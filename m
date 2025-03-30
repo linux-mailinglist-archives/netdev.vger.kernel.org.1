@@ -1,55 +1,56 @@
-Return-Path: <netdev+bounces-178220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C51EA75998
-	for <lists+netdev@lfdr.de>; Sun, 30 Mar 2025 12:34:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 374D5A759A4
+	for <lists+netdev@lfdr.de>; Sun, 30 Mar 2025 12:41:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B5741658CB
-	for <lists+netdev@lfdr.de>; Sun, 30 Mar 2025 10:34:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9544518881E7
+	for <lists+netdev@lfdr.de>; Sun, 30 Mar 2025 10:41:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 686FB1AF0AF;
-	Sun, 30 Mar 2025 10:34:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7882F19D067;
+	Sun, 30 Mar 2025 10:41:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="E8lzzqlY"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="PGU9swEi"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7004211CAF;
-	Sun, 30 Mar 2025 10:34:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6D7BF9CB;
+	Sun, 30 Mar 2025 10:41:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743330853; cv=none; b=WZDfkXdqnvOKPCt2Bg02WtnoKsSni/3OP9KIyNgCyJ8Na/JhMyea1SSHstEut2witrHuIBvnvPYJcMI5kdSTKawwtFBtREeNyp5YqAdcF6BSqFbW5ODj/nU6lhhMmVKXH9SEbnFqFroAdK1o8fKE6Cx0bQ4XP5MQUANSemz+dD8=
+	t=1743331267; cv=none; b=ST8oNkkuZeUMext3rBagvJ2W5S8PbZw1/rtm+wmTUelDsAKC4aWX4aOLzpw7tB/puXz5I2YsDG3HVxqZyAAwAA4WVogwiJ13TwaIzBX5DUPHfrsOVMkNr9C9y/f4cut7kHkDNcJ46qevB7eXMMkeejhqj4IKiX3jWwsPgofqS3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743330853; c=relaxed/simple;
+	s=arc-20240116; t=1743331267; c=relaxed/simple;
 	bh=/Q3k5X2P4dwXQISDL+GBAhFuGgVmsV1ZMtOfAK/F7aQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TgRZBkOmZjSpeDkVqLjhSWWf14omoZA8930wiArWgH7YrUkrQyfVolEyK9Qw+Pe+JovJ/fpRsdudRgBYQ2VlEMeiyPILAS4lD17j0EqiqbtHcKTahPN9rw6jT1eb+wOi6uQBdHkxnocDChU0LloGUeEjDKxmM3g0FirVJ3RxFyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=E8lzzqlY; arc=none smtp.client-ip=117.135.210.5
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=BAMbqORwr3jig5zAsxfZq4vpMp90Z9fSRPGp/NHAdMVNBqvU+frKWig2kCIq6MCIUd8Ckhsq3X9J23SvjpJBVQN2hZ5GYw0iJy/Tm1+86BJfNYdPxrs6UKH7oLQ+K/WAgghJqq6kKm3ylcbNyKPwIt8yoGzgqZINaF67cbLGHVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=PGU9swEi; arc=none smtp.client-ip=220.197.31.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
 	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=R/OU0
-	V8NdoaJXsUCiLUPKOq7COZkSQ1mwl2m2pWiWKA=; b=E8lzzqlYztuKqKaYYo1Ah
-	hYhIoXtLhNQz29V8PYzfAUHoNBB/whZyrvaBRRtfbQTWkWhyydN+PZn98GeuchsZ
-	2a5gp4VOlIEBLUQDiHvkmj7OJrcuBtS65F5Mw+yAc+4LKCJj4lUsDAZ5OuKTWerl
-	ndv4fwz3bC/YQ9wW0IJc+U=
+	V8NdoaJXsUCiLUPKOq7COZkSQ1mwl2m2pWiWKA=; b=PGU9swEi2TtrVi8qIEJaa
+	X2mISGL69kKvbKDpyxZr5eNup951wqhAY9NMQpCP7p0GQrxUra129YFYnClC9BRn
+	PpQM18uJM0DaDUHlxo7c21hbR0vOOPc38YlukzUpq++K42XdG7Nhk2klJcfGHJce
+	hoBuOEV2L13fhiR/cniag4=
 Received: from WIN-S4QB3VCT165.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wAXj9gEHulnSK1lCw--.60329S4;
-	Sun, 30 Mar 2025 18:33:41 +0800 (CST)
+	by gzsmtp2 (Coremail) with SMTP id PSgvCgDXplOpH+lnS_h0Aw--.46366S4;
+	Sun, 30 Mar 2025 18:40:41 +0800 (CST)
 From: Debin Zhu <mowenroot@163.com>
-To: linux-security-module@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	selinux@vger.kernel.org,
-	paul@paul-moore.com,
-	linux-kernel@vger.kernel.org,
+To: paul@paul-moore.com
+Cc: 1985755126@qq.com,
 	kuba@kernel.org,
-	Debin Zhu <mowenroot@163.com>,
-	Bitao Ouyang <1985755126@qq.com>
+	linux-kernel@vger.kernel.org,
+	mowenroot@163.com,
+	netdev@vger.kernel.org
 Subject: [PATCH v2] netlabel: Fix NULL pointer exception caused by CALIPSO on IPv4 sockets
-Date: Sun, 30 Mar 2025 18:33:39 +0800
-Message-Id: <20250330103339.30794-1-mowenroot@163.com>
+Date: Sun, 30 Mar 2025 18:40:39 +0800
+Message-Id: <20250330104039.31595-1-mowenroot@163.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <CAHC9VhRvrOCqBT-2xRF5zrkeDN3EvShUggOF=Uh47TXFc5Uu1w@mail.gmail.com>
+References: <CAHC9VhRvrOCqBT-2xRF5zrkeDN3EvShUggOF=Uh47TXFc5Uu1w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,12 +58,12 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wAXj9gEHulnSK1lCw--.60329S4
+X-CM-TRANSID:PSgvCgDXplOpH+lnS_h0Aw--.46366S4
 X-Coremail-Antispam: 1Uf129KBjvJXoWxCr1rtry3tF4kurW7Cry5twb_yoWrCryDpF
 	yDKan8A348AFWUWws3XFWkCrWSkF4kKF17urWxAw4YkasrGr18Ja48KrWIya4ayFZrKrZ5
 	Xr48ta1F9w4kC3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRebytUUUUU=
-X-CM-SenderInfo: pprzv0hurr3qqrwthudrp/1tbiEwwelGfmvP2sogACsZ
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRco7iUUUUU=
+X-CM-SenderInfo: pprzv0hurr3qqrwthudrp/1tbiXwkglGfpFMS9dQABs1
 
 Vulnerability Description:
 
