@@ -1,94 +1,96 @@
-Return-Path: <netdev+bounces-178231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFDE4A75D0B
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 00:01:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE2C2A75D4C
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 01:20:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FCDA16764F
-	for <lists+netdev@lfdr.de>; Sun, 30 Mar 2025 22:01:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EBBE16868D
+	for <lists+netdev@lfdr.de>; Sun, 30 Mar 2025 23:20:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11BFC1C5D7B;
-	Sun, 30 Mar 2025 22:01:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6940B155393;
+	Sun, 30 Mar 2025 23:19:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qngwqqaa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KJBk8GE2"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4863FE4;
-	Sun, 30 Mar 2025 22:01:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E35A20E6;
+	Sun, 30 Mar 2025 23:19:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743372105; cv=none; b=lok9/LwCChvpgrA4HQ0nPr4nXMCjzZPj4yAqucUPg/AbU+Ea1KtLbgrYsjv5tyhcxLSkmGFUZ/Cr6yyns6x/3LTRHFQNeXy4wwtnURdcl15wVWTTMtyTzSQ6DhuGw/YU9eYxX8uH6vesZmDLc56Q3bG6sGHlPYfjmJkb3rdGkbs=
+	t=1743376798; cv=none; b=urUVUObh/cw4bHu88tawgNwvoAjFXEjsLodhbi12AZRv1jldwRwv8e6+bVYTOnvoETYExt5iyR+sah8jDiHmJKFU79kjtsoqZoakTLn9KE/nKzGXoN++OldjYoNHrwmmy7v9IXThu1mWOujBH/hZImIaWstU/3aXvE8xbqT2/aM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743372105; c=relaxed/simple;
-	bh=Tkszc10LvC0X2gbLARjsGrXZv7vlFk8/4HEG3JZn8mo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XGSDFB+lPfc9i5DrUJ6pnenmnhoApsbhv+1df+Nyrv1atUbB8bPoQXYE5iw9bVvwQp32BsQMZX7W99K5gK0/eaN0uMSpQt8Ibcy9/95Fm9UF9yIZGN08a2/Yp1Bl41TyRIx+AxzfJCnZ34H0mfX2t5ZOr6or87IBF4W+P4K5ghU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qngwqqaa; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=kwMfUz4DFsWidBocR7kOt39zwWI/U4VW18DMFO9dYPI=; b=qngwqqaaexO6eKBiK3FhtSkgdL
-	MSs+nzF88N5K+EnT0ayn42AcEt1Tzd/rNS0zSettN7iHSvSTi0GDIgh/3ttm0X1eKnUb4BifKp7Kq
-	Gq8FPlSLKGduevzveO93LqEZAsb+UOabQlZ62bvZcUYAh+P2QGohtxJ/5jZNFbWqPAeQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tz0iW-007XLD-KA; Mon, 31 Mar 2025 00:01:20 +0200
-Date: Mon, 31 Mar 2025 00:01:20 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 4/4] net: mtip: The L2 switch driver for imx287
-Message-ID: <022e19f5-9a9c-42eb-9358-a6fe832e8f5f@lunn.ch>
-References: <20250328133544.4149716-1-lukma@denx.de>
- <20250328133544.4149716-5-lukma@denx.de>
- <3648e94f-93e6-4fb0-a432-f834fe755ee3@lunn.ch>
- <20250330222041.10fb8d3d@wsk>
+	s=arc-20240116; t=1743376798; c=relaxed/simple;
+	bh=BtYLq95+loFF2wAwBtrJXi2RCQy7Vj59Jd2Eh1mWJJo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=sWgJOebqxR1wKdCwsOdcao27lno9NfSEBLItTslEueNi2QysYjvmzW2PFIHqIvK0RaB2ywg2bRTU1tf0O0ZPSNyA8L9WuMXkx+ujC68q7DQ+DgoUotJkkislEDsvYu4VyloGXb078aw6+sTv2zrWg3bY/eN/ofYiP/567OZmt8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KJBk8GE2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1842C4CEDD;
+	Sun, 30 Mar 2025 23:19:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743376797;
+	bh=BtYLq95+loFF2wAwBtrJXi2RCQy7Vj59Jd2Eh1mWJJo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KJBk8GE2+/BXwguvXiwN/v8lYfT2ywtP7S+D/rOy4oW4YmwqhwtwfoMPPqwbMeOHR
+	 +3rhdec6+raiJLjO+jiLE+oI9YhtTRVF7XCDjMFVwnFP+XNQnlEN80l3hzklr3n1VY
+	 ieLFExOUrQ0iZj6alEq+i4er5a2f+Xv2CSsq9m8Moey4HZUBxUn6b85oEhzOixm23B
+	 WCLLsN17tNS0wqdYCcgnEbDSZZYETPsw/hqAV3woEYpkROhTircZ2gS4J8vhI1P/HN
+	 U65j1smzvkah3I8P1jzJpVLhDk04l6/WuwmgbSv8Zd34fjUL4CHqdpW9hMlKUJJlJY
+	 gi5KfHWumfPfQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E26380AA7A;
+	Sun, 30 Mar 2025 23:20:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250330222041.10fb8d3d@wsk>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next] selftests/bpf: Fix tests after change in struct file
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174337683428.3617599.346257026297188434.git-patchwork-notify@kernel.org>
+Date: Sun, 30 Mar 2025 23:20:34 +0000
+References: <20250327185528.1740787-1-song@kernel.org>
+In-Reply-To: <20250327185528.1740787-1-song@kernel.org>
+To: Song Liu <song@kernel.org>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, kernel-team@meta.com,
+ kuba@kernel.org
 
-> > > +	/* Prevent a state halted on mii error */
-> > > +	if (fep->mii_timeout && phy_dev->state == PHY_HALTED) {
-> > > +		phy_dev->state = PHY_UP;
-> > > +		goto spin_unlock;
-> > > +	}  
-> > 
-> > A MAC driver should not be playing around with the internal state of
-> > phylib.
+Hello:
+
+This patch was applied to bpf/bpf.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
+
+On Thu, 27 Mar 2025 11:55:28 -0700 you wrote:
+> Change in struct file [1] moves f_ref to the 3rd cache line. This makes
+> deferencing file pointer as a 8-byte variable invalid, because
+> btf_struct_walk() will walk into f_lock, which is 4-byte long.
 > 
-> Ok, I've replaced it with PHY API calls (phy_start() and
-> phy_is_started()).
+> Fix the selftests to deference the file pointer as a 4-byte variable.
+> 
+> [1] commit e249056c91a2 ("fs: place f_ref to 3rd cache line in struct
+>                           file to resolve false sharing")
+> Reported-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Song Liu <song@kernel.org>
+> 
+> [...]
 
-phy_start() and phy_stop() should be used in pairs. It is not good to
-call start more often than stop.
+Here is the summary with links:
+  - [bpf-next] selftests/bpf: Fix tests after change in struct file
+    https://git.kernel.org/bpf/bpf/c/bd06a13f44e1
 
-What exactly is going on here? Why would there be MII errors?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-	Andrew
+
 
