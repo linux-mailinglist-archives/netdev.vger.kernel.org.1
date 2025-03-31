@@ -1,77 +1,141 @@
-Return-Path: <netdev+bounces-178301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84373A76724
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 15:53:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 342D9A76755
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 16:03:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD5FD1884368
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 13:54:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9D7116891B
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 14:03:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66C51211A35;
-	Mon, 31 Mar 2025 13:53:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC614213E66;
+	Mon, 31 Mar 2025 14:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="1crgzpip"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dVJ2J1mm"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DBB83234;
-	Mon, 31 Mar 2025 13:53:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F6B22135CE;
+	Mon, 31 Mar 2025 14:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743429229; cv=none; b=XXudRC3ynA7bTjDnUhOwqmQdBIHWVpj4ZfbYOTBECNjuauNtvGyyycDFcc53cLvm3clVf8GrEXBiNDQVxUWsXuaUs6YaWZx5K8Y9apn6ZFt3PreS+ZL/s4qhHGISRRxkT8x/hPth5Bap/93PjVt7OBEMdaDnmFh42npdUkTbxCg=
+	t=1743429802; cv=none; b=SzK80erkfS3sx0jr0bIWvjcC+L2JehLqwybp6L+7AModsYTjK7RmmfQ2Wy5WsUrpASkUdRqX79ZTQNWyOqcUcbKhyDG3u0xIFZ3gr1gJ108kOSunRgi82GW1h9iMbAYMXl8QkxioIidtS5LBC0UyN4uIVyJJP6MGb7Rh4I7WqV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743429229; c=relaxed/simple;
-	bh=1bdgB4pjkJgOiAEZ3O0j60c0NykT/heXgoCddgtisSQ=;
+	s=arc-20240116; t=1743429802; c=relaxed/simple;
+	bh=Vad6Bngms7LR/SnVaW/fBqPRddI72xsArTDQuo7o+yQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P/XEPkTVqQ7niXWU0KviChRnfwTlpNFaQ0pMI36SB2q8U7vC3GArORoE1deiDySTpgmUyZpjwZP3CkBmKsfX83GnLcRlm3hCR5FJOScRXT2bf+TwtLwGFZ5B66Ux0/k2uDTnQ1YmZp1VWoo3MdKrWjvukSmWMxmTUd60/dJ1Z9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=1crgzpip; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=J+9FHX6rBVj88oLrVg3eeFc6dbE26aHLfHIwgVKUO0Q=; b=1crgzpiphNYZZMz+GjSnJxI47/
-	e/wBQT5YUXA7IQOngX6lT3BH2o0OmevomoPSt24xcmo7AMdDP6sMxOlA6msEwtKg5lTNecEG3zBgP
-	kppgV+v1toN5MnPPbjcNc8K2ELoK2CkqXTB1HvrzthnCPpRohtI22a6DtieBEq8MfrDhz0macOk9N
-	wTq803aLg3b+QshUhTKj9IsTc5NzR9vUROvprRfSmGp6ZE43yY5SIEQYUVpakDRz7lznUpX/5x/Dx
-	HXS94PFQ4trFXKc9RzXNSyekPMQqCmn+TmhszUYebpK3nMvTs4dd6gq+EnBfXDllAf/utSY5SkQua
-	FGUJoobA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50846)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tzFa4-00047M-0c;
-	Mon, 31 Mar 2025 14:53:36 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tzFa0-0001j6-2N;
-	Mon, 31 Mar 2025 14:53:32 +0100
-Date: Mon, 31 Mar 2025 14:53:32 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Christian Hewitt <christianshewitt@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Kevin Hilman <khilman@baylibre.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, Da Xue <da@libre.computer>
-Subject: Re: [PATCH v2] net: mdio: mux-meson-gxl: set 28th bit in eth_reg2
-Message-ID: <Z-qeXK2BlCAR1M0F@shell.armlinux.org.uk>
-References: <20250331074420.3443748-1-christianshewitt@gmail.com>
- <17cfc9e2-5920-42e9-b934-036351c5d8d2@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=H+jEFnnQAw/LZkVJ9Ul0rE0tg59QDOwPcFLlon5lk1uiEjCqU9B7quqhbNI5Q19eLZw6paixVM42S68R9ZdU+UtOlsxeM+z8rW8160NCiEJOiZIcSfmTBXptF382YVQ8HtfCe/kGT1HyxdJjCQMEFS32MRiDsZ3d/O/7JPGMxug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dVJ2J1mm; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6eb16dfa988so42503506d6.2;
+        Mon, 31 Mar 2025 07:03:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743429800; x=1744034600; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WeVIRckOKHplZvokKLugkVq4VXYBWlOKbJnfEv8Is8M=;
+        b=dVJ2J1mmT0DYRMyn2es8D8OfsV7cxTutTknMZCMoqIHvkY7lFeejQ9z5D00+LldRbT
+         7vg6SVaEC+D29AHT2h02B0Xhbz/pPV/vhpYsIzGmwAvjhE6SeFGbhwaBOltG/13QIiqd
+         UACVbNO0apCCPdgOyC2v9kSFICjLUDPu8Dk0PgULgMFiISLjA7IVJXJWyUd+pxrzHjyY
+         8MoGEN/J7onHyxEtW9SaOn2vipjpHFUSjDZF8PtRIf0/+m3EUvJcBg2gSfBivBXWTACG
+         Oa17JKSGhT6yif+4PpHHKaC6MMleiuWsEQMLQAiSAwUuipwtLpJXejaRD8rTbZBaSrRF
+         ufTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743429800; x=1744034600;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WeVIRckOKHplZvokKLugkVq4VXYBWlOKbJnfEv8Is8M=;
+        b=PXDBNVx60eATMdbvLfMoIff9JfwW1AEBKbNf4WZY8TpoIEWAb4LUTKw1Prdot3ayFi
+         VszoSniDL+5uMPO/gaPW1sEtaT89Wow2km3rgL5XwnZtL9Zkl9ht0KQ7FfkvFNTA7Jk+
+         6nofpbuvEWqNEy79il4LaMVqaTxdWZzPeLJxqcZ5RlY3Zt0HO7nzuJcmXHolbL+m/i0A
+         CJILQ1TuXiyjVkW+1KZkb0gKBpgrfDDzc1inOOextQmm7xRo+IA0Gz5/kjs8V43MF/+0
+         zcWZdGCcxpzLQvr79bVl3FElBp2xQj7hTrfFAv48CR3W6A/jf0WJQamf0rTXPDhzrLMW
+         Jj6w==
+X-Forwarded-Encrypted: i=1; AJvYcCW3KDKTMQIedlJuCrh5wxpWeDnx1/B6cy+CgD5Ov5lcZUvizHykAXcdmPreMV0nq51/S/cw9rXRibMXoc0=@vger.kernel.org, AJvYcCWTLctxCTUsnzmm1bjWjw0dCBouYVbDgToAxU2kUhyLLPE+UuCrvaXH6Dm9YuZPVEHzhdnqWuHCCHYlBzauMwc=@vger.kernel.org, AJvYcCX/NWh+Zp70TMYhoWBIDEpS5HMwfdMMmcz+ehyt5GgbDXv2639is2Z2XZQO5RRAzhRpiRoFZJX/@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9DL+Pakp9CVyRRgAsUK6ihnJnC0actne0heSfJ8gX/KYofZso
+	gbMwKbgi0ifZKlMWCoBEKIbE3oE2DEGAXnse7/mrrNchamDvc8yX
+X-Gm-Gg: ASbGncu3QR9nhzQKoLEHcVMY++OA+t/59jXmDjnaSlLr7vYe9r0HGQTsDA/0U8ZTRo6
+	DGlrhsjl3YWNZTG03QxK9ZrFidjFFtwkaAPr1OjuYe7ilYNKURAezw5HZ3+ZrmFidvkpClNK/QT
+	cp2roAL2Uy/wktl5nZdZkjLJHawoXQceYOO8T6ndmNf8SBLhI6jGe4YKmI/4FNeak6kXpxh8jwT
+	S/Uxav13nrgL8t6peXwx8CnMBoG5RLDYp2dLVXXukBzSZ7cYJLLN2rRPqHEAQXH46u4geyacG3C
+	9BYsZnr2WKMsKrweDu5q4JV8e8DKRMJ/exkAKccbzwgpS5E33YhQuturi5nRaYX2Fp5RweAcH+s
+	5OEp2BEWdm91kWr4odQueDCAC8bA5mAYr1S8=
+X-Google-Smtp-Source: AGHT+IEDlEMGN6Y4UOiJurFexdK8lqE3yLdBlGqLJ0B32vylkCFGY21A6PxaVo7GzxXzrVRSyGSlLQ==
+X-Received: by 2002:a05:6214:408:b0:6eb:28e4:8516 with SMTP id 6a1803df08f44-6eed6210e02mr137625586d6.33.1743429799321;
+        Mon, 31 Mar 2025 07:03:19 -0700 (PDT)
+Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6eec9771b63sm46984486d6.85.2025.03.31.07.03.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Mar 2025 07:03:18 -0700 (PDT)
+Received: from phl-compute-13.internal (phl-compute-13.phl.internal [10.202.2.53])
+	by mailfauth.phl.internal (Postfix) with ESMTP id B4DB0120007C;
+	Mon, 31 Mar 2025 10:03:17 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-13.internal (MEProxy); Mon, 31 Mar 2025 10:03:17 -0400
+X-ME-Sender: <xms:paDqZ1WmUHDn8KYoEyGyxluVxQOfPkMCMs3Bwv748hxXqB7sBX9nXA>
+    <xme:paDqZ1lMGZy-468fiwH6f-JvSFBNbNYuDHo9ukcKu1lfK6tdRjb7lXWXBFOgawPIq
+    _XBQvVWBASFnwM03w>
+X-ME-Received: <xmr:paDqZxbQybjNBvaaNM90eHs_3vYXJzU1EmGSZHXyfzmCQyNStkpMEAg0>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddukedtudduucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
+    vdenucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrih
+    hlrdgtohhmqeenucggtffrrghtthgvrhhnpeelhfehhfelhefgvddtheejleejledvleel
+    geffleelkeeutdeikeevffffteefheenucffohhmrghinhepkhgvrhhnvghlrdhorhhgpd
+    hgihhthhhusgdrtghomhdprhhushhtqdhfohhrqdhlihhnuhigrdgtohhmpdduiedrhiho
+    uhenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegsoh
+    hquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdeiledvgeehtdeigedq
+    udejjeekheehhedvqdgsohhquhhnrdhfvghngheppehgmhgrihhlrdgtohhmsehfihigmh
+    gvrdhnrghmvgdpnhgspghrtghpthhtohepfeegpdhmohguvgepshhmthhpohhuthdprhgt
+    phhtthhopegrrdhhihhnuggsohhrgheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepfh
+    hujhhithgrrdhtohhmohhnohhrihesghhmrghilhdrtghomhdprhgtphhtthhopehtghhl
+    gieslhhinhhuthhrohhnihigrdguvgdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlh
+    esvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehruhhsthdqfhhorhdqlhhi
+    nhhugiesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvh
+    hgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgt
+    hhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtth
+    hopehtmhhgrhhoshhssehumhhitghhrdgvughu
+X-ME-Proxy: <xmx:paDqZ4XJDCyVDshfxzc6AUdnSEei20UIM9yvC2HQ6wxIEhRn1ODQdg>
+    <xmx:paDqZ_kPX5ekefWznYk7mrrWDjkLEB13wbiJ3Jq4QXpUXdZshbqHcQ>
+    <xmx:paDqZ1cfRgSUUUfw61jTfxxHP6E5yd4nNsGIU85C1uxumcOQcxkQOA>
+    <xmx:paDqZ5ET1ZrRzDoM6YZaYKsfEqwskSmWR3JL2p4JJn7tAquiklIrGw>
+    <xmx:paDqZ5lnqixO2fHtluENiEMSxVpZotDtw6ObuFX26eY94tVoq128AfzE>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 31 Mar 2025 10:03:16 -0400 (EDT)
+Date: Mon, 31 Mar 2025 07:03:15 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: Andreas Hindborg <a.hindborg@kernel.org>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, tglx@linutronix.de,
+	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
+	netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+	gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+	a.hindborg@samsung.com, aliceryhl@google.com,
+	anna-maria@linutronix.de, frederic@kernel.org, arnd@arndb.de,
+	jstultz@google.com, sboyd@kernel.org, mingo@redhat.com,
+	peterz@infradead.org, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+	vschneid@redhat.com, tgunders@redhat.com, me@kloenk.dev,
+	david.laight.linux@gmail.com
+Subject: Re: [PATCH v11 6/8] MAINTAINERS: rust: Add new sections for
+ DELAY/SLEEP and TIMEKEEPING API
+Message-ID: <Z-qgo5gl6Qly-Wur@Mac.home>
+References: <87jz8ichv5.fsf@kernel.org>
+ <87o6xu15m1.ffs@tglx>
+ <67ddd387.050a0220.3229ca.921c@mx.google.com>
+ <20250322.110703.1794086613370193338.fujita.tomonori@gmail.com>
+ <8n9Iwb8Z00ljHvj7jIWUybn9zwN_JLhLSWrljBKG9RE7qQx4MTMqUkTJeVeBZtexynIlqH1Lgt6g0ofLLwnoyQ==@protonmail.internalid>
+ <Z96zstZIiPsP4mSF@Mac.home>
+ <871puoelnj.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,53 +144,160 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <17cfc9e2-5920-42e9-b934-036351c5d8d2@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <871puoelnj.fsf@kernel.org>
 
-On Mon, Mar 31, 2025 at 03:43:26PM +0200, Andrew Lunn wrote:
-> On Mon, Mar 31, 2025 at 07:44:20AM +0000, Christian Hewitt wrote:
-> > From: Da Xue <da@libre.computer>
-> > 
-> > This bit is necessary to enable packets on the interface. Without this
-> > bit set, ethernet behaves as if it is working, but no activity occurs.
-> > 
-> > The vendor SDK sets this bit along with the PHY_ID bits. U-boot also
-> > sets this bit, but if u-boot is not compiled with networking support
-> > the interface will not work.
-> > 
-> > Fixes: 9a24e1ff4326 ("net: mdio: add amlogic gxl mdio mux support");
-> > Signed-off-by: Da Xue <da@libre.computer>
-> > Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
-> > ---
-> > Resending on behalf of Da Xue who has email sending issues.
-> > Changes since v1 [0]:
-> > - Remove blank line between Fixes and SoB tags
-> > - Submit without mail server mangling the patch
-> > - Minor tweaks to subject line and commit message
-> > - CC to stable@vger.kernel.org
-> > 
-> > [0] https://patchwork.kernel.org/project/linux-amlogic/patch/CACqvRUbx-KsrMwCHYQS6eGXBohynD8Q1CQx=8=9VhqZi13BCQQ@mail.gmail.com/
-> > 
-> >  drivers/net/mdio/mdio-mux-meson-gxl.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/net/mdio/mdio-mux-meson-gxl.c b/drivers/net/mdio/mdio-mux-meson-gxl.c
-> > index 00c66240136b..fc5883387718 100644
-> > --- a/drivers/net/mdio/mdio-mux-meson-gxl.c
-> > +++ b/drivers/net/mdio/mdio-mux-meson-gxl.c
-> > @@ -17,6 +17,7 @@
-> >  #define  REG2_LEDACT		GENMASK(23, 22)
-> >  #define  REG2_LEDLINK		GENMASK(25, 24)
-> >  #define  REG2_DIV4SEL		BIT(27)
-> > +#define  REG2_RESERVED_28	BIT(28)
+On Sat, Mar 22, 2025 at 11:40:21PM +0100, Andreas Hindborg wrote:
+> Hi All,
 > 
-> It must have some meaning, it cannot be reserved. So lets try to find
-> a better name.
+> "Boqun Feng" <boqun.feng@gmail.com> writes:
+> 
+> > On Sat, Mar 22, 2025 at 11:07:03AM +0900, FUJITA Tomonori wrote:
+> >> Thank you all!
+> >>
+> >> On Fri, 21 Mar 2025 14:00:52 -0700
+> >> Boqun Feng <boqun.feng@gmail.com> wrote:
+> >>
+> >> > On Fri, Mar 21, 2025 at 09:38:46PM +0100, Thomas Gleixner wrote:
+> >> >> On Fri, Mar 21 2025 at 20:18, Andreas Hindborg wrote:
+> >> >> >> Could you add me as a reviewer in these entries?
+> >> >> >>
+> >> >> >
+> >> >> > I would like to be added as well.
+> >> >>
+> >> >> Please add the relevant core code maintainers (Anna-Maria, Frederic,
+> >> >> John Stultz and myself) as well to the reviewers list, so that this does
+> >> >> not end up with changes going in opposite directions.
+> >> >>
+> >> >
+> >> > Make sense, I assume you want this to go via rust then (althought we
+> >> > would like it to go via your tree if possible ;-))?
+> >>
+> >
+> > Given Andreas is already preparing the pull request of the hrtimer
+> > abstraction to Miguel, and delay, timekeeping and hrtimer are related,
+> > these timekeeping/delay patches should go via Andreas (i.e.
+> > rust/hrtimer-next into rust/rust-next) if Thomas and Miguel are OK with
+> > it. Works for you, Andreas? If so...
+> >
+> >> Once the following review regarding fsleep() is complete, I will submit
+> >> patches #2 through #6 as v12 for rust-next:
+> >>
+> >> https://lore.kernel.org/linux-kernel/20250322.102449.895174336060649075.fujita.tomonori@gmail.com/
+> >>
+> >> The updated MAINTAINERS file will look like the following.
+> >>
+> >> diff --git a/MAINTAINERS b/MAINTAINERS
+> >> index cbf84690c495..858e0b34422f 100644
+> >> --- a/MAINTAINERS
+> >> +++ b/MAINTAINERS
+> >> @@ -10370,6 +10370,18 @@ F:	kernel/time/timer_list.c
+> >>  F:	kernel/time/timer_migration.*
+> >>  F:	tools/testing/selftests/timers/
+> >>
+> >> +DELAY AND SLEEP API [RUST]
+> >> +M:	FUJITA Tomonori <fujita.tomonori@gmail.com>
+> >> +R:	Boqun Feng <boqun.feng@gmail.com>
+> >> +R:	Andreas Hindborg <a.hindborg@kernel.org>
+> >
+> > ... this "R:" entry would be "M:",
+> >
+> >> +R:	Anna-Maria Behnsen <anna-maria@linutronix.de>
+> >> +R:	Frederic Weisbecker <frederic@kernel.org>
+> >> +R:	Thomas Gleixner <tglx@linutronix.de>
+> >> +L:	rust-for-linux@vger.kernel.org
+> >> +L:	linux-kernel@vger.kernel.org
+> >
+> > +T:	git https://github.com/Rust-for-Linux/linux.git hrtimer-next
+> >
+> >> +S:	Maintained
+> >
+> > I will let Andreas decide whether this is a "Supported" entry ;-)
+> >
+> >> +F:	rust/kernel/time/delay.rs
+> >> +
+> >>  HIGH-SPEED SCC DRIVER FOR AX.25
+> >>  L:	linux-hams@vger.kernel.org
+> >>  S:	Orphan
+> >> @@ -23944,6 +23956,17 @@ F:	kernel/time/timekeeping*
+> >>  F:	kernel/time/time_test.c
+> >>  F:	tools/testing/selftests/timers/
+> >>
+> >> +TIMEKEEPING API [RUST]
+> >
+> > and similar things for this entry as well.
+> >
+> >> +M:	FUJITA Tomonori <fujita.tomonori@gmail.com>
+> >> +R:	Boqun Feng <boqun.feng@gmail.com>
+> >> +R:	Andreas Hindborg <a.hindborg@kernel.org>
+> >> +R:	John Stultz <jstultz@google.com>
+> >> +R:	Thomas Gleixner <tglx@linutronix.de>
+> >
+> > +R:      Stephen Boyd <sboyd@kernel.org>
+> >
+> > ?
+> >
+> >> +L:	rust-for-linux@vger.kernel.org
+> >> +L:	linux-kernel@vger.kernel.org
+> >> +S:	Maintained
+> >> +F:	rust/kernel/time.rs
+> >> +
+> >
+> > Tomo, let's wait for Andreas' rely and decide how to change these
+> > entries. Thanks!
+> 
+> My recommendation would be to take all of `rust/kernel/time` under one
+> entry for now. I suggest the following, folding in the hrtimer entry as
+> well:
+> 
+> DELAY, SLEEP, TIMEKEEPING, TIMERS [RUST]
+> M:	Andreas Hindborg <a.hindborg@kernel.org>
 
-Indeed, that was my thoughts as well, but Andrew got his reply in
-before I got around to replying!
+Given you're the one who would handle the patches, I think this make
+more sense.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> R:	Boqun Feng <boqun.feng@gmail.com>
+> R:	FUJITA Tomonori <fujita.tomonori@gmail.com>
+
+Tomo, does this look good to you?
+
+> R:	Lyude Paul <lyude@redhat.com>
+> R:	Frederic Weisbecker <frederic@kernel.org>
+> R:	Thomas Gleixner <tglx@linutronix.de>
+> R:	Anna-Maria Behnsen <anna-maria@linutronix.de>
+> R:	John Stultz <jstultz@google.com>
+
+We should add:
+
+R:      Stephen Boyd <sboyd@kernel.org>
+
+If Stephen is not against it.
+
+> L:	rust-for-linux@vger.kernel.org
+> S:	Supported
+> W:	https://rust-for-linux.com
+> B:	https://github.com/Rust-for-Linux/linux/issues
+> T:	git https://github.com/Rust-for-Linux/linux.git rust-timekeeping-next
+> F:	rust/kernel/time.rs
+> F:	rust/kernel/time/
+> 
+> If that is acceptable to everyone, it is very likely that I can pick 2-6
+> for v6.16.
+> 
+
+You will need to fix something because patch 2-6 removes `Ktime` ;-)
+
+> I assume patch 1 will go through the sched/core tree, and then Miguel
+> can pick 7.
+> 
+
+Patch 1 & 7 probably should go together, but we can decide it later.
+
+Regards,
+Boqun
+
+> Best regards,
+> Andreas Hindborg
+> 
+> 
+> 
 
