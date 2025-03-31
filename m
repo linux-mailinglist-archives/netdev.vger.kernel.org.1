@@ -1,151 +1,217 @@
-Return-Path: <netdev+bounces-178256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4EC0A7604A
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 09:44:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38493A760B6
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 10:00:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35FEB3A7D7A
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 07:44:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 566501888831
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 08:00:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 017F31A3150;
-	Mon, 31 Mar 2025 07:44:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36F741C5D4E;
+	Mon, 31 Mar 2025 07:59:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NwxUtLTB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g3qY9BXL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34A7213D8A4;
-	Mon, 31 Mar 2025 07:44:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81FA17083C
+	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 07:59:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743407069; cv=none; b=aE28NAYH1E/jl326v+ZyjSSARJ5HvU7o+AzVEvxP9TIp6txGsdpxxv3WKLdzBKgUAWhs7bfokiT9BFlAnx/virlnMlmghbj0vwvgVpIB6nqHotatevcJb/sL9lxwDj32XqHLeT6RHbNVTezcMihwfevPL3HSgHtSpNpnT07zdpE=
+	t=1743407996; cv=none; b=D7uMgAM7YhLuNobDWCP6kPDZWBj5tcMOQTn9PGgGAv2wEf+V7xYM9491x5pWAKl9dxyUZyQTeKe5GrSYLa0XCIjEbot+4fYjiWJYx38j31u/ecvRWA0fP/YBb7JVsdcz37eg6NRDlcRXV2Y/nIe1pvMxQgFu4lQY1C2bYyNehgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743407069; c=relaxed/simple;
-	bh=xmT1Q5a6AFUPK9f/ucAFOyzxGK4M6ko0iruMsYTwOog=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kWIk0Y5J5VuxeMioxdUYierfYJasQYC9aag3ZmbAANOgcE5hVju0q3Ta517ErRWrS5J9uam8qLdidMV7djNlksnrIm+KATaABtGfDTY05eZRjrKQj913YJ+9iopGxDTA9bUqyuUPnynboMIQlEXVaFyUDKKKs1H/DOfEXpgNbnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NwxUtLTB; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43cec5cd73bso26111025e9.3;
-        Mon, 31 Mar 2025 00:44:27 -0700 (PDT)
+	s=arc-20240116; t=1743407996; c=relaxed/simple;
+	bh=Zk5zm2C3bg0Ci1xNcIXMleySnerXShrcl/JW3f6P4wo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=GOwZ5rNV6EXJ2BujG5Fjj/BCYMiLOozGfeAnLkdE7NlCc6S1fqpXTznOma85K6hjp8OxD7AT83OjPzHOteoqUBNL93Y0+XJXz1FMj+RQuJGr5jGBhZ0k2sZ2kvw34qDI/FCKCF+YU84jFXYdrHcGyN/x34+8G9BJ6qxLkHxpTts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g3qY9BXL; arc=none smtp.client-ip=209.85.160.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4769273691dso79387851cf.1
+        for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 00:59:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743407066; x=1744011866; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=B8L3gLHE0iXx8zQGDJ8LlLcTKVC/8dXUo9ajwXYWTFg=;
-        b=NwxUtLTBsC5GdkchlO9r7BjGTBt6UkIcPcs9ls+YjHNpqwtzhdjAtxRLqkiwCOBfAq
-         FSYuwvOLFUzcmObNsqhTz5fBfoAQ5aPnARKu6B8sSis5rlZmRiGpJ3jtFb9pbuMfq3al
-         DrO6SDfAzOl+CuTjF0Z4Mi7qHlHa3oOkND1TFri86eQD73GWS8yIr54RCIX6i65Q52U5
-         YeYYew+JGT6h9Z2fJ2PLbd1lhA+TX/ls2t+v1LQVZiW9yuW1ruM6As4GnLhav0dIKkvA
-         487+9GCaEcY8UpAHR7+4YgpSHzuXXo8NN53eqv99A64QIhUlsn7uEIMw94PlMT21WiOy
-         wA5A==
+        d=google.com; s=20230601; t=1743407991; x=1744012791; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=pSaHw7+7pp4TGXvaWxerphGGl9LOneJTVXKMOlHKAyM=;
+        b=g3qY9BXL13ZUpcMXRRawlNGPm6GPbMaNzRaziNL164EEnEPNr4eEPNshL0ccMTBvm2
+         5Vh5NeK1cwvacyyD16ttIUun9lX76NbfGsk+0mqaJRqErnduMgRwCeNyZj+faKSLSz/g
+         0vgPtvdTS7ldYVVzboGOQn0tX72/q93ymh1pgnYTRnlBl9kmjBo6LFZjBL0NVCoJ9d5P
+         ICtvHW5C6tJ4EoPaaNRUb1S60JW9LNCpWbDw/v6FWBBcdQOwXF17ndciK0KD06NkUr6K
+         Z6+wiMUSR1znir2VfxrSGRrViM2q+qIF4JZ2z+q24wFCGE2G13tjhpIZnIuIlglTqhmG
+         Hhhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743407066; x=1744011866;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=B8L3gLHE0iXx8zQGDJ8LlLcTKVC/8dXUo9ajwXYWTFg=;
-        b=uutd2oy2OTly3p0ypqv4qJgWZ2tzw/0qXDK+Etq76smp6vEye7c9cI+uLYcXAMbMkv
-         4vkyuQf+bS00xBHqVEzVaKhWuwt0Fo8J0Kw20xQbiRN2ttA6bMkZHPXUKd8SYf3+b8wx
-         OqB0KcTEUq8DL3H4hFUqlZKlS9w1frsxuYw5hQgzs7LnPJcjRu0Bdi6HpyA6dlEokXyb
-         6EhQmkpAXB+hB2fS5EJYZjvbB+kjz6N5ZCSrEO2ihOU0lZtw96KxbIL/9inmZU7Vlo7w
-         ErLXAE2Wdy2gtJFz0Fdx01BVm+alr26QhLTzkRaJtjTDHNk5ekDU6ktLHOcT5x7Iz34v
-         XG/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV7xXW4cXXSbWMz3gWBY+du7gpv8PtXYk3/wyMnh187vnVjSwdoFK8b1O2J/+2uMbLlZXVYVCzG@vger.kernel.org, AJvYcCXVaVAis6mKHnxOU7e8pNh+si+dyTh351uKBsyw9vjKs2ApAiUMgMcLBOD5Ttkqdysuj1XCxZLYDzme86A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy53LUtWMSY9HiqNoJQCW6CS6spnoqTSuBHR/S8pjXFyqkMFg3W
-	GWMRGf0qFGHp2mwTPOOYf4ptdhcSWwgshbcOlL069inQMTlLdK9J
-X-Gm-Gg: ASbGnctkJcSUA+2uYnuc/rG7Fs9t5YMimA97a+U3mxTd7VqdPP1cISg8pViedhdaH7U
-	Z/LksQEy98gHa+af1yx3yU1oGw8hCBshpHa00hLU0/0q1CdlmfBbhpUYTgDEhhxgqG3XZMqsn6P
-	iNRPLz50hE1eG8BQ96DTHAHKHPNMZ6TT8jIL4iF9BmFqWq4iZL5tasBUYmFTNhpEX4Ci1mk21rq
-	O9X9XJCTCJFJC/yI7DMJip7fyqUoFyUOTTzjwLdhbg6zTOJ6M5f5H2XnezJF2VRi1SIsAU8qeoQ
-	uhcY8iQQbtGH3m/yWZMn7df6exuSyJSvk/4d8Tyg9H2HHBsiAA==
-X-Google-Smtp-Source: AGHT+IEU6fWpjT/iTPyqpawIrj8kideGZRhmNQegpvlEXo12tPGNrAQ7TR+EVkOdgUcKFpnGqAnuvw==
-X-Received: by 2002:a05:600c:5119:b0:43d:526:e0ce with SMTP id 5b1f17b1804b1-43db62bb97dmr49667695e9.21.1743407066132;
-        Mon, 31 Mar 2025 00:44:26 -0700 (PDT)
-Received: from toolbox.. ([87.200.95.144])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b6588e9sm10812284f8f.14.2025.03.31.00.44.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Mar 2025 00:44:25 -0700 (PDT)
-From: Christian Hewitt <christianshewitt@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Kevin Hilman <khilman@baylibre.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-amlogic@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org,
-	Da Xue <da@libre.computer>
-Subject: [PATCH v2] net: mdio: mux-meson-gxl: set 28th bit in eth_reg2
-Date: Mon, 31 Mar 2025 07:44:20 +0000
-Message-Id: <20250331074420.3443748-1-christianshewitt@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1743407991; x=1744012791;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pSaHw7+7pp4TGXvaWxerphGGl9LOneJTVXKMOlHKAyM=;
+        b=bmgmQ9IDVyfRRkhh3FBPTgKJftx74ZMzN0Eo1bV8X4PjGob/a4yy1VRU8zjxpqR5ow
+         LgfJtTqcJ4ZoTtbPH8dBCNREnZK8LhqeIBNCEkMC4jKHKv6tb+YkbigLHQjiTF0GiB9P
+         hAxRbGzxaO2V1PEHF6GbalYus/ZJJ4YLgYgofca3llkTxDW2HOoXqCkI4LwhZkK1kwRr
+         YkGPNcLMIkmhPJEV398lbxFJLZgHmgRjt7+2X4/yo+fk3oR/cAnu7JVGywAB1OWxaJzV
+         cDOfE0xPbn7J5cDIsk89/zU5vk+Co6HcG9/JKnOof3j7x2/+H0kg3EfIfFTb4xJd1UZu
+         3i1A==
+X-Forwarded-Encrypted: i=1; AJvYcCXYwMOChaOGPB0r9WYt1//2eBMH8tzK83JJ/TE1hfA8kIQuOXlFj0piARG/Gw+kzqbSUCd1ceE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmNSqCHM3Inul7/z6fYLhnpvcDpBTZT2BF47ZqAEwIGC4ACuDt
+	DBS6rJg4MXq3oLOfG/pus6yZhUAJm/y9bvU+msFGk/CMuv2KQC5je820N1M52JE+PlOCGw2QsAa
+	+NjsSoZsGrQ==
+X-Google-Smtp-Source: AGHT+IHMJRKNTM5kfVhRn4RblysqB5zEQIunU7dsps7ZXL8apK6+c1uwRRG1ClX4BOAFvIA20P5pKy90iAqMdA==
+X-Received: from qtbhg20.prod.google.com ([2002:a05:622a:6114:b0:476:7b50:740])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:ac8:7d44:0:b0:476:b7e2:385c with SMTP id d75a77b69052e-477e4b1e81cmr100827071cf.2.1743407991376;
+ Mon, 31 Mar 2025 00:59:51 -0700 (PDT)
+Date: Mon, 31 Mar 2025 07:59:46 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.472.ge94155a9ec-goog
+Message-ID: <20250331075946.31960-1-edumazet@google.com>
+Subject: [PATCH net] Revert "tcp: avoid atomic operations on sk->sk_rmem_alloc"
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	Willem de Bruijn <willemb@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Da Xue <da@libre.computer>
+This reverts commit 0de2a5c4b824da2205658ebebb99a55c43cdf60f.
 
-This bit is necessary to enable packets on the interface. Without this
-bit set, ethernet behaves as if it is working, but no activity occurs.
+I forgot that a TCP socket could receive messages in its error queue.
 
-The vendor SDK sets this bit along with the PHY_ID bits. U-boot also
-sets this bit, but if u-boot is not compiled with networking support
-the interface will not work.
+sock_queue_err_skb() can be called without socket lock being held,
+and changes sk->sk_rmem_alloc.
 
-Fixes: 9a24e1ff4326 ("net: mdio: add amlogic gxl mdio mux support");
-Signed-off-by: Da Xue <da@libre.computer>
-Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+The fact that skbs in error queue are limited by sk->sk_rcvbuf
+means that error messages can be dropped if socket receive
+queues are full, which is an orthogonal issue.
+
+In future kernels, we could use a separate sk->sk_error_mem_alloc
+counter specifically for the error queue.
+
+Fixes: 0de2a5c4b824 ("tcp: avoid atomic operations on sk->sk_rmem_alloc")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
-Resending on behalf of Da Xue who has email sending issues.
-Changes since v1 [0]:
-- Remove blank line between Fixes and SoB tags
-- Submit without mail server mangling the patch
-- Minor tweaks to subject line and commit message
-- CC to stable@vger.kernel.org
+ include/net/tcp.h       | 15 ---------------
+ net/ipv4/tcp.c          | 18 ++----------------
+ net/ipv4/tcp_fastopen.c |  2 +-
+ net/ipv4/tcp_input.c    |  6 +++---
+ 4 files changed, 6 insertions(+), 35 deletions(-)
 
-[0] https://patchwork.kernel.org/project/linux-amlogic/patch/CACqvRUbx-KsrMwCHYQS6eGXBohynD8Q1CQx=8=9VhqZi13BCQQ@mail.gmail.com/
-
- drivers/net/mdio/mdio-mux-meson-gxl.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/mdio/mdio-mux-meson-gxl.c b/drivers/net/mdio/mdio-mux-meson-gxl.c
-index 00c66240136b..fc5883387718 100644
---- a/drivers/net/mdio/mdio-mux-meson-gxl.c
-+++ b/drivers/net/mdio/mdio-mux-meson-gxl.c
-@@ -17,6 +17,7 @@
- #define  REG2_LEDACT		GENMASK(23, 22)
- #define  REG2_LEDLINK		GENMASK(25, 24)
- #define  REG2_DIV4SEL		BIT(27)
-+#define  REG2_RESERVED_28	BIT(28)
- #define  REG2_ADCBYPASS		BIT(30)
- #define  REG2_CLKINSEL		BIT(31)
- #define ETH_REG3		0x4
-@@ -65,7 +66,7 @@ static void gxl_enable_internal_mdio(struct gxl_mdio_mux *priv)
- 	 * The only constraint is that it must match the one in
- 	 * drivers/net/phy/meson-gxl.c to properly match the PHY.
- 	 */
--	writel(FIELD_PREP(REG2_PHYID, EPHY_GXL_ID),
-+	writel(REG2_RESERVED_28 | FIELD_PREP(REG2_PHYID, EPHY_GXL_ID),
- 	       priv->regs + ETH_REG2);
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index df04dc09c519d850579e22a17f49eeec7d22c607..4450c384ef178e860bd76c23653e9ce9d7a7289b 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -779,7 +779,6 @@ static inline int tcp_bound_to_half_wnd(struct tcp_sock *tp, int pktsize)
  
- 	/* Enable the internal phy */
+ /* tcp.c */
+ void tcp_get_info(struct sock *, struct tcp_info *);
+-void tcp_sock_rfree(struct sk_buff *skb);
+ 
+ /* Read 'sendfile()'-style from a TCP socket */
+ int tcp_read_sock(struct sock *sk, read_descriptor_t *desc,
+@@ -2899,18 +2898,4 @@ enum skb_drop_reason tcp_inbound_hash(struct sock *sk,
+ 		const void *saddr, const void *daddr,
+ 		int family, int dif, int sdif);
+ 
+-/* version of skb_set_owner_r() avoiding one atomic_add() */
+-static inline void tcp_skb_set_owner_r(struct sk_buff *skb, struct sock *sk)
+-{
+-	skb_orphan(skb);
+-	skb->sk = sk;
+-	skb->destructor = tcp_sock_rfree;
+-
+-	sock_owned_by_me(sk);
+-	atomic_set(&sk->sk_rmem_alloc,
+-		   atomic_read(&sk->sk_rmem_alloc) + skb->truesize);
+-
+-	sk_forward_alloc_add(sk, -skb->truesize);
+-}
+-
+ #endif	/* _TCP_H */
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index ea8de00f669d059d97766529e3b8c53d5040456d..6edc441b37023de48281aa810aa7a36199fd8bc3 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -1525,25 +1525,11 @@ void tcp_cleanup_rbuf(struct sock *sk, int copied)
+ 	__tcp_cleanup_rbuf(sk, copied);
+ }
+ 
+-/* private version of sock_rfree() avoiding one atomic_sub() */
+-void tcp_sock_rfree(struct sk_buff *skb)
+-{
+-	struct sock *sk = skb->sk;
+-	unsigned int len = skb->truesize;
+-
+-	sock_owned_by_me(sk);
+-	atomic_set(&sk->sk_rmem_alloc,
+-		   atomic_read(&sk->sk_rmem_alloc) - len);
+-
+-	sk_forward_alloc_add(sk, len);
+-	sk_mem_reclaim(sk);
+-}
+-
+ static void tcp_eat_recv_skb(struct sock *sk, struct sk_buff *skb)
+ {
+ 	__skb_unlink(skb, &sk->sk_receive_queue);
+-	if (likely(skb->destructor == tcp_sock_rfree)) {
+-		tcp_sock_rfree(skb);
++	if (likely(skb->destructor == sock_rfree)) {
++		sock_rfree(skb);
+ 		skb->destructor = NULL;
+ 		skb->sk = NULL;
+ 		return skb_attempt_defer_free(skb);
+diff --git a/net/ipv4/tcp_fastopen.c b/net/ipv4/tcp_fastopen.c
+index ca40665145c692ce0de518886bb366406606f7ac..1a6b1bc5424514e27a99cbb2fcedf001afd51d98 100644
+--- a/net/ipv4/tcp_fastopen.c
++++ b/net/ipv4/tcp_fastopen.c
+@@ -189,7 +189,7 @@ void tcp_fastopen_add_skb(struct sock *sk, struct sk_buff *skb)
+ 	tcp_segs_in(tp, skb);
+ 	__skb_pull(skb, tcp_hdrlen(skb));
+ 	sk_forced_mem_schedule(sk, skb->truesize);
+-	tcp_skb_set_owner_r(skb, sk);
++	skb_set_owner_r(skb, sk);
+ 
+ 	TCP_SKB_CB(skb)->seq++;
+ 	TCP_SKB_CB(skb)->tcp_flags &= ~TCPHDR_SYN;
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index e1f952fbac48dfdc4f4f75a50a85b4904b93bbe2..a35018e2d0ba27b14d0b59d3728f7181b1a51161 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -5171,7 +5171,7 @@ static void tcp_data_queue_ofo(struct sock *sk, struct sk_buff *skb)
+ 		if (tcp_is_sack(tp))
+ 			tcp_grow_window(sk, skb, false);
+ 		skb_condense(skb);
+-		tcp_skb_set_owner_r(skb, sk);
++		skb_set_owner_r(skb, sk);
+ 	}
+ }
+ 
+@@ -5187,7 +5187,7 @@ static int __must_check tcp_queue_rcv(struct sock *sk, struct sk_buff *skb,
+ 	tcp_rcv_nxt_update(tcp_sk(sk), TCP_SKB_CB(skb)->end_seq);
+ 	if (!eaten) {
+ 		tcp_add_receive_queue(sk, skb);
+-		tcp_skb_set_owner_r(skb, sk);
++		skb_set_owner_r(skb, sk);
+ 	}
+ 	return eaten;
+ }
+@@ -5504,7 +5504,7 @@ tcp_collapse(struct sock *sk, struct sk_buff_head *list, struct rb_root *root,
+ 			__skb_queue_before(list, skb, nskb);
+ 		else
+ 			__skb_queue_tail(&tmp, nskb); /* defer rbtree insertion */
+-		tcp_skb_set_owner_r(nskb, sk);
++		skb_set_owner_r(nskb, sk);
+ 		mptcp_skb_ext_move(nskb, skb);
+ 
+ 		/* Copy data, releasing collapsed skbs. */
 -- 
-2.34.1
+2.49.0.472.ge94155a9ec-goog
+
 
