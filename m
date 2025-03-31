@@ -1,166 +1,151 @@
-Return-Path: <netdev+bounces-178255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECA2EA75FE0
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 09:19:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D4EC0A7604A
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 09:44:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 559623A8ED6
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 07:19:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35FEB3A7D7A
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 07:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F8401AD3E5;
-	Mon, 31 Mar 2025 07:19:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 017F31A3150;
+	Mon, 31 Mar 2025 07:44:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="bkhLB0um"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NwxUtLTB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60DAB148316;
-	Mon, 31 Mar 2025 07:19:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34A7213D8A4;
+	Mon, 31 Mar 2025 07:44:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743405586; cv=none; b=iVkmL9EgOD0KAP2y+kKk6H9nsszJFgGOb+xNEw6FmdNo4FIDQR14oP17VhfNYx9I9W6OEDYggQfU3twxlsXDNQhi7Vnoc8WtHv60nh2sPoaqPuHUzX9q4M7YqJTxUwYZ2oXvMHWNtB5iIFFWpUsW3Xu9ewZPkwAszgqRQnPTij0=
+	t=1743407069; cv=none; b=aE28NAYH1E/jl326v+ZyjSSARJ5HvU7o+AzVEvxP9TIp6txGsdpxxv3WKLdzBKgUAWhs7bfokiT9BFlAnx/virlnMlmghbj0vwvgVpIB6nqHotatevcJb/sL9lxwDj32XqHLeT6RHbNVTezcMihwfevPL3HSgHtSpNpnT07zdpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743405586; c=relaxed/simple;
-	bh=kLv4EqQgwdCrvSrr5EdhdhHZ0fV3NRImHOB9sTXjSBs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sEnqO2A04vJY8MWEGh7DtHW3JKo5o51gqKcabisY3A22KpHyQm+9s4FuaJpX295IC9runUb+Gt57CgJcOuwWVclWkTW7F6YvCIOGPPGHGt4MhDYycj60ud7a6qZRh2dQJH0I36KfknwKmpEXZ1KXNkXxoGSMQPm78j961cmHW6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=bkhLB0um; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0E28310252BE4;
-	Mon, 31 Mar 2025 09:19:36 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1743405581; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=zHC+RUrju8uKC19QVlEvi9qbZzniETFM7Cs0X8sau98=;
-	b=bkhLB0umV2e81WF2Xl3qKpOmUa/m+lCyAO1SLB+J/DjY3URF5h4HBKASO1E764K59F16w1
-	9FXE1LwUK4wbsmZVn0NuYH/B03EWeD59CgoypJrleWWvnlpnNxtwVilL00I1zIo02gHV+n
-	CHXyvOzfTgsA2Lqk444swNg+4KYlHhqM/vjf4XZ/FhwxNz8nB2azqF+0hlN1iqMNXb9kTU
-	BoaLgH9lJMl0iQTZ8jY0nkjDBeZSDTTvkRJwPZ0MKuDVJVB/R1SeYehzf+kpeGyzSeLLxL
-	+gh9/Wn1qrBHUuGBjqYH36qE3cxTegWmzsu1q4/eLg9h0f/fchMFOfoNZSH71A==
-Date: Mon, 31 Mar 2025 09:19:26 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Shawn Guo
- <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix
- Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2 1/4] dt-bindings: net: Add MTIP L2 switch description
-Message-ID: <20250331091926.6f3dba38@wsk>
-In-Reply-To: <d4c8de9b-e52c-480b-a3bf-e82979602477@kernel.org>
-References: <20250328133544.4149716-1-lukma@denx.de>
-	<20250328133544.4149716-2-lukma@denx.de>
-	<e6f3e50f-8d97-4dbc-9de3-1d9a137ae09c@kernel.org>
-	<20250329231004.4432831b@wsk>
-	<564768c3-56f0-4236-86e6-00cacb7b6e7d@kernel.org>
-	<20250330223630.4a0b23cc@wsk>
-	<d4c8de9b-e52c-480b-a3bf-e82979602477@kernel.org>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1743407069; c=relaxed/simple;
+	bh=xmT1Q5a6AFUPK9f/ucAFOyzxGK4M6ko0iruMsYTwOog=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kWIk0Y5J5VuxeMioxdUYierfYJasQYC9aag3ZmbAANOgcE5hVju0q3Ta517ErRWrS5J9uam8qLdidMV7djNlksnrIm+KATaABtGfDTY05eZRjrKQj913YJ+9iopGxDTA9bUqyuUPnynboMIQlEXVaFyUDKKKs1H/DOfEXpgNbnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NwxUtLTB; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43cec5cd73bso26111025e9.3;
+        Mon, 31 Mar 2025 00:44:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743407066; x=1744011866; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=B8L3gLHE0iXx8zQGDJ8LlLcTKVC/8dXUo9ajwXYWTFg=;
+        b=NwxUtLTBsC5GdkchlO9r7BjGTBt6UkIcPcs9ls+YjHNpqwtzhdjAtxRLqkiwCOBfAq
+         FSYuwvOLFUzcmObNsqhTz5fBfoAQ5aPnARKu6B8sSis5rlZmRiGpJ3jtFb9pbuMfq3al
+         DrO6SDfAzOl+CuTjF0Z4Mi7qHlHa3oOkND1TFri86eQD73GWS8yIr54RCIX6i65Q52U5
+         YeYYew+JGT6h9Z2fJ2PLbd1lhA+TX/ls2t+v1LQVZiW9yuW1ruM6As4GnLhav0dIKkvA
+         487+9GCaEcY8UpAHR7+4YgpSHzuXXo8NN53eqv99A64QIhUlsn7uEIMw94PlMT21WiOy
+         wA5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743407066; x=1744011866;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=B8L3gLHE0iXx8zQGDJ8LlLcTKVC/8dXUo9ajwXYWTFg=;
+        b=uutd2oy2OTly3p0ypqv4qJgWZ2tzw/0qXDK+Etq76smp6vEye7c9cI+uLYcXAMbMkv
+         4vkyuQf+bS00xBHqVEzVaKhWuwt0Fo8J0Kw20xQbiRN2ttA6bMkZHPXUKd8SYf3+b8wx
+         OqB0KcTEUq8DL3H4hFUqlZKlS9w1frsxuYw5hQgzs7LnPJcjRu0Bdi6HpyA6dlEokXyb
+         6EhQmkpAXB+hB2fS5EJYZjvbB+kjz6N5ZCSrEO2ihOU0lZtw96KxbIL/9inmZU7Vlo7w
+         ErLXAE2Wdy2gtJFz0Fdx01BVm+alr26QhLTzkRaJtjTDHNk5ekDU6ktLHOcT5x7Iz34v
+         XG/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV7xXW4cXXSbWMz3gWBY+du7gpv8PtXYk3/wyMnh187vnVjSwdoFK8b1O2J/+2uMbLlZXVYVCzG@vger.kernel.org, AJvYcCXVaVAis6mKHnxOU7e8pNh+si+dyTh351uKBsyw9vjKs2ApAiUMgMcLBOD5Ttkqdysuj1XCxZLYDzme86A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy53LUtWMSY9HiqNoJQCW6CS6spnoqTSuBHR/S8pjXFyqkMFg3W
+	GWMRGf0qFGHp2mwTPOOYf4ptdhcSWwgshbcOlL069inQMTlLdK9J
+X-Gm-Gg: ASbGnctkJcSUA+2uYnuc/rG7Fs9t5YMimA97a+U3mxTd7VqdPP1cISg8pViedhdaH7U
+	Z/LksQEy98gHa+af1yx3yU1oGw8hCBshpHa00hLU0/0q1CdlmfBbhpUYTgDEhhxgqG3XZMqsn6P
+	iNRPLz50hE1eG8BQ96DTHAHKHPNMZ6TT8jIL4iF9BmFqWq4iZL5tasBUYmFTNhpEX4Ci1mk21rq
+	O9X9XJCTCJFJC/yI7DMJip7fyqUoFyUOTTzjwLdhbg6zTOJ6M5f5H2XnezJF2VRi1SIsAU8qeoQ
+	uhcY8iQQbtGH3m/yWZMn7df6exuSyJSvk/4d8Tyg9H2HHBsiAA==
+X-Google-Smtp-Source: AGHT+IEU6fWpjT/iTPyqpawIrj8kideGZRhmNQegpvlEXo12tPGNrAQ7TR+EVkOdgUcKFpnGqAnuvw==
+X-Received: by 2002:a05:600c:5119:b0:43d:526:e0ce with SMTP id 5b1f17b1804b1-43db62bb97dmr49667695e9.21.1743407066132;
+        Mon, 31 Mar 2025 00:44:26 -0700 (PDT)
+Received: from toolbox.. ([87.200.95.144])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b6588e9sm10812284f8f.14.2025.03.31.00.44.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Mar 2025 00:44:25 -0700 (PDT)
+From: Christian Hewitt <christianshewitt@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-amlogic@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: stable@vger.kernel.org,
+	Da Xue <da@libre.computer>
+Subject: [PATCH v2] net: mdio: mux-meson-gxl: set 28th bit in eth_reg2
+Date: Mon, 31 Mar 2025 07:44:20 +0000
+Message-Id: <20250331074420.3443748-1-christianshewitt@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/_S/Kbz_Yl3YhS+ddHATqFlD";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 
---Sig_/_S/Kbz_Yl3YhS+ddHATqFlD
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+From: Da Xue <da@libre.computer>
 
-Hi Krzysztof,
+This bit is necessary to enable packets on the interface. Without this
+bit set, ethernet behaves as if it is working, but no activity occurs.
 
-> On 30/03/2025 23:04, Lukasz Majewski wrote:
-> > Hi Krzysztof,
-> >  =20
-> >> On 29/03/2025 23:10, Lukasz Majewski wrote: =20
-> >>>>> +     =20
-> >>>>
-> >>>> If this is ethernet switch, why it does not reference
-> >>>> ethernet-switch schema? or dsa.yaml or dsa/ethernet-ports? I am
-> >>>> not sure which one should go here, but surprising to see none.
-> >>>> =20
-> >>>
-> >>> It uses:
-> >>> $ref:=C2=B7ethernet-controller.yaml#
-> >>>
-> >>> for "ports".
-> >>>
-> >>> Other crucial node is "mdio", which references $ref: mdio.yaml#
-> >>> =20
-> >>
-> >> These are children, I am speaking about this device node. =20
-> >=20
-> > It looks like there is no such reference.
-> >=20
-> > I've checked the aforementioned ti,cpsw-switch.yaml,
-> > microchip,lan966x-switch.yaml and
-> > renesas,r8a779f0-ether-switch.yaml.
-> >=20
-> > Those only have $ref: for ethernet-port children node.
-> >=20
-> > The "outer" one doesn't have it.
-> >=20
-> >=20
-> > Or am I missing something? =20
->=20
-> There is ethernet-switch.yaml for non-DSA switches and there is DSA
-> (using ethernet switch, btw). I don't know why these devices do not
-> use it, I guess no one converted them after we split ethernet-switch
-> out of DSA.
+The vendor SDK sets this bit along with the PHY_ID bits. U-boot also
+sets this bit, but if u-boot is not compiled with networking support
+the interface will not work.
 
-In net next there is:
-Documentation/devicetree/bindings/net/dsa/dsa.yaml
-Documentation/devicetree/bindings/net/mscc,vsc7514-switch.yaml
+Fixes: 9a24e1ff4326 ("net: mdio: add amlogic gxl mdio mux support");
+Signed-off-by: Da Xue <da@libre.computer>
+Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+---
+Resending on behalf of Da Xue who has email sending issues.
+Changes since v1 [0]:
+- Remove blank line between Fixes and SoB tags
+- Submit without mail server mangling the patch
+- Minor tweaks to subject line and commit message
+- CC to stable@vger.kernel.org
 
-which uses
-$ref: ethernet-switch.yaml#
+[0] https://patchwork.kernel.org/project/linux-amlogic/patch/CACqvRUbx-KsrMwCHYQS6eGXBohynD8Q1CQx=8=9VhqZi13BCQQ@mail.gmail.com/
 
-I will add it in a similar way as it is in dsa.yaml.
+ drivers/net/mdio/mdio-mux-meson-gxl.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
->=20
-> Best regards,
-> Krzysztof
-
-
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/_S/Kbz_Yl3YhS+ddHATqFlD
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmfqQf4ACgkQAR8vZIA0
-zr3YwAf/W+aAijdBzs/ijQ5WOVZ40ggbPOSDQyVVgE911O2jLoMAf5iA1mI+/PA5
-y0NhWmAIJajXD/3tu6T2jL+/KGfOPptU0BfJ3W1J5jmGj/rO0VAcESegy115wfBq
-Po6x6ouWXbUymQDWpnAQWp7iABOdYLcYZx1R8vsoGiqpmRbTSVg0gil/+XjcyPH7
-v0B07w8aV4RD3iBnKqM6n0Y+nRWzSUR0ckDEy4bJAz0jJ5Dmf7XS/hlY5UCBVAAv
-2J7dgIMLiAzgLub3niwGAtW2isR30sQC165/6f15tr8int/cM2w9Lhe05nr2EbJ5
-aqmbze9vgtfJAKTyDqq51IBHO8SyDA==
-=zeoN
------END PGP SIGNATURE-----
-
---Sig_/_S/Kbz_Yl3YhS+ddHATqFlD--
+diff --git a/drivers/net/mdio/mdio-mux-meson-gxl.c b/drivers/net/mdio/mdio-mux-meson-gxl.c
+index 00c66240136b..fc5883387718 100644
+--- a/drivers/net/mdio/mdio-mux-meson-gxl.c
++++ b/drivers/net/mdio/mdio-mux-meson-gxl.c
+@@ -17,6 +17,7 @@
+ #define  REG2_LEDACT		GENMASK(23, 22)
+ #define  REG2_LEDLINK		GENMASK(25, 24)
+ #define  REG2_DIV4SEL		BIT(27)
++#define  REG2_RESERVED_28	BIT(28)
+ #define  REG2_ADCBYPASS		BIT(30)
+ #define  REG2_CLKINSEL		BIT(31)
+ #define ETH_REG3		0x4
+@@ -65,7 +66,7 @@ static void gxl_enable_internal_mdio(struct gxl_mdio_mux *priv)
+ 	 * The only constraint is that it must match the one in
+ 	 * drivers/net/phy/meson-gxl.c to properly match the PHY.
+ 	 */
+-	writel(FIELD_PREP(REG2_PHYID, EPHY_GXL_ID),
++	writel(REG2_RESERVED_28 | FIELD_PREP(REG2_PHYID, EPHY_GXL_ID),
+ 	       priv->regs + ETH_REG2);
+ 
+ 	/* Enable the internal phy */
+-- 
+2.34.1
 
