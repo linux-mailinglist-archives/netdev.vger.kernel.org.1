@@ -1,224 +1,148 @@
-Return-Path: <netdev+bounces-178365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B31A8A76C1D
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 18:40:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF484A76C22
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 18:41:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEB5E188E7C0
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 16:39:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C668D188ED82
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 16:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D08682147FC;
-	Mon, 31 Mar 2025 16:39:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B468A214815;
+	Mon, 31 Mar 2025 16:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="epM8scgQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QCFBnY8W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E11B7212FB0;
-	Mon, 31 Mar 2025 16:39:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D35378F4F;
+	Mon, 31 Mar 2025 16:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743439154; cv=none; b=d7f0bFJUEeimVvOCayRyw3IzxR7YWC8lKbp/s+UHf/SEMGR10Wx///5oFOta+hzmkbeXabYiRhpOsh533zRBi7yv0/51LrnUs+e3J6yVYPIkQFg0yHRTWIisFdABGJzHgIRvwlY/m6r1mZGWyFelyNI5U55SqH9p0VkwIYuntlE=
+	t=1743439227; cv=none; b=NUtR1otSAYnrku9WF7qlI+7LCAdAlhZdwUuvlqoKyxw2lOm81KAxXWZYNNHw8ZvWBOo9dC5tzSfKYsEb9430wgtl90kwIkDfMNDO0PkoJuq07KdQBS5Wi+08t1V9ePZ3MdaRNpAdoU1lR4ODEZ+IRH9+mVW2CchSfGN4vNwcdE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743439154; c=relaxed/simple;
-	bh=Z8d4g9wEquUrOEcli/D/aANZ3jmocVZYpI2mvNFSYRA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XrlzI+SjyPOFHbrBC78+69IMTTGxPKrLcp7ltifl7Ezff57jaxBeYnfoT7k5erzm3IpDWyHO+4TAgU/G+F2al4z6hbEwMANyZOVaxnhTDAJ7RSMbjhsgXwEs1Q5LG8IC+zo0sTJW6T0yFOpntJmYqmCXHLByJOqr0LL+D1Nyil8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=epM8scgQ; arc=none smtp.client-ip=209.85.128.52
+	s=arc-20240116; t=1743439227; c=relaxed/simple;
+	bh=AYFUramL9FR2hoJVHPU1NGGSkE1T1sbmog92XXloJv4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hy8FmaOqc05XPwW01Gjgwya7xUhYAz7DOqT8i4eqrmFm1IDZK8ANSatTVUjzRN+Iy/zTRz1ZaT3i8q18wID18Afi6AaSd81BQ01Fr01mzV2RuPOMSyBCQ95uqqHhm2XHp3BDA5UT6Oa+F4iAfHhUoxae/bJg0ao9ZkiE2UOrEjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QCFBnY8W; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43cfecdd8b2so37112595e9.2;
-        Mon, 31 Mar 2025 09:39:12 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-223fd89d036so98768755ad.1;
+        Mon, 31 Mar 2025 09:40:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743439151; x=1744043951; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z8d4g9wEquUrOEcli/D/aANZ3jmocVZYpI2mvNFSYRA=;
-        b=epM8scgQmmLkOdNUxSTX/j2O9GeYjo1zReheYU2tLtieFX0jmytKD4FBBOvEhOMHyy
-         jhkka8vHTRjETFuJB+3F+u06E30cUPhkDnmjDLG7qdrQCfJQ1t2xO0fd0IZeAmPvCZIC
-         D4pBesJIoD0i0uuRv2F0TfjBWMjw5U9uQ0kFEAbKmRL6sRPflGs8fXYl3+zka2lQBeAV
-         jXReMlQDtcBhJzXgVhh9qgHZE2Qa/iqejrHxotX9qj8E/rWpaWEKN/YHnULms1el1AVq
-         XjLbyO6M2T5fWQRL4QGECN6vb1qdjXsIuzFmxwiKUPPvc56Q0FgZpbEj9ws8SdfVb1H2
-         1pxQ==
+        d=gmail.com; s=20230601; t=1743439225; x=1744044025; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dz9N0KZHNJSKflVhOQJGTKP9fs9EvMvsQxUyQyH/M1c=;
+        b=QCFBnY8W161YLbYvU6ITYXKaBQIVoRufgmUQaoPjCBb4+MnHqdw4CNKJ5F9LiJNiQZ
+         Gcm2wXXYIPh3oe8vpSroVqw5JLI9HxR8LAgZIgzMSo/OPYO8XkyzL/el+/JC3dkgNzFW
+         PwhfSfXBKceYZctkwz02EjSdH/E2B6pHCpdxw7I9l/AXRwTYfW6qWWU1tNGfe9R1aYQz
+         JIQv6dup8LtuRT/W22PSL26ZTnltgfUt0h3EPLq6CAk7ZXuvR8DPhhtOygkFcrdIBck0
+         vC2duj5t8ARB67sKl3VVWLkYYYxtZpiqXHGKRSGU7v41DafnZfKuCtNswwN2psd7i7IJ
+         ofVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743439151; x=1744043951;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Z8d4g9wEquUrOEcli/D/aANZ3jmocVZYpI2mvNFSYRA=;
-        b=Tke1GEcYhVas7RsinNNyr+yBg6QpemcQYmowWrDWXACf/haeFuH1be7FAJq3RuZjz+
-         eZ7ch66CHj5YcH0fnkSl1RvRPAt77ga4mvo3XU3YSsbu28/GJxkwVxMOcIUV5upxyWWH
-         3u2exA4G5T2M8GquZx3qbRrZM7IJsitpwNsMTqumxJixZtcAfZ2yh6DCL2nW1gTW41rx
-         SvbpgZm7i2qnetvIQlzkCmFNqiNs41KpPe3Wf2l8sN7sYF+8DO1MnNCfwSsOUEfqinky
-         MaxQ9qmDi6eMXDGK/jF0DHN4frroJA3HNr9NOcQGvbUxGUQ26owOGrptc2zLZcmz4lmC
-         jj+g==
-X-Forwarded-Encrypted: i=1; AJvYcCXqlNw33K0d9tJKYk1mPeK3U4+qY/x/JGIfMcjl+OfwwNoHTgGmT1mB1CiUuIczgNBfmDuJFLkU@vger.kernel.org, AJvYcCXwOj3hdFxPMuS4NWX67EBmsS9IdZfyj/jNNcEIbKc4rmOImKL88SPwqq58eUQ+pYMLTAAi4KeI1gIygIo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPd+F08/77rHXM2qDmqRRsLQWemOymgnCYXwxKSoGQZm5JHDpX
-	kVItjNsbhdMQQ4clzTeY6vGKRFC7RMQPLxWuU0wLU4CGau2B1YuiWiqqZYE9VevouPiJIuF/dIq
-	PK3+LbUU5YnKfDoRYcdICIk5xvRI=
-X-Gm-Gg: ASbGncusJdipuwxYJ4oUshOGuCpzVIG4z4vQK7m2DiImDJqqzWj/WgrwEqYnFzNHYqN
-	6z5Kt0Ef9vXnHEmlA0ViMlN0tFuQPD5WmxyBYVv9RE1O/CCkze4VIP5yt3PJO8jux0O8SVeOIBa
-	uy/GrDRss6U+qz6kFBTTooexbrSJqLA0ldIAVDItJ8D/oQ6X6c5L1HVoj6nWw=
-X-Google-Smtp-Source: AGHT+IHZzXLpgViYZ4N1izMamI668R2BU8hGvXjTj9xo36k3cDMT/lFyo33eVfGT780WUYBHXlsgJZJWvr5rEwj0YiM=
-X-Received: by 2002:a05:600c:5489:b0:43c:fda5:41e9 with SMTP id
- 5b1f17b1804b1-43dbc419540mr92229645e9.31.1743439150876; Mon, 31 Mar 2025
- 09:39:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743439225; x=1744044025;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Dz9N0KZHNJSKflVhOQJGTKP9fs9EvMvsQxUyQyH/M1c=;
+        b=HNartIfoNOGCzVzYxck1Y5huybxHuv9v51RC4liSoAj/vV+a16cXZWmNatX6Ikqplr
+         QmkKIo6KwsPEyY4R1ZTckRvCWeZ56+S7d006IEFQE4k5/dcv7xUIpiq9cugEX0MNvBq+
+         x0BFACEtsHsk8QQyqrf04b4gu6rF7JdVzrFKFdbNt3emYsZcZ053+Y0L0O+T9o7/sI4j
+         oYo5qu0yZYs9pouaEe/lAzbPIdtAq6lvxsFCWOmYv6m55o+aQx+zuBEdfr2halC/WmwR
+         6EfVmwRzU9n1q6+AhAX4L7luuuoUUs4wdWxolrZTqfPuX5qJ5KL786dG10Rh+VbKpivx
+         eMnA==
+X-Forwarded-Encrypted: i=1; AJvYcCUIfdlSSxwvXVj+yWO1YJ8kyDcOT0T0R78klOBPQa011WEq6itxywCeG7tO4Qrv3NhUzdr+OiarfoJdB9I=@vger.kernel.org, AJvYcCWSd9SUaY51I6XJsPYltElyvcKdo+p4Ek8lQV+HLE8Pl6HQeOjXucyqHqBJIXYcd//DIlV6mCAl@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywms6N5z2DNlOF1yvwPdYCRCx44nc1U1GH/RCj2M0G7eyncoXCs
+	hk4NIQ4XrSo+FAFuB1c1iY4VDykAneR/uH92wxaUjb5w5BK7mTV6
+X-Gm-Gg: ASbGncvGk3Q32GzVGDtWTkm/qt2ZJNdpVlF6UQkZtU9jZtde6B0X0kiFJRTMTAJMSDt
+	9Wiav8FXcvYXFxey82rgoMG71n0jPx8+77gfXthWNzmlrMVa6s+8uDDbhz9T4IePEi7+9FPkJ5c
+	gB2QJ5TyWqEkEpb8WdCMUUuRLes0tenJ0V6kM84k5PCzJArrsY8OisfHX7CSz22ick8CAxNtqAq
+	zx8NHOEsEVwe4AoMaJuiYVzHOIgXjctpQhruDHheiGVCFRMQm8TFNNo3hpcK6nVKDsN0pDcHYB6
+	F4zpGowCqji40v3Dke77AlfNnQHjokPd9/ocMnkBXYbqT+jdYxp3ig==
+X-Google-Smtp-Source: AGHT+IFrMCP1PBKqC7tae7DS45440GgX8X4vbPNHIkLinUfhelvAilP1Pp5/T9e0yqtatcKWxgMYfA==
+X-Received: by 2002:a17:902:cec3:b0:215:b473:1dc9 with SMTP id d9443c01a7336-2292f9fc071mr159229405ad.46.1743439225283;
+        Mon, 31 Mar 2025 09:40:25 -0700 (PDT)
+Received: from mythos-cloud ([125.138.201.7])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3039dff0941sm9802525a91.13.2025.03.31.09.40.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Mar 2025 09:40:24 -0700 (PDT)
+Date: Tue, 1 Apr 2025 01:40:19 +0900
+From: Moon Yeounsu <yyyynoom@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5] net: dlink: add support for reporting stats
+ via `ethtool -S` and `ip -s -s link show`
+Message-ID: <Z-rFcxj7XeiMHsz7@mythos-cloud>
+References: <20241209092828.56082-2-yyyynoom@gmail.com>
+ <20241210191519.67a91a50@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250307173611.129125-1-maxime.chevallier@bootlin.com>
- <20250307173611.129125-10-maxime.chevallier@bootlin.com> <8d3a9c9bb76b1c6bc27d2bd01f4831b2cac83f7f.camel@gmail.com>
- <20250328090621.2d0b3665@fedora-2.home> <CAKgT0Ue_JzmJAPKBhe6XaMkDCy+YNNg5_5VvzOR6CCbqcaQg3Q@mail.gmail.com>
- <12e3b86d-27aa-420b-8676-97b603abb760@lunn.ch> <CAKgT0UcZRi1Eg2PbBnx0pDG_pCSV8tfELinNoJ-WH4g3CJOh2A@mail.gmail.com>
- <02c401a4-d255-4f1b-beaf-51a43cc087c5@lunn.ch> <Z-qsnN4umaz0QrG0@shell.armlinux.org.uk>
- <20250331182000.0d94902a@fedora.home>
-In-Reply-To: <20250331182000.0d94902a@fedora.home>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Mon, 31 Mar 2025 09:38:34 -0700
-X-Gm-Features: AQ5f1Jo4H2kJVBl3bUTBM3aQvZN8Nc6GirQhFLcIGY7KsXCNVmJ2NznhupG4LQQ
-Message-ID: <CAKgT0UdJHkGRh5S4hHg0V=Abd7UizH49F+V2QJJQxguHvCYhMg@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 09/13] net: phylink: Use phy_caps_lookup for
- fixed-link configuration
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	thomas.petazzoni@bootlin.com, linux-arm-kernel@lists.infradead.org, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
-	=?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>, 
-	Oleksij Rempel <o.rempel@pengutronix.de>, Simon Horman <horms@kernel.org>, 
-	Romain Gantois <romain.gantois@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241210191519.67a91a50@kernel.org>
 
-On Mon, Mar 31, 2025 at 9:20=E2=80=AFAM Maxime Chevallier
-<maxime.chevallier@bootlin.com> wrote:
+First of all, I apologize for my late reply.
+To be honest, I didn't fully understand the code I wrote.
+
+The reason I initially decided to use `spin_lock_irqsave()` was that
+most of the other stat-related code was using it.
+So when I received your reply, I didn't understand why `spin_lock_bh()`
+should be used. That's why I started reviewing interrupts and locks again.
+
+As a result, my response got delayed. However, I believe I should take
+full responsibility for the code I wrote.
+
+I still don't fully understand interrupts and locks,
+as the IRQ subsystem is vast and complex.
+
+On Tue, Dec 10, 2024 at 07:15:19PM -0800, Jakub Kicinski wrote:
+> On Mon,  9 Dec 2024 18:28:27 +0900 Moon Yeounsu wrote:
+> > +	unsigned long flags;
+> > +
+> > +	spin_lock_irqsave(&np->stats_lock, flags);
+> 
+> I believe spin_lock_bh() is sufficient here, no need to save IRQ flags.
 >
-> On Mon, 31 Mar 2025 15:54:20 +0100
-> "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
->
-> > On Mon, Mar 31, 2025 at 04:17:02PM +0200, Andrew Lunn wrote:
-> > > On Fri, Mar 28, 2025 at 04:26:04PM -0700, Alexander Duyck wrote:
-> > > > A serdes PHY is part of it, but not a traditional twisted pair PHY =
-as
-> > > > we are talking about 25R, 50R(50GAUI & LAUI), and 100P interfaces. =
-I
-> > > > agree it is a different beast, but are we saying that the fixed-lin=
-k
-> > > > is supposed to be a twisted pair PHY only?
-> > >
-> > > With phylink, the PCS enumerates its capabilities, the PHY enumerates
-> > > its capabilities, and the MAC enumerates it capabilities. phylink the=
-n
-> > > finds the subset which all support.
-> > >
-> > > As i said, historically, fixed_link was used in place of a PHY, since
-> > > it emulated a PHY. phylinks implementation of fixed_link is however
-> > > different. Can it be used in place of both a PCS and a PHY? I don't
-> > > know.
-> >
-> > In fixed-link mode, phylink will use a PCS if the MAC driver says there
-> > is one, but it will not look for a PHY.
 
-Admittedly the documentation does reference much lower speeds as being
-the use case. I was a bit of an eager beaver and started assembling
-things without really reading the directions. I just kind of assumed
-what I could or couldn't get away with within the interface.
+Anyway, base on what I have learned, I believe `spin_lock_irq()`
+should be used in this context instead of `spin_lock_bh()`.
 
-> > > You are pushing the envelope here, and maybe we need to take a step
-> > > back and consider what is a fixed link, how does it fit into the MAC,
-> > > PCS, PHY model of enumeration? Maybe fixed link should only represent
-> > > the PHY and we need a second sort of fixed_link object to represent
-> > > the PCS? I don't know?
-> >
-> > As I previously wrote today in response to an earlier email, the
-> > link modes that phylink used were the first-match from the old
-> > settings[] array in phylib which is now gone. This would only ever
-> > return _one_ link mode, which invariably was a baseT link mode for
-> > the slower speeds.
-> >
-> > Maxime's first approach at adapting this to his new system was to
-> > set every single link mode that corresponded with the speed. I
-> > objected to that, because it quickly gets rediculous when we end
-> > up with lots of link modes being indicated for e.g. 10, 100M, 1G
-> > but the emulated PHY for these speeds only indicates baseT. That's
-> > just back-compatibility but... in principle changing the link modes
-> > that are reported to userspace for a fixed link is something we
-> > should not be doing - we don't know if userspace tooling has come
-> > to rely on that.
-> >
-> > Yes, it's a bit weird to be reporting 1000baseT for a 1000BASE-X
-> > interface mode, but that's what we've always done in the past and
-> > phylink was coded to maintain that (following the principle that
-> > we shouldn't do gratuitous changes to the information exposed to
-> > userspace.)
-> >
-> > Maxime's replacement approach is to just expose baseT, which
-> > means that for the speeds which do not have a baseT mode, we go
-> > from supporting it but with a weird link mode (mostly baseCR*)
-> > based on first-match in the settings[] table, to not supporting the
-> > speed.
->
-> I very wrongfully considered that there was no >10G fixed-link users, I
-> plan to fix that with something like the proposed patch in the
-> discussion, that reports all linkmodes for speeds above 10G (looks less
-> like a randomly selected mode, you can kind-of see what's going on as
-> you get all the linkmodes) but is a change in what we expose to
-> userspace.
+The reason is that the `get_stats()` function can be called from
+an interrupt context (in the top-half).
 
-I am not sure if there are any >10G users. I haven't landed anything
-in the kernel yet and like I said what I was doing was more of a hack
-to enable backwards compatibility on older kernels w/ the correct
-supported and advertised modes. If I have to patch one kernel to make
-it work for me that would be manageable.
+If my understanding is correct, calling `spin_lock_bh()` in the
+top-half may lead to a deadlock.
 
-One thing I was thinking about that it looks like this code might
-prevent would be reinterpreting the meaning of duplex. Currently we
-only have 3 values for it 0 (half), 1 (Full), and ~0 (Unknown). One
-thought I had is that once we are over 1G we don't really care about
-that anymore as everything is Full duplex and instead care about
-lanes. As it turns out the duplex values currently used would work
-well to be extended out to lanes. Essentially 0 would still be half, 1
-would be 1 lane full duplex, 2-8 could be the number of full duplex
-lanes the interface is using, and unknown lane count would still be ~0
-since it is unlikely we will end up with anything other than a power
-of 2 number of lanes anyway. With that you could greatly sort out a
-number of modes in your setup. We would then have to do some cleanups
-here and there to do something like "duplex =3D=3D DUPLEX_UNKNOWN ? duplex
-: !!duplex" to clean up any cases where the legacy values are
-expected.
+The calling sequence is as follows:
+	1. `rio_interrupt()` (registered via `request_irq()`)
+	2. `rio_error()`
+	3. `get_stats()`
 
-Likewise if you were to look at adding the port type that might allow
-for further division and cleanup. With that someone could specify the
-speed, duplex, and port type and they would be able to pretty
-precisely pick out a specific fixed mode.
+> > +	u64 collisions = np->single_collisions + np->multi_collisions;
+> > +	u64 tx_frames_abort = np->tx_frames_abort;
+> > +	u64 tx_carrier_errors = np->tx_carrier_sense_errors;
+> 
+> Please don't mix code and variable declarations.
 
-> Or maybe simpler, I could extend the list of compat fixed-link linkmodes
-> to all speeds with the previous arbitrary values that Russell listed in
-> the other mail (that way, no user-visible changes :) )
->
-> I was hoping Alexander could give option 1 a try, but let me know if
-> you think we should instead adopt option 2, which is probably the safer
-> on.
+I'll fix it as well.
+Thank you for pointing that out.
 
-I can try to get to it, but I have a number of meetings today so I may
-not be able to get to it until tomorrow morning.
+> -- 
+> pw-bot: cr
 
-Also I suspect this may have an impact outside of just the fixed link
-setup. I will have to try some other spots to see if I see anything
-odd pop up as I suspect that I will have issues with 50R2/50R running
-over top of each other after these changes.
+If I am mistaken, please let me know.
 
-Thanks,
-
-- Alex
+Thank you for reviewing my patch!
 
