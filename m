@@ -1,186 +1,166 @@
-Return-Path: <netdev+bounces-178271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31774A763E7
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 12:14:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 410CBA76436
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 12:31:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9B6D16740A
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 10:14:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C9ED1885F45
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 10:32:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E5E11DF247;
-	Mon, 31 Mar 2025 10:14:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B12821DF72E;
+	Mon, 31 Mar 2025 10:31:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UM5PkaxQ"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="DyrrMMLH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A38D157A5A
-	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 10:14:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4001C84AA;
+	Mon, 31 Mar 2025 10:31:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743416061; cv=none; b=WLT3+MeUWQuGEHcY6OALICa55tesz6AV+KeXU5BWeZXgxtOHKF7TNKRQsCNaJUYluRUb9a7aqPc51Xmia/Gp1YVeIpy4v0pPrwHQ0OFMLUgK56UB5iWQosn9Rr+RmD8bZ4a9VNdizq5aV+0framNfVQpNGEdyNZ3QqYhby4Dnck=
+	t=1743417112; cv=none; b=vCVAyT1Bfvr0YgUoONfeh6n7/M+C387IRvIzY6dwMRyW7e0cWicjKEZfd1hw+Ipgxn9Qj8dPTRz20lJqTv6pcT0fDX2ryJvBpkxo9+4BbVbE9d3V67rgXoxfFLTNxUU9pcFCUS9A9UrWYoLZJzYYQ7TTrs9FcqsaRSpKMaialvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743416061; c=relaxed/simple;
-	bh=56IfTRauGxaQRKelmBbZK/tQWYp/lbJMPy7TjK50Wqc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=OZO35JJX+57Mx4v9KyYgzwB9ysraWDHcuKkrVNFKWYoX+wV2h27SdBNHO6/sHcs6J/A0u06M/Xo6/vYEX+UDZEpBtlIDFAiA1rjuTozYaqf/rN6WUuSMScRKsGj/O+ar1oweBKSwsiqpb/oqgizsoHjejcz2kgHblaGamAO1OVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UM5PkaxQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DDE1C4CEE5;
-	Mon, 31 Mar 2025 10:14:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743416060;
-	bh=56IfTRauGxaQRKelmBbZK/tQWYp/lbJMPy7TjK50Wqc=;
-	h=From:Date:Subject:To:Cc:From;
-	b=UM5PkaxQaot4GJoJ+pHs9qPNmy+XoOLrc2NZ7l9Mikjh9Q6ro0mj/NEQyD+mWDF4n
-	 A2JEbK/A0Lud86zCoJEVtjBNiIYh7t0+Fouw68z1hC+mmAsYvLLoDSt1oNk5Op3uxz
-	 MKUmfoHUs5SPE/B3B8SjuvCD7Kj79NMRAaGk83yjA97UYFcHG1RINlUoNUPvn80iV3
-	 uIPvHC4IFUNLWtAEE3W19QGnUhQp2ZHn2KZjnUAq31SIezXVpEtg7gr4I9aR38Dnx3
-	 UMmAJu5whsDInYk/XgHgfCx09hFossNbly/7CZn/M4ZHB/+fq/us1yReLb6zI2taWu
-	 FCBZQs+lAJjNg==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Mon, 31 Mar 2025 12:14:09 +0200
-Subject: [PATCH net v3] net: airoha: Validate egress gdm port in
- airoha_ppe_foe_entry_prepare()
+	s=arc-20240116; t=1743417112; c=relaxed/simple;
+	bh=ef0/xHtnXB7UZeFcrLVM0z8MLa7kOyzZdou9OiivoKM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jLEd5wFqlIKYBJxMlOUazWzPO2+eqfGlfT+nCojUjg5F3RkE5ZSod2Okpt+9YlQ3kp5GdeDxJaz9exAvn5/TgmeOrJmYW7scQ1u05Fll5ZOG1rONyCP/D5loYomZGk6cRCiiJlk0VarlUy5SfY1k9leNnT3ezSDc0IH7LICgJpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=DyrrMMLH; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4CC291026C8AE;
+	Mon, 31 Mar 2025 12:31:43 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1743417107; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=6OR5ZX6gnhmwXhcE50/jYL+u26UqK30a7zFCArx/L1g=;
+	b=DyrrMMLH87OXRxD/qEfdtU327Jed9RoYP40D9mxVBA3SxepNbu8oMu4P56o1i+RGmgoQUo
+	O16LrlpZJDgSTe1WyJi++xSKZATz6iHOCFSlRDqcXqFQ8ee6Mdfn1moIr66fS0jGcerBQd
+	3YB1H2PBNd9UF2TqAJ21o6aq2KrPR8tGMK91SBqVS++ezHeSwHqNKXkBd3OOXxDCvAt2li
+	MvNvGozlyQKf9EarKirjEiE16YXlSM0c91JbZ1BDRwGAN4YtvK9PdGDC5Fipv9lJ6U/8rb
+	hdjGFuQHOH4hMqgDuOln95lRF1CKaByzi+qNwNQkON999iTLURc7Lgc5b13i2g==
+From: Lukasz Majewski <lukma@denx.de>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Shawn Guo <shawnguo@kernel.org>
+Cc: Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	Lukasz Majewski <lukma@denx.de>
+Subject: [PATCH v3 0/4] net: mtip: Add support for MTIP imx287 L2 switch driver
+Date: Mon, 31 Mar 2025 12:31:12 +0200
+Message-Id: <20250331103116.2223899-1-lukma@denx.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250331-airoha-validate-egress-gdm-port-v3-1-c14e6ba9733a@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAPBq6mcC/x3NQQqDQAxA0atI1gZGQ231KtJFmEnHQOtIIlIQ7
- 96hy7f5/wQXU3GYmhNMDnUtawW1DcSF1yyoqRr60N8CUYesVhbGg9+aeBeUbOKOOX1wK7Yj0RA
- f93EcQmSolc3kpd//YX5e1w9fdG6DcQAAAA==
-X-Change-ID: 20250331-airoha-validate-egress-gdm-port-336c879960ca
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-Device pointer in airoha_ppe_foe_entry_prepare routine is not strictly
-necessary a device allocated by airoha_eth driver since it is an egress
-device and the flowtable can contain even wlan, pppoe or vlan devices.
-E.g:
+This patch series adds support for More Than IP's L2 switch driver embedded
+in some NXP's SoCs. This one has been tested on imx287, but is also available
+in the vf610.
 
-flowtable ft {
-        hook ingress priority filter
-        devices = { eth1, lan1, lan2, lan3, lan4, wlan0 }
-        flags offload                               ^
-                                                    |
-                     "not allocated by airoha_eth" --
-}
+In the past there has been performed some attempts to upstream this driver:
+1. The 4.19-cip based one [1]
+2. DSA based one for 5.12 [2] - i.e. the switch itself was treat as a DSA switch
+   with NO tag appended.
+3. The extension for FEC driver for 5.12 [3] - the trick here was to fully reuse
+   FEC when the in-HW switching is disabled. When bridge offloading is enabled,
+   the driver uses already configured MAC and PHY to also configure PHY.
 
-In this case airoha_get_dsa_port() will just return the original device
-pointer and we can't assume netdev priv pointer points to an
-airoha_gdm_port struct.
-Fix the issue validating egress gdm port in airoha_ppe_foe_entry_prepare
-routine before accessing net_device priv pointer.
+All three approaches were not accepted as eligible for upstreaming.
 
-Fixes: 00a7678310fe ("net: airoha: Introduce flowtable offload support")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
-Changes in v3:
-- Rebase on top of net tree
-- Fix commit log
-- Link to v2: https://lore.kernel.org/r/20250315-airoha-flowtable-null-ptr-fix-v2-1-94b923d30234@kernel.org
+The driver from this series has floowing features:
 
-Changes in v2:
-- Avoid checking netdev_priv pointer since it is always not NULL
-- Link to v1: https://lore.kernel.org/r/20250312-airoha-flowtable-null-ptr-fix-v1-1-6363fab884d0@kernel.org
----
- drivers/net/ethernet/airoha/airoha_eth.c | 13 +++++++++++++
- drivers/net/ethernet/airoha/airoha_eth.h |  3 +++
- drivers/net/ethernet/airoha/airoha_ppe.c | 10 ++++++++--
- 3 files changed, 24 insertions(+), 2 deletions(-)
+1. It is fully separated from fec_main - i.e. can be used interchangeable
+   with it. To be more specific - one can build them as modules and
+   if required switch between them when e.g. bridge offloading is required.
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index c0a642568ac115ea9df6fbaf7133627a4405a36c..bf9c882e9c8b087dbf5e907636547a0117d1b96a 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -2454,6 +2454,19 @@ static void airoha_metadata_dst_free(struct airoha_gdm_port *port)
- 	}
- }
- 
-+int airoha_is_valid_gdm_port(struct airoha_eth *eth,
-+			     struct airoha_gdm_port *port)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(eth->ports); i++) {
-+		if (eth->ports[i] == port)
-+			return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
- static int airoha_alloc_gdm_port(struct airoha_eth *eth,
- 				 struct device_node *np, int index)
- {
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-index 60690b685710c72a2e15c6c6c94240108dafa1c1..d199b8adffc0b25c369dc19cdc074c50af40e3bf 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.h
-+++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -532,6 +532,9 @@ u32 airoha_rmw(void __iomem *base, u32 offset, u32 mask, u32 val);
- #define airoha_qdma_clear(qdma, offset, val)			\
- 	airoha_rmw((qdma)->regs, (offset), (val), 0)
- 
-+int airoha_is_valid_gdm_port(struct airoha_eth *eth,
-+			     struct airoha_gdm_port *port);
-+
- void airoha_ppe_check_skb(struct airoha_ppe *ppe, u16 hash);
- int airoha_ppe_setup_tc_block_cb(enum tc_setup_type type, void *type_data,
- 				 void *cb_priv);
-diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
-index 8b55e871352d359fa692c253d3f3315c619472b3..65833e2058194a64569eafec08b80df8190bba6c 100644
---- a/drivers/net/ethernet/airoha/airoha_ppe.c
-+++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-@@ -197,7 +197,8 @@ static int airoha_get_dsa_port(struct net_device **dev)
- #endif
- }
- 
--static int airoha_ppe_foe_entry_prepare(struct airoha_foe_entry *hwe,
-+static int airoha_ppe_foe_entry_prepare(struct airoha_eth *eth,
-+					struct airoha_foe_entry *hwe,
- 					struct net_device *dev, int type,
- 					struct airoha_flow_data *data,
- 					int l4proto)
-@@ -224,6 +225,11 @@ static int airoha_ppe_foe_entry_prepare(struct airoha_foe_entry *hwe,
- 	if (dev) {
- 		struct airoha_gdm_port *port = netdev_priv(dev);
- 		u8 pse_port;
-+		int err;
-+
-+		err = airoha_is_valid_gdm_port(eth, port);
-+		if (err)
-+			return err;
- 
- 		if (dsa_port >= 0)
- 			pse_port = port->id == 4 ? FE_PSE_PORT_GDM4 : port->id;
-@@ -633,7 +639,7 @@ static int airoha_ppe_flow_offload_replace(struct airoha_gdm_port *port,
- 	    !is_valid_ether_addr(data.eth.h_dest))
- 		return -EINVAL;
- 
--	err = airoha_ppe_foe_entry_prepare(&hwe, odev, offload_type,
-+	err = airoha_ppe_foe_entry_prepare(eth, &hwe, odev, offload_type,
- 					   &data, l4proto);
- 	if (err)
- 		return err;
+   To be more specific:
+        - Use FEC_MAIN: When one needs support for two ETH ports with separate
+          uDMAs used for both and bridging can be realized in SW.
 
----
-base-commit: 2ea396448f26d0d7d66224cb56500a6789c7ed07
-change-id: 20250331-airoha-validate-egress-gdm-port-336c879960ca
+        - Use MTIPL2SW: When it is enough to support two ports with only uDMA0
+          attached to switch and bridging shall be offloaded to HW. 
 
-Best regards,
+2. This driver uses MTIP's L2 switch internal VLAN feature to provide port
+   separation at boot time. Port separation is disabled when bridging is
+   required.
+
+3. Example usage:
+        Configuration:
+        ip link set lan0 up; sleep 1;
+        ip link set lan1 up; sleep 1;
+        ip link add name br0 type bridge;
+        ip link set br0 up; sleep 1;
+        ip link set lan0 master br0;
+        ip link set lan1 master br0;
+        bridge link;
+        ip addr add 192.168.2.17/24 dev br0;
+        ping -c 5 192.168.2.222
+
+        Removal:
+        ip link set br0 down;
+        ip link delete br0 type bridge;
+        ip link set dev lan1 down
+        ip link set dev lan0 down
+
+4. Limitations:
+        - Driver enables and disables switch operation with learning and ageing.
+        - Missing is the advanced configuration (e.g. adding entries to FBD). This is
+          on purpose, as up till now we didn't had consensus about how the driver
+          shall be added to Linux.
+
+Links:
+[1] - https://github.com/lmajewski/linux-imx28-l2switch/commits/master
+[2] - https://github.com/lmajewski/linux-imx28-l2switch/tree/imx28-v5.12-L2-upstream-RFC_v1
+[3] - https://source.denx.de/linux/linux-imx28-l2switch/-/tree/imx28-v5.12-L2-upstream-switchdev-RFC_v1?ref_type=heads
+
+Lukasz Majewski (4):
+  dt-bindings: net: Add MTIP L2 switch description
+  ARM: dts: nxp: mxs: Adjust the imx28.dtsi L2 switch description
+  ARM: dts: nxp: mxs: Adjust XEA board's DTS to support L2 switch
+  net: mtip: The L2 switch driver for imx287
+
+ .../bindings/net/nxp,imx287-mtip-switch.yaml  |  154 ++
+ MAINTAINERS                                   |    7 +
+ arch/arm/boot/dts/nxp/mxs/imx28-xea.dts       |   54 +
+ arch/arm/boot/dts/nxp/mxs/imx28.dtsi          |    8 +-
+ drivers/net/ethernet/freescale/Kconfig        |    1 +
+ drivers/net/ethernet/freescale/Makefile       |    1 +
+ drivers/net/ethernet/freescale/mtipsw/Kconfig |   13 +
+ .../net/ethernet/freescale/mtipsw/Makefile    |    3 +
+ .../net/ethernet/freescale/mtipsw/mtipl2sw.c  | 1964 +++++++++++++++++
+ .../net/ethernet/freescale/mtipsw/mtipl2sw.h  |  780 +++++++
+ .../ethernet/freescale/mtipsw/mtipl2sw_br.c   |  113 +
+ .../ethernet/freescale/mtipsw/mtipl2sw_mgnt.c |  449 ++++
+ 12 files changed, 3545 insertions(+), 2 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/nxp,imx287-mtip-switch.yaml
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/Kconfig
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/Makefile
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw.c
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw.h
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw_br.c
+ create mode 100644 drivers/net/ethernet/freescale/mtipsw/mtipl2sw_mgnt.c
+
 -- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+2.39.5
 
 
