@@ -1,78 +1,127 @@
-Return-Path: <netdev+bounces-178285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0778AA76640
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 14:44:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0369A76655
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 14:50:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F2C6188915C
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 12:44:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E3813A8670
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 12:50:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A420202979;
-	Mon, 31 Mar 2025 12:44:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4734E21018F;
+	Mon, 31 Mar 2025 12:50:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z0hm7OUA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R7VWA6y6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2645C1E32A3
-	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 12:44:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AF5D1E32B9
+	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 12:50:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743425062; cv=none; b=tKtvJErPAbA3EtTJOBIIaEe0ZRRRMncoRsCXh48MviaVWCkfdHNF8YzOZSTgTeAQwsKGy2YzyuYD/WDtafr1pm4UPy4J5mHAjcBXrQ3HF0qgNq6BjevhawUoRjtnMLs2tGEJw3eVDZiTbnIC7/COizwzCgxNmIxODowAPMmUKY4=
+	t=1743425420; cv=none; b=RHqkX7s2zun9oeq0jmNM/f2DFBN8oH4Jh8CMqMw3l6ok7RwEdiYbfvM+5S+kS1a/UWtJ9V+qEWMntitB/stEYxMYZwS/rpSBsz+QdWo0lusNtwQxskgcyZMNmVA+AW6nH/avDv9dqFL6k/FO+u3axoFjtEaMdJw6wT4aeOr0ffc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743425062; c=relaxed/simple;
-	bh=aWKuAcjkPK09JdPcFjyNkwxjOob7bYo2Ezmy79mpceI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s7cD2vlkiVtl30QPag0u6Tcojui9lHqFvCCnXOnjUYSK3vMMtdwd4YptM6G85y8SUHTNBqPMPV0oproq4wtTRmIMtGMFjnG5mwpAwzhNKeO6VUqKkPR0B3euGjiYnwYjdU/cnr4EO5hsxnC4n6FWxHZWjqo4gEx7k4eaZdz+GTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z0hm7OUA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83B21C4CEE3;
-	Mon, 31 Mar 2025 12:44:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743425061;
-	bh=aWKuAcjkPK09JdPcFjyNkwxjOob7bYo2Ezmy79mpceI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z0hm7OUAeDeIi8eEDtMPNIFr4ScWb2ZLf96Xcnjx850/pzOaY/AzdTHxPf/PI27bt
-	 DU0pB9+1hUrQJ9O/UijUkzOLAphq1P6aV2KpATW1VW8MchkacV3rurMJdnOvIStNCn
-	 Gh6yv/vvm5HeA8nJDyhQ0+ZFIvuSTGDsH67g3kpCPXpm5nXmz/fJXxKRHJJgFUa0Va
-	 1fB9O4JJINqI8hDVEpcu0jYzs6Hkte7gIc3CUFAEg3CotrGQ1lJP9FlD/vP3lnfeb3
-	 ZviGP1xwWrujPubASZ045KYuguYYWVFI9uO8AHUMBEKOAvEhhOW+1WKiMyphFOp8YS
-	 1QaZOFalabIFg==
-Date: Mon, 31 Mar 2025 13:44:17 +0100
-From: Simon Horman <horms@kernel.org>
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
-	jdamato@fastly.com, sdf@fomichev.me, almasrymina@google.com,
-	xuanzhuo@linux.alibaba.com
-Subject: Re: [PATCH net] net: fix use-after-free in the
- netdev_nl_sock_priv_destroy()
-Message-ID: <20250331124417.GB185681@horms.kernel.org>
-References: <20250328062237.3746875-1-ap420073@gmail.com>
+	s=arc-20240116; t=1743425420; c=relaxed/simple;
+	bh=SW3ONDZMYya4KBy0oEZkmBYKj2pWTuwXv08rG2NsZo0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=PX52DQRiQeaV9u3eRuTHiH08pCUOkCU3rZ0GtxUHDSDJhA7v6vImqfoI1OuDiosv4YJ3cPyCjRfwVFiZ9SumsIPMmnZUbBUjmfqzpEGCtW+tF+ASa6urdK9cnNc9VB4LCRIaauvJ+6uv+EliqvDI2WUFsgYDSJsowpo/9zmkD0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R7VWA6y6; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743425415;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SW3ONDZMYya4KBy0oEZkmBYKj2pWTuwXv08rG2NsZo0=;
+	b=R7VWA6y6fm2mVykhDyYaaNhUcrmiVZOQeNlJnxRrInJUYR71iNLHOua7UPgYh9269ZLEfh
+	lO/yi3pe/WdQi3Vl0jNzHn+ubjyodwsM5XMcROpOpWdkfI+Adj9+w8QePpFsLlnMK4zNgt
+	KPdM/plNLfRhHEDM7hR8PxbJY8N3ddI=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-43-ZRrQJD0COBWsF_znMV3BhQ-1; Mon,
+ 31 Mar 2025 08:50:11 -0400
+X-MC-Unique: ZRrQJD0COBWsF_znMV3BhQ-1
+X-Mimecast-MFC-AGG-ID: ZRrQJD0COBWsF_znMV3BhQ_1743425410
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7158B19560A2;
+	Mon, 31 Mar 2025 12:50:10 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.89.226])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9C6B8180B489;
+	Mon, 31 Mar 2025 12:50:07 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Guillaume Nault <gnault@redhat.com>
+Cc: David Miller <davem@davemloft.net>,  Jakub Kicinski <kuba@kernel.org>,
+  Paolo Abeni <pabeni@redhat.com>,  Eric Dumazet <edumazet@google.com>,
+  netdev@vger.kernel.org,  Simon Horman <horms@kernel.org>,  David Ahern
+ <dsahern@kernel.org>,  Pravin B Shelar <pshelar@ovn.org>,  Eelco Chaudron
+ <echaudro@redhat.com>,  Stefano Brivio <sbrivio@redhat.com>,
+  dev@openvswitch.org
+Subject: Re: [PATCH net] tunnels: Accept PACKET_HOST in
+ skb_tunnel_check_pmtu().
+In-Reply-To: <eac941652b86fddf8909df9b3bf0d97bc9444793.1743208264.git.gnault@redhat.com>
+	(Guillaume Nault's message of "Sat, 29 Mar 2025 01:33:44 +0100")
+References: <eac941652b86fddf8909df9b3bf0d97bc9444793.1743208264.git.gnault@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
+Date: Mon, 31 Mar 2025 08:50:05 -0400
+Message-ID: <f7tr02dnz42.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250328062237.3746875-1-ap420073@gmail.com>
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Fri, Mar 28, 2025 at 06:22:37AM +0000, Taehee Yoo wrote:
-> In the netdev_nl_sock_priv_destroy(), an instance lock is acquired
-> before calling net_devmem_unbind_dmabuf(), then releasing an instance
-> lock(netdev_unlock(binding->dev)).
-> However, a binding is freed in the net_devmem_unbind_dmabuf().
-> So using a binding after net_devmem_unbind_dmabuf() occurs UAF.
-> To fix this UAF, it needs to use temporary variable.
-> 
-> Fixes: ba6f418fbf64 ("net: bubble up taking netdev instance lock to callers of net_devmem_unbind_dmabuf()")
-> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+Guillaume Nault <gnault@redhat.com> writes:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+> Because skb_tunnel_check_pmtu() doesn't handle PACKET_HOST packets,
+> commit 30a92c9e3d6b ("openvswitch: Set the skbuff pkt_type for proper
+> pmtud support.") forced skb->pkt_type to PACKET_OUTGOING for
+> openvswitch packets that are sent using the OVS_ACTION_ATTR_OUTPUT
+> action. This allowed such packets to invoke the
+> iptunnel_pmtud_check_icmp() or iptunnel_pmtud_check_icmpv6() helpers
+> and thus trigger PMTU update on the input device.
+>
+> However, this also broke other parts of PMTU discovery. Since these
+> packets don't have the PACKET_HOST type anymore, they won't trigger the
+> sending of ICMP Fragmentation Needed or Packet Too Big messages to
+> remote hosts when oversized (see the skb_in->pkt_type condition in
+> __icmp_send() for example).
+>
+> These two skb->pkt_type checks are therefore incompatible as one
+> requires skb->pkt_type to be PACKET_HOST, while the other requires it
+> to be anything but PACKET_HOST.
+>
+> It makes sense to not trigger ICMP messages for non-PACKET_HOST packets
+> as these messages should be generated only for incoming l2-unicast
+> packets. However there doesn't seem to be any reason for
+> skb_tunnel_check_pmtu() to ignore PACKET_HOST packets.
+>
+> Allow both cases to work by allowing skb_tunnel_check_pmtu() to work on
+> PACKET_HOST packets and not overriding skb->pkt_type in openvswitch
+> anymore.
+>
+> Fixes: 30a92c9e3d6b ("openvswitch: Set the skbuff pkt_type for proper pmtud support.")
+> Fixes: 4cb47a8644cc ("tunnels: PMTU discovery support for directly bridged IP packets")
+> Signed-off-by: Guillaume Nault <gnault@redhat.com>
+> ---
+
+Thanks, Guillaume.
+
+Reviewed-by: Aaron Conole <aconole@redhat.com>
+
+I did manage to test this with two hosts over the weekend, and it
+appears to work for at least one forwarding case that I encountered.
+
+Tested-by: Aaron Conole <aconole@redhat.com>
 
 
