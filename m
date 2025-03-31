@@ -1,163 +1,102 @@
-Return-Path: <netdev+bounces-178459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C855A77184
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 01:48:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77BD6A7718B
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 01:51:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 375B9188E0C3
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 23:48:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C26816A3DF
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 23:51:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B77921E08D;
-	Mon, 31 Mar 2025 23:47:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C130421660F;
+	Mon, 31 Mar 2025 23:51:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="B3XRSBgI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dg+NJLMk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7DF21C168
-	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 23:47:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4441DC9B8
+	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 23:51:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743464842; cv=none; b=XIA6teUxtO/ygkvcJuv+sK2MrbQOCPxC77+SSJZp8JBMx7KU353ur6glk8SrnzHkGLkFXtumAQjRPs9Qp0fx51DUZLTkk8PwmaA1AvNBnSBjf/vnsbikxHG6dGH7AQqtLKZl+f2vhlTQdnbHEvV+I9//FKNWzSSb5hEW7Y2iCOM=
+	t=1743465100; cv=none; b=RnxHOyBxxFI5AzWLu41i1ZvHHOEgx4JlPcxQOnfcrXNO8+kxUN0eARMnFZQoHkIKCFJLufPGy6KPyR0f35sZwzRDUviz+T+OAPRAn9StssvKRMPTtTq2iy0cov5Kb71lj7jzXfsumjkfyZvB3+o2zRW3sCzE1TesepMagiYrNqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743464842; c=relaxed/simple;
-	bh=Z+ud/85iP+UMsBhx+ywUbALKwEcKeSSDD6BaPuMwPFI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=n0cb4LLe/Ufde9lDzOMrHVqvRdTk6kSMth/ad57WLwGBzXrIJ0KugVQroq5UlLuL7imlSAgOK1nkTDpcc+2AEP0iVTpEMmtN7fR+Tj9hEdraiOwzB6j1mJs/TBYmRyedC0BQCleNpGfADovgzMhmaXo+V6vWQRcWU+1/mDsrs88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=B3XRSBgI; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=8EmR3lofZX+ZAws+n3rGXwL377TutUuyQKZMpkiQptg=; t=1743464841; x=1744328841; 
-	b=B3XRSBgIR7Pu6B89j4hA37oCN00oVQI1DOscL684kTyNMkOcLQE/q3ndukjqPAYZ87F/dSeztLz
-	k7C6ILKcG17FAc7hOqsmx1fE/OrFlzY6WS2/8iruK40JNpstMf+3bmUR6/t4JN5hG7cCzl0aw9Equ
-	VjRSgEImng8o0/fZTys7yxC7rLSl61X0DyaYekQUgZnok7Am7k+zv5IvR1ODUHOyORp6zB9SdFxIm
-	04KsXISFjNEYdjOiPVaXL1uka9xGh90k1iI3QGOsg9+9kaNaJEVNaFJFA2ulIDhTTqEgitt2ejPCJ
-	VQOQOETD3gs5fx0linWkbFWMOqSFW1fqGTWQ==;
-Received: from ouster448.stanford.edu ([172.24.72.71]:55223 helo=localhost.localdomain)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tzOqe-000219-05; Mon, 31 Mar 2025 16:47:20 -0700
-From: John Ousterhout <ouster@cs.stanford.edu>
-To: netdev@vger.kernel.org
-Cc: pabeni@redhat.com,
-	edumazet@google.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	John Ousterhout <ouster@cs.stanford.edu>
-Subject: [PATCH net-next v7 14/14] net: homa: create Makefile and Kconfig
-Date: Mon, 31 Mar 2025 16:45:47 -0700
-Message-ID: <20250331234548.62070-15-ouster@cs.stanford.edu>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20250331234548.62070-1-ouster@cs.stanford.edu>
-References: <20250331234548.62070-1-ouster@cs.stanford.edu>
+	s=arc-20240116; t=1743465100; c=relaxed/simple;
+	bh=GdwAFnyC9+HG6YrD19YSXPwAh4c4bGfWOmSo+qN1+GY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=odzwDqycNJ26+IRMgjUFJow0eU7VVWd3ZPLn6uxnB37pANIbOuhUjQHfAbdHyHjFPDlwoEMnmyGloqWwV4rzs6Y+8G/1HRUMBE1Wm6CccrsoCO+cLQf8yCPsqaaeuh7bikn4fhTwF2M/C+eHEWgWUy8bWJm1E7hqtpnmykBKzFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dg+NJLMk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1B4EC4CEE3;
+	Mon, 31 Mar 2025 23:51:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743465100;
+	bh=GdwAFnyC9+HG6YrD19YSXPwAh4c4bGfWOmSo+qN1+GY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Dg+NJLMk24WVe5HeoHT7yZKHkLr7q7kqlxAZmWvMgQPbugWuAHQMEAgJJnclQB+Zb
+	 5T901YsjTlS68X6lE9l1TFm7BztygV6PQGhCOGM2a8OCLATBN7cq4u9q++jB9OK9kn
+	 PRYvq9mEmzDhwFpXl5Ij2bzQGEsmcxnbMWMVLZxJ3e4VrXtVmQJgndLVfnm10jZxcg
+	 8+M9emW1wvCykp7n+KIBYFJuCT+5SuIoqz+sNU8xKlvAG9CNgbOmyAgfUEXzCF5L5x
+	 ln36iLE7wY1KxjHYBonCxoJzGbB2SQu+ymR2xX3ZYOfdeydOtuivxvOdZqp5Wj2Yi8
+	 oCBTuPMGjVhHQ==
+Date: Mon, 31 Mar 2025 16:51:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tobias Waldekranz <tobias@waldekranz.com>
+Cc: davem@davemloft.net, maxime.chevallier@bootlin.com,
+ marcin.s.wojtas@gmail.com, linux@armlinux.org.uk, andrew@lunn.ch,
+ edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH v4 net] net: mvpp2: Prevent parser TCAM memory
+ corruption
+Message-ID: <20250331165137.467fbea1@kernel.org>
+In-Reply-To: <20250327103139.567970-1-tobias@waldekranz.com>
+References: <20250327103139.567970-1-tobias@waldekranz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -101.0
-X-Scan-Signature: c870281afef8b7f1344e56ea5df5212b
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Before this commit the Homa code is "inert": it won't be compiled
-in kernel builds. This commit adds Homa's Makefile and Kconfig, and
-also links Homa into net/Makefile and net/Kconfig, so that Homa
-will be built during kernel builds if enabled (it is disabled by
-default).
+On Thu, 27 Mar 2025 11:30:49 +0100 Tobias Waldekranz wrote:
+> +static void mvpp2_prs_mac_promisc_set_unlocked(struct mvpp2 *priv, int port,
 
-Signed-off-by: John Ousterhout <ouster@cs.stanford.edu>
----
- net/Kconfig       |  1 +
- net/Makefile      |  1 +
- net/homa/Kconfig  | 19 +++++++++++++++++++
- net/homa/Makefile | 15 +++++++++++++++
- 4 files changed, 36 insertions(+)
- create mode 100644 net/homa/Kconfig
- create mode 100644 net/homa/Makefile
+Could be subjective but I tend to call things _locked, not _unlocked.
+As it the function is called in context in which the state is already
+locked. Could you change? Another way would be to just prepend two
+underscores to the name..
 
-diff --git a/net/Kconfig b/net/Kconfig
-index c3fca69a7c83..d6df0595d1d5 100644
---- a/net/Kconfig
-+++ b/net/Kconfig
-@@ -247,6 +247,7 @@ endif
- 
- source "net/dccp/Kconfig"
- source "net/sctp/Kconfig"
-+source "net/homa/Kconfig"
- source "net/rds/Kconfig"
- source "net/tipc/Kconfig"
- source "net/atm/Kconfig"
-diff --git a/net/Makefile b/net/Makefile
-index 60ed5190eda8..516b17d0bc6f 100644
---- a/net/Makefile
-+++ b/net/Makefile
-@@ -44,6 +44,7 @@ obj-y				+= 8021q/
- endif
- obj-$(CONFIG_IP_DCCP)		+= dccp/
- obj-$(CONFIG_IP_SCTP)		+= sctp/
-+obj-$(CONFIG_HOMA)		+= homa/
- obj-$(CONFIG_RDS)		+= rds/
- obj-$(CONFIG_WIRELESS)		+= wireless/
- obj-$(CONFIG_MAC80211)		+= mac80211/
-diff --git a/net/homa/Kconfig b/net/homa/Kconfig
-new file mode 100644
-index 000000000000..3e623906612f
---- /dev/null
-+++ b/net/homa/Kconfig
-@@ -0,0 +1,19 @@
-+# SPDX-License-Identifier: BSD-2-Clause
-+#
-+# Homa transport protocol
-+#
-+
-+menuconfig HOMA
-+	tristate "The Homa transport protocol"
-+	depends on INET
-+	depends on IPV6
-+
-+	help
-+	  Homa is a network transport protocol for communication within
-+	  a datacenter. It provides significantly lower latency than TCP,
-+	  particularly for workloads containing a mixture of large and small
-+	  messages operating at high network utilization. For more information
-+	  see the homa(7) man page or checkout the Homa Wiki at
-+	  https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview.
-+
-+	  If unsure, say N.
-diff --git a/net/homa/Makefile b/net/homa/Makefile
-new file mode 100644
-index 000000000000..2b3c3aff2058
---- /dev/null
-+++ b/net/homa/Makefile
-@@ -0,0 +1,15 @@
-+# SPDX-License-Identifier: BSD-2-Clause
-+#
-+# Makefile for the Linux implementation of the Homa transport protocol.
-+
-+obj-$(CONFIG_HOMA) := homa.o
-+homa-y:=        homa_incoming.o \
-+		homa_interest.o \
-+		homa_outgoing.o \
-+		homa_peer.o \
-+		homa_plumbing.o \
-+		homa_pool.o \
-+		homa_rpc.o \
-+		homa_sock.o \
-+		homa_timer.o \
-+		homa_utils.o
+> +					       enum mvpp2_prs_l2_cast l2_cast,
+> +					       bool add)
+>  {
+>  	struct mvpp2_prs_entry pe;
+>  	unsigned char cast_match;
+>  	unsigned int ri;
+>  	int tid;
+>  
+> +	lockdep_assert_held(&priv->prs_spinlock);
+> +
+>  	if (l2_cast == MVPP2_PRS_L2_UNI_CAST) {
+>  		cast_match = MVPP2_PRS_UCAST_VAL;
+>  		tid = MVPP2_PE_MAC_UC_PROMISCUOUS;
+
+> @@ -522,6 +541,14 @@ void mvpp2_prs_mac_promisc_set(struct mvpp2 *priv, int port,
+>  	mvpp2_prs_hw_write(priv, &pe);
+>  }
+>  
+> +void mvpp2_prs_mac_promisc_set(struct mvpp2 *priv, int port,
+> +			       enum mvpp2_prs_l2_cast l2_cast, bool add)
+> +{
+> +		spin_lock_bh(&priv->prs_spinlock);
+> +		mvpp2_prs_mac_promisc_set_unlocked(priv, port, l2_cast, add);
+> +		spin_unlock_bh(&priv->prs_spinlock);
+
+nit2: this is indented too much
+
+> +}
 -- 
-2.34.1
-
+pw-bot: cr
 
