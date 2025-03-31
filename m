@@ -1,184 +1,128 @@
-Return-Path: <netdev+bounces-178356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DB20A76BA8
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 18:11:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 95C32A76BD3
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 18:18:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27ACD166D0C
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 16:11:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF16F167928
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 16:18:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDC4C21422A;
-	Mon, 31 Mar 2025 16:11:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E9731E1A33;
+	Mon, 31 Mar 2025 16:17:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="peFrHoYw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cb0H50iU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A7E1DF75A
-	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 16:11:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B76A1DE892
+	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 16:17:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743437511; cv=none; b=UfR1opratcru0G4TR8O462LLk49TCsC3/Bf8Mjmeh4uXO4S5iIIBn8FcYhar+9qNCszwCd0byPuUHzWi0prVO1R9C2Y3envCDOtPTshBvUi/JTAF2e8Uefzs26M3129M+yBWpHyVri0IbFIDvweXi/Iy0AIugkHHStPkEFqA6k8=
+	t=1743437875; cv=none; b=Q2TH8TP49TYmtnFxf7nbo0AUZv1GFy5Epya2XjEh3x3yTDCEQHa5WxFKZS41rsXXY7puYEcZ2pIajiTkbh5eEb+kcLrgBEhNpb+XylguBFyYarIEZoRILIK8U+p+Ry3IctWMJUIKnCztYZkDPywfbQhvQV84oU0w6Nqs2AwFI2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743437511; c=relaxed/simple;
-	bh=D0h4VNQP+PK921gcUla5yKBnP985hbMX4nsgHpW2j9o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=u60hXKdWtuPuF8Bis0NOfSz2m0BwKGMUKa12GZdsJOzh2EKYw3UEsYNRBDFhvFKXKa9biSORuCFoObtVmx5I3oPXZTvBKDPvE92/26HtldHbTjPH8BWsP+1MhtyDyGlDvMV2vHQCdDg76aYTVKLaxRbLEVAiMJQNSSIrxSbtyUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=peFrHoYw; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-476a304a8edso42492411cf.3
-        for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 09:11:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743437509; x=1744042309; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=To6JPgAW/7HbS4G5u1fW1vC6n8Hiz1fLAs6UmlGPHDM=;
-        b=peFrHoYw9sN43qnRF6mM0wTH/p5lGHB1dH+Bt11/4MgMFlNgeIGSz3s3CICfwMiE5v
-         dyh3T5KrKX9TxikdRVdKIsrAsDkU4bT1yhNHIaZW1qK8BQo3ahHwY6kRZcbJg6oY3E7y
-         bYZFmlPfgalzPRJrVqrNd1fk44pMu/RyuAOfgsZ/Dr5W8xFMpiQyyoyxETJvejcBGzYV
-         HLtXsaqOQaVJCTuyGpJblzuDf988aXqiQz18Z7ofKLaugtCZhGJOxFY5XOOIHA0T05E5
-         FGkqyIDLPHPct1OTIfI+IpuHvlz0T1uk25Z9CXeayMg7trzCj2/0wifVCxloEsxmUbXL
-         I0kQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743437509; x=1744042309;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=To6JPgAW/7HbS4G5u1fW1vC6n8Hiz1fLAs6UmlGPHDM=;
-        b=akWVrhOtjtfcQWLlEUw4vk8hKWy5kFq+54zhsEwxLMYy13wjBqAxXUYehs+v/SXkTP
-         JGYkDCKn+kdUo2IWPWz8SEUfuTpOANrHHDVCpjNQTL/pBw4f+aOZj48mM79xa+fcBqh0
-         omVAC5pT+MlnqQ20GBqQgRVSX8r0wb769nh7G3Q9PSFk62yfpzBvEVUvzRBt6QuQfyXR
-         1wKWodGyzdSfcebmYambkQX65HHF/ntcKwUYVbeoUWVCW0k/oR6RUJpe1WNAfUXerbeL
-         BrsApIdY0dnKOx+c+3BhW6ccR2xEm4TDnOvTwWhw2HCOeAks446L4bUIwjkPotcV3VOj
-         pM4A==
-X-Forwarded-Encrypted: i=1; AJvYcCWp38yhgL9Gf/AH9ROIXwDUEkjG/eJDg6Fjjs8dn5zFUzOgId8U0M5booApx6Yv6x+oNIZBZXA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOl6pMhtqaHy1mO0mBT3ph8jsTxuzgvpP9Dwdyez9osvjrPTP6
-	h++aGXypXtZCx/FCVRjldCx1ztRA5a6U0rNFCaxeH53UTqasyEXDpG+HvXj5IKxtkytOkGTDTyE
-	tK+JokXuus6/+7s69MbfnBVCvnuXagWWY2UeT9iMVaEC1iZ1kqQ==
-X-Gm-Gg: ASbGncs/gu0NGLoVtfM9pu0iESJCiPZtVnRSaCmwO1phwHnRYFJzPBHhEFmoKovWmo9
-	+B7PTDkcOlNbKEMkgOyHPb5JqUn39E3YSkgFjU1wL7/WAGr+QNhn2mVrGfy4XRi1fARfhM2Wz+Y
-	tizMKbFS9kFceyoSvIdYed4fmU
-X-Google-Smtp-Source: AGHT+IEAJL2kL+B28UyibpUl7AKAk2gFrXtEQuhwlzSAZp0ZZZHUX6c3h54ed0PRaPjRrquIFdurjuhx+EIfToC/kgQ=
-X-Received: by 2002:ac8:594a:0:b0:476:9252:ce8 with SMTP id
- d75a77b69052e-477ed6b766dmr102334581cf.10.1743437508852; Mon, 31 Mar 2025
- 09:11:48 -0700 (PDT)
+	s=arc-20240116; t=1743437875; c=relaxed/simple;
+	bh=GLt2qxliARWsWadN44XE6Cw38AjZfFoCaVkAZ79+/cI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=bxdtLdhL18X6LmQjPHpnSDLS2RgFot0c/kFOPyabrBC0C8gpUtaOmWt9MIPWvh/EIZfXvU4ePoZqPsPdTKjbVs28U5K2VpNudej7p+OHytoKrnkO6iV2AMT41nLX0wpsLp2zZg4kWnP7VlNbgRRBcHrZJGWUJpqc2mwkmVD62Bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cb0H50iU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A343AC4CEE3;
+	Mon, 31 Mar 2025 16:17:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743437875;
+	bh=GLt2qxliARWsWadN44XE6Cw38AjZfFoCaVkAZ79+/cI=;
+	h=From:Date:Subject:To:Cc:From;
+	b=cb0H50iU2Gu6dsH85BTD+036NEeKyWwrG8lw5jnA3dsFfdgL6vGLXJltqgkrDeSzA
+	 aeDEh1Ct8X8cIt2oXr6/pWEIo8khx99q/+cCocoQVZbSHl8/1J5OAKimmOr/uU5Hz7
+	 xXi3D3w03j3ziem/oWwdP0g0x2rwarRPa/f8VRM9pm6TrKhElm3fvNQFM334lAc00X
+	 JIThzeKgMc8E0cyx3YYhuWY+wdYXbXV0CQNB9Cl375QfLJXAz1DMrXX5w08vVLW42E
+	 kdG43wiRV52EdSQnjwmiUaHLdY/7gZDK4BnJ/JGr5ZAZj7cDWe0Wk20JKgOFTf1R+f
+	 X9BWisPAEPaHg==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Mon, 31 Mar 2025 18:17:31 +0200
+Subject: [PATCH net] net: airoha: Fix ETS priomap validation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250331091532.224982-1-edumazet@google.com> <CADvbK_eneePox-VFbicSmt55g+VJdc+5m_LoS2bu_Pezatjq0g@mail.gmail.com>
-In-Reply-To: <CADvbK_eneePox-VFbicSmt55g+VJdc+5m_LoS2bu_Pezatjq0g@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 31 Mar 2025 18:11:38 +0200
-X-Gm-Features: AQ5f1JpmtQJ1mcLIfaI0R6gmxfDbt2V4k4xXRwJzOYeu5FBRnduWiHVHy_2urxQ
-Message-ID: <CANn89i+xpmBDQBPPG_QDfACHL=8h5=1bKqJjvD+e4=SHU7t76A@mail.gmail.com>
-Subject: Re: [PATCH net] sctp: add mutual exclusion in proc_sctp_do_udp_port()
-To: Xin Long <lucien.xin@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, syzbot+fae49d997eb56fa7c74d@syzkaller.appspotmail.com, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250331-airoha-ets-validate-priomap-v1-1-60a524488672@kernel.org>
+X-B4-Tracking: v=1; b=H4sIABrA6mcC/x3MzQpAQBAA4FfRnE3tTyKvIofBYAq7zUpK3t3m+
+ F2+BxKrcIK2eED5kiThyLBlAeNKx8IoUzY44yrjvUUSDSshnwkv2mSikzGqhJ0iNuPgZ+PqobI
+ W8hCVZ7n/vevf9wP9Uww7bQAAAA==
+X-Change-ID: 20250331-airoha-ets-validate-priomap-8cb3f027b511
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Davide Caratti <dcaratti@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.2
 
-On Mon, Mar 31, 2025 at 5:54=E2=80=AFPM Xin Long <lucien.xin@gmail.com> wro=
-te:
->
-> On Mon, Mar 31, 2025 at 5:15=E2=80=AFAM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > We must serialize calls to sctp_udp_sock_stop() and sctp_udp_sock_start=
-()
-> > or risk a crash as syzbot reported:
-> >
-> > Oops: general protection fault, probably for non-canonical address 0xdf=
-fffc000000000d: 0000 [#1] SMP KASAN PTI
-> > KASAN: null-ptr-deref in range [0x0000000000000068-0x000000000000006f]
-> > CPU: 1 UID: 0 PID: 6551 Comm: syz.1.44 Not tainted 6.14.0-syzkaller-g7f=
-2ff7b62617 #0 PREEMPT(full)
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS=
- Google 02/12/2025
-> >  RIP: 0010:kernel_sock_shutdown+0x47/0x70 net/socket.c:3653
-> > Call Trace:
-> >  <TASK>
-> >   udp_tunnel_sock_release+0x68/0x80 net/ipv4/udp_tunnel_core.c:181
-> >   sctp_udp_sock_stop+0x71/0x160 net/sctp/protocol.c:930
-> >   proc_sctp_do_udp_port+0x264/0x450 net/sctp/sysctl.c:553
-> >   proc_sys_call_handler+0x3d0/0x5b0 fs/proc/proc_sysctl.c:601
-> >   iter_file_splice_write+0x91c/0x1150 fs/splice.c:738
-> >   do_splice_from fs/splice.c:935 [inline]
-> >   direct_splice_actor+0x18f/0x6c0 fs/splice.c:1158
-> >   splice_direct_to_actor+0x342/0xa30 fs/splice.c:1102
-> >   do_splice_direct_actor fs/splice.c:1201 [inline]
-> >   do_splice_direct+0x174/0x240 fs/splice.c:1227
-> >   do_sendfile+0xafd/0xe50 fs/read_write.c:1368
-> >   __do_sys_sendfile64 fs/read_write.c:1429 [inline]
-> >   __se_sys_sendfile64 fs/read_write.c:1415 [inline]
-> >   __x64_sys_sendfile64+0x1d8/0x220 fs/read_write.c:1415
-> >   do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-> >
-> > Fixes: 046c052b475e ("sctp: enable udp tunneling socks")
-> > Reported-by: syzbot+fae49d997eb56fa7c74d@syzkaller.appspotmail.com
-> > Closes: https://lore.kernel.org/netdev/67ea5c01.050a0220.1547ec.012b.GA=
-E@google.com/T/#u
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-> > Cc: Xin Long <lucien.xin@gmail.com>
-> > ---
-> >  net/sctp/sysctl.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/net/sctp/sysctl.c b/net/sctp/sysctl.c
-> > index 8e1e97be4df79f3245e2bbbeb0a75841abc67f58..ee3eac338a9deef064f273e=
-29bb59b057835d3f1 100644
-> > --- a/net/sctp/sysctl.c
-> > +++ b/net/sctp/sysctl.c
-> > @@ -525,6 +525,8 @@ static int proc_sctp_do_auth(const struct ctl_table=
- *ctl, int write,
-> >         return ret;
-> >  }
-> >
-> > +static DEFINE_MUTEX(sctp_sysctl_mutex);
-> > +
-> >  static int proc_sctp_do_udp_port(const struct ctl_table *ctl, int writ=
-e,
-> >                                  void *buffer, size_t *lenp, loff_t *pp=
-os)
-> >  {
-> > @@ -549,6 +551,7 @@ static int proc_sctp_do_udp_port(const struct ctl_t=
-able *ctl, int write,
-> >                 if (new_value > max || new_value < min)
-> >                         return -EINVAL;
-> >
-> > +               mutex_lock(&sctp_sysctl_mutex);
-> >                 net->sctp.udp_port =3D new_value;
-> >                 sctp_udp_sock_stop(net);
-> >                 if (new_value) {
-> > @@ -561,6 +564,7 @@ static int proc_sctp_do_udp_port(const struct ctl_t=
-able *ctl, int write,
-> >                 lock_sock(sk);
-> >                 sctp_sk(sk)->udp_port =3D htons(net->sctp.udp_port);
-> >                 release_sock(sk);
-> > +               mutex_unlock(&sctp_sysctl_mutex);
-> >         }
-> >
-> >         return ret;
-> > --
-> > 2.49.0.472.ge94155a9ec-goog
-> >
-> Instead of introducing a new lock for this, wouldn't be better to just
-> move up `lock_sock(sk)` a little bit?
+ETS Qdisc schedules SP bands in a priority order assigning band-0 the
+highest priority (band-0 > band-1 > .. > band-n) while EN7581 arranges
+SP bands in a priority order assigning band-7 the highest priority
+(band-7 > band-6, .. > band-n).
+Fix priomap check in airoha_qdma_set_tx_ets_sched routine in order to
+align ETS Qdisc and airoha_eth driver SP priority ordering.
 
-It depends if calling synchronize_rcu() two times while holding the
-socket lock is ok or not ?
+Fixes: b56e4d660a96 ("net: airoha: Enforce ETS Qdisc priomap")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ drivers/net/ethernet/airoha/airoha_eth.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-What is the issue about using a separate mutex ?
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
+index c0a642568ac115ea9df6fbaf7133627a4405a36c..5a1039c95241ad943ce6d42e8aa290f693653471 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.c
++++ b/drivers/net/ethernet/airoha/airoha_eth.c
+@@ -2028,7 +2028,7 @@ static int airoha_qdma_set_tx_ets_sched(struct airoha_gdm_port *port,
+ 	struct tc_ets_qopt_offload_replace_params *p = &opt->replace_params;
+ 	enum tx_sched_mode mode = TC_SCH_SP;
+ 	u16 w[AIROHA_NUM_QOS_QUEUES] = {};
+-	int i, nstrict = 0, nwrr, qidx;
++	int i, nstrict = 0;
+ 
+ 	if (p->bands > AIROHA_NUM_QOS_QUEUES)
+ 		return -EINVAL;
+@@ -2046,17 +2046,17 @@ static int airoha_qdma_set_tx_ets_sched(struct airoha_gdm_port *port,
+ 	 * lowest priorities with respect to SP ones.
+ 	 * e.g: WRR0, WRR1, .., WRRm, SP0, SP1, .., SPn
+ 	 */
+-	nwrr = p->bands - nstrict;
+-	qidx = nstrict && nwrr ? nstrict : 0;
+-	for (i = 1; i <= p->bands; i++) {
+-		if (p->priomap[i % AIROHA_NUM_QOS_QUEUES] != qidx)
++	for (i = 0; i < nstrict; i++) {
++		if (p->priomap[p->bands - i - 1] != i)
+ 			return -EINVAL;
+-
+-		qidx = i == nwrr ? 0 : qidx + 1;
+ 	}
+ 
+-	for (i = 0; i < nwrr; i++)
++	for (i = 0; i < p->bands - nstrict; i++) {
++		if (p->priomap[i] != nstrict + i)
++			return -EINVAL;
++
+ 		w[i] = p->weights[nstrict + i];
++	}
+ 
+ 	if (!nstrict)
+ 		mode = TC_SCH_WRR8;
+
+---
+base-commit: 4f1eaabb4b66a1f7473f584e14e15b2ac19dfaf3
+change-id: 20250331-airoha-ets-validate-priomap-8cb3f027b511
+
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
