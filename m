@@ -1,218 +1,336 @@
-Return-Path: <netdev+bounces-178444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96D42A770D2
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 00:20:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA3C7A770D4
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 00:22:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B32B9188BDC9
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 22:20:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28973167F64
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 22:22:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD12921B9CF;
-	Mon, 31 Mar 2025 22:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8837221A428;
+	Mon, 31 Mar 2025 22:22:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fL/Swizj"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="fm16aIjr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-24429.protonmail.ch (mail-24429.protonmail.ch [109.224.244.29])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E076742A94;
-	Mon, 31 Mar 2025 22:20:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE9BB42A94
+	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 22:22:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.224.244.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743459602; cv=none; b=UzKQJ45/qKihhMNE0d2DlOipYozkmpWMG6vLws6NLRRAF9vChIuhnT674jqLnF+N+125Md9CTjWy6Fd8E7f5+GNuzGJa6V1v1m33y9yo0AR7tiHxhVw3MhdEQiDedpewrPlNYB2lOXwK1kGqAyRXM2/9oYYa6HZEWL8NFgOXhZw=
+	t=1743459756; cv=none; b=cRmU4vB4dLkDoXHRYXyWLcfIYk9F7wpzI3XxE00OMBydILIblLt593ptLkpg0gMo/8UwiBxRpHr6t+iIGDv4hTNbkmIDnCjDe+82Qvea7SvKWFcxT9bC+8HEygIg7Fq++/U0PcR6K3xhl2iTouHhPt+qJ+IlTDOq1Db03Ur3Dg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743459602; c=relaxed/simple;
-	bh=6Imi+mj6K0Ur5HmqiOzqPpY5VuUrlHSMhZMS4R6+nSY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YmxzzIWmlNMsaru5Kny3rlKB6rvcYSaD1d8fykBtoxYrnHq852bzgRUXL3qrEeL+vLp1WaBIQktFki5kXm384lavYmBWCk3/wsGly2oEUqvzRU1/LZBWsAxoAZtUF2uCij3p32coQAXAfA6IdD0p2VQ1ER/Wz4KIUgh6WdY9LAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fL/Swizj; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-39c0e0bc733so2454915f8f.1;
-        Mon, 31 Mar 2025 15:20:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743459599; x=1744064399; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b+hSR1+tIbx5yMHcV2MZCy95L6aErMxELApRXynVAjg=;
-        b=fL/SwizjMfW0NmLG8kUirG28IRChM7w+Wa/FmxfFHZ/qT0tD0yzbtwzL0kdgROtczA
-         vQ7TF2fdUJXHv91lnP0TtoMabBEKeGx1GtOo0Yup2oPCbVrlw7wgkBdFaG9Sqod6jli7
-         80gFlMD7ZBpqxJgRGkydhoRBNzmTcpg2Mno9Kg8mKhSWj93tRRH5J+O5Kap/QXuLhp2i
-         /OgjJ23FsBkrU/Am4bCK1vwDbCsrvTIVe5lw/iID7rHx1i3xAwEUm2ZHoL55oV5yunTR
-         k4RF1g5melvdYk/5FUWYO+rpC0nxv9x074fHHKagj0PDY04rcu8nYAA6grKBmlL0QyEw
-         g7cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743459599; x=1744064399;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b+hSR1+tIbx5yMHcV2MZCy95L6aErMxELApRXynVAjg=;
-        b=S/RdeawxSM2/Ic5uAmCTnT8jf27eKgs88zAwYBvAWN0j86r7TaD9AnEHyA3nL1vW2V
-         XcStewyHGAsW+ny31EOfiHBKtXJR2cPMRwHb5GDuJCo4PRFWjDldOw5BbqPwkmviAm9S
-         LZsQGhyA4YGtB4VcmUdGd+QQWEkx64S2TVoi8zm3kB4IBDM6ijiUiQkmWPLppKn9SkEB
-         w0guGaYvoh9QjTF+ZQs8EMXXXsPDoHj/dewO7Ba9Q+f1sKHR1h1c4PFhBDsfoGEL1jC8
-         Tv3X4f/313IasP1rDzNEjftWWkmsI3h4p6CY87z5qBgFlIflaw5iXg0Rwu9lkMQU2xJ4
-         idNw==
-X-Forwarded-Encrypted: i=1; AJvYcCX/KIKQHvMmnoo/URt7InBvIgUyTFdnactCEXsZTyTnHvqdspPffjpGZ4zqiAvGzskoPFjTGIm9Pd0Ai3w=@vger.kernel.org, AJvYcCXAigFtG/jCn3O3igbrlaI1kCAuLgHGe9MezoDyMujPr/cIHCN9MCia99KulP3WTjaXJopWVeNV@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvXfFLYXFjOddjPMAdUGgSehqGjURatMKX+tPZlZdI40aaxR9T
-	YYCjvbgZVWkoHlI+c0BGG0APJGf0x3raNhEiCj0NYSfu9rz2jOBENd4SWee4gpXwXU0V9iu+wVM
-	oGVVaxzmThMW2Ygd+C2HIcB8FG+U=
-X-Gm-Gg: ASbGncsf2UEvhp621mAOV85TBLjK0nDXL7TqZo4RpDfRs/YxMEB/TsdcVw/xuiEX3jZ
-	2JucOrQvPDpTeGZv+2VhoSnLHFs+Z3K6SFkZ7yetIurdOPMg75K+zH7GyqMmqZcYoQgB18Q5gHS
-	skvwjoBWPQ8zljgLcIcl8p2P4Z3ZBaODHWneAmyUpLG4BNeodmTdf1C2ICFEY=
-X-Google-Smtp-Source: AGHT+IFgSysh56KurewSd3Nk/bNUGW3qwrcRPIQP/JUmaMtg6PyNAGFcsjnPPM0EApLH1ebhQAo8saKc84XBpk9ytY0=
-X-Received: by 2002:a05:6000:2405:b0:39c:140b:feec with SMTP id
- ffacd0b85a97d-39c140bff36mr6815630f8f.7.1743459598932; Mon, 31 Mar 2025
- 15:19:58 -0700 (PDT)
+	s=arc-20240116; t=1743459756; c=relaxed/simple;
+	bh=gGzgiTvXQQibZ+ERzRwwxgHi50AUO/I+7vx93+o07d4=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=IjriA6G1IJ2RJ2jeVZY5scBDE+S5drXemYsLxL8iKIj9TxB8uGyHGYEG9B6Tzw7mO1y1Ni4Em6fUxnWf3355UbZE75rF89R9r1AToMhnnQ6o0XFUISBVMl1jo/nboAmaCivUpo/mB9/ggq93wrtevXCaAmc124i1V7tK9iZtOaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=fm16aIjr; arc=none smtp.client-ip=109.224.244.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1743459746; x=1743718946;
+	bh=Nxy07cmWokL1xUwGoARaDrFRBW2Ukg+q1AJmS9EGCs0=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector:
+	 List-Unsubscribe:List-Unsubscribe-Post;
+	b=fm16aIjrCukTMj5VVVhpAe1iAsu97ziHBF6l9GXj5qGKKe0oII+S7fJH7YUTadCLW
+	 6395cgfAv6lhO5xYE+poU+fcVJ41MRYiVBfTrRfGAJauz800gV4t1bmS3uAsx7CwOA
+	 8N2zUQh+9MLEQBNf4m0DyWrufi60IavYO7ISN0m0ZQw02Y89RVTuw7HEyJB68qLQpk
+	 P4hWTRDAUOWVog9snHzb2X2Q503rVibj39SH/d6uGJlnpSr6HkeLvSyM70KyC/Z9jc
+	 CvOpvCkBsPtNIHRslNKR+SA79D+yZZW6aLH0n0ynVHAZTCclDbeGrnjrfFoQIlgMKB
+	 zgq2UMAk/WaFw==
+Date: Mon, 31 Mar 2025 22:22:19 +0000
+To: Linux Networking <netdev@vger.kernel.org>
+From: Turritopsis Dohrnii Teo En Ming <teo.en.ming@protonmail.com>
+Cc: "ceo@teo-en-ming-corp.com" <ceo@teo-en-ming-corp.com>
+Subject: Overall Summary of Installing and Configuring Palo Alto VM-Series Software Firewall 10.0.4 in Ubuntu Desktop 22.04.5 LTS KVM Host
+Message-ID: <W7-9ud6OsKlsNj2TxreqwNR_nZuD6PvhV8zMRFNgZd67mh1eKrzugdgVtRJOouvoJ0tXr3ksDXF6QiSr6s7qBASErhpZT-oRrOlizjTFcJU=@protonmail.com>
+Feedback-ID: 39510961:user:proton
+X-Pm-Message-ID: bb1ebea3f4112c947d6799dc19d921c60cfaaf97
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250307173611.129125-1-maxime.chevallier@bootlin.com>
- <20250307173611.129125-10-maxime.chevallier@bootlin.com> <8d3a9c9bb76b1c6bc27d2bd01f4831b2cac83f7f.camel@gmail.com>
- <Z-qPs7y8C09xh5_b@shell.armlinux.org.uk>
-In-Reply-To: <Z-qPs7y8C09xh5_b@shell.armlinux.org.uk>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Mon, 31 Mar 2025 15:19:22 -0700
-X-Gm-Features: AQ5f1JoSBA9-etYU7M7NADKlb-o6h_I8MawO0ZvLruH8CUNhEKhc15qJBi4pe_E
-Message-ID: <CAKgT0Ud1ZRBiaDGzHmgWWNjZgGHTbcGUNFzftD3e0ndy2E9nyw@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 09/13] net: phylink: Use phy_caps_lookup for
- fixed-link configuration
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net, 
-	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, 
-	linux-arm-kernel@lists.infradead.org, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
-	=?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>, 
-	Oleksij Rempel <o.rempel@pengutronix.de>, Simon Horman <horms@kernel.org>, 
-	Romain Gantois <romain.gantois@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 31, 2025 at 5:51=E2=80=AFAM Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
->
-> On Thu, Mar 27, 2025 at 06:16:00PM -0700, Alexander H Duyck wrote:
-> > On Fri, 2025-03-07 at 18:36 +0100, Maxime Chevallier wrote:
-> > > When phylink creates a fixed-link configuration, it finds a matching
-> > > linkmode to set as the advertised, lp_advertising and supported modes
-> > > based on the speed and duplex of the fixed link.
-> > >
-> > > Use the newly introduced phy_caps_lookup to get these modes instead o=
-f
-> > > phy_lookup_settings(). This has the side effect that the matched
-> > > settings and configured linkmodes may now contain several linkmodes (=
-the
-> > > intersection of supported linkmodes from the phylink settings and the
-> > > linkmodes that match speed/duplex) instead of the one from
-> > > phy_lookup_settings().
-> > >
-> > > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > > ---
-> > >  drivers/net/phy/phylink.c | 44 +++++++++++++++++++++++++++----------=
---
-> > >  1 file changed, 31 insertions(+), 13 deletions(-)
-> > >
-> > > diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-> > > index cf9f019382ad..8e2b7d647a92 100644
-> > > --- a/drivers/net/phy/phylink.c
-> > > +++ b/drivers/net/phy/phylink.c
-> > > @@ -802,12 +802,26 @@ static int phylink_validate(struct phylink *pl,=
- unsigned long *supported,
-> > >     return phylink_validate_mac_and_pcs(pl, supported, state);
-> > >  }
-> > >
-> > > +static void phylink_fill_fixedlink_supported(unsigned long *supporte=
-d)
-> > > +{
-> > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_10baseT_Half_BIT, supported);
-> > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_10baseT_Full_BIT, supported);
-> > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Half_BIT, supported);
-> > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT, supported);
-> > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Half_BIT, supported)=
-;
-> > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT, supported)=
-;
-> > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, supported)=
-;
-> > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT, supported)=
-;
-> > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT, supported=
-);
-> > > +}
-> > > +
-> >
-> > Any chance we can go with a different route here than just locking
-> > fixed mode to being only for BaseT configurations?
-> >
-> > I am currently working on getting the fbnic driver up and running and I
-> > am using fixed-link mode as a crutch until I can finish up enabling
-> > QSFP module support for phylink and this just knocked out the supported
-> > link modes as I was using 25CR, 50CR, 50CR2, and 100CR2.
-> >
-> > Seems like this should really be something handled by some sort of
-> > validation function rather than just forcing all devices using fixed
-> > link to assume that they are BaseT. I know in our direct attached
-> > copper case we aren't running autoneg so that plan was to use fixed
-> > link until we can add more flexibility by getting QSFP support going.
->
-> Please look back at phylink's historical behaviour. Phylink used to
-> use phy_lookup_setting() to locate the linkmode for the speed and
-> duplex. That is the behaviour that we should be aiming to preserve.
->
-> We were getting:
->
-> speed   duplex  linkmode
-> 10M     Half    10baseT_Half
-> 10M     Full    10baseT_Full
-> 100M    Half    100baseT_Half
-> 100M    Full    100baseT_Full
-> 1G      Half    1000baseT_Half
-> 1G      Full    1000baseT_Full (this changed over time)
-> 2.5G    Full    2500baseT_Full
-> 5G      Full    5000baseT_Full
->
-> At this point, things get weird because of the way linkmodes were
-> added, as we return the _first_ match. Before commit 3c6b59d6f07c
-> ("net: phy: Add more link modes to the settings table"):
->
-> 10G     Full    10000baseKR_Full
-> Faster speeds not supported
->
-> After the commit:
-> 10G     Full    10000baseCR_Full
-> 20G     Full    20000baseKR2_Full
-> 25G     Full    25000baseCR_Full
-> 40G     Full    40000baseCR4_Full
-> 50G     Full    50000baseCR2_Full
-> 56G     Full    56000baseCR4_Full
-> 100G    Full    100000baseCR4_Full
->
-> It's all a bit random. :(
+Subject: Overall Summary of Installing and Configuring Palo Alto VM-Series =
+Software Firewall 10.0.4 in Ubuntu Desktop 22.04.5 LTS KVM Host
 
-I agree. I was using pcs_validate to overcome some of that by limiting
-myself to *mostly* one link type at each speed. The only spot that got
-a bit iffy was the 50G as I support 50GAUI and LAUI-2. I was
-overcoming that by tracking the number of lanes expected and filtering
-for one or the other.
+Author: Mr. Turritopsis Dohrnii Teo En Ming
+Country: Singapore
+Date: 31 Mar 2025 Monday
 
-One thought I had proposed in another email was to look at adding more
-data to the fields. In the case of duplex we could overload it to also
-be the number of lanes as they represent full duplex lanes anyway.
-With that you could sort out some of the CR vs CR2 noise.
+DETAILED INSTRUCTIONS
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-In addition I wonder if we shouldn't also look at including port type
-in the data. Using that you could essentially go through the
-post-validated supported values and OR in the types that belong to the
-various link modes for TP, FIBER, DA, ect. That would sort out some of
-the KR vs CR vs SR vs LR noise.
+Download and install Ubuntu Desktop 22.04.5 LTS on a hardware appliance wit=
+h 3 or 4 network interface cards.
+
+Please *DO NOT* install and run openssh-server, as Advanced Persistent Thre=
+ats (APT) hackers may use this avenue to hack into your Ubuntu KVM host.
+
+On the morning of 30 March 2025 Sunday, Advanced Persistent Threats (APT) h=
+ackers hacked into my previous installation of Ubuntu KVM host and changed =
+my netplan
+configuration. The APT hackers removed all the network interfaces from the =
+network bridges. I have since erased and reinstalled my Ubuntu Desktop 22.0=
+4.5 LTS KVM host.
+
+Install KVM and Dependencies
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D
+
+Run the following command to install KVM, Virt-Manager, and dependencies:
+
+sudo apt update && sudo apt upgrade -y
+
+sudo apt install -y qemu-kvm libvirt-daemon-system libvirt-clients bridge-u=
+tils virt-manager
+
+Verify if KVM is installed:
+
+sudo kvm-ok
+
+INFO: /dev/kvm exists
+KVM acceleration can be used
+
+Start and enable the libvirt service:
+
+sudo systemctl enable --now libvirtd
+
+Download and Prepare the QCOW2 Image
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+Download the Palo Alto VM-Series software firewall QCOW2 image from Palo Al=
+to Networks.
+
+The filename of my image is PA-VM-KVM-10.0.4.vm_eval.qcow2.=20
+
+Copy the image to the KVM images directory:
+
+sudo cp PA-VM-KVM-10.0.4.vm_eval.qcow2 /var/lib/libvirt/images/
+
+Adjust file permissions:
+
+sudo chown libvirt-qemu:kvm /var/lib/libvirt/images/PA-VM-KVM-10.0.4.vm_eva=
+l.qcow2
+
+sudo chmod 644 /var/lib/libvirt/images/PA-VM-KVM-10.0.4.vm_eval.qcow2
+
+Configuring Multiple Interfaces for the Palo Alto VM-Series software firewa=
+ll
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+
+To configure ***multiple interfaces*** for the Palo Alto VM-Series firewall=
+ on Ubuntu KVM, follow these steps:
+
+Identify Network Interfaces
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D
+
+First, determine the network interfaces available on your KVM host using:
+
+ip link show
+
+You'll need at least:
+
+    1 interface for management
+
+    1 or more interfaces for data traffic (inside, outside, DMZ, etc.)
+   =20
+Create Network Bridges=20
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+If you want Palo Alto firewall to be on different networks, create Linux br=
+idges.
+
+Install bridge utilities:
+
+sudo apt install bridge-utils
+
+Configure bridges in Netplan (/etc/netplan/01-netcfg.yaml):
+
+sudo nano /etc/netplan/01-netcfg.yaml
+
+My netplan configuration:
+
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    enp1s0:
+      dhcp4: no
+    enp2s0:
+      dhcp4: no
+    enp3s0:
+      dhcp4: no
+    enp4s0:
+      dhcp4: no
+  bridges:
+    br0:
+      interfaces: [enp1s0]
+      dhcp4: yes
+    br1:
+      interfaces: [enp2s0]
+      dhcp4: no
+    br2:
+      interfaces: [enp3s0]
+      dhcp4: no
+    br3:
+      interfaces: [enp4s0]
+      dhcp4: no
+     =20
+cd /etc/netplan
+
+sudo chmod 600 01-netcfg.yaml
+     =20
+Apply changes:
+
+sudo netplan apply
+
+sudo brctl show
+
+bridge name=09bridge id=09=09STP enabled=09interfaces
+br0=09=098000.da16c5ba83c0=09yes=09=09enp1s0
+br1=09=098000.2a1de38524c1=09yes=09=09enp2s0
+br2=09=098000.2ac0bc028fe3=09yes=09=09
+br3=09=098000.4eb2b8fe7743=09yes=09=09
+virbr0=09=098000.525400f9e6d6=09yes=09
+
+Perform a reboot of Ubuntu KVM host.
+
+sudo reboot
+
+Create a Virtual Machine Using Virt-Manager (GUI)
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+
+Use the following guide.
+
+Guide: VM-Series Deployment Guide: Provision the VM-Series Firewall on a KV=
+M Host
+Link: https://docs.paloaltonetworks.com/vm-series/10-0/vm-series-deployment=
+/set-up-the-vm-series-firewall-on-kvm/install-the-vm-series-firewall-on-kvm=
+/install-the-vm-series-firewall-using-virt-manager/provision-the-vm-series-=
+firewall-on-a-kvm-host
+
+Start the Virtual Machine Manger (GUI).
+
+sudo virt-manager
+
+Configure the Palo Alto firewall virtual machine as per above guide.
+
+You need to set the date of PA-VM 10.0.4 virtual machine to 12 Sep 2021, wh=
+ich is 111833956 seconds ago.
+
+sudo virsh edit PA-VM-KVM-10.0.4
+
+  <clock offset=3D'variable' adjustment=3D'-111833956' basis=3D'utc'>
+    <timer name=3D'rtc' tickpolicy=3D'catchup'/>
+    <timer name=3D'pit' tickpolicy=3D'delay'/>
+    <timer name=3D'hpet' present=3D'no'/>
+  </clock>
+
+Start the virtual machine in Virtual Machine Manager (GUI).
+
+sudo brctl show
+bridge name=09bridge id=09=09STP enabled=09interfaces
+br0=09=098000.da16c5ba83c0=09yes=09=09enp1s0
+=09=09=09=09=09=09=09vnet4
+br1=09=098000.2a1de38524c1=09yes=09=09enp2s0
+=09=09=09=09=09=09=09vnet5
+br2=09=098000.2ac0bc028fe3=09yes=09=09vnet6
+br3=09=098000.4eb2b8fe7743=09yes=09=09vnet7
+virbr0=09=098000.525400f9e6d6=09yes
+
+You MUST wait for PA-HDF login prompt to change to PA-VM login prompt. The =
+waiting time is usually around 10 minutes.
+
+Open your web browser and access the Palo Alto VM-series firewall web login=
+ page at https://<IP address>
+
+Login with the default username and password of admin/admin.
+
+Change the admin password immediately.
+
+Configuring the Palo Alto VM-Series Software Firewall
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+
+Use the following 2 guides.
+
+Guide 1: Example Configuration for Palo Alto Network VM-Series in GCP
+Link: https://docs.aviatrix.com/documentation/latest/security/paloalto-vmse=
+ries-gcp.html
+
+Guide 2: Setting up a Palo Alto Networks Firewall for the First Time
+Link: https://rowelldionicio.com/setting-up-palo-alto-networks-firewall-fir=
+st-time/
+
+Please note that Guide 2 is more detailed and comprehensive.
+
+Outstanding Issues / Issues Pending to be Resolved
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+
+As of 31 Mar 2025 Monday at 4.34 PM, when I connect my laptop to Port 2 on =
+my hardware appliance, which is mapped to network bridge br1, which is in t=
+urn mapped to ethernet1/2 (LAN) in the Palo Alto VM-Series software firewal=
+l, there is still no network connectivity at all. I can't get an IP address=
+ from the Palo Alto firewall DHCP server and I can't ping the LAN gateway 1=
+92.168.1.1 at all.
+
+Currently the network bridge mapping is:
+
+br0 =3D> ethernet1/1 (WAN)
+br1 =3D> ethernet1/2 (LAN)
+
+Perhaps there could be issues with Port 2 on my hardware appliance, or the =
+network bridge br1 may not be working properly. I have flushed all the ipta=
+bles firewall rules on the Ubuntu KVM host and there is still no network co=
+nnectivity between my laptop and Port 2 on the hardware appliance.
+
+I suspect I could have done the network bridge mapping wrongly and this cou=
+ld turn out to be the real scenario:
+
+br0 - MANAGEMENT - ethernet1/1
+br1 - WAN - ethernet1/2 (untrust, outside)
+br2 - LAN - ethernet1/3 (trust, inside)
+
+If I have done the network bridge mapping wrongly, I will have to configure=
+ the Palo Alto VM-Series firewall all over again.
+
+Let me check with Palo Alto Networks technical support. At the mean time, p=
+lease advise whether my netplan configuration for my Ubuntu KVM host is cor=
+rect or not.
+
+Lastly, the command for connecting to the console of Palo Alto VM-Series so=
+ftware firewall.
+
+sudo virsh console PA-VM-KVM-10.0.4
+
+Regards,
+
+Mr. Turritopsis Dohrnii Teo En Ming
+Singapore
+31 March 2025 Monday 5.15 PM
+
+
+
+
+
 
