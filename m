@@ -1,64 +1,81 @@
-Return-Path: <netdev+bounces-178462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77E4AA77190
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 01:55:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4A5BA7719B
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 01:59:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65AEB7A18C9
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 23:54:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 691D316B0B9
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 23:59:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2482B21C9E5;
-	Mon, 31 Mar 2025 23:55:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E7B521D3E2;
+	Mon, 31 Mar 2025 23:59:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YHDDz8SV"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0ag+A0wE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6AA93232;
-	Mon, 31 Mar 2025 23:55:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7F521CFEF;
+	Mon, 31 Mar 2025 23:59:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743465321; cv=none; b=hqOnaxti7GI71CbbrMRJWiM7diERrJZ0RYtFgpEyVV1Q62RtR6+muQ8pKN7sG8qcwoKCyezwVZCAL/4bevYRwbVUdCzsjewIDqKW32JQDYeh4d5ZmPnoddmxvJcIXUJA8yi0hVYUKR/epFydfwKBsDGFqWDGqbYdEhrCGGjj9gE=
+	t=1743465579; cv=none; b=BaWA6CZeLchHXOjWWdyXJToXn/jgUSkWURDrFWavT73qFVbp0xOxb+x9OSdRtkTnIC/L/dSMdUfUoyPs4CT/Hmkh2xytwU0yUAIphjksaVtMpX2hJ19FIGTL5zJT87EGO2u2slR6MeCrvomChVd483G0eo5wMuXo/dU19HZwfKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743465321; c=relaxed/simple;
-	bh=JdSp6kFwin/i7mnHMSnOd2RVt7VK6HD80ILiGQo5gMs=;
+	s=arc-20240116; t=1743465579; c=relaxed/simple;
+	bh=LGdQNnGviTAAfXA1QSxFRNMb1V+I+snZ41QAfqiNhpQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M+Re9Zm9EKOJ8yDNjI/saf8s9N5R+chSfOzq6oJ3el9DvgTKwnAneNl+DtIGpnOs+//ZDBUMkb9CC6X8j9vBwIogJXNlJhDF5Xl0Iq7ZlScobRAp6txQ72kdj4507g8thhRJslOrdD8VDMfi8+JFtAKQrOK9rWkpnkIltEGUePA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YHDDz8SV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 170D6C4CEE5;
-	Mon, 31 Mar 2025 23:55:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743465319;
-	bh=JdSp6kFwin/i7mnHMSnOd2RVt7VK6HD80ILiGQo5gMs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YHDDz8SV6vszt08Lsqy5BvxReOYcxncujzPlqWcLXpmrKq4mH6nWeyEuvG/HXcRxn
-	 t6XFFVMrBl3/M8xPDsKJXzYXf7nnbkJoLbFTb4mNRwiI6kthHlNRYa5w5hTTlYiNuT
-	 IXpqa2XqGn2F54BmhW/mNrjWo1ORYcD4M1u7JAYJji4bGrBGUEd5N2AJIkemzLjl/b
-	 DrI+6sCxT1ifA3huldlmiP9CBE8nE4B1dyL6i1r0DzhFUUiTp5eygjyj7XRYmr0SZr
-	 n4ITR6Jgf0EODRQA0bWOA4nHTGfgaAyN3kciceBQ04axLvArnH+xu4MrCkAsm1caNZ
-	 OsFWB1/AW004Q==
-Date: Mon, 31 Mar 2025 18:55:18 -0500
-From: Rob Herring <robh@kernel.org>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 1/4] dt-bindings: net: Add MTIP L2 switch description
-Message-ID: <20250331235518.GA2823373-robh@kernel.org>
-References: <20250331103116.2223899-1-lukma@denx.de>
- <20250331103116.2223899-2-lukma@denx.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rljDuOYPuRiXPD4ZVLWuyCOkSkYiNJ3J1nelcPRSG6VBAGiqTx6Out6R/pueSVgiLf9AdpL97vxe+t0pIWQtZ6rZYHywoS3K6L0Brw5of/8o8pK3VmsEuZPnam+Uzude5ESP3AW6BkX0jit4CNi12acoSQ3wKvbd1pFAM6GvJmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0ag+A0wE; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Tmf7ncwVgVWuyzc5cYxsbvgKOZsAU8DzNdzbOOmf17Q=; b=0ag+A0wE54kG5CVWg2YhBJ6RlV
+	I/x442UnGC7ZGd93Z1rnW58RCtCT84L0GobDhQ+NLxS8FNx8AHd+93Sk1oHX0r/4EUL1NbNK4zTqo
+	m6/ehJfUHcjXuongTsaAWX45rRvqV3yYKXF9IWZCLUDuZwhYJaFCxCkT8tClvAaCeQHPvNOuSPLJL
+	+sSFaZciN7kWcwA0BIVGGB3mzUdlk3Hm1+o8putRYBxOD6UGLl0rvD0zJmer8oZv7DA/B41Ckd1gf
+	aRmUDPr6wfvm+ulSWBJRYc0JZmZIRDW7INyPrO8O+EOoIxe73SCcgPzjQFOWvYx7GLT/cU1SVVbpg
+	R5jE/4Sw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58766)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tzP2P-000532-0j;
+	Tue, 01 Apr 2025 00:59:29 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tzP2L-00027L-1g;
+	Tue, 01 Apr 2025 00:59:25 +0100
+Date: Tue, 1 Apr 2025 00:59:25 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Da Xue <da@lessconfused.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Kevin Hilman <khilman@baylibre.com>, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org, Da Xue <da@libre.computer>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Jakub Kicinski <kuba@kernel.org>, linux-amlogic@lists.infradead.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	linux-arm-kernel@lists.infradead.org,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [PATCH v2] net: mdio: mux-meson-gxl: set 28th bit in eth_reg2
+Message-ID: <Z-ssXdmRLYqKbyn6@shell.armlinux.org.uk>
+References: <20250331074420.3443748-1-christianshewitt@gmail.com>
+ <17cfc9e2-5920-42e9-b934-036351c5d8d2@lunn.ch>
+ <Z-qeXK2BlCAR1M0F@shell.armlinux.org.uk>
+ <CACdvmAijY=ovZBgwBFDBne5dJPHrReLTV6+1rJZRxxGm42fcMA@mail.gmail.com>
+ <Z-r7c1bAHJK48xhD@shell.armlinux.org.uk>
+ <CACdvmAhvh-+-yiATTqnzJCLthtr8uNpJqUrXQGs5MFJSHafkSQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,209 +84,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250331103116.2223899-2-lukma@denx.de>
+In-Reply-To: <CACdvmAhvh-+-yiATTqnzJCLthtr8uNpJqUrXQGs5MFJSHafkSQ@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Mar 31, 2025 at 12:31:13PM +0200, Lukasz Majewski wrote:
-> This patch provides description of the MTIP L2 switch available in some
-> NXP's SOCs - e.g. imx287.
+On Mon, Mar 31, 2025 at 05:21:08PM -0400, Da Xue wrote:
+> I found this on the zircon kernel:
 > 
-> Signed-off-by: Lukasz Majewski <lukma@denx.de>
-> ---
-> Changes for v2:
-> - Rename the file to match exactly the compatible
->   (nxp,imx287-mtip-switch)
+> #define REG2_ETH_REG2_REVERSED (1 << 28)
 > 
-> Changes for v3:
-> - Remove '-' from const:'nxp,imx287-mtip-switch'
-> - Use '^port@[12]+$' for port patternProperties
-> - Drop status = "okay";
-> - Provide proper indentation for 'example' binding (replace 8
->   spaces with 4 spaces)
-> - Remove smsc,disable-energy-detect; property
-> - Remove interrupt-parent and interrupts properties as not required
-> - Remove #address-cells and #size-cells from required properties check
-> - remove description from reg:
-> - Add $ref: ethernet-switch.yaml#
-> ---
->  .../bindings/net/nxp,imx287-mtip-switch.yaml  | 154 ++++++++++++++++++
->  1 file changed, 154 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/nxp,imx287-mtip-switch.yaml
+> pregs->Write32(REG2_ETH_REG2_REVERSED | REG2_INTERNAL_PHY_ID, PER_ETH_REG2);
 > 
-> diff --git a/Documentation/devicetree/bindings/net/nxp,imx287-mtip-switch.yaml b/Documentation/devicetree/bindings/net/nxp,imx287-mtip-switch.yaml
-> new file mode 100644
-> index 000000000000..98eba3665f32
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/nxp,imx287-mtip-switch.yaml
-> @@ -0,0 +1,154 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/nxp,imx287-mtip-switch.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: NXP SoC Ethernet Switch Controller (L2 MoreThanIP switch)
-> +
-> +maintainers:
-> +  - Lukasz Majewski <lukma@denx.de>
-> +
-> +description:
-> +  The 2-port switch ethernet subsystem provides ethernet packet (L2)
-> +  communication and can be configured as an ethernet switch. It provides the
-> +  reduced media independent interface (RMII), the management data input
-> +  output (MDIO) for physical layer device (PHY) management.
-> +
-> +$ref: ethernet-switch.yaml#
+> I can respin and call it that.
 
-This needs to be: ethernet-switch.yaml#/$defs/ethernet-ports
+Which interface mode is being used, and what is the MAC connected to?
 
-With that, you can drop much of the below part. More below...
+"Reversed" seems to imply that _this_ end is acting as a PHY rather
+than the MAC in the link, so I think a bit more information (the above)
+is needed to ensure that this is the correct solution.
 
-> +
-> +properties:
-> +  compatible:
-> +    const: nxp,imx287-mtip-switch
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  phy-supply:
-> +    description:
-> +      Regulator that powers Ethernet PHYs.
-> +
-> +  clocks:
-> +    items:
-> +      - description: Register accessing clock
-> +      - description: Bus access clock
-> +      - description: Output clock for external device - e.g. PHY source clock
-> +      - description: IEEE1588 timer clock
-> +
-> +  clock-names:
-> +    items:
-> +      - const: ipg
-> +      - const: ahb
-> +      - const: enet_out
-> +      - const: ptp
-> +
-> +  interrupts:
-> +    items:
-> +      - description: Switch interrupt
-> +      - description: ENET0 interrupt
-> +      - description: ENET1 interrupt
-> +
-> +  pinctrl-names: true
-> +
-
-> +  ethernet-ports:
-> +    type: object
-> +    additionalProperties: false
-> +
-> +    properties:
-> +      '#address-cells':
-> +        const: 1
-> +      '#size-cells':
-> +        const: 0
-> +
-> +    patternProperties:
-> +      '^port@[12]+$':
-
-Note that 'ethernet-port' is the preferred node name though 'port' is 
-allowed.
-
-> +        type: object
-> +        description: MTIP L2 switch external ports
-> +
-> +        $ref: ethernet-controller.yaml#
-> +        unevaluatedProperties: false
-> +
-> +        properties:
-> +          reg:
-> +            items:
-> +              - enum: [1, 2]
-> +            description: MTIP L2 switch port number
-> +
-> +          label:
-> +            description: Label associated with this port
-> +
-> +        required:
-> +          - reg
-> +          - label
-> +          - phy-mode
-> +          - phy-handle
-
-All the above under 'ethernet-ports' can be dropped though you might 
-want to keep 'required' part.
-
-> +
-> +  mdio:
-> +    type: object
-> +    $ref: mdio.yaml#
-> +    unevaluatedProperties: false
-> +    description:
-> +      Specifies the mdio bus in the switch, used as a container for phy nodes.
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - clocks
-> +  - clock-names
-> +  - interrupts
-> +  - mdio
-> +  - ethernet-ports
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include<dt-bindings/interrupt-controller/irq.h>
-> +    switch@800f0000 {
-> +        compatible = "nxp,imx287-mtip-switch";
-> +        reg = <0x800f0000 0x20000>;
-> +        pinctrl-names = "default";
-> +        pinctrl-0 = <&mac0_pins_a>, <&mac1_pins_a>;
-> +        phy-supply = <&reg_fec_3v3>;
-> +        interrupts = <100>, <101>, <102>;
-> +        clocks = <&clks 57>, <&clks 57>, <&clks 64>, <&clks 35>;
-> +        clock-names = "ipg", "ahb", "enet_out", "ptp";
-> +
-> +        ethernet-ports {
-> +            #address-cells = <1>;
-> +            #size-cells = <0>;
-> +
-> +            mtip_port1: port@1 {
-> +                reg = <1>;
-> +                label = "lan0";
-> +                local-mac-address = [ 00 00 00 00 00 00 ];
-> +                phy-mode = "rmii";
-> +                phy-handle = <&ethphy0>;
-> +            };
-> +
-> +            mtip_port2: port@2 {
-> +                reg = <2>;
-> +                label = "lan1";
-> +                local-mac-address = [ 00 00 00 00 00 00 ];
-> +                phy-mode = "rmii";
-> +                phy-handle = <&ethphy1>;
-> +            };
-> +        };
-> +
-> +        mdio_sw: mdio {
-> +            #address-cells = <1>;
-> +            #size-cells = <0>;
-> +
-> +            reset-gpios = <&gpio2 13 0>;
-> +            reset-delay-us = <25000>;
-> +            reset-post-delay-us = <10000>;
-> +
-> +            ethphy0: ethernet-phy@0 {
-> +                reg = <0>;
-> +            };
-> +
-> +            ethphy1: ethernet-phy@1 {
-> +                reg = <1>;
-> +            };
-> +        };
-> +    };
-> -- 
-> 2.39.5
-> 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
