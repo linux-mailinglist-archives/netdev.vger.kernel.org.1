@@ -1,317 +1,167 @@
-Return-Path: <netdev+bounces-178241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 089E5A75D6E
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 02:09:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34346A75D7F
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 02:40:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15F7B18895D1
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 00:09:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB70F166FE1
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 00:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26EE510E3;
-	Mon, 31 Mar 2025 00:09:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7033E134AC;
+	Mon, 31 Mar 2025 00:40:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="U+Cdmzwz";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="icQ5/v34";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="U+Cdmzwz";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="icQ5/v34"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AEt6/a+o"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 552BC1EA84
-	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 00:09:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D80B92E3391;
+	Mon, 31 Mar 2025 00:40:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743379745; cv=none; b=Ydx/EtXovEbApNGPuPd6Ze5coXeohGOeTkBhPgQn7mqLpu5yAv9p1QLexSaGzFc9jcGcUnX4qdsrafqAykn5pSg7t751az0yTd+GGQpipFHNsfMFzL/DfaOpAb+hgTqc36eoZ+f8dd7/918jPIjFkND4L2EOa1WGvAzAlSv4/7s=
+	t=1743381625; cv=none; b=JPhc8QNnCQ2tJ+D4xmYqEE30QvV6BIZAnEYehtM0Xpoa4E2cnrfMOSVYJ5abUpjNVCTP+ce8/zczs1pefebVLJotFa8Z5xOJUmMPzrB3I/WoPppdtn+fyYQrIO74QKYYJAAMLl+S1is7Gc24addd3bwHO9zc1tkwhrxETJ/JJZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743379745; c=relaxed/simple;
-	bh=+TiEsBKI6OODzQ6gSVygpWUqpNuIuC1oY1Fi+GW6rXM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p7F2ogkucul0iUL+ThkMohPGSxsEDfhcPuY7jPyL1gxGYMAv5U2mJ+vNdPKu9ODAbSgS53N2l40xBVgjhjd8B3OOAk/0t8kLSLyo8QHlytpcuyY7CxJ0rsYohbQG4aFAHsuLAA+vC5BcBdPHu8/C6K/+m9GR+TdxFdOEgWYYfQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=U+Cdmzwz; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=icQ5/v34; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=U+Cdmzwz; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=icQ5/v34; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from lion.mk-sys.cz (unknown [10.100.225.114])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 866F52119E;
-	Mon, 31 Mar 2025 00:09:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1743379741; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QmoKIZLj2K0suh+6aN0oGatIG4BolsWfodLmPfQxRkk=;
-	b=U+CdmzwzPapSw2A0uWh6tnT3Xngqx+H99WmCt1GaERbQBzzMpFXtWpYahdKqPpHeWIHNpB
-	vOucfI5ien3mtyLXfHKR9WFRVewTrBJEEQQiXJs9pYaFuQ0/szurDamRuTa6Q7atWuawVa
-	2vqJojNgzPjFkkhCskZ6uJCXY3j0Gks=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1743379741;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QmoKIZLj2K0suh+6aN0oGatIG4BolsWfodLmPfQxRkk=;
-	b=icQ5/v34Uzw+QHuzJHfejRrRX9tqKewI8FagYkWB+xN//nKkUo19GSMUWekcclUT1bNIVU
-	ojtfLjliw1Ar2UCQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1743379741; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QmoKIZLj2K0suh+6aN0oGatIG4BolsWfodLmPfQxRkk=;
-	b=U+CdmzwzPapSw2A0uWh6tnT3Xngqx+H99WmCt1GaERbQBzzMpFXtWpYahdKqPpHeWIHNpB
-	vOucfI5ien3mtyLXfHKR9WFRVewTrBJEEQQiXJs9pYaFuQ0/szurDamRuTa6Q7atWuawVa
-	2vqJojNgzPjFkkhCskZ6uJCXY3j0Gks=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1743379741;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QmoKIZLj2K0suh+6aN0oGatIG4BolsWfodLmPfQxRkk=;
-	b=icQ5/v34Uzw+QHuzJHfejRrRX9tqKewI8FagYkWB+xN//nKkUo19GSMUWekcclUT1bNIVU
-	ojtfLjliw1Ar2UCQ==
-Received: by lion.mk-sys.cz (Postfix, from userid 1000)
-	id 6C39B20057; Mon, 31 Mar 2025 02:09:01 +0200 (CEST)
-Date: Mon, 31 Mar 2025 02:09:01 +0200
-From: Michal Kubecek <mkubecek@suse.cz>
-To: Mohsin Bashir <mohsin.bashr@gmail.com>
-Cc: netdev@vger.kernel.org, fbnic@meta.com, kernel-team@meta.com
-Subject: Re: [PATCH ethtool-next] ethtool: fbnic: ethtool dump parser
-Message-ID: <zybblsg5cth563xrx26jgdsxo3nzvyafrn7nu7wd46vjseaqki@iggq3fslim3f>
-References: <20250305194641.535846-1-mohsin.bashr@gmail.com>
+	s=arc-20240116; t=1743381625; c=relaxed/simple;
+	bh=CKpFOxFM9RiaLlkNxdeKxCbkNLU4hkniP8PEEHv41ds=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MU4EXxGKUlOeWsdIemxgY+lCwlG9xGbxuwFOoRjmakMCDnrLs9E1+lEq7T2iBIkaseyiCqq3o/SGCX7BR+UIstzF9KUBDrqO70LMB7nCdOjKxwMRon395LSehouYojU2d8p7UwtYAj2hsm1vzjlO3itiD16PS4qsgxnYwwXBO7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AEt6/a+o; arc=none smtp.client-ip=209.85.166.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3d45875d440so15502665ab.0;
+        Sun, 30 Mar 2025 17:40:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743381623; x=1743986423; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XTi8tTiuzmW2svwLSuHqGg7YclWCnvqmfA6Gyx6yOyE=;
+        b=AEt6/a+oYVCND3KDUYRBLOd8AMAa3w6IwsfIOOQuuTaKEB6cl4a40zLujkrqDBdB6B
+         n5q+rITakTwuEeuHIT+vUecOnNFftQ5G3hxkdp7qz2acddYPhyR9j3NHX/a+oWQhMD/+
+         sTM6iuAu9vq+6hzhmFAyVAZRqexTXtq9sTnywgvTIr64RZN/n+t8q9oGLxvd01ZrZgLK
+         wH19zlLB6lU6lQbfF096lRRwDfApI14Sw7UFMvzh5sfS7cXPo+GduzaS8fcmZ7QBsxDK
+         jZXHvOjnoukY+idDXmf58763FL0qUHU7JvSFOcB5uaNt9IsvrAMGbwmmT1AVzrexXVHp
+         xSbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743381623; x=1743986423;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XTi8tTiuzmW2svwLSuHqGg7YclWCnvqmfA6Gyx6yOyE=;
+        b=ovACxTQe6xTa/L3rByqR5U2Yh/Sg5cblt+v0ca4qglAEFimZ12PPhVj7i0u6zRmFkc
+         GtCPnMr7ANWUr9uy39HHN4NanngvldlZZuseUGnDnh8mGuQ6hRDlD32doG1XOpGQwQ47
+         Ts7FM/EBTglp5WPm4V9CEqdlhEDoH5Cy78JUjAt/yVz8k5hjFHK4IYWdMy0CW1BorP+Y
+         XKYPU2QgB7zCO0lfqLnD+FUAnBBEC8cgBXKtKi3kq8RclNkkxRpNzIBANfYaptNTicU/
+         6zqIvg4C01yeAdbMN2g3tnrE8XabJvnEALwyyPZWfM7z1LcFpWE2MoZ5laekJpO7IMvO
+         SYLg==
+X-Forwarded-Encrypted: i=1; AJvYcCVQibeU8ltxfA2K91X8B/NXSmBYvYJHVqM0oX2CJRqCrWGYRNkCOhXQzc+NM5drj3QZ2D4=@vger.kernel.org, AJvYcCW48gvFjbeL61D/n1bNuusRaY5xqI/9DBuPXEXV7gbeYh0LhzGwQhHPAzom8KIPhiELR8mgaRx/@vger.kernel.org
+X-Gm-Message-State: AOJu0YxD1TgRg0KrBfk6s3Sp4flLkzCslvLqrMmy3mLs1x413KTVUKqS
+	ww2tWAWdwE0tjTlM4ED1cSJQHDtN8zwGrDfzdfaPja3ZetlL56Zyd3vFKpVQ9aV4r+MuD82f97F
+	tIODBGKSo0o3aRDKPyZyuZQp4Qyc=
+X-Gm-Gg: ASbGncuJLXKK3ZcAF+7b+/6MstbPUoBK++zd4qypisqbgHgb3n6Il8mAD6pMdFfX2EG
+	B1DjcBERULUFqIe0ThxxuagYi3F3yjWApbM1zrSbWD4ZGbmPdKMb3O+rlBMw+TXW78eKBFfEJq2
+	7s1BKDKyFn0bmm5Zdw+Ng+Wunz
+X-Google-Smtp-Source: AGHT+IEG2me0G6zAaE4m/FhI4fxfPP7RqjG7OBqfejMtUHFMdpdNanLAAkYJUVIJcvHDCrEAbKpNqjkUXq2QCFL6aQk=
+X-Received: by 2002:a05:6e02:17ce:b0:3a7:820c:180a with SMTP id
+ e9e14a558f8ab-3d5e0a093b2mr76160105ab.19.1743381622902; Sun, 30 Mar 2025
+ 17:40:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="lyawwf7xhbcycxaf"
-Content-Disposition: inline
-In-Reply-To: <20250305194641.535846-1-mohsin.bashr@gmail.com>
-X-Spam-Score: -5.90
-X-Spamd-Result: default: False [-5.90 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SIGNED_PGP(-2.00)[];
-	NEURAL_HAM_LONG(-1.00)[-0.999];
-	MID_RHS_NOT_FQDN(0.50)[];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FREEMAIL_TO(0.00)[gmail.com];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4];
-	RCVD_COUNT_ONE(0.00)[1];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	FROM_EQ_ENVFROM(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	TO_DN_SOME(0.00)[]
-X-Spam-Flag: NO
-X-Spam-Level: 
-
-
---lyawwf7xhbcycxaf
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+References: <cover.1743337403.git.pav@iki.fi>
+In-Reply-To: <cover.1743337403.git.pav@iki.fi>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 31 Mar 2025 08:39:46 +0800
+X-Gm-Features: AQ5f1JoVuXTXHl4OZ6-Pj0C0gXm60GE5eQjrZqTptP7zoCwFTx3OkG9S97GF3Lw
+Message-ID: <CAL+tcoAvFCm9xCOwCLAp18JpT-JBzXQ2yziTZvO8QvZdL5gRZw@mail.gmail.com>
+Subject: Re: [PATCH 0/3] bpf: TSTAMP_COMPLETION_CB timestamping + enable it
+ for Bluetooth
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org, willemdebruijn.kernel@gmail.com, 
+	Martin KaFai Lau <martin.lau@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 05, 2025 at 11:46:41AM -0800, Mohsin Bashir wrote:
-> This patch adds support for parsing the register dump for fbnic.
->=20
-> The patch is composed of several register sections, and each of these
-> sections is dumped lineraly except for the RPC_RAM section which is handl=
-ed
-> differently.
->=20
-> For each of the sections, we dump register name, its value, the bit mask
-> of any subfields within that register, the name of the subfield, and the
-> corresponding value.
->=20
-> Furthermore, there may be unused blocks within a section; we skip such
-> blocks while dumping registers linearly.
->=20
-> Validation:
-> - Validate patch applies to master without any warning
-> - Validate 'ethtool -d' for net-next branch generates ascii dump
-> 	$ uname -r
-> 	  6.14.0-0_fbk701_rc0_429_g8e5edf971d0
-> 	$ ./ethtool -d eth0 > /tmp/fbnic_ascii_dump
->=20
-> Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
-> ---
+Hi Pauli,
 
-Hello,
+On Sun, Mar 30, 2025 at 8:23=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> Add BPF_SOCK_OPS_TSTAMP_COMPLETION_CB and emit it on completion
+> timestamps.
+>
+> Enable that for Bluetooth.
 
-the patch introduces warnings (see below) when compiled on i386
-(32-bit), can you check?
+Thanks for working on this!
 
-Thank you,
-Michal
+It would be better if you can cc Martin in the next revision since he
+is one of co-authors of BPF timestamping. Using
+./scripts/get_maintainer.pl will show you which group people you're
+supposed to cc.
 
+>
+> Tests:
+> https://lore.kernel.org/linux-bluetooth/a74e58b9cf12bc9c64a024d18e6e58999=
+202f853.1743336056.git.pav@iki.fi/
+>
+> ***
+>
+> However, I don't quite see how to do the tskey management so
+> that BPF and socket timestamping do not interfere with each other.
+>
+> The tskey counter here increments only for sendmsg() that have
+> timestamping turned on. IIUC this works similarly as for UDP.  I
+> understood the documentation so that stream sockets would do similarly,
+> but apparently TCP increments also for non-timestamped packets.
 
-fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_intr_global=E2=80=99:
-fbnic.c:5679:16: error: comparison of integer expressions of different sign=
-edness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} and=
- =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
- 5679 |         if (nn !=3D regs_buff - section_start) {
-      |                ^~
-fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_intr_msix=E2=80=99:
-fbnic.c:5773:16: error: comparison of integer expressions of different sign=
-edness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} and=
- =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
- 5773 |         if (nn !=3D regs_buff - section_start) {
-      |                ^~
-fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_qm_tx_global=E2=80=99:
-fbnic.c:6255:16: error: comparison of integer expressions of different sign=
-edness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} and=
- =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
- 6255 |         if (nn !=3D regs_buff - section_start) {
-      |                ^~
-fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_qm_rx_global=E2=80=99:
-fbnic.c:6705:16: error: comparison of integer expressions of different sign=
-edness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} and=
- =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
- 6705 |         if (nn !=3D regs_buff - section_start) {
-      |                ^~
-fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_tce=E2=80=99:
-fbnic.c:7404:16: error: comparison of integer expressions of different sign=
-edness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} and=
- =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
- 7404 |         if (nn !=3D regs_buff - section_start) {
-      |                ^~
-fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_tce_ram=E2=80=99:
-fbnic.c:7535:16: error: comparison of integer expressions of different sign=
-edness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} and=
- =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
- 7535 |         if (nn !=3D regs_buff - section_start) {
-      |                ^~
-fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_tmi=E2=80=99:
-fbnic.c:7918:16: error: comparison of integer expressions of different sign=
-edness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} and=
- =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
- 7918 |         if (nn !=3D regs_buff - section_start) {
-      |                ^~
-fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_ptp=E2=80=99:
-fbnic.c:8087:16: error: comparison of integer expressions of different sign=
-edness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} and=
- =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
- 8087 |         if (nn !=3D regs_buff - section_start) {
-      |                ^~
-fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_rxb=E2=80=99:
-fbnic.c:9154:16: error: comparison of integer expressions of different sign=
-edness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} and=
- =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
- 9154 |         if (nn !=3D regs_buff - section_start) {
-      |                ^~
-fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_rpc=E2=80=99:
-fbnic.c:9942:16: error: comparison of integer expressions of different sign=
-edness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} and=
- =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
- 9942 |         if (nn !=3D regs_buff - section_start) {
-      |                ^~
-fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_rpc_ram=E2=80=99:
-fbnic.c:10176:16: error: comparison of integer expressions of different sig=
-nedness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} an=
-d =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
-10176 |         if (nn !=3D regs_buff - section_start) {
-      |                ^~
-fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_fab=E2=80=99:
-fbnic.c:10598:16: error: comparison of integer expressions of different sig=
-nedness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} an=
-d =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
-10598 |         if (nn !=3D regs_buff - section_start) {
-      |                ^~
-fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_master=E2=80=99:
-fbnic.c:11534:16: error: comparison of integer expressions of different sig=
-nedness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} an=
-d =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
-11534 |         if (nn !=3D regs_buff - section_start) {
-      |                ^~
-fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_mac_pcs=E2=80=99:
-fbnic.c:12251:16: error: comparison of integer expressions of different sig=
-nedness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} an=
-d =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
-12251 |         if (nn !=3D regs_buff - section_start) {
-      |                ^~
-fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_mac_rsfec=E2=80=99:
-fbnic.c:12619:16: error: comparison of integer expressions of different sig=
-nedness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} an=
-d =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
-12619 |         if (nn !=3D regs_buff - section_start) {
-      |                ^~
-fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_mac_mac=E2=80=99:
-fbnic.c:13495:16: error: comparison of integer expressions of different sig=
-nedness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} an=
-d =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
-13495 |         if (nn !=3D regs_buff - section_start) {
-      |                ^~
-fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_pcie_ss_comphy=E2=80=99:
-fbnic.c:21516:16: error: comparison of integer expressions of different sig=
-nedness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} an=
-d =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
-21516 |         if (nn !=3D regs_buff - section_start) {
-      |                ^~
-fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_sig=E2=80=99:
-fbnic.c:22359:16: error: comparison of integer expressions of different sig=
-nedness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} an=
-d =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
-22359 |         if (nn !=3D regs_buff - section_start) {
-      |                ^~
-fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_pul_user=E2=80=99:
-fbnic.c:24349:16: error: comparison of integer expressions of different sig=
-nedness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} an=
-d =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
-24349 |         if (nn !=3D regs_buff - section_start) {
-      |                ^~
-fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_queue=E2=80=99:
-fbnic.c:25416:16: error: comparison of integer expressions of different sig=
-nedness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} an=
-d =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
-25416 |         if (nn !=3D regs_buff - section_start) {
-      |                ^~
-fbnic.c: In function =E2=80=98fbnic_dump_regs=E2=80=99:
-fbnic.c:25495:46: error: comparison of integer expressions of different sig=
-nedness: =E2=80=98int=E2=80=99 and =E2=80=98__u32=E2=80=99 {aka =E2=80=98un=
-signed int=E2=80=99} [-Werror=3Dsign-compare]
-25495 |         if ((regs_buff - section_start) << 2 !=3D regs->len) {
-      |                                              ^~
-fbnic.c:25498:51: error: format =E2=80=98%lu=E2=80=99 expects argument of t=
-ype =E2=80=98long unsigned int=E2=80=99, but argument 3 has type =E2=80=98i=
-nt=E2=80=99 [-Werror=3Dformat=3D]
-25498 |                 fprintf(stderr, "dwords [bytes] %lu\n",
-      |                                                 ~~^
-      |                                                   |
-      |                                                   long unsigned int
-      |                                                 %u
-25499 |                         (regs_buff - section_start) << 2);
-      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      |                                                     |
-      |                                                     int
+TCP increments sequence number for every skb regardless of BPF
+timestamping feature. BPF timetamping uses the last byte of the last
+skb to generate the tskey in tcp_tx_timestamp(). So it means the tskey
+comes with the sequence number of each to-be-traced skb. It works for
+both socket and BPF timestamping features.
 
---lyawwf7xhbcycxaf
-Content-Type: application/pgp-signature; name="signature.asc"
+>
+> If BPF needs tskey while socket timestamping is off, we can't increment
+> sk_tskey, as that interferes with counting by user applications doing
+> socket timestamps.
 
------BEGIN PGP SIGNATURE-----
+That is the reason why in TCP we chose to implement the tskey of BPF
+timestamping in the socket timestamping area. Please take a look at
+tcp_tx_timestamp(). As for UDP implementation, it is a leftover that I
+will make work next month.
 
-iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmfp3RkACgkQ538sG/LR
-dpVqTgf+JKiPtZ7KaKP+o5oUysEAlapjIGbLqFTWINBaD1yXIBWjJSiU8w6yOy6h
-jzUZRJTl/Cghllm01wQ+WWvISqHWylu7F3smt7omD9iY3x26F4DFiNg3oI8MQrmj
-kXr8iF5499fqavzPfkixvpZ38PY2L6W2PLuEQ1zZ0eBFKZvEPmqbVVCcXNeqD1GN
-HX7tXfvEWtMYdyMIZvRE735Wty9UZ9QMW3yC5FXvHlS+eLT0QSymV3Sun6J/5RkX
-to6eGj2PH+w7x+uwJvDQAJu1BYDS1UEQxwVbhnthSv100RQUiwHyShbnW4vKJKHn
-jbflWFDvD6bGU/u7Ou2SIIPonBsXMw==
-=qdlM
------END PGP SIGNATURE-----
+>
+> Should the Bluetooth timestamping actually just increment the counters
+> for any packet, timestamped or not?
 
---lyawwf7xhbcycxaf--
+It's supposed to be the same tskey shared with socket timestamping so
+that people don't need to separately take care of a new tskey
+management.That is to say, if the socket timestamping and BPF
+timestamping are turned on, sharing the same tskey will be consistent.
+
+Thanks,
+Jason
+
+>
+> Pauli Virtanen (3):
+>   bpf: Add BPF_SOCK_OPS_TSTAMP_COMPLETION_CB callback
+>   [RFC] bpf: allow non-TCP skbs for bpf_sock_ops_enable_tx_tstamp
+>   [RFC] Bluetooth: enable bpf TX timestamping
+>
+>  include/net/bluetooth/bluetooth.h |  1 +
+>  include/uapi/linux/bpf.h          |  5 +++++
+>  net/bluetooth/hci_conn.c          | 21 +++++++++++++++++++--
+>  net/core/filter.c                 | 12 ++++++++++--
+>  net/core/skbuff.c                 |  3 +++
+>  5 files changed, 38 insertions(+), 4 deletions(-)
+>
+> --
+> 2.49.0
+>
 
