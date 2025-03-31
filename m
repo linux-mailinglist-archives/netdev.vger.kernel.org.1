@@ -1,133 +1,170 @@
-Return-Path: <netdev+bounces-178334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A227CA7693E
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 17:05:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46B4CA76985
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 17:11:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 315653AEBC5
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 14:56:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6067163766
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 15:09:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99EB22173A;
-	Mon, 31 Mar 2025 14:47:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A5921D3F3;
+	Mon, 31 Mar 2025 14:54:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="bFaJhGk1";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="GpFJh1rX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="F3f6OHDF"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3589F2163BD;
-	Mon, 31 Mar 2025 14:47:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D06B322F166;
+	Mon, 31 Mar 2025 14:54:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743432440; cv=none; b=H7YpeBQ5vWyPltedFFrbTj/z6IEOQoVbSpEv4/TJ0vPBU/wdHTsV0O5NSNbXr7ektqT/7+BKuHuuU6tcyRtcSPTNaXX3BahXz+INmEedSbTIGj/LifcXagl5PB82TmGzXP/vRNs0W+LnWxsnOqPQq1/L4Eu0lBX5Eg/EygebQbo=
+	t=1743432879; cv=none; b=h5wMTH1kAeRrOJIu6Yp/IftVkcNB2TNdiC7eQ9oeM8SHn2NCplPFDMVqO9GohzvP3DLo2Em2fYLRPdX3sRS/IXfIjl+phTsrxl5fhVWNSu2h/aKF1XkaMFnWcJErZyrGy61S2bSW6Q4U+H8wzHGqcMIsl9ubvuhdk7nnQyWQj9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743432440; c=relaxed/simple;
-	bh=O/9fTspNTdIHvOEANop/UpL0WNKbeSl7SXNAq+SBv3I=;
+	s=arc-20240116; t=1743432879; c=relaxed/simple;
+	bh=zR+wuro+r4rnXuqJeZdxGMuQG6Zw/ZgAj/YeJHwsL5c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bPqzIT3Wj84r3HU+9rsLiI0E8XSlKwL5tS4xAEtlbDFgZhJhUuAQ8m+Eosadp53Zfg+NeyiRCV5Q30hD0ZtAJRkBpynayJClh6oSgroSWaaz7L4o2bVq9w8nD8WuO5FrbTTBqFVzMtrwIy+aRz0ukRAYADqoxmWc8etp8TdciPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=bFaJhGk1; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=GpFJh1rX; arc=none smtp.client-ip=103.168.172.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id F419911400CE;
-	Mon, 31 Mar 2025 10:47:15 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Mon, 31 Mar 2025 10:47:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1743432435; x=
-	1743518835; bh=OFdJhOTwQCjtFW79ikh9RA6LiABUkfS8zj5b9DPqql4=; b=b
-	FaJhGk1gZiFCmGRkYhco9D+iccIKGCgqHX/elzeUpvKPsqyDfhGfVlMgCmTAtMtt
-	j8Xd6U6DPugsyuz7abv6PWfvnxrUQ9Ns2JdWF40WBmoxx7QpQrW7+ZcyUHQ3l8fK
-	jSLe1kx+wYJtzFTQ/lZqbC3o31Vr2zvlkYqmcTRYfDVLHEKesNFTYX0iqYnfYLea
-	8wd7ZNFKmMQK1H9Fcdsoow/1hQM8bI//gbFwYv2RgtOM2K+W6Nhi8Qrxcp8BZZoR
-	sNidzXeNSjNqZ7fOTbe2yJrigjyjav3tgZYllZdRlv/yR39D8q/oF/eHKlPC/LYU
-	tzSfBcm15FO0UqYD3k2HQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1743432435; x=1743518835; bh=OFdJhOTwQCjtFW79ikh9RA6LiABUkfS8zj5
-	b9DPqql4=; b=GpFJh1rXy8WkOfA6zJgStrzEWqctmdccAN57Og2s4x8pp1vK01E
-	ueu0cII/Kp8nV1M8AHGMarIv4jSZ2fkPEZDeNMi/lDyNSfgHQOxzoO6dTGvS6tJN
-	13pGtJsaIYoldf56vAj1gpisHEbot6atzTED2MAfP47tProAiVAJg1/AwsgwnCkU
-	aFoY1nVywJF4ywo3qOvQNVtVCqUR/TwLcu/PPYfvr/fszajGv1QEKwRbRt1hhk1A
-	ngqNKR7mGBv1B3Qdl6fPHUF60vvtMKRib/Lm1XxvAKuVisSe0pYc94KneHKaSq89
-	HWidXfM6Nd1By8hGYmlKKOPmej+cZO2Nxvw==
-X-ME-Sender: <xms:86rqZ3iXvxTLML56UriXPkMcH6t7BdmCBlVD15UIiNuj_z0Pk0xgYA>
-    <xme:86rqZ0BqP_LOZ_qkYpFEb0orFnsU9X44nI9j1xsJqwRlUPEE8M2PWYaL7r30kECNW
-    oarqOJLeYegQIpJmnw>
-X-ME-Received: <xmr:86rqZ3EV1ohOvphqIkgf0WE8f1gq9g-FH-qeL5ius8rWmMTQcpjPfA9UG0TU>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddukedtvddtucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
-    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
-    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdef
-    hfekgeetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhn
-    sggprhgtphhtthhopeduledpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnth
-    honhhiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopehhohhrmhhssehkvghrnhgv
-    lhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnh
-    gvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkshgvlhhfthgvshhtsehvghgvrhdr
-    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhhrgifrdhlvghonhesghhmrghilhdrtg
-    homhdprhgtphhtthhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgvtghunhgvthdr
-    tghomhdprhgtphhtthhopegrnhhtohhnhidrrghnthhonhihsehsvggtuhhnvghtrdgtoh
-    hmpdhrtghpthhtohepfihilhhlvghmuggvsghruhhijhhnrdhkvghrnhgvlhesghhmrghi
-    lhdrtghomhdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:86rqZ0QTeqHpyLmXavyJ0Ma9h1mXiuo1TArAJ1Rc1_ebVv3NHzwAdg>
-    <xmx:86rqZ0wQPWVrMo1lmgfo8hqofzglGBEGfK8JrpF_UQ7kxsFTOMfPuA>
-    <xmx:86rqZ67UmmbqNbmuuvIUrkeliSvEXiUw9umC9K61z3fnKidkApZXaw>
-    <xmx:86rqZ5xzBjIdX5RgEv3llwe686u4N7LH0IdzaINNb4N2fh4Wji3HkA>
-    <xmx:86rqZxHw-VS_6bRV1GBIRr5ZtjVoyHZ_FZUzH1UGregcnmXowCj6zZqx>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 31 Mar 2025 10:47:14 -0400 (EDT)
-Date: Mon, 31 Mar 2025 16:47:13 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>,
-	steffen.klassert@secunet.com, antony.antony@secunet.com,
-	willemdebruijn.kernel@gmail.com, David Ahern <dsahern@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Shuah Khan <skhan@linuxfoundation.org>, netdev@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Subject: Re: [PATCH net-next v24 00/23] Introducing OpenVPN Data Channel
- Offload
-Message-ID: <Z-qq8WeQr84M5s7A@krikkit>
-References: <20250318-b4-ovpn-v24-0-3ec4ab5c4a77@openvpn.net>
- <8e64c910-ee4d-4875-8034-927e1073ae4b@openvpn.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ca/9RP7cHwJRx3FntqSqlUqtIKkRMv7c/jynWq5EdE8k4Ymj4lWkRczyJ6o4itRwXDO6IaXrLmNkEry7FLxU+cvvpulv/XJdgQC9eINJ5W35JE+FVlFUb88NTzJ2tO6RsHnZcL6tIBEW0XmUaqETsyv6zp2j2LECH9ywSivYTg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=F3f6OHDF; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=HPcnOhRdd53xj4ndL5o1wFLEp2VkNlI8kdN53UFjnhg=; b=F3f6OHDFFH6FQttsDKRCCNG1cK
+	wWwHSeYsKPv+hnYTawudXWiiN08AoomTV4Drfe0f3vmHHSk3rhl6pVaKsoXTrmMljQrf8toegjLfc
+	zyEoSWns/BnymMsKH7B3jbt6rQHHJRtWs7YnSGtp8i7G7LWHP5+9tLRcgTkd9Y6jdE/4vkPqjgQPj
+	z1bBoFttbNwAmuVg9GmldXo0+1v7kGdQZkiBuPsncuWtvGr3eksArn/2eTSTpmHzxftMuU6/2xzke
+	IEM1shTTauu6d6W1PjNMrDhZCAu5tN5fFsDTgxAfU67CGseWezC4wJWWucKiilVuJGjNo3mQhu12Q
+	IM+r03aA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49000)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tzGWw-0004EQ-0s;
+	Mon, 31 Mar 2025 15:54:26 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tzGWq-0001lE-3B;
+	Mon, 31 Mar 2025 15:54:21 +0100
+Date: Mon, 31 Mar 2025 15:54:20 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alexander Duyck <alexander.duyck@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Simon Horman <horms@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>
+Subject: Re: [PATCH net-next v5 09/13] net: phylink: Use phy_caps_lookup for
+ fixed-link configuration
+Message-ID: <Z-qsnN4umaz0QrG0@shell.armlinux.org.uk>
+References: <20250307173611.129125-1-maxime.chevallier@bootlin.com>
+ <20250307173611.129125-10-maxime.chevallier@bootlin.com>
+ <8d3a9c9bb76b1c6bc27d2bd01f4831b2cac83f7f.camel@gmail.com>
+ <20250328090621.2d0b3665@fedora-2.home>
+ <CAKgT0Ue_JzmJAPKBhe6XaMkDCy+YNNg5_5VvzOR6CCbqcaQg3Q@mail.gmail.com>
+ <12e3b86d-27aa-420b-8676-97b603abb760@lunn.ch>
+ <CAKgT0UcZRi1Eg2PbBnx0pDG_pCSV8tfELinNoJ-WH4g3CJOh2A@mail.gmail.com>
+ <02c401a4-d255-4f1b-beaf-51a43cc087c5@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8e64c910-ee4d-4875-8034-927e1073ae4b@openvpn.net>
+In-Reply-To: <02c401a4-d255-4f1b-beaf-51a43cc087c5@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-2025-03-28, 10:14:27 +0100, Antonio Quartulli wrote:
-> Hi Sabrina,
+On Mon, Mar 31, 2025 at 04:17:02PM +0200, Andrew Lunn wrote:
+> On Fri, Mar 28, 2025 at 04:26:04PM -0700, Alexander Duyck wrote:
+> > A serdes PHY is part of it, but not a traditional twisted pair PHY as
+> > we are talking about 25R, 50R(50GAUI & LAUI), and 100P interfaces. I
+> > agree it is a different beast, but are we saying that the fixed-link
+> > is supposed to be a twisted pair PHY only?
 > 
-> do you plan to drop more comments at the patchset at this point?
+> With phylink, the PCS enumerates its capabilities, the PHY enumerates
+> its capabilities, and the MAC enumerates it capabilities. phylink then
+> finds the subset which all support.
+> 
+> As i said, historically, fixed_link was used in place of a PHY, since
+> it emulated a PHY. phylinks implementation of fixed_link is however
+> different. Can it be used in place of both a PCS and a PHY? I don't
+> know.
 
-Yes, I had a couple of small comments here and there that I didn't
-think strictly required a respin, but I'll send them out now since
-there'll be more iteration. I'll try to have them all out by tomorrow
-evening.
+In fixed-link mode, phylink will use a PCS if the MAC driver says there
+is one, but it will not look for a PHY.
+
+> You are pushing the envelope here, and maybe we need to take a step
+> back and consider what is a fixed link, how does it fit into the MAC,
+> PCS, PHY model of enumeration? Maybe fixed link should only represent
+> the PHY and we need a second sort of fixed_link object to represent
+> the PCS? I don't know?
+
+As I previously wrote today in response to an earlier email, the
+link modes that phylink used were the first-match from the old
+settings[] array in phylib which is now gone. This would only ever
+return _one_ link mode, which invariably was a baseT link mode for
+the slower speeds.
+
+Maxime's first approach at adapting this to his new system was to
+set every single link mode that corresponded with the speed. I
+objected to that, because it quickly gets rediculous when we end
+up with lots of link modes being indicated for e.g. 10, 100M, 1G
+but the emulated PHY for these speeds only indicates baseT. That's
+just back-compatibility but... in principle changing the link modes
+that are reported to userspace for a fixed link is something we
+should not be doing - we don't know if userspace tooling has come
+to rely on that.
+
+Yes, it's a bit weird to be reporting 1000baseT for a 1000BASE-X
+interface mode, but that's what we've always done in the past and
+phylink was coded to maintain that (following the principle that
+we shouldn't do gratuitous changes to the information exposed to
+userspace.)
+
+Maxime's replacement approach is to just expose baseT, which
+means that for the speeds which do not have a baseT mode, we go
+from supporting it but with a weird link mode (mostly baseCR*)
+based on first-match in the settings[] table, to not supporting the
+speed.
+
+> > In addition one advantage is that it makes it possible to support
+> > speeds that don't yet have a type in the phy_interface_t, so as I was
+> > enabling things it allowed some backwards compatibility with older
+> > kernels.
+> 
+> I don't like the sound of that. I would simply not support the older
+> kernels, rather than do some hacks.
+
+I think Alexander is referring to having a PHY interface modes that
+supports the speed - for example, if we didn't have a PHY interface
+mode that supported 100G speeds, then 100G speed would not be
+supported.
+
+Phylink has already restricted this and has done for quite some time.
+We only allow speeds that the selected interface mode can support,
+with the exception of PHY_INTERFACE_MODE_INTERNAL which supports
+everything.
 
 -- 
-Sabrina
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
