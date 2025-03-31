@@ -1,216 +1,172 @@
-Return-Path: <netdev+bounces-178403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38C95A76D9C
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 21:49:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D849CA76DCB
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 21:56:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D900716824F
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 19:49:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F88516B06D
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 19:56:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D25B214A82;
-	Mon, 31 Mar 2025 19:49:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ACCA218EB1;
+	Mon, 31 Mar 2025 19:56:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="XbtLqEqF"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="wQfNtAoa"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2065.outbound.protection.outlook.com [40.107.243.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0806173;
-	Mon, 31 Mar 2025 19:49:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743450559; cv=fail; b=qiSlWaV23SGnpAblPzV3KPvHIbpEcdAjTWhORX7MTp7Iz6X595J7YWCGt1ldTy21D9ruc1ozitRPWQiSmgbwoHyiUEcHkIdfAdEPCIgV8EKww0btPaIuU4WOku9yz70Km4n+5ZKDj7YlvlC9alIXA0YOnB1Z+WZb1UFYp/2n4ig=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743450559; c=relaxed/simple;
-	bh=5UuG92J2R81uVllmpP5uAoJYKbellZCh3HKQGwuXulc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=eCw0/z8EecVUwn/Jx+3Kozvo7bVXpNcOU3/i/9XCqjNgL6CiW0MvcnQlD+b7phvkMrQB5iisdHxjU44nsZwRDW1EXaao0sQeYCvXyRJUNNuzj3IjZLXpA6YIi40o4EAZf5QcdLjops4eQBlTaEuzDrT6u/vIosV2tFipkpduhNU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=XbtLqEqF; arc=fail smtp.client-ip=40.107.243.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XjB75mTgtoAOYXrlR5wCaXM32+b9MUUV4lCliDnD/vOhBYbvFakItNzKalSwgPL2Sgoe1J1uJTwCxTh1uaiMBHBIPH+leHdoVdiXZ7qnewmPAQQ8C6bBnDDLzCtnA118X/2DLN5X+KWqYQMAKTxHWIhVqO+gBv0P6wdcQXx1f9zsHTg/1FxsGW7V3hzalD03hE7AbB3MsGvDU4wLVLyq7DBMt9U5Zo92XdGLYOE/mJ8sRIIbQTRNBIE+iTI5B0Wrig4KzK7Tms9VAcGy7SZtfX3rK9noXKdUFZQif57Hwfo1NGXi1zY89ffbFI2jsNlEnJ67w994b8p/yJOFZcRCqg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5UuG92J2R81uVllmpP5uAoJYKbellZCh3HKQGwuXulc=;
- b=e3uuViu+3Ne149y08o7ZXePCymq5Qu8EId9Uh0cZgL0VaambHP+YkdI8TDDyfkd6px+7c8pJPTImKge6aYbZXCkHR6KCd9JE6TuVs+Mf9MjB7b53FKo5/zNw8qVu6OCB9a6dbx5AlpjNASk7wBSUuQc66V271oN/ACh+Cxc56XYueqdws5hWUCQISs2Pg5RXNarxHSeZClQTsLfcGI69jYHiBiZDE+PB8pSCircs/Fj218GsbaoBh4ftvmPTzgeC65xvRxiwYGknoOkbiw71iu4wQbHgKI5slSiSbingXj/acPp3mNFLSA0MZVuoTmbF4OO+WKcAS/a4Gp6jlow4Iw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5UuG92J2R81uVllmpP5uAoJYKbellZCh3HKQGwuXulc=;
- b=XbtLqEqFlS4V2AIncASrPqffojegHm/qxfYQhAfBuFgR0RQ7RMayAgFz4DTzjgQlGS9huc5PicWAya8jlTTR/he5zeVmcusTjFXQoNJb2h/F56lao6r3/YRH6vV146XKDRVT0W1tSTmd+PxU9lN7Tj8tzevW7ELzoqBtBBBBvcu+VTmsZFQ2TYX81hi7IFUZJIONwZ5IgnAmpv0nV2IYM06a0FPBZVZ9eWl7IUZNVNDLh2OdxNbAPdyI5sGtWobk9vBqxTMCUzuJTPwo1bw3DQ4MJD9eO7/xXuIAz5OjM1ZTXzFMIh0MxSXpJ/3o2Oasy9Y4MF5aQPoPF9TD3EBPeg==
-Received: from DM6PR12MB4313.namprd12.prod.outlook.com (2603:10b6:5:21e::17)
- by SJ0PR12MB6856.namprd12.prod.outlook.com (2603:10b6:a03:47f::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.44; Mon, 31 Mar
- 2025 19:49:12 +0000
-Received: from DM6PR12MB4313.namprd12.prod.outlook.com
- ([fe80::4d58:4bbc:90a5:1f13]) by DM6PR12MB4313.namprd12.prod.outlook.com
- ([fe80::4d58:4bbc:90a5:1f13%3]) with mapi id 15.20.8534.045; Mon, 31 Mar 2025
- 19:49:12 +0000
-From: Sean Hefty <shefty@nvidia.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>, Jason Gunthorpe <jgg@nvidia.com>
-CC: Bernard Metzler <BMT@zurich.ibm.com>, Roland Dreier
-	<roland@enfabrica.net>, Nikolay Aleksandrov <nikolay@enfabrica.net>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "shrijeet@enfabrica.net"
-	<shrijeet@enfabrica.net>, "alex.badea@keysight.com"
-	<alex.badea@keysight.com>, "eric.davis@broadcom.com"
-	<eric.davis@broadcom.com>, "rip.sohan@amd.com" <rip.sohan@amd.com>,
-	"dsahern@kernel.org" <dsahern@kernel.org>, "winston.liu@keysight.com"
-	<winston.liu@keysight.com>, "dan.mihailescu@keysight.com"
-	<dan.mihailescu@keysight.com>, Kamal Heib <kheib@redhat.com>,
-	"parth.v.parikh@keysight.com" <parth.v.parikh@keysight.com>, Dave Miller
-	<davem@redhat.com>, "ian.ziemba@hpe.com" <ian.ziemba@hpe.com>,
-	"andrew.tauferner@cornelisnetworks.com"
-	<andrew.tauferner@cornelisnetworks.com>, "welch@hpe.com" <welch@hpe.com>,
-	"rakhahari.bhunia@keysight.com" <rakhahari.bhunia@keysight.com>,
-	"kingshuk.mandal@keysight.com" <kingshuk.mandal@keysight.com>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, "kuba@kernel.org"
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: RE: [RFC PATCH 00/13] Ultra Ethernet driver introduction
-Thread-Topic: [RFC PATCH 00/13] Ultra Ethernet driver introduction
-Thread-Index:
- AQHbjuwVUw9AWIkXnUa8bbJSM0sPK7N6v4MAgAgXf4CAAAnsgIABEwYAgAAgrcCAAYj9gIAAAVBQgAARqYCAAABpoIABaOyAgAF/vICABS/6MA==
-Date: Mon, 31 Mar 2025 19:49:12 +0000
-Message-ID:
- <DM6PR12MB43137DCF20A1428F7E67F82BBDAD2@DM6PR12MB4313.namprd12.prod.outlook.com>
-References: <20250306230203.1550314-1-nikolay@enfabrica.net>
- <20250319164802.GA116657@nvidia.com>
- <CALgUMKhB7nZkU0RtJJRtcHFm2YVmahUPCQv2XpTwZw=PaaiNHg@mail.gmail.com>
- <DM6PR12MB4313D576318921D47B3C61B5BDA42@DM6PR12MB4313.namprd12.prod.outlook.com>
- <BN8PR15MB25131FB51A63577B5795614399A72@BN8PR15MB2513.namprd15.prod.outlook.com>
- <DM6PR12MB431329322A0C0CCB7D5F85E6BDA72@DM6PR12MB4313.namprd12.prod.outlook.com>
- <Z+QTD7ihtQSYI0bl@nvidia.com>
- <DM6PR12MB43137AE666F19784D2832030BDA62@DM6PR12MB4313.namprd12.prod.outlook.com>
- <Z+Qi+XxYizfhr06P@nvidia.com>
- <DM6PR12MB431345D07D958CF0B784AE0EBDA62@DM6PR12MB4313.namprd12.prod.outlook.com>
- <Z+VSFRFG1gIbGsLQ@nvidia.com>
- <a7f22729-d76d-4e90-8457-6844f18929eb@huawei.com>
-In-Reply-To: <a7f22729-d76d-4e90-8457-6844f18929eb@huawei.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR12MB4313:EE_|SJ0PR12MB6856:EE_
-x-ms-office365-filtering-correlation-id: da5d1df2-e404-4e56-04fd-08dd708d1c23
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|1800799024|376014|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?aHlVWG0veHpudmsxNE83d2M3RXZOd05oQlVxYmxLTGFKSTczQ21rTmpsZWdJ?=
- =?utf-8?B?NU8xUmdaM2VpaXIzZmxjdkRJaFZUd09aYXZEMnZmNlFBNU9mMjNSZldiVXJO?=
- =?utf-8?B?aTBobURZWlhvbEZkQ0JRRUpQekhCNjRxanhVSzd3ZVRrNnlDRklKRENXeUxm?=
- =?utf-8?B?SndlUmE4SFcrU3FSQnY2Q2FqUXk2Yzl0S1ZYZ0NLbzhCckc1ZWZLSXA1Z2c3?=
- =?utf-8?B?K2luWTVQVy94NURLTDhBY0VaNjBPK3gyMnRkdTU5c2NyWlhBK2dOdnVocmg4?=
- =?utf-8?B?alZYTE5aZWY5cnBKNmVQK0tJN0pXV2IzUEdZUEtnQTV4VjhUQnI3aEFGVE40?=
- =?utf-8?B?cEFyRkVzNkFBdUtkZUZZVTRBYi9UbHQyc3dqL2FFekk2SmhCTm42VUNmY1g2?=
- =?utf-8?B?dnJMVnY1dEgwZDZtek1VSnNWUWljWkJXNmZmQ0NjMGJKVWxYMHY2V0FURGZF?=
- =?utf-8?B?M2g3QzU3LzVJRUV1b3hPV0p4K1ZaM1Q5V1RvUVJrYlR3STJOQmQzQUZURmhD?=
- =?utf-8?B?REdKTnFFVThpMUVUNGpvcWtXc0ZQNU9UcWxGK0hIZmVxamV0eXdRRHB5SElT?=
- =?utf-8?B?WGMzZk1lMkJOOE1oOG1mZFhuV0lPTHBURXIveVNyVVJiTzJiaFpaOHExOVdN?=
- =?utf-8?B?eXpoeGRHTnBmT2NoWm04cDlVM0Y5N3V4RCtiQ1hJakR1OTZ1SU5QZXJpVkhN?=
- =?utf-8?B?cElTbVQ4T1ZWTHFNQTV4QU80ZEtrSGZiZ01pZzFnUExKcEpZQzF0RndNZXlr?=
- =?utf-8?B?WnJQSWRuMXhiTmFHcVB6ZTI2RG1weDU2UEJ0QVRZUW1NSmNtRWtBcGNCVVNL?=
- =?utf-8?B?OE9zUURiNzZQejhNVzFScURXVGtCaTdvTUNQVGhKcFlMVzZVMEdUUzJINEdI?=
- =?utf-8?B?NkhWVm5DRVRNalQ3Zktnd2pkcmhzb1ExSGxRNlVLTVUwMkcvWmpQb1JCSW0y?=
- =?utf-8?B?ZU9QWjZEVGsxQ0ZkTHQ0c2p0SmFxSkZvN09PUDBKc0tYbnhSYUE0L1JzUGRa?=
- =?utf-8?B?Y09LVE5LRU4rVThPQTFxYkl0YTB0dHp3QURReHVkVXhTSjVHWG5meXk4Tkwx?=
- =?utf-8?B?bHhHcmpac2QvYTFsQStiLzRKMFkwdzZpS2ZYcDRxdzN2cXQwOStSS3V3MEhu?=
- =?utf-8?B?YUQ1NEdySkg2M25XWURYWHdJYm9zVndXRXoyWUdYZzVuRnJ0bFNyRThlUEEy?=
- =?utf-8?B?Wm5UYkZZV1pXc0lidi9YR1ZMTncrbis1VUdmTHhjQW1tNllBcElkSkpXVks2?=
- =?utf-8?B?QXJkME91b240dU9WMktVTy9FZEVvMWxXSi9uelBnYUVOSTcvdGZQNDFRcU40?=
- =?utf-8?B?ZThwUCtHSjVYdVd4LzNkS3U5LzNrbGhCeVhtdmRUcjQxcnZTS0NHbVBObTNR?=
- =?utf-8?B?dDFxSVZZRVMvSTU0YzdlNVliOXQ5eUl1d2FZUElnRittcVluMDJ5aHFjVEJi?=
- =?utf-8?B?bjkyd0lwanhHYkhkWkhua0NtMkZSSE5WLzhuZmtjdm1CdkFWdWVwcEZxREFM?=
- =?utf-8?B?b01mSHM4SUlnUWsyWkFVU2tOM2huRjdIWEh3Mi9oUFpKUlQ4VWRMdWdRK01R?=
- =?utf-8?B?cUIzK0VKamRST0NXMnhHcHo4aDdqRHA2NTlVa2UzN28zZEFveEF3SFFzYmpr?=
- =?utf-8?B?S0pwUDZlQmxkbEg4dVVKUXZGTUJMVFNacnFMS2tEc3lpOUt1bjk4Qk54NVBK?=
- =?utf-8?B?Qk03MG1adWk1Y2hYQnpxdVpiWm85cW5SUGdJTm1sNXJuckd1dllIOVp1bFFT?=
- =?utf-8?B?MExjUDNtL3RjRHdRRTg4WDllU0wvRjU5ZzJUMXpBcW00K042UVRqaDJ5U2h1?=
- =?utf-8?B?ZWx6UkVMdVlZMzNXZVJTQi90UFJudEF4WFRKY1k1TFhLMkFXOUk5MGFlNXYw?=
- =?utf-8?B?aThxZW5IWDc4UDk4UTdVV3oyd2xMR0VMbXVxV056Y0NQUVhaclFJalE1UjA3?=
- =?utf-8?Q?cTm1yMMMqmSc4pW/43JFwcJE17ib0UhW?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4313.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?b2tvSzQ5VllWaDlJUUFzbm9uSUlGQUV0RUNkOW9oU1EvVzRGSGdOandWUW1P?=
- =?utf-8?B?bnpsYzk0cFpwdVhzOGFTamc2MVdpTFJRNHYzRnlJS2M5emw4QlpzN2VsVHVL?=
- =?utf-8?B?QlUrVUhnQUZjMVNYUmkxL3NZNDIwMitOT2lmc09SVHJIZWZ0RXdEd3gzUWtM?=
- =?utf-8?B?TmRWRk5aTUYvWjc2VFVQTktDYWN1YXFGYUpqdlU4Z2ROVnZ5OVVNSlhtVnR2?=
- =?utf-8?B?SGs5cDJCMzYzNWErNkZuUmFHMk5qbzl4N1M0SzBEbGh2RlVpbXVPbTQ3RW9x?=
- =?utf-8?B?SGRDMHY5M1N0a0k3TzloSExNUTVieE1sSmdKYWFWOG9wQVBvRjdxcFdYbTY3?=
- =?utf-8?B?YWJXZFRZZFg3V3hwMXpCMVd4MDlqVlIzekE5aDk3bm5LZ21BcWM5VGU0dHJy?=
- =?utf-8?B?bXBxTUVIK0IwWHVhUW41OTdjY2x1SnA5WTZJUkttTnprSW51U0lOM2pBU01V?=
- =?utf-8?B?OE4xOGVML1JkNUdjWHhQcDRPcERCVTBHSnRGeDgwU1N1T0hKNXl5QjlRMC9O?=
- =?utf-8?B?bHhHMkRyU3UyanUrTG5qNnRGZjJjaFV3bC9KTXVvaW16ZjdyakR1b3JCVXdt?=
- =?utf-8?B?OGNaUEtaUkRVY3hYT252bGh5Q2Nid2FHS1dYOVZpOHhGRzlBNUh5b3RicXcy?=
- =?utf-8?B?eDRrMSt1MWcxZEE0VDRBN0FkNlNFQmNmRUJ2d1BJbm9mY2I0Tlh0VDNCY2l6?=
- =?utf-8?B?M1MrQnN2K3A4Yyt6QmJaeGpvS1ZNY1RSYStaVHBUYnZvcTRFeEYzRnM1VXQz?=
- =?utf-8?B?TEY2bGhMVXlkc0JhcGc0SjhPZ1o1MUZkZHNrdzRuLzhEazN3Y283OE14QlNH?=
- =?utf-8?B?dUl0dWM5OVVsRktaRGNCaWFPNitrUUg2R0d2UnFtd2pQVlNJcFBSMkZyajFz?=
- =?utf-8?B?MXRxd0o4RmMxcDhQU0gxdzhEN2hVYW8rd1U3VmhIWCtLWFYzcngySWFGN2N2?=
- =?utf-8?B?U3E2M1JOTENUSytqUWlEdHlZdmdNM05HM3FBN2RNVks5N2JJaG9nYzZUb3dy?=
- =?utf-8?B?M3l3MWFiU2o4YTAwQzZGVnp1czRFNG85OWVpN0N0UDQ1V3RQQ3VWbU9lcDRY?=
- =?utf-8?B?MUlEVjJEY3RNUExEaG5ScGVJcmhJZzNOWGJrZy9LVlFXUWJKWk5zbE5OeDh1?=
- =?utf-8?B?aXFHdTFNbFNCRzVaTVRuL0xDQVgxcTc1c00ybmRNalZPc0NhLzdMRkFNRkxU?=
- =?utf-8?B?RWZDemN5Q0NTNDZpMU90RmxIUkNWRUFMMVg3elZBbFBaUUVMTTFOZEhaNUVP?=
- =?utf-8?B?ejZyZVlPTXZWVjFuK1RqWFA5WUJERzkzTnBka0crYm9TaE9xNUNscWg4YzIx?=
- =?utf-8?B?ZXNxc0RlNHFlczNKajVuQzRlOUZUdVc1MUlhZ2pqSk1Tc1JENmJYQlgzNlMx?=
- =?utf-8?B?VlJLaHNXbUhPNmN0c1RyRFQ1djF2R2xGaldsWFVmTS9GaVZzTklFYmhBVVBu?=
- =?utf-8?B?eitnVTc0dmZMamFna2ZyZTJERTcvZElwdTV4WW5jL3RrWU0xSUFJa2NNS0k0?=
- =?utf-8?B?dnFFSGhmSEN3UU43ejNrNXF5YnlRdlFWdnFKTG5BWGZKdUluTDFnemRyczVT?=
- =?utf-8?B?TVlYYTVOSldGRkRrWFZZa3BaektVQ2pxQ3dDWjdaWFdQcUNGRUhjRGhQRjYw?=
- =?utf-8?B?T0NYT2xveG9ZMGRzaG5UWmo3M0NNckMrY2w4RFNNWkFwTTB4S1JYeUZhS2h6?=
- =?utf-8?B?V2t0eVlGOUt2dkgvNmJjRHZoejRqN3FPNlhaMHA4aDliSGpZUWZiTWUxWVdx?=
- =?utf-8?B?QzYvZVZjZmlWSzE4U09jL0JtNDBjV0NPV2h4b2E0bmdFcExyZEQ5QjlrZDFz?=
- =?utf-8?B?RzlReDVyU3NrUGV2SFVGTmZobU5kVXFxTktnOHQ0QzloUVZWOGlUblNrNWQ5?=
- =?utf-8?B?a0txaEFJKzVwQnZPMHVHOFpuc1dpTzE5TmhWOVBDeXlUWkdJY0VBU0hodXVI?=
- =?utf-8?B?WHlkWjFkVHJuUFZpcC9sakUwcUE1SmpPaGxnMkkwRS9UVjRxcHdOcEhmV3h6?=
- =?utf-8?B?ZnNzdTQ2N25qaUdldGN3aTVvTnJUWU0yVzJobUVyRzQrUGVjZXNLSkVpZFdJ?=
- =?utf-8?B?Kyt5MTljZzRoQ0V4d0dyaFNIUUxCWEJDZ3hQdldlSEg4Tkt4SUVQT2pwcGxl?=
- =?utf-8?Q?JDEI=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A68218585
+	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 19:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743451006; cv=none; b=Uww07w1+FZmuNAhNJbRqDQTcoPDYNW+xjPnHTCx5U6/ed9v2CmAZsA5TCxTvOrgAuc+JyMV5iIiI9cwJIB/i5pcjMEEqfJSJD6BUiMjsN9zwA5o6sg9Ln8BLMJQHXXtP9TFmLC4XJCTmJYgdrqgIS2Q+77hjyGhmU5Sy23fSCt0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743451006; c=relaxed/simple;
+	bh=vAxCqO8D+zzqb/qZNB5/FCTsdHivJpMM4FMnnmj32U8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WoOXSXQnVIQQwQXDF3UfsJiLfnXrb3TKtQGqOXOXaKwAzYtx0KDYbCWShELEGwq1RaH5O9rm0mQXt/COQaKVXOXz4SQt4Jwu/vL/+GdT9qEA/VlXL54NQxyNXbdC1LuxNbLECLCZoE3ClXoyDHSvlf1pFOYVkx5lwYAv+VDglnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=wQfNtAoa; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-223fd89d036so102402885ad.1
+        for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 12:56:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1743451003; x=1744055803; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=AzqSa6qdLoYyh4MHGFR7tGBhWMYj3VcZWbyxOBNFEgk=;
+        b=wQfNtAoaOTDHACeqKolF4hex7jcF2MtR0IXe8aOTrPmPKl+i4PZsYiY5ZiBCyPe0O8
+         biyyGGStZ7YLhpArvX7dAPP2s6Vw4ol4yjVoBLmLMy8ZNBGcSje55I0ZYxJ0ADUBv/CR
+         QZAkPBy2ZrSvZgIjMsRSW5CVFAONkd66D/U5/EKvVsju/36x2IXaD46GraGR+/HS3aKV
+         2glsO1EFZo4uFjS4X41oq5uvivVRGxQ0LXiprr6I+3NwWtGdWMlyG5IyNV2pOOaTczj5
+         ODs6Y+OXVosnLKksBj3XZNceha19Wr12Y8fZWp8XmIOA4IqdIoSw5MVaIiGwPdJlERqz
+         JWvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743451003; x=1744055803;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AzqSa6qdLoYyh4MHGFR7tGBhWMYj3VcZWbyxOBNFEgk=;
+        b=WEU+OkMPoNSLzyUlEHwoExRsvaq8tJFg6QrPetzKwH8BmBqfGMlo+aGQ/w25+sePg+
+         tcJD8tQWjPy54j0k2BBaSHWaHbE31BRa537rjtgpLJ+lERwbCAfi9j5TXVceV5u0kZ29
+         5Oun22lnD1PJlVkIgD9m0Arg21ZuKUZrFPG7zXK7d7IyHHh08N16laAhopmfoCZQFIt/
+         z53xdG5DoCEqEPQZHyUBtr13RjFizrEKxJVWk23a7/vfJZwCzY1AORLHkkpzuA9VANbQ
+         gRcEPCRpy9TL4GBwYXnLDN8lKil6bxuxvwi+y/gE/BXcsENg6gSdqt2Fi3Z+woGHTA2o
+         J+mQ==
+X-Gm-Message-State: AOJu0YyEf5rAZ3M8B7J3EBHaXF9z6YgaDblLW95iuU2/NxxmAn09o+7n
+	as18OoapLdc0ewTZ+2DqIYYNmeehs+8siLRTeoPtiOe8vlIoTBoRNyA6s5zRioU5xt416NHkCTg
+	=
+X-Gm-Gg: ASbGncv+UZx5Mca65k0QcXvzuS6rAQQnQZtqQ+vv8YkGq3OggB2j507urQewgqZUqi+
+	4wzV1k31yDGLUT3zlvDDkX0xMTWpvymqE+xipcR+v7z6wvd9dEBfgkyiRMPzNtcor2v+neZ01Yz
+	5C/Odb7YWVSKUfPRZjPutuRKToCP1aVtItInmx5Cts8qaGJ504cnyqEW3URYSdOv7XeFylfwbUa
+	5ms1hvAdNvOmd8fnILO/qxYbFj/34CMWXaZV3ucBW6q4AwGLrnOICaPMV+Iu1iKr5RzaDQIhkhk
+	TbIQeH5kMLdrdsIqDYMR7exORG9pJDWx48lJvsls+jok9ScXlSzoCqLbKwMrj6H2zG+7
+X-Google-Smtp-Source: AGHT+IEpEnY4rZKG+/LUO41TSZFdr+jiBWbL1y7GD4aLnGkKhbPHZ+UMnU43ZPvQuWmZC/hfP1zMgw==
+X-Received: by 2002:a05:6a00:3901:b0:736:54c9:df2c with SMTP id d2e1a72fcca58-73980415eafmr12174016b3a.15.1743451002841;
+        Mon, 31 Mar 2025 12:56:42 -0700 (PDT)
+Received: from rogue-one.tail33bf8.ts.net ([179.218.14.134])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73970deee97sm7313082b3a.25.2025.03.31.12.56.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Mar 2025 12:56:42 -0700 (PDT)
+From: Pedro Tammela <pctammela@mojatatu.com>
+To: netdev@vger.kernel.org
+Cc: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	shuah@kernel.org,
+	pctammela@mojatatu.com,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net] selftests: tc-testing: fix nat regex matching
+Date: Mon, 31 Mar 2025 16:56:18 -0300
+Message-ID: <20250331195618.535992-1-pctammela@mojatatu.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4313.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: da5d1df2-e404-4e56-04fd-08dd708d1c23
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Mar 2025 19:49:12.0831
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: d6dLicM1+vxbaUIF24WtHeO2rV96fIRndexfavRszi6oLSdn/ED24YAtxG8V/e3Wfm8AFTnhK71fJjdmoEl6wA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6856
+Content-Transfer-Encoding: 8bit
 
-PiBUaHJvdWdoIHJlYWRpbmcgdGhpcyBwYXRjaHNldCwgaXQgc2VlbXMgdGhlIHNlbWFudGljcyBv
-ZiAnam9iJyBmb3IgVUVDIGlzIGFib3V0DQo+IGhvdyB0byBpZGVudGlmeSBhIFBEQyhQYWNrZXQg
-RGVsaXZlcnkgQ29udGV4dCkgaW5zdGFuY2UsIHdoaWNoIGlzIHNwZWNpZmllZCBieQ0KPiBzcmMg
-ZmVwX2FkZHJlc3MvcGRjX2lkIGFuZCBkc3QgZmVwX2FkZHJlc3MvcGRjX2lkIGFzIHRoZXJlIHNl
-ZW1zIHRvIGJlIG1vcmUNCj4gdGhhbiBvbmUgUERDIGluc3RhbmNlIGJldHdlZW4gdHdvIG5vZGVz
-LCBzbyB0aGUgJ2pvYicgaXMgcmVhbGx5IGFib3V0DQo+IGdyb3VwaW5nIHByb2Nlc3NlcyBmcm9t
-IHRoZSBzYW1lICdqb2InIHRvIHVzZSB0aGUgc2FtZSBQREMgaW5zdGFuY2UgYW5kDQo+IHByZXZl
-bnRpbmcgcHJvY2Vzc2VzIGZyb20gZGlmZmVyZW50ICdqb2InIGZyb20gdXNpbmcgdGhlIHNhbWUg
-UERDIGluc3RhbmNlPw0KDQpVRUMgdGFyZ2V0cyBIUEMgYW5kIEFJIHdvcmtsb2Fkcywgc28gdGhl
-IGNvbmNlcHQgb2YgYSBqb2IgaW4gdGhpcyBkaXNjdXNzaW9uIHJlcHJlc2VudHMgYSBwYXJhbGxl
-bCBhcHBsaWNhdGlvbi4gIEkuZS4gYSBncm91cCBvZiBwcm9jZXNzZXMgYWNyb3NzIG11bHRpcGxl
-IG5vZGVzIGNvbW11bmljYXRpbmcuDQoNCi0gU2Vhbg0K
+In iproute 6.14, the nat ip mask logic was fixed to remove a undefined
+behaviour. So now instead of reporting '0.0.0.0/32' on x86 and potentially
+'0.0.0.0/0' in other platforms, it reports '0.0.0.0/0' in all platforms.
+
+Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+---
+ .../selftests/tc-testing/tc-tests/actions/nat.json | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/actions/nat.json b/tools/testing/selftests/tc-testing/tc-tests/actions/nat.json
+index ee2792998c89..4f21aeb8a3fb 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/actions/nat.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/actions/nat.json
+@@ -305,7 +305,7 @@
+         "cmdUnderTest": "$TC actions add action nat ingress default 10.10.10.1 index 12",
+         "expExitCode": "0",
+         "verifyCmd": "$TC actions get action nat index 12",
+-        "matchPattern": "action order [0-9]+:  nat ingress 0.0.0.0/32 10.10.10.1 pass.*index 12 ref",
++        "matchPattern": "action order [0-9]+:  nat ingress 0.0.0.0/0 10.10.10.1 pass.*index 12 ref",
+         "matchCount": "1",
+         "teardown": [
+             "$TC actions flush action nat"
+@@ -332,7 +332,7 @@
+         "cmdUnderTest": "$TC actions add action nat ingress any 10.10.10.1 index 12",
+         "expExitCode": "0",
+         "verifyCmd": "$TC actions get action nat index 12",
+-        "matchPattern": "action order [0-9]+:  nat ingress 0.0.0.0/32 10.10.10.1 pass.*index 12 ref",
++        "matchPattern": "action order [0-9]+:  nat ingress 0.0.0.0/0 10.10.10.1 pass.*index 12 ref",
+         "matchCount": "1",
+         "teardown": [
+             "$TC actions flush action nat"
+@@ -359,7 +359,7 @@
+         "cmdUnderTest": "$TC actions add action nat ingress all 10.10.10.1 index 12",
+         "expExitCode": "0",
+         "verifyCmd": "$TC actions get action nat index 12",
+-        "matchPattern": "action order [0-9]+:  nat ingress 0.0.0.0/32 10.10.10.1 pass.*index 12 ref",
++        "matchPattern": "action order [0-9]+:  nat ingress 0.0.0.0/0 10.10.10.1 pass.*index 12 ref",
+         "matchCount": "1",
+         "teardown": [
+             "$TC actions flush action nat"
+@@ -548,7 +548,7 @@
+         "cmdUnderTest": "$TC actions add action nat egress default 20.20.20.1 pipe index 10",
+         "expExitCode": "0",
+         "verifyCmd": "$TC actions get action nat index 10",
+-        "matchPattern": "action order [0-9]+:  nat egress 0.0.0.0/32 20.20.20.1 pipe.*index 10 ref",
++        "matchPattern": "action order [0-9]+:  nat egress 0.0.0.0/0 20.20.20.1 pipe.*index 10 ref",
+         "matchCount": "1",
+         "teardown": [
+             "$TC actions flush action nat"
+@@ -575,7 +575,7 @@
+         "cmdUnderTest": "$TC actions add action nat egress any 20.20.20.1 pipe index 10",
+         "expExitCode": "0",
+         "verifyCmd": "$TC actions get action nat index 10",
+-        "matchPattern": "action order [0-9]+:  nat egress 0.0.0.0/32 20.20.20.1 pipe.*index 10 ref",
++        "matchPattern": "action order [0-9]+:  nat egress 0.0.0.0/0 20.20.20.1 pipe.*index 10 ref",
+         "matchCount": "1",
+         "teardown": [
+             "$TC actions flush action nat"
+@@ -602,7 +602,7 @@
+         "cmdUnderTest": "$TC actions add action nat egress all 20.20.20.1 pipe index 10",
+         "expExitCode": "0",
+         "verifyCmd": "$TC actions get action nat index 10",
+-        "matchPattern": "action order [0-9]+:  nat egress 0.0.0.0/32 20.20.20.1 pipe.*index 10 ref",
++        "matchPattern": "action order [0-9]+:  nat egress 0.0.0.0/0 20.20.20.1 pipe.*index 10 ref",
+         "matchCount": "1",
+         "teardown": [
+             "$TC actions flush action nat"
+@@ -629,7 +629,7 @@
+         "cmdUnderTest": "$TC actions add action nat egress all 20.20.20.1 pipe index 10 cookie aa1bc2d3eeff112233445566778800a1",
+         "expExitCode": "0",
+         "verifyCmd": "$TC actions get action nat index 10",
+-        "matchPattern": "action order [0-9]+:  nat egress 0.0.0.0/32 20.20.20.1 pipe.*index 10 ref.*cookie aa1bc2d3eeff112233445566778800a1",
++        "matchPattern": "action order [0-9]+:  nat egress 0.0.0.0/0 20.20.20.1 pipe.*index 10 ref.*cookie aa1bc2d3eeff112233445566778800a1",
+         "matchCount": "1",
+         "teardown": [
+             "$TC actions flush action nat"
+-- 
+2.43.0
+
 
