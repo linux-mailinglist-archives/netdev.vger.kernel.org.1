@@ -1,88 +1,86 @@
-Return-Path: <netdev+bounces-178367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF484A76C22
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 18:41:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4549A76C2E
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 18:48:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C668D188ED82
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 16:40:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA8CB16B494
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 16:48:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B468A214815;
-	Mon, 31 Mar 2025 16:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QCFBnY8W"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0971821481B;
+	Mon, 31 Mar 2025 16:48:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D35378F4F;
-	Mon, 31 Mar 2025 16:40:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3462E630;
+	Mon, 31 Mar 2025 16:48:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743439227; cv=none; b=NUtR1otSAYnrku9WF7qlI+7LCAdAlhZdwUuvlqoKyxw2lOm81KAxXWZYNNHw8ZvWBOo9dC5tzSfKYsEb9430wgtl90kwIkDfMNDO0PkoJuq07KdQBS5Wi+08t1V9ePZ3MdaRNpAdoU1lR4ODEZ+IRH9+mVW2CchSfGN4vNwcdE4=
+	t=1743439720; cv=none; b=pnLYCVOdT1KWbmYVJ4qIUzdcW9WT+ogURXbRnq8E15locRo4O83ubcShDv0lA4RTIBNvF8cYTvfUKw8QyMBNrUtwPQ17bzk2wPBrZGszCvnoAAs2p2vqWztXsa/NvG0B+7MgTFbBnXz6EMHxYH1ALTlJ9Q7ED8lEQXQzsHkhvdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743439227; c=relaxed/simple;
-	bh=AYFUramL9FR2hoJVHPU1NGGSkE1T1sbmog92XXloJv4=;
+	s=arc-20240116; t=1743439720; c=relaxed/simple;
+	bh=CHf4F+Vs2THX+O+eioOWULMiJfIIbhKmgIxfWXMsmMQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hy8FmaOqc05XPwW01Gjgwya7xUhYAz7DOqT8i4eqrmFm1IDZK8ANSatTVUjzRN+Iy/zTRz1ZaT3i8q18wID18Afi6AaSd81BQ01Fr01mzV2RuPOMSyBCQ95uqqHhm2XHp3BDA5UT6Oa+F4iAfHhUoxae/bJg0ao9ZkiE2UOrEjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QCFBnY8W; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=T9MOQs67utp0cmEtV/2uGdCBESH5I3T4V8DNvs/wOSiVXGFJQDC0o6RxRDl1mA20plArmu2y9xqObUTGvAogUQMCJ6JIRLzlZCtiLOsz6CkqFkp4hDrU1bZL8UVYjVosAFxt6g+iU7FiHx/PVZsRbQYzrZjrB75XOn2cqpK7crA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-223fd89d036so98768755ad.1;
-        Mon, 31 Mar 2025 09:40:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743439225; x=1744044025; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dz9N0KZHNJSKflVhOQJGTKP9fs9EvMvsQxUyQyH/M1c=;
-        b=QCFBnY8W161YLbYvU6ITYXKaBQIVoRufgmUQaoPjCBb4+MnHqdw4CNKJ5F9LiJNiQZ
-         Gcm2wXXYIPh3oe8vpSroVqw5JLI9HxR8LAgZIgzMSo/OPYO8XkyzL/el+/JC3dkgNzFW
-         PwhfSfXBKceYZctkwz02EjSdH/E2B6pHCpdxw7I9l/AXRwTYfW6qWWU1tNGfe9R1aYQz
-         JIQv6dup8LtuRT/W22PSL26ZTnltgfUt0h3EPLq6CAk7ZXuvR8DPhhtOygkFcrdIBck0
-         vC2duj5t8ARB67sKl3VVWLkYYYxtZpiqXHGKRSGU7v41DafnZfKuCtNswwN2psd7i7IJ
-         ofVw==
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ac73723b2d5so455795066b.3;
+        Mon, 31 Mar 2025 09:48:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743439225; x=1744044025;
+        d=1e100.net; s=20230601; t=1743439717; x=1744044517;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Dz9N0KZHNJSKflVhOQJGTKP9fs9EvMvsQxUyQyH/M1c=;
-        b=HNartIfoNOGCzVzYxck1Y5huybxHuv9v51RC4liSoAj/vV+a16cXZWmNatX6Ikqplr
-         QmkKIo6KwsPEyY4R1ZTckRvCWeZ56+S7d006IEFQE4k5/dcv7xUIpiq9cugEX0MNvBq+
-         x0BFACEtsHsk8QQyqrf04b4gu6rF7JdVzrFKFdbNt3emYsZcZ053+Y0L0O+T9o7/sI4j
-         oYo5qu0yZYs9pouaEe/lAzbPIdtAq6lvxsFCWOmYv6m55o+aQx+zuBEdfr2halC/WmwR
-         6EfVmwRzU9n1q6+AhAX4L7luuuoUUs4wdWxolrZTqfPuX5qJ5KL786dG10Rh+VbKpivx
-         eMnA==
-X-Forwarded-Encrypted: i=1; AJvYcCUIfdlSSxwvXVj+yWO1YJ8kyDcOT0T0R78klOBPQa011WEq6itxywCeG7tO4Qrv3NhUzdr+OiarfoJdB9I=@vger.kernel.org, AJvYcCWSd9SUaY51I6XJsPYltElyvcKdo+p4Ek8lQV+HLE8Pl6HQeOjXucyqHqBJIXYcd//DIlV6mCAl@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywms6N5z2DNlOF1yvwPdYCRCx44nc1U1GH/RCj2M0G7eyncoXCs
-	hk4NIQ4XrSo+FAFuB1c1iY4VDykAneR/uH92wxaUjb5w5BK7mTV6
-X-Gm-Gg: ASbGncvGk3Q32GzVGDtWTkm/qt2ZJNdpVlF6UQkZtU9jZtde6B0X0kiFJRTMTAJMSDt
-	9Wiav8FXcvYXFxey82rgoMG71n0jPx8+77gfXthWNzmlrMVa6s+8uDDbhz9T4IePEi7+9FPkJ5c
-	gB2QJ5TyWqEkEpb8WdCMUUuRLes0tenJ0V6kM84k5PCzJArrsY8OisfHX7CSz22ick8CAxNtqAq
-	zx8NHOEsEVwe4AoMaJuiYVzHOIgXjctpQhruDHheiGVCFRMQm8TFNNo3hpcK6nVKDsN0pDcHYB6
-	F4zpGowCqji40v3Dke77AlfNnQHjokPd9/ocMnkBXYbqT+jdYxp3ig==
-X-Google-Smtp-Source: AGHT+IFrMCP1PBKqC7tae7DS45440GgX8X4vbPNHIkLinUfhelvAilP1Pp5/T9e0yqtatcKWxgMYfA==
-X-Received: by 2002:a17:902:cec3:b0:215:b473:1dc9 with SMTP id d9443c01a7336-2292f9fc071mr159229405ad.46.1743439225283;
-        Mon, 31 Mar 2025 09:40:25 -0700 (PDT)
-Received: from mythos-cloud ([125.138.201.7])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3039dff0941sm9802525a91.13.2025.03.31.09.40.23
+        bh=5E8+H59wzbXfu7vdIDwS2i7uceTsCJ9EpwxfmQG2Njk=;
+        b=ZMWPTSVjR2eK4PcVTv96kWC6dmV7o9brf3sZZFNAHgC87ObVss6Vwa9lEvSsgmUc11
+         ptevtVjqo+wO3c0Qc4/uZpS9jCAy1cAlKqns8gmscKusKfYBdBv0DYs4i78hjje3zuIH
+         AA9fd42poZpLkOeh7FZVZXwywnS+lLH3z+Vk9Bj9QZHdWO/m+uAXimD5hfloTWFqjlKL
+         9UBOdUVvovFaxrRibnSEYiGwqwe3TYCb4cjfYjQefLj0ePv7dG026MMjwa2j0H02ryxE
+         e4t4ZTrXkBc9mWov8mZcsg1am6d8la77KRi7DlVYzU37AWSiIJtbBKftealmzKaDQPa/
+         VKew==
+X-Forwarded-Encrypted: i=1; AJvYcCUUsbXAr6Mq1GWiGbwy+hOyT4JVNHUld1q2Mav4XNUArZVy2Uuda/LDh7xDjUAe3ajSWjvvDiUj@vger.kernel.org, AJvYcCXeOHq5J48V8QQf77cG4Fn9stbQJPRfGnfJfYyWI93sjgfXrPWmyRljA79pYLmxAXSn0/T3gCpukIdbfP0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzC9AJewNlUMUumsXVKWRyMdKYOZRxA/11UR+1vjAUNnIOmBmmG
+	LG02ymjX6YjI0osBZRm/EgJUwhNX4HSlKVgx53+/Bm2cQtzAp16s
+X-Gm-Gg: ASbGncvZJlEQZYxkeAH9SSZ+NnX1pBAYAmLRKtHEZ8c7RJG7mjHcLE3rMr8E59NfOvV
+	Vj+PlrWev46mPa0KkORD0T3aLI3KgtCKY0IHTshneFdlIXWM6UanycW6fYVGI9FHhkPm1+UgPLE
+	aimoQFt/R5y84j8i4IRf9+Y+8YyMpV4Snnn/pvsbMkcQACKvVRA6g8cYpvHEa/hlMykqVjYx/Ez
+	KRTWJJ3WS13j/R7jemVndybkOHUV88zdwsGPRgT4XvO5H4TnjPX6XocL3FcFV1SbM4qr1l6Xt01
+	ILX+BdZL4c2xfb/vy6nccw3rWW/KsNlOixg=
+X-Google-Smtp-Source: AGHT+IG9Hetq4icmncBIQ+Sho5r6qqCRy3N2GORfFwLBOGtVM5myc3g/zvhQdJi3y87ufObaGZ6lBQ==
+X-Received: by 2002:a17:907:7fa5:b0:ac4:16a:1863 with SMTP id a640c23a62f3a-ac738a50991mr890792466b.26.1743439717179;
+        Mon, 31 Mar 2025 09:48:37 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:4::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac71927b027sm639547066b.47.2025.03.31.09.48.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Mar 2025 09:40:24 -0700 (PDT)
-Date: Tue, 1 Apr 2025 01:40:19 +0900
-From: Moon Yeounsu <yyyynoom@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5] net: dlink: add support for reporting stats
- via `ethtool -S` and `ip -s -s link show`
-Message-ID: <Z-rFcxj7XeiMHsz7@mythos-cloud>
-References: <20241209092828.56082-2-yyyynoom@gmail.com>
- <20241210191519.67a91a50@kernel.org>
+        Mon, 31 Mar 2025 09:48:36 -0700 (PDT)
+Date: Mon, 31 Mar 2025 09:48:34 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Boqun Feng <boqun.feng@gmail.com>
+Cc: "Paul E. McKenney" <paulmck@kernel.org>, Waiman Long <llong@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+	aeh@meta.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	jhs@mojatatu.com, kernel-team@meta.com,
+	Erik Lundgren <elundgren@meta.com>
+Subject: Re: [PATCH] lockdep: Speed up lockdep_unregister_key() with
+ expedited RCU synchronization
+Message-ID: <Z+rHYq0ItKiyshMY@gmail.com>
+References: <f1ae824f-f506-49f7-8864-1adc0f7cbee6@redhat.com>
+ <Z-MHHFTS3kcfWIlL@boqun-archlinux>
+ <1e4c0df6-cb4d-462c-9019-100044ea8016@redhat.com>
+ <Z-OPya5HoqbKmMGj@Mac.home>
+ <df237702-55c3-466b-b51e-f3fe46ae03ba@redhat.com>
+ <37bbf28f-911a-4fea-b531-b43cdee72915@redhat.com>
+ <Z-QvvzFORBDESCgP@Mac.home>
+ <712657fb-36bc-40d8-9acc-d19f54586c0c@redhat.com>
+ <1554a0dd-9485-4f09-8800-f06439d143e0@paulmck-laptop>
+ <67e44a9f.050a0220.31c403.3ad3@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,58 +89,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241210191519.67a91a50@kernel.org>
+In-Reply-To: <67e44a9f.050a0220.31c403.3ad3@mx.google.com>
 
-First of all, I apologize for my late reply.
-To be honest, I didn't fully understand the code I wrote.
+Hello Boqun, Waimn
 
-The reason I initially decided to use `spin_lock_irqsave()` was that
-most of the other stat-related code was using it.
-So when I received your reply, I didn't understand why `spin_lock_bh()`
-should be used. That's why I started reviewing interrupts and locks again.
-
-As a result, my response got delayed. However, I believe I should take
-full responsibility for the code I wrote.
-
-I still don't fully understand interrupts and locks,
-as the IRQ subsystem is vast and complex.
-
-On Tue, Dec 10, 2024 at 07:15:19PM -0800, Jakub Kicinski wrote:
-> On Mon,  9 Dec 2024 18:28:27 +0900 Moon Yeounsu wrote:
-> > +	unsigned long flags;
-> > +
-> > +	spin_lock_irqsave(&np->stats_lock, flags);
+On Wed, Mar 26, 2025 at 11:42:37AM -0700, Boqun Feng wrote:
+> On Wed, Mar 26, 2025 at 10:10:28AM -0700, Paul E. McKenney wrote:
+> > On Wed, Mar 26, 2025 at 01:02:12PM -0400, Waiman Long wrote:
+> [...]
+> > > > > > Thinking about it more, doing it in a lockless way is probably a good
+> > > > > > idea.
+> > > > > > 
+> > > > > If we are using hazard pointer for synchronization, should we also take off
+> > > > > "_rcu" from the list iteration/insertion/deletion macros to avoid the
+> > > > > confusion that RCU is being used?
+> > > > > 
+> > > > We can, but we probably want to introduce a new set of API with suffix
+> > > > "_lockless" or something because they will still need a lockless fashion
+> > > > similar to RCU list iteration/insertion/deletion.
+> > > 
+> > > The lockless part is just the iteration of the list. Insertion and deletion
+> > > is protected by lockdep_lock().
+> > > 
+> > > The current hlist_*_rcu() macros are doing the right things for lockless use
+> > > case too. We can either document that RCU is not being used or have some
+> > > _lockless helpers that just call the _rcu equivalent.
+> > 
+> > We used to have _lockless helper, but we got rid of them.  Not necessarily
+> > meaning that we should not add them back in, but...  ;-)
+> > 
 > 
-> I believe spin_lock_bh() is sufficient here, no need to save IRQ flags.
->
+> I will probably go with using *_rcu() first with some comments, if this
+> "hazard pointers for hash table" is a good idea in other places, we can
+> add *_hazptr() or pick a better name then.
 
-Anyway, base on what I have learned, I believe `spin_lock_irq()`
-should be used in this context instead of `spin_lock_bh()`.
+I am trying to figure out what are the next steps to get this issue
+solve.
 
-The reason is that the `get_stats()` function can be called from
-an interrupt context (in the top-half).
+Would you mind help me to understand what _rcu() fuction you are
+suggesting and what will it replace?
 
-If my understanding is correct, calling `spin_lock_bh()` in the
-top-half may lead to a deadlock.
-
-The calling sequence is as follows:
-	1. `rio_interrupt()` (registered via `request_irq()`)
-	2. `rio_error()`
-	3. `get_stats()`
-
-> > +	u64 collisions = np->single_collisions + np->multi_collisions;
-> > +	u64 tx_frames_abort = np->tx_frames_abort;
-> > +	u64 tx_carrier_errors = np->tx_carrier_sense_errors;
-> 
-> Please don't mix code and variable declarations.
-
-I'll fix it as well.
-Thank you for pointing that out.
-
-> -- 
-> pw-bot: cr
-
-If I am mistaken, please let me know.
-
-Thank you for reviewing my patch!
+Thank you,
+--breno
 
