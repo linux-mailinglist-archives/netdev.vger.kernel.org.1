@@ -1,252 +1,234 @@
-Return-Path: <netdev+bounces-178410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCB96A76EE1
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 22:15:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 816C0A76DFE
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 22:12:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F27CD3AAFD7
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 20:14:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AE3F188C6E4
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 20:12:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BE2E21D596;
-	Mon, 31 Mar 2025 20:12:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E0F216E24;
+	Mon, 31 Mar 2025 20:11:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="Xak0cnp3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IprQjvxa"
 X-Original-To: netdev@vger.kernel.org
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f196.google.com (mail-yb1-f196.google.com [209.85.219.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59CA221A43B;
-	Mon, 31 Mar 2025 20:12:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A830B21507C;
+	Mon, 31 Mar 2025 20:11:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743451974; cv=none; b=nBAO4jZROEXUGTIc3sOsgmY22N6fhzOz4ceL9OK6LMOW6YMU6vsz52lg/qAba4JCzBLNR3SR3Xd23mN1qfEPCoUrvBc4Ep6zPWzUYZgpGMK9hR7k7s0FPhiT4DNbQw6M3jYTU+3tPHuqsyPq692yaA6QPdC2oSz/4v38WGgXdHk=
+	t=1743451915; cv=none; b=Zm1pX6//h0nks5tGkmcrJTf1WCOY+ASFsvlA9bG/mT0OZZQ7Y3YQpe2MeFLolf0a62/VttI9imDKCbmI2Awo81syZRwksb6RJYhp/BAIqR1haQPM6vHjzxDDZnC8ujE+kh3sSTVcu7fBkZrDpkW/QHO6q1Drd1ehJq+8ia9qmZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743451974; c=relaxed/simple;
-	bh=lvZ73xzz3mMkJwAURa9e3ydTBqQTchnZWwnxcU8/e2g=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Hhfm8zsbolBQSWPKHcIBq0cWmcze9816XLKuQTyfyCwrG+tWwDTBpM/EE91HeOo5ULTyZSPyZIcLuQhhiDF7JHXmR3M6fkV0BlIiR4qJMzjdQjuk8yVKJRLKaGQRs393KH4TmV52a8SaXTqatKmG055HxfWzbttmc6dH9KSNxxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=Xak0cnp3; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Message-Id:Date:Cc:To:From;
-	bh=+UPgsoYyuTHoMpsEKfJbS83mget/Pt2RmairKSJfS28=; b=Xak0cnp3eC8vOcjRAmxhSzY8or
-	2ms51j9kwZ1j9gIgrhniOYdwKhaCSLkvMAzSsB13j5fW24Fn9N4r0G7o+JLiV4Jim2ehU9QMjLI/x
-	MT1xKsKlR048ZocTScVzlgzGvLIn86CkVMKH+3vlZd8IVmXEl1AtfZJmysQ/w1i5/w1s1EDLVd2EU
-	lmqtgGDBeVOMHtDw3AH38UOjan0N79BO8U3ne3Y6gpiRU9WwuNUpelZlVKnzxv4g0hnoLKJOV7yds
-	VUQ3iGNNMyE1r1ujQccxBuvwnA6ubRqR+LTje4X0ZZjlBuJ4YQEmbPxfE2LAjlzZ+0T53syP9/Ds9
-	w8gMyZ6VWeVNfn2lt+dc3VKBYUAl98jEsFqoe+OYds4YpSjRk9iNBvGnWXbNlmJDWcln+mLRk75WB
-	FO0XUUIsIiNT/TqLX8q+GxomIf5bbiv/WLO3mQnFCgN74NWzI7vElK7sMVqnIlGxQCsxx1OksawWH
-	wFYOTpCl6/Ns2jtL/6xPHTZv;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1tzLUy-007Y96-2f;
-	Mon, 31 Mar 2025 20:12:45 +0000
-From: Stefan Metzmacher <metze@samba.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-	Jens Axboe <axboe@kernel.dk>
-Cc: Stefan Metzmacher <metze@samba.org>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Breno Leitao <leitao@debian.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Karsten Keil <isdn@linux-pingi.de>,
-	Ayush Sawal <ayush.sawal@chelsio.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Willem de Bruijn <willemb@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Joerg Reuter <jreuter@yaina.de>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Oliver Hartkopp <socketcan@hartkopp.net>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Robin van der Gracht <robin@protonic.nl>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Alexandra Winter <wintera@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>,
-	James Chapman <jchapman@katalix.com>,
-	Jeremy Kerr <jk@codeconstruct.com.au>,
-	Matt Johnston <matt@codeconstruct.com.au>,
-	Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Remi Denis-Courmont <courmisch@gmail.com>,
-	Allison Henderson <allison.henderson@oracle.com>,
-	David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Jon Maloy <jmaloy@redhat.com>,
-	Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Martin Schiller <ms@dev.tdt.de>,
-	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-sctp@vger.kernel.org,
-	linux-hams@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-can@vger.kernel.org,
-	dccp@vger.kernel.org,
-	linux-wpan@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	mptcp@lists.linux.dev,
-	linux-rdma@vger.kernel.org,
-	rds-devel@oss.oracle.com,
-	linux-afs@lists.infradead.org,
-	tipc-discussion@lists.sourceforge.net,
-	virtualization@lists.linux.dev,
-	linux-x25@vger.kernel.org,
-	bpf@vger.kernel.org,
-	isdn4linux@listserv.isdn4linux.de,
-	io-uring@vger.kernel.org
-Subject: [RFC PATCH 4/4] io_uring: let io_uring_cmd_getsockopt() allow level other than SOL_SOCKET
-Date: Mon, 31 Mar 2025 22:10:56 +0200
-Message-Id: <330de91a48996e6dc5cdc844b74fb17fb933326c.1743449872.git.metze@samba.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1743449872.git.metze@samba.org>
-References: <cover.1743449872.git.metze@samba.org>
+	s=arc-20240116; t=1743451915; c=relaxed/simple;
+	bh=OBzbiRgekCpil9D7mX+5gJrMZSeLnL5vGhu0E44lgKQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hV6X5lDQR93EqO4c9Nl2qpR5+N/6llGAWbtXsBBDwjvXF9ufAW7jqUcmLR2jzKkAI8rD5SSRls9/qikOaBHOgIUS856JQFe6yIHWn/ansCKCG4T4A0gwGuw1HlVWXSI8xxlUPcMp2pe8VY6kLjFbAWGvAP/OD8PAfcE0EzG5bNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IprQjvxa; arc=none smtp.client-ip=209.85.219.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f196.google.com with SMTP id 3f1490d57ef6-e6cea43bb31so444981276.0;
+        Mon, 31 Mar 2025 13:11:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743451911; x=1744056711; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LR1OgG1N7YtLAYw3VdmcuwXI0YdDXSMCdXCbozGI5l8=;
+        b=IprQjvxat1qAyqLiHmxeaRZyzVXqYEMHMMqw4EnSj8ST4VyX0fXotXr+PfDkWih1x6
+         joQotgVIE/UHQT22gunaLiCVjSC17JElah1LiH7nJtW39Pyqs1crXW1sLrp1mU4TZ4SC
+         JEZBV+R+0OVf0VYZZURkNJJCvDVB7AFNkgMOkwm4gqf7JzBAVwuHQPILkUgp4HMsz/Zw
+         +kPA+gFgPklS4GDqVeJFz97VejRuDtDs6AhlPDDOe01o6S6Old6VpRi55w3WB1WZyikG
+         aaQEICKZACdfP8y4MglHlfM6kHi0liIIcUpUAmhu2yihOsmcAFX+Vx6o/MLOpdSf2Sko
+         65Iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743451911; x=1744056711;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LR1OgG1N7YtLAYw3VdmcuwXI0YdDXSMCdXCbozGI5l8=;
+        b=UOuzQ9be2uQsXKpr2cFtPku2ny6u/tbPlz0JIY5gO8ATCvqN/Td9XiGtvj+2FIHtCV
+         YwEM60J7swQeU0RQd9LHKzRUxIVezYf6W+46SmsnmYtY/AzW2r8+v3bsUc2Jp4JjPO8N
+         slHKxdZnm1fE2W+NoydxbYVqTuyrbxqE6LGucbrVSnn7mUyn2PAaIVPYCcQY+sRv9JpD
+         VJTsnV7kINH4mKbBRnOyKpZ6e6uSSQycG7E+9LZ2At+jtqEQueSeOKVAu2EIpYlxRikM
+         gSjYaT5/kv6moZzFAZ3BaA0/zSqjeIc6NI8k0B59qrPFzl58FuwytEovn9ZB/W79O6cn
+         EGbg==
+X-Forwarded-Encrypted: i=1; AJvYcCUc8BYzrnAvt0D2ccjPKoE4ePXzeQf9E00XKv0vSdR66GhGvs7L6rANt4kAcVa0M+NVoDid9swNQypB6QE=@vger.kernel.org, AJvYcCWHIk+gCrgSfJ291q1J4JxTy07t/P+cq9gn0niJSaCE5FHn/EdXLAElpnxr/m01cMgX9RRMTTP8@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxNQ9oJ7Om4xTOukit7RQU2u5NZQQS0TX8XWkPePOUsRk0+34P
+	HCfF5ydfzphhWvnmzMQlyUCyNNDOXr0muXW3dWixK/tDp6oy302G
+X-Gm-Gg: ASbGncuTjx1dssVVpudKajJ14sZn2fQ7Tjun1QYXVupOCv4eSW5tLsdrDm3uObaSd/6
+	rns6xuw+pEa+YW5yToeA09QMa56ndqgNUnn9ygQ0jerBpefc2+1mb6Oi0qfOCr0biUaMjrCA4mj
+	1u7bjrEMBpcFGZF3k5cPVjkVWvtGbLF23rA+WiiLUn/ZukrEzyz8Wau2QUG1lQRL52qhs5s7/JD
+	QkqXmVhWsyX26kKKmFd4aofyYRT5fyOrkFHzW0gyKGpRvsI3LqsZamhPPjidsfCo49FYAr+2NNV
+	hxqeb1Vr99nMJ12Ld32JQbwbQ9x8hC9V+u6LNxNIeiJc2DDtEqjm+9CLhi3mwS+5//k=
+X-Google-Smtp-Source: AGHT+IH766RK/hwM7mkPwql2PqHI7sNoGHRERLD30OsqqydvJaXG//mcrrrJ8IvYqM/qPgbCxFEohQ==
+X-Received: by 2002:a05:690c:6f90:b0:6ef:94db:b208 with SMTP id 00721157ae682-702572ffee4mr138081477b3.24.1743451911527;
+        Mon, 31 Mar 2025 13:11:51 -0700 (PDT)
+Received: from [10.102.6.66] ([208.97.243.82])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-7023a341a69sm23270557b3.25.2025.03.31.13.11.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 31 Mar 2025 13:11:51 -0700 (PDT)
+Message-ID: <5d93f576-1d27-4d3f-8b37-0b2127260cca@gmail.com>
+Date: Mon, 31 Mar 2025 16:11:50 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Patch net-next 2/3] net: bridge: mcast: Notify on offload flag
+ change
+To: Nikolay Aleksandrov <razor@blackwall.org>,
+ Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Roopa Prabhu <roopa@nvidia.com>, Simon Horman <horms@kernel.org>,
+ linux-kernel@vger.kernel.org, bridge@lists.linux.dev
+References: <20250318224255.143683-1-Joseph.Huang@garmin.com>
+ <20250318224255.143683-3-Joseph.Huang@garmin.com>
+ <d9a8d030-7cac-4f5f-b422-1bae7f08c74f@blackwall.org>
+Content-Language: en-US
+From: Joseph Huang <joseph.huang.2024@gmail.com>
+In-Reply-To: <d9a8d030-7cac-4f5f-b422-1bae7f08c74f@blackwall.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-do_sock_getsockopt() works with a kernel pointer for optlen now.
+On 3/21/2025 4:47 AM, Nikolay Aleksandrov wrote:
+>> diff --git a/net/bridge/br_switchdev.c b/net/bridge/br_switchdev.c
+>> index 68dccc2ff7b1..5b09cfcdf3f3 100644
+>> --- a/net/bridge/br_switchdev.c
+>> +++ b/net/bridge/br_switchdev.c
+>> @@ -504,20 +504,41 @@ static void br_switchdev_mdb_complete(struct net_device *dev, int err, void *pri
+>>   	struct net_bridge_mdb_entry *mp;
+>>   	struct net_bridge_port *port = data->port;
+>>   	struct net_bridge *br = port->br;
+>> +	bool offload_changed = false;
+>> +	bool failed_changed = false;
+>> +	u8 notify;
+>>   
+>>   	spin_lock_bh(&br->multicast_lock);
+>>   	mp = br_mdb_ip_get(br, &data->ip);
+>>   	if (!mp)
+>>   		goto out;
+>> +
+>> +	notify = br->multicast_ctx.multicast_mdb_notify_on_flag_change;
+> 
+> let's not waste cycles if there was an error and notify == 0, please keep the original
+> code path and avoid walking over the group ports.
 
-Link: https://lore.kernel.org/io-uring/86b1dce5-4bb4-4a0b-9cff-e72f488bf57d@samba.org/T/#t
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Breno Leitao <leitao@debian.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Karsten Keil <isdn@linux-pingi.de>
-Cc: Ayush Sawal <ayush.sawal@chelsio.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Willem de Bruijn <willemb@google.com>
-Cc: David Ahern <dsahern@kernel.org>
-Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Cc: Xin Long <lucien.xin@gmail.com>
-Cc: Neal Cardwell <ncardwell@google.com>
-Cc: Joerg Reuter <jreuter@yaina.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Oliver Hartkopp <socketcan@hartkopp.net>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Robin van der Gracht <robin@protonic.nl>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: kernel@pengutronix.de
-Cc: Alexander Aring <alex.aring@gmail.com>
-Cc: Stefan Schmidt <stefan@datenfreihafen.org>
-Cc: Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: Alexandra Winter <wintera@linux.ibm.com>
-Cc: Thorsten Winkler <twinkler@linux.ibm.com>
-Cc: James Chapman <jchapman@katalix.com>
-Cc: Jeremy Kerr <jk@codeconstruct.com.au>
-Cc: Matt Johnston <matt@codeconstruct.com.au>
-Cc: Matthieu Baerts <matttbe@kernel.org>
-Cc: Mat Martineau <martineau@kernel.org>
-Cc: Geliang Tang <geliang@kernel.org>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Remi Denis-Courmont <courmisch@gmail.com>
-Cc: Allison Henderson <allison.henderson@oracle.com>
-Cc: David Howells <dhowells@redhat.com>
-Cc: Marc Dionne <marc.dionne@auristor.com>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: Jan Karcher <jaka@linux.ibm.com>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: Tony Lu <tonylu@linux.alibaba.com>
-Cc: Wen Gu <guwen@linux.alibaba.com>
-Cc: Jon Maloy <jmaloy@redhat.com>
-Cc: Boris Pismenny <borisp@nvidia.com>
-Cc: John Fastabend <john.fastabend@gmail.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Martin Schiller <ms@dev.tdt.de>
-Cc: "Björn Töpel" <bjorn@kernel.org>
-Cc: Magnus Karlsson <magnus.karlsson@intel.com>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: Jonathan Lemon <jonathan.lemon@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>
-Cc: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>
-CC: Stefan Metzmacher <metze@samba.org>
-Cc: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-sctp@vger.kernel.org
-Cc: linux-hams@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org
-Cc: linux-can@vger.kernel.org
-Cc: dccp@vger.kernel.org
-Cc: linux-wpan@vger.kernel.org
-Cc: linux-s390@vger.kernel.org
-Cc: mptcp@lists.linux.dev
-Cc: linux-rdma@vger.kernel.org
-Cc: rds-devel@oss.oracle.com
-Cc: linux-afs@lists.infradead.org
-Cc: tipc-discussion@lists.sourceforge.net
-Cc: virtualization@lists.linux.dev
-Cc: linux-x25@vger.kernel.org
-Cc: bpf@vger.kernel.org
-Cc: isdn4linux@listserv.isdn4linux.de
-Cc: io-uring@vger.kernel.org
-Signed-off-by: Stefan Metzmacher <metze@samba.org>
----
- io_uring/uring_cmd.c | 3 ---
- 1 file changed, 3 deletions(-)
+But we do want to keep the error flag so that the error shows up in 
+'bridge mdb show', right? Notify should only affect the real-time 
+notifications, and not the error status itself.
 
-diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
-index f2cfc371f3d0..8b0cc919a60c 100644
---- a/io_uring/uring_cmd.c
-+++ b/io_uring/uring_cmd.c
-@@ -312,9 +312,6 @@ static inline int io_uring_cmd_getsockopt(struct socket *sock,
- 	void __user *optval;
- 
- 	level = READ_ONCE(cmd->sqe->level);
--	if (level != SOL_SOCKET)
--		return -EOPNOTSUPP;
+> 
+>> +
+>>   	for (pp = &mp->ports; (p = mlock_dereference(*pp, br)) != NULL;
+>>   	     pp = &p->next) {
+>>   		if (p->key.port != port)
+>>   			continue;
+>>   
+>> -		if (err)
+>> +		if (err) {
+>> +			if (!(p->flags & MDB_PG_FLAGS_OFFLOAD_FAILED))
+>> +				failed_changed = true;
+>>   			p->flags |= MDB_PG_FLAGS_OFFLOAD_FAILED;
+>> -		else
+>> +		} else {
+>> +			if (!(p->flags & MDB_PG_FLAGS_OFFLOAD))
+>> +				offload_changed = true;
+>>   			p->flags |= MDB_PG_FLAGS_OFFLOAD;
+>> +		}
+>> +
+>> +		if (notify == MDB_NOTIFY_ON_FLAG_CHANGE_DISABLE ||
+>> +		    (!offload_changed && !failed_changed))
+>> +			continue;
+>> +
+>> +		if (notify == MDB_NOTIFY_ON_FLAG_CHANGE_FAIL_ONLY &&
+>> +		    !failed_changed)
+>> +			continue;
+>> +
+>> +		br_mdb_flag_change_notify(br->dev, mp, p);
+> 
+> This looks like a mess.. First you need to manage these flags properly as I wrote in my
+> other reply, they must be mutually exclusive and you can do this in a helper. Also
+> please read the old flags in the beginning, then check what flags changed, make a mask
+> what flags are for notifications (again can come from a helper, it can be generated when
+> the option changes so you don't compute it every time) and decide what to do if any of
+> those flags changed.
+> Note you have to keep proper flags state regardless of the notify option.
+> 
+>>   	}
+>>   out:
+>>   	spin_unlock_bh(&br->multicast_lock);
+> 
+
+How does this look:
+
+--- a/net/bridge/br_switchdev.c
++++ b/net/bridge/br_switchdev.c
+@@ -496,6 +496,21 @@ struct br_switchdev_mdb_complete_info {
+         struct br_ip ip;
+  };
+
++static void br_multicast_set_pg_offload_flags(int err,
++                                             struct 
+net_bridge_port_group *p)
++{
++       p->flags &= ~(MDB_PG_FLAGS_OFFLOAD | MDB_PG_FLAGS_OFFLOAD_FAILED);
++       p->flags |= (err ? MDB_PG_FLAGS_OFFLOAD_FAILED : 
+MDB_PG_FLAGS_OFFLOAD);
++}
++
++static bool br_multicast_should_notify(struct net_bridge *br,
++                                      u8 old_flags, u8 new_flags)
++{
++       return (br_boolopt_get(br, 
+BR_BOOLOPT_FAILED_OFFLOAD_NOTIFICATION) &&
++               ((old_flags & MDB_PG_FLAGS_OFFLOAD_FAILED) !=
++               (new_flags & MDB_PG_FLAGS_OFFLOAD_FAILED)));
++}
++
+  static void br_switchdev_mdb_complete(struct net_device *dev, int err, 
+void *priv)
+  {
+         struct br_switchdev_mdb_complete_info *data = priv;
+@@ -504,23 +519,25 @@ static void br_switchdev_mdb_complete(struct 
+net_device *dev, int err, void *pri
+         struct net_bridge_mdb_entry *mp;
+         struct net_bridge_port *port = data->port;
+         struct net_bridge *br = port->br;
 -
- 	optval = u64_to_user_ptr(READ_ONCE(cmd->sqe->optval));
- 	optname = READ_ONCE(cmd->sqe->optname);
- 	optlen = READ_ONCE(cmd->sqe->optlen);
--- 
-2.34.1
+-       if (err)
+-               goto err;
++       u8 old_flags;
 
+         spin_lock_bh(&br->multicast_lock);
+         mp = br_mdb_ip_get(br, &data->ip);
+         if (!mp)
+                 goto out;
+         for (pp = &mp->ports; (p = mlock_dereference(*pp, br)) != NULL;
+              pp = &p->next) {
+                 if (p->key.port != port)
+                         continue;
+-               p->flags |= MDB_PG_FLAGS_OFFLOAD;
++
++               old_flags = p->flags;
++               br_multicast_set_pg_offload_flags(err, p);
++               if (br_multicast_should_notify(br, old_flags, p->flags))
++                       br_mdb_flag_change_notify(br->dev, mp, p);
+         }
+  out:
+         spin_unlock_bh(&br->multicast_lock);
+-err:
+         kfree(priv);
+  }
+
+Thanks,
+Joseph
 
