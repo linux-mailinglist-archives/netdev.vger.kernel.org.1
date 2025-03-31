@@ -1,59 +1,60 @@
-Return-Path: <netdev+bounces-178435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D309A77015
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 23:26:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0239A77019
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 23:27:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65011188A855
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 21:26:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FAF0188C776
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 21:27:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D581621ADAE;
-	Mon, 31 Mar 2025 21:25:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7DFB21B90B;
+	Mon, 31 Mar 2025 21:27:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ouIznht7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WOu/4uBf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9341D63DD;
-	Mon, 31 Mar 2025 21:25:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819CC1D63DD
+	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 21:27:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743456358; cv=none; b=uabyOJmUdOBERC8XMPMfNKibDjHelW/4BC8J0m2Hs+7Eh8K8GW04oXKkHT5+78s/AMY6wZ/M91T6EqG2hDl8+Io7RDS2XyseiypPgwzkcnWsM781JhrCvCXePsZBNAcXTQf+lJL8TgRXh2n04fp7P7KYQUiR3DK/Jn9j8bUvz/Q=
+	t=1743456457; cv=none; b=RXT8ShvP6xq4YllFNx9z84jFOzVjdW+c59kGQmmBLP60T/LXqwg7d1CPFVd4UqCTi1oCjbm4kUKcfril65t+zE5H2T2HnaX0NYwTDFmdBFDAuQsYF/23a6KcqGmu+YFs23Z5h7dc5pRx4g9+F31H7MBN9RlwhUFMJeVC+GgSBY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743456358; c=relaxed/simple;
-	bh=VENzcAMS3GYy4saaDxr2yze+Keef8IZU4+9h3qOq2I4=;
+	s=arc-20240116; t=1743456457; c=relaxed/simple;
+	bh=j7OaQj73o+b7zJ0DsvrbatEWzUHO9a9o63SU+Xxtthg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DfoONVN9OTWkLwtOkc8/MIk5WS61mZwt6X3RbIXA3PBu+bfsL6R3Bp4VjHp4dkOvjsdbwiqM9VaED+QkJzJYHOVthM5sNXE96/pBV5/sdZV0qxQuLge3MEdAydNBx7KZhF5nYJJsBpRMyr6aDwGVwjysc/ed6OtH1KnfwdFHQDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ouIznht7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F191FC4CEE3;
-	Mon, 31 Mar 2025 21:25:57 +0000 (UTC)
+	 MIME-Version:Content-Type; b=BD/hBC9RSla0bqgKQ70GtqpXwXh+V7oDxgb7SQ2dFn1OP/t8VVYgz9zUHkZ9yNiynIr3E/KkqDHJe+RuYRZGbctezRvPNDXoc+qZ4UD10nsZYEewCopYu9Iywp3hUWSmynDjkTmDluzOLe5lNT2bXDdPOg2wlzzfX2q7xIByptQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WOu/4uBf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3818C4CEE3;
+	Mon, 31 Mar 2025 21:27:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743456358;
-	bh=VENzcAMS3GYy4saaDxr2yze+Keef8IZU4+9h3qOq2I4=;
+	s=k20201202; t=1743456457;
+	bh=j7OaQj73o+b7zJ0DsvrbatEWzUHO9a9o63SU+Xxtthg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ouIznht7YcCVIRNkYpECS0nSVFTjzFrw2MqdDKyXdI8C2lFDWc2/4AbWZtR65+fly
-	 3l1TeVBeLIHmJRiF/+PlYx9DmUXjmsCE7MuXZ2am1UTdMsju8eZQcPhUJZqi353jMP
-	 KxdlydrxMViPlqtV51kwgUPbYc6Htp+OipXraWGiwMQHvopAKeY/ME6H6WjepZkr69
-	 EHSuF3YEqPjIbWoP0XAlz3x7gDSTOrZ4kvGIRDrJhvyzcob4IZo+j7MKM/c2IoJA2M
-	 5nhRF/jeO2yvEjrbgfunTl7HFZbUjhQOo72Z3ExcpA+wq7QlyNKcGQ5+fLWyU1grda
-	 4uH/jjW/hvYBQ==
-Date: Mon, 31 Mar 2025 14:25:57 -0700
+	b=WOu/4uBfJB1I5XHsa8esWn2ih4CRf07IL6P+RKGLgMdThUZb0SF1GEqm0ds+RFLxy
+	 eRLBtXXvJWibmTa9mNHi412pvmnumoFdDQe+Z2AIr323q5kOj+jdv93fsZ/RZ+1UMS
+	 QCeSmUvMw9h3nCCuE3Bvx1rNHAer36k9+sOXD8upx+hpG90bvO9gQwN3WbuIGJrcUY
+	 tZK5F/0OARj38g5/NdRtF1LdjuTIysTsfhcFrnh0W2lp9PkGqz90B3+UC7MWhDu+tE
+	 3j6AZrVVCf2GK8rKAKwOe17woSJej1mQWxijhOhC6rDHLc+roxIf7eEeaC5V/kGPF3
+	 +W/in5mMbjlvw==
+Date: Mon, 31 Mar 2025 14:27:36 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Moon Yeounsu <yyyynoom@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5] net: dlink: add support for reporting stats
- via `ethtool -S` and `ip -s -s link show`
-Message-ID: <20250331142557.3e454470@kernel.org>
-In-Reply-To: <Z-rFcxj7XeiMHsz7@mythos-cloud>
-References: <20241209092828.56082-2-yyyynoom@gmail.com>
-	<20241210191519.67a91a50@kernel.org>
-	<Z-rFcxj7XeiMHsz7@mythos-cloud>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, Cosmin Ratiu
+ <cratiu@nvidia.com>
+Subject: Re: [PATCH net v4 02/11] net: hold instance lock during
+ NETDEV_REGISTER/UP
+Message-ID: <20250331142736.263cbd6f@kernel.org>
+In-Reply-To: <Z-sFZfPR9QlDwhoI@mini-arch>
+References: <20250331150603.1906635-1-sdf@fomichev.me>
+	<20250331150603.1906635-3-sdf@fomichev.me>
+	<20250331134811.02655264@kernel.org>
+	<Z-sFZfPR9QlDwhoI@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,29 +64,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 1 Apr 2025 01:40:19 +0900 Moon Yeounsu wrote:
-> On Tue, Dec 10, 2024 at 07:15:19PM -0800, Jakub Kicinski wrote:
-> > On Mon,  9 Dec 2024 18:28:27 +0900 Moon Yeounsu wrote:  
-> > > +	unsigned long flags;
-> > > +
-> > > +	spin_lock_irqsave(&np->stats_lock, flags);  
+On Mon, 31 Mar 2025 14:13:09 -0700 Stanislav Fomichev wrote:
+> > > @@ -3042,14 +3040,16 @@ static int do_setlink(const struct sk_buff *skb, struct net_device *dev,
+> > >  
+> > >  		new_ifindex = nla_get_s32_default(tb[IFLA_NEW_IFINDEX], 0);
+> > >  
+> > > -		err = netif_change_net_namespace(dev, tgt_net, pat,
+> > > -						 new_ifindex, extack);
+> > > +		err = __dev_change_net_namespace(dev, tgt_net, pat, new_ifindex,  
 > > 
-> > I believe spin_lock_bh() is sufficient here, no need to save IRQ flags.
-> >  
+> > nit: over 80 chars now  
 > 
-> Anyway, base on what I have learned, I believe `spin_lock_irq()`
-> should be used in this context instead of `spin_lock_bh()`.
-> 
-> The reason is that the `get_stats()` function can be called from
-> an interrupt context (in the top-half).
-> 
-> If my understanding is correct, calling `spin_lock_bh()` in the
-> top-half may lead to a deadlock.
-> 
-> The calling sequence is as follows:
-> 	1. `rio_interrupt()` (registered via `request_irq()`)
-> 	2. `rio_error()`
-> 	3. `get_stats()`
+> It's exactly 80, is it considered over? This has been done by clang
+> formatter which has 'ColumnLimit: 80'.. Will undo regardless, but lmk
+> if the rule is >80 or >=80 (the formatter thinks it's the former)
 
-Makes sense, please document this in the commit message for v6.
+My bad, unplugging the external screen seems to slightly shrink windows
+in GNOME. My terminal was set to 79 chars :S
 
