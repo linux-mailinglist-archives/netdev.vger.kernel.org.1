@@ -1,170 +1,150 @@
-Return-Path: <netdev+bounces-178335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46B4CA76985
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 17:11:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87D9DA76AC8
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 17:40:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6067163766
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 15:09:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C6883B7981
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 15:32:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A5921D3F3;
-	Mon, 31 Mar 2025 14:54:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="F3f6OHDF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E10221B9D9;
+	Mon, 31 Mar 2025 15:06:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D06B322F166;
-	Mon, 31 Mar 2025 14:54:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00E9A21B9C7
+	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 15:06:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743432879; cv=none; b=h5wMTH1kAeRrOJIu6Yp/IftVkcNB2TNdiC7eQ9oeM8SHn2NCplPFDMVqO9GohzvP3DLo2Em2fYLRPdX3sRS/IXfIjl+phTsrxl5fhVWNSu2h/aKF1XkaMFnWcJErZyrGy61S2bSW6Q4U+H8wzHGqcMIsl9ubvuhdk7nnQyWQj9M=
+	t=1743433568; cv=none; b=W7XcSlCaq2skhlK9QYBPhxwDa/RkbMN87Pl5LRjE92tOE7FETBKY+cw+JVjf2w9IpKtlqijmt1gp+NkVBDrJPx/BgXVrJeRkAFvY53RAEzeA9sgVKW2HKFhPervaIT2lf0rvckxFwaSKn3P3YilBwl+fdg6KGkUIL10VgpRS6Vo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743432879; c=relaxed/simple;
-	bh=zR+wuro+r4rnXuqJeZdxGMuQG6Zw/ZgAj/YeJHwsL5c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ca/9RP7cHwJRx3FntqSqlUqtIKkRMv7c/jynWq5EdE8k4Ymj4lWkRczyJ6o4itRwXDO6IaXrLmNkEry7FLxU+cvvpulv/XJdgQC9eINJ5W35JE+FVlFUb88NTzJ2tO6RsHnZcL6tIBEW0XmUaqETsyv6zp2j2LECH9ywSivYTg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=F3f6OHDF; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=HPcnOhRdd53xj4ndL5o1wFLEp2VkNlI8kdN53UFjnhg=; b=F3f6OHDFFH6FQttsDKRCCNG1cK
-	wWwHSeYsKPv+hnYTawudXWiiN08AoomTV4Drfe0f3vmHHSk3rhl6pVaKsoXTrmMljQrf8toegjLfc
-	zyEoSWns/BnymMsKH7B3jbt6rQHHJRtWs7YnSGtp8i7G7LWHP5+9tLRcgTkd9Y6jdE/4vkPqjgQPj
-	z1bBoFttbNwAmuVg9GmldXo0+1v7kGdQZkiBuPsncuWtvGr3eksArn/2eTSTpmHzxftMuU6/2xzke
-	IEM1shTTauu6d6W1PjNMrDhZCAu5tN5fFsDTgxAfU67CGseWezC4wJWWucKiilVuJGjNo3mQhu12Q
-	IM+r03aA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49000)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tzGWw-0004EQ-0s;
-	Mon, 31 Mar 2025 15:54:26 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tzGWq-0001lE-3B;
-	Mon, 31 Mar 2025 15:54:21 +0100
-Date: Mon, 31 Mar 2025 15:54:20 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexander Duyck <alexander.duyck@gmail.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Simon Horman <horms@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>
-Subject: Re: [PATCH net-next v5 09/13] net: phylink: Use phy_caps_lookup for
- fixed-link configuration
-Message-ID: <Z-qsnN4umaz0QrG0@shell.armlinux.org.uk>
-References: <20250307173611.129125-1-maxime.chevallier@bootlin.com>
- <20250307173611.129125-10-maxime.chevallier@bootlin.com>
- <8d3a9c9bb76b1c6bc27d2bd01f4831b2cac83f7f.camel@gmail.com>
- <20250328090621.2d0b3665@fedora-2.home>
- <CAKgT0Ue_JzmJAPKBhe6XaMkDCy+YNNg5_5VvzOR6CCbqcaQg3Q@mail.gmail.com>
- <12e3b86d-27aa-420b-8676-97b603abb760@lunn.ch>
- <CAKgT0UcZRi1Eg2PbBnx0pDG_pCSV8tfELinNoJ-WH4g3CJOh2A@mail.gmail.com>
- <02c401a4-d255-4f1b-beaf-51a43cc087c5@lunn.ch>
+	s=arc-20240116; t=1743433568; c=relaxed/simple;
+	bh=FUVy/ehHBEzDQteyx5xQDnN97mju188bUJXD7LTTwMI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Hc1V/H18PjLRdVBx7bs5eLgmR+ldh72U/wJMYF1HNTIpmnG+nQNiea8yTfwD8lYU8eSvEMc3YYMZQN+1f4xa/cA+NcbHAIl+FgJ0MF3b+/oqwwEAqcl+j9YcnhKUvj0W93rWBlXQzL+PV1F11krR9RHCiMG+BHxJjkS4cszYOSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2279915e06eso92825685ad.1
+        for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 08:06:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743433565; x=1744038365;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NMXlwOaFY1dsVtlvl/4OymETUbE9aegYlCc/Rb8Fw8k=;
+        b=py+2qBmUPKgOrsHHeXqGq8kJTyL1TixaTldtoNkGFXv3XQISPmEby/CZ/7IidCBSkq
+         G6cA6vx2sOCnuU+pdybWMqkoQppV8fnXWIyn2043V/SVDqeoYpIVTxUQK20ZKvR39O9d
+         doXwrV74XOsHWaRMuZUEnuqp5uFG/vx0gr2t/Yd9q1zNeHWGSeC+sLPeGBGayYchCtGv
+         Jr6OP+awV3NqWjm9LVpYsDUjUo3RAJe8nUKl/YNtuNJYy/PJyxy/CPuH+6I2yN+Oc+c4
+         vR7U6wtO8XkvmgSNm9UdwjyrmD+Rzp2S4eawgB8u13CSL3pNPUyALvplpdSrCAiDcY31
+         588w==
+X-Gm-Message-State: AOJu0YzsKKfEojC+nIpIsWEC735l2/j4hmka4HJEeWqtVH4dnfVLn4Lu
+	Hg3dYql5baPkWvxXu5SXjE7x3jk9cXRjmqsAEAELgDMh8yKH4sZxXpEw
+X-Gm-Gg: ASbGncs5uIdGCyDkZd6ebzcyNnWRjAI1rDk2cs9o5h7EMnpaMle1/AukDWi5t/y7sk4
+	vslcYc/lxk8HEPVqs1kLqg1KKWJq2ine5iqZuFKcI5NF6A1Wp/ejVOhi9au1tjMJgswby0cS0m5
+	376g8oQNGYmhNBvKRTSdi87pnot+g++OsrysLRKMx9eAFCmcjN+PdA3nZvw+TzKDVJlU5ZvpQl8
+	W2UbeuKGh3AZOoQhuKEbjd9eSQpr2UshcqZPzspLMwaxUiwnzlEy2ygg7d1ncmjPDqhzt4abhyR
+	/DE3DfKBQ2l3CZO/svccinuMCOLSSk0LcooTpnjgqYYS
+X-Google-Smtp-Source: AGHT+IFrLj0Hqhhe3+LajP5JiHPgVvLPdkFa+ivZN7JpvTKlCUuapxJHqgv+BYyUA2xkjbbLpU00Uw==
+X-Received: by 2002:a17:902:f646:b0:224:1074:6393 with SMTP id d9443c01a7336-2292f9eb8c7mr147439945ad.43.1743433564863;
+        Mon, 31 Mar 2025 08:06:04 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2291eec6f76sm69996585ad.35.2025.03.31.08.06.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Mar 2025 08:06:04 -0700 (PDT)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Subject: [PATCH net v4 00/11] net: hold instance lock during NETDEV_UP/REGISTER
+Date: Mon, 31 Mar 2025 08:05:52 -0700
+Message-ID: <20250331150603.1906635-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <02c401a4-d255-4f1b-beaf-51a43cc087c5@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 31, 2025 at 04:17:02PM +0200, Andrew Lunn wrote:
-> On Fri, Mar 28, 2025 at 04:26:04PM -0700, Alexander Duyck wrote:
-> > A serdes PHY is part of it, but not a traditional twisted pair PHY as
-> > we are talking about 25R, 50R(50GAUI & LAUI), and 100P interfaces. I
-> > agree it is a different beast, but are we saying that the fixed-link
-> > is supposed to be a twisted pair PHY only?
-> 
-> With phylink, the PCS enumerates its capabilities, the PHY enumerates
-> its capabilities, and the MAC enumerates it capabilities. phylink then
-> finds the subset which all support.
-> 
-> As i said, historically, fixed_link was used in place of a PHY, since
-> it emulated a PHY. phylinks implementation of fixed_link is however
-> different. Can it be used in place of both a PCS and a PHY? I don't
-> know.
+Solving the issue reported by Cosmin in [0] requires consistent
+lock during NETDEV_UP/REGISTER notifiers. This series
+addresses that (along with some other fixes in net/ipv4/devinet.c
+and net/ipv6/addrconf.c) and appends the patches from Jakub
+that were conditional on consistent locking in NETDEV_UNREGISTER.
 
-In fixed-link mode, phylink will use a PCS if the MAC driver says there
-is one, but it will not look for a PHY.
+0: https://lore.kernel.org/netdev/700fa36b94cbd57cfea2622029b087643c80cbc9.camel@nvidia.com/
 
-> You are pushing the envelope here, and maybe we need to take a step
-> back and consider what is a fixed link, how does it fit into the MAC,
-> PCS, PHY model of enumeration? Maybe fixed link should only represent
-> the PHY and we need a second sort of fixed_link object to represent
-> the PCS? I don't know?
+v4:
+- make sure EXPORT_IPV6_MOD works for !CONFIG_INET configs (Intel LKP)
 
-As I previously wrote today in response to an earlier email, the
-link modes that phylink used were the first-match from the old
-settings[] array in phylib which is now gone. This would only ever
-return _one_ link mode, which invariably was a baseT link mode for
-the slower speeds.
+v3:
+- s/EXPORT_SYMBOL/EXPORT_IPV6_MOD/ for netif_disable_lro (Jakub)
+- drop netdev_lockdep_set_classes mlx5 patch (Jakub)
+- update doc to clarify that instance lock is held for ops-locked
+  devices only, also list NETDEV_UNREGISTER as unlocked (Jakub)
+- drop patch that unlocks and relocks bonding and teaming
+  UNREGISTER notifiers (Jakub)
+- lock ops (instead of unconditional instance lock) in addrconf (Jakub)
+- rename rtnl_net_debug.c to lock_debug.c and share rtnl_net_debug_event
+  (as netdev_debug_event) with netdevsim (Jakub)
+- use netdevsim in one of the existing tests that set netns (Jakub)
+- add ops locks around xp_clear_dev in xsk_notifier
 
-Maxime's first approach at adapting this to his new system was to
-set every single link mode that corresponded with the speed. I
-objected to that, because it quickly gets rediculous when we end
-up with lots of link modes being indicated for e.g. 10, 100M, 1G
-but the emulated PHY for these speeds only indicates baseT. That's
-just back-compatibility but... in principle changing the link modes
-that are reported to userspace for a fixed link is something we
-should not be doing - we don't know if userspace tooling has come
-to rely on that.
+v2:
+- export netdev_get_by_index_lock
+- new patch: add netdev_lockdep_set_classes to mlx5
+- new patch: exercise notifiers in netdevsim
+- ignore specific locked netdev in call_netdevice_register_notifiers,
+  not all
 
-Yes, it's a bit weird to be reporting 1000baseT for a 1000BASE-X
-interface mode, but that's what we've always done in the past and
-phylink was coded to maintain that (following the principle that
-we shouldn't do gratuitous changes to the information exposed to
-userspace.)
+Jakub Kicinski (3):
+  net: designate XSK pool pointers in queues as "ops protected"
+  netdev: add "ops compat locking" helpers
+  netdev: don't hold rtnl_lock over nl queue info get when possible
 
-Maxime's replacement approach is to just expose baseT, which
-means that for the speeds which do not have a baseT mode, we go
-from supporting it but with a weird link mode (mostly baseCR*)
-based on first-match in the settings[] table, to not supporting the
-speed.
+Stanislav Fomichev (8):
+  net: switch to netif_disable_lro in inetdev_init
+  net: hold instance lock during NETDEV_REGISTER/UP
+  net: use netif_disable_lro in ipv6_add_dev
+  net: rename rtnl_net_debug to lock_debug
+  netdevsim: add dummy device notifiers
+  net: dummy: request ops lock
+  docs: net: document netdev notifier expectations
+  selftests: net: use netdevsim in netns test
 
-> > In addition one advantage is that it makes it possible to support
-> > speeds that don't yet have a type in the phy_interface_t, so as I was
-> > enabling things it allowed some backwards compatibility with older
-> > kernels.
-> 
-> I don't like the sound of that. I would simply not support the older
-> kernels, rather than do some hacks.
-
-I think Alexander is referring to having a PHY interface modes that
-supports the speed - for example, if we didn't have a PHY interface
-mode that supported 100G speeds, then 100G speed would not be
-supported.
-
-Phylink has already restricted this and has done for quite some time.
-We only allow speeds that the selected interface mode can support,
-with the exception of PHY_INTERFACE_MODE_INTERNAL which supports
-everything.
+ Documentation/networking/netdevices.rst     | 22 ++++++++
+ drivers/net/dummy.c                         |  1 +
+ drivers/net/netdevsim/netdev.c              | 10 ++++
+ drivers/net/netdevsim/netdevsim.h           |  3 +
+ include/linux/netdevice.h                   |  3 +-
+ include/net/ip.h                            | 16 +++---
+ include/net/netdev_lock.h                   | 27 +++++++++
+ include/net/netdev_rx_queue.h               |  6 +-
+ net/core/Makefile                           |  2 +-
+ net/core/dev.c                              | 62 ++++++++++++++++++++-
+ net/core/dev.h                              | 15 +++++
+ net/core/dev_api.c                          |  4 +-
+ net/core/{rtnl_net_debug.c => lock_debug.c} | 14 +++--
+ net/core/netdev-genl.c                      | 18 +++---
+ net/core/rtnetlink.c                        | 10 ++--
+ net/ipv4/devinet.c                          |  2 +-
+ net/ipv6/addrconf.c                         | 15 ++++-
+ net/xdp/xsk.c                               |  2 +
+ net/xdp/xsk_buff_pool.c                     |  7 ++-
+ tools/testing/selftests/net/lib.sh          | 25 +++++++++
+ tools/testing/selftests/net/netns-name.sh   | 13 +++--
+ 21 files changed, 229 insertions(+), 48 deletions(-)
+ rename net/core/{rtnl_net_debug.c => lock_debug.c} (90%)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.48.1
+
 
