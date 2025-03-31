@@ -1,150 +1,88 @@
-Return-Path: <netdev+bounces-178428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98B84A76FDF
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 23:05:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F12F8A76FED
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 23:07:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D526D167E8E
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 21:05:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 867E23AAA15
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 21:06:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9083521C18C;
-	Mon, 31 Mar 2025 21:04:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C19821A435;
+	Mon, 31 Mar 2025 21:06:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eUvvJktx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PuBdK4Uw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B761D63DD;
-	Mon, 31 Mar 2025 21:04:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56DC2153CE
+	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 21:06:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743455095; cv=none; b=FqqqgqELlSNr7cys+HgH4+esX0qFcrxRQuplk/IIfpFFYulU3ZUtbjD2L++nk5b/CDgZbm9fQIDZi94fzDjQPCzs5dvTSV8QLtjCsePaTBMdqfm4VVaSApuVqMj5TgotSJscQqCY9+nqxwvuDAKdmwkW4+9taFr45bQhovWqam4=
+	t=1743455194; cv=none; b=FXk3UvRkL0zpl3nqyQ2LVLjvQPSlrFCWs5rO+AQ6rjc65XkUUhyaUfGSK1XvFiAKP1D8G412xrsyovgKctTRgnGnS1EvzfrJiKDO7Yb3gGBhJmkMI00JdrmduFeKrqAEbLXiw1j+pKjc25ZU8D2lZIPl7kUyEv0aq0tEtfa0j9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743455095; c=relaxed/simple;
-	bh=U+1yEEOZzVsnuUOy+RsFKoOt/F2YbfNHQ5QjEgiuuAI=;
+	s=arc-20240116; t=1743455194; c=relaxed/simple;
+	bh=Dk1VcguMht2nTcwj3uFpQ0ArG2yno2su+1rycgbMevg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t3CAKiAFtgMoY3GonZUqi+4KfYCFXkKJidi51oIFzOlyoDeN9hVTYF7JAzHpsCUvtxesmEu2+1ewmXSgYAlVMithJjbB/IcZAh7ImNiFKHbRNzOBTcfx8sEz7LMdbt5+qyYsLlkkzJB/dTNmqvwA/Qgyc8cwKSh6tJj9dYulZeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eUvvJktx; arc=none smtp.client-ip=209.85.214.173
+	 Content-Type:Content-Disposition:In-Reply-To; b=l7LzCLEJodXybhNHWKsEjCpXM48IS8V00tMCZ3cIcENfm1eS6uGkWvSrAGPWmIewsueNhfQP51j0EQpWZ6Svh/wG/KP3+MIYF5i3IxfGRYY8mPxCJTkVRMTniYC3C6Qfl4KZWrqDtwzRBsleBqlwWQa16jPgYaLBjHxw3FZPOtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PuBdK4Uw; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-22580c9ee0aso97925585ad.2;
-        Mon, 31 Mar 2025 14:04:53 -0700 (PDT)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-22409077c06so132952305ad.1
+        for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 14:06:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743455093; x=1744059893; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1743455192; x=1744059992; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gYhYk9y2DXMVeKQttY/EQvcE7aZgDZ1TAkVyVBo9hSY=;
-        b=eUvvJktxaCAAI6XUQIGaNozpKoDBqD5n50gV1B1gWbam94qyq3rR5UlEPlV+cPaba8
-         QnnVkEcZlvZUbP/CYH6DQGJ98I//1dHtRwwslKg+X6xLiNu8W+065gax+KC9thAw5qhn
-         I2YEj1KQ7U2Ax6iJyZj5XYYnQcFHku46LcVNh6SfLf4vc0ukhP5Jw/hY40d4qeFYSY4p
-         jVwWARJHOaP/XtG6v1A2ZnixfVjOIt0MGiajmN+/I2KYM2kTS0FHrfWaTdkW2uvxwv8p
-         W7AQyuD5OYUUZ/tDNfWB0RDZfDE5QtPJ/yMlXbY86+8EoQMwj7bJkm//zNJiFevyTORg
-         EPEQ==
+        bh=+aKsaAcq6agx3Z+fVFt9fX0kjTgnx6HI3CKvH6wQ9aI=;
+        b=PuBdK4UwECB3iffgYd0gefOcoI6BY0dpMBxRwX1fq/ld7OmuNko25fLIMxKvY32qAy
+         uqw/ORWgmByCfpK8kiEUNSTvGLEzPsQm7CZ/H6ITQeSq0qIQkrHCIgX+uakq15vixsk1
+         VfxitMIXIdEsnhm3hKeNNTGmtNAoRvK0BjcxttdL8Zhgyr3GFqxFTnQAPA0GNeOGQ7AD
+         jZ2HZj6C3yZGmTgpc1Lpatl1/JYKtNu/781ymVXPHJIRpLzNbL4MkHY/K/eT25HcYr/M
+         pQ3/xTIQED8015YzHWpSdIB8xYunsRaK1KaQTG+OdrbCnGKaGE+odm74rGjhBNfo7JRb
+         WIiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743455093; x=1744059893;
+        d=1e100.net; s=20230601; t=1743455192; x=1744059992;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gYhYk9y2DXMVeKQttY/EQvcE7aZgDZ1TAkVyVBo9hSY=;
-        b=N4TPDuMg7WsZdw2d7Nq3iXmYEaSjLiC3MDV77YvFJ7lFoGVpH0h22yCgnnmJKF+3Y+
-         sJ/oeVmAwn+3SRAz/TqEMFrSP3CiThuYfi02pTVq7brwZ8ivJ+TP8+CM+28wtSARGCgz
-         mdXPkFIBSmHSECY+CdghAaLteBjoffAf9KHB/HcK0ViZNnEmul+RPct5O8iDrryTfG+w
-         XJWJ8FxDYU6O74M5fh7WAEKCyNmhGjFanROKoowBRLjFnB7g1ZEeZavrDH4Y+2S+nooj
-         ArYSOjrR8I17VaVQDrfG92HAFtoW7/zmmzShnQGE/JWjpEzWN2ZsyIMuaiNxUqwd1mE2
-         VqWA==
-X-Forwarded-Encrypted: i=1; AJvYcCUBg7GT/yQxgmoS4l3vOA3gK97se8WqIlpUSKGg2WeLmGVCBGQzPgGdkLHfHehfrmsv+SZchg==@vger.kernel.org, AJvYcCUQJPz5g562Sy3ask/L5OSXtlliiwK6VWlLeY7qsbWF5CZStQKZuE/9KCCH4EN2g93mPWJK0h1xfehPNQ==@vger.kernel.org, AJvYcCUTYv4gA4SSSd5c0vFnKFCe9WUSQ6qbeMOqKI9tZfoa3aMRxLANPRprYnAwwegNpZwx2A2f+82bTq15qQ==@vger.kernel.org, AJvYcCUdOr75UNYchjCD8ICbpRI4IU6h71HwF5+VQhqVcm1H2vzvDli099pZoIoHxFwBo2yAR6XobEjMEH8ePQ==@vger.kernel.org, AJvYcCUl+lcGULIDP5EXFIX8jycnPpZXGxEShXKnurMvsGxwp3G3k+humhzPbsPkIRWhqywgZTA=@vger.kernel.org, AJvYcCUpBYi4IYwchoHardn9gBg2tZlbDCsKm/sMVjrp8UsFhg5WfZr64UDm0fxw9E+uO6LztROONeu/@vger.kernel.org, AJvYcCUuGa4R2NZpDWSTtoVi5KhvFM4O/BbgErU7jTzRtc3E8drWlnYFQXugLtnaavZiIMWt+CNdfweAR31iJA==@vger.kernel.org, AJvYcCUxyi19ZsGHB/F3Ot03AdKQFQ/2E23HMkgNbxJNc92nvapEpv8xWPQIxxidi0qFFpOsrxbC0pT23Ulo@vger.kernel.org, AJvYcCV8vuYcdCmlVCbkMqsvI0VcEvPnFy6lsWWb0KBTMgEcPYO3jYwRdjpVz2LWl9tqDCf5yT3ZjPgxSQjAeVLqizJR@vger.kernel.org, AJvYcCV8zKg3m5GGYYx4gLhDgI3FiIq9FGV1nc1d7VSd
- xe0C26rqZjDDXFUcCnyHmsS8JLJX9Qm91onsCv3T99wX@vger.kernel.org, AJvYcCVPephLkKTdrQsgtZZZpUq5bJiCjn2B5MkK2g6ecwLNkBShpbned9qmvgw5ljsKEGtWqTIR8S8P3W4=@vger.kernel.org, AJvYcCW7uqAB66Ary3KPonJlJnKYzAjSG+WVTrX0pIaJuZvLM3nYCVn4dbCzEnp82RGpuKD1JQfD1zgTxDqr@vger.kernel.org, AJvYcCXII84sUJcMlMxKZL6U0/ELND+Y8XfStBWUrKlXBXiHo5m4VIRg7bi0OXGGDWw/cMwrbToeYx7vyL17CA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeTgQl3xwTOOQu1feED/x9zymZJBvH50oOm64FeSDPK5M1GcmL
-	AowwyWoHQ3k5MD34Oz+Khk9WKI9U7r0GYDvNBuJr32U2xb/uUDg=
-X-Gm-Gg: ASbGncs/8+SW8QoyUkkUtbXEEryA/QWnRuiZWux19n6rw0rHGXjn/fQ0UwpCn/I5Ln0
-	R3jLiAjHCsnzroBE0nuJcc5WRnVBC4gwE/ph2OPGPhHt6C+O3HMa0mstYULMdUYhianNx0KmkkR
-	CpgMuxXraAcVfg1EBygzNzSLzZxlrbUW6g597T72l3p1IVOvTUhhSUL6c2ih/R/aK3ja56b4bZ3
-	JyXILgGU9qtaIPMjaqjyGFHsAr3lkyxlnLcG70+7qV9bOLjB9YcuP137s2k5fj8nw/fdc1d6por
-	FZ6uEZmYbomlRMxBn/Uhkfv8f4g1yPHmlZZkdBSGyziQ2fLLqfCZnHk=
-X-Google-Smtp-Source: AGHT+IFXBij7YY6OTj5GMzGgIwp1/yPImE6Pq87f1IxAZ8AzDKSftLkrfp99lNthyITIW+quB0Qxkw==
-X-Received: by 2002:a05:6a00:1412:b0:736:3fa8:cf7b with SMTP id d2e1a72fcca58-739803bc866mr12795498b3a.13.1743455092825;
-        Mon, 31 Mar 2025 14:04:52 -0700 (PDT)
+        bh=+aKsaAcq6agx3Z+fVFt9fX0kjTgnx6HI3CKvH6wQ9aI=;
+        b=xDs2EOBFtZhV3be/QEq5QTivuvrRnvSk3HofOzGYNwfMUvFnpGgWBp6fSEwS2TYEJq
+         ThFR79MPyneMclVl14wuP+pHY85icBuUAAk9GOmkeL8J0UIPWdmDDfl5z6mQXwi+Er28
+         wTRrySxZrRNdl4a061Bre9E7e7AuRbSxPGbyXP6Qtk+F4raQWEM74aPm7se+J0B+FZrd
+         XbjW+nqps5tyHv78XqkUrvBzam+WwuB8GUqaPjF7T60U6yx5d3PPCITU9BYTpISGvbG5
+         q5xzFdwo3/Fk/sNcaucED10uzVqIQFxt6DQx9WFl7zYTf1j8TjYmI7I/V8VlrBQygUsN
+         Ba/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVITs3dyQlS0k2F6fvMWYXrkurHYL/ZtkQoqtJ8yCGSLGdWTqUx564e3eHKw/a9XT94mBE+HH4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOPVpMDY1a5lwiFAB1HErzyGTFOImQDkyY7RyjuF8ee1/t/zZO
+	mB+LwXiZd30Al4+qJex8tcRV/TFZqqSSmhvPFIa1gWuWVD7ltpkb8YKq0Xc=
+X-Gm-Gg: ASbGncsTN+yUxS8MVOh+RBs3cyVV/hCvfMzfNMW9+5wa5V/1u2J+xXvQIHl7uUfW4pj
+	TcqsMRPB3Z38iZjibPbZCl3fDg8AkXPXp1nByHV9zXz4m5fw5mtT70l7DEpfQUksjAuIGzHHDYE
+	moEI4eM4auYHNRIHngDrVOGnwvo5ichd+31y0m5iCIDfRrJCHeOuEPS8oMXJEgDaGcUk4eKVBZn
+	ssiZ7SEXXQoOzTkWTtgaGyOF62tolSTeghp8bpQ0rnhhexc9/luJBWYbrPkTrr9995RHEr6bP78
+	xVIgZnII2tu1uw/1MvM0SwAVOlhH3CNP8A4Rd+8zt5sa
+X-Google-Smtp-Source: AGHT+IF3QLI6+qwIO+xtZmgPT3SegsERZzYQ+um7GOqojgXW7d0+1plwojmGyWqrfBGxzitQFNtPwg==
+X-Received: by 2002:a17:90b:264e:b0:2fa:137f:5c61 with SMTP id 98e67ed59e1d1-30531fa4e78mr19174154a91.12.1743455192142;
+        Mon, 31 Mar 2025 14:06:32 -0700 (PDT)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-af93ba10126sm6811351a12.75.2025.03.31.14.04.52
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-305175c99a6sm7770412a91.40.2025.03.31.14.06.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Mar 2025 14:04:52 -0700 (PDT)
-Date: Mon, 31 Mar 2025 14:04:51 -0700
+        Mon, 31 Mar 2025 14:06:31 -0700 (PDT)
+Date: Mon, 31 Mar 2025 14:06:30 -0700
 From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Stefan Metzmacher <metze@samba.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Breno Leitao <leitao@debian.org>, Jakub Kicinski <kuba@kernel.org>,
-	Christoph Hellwig <hch@lst.de>, Karsten Keil <isdn@linux-pingi.de>,
-	Ayush Sawal <ayush.sawal@chelsio.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Willem de Bruijn <willemb@google.com>,
-	David Ahern <dsahern@kernel.org>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Joerg Reuter <jreuter@yaina.de>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Oliver Hartkopp <socketcan@hartkopp.net>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Robin van der Gracht <robin@protonic.nl>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Alexandra Winter <wintera@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>,
-	James Chapman <jchapman@katalix.com>,
-	Jeremy Kerr <jk@codeconstruct.com.au>,
-	Matt Johnston <matt@codeconstruct.com.au>,
-	Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Remi Denis-Courmont <courmisch@gmail.com>,
-	Allison Henderson <allison.henderson@oracle.com>,
-	David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>, Jon Maloy <jmaloy@redhat.com>,
-	Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	Martin Schiller <ms@dev.tdt.de>,
-	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org,
-	linux-hams@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-can@vger.kernel.org, dccp@vger.kernel.org,
-	linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
-	mptcp@lists.linux.dev, linux-rdma@vger.kernel.org,
-	rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
-	tipc-discussion@lists.sourceforge.net,
-	virtualization@lists.linux.dev, linux-x25@vger.kernel.org,
-	bpf@vger.kernel.org, isdn4linux@listserv.isdn4linux.de,
-	io-uring@vger.kernel.org
-Subject: Re: [RFC PATCH 0/4] net/io_uring: pass a kernel pointer via optlen_t
- to proto[_ops].getsockopt()
-Message-ID: <Z-sDc-0qyfPZz9lv@mini-arch>
-References: <cover.1743449872.git.metze@samba.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	Cosmin Ratiu <cratiu@nvidia.com>
+Subject: Re: [PATCH net v4 01/11] net: switch to netif_disable_lro in
+ inetdev_init
+Message-ID: <Z-sD1kYBPZlmpPcr@mini-arch>
+References: <20250331150603.1906635-1-sdf@fomichev.me>
+ <20250331150603.1906635-2-sdf@fomichev.me>
+ <20250331134335.009691e4@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -153,32 +91,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <cover.1743449872.git.metze@samba.org>
+In-Reply-To: <20250331134335.009691e4@kernel.org>
 
-On 03/31, Stefan Metzmacher wrote:
-> The motivation for this is to remove the SOL_SOCKET limitation
-> from io_uring_cmd_getsockopt().
+On 03/31, Jakub Kicinski wrote:
+> On Mon, 31 Mar 2025 08:05:53 -0700 Stanislav Fomichev wrote:
+> > +EXPORT_IPV6_MOD(netif_disable_lro);
 > 
-> The reason for this limitation is that io_uring_cmd_getsockopt()
-> passes a kernel pointer as optlen to do_sock_getsockopt()
-> and can't reach the ops->getsockopt() path.
+> > +++ b/net/ipv4/devinet.c
 > 
-> The first idea would be to change the optval and optlen arguments
-> to the protocol specific hooks also to sockptr_t, as that
-> is already used for setsockopt() and also by do_sock_getsockopt()
-> sk_getsockopt() and BPF_CGROUP_RUN_PROG_GETSOCKOPT().
+> >  	if (IPV4_DEVCONF(in_dev->cnf, FORWARDING))
+> > -		dev_disable_lro(dev);
+> > +		netif_disable_lro(dev);
+> >  	/* Reference in_dev->dev */
+> >  	netdev_hold(dev, &in_dev->dev_tracker, GFP_KERNEL);
+> >  	/* Account for reference dev->ip_ptr (below) */
 > 
-> But as Linus don't like 'sockptr_t' I used a different approach.
-> 
-> @Linus, would that optlen_t approach fit better for you?
+> I still don't see a way for devinet.c to be built into a module.
+> The export and moving the defines needs to go to patch 3.
 
-[..]
-
-> Instead of passing the optlen as user or kernel pointer,
-> we only ever pass a kernel pointer and do the
-> translation from/to userspace in do_sock_getsockopt().
-
-At this point why not just fully embrace iov_iter? You have the size
-now + the user (or kernel) pointer. Might as well do
-s/sockptr_t/iov_iter/ conversion?
+Ah, I missed that, you're right, will do!
 
