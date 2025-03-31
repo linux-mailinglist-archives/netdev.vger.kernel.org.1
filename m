@@ -1,147 +1,134 @@
-Return-Path: <netdev+bounces-178252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 415D0A75F0E
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 08:53:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF295A75F1F
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 09:00:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 167C47A3050
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 06:52:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33D793A8211
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 07:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 558A118B48B;
-	Mon, 31 Mar 2025 06:53:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D4891A3BD7;
+	Mon, 31 Mar 2025 07:00:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BAuq3V7b"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="NnnXc3jb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F07F38F80
-	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 06:53:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89FC61519B8;
+	Mon, 31 Mar 2025 07:00:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743403990; cv=none; b=iLMyTE/5sMLryo68FjATJfMumysxnJKEnpPNuXifule5hQqrnhDD4wys9jq22U8t6n7+WU4C+dVOpEGvAvXg5+c7ryUIr4SceDQLPyB0NHA15btlcoebks0eCUMZ3TInBKnMrh8skVG/98CPbQfPj3DSn0ja4XIaHBuGYDMb+S8=
+	t=1743404449; cv=none; b=mfhyD7KhMGnZEuXgp2z/73OtI43wRw4qHasru7s/j6MxWr84rrZgzBBBY0ukB50syvhvlaYgOvrCiii/r2JRy1Ya/RHZLvHGNAjzReLbFlPqt5BPERYUjBNcK8MbSMA68ABD6X/FzkVjWP7kHl8M3JwR5U8VftE41BWO8QA5CeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743403990; c=relaxed/simple;
-	bh=FAP1uFngi3txu2jcmcowfO+bhV84fsioCaY71nIE/+o=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=WPNPf47dy+9fiyBIkF2u4xwGwTMl5TbN+824ArQG8Nncmi2bS2WEGjwGbntZxwbd2EGYefmR4pJ9zt2JeRXJJFAW6fIL+eg+tkK8dkhF9sCvse9laRtxwMnlKh8qk7HNjXmEBX9t1KtTl4mfYM08QyGJ5zAt7uJDeBvPjrAZicI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BAuq3V7b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D2D5C4CEE3;
-	Mon, 31 Mar 2025 06:53:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743403989;
-	bh=FAP1uFngi3txu2jcmcowfO+bhV84fsioCaY71nIE/+o=;
-	h=From:Date:Subject:To:Cc:From;
-	b=BAuq3V7b0YUom6d2OXCQJUo4Hh6iKc8hOW2pdnRqaqZCj1x8efk9SWjEIUZXOxlgY
-	 x+m3n2OwYUHyjHbarz9ATAdvW4LDPu24EWfUS5XVF88nVEL0tccc7YDyl/xE093UeR
-	 7dPjfOyH/yf6GsuW1vG1NF5g4fEBJGiNgrOnQj47bQtxtWdT4zPFsFwX4Kh/p780wV
-	 5nz50asv6x3TunjTeq4ndb+9JtFPh0pU9Jyat0TybkCgjM6wImUDBGfJ0v1K6XDrlD
-	 9SzzpaTJx9gTHmQ8MyiCnaGSi23l1q1hh8us9S0IVHPnvwon1xYVCIQsu2gB6sdm0J
-	 6HVH5xLbzCjuw==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Mon, 31 Mar 2025 08:52:53 +0200
-Subject: [PATCH net] net: airoha: Fix qid report in
- airoha_tc_get_htb_get_leaf_queue()
+	s=arc-20240116; t=1743404449; c=relaxed/simple;
+	bh=p/p8rn7lBW65XVPA+w0Sra2JPznUZ41wzwWe+Ccmuxs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uK1VvG6rDKWMJ5qavldnzp+CRByZRasaBusm9qfN1NJ9sZRIE2BBmCNQpTH5BoSyNG12SjQABEU3fjeIn7AEThq61ySTnrgrzhf/kzPHz2PL9Y25v68q7spaYaceJYqpwqFzOCVWQTSbH8xeRrnMAu/zqfiXaAJytzxs7ucjHm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=NnnXc3jb; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 07FFA102F66E1;
+	Mon, 31 Mar 2025 09:00:35 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1743404439; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=Tuk9xLLGOA3p2uSHVjgEZqViacVfaAPTNHEavU4XDWs=;
+	b=NnnXc3jbq7tgb9NvNsc9O9FQmE+niADmjpA5rKPOCm1kMZVJGVlMDhqRZeGk8x5hTsguYq
+	pvGzvAwYbMQeIaXFyfvOCg8JFIkR1j6JinU2OEH+7nQiniop+N4eEQOPkZbgW57u/Jlw62
+	Lgurh2V2yvOKoaFccfxzeseieCKCbVYDcKh6NX/1vrCfORggFLr5GE1YIWnX1dxcaF/fBb
+	vCkCijMHFcCZW7rxNFWZpap+LszDiTYnSNwq8nuF8IvsBmxEYJUCqQ9iq/KL5qfYdIKIqo
+	fsZ0OiFr2imsRSjTGUSExQBccEI/TXhceVDp4zQpSVtLNOUUjjPKIcEirUQKUw==
+Date: Mon, 31 Mar 2025 09:00:33 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Shawn Guo
+ <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix
+ Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 4/4] net: mtip: The L2 switch driver for imx287
+Message-ID: <20250331090033.281807b2@wsk>
+In-Reply-To: <022e19f5-9a9c-42eb-9358-a6fe832e8f5f@lunn.ch>
+References: <20250328133544.4149716-1-lukma@denx.de>
+	<20250328133544.4149716-5-lukma@denx.de>
+	<3648e94f-93e6-4fb0-a432-f834fe755ee3@lunn.ch>
+	<20250330222041.10fb8d3d@wsk>
+	<022e19f5-9a9c-42eb-9358-a6fe832e8f5f@lunn.ch>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250331-airoha-htb-qdisc-offload-del-fix-v1-1-4ea429c2c968@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAMQ76mcC/x2NQQqAIBAAvxJ7bqG0sPpKdNBccyGyNCKI/p50n
- DnMPJAoMiUYigciXZw4bBnqsoDZ620hZJsZRCXaSsoaNcfgNfrT4GE5zRicW4O2aGlFxzcqRU0
- nVG+kVJAze6Ss/8U4ve8HaxOvvnIAAAA=
-X-Change-ID: 20250331-airoha-htb-qdisc-offload-del-fix-77e48279b337
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
+Content-Type: multipart/signed; boundary="Sig_/O3v+DOu0N.qQTG3HhCy4w.0";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Last-TLS-Session-Version: TLSv1.3
 
-Fix the following kernel warning deleting HTB offloaded leafs and/or root
-HTB qdisc in airoha_eth driver properly reporting qid in
-airoha_tc_get_htb_get_leaf_queue routine.
+--Sig_/O3v+DOu0N.qQTG3HhCy4w.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-$tc qdisc replace dev eth1 root handle 10: htb offload
-$tc class add dev eth1 arent 10: classid 10:4 htb rate 100mbit ceil 100mbit
-$tc qdisc replace dev eth1 parent 10:4 handle 4: ets bands 8 \
- quanta 1514 3028 4542 6056 7570 9084 10598 12112
-$tc qdisc del dev eth1 root
+Hi Andrew.
 
-[   55.827864] ------------[ cut here ]------------
-[   55.832493] WARNING: CPU: 3 PID: 2678 at 0xffffffc0798695a4
-[   55.956510] CPU: 3 PID: 2678 Comm: tc Tainted: G           O 6.6.71 #0
-[   55.963557] Hardware name: Airoha AN7581 Evaluation Board (DT)
-[   55.969383] pstate: 20400005 (nzCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[   55.976344] pc : 0xffffffc0798695a4
-[   55.979851] lr : 0xffffffc079869a20
-[   55.983358] sp : ffffffc0850536a0
-[   55.986665] x29: ffffffc0850536a0 x28: 0000000000000024 x27: 0000000000000001
-[   55.993800] x26: 0000000000000000 x25: ffffff8008b19000 x24: ffffff800222e800
-[   56.000935] x23: 0000000000000001 x22: 0000000000000000 x21: ffffff8008b19000
-[   56.008071] x20: ffffff8002225800 x19: ffffff800379d000 x18: 0000000000000000
-[   56.015206] x17: ffffffbf9ea59000 x16: ffffffc080018000 x15: 0000000000000000
-[   56.022342] x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000001
-[   56.029478] x11: ffffffc081471008 x10: ffffffc081575a98 x9 : 0000000000000000
-[   56.036614] x8 : ffffffc08167fd40 x7 : ffffffc08069e104 x6 : ffffff8007f86000
-[   56.043748] x5 : 0000000000000000 x4 : 0000000000000000 x3 : 0000000000000001
-[   56.050884] x2 : 0000000000000000 x1 : 0000000000000250 x0 : ffffff800222c000
-[   56.058020] Call trace:
-[   56.060459]  0xffffffc0798695a4
-[   56.063618]  0xffffffc079869a20
-[   56.066777]  __qdisc_destroy+0x40/0xa0
-[   56.070528]  qdisc_put+0x54/0x6c
-[   56.073748]  qdisc_graft+0x41c/0x648
-[   56.077324]  tc_get_qdisc+0x168/0x2f8
-[   56.080978]  rtnetlink_rcv_msg+0x230/0x330
-[   56.085076]  netlink_rcv_skb+0x5c/0x128
-[   56.088913]  rtnetlink_rcv+0x14/0x1c
-[   56.092490]  netlink_unicast+0x1e0/0x2c8
-[   56.096413]  netlink_sendmsg+0x198/0x3c8
-[   56.100337]  ____sys_sendmsg+0x1c4/0x274
-[   56.104261]  ___sys_sendmsg+0x7c/0xc0
-[   56.107924]  __sys_sendmsg+0x44/0x98
-[   56.111492]  __arm64_sys_sendmsg+0x20/0x28
-[   56.115580]  invoke_syscall.constprop.0+0x58/0xfc
-[   56.120285]  do_el0_svc+0x3c/0xbc
-[   56.123592]  el0_svc+0x18/0x4c
-[   56.126647]  el0t_64_sync_handler+0x118/0x124
-[   56.131005]  el0t_64_sync+0x150/0x154
-[   56.134660] ---[ end trace 0000000000000000 ]---
+> > > > +	/* Prevent a state halted on mii error */
+> > > > +	if (fep->mii_timeout && phy_dev->state =3D=3D PHY_HALTED) {
+> > > > +		phy_dev->state =3D PHY_UP;
+> > > > +		goto spin_unlock;
+> > > > +	}   =20
+> > >=20
+> > > A MAC driver should not be playing around with the internal state
+> > > of phylib. =20
+> >=20
+> > Ok, I've replaced it with PHY API calls (phy_start() and
+> > phy_is_started()). =20
+>=20
+> phy_start() and phy_stop() should be used in pairs. It is not good to
+> call start more often than stop.
+>=20
+> What exactly is going on here? Why would there be MII errors?
+>=20
 
-Fixes: ef1ca9271313b ("net: airoha: Add sched HTB offload support")
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/airoha/airoha_eth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Exactly.
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index c0a642568ac115ea9df6fbaf7133627a4405a36c..20a96cafc748e97a8ff9ab33a5be71ab62e8c9c5 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -2358,7 +2358,7 @@ static int airoha_tc_get_htb_get_leaf_queue(struct airoha_gdm_port *port,
- 		return -EINVAL;
- 	}
- 
--	opt->qid = channel;
-+	opt->qid = AIROHA_NUM_TX_RING + channel;
- 
- 	return 0;
- }
+I've double check it - this can be safely dropped.
 
----
-base-commit: 2ea396448f26d0d7d66224cb56500a6789c7ed07
-change-id: 20250331-airoha-htb-qdisc-offload-del-fix-77e48279b337
+> 	Andrew
+
 
 Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
 
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/O3v+DOu0N.qQTG3HhCy4w.0
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmfqPZEACgkQAR8vZIA0
+zr2uZAf/X9cFX5/KF/UwjOOG5zujQrAPZ8w1dyFZMuxUtk8kuXMPb15aOYHrHNru
+75mZmO+XEFjn8ZH1zo8gNFkcIZtXXRl9ySXNdv3qKnlRBNdMddQR5lMI+l1OixPr
+SEH8lCzHgIi3s+RHFNsFrOrRnkKYkQwNHjiciDsgOFfn2Pzn7/oysfr0N/0guAsf
+o4IQTXOe6HKQk/xiKYSiYSxbxZEYkEhVaRiizQwFF/lPbInPSJYN4/QMPkoaldcT
+qcRyDKlHIAcvHnts/1lsTgrlugfSqAIdXgnUYKwi0GCmpkX7U6DA15uN7+kfhKSq
+wm1rAr67gqNHiUvqXB6WyIQRFbZPNg==
+=ACUc
+-----END PGP SIGNATURE-----
+
+--Sig_/O3v+DOu0N.qQTG3HhCy4w.0--
 
