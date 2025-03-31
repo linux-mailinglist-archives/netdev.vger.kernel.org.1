@@ -1,152 +1,117 @@
-Return-Path: <netdev+bounces-178347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E35DA76ABE
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 17:39:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB59DA76AC6
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 17:40:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C523188438B
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 15:33:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB75916E60B
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 15:35:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAC392222CD;
-	Mon, 31 Mar 2025 15:06:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62B5A22172E;
+	Mon, 31 Mar 2025 15:22:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TBLExL2i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A11F2222C4
-	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 15:06:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8AB213E6A;
+	Mon, 31 Mar 2025 15:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743433583; cv=none; b=anUiNdV3RU2yupWtckeCZNC6oww/ai1lAwRPDyr5V2/yBysClTxYmoT/SefTtiqzCQpXQ14Euf8V9OkY7OXaGXVElxtZw6YbF2jRBRAamDKWiAuJ6AcH4zZ6YG3TLzEJgODYXUvubSnCIL6MNUH/Zg7qLmO0ZvLZx1ltUZIYbXk=
+	t=1743434547; cv=none; b=sAJ/ae8Vb2yrBvbEW1FIow/uaSYx4Tu2VURo/OP1nlByR/xGSTfQRYHUoCwSgYis77elVnUuYbQUnlYj6Ompsc4Wg9ha7KizuSrz2Trob9O9aozX0M3mhR9VMlEtsj22HVi0sBbkAnMzmmE0Ad0AlEyR28jmwaV8YMpIIrVinmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743433583; c=relaxed/simple;
-	bh=CUR5I3UpwjbNO0hNnmCCSuAoAxW+HdofdbYjgHwMqZw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UG+lJgUHvjJ8kou0red5vYVQfr96LDLlfOyHFdhiqO+k2Lq+vQWUveL1kL7becp1cKjmJzclfD2nbLEgZkDZfbkkPSXnIQ0e/1p4mFaGQ6cih7Ef8/pT9kNqJdW6Bx+C1zeIT9YCKGKSFkR23auUVcIc2xDuOIefo/nebZrUCo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+	s=arc-20240116; t=1743434547; c=relaxed/simple;
+	bh=w4FKHA0anMKrh0e3i1HLRk37hU4Z/VK/ffHTy5oGwnE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KUQEW19f53718QB+lybuy/g/rk/ouylbBWt6oyHkIBpWprqMtHi1TDQMbHMdD2oocZrs0raNjiyE6NuaJW7uTYy9h0Nl2+AYT4Cpd/2e1zfVsNOlqECWcrpqNEt73Zp6COm91xJ+JuRL5q+fLYP617DBnUazX5So9haP6b50vJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TBLExL2i; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-223f4c06e9fso82917655ad.1
-        for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 08:06:22 -0700 (PDT)
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2ff69365e1dso6002388a91.3;
+        Mon, 31 Mar 2025 08:22:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743434545; x=1744039345; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=z8kHRV4D1blEw8Z5EgHS57iPCad16rDsewn8MF9vi3Q=;
+        b=TBLExL2iXAbEGJambbdJhcM4M53gGJhFf7IAWt8AhEpSzecm9oecX6X+9b1KDfYmCA
+         4yYGg36SjeP0ONeye+tjpW1Otpup7swOtzVHhitS+CezHiWJxyyUlNm0RGsptLvCmsTn
+         ZQORkoAHSMe1JlAk+i5VEBHboVzf7i0ZN8KptNasvWD1udCoSQrrmRypwNpMv0N0Lo3g
+         Br7ch2xxXDehFQkuVn5hC0z5nms1ZuPiHVDtqD/HYm5Xu6umHuBHF2aqbLZy3dMqcPjX
+         rQq5yHoyI6gvlKt+zNhzCM0atMKRFTgdZBS24QA5spECq4MCUrgXlDfKHcRkhmzh1PDg
+         hQ2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743433581; x=1744038381;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=knTGk9lxkObf5m8zJBEYc+FoI0axfDUQp9+wJSH7C6k=;
-        b=uwZzNPaiuGJ28idfEhdTr7HWv/WWUwVfN5VZg2pMzbmEaeTE/k+SnzTh+EkiKp1boH
-         EBc6/E6MDhj6cHCz0LKoi+JkOmbSodNxqxo9UE13MPTu0LY4CH2fFC1UZQ3AZPRqSMU2
-         kJiFmPoXCJ0yeBQJDp88wPchFx/UJt/w3Mk4c6RCup+ZxM5sJif+CkWPj1PhsdpgevrJ
-         ZUbaOM5xo3CPKUL7y1KZd8WqiK+upjNtO6HvR4SWz2Gp1YDJmxwNOUNLFQR4EW5mJUCb
-         rktgTLcJYSAhyDaljwO+74HuNSkY6jDfdVChLDYa7KVrisGEVeiJvtW2HMDRrSBp+7sO
-         vyug==
-X-Gm-Message-State: AOJu0YyccbCbQq7hY7QVOM6qMZe5jdTT1F7Qgb5kcNByF83GVfcD2M9l
-	N/n1ksWh2FCzn4lE3ZJPz9jq6XT5X6AE3e2UetxoJ1O/zSjIF1E2BM9l
-X-Gm-Gg: ASbGncus8ev1RYsxbxepqOuOOTyZ/bT77x/Is4kyOP1yAoNfmYnWr5TEn6hG3/05XXY
-	4W+vhZ5iqQCBkeZ3viE12R+PQ43MsJJWv8kji4rXZXAPEKwsQ3D32TC56ZXBTdx58mFB4fp12bR
-	j5ewSDXohKcLHqietNueGfJWLa3DW01l+7cwTIWmt+pW60Lybrjy85uiktjXjRNg5H8Vi2pViYy
-	YqAPtE9RcRO9mYlmfA5HkC7QtoNakMXHFF3kdKPPLrt8d1eWRNmpy7FOb5DccRyJo3TPvn7Trek
-	S7Xqxw6dv3Fsj9yekqRBY+7dIfW0wSXld294WVX4gfuM
-X-Google-Smtp-Source: AGHT+IHOliYcGEM1yeelfVNMGvLe62fnCfpFru2B/c1wuq4EYQTooKUdgiQELzB4UXi9t4awYWCIAQ==
-X-Received: by 2002:a17:902:d485:b0:223:fb95:b019 with SMTP id d9443c01a7336-22921d4fc97mr183423905ad.24.1743433580926;
-        Mon, 31 Mar 2025 08:06:20 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743434545; x=1744039345;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z8kHRV4D1blEw8Z5EgHS57iPCad16rDsewn8MF9vi3Q=;
+        b=q9KVkeyL9pLhpG1reG7TuYjtanmnyoz6frhGg71fvPOIKToWbXQB0g5OlrD2xckvLv
+         P/0picU+tTHQpuDzZjePGOoR4iKCCwYFmiox+LmcEr3yLi5COKm7WRnmEsGToWrvJriI
+         D54zy3XGVZhmPyP2PWas7a6+LJess7HA254AD2zkSKJnlzyImQ0UkokQFiUlNQVx6pc7
+         mqKJ0/8/wGz6d8WDtwIQ6f26jzffVd1/2nA23Avq7dRCHLFNaFFuoUv8TgsObEnfaiNS
+         42eK0X66hnZQxxgU3g/rNlZzmL8oRuxLrRZudwuQnEHvq6wX+Bn0ctVb4xf0Y6pqSQIl
+         CVDA==
+X-Forwarded-Encrypted: i=1; AJvYcCUJgfHgoZd0wnYwVR9927mWf2p1cAcqmg80q6PakyneCNZ0GjMyO6Y96o+E2A7trGzcMcHOCBamJmUlrnAB@vger.kernel.org, AJvYcCUM/69x/JgbHyqxGcvBpY+F1PLXgrO0DDVFYK6f5vBLMRlQ3JRBr3ZhhO1nphU41vUTOeE=@vger.kernel.org, AJvYcCWPCVcLWTlV1ZC5AH5REd4dxBHBkAT+zgq7d91pRbduyyoSE45TmQbObegm8X+yNcCPhTIWeqPN@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz499E8YPB67Oi/CeK6p0hASrRUoVtb2oqD01MZ6WggfnTcbr1Q
+	SInAvBt1PLo6ORhsEknmJnI7XMG/JD4LocYLoYradaWQWIsTsPw6zuyk
+X-Gm-Gg: ASbGncvKskPbjfcw19wlCadhKIb/YzzCxC7HrOI43aHSWH50RvvMYHkP/0kXC2dh3B0
+	PzTNMrcJkOAE+jEVYoITY+mMV+W9FhAveQikRiuZTr5p5CMFxXkmF6F9fpv2cbK/JNEKkcaKdDw
+	GccsrTnN6IWaqFl8CKqRS4bkv0vPUzHQulJABu9bEFAKffIVshoVGHlEYcy6SuQBj8j0VWU5N1H
+	mBznUTyCJZ5UfNfuBBw82HrmJyhiuPQOaSB10k9mO8iX1U4V84899ELrQdVr589Ry8fcrR++JBJ
+	cPKIke91KZiMrHs0Di+uNG1KhJ4x2Gd26Yh7Lc+fBNSi
+X-Google-Smtp-Source: AGHT+IE8+4eupeE2NGK/U3jWJ3Gg10N3UWQlFKfezMmp/E0AIxLwJgjIRW/MrxT/PjXZK1WP5aSKgQ==
+X-Received: by 2002:a17:90b:1648:b0:301:1d03:93cd with SMTP id 98e67ed59e1d1-3053214bfcamr14758556a91.24.1743434545096;
+        Mon, 31 Mar 2025 08:22:25 -0700 (PDT)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2291f1dd285sm70173665ad.169.2025.03.31.08.06.20
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-30516d62c57sm7348400a91.28.2025.03.31.08.22.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Mar 2025 08:06:20 -0700 (PDT)
-From: Stanislav Fomichev <sdf@fomichev.me>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Subject: [PATCH net v4 11/11] netdev: don't hold rtnl_lock over nl queue info get when possible
-Date: Mon, 31 Mar 2025 08:06:03 -0700
-Message-ID: <20250331150603.1906635-12-sdf@fomichev.me>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250331150603.1906635-1-sdf@fomichev.me>
-References: <20250331150603.1906635-1-sdf@fomichev.me>
+        Mon, 31 Mar 2025 08:22:24 -0700 (PDT)
+Date: Mon, 31 Mar 2025 08:22:23 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Wang Liang <wangliang74@huawei.com>
+Cc: bjorn@kernel.org, magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, ast@kernel.org,
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+	yuehaibing@huawei.com, zhangchangzhong@huawei.com,
+	netdev@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] xsk: correct tx_ring_empty_descs count statistics
+Message-ID: <Z-qzLyGKskaqgFh5@mini-arch>
+References: <20250329061548.1357925-1-wangliang74@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250329061548.1357925-1-wangliang74@huawei.com>
 
-From: Jakub Kicinski <kuba@kernel.org>
-
-Netdev queue dump accesses: NAPI, memory providers, XSk pointers.
-All three are "ops protected" now, switch to the op compat locking.
-rtnl lock does not have to be taken for "ops locked" devices.
+On 03/29, Wang Liang wrote:
+> The tx_ring_empty_descs count may be incorrect, when set the XDP_TX_RING
+> option but do not reserve tx ring. Because xsk_poll() try to wakeup the
+> driver by calling xsk_generic_xmit() for non-zero-copy mode. So the
+> tx_ring_empty_descs count increases once the xsk_poll()is called:
+> 
+>   xsk_poll
+>     xsk_generic_xmit
+>       __xsk_generic_xmit
+>         xskq_cons_peek_desc
+>           xskq_cons_read_desc
+>             q->queue_empty_descs++;
+> 
+> To avoid this count error, add check for tx descs before send msg in poll.
+> 
+> Fixes: df551058f7a3 ("xsk: Fix crash in poll when device does not support ndo_xsk_wakeup")
+> Signed-off-by: Wang Liang <wangliang74@huawei.com>
 
 Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
----
- net/core/netdev-genl.c | 18 +++++++-----------
- 1 file changed, 7 insertions(+), 11 deletions(-)
-
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index fd1cfa9707dc..39f52a311f07 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -481,18 +481,15 @@ int netdev_nl_queue_get_doit(struct sk_buff *skb, struct genl_info *info)
- 	if (!rsp)
- 		return -ENOMEM;
- 
--	rtnl_lock();
--
--	netdev = netdev_get_by_index_lock(genl_info_net(info), ifindex);
-+	netdev = netdev_get_by_index_lock_ops_compat(genl_info_net(info),
-+						     ifindex);
- 	if (netdev) {
- 		err = netdev_nl_queue_fill(rsp, netdev, q_id, q_type, info);
--		netdev_unlock(netdev);
-+		netdev_unlock_ops_compat(netdev);
- 	} else {
- 		err = -ENODEV;
- 	}
- 
--	rtnl_unlock();
--
- 	if (err)
- 		goto err_free_msg;
- 
-@@ -541,17 +538,17 @@ int netdev_nl_queue_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
- 	if (info->attrs[NETDEV_A_QUEUE_IFINDEX])
- 		ifindex = nla_get_u32(info->attrs[NETDEV_A_QUEUE_IFINDEX]);
- 
--	rtnl_lock();
- 	if (ifindex) {
--		netdev = netdev_get_by_index_lock(net, ifindex);
-+		netdev = netdev_get_by_index_lock_ops_compat(net, ifindex);
- 		if (netdev) {
- 			err = netdev_nl_queue_dump_one(netdev, skb, info, ctx);
--			netdev_unlock(netdev);
-+			netdev_unlock_ops_compat(netdev);
- 		} else {
- 			err = -ENODEV;
- 		}
- 	} else {
--		for_each_netdev_lock_scoped(net, netdev, ctx->ifindex) {
-+		for_each_netdev_lock_ops_compat_scoped(net, netdev,
-+						       ctx->ifindex) {
- 			err = netdev_nl_queue_dump_one(netdev, skb, info, ctx);
- 			if (err < 0)
- 				break;
-@@ -559,7 +556,6 @@ int netdev_nl_queue_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
- 			ctx->txq_idx = 0;
- 		}
- 	}
--	rtnl_unlock();
- 
- 	return err;
- }
--- 
-2.48.1
-
 
