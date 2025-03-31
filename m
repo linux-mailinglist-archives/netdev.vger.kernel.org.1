@@ -1,89 +1,88 @@
-Return-Path: <netdev+bounces-178240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08305A75D68
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 01:59:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 089E5A75D6E
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 02:09:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE3C87A32D6
-	for <lists+netdev@lfdr.de>; Sun, 30 Mar 2025 23:58:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15F7B18895D1
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 00:09:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712C31A7264;
-	Sun, 30 Mar 2025 23:59:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26EE510E3;
+	Mon, 31 Mar 2025 00:09:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Vd0E/tfE";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="0mSkC1Yg";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="vaLh+k8T";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="FX/hch+4"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="U+Cdmzwz";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="icQ5/v34";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="U+Cdmzwz";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="icQ5/v34"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C91B11876
-	for <netdev@vger.kernel.org>; Sun, 30 Mar 2025 23:59:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 552BC1EA84
+	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 00:09:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743379163; cv=none; b=c11hRBVRunVYBNJQtkdqHND7zPQSScH+OY4bVUAHWKaM1XAvAEWZWxcG0aKjJvocPJ/83hX43WxpZuX4ytBRF5wbj670IwvI864DJuJaipw/LgNW83ZoPAvdvlMk3FvcX8jzAglnDkKs8kC+kX5wG686TEGby8wzi2P26FdWyXs=
+	t=1743379745; cv=none; b=Ydx/EtXovEbApNGPuPd6Ze5coXeohGOeTkBhPgQn7mqLpu5yAv9p1QLexSaGzFc9jcGcUnX4qdsrafqAykn5pSg7t751az0yTd+GGQpipFHNsfMFzL/DfaOpAb+hgTqc36eoZ+f8dd7/918jPIjFkND4L2EOa1WGvAzAlSv4/7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743379163; c=relaxed/simple;
-	bh=qU3cFpA6EvKqIXF9C2ONe3DLpE0PdrxRDyoNK755y/g=;
+	s=arc-20240116; t=1743379745; c=relaxed/simple;
+	bh=+TiEsBKI6OODzQ6gSVygpWUqpNuIuC1oY1Fi+GW6rXM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CgTPXRKQGog5vHT+gc5VEI8rtJ0eWeLUV+nH9QUNjFc4pmpwzRoz37lkn7wtifxdEvFFgYSAzJ+hNhryshQGCOq5jX1+q7yLy4zPg8BS/+dW7ganaIFC3OEkvKvQuzMwaH5K2HeCk3Df+ildkPWa+jkpgsNc74D+qtVF3JM0zME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Vd0E/tfE; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=0mSkC1Yg; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=vaLh+k8T; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=FX/hch+4; arc=none smtp.client-ip=195.135.223.130
+	 Content-Type:Content-Disposition:In-Reply-To; b=p7F2ogkucul0iUL+ThkMohPGSxsEDfhcPuY7jPyL1gxGYMAv5U2mJ+vNdPKu9ODAbSgS53N2l40xBVgjhjd8B3OOAk/0t8kLSLyo8QHlytpcuyY7CxJ0rsYohbQG4aFAHsuLAA+vC5BcBdPHu8/C6K/+m9GR+TdxFdOEgWYYfQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=U+Cdmzwz; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=icQ5/v34; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=U+Cdmzwz; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=icQ5/v34; arc=none smtp.client-ip=195.135.223.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Received: from lion.mk-sys.cz (unknown [10.100.225.114])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id D52D121114;
-	Sun, 30 Mar 2025 23:59:19 +0000 (UTC)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 866F52119E;
+	Mon, 31 Mar 2025 00:09:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1743379160; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1743379741; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Qb3Fitni+pHvKvVooqnw/bGrNakmJWYHtWJAaZ/6qVg=;
-	b=Vd0E/tfEYkojPxIPaLdBUxftMB5hjg/0C+qh17ywCtTiGlbqN1UeHceuS+/btEaa96PwcJ
-	QKZdITlYGWFtujBNb8toSYiOGJlnz6+Rr9bYyShAofWdAUNsYNgYju9YgrRY7kjGlEn430
-	f0zqduNeEHorPvydb8qj2IpbauWjx00=
+	bh=QmoKIZLj2K0suh+6aN0oGatIG4BolsWfodLmPfQxRkk=;
+	b=U+CdmzwzPapSw2A0uWh6tnT3Xngqx+H99WmCt1GaERbQBzzMpFXtWpYahdKqPpHeWIHNpB
+	vOucfI5ien3mtyLXfHKR9WFRVewTrBJEEQQiXJs9pYaFuQ0/szurDamRuTa6Q7atWuawVa
+	2vqJojNgzPjFkkhCskZ6uJCXY3j0Gks=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1743379160;
+	s=susede2_ed25519; t=1743379741;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Qb3Fitni+pHvKvVooqnw/bGrNakmJWYHtWJAaZ/6qVg=;
-	b=0mSkC1YgUyQQgLZf1i44ednngPj7oPfh+c3WPtza3PWMzet+5ju9wHUwDNfQinRTDaSPFj
-	VhlUptSNCRx24yAg==
+	bh=QmoKIZLj2K0suh+6aN0oGatIG4BolsWfodLmPfQxRkk=;
+	b=icQ5/v34Uzw+QHuzJHfejRrRX9tqKewI8FagYkWB+xN//nKkUo19GSMUWekcclUT1bNIVU
+	ojtfLjliw1Ar2UCQ==
 Authentication-Results: smtp-out1.suse.de;
 	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1743379159; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1743379741; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Qb3Fitni+pHvKvVooqnw/bGrNakmJWYHtWJAaZ/6qVg=;
-	b=vaLh+k8TeqC8Rld4o4V8PyQjWPlA/wlDHVx0J/rIx4WEENYcdsWkVnJcL8fC9St2+hQd70
-	yi8swrupzRK7VG3eQRTO18G/4e/F0mWGis+U/6q1vcxtq0ZL5InBd3ftETA9jFedpiCqav
-	7fF2ngcgPv5+dwFfH20oEkX6y6aB4FE=
+	bh=QmoKIZLj2K0suh+6aN0oGatIG4BolsWfodLmPfQxRkk=;
+	b=U+CdmzwzPapSw2A0uWh6tnT3Xngqx+H99WmCt1GaERbQBzzMpFXtWpYahdKqPpHeWIHNpB
+	vOucfI5ien3mtyLXfHKR9WFRVewTrBJEEQQiXJs9pYaFuQ0/szurDamRuTa6Q7atWuawVa
+	2vqJojNgzPjFkkhCskZ6uJCXY3j0Gks=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1743379159;
+	s=susede2_ed25519; t=1743379741;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Qb3Fitni+pHvKvVooqnw/bGrNakmJWYHtWJAaZ/6qVg=;
-	b=FX/hch+42tcZAQj9rVlLXkfuqrzC6TQNucut4BnTlzGrhTgB1I2NpDRSoWG4L10SjBioVE
-	9SRWst8iOOyMhiAA==
+	bh=QmoKIZLj2K0suh+6aN0oGatIG4BolsWfodLmPfQxRkk=;
+	b=icQ5/v34Uzw+QHuzJHfejRrRX9tqKewI8FagYkWB+xN//nKkUo19GSMUWekcclUT1bNIVU
+	ojtfLjliw1Ar2UCQ==
 Received: by lion.mk-sys.cz (Postfix, from userid 1000)
-	id BBD8720057; Mon, 31 Mar 2025 01:59:19 +0200 (CEST)
-Date: Mon, 31 Mar 2025 01:59:19 +0200
+	id 6C39B20057; Mon, 31 Mar 2025 02:09:01 +0200 (CEST)
+Date: Mon, 31 Mar 2025 02:09:01 +0200
 From: Michal Kubecek <mkubecek@suse.cz>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: kernel@pengutronix.de, netdev@vger.kernel.org
-Subject: Re: [PATCH ethtool v1 1/1] ethtool: fix incorrect MDI-X "Unknown"
- output for MDI mode
-Message-ID: <xnvoptvzs4ikkrvsyu77tgbtstoupoin4mttuyz5qaljgd4vg4@xqmpvzrvirpt>
-References: <20250324135310.113824-1-o.rempel@pengutronix.de>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, fbnic@meta.com, kernel-team@meta.com
+Subject: Re: [PATCH ethtool-next] ethtool: fbnic: ethtool dump parser
+Message-ID: <zybblsg5cth563xrx26jgdsxo3nzvyafrn7nu7wd46vjseaqki@iggq3fslim3f>
+References: <20250305194641.535846-1-mohsin.bashr@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,98 +90,228 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="vnoy7vgw3d33hn4l"
+	protocol="application/pgp-signature"; boundary="lyawwf7xhbcycxaf"
 Content-Disposition: inline
-In-Reply-To: <20250324135310.113824-1-o.rempel@pengutronix.de>
+In-Reply-To: <20250305194641.535846-1-mohsin.bashr@gmail.com>
 X-Spam-Score: -5.90
 X-Spamd-Result: default: False [-5.90 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
+	BAYES_HAM(-3.00)[100.00%];
 	SIGNED_PGP(-2.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_LONG(-1.00)[-0.999];
 	MID_RHS_NOT_FQDN(0.50)[];
 	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	NEURAL_HAM_SHORT(-0.20)[-0.994];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_ONE(0.00)[1];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
 	RCVD_TLS_LAST(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FREEMAIL_TO(0.00)[gmail.com];
 	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_EQ_ENVFROM(0.00)[];
+	ARC_NA(0.00)[];
 	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3]
+	RCPT_COUNT_THREE(0.00)[4];
+	RCVD_COUNT_ONE(0.00)[1];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	FROM_EQ_ENVFROM(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	TO_DN_SOME(0.00)[]
 X-Spam-Flag: NO
 X-Spam-Level: 
 
 
---vnoy7vgw3d33hn4l
-Content-Type: text/plain; charset=us-ascii
+--lyawwf7xhbcycxaf
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 24, 2025 at 02:53:10PM +0100, Oleksij Rempel wrote:
-> Add a missing case to handle the MDI mode correctly when showing the
-> current MDI/MDI-X status. Without this, the code may show "Unknown" even
-> when the status is valid. This regression was introduced in commit
-> bd1341cd2146 ("add json support for base command").
+On Wed, Mar 05, 2025 at 11:46:41AM -0800, Mohsin Bashir wrote:
+> This patch adds support for parsing the register dump for fbnic.
 >=20
-> The logic assumed that `mdi_x =3D false` was already set at function start
-> and omitted the `case ETH_TP_MDI:` branch in the switch statement. Howeve=
-r,
-> without an explicit `break`, the code continued into the default case,
-> resulting in "Unknown" being printed even when the mode was valid.
+> The patch is composed of several register sections, and each of these
+> sections is dumped lineraly except for the RPC_RAM section which is handl=
+ed
+> differently.
 >=20
-> This patch adds a missing `case ETH_TP_MDI:` with an explicit `break` to
-> avoid falling into the default case. As a result, users will now correctly
-> see `MDI-X: off` instead of `Unknown` when the resolved state is MDI.
+> For each of the sections, we dump register name, its value, the bit mask
+> of any subfields within that register, the name of the subfield, and the
+> corresponding value.
 >=20
-> Fixes: bd1341cd2146 ("add json support for base command")
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> Furthermore, there may be unused blocks within a section; we skip such
+> blocks while dumping registers linearly.
+>=20
+> Validation:
+> - Validate patch applies to master without any warning
+> - Validate 'ethtool -d' for net-next branch generates ascii dump
+> 	$ uname -r
+> 	  6.14.0-0_fbk701_rc0_429_g8e5edf971d0
+> 	$ ./ethtool -d eth0 > /tmp/fbnic_ascii_dump
+>=20
+> Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
 > ---
->  common.c | 2 ++
->  1 file changed, 2 insertions(+)
->=20
-> diff --git a/common.c b/common.c
-> index 4fda4b49d2fd..1ba27e7577b4 100644
-> --- a/common.c
-> +++ b/common.c
-> @@ -171,6 +171,8 @@ void dump_mdix(u8 mdix, u8 mdix_ctrl)
->  		mdi_x_forced =3D true;
->  	} else {
->  		switch (mdix) {
-> +		case ETH_TP_MDI:
-> +			break;
->  		case ETH_TP_MDI_X:
->  			mdi_x =3D true;
->  			break;
-> --
-> 2.39.5
->=20
 
 Hello,
 
-I applied the same fix submitted earlier by Michal Schmidt as commit
-c4874fb88660 ("fix MDI-X showing as Unknown instead of "off (auto)"").
+the patch introduces warnings (see below) when compiled on i386
+(32-bit), can you check?
 
+Thank you,
 Michal
 
---vnoy7vgw3d33hn4l
+
+fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_intr_global=E2=80=99:
+fbnic.c:5679:16: error: comparison of integer expressions of different sign=
+edness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} and=
+ =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
+ 5679 |         if (nn !=3D regs_buff - section_start) {
+      |                ^~
+fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_intr_msix=E2=80=99:
+fbnic.c:5773:16: error: comparison of integer expressions of different sign=
+edness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} and=
+ =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
+ 5773 |         if (nn !=3D regs_buff - section_start) {
+      |                ^~
+fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_qm_tx_global=E2=80=99:
+fbnic.c:6255:16: error: comparison of integer expressions of different sign=
+edness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} and=
+ =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
+ 6255 |         if (nn !=3D regs_buff - section_start) {
+      |                ^~
+fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_qm_rx_global=E2=80=99:
+fbnic.c:6705:16: error: comparison of integer expressions of different sign=
+edness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} and=
+ =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
+ 6705 |         if (nn !=3D regs_buff - section_start) {
+      |                ^~
+fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_tce=E2=80=99:
+fbnic.c:7404:16: error: comparison of integer expressions of different sign=
+edness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} and=
+ =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
+ 7404 |         if (nn !=3D regs_buff - section_start) {
+      |                ^~
+fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_tce_ram=E2=80=99:
+fbnic.c:7535:16: error: comparison of integer expressions of different sign=
+edness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} and=
+ =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
+ 7535 |         if (nn !=3D regs_buff - section_start) {
+      |                ^~
+fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_tmi=E2=80=99:
+fbnic.c:7918:16: error: comparison of integer expressions of different sign=
+edness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} and=
+ =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
+ 7918 |         if (nn !=3D regs_buff - section_start) {
+      |                ^~
+fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_ptp=E2=80=99:
+fbnic.c:8087:16: error: comparison of integer expressions of different sign=
+edness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} and=
+ =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
+ 8087 |         if (nn !=3D regs_buff - section_start) {
+      |                ^~
+fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_rxb=E2=80=99:
+fbnic.c:9154:16: error: comparison of integer expressions of different sign=
+edness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} and=
+ =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
+ 9154 |         if (nn !=3D regs_buff - section_start) {
+      |                ^~
+fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_rpc=E2=80=99:
+fbnic.c:9942:16: error: comparison of integer expressions of different sign=
+edness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} and=
+ =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
+ 9942 |         if (nn !=3D regs_buff - section_start) {
+      |                ^~
+fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_rpc_ram=E2=80=99:
+fbnic.c:10176:16: error: comparison of integer expressions of different sig=
+nedness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} an=
+d =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
+10176 |         if (nn !=3D regs_buff - section_start) {
+      |                ^~
+fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_fab=E2=80=99:
+fbnic.c:10598:16: error: comparison of integer expressions of different sig=
+nedness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} an=
+d =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
+10598 |         if (nn !=3D regs_buff - section_start) {
+      |                ^~
+fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_master=E2=80=99:
+fbnic.c:11534:16: error: comparison of integer expressions of different sig=
+nedness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} an=
+d =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
+11534 |         if (nn !=3D regs_buff - section_start) {
+      |                ^~
+fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_mac_pcs=E2=80=99:
+fbnic.c:12251:16: error: comparison of integer expressions of different sig=
+nedness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} an=
+d =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
+12251 |         if (nn !=3D regs_buff - section_start) {
+      |                ^~
+fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_mac_rsfec=E2=80=99:
+fbnic.c:12619:16: error: comparison of integer expressions of different sig=
+nedness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} an=
+d =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
+12619 |         if (nn !=3D regs_buff - section_start) {
+      |                ^~
+fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_mac_mac=E2=80=99:
+fbnic.c:13495:16: error: comparison of integer expressions of different sig=
+nedness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} an=
+d =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
+13495 |         if (nn !=3D regs_buff - section_start) {
+      |                ^~
+fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_pcie_ss_comphy=E2=80=99:
+fbnic.c:21516:16: error: comparison of integer expressions of different sig=
+nedness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} an=
+d =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
+21516 |         if (nn !=3D regs_buff - section_start) {
+      |                ^~
+fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_sig=E2=80=99:
+fbnic.c:22359:16: error: comparison of integer expressions of different sig=
+nedness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} an=
+d =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
+22359 |         if (nn !=3D regs_buff - section_start) {
+      |                ^~
+fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_pul_user=E2=80=99:
+fbnic.c:24349:16: error: comparison of integer expressions of different sig=
+nedness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} an=
+d =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
+24349 |         if (nn !=3D regs_buff - section_start) {
+      |                ^~
+fbnic.c: In function =E2=80=98fbnic_dump_fb_nic_queue=E2=80=99:
+fbnic.c:25416:16: error: comparison of integer expressions of different sig=
+nedness: =E2=80=98uint32_t=E2=80=99 {aka =E2=80=98unsigned int=E2=80=99} an=
+d =E2=80=98int=E2=80=99 [-Werror=3Dsign-compare]
+25416 |         if (nn !=3D regs_buff - section_start) {
+      |                ^~
+fbnic.c: In function =E2=80=98fbnic_dump_regs=E2=80=99:
+fbnic.c:25495:46: error: comparison of integer expressions of different sig=
+nedness: =E2=80=98int=E2=80=99 and =E2=80=98__u32=E2=80=99 {aka =E2=80=98un=
+signed int=E2=80=99} [-Werror=3Dsign-compare]
+25495 |         if ((regs_buff - section_start) << 2 !=3D regs->len) {
+      |                                              ^~
+fbnic.c:25498:51: error: format =E2=80=98%lu=E2=80=99 expects argument of t=
+ype =E2=80=98long unsigned int=E2=80=99, but argument 3 has type =E2=80=98i=
+nt=E2=80=99 [-Werror=3Dformat=3D]
+25498 |                 fprintf(stderr, "dwords [bytes] %lu\n",
+      |                                                 ~~^
+      |                                                   |
+      |                                                   long unsigned int
+      |                                                 %u
+25499 |                         (regs_buff - section_start) << 2);
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                     |
+      |                                                     int
+
+--lyawwf7xhbcycxaf
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmfp2tIACgkQ538sG/LR
-dpXowwf/fhGajdbrGn5vheGHB+krDElnsmLTvu6DJSqM3ddglHRlWSAREIzKZirX
-Kn+JkCnKIFzUfMnpONSnr+WJ3niwFwCy769S9ITzb3dpu9fXlND9YIKP6JsicHl/
-azT0osNvFWtn0c6nL5w6Wj02NCLHSxoDYvt18w6K1hRysL4DtXxnSf47RhTIB2AU
-uqroCFjwvWbBhRy09uxq1I9Kr0zHDIlrGxMfqg4txVDq+hcLOr7Bqhqc+nX+yaoC
-xeOYiIkfMpKXaT/8a/vpbmH6B/hHUKHftMATWx9sXW3TmEpEhPutlN9hmVA55m+e
-y5dO08zNc7Ru4gCnmKfw0mHIysxKtQ==
-=g+Ra
+iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmfp3RkACgkQ538sG/LR
+dpVqTgf+JKiPtZ7KaKP+o5oUysEAlapjIGbLqFTWINBaD1yXIBWjJSiU8w6yOy6h
+jzUZRJTl/Cghllm01wQ+WWvISqHWylu7F3smt7omD9iY3x26F4DFiNg3oI8MQrmj
+kXr8iF5499fqavzPfkixvpZ38PY2L6W2PLuEQ1zZ0eBFKZvEPmqbVVCcXNeqD1GN
+HX7tXfvEWtMYdyMIZvRE735Wty9UZ9QMW3yC5FXvHlS+eLT0QSymV3Sun6J/5RkX
+to6eGj2PH+w7x+uwJvDQAJu1BYDS1UEQxwVbhnthSv100RQUiwHyShbnW4vKJKHn
+jbflWFDvD6bGU/u7Ou2SIIPonBsXMw==
+=qdlM
 -----END PGP SIGNATURE-----
 
---vnoy7vgw3d33hn4l--
+--lyawwf7xhbcycxaf--
 
