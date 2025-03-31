@@ -1,123 +1,92 @@
-Return-Path: <netdev+bounces-178306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9059DA767D5
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 16:28:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B1B9A767E0
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 16:30:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6AA01888A58
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 14:28:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0DEB3A5AA4
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 14:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F738213E8E;
-	Mon, 31 Mar 2025 14:28:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 412311E231F;
+	Mon, 31 Mar 2025 14:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mF7uknFw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA011D89FD;
-	Mon, 31 Mar 2025 14:28:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 775AD211A0D;
+	Mon, 31 Mar 2025 14:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743431300; cv=none; b=WUKT+eVQNdDPrmOvIiFr6qw035Tle+0fjHvM8dxPL7PPPtFktOwfRpcAUdd3Kd5aCKV1G3V1AVEycvQ/Oluq8jEx1CZME0yXakv3yOscd5/nWOoIqGogCIUK8lOjnq7vzViBWkvpkwByFganEGt8IF/llus2cAB7xvxwV2bGssw=
+	t=1743431415; cv=none; b=VJCaJlfb4oVDbT6mmiFHm5+T5u/vZhI5uJbAlwmrjEaaa0jVWp8l5gbsZrYtEdd4DMX+U03N7teQ9mPo4RBcLdFJx9pUZIazd3MsfEJZPJRiQau8v4UiSAEJJDZwNGjo9BpTv8UFKZnqQEfVbI5awp1QMOUDkYXzZwll1FOqe8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743431300; c=relaxed/simple;
-	bh=rdp+7SmbHx2MDpmjbmMeQvz1BzYF8QNfJzE3RtZF8Mk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u5TsueEadcY8UEeeE2aU0t4UZY+qLWCX9DTuetwt9886+PyBKCaqy/AzOcTQHgwFlq75UZFvzpO0t30VjvTSuZl7LX/16yKRZCpSAmKiK2eB1/KH2J9oWutVh/FkOLOo+DghsBugtvG03KtvZTAzh24BA+HVGgkuCU2DS3nQ8Ag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2260c91576aso71868365ad.3;
-        Mon, 31 Mar 2025 07:28:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743431296; x=1744036096;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7pIThaHs+FLtjAGsieixrT5JLF7IdEj6iYw9YHCNduo=;
-        b=CO/TjkTDyQVq5kFuIccHZ9HrcgrI8OpJi3cFRh7nfTL7x4FIoQ+SrWwXT0ar1cVS0h
-         nsTFZgYsw/955yMEVSVjH07UiP4oudeS/YyOZJnsnoSg1vpIrb9U7eq0CnFf4mmP6TSN
-         qEnsqk+vpOQ+U2uLzA3/LdRITFjY1IzbkKavWya167hij/jhPdp4tnsYVmcpF4siGwP5
-         cuaYqIHmAHMElOwDqYz8X74k/R13PlX/6sW+9zFj7K+j5VF6puqv68TUTY3ZOxIu5hKb
-         Zi/9V25PuWdYNDh7rNywboOFay3qRa38gzNACNdqauKGgqcFnUypyrp8Sw0esptmlhh+
-         Vwvg==
-X-Forwarded-Encrypted: i=1; AJvYcCUSBSNoCK7b8GGx5tcFpFLwOIl7S2NdapkdfG8B9zQdiOOPNHPNhdlKq0a8vxGO2QebyWRnh0WB@vger.kernel.org, AJvYcCWNzq38rLtseWkS58E6Sh/FOmvMzidK0ggpiJJs6D7+APpsbECUh+mvEQicGBF8Bm/AQuMHLicVgz2JVGM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+4DN/Uo5LEZSCHjM/RQFWVZSjtsc39gparl5qUE48kdjxAeRA
-	gUAS/9RRrmK/+viSKvHHl1Au0MIk18+xFBsTA7oGd2u0R6CqfRZ1xM26
-X-Gm-Gg: ASbGnctk+lgi7TH7q72J4jVPO90Hq5i1nCNWwxCsV9Tztlo7kHrGz9rShzdChb1G8yo
-	kNI1S47QAfZs7qmmbmDHD5hn9lbGeTvbSeI/ERqVYdx1GWOOvYPZmponCGWLqE1/llwjeFO3u8X
-	a/15aNCSUQDtH/X7rS8oNgDwPlXFhQG0cgJdTZYdKHiZ35+/CBLyVSbYTb0VkiFpOD2N1bb+/BZ
-	6vPhcKzZTSCb5K2Sr9DuvYTzdY12abQNUcvmVsAiql+Q6F///4I/50H/Ic32xr4DitvpYvdH9gu
-	qj4RCvViXGSkEydI78yZYo4NvUv1Nnb0X1PsXlfGhmhj
-X-Google-Smtp-Source: AGHT+IEwykwTGdoKzzKD5abl3GEKIsWHwwiPxmvoLbNPIptX+CQYaKwHTKORDO7eWuymmETq2FYuHA==
-X-Received: by 2002:a17:902:f54a:b0:216:53fa:634f with SMTP id d9443c01a7336-2292f9ef20emr146929925ad.48.1743431296207;
-        Mon, 31 Mar 2025 07:28:16 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2291eee377esm69891775ad.97.2025.03.31.07.28.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Mar 2025 07:28:15 -0700 (PDT)
-From: Stanislav Fomichev <sdf@fomichev.me>
-To: bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	song@kernel.org,
-	yhs@fb.com,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	linux-kernel@vger.kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	hawk@kernel.org,
-	sdf@fomichev.me,
-	syzbot+08936936fe8132f91f1a@syzkaller.appspotmail.com
-Subject: [PATCH bpf] bpf: add missing ops lock around dev_xdp_attach_link
-Date: Mon, 31 Mar 2025 07:28:14 -0700
-Message-ID: <20250331142814.1887506-1-sdf@fomichev.me>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1743431415; c=relaxed/simple;
+	bh=D29w7RaQcGFnVgpKwS2JqLdCApkCYd4nC1z1uMeWXeM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mzrh5xcjB7BAuNHsXOtLMEsKHZBax/fxSg8IX7lCMO17/eUPjjCL434KAPOriVnd1CbAvOUYg1WVPYHnzMy7OdZQO2OaS5AKuoh4juEE2wwtwuvLZW1ryaEjVySG/1At+dHHN/fojHMpJke3jQYcn2Lc3/t3/TiW9bfVDYBmZEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mF7uknFw; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=VFIvp5VniFRkYy5hkXsYY1LBxwev4K/a9oaC6jauFow=; b=mF7uknFwslSgNDplU7qtD4tjzz
+	4ZbCxwXsInxKsRRYh3jjHFhaBRmV8rLkSexH5I6S3f4gNUGNcK7yzKVZZdp4KkV/szFUQzQohce//
+	0A4vbN0w1lpDuN4OaFcahrXq4z+XcbRRcrYckhusHpTBDexqA/RabOa97nrElIz6Jdrc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tzG9H-007aKX-Kb; Mon, 31 Mar 2025 16:29:59 +0200
+Date: Mon, 31 Mar 2025 16:29:59 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+Cc: Jacek Kowalski <jacek@jacekk.info>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [Intel-wired-lan] [PATCH] e1000e: add option not to verify NVM
+ checksum
+Message-ID: <978d1158-c419-4a59-b0dd-ad5be9869991@lunn.ch>
+References: <c0435964-44ad-4b03-b246-6db909e419df@jacekk.info>
+ <9ad46cc5-0d49-8f51-52ff-05eb7691ef61@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9ad46cc5-0d49-8f51-52ff-05eb7691ef61@intel.com>
 
-Syzkaller points out that create_link path doesn't grab ops lock,
-add it.
+> From a technical perspective, your patch looks correct. However, if the
+> checksum validation is skipped, there is no way to distinguish between the
+> simple checksum error described above, and actual NVM corruption, which may
+> result in loss of functionality and undefined behavior. This means, that if
+> there is any functional issue with the network adapter on a given system,
+> while checksum validation was suspended by the user, we will not be able to
+> offer support
 
-Cc: Jakub Kicinski <kuba@kernel.org>
-Reported-by: syzbot+08936936fe8132f91f1a@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/bpf/67e6b3e8.050a0220.2f068f.0079.GAE@google.com/
-Fixes: 97246d6d21c2 ("net: hold netdev instance lock during ndo_bpf")
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
----
- net/core/dev.c | 2 ++
- 1 file changed, 2 insertions(+)
+We have a similar issue with SFP, which contain a checksum. But a few
+vendors are lazy, they set a serial number and don't recalculate the
+checksum.
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index be17e0660144..5d20ff226d5e 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -10284,7 +10284,9 @@ int bpf_xdp_link_attach(const union bpf_attr *attr, struct bpf_prog *prog)
- 		goto unlock;
- 	}
- 
-+	netdev_lock_ops(dev);
- 	err = dev_xdp_attach_link(dev, &extack, link);
-+	netdev_unlock_ops(dev);
- 	rtnl_unlock();
- 
- 	if (err) {
--- 
-2.48.1
+We handle this by adding quirks. We know which vendors/products have
+FUBAR checksums, and allow them to be used when the checksum is
+FUBAR. You could do something similar here, add a list of vendors with
+known FUBAR checksums and allow them to be used, but taint the kernel,
+and print a warming that the device is unsupported because the vendor
+messed up the CRC.
 
+	Andrew
 
