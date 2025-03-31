@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-178337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87E3CA76A7C
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 17:32:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8C94A76AE2
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 17:42:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C18BD7A177D
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 15:31:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C32753A44EC
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 15:32:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27F042135DE;
-	Mon, 31 Mar 2025 15:06:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7710321C171;
+	Mon, 31 Mar 2025 15:06:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7180DEEAA
-	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 15:06:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C497A21C16D
+	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 15:06:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743433569; cv=none; b=XQRs1f9pjj/e/ebgHFWOEDvM3cMiI+8LqEvVtLgs3U20ghbyQfTWkkxcOIGGde3wCk2xMZ3l4GZnc89Mzp2mZfhgxOqWBKiKhSGafZIkfoK965a/8km6Eqmz4n2U9xXwiZMbyoKLQKn2jsFS2EciA0Wj5j/+fpg7Jpaxh7Izrc4=
+	t=1743433571; cv=none; b=JtTj7EAIOQ6qqeis/Xike1cLCycWjyDXfqtVzLJibpIHsfieISdDxeFGGaTuQlGGEn5KFMxDm47iQxy9cLWju+oMypjeqNhUOq4vYvNxqZKZmpjL8Uy2uLmHZNd6tRbSa5MuTrUsj/mTdPCTOzQwpNR4t4bf0InxuhjhI7vc2SU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743433569; c=relaxed/simple;
-	bh=KHncWnuf/Sc/VwW6z7GPX+D2Xs845t7ZdWeh9oaEAaE=;
+	s=arc-20240116; t=1743433571; c=relaxed/simple;
+	bh=Y0zSK5Mfb9dAIBmguwkV8PCJ1TB5QJ7L71JV9vpNrIM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=khmifZ7Jbv/9ISul2E9UZORD1gE0cq3aXlDjqN+wG0dRQNBQNnSWt9gSO4e6lPvu1QPPEazVgFAeiSV3/SHlOT+lucR8Qt3afi+51LeveRn3GBNPxdWyA43ZzBBNwt7RqRpOtLBz7jaReK6V9RSRYAqjzEK1UKMjPeXH2KBwyCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.177
+	 MIME-Version; b=TV7e7Syqq+/9vwhEoMD5a94pp0f457IKmkvI0qNdk2VQEGQzUlN5XdTyeCD2WxwrdfQp/W+4Q4xswUgI/zkxQjs1/1EH1WziNeteA1Tvmc2tNV1IGGfe9FRQtEmqtg40Y7aXX1JMNPoP38vKJEIqX7gRP3iHWLCAPCXutGYnElg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-224100e9a5cso83289965ad.2
-        for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 08:06:07 -0700 (PDT)
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-3031354f134so5918691a91.3
+        for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 08:06:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743433566; x=1744038366;
+        d=1e100.net; s=20230601; t=1743433568; x=1744038368;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JWONSdK5Y4BghzZ5YDsp0NyBVnhcNSi2+zcc7IvC1V4=;
-        b=R9ggGtaD071pZ+p+ghy87K9wkq6hAcJoNc+iD6OiIAj0HpxTniPzGM3r6jBAmKZ/h6
-         B/uX+POykAirKe72hBT2NIN/2sV95l3l2ZQDMxeGtHVZ6TJGRcd/nmdZ8wFVrcFJFHhm
-         e6PBRL0aelDkUB8P/3F2V3cfuL2LEpBV5yCzSKReQTKbSuakRdTlTdAOeEwWKaA8j80h
-         3rCm1UOX/9nVtaS4oDlXAyPB7bH5ZBH5I41qGDS5YJRsr0xSbWnKMmczLQ5iZ71c96c3
-         OWOoMBeIZEIq/jvxNoJXVi6kIFw20vxIR/TrTqcLZr0g5cmX639QNntQmUoHB0j9epAp
-         ZCog==
-X-Gm-Message-State: AOJu0YyimWftXmRJPjxsX+uyinfl9zmWpfybRSbjEm70hiqwOsdW2iao
-	334QhUoZUfr1D/4ikA6c1HNFGxFuOueH04sUfg+6gUTc1Vn9wgtRdAQr
-X-Gm-Gg: ASbGncsngCJaE02xEvmNM5CmtR8kuB0HOcQpCgbRQGKUVfR1Wd+iniOGPb4EXCt0PFO
-	yqZwjK9LzFOW7sQspS8H1p/AOK11ZjehRI0m2KWjIKJnSnAKrOZHvjYgxjs3ElawMLZrlK2JEuW
-	ssu0jl2qbQWY8vc7oRmsS5EyLqc7RfAYl5b3KPY99JUMVmpvzzlfBmMpBU9FQI8TqltJbzsuRq0
-	FybMfmAFkPv+G1cpmVnIJAF1En8UwQcO9CW8GQQPpqDQfOltzUOoSQbLqdRDSE9qCkX3IGQnZH3
-	+lO61OocYMopFthmA1Wn/RKZgy00RoE4cenEHAMr7w+PmOc0pDWrV5g=
-X-Google-Smtp-Source: AGHT+IECqaIy3GvJqVSIFeMjBGMYvADi/OIpXl32SGw8HOk8LLHxmYyqJbYb9wlMJnC2nKhnxUzFOQ==
-X-Received: by 2002:a17:903:32d1:b0:220:e63c:5aff with SMTP id d9443c01a7336-2292fa0154cmr140903695ad.47.1743433566376;
-        Mon, 31 Mar 2025 08:06:06 -0700 (PDT)
+        bh=dH1tGqHtaJIkSU1XT0iRYgg9/cYsUvwhQOGJy6XN8+I=;
+        b=ZdVqNqhCo5ay/JGnSKIjoVcYEWBi1yyPNkJvUqBDG995HeQPi2I6VPIjdR4RGqrH4k
+         Eq3Hr4+x26YClJd27/gzep6TmYS1qOG7W+YuCs3CDoixw8ZJ7895Vn0ucRz0cMQeEw2m
+         DIDPtH03Z86z1BvaCU2fpWd28nw+nW+8qp1i8/Q7LzHMT09+rOYy9L+9rOzHz5N77InO
+         olW3ClWbVf/w7Z7PfW0TN+mbZY3U7Z+YY+VmSPmraWVL8FwzOwbVnVE4Q36tWklTW1Hd
+         rW+mlNA8ib4YTcnsOrifrsxjbyBOIOXcCfMEgJDVpFGfOHv4awAqGjlZqQ+twxLGMFsu
+         pdyA==
+X-Gm-Message-State: AOJu0Yzcn+VqlktwScCowT0wOk1VWS50Ur0IEVkxWk/voAzEtYSFOTKa
+	DJ4HKoWUflb4kgvWekqDDCdBIJ0T8kuieiRfM2SZoTXCdRZwsCbqBQU0
+X-Gm-Gg: ASbGncuuDU9rayK1hHTCI9t6/hRKQ7fP6isvzoiOHL0Xnafq6zdRLYbg7basSWzc5Lv
+	vynyYglF6wANINVH7MJmjR6NGEg5GPE5sBvvvZ1K6tUrjixkaGqvVFFDX0gErLBieHYke+WiNIM
+	u1UbPmOV++11xqEeHo6wHy7neJqvz94I9qm239244F2ZgYbbgQHwNDpkF2hswD2kZqmiQY080s8
+	Fi73ftFIl7puL1S+UCVVPiB55WxJPpSbEpvNL0j216aydsnhQ1RigCSbyH0e16NF0rhqUIM6FU+
+	q14veo0d8X+IqCWT9rNSWv6RrZBBRye/TIcpQVLrJ0It
+X-Google-Smtp-Source: AGHT+IHABNHL3tzX7Oz1lJpYefmo8KItnnenATa3QhIeTyO9hTCDy1TpAqRLOLSRfT2422XOH2C9zw==
+X-Received: by 2002:a17:90b:3c8e:b0:2f8:b2c:5ef3 with SMTP id 98e67ed59e1d1-30531fa5f90mr17337718a91.14.1743433567725;
+        Mon, 31 Mar 2025 08:06:07 -0700 (PDT)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2291eeca2cbsm70395875ad.52.2025.03.31.08.06.05
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-3039e10af2csm9726009a91.21.2025.03.31.08.06.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Mar 2025 08:06:05 -0700 (PDT)
+        Mon, 31 Mar 2025 08:06:07 -0700 (PDT)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -64,9 +64,9 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	Cosmin Ratiu <cratiu@nvidia.com>
-Subject: [PATCH net v4 01/11] net: switch to netif_disable_lro in inetdev_init
-Date: Mon, 31 Mar 2025 08:05:53 -0700
-Message-ID: <20250331150603.1906635-2-sdf@fomichev.me>
+Subject: [PATCH net v4 02/11] net: hold instance lock during NETDEV_REGISTER/UP
+Date: Mon, 31 Mar 2025 08:05:54 -0700
+Message-ID: <20250331150603.1906635-3-sdf@fomichev.me>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250331150603.1906635-1-sdf@fomichev.me>
 References: <20250331150603.1906635-1-sdf@fomichev.me>
@@ -78,99 +78,169 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Cosmin reports the following deadlock:
-dump_stack_lvl+0x62/0x90
-print_deadlock_bug+0x274/0x3b0
-__lock_acquire+0x1229/0x2470
-lock_acquire+0xb7/0x2b0
-__mutex_lock+0xa6/0xd20
-dev_disable_lro+0x20/0x80
+Callers of inetdev_init can come from several places with inconsistent
+expectation about netdev instance lock. Grab instance lock during
+REGISTER (plus UP). Also solve the inconsistency with UNREGISTER
+where it was locked only during move netns path.
+
+WARNING: CPU: 10 PID: 1479 at ./include/net/netdev_lock.h:54
+__netdev_update_features+0x65f/0xca0
+__warn+0x81/0x180
+__netdev_update_features+0x65f/0xca0
+report_bug+0x156/0x180
+handle_bug+0x4f/0x90
+exc_invalid_op+0x13/0x60
+asm_exc_invalid_op+0x16/0x20
+__netdev_update_features+0x65f/0xca0
+netif_disable_lro+0x30/0x1d0
 inetdev_init+0x12f/0x1f0
 inetdev_event+0x48b/0x870
 notifier_call_chain+0x38/0xf0
-netif_change_net_namespace+0x72e/0x9f0
-do_setlink.isra.0+0xd5/0x1220
-rtnl_newlink+0x7ea/0xb50
-rtnetlink_rcv_msg+0x459/0x5e0
-netlink_rcv_skb+0x54/0x100
-netlink_unicast+0x193/0x270
-netlink_sendmsg+0x204/0x450
+register_netdevice+0x741/0x8b0
+register_netdev+0x1f/0x40
+mlx5e_probe+0x4e3/0x8e0 [mlx5_core]
+auxiliary_bus_probe+0x3f/0x90
+really_probe+0xc3/0x3a0
+__driver_probe_device+0x80/0x150
+driver_probe_device+0x1f/0x90
+__device_attach_driver+0x7d/0x100
+bus_for_each_drv+0x80/0xd0
+__device_attach+0xb4/0x1c0
+bus_probe_device+0x91/0xa0
+device_add+0x657/0x870
 
-Switch to netif_disable_lro which assumes the caller holds the instance
-lock. inetdev_init is called for blackhole device (which sw device and
-doesn't grab instance lock) and from REGISTER/UNREGISTER notifiers.
-We already hold the instance lock for REGISTER notifier during
-netns change and we'll soon hold the lock during other paths.
-
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 Reported-by: Cosmin Ratiu <cratiu@nvidia.com>
 Fixes: ad7c7b2172c3 ("net: hold netdev instance lock during sysfs operations")
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- include/net/ip.h   | 16 ++++++++--------
- net/core/dev.c     |  1 +
- net/ipv4/devinet.c |  2 +-
- 3 files changed, 10 insertions(+), 9 deletions(-)
+ include/linux/netdevice.h |  2 +-
+ net/core/dev.c            | 12 +++++++++---
+ net/core/dev_api.c        |  4 +---
+ net/core/rtnetlink.c      | 10 +++++-----
+ 4 files changed, 16 insertions(+), 12 deletions(-)
 
-diff --git a/include/net/ip.h b/include/net/ip.h
-index 8a48ade24620..47ed6d23853d 100644
---- a/include/net/ip.h
-+++ b/include/net/ip.h
-@@ -667,14 +667,6 @@ static inline void ip_ipgre_mc_map(__be32 naddr, const unsigned char *broadcast,
- 		memcpy(buf, &naddr, sizeof(naddr));
- }
- 
--#if IS_MODULE(CONFIG_IPV6)
--#define EXPORT_IPV6_MOD(X) EXPORT_SYMBOL(X)
--#define EXPORT_IPV6_MOD_GPL(X) EXPORT_SYMBOL_GPL(X)
--#else
--#define EXPORT_IPV6_MOD(X)
--#define EXPORT_IPV6_MOD_GPL(X)
--#endif
--
- #if IS_ENABLED(CONFIG_IPV6)
- #include <linux/ipv6.h>
- #endif
-@@ -694,6 +686,14 @@ static __inline__ void inet_reset_saddr(struct sock *sk)
- 
- #endif
- 
-+#if IS_MODULE(CONFIG_IPV6)
-+#define EXPORT_IPV6_MOD(X) EXPORT_SYMBOL(X)
-+#define EXPORT_IPV6_MOD_GPL(X) EXPORT_SYMBOL_GPL(X)
-+#else
-+#define EXPORT_IPV6_MOD(X)
-+#define EXPORT_IPV6_MOD_GPL(X)
-+#endif
-+
- static inline unsigned int ipv4_addr_hash(__be32 ip)
- {
- 	return (__force unsigned int) ip;
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index fa79145518d1..cf3b6445817b 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -4192,7 +4192,7 @@ int dev_change_flags(struct net_device *dev, unsigned int flags,
+ int netif_set_alias(struct net_device *dev, const char *alias, size_t len);
+ int dev_set_alias(struct net_device *, const char *, size_t);
+ int dev_get_alias(const struct net_device *, char *, size_t);
+-int netif_change_net_namespace(struct net_device *dev, struct net *net,
++int __dev_change_net_namespace(struct net_device *dev, struct net *net,
+ 			       const char *pat, int new_ifindex,
+ 			       struct netlink_ext_ack *extack);
+ int dev_change_net_namespace(struct net_device *dev, struct net *net,
 diff --git a/net/core/dev.c b/net/core/dev.c
-index be17e0660144..711a946d4bfb 100644
+index 711a946d4bfb..e59eb173900d 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -1771,6 +1771,7 @@ void netif_disable_lro(struct net_device *dev)
- 		netdev_unlock_ops(lower_dev);
- 	}
- }
-+EXPORT_IPV6_MOD(netif_disable_lro);
+@@ -1859,7 +1859,9 @@ static int call_netdevice_register_net_notifiers(struct notifier_block *nb,
+ 	int err;
  
- /**
-  *	dev_disable_gro_hw - disable HW Generic Receive Offload on a device
-diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-index 754f60fb6e25..77e5705ac799 100644
---- a/net/ipv4/devinet.c
-+++ b/net/ipv4/devinet.c
-@@ -281,7 +281,7 @@ static struct in_device *inetdev_init(struct net_device *dev)
- 	if (!in_dev->arp_parms)
- 		goto out_kfree;
- 	if (IPV4_DEVCONF(in_dev->cnf, FORWARDING))
--		dev_disable_lro(dev);
-+		netif_disable_lro(dev);
- 	/* Reference in_dev->dev */
- 	netdev_hold(dev, &in_dev->dev_tracker, GFP_KERNEL);
- 	/* Account for reference dev->ip_ptr (below) */
+ 	for_each_netdev(net, dev) {
++		netdev_lock_ops(dev);
+ 		err = call_netdevice_register_notifiers(nb, dev);
++		netdev_unlock_ops(dev);
+ 		if (err)
+ 			goto rollback;
+ 	}
+@@ -11046,7 +11048,9 @@ int register_netdevice(struct net_device *dev)
+ 		memcpy(dev->perm_addr, dev->dev_addr, dev->addr_len);
+ 
+ 	/* Notify protocols, that a new device appeared. */
++	netdev_lock_ops(dev);
+ 	ret = call_netdevice_notifiers(NETDEV_REGISTER, dev);
++	netdev_unlock_ops(dev);
+ 	ret = notifier_to_errno(ret);
+ 	if (ret) {
+ 		/* Expect explicit free_netdev() on failure */
+@@ -12058,7 +12062,7 @@ void unregister_netdev(struct net_device *dev)
+ }
+ EXPORT_SYMBOL(unregister_netdev);
+ 
+-int netif_change_net_namespace(struct net_device *dev, struct net *net,
++int __dev_change_net_namespace(struct net_device *dev, struct net *net,
+ 			       const char *pat, int new_ifindex,
+ 			       struct netlink_ext_ack *extack)
+ {
+@@ -12143,11 +12147,12 @@ int netif_change_net_namespace(struct net_device *dev, struct net *net,
+ 	 * And now a mini version of register_netdevice unregister_netdevice.
+ 	 */
+ 
++	netdev_lock_ops(dev);
+ 	/* If device is running close it first. */
+ 	netif_close(dev);
+-
+ 	/* And unlink it from device chain */
+ 	unlist_netdevice(dev);
++	netdev_unlock_ops(dev);
+ 
+ 	synchronize_net();
+ 
+@@ -12209,11 +12214,12 @@ int netif_change_net_namespace(struct net_device *dev, struct net *net,
+ 	err = netdev_change_owner(dev, net_old, net);
+ 	WARN_ON(err);
+ 
++	netdev_lock_ops(dev);
+ 	/* Add the device back in the hashes */
+ 	list_netdevice(dev);
+-
+ 	/* Notify protocols, that a new device appeared. */
+ 	call_netdevice_notifiers(NETDEV_REGISTER, dev);
++	netdev_unlock_ops(dev);
+ 
+ 	/*
+ 	 *	Prevent userspace races by waiting until the network
+diff --git a/net/core/dev_api.c b/net/core/dev_api.c
+index 8dbc60612100..cb3e5807dce8 100644
+--- a/net/core/dev_api.c
++++ b/net/core/dev_api.c
+@@ -119,9 +119,7 @@ int dev_change_net_namespace(struct net_device *dev, struct net *net,
+ {
+ 	int ret;
+ 
+-	netdev_lock_ops(dev);
+-	ret = netif_change_net_namespace(dev, net, pat, 0, NULL);
+-	netdev_unlock_ops(dev);
++	ret = __dev_change_net_namespace(dev, net, pat, 0, NULL);
+ 
+ 	return ret;
+ }
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index 334db17be37d..f49665851172 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -3025,8 +3025,6 @@ static int do_setlink(const struct sk_buff *skb, struct net_device *dev,
+ 	char ifname[IFNAMSIZ];
+ 	int err;
+ 
+-	netdev_lock_ops(dev);
+-
+ 	err = validate_linkmsg(dev, tb, extack);
+ 	if (err < 0)
+ 		goto errout;
+@@ -3042,14 +3040,16 @@ static int do_setlink(const struct sk_buff *skb, struct net_device *dev,
+ 
+ 		new_ifindex = nla_get_s32_default(tb[IFLA_NEW_IFINDEX], 0);
+ 
+-		err = netif_change_net_namespace(dev, tgt_net, pat,
+-						 new_ifindex, extack);
++		err = __dev_change_net_namespace(dev, tgt_net, pat, new_ifindex,
++						 extack);
+ 		if (err)
+-			goto errout;
++			return err;
+ 
+ 		status |= DO_SETLINK_MODIFIED;
+ 	}
+ 
++	netdev_lock_ops(dev);
++
+ 	if (tb[IFLA_MAP]) {
+ 		struct rtnl_link_ifmap *u_map;
+ 		struct ifmap k_map;
 -- 
 2.48.1
 
