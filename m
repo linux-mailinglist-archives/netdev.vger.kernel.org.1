@@ -1,113 +1,96 @@
-Return-Path: <netdev+bounces-178299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C238A76709
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 15:43:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AA51AA7671F
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 15:51:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 774421885B06
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 13:44:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1FF41889843
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 13:51:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 978291DF979;
-	Mon, 31 Mar 2025 13:43:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC941212FAB;
+	Mon, 31 Mar 2025 13:51:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WiFvSyC7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bp6BdQ72"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F013134BD;
-	Mon, 31 Mar 2025 13:43:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A8F20296C
+	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 13:51:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743428629; cv=none; b=ckYK0WsEo1ThsjiPIbb1HHSnURrmg0ebXLU5KZ98Ejqa+5zc9U9HHlEMs9pdZS5Jv3cSsgbe8acIPxcHKOPkzfTpc0uoyJ9ggwClMzjOkTCC7QK5M066IyAJwdBTj4fhG4FRl1dpr/W6X2ky8dFyOZDFDD+SHHEm0vONYbeCS8I=
+	t=1743429070; cv=none; b=BdId8HExGE7lC3O5WxqbUNDpJpZFKJv0E58sd8HeKYVWAeXrJfOUGapTv3U8s0EGFAlGuyBTliHyDn+XQjgocUHd+Xe9Ss8gazwXaGMT2Y0DGiDVvq9YTrvnme0Z7auyn1Iqo37hSXW59OA88XWTt6+eTHh2wLrGVG6DXbZWP/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743428629; c=relaxed/simple;
-	bh=4S39YPDrlfGm97HS44JGSQIy0HSb6Kvb16xeeAj45VA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ralSaEepGRV1mne+L8B/OBTTj6QM7J2pOfxFiTVjB28XmKQSR+osFK1r4oRjg5RIA9B0Th5IPpalKsxozJYqfpDZoZZS9iELkFEOSync2WamflHjlhcceiPYCTng1e0xGJ/IYTRoa1zN1FC3eplIDv7JUIXTH5Fegb67Yip19Ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WiFvSyC7; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=zAr+PsQ5oZEISZvL8CyPCWlvx2E0ZRGXrPFMppbVz7U=; b=WiFvSyC7/ScDVRJ6zoDc9cDal6
-	136PUf+tWUGT11nU5oDrivLxmYukJvwijogZoCf3NhGt3fAhMVripY33CcaZvnqjBwx3a2DaljT+g
-	WcXPwFOc9lISrR9zSDSeyIHKBt1LATOY+Kp3ddT1BK6epTdRrinN4EWCtyPvK+W8SudY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tzFQE-007a4C-Ux; Mon, 31 Mar 2025 15:43:26 +0200
-Date: Mon, 31 Mar 2025 15:43:26 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Hewitt <christianshewitt@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Kevin Hilman <khilman@baylibre.com>,
-	Jerome Brunet <jbrunet@baylibre.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, Da Xue <da@libre.computer>
-Subject: Re: [PATCH v2] net: mdio: mux-meson-gxl: set 28th bit in eth_reg2
-Message-ID: <17cfc9e2-5920-42e9-b934-036351c5d8d2@lunn.ch>
-References: <20250331074420.3443748-1-christianshewitt@gmail.com>
+	s=arc-20240116; t=1743429070; c=relaxed/simple;
+	bh=Hn5ZgpWUfjORcCaaECTI4BDLLOY17ziXbas+GSCOQak=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=guF2FWygKI2M1v67Mx1mOr/iSAdjzfSIZTbS/kgdVEh30ANpYOMAl9TMTh57bHKjPCz6dq/Fp8sErLogsBBFQwK0MbEvtXC7QRO0B0l4yeNDtdztahd0cj078Y9G1/RZdOrTDpbGLVB7hILaejxLJcd8wW5AM6ziozoIDv9+1mE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bp6BdQ72; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B582FC4CEE4;
+	Mon, 31 Mar 2025 13:51:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743429070;
+	bh=Hn5ZgpWUfjORcCaaECTI4BDLLOY17ziXbas+GSCOQak=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Bp6BdQ72ETAZ8FegulUP/r9lsYuObL/jrj+RxrQ8JtZ4R6cBST3AY4jBXAfvl09i8
+	 +PBdGZ2L3w8Rlw9fqmlY9JqKDiBD7fIgHScR6Habp9OAvQsMdquqpful5wu9L62X+S
+	 4pBPjdg445+aa9fjnUAco2IydqcngEN0AE1s6WJ8EFDI1KE606PTjHyZY/iJMDneln
+	 SX8jWDc+BP5amhc18JytP+b/I9Ypu+QViQZp8PfDJ5ilROZtcXLjquZutK8FT3AOmc
+	 5kUoFWkGeTQBl3a9axpyifFz7XAepDbdFGQTsxrnF995O9OSuz3MFnXdPuR+5U9Dd2
+	 3455DHX22MM3g==
+Date: Mon, 31 Mar 2025 06:51:09 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ <netdev@vger.kernel.org>
+Subject: Re: [PATCH v4 net 0/3] udp: Fix two integer overflows when
+ sk->sk_rcvbuf is close to INT_MAX.
+Message-ID: <20250331065109.45dddd0d@kernel.org>
+In-Reply-To: <20250329180541.34968-1-kuniyu@amazon.com>
+References: <20250329180541.34968-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250331074420.3443748-1-christianshewitt@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 31, 2025 at 07:44:20AM +0000, Christian Hewitt wrote:
-> From: Da Xue <da@libre.computer>
-> 
-> This bit is necessary to enable packets on the interface. Without this
-> bit set, ethernet behaves as if it is working, but no activity occurs.
-> 
-> The vendor SDK sets this bit along with the PHY_ID bits. U-boot also
-> sets this bit, but if u-boot is not compiled with networking support
-> the interface will not work.
-> 
-> Fixes: 9a24e1ff4326 ("net: mdio: add amlogic gxl mdio mux support");
-> Signed-off-by: Da Xue <da@libre.computer>
-> Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
-> ---
-> Resending on behalf of Da Xue who has email sending issues.
-> Changes since v1 [0]:
-> - Remove blank line between Fixes and SoB tags
-> - Submit without mail server mangling the patch
-> - Minor tweaks to subject line and commit message
-> - CC to stable@vger.kernel.org
-> 
-> [0] https://patchwork.kernel.org/project/linux-amlogic/patch/CACqvRUbx-KsrMwCHYQS6eGXBohynD8Q1CQx=8=9VhqZi13BCQQ@mail.gmail.com/
-> 
->  drivers/net/mdio/mdio-mux-meson-gxl.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/mdio/mdio-mux-meson-gxl.c b/drivers/net/mdio/mdio-mux-meson-gxl.c
-> index 00c66240136b..fc5883387718 100644
-> --- a/drivers/net/mdio/mdio-mux-meson-gxl.c
-> +++ b/drivers/net/mdio/mdio-mux-meson-gxl.c
-> @@ -17,6 +17,7 @@
->  #define  REG2_LEDACT		GENMASK(23, 22)
->  #define  REG2_LEDLINK		GENMASK(25, 24)
->  #define  REG2_DIV4SEL		BIT(27)
-> +#define  REG2_RESERVED_28	BIT(28)
+On Sat, 29 Mar 2025 11:05:10 -0700 Kuniyuki Iwashima wrote:
+> v4:
+>   * Patch 4
+>     * Wait RCU for at most 30 sec
 
-It must have some meaning, it cannot be reserved. So lets try to find
-a better name.
+The new test still doesn't pass
 
-	Andrew
+TAP version 13
+1..1
+# timeout set to 3600
+# selftests: net: so_rcvbuf
+# 0.00 [+0.00] TAP version 13
+# 0.00 [+0.00] 1..2
+# 0.00 [+0.00] # Starting 2 tests from 2 test cases.
+# 0.00 [+0.00] #  RUN           so_rcvbuf.udp_ipv4.rmem_max ...
+# 0.00 [+0.00] # so_rcvbuf.c:151:rmem_max:Expected pages (35) == 0 (0)
+# 0.00 [+0.00] # rmem_max: Test terminated by assertion
+# 0.00 [+0.00] #          FAIL  so_rcvbuf.udp_ipv4.rmem_max
+# 0.00 [+0.00] not ok 1 so_rcvbuf.udp_ipv4.rmem_max
+# 0.01 [+0.00] #  RUN           so_rcvbuf.udp_ipv6.rmem_max ...
+# 0.01 [+0.00] # so_rcvbuf.c:151:rmem_max:Expected pages (35) == 0 (0)
+# 0.01 [+0.00] # rmem_max: Test terminated by assertion
+# 0.01 [+0.00] #          FAIL  so_rcvbuf.udp_ipv6.rmem_max
+# 0.01 [+0.00] not ok 2 so_rcvbuf.udp_ipv6.rmem_max
+# 0.01 [+0.00] # FAILED: 0 / 2 tests passed.
+# 0.01 [+0.00] # Totals: pass:0 fail:2 xfail:0 xpass:0 skip:0 error:0
+not ok 1 selftests: net: so_rcvbuf # exit=1
+
+
+Plus we also see failures in udpgso.sh
 
