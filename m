@@ -1,107 +1,124 @@
-Return-Path: <netdev+bounces-178381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADD8CA76CC7
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 20:14:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B666A76CD9
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 20:22:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50FE118881B4
-	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 18:14:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C95741654FB
+	for <lists+netdev@lfdr.de>; Mon, 31 Mar 2025 18:22:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C2CB215073;
-	Mon, 31 Mar 2025 18:14:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD7F4189528;
+	Mon, 31 Mar 2025 18:22:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ls2OIPgX"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="McjMFnPH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD92379C0;
-	Mon, 31 Mar 2025 18:14:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D141321859F
+	for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 18:22:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743444853; cv=none; b=qlk4+XYnIOCzopEy6wlJ4+6APIZJOxW39Q/sreWCgagh+N1VnGQQ6JFrIBryRo4zbrs494/MaKZdoz6vn0uVuvqZ5aF49dgT/FiTI61kC23XXyIHGsgWR9HigN/XhbMVYtYF6TVtYLXbYz4o6zv3ZwXh/5VtjV9pkvxh4zm7Oao=
+	t=1743445341; cv=none; b=WNoH9Uym6gGp38klGdJvlYAYg86ER6nqkxBsvtVKIXNaORjliB7ttg/EVN1qESGTa1jY8hUAmsYHE2i+ZbJtVCSVvbJfuKP4QMO2Bi+zjna0tfc9+7qRv5lM8mtRylUnBUUA+tRh/XYPI7lPHfwIJTUDct46QulwE7LvpKG6o04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743444853; c=relaxed/simple;
-	bh=R8z5shiXlAJJhQoIwb83l7c8bOKbIxipiJo6viYBdqA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qRIH4Y2ZBMRGSOV5PbKTwVuVMIyanCFwl6yit/pwyWoCU8QXY6wETznqP9hPAMVlBkf0xkXhhu+MK7oBHxRbVillj9E2I9g700UM7UcN3MMjU+0E8O+D7FWW1Zhrzkqz3IPVVPqX+Q37Td044nVP/q85Hxt4jLt873EgHLdFUQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ls2OIPgX; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5498d2a8b89so5609029e87.1;
-        Mon, 31 Mar 2025 11:14:11 -0700 (PDT)
+	s=arc-20240116; t=1743445341; c=relaxed/simple;
+	bh=gyfZ0dU3klyEE36Mi6RWWpcQ7bq7zvBhqScsBSUilBM=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nMsAvB8q0KAO7r8PdjEAdfJcamT35sYjuu+ss77ThtrCi0l5flBRtldcPIXo/esHNSR2cvK8THZZslslW09J0PJ95XFwkGFdJ2Jmc0D0Zrrl4rBOQbkIgtkJdUJJKL7QvQmuOFlIBiBuysWFZQFM6awz5PvQyakUuXeENaZr79g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=McjMFnPH; arc=none smtp.client-ip=207.171.188.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743444850; x=1744049650; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A5lk9jhdHxqhJGM2EvAiNOOlsC8BNa3794LCUzwdQio=;
-        b=ls2OIPgXn2RFRLP1kEL6ExuMpIxpuFcETQZqyb+tF+T9e0qWebl2vqbCJoftRKgkUG
-         ybV3ogJI+Nq8xK56IWFDgFaZujrKblETiUPj3QxQbyG+0bbg49dtYpWLYOAU2dhTXXic
-         pCt4ksMUL/kR6OMBAW/bvYw1Usg2/wnqBoGhAM1hirYpqgR1zyYurDfRaq8ttnEHmfUg
-         llPkbtPW5tvqVRr6VN0Zd4gcctL1k+Z/KEhzMzVCLFeob6Pg6+kNmP/GGmPL2hVQMDs/
-         kgb/XqQYlnu83nPCDxAYnbtA853M8VQEmCeP5Hxo/kWxhaUOUjO6YbyA2xDS5xAkBT9L
-         R9oQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743444850; x=1744049650;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=A5lk9jhdHxqhJGM2EvAiNOOlsC8BNa3794LCUzwdQio=;
-        b=OF5KZKYatiN0wp8xvZKIu4zN9QJcJVhofbya/IZJYGH9FvNAmS0nMLmyZIyxixHhXj
-         662NwitwANbvPbXQBKVrw6KYHMeqMEguL4PEczF2+jdqNx6NLu0D/+dlJ+DUJ+xI3GvV
-         cTYEu9Qvet6tYr57B1AFrcivRCPWRz4ljWXJvSCahx9M5TKxQGA2LGh4hRu3mU0H4d7o
-         7uyHkbHQTT+1kfAHis9W1FTXzyubUwUG/lIHW9tUOX0Rdy/Uh5u7cN6rdBYZ87HT8dXW
-         VbIj4tdoeFgFavt8UA5bEr85xdqCHvKJyvKxNDZjktE0T1xPl6AFPoErZhoSvoPo/MbB
-         BKQg==
-X-Forwarded-Encrypted: i=1; AJvYcCUvputytTjGzeePvfj+oQbPl1wEPNeiK7yOOXLgSBmE/nmqGCf9vz6O65vJnwKQ0P1S76cub3UCMoaxs5e4@vger.kernel.org, AJvYcCWbznTdTfzwdp/I0HGvr7AfI5DpJfka+WXtDrJ5akK/Q9KkjecEKsbr+QGHJeccjwoK09Gxz87a@vger.kernel.org, AJvYcCXRUjetb0doaDy7xTlDWoFCAw6fQfl22Ewd7JTPBRmrhSiv5wMEQbgcbJ1XMTOOzOeNySgRPdxLkRGW@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHJ7V+6HR9gW93F1bV7eaynIdZl7wbnLHccC1PMB7AA5Iiq+a6
-	/UQVvnLaOeP6pMhR5vBcaEaBiZMCfEfulChdIAkkv4UUEX/L0B36wux4YgpQBQTXILaXdoa7zfy
-	ghSYQsWx3nm8ks/qMWXVC5jt+fvQ=
-X-Gm-Gg: ASbGncvL1AM5RLyNvvPtLbBOo1dZL/zn9ZSj1Ov9kI5u4+Ed3MHXJDOkNfnmtD0ehMC
-	nPcGfeztpt5DoPWwnzybRIlO6QCuRdV82X1AMd1uwrS2nT8o98sLaifpQFtJbtqkji80jYyO+Qp
-	RSXBIWQcMFjGkhHqEZdwL6UI7OuBLSigiE6cX+q9oOB0lxHefM5Leown0ooV4kWKdDotNE
-X-Google-Smtp-Source: AGHT+IHKzL9HwLPvv//AcrZpsGw9jXwcmKxRn4dqH2+JnEGKxalj4U2wocYAbP1m6LV80Fp1ly5wMt1Lp9f4JagIqw4=
-X-Received: by 2002:a05:6512:31c3:b0:549:4a13:3a82 with SMTP id
- 2adb3069b0e04-54b10dc6b6bmr2519774e87.21.1743444849596; Mon, 31 Mar 2025
- 11:14:09 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1743445340; x=1774981340;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=BjkTnIzADyvzBAKQ6Mk8B2bjlzgVpYN2lKvlhi35Oto=;
+  b=McjMFnPHhvKuBThc3r/LTdPtvilnK6qrioXyzGnSPk2gaCmPs1WC45BV
+   UpLm/P5OWj61nq92VWzGNY7W3Kteln57vvpj90RPLO9S8lzYSDW5zhChk
+   pjot0NUCg6jFjGJzXuDOXKuIHmR5GvGpBl2HyNKWBfGrzmQ7/rcWYAdVr
+   4=;
+X-IronPort-AV: E=Sophos;i="6.14,291,1736812800"; 
+   d="scan'208";a="6099139"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2025 18:22:12 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:33788]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.31.48:2525] with esmtp (Farcaster)
+ id e9097118-372f-4800-a4a2-c187b91b8e40; Mon, 31 Mar 2025 18:22:11 +0000 (UTC)
+X-Farcaster-Flow-ID: e9097118-372f-4800-a4a2-c187b91b8e40
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 31 Mar 2025 18:22:03 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.88.186.82) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 31 Mar 2025 18:22:01 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH v4 net 0/3] udp: Fix two integer overflows when sk->sk_rcvbuf is close to INT_MAX.
+Date: Mon, 31 Mar 2025 11:21:34 -0700
+Message-ID: <20250331182142.1108-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250331065109.45dddd0d@kernel.org>
+References: <20250331065109.45dddd0d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250331103116.2223899-1-lukma@denx.de> <20250331103116.2223899-2-lukma@denx.de>
-In-Reply-To: <20250331103116.2223899-2-lukma@denx.de>
-From: Fabio Estevam <festevam@gmail.com>
-Date: Mon, 31 Mar 2025 15:13:57 -0300
-X-Gm-Features: AQ5f1Jq-g5W90csHkjK9HYDezlRlK94-DydnLNjU-qHoYaOMSuEvsPfN0-r6dq4
-Message-ID: <CAOMZO5A4P=JbmXRyz91e3DSFbXjG7aRxMyBaTMsfB9jpVG9tww@mail.gmail.com>
-Subject: Re: [PATCH v3 1/4] dt-bindings: net: Add MTIP L2 switch description
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, 
-	Pengutronix Kernel Team <kernel@pengutronix.de>, Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, imx@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D033UWA003.ant.amazon.com (10.13.139.42) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hi Lukasz,
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Mon, 31 Mar 2025 06:51:09 -0700
+> On Sat, 29 Mar 2025 11:05:10 -0700 Kuniyuki Iwashima wrote:
+> > v4:
+> >   * Patch 4
+> >     * Wait RCU for at most 30 sec
+> 
+> The new test still doesn't pass
+> 
+> TAP version 13
+> 1..1
+> # timeout set to 3600
+> # selftests: net: so_rcvbuf
+> # 0.00 [+0.00] TAP version 13
+> # 0.00 [+0.00] 1..2
+> # 0.00 [+0.00] # Starting 2 tests from 2 test cases.
+> # 0.00 [+0.00] #  RUN           so_rcvbuf.udp_ipv4.rmem_max ...
+> # 0.00 [+0.00] # so_rcvbuf.c:151:rmem_max:Expected pages (35) == 0 (0)
+> # 0.00 [+0.00] # rmem_max: Test terminated by assertion
+> # 0.00 [+0.00] #          FAIL  so_rcvbuf.udp_ipv4.rmem_max
+> # 0.00 [+0.00] not ok 1 so_rcvbuf.udp_ipv4.rmem_max
+> # 0.01 [+0.00] #  RUN           so_rcvbuf.udp_ipv6.rmem_max ...
+> # 0.01 [+0.00] # so_rcvbuf.c:151:rmem_max:Expected pages (35) == 0 (0)
+> # 0.01 [+0.00] # rmem_max: Test terminated by assertion
+> # 0.01 [+0.00] #          FAIL  so_rcvbuf.udp_ipv6.rmem_max
+> # 0.01 [+0.00] not ok 2 so_rcvbuf.udp_ipv6.rmem_max
+> # 0.01 [+0.00] # FAILED: 0 / 2 tests passed.
+> # 0.01 [+0.00] # Totals: pass:0 fail:2 xfail:0 xpass:0 skip:0 error:0
+> not ok 1 selftests: net: so_rcvbuf # exit=1
+> 
+> 
+> Plus we also see failures in udpgso.sh
 
-On Mon, Mar 31, 2025 at 7:31=E2=80=AFAM Lukasz Majewski <lukma@denx.de> wro=
-te:
+I forgot to update `size` when skb_condense() is called.
 
-> +properties:
-> +  compatible:
-> +    const: nxp,imx287-mtip-switch
+Without the change I saw the new test stuck at 1 page after
+udpgso.sh, but with the change both passed.
 
-For consistency, please use "nxp,imx28-mtip-switch" instead.
+Will post v5.
 
-imx287 is not used anywhere in the kernel.
+Thanks!
 
