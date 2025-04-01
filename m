@@ -1,150 +1,117 @@
-Return-Path: <netdev+bounces-178523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D443DA776F8
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 10:56:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 631F2A77719
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 11:02:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FD76169E75
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 08:56:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CD8C1644B7
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 09:02:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2199B1EBA0D;
-	Tue,  1 Apr 2025 08:56:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 708B11E1A16;
+	Tue,  1 Apr 2025 09:01:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xa1b5g3B"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="FC47UPsP"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0908A1EA84
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 08:56:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77E2B2E3398
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 09:01:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743497768; cv=none; b=nV2l33flxuQjaifKRHuB3woPEMvMXix946La7uWi8On6cj5APGlb9tXGaSVMSTYheXKXuyf8LOcxDutfEgCMEr4dsLTPSzWnJU2mzHzZPi3WO3J281A8jLKbxxo9H5LE8eMnAwTTExj1H03jD8V4I1zG8ppjpBXK57Ep9i3HMzY=
+	t=1743498116; cv=none; b=b/a60a+TOHrFhFpKurFWzDrgNpi73kah0OQ6f+T5lrdp54zjtGg43zUSVEZ+JnP+nmOr4/Td2U9As0fN5I9Cic15eSRGGYK6cokPASztusSpEx7/M9qKAqk+tjynd+pTg/95Z0HozVVYYR1pBVQprN6P0+XOtsoP5Xqc52CLBik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743497768; c=relaxed/simple;
-	bh=tV7GHmfr5Si8SRiqwT6boi3Gj3jsFs4R9lIa/PbtSKw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i401V5wUKME3ZbTicb6H8Aljo/cSU3UtGWncJg4aU3hU1Y2B36XaXGLCa8AjjXXG1HLr0n5iPTxDs+Oyg7eL0qVyp7P85hfDu1fFG/eJcy8H70YRenUEX989tVwWZCXcNp31P8hxqiWK7TU9+K+VdwBw5goz6xjB9sJ8ntC40so=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xa1b5g3B; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743497765;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/EOGpZgMMwI61gNswk7Hqy4zEoEqDiKfuBQe+kGOmzE=;
-	b=Xa1b5g3BriYlUA5VNSoObwldecuYJmbPxvW+fI6QgxRaN3T2RbHY22klk0qX064bGWF6Rn
-	SEHx6iEeBhwbvu+24L36vR2OJ2Rz42he3E3LxY3Qyo1NtNZQoNYwUmEj5bBiUuyVQYVhOv
-	WTn9YJCswgrpSms3VJ3wrX4PMLGvfbE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-427-twN-uo-7O06W5aOt0CHD2A-1; Tue, 01 Apr 2025 04:56:03 -0400
-X-MC-Unique: twN-uo-7O06W5aOt0CHD2A-1
-X-Mimecast-MFC-AGG-ID: twN-uo-7O06W5aOt0CHD2A_1743497763
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-39979ad285bso2970107f8f.2
-        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 01:56:03 -0700 (PDT)
+	s=arc-20240116; t=1743498116; c=relaxed/simple;
+	bh=Alm/NQeAVgEcuh4ciLphCWPGTw4jKXnaMg0KD3XqiG0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fbXycEy2frh38lYZiV+DTEKAMJxdiP19gdsNLA7fGgzRz48gyCjLV3ZAZBnlMnhgJZCxgjLDvoDe41xbSB4T548/4Ya8cnvlSWUUZ5APdevHzsluf8/G2ZuHWJSOG8Z2OdFg6R6Dztl8Q9T6Q1hw5JmcTpVO6V0P7EtjNBO4xYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=FC47UPsP; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43690d4605dso35882615e9.0
+        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 02:01:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1743498111; x=1744102911; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=n46xaXN7gcanzSsfM8jO0yQceE6z1/lxfQvp5svqoQ0=;
+        b=FC47UPsP1GD68VpPMrHCBGo7l3jyAbIpfdLNJxDHe5XmhgHcLTCQMfEWEgkCU+ZOuy
+         HcWeHRptHSuu37UuC/IzrCovnGSeMb/PdKAvBVCljenjxbn/S6H/KcDeaqTVMhtEl+EJ
+         0SVxlwRjZx+CAN7I8VO24MMj61CZ1RLl0k0nLoNn+pE4qe6tFBEbWyniwYgeaqJ5jxOs
+         sck+2oco3FrWDYrq62j7Hofr9yxCU4Il3KZxrjRHoTeF3ZKUmrMlmV0tQb1J8n3ZDiAg
+         i+n9AY5M0PD0d5Vrroj+N6m4nnm7kppfhbsvuULUdr8LDV+C5W2Ep6yUOYxtz0gPDgLw
+         Ck2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743497763; x=1744102563;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/EOGpZgMMwI61gNswk7Hqy4zEoEqDiKfuBQe+kGOmzE=;
-        b=LcSm0lksW8Sv7VRg8uj+e0fKLdA64JGScR53wdIkbUqng8hDWPfyGQd5GzGTYEtkiQ
-         Jsy8wYHy2tmyKbY81yVui4phqCYT09g+PRSvuI0WPdXB1DrspTLUb5PWJKqu7iKyFqJ3
-         eFY8rcY/+bY4PdzjbOwF06rZUduume0J4z9fBW7D17prEA7QELvpsUXKmjDj5vGqCPiw
-         CM4uEM8B2oTYo1u2gURsTlb7+aCekh9/yQ8qpWo05/8wXbPW4tcAqEpcb+CoCVal5E4p
-         tXBBqDhLLfufguyKjxGKsAKTrPNInKpoSBgsRfWDPLph6t7luuuUYiGJp8opj5h5bNsn
-         d4UQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUjTlOIzgj0UA8aKnbL+2KVQ1a9zbjZKTl0lVq/W0nRG4PTTNPGGtsfAwyYZTGsdakFQCDJT/0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtycGFmZwms17ryA4ZOfm0SY7HMb3EfRW5594FlDAdsCI1jCzg
-	fmBFmEkibcq3CbwsW81GMmGBDHxAbwik3pQS8Nw1oKPmbLuooVnICYr9LFwvZBPo6xebMZ7Mi0C
-	p3+uq6G0VijT9lR8McT2vdQouY799A3XEclGWD46a2hhGheWUUrQ6Og==
-X-Gm-Gg: ASbGncuuzZd3M+dhMAkUh1Ev9hrZVAFs33YqQ+0uaNZ6wkvOb0LPtHFl9gUbaci2UxR
-	dXxvsK39OHS/y1P37AvT1rrwtWLAS0CytiY0a7MBMm97Sy4JI5VpJuvhkYNRzCBTesV7DIH1QN8
-	EqZMYW9wPjrhn7WDhdVuDMtuI/GSEaXpLH0N/ExJUSAJy0g7PpDkDy+xO4Nme2+VpD6r11sgxD2
-	Ejj6WLw0BaH/55PNnFjOGRhbpJZVyNJY662Td4hAkT1P1kLNmN5Pp0+z/z20+FX8oQXB80MMXQx
-	2uS9kCro5QXpqgvmkDZzTZnII3GRlbGrDRPwtOlY+uZCRQ==
-X-Received: by 2002:a05:6000:2913:b0:391:122c:8b2 with SMTP id ffacd0b85a97d-39c120e1566mr10357876f8f.31.1743497762625;
-        Tue, 01 Apr 2025 01:56:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHPPFEHn5QvMX8T7Toc4UY1OJQWioAVuAJM2JZ1z1ZDDcbJGmm1kVkDwd+dzHOwCnzyaJepwA==
-X-Received: by 2002:a05:6000:2913:b0:391:122c:8b2 with SMTP id ffacd0b85a97d-39c120e1566mr10357860f8f.31.1743497762256;
-        Tue, 01 Apr 2025 01:56:02 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-68-231.dyn.eolo.it. [146.241.68.231])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b79e141sm13581555f8f.77.2025.04.01.01.56.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Apr 2025 01:56:01 -0700 (PDT)
-Message-ID: <7488e6cf-e68b-4404-aaa9-f4892b2ff94b@redhat.com>
-Date: Tue, 1 Apr 2025 10:56:00 +0200
+        d=1e100.net; s=20230601; t=1743498111; x=1744102911;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=n46xaXN7gcanzSsfM8jO0yQceE6z1/lxfQvp5svqoQ0=;
+        b=stpiIDy0Hqyhgy4HcyKjya82ZpFR+QfVHjiSJ0zh/tR+S7s3WU5jbOsEKgdSzKIX7t
+         1L/I9BpBsjB5zI8OnHUTZailVRYyKHLp8HFzIyNX9A2SiBdTJ29qPNXAmjmpKHShRtCM
+         X6rCBUDo19cMpq1V+i9iBHdk6YgUjDFWm/Trrvay2fnsHwU4b5tscXJN7KiqFufrgr+j
+         yLvqPZbMPzQQeJJ52l3ja0VkV6Z8MP+0oCPL8BkKh9jpY2aSNqReBeMt9/e7Rw+PxjC8
+         klSQzAqOArmiDk6cz0hcSuD9MGajnZ/o8aut5QTarNBOCTp6o+b+Js+nT1OQCedPerkQ
+         geXA==
+X-Gm-Message-State: AOJu0YwLHYfWAUs8170PePCq3aoYDnPKoLwDl2uXuBSUKzrPNtEAJrjy
+	Nr2ncixdAJt0q1ZfhPXKEtfG6AEVyLgksudA+QCaW+tX8ZfrK7X/HGNGFyIiI+A=
+X-Gm-Gg: ASbGncueYErGWByQBlJ0izsrdHWjkJ9eXKBxN4OYI5ITT4ofzmnIyRSJ88Zw16wsBPP
+	hb1DoJvg13Dp36y9MxqppSWCWx3ih72ozbZzPNl100x7u4dnK3NfPGH5/tVC+dWT7/RmUGfGePb
+	EnimvF8EhIXoWVyvzNce8W/akc2lucZxBf0RtOD51UC0weTjvUMnTt1lclvf88xGqKNmCIK/JaD
+	uQ7+VG0etYb5GAxJKexBH2rYb4rtTw1XF7TRk4oV+6B7Bcmu7fqi8dsEWwD277LItXXLYO93KGW
+	YJ0jg+7TQoFo17Vqpgh4BfF6ZggONYnTyQ/a9GwAr+Qka1Pv7TSuahC1TGKZpfGQld7okZhglON
+	BtxGHcO4GUp4=
+X-Google-Smtp-Source: AGHT+IE1pFZ2aeS5F5KYmjpz6vDu8iHwL34YVovaKWqffWU7tAc7e0gqKeEeofXyr3+FSdvuytsgWg==
+X-Received: by 2002:a05:6000:43d5:b0:391:29c0:83f5 with SMTP id ffacd0b85a97d-39c12114dbemr7535395f8f.44.1743498111310;
+        Tue, 01 Apr 2025 02:01:51 -0700 (PDT)
+Received: from jiri-mlt.client.nvidia.com ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b66a9d2sm13540606f8f.43.2025.04.01.02.01.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Apr 2025 02:01:50 -0700 (PDT)
+Date: Tue, 1 Apr 2025 11:01:44 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com, 
+	andrew+netdev@lunn.ch, horms@kernel.org, donald.hunter@gmail.com, parav@nvidia.com
+Subject: Re: [PATCH net-next v2 2/4] net/mlx5: Expose serial numbers in
+ devlink info
+Message-ID: <qt22pagi3weqc2mazctajndd5sej6zmvr3q4sq25r2ioe2qaow@parw3mavhvji>
+References: <20250320085947.103419-1-jiri@resnulli.us>
+ <20250320085947.103419-3-jiri@resnulli.us>
+ <20250325044653.52fea697@kernel.org>
+ <6mrfruwwp35efgzjjvgqkvjzahsvki6b3sw6uozapl7o5nf6mu@z6t7s7qp6e76>
+ <20250331092226.589edb9a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 2/2] page_pool: Track DMA-mapped pages and
- unmap them when destroying the pool
-To: Alexander Lobakin <aleksander.lobakin@intel.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Eric Dumazet <edumazet@google.com>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Simon Horman <horms@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
- Mina Almasry <almasrymina@google.com>, Yonglong Liu
- <liuyonglong@huawei.com>, Yunsheng Lin <linyunsheng@huawei.com>,
- Pavel Begunkov <asml.silence@gmail.com>, Matthew Wilcox
- <willy@infradead.org>, netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-mm@kvack.org, Qiuling Ren
- <qren@redhat.com>, Yuying Ma <yuma@redhat.com>
-References: <20250328-page-pool-track-dma-v5-0-55002af683ad@redhat.com>
- <20250328-page-pool-track-dma-v5-2-55002af683ad@redhat.com>
- <aaf31c50-9b57-40b7-bbd7-e19171370563@intel.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <aaf31c50-9b57-40b7-bbd7-e19171370563@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250331092226.589edb9a@kernel.org>
 
-On 3/31/25 6:35 PM, Alexander Lobakin wrote:
-> From: Toke Høiland-Jørgensen <toke@redhat.com>
-> Date: Fri, 28 Mar 2025 13:19:09 +0100
-> 
->> When enabling DMA mapping in page_pool, pages are kept DMA mapped until
->> they are released from the pool, to avoid the overhead of re-mapping the
->> pages every time they are used. This causes resource leaks and/or
->> crashes when there are pages still outstanding while the device is torn
->> down, because page_pool will attempt an unmap through a non-existent DMA
->> device on the subsequent page return.
-> 
-> [...]
-> 
->> @@ -173,10 +212,10 @@ struct page_pool {
->>  	int cpuid;
->>  	u32 pages_state_hold_cnt;
->>  
->> -	bool has_init_callback:1;	/* slow::init_callback is set */
->> +	bool dma_sync;			/* Perform DMA sync for device */
-> 
-> Have you seen my comment under v3 (sorry but I missed that there was v4
-> already)? Can't we just test the bit atomically?
+Mon, Mar 31, 2025 at 06:22:26PM +0200, kuba@kernel.org wrote:
+>On Mon, 31 Mar 2025 15:06:18 +0200 Jiri Pirko wrote:
+>> >I suppose you only expect one of the fields to be populated but 
+>> >the code as is doesn't express that.  
+>> 
+>> Nope. none or all could be populated, depends on what device exposes.
+>
+>Then you override the err in case first put fails.
 
-My understanding is that to make such operation really atomic, we will
-need to access all the other bits within the same bitfield with atomic
-bit ops, leading to a significant code churn (and possibly some overhead).
+Correct, will fix.
 
-I think that using a full bool field is a better option.
 
-Thanks,
+>But also having two serial numbers makes no sense.
 
-Paolo
+They are serial number for different entity:
+  serial_number e4397f872caeed218000846daa7d2f49
+  board.serial_number MT2314XZ00YA
 
+Why it does not make sense?
 
