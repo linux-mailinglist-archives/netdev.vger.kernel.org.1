@@ -1,194 +1,137 @@
-Return-Path: <netdev+bounces-178509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D081DA77664
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 10:26:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98C31A7766A
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 10:28:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F46C3A66CF
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 08:24:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B898167322
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 08:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E1371EA7CC;
-	Tue,  1 Apr 2025 08:24:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A51B1EA7CF;
+	Tue,  1 Apr 2025 08:28:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="3Fq/qU1j"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WvgiQBtQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E18A31E98F9;
-	Tue,  1 Apr 2025 08:24:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADAE31E47B3
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 08:28:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743495881; cv=none; b=IHe9Dr7txe2I3jlDUxiqV7V3Hgcq4kFBU1yYmZyuCXat6tWUfJqH36xPZKTL7x6xrWwFnY2cZnM4tnVmQTsV7zV12EJV7UrvC/+iQjKog4pXq7v96wRxlCNTbUAi1XTRcna2qBThkToMFKBO4lfL8++r2qypVNcQL7hGZa21VM4=
+	t=1743496121; cv=none; b=fXWrrySnA0qmyatF5zHsxX6NAa66dM6e1ZtwVKnWSdrBZp053Mq2aALs1n+8NiKr5vvIyb/QwuABzJjzA5yB6vhdjLVqlBGfub5v5kfnK5u5tO0KJLZVQ2+7HfYrA7ze5dXh0JAQPyiVtxAkamEv0LGts3oOfHMJBrIVYCzq1Hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743495881; c=relaxed/simple;
-	bh=SB2q6xQ56/3mpPcfMH9fyJWiPwvHFAbAR+tuJWgebls=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZzXnRECO0kaPl5WMWl8MyClGZwxJ9hvz74Ax0BRdYMgMmRXZZ4NwEbKPsBvMMSgiPAmx3FzmxRC/+BpjV0bi5aiy15jM+l3MhkRkaFwBowzFKsxYQfYEBSFyoVOO8dBEKmUGwGesD8hswGbbYC85b2W/vQraxD2VuIx6fhA5mHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=3Fq/qU1j; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=P2vCMgKs60kE2AEX7EBwSn8Ro/J/oeai91FyuRtK384=; b=3Fq/qU1j2+zydWavWoxfAcA+HK
-	TKI4UvNHnhwFprYvUSDhd/3g172hIDos3qtk3cBwAqJau7Jhvq4tL41vm2l+ADVCkiocupdWJOVV9
-	3ql30+yvvyae6VsUM3J7Ho+XZD0hOHcAcb3P3IaIR9Fau7GUsyxSJRscTfjSw1IIJ/+i8wF6Y7WJW
-	vpnL7/YUDkat74R3AevuO9U2FwYyU0h5hqTzt9D7JnIfzoT6hCTiiqAHln7Nfpr5hkPfZwYhz9lRN
-	fLYDUS+e8G5ZMVcKG8sSMA005efyjFsifeGCyB0zCn9XI47K+K3yIgCUMzDP2hA8J6QinWnPoiBrH
-	AToIIUnvWg47OEFx9eir/cQlNMMu9gkPCUuvmtc0NA+8ULSsYhiEONjvU/M7aKAobjU56cv1KLDYy
-	rD56flFnuBVlPW0d8J7D3M+Ja1yDDNunOFIiCoQAP8LG52u2txNMmM8CdZicF/Y+R05Hcl8XrdDW2
-	XC695dYaZdJI//kShfqpRZux;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1tzWvB-007dPk-1c;
-	Tue, 01 Apr 2025 08:24:33 +0000
-Message-ID: <51bb66d4-eaf3-4247-ba11-d793b6f0d56c@samba.org>
-Date: Tue, 1 Apr 2025 10:24:32 +0200
+	s=arc-20240116; t=1743496121; c=relaxed/simple;
+	bh=2TEgE2Gh5l/esd2JjsKB39oXFx7MFG2tU8DRfLx4nrk=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=qxGzCVlKeMJpyP7Ht4VEEBJQmKXQkPsJodvh/xN7IOkcHL/znxyKMTyLgMGNtAv+F69QC+CDx43nl5opvEn9e9KIDzMJzObZXtqBKJBVQuPaE2rlO6EBv/saQ4J8FsghkxOj1vlRyQDjUKzLw0HDy3GEkFQtlmFSfZTgFVCw/kE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WvgiQBtQ; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43948f77f1aso36676245e9.0
+        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 01:28:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743496118; x=1744100918; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=m3NjyvvecvcpSpvcJ8ewc7DM5ZorTog+O/HqraBhzZ8=;
+        b=WvgiQBtQPjNchslTca0qYWoz8x48xQUMQqroi4RDxUbC+RNa9K6/KVS/emDo9filW4
+         wH5MTlVYxarknK5+Cn4kl76eGs4UdtwJGBm6odkQLZwEZm2RGGH0BYO92wxOo3ui5vE0
+         XZXVMMvGcpXMLlymixdaG3WMiLQNJ/T51+an4S/PdYr9N8NQo9TEssErzP9a8+yBpV3G
+         DhyQTsuPmfiSZeuWnUpFdrbO0kvwCfTy5JKLB7MBAIaDs1T9Ws8QvN2YW4ObHbiYB6BY
+         7ZRJxsGLbtJnannUhy1ZkHO9xSy48lXvz0cy+lwb6t9uWRrbNErcy4nJwdqJB/lGK+wX
+         QtEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743496118; x=1744100918;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m3NjyvvecvcpSpvcJ8ewc7DM5ZorTog+O/HqraBhzZ8=;
+        b=rrDZKyIRCzSbGM3mVgjHR0tx07FAsDwq0XgF2Gm2ztvToI6qjqOmcrNO+QlG4JSNuj
+         LFTUTFbLpcIZWs3zMFEv29cm/71a5yo4CgGxY9S0ct+PkDEod7HSuuNkEJwoD6tZsGWU
+         rhM+tg9lTrszZYHMaZNCN7gi8I75KC+dqkJqh9fEPQkpxeQB5Kbq5xN7Iufu7epwjUnd
+         NfmkCWPrH21Sr1ywT0Q8FdbbVDIiLVyA6PZNAB6Gug57ZfWLhCww7M+VxEwz7dUMqLPY
+         yRZtAts+eBiT8CoDnTwJKbSaiB35808gUJUs+VtD/PFituaT3G71vIneMYQDUQk6iZTz
+         J2YQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUmwi96eaSYQvxDVdfBgII+zEQHG16wbjYv6J/2DGMiE+gmY93+7Bdggt1R56q955T2eB3aGOk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1nh0yFkjke41lG8ysjYJ7B472PDvMe1ktoY8h7brXuqo5sH1u
+	uU2/Lzl5Hj1Iwz6M68JNQFNFUYoqrc/XLYMR6IOe5XbfWwn9Zttd
+X-Gm-Gg: ASbGnctPTJKfsVgDp3oK9DachDwenSjmjxx9aHf+X0HnyxhhOuravlxGGdJN3pPM2Pe
+	lAXDLrFQ/8uxGHaVlWRAwB/vXTNuCMNfQiyW3LT6tWzuRXiY2MjSHdl8SrlWR+kvdmzgZz8JjWn
+	HKwnoYyJ7/9avnbbhnFikgLU28rWq6NCpSvKNccScbMAt2kmgLBDnCpXbL+OsjbcpAxTB8faRUl
+	GomO8fsYzC+gKl7MiwS/KdTDMpF1s8defutZrFxjeOaDwUjnZ6lW6nqUfh2RtLYqJ7V1uSA66uf
+	mAkIrHVhz8qB2emBdy7oHOXX0gRuVfzFRPvdotSJKNWlpwvxwrcR1SVAk0q5KqcOr8Vi
+X-Google-Smtp-Source: AGHT+IGSSsJ2uaoAFr57mIV3I9zTlIs7G7pBWSePUCC5JrvteLiXIohHqI5a5A6ULL01I6AUn/BgHg==
+X-Received: by 2002:a05:600c:510c:b0:43d:10a:1b90 with SMTP id 5b1f17b1804b1-43db6248f5cmr105815445e9.16.1743496117793;
+        Tue, 01 Apr 2025 01:28:37 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:d018:a09f:82bc:eb27])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b662bf9sm13087089f8f.29.2025.04.01.01.28.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Apr 2025 01:28:37 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
+  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
+  yuyanghuang@google.com,  jacob.e.keller@intel.com
+Subject: Re: [PATCH net] netlink: specs: fix schema of rt_addr
+In-Reply-To: <20250401012939.2116915-1-kuba@kernel.org> (Jakub Kicinski's
+	message of "Mon, 31 Mar 2025 18:29:39 -0700")
+Date: Tue, 01 Apr 2025 09:28:10 +0100
+Message-ID: <m2msd0i8v9.fsf@gmail.com>
+References: <20250401012939.2116915-1-kuba@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 3/4] net: pass a kernel pointer via 'optlen_t' to
- proto[ops].getsockopt() hooks
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
- Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>,
- Breno Leitao <leitao@debian.org>, Jakub Kicinski <kuba@kernel.org>,
- Christoph Hellwig <hch@lst.de>, Karsten Keil <isdn@linux-pingi.de>,
- Ayush Sawal <ayush.sawal@chelsio.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn
- <willemb@google.com>, David Ahern <dsahern@kernel.org>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Xin Long <lucien.xin@gmail.com>, Neal Cardwell <ncardwell@google.com>,
- Joerg Reuter <jreuter@yaina.de>, Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Oliver Hartkopp <socketcan@hartkopp.net>,
- Marc Kleine-Budde <mkl@pengutronix.de>,
- Robin van der Gracht <robin@protonic.nl>,
- Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de,
- Alexander Aring <alex.aring@gmail.com>,
- Stefan Schmidt <stefan@datenfreihafen.org>,
- Miquel Raynal <miquel.raynal@bootlin.com>,
- Alexandra Winter <wintera@linux.ibm.com>,
- Thorsten Winkler <twinkler@linux.ibm.com>,
- James Chapman <jchapman@katalix.com>, Jeremy Kerr <jk@codeconstruct.com.au>,
- Matt Johnston <matt@codeconstruct.com.au>,
- Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>,
- Remi Denis-Courmont <courmisch@gmail.com>,
- Allison Henderson <allison.henderson@oracle.com>,
- David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>,
- Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
- "D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>,
- Wen Gu <guwen@linux.alibaba.com>, Jon Maloy <jmaloy@redhat.com>,
- Boris Pismenny <borisp@nvidia.com>, John Fastabend
- <john.fastabend@gmail.com>, Stefano Garzarella <sgarzare@redhat.com>,
- Martin Schiller <ms@dev.tdt.de>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
- <bjorn@kernel.org>, Magnus Karlsson <magnus.karlsson@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Jonathan Lemon <jonathan.lemon@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org,
- linux-hams@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-can@vger.kernel.org, dccp@vger.kernel.org, linux-wpan@vger.kernel.org,
- linux-s390@vger.kernel.org, mptcp@lists.linux.dev,
- linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com,
- linux-afs@lists.infradead.org, tipc-discussion@lists.sourceforge.net,
- virtualization@lists.linux.dev, linux-x25@vger.kernel.org,
- bpf@vger.kernel.org, isdn4linux@listserv.isdn4linux.de,
- io-uring@vger.kernel.org
-References: <cover.1743449872.git.metze@samba.org>
- <d482e207223f434f0d306d3158b2142dceac4631.1743449872.git.metze@samba.org>
- <20250331224946.13899fcf@pumpkin>
-Content-Language: en-US, de-DE
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <20250331224946.13899fcf@pumpkin>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-Am 31.03.25 um 23:49 schrieb David Laight:
-> On Mon, 31 Mar 2025 22:10:55 +0200
-> Stefan Metzmacher <metze@samba.org> wrote:
-> 
->> The motivation for this is to remove the SOL_SOCKET limitation
->> from io_uring_cmd_getsockopt().
->>
->> The reason for this limitation is that io_uring_cmd_getsockopt()
->> passes a kernel pointer.
->>
->> The first idea would be to change the optval and optlen arguments
->> to the protocol specific hooks also to sockptr_t, as that
->> is already used for setsockopt() and also by do_sock_getsockopt()
->> sk_getsockopt() and BPF_CGROUP_RUN_PROG_GETSOCKOPT().
->>
->> But as Linus don't like 'sockptr_t' I used a different approach.
->>
->> Instead of passing the optlen as user or kernel pointer,
->> we only ever pass a kernel pointer and do the
->> translation from/to userspace in do_sock_getsockopt().
->>
->> The simple solution would be to just remove the
->> '__user' from the int *optlen argument, but it
->> seems the compiler doesn't complain about
->> '__user' vs. without it, so instead I used
->> a helper struct in order to make sure everything
->> compiles with a typesafe change.
->>
->> That together with get_optlen() and put_optlen() helper
->> macros make it relatively easy to review and check the
->> behaviour is most likely unchanged.
-> 
-> I've looked into this before (and fallen down the patch rabbit hole).
+Jakub Kicinski <kuba@kernel.org> writes:
 
-Yes, if you want to change the logic at the same time as
-changing the kind of argument variable, then it get messy
-quite fast.
+> The spec is mis-formatted, schema validation says:
+>
+>   Failed validating 'type' in schema['properties']['operations']['properties']['list']['items']['properties']['dump']['properties']['request']['properties']['value']:
+>     {'minimum': 0, 'type': 'integer'}
+>
+>   On instance['operations']['list'][3]['dump']['request']['value']:
+>     '58 - ifa-family'
+>
+> The ifa-family clearly wants to be part of an attribute list.
+>
+> Fixes: dfb0f7d9d979 ("doc/netlink: Add spec for rt addr messages")
 
-> I think the best (final) solution is to pass a validated non-negative
-> 'optlen' into all getsockopt() functions and to have them usually return
-> either -errno or the modified length.
-> This simplifies 99% of the functions.
+The fixes tag looks wrong. I think it should be:
 
-Yes, maybe not 99%, but a lot.
+Fixes: 4f280376e531 ("selftests/net: Add selftest for IPv4 RTM_GETMULTICAST support")
 
-> The problem case is functions that want to update the length and return
-> an error.
-> By best solution is to support return values of -errno << 20 | length
-> (as well as -errno and length).
-> 
-> There end up being some slight behaviour changes.
-> - Some code tries to 'undo' actions if the length can't be updated.
->    I'm sure this is unnecessary and the recovery path is untested and
->    could be buggy. Provided the kernel data is consistent there is
->    no point trying to get code to recover from EFAULT.
->    The 'length' has been read - so would also need to be readonly
->    or unmapped by a second thread!
-> - A lot of getsockopt functions actually treat a negative length as 4.
->    I think this 'bug' needs to preserved to avoid breaking applications.
-> 
-> The changes are mechanical but very widespread.
-> 
-> They also give the option of not writing back the length if unchanged.
+I wonder if the op name should be changed from getmaddrs to getmaddr,
+removing the plural to be consistent with do/dump conventions, or to
+getmulticast to be consistent with RTM_GETMULTICAST.
 
-See my other mail regarding proto[_ops].getsockopt_iter(),
-where implementation could be converted step by step.
-
-But we may still need to keep the current  proto[ops].getsockopt()
-as proto[ops].getsockopt_legacy() in order to keep the
-insane uapi semantics alive.
-
-metze
-
-
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: donald.hunter@gmail.com
+> CC: yuyanghuang@google.com
+> CC: jacob.e.keller@intel.com
+> ---
+>  Documentation/netlink/specs/rt_addr.yaml | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/Documentation/netlink/specs/rt_addr.yaml b/Documentation/netlink/specs/rt_addr.yaml
+> index 5dd5469044c7..3bc9b6f9087e 100644
+> --- a/Documentation/netlink/specs/rt_addr.yaml
+> +++ b/Documentation/netlink/specs/rt_addr.yaml
+> @@ -187,6 +187,7 @@ protonum: 0
+>        dump:
+>          request:
+>            value: 58
+> +          attributes:
+>              - ifa-family
+>          reply:
+>            value: 58
 
