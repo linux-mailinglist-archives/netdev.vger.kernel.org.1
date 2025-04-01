@@ -1,189 +1,305 @@
-Return-Path: <netdev+bounces-178605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4694A77C66
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 15:42:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F130FA77C7C
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 15:44:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A8EE16C3FB
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 13:42:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A38E616AF44
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 13:44:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E09387E792;
-	Tue,  1 Apr 2025 13:41:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E302D1E47B3;
+	Tue,  1 Apr 2025 13:44:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dcDarGC2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U2OyV5Rq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3692220126C
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 13:41:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0E4202C26
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 13:44:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743514916; cv=none; b=BOf31g2qFR1fRqtCABc941FVJQV6OGceUcKM4tllbuEN2etAUBmuApIGdrO/ddOxZB9xiDUkuCpQaxnRYlW5/RdOF3ItBQOBd+EyWvH2Oyz1ZC6+uWCMFKaVXBxF+vHmpp3YCDG+q1y33kuc7xqNVO26xYMHTxS6WS8h2HP1WH8=
+	t=1743515072; cv=none; b=BSwABbjOEax+Lq7a3i2VnouUN0LRF9oqSnNmAVCAM9A7XXGwO3aecBlU2dKwqzHnjlJRFl/t8TEo2nSnNJ+soxIrYMlJ/ORs5ml28Ok9CoJji2QSf0j0L0wJldfCb98nGrBw0q7lSSMuXnmE3MOEN6HCKKoHZay1rcEmP3FlZEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743514916; c=relaxed/simple;
-	bh=9DmKSKgpRK/Ghoozm0xXZsix9t8rCDXOdYOtPeAD78E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pL1KZ8qvipAOkyt/CeUCBwEJNQGoFqKdrpqA/pE5AGUAnpHfBTtJPdrNlBS5fiOulYZ6wS/1L8rbM3aB9Ur5shxPQl1pqIdJAMTSCpqdinLrF8PFujxkmOW/f73Q1v0vu3rUU0UWJtZEZoyaYzb4YUjMq1ka6WCPzZEHaUa37jk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dcDarGC2; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743514913;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JT/1HJ7j1dGnCuukkfDvHYvyoCmZ0J/ymsOhodchoIw=;
-	b=dcDarGC2gddVDEPe4RNEH554bR1RiI+ZMECqJ7afbb1OHqgqlOefz4BLhmyGg9BAHpgAIz
-	4t9Ejuau2SR01bflU0aS/Xq8+VzhA8YgOOw7Ke0muHVdNWfNLTWKcqw1qOBxExPqYeeL75
-	TjiMHOzO7dyw9t+14UZeOL3mUds2hOo=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-657-REquLzR8M1mrtaMPxLLQ3A-1; Tue, 01 Apr 2025 09:41:51 -0400
-X-MC-Unique: REquLzR8M1mrtaMPxLLQ3A-1
-X-Mimecast-MFC-AGG-ID: REquLzR8M1mrtaMPxLLQ3A_1743514911
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43cf44b66f7so40809275e9.1
-        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 06:41:51 -0700 (PDT)
+	s=arc-20240116; t=1743515072; c=relaxed/simple;
+	bh=8bpp/MaW8+ZTtpUqf2IhtZcsfdQiRx/Eafa08qoqHbo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Q0U5jw7XftZNR4E7pKmSwFLzD792K/Dy873OkA5roDp1uxI4IOd7qJ+vGdcUoy3BXZ+hfbxtui3/6B+jQqQVVVr1xmO2G9xHEas3MCIep1DueIT19SdBJLo0wBjO2ViRd7GyX4mGKOrOm5iM85SWcIUJ/A9Psbz/xtABMknp1h8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U2OyV5Rq; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-3054210ce06so8683924a91.2
+        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 06:44:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1743515070; x=1744119870; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ZyEbqOkrSD6TU4NwMw2CtJ+zlTXsk1fSPsK0Ogdp3/c=;
+        b=U2OyV5Rqw8FO3nK2Kw6mr0+FS0XOL2u/CvjZ0uwKKRWZb17Cs5xuqJ465s6hFQ66Bl
+         K7R30hUZez+z3LX5FPn5UueO6tFMvJULtD49dHxbm8nwjOo7MeI9Np/6TYZ+827HIyia
+         H1MW4iPPWsxfvJ5ZlaVOjF8i42Qamwj2U3e841Uu7mdKAl/hZ2P/CFkJPtqYE5EgrtzF
+         d17VRfSNnfqiVHQccqG1lGI8VnDmv+WC0wTLnVd+dF+OijM62VVIreoOnYjqvNl016SV
+         UxoVFVYmEql3rdsnGZyeWRfxOMOxT8OHplycNT/IU/hDtQM7GTUDoCCrDzmTwuAfj3jm
+         sUXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743514910; x=1744119710;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JT/1HJ7j1dGnCuukkfDvHYvyoCmZ0J/ymsOhodchoIw=;
-        b=mkeO54G9OtBu6m8yllKRzrEEY7CSQ2R52ivC+w6Z1qufHAph0WclCbZ4w1Xi9D0yOB
-         8WEfMgZkcaoH4zCTpwkA1eE67/ahN9uGMEwRipprvD8/ZLQwtyWRfTCK/3uuM3eNirks
-         /NoKI3AipEj1dplhSXE5smXq5WBZK8Xi0iO5+w0JfLIlq64S7AELOGVBlfXzigHA+8Sl
-         qlBepLbmVkDQoGc36hvOdGpaFL80zSWjfq76VNjiPRN0o7qkmFXdjQxRr4vJ+eXLPOiW
-         cugO3eR7qeByWEbamX3D99KEd/rkxbWHHfw4NC3akRrwvK/pTrsA7qCEdBzVX/ejPLFp
-         Gv+A==
-X-Forwarded-Encrypted: i=1; AJvYcCUcm+m0RwadERUXsaKYKmC6d8TiilhdZzE7MrH9TO7W7EvqSww8bWnjK7fMYQydYGTmwvUrZDA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw42isOzLPwfrLzs8kWHTxX0s0DvZCDA5iRjXLAd7HaDaVcmZSX
-	91yKN5KW5ac3GDzVCW9gW5mzHFjx8K85e3bxavbXUKHNv49jbXty+m6pMegd40UAPBpuUfQMV5W
-	KOtdTEMwZ0Q4Bo2WJKruQGHkrdWiONlSH9V9wW7uidAiHjduzoANJrQ==
-X-Gm-Gg: ASbGncu33o76k7e1Bgnq5nnQs+C1FtR/orXBZmShTIJlBYhBNkB7Zf6/K6TZg86Olyp
-	mQwva6Dyz7VCL9j117gviyEkyy5kJsXRAZkKYk2tKIg8Zw+gDx+feO2aIfG6otXLZ1kgNnW7I0N
-	ezyytFN8EgzcQjKhLiJL59eUOiAtTWEOk+Y4d2Y3g7Qacgk8KiaqilfBCm/JZZFlvzA+lzESgxc
-	U09SOnBDOgA1LmeBabRkIeRPdz097OYHT4adls6fDFWnpudCCsXc8j9xtckQlElaOHAN3aamKLU
-	8YsG6nl0g7Gwg+ROBESghFDdq5Mswv6TmW7ElI1mqCov5TCc9H4DyRux0h8=
-X-Received: by 2002:a05:600c:4705:b0:43d:79:ae1b with SMTP id 5b1f17b1804b1-43db6247e03mr130604225e9.14.1743514910753;
-        Tue, 01 Apr 2025 06:41:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFOonQsa/shEuP0wDgfiH+HuLEzgbTbno+i+to8l7EiHyrr/1tPYY8WHBx9YFeKuuzvpEHoDA==
-X-Received: by 2002:a05:600c:4705:b0:43d:79:ae1b with SMTP id 5b1f17b1804b1-43db6247e03mr130603935e9.14.1743514910230;
-        Tue, 01 Apr 2025 06:41:50 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-11-6-59.retail.telecomitalia.it. [87.11.6.59])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b79e33asm14333177f8f.66.2025.04.01.06.41.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 06:41:49 -0700 (PDT)
-Date: Tue, 1 Apr 2025 15:41:42 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Cindy Lu <lulu@redhat.com>
-Cc: jasowang@redhat.com, mst@redhat.com, michael.christie@oracle.com, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v8 3/8] vhost: Add the cgroup related function
-Message-ID: <qucbuuwmqlrjhm7t7onoedzldrb2cvixjbjezmcovpo24ttzdx@sde275drep5u>
-References: <20250328100359.1306072-1-lulu@redhat.com>
- <20250328100359.1306072-4-lulu@redhat.com>
+        d=1e100.net; s=20230601; t=1743515070; x=1744119870;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZyEbqOkrSD6TU4NwMw2CtJ+zlTXsk1fSPsK0Ogdp3/c=;
+        b=RnRcd/xEVug3Tr1KoakAWxCOrOkZq1iG6ovEZDp13d4BOYlTOxiEO6vMHAn2sCUhlq
+         ie1sIvQOuySQ/aLucB7Mq03+ZmoSNRYRha/znE4QNYg3JrRpsSLIHQGqXCuhQuiZta31
+         55DvzlsAe+iP+7yEWW/+N0YEzED+W0in4aYLR/N8NR/TIWsE7AKcSyioiTvlAw/lJ6cs
+         gOGZy6uonZ+iB9ZYp4cWqRybucIBv50r2Yzbg3vd2pWglHyTGTKjKFlZsIF/uKc36EwO
+         2MkfbdDzHkWyB+1MXbpjQfRpFOT8CNWMJtnuG91r20qyLjJ7nQuiFbIyFmVty8EPvCqH
+         3FGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXwYQUa2Hn8iOo+8kJ/uS5x0Wkr3x/wDw8Ue+ghm2SOkwy25VC5qgadD1QaA5Z10TqCHgzc4Z8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMkEGbok/ntTGr5e1+cjidZ1amn8hQxqLR+QT6Qk7LR66hxC4t
+	MO2ncCQAOeGM6qT5zb0MflxowtVU6vPrEQDYrL/jcUF93SehFR+X1i/mvXXzRjcDMmrc8FtgKvj
+	pg1GJpA==
+X-Google-Smtp-Source: AGHT+IHdNj17IzfPxuNN9wWBGf+SCwwzrruftH70/zxd2bKdhdb2VT0VeYc7kAxS7tGQlGM1MK8F7pOfJkAn
+X-Received: from pjp4.prod.google.com ([2002:a17:90b:55c4:b0:2ea:3a1b:f493])
+ (user=chharry job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5243:b0:2fe:a515:4a98
+ with SMTP id 98e67ed59e1d1-3053217848bmr18928134a91.31.1743515069900; Tue, 01
+ Apr 2025 06:44:29 -0700 (PDT)
+Date: Tue,  1 Apr 2025 21:44:03 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250328100359.1306072-4-lulu@redhat.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.472.ge94155a9ec-goog
+Message-ID: <20250401134424.3725875-1-chharry@google.com>
+Subject: [PATCH] Bluetooth: Add driver command BTUSB_DRV_CMD_SWITCH_ALT_SETTING
+From: Hsin-chen Chuang <chharry@google.com>
+To: luiz.dentz@gmail.com
+Cc: Hsin-chen Chuang <chharry@chromium.org>, chromeos-bluetooth-upstreaming@chromium.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Marcel Holtmann <marcel@holtmann.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Ying Hsu <yinghsu@chromium.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Mar 28, 2025 at 06:02:47PM +0800, Cindy Lu wrote:
->Add back the previously removed cgroup function to support the kthread
+From: Hsin-chen Chuang <chharry@chromium.org>
 
-nit: Missing . at the end
+Although commit 75ddcd5ad40e ("Bluetooth: btusb: Configure altsetting
+for HCI_USER_CHANNEL") has enabled the HCI_USER_CHANNEL user to send out
+SCO data through USB Bluetooth chips, it's observed that with the patch
+HFP is flaky on most of the existing USB Bluetooth controllers: Intel
+chips sometimes send out no packet for Transparent codec; MTK chips may
+generate SCO data with a wrong handle for CVSD codec; RTK could split
+the data with a wrong packet size for Transparent codec; ... etc.
 
->The biggest change for this part is in vhost_attach_cgroups() and
->vhost_attach_task_to_cgroups().
->
->The old function was remove in
+To address the issue above one needs to reset the altsetting back to
+zero when there is no active SCO connection, which is the same as the
+BlueZ behavior, and another benefit is the bus doesn't need to reserve
+bandwidth when no SCO connection.
 
-nit: s/remove/removed
+This patch introduces a fundamental solution that lets the user space
+program to configure the altsetting freely:
+- Define the new packet type HCI_DRV_PKT which is specifically used for
+  communication between the user space program and the Bluetooth drviers
+- Define the btusb driver command BTUSB_DRV_CMD_SWITCH_ALT_SETTING which
+  indicates the expected altsetting from the user space program
+- btusb intercepts the command and adjusts the Isoc endpoint
+  correspondingly
 
->commit 6e890c5d5021 ("vhost: use vhost_tasks for worker threads")
->
->Signed-off-by: Cindy Lu <lulu@redhat.com>
->---
-> drivers/vhost/vhost.c | 41 +++++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 41 insertions(+)
+This patch is tested on ChromeOS devices. The USB Bluetooth models
+(CVSD, TRANS alt3, and TRANS alt6) could pass the stress HFP test narrow
+band speech and wide band speech.
 
-As I mentioned, this patch also has unused functions, but LGTM.
+Cc: chromeos-bluetooth-upstreaming@chromium.org
+Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control USB alt setting")
+Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
+---
 
-Thanks,
-Stefano
+ drivers/bluetooth/btusb.c       | 67 +++++++++++++++++++++++++++++++++
+ include/net/bluetooth/hci.h     |  1 +
+ include/net/bluetooth/hci_mon.h |  2 +
+ net/bluetooth/hci_core.c        |  2 +
+ net/bluetooth/hci_sock.c        | 14 +++++--
+ 5 files changed, 83 insertions(+), 3 deletions(-)
 
->
->diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
->index 9500e85b42ce..20571bd6f7bd 100644
->--- a/drivers/vhost/vhost.c
->+++ b/drivers/vhost/vhost.c
->@@ -22,6 +22,7 @@
-> #include <linux/slab.h>
-> #include <linux/vmalloc.h>
-> #include <linux/kthread.h>
->+#include <linux/cgroup.h>
-> #include <linux/module.h>
-> #include <linux/sort.h>
-> #include <linux/sched/mm.h>
->@@ -620,6 +621,46 @@ long vhost_dev_check_owner(struct vhost_dev *dev)
-> }
-> EXPORT_SYMBOL_GPL(vhost_dev_check_owner);
->
->+struct vhost_attach_cgroups_struct {
->+	struct vhost_work work;
->+	struct task_struct *owner;
->+	int ret;
->+};
->+
->+static void vhost_attach_cgroups_work(struct vhost_work *work)
->+{
->+	struct vhost_attach_cgroups_struct *s;
->+
->+	s = container_of(work, struct vhost_attach_cgroups_struct, work);
->+	s->ret = cgroup_attach_task_all(s->owner, current);
->+}
->+
->+static int vhost_attach_task_to_cgroups(struct vhost_worker *worker)
->+{
->+	struct vhost_attach_cgroups_struct attach;
->+	int saved_cnt;
->+
->+	attach.owner = current;
->+
->+	vhost_work_init(&attach.work, vhost_attach_cgroups_work);
->+	vhost_worker_queue(worker, &attach.work);
->+
->+	mutex_lock(&worker->mutex);
->+
->+	/*
->+	 * Bypass attachment_cnt check in __vhost_worker_flush:
->+	 * Temporarily change it to INT_MAX to bypass the check
->+	 */
->+	saved_cnt = worker->attachment_cnt;
->+	worker->attachment_cnt = INT_MAX;
->+	__vhost_worker_flush(worker);
->+	worker->attachment_cnt = saved_cnt;
->+
->+	mutex_unlock(&worker->mutex);
->+
->+	return attach.ret;
->+}
->+
-> /* Caller should have device mutex */
-> bool vhost_dev_has_owner(struct vhost_dev *dev)
-> {
->-- 
->2.45.0
->
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 5012b5ff92c8..a7bc64e86661 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2151,6 +2151,67 @@ static int submit_or_queue_tx_urb(struct hci_dev *hdev, struct urb *urb)
+ 	return 0;
+ }
+ 
++static struct sk_buff *btusb_drv_response(u8 opcode, size_t data_len)
++{
++	struct sk_buff *skb;
++
++	/* btusb driver response starts with 1 oct of the opcode,
++	 * and followed by the command specific data.
++	 */
++	skb = bt_skb_alloc(1 + data_len, GFP_KERNEL);
++	if (!skb)
++		return NULL;
++
++	skb_put_u8(skb, opcode);
++	hci_skb_pkt_type(skb) = HCI_DRV_PKT;
++
++	return skb;
++}
++
++static int btusb_switch_alt_setting(struct hci_dev *hdev, int new_alts);
++
++#define BTUSB_DRV_CMD_SWITCH_ALT_SETTING 0x35
++
++static int btusb_drv_cmd(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	/* btusb driver command starts with 1 oct of the opcode,
++	 * and followed by the command specific data.
++	 */
++	if (!skb->len)
++		return -EILSEQ;
++
++	switch (skb->data[0]) {
++	case BTUSB_DRV_CMD_SWITCH_ALT_SETTING: {
++		struct sk_buff *resp;
++		int status;
++
++		/* Response data: Total 1 Oct
++		 *   Status: 1 Oct
++		 *     0 = Success
++		 *     1 = Invalid command
++		 *     2 = Other errors
++		 */
++		resp = btusb_drv_response(BTUSB_DRV_CMD_SWITCH_ALT_SETTING, 1);
++		if (!resp)
++			return -ENOMEM;
++
++		if (skb->len != 2 || skb->data[1] > 6) {
++			status = 1;
++		} else {
++			status = btusb_switch_alt_setting(hdev, skb->data[1]);
++			if (status)
++				status = 2;
++		}
++		skb_put_u8(resp, status);
++
++		kfree_skb(skb);
++		return hci_recv_frame(hdev, resp);
++	}
++	}
++
++	return -EILSEQ;
++}
++
+ static int btusb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct urb *urb;
+@@ -2192,6 +2253,9 @@ static int btusb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 			return PTR_ERR(urb);
+ 
+ 		return submit_or_queue_tx_urb(hdev, urb);
++
++	case HCI_DRV_PKT:
++		return btusb_drv_cmd(hdev, skb);
+ 	}
+ 
+ 	return -EILSEQ;
+@@ -2669,6 +2733,9 @@ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
+ 			return PTR_ERR(urb);
+ 
+ 		return submit_or_queue_tx_urb(hdev, urb);
++
++	case HCI_DRV_PKT:
++		return btusb_drv_cmd(hdev, skb);
+ 	}
+ 
+ 	return -EILSEQ;
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index a8586c3058c7..e297b312d2b7 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -494,6 +494,7 @@ enum {
+ #define HCI_EVENT_PKT		0x04
+ #define HCI_ISODATA_PKT		0x05
+ #define HCI_DIAG_PKT		0xf0
++#define HCI_DRV_PKT		0xf1
+ #define HCI_VENDOR_PKT		0xff
+ 
+ /* HCI packet types */
+diff --git a/include/net/bluetooth/hci_mon.h b/include/net/bluetooth/hci_mon.h
+index 082f89531b88..bbd752494ef9 100644
+--- a/include/net/bluetooth/hci_mon.h
++++ b/include/net/bluetooth/hci_mon.h
+@@ -51,6 +51,8 @@ struct hci_mon_hdr {
+ #define HCI_MON_CTRL_EVENT	17
+ #define HCI_MON_ISO_TX_PKT	18
+ #define HCI_MON_ISO_RX_PKT	19
++#define HCI_MON_DRV_TX_PKT	20
++#define HCI_MON_DRV_RX_PKT	21
+ 
+ struct hci_mon_new_index {
+ 	__u8		type;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 5eb0600bbd03..bb4e1721edc2 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2911,6 +2911,8 @@ int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 		break;
+ 	case HCI_ISODATA_PKT:
+ 		break;
++	case HCI_DRV_PKT:
++		break;
+ 	default:
+ 		kfree_skb(skb);
+ 		return -EINVAL;
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 022b86797acd..0bc4f77ed17b 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -234,7 +234,8 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
+ 			if (hci_skb_pkt_type(skb) != HCI_EVENT_PKT &&
+ 			    hci_skb_pkt_type(skb) != HCI_ACLDATA_PKT &&
+ 			    hci_skb_pkt_type(skb) != HCI_SCODATA_PKT &&
+-			    hci_skb_pkt_type(skb) != HCI_ISODATA_PKT)
++			    hci_skb_pkt_type(skb) != HCI_ISODATA_PKT &&
++			    hci_skb_pkt_type(skb) != HCI_DRV_PKT)
+ 				continue;
+ 		} else {
+ 			/* Don't send frame to other channel types */
+@@ -391,6 +392,12 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
+ 		else
+ 			opcode = cpu_to_le16(HCI_MON_ISO_TX_PKT);
+ 		break;
++	case HCI_DRV_PKT:
++		if (bt_cb(skb)->incoming)
++			opcode = cpu_to_le16(HCI_MON_DRV_RX_PKT);
++		else
++			opcode = cpu_to_le16(HCI_MON_DRV_TX_PKT);
++		break;
+ 	case HCI_DIAG_PKT:
+ 		opcode = cpu_to_le16(HCI_MON_VENDOR_DIAG);
+ 		break;
+@@ -1806,7 +1813,7 @@ static int hci_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	if (flags & ~(MSG_DONTWAIT | MSG_NOSIGNAL | MSG_ERRQUEUE | MSG_CMSG_COMPAT))
+ 		return -EINVAL;
+ 
+-	if (len < 4 || len > hci_pi(sk)->mtu)
++	if (len > hci_pi(sk)->mtu)
+ 		return -EINVAL;
+ 
+ 	skb = bt_skb_sendmsg(sk, msg, len, len, 0, 0);
+@@ -1860,7 +1867,8 @@ static int hci_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 		if (hci_skb_pkt_type(skb) != HCI_COMMAND_PKT &&
+ 		    hci_skb_pkt_type(skb) != HCI_ACLDATA_PKT &&
+ 		    hci_skb_pkt_type(skb) != HCI_SCODATA_PKT &&
+-		    hci_skb_pkt_type(skb) != HCI_ISODATA_PKT) {
++		    hci_skb_pkt_type(skb) != HCI_ISODATA_PKT &&
++		    hci_skb_pkt_type(skb) != HCI_DRV_PKT) {
+ 			err = -EINVAL;
+ 			goto drop;
+ 		}
+-- 
+2.49.0.472.ge94155a9ec-goog
 
 
