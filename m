@@ -1,46 +1,86 @@
-Return-Path: <netdev+bounces-178531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A29D0A7779F
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 11:24:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE757A777AD
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 11:27:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC2781887FF8
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 09:25:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 879A7166F18
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 09:27:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113721EE01F;
-	Tue,  1 Apr 2025 09:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB7031EDA0D;
+	Tue,  1 Apr 2025 09:27:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FPdcnHQZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFB4E1E8329;
-	Tue,  1 Apr 2025 09:24:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535511C7006
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 09:27:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743499490; cv=none; b=tz8rMnQsIgGwwcnp3yh0r7t+MEfhxLNu00A8oYnUzVuLY1idJ3hBkNru3KfJHVHuucYK8qhGvHmvqEjsG6xBCG3Ge5YUG7MjDP0LxW8Hc2qjfKUX1QTIkiUIjoIqY6eDvOQnLXVe7d78bUSI2mrCjXFjNUcQ6M0exOxtP9msz1E=
+	t=1743499622; cv=none; b=Y4ZqMxKtz1s1hPtjaiN+Ru6+HuR4Ass52RBlxswDsldqQX4elub6qeQurDRANQHCmYgcP/LlIwfZPNdDXcMOOUZVHJ9uEK+KW1kWdKKZlFbXVm4hiz9025HTsOT0k1mig/6gOK7sVsp6qSrSLyAo1tCS+EHvOWl2DIIDCtRFWXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743499490; c=relaxed/simple;
-	bh=YJe+5k/IbiLgySfuYIrcy0ukBJS+OJdrxR9fS3/iHlU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=QZLPN/UhIKVUiHRTggUnTuSeJ+Ti2dQBt3T2JLuPe35SubSrT6cb3xZl0rVUR9No+hY0SMfS/E+6rdplML8dC+5J1xW+zBgawpIFByEeLarv9IXsejO5QMySSHKxoXhQEUFdRJszHfs0PsOR/zZpE0EMjYrjo/n6xvlqXWOWclo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4ZRjBj1T7pz1k1BR;
-	Tue,  1 Apr 2025 17:19:57 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0D5CC1400F4;
-	Tue,  1 Apr 2025 17:24:44 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 1 Apr 2025 17:24:43 +0800
-Message-ID: <b87a14f4-181b-4a82-9d71-2750699601d6@huawei.com>
-Date: Tue, 1 Apr 2025 17:24:43 +0800
+	s=arc-20240116; t=1743499622; c=relaxed/simple;
+	bh=RGDowPCAGuj867zdN5U68AnSEqQazuLOkGo5GI4oCYs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=L3r6u8qnIau1EYplyTyS8EgFRx1eYq0/5WmPxunU35/v9l+Vt1yInD4MtXFxMwP0FctoCqICJ1KzAmXw9B0xw/mjDzguWidTLiAzJfQwjLsGC4TAed7cvVaWbL4B8edssRyFqxaKf6L4u+rx2Zu7dv3pYp+0el9hsvxTeXIiJ80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FPdcnHQZ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743499620;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rv7jpfmifiJSCwlwKmjavmbnONcngGxU5yqNRTT6nzM=;
+	b=FPdcnHQZRqE5cXwfx+HpFRSwvzuhFLMYR6SJO/+FQ4ZUyOcPZpcVDaGtrAVIFfKgUDUDZQ
+	2pl4rkigLa5JbJ6tbtLwZXCr4nwRxOxu44wY34N5P4bxiAkZoXaK//XSPmO0flYQNJ5sMp
+	WRl9vbKzkGMVq7jvDovvub4WB5yHmOY=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-74--6dXuXEnPiq6_EkXdfhtmg-1; Tue, 01 Apr 2025 05:26:59 -0400
+X-MC-Unique: -6dXuXEnPiq6_EkXdfhtmg-1
+X-Mimecast-MFC-AGG-ID: -6dXuXEnPiq6_EkXdfhtmg_1743499618
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43cf44b66f7so38818385e9.1
+        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 02:26:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743499618; x=1744104418;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rv7jpfmifiJSCwlwKmjavmbnONcngGxU5yqNRTT6nzM=;
+        b=U28elXHTAMzHGnXwACNDnILOy/97V1T2Hr+4XnA0mqz3emYT0otzsAEMfoDLvdAUH0
+         tjgu9cQlGTKi9EPBLiXbMGyoEBamJW+SCgN9U8ug16r7GWeZ8CqyPbruPErgPaDCmAR7
+         GGOt03ltKOxDSnSMTqQvDy6pacnetxosZF07ZOynqia48uyCq7wYSydOdCuQL+i9ShLt
+         yvglgD0PW/kxFESVlGGv6tMqNM+wNmYNCNB70mThBMM84IoF/kfgVgnAmKMDolTjEFSK
+         5dfUkacsP8Fil0xu69hJgluXa2ghMwHzgXkkmGxqx0ZneVTMzlrcyFgc//Z8srgjfNCV
+         +Jmg==
+X-Forwarded-Encrypted: i=1; AJvYcCXGHv+t6YHbopUgh8fig4ctcFyuM0A5ElFcl+GJpCjFugRZTJQAtCCko4JeRp+yQzgVPP8hU5o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHkVIX0iBhizrIpqcCzTmXLYNJKJorxRR1XMGmzwQ3gixpZxzg
+	ykTZsKUIE+stNJVtTs8kB0sRdc6YoOQpa+JhcatoKi/C8g3QvfAuESoVlHQtVC2qPnBQSKd/e9A
+	O4MBjg7wwtFqCY0vuHEsr5FpgRAPrajinDj79RijGEa2r7dDpEi1Mkg==
+X-Gm-Gg: ASbGncvCBKd036fu3qYLj48bRFtICNYNZLSXwQ4uRwA0nmtxW+Q+yntnbpi3PTWdtrB
+	K+nYCSMbdH+fvnEZ/qsIdxYhABKG3N4KNrfOm4W5GsBCtURBOb0V5A7RiOa6NNw1HZ6ywYTCNd0
+	AGg+JNatvqidqlmW9netHDagm8Wml2v7SMCthYtAeUTBTRXHBy8yXiHvt9wpJg8fNuWo1ybJXE1
+	eZ/GmOQzIs+aihUOE7VrB6qb4VjaK8C2FjPtV6O1qjpUFfL+8uVKYl23/chYBBjZra6ybZvm+Is
+	G7Bbt4MOv29Df4P7xLRUNvp+4xeT1KisyQi0oIw6LFKHPQ==
+X-Received: by 2002:a05:600c:3d8e:b0:43d:5ec:b2f4 with SMTP id 5b1f17b1804b1-43db6228293mr125405355e9.10.1743499617774;
+        Tue, 01 Apr 2025 02:26:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEK/gJwnwUGeCgqE+r9MWZUBTdjxnbDuFOZNWFHvltqYEKrV2WwlMUD+8wRfy3qo0w27wcgfQ==
+X-Received: by 2002:a05:600c:3d8e:b0:43d:5ec:b2f4 with SMTP id 5b1f17b1804b1-43db6228293mr125405005e9.10.1743499617238;
+        Tue, 01 Apr 2025 02:26:57 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-68-231.dyn.eolo.it. [146.241.68.231])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b663860sm13774077f8f.39.2025.04.01.02.26.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Apr 2025 02:26:56 -0700 (PDT)
+Message-ID: <5f493420-d7ff-43ab-827f-30e66b7df2c9@redhat.com>
+Date: Tue, 1 Apr 2025 11:26:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,68 +88,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 2/2] page_pool: Track DMA-mapped pages and
- unmap them when destroying the pool
-To: Zhu Yanjun <yanjun.zhu@linux.dev>, Alexander Lobakin
-	<aleksander.lobakin@intel.com>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
-	<toke@redhat.com>
-CC: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Simon
- Horman <horms@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Mina
- Almasry <almasrymina@google.com>, Yonglong Liu <liuyonglong@huawei.com>,
-	Pavel Begunkov <asml.silence@gmail.com>, Matthew Wilcox
-	<willy@infradead.org>, <netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linux-mm@kvack.org>, Qiuling Ren
-	<qren@redhat.com>, Yuying Ma <yuma@redhat.com>
-References: <20250328-page-pool-track-dma-v5-0-55002af683ad@redhat.com>
- <20250328-page-pool-track-dma-v5-2-55002af683ad@redhat.com>
- <aaf31c50-9b57-40b7-bbd7-e19171370563@intel.com>
- <b75c5329-0049-4c9c-ba79-a1132d848d5d@linux.dev>
+Subject: Re: [PATCH net 1/3] net_sched: sch_sfq: use a temporary work area for
+ validating configuration
+To: Cong Wang <xiyou.wangcong@gmail.com>, Octavian Purdila <tavip@google.com>
+Cc: jhs@mojatatu.com, jiri@resnulli.us, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, horms@kernel.org, shuah@kernel.org,
+ netdev@vger.kernel.org
+References: <20250328201634.3876474-1-tavip@google.com>
+ <20250328201634.3876474-2-tavip@google.com>
+ <Z+nYlgveEBukySzX@pop-os.localdomain>
 Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <b75c5329-0049-4c9c-ba79-a1132d848d5d@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <Z+nYlgveEBukySzX@pop-os.localdomain>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 2025/4/1 1:27, Zhu Yanjun wrote:
-> 在 2025/3/31 18:35, Alexander Lobakin 写道:
->> From: Toke Høiland-Jørgensen <toke@redhat.com>
->> Date: Fri, 28 Mar 2025 13:19:09 +0100
->>
->>> When enabling DMA mapping in page_pool, pages are kept DMA mapped until
->>> they are released from the pool, to avoid the overhead of re-mapping the
->>> pages every time they are used. This causes resource leaks and/or
->>> crashes when there are pages still outstanding while the device is torn
->>> down, because page_pool will attempt an unmap through a non-existent DMA
->>> device on the subsequent page return.
->>
->> [...]
->>
->>> @@ -173,10 +212,10 @@ struct page_pool {
->>>       int cpuid;
->>>       u32 pages_state_hold_cnt;
->>>   -    bool has_init_callback:1;    /* slow::init_callback is set */
->>> +    bool dma_sync;            /* Perform DMA sync for device */
->>
->> Have you seen my comment under v3 (sorry but I missed that there was v4
->> already)? Can't we just test the bit atomically?
+On 3/31/25 1:49 AM, Cong Wang wrote:
+> On Fri, Mar 28, 2025 at 01:16:32PM -0700, Octavian Purdila wrote:
+>> diff --git a/net/sched/sch_sfq.c b/net/sched/sch_sfq.c
+>> index 65d5b59da583..027a3fde2139 100644
+>> --- a/net/sched/sch_sfq.c
+>> +++ b/net/sched/sch_sfq.c
+>> @@ -631,6 +631,18 @@ static int sfq_change(struct Qdisc *sch, struct nlattr *opt,
+>>  	struct red_parms *p = NULL;
+>>  	struct sk_buff *to_free = NULL;
+>>  	struct sk_buff *tail = NULL;
+>> +	/* work area for validating changes before committing them */
+>> +	struct {
+>> +		int limit;
+>> +		unsigned int divisor;
+>> +		unsigned int maxflows;
+>> +		int perturb_period;
+>> +		unsigned int quantum;
+>> +		u8 headdrop;
+>> +		u8 maxdepth;
+>> +		u8 flags;
+>> +	} tmp;
 > 
-> Perhaps test_bit series functions can test the bit atomically. Maybe there are more good options about this testing the bit atomically. But test_bit should implement the task that tests the bit atomically.
+> Thanks for your patch. It reminds me again about the lacking of complete
+> RCU support in TC. ;-)
+> 
+> Instead of using a temporary struct, how about introducing a new one
+> called struct sfq_sched_opt and putting it inside struct sfq_sched_data?
+> It looks more elegant to me.
 
-There are two reading of dma_sync in this patch, the first reading is not
-under rcu read lock and doing the reading without READ_ONCE(), the second
-reading is under rcu read lock and do the reading with READ_ONCE().
+I agree with that. It should also make the code more compact. @Octavian,
+please update the patch as per Cong's suggestion.
 
-The first one seems an optimization to avoid taking the rcu read lock,
-why might need READ_ONCE() to make KCSAN happy if we do care about making
-KCSAN happy.
+Thanks,
 
-The second one does not seems to need the atomicity by using the READ_ONCE()
-as it is always under RCU read lock(implicit or explicit one), and there is
-a rcu sync after the clearing of that bit.
+Paolo
+
 
