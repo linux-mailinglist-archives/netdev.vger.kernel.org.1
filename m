@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-178641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B502A78045
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 18:25:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90ECCA78033
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 18:23:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09C883AD358
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 16:20:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FEE118943E5
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 16:21:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 818572253E8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 898EE2253EF;
 	Tue,  1 Apr 2025 16:13:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="WrJMMAkM"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="RrewFXau"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB65214A80;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59D8214A91;
 	Tue,  1 Apr 2025 16:13:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743524013; cv=none; b=lavQPDz0tNpF4hip2NOP3gX0X33I3o56GcMY3GxUjMn387UaqFLvtO4jTkvMRZN1D8piht9qOyuMlHkrxPQsOyD5qc1FZqL03zNot/I7TJhC9KBWPvwWPH3qKsIXfmz9TFb0o6YFJMXQSabD2QtfYoj/9dKrd2aEw7dySM/e4ls=
+	t=1743524013; cv=none; b=p+d+3Z3fzlDXi28Q1NfBO9A39ob4Oxy6ycMqSxy42/L2fQzgxK6YmtBthoyGs0LR4elJomFJRX0QD3Nh0hQErbTGGl4aVnGo/rWoxnOTb3AMuTCysFL34ubMJk4L24Mvq5QWDIVkzpWGf8nq14G2M4MdjK1ob2n7ZdGAoDXI1Qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1743524013; c=relaxed/simple;
-	bh=yIQlV+xSWp6m0A0vkyE28xWvYegA9yXQmu6qD2GvGss=;
+	bh=pTaeXJ5bInDg+SC4wghPI6lAHGRDUz3yhZDRfxhw948=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QifFcOZ6fHCuiBlX6WX4YtOB0XI10YkfrV6Z2gnXR3zEA79oBbqUIuj6WtSKUbQwzJQRBomnxrB6Axy8COMpy5tZQi7+Wn06zc8LnIrhvw6DmIv4lfqiZpm8SFNM0nRtHRP/vvMRWc4u0XRmSkdXdmXH8wq6/h94T70FLUjbrtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=WrJMMAkM; arc=none smtp.client-ip=68.232.154.123
+	 MIME-Version:Content-Type; b=C4sTGkupA9mN5SdUxbZSYK73ef0oZ1CT/fdxgjCb43zuZT7mVzcQcRdEz80eCUKLUpB6c7OHOAD/1VYMtaJuFM/kuGOdzhGW1HANQds/TmCZyMkOAEEdbFpZ2S+FvvcuzbNpEiaXLOJPakTzP7Vc6kUSNXKu/jMDoff3wf+QjfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=RrewFXau; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,21 +36,21 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1743524011; x=1775060011;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=yIQlV+xSWp6m0A0vkyE28xWvYegA9yXQmu6qD2GvGss=;
-  b=WrJMMAkMMj3BnRGSmbw4hQH2YpZckssG6N3Ln84ylN3HqiQILkvb8HCB
-   BeaVagxgRYr/6g3rsC3vJmbettupWf/dYQTP9bX1R2ZqIypdxdblOaaiF
-   5oF0W4v47dymgtt4ytRfiClEUQXrP3ABxfxXmdq/suu8bpOx5u1AjxLTz
-   vn/VCiEH1PKO9FiO4wxrfV9q3VRngu+xe+gBHRI1fjNw0O21HI3CkbrNn
-   I4NB/zTPBpHgnrjflvNNJXSDQkD1jSdjcY7d0JxSfW8fcoKC2PAB8Dcnc
-   oFv+2ZQAp+E71KFBC/O7RY7OLc/E7Fo8gJ61qcQyFgmqlpPqLzZvzr7w0
+  bh=pTaeXJ5bInDg+SC4wghPI6lAHGRDUz3yhZDRfxhw948=;
+  b=RrewFXauehvBPV5t716gLVSAcEsFoUHURAznznkHBv3TAYCG25ZmAv3b
+   FAyXUCyGk/d+grX0Y6KPa8gaictJvDjrnyVFVGzkwSBnsVWhAf2zlQkGu
+   t9SPvULbtnQzGRBUNcwAi6Spx45t6jpGi3inpaTCKjKL0qM1EneCoVn+T
+   Jc62ZIu2SfMrG95vt02Qi5Bid01tf2X+VeNHXJdgWOC5E2473E1hz2tg/
+   LJ7p5Rtqwj6k7am/9Qg48QyqCHgqoxGjkFqsVFju6NJcfCjCEVqNI3+zZ
+   qFf4f2Ip6BOfptx51DKR109wyDHkOawNzjqvCIEsB+6omLerdpifoBCu/
    w==;
 X-CSE-ConnectionGUID: ggLzNIpETriZ0zPViMY9HA==
-X-CSE-MsgGUID: 2gYnf6TSRa2gsktm+Ip4hg==
+X-CSE-MsgGUID: wPZVl3ZNSCaFv+rOE6Hgjg==
 X-IronPort-AV: E=Sophos;i="6.14,293,1736838000"; 
-   d="scan'208";a="39512780"
+   d="scan'208";a="39512781"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Apr 2025 09:13:22 -0700
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Apr 2025 09:13:23 -0700
 Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
@@ -67,9 +67,9 @@ CC: <nicolas.ferre@microchip.com>, <netdev@vger.kernel.org>,
 	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<linux-arm-kernel@lists.infradead.org>, Ryan Wanner
 	<Ryan.Wanner@microchip.com>
-Subject: [PATCH 4/6] ARM: dts: microchip: sama7d65: Enable GMAC interface
-Date: Tue, 1 Apr 2025 09:13:20 -0700
-Message-ID: <fca0c1deb74006cdedbdd71061dec9dabf1e9b9a.1743523114.git.Ryan.Wanner@microchip.com>
+Subject: [PATCH 5/6] ARM: dts: microchip: sama7d65: Add MCP16502 to sama7d65 curiosity
+Date: Tue, 1 Apr 2025 09:13:21 -0700
+Message-ID: <60f6b7764227bb42c74404e8ca1388477183b7b5.1743523114.git.Ryan.Wanner@microchip.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1743523114.git.Ryan.Wanner@microchip.com>
 References: <cover.1743523114.git.Ryan.Wanner@microchip.com>
@@ -84,76 +84,167 @@ Content-Type: text/plain
 
 From: Ryan Wanner <Ryan.Wanner@microchip.com>
 
-Enable GMAC0 interface for sama7d65_curiosity board.
+Add MCP16502 to the sama7d65_curiosity board to control voltages in the
+MPU. The device is connected to twi 10 interface
 
 Signed-off-by: Ryan Wanner <Ryan.Wanner@microchip.com>
 ---
- .../dts/microchip/at91-sama7d65_curiosity.dts | 51 +++++++++++++++++++
- 1 file changed, 51 insertions(+)
+ .../dts/microchip/at91-sama7d65_curiosity.dts | 135 ++++++++++++++++++
+ 1 file changed, 135 insertions(+)
 
 diff --git a/arch/arm/boot/dts/microchip/at91-sama7d65_curiosity.dts b/arch/arm/boot/dts/microchip/at91-sama7d65_curiosity.dts
-index 30fdc4f55a3b..441370dbb4c2 100644
+index 441370dbb4c2..81abc387112d 100644
 --- a/arch/arm/boot/dts/microchip/at91-sama7d65_curiosity.dts
 +++ b/arch/arm/boot/dts/microchip/at91-sama7d65_curiosity.dts
-@@ -105,7 +105,58 @@ &main_xtal {
- 	clock-frequency = <24000000>;
+@@ -30,6 +30,15 @@ memory@60000000 {
+ 		device_type = "memory";
+ 		reg = <0x60000000 0x40000000>;
+ 	};
++
++	reg_5v: regulator-5v {
++		compatible = "regulator-fixed";
++		regulator-name = "5V_MAIN";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		regulator-always-on;
++	};
++
  };
  
-+&gmac0 {
-+	#address-cells = <1>;
-+	#size-cells = <0>;
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_gmac0_default
-+		     &pinctrl_gmac0_mdio_default
-+		     &pinctrl_gmac0_txck_default
-+		     &pinctrl_gmac0_phy_irq>;
-+	phy-mode = "rgmii-id";
-+	status = "okay";
+ &dma0 {
+@@ -99,6 +108,132 @@ channel@4 {
+ 			label = "VDDCPU";
+ 		};
+ 	};
 +
-+	ethernet-phy@7 {
-+		reg = <0x7>;
-+		interrupt-parent = <&pioa>;
-+		interrupts = <PIN_PC1 IRQ_TYPE_LEVEL_LOW>;
++	pmic@5b {
++		compatible = "microchip,mcp16502";
++		reg = <0x5b>;
++		lvin-supply = <&reg_5v>;
++		pvin1-supply = <&reg_5v>;
++		pvin2-supply = <&reg_5v>;
++		pvin3-supply = <&reg_5v>;
++		pvin4-supply = <&reg_5v>;
 +		status = "okay";
-+	};
-+};
- &pioa {
-+	pinctrl_gmac0_default: gmac0-default {
-+		pinmux = <PIN_PA26__G0_TX0>,
-+			 <PIN_PA27__G0_TX1>,
-+			 <PIN_PB4__G0_TX2>,
-+			 <PIN_PB5__G0_TX3>,
-+			 <PIN_PA29__G0_RX0>,
-+			 <PIN_PA30__G0_RX1>,
-+			 <PIN_PB2__G0_RX2>,
-+			 <PIN_PB6__G0_RX3>,
-+			 <PIN_PA25__G0_TXCTL>,
-+			 <PIN_PB3__G0_RXCK>,
-+			 <PIN_PA28__G0_RXCTL>;
-+		slew-rate = <0>;
-+		bias-disable;
-+	};
 +
-+	pinctrl_gmac0_mdio_default: gmac0-mdio-default {
-+		pinmux = <PIN_PA31__G0_MDC>,
-+			 <PIN_PB0__G0_MDIO>;
-+		bias-disable;
-+	};
++		regulators {
++			vdd_3v3: VDD_IO {
++				regulator-name = "VDD_IO";
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-initial-mode = <2>;
++				regulator-allowed-modes = <2>, <4>;
++				regulator-always-on;
 +
-+	pinctrl_gmac0_phy_irq: gmac0-phy-irq {
-+		pinmux = <PIN_PC1__GPIO>;
-+		bias-disable;
-+	};
++				regulator-state-standby {
++					regulator-on-in-suspend;
++					regulator-suspend-microvolt = <3300000>;
++					regulator-mode = <4>;
++				};
 +
-+	pinctrl_gmac0_txck_default: gmac0-txck-default {
-+		pinmux = <PIN_PB1__G0_REFCK>;
-+		slew-rate = <0>;
-+		bias-pull-up;
-+	};
++				regulator-state-mem {
++					regulator-off-in-suspend;
++					regulator-mode = <4>;
++				};
++			};
 +
- 	pinctrl_i2c10_default: i2c10-default{
- 		pinmux = <PIN_PB19__FLEXCOM10_IO1>,
- 			 <PIN_PB20__FLEXCOM10_IO0>;
++			vddioddr: VDD_DDR {
++				regulator-name = "VDD_DDR";
++				regulator-min-microvolt = <1350000>;
++				regulator-max-microvolt = <1350000>;
++				regulator-initial-mode = <2>;
++				regulator-allowed-modes = <2>, <4>;
++				regulator-always-on;
++
++				regulator-state-standby {
++					regulator-on-in-suspend;
++					regulator-suspend-microvolt = <1350000>;
++					regulator-mode = <4>;
++				};
++
++				regulator-state-mem {
++					regulator-on-in-suspend;
++					regulator-suspend-microvolt = <1350000>;
++					regulator-mode = <4>;
++				};
++			};
++
++			vddcore: VDD_CORE {
++				regulator-name = "VDD_CORE";
++				regulator-min-microvolt = <1050000>;
++				regulator-max-microvolt = <1050000>;
++				regulator-initial-mode = <2>;
++				regulator-allowed-modes = <2>, <4>;
++				regulator-always-on;
++
++				regulator-state-standby {
++					regulator-on-in-suspend;
++					regulator-suspend-microvolt = <1050000>;
++					regulator-mode = <4>;
++				};
++
++				regulator-state-mem {
++					regulator-off-in-suspend;
++					regulator-mode = <4>;
++				};
++			};
++
++			vddcpu: VDD_OTHER {
++				regulator-name = "VDD_OTHER";
++				regulator-min-microvolt = <1050000>;
++				regulator-max-microvolt = <1250000>;
++				regulator-initial-mode = <2>;
++				regulator-allowed-modes = <2>, <4>;
++				regulator-ramp-delay = <3125>;
++				regulator-always-on;
++
++				regulator-state-standby {
++					regulator-on-in-suspend;
++					regulator-suspend-microvolt = <1050000>;
++					regulator-mode = <4>;
++				};
++
++				regulator-state-mem {
++					regulator-off-in-suspend;
++					regulator-mode = <4>;
++				};
++			};
++
++			vldo1: LDO1 {
++				regulator-name = "LDO1";
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				regulator-always-on;
++
++				regulator-state-standby {
++					regulator-suspend-microvolt = <1800000>;
++					regulator-on-in-suspend;
++				};
++
++				regulator-state-mem {
++					regulator-off-in-suspend;
++				};
++			};
++
++			vldo2: LDO2 {
++				regulator-name = "LDO2";
++				regulator-min-microvolt = <1200000>;
++				regulator-max-microvolt = <3700000>;
++
++				regulator-state-standby {
++					regulator-suspend-microvolt = <1800000>;
++					regulator-on-in-suspend;
++				};
++
++				regulator-state-mem {
++					regulator-off-in-suspend;
++				};
++			};
++		};
++	};
+ };
+ 
+ &main_xtal {
 -- 
 2.43.0
 
