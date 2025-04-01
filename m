@@ -1,351 +1,127 @@
-Return-Path: <netdev+bounces-178559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70F3AA778E8
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 12:35:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7053CA778F4
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 12:36:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41A8D7A2AF6
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 10:34:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FD9C1669E7
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 10:36:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 916A51F12F6;
-	Tue,  1 Apr 2025 10:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4590B1EDA35;
+	Tue,  1 Apr 2025 10:36:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="Tprvait7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gwLpBN2K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ADFA1F09B6;
-	Tue,  1 Apr 2025 10:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1CC31F09A7
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 10:36:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743503723; cv=none; b=H1U61Ig+lf60V5h/TDoM0JhNxm0NlZcA6xcQyc7Rc9fKLAJSYdXLh2tmS6w+XcxxmsjA8NQTGB+npPmQ8YjMGjhjGWj+Z0whn1uWw5uvmGP/TdffMAQTsFEFF60u8yN9z0kQmJSKFLkPtjd5TufP/wA7b/fYyRE1Ce+K5RDsf64=
+	t=1743503795; cv=none; b=QlQucIHxDp33bK5d/E8Cjf5IjiaKyyrSV/KD8vqegM8hxJlptaVXk9sg37h1i0kP7e5eX3tL9ZCmwTmM32Jpu0cFgP7x1MiKskJZs4ly0FYPi06NFBJ9k5i16bBdTE8QQNfh2i6VJaM3QGbyn3v20v3qBaLZJwJzsbweREGezBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743503723; c=relaxed/simple;
-	bh=v9kSnKkZYZ8WOxxdEDKtjf+iuECm/3V8MlhXkQVOj30=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cNLgt1YIS2TSf3jkMFXTP+vg+4/4UZ9kbkONPQRqImHsCdWkOqg0RhPoUtne2MCqvBpYNaByTZyjBJUEq2d4yK/1sakdd83f3+0nCXwJy8D0nB0v4lyeC2TRt4GjPh1RIUExBBV2Hr9h6yZHLDJHCE1VJYF33KL7c4S91b7mLUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=Tprvait7; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0C57C101CA6E8;
-	Tue,  1 Apr 2025 12:35:08 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1743503712; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=s7Poqe3mZVIgpU2JGC2x8jHFSjWgHlNoBHPst74G6xY=;
-	b=Tprvait7ezlgUnAVteDKrKb1PEx6byXSrNXb/HiG066infjz5H+UTJvCI6zLh9XeLH6MKU
-	MxkqTmCR6QkesCm39uIpLj4kXiXIH56ZhgtIsLMfHMDmI+28XrcmloOb9g2XzhJqnPNB66
-	WtXO/aqYSH8geX9cjsFOO1M6bbUn2lQYwNNWVud73LoU4hDW071gPsXenQRGv00jDZ6Kxl
-	eS/K1EqL162DFt++crqpY+cKc+lxs3ZB13GzUXpqlw/sMHEBMMWUwMq3m/uT2ZnYXlRkfL
-	WcmLG0/LhqHwh3iY7bgZr6pSCQWXGCctRUcx0i2Am6uMrzLULMijb5gL0lYoUA==
-Date: Tue, 1 Apr 2025 12:35:07 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Rob Herring <robh@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
- <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, Richard Cochran
- <richardcochran@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 1/4] dt-bindings: net: Add MTIP L2 switch description
-Message-ID: <20250401123507.2e3bf0a6@wsk>
-In-Reply-To: <20250331235518.GA2823373-robh@kernel.org>
-References: <20250331103116.2223899-1-lukma@denx.de>
-	<20250331103116.2223899-2-lukma@denx.de>
-	<20250331235518.GA2823373-robh@kernel.org>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1743503795; c=relaxed/simple;
+	bh=9/EHYs6xpCZI3XSkaJGAtARzqbLbwZsMQFjbMWVvXVw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=F5kuDbQQrtdO5E+L9JvoY8Xk277k8I6bIM7p+3wuqX0Hh0NxcOgYAGre/xXH2/Ic/i4/HYqoAApybxWTda4To9NMDesw/hQIFktHM17gcaVTfmQLLAs0/qOKIGiWhQcOWL2GeibeU9EuRrBLU7qIEpBQj7x0jO/q3GogKRvDR/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gwLpBN2K; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743503792;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=irbRg405LqpQNUULtX+WksVa1vDGOOwZVIRyr5VBbnA=;
+	b=gwLpBN2K+DpWeACvLO37pagyiQjvM92zhrttb4+VKzhEYdSFMysgHB5ZivItfxbPt0ZZlP
+	tbpRN0eqcOCYxUYzd6UXTJgxlcJk6gx6OaeoJCM03ZkX4VhOUbtz9vCwDr83LrpM5ZMVeH
+	XVPt297QCgTig7jJzvAOClpcr/RVUBw=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-591-0snMkkqPN3-PuLQQBi81Eg-1; Tue, 01 Apr 2025 06:36:31 -0400
+X-MC-Unique: 0snMkkqPN3-PuLQQBi81Eg-1
+X-Mimecast-MFC-AGG-ID: 0snMkkqPN3-PuLQQBi81Eg_1743503790
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3912fe32b08so3081489f8f.3
+        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 03:36:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743503790; x=1744108590;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=irbRg405LqpQNUULtX+WksVa1vDGOOwZVIRyr5VBbnA=;
+        b=CHq1iI8O9fR2lJxQd398kU2yVUKIftfGLhoipzom589UQ6QCP309lZ/WaVBqdSEe9U
+         Hhw/bklfMrPmjJ6nfVddau/BJZ98awwuDS3pxlrSmV8HGOC8okcm8agu/BE7UyMNtL4D
+         VurHt5c+nnx8CgFpKEDoo1uYbBv7wUBs5uNQYecs23Fq+lWZv2vAn4xSxufhDOygyBlt
+         1uxXnUhI5DN3lhmIjTMNt3URryPP8BQhqpRENFvoehhEqem+p9YDVuzVgqKsEbrxX8CR
+         bSjqdUrbrhXxxtIAgVc6taLv7Q5HkoNSbFBuBnR5R4BWyqzpDU+JcvhxXjczp7CiNeWv
+         USeA==
+X-Forwarded-Encrypted: i=1; AJvYcCWrighOIbbM/gm+1VCMZRPSYe/5nUYGS/qEggi4Ldh5LPzdIdyw3dVS230y2yynezPXVP4bNHg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzels0wKmrhWmWxg80Xej2f8hn7NA2Nmt+Ddd+xz25J6Yhp9+/A
+	1nhlQMigk40T21iiZaNiVb5P7v/7/LA2DkCX5+MmezMoknrY56haR0MS48M16pj385dCI7rF/Bf
+	jf9nTxl58H4KaJEzy55I97A/kK4ZzQD8kUskaVWC/WSr5i8GkTeX14A==
+X-Gm-Gg: ASbGnctTIGJcs7YQEkAso0wYk+f4nyGeRCMBydYUrEV8XErJ4eMFoGz6allx8oKf1Uu
+	SSVfi9aTDiImXXBqnOeMLz3NdnHgs4BaboOYlSz8pHpcHF3lBsOBKaOxeJpiCLX+qpwSSyotHKX
+	y1NWqTSO7+jMXJ4eISUf7eMq+kgIFUvij99rK4fXNddQiFIxjuJLIUUAKBrZvZhV4ENFgQ3yZ6L
+	XTkLsY7U4pNBhmzcUIQWH3+IWdWBWKv3tJl8gRa6IgGTnvCQTAEyiCLbYgUEjtzpcJs80kpHp5m
+	TMiLld4OAmq1y/YKEQSv5qwioweGwWuvvNxyRgDI66Q9zg==
+X-Received: by 2002:a05:6000:18a8:b0:399:6d53:68d9 with SMTP id ffacd0b85a97d-39c12118aedmr10813602f8f.38.1743503790192;
+        Tue, 01 Apr 2025 03:36:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHQmtPCHJlXKLKUpS3M2CZ3vPpJsGxYjZZ0dPv5EAK7n+IEZYEck46rKc/h0rEPKySQLP5l/A==
+X-Received: by 2002:a05:6000:18a8:b0:399:6d53:68d9 with SMTP id ffacd0b85a97d-39c12118aedmr10813583f8f.38.1743503789829;
+        Tue, 01 Apr 2025 03:36:29 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-68-231.dyn.eolo.it. [146.241.68.231])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0ddeecc9sm12532244f8f.83.2025.04.01.03.36.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Apr 2025 03:36:29 -0700 (PDT)
+Message-ID: <a9e10c46-c418-4bb0-b366-0a31f35caa6d@redhat.com>
+Date: Tue, 1 Apr 2025 12:36:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/RWGAJJQc9ifwwn2SMI2BeSX";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Last-TLS-Session-Version: TLSv1.3
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] ipv4: remove unnecessary judgment in
+ ip_route_output_key_hash_rcu
+To: shaozhengchao@163.com, netdev@vger.kernel.org, davem@davemloft.net,
+ dsahern@kernel.org, edumazet@google.com, kuba@kernel.org
+Cc: horms@kernel.org
+References: <20250401020017.96438-1-shaozhengchao@163.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250401020017.96438-1-shaozhengchao@163.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
---Sig_/RWGAJJQc9ifwwn2SMI2BeSX
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 4/1/25 4:00 AM, shaozhengchao@163.com wrote:
+> From: Zhengchao Shao <shaozhengchao@163.com>
+> 
+> In the ip_route_output_key_cash_rcu function, the input fl4 member saddr is
+> first checked to be non-zero before entering multicast, broadcast and
+> arbitrary IP address checks. However, the fact that the IP address is not
+> 0 has already ruled out the possibility of any address, so remove
+> unnecessary judgment.
+> 
+> Signed-off-by: Zhengchao Shao <shaozhengchao@163.com>
 
-Hi Rob,
+## Form letter - net-next-closed
 
-> On Mon, Mar 31, 2025 at 12:31:13PM +0200, Lukasz Majewski wrote:
-> > This patch provides description of the MTIP L2 switch available in
-> > some NXP's SOCs - e.g. imx287.
-> >=20
-> > Signed-off-by: Lukasz Majewski <lukma@denx.de>
-> > ---
-> > Changes for v2:
-> > - Rename the file to match exactly the compatible
-> >   (nxp,imx287-mtip-switch)
-> >=20
-> > Changes for v3:
-> > - Remove '-' from const:'nxp,imx287-mtip-switch'
-> > - Use '^port@[12]+$' for port patternProperties
-> > - Drop status =3D "okay";
-> > - Provide proper indentation for 'example' binding (replace 8
-> >   spaces with 4 spaces)
-> > - Remove smsc,disable-energy-detect; property
-> > - Remove interrupt-parent and interrupts properties as not required
-> > - Remove #address-cells and #size-cells from required properties
-> > check
-> > - remove description from reg:
-> > - Add $ref: ethernet-switch.yaml#
-> > ---
-> >  .../bindings/net/nxp,imx287-mtip-switch.yaml  | 154
-> > ++++++++++++++++++ 1 file changed, 154 insertions(+)
-> >  create mode 100644
-> > Documentation/devicetree/bindings/net/nxp,imx287-mtip-switch.yaml
-> >=20
-> > diff --git
-> > a/Documentation/devicetree/bindings/net/nxp,imx287-mtip-switch.yaml
-> > b/Documentation/devicetree/bindings/net/nxp,imx287-mtip-switch.yaml
-> > new file mode 100644 index 000000000000..98eba3665f32 --- /dev/null
-> > +++
-> > b/Documentation/devicetree/bindings/net/nxp,imx287-mtip-switch.yaml
-> > @@ -0,0 +1,154 @@ +# SPDX-License-Identifier: (GPL-2.0-only OR
-> > BSD-2-Clause) +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/net/nxp,imx287-mtip-switch.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: NXP SoC Ethernet Switch Controller (L2 MoreThanIP switch)
-> > +
-> > +maintainers:
-> > +  - Lukasz Majewski <lukma@denx.de>
-> > +
-> > +description:
-> > +  The 2-port switch ethernet subsystem provides ethernet packet
-> > (L2)
-> > +  communication and can be configured as an ethernet switch. It
-> > provides the
-> > +  reduced media independent interface (RMII), the management data
-> > input
-> > +  output (MDIO) for physical layer device (PHY) management.
-> > +
-> > +$ref: ethernet-switch.yaml# =20
->=20
-> This needs to be: ethernet-switch.yaml#/$defs/ethernet-ports
->=20
-> With that, you can drop much of the below part. More below...
->=20
-> > +
-> > +properties:
+Linus already pulled net-next material v6.15 and therefore net-next is
+closed for new drivers, features, code refactoring and optimizations. We
+are currently accepting bug fixes only.
 
-So it shall be after the "properties:"
+Please repost when net-next reopens after Apr 7th.
 
-$ref: ethernet-switch.yaml#/$defs/ethernet-ports   [*]
+RFC patches sent for review only are obviously welcome at any time.
 
+See:
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
 
-> > +  compatible:
-> > +    const: nxp,imx287-mtip-switch
-> > +
-> > +  reg:
-> > +    maxItems: 1
-> > +
-> > +  phy-supply:
-> > +    description:
-> > +      Regulator that powers Ethernet PHYs.
-> > +
-> > +  clocks:
-> > +    items:
-> > +      - description: Register accessing clock
-> > +      - description: Bus access clock
-> > +      - description: Output clock for external device - e.g. PHY
-> > source clock
-> > +      - description: IEEE1588 timer clock
-> > +
-> > +  clock-names:
-> > +    items:
-> > +      - const: ipg
-> > +      - const: ahb
-> > +      - const: enet_out
-> > +      - const: ptp
-> > +
-> > +  interrupts:
-> > +    items:
-> > +      - description: Switch interrupt
-> > +      - description: ENET0 interrupt
-> > +      - description: ENET1 interrupt
-> > +
-> > +  pinctrl-names: true
-> > + =20
->=20
-> > +  ethernet-ports:
-
-And then this "node" can be removed as it has been referenced above [*]?
-
-(I shall only keep the properties, which are not standard to [*] if
-any).
-
-> > +    type: object
-> > +    additionalProperties: false
-> > +
-> > +    properties:
-> > +      '#address-cells':
-> > +        const: 1
-> > +      '#size-cells':
-> > +        const: 0
-> > +
-> > +    patternProperties:
-> > +      '^port@[12]+$': =20
->=20
-> Note that 'ethernet-port' is the preferred node name though 'port' is=20
-> allowed.
-
-Ok. That would be the correct define:
-
-ethernet-ports {
-     mtip_port1: ethernet-port@1 {
-               reg =3D <1>;
-               label =3D "lan0";
-               local-mac-address =3D [ 00 00 00 00 00 00 ];
-               phy-mode =3D "rmii";
-               phy-handle =3D <&ethphy0>;
-	       };
-
-               mtip_port2: port@2 {
-		....
-	       };
-
->=20
-> > +        type: object
-> > +        description: MTIP L2 switch external ports
-> > +
-> > +        $ref: ethernet-controller.yaml#
-> > +        unevaluatedProperties: false
-> > +
-> > +        properties:
-> > +          reg:
-> > +            items:
-> > +              - enum: [1, 2]
-> > +            description: MTIP L2 switch port number
-> > +
-> > +          label:
-> > +            description: Label associated with this port
-> > +
-> > +        required:
-> > +          - reg
-> > +          - label
-> > +          - phy-mode
-> > +          - phy-handle =20
->=20
-> All the above under 'ethernet-ports' can be dropped though you might=20
-> want to keep 'required' part.
-
-Ok, I will keep it.
-
->=20
-> > +
-> > +  mdio:
-> > +    type: object
-> > +    $ref: mdio.yaml#
-> > +    unevaluatedProperties: false
-> > +    description:
-> > +      Specifies the mdio bus in the switch, used as a container
-> > for phy nodes. +
-> > +required:
-> > +  - compatible
-> > +  - reg
-> > +  - clocks
-> > +  - clock-names
-> > +  - interrupts
-> > +  - mdio
-> > +  - ethernet-ports
-> > +
-> > +additionalProperties: false
-> > +
-> > +examples:
-> > +  - |
-> > +    #include<dt-bindings/interrupt-controller/irq.h>
-> > +    switch@800f0000 {
-> > +        compatible =3D "nxp,imx287-mtip-switch";
-> > +        reg =3D <0x800f0000 0x20000>;
-> > +        pinctrl-names =3D "default";
-> > +        pinctrl-0 =3D <&mac0_pins_a>, <&mac1_pins_a>;
-> > +        phy-supply =3D <&reg_fec_3v3>;
-> > +        interrupts =3D <100>, <101>, <102>;
-> > +        clocks =3D <&clks 57>, <&clks 57>, <&clks 64>, <&clks 35>;
-> > +        clock-names =3D "ipg", "ahb", "enet_out", "ptp";
-> > +
-> > +        ethernet-ports {
-> > +            #address-cells =3D <1>;
-> > +            #size-cells =3D <0>;
-> > +
-> > +            mtip_port1: port@1 {
-> > +                reg =3D <1>;
-> > +                label =3D "lan0";
-> > +                local-mac-address =3D [ 00 00 00 00 00 00 ];
-> > +                phy-mode =3D "rmii";
-> > +                phy-handle =3D <&ethphy0>;
-> > +            };
-> > +
-> > +            mtip_port2: port@2 {
-> > +                reg =3D <2>;
-> > +                label =3D "lan1";
-> > +                local-mac-address =3D [ 00 00 00 00 00 00 ];
-> > +                phy-mode =3D "rmii";
-> > +                phy-handle =3D <&ethphy1>;
-> > +            };
-> > +        };
-> > +
-> > +        mdio_sw: mdio {
-> > +            #address-cells =3D <1>;
-> > +            #size-cells =3D <0>;
-> > +
-> > +            reset-gpios =3D <&gpio2 13 0>;
-> > +            reset-delay-us =3D <25000>;
-> > +            reset-post-delay-us =3D <10000>;
-> > +
-> > +            ethphy0: ethernet-phy@0 {
-> > +                reg =3D <0>;
-> > +            };
-> > +
-> > +            ethphy1: ethernet-phy@1 {
-> > +                reg =3D <1>;
-> > +            };
-> > +        };
-> > +    };
-> > --=20
-> > 2.39.5
-> >  =20
-
-Thanks for the hint.
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/RWGAJJQc9ifwwn2SMI2BeSX
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmfrwVsACgkQAR8vZIA0
-zr24oQf/anBJOGl0tWgnq6LRJxzQ6T2tFRMS9KaTl/Yl6SF0MpjdSH1Wjw4HV+oV
-gfTYtA1SQiOTdgGUq4oM8BTfLLxjLpD12kjIOAEY4ObVyfkYCtTFjyA5S+NA80Zs
-tcAyZZa9TVHculFJliwKPe6/XuAPXLwdPMb63tQrokVOi4XmKBO/PC1i6mpRONei
-y+aBVCE3+j+CiqVkK9ZEwKpI3FWfcODNbAQQ+tXQoKSvrsFLlr9xUMqUZnR2vr0V
-+qdkD74tQDFVoEOd9BQCUP0sacxP9+pS4sIjRgq8t4gJv0W59RxNKssq8RgWN10t
-GEICbrn8XIbQCF2SyxmkwxbNAym54g==
-=siSa
------END PGP SIGNATURE-----
-
---Sig_/RWGAJJQc9ifwwn2SMI2BeSX--
 
