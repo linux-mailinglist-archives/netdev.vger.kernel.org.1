@@ -1,87 +1,87 @@
-Return-Path: <netdev+bounces-178688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AB97A78404
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 23:30:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A96D5A78405
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 23:30:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CE803AA7D8
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 21:29:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D85618909B2
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 21:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B42661EFF96;
-	Tue,  1 Apr 2025 21:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E43DB20AF77;
+	Tue,  1 Apr 2025 21:30:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NRglROpU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e+oXQbsp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2991204F6E
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 21:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77E551EFF96
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 21:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743543010; cv=none; b=XJ3GaJ5xneQNydDFnjfOVK5XpuuJ/hgdPmAXGx68LyKYt5HPDXzrzlcGU7LAfpUrwbEzjEGrCSz5zd3G9sj4eNNimaHFIZpUahJEk/9IOKj3erRaSTZxX7CDbqMRSrL3uvIudoK/bv1FuE11ZpXMzB3jl00LEOczlS+u7Xm6SpA=
+	t=1743543016; cv=none; b=tlK/vCCue5VOZsPMM54T2RS1kCJW9uX3lCC3oKWWegmXnjpw7G9mhxHFHFVEfrDWrgGa9giPjYR6aIporn7pxsns4+I2VWbRp/bI3d+wzvTsIYw1lkHBkzvKpkmhuy+U5wPxy+O+94jCi1gXUSCEvzcX+MR8fA3eRquvvtxVBaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743543010; c=relaxed/simple;
-	bh=wwyo0LgWvt+4IBjBvdZHAc0CUJKp8k4bfCj5fdOUats=;
+	s=arc-20240116; t=1743543016; c=relaxed/simple;
+	bh=3T6senwk4kmjD3k4TYcRopBQIBs+dg6rxgGdS3SkxJM=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DHzqZYMrEGc3VGw334+9dA0CX8qPmAC/3Mspfd7cXtMiYtOV+WU6IzDpMy5hcOdlo1ktmBeRHSHDhUbr43Zo+AnI4/BXvJvr4aoJw6d2y+KGcNt1WlFJk3qjlfRcGLdrUyHqKsCBRbFV53pWHYh6cciY7VQx8BHsnJZULAp9aHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NRglROpU; arc=none smtp.client-ip=209.85.214.180
+	 MIME-Version:Content-Type; b=KfW1t02KdVnCLpsA1O4tXjuSMoLHxPJ8uZ0BT2YA4uOaAXcOf1US71MgrmzGcP6MpGGb7pnVKttoMkqa6Y100juPNr8OH0naltirphe/RKz3DSPgocv0Tl1fBSD+mVMxh6z1x+D5cuFKpRnM33A4wjnB9dyvYPFEDTXy6Z5qkKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e+oXQbsp; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2279915e06eso124413865ad.1
-        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 14:30:08 -0700 (PDT)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-227aaa82fafso117621215ad.2
+        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 14:30:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743543008; x=1744147808; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1743543015; x=1744147815; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=8tZTsgFV95G1RpNriOWM6jediUbS/l+nOAJ3TKTvjfw=;
-        b=NRglROpUdczxSogN8oAu6v4hsC7rdrHdQQDK9cEstTL5lO1/Eo2Q4Cq2phntdQjbpU
-         ZnaIHY1QG8FpGahMkeIDtqZIiAjaaDmi5W6/5E0/YLGmb9rnHLQaoCJO2mfcmPmOOHln
-         8S0DVHd3djzLXvcLWRPtcDXOWOSB49PfKgLLcvvYuAQk6IvOxl3ZGHmtjlv1Rh2MjggA
-         EZWhFEF3hyrcdSLwrx4K/eQsURrAJvQet3Ooce7jLrgsHYxg1kWZdEuSxzqjOvIwyu4l
-         2fK0YUwKsWxbDVkBYBorhsl9LA+bVsiVVdOqgJ0CDPq29IfxcK9nQG2c/XKcjMgelpEd
-         f8ug==
+        bh=e/fSpXDjzv9lRFDd8D9PPZpOC7fC5+qSFEn/Fu2i7ro=;
+        b=e+oXQbspWSTndfmIcXZblZ7A4KF2ut4B4a+Wi4d/SU5wUzJfNZCaCVsPuVyfi3rWv/
+         FjX0VXGg3VgctyBcGhGeiNxVtuCb49EwrI++el5ajHteixWDAyn+B4vqD7rc6v5bWb9y
+         Gl4rN7dELS1D6Z1gxaNa2GjaxaRwyUt6DCvNN424+OqvlPBlmrhTeqE6kjV2bEghRBpt
+         A9bsR/7iMGLURccrc+NaugecHtH177ntl2hCesibVUVT/05KlTuNFTtsA1TMx6M8FAFE
+         ZeqHwNjrToAcIuWyAgEROcoDzj8rn5iw7meAp2IOq1o96oJ81jwZ5oX3ZL6auK0knq7l
+         hQ3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743543008; x=1744147808;
+        d=1e100.net; s=20230601; t=1743543015; x=1744147815;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=8tZTsgFV95G1RpNriOWM6jediUbS/l+nOAJ3TKTvjfw=;
-        b=kEWKkQcF2an4m7Dn4dnKNf6+Ccm9mZZKrR2C7ICIkOSM4gzRjE8CulLDtc/YV9VOqS
-         rr4Laaw2v+OhcpRApNiNHRaQSldwPXztgg1gvUYXVV7R3hrwIETq6D+VnNb7pBdltWz6
-         dbXBdRVB0tfpkVBke8b17lmYwPaY8ILijDQ/pzL1EUMpFMDW0xi1CiYwE9768EfQq7GL
-         dP26dJrDdjH5DW7mMJHG/KEtbla5dDWk6E2ow0+G3lP0srp4qDtgcRMAoDW37RmMkU+c
-         OPGMSLrZtWqwpB1AHexTSmAV1dxodXp2w+jWQyq7gKHabTZrL3o5sRQWhlxrIPl7wzHD
-         49Wg==
-X-Gm-Message-State: AOJu0Yw4HB/et6hBxt4FdmM6sEOd9+EO1SjwZeqx5P2Y/y8Szwgscgki
-	gqlGEbV/c3csJ7OlOYiehGdNzdQ2igj7fQ+Nyip0thDXrnayyzbWR6lOGA==
-X-Gm-Gg: ASbGncvPBK5tec2Ye22NEg2h5VMoyyf7OktSv5shq6Hmf3f+9TLamnpaPP7g3OWYsjW
-	sMg+qPZNn8Y94CHGEuegMudjiFdxO8gqZBBiDc+GhJcbsnNEv0U+FUNejmyWg4LQXKn0o9+ozdr
-	bhlk9yZkhEAen168/gNEs60eMLielH5b+o0OpibEkW4Rp8vzUOCUSsmAgH5QuZ1UrapYa+a6Gif
-	ZWZDzfFNQJpwY3/GUFScSNqKjs6AMBg1v2fvtDFto0kvJhCiEe8DN2EGSrp7qoyWtsKTacmhOut
-	SWfRA6PED/+wlu1xI5Cf8iQqXxLg/A2Bao0toIypnRamqkYRnOrIdZc7sBA6a1aINar7WPQThMj
-	Huj4=
-X-Google-Smtp-Source: AGHT+IFTO6S0bMIxqczU3jnmQOabVu7CcvZK93TBhmBWqgg3DVxTZ0IRKJ4eSGpDXVrhebZKzOPiNQ==
-X-Received: by 2002:a17:902:da83:b0:21f:5cd8:c67 with SMTP id d9443c01a7336-2292f974bacmr214241455ad.31.1743543007945;
-        Tue, 01 Apr 2025 14:30:07 -0700 (PDT)
+        bh=e/fSpXDjzv9lRFDd8D9PPZpOC7fC5+qSFEn/Fu2i7ro=;
+        b=Ak9QZqnwovivGCjhBqIUC0L0c9inY/uVNSluN3DgkuffewRdyrnNQzx+C2kR5q/ZrF
+         u7ES/TcPt92UwtZeXCBeoqypwTkkMYKsclyjvfwlaKgm4s77naWC7beHud4ykr3tSn8g
+         XoVZVi8vg0CWt9Pndp5mly6PTChCZKHB7cDObr68/LJ3smGyRQsOmXJmr1osHcmr4LeV
+         osv5ALDj1t0v7z3d652bfnNQ6dzSBtH2uA/n1qZ+yIhR/aRUOrqegG5WGd1dXGZp8Grf
+         9IfInkJOyNMUXNYB2UiCzArwvFvkOFm0Zqs8brLGakhmDWuZl81VehlWiIxAPyGu8LP+
+         hvig==
+X-Gm-Message-State: AOJu0YyBI1LANHIjjc7n/YzvePmSUGeTvDztXnYYCLliIwJBjOv7LT12
+	jwS1P6hvWncO7DJPDc9aO4JU89f0hGOvVF4E/JLXkApatPR1VX9x
+X-Gm-Gg: ASbGnctV8IX04ia7aijZXj9qKAJYjcD+ZfSAtOeABtBwy1qwh4ONVIOkWPC+mysTwXV
+	9lsldlnxuJqy7Bos/rVsvOh1PTZEL7Y4n9p5OGa75PZfxWJOBOrfbdwSH8dq+FHOWMH5hakLYia
+	Rx+yIXNZA2ZMr0TwlsA2jB8VO4nwJGJm+TEFohorT2pbCFa5h5GVqOjyGM+Fmr5UMk3RXoXVmVN
+	QLn3Q/UkjwR8QJHffilfI4/LqXSkhcvtCBWg13pAjpP/ctTWxCW3BGugBtH5oM2doa3Wedl2D5j
+	iSQpUKF7NMUp5WGvfq3dDjwpWKIwSYvYJ/fIwAGKxJiSckAZBd16yxKsFQIwvSDcIzwoLsso866
+	vDd4=
+X-Google-Smtp-Source: AGHT+IEL5ZmF6gw8On6RjZDTO1j4Npd+KuixASNNeWQWRZY7yeX0HfyE0tJfwvjioEn990GUWwdiyA==
+X-Received: by 2002:a17:903:3d05:b0:220:e1e6:4457 with SMTP id d9443c01a7336-2292f974b94mr227174965ad.26.1743543014529;
+        Tue, 01 Apr 2025 14:30:14 -0700 (PDT)
 Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291f1e00e0sm93898515ad.209.2025.04.01.14.30.07
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291eee0d37sm94492275ad.91.2025.04.01.14.30.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 14:30:07 -0700 (PDT)
-Subject: [net PATCH 1/2] net: phy: Cleanup handling of recent changes to
- phy_lookup_setting
+        Tue, 01 Apr 2025 14:30:14 -0700 (PDT)
+Subject: [net PATCH 2/2] net: phylink: Set advertising based on
+ phy_lookup_setting in ksettings_set
 From: Alexander Duyck <alexander.duyck@gmail.com>
 To: netdev@vger.kernel.org
 Cc: linux@armlinux.org.uk, andrew@lunn.ch, hkallweit1@gmail.com,
  davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
  maxime.chevallier@bootlin.com
-Date: Tue, 01 Apr 2025 14:30:06 -0700
+Date: Tue, 01 Apr 2025 14:30:13 -0700
 Message-ID: 
- <174354300640.26800.16674542763242575337.stgit@ahduyck-xeon-server.home.arpa>
+ <174354301312.26800.4565150748823347100.stgit@ahduyck-xeon-server.home.arpa>
 In-Reply-To: 
  <174354264451.26800.7305550288043017625.stgit@ahduyck-xeon-server.home.arpa>
 References: 
@@ -98,56 +98,34 @@ Content-Transfer-Encoding: 7bit
 
 From: Alexander Duyck <alexanderduyck@fb.com>
 
-The blamed commit introduced an issue where it was limiting the link
-configuration so that we couldn't use fixed-link mode for any settings
-other than twisted pair modes 10G or less. As a result this was causing the
-driver to lose any advertised/lp_advertised/supported modes when setup as a
-fixed link.
+While testing a driver that supports mulitple speeds on the same SFP module
+I noticed I wasn't able to change them when I was not using
+autonegotiation. I would attempt to update the speed, but it had no effect.
 
-To correct this we can add a check to identify if the user is in fact
-enabling a TP mode and then apply the mask to select only 1 of each speed
-for twisted pair instead of applying this before we know the number of bits
-set.
+A bit of digging led me to the fact that we weren't updating the advertised
+link mask and as a result the interface wasn't being updated when I
+requested an updated speed. This change makes it so that we apply the speed
+from the phy settings to the config.advertised following a behavior similar
+to what we already do when setting up a fixed-link.
 
-Fixes: de7d3f87be3c ("net: phylink: Use phy_caps_lookup for fixed-link configuration")
+Fixes: ea269a6f7207 ("net: phylink: Update SFP selected interface on advertising changes")
 Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
 ---
- drivers/net/phy/phylink.c |   15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ drivers/net/phy/phylink.c |    1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 16a1f31f0091..380e51c5bdaa 100644
+index 380e51c5bdaa..f561a803e5ce 100644
 --- a/drivers/net/phy/phylink.c
 +++ b/drivers/net/phy/phylink.c
-@@ -713,17 +713,24 @@ static int phylink_parse_fixedlink(struct phylink *pl,
- 		phylink_warn(pl, "fixed link specifies half duplex for %dMbps link?\n",
- 			     pl->link_config.speed);
+@@ -2763,6 +2763,7 @@ int phylink_ethtool_ksettings_set(struct phylink *pl,
  
--	linkmode_zero(pl->supported);
--	phylink_fill_fixedlink_supported(pl->supported);
--
-+	linkmode_fill(pl->supported);
- 	linkmode_copy(pl->link_config.advertising, pl->supported);
- 	phylink_validate(pl, pl->supported, &pl->link_config);
+ 		config.speed = c->speed;
+ 		config.duplex = c->duplex;
++		linkmode_and(config.advertising, c->linkmodes, pl->supported);
+ 		break;
  
- 	c = phy_caps_lookup(pl->link_config.speed, pl->link_config.duplex,
- 			    pl->supported, true);
--	if (c)
-+	if (c) {
- 		linkmode_and(match, pl->supported, c->linkmodes);
- 
-+		/* Compatbility with the legacy behaviour:
-+		 * Report one single BaseT mode.
-+		 */
-+		phylink_fill_fixedlink_supported(mask);
-+		if (linkmode_intersects(match, mask))
-+			linkmode_and(match, match, mask);
-+		linkmode_zero(mask);
-+	}
-+
- 	linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT, mask);
- 	linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT, mask);
- 	linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, mask);
+ 	case AUTONEG_ENABLE:
 
 
 
