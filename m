@@ -1,129 +1,160 @@
-Return-Path: <netdev+bounces-178496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE14AA774B8
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 08:49:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 942FAA774D4
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 08:57:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80B80168D1E
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 06:49:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2B1F3A9E70
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 06:57:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFEF31CBEB9;
-	Tue,  1 Apr 2025 06:49:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2592B1E5B69;
+	Tue,  1 Apr 2025 06:57:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="EAoiDVHp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cGUWTLuq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B8642052
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 06:49:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 820BC3BBC9;
+	Tue,  1 Apr 2025 06:57:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743490163; cv=none; b=ZEnhqoToEIMp5GaKcNS5+dqdh1aJFVvHKgnTUaIi4G5Db9qvLa0sK6bhh60Uu3XsLk1nRzzSeSmM+b+SuWQo8BvAT3Omwv0dlp7MsnfqHX8DfausMmSzaFINss4yttQN2XTIVYlraKhZh9yhNGJPvzrVRtLbnxGG+yIbwPoP7rI=
+	t=1743490673; cv=none; b=vBd1DWTc4Dd54P/1J7Ui3Q6rr1/6vWG/BNCmAirOAYXJk3x0jbAdQD6eY2RMq0mgwA/fjnVj9hLP6vTxOwznWdjpdytf4V1uUUVjkyJ6UQ2aVwPSFL5QyWLEnvBP39hyk9+zVBPD1x1BGFNtH9BUvngHHcUOQcUyuWn5zCCo3wU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743490163; c=relaxed/simple;
-	bh=19NqAsNMeTd9dQAzYg4gwKcYyPfAqdZa/VkYUFGvdIk=;
-	h=Message-ID:Date:MIME-Version:Subject:Cc:References:From:To:
-	 In-Reply-To:Content-Type; b=PxyBss6a7VqFOz0Q33nWQLe7TqUXDZekDt1+CexVyiEpFHuTxC+GLPyRR4yT6JoC3tkWnr7IA/+rZhSijhD0lIBvc0LwXtvgiWhLchSD2q0gBXqWTOXx4PyWYThvyvKHQfj3PstSz7pdguBZekAPmD6TtHPc85to0wkVuz9l9Qk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=EAoiDVHp; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3912b75c0f2so459382f8f.0
-        for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 23:49:21 -0700 (PDT)
+	s=arc-20240116; t=1743490673; c=relaxed/simple;
+	bh=IGCSEc7Ts4W/Xzxedq5JGQXSYv7wzW4BM7kIZ4pyBGQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FH8Lg/CfOG71e8rKpC/GcfXcmvcGv5EP2h98mCQBCVnfMGgDFTYqyxEWmR3OuZJjd/oppkmZdq3N4ILQJ4GogWURcKo464rir/rcSRBLYdK6XQHGGHuU6zHu0Rn0Y8GoEqNmd28JzZNXWHeofeB01YXShoSY+g+cXCI/rreYQrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cGUWTLuq; arc=none smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6e8f7019422so46909766d6.1;
+        Mon, 31 Mar 2025 23:57:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1743490160; x=1744094960; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:to
-         :content-language:from:references:cc:subject:reply-to:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vPMIAVs3qOWVsyBtsGxXHT6n12gnPK6Ng3mzSvT++nI=;
-        b=EAoiDVHprKpL8bnxeK2mi3D9vvM5G7a6BQZcbfqU6oD8vFnYv0u7FbbwHcAsEX7OmD
-         A6L8H36bh2H5q7J7Yz21mfDtuoSRoS03DGBcgL7sE85ONOTKMvm43aYh3XhaPeZ1DCcT
-         l/IctihWLydaEIyhrna+iwAxd4IcZ+lW8LDx/TDp2tNKMeoI9AOzO5gz6XygnCHfz/Vy
-         +jInVOCFuTbgGB+UqzUTIJWfA8lnjgDS5VjJe9icXBuySfs1GJm8jV0DqYvqDLG0KbfZ
-         QDBh2UXaJmKq4pBYOG0WGYjwJrFuV/r5kPTPQzHEKDoK+m/A6UhWVG+T6H6yPygg4aHp
-         4lmg==
+        d=gmail.com; s=20230601; t=1743490670; x=1744095470; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ssnm22tzkENh8oJAuNiuanJgxcOth+qg0jpPFpBJdzU=;
+        b=cGUWTLuqjA+4F99F7Hf4STbEs6beosoTp1GBEKtW95IGyc6bkiZylCshJNKN3ymPLH
+         W+IE4SXa2R7RogEluuEpu3yegbgZvwlvrL0XIwoM1YRggqnlSItP6/bC5TbuSNHGKvfH
+         ruIrFYeSWxEJgQ8LUsrm6RpF3UuM6ybsMwhNq6BO59sijy2o/jWQaOV2R6+WYlqALtxn
+         GtHFopYVjo3IS/uIIygXNw6pgp9GYoYVC1Pgl7Dd6Q/E+bSz5v4C6FujBUiiid7EB9JR
+         e8crPJgKpolZGsN8S9ncQQ9xD7OQZ9QHHu+IjF0MyoQ0MVJ9Ss1NdsiqOo+4mcPulnq/
+         EgbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743490160; x=1744094960;
-        h=content-transfer-encoding:in-reply-to:organization:to
-         :content-language:from:references:cc:subject:reply-to:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=vPMIAVs3qOWVsyBtsGxXHT6n12gnPK6Ng3mzSvT++nI=;
-        b=mpphpzAjEYuXrI1enCOi4Jl2FUeQ8q1jSxJyylTEGoyyF3/TVLjTc+Qe6RcJ445zUG
-         Hcx1D42zNSfkwFZbToL2mVTkrAf18oMLMtSTdvT8xHkyIoj7ff92mtPnTWj4VLGL8K+l
-         JfdMgg26jA14O/PjUarOBySytt0orKdVi1grg0e6rVuwDUy2LVzAq+u9YkKzGrE1Eae+
-         JRACtW6pTUYVzFUIpdcwncuK3exyP21+DLKRhLo7+M6hB9a+jn3zlKDup367hDRjwQVj
-         42wPJSvW+BsxBmWMwUy07m4w5zed8nj5z3vykXVWTsyizhnVQCFZJ/JdXQV2sjMkFEBQ
-         89SA==
-X-Forwarded-Encrypted: i=1; AJvYcCXjq2GNtNyDUj80+c4LGh0PrEKjUEv1QtvFDmukdZNfXUauAtUQ1mY03W29jZKgcXyMQ0bmekY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyufcRxTNC52NislQ+A0aF8AZykDRINt5lzCVs4tiH+UAYYAKk
-	wX1S3ozRto0/IbMwCRfqIpxlu9SFP9TFl0N6EZybtmmdyXDX/+aMrk+MKXbS13E=
-X-Gm-Gg: ASbGncvNR/lHvOm+n6HpWqRUYLhNorcLTgJpME1XN47B6qAUU4hf6Eo6Heweljeu5oG
-	kVvehShpcJMyEsD9E79eEJrMbEyVqX1aeT9ULtWCsWjqA8i/cQvL/58186o1CDAC2BIV5410Rkg
-	u7WQlWT+CW4KwVd8H/qLPvYGC756d0myPKCYec9uuGgT7ZyX+TsYXaL8VZo8pPQliZu7Ba4nEBa
-	MIDrCksq9KcegYQlCtMAf+70bzeGn8aoC8cWtAhRoFcrKj4Cdhsq+pypkLp9HcbvaO9pwr5CZXv
-	qMNeFfebI4iubU1FOLBeV5JnCDL8Trz7d2tUD0pzSf3HlA+rt3nx2OEVI3AuhzeO0jZlVovv8FC
-	jIdVH0ZDlH/HuSwILwCvM53AWmJ4YEZei
-X-Google-Smtp-Source: AGHT+IE7jpoepUT2i4HRtlJZ9boKfMMP++uvAeDbYxxM1bo0GvqONcbsJ5VntlNknnK+5rheBrgwLg==
-X-Received: by 2002:a5d:6d88:0:b0:39c:1258:b36 with SMTP id ffacd0b85a97d-39c2483c1b6mr279314f8f.14.1743490160172;
-        Mon, 31 Mar 2025 23:49:20 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:a98c:be9d:164a:20eb? ([2a01:e0a:b41:c160:a98c:be9d:164a:20eb])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d8fba3e44sm151339775e9.4.2025.03.31.23.49.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 31 Mar 2025 23:49:19 -0700 (PDT)
-Message-ID: <bb1a3cde-d4e9-40f8-b03e-0a757fb7a47f@6wind.com>
-Date: Tue, 1 Apr 2025 08:49:18 +0200
+        d=1e100.net; s=20230601; t=1743490670; x=1744095470;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ssnm22tzkENh8oJAuNiuanJgxcOth+qg0jpPFpBJdzU=;
+        b=Wqe2dAlcT5IhE3qvYbCVoYaAs2oB9LUWF63Q0i91N06dS9dIWno9Kbsi26HQ1N5sMW
+         JYfOws4SNhjjJ0RA/AeoHDjAoNBkY20xpBTUruY5wubBZgzUJNFwQyLTLCK8mhRqLTN6
+         HFi1soz6DgJ9MYS3pk5u/oG9wJtFHE8+Le4TfR5CLStGoqOx/wUr8NrtC3ymuhP/7KF1
+         Q3f6n5jbQ5JBxL9y+eaDFY7upEnZVQav8K2mLLngOfJNwmICEvdXKxWRPDb+kjPIxRwK
+         iWWQ3XS2hsFkiYiTV+WYGO1Y5Z2tpRgHLofNTykfomEt0CnZdaFnyMvyIziwQuUiabDh
+         vMEA==
+X-Forwarded-Encrypted: i=1; AJvYcCUwAyo8lYc1/8er+I0L2dZNmBBTtH+FwOwW5GNToyXrPW2coZ6D71TM5SDrA6iM7yikf0yAhFwTV+blO2Q+@vger.kernel.org, AJvYcCWTWpbL/4wi+s2HEHYKG3gW8QYIo2AcJNLaN/JNafEwpDSewCyK8Yzb/V7di4bDwWNVwCQURB34@vger.kernel.org, AJvYcCXl8naALy2TqsErRhtR/7puTyH788/eihP0hpALrGxwTwV1eVAsvAdWXJZLfiijPLaml+w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoAEn1HiOSWHPk9Z5S2f57zj0AIWWjK0NFStvDL9uOebeYkS01
+	iF6Dv0XfF/ezFDiRSps4lAFkCycCe8R2hCvnu6h1FTsM46SFqx/jLhCyD3QNyaMrQNqNUS/tYnt
+	Qj+rkNhWJICPmP3cw96UAgY1E1cc=
+X-Gm-Gg: ASbGncvC07b9zVDnPBPbi65VAVxTQ/pr2GefrvP9Fypik6soE7V8zaBMfAh765nVUAN
+	YnVt9EjPGI7bAyiUlv2vgacqHCkLX1oWHujzySys+Bd/lEI7D/hTBzjW+nBxM/gq2mVrz1Y8uN8
+	QWKDuNBZB6v8om/RNU5WWlGbBF/oRtNZoxovvpzMI=
+X-Google-Smtp-Source: AGHT+IEdDAVr7gVEbl/GU6WDm3sxWkA6MwHWEQcbw2gEjH2spd6Tnyrk+S3j01CtNdHmm8Kio51U0o84zUlZceK8Um4=
+X-Received: by 2002:ad4:5c69:0:b0:6e8:9dc9:1c03 with SMTP id
+ 6a1803df08f44-6eed61d4938mr215266606d6.21.1743490670336; Mon, 31 Mar 2025
+ 23:57:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH iproute2] ip: display the 'netns-immutable' property
-Cc: stephen@networkplumber.org, netdev@vger.kernel.org
-References: <20250328095826.706221-1-nicolas.dichtel@6wind.com>
- <174347883527.227928.17713387159044503900.git-patchwork-notify@kernel.org>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-To: dsahern@gmail.com
-Organization: 6WIND
-In-Reply-To: <174347883527.227928.17713387159044503900.git-patchwork-notify@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250329061548.1357925-1-wangliang74@huawei.com>
+ <Z-qzLyGKskaqgFh5@mini-arch> <Z-sRF0G43HpGiGwH@mini-arch> <0d1b689c-c0ef-460a-9969-ff5aebbb8fac@huawei.com>
+In-Reply-To: <0d1b689c-c0ef-460a-9969-ff5aebbb8fac@huawei.com>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Tue, 1 Apr 2025 08:57:39 +0200
+X-Gm-Features: AQ5f1JoOBJ9GaGcDlhTEvX2DMHnIg27Jf5d7FVBWwMgFdH6LVMOQBiZvlY1hMAs
+Message-ID: <CAJ8uoz1JxhXFkzW8n_Dud8SR-4zE7gim5vS_UZHELiA7d0k+wQ@mail.gmail.com>
+Subject: Re: [PATCH net] xsk: correct tx_ring_empty_descs count statistics
+To: Wang Liang <wangliang74@huawei.com>
+Cc: Stanislav Fomichev <stfomichev@gmail.com>, bjorn@kernel.org, magnus.karlsson@intel.com, 
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, yuehaibing@huawei.com, zhangchangzhong@huawei.com, 
+	netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Tue, 1 Apr 2025 at 04:36, Wang Liang <wangliang74@huawei.com> wrote:
+>
+>
+> =E5=9C=A8 2025/4/1 6:03, Stanislav Fomichev =E5=86=99=E9=81=93:
+> > On 03/31, Stanislav Fomichev wrote:
+> >> On 03/29, Wang Liang wrote:
+> >>> The tx_ring_empty_descs count may be incorrect, when set the XDP_TX_R=
+ING
+> >>> option but do not reserve tx ring. Because xsk_poll() try to wakeup t=
+he
+> >>> driver by calling xsk_generic_xmit() for non-zero-copy mode. So the
+> >>> tx_ring_empty_descs count increases once the xsk_poll()is called:
+> >>>
+> >>>    xsk_poll
+> >>>      xsk_generic_xmit
+> >>>        __xsk_generic_xmit
+> >>>          xskq_cons_peek_desc
+> >>>            xskq_cons_read_desc
+> >>>              q->queue_empty_descs++;
 
-Le 01/04/2025 à 05:40, patchwork-bot+netdevbpf@kernel.org a écrit :
-> Hello:
-> 
-> This patch was applied to iproute2/iproute2-next.git (main)
-> by David Ahern <dsahern@kernel.org>:
-Thanks for applying this patch. Note that the attribute IFLA_NETNS_IMMUTABLE
-will be available in the 6.15 release.
+Sorry, but I do not understand how to reproduce this error. So you
+first issue a setsockopt with the XDP_TX_RING option and then you do
+not "reserve tx ring". What does that last "not reserve tx ring" mean?
+No mmap() of that ring, or something else? I guess you have bound the
+socket with a bind()? Some pseudo code on how to reproduce this would
+be helpful. Just want to understand so I can help. Thank you.
 
-
-Regards,
-Nicolas
-
-> 
-> On Fri, 28 Mar 2025 10:58:26 +0100 you wrote:
->> The user needs to specify '-details' to have it.
->>
->> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
->> ---
->>  ip/ipaddress.c | 5 +++++
->>  1 file changed, 5 insertions(+)
-> 
-> Here is the summary with links:
->   - [iproute2] ip: display the 'netns-immutable' property
->     https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=e4e55167d004
-> 
-> You are awesome, thank you!
-
+> >>>
+> >>> To avoid this count error, add check for tx descs before send msg in =
+poll.
+> >>>
+> >>> Fixes: df551058f7a3 ("xsk: Fix crash in poll when device does not sup=
+port ndo_xsk_wakeup")
+> >>> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+> >> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+> > Hmm, wait, I stumbled upon xskq_has_descs again and it looks only at
+> > cached prod/cons. How is it supposed to work when the actual tx
+> > descriptor is posted? Is there anything besides xskq_cons_peek_desc fro=
+m
+> > __xsk_generic_xmit that refreshes cached_prod?
+>
+>
+> Yes, you are right!
+>
+> How about using xskq_cons_nb_entries() to check free descriptors?
+>
+> Like this:
+>
+>
+> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> index e5d104ce7b82..babb7928d335 100644
+> --- a/net/xdp/xsk.c
+> +++ b/net/xdp/xsk.c
+> @@ -993,7 +993,7 @@ static __poll_t xsk_poll(struct file *file, struct
+> socket *sock,
+>          if (pool->cached_need_wakeup) {
+>                  if (xs->zc)
+>                          xsk_wakeup(xs, pool->cached_need_wakeup);
+> -               else if (xs->tx)
+> +               else if (xs->tx && xskq_cons_nb_entries(xs->tx, 1))
+>                          /* Poll needs to drive Tx also in copy mode */
+>                          xsk_generic_xmit(sk);
+>          }
+>
+>
 
