@@ -1,217 +1,202 @@
-Return-Path: <netdev+bounces-178614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13E3EA77CF9
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 15:57:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 46D2EA77CFC
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 15:57:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F2DE188B913
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 13:57:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F3D0188BCEA
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 13:57:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 264752046A8;
-	Tue,  1 Apr 2025 13:57:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D319A2046A6;
+	Tue,  1 Apr 2025 13:57:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sigma-star.at header.i=@sigma-star.at header.b="khWvoUj1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U9H71HUm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BAC6204692
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 13:57:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 254C21EF080
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 13:57:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743515835; cv=none; b=GKtS+Kq7cY2CbzGDE0ZSyXyBXCq6pr8/KsTTUZSi36ClB447ua1lWzV2R/oS+RL0wqRydWUf+MOip9DN0dc2z7D7VJEHO+TfukGJjeTmqQOX6bU2U2dmCJerumt7n0W0YLBv0arghRTAHLpGfFoK54ZV2PxxbamvMQVJnx/jfU0=
+	t=1743515864; cv=none; b=LUdkfpKiLHFR/y7MYI5CpL9kAMlaBi8UzuSZvgxZ9UUKEXQ36NWKUoz4KpBkopwYLq1eHcQC0hOTznc35YgBrAgYRt0M/N9GZpiO6Kkwcw5wXJ82COVwdB0KF2vuVwqSyL4372zZ7cLCa+WFyse4RjTRlYy8+NVex+pWXCMLwTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743515835; c=relaxed/simple;
-	bh=NWXXVvjt39xU+rA7+NnTR8sUGDWv6O8iuPCim6wufCs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e8BymVGXo3LvzwEOifz4MX+d6e3eQOF9BK35wAI2NA1KZyXDnn+d3u7oi9/e1bw+KpU5wWKKqUUQXXQfW87/+ycU+fXOt9femJVHTOTDUFlCyJhglDACdn9t8HKKNqSwPfkbs44SFvPtMMmtuNoT5TVum7I/sRWVGPR9OwxmXi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigma-star.at; spf=pass smtp.mailfrom=sigma-star.at; dkim=pass (2048-bit key) header.d=sigma-star.at header.i=@sigma-star.at header.b=khWvoUj1; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigma-star.at
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sigma-star.at
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-39ac9aea656so4599003f8f.3
-        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 06:57:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sigma-star.at; s=google; t=1743515828; x=1744120628; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=uwYV6EoXAucL5Dj4d79APrOokX4rUIbo+yxZ5Oz9Kew=;
-        b=khWvoUj1FQ5wPqYpMh3IWstvhOhhNAoHJ8X/kS/Tlw1XOWzp11ZTOLrbqWS8cBujbf
-         an6M46xGdsP3+VJZ/Lwzm7x5t06rfi5fuz2dghVnoFTnxhBW8weS32/ZZwVebWWA9p27
-         sSueg11U6Y9Lyp8fa8TJRc005VAhLl1RihBnO57YfnIelYH+XwuM1nCi7F0+pq6lkKWB
-         jwBLuU2SWESlRWlSXmLlvU9z+9c4XEDx6PEJ1uFXbs+zMgjvSEX1/apRBEFDpCfipUde
-         hXwwkQPluhKC1OaMoSn/hgUvXK/nnGyt1pf38/9XdpfAhmAHsVDN9GMMl41oskWsZqkF
-         E9QA==
+	s=arc-20240116; t=1743515864; c=relaxed/simple;
+	bh=Ei4o2YiJCXeec+uFKDsiydnj+4SkZPbIQelCXI4KKNs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YNISS4lcr176ph3ERJu88HRVzUUeJoUsm+MVjODk3jEwMetuJTy4dFtxrbNVLbN6tUoL9QzfowJgbr0SMTMvEWuOI+6NCxbskk/ysInbojduf6/9mYz1fRObS3v6ITRAOVIl3t8ngUzRW4nG4htKGM5phAR3OfGvc8TquRyOP7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U9H71HUm; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743515861;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nK9hIRueLujXj1So3EtFD3gYBWrgxP2wNV1sCqS84Xw=;
+	b=U9H71HUmQsubaekBCr66HRJwKbVXaXEB5Hj1Lu884wmJpFx1061+DxamQFqcbWGq5caPWb
+	bETu8Fyo9ohwqM5Bj/+PJyoV/xgcsSLfLuLTgKcQE6ihQ+hwXDGDFQaJLdmi/LADvhlvTl
+	N6l9ubkCb/2FfW71a0UY0UEl7bE4MMw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-325-gaGkv8_rMfe3N3Gk3njkmg-1; Tue, 01 Apr 2025 09:57:40 -0400
+X-MC-Unique: gaGkv8_rMfe3N3Gk3njkmg-1
+X-Mimecast-MFC-AGG-ID: gaGkv8_rMfe3N3Gk3njkmg_1743515856
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-391345e3aa3so3189659f8f.0
+        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 06:57:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743515828; x=1744120628;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uwYV6EoXAucL5Dj4d79APrOokX4rUIbo+yxZ5Oz9Kew=;
-        b=Ulkj7ReCBAQGpRoxBBHLi6OFfhTTTAljnNAyUdvijZv+eAIkF08yv1R9sOgO+blxfL
-         vzYHa1Unxq6KZkS9usroGofT0xw1fYowBC+N+WtygPNVGOqSl9ApIaVz+PCDQuEw/Kl4
-         2VzPNcgSs3N2NE6OSxXN56V1kjRgCMYiRnAUnavXtF4bhuZQksd0uO+aXRpQnZAZ/YRy
-         WAqgZjHpOzCwBV4AIOs9ZydtRwrOHXoBTVl7o0XJa94PT4wk7sUHvQHr2acKh1lAvXka
-         RfRbISlbMQqrM4b6QtEPzm2dstgNeeNPb0hkf7y+8mDPx7htGbMaKyG1JAYEGaWOlNVb
-         APmQ==
-X-Gm-Message-State: AOJu0Yx0lfY3xxu8gzSnhSWR8cUzSaqx21FYc4fW4Fh2Pm06wVqZr7VV
-	6RpPcefbe82/Y8hiZLW5FxPW++HFgLRZEg0Q2JLWPhBdpnMxmLCucELnU9WE/tZvT+8edAXu5OA
-	fbWw=
-X-Gm-Gg: ASbGnctY8ZIxNZRp3GjruZJQ3N5ge1+UClcE4hwLdoNDlHMKRgdcPp7BoHJBF7lIor4
-	NvJtlqzwcjgOuOSf0Q4IlFMa93pjDEf0fR16f9jrVY6O+Q82cQolSCkkbb8PDtqSdpk6q4SMba7
-	MIAmyiSGiBbhlhckow8wKLNatX8flCuw8RSnO08HxWqmMG89/VLHNfDlfllIdtf8wxV536lZ8i2
-	hd2JpcoW3HC3UG9oUKfYlgWeYP8byd9vQ6+Tx52LouOrRSRakaF2qCm8uGCv8Sfi1qPvf8Cb0jW
-	0MoZVmhig8bLGGrqUk7xFsDC15oXSfLj4s3F2Xcy3s/RNwLBA0bNSt1/rSIJltDrpHOgLiU2IQt
-	Gbj20xCEz
-X-Google-Smtp-Source: AGHT+IHTPWai+jBGLAnveIJs6fn4EvvDuSSqT2nask6GBM2fV4+C1CEIjhI6NE2QLkoCxTJzkbEvmA==
-X-Received: by 2002:a05:6000:381:b0:39c:1ef5:ff8b with SMTP id ffacd0b85a97d-39c1ef5ffa2mr4867175f8f.48.1743515828334;
-        Tue, 01 Apr 2025 06:57:08 -0700 (PDT)
-Received: from localtoast.corp.sigma-star.at ([82.150.214.1])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d82dedd03sm200475155e9.3.2025.04.01.06.57.07
+        d=1e100.net; s=20230601; t=1743515856; x=1744120656;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nK9hIRueLujXj1So3EtFD3gYBWrgxP2wNV1sCqS84Xw=;
+        b=aoHvdvN7xAKb01dMe7ntV+FiKz/Uj4tn9KRW3R7kqs4uvkoofbmqUwC/qwXVfrhEig
+         brT4w/G+/4EL0Oc2zMW6GdE4PUqXG9YjRMJzxlFT4QD/Xmg4qkkM1mr/auq/IAjSDlKQ
+         gKs53fXnsWHGBJxu7me55JzT4sTq0KO/a7x5uiunmhQpCOz8eqFSToTiv292waprlQtK
+         R7IEfyWFZ6/WHAEH7eB2zj3ZL4W3IJiDZ/6EhOiCKU/u2aqM5xkYtv5i4b4ABvev34O6
+         evtSawrzghI8Cu4gVA+jINDxOeYH4PhGugMRu2SMQSeFm05qhvi2c5DufcKpZs7fBE5m
+         JIpg==
+X-Forwarded-Encrypted: i=1; AJvYcCVJF0XjojFLmVj7Ihd1l3zp9fRtARkvl1DsveH0QDVgYUsrAMCpM47mbyxyXPp+k2km1Xftj4M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7QhRg7BXuppWD8jAXzosUh4pXkO29AaPc52lUEyGNQAr3GxLw
+	SYj2VXtICSQa8AeaXy08SHSlQkkGQsuMGEUqAH15ZwALzq0brmZ2tcLXv79mocg374/4Bp7tbCr
+	q2HLvGezGfTbUKgdKfbnS56/cBusp4FZrLJ/F2XMtf9WekO9Su0QWtg==
+X-Gm-Gg: ASbGncsXxKo7fUmvAUCxEFXJwMi4gF1YRvsJNAUj1ieSUtR0fHIRs5cFqBQO7r/P2WL
+	f4wSy7CkpAfUh1HLta2GiHGEXP8tBvAl79MFyEzET0e95xKiMPC1nLNBtUx+Sa4eU3X8J7RiSlc
+	o+/2c8MhBfLG4yqlX1tW0aDK7RsdFJtZh8equpy5TBM/Z/pyTocTPgupsOUPmVfmw3IHwE8oHAW
+	7pZllcPEibbCYUDuLhQnDvV7udCwRw+efMkN4QsCfD5feuydpntZW3tEZIYGL6eBpYTOFA5zkjx
+	UlODHb/9nBHoBMDKT7Th7/P72BKGkZrtqmlPpURDupeiv3Zr8ekpH5Td94I=
+X-Received: by 2002:a05:6000:2913:b0:39a:ca59:a626 with SMTP id ffacd0b85a97d-39c120e3e5cmr11015550f8f.28.1743515856238;
+        Tue, 01 Apr 2025 06:57:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFgTZzKaL62iArCAHG5W6zUwy/3RjZmmIeQYPk9NlRX20WPMdkLbAFtCRU8EaAYV78xSkqWEQ==
+X-Received: by 2002:a05:6000:2913:b0:39a:ca59:a626 with SMTP id ffacd0b85a97d-39c120e3e5cmr11015519f8f.28.1743515855788;
+        Tue, 01 Apr 2025 06:57:35 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-11-6-59.retail.telecomitalia.it. [87.11.6.59])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d8314b5e7sm201779655e9.35.2025.04.01.06.57.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 06:57:08 -0700 (PDT)
-From: David Oberhollenzer <david.oberhollenzer@sigma-star.at>
-To: netdev@vger.kernel.org,
-	andrew@lunn.ch
-Cc: Julian.FRIEDRICH@frequentis.com,
-	f.fainelli@gmail.com,
-	olteanv@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	upstream+netdev@sigma-star.at,
-	David Oberhollenzer <david.oberhollenzer@sigma-star.at>
-Subject: [PATCH v4] net: dsa: mv88e6xxx: propperly shutdown PPU re-enable timer on destroy
-Date: Tue,  1 Apr 2025 15:56:37 +0200
-Message-ID: <20250401135705.92760-1-david.oberhollenzer@sigma-star.at>
-X-Mailer: git-send-email 2.48.1
+        Tue, 01 Apr 2025 06:57:35 -0700 (PDT)
+Date: Tue, 1 Apr 2025 15:57:23 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Cindy Lu <lulu@redhat.com>
+Cc: jasowang@redhat.com, mst@redhat.com, michael.christie@oracle.com, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v8 6/8] vhost: uapi to control task mode (owner vs
+ kthread)
+Message-ID: <pgcopzs6q6kqwlmndtbt2bdpbj3xvosjjxb7vikte3gnt643xh@5qhv5myd2cpc>
+References: <20250328100359.1306072-1-lulu@redhat.com>
+ <20250328100359.1306072-7-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250328100359.1306072-7-lulu@redhat.com>
 
-The mv88e6xxx has an internal PPU that polls PHY state. If we want to
-access the internal PHYs, we need to disable the PPU first. Because
-that is a slow operation, a 10ms timer is used to re-enable it,
-canceled with every access, so bulk operations effectively only
-disable it once and re-enable it some 10ms after the last access.
+On Fri, Mar 28, 2025 at 06:02:50PM +0800, Cindy Lu wrote:
+>Add a new UAPI to configure the vhost device to use the kthread mode
 
-If a PHY is accessed and then the mv88e6xxx module is removed before
-the 10ms are up, the PPU re-enable ends up accessing a dangling pointer.
+nit: missing . at the end
 
-This especially affects probing during bootup. The MDIO bus and PHY
-registration may succeed, but registration with the DSA framework
-may fail later on (e.g. because the CPU port depends on another,
-very slow device that isn't done probing yet, returning -EPROBE_DEFER).
-In this case, probe() fails, but the MDIO subsystem may already have
-accessed the MIDO bus or PHYs, arming the timer.
+>The userspace application can use IOCTL VHOST_FORK_FROM_OWNER
+>to choose between owner and kthread mode if necessary
 
-This is fixed as follows:
- - If probe fails after mv88e6xxx_phy_init(), make sure we also call
-   mv88e6xxx_phy_destroy() before returning
- - In mv88e6xxx_remove(), make sure we do the teardown in the correct
-   order, calling mv88e6xxx_phy_destroy() after unregistering the
-   switch device.
- - In mv88e6xxx_phy_destroy(), destroy both the timer and the work item
-   that the timer might schedule, synchronously waiting in case one of
-   the callbacks already fired and destroying the timer first, before
-   waiting for the work item.
- - Access to the PPU is guarded by a mutex, the worker acquires it
-   with a mutex_trylock(), not proceeding with the expensive shutdown
-   if that fails. We grab the mutex in mv88e6xxx_phy_destroy() to make
-   sure the slow PPU shutdown is already done or won't even enter, when
-   we wait for the work item.
+Ditto
 
-Fixes: 2e5f032095ff ("dsa: add support for the Marvell 88E6131 switch chip")
-Signed-off-by: David Oberhollenzer <david.oberhollenzer@sigma-star.at>
----
-FWIW, this is a forward port of a patch I'm using on v6.6.
+>This setting must be applied before VHOST_SET_OWNER, as the worker
+>will be created in the VHOST_SET_OWNER function
+
+Ditto.
+
+>
+>Signed-off-by: Cindy Lu <lulu@redhat.com>
+>---
+> drivers/vhost/vhost.c      | 22 ++++++++++++++++++++--
+> include/uapi/linux/vhost.h | 16 ++++++++++++++++
+> 2 files changed, 36 insertions(+), 2 deletions(-)
+>
+>diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+>index be97028a8baf..ff930c2e5b78 100644
+>--- a/drivers/vhost/vhost.c
+>+++ b/drivers/vhost/vhost.c
+>@@ -1134,7 +1134,7 @@ void vhost_dev_reset_owner(struct vhost_dev *dev, struct vhost_iotlb *umem)
+> 	int i;
+>
+> 	vhost_dev_cleanup(dev);
+>-
+>+	dev->inherit_owner = true;
+> 	dev->umem = umem;
+> 	/* We don't need VQ locks below since vhost_dev_cleanup makes sure
+> 	 * VQs aren't running.
+>@@ -2287,7 +2287,25 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *argp)
+> 		r = vhost_dev_set_owner(d);
+> 		goto done;
+> 	}
+>-
+
+As I mentioned, I'll add the Kconfig in this patch to avoid bisection 
+issues.
+
+The rest LGTM.
 
 Thanks,
+Stefano
 
-David
----
- drivers/net/dsa/mv88e6xxx/chip.c | 11 +++++++----
- drivers/net/dsa/mv88e6xxx/phy.c  |  3 +++
- 2 files changed, 10 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 901929f96b38..29a89ab4b789 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -7350,13 +7350,13 @@ static int mv88e6xxx_probe(struct mdio_device *mdiodev)
- 	err = mv88e6xxx_switch_reset(chip);
- 	mv88e6xxx_reg_unlock(chip);
- 	if (err)
--		goto out;
-+		goto out_phy;
- 
- 	if (np) {
- 		chip->irq = of_irq_get(np, 0);
- 		if (chip->irq == -EPROBE_DEFER) {
- 			err = chip->irq;
--			goto out;
-+			goto out_phy;
- 		}
- 	}
- 
-@@ -7375,7 +7375,7 @@ static int mv88e6xxx_probe(struct mdio_device *mdiodev)
- 	mv88e6xxx_reg_unlock(chip);
- 
- 	if (err)
--		goto out;
-+		goto out_phy;
- 
- 	if (chip->info->g2_irqs > 0) {
- 		err = mv88e6xxx_g2_irq_setup(chip);
-@@ -7409,6 +7409,8 @@ static int mv88e6xxx_probe(struct mdio_device *mdiodev)
- 		mv88e6xxx_g1_irq_free(chip);
- 	else
- 		mv88e6xxx_irq_poll_free(chip);
-+out_phy:
-+	mv88e6xxx_phy_destroy(chip);
- out:
- 	if (pdata)
- 		dev_put(pdata->netdev);
-@@ -7431,7 +7433,6 @@ static void mv88e6xxx_remove(struct mdio_device *mdiodev)
- 		mv88e6xxx_ptp_free(chip);
- 	}
- 
--	mv88e6xxx_phy_destroy(chip);
- 	mv88e6xxx_unregister_switch(chip);
- 
- 	mv88e6xxx_g1_vtu_prob_irq_free(chip);
-@@ -7444,6 +7445,8 @@ static void mv88e6xxx_remove(struct mdio_device *mdiodev)
- 		mv88e6xxx_g1_irq_free(chip);
- 	else
- 		mv88e6xxx_irq_poll_free(chip);
-+
-+	mv88e6xxx_phy_destroy(chip);
- }
- 
- static void mv88e6xxx_shutdown(struct mdio_device *mdiodev)
-diff --git a/drivers/net/dsa/mv88e6xxx/phy.c b/drivers/net/dsa/mv88e6xxx/phy.c
-index 8bb88b3d900d..ee9e5d7e5277 100644
---- a/drivers/net/dsa/mv88e6xxx/phy.c
-+++ b/drivers/net/dsa/mv88e6xxx/phy.c
-@@ -229,7 +229,10 @@ static void mv88e6xxx_phy_ppu_state_init(struct mv88e6xxx_chip *chip)
- 
- static void mv88e6xxx_phy_ppu_state_destroy(struct mv88e6xxx_chip *chip)
- {
-+	mutex_lock(&chip->ppu_mutex);
- 	del_timer_sync(&chip->ppu_timer);
-+	cancel_work_sync(&chip->ppu_work);
-+	mutex_unlock(&chip->ppu_mutex);
- }
- 
- int mv88e6185_phy_ppu_read(struct mv88e6xxx_chip *chip, struct mii_bus *bus,
--- 
-2.48.1
+>+	if (ioctl == VHOST_FORK_FROM_OWNER) {
+>+		u8 inherit_owner;
+>+		/*inherit_owner can only be modified before owner is set*/
+>+		if (vhost_dev_has_owner(d)) {
+>+			r = -EBUSY;
+>+			goto done;
+>+		}
+>+		if (copy_from_user(&inherit_owner, argp, sizeof(u8))) {
+>+			r = -EFAULT;
+>+			goto done;
+>+		}
+>+		if (inherit_owner > 1) {
+>+			r = -EINVAL;
+>+			goto done;
+>+		}
+>+		d->inherit_owner = (bool)inherit_owner;
+>+		r = 0;
+>+		goto done;
+>+	}
+> 	/* You must be the owner to do anything else */
+> 	r = vhost_dev_check_owner(d);
+> 	if (r)
+>diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+>index b95dd84eef2d..1ae0917bfeca 100644
+>--- a/include/uapi/linux/vhost.h
+>+++ b/include/uapi/linux/vhost.h
+>@@ -235,4 +235,20 @@
+>  */
+> #define VHOST_VDPA_GET_VRING_SIZE	_IOWR(VHOST_VIRTIO, 0x82,	\
+> 					      struct vhost_vring_state)
+>+
+>+/**
+>+ * VHOST_FORK_FROM_OWNER - Set the inherit_owner flag for the vhost device,
+>+ * This ioctl must called before VHOST_SET_OWNER.
+>+ *
+>+ * @param inherit_owner: An 8-bit value that determines the vhost thread mode
+>+ *
+>+ * When inherit_owner is set to 1(default value):
+>+ *   - Vhost will create tasks similar to processes forked from the owner,
+>+ *     inheriting all of the owner's attributes.
+>+ *
+>+ * When inherit_owner is set to 0:
+>+ *   - Vhost will create tasks as kernel thread.
+>+ */
+>+#define VHOST_FORK_FROM_OWNER _IOW(VHOST_VIRTIO, 0x83, __u8)
+>+
+> #endif
+>-- 
+>2.45.0
+>
 
 
