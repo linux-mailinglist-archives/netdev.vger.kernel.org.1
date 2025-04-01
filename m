@@ -1,139 +1,111 @@
-Return-Path: <netdev+bounces-178521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E525A776DE
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 10:50:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AA58A776CE
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 10:48:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE1CE3A887A
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 08:49:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 173793A8F2D
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 08:47:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1BA01EB5C9;
-	Tue,  1 Apr 2025 08:49:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 862FC1EB5C9;
+	Tue,  1 Apr 2025 08:47:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="T7/MJBWl"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="cTe3H2/z";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="cTe3H2/z"
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD0BB1EA7E6;
-	Tue,  1 Apr 2025 08:49:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743497398; cv=none; b=N4taodFtUDedbDKYzhCOfpKZkSe+NZ1a+LWrJRqo0Pq34x4/ZG/Vn5oOhIHl1rQylgJ+gCPOqWtRwdqUtvOdM+Wo/0e/3eauskq+WiJ+IL6ijS5TYVfmusZinHl5JeMmra+a0II1NR4gT8C4EZSIvO2euWssJLvDdE7odWyWvtw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743497398; c=relaxed/simple;
-	bh=8Wpy81kT7TAdW80xAypJxb8zwA8ToD3dhvNI1DF5/tY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=MDHZ3AKxXOuDJKf89q7rDqsJt9T+lIbNuJRiNttcWEF4qhPrGNEmR4ebzYAFedNJrwLjtZpDcdpGeTVsOHJyURUcwAF0dx9OcLlEVIdvHZwWYNtRj3iBEHqhtV4MtLqQMD0JYWJarKeaE/bdqS2hoqXtQSlxKyhd/No8BN/ju20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=T7/MJBWl; arc=none smtp.client-ip=139.165.32.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
-Received: from [192.168.1.58] (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id C26F12022C81;
-	Tue,  1 Apr 2025 10:44:23 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be C26F12022C81
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1743497063;
-	bh=NMSewLCZVUlqvdalC/wCq7Jj67bLVDUUghgF0Nt7r8c=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=T7/MJBWlQgQ9eXP1jb+DAibnpmulCgGaRuhoxYXSKesrBxHk1XLhjfIONyOGvQ0Su
-	 NS7B071ZfjwKB6JXUZIdCfafnFNzJPy3DfK45usDGUvWb+6RtlaqMYqUb4YHrDWbqv
-	 uC4MToKCoetoKmiRp/7lr0PSQYvxT/lUW9WMJSESH+5qvqxcHvffVqy/YcY/s12s8G
-	 IK7Z+BWHM7HBhUbvnEW5XJuUgwCKhqIeL1Tap9bUrZEmQB8XClZ4gBokPo+i1ZE7u4
-	 kczS0N2Zgel3MF2GvwC30lPwMGtmFNyxKJmR9lLEw6dmEGboK966XVNAmqt/bVWKCT
-	 xC7ciQ6Okvq5g==
-Message-ID: <d24ea1cc-4d32-44f9-9051-0c874f73f1c5@uliege.be>
-Date: Tue, 1 Apr 2025 10:44:23 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7FFD79C0
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 08:47:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743497274; cv=none; b=ZP3eQv23r/WW04meU5uxYUVJLhNEtl9QE9Q/Qh4ETcvDIwZRcb1oXV8X8IpJAEmvB7SMLNpj6sSnpo8k7pg/U/gWa8eqokVOUTP88Aqjag9erCJ51VjBMByTKg7GngxBI+6cvkP2U8S3Chy+gQioBm6Maq0DX2cBplAdmYFyGmo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743497274; c=relaxed/simple;
+	bh=xQBIVbpmVUWrYaXxtQbX8UTUDAhT+C6Kszgm8v/ZAHA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=QgOjrOkt9Ak7GtKtkW1ppDmJcwj4fx0ylmVZLZM7zb7SADK+YFcrmYpypqaDH1PwByRh+eY1Z4eA/u9ygsZHw1ZppeUn/3uiHjEvzQ5VMb1yamc/mqqN6bL0Bgxas2r7SGKxvm5CH1Yo3oFWwr+XGFYGsqqS6PzApmzYQ75mn1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=cTe3H2/z; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=cTe3H2/z; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 07431211DD;
+	Tue,  1 Apr 2025 08:47:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1743497271; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=xQBIVbpmVUWrYaXxtQbX8UTUDAhT+C6Kszgm8v/ZAHA=;
+	b=cTe3H2/zamcxc2ZtiHKzcfbj0LxQ1nqdUMoOTWX/sxxl/YpB7UCGnAj5iGlGV1wGjb8tDf
+	rujjo0BtYkTgaY1m+ag0Bb4BOn1q8KjG+G+q5q31+FQ7+1WrSVjZ9Aj7OX7G/zns7oI5fz
+	bqG9LiZMfWQ0EjlkRQFa4GUbIMRHVJ4=
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1743497271; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=xQBIVbpmVUWrYaXxtQbX8UTUDAhT+C6Kszgm8v/ZAHA=;
+	b=cTe3H2/zamcxc2ZtiHKzcfbj0LxQ1nqdUMoOTWX/sxxl/YpB7UCGnAj5iGlGV1wGjb8tDf
+	rujjo0BtYkTgaY1m+ag0Bb4BOn1q8KjG+G+q5q31+FQ7+1WrSVjZ9Aj7OX7G/zns7oI5fz
+	bqG9LiZMfWQ0EjlkRQFa4GUbIMRHVJ4=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C98EE13691;
+	Tue,  1 Apr 2025 08:47:50 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id OuIRMDao62cRcQAAD6G6ig
+	(envelope-from <oneukum@suse.com>); Tue, 01 Apr 2025 08:47:50 +0000
+From: Oliver Neukum <oneukum@suse.com>
+To: gregkh@linuxfoundation.org,
+	bjorn@mork.no,
+	loic.poulain@linaro.org,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCHv2 0/4] USB: wdm: fix WWAN integration issue 
+Date: Tue,  1 Apr 2025 10:45:37 +0200
+Message-ID: <20250401084749.175246-1-oneukum@suse.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: new splat
-To: Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <alexei.starovoitov@gmail.com>, bpf
- <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
- Jakub Kicinski <kuba@kernel.org>
-References: <CAADnVQJFWn3dBFJtY+ci6oN1pDFL=TzCmNbRgey7MdYxt_AP2g@mail.gmail.com>
- <647c3886-72fd-4e49-bdd0-4512f0319e8c@redhat.com>
-Content-Language: en-US
-From: Justin Iurman <justin.iurman@uliege.be>
-In-Reply-To: <647c3886-72fd-4e49-bdd0-4512f0319e8c@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-1.96 / 50.00];
+	BAYES_HAM(-2.66)[98.52%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	SUBJECT_ENDS_SPACES(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	TO_DN_NONE(0.00)[];
+	RCVD_TLS_ALL(0.00)[]
+X-Spam-Score: -1.96
+X-Spam-Flag: NO
 
-On 3/31/25 10:07, Paolo Abeni wrote:
-> Adding Justin.
-> 
-> On 3/31/25 1:28 AM, Alexei Starovoitov wrote:
->> After bpf fast forward we see this new failure:
->>
->> [  138.359852] BUG: using __this_cpu_read() in preemptible [00000000]
->> code: test_progs/9368
->> [  138.362686] caller is lwtunnel_xmit+0x1c/0x2e0
->> [  138.364363] CPU: 9 UID: 0 PID: 9368 Comm: test_progs Tainted: G
->>        O        6.14.0-10767-g8be3a12f9f26 #1092 PREEMPT
->> [  138.364366] Tainted: [O]=OOT_MODULE
->> [  138.364366] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
->> BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
->> [  138.364368] Call Trace:
->> [  138.364370]  <TASK>
->> [  138.364375]  dump_stack_lvl+0x80/0x90
->> [  138.364381]  check_preemption_disabled+0xc6/0xe0
->> [  138.364385]  lwtunnel_xmit+0x1c/0x2e0
->> [  138.364387]  ip_finish_output2+0x2f9/0x850
->> [  138.364391]  ? __ip_finish_output+0xa0/0x320
->> [  138.364394]  ip_send_skb+0x3f/0x90
->> [  138.364397]  udp_send_skb+0x1a6/0x3d0
->> [  138.364402]  udp_sendmsg+0x87b/0x1000
->> [  138.364404]  ? ip_frag_init+0x60/0x60
->> [  138.364406]  ? reacquire_held_locks+0xcd/0x1f0
->> [  138.364414]  ? copy_process+0x2ae0/0x2fa0
->> [  138.364418]  ? inet_autobind+0x41/0x60
->> [  138.364420]  ? __local_bh_enable_ip+0x79/0xe0
->> [  138.364422]  ? inet_autobind+0x41/0x60
->> [  138.364424]  ? inet_send_prepare+0xe7/0x1e0
->> [  138.364428]  __sock_sendmsg+0x38/0x70
->> [  138.364432]  ____sys_sendmsg+0x1c9/0x200
->> [  138.364437]  ___sys_sendmsg+0x73/0xa0
->> [  138.364444]  ? __fget_files+0xb9/0x180
->> [  138.364447]  ? lock_release+0x131/0x280
->> [  138.364450]  ? __fget_files+0xc3/0x180
->> [  138.364453]  __sys_sendmsg+0x5a/0xa0
-> 
-> Possibly a decoded stack trace could help.
-> 
-> I think a possible suspect is:
-> 
-> commit 986ffb3a57c5650fb8bf6d59a8f0f07046abfeb6
-> Author: Justin Iurman <justin.iurman@uliege.be>
-> Date:   Fri Mar 14 13:00:46 2025 +0100
-> 
->      net: lwtunnel: fix recursion loops
-> 
-> with dev_xmit_recursion() in lwtunnel_xmit() being called in preemptible
-> scope.
+The original integration of WWAN left a few race conditions
+and deficiencies in error handling
 
-Correct, I came to the same conclusion based on that trace. However, I 
-can't reproduce it with a PREEMPT kernel. It goes through without 
-problem and the output is (as expected), i.e., "lwtunnel_xmit(): 
-recursion limit reached on datapath".
-
-> @Justin, could you please have a look?
-
-I guess that using preempt_{disable|enable}() would not be enough here, 
-so we may s/rcu_read_{lock|unlock}()/rcu_read_{lock|unlock}_bh()/g and 
-move the call to rcu_read_lock_bh() before dev_xmit_recursion(). Thoughts?
-
-> Thanks,
-> 
-> Paolo
-> 
+V2: Added memory barriers Alan Stern pointed out the need for
 
