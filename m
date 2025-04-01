@@ -1,154 +1,197 @@
-Return-Path: <netdev+bounces-178569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE7A9A779A7
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 13:36:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F923A779F0
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 13:47:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A784188FE09
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 11:36:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 779077A0684
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 11:45:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCACA1FAC33;
-	Tue,  1 Apr 2025 11:36:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5060C202963;
+	Tue,  1 Apr 2025 11:46:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kKXlPgfQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ACaxnbrC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 086A61F91CD
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 11:36:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F74F1FAC50;
+	Tue,  1 Apr 2025 11:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743507381; cv=none; b=Kq78EwYF3jJAxXoxWCsVy/8bP07duEcAwqFtZP+UWIaPTYFaWZv5mTkVW+3Vd0qksJjUq/n7n1ijTfWMdsx5hL6eF+sQ6eOEUI/UA2JmBLgGCZCuG3yep1bQDfNkrHI/aLocP06d7QeE3jUwCqbbDih2HDH4xUdTdYo1/rkjWD0=
+	t=1743508009; cv=none; b=g7dhOAFaSp+BYExD/j3dnSzjhq7BpCnTwwf9aaksjyO4sIF1K4IA/pRZMz0LAlsBkkD6MLgWR2nnC0ahO0hybKSQmaTS9Yi0fgELuWRF8JyCVYwUbn127PB3NhuA7+KpwpexLjJWoQMtT7WrauxVGwwqjkU/6GF/V1D21JgB3PM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743507381; c=relaxed/simple;
-	bh=uL7TvS0jxMjjrKYeadjaTz4r0PxHMC116KdpVCXfges=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oks4lcJoA8+1c+3bkYMqrf6h5JGo+AAXvpIIG8SbUmPQAQddm9jvGR36XNrAGHUq5mwPlF+gL68swChNrrgTKc0NIHk5ebSlaqFmCDMVcVTo/ixoxgPE4ooPk9VWKGGdpOrQJN5zzm6Gir2gfc6H55Moroc9pstPdgZwZ/w1zkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kKXlPgfQ; arc=none smtp.client-ip=209.85.218.46
+	s=arc-20240116; t=1743508009; c=relaxed/simple;
+	bh=ceoqctLKCcbnOajnu47CcnpUXs373ivSmAbLGEWNX98=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=C8e9xBiQqdPIWPQqGMqmspendvdIvPYDr3KqD8RAIBbraCeLS0VXHe0tZl2omuqljm2l1jtNu2aJmN0ES0SVRTrYvskCU/SjgOERF6DCfjimOMucgtEmdQs0RaTiDk/A/8o++0pFHoV1OY1lMOjGDb+pFu7r6OC5iH6vpOF6R8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ACaxnbrC; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-ac2bb7ca40bso1106658566b.3
-        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 04:36:16 -0700 (PDT)
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43ce71582e9so38690325e9.1;
+        Tue, 01 Apr 2025 04:46:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743507375; x=1744112175; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CIarTnop7r79FG0iKaDMlMH6a2WjIZFcRgHpoMoYXr0=;
-        b=kKXlPgfQVgEy/iMVOsksmp9X5CbyxgH24DrOGGaurBls2SOSilYxxAz9ZWCxdAl6Ag
-         qRkWvw42lZ6u8t1KGSGAtkj5wDIKoklA0OpYD04a0r6D9E7XbvCwVOOWPoyiSWr3ZcLx
-         ifoMHDjp+lqE462F2JPmYcKwmQW7t1/OWaIbo7nbpPRkDKcjb1o7giymFMZK+OFPsMGq
-         ep/pr09Yisf+wd3Ro+yVYon6FECyeonc7GamYvV7kzimMI9B5h7Qg1DjmzaACron4ODz
-         1d4yk6QazYCjB1d2HuiTJEuZttWW6kiBe7BbSAt70gz+l8TUOzMWTnDhtyi+0MNXY4du
-         d7fg==
+        d=gmail.com; s=20230601; t=1743508006; x=1744112806; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CCF3/Qv9Ekc9KpUGlNmFhgd8mAsoihUePrT98r2Qqv8=;
+        b=ACaxnbrCqfdZl+cc6tYdPBQFLz0rLP5R5c5md4wfFOXl9c592iYq26mxy4Peh+PHbv
+         fdSiEiWBJSXMETWxBrHH+HMfQU/zP0PBXP3iY3JfMqQRl1PnroENAGzACnNPsyr/yIMN
+         8MSba6no3Hcq+XNMNlELbzwfmtWYI01bNsTNW56aAXt+/2CFvrVddeA96XLVs8qQ1lS1
+         6B2x54rJBD21J3dEJO9irz7KnyfEiS5xy+ZZLXbEqnRqXUP2PAw2VJWgoGNTuTdbDOhg
+         hl3Ds7zrwsMNfxbibT3PVk8UJt6v/YouZi+Ze9oMsuJv5GTtGCGPpf3pzCMzVyzIV6yw
+         lGiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743507375; x=1744112175;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CIarTnop7r79FG0iKaDMlMH6a2WjIZFcRgHpoMoYXr0=;
-        b=LDYiqNWtkvJZ65crC+TU4o9dJ3Z3Os3LwZWu2Je0RCQlAikmb+GtUvA+xKwENDYGaM
-         Gkl8fXVkjKxiYP3zoMqOfqd4sOHYZk12JxzpmRV0VekNGbdAWPfGdvW+gLXptU98Bx4z
-         31BBahj1iayKdOInJ0QvNWKLrgXTUppMtP6Q9fZPvsLa8p/yzHRug1Ml2IC92hgzqEQq
-         YYM9juDFWCH6WpnsQZR/TCU49x0VMNjM8YZKqDMToIBmj8VmrwxpZ3nVGgVhLJ6yKMb8
-         kjSoMen3f/2WjSrc6KujzBN1m2s+Aw+en2MN2li5eFlKshWLKY9uRYnXUUQGpa+R18p3
-         jhQg==
-X-Gm-Message-State: AOJu0Yx0CncuE/su6BgPwK9c8Pdr937ctWiTuzkR4pnX5QrYDvTgfvAX
-	/+IuzoDbb1wWGkLmxOWP/e6G2ZB9wrt5eBQvQcPidSyaMf+nkCcp
-X-Gm-Gg: ASbGnctbS80364HW2DmZVJFob+yUg9200U8E+PxzEyE9XBcQkLWvxyUX8lFtbthf9/Q
-	hYgBrg1K3laPoO5tX2fxOlnmpWaBRUAvm3Aynx7plrpZc0kD0GJf1bsMZvoA0YbvVsKq7WtXEDG
-	mTirmwld4siT0dJFRqs8fyeyWDlz6XuBirvAYDqZFIj8OfcDt9FqOl4OWiGspGCaLMxYHcbHdzS
-	f9DyamSqpS2GHLpfjXyIVGkDnwNtHokakhE8dBgJWOrKnMUd3yrGmubtWaSpiJK6ndxbbQ/m1KV
-	NLvxuLor5yySx/CIqio5MRDqvrK/e0dXjHxRWAfqwmKW/tix+ODFNJ9k
-X-Google-Smtp-Source: AGHT+IFcdlFCOdEOw90getE7Ym8/TIApcfHpWBBOaxPWhaw1FeQTgr1w4jdVpK0Ezczp7DjTBCf50Q==
-X-Received: by 2002:a17:907:9411:b0:ac3:3fe4:3378 with SMTP id a640c23a62f3a-ac782af4c9bmr238618466b.12.1743507374874;
-        Tue, 01 Apr 2025 04:36:14 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:325::83? ([2620:10d:c092:600::1:8c87])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac7192ea10bsm750309966b.83.2025.04.01.04.36.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Apr 2025 04:36:14 -0700 (PDT)
-Message-ID: <32917bbb-c27a-4a65-8ba6-1df5c4729c12@gmail.com>
-Date: Tue, 1 Apr 2025 12:37:34 +0100
+        d=1e100.net; s=20230601; t=1743508006; x=1744112806;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CCF3/Qv9Ekc9KpUGlNmFhgd8mAsoihUePrT98r2Qqv8=;
+        b=IMkt1MujyXmX9KOk6H3YdLMii6b1ZNdlg/IyLtQRAkH6yYUjJaYbiDgduQI0Fzp2bC
+         RfXEK5L3Hbj1pO+mS+tvYSNHk0XOEjqHGIWOgM9FMXQucsoxHfiSzaO7nWQXp7VL2QOk
+         3RkGNNymI418t+RKsHRf6gHDnuVm/U0xKYZ9LbpaePH143/ABE3hdw4UDyWdSIHEjiQm
+         kzK8b6S9Hj4dSA9rfTy8JCgvr2YoX06w8+xksZ7yVDV5u+quc3xIphvn7JGqT8LFyKzX
+         0CdJhYiVkGrn/wQxbqDet4QtB3TSYRZy+QNqX9yWpu0QdUauQND98/leGiRyeFiiW29L
+         p7pw==
+X-Forwarded-Encrypted: i=1; AJvYcCUDhMqI8xEHTVndIHW33uH/WiFrS2P/BkBxj5pBgIUkRrdUO+PyRIYdjzbWHz07ih+Fp4BOuHfmSo88@vger.kernel.org, AJvYcCUDwVX84seePegmoZudRyNxSEmJqvSQI9+ncj1It2+WMTPi8eA/jHw0Po2EQZCjPrvNOhBHbrtA@vger.kernel.org, AJvYcCXVcb2tusMgFqZ8SnjLGt36nofUYGZlpHPVO1HtOguA4GqOxgXGSkEQLR6E2bZG7Wx7wR0wnzQ/oivwu2eE@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3zCYnFoY1EZLAWkm/ZFUr3ALLtsVNKH7WHs6BLk/BtT4yLngL
+	ZaVR9QcePGRZge7Jkq2xt0np3XN0J2Bh+xpYZuHMyAMxh5LQNQI5
+X-Gm-Gg: ASbGncu6eZyb5euHxBZaB39yGV9YbW029wzOrgSicQjJfYLGk+5pyLmPDV5ymxtSVXI
+	kkexEEFA8b96dIN6yn5duBqbZsQWcDMsqeVAYDvRS5itvVYwMhLtDazBKbkG8YIgTKusR4KWxbQ
+	zpBalDH5YzcY/LTuZ/61UQN4tZgjg5RmjBUIznxvCVqBFH6W48T1MLE6hin84/vFDv13/qSdxLY
+	bSt7T43ySYZsWUUSRT9dt6bVUutHG68rFu6WYYryssB269rOfNQ9GYMx0WTVrqHtMwjumwqWiaI
+	huQ9d6R1HjN3qtaZZqqDLCrLEAriZo7ljt17q+0y+WITpyAU9vqsu8Lv5DOymaImM1dh/C+J++1
+	1OMm5mDzHWUhcrzFLwytsy5wF
+X-Google-Smtp-Source: AGHT+IECBdGy0veigc4dKDxdqeIRbDAyoVZxmglOTHF5tsWKDtaGPfK2VbavW3AsceadqMj/Ll0N2Q==
+X-Received: by 2002:a05:600c:548c:b0:43d:97ea:2f4 with SMTP id 5b1f17b1804b1-43db61d3924mr119814325e9.12.1743508005651;
+        Tue, 01 Apr 2025 04:46:45 -0700 (PDT)
+Received: from localhost.localdomain (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-43ead679894sm8148175e9.40.2025.04.01.04.46.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Apr 2025 04:46:45 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Andrei Botila <andrei.botila@oss.nxp.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Eric Woudstra <ericwouds@gmail.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [net-next RFC PATCH v5 0/6] net: phy: Add support for new Aeonsemi PHYs
+Date: Tue,  1 Apr 2025 13:46:01 +0200
+Message-ID: <20250401114611.4063-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] net: move mp dev config validation to
- __net_mp_open_rxq()
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, ap420073@gmail.com,
- almasrymina@google.com, dw@davidwei.uk, sdf@fomichev.me
-References: <20250331194201.2026422-1-kuba@kernel.org>
- <20250331194303.2026903-1-kuba@kernel.org>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20250331194303.2026903-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 3/31/25 20:43, Jakub Kicinski wrote:
-> devmem code performs a number of safety checks to avoid having
-> to reimplement all of them in the drivers. Move those to
-> __net_mp_open_rxq() and reuse that function for binding to make
-> sure that io_uring ZC also benefits from them.
-> 
-> While at it rename the queue ID variable to rxq_idx in
-> __net_mp_open_rxq(), we touch most of the relevant lines.
+Add support for new Aeonsemi 10G C45 PHYs. These PHYs intergate an IPC
+to setup some configuration and require special handling to sync with
+the parity bit. The parity bit is a way the IPC use to follow correct
+order of command sent.
 
-Looks good, one question below
+Supported PHYs AS21011JB1, AS21011PB1, AS21010JB1, AS21010PB1,
+AS21511JB1, AS21511PB1, AS21510JB1, AS21510PB1, AS21210JB1,
+AS21210PB1 that all register with the PHY ID 0x7500 0x7500
+before the firmware is loaded.
 
-...
-> diff --git a/net/core/devmem.c b/net/core/devmem.c
-> index ee145a2aa41c..f2ce3c2ebc97 100644
-> --- a/net/core/devmem.c
-> +++ b/net/core/devmem.c
-> @@ -8,7 +8,6 @@
-...
-> -
-> -	err = xa_alloc(&binding->bound_rxqs, &xa_idx, rxq, xa_limit_32b,
-> -		       GFP_KERNEL);
-> +	err = __net_mp_open_rxq(dev, rxq_idx, &mp_params, extack);
->   	if (err)
->   		return err;
+The big special thing about this PHY is that it does provide
+a generic PHY ID in C45 register that change to the correct one
+one the firmware is loaded.
 
-Was reversing the order b/w open and xa_alloc intentional?
-It didn't need __net_mp_close_rxq() before, which is a good thing
-considering the error handling in __net_mp_close_rxq is a bit
-flaky (i.e. the WARN_ON at the end).
+In practice:
+- MMD 0x7 ID 0x7500 0x9410 -> FW LOAD -> ID 0x7500 0x9422
 
->   
-> -	rxq->mp_params.mp_priv = binding;
-> -	rxq->mp_params.mp_ops = &dmabuf_devmem_ops;
-> -
-> -	err = netdev_rx_queue_restart(dev, rxq_idx);
-> +	rxq = __netif_get_rx_queue(dev, rxq_idx);
-> +	err = xa_alloc(&binding->bound_rxqs, &xa_idx, rxq, xa_limit_32b,
-> +		       GFP_KERNEL);
->   	if (err)
-> -		goto err_xa_erase;
-> +		goto err_close_rxq;
->   
->   	return 0;
->   
-> -err_xa_erase:
-> -	rxq->mp_params.mp_priv = NULL;
-> -	rxq->mp_params.mp_ops = NULL;
-> -	xa_erase(&binding->bound_rxqs, xa_idx);
-> -
-> +err_close_rxq:
-> +	__net_mp_close_rxq(dev, rxq_idx, &mp_params);
->   	return err;
->   }
+To handle this, we operate on .match_phy_device where
+we check the PHY ID, if the ID match the generic one,
+we load the firmware and we return 0 (PHY driver doesn't
+match). Then PHY core will try the next PHY driver in the list
+and this time the PHY is correctly filled in and we register
+for it.
+
+To help in the matching and not modify part of the PHY device
+struct, .match_phy_device is extended to provide also the
+current phy_driver is trying to match for. This add the
+extra benefits that some other PHY can simplify their
+.match_phy_device OP.
+
+Changes v5:
+- Add Reviewed-by tag from Rob
+- Fix subject in DT patch
+- Fix wrong Suggested-by tag in patch 1
+- Rework nxp patch to 80 column
+Changes v4:
+- Add Reviewed-by tag
+- Better handle PHY ID scan in as21xxx
+- Also simplify nxp driver and fix .match_phy_device
+Changes v3:
+- Correct typo intergate->integrate
+- Try to reduce to 80 column (where possible... define become
+  unreasable if split)
+- Rework to new .match_phy_device implementation
+- Init active_low_led and fix other minor smatch war
+- Drop inline tag (kbot doesn't like it but not reported by checkpatch???)
+Changes v2:
+- Move to RFC as net-next closed :(
+- Add lock for IPC command
+- Better check size values from IPC
+- Add PHY ID for all supported PHYs
+- Drop .get_feature (correct values are exported by standard
+  regs)
+- Rework LED event to enum
+- Update .yaml with changes requested (firmware-name required
+  for generic PHY ID)
+- Better document C22 in C45
+- Document PHY name logic
+- Introduce patch to load PHY 2 times
+
+Christian Marangi (6):
+  net: phy: pass PHY driver to .match_phy_device OP
+  net: phy: bcm87xx: simplify .match_phy_device OP
+  net: phy: nxp-c45-tja11xx: simplify .match_phy_device OP
+  net: phy: introduce genphy_match_phy_device()
+  net: phy: Add support for Aeonsemi AS21xxx PHYs
+  dt-bindings: net: Document support for Aeonsemi PHYs
+
+ .../bindings/net/aeonsemi,as21xxx.yaml        |  122 ++
+ MAINTAINERS                                   |    7 +
+ drivers/net/phy/Kconfig                       |   12 +
+ drivers/net/phy/Makefile                      |    1 +
+ drivers/net/phy/as21xxx.c                     | 1067 +++++++++++++++++
+ drivers/net/phy/bcm87xx.c                     |   14 +-
+ drivers/net/phy/icplus.c                      |    6 +-
+ drivers/net/phy/marvell10g.c                  |   12 +-
+ drivers/net/phy/micrel.c                      |    6 +-
+ drivers/net/phy/nxp-c45-tja11xx.c             |   41 +-
+ drivers/net/phy/nxp-tja11xx.c                 |    6 +-
+ drivers/net/phy/phy_device.c                  |   52 +-
+ drivers/net/phy/realtek/realtek_main.c        |   27 +-
+ drivers/net/phy/teranetics.c                  |    3 +-
+ include/linux/phy.h                           |    6 +-
+ 15 files changed, 1316 insertions(+), 66 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/aeonsemi,as21xxx.yaml
+ create mode 100644 drivers/net/phy/as21xxx.c
 
 -- 
-Pavel Begunkov
+2.48.1
 
 
