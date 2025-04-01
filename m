@@ -1,86 +1,78 @@
-Return-Path: <netdev+bounces-178568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06EDAA77961
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 13:14:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE7A9A779A7
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 13:36:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E69A816AF0F
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 11:13:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A784188FE09
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 11:36:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC77B1F1539;
-	Tue,  1 Apr 2025 11:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCACA1FAC33;
+	Tue,  1 Apr 2025 11:36:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eVPQvJ+t"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kKXlPgfQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7451F03C1
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 11:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 086A61F91CD
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 11:36:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743506022; cv=none; b=QAg8ijm2FXatTwJwF3lVYXtj6TfVKM/fNYDf5rL8qIZt3QtlfwiM8b94Eg8gSTofNdMW2NLP11M5QHYKhdBXBUK1OFTiX2i6JlFAM6evAXW9+DgmeewY2BT5Q0fq6OJKfdmHYBmZBjlBbozIKaRB0xqB4/IGCB8/GQB7/K/hLEE=
+	t=1743507381; cv=none; b=Kq78EwYF3jJAxXoxWCsVy/8bP07duEcAwqFtZP+UWIaPTYFaWZv5mTkVW+3Vd0qksJjUq/n7n1ijTfWMdsx5hL6eF+sQ6eOEUI/UA2JmBLgGCZCuG3yep1bQDfNkrHI/aLocP06d7QeE3jUwCqbbDih2HDH4xUdTdYo1/rkjWD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743506022; c=relaxed/simple;
-	bh=eXuN+GYWt27q9quy/yiuSyZGCuDlUf8hAuxc9QFf05A=;
+	s=arc-20240116; t=1743507381; c=relaxed/simple;
+	bh=uL7TvS0jxMjjrKYeadjaTz4r0PxHMC116KdpVCXfges=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WI8jXpZdA+cLumFAK0Pd+qKI3ZUvD6nOk+BT1Z+FGWU8a3PkaDTb417rsilultUp7t4Y9WeOTZlFSYZjyMjHBLQLymrctmIjBYsmDihffrkjMG+ulwQWmJ9IRb5ltM6e8HArGtCS4kx77R32aSmCJdi8fkd18icpmGLm7keHgJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eVPQvJ+t; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743506019;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dyuutc9PeXY9tGsltbN84zDiDd1XgKUjGnAvVE3myf0=;
-	b=eVPQvJ+t39bdP9V7cK+6EYkGGh77n5Q/Za8ZpOqRWHxWVlhagJI4tMFPR97FrWmzYLcOk1
-	AqnIQ8VGIMBMEe6/4GI6geGZsKQnKaX31gfLmVtsiS1ZIwn9m1MzxTd65NazqPjfq++9MM
-	JdnylS7xAGShs5Cb4kYPaRAHuc+BVyU=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-689-F-SgJszUNmG0tGrOsSIQlw-1; Tue, 01 Apr 2025 07:13:38 -0400
-X-MC-Unique: F-SgJszUNmG0tGrOsSIQlw-1
-X-Mimecast-MFC-AGG-ID: F-SgJszUNmG0tGrOsSIQlw_1743506017
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43d6c65dc52so36608525e9.1
-        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 04:13:38 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=oks4lcJoA8+1c+3bkYMqrf6h5JGo+AAXvpIIG8SbUmPQAQddm9jvGR36XNrAGHUq5mwPlF+gL68swChNrrgTKc0NIHk5ebSlaqFmCDMVcVTo/ixoxgPE4ooPk9VWKGGdpOrQJN5zzm6Gir2gfc6H55Moroc9pstPdgZwZ/w1zkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kKXlPgfQ; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-ac2bb7ca40bso1106658566b.3
+        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 04:36:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743507375; x=1744112175; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CIarTnop7r79FG0iKaDMlMH6a2WjIZFcRgHpoMoYXr0=;
+        b=kKXlPgfQVgEy/iMVOsksmp9X5CbyxgH24DrOGGaurBls2SOSilYxxAz9ZWCxdAl6Ag
+         qRkWvw42lZ6u8t1KGSGAtkj5wDIKoklA0OpYD04a0r6D9E7XbvCwVOOWPoyiSWr3ZcLx
+         ifoMHDjp+lqE462F2JPmYcKwmQW7t1/OWaIbo7nbpPRkDKcjb1o7giymFMZK+OFPsMGq
+         ep/pr09Yisf+wd3Ro+yVYon6FECyeonc7GamYvV7kzimMI9B5h7Qg1DjmzaACron4ODz
+         1d4yk6QazYCjB1d2HuiTJEuZttWW6kiBe7BbSAt70gz+l8TUOzMWTnDhtyi+0MNXY4du
+         d7fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743506017; x=1744110817;
+        d=1e100.net; s=20230601; t=1743507375; x=1744112175;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dyuutc9PeXY9tGsltbN84zDiDd1XgKUjGnAvVE3myf0=;
-        b=Grt1d8d3SVMbO6Vg6QhI8KQTr028CpGk0tPUL0uK37ri4WCTGzjlvVhswXVaEaM09h
-         p0P43aLub2E2eYyXi1DsdgIOxMH9X9AT16x2A9wfK51Qz3QAq1oY7ge4C2n9htuWo7r6
-         PfI+XaSvlIrI6OW5HgW+WTbnemkJHkxjtf5MU0kMkrx8YExVWOCUZi/Y/pxiCKD1cSU9
-         TbqztO63Hts8VROYg10l/GS313UzyJakQcBtOTgasWOMsNXtIhC8htWBcoDTTyoQBYDo
-         PwadUCPLQh7DfkKMzn77pUWlTpQS2usEI6apcqlQQ7ZrQhdMRLoPeYyAgR2p8RBl9Jzh
-         z8tw==
-X-Forwarded-Encrypted: i=1; AJvYcCX8ElBkJzx9XodpP7Bf3yIUmfJIiL22iaI9xBIHVbW1OfRMt49XVQw+nfARu4NHCaYNTzdMsDM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFyoGM0DDSocAW/VYpM2LDspjV+/QlCLm7ydEiMvpruaCppKO+
-	1LyAQRbiVHxvTeeZ/N09HycNUXAt/EVFLDJb2OPy2A41vo5ViPLyZ5Jai/JGhfuSqOaKh811Pys
-	+uJttgh0fYeJnvBtXnPABxgXFgbhz7d7+Xt4HjsK31YmOWFxuSvrCJg==
-X-Gm-Gg: ASbGncsNEnXZ23a+ZfjLIA74euz47kb/RkanBawx+PtoNXgA0FueXQa+9WUyNKvV6I8
-	uuTERvNMHlV9nSiPbuGEdE7gUVTqdLW6O+Zn/7OvRbaIbXqo/xR7Ems316UQw3eh6Rru1lN65H0
-	KSn2nt7L/q6G1ipaGFemuj9LqNVssGdmSjynAf8nxb+o7/yJywxtwibI+mAoXWOganjZEXWE+4O
-	aqbq79mFypL7rv97qPrnRZu/608cwPKq9orXjy7en609M98yeF9ViXRR8Vs1ce6jQmFheqIqAV2
-	ma3h7WRXRr5Z8qd7yH+jPfsXM+ZMVTP3w3x69LRKAQLvMQ==
-X-Received: by 2002:a05:600c:3150:b0:43d:412e:8a81 with SMTP id 5b1f17b1804b1-43dbc6f89f7mr80386005e9.28.1743506017498;
-        Tue, 01 Apr 2025 04:13:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFB1t2RowSwKmhupv9C7Srpftmd9msTTSzuOJ2YeoUsVGmOMoMK48qhVxxi7g9VgrKpY/0h5Q==
-X-Received: by 2002:a05:600c:3150:b0:43d:412e:8a81 with SMTP id 5b1f17b1804b1-43dbc6f89f7mr80385735e9.28.1743506017118;
-        Tue, 01 Apr 2025 04:13:37 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-68-231.dyn.eolo.it. [146.241.68.231])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d8fba3b13sm157751425e9.3.2025.04.01.04.13.36
+        bh=CIarTnop7r79FG0iKaDMlMH6a2WjIZFcRgHpoMoYXr0=;
+        b=LDYiqNWtkvJZ65crC+TU4o9dJ3Z3Os3LwZWu2Je0RCQlAikmb+GtUvA+xKwENDYGaM
+         Gkl8fXVkjKxiYP3zoMqOfqd4sOHYZk12JxzpmRV0VekNGbdAWPfGdvW+gLXptU98Bx4z
+         31BBahj1iayKdOInJ0QvNWKLrgXTUppMtP6Q9fZPvsLa8p/yzHRug1Ml2IC92hgzqEQq
+         YYM9juDFWCH6WpnsQZR/TCU49x0VMNjM8YZKqDMToIBmj8VmrwxpZ3nVGgVhLJ6yKMb8
+         kjSoMen3f/2WjSrc6KujzBN1m2s+Aw+en2MN2li5eFlKshWLKY9uRYnXUUQGpa+R18p3
+         jhQg==
+X-Gm-Message-State: AOJu0Yx0CncuE/su6BgPwK9c8Pdr937ctWiTuzkR4pnX5QrYDvTgfvAX
+	/+IuzoDbb1wWGkLmxOWP/e6G2ZB9wrt5eBQvQcPidSyaMf+nkCcp
+X-Gm-Gg: ASbGnctbS80364HW2DmZVJFob+yUg9200U8E+PxzEyE9XBcQkLWvxyUX8lFtbthf9/Q
+	hYgBrg1K3laPoO5tX2fxOlnmpWaBRUAvm3Aynx7plrpZc0kD0GJf1bsMZvoA0YbvVsKq7WtXEDG
+	mTirmwld4siT0dJFRqs8fyeyWDlz6XuBirvAYDqZFIj8OfcDt9FqOl4OWiGspGCaLMxYHcbHdzS
+	f9DyamSqpS2GHLpfjXyIVGkDnwNtHokakhE8dBgJWOrKnMUd3yrGmubtWaSpiJK6ndxbbQ/m1KV
+	NLvxuLor5yySx/CIqio5MRDqvrK/e0dXjHxRWAfqwmKW/tix+ODFNJ9k
+X-Google-Smtp-Source: AGHT+IFcdlFCOdEOw90getE7Ym8/TIApcfHpWBBOaxPWhaw1FeQTgr1w4jdVpK0Ezczp7DjTBCf50Q==
+X-Received: by 2002:a17:907:9411:b0:ac3:3fe4:3378 with SMTP id a640c23a62f3a-ac782af4c9bmr238618466b.12.1743507374874;
+        Tue, 01 Apr 2025 04:36:14 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:325::83? ([2620:10d:c092:600::1:8c87])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac7192ea10bsm750309966b.83.2025.04.01.04.36.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Apr 2025 04:13:36 -0700 (PDT)
-Message-ID: <18c69469-5357-422e-a7dd-9722d502fd95@redhat.com>
-Date: Tue, 1 Apr 2025 13:13:35 +0200
+        Tue, 01 Apr 2025 04:36:14 -0700 (PDT)
+Message-ID: <32917bbb-c27a-4a65-8ba6-1df5c4729c12@gmail.com>
+Date: Tue, 1 Apr 2025 12:37:34 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,139 +80,75 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/3] net_sched: sch_sfq: use a temporary work area for
- validating configuration
-To: Eric Dumazet <edumazet@google.com>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>, Octavian Purdila
- <tavip@google.com>, jhs@mojatatu.com, jiri@resnulli.us, davem@davemloft.net,
- kuba@kernel.org, horms@kernel.org, shuah@kernel.org, netdev@vger.kernel.org
-References: <20250328201634.3876474-1-tavip@google.com>
- <20250328201634.3876474-2-tavip@google.com>
- <Z+nYlgveEBukySzX@pop-os.localdomain>
- <5f493420-d7ff-43ab-827f-30e66b7df2c9@redhat.com>
- <CANn89iJW0VGQMvq6Bs8co8Bq6Dq1dUT7TN+EXg=GwYbSywUz0A@mail.gmail.com>
+Subject: Re: [PATCH net 1/2] net: move mp dev config validation to
+ __net_mp_open_rxq()
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, ap420073@gmail.com,
+ almasrymina@google.com, dw@davidwei.uk, sdf@fomichev.me
+References: <20250331194201.2026422-1-kuba@kernel.org>
+ <20250331194303.2026903-1-kuba@kernel.org>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CANn89iJW0VGQMvq6Bs8co8Bq6Dq1dUT7TN+EXg=GwYbSywUz0A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250331194303.2026903-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 4/1/25 12:47 PM, Eric Dumazet wrote:
-> On Tue, Apr 1, 2025 at 11:27 AM Paolo Abeni <pabeni@redhat.com> wrote:
->> On 3/31/25 1:49 AM, Cong Wang wrote:
->>> On Fri, Mar 28, 2025 at 01:16:32PM -0700, Octavian Purdila wrote:
->>>> diff --git a/net/sched/sch_sfq.c b/net/sched/sch_sfq.c
->>>> index 65d5b59da583..027a3fde2139 100644
->>>> --- a/net/sched/sch_sfq.c
->>>> +++ b/net/sched/sch_sfq.c
->>>> @@ -631,6 +631,18 @@ static int sfq_change(struct Qdisc *sch, struct nlattr *opt,
->>>>      struct red_parms *p = NULL;
->>>>      struct sk_buff *to_free = NULL;
->>>>      struct sk_buff *tail = NULL;
->>>> +    /* work area for validating changes before committing them */
->>>> +    struct {
->>>> +            int limit;
->>>> +            unsigned int divisor;
->>>> +            unsigned int maxflows;
->>>> +            int perturb_period;
->>>> +            unsigned int quantum;
->>>> +            u8 headdrop;
->>>> +            u8 maxdepth;
->>>> +            u8 flags;
->>>> +    } tmp;
->>>
->>> Thanks for your patch. It reminds me again about the lacking of complete
->>> RCU support in TC. ;-)
->>>
->>> Instead of using a temporary struct, how about introducing a new one
->>> called struct sfq_sched_opt and putting it inside struct sfq_sched_data?
->>> It looks more elegant to me.
->>
->> I agree with that. It should also make the code more compact. @Octavian,
->> please update the patch as per Cong's suggestion.
+On 3/31/25 20:43, Jakub Kicinski wrote:
+> devmem code performs a number of safety checks to avoid having
+> to reimplement all of them in the drivers. Move those to
+> __net_mp_open_rxq() and reuse that function for binding to make
+> sure that io_uring ZC also benefits from them.
 > 
-> The concern with this approach was data locality.
+> While at it rename the queue ID variable to rxq_idx in
+> __net_mp_open_rxq(), we touch most of the relevant lines.
 
-I did not consider that aspect.
+Looks good, one question below
 
-How about not using the struct at all, then?
-
-	int cur_limit;
-	// ...
-	u8 cur_flags;
-
-the 'tmp' struct is IMHO not so nice.
-
-> I had in my TODO list a patch to remove (accumulated over time) holes
-> and put together hot fields.
-> 
-> Something like :
-> 
-> struct sfq_sched_data {
-> int                        limit;                /*     0   0x4 */
-> unsigned int               divisor;              /*   0x4   0x4 */
-> u8                         headdrop;             /*   0x8   0x1 */
-> u8                         maxdepth;             /*   0x9   0x1 */
-> u8                         cur_depth;            /*   0xa   0x1 */
-> u8                         flags;                /*   0xb   0x1 */
-> unsigned int               quantum;              /*   0xc   0x4 */
-> siphash_key_t              perturbation;         /*  0x10  0x10 */
-> struct tcf_proto *         filter_list;          /*  0x20   0x8 */
-> struct tcf_block *         block;                /*  0x28   0x8 */
-> sfq_index *                ht;                   /*  0x30   0x8 */
-> struct sfq_slot *          slots;                /*  0x38   0x8 */
-> /* --- cacheline 1 boundary (64 bytes) --- */
-> struct red_parms *         red_parms;            /*  0x40   0x8 */
-> struct tc_sfqred_stats     stats;                /*  0x48  0x18 */
-> struct sfq_slot *          tail;                 /*  0x60   0x8 */
-> struct sfq_head            dep[128];             /*  0x68 0x200 */
-> /* --- cacheline 9 boundary (576 bytes) was 40 bytes ago --- */
-> unsigned int               maxflows;             /* 0x268   0x4 */
-> int                        perturb_period;       /* 0x26c   0x4 */
-> struct timer_list          perturb_timer;        /* 0x270  0x28 */
-> 
-> /* XXX last struct has 4 bytes of padding */
-> 
-> /* --- cacheline 10 boundary (640 bytes) was 24 bytes ago --- */
-> struct Qdisc *             sch;                  /* 0x298   0x8 */
-> 
-> /* size: 672, cachelines: 11, members: 20 */
-> /* paddings: 1, sum paddings: 4 */
-> /* last cacheline: 32 bytes */
-> };
-> 
-> 
-> With this patch :
-> 
-> diff --git a/net/sched/sch_sfq.c b/net/sched/sch_sfq.c
-> index 65d5b59da583..f8fec2bc0d25 100644
-> --- a/net/sched/sch_sfq.c
-> +++ b/net/sched/sch_sfq.c
-> @@ -110,10 +110,11 @@ struct sfq_sched_data {
->         unsigned int    divisor;        /* number of slots in hash table */
->         u8              headdrop;
->         u8              maxdepth;       /* limit of packets per flow */
+...
+> diff --git a/net/core/devmem.c b/net/core/devmem.c
+> index ee145a2aa41c..f2ce3c2ebc97 100644
+> --- a/net/core/devmem.c
+> +++ b/net/core/devmem.c
+> @@ -8,7 +8,6 @@
+...
 > -
-> -       siphash_key_t   perturbation;
->         u8              cur_depth;      /* depth of longest slot */
->         u8              flags;
-> +       unsigned int    quantum;        /* Allotment per round: MUST
-> BE >= MTU */
-> +
-> +       siphash_key_t   perturbation;
->         struct tcf_proto __rcu *filter_list;
->         struct tcf_block *block;
->         sfq_index       *ht;            /* Hash table ('divisor' slots) */
-> @@ -132,7 +133,6 @@ struct sfq_sched_data {
-> 
->         unsigned int    maxflows;       /* number of flows in flows array */
->         int             perturb_period;
+> -	err = xa_alloc(&binding->bound_rxqs, &xa_idx, rxq, xa_limit_32b,
+> -		       GFP_KERNEL);
+> +	err = __net_mp_open_rxq(dev, rxq_idx, &mp_params, extack);
+>   	if (err)
+>   		return err;
 
-Would it make any sense to additionally move 'maxflows' and
-'perturb_period' at the top, just after 'perturbation'?
+Was reversing the order b/w open and xa_alloc intentional?
+It didn't need __net_mp_close_rxq() before, which is a good thing
+considering the error handling in __net_mp_close_rxq is a bit
+flaky (i.e. the WARN_ON at the end).
 
-Thanks,
+>   
+> -	rxq->mp_params.mp_priv = binding;
+> -	rxq->mp_params.mp_ops = &dmabuf_devmem_ops;
+> -
+> -	err = netdev_rx_queue_restart(dev, rxq_idx);
+> +	rxq = __netif_get_rx_queue(dev, rxq_idx);
+> +	err = xa_alloc(&binding->bound_rxqs, &xa_idx, rxq, xa_limit_32b,
+> +		       GFP_KERNEL);
+>   	if (err)
+> -		goto err_xa_erase;
+> +		goto err_close_rxq;
+>   
+>   	return 0;
+>   
+> -err_xa_erase:
+> -	rxq->mp_params.mp_priv = NULL;
+> -	rxq->mp_params.mp_ops = NULL;
+> -	xa_erase(&binding->bound_rxqs, xa_idx);
+> -
+> +err_close_rxq:
+> +	__net_mp_close_rxq(dev, rxq_idx, &mp_params);
+>   	return err;
+>   }
 
-Paolo
+-- 
+Pavel Begunkov
 
 
