@@ -1,762 +1,198 @@
-Return-Path: <netdev+bounces-178498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF1ABA774D8
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 08:59:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72AAEA7751C
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 09:20:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 891AD164B08
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 06:59:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 276B83A74F0
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 07:17:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1693818A6A7;
-	Tue,  1 Apr 2025 06:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F21031E7C2F;
+	Tue,  1 Apr 2025 07:17:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="E2O67iTL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DtvyLz1O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 477861CBEB9
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 06:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8971E7C0E
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 07:17:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743490754; cv=none; b=BZAXJad9WjgM+nv9/hRJjkIM3Yag3syP2ltNAdpj41og0rBqvVM8iLDKzJKojUhHoAcaVu+g/OnX51+zgLWRmmWlg9jmZZcnrTrdVFmglDI16tKf99cpK+nt8XqGRxRfcGwHDJNuj9hLwWqjpcOT457e13rudPDQOXTKhOzfMNQ=
+	t=1743491869; cv=none; b=hHj3XHz4jCnt94DcZwp49sKiVcEWBlBvmkGkssVil3r+2qwMi8v+M3VxPaBCG9BC7wiyV7iwgJd/TroyVwPFK2Tp/6nriFuE433Qs6DucoLQGe/3m9XjRnrqEZjn3/RzfOFi20SMpmHXhh/G68AEkApY4XJpGnSmexyAPGSzGzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743490754; c=relaxed/simple;
-	bh=vxkUrIc+AdxE/tfD/ME0k7PUFMZg/8Xh5pY7UrodiY4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tAWJ/1dbTzJeN1hpEX5hpVqxyuF0uydC5/HLwWjWdnFAaCf+dKKGGIA9/zkb/7fnWG8x2xoZfMLzexRZXSAh/EQqlazXm1nv1piUQdcl5GzOWib/C8/Q6wZWFiC90pFNd8sQ2YbSJRiDboHTmV45T2OZOgssGXLDTi4VJLWmpIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=E2O67iTL; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ac2902f7c2aso910338866b.1
-        for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 23:59:10 -0700 (PDT)
+	s=arc-20240116; t=1743491869; c=relaxed/simple;
+	bh=R47fBs/aSUqu8V65BhtfZkaJpwfAsSFzOW3O2T9Jovo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fagJGdQq/K6TjB8niR9EWZqfZfAB0H/jVBzN/FCYJg3Y7PEHrZAlNy3KyJivciigikrP8fQ6EXr5KjOtPiaMFSs8B9bYnT+vIw6dKDUspKKheIpV8HAiqY4yMgJz8RbRPgA5pTEvzMl7tBhsPm6iF/WfUeB1n521vSG1sy6UN+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DtvyLz1O; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5e6c18e2c7dso9574999a12.3
+        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 00:17:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1743490749; x=1744095549; darn=vger.kernel.org;
-        h=content-transfer-encoding:organization:mime-version:message-id:date
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=a3D5ZkYDjF4TOm8wRIOw5dQb0W1x13GwbxqtqhbuoXI=;
-        b=E2O67iTLrpk42f8K9NqlvkYv30rOrjQDpwgoZNTpv+h6RqM1NFiYF1JlLr/uZtGU4Y
-         JFzLZbTdbiJz/+3FA5e5OOitXCpNNd2zLA4XXdrh4T10wvvaTokWIZbb2gDSj3nNGwyZ
-         tLTNbFBA/XI8vAqN6sOYWCguP/2Kcc4pJNUb+ml811HAcU9m349P3pHituY1S8rUwN7u
-         zLh0PzWyn2/p8C5Jv5Tm3+m2P4v5GwwLEm11UJ1hOrRcFPGba4WTyEXpT253NeRdEhnM
-         NcJ56odMmjXpAraE3xIGzyyEKtCDIQDhFrPAWsejQyKY5U2UHBvAjx0XtMr3up/DvRPV
-         ZNAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743490749; x=1744095549;
-        h=content-transfer-encoding:organization:mime-version:message-id:date
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1743491866; x=1744096666; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=a3D5ZkYDjF4TOm8wRIOw5dQb0W1x13GwbxqtqhbuoXI=;
-        b=vqJ+UrBkLXFcLlKAYwwb4V1w4fIjfpRN0DYLPrshBmKekBxzJgdCgjjXbyTNWPrJqH
-         KPHm+jjPBVC3unLnDndyDxFyXDAF+js63rLLNe/OJuNXdjHGYDxAwcwraOUvPTTJdCiS
-         23p8Oag0Rjmx4jldIVKJ19bBVVIS03ZDKEQYJWi9kdAyNITl9ZDKWdxUX5toDJdjvLxf
-         98j4kDoqtR1wHNJ4AHSEUN6iXm+epKkI+Ir6M1cjQ59ah/TAXqFaAUtvKNH2OYAt3dNP
-         iyizQTEonIS++RPKNUUIXBLGH0bpzxzaGUxRWuzqcl0dbWbBf3T+Sp/oFiTDde9Yef9k
-         QIOA==
-X-Forwarded-Encrypted: i=1; AJvYcCXNdfz1/qKRtl+hzlu1rZyYaFfe6tw8UyY+E2a87XMDvdxGn385tS0HdQibncTi1QWYCDCvlI0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJ9yBiJ2/S3KjiHfk3kn+JGfRXfEHWAe4YcHb5mb6cJScTIGWF
-	OUVcdsvjLv/K7ePPO5qvLTzULUcoLVnygiFdwBU2wyLS1GYhEP5ZF13bha3CD/0=
-X-Gm-Gg: ASbGnctR85O7bXcr/07MjmrfnhaMspCReunw0+gXytBqYaBlrjulkDZKA/lplUYR2lY
-	wWLBFQS11JsDUsyNeVGeMEPLlSYK2uUUu8eeurFf+n+Vd6nYAwvg32PTbe44GhhbeAzwQSvM3Nf
-	PzPW9LqHHOWu9sRFmfOgJVAfGzAmkzs7+oBOwpDLofqQ6WufmOe0fVKCSE9jAp8GSNIWpgs/IT1
-	dcEcUH7DaImq9raZYlNwE3Y7mt6AhyhzzzQnR0OM4WuShxaRPuTtCsOjhpy0POw0ABTpGOasvXM
-	I/H6dBMwQvLCILRKPXaAsxQviFJkydpWPmS7fNLHJQDVGGr6nBEVM4lzxIG/RE1GSbmcqosVQNZ
-	VT350RrpKWhYp
-X-Google-Smtp-Source: AGHT+IExSatQH4jO8ePmgpqfKFXPwV+S7MworPFM7bEqRTWEfHapHAJ1UrJPwGCqtyWP7SY6aRnzlg==
-X-Received: by 2002:a17:907:6eaa:b0:ac4:2b0:216f with SMTP id a640c23a62f3a-ac738bad2cemr993848766b.43.1743490749064;
-        Mon, 31 Mar 2025 23:59:09 -0700 (PDT)
-Received: from wkz-x13.addiva.ad (h-79-136-22-50.NA.cust.bahnhof.se. [79.136.22.50])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac7192ea229sm720277466b.81.2025.03.31.23.59.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Mar 2025 23:59:08 -0700 (PDT)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: maxime.chevallier@bootlin.com,
-	marcin.s.wojtas@gmail.com,
-	linux@armlinux.org.uk,
-	andrew@lunn.ch,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH v5] net: mvpp2: Prevent parser TCAM memory corruption
-Date: Tue,  1 Apr 2025 08:58:04 +0200
-Message-ID: <20250401065855.3113635-1-tobias@waldekranz.com>
-X-Mailer: git-send-email 2.43.0
+        bh=XblhwfpoL/wdEhd1eNKwaQ/ml4EekreePjQ1dJcuRAM=;
+        b=DtvyLz1Od59Hp8+TagKu6UR/rbTD2D5U2FxA6Xf1la+p93j4PCDALHHfiLEep+iLuq
+         PkLztcDwktObwdCtYBP/l+hnKSv9IoHUMGK9tX/UPI6TGfK1c7y5cXq3DJFPYZ8m/e31
+         /d/add4QL2m679dUB7QUH7Uxfipic+oP84ST4OSN7heSx/Xwo0RHC6/nNjXKQJ/MdA9m
+         Ff5pIrD/xlz7pr7xsUnD7cJFrdLNyqlPpP0Bd7nxTRye/zSEQSbUvU1u/5vhmkUm5X+V
+         6y7Wz7i5DcV97vTPZQo2I0wkR5wRu0/Bxi21Hn7leIDL2xH7JmTzKAw9kGPaWbNXFBB2
+         G3Dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743491866; x=1744096666;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XblhwfpoL/wdEhd1eNKwaQ/ml4EekreePjQ1dJcuRAM=;
+        b=L7+Jzs4TnvHJlQToFiCKv6RblOHzJvSamt5HejwMYWn1mrwJkovTZpGBVNLmpKvMUz
+         7+YEy7j/XiugnZ5aHWhCUu6+og3Lkr6oH919WvLNW5wDCtk5AuO0DKSfVSYegehgSjnq
+         EPfXI6yPdyE403F+y3WIg26jWpkAYB1MsvlhJ7r0q1J5ZGR2z5Zh3B2hx6RcKgS9TozX
+         W/tLxbSUwNsKo51g40L1uVVGb1uR8WNpNO0B361C0ncLD/dyd0lbsCFJypyiXqkfVcB1
+         ZvefqYXyLufniAcVbb10TXOENmNuYUNRyu5tWmdJN5IQC1CMwQHw3DMNBjJSMiB1PA8m
+         8oYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXHO1vXW9PfbVqX1DF0DrGa1ESejkMYyW4FkBXSyLtvre0G46mxag2QlP9+k9Z6NVuxTfsBBDA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3kiy1ZYc2BzdEpk+3e4C0oi16dwcvvtbIX5OAPci89ErItxTp
+	ILavAbcEhy1sVIT1Jyfk3K1lrAiRfjzYJiMAh8+QF8NE6/N4hB3vvJg5Ib3RDcrbPgDOVWGD0m2
+	X2gHSV08Ih0qfkoSMeySs6WBr22s=
+X-Gm-Gg: ASbGncsptWEGVXtTx76Op+M+1JDdpc3Et9A+lt+0b6sy43BM1IX9nLoTktIKlBRaACe
+	OnsrIGgbk67qwYv/gHNsidZ7Pre904g07UIVp+597A6e0LxFBAD2mXASsCq1zJ9O+OC4OMiJfMh
+	N6gcSsR5q4DSVB1Hc7aNUFlWtNLESF
+X-Google-Smtp-Source: AGHT+IH59AhC/WPDKe0tNo+ygDNx2ppU0eb7SOaWgqOd7tpTok7YxVanM7ebMrxIlAvYIZF5waOeEo98TfMSKOA8xtA=
+X-Received: by 2002:a05:6402:510a:b0:5e0:58ca:6706 with SMTP id
+ 4fb4d7f45d1cf-5edfdc02a25mr9816856a12.30.1743491866127; Tue, 01 Apr 2025
+ 00:17:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Wires
-Content-Transfer-Encoding: 8bit
+References: <20250331114729.594603-1-ap420073@gmail.com> <20250331114729.594603-2-ap420073@gmail.com>
+ <CACKFLinMwcWpv1Z13Si2sDPFUeRYx_aMfS=_46PWTBYmHvMm5g@mail.gmail.com>
+In-Reply-To: <CACKFLinMwcWpv1Z13Si2sDPFUeRYx_aMfS=_46PWTBYmHvMm5g@mail.gmail.com>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Tue, 1 Apr 2025 16:17:34 +0900
+X-Gm-Features: AQ5f1Jr3pJedCQujxifYkff-151hJHDXgaehO7mPrnONjrjmcY1zXgH6VMlqdOM
+Message-ID: <CAMArcTXrryUq_D9i4ezRk7Et6qNC4jD9iGNxSELYt2qWzSREgg@mail.gmail.com>
+Subject: Re: [RFC net-next 1/2] eth: bnxt: refactor buffer descriptor
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	pavan.chebbi@broadcom.com, ilias.apalodimas@linaro.org, dw@davidwei.uk, 
+	netdev@vger.kernel.org, kuniyu@amazon.com, sdf@fomichev.me, 
+	aleksander.lobakin@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Protect the parser TCAM/SRAM memory, and the cached (shadow) SRAM
-information, from concurrent modifications.
+On Tue, Apr 1, 2025 at 2:39=E2=80=AFPM Michael Chan <michael.chan@broadcom.=
+com> wrote:
+>
 
-Both the TCAM and SRAM tables are indirectly accessed by configuring
-an index register that selects the row to read or write to. This means
-that operations must be atomic in order to, e.g., avoid spreading
-writes across multiple rows. Since the shadow SRAM array is used to
-find free rows in the hardware table, it must also be protected in
-order to avoid TOCTOU errors where multiple cores allocate the same
-row.
+Hi Michael,
+Thanks a lot for the review!
 
-This issue was detected in a situation where `mvpp2_set_rx_mode()` ran
-concurrently on two CPUs. In this particular case the
-MVPP2_PE_MAC_UC_PROMISCUOUS entry was corrupted, causing the
-classifier unit to drop all incoming unicast - indicated by the
-`rx_classifier_drops` counter.
+> On Mon, Mar 31, 2025 at 4:47=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> w=
+rote:
+>
+> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/et=
+hernet/broadcom/bnxt/bnxt.c
+> > index 934ba9425857..198a42da3015 100644
+> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > @@ -915,24 +915,24 @@ static struct page *__bnxt_alloc_rx_page(struct b=
+nxt *bp, dma_addr_t *mapping,
+> >         if (!page)
+> >                 return NULL;
+> >
+> > -       *mapping =3D page_pool_get_dma_addr(page) + *offset;
+> > +       *mapping =3D page_pool_get_dma_addr(page) + bp->rx_dma_offset +=
+ *offset;
+>
+> Why are we changing the logic here by adding bp->rx_dma_offset?
+> Please explain this and other similar offset changes in the rest of
+> the patch.  It may be more clear if you split this patch into smaller
+> patches.
 
-Fixes: 3f518509dedc ("ethernet: Add new driver for Marvell Armada 375 network unit")
-Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
----
+Apologies for a lack of explanation.
+This change intends to make the two functions similar.
+__bnxt_alloc_rx_page() and __bnxt_alloc_rx_frag().
 
-v4 -> v5:
- - Fix incorrect indentation (Jakub)
- - Use double-underbar prefix instead of _unlocked suffix (Jakub)
+Original code like this.
+```
+    __bnxt_alloc_rx_page()
+        *mapping =3D page_pool_get_dma_addr(page) + *offset;
+    __bnxt_alloc_rx_frag()
+        *mapping =3D page_pool_get_dma_addr(page) + bp->rx_dma_offset + off=
+set;
 
-v3 -> v4:
- - Move memory allocations outside of atomic region in
-   mvpp2_prs_default_init() (Maxime)
+Then, we use a mapping value like below.
+    bnxt_alloc_rx_data()
+        if (BNXT_RX_PAGE_MODE(bp)) {
+            ...
+            mapping +=3D bp->rx_dma_offset;
+        }
 
-v2 -> v3:
- - Note the fact that prs_spinlock also protects the SRAM shadow table
-   (Andrew)
- - Add lockdep assertions for HW table accesses (Andrew/Jakub)
- - Add locking to the init path, since it uses the table access
-   functions that are now annotated with lockdep assertions
+    rx_buf->mapping =3D mapping;
 
-v1 -> v2:
- - Parser memory is never modified from hard IRQ context, so settle
-   for disabling bottom halves in critical sections. (Maxime)
+    bnxt_alloc_rx_page()
+        page =3D __bnxt_alloc_rx_page();
+        // no mapping offset change.
+```
 
- drivers/net/ethernet/marvell/mvpp2/mvpp2.h    |   3 +
- .../net/ethernet/marvell/mvpp2/mvpp2_main.c   |   3 +-
- .../net/ethernet/marvell/mvpp2/mvpp2_prs.c    | 201 ++++++++++++------
- 3 files changed, 140 insertions(+), 67 deletions(-)
+So I changed this logic like below.
+```
+    __bnxt_alloc_rx_page()
+        *mapping =3D page_pool_get_dma_addr(page) + bp->rx_dma_offset + *of=
+fset;
+    __bnxt_alloc_rx_frag()
+        *mapping =3D page_pool_get_dma_addr(page) + bp->rx_dma_offset + *of=
+fset;
 
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2.h b/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
-index 44fe9b68d1c2..061fcd444d50 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
-@@ -1113,6 +1113,9 @@ struct mvpp2 {
- 
- 	/* Spinlocks for CM3 shared memory configuration */
- 	spinlock_t mss_spinlock;
-+
-+	/* Spinlock for shared PRS parser memory and shadow table */
-+	spinlock_t prs_spinlock;
- };
- 
- struct mvpp2_pcpu_stats {
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-index 566c12c89520..416a926a8281 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-@@ -7723,8 +7723,9 @@ static int mvpp2_probe(struct platform_device *pdev)
- 	if (mvpp2_read(priv, MVPP2_VER_ID_REG) == MVPP2_VER_PP23)
- 		priv->hw_version = MVPP23;
- 
--	/* Init mss lock */
-+	/* Init locks for shared packet processor resources */
- 	spin_lock_init(&priv->mss_spinlock);
-+	spin_lock_init(&priv->prs_spinlock);
- 
- 	/* Initialize network controller */
- 	err = mvpp2_init(pdev, priv);
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_prs.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_prs.c
-index 9af22f497a40..93e978bdf303 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_prs.c
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_prs.c
-@@ -23,6 +23,8 @@ static int mvpp2_prs_hw_write(struct mvpp2 *priv, struct mvpp2_prs_entry *pe)
- {
- 	int i;
- 
-+	lockdep_assert_held(&priv->prs_spinlock);
-+
- 	if (pe->index > MVPP2_PRS_TCAM_SRAM_SIZE - 1)
- 		return -EINVAL;
- 
-@@ -43,11 +45,13 @@ static int mvpp2_prs_hw_write(struct mvpp2 *priv, struct mvpp2_prs_entry *pe)
- }
- 
- /* Initialize tcam entry from hw */
--int mvpp2_prs_init_from_hw(struct mvpp2 *priv, struct mvpp2_prs_entry *pe,
--			   int tid)
-+static int __mvpp2_prs_init_from_hw(struct mvpp2 *priv,
-+				    struct mvpp2_prs_entry *pe, int tid)
- {
- 	int i;
- 
-+	lockdep_assert_held(&priv->prs_spinlock);
-+
- 	if (tid > MVPP2_PRS_TCAM_SRAM_SIZE - 1)
- 		return -EINVAL;
- 
-@@ -73,6 +77,18 @@ int mvpp2_prs_init_from_hw(struct mvpp2 *priv, struct mvpp2_prs_entry *pe,
- 	return 0;
- }
- 
-+int mvpp2_prs_init_from_hw(struct mvpp2 *priv, struct mvpp2_prs_entry *pe,
-+			   int tid)
-+{
-+	int err;
-+
-+	spin_lock_bh(&priv->prs_spinlock);
-+	err = __mvpp2_prs_init_from_hw(priv, pe, tid);
-+	spin_unlock_bh(&priv->prs_spinlock);
-+
-+	return err;
-+}
-+
- /* Invalidate tcam hw entry */
- static void mvpp2_prs_hw_inv(struct mvpp2 *priv, int index)
- {
-@@ -374,7 +390,7 @@ static int mvpp2_prs_flow_find(struct mvpp2 *priv, int flow)
- 		    priv->prs_shadow[tid].lu != MVPP2_PRS_LU_FLOWS)
- 			continue;
- 
--		mvpp2_prs_init_from_hw(priv, &pe, tid);
-+		__mvpp2_prs_init_from_hw(priv, &pe, tid);
- 		bits = mvpp2_prs_sram_ai_get(&pe);
- 
- 		/* Sram store classification lookup ID in AI bits [5:0] */
-@@ -441,7 +457,7 @@ static void mvpp2_prs_mac_drop_all_set(struct mvpp2 *priv, int port, bool add)
- 
- 	if (priv->prs_shadow[MVPP2_PE_DROP_ALL].valid) {
- 		/* Entry exist - update port only */
--		mvpp2_prs_init_from_hw(priv, &pe, MVPP2_PE_DROP_ALL);
-+		__mvpp2_prs_init_from_hw(priv, &pe, MVPP2_PE_DROP_ALL);
- 	} else {
- 		/* Entry doesn't exist - create new */
- 		memset(&pe, 0, sizeof(pe));
-@@ -469,14 +485,17 @@ static void mvpp2_prs_mac_drop_all_set(struct mvpp2 *priv, int port, bool add)
- }
- 
- /* Set port to unicast or multicast promiscuous mode */
--void mvpp2_prs_mac_promisc_set(struct mvpp2 *priv, int port,
--			       enum mvpp2_prs_l2_cast l2_cast, bool add)
-+static void __mvpp2_prs_mac_promisc_set(struct mvpp2 *priv, int port,
-+					enum mvpp2_prs_l2_cast l2_cast,
-+					bool add)
- {
- 	struct mvpp2_prs_entry pe;
- 	unsigned char cast_match;
- 	unsigned int ri;
- 	int tid;
- 
-+	lockdep_assert_held(&priv->prs_spinlock);
-+
- 	if (l2_cast == MVPP2_PRS_L2_UNI_CAST) {
- 		cast_match = MVPP2_PRS_UCAST_VAL;
- 		tid = MVPP2_PE_MAC_UC_PROMISCUOUS;
-@@ -489,7 +508,7 @@ void mvpp2_prs_mac_promisc_set(struct mvpp2 *priv, int port,
- 
- 	/* promiscuous mode - Accept unknown unicast or multicast packets */
- 	if (priv->prs_shadow[tid].valid) {
--		mvpp2_prs_init_from_hw(priv, &pe, tid);
-+		__mvpp2_prs_init_from_hw(priv, &pe, tid);
- 	} else {
- 		memset(&pe, 0, sizeof(pe));
- 		mvpp2_prs_tcam_lu_set(&pe, MVPP2_PRS_LU_MAC);
-@@ -522,6 +541,14 @@ void mvpp2_prs_mac_promisc_set(struct mvpp2 *priv, int port,
- 	mvpp2_prs_hw_write(priv, &pe);
- }
- 
-+void mvpp2_prs_mac_promisc_set(struct mvpp2 *priv, int port,
-+			       enum mvpp2_prs_l2_cast l2_cast, bool add)
-+{
-+	spin_lock_bh(&priv->prs_spinlock);
-+	__mvpp2_prs_mac_promisc_set(priv, port, l2_cast, add);
-+	spin_unlock_bh(&priv->prs_spinlock);
-+}
-+
- /* Set entry for dsa packets */
- static void mvpp2_prs_dsa_tag_set(struct mvpp2 *priv, int port, bool add,
- 				  bool tagged, bool extend)
-@@ -539,7 +566,7 @@ static void mvpp2_prs_dsa_tag_set(struct mvpp2 *priv, int port, bool add,
- 
- 	if (priv->prs_shadow[tid].valid) {
- 		/* Entry exist - update port only */
--		mvpp2_prs_init_from_hw(priv, &pe, tid);
-+		__mvpp2_prs_init_from_hw(priv, &pe, tid);
- 	} else {
- 		/* Entry doesn't exist - create new */
- 		memset(&pe, 0, sizeof(pe));
-@@ -610,7 +637,7 @@ static void mvpp2_prs_dsa_tag_ethertype_set(struct mvpp2 *priv, int port,
- 
- 	if (priv->prs_shadow[tid].valid) {
- 		/* Entry exist - update port only */
--		mvpp2_prs_init_from_hw(priv, &pe, tid);
-+		__mvpp2_prs_init_from_hw(priv, &pe, tid);
- 	} else {
- 		/* Entry doesn't exist - create new */
- 		memset(&pe, 0, sizeof(pe));
-@@ -673,7 +700,7 @@ static int mvpp2_prs_vlan_find(struct mvpp2 *priv, unsigned short tpid, int ai)
- 		    priv->prs_shadow[tid].lu != MVPP2_PRS_LU_VLAN)
- 			continue;
- 
--		mvpp2_prs_init_from_hw(priv, &pe, tid);
-+		__mvpp2_prs_init_from_hw(priv, &pe, tid);
- 		match = mvpp2_prs_tcam_data_cmp(&pe, 0, tpid);
- 		if (!match)
- 			continue;
-@@ -726,7 +753,7 @@ static int mvpp2_prs_vlan_add(struct mvpp2 *priv, unsigned short tpid, int ai,
- 			    priv->prs_shadow[tid_aux].lu != MVPP2_PRS_LU_VLAN)
- 				continue;
- 
--			mvpp2_prs_init_from_hw(priv, &pe, tid_aux);
-+			__mvpp2_prs_init_from_hw(priv, &pe, tid_aux);
- 			ri_bits = mvpp2_prs_sram_ri_get(&pe);
- 			if ((ri_bits & MVPP2_PRS_RI_VLAN_MASK) ==
- 			    MVPP2_PRS_RI_VLAN_DOUBLE)
-@@ -760,7 +787,7 @@ static int mvpp2_prs_vlan_add(struct mvpp2 *priv, unsigned short tpid, int ai,
- 
- 		mvpp2_prs_shadow_set(priv, pe.index, MVPP2_PRS_LU_VLAN);
- 	} else {
--		mvpp2_prs_init_from_hw(priv, &pe, tid);
-+		__mvpp2_prs_init_from_hw(priv, &pe, tid);
- 	}
- 	/* Update ports' mask */
- 	mvpp2_prs_tcam_port_map_set(&pe, port_map);
-@@ -800,7 +827,7 @@ static int mvpp2_prs_double_vlan_find(struct mvpp2 *priv, unsigned short tpid1,
- 		    priv->prs_shadow[tid].lu != MVPP2_PRS_LU_VLAN)
- 			continue;
- 
--		mvpp2_prs_init_from_hw(priv, &pe, tid);
-+		__mvpp2_prs_init_from_hw(priv, &pe, tid);
- 
- 		match = mvpp2_prs_tcam_data_cmp(&pe, 0, tpid1) &&
- 			mvpp2_prs_tcam_data_cmp(&pe, 4, tpid2);
-@@ -849,7 +876,7 @@ static int mvpp2_prs_double_vlan_add(struct mvpp2 *priv, unsigned short tpid1,
- 			    priv->prs_shadow[tid_aux].lu != MVPP2_PRS_LU_VLAN)
- 				continue;
- 
--			mvpp2_prs_init_from_hw(priv, &pe, tid_aux);
-+			__mvpp2_prs_init_from_hw(priv, &pe, tid_aux);
- 			ri_bits = mvpp2_prs_sram_ri_get(&pe);
- 			ri_bits &= MVPP2_PRS_RI_VLAN_MASK;
- 			if (ri_bits == MVPP2_PRS_RI_VLAN_SINGLE ||
-@@ -880,7 +907,7 @@ static int mvpp2_prs_double_vlan_add(struct mvpp2 *priv, unsigned short tpid1,
- 
- 		mvpp2_prs_shadow_set(priv, pe.index, MVPP2_PRS_LU_VLAN);
- 	} else {
--		mvpp2_prs_init_from_hw(priv, &pe, tid);
-+		__mvpp2_prs_init_from_hw(priv, &pe, tid);
- 	}
- 
- 	/* Update ports' mask */
-@@ -1213,8 +1240,8 @@ static void mvpp2_prs_mac_init(struct mvpp2 *priv)
- 	/* Create dummy entries for drop all and promiscuous modes */
- 	mvpp2_prs_drop_fc(priv);
- 	mvpp2_prs_mac_drop_all_set(priv, 0, false);
--	mvpp2_prs_mac_promisc_set(priv, 0, MVPP2_PRS_L2_UNI_CAST, false);
--	mvpp2_prs_mac_promisc_set(priv, 0, MVPP2_PRS_L2_MULTI_CAST, false);
-+	__mvpp2_prs_mac_promisc_set(priv, 0, MVPP2_PRS_L2_UNI_CAST, false);
-+	__mvpp2_prs_mac_promisc_set(priv, 0, MVPP2_PRS_L2_MULTI_CAST, false);
- }
- 
- /* Set default entries for various types of dsa packets */
-@@ -1533,12 +1560,6 @@ static int mvpp2_prs_vlan_init(struct platform_device *pdev, struct mvpp2 *priv)
- 	struct mvpp2_prs_entry pe;
- 	int err;
- 
--	priv->prs_double_vlans = devm_kcalloc(&pdev->dev, sizeof(bool),
--					      MVPP2_PRS_DBL_VLANS_MAX,
--					      GFP_KERNEL);
--	if (!priv->prs_double_vlans)
--		return -ENOMEM;
--
- 	/* Double VLAN: 0x88A8, 0x8100 */
- 	err = mvpp2_prs_double_vlan_add(priv, ETH_P_8021AD, ETH_P_8021Q,
- 					MVPP2_PRS_PORT_MASK);
-@@ -1941,7 +1962,7 @@ static int mvpp2_prs_vid_range_find(struct mvpp2_port *port, u16 vid, u16 mask)
- 		    port->priv->prs_shadow[tid].lu != MVPP2_PRS_LU_VID)
- 			continue;
- 
--		mvpp2_prs_init_from_hw(port->priv, &pe, tid);
-+		__mvpp2_prs_init_from_hw(port->priv, &pe, tid);
- 
- 		mvpp2_prs_tcam_data_byte_get(&pe, 2, &byte[0], &enable[0]);
- 		mvpp2_prs_tcam_data_byte_get(&pe, 3, &byte[1], &enable[1]);
-@@ -1970,6 +1991,8 @@ int mvpp2_prs_vid_entry_add(struct mvpp2_port *port, u16 vid)
- 
- 	memset(&pe, 0, sizeof(pe));
- 
-+	spin_lock_bh(&priv->prs_spinlock);
-+
- 	/* Scan TCAM and see if entry with this <vid,port> already exist */
- 	tid = mvpp2_prs_vid_range_find(port, vid, mask);
- 
-@@ -1988,8 +2011,10 @@ int mvpp2_prs_vid_entry_add(struct mvpp2_port *port, u16 vid)
- 						MVPP2_PRS_VLAN_FILT_MAX_ENTRY);
- 
- 		/* There isn't room for a new VID filter */
--		if (tid < 0)
-+		if (tid < 0) {
-+			spin_unlock_bh(&priv->prs_spinlock);
- 			return tid;
-+		}
- 
- 		mvpp2_prs_tcam_lu_set(&pe, MVPP2_PRS_LU_VID);
- 		pe.index = tid;
-@@ -1997,7 +2022,7 @@ int mvpp2_prs_vid_entry_add(struct mvpp2_port *port, u16 vid)
- 		/* Mask all ports */
- 		mvpp2_prs_tcam_port_map_set(&pe, 0);
- 	} else {
--		mvpp2_prs_init_from_hw(priv, &pe, tid);
-+		__mvpp2_prs_init_from_hw(priv, &pe, tid);
- 	}
- 
- 	/* Enable the current port */
-@@ -2019,6 +2044,7 @@ int mvpp2_prs_vid_entry_add(struct mvpp2_port *port, u16 vid)
- 	mvpp2_prs_shadow_set(priv, pe.index, MVPP2_PRS_LU_VID);
- 	mvpp2_prs_hw_write(priv, &pe);
- 
-+	spin_unlock_bh(&priv->prs_spinlock);
- 	return 0;
- }
- 
-@@ -2028,15 +2054,16 @@ void mvpp2_prs_vid_entry_remove(struct mvpp2_port *port, u16 vid)
- 	struct mvpp2 *priv = port->priv;
- 	int tid;
- 
--	/* Scan TCAM and see if entry with this <vid,port> already exist */
--	tid = mvpp2_prs_vid_range_find(port, vid, 0xfff);
-+	spin_lock_bh(&priv->prs_spinlock);
- 
--	/* No such entry */
--	if (tid < 0)
--		return;
-+	/* Invalidate TCAM entry with this <vid,port>, if it exists */
-+	tid = mvpp2_prs_vid_range_find(port, vid, 0xfff);
-+	if (tid >= 0) {
-+		mvpp2_prs_hw_inv(priv, tid);
-+		priv->prs_shadow[tid].valid = false;
-+	}
- 
--	mvpp2_prs_hw_inv(priv, tid);
--	priv->prs_shadow[tid].valid = false;
-+	spin_unlock_bh(&priv->prs_spinlock);
- }
- 
- /* Remove all existing VID filters on this port */
-@@ -2045,6 +2072,8 @@ void mvpp2_prs_vid_remove_all(struct mvpp2_port *port)
- 	struct mvpp2 *priv = port->priv;
- 	int tid;
- 
-+	spin_lock_bh(&priv->prs_spinlock);
-+
- 	for (tid = MVPP2_PRS_VID_PORT_FIRST(port->id);
- 	     tid <= MVPP2_PRS_VID_PORT_LAST(port->id); tid++) {
- 		if (priv->prs_shadow[tid].valid) {
-@@ -2052,6 +2081,8 @@ void mvpp2_prs_vid_remove_all(struct mvpp2_port *port)
- 			priv->prs_shadow[tid].valid = false;
- 		}
- 	}
-+
-+	spin_unlock_bh(&priv->prs_spinlock);
- }
- 
- /* Remove VID filering entry for this port */
-@@ -2060,10 +2091,14 @@ void mvpp2_prs_vid_disable_filtering(struct mvpp2_port *port)
- 	unsigned int tid = MVPP2_PRS_VID_PORT_DFLT(port->id);
- 	struct mvpp2 *priv = port->priv;
- 
-+	spin_lock_bh(&priv->prs_spinlock);
-+
- 	/* Invalidate the guard entry */
- 	mvpp2_prs_hw_inv(priv, tid);
- 
- 	priv->prs_shadow[tid].valid = false;
-+
-+	spin_unlock_bh(&priv->prs_spinlock);
- }
- 
- /* Add guard entry that drops packets when no VID is matched on this port */
-@@ -2079,6 +2114,8 @@ void mvpp2_prs_vid_enable_filtering(struct mvpp2_port *port)
- 
- 	memset(&pe, 0, sizeof(pe));
- 
-+	spin_lock_bh(&priv->prs_spinlock);
-+
- 	pe.index = tid;
- 
- 	reg_val = mvpp2_read(priv, MVPP2_MH_REG(port->id));
-@@ -2111,6 +2148,8 @@ void mvpp2_prs_vid_enable_filtering(struct mvpp2_port *port)
- 	/* Update shadow table */
- 	mvpp2_prs_shadow_set(priv, pe.index, MVPP2_PRS_LU_VID);
- 	mvpp2_prs_hw_write(priv, &pe);
-+
-+	spin_unlock_bh(&priv->prs_spinlock);
- }
- 
- /* Parser default initialization */
-@@ -2118,6 +2157,20 @@ int mvpp2_prs_default_init(struct platform_device *pdev, struct mvpp2 *priv)
- {
- 	int err, index, i;
- 
-+	priv->prs_shadow = devm_kcalloc(&pdev->dev, MVPP2_PRS_TCAM_SRAM_SIZE,
-+					sizeof(*priv->prs_shadow),
-+					GFP_KERNEL);
-+	if (!priv->prs_shadow)
-+		return -ENOMEM;
-+
-+	priv->prs_double_vlans = devm_kcalloc(&pdev->dev, sizeof(bool),
-+					      MVPP2_PRS_DBL_VLANS_MAX,
-+					      GFP_KERNEL);
-+	if (!priv->prs_double_vlans)
-+		return -ENOMEM;
-+
-+	spin_lock_bh(&priv->prs_spinlock);
-+
- 	/* Enable tcam table */
- 	mvpp2_write(priv, MVPP2_PRS_TCAM_CTRL_REG, MVPP2_PRS_TCAM_EN_MASK);
- 
-@@ -2136,12 +2189,6 @@ int mvpp2_prs_default_init(struct platform_device *pdev, struct mvpp2 *priv)
- 	for (index = 0; index < MVPP2_PRS_TCAM_SRAM_SIZE; index++)
- 		mvpp2_prs_hw_inv(priv, index);
- 
--	priv->prs_shadow = devm_kcalloc(&pdev->dev, MVPP2_PRS_TCAM_SRAM_SIZE,
--					sizeof(*priv->prs_shadow),
--					GFP_KERNEL);
--	if (!priv->prs_shadow)
--		return -ENOMEM;
--
- 	/* Always start from lookup = 0 */
- 	for (index = 0; index < MVPP2_MAX_PORTS; index++)
- 		mvpp2_prs_hw_port_init(priv, index, MVPP2_PRS_LU_MH,
-@@ -2158,26 +2205,13 @@ int mvpp2_prs_default_init(struct platform_device *pdev, struct mvpp2 *priv)
- 	mvpp2_prs_vid_init(priv);
- 
- 	err = mvpp2_prs_etype_init(priv);
--	if (err)
--		return err;
--
--	err = mvpp2_prs_vlan_init(pdev, priv);
--	if (err)
--		return err;
--
--	err = mvpp2_prs_pppoe_init(priv);
--	if (err)
--		return err;
--
--	err = mvpp2_prs_ip6_init(priv);
--	if (err)
--		return err;
--
--	err = mvpp2_prs_ip4_init(priv);
--	if (err)
--		return err;
-+	err = err ? : mvpp2_prs_vlan_init(pdev, priv);
-+	err = err ? : mvpp2_prs_pppoe_init(priv);
-+	err = err ? : mvpp2_prs_ip6_init(priv);
-+	err = err ? : mvpp2_prs_ip4_init(priv);
- 
--	return 0;
-+	spin_unlock_bh(&priv->prs_spinlock);
-+	return err;
- }
- 
- /* Compare MAC DA with tcam entry data */
-@@ -2217,7 +2251,7 @@ mvpp2_prs_mac_da_range_find(struct mvpp2 *priv, int pmap, const u8 *da,
- 		    (priv->prs_shadow[tid].udf != udf_type))
- 			continue;
- 
--		mvpp2_prs_init_from_hw(priv, &pe, tid);
-+		__mvpp2_prs_init_from_hw(priv, &pe, tid);
- 		entry_pmap = mvpp2_prs_tcam_port_map_get(&pe);
- 
- 		if (mvpp2_prs_mac_range_equals(&pe, da, mask) &&
-@@ -2229,7 +2263,8 @@ mvpp2_prs_mac_da_range_find(struct mvpp2 *priv, int pmap, const u8 *da,
- }
- 
- /* Update parser's mac da entry */
--int mvpp2_prs_mac_da_accept(struct mvpp2_port *port, const u8 *da, bool add)
-+static int __mvpp2_prs_mac_da_accept(struct mvpp2_port *port,
-+				     const u8 *da, bool add)
- {
- 	unsigned char mask[ETH_ALEN] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
- 	struct mvpp2 *priv = port->priv;
-@@ -2261,7 +2296,7 @@ int mvpp2_prs_mac_da_accept(struct mvpp2_port *port, const u8 *da, bool add)
- 		/* Mask all ports */
- 		mvpp2_prs_tcam_port_map_set(&pe, 0);
- 	} else {
--		mvpp2_prs_init_from_hw(priv, &pe, tid);
-+		__mvpp2_prs_init_from_hw(priv, &pe, tid);
- 	}
- 
- 	mvpp2_prs_tcam_lu_set(&pe, MVPP2_PRS_LU_MAC);
-@@ -2317,6 +2352,17 @@ int mvpp2_prs_mac_da_accept(struct mvpp2_port *port, const u8 *da, bool add)
- 	return 0;
- }
- 
-+int mvpp2_prs_mac_da_accept(struct mvpp2_port *port, const u8 *da, bool add)
-+{
-+	int err;
-+
-+	spin_lock_bh(&port->priv->prs_spinlock);
-+	err = __mvpp2_prs_mac_da_accept(port, da, add);
-+	spin_unlock_bh(&port->priv->prs_spinlock);
-+
-+	return err;
-+}
-+
- int mvpp2_prs_update_mac_da(struct net_device *dev, const u8 *da)
- {
- 	struct mvpp2_port *port = netdev_priv(dev);
-@@ -2345,6 +2391,8 @@ void mvpp2_prs_mac_del_all(struct mvpp2_port *port)
- 	unsigned long pmap;
- 	int index, tid;
- 
-+	spin_lock_bh(&priv->prs_spinlock);
-+
- 	for (tid = MVPP2_PE_MAC_RANGE_START;
- 	     tid <= MVPP2_PE_MAC_RANGE_END; tid++) {
- 		unsigned char da[ETH_ALEN], da_mask[ETH_ALEN];
-@@ -2354,7 +2402,7 @@ void mvpp2_prs_mac_del_all(struct mvpp2_port *port)
- 		    (priv->prs_shadow[tid].udf != MVPP2_PRS_UDF_MAC_DEF))
- 			continue;
- 
--		mvpp2_prs_init_from_hw(priv, &pe, tid);
-+		__mvpp2_prs_init_from_hw(priv, &pe, tid);
- 
- 		pmap = mvpp2_prs_tcam_port_map_get(&pe);
- 
-@@ -2375,14 +2423,17 @@ void mvpp2_prs_mac_del_all(struct mvpp2_port *port)
- 			continue;
- 
- 		/* Remove entry from TCAM */
--		mvpp2_prs_mac_da_accept(port, da, false);
-+		__mvpp2_prs_mac_da_accept(port, da, false);
- 	}
-+
-+	spin_unlock_bh(&priv->prs_spinlock);
- }
- 
- int mvpp2_prs_tag_mode_set(struct mvpp2 *priv, int port, int type)
- {
- 	switch (type) {
- 	case MVPP2_TAG_TYPE_EDSA:
-+		spin_lock_bh(&priv->prs_spinlock);
- 		/* Add port to EDSA entries */
- 		mvpp2_prs_dsa_tag_set(priv, port, true,
- 				      MVPP2_PRS_TAGGED, MVPP2_PRS_EDSA);
-@@ -2393,9 +2444,11 @@ int mvpp2_prs_tag_mode_set(struct mvpp2 *priv, int port, int type)
- 				      MVPP2_PRS_TAGGED, MVPP2_PRS_DSA);
- 		mvpp2_prs_dsa_tag_set(priv, port, false,
- 				      MVPP2_PRS_UNTAGGED, MVPP2_PRS_DSA);
-+		spin_unlock_bh(&priv->prs_spinlock);
- 		break;
- 
- 	case MVPP2_TAG_TYPE_DSA:
-+		spin_lock_bh(&priv->prs_spinlock);
- 		/* Add port to DSA entries */
- 		mvpp2_prs_dsa_tag_set(priv, port, true,
- 				      MVPP2_PRS_TAGGED, MVPP2_PRS_DSA);
-@@ -2406,10 +2459,12 @@ int mvpp2_prs_tag_mode_set(struct mvpp2 *priv, int port, int type)
- 				      MVPP2_PRS_TAGGED, MVPP2_PRS_EDSA);
- 		mvpp2_prs_dsa_tag_set(priv, port, false,
- 				      MVPP2_PRS_UNTAGGED, MVPP2_PRS_EDSA);
-+		spin_unlock_bh(&priv->prs_spinlock);
- 		break;
- 
- 	case MVPP2_TAG_TYPE_MH:
- 	case MVPP2_TAG_TYPE_NONE:
-+		spin_lock_bh(&priv->prs_spinlock);
- 		/* Remove port form EDSA and DSA entries */
- 		mvpp2_prs_dsa_tag_set(priv, port, false,
- 				      MVPP2_PRS_TAGGED, MVPP2_PRS_DSA);
-@@ -2419,6 +2474,7 @@ int mvpp2_prs_tag_mode_set(struct mvpp2 *priv, int port, int type)
- 				      MVPP2_PRS_TAGGED, MVPP2_PRS_EDSA);
- 		mvpp2_prs_dsa_tag_set(priv, port, false,
- 				      MVPP2_PRS_UNTAGGED, MVPP2_PRS_EDSA);
-+		spin_unlock_bh(&priv->prs_spinlock);
- 		break;
- 
- 	default:
-@@ -2437,11 +2493,15 @@ int mvpp2_prs_add_flow(struct mvpp2 *priv, int flow, u32 ri, u32 ri_mask)
- 
- 	memset(&pe, 0, sizeof(pe));
- 
-+	spin_lock_bh(&priv->prs_spinlock);
-+
- 	tid = mvpp2_prs_tcam_first_free(priv,
- 					MVPP2_PE_LAST_FREE_TID,
- 					MVPP2_PE_FIRST_FREE_TID);
--	if (tid < 0)
-+	if (tid < 0) {
-+		spin_unlock_bh(&priv->prs_spinlock);
- 		return tid;
-+	}
- 
- 	pe.index = tid;
- 
-@@ -2461,6 +2521,7 @@ int mvpp2_prs_add_flow(struct mvpp2 *priv, int flow, u32 ri, u32 ri_mask)
- 	mvpp2_prs_tcam_port_map_set(&pe, MVPP2_PRS_PORT_MASK);
- 	mvpp2_prs_hw_write(priv, &pe);
- 
-+	spin_unlock_bh(&priv->prs_spinlock);
- 	return 0;
- }
- 
-@@ -2472,6 +2533,8 @@ int mvpp2_prs_def_flow(struct mvpp2_port *port)
- 
- 	memset(&pe, 0, sizeof(pe));
- 
-+	spin_lock_bh(&port->priv->prs_spinlock);
-+
- 	tid = mvpp2_prs_flow_find(port->priv, port->id);
- 
- 	/* Such entry not exist */
-@@ -2480,8 +2543,10 @@ int mvpp2_prs_def_flow(struct mvpp2_port *port)
- 		tid = mvpp2_prs_tcam_first_free(port->priv,
- 						MVPP2_PE_LAST_FREE_TID,
- 					       MVPP2_PE_FIRST_FREE_TID);
--		if (tid < 0)
-+		if (tid < 0) {
-+			spin_unlock_bh(&port->priv->prs_spinlock);
- 			return tid;
-+		}
- 
- 		pe.index = tid;
- 
-@@ -2492,13 +2557,14 @@ int mvpp2_prs_def_flow(struct mvpp2_port *port)
- 		/* Update shadow table */
- 		mvpp2_prs_shadow_set(port->priv, pe.index, MVPP2_PRS_LU_FLOWS);
- 	} else {
--		mvpp2_prs_init_from_hw(port->priv, &pe, tid);
-+		__mvpp2_prs_init_from_hw(port->priv, &pe, tid);
- 	}
- 
- 	mvpp2_prs_tcam_lu_set(&pe, MVPP2_PRS_LU_FLOWS);
- 	mvpp2_prs_tcam_port_map_set(&pe, (1 << port->id));
- 	mvpp2_prs_hw_write(port->priv, &pe);
- 
-+	spin_unlock_bh(&port->priv->prs_spinlock);
- 	return 0;
- }
- 
-@@ -2509,11 +2575,14 @@ int mvpp2_prs_hits(struct mvpp2 *priv, int index)
- 	if (index > MVPP2_PRS_TCAM_SRAM_SIZE)
- 		return -EINVAL;
- 
-+	spin_lock_bh(&priv->prs_spinlock);
-+
- 	mvpp2_write(priv, MVPP2_PRS_TCAM_HIT_IDX_REG, index);
- 
- 	val = mvpp2_read(priv, MVPP2_PRS_TCAM_HIT_CNT_REG);
- 
- 	val &= MVPP2_PRS_TCAM_HIT_CNT_MASK;
- 
-+	spin_unlock_bh(&priv->prs_spinlock);
- 	return val;
- }
--- 
-2.43.0
+    bnxt_alloc_rx_data()
+        // no mapping offset change.
+        rx_buf->mapping =3D mapping;
 
+    bnxt_alloc_rx_page()
+        page =3D __bnxt_alloc_rx_page();
+        mapping -=3D bp->rx_dma_offset; //added for this change.
+```
+
+However, including this change is not necessary for this patchset.
+Moreover, it makes the patch harder to review.
+Therefore, as you mentioned, I would like to drop this change for now
+and submit a separate patch for it later.
+
+Also, if you think I missed other points, please let me know!
+
+>
+> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/et=
+hernet/broadcom/bnxt/bnxt.h
+> > index 21726cf56586..13db8b7bd4b7 100644
+> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> > @@ -807,7 +807,7 @@ struct nqe_cn {
+> >  #define SW_RXBD_RING_SIZE (sizeof(struct bnxt_sw_rx_bd) * RX_DESC_CNT)
+> >  #define HW_RXBD_RING_SIZE (sizeof(struct rx_bd) * RX_DESC_CNT)
+> >
+> > -#define SW_RXBD_AGG_RING_SIZE (sizeof(struct bnxt_sw_rx_agg_bd) * RX_D=
+ESC_CNT)
+> > +#define SW_RXBD_AGG_RING_SIZE (sizeof(struct bnxt_sw_rx_bd) * RX_DESC_=
+CNT)
+>
+> I would just eliminate SW_RXBD_AGG_RING_SIZE since it is now identical
+> to SW_RXBD_RING_SIZE.
+> Thanks.
+
+Okay, I will remove SW_RXBD_AGG_RING_SIZE and then use
+SW_RXBD_RING_SIZE instead.
+
+Thanks a lot!
+Taehee Yoo
 
