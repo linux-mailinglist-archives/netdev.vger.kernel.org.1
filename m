@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-178473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98E8BA771B9
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 02:11:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38679A771BC
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 02:12:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0B383ABEE5
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 00:10:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21B66188DBDD
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 00:11:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F1D9136327;
-	Tue,  1 Apr 2025 00:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 751941714B7;
+	Tue,  1 Apr 2025 00:10:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o59W/nnN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GPyp+/aH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AAD7126C03;
-	Tue,  1 Apr 2025 00:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511561684B4
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 00:10:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743466218; cv=none; b=ddchGjU58t5Nl/AeEszFruzrbAaDLHNUoh2q96o0X0NIx/608xKR1BaiSsfMPvbY6hP3GOSMiGBJaCmUwW6bdrciyYdMcrSeUoUvIJgIUy9D/rwjf+2ZZd3Kxdlf2ilph9ceKS/7VaG6dlUZLIiA4CBeJWP3OBpbK7jeif7HblU=
+	t=1743466220; cv=none; b=SkgUV2wrJzHRb9p8mFttnRtDnbQFxYuhSSsjFIo77ZsNm4J2DyExX+xmT4FNTpDj+OajYwiydFe7IKA0dtzTAvQ5TJ9B1KqLZNV8711HzjijTM+meOZEzvr3FN8Unj4VA0sMVzcVZy6mpbjDx0ODiLq8wWSOCuSWxYHLZkTh888=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743466218; c=relaxed/simple;
-	bh=5QRTI9bWZpF773xhoyYYNn0i3blXsXsmrnbBr/YFvH0=;
+	s=arc-20240116; t=1743466220; c=relaxed/simple;
+	bh=wBb/huNQorYOwrkR/InTr/dW/O721p1IiLxRB2g3+nY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CrlmVBXAFG+jm4sj6S6irs34d6lUCzKyoHpatMIuGSF+UL4Mh4S+2HwXJEqXlrmmPurFs8IqQnceejZUoKefQ+VeVQqJjCTqPLqbDWQSG/bWqvoCjzFsWAkNZOKfd0+0/IcbsSdlk7b8H8nIM2WHoJLkuQDt3jrkoiSWscVd62c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o59W/nnN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4291FC4CEE3;
-	Tue,  1 Apr 2025 00:10:18 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=lV34n9gy9X9D2Yvfl94SAiTPW6vttb20oPH6DZiCnRb3JxMKyg1hsvc4KeHhfA0X1F5rEL4FEEpZJ0Ub2/oRlThhNleA4P0QCdQj7rMg2mYCvd4iv8PRMQx1Fy0TrX4JWxnf7E96yPCti+/wEUP4byMFMVfJIM8PNMiYjw0SZS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GPyp+/aH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8597C4CEE5;
+	Tue,  1 Apr 2025 00:10:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743466218;
-	bh=5QRTI9bWZpF773xhoyYYNn0i3blXsXsmrnbBr/YFvH0=;
+	s=k20201202; t=1743466219;
+	bh=wBb/huNQorYOwrkR/InTr/dW/O721p1IiLxRB2g3+nY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=o59W/nnNNK7k07yN+C8ku2/+LBfxtfV2k4ze4LjmpuwsUY0wFQf0cohNMJyC1oMl9
-	 ogoRdXXAIl/DNVJECw/+d3iK66ClBYD/ScdJljTA4K9R2otPBetPzjnPZVfPC2wn0o
-	 KyZGCMZT1Qa7fWH5h4XcA3rsyqwIc/+QVClGE35wOoHg3Ai/qLNfFS8dUYeXZztuly
-	 vI1qgXjnXAty919QgV0XxfeDmtYNF8qzVg48PhnzmE1QtfsEKvMQ5t+xAnvhl+hcxM
-	 9s7UrJR6wVagwaQxcD8dJlZwhW8/7fEToGfhgdDViwFpJ15bHnktaeJaoNBYgRI4mw
-	 0Wk7875CQCQHA==
+	b=GPyp+/aHbgDAlsUGQjBGIxzhsXVZbBPFy6G4NJQKr7nXbDb7te7FqXWga5wqvHHE7
+	 b8BGUZbEZx6c0JRxOD5kKY+sQ6Fe0ZVB1A3z7Tuq7I5icyBuzuuMJVg+GDbdwNZJL1
+	 vrPeMkVD2SO00aCgVQZNjR4dCMXEeeklk09qy6lqoMkvcCN1NUhWhB0+eaUBHFspmK
+	 N6jWWGOvn69I0OOJVl9rHMoVAtarFyzwFRlrGb2clceJqQBDKH40jwpyembmOqGQYk
+	 h8WS3m9SVY51txVb0SUGPisBNklmXHB+iXaSHLb+wy44BU6kmZBt8JgGCUSKG26fug
+	 GrXJtExX+UelA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DE8380AA7A;
-	Tue,  1 Apr 2025 00:10:56 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF0B380AA7A;
+	Tue,  1 Apr 2025 00:10:57 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/4] mptcp: misc. fixes for 6.15-rc0
+Subject: Re: [PATCH net v3 0/3] selftests: drv-net: replace the rpath helper with
+ Path objects
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174346625474.178192.14379060520127760494.git-patchwork-notify@kernel.org>
-Date: Tue, 01 Apr 2025 00:10:54 +0000
-References: <20250328-net-mptcp-misc-fixes-6-15-v1-0-34161a482a7f@kernel.org>
-In-Reply-To: <20250328-net-mptcp-misc-fixes-6-15-v1-0-34161a482a7f@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, fw@strlen.de, shuah@kernel.org, dmytro@shytyi.net,
- yangang@kylinos.cn, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, stable@vger.kernel.org, liucong2@kylinos.cn
+ <174346625624.178192.4849291086810969698.git-patchwork-notify@kernel.org>
+Date: Tue, 01 Apr 2025 00:10:56 +0000
+References: <20250327222315.1098596-1-kuba@kernel.org>
+In-Reply-To: <20250327222315.1098596-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me,
+ willemdebruijn.kernel@gmail.com
 
 Hello:
 
 This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 28 Mar 2025 15:27:15 +0100 you wrote:
-> Here are 4 unrelated patches:
+On Thu, 27 Mar 2025 15:23:12 -0700 you wrote:
+> Trying to change the env.rpath() helper during the development
+> cycle was causing a lot of conflicts between net and net-next.
+> Let's get it converted now that the trees are converged.
 > 
-> - Patch 1: fix a NULL pointer when two SYN-ACK for the same request are
->   handled in parallel. A fix for up to v5.9.
+> v2: https://lore.kernel.org/20250306171158.1836674-1-kuba@kernel.org
 > 
-> - Patch 2: selftests: fix check for the wrong FD. A fix for up to v5.17.
+> Jakub Kicinski (3):
+>   selftests: drv-net: replace the rpath helper with Path objects
+>   selftests: net: use the dummy bpf from net/lib
+>   selftests: net: use Path helpers in ping
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/4] mptcp: fix NULL pointer in can_accept_new_subflow
-    https://git.kernel.org/netdev/net/c/443041deb5ef
-  - [net,2/4] selftests: mptcp: fix incorrect fd checks in main_loop
-    https://git.kernel.org/netdev/net/c/7335d4ac8129
-  - [net,3/4] selftests: mptcp: close fd_in before returning in main_loop
-    https://git.kernel.org/netdev/net/c/c183165f87a4
-  - [net,4/4] selftests: mptcp: ignore mptcp_diag binary
-    https://git.kernel.org/netdev/net/c/b44a4c28228f
+  - [net,v3,1/3] selftests: drv-net: replace the rpath helper with Path objects
+    https://git.kernel.org/netdev/net/c/e514d77334a6
+  - [net,v3,2/3] selftests: net: use the dummy bpf from net/lib
+    (no matching commit)
+  - [net,v3,3/3] selftests: net: use Path helpers in ping
+    https://git.kernel.org/netdev/net/c/88dec030dfcd
 
 You are awesome, thank you!
 -- 
