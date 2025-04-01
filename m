@@ -1,138 +1,116 @@
-Return-Path: <netdev+bounces-178594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AA97A77BA6
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 15:05:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E7B7A77BAB
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 15:06:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33AEC189072F
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 13:05:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58E8B16C300
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 13:06:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F410E2036E3;
-	Tue,  1 Apr 2025 13:05:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="b+nHgLwZ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="F6p8nPEH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DD791F152E;
+	Tue,  1 Apr 2025 13:06:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F6C520127D;
-	Tue,  1 Apr 2025 13:05:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6613229A1;
+	Tue,  1 Apr 2025 13:06:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743512733; cv=none; b=sm1NxuFlrpQzFGYz8wTvvbRhanXwZZ0dJR5nkf8v5NcdeWDDhRA239jz7UjAbix7edB7psr9CKDIzasaG/gicd5ehUA2JX9o52GACnV1HMKj5OcNhQiYqVs7P5V+ec10V3o7juCp1W64BEtKggAJ2lJSiJdY1dUwfj0EUBdY3Zw=
+	t=1743512797; cv=none; b=VrQWAGKQhWH3zp8aP/uE+Nl8zjxrkgF1zdiJZjPMuHUw3heSHZDTa//2GRzWP4VdLpLObDA3EQAukjfq4ocF8xDU93sRVAFRZQuoVsLh2vbIbaEs7EU+qyJIgdoWH6Haoz7UnGcU342jhosu8jHiCMOqAOmWX3p3RnJCpzsUwkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743512733; c=relaxed/simple;
-	bh=68g1dwxubK/qOagQYfmF+/7yRupBhMvJ/WhIYkafHTE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SWIesTXhWkkCpvgNr6lUtp2nGpPL0N+a03hLR8Vk9lRmA1DaoWFPXy30TgHjJ08sUHp59ecdCoXkfRGtfwKS/xDl6eAwyDMui2k7Ko+L5zLjZrKJUxzYLO/CsgHNKbSHAGVOqRTvunTLaZhJFsZpVeARN8UoTz7vN1wCtLeq1Iw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=b+nHgLwZ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=F6p8nPEH; arc=none smtp.client-ip=202.12.124.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-13.internal (phl-compute-13.phl.internal [10.202.2.53])
-	by mailfout.stl.internal (Postfix) with ESMTP id E803811401B2;
-	Tue,  1 Apr 2025 09:05:29 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-13.internal (MEProxy); Tue, 01 Apr 2025 09:05:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1743512729; x=
-	1743599129; bh=7dX1gNT+/GJ5Ayv5rUNeFUzBzq39S0of/HzEkJa1y/g=; b=b
-	+nHgLwZ6xWFlhNWUsHfjvlTv60SHG/XB1HA/l1REtXULj23c19fQfmUBMSqqwwP5
-	Ye9o8WdxvirZdvtVF96RJZt3rXnFilT4pwFr3IGMipn7qmohD7siKLkUAzEgaflA
-	LdHW0+ZbAZB+XrAC6Gb+iLRjLNAEnCJAE2OOWtMEeFjheSZk7fYbWYKRZHL5Xk+C
-	EKJXAtSgMYNIGuqiywRfO/Xy15MItymOC2PN9Uv7lInl/t1w/y/9Un/ig+kKBPPF
-	F8QCVyVk/5f10QVJQXeQjtA85drV3DCAHlQneFZr02va1D7MJ3JhfOHItKwt+AYB
-	EZEpwLkzgdjb6EbPkFFHQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1743512729; x=1743599129; bh=7dX1gNT+/GJ5Ayv5rUNeFUzBzq39S0of/Hz
-	EkJa1y/g=; b=F6p8nPEHR5UXbZ40y7SPpxMiS2jUW5unEFtP3wrwKy2WNCWdFH9
-	o+EjG1jjWsGP9cH3Pe4ELRpSLa8t/DPK3X8f+UmaGxSvtHHqNgEPn6bPJ/1zUyVT
-	1EOFMrRMVKmBWqQJFHrZYe15sSfk7WNk9kaqBfa7D6+QwNUFf0EUEc4TLjx/B8u4
-	em+aUv4aaciqbLxTOirPovTAXEG1a8x6SFW+9nkNFnvnB272AMPpxl76R/pifvjd
-	rwuQiNfS/qNEhPRLTlFFwuefgwD6GlH2SBGBzxVf8cWEWXNEqGjxtU0+gu2WndPX
-	9oYlpGRbaq/Cp8Uiv+Si0SUsp3LLp+kEfMQ==
-X-ME-Sender: <xms:meTrZ0VdFfDtmGdHbQ3kCC9QOvAWp8k6HK1Ku_iUKfV_J9jM2hAzEw>
-    <xme:meTrZ4nQdoRh2fdUTskeBPsv0kQubBAANvw7n-8Qceq1evdd6u7sbZHEcmeU3QU1F
-    o5cp8gIvoELLGvJADg>
-X-ME-Received: <xmr:meTrZ4Y4nilMhRYVyjDNFQIC6SEDcL5Xq1lJecgHd4wJJf8ugqfc5zdW7x_R>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddukedvkeehucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
-    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
-    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdef
-    hfekgeetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhn
-    sggprhgtphhtthhopedugedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnth
-    honhhiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghr
-    rdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
-    gtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehp
-    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhhuhhnth
-    gvrhesghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhr
-    ghdprhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdprhgtph
-    htthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghh
-X-ME-Proxy: <xmx:meTrZzXhkXPrl5iRUPISqDTst60Zo5F4z2ll2ZjHG1mKL5sZm1yupQ>
-    <xmx:meTrZ-lFkhS6wNkpGWyfHTMy8gmlvQBxauToBVV2CUrldJ0ohl9xmw>
-    <xmx:meTrZ4e2yS6VcRZAjicLAYOIeS47ZytIWhcXVg4OvYhHjpMpRnNjdA>
-    <xmx:meTrZwGT8e6Na3qC6Ruq7-2zH9wUvgfU57pI7pe-feixhWoCQd_EmQ>
-    <xmx:meTrZ6mW5ufr7w-ukq-jpGEbP-qTXLaA0HEbVLaiXsHiXUaw0n_udppE>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 1 Apr 2025 09:05:28 -0400 (EDT)
-Date: Tue, 1 Apr 2025 15:05:27 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>,
-	willemdebruijn.kernel@gmail.com
-Subject: Re: [PATCH net-next v24 06/23] ovpn: introduce the ovpn_socket object
-Message-ID: <Z-vkl4NqfrkoJn-l@krikkit>
-References: <20250318-b4-ovpn-v24-0-3ec4ab5c4a77@openvpn.net>
- <20250318-b4-ovpn-v24-6-3ec4ab5c4a77@openvpn.net>
+	s=arc-20240116; t=1743512797; c=relaxed/simple;
+	bh=aM4P6LXDP5Ax4pIA2Q6gLObhPDwVSK/b1kVvhkanqUU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=taYgupAhslhcHXW3/3UWEe3Za6Befa14Yi8N/oh+ocyUF0o8tXCGml5dl7wDI7dj9ZKHuMOnkN1eaCAAKDqC7zNkwUfSNr1l/jXW23X/fsbeIcylLUQ9YA5jchWnfA1E2y0OTSxisL3ge38Ekz3OyTbO8AsCTzLy1x1v71o00ik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [124.16.141.245])
+	by APP-01 (Coremail) with SMTP id qwCowADXgQLL5OtndRXABA--.4273S2;
+	Tue, 01 Apr 2025 21:06:19 +0800 (CST)
+From: Wentao Liang <vulab@iscas.ac.cn>
+To: ecree.xilinx@gmail.com,
+	habetsm.xilinx@gmail.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-net-drivers@amd.com,
+	linux-kernel@vger.kernel.org,
+	Wentao Liang <vulab@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] sfc: Add error handling for devlink_info_serial_number_put()
+Date: Tue,  1 Apr 2025 21:05:57 +0800
+Message-ID: <20250401130557.2515-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.42.0.windows.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250318-b4-ovpn-v24-6-3ec4ab5c4a77@openvpn.net>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowADXgQLL5OtndRXABA--.4273S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kr1xArW5KFWxXw13JF17GFg_yoW8Gr1fpa
+	y3JF9IgryfGrW09w4UZF18ZFyavayUKF1DGFZakw4ruan3tFn0vrsY93Wa9F4UArykG3Wx
+	tr1UCrW7C3Z8A37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9C14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r106r15McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
+	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxkIecxEwVAFwVW5GwCF04k20xvY0x0EwIxGrw
+	CFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE
+	14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2
+	IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxK
+	x2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI
+	0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUaeHkUUUUU=
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBgsTA2frlYK1dQABsH
 
-2025-03-18, 02:40:41 +0100, Antonio Quartulli wrote:
-> +void ovpn_socket_release(struct ovpn_peer *peer)
-> +{
-> +	struct ovpn_socket *sock;
-> +
-> +	might_sleep();
-> +
-> +	/* release may be invoked after socket was detached */
-> +	rcu_read_lock();
-> +	sock = rcu_dereference_protected(peer->sock, true);
-> +	if (!sock) {
-> +		rcu_read_unlock();
-> +		return;
-> +	}
-> +	rcu_assign_pointer(peer->sock, NULL);
+In  efx_devlink_info_board_cfg(), the return value of
+devlink_info_serial_number_put() needs to be checked.
+This could result in silent failures if the function failed.
 
-minor nit: that could be rcu_replace_pointer instead of rcu_deref + rcu_assign_pointer
+Add error checking for efx_devlink_info_board_cfg() and
+propagate any errors immediately to ensure proper
+error handling and prevents silent failures.
 
-(and I don't think the rcu_read_lock does much here)
+Fixes: 14743ddd2495 ("sfc: add devlink info support for ef100")
+Cc: stable@vger.kernel.org # v6.3+
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+---
+ drivers/net/ethernet/sfc/efx_devlink.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/net/ethernet/sfc/efx_devlink.c b/drivers/net/ethernet/sfc/efx_devlink.c
+index 3cd750820fdd..17279bbd81d5 100644
+--- a/drivers/net/ethernet/sfc/efx_devlink.c
++++ b/drivers/net/ethernet/sfc/efx_devlink.c
+@@ -581,12 +581,14 @@ static int efx_devlink_info_board_cfg(struct efx_nic *efx,
+ {
+ 	char sn[EFX_MAX_SERIALNUM_LEN];
+ 	u8 mac_address[ETH_ALEN];
+-	int rc;
++	int rc, err;
+ 
+ 	rc = efx_mcdi_get_board_cfg(efx, (u8 *)mac_address, NULL, NULL);
+ 	if (!rc) {
+ 		snprintf(sn, EFX_MAX_SERIALNUM_LEN, "%pm", mac_address);
+-		devlink_info_serial_number_put(req, sn);
++		err = devlink_info_serial_number_put(req, sn);
++		if (err)
++			return err;
+ 	}
+ 	return rc;
+ }
 -- 
-Sabrina
+2.42.0.windows.2
+
 
