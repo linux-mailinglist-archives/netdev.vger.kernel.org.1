@@ -1,100 +1,123 @@
-Return-Path: <netdev+bounces-178617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE9C9A77DAA
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 16:26:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2B30A77DC4
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 16:31:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F10716426B
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 14:26:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F3F13B0555
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 14:29:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 143712046BF;
-	Tue,  1 Apr 2025 14:26:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13F14204C1F;
+	Tue,  1 Apr 2025 14:29:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="w1HMinGr"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="zpLBVqoX"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F35A202F90;
-	Tue,  1 Apr 2025 14:26:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0336204C1E
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 14:29:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743517611; cv=none; b=P8g2zN9aUEKDToZYmVOoz5NDLrTOyNRMnHh7woJrHdiI6GCjBu9yRAlerHPM0fe+54hxzn/hnBO3VjaYN+deXyp1HsjVAOG0OS2nSXeyjrvZlfJ4tBhOgnS8T2qXrqAJ1kSCmTjFomRHjj+3suCJJEYt4rO+xsuqLy0rVOj1+AI=
+	t=1743517763; cv=none; b=C+TAtzu49w3l+d6x0slusq6w9uTl8DvDIEog6RvUgtQd9aImoBtIpAXhY5S2LzG55eTbK4caQehQ/Td5jF6LpbWr0ysaBEE/myMVJSJTN9x5zFd4D8ZoEzFCujUJbVDXWcqx8pcdVAecAqtsO5cYaFUVuR0iWEsLOxDNK4Imn8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743517611; c=relaxed/simple;
-	bh=3q+4yBpWMs18uCb9ElAcLNLMXOmLGv8K/NRxHjVPnwY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MsrptVffLQiIxfTpsiialPFxIKutRH6wpK2a+1J/J7VHHcbyVHwOSho8pyTbsWho/Qmn2BBgC9PzTJZg1kEbO+iTSCvXD0bK2sfSlhkINisCmFTn+ARCl3HV3WFWxfViGxGHYP/zJMJ/htNCvhNV2+jlDYssHwKlHRqYRV1oxUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=w1HMinGr; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/MiDSMXmSkUozSptENcrOEkA6Nl8T9COvZLyxjyLAcs=; b=w1HMinGrdUa2sUmccFf4UKSXn2
-	UDB1RtzMqivkTW8LrZ3DXO9FBSi9OZ7Gz2hI1TBru91x+9wodVm1r98BuidYCys2oyJMY1wpmNpfg
-	HcIOTp3y5/0gpuLuBLDqFPJFNX/5PYXYZj/8hVv4XVse315Vi3PgM2vxdz+1KSgclyVA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tzcZL-007goa-Ne; Tue, 01 Apr 2025 16:26:23 +0200
-Date: Tue, 1 Apr 2025 16:26:23 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: steve@snewbury.org.uk
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ppp: Pass PPP Kconfig defines through to the CPP
-Message-ID: <b5e6d8a2-df18-4e64-938e-39e73d1214f9@lunn.ch>
-References: <20250331194918.385248-1-steve@snewbury.org.uk>
+	s=arc-20240116; t=1743517763; c=relaxed/simple;
+	bh=XX6oOUemsawBL+SQdwNjm1O0/5SaihaOSkbclmz4J4c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EkItEDH2jfduONIhEDnFreW17V74I8ATGqxv3NNqSe/1GJBH8HDQpEa4vHILU+uKNGMa1cnNYDKWqabG3GNzsg3M9REsHSxmSeiGdnrrpwRtSoYD4AsaDFnyZ50eU2/3ihu2Kvq+7dyC+zu3oJeVjqxeajmmlacze9W2VgEZ894=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=zpLBVqoX; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-227aaa82fafso107761815ad.2
+        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 07:29:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1743517760; x=1744122560; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=n6BkKDZgFevCmNfmsTeyIWH988WzbqqfzHgPc2ecmlM=;
+        b=zpLBVqoXsnYHhlLLSwIo8MwhAY7HXcLKKEDtBpTCECwck663RV9JC3A6pKTTgUKE/V
+         YxrzvNHJ3cj0vEGHMsXKf++Z2lV0gzc6kWJpHwe8Emdxf8GdZTZp89mTxn3fwqm68tNd
+         DQ5nBpDMYKhMuGdt+OHq4kTFQExBJ3UfM7g+xGMqUAGPMk+gnO6IyW4MoHRJWKkPGwsc
+         ZYyDrnfqgklpQbCLjwT708X6pvp67ggKlAe0FhEof97asm50/FZHUcaTet7DOM11js0V
+         KH7DRJqQGaixFCnN2KkkOkQYQVfjl+IZI9lcJ0qRaU6IKpcmufPCanWMVeEVB0IOm77m
+         aBBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743517760; x=1744122560;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=n6BkKDZgFevCmNfmsTeyIWH988WzbqqfzHgPc2ecmlM=;
+        b=Tuh0ognGm3h1knslhaTm2j2Bu/dQIgdetbAVIcjFilwsBgSTD+3Xt/ZV2RLdtGjf0k
+         AoHVm41M3eWA1Hh3asMscfXt6B/Nnh4LBoiki2rAW0gYsZiqzPIQZ8oSOC8Kgh75u7IS
+         xM3balKvC8RlSRX0p1EvdSJlMJ/rd5b7bTBs7pVMMiMOT5MzjcXX0+OZQEzRiznDYaYq
+         GJX0nPgM/zjy1ioiEIfAah5+JD3C4sv/ee3QQw7PoJjzcO5I5eRtLsuptnvzj+ge5yLP
+         osgHYrpnmJqv5ro3b2vjl6woF904DOFAnr275lJ7kO4WOrHr1Z/TrSzXTAMtHkL6o2gX
+         1xZw==
+X-Gm-Message-State: AOJu0YxCjuYwLkKzV4rK0H8eRDl/Wh7e1E/buEVg2twenrumXPuVYlxf
+	6e/D8nUJ9E3GnAPGXYF5ZtKib0pdQG8TaLe6J7YdH8Jg8TL+g0OTN6PlGMX66g==
+X-Gm-Gg: ASbGncvdTlK3sWNJMLSNNjI0DQCAH5fHGpnv1s5axvJ8mk4tAtaTOJ8/hoJPCFZIhpf
+	AjgIygGYCSRgdT0B8tkL4wm9p4u7SjMtliYAvN5wsTZTwg+72Tv5FnUzgKEQswlOd7wT6wpAyDo
+	Uquv/XZ6XfK9IE+X6ZAgQ4hSIWF79c8ezr0P69RhhamSABh1s9uVrUHN5qwk42ozAoXbGA9dukm
+	6MAk7h6+RWDJmGejAc3o0URTC446z/zlqdjbv4LXQnmq8AxSLBW9ncr3BtOK3bgkx3w81zJd9nf
+	z1a+yK2KXTHrveQkDTQe2xcZfENtHZ0lobkPU7l7EnxmycU9CnDPXMhki26qhCIO
+X-Google-Smtp-Source: AGHT+IFpBZsmg7PjdBnd0C9b5R1nD+BfWySEnglDXheprt5qViicZNJCWLtqLXYmefKJWINu74z1aA==
+X-Received: by 2002:a05:6a00:3927:b0:736:6ac4:d204 with SMTP id d2e1a72fcca58-739803a62dfmr18569914b3a.11.1743517759743;
+        Tue, 01 Apr 2025 07:29:19 -0700 (PDT)
+Received: from [192.168.50.25] ([179.218.14.134])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73970def16esm8949518b3a.5.2025.04.01.07.29.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Apr 2025 07:29:19 -0700 (PDT)
+Message-ID: <a32b8916-616f-4e50-848f-c657bb7494b4@mojatatu.com>
+Date: Tue, 1 Apr 2025 11:29:15 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250331194918.385248-1-steve@snewbury.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] selftests: tc-testing: fix nat regex matching
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, shuah@kernel.org, linux-kselftest@vger.kernel.org
+References: <20250331195618.535992-1-pctammela@mojatatu.com>
+ <20250401095349.GC214849@horms.kernel.org>
+Content-Language: en-US
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <20250401095349.GC214849@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 31, 2025 at 08:49:16PM +0100, steve@snewbury.org.uk wrote:
-> From: Steven Newbury <steve@snewbury.org.uk>
+On 01/04/2025 06:53, Simon Horman wrote:
+> On Mon, Mar 31, 2025 at 04:56:18PM -0300, Pedro Tammela wrote:
+>> In iproute 6.14, the nat ip mask logic was fixed to remove a undefined
+>> behaviour. So now instead of reporting '0.0.0.0/32' on x86 and potentially
+>> '0.0.0.0/0' in other platforms, it reports '0.0.0.0/0' in all platforms.
+>>
 > 
-> It seems for a very long time the conditional code in ppp_generic.c for PPP_MULTILINK
-> and PPP_FILTER hasn't been compiled!  I do wonder whether anybody actually still uses
-> these options!
-> ---
->  drivers/net/ppp/Makefile | 7 +++++++
->  1 file changed, 7 insertions(+)
+> Hi Pedro,
 > 
-> diff --git a/drivers/net/ppp/Makefile b/drivers/net/ppp/Makefile
-> index 16c457d6b324..9d12915e4ac5 100644
-> --- a/drivers/net/ppp/Makefile
-> +++ b/drivers/net/ppp/Makefile
-> @@ -12,3 +12,10 @@ obj-$(CONFIG_PPP_SYNC_TTY) += ppp_synctty.o
->  obj-$(CONFIG_PPPOE) += pppox.o pppoe.o
->  obj-$(CONFIG_PPPOL2TP) += pppox.o
->  obj-$(CONFIG_PPTP) += pppox.o pptp.o
-> +
-> +ifdef CONFIG_PPP_MULTILINK
-> +ccflags-y += -DCONFIG_PPP_MULTILINK
-> +endif
-> +ifdef CONFIG_PPP_FILTER
-> +ccflags-y += -DCONFIG_PPP_FILTER
-> +endif
+> As a fix for 'net' usually a Fixes tag would go here.
+> But perhaps that isn't appropriate in this case for some reason?
+> 
+>> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+> 
+> I am assuming that you are referring to this fix:
+> 
+> - [PATCH iproute2-next] tc: nat: Fix mask calculation
+>    https://lore.kernel.org/netdev/20250306112520.188728-1-torben.nielsen@prevas.dk/
+> 
+> If so, it might be nice to include a reference to it in the commit message.
 
-That looks very odd. I don't see many other instances for Makefiles
-doing this. Please add a bigger explanation of why this is needed, and
-why the usual Kconfig mechanism don't work.
+Will do, thanks!
 
-    Andrew
+> 
+> And also, if so, this change looks good to me:
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
 
----
-pw-bot: cr
 
