@@ -1,113 +1,97 @@
-Return-Path: <netdev+bounces-178484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95E9AA77270
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 03:53:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBA72A77278
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 04:01:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8620D3A8633
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 01:53:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 833CE168211
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 02:01:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6637313635E;
-	Tue,  1 Apr 2025 01:53:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA84F43AB7;
+	Tue,  1 Apr 2025 02:01:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0lemj78U"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Igzdbqjx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2139EEDE
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 01:53:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A6C9EACE
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 02:00:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743472408; cv=none; b=mw+FHl84RB6pdAunlDRPPDClhBMYEoCP88gdAF2b8h7yUspDbJ9d/Xdzp5Z+CuMkTL9VgOPJOh/r5m9OSU9IS/fFoJV8ylMRMbEPXNndPHx1KOD0GMrEQxxEGMT56crE2BvXlKMFdnYBtH5yUjZitqiYbDKBgjSd+efDZsByYsY=
+	t=1743472861; cv=none; b=XACr1GSHox9PV3+4isNc4nDGnepEj4UEWIuLpwP04C6xjNFFdqprtExTqs3CnLl3QCqvAodc3R2pGCXevm5/wO0D7SpOPIkrv1CsBQWSMr4kOkXFNz6pl3S/YI1Lh5DpI5fBT0ybkQO+3I+4hJAF5wsvux+gcd6jjXzq4jR38nY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743472408; c=relaxed/simple;
-	bh=khj3I8hr8oDzUh0PLOjj1KDH/DL6+fu/siTxOHYY9bk=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=u2mRznxYDWp1i6DO3e0eKUsMSQCvva2mf3e3vFLhxgadkke0J9O7hTkycZAC6JWscvTRKlJGMTlyotJw3fFlah19za3qQ73P1VVLd8DVwGuQufFeckvkxXMMhvQh7fqrc2caX2LbxqjC/6EhHv+3/CHxw7Fa5QGLKcZCao8gWr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gthelen.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0lemj78U; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gthelen.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff58318acaso14395277a91.0
-        for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 18:53:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743472406; x=1744077206; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=bkNNQdpSk9bbcKCM99d0+en1tupRsaQZtQor4WU6i8s=;
-        b=0lemj78UX6L8bVTeTcAQ011f78/5q/1OJ5fGsF6YVLL+rkIaFERticD7b+6rbtCtEU
-         IJkpkn2oe86aAmx5wBaA9kTE+ZSXr/duwtcnkXio7fAAmZH7Mq7eZQ2iFHq/60+JCciM
-         ky5LpqnF5/slfs+5gthm4deHRrcZtJyNXaYCFxp+FZ74XRgU0CXS+kn/WJARnrfl1EAb
-         RfJf4+xNllBxANYHaj3176avsGSAgrx/fqf4O00vpBkrVa1cHpQW16p93mTi2Gjhbt4o
-         AKcxSHpCcQLx6tljkoh/aEUzb4x282mpSX2QllOVu1vC9x8KjJwQM/3qJbNi3oz8tVL9
-         ejmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743472406; x=1744077206;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bkNNQdpSk9bbcKCM99d0+en1tupRsaQZtQor4WU6i8s=;
-        b=qeLX9EQv0VokxjFdGoBbQu+tSHechFjP2OUZyhxVhk5G2V6kNRyh9yRL9V2MW2UeB2
-         MzUMFdXH6Msux1FktD1HJ5lvwhF5kMOQFnHJ1urikpYUvi7X5j0Brn7YghBKSwj1KIbd
-         p5S7V51ZTfu+hrAjisDyagNn5vfXPxf2ECWGTLzf7cfTDFJqvYhYpyq5vRUL+2lku+26
-         uL2YaltRNUro89DpS3jAzFHFTyZrz5YyUC4HrYSDKVaHisdzjWQKmCsxGpGBneCYxuvQ
-         UOU9bJGo5Ryv2G74ZgnNZYBfL+wyd67KHjLSPJxqR3T3m+H/TdCNsddM7uj7rRLE3Y4P
-         XxVA==
-X-Gm-Message-State: AOJu0YxjJFq/CHtZyEGTPF185g3kbwivTYXU+dd5yWm2jYkL0Okr+kL1
-	/9+aDJHI2WXH5t2A4wXffE9C/SmIJ6w/4YeHfng5tzlcdvdBIYfEB4PHl+lJ4o983RtEAbWHg4k
-	KCg3Bfw==
-X-Google-Smtp-Source: AGHT+IEnK8LH0fg0laboEMWyVSOSyKeffrJ8PKEqxYzH2W6ofzvPImjNul10lI3H7St49aRK2fEenZVHUU9L
-X-Received: from pjyd14.prod.google.com ([2002:a17:90a:dfce:b0:2ee:3128:390f])
- (user=gthelen job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90a:d2ce:b0:2ee:aed6:9ec2
- with SMTP id 98e67ed59e1d1-30531fa153emr20864641a91.14.1743472406332; Mon, 31
- Mar 2025 18:53:26 -0700 (PDT)
-Date: Mon, 31 Mar 2025 18:53:15 -0700
+	s=arc-20240116; t=1743472861; c=relaxed/simple;
+	bh=EKX9CIfbKiTt29ZxkVuXsa3z+gTnkt7DnQwceh8032A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=St/UNqGsSdDfe8xLQWzkQSQlEVeUIKh+b5TPjrRTjsgroTQfqeC8D6VLYiwQrReVgNluGO0ZnRGGKxLSj1O7VVnmQr5aJtdkZIISEfzPfD8EQMQgL+vvSQc0OUBaf7cE1w6iBsIrzX0CrtUjOjppoQYhd2ZBozTHEJkCpF4sZUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Igzdbqjx; arc=none smtp.client-ip=220.197.31.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version; bh=AouMB
+	HNPa08DmkVd5Laa6OWFeeQtROq+pwDf44Ej+aY=; b=IgzdbqjxFEt+LwXn4Typt
+	gEnpzb+j9qrYkqqgY54rerCoAfVJKw/5Xph6QMUA+Y47cXoMMNrMH7r4/jpNw97G
+	fuk0OxMi8gB7fwAb+cZNTFMKt3+L/ych0pF9jS2xxQ0+dex61c/edkgscAamupWi
+	uUdWNSiQXPQaiTfNZduWKc=
+Received: from x04j10049.na61.tbsite.net (unknown [])
+	by gzga-smtp-mtada-g1-4 (Coremail) with SMTP id _____wDneoKzSOtn8DXnDA--.29599S2;
+	Tue, 01 Apr 2025 10:00:20 +0800 (CST)
+From: shaozhengchao@163.com
+To: netdev@vger.kernel.org,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: horms@kernel.org,
+	shaozhengchao@163.com
+Subject: [PATCH net-next] ipv4: remove unnecessary judgment in ip_route_output_key_hash_rcu
+Date: Tue,  1 Apr 2025 10:00:17 +0800
+Message-ID: <20250401020017.96438-1-shaozhengchao@163.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.49.0.472.ge94155a9ec-goog
-Message-ID: <20250401015315.2306092-1-gthelen@google.com>
-Subject: [PATCH] eth: mlx4: select PAGE_POOL
-From: Greg Thelen <gthelen@google.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Greg Thelen <gthelen@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDneoKzSOtn8DXnDA--.29599S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrZw4UKFWfuF4xZFW8Xw1rXrb_yoWDJFgE93
+	Z7WrWrGF45Xr18Gan8Crs5Z3s8Kws0yrnYva1rKF9xta4rJF4DZF9FgryrJr9xGrZIg3sx
+	ury3WFn8XFW2gjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xRR-BMJUUUUU==
+X-CM-SenderInfo: pvkd065khqwuxkdrqiywtou0bp/1tbiPR4ivGfrQcHJBwAAs-
 
-With commit 8533b14b3d65 ("eth: mlx4: create a page pool for Rx") mlx4
-started using functions guarded by PAGE_POOL. This change introduced
-build errors when CONFIG_MLX4_EN is set but CONFIG_PAGE_POOL is not:
+From: Zhengchao Shao <shaozhengchao@163.com>
 
-  ld: vmlinux.o: in function `mlx4_en_alloc_frags':
-  en_rx.c:(.text+0xa5eaf9): undefined reference to `page_pool_alloc_pages'
-  ld: vmlinux.o: in function `mlx4_en_create_rx_ring':
-  (.text+0xa5ee91): undefined reference to `page_pool_create'
+In the ip_route_output_key_cash_rcu function, the input fl4 member saddr is
+first checked to be non-zero before entering multicast, broadcast and
+arbitrary IP address checks. However, the fact that the IP address is not
+0 has already ruled out the possibility of any address, so remove
+unnecessary judgment.
 
-Make MLX4_EN select PAGE_POOL to fix the ml;x4 build errors.
-
-Fixes: 8533b14b3d65 ("eth: mlx4: create a page pool for Rx")
-Signed-off-by: Greg Thelen <gthelen@google.com>
+Signed-off-by: Zhengchao Shao <shaozhengchao@163.com>
 ---
- drivers/net/ethernet/mellanox/mlx4/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+ net/ipv4/route.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/Kconfig b/drivers/net/ethernet/mellanox/mlx4/Kconfig
-index 825e05fb8607..0b1cb340206f 100644
---- a/drivers/net/ethernet/mellanox/mlx4/Kconfig
-+++ b/drivers/net/ethernet/mellanox/mlx4/Kconfig
-@@ -7,6 +7,7 @@ config MLX4_EN
- 	tristate "Mellanox Technologies 1/10/40Gbit Ethernet support"
- 	depends on PCI && NETDEVICES && ETHERNET && INET
- 	depends on PTP_1588_CLOCK_OPTIONAL
-+	select PAGE_POOL
- 	select MLX4_CORE
- 	help
- 	  This driver supports Mellanox Technologies ConnectX Ethernet
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index 753704f75b2c..22dfc971aab4 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -2699,8 +2699,7 @@ struct rtable *ip_route_output_key_hash_rcu(struct net *net, struct flowi4 *fl4,
+ 
+ 	if (fl4->saddr) {
+ 		if (ipv4_is_multicast(fl4->saddr) ||
+-		    ipv4_is_lbcast(fl4->saddr) ||
+-		    ipv4_is_zeronet(fl4->saddr)) {
++		    ipv4_is_lbcast(fl4->saddr)) {
+ 			rth = ERR_PTR(-EINVAL);
+ 			goto out;
+ 		}
 -- 
-2.49.0.472.ge94155a9ec-goog
+2.43.0
 
 
