@@ -1,169 +1,129 @@
-Return-Path: <netdev+bounces-178495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C81D5A774B7
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 08:48:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE14AA774B8
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 08:49:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E850B188DC68
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 06:48:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80B80168D1E
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 06:49:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6991E2606;
-	Tue,  1 Apr 2025 06:48:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFEF31CBEB9;
+	Tue,  1 Apr 2025 06:49:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KX8ZUeUS"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="EAoiDVHp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A016B1DF261
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 06:48:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B8642052
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 06:49:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743490106; cv=none; b=KUxrT1xtwx56lcMCmfLTodV3IFE8R7RsLlw4iwzKbrTDNyOyrnKQC+USbGlEvOcvXWe3uj5WFy5nYb5ow6IdnGhx3h+pKvpKCGoPnywdLlU3pD5mlARKQ7IsWTqYgBig2BlPebcti3Fhkyd+ch4qRKsnDsdfsMLVvMCnkTCoS8s=
+	t=1743490163; cv=none; b=ZEnhqoToEIMp5GaKcNS5+dqdh1aJFVvHKgnTUaIi4G5Db9qvLa0sK6bhh60Uu3XsLk1nRzzSeSmM+b+SuWQo8BvAT3Omwv0dlp7MsnfqHX8DfausMmSzaFINss4yttQN2XTIVYlraKhZh9yhNGJPvzrVRtLbnxGG+yIbwPoP7rI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743490106; c=relaxed/simple;
-	bh=aWTMd0n/WGt5QHM3Y3BeRPkvR+LKpzjED4zv2rp+2z8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YqKJf536nF/XO6s4XSVj5S45MGBUnKNtRJFi71MOTldmuYZI54dk/m31fIp56LqCDeqQvHaKz1bp2g14q+NpVMwv7Y+9JgeM2z32V1thoM4zQgkz2wF1h7/ktrsNFj/DSy5pQxQ9kVHRvBTct2zkxw243W95nFKmpiYBbIfcVfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KX8ZUeUS; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5efe8d9ebdfso2953987a12.3
-        for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 23:48:24 -0700 (PDT)
+	s=arc-20240116; t=1743490163; c=relaxed/simple;
+	bh=19NqAsNMeTd9dQAzYg4gwKcYyPfAqdZa/VkYUFGvdIk=;
+	h=Message-ID:Date:MIME-Version:Subject:Cc:References:From:To:
+	 In-Reply-To:Content-Type; b=PxyBss6a7VqFOz0Q33nWQLe7TqUXDZekDt1+CexVyiEpFHuTxC+GLPyRR4yT6JoC3tkWnr7IA/+rZhSijhD0lIBvc0LwXtvgiWhLchSD2q0gBXqWTOXx4PyWYThvyvKHQfj3PstSz7pdguBZekAPmD6TtHPc85to0wkVuz9l9Qk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=EAoiDVHp; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3912b75c0f2so459382f8f.0
+        for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 23:49:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743490103; x=1744094903; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ttfHQMhkIn+oSS1IOHBwzHwIzCdKvXbxdgLxXrmA4ZM=;
-        b=KX8ZUeUSN43JsTB6kXj8LyChisESEmgJ4B3lD94rtz0ZcyaIO/9f/U4BIe+kFWzU4E
-         8BfiK5Rmuw72q+zH0vjJZwfelMliX19N283lfTWc+hJkUfe0EE/GhaUi3ew+yqiio4Jg
-         ekmg77raa+QzFvD1BpYXnkvRdToNRCUpjwhGSEaFC0wEKdFChy28ZdN7Q+wbskMlYmOu
-         CzIazPacG5MAygGocRM+uh/WvBOk4NM3LvnU77SBLKx0s7QLMxq5v3GYOGnSncnhEXP7
-         1YfNNZj+OQSFUTR7xRva6dfjIpGSVjziQ+xP8qDn0ex67Jy0nwEgCeihz2+0VUXbvNlW
-         mP7w==
+        d=6wind.com; s=google; t=1743490160; x=1744094960; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:to
+         :content-language:from:references:cc:subject:reply-to:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vPMIAVs3qOWVsyBtsGxXHT6n12gnPK6Ng3mzSvT++nI=;
+        b=EAoiDVHprKpL8bnxeK2mi3D9vvM5G7a6BQZcbfqU6oD8vFnYv0u7FbbwHcAsEX7OmD
+         A6L8H36bh2H5q7J7Yz21mfDtuoSRoS03DGBcgL7sE85ONOTKMvm43aYh3XhaPeZ1DCcT
+         l/IctihWLydaEIyhrna+iwAxd4IcZ+lW8LDx/TDp2tNKMeoI9AOzO5gz6XygnCHfz/Vy
+         +jInVOCFuTbgGB+UqzUTIJWfA8lnjgDS5VjJe9icXBuySfs1GJm8jV0DqYvqDLG0KbfZ
+         QDBh2UXaJmKq4pBYOG0WGYjwJrFuV/r5kPTPQzHEKDoK+m/A6UhWVG+T6H6yPygg4aHp
+         4lmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743490103; x=1744094903;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ttfHQMhkIn+oSS1IOHBwzHwIzCdKvXbxdgLxXrmA4ZM=;
-        b=G/64noGnOjHZUV3ej4e4nSgdytivQODC+9h53taan5fxakwEDv466njSM1XB+f235n
-         ryASgI1r9b9Duyyv0h1GN1M/ba7As3DlGUZ83fzTNB3D1cDJvu5nKvng76rJhIUlOXPd
-         nUEg/UC2D928R7h6g1GgZYWcLQVBJOse0RONnm2ozzXcu8nV9yJo3izngog7uNkkyxe1
-         krCcbPIv7VVG3SsV8dUuMwPVsAAv7P8fPuD01MAph8dVbdIKtuBbhrUQKC1WIyScJyMl
-         uX08rWHxFgs/ALORvrgQno0nYXBZSdH9sX0NXb7mQTB+PKE+Ba0ZURpypADdMsaSWep7
-         i+6A==
-X-Forwarded-Encrypted: i=1; AJvYcCWHEFA6TUC7krXLDvUCoKgmaL/jXVhv0oVKMN0pKTft10vMvqa15zhqjwJSnVIVvQL54yrLfWk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5daQd2UGClXsLzzWkVZORjra50hFxfcen1pAzkB2eKiIKtOxn
-	2kqNL7n8vZFa31QMOKEluCm36NngUmxxzvlgprrNP+vuD8lObSrYOa2JfBsEjhq4xEZBc7Lhm5/
-	CK3gZxGb20cJmyiIj3GSyG1RNEHU=
-X-Gm-Gg: ASbGncvnB2vY2yetFGFH1juNUdtMVF8VCUxkDtJ9ppl/KU+aScaLD2iLjP+nZA2KWO3
-	BcsGx8qOruCkF83HPn0p02B1bs2W11Bwv6PtVdCwjZB/YUZEwcDf3aveWAKzuYaTZsBiHf61ibf
-	7tiiWdGRiJt8VOyvxKrriPZD34FkO3
-X-Google-Smtp-Source: AGHT+IEB6HdhgIFT+acktUH3yJ0tlpGqfL4v8YLv56HLTC9NILraErhCPjqlwi6UibzZen2nLqy50xBUUtaSoq9eu9M=
-X-Received: by 2002:a05:6402:210e:b0:5de:aa54:dc30 with SMTP id
- 4fb4d7f45d1cf-5edfcc04b36mr9010860a12.5.1743490102716; Mon, 31 Mar 2025
- 23:48:22 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743490160; x=1744094960;
+        h=content-transfer-encoding:in-reply-to:organization:to
+         :content-language:from:references:cc:subject:reply-to:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=vPMIAVs3qOWVsyBtsGxXHT6n12gnPK6Ng3mzSvT++nI=;
+        b=mpphpzAjEYuXrI1enCOi4Jl2FUeQ8q1jSxJyylTEGoyyF3/TVLjTc+Qe6RcJ445zUG
+         Hcx1D42zNSfkwFZbToL2mVTkrAf18oMLMtSTdvT8xHkyIoj7ff92mtPnTWj4VLGL8K+l
+         JfdMgg26jA14O/PjUarOBySytt0orKdVi1grg0e6rVuwDUy2LVzAq+u9YkKzGrE1Eae+
+         JRACtW6pTUYVzFUIpdcwncuK3exyP21+DLKRhLo7+M6hB9a+jn3zlKDup367hDRjwQVj
+         42wPJSvW+BsxBmWMwUy07m4w5zed8nj5z3vykXVWTsyizhnVQCFZJ/JdXQV2sjMkFEBQ
+         89SA==
+X-Forwarded-Encrypted: i=1; AJvYcCXjq2GNtNyDUj80+c4LGh0PrEKjUEv1QtvFDmukdZNfXUauAtUQ1mY03W29jZKgcXyMQ0bmekY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyufcRxTNC52NislQ+A0aF8AZykDRINt5lzCVs4tiH+UAYYAKk
+	wX1S3ozRto0/IbMwCRfqIpxlu9SFP9TFl0N6EZybtmmdyXDX/+aMrk+MKXbS13E=
+X-Gm-Gg: ASbGncvNR/lHvOm+n6HpWqRUYLhNorcLTgJpME1XN47B6qAUU4hf6Eo6Heweljeu5oG
+	kVvehShpcJMyEsD9E79eEJrMbEyVqX1aeT9ULtWCsWjqA8i/cQvL/58186o1CDAC2BIV5410Rkg
+	u7WQlWT+CW4KwVd8H/qLPvYGC756d0myPKCYec9uuGgT7ZyX+TsYXaL8VZo8pPQliZu7Ba4nEBa
+	MIDrCksq9KcegYQlCtMAf+70bzeGn8aoC8cWtAhRoFcrKj4Cdhsq+pypkLp9HcbvaO9pwr5CZXv
+	qMNeFfebI4iubU1FOLBeV5JnCDL8Trz7d2tUD0pzSf3HlA+rt3nx2OEVI3AuhzeO0jZlVovv8FC
+	jIdVH0ZDlH/HuSwILwCvM53AWmJ4YEZei
+X-Google-Smtp-Source: AGHT+IE7jpoepUT2i4HRtlJZ9boKfMMP++uvAeDbYxxM1bo0GvqONcbsJ5VntlNknnK+5rheBrgwLg==
+X-Received: by 2002:a5d:6d88:0:b0:39c:1258:b36 with SMTP id ffacd0b85a97d-39c2483c1b6mr279314f8f.14.1743490160172;
+        Mon, 31 Mar 2025 23:49:20 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:a98c:be9d:164a:20eb? ([2a01:e0a:b41:c160:a98c:be9d:164a:20eb])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d8fba3e44sm151339775e9.4.2025.03.31.23.49.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 31 Mar 2025 23:49:19 -0700 (PDT)
+Message-ID: <bb1a3cde-d4e9-40f8-b03e-0a757fb7a47f@6wind.com>
+Date: Tue, 1 Apr 2025 08:49:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250331114729.594603-1-ap420073@gmail.com> <20250331114729.594603-2-ap420073@gmail.com>
- <20250331103416.7b76c83c@kernel.org>
-In-Reply-To: <20250331103416.7b76c83c@kernel.org>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Tue, 1 Apr 2025 15:48:11 +0900
-X-Gm-Features: AQ5f1Jr7M1aS7CTQQ2IRS5FEZcpWMkH-1PKs1vQ6UWMSHcWrXTYemPxvUnq53FI
-Message-ID: <CAMArcTVRQnxrLnXPQp4D+F1TMS7SeQLtWTsxaLt8vJ7Gdqfj=Q@mail.gmail.com>
-Subject: Re: [RFC net-next 1/2] eth: bnxt: refactor buffer descriptor
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
-	andrew+netdev@lunn.ch, horms@kernel.org, michael.chan@broadcom.com, 
-	pavan.chebbi@broadcom.com, ilias.apalodimas@linaro.org, dw@davidwei.uk, 
-	netdev@vger.kernel.org, kuniyu@amazon.com, sdf@fomichev.me, 
-	aleksander.lobakin@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH iproute2] ip: display the 'netns-immutable' property
+Cc: stephen@networkplumber.org, netdev@vger.kernel.org
+References: <20250328095826.706221-1-nicolas.dichtel@6wind.com>
+ <174347883527.227928.17713387159044503900.git-patchwork-notify@kernel.org>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Content-Language: en-US
+To: dsahern@gmail.com
+Organization: 6WIND
+In-Reply-To: <174347883527.227928.17713387159044503900.git-patchwork-notify@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 1, 2025 at 2:34=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
+Hello,
 
-Hi Jakub,
-Thanks a lot for the review!
+Le 01/04/2025 à 05:40, patchwork-bot+netdevbpf@kernel.org a écrit :
+> Hello:
+> 
+> This patch was applied to iproute2/iproute2-next.git (main)
+> by David Ahern <dsahern@kernel.org>:
+Thanks for applying this patch. Note that the attribute IFLA_NETNS_IMMUTABLE
+will be available in the 6.15 release.
 
-> On Mon, 31 Mar 2025 11:47:28 +0000 Taehee Yoo wrote:
-> > There are two kinds of buffer descriptors in bnxt, struct
-> > bnxt_sw_rx_bd and struct bnxt_sw_rx_agg_bd.(+ struct bnxt_tpa_info).
-> > The bnxt_sw_rx_bd is the bd for ring buffer, the bnxt_sw_rx_agg_bd is
-> > the bd for the aggregation ring buffer. The purpose of these bd are the
-> > same, but the structure is a little bit different.
-> >
-> > struct bnxt_sw_rx_bd {
-> >         void *data;
-> >         u8 *data_ptr;
-> >         dma_addr_t mapping;
-> > };
-> >
-> > struct bnxt_sw_rx_agg_bd {
-> >         struct page *page;
-> >         unsigned int offset;
-> >         dma_addr_t mapping;
-> > }
-> >
-> > bnxt_sw_rx_bd->data would be either page pointer or page_address(page) =
-+
-> > offset. Under page mode(xdp is set), data indicates page pointer,
-> > if not, it indicates virtual address.
-> > Before the recent head_pool work from Jakub, bnxt_sw_rx_bd->data was
-> > allocated by kmalloc().
-> > But after Jakub's work, bnxt_sw_rx_bd->data is allocated by page_pool.
-> > So, there is no reason to still keep handling virtual address anymore.
-> > The goal of this patch is to make bnxt_sw_rx_bd the same as
-> > the bnxt_sw_rx_agg_bd.
-> > By this change, we can easily use page_pool API like
-> > page_pool_dma_sync_for_{cpu | device}()
-> > Also, we can convert from page to the netmem very smoothly by this chan=
-ge.
->
-> LGTM, could you split this into two patches, tho?
-> One for the BD change and one for the syncing changes?
 
-Okay, I will split this patch.
+Regards,
+Nicolas
 
->
-> > -     dma_sync_single_for_device(&pdev->dev, mapping, bp->rx_copybreak,
-> > -                                bp->rx_dir);
-> > -
-> > +     page_pool_dma_sync_for_device(rxr->head_pool, page_to_netmem(page=
-),
-> > +                                   bp->rx_dma_offset, bp->rx_copybreak=
-);
->
-> I think we should add a separate helper for this instead of extending
-> the existing page_pool_dma_sync_for_device(). Let's call it
-> page_pool_dma_sync_for_device_frag() ?
+> 
+> On Fri, 28 Mar 2025 10:58:26 +0100 you wrote:
+>> The user needs to specify '-details' to have it.
+>>
+>> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+>> ---
+>>  ip/ipaddress.c | 5 +++++
+>>  1 file changed, 5 insertions(+)
+> 
+> Here is the summary with links:
+>   - [iproute2] ip: display the 'netns-immutable' property
+>     https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=e4e55167d004
+> 
+> You are awesome, thank you!
 
-Thanks. I will add a separate helper,
-the page_pool_dma_sync_for_device_frag().
-
->
-> The use case here is that the driver recycles a frag directly, rather
-> than following the normal PP recycling path.
-
-I'm not sure that I understand this use case correctly.
-I think it's like when a packet is dropped or fully
-copied by rx-copy-break, a driver can reuse frag directly.
-To reuse a frag in a driver directly, a driver can use
-page_pool_dma_sync_for_device_frag() before setting ring buffer.
-If I misunderstand, please let me know.
-
-Thanks a lot!
-Taehee Yoo
 
