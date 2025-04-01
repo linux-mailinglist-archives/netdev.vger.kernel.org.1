@@ -1,185 +1,131 @@
-Return-Path: <netdev+bounces-178668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D041A7824E
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 20:36:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FB71A7825E
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 20:41:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C66516F307
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 18:35:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C994716DE4C
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 18:39:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4FB121CC51;
-	Tue,  1 Apr 2025 18:27:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FDA2218E81;
+	Tue,  1 Apr 2025 18:36:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UGDTgEUS"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZaBiqfOs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FD7621CA1C
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 18:27:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6117521D581
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 18:36:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743532028; cv=none; b=BNskcRiYhmEXdvgK0um4okEgfUeH2efAT3gPnG1vLipmuyJa0dg8fYR8HOZAY7lFHvWs80AQJlZN+uSkOoTqDJEg9ERvlfIlk09z0pxW3jYLmxYWF28Yokg//D8rIytmTDMWApqmXr1ZdmAbqR5CS7BhHERP5irp/GZnVr1DTzg=
+	t=1743532605; cv=none; b=QtEegxpXGefi34x3jF+NuSzKXcG0jbfjnQhQCA4YSRZ8fOpXmtnUR0b82FaarTXggQwSf7Es44srj9EfSqNli6mbIccsuvinJvRoceRr2erMsbXNjOEMKe7yTl3QYTTWP77WSsIvXUtVP4wpR8u6Po0HpBCPx6NPYE15PZaBQJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743532028; c=relaxed/simple;
-	bh=95QeDf0/+jbroRmGa0qtsVqLmm3cierM28kabh7h9Jk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cQJdQuQbv8FxMCfAQuGWmOj8W0A3B+hBVUwM/5tceTug3SlFiT4OGPl5EvnyiZLR5DW2bl2yZ+6GEAkclL9Ypl+Eff6CmmqvMCwubn0Kgin1LSp72C2dDv3lUv6Q0oaOu6d7fyuuiJsz/sPkKW8j4MRg8kFPOHhb5EEGts4ABmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UGDTgEUS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FFEDC4CEE4;
-	Tue,  1 Apr 2025 18:27:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743532027;
-	bh=95QeDf0/+jbroRmGa0qtsVqLmm3cierM28kabh7h9Jk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UGDTgEUSCZg4ZEWQZVNbXm/mjeywgI4cALUNllu2Pgvfq/loNMI6lOavPEr94JzUB
-	 CKD/DMXW0fRrkw3djAQZssEXXd9rVoD1HsHOhqeVSZR8+QWD3LrvUKynfcp3PRGGFp
-	 tkQIU1F4SQBLOoJ4qdRSIvDEvjbcFMsuJ65SSdrE1AxxmsW0LB/4A6gIGzzl/DrtKQ
-	 853Yy/hlHr4fI9iAW+eH0tvK2CmMnS6q89Rmqq7BtJtFRKynYYFfhD/tPmyu8qVU4q
-	 rS8H+PBivzJp8CH2LZyUbXgpBDl9rwoxc9UHQlTxpbpN5ptMBdY/RPYKL9s3I0ESue
-	 sW5x4uwKkFWSQ==
-Date: Tue, 1 Apr 2025 11:27:06 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: Samiullah Khawaja <skhawaja@google.com>, "David S . Miller "
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, almasrymina@google.com, willemb@google.com,
- mkarsten@uwaterloo.ca, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v4 1/4] Add support to set napi threaded for
- individual napi
-Message-ID: <20250401112706.2ff58e3d@kernel.org>
-In-Reply-To: <20250325075100.77b5c4c0@kernel.org>
-References: <20250321021521.849856-1-skhawaja@google.com>
-	<20250321021521.849856-2-skhawaja@google.com>
-	<Z92dcVfEiI2g8XOZ@LQ3V64L9R2>
-	<20250325075100.77b5c4c0@kernel.org>
+	s=arc-20240116; t=1743532605; c=relaxed/simple;
+	bh=Rz+VoLdMAZz4lMAg8R2vY/3hQsTNk1kIM8k6Gap7Et4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=C94PNNgIkW4s3DFXVCHekdTsznhwnPg4iljkeItBqM+oTjWPwoWHcuVrrjlCzsRr58iPXMn4IznrYdBHU5tMzcuFjlWRPWDvVPQOOBFs6G1DWgQTFslxVmxbIE5db0iJtxTuztDPv7wupVpygZ5Lyfcd8sjxk7fQz7uwVgslrcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZaBiqfOs; arc=none smtp.client-ip=207.171.188.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1743532604; x=1775068604;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Tm3ijMpDpVX9BQ+H9sXAyP+ku4XHZtWzpcXNcnqwvYM=;
+  b=ZaBiqfOsXCy4ekzMy7eo+8kN4gZfeAx6URWoSVnWLVm9NMWRgvl27+vd
+   LvYBJwiNtg9Yffj+Kr+8cYx9lnIW2ZeImGsfn3MBBZ1RevDY2fqIJr4cQ
+   t/3i1Ane5pR9S8QyXTS7RUQpPuUOtRfGRrFmbfkJB5B42LVXucjK0b1RM
+   c=;
+X-IronPort-AV: E=Sophos;i="6.14,294,1736812800"; 
+   d="scan'208";a="6496442"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2025 18:36:37 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:25956]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.55.83:2525] with esmtp (Farcaster)
+ id 6f2c2187-97a3-4645-8ff5-e3668646c36d; Tue, 1 Apr 2025 18:36:36 +0000 (UTC)
+X-Farcaster-Flow-ID: 6f2c2187-97a3-4645-8ff5-e3668646c36d
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 1 Apr 2025 18:36:36 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.94.43.60) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 1 Apr 2025 18:36:33 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <willemdebruijn.kernel@gmail.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v4 net 0/3] udp: Fix two integer overflows when sk->sk_rcvbuf is close to INT_MAX.
+Date: Tue, 1 Apr 2025 11:35:41 -0700
+Message-ID: <20250401183625.66095-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <67eb3e2c92fb9_395352294e1@willemb.c.googlers.com.notmuch>
+References: <67eb3e2c92fb9_395352294e1@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWA001.ant.amazon.com (10.13.139.88) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Tue, 25 Mar 2025 07:51:00 -0700 Jakub Kicinski wrote:
-> On Fri, 21 Mar 2025 10:10:09 -0700 Joe Damato wrote:
-> > > +int napi_set_threaded(struct napi_struct *napi, bool threaded)
-> > > +{
-> > > +	if (napi->dev->threaded)
-> > > +		return -EINVAL;    
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Mon, 31 Mar 2025 21:15:24 -0400
+> Jakub Kicinski wrote:
+> > On Mon, 31 Mar 2025 13:31:47 -0700 Kuniyuki Iwashima wrote:
+> > > > > Please do test locally if you can.  
+> > > > 
+> > > > Sure, will try the same tests with CI.  
+> > > 
+> > > Is there a way to tell NIPA to run a test in a dedicated VM ?
+> > > 
+> > > I see some tests succeed when executed solely but fail when
+> > > executed with
+> > > 
+> > >   make -C tools/testing/selftests/ TARGETS=net run_tests
+> > > 
+> > > When combined with other tests, assuming that the global UDP usage
+> > > will soon drop to 0 is not always easy... so it's defeating the
+> > > purpose but I'd drop the test in v5 not to make CI unhappy.
 > > 
-> > This works differently than the existing per-NAPI defer_hard_irqs /
-> > gro_flush_timeout which are also interface wide.
+> > Can we account for some level of system noise? Or try to dump all 
+> > the sockets and count the "accounted for" in-use memory?
 > > 
-> > In that implementation: 
-> >   - the per-NAPI value is set when requested by the user
-> >   - when the sysfs value is written, all NAPIs have their values
-> >     overwritten to the sysfs value
+> > We can do various things in NIPA, but I'm not sure if it's okay 
+> > for tests inside net/ should require a completely idle system.
+> > If we want a completely idle system maybe user-mode Linux + kunit
+> > is a better direction?
 > > 
-> > I think either:
-> >   - This implementation should work like the existing ones, or
-> >   - The existing ones should be changed to work like this
-> > 
-> > I am opposed to have two different behaviors when setting per-NAPI
-> > vs system/nic-wide sysfs values.
-> > 
-> > I don't have a preference on which behavior is chosen, but the
-> > behavior should be the same for all of the things that are
-> > system/nic-wide and moving to per-NAPI.  
+> > Willem, WDYT?
 > 
-> And we should probably have a test that verifies the consistency
-> for all the relevant attrs.
+> The number of tests depending on global variables like
+> proto_memory_allocated is thankfully low.
+> 
+> kselftest/runner.sh runs RUN_IN_NETNS tests in parallel. That sounds
+> the case here. Perhaps we can add a test option to force running
+> without concurrent other tests?
+> 
+> Otherwise, the specific test drops usage from MAX to 0. And verifies
+> to reach MAX before exiting its loop.
 
-I was thinking about it some more in another context, and I decided 
-to write down what came to mind. Does this make sense as part of
-our docs?
+Yes, and we need to query rmem_alloc via netlink.
 
-===================================
-Adding new configuration interfaces
-===================================
+Also, I haven't investigated, but I saw a weird timeout, when the usage
+stuck at 523914, which is smaller than INT_MAX >> PAGE_SHIFT.
 
-Best practices for implementing new configuration interfaces in networking.
+Probably the test needs to check sockets' rmem_alloc to be accurate.
 
-Multi-level configuration
-=========================
+I'll drop the test for now and follow up in net-next.
 
-In certain cases the same configuration option can be specified with different
-levels of granularity, e.g. global configuration, and device-level
-configuration. Finer-grained rules always take precedence. A more tricky
-problem is what effect should changing the coarser settings have on already
-present finer settings. Setting coarser configuration can either reset
-all finer grained rules ("write all" semantics), or affect only objects
-for which finer grained rules have not been specified ("default" semantics).
-
-The "default" semantics are recommended unless clear and documented reason
-exists for the interface to behave otherwise.
-
-Configuration persistence
-=========================
-
-User configuration should always be preserved, as long as related objects
-exist.
-
-No loss on close
-----------------
-
-Closing and opening a net_device should not result in loss of configuration.
-Dynamically allocated objects should be re-instantiated when the device
-is opened.
-
-No partial loss
----------------
-
-Loss of configuration is only acceptable due to asynchronous device errors,
-and in response to explicit reset requests from the user (``devlink reload``,
-``ethtool --reset``, etc.). The implementation should not attempt to preserve
-the objects affected by configuration loss (e.g. if some of net_device
-configuration is lost, the net_device should be unregistered and re-registered
-as part of the reset procedure).
-
-Explicit default tracking
--------------------------
-
-Network configuration is often performed in multiple steps, so it is important
-that conflicting user requests cause an explicit error, rather than silent
-reset of previously requested settings to defaults. For example, if user
-first requests an RSS indirection table directing to queues 0, 1, and 2,
-and then sets the queue count to 2 the queue count change should be rejected.
-
-This implies that network configuration often needs to include an indication
-whether given setting has been requested by a user, or is a default value
-populated by the core, or the driver. What's more the user configuration API
-may need to provide an ability to not only set a value but also to reset
-it back to the default.
-
-Indexed objects
----------------
-
-Configuration related to indexed objects (queues, NAPI instances etc.)
-should not be reset when device is closed, but should be reset when object
-is explicitly "freed" by the user. For example reducing the queue count
-should discard configuration of now-disabled queued.
-
-Core validation
-===============
-
-For driver-facing APIs the networking stack should do its best to validate
-the request (using maintained state and potentially requesting other config
-from the driver via GET methods), before passing the configuration to
-the driver.
-
-Testing
-=======
-
-All new configuration APIs are required to be accompanied by tests,
-including tests validating the configuration persistence, and (if applicable)
-the interactions of multi-level configuration.
-
-Tests validating the API should support execution against netdevsim,
-and real drivers (netdev Python tests have this support built-in).
-
+Thanks!
 
