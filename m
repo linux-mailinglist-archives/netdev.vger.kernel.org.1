@@ -1,148 +1,119 @@
-Return-Path: <netdev+bounces-178553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA74CA778B4
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 12:19:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D391A778C8
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 12:27:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FA64188F43E
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 10:19:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 674967A2B0C
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 10:26:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 243201F0E45;
-	Tue,  1 Apr 2025 10:18:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 582811F03C8;
+	Tue,  1 Apr 2025 10:27:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kb1AqoYL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E7/B1RWO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC6A1F0986;
-	Tue,  1 Apr 2025 10:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72CF71EDA35
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 10:27:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743502721; cv=none; b=pwlmRVwzJzBG9tpSSkPUydYxZuo1q0ZZY8mmY7tRh4lEHia5EZ9MYCumhMxIkNsyngRI3oxAn+060yClFQJ2GDCwt5UMbQhXFXDudHDaWc4LyQ6gPbwrHJI6NmFspK4YKbq1nPyar0rEkkBBTVcsksxUUpVA2O5F5sqCHCnDI+g=
+	t=1743503250; cv=none; b=ZZi0xmaeTUUi3InfTMSBPN1ZAQTBwCXH47BeAOwxCHp9oxY243ufjLySa+PVSjeMG1St/dHwOgmKQl5oBKkyMy9mlqlUZnMhPK6FN8oUomIcSkGVZ3wb4lys1fIfIHQGgjS/8UucF2teryE2YHX/V/JXJbtWqzb+MAsIkb5btvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743502721; c=relaxed/simple;
-	bh=c50V6tQVBqAf9hFBVQTLRlrMxI4we7B1IjHR9mZdbbw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HIkyQVETBwUYgUU3LRGFKZF7j6VP/9UtdM2VF52MyNy8xNgrtK3EOFyPVmRWcMR7EN75GJC1HYxesNQ7+eWsIGkggl/GtPABglvhT8VN+PjjnGwudGI/8yvqQEFuwY4rHj8weUeg5v2NRbkVQgtC1gUS0B0qqxxRwmmP/7q5hcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kb1AqoYL; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2255003f4c6so96363005ad.0;
-        Tue, 01 Apr 2025 03:18:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743502719; x=1744107519; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=52Yyy6tKNAW68e/IV+CVhMLgP7UMspcJa+7anxM/WEc=;
-        b=Kb1AqoYLJOX6XfCvFlRVhlDjYoj9yRrZIXnKYi3JBCx1l7Ol2m4v9l8nsngANsI8sl
-         VLOj/6wiq5i2htMksfKZgaMSL0HbqoPsNe0/nSS4CIPEMkZ4lVD9MJ4M1dylU+3ueuNO
-         Wr6nFz5QEqwqh8jNfzv0XoIRS3/ER1utZRHzPFwRkBzHks4Cq87io982L5KgTLSFZEd2
-         237gJo469an1TPRKjoC20q29RZlUfO8WT5NGjK2saCNqoitc5n22sDu1Ac0Ho5ghI662
-         1grXLm7J6xUhG4NQekbIuC5TqsLdExWD5sc29HXE71mXKY3ZU9e6hFrAX2G0ml6p+avr
-         Arfg==
+	s=arc-20240116; t=1743503250; c=relaxed/simple;
+	bh=i65bli/LUjeAzAEjbdZeFArLOirreOB4o5/lk4mXqsg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mPTM8MPIFI/oP/2JfseIsPfQQbAy1bR0rZfWfgnlm3dbTgpgqdjjYbnorTL5JKiBCDdcl2m+3hin9k9YOw8W3NyOfS6wj32H8mZx5Yi3J6u/XK6Ev2idz0CkZE820gDMBiBcZZLV9NBfcgG43pA3DJmJzIIxva4hM/HUO6zPvvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E7/B1RWO; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743503247;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lCMlwQTPbF+tcTXJk5vNlRndQ5yW7K0i3e1xn78wccs=;
+	b=E7/B1RWO9YRw+XlsdaQz1uOtrnDZLpyoKOG11CxPhCeMp5UGrtS733X3+v6UifpkXJ5Bq9
+	X/Dp8STJVLGVzJsoLXEE4Ejq1PbQpXjidc+a0rhVxxXWeQM/Tox1t2X/I6FkAO/1w1exsi
+	cXg5W060iZWuUI3D/IVeoejnn57Cwew=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-685-3Pk9jkexOVu9YZbaAtBziQ-1; Tue, 01 Apr 2025 06:27:26 -0400
+X-MC-Unique: 3Pk9jkexOVu9YZbaAtBziQ-1
+X-Mimecast-MFC-AGG-ID: 3Pk9jkexOVu9YZbaAtBziQ_1743503245
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-39130f02631so1800639f8f.2
+        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 03:27:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743502719; x=1744107519;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=52Yyy6tKNAW68e/IV+CVhMLgP7UMspcJa+7anxM/WEc=;
-        b=JQFmi+SZkIeZi9AemMoNz87A6sWqzI1SWIm3TPz2dHCyHd3YH4kJNKwXEllnWvhSu+
-         G5UlvzJz6i3pHGSv5Ctg+K4DOfd+XbqeTuUOcOlC+RUAVIEZPDpE3/Y3A/YNNmgjyIsP
-         9Il+Rt4PkUIw9I35H7LEVOBc0AbDD4Hu4d1RUdiEhwp7dDVpfJ9JT/8Lznp29j0VCBDk
-         wr/642hWwAy8I+QIf9skQ/9w2fTP4EzKm+BBUoddIJLIcBNby+/8Uad10wOF02R3bjdp
-         BjGcDyVVOhYs26whnTq2VmUtP0g/1K0D4MreYLCChAzIKmBmeE9fOtP+ZL1uVkOVzHhg
-         JFmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVbRwbZHwGr+cSU4nI66hz5HERCA0kCgahFmQMomqO16xIbVxg3pq9MSea5vGijaxcYCL6EWVwC5ypemCQ=@vger.kernel.org, AJvYcCWjeLIXBXnKA2lC3dp2NwssKjXrkaGX4tEXWTQtt3EyoZ3ixGK+Q/1ktwWCt5FBqOqZasRdWYpmTgjZ@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3qnKafNKeXGtLjWrA89vLpntIoInKZfAH+sb9aT43RbunzjKx
-	keeNAGw6aNR+/rva/MpwicgzEoiLDLk7ucBl7ugl4+MUQZwx4yZvm2QJ89bk
-X-Gm-Gg: ASbGncvUzno/Ub1o/vOBM9Z+1e+IkHmFmlWQ9jVvo2BqR1dH/1oqTgXZ+2yd1jZNmDP
-	yA3rWcZelkjzBXxV1HH4oZGx2QogpAotGvFSJCflniLylJA9+1ajnTnEUEjm8N3HM+ObOqOH8qE
-	zHHOqHMSzq+MPYfLtydjiSfrs145zTNEePXf/52uiP+spKEtL1ULvGNz5qc3+YUIOpPPmTAtfY4
-	hnmXY469d3F+j53IQtHUs52DKQzZMUOyAD6e1uvGQxZ5QCNYsxekIJXHJzTkzTkhIfMDo5l9VHS
-	kuwGfPGEjWzTTcohhwxJuvQFz2MSVXQPzLaSqbKaiyxrip4hW/Y5T4Vk6bsh4CloNkFW
-X-Google-Smtp-Source: AGHT+IG8E+nX/g9arCxFT9vcimbEEY6MEhX7K2Zyy7L+8Tm9Z+wZnUc/i/1mUf+iHWktCq32FC3BRg==
-X-Received: by 2002:a17:902:f606:b0:220:eade:d77e with SMTP id d9443c01a7336-2295c0ebb1cmr39150275ad.40.1743502718774;
-        Tue, 01 Apr 2025 03:18:38 -0700 (PDT)
-Received: from mi-ThinkStation-K.mioffice.cn ([43.224.245.231])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291f1f8badsm84595835ad.246.2025.04.01.03.18.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 03:18:38 -0700 (PDT)
-From: Ying Lu <luying526@gmail.com>
-To: oneukum@suse.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	luying1 <luying1@xiaomi.com>
-Subject: [PATCH v1 1/1] usbnet:fix NPE during rx_complete
-Date: Tue,  1 Apr 2025 18:18:01 +0800
-Message-ID: <e3646459ea67f10135ab821f90f66d8b6e74456c.1743497376.git.luying1@xiaomi.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <cover.1743497376.git.luying1@xiaomi.com>
-References: <cover.1743497376.git.luying1@xiaomi.com>
+        d=1e100.net; s=20230601; t=1743503245; x=1744108045;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lCMlwQTPbF+tcTXJk5vNlRndQ5yW7K0i3e1xn78wccs=;
+        b=KEE24ZmpewlOFcAVPdf3gobk4CoUnB+bKBCplKVLLNS7jLoBCsmCAFL/G134EGLkMv
+         AZomHb1N+jv4McVpxjoy8z+ui69zU5rr25ncbewwbJrrDay0Npvv507qYFaXVhhyEIjm
+         PXRwf7posm6q22PAkDvRAQ6RSTZsC2Jcmg0/s2X+7SD/JNdC9NSULiiu1OwfNK7t8aI+
+         s5DDoaWhAIkkK5X2A/cqQPfYOCbWqlFXt+jHYnSYk4ro5ygWJnSWqtWgaEfLmM8KWcjv
+         5PMuQTzOWXcsTwNWuNLclqpI9eAYtL3K/Sa1UYoMpQiHKbZV2s3OwQy0xfM3YeYByPU1
+         BY8A==
+X-Forwarded-Encrypted: i=1; AJvYcCVtefMZdVz/LiYugZggrAnlEoi3jXXvX2f5q00q0UT57tK4IQ3aPCwhC4b2oi8Rp0ZYxcAmFKk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz97VtSXWTo9hX49F3dlWwNo8PzRfnt/DxYOIfz9mJ7rY5Nr3dR
+	fldCHvWdJFCXfzl7DwhYjoVtcukPzz1IQ/b08+D459bnvNoc5H+ObrXhY/RFiVSdgYSwFxx0zrU
+	jrkyGKnkj8xhx9BNlHHyZ+Ok/f2YhJVqd+wJM8kPSiOiHsswY2i9ikA==
+X-Gm-Gg: ASbGncscTspTFPeJjSNzTwOSnf/C5zNjxbggvnUdRCNh+W7EsqX6xSPsyvg02tEPFKZ
+	lZLeYzpkb7zpSrHpAgTPknV+/Up4W464AEFio5cEOmjVBeq0WAg30etUhi3yLGy42vvujBDCq3s
+	2uBVNvjAskc0hL3alRw55LcZiBzH6WW1ojeqRx3J9Y3KrXN9wBgW4fqu72nZWXEknue/8YPRjdK
+	2ly0cA+kmqvu/ySMoswYsRY9n5pIO0UFdMghspGl4jAVSHwnNy+ZmkW+alXSCfjsz0RwlVjS7MF
+	k5URR25ngozOpMpx/oL0FgnlQI/hYVBeeMzSHR3N0Z+ykA==
+X-Received: by 2002:a5d:6da1:0:b0:391:13ef:1b1b with SMTP id ffacd0b85a97d-39c236500aamr1960634f8f.30.1743503244341;
+        Tue, 01 Apr 2025 03:27:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IErywGUsB1jww0h7aRyVpVwYFuo7TtXzQBsO1rG5ZLjGsVlSSuop7KaYODnx/bHOTtheyZ/BA==
+X-Received: by 2002:a5d:6da1:0:b0:391:13ef:1b1b with SMTP id ffacd0b85a97d-39c236500aamr1960614f8f.30.1743503244004;
+        Tue, 01 Apr 2025 03:27:24 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-68-231.dyn.eolo.it. [146.241.68.231])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b7a420bsm13526035f8f.82.2025.04.01.03.27.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Apr 2025 03:27:23 -0700 (PDT)
+Message-ID: <6859da28-6e54-49a1-ad12-759fb85537d8@redhat.com>
+Date: Tue, 1 Apr 2025 12:27:22 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Patch net 0/2] net_sched: skbprio: Remove overly strict queue
+ assertions
+To: Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org
+Cc: jhs@mojatatu.com, jiri@resnulli.us
+References: <20250329222536.696204-1-xiyou.wangcong@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250329222536.696204-1-xiyou.wangcong@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-From: luying1 <luying1@xiaomi.com>
+On 3/29/25 11:25 PM, Cong Wang wrote:
+> This patchset contains a bug fix and its test case. Please see each
+> patch description for more details.
+> 
+> ---
+> Cong Wang (2):
+>   net_sched: skbprio: Remove overly strict queue assertions
+>   selftests: tc-testing: Add TBF with SKBPRIO queue length corner case
+>     test
+> 
+>  net/sched/sch_skbprio.c                       |  3 --
+>  .../tc-testing/tc-tests/infra/qdiscs.json     | 34 ++++++++++++++++++-
+>  2 files changed, 33 insertions(+), 4 deletions(-)
+> 
 
-Missing usbnet_going_away Check in Critical Path.
-The usb_submit_urb function lacks a usbnet_going_away
-validation, whereas __usbnet_queue_skb includes this check.
-
-This inconsistency creates a race condition where:
-A URB request may succeed, but the corresponding SKB data
-fails to be queued.
-
-Subsequent processes:
-(e.g., rx_complete → defer_bh → __skb_unlink(skb, list))
-attempt to access skb->next, triggering a NULL pointer
-dereference (Kernel Panic).
-
-Signed-off-by: luying1 <luying1@xiaomi.com>
----
- drivers/net/usb/usbnet.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index 44179f4e807f..5161bb5d824b 100644
---- a/drivers/net/usb/usbnet.c
-+++ b/drivers/net/usb/usbnet.c
-@@ -519,7 +519,8 @@ static int rx_submit (struct usbnet *dev, struct urb *urb, gfp_t flags)
- 	    netif_device_present (dev->net) &&
- 	    test_bit(EVENT_DEV_OPEN, &dev->flags) &&
- 	    !test_bit (EVENT_RX_HALT, &dev->flags) &&
--	    !test_bit (EVENT_DEV_ASLEEP, &dev->flags)) {
-+	    !test_bit (EVENT_DEV_ASLEEP, &dev->flags) &&
-+	    !usbnet_going_away(dev)) {
- 		switch (retval = usb_submit_urb (urb, GFP_ATOMIC)) {
- 		case -EPIPE:
- 			usbnet_defer_kevent (dev, EVENT_RX_HALT);
-@@ -540,8 +541,7 @@ static int rx_submit (struct usbnet *dev, struct urb *urb, gfp_t flags)
- 			tasklet_schedule (&dev->bh);
- 			break;
- 		case 0:
--			if (!usbnet_going_away(dev))
--				__usbnet_queue_skb(&dev->rxq, skb, rx_start);
-+			__usbnet_queue_skb(&dev->rxq, skb, rx_start);
- 		}
- 	} else {
- 		netif_dbg(dev, ifdown, dev->net, "rx: stopped\n");
--- 
-2.40.1
+Acked-by: Paolo Abeni <pabeni@redhat.com>
 
 
