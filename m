@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-178657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26AF4A78095
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 18:37:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6315FA78096
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 18:37:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D606418851E0
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 16:35:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9F44188AEA8
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 16:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2797420F06A;
-	Tue,  1 Apr 2025 16:35:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C03C20F078;
+	Tue,  1 Apr 2025 16:35:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C70820E70E
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 16:35:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA52720F063
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 16:35:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743525308; cv=none; b=KViqTCVCY+zEozXXy9z/aWgq7foVs/fgSxMpQr4E5+AeHDSV42qLEyoHmvRJSmgTVSWHxZAklVcHMZouUXhHMCT19XdQTG+k6J1NDqs+nBnTGBmohzmI7OPxAh+bLmxaAYvIxI0cd/2ARThE9rc2TAv/uwVmBoANrgIDjqZmBHc=
+	t=1743525309; cv=none; b=RjXvlswti3Qc5ytdH8mk/xKY5t1L3GSmoFgjoPaQHSblicLXc8HY5e4cGF1TvILO5/suftlbgoSnvrC7qQrPSnGCue5lANW3J1cKNaQu1F/rPx5k/xazrq9o+HKSBbpKNIh0xT03py36tFQ3RjiZDgkgjxeibH2j34Qcw7eNo/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743525308; c=relaxed/simple;
-	bh=d7JvG3+7EDCHito5Pw1XyustXPnDzUgGCpwAMdHun1U=;
+	s=arc-20240116; t=1743525309; c=relaxed/simple;
+	bh=tf/CChIRlAkfC+Vo8oKSHhJyTpfdaovsvldGu0jbXEc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uZimsA8kXmDsoJSW9nWrZsmvWtYbyZVy7f+ks4lWQ1bgZDlm9IoEi2V/cMI5cczTGMNQ+1apR/QHqRLQAAYC7UPvUE66ggo684YzRTOX+dFtkI1rZEBoT5USNQHPjtQzYY3lXlnsXILfLpHmVqKRHhn3PIr04tQZXBGfUAYlDIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.180
+	 MIME-Version; b=XQUynFhUsYRNu9ZgZrZGZAVcpo0ge86Srn3qQpWpCrofE9qXMreDoRfxznBPMSpy5i+wi3lYr1i+nCz8ZqWPomSKyjwJ7zn9AqDqbAjKIMFr+D81L+6iEvmfc/ovelwpA91wPp0Y9K0F8ClWIPtl5rTpKwu5GFS4L24C4MCT7x8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-223f4c06e9fso107469285ad.1
-        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 09:35:06 -0700 (PDT)
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-301c4850194so8064791a91.2
+        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 09:35:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743525305; x=1744130105;
+        d=1e100.net; s=20230601; t=1743525307; x=1744130107;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hiPqGUN65xqmstpHwHf6M/veERZEgyfwG65731/G/BY=;
-        b=M+bKIzDC+YuGtvg3QuEhhu9y9T8h44ArfOPMTDsX8AznsjnNBOjv7qdjgvAklMH3dR
-         Cw5ZA6E4bTjfxA1W6KLo1gu+MiC54peCtiV3pIf15buMNpg0IM0l1OXYCQJOE1lxBasc
-         p8+tklbdKuSEgLgh4b56wH+UV2nAlvZsOrZyEzrugcaRMj06CBElyU/1mCMsNmAUV1eY
-         YpTQEVlqE3LSUXdLEL5gNvzGt2wJGxrg9/8jcuRjKNRSNg1qR6o3GMbWj8emwdrIeghc
-         f9go1R2bVbfEf8eFGhmE08Boa4QBF9m/fWJim0N6SGFFcfXP1zmV41LKeTcG3yVFz16W
-         VYTQ==
-X-Gm-Message-State: AOJu0Yx0I7mV12oQGEVRxnaddFi1jSWPsWtLREWQigRGC5GmLMAOpVvn
-	wizrO0R4WnOr6tW4cI2Me9KiUNS3B96y2hwH8Kp4CjrsdcJimPb19cBeII753Q==
-X-Gm-Gg: ASbGncsf9Kn9pp4dflCEaUQzoEDwsA2FHUH9jNR/kC9K7gdPjrThqiZcXyy/37SlqEh
-	WQuWpYcDECwHWTi0apiCLQ0NGMQKyUk6TtryL+bGFCDJdGF26HqJx5Fdz03k+g5IUJ1YR1eku/V
-	fwwIUG8GYbjfUCv8zXycc7cEHlkDLlSiyw7JYTxqww1HplOM4xfA7D08XjcSG0xfd0rUtpex+7k
-	N57asodUc1cg4tqLYc7hGceenyRQP9saD2EVfhlR5o5ROm+HlirgnXw+o/d+ljbSWxfEFRv9Rti
-	R9hJN6mrnp4sD+fkwvnkfNiKMHMmZ01iQE8S6aJ62gUN
-X-Google-Smtp-Source: AGHT+IFM3+SrbXG6XEfuI1EjqDuyDuQPpR8R+/0lKIAqsZuUi++maDKuKcOXzI1oQUUqod4Td6+Aug==
-X-Received: by 2002:a17:903:2c8:b0:224:3610:bef4 with SMTP id d9443c01a7336-2296834c024mr8384025ad.25.1743525305490;
-        Tue, 01 Apr 2025 09:35:05 -0700 (PDT)
+        bh=6p3CjK1FzhuhSc0mPtP8gefXfwAJuXaqGhkba69pwL0=;
+        b=Cl/wSChZ1Xrlt86ANjRvigxDPM/Tg4LPdOvBNUT0mLBHch37Qb1rKOfk21lfjA5KOs
+         UWiaS+6JNT1hETTmDLC0MsW0kvykbmtauNkPem7avlg5LpvYvGr7+ZXUTmytVvGFhSJH
+         35TVFom9/HvBVCj33vfiL+rcmQNzk1qzEnNV/6TAeLSTigBJNC6OygaXXiMQo6jsWxDs
+         XxM1PM6osL8HBTyPA9EXH/U5sAstiUj5rUBnKsOVtkG55oFAukRbpw2p8AE77T7ezaVY
+         oBiWcCfxcQfPbE6z/3ZhzvJc3aX6ilMQXz/U8BjSZiayloDgJsCGBC3/XaQlc1gGhscm
+         bbCA==
+X-Gm-Message-State: AOJu0Yw8l1lyEIh3W6iEKnPJpTweeIUCxO4zECLazTWLWLThbdTjgNHu
+	VlaqT5NWVh3LEYpHi0/BSMfVONGSTZUhQSNY84aP6QWfxQFitXkKuT59T60jMw==
+X-Gm-Gg: ASbGncsIMXkpBesZaKOuBcG/nZBaO6cjp+JdKtjx8AL70bxZdMumVxm8tWAfwIOojn5
+	dWjVnb57J0AuLfqAfmoe32YWjCZxqyttg14YI0n+PYx36BzvmppCGbVywr95MvbezSiRxeSmxo0
+	ZrNHg0R2E5UwMwewWsMgqoln64NgNNU8XQg5ungbfmDDknWjc33ve7uYG9GG09R3fGN9Z12q6jD
+	wjeyECzKgFNgD2dUebUVYOrEPS3f4tllhXCjSw+W5fp213THoQIVA9tReVcSiTRDZVT3qtJ9Qlp
+	11eiiqAtoLLRuUHFSKsrqXSchgZCtOIM6FnUzz88OM9y
+X-Google-Smtp-Source: AGHT+IHkb6fll9FtZ8OBF2fS7+hDr23ynKzxNGZCtKyjfTv9c8AzQNFIiT6EKC0qn7NXB/tZTP/Vbw==
+X-Received: by 2002:a17:90a:c88c:b0:2ee:8e75:4aeb with SMTP id 98e67ed59e1d1-305320af2b4mr24545193a91.17.1743525306885;
+        Tue, 01 Apr 2025 09:35:06 -0700 (PDT)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2291f1f9240sm90412855ad.236.2025.04.01.09.35.04
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-305175c99a6sm9543642a91.40.2025.04.01.09.35.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 09:35:05 -0700 (PDT)
+        Tue, 01 Apr 2025 09:35:06 -0700 (PDT)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com
-Subject: [PATCH net v5 08/11] selftests: net: use netdevsim in netns test
-Date: Tue,  1 Apr 2025 09:34:49 -0700
-Message-ID: <20250401163452.622454-9-sdf@fomichev.me>
+Subject: [PATCH net v5 09/11] net: designate XSK pool pointers in queues as "ops protected"
+Date: Tue,  1 Apr 2025 09:34:50 -0700
+Message-ID: <20250401163452.622454-10-sdf@fomichev.me>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250401163452.622454-1-sdf@fomichev.me>
 References: <20250401163452.622454-1-sdf@fomichev.me>
@@ -77,88 +77,92 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Netdevsim has extra register_netdevice_notifier_dev_net notifiers,
-use netdevim instead of dummy device to test them out.
+From: Jakub Kicinski <kuba@kernel.org>
 
+Read accesses go via xsk_get_pool_from_qid(), the call coming
+from the core and gve look safe (other "ops locked" drivers
+don't support XSK).
+
+Write accesses go via xsk_reg_pool_at_qid() and xsk_clear_pool_at_qid().
+Former is already under the ops lock, latter needs to be locked when
+coming from the workqueue via xp_clear_dev().
+
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- tools/testing/selftests/net/lib.sh        | 25 +++++++++++++++++++++++
- tools/testing/selftests/net/netns-name.sh | 13 ++++++++----
- 2 files changed, 34 insertions(+), 4 deletions(-)
+ include/linux/netdevice.h     | 1 +
+ include/net/netdev_rx_queue.h | 6 +++---
+ net/xdp/xsk.c                 | 2 ++
+ net/xdp/xsk_buff_pool.c       | 7 ++++++-
+ 4 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests/net/lib.sh
-index 975be4fdbcdb..701905eeff66 100644
---- a/tools/testing/selftests/net/lib.sh
-+++ b/tools/testing/selftests/net/lib.sh
-@@ -222,6 +222,31 @@ setup_ns()
- 	NS_LIST+=("${ns_list[@]}")
- }
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index cf3b6445817b..9fb03a292817 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -688,6 +688,7 @@ struct netdev_queue {
+ 	/* Subordinate device that the queue has been assigned to */
+ 	struct net_device	*sb_dev;
+ #ifdef CONFIG_XDP_SOCKETS
++	/* "ops protected", see comment about net_device::lock */
+ 	struct xsk_buff_pool    *pool;
+ #endif
  
-+# Create netdevsim with given id and net namespace.
-+create_netdevsim() {
-+    local id="$1"
-+    local ns="$2"
-+
-+    modprobe netdevsim &> /dev/null
-+    udevadm settle
-+
-+    echo "$id 1" | ip netns exec $ns tee /sys/bus/netdevsim/new_device >/dev/null
-+    local dev=$(ip netns exec $ns ls /sys/bus/netdevsim/devices/netdevsim$id/net)
-+    ip -netns $ns link set dev $dev name nsim$id
-+    ip -netns $ns link set dev nsim$id up
-+
-+    echo nsim$id
-+}
-+
-+# Remove netdevsim with given id.
-+cleanup_netdevsim() {
-+    local id="$1"
-+
-+    if [ -d "/sys/bus/netdevsim/devices/netdevsim$id/net" ]; then
-+        echo "$id" > /sys/bus/netdevsim/del_device
-+    fi
-+}
-+
- tc_rule_stats_get()
+diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queue.h
+index b2238b551dce..8cdcd138b33f 100644
+--- a/include/net/netdev_rx_queue.h
++++ b/include/net/netdev_rx_queue.h
+@@ -20,12 +20,12 @@ struct netdev_rx_queue {
+ 	struct net_device		*dev;
+ 	netdevice_tracker		dev_tracker;
+ 
++	/* All fields below are "ops protected",
++	 * see comment about net_device::lock
++	 */
+ #ifdef CONFIG_XDP_SOCKETS
+ 	struct xsk_buff_pool            *pool;
+ #endif
+-	/* NAPI instance for the queue
+-	 * "ops protected", see comment about net_device::lock
+-	 */
+ 	struct napi_struct		*napi;
+ 	struct pp_memory_provider_params mp_params;
+ } ____cacheline_aligned_in_smp;
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index e5d104ce7b82..98a38d21b9b7 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -1651,7 +1651,9 @@ static int xsk_notifier(struct notifier_block *this,
+ 				xsk_unbind_dev(xs);
+ 
+ 				/* Clear device references. */
++				netdev_lock_ops(dev);
+ 				xp_clear_dev(xs->pool);
++				netdev_unlock_ops(dev);
+ 			}
+ 			mutex_unlock(&xs->mutex);
+ 		}
+diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
+index 25a76c5ce0f1..c7e50fd86c6a 100644
+--- a/net/xdp/xsk_buff_pool.c
++++ b/net/xdp/xsk_buff_pool.c
+@@ -279,9 +279,14 @@ static void xp_release_deferred(struct work_struct *work)
  {
- 	local dev=$1; shift
-diff --git a/tools/testing/selftests/net/netns-name.sh b/tools/testing/selftests/net/netns-name.sh
-index 0be1905d1f2f..38871bdef67f 100755
---- a/tools/testing/selftests/net/netns-name.sh
-+++ b/tools/testing/selftests/net/netns-name.sh
-@@ -7,10 +7,12 @@ set -o pipefail
- DEV=dummy-dev0
- DEV2=dummy-dev1
- ALT_NAME=some-alt-name
-+NSIM_ADDR=2025
+ 	struct xsk_buff_pool *pool = container_of(work, struct xsk_buff_pool,
+ 						  work);
++	struct net_device *netdev = pool->netdev;
  
- RET_CODE=0
+ 	rtnl_lock();
+-	xp_clear_dev(pool);
++	if (netdev) {
++		netdev_lock_ops(netdev);
++		xp_clear_dev(pool);
++		netdev_unlock_ops(netdev);
++	}
+ 	rtnl_unlock();
  
- cleanup() {
-+    cleanup_netdevsim $NSIM_ADDR
-     cleanup_ns $NS $test_ns
- }
- 
-@@ -25,12 +27,15 @@ setup_ns NS test_ns
- 
- #
- # Test basic move without a rename
-+# Use netdevsim because it has extra asserts for notifiers.
- #
--ip -netns $NS link add name $DEV type dummy || fail
--ip -netns $NS link set dev $DEV netns $test_ns ||
-+
-+nsim=$(create_netdevsim $NSIM_ADDR $NS)
-+ip -netns $NS link set dev $nsim netns $test_ns ||
-     fail "Can't perform a netns move"
--ip -netns $test_ns link show dev $DEV >> /dev/null || fail "Device not found after move"
--ip -netns $test_ns link del $DEV || fail
-+ip -netns $test_ns link show dev $nsim >> /dev/null ||
-+    fail "Device not found after move"
-+cleanup_netdevsim $NSIM_ADDR
- 
- #
- # Test move with a conflict
+ 	if (pool->fq) {
 -- 
 2.49.0
 
