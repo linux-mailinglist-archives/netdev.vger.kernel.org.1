@@ -1,145 +1,128 @@
-Return-Path: <netdev+bounces-178589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3960A77B28
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 14:41:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B24B1A77B40
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 14:48:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7082188F748
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 12:41:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B74C216C4B4
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 12:48:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C50B20126A;
-	Tue,  1 Apr 2025 12:40:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45B02202C5B;
+	Tue,  1 Apr 2025 12:48:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="G6Kx5mH9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZmhHqY9P"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 124291F0E56;
-	Tue,  1 Apr 2025 12:40:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4584202963;
+	Tue,  1 Apr 2025 12:48:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743511253; cv=none; b=Fjfo5wemffn7ncVBZL0fpjntLjMQF7RUDYWNix5w47fqFl111aDOWp6GVTxfP8ZKzPKcMxakGqJdKNgtDbRky5xIW6pOuru4TnXWdPErBIvsq5Fx3WYBptTayaFJAZVLsCXtzBIAI1e/KZC4WQpeFiVLIcIX2D4I5MrkeUx6ELk=
+	t=1743511695; cv=none; b=L6VyRENNcNf7+ZH6e6wgXaUlfVqS0kJMTKNGCAHWXLfoPDzW0kNDsN+kIs7iNgzLNpAh5/QsqrzIRjq1twJsW3WA3NC83dsTv7JQBW7GqbQ+mZS8HaNlIE03GLBzDTyKUhrrQIRZNaTs6VLak6yL5u54/91JKkugaM9zLdH9D6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743511253; c=relaxed/simple;
-	bh=Get7KAvoCaSnLRrPLPueAHCZCSCjbAm1U96QKIwX9RA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CCgElouZWUL87kijBz6mjKTj/5fuFxu43Xk9g6eLREdcUyFl1PWZ5BPDOklULR+Scl8U9Qj2kJY3gAf2jkOLsPfsQRknpIpAlCne80sCIDedNTkYNXeTmoF8iWKKO1UtFKg5mukp5aorGguJkH6cBzpSobNN//DEI7ulbvzwQiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=G6Kx5mH9; arc=none smtp.client-ip=117.135.210.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=6+nnE
-	i89eaWkxtOk2uXcxBBZ5vP3fWMFYrDB8rldhD4=; b=G6Kx5mH9vyvEeZAKu41nB
-	JOOg4O0//KJXxpE/acxhJ72DXkdVZzA8GsH7TPQ6UsuttLG++zY2OVma58OQqj6O
-	N7DyHde3O9AFxapM9u7QVuwWJ/WqBVVk2zGCvzZy2jEEK2owzPlwz3hjpvLbBhrq
-	db26P8TA0RC7O7uD08pRVM=
-Received: from WIN-S4QB3VCT165.localdomain (unknown [36.28.141.24])
-	by gzsmtp5 (Coremail) with SMTP id QCgvCgBnc1qy3utnVqF_TA--.58053S4;
-	Tue, 01 Apr 2025 20:40:20 +0800 (CST)
-From: Debin Zhu <mowenroot@163.com>
-To: pabeni@redhat.com
-Cc: 1985755126@qq.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	mowenroot@163.com,
-	netdev@vger.kernel.org,
-	paul@paul-moore.com
-Subject: [PATCH v3] netlabel: Fix NULL pointer exception caused by CALIPSO on IPv4 sockets
-Date: Tue,  1 Apr 2025 20:40:18 +0800
-Message-Id: <20250401124018.4763-1-mowenroot@163.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <2a4f2c24-62a8-4627-88c0-776c0e005163@redhat.com>
-References: <2a4f2c24-62a8-4627-88c0-776c0e005163@redhat.com>
+	s=arc-20240116; t=1743511695; c=relaxed/simple;
+	bh=lDZTSMaO1bJ543JPMI+eaUZipC3tuQ8E4v6VNT6soTQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lH9V7F9UsEa4MpYQeTdaOwQ6WzS/AaZrGQiAq+xu+tBs3GUHNpLmn6MFUjdpglz0/UhA4uqNi3HXsCf62jxpzbithYqrD4h7hJXz/X3mEUVwjkBg2vjSSS3VRGScZ4MCk2PCc5A68MSt3SP5+GCn+F17tQoVa1vOXeXyfi/ywMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZmhHqY9P; arc=none smtp.client-ip=209.85.160.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-2bd2218ba4fso2139465fac.1;
+        Tue, 01 Apr 2025 05:48:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743511692; x=1744116492; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kQ/5Y+dwWDZJJrv96q/JH3lzjHcexnpxucH3IGGyZas=;
+        b=ZmhHqY9PqE4SDQfwiw8wgVjj+M1p79SCQm7oFdJ032GQOB+E9ClHrzPF8SsQZsyErS
+         sz4o5fcTz91GeixTsLmDAlwf2rwwoozROjbqAcJCo8Eua0mm56zWz5Qp22vnwRcymBA5
+         w/Hk49hySYzkMX0ceEfK0KCsfZ6HMZimbQiZZkVCSw5j0cbjUbcyrZAa0ytaGJRpxpYQ
+         vZ/frDwR/AK7CHJwzwm2h979+ANKyCTVTwUEXwwiU124LVvzJwqLvCxTupCDm/5HWlHt
+         w3Ck0VRM1wiSfEZkDSL/fhhvF1DIifUmAJ4qox6UueoENlhctX9u2ETyMqd6HEGuChhX
+         7+Fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743511692; x=1744116492;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kQ/5Y+dwWDZJJrv96q/JH3lzjHcexnpxucH3IGGyZas=;
+        b=t+jQfzEh5ItWSZczQS2Duf2ccBG6/s0bZapRNEFCfi1+vfLtOKCypRzgUjVH3PBFO2
+         qPIrl/m0gl31c1nSvTLF8pONlAc2AAkcas3tUQXEWyVtmWBSxkmnfkGF9SoYZKayypzr
+         U4JzvwUTnKMXXuPawbvi8GtwLMtXMlFbUqo7MeeZbxjPZa4OWjlAUGn+8jftZueB3IHJ
+         idArwoQes7Ec9W/knFoCB6TYY/+DNiXRKz8TrachNtQSTx+47Q0M3jn+1HWK5QYH60S8
+         YBZLV0NPWcLu1s9Chv8ULg7wRdJhDYHLTUSH7/tlhNj5Es0Uz/G5CkREi+YmAbDULNP8
+         yc9A==
+X-Forwarded-Encrypted: i=1; AJvYcCUhhB8eO8QNEr3K4nRQ2HkWxJxApubtEEWOZpj9yp0bLOy/t+dMjIrOXkcqQNNLa8zC+yTFFnw76vfe@vger.kernel.org, AJvYcCW4FnxkAuIjueudGApL8vhuLkCaTTUA2r6gqN3pB4qF1ue41p730eXBOMqy6Iyp9+6JHoq849ksPCkpT2Y=@vger.kernel.org, AJvYcCXmmRLRUgwta06HOaBIu+tdn06kqh7ijcC5NCMAZ3KROGLdBsqyjhBuHnSaBuY3bN2TC8THrNcp@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFHrowIwBRywrc8D/AY1X0JJ36/sXg0QUdglXKKSUH80ZDTCh0
+	8haTkaS7lW4JnN74MCGkXiQzTJITBFKImGbgZNuaAsv2/zUWchx2I8loLdJDShzZ9B1jJpItLvE
+	IFpxph0/XGs3itcUA48NZ3J070X0=
+X-Gm-Gg: ASbGncu5NxX0ooZcfBp2IUhpJGKLKh27HXWMl7IrJ/K+CeYOqBK/4GR9frTNzPhm8+h
+	RVrdI+EwRkurdGOG1OqLarV6rFAzW77KGRFypYoMypSQAUsPKV8O5+ItUWS8PTJmEwIRbGHzT2/
+	Jjv5VIamwHIEjD11M09ZBOt25dpA6DurWX6Dn9fA==
+X-Google-Smtp-Source: AGHT+IG8Tnh6OLeshuh3GjQ9rBKBY3rdOk43MjNujALzJsNlpgR6kqN2j5V1jvVfj4hbg6MC7kksYi4B5VGTjaEAj5Y=
+X-Received: by 2002:a05:6870:4190:b0:297:2763:18d4 with SMTP id
+ 586e51a60fabf-2cbcf5017efmr6147877fac.15.1743511692636; Tue, 01 Apr 2025
+ 05:48:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:QCgvCgBnc1qy3utnVqF_TA--.58053S4
-X-Coremail-Antispam: 1Uf129KBjvJXoW7CryUZF1kZr4DXFyUCr4xtFb_yoW8tFWrpF
-	9rGwn8Zw18AFWxWrs3XrWkCry3KF48KF1xurn2yw4UAw1UGr18ta48KryFyFyayFW8Kwsx
-	Xr4Sq3WYk348Z3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zio7KfUUUUU=
-X-CM-SenderInfo: pprzv0hurr3qqrwthudrp/1tbiXxAilGfr3gwPWQAAsx
+References: <cover.1743497376.git.luying1@xiaomi.com> <e3646459ea67f10135ab821f90f66d8b6e74456c.1743497376.git.luying1@xiaomi.com>
+ <2025040110-unknowing-siding-c7d2@gregkh>
+In-Reply-To: <2025040110-unknowing-siding-c7d2@gregkh>
+From: Ying Lu <luying526@gmail.com>
+Date: Tue, 1 Apr 2025 20:48:01 +0800
+X-Gm-Features: AQ5f1JrUr1k0WWafmzfNg_Oduajj52h1wbW1c-bclvNY54dwzB0hk0pYL0L0OOI
+Message-ID: <CAGo_G-f_8w9E388GOunNJ329W8UqOQ0y2amx_gMvbbstw4=H2A@mail.gmail.com>
+Subject: Re: [PATCH v1 1/1] usbnet:fix NPE during rx_complete
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: oneukum@suse.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luying1 <luying1@xiaomi.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-When calling netlbl_conn_setattr(), addr->sa_family is used
-to determine the function behavior. If sk is an IPv4 socket,
-but the connect function is called with an IPv6 address,
-the function calipso_sock_setattr() is triggered.
-Inside this function, the following code is executed:
+On Tue, Apr 1, 2025 at 6:31=E2=80=AFPM Greg KH <gregkh@linuxfoundation.org>=
+ wrote:
+>
+> On Tue, Apr 01, 2025 at 06:18:01PM +0800, Ying Lu wrote:
+> > From: luying1 <luying1@xiaomi.com>
+> >
+> > Missing usbnet_going_away Check in Critical Path.
+> > The usb_submit_urb function lacks a usbnet_going_away
+> > validation, whereas __usbnet_queue_skb includes this check.
+> >
+> > This inconsistency creates a race condition where:
+> > A URB request may succeed, but the corresponding SKB data
+> > fails to be queued.
+> >
+> > Subsequent processes:
+> > (e.g., rx_complete =E2=86=92 defer_bh =E2=86=92 __skb_unlink(skb, list)=
+)
+> > attempt to access skb->next, triggering a NULL pointer
+> > dereference (Kernel Panic).
+> >
+> > Signed-off-by: luying1 <luying1@xiaomi.com>
+>
+> Please use your name, not an email alias.
+>
+OK, I have updated. please check the Patch v2
 
-sk_fullsock(__sk) ? inet_sk(__sk)->pinet6 : NULL;
+> Also, what commit id does this fix?  Should it be applied to stable
+> kernels?
+The commit  id is 04e906839a053f092ef53f4fb2d610983412b904
+(usbnet: fix cyclical race on disconnect with work queue)
+Should it be applied to stable kernels?  -- Yes
 
-Since sk is an IPv4 socket, pinet6 is NULL, leading to a
-null pointer dereference.
-
-This patch fixes the issue by checking if inet6_sk(sk)
-returns a NULL pointer before accessing pinet6.
-
-Fixes: ceba1832b1b2("calipso: Set the calipso socket label to match the secattr.")
-Signed-off-by: Debin Zhu <mowenroot@163.com>
-Signed-off-by: Bitao Ouyang <1985755126@qq.com>
-Acked-by: Paul Moore <paul@paul-moore.com>
-
----
- net/ipv6/calipso.c | 23 +++++++++++++++++++----
- 1 file changed, 19 insertions(+), 4 deletions(-)
-
-diff --git a/net/ipv6/calipso.c b/net/ipv6/calipso.c
-index dbcea9fee..a8a8736df 100644
---- a/net/ipv6/calipso.c
-+++ b/net/ipv6/calipso.c
-@@ -1072,8 +1072,13 @@ static int calipso_sock_getattr(struct sock *sk,
- 	struct ipv6_opt_hdr *hop;
- 	int opt_len, len, ret_val = -ENOMSG, offset;
- 	unsigned char *opt;
--	struct ipv6_txoptions *txopts = txopt_get(inet6_sk(sk));
-+	struct ipv6_pinfo *pinfo = inet6_sk(sk);
-+	struct ipv6_txoptions *txopts;
- 
-+	if (!pinfo)
-+		return -EAFNOSUPPORT;
-+
-+	txopts = txopt_get(pinfo);
- 	if (!txopts || !txopts->hopopt)
- 		goto done;
- 
-@@ -1125,8 +1130,13 @@ static int calipso_sock_setattr(struct sock *sk,
- {
- 	int ret_val;
- 	struct ipv6_opt_hdr *old, *new;
--	struct ipv6_txoptions *txopts = txopt_get(inet6_sk(sk));
--
-+	struct ipv6_pinfo *pinfo = inet6_sk(sk);
-+	struct ipv6_txoptions *txopts;
-+
-+	if (!pinfo)
-+		return -EAFNOSUPPORT;
-+
-+	txopts = txopt_get(pinfo);
- 	old = NULL;
- 	if (txopts)
- 		old = txopts->hopopt;
-@@ -1153,8 +1163,13 @@ static int calipso_sock_setattr(struct sock *sk,
- static void calipso_sock_delattr(struct sock *sk)
- {
- 	struct ipv6_opt_hdr *new_hop;
--	struct ipv6_txoptions *txopts = txopt_get(inet6_sk(sk));
-+	struct ipv6_pinfo *pinfo = inet6_sk(sk);
-+	struct ipv6_txoptions *txopts;
- 
-+	if (!pinfo)
-+		return;
-+
-+	txopts = txopt_get(pinfo);
- 	if (!txopts || !txopts->hopopt)
- 		goto done;
- 
--- 
-2.34.1
-
+> thanks,
+>
+> greg k-h
 
