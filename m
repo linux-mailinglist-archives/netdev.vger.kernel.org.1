@@ -1,304 +1,303 @@
-Return-Path: <netdev+bounces-178565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F30FEA7791F
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 12:52:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BFF9A77935
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 13:00:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2F797A383D
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 10:51:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1536116A73C
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 11:00:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE07C1F12EA;
-	Tue,  1 Apr 2025 10:52:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C63081EF0BB;
+	Tue,  1 Apr 2025 11:00:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hazent-com.20230601.gappssmtp.com header.i=@hazent-com.20230601.gappssmtp.com header.b="TyHMHuWW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bXCrPygz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3631E1C22
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 10:52:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A688926AE4;
+	Tue,  1 Apr 2025 11:00:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743504746; cv=none; b=po0+r7vYkbf6iNgUOjQPBWtarz2JCqsAVjRFMSO+4InmszWHa4tJ251CDX40fpx/stBX3lc5qFQbsOfYGU4xg8TRPqxTzfeFzJTJulqR/AjonViDmWkc3t0lYILKy/ojjR0CPjPmLaFcu2CmmSmQhdZ+ys7IbOJJU+yJC0a+w20=
+	t=1743505254; cv=none; b=CKxSozBMHxGXli/FyMVT8rV+85N5vs8vJ4F7fGSl0mUgPJYiYsYAYSCr2VbV29YURQV+QK5QvnbwGW8iURoRIrOIwAjVyW1HYosogH0tc8A6TfIkya8wRRPbyH1y4r1rerhkkGYV5Ggx1QEJ4hmX3hI2kzhkrrL8p35YOgkX4gM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743504746; c=relaxed/simple;
-	bh=eWza1Uj4fmHQlvuDleTNnRT9cX4gAE4qYkdYLL8RKLU=;
-	h=Message-ID:Subject:From:To:Date:Content-Type:MIME-Version; b=axmq8qysaoL6q5q35Jmls46tNOmZTIYzWY35jRKcltMblbNOKJqTIhHn0Xbduv+8A/MQj7NCKkmxWcv4XRKOvMRI3m+WsImCmS/TcZGmrAe2wF4O0GI518nz98YidxxIKKqZ8NedJjO01HpkL3KlcwqsHza7pigtbIqkRgvpGOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hazent.com; spf=pass smtp.mailfrom=hazent.com; dkim=pass (2048-bit key) header.d=hazent-com.20230601.gappssmtp.com header.i=@hazent-com.20230601.gappssmtp.com header.b=TyHMHuWW; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hazent.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hazent.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-39c1efc457bso838761f8f.2
-        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 03:52:23 -0700 (PDT)
+	s=arc-20240116; t=1743505254; c=relaxed/simple;
+	bh=bTiJ78JbeOMDcZQX/uIbIFXh2P+1V9ywUirG6sG5vR8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R4UOX/hpdZ7CzR/OqBx0SjkNmDKx0de1NNdoBvs+IM5yLdVJMtafQqy4tl3YxrMFNcX7wkSDf/FQj+jpahUBFTN9xWIlHLHlR72ezlPYDmowKKq9BwiXm3bumd1amuFRC6vGgRq1pEmJ7A7b0zeNWpFKDnsUxAzQkP1mcbFNQnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bXCrPygz; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6eaf1b6ce9aso55870626d6.2;
+        Tue, 01 Apr 2025 04:00:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=hazent-com.20230601.gappssmtp.com; s=20230601; t=1743504737; x=1744109537; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:date:to:from
-         :subject:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=E+Ss3FG8YVMs1Z9lPo5iO4P1N5xfxEuAvsPaF7B5nyI=;
-        b=TyHMHuWWZ4JIl56xcYLTIpTV6tZf1/w8BkacuO+qecQdHiVG2XkbE1zbtKISHFoFWN
-         NllFPaDWhGcmcP9S/VGU5rGGVvrhLzZXoZMYeyyAO6uKE9qf463KZE1QNQ3JIwkogrzZ
-         9IBxSEGdlsa4F5rpUw1ACyNnHhUI/xbggOW2CTygfYxr2mssWLKJ5auavPQ7vokQgJPd
-         1V1KKkfJpQRa3pl/rdu+TRn26wbPB3R04jFk7M7LMaWgBW0khOpFTQpKU78Tl1NxOlJI
-         skeIoIexFJydOII4N6ctK1QX9GoyWRVwtHUi1lBHY0QjRBwKXGHA6bRYq1ylKb7bu1Tq
-         CwPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743504737; x=1744109537;
-        h=mime-version:user-agent:content-transfer-encoding:date:to:from
-         :subject:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1743505250; x=1744110050; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=E+Ss3FG8YVMs1Z9lPo5iO4P1N5xfxEuAvsPaF7B5nyI=;
-        b=B/qMhi9CakdHTWjATKxYc8G70sNT4mMOU/9AON1niESb6alpGgE50XvM7TCCjlWnwk
-         HOKNex8038Q1G3xUJ/cUzZqvAIq26bdfv5AWgICM8sDwqzNcOsd18P2onJaaklizVFf0
-         pTWLP6VqQ4AsVTzSvb/qcrIM/u7fYScANFjIsz9LnNBVeclAvJFQq6MoZnVSs1cNeKtR
-         ktqwzP7WyWflAoUDMPWxyUxxXdDPxS7HsP/ALZNwO1vietKzEZkfr0+wqBUXwUDV4wgV
-         IEsQ6UzHjrQIUIS82cEHyEQvVD9mXFBRZ5PKcxpXI4JRYRJhPSRHEJ4l257m06sdE5SL
-         i57A==
-X-Gm-Message-State: AOJu0YyQCnU9ZP1ZJKLB4BXYXnnjvP2tWuL0a4mFxtzDOemlp9mD9JtJ
-	nKap1syYdHxQivn0tgE1/G29mbIuWcE8cLutHzBphfXSqvf7IbppzSJWSQy8+gej5GOdWkuuDjr
-	L2Q==
-X-Gm-Gg: ASbGncvPzF0WlreWpTO2JMhexNPvS2mw3yT616y8Lc7OYjsAJzu7glpnv42b0r0giDO
-	OOv61flTJ4bGlXeEK+bt7qRnViTAgXxHvcBEsgDzjfYGmyvl4iKPy3Rte6QtRsQck60lFMax7ef
-	qj2lG4uBfH9YFUUTEnZTo+Qhg353X6Q15PERsb2Q7aBPSyvOR2AMckPZIExWGhwNB2UNG1FMNmX
-	1U9NtaKIN4MJJDhX9DAZUzmyvndgwp+xW3WIw8g5u8ym03t5N3S1sWyWmpF3onhUbLue0DXjL9Y
-	oS5+vtSynZHCKldMu7b8BynNH3+WujZGaif4DzU/iLQqNPCwh65z
-X-Google-Smtp-Source: AGHT+IG7CU/J/S+PYYOLiPGauYV1N5WI7DSjfcFzPgJvOez3WoxLMz9+fSqU24v8pAoZXstzFvtTXg==
-X-Received: by 2002:a05:6000:4405:b0:39a:d336:16 with SMTP id ffacd0b85a97d-39c121188d3mr7433253f8f.34.1743504736642;
-        Tue, 01 Apr 2025 03:52:16 -0700 (PDT)
-Received: from [192.168.2.3] ([109.227.147.74])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d8fccfd9bsm153189815e9.20.2025.04.01.03.52.16
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 03:52:16 -0700 (PDT)
-Message-ID: <9a6e59fcc08cb1ada36aa01de6987ad9f6aaeaa4.camel@hazent.com>
-Subject: Issue with AMD Xilinx AXI Ethernet (xilinx_axienet) on MicroBlaze:
- Packets only received after some buffer is full
-From: =?ISO-8859-1?Q?=C1lvaro?= "G. M." <alvaro.gamez@hazent.com>
-To: netdev@vger.kernel.org
-Date: Tue, 01 Apr 2025 12:52:15 +0200
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.0-1 
+        bh=5Y1SHtLZ5xBQTVg2DqgLWxnEjq7LoaCecytPGBCq3l0=;
+        b=bXCrPygzeW3jAtve1WRIt1uUp42X0PQzBl1+bMH30dz2qZeUKTrgoR1k7OODtU2moN
+         n3I9eyqfxgrtKW7fOjJcb3txxFMHTpiC4vjn+kH3jIW+vDxz7M+iym5QqVduKlA4/1Ue
+         2H/T2JsLSmw70z0qbUFmbxw/rlyEgLxUDlwQMYAEc38yCAjdUfEi6BmUdhw97uyEXTf8
+         Tn46DkCiyrr+KwijRYEe6h4mWob2HPEjBJKlDnGbWqGmKdlkGYIVP/p2x9dVTWdHxnM7
+         jXC69W8gPGsWJJGTbnhfMVtQEfFJwTBVBIZLXXFBDobaP0h/qYb36Z+ok+gZHckHLor4
+         Aa0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743505250; x=1744110050;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5Y1SHtLZ5xBQTVg2DqgLWxnEjq7LoaCecytPGBCq3l0=;
+        b=ffV6lP4xOMOdpm+CyW2G4yzU0iv9ZkRUldPM1mBPuHQaicJHxwfnTg0J2Qa2Fn/m4J
+         rxVEOUAKwXYN1XjAqN/M8oh4r0DmYR0UUmUd1O1giQXac6+rgwn7pvpc6YKhQSoyYQ24
+         6tYVt9i0v4Y1GNxOF4NfRQRDIlZ7SQghKZyVECtZXMP+MX5dcBXiUpV9033waorSeqm/
+         Ovkc3fvUZkVAbn98mnWITcAoYM/+ZiMPFUZdpUIYI57PWo8tipOKuokLxSui+up764wL
+         1EBwxve1dROzRX8zcmUEHzVbdjktswBvO9488gkufu1WGO5hFvqSY8OY0DZ87PBh2KM3
+         /Yhw==
+X-Forwarded-Encrypted: i=1; AJvYcCVY2qvXzyXrZ7JpOgG1Yfe33f6lSqwfBhD4GS7QNFFSyPgz2j7s29nVNLxCVQfFnLuMIJQq820B@vger.kernel.org, AJvYcCWZ1sKjfs2Edpt6Ljoj6Xr4rRcAOeluTy2tebbW8SI3qNH6mtKaJUy2ABW8cBkh3mp6w8Y=@vger.kernel.org, AJvYcCX/yaFDq/VdNkhWObkWlGOxFn+X8+onuMxbyPsaerbwhIuJ5Ta5WbixQlv1OMhCTvC7ZXfsMG4I7gUmU8pn@vger.kernel.org
+X-Gm-Message-State: AOJu0Yymx66NfXeV33FJwpRwDBBjklDzOFx9Wq30YXVd8nmm0epfSBU/
+	hkafUBa6HhCJo0TYgGW1V/hi67J4/4DOk7bBOxRktY88a2HoYmG9FomcfAyYeT8Av7oONYtG8DM
+	PW0G3GJ1DyDySuKvUkPNnnWiqZo0=
+X-Gm-Gg: ASbGncuJW+g1g05JU3HilqvQB5XyeAK7to2x8BWGDmC4b8td9/WFh3FnBMFHoUuZ0Sn
+	9z1DoM0S+FRlQniKuZvWI8lExR652DUa3yKj0bEQfxGaHwKa2SyneWQBHmnPGtXRs+G7PMbCjXc
+	VbtDVVFASqDpDjFszwbIvAprWbqCPmtKI10ltHCfs=
+X-Google-Smtp-Source: AGHT+IErYsKUVjZ/6d91309ojFYwNUdo/Z1MGFCRD5nS6Spzau8We9OZbO/XqDE8PoRtMorgFNEPvsqz4DDo1JhGcz0=
+X-Received: by 2002:ad4:5c62:0:b0:6e8:96f4:733 with SMTP id
+ 6a1803df08f44-6eed5f8913cmr238815656d6.8.1743505250404; Tue, 01 Apr 2025
+ 04:00:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250329061548.1357925-1-wangliang74@huawei.com>
+ <Z-qzLyGKskaqgFh5@mini-arch> <Z-sRF0G43HpGiGwH@mini-arch> <0d1b689c-c0ef-460a-9969-ff5aebbb8fac@huawei.com>
+ <CAJ8uoz1JxhXFkzW8n_Dud8SR-4zE7gim5vS_UZHELiA7d0k+wQ@mail.gmail.com>
+ <ed10eea2-0bf2-4747-b519-f9b9089e434e@huawei.com> <CAJ8uoz2QXNN4so-EgR8sU8A86E_AeYx1w_b+BSVeCgzr1kaR+g@mail.gmail.com>
+ <ffc84696-f9c6-4869-9f1e-7faf45d99060@huawei.com>
+In-Reply-To: <ffc84696-f9c6-4869-9f1e-7faf45d99060@huawei.com>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Tue, 1 Apr 2025 13:00:39 +0200
+X-Gm-Features: AQ5f1JofBG8n90XzSIs_Hwdmznp7MT2d6l4fbpyGTawGS0bPjc0azhU2h0HqNmA
+Message-ID: <CAJ8uoz127WoEFbm1Gg7OquYJCLigg03N1XrKDcXejsUmVuQ3PA@mail.gmail.com>
+Subject: Re: [PATCH net] xsk: correct tx_ring_empty_descs count statistics
+To: Wang Liang <wangliang74@huawei.com>
+Cc: Stanislav Fomichev <stfomichev@gmail.com>, bjorn@kernel.org, magnus.karlsson@intel.com, 
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, yuehaibing@huawei.com, zhangchangzhong@huawei.com, 
+	netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Tue, 1 Apr 2025 at 11:33, Wang Liang <wangliang74@huawei.com> wrote:
+>
+>
+> =E5=9C=A8 2025/4/1 16:12, Magnus Karlsson =E5=86=99=E9=81=93:
+> > On Tue, 1 Apr 2025 at 09:44, Wang Liang <wangliang74@huawei.com> wrote:
+> >>
+> >> =E5=9C=A8 2025/4/1 14:57, Magnus Karlsson =E5=86=99=E9=81=93:
+> >>> On Tue, 1 Apr 2025 at 04:36, Wang Liang <wangliang74@huawei.com> wrot=
+e:
+> >>>> =E5=9C=A8 2025/4/1 6:03, Stanislav Fomichev =E5=86=99=E9=81=93:
+> >>>>> On 03/31, Stanislav Fomichev wrote:
+> >>>>>> On 03/29, Wang Liang wrote:
+> >>>>>>> The tx_ring_empty_descs count may be incorrect, when set the XDP_=
+TX_RING
+> >>>>>>> option but do not reserve tx ring. Because xsk_poll() try to wake=
+up the
+> >>>>>>> driver by calling xsk_generic_xmit() for non-zero-copy mode. So t=
+he
+> >>>>>>> tx_ring_empty_descs count increases once the xsk_poll()is called:
+> >>>>>>>
+> >>>>>>>      xsk_poll
+> >>>>>>>        xsk_generic_xmit
+> >>>>>>>          __xsk_generic_xmit
+> >>>>>>>            xskq_cons_peek_desc
+> >>>>>>>              xskq_cons_read_desc
+> >>>>>>>                q->queue_empty_descs++;
+> >>> Sorry, but I do not understand how to reproduce this error. So you
+> >>> first issue a setsockopt with the XDP_TX_RING option and then you do
+> >>> not "reserve tx ring". What does that last "not reserve tx ring" mean=
+?
+> >>> No mmap() of that ring, or something else? I guess you have bound the
+> >>> socket with a bind()? Some pseudo code on how to reproduce this would
+> >>> be helpful. Just want to understand so I can help. Thank you.
+> >> Sorry, the last email is garbled, and send again.
+> >>
+> >> Ok. Some pseudo code like below:
+> >>
+> >>       fd =3D socket(AF_XDP, SOCK_RAW, 0);
+> >>       setsockopt(fd, SOL_XDP, XDP_UMEM_REG, &mr, sizeof(mr));
+> >>
+> >>       setsockopt(fd, SOL_XDP, XDP_UMEM_FILL_RING, &fill_size,
+> >> sizeof(fill_size));
+> >>       setsockopt(fd, SOL_XDP, XDP_UMEM_COMPLETION_RING, &comp_size,
+> >> sizeof(comp_size));
+> >>       mmap(NULL, off.fr.desc + fill_size * sizeof(__u64), ...,
+> >> XDP_UMEM_PGOFF_FILL_RING);
+> >>       mmap(NULL, off.cr.desc + comp_size * sizeof(__u64), ...,
+> >> XDP_UMEM_PGOFF_COMPLETION_RING);
+> >>
+> >>       setsockopt(fd, SOL_XDP, XDP_RX_RING, &rx_size, sizeof(rx_size));
+> >>       setsockopt(fd, SOL_XDP, XDP_TX_RING, &tx_size, sizeof(tx_size));
+> >>       mmap(NULL, off.rx.desc + rx_size * sizeof(struct xdp_desc), ...,
+> >> XDP_PGOFF_RX_RING);
+> >>       mmap(NULL, off.tx.desc + tx_size * sizeof(struct xdp_desc), ...,
+> >> XDP_PGOFF_TX_RING);
+> >>
+> >>       bind(fd, (struct sockaddr *)&sxdp, sizeof(sxdp));
+> >>       bpf_map_update_elem(xsk_map_fd, &queue_id, &fd, 0);
+> >>
+> >>       while(!global_exit) {
+> >>           poll(fds, 1, -1);
+> >>           handle_receive_packets(...);
+> >>       }
+> >>
+> >> The xsk is created success, and xs->tx is initialized.
+> >>
+> >> The "not reserve tx ring" means user app do not update tx ring produce=
+r.
+> >> Like:
+> >>
+> >>       xsk_ring_prod__reserve(tx, 1, &tx_idx);
+> >>       xsk_ring_prod__tx_desc(tx, tx_idx)->addr =3D frame;
+> >>       xsk_ring_prod__tx_desc(tx, tx_idx)->len =3D pkg_length;
+> >>       xsk_ring_prod__submit(tx, 1);
+> >>
+> >> These functions (xsk_ring_prod__reserve, etc.) is provided by libxdp.
+> >>
+> >> The tx->producer is not updated, so the xs->tx->cached_cons and
+> >> xs->tx->cached_prod are always zero.
+> >>
+> >> When receive packets and user app call poll(), xsk_generic_xmit() will=
+ be
+> >> triggered by xsk_poll(), leading to this issue.
+> > Thanks, that really helped. The problem here is that the kernel cannot
+> > guess your intent. Since you created a socket with both Rx and Tx, it
+> > thinks you will use it for both, so it should increase
+> > queue_empty_descs in this case as you did not provide any Tx descs.
+> > Your proposed patch will break this. Consider this Tx case with the
+> > exact same init code as you have above but with this send loop:
+> >
+> > while(!global_exit) {
+> >         maybe_send_packets(...);
+> >         poll(fds, 1, -1);
+> > }
+> >
+> > With your patch, the queue_empty_descs will never be increased in the
+> > case when I do not submit any Tx descs, even though we would like it
+> > to be so.
+> >
+> > So in my mind, you have a couple of options:
+> >
+> > * Create two sockets, one rx only and one tx only and use the
+> > SHARED_UMEM mode to bind them to the same netdev and queue id. In your
+> > loop above, you would use the Rx socket. This might have the drawback
+> > that you need to call poll() twice if you are both sending and
+> > receiving in the same loop. But the stats will be the way you want
+> > them to be.
+> >
+> > * Introduce a new variable in user space that you increase every time
+> > you do poll() in your loop above. When displaying the statistics, just
+> > deduct this variable from the queue_empty_descs that the kernel
+> > reports using the XDP_STATISTICS getsockopt().
+> >
+> > Hope this helps.
+>
+>
+> Thank you for the advices.
+>
+>  From user view, queue_empty_descs increases when the app only receive
+> packets and call poll(), it is some confusing.
 
-I have a custom PCB board fitting a AMD/Xilinx Artix 7 FPGA with a Microbla=
-ze design
-inside that uses Xilinx' AXI 1G/2.5G Ethernet Subsystem connected via DMA.
+But if the only thing you are doing in the app is receive packets, you
+should create an Rx only socket.
 
-This board and HDL design have been tested and in production since 2016 usi=
-ng
-kernel 4.4.43 without any issue. The hardware part of the ethernet is DP836=
-20
-running in 100base-FX mode, which back in the day required a small patch to
-dp83848.c from myself that has been in the kernel since.
+> In your Tx case, if user app use sendto() to send packets, the
+> queue_empty_descs will increase. This is reasonably.
+>
+> In linux manual, poll() waits for some event on a file descriptor. But
+> in af_xdp, poll() has a side effect of send msg.
 
-I am now trying to upgrade to a recent kernel (v6.13) and I'm facing some s=
-trange
-behavior of the ethernet system. The most probable cause is a misconfigurat=
-ion
-on my part of the device tree, since things have changed since then and I'v=
-e found
-the device tree documentation confusing, but I can't discard some kind of b=
-ug,
-for I have never seem something similar to this.
+If I remember correctly, we did this so that zero-copy mode and copy
+mode should have the same behavior from an app point of view. But I do
+not remember why we implemented this behavior in zero-copy in the
+first place. Maybe out of necessity since zero-copy Tx is driven by
+the driver.
 
-Relevant boot messages:
+> Previous commit 77cd0d7b3f25 ("xsk: add support for need_wakeup flag in
+> AF_XDP rings") add need_wakeup flag. It mainly work in rx process. When
+> the application and driver run on the same core, if the fill ring is
+> empty, the driver can set the need_wakeup flag and return, so the
+> application could be scheduled to produce entries of the fill ring.
+>
+> The commit df551058f7a3 ("xsk: Fix crash in poll when device does not
+> support ndo_xsk_wakeup") add sendmsg function in xsk_poll(), considering
+> some devices donot define ndo_xsk_wakeup.
+>
+> At present the value of need_wakeup & XDP_WAKEUP_TX is always true,
+> except the mlx5 driver. If the mlx5 driver queued some packets for tx,
+> it may clear XDP_WAKEUP_TX by xsk_clear_tx_need_wakeup(). So when user
+> app use sendto() to send packets, __xsk_sendmsg() will return without
+> calling xsk_generic_xmit().
 
-xilinx_axienet 40c00000.ethernet eth0: PHY [axienet-40c00000:01] driver [TI=
- DP83620 10/100 Mbps PHY] (irq=3DPOLL)
-xilinx_axienet 40c00000.ethernet eth0: configuring for phy/mii link mode
-xilinx_axienet 40c00000.ethernet eth0: Link is Up - 100Mbps/Half - flow con=
-trol off
+Mellanox is doing it in the correct way. The Intel drivers had it like
+this too in the beginning, until we discovered a race condition in the
+HW in which the interrupt was not armed at the same time as the
+need_wakeup flag was cleared. This would then lead to packets not
+being sent and user-space not knowing about it. As to why all other
+drivers copied this unfortunate fall-back, I do not know.
 
-Now, transmission from the Microblaze seems to work fine, but reception how=
-ever does not.
-I run tcpdump on the Microblaze and I can see that there's some kind of buf=
-fering occuring,
-as a single ARP packet sent from my directly connected computer won't reach=
- tcpdump unless
-I send also a big chunk of data via, for example, multicast, or after enoug=
-h time of ping flooding.
+> So I have a bold suggestion, how about removing xsk_generic_xmit() in
+> xsk_poll()?
 
-It's not however a matter of sending a big chunk of data at the beginning, =
-it seems like the
-buffer empties once full and the process starts back again, so a single pin=
-g packet won't be
-received after the buffer has emptied.
+That would indeed be bold :-)! But we cannot do this since it would
+break existing applications that rely on this. I think you have to use
+one of the workarounds I pitched in the previous mail. If you are
+really just receiving, you should create an Rx only socket.
 
-I can see that interrupts increase, but not as fast as they occur when usin=
-g old kernel.
-For example, in the ping case, kernel 4.43 will notify that there was an in=
-terrupt
-for each single ping packet received with ping -c 1 (so no coalescing shena=
-nigans can occur),
-but the new kernel won't show any increase in the number of interrupts, so =
-it means
-that the DMA core is either not generating the irq for some reason or isn't=
- even
-executing the DMA transfer at all.
-
-Output packets, however, do seem to be sent expeditely and received in my w=
-orking computer
-as soon as I sent them from the Microblaze.
-
-I guess I may have made some mistake in upgrading the DTS to the new format=
-, although
-I've tried the two available methods (either setting node "dmas" or using "=
-axistream-connected"
-property) and both methods result in the same boot messages and behavior.
-
-By crafting properly sized UDP multicast packets (so I don't have to rely o=
-n ARP which isn't
-working due to timeouts), I've been able to determine I need to send 131072=
- bytes before
-reception can truly occur, although it somehow seems like sending multicast=
- UDP
-packets won't trigger receiving IRQ unless I have a specific UDP listener p=
-rogram running on
-the Microblaze. I'm quite confused about that too.
-
-So please, if anyone could inspect the DTS for me and/or guide me on how to=
- debug this, I'd be grateful.
-
-These are the relevant parts of the DTS for kernel 6.13, which I've hand cr=
-afted with help
-from Documentation/devicetree/bindings and peeking at xilinx_axienet_main.c=
-:
-
-
-axi_ethernet_0_dma: dma@41e00000 {
-	compatible =3D "xlnx,axi-dma-1.00.a";
-	#dma-cells =3D <1>;
-	reg =3D <0x41e00000 0x10000>;
-	interrupt-parent =3D <&microblaze_0_axi_intc>;
-	interrupts =3D <7 1 8 1>;
-	xlnx,addrwidth =3D <32>;
-	xlnx,datawidth =3D <32>;
-	xlnx,include-sg;
-	xlnx,sg-length-width =3D <16>;
-	xlnx,include-dre =3D <1>;
-	xlnx,axistream-connected =3D <1>;
-	xlnx,irq-delay =3D <1>;
-	dma-channels =3D <2>;
-	clock-names =3D "s_axi_lite_aclk", "m_axi_mm2s_aclk", "m_axi_s2mm_aclk", "=
-m_axi_sg_aclk";
-	clocks =3D <&clk_bus_0>, <&clk_bus_0>, <&clk_bus_0>, <&clk_bus_0>;
-	dma-channel@41e00000 {
-		compatible =3D "xlnx,axi-dma-mm2s-channel";
-		xlnx,include-dre =3D <1>;
-		interrupts =3D <7 1>;
-		xlnx,datawidth =3D <32>;
-	};
-	dma-channel@41e00030 {
-		compatible =3D "xlnx,axi-dma-s2mm-channel";
-		xlnx,include-dre =3D <1>;
-		interrupts =3D <8 1>;
-		xlnx,datawidth =3D <32>;
-	};
-};
-axi_ethernet_eth: ethernet@40c00000 {
-	compatible =3D "xlnx,axi-ethernet-1.00.a";
-	reg =3D <0x40c00000 0x40000>, <0x41e00000 0x10000>;
-	phy-handle =3D <&phy1>;
-	xlnx,rxmem =3D <0x1000>;
-	phy-mode =3D "mii";
-	xlnx,txcsum =3D <0x2>;
-	xlnx,rxcsum =3D <0x2>;
-	clock-names =3D "s_axi_lite_clk", "axis_clk", "ref_clk", "mgt_clk";
-	clocks =3D <&clk_bus_0>, <&clk_bus_0>, <&clk_bus_0>, <&clk_bus_0>;
-/*	axistream-connected =3D <&axi_ethernet_0_dma>; */
-	dmas =3D <&axi_ethernet_0_dma 0>, <&axi_ethernet_0_dma 1>;
-	dma-names =3D "tx_chan0", "rx_chan0";
-	mdio {
-		#address-cells =3D <1>;
-		#size-cells =3D <0>;
-		phy1: ethernet-phy@1 {
-			device_type =3D "ethernet-phy";
-			reg =3D <1>;
-		};
-	};
-};
-
-
-And these are same parts of the DTS for kernel 4.43 which worked fine.
-These were created with help from Xilinx tools.
-
-axi_ethernet_0_dma: dma@41e00000 {
-	#dma-cells =3D <1>;
-	compatible =3D "xlnx,axi-dma-1.00.a";
-	interrupt-parent =3D <&microblaze_0_axi_intc>;
-	interrupts =3D <7 1 8 1>;
-	reg =3D <0x41e00000 0x10000>;
-	xlnx,include-sg ;
-	dma-channel@41e00000 {
-		compatible =3D "xlnx,axi-dma-mm2s-channel";
-		dma-channels =3D <0x1>;
-		interrupts =3D <7 1>;
-		xlnx,datawidth =3D <0x8>;
-		xlnx,device-id =3D <0x0>;
-	};
-	dma-channel@41e00030 {
-		compatible =3D "xlnx,axi-dma-s2mm-channel";
-		dma-channels =3D <0x1>;
-		interrupts =3D <8 1>;
-		xlnx,datawidth =3D <0x8>;
-		xlnx,device-id =3D <0x0>;
-	};
-};
-axi_ethernet_eth: ethernet@40c00000 {
-	axistream-connected =3D <&axi_ethernet_0_dma>;
-	axistream-control-connected =3D <&axi_ethernet_0_dma>;
-	clock-frequency =3D <83250000>;
-	clocks =3D <&clk_bus_0>;
-	compatible =3D "xlnx,axi-ethernet-1.00.a";
-	device_type =3D "network";
-	interrupt-parent =3D <&microblaze_0_axi_intc>;
-	interrupts =3D <3 0>;
-	phy-mode =3D "mii";
-	reg =3D <0x40c00000 0x40000>;
-	xlnx =3D <0x0>;
-	xlnx,axiliteclkrate =3D <0x0>;
-	xlnx,axisclkrate =3D <0x0>;
-	xlnx,gt-type =3D <0x0>;
-	xlnx,gtinex =3D <0x0>;
-	xlnx,phy-type =3D <0x0>;
-	xlnx,phyaddr =3D <0x1>;
-	xlnx,rable =3D <0x0>;
-	xlnx,rxcsum =3D <0x2>;
-	xlnx,rxlane0-placement =3D <0x0>;
-	xlnx,rxlane1-placement =3D <0x0>;
-	xlnx,rxmem =3D <0x1000>;
-	xlnx,rxnibblebitslice0used =3D <0x1>;
-	xlnx,tx-in-upper-nibble =3D <0x1>;
-	xlnx,txcsum =3D <0x2>;
-	xlnx,txlane0-placement =3D <0x0>;
-	xlnx,txlane1-placement =3D <0x0>;
-	phy-handle =3D <&phy0>;
-	axi_ethernetlite_0_mdio: mdio {
-		#address-cells =3D <1>;
-		#size-cells =3D <0>;
-		phy0: phy@1 {
-			device_type =3D "ethernet-phy";
-			reg =3D <1>;
-			ti,rx-internal-delay =3D <7>;
-			ti,tx-internal-delay =3D <7>;
-			ti,fifo-depth =3D <1>;
-		};
-	};
-};
-
-
-
-Best regards,
-
---=20
-=C3=81lvaro G. M.
+> >>>>>>> To avoid this count error, add check for tx descs before send msg=
+ in poll.
+> >>>>>>>
+> >>>>>>> Fixes: df551058f7a3 ("xsk: Fix crash in poll when device does not=
+ support ndo_xsk_wakeup")
+> >>>>>>> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+> >>>>>> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+> >>>>> Hmm, wait, I stumbled upon xskq_has_descs again and it looks only a=
+t
+> >>>>> cached prod/cons. How is it supposed to work when the actual tx
+> >>>>> descriptor is posted? Is there anything besides xskq_cons_peek_desc=
+ from
+> >>>>> __xsk_generic_xmit that refreshes cached_prod?
+> >>>> Yes, you are right!
+> >>>>
+> >>>> How about using xskq_cons_nb_entries() to check free descriptors?
+> >>>>
+> >>>> Like this:
+> >>>>
+> >>>>
+> >>>> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> >>>> index e5d104ce7b82..babb7928d335 100644
+> >>>> --- a/net/xdp/xsk.c
+> >>>> +++ b/net/xdp/xsk.c
+> >>>> @@ -993,7 +993,7 @@ static __poll_t xsk_poll(struct file *file, stru=
+ct
+> >>>> socket *sock,
+> >>>>            if (pool->cached_need_wakeup) {
+> >>>>                    if (xs->zc)
+> >>>>                            xsk_wakeup(xs, pool->cached_need_wakeup);
+> >>>> -               else if (xs->tx)
+> >>>> +               else if (xs->tx && xskq_cons_nb_entries(xs->tx, 1))
+> >>>>                            /* Poll needs to drive Tx also in copy mo=
+de */
+> >>>>                            xsk_generic_xmit(sk);
+> >>>>            }
+> >>>>
+> >>>>
 
