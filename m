@@ -1,342 +1,246 @@
-Return-Path: <netdev+bounces-178632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94BE1A77EE9
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 17:29:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1642A77F0B
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 17:36:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0757216BBDA
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 15:28:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2FBF3A6605
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 15:35:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9950820B7E8;
-	Tue,  1 Apr 2025 15:28:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PRdqBRaf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0EE320AF9B;
+	Tue,  1 Apr 2025 15:36:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC30B20B1F6;
-	Tue,  1 Apr 2025 15:28:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857491E6DC5;
+	Tue,  1 Apr 2025 15:35:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743521314; cv=none; b=lp4Hm31JKxyLIgybA3Bg/FQV9yHN9u6pgh8CeKMEk81jiXuk5ZeW2hdvTGI4dPzqAyjgMMkxmS6nuYhByYe1DJ+Uco4t0pI8K9mg4Ithw+tl+Uq7n1SD5UdW4C+GlUYGeTbw2jzc007zc1RaZGc2PtOb052uoVjRHR2Kf7oBhTE=
+	t=1743521761; cv=none; b=rMdOdmQipi6+zVEdvCYCP8L3frHUY/dhbYqfUzPwxrJ66pzbVCEaPDAgU4wSk+k16dRNBICSL7xCrxsewzUzhdfd8fVt0oS94Da1vXC1n18uvR5TBY9shXQsmw234mQU+qMWIarJN124oUnpPQADsms8rITW6wQCVMUf/TbYDB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743521314; c=relaxed/simple;
-	bh=T4m/nE01qegpsGCiEFUIyekp61gi9JebQvkw81pCVdU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Hh/hbPavVbZEwNxwl8cTlUSceqY3D8UX28tjUk8kT1Nn1h9fPIp5MdVeLiNsU1Xm9BcABIL2DSx/h0DLsSQ6188uIHp4yylKPzv7XKrzjCR6AHFMztPA53nmH4qUBYEYdGnstVTGT2+xx0f/zpjQDFuz4J95zs7EVSbM7UtaNlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PRdqBRaf; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1743521761; c=relaxed/simple;
+	bh=pJCOvKSCNP3r+h21HV73SeQ/4Pz+Jso9BZLFQjDEpRM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KNCBCnOpPc14O6vLlWsOgbb0w7kz99bd98PQNMRiaxwUd+GQrdu0d1itKcJiUobZumU4AvlEgk6RCnfk/vOm1clpsUZxlYtiWfwqW3zk7G92c00GAQnq89yO2g44mCxhaLnfJu7DKi4OhNkH1adz+7ZY1NO9lrnbc6tC7lWXmno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-22403cbb47fso119044645ad.0;
-        Tue, 01 Apr 2025 08:28:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743521312; x=1744126112; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=QWoRQ0u8OSafzgnHjL0rkdECIXv/ii6wOIMSgWZzu/A=;
-        b=PRdqBRafpJLvRzyafs9IKU+VS/aVBajIMF2TvJL8JaAMEvz1ab0FJpuQOG6my3JVdb
-         UJ5BYfVg5NOSyEqYbpxQz0WmlsnFas4cWvLgYHbzCxnBBWRAgALBJk8wo3eJIpZQYzgF
-         +RDY9CGXCgJ5tQV8DDtlW62xms+Lg1bGSzHFbNf+KGmzBRvkfu9LfjO6O4b52BDEH7xT
-         K4kcEiIau+Gn1CCpdyjEyUbCuYqdvrvqgKJWXI/LBH7SMu3gOPXHEkb2MV4xTNQb+BQp
-         ffOa2xKd0wMLyx5cfzvw+JrxsBhfOQgKKgrPnzOwfA0b/d4vDu11Ju6QUqbb9JgdnT2E
-         QIrg==
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5e5e8274a74so9181228a12.1;
+        Tue, 01 Apr 2025 08:35:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743521312; x=1744126112;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QWoRQ0u8OSafzgnHjL0rkdECIXv/ii6wOIMSgWZzu/A=;
-        b=Lx+D28VkcqAad0DkG11PaH8s6/iQffAcWKNJC0oHNEn3BVd6r20N3wkxP8ECEXP/JX
-         G60os9SGHJnGOOSzZ2zNZd9EoCcs6fuTrko0pz9ItrS4tUFGyiaGf7kZFK2pzTolKEgo
-         Vw6lFpmEmpPuzR4i0W382gyQ18wfLD/t3foLCIsQha9tF/qaHU6ueBerhdznbdhX9V80
-         b7C9dvYrOt/MRjxcYIC0udtRVpwrKNyUcZiJLmA6gj2byqLrt74mDlLgawtVV+nF66hn
-         3bwyGqv3rhDgQAkACd3Bp5ss1HtEb0ZoZV+4/ZpX9M5Nk6LN9UJUjDBd45yXnxO0rumL
-         bL6A==
-X-Forwarded-Encrypted: i=1; AJvYcCV/u55dpKP0W4NwBfI4eYxI6gTmq01RgTtCngEbtKZvW2X52bnGwZ5Qr7xebUSDyc9/yESDb+sH@vger.kernel.org, AJvYcCVLCErhhJIx4J1CgonuK3y515+oxGVTmWakHba5R7siUoio7dXa6RuINHV1/MMtOiaAKLIHK5kZ9/CYcro=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyyaDam9koRuotUGD4WlQgf8+ACdpYTQkjXFkLgcrAck2ieDvRl
-	AWJU4bWHlfaoOPRpLTEKdDgeeNuOA6UU26K+PNiZuGJXZHiZaQT4hK2SUw==
-X-Gm-Gg: ASbGncvUXOlWsM8leolAnTthtdFkPAeFSyU35PxjfQzmaygK7hi2kU3RWfjM983IpaU
-	6g3JA9y5mSy87BVkKWpoQiVl8HdzLK1/vxwh3UMIZGelTx+/v/jqrhyqa2vcPiJ4TC/hkgRPEGw
-	xo9J+BSQuwAzbHIzM2bWOWd7ZCx08yGGPeQ0jH8Y5chWessgzy7cJvs3ZJEppF9fGnVijMcYwE5
-	I2Rh71Y9uNUQWGnN4bF6q18iZgXgiOWlTwEl36gDXKiBpo36VslPuMH4wnbACjfMHCvJ/wweqni
-	PZ0haT0Y0omSQni9EphfOaSYUnLipGhQQ92MOf0V5iw/AE92E0MP5iqUbg6LNb6sxq4X5ZG2e1c
-	AsxM0DgPY5PW3FdqOocB8KQsj
-X-Google-Smtp-Source: AGHT+IEoyq6eWRZ10eRzbU6lc1mU8jyJ+JmDPIL8wHVPlaY78fQ2mYq34IsqtsHOAz3s29OhpbqapQ==
-X-Received: by 2002:a17:902:f549:b0:224:a74:28cd with SMTP id d9443c01a7336-2292f9767camr203073785ad.31.1743521311689;
-        Tue, 01 Apr 2025 08:28:31 -0700 (PDT)
-Received: from ?IPv6:2605:59c8:829:4c00:82ee:73ff:fe41:9a02? ([2605:59c8:829:4c00:82ee:73ff:fe41:9a02])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-2291f1f7cc2sm89178845ad.258.2025.04.01.08.28.30
+        d=1e100.net; s=20230601; t=1743521756; x=1744126556;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4q7PyMxC5xqAGPRw+fer430fLSzbIyCkfxfyp4wlUFw=;
+        b=P31o/Djw3E53g+SVwSwvnbYcIxjYDVl9V7xtT1U02+n4pJ4rAAKQw7A499goelXsVj
+         q9JUBgVmObhjnWHiwseH2e8grhCLV2L7ULPu4I2sCfElizuAR0GYX11F0MwQm2dNQ0TA
+         Fv6qF0W13Npe9AYn04y33CBMc6FaCB3diWCfxveZU5ftFCrepS2JO+Ae/J4nfHO/4p8V
+         CC/5JMpqjolbhCLezAjpqwyMVSNWNQ4x5H9RozRpEg2kLgCzItTXVhRwOCGDOrXUa9uJ
+         FmPDwNls+A5pFLCzDWnwB0NalZyoU2d+r5mHTuE3CiXrBjfT/2VE5VaJgNooMJYw+P7n
+         tPAg==
+X-Forwarded-Encrypted: i=1; AJvYcCU59vcXWby0a82uLH/0ps9BN4d24YnOakZtWlQnbn7n8UylXpcLzgIZ0QiVUPvVai6u+zxbTg==@vger.kernel.org, AJvYcCUiOuQYCrE8/9yBx/XI2SKIOovvRUS+RNfr7J6wGYU/w7AFE5eCk1IqPKfs4+pL/3oebT4on2QtOUSLUg==@vger.kernel.org, AJvYcCUtvBkCAuNU3kBi3X32MLPCULhHA1e8TYbFUtDLwJN60IhKeo7fXqaqcG1eb3CXKyslC7DPQoNPOrC3mA==@vger.kernel.org, AJvYcCVCyF98k3WW7EPtirSCRHss5Tlkm4gChkAwumr0D6HAEnwN/X87vZhCP95qKj9TDEqDnMcFTEz2@vger.kernel.org, AJvYcCVMAspCe+OHfEBC6xLQW+PBV4/km5uzHaaWipQy65N1An9FlpfPsYTrS1Lq6T5T4ZlmdwS2b5lhId0VlA==@vger.kernel.org, AJvYcCVN3+C/DHyzAfJqLuzY1NFVelRFB51CrupnQmNNE0CTHzw1gh8ud3QLyocMZ2BLIiHUrklyess1ss0PLRYo@vger.kernel.org, AJvYcCVSbkPWsKrQnEve8ZoIfkBYmNejNFnLYG1zPwqkOtNdb9uFEcAUgls+gukHPGbzKb1Ke3Y=@vger.kernel.org, AJvYcCVhPjfzzyblyeHNBdv+Mf3VlUGZfnVv7WLqx82Q50J6EZTAo4Vmi0ya2sAVwFqyMox2+dJfD/9m97sopQ==@vger.kernel.org, AJvYcCWD8rGHYD6WmoT2QWw/qichqbXfsXst8iJFr/z2Yy8KTAATHwVxlVjSsROA8C0KVR+kK877A+HQJm2I1w==@vger.kernel.org, AJvYcCWM/bD/6R50DHS8hEibxFlLhzmL5UK2GJWrc0xP
+ g2TdoZXpIT0WEDliEj03aOQ9mIfGwVTG6jOIGss=@vger.kernel.org, AJvYcCWMAdMgIVxDkO09K5htFnTufprtvaXnXrnEzEGjBql33GslZcTUQHASYYaEuNonBcb2IXcKY8MbXtdM@vger.kernel.org, AJvYcCWzjDxYxB/rPYkj46A2OxdccTktCgDvqDDioimR6QR4dC8JRC33rGYHVPXqOyAlwk/oRTetpUbhLAQy@vger.kernel.org, AJvYcCXLhqkrcN14mDZK39CKJ3VYHxRC4f1LJGPl1UwgDXEBhQG8WzJ6REi0dDa27RpVTcowIfhzDNy22csmd92qUD2R@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhaGUO2XTpXf0NlCYl0w1h2OLzDFbFLYpcSKgIG9T8qjS4pked
+	qYEGz2tmh5l2gA7rnwxSmFAn6k23yC83RdNyZ7PQjP+8kdxk+SdH
+X-Gm-Gg: ASbGncvKk06p4+xZCY1uQ/UFn1tPqFIOLfOghcRMab9aqKAtZWBWvw9VUCuqmy7FgNM
+	2dmCd6Zpj42mIJQaGCGVNuoW3y0+N5PZV+v2HXa4gkGxLxWBWPpeA/a0M7FYwGj2e4J6hf0l9zF
+	ITorZN8NOqiK+CU919fj6V2bbq5o3BzXebcqC52G+EYgeh4rBjyKOtNYFu5oof0iMaXWzqv5eT6
+	kzdHehDXHlYBUgiQZMECHzJDlFp69ZFjbjyT77li/ghyz3qGVyiie9Ow1iQ6FxM4uunmFgjPNE3
+	C+UHdC84mmLCq00LDDKo2aJousufipPqPD8=
+X-Google-Smtp-Source: AGHT+IHFJFeJCDIRO8qg0nwWQsfiPbwY1MfkzK1Af/7Jr+VrKkdamoUYCv4u5bbzZ6LGAdCd+o5mpQ==
+X-Received: by 2002:a05:6402:348e:b0:5e7:b015:ad42 with SMTP id 4fb4d7f45d1cf-5edfdd21affmr11635868a12.28.1743521755451;
+        Tue, 01 Apr 2025 08:35:55 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff:4::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5edc16d4f4bsm7213679a12.30.2025.04.01.08.35.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 08:28:31 -0700 (PDT)
-Message-ID: <3517cb7b3b10c29a6bf407f2e35fdebaf7a271e3.camel@gmail.com>
-Subject: Re: [PATCH net-next v5 09/13] net: phylink: Use phy_caps_lookup for
- fixed-link configuration
-From: Alexander H Duyck <alexander.duyck@gmail.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, Heiner Kallweit
- <hkallweit1@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,  thomas.petazzoni@bootlin.com,
- linux-arm-kernel@lists.infradead.org,  Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <vladimir.oltean@nxp.com>,  =?ISO-8859-1?Q?K=F6ry?= Maincent
- <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Simon Horman <horms@kernel.org>, Romain Gantois <romain.gantois@bootlin.com>
-Date: Tue, 01 Apr 2025 08:28:29 -0700
-In-Reply-To: <20250331091449.155e14a4@fedora-2.home>
-References: <20250307173611.129125-1-maxime.chevallier@bootlin.com>
-	 <20250307173611.129125-10-maxime.chevallier@bootlin.com>
-	 <8d3a9c9bb76b1c6bc27d2bd01f4831b2cac83f7f.camel@gmail.com>
-	 <20250328090621.2d0b3665@fedora-2.home>
-	 <CAKgT0Ue_JzmJAPKBhe6XaMkDCy+YNNg5_5VvzOR6CCbqcaQg3Q@mail.gmail.com>
-	 <20250331091449.155e14a4@fedora-2.home>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
+        Tue, 01 Apr 2025 08:35:54 -0700 (PDT)
+Date: Tue, 1 Apr 2025 08:35:50 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Stefan Metzmacher <metze@samba.org>
+Cc: Stanislav Fomichev <stfomichev@gmail.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	Karsten Keil <isdn@linux-pingi.de>,
+	Ayush Sawal <ayush.sawal@chelsio.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Willem de Bruijn <willemb@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	Joerg Reuter <jreuter@yaina.de>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Oliver Hartkopp <socketcan@hartkopp.net>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Robin van der Gracht <robin@protonic.nl>,
+	Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de,
+	Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Alexandra Winter <wintera@linux.ibm.com>,
+	Thorsten Winkler <twinkler@linux.ibm.com>,
+	James Chapman <jchapman@katalix.com>,
+	Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Remi Denis-Courmont <courmisch@gmail.com>,
+	Allison Henderson <allison.henderson@oracle.com>,
+	David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>, Jon Maloy <jmaloy@redhat.com>,
+	Boris Pismenny <borisp@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Martin Schiller <ms@dev.tdt.de>,
+	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org,
+	linux-hams@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-can@vger.kernel.org, dccp@vger.kernel.org,
+	linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org,
+	mptcp@lists.linux.dev, linux-rdma@vger.kernel.org,
+	rds-devel@oss.oracle.com, linux-afs@lists.infradead.org,
+	tipc-discussion@lists.sourceforge.net,
+	virtualization@lists.linux.dev, linux-x25@vger.kernel.org,
+	bpf@vger.kernel.org, isdn4linux@listserv.isdn4linux.de,
+	io-uring@vger.kernel.org
+Subject: Re: [RFC PATCH 0/4] net/io_uring: pass a kernel pointer via optlen_t
+ to proto[_ops].getsockopt()
+Message-ID: <Z+wH1oYOr1dlKeyN@gmail.com>
+References: <cover.1743449872.git.metze@samba.org>
+ <Z-sDc-0qyfPZz9lv@mini-arch>
+ <39515c76-310d-41af-a8b4-a814841449e3@samba.org>
+ <407c1a05-24a7-430b-958c-0ca78c467c07@samba.org>
+ <ed2038b1-0331-43d6-ac15-fd7e004ab27e@samba.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ed2038b1-0331-43d6-ac15-fd7e004ab27e@samba.org>
 
-On Mon, 2025-03-31 at 09:14 +0200, Maxime Chevallier wrote:
-> On Fri, 28 Mar 2025 14:03:54 -0700
-> Alexander Duyck <alexander.duyck@gmail.com> wrote:
->=20
-> > On Fri, Mar 28, 2025 at 1:06=E2=80=AFAM Maxime Chevallier
-> > <maxime.chevallier@bootlin.com> wrote:
-> > >=20
-> > > On Thu, 27 Mar 2025 18:16:00 -0700
-> > > Alexander H Duyck <alexander.duyck@gmail.com> wrote:
-> > > =20
-> > > > On Fri, 2025-03-07 at 18:36 +0100, Maxime Chevallier wrote: =20
-> > > > > When phylink creates a fixed-link configuration, it finds a match=
-ing
-> > > > > linkmode to set as the advertised, lp_advertising and supported m=
-odes
-> > > > > based on the speed and duplex of the fixed link.
-> > > > >=20
-> > > > > Use the newly introduced phy_caps_lookup to get these modes inste=
-ad of
-> > > > > phy_lookup_settings(). This has the side effect that the matched
-> > > > > settings and configured linkmodes may now contain several linkmod=
-es (the
-> > > > > intersection of supported linkmodes from the phylink settings and=
- the
-> > > > > linkmodes that match speed/duplex) instead of the one from
-> > > > > phy_lookup_settings().
-> > > > >=20
-> > > > > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > > > > ---
-> > > > >  drivers/net/phy/phylink.c | 44 +++++++++++++++++++++++++++------=
-------
-> > > > >  1 file changed, 31 insertions(+), 13 deletions(-)
-> > > > >=20
-> > > > > diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.=
-c
-> > > > > index cf9f019382ad..8e2b7d647a92 100644
-> > > > > --- a/drivers/net/phy/phylink.c
-> > > > > +++ b/drivers/net/phy/phylink.c
-> > > > > @@ -802,12 +802,26 @@ static int phylink_validate(struct phylink =
-*pl, unsigned long *supported,
-> > > > >     return phylink_validate_mac_and_pcs(pl, supported, state);
-> > > > >  }
-> > > > >=20
-> > > > > +static void phylink_fill_fixedlink_supported(unsigned long *supp=
-orted)
-> > > > > +{
-> > > > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_10baseT_Half_BIT, supporte=
-d);
-> > > > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_10baseT_Full_BIT, supporte=
-d);
-> > > > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Half_BIT, support=
-ed);
-> > > > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT, support=
-ed);
-> > > > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Half_BIT, suppor=
-ted);
-> > > > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT, suppor=
-ted);
-> > > > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, suppor=
-ted);
-> > > > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT, suppor=
-ted);
-> > > > > +   linkmode_set_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT, suppo=
-rted);
-> > > > > +}
-> > > > > + =20
-> > > >=20
-> > > > Any chance we can go with a different route here than just locking
-> > > > fixed mode to being only for BaseT configurations?
-> > > >=20
-> > > > I am currently working on getting the fbnic driver up and running a=
-nd I
-> > > > am using fixed-link mode as a crutch until I can finish up enabling
-> > > > QSFP module support for phylink and this just knocked out the suppo=
-rted
-> > > > link modes as I was using 25CR, 50CR, 50CR2, and 100CR2.
-> > > >=20
-> > > > Seems like this should really be something handled by some sort of
-> > > > validation function rather than just forcing all devices using fixe=
-d
-> > > > link to assume that they are BaseT. I know in our direct attached
-> > > > copper case we aren't running autoneg so that plan was to use fixed
-> > > > link until we can add more flexibility by getting QSFP support goin=
-g. =20
-> > >=20
-> > > These baseT mode were for compatibility with the previous way to deal
-> > > with fixed links, but we can extend what's being report above 10G wit=
-h
-> > > other modes. Indeed the above code unnecessarily restricts the
-> > > linkmodes. Can you tell me if the following patch works for you ?
-> > >=20
-> > > Maxime
-> > >=20
-> > > -----------
-> > >=20
-> > > From 595888afb23f209f2b1002d0b0406380195d53c1 Mon Sep 17 00:00:00 200=
-1
-> > > From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > > Date: Fri, 28 Mar 2025 08:53:00 +0100
-> > > Subject: [PATCH] net: phylink: Allow fixed-link registration above 10=
-G
-> > >=20
-> > > The blamed commit introduced a helper to keep the linkmodes reported =
-by
-> > > fixed links identical to what they were before phy_caps. This means
-> > > filtering linkmodes only to report BaseT modes.
-> > >=20
-> > > Doing so, it also filtered out any linkmode above 10G. Reinstate the
-> > > reporting of linkmodes above 10G, where we report any linkmodes that
-> > > exist at these speeds.
-> > >=20
-> > > Reported-by: Alexander H Duyck <alexander.duyck@gmail.com>
-> > > Closes: https://lore.kernel.org/netdev/8d3a9c9bb76b1c6bc27d2bd01f4831=
-b2cac83f7f.camel@gmail.com/
-> > > Fixes: de7d3f87be3c ("net: phylink: Use phy_caps_lookup for fixed-lin=
-k configuration")
-> > > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > > ---
-> > >  drivers/net/phy/phylink.c | 17 +++++++++++++----
-> > >  1 file changed, 13 insertions(+), 4 deletions(-)
-> > >=20
-> > > diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-> > > index 69ca765485db..de90fed9c207 100644
-> > > --- a/drivers/net/phy/phylink.c
-> > > +++ b/drivers/net/phy/phylink.c
-> > > @@ -715,16 +715,25 @@ static int phylink_parse_fixedlink(struct phyli=
-nk *pl,
-> > >                 phylink_warn(pl, "fixed link specifies half duplex fo=
-r %dMbps link?\n",
-> > >                              pl->link_config.speed);
-> > >=20
-> > > -       linkmode_zero(pl->supported);
-> > > -       phylink_fill_fixedlink_supported(pl->supported);
-> > > +       linkmode_fill(pl->supported);
-> > >=20
-> > >         linkmode_copy(pl->link_config.advertising, pl->supported);
-> > >         phylink_validate(pl, pl->supported, &pl->link_config);
-> > >=20
-> > > +       phylink_fill_fixedlink_supported(match);
-> > > + =20
-> >=20
-> > I worry that this might put you back into the same problem again with
-> > the older drivers. In addition it is filling in modes that shouldn't
-> > be present after the validation.
->=20
-> Note that I'm not directly filling pl->supported here.
->=20
-> [...]
->=20
->  	c =3D phy_caps_lookup(pl->link_config.speed, pl->link_config.duplex,
->  			    pl->supported, true);
-> -	if (c)
-> -		linkmode_and(match, pl->supported, c->linkmodes);
-> +	if (c) {
-> +		/* Compatbility with the legacy behaviour : Report one single
-> +		 * BaseT mode for fixed-link speeds under or at 10G, or all
-> +		 * linkmodes at the speed/duplex for speeds over 10G
-> +		 */
-> +		if (linkmode_intersects(match, c->linkmodes))
-> +			linkmode_and(match, match, c->linkmodes);
-> +		else
-> +			linkmode_copy(match, c->linkmodes);
-> +	}
->=20
-> [...]
->=20
-> 	if (c) {
-> 		linkmode_or(pl->supported, pl->supported, match);
-> 		linkmode_or(pl->link_config.lp_advertising,
-> 			    pl->link_config.lp_advertising, match);
-> 	}
->=20
-> For speeds above 10G, you will get all the modes for the requested
-> speed, so it should solve the issue in the next steps of your code
-> where you need matching linkmodes for your settings ? Did you give it a
-> try ?
->=20
-> You may end up with too many linkmodes, but for fixed-link we don't
-> really expect these modes to precisely represent any real linkmodes
+On Tue, Apr 01, 2025 at 03:48:58PM +0200, Stefan Metzmacher wrote:
+> Am 01.04.25 um 15:37 schrieb Stefan Metzmacher:
+> > Am 01.04.25 um 10:19 schrieb Stefan Metzmacher:
+> > > Am 31.03.25 um 23:04 schrieb Stanislav Fomichev:
+> > > > On 03/31, Stefan Metzmacher wrote:
+> > > > > The motivation for this is to remove the SOL_SOCKET limitation
+> > > > > from io_uring_cmd_getsockopt().
+> > > > > 
+> > > > > The reason for this limitation is that io_uring_cmd_getsockopt()
+> > > > > passes a kernel pointer as optlen to do_sock_getsockopt()
+> > > > > and can't reach the ops->getsockopt() path.
+> > > > > 
+> > > > > The first idea would be to change the optval and optlen arguments
+> > > > > to the protocol specific hooks also to sockptr_t, as that
+> > > > > is already used for setsockopt() and also by do_sock_getsockopt()
+> > > > > sk_getsockopt() and BPF_CGROUP_RUN_PROG_GETSOCKOPT().
+> > > > > 
+> > > > > But as Linus don't like 'sockptr_t' I used a different approach.
+> > > > > 
+> > > > > @Linus, would that optlen_t approach fit better for you?
+> > > > 
+> > > > [..]
+> > > > 
+> > > > > Instead of passing the optlen as user or kernel pointer,
+> > > > > we only ever pass a kernel pointer and do the
+> > > > > translation from/to userspace in do_sock_getsockopt().
+> > > > 
+> > > > At this point why not just fully embrace iov_iter? You have the size
+> > > > now + the user (or kernel) pointer. Might as well do
+> > > > s/sockptr_t/iov_iter/ conversion?
+> > > 
+> > > I think that would only be possible if we introduce
+> > > proto[_ops].getsockopt_iter() and then convert the implementations
+> > > step by step. Doing it all in one go has a lot of potential to break
+> > > the uapi. I could try to convert things like socket, ip and tcp myself, but
+> > > the rest needs to be converted by the maintainer of the specific protocol,
+> > > as it needs to be tested. As there are crazy things happening in the existing
+> > > implementations, e.g. some getsockopt() implementations use optval as in and out
+> > > buffer.
+> > > 
+> > > I first tried to convert both optval and optlen of getsockopt to sockptr_t,
+> > > and that showed that touching the optval part starts to get complex very soon,
+> > > see https://git.samba.org/?p=metze/linux/wip.git;a=commitdiff;h=141912166473bf8843ec6ace76dc9c6945adafd1
+> > > (note it didn't converted everything, I gave up after hitting
+> > > sctp_getsockopt_peer_addrs and sctp_getsockopt_local_addrs.
+> > > sctp_getsockopt_context, sctp_getsockopt_maxseg, sctp_getsockopt_associnfo and maybe
+> > > more are the ones also doing both copy_from_user and copy_to_user on optval)
+> > > 
+> > > I come also across one implementation that returned -ERANGE because *optlen was
+> > > too short and put the required length into *optlen, which means the returned
+> > > *optlen is larger than the optval buffer given from userspace.
+> > > 
+> > > Because of all these strange things I tried to do a minimal change
+> > > in order to get rid of the io_uring limitation and only converted
+> > > optlen and leave optval as is.
+> > > 
+> > > In order to have a patchset that has a low risk to cause regressions.
+> > > 
+> > > But as alternative introducing a prototype like this:
+> > > 
+> > >          int (*getsockopt_iter)(struct socket *sock, int level, int optname,
+> > >                                 struct iov_iter *optval_iter);
+> > > 
+> > > That returns a non-negative value which can be placed into *optlen
+> > > or negative value as error and *optlen will not be changed on error.
+> > > optval_iter will get direction ITER_DEST, so it can only be written to.
+> > > 
+> > > Implementations could then opt in for the new interface and
+> > > allow do_sock_getsockopt() work also for the io_uring case,
+> > > while all others would still get -EOPNOTSUPP.
+> > > 
+> > > So what should be the way to go?
+> > 
+> > Ok, I've added the infrastructure for getsockopt_iter, see below,
+> > but the first part I wanted to convert was
+> > tcp_ao_copy_mkts_to_user() and that also reads from userspace before
+> > writing.
+> > 
+> > So we could go with the optlen_t approach, or we need
+> > logic for ITER_BOTH or pass two iov_iters one with ITER_SRC and one
+> > with ITER_DEST...
+> > 
+> > So who wants to decide?
+> 
+> I just noticed that it's even possible in same cases
+> to pass in a short buffer to optval, but have a longer value in optlen,
+> hci_sock_getsockopt() with SOL_BLUETOOTH completely ignores optlen.
+> 
+> This makes it really hard to believe that trying to use iov_iter for this
+> is a good idea :-(
 
-Here is more the quick-n-dirty approach that I think does what you were
-trying to do without breaking stuff:
-
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 16a1f31f0091..380e51c5bdaa 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -713,17 +713,24 @@ static int phylink_parse_fixedlink(struct phylink *pl=
-,
-                phylink_warn(pl, "fixed link specifies half duplex for %dMb=
-ps link?\n",
-                             pl->link_config.speed);
-=20
--       linkmode_zero(pl->supported);
--       phylink_fill_fixedlink_supported(pl->supported);
--
-+       linkmode_fill(pl->supported);
-        linkmode_copy(pl->link_config.advertising, pl->supported);
-        phylink_validate(pl, pl->supported, &pl->link_config);
-=20
-        c =3D phy_caps_lookup(pl->link_config.speed, pl->link_config.duplex=
-,
-                            pl->supported, true);
--       if (c)
-+       if (c) {
-                linkmode_and(match, pl->supported, c->linkmodes);
-=20
-+               /* Compatbility with the legacy behaviour:
-+                * Report one single BaseT mode.
-+                */
-+               phylink_fill_fixedlink_supported(mask);
-+               if (linkmode_intersects(match, mask))
-+                       linkmode_and(match, match, mask);
-+               linkmode_zero(mask);
-+       }
-+
-        linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT, mask);
-        linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT, mask);
-        linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, mask);
-
-Basically we still need the value to be screened by the pl->supported.
-The one change is that we have to run the extra screening on the
-intersect instead of skipping the screening, or doing it before we even
-start providing bits.
-
-With this approach we will even allow people to use non twisted pair
-setups regardless of speed as long as they don't provide any twisted
-pair modes in the standard set.
-
-I will try to get this tested today and if it works out I will submit
-it for net. I just need to test this and an SFP ksettings_set issue I
-found when we aren't using autoneg.
+That was my finding as well a while ago, when I was planning to get the
+__user pointers converted to iov_iter. There are some weird ways of
+using optlen and optval, which makes them non-trivial to covert to
+iov_iter.
 
