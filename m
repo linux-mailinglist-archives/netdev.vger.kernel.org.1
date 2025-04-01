@@ -1,118 +1,239 @@
-Return-Path: <netdev+bounces-178543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21C06A7781E
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 11:49:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11234A77828
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 11:51:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B0883A62B4
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 09:49:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92B9F188E442
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 09:50:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C2E71EE01A;
-	Tue,  1 Apr 2025 09:49:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB4611EEA27;
+	Tue,  1 Apr 2025 09:49:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N6mjwC9t"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eFSdz2gW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94191E885A
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 09:49:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743500986; cv=none; b=SRym/QlrtcboFiO2YHZHHUpMkS3EsLzyRkzpA7hUqhNkdOtcxFRZ+JP+ydCaoR1nLaPSXcKDJOQaDbTbEPqGYTxQtRWzKdrlH7tlX8KyOuDN2fz0J18+KKEZ+TUpwQtXrLaKihW2Mn8Dwy4692zaiFszpuTDxw14U4gwk5kt4QU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743500986; c=relaxed/simple;
-	bh=n6+62L9dbn5yPCNRRBPjy2Xoe5oXCpq8+IGpUfsX3+I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SE9z6NlxmvX6ILB219xKPuQLEa8nrx/3NgFGJk1+zXNaWpBIcvi8F/CvplXRbU/qP/1JCQDDY4TRBuuU970F4VIC8va/OpwXSVgxRSfP6FrcB6rR9IZ91Ep71KcK15enV62Efqr/AhNR7Ys3DXw1yKcaiFbjj9199b/yov2qrrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N6mjwC9t; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743500982;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uz7X0saZ07cJoMgjZepVgox7FPN1JF4+WKasDO8EH1c=;
-	b=N6mjwC9tyB9hmFy7Y9XBNygj/3wxoZGqwgdcheZtw8KOIUE6KAA0UnH7Ymp2tZtK7xJUuq
-	8bt2pZQt3Oddha+IjNAsLm6S6hXUj5ly+7gzyHwqvhKBgGTUZec01HrxfvVzGch8pHqTgI
-	FO0gsN7nY602N2ILvj9LBqU/XDmhGVQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-512-FH2MhGjsNFmC1elL4IGuRQ-1; Tue, 01 Apr 2025 05:49:41 -0400
-X-MC-Unique: FH2MhGjsNFmC1elL4IGuRQ-1
-X-Mimecast-MFC-AGG-ID: FH2MhGjsNFmC1elL4IGuRQ_1743500980
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43ceeaf1524so27866555e9.1
-        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 02:49:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743500980; x=1744105780;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uz7X0saZ07cJoMgjZepVgox7FPN1JF4+WKasDO8EH1c=;
-        b=fUipP1N3vnFVw6K+Kq2Zupbz4qKOk7EZzQ36dGHrSSqFX4Hc9ykxGdn5q6tIf3VfYo
-         T90D0iA8OCExeYUGXA/a8A4n3k3q/RhZhypyNkxgF3NipWuXjgm3i3/U/+GH8ATNDQtY
-         gzm7MX7xNDLhfIVPFlJOgyyJV55YfumsxUsXDxb95Ac0DUcKxawjjGMm7/kYk07G2Qio
-         dyXEdepZfdfNmId3WGbMS3KZ4XwxdH19yvVA8WQBkZtqW4t4FZ1WUXae39C52KoQbvZj
-         JvD4X85Eo5LfVxtl80ln3nxaAUQgm05c88LXLMLQ+EvohjW2RUl7dRFmxd0pDPTPyli4
-         zE5A==
-X-Forwarded-Encrypted: i=1; AJvYcCUdYj2fDcbdiDQuVWz0pVQlhXqMbvuzicjkqMoJc6/X4XsoPpzJqF3QBOURthlUCfQWJqrTGRE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKxzoA6532UJ+ue/TcUNwN/5c7zqci0GqbCeDMrZMsgecMfDPC
-	CybNDOIYYhLXp4OZn5BjJIlaCuIfjpe1hTI5INQ7aQMEO8npi5lbmomv+ewPVzNosSFt/T88Crh
-	LSY2ws5Vd9y3/DDOHrhw+HpDOXNzUw+v7nPjfmK+hfgwR97JD3nqqrw==
-X-Gm-Gg: ASbGncvuisLYxUfhD1URMXONFsRz1tU5SOwJDlunOwf0aw4YFBw8nxpg9M4p0JShKAV
-	dBd3Hn6+3BXoVfli2JN4gDCvNE0BdYLxFkfZP6rQXb7jiDBBLFyt/LPqOtqTNy+f/vTtj6aR+jf
-	vmy59ELRExSHvEIRzKa91ksKOfz96kVWBaf3JdfEvevm1x/i+9Bfs4kZ80f+1ipY1cZKwWuIlcp
-	2whM38LvId7Eo1lhyVWDu2BgpVUujkeCLh5Knrgm5NI2/A1UtcZMRV/aLxTKAqMOvjF6Eb4k9XP
-	yxrHLBJd3qHthg==
-X-Received: by 2002:a05:600c:310c:b0:43b:c7f0:6173 with SMTP id 5b1f17b1804b1-43db6224034mr86356895e9.4.1743500980218;
-        Tue, 01 Apr 2025 02:49:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGq6P/LONQIdq2pleoYEuzzxgyj99hAud3WvWbJHB5zZUAUKpRXcJTP2ISiVIGMBWKtclaTMA==
-X-Received: by 2002:a05:600c:310c:b0:43b:c7f0:6173 with SMTP id 5b1f17b1804b1-43db6224034mr86356785e9.4.1743500979880;
-        Tue, 01 Apr 2025 02:49:39 -0700 (PDT)
-Received: from localhost ([2a01:e11:1007:ea0:8374:5c74:dd98:a7b2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d82efe389sm192609015e9.19.2025.04.01.02.49.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 02:49:39 -0700 (PDT)
-Date: Tue, 1 Apr 2025 11:49:38 +0200
-From: Davide Caratti <dcaratti@redhat.com>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: airoha: Fix ETS priomap validation
-Message-ID: <Z-u2svZqo4NC0JGm@dcaratti.users.ipa.redhat.com>
-References: <20250331-airoha-ets-validate-priomap-v1-1-60a524488672@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3218A1EBA08
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 09:49:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743500997; cv=fail; b=o+opn0CXE7wXy5iBEj0u7WOPJl5Y4G2f88sxDlyJHj4f8CzF7dUtgB7/9OVgeRDPqxQHkWd4z6ZLvQInNOUAw4pjBlsG1HHJlXs+BB9CPR7OCZobSi8d3j1Gl6MxHHrLAd+sYDflLqMmdBNEt8YH4LYDX4xJVWpDxDF0CjDV1IQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743500997; c=relaxed/simple;
+	bh=kWtcSErcX2K3ECJXFSNs7X004LenvlJ+QvRMnV1uQFs=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=gH/J6N+mt4VYWzoN15dMLOFNt5jqSAYnID0pv6dmfeLjBoyxtyYpMRkIYqg1Urf25IUj1QC8Le8oylB4V4ZXbHJZ0+dLB2USfOt/rppY9wDxIi12v8CUkuBQj8JnY4ga2d1jM+QDnTUbxCKnh8bWRYo9TEBj+N0NMXMXc/JMcUo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eFSdz2gW; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1743500996; x=1775036996;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=kWtcSErcX2K3ECJXFSNs7X004LenvlJ+QvRMnV1uQFs=;
+  b=eFSdz2gWhTipyl6nyI3iEPafmq/YbB52uj35x+PqKpHoXf52Vw5qMB62
+   fdsm4VQE7dkk4v2QIxPMtA64FaEB/4u72IBfnK3vCf3or3KI9WE4Eh86o
+   +u02DfkLIVZo3t+nL0EYxCLC/ZYcLqU75qujyoKam7wH15JiFdngtc7ae
+   n6s9Q0jMlLKbZQ0hOAlgL0+qbaFAQ/WZ6uAwbz8PzF54ODL8L1woNIIbv
+   atHZ9nkvpdrCB9rX3RfhcI7DKg0N/+3QFHMDgb5r9yN8N3UVJ4ll3IGLd
+   w6feXKeL2Md70ENklxkN9ftPZVHEsBWZVdqLnF8WzVDfJ1p11tpO1L4Wr
+   g==;
+X-CSE-ConnectionGUID: VtHJi25zTdSf8a+N19/Bvw==
+X-CSE-MsgGUID: JZSSB2PZS9u9uwfHlT2G9w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11390"; a="55010613"
+X-IronPort-AV: E=Sophos;i="6.14,293,1736841600"; 
+   d="scan'208";a="55010613"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2025 02:49:55 -0700
+X-CSE-ConnectionGUID: Ro9E7N6ORfG98McBYeQpyQ==
+X-CSE-MsgGUID: tE3r7Tc4QwahxeP1CXyudg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,293,1736841600"; 
+   d="scan'208";a="131474379"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2025 02:49:55 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1544.14; Tue, 1 Apr 2025 02:49:54 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Tue, 1 Apr 2025 02:49:54 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.175)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Tue, 1 Apr 2025 02:49:54 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Nw0hNnt+PK2XhAD6+1tdwNobZ+uZ+s2DzSHdD1FEH+3OIwxi/eoIvii6rY0Amf0mwZsDAnxSPaLsIDMI9F/rGr5ac+pVyEsyk29pIKd67ULJxUM04GeUYUTgqe8fMlQUycEpJEDKqV2Pk1rwtIbk7U8pL9XCUdvN2whjKox86uTNbkJhuYUO5HXAwYl6VADR9QOr0BYcbEZzsUA/IdtdcGvvVySdkGUoAzy9NuG0eyrAIwLdTWlHygHk5myw5zDo+bbBImVzhpCmfj2dvDEe6ESemYQDfEff9lhT6rfSClU+UYj1awIxwGx6/eK9+OoF/x/KsyhEoltxmTYoAcjRvw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kWtcSErcX2K3ECJXFSNs7X004LenvlJ+QvRMnV1uQFs=;
+ b=Mc0RwJHumd1n3yJ9KXtNsWa+Z3bhVX+4oTxOu+AC6lgOCsihanE+cIp8WKmDgs2TpaUJjGA2VkNJOCM3aoclsyVRYTSpyMEKZ7xuWqVmgqxROQOUkVUfD0/bItlvJMvmwPkZ2smOkbJ0C9VxvrrTmPwAUgsK6GVSk7iI+r77ER5fUJE66WFgIx2tx8g4qUTR1q1EEjnLIJVsrQ1UJGRN6jPaD4IlVtPyR/AL9+pHsoVXwCS+fAlm/z3Qda9q529UDeMMxuHYRRKWTlBrW0ljgPZ5+3WnlEVPGiZmfaBTGbwshAo2TKzkOTCoTrIBCUAxRXYd4yoAIlbdLJ1t3s6cZA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH0PR11MB5013.namprd11.prod.outlook.com (2603:10b6:510:30::21)
+ by IA1PR11MB6441.namprd11.prod.outlook.com (2603:10b6:208:3aa::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.44; Tue, 1 Apr
+ 2025 09:49:52 +0000
+Received: from PH0PR11MB5013.namprd11.prod.outlook.com
+ ([fe80::1c54:1589:8882:d22b]) by PH0PR11MB5013.namprd11.prod.outlook.com
+ ([fe80::1c54:1589:8882:d22b%5]) with mapi id 15.20.8534.043; Tue, 1 Apr 2025
+ 09:49:52 +0000
+From: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
+To: Simon Horman <horms@kernel.org>, Martyna Szapar-Mudlaw
+	<martyna.szapar-mudlaw@linux.intel.com>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Michal Swiatkowski
+	<michal.swiatkowski@linux.intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next] ice: improve error message for
+ insufficient filter space
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next] ice: improve error message
+ for insufficient filter space
+Thread-Index: AQHblLi6BpF6HIeWIkSLNd+sSrYdgrN6aGOAgBREBiA=
+Date: Tue, 1 Apr 2025 09:49:52 +0000
+Message-ID: <PH0PR11MB5013F63C43277D7466F4F95896AC2@PH0PR11MB5013.namprd11.prod.outlook.com>
+References: <20250314081110.34694-2-martyna.szapar-mudlaw@linux.intel.com>
+ <20250319121743.GB280585@kernel.org>
+In-Reply-To: <20250319121743.GB280585@kernel.org>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB5013:EE_|IA1PR11MB6441:EE_
+x-ms-office365-filtering-correlation-id: 934819f7-d319-4957-6c23-08dd71028cea
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?oRy41ZKgwSAevWhJ0LWCdIvUiGmtbe09fCS+pe5CM3Nuz82eT5CVApDCCwhA?=
+ =?us-ascii?Q?n2O3jkMQGTgS0VR/K39cEwi+obsleCVFEm/2v/YWdugJvblc4WwPPBO5amBj?=
+ =?us-ascii?Q?RaTvMHESyzkhDpQQ9JFNivs9lSEapzV09nvYOnZ8S5vUOk3on0inMQJEm56p?=
+ =?us-ascii?Q?EAvpGJ8xVF3JkWNGHJsoNuC8fi933kWo6GxrN1JZVFkuCxk6H34sn++4wVbr?=
+ =?us-ascii?Q?rgz8sCTKlknYGc8HnZv2gm+K8AbZsgwRmEUdR+K6/WFH5hz0+ghEArc6BuNr?=
+ =?us-ascii?Q?2ws4r4PJvGZ6WJN0x0FXiAyYjIgjli8ZdAG7o3WjKVfcz7r27zepQUznh+6H?=
+ =?us-ascii?Q?c0w17Y1/dBkXAs7atFRW3Z9voxbO4ZNu7zshuMLDDR6bLmkTMXUoVlsUUnRg?=
+ =?us-ascii?Q?hkDPSju6Q8ku9WrKbccfCGpn7duZ602SUduZQrUEUPO9KHNTZD9cqvVrPYI/?=
+ =?us-ascii?Q?1uPQ7jCKfQFfmZ9/8FiYtj2fg38hqw/0EmeoV1DR+4DG5dpanQPdz3oRzmVh?=
+ =?us-ascii?Q?t03ESBAUwbLe6i26tQErYFKsTfH5l9oeKTCf+W7PZkfKT4Ti+k4ILxXzs7Qp?=
+ =?us-ascii?Q?0TkEYLwxtRKB6vYvDWjKqJ3yAHzyCtedLYFluRVH34eWymF5FgFpmjU/TGS9?=
+ =?us-ascii?Q?tU9sijI4EMDFmXRJ0tUGZz+xa9NgU64kneh4jOozpjrO76zje5/kfGO0ev9D?=
+ =?us-ascii?Q?wVhAJIwnep1wOiM7vwasGaYvvLvojIf7o3LpiZ+02L7IqS0UMrIUWgZ+To6J?=
+ =?us-ascii?Q?xWBxdAqW605i4R3XnKAVR+gLtTD8lSy7LxXwctGnpoXXmiaHqnAwUYUZ4E9s?=
+ =?us-ascii?Q?ps+Mhwl1VWqK2eVsG5mBANcxYWrLUo/M38QEtRgaQ2n0gt2DPVENslWTgToK?=
+ =?us-ascii?Q?ONAu4nKmGtnk5Wn17oTPd3y0fFt8ZwzlxSixmhW9OMyat8twSh4P05hbrktI?=
+ =?us-ascii?Q?SKgjrlrHMrN1qZHq7rp9h+PgVhwJLGkwctA5+GdjaUFOfb/PpESTJa6/B0Zt?=
+ =?us-ascii?Q?GcGTMIKmqFA9EvU7w2j/4jUeS/MFXmhRghot3TJKToaPAzA49JyejYUaVT6d?=
+ =?us-ascii?Q?E9j9SZ1GWTPeSRUSRNToYAuhTJhqaUExQKuVQzHY6yl1E98uHYOa8kkYkPM6?=
+ =?us-ascii?Q?mmBZJGBcDE4ZK1twsb/iQrilv93AUpaJ1C4wUGbtKCOYcy4HGTi3uQ+fYyES?=
+ =?us-ascii?Q?zR6Ftkf9yM3uSRs81uHvsm1gKqlCUuG1AVbKAZlTV1xjYWk5D/kcDnXQDP8e?=
+ =?us-ascii?Q?RqbO41kxlAJ2AugHLKsVMrVbFkePov8O4seEpIvKKXPHbwYRiDZuSkPlxORA?=
+ =?us-ascii?Q?n5k8Kj8ebCGIOX4DRw4h1Y7NG40aB6CzkRGskAkrmd708f2bqeigylvCd0Jx?=
+ =?us-ascii?Q?5Nr2iN0N2FiLo6vPeRvqngXHoUn6WC76fNqpGAyKX5FX+7us6iHYl5nyuX7k?=
+ =?us-ascii?Q?JYaOPp0Ppr35kU7FYPBydzRm8oq+wQPX?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5013.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?GlhXBT/zEAD1ifvJypVJJUHw4BTQJsp5OfNCkwsuFsnNxkwmPN+bLo0Gg7Gr?=
+ =?us-ascii?Q?gVEMsH8dre3TvZ9inrudOaIE7Wv/NiXUZNX9jKNDUwooqaoWYO0JN6jJ8U6t?=
+ =?us-ascii?Q?PvKXE5MYUnUyEbpSGd9rHXwNn/03UUVT+WeKmFW9o+Xf6eiUfZjT/ieK8THM?=
+ =?us-ascii?Q?HiY4VlJGCkVuk4rkVrzH3m6tIn+M/Gsg7FwhODyU9wXjtCcAjbjU1cgugpY4?=
+ =?us-ascii?Q?jSZQUIAjWsxo26OztqFTgDWya2HvlzRXwsUVRQz0gPt8dCkp7XS/0eOQyQ1W?=
+ =?us-ascii?Q?A+RMuliUsTXsBtDb80DwC3VeH+/ZOEhQHjJGEfKV9ykEtNc3qdQXxGK7Wk35?=
+ =?us-ascii?Q?xKvFQ7RLu+lTJtRfBhCqtK9WdoLaAMLGJZWdhtZPvEvRxLOz0/uGp+fzxaZI?=
+ =?us-ascii?Q?xQLdV0aNnhh5BX4Jo5gsTs1N6OBIRWHIb8VnPoBb31i3DBvoLwK9pRQqY0Rc?=
+ =?us-ascii?Q?2IkgepdlYuWdAAOkz5FCxL3xSAt4E4yebUQE4HMrBf4PJxF7szGFfdIycyug?=
+ =?us-ascii?Q?Qiau8XpwJ46f0fWBBJK2bk7X7aKBkuvfoUwOmH9ZP1wxpU73hWsFCDrCk6nt?=
+ =?us-ascii?Q?07NYnHhkU5GcMw0EOATRzhWKJ8E91U+drGGNWNMSTvFHBD94HwMv+HngFoP7?=
+ =?us-ascii?Q?Ctyy3JmpVaNvuMYRl/dQ6IqbHbhqVnYxANxWn+HpWJE0HxRrmN7ZpmPq8ccf?=
+ =?us-ascii?Q?CXxpBRQetalwL0OZ6x1c3cwraIZVQDQaycm0JoINle72RgfA7M1ds0jaDtZX?=
+ =?us-ascii?Q?59mDcsNr2/bs7PFqkbVDJErQKJyiMmdqc9E0o2XMu7Jqt9Wfx42+sBuitEI7?=
+ =?us-ascii?Q?UExuOdr/MCSoMLCGSS4xOsG3TwhN+b3UlOrwfILQUggazfREeG9XLWbES9qa?=
+ =?us-ascii?Q?kplXqncWcekwJEPstChbT4dTq4Za/ys/hxEYFp1qM7z0VmaXvLnw1oV/JYaR?=
+ =?us-ascii?Q?mMu/Riiu+GnANmz3Aagt+RdtCle61bLx0XgeYjRe2unRg/55ufUjOmGzCFQQ?=
+ =?us-ascii?Q?xv0xlHBFB5UQWMeSlv0NzXZ3pGVLKHwvKPrzyibWjTqjH3/o7ePjShhrpHRS?=
+ =?us-ascii?Q?CoV0ibcDppeI3fpn3iaBXqH4+ts4j/FxEMQMme+h8HGpQu97YByybChy2t2o?=
+ =?us-ascii?Q?m45Lje87tbTOrBkOQ9/ag6RX6HcWIJTzhhrIPmrVaXf/8Dpvq+yCw/toDvLP?=
+ =?us-ascii?Q?1zp+YgAJJeLjfpvcNIeAlNTlS19DumAgxAgR6WzunAQN1TROsEuMfrPJ+F1O?=
+ =?us-ascii?Q?sG3bhWswAP0zjPbpXImnhLKZ6uQVnA2pS4ik4FYga1xpsGY2z1iJ1fGNH8fJ?=
+ =?us-ascii?Q?Gr1/MpGTV5YUjYePEMQsVVCkv3jN5Gh4htwIEr5ETH4k2vLt0jqKDDc9vh4c?=
+ =?us-ascii?Q?ThFZcANqP8WCYUAM4UR4HQnp0Ym/Lo912C6cOGHhoSueeyllrOV1heTibjrQ?=
+ =?us-ascii?Q?uG5GwIbFnRIUHQtDtbwPa4gtl32EfwnuUf/Wcm0vuzosH4eeeJP0eCSoJwxa?=
+ =?us-ascii?Q?Wf1eM+R0PZY1MBcSGYI5IDB7ZAUHnl+FQmfRk6w/eq8iS2AHAqfr4U53qM7M?=
+ =?us-ascii?Q?/CDPuX/WM4nUVq4Wp31xiiz3Q5XBGbPihK7YdO+F1ig8hD4xPdW6Vt+3jzKL?=
+ =?us-ascii?Q?/A=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250331-airoha-ets-validate-priomap-v1-1-60a524488672@kernel.org>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5013.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 934819f7-d319-4957-6c23-08dd71028cea
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Apr 2025 09:49:52.4047
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: nvu1oOuhEgHKiJuI8JTqeshQYI0CwpfmLEwYnBmoCgQn/nFhSr9WAOkLyC/DOZijP5BDcK7M+yTvuNPiN1qw/sQce+9E6QMatxu5MaZ5Uxk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6441
+X-OriginatorOrg: intel.com
 
-On Mon, Mar 31, 2025 at 06:17:31PM +0200, Lorenzo Bianconi wrote:
-> ETS Qdisc schedules SP bands in a priority order assigning band-0 the
-> highest priority (band-0 > band-1 > .. > band-n) while EN7581 arranges
-> SP bands in a priority order assigning band-7 the highest priority
-> (band-7 > band-6, .. > band-n).
-> Fix priomap check in airoha_qdma_set_tx_ets_sched routine in order to
-> align ETS Qdisc and airoha_eth driver SP priority ordering.
-> 
-> Fixes: b56e4d660a96 ("net: airoha: Enforce ETS Qdisc priomap")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+Hi,
 
-LGTM!
+I tried to add tc rules to the HW beyond the maximum limit and still notici=
+ng the below error message instead of error message mentioned in the patch.
 
-Reviewed-by: Davide Caratti <dcaratti@redhat.com>
+[root@dell-cnv-sut ~]# tc filter add dev ens5f0np0 ingress protocol ip prio=
+ 0 flower skip_sw dst_mac 00:f0:01:00:00:0E action mirred egress redirect d=
+ev ens5f0npf0vf0
+Error: ice: Unable to add filter due to error.
+We have an error talking to the kernel
+
+[root@dell-cnv-sut ~]# tc filter show dev ens5f0np0 root | grep -c in_hw
+16306
+
+Please check it.
+
+Thanks,
+Sujai B
+
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Simon Horman
+> Sent: Wednesday, March 19, 2025 5:48 PM
+> To: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Michal
+> Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Subject: Re: [Intel-wired-lan] [PATCH iwl-next] ice: improve error messag=
+e for
+> insufficient filter space
+>=20
+> On Fri, Mar 14, 2025 at 09:11:11AM +0100, Martyna Szapar-Mudlaw wrote:
+> > When adding a rule to switch through tc, if the operation fails due to
+> > not enough free recipes (-ENOSPC), provide a clearer error message:
+> > "Unable to add filter: insufficient space available."
+> >
+> > This improves user feedback by distinguishing space limitations from
+> > other generic failures.
+> >
+> > Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> > Signed-off-by: Martyna Szapar-Mudlaw
+> > <martyna.szapar-mudlaw@linux.intel.com>
+>=20
+> Reviewed-by: Simon Horman <horms@kernel.org>
 
 
