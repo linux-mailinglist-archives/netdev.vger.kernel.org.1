@@ -1,115 +1,180 @@
-Return-Path: <netdev+bounces-178628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92F11A77E83
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 17:05:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABA0BA77ECB
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 17:21:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A82016D013
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 15:05:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76680188FE90
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 15:20:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA648205E37;
-	Tue,  1 Apr 2025 15:05:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E6B20AF63;
+	Tue,  1 Apr 2025 15:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gWWOrOw7"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="vCnAKf3a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 040BB205ADC;
-	Tue,  1 Apr 2025 15:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D388920487D
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 15:20:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743519921; cv=none; b=teZA5Yns7eFybD/plR1D7Yotuw+TqdGdAAFm3y1Wc51q/xHRfEkr1fFL+ivvPE7vllE+YTzRy7L9nD54Ah98GC9mytzczCb7RAKnXXVUhejbpEVH88NW6lnfkKpXB1dOji2gh/vVjQNX26GNBzKglQYtXYq3AzwiUeVdRvFJ+m8=
+	t=1743520818; cv=none; b=t40cj3JE4alIlogfsRN8NnkgXN9XU4KrdBQY157jnaSu1lb+s0bHiXd/qEWxSWyzU9IFoNstXRxIS74lA+GP1tkDun4047kOrUZ0l4arV+BAGby7v0f0H4VqOz2Tf0qaB+a2acOjMrzk4iy2FCAq4KG8dJccZisoc6RvnDRd750=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743519921; c=relaxed/simple;
-	bh=rzrpNc9TFQoSZZ0niGpxua8m7OyYjVALmZMPEBzfiAg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iLdo311wb2MjAlgV6Irw7c9ToaK8PELcH54nNILfZIg3QV/biGBGLNyZdzb2qbe8DQaiOHMNCuQQ3U5KkRrVWpLejk4MKalAVKCwxZg3GSboN0ypZF+bsnCMjZpF+q9wpOZuXfcziBWKuv3J9nj8V6J7xhdghZ0fqPlgrMat6ig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gWWOrOw7; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43cef035a3bso41485115e9.1;
-        Tue, 01 Apr 2025 08:05:19 -0700 (PDT)
+	s=arc-20240116; t=1743520818; c=relaxed/simple;
+	bh=+AZtruNF2slaQ2pW+XbtDx6RQe/JY4tZmaizs714skE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NdZOEdDZhYuVRSA7fQhnFSHmMDB60vRHPKksJd/sbTOkZWv/tbvWpqKvwjB7VUHRNpOflK8CnHKKhDzOpdSqVxc7nZXyexIvQJp9PZkDQOrx5i3yd0uKcT+6x5lqnj6WV58nd94paCSfw6q/Hk0T1T35Wk4TFkLyjuHg+w6eFko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=vCnAKf3a; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-226185948ffso110451825ad.0
+        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 08:20:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743519918; x=1744124718; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rzrpNc9TFQoSZZ0niGpxua8m7OyYjVALmZMPEBzfiAg=;
-        b=gWWOrOw7Qkt+Wb9dSEsRkCh/1CZAm62FTaWgCI5G1A2ccVCPANI5QNMZb+TLEDcUbu
-         09W7zkaKyzoiC+9o8ls0U0HhotzI8kttDl5ZKHDzPCQGKFZnG076WRwkSa7BRUvAmJSl
-         bAPHSE4HwS8KX78iFr3ltsaX3t7LIbXaZvg8Nt/E3gOESPzX/2FOkrqgY5HypZydwjoa
-         M5RwWdyZ6bPbKe3uXC/Ii7N6LU88ItQykLByOOajOjdBHXknRsnh4QYoRcBFsSULYr7Q
-         dcZkCJQDZph78y1lYyu4Aqd8oq9ZZ9o6LtE7NI8TkhaZ7QUB0eUNUxd693iK4cUVLCXH
-         ZHPQ==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1743520814; x=1744125614; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KYEEeuDUK0c4tCya15zU0U36ES4DSsfjDlwanwz0lTg=;
+        b=vCnAKf3aSWBSwiSYoBif7AJoUhZNLXu7w6fNck+j+1y6N1gMjZ/zk2cCQ9NptraLi5
+         kRoTI3ljV+nfIG9r5CHpQ4E/MwkGK69cSoIpUYOIGwrSWMAgmaRw83vLWPGdYoW72nxU
+         lbIlPLta2JRJdT9oBibx06urt+OMESd21rZvekBSD44A06YC4V24KFlt+HgG4luHxriF
+         UyNb+VXD44Jvzkn5Ilp8f6V/DBDFm292kI0zd2rNB2EiKDcMdApm4Maj7Zd4znARrzxH
+         r3gi4y9zKAVYzKeXhtGAp/KE4vurW/0345fmeNAKX9sOchijrobaT8rokW1MJr40SgM3
+         gwXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743519918; x=1744124718;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rzrpNc9TFQoSZZ0niGpxua8m7OyYjVALmZMPEBzfiAg=;
-        b=kniHZGyaPk71UQiLlzSw2blLCXb3RKvAvxnlgPNoNvNYYS301iR4FcjvT4SwGTNF48
-         ojo16LgQiRPxYQy0T6rninxNzUHxYAePxqJtnJpIJfh1ojr+Mbo5Z3BIpLdr+d7FsVic
-         g5UdxjTpE3vAuyAoxaalyMuhyOqmdyDm3lwMx+F4JdbCAGCehCycbCj9EvIptpXr7GKU
-         9q045uhfUOqp+4L/LuwyJ8c5J+tVpWNXMXVyQquZ6MwCfzDSt1K48QWSe9pFuiGeb4LM
-         wKy2dgFmEw6RTrNaaOYMw1eyg/kfZxHEtFLWZV11DKN0VVfJIsqxUQ9NV0C6OkG99ETi
-         +jlA==
-X-Forwarded-Encrypted: i=1; AJvYcCVOkOeQu+KeFsmU0LcMWotmHNOr3CCgczPJGh+tj+duMdN2e9iWfWGEitr1eHi18k9NZ4A174uATj7+ei4c@vger.kernel.org, AJvYcCVnisxby/FiXmgc6SAhbr8r279W7RMiAyjfPxftYW+yaKUWWFItz2rvIgsLILcwJOpMf4o=@vger.kernel.org, AJvYcCW1BL+IkNlgepJyfWnELj5BfCWPEHuQ1/DOImguNvQxNSSe2D7+6vWd6MYAIR/xmybYrUUyw8wU@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLwYh3mfE5zXUOmIxUjdXgVwVkVkXB0qRpjW1YIPadWp9z+aCE
-	QOEePDilATysLgDCIiwQB6V762eHPiXnIhORPH3hj5WtDe0T+acZytqq4lqv8DYt1OcXVnNJUOR
-	yCr3KYdDzNquwg4efnJpX9Blw4R4=
-X-Gm-Gg: ASbGnctk6GUDHIXWUsJSsvu+aEtwmtDNN1XW2yDGbfuVRNhesUfYBTymZbVfQIxYWnv
-	jIAa9BIlFMTQ/N1TRCRWM/jkhpiegfSpoFQ1BRtRC6LflWe8WDljkjgaQu5PbR9KkxGOtFKNhkU
-	gE59jl/7S0+6PZX6JQCSC5JTYs4IZChk9qUgYbLeI4JhhDI+P29ecS
-X-Google-Smtp-Source: AGHT+IHZQtwFAvK2hEK3yaLRLVk7xQKQq7OYedZ7AVxaKdxQr56jQ+LIq0hmcvz8D6ogCFiYYaPot5hdNFHc3HTAwRs=
-X-Received: by 2002:a05:600c:458b:b0:43c:fabf:9146 with SMTP id
- 5b1f17b1804b1-43db6248241mr135498295e9.17.1743519916412; Tue, 01 Apr 2025
- 08:05:16 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743520814; x=1744125614;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KYEEeuDUK0c4tCya15zU0U36ES4DSsfjDlwanwz0lTg=;
+        b=NnqoUW4ccZq2ulnavXXwp5DghQCdOWxihujgLjXPrU9J4for7V3qRN3FMxUMsYwcoG
+         irGbKGnCeN4euytpufVZOIq4pglzgIdcsyvRKGXh5rzF/XgVwPokp7jUZtmxGsFHKKoL
+         a/uqKfqBd6b7keglSda6iSbIgjhkd/fnnC9N/O9jRhiEBy1KPmZtGKFjoaAWWwiO+L/u
+         UY2mTOmElWyn6gV4FwN3v09IerrvaSeebGIOMo427QbAiFTTywj0TeoD9ZOE+yMDiCuz
+         dPf2GCre9oJuf0RlBhDySS3fTPL9pW5OBtugcgiQ+oXW2YA5STxxaa76Rcv9CDJ1CQCa
+         pa9g==
+X-Forwarded-Encrypted: i=1; AJvYcCVJ5BM0CDes0YP0ZlIS+rX4Vc+wEeLC0ug8yi2fpEjCgeWJ8PBjOZblBvAMBMUiTG9/18qVASM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVi7xsD/q296ouZxGkQ2DZVJPy87FlBpk7CWkb15p1imE4P6Y5
+	txCfa2Zz2ETZc1OQWoNtBOsRTPE+z31wHyDw+RJOPCnqwSrerqq3jq6X8iESqDE=
+X-Gm-Gg: ASbGncuYZ+pkJCb+W8PtBcSVbLXXI1+VqJS3jR+DlQOStYIIFp9SXzIYX14a+YXbbld
+	GuFCHYdOJIlltjo66XQNu/Eg3T5kQxpHbJJEBeiZAxN7ecS1mLLON76Jw+Nrdz3UPLGX5F9LkEv
+	3DJdUI7NR/jxxkNZaXL2HvNoDRgo6MNZO8ejwEIHBnygM1s36N47pfoYLs4srcAX6G51U4P2gI6
+	fer+Zzf4rFiz97xWAouslgEMNMmnP1vT5S0awRaTpzdS8ZqZcRZg7wqQGsDM3oJsHoUkRdcOw95
+	a+jtdKdn6lS1E42KKLXb+baDeIQ4Y6fnGYDgIEO8+DB2MpPJ0F1g4eTsDV54idX5K5rOHyl2jcu
+	KWwXiaPM=
+X-Google-Smtp-Source: AGHT+IHrXzh7NOJm4rB0nkI45VWc5AFQfzmeAtyz7eSg+CEnlTOfwwlOX4w5rwiBW7EDP/70P/4/wg==
+X-Received: by 2002:a17:902:da2d:b0:220:fe50:5b44 with SMTP id d9443c01a7336-2292f98769cmr194525895ad.31.1743520814041;
+        Tue, 01 Apr 2025 08:20:14 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1156:1:1cf1:8569:9916:d71f? ([2620:10d:c090:500::5:4565])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291f1ce07dsm89376415ad.144.2025.04.01.08.20.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Apr 2025 08:20:13 -0700 (PDT)
+Message-ID: <9eba198d-c209-4057-85b6-05d0444d1d37@davidwei.uk>
+Date: Tue, 1 Apr 2025 08:20:11 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250331142814.1887506-1-sdf@fomichev.me> <d2914c9f-5fc6-4719-bf6b-bc48991cd563@redhat.com>
-In-Reply-To: <d2914c9f-5fc6-4719-bf6b-bc48991cd563@redhat.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Tue, 1 Apr 2025 08:05:05 -0700
-X-Gm-Features: AQ5f1JoaNp4frNZ66sJ-r3eX-oDEbtMT1TlTYmYwNQwwHoQyApuM5RKvG1xty38
-Message-ID: <CAADnVQJJFPD2X1enPCa-0D7RG6SraRFTdMj1bsKkzFuz6Nighw@mail.gmail.com>
-Subject: Re: [PATCH bpf] bpf: add missing ops lock around dev_xdp_attach_link
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, bpf <bpf@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, syzbot+08936936fe8132f91f1a@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next 1/2] eth: bnxt: refactor buffer descriptor
+Content-Language: en-GB
+To: Taehee Yoo <ap420073@gmail.com>, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, andrew+netdev@lunn.ch,
+ horms@kernel.org, michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
+ ilias.apalodimas@linaro.org, netdev@vger.kernel.org
+Cc: kuniyu@amazon.com, sdf@fomichev.me, aleksander.lobakin@intel.com
+References: <20250331114729.594603-1-ap420073@gmail.com>
+ <20250331114729.594603-2-ap420073@gmail.com>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20250331114729.594603-2-ap420073@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 1, 2025 at 3:33=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> On 3/31/25 4:28 PM, Stanislav Fomichev wrote:
-> > Syzkaller points out that create_link path doesn't grab ops lock,
-> > add it.
-> >
-> > Cc: Jakub Kicinski <kuba@kernel.org>
-> > Reported-by: syzbot+08936936fe8132f91f1a@syzkaller.appspotmail.com
-> > Closes: https://lore.kernel.org/bpf/67e6b3e8.050a0220.2f068f.0079.GAE@g=
-oogle.com/
-> > Fixes: 97246d6d21c2 ("net: hold netdev instance lock during ndo_bpf")
-> > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
->
-> LGTM, but are there any special reasons to get this via the bpf tree? It
-> looks like 'net' material to me?!?
+On 2025-03-31 04:47, Taehee Yoo wrote:
+> There are two kinds of buffer descriptors in bnxt, struct
+> bnxt_sw_rx_bd and struct bnxt_sw_rx_agg_bd.(+ struct bnxt_tpa_info).
+> The bnxt_sw_rx_bd is the bd for ring buffer, the bnxt_sw_rx_agg_bd is
+> the bd for the aggregation ring buffer. The purpose of these bd are the
+> same, but the structure is a little bit different.
+> 
+> struct bnxt_sw_rx_bd {
+>         void *data;
+>         u8 *data_ptr;
+>         dma_addr_t mapping;
+> };
+> 
+> struct bnxt_sw_rx_agg_bd {
+>         struct page *page;
+>         unsigned int offset;
+>         dma_addr_t mapping;
+> }
+> 
+> bnxt_sw_rx_bd->data would be either page pointer or page_address(page) +
+> offset. Under page mode(xdp is set), data indicates page pointer,
+> if not, it indicates virtual address.
+> Before the recent head_pool work from Jakub, bnxt_sw_rx_bd->data was
+> allocated by kmalloc().
+> But after Jakub's work, bnxt_sw_rx_bd->data is allocated by page_pool.
+> So, there is no reason to still keep handling virtual address anymore.
+> The goal of this patch is to make bnxt_sw_rx_bd the same as
+> the bnxt_sw_rx_agg_bd.
+> By this change, we can easily use page_pool API like
+> page_pool_dma_sync_for_{cpu | device}()
+> Also, we can convert from page to the netmem very smoothly by this change.
+> 
+> Tested-by: David Wei <dw@davidwei.uk>
+> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 313 +++++++++---------
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  31 +-
+>  .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |   2 +-
+>  drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.c |  23 +-
+>  drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h |   2 +-
+>  include/net/page_pool/types.h                 |   4 +-
+>  net/core/page_pool.c                          |  23 +-
+>  7 files changed, 199 insertions(+), 199 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index 934ba9425857..198a42da3015 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+...
+> @@ -1111,25 +1103,24 @@ static void bnxt_reuse_rx_agg_bufs(struct bnxt_cp_ring_info *cpr, u16 idx,
+>  
+>  static struct sk_buff *bnxt_rx_multi_page_skb(struct bnxt *bp,
+>  					      struct bnxt_rx_ring_info *rxr,
+> -					      u16 cons, void *data, u8 *data_ptr,
+> +					      u16 cons, struct page *page,
+> +					      unsigned int offset,
+>  					      dma_addr_t dma_addr,
+>  					      unsigned int offset_and_len)
+>  {
+>  	unsigned int len = offset_and_len & 0xffff;
+> -	struct page *page = data;
+>  	u16 prod = rxr->rx_prod;
+>  	struct sk_buff *skb;
+>  	int err;
+>  
+>  	err = bnxt_alloc_rx_data(bp, rxr, prod, GFP_ATOMIC);
+>  	if (unlikely(err)) {
+> -		bnxt_reuse_rx_data(rxr, cons, data);
+> +		bnxt_reuse_rx_data(rxr, cons, page);
+>  		return NULL;
+>  	}
+> -	dma_addr -= bp->rx_dma_offset;
+> -	dma_sync_single_for_cpu(&bp->pdev->dev, dma_addr, BNXT_RX_PAGE_SIZE,
+> -				bp->rx_dir);
+> -	skb = napi_build_skb(data_ptr - bp->rx_offset, BNXT_RX_PAGE_SIZE);
+> +	page_pool_dma_sync_for_cpu(rxr->page_pool, page, 0, BNXT_RX_PAGE_SIZE);
 
-Pls take it through net.
+bnxt_alloc_rx_data() can allocate out of both head_pool and page_pool,
+but page_pool_dma_sync_for_cpu() always takes page_pool. The only
+difference is pool->p.offset; can this ever be different between the
+two?
 
