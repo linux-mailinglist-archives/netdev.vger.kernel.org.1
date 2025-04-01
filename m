@@ -1,46 +1,86 @@
-Return-Path: <netdev+bounces-178501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18802A77579
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 09:44:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C01FA7758B
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 09:46:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 172DF3A8E44
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 07:44:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 588E1188AD7E
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 07:45:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7FF51E9B35;
-	Tue,  1 Apr 2025 07:44:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 476BC1E9B2F;
+	Tue,  1 Apr 2025 07:45:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MwMKzKWa"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD011E98F9;
-	Tue,  1 Apr 2025 07:43:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B9191E9B1A
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 07:45:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743493442; cv=none; b=UUoy43ALCEGkKRm5XrXtF9H8PKlo6WW4JqNosf688K70T9Wuwu3ix8ftThyLrW/du3RPM3uH1WqV7L5APC6LvMwrEII4N082YsXT2Fu/za2pIu85MNfCSe+6gfI3LaigvHaw3ag0Zjv6G0Mot+V6qEbVy1wf4URCrarXkzvO7O4=
+	t=1743493517; cv=none; b=ehQev9SlpZHNffijqh20lzf2YYbHPl80AOSzFIizxBQsWKLbfphzmEgv5EmDg5W/3GyhECJaBSVJ2Uw15zHkbfj9sYwnxbiRIj+fS+cL5gITtUbVPksmmWVlaqaN9U/qUzT8x6z2ULfiuHvJU8j6K+4+M1ZGNN5GcH2pV4bJzhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743493442; c=relaxed/simple;
-	bh=THngXZIhQioKCrZCm1xvnaDv2uQrZPu+UxuNcjKLAD8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=X93YDxZREl349oXhhA+pipBoK0Jft49fcj/aalNGax2+ZH6DAtqLFtaHvLcExRsq+LIaqA+cMKTLV3Zbaf7FbV76+R8M+krGCVGOHfySn+HS+4yubHbO00XZgHaQprBztbr0F5A3UiRAPTfmu50FDtHxawuiOirEZQOTUBXszpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4ZRg050xggzHrJW;
-	Tue,  1 Apr 2025 15:40:37 +0800 (CST)
-Received: from kwepemg200005.china.huawei.com (unknown [7.202.181.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id EE786180080;
-	Tue,  1 Apr 2025 15:43:56 +0800 (CST)
-Received: from [10.174.176.70] (10.174.176.70) by
- kwepemg200005.china.huawei.com (7.202.181.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 1 Apr 2025 15:43:55 +0800
-Message-ID: <ed10eea2-0bf2-4747-b519-f9b9089e434e@huawei.com>
-Date: Tue, 1 Apr 2025 15:43:54 +0800
+	s=arc-20240116; t=1743493517; c=relaxed/simple;
+	bh=NJg9loH5DPwUT9RIGGEOKSUIUmJpxXqcl7s9uyAryf0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HE2yHRfUQSTvvUQYRqUJNWc3TscXC2Lac9VcjCFFF/1K+Qrzi390CEbZbK/SeXwUMPWyoSvmjVgvLzWhGEvSHqCW4NCZp7MtBObtbSA+2gx1Kmuu7aT5KGuFR8JRanabgtiHU/MmA3/jKcHRUAxWbh4fqoV4kljUiLTstaKunyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MwMKzKWa; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743493514;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uPVEmBMiCehllT7+kdVA6tb5Y19MZOZXc3+AWueTqfA=;
+	b=MwMKzKWaTwMWMDOSrDwMytvj4aEHcCL4aHPIGyOp2iTmsN/x1tBaUymo4MVyqhU53gRT5N
+	4xjIj9GLwcho2XWv6Atp+lbrEoG17Ya9zEws8w22yHTirilWrVVK+p7BVnFPjjanXqeAJf
+	TI1Y+CURshlWrP/WIrMJNQwWix4sr7c=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-27-xbSv1jGhNSqshsKgilQpoA-1; Tue, 01 Apr 2025 03:45:13 -0400
+X-MC-Unique: xbSv1jGhNSqshsKgilQpoA-1
+X-Mimecast-MFC-AGG-ID: xbSv1jGhNSqshsKgilQpoA_1743493512
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-39135d31ca4so2718877f8f.1
+        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 00:45:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743493512; x=1744098312;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uPVEmBMiCehllT7+kdVA6tb5Y19MZOZXc3+AWueTqfA=;
+        b=h/AzF9kEoJ0T4B6u6NEpWe9ATLh37U8x5Y4ompZJnlcc/fGxoOee/beWV5R5Qs+bGD
+         35ihuuyu7G4o3u2a0A3QIuPvlJFSjumgX804llybgLXS7bAcMcQBvieZro+zuQV+eIzS
+         l+x12UrKzdPG2lLSwUnsJa/jSc77yT8Yi7MuxvQEU+xZhTAOIvNcPfkQ2n0YwGdJqC/I
+         xWnuAwO7TPYDuQQyWhXJtkuD5CIxNPjJmxTSj5EzSKTJ+tTEYEUTaAev8fY9KV5M6+mN
+         RUKAXn54QKnSnZZPZ6ENxcQj520b3JynE45tvR/hP5VLqxD0oqI1CGUkemg5bb2r8fkU
+         tZuA==
+X-Forwarded-Encrypted: i=1; AJvYcCU4VMYVaQKo/4bhKxxanKg0n3FEV0ZmkaPO+22THm8TwGN/ZZDnNEEPKtwcXRPSTj6H0LEz3sU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+KW919sXvb1yM/l0NWYsjeFWCfzYuqayXVTYdhxA119VvFZiT
+	teKXnfAC/j4JkmV7Qe04HolIWpQkG2AInNemWJsd+VdKKiXz3tV/45EkLBCxcp7fysdzrHfX9DQ
+	POHMA3jn+c6+P0fPBqMogi8z2fFYFaxedy1VGJjbBZzo/f6gRlGo7Tg==
+X-Gm-Gg: ASbGnctgmLBtxDTf7RBiGq2qgGgJKRfXLYEB2WQmcH+xNwEI/320jW/6opT5tjDvA+P
+	SfBtd8tT7lryMkqW42tAZeN1TetWHHyMkLNAAgkTPYEXlb3KMnqkesL9hPjj3q6SLQFePfakQ0+
+	rH7FuUuWRHRh7DRY5Rqko/RFhXKPESdnZhHSH7qfLDIz2dPazidobgIBR0qIVhcKKJSmIva77Sj
+	p3AdYduMek0GQCNA5oJpusXGHb2oaBznYvJSiWOYQAKjVPC+woBY0Bx4QgjMpuQ5jodNPuDs4r3
+	cntAPm/pmLSQN5SJBpDUg5yV5RKCe22hGJ6LsdaTcv9zyQ==
+X-Received: by 2002:a05:6000:1448:b0:399:6d6a:90d9 with SMTP id ffacd0b85a97d-39c0c136bd4mr13298966f8f.18.1743493511675;
+        Tue, 01 Apr 2025 00:45:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFpGjDvgRuv3rPh+sZzuIo7a1UqtEX2dbLL0x3yl3Qc1zwqWs0cDqxIOuutwoJPuKYJIFAmdw==
+X-Received: by 2002:a05:6000:1448:b0:399:6d6a:90d9 with SMTP id ffacd0b85a97d-39c0c136bd4mr13298938f8f.18.1743493511262;
+        Tue, 01 Apr 2025 00:45:11 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-68-231.dyn.eolo.it. [146.241.68.231])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b6630a3sm13423505f8f.30.2025.04.01.00.45.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Apr 2025 00:45:10 -0700 (PDT)
+Message-ID: <d9a7af40-84f9-446e-a708-d989b322a675@redhat.com>
+Date: Tue, 1 Apr 2025 09:45:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,130 +88,71 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] xsk: correct tx_ring_empty_descs count statistics
-To: Magnus Karlsson <magnus.karlsson@gmail.com>
-CC: Stanislav Fomichev <stfomichev@gmail.com>, <bjorn@kernel.org>,
-	<magnus.karlsson@intel.com>, <maciej.fijalkowski@intel.com>,
-	<jonathan.lemon@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>, <ast@kernel.org>,
-	<daniel@iogearbox.net>, <hawk@kernel.org>, <john.fastabend@gmail.com>,
-	<yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
-	<netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20250329061548.1357925-1-wangliang74@huawei.com>
- <Z-qzLyGKskaqgFh5@mini-arch> <Z-sRF0G43HpGiGwH@mini-arch>
- <0d1b689c-c0ef-460a-9969-ff5aebbb8fac@huawei.com>
- <CAJ8uoz1JxhXFkzW8n_Dud8SR-4zE7gim5vS_UZHELiA7d0k+wQ@mail.gmail.com>
-From: Wang Liang <wangliang74@huawei.com>
-In-Reply-To: <CAJ8uoz1JxhXFkzW8n_Dud8SR-4zE7gim5vS_UZHELiA7d0k+wQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemg200005.china.huawei.com (7.202.181.32)
+Subject: Re: Concurrent slab-use-after-free in netdev_next_lower_dev
+To: Dylan Wolff <wolffd@comp.nus.edu.sg>, Wenjia Zhang
+ <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+ "D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>,
+ Wen Gu <guwen@linux.alibaba.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, linux-rdma@vger.kernel.org,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Jiacheng Xu <3170103308@zju.edu.cn>
+References: <CAJeEPuJHMKo9T3GcAQH2+X3Rke3b4YH3_S6FmnBp4tQqLciYxA@mail.gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CAJeEPuJHMKo9T3GcAQH2+X3Rke3b4YH3_S6FmnBp4tQqLciYxA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 3/31/25 3:00 PM, Dylan Wolff wrote:
+> From the report, it looks like the net_device is freed at the end of an
+> rtnl critical section in netdev_run_todo. At the time of the crash, the
+> *use* thread has acquired rtnl_lock() in smc_vlan_by_tcpsk. The crash
+> occurred at the line preceded by `>>>` below in 6.13 rc4 while iterating
+> over devices with netdev_walk_all_lower_dev:
+> 
+> ```
+> static struct net_device *netdev_next_lower_dev(struct net_device *dev,
+> struct list_head **iter)
+> {
+> struct netdev_adjacent *lower;
+> 
+>>>> lower = list_entry((*iter)->next, struct netdev_adjacent, list);
+> 
+> if (&lower->list == &dev->adj_list.lower)
+> return NULL;
+> 
+> *iter = &lower->list;
+> 
+> return lower->dev;
+> }
+> ```
 
-在 2025/4/1 14:57, Magnus Karlsson 写道:
-> On Tue, 1 Apr 2025 at 04:36, Wang Liang <wangliang74@huawei.com> wrote:
->>
->> 在 2025/4/1 6:03, Stanislav Fomichev 写道:
->>> On 03/31, Stanislav Fomichev wrote:
->>>> On 03/29, Wang Liang wrote:
->>>>> The tx_ring_empty_descs count may be incorrect, when set the XDP_TX_RING
->>>>> option but do not reserve tx ring. Because xsk_poll() try to wakeup the
->>>>> driver by calling xsk_generic_xmit() for non-zero-copy mode. So the
->>>>> tx_ring_empty_descs count increases once the xsk_poll()is called:
->>>>>
->>>>>     xsk_poll
->>>>>       xsk_generic_xmit
->>>>>         __xsk_generic_xmit
->>>>>           xskq_cons_peek_desc
->>>>>             xskq_cons_read_desc
->>>>>               q->queue_empty_descs++;
-> Sorry, but I do not understand how to reproduce this error. So you
-> first issue a setsockopt with the XDP_TX_RING option and then you do
-> not "reserve tx ring". What does that last "not reserve tx ring" mean?
-> No mmap() of that ring, or something else? I guess you have bound the
-> socket with a bind()? Some pseudo code on how to reproduce this would
-> be helpful. Just want to understand so I can help. Thank you.
-Sorry, the last email is garbled, and send again.
+Please share the decoded syzkaller/kasan splat in plaintext instead of
+describing it in natural language, and please avoid attachments unless
+explicitly asked for.
 
-Ok. Some pseudo code like below:
+Also, can you reproduce the issue on top of the current net tree?
 
-     fd = socket(AF_XDP, SOCK_RAW, 0);
-     setsockopt(fd, SOL_XDP, XDP_UMEM_REG, &mr, sizeof(mr));
+> This looks to me like it is an issue with reference counting; I see that
+> netdev_refcnt_read is checked in netdev_run_todo before the device is
+> freed, but I don't see anything in netdev_walk_all_lower_dev /
+> netdev_next_lower_dev that is incrementing netdev_refcnt_read when it is
+> iterating over the devices. I'm guessing the fix is to either add reference
+> counting to netdev_walk_all_lower_dev or to use a different,
+> concurrency-safe iterator over the devices in the caller (smc_vlan_by_tcpsk
+> ).
+> 
+> Could someone confirm if I am on the right track here? If so I am happy to
+> try to come up with the patch.
 
-     setsockopt(fd, SOL_XDP, XDP_UMEM_FILL_RING, &fill_size, 
-sizeof(fill_size));
-     setsockopt(fd, SOL_XDP, XDP_UMEM_COMPLETION_RING, &comp_size, 
-sizeof(comp_size));
-     mmap(NULL, off.fr.desc + fill_size * sizeof(__u64), ..., 
-XDP_UMEM_PGOFF_FILL_RING);
-     mmap(NULL, off.cr.desc + comp_size * sizeof(__u64), ..., 
-XDP_UMEM_PGOFF_COMPLETION_RING);
+netdev_walk_all_lower_dev() should not need additional refcounting, as
+it is traversing the list under rtnl lock, and device should be removed
+from the adjacency list  before the actual device free under such lock, too.
 
-     setsockopt(fd, SOL_XDP, XDP_RX_RING, &rx_size, sizeof(rx_size));
-     setsockopt(fd, SOL_XDP, XDP_TX_RING, &tx_size, sizeof(tx_size));
-     mmap(NULL, off.rx.desc + rx_size * sizeof(struct xdp_desc), ..., 
-XDP_PGOFF_RX_RING);
-     mmap(NULL, off.tx.desc + tx_size * sizeof(struct xdp_desc), ..., 
-XDP_PGOFF_TX_RING);
+Thanks,
 
-     bind(fd, (struct sockaddr *)&sxdp, sizeof(sxdp));
-     bpf_map_update_elem(xsk_map_fd, &queue_id, &fd, 0);
+Paolo
 
-     while(!global_exit) {
-         poll(fds, 1, -1);
-         handle_receive_packets(...);
-     }
-
-The xsk is created success, and xs->tx is initialized.
-
-The "not reserve tx ring" means user app do not update tx ring producer.
-Like:
-
-     xsk_ring_prod__reserve(tx, 1, &tx_idx);
-     xsk_ring_prod__tx_desc(tx, tx_idx)->addr = frame;
-     xsk_ring_prod__tx_desc(tx, tx_idx)->len = pkg_length;
-     xsk_ring_prod__submit(tx, 1);
-
-These functions (xsk_ring_prod__reserve, etc.) is provided by libxdp.
-
-The tx->producer is not updated, so the xs->tx->cached_cons and
-xs->tx->cached_prod are always zero.
-
-When receive packets and user app call poll(), xsk_generic_xmit() will be
-triggered by xsk_poll(), leading to this issue.
->>>>> To avoid this count error, add check for tx descs before send msg in poll.
->>>>>
->>>>> Fixes: df551058f7a3 ("xsk: Fix crash in poll when device does not support ndo_xsk_wakeup")
->>>>> Signed-off-by: Wang Liang <wangliang74@huawei.com>
->>>> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
->>> Hmm, wait, I stumbled upon xskq_has_descs again and it looks only at
->>> cached prod/cons. How is it supposed to work when the actual tx
->>> descriptor is posted? Is there anything besides xskq_cons_peek_desc from
->>> __xsk_generic_xmit that refreshes cached_prod?
->>
->> Yes, you are right!
->>
->> How about using xskq_cons_nb_entries() to check free descriptors?
->>
->> Like this:
->>
->>
->> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
->> index e5d104ce7b82..babb7928d335 100644
->> --- a/net/xdp/xsk.c
->> +++ b/net/xdp/xsk.c
->> @@ -993,7 +993,7 @@ static __poll_t xsk_poll(struct file *file, struct
->> socket *sock,
->>           if (pool->cached_need_wakeup) {
->>                   if (xs->zc)
->>                           xsk_wakeup(xs, pool->cached_need_wakeup);
->> -               else if (xs->tx)
->> +               else if (xs->tx && xskq_cons_nb_entries(xs->tx, 1))
->>                           /* Poll needs to drive Tx also in copy mode */
->>                           xsk_generic_xmit(sk);
->>           }
->>
->>
 
