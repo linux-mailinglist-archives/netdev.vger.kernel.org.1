@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-178653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13E6FA78094
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 18:36:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5BF7A78093
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 18:36:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EFC418887E8
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 16:35:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55AE616B43D
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 16:35:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FC2A20C476;
-	Tue,  1 Apr 2025 16:35:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4653120C48C;
+	Tue,  1 Apr 2025 16:35:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B64820D4F7
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 16:35:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D5720E313
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 16:35:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743525302; cv=none; b=LHG7AZNugxpkchbBwJxYfohCW3hJdd8DQhll/+KCDmTr5v8eRDrXaLlJ7U1QwwJGABMykZTXU8PPHX9io4ICRZ87GzGGTvRkz6kiYtda5E9YOwfQ11WJnBW2WgtLr1ycBnjwE12ejB6tfrmtkNI+ddspbibewMKI0fafgJQwkc0=
+	t=1743525304; cv=none; b=gPNVElpuSEahclovjO4gQSYyjNLdYxYZnHe7jinWWDF/4zuUwAVPFoS0uY5gc3ls5YLjPz+TAK3K52wkZGpw+IxxONbWmUhc0ufCY2gAZL1VeLLC8wlVI7+rW2OMu8R7w9Wlq1DixIqtxKVq6/ZrVmC4lY86GvW8EzINAvjhd5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743525302; c=relaxed/simple;
-	bh=V52ogIerz3pWrsOVtz2HNfeJC3T1ZLd6RIDKy5JCA10=;
+	s=arc-20240116; t=1743525304; c=relaxed/simple;
+	bh=37DPlTB1m+vNulI3hmYc3tDyAAJiHuA+wLkwQsf3Un8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rCWvP0TIS7ihjvHfLAhFhPb8H/oVZgBuvQAbiyHEVVzQjGCeQb5Vnx4rd63bYP9ZOwuzxRj1hQXxpNzpCr7uM1+yWgbjPaSBU4sIA9NpVXR8iGwdZkOrwRBPuCfE5vlI1ZzgavCal5UrBm+Y0TQ2qToYdi67l/HQBqe97GkUybQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.176
+	 MIME-Version; b=LED/RJtHLW9eyn8MLjP6BJQhOyS9zYIkzywX5en0UNANpRJK3pCNKFkUawAPx6rq5rQyh69tFKqfUxnyohokbw0xR6R00HTM0sirFtFzxzr0/6I0oy1aV66IKjGc0/95GklT4JbuG9gfZXV2UHQqnfAyowUkmSrT8UI7ocU31K0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-22435603572so108880745ad.1
-        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 09:35:00 -0700 (PDT)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2260c91576aso92327295ad.3
+        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 09:35:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743525300; x=1744130100;
+        d=1e100.net; s=20230601; t=1743525301; x=1744130101;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QqW4GjRTu/v0EzDHaXQV7WFvqxG263JPBR8ADF6KpwE=;
-        b=O8FRzwqw9F6IMs6qN7nLQ2J+p5+ELs/DdNBXPpePbhC2NCVqOufULIzd+Irj1APbIr
-         nytZCXaiLh/SrV9gr82oRskreoLmyDlKIMQDQVLHrQcyVrA3l2W20CPSXH2u3Y553bZz
-         V2Wu5r1iLjw0jKjWbiZ2N3zNiVXXa6EUSEBx+OhuQr3DTZi2QTxtfZ+eJ+I6ess4CPbw
-         44WXE2lXkBGeAd6Xx41f8OpyIjP0OzXdESOEB2NWlzFHP7R9Xyg5IM24PM2zBus7ekqF
-         rfPxhTvLZGYQR8nsl/1bzvsSNKZ1fOpXqTmPasSPPVw8ATlnkkEHONc6VXE1H+6VOh5l
-         bcsQ==
-X-Gm-Message-State: AOJu0Yww+JYH3Foq0b7Zbximxv9+YESUyMrwR3jS2KdQJ0C9Bvc4/RmI
-	EROs6t+Vh5F5hyC2mgQL634cieiqNDvTqNCmhry7hKnNUya3/Uz+Az9YRueXOw==
-X-Gm-Gg: ASbGnctJIB3A5NryV59zZT4HwuP3ru1j2it65qqbnBnu8/0h/WylEB4jN3PAgo9LCmZ
-	A+pqCDGWi0VV7DLia519bRvSe8AsHzl4GJczBRqK3Ka+VMV7HZMfSBvMNnpmE2DjZaD1Hs4FIL7
-	OiTDvWRFs95nUieZVulXijPddAQline7hq26hvqm/+dWcZxtADHDG19OOmV2DVM1yQ/Ea/Afxxs
-	vtidtXG2WDJ5TFGczBxMLRB1y5V484ZaA/kv9CGrLvGguIZ5Ms2iUOPzP53OfjHxE955Q0uztr1
-	z6Vm9ShM890QsiLLifgfRA5C4rJ4W/2+uiYjyszHle3H
-X-Google-Smtp-Source: AGHT+IF4T6jmB2z2n9PHadBfxpjeLuK3A1AU8GVUIt9fw/PANgQSkHTea+AbaGmRTKn59laZq5DbGA==
-X-Received: by 2002:a17:902:cece:b0:220:cb1a:da5 with SMTP id d9443c01a7336-2292f9f2ee6mr230756585ad.40.1743525299840;
-        Tue, 01 Apr 2025 09:34:59 -0700 (PDT)
+        bh=QtrkWp/IUEbfiPxi5ET2roEwQfuYzRFO4zkGAj8DquA=;
+        b=SZeC8YhOM44NAPdBJ4zyiLeoOsMwIunYBxyHnLiMN8dSAgmR2cgMSw1UBcLUCMnQCl
+         oWkNDzYvznEuZUkERKCRaUfSrT6ejOVKWO4Jk9Wjn8Vk4Yu4407qZUQpJ7KfAZcHsE0C
+         /Hb8PXzmrszEqrUaMEMm4x4vXBWDVls0qhxJ1oGwx4SymY8ucXALJWCBFZWVS+xJw5/s
+         sTbjZuIvrS8/MGFVrz1lrJI/+v1ZNHJh3lFnJqM/CvGNOiFLQur2pOsy+3P/f6xmLpB1
+         uLCUVvSvPbcNU4gkV9obqR7lgJ9Bk6kPDD8VqHD8hGNsItJ6NZoLDTQxkF7miggE9zwd
+         xrtw==
+X-Gm-Message-State: AOJu0YzHWg4BuM+1ytOltxbOuQZS47CfCwSxlYPv/FZc9aZTq+gPYFtZ
+	6rH4MzSQLGR0EGO3Wt5dhYtaoVhmpyyJ+CLssGsGFnYtLzD5TOn4ANs2+8H3nw==
+X-Gm-Gg: ASbGncvQn6UtJ100tku9avgLcGSkhRhfUdGWst7BC8dOpBOU81rB+blYlj+Q9BCxpy9
+	MbwsBH9Es/RuhczaD4jQqgdjhwn+d2/XDAsgiL68WQFqJMYOslT/cDJfPhhCAczJvz+UAZeGh+l
+	2sn23iL1wwicJFvi4TzFaRvARWD7j2L/a5AGpM8bFYYOdmv6P63PfkGv7qRIO7ka4APLjGvLTl5
+	mHVXw4tOVwWxay6StLToh7bvT+oMf9+WRwjrp5Qv3wqpALgBBu76DtOuQo4d0A7o4CxnLNKKmcE
+	QBxi5KisIKY1lXDv2P32siohLZNWg/wro9zVydoxia9nTR05o9vG4jI=
+X-Google-Smtp-Source: AGHT+IE7QtvIM/kCpjnL0I+6bU7HziVdI2MSwS7kXtHjLp24ijHW5tP/29JZGijVvCfUuKSxM1osSQ==
+X-Received: by 2002:a17:902:da83:b0:227:e7c7:d451 with SMTP id d9443c01a7336-2292f974b3emr226446835ad.29.1743525301231;
+        Tue, 01 Apr 2025 09:35:01 -0700 (PDT)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2291f1cde7bsm91060475ad.149.2025.04.01.09.34.59
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2291eee03f5sm91135375ad.99.2025.04.01.09.35.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 09:34:59 -0700 (PDT)
+        Tue, 01 Apr 2025 09:35:00 -0700 (PDT)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com
-Subject: [PATCH net v5 04/11] net: rename rtnl_net_debug to lock_debug
-Date: Tue,  1 Apr 2025 09:34:45 -0700
-Message-ID: <20250401163452.622454-5-sdf@fomichev.me>
+Subject: [PATCH net v5 05/11] netdevsim: add dummy device notifiers
+Date: Tue,  1 Apr 2025 09:34:46 -0700
+Message-ID: <20250401163452.622454-6-sdf@fomichev.me>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250401163452.622454-1-sdf@fomichev.me>
 References: <20250401163452.622454-1-sdf@fomichev.me>
@@ -77,33 +77,143 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-And make it selected by CONFIG_DEBUG_NET. Don't rename any of
-the structs/functions. Next patch will use rtnl_net_debug_event in
-netdevsim.
+In order to exercise and verify notifiers' locking assumptions,
+register dummy notifiers (via register_netdevice_notifier_dev_net).
+Share notifier event handler that enforces the assumptions with
+lock_debug.c (rename and export rtnl_net_debug_event as
+netdev_debug_event). Add ops lock asserts to netdev_debug_event.
 
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- net/core/Makefile                           | 2 +-
- net/core/{rtnl_net_debug.c => lock_debug.c} | 0
- 2 files changed, 1 insertion(+), 1 deletion(-)
- rename net/core/{rtnl_net_debug.c => lock_debug.c} (100%)
+ drivers/net/netdevsim/netdev.c    | 13 +++++++++++++
+ drivers/net/netdevsim/netdevsim.h |  3 +++
+ include/net/netdev_lock.h         |  3 +++
+ net/core/lock_debug.c             | 14 +++++++++-----
+ 4 files changed, 28 insertions(+), 5 deletions(-)
 
-diff --git a/net/core/Makefile b/net/core/Makefile
-index a10c3bd96798..b2a76ce33932 100644
---- a/net/core/Makefile
-+++ b/net/core/Makefile
-@@ -45,5 +45,5 @@ obj-$(CONFIG_BPF_SYSCALL) += bpf_sk_storage.o
- obj-$(CONFIG_OF)	+= of_net.o
- obj-$(CONFIG_NET_TEST) += net_test.o
- obj-$(CONFIG_NET_DEVMEM) += devmem.o
--obj-$(CONFIG_DEBUG_NET_SMALL_RTNL) += rtnl_net_debug.o
-+obj-$(CONFIG_DEBUG_NET) += lock_debug.o
- obj-$(CONFIG_FAIL_SKB_REALLOC) += skb_fault_injection.o
-diff --git a/net/core/rtnl_net_debug.c b/net/core/lock_debug.c
-similarity index 100%
-rename from net/core/rtnl_net_debug.c
-rename to net/core/lock_debug.c
+diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+index b67af4651185..ddda0c1e7a6d 100644
+--- a/drivers/net/netdevsim/netdev.c
++++ b/drivers/net/netdevsim/netdev.c
+@@ -939,6 +939,7 @@ static int nsim_init_netdevsim(struct netdevsim *ns)
+ 	ns->netdev->netdev_ops = &nsim_netdev_ops;
+ 	ns->netdev->stat_ops = &nsim_stat_ops;
+ 	ns->netdev->queue_mgmt_ops = &nsim_queue_mgmt_ops;
++	netdev_lockdep_set_classes(ns->netdev);
+ 
+ 	err = nsim_udp_tunnels_info_create(ns->nsim_dev, ns->netdev);
+ 	if (err)
+@@ -960,6 +961,14 @@ static int nsim_init_netdevsim(struct netdevsim *ns)
+ 	if (err)
+ 		goto err_ipsec_teardown;
+ 	rtnl_unlock();
++
++	if (IS_ENABLED(CONFIG_DEBUG_NET)) {
++		ns->nb.notifier_call = netdev_debug_event;
++		if (register_netdevice_notifier_dev_net(ns->netdev, &ns->nb,
++							&ns->nn))
++			ns->nb.notifier_call = NULL;
++	}
++
+ 	return 0;
+ 
+ err_ipsec_teardown:
+@@ -1043,6 +1052,10 @@ void nsim_destroy(struct netdevsim *ns)
+ 	debugfs_remove(ns->qr_dfs);
+ 	debugfs_remove(ns->pp_dfs);
+ 
++	if (ns->nb.notifier_call)
++		unregister_netdevice_notifier_dev_net(ns->netdev, &ns->nb,
++						      &ns->nn);
++
+ 	rtnl_lock();
+ 	peer = rtnl_dereference(ns->peer);
+ 	if (peer)
+diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
+index 665020d18f29..d04401f0bdf7 100644
+--- a/drivers/net/netdevsim/netdevsim.h
++++ b/drivers/net/netdevsim/netdevsim.h
+@@ -144,6 +144,9 @@ struct netdevsim {
+ 
+ 	struct nsim_ethtool ethtool;
+ 	struct netdevsim __rcu *peer;
++
++	struct notifier_block nb;
++	struct netdev_net_notifier nn;
+ };
+ 
+ struct netdevsim *
+diff --git a/include/net/netdev_lock.h b/include/net/netdev_lock.h
+index 1c0c9a94cc22..c316b551df8d 100644
+--- a/include/net/netdev_lock.h
++++ b/include/net/netdev_lock.h
+@@ -98,4 +98,7 @@ static inline int netdev_lock_cmp_fn(const struct lockdep_map *a,
+ 				  &qdisc_xmit_lock_key);	\
+ }
+ 
++int netdev_debug_event(struct notifier_block *nb, unsigned long event,
++		       void *ptr);
++
+ #endif
+diff --git a/net/core/lock_debug.c b/net/core/lock_debug.c
+index 7ecd28cc1c22..72e522a68775 100644
+--- a/net/core/lock_debug.c
++++ b/net/core/lock_debug.c
+@@ -6,10 +6,11 @@
+ #include <linux/notifier.h>
+ #include <linux/rtnetlink.h>
+ #include <net/net_namespace.h>
++#include <net/netdev_lock.h>
+ #include <net/netns/generic.h>
+ 
+-static int rtnl_net_debug_event(struct notifier_block *nb,
+-				unsigned long event, void *ptr)
++int netdev_debug_event(struct notifier_block *nb, unsigned long event,
++		       void *ptr)
+ {
+ 	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
+ 	struct net *net = dev_net(dev);
+@@ -17,11 +18,13 @@ static int rtnl_net_debug_event(struct notifier_block *nb,
+ 
+ 	/* Keep enum and don't add default to trigger -Werror=switch */
+ 	switch (cmd) {
++	case NETDEV_REGISTER:
+ 	case NETDEV_UP:
++		netdev_ops_assert_locked(dev);
++		fallthrough;
+ 	case NETDEV_DOWN:
+ 	case NETDEV_REBOOT:
+ 	case NETDEV_CHANGE:
+-	case NETDEV_REGISTER:
+ 	case NETDEV_UNREGISTER:
+ 	case NETDEV_CHANGEMTU:
+ 	case NETDEV_CHANGEADDR:
+@@ -66,6 +69,7 @@ static int rtnl_net_debug_event(struct notifier_block *nb,
+ 
+ 	return NOTIFY_DONE;
+ }
++EXPORT_SYMBOL_NS_GPL(netdev_debug_event, "NETDEV_INTERNAL");
+ 
+ static int rtnl_net_debug_net_id;
+ 
+@@ -74,7 +78,7 @@ static int __net_init rtnl_net_debug_net_init(struct net *net)
+ 	struct notifier_block *nb;
+ 
+ 	nb = net_generic(net, rtnl_net_debug_net_id);
+-	nb->notifier_call = rtnl_net_debug_event;
++	nb->notifier_call = netdev_debug_event;
+ 
+ 	return register_netdevice_notifier_net(net, nb);
+ }
+@@ -95,7 +99,7 @@ static struct pernet_operations rtnl_net_debug_net_ops __net_initdata = {
+ };
+ 
+ static struct notifier_block rtnl_net_debug_block = {
+-	.notifier_call = rtnl_net_debug_event,
++	.notifier_call = netdev_debug_event,
+ };
+ 
+ static int __init rtnl_net_debug_init(void)
 -- 
 2.49.0
 
