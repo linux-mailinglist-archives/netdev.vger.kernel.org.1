@@ -1,128 +1,177 @@
-Return-Path: <netdev+bounces-178610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54494A77CAD
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 15:50:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD77CA77CA9
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 15:50:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D265316AC64
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 13:49:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB5E27A2075
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 13:49:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D942046BF;
-	Tue,  1 Apr 2025 13:49:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7E6F20459E;
+	Tue,  1 Apr 2025 13:49:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iST4EujV"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="PR1Tl/t6";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="kOKRpO0q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860DE202C43;
-	Tue,  1 Apr 2025 13:49:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A46DB20371A;
+	Tue,  1 Apr 2025 13:49:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743515361; cv=none; b=kenWqJzvwipXgXFP41c5rNSxVhgBjEzLPktwS/nK7bPAq72ObNqdsuiTdOyk/W+JVazK0c1PtyNUq1dGEQkNG71BogAuFV0IgNp7zp+5b29MvQWSOLjp+TKtsT7/t2eLzQcktEBxWobRiIrAt+IHhux4Ear069tzAspUiyn1eiw=
+	t=1743515379; cv=none; b=AAbtxdV5cnTmjcmLz/iih7/rZXusUnco1frQElN4udh9YbMffeWtWKie9mbUawqYbbpRfszHILZE+FUtRx/qj55drkLFjhvbIVlrwAMLtAAFX0RsLEltYC+SxH1GWqz0dcIUmcQuuKTyEFlo92yf9YY0fGW4suMhnq8PCD9Hga8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743515361; c=relaxed/simple;
-	bh=lTmvtAZFfM9uXdy/5V7cbp2eydMoTmaK/VFQFrqBxaM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LESJSn8PyXzZ1XtDL42kCnsR8gab+dwUKgOMKDPThFj9mCg/Z2H6YRqEQId1AMIpNlJ7Wbk16aLS6INn3aRGXklOZmB+B3MDpkD1sVnmJLCkJtyNwwvqs4akyfYZetezVJpC7z506GK5wGc4HVsDetUMBBqNBGEoHi+aTfnGQfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iST4EujV; arc=none smtp.client-ip=209.85.214.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-22423adf751so102313115ad.2;
-        Tue, 01 Apr 2025 06:49:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743515358; x=1744120158; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3+q47wA2IEeOPKNJa5W5ktJHHXBcjtXz826Y0oM/YZc=;
-        b=iST4EujVE+lvr8OOxmxulGpRDs+QJvjmHv4fQ58nF6IahFkP8r3PVwXXVZxcZcouUn
-         RMzYqjVm3x49zX5sMjfN6vjkwrVEOMr8DlPdUkN20QOiVOY+OlNNUguWwGLwSsEpT0Dc
-         nBHrmits1aONf1iz6jOOskHiqp3Ukqs2kEd23J/NJEcCxOImbgvDSI5A+OoU0Py6Csno
-         BBwkuSJNxtURvmJfmDZD9xVk6rAoTUSVNBrPGden5SOX2ShYHpMc80oh6+/A7jYHU9ea
-         eiyWXEeIIrW1GoPI4J7U77XNU0pA5gXfUsj4/aQOYvN2SxT0l6XE/pHc/6pZ/DrJP+yQ
-         n1IQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743515358; x=1744120158;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3+q47wA2IEeOPKNJa5W5ktJHHXBcjtXz826Y0oM/YZc=;
-        b=i7L3/mDs72Z2gVP3GiDKIxt8lp0a8tn75EKqBEh8F79ZgIVF2+nUvwQhu4p3fiAuLo
-         abs2EIBp5JK5i5lwyOLQmzvSgI6GmQCpvr0otXzww4i5/AsksVS6KiZM+eRqwXub0FSy
-         uu3uxRRtMaTLp1NliXjG5jAzs8RN1aKRLya4DnFiA+O0ywMVtliJS5wH7LKyyZMVnLWY
-         7EKayty/puDjnV5W9bZSfBbgwAcbFcgZx6uCLX7+9B/H/ugtqk7orqrrFYz1B1OrGpp8
-         996NnKZdbTUjIGPgIpqiCwV73u+eVY4UdE6c4KyriQSrrfjd94Dmm0WqMqvbLwPgtd0j
-         jMlw==
-X-Forwarded-Encrypted: i=1; AJvYcCXgbgmNFqYEeqpcdJ/GfXZr3/6hJJ2A+aDpkJ5l/2RY4D3hDm7uznfI24xH5PrLpsNBp/w/8lgfMWgF8q4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDSmfYrv5ZorOQxzaIqaGab0sAGEv/nkPPj29dZ71pNpXTpCk0
-	vYQ5JqKKIfaxQuW/9Fy3qFT07oV/HCzZnaxGeUEunIz35VJPuki7
-X-Gm-Gg: ASbGncu13qR8+85NpY/Mb32nnKnYBwtyOeFzb36qaeDM0neI571AhT2Q8a5gDw+5eol
-	/sWkRDx0aKSJCNDOAKzStpADQBCvFR+zrtwUQ3ZMPTyylKyxKOBgjw0Z+aUzLid+T7KnNE4XId5
-	C4TMpxMRyZ6gY06gTM8SuBGv/u1rljus4Mo9QUoXTsrk9tNNlgEa8rpdzrAJXq+XviOOMVWJIEG
-	qypR7nMMzAlCIwVoA3e9DhfGN2jX88Whv1/zQRmTFguGuvNejZlpRDJ7X4iMWLTZNcKrM0p/SBR
-	ruwpT4K/+hfaT7L/b+MuTiWy5sY2sbv/aLKK/XRcu1Mg/QYOZu0bvnAksQHfRNvO08o+QrI=
-X-Google-Smtp-Source: AGHT+IFDuYQrB51/C/raCB2BuO/V6qNOIE/Zw48vTb0rNVKT36QdbUt5014p7SaKf9/1L5ughIF/5g==
-X-Received: by 2002:a17:902:d486:b0:221:7eae:163b with SMTP id d9443c01a7336-2295c103f2dmr42994595ad.46.1743515357608;
-        Tue, 01 Apr 2025 06:49:17 -0700 (PDT)
-Received: from henry.localdomain ([111.202.148.167])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291f1f9584sm88076145ad.224.2025.04.01.06.49.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 06:49:17 -0700 (PDT)
-From: Henry Martin <bsdhenrymartin@gmail.com>
-To: m.grzeschik@pengutronix.de,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Henry Martin <bsdhenrymartin@gmail.com>
-Subject: [PATCH v1] arcnet: Add NULL check in com20020pci_probe()
-Date: Tue,  1 Apr 2025 21:49:03 +0800
-Message-Id: <20250401134903.28462-1-bsdhenrymartin@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1743515379; c=relaxed/simple;
+	bh=jeth/bwBzY8doEtYBJgsfD1LAAzvW37CgYN819KxCvk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FBakuPcwBBZV5wWqBlQpNLh+lhwlp6Ed0coXl/UmTATNo+tFLnrc0l/ntdGnIXWx/ui3G8bEaXeKcKRbaKgmqIXywmeaPEgWLO8qmaTcOiWKxtsdDIUCQBRX/qSuNks0hyhnE+D4121VMVpiHLn3MVDkdsE4L2o9LeiIWp/qdBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=PR1Tl/t6; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=kOKRpO0q; arc=none smtp.client-ip=202.12.124.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 369042540230;
+	Tue,  1 Apr 2025 09:49:35 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-04.internal (MEProxy); Tue, 01 Apr 2025 09:49:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1743515375; x=
+	1743601775; bh=IDNWLnNGgo+VaA1pzStaigL03Xw+iXfe/8+bV3Foqqc=; b=P
+	R1Tl/t6/ah/BbDH+eD5qFwGmTVrTWzOeEJW75feD8gMY9DX3W2M7hbS4uywyiBM8
+	aWqlVACXcI2pgSo4oojXTk4nV9Q8mH8kW3K9cUFwRLTkFXhIq4D8tn9gGC5l1W5a
+	uDh+KbIVbFXqCu/k3r6xewe/rFwp6mvwR7rRyCIdu3XZlOLuveHS33kd1eurjgQT
+	Jzhm3uGlfC7lqYgBJNXal/C8C/gXSdesOshDbOLfXw8oMtvosIOhDqu2cPIt/rgt
+	JLbV6Ffa4wyFgEV88ldrbXWmS+3i/4s+bSM/5Uy6+LppQUNEowuKkLr3lZDM9c38
+	1ydaM7WY+G6QQKDkGK3Hg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1743515375; x=1743601775; bh=IDNWLnNGgo+VaA1pzStaigL03Xw+iXfe/8+
+	bV3Foqqc=; b=kOKRpO0qLT+7631+t61z+Wr+8D17CtFfuHnpdjh09HfyxemYmbG
+	dSEkZ8vHgxmQx1PQgQyqPEoCa0EGJpbSSV5fL5IBI4r1jb6ALYGO+pRssn5q4rLE
+	wek3cNXA4JuSTM60Y/spxuUgQB7UgnDbe+SmUM3mY/ged1g5G402HAeSktgwlSGw
+	sTzFpqRd23WW8i2A70t719e2wfGV8YxL+AzIk/GG3SHw/TdRQumo/hwNC3Mk3OKW
+	kNdaQps10Zr2ALgQhMMDmOu5+Fsw91y3uAvcoYxJbNYN1lDMXDpkKSst6todeTHC
+	LB4UPM5SI3bZzEdmSrXGVP83QANvaEpMlUA==
+X-ME-Sender: <xms:7u7rZ-LoFvBMA0vs6fHYu_oxudWyGWLFEPi6-8uMS4wiJftyHd-J3g>
+    <xme:7u7rZ2JQSsPfjdQmPKYY23A_DcFEwBoD1ReBD8ua17mwSOvYDHP2nzIsnZmNlnqxD
+    yaHaDzhpBJBhDdvLCU>
+X-ME-Received: <xmr:7u7rZ-udlPgakiG0OXQhgLfO5sOjCkZYtw8P3y-aIyzT1FqKXHGyQO5ZcH8K>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddukedvleegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
+    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
+    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdef
+    hfekgeetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhn
+    sggprhgtphhtthhopedufedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnth
+    honhhiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghr
+    rdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
+    gtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehp
+    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhhuhhnth
+    gvrhesghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhr
+    ghdprhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdprhgtph
+    htthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghh
+X-ME-Proxy: <xmx:7u7rZzbLrwCcsT5I9vIn31J0oy8TjzAo_ovB6in--X9f9jSPC1ussg>
+    <xmx:7u7rZ1bOd6FCYmP1T4bNqnmi57ysuAFMVv86kSaLqPr1G5JJsQFJKw>
+    <xmx:7u7rZ_C6kq-zuSM8-5Sld5m-RQFuQXodfDddLNOdBoo0QuBWhMoSeQ>
+    <xmx:7u7rZ7bJSn3cc8s11fkAq70yaIL98plcGTWHkFPVNGIzNM7T9C1AOQ>
+    <xmx:7-7rZ5oZsvBW3JPT5lM_WhxSmj9l9vkOGcpf1VH3L5aSm8_rrQ8EgU6G>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 1 Apr 2025 09:49:34 -0400 (EDT)
+Date: Tue, 1 Apr 2025 15:49:32 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+Subject: Re: [PATCH net-next v24 07/23] ovpn: implement basic TX path (UDP)
+Message-ID: <Z-vu7AWTwWE2D_df@krikkit>
+References: <20250318-b4-ovpn-v24-0-3ec4ab5c4a77@openvpn.net>
+ <20250318-b4-ovpn-v24-7-3ec4ab5c4a77@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250318-b4-ovpn-v24-7-3ec4ab5c4a77@openvpn.net>
 
-devm_kasprintf() returns NULL when memory allocation fails. Currently,
-com20020pci_probe() does not check for this case, which results in a
-NULL pointer dereference.
+2025-03-18, 02:40:42 +0100, Antonio Quartulli wrote:
+> +static int ovpn_udp_output(struct ovpn_peer *peer, struct dst_cache *cache,
+> +			   struct sock *sk, struct sk_buff *skb)
+> +{
+> +	struct ovpn_bind *bind;
+> +	int ret;
+> +
+> +	/* set sk to null if skb is already orphaned */
+> +	if (!skb->destructor)
+> +		skb->sk = NULL;
+> +
+> +	/* always permit openvpn-created packets to be (outside) fragmented */
+> +	skb->ignore_df = 1;
 
-Add NULL check after devm_kasprintf() to prevent this issue.
+Have you tested this with IPv4 encap? AFAICT it doesn't have any
+effect because of the call chain:
 
-Fixes: 6b17a597fc2f ("arcnet: restoring support for multiple Sohard Arcnet cards")
-Signed-off-by: Henry Martin <bsdhenrymartin@gmail.com>
----
- drivers/net/arcnet/com20020-pci.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ovpn_udp4_output -> udp_tunnel_xmit_skb -> iptunnel_xmit -> skb_scrub_packet
 
-diff --git a/drivers/net/arcnet/com20020-pci.c b/drivers/net/arcnet/com20020-pci.c
-index c5e571ec94c9..65c6fab0e359 100644
---- a/drivers/net/arcnet/com20020-pci.c
-+++ b/drivers/net/arcnet/com20020-pci.c
-@@ -264,6 +264,13 @@ static int com20020pci_probe(struct pci_dev *pdev,
- 							"pci:red:recon:%d-%d",
- 							dev->dev_id, i);
- 			card->recon_led.dev = &dev->dev;
-+			if (!card->tx_led.default_trigger ||
-+			    !card->tx_led.name ||
-+			    !card->recon_led.default_trigger ||
-+			    !card->recon_led.name) {
-+				ret = -ENOMEM;
-+				goto err_free_arcdev;
-+			}
- 
- 			ret = devm_led_classdev_register(&pdev->dev, &card->tx_led);
- 			if (ret)
+which does
+
+    skb->ignore_df = 0;
+
+
+But since you pass df = 0 to udp_tunnel_xmit_skb, I suspect it works
+as intended despite skb_scrub_packet.
+
+
+[note: that was the last comment I wanted to send, I have a few more
+suggestions that don't need to be addressed at this time]
+
+> +
+> +	rcu_read_lock();
+> +	bind = rcu_dereference(peer->bind);
+> +	if (unlikely(!bind)) {
+> +		net_warn_ratelimited("%s: no bind for remote peer %u\n",
+> +				     netdev_name(peer->ovpn->dev), peer->id);
+> +		ret = -ENODEV;
+> +		goto out;
+> +	}
+> +
+> +	switch (bind->remote.in4.sin_family) {
+> +	case AF_INET:
+> +		ret = ovpn_udp4_output(peer, bind, cache, sk, skb);
+> +		break;
+> +#if IS_ENABLED(CONFIG_IPV6)
+> +	case AF_INET6:
+> +		ret = ovpn_udp6_output(peer, bind, cache, sk, skb);
+> +		break;
+> +#endif
+> +	default:
+> +		ret = -EAFNOSUPPORT;
+> +		break;
+> +	}
+> +
+> +out:
+> +	rcu_read_unlock();
+> +	return ret;
+> +}
+
 -- 
-2.34.1
-
+Sabrina
 
