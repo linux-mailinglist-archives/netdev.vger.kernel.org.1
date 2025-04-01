@@ -1,242 +1,136 @@
-Return-Path: <netdev+bounces-178506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EB9AA775FC
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 10:12:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7DEAA7760A
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 10:13:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B3073A9924
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 08:12:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7796B3AA270
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 08:13:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 429471E8837;
-	Tue,  1 Apr 2025 08:12:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFDC61EB1A7;
+	Tue,  1 Apr 2025 08:12:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gYBPKsZS"
+	dkim=pass (2048-bit key) header.d=sigma-star.at header.i=@sigma-star.at header.b="Pa9GrgQY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C880132103;
-	Tue,  1 Apr 2025 08:12:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 740EB1E9B1B
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 08:12:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743495148; cv=none; b=j9kEcltvf9ZQrWUZHlpdN3r9Y/elnx3T1FVljNmhfRczK2whhpxXISM6MzsynR1kKYxwIpxUwKjOFYWUDJt10Oo4jNHBfJrevCViZ/PUs1Jxs7gtelVJEbOCQt7S+DqNmt+OhKcfXIKACg8F1zUMS8GlTgE6wqLz/2f/8xdVKtA=
+	t=1743495166; cv=none; b=OKVNGNM9TqV7PxbgdKWzsKW4ckvfzKDfPngwOAjJ9mP8UTnUjAfL1SlY5qQvWusvkH4DzM2Ze0n4YMg2DP7DcmmqAExkBBfIBw9xiccdiCZbmFedcwMXEKu59xn5fnDhK2RvIytTpqlIynZ1IeIPSrWYW/rOSd1KX5FgKlobZck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743495148; c=relaxed/simple;
-	bh=/waPTM4xPD4317aDJ0hxEkq/rYW4h1hSGRbxP3lbXHk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BtvaoKea39H7y59wYvOBtDcl35Mk1KqDRx0a5dfTAHN4Xf3tMgWmfwAHZeBhnnc4Ol1KPm5b3npeCBQyEP9Tad6UoS/IGE5HYWDDjclm57K2r1peDhV8GEBKbeycYf4mqsBjCOt0oWvSWFuU38Uj5W/kHm5akWgh94w41fGigy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gYBPKsZS; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c5b2472969so533858985a.1;
-        Tue, 01 Apr 2025 01:12:26 -0700 (PDT)
+	s=arc-20240116; t=1743495166; c=relaxed/simple;
+	bh=Q7BKqapfD6AxdJDkjzeoVlhT6jorL6pZj/n+hnRVzrc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mYw/pt4qls7xv0qrudy3hXYAtMGphr85V+zYLjkuEQzfwYfU1Fut4y+/GdRjt7ZjJFpzE9n+4OhoovSJInjy8gJpkuKWsPwpg9p6oSsNqtHzF/uJ+ju0zGjelySZf6/sGOrG4MZjgD9QHEEYDBQ3wnpPC0HhN7y6G2WCFfG6OjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigma-star.at; spf=pass smtp.mailfrom=sigma-star.at; dkim=pass (2048-bit key) header.d=sigma-star.at header.i=@sigma-star.at header.b=Pa9GrgQY; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigma-star.at
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sigma-star.at
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-43cf680d351so35183265e9.0
+        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 01:12:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743495145; x=1744099945; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N921zeEVObbyyzXGZX+/L4SVyesPmMbWZMrfrZMAMZI=;
-        b=gYBPKsZSZuncc84FAmAB2dTrZW1TMTPrBSnol3BqvCM/JZuuRikBU6koP40hXj2P+F
-         Z6r5dIVfwDjT6W2z98EtOVQwoX8W9j61NWtxRQtRdkKiEO4MD6n6KMUUttexDP0W9WKH
-         ty0o3Wcl9E179vHC/FUiRfeHlw93crfZlEbS5g6/3AOwPTf7Zv1065Gd1CPwaWjfdSuO
-         SbWl1a+WnG++DoqKAaycIbWix4izPMLXXlOyFQr43vPgDk6A+QxkiKplUD2cjwxDVE2p
-         KN8aNK8h7qRienEIFWsdCcXG73feEc8JMC2qUrebTHEVWqd3N9AbCCEpxi6u+V7H4AzD
-         zAGw==
+        d=sigma-star.at; s=google; t=1743495160; x=1744099960; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4p3P+1/911O4XZnCq9FVI9Zjtz1ACANtbEDZFOoYNIQ=;
+        b=Pa9GrgQYV0vw/MfwYWGt780JsX0dxDwb9VSjc3BptMrPdypWT4MOTQYcdaT3hr6P75
+         e/n7NqfsyvNP4qKvbeAiTncdMVIQetF1fw+5vIHEwx5FstZ2zwJY2z62y3fqzbLgNRkQ
+         BZBLJGJhA+41MwCoPp/cMHJiVRqcP+w1BiRRTaHkE0/bGjYH0FtN2TkUd/MwIV0hCC7H
+         WH/A/+tCRQmKYSxtktGwRw6c2ztmP0fBLaMVyNYOGwNJOuPqKJ5u/x6p+1LKXoIEpI1K
+         g/QkvxSEoJyXiLNcr3+tKkiCNZnYHMFcwLJK9Nuq9Pkj8igyknuffjyiL7zw70j7YSU3
+         fjBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743495145; x=1744099945;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=N921zeEVObbyyzXGZX+/L4SVyesPmMbWZMrfrZMAMZI=;
-        b=OHHPNV08ZuS+5ogeL3xwdcebtwhs1MjIkv0vKL9VOxEyrzUFdqbJTrQQ7dxHbHAang
-         feeXEIocvZg2IpbdBgEYy2P6Zl4RP+zqoLp8hmhEfpqBPz3DoAuBTs1Nj7KieLTQvA93
-         CTIfk2i2NC4kNSDuzOC2b3E7h1WyntLzo9PbxoK9Iit8LaSy33d+o/O/6LGJfWl0823E
-         sdXXwfK/JYHxX7m44B79Eatx+Gcv0LvxjQk/9mkA7JHr+HkM3p5iHtmpTtYx7g7OiKMs
-         52gK93oyt54DRCa1W3Dug0ocJ60p0cWjujmFR8a9F21Y2Hg6nFHjWsHtwVmKAhFUppOP
-         NkdA==
-X-Forwarded-Encrypted: i=1; AJvYcCU5wrIe3Qp9ror/PWd0XpDeV00tTmM+pXoMx7l/BFyNM+lxFs8EEAnI3uYfFmxuxuDgb/PenrEn@vger.kernel.org, AJvYcCWO2+Hk3UWVuXyEZo3SEkcVkGFqDo6iOjDJ4ERDrb5gIPD3b55ZldurDuOPetyHddWO/AY=@vger.kernel.org, AJvYcCWSLZKUnQE4Vq71PK5RL9F7stPASD8e7BlgcPeLrP5LYU+3SjT1/YKFJcu0HNmvZr8uYQXi+XJZZ26wxKkT@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+j8C3juxLDc8uit6/SYtsBZDA479akCpUwHscLhmJQHatVMYd
-	+BUk73JhO06yss2ahL9thFohQrcR1s/MYs+5h4+81GWkf9neQlK1eKn1lil+ghL/2qqnF7rrUkV
-	YS9yw2JP6cY2ClHKfoNKiOZcQKUo=
-X-Gm-Gg: ASbGnctlRnNrSjvI7mwQC7OJNwftfqxfBDUI4ay8aWkVO5e6Xzwk8qIUBUSREer6voo
-	PM6VUP5vkM9LvSBHxSr1JH89EY4i96RmjQKzxL9n6bbmQhZFE9Ew/C/UcLMpVm97L0xMLFe2QGS
-	wxEEWnZkUNAL52xkT9aKvhmmYh1Dypcu1Kf+BWZUo=
-X-Google-Smtp-Source: AGHT+IHHhqW7g5N8MXmKeQ3ZdpNS4nfu3IJeiO8IjKHPXDxhW5RCauWGQn75EU0rmHifckbfG9wIri5Wmu8NJ1eEBmc=
-X-Received: by 2002:a05:620a:17a0:b0:7c5:3e22:6167 with SMTP id
- af79cd13be357-7c69073366amr1734893785a.23.1743495145058; Tue, 01 Apr 2025
- 01:12:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743495160; x=1744099960;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4p3P+1/911O4XZnCq9FVI9Zjtz1ACANtbEDZFOoYNIQ=;
+        b=MtqxrtcdY7QlpIxrykVXbIQiLrTsHRaqgWtVqAADW+1qAxmWbzRlMxE/Z6/PnX1qe4
+         xWBKmOtQDYw7J6hj1NouW2P6VT7E1uAtdSN87LDXIgU6O0y8OdmKW8UUCWs5OV43bL4Q
+         ibR2jAkhkHx8pr7sq3is2wTSC32xQLEi32xEy3D8aIVyUzF7Yg6a+Bu6wxY1ZKCa7338
+         JpTIA+PrCS66ZQ83rsVt22IluEQV02g2wGQ8DvYRNGSWzHk3X2orkHyD1WchkB2hkDun
+         O76EVFoH27pmyfJLYQgRnAVlWWmO+YSX3LwkS4OSW/0Cgwh/8P6kRFKur3jw+q0DJEW1
+         bQxA==
+X-Gm-Message-State: AOJu0YxKx9qe+4UNxZOs1gTrXUeySTikMCpy5xscpUKZMvLUeGcisgW7
+	9SXO7RufpA2GvEoEN7P0wpn81QXc/XOrseJ8YRu9VC+41iED3Sq+UrdzhB1eFv4=
+X-Gm-Gg: ASbGncsX0JK+xQ//qV46pHNpFTze60czAr3v6Lc/6z7ic598PBKUYQ3zGZbgDhjVPeJ
+	zcJ/bQqyhM74xFWHX/4Hnnu0obzAbX+eDkgrIYcrTGC/lqGh5tOEFD5LhfWGkWrTtL1sMQbJFrr
+	KTtdg2KP24C5ZtUw9C01cU1jkrKAFiYUW6Fy9y5hU/jFB4GK0hhGpP8jn6MhIp6uXUOX5E6Hvxg
+	ygHyPgEZdBfvL0NpPF74f1TIe7jo+1aAlueWusd04PB4L4JE2qQ5CGK5R0m8x5CFap2m8aE0PB3
+	YiKqULIEqBoUuDYH2m/UZwbJ8bUlGL7d/8K7kXX0KwfClvAY/w5eg63jPfFzCYB36Ro=
+X-Google-Smtp-Source: AGHT+IHPsofN0L3NqyV7NNJjLnBN+caNMjZHK7Rek25KHBJOQORDn/np2fxXKpMa9Y0VNxWPeQRZFw==
+X-Received: by 2002:a05:600c:1912:b0:43d:fa5f:7d04 with SMTP id 5b1f17b1804b1-43dfa5f7d37mr109437685e9.16.1743495160467;
+        Tue, 01 Apr 2025 01:12:40 -0700 (PDT)
+Received: from [10.115.255.165] ([82.150.214.1])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d830f5f56sm195318935e9.26.2025.04.01.01.12.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Apr 2025 01:12:40 -0700 (PDT)
+Message-ID: <9187e9a3-fb93-4927-b02f-7f41176f844d@sigma-star.at>
+Date: Tue, 1 Apr 2025 10:12:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250329061548.1357925-1-wangliang74@huawei.com>
- <Z-qzLyGKskaqgFh5@mini-arch> <Z-sRF0G43HpGiGwH@mini-arch> <0d1b689c-c0ef-460a-9969-ff5aebbb8fac@huawei.com>
- <CAJ8uoz1JxhXFkzW8n_Dud8SR-4zE7gim5vS_UZHELiA7d0k+wQ@mail.gmail.com> <ed10eea2-0bf2-4747-b519-f9b9089e434e@huawei.com>
-In-Reply-To: <ed10eea2-0bf2-4747-b519-f9b9089e434e@huawei.com>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Tue, 1 Apr 2025 10:12:14 +0200
-X-Gm-Features: AQ5f1JpJTLxGpoXFk_gCek9AD6xD42I4RGHs3jBV7-49f2FG1SOBDoEkHyywjuI
-Message-ID: <CAJ8uoz2QXNN4so-EgR8sU8A86E_AeYx1w_b+BSVeCgzr1kaR+g@mail.gmail.com>
-Subject: Re: [PATCH net] xsk: correct tx_ring_empty_descs count statistics
-To: Wang Liang <wangliang74@huawei.com>
-Cc: Stanislav Fomichev <stfomichev@gmail.com>, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, yuehaibing@huawei.com, zhangchangzhong@huawei.com, 
-	netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] net: dsa: mv88e6xxx: propperly shutdown PPU re-enable
+ timer on destroy
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, Julian.FRIEDRICH@frequentis.com,
+ f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+ upstream+netdev@sigma-star.at
+References: <20250113084912.16245-1-david.oberhollenzer@sigma-star.at>
+ <20250114152729.4307e3a8@kernel.org>
+Content-Language: en-US
+From: David Oberhollenzer <david.oberhollenzer@sigma-star.at>
+In-Reply-To: <20250114152729.4307e3a8@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, 1 Apr 2025 at 09:44, Wang Liang <wangliang74@huawei.com> wrote:
->
->
-> =E5=9C=A8 2025/4/1 14:57, Magnus Karlsson =E5=86=99=E9=81=93:
-> > On Tue, 1 Apr 2025 at 04:36, Wang Liang <wangliang74@huawei.com> wrote:
-> >>
-> >> =E5=9C=A8 2025/4/1 6:03, Stanislav Fomichev =E5=86=99=E9=81=93:
-> >>> On 03/31, Stanislav Fomichev wrote:
-> >>>> On 03/29, Wang Liang wrote:
-> >>>>> The tx_ring_empty_descs count may be incorrect, when set the XDP_TX=
-_RING
-> >>>>> option but do not reserve tx ring. Because xsk_poll() try to wakeup=
- the
-> >>>>> driver by calling xsk_generic_xmit() for non-zero-copy mode. So the
-> >>>>> tx_ring_empty_descs count increases once the xsk_poll()is called:
-> >>>>>
-> >>>>>     xsk_poll
-> >>>>>       xsk_generic_xmit
-> >>>>>         __xsk_generic_xmit
-> >>>>>           xskq_cons_peek_desc
-> >>>>>             xskq_cons_read_desc
-> >>>>>               q->queue_empty_descs++;
-> > Sorry, but I do not understand how to reproduce this error. So you
-> > first issue a setsockopt with the XDP_TX_RING option and then you do
-> > not "reserve tx ring". What does that last "not reserve tx ring" mean?
-> > No mmap() of that ring, or something else? I guess you have bound the
-> > socket with a bind()? Some pseudo code on how to reproduce this would
-> > be helpful. Just want to understand so I can help. Thank you.
-> Sorry, the last email is garbled, and send again.
->
-> Ok. Some pseudo code like below:
->
->      fd =3D socket(AF_XDP, SOCK_RAW, 0);
->      setsockopt(fd, SOL_XDP, XDP_UMEM_REG, &mr, sizeof(mr));
->
->      setsockopt(fd, SOL_XDP, XDP_UMEM_FILL_RING, &fill_size,
-> sizeof(fill_size));
->      setsockopt(fd, SOL_XDP, XDP_UMEM_COMPLETION_RING, &comp_size,
-> sizeof(comp_size));
->      mmap(NULL, off.fr.desc + fill_size * sizeof(__u64), ...,
-> XDP_UMEM_PGOFF_FILL_RING);
->      mmap(NULL, off.cr.desc + comp_size * sizeof(__u64), ...,
-> XDP_UMEM_PGOFF_COMPLETION_RING);
->
->      setsockopt(fd, SOL_XDP, XDP_RX_RING, &rx_size, sizeof(rx_size));
->      setsockopt(fd, SOL_XDP, XDP_TX_RING, &tx_size, sizeof(tx_size));
->      mmap(NULL, off.rx.desc + rx_size * sizeof(struct xdp_desc), ...,
-> XDP_PGOFF_RX_RING);
->      mmap(NULL, off.tx.desc + tx_size * sizeof(struct xdp_desc), ...,
-> XDP_PGOFF_TX_RING);
->
->      bind(fd, (struct sockaddr *)&sxdp, sizeof(sxdp));
->      bpf_map_update_elem(xsk_map_fd, &queue_id, &fd, 0);
->
->      while(!global_exit) {
->          poll(fds, 1, -1);
->          handle_receive_packets(...);
->      }
->
-> The xsk is created success, and xs->tx is initialized.
->
-> The "not reserve tx ring" means user app do not update tx ring producer.
-> Like:
->
->      xsk_ring_prod__reserve(tx, 1, &tx_idx);
->      xsk_ring_prod__tx_desc(tx, tx_idx)->addr =3D frame;
->      xsk_ring_prod__tx_desc(tx, tx_idx)->len =3D pkg_length;
->      xsk_ring_prod__submit(tx, 1);
->
-> These functions (xsk_ring_prod__reserve, etc.) is provided by libxdp.
->
-> The tx->producer is not updated, so the xs->tx->cached_cons and
-> xs->tx->cached_prod are always zero.
->
-> When receive packets and user app call poll(), xsk_generic_xmit() will be
-> triggered by xsk_poll(), leading to this issue.
+Hi,
 
-Thanks, that really helped. The problem here is that the kernel cannot
-guess your intent. Since you created a socket with both Rx and Tx, it
-thinks you will use it for both, so it should increase
-queue_empty_descs in this case as you did not provide any Tx descs.
-Your proposed patch will break this. Consider this Tx case with the
-exact same init code as you have above but with this send loop:
+I did some further re-testing on the fix, regarding the the similar race
+in remove() as well as the previous question regarding the locking and
+cancellation order. V3 already expands on this, and the point still stands,
+the nested timer+queue+trylock mechanism is somewhat tricky and I manage
+to hit the race window with just cancel_work_sync(), without the lock or
+a different order for tear down.
 
-while(!global_exit) {
-       maybe_send_packets(...);
-       poll(fds, 1, -1);
-}
+On 1/15/25 12:27 AM, Jakub Kicinski wrote:
+> On Mon, 13 Jan 2025 09:49:12 +0100 David Oberhollenzer wrote:
+>> @@ -7323,6 +7323,8 @@ static int mv88e6xxx_probe(struct mdio_device *mdiodev)
+>>   		mv88e6xxx_g1_irq_free(chip);
+>>   	else
+>>   		mv88e6xxx_irq_poll_free(chip);
+>> +out_phy:
+>> +	mv88e6xxx_phy_destroy(chip);
+>>   out:
+>>   	if (pdata)
+>>   		dev_put(pdata->netdev);
+> 
+> If this is the right ordering the order in mv88e6xxx_remove()
+> looks suspicious. We call mv88e6xxx_phy_destroy() pretty early
+> and then unregister from DSA. Isn't there a window where DSA
+> callbacks can reschedule the timer?
 
-With your patch, the queue_empty_descs will never be increased in the
-case when I do not submit any Tx descs, even though we would like it
-to be so.
+yes, this does looks suspicious, mv88e6xxx_phy_destroy() should be done
+after the switch is unregistered, otherwise it should logically cause
+the same issue.
 
-So in my mind, you have a couple of options:
+However, I did not manage to trigger this during testing, and this also
+did not fix the original issue I saw, but I will fix the order in a
+followup v4 patch.
 
-* Create two sockets, one rx only and one tx only and use the
-SHARED_UMEM mode to bind them to the same netdev and queue id. In your
-loop above, you would use the Rx socket. This might have the drawback
-that you need to call poll() twice if you are both sending and
-receiving in the same loop. But the stats will be the way you want
-them to be.
+Greetings,
 
-* Introduce a new variable in user space that you increase every time
-you do poll() in your loop above. When displaying the statistics, just
-deduct this variable from the queue_empty_descs that the kernel
-reports using the XDP_STATISTICS getsockopt().
+David
 
-Hope this helps.
-
-> >>>>> To avoid this count error, add check for tx descs before send msg i=
-n poll.
-> >>>>>
-> >>>>> Fixes: df551058f7a3 ("xsk: Fix crash in poll when device does not s=
-upport ndo_xsk_wakeup")
-> >>>>> Signed-off-by: Wang Liang <wangliang74@huawei.com>
-> >>>> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-> >>> Hmm, wait, I stumbled upon xskq_has_descs again and it looks only at
-> >>> cached prod/cons. How is it supposed to work when the actual tx
-> >>> descriptor is posted? Is there anything besides xskq_cons_peek_desc f=
-rom
-> >>> __xsk_generic_xmit that refreshes cached_prod?
-> >>
-> >> Yes, you are right!
-> >>
-> >> How about using xskq_cons_nb_entries() to check free descriptors?
-> >>
-> >> Like this:
-> >>
-> >>
-> >> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-> >> index e5d104ce7b82..babb7928d335 100644
-> >> --- a/net/xdp/xsk.c
-> >> +++ b/net/xdp/xsk.c
-> >> @@ -993,7 +993,7 @@ static __poll_t xsk_poll(struct file *file, struct
-> >> socket *sock,
-> >>           if (pool->cached_need_wakeup) {
-> >>                   if (xs->zc)
-> >>                           xsk_wakeup(xs, pool->cached_need_wakeup);
-> >> -               else if (xs->tx)
-> >> +               else if (xs->tx && xskq_cons_nb_entries(xs->tx, 1))
-> >>                           /* Poll needs to drive Tx also in copy mode =
-*/
-> >>                           xsk_generic_xmit(sk);
-> >>           }
-> >>
-> >>
 
