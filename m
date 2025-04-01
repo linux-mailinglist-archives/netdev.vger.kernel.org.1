@@ -1,121 +1,169 @@
-Return-Path: <netdev+bounces-178493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3529BA7745F
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 08:16:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C81D5A774B7
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 08:48:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35BDB7A2FDD
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 06:15:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E850B188DC68
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 06:48:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6109C1BFE00;
-	Tue,  1 Apr 2025 06:16:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6991E2606;
+	Tue,  1 Apr 2025 06:48:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=crpt.ru header.i=@crpt.ru header.b="kBJe710r"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KX8ZUeUS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.crpt.ru (mail1.crpt.ru [91.236.205.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A50D44690;
-	Tue,  1 Apr 2025 06:16:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.236.205.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A016B1DF261
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 06:48:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743488199; cv=none; b=pnAXOzD7wP2n1tb8y4Eyc31xzImojNiPxwa/9vxECZCo2IiEZWIMIb5IGOW2nYrruzrtmLG31JIvCaVuKpw/ueRZMTi2AI/PvpcBiROCJ1bqY7eqIZf1MDllN7eOrxXaf+7m2daSic0tZjqYWVPuKbCLW79Ei66pqEzLK8lPrEQ=
+	t=1743490106; cv=none; b=KUxrT1xtwx56lcMCmfLTodV3IFE8R7RsLlw4iwzKbrTDNyOyrnKQC+USbGlEvOcvXWe3uj5WFy5nYb5ow6IdnGhx3h+pKvpKCGoPnywdLlU3pD5mlARKQ7IsWTqYgBig2BlPebcti3Fhkyd+ch4qRKsnDsdfsMLVvMCnkTCoS8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743488199; c=relaxed/simple;
-	bh=Z8NqerlcGoOG+aaVto1jZC3JJTU9M/lUypli3aT8rjg=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=GRRnCQSpwRuPCnEgxNhZc+PquolynGTiDn6VfA8i/cU/Jgnzh/1crcGoSpuRCcXuToQAvOK3EORciMjqR7nFNWZ1Joonhb/EA50/KPPihzynE1zeah0TNS9jCKi4UdXJmhIH6EvzL2Qm9ta2vv0aYWWM1BvCilJdGaeQCLgXpn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=crpt.ru; spf=pass smtp.mailfrom=crpt.ru; dkim=pass (2048-bit key) header.d=crpt.ru header.i=@crpt.ru header.b=kBJe710r; arc=none smtp.client-ip=91.236.205.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=crpt.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=crpt.ru
-Received: from mail.crpt.ru ([192.168.60.3])
-	by mail.crpt.ru  with ESMTP id 5316FqG3023749-5316FqG5023749
-	(version=TLSv1.2 cipher=AES256-SHA256 bits=256 verify=OK);
-	Tue, 1 Apr 2025 09:15:52 +0300
-Received: from EX2.crpt.local (192.168.60.4) by ex1.crpt.local (192.168.60.3)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.44; Tue, 1 Apr
- 2025 09:15:53 +0300
-Received: from EX2.crpt.local ([192.168.60.4]) by EX2.crpt.local
- ([192.168.60.4]) with mapi id 15.01.2507.044; Tue, 1 Apr 2025 09:15:53 +0300
-From: =?koi8-r?B?98HUz9LP0MnOIOHOxNLFyg==?= <a.vatoropin@crpt.ru>
-To: Tariq Toukan <tariqt@nvidia.com>
-CC: =?koi8-r?B?98HUz9LP0MnOIOHOxNLFyg==?= <a.vatoropin@crpt.ru>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
-Subject: [PATCH] net/mlx4_en: Remove the redundant NULL check for the 'my_ets'
- object
-Thread-Topic: [PATCH] net/mlx4_en: Remove the redundant NULL check for the
- 'my_ets' object
-Thread-Index: AQHbos2F9RohqMpRK0mdORQAbVJ5/g==
-Date: Tue, 1 Apr 2025 06:15:52 +0000
-Message-ID: <20250401061439.9978-1-a.vatoropin@crpt.ru>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-kse-serverinfo: EX1.crpt.local, 9
-x-kse-antivirus-interceptor-info: scan successful
-x-kse-antivirus-info: Clean, bases: 2/17/2025 9:52:00 AM
-x-kse-attachment-filter-triggered-rules: Clean
-x-kse-attachment-filter-triggered-filters: Clean
-x-kse-bulkmessagesfiltering-scan-result: protection disabled
-Content-Type: text/plain; charset="koi8-r"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1743490106; c=relaxed/simple;
+	bh=aWTMd0n/WGt5QHM3Y3BeRPkvR+LKpzjED4zv2rp+2z8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YqKJf536nF/XO6s4XSVj5S45MGBUnKNtRJFi71MOTldmuYZI54dk/m31fIp56LqCDeqQvHaKz1bp2g14q+NpVMwv7Y+9JgeM2z32V1thoM4zQgkz2wF1h7/ktrsNFj/DSy5pQxQ9kVHRvBTct2zkxw243W95nFKmpiYBbIfcVfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KX8ZUeUS; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5efe8d9ebdfso2953987a12.3
+        for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 23:48:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743490103; x=1744094903; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ttfHQMhkIn+oSS1IOHBwzHwIzCdKvXbxdgLxXrmA4ZM=;
+        b=KX8ZUeUSN43JsTB6kXj8LyChisESEmgJ4B3lD94rtz0ZcyaIO/9f/U4BIe+kFWzU4E
+         8BfiK5Rmuw72q+zH0vjJZwfelMliX19N283lfTWc+hJkUfe0EE/GhaUi3ew+yqiio4Jg
+         ekmg77raa+QzFvD1BpYXnkvRdToNRCUpjwhGSEaFC0wEKdFChy28ZdN7Q+wbskMlYmOu
+         CzIazPacG5MAygGocRM+uh/WvBOk4NM3LvnU77SBLKx0s7QLMxq5v3GYOGnSncnhEXP7
+         1YfNNZj+OQSFUTR7xRva6dfjIpGSVjziQ+xP8qDn0ex67Jy0nwEgCeihz2+0VUXbvNlW
+         mP7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743490103; x=1744094903;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ttfHQMhkIn+oSS1IOHBwzHwIzCdKvXbxdgLxXrmA4ZM=;
+        b=G/64noGnOjHZUV3ej4e4nSgdytivQODC+9h53taan5fxakwEDv466njSM1XB+f235n
+         ryASgI1r9b9Duyyv0h1GN1M/ba7As3DlGUZ83fzTNB3D1cDJvu5nKvng76rJhIUlOXPd
+         nUEg/UC2D928R7h6g1GgZYWcLQVBJOse0RONnm2ozzXcu8nV9yJo3izngog7uNkkyxe1
+         krCcbPIv7VVG3SsV8dUuMwPVsAAv7P8fPuD01MAph8dVbdIKtuBbhrUQKC1WIyScJyMl
+         uX08rWHxFgs/ALORvrgQno0nYXBZSdH9sX0NXb7mQTB+PKE+Ba0ZURpypADdMsaSWep7
+         i+6A==
+X-Forwarded-Encrypted: i=1; AJvYcCWHEFA6TUC7krXLDvUCoKgmaL/jXVhv0oVKMN0pKTft10vMvqa15zhqjwJSnVIVvQL54yrLfWk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5daQd2UGClXsLzzWkVZORjra50hFxfcen1pAzkB2eKiIKtOxn
+	2kqNL7n8vZFa31QMOKEluCm36NngUmxxzvlgprrNP+vuD8lObSrYOa2JfBsEjhq4xEZBc7Lhm5/
+	CK3gZxGb20cJmyiIj3GSyG1RNEHU=
+X-Gm-Gg: ASbGncvnB2vY2yetFGFH1juNUdtMVF8VCUxkDtJ9ppl/KU+aScaLD2iLjP+nZA2KWO3
+	BcsGx8qOruCkF83HPn0p02B1bs2W11Bwv6PtVdCwjZB/YUZEwcDf3aveWAKzuYaTZsBiHf61ibf
+	7tiiWdGRiJt8VOyvxKrriPZD34FkO3
+X-Google-Smtp-Source: AGHT+IEB6HdhgIFT+acktUH3yJ0tlpGqfL4v8YLv56HLTC9NILraErhCPjqlwi6UibzZen2nLqy50xBUUtaSoq9eu9M=
+X-Received: by 2002:a05:6402:210e:b0:5de:aa54:dc30 with SMTP id
+ 4fb4d7f45d1cf-5edfcc04b36mr9010860a12.5.1743490102716; Mon, 31 Mar 2025
+ 23:48:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-FEAS-Client-IP: 192.168.60.3
-X-FE-Policy-ID: 2:4:0:SYSTEM
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; d=crpt.ru; s=crpt.ru; c=relaxed/relaxed;
- h=from:to:cc:subject:date:message-id:content-type:mime-version;
- bh=X+FeLn4yQ3EuUGa91ttWBxCVvRzj24Ap0XyairhLOG8=;
- b=kBJe710rNp6XE77GRLslW/h5oCWwYT963XzfEx3vzgnEw0c/ycheVu3EiX6DEredBQEOw9xgJ231
-	H8GOsKetqxvVxXGh2lmh9S6zUorJUiLzQ8nbT8rVSuSoUwKuRJIiV8+NC8Rb9vt6QbSs7iT2mpMI
-	ONI0tht/5K77fDn0AprIdI6Bjp5VWYxVSvbBLYR4q9VfFSB5qZPxp+Clp4aucl3O/jVQfV1uuILu
-	ZBr/UwxQ03jA+0K1zzAEEfPFb1lsqV72HAsKeXE8SVSC/soRAWvNQ2tAPJnNTR274d18ABlmOlkB
-	jkJWqY3grNBhAXZy8GhG1ZDSq3EnOFzhQ58AtA==
+References: <20250331114729.594603-1-ap420073@gmail.com> <20250331114729.594603-2-ap420073@gmail.com>
+ <20250331103416.7b76c83c@kernel.org>
+In-Reply-To: <20250331103416.7b76c83c@kernel.org>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Tue, 1 Apr 2025 15:48:11 +0900
+X-Gm-Features: AQ5f1Jr7M1aS7CTQQ2IRS5FEZcpWMkH-1PKs1vQ6UWMSHcWrXTYemPxvUnq53FI
+Message-ID: <CAMArcTVRQnxrLnXPQp4D+F1TMS7SeQLtWTsxaLt8vJ7Gdqfj=Q@mail.gmail.com>
+Subject: Re: [RFC net-next 1/2] eth: bnxt: refactor buffer descriptor
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
+	andrew+netdev@lunn.ch, horms@kernel.org, michael.chan@broadcom.com, 
+	pavan.chebbi@broadcom.com, ilias.apalodimas@linaro.org, dw@davidwei.uk, 
+	netdev@vger.kernel.org, kuniyu@amazon.com, sdf@fomichev.me, 
+	aleksander.lobakin@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Andrey Vatoropin <a.vatoropin@crpt.ru>
+On Tue, Apr 1, 2025 at 2:34=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
 
-Static analysis shows that pointer "my_ets" cannot be NULL because it=20
-points to the object "struct ieee_ets".
+Hi Jakub,
+Thanks a lot for the review!
 
-Remove the extra NULL check. It is meaningless and harms the readability
-of the code.
+> On Mon, 31 Mar 2025 11:47:28 +0000 Taehee Yoo wrote:
+> > There are two kinds of buffer descriptors in bnxt, struct
+> > bnxt_sw_rx_bd and struct bnxt_sw_rx_agg_bd.(+ struct bnxt_tpa_info).
+> > The bnxt_sw_rx_bd is the bd for ring buffer, the bnxt_sw_rx_agg_bd is
+> > the bd for the aggregation ring buffer. The purpose of these bd are the
+> > same, but the structure is a little bit different.
+> >
+> > struct bnxt_sw_rx_bd {
+> >         void *data;
+> >         u8 *data_ptr;
+> >         dma_addr_t mapping;
+> > };
+> >
+> > struct bnxt_sw_rx_agg_bd {
+> >         struct page *page;
+> >         unsigned int offset;
+> >         dma_addr_t mapping;
+> > }
+> >
+> > bnxt_sw_rx_bd->data would be either page pointer or page_address(page) =
++
+> > offset. Under page mode(xdp is set), data indicates page pointer,
+> > if not, it indicates virtual address.
+> > Before the recent head_pool work from Jakub, bnxt_sw_rx_bd->data was
+> > allocated by kmalloc().
+> > But after Jakub's work, bnxt_sw_rx_bd->data is allocated by page_pool.
+> > So, there is no reason to still keep handling virtual address anymore.
+> > The goal of this patch is to make bnxt_sw_rx_bd the same as
+> > the bnxt_sw_rx_agg_bd.
+> > By this change, we can easily use page_pool API like
+> > page_pool_dma_sync_for_{cpu | device}()
+> > Also, we can convert from page to the netmem very smoothly by this chan=
+ge.
+>
+> LGTM, could you split this into two patches, tho?
+> One for the BD change and one for the syncing changes?
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+Okay, I will split this patch.
 
-Signed-off-by: Andrey Vatoropin <a.vatoropin@crpt.ru>
----
- drivers/net/ethernet/mellanox/mlx4/en_dcb_nl.c | 3 ---
- 1 file changed, 3 deletions(-)
+>
+> > -     dma_sync_single_for_device(&pdev->dev, mapping, bp->rx_copybreak,
+> > -                                bp->rx_dir);
+> > -
+> > +     page_pool_dma_sync_for_device(rxr->head_pool, page_to_netmem(page=
+),
+> > +                                   bp->rx_dma_offset, bp->rx_copybreak=
+);
+>
+> I think we should add a separate helper for this instead of extending
+> the existing page_pool_dma_sync_for_device(). Let's call it
+> page_pool_dma_sync_for_device_frag() ?
 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/en_dcb_nl.c b/drivers/net/e=
-thernet/mellanox/mlx4/en_dcb_nl.c
-index 752a72499b4f..be80da03a594 100644
---- a/drivers/net/ethernet/mellanox/mlx4/en_dcb_nl.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/en_dcb_nl.c
-@@ -290,9 +290,6 @@ static int mlx4_en_dcbnl_ieee_getets(struct net_device =
-*dev,
- 	struct mlx4_en_priv *priv =3D netdev_priv(dev);
- 	struct ieee_ets *my_ets =3D &priv->ets;
-=20
--	if (!my_ets)
--		return -EINVAL;
--
- 	ets->ets_cap =3D IEEE_8021QAZ_MAX_TCS;
- 	ets->cbs =3D my_ets->cbs;
- 	memcpy(ets->tc_tx_bw, my_ets->tc_tx_bw, sizeof(ets->tc_tx_bw));
---=20
-2.43.0
+Thanks. I will add a separate helper,
+the page_pool_dma_sync_for_device_frag().
+
+>
+> The use case here is that the driver recycles a frag directly, rather
+> than following the normal PP recycling path.
+
+I'm not sure that I understand this use case correctly.
+I think it's like when a packet is dropped or fully
+copied by rx-copy-break, a driver can reuse frag directly.
+To reuse a frag in a driver directly, a driver can use
+page_pool_dma_sync_for_device_frag() before setting ring buffer.
+If I misunderstand, please let me know.
+
+Thanks a lot!
+Taehee Yoo
 
