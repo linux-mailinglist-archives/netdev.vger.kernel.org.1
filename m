@@ -1,121 +1,139 @@
-Return-Path: <netdev+bounces-178514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2BE8A7769A
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 10:40:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E525A776DE
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 10:50:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0881A188A3DC
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 08:40:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE1CE3A887A
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 08:49:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B22B81EB1A7;
-	Tue,  1 Apr 2025 08:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1BA01EB5C9;
+	Tue,  1 Apr 2025 08:49:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="T7/MJBWl"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 835261E47C9;
-	Tue,  1 Apr 2025 08:39:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD0BB1EA7E6;
+	Tue,  1 Apr 2025 08:49:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743496797; cv=none; b=falYdLFL1lhLbc71g3ODPjPH4fclwPBpV9Jhojejq96nZIT+SL4hCIhmNolRBhO3X5LgRUduTnPlaa7qDn8XElljTMcxFrDODubcpkzHL0KGAejVu7UVrQ2T4oFaDc7Fn0Y5DDR16yZl1hW1hL7RZeiQmAaUdSKGdOAtaK+EuPw=
+	t=1743497398; cv=none; b=N4taodFtUDedbDKYzhCOfpKZkSe+NZ1a+LWrJRqo0Pq34x4/ZG/Vn5oOhIHl1rQylgJ+gCPOqWtRwdqUtvOdM+Wo/0e/3eauskq+WiJ+IL6ijS5TYVfmusZinHl5JeMmra+a0II1NR4gT8C4EZSIvO2euWssJLvDdE7odWyWvtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743496797; c=relaxed/simple;
-	bh=M+neyQM2i4qoH8h0avruc2kXdgJ2YHJWrKz+OdjGL7Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=C3+6Kn0NLUOagBkQbwiV2BXycDzLOfdS3ZOL9OkR++oPSHRwZTWlV9hJwq4tsAfcA2/M4LV8xaIpwdAkoHCulPmHEJPCcx6WtSRslppVpBC7Fx2MDFGzqK2760ot9l3vi+4eTgYzEVOIARPGLCKzAzFqFq8ND6McQwd9P8MESQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [124.16.141.245])
-	by APP-01 (Coremail) with SMTP id qwCowAA33f1AputnQ5eqBA--.451S2;
-	Tue, 01 Apr 2025 16:39:30 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: mareklindner@neomailbox.ch,
-	sw@simonwunderlich.de,
-	a@unstable.cc,
-	sven@narfation.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: b.a.t.m.a.n@lists.open-mesh.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] batman-adv: batman-adv: handle tvlv unicast send errors
-Date: Tue,  1 Apr 2025 16:39:00 +0800
-Message-ID: <20250401083901.2261-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.42.0.windows.2
+	s=arc-20240116; t=1743497398; c=relaxed/simple;
+	bh=8Wpy81kT7TAdW80xAypJxb8zwA8ToD3dhvNI1DF5/tY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=MDHZ3AKxXOuDJKf89q7rDqsJt9T+lIbNuJRiNttcWEF4qhPrGNEmR4ebzYAFedNJrwLjtZpDcdpGeTVsOHJyURUcwAF0dx9OcLlEVIdvHZwWYNtRj3iBEHqhtV4MtLqQMD0JYWJarKeaE/bdqS2hoqXtQSlxKyhd/No8BN/ju20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=T7/MJBWl; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from [192.168.1.58] (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id C26F12022C81;
+	Tue,  1 Apr 2025 10:44:23 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be C26F12022C81
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1743497063;
+	bh=NMSewLCZVUlqvdalC/wCq7Jj67bLVDUUghgF0Nt7r8c=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=T7/MJBWlQgQ9eXP1jb+DAibnpmulCgGaRuhoxYXSKesrBxHk1XLhjfIONyOGvQ0Su
+	 NS7B071ZfjwKB6JXUZIdCfafnFNzJPy3DfK45usDGUvWb+6RtlaqMYqUb4YHrDWbqv
+	 uC4MToKCoetoKmiRp/7lr0PSQYvxT/lUW9WMJSESH+5qvqxcHvffVqy/YcY/s12s8G
+	 IK7Z+BWHM7HBhUbvnEW5XJuUgwCKhqIeL1Tap9bUrZEmQB8XClZ4gBokPo+i1ZE7u4
+	 kczS0N2Zgel3MF2GvwC30lPwMGtmFNyxKJmR9lLEw6dmEGboK966XVNAmqt/bVWKCT
+	 xC7ciQ6Okvq5g==
+Message-ID: <d24ea1cc-4d32-44f9-9051-0c874f73f1c5@uliege.be>
+Date: Tue, 1 Apr 2025 10:44:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowAA33f1AputnQ5eqBA--.451S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ww1rGF1DCrW8XrWUuw13CFg_yoW8XF17pF
-	Z5Gr15Gw1DJa1SqFyjq345Zr4Yyws7KrWj9FZ7A3W3ZFsxKrySgay8Z34jyF4rXay2ka1D
-	Xr4qgF9xAa4DCFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
-	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIda
-	VFxhVjvjDU0xZFpf9x0JUd-B_UUUUU=
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCQ8TA2frlbhKlQAAso
+User-Agent: Mozilla Thunderbird
+Subject: Re: new splat
+To: Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <alexei.starovoitov@gmail.com>, bpf
+ <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>
+References: <CAADnVQJFWn3dBFJtY+ci6oN1pDFL=TzCmNbRgey7MdYxt_AP2g@mail.gmail.com>
+ <647c3886-72fd-4e49-bdd0-4512f0319e8c@redhat.com>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@uliege.be>
+In-Reply-To: <647c3886-72fd-4e49-bdd0-4512f0319e8c@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-In batadv_tvlv_unicast_send(), the return value of
-batadv_send_skb_to_orig() is ignored. This could silently
-drop send failures, making it difficult to detect connectivity
-issues.
+On 3/31/25 10:07, Paolo Abeni wrote:
+> Adding Justin.
+> 
+> On 3/31/25 1:28 AM, Alexei Starovoitov wrote:
+>> After bpf fast forward we see this new failure:
+>>
+>> [  138.359852] BUG: using __this_cpu_read() in preemptible [00000000]
+>> code: test_progs/9368
+>> [  138.362686] caller is lwtunnel_xmit+0x1c/0x2e0
+>> [  138.364363] CPU: 9 UID: 0 PID: 9368 Comm: test_progs Tainted: G
+>>        O        6.14.0-10767-g8be3a12f9f26 #1092 PREEMPT
+>> [  138.364366] Tainted: [O]=OOT_MODULE
+>> [  138.364366] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
+>> BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
+>> [  138.364368] Call Trace:
+>> [  138.364370]  <TASK>
+>> [  138.364375]  dump_stack_lvl+0x80/0x90
+>> [  138.364381]  check_preemption_disabled+0xc6/0xe0
+>> [  138.364385]  lwtunnel_xmit+0x1c/0x2e0
+>> [  138.364387]  ip_finish_output2+0x2f9/0x850
+>> [  138.364391]  ? __ip_finish_output+0xa0/0x320
+>> [  138.364394]  ip_send_skb+0x3f/0x90
+>> [  138.364397]  udp_send_skb+0x1a6/0x3d0
+>> [  138.364402]  udp_sendmsg+0x87b/0x1000
+>> [  138.364404]  ? ip_frag_init+0x60/0x60
+>> [  138.364406]  ? reacquire_held_locks+0xcd/0x1f0
+>> [  138.364414]  ? copy_process+0x2ae0/0x2fa0
+>> [  138.364418]  ? inet_autobind+0x41/0x60
+>> [  138.364420]  ? __local_bh_enable_ip+0x79/0xe0
+>> [  138.364422]  ? inet_autobind+0x41/0x60
+>> [  138.364424]  ? inet_send_prepare+0xe7/0x1e0
+>> [  138.364428]  __sock_sendmsg+0x38/0x70
+>> [  138.364432]  ____sys_sendmsg+0x1c9/0x200
+>> [  138.364437]  ___sys_sendmsg+0x73/0xa0
+>> [  138.364444]  ? __fget_files+0xb9/0x180
+>> [  138.364447]  ? lock_release+0x131/0x280
+>> [  138.364450]  ? __fget_files+0xc3/0x180
+>> [  138.364453]  __sys_sendmsg+0x5a/0xa0
+> 
+> Possibly a decoded stack trace could help.
+> 
+> I think a possible suspect is:
+> 
+> commit 986ffb3a57c5650fb8bf6d59a8f0f07046abfeb6
+> Author: Justin Iurman <justin.iurman@uliege.be>
+> Date:   Fri Mar 14 13:00:46 2025 +0100
+> 
+>      net: lwtunnel: fix recursion loops
+> 
+> with dev_xmit_recursion() in lwtunnel_xmit() being called in preemptible
+> scope.
 
-Add error checking for batadv_send_skb_to_orig() and log failures
-via batadv_dbg() to improve error visibility.
+Correct, I came to the same conclusion based on that trace. However, I 
+can't reproduce it with a PREEMPT kernel. It goes through without 
+problem and the output is (as expected), i.e., "lwtunnel_xmit(): 
+recursion limit reached on datapath".
 
-Fixes: 1ad5bcb2a032 ("batman-adv: Consume skb in batadv_send_skb_to_orig")
-Cc: stable@vger.kernel.org # 4.10+
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- net/batman-adv/tvlv.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+> @Justin, could you please have a look?
 
-diff --git a/net/batman-adv/tvlv.c b/net/batman-adv/tvlv.c
-index 2a583215d439..f081136cc5b7 100644
---- a/net/batman-adv/tvlv.c
-+++ b/net/batman-adv/tvlv.c
-@@ -625,6 +625,7 @@ void batadv_tvlv_unicast_send(struct batadv_priv *bat_priv, const u8 *src,
- 	unsigned char *tvlv_buff;
- 	unsigned int tvlv_len;
- 	ssize_t hdr_len = sizeof(*unicast_tvlv_packet);
-+	int r;
- 
- 	orig_node = batadv_orig_hash_find(bat_priv, dst);
- 	if (!orig_node)
-@@ -657,7 +658,10 @@ void batadv_tvlv_unicast_send(struct batadv_priv *bat_priv, const u8 *src,
- 	tvlv_buff += sizeof(*tvlv_hdr);
- 	memcpy(tvlv_buff, tvlv_value, tvlv_value_len);
- 
--	batadv_send_skb_to_orig(skb, orig_node, NULL);
-+	r = batadv_send_skb_to_orig(skb, orig_node, NULL);
-+	if (r != NET_XMIT_SUCCESS)
-+		batadv_dbg(BATADV_DBG_TP_METER, bat_priv,
-+			   "Fail to send the ack.");
- out:
- 	batadv_orig_node_put(orig_node);
- }
--- 
-2.42.0.windows.2
+I guess that using preempt_{disable|enable}() would not be enough here, 
+so we may s/rcu_read_{lock|unlock}()/rcu_read_{lock|unlock}_bh()/g and 
+move the call to rcu_read_lock_bh() before dev_xmit_recursion(). Thoughts?
 
+> Thanks,
+> 
+> Paolo
+> 
 
