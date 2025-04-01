@@ -1,219 +1,145 @@
-Return-Path: <netdev+bounces-178481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF175A771D4
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 02:22:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D498A77247
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 03:15:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91DAF3A4206
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 00:22:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EBB83A96A3
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 01:15:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 620CF2E3384;
-	Tue,  1 Apr 2025 00:22:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 929D92CCDB;
+	Tue,  1 Apr 2025 01:15:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YsS7lEgW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RTwKfK2/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A916A2E336E
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 00:22:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C1B1078F
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 01:15:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743466966; cv=none; b=D9NxGRXiY0RYBgZbD9t7XKUdC5JZ1MwBfWRU5subI88AzIuQob3sQ4QQPHham1h07RSC5Euj4Az8k8DzZjJXnDeuqLlJRkgDkSH3/V0TxU5qL7o+y8CRnd0eleG+Wk6RUblBGvbtAeXMm9DMYEt5wOo7vTzKv2DAeXAwmky5QqM=
+	t=1743470128; cv=none; b=dw1v2zVVPCgPOiTcv3GtGj760krNuX8Wo2iUyukfQVhSIioM0hQvVudiKjQvzvjziU72AbFybcfoWxBR3gAtC5kjN+OZgap3kThEO8o6wMSeFidW0S1RLb+nDghlmfBloTsgxdP/0XcrQ4sNPNmHGcG2+NsuSZXC6LP3vsv4ZT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743466966; c=relaxed/simple;
-	bh=4XfgwtpOwwF88p447a7i5E0lGitT+KIaoI/+mHL85IY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qCf3sNen/sdLddVMxEezSavreNtqpOOR/ZGQmcYvXP1MbH5b4L4XWA8ZAS1FvF65BqawTtvgXoVR/ZHz5j8JeFjiwev/oT56wZ6xkvN3gW9/TMqZq/eeDOcTd+wvSyrcwLfND5ffsKpGOHlyhHQulXV85HBzLE8TNM8aROiueeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YsS7lEgW; arc=none smtp.client-ip=209.85.166.182
+	s=arc-20240116; t=1743470128; c=relaxed/simple;
+	bh=uSKK15Bmle+CHDxqKOqkP+lDtUPEqARU0bViNSV6Ntk=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=isVkion3NgHS9eIvrR3uoyu0TgM1qXTiCgVHBiY8vuVDIQfY1Wki67kyQf+0zXJ03Ga0BzNutExF5JWJUsHcKhSrpy9+9PxD2a6L0Yw0kgu9HZFLuw11i0wcEEeoQRaO7cxyNP0X7NR1jH//Zzx5Y0thzanxe7ZsOiVKVcz/0XY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RTwKfK2/; arc=none smtp.client-ip=209.85.160.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3cf82bd380bso46514315ab.0
-        for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 17:22:44 -0700 (PDT)
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4766cb762b6so46410091cf.0
+        for <netdev@vger.kernel.org>; Mon, 31 Mar 2025 18:15:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743466964; x=1744071764; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1743470126; x=1744074926; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Zfd/LWZmW1cdJq0JxxDmbV4zkHqAWFSFwhGfNaz/now=;
-        b=YsS7lEgWI/OaLe1vxdp79X65l2quBTSR78KIv4LlWD4or0fsgsIJjvNKX1WjyH5ecU
-         LZkEuIbTuHcuDFAZIebAcRJDk2N/wVQA0mD2gT4NpprqfEM25nQoM8x+L/vusM2Q20sF
-         vathzlrWMmvXkwizpuO0h9i9DrZMenzzBqzuQAl1Rsv7vrLERk/x1ZZ4fx3n0R4+3BDl
-         eVLbnJJ8rON1Ty7AKkzOPCJKowRbftsxq0FG2yy2pTKSeLwb6C9vQOdlbtBwpBTh+q2W
-         9+fu1PdP+GnpVz8Ddh4eU11u8Rgd7skmeC/m7VvJCPhWQj+g5DDW2KEmLWbw+ojqnpNl
-         QfgQ==
+        bh=VXAoilsLfrA53qHSwwb6+fb6SaPNoUOlQKK+o+3d4NE=;
+        b=RTwKfK2/Ka1tfqzb7iipguWWjcmjxCogHpyX+7tm6n8ERWDAZ9LXGsjPMTfJZQrC2p
+         8TQ3qCGW671Rm8e2GXjwTDbW0jPvDu8wjn8I2QzoDKXnXvMHYRTocu2UY9xovq2dOu0a
+         McAEO4DPxEsWef22ARck8RVfOMgYVdxp46WShzLRspwhDOjronkQ56YvCIjq/5s5Lgge
+         Fb5x3ft2lu8VA7ank8zzAhG5JiucmiN0fppgrYn24uK3k3+aMzTGumNRiKmbEeO7q8Ia
+         5JJLqUML/GYfa0bpbz9jxw/eQtolj6UHXAUzRLQznJjnqRTP5U6eE6hyEMFoUgsXVFua
+         oVbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743466964; x=1744071764;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Zfd/LWZmW1cdJq0JxxDmbV4zkHqAWFSFwhGfNaz/now=;
-        b=vCpa3BcZR8yNNO89cv4gO0g8c+xy1KPV+r7ivA2zOSjBXfOhL1putcra7lXycuWNC8
-         aQS6CkHXrU/j9NFJ8MBihHziQPu127EpcSoyGzOoPlaLldYyOMrhdbnsz1hmSGj2QHIq
-         eMI0woMtww0yExAlrU5HVEVUMHsptmsIL5jVDeZDU9iv6WZB/LcVT9i3hMjBH2PSLnSo
-         VJjLLbgqjEAmaiDoHFNMuiUfbwoPDgb4B47K/7Pa9QdOsPItEYB/uDXYs1aTynHs3ia9
-         U4/B9Cs2lZ45HtoQS6X1lawYdMqYbZ9ULnxj4EZ2EcLIlwZrWfZ28Uib6tr3/VNJkctV
-         v4jg==
-X-Forwarded-Encrypted: i=1; AJvYcCURhqTDyqAHpzJ4iE3XcORieJMi9BV2tV/9Yn5u7XFIFjSWng2ajF+wOGMATySBXksFrWWFwpM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLhq149V7u+dswk93U/RXUx6YwlS3D2EQziEAoNB/ib99cvaTf
-	ga5RY4INNNPhkeQuCsEPRsqAlxFAIhscuNK6ilu6s/rasG6OHdJh7u0kecaYNSmlSoSRwAPaXGX
-	gZls1/GnyMpQKe8AdTDeDxa9C7UQ=
-X-Gm-Gg: ASbGncvnybAK8yJjGy9SFml34bB6F2K+rAUxU5Sx/5wZfDDIjrCv+IGqZs4Ly+oLMY3
-	IWx8W6uaeYObz/RvztemA6J4dy68SMYJ8Bto8L6iMVIKvaGA6Rl37F00vCuRc8xphL3EWNf37Bv
-	YK80gp+xOFjEZVmtv7OxG3F5/m+KksNBAa9U+c4SIVYLdu+8C4li6k6LbYlHK7
-X-Google-Smtp-Source: AGHT+IGnbuHfnaVrZiMQiitGXOPK6ZRnp84dcvly5lrPIVZ8qPqalBKYSNL47cZnl9PgefiajtHfFR9ftKV6Vg0q5wg=
-X-Received: by 2002:a05:6e02:152e:b0:3d4:3c21:ba71 with SMTP id
- e9e14a558f8ab-3d5e09f7bbdmr141196815ab.18.1743466963550; Mon, 31 Mar 2025
- 17:22:43 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743470126; x=1744074926;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=VXAoilsLfrA53qHSwwb6+fb6SaPNoUOlQKK+o+3d4NE=;
+        b=StI8VVgjst/PPfrWUKu9qPhRNF7cZiuZZnW1Us0jAFKmN5NSxF2ZBqC7QcmIHR7bwt
+         cw5JgdYYQ8URy+a8xtwSyCtzfMRBCUOho1QgUXcIjTB88iDmE9ToZmZfpcNCppm19v90
+         wm3Gkawtx6C1Qcq6kIwyBrrfR6GSfL6pxC90w/COFEWW7W8zL//whThNObEz2mIcEFK3
+         mnIk6KOJUYtxSp0v6q/I4CKjEONFfmTN1+RsHaaFoO2KDyxhPbkdc5Vbl6QCcUW2nZsv
+         h9RKNN6VwCwUlCaai5EkFBsz462UmYGmps1lyG748b8chkdWzgNuQCke/KcAH4Ws7VBB
+         AUdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV2DnFszwCGcUr/+w1RZFX2C/Z5eD0n+9tv92pqdtVHHPLY19PomE+Qu88ukmOsq7oZ/YhOt0g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw94ehV9kQOKDk3ewNx3+X7v64WUx9ALCgAWufoF1LrG/LbzMut
+	LarEKfqixm5Y+O2jdmv42E+P7jV7O9EUF7LDeGbiHEHw0Strv8GH
+X-Gm-Gg: ASbGncs3cOFCnBQOk12BtH7YAVHHA1QibGi3lvu/x3/We/InKayxonC2mv1otGRTzfs
+	MyJFXArqD1UTgnJBX8hFDtfDWvRL7aW9pGCaxXfBylEvILb+aK+YprToAFJKUKjhXlYSZ3kDJGM
+	vXVoLdc8iGnRkw5EhZCJOdhJI2zBMdkW15S+Jt+FnH1RUidZ/YENP4uwx/XP+bLGNKpuM+JlNT7
+	Gm2aW9fFrHjEwpsXylkJpiEN8s/DPHG0JTatx3u1+OuYownNmNgZ/oRSzseBEfYV7qIHDfrL+pz
+	DkwvJtfpihxR63xQeXI6QRyF6GPy3ipat+JFY4U3WuBRlf623uDyTwnsMTNMwq/0mmisNy4a5U4
+	Efqa+iVJMmJ9dQlszzKswxg==
+X-Google-Smtp-Source: AGHT+IGnJcZQD6hpooq/ugxfcaYJ3Ge+iWQ02+18qk00Wwz0VMflSS2FtfvZoOkN+q5VFQ++rbVd8w==
+X-Received: by 2002:a05:622a:518d:b0:471:f9bc:fe53 with SMTP id d75a77b69052e-4778462aad3mr218996171cf.26.1743470125802;
+        Mon, 31 Mar 2025 18:15:25 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47782a49f2csm57601861cf.32.2025.03.31.18.15.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Mar 2025 18:15:24 -0700 (PDT)
+Date: Mon, 31 Mar 2025 21:15:24 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ willemdebruijn.kernel@gmail.com
+Cc: davem@davemloft.net, 
+ dsahern@kernel.org, 
+ edumazet@google.com, 
+ horms@kernel.org, 
+ kuni1840@gmail.com, 
+ netdev@vger.kernel.org, 
+ pabeni@redhat.com
+Message-ID: <67eb3e2c92fb9_395352294e1@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250331162941.01e14713@kernel.org>
+References: <20250331185515.5053-1-kuniyu@amazon.com>
+ <20250331203303.17835-1-kuniyu@amazon.com>
+ <20250331162941.01e14713@kernel.org>
+Subject: Re: [PATCH v4 net 0/3] udp: Fix two integer overflows when
+ sk->sk_rcvbuf is close to INT_MAX.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250331091532.224982-1-edumazet@google.com> <CADvbK_eneePox-VFbicSmt55g+VJdc+5m_LoS2bu_Pezatjq0g@mail.gmail.com>
- <CANn89i+xpmBDQBPPG_QDfACHL=8h5=1bKqJjvD+e4=SHU7t76A@mail.gmail.com> <20250331195038.7aafa82a@pumpkin>
-In-Reply-To: <20250331195038.7aafa82a@pumpkin>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Mon, 31 Mar 2025 20:22:32 -0400
-X-Gm-Features: AQ5f1JrmCp9CSTdSTAD3gk2_wDWZWqvN6R-AM0IlczsJhzIdv2baAGUs9VaB7vM
-Message-ID: <CADvbK_f1CauY6Oo1A0VeCDNdUL4T0ZA++K3g_1B_xJu=gD_a4w@mail.gmail.com>
-Subject: Re: [PATCH net] sctp: add mutual exclusion in proc_sctp_do_udp_port()
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot+fae49d997eb56fa7c74d@syzkaller.appspotmail.com, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 31, 2025 at 2:50=E2=80=AFPM David Laight
-<david.laight.linux@gmail.com> wrote:
->
-> On Mon, 31 Mar 2025 18:11:38 +0200
-> Eric Dumazet <edumazet@google.com> wrote:
->
-> > On Mon, Mar 31, 2025 at 5:54=E2=80=AFPM Xin Long <lucien.xin@gmail.com>=
- wrote:
-> > >
-> > > On Mon, Mar 31, 2025 at 5:15=E2=80=AFAM Eric Dumazet <edumazet@google=
-.com> wrote:
-> > > >
-> > > > We must serialize calls to sctp_udp_sock_stop() and sctp_udp_sock_s=
-tart()
-> > > > or risk a crash as syzbot reported:
-> > > >
-> > > > Oops: general protection fault, probably for non-canonical address =
-0xdffffc000000000d: 0000 [#1] SMP KASAN PTI
-> > > > KASAN: null-ptr-deref in range [0x0000000000000068-0x00000000000000=
-6f]
-> > > > CPU: 1 UID: 0 PID: 6551 Comm: syz.1.44 Not tainted 6.14.0-syzkaller=
--g7f2ff7b62617 #0 PREEMPT(full)
-> > > > Hardware name: Google Google Compute Engine/Google Compute Engine, =
-BIOS Google 02/12/2025
-> > > >  RIP: 0010:kernel_sock_shutdown+0x47/0x70 net/socket.c:3653
-> > > > Call Trace:
-> > > >  <TASK>
-> > > >   udp_tunnel_sock_release+0x68/0x80 net/ipv4/udp_tunnel_core.c:181
-> > > >   sctp_udp_sock_stop+0x71/0x160 net/sctp/protocol.c:930
-> > > >   proc_sctp_do_udp_port+0x264/0x450 net/sctp/sysctl.c:553
-> > > >   proc_sys_call_handler+0x3d0/0x5b0 fs/proc/proc_sysctl.c:601
-> > > >   iter_file_splice_write+0x91c/0x1150 fs/splice.c:738
-> > > >   do_splice_from fs/splice.c:935 [inline]
-> > > >   direct_splice_actor+0x18f/0x6c0 fs/splice.c:1158
-> > > >   splice_direct_to_actor+0x342/0xa30 fs/splice.c:1102
-> > > >   do_splice_direct_actor fs/splice.c:1201 [inline]
-> > > >   do_splice_direct+0x174/0x240 fs/splice.c:1227
-> > > >   do_sendfile+0xafd/0xe50 fs/read_write.c:1368
-> > > >   __do_sys_sendfile64 fs/read_write.c:1429 [inline]
-> > > >   __se_sys_sendfile64 fs/read_write.c:1415 [inline]
-> > > >   __x64_sys_sendfile64+0x1d8/0x220 fs/read_write.c:1415
-> > > >   do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-> > > >
-> > > > Fixes: 046c052b475e ("sctp: enable udp tunneling socks")
-> > > > Reported-by: syzbot+fae49d997eb56fa7c74d@syzkaller.appspotmail.com
-> > > > Closes: https://lore.kernel.org/netdev/67ea5c01.050a0220.1547ec.012=
-b.GAE@google.com/T/#u
-> > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > > > Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-> > > > Cc: Xin Long <lucien.xin@gmail.com>
-> > > > ---
-> > > >  net/sctp/sysctl.c | 4 ++++
-> > > >  1 file changed, 4 insertions(+)
-> > > >
-> > > > diff --git a/net/sctp/sysctl.c b/net/sctp/sysctl.c
-> > > > index 8e1e97be4df79f3245e2bbbeb0a75841abc67f58..ee3eac338a9deef064f=
-273e29bb59b057835d3f1 100644
-> > > > --- a/net/sctp/sysctl.c
-> > > > +++ b/net/sctp/sysctl.c
-> > > > @@ -525,6 +525,8 @@ static int proc_sctp_do_auth(const struct ctl_t=
-able *ctl, int write,
-> > > >         return ret;
-> > > >  }
-> > > >
-> > > > +static DEFINE_MUTEX(sctp_sysctl_mutex);
-> > > > +
-> > > >  static int proc_sctp_do_udp_port(const struct ctl_table *ctl, int =
-write,
-> > > >                                  void *buffer, size_t *lenp, loff_t=
- *ppos)
-> > > >  {
-> > > > @@ -549,6 +551,7 @@ static int proc_sctp_do_udp_port(const struct c=
-tl_table *ctl, int write,
-> > > >                 if (new_value > max || new_value < min)
-> > > >                         return -EINVAL;
-> > > >
-> > > > +               mutex_lock(&sctp_sysctl_mutex);
-> > > >                 net->sctp.udp_port =3D new_value;
-> > > >                 sctp_udp_sock_stop(net);
-> > > >                 if (new_value) {
-> > > > @@ -561,6 +564,7 @@ static int proc_sctp_do_udp_port(const struct c=
-tl_table *ctl, int write,
-> > > >                 lock_sock(sk);
-> > > >                 sctp_sk(sk)->udp_port =3D htons(net->sctp.udp_port)=
-;
-> > > >                 release_sock(sk);
-> > > > +               mutex_unlock(&sctp_sysctl_mutex);
-> > > >         }
-> > > >
-> > > >         return ret;
-> > > > --
-> > > > 2.49.0.472.ge94155a9ec-goog
-> > > >
-> > > Instead of introducing a new lock for this, wouldn't be better to jus=
-t
-> > > move up `lock_sock(sk)` a little bit?
-> >
-> > It depends if calling synchronize_rcu() two times while holding the
-> > socket lock is ok or not ?
-> >
-> > What is the issue about using a separate mutex ?
-> >
->
-> Don't they need locking against a different path that is using the socket=
-?
-> Not only against concurrent accesses to the sysctl?
->
-Hi Davide,
+Jakub Kicinski wrote:
+> On Mon, 31 Mar 2025 13:31:47 -0700 Kuniyuki Iwashima wrote:
+> > > > Please do test locally if you can.  
+> > > 
+> > > Sure, will try the same tests with CI.  
+> > 
+> > Is there a way to tell NIPA to run a test in a dedicated VM ?
+> > 
+> > I see some tests succeed when executed solely but fail when
+> > executed with
+> > 
+> >   make -C tools/testing/selftests/ TARGETS=net run_tests
+> > 
+> > When combined with other tests, assuming that the global UDP usage
+> > will soon drop to 0 is not always easy... so it's defeating the
+> > purpose but I'd drop the test in v5 not to make CI unhappy.
+> 
+> Can we account for some level of system noise? Or try to dump all 
+> the sockets and count the "accounted for" in-use memory?
+> 
+> We can do various things in NIPA, but I'm not sure if it's okay 
+> for tests inside net/ should require a completely idle system.
+> If we want a completely idle system maybe user-mode Linux + kunit
+> is a better direction?
+> 
+> Willem, WDYT?
 
-The lock is used to protect the variable 'net->sctp.udp4_sock',  and there
-are no other paths accessing it.
+The number of tests depending on global variables like
+proto_memory_allocated is thankfully low.
 
-The udp socket is created to listen on a specific port for receiving only,
-there's no need to access net->sctp.udp4_sock in sctp data path.
+kselftest/runner.sh runs RUN_IN_NETNS tests in parallel. That sounds
+the case here. Perhaps we can add a test option to force running
+without concurrent other tests?
 
-Thanks.
+Otherwise, the specific test drops usage from MAX to 0. And verifies
+to reach MAX before exiting its loop.
 
-> Presuming the crash was because of the net->sctp.udp4_sock =3D NULL
-> assignment in sock_stop(), if 'min' is zero allowing 'new_value' zero
-> then the pointer is left NULL.
->
-> IIRC sctp_sk(sk) is fixed, so the sock_lock() doesn't do much apart
-> from stop some unlikely 'data tearing'.
->
->         David
+Other concurrent tests are unlikely to spike very high. It might just
+be sufficient to relax that ASSERT to something a bit higher than 0,
+but a far cry from INT_MAX, to mean "clearly no longer stressed".
 
