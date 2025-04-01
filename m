@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-178475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38679A771BC
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 02:12:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEB70A771BD
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 02:12:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21B66188DBDD
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 00:11:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F3053AC3C2
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 00:11:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 751941714B7;
-	Tue,  1 Apr 2025 00:10:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46841917F4;
+	Tue,  1 Apr 2025 00:10:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GPyp+/aH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VuR12LFz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511561684B4
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 00:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08D1190472
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 00:10:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743466220; cv=none; b=SkgUV2wrJzHRb9p8mFttnRtDnbQFxYuhSSsjFIo77ZsNm4J2DyExX+xmT4FNTpDj+OajYwiydFe7IKA0dtzTAvQ5TJ9B1KqLZNV8711HzjijTM+meOZEzvr3FN8Unj4VA0sMVzcVZy6mpbjDx0ODiLq8wWSOCuSWxYHLZkTh888=
+	t=1743466221; cv=none; b=Jf8djVidI/zmT/eoyHAAdjvyMdqjOAUo4R1lg1EIkFHFv/c9T5zrqI8zmwiwiY3lzB/tWqtCS17jVIrAv/iEnh99bOuBbpO0jOdD45vOuXIMgE2oUPn9NrJBsB8k0OIX0kziTUYXH4niZadDxahJnX/r6vd4lro87K+SaNZ6nws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743466220; c=relaxed/simple;
-	bh=wBb/huNQorYOwrkR/InTr/dW/O721p1IiLxRB2g3+nY=;
+	s=arc-20240116; t=1743466221; c=relaxed/simple;
+	bh=SjhPl+Pmp85NCIZaTgfj8/3Nhp5c8Y7ck68owE00c/s=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lV34n9gy9X9D2Yvfl94SAiTPW6vttb20oPH6DZiCnRb3JxMKyg1hsvc4KeHhfA0X1F5rEL4FEEpZJ0Ub2/oRlThhNleA4P0QCdQj7rMg2mYCvd4iv8PRMQx1Fy0TrX4JWxnf7E96yPCti+/wEUP4byMFMVfJIM8PNMiYjw0SZS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GPyp+/aH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8597C4CEE5;
-	Tue,  1 Apr 2025 00:10:19 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=lBz5txJFun16h5al5H+JdfHIj5+a177po4kHYk90aG0uBLGYWmd6LmAon6g88tKhpHXzEfj7ocZdih3wkRfGxYSoWL83kp0ylO3kWoX2RWTmXzrNEKyx6yae6+qC2bFrsErr9mQckhdNwdbQ7UkP83ITRoVO3fNY2EJqyf1Sq+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VuR12LFz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45ECEC4CEE3;
+	Tue,  1 Apr 2025 00:10:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743466219;
-	bh=wBb/huNQorYOwrkR/InTr/dW/O721p1IiLxRB2g3+nY=;
+	s=k20201202; t=1743466221;
+	bh=SjhPl+Pmp85NCIZaTgfj8/3Nhp5c8Y7ck68owE00c/s=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GPyp+/aHbgDAlsUGQjBGIxzhsXVZbBPFy6G4NJQKr7nXbDb7te7FqXWga5wqvHHE7
-	 b8BGUZbEZx6c0JRxOD5kKY+sQ6Fe0ZVB1A3z7Tuq7I5icyBuzuuMJVg+GDbdwNZJL1
-	 vrPeMkVD2SO00aCgVQZNjR4dCMXEeeklk09qy6lqoMkvcCN1NUhWhB0+eaUBHFspmK
-	 N6jWWGOvn69I0OOJVl9rHMoVAtarFyzwFRlrGb2clceJqQBDKH40jwpyembmOqGQYk
-	 h8WS3m9SVY51txVb0SUGPisBNklmXHB+iXaSHLb+wy44BU6kmZBt8JgGCUSKG26fug
-	 GrXJtExX+UelA==
+	b=VuR12LFzME8o2hsLIf7X8MQMkg+c4YlIsYR5nv+ibqfDXrJK8l3vEQfHtCtnU/aqw
+	 3YMyyR4udd+V1MElaOoGLAKZa+WRh9FCPFVWooad7s5t7nQ18dL/5izgYgeCYc6yRI
+	 ADhAzzmUEpq4gf5wi0ej4QwUL/di9ElvC6uoIGfpqIJKTcuLQNxv7AaXzlJZBpYG8t
+	 JGJ9DcROKuT5kvy1eRZ7gImptf+61kAIrcMM01owp/M+XrN27BCXGPbL/g8yaZKg4E
+	 emUSUUv3aCq2JFytR3hZjODZr0YV2llrVV+I7wSFtNK7qS+7wo1Kg7ET4VnuELeoHb
+	 S0HfAoTdGCJFA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF0B380AA7A;
-	Tue,  1 Apr 2025 00:10:57 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C56380AA7A;
+	Tue,  1 Apr 2025 00:10:59 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,45 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3 0/3] selftests: drv-net: replace the rpath helper with
- Path objects
+Subject: Re: [PATCH net] Revert "tcp: avoid atomic operations on
+ sk->sk_rmem_alloc"
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174346625624.178192.4849291086810969698.git-patchwork-notify@kernel.org>
-Date: Tue, 01 Apr 2025 00:10:56 +0000
-References: <20250327222315.1098596-1-kuba@kernel.org>
-In-Reply-To: <20250327222315.1098596-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me,
- willemdebruijn.kernel@gmail.com
+ <174346625775.178192.8168747588535755973.git-patchwork-notify@kernel.org>
+Date: Tue, 01 Apr 2025 00:10:57 +0000
+References: <20250331075946.31960-1-edumazet@google.com>
+In-Reply-To: <20250331075946.31960-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ ncardwell@google.com, horms@kernel.org, netdev@vger.kernel.org,
+ willemb@google.com, kuniyu@amazon.com, eric.dumazet@gmail.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 27 Mar 2025 15:23:12 -0700 you wrote:
-> Trying to change the env.rpath() helper during the development
-> cycle was causing a lot of conflicts between net and net-next.
-> Let's get it converted now that the trees are converged.
+On Mon, 31 Mar 2025 07:59:46 +0000 you wrote:
+> This reverts commit 0de2a5c4b824da2205658ebebb99a55c43cdf60f.
 > 
-> v2: https://lore.kernel.org/20250306171158.1836674-1-kuba@kernel.org
+> I forgot that a TCP socket could receive messages in its error queue.
 > 
-> Jakub Kicinski (3):
->   selftests: drv-net: replace the rpath helper with Path objects
->   selftests: net: use the dummy bpf from net/lib
->   selftests: net: use Path helpers in ping
+> sock_queue_err_skb() can be called without socket lock being held,
+> and changes sk->sk_rmem_alloc.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v3,1/3] selftests: drv-net: replace the rpath helper with Path objects
-    https://git.kernel.org/netdev/net/c/e514d77334a6
-  - [net,v3,2/3] selftests: net: use the dummy bpf from net/lib
-    (no matching commit)
-  - [net,v3,3/3] selftests: net: use Path helpers in ping
-    https://git.kernel.org/netdev/net/c/88dec030dfcd
+  - [net] Revert "tcp: avoid atomic operations on sk->sk_rmem_alloc"
+    https://git.kernel.org/netdev/net/c/f278b6d5bb46
 
 You are awesome, thank you!
 -- 
