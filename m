@@ -1,172 +1,119 @@
-Return-Path: <netdev+bounces-178486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3674A77286
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 04:06:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D353BA772C5
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 04:35:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF89A16B6FC
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 02:06:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 266E61889B7C
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 02:36:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AA27155335;
-	Tue,  1 Apr 2025 02:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 750B1198E77;
+	Tue,  1 Apr 2025 02:35:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0237D70820;
-	Tue,  1 Apr 2025 02:06:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 940D81519B9;
+	Tue,  1 Apr 2025 02:35:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743473177; cv=none; b=cp7L0bN7Cu2Ei4Ugq/OTap8nztb3i55MVRMa05xaLuSrEf20syrcs9AZUOJ3kl6EH6UHq7eKGeDEBPCn8rgbJxuazQ0UHsNedvL6Vtkx5LQTyDlktIBzdjsQEbsUJvamFfyN4Z4EUsg7Bb6oup3o9F7GS1NSGJ/+DTKnoacffag=
+	t=1743474953; cv=none; b=VfSZLdMIbiLeRUIeJP32zwOW2eGJ1Zx9WEiw1COBP5F7dql/AWVpmaxW84JDik6FZ41jYkXqnCmNbygSeugjbAUDL5Xw1VJLCEQT5df3FCn0futh5WykvCDGTVrlwSp7d3hdzqPr/fe1b84YYCh3jTbaPyLpee8PhnW+thnNc6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743473177; c=relaxed/simple;
-	bh=fcn3liMwudo0wN6f3rirmSwrVwuI5qiuPrbEm4PyqQs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Yiizq/M1mEhYSOfNEJv4GFA4QEUEu1ZMRySTOIcA2q/cZ/k681wD3nVT/mMwWlP8mQa5fTe5Y3zqUl80WCFWhVWw4KT9O7GJnWih1J8UXnYJzpm4zufp1UeSxPDMcqwafkBYnD6fTASBNtsRcPo6jnc6KMmTd0yOXfAJ7e2X2dM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+	s=arc-20240116; t=1743474953; c=relaxed/simple;
+	bh=HGc9dhFhuKzkHVwyXlWb3E5x5TBalZYItz7+9JKWtVk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=XWuhOUMUa/n/JL2lQb+UgnvDe/+XlUdgDTzZPFjHC9CEFnG7+PN/SCyP5oTM/61+gtKVWqFuf++gzcnagC7QT+d7hhMtdttPSX2skFqiZQBTs/G/qX06kQ+loylL95Wu86BqE4h9pxvowB3OBXF6AdcnIuNAsq/54MlBBp87KWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4ZRWYW5tqGz1d10T;
-	Tue,  1 Apr 2025 10:05:35 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4ZRX8X0K1HzHrJ2;
+	Tue,  1 Apr 2025 10:32:28 +0800 (CST)
 Received: from kwepemg200005.china.huawei.com (unknown [7.202.181.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id B71AC14033A;
-	Tue,  1 Apr 2025 10:06:05 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by kwepemg200005.china.huawei.com
- (7.202.181.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 1 Apr
- 2025 10:06:04 +0800
-From: Wang Liang <wangliang74@huawei.com>
-To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-	<kuniyu@amazon.com>
-CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
-	<wangliang74@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net v3] ipv6: sit: fix skb_under_panic with overflowed needed_headroom
-Date: Tue, 1 Apr 2025 10:16:17 +0800
-Message-ID: <20250401021617.1571464-1-wangliang74@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	by mail.maildlp.com (Postfix) with ESMTPS id BB5BB140154;
+	Tue,  1 Apr 2025 10:35:47 +0800 (CST)
+Received: from [10.174.176.70] (10.174.176.70) by
+ kwepemg200005.china.huawei.com (7.202.181.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 1 Apr 2025 10:35:46 +0800
+Message-ID: <0d1b689c-c0ef-460a-9969-ff5aebbb8fac@huawei.com>
+Date: Tue, 1 Apr 2025 10:35:45 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] xsk: correct tx_ring_empty_descs count statistics
+To: Stanislav Fomichev <stfomichev@gmail.com>
+CC: <bjorn@kernel.org>, <magnus.karlsson@intel.com>,
+	<maciej.fijalkowski@intel.com>, <jonathan.lemon@gmail.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <ast@kernel.org>,
+	<daniel@iogearbox.net>, <hawk@kernel.org>, <john.fastabend@gmail.com>,
+	<yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
+	<netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20250329061548.1357925-1-wangliang74@huawei.com>
+ <Z-qzLyGKskaqgFh5@mini-arch> <Z-sRF0G43HpGiGwH@mini-arch>
+From: Wang Liang <wangliang74@huawei.com>
+In-Reply-To: <Z-sRF0G43HpGiGwH@mini-arch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  kwepemg200005.china.huawei.com (7.202.181.32)
 
-When create ipip6 tunnel, if tunnel->parms.link is assigned to the previous
-created tunnel device, the dev->needed_headroom will increase based on the
-previous one.
 
-If the number of tunnel device is sufficient, the needed_headroom can be
-overflowed. The overflow happens like this:
+在 2025/4/1 6:03, Stanislav Fomichev 写道:
+> On 03/31, Stanislav Fomichev wrote:
+>> On 03/29, Wang Liang wrote:
+>>> The tx_ring_empty_descs count may be incorrect, when set the XDP_TX_RING
+>>> option but do not reserve tx ring. Because xsk_poll() try to wakeup the
+>>> driver by calling xsk_generic_xmit() for non-zero-copy mode. So the
+>>> tx_ring_empty_descs count increases once the xsk_poll()is called:
+>>>
+>>>    xsk_poll
+>>>      xsk_generic_xmit
+>>>        __xsk_generic_xmit
+>>>          xskq_cons_peek_desc
+>>>            xskq_cons_read_desc
+>>>              q->queue_empty_descs++;
+>>>
+>>> To avoid this count error, add check for tx descs before send msg in poll.
+>>>
+>>> Fixes: df551058f7a3 ("xsk: Fix crash in poll when device does not support ndo_xsk_wakeup")
+>>> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+>> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+> Hmm, wait, I stumbled upon xskq_has_descs again and it looks only at
+> cached prod/cons. How is it supposed to work when the actual tx
+> descriptor is posted? Is there anything besides xskq_cons_peek_desc from
+> __xsk_generic_xmit that refreshes cached_prod?
 
-  ipip6_newlink
-    ipip6_tunnel_create
-      register_netdevice
-        ipip6_tunnel_init
-          ipip6_tunnel_bind_dev
-            t_hlen = tunnel->hlen + sizeof(struct iphdr); // 40
-            hlen = tdev->hard_header_len + tdev->needed_headroom; // 65496
-            dev->needed_headroom = t_hlen + hlen; // 65536 -> 0
 
-The value of LL_RESERVED_SPACE(rt->dst.dev) may be HH_DATA_MOD, that leads
-to a small skb allocated in __ip_append_data(), which triggers a
-skb_under_panic:
+Yes, you are right!
 
- ------------[ cut here ]------------
- kernel BUG at net/core/skbuff.c:209!
- Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
- CPU: 0 UID: 0 PID: 23587 Comm: test Tainted: G        W          6.14.0-00624-g2f2d52945852-dirty #15
- Tainted: [W]=WARN
- Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
- RIP: 0010:skb_panic (net/core/skbuff.c:209 (discriminator 4))
- Call Trace:
-  <TASK>
-  skb_push (net/core/skbuff.c:2544)
-  fou_build_udp (net/ipv4/fou_core.c:1041)
-  gue_build_header (net/ipv4/fou_core.c:1085)
-  ip_tunnel_xmit (net/ipv4/ip_tunnel.c:780)
-  sit_tunnel_xmit__.isra.0 (net/ipv6/sit.c:1065)
-  sit_tunnel_xmit (net/ipv6/sit.c:1076)
-  dev_hard_start_xmit (net/core/dev.c:3816)
-  __dev_queue_xmit (net/core/dev.c:4653)
-  neigh_connected_output (net/core/neighbour.c:1543)
-  ip_finish_output2 (net/ipv4/ip_output.c:236)
-  __ip_finish_output (net/ipv4/ip_output.c:314)
-  ip_finish_output (net/ipv4/ip_output.c:324)
-  ip_mc_output (net/ipv4/ip_output.c:421)
-  ip_send_skb (net/ipv4/ip_output.c:1502)
-  udp_send_skb (net/ipv4/udp.c:1197)
-  udp_sendmsg (net/ipv4/udp.c:1484)
-  udpv6_sendmsg (net/ipv6/udp.c:1545)
-  inet6_sendmsg (net/ipv6/af_inet6.c:659)
-  ____sys_sendmsg (net/socket.c:2573)
-  ___sys_sendmsg (net/socket.c:2629)
-  __sys_sendmmsg (net/socket.c:2719)
-  __x64_sys_sendmmsg (net/socket.c:2740)
-  do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
-  entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-  </TASK>
- ---[ end trace 0000000000000000 ]---
+How about using xskq_cons_nb_entries() to check free descriptors?
 
-Fix this by add check for needed_headroom in ipip6_tunnel_bind_dev().
+Like this:
 
-Reported-by: syzbot+4c63f36709a642f801c5@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=4c63f36709a642f801c5
-Fixes: c88f8d5cd95f ("sit: update dev->needed_headroom in ipip6_tunnel_bind_dev()")
-Signed-off-by: Wang Liang <wangliang74@huawei.com>
----
-v3: rebase on the latest mainline.
-v2: update stack trace with symbols.
----
- net/ipv6/sit.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/net/ipv6/sit.c b/net/ipv6/sit.c
-index 9a0f32acb750..a88c2bb59e6b 100644
---- a/net/ipv6/sit.c
-+++ b/net/ipv6/sit.c
-@@ -1096,7 +1096,7 @@ static netdev_tx_t sit_tunnel_xmit(struct sk_buff *skb,
- 
- }
- 
--static void ipip6_tunnel_bind_dev(struct net_device *dev)
-+static int ipip6_tunnel_bind_dev(struct net_device *dev)
- {
- 	struct ip_tunnel *tunnel = netdev_priv(dev);
- 	int t_hlen = tunnel->hlen + sizeof(struct iphdr);
-@@ -1135,7 +1135,12 @@ static void ipip6_tunnel_bind_dev(struct net_device *dev)
- 		WRITE_ONCE(dev->mtu, mtu);
- 		hlen = tdev->hard_header_len + tdev->needed_headroom;
- 	}
-+
-+	if (t_hlen + hlen > U16_MAX)
-+		return -EOVERFLOW;
-+
- 	dev->needed_headroom = t_hlen + hlen;
-+	return 0;
- }
- 
- static void ipip6_tunnel_update(struct ip_tunnel *t,
-@@ -1452,7 +1457,9 @@ static int ipip6_tunnel_init(struct net_device *dev)
- 	tunnel->dev = dev;
- 	strcpy(tunnel->parms.name, dev->name);
- 
--	ipip6_tunnel_bind_dev(dev);
-+	err = ipip6_tunnel_bind_dev(dev);
-+	if (err)
-+		return err;
- 
- 	err = dst_cache_init(&tunnel->dst_cache, GFP_KERNEL);
- 	if (err)
--- 
-2.34.1
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index e5d104ce7b82..babb7928d335 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -993,7 +993,7 @@ static __poll_t xsk_poll(struct file *file, struct 
+socket *sock,
+         if (pool->cached_need_wakeup) {
+                 if (xs->zc)
+                         xsk_wakeup(xs, pool->cached_need_wakeup);
+-               else if (xs->tx)
++               else if (xs->tx && xskq_cons_nb_entries(xs->tx, 1))
+                         /* Poll needs to drive Tx also in copy mode */
+                         xsk_generic_xmit(sk);
+         }
 
 
