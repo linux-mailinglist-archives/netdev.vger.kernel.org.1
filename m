@@ -1,272 +1,249 @@
-Return-Path: <netdev+bounces-178576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4DA4A77A02
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 13:49:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58C35A77A1A
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 13:53:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B731189002D
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 11:48:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AF78164F68
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 11:53:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266CD2045AC;
-	Tue,  1 Apr 2025 11:47:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA9251FBC92;
+	Tue,  1 Apr 2025 11:52:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ewBH0D1y"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GovLrEPw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F38204098;
-	Tue,  1 Apr 2025 11:46:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE4969476
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 11:52:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743508019; cv=none; b=fBXyo6Ksvrb/vx2ZxV7hj3D1nJSeVu+6rbQjbd1v0dkvxq2D2k9h7Gl6EfIidExD43DULuSUJZco9CmufCa/SpCwkeGhE0FT7RPqdq4Xkv9f9gmQNUB19veENOMEN4nsLWjTZn3EcBdX9nFNt6ETUFH4oh/8mo6jsIZvAPcgzCc=
+	t=1743508379; cv=none; b=KpayUTZPtEPNjUZkYfifAV1cMNOwApgo0hUKlKdxW/WZt9AEC13il5290+PuNDm5rTcPLtkA5D1OBrOjkWUI4joHC9eXZ2UjrGXolKm5MKHrc452KKjws8bII+pFdg+Jpcb7n/8fOImjqSZL4IgBiU4H3GvzT5WFva3fz9LaeJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743508019; c=relaxed/simple;
-	bh=4THuh4l2cNhIbqy6HlF/J7Hc+TBYJG/XLk/3DEKuZfU=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=l+z2761lW9aTAJ7bCbBvQYDi1yaMoY/WvWsxLlr3xmR1xijH/PTcTNvQI+j80C1ilVVhuwRiOXXUBJAZrEBLvsAS6gUM5lIxFehhUhrH8Lh+OCZThrXK48Gu6CDMv82otNbgAtyn2rZ5Y4LKaXDE8U0UVjKoUFOh7mZhOPMbKKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ewBH0D1y; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43d0c18e84eso24931165e9.3;
-        Tue, 01 Apr 2025 04:46:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743508014; x=1744112814; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1XrhBUQXr1bVfeeEaE7z+isBFAKnFsoBJygdtgcyNsY=;
-        b=ewBH0D1yOLtVc7ULAh5fwUBFzWVbixVbkBq9vbUFCuDU6+NnVUiWhiHTrngGvYAQi1
-         Wu1KbikOY2zeX1n+kUF4nrQNhjl7ZxtCnHeHCBlCs7RZ7GGdKehmKhIXpENBaML4haTT
-         v7Fh1fZkyvhj0SWrAfZt5kiYAgAaMYoAWOICCl6kGDKP3kynompF9Da2CNJ1k1Ib8JZ3
-         /nXDs0ehmqtUcuxjUrtPhJ0LDxzooNzjqh2m9Qs0rvuQ2B5KEzClt+0pQ94eAV2H3z5s
-         jFxQ77PsZ/dKJhgDZXIjngCqWsFa9lZ+Zdmv+7t8q6B8F2RxGk+Y9FGwWt4zy3SDdDbL
-         CM7A==
+	s=arc-20240116; t=1743508379; c=relaxed/simple;
+	bh=20Pgp79nL82axSyJe+vfX4v3UQ7qyPuScvWjFFoN0IQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lkNXWBQYy4RnbsN5auOUtag9jGH4BB5FYdE4Rm2LeQH1fRt2SbfMt2H4A90xrGLeY+6Qan04PKbi4A6rIqdGjhyKSXYmtWODgT5fAcftm095wbqQgJdgnCvWtuGcIC6W91nlYpeUXsFEbamd8ENcsUZB9/Aal8MD7mznJD+6ai4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GovLrEPw; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743508376;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jkH9MDM8OgZyTlbT0rSNsiuPV2xBPqaeIED0uLLAzGU=;
+	b=GovLrEPwm/wS+xDUxEXfmu8UcgZntfMO86tvgDcmo3tBsZroz+gXdpP/gHmkGfZOFTagXK
+	agzYRPVu9LN7waK2IlpUyk26yjE8TWm53lPSnBbQQ/JwFh98KidQi+oWbLZr/ofjdr6aEv
+	nTW2fPrKKk7UWAskQaGz5FzjDpN5zQQ=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-517-dTpOn4lQMnuMsLzzxpcVBQ-1; Tue, 01 Apr 2025 07:52:55 -0400
+X-MC-Unique: dTpOn4lQMnuMsLzzxpcVBQ-1
+X-Mimecast-MFC-AGG-ID: dTpOn4lQMnuMsLzzxpcVBQ_1743508374
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3913aaf1e32so3149341f8f.0
+        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 04:52:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743508014; x=1744112814;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1XrhBUQXr1bVfeeEaE7z+isBFAKnFsoBJygdtgcyNsY=;
-        b=hpJPLwk+GJcYVha3+RTul76XDy0zVNBzSo67AXWAxjyvicBuxFRd/WHMjS/XSj0OM9
-         NZw83SXTOf8h1l8JdicIK2y5FmhqxDng+QJNEvpxtgbhG70AivQ4+W3lsjYGai9W+2Uz
-         IW/uV5d+zh9C4aAZSQYOF0u88vpksCVLxAtQMLDDH0etuf4B7JqNGGvA3wVD7wx2kRqM
-         Avol91dQqD6aPNo6BtC6j2srNifijVY/gI/ulKPZq/ZlcneTOQ7LinNDQbsFWOFP+Zw8
-         yjRnDOFzvTdEm4Tgn4nKwd/19gL/gucSzdwukubWNzfPfcSz0+DASYa3WaHcBm2wyjOM
-         1xYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUbpi0O4OeiORhSSngd8Xzd08yy1cMkeeb+1qZl2qW5mrkdX2fObCHKLSDk03hgfRpnQaDvlYZfSIQi@vger.kernel.org, AJvYcCVD4nZisD+S5plZqGzgFDhPMnMmqgDofQUgMfwdszxRm3CMIbR8jwC1z9pj8FcbTqt8RJ702wZk@vger.kernel.org, AJvYcCVrEXXaNYGVrv81s7LfKdiZRjxeJuYoT7R3jydDP+E8icOIEiurOq+Odz92pAORLN6dGNgVWDj0icQuRZjp@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIAJyomOovqLEiP2lwFixQ8aecpekAMnkxSRURmqdVVqzSuSkx
-	LmWcu2A8Xlcew4ALv8eFRsa/z+ep0mKGHKyvCdVjIe7FNnnRoPHa
-X-Gm-Gg: ASbGnctjvCc9W/OATk4elH+X1YeiJNe+vDvKJT3L6/FNizHFS8MQoOFFN1QkGNtmESd
-	8/xrxdo+JWww+aQ5g1dMKG40+gN5fTuoDmdGqjdqNivanjvCkO1B8/ITG1OVAFNakFzAySN+YFg
-	bv8zLPrtViQev6149VBlY62YbkFoB397cgj0n9fkDPaD2f2ux+DXTWdnFSgEyTp2V8ICJWLWzX7
-	2aGMsfPwnpO0Rd83dZNZcRUBO43s551L4CyN92QHE+oNxL/iy+D1klEjstyTj9KGoCZ0NPRSQr0
-	VoRotv/XfKjoj95yK7YkBwrtXc3clouMnVCFMUhraUK35WFlpGkcuM1MLKEbdsU9c+ThIoQ8vBu
-	bkW6/S2GzmWtUITxVZ5AK97dZ
-X-Google-Smtp-Source: AGHT+IH6dilQJLlHGgeFR3Ax8B3Ld3g5aXQaayD1pRKUbQJUZ4aGA9CVqtKPy6UCRne+8g3E6M/oRw==
-X-Received: by 2002:a05:600c:1f89:b0:43d:36c:f24 with SMTP id 5b1f17b1804b1-43db61fed40mr104748755e9.13.1743508014190;
-        Tue, 01 Apr 2025 04:46:54 -0700 (PDT)
-Received: from localhost.localdomain (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-43ead679894sm8148175e9.40.2025.04.01.04.46.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 04:46:53 -0700 (PDT)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Christian Marangi <ansuelsmth@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	Andrei Botila <andrei.botila@oss.nxp.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Eric Woudstra <ericwouds@gmail.com>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [net-next RFC PATCH v5 6/6] dt-bindings: net: Document support for Aeonsemi PHYs
-Date: Tue,  1 Apr 2025 13:46:07 +0200
-Message-ID: <20250401114611.4063-7-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250401114611.4063-1-ansuelsmth@gmail.com>
-References: <20250401114611.4063-1-ansuelsmth@gmail.com>
+        d=1e100.net; s=20230601; t=1743508374; x=1744113174;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jkH9MDM8OgZyTlbT0rSNsiuPV2xBPqaeIED0uLLAzGU=;
+        b=LpOe4M4Aj0T9DJeoGQ1f15T2DGc0yNJgiw9d5NsDXOmmAumBaIVNSM6OCNy9qD//B8
+         hctoNyny79Atj/x4Sk4r/OvaPk41f4+gP+F+w0BX3DHlNSYEwKEOnYNDt/gaY4riCPad
+         OIPxfkH/Dv86K0QA1SFm4Cf1iUMJPc+SlIn51Xe6sj3kJtfqgjnxL0AbIwsLjXgJPciR
+         fgCqVembS+DEucSM9hSMXaHlYckEmJwtWBgG8fI5spmClp78UzYt/b77YrgMVc7LMD1Q
+         VsAfmgbfhfo/N3eBn/8jmQRJFseNYCXPsUAvVJ6AewdaK/Lxq7gvkQKfDObvautGqH2q
+         pf8g==
+X-Forwarded-Encrypted: i=1; AJvYcCUzqeEoh/Aug2eU+vtxfJb0EVW0SWU2QdpSCIispvx7569K7vgSHPXnD4UlAq3oEL7HxmB/4Q0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPrv8iRGAk7b9uLoOJmv7bqfjVUTMfgBsjGMVsWzKWe24fZlWJ
+	EORVCKkfczg/EI0BfVBRSmJZ0eKy6avyWzuUzh+QzUK9jhRj5T7Bpo+axh9qxl+NdQDVILgR7Bp
+	waYMzo5Fei3uXNbLmfkj9C1w5WcNuNM/7vEGvdlkXmVkuvuU2hunkDr65E/edLQ==
+X-Gm-Gg: ASbGncswnrlrqaoHIGYjk0WHq1rORuRn8xv5BesjmO3MJaL4FW5cmjWGd8LHtl1LEsl
+	ij540mJldQd3NyBJQeYbCoZ+Uc2MuneJ64tkFhvYW3D7BJ5E8GIyBNteFdWqnstNaVVMGnmZ1+7
+	Xxqev+pjJ7z/R39tbypIk6IM6C9AqPrw5TxnwzolLHXURRnBwwvkrQMEsWgz2z1Wcq2EpMcXUgX
+	GltJ3BqbdTSbppcGEBoqaUnNUiK1/0seOmJShGvwYTfYsHaNg7+3x1Y35UOCsBLC7TbC9/xOkoS
+	3mNUoiPA86du5SGOJYVU6cguPjOz2BNQqa8mlcWIpYg4Rw==
+X-Received: by 2002:a05:6000:4203:b0:38f:2ddd:a1bb with SMTP id ffacd0b85a97d-39c120c8e66mr10278910f8f.8.1743508373871;
+        Tue, 01 Apr 2025 04:52:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHVyFMvMMFyiAxtgXRX3AjletpHTEVLtTxo7DaN41Y9GMmZ+nYfrUoc4eH5cPS4yTs3hMsIfw==
+X-Received: by 2002:a05:6000:4203:b0:38f:2ddd:a1bb with SMTP id ffacd0b85a97d-39c120c8e66mr10278895f8f.8.1743508373446;
+        Tue, 01 Apr 2025 04:52:53 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-68-231.dyn.eolo.it. [146.241.68.231])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b79e311sm14029473f8f.78.2025.04.01.04.52.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Apr 2025 04:52:53 -0700 (PDT)
+Message-ID: <9d90b5e4-bd6d-4d78-a1c5-044621c06c96@redhat.com>
+Date: Tue, 1 Apr 2025 13:52:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: ibmveth: make veth_pool_store stop hanging
+To: davemarq@linux.ibm.com, netdev@vger.kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org, Nick Child <nnac123@linux.ibm.com>
+References: <20250331212328.109496-1-davemarq@linux.ibm.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250331212328.109496-1-davemarq@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Add Aeonsemi PHYs and the requirement of a firmware to correctly work.
-Also document the max number of LEDs supported and what PHY ID expose
-when no firmware is loaded.
+On 3/31/25 11:23 PM, davemarq@linux.ibm.com wrote:
+> From: Dave Marquardt <davemarq@linux.ibm.com>
+> 
+> Use rtnl_mutex to synchronize veth_pool_store with itself,
+> ibmveth_close and ibmveth_open, preventing multiple calls in a row to
+> napi_disable.
+> 
+> Signed-off-by: Dave Marquardt <davemarq@linux.ibm.com>
+> Fixes: 860f242eb534 ("[PATCH] ibmveth change buffer pools dynamically")
+> Reviewed-by: Nick Child <nnac123@linux.ibm.com>
+> ---
+> In working on removing BUG_ON calls from ibmveth, I realized that 2
+> threads could call veth_pool_store through writing to
+> /sys/devices/vio/30000002/pool*/*. You can do this easily with a little
+> shell script.
+> 
+> Running on a 6.14 kernel, I saw a hang:
+> 
+>     [  243.683282][  T108] INFO: task stress.sh:5829 blocked for more than 122 seconds.
+>     [  243.683300][  T108]       Not tainted 6.14.0-01103-g2df0c02dab82 #3
+>     [  243.683303][  T108] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+>     [  366.563278][  T108] INFO: task stress.sh:5829 blocked for more than 245 seconds.
+>     [  366.563297][  T108]       Not tainted 6.14.0-01103-g2df0c02dab82 #3
+>     [  366.563301][  T108] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> 
+> I configured LOCKDEP, compiled ibmveth.c with DEBUG, and built a new
+> kernel. I ran the test again and saw:
+> 
+>     Setting pool0/active to 0
+>     Setting pool1/active to 1
+>     [   73.911067][ T4365] ibmveth 30000002 eth0: close starting
+>     Setting pool1/active to 1
+>     Setting pool1/active to 0
+>     [   73.911367][ T4366] ibmveth 30000002 eth0: close starting
+>     [   73.916056][ T4365] ibmveth 30000002 eth0: close complete
+>     [   73.916064][ T4365] ibmveth 30000002 eth0: open starting
+>     [  110.808564][  T712] systemd-journald[712]: Sent WATCHDOG=1 notification.
+>     [  230.808495][  T712] systemd-journald[712]: Sent WATCHDOG=1 notification.
+>     [  243.683786][  T123] INFO: task stress.sh:4365 blocked for more than 122 seconds.
+>     [  243.683827][  T123]       Not tainted 6.14.0-01103-g2df0c02dab82-dirty #8
+>     [  243.683833][  T123] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+>     [  243.683838][  T123] task:stress.sh       state:D stack:28096 pid:4365  tgid:4365  ppid:4364   task_flags:0x400040 flags:0x00042000
+>     [  243.683852][  T123] Call Trace:
+>     [  243.683857][  T123] [c00000000c38f690] [0000000000000001] 0x1 (unreliable)
+>     [  243.683868][  T123] [c00000000c38f840] [c00000000001f908] __switch_to+0x318/0x4e0
+>     [  243.683878][  T123] [c00000000c38f8a0] [c000000001549a70] __schedule+0x500/0x12a0
+>     [  243.683888][  T123] [c00000000c38f9a0] [c00000000154a878] schedule+0x68/0x210
+>     [  243.683896][  T123] [c00000000c38f9d0] [c00000000154ac80] schedule_preempt_disabled+0x30/0x50
+>     [  243.683904][  T123] [c00000000c38fa00] [c00000000154dbb0] __mutex_lock+0x730/0x10f0
+>     [  243.683913][  T123] [c00000000c38fb10] [c000000001154d40] napi_enable+0x30/0x60
+>     [  243.683921][  T123] [c00000000c38fb40] [c000000000f4ae94] ibmveth_open+0x68/0x5dc
+>     [  243.683928][  T123] [c00000000c38fbe0] [c000000000f4aa20] veth_pool_store+0x220/0x270
+>     [  243.683936][  T123] [c00000000c38fc70] [c000000000826278] sysfs_kf_write+0x68/0xb0
+>     [  243.683944][  T123] [c00000000c38fcb0] [c0000000008240b8] kernfs_fop_write_iter+0x198/0x2d0
+>     [  243.683951][  T123] [c00000000c38fd00] [c00000000071b9ac] vfs_write+0x34c/0x650
+>     [  243.683958][  T123] [c00000000c38fdc0] [c00000000071bea8] ksys_write+0x88/0x150
+>     [  243.683966][  T123] [c00000000c38fe10] [c0000000000317f4] system_call_exception+0x124/0x340
+>     [  243.683973][  T123] [c00000000c38fe50] [c00000000000d05c] system_call_vectored_common+0x15c/0x2ec
+>     ...
+>     [  243.684087][  T123] Showing all locks held in the system:
+>     [  243.684095][  T123] 1 lock held by khungtaskd/123:
+>     [  243.684099][  T123]  #0: c00000000278e370 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x50/0x248
+>     [  243.684114][  T123] 4 locks held by stress.sh/4365:
+>     [  243.684119][  T123]  #0: c00000003a4cd3f8 (sb_writers#3){.+.+}-{0:0}, at: ksys_write+0x88/0x150
+>     [  243.684132][  T123]  #1: c000000041aea888 (&of->mutex#2){+.+.}-{3:3}, at: kernfs_fop_write_iter+0x154/0x2d0
+>     [  243.684143][  T123]  #2: c0000000366fb9a8 (kn->active#64){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x160/0x2d0
+>     [  243.684155][  T123]  #3: c000000035ff4cb8 (&dev->lock){+.+.}-{3:3}, at: napi_enable+0x30/0x60
+>     [  243.684166][  T123] 5 locks held by stress.sh/4366:
+>     [  243.684170][  T123]  #0: c00000003a4cd3f8 (sb_writers#3){.+.+}-{0:0}, at: ksys_write+0x88/0x150
+>     [  243.684183][  T123]  #1: c00000000aee2288 (&of->mutex#2){+.+.}-{3:3}, at: kernfs_fop_write_iter+0x154/0x2d0
+>     [  243.684194][  T123]  #2: c0000000366f4ba8 (kn->active#64){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x160/0x2d0
+>     [  243.684205][  T123]  #3: c000000035ff4cb8 (&dev->lock){+.+.}-{3:3}, at: napi_disable+0x30/0x60
+>     [  243.684216][  T123]  #4: c0000003ff9bbf18 (&rq->__lock){-.-.}-{2:2}, at: __schedule+0x138/0x12a0
+> 
+> From the ibmveth debug, two threads are calling veth_pool_store, which
+> calls ibmveth_close and ibmveth_open. Here's the sequence:
+> 
+>   T4365             T4366             
+>   ----------------- ----------------- ---------
+>   veth_pool_store   veth_pool_store   
+>                     ibmveth_close     
+>   ibmveth_close                       
+>   napi_disable                        
+>                     napi_disable      
+>   ibmveth_open                        
+>   napi_enable                         <- HANG
+> 
+> ibmveth_close calls napi_disable at the top and ibmveth_open calls
+> napi_enable at the top.
+> 
+> https://docs.kernel.org/networking/napi.html]] says
+> 
+>   The control APIs are not idempotent. Control API calls are safe
+>   against concurrent use of datapath APIs but an incorrect sequence of
+>   control API calls may result in crashes, deadlocks, or race
+>   conditions. For example, calling napi_disable() multiple times in a
+>   row will deadlock.
+> 
+> In the normal open and close paths, rtnl_mutex is acquired to prevent
+> other callers. This is missing from veth_pool_store. Use rtnl_mutex in
+> veth_pool_store fixes these hangs.
 
-Supported PHYs AS21011JB1, AS21011PB1, AS21010JB1, AS21010PB1,
-AS21511JB1, AS21511PB1, AS21510JB1, AS21510PB1, AS21210JB1,
-AS21210PB1 that all register with the PHY ID 0x7500 0x9410 on C45
-registers before the firmware is loaded.
+Some/most of the above should actually land into the commit message,
+please rewrite it accordingly.
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- .../bindings/net/aeonsemi,as21xxx.yaml        | 122 ++++++++++++++++++
- MAINTAINERS                                   |   1 +
- 2 files changed, 123 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/aeonsemi,as21xxx.yaml
+>  drivers/net/ethernet/ibm/ibmveth.c | 27 +++++++++++++++++++++++----
+>  1 file changed, 23 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
+> index b619a3ec245b..77ef19a53e72 100644
+> --- a/drivers/net/ethernet/ibm/ibmveth.c
+> +++ b/drivers/net/ethernet/ibm/ibmveth.c
+> @@ -1802,18 +1802,24 @@ static ssize_t veth_pool_store(struct kobject *kobj, struct attribute *attr,
+>  	long value = simple_strtol(buf, NULL, 10);
+>  	long rc;
+>  
+> +	rtnl_lock();
+> +
+>  	if (attr == &veth_active_attr) {
+>  		if (value && !pool->active) {
+>  			if (netif_running(netdev)) {
+>  				if (ibmveth_alloc_buffer_pool(pool)) {
+>  					netdev_err(netdev,
+>  						   "unable to alloc pool\n");
+> +					rtnl_unlock();
+>  					return -ENOMEM;
+>  				}
+>  				pool->active = 1;
+>  				ibmveth_close(netdev);
+> -				if ((rc = ibmveth_open(netdev)))
+> +				rc = ibmveth_open(netdev);
+> +				if (rc) {
+> +					rtnl_unlock();
+>  					return rc;
 
-diff --git a/Documentation/devicetree/bindings/net/aeonsemi,as21xxx.yaml b/Documentation/devicetree/bindings/net/aeonsemi,as21xxx.yaml
-new file mode 100644
-index 000000000000..69eb29dc4d7b
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/aeonsemi,as21xxx.yaml
-@@ -0,0 +1,122 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/aeonsemi,as21xxx.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Aeonsemi AS21XXX Ethernet PHY
-+
-+maintainers:
-+  - Christian Marangi <ansuelsmth@gmail.com>
-+
-+description: |
-+  Aeonsemi AS21xxx Ethernet PHYs requires a firmware to be loaded to actually
-+  work. The same firmware is compatible with various PHYs of the same family.
-+
-+  A PHY with not firmware loaded will be exposed on the MDIO bus with ID
-+  0x7500 0x7500 or 0x7500 0x9410 on C45 registers.
-+
-+  This can be done and is implemented by OEM in 2 different way:
-+    - Attached SPI flash directly to the PHY with the firmware. The PHY
-+      will self load the firmware in the presence of this configuration.
-+    - Manually provided firmware loaded from a file in the filesystem.
-+
-+  Each PHY can support up to 5 LEDs.
-+
-+  AS2xxx PHY Name logic:
-+
-+  AS21x1xxB1
-+      ^ ^^
-+      | |J: Supports SyncE/PTP
-+      | |P: No SyncE/PTP support
-+      | 1: Supports 2nd Serdes
-+      | 2: Not 2nd Serdes support
-+      0: 10G, 5G, 2.5G
-+      5: 5G, 2.5G
-+      2: 2.5G
-+
-+allOf:
-+  - $ref: ethernet-phy.yaml#
-+
-+select:
-+  properties:
-+    compatible:
-+      contains:
-+        enum:
-+          - ethernet-phy-id7500.9410
-+          - ethernet-phy-id7500.9402
-+          - ethernet-phy-id7500.9412
-+          - ethernet-phy-id7500.9422
-+          - ethernet-phy-id7500.9432
-+          - ethernet-phy-id7500.9442
-+          - ethernet-phy-id7500.9452
-+          - ethernet-phy-id7500.9462
-+          - ethernet-phy-id7500.9472
-+          - ethernet-phy-id7500.9482
-+          - ethernet-phy-id7500.9492
-+  required:
-+    - compatible
-+
-+properties:
-+  reg:
-+    maxItems: 1
-+
-+  firmware-name:
-+    description: specify the name of PHY firmware to load
-+    maxItems: 1
-+
-+required:
-+  - compatible
-+  - reg
-+
-+if:
-+  properties:
-+    compatible:
-+      contains:
-+        const: ethernet-phy-id7500.9410
-+then:
-+  required:
-+    - firmware-name
-+else:
-+  properties:
-+    firmware-name: false
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/leds/common.h>
-+
-+    mdio {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        ethernet-phy@1f {
-+            compatible = "ethernet-phy-id7500.9410",
-+                         "ethernet-phy-ieee802.3-c45";
-+
-+            reg = <31>;
-+            firmware-name = "as21x1x_fw.bin";
-+
-+            leds {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
-+
-+                led@0 {
-+                    reg = <0>;
-+                    color = <LED_COLOR_ID_GREEN>;
-+                    function = LED_FUNCTION_LAN;
-+                    function-enumerator = <0>;
-+                    default-state = "keep";
-+                };
-+
-+                led@1 {
-+                    reg = <1>;
-+                    color = <LED_COLOR_ID_GREEN>;
-+                    function = LED_FUNCTION_LAN;
-+                    function-enumerator = <1>;
-+                    default-state = "keep";
-+                };
-+            };
-+        };
-+    };
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 53ca93b0cc18..310530649a48 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -650,6 +650,7 @@ AEONSEMI PHY DRIVER
- M:	Christian Marangi <ansuelsmth@gmail.com>
- L:	netdev@vger.kernel.org
- S:	Maintained
-+F:	Documentation/devicetree/bindings/net/aeonsemi,as21xxx.yaml
- F:	drivers/net/phy/as21xxx.c
- 
- AF8133J THREE-AXIS MAGNETOMETER DRIVER
--- 
-2.48.1
+If you avoid a bit of duplicate code with
+					goto unlock_err;
+
+// at the end of the function
+unlock_err:
+	rtnl_unlock();
+	return rc;
+
+
+Cheers,
+
+Paolo
 
 
