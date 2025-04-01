@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-178471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D0F7A771AF
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 02:10:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C894BA771B4
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 02:11:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 254157A460B
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 00:09:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81FD83AC088
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 00:10:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE3A3595D;
-	Tue,  1 Apr 2025 00:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE0F9770FE;
+	Tue,  1 Apr 2025 00:10:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aWROXs7W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ex3yR04s"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED3D7249EB;
-	Tue,  1 Apr 2025 00:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C77CA70830;
+	Tue,  1 Apr 2025 00:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743466214; cv=none; b=sFa2HLbxpYRex+y1cj+fCfLCV0noN1JHGTF0e0XN5/n5hcPJDIFq8N6gkEG0LUCPZ42aAQMlWRIahpPYc+E3U+Y7JSR0JvuetQvTl8JT5aqUafftxHMnW7S5YrYeYleqtYDemB9h8FmpcvujUq4/LTiQgtWKjbVgRoIrWJnrMx0=
+	t=1743466216; cv=none; b=P0ltuK0J1StUMo9bq87JAwlqxpJHNjPYYWpu7Ea62z79qg46Bx95EiL2ysy9zAxqSQBu46ieMJNZkY3cLvSoRF1N5wzitQTEzWB6TkFwpYJL0zJldy1AuxzAEXQI7ToYZoEJWieNcUcZafGDbKgi1uxJ45jERh5Mt5xHNWoDxZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743466214; c=relaxed/simple;
-	bh=lTcTE/LTZtpys54JpnfKYjr833Iiem9m8Zf36ycFxvI=;
+	s=arc-20240116; t=1743466216; c=relaxed/simple;
+	bh=m+3g28N2wpxxMt369w3Y4pYfOAKgthUh76+bPArrHV8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=KDNF6XlHJ5Eku2GlyRtFCmVFvmife/vuFUZbwhM/PN1nntR09+KGBPtEQLf5jCaz77ZkYFTylhiWvsigR0Kl9+BEFWS9/P8tDuM6XFacp4r3K71l3I81BQjGskO4cKV7E6tQQALZH7l81x/mD9hU68v7XJT1jIJ2bIGwCQ/AHdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aWROXs7W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C53FAC4CEE5;
-	Tue,  1 Apr 2025 00:10:13 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=QxJoon6FPzv+eJ2Mg+AlYCnWRkTzEryr5Vyw7RQpWcR4G9vxBQLW7elWnI2Om9WGlo/SMN2KKNuo5xULIhe0xVdJ8ZH3FU2eKnGPtUQTyPQQYVA7XbTQ+2k1p1RHv1HJU9LS7ckuBa5Qo0qxjHpZY/XduWBAxYYQdE1Jpa7nDEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ex3yR04s; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41C9AC4CEE3;
+	Tue,  1 Apr 2025 00:10:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743466213;
-	bh=lTcTE/LTZtpys54JpnfKYjr833Iiem9m8Zf36ycFxvI=;
+	s=k20201202; t=1743466215;
+	bh=m+3g28N2wpxxMt369w3Y4pYfOAKgthUh76+bPArrHV8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=aWROXs7WN/ydk50CGW1sVp+7lD3XE+c4mOveCojDmbZav8RBIBYG00giPZvFsLPoM
-	 r/RCtSYZKdMI1FUPdMfEm2QwOi62epksiwbmCLDj9udmrEn9yG/gMzUc63T9B5rZDX
-	 gNBoMH0qF6E4CZ3WqGMvowuCJ0Geu0vj7d7NxR8qbGyJQEaCj5NR6ldC6/1nZZPBhT
-	 2IRiqRtqA/acHoAiHULqYA5b86crd9rmC1XXnJMMS6AHE8R2SF6crqA4Bozv6E6DIB
-	 L2zgJt/o8wTzviMZSJBULEgx5JpSL02BFQyDTjJ4QlH3YPyG6KwBjhroKQT+9g4lkl
-	 kG/iwv/KKPo5w==
+	b=Ex3yR04slp8u3G8DivtgV/oOx0qemgieWg8B42KwvRFBl8RJR9EPnxE3col6bHX+U
+	 ds4AjCnQnqriaZ/0erNf7uv9AT8fPMxkLVBpVmTG0BZoHb0Mx9vD7QK4FGZB0GLn5h
+	 U7jfmpfbjLIrvrB9Ey2X+fWGvQnqtVZnKpWDnGMfiXR2SvlXgy9IiWUQUpI67LvCZ+
+	 0OsM8TAtYsUMd3hA+5/LjRlUxiPAJuTsqdAFcI6UZGHIgJMDmzwyUErvaWQlUfSlv4
+	 RvD3Jvxl3NOSEh0AVpBbMpONWMzqYaCrcPJQmvEfwA40oso/PQumamR1AI2XVrS2UW
+	 LjAb3dpl6k+ww==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADAE0380AA7A;
-	Tue,  1 Apr 2025 00:10:51 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33A50380AA7A;
+	Tue,  1 Apr 2025 00:10:53 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] bnxt_en: bring back rtnl lock in bnxt_shutdown
+Subject: Re: [net PATCH] octeontx2-af: Fix mbox INTR handler when num VFs > 64
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174346625025.178192.2418191535450916154.git-patchwork-notify@kernel.org>
-Date: Tue, 01 Apr 2025 00:10:50 +0000
-References: <20250328174216.3513079-1-sdf@fomichev.me>
-In-Reply-To: <20250328174216.3513079-1-sdf@fomichev.me>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
- michael.chan@broadcom.com, pavan.chebbi@broadcom.com, andrew+netdev@lunn.ch,
- ap420073@gmail.com
+ <174346625174.178192.8436151483529175926.git-patchwork-notify@kernel.org>
+Date: Tue, 01 Apr 2025 00:10:51 +0000
+References: <20250327091441.1284-1-gakula@marvell.com>
+In-Reply-To: <20250327091441.1284-1-gakula@marvell.com>
+To: Geetha sowjanya <gakula@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
+ davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ sgoutham@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
+ tduszynski@marvell.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 28 Mar 2025 10:42:16 -0700 you wrote:
-> Taehee reports missing rtnl from bnxt_shutdown path:
+On Thu, 27 Mar 2025 14:44:41 +0530 you wrote:
+> When number of RVU VFs > 64, the vfs value passed to "rvu_queue_work"
+> function is incorrect. Due to which mbox workqueue entries for
+> VFs 0 to 63 never gets added to workqueue.
 > 
-> inetdev_event (./include/linux/inetdevice.h:256 net/ipv4/devinet.c:1585)
-> notifier_call_chain (kernel/notifier.c:85)
-> __dev_close_many (net/core/dev.c:1732 (discriminator 3))
-> kernel/locking/mutex.c:713 kernel/locking/mutex.c:732)
-> dev_close_many (net/core/dev.c:1786)
-> netif_close (./include/linux/list.h:124 ./include/linux/list.h:215
-> bnxt_shutdown (drivers/net/ethernet/broadcom/bnxt/bnxt.c:16707) bnxt_en
-> pci_device_shutdown (drivers/pci/pci-driver.c:511)
-> device_shutdown (drivers/base/core.c:4820)
-> kernel_restart (kernel/reboot.c:271 kernel/reboot.c:285)
+> Fixes: 9bdc47a6e328 ("octeontx2-af: Mbox communication support btw AF and it's VFs")
+> Signed-off-by: Geetha sowjanya <gakula@marvell.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] bnxt_en: bring back rtnl lock in bnxt_shutdown
-    https://git.kernel.org/netdev/net/c/dd07df9ff3d1
+  - [net] octeontx2-af: Fix mbox INTR handler when num VFs > 64
+    https://git.kernel.org/netdev/net/c/0fdba88a2115
 
 You are awesome, thank you!
 -- 
