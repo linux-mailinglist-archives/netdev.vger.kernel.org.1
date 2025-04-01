@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-178638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8DA2A7802C
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 18:23:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3ADDA7803F
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 18:24:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A44EC16EA03
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 16:20:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1437D3B3707
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 16:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F7E92144A6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAA12214A71;
 	Tue,  1 Apr 2025 16:13:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="bP6hYkDd"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="t2W+rIeS"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BB5B211A1E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 032762139C8;
 	Tue,  1 Apr 2025 16:13:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743524011; cv=none; b=W3Di/Rbp6X2tp92jWd+M/VgNfWAS4Ob9/x7ojHtgMczxYmUYKrrMeIS3OiyJ4wwSIiWv8UGIxjBLUr7JWa4oTHChWHBCJytK8hH1IZ8lkxyXOVzccL+HZe+58+i5MaN7pj8U880g7aCuKKhrZk4BKoYx9nnWc+gBfn4lyxAXOjs=
+	t=1743524011; cv=none; b=ZB5BSPHbJHPWCawvnHXAGeahTpuLwMYyKZkbrZu00lyGX5+RPh8l3F2cWnRRW+4kHjmH+npAZdIsATLPMv5Bb3GSASg3uZrsDQT+GUjdWEOAKIF1Kh88CG+HBXxYsntTYwhnFdrBlkTUZgyKu7iKuKNnZem9Oa+y9g4b2GZjUg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1743524011; c=relaxed/simple;
-	bh=gQHIFtd7jO6LKnDGPFxQ3YPgospqXdvc41+Z7wLtHwo=;
+	bh=R+dvFcKSVcqqUDpItH268Ej1pZUEkDrwiH4aY6Td5JY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y8h/sd5GUbpy90aoxO8c7qy82zw/p/8B2BVoYbBkvSsrVajbj4NYb9wYuaPBcFYL81JPTph0wbA4iQr9nV53564JmLUtcZDzFSTFxk3O/CQw5cFYCt7Y6FTvaYwk8W9D017KdUNWWmAWlLuYpSr8SrjDdi7tCiCvRh+ZyNIQJGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=bP6hYkDd; arc=none smtp.client-ip=68.232.154.123
+	 MIME-Version:Content-Type; b=JxXUNXIlzMFc/MxV2ePGpvgIPQQA9ar7ij0+ac6vVoxOPRi7kU/7+E6h6to4mGg4NV0y08Woz/0ZH8FrIbZ12roO/15Pq3A1cetzMroPwMCpbwOclqjHLadF66DgGMssRMrp2TUnAssqMj6JdwzgHeGYQw59YAxrjmqszTCAe3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=t2W+rIeS; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,21 +36,21 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1743524009; x=1775060009;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=gQHIFtd7jO6LKnDGPFxQ3YPgospqXdvc41+Z7wLtHwo=;
-  b=bP6hYkDds5oFhkhYQQDPBnZxcaM2o5UmV8sKy/Nn+e+cznDMpS7RGQut
-   hlf59zsgbpMTGWH2onopbvHnpsI0WlC99rfFiZYTuHikFHW6lxUfWJDfu
-   vrxjcBVvsOQd6SGezfMZggoZLWfTKxjhxK0BNDlQbD7nsws0k3dskMVa3
-   0l+6yphjywfjoLENMaAjGoUn8yh/ZPxBeH7hCFga2uyCEV7jOVLePoDTI
-   7Wmh4TvU8SXQwvI4+pbwgheeoZIvkLLUtbYHXe4rLfNUuYtXKc7ZXH6x8
-   B7FUrTRlZnivq+JjhUt/2IMlIVMmojMbg/TRcMGt/9DM4+nCg8u4wUC/Q
+  bh=R+dvFcKSVcqqUDpItH268Ej1pZUEkDrwiH4aY6Td5JY=;
+  b=t2W+rIeSrOB5+JvDtmQbkWYbXiB/XFwIEi2ppJcXsle6AKtpMwHx4gMr
+   WP0gJZlp69NTPfaXY/oZMBOiUShoxs8K4FB056nNLhIVpnVPUWyTfdMjn
+   jSgfp+mjiwEn7OtuBXVWG/wUQ14tLqLbDvwixaevR0Tt+QgPXJyZZwQuc
+   Fwv32uE6vsp/GmuFwyoEyiQx9h83Ga5LKhvazOUvq664G/lw5VjguH6DI
+   bHqjyq52KsrG+h5gz7eJUnBfi6XibqaXxVEqIAcV/kSAOKJSJM+ksOmTG
+   I/jsT779UgZuclXvnJXIxxFf4R1D07sO1T2ihkmcOiuhESINg26/uVQPO
    g==;
 X-CSE-ConnectionGUID: ggLzNIpETriZ0zPViMY9HA==
-X-CSE-MsgGUID: 2KMWCwVCQiOgIjwH19Ge9Q==
+X-CSE-MsgGUID: pl7XT+nXRGqhxAxzXvgSmQ==
 X-IronPort-AV: E=Sophos;i="6.14,293,1736838000"; 
-   d="scan'208";a="39512776"
+   d="scan'208";a="39512777"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Apr 2025 09:13:21 -0700
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Apr 2025 09:13:22 -0700
 Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
@@ -67,9 +67,9 @@ CC: <nicolas.ferre@microchip.com>, <netdev@vger.kernel.org>,
 	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<linux-arm-kernel@lists.infradead.org>, Ryan Wanner
 	<Ryan.Wanner@microchip.com>
-Subject: [PATCH 1/6] dt-bindings: net: cdns,macb: add sama7d65 ethernet interface
-Date: Tue, 1 Apr 2025 09:13:17 -0700
-Message-ID: <392b078b38d15f6adf88771113043044f31e8cd6.1743523114.git.Ryan.Wanner@microchip.com>
+Subject: [PATCH 2/6] ARM: dts: microchip: sama7d65: Add gmac interfaces for sama7d65 SoC
+Date: Tue, 1 Apr 2025 09:13:18 -0700
+Message-ID: <05b107796b6f3a173d0dd0a5b2107b675cfd994e.1743523114.git.Ryan.Wanner@microchip.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1743523114.git.Ryan.Wanner@microchip.com>
 References: <cover.1743523114.git.Ryan.Wanner@microchip.com>
@@ -84,25 +84,56 @@ Content-Type: text/plain
 
 From: Ryan Wanner <Ryan.Wanner@microchip.com>
 
-Add documentation for sama7d65 ethernet interface.
+Add support for GMAC interfaces on SAMA7D65 SoC.
 
 Signed-off-by: Ryan Wanner <Ryan.Wanner@microchip.com>
 ---
- Documentation/devicetree/bindings/net/cdns,macb.yaml | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm/boot/dts/microchip/sama7d65.dtsi | 32 +++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/cdns,macb.yaml b/Documentation/devicetree/bindings/net/cdns,macb.yaml
-index 3c30dd23cd4e..eeb9b6592720 100644
---- a/Documentation/devicetree/bindings/net/cdns,macb.yaml
-+++ b/Documentation/devicetree/bindings/net/cdns,macb.yaml
-@@ -62,6 +62,7 @@ properties:
-       - items:
-           - enum:
-               - microchip,sam9x7-gem     # Microchip SAM9X7 gigabit ethernet interface
-+              - microchip,sama7d65-gem   # Microchip SAMA7D65 gigabit ethernet interface
-           - const: microchip,sama7g5-gem # Microchip SAMA7G5 gigabit ethernet interface
+diff --git a/arch/arm/boot/dts/microchip/sama7d65.dtsi b/arch/arm/boot/dts/microchip/sama7d65.dtsi
+index b6710ccd4c36..cd17b838e179 100644
+--- a/arch/arm/boot/dts/microchip/sama7d65.dtsi
++++ b/arch/arm/boot/dts/microchip/sama7d65.dtsi
+@@ -169,6 +169,38 @@ dma1: dma-controller@e1614000 {
+ 			status = "disabled";
+ 		};
  
-   reg:
++		gmac0: ethernet@e1618000 {
++			compatible = "microchip,sama7d65-gem", "microchip,sama7g5-gem";
++			reg = <0xe1618000 0x2000>;
++			interrupts = <GIC_SPI 46 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 144 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 145 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 146 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 147 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 148 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&pmc PMC_TYPE_PERIPHERAL 46>, <&pmc PMC_TYPE_PERIPHERAL 46>, <&pmc PMC_TYPE_GCK 46>, <&pmc PMC_TYPE_GCK 49>;
++			clock-names = "pclk", "hclk", "tx_clk", "tsu_clk";
++			assigned-clocks = <&pmc PMC_TYPE_GCK 46>, <&pmc PMC_TYPE_GCK 49>;
++			assigned-clock-rates = <125000000>, <200000000>;
++			status = "disabled";
++		};
++
++		gmac1: ethernet@e161c000 {
++			compatible = "microchip,sama7d65-gem", "microchip,sama7g5-gem";
++			reg = <0xe161c000 0x2000>;
++			interrupts = <GIC_SPI 47 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 151 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 152 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 153 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 154 IRQ_TYPE_LEVEL_HIGH>,
++				     <GIC_SPI 155 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&pmc PMC_TYPE_PERIPHERAL 47>, <&pmc PMC_TYPE_PERIPHERAL 47>,<&pmc PMC_TYPE_GCK 47>, <&pmc PMC_TYPE_GCK 50>;
++			clock-names = "pclk", "hclk", "tx_clk", "tsu_clk";
++			assigned-clocks = <&pmc PMC_TYPE_GCK 47>, <&pmc PMC_TYPE_GCK 50>;
++			assigned-clock-rates = <125000000>, <200000000>;
++			status = "disabled";
++		};
++
+ 		pit64b0: timer@e1800000 {
+ 			compatible = "microchip,sama7d65-pit64b", "microchip,sam9x60-pit64b";
+ 			reg = <0xe1800000 0x100>;
 -- 
 2.43.0
 
