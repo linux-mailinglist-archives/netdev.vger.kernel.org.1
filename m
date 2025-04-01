@@ -1,152 +1,108 @@
-Return-Path: <netdev+bounces-178645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5321CA7807C
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 18:32:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9851FA78081
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 18:33:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECBB3166DE9
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 16:30:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A4E516C0A7
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 16:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A79120D517;
-	Tue,  1 Apr 2025 16:30:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FA2320D50B;
+	Tue,  1 Apr 2025 16:31:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="lT4hQ8Jp"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mtv7kC6x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-0201.mail-europe.com (mail-0201.mail-europe.com [51.77.79.158])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5789F20D4F6
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 16:30:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.77.79.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C3920B7EA;
+	Tue,  1 Apr 2025 16:31:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743525047; cv=none; b=SO7X/oOediq/tvyCm7uXhIwgGM3o33Tc53YGKZeicgwMOUsG9+vzhGQ6TuIP2enJm6c7mp9ZkMWnbRxy/6f5hrmX2uwv0HFA7tRVWmqBVvmT/dqAwzbb9TtudjutZ6gnmHqCdgc4JvBYs5J303gd0rChm+NwaS5hrIdvgjwsHqo=
+	t=1743525082; cv=none; b=Q8F2qiYiUci3YG/dnun6pdOHh6t7Osa7zckPWUeIYWF+rR/C73cwjt1uPZnZEi+fZYsTyL3lV8zv+VhM85ME9bBz0NGZjhmCuoO6KJIMkZSnufAPsDkHosM1Vjk6A7qtAeYXiYyA7/CyYITpiQPeijl8/e+ulo1V95F3nxwMVhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743525047; c=relaxed/simple;
-	bh=WW3nu6KzgsPeLsLxy3Wgc9nNsHDQgS0gktfXMmLlS1Q=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Q4OxKhxRO2FZ9UihiXmjT5KbsvQQ7Yt4oKvAK3E12XO7GzoYUUJuIZ/QjDI6CGVIFdswqL84dIixS+oTkWZSQ7GlAJrjYa2muDSXe+nDNzVYsEcpL71b+0oNjWqrFLU4cdGpvrdSMgIVJpShR4OXvHgTghvJO/AXJIWfxMejvkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=lT4hQ8Jp; arc=none smtp.client-ip=51.77.79.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1743525035; x=1743784235;
-	bh=+7Do12VfIiKrGfPsYu9Gte5UkMRRTNhdO0sLTH4l5Bw=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector:
-	 List-Unsubscribe:List-Unsubscribe-Post;
-	b=lT4hQ8Jpy+oEEM2/VfM01Zr5ce7tNPyFFyNLL8FKlTRnEy9+GsVACtENwGdXxxHAv
-	 ly/odcxvYQU7wkrUwuXBsZU/8ofDUJivijwrczyXSQib3e92iEL9iBvgWMLIHZoQTT
-	 IezWRGDQxMv3bdAzP0jRt+yCyc3iLMdI/w2ehld4uDwXMGBHaiwqVCxlXfU/GswWvs
-	 bqG2SUJF+sgJxye1JQD4SenoPQRFU+zkCbT5ZWzCjnesI9c4YG6VOfABfKFCC1Zrnf
-	 MjFI5XUzrOylecw9Ys1qUBAHwDUUMjhSRO4HlA52SID1Gvwaoud9d8mtpAk6Enafb3
-	 Df2evwIuvmAVg==
-Date: Tue, 01 Apr 2025 16:30:30 +0000
-To: Linux Networking <netdev@vger.kernel.org>
-From: Turritopsis Dohrnii Teo En Ming <teo.en.ming@protonmail.com>
-Cc: "ceo@teo-en-ming-corp.com" <ceo@teo-en-ming-corp.com>
-Subject: I have FINALLY SUCCEEDED in getting Palo Alto VM-Series Software Firewall 10.0.4 to work in Ubuntu Desktop 22.04.5 LTS KVM Host
-Message-ID: <w-vSvJ1CEeQo-3EplTRQeiIgtT7x20Pk89dGwGAfApgvgoPO6aKk2739taptvtxkLqkgLn84ICgfSmNmYgX827_wt9CJuqI5ery3YWh-AzE=@protonmail.com>
-Feedback-ID: 39510961:user:proton
-X-Pm-Message-ID: 0d1f40840f789016aa6b44e3a695f4ff8df895fc
+	s=arc-20240116; t=1743525082; c=relaxed/simple;
+	bh=KXsNaz4eUmfKifeMxUbmS+yJGRk7Pas5WljQxZ0zVaU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E/V8KR6Ho9hLdBcnIcA11AC49+Q30rK1TnAP3EUprmxmsXnNEY8kWmEuDO9uS20Y6HoRcYkikF+3BzLl09NfsbFaI9TECK20ibdXx3UxPKdClRzDZf1A3Spy0XhtI7SGEKKnZHcjZrKaj5p3XnAuNf0VGF5aIoZBxM6+4jy1uug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mtv7kC6x; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=zTEFQc5dWYUuBsuVKJTFRf6BPFUabOSLuUQv6M/NaUs=; b=mtv7kC6xk2ChNFw+jpUJFuq5fe
+	VrjElzIo3L2TH/x+D2KvBRax+IzONx5GZK0evuOqnvr5WlXVtfx9s2LdxuVh7NM/vLzpukOgRVyYr
+	5bKNnTfeFOPtUeVBpxNNGTOZTlm08RKnEXaNlptfT+iJdMIn+Kl1XKFGGTOBU0sLRjc9LP/JRQubB
+	+Zm1AucNADqY66/GtLsXrMCeC61VEYLnMm1hKfb/Z4aR4Iio4lU6v4N9aSjGY7If5iZI9caec0Ef/
+	6EDIqh++B1MgxPkKap+KH8/UwUfO9iU/JimJ8EiiTiaE6nOL0VdgGWggwdfVy6w6aGuTBabeQ66I6
+	bof9UvDA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48484)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tzeW0-0006de-0J;
+	Tue, 01 Apr 2025 17:31:04 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tzeVv-0002qU-2E;
+	Tue, 01 Apr 2025 17:30:59 +0100
+Date: Tue, 1 Apr 2025 17:30:59 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Andrei Botila <andrei.botila@oss.nxp.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Eric Woudstra <ericwouds@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next RFC PATCH v5 3/6] net: phy: nxp-c45-tja11xx: simplify
+ .match_phy_device OP
+Message-ID: <Z-wUwypg9KYVUcBz@shell.armlinux.org.uk>
+References: <20250401114611.4063-1-ansuelsmth@gmail.com>
+ <20250401114611.4063-4-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250401114611.4063-4-ansuelsmth@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Subject: I have FINALLY SUCCEEDED in getting Palo Alto VM-Series Software F=
-irewall 10.0.4 to work in Ubuntu Desktop 22.04.5 LTS KVM Host
+On Tue, Apr 01, 2025 at 01:46:04PM +0200, Christian Marangi wrote:
+> Simplify .match_phy_device OP by using a generic function and using the
+> new phy_id PHY driver info instead of hardcoding the matching PHY ID
+> with new variant for macsec and no_macsec PHYs.
+> 
+> Also make use of PHY_ID_MATCH_MODEL macro and drop PHY_ID_MASK define to
+> introduce phy_id and phy_id_mask again in phy_driver struct.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 
-Author: Mr. Turritopsis Dohrnii Teo En Ming
-Country: Singapore
-Date: 2nd April 2025 Wednesday
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-I have FINALLY SUCCEEDED in getting Palo Alto VM-Series Software Firewall 1=
-0.0.4 to work in Ubuntu Desktop 22.04.5 LTS KVM Host.
+Thanks!
 
-Below are my FINAL notes.
-
-cd /etc/netplan/
-sudo nano 01-netcfg.yaml
-
-My FINAL netplan configuration:
-
-network:
-  version: 2
-  renderer: networkd
-  ethernets:
-    enp1s0:
-      dhcp4: no
-    enp2s0:
-      dhcp4: no
-    enp3s0:
-      dhcp4: no
-    enp4s0:
-      dhcp4: no
-  bridges:
-# Management interface
-    br0:
-      interfaces: [enp1s0]
-      dhcp4: yes
-# WAN interface
-    br1:
-      interfaces: [enp2s0]
-      dhcp4: yes
-# LAN interface
-    br2:
-      interfaces: [enp3s0]
-      dhcp4: no
-      addresses: [192.168.1.254/24]
-# Unused interface for the moment, maybe DMZ in the future
-    br3:
-      interfaces: [enp4s0]
-      dhcp4: yes
-
-sudo netplan apply
-sudo systemctl restart NetworkManager
-
-sudo brctl addif br0 enp1s0
-sudo brctl addif br1 enp2s0
-sudo brctl addif br2 enp3s0
-sudo brctl addif br3 enp4s0
-
-teo-en-ming@PA-VM:/etc/netplan$ sudo brctl show
-bridge name=09bridge id=09=09STP enabled=09interfaces
-br0=09=098000.da16c5ba83c0=09yes=09=09enp1s0
-br1=09=098000.2a1de38524c1=09yes=09=09enp2s0
-br2=09=098000.2ac0bc028fe3=09yes=09=09eno1
-br3=09=098000.4eb2b8fe7743=09yes=09=09enp4s0
-virbr0=09=098000.525400f9e6d6=09yes=09
-
-You should use virtio for all of your Linux bridges in Virtual Machine Mana=
-ger (GUI). virtio has been verified to work.=09
-
-Interface Mappings
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-Port 1 on the hardware appliance maps to the Management interface eth0
-Port 2 on the hardware appliance maps to the WAN interface ethernet1/1
-Port 3 on the hardware appliance maps to the LAN interface ethernet1/2
-Port 4 on the hardware appliance maps to the DMZ interface ethernet1/3 (to =
-be implemented in the future)
-
-Congratulations to myself!
-
-My next project: I am planning to download, install and configure Check Poi=
-nt CloudGuard Virtual Firewall in Ubuntu Linux KVM host!
-
-Regards,
-
-Mr. Turritopsis Dohrnii Teo En Ming
-Singapore
-2nd April 2025 Wednesday 12.25 AM
-
-
-
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
