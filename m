@@ -1,262 +1,287 @@
-Return-Path: <netdev+bounces-178694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47A61A784FC
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 00:54:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87090A78502
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 00:55:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55CED7A40BD
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 22:53:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AB8216C5D3
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 22:55:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82EF6219A97;
-	Tue,  1 Apr 2025 22:54:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7355B1EE03C;
+	Tue,  1 Apr 2025 22:55:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="IW6fwwEP"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Naq2ygTf"
 X-Original-To: netdev@vger.kernel.org
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2051.outbound.protection.outlook.com [40.107.244.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AFAB1EDA2F;
-	Tue,  1 Apr 2025 22:54:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743548052; cv=none; b=h69U5ren+WkV+UWF+Gsowe5ocug2SrCHCgID0Hxko/la72wjdAydrAmRSNuKlBbxowbg+XFRBsl8337m9MtmtxaYiFcA6ppWLcdbv+StWX9aIeQfLcV5GMripeNYyg4ovw0oabU9ZNm4N+x+pOYmQyUkEtWLB8Ch9Ybi3tPnE4w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743548052; c=relaxed/simple;
-	bh=6HoAuf2vzPHVJ2QZmJsjedZxev9+dXlJ30t8kC/q4so=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KwWcqvgOLvk7K8ZMCBfsBACE6+egiOkrjx8RHfNGdxQ2C16lBZ6HqqamIcYzYnZrZNZCWI1z9nUZJZ2fc3+jxq/U1KJN+UDq4Jmk/GdyNb9OZq9dzIOnoZgR39w5s3uHN5RJJBwAkSTrB6aaWCzU8nPAsPuWSEPNw7Mhld+Hz5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=IW6fwwEP; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=jhU/1epdO5g4YL4nxOBTdkpLkxHYpKmTVfMEhpcPmlc=; b=IW6fwwEPPkmdsZxj7g+aJ77oDC
-	TZyj9OYgjt/oW3rcg6zc2IwcQY7PucVHacoqhFZSuioxiwP0c+TVmlQwkKwmEDuQfYKrelB30pne8
-	noM/hAERvxydKZC6534MSnuc9o3Qr33dybs8XteUuD/5wua8UuX/LUwmsHPGxvWSAPSECmUwLh/M7
-	vEf4pcSnxVomrCHam4VbiuJsYzt56PnKWhLrhZrL7VHPzXxBK6lYt9saEluaMHu+ay5Rabd3yy7ry
-	ccPOD9QwS43fl7ikIpva5xA8dkMNjLlBWf3z8NTITGnd2Fc0GzaMPITJ/3v1wThNnxrBKxJZccqSE
-	bZxWPAxIwTxeRauuNwKMt9VV5mMfgz3j385xbS1RGLMjKeCLMjE6J2zM3RM6k//TEot8Fk2z8SpNm
-	NLW2Z3pf1R/KCx/hLlgYyBRUIURmY1UxocoUq7NkcjzxtAspKukJcih61F5qrPB+CiT2By/MFJJjV
-	mAvBS4EBxvZDwzm75pXT80bF;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1tzkUb-007jIP-01;
-	Tue, 01 Apr 2025 22:54:01 +0000
-Message-ID: <4b7ac4e9-6856-4e54-a2ba-15465e9622ac@samba.org>
-Date: Wed, 2 Apr 2025 00:53:58 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81ED01C863F
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 22:55:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743548149; cv=fail; b=bIug2iGtPmRYHejXUzgCQmyBEG7fH7Nb8l8wxffj26K62QzStiSrsgXNH8mNdahgfhGQDhVEWfd6Lbc+6C3vNBlaNkKueLhBPB10ey1uRGTQXROT+QsVNeFeuA5FQ+PCSvJp5OtnwF1IXVbY2n7s04AHSR0nAEU2iK/8igQteY0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743548149; c=relaxed/simple;
+	bh=y4vpATe5z3j6V+1B/2kpN1voo/r7CEPJTIEmJJg3Tbk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Kyz6nlPrInmWRN0xkoODuYb6U3TPUa81OguVrMIpoTxJyLmN7pmnaJgu95DsEm1WMzCsDz8Ho7eUa6BvKVNj2jpaR6+/FZU6V6sjbWqs2lWlibDs1T864UNK9TyOsGhjkUtAxXyTFP1LOGl09hS+1S+dIWDqreMDZ5hz/GdMqyo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Naq2ygTf; arc=fail smtp.client-ip=40.107.244.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BIP6+3wEspkiWb5o0JmQQcbgj2iOIGv+8jfmQ7pzsa7kO3+yQ6Isqt7JcPWxQSZAAHlGp3JFv9Cnh4Vm9GKp8nEN16bd32ywtdP+ZXMZ5oy0ZvFAfpalpAY4MzOF34apGZcEP2klL+XcZez2V8HfoW52asNuwJchcQnpF5VjioihmqwV0tryY/N3V2fe4ETKm9xBvHRQEgSnpHaO46+HDxSVgO8HNoRlOeB5UXZpVmrGtdqGdEF3wxy0j5wghg2ErWHbKpVVT/f2dJ6E9XaPmjTFGaCEtZK6cu8rRbk8cWSX8VJWsFEkkA2GCuFQVkOKcmBK2NL7dfABJfCfvXI6cQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oV7kCTXFRM2ksqnERWk4glveT7DaOUVXOvg5y8zflLk=;
+ b=w0MHC6Bwk2q7A0qPohLuFDf2H9k5dnn+m5YcJfCDLqDhVSwAo98pSytC3RFrURulbT4Qkru9+fkRtU2A4i/64biUX0gvOaL/JSD4wu0fojZfL4ZIYEusKJMx4EptK1cCmETNPUmWIY4L4jq60UQFWLa0bADwkRANKvZ3bqyOWz92HibzWMA0MquRL4N9S5vwSUKzTPoChJeSfaIwM7+TplHHH98mNRVqyzEAlHrUz/Qz0/XcUGA4m/J87lEQ9ebBFt7wpAA3uJvP0ESB5cO/VS3dXPLN8cD8DPbZLEkd66hyVX3GhiTkBNjZyGhzCHPtNOWs4DRRUonqQa9DnKb9zg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oV7kCTXFRM2ksqnERWk4glveT7DaOUVXOvg5y8zflLk=;
+ b=Naq2ygTfP0DrtoFwJOKYJ4lh2j8WR0zHdxeNAnlzD6rVBoJ5qMsMYIXxxjioYr3UY6t5U0DkQ7+XHQBVoAIzU7fiGyfyX4eqCU2Z9cSeenmt0bIjus/lr4QUr4RIdWzxmk4OKZjUS0cTBfCySWmD9PVGTVjW9RZNodk2wGiDCuM=
+Received: from MW4PR04CA0215.namprd04.prod.outlook.com (2603:10b6:303:87::10)
+ by MN2PR12MB4063.namprd12.prod.outlook.com (2603:10b6:208:1dc::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.52; Tue, 1 Apr
+ 2025 22:55:42 +0000
+Received: from CO1PEPF000044FB.namprd21.prod.outlook.com
+ (2603:10b6:303:87:cafe::cf) by MW4PR04CA0215.outlook.office365.com
+ (2603:10b6:303:87::10) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.54 via Frontend Transport; Tue,
+ 1 Apr 2025 22:55:41 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ CO1PEPF000044FB.mail.protection.outlook.com (10.167.241.201) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8632.2 via Frontend Transport; Tue, 1 Apr 2025 22:55:41 +0000
+Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 1 Apr
+ 2025 17:55:40 -0500
+Received: from xcbecree42x.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39 via Frontend
+ Transport; Tue, 1 Apr 2025 17:55:39 -0500
+From: <edward.cree@amd.com>
+To: <linux-net-drivers@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<edumazet@google.com>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<andrew+netdev@lunn.ch>
+CC: Edward Cree <ecree.xilinx@gmail.com>, <netdev@vger.kernel.org>, Kyungwook
+ Boo <bookyungwook@gmail.com>
+Subject: [PATCH net] sfc: fix NULL dereferences in ef100_process_design_param()
+Date: Tue, 1 Apr 2025 23:54:39 +0100
+Message-ID: <20250401225439.2401047-1-edward.cree@amd.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 0/4] net/io_uring: pass a kernel pointer via optlen_t
- to proto[_ops].getsockopt()
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Breno Leitao <leitao@debian.org>,
- Linus Torvalds <torvalds@linux-foundation.org>, Jens Axboe
- <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Karsten Keil <isdn@linux-pingi.de>, Ayush Sawal <ayush.sawal@chelsio.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn
- <willemb@google.com>, David Ahern <dsahern@kernel.org>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Xin Long <lucien.xin@gmail.com>, Neal Cardwell <ncardwell@google.com>,
- Joerg Reuter <jreuter@yaina.de>, Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Oliver Hartkopp <socketcan@hartkopp.net>,
- Marc Kleine-Budde <mkl@pengutronix.de>,
- Robin van der Gracht <robin@protonic.nl>,
- Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de,
- Alexander Aring <alex.aring@gmail.com>,
- Stefan Schmidt <stefan@datenfreihafen.org>,
- Miquel Raynal <miquel.raynal@bootlin.com>,
- Alexandra Winter <wintera@linux.ibm.com>,
- Thorsten Winkler <twinkler@linux.ibm.com>,
- James Chapman <jchapman@katalix.com>, Jeremy Kerr <jk@codeconstruct.com.au>,
- Matt Johnston <matt@codeconstruct.com.au>,
- Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>,
- Remi Denis-Courmont <courmisch@gmail.com>,
- Allison Henderson <allison.henderson@oracle.com>,
- David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>,
- Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
- "D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>,
- Wen Gu <guwen@linux.alibaba.com>, Jon Maloy <jmaloy@redhat.com>,
- Boris Pismenny <borisp@nvidia.com>, John Fastabend
- <john.fastabend@gmail.com>, Stefano Garzarella <sgarzare@redhat.com>,
- Martin Schiller <ms@dev.tdt.de>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
- <bjorn@kernel.org>, Magnus Karlsson <magnus.karlsson@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Jonathan Lemon <jonathan.lemon@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org,
- linux-hams@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-can@vger.kernel.org, dccp@vger.kernel.org, linux-wpan@vger.kernel.org,
- linux-s390@vger.kernel.org, mptcp@lists.linux.dev,
- linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com,
- linux-afs@lists.infradead.org, tipc-discussion@lists.sourceforge.net,
- virtualization@lists.linux.dev, linux-x25@vger.kernel.org,
- bpf@vger.kernel.org, isdn4linux@listserv.isdn4linux.de,
- io-uring@vger.kernel.org
-References: <cover.1743449872.git.metze@samba.org>
- <Z-sDc-0qyfPZz9lv@mini-arch> <39515c76-310d-41af-a8b4-a814841449e3@samba.org>
- <407c1a05-24a7-430b-958c-0ca78c467c07@samba.org>
- <ed2038b1-0331-43d6-ac15-fd7e004ab27e@samba.org> <Z+wH1oYOr1dlKeyN@gmail.com>
- <Z-wKI1rQGSgrsjbl@mini-arch> <0f0f9cfd-77be-4988-8043-0d1bd0d157e7@samba.org>
- <Z-xi7TH83upf-E3q@mini-arch>
-Content-Language: en-US, de-DE
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <Z-xi7TH83upf-E3q@mini-arch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+Received-SPF: None (SATLEXMB03.amd.com: edward.cree@amd.com does not designate
+ permitted sender hosts)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044FB:EE_|MN2PR12MB4063:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3c17c671-cd13-4065-e1d4-08dd717053c6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|82310400026|376014|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?xbqXGSHYS8nd7Zrfjj4a4/GXPszK4XRIURz+YOqdxeZ47aihHeDjEae6G40l?=
+ =?us-ascii?Q?0zLNIwytEGkKOp5NjldhPVNbGuSMCncaBfbOOYEAaYkQeMcFnfBzF690FE3q?=
+ =?us-ascii?Q?TTm2xlmA/xkLq0EZ0EtpvxBtN9/XmCHNNyMtrRKpI2+Xva94xjW8uYtXXR7D?=
+ =?us-ascii?Q?KwYcF46Wyged3xNsf4zFed3VGU8t1g6knv2u0I4+LG4WubJxjzdMFO0D+Vn2?=
+ =?us-ascii?Q?4qEa1QtzreElUo+fRxF7qLTMKxhZlZH4FNMUzeFzYAw7uA/lVv3Cg2C6Y8eM?=
+ =?us-ascii?Q?RdpkA5AZsHqoQ9AQ/c8cFXz1jpZFcQoqVNZlbPBhJF/scErHdP2dQ6vdaqGF?=
+ =?us-ascii?Q?3WM/1mtpE1tTyKF/q1/cTgg69EXsT8FXdbT4DkdaQv5E+ooC61qQ+lyOcK//?=
+ =?us-ascii?Q?rXqKPk/HKfXcI5YHB7H6Im1ImoJCZW5iekYfKzntJ9TQbKDjCTaJmFFFwO61?=
+ =?us-ascii?Q?xA3sutrWwEcs+o+gxN747cF+9xS/rgCvtzy1Sd/NXWxeGvjL5n7/rYxlBDYw?=
+ =?us-ascii?Q?b7a5WSkL4WHaDW0S113rFtrsvCsjKVk2F+jpxmY1NnKWu1SmkLI/M62vweRN?=
+ =?us-ascii?Q?lnG4T5MtIKDe4s5sPxOJspkHs+hwSV23z0reZFbdYU8s2DtOyW5hQBQ+aFlL?=
+ =?us-ascii?Q?yRhSa0/R0x4dmImmQbbkTBOeEyXFi7nkP77IyjB7bFxHg/QHF4HoBkGK6gns?=
+ =?us-ascii?Q?TF19ETKGyWPStKcQTMZ4mKSzk7xzZnWk8DuWieFUezZ7lC57SY4DCrHBh8oq?=
+ =?us-ascii?Q?CRssmMeJEt37mXGWeMyMvCL5ao0SMEQZ+3ed97i6VvnqFcqkfUl7Kbkm5enp?=
+ =?us-ascii?Q?POS4Pa5ic7HqB4FKQJ1XwvZEZQUHumrlGav5TSmAU3WGzuKkIJR6j3toF3CC?=
+ =?us-ascii?Q?ajb38RubfOjMDRkS/8/TqpE1/IwbZhB0tJ0L76oMwK2aoiyn3qTaftRv6K/R?=
+ =?us-ascii?Q?6a8vqYm3ZLXnPuHMBZ0vQJXaW9kkLf/6jBm3aMoGa/CR6ffiy447saLFRQCx?=
+ =?us-ascii?Q?aHaxkIo3uhKqhhHA+c+zoVo0sdq7clMctxqSxF6CAP7vklXHwpP210/vl4rc?=
+ =?us-ascii?Q?EAnaDCYAcWyqEvafd1yYKw9dVvaCkew+5kkqpn+86W7SXDulkm+E6AW39InG?=
+ =?us-ascii?Q?lTPX5Ofq12olqkXH+vyfus4JJaG3an39sUzZJXrMbmyaSMk/VNbYRXvKA2Ym?=
+ =?us-ascii?Q?zXRgJTdgVmTevo2x/tCAx9PB/WfW+BNZ4sVDqS9oizbT86aV08CwVZMqxQ6X?=
+ =?us-ascii?Q?5FQsB0WexnUJILBfiQA/pATupcOtC8Zv89elEsLoMLr+SXPA+my3RV8brRMg?=
+ =?us-ascii?Q?HZe0IMAVPp1EWg2QVXMAqQ2vWUNaHYj5m/ebUeG/4yjwYDCdZKHkCkketlIP?=
+ =?us-ascii?Q?tnM9mKh7xbkBtxPGMvJSOAML4YezzZj0GPV8zmXOkk0U/gRffNRaq6iqJ+5J?=
+ =?us-ascii?Q?u2My4DVhPd638VIvuX2ln6CLZ3j35S04jZnLa9Epq5vKAQhccuin6A=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Apr 2025 22:55:41.0753
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3c17c671-cd13-4065-e1d4-08dd717053c6
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000044FB.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4063
 
-Am 02.04.25 um 00:04 schrieb Stanislav Fomichev:
-> On 04/01, Stefan Metzmacher wrote:
->> Am 01.04.25 um 17:45 schrieb Stanislav Fomichev:
->>> On 04/01, Breno Leitao wrote:
->>>> On Tue, Apr 01, 2025 at 03:48:58PM +0200, Stefan Metzmacher wrote:
->>>>> Am 01.04.25 um 15:37 schrieb Stefan Metzmacher:
->>>>>> Am 01.04.25 um 10:19 schrieb Stefan Metzmacher:
->>>>>>> Am 31.03.25 um 23:04 schrieb Stanislav Fomichev:
->>>>>>>> On 03/31, Stefan Metzmacher wrote:
->>>>>>>>> The motivation for this is to remove the SOL_SOCKET limitation
->>>>>>>>> from io_uring_cmd_getsockopt().
->>>>>>>>>
->>>>>>>>> The reason for this limitation is that io_uring_cmd_getsockopt()
->>>>>>>>> passes a kernel pointer as optlen to do_sock_getsockopt()
->>>>>>>>> and can't reach the ops->getsockopt() path.
->>>>>>>>>
->>>>>>>>> The first idea would be to change the optval and optlen arguments
->>>>>>>>> to the protocol specific hooks also to sockptr_t, as that
->>>>>>>>> is already used for setsockopt() and also by do_sock_getsockopt()
->>>>>>>>> sk_getsockopt() and BPF_CGROUP_RUN_PROG_GETSOCKOPT().
->>>>>>>>>
->>>>>>>>> But as Linus don't like 'sockptr_t' I used a different approach.
->>>>>>>>>
->>>>>>>>> @Linus, would that optlen_t approach fit better for you?
->>>>>>>>
->>>>>>>> [..]
->>>>>>>>
->>>>>>>>> Instead of passing the optlen as user or kernel pointer,
->>>>>>>>> we only ever pass a kernel pointer and do the
->>>>>>>>> translation from/to userspace in do_sock_getsockopt().
->>>>>>>>
->>>>>>>> At this point why not just fully embrace iov_iter? You have the size
->>>>>>>> now + the user (or kernel) pointer. Might as well do
->>>>>>>> s/sockptr_t/iov_iter/ conversion?
->>>>>>>
->>>>>>> I think that would only be possible if we introduce
->>>>>>> proto[_ops].getsockopt_iter() and then convert the implementations
->>>>>>> step by step. Doing it all in one go has a lot of potential to break
->>>>>>> the uapi. I could try to convert things like socket, ip and tcp myself, but
->>>>>>> the rest needs to be converted by the maintainer of the specific protocol,
->>>>>>> as it needs to be tested. As there are crazy things happening in the existing
->>>>>>> implementations, e.g. some getsockopt() implementations use optval as in and out
->>>>>>> buffer.
->>>>>>>
->>>>>>> I first tried to convert both optval and optlen of getsockopt to sockptr_t,
->>>>>>> and that showed that touching the optval part starts to get complex very soon,
->>>>>>> see https://git.samba.org/?p=metze/linux/wip.git;a=commitdiff;h=141912166473bf8843ec6ace76dc9c6945adafd1
->>>>>>> (note it didn't converted everything, I gave up after hitting
->>>>>>> sctp_getsockopt_peer_addrs and sctp_getsockopt_local_addrs.
->>>>>>> sctp_getsockopt_context, sctp_getsockopt_maxseg, sctp_getsockopt_associnfo and maybe
->>>>>>> more are the ones also doing both copy_from_user and copy_to_user on optval)
->>>>>>>
->>>>>>> I come also across one implementation that returned -ERANGE because *optlen was
->>>>>>> too short and put the required length into *optlen, which means the returned
->>>>>>> *optlen is larger than the optval buffer given from userspace.
->>>>>>>
->>>>>>> Because of all these strange things I tried to do a minimal change
->>>>>>> in order to get rid of the io_uring limitation and only converted
->>>>>>> optlen and leave optval as is.
->>>>>>>
->>>>>>> In order to have a patchset that has a low risk to cause regressions.
->>>>>>>
->>>>>>> But as alternative introducing a prototype like this:
->>>>>>>
->>>>>>>            int (*getsockopt_iter)(struct socket *sock, int level, int optname,
->>>>>>>                                   struct iov_iter *optval_iter);
->>>>>>>
->>>>>>> That returns a non-negative value which can be placed into *optlen
->>>>>>> or negative value as error and *optlen will not be changed on error.
->>>>>>> optval_iter will get direction ITER_DEST, so it can only be written to.
->>>>>>>
->>>>>>> Implementations could then opt in for the new interface and
->>>>>>> allow do_sock_getsockopt() work also for the io_uring case,
->>>>>>> while all others would still get -EOPNOTSUPP.
->>>>>>>
->>>>>>> So what should be the way to go?
->>>>>>
->>>>>> Ok, I've added the infrastructure for getsockopt_iter, see below,
->>>>>> but the first part I wanted to convert was
->>>>>> tcp_ao_copy_mkts_to_user() and that also reads from userspace before
->>>>>> writing.
->>>>>>
->>>>>> So we could go with the optlen_t approach, or we need
->>>>>> logic for ITER_BOTH or pass two iov_iters one with ITER_SRC and one
->>>>>> with ITER_DEST...
->>>>>>
->>>>>> So who wants to decide?
->>>>>
->>>>> I just noticed that it's even possible in same cases
->>>>> to pass in a short buffer to optval, but have a longer value in optlen,
->>>>> hci_sock_getsockopt() with SOL_BLUETOOTH completely ignores optlen.
->>>>>
->>>>> This makes it really hard to believe that trying to use iov_iter for this
->>>>> is a good idea :-(
->>>>
->>>> That was my finding as well a while ago, when I was planning to get the
->>>> __user pointers converted to iov_iter. There are some weird ways of
->>>> using optlen and optval, which makes them non-trivial to covert to
->>>> iov_iter.
->>>
->>> Can we ignore all non-ip/tcp/udp cases for now? This should cover +90%
->>> of useful socket opts. See if there are any obvious problems with them
->>> and if not, try converting. The rest we can cover separately when/if
->>> needed.
->>
->> That's what I tried, but it fails with
->> tcp_getsockopt ->
->>     do_tcp_getsockopt ->
->>       tcp_ao_get_mkts ->
->>          tcp_ao_copy_mkts_to_user ->
->>             copy_struct_from_sockptr
->>       tcp_ao_get_sock_info ->
->>          copy_struct_from_sockptr
->>
->> That's not possible with a ITER_DEST iov_iter.
->>
->> metze
-> 
-> Can we create two iterators over the same memory? One for ITER_SOURCE and
-> another for ITER_DEST. And then make getsockopt_iter accept optval_in and
-> optval_out. We can also use optval_out position (iov_offset) as optlen output
-> value. Don't see why it won't work, but I agree that's gonna be a messy
-> conversion so let's see if someone else has better suggestions.
+From: Edward Cree <ecree.xilinx@gmail.com>
 
-Yes, that might work, but it would be good to get some feedback
-if this would be the way to go:
+Since cited commit, ef100_probe_main() and hence also
+ ef100_check_design_params() run before efx->net_dev is created;
+ consequently, we cannot netif_set_tso_max_size() or _segs() at this
+ point.
+Move those netif calls to ef100_probe_netdev(), and also replace
+ netif_err within the design params code with pci_err.
 
-           int (*getsockopt_iter)(struct socket *sock,
-				 int level, int optname,
-				 struct iov_iter *optval_in,
-				 struct iov_iter *optval_out);
+Reported-by: Kyungwook Boo <bookyungwook@gmail.com>
+Fixes: 98ff4c7c8ac7 ("sfc: Separate netdev probe/remove from PCI probe/remove")
+Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
+---
+ drivers/net/ethernet/sfc/ef100_netdev.c |  6 ++--
+ drivers/net/ethernet/sfc/ef100_nic.c    | 47 +++++++++++--------------
+ 2 files changed, 24 insertions(+), 29 deletions(-)
 
-And *optlen = optval_out->iov_offset;
-
-Any objection or better ideas? Linus would that be what you had in mind?
-
-Thanks!
-metze
+diff --git a/drivers/net/ethernet/sfc/ef100_netdev.c b/drivers/net/ethernet/sfc/ef100_netdev.c
+index d941f073f1eb..3a06e3b1bd6b 100644
+--- a/drivers/net/ethernet/sfc/ef100_netdev.c
++++ b/drivers/net/ethernet/sfc/ef100_netdev.c
+@@ -450,8 +450,9 @@ int ef100_probe_netdev(struct efx_probe_data *probe_data)
+ 	net_dev->hw_enc_features |= efx->type->offload_features;
+ 	net_dev->vlan_features |= NETIF_F_HW_CSUM | NETIF_F_SG |
+ 				  NETIF_F_HIGHDMA | NETIF_F_ALL_TSO;
+-	netif_set_tso_max_segs(net_dev,
+-			       ESE_EF100_DP_GZ_TSO_MAX_HDR_NUM_SEGS_DEFAULT);
++	nic_data = efx->nic_data;
++	netif_set_tso_max_size(efx->net_dev, nic_data->tso_max_payload_len);
++	netif_set_tso_max_segs(efx->net_dev, nic_data->tso_max_payload_num_segs);
+ 
+ 	rc = efx_ef100_init_datapath_caps(efx);
+ 	if (rc < 0)
+@@ -477,7 +478,6 @@ int ef100_probe_netdev(struct efx_probe_data *probe_data)
+ 	/* Don't fail init if RSS setup doesn't work. */
+ 	efx_mcdi_push_default_indir_table(efx, efx->n_rx_channels);
+ 
+-	nic_data = efx->nic_data;
+ 	rc = ef100_get_mac_address(efx, net_dev->perm_addr, CLIENT_HANDLE_SELF,
+ 				   efx->type->is_vf);
+ 	if (rc)
+diff --git a/drivers/net/ethernet/sfc/ef100_nic.c b/drivers/net/ethernet/sfc/ef100_nic.c
+index 62e674d6ff60..3ad95a4c8af2 100644
+--- a/drivers/net/ethernet/sfc/ef100_nic.c
++++ b/drivers/net/ethernet/sfc/ef100_nic.c
+@@ -887,8 +887,7 @@ static int ef100_process_design_param(struct efx_nic *efx,
+ 	case ESE_EF100_DP_GZ_TSO_MAX_HDR_NUM_SEGS:
+ 		/* We always put HDR_NUM_SEGS=1 in our TSO descriptors */
+ 		if (!reader->value) {
+-			netif_err(efx, probe, efx->net_dev,
+-				  "TSO_MAX_HDR_NUM_SEGS < 1\n");
++			pci_err(efx->pci_dev, "TSO_MAX_HDR_NUM_SEGS < 1\n");
+ 			return -EOPNOTSUPP;
+ 		}
+ 		return 0;
+@@ -901,32 +900,28 @@ static int ef100_process_design_param(struct efx_nic *efx,
+ 		 */
+ 		if (!reader->value || reader->value > EFX_MIN_DMAQ_SIZE ||
+ 		    EFX_MIN_DMAQ_SIZE % (u32)reader->value) {
+-			netif_err(efx, probe, efx->net_dev,
+-				  "%s size granularity is %llu, can't guarantee safety\n",
+-				  reader->type == ESE_EF100_DP_GZ_RXQ_SIZE_GRANULARITY ? "RXQ" : "TXQ",
+-				  reader->value);
++			pci_err(efx->pci_dev,
++				"%s size granularity is %llu, can't guarantee safety\n",
++				reader->type == ESE_EF100_DP_GZ_RXQ_SIZE_GRANULARITY ? "RXQ" : "TXQ",
++				reader->value);
+ 			return -EOPNOTSUPP;
+ 		}
+ 		return 0;
+ 	case ESE_EF100_DP_GZ_TSO_MAX_PAYLOAD_LEN:
+ 		nic_data->tso_max_payload_len = min_t(u64, reader->value,
+ 						      GSO_LEGACY_MAX_SIZE);
+-		netif_set_tso_max_size(efx->net_dev,
+-				       nic_data->tso_max_payload_len);
+ 		return 0;
+ 	case ESE_EF100_DP_GZ_TSO_MAX_PAYLOAD_NUM_SEGS:
+ 		nic_data->tso_max_payload_num_segs = min_t(u64, reader->value, 0xffff);
+-		netif_set_tso_max_segs(efx->net_dev,
+-				       nic_data->tso_max_payload_num_segs);
+ 		return 0;
+ 	case ESE_EF100_DP_GZ_TSO_MAX_NUM_FRAMES:
+ 		nic_data->tso_max_frames = min_t(u64, reader->value, 0xffff);
+ 		return 0;
+ 	case ESE_EF100_DP_GZ_COMPAT:
+ 		if (reader->value) {
+-			netif_err(efx, probe, efx->net_dev,
+-				  "DP_COMPAT has unknown bits %#llx, driver not compatible with this hw\n",
+-				  reader->value);
++			pci_err(efx->pci_dev,
++				"DP_COMPAT has unknown bits %#llx, driver not compatible with this hw\n",
++				reader->value);
+ 			return -EOPNOTSUPP;
+ 		}
+ 		return 0;
+@@ -946,10 +941,10 @@ static int ef100_process_design_param(struct efx_nic *efx,
+ 		 * So the value of this shouldn't matter.
+ 		 */
+ 		if (reader->value != ESE_EF100_DP_GZ_VI_STRIDES_DEFAULT)
+-			netif_dbg(efx, probe, efx->net_dev,
+-				  "NIC has other than default VI_STRIDES (mask "
+-				  "%#llx), early probing might use wrong one\n",
+-				  reader->value);
++			pci_dbg(efx->pci_dev,
++				"NIC has other than default VI_STRIDES (mask "
++				"%#llx), early probing might use wrong one\n",
++				reader->value);
+ 		return 0;
+ 	case ESE_EF100_DP_GZ_RX_MAX_RUNT:
+ 		/* Driver doesn't look at L2_STATUS:LEN_ERR bit, so we don't
+@@ -961,9 +956,9 @@ static int ef100_process_design_param(struct efx_nic *efx,
+ 		/* Host interface says "Drivers should ignore design parameters
+ 		 * that they do not recognise."
+ 		 */
+-		netif_dbg(efx, probe, efx->net_dev,
+-			  "Ignoring unrecognised design parameter %u\n",
+-			  reader->type);
++		pci_dbg(efx->pci_dev,
++			"Ignoring unrecognised design parameter %u\n",
++			reader->type);
+ 		return 0;
+ 	}
+ }
+@@ -999,13 +994,13 @@ static int ef100_check_design_params(struct efx_nic *efx)
+ 	 */
+ 	if (reader.state != EF100_TLV_TYPE) {
+ 		if (reader.state == EF100_TLV_TYPE_CONT)
+-			netif_err(efx, probe, efx->net_dev,
+-				  "truncated design parameter (incomplete type %u)\n",
+-				  reader.type);
++			pci_err(efx->pci_dev,
++				"truncated design parameter (incomplete type %u)\n",
++				reader.type);
+ 		else
+-			netif_err(efx, probe, efx->net_dev,
+-				  "truncated design parameter %u\n",
+-				  reader.type);
++			pci_err(efx->pci_dev,
++				"truncated design parameter %u\n",
++				reader.type);
+ 		rc = -EIO;
+ 	}
+ out:
 
