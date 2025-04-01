@@ -1,124 +1,243 @@
-Return-Path: <netdev+bounces-178536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BEAEA777C3
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 11:30:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43FC8A777D2
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 11:34:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2E5E188D917
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 09:29:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22FE71886CD5
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 09:34:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF39E1EA7C1;
-	Tue,  1 Apr 2025 09:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=riseup.net header.i=@riseup.net header.b="sbzjVMRZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 544B51EEA5E;
+	Tue,  1 Apr 2025 09:33:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.riseup.net (mx1.riseup.net [198.252.153.129])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147F91EEA32
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 09:29:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.252.153.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 552911624D5;
+	Tue,  1 Apr 2025 09:33:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743499773; cv=none; b=i5xByLWi9VztiMGUU13W0E+udZAb8fW7A9WFamEUE/nOXPDDznE8rtWbph4AF0BcCc9Ym6fwxJuLu7Xw/buWL9WpoGU6m53Uz64oNO+LDaaQlR0QyK4ewLHoWXE8a5GB7KHUgjDAfB+tOuUsq6/aiRD1URcQLRgfKFTKKztm0Ec=
+	t=1743500025; cv=none; b=gaZv8hwk7SeS9v66Bm5EDJ8w/44wd2hmvbXUXyyC5xtG6BRp6fe0CElqav2FQIKmvyjUNGAgpMdjiVGHb7lpqa4AYqZhq7FCnVygP0YLin+VjqxiwaAGMojKhVUY7nIwe5Bn3HhvNbGon2S2RzCnB/WneuQvUw69s8ivCtHWuI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743499773; c=relaxed/simple;
-	bh=Cn+8sT/QYsmCGl3JUXA5V0dP2PcIq6LhyefrNj0pcfI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kv4qpQg8yT62ukuvWkNEvGnWX5iWX57vA6suxLHbCxObeuWyN7mHYH3p+UKSkruJU5QEMPGIRDz7HBnCKCUAFdg/ZI3vp1JO5GN89By7yuiaZH3V7bBlms6a7iobXANTN8lmMBOS7a12q+01qXRtZpbGz9Lf9zCtQw2pbKlHDl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riseup.net; spf=pass smtp.mailfrom=riseup.net; dkim=pass (1024-bit key) header.d=riseup.net header.i=@riseup.net header.b=sbzjVMRZ; arc=none smtp.client-ip=198.252.153.129
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=riseup.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=riseup.net
-Received: from fews02-sea.riseup.net (fews02-sea-pn.riseup.net [10.0.1.112])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx1.riseup.net (Postfix) with ESMTPS id 4ZRjPc4tQQzDqMc;
-	Tue,  1 Apr 2025 09:29:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=riseup.net; s=squak;
-	t=1743499764; bh=Cn+8sT/QYsmCGl3JUXA5V0dP2PcIq6LhyefrNj0pcfI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=sbzjVMRZUuOxHvvFDDwsbYCPovyushHcjb0evHAJqnd9vJfWJlya1BDV2qrfFG2tX
-	 wSLyph40VRMjSPO7lABW+Eg8CohfnjnlShZhfvZ3LX65QLAuKDp/g1k6VCW8ryavrg
-	 LRq+ang8BExjrGWUP1/ur57oTjE3Ve0rDr6shwUc=
-X-Riseup-User-ID: FAD0911A4596008EF27214C2572370FE5068751742FBCCCAE64BC93A15C63CD3
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	 by fews02-sea.riseup.net (Postfix) with ESMTPSA id 4ZRjPZ5SS5zFx0d;
-	Tue,  1 Apr 2025 09:29:22 +0000 (UTC)
-Message-ID: <0a43df40-cbf8-49ac-9266-19f354c1f8ea@riseup.net>
-Date: Tue, 1 Apr 2025 11:29:19 +0200
+	s=arc-20240116; t=1743500025; c=relaxed/simple;
+	bh=jPe2NtHiYqWwzbQU/mfy1WhcfYq0+olPLKklzEkcNjQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=u9en4OHSseFTyR13sBQmRKPKJvzCdRDmpxVDWIkdjUrEjIhv6RDRjzNzveNOC/kvoxqReM+jq7eWJy4efUBdkC7ozc4C7S6g/QW9J6Z7qpq5A4sxWxiB/L9PAHd1I/hfIend2QXUqvOp1uGx4tlfSnv4GoJr/6L0aZ70wuiQ/pY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4ZRjTw1vpgz1d0sR;
+	Tue,  1 Apr 2025 17:33:08 +0800 (CST)
+Received: from kwepemg200005.china.huawei.com (unknown [7.202.181.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 93C9F140203;
+	Tue,  1 Apr 2025 17:33:38 +0800 (CST)
+Received: from [10.174.176.70] (10.174.176.70) by
+ kwepemg200005.china.huawei.com (7.202.181.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 1 Apr 2025 17:33:37 +0800
+Message-ID: <ffc84696-f9c6-4869-9f1e-7faf45d99060@huawei.com>
+Date: Tue, 1 Apr 2025 17:33:35 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 net-next] net: hsr: sync hw addr of slave2 according to
- slave1 hw addr on PRP
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: lukma@denx.de, wojciech.drewek@intel.com, m-karicheri2@ti.com
-References: <20250328160642.3595-1-ffmancera@riseup.net>
- <05c4da9d-6701-48ef-b80b-a28646940be3@redhat.com>
-Content-Language: en-US
-From: "Fernando F. Mancera" <ffmancera@riseup.net>
-In-Reply-To: <05c4da9d-6701-48ef-b80b-a28646940be3@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] xsk: correct tx_ring_empty_descs count statistics
+To: Magnus Karlsson <magnus.karlsson@gmail.com>
+CC: Stanislav Fomichev <stfomichev@gmail.com>, <bjorn@kernel.org>,
+	<magnus.karlsson@intel.com>, <maciej.fijalkowski@intel.com>,
+	<jonathan.lemon@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>, <ast@kernel.org>,
+	<daniel@iogearbox.net>, <hawk@kernel.org>, <john.fastabend@gmail.com>,
+	<yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
+	<netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20250329061548.1357925-1-wangliang74@huawei.com>
+ <Z-qzLyGKskaqgFh5@mini-arch> <Z-sRF0G43HpGiGwH@mini-arch>
+ <0d1b689c-c0ef-460a-9969-ff5aebbb8fac@huawei.com>
+ <CAJ8uoz1JxhXFkzW8n_Dud8SR-4zE7gim5vS_UZHELiA7d0k+wQ@mail.gmail.com>
+ <ed10eea2-0bf2-4747-b519-f9b9089e434e@huawei.com>
+ <CAJ8uoz2QXNN4so-EgR8sU8A86E_AeYx1w_b+BSVeCgzr1kaR+g@mail.gmail.com>
+From: Wang Liang <wangliang74@huawei.com>
+In-Reply-To: <CAJ8uoz2QXNN4so-EgR8sU8A86E_AeYx1w_b+BSVeCgzr1kaR+g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemg200005.china.huawei.com (7.202.181.32)
 
 
-
-On 01/04/2025 11:16, Paolo Abeni wrote:
-> On 3/28/25 5:06 PM, Fernando Fernandez Mancera wrote:
->> In order to work properly PRP requires slave1 and slave2 to share the
->> same MAC address. To ease the configuration process on userspace tools,
->> sync the slave2 MAC address with slave1.
+在 2025/4/1 16:12, Magnus Karlsson 写道:
+> On Tue, 1 Apr 2025 at 09:44, Wang Liang <wangliang74@huawei.com> wrote:
 >>
->> Signed-off-by: Fernando Fernandez Mancera <ffmancera@riseup.net>
->> ---
->> NOTE: I am not sure the call_netdevice_notifiers() are needed here.
->> I am wondering, if this change makes sense in HSR too.
->> Feedback is welcome.
->> v2: specified the target tree
-> 
-> Please respect the 24h grace period before reposting:
-> 
-> https://elixir.bootlin.com/linux/v6.14-rc6/source/Documentation/process/maintainer-netdev.rst#L15
-> 
-> Also please note that net-next is currently closed for new features due
-> to the merge window. Please resent after Apr 7th.
-> 
->> ---
->>   net/hsr/hsr_device.c | 2 ++
->>   net/hsr/hsr_main.c   | 9 +++++++++
->>   2 files changed, 11 insertions(+)
+>> 在 2025/4/1 14:57, Magnus Karlsson 写道:
+>>> On Tue, 1 Apr 2025 at 04:36, Wang Liang <wangliang74@huawei.com> wrote:
+>>>> 在 2025/4/1 6:03, Stanislav Fomichev 写道:
+>>>>> On 03/31, Stanislav Fomichev wrote:
+>>>>>> On 03/29, Wang Liang wrote:
+>>>>>>> The tx_ring_empty_descs count may be incorrect, when set the XDP_TX_RING
+>>>>>>> option but do not reserve tx ring. Because xsk_poll() try to wakeup the
+>>>>>>> driver by calling xsk_generic_xmit() for non-zero-copy mode. So the
+>>>>>>> tx_ring_empty_descs count increases once the xsk_poll()is called:
+>>>>>>>
+>>>>>>>      xsk_poll
+>>>>>>>        xsk_generic_xmit
+>>>>>>>          __xsk_generic_xmit
+>>>>>>>            xskq_cons_peek_desc
+>>>>>>>              xskq_cons_read_desc
+>>>>>>>                q->queue_empty_descs++;
+>>> Sorry, but I do not understand how to reproduce this error. So you
+>>> first issue a setsockopt with the XDP_TX_RING option and then you do
+>>> not "reserve tx ring". What does that last "not reserve tx ring" mean?
+>>> No mmap() of that ring, or something else? I guess you have bound the
+>>> socket with a bind()? Some pseudo code on how to reproduce this would
+>>> be helpful. Just want to understand so I can help. Thank you.
+>> Sorry, the last email is garbled, and send again.
 >>
->> diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
->> index 439cfb7ad5d1..f971eb321655 100644
->> --- a/net/hsr/hsr_device.c
->> +++ b/net/hsr/hsr_device.c
->> @@ -706,6 +706,8 @@ int hsr_dev_finalize(struct net_device *hsr_dev, struct net_device *slave[2],
->>   		 */
->>   		hsr->net_id = PRP_LAN_ID << 1;
->>   		hsr->proto_ops = &prp_ops;
->> +		eth_hw_addr_set(slave[1], slave[0]->dev_addr);
-> 
-> I'm unsure about this. It will have 'destructive' effect on slave[1],
-> i.e. the original mac address will be permanently chaneged and will be
-> up to the user-space restore it when/if removing from hsr.
-> 
-> I think it would be better to additionally store the original mac
-> address at hsr creation time and restore it at link removal time.
-> 
+>> Ok. Some pseudo code like below:
+>>
+>>       fd = socket(AF_XDP, SOCK_RAW, 0);
+>>       setsockopt(fd, SOL_XDP, XDP_UMEM_REG, &mr, sizeof(mr));
+>>
+>>       setsockopt(fd, SOL_XDP, XDP_UMEM_FILL_RING, &fill_size,
+>> sizeof(fill_size));
+>>       setsockopt(fd, SOL_XDP, XDP_UMEM_COMPLETION_RING, &comp_size,
+>> sizeof(comp_size));
+>>       mmap(NULL, off.fr.desc + fill_size * sizeof(__u64), ...,
+>> XDP_UMEM_PGOFF_FILL_RING);
+>>       mmap(NULL, off.cr.desc + comp_size * sizeof(__u64), ...,
+>> XDP_UMEM_PGOFF_COMPLETION_RING);
+>>
+>>       setsockopt(fd, SOL_XDP, XDP_RX_RING, &rx_size, sizeof(rx_size));
+>>       setsockopt(fd, SOL_XDP, XDP_TX_RING, &tx_size, sizeof(tx_size));
+>>       mmap(NULL, off.rx.desc + rx_size * sizeof(struct xdp_desc), ...,
+>> XDP_PGOFF_RX_RING);
+>>       mmap(NULL, off.tx.desc + tx_size * sizeof(struct xdp_desc), ...,
+>> XDP_PGOFF_TX_RING);
+>>
+>>       bind(fd, (struct sockaddr *)&sxdp, sizeof(sxdp));
+>>       bpf_map_update_elem(xsk_map_fd, &queue_id, &fd, 0);
+>>
+>>       while(!global_exit) {
+>>           poll(fds, 1, -1);
+>>           handle_receive_packets(...);
+>>       }
+>>
+>> The xsk is created success, and xs->tx is initialized.
+>>
+>> The "not reserve tx ring" means user app do not update tx ring producer.
+>> Like:
+>>
+>>       xsk_ring_prod__reserve(tx, 1, &tx_idx);
+>>       xsk_ring_prod__tx_desc(tx, tx_idx)->addr = frame;
+>>       xsk_ring_prod__tx_desc(tx, tx_idx)->len = pkg_length;
+>>       xsk_ring_prod__submit(tx, 1);
+>>
+>> These functions (xsk_ring_prod__reserve, etc.) is provided by libxdp.
+>>
+>> The tx->producer is not updated, so the xs->tx->cached_cons and
+>> xs->tx->cached_prod are always zero.
+>>
+>> When receive packets and user app call poll(), xsk_generic_xmit() will be
+>> triggered by xsk_poll(), leading to this issue.
+> Thanks, that really helped. The problem here is that the kernel cannot
+> guess your intent. Since you created a socket with both Rx and Tx, it
+> thinks you will use it for both, so it should increase
+> queue_empty_descs in this case as you did not provide any Tx descs.
+> Your proposed patch will break this. Consider this Tx case with the
+> exact same init code as you have above but with this send loop:
+>
+> while(!global_exit) {
+>         maybe_send_packets(...);
+>         poll(fds, 1, -1);
+> }
+>
+> With your patch, the queue_empty_descs will never be increased in the
+> case when I do not submit any Tx descs, even though we would like it
+> to be so.
+>
+> So in my mind, you have a couple of options:
+>
+> * Create two sockets, one rx only and one tx only and use the
+> SHARED_UMEM mode to bind them to the same netdev and queue id. In your
+> loop above, you would use the Rx socket. This might have the drawback
+> that you need to call poll() twice if you are both sending and
+> receiving in the same loop. But the stats will be the way you want
+> them to be.
+>
+> * Introduce a new variable in user space that you increase every time
+> you do poll() in your loop above. When displaying the statistics, just
+> deduct this variable from the queue_empty_descs that the kernel
+> reports using the XDP_STATISTICS getsockopt().
+>
+> Hope this helps.
 
-Yes, probably it makes more sense to restore the original MAC address at 
-link removal. Thanks for the suggestion Paolo!
 
-> Thanks,
-> 
-> Paolo
-> 
-> 
+Thank you for the advices.
 
+ From user view, queue_empty_descs increases when the app only receive 
+packets and call poll(), it is some confusing.
+
+In your Tx case, if user app use sendto() to send packets, the 
+queue_empty_descs will increase. This is reasonably.
+
+In linux manual, poll() waits for some event on a file descriptor. But 
+in af_xdp, poll() has a side effect of send msg.
+
+Previous commit 77cd0d7b3f25 ("xsk: add support for need_wakeup flag in 
+AF_XDP rings") add need_wakeup flag. It mainly work in rx process. When 
+the application and driver run on the same core, if the fill ring is 
+empty, the driver can set the need_wakeup flag and return, so the 
+application could be scheduled to produce entries of the fill ring.
+
+The commit df551058f7a3 ("xsk: Fix crash in poll when device does not 
+support ndo_xsk_wakeup") add sendmsg function in xsk_poll(), considering 
+some devices donot define ndo_xsk_wakeup.
+
+At present the value of need_wakeup & XDP_WAKEUP_TX is always true, 
+except the mlx5 driver. If the mlx5 driver queued some packets for tx, 
+it may clear XDP_WAKEUP_TX by xsk_clear_tx_need_wakeup(). So when user 
+app use sendto() to send packets, __xsk_sendmsg() will return without 
+calling xsk_generic_xmit().
+
+So I have a bold suggestion, how about removing xsk_generic_xmit() in 
+xsk_poll()?
+
+>>>>>>> To avoid this count error, add check for tx descs before send msg in poll.
+>>>>>>>
+>>>>>>> Fixes: df551058f7a3 ("xsk: Fix crash in poll when device does not support ndo_xsk_wakeup")
+>>>>>>> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+>>>>>> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+>>>>> Hmm, wait, I stumbled upon xskq_has_descs again and it looks only at
+>>>>> cached prod/cons. How is it supposed to work when the actual tx
+>>>>> descriptor is posted? Is there anything besides xskq_cons_peek_desc from
+>>>>> __xsk_generic_xmit that refreshes cached_prod?
+>>>> Yes, you are right!
+>>>>
+>>>> How about using xskq_cons_nb_entries() to check free descriptors?
+>>>>
+>>>> Like this:
+>>>>
+>>>>
+>>>> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+>>>> index e5d104ce7b82..babb7928d335 100644
+>>>> --- a/net/xdp/xsk.c
+>>>> +++ b/net/xdp/xsk.c
+>>>> @@ -993,7 +993,7 @@ static __poll_t xsk_poll(struct file *file, struct
+>>>> socket *sock,
+>>>>            if (pool->cached_need_wakeup) {
+>>>>                    if (xs->zc)
+>>>>                            xsk_wakeup(xs, pool->cached_need_wakeup);
+>>>> -               else if (xs->tx)
+>>>> +               else if (xs->tx && xskq_cons_nb_entries(xs->tx, 1))
+>>>>                            /* Poll needs to drive Tx also in copy mode */
+>>>>                            xsk_generic_xmit(sk);
+>>>>            }
+>>>>
+>>>>
 
