@@ -1,222 +1,217 @@
-Return-Path: <netdev+bounces-178613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AACD7A77CBD
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 15:52:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13E3EA77CF9
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 15:57:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 900FC7A2864
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 13:51:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F2DE188B913
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 13:57:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B06C2040B2;
-	Tue,  1 Apr 2025 13:51:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 264752046A8;
+	Tue,  1 Apr 2025 13:57:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DXUh2oCq"
+	dkim=pass (2048-bit key) header.d=sigma-star.at header.i=@sigma-star.at header.b="khWvoUj1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3234FC2C6
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 13:51:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BAC6204692
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 13:57:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743515516; cv=none; b=XCiXLFERi7fMgTtvjHIKbFVDDd8DVHZ/UrPxYItLZD4oDF/r6OwIqZAamQ88r6ErMiFNy8LFqCRGf0xJJES3U/McrW/QdnBj40xTlP6DXlJ0lTcWALAZc+7+HU50f+/EnUi6l73hrCoiryzdXD28lyVFBECxB/Kw0EzH+IgjQAc=
+	t=1743515835; cv=none; b=GKtS+Kq7cY2CbzGDE0ZSyXyBXCq6pr8/KsTTUZSi36ClB447ua1lWzV2R/oS+RL0wqRydWUf+MOip9DN0dc2z7D7VJEHO+TfukGJjeTmqQOX6bU2U2dmCJerumt7n0W0YLBv0arghRTAHLpGfFoK54ZV2PxxbamvMQVJnx/jfU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743515516; c=relaxed/simple;
-	bh=fyJnXBrOut1qI3iVOlrjftIknLYmdN5T3FQdk35b5Ao=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pn7iKztKsf+OawO8KesGllsadQ3oM1fq57DRxA1+Hj93/OfAUTv4XpQd45LMAXM3/48NxSRXEBZoVwK7ztPRMc55HRyr5HuWtsC2M9cXMbzVsbmKLHqAzrj3M7n/X8dLleC81OIaYvWaVzdov7OAxXdvs6BNG98+aUIZQjpedCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DXUh2oCq; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743515513;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yd713vKppQHQbjGvhffkowOQ35Ux0lbgZmPhSE6rLE4=;
-	b=DXUh2oCqO1ROUWPH9FsOCb2vIi7aEw9cFXs8Wd2MT//ewVMR1qzWvxWhArg1aEIv+yxneX
-	wlr6CmaPzWfj4M8Jz77xLWVIiP7RH2ZQtVWfnI/pkm8yml/cLTKR+Xjrb3mRnCuD61H393
-	t/ee6bw7ZWLxrE6cgoPts4yAlnqCFBo=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-411-15T3kF9vPCiWu1hBffIHpA-1; Tue, 01 Apr 2025 09:51:52 -0400
-X-MC-Unique: 15T3kF9vPCiWu1hBffIHpA-1
-X-Mimecast-MFC-AGG-ID: 15T3kF9vPCiWu1hBffIHpA_1743515510
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43ceb011ea5so39828755e9.2
-        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 06:51:50 -0700 (PDT)
+	s=arc-20240116; t=1743515835; c=relaxed/simple;
+	bh=NWXXVvjt39xU+rA7+NnTR8sUGDWv6O8iuPCim6wufCs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e8BymVGXo3LvzwEOifz4MX+d6e3eQOF9BK35wAI2NA1KZyXDnn+d3u7oi9/e1bw+KpU5wWKKqUUQXXQfW87/+ycU+fXOt9femJVHTOTDUFlCyJhglDACdn9t8HKKNqSwPfkbs44SFvPtMMmtuNoT5TVum7I/sRWVGPR9OwxmXi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigma-star.at; spf=pass smtp.mailfrom=sigma-star.at; dkim=pass (2048-bit key) header.d=sigma-star.at header.i=@sigma-star.at header.b=khWvoUj1; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigma-star.at
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sigma-star.at
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-39ac9aea656so4599003f8f.3
+        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 06:57:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sigma-star.at; s=google; t=1743515828; x=1744120628; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uwYV6EoXAucL5Dj4d79APrOokX4rUIbo+yxZ5Oz9Kew=;
+        b=khWvoUj1FQ5wPqYpMh3IWstvhOhhNAoHJ8X/kS/Tlw1XOWzp11ZTOLrbqWS8cBujbf
+         an6M46xGdsP3+VJZ/Lwzm7x5t06rfi5fuz2dghVnoFTnxhBW8weS32/ZZwVebWWA9p27
+         sSueg11U6Y9Lyp8fa8TJRc005VAhLl1RihBnO57YfnIelYH+XwuM1nCi7F0+pq6lkKWB
+         jwBLuU2SWESlRWlSXmLlvU9z+9c4XEDx6PEJ1uFXbs+zMgjvSEX1/apRBEFDpCfipUde
+         hXwwkQPluhKC1OaMoSn/hgUvXK/nnGyt1pf38/9XdpfAhmAHsVDN9GMMl41oskWsZqkF
+         E9QA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743515510; x=1744120310;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yd713vKppQHQbjGvhffkowOQ35Ux0lbgZmPhSE6rLE4=;
-        b=eY0dCVCS3sTvFcwQDLov3FFYqoAxZpxOQW5Ba7IbS8iFpCeOA1Vpm6N9p1RPs+jAFm
-         cQ7MTH7LZu9KrRR1DJuN4ciGCtuthlsDcEzqVG8OjuuiVsB4gPDMeljkvxoz/f3nc6fv
-         2G0J9qGWFx9WssvZ2r5LIhm0CuUXdAjlY7Ov706yeEaQd4Lx5/CbiS3msw4arsYvK1qn
-         yIKYQeklK24e+pwA4pLNFv2gopz1A3OXGcVNBXyO62sdJxrvgjNsw+SVprGQDgKKI5ls
-         ubXJ3PHnf/kE8zPeha/sDCq2BJqXH8JtE997+Uzk67L57oEjOKreSV9uU3rgcKClfkkD
-         LHIg==
-X-Forwarded-Encrypted: i=1; AJvYcCVrcNTT1QjmVPZ9zC3nQ2mYEWY6hqgwLyriBla4+WBmf2oBO/twuLB8cNy6MlI/hR5iJ8DlZ6I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YziV7Fry6qvhtu/4QkCSOmRyku0noU5E7qsBtrxKxC+xAY9KK2Z
-	IpJPCZarsm6ajYebEpVHRlV38liqlAz8aX3UTJ66InTsgXudgT1+iji6/I9aIfV5ORYQamlPatH
-	c7GPZ6qR2nY+HuHJBHVZHBKm03/nkSQoEUqtrcnQxgnRnNSRBBauATg==
-X-Gm-Gg: ASbGncuNjgJUWKlEJp7gUQO/hKFSVNc7W7+Ky0/sHnriBa0M59fCYMqMVM/6buHygyh
-	ndJm9cOhatNUcAkLY2926FnGlVkmRRuhNtRUiQfoK94eFjeOTPk0vlWqwQipB5vp+iuoUwIfel6
-	S2Nuu0/curWkba3kLB/ZsiZ4M43Aok7dbGwQL7/S+KLruhi68gptyTTVmKr6o2dWdU0inzVFENl
-	OKJnMweqsUL3EOD2r9IQI9r3IOOZ0yw5w0XjXVeFAVMcEne5a8ST2U9td12RYLd8VegjuwR/NI/
-	k7FUgllZwHtqDA8cXQaCpUBZpcmNSYyduCnxnjEUw1a/B8F9lYD4qse2Q2Y=
-X-Received: by 2002:a5d:5984:0:b0:391:4095:49b7 with SMTP id ffacd0b85a97d-39c120e079amr10530783f8f.25.1743515509947;
-        Tue, 01 Apr 2025 06:51:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHsBMqSUaVpvZcub9DerZUyAcDAdWPbokGx4MrEDvZ1V89a1sJp60yqYaFeSZ3uq31KHnaDGQ==
-X-Received: by 2002:a5d:5984:0:b0:391:4095:49b7 with SMTP id ffacd0b85a97d-39c120e079amr10530760f8f.25.1743515509455;
-        Tue, 01 Apr 2025 06:51:49 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-11-6-59.retail.telecomitalia.it. [87.11.6.59])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b7a4318sm13937042f8f.87.2025.04.01.06.51.48
+        d=1e100.net; s=20230601; t=1743515828; x=1744120628;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uwYV6EoXAucL5Dj4d79APrOokX4rUIbo+yxZ5Oz9Kew=;
+        b=Ulkj7ReCBAQGpRoxBBHLi6OFfhTTTAljnNAyUdvijZv+eAIkF08yv1R9sOgO+blxfL
+         vzYHa1Unxq6KZkS9usroGofT0xw1fYowBC+N+WtygPNVGOqSl9ApIaVz+PCDQuEw/Kl4
+         2VzPNcgSs3N2NE6OSxXN56V1kjRgCMYiRnAUnavXtF4bhuZQksd0uO+aXRpQnZAZ/YRy
+         WAqgZjHpOzCwBV4AIOs9ZydtRwrOHXoBTVl7o0XJa94PT4wk7sUHvQHr2acKh1lAvXka
+         RfRbISlbMQqrM4b6QtEPzm2dstgNeeNPb0hkf7y+8mDPx7htGbMaKyG1JAYEGaWOlNVb
+         APmQ==
+X-Gm-Message-State: AOJu0Yx0lfY3xxu8gzSnhSWR8cUzSaqx21FYc4fW4Fh2Pm06wVqZr7VV
+	6RpPcefbe82/Y8hiZLW5FxPW++HFgLRZEg0Q2JLWPhBdpnMxmLCucELnU9WE/tZvT+8edAXu5OA
+	fbWw=
+X-Gm-Gg: ASbGnctY8ZIxNZRp3GjruZJQ3N5ge1+UClcE4hwLdoNDlHMKRgdcPp7BoHJBF7lIor4
+	NvJtlqzwcjgOuOSf0Q4IlFMa93pjDEf0fR16f9jrVY6O+Q82cQolSCkkbb8PDtqSdpk6q4SMba7
+	MIAmyiSGiBbhlhckow8wKLNatX8flCuw8RSnO08HxWqmMG89/VLHNfDlfllIdtf8wxV536lZ8i2
+	hd2JpcoW3HC3UG9oUKfYlgWeYP8byd9vQ6+Tx52LouOrRSRakaF2qCm8uGCv8Sfi1qPvf8Cb0jW
+	0MoZVmhig8bLGGrqUk7xFsDC15oXSfLj4s3F2Xcy3s/RNwLBA0bNSt1/rSIJltDrpHOgLiU2IQt
+	Gbj20xCEz
+X-Google-Smtp-Source: AGHT+IHTPWai+jBGLAnveIJs6fn4EvvDuSSqT2nask6GBM2fV4+C1CEIjhI6NE2QLkoCxTJzkbEvmA==
+X-Received: by 2002:a05:6000:381:b0:39c:1ef5:ff8b with SMTP id ffacd0b85a97d-39c1ef5ffa2mr4867175f8f.48.1743515828334;
+        Tue, 01 Apr 2025 06:57:08 -0700 (PDT)
+Received: from localtoast.corp.sigma-star.at ([82.150.214.1])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43d82dedd03sm200475155e9.3.2025.04.01.06.57.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 06:51:48 -0700 (PDT)
-Date: Tue, 1 Apr 2025 15:51:42 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Cindy Lu <lulu@redhat.com>
-Cc: jasowang@redhat.com, mst@redhat.com, michael.christie@oracle.com, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v8 5/8] vhost: Reintroduce kthread mode support in vhost
-Message-ID: <qtii7gazb52fuvkeiymllkapnd3l3ji6ht7y7cfegybreavmit@h6bvfhwpghg6>
-References: <20250328100359.1306072-1-lulu@redhat.com>
- <20250328100359.1306072-6-lulu@redhat.com>
+        Tue, 01 Apr 2025 06:57:08 -0700 (PDT)
+From: David Oberhollenzer <david.oberhollenzer@sigma-star.at>
+To: netdev@vger.kernel.org,
+	andrew@lunn.ch
+Cc: Julian.FRIEDRICH@frequentis.com,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	upstream+netdev@sigma-star.at,
+	David Oberhollenzer <david.oberhollenzer@sigma-star.at>
+Subject: [PATCH v4] net: dsa: mv88e6xxx: propperly shutdown PPU re-enable timer on destroy
+Date: Tue,  1 Apr 2025 15:56:37 +0200
+Message-ID: <20250401135705.92760-1-david.oberhollenzer@sigma-star.at>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250328100359.1306072-6-lulu@redhat.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 28, 2025 at 06:02:49PM +0800, Cindy Lu wrote:
->This commit restores the previously removed functions kthread
->wake/stop/create, and use ops structure vhost_worker_ops to
->manage worker wakeup, stop and creation. The function
->vhost_worker_create initializes these ops pointers based on
->the value of inherit_owner
->
->The old function was remove in
+The mv88e6xxx has an internal PPU that polls PHY state. If we want to
+access the internal PHYs, we need to disable the PPU first. Because
+that is a slow operation, a 10ms timer is used to re-enable it,
+canceled with every access, so bulk operations effectively only
+disable it once and re-enable it some 10ms after the last access.
 
-nit: s/remove/removed
+If a PHY is accessed and then the mv88e6xxx module is removed before
+the 10ms are up, the PPU re-enable ends up accessing a dangling pointer.
 
->commit 6e890c5d5021 ("vhost: use vhost_tasks for worker threads")
->
->Signed-off-by: Cindy Lu <lulu@redhat.com>
->---
-> drivers/vhost/vhost.c | 48 ++++++++++++++++++++++++++++++++++++++++++-
-> drivers/vhost/vhost.h |  1 +
-> 2 files changed, 48 insertions(+), 1 deletion(-)
->
->diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
->index c162ad772f8f..be97028a8baf 100644
->--- a/drivers/vhost/vhost.c
->+++ b/drivers/vhost/vhost.c
->@@ -734,11 +734,21 @@ static void vhost_task_wakeup(struct vhost_worker *worker)
-> 	return vhost_task_wake(worker->vtsk);
-> }
->
->+static void vhost_kthread_wakeup(struct vhost_worker *worker)
->+{
->+	wake_up_process(worker->kthread_task);
->+}
->+
-> static void vhost_task_do_stop(struct vhost_worker *worker)
-> {
-> 	return vhost_task_stop(worker->vtsk);
-> }
->
->+static void vhost_kthread_do_stop(struct vhost_worker *worker)
->+{
->+	kthread_stop(worker->kthread_task);
->+}
->+
-> static int vhost_task_worker_create(struct vhost_worker *worker,
-> 				    struct vhost_dev *dev, const char *name)
-> {
->@@ -762,6 +772,41 @@ static int vhost_task_worker_create(struct vhost_worker *worker,
-> 	return 0;
-> }
->
->+static int vhost_kthread_worker_create(struct vhost_worker *worker,
->+				       struct vhost_dev *dev, const char *name)
->+{
->+	struct task_struct *task;
->+	u32 id;
->+	int ret;
->+
->+	task = kthread_create(vhost_run_work_kthread_list, worker, "%s", name);
->+	if (IS_ERR(task))
->+		return PTR_ERR(task);
->+
->+	worker->kthread_task = task;
->+	wake_up_process(task);
->+	ret = xa_alloc(&dev->worker_xa, &id, worker, xa_limit_32b, GFP_KERNEL);
->+	if (ret < 0)
->+		goto stop_worker;
->+
->+	ret = vhost_attach_task_to_cgroups(worker);
->+	if (ret)
->+		goto stop_worker;
->+
->+	worker->id = id;
->+	return 0;
->+
->+stop_worker:
->+	vhost_kthread_do_stop(worker);
->+	return ret;
->+}
->+
->+static const struct vhost_worker_ops kthread_ops = {
->+	.create = vhost_kthread_worker_create,
->+	.stop = vhost_kthread_do_stop,
->+	.wakeup = vhost_kthread_wakeup,
->+};
->+
-> static const struct vhost_worker_ops vhost_task_ops = {
-> 	.create = vhost_task_worker_create,
-> 	.stop = vhost_task_do_stop,
->@@ -773,7 +818,8 @@ static struct vhost_worker *vhost_worker_create(struct vhost_dev *dev)
-> 	struct vhost_worker *worker;
-> 	char name[TASK_COMM_LEN];
-> 	int ret;
->-	const struct vhost_worker_ops *ops = &vhost_task_ops;
->+	const struct vhost_worker_ops *ops =
->+		dev->inherit_owner ? &vhost_task_ops : &kthread_ops;
->
-> 	worker = kzalloc(sizeof(*worker), GFP_KERNEL_ACCOUNT);
-> 	if (!worker)
->diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
->index 98895e299efa..af4b2f7d3b91 100644
->--- a/drivers/vhost/vhost.h
->+++ b/drivers/vhost/vhost.h
->@@ -37,6 +37,7 @@ struct vhost_worker_ops {
-> };
->
-> struct vhost_worker {
->+	struct task_struct *kthread_task;
-                           ^
-nit: I'm not a fan of tabs, but here all the other fields have it, so I 
-would put it in.
+This especially affects probing during bootup. The MDIO bus and PHY
+registration may succeed, but registration with the DSA framework
+may fail later on (e.g. because the CPU port depends on another,
+very slow device that isn't done probing yet, returning -EPROBE_DEFER).
+In this case, probe() fails, but the MDIO subsystem may already have
+accessed the MIDO bus or PHYs, arming the timer.
 
-> 	struct vhost_task	*vtsk;
-> 	struct vhost_dev	*dev;
-> 	/* Used to serialize device wide flushing with worker swapping. */
->-- 
->2.45.0
->
+This is fixed as follows:
+ - If probe fails after mv88e6xxx_phy_init(), make sure we also call
+   mv88e6xxx_phy_destroy() before returning
+ - In mv88e6xxx_remove(), make sure we do the teardown in the correct
+   order, calling mv88e6xxx_phy_destroy() after unregistering the
+   switch device.
+ - In mv88e6xxx_phy_destroy(), destroy both the timer and the work item
+   that the timer might schedule, synchronously waiting in case one of
+   the callbacks already fired and destroying the timer first, before
+   waiting for the work item.
+ - Access to the PPU is guarded by a mutex, the worker acquires it
+   with a mutex_trylock(), not proceeding with the expensive shutdown
+   if that fails. We grab the mutex in mv88e6xxx_phy_destroy() to make
+   sure the slow PPU shutdown is already done or won't even enter, when
+   we wait for the work item.
 
-The patch LGTM:
+Fixes: 2e5f032095ff ("dsa: add support for the Marvell 88E6131 switch chip")
+Signed-off-by: David Oberhollenzer <david.oberhollenzer@sigma-star.at>
+---
+FWIW, this is a forward port of a patch I'm using on v6.6.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Thanks,
+
+David
+---
+ drivers/net/dsa/mv88e6xxx/chip.c | 11 +++++++----
+ drivers/net/dsa/mv88e6xxx/phy.c  |  3 +++
+ 2 files changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index 901929f96b38..29a89ab4b789 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -7350,13 +7350,13 @@ static int mv88e6xxx_probe(struct mdio_device *mdiodev)
+ 	err = mv88e6xxx_switch_reset(chip);
+ 	mv88e6xxx_reg_unlock(chip);
+ 	if (err)
+-		goto out;
++		goto out_phy;
+ 
+ 	if (np) {
+ 		chip->irq = of_irq_get(np, 0);
+ 		if (chip->irq == -EPROBE_DEFER) {
+ 			err = chip->irq;
+-			goto out;
++			goto out_phy;
+ 		}
+ 	}
+ 
+@@ -7375,7 +7375,7 @@ static int mv88e6xxx_probe(struct mdio_device *mdiodev)
+ 	mv88e6xxx_reg_unlock(chip);
+ 
+ 	if (err)
+-		goto out;
++		goto out_phy;
+ 
+ 	if (chip->info->g2_irqs > 0) {
+ 		err = mv88e6xxx_g2_irq_setup(chip);
+@@ -7409,6 +7409,8 @@ static int mv88e6xxx_probe(struct mdio_device *mdiodev)
+ 		mv88e6xxx_g1_irq_free(chip);
+ 	else
+ 		mv88e6xxx_irq_poll_free(chip);
++out_phy:
++	mv88e6xxx_phy_destroy(chip);
+ out:
+ 	if (pdata)
+ 		dev_put(pdata->netdev);
+@@ -7431,7 +7433,6 @@ static void mv88e6xxx_remove(struct mdio_device *mdiodev)
+ 		mv88e6xxx_ptp_free(chip);
+ 	}
+ 
+-	mv88e6xxx_phy_destroy(chip);
+ 	mv88e6xxx_unregister_switch(chip);
+ 
+ 	mv88e6xxx_g1_vtu_prob_irq_free(chip);
+@@ -7444,6 +7445,8 @@ static void mv88e6xxx_remove(struct mdio_device *mdiodev)
+ 		mv88e6xxx_g1_irq_free(chip);
+ 	else
+ 		mv88e6xxx_irq_poll_free(chip);
++
++	mv88e6xxx_phy_destroy(chip);
+ }
+ 
+ static void mv88e6xxx_shutdown(struct mdio_device *mdiodev)
+diff --git a/drivers/net/dsa/mv88e6xxx/phy.c b/drivers/net/dsa/mv88e6xxx/phy.c
+index 8bb88b3d900d..ee9e5d7e5277 100644
+--- a/drivers/net/dsa/mv88e6xxx/phy.c
++++ b/drivers/net/dsa/mv88e6xxx/phy.c
+@@ -229,7 +229,10 @@ static void mv88e6xxx_phy_ppu_state_init(struct mv88e6xxx_chip *chip)
+ 
+ static void mv88e6xxx_phy_ppu_state_destroy(struct mv88e6xxx_chip *chip)
+ {
++	mutex_lock(&chip->ppu_mutex);
+ 	del_timer_sync(&chip->ppu_timer);
++	cancel_work_sync(&chip->ppu_work);
++	mutex_unlock(&chip->ppu_mutex);
+ }
+ 
+ int mv88e6185_phy_ppu_read(struct mv88e6xxx_chip *chip, struct mii_bus *bus,
+-- 
+2.48.1
 
 
