@@ -1,110 +1,80 @@
-Return-Path: <netdev+bounces-178538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 921A3A777DB
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 11:36:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA42FA777D4
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 11:35:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 270773A7604
-	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 09:34:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51578188F51F
+	for <lists+netdev@lfdr.de>; Tue,  1 Apr 2025 09:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E4B1624D5;
-	Tue,  1 Apr 2025 09:34:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4772E1EDA2A;
+	Tue,  1 Apr 2025 09:34:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="AJDCUGK8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tCeV6Q+/"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2681EBA14
-	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 09:34:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2358F1624D5
+	for <netdev@vger.kernel.org>; Tue,  1 Apr 2025 09:34:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743500064; cv=none; b=BnlCQEepNmXvofFH1JiTTibj6lHFOAkO7RI4MMnn7qxCDwN/YsiTATQoxRl6RmLK+k3cemA76qY1XRnMSN3UAG7gCqpJWaN6Z8Nb/iEWulJm0+/UH/ZqL7z3yCm7xhsq0Buxk6WKv1CSRPjHuBhcfZYsky2fq55ZofU4OWCMTeI=
+	t=1743500073; cv=none; b=Xbzc9yN/fq0i9p5jU1zaWCBgvmZx9Z/NgMzjjLsrLkKv2lZvxGkM7+1ejOGbjMukbPkojUxiJnojI9bQueYQsFNAqBxSj1k6J7w7WYEUVPcP5kH40Lomw6M8T8XPF8QM8XdFOzbVvJn6MD7B8F/92Bg2lhGZEzK1kucRKWe3m+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743500064; c=relaxed/simple;
-	bh=HdOJjoxPx/EbF28f3Nu92fwR43QXRJchMEJWMWnyicY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L+LZ2XQvcn4VP6KcDITeV2u6OB4rZ5sCwhAu3Z7cYViWhoDubXeK8pT2Ep2y6Cs9XxA5fN+H6k4q1o9X8kuxYjTRw8Kdg+m/TGbltegcraeP2/dO5usF2cRYkgBuBauThDPLrd9GK9I1rgT7povi0SwhAvUUJ0xQ07iZSKeDvqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=AJDCUGK8; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6F53443181;
-	Tue,  1 Apr 2025 09:34:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1743500060;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IEEpqTIV2IfNfQZ4XX99c/ER5sqAOLBqoVSbkX+wjtw=;
-	b=AJDCUGK8+i2V2aiAFWimcF7nf+JU0UlFZFFv4qC7LruSWRn890113lbR0XMkSFNT5DZxk8
-	kxWLhUAj5VfapjI8AMywMa7uLLF1ljV07d4ZBBbG2zEt5csBtHMXr/iVk6qsLghhkh/XS2
-	RcC9B2lWlvDZTVo2g+rG9CXLEXoaXD584jWt95sAgRqga3rk951c/yjMDUoZIg4hOVvsSK
-	Jw7e2pJ6QvMVM5nQdECeqOTNJig642xwzGAhzs9qnLb/t4wsMvTD6/zcUM0SzuulOsZb0R
-	i0MFMAGfqyZBYbam4SxR6GMcWpVaT4Prz1Ck49Z3q+BjZvKB80mBOsyyMkyL8g==
-Date: Tue, 1 Apr 2025 11:34:18 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: davem@davemloft.net, kuba@kernel.org, marcin.s.wojtas@gmail.com,
- linux@armlinux.org.uk, andrew@lunn.ch, edumazet@google.com,
- pabeni@redhat.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v5] net: mvpp2: Prevent parser TCAM memory corruption
-Message-ID: <20250401113418.3af0279a@fedora.home>
-In-Reply-To: <20250401065855.3113635-1-tobias@waldekranz.com>
-References: <20250401065855.3113635-1-tobias@waldekranz.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1743500073; c=relaxed/simple;
+	bh=7lkAOLmurMCkLel+JEnAt0AfvmrS0keXEItR7INNDXI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UkANEFDqjz4OVGV1YFCO2nOYPOa1NWGEHCXFQJSXQUrTlSqBZQ+E4AtayTD2M83sjsQcPssKWKDWEA230G6to/Pegs1bGZPi9iRSaJin9uP8JXgfPGKp/whiQIVbiaXcdZMOfd0sNGoaWnKXo8UPWYuL+v5kcdIIPCurNEJlcyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tCeV6Q+/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACD2EC4CEE4;
+	Tue,  1 Apr 2025 09:34:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743500071;
+	bh=7lkAOLmurMCkLel+JEnAt0AfvmrS0keXEItR7INNDXI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tCeV6Q+/pvkhcx91PG1MjGJj26MDQSAzN5cUN18jYSX31tCdizbhkOdQUVKLQZeE7
+	 Qocao8Czzn8TGft7RucqfYzeauAZx18r/0btTdO98PlUhxaVVfyPEXM0DskQPbNMml
+	 EB/eo5sUh/OyMzJi0q3VPqBAlBm+lGndPYI4WUb6SgSmKUILXpAnCl11ryLNZDsJqG
+	 wloIFVT+Vec7yd7goYUcENJGEy7PhnWECr2QEa0PtN3w+I9jWedofCq7OmjkZ81xbx
+	 TWd6No/Ar0t5xZVx050FFRAaCWxjBK8dKFSLbho/6S7BQF7PblesHx41OWKrtv9N4y
+	 wjPVPJ7sB00Hg==
+Date: Tue, 1 Apr 2025 10:34:27 +0100
+From: Simon Horman <horms@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Davide Caratti <dcaratti@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: airoha: Fix ETS priomap validation
+Message-ID: <20250401093427.GA214849@horms.kernel.org>
+References: <20250331-airoha-ets-validate-priomap-v1-1-60a524488672@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddukedvgeehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepledprhgtphhtthhopehtohgsihgrshesfigrlhguvghkrhgrnhiirdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpt
- hhtohepmhgrrhgtihhnrdhsrdifohhjthgrshesghhmrghilhdrtghomhdprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250331-airoha-ets-validate-priomap-v1-1-60a524488672@kernel.org>
 
-Hi Tobias,
-
-On Tue,  1 Apr 2025 08:58:04 +0200
-Tobias Waldekranz <tobias@waldekranz.com> wrote:
-
-> Protect the parser TCAM/SRAM memory, and the cached (shadow) SRAM
-> information, from concurrent modifications.
+On Mon, Mar 31, 2025 at 06:17:31PM +0200, Lorenzo Bianconi wrote:
+> ETS Qdisc schedules SP bands in a priority order assigning band-0 the
+> highest priority (band-0 > band-1 > .. > band-n) while EN7581 arranges
+> SP bands in a priority order assigning band-7 the highest priority
+> (band-7 > band-6, .. > band-n).
+> Fix priomap check in airoha_qdma_set_tx_ets_sched routine in order to
+> align ETS Qdisc and airoha_eth driver SP priority ordering.
 > 
-> Both the TCAM and SRAM tables are indirectly accessed by configuring
-> an index register that selects the row to read or write to. This means
-> that operations must be atomic in order to, e.g., avoid spreading
-> writes across multiple rows. Since the shadow SRAM array is used to
-> find free rows in the hardware table, it must also be protected in
-> order to avoid TOCTOU errors where multiple cores allocate the same
-> row.
-> 
-> This issue was detected in a situation where `mvpp2_set_rx_mode()` ran
-> concurrently on two CPUs. In this particular case the
-> MVPP2_PE_MAC_UC_PROMISCUOUS entry was corrupted, causing the
-> classifier unit to drop all incoming unicast - indicated by the
-> `rx_classifier_drops` counter.
-> 
-> Fixes: 3f518509dedc ("ethernet: Add new driver for Marvell Armada 375 network unit")
-> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
-> ---
+> Fixes: b56e4d660a96 ("net: airoha: Enforce ETS Qdisc priomap")
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 
-It looks pretty good, I ran my no-so-stressfull tests to make sure
-filtering / promisc paths still work and without warning, which is the
-case :)
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Thanks !
-
-Maxime
 
