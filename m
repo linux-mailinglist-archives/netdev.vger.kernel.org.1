@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-178878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EFEEA79522
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 20:32:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 383C8A79524
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 20:32:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 642813AC1BB
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 18:31:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01FC81890B68
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 18:32:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 196B61D7E2F;
-	Wed,  2 Apr 2025 18:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4512F1DC198;
+	Wed,  2 Apr 2025 18:31:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="XjJT2Uqz"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="EBHURQ2C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
+Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B821A3173
-	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 18:31:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98CAE2E3374
+	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 18:31:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743618715; cv=none; b=s6dwR9ys7L9bWGKjdoYjpwkOs/DuRACIjzxJaqLExpfVWEiNjUzJmkfKoe1QpKcPl1jz/LFxnu1QaQrWOji3zKjU+RlMhL1B84qZnxHf+ZqFpzAlwT+p4qac2tW/JES/z4Sm6KHBuMIdRTdvJ76aYDSkcboSGRhc46zM8RsLD4U=
+	t=1743618716; cv=none; b=btoIVAra1DPZLmSnV7fTcWckoZIrWgS8tYaa1NFQiSkiVi2TJTUVqFk7v/On1/BfccFrICN5+xubjMRcJORqNgwdXZP0HAHFkr7UGTZnPvSwvVMGPzxKJK7jBoaoNm4lzP/JoVtNbVESbxJE3JjmyU90qYII6gQPTQYAjOdpQ54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743618715; c=relaxed/simple;
-	bh=ejtJgqgiW4yRqj478rhg5NO7Ij0T7wZA9qmvgMkBM4M=;
+	s=arc-20240116; t=1743618716; c=relaxed/simple;
+	bh=o5ouQ47XIefZtNuo59b5RU7CJhoAR/EzlzhbUNAdDDs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AO+icMUgOAsCIEqyPGzHg8OS73Xb+yoQgNk7gp0eRUFLtOiSHf86/cqZsB7AHWgV7mRlSvyDB2ovwItzjZhafgpsdiEv1nJ6aYLLewXGazPeXyZdvlAhhCwwxcRP42+LTOvxUR2wwwRUpR7wrpcYKQUNJb0XISCI6srKH8wmhDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=XjJT2Uqz; arc=none smtp.client-ip=209.85.160.52
+	 MIME-Version; b=N3uGGY1Zoetx8jII2IkfdxHrcFeyRpJ+buhiWf2JHxF1s7dunVhlm8pCe7QW6Bf5FrpKR5vlWwj4BlRCHGBgImfmSk9mhLdt39wuq9Qlgln8IMYVEGyWazTqqpc3mC0zJ06gwBGVIgucQHTmzP3rYJCUzNKFvlTo3k2acCwajRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=EBHURQ2C; arc=none smtp.client-ip=209.85.160.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-2b8e2606a58so25790fac.0
-        for <netdev@vger.kernel.org>; Wed, 02 Apr 2025 11:31:53 -0700 (PDT)
+Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-2a01bcd0143so32056fac.2
+        for <netdev@vger.kernel.org>; Wed, 02 Apr 2025 11:31:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1743618712; x=1744223512; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1743618713; x=1744223513; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YpOPhY3pXWa2a3oRCwpjjmk1VE9xvBrlEZBOx62p0qY=;
-        b=XjJT2UqzLvfzjM/ewXKF7f9buL+aVkK3gHdZkp/7tT2TPH22JStEKZQ4kIBebbnIDo
-         XBq61sIFdcs7Q4H21yox3NRDEupYUnkX2GcT/CNw7ZGpZA5kYPOFl+3Q2ZY5DG5Ij4fC
-         1q2aAW8rGd9aHP6ZNwvjrBOXaRYsuQvq8I7PA=
+        bh=SWHOxVxf8+IcejOJg3ObVeF4Mqr2/CaNCjHZcGNxb5k=;
+        b=EBHURQ2C4xO5GP0Z+rX0HzHs7xbycn+KPaLGLtmQe3EPZLVme0JLLrEwKU6yapBVv3
+         +tGq9MJ/Ty8Fr722GWmsNAX2+wM52juanaNrpL8xrYN5FhB6u2diFvj2G20JDL0fl9La
+         UFSqxP/w6H3nHf3Wc+8hA7i3pqz26C2puGr1U=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743618712; x=1744223512;
+        d=1e100.net; s=20230601; t=1743618713; x=1744223513;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YpOPhY3pXWa2a3oRCwpjjmk1VE9xvBrlEZBOx62p0qY=;
-        b=nfpe/bUEWvbGTvMQxYQSFb4Luaps0dKId6NFJvc42a3QseBakab9mejXY3a1XmUWRJ
-         cLtpGxrQ7aHKi7dNu6dvMsh132uO9Lu4LATLdSuSxdHLVHEc2ZxF3GQ0RuvNlYCOaikJ
-         ciDq4Sjad00yq7WRHGL87VzcFSVF7Uw7ktoYfyj4x4uncc1YhIKfDAl5SVCpcgjzhvTk
-         yjYYyPvR0TEd9Rs2JQ7+wJkUV21srqA7v1YWKud/2t7lqlh2IrIuVi+lOkLG6cUgy7W6
-         cYZcFdTvdmhePUJylDAxYzL5MYnYiUQNOceTdAf9MtP+X8mC6HqBsuYcvb+jGgFpGKnB
-         F3Vg==
-X-Gm-Message-State: AOJu0YweteaVBh57PnKVh3FJ6uNyzfN96FdQ4Jy1eyIm91FrjMN//iNs
-	pznTVr5b/r4KTUuMZiE+sotuUqhrD2eV4JyckN/K4P84g6RtByPrI5z1xjRbcg==
-X-Gm-Gg: ASbGncvvZFE7kUWjDpZ740fG7+P2xag9DSOjaW6OX1aqI6X1HzCQQA9HTu8JuPONuI4
-	xc46VhUsmL1rWkavpNZ1RrvrZ77s4IE4kiF2pRwSfF7QQx5nDVDVtGXtPfraejIcI4OsnaXH+Jt
-	X6efWI9b8OSqOCvEwMBSgZ8bYRkdCRKhm4eaIQ3EYjxcjsVv5WOnqTsaOcbmYzqljuKiekbF0qy
-	L7QGUHbBEGLrdLLkjiRbMOwnbGGehGv8EL8KTzro891knqdDmi6DTHCwewV7NoR+phhlsHUhUIL
-	lOJrY7aizORbgrc04Af5V7bsPbWKJmSxF/8jmr3s+fNgJ304CWoXH6tIdOaCjA0iU481sbyKaB3
-	c8Bkv+fpzVTAQKizPHtrU
-X-Google-Smtp-Source: AGHT+IE3tmntW6ugOk+L37562RiQgvnHk73rQ1tWXvIB6YNUWHXdBbGZBPKBxXB9C0DLLBKFV1khmQ==
-X-Received: by 2002:a05:6870:7182:b0:29e:290f:7af4 with SMTP id 586e51a60fabf-2cc382d2af9mr4855357fac.34.1743618712259;
-        Wed, 02 Apr 2025 11:31:52 -0700 (PDT)
+        bh=SWHOxVxf8+IcejOJg3ObVeF4Mqr2/CaNCjHZcGNxb5k=;
+        b=IINIW239ng5l7OreEk5koXD5/tjjNEkbdtw9TWqGzSFApPuNb3WLvXXwiHXuuieIKb
+         yfPbt/ZcdDsfW2Bw+/6b04OG3EwA5JdgLI4xt3zI0FKa/moysBo8L9MKFttmOAd8PRp5
+         T28Nwee3WmeW3GC9tdxl/onzL9sM6tGf/pSUxFDhe+JcKeEa4hbPYOgSCoql7Cis3lwh
+         wsq5bcgPEh9wk7piyy9fDZpaq3nN1C/r2gLzbwAYVe4jmD+B+UpaUkS9QQqqcGEpB+7G
+         9xhk0C18wKbawNa+IJvdZLcc2OLxLz1SqjXulAlm8GhuPoBPOpGmcIoY08hzrtO+HeT1
+         c3xQ==
+X-Gm-Message-State: AOJu0YzIpUn9Z3bSfd8EE9bn+7Vd+mzgUZeqG9e0X6IY5gYdpbKtfmcG
+	s3T2vItPLsyjheU6Wyt+Wbllz4zj+8k8p4jZLx/DJ42nlGlEeZLG5vbkUSTAjw==
+X-Gm-Gg: ASbGncs2eYsbjUtNG1UKANjzyiOJ5BsyjCdwDPs+C7Xu3vb+m7liITUIWwfklEBtKTt
+	fuDbCv35AG/AR8rAclcQphebQVylv9aJiav0fevs2WeSsdJVDY01jivGR+zREy4uRMjN7TNAGtc
+	mnhTtbKvnxnYIhbHg8fUeDhFli++ep7aMAMcYM+d3advtyw9xoRkWI5uPRh+pSSSHboK8eVZJxz
+	xhVYR+YhTWmERvo5PhSHg6oNEDHgooaUBUbQlnXA2f/e5sj833hNaycR0x5R31M+857M1iE0mjO
+	WZCNUfQYemQnvp2pKtooj5HDq85VPRwSRA/AfpQYjdkGE1/C8ALSarCsQTw7HbX3efV2U4YUmMK
+	iVny/wpqF3dqa5FCgJ+Pe
+X-Google-Smtp-Source: AGHT+IEEUryZ4vixKrjelVVHURx1nclBUYK3xifh9hRybwzGHOdhAkS3iKDwLiaX3vEyrCoqMQjp6Q==
+X-Received: by 2002:a05:6871:e787:b0:2a7:d856:94a with SMTP id 586e51a60fabf-2cbcf52fdd7mr10442833fac.22.1743618713526;
+        Wed, 02 Apr 2025 11:31:53 -0700 (PDT)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2c86a856de7sm2917135fac.39.2025.04.02.11.31.50
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2c86a856de7sm2917135fac.39.2025.04.02.11.31.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Apr 2025 11:31:51 -0700 (PDT)
+        Wed, 02 Apr 2025 11:31:53 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -80,9 +80,9 @@ Cc: netdev@vger.kernel.org,
 	danieller@nvidia.com,
 	damodharam.ammepalli@broadcom.com,
 	andrew.gospodarek@broadcom.com
-Subject: [PATCH net 1/2] ethtool: cmis_cdb: use correct rpl size in ethtool_cmis_module_poll()
-Date: Wed,  2 Apr 2025 11:31:22 -0700
-Message-ID: <20250402183123.321036-2-michael.chan@broadcom.com>
+Subject: [PATCH net 2/2] ethtool: cmis: use u16 for calculated read_write_len_ext
+Date: Wed,  2 Apr 2025 11:31:23 -0700
+Message-ID: <20250402183123.321036-3-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.43.4
 In-Reply-To: <20250402183123.321036-1-michael.chan@broadcom.com>
 References: <20250402183123.321036-1-michael.chan@broadcom.com>
@@ -96,60 +96,95 @@ Content-Transfer-Encoding: 8bit
 
 From: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
 
-rpl is passed as a pointer to ethtool_cmis_module_poll(), so the correct
-size of rpl is sizeof(*rpl) which should be just 1 byte.  Using the
-pointer size instead can cause stack corruption:
+For EPL (Extended Payload), the maximum calculated size returned by
+ethtool_cmis_get_max_epl_size() is 2048, so the read_write_len_ext
+field in struct ethtool_cmis_cdb_cmd_args needs to be changed to u16
+to hold the value.
 
-Kernel panic - not syncing: stack-protector: Kernel stack is corrupted in: ethtool_cmis_wait_for_cond+0xf4/0x100
-CPU: 72 UID: 0 PID: 4440 Comm: kworker/72:2 Kdump: loaded Tainted: G           OE      6.11.0 #24
-Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
-Hardware name: Dell Inc. PowerEdge R760/04GWWM, BIOS 1.6.6 09/20/2023
-Workqueue: events module_flash_fw_work
-Call Trace:
- <TASK>
- panic+0x339/0x360
- ? ethtool_cmis_wait_for_cond+0xf4/0x100
- ? __pfx_status_success+0x10/0x10
- ? __pfx_status_fail+0x10/0x10
- __stack_chk_fail+0x10/0x10
- ethtool_cmis_wait_for_cond+0xf4/0x100
- ethtool_cmis_cdb_execute_cmd+0x1fc/0x330
- ? __pfx_status_fail+0x10/0x10
- cmis_cdb_module_features_get+0x6d/0xd0
- ethtool_cmis_cdb_init+0x8a/0xd0
- ethtool_cmis_fw_update+0x46/0x1d0
- module_flash_fw_work+0x17/0xa0
- process_one_work+0x179/0x390
- worker_thread+0x239/0x340
- ? __pfx_worker_thread+0x10/0x10
- kthread+0xcc/0x100
- ? __pfx_kthread+0x10/0x10
- ret_from_fork+0x2d/0x50
- ? __pfx_kthread+0x10/0x10
- ret_from_fork_asm+0x1a/0x30
- </TASK>
+To avoid confusion with other u8 read_write_len_ext fields defined
+by the CMIS spec, change the field name to calc_read_write_len_ext.
+
+Without this change, module flashing can fail:
+
+Transceiver module firmware flashing started for device enp177s0np0
+Transceiver module firmware flashing in progress for device enp177s0np0
+Progress: 0%
+Transceiver module firmware flashing encountered an error for device enp177s0np0
+Status message: Write FW block EPL command failed, LPL length is longer
+	than CDB read write length extension allows.
 
 Fixes: a39c84d79625 ("ethtool: cmis_cdb: Add a layer for supporting CDB commands)
 Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 Signed-off-by: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- net/ethtool/cmis_cdb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/ethtool/cmis.h     | 7 ++++---
+ net/ethtool/cmis_cdb.c | 8 ++++----
+ 2 files changed, 8 insertions(+), 7 deletions(-)
 
+diff --git a/net/ethtool/cmis.h b/net/ethtool/cmis.h
+index 1e790413db0e..51f5d5439e2a 100644
+--- a/net/ethtool/cmis.h
++++ b/net/ethtool/cmis.h
+@@ -63,8 +63,9 @@ struct ethtool_cmis_cdb_request {
+  * struct ethtool_cmis_cdb_cmd_args - CDB commands execution arguments
+  * @req: CDB command fields as described in the CMIS standard.
+  * @max_duration: Maximum duration time for command completion in msec.
+- * @read_write_len_ext: Allowable additional number of byte octets to the LPL
+- *			in a READ or a WRITE commands.
++ * @calc_read_write_len_ext: Calculated allowable additional number of byte
++ *			     octets to the LPL or EPL in a READ or WRITE CDB
++ *			     command.
+  * @msleep_pre_rpl: Waiting time before checking reply in msec.
+  * @rpl_exp_len: Expected reply length in bytes.
+  * @flags: Validation flags for CDB commands.
+@@ -73,7 +74,7 @@ struct ethtool_cmis_cdb_request {
+ struct ethtool_cmis_cdb_cmd_args {
+ 	struct ethtool_cmis_cdb_request req;
+ 	u16				max_duration;
+-	u8				read_write_len_ext;
++	u16				calc_read_write_len_ext;
+ 	u8				msleep_pre_rpl;
+ 	u8                              rpl_exp_len;
+ 	u8				flags;
 diff --git a/net/ethtool/cmis_cdb.c b/net/ethtool/cmis_cdb.c
-index d159dc121bde..dba3aa909a95 100644
+index dba3aa909a95..1f487e1a6347 100644
 --- a/net/ethtool/cmis_cdb.c
 +++ b/net/ethtool/cmis_cdb.c
-@@ -363,7 +363,7 @@ ethtool_cmis_module_poll(struct net_device *dev,
- 	struct netlink_ext_ack extack = {};
- 	int err;
+@@ -35,13 +35,13 @@ void ethtool_cmis_cdb_compose_args(struct ethtool_cmis_cdb_cmd_args *args,
+ 	args->req.lpl_len = lpl_len;
+ 	if (lpl) {
+ 		memcpy(args->req.payload, lpl, args->req.lpl_len);
+-		args->read_write_len_ext =
++		args->calc_read_write_len_ext =
+ 			ethtool_cmis_get_max_lpl_size(read_write_len_ext);
+ 	}
+ 	if (epl) {
+ 		args->req.epl_len = cpu_to_be16(epl_len);
+ 		args->req.epl = epl;
+-		args->read_write_len_ext =
++		args->calc_read_write_len_ext =
+ 			ethtool_cmis_get_max_epl_size(read_write_len_ext);
+ 	}
  
--	ethtool_cmis_page_init(&page_data, 0, offset, sizeof(rpl));
-+	ethtool_cmis_page_init(&page_data, 0, offset, sizeof(*rpl));
- 	page_data.data = (u8 *)rpl;
+@@ -590,7 +590,7 @@ ethtool_cmis_cdb_execute_epl_cmd(struct net_device *dev,
+ 			space_left = CMIS_CDB_EPL_FW_BLOCK_OFFSET_END - offset + 1;
+ 			bytes_to_write = min_t(u16, bytes_left,
+ 					       min_t(u16, space_left,
+-						     args->read_write_len_ext));
++						     args->calc_read_write_len_ext));
  
- 	err = ops->get_module_eeprom_by_page(dev, &page_data, &extack);
+ 			err = __ethtool_cmis_cdb_execute_cmd(dev, page_data,
+ 							     page, offset,
+@@ -631,7 +631,7 @@ int ethtool_cmis_cdb_execute_cmd(struct net_device *dev,
+ 				       offsetof(struct ethtool_cmis_cdb_request,
+ 						epl));
+ 
+-	if (args->req.lpl_len > args->read_write_len_ext) {
++	if (args->req.lpl_len > args->calc_read_write_len_ext) {
+ 		args->err_msg = "LPL length is longer than CDB read write length extension allows";
+ 		return -EINVAL;
+ 	}
 -- 
 2.30.1
 
