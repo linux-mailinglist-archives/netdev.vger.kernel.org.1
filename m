@@ -1,255 +1,158 @@
-Return-Path: <netdev+bounces-178767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3019A78D45
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 13:39:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFF88A78D5B
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 13:43:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B0417A519F
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 11:38:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77D197A5435
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 11:42:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47684238168;
-	Wed,  2 Apr 2025 11:39:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07DF2237A3B;
+	Wed,  2 Apr 2025 11:43:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PT3Gl7E2"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qouLRvB4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2086.outbound.protection.outlook.com [40.107.243.86])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E620236451;
-	Wed,  2 Apr 2025 11:39:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743593953; cv=none; b=KHNt36HkuwC0ydNqrn1Zv97aFza50GNuJ3N37bdYrA6W49uaUj9vIiIKAv28RtgbiePtspuK7RryKBt9i+UnzAWEYawYawUQuDnDZD1htbyrj/2vE2b9GCkUK9gacg34Ho2NEtYhCvbbS8wr7PAel5mWlIcEKIe0WtqHE9yy2eA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743593953; c=relaxed/simple;
-	bh=8XKoDvfo8v/zPSCYrrN1wH1gLYamNkwyEienHdHA5hY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bt/4OG8EBIgBNmA8N9/A44AskQWFhM/opCFQ0DMDnrNqZNE8WLYDlGHb+XW/bizCO7+bySdThdPaOXJvO0uHOPdEiYflD5BagkM6+y4453btc/s3rYkit6pMpYJWyvkr7TYjderMcctIEW+Pi7Y2FUmLkLBc1k65Ifq2GMURPw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PT3Gl7E2; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-ac3eb3fdd2eso1200476766b.0;
-        Wed, 02 Apr 2025 04:39:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743593949; x=1744198749; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=s0qzc5GVXuSt6bU4NYxI3jol0L+9rn5+w5SAhFRWk6w=;
-        b=PT3Gl7E2NJYHpwqXU43iesEEzk8uaxhS7B7YgSOPSkFHR9n1FldjZ/HPWCOHRH+yjj
-         elVRk9Ghg2DusTBcfXzX6dY5IlS4cjHQyAuBlzXfNZMjN0mdYNPeOWosbeB+0rsEP3FZ
-         3cfIBbW21F/f4L2VB+u5LNqZAoIgGaT7x/+KQ1ZqSur5XgMriuE4ZEoCrLuVOLnaNChm
-         tjS5UCiXDwgZjd81rJqyfLc4/a2iLWyl0hQGtUJvu7JTBrVpecgA1kDodrPjAqe12nzT
-         MRTSiopRIVdGq26UvE3FnJqqIJMPyEPRx77tCp24gnHoKRNoMIJoNcBXPpc+PbSrLEz7
-         GP2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743593949; x=1744198749;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s0qzc5GVXuSt6bU4NYxI3jol0L+9rn5+w5SAhFRWk6w=;
-        b=otp/7ljakRJad2iy4lrnKjK3zBH91/CUgSeVi1g+oFTevP1DGH3L2xWozNWiBPtd0p
-         o4zSQe2k0Dvg1vF6Asqwk3h3tYB645ZoFsrUbbhaXnWIM6LTNDSMlKPlGiVTlTrnBsev
-         v+95P96Q6Szn8BPEh+vY55UEI5HAkiVMmkMtim8HRCTCemNT87MOz1m7XmQ2nuuUH2Nb
-         ilnkjgW+oQ1XG8qqiwikU1IN26R9fk1fr4rzNPfB75Rzd/szpU2Wxnsyh4L9xO00HcLc
-         uajGDNM8hZIMVTs/z+oGf8e6v1g7p/LjayT4dJ0Bx5NlgPpacbID0pPt5NIWWDvEWLAm
-         UExQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUN5qD82x3alYcx4MSZZNGtnbrgDIGFiXCj4ioVIs25qY+PXpaJR6RCvFaYKOKogkBRups=@vger.kernel.org, AJvYcCX9nxw8c46CIs59rAjSefjuh+bAlrGQc2Fs6fqlStdxKvMzLNB9dXpRszKU3WCTE+KxsyGdg7GIV9dgog==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxzx+ubara+uyssZKGjZn8q1Dxh4+Pw3dFakTBpYmIkJ5sjUj3N
-	ClnuAh+MiepXNsU6KVs9+tde3sYX2zhvtM+GPvIgzRTXGgJ4GrDq
-X-Gm-Gg: ASbGnctqCxu8OhN0mK8JladEGka1d65ucAKzm49mfchvN2R8MJfcQ/QWXSMuo9Sj33o
-	hz6f9TytdcMXpPVoZfcNvP9gka93uFxFhDyHN2uW990l8UicY33io+hV5L9JpLnAySCPqXSm4KS
-	QUJtJWEGBmXcw5HxE2Sjdg6dEyPvMa/Jh1QiKzhk10tHuLtNzIATl5oxyuXY6pc54ppmkH5Cy8G
-	Qi4m6QLIw8D53fiUDM6esPZxQLCHX5nUzgi/DHD4nbg1He9JAVyJWLMypwkjge7auF6M8aQxnQs
-	gLEPi53uyjWuNJfwrxezUXOBzNXXulOwXNM5Ghgo6Rbd3gsaRE3L39Y=
-X-Google-Smtp-Source: AGHT+IH98micgWE/G7YD/wxn1wqCl92PnyTlyppPlmkUIG29k9jKNXnGuQCcoeX2OOyYg+ci5URgfw==
-X-Received: by 2002:a17:907:9629:b0:ac3:cc0e:90e5 with SMTP id a640c23a62f3a-ac782be4287mr524643266b.30.1743593949111;
-        Wed, 02 Apr 2025 04:39:09 -0700 (PDT)
-Received: from [192.168.8.100] ([148.252.140.143])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac71922bb92sm914833466b.12.2025.04.02.04.39.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Apr 2025 04:39:02 -0700 (PDT)
-Message-ID: <2c5821c8-0ba5-42a3-bcdd-330d8ef736d0@gmail.com>
-Date: Wed, 2 Apr 2025 12:40:20 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D33235BFB
+	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 11:43:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.86
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743594200; cv=fail; b=BPFq6+bdlIaIun5HWHUWPMWC0YcoX6YfxRvHKGrTVEjcYeVgzF/z8ZJdvXysW0QGND+BNifuDK1ZF0N60Vi51+lJ9VyufdteJB06JOZE0MLDs0jinYeJ4Vgpeg5tuBEnmSw9mjfYNfH2tA/pE02577zNfQYS+GgsHUGGMbKFASU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743594200; c=relaxed/simple;
+	bh=onISp+J0Z6hvDG0uDPspU0LLTsXMkFeLZgVlxY5R6f0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=p+VsjuH5cHb3jtEscoeq4ohDQYzmoR88j26Fpn0RR9EgfKXFWgY+XNlVZnICSqFpM+g753r/eK3j31QGcoFJ3qTH0VrDix4ttfgpZbNlBZUtm/j7IZcKWrfK6hpc0OZe1kWhdDcPwEn5iteJNAUrBPKMlOpbadg2yRu33OwJiM4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qouLRvB4; arc=fail smtp.client-ip=40.107.243.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=CTKLwbYOpw6KwDUhsIWFbV+R/lHZrE0xqG4E4UTvH0fGN81PaBuSrHk6oPdFmO9nqaIMmDaI4c3f6Rfe+bGNMus/x3Z9zkcpxtK4U3/8BnL+FtDNdPF1lBS84GWYbw6/y5m2zv+8RC2Tnv6J5oNvppnp2Ejx13X6rivxjPSSdHo0N45gSFY9LzYRwPZzKm6zcXgtuTPcLNUv6c3NE4euasSOXDUhg4X3R42wVXzQ5XDVmMtzcuZIKVAUA3mtnlD19QMnwxuBrVnFptYI1qwWJZYTye2oc9qrKE+y8itImJeOwhiYgY//FR6RdEgj4SnhMHZjbaedVXXiD5tnhrXnbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mW4bUrULxL4m8sx6gFzrL1x34bgMXki/JE09xo/GLP0=;
+ b=y56Bixe/VXwSCiGkwnOQGAMjG29NrXt/CqoFzuMd2L03Ybr0vhKaKre8FMw0qO23CLkRj+vKjwLx+xharBPb0YxQS/Ycj7YJ3u9BnLO3aFKkpYAgNCb3nxR9wIbMCguBzUQpGvyHhYI6bBgHFOocdxUPQc4kvPV1QJ1K4XGvThdzaG+cB5nu2crTB/HzPn3GJWg4SNvqrNCghKLcqgQ2EXaVfuytNFvFgnDLwXwwposdHNJkNsrLI+1ciWdVKv2cwwpLFwZ9KRuDvBmPeuNTop6zFa2TQDZE6vtDST+zmiK5mIJmAsMX6wtpt+wBRXZgLqEQbYfX3Jk3xHtFHc9cqQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mW4bUrULxL4m8sx6gFzrL1x34bgMXki/JE09xo/GLP0=;
+ b=qouLRvB4dr2iDHvEF1XxxjckVGPhRvobwFMSIOZqdh0Oh0UAA20+oUjHKFSPevnVDsQzxc+rr2wHNlrbdjPtpWKn/pqBY3CqddbN2mYqmau2FzBS+Kw71yWpjT+MkjJFUwsv/scZsUYqblBWbkeZXfoucRgn7okbAY1aJQwC2Tm+P7CLHv71SPFyYu7ljLWsxPoH2Z5cLdmIjgSxQRDG97oA0JKhHS1q4NDswqTXav0K3doQd+8BHrQBQ2b0fBU+CAd0DoQjQ0qM2V6kXXP4nnbKcLNhQe/S8wtloqPtmqswmGLpQlVBcynYCNsVv6LO8K1X9uCvs2AeTepu6F8GdA==
+Received: from SA1P222CA0044.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:2d0::9)
+ by SN7PR12MB6888.namprd12.prod.outlook.com (2603:10b6:806:260::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.44; Wed, 2 Apr
+ 2025 11:43:15 +0000
+Received: from SN1PEPF000397B3.namprd05.prod.outlook.com
+ (2603:10b6:806:2d0:cafe::6) by SA1P222CA0044.outlook.office365.com
+ (2603:10b6:806:2d0::9) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8583.41 via Frontend Transport; Wed,
+ 2 Apr 2025 11:43:15 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SN1PEPF000397B3.mail.protection.outlook.com (10.167.248.57) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8606.22 via Frontend Transport; Wed, 2 Apr 2025 11:43:14 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 2 Apr 2025
+ 04:43:00 -0700
+Received: from shredder.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 2 Apr
+ 2025 04:42:54 -0700
+From: Ido Schimmel <idosch@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<dsahern@kernel.org>, <horms@kernel.org>, <gnault@redhat.com>,
+	<stfomichev@gmail.com>, Ido Schimmel <idosch@nvidia.com>
+Subject: [PATCH net 0/2] ipv6: Multipath routing fixes
+Date: Wed, 2 Apr 2025 14:42:22 +0300
+Message-ID: <20250402114224.293392-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 2/2] page_pool: Track DMA-mapped pages and
- unmap them when destroying the pool
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>, Saeed Mahameed
- <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Simon Horman <horms@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
- Mina Almasry <almasrymina@google.com>, Yonglong Liu
- <liuyonglong@huawei.com>, Yunsheng Lin <linyunsheng@huawei.com>,
- Matthew Wilcox <willy@infradead.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-mm@kvack.org, Qiuling Ren <qren@redhat.com>,
- Yuying Ma <yuma@redhat.com>
-References: <20250401-page-pool-track-dma-v6-0-8b83474870d4@redhat.com>
- <20250401-page-pool-track-dma-v6-2-8b83474870d4@redhat.com>
- <3e0eb1fa-b501-4573-be9f-3d8e52593f75@gmail.com> <87jz82n7j3.fsf@toke.dk>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <87jz82n7j3.fsf@toke.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF000397B3:EE_|SN7PR12MB6888:EE_
+X-MS-Office365-Filtering-Correlation-Id: 47cfdfba-95e7-49d7-819b-08dd71db8e05
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Ms9mEP9maaR+xNmVL871n0CSQwkz4Nlujru03meZ1ubEOIPPqDum1CPgDE49?=
+ =?us-ascii?Q?Lr7xJpFUUgI6z96LAueqxxZeQl/DYaw+NEsvg6DiDDV2RyXrEiA36P6E0lls?=
+ =?us-ascii?Q?CifOg990eCG2mUCEDPBoB9i0tMpdy/+/KHInGSHXBqZ8RV6zh9221mlDsplZ?=
+ =?us-ascii?Q?5IEix1I5iNKTlEf9hmvAv0ha3p0+MOgjXRVriiRcgwqk5TwWVRjoOTCK1PtS?=
+ =?us-ascii?Q?CX7rB4c4udzfvqSqFlTD+28EGv+FssF4vSexkJGF+GH5uD/W8ZQ/hpP2Sy3f?=
+ =?us-ascii?Q?nE4gcmdJOb7vSaBThH95VEkPv8lmgpMiCkNYBTpe2lTKkM3OO+hceWm8M6gV?=
+ =?us-ascii?Q?rnp0PQNK8UZL5nr6HtqO7SPjYmI2QrNSMFZeudzw73WCvOwe9gdYWWQpxREG?=
+ =?us-ascii?Q?pWDADgk9sfgbGgTYfKlPBA1H2Mi+ZnmpN0w+RhgYpmSY+4GVyk7NXD+3UclY?=
+ =?us-ascii?Q?rBiFO1lMW7cq+bsf+Q4S+ghMFIffRI4QQ5xGo6Z8nRmPy7ML+3dI2/gOf3e9?=
+ =?us-ascii?Q?T/nc/TVicF4Riv3WzRgt9WCvdQZIqUhuyMvtdGSwJ3owRLFdbNUKPG6vIqOF?=
+ =?us-ascii?Q?J68/RXZh8yRDXxGuRq0yKv72CqeEE935mjcTMT+u5+Amr/i6XrKYlewuYZ3v?=
+ =?us-ascii?Q?+NOp+gb52bS9LdNYCXdZ3KQzlE9M6OPm9zzpSKa+vYhzPdVF8wxZfq9bXUGm?=
+ =?us-ascii?Q?Zv1QCzns/9f0+lDu3A++kj4YJeY+d6T+Bl/d0nGe3MpbfNCFD9VBC1onSaAW?=
+ =?us-ascii?Q?LmkiPfUXq3FINhQxjE8lmh73yhPVEw5jOvNyKeX8spXTSCokzfe0+HjcO8fU?=
+ =?us-ascii?Q?jsqfWO9ZQKQ6Stptiir4eZelIar00hpmACnbqGpgxlFjQ2UzVyJD7dU6a/SF?=
+ =?us-ascii?Q?l38UBtWwplK9GngQ+DxPSlP6N1ge5uU0ezU/KqQbLNpCiVu//4YekCCGTQDE?=
+ =?us-ascii?Q?btZjfNcVRgoGv4erxj9pE5q5ImTApwYzFUWT6QyFPt+/lsVDbIVUXPVKFr0z?=
+ =?us-ascii?Q?0hdGHaj3O2ZzzlUy7QPE4XYfmsUAjzcq1cLKZ/xPN4bVLWse92G8qaB93TMA?=
+ =?us-ascii?Q?HT+qN2ZitcC9e/1JoXghLWLRl1UY+FBjCoZoMkBOx7u9SqQ4xEx//8GBQjgo?=
+ =?us-ascii?Q?IhJHheFOUZ8gp99pWdAU9FBCx+HlDsDQJvmPRprj5r+4XmKTF6TidLDxIeXS?=
+ =?us-ascii?Q?1nE5lR3ZgRX60dk8kGlQ9TySEhKxdQLgB1/okESfMNrAQ3/GyhbbRfXOmDg2?=
+ =?us-ascii?Q?oVga+/h2w7/Yfpc7P7GkChtuu/DMv62G0TiEvX1J10UiJj6gGVeT+g+ecSZM?=
+ =?us-ascii?Q?2+gh+8nI8L7kwtCaWJYR+Mg8pZ667iwAgtzCLvo2Q8V1seumNQpU+S4HJ0vf?=
+ =?us-ascii?Q?/XwfrbehFS4H0ZlcE7DblM6bZk7Xx74Y46uHrD9INRslujEFabcIxfuLpA8Z?=
+ =?us-ascii?Q?V9Jwn9+j5bQUCnt2ehSl+GSajyCP/h0XDcu7qT1zl9aWggpdfQn9PUN4puHA?=
+ =?us-ascii?Q?m6BCEkzeelV8ll4=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2025 11:43:14.9574
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 47cfdfba-95e7-49d7-819b-08dd71db8e05
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF000397B3.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6888
 
-On 4/2/25 12:10, Toke Høiland-Jørgensen wrote:
-> Pavel Begunkov <asml.silence@gmail.com> writes:
-> 
->> On 4/1/25 10:27, Toke Høiland-Jørgensen wrote:
->> ...
->>> Reported-by: Yonglong Liu <liuyonglong@huawei.com>
->>> Closes: https://lore.kernel.org/r/8743264a-9700-4227-a556-5f931c720211@huawei.com
->>> Fixes: ff7d6b27f894 ("page_pool: refurbish version of page_pool code")
->>> Suggested-by: Mina Almasry <almasrymina@google.com>
->>> Reviewed-by: Mina Almasry <almasrymina@google.com>
->>> Reviewed-by: Jesper Dangaard Brouer <hawk@kernel.org>
->>> Tested-by: Jesper Dangaard Brouer <hawk@kernel.org>
->>> Tested-by: Qiuling Ren <qren@redhat.com>
->>> Tested-by: Yuying Ma <yuma@redhat.com>
->>> Tested-by: Yonglong Liu <liuyonglong@huawei.com>
->>> Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
->>> Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
->>
->> I haven't looked into the bit carving, but the rest looks
->> good to me. A few nits below,
->>
->> ...
->>> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
->>> index 7745ad924ae2d801580a6760eba9393e1cf67b01..52b5ddab7ecb405066fd55b8d61abfd4186b9dcf 100644
->>> --- a/net/core/page_pool.c
->>> +++ b/net/core/page_pool.c
->>> @@ -227,6 +227,8 @@ static int page_pool_init(struct page_pool *pool,
->>>    			return -EINVAL;
->>>    
->>>    		pool->dma_map = true;
->>> +
->>> +		xa_init_flags(&pool->dma_mapped, XA_FLAGS_ALLOC1);
->>
->> nit: might be better to init/destroy unconditionally, it doesn't
->> allocate any memory.
-> 
-> Hmm, yeah, suppose both could work; I do think this makes it clearer
-> that it's tied to DMA mapping, but I won't insist. Not sure it's worth
-> respinning just for this, though (see below).
+This patchset contains two fixes for IPv6 multipath routing. See the
+commit messages for more details.
 
-That's a somewhat safer way, but yes, I agree, it's not worth of
-a respin.
+Ido Schimmel (2):
+  ipv6: Start path selection from the first nexthop
+  ipv6: Do not consider link down nexthops in path selection
 
-> 
->>>    	}
->>>    
->>>    	if (pool->slow.flags & PP_FLAG_DMA_SYNC_DEV) {
->>> @@ -276,9 +278,6 @@ static int page_pool_init(struct page_pool *pool,
->>>    	/* Driver calling page_pool_create() also call page_pool_destroy() */
->>>    	refcount_set(&pool->user_cnt, 1);
->>>    
->>> -	if (pool->dma_map)
->>> -		get_device(pool->p.dev);
->>> -
->>>    	if (pool->slow.flags & PP_FLAG_ALLOW_UNREADABLE_NETMEM) {
->>>    		netdev_assert_locked(pool->slow.netdev);
->>>    		rxq = __netif_get_rx_queue(pool->slow.netdev,
->>> @@ -322,7 +321,7 @@ static void page_pool_uninit(struct page_pool *pool)
->>>    	ptr_ring_cleanup(&pool->ring, NULL);
->>>    
->>>    	if (pool->dma_map)
->>> -		put_device(pool->p.dev);
->>> +		xa_destroy(&pool->dma_mapped);
->>>    
->>>    #ifdef CONFIG_PAGE_POOL_STATS
->>>    	if (!pool->system)
->>> @@ -463,13 +462,21 @@ page_pool_dma_sync_for_device(const struct page_pool *pool,
->>>    			      netmem_ref netmem,
->>>    			      u32 dma_sync_size)
->>>    {
->>> -	if (pool->dma_sync && dma_dev_need_sync(pool->p.dev))
->>> -		__page_pool_dma_sync_for_device(pool, netmem, dma_sync_size);
->>> +	if (READ_ONCE(pool->dma_sync) && dma_dev_need_sync(pool->p.dev)) {
->>> +		rcu_read_lock();
->>> +		/* re-check under rcu_read_lock() to sync with page_pool_scrub() */
->>> +		if (READ_ONCE(pool->dma_sync))
->>> +			__page_pool_dma_sync_for_device(pool, netmem,
->>> +							dma_sync_size);
->>> +		rcu_read_unlock();
->>> +	}
->>>    }
->>>    
->>> -static bool page_pool_dma_map(struct page_pool *pool, netmem_ref netmem)
->>> +static bool page_pool_dma_map(struct page_pool *pool, netmem_ref netmem, gfp_t gfp)
->>>    {
->>>    	dma_addr_t dma;
->>> +	int err;
->>> +	u32 id;
->>>    
->>>    	/* Setup DMA mapping: use 'struct page' area for storing DMA-addr
->>>    	 * since dma_addr_t can be either 32 or 64 bits and does not always fit
->>> @@ -483,15 +490,28 @@ static bool page_pool_dma_map(struct page_pool *pool, netmem_ref netmem)
->>>    	if (dma_mapping_error(pool->p.dev, dma))
->>>    		return false;
->>>    
->>> -	if (page_pool_set_dma_addr_netmem(netmem, dma))
->>> +	if (in_softirq())
->>> +		err = xa_alloc(&pool->dma_mapped, &id, netmem_to_page(netmem),
->>> +			       PP_DMA_INDEX_LIMIT, gfp);
->>> +	else
->>> +		err = xa_alloc_bh(&pool->dma_mapped, &id, netmem_to_page(netmem),
->>> +				  PP_DMA_INDEX_LIMIT, gfp);
->>
->> Is it an optimisation? bh disable should be reentrable and could
->> just be xa_alloc_bh().
-> 
-> Yeah, it's an optimisation. We do the same thing in
-> page_pool_recycle_in_ring(), so I just kept the same pattern.
-
-Got it
-
-> 
->> KERN_{NOTICE,INFO} Maybe?
-> 
-> Erm? Was this supposed to be part of the comment below?
-
-Oops, yes, that's for the warning below
-
->>> +	if (err) {
->>> +		WARN_ONCE(1, "couldn't track DMA mapping, please report to netdev@");
->>
->> That can happen with enough memory pressure, I don't think
->> it should be a warning. Maybe some pr_info?
-> 
-> So my reasoning here was that this code is only called in the alloc
-> path, so if we're under memory pressure, the page allocation itself
-> should fail before the xarray alloc does. And if it doesn't (i.e., if
-> the use of xarray itself causes allocation failures), we really want to
-> know about it so we can change things. Hence the loud warning.
-
-There is a gap between allocations, one doesn't guarantee
-another. I'd say the mental test here is whether we can reasonably
-cause it from user space (including by abusive users), because crash
-on warning setups exist, and it'll let you know about itself too
-loudly, when it could've been tolerated just fine. Not going to
-insist though.
-
-> @maintainers, given the comments above I'm not going to respin for this
-> unless you tell me to, but let me know! :)
-> 
-> -Toke
-> 
+ net/ipv6/route.c | 42 ++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 38 insertions(+), 4 deletions(-)
 
 -- 
-Pavel Begunkov
+2.49.0
 
 
