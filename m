@@ -1,75 +1,77 @@
-Return-Path: <netdev+bounces-178742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8B09A78A78
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 11:00:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 73931A78A7B
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 11:01:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5B023AA79B
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 08:59:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FB6B3B390C
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 08:59:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13FD2230BEB;
-	Wed,  2 Apr 2025 08:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B133C23496F;
+	Wed,  2 Apr 2025 08:59:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BaHdtBci"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ts9DatLm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A51E2101AE;
-	Wed,  2 Apr 2025 08:59:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE4C1514F6;
+	Wed,  2 Apr 2025 08:59:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743584352; cv=none; b=OA4VAoskO6ch8uWFLqBBuyBTiSDtjf6S20W9/T1qzE1aESbZ9AAd68u/g1+wXOZxYPvCLS/D8mSIAL67sZtP+QYTmi1luooMtP+dIwXGM25fuvhB0V2eIOEFlGmrq+0fftJWJY7IRqzkUKQ2W0/b5XUkX1er3nVnrDPklHxw6bw=
+	t=1743584359; cv=none; b=iK88nYM535IHQTc5NlX/Bel9Wc2ib/RqhTErFcLyTX76NggY8wZSmyspxqXjfcOaqmdEBIIhkkC27J0QKyDH2eX1SujLii4/AyXOq37fV+YMUXoqV6lTXOiYePTR9FY/Sozakk48WeBfWku+2Sa2tW/5FXuQ8SNMy3pqN0CqIZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743584352; c=relaxed/simple;
-	bh=FImPpNmyJS5Unwz1IzdBjZhRiBRNZqR4MSg4lmTUX5s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=D9Fczdyylqf1mbZA7WS4R9m3xRFBhxNXuF8hqwuS2thSZCu3D/ZEoOf0rS+989uESyUgSTlIj2CmeV3ZWD6qik17oqbdcLxFn5Qid/OSHFFQcBxU8f90/OnGPttJVZeRa798SJ/5BxxeqcGosV3lF5YRJy+b9IOCoQ1ceu5yaeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BaHdtBci; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1743584359; c=relaxed/simple;
+	bh=zvhBFDJD/NQkSOSdd1xN85qPAdYMy5AaqSXyRKKDQho=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hc+ZU9sEyU9TuPvEIhlBVErbpJc6amGjVSGXQn6/ooQd/PORXxtLMCi7I8uyK9HQ4B/64oqi7Eu8pRAak2NeVapzkUD45StbxkfOpcTNcNLKdhZWecxIJYRtnbSVZwZo1wZx3y2MrvKErV13JMZBLofXdLo7nrBGbTYv+WZuJv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ts9DatLm; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-223f4c06e9fso12765545ad.1;
-        Wed, 02 Apr 2025 01:59:09 -0700 (PDT)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-22438c356c8so124605365ad.1;
+        Wed, 02 Apr 2025 01:59:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743584349; x=1744189149; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ve0W8Sp53gZQY9zpfnHE+Bd23zrDJDsNySDJaZMcLUk=;
-        b=BaHdtBci3eZqgzE15qw4rX60w1IpHNI+QxlAldX3OHPZckmuPupu9LZ7OULBYCuu9F
-         YEeMIisPXC75La3gGIcGEaMJ16du6GnFlyQa3DGfp46dFy/VKPJXLCIwKgqu3rUiyWjK
-         B+ZVYZrfH3IEVGnAIS0aq+o60KE18WkwPmkavNoz1cDgXeU7uC1NH0u+FfGwv+ilnzjY
-         kGYraqiJpLFfZJJ+T2oYQnLMMeOkJ2xIw2gzqBP3IwFioTFPf0aFxLlFEstJcNrwZaxI
-         xCbsxumpj2/p5gtQGhspZQI+NvyQB/PcZANnlA42QDDcLmT9fI3iG+9fbMs8MRpS6vhU
-         /q4Q==
+        d=gmail.com; s=20230601; t=1743584354; x=1744189154; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jJPesJ9u7hxBIZyJ3YQPpH4TNpyDS3MW5BiB4rLe8ZA=;
+        b=Ts9DatLmavymJS8Z01KF8PmqVHVMjt8/GNMsFRjBb7q0Vx7AuCFFGaNiCaeNuj2Lnp
+         fd5C+Xc9hRILAUJoPpnRAwIzYmmeZvqDYMC+fdzEKrotr3Wzp1pjh6t9RXnhrcoh+ymG
+         YnlQPm0fEHDvVEvLQkTWlk0SPuMmfCzs3zeYyAQKQfRaJx95yd0n1iZM6Rps2g5kJaVi
+         s110KAffD2tPZA4SzffL2cSqooIX89TuUNl46u+MHMSuGS9QfasAYi8At8ib0HO+P1ct
+         nclhV+hNjg2mqK1tU+wq82Dpw3RlWlPTb+7uKR6FiHuh8n1d3F6iBJEP5CvbCs3JalM5
+         P5Ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743584349; x=1744189149;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ve0W8Sp53gZQY9zpfnHE+Bd23zrDJDsNySDJaZMcLUk=;
-        b=YiC/Jw+GcXdHEUDspqKL9hFTDfpZx92JxP3MR0+IequkvTDIiJ47GYboKFsQptAa9z
-         hA8traMTW/oIkB309puCJH1GqXjzo4qq7tj9CyI3iDwXP9jCWI6YAMgUA5A8VnuaEYBS
-         VpvUwiBL2JxCE5whx9pquVKb+SJY8WZusRZLQIydumvDjeCu+trNj1L80hb88d+/mgoT
-         aj1MlC/geSnmVtTwerCFKBT5jfjb2+3cS6g8eSM3FYMvsT8HJhsCZvcTAV6P8Wxj9oRU
-         P9ajYEoINeLbl3KZUw8Wimbri+wrz1sxEdNeNwXKVgOjM4NfDvlnPX+yqEmW8UTY60SJ
-         ZwZg==
-X-Forwarded-Encrypted: i=1; AJvYcCVbBONxZFvhBKjlu2fYNaC4t+nTO7xB3ku07FB/KjzgC/hGWL8GHeO53vGNEfIUue0oP4cABrPgJG1d@vger.kernel.org, AJvYcCXP65Zf2zam1TGKgCm1mIOjWkRP4vL+CmRF3GFQAk2DeWxC5bKcXaokExJJeHJttz/p0t4olGKCKq8zLF0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyoy0PQKr17fh0RB44nZ6t+jvvcyM4j9/QkPlSc7p60kAXfZ1R4
-	v5v+HBtox4yGmcr1EnBi/6wKItNLyoj+MzS3o9hbZ8Ls91OPQsTi
-X-Gm-Gg: ASbGncsIUV8/Ar94hBV9vxxLHXn/+MW7F+Nx9Fcqyw7hcHe7nhlunIXA0RkK8Q/F0hs
-	eGAaxUVYaHxQ2Yb6mF23DHezNhuGtBAcThAFwGnF1tmoqu4zhx3nD/NJvyiYl2f63GWG2/RLiWB
-	3A8rZMN2YizXInNWMPxCvnvriFMAkeUDWZW/mxlDwbl4cDjZH5hTuNJM2vR6AlRhIYwAKI/rvij
-	nc3mmfdjB2ynqSQ1D/iyRMy4TAYzCk0LjdPrvJNBbx/ywzPk/8JG9ZgZA0dEtuI7Ms66yycgGf9
-	3nDZIju8vbyqT5S7HEIX79Hw48jHRnfi7hash5YUbBO9Hnw4tl6b6wc4iGJS8D2E6/8/
-X-Google-Smtp-Source: AGHT+IFa3BpE//zwvFShApKvt+3e1p+ONEbWXM06PMfvHx2G5By1UCRT6z5CIwzVQTE8XmebbhJzDQ==
-X-Received: by 2002:a17:902:ced0:b0:215:6c5f:d142 with SMTP id d9443c01a7336-2296e396d8amr17787695ad.20.1743584348823;
-        Wed, 02 Apr 2025 01:59:08 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743584354; x=1744189154;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jJPesJ9u7hxBIZyJ3YQPpH4TNpyDS3MW5BiB4rLe8ZA=;
+        b=haturW3xJUSO4z/WTIlZt4C5qS9bd6fJCFIk32nJrdSIeOUjetmSCl2xWsT2UdKOfB
+         Wufp14R7sNFYUfq/MuoAveqPa+t1qZYuUwgSFSwEQDsM/1maVFB/tNQePQxr3Ushie81
+         7jLCOksd0VvtsU8yeNz1bDDejwcVjz2AXqVq83nvnQH+pOD7NgivQHvZW3+jMgcXbeYA
+         xFS99s3OuQtOjl0QzmYlkPO+C5WXsZHOiuM1SRePEHX3pT4HFZziMhxL2QZxoC4j7wRi
+         xfsWPKfoVOs00r/v3fizDxvX67E5TvRlKTQ35MRwiNR5RmoFd0kP8KHmGEEt09kkacpR
+         0Wog==
+X-Forwarded-Encrypted: i=1; AJvYcCUyALxS9/HPX7O3ox2EPqqy9WzizEaSdPpnB6dg6RQwiN+GOmDrxOpyJ2nDTM70aJ4reO99Mp2mLHGF@vger.kernel.org, AJvYcCWjzqhmGT41iY6xXjTPpV2aB0qsSkULfMfRoLTPvixSiMJTg/+NzVuz7zGiuUarq8b/XiNXVpnv@vger.kernel.org, AJvYcCXTU2SYnnfmeW6ya3Jlltkm3XRpO+GEcKh5op5Kvx2igVIbJPxxmorCuK3DZ+CXH0erL3KfGRRLLaVIS6Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzo27FVoHLs2L+kI5T9IlpPzcygwmkQ0DuiGPkgALLwrR4ZGUlP
+	XWS3WMD11K32tbXfSwGYAJt2BPtlGOGeUy6vZUHCk3EUq2YV3XNx
+X-Gm-Gg: ASbGnctiVadqanNxlhPsCTVPW918fDdCXgHYUrNdJP9uGoREjRD5+Nn/tFU+zeRLK+C
+	c7E3C7j6apnuIPb4I8nFHRW1XNa+APGtOwjthjunbJdDhwfggPmfEnjqSwOyxzJqQUPAESjlSkz
+	nOOGelwCcHHckEKVLpPoP+NSxfV3LayK+7fmQva8qoVPu0x/LFWv+dEWugQaYoOhUG/XiTPOkeY
+	gNQNGCoB6t1zalKNeF14KQlDd+oP/3EJgQMekrhmIrEG7Hzva5h3lL+yQWm5HxuJFpCaUbZK1MA
+	aRjP24MdjjUms5lHINkyJIx49LOZNUATl0h8z57CeAN5aNXvCwOLBXlVo99IDZhqmGLA
+X-Google-Smtp-Source: AGHT+IG0QOR/eegQ5jpsDzvfXIfWd3tr80odWWEuLDBHoglnXdXs+WCgec4VqfDfOBL7wHXaoEYSGQ==
+X-Received: by 2002:a17:902:e549:b0:223:fbc7:25f4 with SMTP id d9443c01a7336-2292f95d954mr223072675ad.14.1743584354350;
+        Wed, 02 Apr 2025 01:59:14 -0700 (PDT)
 Received: from mi-ThinkStation-K.mioffice.cn ([43.224.245.231])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291f1cf6dcsm102249465ad.113.2025.04.02.01.59.05
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291f1cf6dcsm102249465ad.113.2025.04.02.01.59.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Apr 2025 01:59:08 -0700 (PDT)
+        Wed, 02 Apr 2025 01:59:14 -0700 (PDT)
 From: Ying Lu <luying526@gmail.com>
 To: oneukum@suse.com,
 	andrew+netdev@lunn.ch,
@@ -81,11 +83,14 @@ Cc: netdev@vger.kernel.org,
 	linux-usb@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	gregkh@linuxfoundation.org,
-	Ying Lu <luying1@xiaomi.com>
-Subject: [PATCH v4 0/1] usbnet:fix NPE during rx_complete
-Date: Wed,  2 Apr 2025 16:58:58 +0800
-Message-ID: <cover.1743584159.git.luying1@xiaomi.com>
+	Ying Lu <luying1@xiaomi.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v4 1/1] usbnet:fix NPE during rx_complete
+Date: Wed,  2 Apr 2025 16:58:59 +0800
+Message-ID: <4c9ef2efaa07eb7f9a5042b74348a67e5a3a7aea.1743584159.git.luying1@xiaomi.com>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <cover.1743584159.git.luying1@xiaomi.com>
+References: <cover.1743584159.git.luying1@xiaomi.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,37 +102,50 @@ Content-Transfer-Encoding: 8bit
 
 From: Ying Lu <luying1@xiaomi.com>
 
-The patchset fix the issue caused by the following modifications:
-commit 04e906839a053f092ef53f4fb2d610983412b904
-(usbnet: fix cyclical race on disconnect with work queue)
+Missing usbnet_going_away Check in Critical Path.
+The usb_submit_urb function lacks a usbnet_going_away
+validation, whereas __usbnet_queue_skb includes this check.
 
-The issue:
-The usb_submit_urb function lacks a usbnet_going_away validation,
-whereas __usbnet_queue_skb includes this check. This inconsistency
-creates a race condition where: A URB request may succeed, but
-the corresponding SKB data fails to be queued.
+This inconsistency creates a race condition where:
+A URB request may succeed, but the corresponding SKB data
+fails to be queued.
 
-Subsequent processes (e.g., rx_complete → defer_bh → __skb_unlink(skb, list))
-attempt to access skb->next, triggering a NULL pointer dereference (Kernel Panic).
+Subsequent processes:
+(e.g., rx_complete → defer_bh → __skb_unlink(skb, list))
+attempt to access skb->next, triggering a NULL pointer
+dereference (Kernel Panic).
 
-Fix issue:
-adding the usbnet_going_away check in usb_submit_urb to synchronize the validation logic.
-
-Changes in v4
--use the correct "Cc:" tag format.
-
-Changes in v3
--use the correct "Fixes:" tag format.
-
-Changes in v2
--Use the formal name instead of an email alias.
-
-Ying Lu (1):
-  usbnet:fix NPE during rx_complete
-
+Fixes: 04e906839a05 ("usbnet: fix cyclical race on disconnect with work queue")
+Cc: stable@vger.kernel.org
+Signed-off-by: Ying Lu <luying1@xiaomi.com>
+---
  drivers/net/usb/usbnet.c | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
+index 44179f4e807f..5161bb5d824b 100644
+--- a/drivers/net/usb/usbnet.c
++++ b/drivers/net/usb/usbnet.c
+@@ -519,7 +519,8 @@ static int rx_submit (struct usbnet *dev, struct urb *urb, gfp_t flags)
+ 	    netif_device_present (dev->net) &&
+ 	    test_bit(EVENT_DEV_OPEN, &dev->flags) &&
+ 	    !test_bit (EVENT_RX_HALT, &dev->flags) &&
+-	    !test_bit (EVENT_DEV_ASLEEP, &dev->flags)) {
++	    !test_bit (EVENT_DEV_ASLEEP, &dev->flags) &&
++	    !usbnet_going_away(dev)) {
+ 		switch (retval = usb_submit_urb (urb, GFP_ATOMIC)) {
+ 		case -EPIPE:
+ 			usbnet_defer_kevent (dev, EVENT_RX_HALT);
+@@ -540,8 +541,7 @@ static int rx_submit (struct usbnet *dev, struct urb *urb, gfp_t flags)
+ 			tasklet_schedule (&dev->bh);
+ 			break;
+ 		case 0:
+-			if (!usbnet_going_away(dev))
+-				__usbnet_queue_skb(&dev->rxq, skb, rx_start);
++			__usbnet_queue_skb(&dev->rxq, skb, rx_start);
+ 		}
+ 	} else {
+ 		netif_dbg(dev, ifdown, dev->net, "rx: stopped\n");
 -- 
 2.49.0
 
