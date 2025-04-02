@@ -1,280 +1,166 @@
-Return-Path: <netdev+bounces-178858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F9E8A7938A
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 19:00:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41394A79391
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 19:02:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23E4A16E59D
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 17:00:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57C623ADA60
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 17:02:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7047318DF89;
-	Wed,  2 Apr 2025 17:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56BD199FA2;
+	Wed,  2 Apr 2025 17:02:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u7rjdukW"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="NYef/jus"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A66615350B
-	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 17:00:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2BB19A28D
+	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 17:02:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743613241; cv=none; b=k1dB7Mhb4F3fbq4JmNfo3sfTus97JzST8bfkVJJUMOcKMtpHHiylMcrqNBTdIdP5mkcjSw+KaNuu9z4yJrn9tjrZXXUEBMtH0O7NJLOX7pm1UUxVWAf3zJuvjVUg+sa9aNGsg9o+RCePf+gvDnnBHug1QFFFvVdI/wNUm6jwn2k=
+	t=1743613340; cv=none; b=innjV7Lj/ETGFqZoR6VgpG+/U/wAETZ+f+yNnMIH3gt4a2fUgMVAFDZ05JFxfuWF/zchhg7rGzBwJQI2In5SadhZDI1ft6IDQOHEQVIvdj4+q88FKZ/8ntspJNWs5g1FRN0FBFBvQA5NGVpAoCHHqQHVBIFdl1pTjqnrzG4Taaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743613241; c=relaxed/simple;
-	bh=if/TtBR+AlFwGU/YYCmLeS1V9RkcM4V+0zk3I3YaWFU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wb8XtdRQgDI+lHik1YDfry8xjXJq5KSL6U+L4BDWwTEwpcH5WAISMApSwAzCTBBQzlLAqY+Dbc0ZIaR7F7u7RdhZIpxCVaZT1KGwF7bwTEsvfwyHFWNykaNw7FCbSjr6Kjji78vXW54bf1U2dnox8Ty0BAImsJ5qEUYAD2DKju4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u7rjdukW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB53BC4CEDD;
-	Wed,  2 Apr 2025 17:00:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743613240;
-	bh=if/TtBR+AlFwGU/YYCmLeS1V9RkcM4V+0zk3I3YaWFU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=u7rjdukWSzUkakLjWo47ORoQkguMhEh2rF1SVIx1JEOZPrG0LH6u/eDCAZwddWQcB
-	 Kpc80b22IjIpBT0FrYEj5ZiY9MguMrFQkvBULKA3m5qRYlLopjx+DVw4yNIlwbq/BP
-	 SWoo6M9LPrulYwljujX3FDghxpXz7dfd3mN5cZI8XKGifFMLs9tL0acHuxFS3KT0eQ
-	 ff1k9MSYSAd7SjGyfzJteq76uRzk+IyOUb0wScTOSYyGI7a0EpnQ5TcMN9BqPo9UcP
-	 /wET+h/MMQbuIdU/orWCc1TM+8k8rW5Ub7payG3Bf3XUH6BB14GeiGlIjUEeqO3HjO
-	 T6WRGsvAW0P1g==
-Date: Wed, 2 Apr 2025 10:00:39 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "=?UTF-8?B?w4FsdmFybw==?= \"G. M.\"" <alvaro.gamez@hazent.com>
-Cc: netdev@vger.kernel.org, Radhey Shyam Pandey
- <radhey.shyam.pandey@amd.com>
-Subject: Re: Issue with AMD Xilinx AXI Ethernet (xilinx_axienet) on
- MicroBlaze: Packets only received after some buffer is full
-Message-ID: <20250402100039.4cae8073@kernel.org>
-In-Reply-To: <9a6e59fcc08cb1ada36aa01de6987ad9f6aaeaa4.camel@hazent.com>
-References: <9a6e59fcc08cb1ada36aa01de6987ad9f6aaeaa4.camel@hazent.com>
+	s=arc-20240116; t=1743613340; c=relaxed/simple;
+	bh=U7nGPWhznSJJshLcgPP3rxrOguZGpWuN7J34i3nO9yU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cqmA9PcP110RYdsn2i7bfaCO4QK3uz/HLxiprL1ZioXXTpKFGHHh8EJ6oAIt/9+k8a3bhOC1Vv4lo8cMMrR42cKEEqX/AIllLhFmkjxoCxZf6pSXAwtHuwTOZBNkSAztnVJ30D3JZN4HWDbajjiOz/jcLIVFPPk/Nl8t22u4WxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=NYef/jus; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=0pw8Fy8YqVSg6jRY5P9k4xRL+vea0CWDVg+v/OcYwcc=; b=NYef/jusGDxLoCWon9jx4Zgslg
+	GLzp9wsLH+7qFGkTk3FJWwE86BzNEhQ0Vcq6jJWBUbAIeLRNDO5ng1DbgkScrofhR8FkrTQj2dbtp
+	5XwyvSjS8NUVzuvfB56VKrscv6SEwxrEAhL87WIthCxWGQd47cvCAL2uqS45BB6UZVHObVN2pwgYN
+	4Vm4JLZvkuT5BR6Djny+w2Tjp0zxIe0FKGcTzzx8invefIf0n/FsIyGDir94WSuNbSFf2kuhoeU8+
+	bsj8oW840wbDKraUSc9Nld7L6pFcDbPrMVdVCkZ0/NDz5zxfVg8ne4JOEd4usBQPLoZJ1UMrzXSzJ
+	bdIJj3+g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41948)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u01TZ-0007vT-2z;
+	Wed, 02 Apr 2025 18:02:06 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u01TV-0003rm-2i;
+	Wed, 02 Apr 2025 18:02:01 +0100
+Date: Wed, 2 Apr 2025 18:02:01 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Wei Fang <wei.fang@nxp.com>
+Subject: Re: [PATCH v2 net 2/2] net: phy: allow MDIO bus PM ops to start/stop
+ state machine for phylink-controlled PHY
+Message-ID: <Z-1tiW9zjcoFkhwc@shell.armlinux.org.uk>
+References: <20250402150859.1365568-1-vladimir.oltean@nxp.com>
+ <20250402150859.1365568-2-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250402150859.1365568-2-vladimir.oltean@nxp.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-+CC Radhey, maintainer of axienet
+On Wed, Apr 02, 2025 at 06:08:59PM +0300, Vladimir Oltean wrote:
+> DSA has 2 kinds of drivers:
+> 
+> 1. Those who call dsa_switch_suspend() and dsa_switch_resume() from
+>    their device PM ops: qca8k-8xxx, bcm_sf2, microchip ksz
+> 2. Those who don't: all others. The above methods should be optional.
+> 
+> For type 1, dsa_switch_suspend() calls dsa_user_suspend() -> phylink_stop(),
+> and dsa_switch_resume() calls dsa_user_resume() -> phylink_start().
+> These seem good candidates for setting mac_managed_pm = true because
+> that is essentially its definition, but that does not seem to be the
+> biggest problem for now, and is not what this change focuses on.
+> 
+> Talking strictly about the 2nd category of drivers here, I have noticed
+> that these also trigger the
+> 
+> 	WARN_ON(phydev->state != PHY_HALTED && phydev->state != PHY_READY &&
+> 		phydev->state != PHY_UP);
+> 
+> from mdio_bus_phy_resume(), because the PHY state machine is running.
+> 
+> It's running as a result of a previous dsa_user_open() -> ... ->
+> phylink_start() -> phy_start(), and AFAICS, mdio_bus_phy_suspend() was
+> supposed to have called phy_stop_machine(), but it didn't. So this is
+> why the PHY is in state PHY_NOLINK by the time mdio_bus_phy_resume()
+> runs.
+> 
+> mdio_bus_phy_suspend() did not call phy_stop_machine() because for
+> phylink, the phydev->adjust_link function pointer is NULL. This seems a
+> technicality introduced by commit fddd91016d16 ("phylib: fix PAL state
+> machine restart on resume"). That commit was written before phylink
+> existed, and was intended to avoid crashing with consumer drivers which
+> don't use the PHY state machine - phylink does.
 
-On Tue, 01 Apr 2025 12:52:15 +0200 =C3=81lvaro "G. M." wrote:
-> Hello,
->=20
-> I have a custom PCB board fitting a AMD/Xilinx Artix 7 FPGA with a Microb=
-laze design
-> inside that uses Xilinx' AXI 1G/2.5G Ethernet Subsystem connected via DMA.
->=20
-> This board and HDL design have been tested and in production since 2016 u=
-sing
-> kernel 4.4.43 without any issue. The hardware part of the ethernet is DP8=
-3620
-> running in 100base-FX mode, which back in the day required a small patch =
-to
-> dp83848.c from myself that has been in the kernel since.
->=20
-> I am now trying to upgrade to a recent kernel (v6.13) and I'm facing some=
- strange
-> behavior of the ethernet system. The most probable cause is a misconfigur=
-ation
-> on my part of the device tree, since things have changed since then and I=
-'ve found
-> the device tree documentation confusing, but I can't discard some kind of=
- bug,
-> for I have never seem something similar to this.
->=20
-> Relevant boot messages:
->=20
-> xilinx_axienet 40c00000.ethernet eth0: PHY [axienet-40c00000:01] driver [=
-TI DP83620 10/100 Mbps PHY] (irq=3DPOLL)
-> xilinx_axienet 40c00000.ethernet eth0: configuring for phy/mii link mode
-> xilinx_axienet 40c00000.ethernet eth0: Link is Up - 100Mbps/Half - flow c=
-ontrol off
->=20
-> Now, transmission from the Microblaze seems to work fine, but reception h=
-owever does not.
-> I run tcpdump on the Microblaze and I can see that there's some kind of b=
-uffering occuring,
-> as a single ARP packet sent from my directly connected computer won't rea=
-ch tcpdump unless
-> I send also a big chunk of data via, for example, multicast, or after eno=
-ugh time of ping flooding.
->=20
-> It's not however a matter of sending a big chunk of data at the beginning=
-, it seems like the
-> buffer empties once full and the process starts back again, so a single p=
-ing packet won't be
-> received after the buffer has emptied.
->=20
-> I can see that interrupts increase, but not as fast as they occur when us=
-ing old kernel.
-> For example, in the ping case, kernel 4.43 will notify that there was an =
-interrupt
-> for each single ping packet received with ping -c 1 (so no coalescing she=
-nanigans can occur),
-> but the new kernel won't show any increase in the number of interrupts, s=
-o it means
-> that the DMA core is either not generating the irq for some reason or isn=
-'t even
-> executing the DMA transfer at all.
->=20
-> Output packets, however, do seem to be sent expeditely and received in my=
- working computer
-> as soon as I sent them from the Microblaze.
->=20
-> I guess I may have made some mistake in upgrading the DTS to the new form=
-at, although
-> I've tried the two available methods (either setting node "dmas" or using=
- "axistream-connected"
-> property) and both methods result in the same boot messages and behavior.
->=20
-> By crafting properly sized UDP multicast packets (so I don't have to rely=
- on ARP which isn't
-> working due to timeouts), I've been able to determine I need to send 1310=
-72 bytes before
-> reception can truly occur, although it somehow seems like sending multica=
-st UDP
-> packets won't trigger receiving IRQ unless I have a specific UDP listener=
- program running on
-> the Microblaze. I'm quite confused about that too.
->=20
-> So please, if anyone could inspect the DTS for me and/or guide me on how =
-to debug this, I'd be grateful.
->=20
-> These are the relevant parts of the DTS for kernel 6.13, which I've hand =
-crafted with help
-> from Documentation/devicetree/bindings and peeking at xilinx_axienet_main=
-.c:
->=20
->=20
-> axi_ethernet_0_dma: dma@41e00000 {
-> 	compatible =3D "xlnx,axi-dma-1.00.a";
-> 	#dma-cells =3D <1>;
-> 	reg =3D <0x41e00000 0x10000>;
-> 	interrupt-parent =3D <&microblaze_0_axi_intc>;
-> 	interrupts =3D <7 1 8 1>;
-> 	xlnx,addrwidth =3D <32>;
-> 	xlnx,datawidth =3D <32>;
-> 	xlnx,include-sg;
-> 	xlnx,sg-length-width =3D <16>;
-> 	xlnx,include-dre =3D <1>;
-> 	xlnx,axistream-connected =3D <1>;
-> 	xlnx,irq-delay =3D <1>;
-> 	dma-channels =3D <2>;
-> 	clock-names =3D "s_axi_lite_aclk", "m_axi_mm2s_aclk", "m_axi_s2mm_aclk",=
- "m_axi_sg_aclk";
-> 	clocks =3D <&clk_bus_0>, <&clk_bus_0>, <&clk_bus_0>, <&clk_bus_0>;
-> 	dma-channel@41e00000 {
-> 		compatible =3D "xlnx,axi-dma-mm2s-channel";
-> 		xlnx,include-dre =3D <1>;
-> 		interrupts =3D <7 1>;
-> 		xlnx,datawidth =3D <32>;
-> 	};
-> 	dma-channel@41e00030 {
-> 		compatible =3D "xlnx,axi-dma-s2mm-channel";
-> 		xlnx,include-dre =3D <1>;
-> 		interrupts =3D <8 1>;
-> 		xlnx,datawidth =3D <32>;
-> 	};
-> };
-> axi_ethernet_eth: ethernet@40c00000 {
-> 	compatible =3D "xlnx,axi-ethernet-1.00.a";
-> 	reg =3D <0x40c00000 0x40000>, <0x41e00000 0x10000>;
-> 	phy-handle =3D <&phy1>;
-> 	xlnx,rxmem =3D <0x1000>;
-> 	phy-mode =3D "mii";
-> 	xlnx,txcsum =3D <0x2>;
-> 	xlnx,rxcsum =3D <0x2>;
-> 	clock-names =3D "s_axi_lite_clk", "axis_clk", "ref_clk", "mgt_clk";
-> 	clocks =3D <&clk_bus_0>, <&clk_bus_0>, <&clk_bus_0>, <&clk_bus_0>;
-> /*	axistream-connected =3D <&axi_ethernet_0_dma>; */
-> 	dmas =3D <&axi_ethernet_0_dma 0>, <&axi_ethernet_0_dma 1>;
-> 	dma-names =3D "tx_chan0", "rx_chan0";
-> 	mdio {
-> 		#address-cells =3D <1>;
-> 		#size-cells =3D <0>;
-> 		phy1: ethernet-phy@1 {
-> 			device_type =3D "ethernet-phy";
-> 			reg =3D <1>;
-> 		};
-> 	};
-> };
->=20
->=20
-> And these are same parts of the DTS for kernel 4.43 which worked fine.
-> These were created with help from Xilinx tools.
->=20
-> axi_ethernet_0_dma: dma@41e00000 {
-> 	#dma-cells =3D <1>;
-> 	compatible =3D "xlnx,axi-dma-1.00.a";
-> 	interrupt-parent =3D <&microblaze_0_axi_intc>;
-> 	interrupts =3D <7 1 8 1>;
-> 	reg =3D <0x41e00000 0x10000>;
-> 	xlnx,include-sg ;
-> 	dma-channel@41e00000 {
-> 		compatible =3D "xlnx,axi-dma-mm2s-channel";
-> 		dma-channels =3D <0x1>;
-> 		interrupts =3D <7 1>;
-> 		xlnx,datawidth =3D <0x8>;
-> 		xlnx,device-id =3D <0x0>;
-> 	};
-> 	dma-channel@41e00030 {
-> 		compatible =3D "xlnx,axi-dma-s2mm-channel";
-> 		dma-channels =3D <0x1>;
-> 		interrupts =3D <8 1>;
-> 		xlnx,datawidth =3D <0x8>;
-> 		xlnx,device-id =3D <0x0>;
-> 	};
-> };
-> axi_ethernet_eth: ethernet@40c00000 {
-> 	axistream-connected =3D <&axi_ethernet_0_dma>;
-> 	axistream-control-connected =3D <&axi_ethernet_0_dma>;
-> 	clock-frequency =3D <83250000>;
-> 	clocks =3D <&clk_bus_0>;
-> 	compatible =3D "xlnx,axi-ethernet-1.00.a";
-> 	device_type =3D "network";
-> 	interrupt-parent =3D <&microblaze_0_axi_intc>;
-> 	interrupts =3D <3 0>;
-> 	phy-mode =3D "mii";
-> 	reg =3D <0x40c00000 0x40000>;
-> 	xlnx =3D <0x0>;
-> 	xlnx,axiliteclkrate =3D <0x0>;
-> 	xlnx,axisclkrate =3D <0x0>;
-> 	xlnx,gt-type =3D <0x0>;
-> 	xlnx,gtinex =3D <0x0>;
-> 	xlnx,phy-type =3D <0x0>;
-> 	xlnx,phyaddr =3D <0x1>;
-> 	xlnx,rable =3D <0x0>;
-> 	xlnx,rxcsum =3D <0x2>;
-> 	xlnx,rxlane0-placement =3D <0x0>;
-> 	xlnx,rxlane1-placement =3D <0x0>;
-> 	xlnx,rxmem =3D <0x1000>;
-> 	xlnx,rxnibblebitslice0used =3D <0x1>;
-> 	xlnx,tx-in-upper-nibble =3D <0x1>;
-> 	xlnx,txcsum =3D <0x2>;
-> 	xlnx,txlane0-placement =3D <0x0>;
-> 	xlnx,txlane1-placement =3D <0x0>;
-> 	phy-handle =3D <&phy0>;
-> 	axi_ethernetlite_0_mdio: mdio {
-> 		#address-cells =3D <1>;
-> 		#size-cells =3D <0>;
-> 		phy0: phy@1 {
-> 			device_type =3D "ethernet-phy";
-> 			reg =3D <1>;
-> 			ti,rx-internal-delay =3D <7>;
-> 			ti,tx-internal-delay =3D <7>;
-> 			ti,fifo-depth =3D <1>;
-> 		};
-> 	};
-> };
->=20
->=20
->=20
-> Best regards,
->=20
+I think this is a historical bug (as I believe I previously mentioned,
+suspend/resume support wasn't tested with phylink as none of the
+platforms it was developed against had suspend/resume support.)
 
+phylink should be no differnet from a MAC that uses phylib and supplies
+an adjust_link function. The exception is when mac_managed_pm has been
+set.
+
+Reading commit fba863b81604 ("net: phy: make PHY PM ops a no-op if MAC
+driver manages PHY PM") which introduced mac_managed_pm, this flag
+should be set whenever a MAC driver causes phy_start() to be called
+via its resume path. That means for a phylink using MAC driver calling
+either phylink_start() or phylink_resume() from its resume method.
+
+Setting that flag will have the effect that, in those cases,
+mdio_bus_phy_suspend() and mdio_bus_phy_resume() become no-ops.
+
+Now, if the MAC driver does not call either of those two phylink
+functions, then mac_managed_pm should not be set, and the mdio bus
+PHY suspend/resume should happen in full - because a phylink driver
+should be no different from a phylib driver that's supplied an
+adjust_link callback.
+
+So yes, I think the principle of your patch is correct, and I agree
+that this is needed (just coming to the same conclusion from a
+different direction.)
+
+> +static bool phy_uses_state_machine(struct phy_device *phydev)
+> +{
+> +	if (phydev->phy_link_change == phy_link_change)
+> +		return phydev->attached_dev && phydev->adjust_link;
+> +
+> +	return phydev->phy_link_change;
+
+I think this can be simplified to:
+
+	return phydev->phy_link_change != phy_link_change ||
+	       (phydev->attached_dev && phydev->adjust_link);
+
+since phydev->phy_link_change should never be NULL (the hook exists
+specifically for phylink's usage, and is either set to phy_link_change
+or phylink_phy_change.)
+
+If it were to be NULL, then anything which calls phy_link_(up|down)
+will oops the kernel - not just the state machine, but cable testing,
+loopback, and changing EEE settings.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
