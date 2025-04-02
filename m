@@ -1,133 +1,157 @@
-Return-Path: <netdev+bounces-178726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B126A7878A
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 07:17:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F20EA787A1
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 07:43:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2513516E761
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 05:17:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B86A7A2B25
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 05:42:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E534A207E05;
-	Wed,  2 Apr 2025 05:17:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23AEB230BE3;
+	Wed,  2 Apr 2025 05:43:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Vw1LlETx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m5TNYqzv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 046052F4A
-	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 05:17:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E7302E3360;
+	Wed,  2 Apr 2025 05:43:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743571036; cv=none; b=nnoNEt5gG8Yat3Kk0Az0RrdLAS6r07hSolKeuQUhlGQdl5Nu6B5lKVZIgBvmvDBeu+ca5YVL1B7ei/A80eImNby1waofOtye+vMmgusurtLB90L/4M/ZbdpO2BnqJbbjS3AikQoh79rNp1Ipa2R6UWkEBpL7jSkVxl2tcwm63L0=
+	t=1743572619; cv=none; b=tHKTWN9TebDnn3fkcLldIld0+bw3vhHtOn3OqjdnGe1mCMt/tfjKxLIMI/O/dPKReamlKoJl56aqH9lzqZCHZzTVcPeRijmzWliNUKukMf+9N/xrLTfwEpITCamqDoTfbLJaqE8oZ8yfF8QOMi5HVarXaFMnia2o0Z/5YvgnehA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743571036; c=relaxed/simple;
-	bh=f/mTU65/JW9fjgOXPQIjFFmmS2JfKwOh/I4on60hsoU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qmvir75FJdRe71KKy9DpA69WD9WyTUz7AKOa5c/YFg9AK2VNZhsi7M0Dd2If0k6ZP53cNaI0CurOrimrwvA7MpGiJU9VZudh55ECgG8Hkx4KdSo7qMl2hdK2PenMWx411Q4EGaCcxwuDgwkhdLgQitRjWgATlvoQoykF4TXw/94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Vw1LlETx; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1743571035; x=1775107035;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=f/mTU65/JW9fjgOXPQIjFFmmS2JfKwOh/I4on60hsoU=;
-  b=Vw1LlETxdJKQ3oOb0zhdL+s2gor9ELHiyNHh7Me3HUcDp2vWCR0/72aC
-   yXldogokkYWgrDIHpJ/wY53eIXf/hZg2o+GoF2GEQVo2lP+GuL37NgNNO
-   6ScgyGEqc063I9Twg3HtBJUt0XpRLTlSfMQ61h80L/lOSIyQY/f4bxvM+
-   Zf2noYxfOBf/gYHixKMsT78XxtQt/dp//A4uGhGAMQ7p7SqHmrlwxYJOt
-   ufIiHRhXFxdvxgs/5hjzIgyuM1BQY5NZYtXhVq7USHVhXCUG8zWL9LnX8
-   JOO9ue4ANbQastp0guwOdRHc0iy5MoH90ggs5bGu+ASxw4BKYmfamP/JE
-   w==;
-X-CSE-ConnectionGUID: yIbMmB9BQyODfUhOSl0bVw==
-X-CSE-MsgGUID: kF8XP3yGRtKEaZoxAQjQHg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11391"; a="67386112"
-X-IronPort-AV: E=Sophos;i="6.14,295,1736841600"; 
-   d="scan'208";a="67386112"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2025 22:17:14 -0700
-X-CSE-ConnectionGUID: Cmg4GD9TSx21Zqm5UlB1ig==
-X-CSE-MsgGUID: t3wdfDJASGqBUEjh59bLLw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,295,1736841600"; 
-   d="scan'208";a="131449190"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2025 22:17:12 -0700
-Date: Wed, 2 Apr 2025 07:17:00 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: edward.cree@amd.com
-Cc: linux-net-drivers@amd.com, davem@davemloft.net, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
-	andrew+netdev@lunn.ch, Edward Cree <ecree.xilinx@gmail.com>,
-	netdev@vger.kernel.org, Kyungwook Boo <bookyungwook@gmail.com>
-Subject: Re: [PATCH net] sfc: fix NULL dereferences in
- ef100_process_design_param()
-Message-ID: <Z+zITLJ4wB2Mhk8h@mev-dev.igk.intel.com>
-References: <20250401225439.2401047-1-edward.cree@amd.com>
+	s=arc-20240116; t=1743572619; c=relaxed/simple;
+	bh=4YodOXIyddgrUGXCDpWh7pKVlP0DqqsIUu4EW1rqHZU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Njtdr4wO6l2X5cIMrR1kBjL544GlH2VfxUQQBjiuui88RaJmnrlPAVAsc0sn0SL6AtAOAdX64dYUPfKBHcljXC28cinuPT70ER05z01ELncn2LHB5fqkbKvWmZCaMygnjwaWh6DAnCHxeELLutcBFrpqAkbKFTJEfsgRdD+y/5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m5TNYqzv; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-301e05b90caso10842925a91.2;
+        Tue, 01 Apr 2025 22:43:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743572617; x=1744177417; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7oMFt6rTiybYoRdpooKvYV5UYutJybr7cfusGu3htIA=;
+        b=m5TNYqzv15bXRjG04zu1R2qoTvZYtpwYNcXckGw0dyM/Z4WngShcMCJQqAE9kdvh/G
+         7+4N9p1JMXKm70KdpvUuhu6WE8+qReIGsRS3RaPO1JF6cgCF/lG6uqo4Q3VfzFCglVIH
+         uWKdP69QgSrh6SK8N+8HGB+oeONjfWCAxdG1+EBho7LhJzK6UpX1mO7lGqkvvBnLkqmp
+         DwzJ8srdFT54P+y/IaXBXKDi5qDjYv+vPAJ0Um1vV2kKVG+rPMvO1e8HNukKEqXVj2JY
+         pbkn4fZT7rTAcL2AZESx/gNMtBfyU0U7Cvev+AJGbueHsasaRRKnnJAkZCMYXwUXndI2
+         cdIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743572617; x=1744177417;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7oMFt6rTiybYoRdpooKvYV5UYutJybr7cfusGu3htIA=;
+        b=GBn0RZbtb9YoXmPOfJfGGQqX7YsXb2ERUYgJo7DhB8RLEM7p1Bzz/KUiOrWSPxaIc4
+         3lFRHbotz6wSByjhlsTEg3X/8wejEElSygyQAfNsUEs/7KFJrZzXe8REujHEq4+Pex5R
+         5ix7qDnQCboX0+DAwxHIqzMvGthLoGTqAWT6FKqIpUM0f8yTQZGoEZXgrbUw1G7U8TPT
+         PKf0a3DmyCM2OAgXSurJZ+zn27tYlW6e7n8B34DtOdeSGcXWiy/C2W23NhYSXsgebIl2
+         t5UQgbntFJqmLe1pAduW23DZB5R2XNe1ZYLSf2knGSGFUMIVyxR7iK6Tbz/5tkcztpUA
+         mfww==
+X-Forwarded-Encrypted: i=1; AJvYcCUcTEdXZJs7aRvfDEceIazcDU5duSe1oWZH0OZc4HdyrmSSaumNGWh8LrWLMX/9DHuRIsCLswme@vger.kernel.org, AJvYcCVSJDyxtnKLIQZww9YB+zsPoKs1bzibfsIiXXGMIk2iBBOMHaay/+nVhiHIgKAH1IBGHpHYIT9TinoUANT3@vger.kernel.org, AJvYcCWKRtrDEE6A2RUJPM+OB3llapuFT2GfKLb6K8ZoFbId+ZO3gTuQ0YGGH4pqmp12VNLZ8w4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSTt+jrj5K0hUAZWI5bcxGrbT1iUvMRffJSSO1uXzBGKdG4fPz
+	9QpxyXHJrOm4Hqu165gOy4Rse/KJQ21iIq6aPF3Hf2cIPU07tu/a
+X-Gm-Gg: ASbGncul4SMwqY2BSF+CBfJp491qzk9J24GAeWyb2BiW8hKuGIDALhGkEngne8ErqNp
+	ov064JbMbA7J7i5Oe4i2kJqP/2yr0tnBCPSNxCNs2h6BHL0PV/OfXOlnSWcTolGs5d/zEHbd7BN
+	hEBLSUFsOZ4+Lh/7DKhssTe/SW9MW9h7YQaVEs1hObiugXWCuqu5+nAnQCUcZrHJljeEMkphlrQ
+	hic2PZS0EZFqAtcZHg++YOlqg4jzy3dchqcgX2bvtcAwHJf82XeaW8qDWFr62hIthQ6SXTcuGXO
+	oRovcVCsUTpH0LREctnINn3/nUwpc/XoDJ+s+5zxh31ReYa7ONJlBKTsVZ4Z
+X-Google-Smtp-Source: AGHT+IEic+6AY+ZdBrLSKJCMvjDVGOhMYUP1QxYWYvLdMiiVD00LmEfJ4lEnY8i5M2nghj2SBWMTbA==
+X-Received: by 2002:a17:90b:5210:b0:2ee:9d49:3ae6 with SMTP id 98e67ed59e1d1-30531f93127mr25734500a91.10.1743572616792;
+        Tue, 01 Apr 2025 22:43:36 -0700 (PDT)
+Received: from minh.192.168.1.1 ([2001:ee0:4f4e:bd30:194b:b252:cf33:1fe5])
+        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-3056f83c93asm720529a91.14.2025.04.01.22.43.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Apr 2025 22:43:36 -0700 (PDT)
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+To: virtualization@lists.linux.dev
+Cc: "Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Bui Quang Minh <minhquangbui99@gmail.com>
+Subject: [PATCH] virtio-net: disable delayed refill when setting up xdp
+Date: Wed,  2 Apr 2025 12:42:10 +0700
+Message-ID: <20250402054210.67623-1-minhquangbui99@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250401225439.2401047-1-edward.cree@amd.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 01, 2025 at 11:54:39PM +0100, edward.cree@amd.com wrote:
-> From: Edward Cree <ecree.xilinx@gmail.com>
-> 
-> Since cited commit, ef100_probe_main() and hence also
->  ef100_check_design_params() run before efx->net_dev is created;
->  consequently, we cannot netif_set_tso_max_size() or _segs() at this
->  point.
-> Move those netif calls to ef100_probe_netdev(), and also replace
->  netif_err within the design params code with pci_err.
-> 
-> Reported-by: Kyungwook Boo <bookyungwook@gmail.com>
-> Fixes: 98ff4c7c8ac7 ("sfc: Separate netdev probe/remove from PCI probe/remove")
-> Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
-> ---
->  drivers/net/ethernet/sfc/ef100_netdev.c |  6 ++--
->  drivers/net/ethernet/sfc/ef100_nic.c    | 47 +++++++++++--------------
->  2 files changed, 24 insertions(+), 29 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/sfc/ef100_netdev.c b/drivers/net/ethernet/sfc/ef100_netdev.c
-> index d941f073f1eb..3a06e3b1bd6b 100644
-> --- a/drivers/net/ethernet/sfc/ef100_netdev.c
-> +++ b/drivers/net/ethernet/sfc/ef100_netdev.c
-> @@ -450,8 +450,9 @@ int ef100_probe_netdev(struct efx_probe_data *probe_data)
->  	net_dev->hw_enc_features |= efx->type->offload_features;
->  	net_dev->vlan_features |= NETIF_F_HW_CSUM | NETIF_F_SG |
->  				  NETIF_F_HIGHDMA | NETIF_F_ALL_TSO;
-> -	netif_set_tso_max_segs(net_dev,
-> -			       ESE_EF100_DP_GZ_TSO_MAX_HDR_NUM_SEGS_DEFAULT);
-> +	nic_data = efx->nic_data;
-> +	netif_set_tso_max_size(efx->net_dev, nic_data->tso_max_payload_len);
-> +	netif_set_tso_max_segs(efx->net_dev, nic_data->tso_max_payload_num_segs);
+When setting up XDP for a running interface, we call napi_disable() on
+the receive queue's napi. In delayed refill_work, it also calls
+napi_disable() on the receive queue's napi. This can leads to deadlock
+when napi_disable() is called on an already disabled napi. This commit
+fixes this by disabling future and cancelling all inflight delayed
+refill works before calling napi_disabled() in virtnet_xdp_set.
 
-Is it fine to drop default value for max segs? Previously if somehow
-this value wasn't read from HW it was set to default, now it will be 0.
+Fixes: 4941d472bf95 ("virtio-net: do not reset during XDP set")
+Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+---
+ drivers/net/virtio_net.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-At the beggining of ef100_probe_main() default values for nic_data are
-set. Maybe it is worth to set also this default for max segs?
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 7e4617216a4b..33406d59efe2 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -5956,6 +5956,15 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+ 	if (!prog && !old_prog)
+ 		return 0;
+ 
++	/*
++	 * Make sure refill_work does not run concurrently to
++	 * avoid napi_disable race which leads to deadlock.
++	 */
++	if (netif_running(dev)) {
++		disable_delayed_refill(vi);
++		cancel_delayed_work_sync(&vi->refill);
++	}
++
+ 	if (prog)
+ 		bpf_prog_add(prog, vi->max_queue_pairs - 1);
+ 
+@@ -6004,6 +6013,8 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+ 			virtnet_napi_tx_enable(&vi->sq[i]);
+ 		}
+ 	}
++	if (netif_running(dev))
++		enable_delayed_refill(vi);
+ 
+ 	return 0;
+ 
+@@ -6019,6 +6030,7 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+ 			virtnet_napi_enable(&vi->rq[i]);
+ 			virtnet_napi_tx_enable(&vi->sq[i]);
+ 		}
++		enable_delayed_refill(vi);
+ 	}
+ 	if (prog)
+ 		bpf_prog_sub(prog, vi->max_queue_pairs - 1);
+-- 
+2.43.0
 
->  
->  	rc = efx_ef100_init_datapath_caps(efx);
->  	if (rc < 0)
-> @@ -477,7 +478,6 @@ int ef100_probe_netdev(struct efx_probe_data *probe_data)
->  	/* Don't fail init if RSS setup doesn't work. */
->  	efx_mcdi_push_default_indir_table(efx, efx->n_rx_channels);
->  
-> -	nic_data = efx->nic_data;
->  	rc = ef100_get_mac_address(efx, net_dev->perm_addr, CLIENT_HANDLE_SELF,
->  				   efx->type->is_vf);
->  	if (rc)
-
-[...]
 
