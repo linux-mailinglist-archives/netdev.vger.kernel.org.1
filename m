@@ -1,252 +1,291 @@
-Return-Path: <netdev+bounces-178706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16FCBA7857E
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 02:15:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEE55A78592
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 02:21:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8513C1892D0C
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 00:15:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C7653AF66D
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 00:21:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18EB3802;
-	Wed,  2 Apr 2025 00:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A9EA1362;
+	Wed,  2 Apr 2025 00:21:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=seco.com header.i=@seco.com header.b="OqdsO7vo";
-	dkim=pass (2048-bit key) header.d=seco.com header.i=@seco.com header.b="OqdsO7vo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kqwk6oE6"
 X-Original-To: netdev@vger.kernel.org
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11021089.outbound.protection.outlook.com [40.107.130.89])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B8E1DFF0;
-	Wed,  2 Apr 2025 00:14:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.89
-ARC-Seal:i=3; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743552896; cv=fail; b=sOMlDOVDMUPELYIojeQDm69aFgAmpS8r/2UWJAFnjsoXPDfP1zPcKm/IvWkcpZCHxPXLly9c+5MW+qqicYUl83zZlMO9Mq6oK9XVmDVjgypNeFnYS2zG7Y3/3/VOLxGcDlBWKUxXIRzHEWbhZ/YXQZW5vGIhLiBtuE5KTQR5AYQ=
-ARC-Message-Signature:i=3; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743552896; c=relaxed/simple;
-	bh=uvqAhcYYDoKWo1DGzqv5iDWIE9DIE/kbOQNrELsZlHk=;
-	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=MVBdLZZS7Wrw484FK+HP6YFWFdrHHrbArTRQ4LTzaL8n9g+Ya4GYT6N3qv3xmQhYCl/muQO/1e3LbVsZXlI9lbsZmmmCGBv73FlJuzAHD7IvobUM5yjQ0P2RKmr94Y9T84VuA7X+8gQvhlvhcPn6O4VTut78herGdRZEe4BngoY=
-ARC-Authentication-Results:i=3; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=seco.com; spf=pass smtp.mailfrom=seco.com; dkim=pass (2048-bit key) header.d=seco.com header.i=@seco.com header.b=OqdsO7vo; dkim=pass (2048-bit key) header.d=seco.com header.i=@seco.com header.b=OqdsO7vo; arc=fail smtp.client-ip=40.107.130.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=seco.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seco.com
-ARC-Seal: i=2; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=pass;
- b=oXXaetSTy1VaQTStd8+iLk7FcSv7io8Fp17FhGmc5TzBSybRx4X21eDHx5+9CC3GunvjCpSFnx3Way2L2uivivMmO/2i+nXKV3QtyUiYUxBjvMYYfawP9KTogXI0Lyuh29+tepGiebmc20v9HwQ6kXa+qbo14k4TFOqd2XLjzlQuagwtYTQ09NhwyUuyoLCXuBZer8mO5HnVDgntRJYUnnL6Oo5Ma0o1TkdUP2ZCMn7zs2dj+C+ZLM49kdvK1Hp76cJ47iUUJRKBO6eDVzU7CzQ7T2VF8kb59/nelChJhkgM84Tj3bYJ2rC5PyqLg3ksxGr0MNpglgwn75D+rpmXEg==
-ARC-Message-Signature: i=2; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uvqAhcYYDoKWo1DGzqv5iDWIE9DIE/kbOQNrELsZlHk=;
- b=qe9jBXPsDA8VB8Lf54xagZLmAWlvrQtT4MFb8NYIMhz9VyzIhn2r5VYGJZHv8ZRIrJxLg0DG66qbTZKxghSA0Rv0XV4qjufpLdGRQ+mCPWGtcdeSj7PvJDQNFuYsUsrPSZAxBN7IlydMW2tKjx3GDqBpRclK7l7JJIdEjOXJKPXLY156vv1+Kh0gySC+mmzYEyyaSL34LB63S/WW6oA54eq2+7zdzKhJfcVNWkGbKZvblh5WE6/UFzf0OLHbBWNNx8dFo2hr6NvkCfQRzxfiUyOyjYb7tTRcWaIQ5VdwDezt49LRBiye2OwgPkZJR/nuCuWtOS9xNjdfqx0BpAJpwA==
-ARC-Authentication-Results: i=2; mx.microsoft.com 1; spf=pass (sender ip is
- 20.160.56.85) smtp.rcpttodomain=airoha.com smtp.mailfrom=seco.com; dmarc=pass
- (p=reject sp=reject pct=100) action=none header.from=seco.com; dkim=pass
- (signature was verified) header.d=seco.com; arc=pass (0 oda=1 ltdi=1
- spf=[1,1,smtp.mailfrom=seco.com] dkim=[1,1,header.d=seco.com]
- dmarc=[1,1,header.from=seco.com])
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=seco.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uvqAhcYYDoKWo1DGzqv5iDWIE9DIE/kbOQNrELsZlHk=;
- b=OqdsO7voftexkR2WjH1TKxTalNRiAGVSWbSxrGrupQYAb0xisRf2kiRrCdSxyxZ0sjDE5AynVrebfJvNu4y1vn4DnICuKv9sVRBAODkuEnc5htLj9tQldG7lLvk47PnXTwRm/IG/CYKRKmrTgOuqPWfHtRRpGMajwqg//G2nLxaHpJx2s70XLFJ9nN+u6uxraRP1ZAGCSYnkLo3e0RqCy2jXS/uPGkBA3O4XBPLwFW+SwhId1uUu8/pSuDM5NCPBbC1ZMzvCdLRTcoNizV3ENxkLIQJ5NBAsX0qNqolWXse69UjlPJ1IIiBRjDf+9K4YxpjAb8Mdl1iHKjv/fwTH8Q==
-Received: from AM0PR08CA0027.eurprd08.prod.outlook.com (2603:10a6:208:d2::40)
- by PA4PR03MB7279.eurprd03.prod.outlook.com (2603:10a6:102:109::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.44; Wed, 2 Apr
- 2025 00:14:48 +0000
-Received: from AM1PEPF000252DD.eurprd07.prod.outlook.com
- (2603:10a6:208:d2:cafe::8f) by AM0PR08CA0027.outlook.office365.com
- (2603:10a6:208:d2::40) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8534.54 via Frontend Transport; Wed,
- 2 Apr 2025 00:14:48 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 20.160.56.85)
- smtp.mailfrom=seco.com; dkim=pass (signature was verified)
- header.d=seco.com;dmarc=pass action=none header.from=seco.com;
-Received-SPF: Pass (protection.outlook.com: domain of seco.com designates
- 20.160.56.85 as permitted sender) receiver=protection.outlook.com;
- client-ip=20.160.56.85; helo=repost-eu.tmcas.trendmicro.com; pr=C
-Received: from repost-eu.tmcas.trendmicro.com (20.160.56.85) by
- AM1PEPF000252DD.mail.protection.outlook.com (10.167.16.55) with Microsoft
- SMTP Server (version=TLS1_3, cipher=TLS_AES_256_GCM_SHA384) id 15.20.8606.22
- via Frontend Transport; Wed, 2 Apr 2025 00:14:46 +0000
-Received: from outmta (unknown [192.168.82.134])
-	by repost-eu.tmcas.trendmicro.com (Trend Micro CAS) with ESMTP id 846B320080F88;
-	Wed,  2 Apr 2025 00:14:46 +0000 (UTC)
-Received: from DUZPR83CU001.outbound.protection.outlook.com (unknown [40.93.64.8])
-	by repre.tmcas.trendmicro.com (Trend Micro CAS) with ESMTPS id D9F2F2008006E;
-	Wed,  2 Apr 2025 00:14:42 +0000 (UTC)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ODGwDzXzPYexsLNl78XgLMGyTLU7q67yYs6Lwiad+dhEKRjZIIwFL5gUC3kSb+0+8RpR/aK6wXC8sSSE8d1sB7sm2ZdkC9WK2TKiop0oof9wo5tU8QmvK4nsRWbhHWQgTOyQ6J+6SrGsyGp01EtqpL25sFNjr14x1Q+5HUKpQ1L76ZAOUKbu814zL+j/Ks5S9SsBboHJzXoijMnbvuxRco8SoabELuLgR/g9ce3cbWAzMtjm5IoL332oks5scPLMkko5prsvw5MeTKp18lipKstf+jzkaRgpwEjb4eLlk17IIdGU4NI+oCUXfsqfSl6O8yIv3oSCbH7pkCChLLNA/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uvqAhcYYDoKWo1DGzqv5iDWIE9DIE/kbOQNrELsZlHk=;
- b=TPeu5QDSYpkq9HVyVm7P5D4Nop+RZJeecw6NWJCz2wzlE75cpkghM1ex1haZ5i8WTvUcrMN08MeUnYDCROWv0nb1SjUhcSQzKZi0Hl7WJD4iHvtb5nEGqhzhLT3XBqwnp7yvxkgkOcbLe2On1Bt4e/wm/wqXP4IRH7+JgdS5Rfyte09Kj+KU4mZcJNVw2l8zQxzAC4qg2v9kNLbVHpfeKVXHr9yfo4FtofPId8YnTVCyszLsabWu82tgththEo58wy6UXbx/gF0fKLrSDXccqPL78d38NtebjoSGYKuqAToAujO14ldAeW5PKz2iQao2ySNy5OCBL3yOj113Cs90kQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=seco.com; dmarc=pass action=none header.from=seco.com;
- dkim=pass header.d=seco.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=seco.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uvqAhcYYDoKWo1DGzqv5iDWIE9DIE/kbOQNrELsZlHk=;
- b=OqdsO7voftexkR2WjH1TKxTalNRiAGVSWbSxrGrupQYAb0xisRf2kiRrCdSxyxZ0sjDE5AynVrebfJvNu4y1vn4DnICuKv9sVRBAODkuEnc5htLj9tQldG7lLvk47PnXTwRm/IG/CYKRKmrTgOuqPWfHtRRpGMajwqg//G2nLxaHpJx2s70XLFJ9nN+u6uxraRP1ZAGCSYnkLo3e0RqCy2jXS/uPGkBA3O4XBPLwFW+SwhId1uUu8/pSuDM5NCPBbC1ZMzvCdLRTcoNizV3ENxkLIQJ5NBAsX0qNqolWXse69UjlPJ1IIiBRjDf+9K4YxpjAb8Mdl1iHKjv/fwTH8Q==
-Authentication-Results-Original: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=seco.com;
-Received: from PAVPR03MB9020.eurprd03.prod.outlook.com (2603:10a6:102:329::6)
- by AM9PR03MB7559.eurprd03.prod.outlook.com (2603:10a6:20b:416::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.44; Wed, 2 Apr
- 2025 00:14:41 +0000
-Received: from PAVPR03MB9020.eurprd03.prod.outlook.com
- ([fe80::2174:a61d:5493:2ce]) by PAVPR03MB9020.eurprd03.prod.outlook.com
- ([fe80::2174:a61d:5493:2ce%3]) with mapi id 15.20.8534.043; Wed, 2 Apr 2025
- 00:14:41 +0000
-Message-ID: <ac525337-7d5d-4899-8c9a-90b831545d88@seco.com>
-Date: Tue, 1 Apr 2025 20:14:35 -0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH 0/6] net: pcs: Introduce support for PCS OF
-To: Christian Marangi <ansuelsmth@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Philipp Zabel
- <p.zabel@pengutronix.de>, Daniel Golle <daniel@makrotopia.org>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, upstream@airoha.com
-References: <20250318235850.6411-1-ansuelsmth@gmail.com>
-Content-Language: en-US
-From: Sean Anderson <sean.anderson@seco.com>
-In-Reply-To: <20250318235850.6411-1-ansuelsmth@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH2PR17CA0006.namprd17.prod.outlook.com
- (2603:10b6:610:53::16) To PAVPR03MB9020.eurprd03.prod.outlook.com
- (2603:10a6:102:329::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81EF367;
+	Wed,  2 Apr 2025 00:21:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743553294; cv=none; b=esOoJ+EV+krM0VLxmu/jnDXN1Gz8TPlEtSZUU4T1CyO2ToCSccg6RV/G3giL4psm4uiWky7QUYsg2hPQzNtYmbJYi8UhK6VZfVTX2KD3cOEWE1YNPyrBwKKph/3YFh86GKxTZCI8gyQCYANKvbDgID+xn7ITOp5VE8XdsQkDdBw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743553294; c=relaxed/simple;
+	bh=g/vGnOWj+RLoNXJFxO2hLBeGdbkn6WT69EDQvJ//6Dk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lB+5HTf8rAxXV2S4gs+QfD3KiEp5RT0Uur2yDXCCu3gz14h2G0gvdr/V2zWrnCjb+4LAdpgEv9pbXBn14C4hi8uCfUcEedu/u0s1L2ZJdbwlvEBZe23uK5dHXPUOuOE1J9Wx8XdD2dJPQb4UxVBPZTx6WEFNXkaGkN24fTEAqnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kqwk6oE6; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-22622ddcc35so48520695ad.2;
+        Tue, 01 Apr 2025 17:21:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743553292; x=1744158092; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ZeLn/wYhVo9FIJa6C3cWnGduVLCV+HiAmOS2o0hOnJo=;
+        b=kqwk6oE6FfnKfTOvqOikqwQCLlNV9oplDwQvx8fowkWk3u606A/rVxAJqkMyER5cuE
+         q1XJopoRCoXrnLd24QcQD5tOk4eV0nIt06S6bnaLXXzFf3Ep6KQLtAUGzXCrXP8z77Nz
+         bM8CbbPxDsrczzxhZ8SBEAnx8EEV3tE7ZyG99RPaKqIZZZQkbEN1Gju+TC6E7QwdV2tI
+         cKCkxeFmvIRQ0crD7VBcd3pUn++uYb/r1K3LF54RrEPlbeSBWQ/DeU7PsWPKnzFj7g5x
+         QGagL+OCLSl7S+xnElzIuMfRH+327hgxxruSDhRVvywCN781f+Jv3coepXlxWunh24Q5
+         TdqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743553292; x=1744158092;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZeLn/wYhVo9FIJa6C3cWnGduVLCV+HiAmOS2o0hOnJo=;
+        b=SnEd1OU2F/j2Qwy4DYjbPIijChrjj0P1TYi4b7C4jU3u4i/Git81XaIs//Eclyb+Ty
+         cvRTwvWUkqyLrkwqvVdx/+qUR1ytW0VXDFvvzj2/YuDezSRG3iItd3crikTNNlHw8mcI
+         fzZ5WuZvOJWii0rSRUQgdVu6ovrCXjt3QN5bIr+xqEuG5rdX7WaPkhZ9q22rxtQlo3q0
+         HWsBmnkj45n/Kg/uC4gqfiWyWwwvYtMmSF+p5uZVxpHuHsc8FN2ywW9vud1AoALBVAaM
+         zWslCg0qV2cwqcAi9/FRX/HNsX2GgiRcE2pEw2nn00/BJqXrZrZVacqVeQFEiPE3TwZb
+         uKiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUlMyJW0+0waQwM2Ac0YYXgEtx4ZerGWZMgaUN48ogJgU/sjYDsfLyRPwVdiyU/pTBFiyEvW+9Q1Ir6EFgL@vger.kernel.org, AJvYcCV4cf/60k9Hx9eKQBppXXXFVz7CZHca0Bx+/M/IBtlLkTOro9JOh8tHrM/kRnuUTwI3SH/fmzkcHlSfbTvZ@vger.kernel.org, AJvYcCV5Sj0b+ew1QjtP1pRUagvinwHTXbYUcLnSHcaVpOu2TBsrkYKK0xeUkBV3UbV2MIiGmguJxONu@vger.kernel.org, AJvYcCWVvBdOx98j2xixwa9whKB35luhwiG3+wDe7vrVA2BysvGddKH3O9m1MUfFUduyJES2ZkI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhEysvL2XrPvDWbLk+wLxb/nvsFqnFFbsZWQ1fwYJbUaBdfP4E
+	dwvHH0I2J/yIKpOrTGIjgVf2oXdrxmISvRXZ2zaXCHRnMAAbUq7u
+X-Gm-Gg: ASbGncsM785IpFWDrJVZPC2lP/131pt/51PvR6wi90jrvjfWvTx+KVXxTwYz4dwSyWu
+	trJgj4UxEW3PfiFKaG6SVaVyehqz+adEPGvNYOHMRMGFMdIvVKwwyQ1IX5DLvJ3t9R+OIJXdQA/
+	nW2T6TakqMu37WfQUEWTYREqxdpg4AxlpWkjZ+CM0zvLRNlJLs9tNUt1TPaunQDW5PZIPyTh6vp
+	RzhBL110O9JdPWtwGwkVqK+xxreZSgrJboLKleqwz/2YBYxxgadSL22q3zDZmTSwNDKmgdyV+3E
+	5Q2yhY7Bn+AootfRSstG8gXuM0gUgRHP9BtrOzlRYGWW1WqQCNOyK7gPHksn1IDoJuDN/vYtgJN
+	p
+X-Google-Smtp-Source: AGHT+IG+mezWcwSTSWGHMlaSZh1ZMn0L/JmAS44qUO3mIuUAuBB2BnPV9gzUgWR5YRWldZH9Je5K7g==
+X-Received: by 2002:a05:6a00:4b0f:b0:736:6202:3530 with SMTP id d2e1a72fcca58-739c796698dmr774634b3a.22.1743553291831;
+        Tue, 01 Apr 2025 17:21:31 -0700 (PDT)
+Received: from devvm6277.cco0.facebook.com ([2a03:2880:2ff:5::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-739710b453dsm9646252b3a.155.2025.04.01.17.21.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Apr 2025 17:21:30 -0700 (PDT)
+Date: Tue, 1 Apr 2025 17:21:28 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Bryan Tan <bryan-bt.tan@broadcom.com>,
+	Vishnu Dasa <vishnu.dasa@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] vsock: add namespace support to vhost-vsock
+Message-ID: <Z+yDCKt7GpubbTKJ@devvm6277.cco0.facebook.com>
+References: <20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com>
+ <r6a6ihjw3etlb5chqsb65u7uhcav6q6pjxu65iqpp76423w2wd@kmctvoaywmbu>
+ <Z-w47H3qUXZe4seQ@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-TrafficTypeDiagnostic:
-	PAVPR03MB9020:EE_|AM9PR03MB7559:EE_|AM1PEPF000252DD:EE_|PA4PR03MB7279:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7c72182e-1330-4930-3ac6-08dd717b606c
-X-TrendMicro-CAS-OUT-LOOP-IDENTIFIER: 656f966764b7fb185830381c646b41a1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam-Untrusted:
- BCL:0;ARA:13230040|366016|376014|7416014|1800799024|921020;
-X-Microsoft-Antispam-Message-Info-Original:
- =?utf-8?B?THl4TUZLZ3N0SHZSM0pYVjg0SVVXMnNFQ0ZlT2luVy9oN25hQTVzYllxUmlO?=
- =?utf-8?B?QkxEaVF6cUgrcVNLQVlyZFV4Wnk3NGZOSUh0NUUzYjV3WVJEcitqQm1FeW9W?=
- =?utf-8?B?VENhZGxuclFQV0VqWmtySnV0cXluOHQ3cHZTMk1RK2x4dXRWOVZEMkYyQ2I0?=
- =?utf-8?B?ZkIrdnpkKzBBZ0JlNkxDRy93OFdzMmhUMDhmOTRFSkREM3I5NTFnRGdHbXlZ?=
- =?utf-8?B?akdqWkFMS2NNNlMzNnpUcFZKYXNDM09aWCtWL3V6T1JaZHVwSFN5TC95U0hO?=
- =?utf-8?B?cVM4VmpxZTJLQk1nenZoaGVSVnV4d1NDVmtqTEdNd0RYMlZEYThGWWNyTGNo?=
- =?utf-8?B?Tlc2OUl4NGlvZk1jVGhGMFZJNHdkNURpcUliWmJxbkY1MTlCYmdxNmlWbnQ4?=
- =?utf-8?B?VXNFYVR4dGRtNU5yZ1p1dHBvTkdPOWg2RUZvZm1aM2d5M256QUhoOHpTQUFj?=
- =?utf-8?B?SmtUMXNUVk9TUVAvek5ySGtRUFZnQnVENlFyd29QMDRzbWI2VkN4ZU9TSGZj?=
- =?utf-8?B?UXYwN0c0SUY1TUJLK1ZnblVTV25vQ0dIS2VVNzBTRHNkWFRTMEcvdEFRb09u?=
- =?utf-8?B?OGVpamZHZFF5MUFuc285RDM3by9OSGx0Z2hOa3hBSnJWWTVkbkVmQUJXeXNv?=
- =?utf-8?B?V29wYitnZ1JlMjYyYURiL1Zhd3UyOVNGZjQ1OEc0QUpOdG1tRlg3YXpFLzQy?=
- =?utf-8?B?SU5uR21ESlZ4czlMckxvRjF2eG5vMlkzT01YVXAwQ2xBUGJ3aWtXS3lFNGRL?=
- =?utf-8?B?anhaUWxRcy9CckpHeHQzd05CTkc5bkFXbTRjOVlNcTAzUDZjTVZYZWkzdk9w?=
- =?utf-8?B?QVV1eVBrS2w4RnV0QjRBbEJXREhsZG1UdU0wK0U4MElUeUdabk4zcy9jZDd0?=
- =?utf-8?B?cUVwN1pRUDZwaTBYUnpheTdHMm1sbjFnYVUrVFdnNnppSTIvT3dqSmRYN3My?=
- =?utf-8?B?R2o0cjhyQkdkcXBScmFtVVFhbndzWGpyUERkdGVHVVNCSnJhUENIK2tPVjd4?=
- =?utf-8?B?dy9mbVVGY2d1SUljc0w3RzBPVXFBcm9OMHRLQlRrUW84ekJDZ05SRmoyYW5h?=
- =?utf-8?B?VHlUTHFxZkNVYmh5ekRlcFkxL2UwZk51WmVISU9Va3BxSzMvMEJ2VkN4Ni95?=
- =?utf-8?B?THB3YXFTcmJjS2ZEQ3hXcEZoSktzV2VSc0hQTEVldkF5dEpGYUtWVDZISGZY?=
- =?utf-8?B?TFB5LzhnMUVhVnFGMUNET2N1aG9KM2pJMklsUEtDSk5hM3hrQmJzbzZVUkt0?=
- =?utf-8?B?alJmQjM5YVR2V2k4WVZzOW1NRzE3dnIxcGVpdVVuV0RSeTdrVUUvVU52UHll?=
- =?utf-8?B?WktGQVBHU1FZNUpGMk5TQjRoSDUvOTB0djRLKzJNMUpsL3kxUklxZGpHQVBW?=
- =?utf-8?B?c1ArWWRSS0c2dTRLTGJ1bEJZMGVwU1hTRlFnSFRRTkZjNlY4TjFGVExEYkJ1?=
- =?utf-8?B?ekFqNmEwZ0NIMkVCWkpsTlRlSm1TSnZUZFVrTmcrd1hVQkI0ai9PRnhtVWRX?=
- =?utf-8?B?UU9XMlJha0VzVGNMMzBINjROOVQ5YjI2dWRtRGpHMWdVc2lkWVduOEJkMkpi?=
- =?utf-8?B?RldOeklDbFFoYWc1SU82ZndIM2RJVjN6NlgyWGRpOFJyTkdTbjdlK1JkRnVZ?=
- =?utf-8?B?TllFNklLSzd2aUt3NkpDdWdaUHozRjJhdjJwZEJ0bW9ZUVJERDlLQ3hrY01C?=
- =?utf-8?B?cXUza09peGxBR01LZ3Y0VmtmcGF4bHNvN2hobVFkVWZQQVdXbGt6YmJ4UTBT?=
- =?utf-8?B?cXhrMUE0NUF5ZTZQQ0JLL01NYWkyT0FDU1pDTFZUcWdWMjZ1a08rTzdJZjZR?=
- =?utf-8?B?SjVMRDNpTU9sUVJiL3lVYzhQSFNzSW1ZTHlJYXlORCtsdjhqSVNic3Fid3hp?=
- =?utf-8?B?UVlzMlh4dDJva2hmT2FJTjVwYWNNMUhCN3pLVlh4dnJ3UXVuT1dJa3MwTVNV?=
- =?utf-8?Q?b4HL5CezVv8=3D?=
-X-Forefront-Antispam-Report-Untrusted:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAVPR03MB9020.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(921020);DIR:OUT;SFP:1102;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR03MB7559
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped:
- AM1PEPF000252DD.eurprd07.prod.outlook.com
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs:
-	cf99cc8c-8746-46ac-ae41-08dd717b5cf6
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|35042699022|14060799003|1800799024|376014|7416014|82310400026|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UXZwaklHZlZGVTRVZ1ZkaUt6UGlXcG1DMnBrblY1S2xxT050bFRkc1JlaFB6?=
- =?utf-8?B?S3VqYS9veU84VUtWNkVsNlpXQm9GNm9NM01ndzI4SnBrMEtBNWhBeUlCY1Y0?=
- =?utf-8?B?UU1Ld0wzWVpuQjNmdUgwOUJGV1M2WTIrMENvYzFmRWI1RnNSWE9lVUZTWHQz?=
- =?utf-8?B?bTllbGlGb1EyR2h6a0xtYmxjQzJSM1lnaEhWV1BZZjdmYzlveUZ1cldPU1lN?=
- =?utf-8?B?RmlLL2VLZ0Z3N1ZBMUpxQWV0NXUwZWxuL1ZoT0x5eit1Q1JuVjljVndhWnVW?=
- =?utf-8?B?cThMbDhjU1FKU2tpMjJvNVpMK0tUc0p5RHowSHluSmFrbHZBNkJCK1Awa0tl?=
- =?utf-8?B?eEx2ejZLN1c1ZzRnVzhlQmxhbVFpbldKMjh0TDluT3crSjUvdk5NRlBJTEZG?=
- =?utf-8?B?dXZZVDFnMXk0NU8vdU90R25ZdU80SWl6VlZqcjVXakNSRWhqaWs4am05dC94?=
- =?utf-8?B?blc2ZnR4b0FrZXFCRGJxS3JGK2o2NDdIc2Y2MG9UK2QxSTFTT0x3WW4wK0Zr?=
- =?utf-8?B?cDN5NzNLTzc2a1MwcGc2Q0VBMHo2TVl5bURUZFlSN084TEphYVdMUUVwRWxs?=
- =?utf-8?B?cDJhNEtxN0FoT3hhOHNvdmRmcDJqWFNwOVV0cDJrdGdiNy9uc2F1bUdDd2Ez?=
- =?utf-8?B?UDZXaDNhODJjVGpid0JkeENrMXYwQjdhQWpFazVJd0dxUWJ3UnA1ckZnZFIv?=
- =?utf-8?B?SmNBTk5nV0ZYSEVncnFUZnB0M3ZBNjMyZE9vbTVOZmxmL3NOWmRvK3NueTJJ?=
- =?utf-8?B?ZFo1Nm4rNFEwN2lPbkZqYm5JSGpzYjM1WGQ5RFdHdjJzMU1jbk0zOUpSMjBR?=
- =?utf-8?B?YllKSjM3QnN5N2ljS1pwMmE0MWdyajFsMGpOTlh2WG9oMGVUa2NUNlo4dGJx?=
- =?utf-8?B?WGM5M3VLOFN1R0dKWkI1Z084LzdHMGFwMGZPaDFUdFViY3FHM2s0N3VQcU1S?=
- =?utf-8?B?bVkrNnNPdVJtRDBoS3JkdFlhYThHekFnd1hQbGM5bHhWekxFd2hJR0pTbWYz?=
- =?utf-8?B?UTBTSFJuUVl4OGVvamhQai9FL002NlUzaFRxejJXUE1rV0k5YmJNK0U5bWFu?=
- =?utf-8?B?VW9hVm9Dbm5VcldZdEFQQ1JiT1JOZGw3Y2kwQy9PRlVIL3dSaWxwRWc5Qzk5?=
- =?utf-8?B?a3UyTUJJTDFEOVRiR2V4ellDcTlzT3hHa2J6bjNNQVFyOENkRTUyTVV1cWxN?=
- =?utf-8?B?Qzg1ejVLak1xSEpEcEdjcDdaR3lrcExiRG44WVloMFBGYjJxY1hWQ01saVN6?=
- =?utf-8?B?M1c2Y3d0dHZYTWRBa3g3TENrUUF1L3ZySTh6cXJBY2NIeW9CNFhNRDY3eFBL?=
- =?utf-8?B?TDk1aU9CMUZtUlY3d2lRMTFVVFB6eEtEZ3JCY2lpaElsU3BGNnU3U1dncTFK?=
- =?utf-8?B?L1BIS1ZmYnRhT2w5YUxhcTA2Uk41cnFTUG5EVU1iaEppSFRPWnFJNFpXMGxt?=
- =?utf-8?B?bzI0ZStaRnFhdFFtTXhybjBGVGNibnZrZHBqdTdsK0J5RDV3eXlKMVBKUEp0?=
- =?utf-8?B?N3NRb1ppOGpkUWFZYnRsdTQxSXRJQ0NnMjFjRVExVjBFNlkrbFdOb1VSSUVz?=
- =?utf-8?B?TElwSUx0ekNwOTNDYlFsUE53WEtaOXpHblBrZFJXemswMXNlTnJ6TFQ0NUIv?=
- =?utf-8?B?ZSs2eDRnczM2MlJQYjd0aGZYU2hkU1BpVEZiR09yR2trK1ZxTG9kYWhlNmpr?=
- =?utf-8?B?dVZtREJ5SW5JK1dCRmVIaCtyT2lobmRLcFhWblVBdXRUYmJOTGVXQ3BWdFFl?=
- =?utf-8?B?YlhYS295NnZtL01ZUUxyZmNOZW9xbTZnV21jSmJ5UW5SOHV4MHRkUE9MZ3Vl?=
- =?utf-8?B?aTZaMkpaYktDM0NDTDlSYmVnMlFKem8xdFY1c1pCODRjdlAvUVhDcE4rZE9Q?=
- =?utf-8?B?ak9VS1FYQTRSL1RYOHd0a1dVdjZQM3VaNFc2WWxoY2pKamdJNmJzVzlFZ2Q0?=
- =?utf-8?B?cFIyVFNzK28yYXJ3NUVWSkVzbXFHbUpLbk5SSGdRRmxnRXNCWm53WjQ2clNH?=
- =?utf-8?B?UmJTMi9UZmNCNEJFTTRJanFGdCtsdlQ5YTFqQTJrSWdDNDYrTXlNZTR3SEJL?=
- =?utf-8?Q?NKAuk4?=
-X-Forefront-Antispam-Report:
-	CIP:20.160.56.85;CTRY:NL;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:repost-eu.tmcas.trendmicro.com;PTR:repost-eu.tmcas.trendmicro.com;CAT:NONE;SFS:(13230040)(36860700013)(35042699022)(14060799003)(1800799024)(376014)(7416014)(82310400026)(921020);DIR:OUT;SFP:1102;
-X-OriginatorOrg: seco.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Apr 2025 00:14:46.8631
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7c72182e-1330-4930-3ac6-08dd717b606c
-X-MS-Exchange-CrossTenant-Id: bebe97c3-6438-442e-ade3-ff17aa50e733
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=bebe97c3-6438-442e-ade3-ff17aa50e733;Ip=[20.160.56.85];Helo=[repost-eu.tmcas.trendmicro.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM1PEPF000252DD.eurprd07.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR03MB7279
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z-w47H3qUXZe4seQ@redhat.com>
 
-Hi Christian,
+On Tue, Apr 01, 2025 at 08:05:16PM +0100, Daniel P. Berrangé wrote:
+> On Fri, Mar 28, 2025 at 06:03:19PM +0100, Stefano Garzarella wrote:
+> > CCing Daniel
+> > 
+> > On Wed, Mar 12, 2025 at 01:59:34PM -0700, Bobby Eshleman wrote:
+> > > Picking up Stefano's v1 [1], this series adds netns support to
+> > > vhost-vsock. Unlike v1, this series does not address guest-to-host (g2h)
+> > > namespaces, defering that for future implementation and discussion.
+> > > 
+> > > Any vsock created with /dev/vhost-vsock is a global vsock, accessible
+> > > from any namespace. Any vsock created with /dev/vhost-vsock-netns is a
+> > > "scoped" vsock, accessible only to sockets in its namespace. If a global
+> > > vsock or scoped vsock share the same CID, the scoped vsock takes
+> > > precedence.
+> > > 
+> > > If a socket in a namespace connects with a global vsock, the CID becomes
+> > > unavailable to any VMM in that namespace when creating new vsocks. If
+> > > disconnected, the CID becomes available again.
+> > 
+> > I was talking about this feature with Daniel and he pointed out something
+> > interesting (Daniel please feel free to correct me):
+> > 
+> >     If we have a process in the host that does a listen(AF_VSOCK) in a
+> > namespace, can this receive connections from guests connected to
+> > /dev/vhost-vsock in any namespace?
+> > 
+> >     Should we provide something (e.g. sysctl/sysfs entry) to disable
+> > this behaviour, preventing a process in a namespace from receiving
+> > connections from the global vsock address space (i.e.      /dev/vhost-vsock
+> > VMs)?
+> 
+> I think my concern goes a bit beyond that, to the general conceptual
+> idea of sharing the CID space between the global vsocks and namespace
+> vsocks. So I'm not sure a sysctl would be sufficient...details later
+> below..
+> 
+> > I understand that by default maybe we should allow this behaviour in order
+> > to not break current applications, but in some cases the user may want to
+> > isolate sockets in a namespace also from being accessed by VMs running in
+> > the global vsock address space.
+> > 
+> > Indeed in this series we have talked mostly about the host -> guest path (as
+> > the direction of the connection), but little about the guest -> host path,
+> > maybe we should explain it better in the cover/commit
+> > descriptions/documentation.
+> 
+> > > Testing
+> > > 
+> > > QEMU with /dev/vhost-vsock-netns support:
+> > > 	https://github.com/beshleman/qemu/tree/vsock-netns
+> > > 
+> > > Test: Scoped vsocks isolated by namespace
+> > > 
+> > >  host# ip netns add ns1
+> > >  host# ip netns add ns2
+> > >  host# ip netns exec ns1 \
+> > > 				  qemu-system-x86_64 \
+> > > 					  -m 8G -smp 4 -cpu host -enable-kvm \
+> > > 					  -serial mon:stdio \
+> > > 					  -drive if=virtio,file=${IMAGE1} \
+> > > 					  -device vhost-vsock-pci,netns=on,guest-cid=15
+> > >  host# ip netns exec ns2 \
+> > > 				  qemu-system-x86_64 \
+> > > 					  -m 8G -smp 4 -cpu host -enable-kvm \
+> > > 					  -serial mon:stdio \
+> > > 					  -drive if=virtio,file=${IMAGE2} \
+> > > 					  -device vhost-vsock-pci,netns=on,guest-cid=15
+> > > 
+> > >  host# socat - VSOCK-CONNECT:15:1234
+> > >  2025/03/10 17:09:40 socat[255741] E connect(5, AF=40 cid:15 port:1234, 16): No such device
+> > > 
+> > >  host# echo foobar1 | sudo ip netns exec ns1 socat - VSOCK-CONNECT:15:1234
+> > >  host# echo foobar2 | sudo ip netns exec ns2 socat - VSOCK-CONNECT:15:1234
+> > > 
+> > >  vm1# socat - VSOCK-LISTEN:1234
+> > >  foobar1
+> > >  vm2# socat - VSOCK-LISTEN:1234
+> > >  foobar2
+> > > 
+> > > Test: Global vsocks accessible to any namespace
+> > > 
+> > >  host# qemu-system-x86_64 \
+> > > 	  -m 8G -smp 4 -cpu host -enable-kvm \
+> > > 	  -serial mon:stdio \
+> > > 	  -drive if=virtio,file=${IMAGE2} \
+> > > 	  -device vhost-vsock-pci,guest-cid=15,netns=off
+> > > 
+> > >  host# echo foobar | sudo ip netns exec ns1 socat - VSOCK-CONNECT:15:1234
+> > > 
+> > >  vm# socat - VSOCK-LISTEN:1234
+> > >  foobar
+> > > 
+> > > Test: Connecting to global vsock makes CID unavailble to namespace
+> > > 
+> > >  host# qemu-system-x86_64 \
+> > > 	  -m 8G -smp 4 -cpu host -enable-kvm \
+> > > 	  -serial mon:stdio \
+> > > 	  -drive if=virtio,file=${IMAGE2} \
+> > > 	  -device vhost-vsock-pci,guest-cid=15,netns=off
+> > > 
+> > >  vm# socat - VSOCK-LISTEN:1234
+> > > 
+> > >  host# sudo ip netns exec ns1 socat - VSOCK-CONNECT:15:1234
+> > >  host# ip netns exec ns1 \
+> > > 				  qemu-system-x86_64 \
+> > > 					  -m 8G -smp 4 -cpu host -enable-kvm \
+> > > 					  -serial mon:stdio \
+> > > 					  -drive if=virtio,file=${IMAGE1} \
+> > > 					  -device vhost-vsock-pci,netns=on,guest-cid=15
+> > > 
+> > >  qemu-system-x86_64: -device vhost-vsock-pci,netns=on,guest-cid=15: vhost-vsock: unable to set guest cid: Address already in use
+> 
+> I find it conceptually quite unsettling that the VSOCK CID address
+> space for AF_VSOCK is shared between the host and the namespace.
+> That feels contrary to how namespaces are more commonly used for
+> deterministically isolating resources between the namespace and the
+> host.
+> 
+> Naively I would expect that in a namespace, all VSOCK CIDs are
+> free for use, without having to concern yourself with what CIDs
+> are in use in the host now, or in future.
+> 
 
-On 3/18/25 19:58, Christian Marangi wrote:
-> This series introduce a most awaited feature that is correctly
-> provide PCS with OF without having to use specific export symbol.
+True, that would be ideal. I think the definition of backwards
+compatibility we've established includes the notion that any VM may
+reach any namespace and any namespace may reach any VM. IIUC, it sounds
+like you are suggesting this be revised to more strictly adhere to
+namespace semantics?
 
-I've actually been working on the same problem on and off over the past
-several years [1,2]. I saw your patch series and it inspired me to clean
-it up a bit [3]. The merge window is closed, so I can't post it (and I
-still need to test the lynx conversion a bit more), but please feel free
-to have a look.
+I do like Stefano's suggestion to add a sysctl for a "strict" mode,
+Since it offers the best of both worlds, and still tends conservative in
+protecting existing applications... but I agree, the non-strict mode
+vsock would be unique WRT the usual concept of namespaces.
 
---Sean
+> What happens if we reverse the QEMU order above, to get the
+> following scenario
+> 
+>    # Launch VM1 inside the NS
+>    host# ip netns exec ns1 \
+>   				  qemu-system-x86_64 \
+>   					  -m 8G -smp 4 -cpu host -enable-kvm \
+>   					  -serial mon:stdio \
+>   					  -drive if=virtio,file=${IMAGE1} \
+>   					  -device vhost-vsock-pci,netns=on,guest-cid=15
+>    # Launch VM2
+>    host# qemu-system-x86_64 \
+>   	  -m 8G -smp 4 -cpu host -enable-kvm \
+>   	  -serial mon:stdio \
+>   	  -drive if=virtio,file=${IMAGE2} \
+>   	  -device vhost-vsock-pci,guest-cid=15,netns=off
+>   
+>    vm1# socat - VSOCK-LISTEN:1234
+>    vm2# socat - VSOCK-LISTEN:1234
+> 
+>    host# socat - VSOCK-CONNECT:15:1234
+>      => Presume this connects to "VM2" running outside the NS
+> 
+>    host# sudo ip netns exec ns1 socat - VSOCK-CONNECT:15:1234
+> 
+>      => Does this connect to "VM1" inside the NS, or "VM2"
+>         outside the NS ?
+> 
 
-[1] https://lore.kernel.org/netdev/20211004191527.1610759-1-sean.anderson@seco.com/
-[2] https://lore.kernel.org/netdev/20221103210650.2325784-1-sean.anderson@seco.com/
-[3] https://github.com/sean-anderson-seco/linux/tree/pcs
+VM1 inside the NS. Current logic says that whenever two CIDs collide
+(local vs global), always select the one in the local namespace
+(irrespective of creation order).
+
+Adding a sysctl option... it would *never* connect to the global one,
+even if there was no local match but there was a global one.
+
+> 
+> 
+> With regards,
+> Daniel
+
+Thanks for the review!
+
+Best,
+Bobby
 
