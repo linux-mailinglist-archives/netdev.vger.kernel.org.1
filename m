@@ -1,208 +1,142 @@
-Return-Path: <netdev+bounces-178762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52722A78C96
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 12:45:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 296AAA78CA1
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 12:47:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90128189476F
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 10:45:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCA0816FBFC
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 10:47:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFF48235BF0;
-	Wed,  2 Apr 2025 10:44:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A8BC214810;
+	Wed,  2 Apr 2025 10:47:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="EplJr8+B";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="qpuImgyh";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="EplJr8+B";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="qpuImgyh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WTgpdK+B"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4881153BE
-	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 10:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C59A53BE
+	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 10:47:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743590695; cv=none; b=XYAACjPzqhj8fNa/KnrBNVNfbI/pCWAoMo2WuTRY3KBc4CMOVnjefRtBZ5VaTzWryTL2cOelEnzsufQ6dxE8edqgwOjuZf2Sq93B1+R+LNM+hWiKY1x0w46wNXTOnbC84FV/lxWCa+Xhk1C4LHlDxDreT94NZYKJ6ntfy8lDNeQ=
+	t=1743590827; cv=none; b=hFwGxbIAA1A6dMP2Kd/ZwgUswHO2FYt3mGfNlUdLr0+CsbG6PJVsEAd4kFhimnbNt0z0V8wAJRVeThM+qLmDA8ksnzJwsZS78IPLzI8MQbBGK1cZWfosB/mGZgbi3vELwnlI/DgzqZU3+/Y5dk5KHahF8eKGsc0Zd7q9Htn0Ygs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743590695; c=relaxed/simple;
-	bh=+uB5iUofgagnRdSq6+dSLbB0qAKAimYmRXFsyrrPlaE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rPnQUXSPbxYcxtTmrs41y227UTnJLjK8kYpNqQ+HVar1o6xQqujk9edIgXM7hit2dmDsVRKGPJ17tJpMJEvfkdIBFfRMYhA3Cht9f9q7O55CqgJ5metHWeELIYxkkyJo1zE6zxSZ3v4bJLypbt0REHIm28avz0xQ69tCDLcQfLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=EplJr8+B; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=qpuImgyh; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=EplJr8+B; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=qpuImgyh; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	s=arc-20240116; t=1743590827; c=relaxed/simple;
+	bh=0a+SffDhckWdTT+/Mtaarfhb4eWEN041VfkiOT7ftig=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eaPLZD2kp7CvxQsWtXtlkKgpMn0tPpmZH3135QPrvOtu0vIM5hD19CQbTPzOfqQLYq6ZDcIn+JCTxb27dunrcI90Az+BqMHr9BMYyQP3jpfux/vJ5h+EU/cKUV1XGQNHDOfapk7c7/4zYUw1C9RZTLN/CvXuMRFElij6OgwUTAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WTgpdK+B; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743590825;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ypu8JjwQ7LGF38JD3wHnehscjaJly8YMFDiK1em5sIw=;
+	b=WTgpdK+BkkfzUjZzjG7EI1EgrwpbpdYcz4eZAHIkraKcRF9LQGUHOJ0fRSodLF+EZJoR94
+	DMPS434aMvl70F1M02a6UHwY8xyiZhEtNv/NDGeKfbtMKit7P0ws0Ot8tepha207RzK0lr
+	VMyrm+JnX1y3rXNtY47Zfi70Silh3HY=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-518-TKmhR-jAPDK1jkstwgn0Ag-1; Wed,
+ 02 Apr 2025 06:47:01 -0400
+X-MC-Unique: TKmhR-jAPDK1jkstwgn0Ag-1
+X-Mimecast-MFC-AGG-ID: TKmhR-jAPDK1jkstwgn0Ag_1743590820
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 29DF41F38A;
-	Wed,  2 Apr 2025 10:44:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1743590692; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=V44jQhfXZFRMaYV7EYWgg+brV+qQ7i8rYGkA/MtWj1Q=;
-	b=EplJr8+BK+pJm2YQ2ZJTFdqc3XPtJ6TX8dVEmw1CaQVIW8ZW6up9Vj7BaoHUkMftbqZL50
-	3/HQjChFzrNoqULvi0jw88k5gKQ6vBVq1Uo8WDjWgXVmCJ85Y2Wv0tQ2mNAD4gtygKQFxH
-	AMU7nqKMSyog8qUZzOqbfvU/RPD7sII=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1743590692;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=V44jQhfXZFRMaYV7EYWgg+brV+qQ7i8rYGkA/MtWj1Q=;
-	b=qpuImgyhZeem5DOPN+L2+Zs5U1kwMSecOMXLIJNHGhsvo3XNUFJZIzGqYI1po9FczHpLC+
-	QFhDLGC/oxP2HnAg==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=EplJr8+B;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=qpuImgyh
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1743590692; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=V44jQhfXZFRMaYV7EYWgg+brV+qQ7i8rYGkA/MtWj1Q=;
-	b=EplJr8+BK+pJm2YQ2ZJTFdqc3XPtJ6TX8dVEmw1CaQVIW8ZW6up9Vj7BaoHUkMftbqZL50
-	3/HQjChFzrNoqULvi0jw88k5gKQ6vBVq1Uo8WDjWgXVmCJ85Y2Wv0tQ2mNAD4gtygKQFxH
-	AMU7nqKMSyog8qUZzOqbfvU/RPD7sII=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1743590692;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=V44jQhfXZFRMaYV7EYWgg+brV+qQ7i8rYGkA/MtWj1Q=;
-	b=qpuImgyhZeem5DOPN+L2+Zs5U1kwMSecOMXLIJNHGhsvo3XNUFJZIzGqYI1po9FczHpLC+
-	QFhDLGC/oxP2HnAg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 860F4137D4;
-	Wed,  2 Apr 2025 10:44:51 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id CfIsHyMV7WcKXgAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Wed, 02 Apr 2025 10:44:51 +0000
-Message-ID: <3f387b13-5482-46ed-9f52-4a9ed7001e67@suse.cz>
-Date: Wed, 2 Apr 2025 12:44:50 +0200
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2B5531801A12;
+	Wed,  2 Apr 2025 10:46:59 +0000 (UTC)
+Received: from calimero.vinschen.de (unknown [10.22.80.96])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B457319560AD;
+	Wed,  2 Apr 2025 10:46:58 +0000 (UTC)
+Received: by calimero.vinschen.de (Postfix, from userid 500)
+	id 48D59A8098D; Wed, 02 Apr 2025 12:46:56 +0200 (CEST)
+Date: Wed, 2 Apr 2025 12:46:56 +0200
+From: Corinna Vinschen <vinschen@redhat.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Anthony Nguyen <anthony.l.nguyen@intel.com>, david.zage@intel.com,
+	vinicius.gomes@intel.com, rodrigo.cadore@l-acoustics.com,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Christopher S M Hall <christopher.s.hall@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Mor Bar-Gabay <morx.bar.gabay@intel.com>,
+	Avigail Dahan <avigailx.dahan@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v4 1/6] igc: fix PTM cycle
+ trigger logic
+Message-ID: <Z-0VoDTYP9HsSrsJ@calimero.vinschen.de>
+Mail-Followup-To: Jacob Keller <jacob.e.keller@intel.com>,
+	Anthony Nguyen <anthony.l.nguyen@intel.com>, david.zage@intel.com,
+	vinicius.gomes@intel.com, rodrigo.cadore@l-acoustics.com,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Christopher S M Hall <christopher.s.hall@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Mor Bar-Gabay <morx.bar.gabay@intel.com>,
+	Avigail Dahan <avigailx.dahan@intel.com>
+References: <20250401-jk-igc-ptm-fixes-v4-v4-0-c0efb82bbf85@intel.com>
+ <20250401-jk-igc-ptm-fixes-v4-v4-1-c0efb82bbf85@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] slab: introduce auto_kfree macro
-Content-Language: en-US
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- linux-kernel@vger.kernel.org, linux-mm@kvack.org,
- torvalds@linux-foundation.org, peterz@infradead.org,
- Kees Cook <keescook@chromium.org>, Jann Horn <jannh@google.com>
-Cc: andriy.shevchenko@linux.intel.com, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, Harry Yoo <harry.yoo@oracle.com>,
- Matthew Wilcox <willy@infradead.org>, Christoph Lameter <cl@gentwo.org>
-References: <20250401134408.37312-1-przemyslaw.kitszel@intel.com>
-From: Vlastimil Babka <vbabka@suse.cz>
-In-Reply-To: <20250401134408.37312-1-przemyslaw.kitszel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Queue-Id: 29DF41F38A
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.cz:dkim,suse.cz:mid,intel.com:email];
-	DKIM_TRACE(0.00)[suse.cz:+]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -4.51
-X-Spam-Flag: NO
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250401-jk-igc-ptm-fixes-v4-v4-1-c0efb82bbf85@intel.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Cc Kees and others from his related efforts:
+On Apr  1 16:35, Jacob Keller wrote:
+> From: Christopher S M Hall <christopher.s.hall@intel.com>
+> 
+> Writing to clear the PTM status 'valid' bit while the PTM cycle is
+> triggered results in unreliable PTM operation. To fix this, clear the
+> PTM 'trigger' and status after each PTM transaction.
+> 
+> The issue can be reproduced with the following:
+> 
+> $ sudo phc2sys -R 1000 -O 0 -i tsn0 -m
+> 
+> Note: 1000 Hz (-R 1000) is unrealistically large, but provides a way to
+> quickly reproduce the issue.
+> 
+> PHC2SYS exits with:
+> 
+> "ioctl PTP_OFFSET_PRECISE: Connection timed out" when the PTM transaction
+>   fails
+> 
+> This patch also fixes a hang in igc_probe() when loading the igc
+> driver in the kdump kernel on systems supporting PTM.
+> 
+> The igc driver running in the base kernel enables PTM trigger in
+> igc_probe().  Therefore the driver is always in PTM trigger mode,
+> except in brief periods when manually triggering a PTM cycle.
+> 
+> When a crash occurs, the NIC is reset while PTM trigger is enabled.
+> Due to a hardware problem, the NIC is subsequently in a bad busmaster
+> state and doesn't handle register reads/writes.  When running
+> igc_probe() in the kdump kernel, the first register access to a NIC
+> register hangs driver probing and ultimately breaks kdump.
+> 
+> With this patch, igc has PTM trigger disabled most of the time,
+> and the trigger is only enabled for very brief (10 - 100 us) periods
+> when manually triggering a PTM cycle.  Chances that a crash occurs
+> during a PTM trigger are not 0, but extremly reduced.
+> 
+> Fixes: a90ec8483732 ("igc: Add support for PTP getcrosststamp()")
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com>
+> Tested-by: Avigail Dahan <avigailx.dahan@intel.com>
+> Signed-off-by: Christopher S M Hall <christopher.s.hall@intel.com>
+> Reviewed-by: Corinna Vinschen <vinschen@redhat.com>
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 
-https://lore.kernel.org/all/20250321202620.work.175-kees@kernel.org/
-
-On 4/1/25 15:44, Przemek Kitszel wrote:
-> Add auto_kfree macro that acts as a higher level wrapper for manual
-> __free(kfree) invocation, and sets the pointer to NULL - to have both
-> well defined behavior also for the case code would lack other assignement.
-> 
-> Consider the following code:
-> int my_foo(int arg)
-> {
-> 	struct my_dev_foo *foo __free(kfree); /* no assignement */
-> 
-> 	foo = kzalloc(sizeof(*foo), GFP_KERNEL);
-> 	/* ... */
-> }
-> 
-> So far it is fine and even optimal in terms of not assigning when
-> not needed. But it is typical to don't touch (and sadly to don't
-> think about) code that is not related to the change, so let's consider
-> an extension to the above, namely an "early return" style to check
-> arg prior to allocation:
-> int my_foo(int arg)
-> {
->         struct my_dev_foo *foo __free(kfree); /* no assignement */
-> +
-> +	if (!arg)
-> +		return -EINVAL;
->         foo = kzalloc(sizeof(*foo), GFP_KERNEL);
->         /* ... */
-> }
-> Now we have uninitialized foo passed to kfree, what likely will crash.
-> One could argue that `= NULL` should be added to this patch, but it is
-> easy to forgot, especially when the foo declaration is outside of the
-> default git context.
-> 
-> With new auto_kfree, we simply will start with
-> 	struct my_dev_foo *foo auto_kfree;
-> and be safe against future extensions.
-> 
-> I believe this will open up way for broader adoption of Scope Based
-> Resource Management, say in networking.
-> I also believe that my proposed name is special enough that it will
-> be easy to know/spot that the assignement is hidden.
-> 
-> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> ---
->  include/linux/slab.h | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/include/linux/slab.h b/include/linux/slab.h
-> index 98e07e9e9e58..b943be0ce626 100644
-> --- a/include/linux/slab.h
-> +++ b/include/linux/slab.h
-> @@ -471,6 +471,7 @@ void kfree_sensitive(const void *objp);
->  size_t __ksize(const void *objp);
->  
->  DEFINE_FREE(kfree, void *, if (!IS_ERR_OR_NULL(_T)) kfree(_T))
-> +#define auto_kfree __free(kfree) = NULL
->  DEFINE_FREE(kfree_sensitive, void *, if (_T) kfree_sensitive(_T))
->  
->  /**
+Tested-by: Corinna Vinschen <vinschen@redhat.com>
 
 
