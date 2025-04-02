@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-178870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24101A793E3
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 19:39:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18E0DA793E8
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 19:39:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2A9E3B4295
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 17:39:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92F2F18950D7
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 17:39:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BD251C6FF4;
-	Wed,  2 Apr 2025 17:39:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63CF11D8DEE;
+	Wed,  2 Apr 2025 17:39:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SSD69hQ8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Cu2/+OWP"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5679A1A38E1;
-	Wed,  2 Apr 2025 17:39:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89E451C5F13
+	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 17:39:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743615553; cv=none; b=UpbY6VMGa7UMe/0Mn0GqgLfn3vqTD1YhpVCeUSYwsm9ENv2YFBXkV+0pns8wvVB4UihZPWX6m2NO5MEPhEUtIbsC0wRR6mXMSHK/5oWL+73ol0H27jftsKU02Gv5m8m2sI2TRmNA7rm/iQibG3ot80BfwG32m4XVCiHUgEqhZ9Y=
+	t=1743615554; cv=none; b=K2FYI7/SC/aITeXWHIBCW5AmAbgFFjVAHPHVOlQtfKbIpQgc+5EhXTgibdFfWd40pj2LYNi3j4D3tbJjQOKrRqaNge6Z9GuMgwZuhfhEUCrqZvbnwTy+SavKS8irEZwWLWS24qUd62blLTsJgKzSSRyBwngKm3+f5usfZ8KffkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743615553; c=relaxed/simple;
-	bh=jNwFDxTuOCH8lyUs09sANxzuuVeAM/rbcLgVg4H6dsg=;
+	s=arc-20240116; t=1743615554; c=relaxed/simple;
+	bh=jjngyqRtEr/JTfkD7I0DvtHrLvxx71wGmfxirc7C2W4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Irm9JyvpkgK8m4MeixtO7ddXZHY+1kvzpACgpZEZ+fS3A07gwLlhW7V7o7491dNFsUL1XsxMORF4WKvp9igN6H4Y68r7L9ikf5EA8isoDdr+dk4THUsJ+AsTziGZ0L49pwerqzjRe0QslOrS7UOawzLjgZR+t8iDj0vz34A0Sbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SSD69hQ8; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=jAZLoij6LyMz5fvO3hOAFr9YQHmkFc7Wx7WHVMUMQrUEu+FeJCDJwyWT3rzDymnjKvOqDwgvMKNtwgstdnoRSXLx8tkXSeNfJpS+7kv+4fyYgbfJzXhNZ1e13FaCEQ9rXtzKJDfz4+6GJiCUBCpYds/MTCoqvfB8s2cRzy9RFxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Cu2/+OWP; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1743615551; x=1775151551;
+  t=1743615553; x=1775151553;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=jNwFDxTuOCH8lyUs09sANxzuuVeAM/rbcLgVg4H6dsg=;
-  b=SSD69hQ8Ohknpo8uxIccFl+NOjcxKZfidiYc5MB6qIIlF8TVnj3kSTVA
-   FUbmu0syhtvQvREkVrWoLSwYJp5Vos85bHVhCoBJupCfcBM9BwtIVAdas
-   oDjBZA1iAnNjVsrNR4YLMK4pUFXjlqi8dtNdk20/kJVdZYGhsbJNK04lM
-   Vxhpld0C1vsnZlGXcIm8J3haNDfNerIUcixIyp82IskCSW7itYGVonR47
-   C3amgOpGZ+O3ooIaDSjAnGk4I4yaO1xkuHtYEyAJQal0bQcoAx5Erqb9a
-   ukvnIRq6UlGxnLs82I8cjhVJ0IYxuB9TDbOrvGxEYBR2yAmMBbmA2/guW
-   w==;
-X-CSE-ConnectionGUID: Tk9kVoglT+K+xipyulGQMg==
-X-CSE-MsgGUID: RFOyCye2Qk+Jgyz75ridmQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11392"; a="44257269"
+  bh=jjngyqRtEr/JTfkD7I0DvtHrLvxx71wGmfxirc7C2W4=;
+  b=Cu2/+OWPnDQMygYMRCWgfcV4/q3YHzimVOS9yclqorHRBqHxjwJ/mht5
+   Yy9jSMm+hQAW0rm1bA5UdXiSUKHRD1YAtAytNsmCELiomYT+V0Dqn48Rh
+   KQGdLZrJAvRa8vLhHKenLiCl4M+eNNxCLH7cFiuK+aSvfqQD3cekn2SRy
+   8mqo/Nwo3IH6uv5f9uUcDAFxoVKB9e2b2P8SOSFuKNMNVj1i08Wxj388k
+   jk8252rQ9fPMo30oejuEciuoJ28xEBmixfn+iuQhg9O/LFNXmm9y4C7ch
+   WbJUk0Qqg0EOCBTrV17cka2P80OODWuUn3XMpGmwCARRRqYXpXZqQ0qiy
+   A==;
+X-CSE-ConnectionGUID: iAp66rYpQaCi6nOpT2LZKQ==
+X-CSE-MsgGUID: IRQiRHbiR567tyzGSZEuzg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11392"; a="44257278"
 X-IronPort-AV: E=Sophos;i="6.15,182,1739865600"; 
-   d="scan'208";a="44257269"
+   d="scan'208";a="44257278"
 Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2025 10:39:10 -0700
-X-CSE-ConnectionGUID: p2GHOo/VQNmyOgcQ+JIrIg==
-X-CSE-MsgGUID: 7kOBXsLKRbyTzowjtSdWEQ==
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2025 10:39:11 -0700
+X-CSE-ConnectionGUID: 6Sin+6TvT22vACbEW9WZQA==
+X-CSE-MsgGUID: 6PuYY58hTW6undrhoXro3Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,182,1739865600"; 
-   d="scan'208";a="149968781"
+   d="scan'208";a="149968789"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa002.fm.intel.com with ESMTP; 02 Apr 2025 10:39:09 -0700
+  by fmviesa002.fm.intel.com with ESMTP; 02 Apr 2025 10:39:10 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -65,23 +65,13 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Zdenek Bouska <zdenek.bouska@siemens.com>,
+Cc: Vitaly Lifshits <vitaly.lifshits@intel.com>,
 	anthony.l.nguyen@intel.com,
-	vitaly.lifshits@intel.com,
 	dima.ruinskiy@intel.com,
-	maciej.fijalkowski@intel.com,
-	magnus.karlsson@intel.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	bpf@vger.kernel.org,
-	Song Yoong Siang <yoong.siang.song@intel.com>,
-	Florian Bezdeka <florian.bezdeka@siemens.com>,
-	Mor Bar-Gabay <morx.bar.gabay@intel.com>
-Subject: [PATCH net 2/5] igc: Fix TX drops in XDP ZC
-Date: Wed,  2 Apr 2025 10:38:54 -0700
-Message-ID: <20250402173900.1957261-3-anthony.l.nguyen@intel.com>
+	Avigail Dahan <avigailx.dahan@intel.com>
+Subject: [PATCH net 3/5] e1000e: change k1 configuration on MTP and later platforms
+Date: Wed,  2 Apr 2025 10:38:55 -0700
+Message-ID: <20250402173900.1957261-4-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250402173900.1957261-1-anthony.l.nguyen@intel.com>
 References: <20250402173900.1957261-1-anthony.l.nguyen@intel.com>
@@ -93,40 +83,173 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Zdenek Bouska <zdenek.bouska@siemens.com>
+From: Vitaly Lifshits <vitaly.lifshits@intel.com>
 
-Fixes TX frame drops in AF_XDP zero copy mode when budget < 4.
-xsk_tx_peek_desc() consumed TX frame and it was ignored because of
-low budget. Not even AF_XDP completion was done for dropped frames.
+Starting from Meteor Lake, the Kumeran interface between the integrated
+MAC and the I219 PHY works at a different frequency. This causes sporadic
+MDI errors when accessing the PHY, and in rare circumstances could lead
+to packet corruption.
 
-It can be reproduced on i226 by sending 100000x 60 B frames with
-launch time set to minimal IPG (672 ns between starts of frames)
-on 1Gbit/s. Always 1026 frames are not sent and are missing a
-completion.
+To overcome this, introduce minor changes to the Kumeran idle
+state (K1) parameters during device initialization. Hardware reset
+reverts this configuration, therefore it needs to be applied in a few
+places.
 
-Fixes: 9acf59a752d4c ("igc: Enable TX via AF_XDP zero-copy")
-Signed-off-by: Zdenek Bouska <zdenek.bouska@siemens.com>
-Reviewed-by: Song Yoong Siang <yoong.siang.song@intel.com>
-Reviewed-by: Florian Bezdeka <florian.bezdeka@siemens.com>
-Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com>
+Fixes: cc23f4f0b6b9 ("e1000e: Add support for Meteor Lake")
+Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
+Tested-by: Avigail Dahan <avigailx.dahan@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/igc/igc_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/intel/e1000e/defines.h |  3 +
+ drivers/net/ethernet/intel/e1000e/ich8lan.c | 80 +++++++++++++++++++--
+ drivers/net/ethernet/intel/e1000e/ich8lan.h |  4 ++
+ 3 files changed, 82 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 27c99ff59ed4..156d123c0e21 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -3042,7 +3042,7 @@ static void igc_xdp_xmit_zc(struct igc_ring *ring)
- 	 * descriptors. Therefore, to be safe, we always ensure we have at least
- 	 * 4 descriptors available.
+diff --git a/drivers/net/ethernet/intel/e1000e/defines.h b/drivers/net/ethernet/intel/e1000e/defines.h
+index 5e2cfa73f889..8294a7c4f122 100644
+--- a/drivers/net/ethernet/intel/e1000e/defines.h
++++ b/drivers/net/ethernet/intel/e1000e/defines.h
+@@ -803,4 +803,7 @@
+ /* SerDes Control */
+ #define E1000_GEN_POLL_TIMEOUT          640
+ 
++#define E1000_FEXTNVM12_PHYPD_CTRL_MASK	0x00C00000
++#define E1000_FEXTNVM12_PHYPD_CTRL_P1	0x00800000
++
+ #endif /* _E1000_DEFINES_H_ */
+diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.c b/drivers/net/ethernet/intel/e1000e/ich8lan.c
+index 2f9655cf5dd9..364378133526 100644
+--- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
++++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
+@@ -285,6 +285,45 @@ static void e1000_toggle_lanphypc_pch_lpt(struct e1000_hw *hw)
+ 	}
+ }
+ 
++/**
++ * e1000_reconfigure_k1_exit_timeout - reconfigure K1 exit timeout to
++ * align to MTP and later platform requirements.
++ * @hw: pointer to the HW structure
++ *
++ * Context: PHY semaphore must be held by caller.
++ * Return: 0 on success, negative on failure
++ */
++static s32 e1000_reconfigure_k1_exit_timeout(struct e1000_hw *hw)
++{
++	u16 phy_timeout;
++	u32 fextnvm12;
++	s32 ret_val;
++
++	if (hw->mac.type < e1000_pch_mtp)
++		return 0;
++
++	/* Change Kumeran K1 power down state from P0s to P1 */
++	fextnvm12 = er32(FEXTNVM12);
++	fextnvm12 &= ~E1000_FEXTNVM12_PHYPD_CTRL_MASK;
++	fextnvm12 |= E1000_FEXTNVM12_PHYPD_CTRL_P1;
++	ew32(FEXTNVM12, fextnvm12);
++
++	/* Wait for the interface the settle */
++	usleep_range(1000, 1100);
++
++	/* Change K1 exit timeout */
++	ret_val = e1e_rphy_locked(hw, I217_PHY_TIMEOUTS_REG,
++				  &phy_timeout);
++	if (ret_val)
++		return ret_val;
++
++	phy_timeout &= ~I217_PHY_TIMEOUTS_K1_EXIT_TO_MASK;
++	phy_timeout |= 0xF00;
++
++	return e1e_wphy_locked(hw, I217_PHY_TIMEOUTS_REG,
++				  phy_timeout);
++}
++
+ /**
+  *  e1000_init_phy_workarounds_pchlan - PHY initialization workarounds
+  *  @hw: pointer to the HW structure
+@@ -327,15 +366,22 @@ static s32 e1000_init_phy_workarounds_pchlan(struct e1000_hw *hw)
+ 	 * LANPHYPC Value bit to force the interconnect to PCIe mode.
  	 */
--	while (xsk_tx_peek_desc(pool, &xdp_desc) && budget >= 4) {
-+	while (budget >= 4 && xsk_tx_peek_desc(pool, &xdp_desc)) {
- 		struct igc_metadata_request meta_req;
- 		struct xsk_tx_metadata *meta = NULL;
- 		struct igc_tx_buffer *bi;
+ 	switch (hw->mac.type) {
++	case e1000_pch_mtp:
++	case e1000_pch_lnp:
++	case e1000_pch_ptp:
++	case e1000_pch_nvp:
++		/* At this point the PHY might be inaccessible so don't
++		 * propagate the failure
++		 */
++		if (e1000_reconfigure_k1_exit_timeout(hw))
++			e_dbg("Failed to reconfigure K1 exit timeout\n");
++
++		fallthrough;
+ 	case e1000_pch_lpt:
+ 	case e1000_pch_spt:
+ 	case e1000_pch_cnp:
+ 	case e1000_pch_tgp:
+ 	case e1000_pch_adp:
+-	case e1000_pch_mtp:
+-	case e1000_pch_lnp:
+-	case e1000_pch_ptp:
+-	case e1000_pch_nvp:
+ 		if (e1000_phy_is_accessible_pchlan(hw))
+ 			break;
+ 
+@@ -419,8 +465,20 @@ static s32 e1000_init_phy_workarounds_pchlan(struct e1000_hw *hw)
+ 		 *  the PHY is in.
+ 		 */
+ 		ret_val = hw->phy.ops.check_reset_block(hw);
+-		if (ret_val)
++		if (ret_val) {
+ 			e_err("ME blocked access to PHY after reset\n");
++			goto out;
++		}
++
++		if (hw->mac.type >= e1000_pch_mtp) {
++			ret_val = hw->phy.ops.acquire(hw);
++			if (ret_val) {
++				e_err("Failed to reconfigure K1 exit timeout\n");
++				goto out;
++			}
++			ret_val = e1000_reconfigure_k1_exit_timeout(hw);
++			hw->phy.ops.release(hw);
++		}
+ 	}
+ 
+ out:
+@@ -4888,6 +4946,18 @@ static s32 e1000_init_hw_ich8lan(struct e1000_hw *hw)
+ 	u16 i;
+ 
+ 	e1000_initialize_hw_bits_ich8lan(hw);
++	if (hw->mac.type >= e1000_pch_mtp) {
++		ret_val = hw->phy.ops.acquire(hw);
++		if (ret_val)
++			return ret_val;
++
++		ret_val = e1000_reconfigure_k1_exit_timeout(hw);
++		hw->phy.ops.release(hw);
++		if (ret_val) {
++			e_dbg("Error failed to reconfigure K1 exit timeout\n");
++			return ret_val;
++		}
++	}
+ 
+ 	/* Initialize identification LED */
+ 	ret_val = mac->ops.id_led_init(hw);
+diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.h b/drivers/net/ethernet/intel/e1000e/ich8lan.h
+index 2504b11c3169..5feb589a9b5f 100644
+--- a/drivers/net/ethernet/intel/e1000e/ich8lan.h
++++ b/drivers/net/ethernet/intel/e1000e/ich8lan.h
+@@ -219,6 +219,10 @@
+ #define I217_PLL_CLOCK_GATE_REG	PHY_REG(772, 28)
+ #define I217_PLL_CLOCK_GATE_MASK	0x07FF
+ 
++/* PHY Timeouts */
++#define I217_PHY_TIMEOUTS_REG                   PHY_REG(770, 21)
++#define I217_PHY_TIMEOUTS_K1_EXIT_TO_MASK       0x0FC0
++
+ #define SW_FLAG_TIMEOUT		1000	/* SW Semaphore flag timeout in ms */
+ 
+ /* Inband Control */
 -- 
 2.47.1
 
