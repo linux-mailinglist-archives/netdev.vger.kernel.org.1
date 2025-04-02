@@ -1,82 +1,202 @@
-Return-Path: <netdev+bounces-178910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED346A79867
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 00:45:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C2D9A7987B
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 01:01:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7035F18933E7
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 22:45:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55B5C170F09
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 23:01:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F5741F419A;
-	Wed,  2 Apr 2025 22:45:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84EEC1F758F;
+	Wed,  2 Apr 2025 23:01:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T159m+SA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ICbdYUMO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69C711F3FC0
-	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 22:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A431F7075;
+	Wed,  2 Apr 2025 23:01:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743633906; cv=none; b=PvK9oAyH8TQH7kmo4XahDLFmdatmujZJ+JpSGtw0v8v30+0MGFugNwdB8GajvYJqQDY87c4H31z3b+S/gGptXgVhYqQobjsSbi9/GmcvDKVtS8IWQS1K+NsaVQSCospjnrQxSdQ2INNnlTrpVtk40Iv4ka5sdkU9rveWod1N02U=
+	t=1743634878; cv=none; b=VCnhqNTcpMlX+sLv3agXcKIa+RJENjS6QssUe4jjyxmNCJrLNsnoABcnkcRgDuOfSEUolWv0iSsa53QALXB9qMrmDfMpao55diC4VJkO/j6ehzB9uswcmjvXoC8A6mArrcJOp50JqAkVivNyyE2L9OQfkY+ULq48bdBimStepNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743633906; c=relaxed/simple;
-	bh=3ZCYrknP3EUFodr6yxtKiIsF+WFsMUgZSFvk38Uz0qk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ahmeXgdUTKqs/nf4sKqoAauUIYOTxbuhkooz8IIpo/5RX0gJXcBu496sVOcDY7dXrO8Op79/uYg99cDsha7jcb0GXdyKD+t21fRZGS4VTYYPjJdOTc08ZD0CYa9Bo7zQOEMiwcOhMIQ9+sqxHsGhZN+mDcj3qtltPcIszEBoWFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T159m+SA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7818DC4CEDD;
-	Wed,  2 Apr 2025 22:45:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743633905;
-	bh=3ZCYrknP3EUFodr6yxtKiIsF+WFsMUgZSFvk38Uz0qk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=T159m+SAmuFG2SeQMzZSyhMGmUgfuGctSeG1/zlS5/8DScsmhibr4DSrFUTLxL3ZD
-	 P0mPdjEICbqiLSb98ka0Ayur2akT14lxFE5KvhPKasYYj0mIpkoOp5///xaRb7yobK
-	 XeTK7FZ9R9MgFGGCPvOhDzDN7Tl4ozF59h+CoeuJhor5Gr5oc2GXRbAR2IngQGXXDh
-	 1q3f7oQF6n5txjaQK6KgUhtC+fOTBFqJdZMrMtTVnIij8EYxjlMfvXLyKeg20QbNzl
-	 zmEUNoEsdj4jVZzunYorkeANimLhSWal9bySaDEoR58jA79ZmevV/r0NHdkZKd3Wd3
-	 TkA+SM7Nf23kQ==
-Date: Wed, 2 Apr 2025 15:45:04 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Taehee Yoo <ap420073@gmail.com>, davem@davemloft.net, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, horms@kernel.org,
- michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
- ilias.apalodimas@linaro.org, dw@davidwei.uk, netdev@vger.kernel.org,
- kuniyu@amazon.com, sdf@fomichev.me, aleksander.lobakin@intel.com
-Subject: Re: [RFC net-next 2/2] eth: bnxt: add support rx side device memory
- TCP
-Message-ID: <20250402154504.0da028d2@kernel.org>
-In-Reply-To: <CAHS8izNwpoH7qQbRqS3gpZaouVsR-8j5ju_ZRU6UmjO1ugbFWw@mail.gmail.com>
-References: <20250331114729.594603-1-ap420073@gmail.com>
-	<20250331114729.594603-3-ap420073@gmail.com>
-	<20250331115045.032d2eb7@kernel.org>
-	<CAHS8izNwpoH7qQbRqS3gpZaouVsR-8j5ju_ZRU6UmjO1ugbFWw@mail.gmail.com>
+	s=arc-20240116; t=1743634878; c=relaxed/simple;
+	bh=2GzWdaDmN/7Vn4Jjp/ACQtNwRhu01zTK3kcsoJgCWbo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WWQu2QkaZVIYL0pqwKyv8hiEIDK91lfeX+YGbf1MofGF4a5f8kkQkhmM/QyGiOuZ5IZB+riUGxrfjmevQNU84/GxgPctCkftItG0BfmYMsToiQj2zdUtB4kDzxxiWWPnekRVRCMxoMCiTB7TJQwD2MPvxfKFHcVpV++ylGon4pA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ICbdYUMO; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-30185d00446so225953a91.0;
+        Wed, 02 Apr 2025 16:01:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743634875; x=1744239675; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3Q5g6vjilwHVlFu2iNXstsKlqPmWzVrhaLj3zxkMXn4=;
+        b=ICbdYUMO0SjLlEgMz+UX411Jcgx0uVLYv3Nr6Ym0LMnGc2b+UgMjeEYHdtnuzkpen7
+         Ujm9HX5mwUcnOO+85/2gMng3ruzNmrNy+YASX/3oJ/4HR8x2GVo2sWZwGpf+54IWVGSy
+         LDf6wWgQKz8loEyXr7jJmcoEvnMpkzEyQKn8Y7xE3fvx92Jx0KERbmmMftAoRpRGED2K
+         XoZsBEObkM9bg115rvL2eKuZoxX8toQeilYEp1XivfMYFOvYcgC6e4myHSbjEC/oAE+H
+         bSF2ejKTzGOv4s7i8u1i08j0eqneKfitp6SCYI1ZzmQv2dqOrf1IOOiK1/KQ8qg1JOP0
+         23gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743634875; x=1744239675;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3Q5g6vjilwHVlFu2iNXstsKlqPmWzVrhaLj3zxkMXn4=;
+        b=xVgpiNZ5byRgwnUzVJKdi7ugGKrT7hRhJyO3e8AaxITXPW6ZrZGU/GNyaK6BFNGP02
+         qtL/GJZsbpr1+Ubr02y7z8FIEo6RDN+eSTXvtW21ru9y5m7M4DMnlAiIYOmmsf8AUmKP
+         T00IJtlxdrHoZYKYfMuVbwnGskRaiJC+c+hfQ/+yHEa2o/JYK9+8RFjqe4Orm3k04Ux+
+         8c6OKeNNeFzyo92Xxpfdj5fgsC9Lz4RIBhITe/1DpzodXNXHYvjiL/0PGuuqK3KJX+ta
+         g3f2IkL543/+Uz0uaZhNBRYC3BkrwRQamJvfKgY0UK6ep77WlNkBaEkbtVLAwK5WiZ1g
+         H7Zw==
+X-Forwarded-Encrypted: i=1; AJvYcCWVLbwK9xDZfC1wqWYX4j2J1o6P90T7Dmd8IKrS1MfdRPjsgSiKL1zzwtWCdRcbG10x5fc=@vger.kernel.org, AJvYcCWsRQM2Z5Mo4ihYZWEwi0ccEOVpRXyV22e81L0nHWQfpUoJ0KElNS2CAGdxVy6uhq2UmGRoYoWA@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvxWkjAnyhp+hdcn3ZB00ErkjIxCbUjmgsQXWha3esDW2x6a4I
+	JuTK0iyOkkNI6U5Qcn9JlyfI6Mf/3GgYb6iZiltjJslqsZIp9sK8
+X-Gm-Gg: ASbGncuZFDR/WDt0ygEYymdwfONlxR4w9l1D1updXoDDEyYQZKQFD8cmO+rOieYzvbw
+	iSCLsjXc4ihwZfKmOOjUa028GgiUCqNjbU9wXYHRHwqUV6qj2uVTdzW4Rhp1COib6YDM3NMFUhT
+	5NIPiKutRJCg27Y/KEI5ucnxYj40H7fr8K3fEbJ+smV6nAdEufKVhiBwFCLp5RD01qORaYd1ckm
+	JdWloWR/P+fKQs5AogypT+NPVG/rMwzt4Ur00/awf4ZrF1x2Z1T81m31GR+9wlvBiei0/eLzHlC
+	rEgXTDMxmxcEs6gXyL0YeXAAPKgnUgw3DbgKe9t6g6cJ
+X-Google-Smtp-Source: AGHT+IFTn/3YRHFEhIEuXBYfveNpG911n8tz7h0qc3UcYP9adi1ViVPh9fIv1rRDRodHcVoJYgSsXw==
+X-Received: by 2002:a17:90b:3509:b0:2ee:cbd0:4910 with SMTP id 98e67ed59e1d1-3057a5a14a4mr1641907a91.1.1743634874882;
+        Wed, 02 Apr 2025 16:01:14 -0700 (PDT)
+Received: from gmail.com ([98.97.40.51])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2297865e45fsm1140155ad.135.2025.04.02.16.01.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Apr 2025 16:01:14 -0700 (PDT)
+Date: Wed, 2 Apr 2025 16:00:56 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Dong Chenchen <dongchenchen2@huawei.com>
+Cc: edumazet@google.com, kuniyu@amazon.com, pabeni@redhat.com,
+	willemb@google.com, jakub@cloudflare.com, davem@davemloft.net,
+	kuba@kernel.org, horms@kernel.org, daniel@iogearbox.net,
+	xiyou.wangcong@gmail.com, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, stfomichev@gmail.com, mrpre@163.com,
+	zhangchangzhong@huawei.com
+Subject: Re: [PATCH net v2 1/2] bpf, sockmap: Avoid sk_prot reset on sockmap
+ unlink with ULP set
+Message-ID: <20250402230056.6xobt4gwpfnqorzp@gmail.com>
+References: <20250331012126.1649720-1-dongchenchen2@huawei.com>
+ <20250331012126.1649720-2-dongchenchen2@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250331012126.1649720-2-dongchenchen2@huawei.com>
 
-On Wed, 2 Apr 2025 15:11:39 -0700 Mina Almasry wrote:
-> > We also shouldn't pass netmem to XDP init, it's strange conceptually.
-> > If we reach XDP it has to be a non-net_iov page.
+On 2025-03-31 09:21:25, Dong Chenchen wrote:
+> WARNING: CPU: 0 PID: 6558 at net/core/sock_map.c:1703 sock_map_close+0x3c4/0x480
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 6558 Comm: syz-executor.14 Not tainted 6.14.0-rc5+ #238
+> RIP: 0010:sock_map_close+0x3c4/0x480
+> Call Trace:
+>  <TASK>
+>  inet_release+0x144/0x280
+>  __sock_release+0xb8/0x270
+>  sock_close+0x1e/0x30
+>  __fput+0x3c6/0xb30
+>  __fput_sync+0x7b/0x90
+>  __x64_sys_close+0x90/0x120
+>  do_syscall_64+0x5d/0x170
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
 > 
-> Very noob question, but is XDP/netmem interactions completely
-> impossible for some reason? I was thinking XDP progs that only
-> touch/need the header may work with unreadable netmem, and if we ever
-> add readable net_iovs then those maybe can be exposed to XDP, no? Or
-> am I completely off the rails here?
+> The root cause is:
+> bpf_prog_attach(BPF_SK_SKB_STREAM_VERDICT)
+> tcp_set_ulp //set ulp after sockmap add
+> 	icsk->icsk_ulp_ops = ulp_ops;
+> sock_hash_update_common
+>   sock_map_unref
+>     sock_map_del_link
+>       psock->psock_update_sk_prot(sk, psock, false);
+> 	sk->sk_prot->close = sock_map_close
+> sk_psock_drop
+>   sk_psock_restore_proto
+>     tcp_bpf_update_proto
+>        tls_update //not redo sk_prot to tcp prot
+> inet_release
+>   sk->sk_prot->close
+>     sock_map_close
+>       WARN(sk->sk_prot->close == sock_map_close)
+> 
+> commit e34a07c0ae39 ("sock: redo the psock vs ULP protection check")
+> has moved ulp check from tcp_bpf_update_proto() to psock init.
+> If sk sets ulp after being added to sockmap, it will reset sk_prot to
+> BPF_BASE when removed from sockmap. After the psock is dropped, it will
+> not reset sk_prot back to the tcp prot, only tls context update is
+> performed. This can trigger a warning in sock_map_close() due to
+> recursion of sk->sk_prot->close.
+> 
+> To fix this issue, skip the sk_prot operations redo when deleting link
+> from sockmap if ULP is set.
+> 
+> Fixes: e34a07c0ae39 ("sock: redo the psock vs ULP protection check")
+> Fixes: c0d95d3380ee ("bpf, sockmap: Re-evaluate proto ops when psock is removed from sockmap")
+> Suggested-by: Cong Wang <xiyou.wangcong@gmail.com>
+> Signed-off-by: Dong Chenchen <dongchenchen2@huawei.com>
+> ---
+> Changes for v2:
+> - Move ULP check from sock_map_del_link() to tcp_bpf_update_proto()
+> ---
+>  net/ipv4/tcp_bpf.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
+> index ba581785adb4..01b3930947cc 100644
+> --- a/net/ipv4/tcp_bpf.c
+> +++ b/net/ipv4/tcp_bpf.c
+> @@ -708,6 +708,9 @@ int tcp_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
+>  		return 0;
+>  	}
+>  
 
-Right, I was referring to the current state of things.
-Extensions both to XDP semantics or net_iov could change
-the picture.
+I think in this case we also want to update the ULP so that when it
+tears down it will restore the correct proto ops?
+
+Either tcp_bpf_update_proto should be called with restore=true or
+this logic should be similar to above?
+
+	if (inet_csk_has_ulp(sk)) {
+		/* TLS does not have an unhash proto in SW cases,
+		 * but we need to ensure we stop using the sock_map
+		 * unhash routine because the associated psock is being
+		 * removed. So use the original unhash handler.
+		 */
+		WRITE_ONCE(sk->sk_prot->unhash, psock->saved_unhash);
+		tcp_update_ulp(sk, psock->sk_proto, psock->saved_write_space);
+
+> +	if (inet_csk_has_ulp(sk))
+> +		return 0;
+
+I'm thinking of this stack of psock/ULPs,
+
+   TCP ops -> sockmap psock -> TLS (ULP) ops
+
+When ULP ops was initialized it stored sockmap ops in its ctx->sk_proto
+so that it if it was removed it could restore the correct ops. Similar
+sockmap psock stored TCP ops to restore if its removed. So if we remove
+psock in the middle we shoudl tell the ULP to update its stored value.
+
+The concerning flow might be,
+
+   socket insert into sockmap (gets psock)
+   socket adds ULP
+   socket removed from socketmap (removes psock)
+   socket removes ULP (restores original tcp ops hopefully)
+
+Perhaps we could also add a test for this case to the 2nd patch?
+
+Thanks,
+John
+ 
 
