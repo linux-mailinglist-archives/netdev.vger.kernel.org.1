@@ -1,110 +1,113 @@
-Return-Path: <netdev+bounces-178753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F1DAA78B89
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 11:50:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBE7FA78BD1
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 12:19:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D14F7A1B27
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 09:49:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AC4C1893E8B
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 10:19:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86DB423496B;
-	Wed,  2 Apr 2025 09:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 275C923370C;
+	Wed,  2 Apr 2025 10:19:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aNSrXIJ7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ymdv8SWe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17A818D
-	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 09:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76B3320764C
+	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 10:19:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743587427; cv=none; b=T1HxDNTsHWkr6yYd6WEYTkI2aRo3mE9QC7mngP2/FJLKim80fE7r4wQEKoGdtplGFvYbQa5qBiYrm8DZ5rCAgIZiokCSMREuTTbLyiYQbOUUjzRoPCrd19rMYqUzwmID1bhsJhpzqBW1+LwyVbyEX1X2TIKoSy66tJp3GWgvc30=
+	t=1743589177; cv=none; b=YquTB6KibDOyrQ4uW4bin32wsdb/Tgf+SxyB9ydorcnMlP1vPdWmSaDrPECAfBbfrX+p4hcs5grjeuRbRXaqqFvMp3ph/L+KecHjQaWjnRccaeiE4zYaGed8okAcef0dFIEAvCeVwfFeMLzvtOIH/62H+vfxm0bwTizM7DjDEAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743587427; c=relaxed/simple;
-	bh=WjJTs6P3ilpPrUnWgbRh9qL9J5SqsxBe+zQ0ZZJnU7w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cDP36hExDznXM/BOw6sqYyfHOM3PUs5le502vYsUgjhZ+bX5IVEsd4byxVi4f59zZDlAJAcDwQVJQSRugcSJLSa/XgJca9USHv7CRGcVVUPZcSA9V+Jn1k+tevT+/CMGZSlw7OfJs9txf4Tcp+gn/pOr38y/irE5E/km5mSpUlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aNSrXIJ7; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1743587425; x=1775123425;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=WjJTs6P3ilpPrUnWgbRh9qL9J5SqsxBe+zQ0ZZJnU7w=;
-  b=aNSrXIJ7EzO877gzVOovevDZOaXcJEzB3VZTuOAt5iy3nuzShEWs8Cfl
-   i12UJG7TRZ+kqAMdqTMbZcVg/x34WSbJgvhj03JcSe4/eb+dhjjYgq+g8
-   jb8owQqtylOqiDDoNZBDSx0idrT7kJbLnRUDXnwd/G+xmBFvzGaX1SqTF
-   qwm38OGpsTpTGQqYBuJ4edGKLEIT41HMCbey6B1MKfEdhEPbuM/xvcCqD
-   kWWpdFXVGRFy8CixTsCHhMSHTLrLN47u0JgWhzsHjbiy3gIRnXmfvKTu0
-   uFMW84tBqX6Ascbpa572Zy7mE0ssVpUwaHC6pYaYmEB1KJy30WqRjRWOe
-   Q==;
-X-CSE-ConnectionGUID: B5qbNXgKRseu79OLZj0RbA==
-X-CSE-MsgGUID: hQQfpkUOTI2GZRDo6My6Nw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11391"; a="44836986"
-X-IronPort-AV: E=Sophos;i="6.14,181,1736841600"; 
-   d="scan'208";a="44836986"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2025 02:50:25 -0700
-X-CSE-ConnectionGUID: R1O/c36IRqWiGrGVwnBIDg==
-X-CSE-MsgGUID: 0wbVn0ZjRbueDKs7qR9YCQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,181,1736841600"; 
-   d="scan'208";a="131777729"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2025 02:50:22 -0700
-Date: Wed, 2 Apr 2025 11:50:12 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Edward Cree <ecree.xilinx@gmail.com>
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	edward.cree@amd.com, linux-net-drivers@amd.com, davem@davemloft.net,
-	kuba@kernel.org, edumazet@google.com, pabeni@redhat.com,
-	horms@kernel.org, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
-	Kyungwook Boo <bookyungwook@gmail.com>
-Subject: Re: [PATCH net] sfc: fix NULL dereferences in
- ef100_process_design_param()
-Message-ID: <Z+0ITvrUaZSfdehU@mev-dev.igk.intel.com>
-References: <20250401225439.2401047-1-edward.cree@amd.com>
- <Z+zITLJ4wB2Mhk8h@mev-dev.igk.intel.com>
- <98a26384-5d6f-d5d2-3ecc-1914a74299eb@gmail.com>
+	s=arc-20240116; t=1743589177; c=relaxed/simple;
+	bh=YWKoDaCWMuDN9R2MNxZ8oj+4NZYgHo0qSTGfYB3VYQs=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=BX1dp0oTzFNjhRlqDfLguBW0EP5embsfJALR/EV08U8xrdaocn6jAxAEdgk25gQS73KWzS70f3S5gNRd6LN62RJA3ofhxYdofLQJJHfZqv8tYENncjizujsxVePh1uTktQ10Cm2z0XuOhGZNIoVgzCq5BLTb8DG3BUmaYxn4U7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ymdv8SWe; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43d0359b1fcso4811805e9.0
+        for <netdev@vger.kernel.org>; Wed, 02 Apr 2025 03:19:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743589174; x=1744193974; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vFjD2QrnVua63eX0X19FdrEBBQmGU9xgIwchmAw74Y4=;
+        b=Ymdv8SWeqj9UL+HIurCBaCHn+sqK6fOq3F+zQtKS6xHFhLLhyDC+WHjU+TWE4xPo7A
+         8vHSSVUWZg5ijlq9EV5auMky7VkApWBk5MEL4lQLTohJZ9FToTjzJYnfkRrBb1zAW3lA
+         KuIcC5x59fTZ4rA1KyPeAgOUfRBNrB2jOFQJR9If9WfUkOzlabNkZ/3ahHsHp8qmqIaI
+         G2RfTGDv50Sw8Q+VCIAC4fn1dhnYeK7CEInyUMrAzmNgJJKFt2T009nBq2L2v9ilggtN
+         JhwiomFpNMYz1lwFL1IUdqhAYw2xkMrMj97YSqeE9a6c8HeLGlZYjQHuh+PneRE3vzOh
+         8iPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743589174; x=1744193974;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vFjD2QrnVua63eX0X19FdrEBBQmGU9xgIwchmAw74Y4=;
+        b=m24ox7SROrN2YqxOC+KnZYsTq+GHWrfsN2IIntIgq45s0FGRLxAHCvu63CCGSiNrDx
+         mvPThyeZZ7XsIHA851mBLtMiRL+nDet0mwsOmtDwlBd2mpxfJALTWVcVyQz0uUEfR+Lv
+         bjla3V9hp2Ht8j2g9J5DzEQMpid1Y0IJTmyk6BhQvV1VX2AdcnTD5i0kVD9scXGZHJfo
+         ilqBNIgIMUe92npQcBvr8AfCj/HoE51uc6js49E4ZhzzSkZl/Be3xKJvEj/xOgPK32t+
+         pCUZWTcEy0WWCAKlc6j5BHZNwGs+zS/Itczm93AveRiPyF1Nc4quRDpZIx+aw2H1UhaY
+         eawQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWinuJAKUfHaoefgHbNCUaYuQZd6ZuWsUc06Q9VitbuYkLdmIsd6pl8totfN7Kpc7SDTvuLBnI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3ckmcAeVqIpYGsfiEqyVsc+1bne23s9F3ZIdpdpaap09FF3xb
+	Hv0/3VdlKhlDuhmIyxWEVIZxJrOzV1VaVVdxIM4IOdHXhXs6gNkt
+X-Gm-Gg: ASbGncvF0J2u6iA7Ieq0eNtSKRODlZszEM/lZvd6iEhRj3Ba0aPQQ/tRo6N65Cw/g+w
+	qCjrIZqv0ikx0TOQakadatFAvYGPgQmZ9+9V46/dOJq8OYcNX26rHOacS/qRfoSUTDhFaj2H9Fu
+	pHFS7Q5fP5yPV0gA1VQdCNpH1+UP/tTU/+Mso0QR9IifrDTbjbk4MlKNK3ZqwyuYARTCazdRDNk
+	kBxytstWNHbZIDGZh9EAtJaHRTh2IjEkNWSu9mLSuAh7uEb5/BF51RZA3QN8ae70VvJAWnInTOG
+	PuAzAYVfPGgR3m8ipMEbX6M5eoFDLn5kJVSgMgfUAhxvF9x/MJWw3ZlcNOYi1uwxMjjc
+X-Google-Smtp-Source: AGHT+IFbRGYHwWW8eRm17jkHQP6aiPkAcXWmuPkCErVYgDp8Y6K1X9NP4p9VRy3RjwjIQRrRyKBSvw==
+X-Received: by 2002:a05:600c:3c8b:b0:43b:c857:e9d7 with SMTP id 5b1f17b1804b1-43eb7161d1dmr14066545e9.5.1743589173596;
+        Wed, 02 Apr 2025 03:19:33 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:15dc:40df:e712:c569])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43eb5fc1be0sm16237665e9.4.2025.04.02.03.19.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Apr 2025 03:19:33 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
+  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
+  yuyanghuang@google.com,  jacob.e.keller@intel.com
+Subject: Re: [PATCH net v2 1/3] netlink: specs: rt_addr: fix the spec format
+ / schema failures
+In-Reply-To: <20250402010300.2399363-2-kuba@kernel.org> (Jakub Kicinski's
+	message of "Tue, 1 Apr 2025 18:02:58 -0700")
+Date: Wed, 02 Apr 2025 11:08:44 +0100
+Message-ID: <m27c42j2oj.fsf@gmail.com>
+References: <20250402010300.2399363-1-kuba@kernel.org>
+	<20250402010300.2399363-2-kuba@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <98a26384-5d6f-d5d2-3ecc-1914a74299eb@gmail.com>
+Content-Type: text/plain
 
-On Wed, Apr 02, 2025 at 09:15:02AM +0100, Edward Cree wrote:
-> On 02/04/2025 06:17, Michal Swiatkowski wrote:
-> > On Tue, Apr 01, 2025 at 11:54:39PM +0100, edward.cree@amd.com wrote:
-> >> -	netif_set_tso_max_segs(net_dev,
-> >> -			       ESE_EF100_DP_GZ_TSO_MAX_HDR_NUM_SEGS_DEFAULT);
-> >> +	nic_data = efx->nic_data;
-> >> +	netif_set_tso_max_size(efx->net_dev, nic_data->tso_max_payload_len);
-> >> +	netif_set_tso_max_segs(efx->net_dev, nic_data->tso_max_payload_num_segs);
-> > 
-> > Is it fine to drop default value for max segs? Previously if somehow
-> > this value wasn't read from HW it was set to default, now it will be 0.
-> > 
-> > At the beggining of ef100_probe_main() default values for nic_data are
-> > set. Maybe it is worth to set also this default for max segs?
-> 
-> As I read it, ef100_probe_main() does set a default for this nic_data
->  field along with the others, and sets it to exactly this same value.
-> 
+Jakub Kicinski <kuba@kernel.org> writes:
 
-Sorry, right, I somehow missed it.
+> The spec is mis-formatted, schema validation says:
+>
+>   Failed validating 'type' in schema['properties']['operations']['properties']['list']['items']['properties']['dump']['properties']['request']['properties']['value']:
+>     {'minimum': 0, 'type': 'integer'}
+>
+>   On instance['operations']['list'][3]['dump']['request']['value']:
+>     '58 - ifa-family'
+>
+> The ifa-family clearly wants to be part of an attribute list.
+>
+> Reviewed-by: Yuyang Huang <yuyanghuang@google.com>
+> Fixes: 4f280376e531 ("selftests/net: Add selftest for IPv4 RTM_GETMULTICAST support")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-
-> confused,
-> -ed
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
