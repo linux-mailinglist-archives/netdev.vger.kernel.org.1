@@ -1,173 +1,94 @@
-Return-Path: <netdev+bounces-178749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A85DCA78B09
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 11:26:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9316CA78B1D
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 11:32:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC0DC3ACC4A
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 09:26:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7DD5189365A
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 09:32:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75163235364;
-	Wed,  2 Apr 2025 09:26:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qnk6uNTC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8700C23498F;
+	Wed,  2 Apr 2025 09:32:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ssh248.corpemail.net (ssh248.corpemail.net [210.51.61.248])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CCBA205AD7;
-	Wed,  2 Apr 2025 09:26:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B47720DD4B;
+	Wed,  2 Apr 2025 09:32:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.51.61.248
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743585971; cv=none; b=FBeOgCgwAihxHZ5CKosuPH+fRmpHnOR4Hd/iZmHru2IaY0MdGHpKSgYyg0upN1LH3o5iMqUo880nV0xIiOSCqLLN2foIBDLrCHHvj8/QNMl0YFLU9PDaXmaHcUY8/zEqNrt/xPzXukFZRtiqo2BaxoYTQEa8MqWGX0OGKPoJySQ=
+	t=1743586363; cv=none; b=A3uPQbhZG7tNyVZIjhACS2CpEdFmdJCm8BoUNgzVFprQq4wFWkZYFfJHWSbj4Mn09jgAvLXLC+0igyfGRcHsROT1RCvecN6dZCizAMeQO/lq4v3Otk8G5vzFw2olsuSw7jyb5Y1TK4bSMV4JlIXxRRwFaUzr13FStONa8zWlfZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743585971; c=relaxed/simple;
-	bh=UrEYev3gTVK2sp5pdFb3fCyxVMvmTB7pMIYsSE6G+/Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f0UJPZmZdpGqqMMc1Cv/IPJMxZUST5FwZ2wnEFn36MEmsfj8Jcf+pd1g6r+VSC2SKmr1sDpPIaNbtLSRlgGEAIVGwNAacm5MSPxoSax+3kRmnxXh2NKoUe34Z+5jyoGmWgqjO2/ouFr6LPGhbWrk+4+uqdjcPsX1F6kgrKMPCck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qnk6uNTC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CBDBC4CEDD;
-	Wed,  2 Apr 2025 09:26:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743585969;
-	bh=UrEYev3gTVK2sp5pdFb3fCyxVMvmTB7pMIYsSE6G+/Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qnk6uNTCD4FAegNtPTzvmqtYr8HhwgZC63m8UvDrbJ+jtWCcaEv0R9JlTcD1FgAuO
-	 15OjR90Rrm50QfiGh+F+8Weypj12hn1RAbekQxq8A34AY4gkvsQ1A19W1iDWD+IPSo
-	 igm2tdTZTXOrT589fpUgLmjzDYEfYioExTX/nj/pZ0gVE42HVNatQGKcgZxEDcf/O8
-	 t9RQpiWwgmv0A2YPWIyA7Lm5MeiWcYQp5HA+Mek3whA8g/RsPw2KI7erEpZeb5IgCa
-	 PijpXofM323Mn/XRPeSv4RO897GzqMg2fUN0c6jJNQaKd191A4F4rDOxLmpwVJ6+Uo
-	 d9dRnCZGXTYRQ==
-Date: Wed, 2 Apr 2025 10:26:05 +0100
-From: Simon Horman <horms@kernel.org>
-To: Alexander Graf <graf@amazon.com>
-Cc: netdev@vger.kernel.org, Stefano Garzarella <sgarzare@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, kvm@vger.kernel.org,
-	Asias He <asias@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>, nh-open-source@amazon.com
-Subject: Re: [PATCH v2] vsock/virtio: Remove queued_replies pushback logic
-Message-ID: <20250402092605.GJ214849@horms.kernel.org>
-References: <20250401201349.23867-1-graf@amazon.com>
+	s=arc-20240116; t=1743586363; c=relaxed/simple;
+	bh=2PAdBlm2iE+helgRQkij09k015rNc1HojNJjuskui2U=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XW3TZZdS97OGJK8j5KJo6yvQMoKd9tFit/c67wBAMnK3M3HcAoFEdaenafjXyEKIvZ0eyumPkCFu7IoA3ZdgyNZxDpXr02KcbWDfiwX9DMikKSevae+6P5Ie/Gx3P2ZK1CxoOjiVmQJMnqDkhEbdGJXuiM8vKfi3fI8RttryIdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com; spf=pass smtp.mailfrom=inspur.com; arc=none smtp.client-ip=210.51.61.248
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inspur.com
+Received: from Jtjnmail201616.home.langchao.com
+        by ssh248.corpemail.net ((D)) with ASMTP (SSL) id 202504021732240994;
+        Wed, 02 Apr 2025 17:32:24 +0800
+Received: from jtjnmail201607.home.langchao.com (10.100.2.7) by
+ Jtjnmail201616.home.langchao.com (10.100.2.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 2 Apr 2025 17:32:24 +0800
+Received: from locahost.localdomain.com (10.94.17.92) by
+ jtjnmail201607.home.langchao.com (10.100.2.7) with Microsoft SMTP Server id
+ 15.1.2507.39; Wed, 2 Apr 2025 17:32:23 +0800
+From: Charles Han <hanchunchao@inspur.com>
+To: <saeedm@nvidia.com>, <tariqt@nvidia.com>, <leon@kernel.org>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <maord@nvidia.com>,
+	<lariel@nvidia.com>, <paulb@nvidia.com>
+CC: <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Charles Han <hanchunchao@inspur.com>
+Subject: [PATCH] net/mlx5e: fix potential null dereference in mlx5e_tc_nic_create_miss_table
+Date: Wed, 2 Apr 2025 17:32:20 +0800
+Message-ID: <20250402093221.3253-1-hanchunchao@inspur.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250401201349.23867-1-graf@amazon.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+tUid: 2025402173224611767681e19845ec8a9450d9d607af6
+X-Abuse-Reports-To: service@corp-email.com
+Abuse-Reports-To: service@corp-email.com
+X-Complaints-To: service@corp-email.com
+X-Report-Abuse-To: service@corp-email.com
 
-On Tue, Apr 01, 2025 at 08:13:49PM +0000, Alexander Graf wrote:
-> Ever since the introduction of the virtio vsock driver, it included
-> pushback logic that blocks it from taking any new RX packets until the
-> TX queue backlog becomes shallower than the virtqueue size.
-> 
-> This logic works fine when you connect a user space application on the
-> hypervisor with a virtio-vsock target, because the guest will stop
-> receiving data until the host pulled all outstanding data from the VM.
-> 
-> With Nitro Enclaves however, we connect 2 VMs directly via vsock:
-> 
->   Parent      Enclave
-> 
->     RX -------- TX
->     TX -------- RX
-> 
-> This means we now have 2 virtio-vsock backends that both have the pushback
-> logic. If the parent's TX queue runs full at the same time as the
-> Enclave's, both virtio-vsock drivers fall into the pushback path and
-> no longer accept RX traffic. However, that RX traffic is TX traffic on
-> the other side which blocks that driver from making any forward
-> progress. We're now in a deadlock.
-> 
-> To resolve this, let's remove that pushback logic altogether and rely on
-> higher levels (like credits) to ensure we do not consume unbounded
-> memory.
-> 
-> RX and TX queues share the same work queue. To prevent starvation of TX
-> by an RX flood and vice versa now that the pushback logic is gone, let's
-> deliberately reschedule RX and TX work after a fixed threshold (256) of
-> packets to process.
-> 
-> Fixes: 0ea9e1d3a9e3 ("VSOCK: Introduce virtio_transport.ko")
-> Signed-off-by: Alexander Graf <graf@amazon.com>
-> ---
->  net/vmw_vsock/virtio_transport.c | 70 +++++++++-----------------------
->  1 file changed, 19 insertions(+), 51 deletions(-)
-> 
-> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+mlx5_get_flow_namespace() may return a NULL pointer, dereferencing it
+without NULL check may lead to NULL dereference.
+Add a NULL check for ns.
 
-...
+Fixes: 66cb64e292d2 ("net/mlx5e: TC NIC mode, fix tc chains miss table")
+Signed-off-by: Charles Han <hanchunchao@inspur.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/en_tc.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-> @@ -158,7 +162,7 @@ virtio_transport_send_pkt_work(struct work_struct *work)
->  		container_of(work, struct virtio_vsock, send_pkt_work);
->  	struct virtqueue *vq;
->  	bool added = false;
-> -	bool restart_rx = false;
-> +	int pkts = 0;
->  
->  	mutex_lock(&vsock->tx_lock);
->  
-> @@ -172,6 +176,12 @@ virtio_transport_send_pkt_work(struct work_struct *work)
->  		bool reply;
->  		int ret;
->  
-> +		if (++pkts > VSOCK_MAX_PKTS_PER_WORK) {
-> +			/* Allow other works on the same queue to run */
-> +			queue_work(virtio_vsock_workqueue, work);
-> +			break;
-> +		}
-> +
->  		skb = virtio_vsock_skb_dequeue(&vsock->send_pkt_queue);
->  		if (!skb)
->  			break;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+index 9ba99609999f..9c524d8c0e5a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+@@ -5216,6 +5216,10 @@ static int mlx5e_tc_nic_create_miss_table(struct mlx5e_priv *priv)
+ 	ft_attr.level = MLX5E_TC_MISS_LEVEL;
+ 	ft_attr.prio = 0;
+ 	ns = mlx5_get_flow_namespace(priv->mdev, MLX5_FLOW_NAMESPACE_KERNEL);
++	if (!ns) {
++		mlx5_core_warn(priv->mdev, "Failed to get flow namespace\n");
++		return -EOPNOTSUPP;
++	}
+ 
+ 	*ft = mlx5_create_auto_grouped_flow_table(ns, &ft_attr);
+ 	if (IS_ERR(*ft)) {
+-- 
+2.43.0
 
-Hi Alexander,
-
-The next non-blank line of code looks like this:
-
-		reply = virtio_vsock_skb_reply(skb);
-
-But with this patch reply is assigned but otherwise unused.
-So perhaps the line above, and the declaration of reply, can be removed?
-
-Flagged by W=1 builds.
-
-> @@ -184,17 +194,6 @@ virtio_transport_send_pkt_work(struct work_struct *work)
->  			break;
->  		}
->  
-> -		if (reply) {
-> -			struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
-> -			int val;
-> -
-> -			val = atomic_dec_return(&vsock->queued_replies);
-> -
-> -			/* Do we now have resources to resume rx processing? */
-> -			if (val + 1 == virtqueue_get_vring_size(rx_vq))
-> -				restart_rx = true;
-> -		}
-> -
->  		added = true;
->  	}
->  
-> @@ -203,9 +202,6 @@ virtio_transport_send_pkt_work(struct work_struct *work)
->  
->  out:
->  	mutex_unlock(&vsock->tx_lock);
-> -
-> -	if (restart_rx)
-> -		queue_work(virtio_vsock_workqueue, &vsock->rx_work);
->  }
->  
->  /* Caller need to hold RCU for vsock.
-
-...
 
