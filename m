@@ -1,76 +1,74 @@
-Return-Path: <netdev+bounces-178725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A912EA78780
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 07:10:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B126A7878A
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 07:17:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93B0E188E03F
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 05:10:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2513516E761
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 05:17:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5919920B7E1;
-	Wed,  2 Apr 2025 05:10:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E534A207E05;
+	Wed,  2 Apr 2025 05:17:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EQFCvrRI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Vw1LlETx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F7EB1917D6;
-	Wed,  2 Apr 2025 05:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 046052F4A
+	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 05:17:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743570634; cv=none; b=Rig6RqP7fkTrA9x6fWiFGphe6+eLwDUrys5DfqxmA3ee6mEwhKWHOQZQInkAHAFzMOQdKMkH11AHQlOqs//X/H4GfDhPhpgCRsgeophZmdjyXZL6vBO06XhWjA3sj5AFIYSYCmvcZ6wJjxV4aTevOpwMGpB72neuVUuSt1nau4k=
+	t=1743571036; cv=none; b=nnoNEt5gG8Yat3Kk0Az0RrdLAS6r07hSolKeuQUhlGQdl5Nu6B5lKVZIgBvmvDBeu+ca5YVL1B7ei/A80eImNby1waofOtye+vMmgusurtLB90L/4M/ZbdpO2BnqJbbjS3AikQoh79rNp1Ipa2R6UWkEBpL7jSkVxl2tcwm63L0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743570634; c=relaxed/simple;
-	bh=grZPU9oPQcN0TENqzwiUIqv/0tkINZLoV8QdjaVk4ms=;
+	s=arc-20240116; t=1743571036; c=relaxed/simple;
+	bh=f/mTU65/JW9fjgOXPQIjFFmmS2JfKwOh/I4on60hsoU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fdLorA2OHWIE0qYpg0/Unvf1GSRMpLvBmcVL30OsBv7+9NCJ5V5hW02BCUkZ1z2bsvFJMU66GNdMW/xJof+TJKhZ/VzjpOiGuauLfY7OEvTr5xpz/yxM9/N5O4G3GshztkgC8cLzTFMmhJI5AFQzSI9o6pknGg9TfxB2tjo9RhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EQFCvrRI; arc=none smtp.client-ip=198.175.65.10
+	 Content-Type:Content-Disposition:In-Reply-To; b=qmvir75FJdRe71KKy9DpA69WD9WyTUz7AKOa5c/YFg9AK2VNZhsi7M0Dd2If0k6ZP53cNaI0CurOrimrwvA7MpGiJU9VZudh55ECgG8Hkx4KdSo7qMl2hdK2PenMWx411Q4EGaCcxwuDgwkhdLgQitRjWgATlvoQoykF4TXw/94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Vw1LlETx; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1743570632; x=1775106632;
+  t=1743571035; x=1775107035;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=grZPU9oPQcN0TENqzwiUIqv/0tkINZLoV8QdjaVk4ms=;
-  b=EQFCvrRIvajSsqqZhBdzcTLPrVBY/3IpIYyNgW0vqMfpjUDf67u4xVLq
-   T1OsphOs69Pfnribq76IRUPwVOG3BvuZ8Yq+mYXaDpLQPfKuA+Tlr5QTY
-   V5+YNHFmc7V8bzV32PfYlhf6f0VEgVArXASXJe9xZod7qREEti3ozwZis
-   zkHYXtBklQpNYwcmmOqQ2oc+ueDHy+QR2aj39Vo883to8yP6L5J7ZZhON
-   HJWFbjVBlMHV8W6E66sAQKe1BaRYzu83ZFK5by3/51UT0nN6MU92/3r1Y
-   gDBQi1wJh1yFrUpyOTwvHBLHiPcaRShucYUOdIgWJeY6s0VCrnRZZXuuL
-   A==;
-X-CSE-ConnectionGUID: AxM7Mw19Tm+2crt10Z/C3g==
-X-CSE-MsgGUID: gPIa0Rq/SkWEBluKdREBSA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11391"; a="62316430"
+  bh=f/mTU65/JW9fjgOXPQIjFFmmS2JfKwOh/I4on60hsoU=;
+  b=Vw1LlETxdJKQ3oOb0zhdL+s2gor9ELHiyNHh7Me3HUcDp2vWCR0/72aC
+   yXldogokkYWgrDIHpJ/wY53eIXf/hZg2o+GoF2GEQVo2lP+GuL37NgNNO
+   6ScgyGEqc063I9Twg3HtBJUt0XpRLTlSfMQ61h80L/lOSIyQY/f4bxvM+
+   Zf2noYxfOBf/gYHixKMsT78XxtQt/dp//A4uGhGAMQ7p7SqHmrlwxYJOt
+   ufIiHRhXFxdvxgs/5hjzIgyuM1BQY5NZYtXhVq7USHVhXCUG8zWL9LnX8
+   JOO9ue4ANbQastp0guwOdRHc0iy5MoH90ggs5bGu+ASxw4BKYmfamP/JE
+   w==;
+X-CSE-ConnectionGUID: yIbMmB9BQyODfUhOSl0bVw==
+X-CSE-MsgGUID: kF8XP3yGRtKEaZoxAQjQHg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11391"; a="67386112"
 X-IronPort-AV: E=Sophos;i="6.14,295,1736841600"; 
-   d="scan'208";a="62316430"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2025 22:10:32 -0700
-X-CSE-ConnectionGUID: lJLrnvqyQ6+t3OLQZ1mEug==
-X-CSE-MsgGUID: yDnFL7ROQt+M+lRdqiM+GQ==
+   d="scan'208";a="67386112"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2025 22:17:14 -0700
+X-CSE-ConnectionGUID: Cmg4GD9TSx21Zqm5UlB1ig==
+X-CSE-MsgGUID: t3wdfDJASGqBUEjh59bLLw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.14,295,1736841600"; 
-   d="scan'208";a="131570397"
+   d="scan'208";a="131449190"
 Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2025 22:10:28 -0700
-Date: Wed, 2 Apr 2025 07:10:18 +0200
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Apr 2025 22:17:12 -0700
+Date: Wed, 2 Apr 2025 07:17:00 +0200
 From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Harshitha Ramamurthy <hramamurthy@google.com>
-Cc: netdev@vger.kernel.org, jeroendb@google.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, pkaligineedi@google.com, willemb@google.com,
-	joshwash@google.com, horms@kernel.org, shailend@google.com,
-	jrkim@google.com, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] gve: handle overflow when reporting TX consumed
- descriptors
-Message-ID: <Z+zGrWljk7u91VMY@mev-dev.igk.intel.com>
-References: <20250402001037.2717315-1-hramamurthy@google.com>
+To: edward.cree@amd.com
+Cc: linux-net-drivers@amd.com, davem@davemloft.net, kuba@kernel.org,
+	edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+	andrew+netdev@lunn.ch, Edward Cree <ecree.xilinx@gmail.com>,
+	netdev@vger.kernel.org, Kyungwook Boo <bookyungwook@gmail.com>
+Subject: Re: [PATCH net] sfc: fix NULL dereferences in
+ ef100_process_design_param()
+Message-ID: <Z+zITLJ4wB2Mhk8h@mev-dev.igk.intel.com>
+References: <20250401225439.2401047-1-edward.cree@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,51 +77,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250402001037.2717315-1-hramamurthy@google.com>
+In-Reply-To: <20250401225439.2401047-1-edward.cree@amd.com>
 
-On Wed, Apr 02, 2025 at 12:10:37AM +0000, Harshitha Ramamurthy wrote:
-> From: Joshua Washington <joshwash@google.com>
+On Tue, Apr 01, 2025 at 11:54:39PM +0100, edward.cree@amd.com wrote:
+> From: Edward Cree <ecree.xilinx@gmail.com>
 > 
-> When the tx tail is less than the head (in cases of wraparound), the TX
-> consumed descriptor statistic in DQ will be reported as
-> UINT32_MAX - head + tail, which is incorrect. Mask the difference of
-> head and tail according to the ring size when reporting the statistic.
+> Since cited commit, ef100_probe_main() and hence also
+>  ef100_check_design_params() run before efx->net_dev is created;
+>  consequently, we cannot netif_set_tso_max_size() or _segs() at this
+>  point.
+> Move those netif calls to ef100_probe_netdev(), and also replace
+>  netif_err within the design params code with pci_err.
 > 
-> Cc: stable@vger.kernel.org
-> Fixes: 2c9198356d56 ("gve: Add consumed counts to ethtool stats")
-> Signed-off-by: Joshua Washington <joshwash@google.com>
-> Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
+> Reported-by: Kyungwook Boo <bookyungwook@gmail.com>
+> Fixes: 98ff4c7c8ac7 ("sfc: Separate netdev probe/remove from PCI probe/remove")
+> Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
 > ---
->  drivers/net/ethernet/google/gve/gve_ethtool.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  drivers/net/ethernet/sfc/ef100_netdev.c |  6 ++--
+>  drivers/net/ethernet/sfc/ef100_nic.c    | 47 +++++++++++--------------
+>  2 files changed, 24 insertions(+), 29 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
-> index 31a21ccf4863..4dea1fdce748 100644
-> --- a/drivers/net/ethernet/google/gve/gve_ethtool.c
-> +++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
-> @@ -392,7 +392,9 @@ gve_get_ethtool_stats(struct net_device *netdev,
->  				 */
->  				data[i++] = 0;
->  				data[i++] = 0;
-> -				data[i++] = tx->dqo_tx.tail - tx->dqo_tx.head;
-> +				data[i++] =
-> +					(tx->dqo_tx.tail - tx->dqo_tx.head) &
-> +					tx->mask;
+> diff --git a/drivers/net/ethernet/sfc/ef100_netdev.c b/drivers/net/ethernet/sfc/ef100_netdev.c
+> index d941f073f1eb..3a06e3b1bd6b 100644
+> --- a/drivers/net/ethernet/sfc/ef100_netdev.c
+> +++ b/drivers/net/ethernet/sfc/ef100_netdev.c
+> @@ -450,8 +450,9 @@ int ef100_probe_netdev(struct efx_probe_data *probe_data)
+>  	net_dev->hw_enc_features |= efx->type->offload_features;
+>  	net_dev->vlan_features |= NETIF_F_HW_CSUM | NETIF_F_SG |
+>  				  NETIF_F_HIGHDMA | NETIF_F_ALL_TSO;
+> -	netif_set_tso_max_segs(net_dev,
+> -			       ESE_EF100_DP_GZ_TSO_MAX_HDR_NUM_SEGS_DEFAULT);
+> +	nic_data = efx->nic_data;
+> +	netif_set_tso_max_size(efx->net_dev, nic_data->tso_max_payload_len);
+> +	netif_set_tso_max_segs(efx->net_dev, nic_data->tso_max_payload_num_segs);
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Is it fine to drop default value for max segs? Previously if somehow
+this value wasn't read from HW it was set to default, now it will be 0.
 
-I will add it in gve_tx_dqo.c as num_used_tx_slots() and simplify
-num_avail_tx_slots()
-{
-	return tx->mask - num_used_tx_slots();
-}
-but it isn't needed, even maybe unwanted as this is just fix.
+At the beggining of ef100_probe_main() default values for nic_data are
+set. Maybe it is worth to set also this default for max segs?
 
-Thanks
+>  
+>  	rc = efx_ef100_init_datapath_caps(efx);
+>  	if (rc < 0)
+> @@ -477,7 +478,6 @@ int ef100_probe_netdev(struct efx_probe_data *probe_data)
+>  	/* Don't fail init if RSS setup doesn't work. */
+>  	efx_mcdi_push_default_indir_table(efx, efx->n_rx_channels);
+>  
+> -	nic_data = efx->nic_data;
+>  	rc = ef100_get_mac_address(efx, net_dev->perm_addr, CLIENT_HANDLE_SELF,
+>  				   efx->type->is_vf);
+>  	if (rc)
 
->  			}
->  			do {
->  				start =
-> -- 
-> 2.49.0.472.ge94155a9ec-goog
+[...]
 
