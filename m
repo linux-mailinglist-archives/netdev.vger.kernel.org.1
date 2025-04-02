@@ -1,205 +1,240 @@
-Return-Path: <netdev+bounces-178856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D39EEA79386
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 18:58:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C69E4A79380
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 18:57:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58B6016D470
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 16:58:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34A2D188E29A
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 16:57:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFB4D16DEB3;
-	Wed,  2 Apr 2025 16:58:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C2211925A0;
+	Wed,  2 Apr 2025 16:57:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="aw7nrYss"
 X-Original-To: netdev@vger.kernel.org
-Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.229.168.213])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9EBE33993
-	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 16:58:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.229.168.213
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743613133; cv=none; b=kszxS8ZkUt/Za26R4OzLtGWvguvtnl15piPxMrIrbivJimF0ywtsj/RwSF4Zp+ub1fZozJDvlu1RWjRsq+vUfu6iRhmKaETEvFcUvsS1lPa/q6UVZZ0+Z+OljTgIuPmFubSMmZkvCUs/NtoAgW0PG5A2HzWyZrwOQFd6aH8GexE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743613133; c=relaxed/simple;
-	bh=mapKzw5OkN0Nyvk0qJJXGjvvDoiFFNDXN7gci+u4ruY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PpfmyOaa+l4iPBI1reKRlv2oVxisNJ8E2lrG/Q8gf97fJEfVlifYEJzqHvs2wvOf/x6MFSXJ4gLE7YKEKRsWLbf0lWGvkrhMO2KI8KJo8BEmuMPMzCwozV9QSrXYUbQxHZNAuZ7qE5qyPjT3BB3HbVjQK2/9Em1E1n3XE6t7wjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=52.229.168.213
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from zju.edu.cn (unknown [10.193.154.185])
-	by mtasvr (Coremail) with SMTP id _____wB3JGajbO1noq0tAQ--.38S3;
-	Thu, 03 Apr 2025 00:58:12 +0800 (CST)
-Received: from localhost (unknown [10.193.154.185])
-	by mail-app3 (Coremail) with SMTP id zS_KCgAXw3WfbO1nYb0aAQ--.63831S2;
-	Thu, 03 Apr 2025 00:58:07 +0800 (CST)
-From: Lin Ma <linma@zju.edu.cn>
-To: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	pablo@netfilter.org,
-	kadlec@netfilter.org,
-	jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	lucien.xin@gmail.com,
-	pieter.jansenvanvuuren@netronome.com,
-	netdev@vger.kernel.org
-Cc: Lin Ma <linma@zju.edu.cn>
-Subject: [PATCH net] net: fix geneve_opt length integer overflow
-Date: Thu,  3 Apr 2025 00:56:32 +0800
-Message-Id: <20250402165632.6958-1-linma@zju.edu.cn>
-X-Mailer: git-send-email 2.39.0
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB5813957E;
+	Wed,  2 Apr 2025 16:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743613032; cv=pass; b=TkPR15HNc2/KIcQz9HkoXA7I/PUB8PVCYgDQ+lIvvtu28UESuAtTK/vXgy8TIEpptuqkbA06PGxfVxn5OQ/0Oov2X+3WPs1zmgwd0tGI6g4xfiZPRLhHmV/O2ocaa1yllHgNpcnoLJ5NnXDaClIPFIGwfHoL1tJWW/leuTRcn+I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743613032; c=relaxed/simple;
+	bh=LRXoD+4ibjTlc788eBC7ZXZcOBL4T/2hgXYKcWIvyxM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=QgKYjcGH+ZHCHtgSjoMduMXaLHQHnAAkK/q/nVitMMxnk8qJID1H+tK8EJtfiaLO7jNCwoaCogp3P4oz5QTTQdoLXBWYQ4gIbDp9wKz+rrDnfbWyr04i0VrEsiGu87h7dLvQxvbve1XGfo225ce1pl/EWvXJS+4G0wJv918p82s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=aw7nrYss; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a01d])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4ZSWHW6CmRz49Pxf;
+	Wed,  2 Apr 2025 19:56:55 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1743613016;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=LIPp4RLl6pJSdKh+bwSIUD+9HN3F5P5UNyXOAKQ6xsQ=;
+	b=aw7nrYss69EQ2UHNELm+pE4z1p/JtPZr3nrp+HEmHyJar46JNxqtG/dALqfa6gyq9dmB7z
+	v29jFgAZxJm6HVjQp40rkFvo/g6p/EdKxVtgCSQSL/lK8HhMX87DUHnIzA2HjgewyEIo0g
+	y0ewgU+z+jRbxLBNCH5+dmtn3gPYCl4/YZIVSHrwxmD9ETIOL1e32voDCspP6jBZycAXkD
+	jmmWmCFna4Hev/WaXMI5nMzGW7Vc53SxNGpuMGJCOr/FFkNshw0nzGiDgH7dVqTe/7hS/m
+	CWPQG5O3ijgse4XxdiC2Dyt+PUUdAyGGwTRpbN1+tQF/AqZeO9hJEilk/vONrA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1743613016;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=LIPp4RLl6pJSdKh+bwSIUD+9HN3F5P5UNyXOAKQ6xsQ=;
+	b=fgDTLb5T0tFqGWUR66reVHEf2f9xTo/71wZk8ewRuDHqbR41hrWTCkzZT/GMwaeYuM6Vk7
+	DzmnvBl3AT6lfSOVm1XTyfPut6gkdudCUuKQEI+Vrhk1Ko1bXL3zIoyd7ts4ARB/OncYtm
+	Yw/MdkgtG9q7jPSk0tRc1b5CdY0ilvZXhDmE2LHvfHi7oT1pOglmLo1pHlqYVH/fLQq3bW
+	U8FiwPLk9Xf5ONbeFHePnbDlJa8hE3uhZ2KgJ/NQi55l6mymYffuI0sOXBJc+MVpGH+6H1
+	ft83TyYP8gtX04pL5s+RgfaKGJGCSsh/sl5okfutY13bxuyobr+H8dnXEBLINg==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1743613016; a=rsa-sha256;
+	cv=none;
+	b=oj5ts3byDH0fxrLoPrCAf65IOrjAZatzuY82dY3q+lqL27ABnKwIlqlflBrR7c/3DZEHEt
+	jB4XhKN/p/Ui4InMPlBFSQ5oAbbWoq0QP9EVMa4Ei7t9sJcu29wSF5hamKY5gsiBb9c0JZ
+	esS5bOhaS/w/DX5eltLcSsCYvul1Qsw136eerMNarChp4M9Kw2sMFChiYimRpFagMbpDm1
+	aZ9+yH5jB9g2yj+4J3dNW+gOvxFlaSH79EZsEXPl0ZgrHXdfo+DFSrTK/UqCZDe1MM+MK6
+	mDZppUV0eM/0+G2IqT21cVxdki8KUwIVaVI0BgGx0oBkEQDYj7ZfClH5p5/n4A==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+Message-ID: <db7f317539cbda89df7e87efaea9b22328af610a.camel@iki.fi>
+Subject: Re: [PATCH 3/3] [RFC] Bluetooth: enable bpf TX timestamping
+From: Pauli Virtanen <pav@iki.fi>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, willemdebruijn.kernel@gmail.com, 
+	kerneljasonxing@gmail.com
+Date: Wed, 02 Apr 2025 19:56:52 +0300
+In-Reply-To: <3546b79d-a09b-4971-abd7-ce18696a9536@linux.dev>
+References: <cover.1743337403.git.pav@iki.fi>
+	 <bbd7fa454ed03ebba9bfe79590fb78a75d4f07db.1743337403.git.pav@iki.fi>
+	 <3546b79d-a09b-4971-abd7-ce18696a9536@linux.dev>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=mQINBGX+qmEBEACt7O4iYRbX80B2OV+LbX06Mj1Wd67SVWwq2sAlI+6fK1YWbFu5jOWFy
+ ShFCRGmwyzNvkVpK7cu/XOOhwt2URcy6DY3zhmd5gChz/t/NDHGBTezCh8rSO9DsIl1w9nNEbghUl
+ cYmEvIhQjHH3vv2HCOKxSZES/6NXkskByXtkPVP8prHPNl1FHIO0JVVL7/psmWFP/eeB66eAcwIgd
+ aUeWsA9+/AwcjqJV2pa1kblWjfZZw4TxrBgCB72dC7FAYs94ebUmNg3dyv8PQq63EnC8TAUTyph+M
+ cnQiCPz6chp7XHVQdeaxSfcCEsOJaHlS+CtdUHiGYxN4mewPm5JwM1C7PW6QBPIpx6XFvtvMfG+Ny
+ +AZ/jZtXxHmrGEJ5sz5YfqucDV8bMcNgnbFzFWxvVklafpP80O/4VkEZ8Og09kvDBdB6MAhr71b3O
+ n+dE0S83rEiJs4v64/CG8FQ8B9K2p9HE55Iu3AyovR6jKajAi/iMKR/x4KoSq9Jgj9ZI3g86voWxM
+ 4735WC8h7vnhFSA8qKRhsbvlNlMplPjq0f9kVLg9cyNzRQBVrNcH6zGMhkMqbSvCTR5I1kY4SfU4f
+ QqRF1Ai5f9Q9D8ExKb6fy7ct8aDUZ69Ms9N+XmqEL8C3+AAYod1XaXk9/hdTQ1Dhb51VPXAMWTICB
+ dXi5z7be6KALQARAQABtCZQYXVsaSBWaXJ0YW5lbiA8cGF1bGkudmlydGFuZW5AaWtpLmZpPokCWg
+ QTAQgARAIbAwUJEswDAAULCQgHAgIiAgYVCgkICwIEFgIDAQIeBwIXgBYhBGrOSfUCZNEJOswAnOS
+ aCbhLOrBPBQJl/qsDAhkBAAoJEOSaCbhLOrBPB/oP/1j6A7hlzheRhqcj+6sk+OgZZ+5eX7mBomyr
+ 76G+m/3RhPGlKbDxKTWtBZaIDKg2c0Q6yC1TegtxQ2EUD4kk7wKoHKj8dKbR29uS3OvURQR1guCo2
+ /5kzQQVxQwhIoMdHJYF0aYNQgdA+ZJL09lDz+JC89xvup3spxbKYc9Iq6vxVLbVbjF9Uv/ncAC4Bs
+ g1MQoMowhKsxwN5VlUdjqPZ6uGebZyC+gX6YWUHpPWcHQ1TxCD8TtqTbFU3Ltd3AYl7d8ygMNBEe3
+ T7DV2GjBI06Xqdhydhz2G5bWPM0JSodNDE/m6MrmoKSEG0xTNkH2w3TWWD4o1snte9406az0YOwkk
+ xDq9LxEVoeg6POceQG9UdcsKiiAJQXu/I0iUprkybRUkUj+3oTJQECcdfL1QtkuJBh+IParSF14/j
+ Xojwnf7tE5rm7QvMWWSiSRewro1vaXjgGyhKNyJ+HCCgp5mw+ch7KaDHtg0fG48yJgKNpjkzGWfLQ
+ BNXqtd8VYn1mCM3YM7qdtf9bsgjQqpvFiAh7jYGrhYr7geRjary1hTc8WwrxAxaxGvo4xZ1XYps3u
+ ayy5dGHdiddk5KJ4iMTLSLH3Rucl19966COQeCwDvFMjkNZx5ExHshWCV5W7+xX/2nIkKUfwXRKfK
+ dsVTL03FG0YvY/8A98EMbvlf4TnpyyaytBtQYXVsaSBWaXJ0YW5lbiA8cGF2QGlraS5maT6JAlcEE
+ wEIAEEWIQRqzkn1AmTRCTrMAJzkmgm4SzqwTwUCZf6qYQIbAwUJEswDAAULCQgHAgIiAgYVCgkICw
+ IEFgIDAQIeBwIXgAAKCRDkmgm4SzqwTxYZD/9hfC+CaihOESMcTKHoK9JLkO34YC0t8u3JAyetIz3
+ Z9ek42FU8fpf58vbpKUIR6POdiANmKLjeBlT0D3mHW2ta90O1s711NlA1yaaoUw7s4RJb09W2Votb
+ G02pDu2qhupD1GNpufArm3mOcYDJt0Rhh9DkTR2WQ9SzfnfzapjxmRQtMzkrH0GWX5OPv368IzfbJ
+ S1fw79TXmRx/DqyHg+7/bvqeA3ZFCnuC/HQST72ncuQA9wFbrg3ZVOPAjqrjesEOFFL4RSaT0JasS
+ XdcxCbAu9WNrHbtRZu2jo7n4UkQ7F133zKH4B0SD5IclLgK6Zc92gnHylGEPtOFpij/zCRdZw20VH
+ xrPO4eI5Za4iRpnKhCbL85zHE0f8pDaBLD9L56UuTVdRvB6cKncL4T6JmTR6wbH+J+s4L3OLjsyx2
+ LfEcVEh+xFsW87YQgVY7Mm1q+O94P2soUqjU3KslSxgbX5BghY2yDcDMNlfnZ3SdeRNbssgT28PAk
+ 5q9AmX/5YyNbexOCyYKZ9TLcAJJ1QLrHGoZaAIaR72K/kmVxy0oqdtAkvCQw4j2DCQDR0lQXsH2bl
+ WTSfNIdSZd4pMxXHFF5iQbh+uReDc8rISNOFMAZcIMd+9jRNCbyGcoFiLa52yNGOLo7Im+CIlmZEt
+ bzyGkKh2h8XdrYhtDjw9LmrprPQ==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zS_KCgAXw3WfbO1nYb0aAQ--.63831S2
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
-X-CM-DELIVERINFO: =?B?JftfbwXKKxbFmtjJiESix3B1w3tPqcowV1L23Bze5QtIr9Db75bEBiiEybVhThS0pI
-	APHkyPSxI2Xdeyd3ul0ToYuubmJIVStK4mh6XJdk5kYx1nMSL4elsDoPkvYhVj3nTdF8H0
-	x+MWzRNJCZLoHhnOF0XzyYr7BDRcMckJpVHlJ7+X
-X-Coremail-Antispam: 1Uk129KBj93XoW3Ww1rur43AF1ktFWkAF1UArc_yoW7ZFy7pa
-	98GrWxGFs7Kr9xtrnYyF4kJF98t3Z0v3WxWrs7uryxA3WkW3yUGa4rKrWfKFn8uFWUZFW3
-	Jwn8t3Wxt3WDZ3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26r1j6r4UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8JVW8Jr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27w
-	Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE
-	14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjcxG0xvY0x
-	0EwIxGrVCF72vEw4AK0wACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY0x0EwIxGrwCF
-	x2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14
-	v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY
-	67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2
-	IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jj7KsUUUUU=
 
-struct geneve_opt uses 5 bit length for each single option, which
-means every vary size option should be smaller than 128 bytes.
+Hi,
 
-However, all current related Netlink policies cannot promise this
-length condition and the attacker can exploit a exact 128-byte size
-option to *fake* a zero length option and confuse the parsing logic,
-further achieve heap out-of-bounds read.
+ti, 2025-04-01 kello 18:34 -0700, Martin KaFai Lau kirjoitti:
+> On 3/30/25 5:23 AM, Pauli Virtanen wrote:
+> > Emit timestamps also for BPF timestamping.
+> >=20
+> > ***
+> >=20
+> > The tskey management here is not quite right: see cover letter.
+> > ---
+> >   include/net/bluetooth/bluetooth.h |  1 +
+> >   net/bluetooth/hci_conn.c          | 21 +++++++++++++++++++--
+> >   2 files changed, 20 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/=
+bluetooth.h
+> > index bbefde319f95..3b2e59cedd2d 100644
+> > --- a/include/net/bluetooth/bluetooth.h
+> > +++ b/include/net/bluetooth/bluetooth.h
+> > @@ -383,6 +383,7 @@ struct bt_sock {
+> >   	struct list_head accept_q;
+> >   	struct sock *parent;
+> >   	unsigned long flags;
+> > +	atomic_t bpf_tskey;
+> >   	void (*skb_msg_name)(struct sk_buff *, void *, int *);
+> >   	void (*skb_put_cmsg)(struct sk_buff *, struct msghdr *, struct sock =
+*);
+> >   };
+> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> > index 95972fd4c784..7430df1c5822 100644
+> > --- a/net/bluetooth/hci_conn.c
+> > +++ b/net/bluetooth/hci_conn.c
+> > @@ -28,6 +28,7 @@
+> >   #include <linux/export.h>
+> >   #include <linux/debugfs.h>
+> >   #include <linux/errqueue.h>
+> > +#include <linux/bpf-cgroup.h>
+> >  =20
+> >   #include <net/bluetooth/bluetooth.h>
+> >   #include <net/bluetooth/hci_core.h>
+> > @@ -3072,6 +3073,7 @@ void hci_setup_tx_timestamp(struct sk_buff *skb, =
+size_t key_offset,
+> >   			    const struct sockcm_cookie *sockc)
+> >   {
+> >   	struct sock *sk =3D skb ? skb->sk : NULL;
+> > +	bool have_tskey =3D false;
+> >  =20
+> >   	/* This shall be called on a single skb of those generated by user
+> >   	 * sendmsg(), and only when the sendmsg() does not return error to
+> > @@ -3096,6 +3098,20 @@ void hci_setup_tx_timestamp(struct sk_buff *skb,=
+ size_t key_offset,
+> >  =20
+> >   			skb_shinfo(skb)->tskey =3D key - 1;
+> >   		}
+> > +		have_tskey =3D true;
+> > +	}
+> > +
+> > +	if (cgroup_bpf_enabled(CGROUP_SOCK_OPS) &&
+> > +	    SK_BPF_CB_FLAG_TEST(sk, SK_BPF_CB_TX_TIMESTAMPING)) {
+> > +		struct bt_sock *bt_sk =3D container_of(sk, struct bt_sock, sk);
+> > +		int key =3D atomic_inc_return(&bt_sk->bpf_tskey);
+>=20
+> I don't think it needs to add "atomic_t bpf_tskey". Allow the bpf to deci=
+de what=20
+> the skb_shinfo(skb)->tskey should be if it is not set by the userspace.
 
-One example crash log is like below:
+Ok. So if I understand correctly, the plan is that for UDP and
+Bluetooth seqpacket sockets it works like this:
 
-[    3.905425] ==================================================================
-[    3.905925] BUG: KASAN: slab-out-of-bounds in nla_put+0xa9/0xe0
-[    3.906255] Read of size 124 at addr ffff888005f291cc by task poc/177
-[    3.906646]
-[    3.906775] CPU: 0 PID: 177 Comm: poc-oob-read Not tainted 6.1.132 #1
-[    3.907131] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-[    3.907784] Call Trace:
-[    3.907925]  <TASK>
-[    3.908048]  dump_stack_lvl+0x44/0x5c
-[    3.908258]  print_report+0x184/0x4be
-[    3.909151]  kasan_report+0xc5/0x100
-[    3.909539]  kasan_check_range+0xf3/0x1a0
-[    3.909794]  memcpy+0x1f/0x60
-[    3.909968]  nla_put+0xa9/0xe0
-[    3.910147]  tunnel_key_dump+0x945/0xba0
-[    3.911536]  tcf_action_dump_1+0x1c1/0x340
-[    3.912436]  tcf_action_dump+0x101/0x180
-[    3.912689]  tcf_exts_dump+0x164/0x1e0
-[    3.912905]  fw_dump+0x18b/0x2d0
-[    3.913483]  tcf_fill_node+0x2ee/0x460
-[    3.914778]  tfilter_notify+0xf4/0x180
-[    3.915208]  tc_new_tfilter+0xd51/0x10d0
-[    3.918615]  rtnetlink_rcv_msg+0x4a2/0x560
-[    3.919118]  netlink_rcv_skb+0xcd/0x200
-[    3.919787]  netlink_unicast+0x395/0x530
-[    3.921032]  netlink_sendmsg+0x3d0/0x6d0
-[    3.921987]  __sock_sendmsg+0x99/0xa0
-[    3.922220]  __sys_sendto+0x1b7/0x240
-[    3.922682]  __x64_sys_sendto+0x72/0x90
-[    3.922906]  do_syscall_64+0x5e/0x90
-[    3.923814]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-[    3.924122] RIP: 0033:0x7e83eab84407
-[    3.924331] Code: 48 89 fa 4c 89 df e8 38 aa 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 faf
-[    3.925330] RSP: 002b:00007ffff505e370 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
-[    3.925752] RAX: ffffffffffffffda RBX: 00007e83eaafa740 RCX: 00007e83eab84407
-[    3.926173] RDX: 00000000000001a8 RSI: 00007ffff505e3c0 RDI: 0000000000000003
-[    3.926587] RBP: 00007ffff505f460 R08: 00007e83eace1000 R09: 000000000000000c
-[    3.926977] R10: 0000000000000000 R11: 0000000000000202 R12: 00007ffff505f3c0
-[    3.927367] R13: 00007ffff505f5c8 R14: 00007e83ead1b000 R15: 00005d4fbbe6dcb8
+bpf_sock_ops_enable_tx_tstamp() does not set tskey.
 
-Fix these issues by enforing correct length condition in related
-policies.
+Socket timestamping sets tskey the same way as previously.
 
-Fixes: 925d844696d9 ("netfilter: nft_tunnel: add support for geneve opts")
-Fixes: 4ece47787077 ("lwtunnel: add options setting and dumping for geneve")
-Fixes: 0ed5269f9e41 ("net/sched: add tunnel option support to act_tunnel_key")
-Fixes: 0a6e77784f49 ("net/sched: allow flower to match tunnel options")
-Signed-off-by: Lin Ma <linma@zju.edu.cn>
----
- net/ipv4/ip_tunnel_core.c  | 2 +-
- net/netfilter/nft_tunnel.c | 2 +-
- net/sched/act_tunnel_key.c | 2 +-
- net/sched/cls_flower.c     | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
+So when both are in play, it shall work like:
 
-diff --git a/net/ipv4/ip_tunnel_core.c b/net/ipv4/ip_tunnel_core.c
-index a3676155be78..b6b1bff6f24a 100644
---- a/net/ipv4/ip_tunnel_core.c
-+++ b/net/ipv4/ip_tunnel_core.c
-@@ -451,7 +451,7 @@ static const struct nla_policy
- geneve_opt_policy[LWTUNNEL_IP_OPT_GENEVE_MAX + 1] = {
- 	[LWTUNNEL_IP_OPT_GENEVE_CLASS]	= { .type = NLA_U16 },
- 	[LWTUNNEL_IP_OPT_GENEVE_TYPE]	= { .type = NLA_U8 },
--	[LWTUNNEL_IP_OPT_GENEVE_DATA]	= { .type = NLA_BINARY, .len = 128 },
-+	[LWTUNNEL_IP_OPT_GENEVE_DATA]	= { .type = NLA_BINARY, .len = 127 },
- };
- 
- static const struct nla_policy
-diff --git a/net/netfilter/nft_tunnel.c b/net/netfilter/nft_tunnel.c
-index 681301b46aa4..ec7089ab752c 100644
---- a/net/netfilter/nft_tunnel.c
-+++ b/net/netfilter/nft_tunnel.c
-@@ -335,7 +335,7 @@ static int nft_tunnel_obj_erspan_init(const struct nlattr *attr,
- static const struct nla_policy nft_tunnel_opts_geneve_policy[NFTA_TUNNEL_KEY_GENEVE_MAX + 1] = {
- 	[NFTA_TUNNEL_KEY_GENEVE_CLASS]	= { .type = NLA_U16 },
- 	[NFTA_TUNNEL_KEY_GENEVE_TYPE]	= { .type = NLA_U8 },
--	[NFTA_TUNNEL_KEY_GENEVE_DATA]	= { .type = NLA_BINARY, .len = 128 },
-+	[NFTA_TUNNEL_KEY_GENEVE_DATA]	= { .type = NLA_BINARY, .len = 127 },
- };
- 
- static int nft_tunnel_obj_geneve_init(const struct nlattr *attr,
-diff --git a/net/sched/act_tunnel_key.c b/net/sched/act_tunnel_key.c
-index ae5dea7c48a8..2cef4b08befb 100644
---- a/net/sched/act_tunnel_key.c
-+++ b/net/sched/act_tunnel_key.c
-@@ -68,7 +68,7 @@ geneve_opt_policy[TCA_TUNNEL_KEY_ENC_OPT_GENEVE_MAX + 1] = {
- 	[TCA_TUNNEL_KEY_ENC_OPT_GENEVE_CLASS]	   = { .type = NLA_U16 },
- 	[TCA_TUNNEL_KEY_ENC_OPT_GENEVE_TYPE]	   = { .type = NLA_U8 },
- 	[TCA_TUNNEL_KEY_ENC_OPT_GENEVE_DATA]	   = { .type = NLA_BINARY,
--						       .len = 128 },
-+						       .len = 127 },
- };
- 
- static const struct nla_policy
-diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
-index 03505673d523..099ff6a3e1f5 100644
---- a/net/sched/cls_flower.c
-+++ b/net/sched/cls_flower.c
-@@ -766,7 +766,7 @@ geneve_opt_policy[TCA_FLOWER_KEY_ENC_OPT_GENEVE_MAX + 1] = {
- 	[TCA_FLOWER_KEY_ENC_OPT_GENEVE_CLASS]      = { .type = NLA_U16 },
- 	[TCA_FLOWER_KEY_ENC_OPT_GENEVE_TYPE]       = { .type = NLA_U8 },
- 	[TCA_FLOWER_KEY_ENC_OPT_GENEVE_DATA]       = { .type = NLA_BINARY,
--						       .len = 128 },
-+						       .len = 127 },
- };
- 
- static const struct nla_policy
--- 
-2.17.1
+* attach BPF timestamping
+* setsockopt(SOF_TIMESTAMPING_SOFTWARE | SOF_TIMESTAMPING_OPT_ID)
+* sendmsg() CMSG SO_TIMESTAMPING =3D 0
+=3D> tskey 0 (unset)
+* sendmsg() CMSG SO_TIMESTAMPING =3D SOF_TIMESTAMPING_TX_SOFTWARE
+=3D> tskey 0
+* sendmsg() CMSG SO_TIMESTAMPING =3D SOF_TIMESTAMPING_TX_SOFTWARE
+=3D> tskey 1
+* sendmsg() CMSG SO_TIMESTAMPING =3D 0
+=3D> tskey 0 (unset)
+* sendmsg() CMSG SO_TIMESTAMPING =3D 0
+=3D> tskey 0 (unset)
+* sendmsg() CMSG SO_TIMESTAMPING =3D 0
+=3D> tskey 0 (unset)
+* sendmsg() CMSG SO_TIMESTAMPING =3D SOF_TIMESTAMPING_TX_SOFTWARE
+=3D> tskey 2
 
+and BPF program has to handle the (unset) cases itself.
+
+>=20
+> > +
+> > +		if (!have_tskey)
+> > +			skb_shinfo(skb)->tskey =3D key - 1;
+> > +
+> > +		bpf_skops_tx_timestamping(sk, skb,
+> > +					  BPF_SOCK_OPS_TSTAMP_SENDMSG_CB);
+> > +
+> >   	}
+> >   }
+> >  =20
+>=20
+>=20
+
+--=20
+Pauli Virtanen
 
