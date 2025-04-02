@@ -1,118 +1,135 @@
-Return-Path: <netdev+bounces-178704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC219A7856F
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 02:11:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A230CA78572
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 02:12:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D99E916D0D1
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 00:11:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 627A07A4699
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 00:11:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97C5A41;
-	Wed,  2 Apr 2025 00:11:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6AFC367;
+	Wed,  2 Apr 2025 00:12:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tOVG6Y9J"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ezxme/WU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D2CE36D
-	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 00:11:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 415EFAD24;
+	Wed,  2 Apr 2025 00:12:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743552667; cv=none; b=QKOtxA2uHgcF03oX2rCD3yVNJMVl01ouA+QgDbiOkwvfDMNIhn0S2S4KSGL9NbmfWZ+UJk0iK187ZSKQgze9Rtb5ngkWi0xZv/D11sRo6nWOcBzBxKgE5X/JzgZ8eY7IiuLwGdtAzOa3CiiownetpQoyOttQBoAZ+q0wefqgiUI=
+	t=1743552739; cv=none; b=bawVQmVxXv6RW20LLABDjUVMRgA7wmVVXnXP+vxo1ATjaKxwMz6I41/JWqTxh5VuuSDsJgaN3GvWO5yBZ++Kl3oZ1ZoihjHPo9N2NqJDETMOI0dRtTEJpF1KdlnTPhDQg3KfULlSsw0tkEyd+HZ1nh3vUWl7DDHWxsxrw4pyKTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743552667; c=relaxed/simple;
-	bh=EgdNDcLC7k0XtZIn+43y/w98YuMTuo72Sb3LaUG8pW0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=oWqq9bBYaAMxTcyFmcbtj1s+0TLdryeSIzkxlXsIX7aWmpMISgoJbgdUYI0nQFAQhntkYIAO9IpTK2KeJ25ymQHF73hdMHE565vYNG8HC53DdbLBPo+ECX6v9DjNvJ0ttHRrFQECFLi7B/8a+EkwyOMUdaULO4WreMZhHLmpmsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tOVG6Y9J; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--hramamurthy.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ff53a4754aso1547865a91.2
-        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 17:11:05 -0700 (PDT)
+	s=arc-20240116; t=1743552739; c=relaxed/simple;
+	bh=Fx+DQA/hs6/5nL3RaXhlTNOvDv86/gbuzKWDELxxTaA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QTg/yjiHFfxrX4rT6QjKmQkT0iyFXEoWdQpwGQWzNCwYnqXpgRzLL8IXGqaNFiXcZ6EioVvaT9ZnIAJmiaqJHeiuWcTCPpySX0NilUfwP05anU5iwsVznOrIJPLmWKzF2A/5o0n6xjIU2IuEqod02zvGMKrZj7ahuGluHYDeQuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ezxme/WU; arc=none smtp.client-ip=209.85.160.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-2a01bcd0143so6640606fac.2;
+        Tue, 01 Apr 2025 17:12:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743552665; x=1744157465; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=49XuAK5ARMEMF8yVcphCoCsW7MPVXvhnFi+JlgEVMBM=;
-        b=tOVG6Y9JuSsxQXvsNxGzRZ4CA8H5ZsHTPqU7SSJBsX8Uo1Vg16+Q5CbWMSZPGJVTg1
-         yaVqpxUOXPSVVmS1QrjHEKSt+tm4qcFfvDZuk+mNGMvTYxXIPCmtHFFenwN0HNNGv0mo
-         3vDLEq2C+RRFC9gcl5zQnYrkUoz7jbXpcS1kYXGn3YIttFFVZvoRTuH8/enLxRZ2kuvy
-         hgKjB27EPC26q5QGam1b5UKrmcdLVv2tfuRfASv9hS8QQ8hC6Ec1LjbwvXAuwum3gmxQ
-         Fu5twXGZumDggePA+QAWYCWEE/TWmCUfnMvYdMnz+janlOn9zulgzOmHZAwc2ulJm35d
-         D3xg==
+        d=gmail.com; s=20230601; t=1743552737; x=1744157537; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KQ1QCtwsepe633EoRp9qwqH7AZPQqB3yQI1eiOpigjs=;
+        b=ezxme/WUoVpAL6FY+O+RDR+ybgbnU4rxbYdwWDRnOZnzg79Fjr+QFUkGCOQFlJihsO
+         aw89zLowYU95pg+Ob2My4HHCjSS5w84OqHt1MC9usSdka6o2Zn16opIlrqjvt09j8h1R
+         fUUpWvpjN6ytwToYIbx1JSGVSut5drpumofH7DkUTinNKE4hVDueObsPs+otmhhSuiNK
+         cqqnYKgLNEReMdFQkLwNqdOWXFusVBJu0axeBJ/d/5W8C2lgGlXVjskC4xe1vmaJGInO
+         fZcujhsosHIwPGEaUaXrU0TVDGmA4RXAnynD0m5ltnccrC67CkLaba3f25DlRWhn6Urc
+         jgQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743552665; x=1744157465;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=49XuAK5ARMEMF8yVcphCoCsW7MPVXvhnFi+JlgEVMBM=;
-        b=Z83M0MnbmTBWeekj0h7fHVnf0LxvpSLEG1pl21qcghqk8OD1N8e7mn9u9d01T61eSd
-         3lO/Ewu1gFAmwydHU6f95QPxOZZl9To2FCxpNcngnkmkV79ToFc57kn0DMrNwBlE5Ezo
-         s01xb6FoPqPyB4cs2WQlI+FNY5VwvfAEkB0pzdQuiHs1RHoDbpLAQI+A717xxJK4XRU3
-         Q7K6Td8FvB1S9VHY5cyOszhBLBxLS+/lW4WhMu7L6ph+WxAfW9nD42x5T5W8rM7zpXYx
-         u3iIQpXF2xv/jtqJbQS93/k8KSdWIC/8UJmo4i58lV0hLj8/u8STqEaDZuLdaVvuUjfG
-         SwJw==
-X-Gm-Message-State: AOJu0YzJS360Uu5dUlaKDC31IBVEjhPNQ7FJdSJWiG2qm2xcXP2hGPy9
-	lwQFGN/iyC5IPp1D+T/OJTfZn+VRWHTOOMxpLLwdnGALtM7xSJUfzWDJp6zfkI0aZ6pjOlRRZjp
-	bgAD21zrp+kd1sD1Fm1K//A+vp8meGvhuwtuVcQ8wI6fJ1kd33kPfN6PNUFP8Nnj09Fxok9baJS
-	BcXNrpd3AZKRLeSdlp7GGx2LAYwUbt3IaRDpCYSZzFnxa8bVh7td9U2pzhdmY=
-X-Google-Smtp-Source: AGHT+IEPa9CGIWZyBDpQA9aD0ohqR/Lj8uxc0Ay1S+0+Hqoqc8rpo7eYcxBsaRxplF7qihOZcOaCavYFMyXEGhP6HQ==
-X-Received: from pjbqn7.prod.google.com ([2002:a17:90b:3d47:b0:2ff:5f6a:835c])
- (user=hramamurthy job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90a:d88d:b0:2ee:c291:765a with SMTP id 98e67ed59e1d1-30531f964d1mr23237272a91.8.1743552665424;
- Tue, 01 Apr 2025 17:11:05 -0700 (PDT)
-Date: Wed,  2 Apr 2025 00:10:37 +0000
+        d=1e100.net; s=20230601; t=1743552737; x=1744157537;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KQ1QCtwsepe633EoRp9qwqH7AZPQqB3yQI1eiOpigjs=;
+        b=lY59YGqEfF5vaKf8AD+SA32yf0/7JpoP/qgJByokVKiWYSFlPrmB04/UhC+foVloZV
+         mBjZbogKpaIDfXMN+/qlK8NbOdj2iWPMV0OgzFXxpDRv58Un0EX20PDIrukCaSchxpis
+         0dj57XOlYjtLHEVgjYrFwnzG1pjDJowSGr1opzaG09UR4J/+W37l5noJRT9W2yNCW79K
+         uJIyMCFNxOxK7GDpjzEo3DpBl5JY/hwtwKI6QcH9YcqIVpAYwctrMTi5tFUVF+iRU1Gc
+         jyOfwIrzDK49T6k6jvYh/jXxqLUQ9EQXHsEo1Ob0lMjol+AaRONgcQTfcVPfdn3gwqnI
+         8QEA==
+X-Forwarded-Encrypted: i=1; AJvYcCUDCxTjzUNxSFZU1+PPjafy3IEAY1cdT8ZnmyPuWj7yn2wPHjcByGZP/uaCg9ouK6VDSjo+ODXix3ok@vger.kernel.org, AJvYcCWoBSRz10CJVJTgTTumiyxgHH8WwTG3MPqLFPK/MHN7dh3ASj9voaxTLPdy3faQf+gN4mHaFV7VP7J8lmw=@vger.kernel.org, AJvYcCXEo1j+QMlVJopHnsGfcqGegny1qGT4HtHZrJcyAjGuKK2SqKYElQ2/j7ZUqksMVl5rhwYR85k3@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4q8MHrenqmjfVq4kn+puBv4NaLeDIZYu6kh87qEz/G8EFtP2j
+	WED6hGtYZliF04MDjmJKF+6eu+c7gwmosNznpXSXMlyI5oNjuERVICVq1oxCL3wuN+siDMAsgTb
+	y2ZNffs6IbPO7TgKH1f3zO3g97Zc=
+X-Gm-Gg: ASbGncv0g7cDH9KwiU7RNo+uttEHE7+YYzHD5bLadPZglsOfAXYhWf9NMn2BGA7X2ED
+	G5DiyafiuxAkuhHzy1eR+2Xd4NX/U7TeAQcNmbi/o0O0NTu2XGmNYccwfiNv6oIDF4L0Jvo9DnC
+	ojnw+7HJfdmGw5hzRJ+nkYuYsnF6E=
+X-Google-Smtp-Source: AGHT+IHOraqWJCt2syW2jgSSoa7/gYqdb1v+46ayw9NvK2danUjDUGrKwZ/0H1XbrR63kZIlFS0eLahRL1e8FFkrcx0=
+X-Received: by 2002:a05:6870:44d2:b0:2c2:d47e:5702 with SMTP id
+ 586e51a60fabf-2cbcf41feebmr9997295fac.2.1743552737075; Tue, 01 Apr 2025
+ 17:12:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.49.0.472.ge94155a9ec-goog
-Message-ID: <20250402001037.2717315-1-hramamurthy@google.com>
-Subject: [PATCH net] gve: handle overflow when reporting TX consumed descriptors
-From: Harshitha Ramamurthy <hramamurthy@google.com>
-To: netdev@vger.kernel.org
-Cc: jeroendb@google.com, hramamurthy@google.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	pkaligineedi@google.com, willemb@google.com, joshwash@google.com, 
-	horms@kernel.org, shailend@google.com, jrkim@google.com, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+MIME-Version: 1.0
+References: <cover.1743497376.git.luying1@xiaomi.com> <e3646459ea67f10135ab821f90f66d8b6e74456c.1743497376.git.luying1@xiaomi.com>
+ <2025040110-unknowing-siding-c7d2@gregkh> <CAGo_G-f_8w9E388GOunNJ329W8UqOQ0y2amx_gMvbbstw4=H2A@mail.gmail.com>
+ <2025040121-compactor-lumpiness-e615@gregkh>
+In-Reply-To: <2025040121-compactor-lumpiness-e615@gregkh>
+From: Ying Lu <luying526@gmail.com>
+Date: Wed, 2 Apr 2025 08:12:06 +0800
+X-Gm-Features: AQ5f1JoKCAO_qM4EgqqPFGi9tsJCNmms42uIb-8D6A1QbIT1dV1oyRWyr89hFJc
+Message-ID: <CAGo_G-fiR5webo04uoVKTFh3UZaVTzkUgF2OcD8+fY-HzWCO6g@mail.gmail.com>
+Subject: Re: [PATCH v1 1/1] usbnet:fix NPE during rx_complete
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: oneukum@suse.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luying1 <luying1@xiaomi.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Joshua Washington <joshwash@google.com>
-
-When the tx tail is less than the head (in cases of wraparound), the TX
-consumed descriptor statistic in DQ will be reported as
-UINT32_MAX - head + tail, which is incorrect. Mask the difference of
-head and tail according to the ring size when reporting the statistic.
-
-Cc: stable@vger.kernel.org
-Fixes: 2c9198356d56 ("gve: Add consumed counts to ethtool stats")
-Signed-off-by: Joshua Washington <joshwash@google.com>
-Signed-off-by: Harshitha Ramamurthy <hramamurthy@google.com>
----
- drivers/net/ethernet/google/gve/gve_ethtool.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
-index 31a21ccf4863..4dea1fdce748 100644
---- a/drivers/net/ethernet/google/gve/gve_ethtool.c
-+++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
-@@ -392,7 +392,9 @@ gve_get_ethtool_stats(struct net_device *netdev,
- 				 */
- 				data[i++] = 0;
- 				data[i++] = 0;
--				data[i++] = tx->dqo_tx.tail - tx->dqo_tx.head;
-+				data[i++] =
-+					(tx->dqo_tx.tail - tx->dqo_tx.head) &
-+					tx->mask;
- 			}
- 			do {
- 				start =
--- 
-2.49.0.472.ge94155a9ec-goog
-
+On Tue, Apr 1, 2025 at 9:48=E2=80=AFPM Greg KH <gregkh@linuxfoundation.org>=
+ wrote:
+>
+> On Tue, Apr 01, 2025 at 08:48:01PM +0800, Ying Lu wrote:
+> > On Tue, Apr 1, 2025 at 6:31=E2=80=AFPM Greg KH <gregkh@linuxfoundation.=
+org> wrote:
+> > >
+> > > On Tue, Apr 01, 2025 at 06:18:01PM +0800, Ying Lu wrote:
+> > > > From: luying1 <luying1@xiaomi.com>
+> > > >
+> > > > Missing usbnet_going_away Check in Critical Path.
+> > > > The usb_submit_urb function lacks a usbnet_going_away
+> > > > validation, whereas __usbnet_queue_skb includes this check.
+> > > >
+> > > > This inconsistency creates a race condition where:
+> > > > A URB request may succeed, but the corresponding SKB data
+> > > > fails to be queued.
+> > > >
+> > > > Subsequent processes:
+> > > > (e.g., rx_complete =E2=86=92 defer_bh =E2=86=92 __skb_unlink(skb, l=
+ist))
+> > > > attempt to access skb->next, triggering a NULL pointer
+> > > > dereference (Kernel Panic).
+> > > >
+> > > > Signed-off-by: luying1 <luying1@xiaomi.com>
+> > >
+> > > Please use your name, not an email alias.
+> > >
+> > OK, I have updated. please check the Patch v2
+> >
+> > > Also, what commit id does this fix?  Should it be applied to stable
+> > > kernels?
+> > The commit  id is 04e906839a053f092ef53f4fb2d610983412b904
+> > (usbnet: fix cyclical race on disconnect with work queue)
+> > Should it be applied to stable kernels?  -- Yes
+>
+> Please mark the commit with that information, you seem to have not done
+> so for the v2 version :(
+Thank you for your response. Could you please confirm if I understand corre=
+ctly:
+Should we include in our commit message which commit id we're fixing?
 
