@@ -1,155 +1,130 @@
-Return-Path: <netdev+bounces-178875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE5B3A794C6
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 20:02:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96687A79511
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 20:29:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7CD43AD39B
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 18:02:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11B437A5491
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 18:27:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61F2F19005D;
-	Wed,  2 Apr 2025 18:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 733981C84C6;
+	Wed,  2 Apr 2025 18:28:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="tlBGkHXJ"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="QttT0U/t"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896721E89C
-	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 18:02:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7711C84A5
+	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 18:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743616937; cv=none; b=gEHqzPGYz9zaG6leI2ySo0I5zeS0lEO69YNk6KeA9CCae9NEWORGG/u6AX7TnqbQT8m9jtFzt9csRIzt9kIqcjTgILvimpfgLvcTDgLrrmeuf77nqxCwmNiluVq/gs9cpuSLGd5KwkbXFCi9bLRIfLKdEP5U6yb0zeknwRbH5Mo=
+	t=1743618535; cv=none; b=nObT+4TKsoMP4sW9SK+mKRh9O1ENln+h3ZnpPXRXKEbB6sdyTAA8kapvBTuCoY9jfoWEFGDIYfYscSmC3DYQvH7LpID1t3+CSljRO5/KUJBAveUCTCva5sPeSRAupIQCaigu+SJn5TMHR1oKbL8YplRg+sMq5kiSLekyExZsz6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743616937; c=relaxed/simple;
-	bh=gYczceAqHzDk2ELbVcTJSWecBAjZGC23tqtmFSHUBfc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nLliQF2jI+2SxgcfV6L1KsBfr8N5ZFPnhFx7oIEswN2obVERRNTuBEhxb+Sa6VZLXhCV/dcUOyU0peHnJZfXKwe1Ormnw6M6EgcMetg0kgk34DFkdl207IOVn3lX6/Np52UN95GJrWOKWeFHmpoebSA3QZ3mVlVTQurhRD22ER4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=tlBGkHXJ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ZxnsPdg0hx1/3ld6mtD7WZtnwL/QnwlLJacCHW01Akk=; b=tlBGkHXJGXCU2kO+p3Nmj6RdxI
-	BIz+D3oLfBermYX1JV4e5VJLpMGJVABIYGY292BS+I36HXSiezO/ka6+kIRddFhI90ELE5egGUTju
-	Y6utzYOhVqjWNZtj9Qyi0u3FtF9cQdjMMBmZw32GTRze5vYcV3ZgJOcxlKeN8vmxW5oUskavu8230
-	J5qbjK6WpFm1/kwTIfJAewJ+c64Jj1snufBXHCBlSuwcvpv4s5PVfKfKhP/wmP7gI0upUxBqb0pA3
-	f/vI+kVHxve2iFOToWWzqUfUjHJj76y2ZPtD2OjlbhbvgmxOTGQ3tm0mr+9D7llsLz0OVprQixX0/
-	fuOoWFkg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41976)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u02Ph-0007y9-21;
-	Wed, 02 Apr 2025 19:02:09 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u02Pf-0003ui-0B;
-	Wed, 02 Apr 2025 19:02:07 +0100
-Date: Wed, 2 Apr 2025 19:02:06 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	maxime.chevallier@bootlin.com
-Subject: Re: [net PATCH 2/2] net: phylink: Set advertising based on
- phy_lookup_setting in ksettings_set
-Message-ID: <Z-17nu2epjG1EiAd@shell.armlinux.org.uk>
-References: <174354264451.26800.7305550288043017625.stgit@ahduyck-xeon-server.home.arpa>
- <174354301312.26800.4565150748823347100.stgit@ahduyck-xeon-server.home.arpa>
+	s=arc-20240116; t=1743618535; c=relaxed/simple;
+	bh=D3m5WoVt0h/8wkwTuJYrj8u9HKSDTlsX+T9QXbwiNP8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LqxrJfDluhuro9o6yD7ETuZwHXZ0dkUupVKHdOk3wiiTP0H7tpdXBlay8IqCQ+Np3tP8w88xeE2sBPF4ev6+LMf4QNdusLV/8fLE3m3lbfHFxVF9Q7kIjGkMo6YwcXfXt3GPCDv7EueNo/edp+LdBOAtckY4pFLKJ3VZPJQpgto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=QttT0U/t; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-6feb229b716so1260467b3.3
+        for <netdev@vger.kernel.org>; Wed, 02 Apr 2025 11:28:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1743618532; x=1744223332; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D3m5WoVt0h/8wkwTuJYrj8u9HKSDTlsX+T9QXbwiNP8=;
+        b=QttT0U/tgZ2RcKzvg9upsB6tlV8UjxTlJ7sIc3ekFpxKwkLqbGZWucobtggxfmi8yz
+         VAVzTWCZ0CO+Tige88YmNL7uawgDdB7RZr9/Y+CH0UCIatx5bsUf0YZgq4oGwLjrpPln
+         2tfJloeA/rXFCEiSdbtE6R0bAUm8JI26Cb1s3kK1jq5a/OLmPESlD+jHxoNf/z7/InFf
+         TBrZAjdmzXClEbmiRJugTHDHUZojPwpG4SvUbZm4BvQagJkXAK5XCySr/1KeHVVxOpYS
+         Ygq+E3GH2e0gUgNDdmOfAdJpnGg5RvaQwOIZLg0LgSko2c6G+71jHA/VXVkfFfsGlAhY
+         s04w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743618532; x=1744223332;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=D3m5WoVt0h/8wkwTuJYrj8u9HKSDTlsX+T9QXbwiNP8=;
+        b=gUNpvU+60P1QqPq77tjb37FViutzRzGpz0KTVaVOnjq7DUTsSkG26pddvftz8Xc3up
+         6bjAQLGftJOYAVQ40wOR0T35xM08g6AhI+CtcH8AObz70HOQeMI02Uxy4otiSSU5osKU
+         RiwoZEZZ+LvF4pOA+QkwG16mdkCD2BjZ8qeXOgK+ganmr16olEID2gOaareNvgrB+5zb
+         yF3ODVyPn3qXAqW7l/TaG0PQ/p5oLxDNEP5opUut7jEP30QMzd5rKUpPahiCKnZI9tTF
+         nhFflp/iOr2KJE0vTRWKIBiCEgAoxqdu+WZzkTo+mO04W2pMrQ551cGb+XYYzKsjqBIF
+         mHAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVnqtZjOVr6QX1Py6ltm1X2iF76XmimuMddBWylauFpcBwOvw8ATOWcQrIvaFLiAhAQ6Zmp1f0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyicmHgbrJEIwIV+5GFfgDaMQmvZ4vZnyysZ3X0n3pHKGkrcHL/
+	+jOz8NzHaIxgIujxEFW4Nkz1OFmdI5yLEDDslBOLeTV884I/1GMLJT9plRHQ6uvXccrW254gcX4
+	2t0lbZR24CAJpJMDk6bfX+q/eI+9+1IpkOckr
+X-Gm-Gg: ASbGncvbKE5DRAkLfhl6nSH3KOdnekjVeu4pqjyhoVFtMcbKlWX/k/d8GYHcNFbgyLx
+	wRg3mcYuMWd74gWVeT8u7hiSDM3ZcpJHQQZcA43qUCtM0d5jTIHCkVTWvfsG6v4kGeqLPQ6N67C
+	Jc4C8gYUPY9/wDaWtmgfh8SYhhbQ==
+X-Google-Smtp-Source: AGHT+IHnExvPdDbkaYXl6TfzQuj2zh7liH916FifwMkueNLtDrglF+QixKyEuVLYWMHZBQP9nMP76oqS/6aEZzpPBHw=
+X-Received: by 2002:a05:690c:6986:b0:703:c3b4:45d7 with SMTP id
+ 00721157ae682-703c3b44963mr40875207b3.28.1743618532599; Wed, 02 Apr 2025
+ 11:28:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <174354301312.26800.4565150748823347100.stgit@ahduyck-xeon-server.home.arpa>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <2a4f2c24-62a8-4627-88c0-776c0e005163@redhat.com>
+ <20250401124018.4763-1-mowenroot@163.com> <20250402093609.GK214849@horms.kernel.org>
+In-Reply-To: <20250402093609.GK214849@horms.kernel.org>
+From: Paul Moore <paul@paul-moore.com>
+Date: Wed, 2 Apr 2025 14:28:40 -0400
+X-Gm-Features: ATxdqUGTOorUCYsRGQ4r2FDIOcagFPztRxz3oaDvDqEej0LSOzdzpbCppUGWWfU
+Message-ID: <CAHC9VhQAdxADGrqEDH4kUuoXsUS_E92UtTDcf+uF7J=QavkP3g@mail.gmail.com>
+Subject: Re: [PATCH v3] netlabel: Fix NULL pointer exception caused by CALIPSO
+ on IPv4 sockets
+To: Simon Horman <horms@kernel.org>
+Cc: Debin Zhu <mowenroot@163.com>, pabeni@redhat.com, 1985755126@qq.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 01, 2025 at 02:30:13PM -0700, Alexander Duyck wrote:
-> From: Alexander Duyck <alexanderduyck@fb.com>
-> 
-> While testing a driver that supports mulitple speeds on the same SFP module
-> I noticed I wasn't able to change them when I was not using
-> autonegotiation. I would attempt to update the speed, but it had no effect.
-> 
-> A bit of digging led me to the fact that we weren't updating the advertised
-> link mask and as a result the interface wasn't being updated when I
-> requested an updated speed. This change makes it so that we apply the speed
-> from the phy settings to the config.advertised following a behavior similar
-> to what we already do when setting up a fixed-link.
-> 
-> Fixes: ea269a6f7207 ("net: phylink: Update SFP selected interface on advertising changes")
-> Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
-> ---
->  drivers/net/phy/phylink.c |    1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-> index 380e51c5bdaa..f561a803e5ce 100644
-> --- a/drivers/net/phy/phylink.c
-> +++ b/drivers/net/phy/phylink.c
-> @@ -2763,6 +2763,7 @@ int phylink_ethtool_ksettings_set(struct phylink *pl,
->  
->  		config.speed = c->speed;
->  		config.duplex = c->duplex;
-> +		linkmode_and(config.advertising, c->linkmodes, pl->supported);
+On Wed, Apr 2, 2025 at 5:36=E2=80=AFAM Simon Horman <horms@kernel.org> wrot=
+e:
+> On Tue, Apr 01, 2025 at 08:40:18PM +0800, Debin Zhu wrote:
+> > When calling netlbl_conn_setattr(), addr->sa_family is used
+> > to determine the function behavior. If sk is an IPv4 socket,
+> > but the connect function is called with an IPv6 address,
+> > the function calipso_sock_setattr() is triggered.
+> > Inside this function, the following code is executed:
+> >
+> > sk_fullsock(__sk) ? inet_sk(__sk)->pinet6 : NULL;
+> >
+> > Since sk is an IPv4 socket, pinet6 is NULL, leading to a
+> > null pointer dereference.
+> >
+> > This patch fixes the issue by checking if inet6_sk(sk)
+> > returns a NULL pointer before accessing pinet6.
+> >
+> > Fixes: ceba1832b1b2("calipso: Set the calipso socket label to match the=
+ secattr.")
+>
+> There is probably no need to repost for this, but
+> there is a missing space in the Fixes tag. It should be like this:
+>
+> Fixes: ceba1832b1b2 ("calipso: Set the calipso socket label to match the =
+secattr.")
 
-I had thought that ethtool provided an appropriate advertising mask
-when aneg is disabled, but it just preserves the old mask, which seems
-to be the intended behaviour (if one looks at phylib, that's also what
-happens there.) We should not deviate from that with a user API.
+Thanks.
 
-So, I would like to change how this works somewhat to avoid a user
-visible change. Also, interface mode changing on AUTONEG_DISABLED was
-never intended to work. Indeed, mvneta and mvpp2 don't support
-AUTONEG_DISABLED for 1000BASE-X nor 2500BASE-X which is where this
-interface switching was implemented (for switching between these two.)
+Not sure if the netdev folks are going to pick this up or if I'll end
+up taking it, but if I end up taking it I'll update the tag while
+merging.
 
-I've already got rid of the phylink_sfp_select_interface() usage when
-a module is inserted (see phylink_sfp_config_optical(), where we base
-the interface selection off interface support masks there rather than
-advertisements - it used to be advertisements.)
+> > Signed-off-by: Debin Zhu <mowenroot@163.com>
+> > Signed-off-by: Bitao Ouyang <1985755126@qq.com>
+> > Acked-by: Paul Moore <paul@paul-moore.com>
 
-We now have phylink_interface_max_speed() which gives the speed of
-the interface, which gives us the possibility of doing something
-like this for the AUTONEG_DISABLE state:
-
-	phy_interface_and(interfaces, pl->config->supported_interfaces,
-			  pl->sfp_interfaces);
-
-	best_speed = SPEED_UNKNOWN;
-	best_interface = PHY_INTERFACE_MODE_NA;
-
-	for_each_set_bit(interface, interfaces, __ETHTOOL_LINK_MODE_MASK_NBITS) {
-		max_speed = phylink_interface_max_speed(interface);
-		if (max_speed < config.speed)
-			continue;
-		if (max_speed == config.speed)
-			return interface;
-		if (best_speed == SPEED_UNKNOWN ||
-		    max_speed < best_speed) {
-			best_speed = max_speed;
-			best_interface = interface;
-		}
-	}
-
-	return best_interface;
-
-to select the interface from aneg-disabled state.
-
-Do you think that would work for you?
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+--=20
+paul-moore.com
 
