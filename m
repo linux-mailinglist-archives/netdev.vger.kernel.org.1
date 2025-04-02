@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-178815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E07DA79041
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 15:51:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8EBEA7902B
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 15:47:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A598E3B6548
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 13:47:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 604E01703D6
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 13:46:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A30623A9BE;
-	Wed,  2 Apr 2025 13:46:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDE1723C8C1;
+	Wed,  2 Apr 2025 13:46:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8943723E34A;
-	Wed,  2 Apr 2025 13:46:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E544D23A9BF;
+	Wed,  2 Apr 2025 13:46:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743601573; cv=none; b=kmETiOcpUJt59JhAXePwM4j/28U3IpYYtOsTu1dpMzMo7nkQB5gVxbEaGbc6XpoiK8NypEkiVnNHdhJOhiaGahWp7sMPTtVDwEkjSicGHnQsWZynsDZBZKFRqz5EgZfukjhZ9O5e7AQUUlwMOiwIfjzEzwHZLj8MKbkox7D9Z4w=
+	t=1743601569; cv=none; b=adXaUsiDDV7ajQur2eeY/OC4HZq6f4xaJGoxbFjmxOXTendwJeL0+XPVggTmna+bMiF6kbPe54CTbPuok8b6IiNCObzpPkDGzOOuN46tYUdNoOZfJz49W+M4mJtflH2XKssQIN0serisCviBSryeNl4OKxP3Cv9j2Wvm34tmk/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743601573; c=relaxed/simple;
-	bh=o3/0sPGZz9dV7SG0UNXlsf4x2Gv66UiX7OX/Cm6sb7c=;
+	s=arc-20240116; t=1743601569; c=relaxed/simple;
+	bh=ayi+2RtNbz1gR7WcrLFw26ZRxnOL8sFaE3V8IoKYwbo=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TTMx971P5MUiVWIlkRG3EaylZFkJyZbMvhvyxe6RhhmlXqDJaCj6V+hancLxAMUGcASmC5wXCfQwjJBDlmqTMi9+DONvuoOLVj+oAF78cqTw91B2SBRpPvDgIaeQiU4bgfEPxPOSxt0W1hmCCbbQoSY+5Jx6mdtaP/cDyfjdGdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+	 MIME-Version:Content-Type; b=Ny3IycAhhQKUUbzlWq67lM73KDLM0zcFfrKS+OQzr2pykam/b1Qt6oMHnGth8lKhuiOypHUYP99fEgqPxMQtThLeoYZUq4TCYB6jbDgAic3X9b3LwMcthBP7rNd1eGrf0RY0akOzP8jyOO32EZG8s80Y3b3G0cdq8CTYJ+pNEPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4ZSQzR59Srz2CcG4;
-	Wed,  2 Apr 2025 21:42:43 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4ZSQz21bxDzWfd2;
+	Wed,  2 Apr 2025 21:42:22 +0800 (CST)
 Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id D6BC71402CD;
-	Wed,  2 Apr 2025 21:46:03 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 566691800E4;
+	Wed,  2 Apr 2025 21:46:04 +0800 (CST)
 Received: from localhost.localdomain (10.90.30.45) by
  kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -47,9 +47,9 @@ CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
 	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
 	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH net 5/7] net: hibmcge: fix the incorrect np_link fail state issue.
-Date: Wed, 2 Apr 2025 21:39:03 +0800
-Message-ID: <20250402133905.895421-6-shaojijie@huawei.com>
+Subject: [PATCH net 6/7] net: hibmcge: fix not restore rx pause mac addr after reset issue
+Date: Wed, 2 Apr 2025 21:39:04 +0800
+Message-ID: <20250402133905.895421-7-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20250402133905.895421-1-shaojijie@huawei.com>
 References: <20250402133905.895421-1-shaojijie@huawei.com>
@@ -64,45 +64,44 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  kwepemk100013.china.huawei.com (7.202.194.61)
 
-In the debugfs file, the driver displays the np_link fail state
-based on the HBG_NIC_STATE_NP_LINK_FAIL.
+In normal cases, the driver must ensure that the value
+of rx pause mac addr is the same as the MAC address of
+the network port. This ensures that the driver can
+receive pause frames whose destination address is
+the MAC address of the network port.
 
-However, HBG_NIC_STATE_NP_LINK_FAIL is cleared in hbg_service_task()
-So, this value of np_link fail is always false.
+Currently, the rx pause addr does not restored after reset.
 
-This patch directly reads the related register to display the real state.
+The index of the MAC address of the host is always 0.
+Therefore, this patch sets rx pause addr to
+the MAC address with index 0.
 
-Fixes: e0306637e85d ("net: hibmcge: Add support for mac link exception handling feature")
+Fixes: 3f5a61f6d504 ("net: hibmcge: Add reset supported in this module")
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
- drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.c
-index 9c09e4835990..01ad82d2f5cc 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.c
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.c
-@@ -106,6 +106,7 @@ static int hbg_dbg_nic_state(struct seq_file *s, void *unused)
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c
+index 4e8cb66f601c..a0bcfb5a713d 100644
+--- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c
+@@ -26,12 +26,15 @@ static void hbg_restore_mac_table(struct hbg_priv *priv)
+ 
+ static void hbg_restore_user_def_settings(struct hbg_priv *priv)
  {
- 	struct net_device *netdev = dev_get_drvdata(s->private);
- 	struct hbg_priv *priv = netdev_priv(netdev);
-+	bool np_link_fail;
++	/* The index of host mac is always 0. */
++	u64 rx_pause_addr = ether_addr_to_u64(priv->filter.mac_table[0].addr);
+ 	struct ethtool_pauseparam *pause_param = &priv->user_def.pause_param;
  
- 	seq_printf(s, "event handling state: %s\n",
- 		   state_str_true_false(priv, HBG_NIC_STATE_EVENT_HANDLING));
-@@ -117,8 +118,10 @@ static int hbg_dbg_nic_state(struct seq_file *s, void *unused)
- 		   reset_type_str[priv->reset_type]);
- 	seq_printf(s, "need reset state: %s\n",
- 		   state_str_true_false(priv, HBG_NIC_STATE_NEED_RESET));
--	seq_printf(s, "np_link fail state: %s\n",
--		   state_str_true_false(priv, HBG_NIC_STATE_NP_LINK_FAIL));
-+
-+	np_link_fail = !hbg_reg_read_field(priv, HBG_REG_AN_NEG_STATE_ADDR,
-+					   HBG_REG_AN_NEG_STATE_NP_LINK_OK_B);
-+	seq_printf(s, "np_link fail state: %s\n", str_true_false(np_link_fail));
- 
- 	return 0;
+ 	hbg_restore_mac_table(priv);
+ 	hbg_hw_set_mtu(priv, priv->netdev->mtu);
+ 	hbg_hw_set_pause_enable(priv, pause_param->tx_pause,
+ 				pause_param->rx_pause);
++	hbg_hw_set_rx_pause_mac_addr(priv, rx_pause_addr);
  }
+ 
+ int hbg_rebuild(struct hbg_priv *priv)
 -- 
 2.33.0
 
