@@ -1,160 +1,155 @@
-Return-Path: <netdev+bounces-178874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6814FA793EA
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 19:39:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE5B3A794C6
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 20:02:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A0861894F47
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 17:39:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7CD43AD39B
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 18:02:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3081DDC28;
-	Wed,  2 Apr 2025 17:39:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61F2F19005D;
+	Wed,  2 Apr 2025 18:02:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g0nXMTC7"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="tlBGkHXJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 658381C8604
-	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 17:39:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896721E89C
+	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 18:02:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743615555; cv=none; b=l27vqEsRIUnumNfUvSE1jV/oYg1ybx23eRWPxMp1pJA+QUauyIai9aRS0aCut7dIKDOvppJITTjpxouyPPvFH6IMdGH8pJy3qfWnZTtdssS4E/+J9eoyrxD/5bfBG+LwpY+FH2zahKwE1TT5DfgPkvNH/1RBLh2DIZeWGWPOK/k=
+	t=1743616937; cv=none; b=gEHqzPGYz9zaG6leI2ySo0I5zeS0lEO69YNk6KeA9CCae9NEWORGG/u6AX7TnqbQT8m9jtFzt9csRIzt9kIqcjTgILvimpfgLvcTDgLrrmeuf77nqxCwmNiluVq/gs9cpuSLGd5KwkbXFCi9bLRIfLKdEP5U6yb0zeknwRbH5Mo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743615555; c=relaxed/simple;
-	bh=QfgFqbVAQEpRBjtw5mPjVjuszZjEVNbqgmw276wdWG8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r5CB4JLE8ZJL93wdJkFLmEP/rAps3jydHBYiV9205EvUeMk1imnIKW1kAZtYWofYCZXoJr6T2LzlHg8Cw9Ty84F46jK4GlogP0BnOZIb7GpQnnvQdE1wpTySFqLBLo7QM2aCt+zPJhOR/uK1n/blvsD4rrmmIBzpYtGR88zOlNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g0nXMTC7; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1743615553; x=1775151553;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=QfgFqbVAQEpRBjtw5mPjVjuszZjEVNbqgmw276wdWG8=;
-  b=g0nXMTC727zpHyxEbPKtP4QMiWqDxKJnJuo404AF8MTG9dxkMtNnUE8u
-   tgvaisay9C9EF4dsJau742vy59Kj90hLeJyhcDuQ9vTOExAME6rSdw22T
-   XR3S64vX2h9PMwVjoVEOhevniPgcNnew3qI/SHu+UAOXQhgZso7tNfc2Q
-   cmu8k0AM3CcjcjP2jCpBfqUgPNddBOm7ImLJEI9fc2Ex8HmCcgJQaY12t
-   SR2Gd7bZh7P+Ue3Q3Sj8X+Or7MG9sRqKvPsGiizQ7/kT4F2ZA7m4a5irR
-   SzoHCLQ8R/cKRb5+TTp3++AD418F9KzV+gRkLGGmBkO6Jq03gmtAgpGEt
-   Q==;
-X-CSE-ConnectionGUID: fPlxHISwQAu44C+biazZCg==
-X-CSE-MsgGUID: 6F3qyKnLQkeqTMOPteCv5g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11392"; a="44257299"
-X-IronPort-AV: E=Sophos;i="6.15,182,1739865600"; 
-   d="scan'208";a="44257299"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2025 10:39:13 -0700
-X-CSE-ConnectionGUID: PEX1tSzaS5eAvHH8UHYf4g==
-X-CSE-MsgGUID: SOnt5ROQSUKdjE+j2pjBvQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,182,1739865600"; 
-   d="scan'208";a="149968809"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa002.fm.intel.com with ESMTP; 02 Apr 2025 10:39:11 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Emil Tantilov <emil.s.tantilov@intel.com>,
-	anthony.l.nguyen@intel.com,
-	michal.swiatkowski@linux.intel.com,
-	decot@google.com,
-	willemb@google.com,
-	horms@kernel.org,
-	yuma@redhat.com,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Samuel Salin <Samuel.salin@intel.com>
-Subject: [PATCH net 5/5] idpf: fix adapter NULL pointer dereference on reboot
-Date: Wed,  2 Apr 2025 10:38:57 -0700
-Message-ID: <20250402173900.1957261-6-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250402173900.1957261-1-anthony.l.nguyen@intel.com>
-References: <20250402173900.1957261-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1743616937; c=relaxed/simple;
+	bh=gYczceAqHzDk2ELbVcTJSWecBAjZGC23tqtmFSHUBfc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nLliQF2jI+2SxgcfV6L1KsBfr8N5ZFPnhFx7oIEswN2obVERRNTuBEhxb+Sa6VZLXhCV/dcUOyU0peHnJZfXKwe1Ormnw6M6EgcMetg0kgk34DFkdl207IOVn3lX6/Np52UN95GJrWOKWeFHmpoebSA3QZ3mVlVTQurhRD22ER4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=tlBGkHXJ; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ZxnsPdg0hx1/3ld6mtD7WZtnwL/QnwlLJacCHW01Akk=; b=tlBGkHXJGXCU2kO+p3Nmj6RdxI
+	BIz+D3oLfBermYX1JV4e5VJLpMGJVABIYGY292BS+I36HXSiezO/ka6+kIRddFhI90ELE5egGUTju
+	Y6utzYOhVqjWNZtj9Qyi0u3FtF9cQdjMMBmZw32GTRze5vYcV3ZgJOcxlKeN8vmxW5oUskavu8230
+	J5qbjK6WpFm1/kwTIfJAewJ+c64Jj1snufBXHCBlSuwcvpv4s5PVfKfKhP/wmP7gI0upUxBqb0pA3
+	f/vI+kVHxve2iFOToWWzqUfUjHJj76y2ZPtD2OjlbhbvgmxOTGQ3tm0mr+9D7llsLz0OVprQixX0/
+	fuOoWFkg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41976)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u02Ph-0007y9-21;
+	Wed, 02 Apr 2025 19:02:09 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u02Pf-0003ui-0B;
+	Wed, 02 Apr 2025 19:02:07 +0100
+Date: Wed, 2 Apr 2025 19:02:06 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	maxime.chevallier@bootlin.com
+Subject: Re: [net PATCH 2/2] net: phylink: Set advertising based on
+ phy_lookup_setting in ksettings_set
+Message-ID: <Z-17nu2epjG1EiAd@shell.armlinux.org.uk>
+References: <174354264451.26800.7305550288043017625.stgit@ahduyck-xeon-server.home.arpa>
+ <174354301312.26800.4565150748823347100.stgit@ahduyck-xeon-server.home.arpa>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <174354301312.26800.4565150748823347100.stgit@ahduyck-xeon-server.home.arpa>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Emil Tantilov <emil.s.tantilov@intel.com>
+On Tue, Apr 01, 2025 at 02:30:13PM -0700, Alexander Duyck wrote:
+> From: Alexander Duyck <alexanderduyck@fb.com>
+> 
+> While testing a driver that supports mulitple speeds on the same SFP module
+> I noticed I wasn't able to change them when I was not using
+> autonegotiation. I would attempt to update the speed, but it had no effect.
+> 
+> A bit of digging led me to the fact that we weren't updating the advertised
+> link mask and as a result the interface wasn't being updated when I
+> requested an updated speed. This change makes it so that we apply the speed
+> from the phy settings to the config.advertised following a behavior similar
+> to what we already do when setting up a fixed-link.
+> 
+> Fixes: ea269a6f7207 ("net: phylink: Update SFP selected interface on advertising changes")
+> Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
+> ---
+>  drivers/net/phy/phylink.c |    1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> index 380e51c5bdaa..f561a803e5ce 100644
+> --- a/drivers/net/phy/phylink.c
+> +++ b/drivers/net/phy/phylink.c
+> @@ -2763,6 +2763,7 @@ int phylink_ethtool_ksettings_set(struct phylink *pl,
+>  
+>  		config.speed = c->speed;
+>  		config.duplex = c->duplex;
+> +		linkmode_and(config.advertising, c->linkmodes, pl->supported);
 
-With SRIOV enabled, idpf ends up calling into idpf_remove() twice.
-First via idpf_shutdown() and then again when idpf_remove() calls into
-sriov_disable(), because the VF devices use the idpf driver, hence the
-same remove routine. When that happens, it is possible for the adapter
-to be NULL from the first call to idpf_remove(), leading to a NULL
-pointer dereference.
+I had thought that ethtool provided an appropriate advertising mask
+when aneg is disabled, but it just preserves the old mask, which seems
+to be the intended behaviour (if one looks at phylib, that's also what
+happens there.) We should not deviate from that with a user API.
 
-echo 1 > /sys/class/net/<netif>/device/sriov_numvfs
-reboot
+So, I would like to change how this works somewhat to avoid a user
+visible change. Also, interface mode changing on AUTONEG_DISABLED was
+never intended to work. Indeed, mvneta and mvpp2 don't support
+AUTONEG_DISABLED for 1000BASE-X nor 2500BASE-X which is where this
+interface switching was implemented (for switching between these two.)
 
-BUG: kernel NULL pointer dereference, address: 0000000000000020
-...
-RIP: 0010:idpf_remove+0x22/0x1f0 [idpf]
-...
-? idpf_remove+0x22/0x1f0 [idpf]
-? idpf_remove+0x1e4/0x1f0 [idpf]
-pci_device_remove+0x3f/0xb0
-device_release_driver_internal+0x19f/0x200
-pci_stop_bus_device+0x6d/0x90
-pci_stop_and_remove_bus_device+0x12/0x20
-pci_iov_remove_virtfn+0xbe/0x120
-sriov_disable+0x34/0xe0
-idpf_sriov_configure+0x58/0x140 [idpf]
-idpf_remove+0x1b9/0x1f0 [idpf]
-idpf_shutdown+0x12/0x30 [idpf]
-pci_device_shutdown+0x35/0x60
-device_shutdown+0x156/0x200
-...
+I've already got rid of the phylink_sfp_select_interface() usage when
+a module is inserted (see phylink_sfp_config_optical(), where we base
+the interface selection off interface support masks there rather than
+advertisements - it used to be advertisements.)
 
-Replace the direct idpf_remove() call in idpf_shutdown() with
-idpf_vc_core_deinit() and idpf_deinit_dflt_mbx(), which perform
-the bulk of the cleanup, such as stopping the init task, freeing IRQs,
-destroying the vports and freeing the mailbox. This avoids the calls to
-sriov_disable() in addition to a small netdev cleanup, and destroying
-workqueues, which don't seem to be required on shutdown.
+We now have phylink_interface_max_speed() which gives the speed of
+the interface, which gives us the possibility of doing something
+like this for the AUTONEG_DISABLE state:
 
-Reported-by: Yuying Ma <yuma@redhat.com>
-Fixes: e850efed5e15 ("idpf: add module register and probe functionality")
-Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
-Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Samuel Salin <Samuel.salin@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_main.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+	phy_interface_and(interfaces, pl->config->supported_interfaces,
+			  pl->sfp_interfaces);
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
-index b6c515d14cbf..bec4a02c5373 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_main.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
-@@ -87,7 +87,11 @@ static void idpf_remove(struct pci_dev *pdev)
-  */
- static void idpf_shutdown(struct pci_dev *pdev)
- {
--	idpf_remove(pdev);
-+	struct idpf_adapter *adapter = pci_get_drvdata(pdev);
-+
-+	cancel_delayed_work_sync(&adapter->vc_event_task);
-+	idpf_vc_core_deinit(adapter);
-+	idpf_deinit_dflt_mbx(adapter);
- 
- 	if (system_state == SYSTEM_POWER_OFF)
- 		pci_set_power_state(pdev, PCI_D3hot);
+	best_speed = SPEED_UNKNOWN;
+	best_interface = PHY_INTERFACE_MODE_NA;
+
+	for_each_set_bit(interface, interfaces, __ETHTOOL_LINK_MODE_MASK_NBITS) {
+		max_speed = phylink_interface_max_speed(interface);
+		if (max_speed < config.speed)
+			continue;
+		if (max_speed == config.speed)
+			return interface;
+		if (best_speed == SPEED_UNKNOWN ||
+		    max_speed < best_speed) {
+			best_speed = max_speed;
+			best_interface = interface;
+		}
+	}
+
+	return best_interface;
+
+to select the interface from aneg-disabled state.
+
+Do you think that would work for you?
+
 -- 
-2.47.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
