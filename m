@@ -1,255 +1,187 @@
-Return-Path: <netdev+bounces-178906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05407A7983D
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 00:28:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9A21A79848
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 00:35:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4703218906D1
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 22:28:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64B1C170587
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 22:35:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 796691F560B;
-	Wed,  2 Apr 2025 22:28:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5D3C1F429C;
+	Wed,  2 Apr 2025 22:35:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kPlgUkpf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CKv+7Qf6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C171F3D56;
-	Wed,  2 Apr 2025 22:28:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E033B5BAF0
+	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 22:35:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743632907; cv=none; b=R/S++DCCJ61r07WkSoBGhMFtguqi7n6Am65rq+0GzGfXI3Q787Qfw+W0HZFeTkQJO29ihh2+OTmB41yzZiG1bj61dxoJcJOSIYI5NZs+AsOZX9tz+S8PiwBpBMFzJmmtGYpPEt/LYLoX/A1bKdgPZpdY+m6wGzXK0l65n6aRFL8=
+	t=1743633325; cv=none; b=FmH8WplbNa5yqe0AcEgQa5e26S8ZyDysvJfJ+iscPdnfNiJJyGRSeaTYj7JcBFoYVkGH1fdOjF2AmKNty55vbGBm3efSF3S6OcDWdpOpjlP+r5qV1cha9Rq2IttC9SgYBoqVy1oYgw3e7jERkqJOALAp4V74UwLaIvoUwK61Uos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743632907; c=relaxed/simple;
-	bh=0OpwP0nOVkqFr1A9xs6Ac/M4Q6N13WihMhL0PnP1Z6w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qgyub1TaRQdAOv6KkuNW8qdaUEjnauxfOXoXKol4DBCshcMNuW3filSfoe92p4EdbIEyj87m4kPV27LARLiL1JWNHYhxxIx+66IWzBszmHWRHKNVXqhyFGIsoSDAITj3ni72dw394WTFZVzbEriyDgrLNHzsvjqKJ5zTfNaqVos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kPlgUkpf; arc=none smtp.client-ip=209.85.214.182
+	s=arc-20240116; t=1743633325; c=relaxed/simple;
+	bh=DLxh5MuIyvhh7m6X1g/tBz06mB0DgFyjvKM7GfEPd9Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EHG4JCP/TjLJperMVaSUJmwE7CJBEr5COeSk4R1Pt0M49qZdMFNPu0Z6ba4c3UQZOYP+eSLFmFI0Dq1bsFAAXj2HopAefgqT7hR6iMmdObXpB9rzlxR1Rw+8sGHZqxQY750gfq/2MWmJH2W9t3KDxI7vSsadmQL3u/Q9dNuXxUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CKv+7Qf6; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-225477548e1so3429735ad.0;
-        Wed, 02 Apr 2025 15:28:25 -0700 (PDT)
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-39c0e0bc733so248456f8f.1
+        for <netdev@vger.kernel.org>; Wed, 02 Apr 2025 15:35:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743632905; x=1744237705; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yXllTqI4s65vesFZcUdhMkK73ncFDlJDEPi3mG19ehk=;
-        b=kPlgUkpf5s0KmjHRRuSeFy0mhRs7HYSXyRi1oyKyaX2CRUi9WezTifltpbW99FRHMU
-         PaqV0aqTIJk7fLqhsaq52gd5VqToqcHZOTjPjI7ZeIRm84j/17pAbure1w8qobVPr1zS
-         uigeKa8NRP6mGZG/nf4Utlvd7NuHlJIMzpHngplNyuSZvgnwQhtNG/ClxSSP16tgbovg
-         5VTTDo7qAPgWstnPNNACYUdu08V0qsZtxPbD6hwMngrRygOeifXxuDdzaKfE0PSuWt2W
-         ip7t84WrEz4IjiEWksYt2EEQIm97F1YQJmeP1zk8XjfVOeKZS1V3AqXTcABbY2qxMmMS
-         /DjA==
+        d=gmail.com; s=20230601; t=1743633322; x=1744238122; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7u/lILhCVe7tBDSsAyhX8mHkwtrqrjms7ES/Xq1B1gY=;
+        b=CKv+7Qf6aeYkD+/SUQPmWjsWgO5KbkgAbzk+3+uJmX2o5XKZY/kLNMOyUgw2EDFaMu
+         Q1Jx6pNRqbpnsOMuSkrkwd5q0icacyAwOn+RaFhMtBS8x19JphI0uvUdvIz4g8HsEdAQ
+         N70W+/hWQoxTX0MLgt2EgW4yFSDWc2hDiS6mGnilX5U7LlB5lygzUtXoQCJhJd3qogVA
+         15SX0R5IfFuMa0TduAlvYANfkqVV6uVJN1sq8hD1ReZOLxaWNIy6fOjYWrugXZGsEzvk
+         Co7V5+pDzr6p19Xr/UlnjxPw2yG2Wnkdk2rSr6B3WjKAW6hrHg/MlgHmilpecTeX6wq4
+         MkpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743632905; x=1744237705;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yXllTqI4s65vesFZcUdhMkK73ncFDlJDEPi3mG19ehk=;
-        b=PQjIiCLRxEPoa0u64csTin32cYjeHynLfFC+eC848mUbLVX+tir2sg8yVjqzDfZQdV
-         NmuuoBoiVeQwQcWcWjipuDU3/ibPmy9N7INk1iwqwb/mGo1SwrZYx20NFfT+jmWBrZfa
-         NSl2yUA2rh5Bb9PtFAG93oafzS/1s2Ol0S56vEHRlM7SeYxbiUAn7eI9OmO2XNBkb6yq
-         FzpcfPxw/Ab2lXgNSZ7v0E/YBJSeoz9PHZwMMElSp0/TQNOHP2b7KW1HnnQpR6Wj1vdM
-         nNBX8yxWh4sPmI3D5A0gw03hT664zWe8zRUfaBsvFj67/IbUpNnpTpUr9mHpBNNfmVpf
-         QY4w==
-X-Forwarded-Encrypted: i=1; AJvYcCVBep/nlFYXOaAH2C94bI0g4RCZXH9GUA5bE80ToFHoXzCWZGuZw2XrMCb2bIEtwmkjrthasjhnrt2qAS2N@vger.kernel.org, AJvYcCVju1RELelkYqVk+yt/4sDhcjwp7FT4OTmEg/ybR/ovw+MeP3BS14n+26PscmAqXHSYQ2s=@vger.kernel.org, AJvYcCW4QWw379HoFU1COl+npe56JEBWa5HxgIPkAi/OJA4q905rq2k3jt7Sti+Vk2G7ak9Od4/lkDFL@vger.kernel.org, AJvYcCXlG5jPVj6jYRDcpgrbd649IRUtpMLfMAlKCUIIrAShiiJabbGmaBQub3lOjX3mruqo0KokWtVXF8bksSg5@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnE7RmNNL2lsUSU7aoi9wfVAPKrB5lgRr8G5bZwd3Mwj2Feo3X
-	YFnBFtfBzmn6wID0hJCc23gvZ9dCc0Cs/99Me83g5YlqEpmS7wfi
-X-Gm-Gg: ASbGncsXhUoWRI24t8thKY4WZNpe15c9i0uaJ14nFX2eiJVtB4hGzzxaCg1tw8gl0Iu
-	EKvlgyLzct+5CuIwvn2dH3t/HAhAYdbjHjrciEFIzu99/reVuKxReR+Ea2T5TI/+D041634H9gT
-	Oo4YBWcAs8aPi1b8Vz1ltZ1PfTUvBASwnmYjUT8ao9vcUgjyOpT9UXtvAzGFgi0lCNHF7o/Syll
-	FZjVscLdLC8ugh26jEsW9OVoJNnwQp/Aucro88DHtWrcETd09umvorehzcwKQ+3G9RCOYgb+Af6
-	Scelz/oAE4RaD5A4paByx77YJQyy3XGBnpTmrKy0l1JOO4TbpBh19iPFTX//2oMQG/Y=
-X-Google-Smtp-Source: AGHT+IEi3/Az0kN6/qk5PEcOPsRQRcT8R3qSFIbNneHvLBHXZk97kL5tuRnk3IdLpKHf2gczG5Szfw==
-X-Received: by 2002:a17:902:ecc3:b0:224:826:277f with SMTP id d9443c01a7336-2292f9db08fmr272480865ad.33.1743632904725;
-        Wed, 02 Apr 2025 15:28:24 -0700 (PDT)
-Received: from devvm6277.cco0.facebook.com ([2a03:2880:2ff:70::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-229785c015fsm932655ad.56.2025.04.02.15.28.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Apr 2025 15:28:22 -0700 (PDT)
-Date: Wed, 2 Apr 2025 15:28:19 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v2 0/3] vsock: add namespace support to vhost-vsock
-Message-ID: <Z+26A3sslT+w+wOI@devvm6277.cco0.facebook.com>
-References: <20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com>
- <r6a6ihjw3etlb5chqsb65u7uhcav6q6pjxu65iqpp76423w2wd@kmctvoaywmbu>
- <Z-w47H3qUXZe4seQ@redhat.com>
- <Z+yDCKt7GpubbTKJ@devvm6277.cco0.facebook.com>
- <CAGxU2F7=64HHaAD+mYKYLqQD8rHg1CiF1YMDUULgSFw0WSY-Aw@mail.gmail.com>
- <Z-0BoF4vkC2IS1W4@redhat.com>
- <Z+23pbK9t5ckSmLl@devvm6277.cco0.facebook.com>
+        d=1e100.net; s=20230601; t=1743633322; x=1744238122;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7u/lILhCVe7tBDSsAyhX8mHkwtrqrjms7ES/Xq1B1gY=;
+        b=Slw6qvkmWIp4z767OGbCvRq1CsrJtEp7oimAhNXzWV/1KAatykiAVJ3gQRYLs/1OJ+
+         waRIePjX863EkuufHzAgCvOAkfDkLQeyRWc58Wo5cL+eWXLFO3nQFWlPDSnOHSyuqupy
+         BBXJZVl3uL6RwGrgE2/1tnz/XHaBLaIy43C+KM84ZNEiTb33Qvk042K3LUEcK1Yzc+BN
+         wgL1xdXNSGsHiaHwTW4GFCViJ5jgOmfHayENHA15r7MgSA9abnZ8I9X+7KOjRGOpLfXn
+         QUPm3nhOvLJdqy2m1TQaXPhrTA6UZOcvpuQcP7Y9dilX7VAR1aVmGbB5mrxOwRKebo3A
+         V8CQ==
+X-Gm-Message-State: AOJu0Yybswj+AX4SqCir8437MBcHzLdJOx9tjrL159FvZmlH2FYPBnFo
+	8ce/I/Q4gqfJv/ZXuYHlTp5mmWRLE4JCUCXG12gVxRLQ56hVwvvfnCXdLejs+/VO9uUwtFXDHSq
+	+eR2DiWI/g54PwY+kXLUjhcfDlrY=
+X-Gm-Gg: ASbGncviLxFQvYvDbz3F2TPFRhuk01mm+CbbHr+3RNR5xAkAl6ejXABvfCGn4b+IGCm
+	pOQCuCL9h11Vt8GVeaaisW2rhdq5ze256QcQp3yrYU1FPfP9C0CnOoQaXSAOm9FgCwr1DulWRgO
+	e7+YoqyTqYheOjyO77Wdx3TIdDCaAh9p09DTGjlo1TL7Qh77h+bm26m1VfMg4=
+X-Google-Smtp-Source: AGHT+IGRL2TwWz5ZQWBv+fazHAVWwUtGiI2y8l2mAZDjq3q6MulT1To7PwOC3v9Wfmpj4hZZm1uQaUZL1RY6uwAMJt0=
+X-Received: by 2002:a05:6000:184e:b0:391:a43:8bbd with SMTP id
+ ffacd0b85a97d-39c2f8dc719mr273720f8f.21.1743633322031; Wed, 02 Apr 2025
+ 15:35:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z+23pbK9t5ckSmLl@devvm6277.cco0.facebook.com>
+References: <174354264451.26800.7305550288043017625.stgit@ahduyck-xeon-server.home.arpa>
+ <174354301312.26800.4565150748823347100.stgit@ahduyck-xeon-server.home.arpa> <Z-17nu2epjG1EiAd@shell.armlinux.org.uk>
+In-Reply-To: <Z-17nu2epjG1EiAd@shell.armlinux.org.uk>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Wed, 2 Apr 2025 15:34:45 -0700
+X-Gm-Features: AQ5f1Jonorizg6vbcyGy3bzmvNuGNHP9B6G6UAwlpfHpBMI1lPCOG71iWPxCxWI
+Message-ID: <CAKgT0UfyhFXWRAsW_i3GRQmY-RprruU7gXb8f=-J_5kvRQEMBA@mail.gmail.com>
+Subject: Re: [net PATCH 2/2] net: phylink: Set advertising based on
+ phy_lookup_setting in ksettings_set
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 02, 2025 at 03:18:13PM -0700, Bobby Eshleman wrote:
-> On Wed, Apr 02, 2025 at 10:21:36AM +0100, Daniel P. Berrangé wrote:
-> > On Wed, Apr 02, 2025 at 10:13:43AM +0200, Stefano Garzarella wrote:
-> > > On Wed, 2 Apr 2025 at 02:21, Bobby Eshleman <bobbyeshleman@gmail.com> wrote:
-> > > >
-> > > > I do like Stefano's suggestion to add a sysctl for a "strict" mode,
-> > > > Since it offers the best of both worlds, and still tends conservative in
-> > > > protecting existing applications... but I agree, the non-strict mode
-> > > > vsock would be unique WRT the usual concept of namespaces.
-> > > 
-> > > Maybe we could do the opposite, enable strict mode by default (I think 
-> > > it was similar to what I had tried to do with the kernel module in v1, I 
-> > > was young I know xD)
-> > > And provide a way to disable it for those use cases where the user wants 
-> > > backward compatibility, while paying the cost of less isolation.
-> > 
-> > I think backwards compatible has to be the default behaviour, otherwise
-> > the change has too high risk of breaking existing deployments that are
-> > already using netns and relying on VSOCK being global. Breakage has to
-> > be opt in.
-> > 
-> > > I was thinking two options (not sure if the second one can be done):
-> > > 
-> > >   1. provide a global sysfs/sysctl that disables strict mode, but this
-> > >   then applies to all namespaces
-> > > 
-> > >   2. provide something that allows disabling strict mode by namespace.
-> > >   Maybe when it is created there are options, or something that can be
-> > >   set later.
-> > > 
-> > > 2 would be ideal, but that might be too much, so 1 might be enough. In 
-> > > any case, 2 could also be a next step.
-> > > 
-> > > WDYT?
-> > 
-> > It occured to me that the problem we face with the CID space usage is
-> > somewhat similar to the UID/GID space usage for user namespaces.
-> > 
-> > In the latter case, userns has exposed /proc/$PID/uid_map & gid_map, to
-> > allow IDs in the namespace to be arbitrarily mapped onto IDs in the host.
-> > 
-> > At the risk of being overkill, is it worth trying a similar kind of
-> > approach for the vsock CID space ?
-> > 
-> > A simple variant would be a /proc/net/vsock_cid_outside specifying a set
-> > of CIDs which are exclusively referencing /dev/vhost-vsock associations
-> > created outside the namespace. Anything not listed would be exclusively
-> > referencing associations created inside the namespace.
-> > 
-> > A more complex variant would be to allow a full remapping of CIDs as is
-> > done with userns, via a /proc/net/vsock_cid_map, which the same three
-> > parameters, so that CID=15 association outside the namespace could be
-> > remapped to CID=9015 inside the namespace, allow the inside namespace
-> > to define its out association for CID=15 without clashing.
-> > 
-> > IOW, mapped CIDs would be exclusively referencing /dev/vhost-vsock
-> > associations created outside namespace, while unmapped CIDs would be
-> > exclusively referencing /dev/vhost-vsock associations inside the
-> > namespace. 
-> > 
-> > A likely benefit of relying on a kernel defined mapping/partition of
-> > the CID space is that apps like QEMU don't need changing, as there's
-> > no need to invent a new /dev/vhost-vsock-netns device node.
-> > 
-> > Both approaches give the desirable security protection whereby the
-> > inside namespace can be prevented from accessing certain CIDs that
-> > were associated outside the namespace.
-> > 
-> > Some rule would need to be defined for updating the /proc/net/vsock_cid_map
-> > file as it is the security control mechanism. If it is write-once then
-> > if the container mgmt app initializes it, nothing later could change
-> > it.
-> > 
-> > A key question is do we need the "first come, first served" behaviour
-> > for CIDs where a CID can be arbitrarily used by outside or inside namespace
-> > according to whatever tries to associate a CID first ?
-> 
-> I think with /proc/net/vsock_cid_outside, instead of disallowing the CID
-> from being used, this could be solved by disallowing remapping the CID
-> while in use?
-> 
-> The thing I like about this is that users can check
-> /proc/net/vsock_cid_outside to figure out what might be going on,
-> instead of trying to check lsof or ps to figure out if the VMM processes
-> have used /dev/vhost-vsock vs /dev/vhost-vsock-netns.
-> 
-> Just to check I am following... I suppose we would have a few typical
-> configurations for /proc/net/vsock_cid_outside. Following uid_map file
-> format of:
-> 	"<local cid start>		<global cid start>		<range size>"
-> 
-> 	1. Identity mapping, current namespace CID is global CID (default
-> 	setting for new namespaces):
-> 
-> 		# empty file
-> 
-> 				OR
-> 
-> 		0    0    4294967295
-> 
-> 	2. Complete isolation from global space (initialized, but no mappings):
-> 
-> 		0    0    0
-> 
-> 	3. Mapping in ranges of global CIDs
-> 
-> 	For example, global CID space starts at 7000, up to 32-bit max:
-> 
-> 		7000    0    4294960295
-> 	
-> 	Or for multiple mappings (0-100 map to 7000-7100, 1000-1100 map to
-> 	8000-8100) :
-> 
-> 		7000    0       100
-> 		8000    1000    100
-> 
-> 
-> One thing I don't love is that option 3 seems to not be addressing a
-> known use case. It doesn't necessarily hurt to have, but it will add
-> complexity to CID handling that might never get used?
-> 
-> Since options 1/2 could also be represented by a boolean (yes/no
-> "current ns shares CID with global"), I wonder if we could either A)
-> only support the first two options at first, or B) add just
-> /proc/net/vsock_ns_mode at first, which supports only "global" and
-> "local", and later add a "mapped" mode plus /proc/net/vsock_cid_outside
-> or the full mapping if the need arises?
-> 
-> This could also be how we support Option 2 from Stefano's last email of
-> supporting per-namespace opt-in/opt-out.
-> 
-> Any thoughts on this?
-> 
+On Wed, Apr 2, 2025 at 11:02=E2=80=AFAM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Tue, Apr 01, 2025 at 02:30:13PM -0700, Alexander Duyck wrote:
+> > From: Alexander Duyck <alexanderduyck@fb.com>
+> >
+> > While testing a driver that supports mulitple speeds on the same SFP mo=
+dule
+> > I noticed I wasn't able to change them when I was not using
+> > autonegotiation. I would attempt to update the speed, but it had no eff=
+ect.
+> >
+> > A bit of digging led me to the fact that we weren't updating the advert=
+ised
+> > link mask and as a result the interface wasn't being updated when I
+> > requested an updated speed. This change makes it so that we apply the s=
+peed
+> > from the phy settings to the config.advertised following a behavior sim=
+ilar
+> > to what we already do when setting up a fixed-link.
+> >
+> > Fixes: ea269a6f7207 ("net: phylink: Update SFP selected interface on ad=
+vertising changes")
+> > Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
+> > ---
+> >  drivers/net/phy/phylink.c |    1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> > index 380e51c5bdaa..f561a803e5ce 100644
+> > --- a/drivers/net/phy/phylink.c
+> > +++ b/drivers/net/phy/phylink.c
+> > @@ -2763,6 +2763,7 @@ int phylink_ethtool_ksettings_set(struct phylink =
+*pl,
+> >
+> >               config.speed =3D c->speed;
+> >               config.duplex =3D c->duplex;
+> > +             linkmode_and(config.advertising, c->linkmodes, pl->suppor=
+ted);
+>
+> I had thought that ethtool provided an appropriate advertising mask
+> when aneg is disabled, but it just preserves the old mask, which seems
+> to be the intended behaviour (if one looks at phylib, that's also what
+> happens there.) We should not deviate from that with a user API.
+>
+> So, I would like to change how this works somewhat to avoid a user
+> visible change. Also, interface mode changing on AUTONEG_DISABLED was
+> never intended to work. Indeed, mvneta and mvpp2 don't support
+> AUTONEG_DISABLED for 1000BASE-X nor 2500BASE-X which is where this
+> interface switching was implemented (for switching between these two.)
+>
+> I've already got rid of the phylink_sfp_select_interface() usage when
+> a module is inserted (see phylink_sfp_config_optical(), where we base
+> the interface selection off interface support masks there rather than
+> advertisements - it used to be advertisements.)
+>
+> We now have phylink_interface_max_speed() which gives the speed of
+> the interface, which gives us the possibility of doing something
+> like this for the AUTONEG_DISABLE state:
+>
+>         phy_interface_and(interfaces, pl->config->supported_interfaces,
+>                           pl->sfp_interfaces);
 
-Stefano,
 
-Would only supporting 1/2 still support the Kata use case?
 
-Thanks,
-Bobby
+>         best_speed =3D SPEED_UNKNOWN;
+>         best_interface =3D PHY_INTERFACE_MODE_NA;
+>
+>         for_each_set_bit(interface, interfaces, __ETHTOOL_LINK_MODE_MASK_=
+NBITS) {
+>                 max_speed =3D phylink_interface_max_speed(interface);
+>                 if (max_speed < config.speed)
+>                         continue;
+>                 if (max_speed =3D=3D config.speed)
+>                         return interface;
+>                 if (best_speed =3D=3D SPEED_UNKNOWN ||
+>                     max_speed < best_speed) {
+>                         best_speed =3D max_speed;
+>                         best_interface =3D interface;
+>                 }
+>         }
+>
+>         return best_interface;
+>
+> to select the interface from aneg-disabled state.
+>
+> Do you think that would work for you?
+
+That should work. The only case where it might get iffy would be a
+QSFP-DD cable that supported both NRZ and PAM4. In that case we might
+get a 50R1 when we are expecting a 50R2. However that is kind of a
+problem throughout with all the pure speed/duplex checks. The only way
+to get around that would be to add a new check for lanes to kind of
+take the place of duplex as we would need to also have the lanes
+match.
 
