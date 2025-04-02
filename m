@@ -1,293 +1,148 @@
-Return-Path: <netdev+bounces-178710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE1E1A785EE
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 02:59:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14F7DA785F1
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 03:00:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D94A163CEB
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 00:59:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7122B1890630
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 01:00:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6996E5C96;
-	Wed,  2 Apr 2025 00:58:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3FD0B674;
+	Wed,  2 Apr 2025 01:00:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="DDapI0QI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZU8QSn5D"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD56C2D1;
-	Wed,  2 Apr 2025 00:58:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7688F8837;
+	Wed,  2 Apr 2025 01:00:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743555536; cv=none; b=iySSLwzyhZIBbBsIOpJ7IjRz+g93v5QZUoY59p7jFvzcBaTETBBBs7omlsXKXX3U8cJmYkyYttZWEaQeVDEFJfTR7Z37Pc4axMQWiyS34cJpb91c2rYmP0qrWxem2Lp+oVEq74+XdVVTXiQkcVqjjnEU92TI6NRCVfLlHpf8vdg=
+	t=1743555612; cv=none; b=s+s4WNOuLh9LzU5McgKUpP7A7kZJWiDICH1pB4y3rg99pUaAUhK0Gp+h8JjDpV51MzBqGULZiQtkmZSE4yHJBtJmIrUN5I95X2q5M76XgHG97Kvhf5MRuZ0D0KcDrGwCA7klKvOjjylcfzFVAXIydVTJlkl6ogi83BbUBR27i40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743555536; c=relaxed/simple;
-	bh=CPbNbRtfPG4/EVkztSuwh+xP+T0HOT3dFzSSvPR1c+Q=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KTu8dPDIiOBGh3hFmj5Aywt1cuL0VYQkt2r4cJHZD6jlxaYu3lbOfwbwJKpsjzBrlsID8lMrL0tbgNLvNYq70ATB5gsOCDepNcVu0ONge/Ts536I6MUXELBr4u2qUIo5ULs7z2mgy7BYy1gIj0Y5ZAr2LG+MVPenay7PXB4wG6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=DDapI0QI; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1743555534; x=1775091534;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=WXwFGCPonvXpWZDcPSAxbK+QrXCcGHKLVzBAlINj+BM=;
-  b=DDapI0QISmw5flKbXhf6rFM8I5VXvkp5IvzYPCl1f8UirFWTJVf5oQU4
-   /13uLkv335oZYgwoKyENwnTFnGJ5ITnVMMNdMAvjfHRWrt9mJ8wL3rW9Y
-   Iqb5jhCLoSHK1cEBkTOmvaT2NqP3my6F75EepEMcebSyOEq89atsZF7Do
-   U=;
-X-IronPort-AV: E=Sophos;i="6.14,294,1736812800"; 
-   d="scan'208";a="183992474"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2025 00:58:52 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:39582]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.47.60:2525] with esmtp (Farcaster)
- id d78ee292-0699-4843-a1b5-a7fe49911d04; Wed, 2 Apr 2025 00:58:52 +0000 (UTC)
-X-Farcaster-Flow-ID: d78ee292-0699-4843-a1b5-a7fe49911d04
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 2 Apr 2025 00:58:51 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.94.43.60) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 2 Apr 2025 00:58:49 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuniyu@amazon.com>
-CC: <edumazet@google.com>, <ematsumiya@suse.de>,
-	<linux-fsdevel@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <smfrench@gmail.com>, <wangzhaolong1@huawei.com>,
-	<zhangchangzhong@huawei.com>
-Subject: Re: Fwd: [PATCH][SMB3 client] fix TCP timers deadlock after rmmod
-Date: Tue, 1 Apr 2025 17:57:46 -0700
-Message-ID: <20250402005841.19846-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250401202810.81863-1-kuniyu@amazon.com>
-References: <20250401202810.81863-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1743555612; c=relaxed/simple;
+	bh=/ACN9qX6EOkrFeO0FdXlvcbraUtdbf8Oecbf6xTmBUc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=KonBvE/RstdRsAcQmJQdmORL2evKjnS3A7b7Cob7G9hxUxoIMo/4uGlTZjvabFPwN6owh6QgUrBPFQ5WLzLbZ1VqsxR+0+6wBmeygF2mRyvxTqU7gSj00aeI1vvnNrK4pCABWRC1HvT28v/yLnSeT83cXCB40/vp6baM1g/ONjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZU8QSn5D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C44A4C4CEE4;
+	Wed,  2 Apr 2025 01:00:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743555611;
+	bh=/ACN9qX6EOkrFeO0FdXlvcbraUtdbf8Oecbf6xTmBUc=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=ZU8QSn5DbNG2E0S85Y2UCrLS1bRLLU2RSpMbDLuiDhm4MIiKn95CFWGQuzgKJJa6z
+	 r5EXDT2B5otmGCd+lGyoXkW/5X3sGLNeCR1+sfGgENESbngWN3bqejq+k54p+ZxHFZ
+	 ZUxtgv6kztuCAiZd+Mmr4geXm7kWgqC+PL0Sbfs3szxcXs0Tar/SY0AtpYmvOPBrIa
+	 0hikOoklT5bVc9Q3QMA9Kam/tlu3SrMiHyGeGt98DvjCgjP3z/3T2x3QznGXSk2XJg
+	 2jiGH/ZJvAAofAfjU8re5i1d7WmzTUMmD17i8uIklsbTLr0n0c7IGNImnilJS+RUOT
+	 PaPIZoBHoeh+g==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A57C36010;
+	Wed,  2 Apr 2025 01:00:11 +0000 (UTC)
+From: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
+Date: Wed, 02 Apr 2025 01:59:31 +0100
+Subject: [PATCH net-next] net/selftests: Add loopback link local route for
+ self-connect
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWA001.ant.amazon.com (10.13.139.92) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250402-tcp-ao-selfconnect-flake-v1-1-8388d629ef3d@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAPKL7GcC/zWMywrCQAwAf6XkbDCuL/BXxEM2Zm2wpmV3kULpv
+ 7sKHodhZoGi2bTApVsg69uKjd5gt+lAevaHot0bQ6BwpAMFrDIhj1h0SDK6q1RMAz8VlZij0F7
+ ofIKWT1mTzb/1FVwrus4Vbs1ELooxs0v/Xf/d9sXmsK4fxrqPW5QAAAA=
+X-Change-ID: 20250402-tcp-ao-selfconnect-flake-e0aabc03c076
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Dmitry Safonov <0x7f454c46@gmail.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1743555610; l=2603;
+ i=0x7f454c46@gmail.com; s=20240410; h=from:subject:message-id;
+ bh=VxuHQuF+lHn7Z66dGwiCR30NCU5Nd0bRf7ml37EyIQ0=;
+ b=3aqwhOYRQXABmt30DhIo05TJTESR3xflbbuTR3dBAmI3yMdgAoZyxUVPrqaM+Ncc8k/aXIzyA
+ mxoO5rvkEHQC0Jz5Odvs0oX666np6SxSESKORHPedn8ROHccfn/nftx
+X-Developer-Key: i=0x7f454c46@gmail.com; a=ed25519;
+ pk=cFSWovqtkx0HrT5O9jFCEC/Cef4DY8a2FPeqP4THeZQ=
+X-Endpoint-Received: by B4 Relay for 0x7f454c46@gmail.com/20240410 with
+ auth_id=152
+X-Original-From: Dmitry Safonov <0x7f454c46@gmail.com>
+Reply-To: 0x7f454c46@gmail.com
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-Date: Tue, 1 Apr 2025 13:26:54 -0700
-> (corrected netdev list)
-> 
-> From: Wang Zhaolong <wangzhaolong1@huawei.com>
-> Date: Tue, 1 Apr 2025 21:54:47 +0800
-> > Hi.
-> > 
-> > My colleagues and I have been investigating the issue addressed by this patch
-> > and have discovered some significant concerns that require broader discussion.
-> > 
-> > ### Socket Leak Issue
-> > 
-> > After testing this patch extensively, I've confirmed it introduces a socket leak
-> > when TCP connections don't complete proper termination (e.g., when FIN packets
-> > are dropped). The leak manifests as a continuous increase in TCP slab usage:
-> > 
-> > I've documented this issue with a reproducer in Bugzilla:
-> > 
-> > https://bugzilla.kernel.org/show_bug.cgi?id=219972#c0
-> > 
-> > The key issue appears to stem from the interaction between the SMB client and TCP
-> > socket lifecycle management:
-> > 
-> > 1. Removing `sk->sk_net_refcnt = 1` causes TCP timers to be terminated early in
-> >     `tcp_close()` via the `inet_csk_clear_xmit_timers_sync()` call when
-> >     `!sk->sk_net_refcnt`
-> > 2. This early timer termination prevents proper reference counting resolution
-> >     when connections don't complete the 4-way TCP termination handshake
-> > 3. The resulting socket references are never fully released, leading to a leak
-> > 
-> > #### Timeline of Related Changes
-> > 
-> > 1. v4.2-rc1 26abe14379f8 ("net: Modify sk_alloc to not reference count the netns of kernel sockets")
-> >     - Added `sk_net_refcnt` field to distinguish user sockets (=1) from kernel sockets (=0)
-> >     - Kernel sockets don't hold netns references, which can lead to potential UAF issues
-> > 
-> > 2. v6.9-rc2 151c9c724d05: ("tcp: properly terminate timers for kernel sockets")
-> >     - Modified `tcp_close()` to check `sk->sk_net_refcnt` and explicitly terminate timers for kernel sockets (=0)
-> >     - This prevents UAF when netns is destroyed before socket timers complete
-> >     - **Key change**: If `!sk->sk_net_refcnt`, call `inet_csk_clear_xmit_timers_sync()`
-> > 
-> > 3. v6.12-rc7 ef7134c7fc48: ("smb: client: Fix use-after-free of network namespace")
-> >     - Fixed netns UAF in CIFS by manually setting `sk->sk_net_refcnt = 1`
-> >     - Also called `maybe_get_net()` to maintain netns references
-> >     - This effectively made kernel sockets behave like user sockets for reference counting
-> > 
-> > 4. v6.13-rc4 e9f2517a3e18: ("smb: client: fix TCP timers deadlock after rmmod")
-> >     - Problem commit: Removed `sk->sk_net_refcnt = 1` setting
-> >     - Changed to using explicit `get_net()/put_net()` at CIFS layer
-> >     - This change leads to socket leaks because timers are terminated early
-> > 
-> > ### Lockdep Warning Analysis
-> > 
-> > I've also investigated the lockdep warning mentioned in the patch. My analysis
-> > suggests it may be a false positive rather than an actual deadlock.
-> 
-> Note that the 'deadlock' in the description is simply wrong as I mentioned
-> before.  The 'deadlock' means a lock which belongs to an unloaded module,
-> and not actual deadlock like circular locking etc.
-> 
-> https://lore.kernel.org/netdev/20241219084100.33837-1-kuniyu@amazon.com/
-> 
-> 
-> > The crash
-> > actually occurs in the lockdep subsystem itself (null pointer dereference in
-> > `check_wait_context()`), not in the CIFS or networking code directly.
-> > 
-> > The procedure for the null pointer dereference is as follows:
-> > 
-> > When lockdep is enabled, the lock class "slock-AF_INET-CIFS" is set when a socket
-> > connection is established.
-> > 
-> > ```
-> > cifs_do_mount
-> >    cifs_mount
-> >      mount_get_conns
-> >        cifs_get_tcp_session
-> >          ip_connect
-> >            generic_ip_connect
-> >              cifs_reclassify_socket4
-> >                sock_lock_init_class_and_name(sk, "slock-AF_INET-CIFS",
-> >                  lockdep_init_map
-> >                    lockdep_init_map_wait
-> >                      lockdep_init_map_type
-> >                        lockdep_init_map_type
-> >                          register_lock_class
-> >                            __set_bit(class - lock_classes, lock_classes_in_use);
-> > ```
-> > 
-> > When the module is unloaded, the lock class is cleaned up.
-> > 
-> > ```
-> > free_mod_mem
-> >    lockdep_free_key_range
-> >      __lockdep_free_key_range
-> >        zap_class
-> >          __clear_bit(class - lock_classes, lock_classes_in_use);
-> > ```
-> > 
-> > After the module is uninstalled and the network connection is restored, the
-> > timer is woken up.
-> > 
-> > ```
-> > run_timer_softirq
-> >    run_timer_base
-> >      __run_timers
-> >        call_timer_fn
-> >          tcp_write_timer
-> >            bh_lock_sock
-> >              spin_lock(&((__sk)->sk_lock.slock))
-> >                _raw_spin_lock
-> >                  lock_acquire
-> >                    __lock_acquire
-> >                      check_wait_context
-> >                        hlock_class
-> >                         if (!test_bit(class_idx, lock_classes_in_use)) {
-> >                            return NULL;
-> >                        hlock_class(next)->wait_type_inner; // Null pointer dereference
-> > ```
-> > 
-> > The problem lies within lockdep, as Kuniyuki says:
-> > 
-> > > I tried the repro and confirmed it triggers null deref.
-> > > 
-> > > It happens in LOCKDEP internal, so for me it looks like a problem in
-> > > LOCKDEP rather than CIFS or TCP.
-> > > 
-> > > I think LOCKDEP should hold a module reference and prevent related
-> > > modules from being unloaded.
-> > 
-> > Regarding the deadlock issue, it is clear that the locks mentioned in the deadlock warning
-> > do not belong to the same lock instance. A deadlock should not occur.
-> > 
-> > ### Discussion Points
-> > 
-> > 1. API Design Question: Is this fundamentally an issue with how CIFS uses the socket
-> >     API, or is it a networking layer issue that should handle socket cleanup differently?
-> > 
-> > 2. Approach to Resolution: Would it be better to:
-> >     - Revert to the original solution (setting `sk->sk_net_refcnt = 1`) from ef7134c7fc48?
-> >     - Work with networking subsystem maintainers on a more comprehensive solution that
-> >       handles socket cleanup properly?
+From: Dmitry Safonov <0x7f454c46@gmail.com>
 
-I verified the patch below fixed the null-ptr-deref in lockdep by
-preventing cifs from being unloaded while TCP sockets are alive.
+self-connect-ipv6 got slightly flaky on netdev:
+> # timeout set to 120
+> # selftests: net/tcp_ao: self-connect_ipv6
+> # 1..5
+> # # 708[lib/setup.c:250] rand seed 1742872572
+> # TAP version 13
+> # # 708[lib/proc.c:213]    Snmp6            Ip6OutNoRoutes: 0 => 1
+> # not ok 1 # error 708[self-connect.c:70] failed to connect()
+> # ok 2 No unexpected trace events during the test run
+> # # Planned tests != run tests (5 != 2)
+> # # Totals: pass:1 fail:0 xfail:0 xpass:0 skip:0 error:1
+> ok 1 selftests: net/tcp_ao: self-connect_ipv6
 
-I'll post this officialy, and once this is merged and pulled into
-the cifs tree, I'll send a revert of e9f2517a3e18.
+I can not reproduce it on my machines, but judging by "Ip6OutNoRoutes"
+there is no route to the local_addr (::1).
 
----8<---
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 8daf1b3b12c6..e6515ef9116a 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -547,6 +547,10 @@ struct sock {
- 	struct rcu_head		sk_rcu;
- 	netns_tracker		ns_tracker;
- 	struct xarray		sk_user_frags;
-+
-+#if IS_ENABLED(CONFIG_PROVE_LOCKING) && IS_ENABLED(CONFIG_MODULES)
-+	struct module		*sk_owner;
-+#endif
- };
+Looking at the kernel code, I see that kernel does add link-local
+address automatically in init_loopback(), but that is called from
+ipv6 notifier block. So, in turn the userspace that brought up
+the loopback interface may see rtnetlink ACK earlier than
+addrconf_notify() does it's job (at least, on a slow VM such as netdev).
+Probably, for ipv4 it's the same, judging by inetdev_event().
+
+The fix is quite simple: set the link-local route straight after
+bringing the loopback interface. That will make it synchronous.
+
+Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
+---
+Sorry to send this during the merge window, it's a test stability fix.
+It seems that netdev build bot has hit the issue a couple of times, but
+seems not hitting it constantly at this moment:
+
+https://netdev.bots.linux.dev/flakes.html?br-cnt=150&tn-needle=tcp-ao
+
+I'm marking it net-next, so that build bot carries it until the merge
+closes. If it's not fine, I can re-send it after the merge window.
+---
+ tools/testing/selftests/net/tcp_ao/self-connect.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tools/testing/selftests/net/tcp_ao/self-connect.c b/tools/testing/selftests/net/tcp_ao/self-connect.c
+index 73b2f2276f3f5410aaa74bede7f366f81761bd6e..2c73bea698a677f9aedd7bec28f6e7fee7845d2e 100644
+--- a/tools/testing/selftests/net/tcp_ao/self-connect.c
++++ b/tools/testing/selftests/net/tcp_ao/self-connect.c
+@@ -16,6 +16,9 @@ static void __setup_lo_intf(const char *lo_intf,
  
- struct sock_bh_locked {
-@@ -1583,6 +1587,16 @@ static inline void sk_mem_uncharge(struct sock *sk, int size)
- 	sk_mem_reclaim(sk);
+ 	if (link_set_up(lo_intf))
+ 		test_error("Failed to bring %s up", lo_intf);
++
++	if (ip_route_add(lo_intf, TEST_FAMILY, local_addr, local_addr))
++		test_error("Failed to add a local route %s", lo_intf);
  }
  
-+#if IS_ENABLED(CONFIG_PROVE_LOCKING) && IS_ENABLED(CONFIG_MODULES)
-+static inline void sk_set_owner(struct sock *sk, struct module *owner)
-+{
-+	__module_get(owner);
-+	sk->sk_owner = owner;
-+}
-+#else
-+#define sk_set_owner(sk, owner)
-+#endif
-+
- /*
-  * Macro so as to not evaluate some arguments when
-  * lockdep is not enabled.
-@@ -1592,6 +1606,7 @@ static inline void sk_mem_uncharge(struct sock *sk, int size)
-  */
- #define sock_lock_init_class_and_name(sk, sname, skey, name, key)	\
- do {									\
-+	sk_set_owner(sk, THIS_MODULE);					\
- 	sk->sk_lock.owned = 0;						\
- 	init_waitqueue_head(&sk->sk_lock.wq);				\
- 	spin_lock_init(&(sk)->sk_lock.slock);				\
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 323892066def..b54f12faad1c 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -2324,6 +2324,12 @@ static void __sk_destruct(struct rcu_head *head)
- 		__netns_tracker_free(net, &sk->ns_tracker, false);
- 		net_passive_dec(net);
- 	}
-+
-+#if IS_ENABLED(CONFIG_PROVE_LOCKING) && IS_ENABLED(CONFIG_MODULES)
-+	if (sk->sk_owner)
-+		module_put(sk->sk_owner);
-+#endif
-+
- 	sk_prot_free(sk->sk_prot_creator, sk);
- }
- 
----8<---
+ static void setup_lo_intf(const char *lo_intf)
+
+---
+base-commit: 1a9239bb4253f9076b5b4b2a1a4e8d7defd77a95
+change-id: 20250402-tcp-ao-selfconnect-flake-e0aabc03c076
+
+Best regards,
+-- 
+Dmitry Safonov <0x7f454c46@gmail.com>
+
 
 
