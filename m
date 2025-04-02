@@ -1,291 +1,229 @@
-Return-Path: <netdev+bounces-178707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEE55A78592
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 02:21:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60772A785D9
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 02:48:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C7653AF66D
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 00:21:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76E063A5593
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 00:48:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A9EA1362;
-	Wed,  2 Apr 2025 00:21:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D3922E338C;
+	Wed,  2 Apr 2025 00:48:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kqwk6oE6"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="c0iDym1P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81EF367;
-	Wed,  2 Apr 2025 00:21:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E6C42E3365
+	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 00:48:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743553294; cv=none; b=esOoJ+EV+krM0VLxmu/jnDXN1Gz8TPlEtSZUU4T1CyO2ToCSccg6RV/G3giL4psm4uiWky7QUYsg2hPQzNtYmbJYi8UhK6VZfVTX2KD3cOEWE1YNPyrBwKKph/3YFh86GKxTZCI8gyQCYANKvbDgID+xn7ITOp5VE8XdsQkDdBw=
+	t=1743554911; cv=none; b=kKOFLhKiCx7C2mYQ1YgkCjWC40mhQjHWEjT7LjCq39u1WaLtEOTmv4BBV85QiLYkZHsup5uJpx9ef9lmLLJxICSh9mvZCfmu8crTfy3KN9NmEZby9jBLJw7qq0r4M8i/rTsxeu/u4O/s/i5rJZX843ZQnuDnKaMUM0lvvLYOSmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743553294; c=relaxed/simple;
-	bh=g/vGnOWj+RLoNXJFxO2hLBeGdbkn6WT69EDQvJ//6Dk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lB+5HTf8rAxXV2S4gs+QfD3KiEp5RT0Uur2yDXCCu3gz14h2G0gvdr/V2zWrnCjb+4LAdpgEv9pbXBn14C4hi8uCfUcEedu/u0s1L2ZJdbwlvEBZe23uK5dHXPUOuOE1J9Wx8XdD2dJPQb4UxVBPZTx6WEFNXkaGkN24fTEAqnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kqwk6oE6; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-22622ddcc35so48520695ad.2;
-        Tue, 01 Apr 2025 17:21:32 -0700 (PDT)
+	s=arc-20240116; t=1743554911; c=relaxed/simple;
+	bh=gKvtz1iMes15Dk29gHgnGLSQ0AzIDyIu+TI574Yzf08=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=J6Kiq8t3ckfq5R7JtNYZr4X7iaRRaskm8NrVTWgQT/VyRzwLDGD/sNwzNSz4aZ4pSPACdMSOzIeySyCcoLNEuczHGU8z3tE7xRMmhIsaGzYoYpVt8Yd7nK2zyp9aySSkPPftsA3775Gvs7GLCtyMNGSlwcRLz2OwvNMCTVa2MJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=c0iDym1P; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ac297cbe017so66901766b.0
+        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 17:48:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743553292; x=1744158092; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ZeLn/wYhVo9FIJa6C3cWnGduVLCV+HiAmOS2o0hOnJo=;
-        b=kqwk6oE6FfnKfTOvqOikqwQCLlNV9oplDwQvx8fowkWk3u606A/rVxAJqkMyER5cuE
-         q1XJopoRCoXrnLd24QcQD5tOk4eV0nIt06S6bnaLXXzFf3Ep6KQLtAUGzXCrXP8z77Nz
-         bM8CbbPxDsrczzxhZ8SBEAnx8EEV3tE7ZyG99RPaKqIZZZQkbEN1Gju+TC6E7QwdV2tI
-         cKCkxeFmvIRQ0crD7VBcd3pUn++uYb/r1K3LF54RrEPlbeSBWQ/DeU7PsWPKnzFj7g5x
-         QGagL+OCLSl7S+xnElzIuMfRH+327hgxxruSDhRVvywCN781f+Jv3coepXlxWunh24Q5
-         TdqA==
+        d=linux-foundation.org; s=google; t=1743554907; x=1744159707; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=vu/Ham6OvzEjp0kQLpwOmOKgb686vhg9IiykSVIyewU=;
+        b=c0iDym1PPqyNU9/5T5C/iBDRbEHxV+YNqIYQzZDriq04L6vOi5T+kNgjZRelacSI0b
+         d9nJru1bTi+l+vTfMDcIgMQjo7AwutC6bY0OF/D7RTZOSeAQsJxOLlXUVTNxi/XhbeaJ
+         ceq4SqiTWGQklxOI1EcYNNl/OTYk8pzUgIfmQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743553292; x=1744158092;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZeLn/wYhVo9FIJa6C3cWnGduVLCV+HiAmOS2o0hOnJo=;
-        b=SnEd1OU2F/j2Qwy4DYjbPIijChrjj0P1TYi4b7C4jU3u4i/Git81XaIs//Eclyb+Ty
-         cvRTwvWUkqyLrkwqvVdx/+qUR1ytW0VXDFvvzj2/YuDezSRG3iItd3crikTNNlHw8mcI
-         fzZ5WuZvOJWii0rSRUQgdVu6ovrCXjt3QN5bIr+xqEuG5rdX7WaPkhZ9q22rxtQlo3q0
-         HWsBmnkj45n/Kg/uC4gqfiWyWwwvYtMmSF+p5uZVxpHuHsc8FN2ywW9vud1AoALBVAaM
-         zWslCg0qV2cwqcAi9/FRX/HNsX2GgiRcE2pEw2nn00/BJqXrZrZVacqVeQFEiPE3TwZb
-         uKiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUlMyJW0+0waQwM2Ac0YYXgEtx4ZerGWZMgaUN48ogJgU/sjYDsfLyRPwVdiyU/pTBFiyEvW+9Q1Ir6EFgL@vger.kernel.org, AJvYcCV4cf/60k9Hx9eKQBppXXXFVz7CZHca0Bx+/M/IBtlLkTOro9JOh8tHrM/kRnuUTwI3SH/fmzkcHlSfbTvZ@vger.kernel.org, AJvYcCV5Sj0b+ew1QjtP1pRUagvinwHTXbYUcLnSHcaVpOu2TBsrkYKK0xeUkBV3UbV2MIiGmguJxONu@vger.kernel.org, AJvYcCWVvBdOx98j2xixwa9whKB35luhwiG3+wDe7vrVA2BysvGddKH3O9m1MUfFUduyJES2ZkI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhEysvL2XrPvDWbLk+wLxb/nvsFqnFFbsZWQ1fwYJbUaBdfP4E
-	dwvHH0I2J/yIKpOrTGIjgVf2oXdrxmISvRXZ2zaXCHRnMAAbUq7u
-X-Gm-Gg: ASbGncsM785IpFWDrJVZPC2lP/131pt/51PvR6wi90jrvjfWvTx+KVXxTwYz4dwSyWu
-	trJgj4UxEW3PfiFKaG6SVaVyehqz+adEPGvNYOHMRMGFMdIvVKwwyQ1IX5DLvJ3t9R+OIJXdQA/
-	nW2T6TakqMu37WfQUEWTYREqxdpg4AxlpWkjZ+CM0zvLRNlJLs9tNUt1TPaunQDW5PZIPyTh6vp
-	RzhBL110O9JdPWtwGwkVqK+xxreZSgrJboLKleqwz/2YBYxxgadSL22q3zDZmTSwNDKmgdyV+3E
-	5Q2yhY7Bn+AootfRSstG8gXuM0gUgRHP9BtrOzlRYGWW1WqQCNOyK7gPHksn1IDoJuDN/vYtgJN
-	p
-X-Google-Smtp-Source: AGHT+IG+mezWcwSTSWGHMlaSZh1ZMn0L/JmAS44qUO3mIuUAuBB2BnPV9gzUgWR5YRWldZH9Je5K7g==
-X-Received: by 2002:a05:6a00:4b0f:b0:736:6202:3530 with SMTP id d2e1a72fcca58-739c796698dmr774634b3a.22.1743553291831;
-        Tue, 01 Apr 2025 17:21:31 -0700 (PDT)
-Received: from devvm6277.cco0.facebook.com ([2a03:2880:2ff:5::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-739710b453dsm9646252b3a.155.2025.04.01.17.21.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 17:21:30 -0700 (PDT)
-Date: Tue, 1 Apr 2025 17:21:28 -0700
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v2 0/3] vsock: add namespace support to vhost-vsock
-Message-ID: <Z+yDCKt7GpubbTKJ@devvm6277.cco0.facebook.com>
-References: <20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com>
- <r6a6ihjw3etlb5chqsb65u7uhcav6q6pjxu65iqpp76423w2wd@kmctvoaywmbu>
- <Z-w47H3qUXZe4seQ@redhat.com>
+        d=1e100.net; s=20230601; t=1743554907; x=1744159707;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vu/Ham6OvzEjp0kQLpwOmOKgb686vhg9IiykSVIyewU=;
+        b=eybpe0e2TkKyN75jI+odqc7ejv3iBbS6d3ZqWk/oxuBOwSzH7Wn6HMjxZz3nYa6/Dv
+         Li3tDS6dFUFdxYhExx1d2NDU24h2I3Z1QJPSkFFA5yq+C4J0BaFl7aCtVmc4AwQEhfzv
+         Y5qdRErjIFp8DEKH4NLdw+nHe/jMep86DEESIRjGtJ/ygHTpehO+C3f7utCmLETbVVfY
+         oFhK9ll70Q3oJm1qVoFH7VbKtd+vKWkXH5M0PeLV2HT1uXaUzePXCkWi47Y2p7v2zKo6
+         t1vL/wZtH4bA+XLZGHZOf+IrLLkjuXG/5pHxKOG4v0dJFuwCRZOJ9/KoEGxfODqglXc8
+         LtcA==
+X-Forwarded-Encrypted: i=1; AJvYcCW8Qc0hCzc/AfCuBQ8+AbtAj0NNC47LL/jrpB6L22L9u/Rfw/pRjcZycj4U4dwRKZwwytq7QZ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOS+vtUEe1cZuisMD62ZzrLU8oKNei17bpOl1rVM3f9OOeBbND
+	ygPVVwTg2NWpPOWiiRv5fDEdyb6LZqztMCwXQFE7lS1/dsWU0EKR0buRYDNxZoxjtlHMyxzd1oZ
+	pDtI4PQ==
+X-Gm-Gg: ASbGnctMRhAe17WTeLsNKAO43SHPR7dVmsNrq77lPiG4RJbdqa6MvIB1vdMCJmDG3BJ
+	jW4QkyjgE4/F7D5IvnihLw0/DqRMhWePX30XJYI7BqpOtvPB4ssY7wvBgc4imCkwNdBTOdSuz6t
+	YFYmHNuHp0Q+82rBBw0VgCfYi6XYTUsnXtnVKzws9ufbM2J5WYTieGEEqJUZZUIkS/60moE+SZ5
+	sPieLrZsWg3fVvmcdWzVBcCCRxbRwWQLSM4VYnUHFWUYLkbdJt7u3eb+whLThv600Gwa61EzyTo
+	RZHvyYde40tTDV56GoBADImw/NbhiBHZp3e1rzhy/8xdr3seEWw+vljRAuZdscwJWsfuVk1NuE/
+	+5B5XkAoDhY4ryyDmwGw=
+X-Google-Smtp-Source: AGHT+IH47Bu0s3bfnVEpCSgsJsw81uzkl2RJaxd9z0NTUzvBB+woEAIb0HDq7fyTV8+T9Vhz0LnHoQ==
+X-Received: by 2002:a17:907:3e26:b0:abf:6a8d:76b8 with SMTP id a640c23a62f3a-ac7a51e16f7mr10993966b.11.1743554907200;
+        Tue, 01 Apr 2025 17:48:27 -0700 (PDT)
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com. [209.85.208.48])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac78c9e0756sm136681166b.128.2025.04.01.17.48.25
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Apr 2025 17:48:26 -0700 (PDT)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5e614da8615so693199a12.1
+        for <netdev@vger.kernel.org>; Tue, 01 Apr 2025 17:48:25 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVh8V+dT/cjHWuIJzCh8d/T9j/jyXL2sVjD+JVMbikyA8MZEsjDS78TcEswRmGQXMs4m2Cj9Ss=@vger.kernel.org
+X-Received: by 2002:a17:906:5a58:b0:ac6:b80b:2331 with SMTP id
+ a640c23a62f3a-ac7a5a6a7femr5394166b.4.1743554436373; Tue, 01 Apr 2025
+ 17:40:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z-w47H3qUXZe4seQ@redhat.com>
+References: <cover.1743449872.git.metze@samba.org>
+In-Reply-To: <cover.1743449872.git.metze@samba.org>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Tue, 1 Apr 2025 17:40:19 -0700
+X-Gmail-Original-Message-ID: <CAHk-=whmzrO-BMU=uSVXbuoLi-3tJsO=0kHj1BCPBE3F2kVhTA@mail.gmail.com>
+X-Gm-Features: AQ5f1JqzSUFwvrLn7ljSUlWXdbqdVpjtPJUQgf_7X3eWbMud67Mtv15-jjUkgBs
+Message-ID: <CAHk-=whmzrO-BMU=uSVXbuoLi-3tJsO=0kHj1BCPBE3F2kVhTA@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/4] net/io_uring: pass a kernel pointer via optlen_t
+ to proto[_ops].getsockopt()
+To: Stefan Metzmacher <metze@samba.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
+	Breno Leitao <leitao@debian.org>, Jakub Kicinski <kuba@kernel.org>, Christoph Hellwig <hch@lst.de>, 
+	Karsten Keil <isdn@linux-pingi.de>, Ayush Sawal <ayush.sawal@chelsio.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, David Ahern <dsahern@kernel.org>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>, 
+	Neal Cardwell <ncardwell@google.com>, Joerg Reuter <jreuter@yaina.de>, 
+	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Oliver Hartkopp <socketcan@hartkopp.net>, 
+	Marc Kleine-Budde <mkl@pengutronix.de>, Robin van der Gracht <robin@protonic.nl>, 
+	Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de, 
+	Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, 
+	Miquel Raynal <miquel.raynal@bootlin.com>, Alexandra Winter <wintera@linux.ibm.com>, 
+	Thorsten Winkler <twinkler@linux.ibm.com>, James Chapman <jchapman@katalix.com>, 
+	Jeremy Kerr <jk@codeconstruct.com.au>, Matt Johnston <matt@codeconstruct.com.au>, 
+	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
+	Geliang Tang <geliang@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>, 
+	Remi Denis-Courmont <courmisch@gmail.com>, Allison Henderson <allison.henderson@oracle.com>, 
+	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
+	Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>, 
+	"D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>, 
+	Wen Gu <guwen@linux.alibaba.com>, Jon Maloy <jmaloy@redhat.com>, 
+	Boris Pismenny <borisp@nvidia.com>, John Fastabend <john.fastabend@gmail.com>, 
+	Stefano Garzarella <sgarzare@redhat.com>, Martin Schiller <ms@dev.tdt.de>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Magnus Karlsson <magnus.karlsson@intel.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-sctp@vger.kernel.org, linux-hams@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org, 
+	dccp@vger.kernel.org, linux-wpan@vger.kernel.org, linux-s390@vger.kernel.org, 
+	mptcp@lists.linux.dev, linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, 
+	linux-afs@lists.infradead.org, tipc-discussion@lists.sourceforge.net, 
+	virtualization@lists.linux.dev, linux-x25@vger.kernel.org, 
+	bpf@vger.kernel.org, isdn4linux@listserv.isdn4linux.de, 
+	io-uring@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Apr 01, 2025 at 08:05:16PM +0100, Daniel P. Berrangé wrote:
-> On Fri, Mar 28, 2025 at 06:03:19PM +0100, Stefano Garzarella wrote:
-> > CCing Daniel
-> > 
-> > On Wed, Mar 12, 2025 at 01:59:34PM -0700, Bobby Eshleman wrote:
-> > > Picking up Stefano's v1 [1], this series adds netns support to
-> > > vhost-vsock. Unlike v1, this series does not address guest-to-host (g2h)
-> > > namespaces, defering that for future implementation and discussion.
-> > > 
-> > > Any vsock created with /dev/vhost-vsock is a global vsock, accessible
-> > > from any namespace. Any vsock created with /dev/vhost-vsock-netns is a
-> > > "scoped" vsock, accessible only to sockets in its namespace. If a global
-> > > vsock or scoped vsock share the same CID, the scoped vsock takes
-> > > precedence.
-> > > 
-> > > If a socket in a namespace connects with a global vsock, the CID becomes
-> > > unavailable to any VMM in that namespace when creating new vsocks. If
-> > > disconnected, the CID becomes available again.
-> > 
-> > I was talking about this feature with Daniel and he pointed out something
-> > interesting (Daniel please feel free to correct me):
-> > 
-> >     If we have a process in the host that does a listen(AF_VSOCK) in a
-> > namespace, can this receive connections from guests connected to
-> > /dev/vhost-vsock in any namespace?
-> > 
-> >     Should we provide something (e.g. sysctl/sysfs entry) to disable
-> > this behaviour, preventing a process in a namespace from receiving
-> > connections from the global vsock address space (i.e.      /dev/vhost-vsock
-> > VMs)?
-> 
-> I think my concern goes a bit beyond that, to the general conceptual
-> idea of sharing the CID space between the global vsocks and namespace
-> vsocks. So I'm not sure a sysctl would be sufficient...details later
-> below..
-> 
-> > I understand that by default maybe we should allow this behaviour in order
-> > to not break current applications, but in some cases the user may want to
-> > isolate sockets in a namespace also from being accessed by VMs running in
-> > the global vsock address space.
-> > 
-> > Indeed in this series we have talked mostly about the host -> guest path (as
-> > the direction of the connection), but little about the guest -> host path,
-> > maybe we should explain it better in the cover/commit
-> > descriptions/documentation.
-> 
-> > > Testing
-> > > 
-> > > QEMU with /dev/vhost-vsock-netns support:
-> > > 	https://github.com/beshleman/qemu/tree/vsock-netns
-> > > 
-> > > Test: Scoped vsocks isolated by namespace
-> > > 
-> > >  host# ip netns add ns1
-> > >  host# ip netns add ns2
-> > >  host# ip netns exec ns1 \
-> > > 				  qemu-system-x86_64 \
-> > > 					  -m 8G -smp 4 -cpu host -enable-kvm \
-> > > 					  -serial mon:stdio \
-> > > 					  -drive if=virtio,file=${IMAGE1} \
-> > > 					  -device vhost-vsock-pci,netns=on,guest-cid=15
-> > >  host# ip netns exec ns2 \
-> > > 				  qemu-system-x86_64 \
-> > > 					  -m 8G -smp 4 -cpu host -enable-kvm \
-> > > 					  -serial mon:stdio \
-> > > 					  -drive if=virtio,file=${IMAGE2} \
-> > > 					  -device vhost-vsock-pci,netns=on,guest-cid=15
-> > > 
-> > >  host# socat - VSOCK-CONNECT:15:1234
-> > >  2025/03/10 17:09:40 socat[255741] E connect(5, AF=40 cid:15 port:1234, 16): No such device
-> > > 
-> > >  host# echo foobar1 | sudo ip netns exec ns1 socat - VSOCK-CONNECT:15:1234
-> > >  host# echo foobar2 | sudo ip netns exec ns2 socat - VSOCK-CONNECT:15:1234
-> > > 
-> > >  vm1# socat - VSOCK-LISTEN:1234
-> > >  foobar1
-> > >  vm2# socat - VSOCK-LISTEN:1234
-> > >  foobar2
-> > > 
-> > > Test: Global vsocks accessible to any namespace
-> > > 
-> > >  host# qemu-system-x86_64 \
-> > > 	  -m 8G -smp 4 -cpu host -enable-kvm \
-> > > 	  -serial mon:stdio \
-> > > 	  -drive if=virtio,file=${IMAGE2} \
-> > > 	  -device vhost-vsock-pci,guest-cid=15,netns=off
-> > > 
-> > >  host# echo foobar | sudo ip netns exec ns1 socat - VSOCK-CONNECT:15:1234
-> > > 
-> > >  vm# socat - VSOCK-LISTEN:1234
-> > >  foobar
-> > > 
-> > > Test: Connecting to global vsock makes CID unavailble to namespace
-> > > 
-> > >  host# qemu-system-x86_64 \
-> > > 	  -m 8G -smp 4 -cpu host -enable-kvm \
-> > > 	  -serial mon:stdio \
-> > > 	  -drive if=virtio,file=${IMAGE2} \
-> > > 	  -device vhost-vsock-pci,guest-cid=15,netns=off
-> > > 
-> > >  vm# socat - VSOCK-LISTEN:1234
-> > > 
-> > >  host# sudo ip netns exec ns1 socat - VSOCK-CONNECT:15:1234
-> > >  host# ip netns exec ns1 \
-> > > 				  qemu-system-x86_64 \
-> > > 					  -m 8G -smp 4 -cpu host -enable-kvm \
-> > > 					  -serial mon:stdio \
-> > > 					  -drive if=virtio,file=${IMAGE1} \
-> > > 					  -device vhost-vsock-pci,netns=on,guest-cid=15
-> > > 
-> > >  qemu-system-x86_64: -device vhost-vsock-pci,netns=on,guest-cid=15: vhost-vsock: unable to set guest cid: Address already in use
-> 
-> I find it conceptually quite unsettling that the VSOCK CID address
-> space for AF_VSOCK is shared between the host and the namespace.
-> That feels contrary to how namespaces are more commonly used for
-> deterministically isolating resources between the namespace and the
-> host.
-> 
-> Naively I would expect that in a namespace, all VSOCK CIDs are
-> free for use, without having to concern yourself with what CIDs
-> are in use in the host now, or in future.
-> 
+"
 
-True, that would be ideal. I think the definition of backwards
-compatibility we've established includes the notion that any VM may
-reach any namespace and any namespace may reach any VM. IIUC, it sounds
-like you are suggesting this be revised to more strictly adhere to
-namespace semantics?
+On Mon, 31 Mar 2025 at 13:11, Stefan Metzmacher <metze@samba.org> wrote:
+>
+> But as Linus don't like 'sockptr_t' I used a different approach.
 
-I do like Stefano's suggestion to add a sysctl for a "strict" mode,
-Since it offers the best of both worlds, and still tends conservative in
-protecting existing applications... but I agree, the non-strict mode
-vsock would be unique WRT the usual concept of namespaces.
+So the sockptr_t thing has already happened. I hate it, and I think
+it's ugly as hell, but it is what it is.
 
-> What happens if we reverse the QEMU order above, to get the
-> following scenario
-> 
->    # Launch VM1 inside the NS
->    host# ip netns exec ns1 \
->   				  qemu-system-x86_64 \
->   					  -m 8G -smp 4 -cpu host -enable-kvm \
->   					  -serial mon:stdio \
->   					  -drive if=virtio,file=${IMAGE1} \
->   					  -device vhost-vsock-pci,netns=on,guest-cid=15
->    # Launch VM2
->    host# qemu-system-x86_64 \
->   	  -m 8G -smp 4 -cpu host -enable-kvm \
->   	  -serial mon:stdio \
->   	  -drive if=virtio,file=${IMAGE2} \
->   	  -device vhost-vsock-pci,guest-cid=15,netns=off
->   
->    vm1# socat - VSOCK-LISTEN:1234
->    vm2# socat - VSOCK-LISTEN:1234
-> 
->    host# socat - VSOCK-CONNECT:15:1234
->      => Presume this connects to "VM2" running outside the NS
-> 
->    host# sudo ip netns exec ns1 socat - VSOCK-CONNECT:15:1234
-> 
->      => Does this connect to "VM1" inside the NS, or "VM2"
->         outside the NS ?
-> 
+I think it's a complete hack and having that "kernel or user" pointer
+flag is disgusting.
 
-VM1 inside the NS. Current logic says that whenever two CIDs collide
-(local vs global), always select the one in the local namespace
-(irrespective of creation order).
+Making things worse, the naming is disgusting too, talking about some
+random "socket pointer", when it has absolutely nothing to do with
+socket, and isn't even a pointer. It's something else.
 
-Adding a sysctl option... it would *never* connect to the global one,
-even if there was no local match but there was a global one.
+It's literally called "socket" not because it has anything to do with
+sockets, but because it's a socket-specific hack that isn't acceptable
+anywhere else in the kernel.
 
-> 
-> 
-> With regards,
-> Daniel
+So that "socket" part of the name is literally shorthand for "only
+sockets are disgusting enough to use this, and nobody else should ever
+touch this crap".
 
-Thanks for the review!
+At least so far that part has mostly worked, even if there's some
+"sockptr_t" use in the crypto code. I didn't look closer, because I
+didn't want to lose my lunch.
 
-Best,
-Bobby
+I don't understand why the networking code uses that thing.
+
+If you have a "fat pointer", you should damn well make it have the
+size of the area too, and do things *right*.
+
+Instead of doing what sockptr_t does, which is a complete hack to just
+pass a kernel/user flag, and then passes the length *separately*
+because the socket code couldn't be arsed to do the right thing.
+
+So I do still think "sockptr_t" should die.
+
+As Stanislav says, if you actually want that "user or kernel" thing,
+just use an "iov_iter".
+
+No, an "iov_iter" isn't exactly a pretty thing either, but at least
+it's the standard way to say "this pointer can have multiple different
+kinds of sources".
+
+And it keeps the size of the thing it points to around, so it's at
+least a fat pointer with proper ranges, even if it isn't exactly "type
+safe" (yes, it's type safe in the sense that it stays as a "iov_iter",
+but it's still basically a "random pointer").
+
+> @Linus, would that optlen_t approach fit better for you?
+
+The optlen_t thing is slightly better mainly because it's more
+type-safe. At least it's not a "random misnamed
+user-or-kernel-pointer" thing where the name is about how nothing else
+is so broken as to use it.
+
+So it's better because it's more limited, and it's better in that at
+least it has a type-safe pointer rather than a "void *" with no size
+or type associated with it.
+
+That said, I don't think it's exactly great.
+
+It's just another case of "networking can't just do it right, and uses
+a random hack with special flag values".
+
+So I do think that it would be better to actually get rid of
+"sockptr_t optval, unsigned int optlen" ENTIRELY, and replace that
+with iov_iter and just make networking bite the bullet and do the
+RightThing(tm).
+
+In fact, to make it *really* typesafe, it might be a good idea to wrap
+the iov_iter in another struct, something like
+
+   typedef struct sockopt {
+        struct iov_iter iter;
+   } sockopt_t;
+
+and make the networking functions make the typing very clear, and end
+up with an interface something like
+
+   int do_tcp_setsockopt(struct sock *sk,
+                     int level, int optname,
+                     sockopt_t *val);
+
+where that "sockopt_t *val" replaces not just the "sockptr_t optval",
+but also the "unsigned int optlen" thing.
+
+And no, I didn't look at how much churn that would be. Probably a lot.
+Maybe more than people are willing to do - even if I think some of it
+could be automated with coccinelle or whatever.
+
+                Linus
 
