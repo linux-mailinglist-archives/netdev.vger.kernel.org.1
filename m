@@ -1,240 +1,259 @@
-Return-Path: <netdev+bounces-178773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04096A78DDB
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 14:08:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 331F2A78DE5
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 14:10:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 813A57A4ECB
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 12:07:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B9BF3AA292
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 12:09:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 883F5238173;
-	Wed,  2 Apr 2025 12:08:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADAE52356DF;
+	Wed,  2 Apr 2025 12:09:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="fW/lYQdO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U+iGUcFN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C65123371D
-	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 12:08:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1B9223371D
+	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 12:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743595704; cv=none; b=bmKG31FYnAivAdGQMjRk6yj3MspEmM2032UBcQEkcEa3YVSL+oF1wFTeDNqSIYd5+a5cIIf5rFCJ4nknA+upiM4BoEGwB7sIIY3+vgBctqBXvzLT0szjxVlsXRg/wBQ7qAtlbtIhfG3I5/Q8n9rLHH56CsrRjRx3zEvKp4VFWcQ=
+	t=1743595767; cv=none; b=U0gQRUBf0heNK5wrTQs61fah3gd9RWbJzu47QyHq/0jeSAggqU6EyVO8Lu+bdTf5ym42owuG2YsPnQoKLSMCzJRx4m2rPasgXZioGg2jO/YNRZRL/0X+WTqmCf07GV25ATC+191FdcCrodM3SOG1O1zRl6k2P9lMRrdkLa/YI+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743595704; c=relaxed/simple;
-	bh=0cyQ8kfbsOP5CL/OayFEvuviX2pQwjWQA09VE+ucdsw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lNcl1SxHI15EW1embkbgXEeHqh5fWFBzUVDoPBgu6Vib7Ju7As6ff6D6Gj+BbikdP2XraHyeSCXVc2DJYxXrFjgk4iDAzyFAOAHlXqNQjF6L2Q24bhw1GVrLTnu23BXSE/AAow1oXFL21DKfHGDSiSNZTi37VGJbwzeIXchLp1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=fW/lYQdO; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-39c13fa05ebso1889470f8f.0
-        for <netdev@vger.kernel.org>; Wed, 02 Apr 2025 05:08:22 -0700 (PDT)
+	s=arc-20240116; t=1743595767; c=relaxed/simple;
+	bh=YFS3kPiQ8zANxx4A13I9fHz6kamZ3U0hMtxRi6dnWXw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ik00jkxM1Ue48zcM4GzY/uq9Xjhy13OZP1MpWp6nw19l/U+/1fPTi3fG0xZAk+bQN1gz/RivuoGDWwNowGgeqm3yaTRJaqLx3B6QBiQRFkzxYmNsKVABQlQit4exV9/fiYuLHdNZW8eosOuMlNp5mjf+tNuRLC+1F8NZhnw0+8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U+iGUcFN; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5efe8d9eb1eso1526503a12.0
+        for <netdev@vger.kernel.org>; Wed, 02 Apr 2025 05:09:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1743595701; x=1744200501; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=j5Jfe36OUwvVyT9LS7eCwDhDtrMpAORzy0WnLrxsyVY=;
-        b=fW/lYQdOMx3ShdTtWtuKZ5d+28JswJ8BaFOm1WGuv/4f1OD982+RdjTFucLBEyIeQ3
-         RWk1CPytGQVcqwKH/bvu7bH1gBwAHxI4miaFtmaPrLJZnf/swb840NBNAYmEZqco350/
-         idi8zBo9gcGD8R7dymMV5P2MrRaXC1AX3cGaYi1AMu88rd/dLmvJgHHebajBXvDj9Lep
-         HP9HP3smrNFjx9kYtzr86iK1sZnCPsltQ6aCwCPN3fLx33E4QojpvA00064hJHmr4Uga
-         zIsc9yj2v9F8jKS1EOH/5SHwLMSjfdV2NM84L8IWMswqqI8vvTMu2OZo734qkdOpxrwP
-         vtgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743595701; x=1744200501;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1743595764; x=1744200564; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=j5Jfe36OUwvVyT9LS7eCwDhDtrMpAORzy0WnLrxsyVY=;
-        b=SMyyxDliQ19R+aty9PERPjis0iFPdYNTctdGIfdCH0kbgZfglxoln8Osx/tyOSuYiS
-         6oXCtxJg1UjBrPSXc0g4drSVaQdy/K5Zgz8eJAnwTTuhZNdnmJj1LnDQfinXASNFCTyC
-         Na3VSRkFHEMwd2UKDdLfWMWbtID/a3ZeoIKV8zUeTBvVj1734AbQGzwg57V5gdCT6VR6
-         icRVbqwN3zPvT3rXnxLm3cz50kd8Yj0cOO7LgdCxj/rX5H7rO5Nyk9wTkmSsWcArQ5WI
-         jnRLguKCkoPyR/MN487ZgNRjeFlRS+7YpOO+2HAYO0gd4nfrmoaAVAqeZEoY2URdNjFg
-         JXHQ==
-X-Gm-Message-State: AOJu0YyoCXLTyZ1DfWpy8tS4weZmYRoUPDeNR9F54A0tz/fspjT+M39d
-	YgQHWTzADUJS6YA1KcOTqeWnd9DKk4wf7ENtNRuIk7Skeh2Ve7ID/cYJubU0xmvVpm1lDTyOdZe
-	/tuqeDagw3qO72bviIdn2VWbv7K6xJTUF+lnzv9Sp+8zya+Q=
-X-Gm-Gg: ASbGncsQiRot8lrRa55FAZrlzSwGqMZ6nk76mjq/Eko3bBE22GS+rFpVnOmyJFg+sCK
-	vjBtq3LCGYoWPR6rxTLsi6tVozMv21jABlAuHfpxIyKo2jbqS+CLb1U1hPhh6XS9ct4fK5iuZYe
-	khMnglaEx4tY+W45OE00u8JvFuytUrDyK5Va8eN/Y0LDpR4TuZbCJC/O5EX8rPZbUS4pKV1P75Y
-	U2Fo6fjGE4pigU0Ot+adnCcLDs0k1QKQuaiR1AFmhXPcVjowd8d8lIa6etzYyrVEtdEAViX2H6m
-	5IWErE+yZQW9+3velGh25Nt0i5ElgDo3Zs5f/z+uSslwEMCI93SNmexeGXTXDjULEbMsUGSJyHe
-	0D2zSqfk=
-X-Google-Smtp-Source: AGHT+IG3b1s4SCLE8l25O6MvYbGYEYTk0hwlT/ofXoHltCEE2yp+1M9ogrjFly9DqCR7bodW1lSJ6w==
-X-Received: by 2002:a05:6000:40e0:b0:39a:ca0c:fb0c with SMTP id ffacd0b85a97d-39c120e3590mr13131376f8f.28.1743595700585;
-        Wed, 02 Apr 2025 05:08:20 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:9a9c:dc9e:39c6:2380? ([2001:67c:2fbc:1:9a9c:dc9e:39c6:2380])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b79e304sm16841996f8f.73.2025.04.02.05.08.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Apr 2025 05:08:19 -0700 (PDT)
-Message-ID: <cd992750-2b8b-4793-8575-89d69ff3624c@openvpn.net>
-Date: Wed, 2 Apr 2025 14:08:18 +0200
+        bh=buyw39l33d4if3yuYSFe7/FnbmVmAQ5ttC4t+mfdX1k=;
+        b=U+iGUcFNWXpyqnQWxYHoO8bAlVZR2kcUpysaOqbg6wFnitJrLfd2fnx8L8eZ2oND8j
+         9KpQtAJH27bhT4WpVr233ck/B3znP+du7G9gHhnlHwhjYCHLLR/Z6IwjnDTzveJponU2
+         d7DrSQc8nPTsrzK6TkOf+m7/JmJQMz1OBdS654zmtgbtFBGkSCd2Offwp0doG94TkBav
+         eXLs0NByJxFXvonzbCliiOZKzfAR8IM+9QoD7cNEnfeN4c6Ll67N+/H7TkGTBMPMVbgz
+         cuE9n7xQHNSz3KK1zVw3g5MjSzf4PwPHxxiUn1GMHN17PM3W1ofWrs7TyPUljWRxJu9F
+         M4Uw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743595764; x=1744200564;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=buyw39l33d4if3yuYSFe7/FnbmVmAQ5ttC4t+mfdX1k=;
+        b=awjLKrBLddmD+JnAQqhzxBYbh4csxTiPT+9+uQBVp3P+ergyKnxvXqTPs2mHkkb3My
+         G7OVKtF2fCA/2c7lZ3fgoID/SUhia2ox+2Fs8P4OYvvioSeUU8S9rymQF3UsQ47be/8V
+         V6CtaaRX+9StB3B1l78W9uFbg8sfoUiBrz8Y23nCuSKnHpOvWOor2NuLe60P5LjEQ5h5
+         Wd42RUw+Ln6CqcZMhiGYG6yT4frETk4JeYhtRPeqH84u1LxxjOW0POVIFhFEH6PqfUQe
+         SSugX8Ev7puQPhlogXRrPHHyiAbsvLzqS/pzWhglv0QUG0LfFc29OC6brLPzyauxabsm
+         6EIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU8SbBiB4bSvwHR/cd4hFO19HfFXcTme8lAa5SmuPO+A4nJcjN4LjjagLHu9dWHWCqxjyCOsVk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvkH1pInJ+4n4rzuyRyYWR4JYuUeemCnJrI1Qu+M1xtfP9rxH/
+	WUNfedB8b4WJgU5wef4u3F+X12TS9bnK0pUD64GGEk+PklhGIf1EvNWP0fJN3bj5P/MGaSa59FZ
+	D7UzwRWh5mLDccVSQ7r2S+pPGRL/pD6P8vQo=
+X-Gm-Gg: ASbGnculR6o8Z+DtaYQxiiV/Jxf7PGzDWwYnRmAx6p0cJEnPvbCCzzrUNi7IRD3JnA2
+	4n+DwgRseXCUhJruiFVCU+paX1k+d867Y11iJHAY839Gp1rkCcAg6YQIlQwSOBb3WJKidh5yAn5
+	3A3tjTMCd0FVML4cAOKIC/suQ87U8=
+X-Google-Smtp-Source: AGHT+IGGwjDaUFMu6bmt3CmcczePRDVRId5F9XbsbgbJuJPxfdlEiY9A848Z2r6HKS9aOjmFR2vV0lFSluk5vAYVbkA=
+X-Received: by 2002:a05:6402:440f:b0:5e4:d52b:78a2 with SMTP id
+ 4fb4d7f45d1cf-5f06037318amr1580929a12.15.1743595763434; Wed, 02 Apr 2025
+ 05:09:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v24 09/23] ovpn: implement packet processing
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-References: <20250318-b4-ovpn-v24-0-3ec4ab5c4a77@openvpn.net>
- <20250318-b4-ovpn-v24-9-3ec4ab5c4a77@openvpn.net> <Z-u46_82tkR8TsOa@krikkit>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <Z-u46_82tkR8TsOa@krikkit>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250331114729.594603-1-ap420073@gmail.com> <20250331114729.594603-3-ap420073@gmail.com>
+ <20250331115045.032d2eb7@kernel.org>
+In-Reply-To: <20250331115045.032d2eb7@kernel.org>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Wed, 2 Apr 2025 21:09:11 +0900
+X-Gm-Features: AQ5f1Jry6Y_wUMNfh-BMXY4RSa4GKV67lTYAFNqqvNjQDOdN_cNmyqhVNw1yY8E
+Message-ID: <CAMArcTX1Q3Nx=GNiHHom=_P3A-jwT1gjpjh_yegj9CWkXbqvdg@mail.gmail.com>
+Subject: Re: [RFC net-next 2/2] eth: bnxt: add support rx side device memory TCP
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
+	andrew+netdev@lunn.ch, horms@kernel.org, michael.chan@broadcom.com, 
+	pavan.chebbi@broadcom.com, ilias.apalodimas@linaro.org, dw@davidwei.uk, 
+	netdev@vger.kernel.org, kuniyu@amazon.com, sdf@fomichev.me, 
+	aleksander.lobakin@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 01/04/2025 11:59, Sabrina Dubroca wrote:
-> 2025-03-18, 02:40:44 +0100, Antonio Quartulli wrote:
->> +/* this swap is not atomic, but there will be a very short time frame where the
->> + * old_secondary key won't be available. This should not be a big deal as most
->> + * likely both peers are already using the new primary at this point.
->> + */
-> 
-> This is not the case anymore.
+On Tue, Apr 1, 2025 at 3:50=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
 
-Oh right - this comment can go.
+Hi Jakub,
+Thank you so much for the review!
 
-> 
->> +void ovpn_crypto_key_slots_swap(struct ovpn_crypto_state *cs)
->> +{
->> +	const struct ovpn_crypto_key_slot *old_primary, *old_secondary;
->> +	u8 idx;
->> +
->> +	spin_lock_bh(&cs->lock);
->> +	idx = cs->primary_idx;
->> +	old_primary = rcu_dereference_protected(cs->slots[idx],
->> +						lockdep_is_held(&cs->lock));
->> +	old_secondary = rcu_dereference_protected(cs->slots[!idx],
->> +						  lockdep_is_held(&cs->lock));
->> +	/* perform real swap by switching the index of the primary key */
->> +	WRITE_ONCE(cs->primary_idx, !cs->primary_idx);
->> +
->> +	pr_debug("key swapped: (old primary) %d <-> (new primary) %d\n",
->> +		 old_primary ? old_primary->key_id : -1,
->> +		 old_secondary ? old_secondary->key_id : -1);
->> +
->> +	spin_unlock_bh(&cs->lock);
->> +}
-> 
-> [...]
->> +int ovpn_aead_encrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
->> +		      struct sk_buff *skb)
->> +{
-> [...]
->> +	/* encrypt it */
->> +	return crypto_aead_encrypt(req);
->> +free_iv:
->> +	kfree(ovpn_skb_cb(skb)->iv);
->> +	ovpn_skb_cb(skb)->iv = NULL;
->> +free_sg:
->> +	kfree(ovpn_skb_cb(skb)->sg);
->> +	ovpn_skb_cb(skb)->sg = NULL;
-> 
-> nit: Those shouldn't really be needed, since we'll call
-> ovpn_encrypt_post that will take care of iv/sg/req. But it's fine if
-> you leave them.
+> On Mon, 31 Mar 2025 11:47:29 +0000 Taehee Yoo wrote:
+> > Currently, bnxt_en driver satisfies the requirements of the Device
+> > memory TCP, which is HDS.
+> > So, it implements rx-side Device memory TCP for bnxt_en driver.
+> > It requires only converting the page API to netmem API.
+> > `struct page` for rx-size are changed to `netmem_ref netmem` and
+> > corresponding functions are changed to a variant of netmem API.
+> >
+> > It also passes PP_FLAG_ALLOW_UNREADABLE_NETMEM flag to a parameter of
+> > page_pool.
+> > The netmem will be activated only when a user requests devmem TCP.
+> >
+> > When netmem is activated, received data is unreadable and netmem is
+> > disabled, received data is readable.
+> > But drivers don't need to handle both cases because netmem core API wil=
+l
+> > handle it properly.
+> > So, using proper netmem API is enough for drivers.
+>
+> > @@ -1352,15 +1367,15 @@ static struct sk_buff *bnxt_copy_data(struct bn=
+xt_napi *bnapi,
+> >       if (!skb)
+> >               return NULL;
+> >
+> > -     page_pool_dma_sync_for_cpu(rxr->head_pool, page,
+> > -                                offset + bp->rx_dma_offset,
+> > -                                bp->rx_copybreak);
+> > +     page_pool_dma_sync_netmem_for_cpu(rxr->head_pool, netmem,
+> > +                                       offset + bp->rx_dma_offset,
+> > +                                       bp->rx_copybreak);
+> >
+> >       memcpy(skb->data - NET_IP_ALIGN,
+> > -            bnxt_data_ptr(bp, page, offset) - NET_IP_ALIGN,
+> > +            bnxt_data_ptr(bp, netmem, offset) - NET_IP_ALIGN,
+> >              len + NET_IP_ALIGN);
+> >
+> > -     page_pool_dma_sync_for_device(rxr->head_pool, page_to_netmem(page=
+),
+> > +     page_pool_dma_sync_for_device(rxr->head_pool, netmem,
+> >                                     bp->rx_dma_offset, bp->rx_copybreak=
+);
+> >       skb_put(skb, len);
+> >
+>
+> Do we check if rx copybreak is enabled before allowing ZC to be enabled?
+> We can't copybreak with unreadable memory.
 
-Right!
-This code flow was re-arranged a couple of times, and I have missed that 
-we now always hit those free()s in post().
+For the bnxt driver, only the first page's data is copied by rx-copybreak.
+agg buffers are not affected by rx-copybreak.
+So I think it's okay.
+I tested rx-copybreak+devmem TCP, and it works well.
+0 ~ 1024 rx-copybreak and from very small MTU to large MTU.
 
-I prefer to drop them and put a comment indicating that cleanup happens 
-in post().
+>
+> > @@ -15912,7 +15941,7 @@ static int bnxt_queue_start(struct net_device *=
+dev, void *qmem, int idx)
+> >                       goto err_reset;
+> >       }
+> >
+> > -     napi_enable(&bnapi->napi);
+> > +     napi_enable_locked(&bnapi->napi);
+> >       bnxt_db_nq_arm(bp, &cpr->cp_db, cpr->cp_raw_cons);
+> >
+> >       for (i =3D 0; i < bp->nr_vnics; i++) {
+> > @@ -15964,7 +15993,7 @@ static int bnxt_queue_stop(struct net_device *d=
+ev, void *qmem, int idx)
+> >       bnxt_hwrm_rx_ring_free(bp, rxr, false);
+> >       bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
+> >       page_pool_disable_direct_recycling(rxr->page_pool);
+> > -     if (bnxt_separate_head_pool())
+> > +     if (bnxt_separate_head_pool(rxr))
+> >               page_pool_disable_direct_recycling(rxr->head_pool);
+> >
+> >       if (bp->flags & BNXT_FLAG_SHARED_RINGS)
+> > @@ -15974,7 +16003,7 @@ static int bnxt_queue_stop(struct net_device *d=
+ev, void *qmem, int idx)
+> >        * completion is handled in NAPI to guarantee no more DMA on that=
+ ring
+> >        * after seeing the completion.
+> >        */
+> > -     napi_disable(&bnapi->napi);
+> > +     napi_disable_locked(&bnapi->napi);
+>
+> This is a fix right? The IRQ code already calls the queue reset without
+> rtnl_lock. Let's split it up and submit for net.
+>
 
-> 
-> (same thing on the decrypt side)
+Oh yes, it's a fix indeed.
+I will send a patch to fix this.
+Thanks a lot!
 
-Yep
+> > @@ -2863,15 +2865,15 @@ static inline bool bnxt_sriov_cfg(struct bnxt *=
+bp)
+> >  #endif
+> >  }
+> >
+> > -static inline u8 *bnxt_data_ptr(struct bnxt *bp, struct page *page,
+> > +static inline u8 *bnxt_data_ptr(struct bnxt *bp, netmem_ref netmem,
+> >                               unsigned int offset)
+> >  {
+> > -     return page_address(page) + offset + bp->rx_offset;
+> > +     return netmem_address(netmem) + offset + bp->rx_offset;
+> >  }
+> >
+> > -static inline u8 *bnxt_data(struct page *page, unsigned int offset)
+> > +static inline u8 *bnxt_data(netmem_ref netmem, unsigned int offset)
+> >  {
+> > -     return page_address(page) + offset;
+> > +     return netmem_address(netmem) + offset;
+> >  }
+>
+> This is not great, seems like the unification of normal vs agg bd struct
+> backfires here. unreadable netmem can only be populated in agg bds
+> right? So why don't we keep the structs separate and avoid the need
+> to convert from netmem back to a VA?
 
-> 
->> +	return ret;
->> +}
-> 
-> 
-> [...]
->> +/**
->> + * ovpn_key_id_from_skb - extract key ID from the skb head
->> + * @skb: the packet to extract the key ID code from
->> + *
->> + * Note: this function assumes that the skb head was pulled enough
->> + * to access the first byte.
-> 
-> nit: another "first byte" that I missed previously :(
+Okay, I will drop the 1/2 patch, and I will convert only agg ring
+to netmem. So a normal ring will still handle
+VA instead of page.
+If there are refactorable changes in this driver,
+I will send that separately.
 
-ACK!
+>
+> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h b/drivers/ne=
+t/ethernet/broadcom/bnxt/bnxt_xdp.h
+> > index 9592d04e0661..85b6df6a9e7f 100644
+> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h
+> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_xdp.h
+> > @@ -18,7 +18,7 @@ struct bnxt_sw_tx_bd *bnxt_xmit_bd(struct bnxt *bp,
+> >                                  struct xdp_buff *xdp);
+> >  void bnxt_tx_int_xdp(struct bnxt *bp, struct bnxt_napi *bnapi, int bud=
+get);
+> >  bool bnxt_rx_xdp(struct bnxt *bp, struct bnxt_rx_ring_info *rxr, u16 c=
+ons,
+> > -              struct xdp_buff *xdp, struct page *page, u8 **data_ptr,
+> > +              struct xdp_buff *xdp, netmem_ref netmem, u8 **data_ptr,
+> >                unsigned int *len, u8 *event);
+> >  int bnxt_xdp(struct net_device *dev, struct netdev_bpf *xdp);
+> >  int bnxt_xdp_xmit(struct net_device *dev, int num_frames,
+> > @@ -27,7 +27,7 @@ int bnxt_xdp_xmit(struct net_device *dev, int num_fra=
+mes,
+> >  bool bnxt_xdp_attached(struct bnxt *bp, struct bnxt_rx_ring_info *rxr)=
+;
+> >
+> >  void bnxt_xdp_buff_init(struct bnxt *bp, struct bnxt_rx_ring_info *rxr=
+,
+> > -                     u16 cons, struct page *page, unsigned int len,
+> > +                     u16 cons, netmem_ref netmem, unsigned int len,
+> >                       struct xdp_buff *xdp);
+>
+> We also shouldn't pass netmem to XDP init, it's strange conceptually.
+> If we reach XDP it has to be a non-net_iov page.
 
-> 
->> + *
->> + * Return: the key ID
->> + */
->> +static inline u8 ovpn_key_id_from_skb(const struct sk_buff *skb)
->> +{
->> +	u32 opcode = be32_to_cpu(*(__be32 *)skb->data);
->> +
->> +	return FIELD_GET(OVPN_OPCODE_KEYID_MASK, opcode);
->> +}
-> 
+A normal page_pool will not be converted to netmem in the next version.
+So, XDP will still handle a page.
 
-Regards,
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
-
+Thanks a lot!
+Taehee Yoo
 
