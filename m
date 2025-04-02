@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-178781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8347A78E03
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 14:16:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A74DA78DFE
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 14:16:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B8877A5235
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 12:15:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 193B616EDDD
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 12:16:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCA3F239570;
-	Wed,  2 Apr 2025 12:16:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ACF01D7E57;
+	Wed,  2 Apr 2025 12:16:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C812D238D56;
-	Wed,  2 Apr 2025 12:16:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3557820E01D;
+	Wed,  2 Apr 2025 12:16:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743596189; cv=none; b=lpn5IT4W1Y26oHNekgk6cM6Bzm5vsjna890QfZzyhKtCJOHUtQvxTKT5XHPA1COKzKH0rYI7NvFLej3BcBFUzr7hjWP+3sGaM/C0mqFVAKqlUhTyq9wM3YmJ8ccfkknjwLiJN1gLg+sLgZH4Ed2Mfx9xp/MDDxyq0At4zL6097g=
+	t=1743596187; cv=none; b=dNlE3rwFXSK34LPAAcKW8Ja2sIn2DMVpm8vcBrbtNPa8g3RptKZbm5hRaQ+7+RAQrrAJbPL0F7EMfv4fCKCz4prXMZl6MsY3VsiJmFMfb/bB6qTqB83LlAxMMHUgG4WrAvlGnUl5RBGYoMA03/uuvrH0wPxlaNXIwapbuVMpwAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743596189; c=relaxed/simple;
-	bh=E6gt0WJkhjRjFt7M2cbh0RKeQPvQw7plIkjnWKi1IQw=;
+	s=arc-20240116; t=1743596187; c=relaxed/simple;
+	bh=wMzkNwLUkTDB2rGAA3d36B+dNkQV51SXRAiylkF+XTw=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rmai1bjkh0qg0Gi9cJ3uEuPmetSl4cQEqOH9mf8K3FATgrka0tpxsWvLQKhfclg/uh1mzz9LWe2Ez4Y6kAXynugQNDKXkTqQgqbYvR4l2CEJGFGHdqaBA4Z29xR1Qu4WBflVlqQATVnYGU34MKWnqdOi9yNgs2k7ympOFSaIWDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+	 MIME-Version:Content-Type; b=iD2w7CZCNFy5AenwICrGhGXrHFk22bJ0rKF7vI96zD/Qq76TGb2ePEJ/Eu9Zr/fNNAKGF1oexsV6Pa+zF7U5q/ZsjzA1MsJqbFvnUQxnXeAcKqfLNelP340sYFyhjBuckRvWByUuIfwBa/3HFlQWNfZlKIYn2ckNxGhxVDx1BM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4ZSNzv41wyzHrGB;
-	Wed,  2 Apr 2025 20:12:59 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4ZSNz83psWzvWq0;
+	Wed,  2 Apr 2025 20:12:20 +0800 (CST)
 Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id E5B7E180103;
-	Wed,  2 Apr 2025 20:16:19 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 6CB9C14010D;
+	Wed,  2 Apr 2025 20:16:20 +0800 (CST)
 Received: from localhost.localdomain (10.90.30.45) by
  kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -47,9 +47,9 @@ CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
 	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
 	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH net 2/3] net: hns3: fix spelling mistake "reg_um" -> "reg_num"
-Date: Wed, 2 Apr 2025 20:10:00 +0800
-Message-ID: <20250402121001.663431-3-shaojijie@huawei.com>
+Subject: [PATCH net 3/3] net: hns3: store rx VLAN tag offload state for VF
+Date: Wed, 2 Apr 2025 20:10:01 +0800
+Message-ID: <20250402121001.663431-4-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20250402121001.663431-1-shaojijie@huawei.com>
 References: <20250402121001.663431-1-shaojijie@huawei.com>
@@ -64,72 +64,107 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
  kwepemk100013.china.huawei.com (7.202.194.61)
 
-From: Hao Lan <lanhao@huawei.com>
+From: Jian Shen <shenjian15@huawei.com>
 
-There are spelling mistakes in hclgevf_get_regs. Fix them.
+The VF driver missed to store the rx VLAN tag strip state when
+user change the rx VLAN tag offload state. And it will default
+to enable the rx vlan tag strip when re-init VF device after
+reset. So if user disable rx VLAN tag offload, and trig reset,
+then the HW will still strip the VLAN tag from packet nad fill
+into RX BD, but the VF driver will ignore it for rx VLAN tag
+offload disabled. It may cause the rx VLAN tag dropped.
 
-Signed-off-by: Hao Lan <lanhao@huawei.com>
+Fixes: b2641e2ad456 ("net: hns3: Add support of hardware rx-vlan-offload to HNS3 VF driver")
+Signed-off-by: Jian Shen <shenjian15@huawei.com>
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
- .../hisilicon/hns3/hns3vf/hclgevf_regs.c      | 27 ++++++++++---------
- 1 file changed, 14 insertions(+), 13 deletions(-)
+ .../hisilicon/hns3/hns3vf/hclgevf_main.c      | 25 ++++++++++++++-----
+ .../hisilicon/hns3/hns3vf/hclgevf_main.h      |  3 ++-
+ 2 files changed, 21 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_regs.c b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_regs.c
-index 7d9d9dbc7560..9de01e344e27 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_regs.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_regs.c
-@@ -127,37 +127,38 @@ void hclgevf_get_regs(struct hnae3_handle *handle, u32 *version,
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
+index 9ba767740a04..dada42e7e0ec 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
+@@ -1292,9 +1292,8 @@ static void hclgevf_sync_vlan_filter(struct hclgevf_dev *hdev)
+ 	rtnl_unlock();
+ }
  
- 	struct hclgevf_dev *hdev = hclgevf_ae_get_hdev(handle);
- 	struct hnae3_queue *tqp;
--	int i, j, reg_um;
-+	int i, j, reg_num;
- 	u32 *reg = data;
+-static int hclgevf_en_hw_strip_rxvtag(struct hnae3_handle *handle, bool enable)
++static int hclgevf_en_hw_strip_rxvtag_cmd(struct hclgevf_dev *hdev, bool enable)
+ {
+-	struct hclgevf_dev *hdev = hclgevf_ae_get_hdev(handle);
+ 	struct hclge_vf_to_pf_msg send_msg;
  
- 	*version = hdev->fw_version;
- 	reg += hclgevf_reg_get_header(reg);
+ 	hclgevf_build_send_msg(&send_msg, HCLGE_MBX_SET_VLAN,
+@@ -1303,6 +1302,19 @@ static int hclgevf_en_hw_strip_rxvtag(struct hnae3_handle *handle, bool enable)
+ 	return hclgevf_send_mbx_msg(hdev, &send_msg, false, NULL, 0);
+ }
  
- 	/* fetching per-VF registers values from VF PCIe register space */
--	reg_um = ARRAY_SIZE(cmdq_reg_addr_list);
--	reg += hclgevf_reg_get_tlv(HCLGEVF_REG_TAG_CMDQ, reg_um, reg);
--	for (i = 0; i < reg_um; i++)
-+	reg_num = ARRAY_SIZE(cmdq_reg_addr_list);
-+	reg += hclgevf_reg_get_tlv(HCLGEVF_REG_TAG_CMDQ, reg_num, reg);
-+	for (i = 0; i < reg_num; i++)
- 		*reg++ = hclgevf_read_dev(&hdev->hw, cmdq_reg_addr_list[i]);
++static int hclgevf_en_hw_strip_rxvtag(struct hnae3_handle *handle, bool enable)
++{
++	struct hclgevf_dev *hdev = hclgevf_ae_get_hdev(handle);
++	int ret;
++
++	ret = hclgevf_en_hw_strip_rxvtag_cmd(hdev, enable);
++	if (ret)
++		return ret;
++
++	hdev->rxvtag_strip_en = enable;
++	return 0;
++}
++
+ static int hclgevf_reset_tqp(struct hnae3_handle *handle)
+ {
+ #define HCLGEVF_RESET_ALL_QUEUE_DONE	1U
+@@ -2204,12 +2216,13 @@ static int hclgevf_rss_init_hw(struct hclgevf_dev *hdev)
+ 					  tc_valid, tc_size);
+ }
  
--	reg_um = ARRAY_SIZE(common_reg_addr_list);
--	reg += hclgevf_reg_get_tlv(HCLGEVF_REG_TAG_COMMON, reg_um, reg);
--	for (i = 0; i < reg_um; i++)
-+	reg_num = ARRAY_SIZE(common_reg_addr_list);
-+	reg += hclgevf_reg_get_tlv(HCLGEVF_REG_TAG_COMMON, reg_num, reg);
-+	for (i = 0; i < reg_num; i++)
- 		*reg++ = hclgevf_read_dev(&hdev->hw, common_reg_addr_list[i]);
+-static int hclgevf_init_vlan_config(struct hclgevf_dev *hdev)
++static int hclgevf_init_vlan_config(struct hclgevf_dev *hdev,
++				    bool rxvtag_strip_en)
+ {
+ 	struct hnae3_handle *nic = &hdev->nic;
+ 	int ret;
  
--	reg_um = ARRAY_SIZE(ring_reg_addr_list);
-+	reg_num = ARRAY_SIZE(ring_reg_addr_list);
- 	for (j = 0; j < hdev->num_tqps; j++) {
--		reg += hclgevf_reg_get_tlv(HCLGEVF_REG_TAG_RING, reg_um, reg);
-+		reg += hclgevf_reg_get_tlv(HCLGEVF_REG_TAG_RING, reg_num, reg);
- 		tqp = &hdev->htqp[j].q;
--		for (i = 0; i < reg_um; i++)
-+		for (i = 0; i < reg_num; i++)
- 			*reg++ = readl_relaxed(tqp->io_base -
- 					       HCLGEVF_TQP_REG_OFFSET +
- 					       ring_reg_addr_list[i]);
+-	ret = hclgevf_en_hw_strip_rxvtag(nic, true);
++	ret = hclgevf_en_hw_strip_rxvtag(nic, rxvtag_strip_en);
+ 	if (ret) {
+ 		dev_err(&hdev->pdev->dev,
+ 			"failed to enable rx vlan offload, ret = %d\n", ret);
+@@ -2879,7 +2892,7 @@ static int hclgevf_reset_hdev(struct hclgevf_dev *hdev)
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = hclgevf_init_vlan_config(hdev);
++	ret = hclgevf_init_vlan_config(hdev, hdev->rxvtag_strip_en);
+ 	if (ret) {
+ 		dev_err(&hdev->pdev->dev,
+ 			"failed(%d) to initialize VLAN config\n", ret);
+@@ -2994,7 +3007,7 @@ static int hclgevf_init_hdev(struct hclgevf_dev *hdev)
+ 		goto err_config;
  	}
  
--	reg_um = ARRAY_SIZE(tqp_intr_reg_addr_list);
-+	reg_num = ARRAY_SIZE(tqp_intr_reg_addr_list);
- 	for (j = 0; j < hdev->num_msi_used - 1; j++) {
--		reg += hclgevf_reg_get_tlv(HCLGEVF_REG_TAG_TQP_INTR, reg_um, reg);
--		for (i = 0; i < reg_um; i++)
-+		reg += hclgevf_reg_get_tlv(HCLGEVF_REG_TAG_TQP_INTR,
-+					   reg_num, reg);
-+		for (i = 0; i < reg_num; i++)
- 			*reg++ = hclgevf_read_dev(&hdev->hw,
- 						  tqp_intr_reg_addr_list[i] +
- 						  HCLGEVF_RING_INT_REG_OFFSET * j);
+-	ret = hclgevf_init_vlan_config(hdev);
++	ret = hclgevf_init_vlan_config(hdev, true);
+ 	if (ret) {
+ 		dev_err(&hdev->pdev->dev,
+ 			"failed(%d) to initialize VLAN config\n", ret);
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.h b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.h
+index cccef3228461..1e452b14b04e 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.h
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.h
+@@ -252,7 +252,8 @@ struct hclgevf_dev {
+ 	u16 *vector_status;
+ 	int *vector_irq;
+ 
+-	bool gro_en;
++	u32 gro_en :1;
++	u32 rxvtag_strip_en :1;
+ 
+ 	unsigned long vlan_del_fail_bmap[BITS_TO_LONGS(VLAN_N_VID)];
+ 
 -- 
 2.33.0
 
