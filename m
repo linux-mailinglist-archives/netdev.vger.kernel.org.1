@@ -1,92 +1,128 @@
-Return-Path: <netdev+bounces-178789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB7C4A78E3D
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 14:25:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CF86A78E82
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 14:33:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3976216369C
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 12:23:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E21073B5185
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 12:28:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AD0023A9A7;
-	Wed,  2 Apr 2025 12:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82E3523956C;
+	Wed,  2 Apr 2025 12:28:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bLpZ6hHr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X+jQJxeH"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA49239565;
-	Wed,  2 Apr 2025 12:23:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42C7723906A;
+	Wed,  2 Apr 2025 12:28:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743596591; cv=none; b=cLZ7Y2IKOOmUFkTrk+FCVvoBmLtUf0di1nFVAdkNmP7D9EKRs//gwEOTrTTQW1SU9S6vu0soAhXuUOFrdz2AlTEarCDTC6ITTpon1rW7jz0WaGgrjzKP67U0yUwKZBPIN7u23+O/9uU1yibJE9iIKk3TtmWGNsklPR5MaHMcpLc=
+	t=1743596926; cv=none; b=TtMhkoOCCVtmZhDrELzXluIn2pEphkW+4BoSKvZhrbM4wEoHegUYGFRyUjEIUAIKskQgJMdod8bgKJqSewIzhKdcY675+EE6AnAIswE4Aj+AHAk0CznRlXw7mO1W1LUpen/X3yJTU7ytgDaCgbkSZ0R4ZunokZKbzCsQwxQe5Yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743596591; c=relaxed/simple;
-	bh=hyIORvcjc8cnOrwXJJLDQlnMlsVxwobtC9HnweVC5sY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GceIoZVk0dKlpUxyFCzOEvLm1NEZDNqvNUchYzp72gb3Cm8Y2SM1thDy8WKvyfn1SRjduOkHgWCHX1/rd2t3plo0I0g9w6cSWHoCLG2IXIjO+Mtf8oSR2IPldCtCfRXz9WGntWz9RstxXm/5BlNfVuW3wECswPzTZ90R/fIMVnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bLpZ6hHr; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=m5oPUg4ARF8TnNRDBE3jh/Qug56RDVjQifVvp49cFpw=; b=bLpZ6hHr1wVANQ2fF9WBWqeuN5
-	HVjQWpQ1OlZggMUP4tufjE3uKqSb0br7f/rT6FWm8LhBf6MhyCRlxMQs6R1eqCC9lnu1A6+Eobou1
-	m1u67bO/yEmqZ75JIdUdL/wSSunPuHVf26lfRw+VeWvfOXSXW13frBpp8eGw8qPszd/w=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tzx7O-007mpD-0W; Wed, 02 Apr 2025 14:22:54 +0200
-Date: Wed, 2 Apr 2025 14:22:53 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 2/4] ARM: dts: nxp: mxs: Adjust the imx28.dtsi L2
- switch description
-Message-ID: <82fde123-4783-4d4c-a061-e07731ae7bfd@lunn.ch>
-References: <20250331103116.2223899-1-lukma@denx.de>
- <20250331103116.2223899-3-lukma@denx.de>
+	s=arc-20240116; t=1743596926; c=relaxed/simple;
+	bh=onuIhjTXJJlHvvsqV+euGzwFz3yBubvRTM3rD33wVhs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eUAvM6havoVPLjf+/fzg6c5ODvj5lqtj1VUAH68DyFIZqvQk5ZEuJrUsedwHEoRCy7CE7+I4Q6nSdRjg8yp9QTn/JvKGm7k+Mq5XP1QWrqBEI1GHaTD8A6J1hsmWR7s+yuHTtwS09QI7ec5laOmUU2wMefrw7r+Ne55k1gNwmHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X+jQJxeH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3D84C4CEEA;
+	Wed,  2 Apr 2025 12:28:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743596925;
+	bh=onuIhjTXJJlHvvsqV+euGzwFz3yBubvRTM3rD33wVhs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=X+jQJxeHNYK2sE30eKgGhKnxxnXIgISmGZZWJnbO5E0Op+wIXxk9g0SXQDOKxYqnj
+	 4wdPQq0h18/PDzj1mTEGOYE9/hoT8kiSz/Od0yakv20gz8RA0QslR9YGIKZyUaBemp
+	 C83G78lnzM2GRIqvVuRwJx6BK4RdRKBxWY/E+oMzumfgYGvKz2ZQK5dj7LrT5faWOi
+	 mE1djQ0v8i7Rnlvu2BBVCrZFIOiRMgOaEnEmI68GLCpcDzGUAkiFdZ3DdUsgO4AAAo
+	 rB49S1p8dCnibfF0yKNiFx47YyiRHSH/nwbbZN+OaXnuB6TRidOueCGTM0EliiT8DA
+	 DGIXcuj3YXoxg==
+Message-ID: <0fb67fc2-4915-49af-aa20-8bdc9bed4226@kernel.org>
+Date: Wed, 2 Apr 2025 15:28:38 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250331103116.2223899-3-lukma@denx.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3 3/3] net: ti: icss-iep: Fix possible NULL pointer
+ dereference for perout request
+To: Meghana Malladi <m-malladi@ti.com>, dan.carpenter@linaro.org,
+ pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+ davem@davemloft.net, andrew+netdev@lunn.ch
+Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ namcao@linutronix.de, javier.carrasco.cruz@gmail.com, diogo.ivo@siemens.com,
+ horms@kernel.org, jacob.e.keller@intel.com, john.fastabend@gmail.com,
+ hawk@kernel.org, daniel@iogearbox.net, ast@kernel.org, srk@ti.com,
+ Vignesh Raghavendra <vigneshr@ti.com>, danishanwar@ti.com
+References: <20250328102403.2626974-1-m-malladi@ti.com>
+ <20250328102403.2626974-4-m-malladi@ti.com>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20250328102403.2626974-4-m-malladi@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 31, 2025 at 12:31:14PM +0200, Lukasz Majewski wrote:
-> The current range of 'reg' property is too small to allow full control
-> of the L2 switch on imx287.
+Meghana,
+
+On 28/03/2025 12:24, Meghana Malladi wrote:
+> ICSS IEP driver has flags to check if perout or pps has been enabled
+> at any given point of time. Whenever there is request to enable or
+> disable the signal, the driver first checks its enabled or disabled
+> and acts accordingly.
 > 
-> As this IP block also uses ENET-MAC blocks for its operation, the address
-> range for it must be included as well.
+> After bringing the interface down and up, calling PPS/perout enable
+> doesn't work as the driver believes PPS is already enabled,
+
+How? aren't we calling icss_iep_pps_enable(iep, false)?
+wouldn't this disable the IEP and clear the iep->pps_enabled flag?
+
+And, what if you brought 2 interfaces of the same ICSS instances up
+but put only 1 interface down and up?
+
+> (iep->pps_enabled is not cleared during interface bring down)
+> and driver will just return true even though there is no signal.
+> Fix this by setting pps and perout flags to false instead of
+> disabling perout to avoid possible null pointer dereference.
 > 
-> Moreover, some SoC common properties (like compatible, clocks, interrupts
-> numbers) have been moved to this node.
+> Fixes: 9b115361248d ("net: ti: icssg-prueth: Fix clearing of IEP_CMP_CFG registers during iep_init")
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Closes: https://lore.kernel.org/all/7b1c7c36-363a-4085-b26c-4f210bee1df6@stanley.mountain/
+> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+> ---
 > 
-> Signed-off-by: Lukasz Majewski <lukma@denx.de>
+> Changes from v2(v3-v2):
+> - Add Reported-by tag and link to the bug reported by Dan Carpenter <dan.carpenter@linaro.org>
+> - drop calling icss_iep_perout_enable() for disabling perout and set perout to false instead
+> 
+>  drivers/net/ethernet/ti/icssg/icss_iep.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ethernet/ti/icssg/icss_iep.c
+> index b4a34c57b7b4..b70e4c482d74 100644
+> --- a/drivers/net/ethernet/ti/icssg/icss_iep.c
+> +++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
+> @@ -820,9 +820,9 @@ int icss_iep_exit(struct icss_iep *iep)
+>  	icss_iep_disable(iep);
+>  
+>  	if (iep->pps_enabled)
+> -		icss_iep_pps_enable(iep, false);
+> +		iep->pps_enabled = false;
+>  	else if (iep->perout_enabled)
+> -		icss_iep_perout_enable(iep, NULL, false);
+> +		iep->perout_enabled = false;
+>  
+>  	return 0;
+>  }
 
-Assuming it passed the DT checking:
+-- 
+cheers,
+-roger
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
 
