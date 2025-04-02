@@ -1,94 +1,139 @@
-Return-Path: <netdev+bounces-178867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE046A793D7
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 19:31:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8E6DA793DE
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 19:36:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31F3B18945F7
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 17:31:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E0CB170BB2
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 17:36:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C721917C2;
-	Wed,  2 Apr 2025 17:31:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DEB319C54C;
+	Wed,  2 Apr 2025 17:36:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="z8GqY5ZR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EzY+zyLP"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 314C01373
-	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 17:31:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E78251373;
+	Wed,  2 Apr 2025 17:36:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743615066; cv=none; b=OCMwhibIlSLKJ74Znsy3vgsH/bv7yZtZrR6c0Pb4qW5GS3yDaxgAti18GNZDgp+49Q2InRb+Th1SnkLgBnJ4cN2qKeW6/K+HyIWUTHeexNOuHOnSDtsfIlwiVozGxlrSCNvOQJSjNRYVcjgAsg21wuy6YszFOdcBmf2wl/1XHL4=
+	t=1743615374; cv=none; b=Dx2dfL2Or9OkbQl9n16D279sVy1z1q0OzTlpe75M/Fn68I57m8VTSJvED3FFoXdWV5ihKtA+kf3oe5BSX2s3TCXXqwjv9CWxCH27aoyr4cVSZtf9eiC2EagCUVvwDfb6wqkOahv6Krzke23oSq9CTmDpeGfizQ15bq6v2JxIbIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743615066; c=relaxed/simple;
-	bh=Rw73D4wmRhYR/8cPfLJuF3y9r+weWvIxpWYWc3s4Prg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MqonMr7doszJSWMyI6id7TDDWUOJh3OT1CBATpIWCiKo8qtsGCS5qlzs757iiLQCbr7vnHRMPFQ8ttAJG9FTni1VV2XzHi8YfPHrMWWUTev8QNmWTZPLbQk/QqNLAzkMAgJ2j2Gt73SkjoszXePSCvAq4KflYINLqV/i/ALjqB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=z8GqY5ZR; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=xMnnGkvXuR8AjeO8Jb3XrWEt1kBCTt4Bl1A61qhZ8kg=; b=z8GqY5ZRQ9QgIp/8iFXSIR3N1c
-	4MSPrvlK05hI7wE00vL9txkJbnB4klJJOWSqUR44WfOXriSW/KPqXWnm/gA3u0fDHKYzQgdenMVJK
-	Cp+XkhnjACOFCkVVTR/IcP0boShcb7SJwNpah+W8FXSC8slgBYbaQZKHekO7KUX+alePkIXQSnhuG
-	bvBLjjTO+uAH2w6J+NGpomj9k/F/MWDSPGmeygE6cMbGtA49NbPTqwsJgSY2J5bYrocujUJZER+sP
-	4soZTbAPaTSdLMdJzMlHZJe23e5UkNmbLh+s+MiuMCKAmnnoCiYUzL+a3wsdEYwpC6Vz7+EL88FlG
-	ldp9kNSg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37738)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u01vU-0007wz-0Q;
-	Wed, 02 Apr 2025 18:30:56 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u01vS-0003t4-0q;
-	Wed, 02 Apr 2025 18:30:54 +0100
-Date: Wed, 2 Apr 2025 18:30:54 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Alexander H Duyck <alexander.duyck@gmail.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
-	davem@davemloft.net, pabeni@redhat.com
-Subject: Re: [net PATCH 1/2] net: phy: Cleanup handling of recent changes to
- phy_lookup_setting
-Message-ID: <Z-10ToqF15roQ2u4@shell.armlinux.org.uk>
-References: <174354264451.26800.7305550288043017625.stgit@ahduyck-xeon-server.home.arpa>
- <174354300640.26800.16674542763242575337.stgit@ahduyck-xeon-server.home.arpa>
- <20250402090040.3a8b0ad4@fedora.home>
- <de9d0233962ebd37c413997b47f3c715731cfffd.camel@gmail.com>
- <20250402101720.23017b02@kernel.org>
+	s=arc-20240116; t=1743615374; c=relaxed/simple;
+	bh=XYepnn+4Z6u72L9tQoVt8YSYl3/VkaS1Sw16suZ3Lnk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BIySjB335t3/KbQhMWSoYzaY2vWxgHllAVVXkvYET7I6jkZWt9vQrn0/7wTSETMZfBD1ILlpsnRHRpnASPhraNYVRAba43MHgeNP7xu/wYCL/Zd0BZqESmid9uNiqGOP7zmZ9JNfjYuDZHqevbv7S5Jom+/i6xYIP3Lf3H3+iwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EzY+zyLP; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-39129fc51f8so72821f8f.0;
+        Wed, 02 Apr 2025 10:36:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743615370; x=1744220170; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xJF/yDLwsfW5UrwVXzqdx75NmNQKrLzOg1Gm4WonWkE=;
+        b=EzY+zyLPCzD7dvy0BGiC5yBBXyAtKkCJxK8C6VUn52k0ZcXxUSG06cdePOOSdZjaqz
+         KeLQgL49kd698JsOuMZw6wutysYHg4jZ5kEFfEI648cTss4tL6ss9yZNi27TbgPntWU3
+         2mM3Rqec88xK/BeOQOg323gARIxGGouNnNZwM5MRCBKVLWn88bQeyK+z10l32b4DqhgT
+         WpVYq7R4A1krdsiU0A53vHtJh+uYB0W1Ki+elgM/zS1egLw+l4NQSE5NzQLy4ISXSo0h
+         z4xUnrIPjF2qSA4yTzj8BRV+utgAGlDS0jilwB1qf+SV8drvMEzdswiZbPB8bSvKohVq
+         6rtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743615370; x=1744220170;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xJF/yDLwsfW5UrwVXzqdx75NmNQKrLzOg1Gm4WonWkE=;
+        b=eSNba3HDmVMXitTVmHToUNc2W2i1b0suEsrW85/p9N9IwjoksdD0aWOAVXfA3MwfIU
+         qSKGK0hyX7Ow7lD4+OPBPPKhMA0uRbRdej95zz2LlF6WrapIrRdqB/A/6j3bPwXlcT/v
+         4aMirCYwemzsrJpNagTO7dtbDgAezjGzPPqqmkD5Bt7KJjs3SJVo7jYxyis7nV48tVE/
+         bJtrIP3d/PrSCztzhXghetHuMuNcDqHOtjHh2DEfEpDIJrDD9E4qGXJbb5dXaW1KsssY
+         Ih+XaaNo1Su+6ey4Q29qUk7GwK7dhmNqgcSc23j7qEfwMEV5rbr/eKpzBpvuosVh4xlS
+         Alww==
+X-Forwarded-Encrypted: i=1; AJvYcCU+z86DYvLaABM0P3cWUWSI7nfzVf4eUS5Sx8BTVLwSDwySj/AkgWWh9HPw3cAQg9IgDA/z2BJKxvRdVQ==@vger.kernel.org, AJvYcCUs0JR28gWP+IOrQiQ657C7FLry3lswFrMbT6KJRY0J66EBC25Z8jyGrveV9o7OaLfKwlqVf40LaChJ+0M=@vger.kernel.org, AJvYcCVtDhc1xMzfSG7oQsnvjLxD/ym1pbqWmsF3X5ov9vYGWfM5pHhIE+1EFzzRfOkYgYQ0vw+i61cy@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1gStJKRMvKr87U++DHmkLquRxDMmdGh9WJD5VRM+5QwUArK6j
+	0c5cLJjYGIcpAN+NKBTxsxXHBgnQIit9TczwzZH42Mz89iF3niRyPMCiMA==
+X-Gm-Gg: ASbGncvuNqByKnwFB6xbOAp3Evi7NT9YNho08lLLPsySJN20fODG3gEHZDctT4366EI
+	+SiQEwTocxBzWke22sT1gSItOh6FVLMIVoDoLmVZmjKU7Xsi1OVcLGbmSEyChNJbwEipHegvImQ
+	vxDOl0f30JWkgPfMCUJ2B41imlYzXlaINhAU9EoKhIEJvF8nocxKQoOeg3BGJ9P35Eob9HeBQ5U
+	LaEYCrP+C28puMmVVdouyAWD+1AE4yDLGYLx9a9LWXnWi2xxhv4Sih7XBW5ZU/I75HRj/6Clkj0
+	qkDVYBUr+me6q4Z30zqz4yzY4ElA9xDaTLxw7wf486RdeDJUabps5jBbN9UpjlrVdw==
+X-Google-Smtp-Source: AGHT+IEKaq5swH+Ld/WaSM+FM2PRUctpPNIAzaLPfh6179lOd77dDsKSDCZuW45hwzdmjqiQ95AdYg==
+X-Received: by 2002:a05:6000:4014:b0:391:3f4f:a17f with SMTP id ffacd0b85a97d-39c12114f62mr13489731f8f.42.1743615369806;
+        Wed, 02 Apr 2025 10:36:09 -0700 (PDT)
+Received: from [172.27.62.155] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c0b6656afsm17369462f8f.40.2025.04.02.10.36.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Apr 2025 10:36:09 -0700 (PDT)
+Message-ID: <afae7a4b-e39a-4775-89e4-bd967d1fdf4e@gmail.com>
+Date: Wed, 2 Apr 2025 20:36:05 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250402101720.23017b02@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net/mlx4_en: Remove the redundant NULL check for the
+ 'my_ets' object
+To: =?UTF-8?B?0JLQsNGC0L7RgNC+0L/QuNC9INCQ0L3QtNGA0LXQuQ==?=
+ <a.vatoropin@crpt.ru>, Tariq Toukan <tariqt@nvidia.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
+References: <20250401061439.9978-1-a.vatoropin@crpt.ru>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20250401061439.9978-1-a.vatoropin@crpt.ru>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 02, 2025 at 10:17:20AM -0700, Jakub Kicinski wrote:
-> On Wed, 02 Apr 2025 07:21:05 -0700 Alexander H Duyck wrote:
-> > If needed I can resubmit.
+
+
+On 01/04/2025 9:15, Ваторопин Андрей wrote:
+> From: Andrey Vatoropin <a.vatoropin@crpt.ru>
 > 
-> Let's get a repost, the pw-bots are sensitive to subject changes
-> so I shouldn't edit..
+> Static analysis shows that pointer "my_ets" cannot be NULL because it
+> points to the object "struct ieee_ets".
+> 
+> Remove the extra NULL check. It is meaningless and harms the readability
+> of the code.
+> 
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> 
+> Signed-off-by: Andrey Vatoropin <a.vatoropin@crpt.ru>
+> ---
+>   drivers/net/ethernet/mellanox/mlx4/en_dcb_nl.c | 3 ---
+>   1 file changed, 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx4/en_dcb_nl.c b/drivers/net/ethernet/mellanox/mlx4/en_dcb_nl.c
+> index 752a72499b4f..be80da03a594 100644
+> --- a/drivers/net/ethernet/mellanox/mlx4/en_dcb_nl.c
+> +++ b/drivers/net/ethernet/mellanox/mlx4/en_dcb_nl.c
+> @@ -290,9 +290,6 @@ static int mlx4_en_dcbnl_ieee_getets(struct net_device *dev,
+>   	struct mlx4_en_priv *priv = netdev_priv(dev);
+>   	struct ieee_ets *my_ets = &priv->ets;
+>   
+> -	if (!my_ets)
+> -		return -EINVAL;
+> -
+>   	ets->ets_cap = IEEE_8021QAZ_MAX_TCS;
+>   	ets->cbs = my_ets->cbs;
+>   	memcpy(ets->tc_tx_bw, my_ets->tc_tx_bw, sizeof(ets->tc_tx_bw));
 
-Note that I've yet to review this.
+Thanks for your patch.
+You can add my tag when you resend, once the submission window opens.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 
