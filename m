@@ -1,92 +1,110 @@
-Return-Path: <netdev+bounces-178732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 386D6A78907
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 09:44:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64255A7896C
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 10:04:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F8633A6D1C
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 07:43:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C53A8189273D
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 08:04:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B18823370A;
-	Wed,  2 Apr 2025 07:44:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE8E21ABC3;
+	Wed,  2 Apr 2025 08:03:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JnW1H/iB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r4iLrorL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB862AE77;
-	Wed,  2 Apr 2025 07:44:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61E31362
+	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 08:03:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743579840; cv=none; b=bYHsTXKnTcRMeGE54Tk+hY0bFVVG5wuPCzko9WwCMmQapZAbA4h+W8IChpFJXKF/EaD4i8wcQOtgrh0atU7te9+F0KiTw8V3eqyzFYBHKJetjk85wPy3LyUUw/kSP89BOj/XmX9Lao9S9PfUSrLU4v1QcLA19S8VkfyvkHrqvkw=
+	t=1743581037; cv=none; b=H7uMV6z/FLHRHldw1eS3IdYUDBepxsmD85rCFFf9wpmmtSRqQy1MvaDoyam/iVdPf0vXQ3MNQBWUT25jSnk2I3bHPB73qkkIXwKTbOkNRuCalYXMAQsK6X0zKH7DqP8hbCzDQd/yM7z7dKJUs7Ynd320htfXBJ9/YiWEnaFVfMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743579840; c=relaxed/simple;
-	bh=79oZiKPNcgeMH72JXqZK4G1DEIB8nqM9lhZHMO4iaUE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gU+ExI6YH5iLMpvn2dDleGW65idYv2oBAwQKEBhSKRbD3RKmIt45jLThUtNqGzRf3xHjKuwt2ICI4GNA5Rb+VRQyLxiS6ALomUO2oSjaHE7JDm5CMAA3FZNF9hAaUr+k3faMiYt1FHNCs2Q+DD7fKPuUrO9GlZ7w247ySV4Gnb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JnW1H/iB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFEF3C4CEDD;
-	Wed,  2 Apr 2025 07:43:59 +0000 (UTC)
+	s=arc-20240116; t=1743581037; c=relaxed/simple;
+	bh=v75S2pEh4Qe+XJvompSAPPPcr3paP4/kJxRsItEtRAU=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
+	 To:Date:Message-ID; b=T9tjlfsMuA3cimM4Cm2wxuza4RU3Qngu7bJWDa+dA72TahX2i6wV37U7Atoy/fP9o3+P4lbpvn+4PosjCrD+rClZolw561VMu0yX8Y3+Hj9XPK+SWUU3yTqzrp49VDMqoP2PdmBemBIYdkqShVBp9Qfsj/bN/+yU7hwX37aWrXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r4iLrorL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF05EC4CEDD;
+	Wed,  2 Apr 2025 08:03:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743579840;
-	bh=79oZiKPNcgeMH72JXqZK4G1DEIB8nqM9lhZHMO4iaUE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JnW1H/iB0Hl7hNtigJ75OD+j3Xz+zrqKHzuL7tBeHRcXVLhoMPnhtjRN9Dsp6sbPX
-	 lQAeQReK5jaYPP4IHdjJXx5vfM/qDLhL71bGFeRdH1NsyKXVOPNH5HiKtDARmXw17I
-	 9Wq3jxfaxoHOvhR8Ts9QKMriSTd6GHEcDLbU7DCVJT4faIarC/dHr9peN8yZR8M2wk
-	 +2IXKb56uRmJJa1nk8Vv6KYxknQzAjyUDhKqHO0JB8BjhPVnYikegBcD8+ljpAMyvl
-	 VUozsVJ2PuTRPq+2mAc8CfVghRcw4Vgk/fLIRj0MJbX0EZ8xBLJajIwV5y9AnujM5R
-	 fYRJ2OAzZcW/Q==
-Date: Tue, 1 Apr 2025 21:43:58 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-Cc: netfilter-devel@vger.kernel.org, cgroups@vger.kernel.org,
-	linux-kernel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>
-Subject: Re: [PATCH v3 0/3] netfilter: Make xt_cgroup independent from net_cls
-Message-ID: <Z-zqvmJFI3PkNl6R@slm.duckdns.org>
-References: <20250401115736.1046942-1-mkoutny@suse.com>
+	s=k20201202; t=1743581036;
+	bh=v75S2pEh4Qe+XJvompSAPPPcr3paP4/kJxRsItEtRAU=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=r4iLrorLST1bpcyC7GZikZPBOEkkzdZkL61R0TDaKCc1AjRvo4iB1VslJYi6QU6Ly
+	 iVguOOLLkfkIdx6O7FX2mURnKQQctsp6W1UZs/Et9sTK9thEb4PTHeG7Izmyiavspt
+	 eWz9UyE4c+ERoIHHUl90ARFVsuR0VdAit378ahUSbmvnUshvEpZu088b1VP6QvkGRO
+	 sx8uqukbCCJOtMKd8LiiLqmrq/KBNeWhs/QGhnE8pcJzpkVy0Gf076PJZcbjUufL8J
+	 78pFESobTdpyMo8bkKo+l0hV+pAKVL5CF1iXXKB4Jp81WVlqWonmzDygCXXePJiDaL
+	 NP7yZT9Z6EjqQ==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250401115736.1046942-1-mkoutny@suse.com>
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <89dcde93-8e5a-4193-aa01-fde5dd5ee1fd@redhat.com>
+References: <20250326173634.31096-1-atenart@kernel.org> <89dcde93-8e5a-4193-aa01-fde5dd5ee1fd@redhat.com>
+Subject: Re: [PATCH net] net: decrease cached dst counters in dst_release
+From: Antoine Tenart <atenart@kernel.org>
+Cc: netdev@vger.kernel.org
+To: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, edumazet@google.com, kuba@kernel.org
+Date: Wed, 02 Apr 2025 10:03:52 +0200
+Message-ID: <174358103232.4506.6967775691343340999@kwain>
 
-On Tue, Apr 01, 2025 at 01:57:29PM +0200, Michal Koutný wrote:
-> Changes from v2 (https://lore.kernel.org/r/20250305170935.80558-1-mkoutny@suse.com):
-> - don't accept zero classid neither (Pablo N. A.)
-> - eliminate code that might rely on comparison against zero with
->   !CONFIG_CGROUP_NET_CLASSID
-> 
-> Michal Koutný (3):
->   netfilter: Make xt_cgroup independent from net_cls
->   cgroup: Guard users of sock_cgroup_classid()
->   cgroup: Drop sock_cgroup_classid() dummy implementation
+Hi Paolo,
 
-From cgroup POV:
+Quoting Paolo Abeni (2025-04-01 10:00:56)
+> On 3/26/25 6:36 PM, Antoine Tenart wrote:
+> >=20
+> > diff --git a/net/core/dst.c b/net/core/dst.c
+> > index 9552a90d4772..6d76b799ce64 100644
+> > --- a/net/core/dst.c
+> > +++ b/net/core/dst.c
+> > @@ -165,6 +165,14 @@ static void dst_count_dec(struct dst_entry *dst)
+> >  void dst_release(struct dst_entry *dst)
+> >  {
+> >       if (dst && rcuref_put(&dst->__rcuref)) {
+> > +#ifdef CONFIG_DST_CACHE
+> > +             if (dst->flags & DST_METADATA) {
+> > +                     struct metadata_dst *md_dst =3D (struct metadata_=
+dst *)dst;
+> > +
+> > +                     if (md_dst->type =3D=3D METADATA_IP_TUNNEL)
+> > +                             dst_cache_reset_now(&md_dst->u.tun_info.d=
+st_cache);
+>=20
+> I think the fix is correct, but I'm wondering if we have a similar issue
+> for the METADATA_XFRM meta-dst. Isn't:
+>=20
+>         dst_release(md_dst->u.xfrm_info.dst_orig);
+>=20
+> in metadata_dst_free() going to cause the same UaF? Why don't we need to
+> clean such dst here, too?
 
-  Acked-by: Tejun Heo <tj@kernel.org>
+I don't know much about XFRM but if the orig_dst doesn't have
+DST_NOCOUNT (which I guess is the case) you're right. Also Eric noted in
+ac888d58869b,
 
-Once folks are happy, please let me know how the patches should be routed.
+"""
+    1) in CONFIG_XFRM case, dst_destroy() can call
+       dst_release_immediate(child), this might also cause UAF
+       if the child does not have DST_NOCOUNT set.
+       IPSEC maintainers might take a look and see how to address this.
+"""
 
-Thanks.
+but here I'm not sure if that is the case nor of the implications of
+moving that release.
 
--- 
-tejun
+As the dst_orig one seems logical I can move it to dst_release too, but
+it seems a deeper look by XFRM experts would be needed in any way.
+
+Thanks!
+Antoine
 
