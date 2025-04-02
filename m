@@ -1,149 +1,280 @@
-Return-Path: <netdev+bounces-178859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF624A7938B
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 19:01:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F9E8A7938A
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 19:00:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D0B918927D4
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 17:01:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23E4A16E59D
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 17:00:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CD741922DE;
-	Wed,  2 Apr 2025 17:01:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7047318DF89;
+	Wed,  2 Apr 2025 17:00:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u7rjdukW"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmja5ljk3lje4ms43mwaa.icoremail.net (zg8tmja5ljk3lje4ms43mwaa.icoremail.net [209.97.181.73])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D816333993;
-	Wed,  2 Apr 2025 17:01:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.97.181.73
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A66615350B
+	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 17:00:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743613271; cv=none; b=lqMMgNu0PmrjkrTmUwofaqXjfHn/1ubKuXyVq0f+PzR496NNbzUjK2BCer0seN8vqmmtsXV5XoT88kL5F+UsXVlciXC1xwizaSHkXPWQ9BreTj3K6v6FUMrTscgJVJ1M4IhFpTtARANvN1BCNpNt7wbE0gIrETJMQETCBWRX1ns=
+	t=1743613241; cv=none; b=k1dB7Mhb4F3fbq4JmNfo3sfTus97JzST8bfkVJJUMOcKMtpHHiylMcrqNBTdIdP5mkcjSw+KaNuu9z4yJrn9tjrZXXUEBMtH0O7NJLOX7pm1UUxVWAf3zJuvjVUg+sa9aNGsg9o+RCePf+gvDnnBHug1QFFFvVdI/wNUm6jwn2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743613271; c=relaxed/simple;
-	bh=Mw1X+1hu+47rrKXTu8ZK6ZH36IWcj4glSHoD8EYem8E=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ofa4HcT9X2npYt6P/m0943UR06UxyDXK3ckDr3twABN4krR74KFs7eKiDerT1piYTOnq3lRxQxI/hwlRhI2NLIzfb39dquSRFtmX21YPBDKbacWlmhbJpB/2kyR5ABL3REZFyZWU4lbyeaY3kLq2VyGBno+Q5tl3tdGP63L2P3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=209.97.181.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from zju.edu.cn (unknown [10.193.154.185])
-	by mtasvr (Coremail) with SMTP id _____wBHG5A0be1ndbUtAQ--.43S3;
-	Thu, 03 Apr 2025 01:00:36 +0800 (CST)
-Received: from localhost (unknown [10.193.154.185])
-	by mail-app3 (Coremail) with SMTP id zS_KCgAHInQzbe1nucEaAQ--.64538S2;
-	Thu, 03 Apr 2025 01:00:35 +0800 (CST)
-From: Lin Ma <linma@zju.edu.cn>
-To: pablo@netfilter.org,
-	kadlec@netfilter.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	lucien.xin@gmail.com,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org
-Cc: Lin Ma <linma@zju.edu.cn>
-Subject: [PATCH net] netfilter: nft_tunnel: fix geneve_opt type confusion addition
-Date: Thu,  3 Apr 2025 01:00:26 +0800
-Message-Id: <20250402170026.9696-1-linma@zju.edu.cn>
-X-Mailer: git-send-email 2.39.0
+	s=arc-20240116; t=1743613241; c=relaxed/simple;
+	bh=if/TtBR+AlFwGU/YYCmLeS1V9RkcM4V+0zk3I3YaWFU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Wb8XtdRQgDI+lHik1YDfry8xjXJq5KSL6U+L4BDWwTEwpcH5WAISMApSwAzCTBBQzlLAqY+Dbc0ZIaR7F7u7RdhZIpxCVaZT1KGwF7bwTEsvfwyHFWNykaNw7FCbSjr6Kjji78vXW54bf1U2dnox8Ty0BAImsJ5qEUYAD2DKju4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u7rjdukW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB53BC4CEDD;
+	Wed,  2 Apr 2025 17:00:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743613240;
+	bh=if/TtBR+AlFwGU/YYCmLeS1V9RkcM4V+0zk3I3YaWFU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=u7rjdukWSzUkakLjWo47ORoQkguMhEh2rF1SVIx1JEOZPrG0LH6u/eDCAZwddWQcB
+	 Kpc80b22IjIpBT0FrYEj5ZiY9MguMrFQkvBULKA3m5qRYlLopjx+DVw4yNIlwbq/BP
+	 SWoo6M9LPrulYwljujX3FDghxpXz7dfd3mN5cZI8XKGifFMLs9tL0acHuxFS3KT0eQ
+	 ff1k9MSYSAd7SjGyfzJteq76uRzk+IyOUb0wScTOSYyGI7a0EpnQ5TcMN9BqPo9UcP
+	 /wET+h/MMQbuIdU/orWCc1TM+8k8rW5Ub7payG3Bf3XUH6BB14GeiGlIjUEeqO3HjO
+	 T6WRGsvAW0P1g==
+Date: Wed, 2 Apr 2025 10:00:39 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "=?UTF-8?B?w4FsdmFybw==?= \"G. M.\"" <alvaro.gamez@hazent.com>
+Cc: netdev@vger.kernel.org, Radhey Shyam Pandey
+ <radhey.shyam.pandey@amd.com>
+Subject: Re: Issue with AMD Xilinx AXI Ethernet (xilinx_axienet) on
+ MicroBlaze: Packets only received after some buffer is full
+Message-ID: <20250402100039.4cae8073@kernel.org>
+In-Reply-To: <9a6e59fcc08cb1ada36aa01de6987ad9f6aaeaa4.camel@hazent.com>
+References: <9a6e59fcc08cb1ada36aa01de6987ad9f6aaeaa4.camel@hazent.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zS_KCgAHInQzbe1nucEaAQ--.64538S2
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
-X-CM-DELIVERINFO: =?B?ctDmNAXKKxbFmtjJiESix3B1w3tPqcowV1L23Bze5QtIr9Db75bEBiiEybVhThS0pI
-	APHkyPSxI2Xdeyd3ul0ToYuuaa6ydc/d9u26TTikvtWydc2/+aUjRNbJE+cEEqqrcdbOD6
-	kGcEq7bRdzEG7BBmbwCE69bPlRaDnS6o/Is3qDBX
-X-Coremail-Antispam: 1Uk129KBj93XoWxWFyfur4xurW3Kw4kJF43Arc_yoW5uFWUpr
-	Z8K3ySkr48Kryktr18tF18AFyUJryqyF1xGr93GrW8t3W5Xw1UGay8KrWjgFn3CrWDZrW3
-	trn8ta12qrn8G3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26r1j6r4UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8JVW8Jr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27w
-	Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jrv_JF1lYx0Ex4A2jsIE
-	14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjcxG0xvY0x
-	0EwIxGrVCF72vEw4AK0wACI402YVCY1x02628vn2kIc2xKxwCF04k20xvY0x0EwIxGrwCF
-	x2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14
-	v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY
-	67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2
-	IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07URlksUUUUU=
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-When handling multiple NFTA_TUNNEL_KEY_OPTS_GENEVE attributes, the
-parsing logic should place every geneve_opt structure one by one
-compactly. Hence, when deciding the next geneve_opt position, the
-pointer addition should be in units of char *.
++CC Radhey, maintainer of axienet
 
-However, the current implementation erroneously does type conversion
-before the addition, which will lead to heap out-of-bounds write.
-
-[    6.989857] ==================================================================
-[    6.990293] BUG: KASAN: slab-out-of-bounds in nft_tunnel_obj_init+0x977/0xa70
-[    6.990725] Write of size 124 at addr ffff888005f18974 by task poc/178
-[    6.991162]
-[    6.991259] CPU: 0 PID: 178 Comm: poc-oob-write Not tainted 6.1.132 #1
-[    6.991655] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-[    6.992281] Call Trace:
-[    6.992423]  <TASK>
-[    6.992586]  dump_stack_lvl+0x44/0x5c
-[    6.992801]  print_report+0x184/0x4be
-[    6.993790]  kasan_report+0xc5/0x100
-[    6.994252]  kasan_check_range+0xf3/0x1a0
-[    6.994486]  memcpy+0x38/0x60
-[    6.994692]  nft_tunnel_obj_init+0x977/0xa70
-[    6.995677]  nft_obj_init+0x10c/0x1b0
-[    6.995891]  nf_tables_newobj+0x585/0x950
-[    6.996922]  nfnetlink_rcv_batch+0xdf9/0x1020
-[    6.998997]  nfnetlink_rcv+0x1df/0x220
-[    6.999537]  netlink_unicast+0x395/0x530
-[    7.000771]  netlink_sendmsg+0x3d0/0x6d0
-[    7.001462]  __sock_sendmsg+0x99/0xa0
-[    7.001707]  ____sys_sendmsg+0x409/0x450
-[    7.002391]  ___sys_sendmsg+0xfd/0x170
-[    7.003145]  __sys_sendmsg+0xea/0x170
-[    7.004359]  do_syscall_64+0x5e/0x90
-[    7.005817]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-[    7.006127] RIP: 0033:0x7ec756d4e407
-[    7.006339] Code: 48 89 fa 4c 89 df e8 38 aa 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 faf
-[    7.007364] RSP: 002b:00007ffed5d46760 EFLAGS: 00000202 ORIG_RAX: 000000000000002e
-[    7.007827] RAX: ffffffffffffffda RBX: 00007ec756cc4740 RCX: 00007ec756d4e407
-[    7.008223] RDX: 0000000000000000 RSI: 00007ffed5d467f0 RDI: 0000000000000003
-[    7.008620] RBP: 00007ffed5d468a0 R08: 0000000000000000 R09: 0000000000000000
-[    7.009039] R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
-[    7.009429] R13: 00007ffed5d478b0 R14: 00007ec756ee5000 R15: 00005cbd4e655cb8
-
-Fix this bug with correct pointer addition and conversion.
-
-Fixes: 925d844696d9 ("netfilter: nft_tunnel: add support for geneve opts")
-Signed-off-by: Lin Ma <linma@zju.edu.cn>
----
- net/netfilter/nft_tunnel.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/netfilter/nft_tunnel.c b/net/netfilter/nft_tunnel.c
-index 681301b46aa4..2df4b2a02f27 100644
---- a/net/netfilter/nft_tunnel.c
-+++ b/net/netfilter/nft_tunnel.c
-@@ -341,7 +341,7 @@ static const struct nla_policy nft_tunnel_opts_geneve_policy[NFTA_TUNNEL_KEY_GEN
- static int nft_tunnel_obj_geneve_init(const struct nlattr *attr,
- 				      struct nft_tunnel_opts *opts)
- {
--	struct geneve_opt *opt = (struct geneve_opt *)opts->u.data + opts->len;
-+	struct geneve_opt *opt = (struct geneve_opt *)(opts->u.data + opts->len);
- 	struct nlattr *tb[NFTA_TUNNEL_KEY_GENEVE_MAX + 1];
- 	int err, data_len;
- 
--- 
-2.17.1
+On Tue, 01 Apr 2025 12:52:15 +0200 =C3=81lvaro "G. M." wrote:
+> Hello,
+>=20
+> I have a custom PCB board fitting a AMD/Xilinx Artix 7 FPGA with a Microb=
+laze design
+> inside that uses Xilinx' AXI 1G/2.5G Ethernet Subsystem connected via DMA.
+>=20
+> This board and HDL design have been tested and in production since 2016 u=
+sing
+> kernel 4.4.43 without any issue. The hardware part of the ethernet is DP8=
+3620
+> running in 100base-FX mode, which back in the day required a small patch =
+to
+> dp83848.c from myself that has been in the kernel since.
+>=20
+> I am now trying to upgrade to a recent kernel (v6.13) and I'm facing some=
+ strange
+> behavior of the ethernet system. The most probable cause is a misconfigur=
+ation
+> on my part of the device tree, since things have changed since then and I=
+'ve found
+> the device tree documentation confusing, but I can't discard some kind of=
+ bug,
+> for I have never seem something similar to this.
+>=20
+> Relevant boot messages:
+>=20
+> xilinx_axienet 40c00000.ethernet eth0: PHY [axienet-40c00000:01] driver [=
+TI DP83620 10/100 Mbps PHY] (irq=3DPOLL)
+> xilinx_axienet 40c00000.ethernet eth0: configuring for phy/mii link mode
+> xilinx_axienet 40c00000.ethernet eth0: Link is Up - 100Mbps/Half - flow c=
+ontrol off
+>=20
+> Now, transmission from the Microblaze seems to work fine, but reception h=
+owever does not.
+> I run tcpdump on the Microblaze and I can see that there's some kind of b=
+uffering occuring,
+> as a single ARP packet sent from my directly connected computer won't rea=
+ch tcpdump unless
+> I send also a big chunk of data via, for example, multicast, or after eno=
+ugh time of ping flooding.
+>=20
+> It's not however a matter of sending a big chunk of data at the beginning=
+, it seems like the
+> buffer empties once full and the process starts back again, so a single p=
+ing packet won't be
+> received after the buffer has emptied.
+>=20
+> I can see that interrupts increase, but not as fast as they occur when us=
+ing old kernel.
+> For example, in the ping case, kernel 4.43 will notify that there was an =
+interrupt
+> for each single ping packet received with ping -c 1 (so no coalescing she=
+nanigans can occur),
+> but the new kernel won't show any increase in the number of interrupts, s=
+o it means
+> that the DMA core is either not generating the irq for some reason or isn=
+'t even
+> executing the DMA transfer at all.
+>=20
+> Output packets, however, do seem to be sent expeditely and received in my=
+ working computer
+> as soon as I sent them from the Microblaze.
+>=20
+> I guess I may have made some mistake in upgrading the DTS to the new form=
+at, although
+> I've tried the two available methods (either setting node "dmas" or using=
+ "axistream-connected"
+> property) and both methods result in the same boot messages and behavior.
+>=20
+> By crafting properly sized UDP multicast packets (so I don't have to rely=
+ on ARP which isn't
+> working due to timeouts), I've been able to determine I need to send 1310=
+72 bytes before
+> reception can truly occur, although it somehow seems like sending multica=
+st UDP
+> packets won't trigger receiving IRQ unless I have a specific UDP listener=
+ program running on
+> the Microblaze. I'm quite confused about that too.
+>=20
+> So please, if anyone could inspect the DTS for me and/or guide me on how =
+to debug this, I'd be grateful.
+>=20
+> These are the relevant parts of the DTS for kernel 6.13, which I've hand =
+crafted with help
+> from Documentation/devicetree/bindings and peeking at xilinx_axienet_main=
+.c:
+>=20
+>=20
+> axi_ethernet_0_dma: dma@41e00000 {
+> 	compatible =3D "xlnx,axi-dma-1.00.a";
+> 	#dma-cells =3D <1>;
+> 	reg =3D <0x41e00000 0x10000>;
+> 	interrupt-parent =3D <&microblaze_0_axi_intc>;
+> 	interrupts =3D <7 1 8 1>;
+> 	xlnx,addrwidth =3D <32>;
+> 	xlnx,datawidth =3D <32>;
+> 	xlnx,include-sg;
+> 	xlnx,sg-length-width =3D <16>;
+> 	xlnx,include-dre =3D <1>;
+> 	xlnx,axistream-connected =3D <1>;
+> 	xlnx,irq-delay =3D <1>;
+> 	dma-channels =3D <2>;
+> 	clock-names =3D "s_axi_lite_aclk", "m_axi_mm2s_aclk", "m_axi_s2mm_aclk",=
+ "m_axi_sg_aclk";
+> 	clocks =3D <&clk_bus_0>, <&clk_bus_0>, <&clk_bus_0>, <&clk_bus_0>;
+> 	dma-channel@41e00000 {
+> 		compatible =3D "xlnx,axi-dma-mm2s-channel";
+> 		xlnx,include-dre =3D <1>;
+> 		interrupts =3D <7 1>;
+> 		xlnx,datawidth =3D <32>;
+> 	};
+> 	dma-channel@41e00030 {
+> 		compatible =3D "xlnx,axi-dma-s2mm-channel";
+> 		xlnx,include-dre =3D <1>;
+> 		interrupts =3D <8 1>;
+> 		xlnx,datawidth =3D <32>;
+> 	};
+> };
+> axi_ethernet_eth: ethernet@40c00000 {
+> 	compatible =3D "xlnx,axi-ethernet-1.00.a";
+> 	reg =3D <0x40c00000 0x40000>, <0x41e00000 0x10000>;
+> 	phy-handle =3D <&phy1>;
+> 	xlnx,rxmem =3D <0x1000>;
+> 	phy-mode =3D "mii";
+> 	xlnx,txcsum =3D <0x2>;
+> 	xlnx,rxcsum =3D <0x2>;
+> 	clock-names =3D "s_axi_lite_clk", "axis_clk", "ref_clk", "mgt_clk";
+> 	clocks =3D <&clk_bus_0>, <&clk_bus_0>, <&clk_bus_0>, <&clk_bus_0>;
+> /*	axistream-connected =3D <&axi_ethernet_0_dma>; */
+> 	dmas =3D <&axi_ethernet_0_dma 0>, <&axi_ethernet_0_dma 1>;
+> 	dma-names =3D "tx_chan0", "rx_chan0";
+> 	mdio {
+> 		#address-cells =3D <1>;
+> 		#size-cells =3D <0>;
+> 		phy1: ethernet-phy@1 {
+> 			device_type =3D "ethernet-phy";
+> 			reg =3D <1>;
+> 		};
+> 	};
+> };
+>=20
+>=20
+> And these are same parts of the DTS for kernel 4.43 which worked fine.
+> These were created with help from Xilinx tools.
+>=20
+> axi_ethernet_0_dma: dma@41e00000 {
+> 	#dma-cells =3D <1>;
+> 	compatible =3D "xlnx,axi-dma-1.00.a";
+> 	interrupt-parent =3D <&microblaze_0_axi_intc>;
+> 	interrupts =3D <7 1 8 1>;
+> 	reg =3D <0x41e00000 0x10000>;
+> 	xlnx,include-sg ;
+> 	dma-channel@41e00000 {
+> 		compatible =3D "xlnx,axi-dma-mm2s-channel";
+> 		dma-channels =3D <0x1>;
+> 		interrupts =3D <7 1>;
+> 		xlnx,datawidth =3D <0x8>;
+> 		xlnx,device-id =3D <0x0>;
+> 	};
+> 	dma-channel@41e00030 {
+> 		compatible =3D "xlnx,axi-dma-s2mm-channel";
+> 		dma-channels =3D <0x1>;
+> 		interrupts =3D <8 1>;
+> 		xlnx,datawidth =3D <0x8>;
+> 		xlnx,device-id =3D <0x0>;
+> 	};
+> };
+> axi_ethernet_eth: ethernet@40c00000 {
+> 	axistream-connected =3D <&axi_ethernet_0_dma>;
+> 	axistream-control-connected =3D <&axi_ethernet_0_dma>;
+> 	clock-frequency =3D <83250000>;
+> 	clocks =3D <&clk_bus_0>;
+> 	compatible =3D "xlnx,axi-ethernet-1.00.a";
+> 	device_type =3D "network";
+> 	interrupt-parent =3D <&microblaze_0_axi_intc>;
+> 	interrupts =3D <3 0>;
+> 	phy-mode =3D "mii";
+> 	reg =3D <0x40c00000 0x40000>;
+> 	xlnx =3D <0x0>;
+> 	xlnx,axiliteclkrate =3D <0x0>;
+> 	xlnx,axisclkrate =3D <0x0>;
+> 	xlnx,gt-type =3D <0x0>;
+> 	xlnx,gtinex =3D <0x0>;
+> 	xlnx,phy-type =3D <0x0>;
+> 	xlnx,phyaddr =3D <0x1>;
+> 	xlnx,rable =3D <0x0>;
+> 	xlnx,rxcsum =3D <0x2>;
+> 	xlnx,rxlane0-placement =3D <0x0>;
+> 	xlnx,rxlane1-placement =3D <0x0>;
+> 	xlnx,rxmem =3D <0x1000>;
+> 	xlnx,rxnibblebitslice0used =3D <0x1>;
+> 	xlnx,tx-in-upper-nibble =3D <0x1>;
+> 	xlnx,txcsum =3D <0x2>;
+> 	xlnx,txlane0-placement =3D <0x0>;
+> 	xlnx,txlane1-placement =3D <0x0>;
+> 	phy-handle =3D <&phy0>;
+> 	axi_ethernetlite_0_mdio: mdio {
+> 		#address-cells =3D <1>;
+> 		#size-cells =3D <0>;
+> 		phy0: phy@1 {
+> 			device_type =3D "ethernet-phy";
+> 			reg =3D <1>;
+> 			ti,rx-internal-delay =3D <7>;
+> 			ti,tx-internal-delay =3D <7>;
+> 			ti,fifo-depth =3D <1>;
+> 		};
+> 	};
+> };
+>=20
+>=20
+>=20
+> Best regards,
+>=20
 
 
