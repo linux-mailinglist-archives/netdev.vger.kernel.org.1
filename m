@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-178714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11A7CA78600
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 03:03:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17E12A78602
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 03:04:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E41643AF1CA
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 01:02:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E53A1892D63
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 01:03:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E9211096F;
-	Wed,  2 Apr 2025 01:03:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C0221B7F4;
+	Wed,  2 Apr 2025 01:03:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ukoD2k7Y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MsGQIvNd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BB72F507
-	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 01:03:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 788E019BBA
+	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 01:03:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743555784; cv=none; b=qPeDr4QAgUZFMvpyis/X4cU2Y+MKakD7ArQWmS9KQEup0re2v4DiPgofO61OOOrmJ/o1+m82cjy2tu+wWFB/dLLf8jC/9zgmAi3dhIt5K/Wlocqug451GCFUnt90ufC5TM7CYEm5NoLIRvehibuS12rxA4m8j8FYKVQ3YfsFKQQ=
+	t=1743555785; cv=none; b=KfGaNCq0je5ezxmMOXeedtRdrCGU2mjV4L6OxFqJD8uDQ3xjqMDSoxQ30Q1mmvnQZvGeesRk4wEW7yYv98nCjHKT0BuHXSJIaJQS0/ZWcC/gvz61ZmxXhLwbUVjDtH5TbJl2iHNbWsOeUlIR0qEfc3iRFWqpxl9D+k/HM9Tmr4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743555784; c=relaxed/simple;
-	bh=UG/8IDjmHw6cVEvlQ7wjDK0ND3xss7cfz2MrvaU5+50=;
+	s=arc-20240116; t=1743555785; c=relaxed/simple;
+	bh=AVvuLyhr6OWilSvDp2DBRVh8lVQOmLr6PAHBBPrDV/w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GoN+8jRBk6gpJ5B20MmWz75QCLef/KS9mjv4EZi1GmeuqcFl+eYQDRZjNkrMI8NrFQO/FQNK8e0i+xJ73i5NB4Ucg7G3rmfx9aJ+Eju0s8loB1O3S9MTeqRK6etjJh3BR3f/ubgOElUYoYqwKOvJIjX7fReq838JM9ZnkuUvXAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ukoD2k7Y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB2F9C4CEEB;
-	Wed,  2 Apr 2025 01:03:03 +0000 (UTC)
+	 MIME-Version; b=lafQlWHHL6CqExW/cirZOZvfu8iZsYKxMllQIcGUJHRthucgQ4SlTd1+ZLGOB77ys/IlyzMTN/DLpWgZv8Y4GrJZ0WGpAtgI3pdh6SF1iAlAAnJtdekiSQHD+uTaZULFNN/7D5VIUK7+u2O8IPwIoagOi1+iDqiacfz01FeGjE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MsGQIvNd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86BCCC4CEEE;
+	Wed,  2 Apr 2025 01:03:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743555784;
-	bh=UG/8IDjmHw6cVEvlQ7wjDK0ND3xss7cfz2MrvaU5+50=;
+	s=k20201202; t=1743555785;
+	bh=AVvuLyhr6OWilSvDp2DBRVh8lVQOmLr6PAHBBPrDV/w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ukoD2k7Yr5xj7AXTS0kSOeEcIuQouMKj7PFL3Wl8X5gSuYcyLY+i9racJjCL1d360
-	 ppOorfRZUsIHh46WQTRURCSd2pmJI2XL/ObNO0bADFA0nRdzYPtLjhXNaDxGd7wIUI
-	 JZC5MFTnaAP5UE557e+rXsNJbNDm5G7MHMLRZKBFx0YDPJnsiuvQJWZSGMDO2aLGhk
-	 DC/g3edejww3y+285sesifDppxvQ7DPvSWX3HNBaPcyGGtqJaNjG+oQ9EKXBMx0Qvo
-	 /ON838GqgajFFg2YTJjYPC3Uieq6JtjMkJSv3n+Utjov18g/tApTBxSJ/hl5ZqFhD9
-	 H4moeGoRzlmFw==
+	b=MsGQIvNdeEJZEpv2XqqZRIuVHHDIbJvx71U6gRQjDaNNssY4Teo7jqbtcBJl/PxpK
+	 Dzy3zlL9p3/9mAXF6uk6CX+/y9SfktB70SmieQR6SiZa8EzEvLMDDkPjMMLQWrSUy0
+	 35HTjaCQmc9iabksb5lT77tdUiwBjTLgjiiDIVAUpkGRK/CQIBr7lom2Nuxy2NKRSH
+	 iTohY8mOb8zTKBXEmhIE4Zw3KRnijltEZHRkBIw06vVEKWDaUb7vHIW8TMzKXZvLM+
+	 1wniLkTYRM2JbbQ9/V/PaEYn5UvhJjYL63plTJtCQCgCEsQtiXrGn5Lv8Tkxndy6me
+	 029HE75DnZ+QQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -52,9 +52,9 @@ Cc: netdev@vger.kernel.org,
 	yuyanghuang@google.com,
 	jacob.e.keller@intel.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net v2 2/3] netlink: specs: rt_addr: fix get multi command name
-Date: Tue,  1 Apr 2025 18:02:59 -0700
-Message-ID: <20250402010300.2399363-3-kuba@kernel.org>
+Subject: [PATCH net v2 3/3] netlink: specs: rt_addr: pull the ifa- prefix out of the names
+Date: Tue,  1 Apr 2025 18:03:00 -0700
+Message-ID: <20250402010300.2399363-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250402010300.2399363-1-kuba@kernel.org>
 References: <20250402010300.2399363-1-kuba@kernel.org>
@@ -66,27 +66,132 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Command names should match C defines, codegens may depend on it.
+YAML specs don't normally include the C prefix name in the name
+of the YAML attr. Remove the ifa- prefix from all attributes
+in addr-attrs and specify name-prefix instead.
 
-Fixes: 4f280376e531 ("selftests/net: Add selftest for IPv4 RTM_GETMULTICAST support")
+This is a bit risky, hopefully there aren't many users out there.
+
+Fixes: dfb0f7d9d979 ("doc/netlink: Add spec for rt addr messages")
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/netlink/specs/rt_addr.yaml | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Documentation/netlink/specs/rt_addr.yaml | 41 ++++++++++++------------
+ tools/testing/selftests/net/rtnetlink.py |  2 +-
+ 2 files changed, 22 insertions(+), 21 deletions(-)
 
 diff --git a/Documentation/netlink/specs/rt_addr.yaml b/Documentation/netlink/specs/rt_addr.yaml
-index 3bc9b6f9087e..1650dc3f091a 100644
+index 1650dc3f091a..d032562d1240 100644
 --- a/Documentation/netlink/specs/rt_addr.yaml
 +++ b/Documentation/netlink/specs/rt_addr.yaml
-@@ -169,7 +169,7 @@ protonum: 0
-           value: 20
-           attributes: *ifaddr-all
+@@ -78,45 +78,46 @@ protonum: 0
+ attribute-sets:
+   -
+     name: addr-attrs
++    name-prefix: ifa-
+     attributes:
+       -
+-        name: ifa-address
++        name: address
+         type: binary
+         display-hint: ipv4
+       -
+-        name: ifa-local
++        name: local
+         type: binary
+         display-hint: ipv4
+       -
+-        name: ifa-label
++        name: label
+         type: string
+       -
+-        name: ifa-broadcast
++        name: broadcast
+         type: binary
+         display-hint: ipv4
+       -
+-        name: ifa-anycast
++        name: anycast
+         type: binary
+       -
+-        name: ifa-cacheinfo
++        name: cacheinfo
+         type: binary
+-        struct: ifa-cacheinfo
++        struct: cacheinfo
+       -
+-        name: ifa-multicast
++        name: multicast
+         type: binary
+       -
+-        name: ifa-flags
++        name: flags
+         type: u32
+         enum: ifa-flags
+         enum-as-flags: true
+       -
+-        name: ifa-rt-priority
++        name: rt-priority
+         type: u32
+       -
+-        name: ifa-target-netnsid
++        name: target-netnsid
+         type: binary
+       -
+-        name: ifa-proto
++        name: proto
+         type: u8
+ 
+ 
+@@ -137,10 +138,10 @@ protonum: 0
+             - ifa-prefixlen
+             - ifa-scope
+             - ifa-index
+-            - ifa-address
+-            - ifa-label
+-            - ifa-local
+-            - ifa-cacheinfo
++            - address
++            - label
++            - local
++            - cacheinfo
      -
--      name: getmaddrs
-+      name: getmulticast
-       doc: Get / dump IPv4/IPv6 multicast addresses.
-       attribute-set: addr-attrs
-       fixed-header: ifaddrmsg
+       name: deladdr
+       doc: Remove address
+@@ -154,8 +155,8 @@ protonum: 0
+             - ifa-prefixlen
+             - ifa-scope
+             - ifa-index
+-            - ifa-address
+-            - ifa-local
++            - address
++            - local
+     -
+       name: getaddr
+       doc: Dump address information.
+@@ -182,8 +183,8 @@ protonum: 0
+         reply:
+           value: 58
+           attributes: &mcaddr-attrs
+-            - ifa-multicast
+-            - ifa-cacheinfo
++            - multicast
++            - cacheinfo
+       dump:
+         request:
+           value: 58
+diff --git a/tools/testing/selftests/net/rtnetlink.py b/tools/testing/selftests/net/rtnetlink.py
+index 80950888800b..cadd7bc69241 100755
+--- a/tools/testing/selftests/net/rtnetlink.py
++++ b/tools/testing/selftests/net/rtnetlink.py
+@@ -15,7 +15,7 @@ IPV4_ALL_HOSTS_MULTICAST = b'\xe0\x00\x00\x01'
+     addresses = rtnl.getmaddrs({"ifa-family": socket.AF_INET}, dump=True)
+ 
+     all_host_multicasts = [
+-        addr for addr in addresses if addr['ifa-multicast'] == IPV4_ALL_HOSTS_MULTICAST
++        addr for addr in addresses if addr['multicast'] == IPV4_ALL_HOSTS_MULTICAST
+     ]
+ 
+     ksft_ge(len(all_host_multicasts), 1,
 -- 
 2.49.0
 
