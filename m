@@ -1,72 +1,66 @@
-Return-Path: <netdev+bounces-178861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED1A3A79395
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 19:03:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A1F96A7939B
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 19:07:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4E1A3AFB4E
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 17:02:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAD383A9E07
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 17:06:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D0E618732B;
-	Wed,  2 Apr 2025 17:03:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C1719CD1E;
+	Wed,  2 Apr 2025 17:07:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Id8tlO4+"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2IkIe0/x"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31DED199FA2
-	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 17:03:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E095735949;
+	Wed,  2 Apr 2025 17:06:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743613389; cv=none; b=BzVBjA2iEmpjsqFwNJwNIfEQQhFPhwzIP0mRBHm5bKF5oWuyylLdjIx+stPGWFL/K64JhYOs4I0Aen80fkRcxWcCHcPtZtQnI8NWLjQ1lxq9I7eWIKIRVjxECFy+pkXDXm2xZ0lczQEJ6b6Vk6sK6TePfH3EurrjXSmNeed4CHE=
+	t=1743613620; cv=none; b=rHMaxlwMabZNF+vD1WQn+4rP+VHQ68dTHF5yyyHid0a9g7cFtzM3ByRHrZsZf8sxBUH0N1vmmX4pMRrJatJH/jYq1Dy3l6WYSwBt3/oZlZ7TkZz3GcQsmN2od5t/a3qPcAuF87IBy6JG+vzMeT/x2B3qon7MTSCECcpmkojwX8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743613389; c=relaxed/simple;
-	bh=XpnxqARefrz0ZlGwM/4n8sz9qdFvUpEih2I9i1mPuZk=;
+	s=arc-20240116; t=1743613620; c=relaxed/simple;
+	bh=H3EcLWboaQM1ylt3ubvjTkM0ys+EHhZAClRtpTU23yA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jz45yKaWYS3YQvnlGqiukV1qphdl+2WRfOvDmIunW17YjrudBlyfqCKCSP5Tzu0A5syI2g724EylAR3k2nCa0PnnNcn9YgK9s2805QVtl5ptCx3WaSx7FrJ2R/9T3abPLc8otPEFynx5Gri0k4mFbeoJw+kPfuB+76t1tIy0p4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Id8tlO4+; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Y5t986op0u8yQvI3s0g+XhnyTuCqWkXVsYY33px580c=; b=Id8tlO4+dCTTixpQfuQfc78kM8
-	IWx3jFaXKKSciyy64Ytp39lxblwex6/jXysLkui62awgZes19IgmnKTlnYbbOK2rQghx++tU3YjFT
-	MEmdM/myHjIU+bJLd5GXWZL1TzeaND5zXj8uJyaLtsZ4RDP1Iy0rtbKa1y+Azz0aErvKJQX48SFwP
-	UaJi3eo72fL8NORxMxIwzFE6NhC7bdLa3HhM5j0grUtO6qn4nK3P0GxFeM3hMSUqtNOt7tcvsCJVB
-	WfPgijqkCQTfcsMnj2sAP/48T3atRx2f1LFNyjnSbYZdu88QFsTvFkgTUosUfhiagzBSAdaFkKCe0
-	cl2GeqKQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50636)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u01UV-0007vi-1v;
-	Wed, 02 Apr 2025 18:03:03 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u01UU-0003ru-12;
-	Wed, 02 Apr 2025 18:03:02 +0100
-Date: Wed, 2 Apr 2025 18:03:02 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=nJJs5Toc9Cl6F39Po2g3er4nLvWXraEtVbw58V7zbJFbdpfSC0iSFe9WzcpSfRdFO+jMsQ9GCN4WDWoaqBskjjc+4j30e5GUpSgnxov4bzu25pAFfRRmQNtVtKgtSM7SBYwrXa7auncMZeW/ZZUkOmL1AmGyY+mc4E6agpG/fXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2IkIe0/x; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=eJZNDnvZYJl/v6wAtqRZA40hAuj1eQcDN3vqs62UpXc=; b=2IkIe0/xrkxwiAKy4t0LpTq6k5
+	/rCRyLMMFZZDCwhjeoqr+d+2FBTLgaAXztM7V6t4daPdS3TQHKSxpth3gVcFOELJBkTcTSwwWQmTW
+	T04yRrj1rJRB0Tc+AmMqPSfCtTzbbeYq6UXHNYnBaAq/EijIRKJZvG0sJ7nRsNJGU9cs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u01Xx-007pEN-4K; Wed, 02 Apr 2025 19:06:37 +0200
+Date: Wed, 2 Apr 2025 19:06:37 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Wei Fang <wei.fang@nxp.com>
-Subject: Re: [PATCH v2 net 1/2] net: phy: move phy_link_change() prior to
- mdio_bus_phy_may_suspend()
-Message-ID: <Z-1txga-muXcuqDU@shell.armlinux.org.uk>
-References: <20250402150859.1365568-1-vladimir.oltean@nxp.com>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v3 4/4] net: mtip: The L2 switch driver for imx287
+Message-ID: <d48796b3-636b-46d4-8e3b-74913d4f77ab@lunn.ch>
+References: <20250331103116.2223899-1-lukma@denx.de>
+ <20250331103116.2223899-5-lukma@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,27 +69,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250402150859.1365568-1-vladimir.oltean@nxp.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250331103116.2223899-5-lukma@denx.de>
 
-On Wed, Apr 02, 2025 at 06:08:58PM +0300, Vladimir Oltean wrote:
-> In an upcoming change, mdio_bus_phy_may_suspend() will need to
-> distinguish a phylib-based PHY client from a phylink PHY client.
-> For that, it will need to compare the phydev->phy_link_change() function
-> pointer with the eponymous phy_link_change() provided by phylib.
-> 
-> To avoid forward function declarations, the default PHY link state
-> change method should be moved upwards. There is no functional change
-> associated with this patch, it is only to reduce the noise from a real
-> bug fix.
-> 
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> +struct switch_enet_private *mtip_netdev_get_priv(const struct net_device *ndev)
+> +{
+> +	if (ndev->netdev_ops == &mtip_netdev_ops)
+> +		return netdev_priv(ndev);
+> +
+> +	return NULL;
+> +}
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> +static bool mtip_port_dev_check(const struct net_device *ndev)
+> +{
+> +	if (!mtip_netdev_get_priv(ndev))
+> +		return false;
+> +
+> +	return true;
+> +}
 
-Thanks!
+This appears to be the only use of mtip_netdev_get_priv(). It does not
+care what priv actually is. In my previous review i said i think you
+can simply this. I still think that is true.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+    Andrew
 
