@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-178921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE467A79916
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 01:41:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A035A79911
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 01:40:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7B603B370F
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 23:40:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05BDD17291C
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 23:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA681F8BDF;
-	Wed,  2 Apr 2025 23:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1BE31F9F51;
+	Wed,  2 Apr 2025 23:40:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bGoVU0Fs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kjqa7y2t"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2133D1F8BCC;
-	Wed,  2 Apr 2025 23:40:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 797561F8670;
+	Wed,  2 Apr 2025 23:40:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743637201; cv=none; b=gDTd2vbxCOxyZ9VK3Onq6MpxuXENoHSLCENnmA7pFwXYv6+lVi9CTQS5QhmQs3LkyVPLEMCEpmron3J38/dbl+Zej2lYH2DNHPifn9uSY/TyVMUsKP5ldWOwqRV+09FbAn6yQ60hAoJirG6DKRfk5JQtWYBG5m5yaldnar0UTAs=
+	t=1743637202; cv=none; b=ditfgVPw9l5RT4+b0BOCbTa1fMyQxZ6uz4gE4E3BqECk9EkOaspwuHoH+Uyum3JWiSfoUZzPINnRA4Q9f2YHTTzYmYrYCGVCR3QK5CfHNaDC4Pp7FXfGButwFmKCU1gZHSlRV4Kb9kWsFSPRJI3/y/EX0+41A7DsLtrsMQ9t2z0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743637201; c=relaxed/simple;
-	bh=zm4Rc4GCeKZtCxD8lh7jO+Cixg48kBq8dl95C4HpKZ4=;
+	s=arc-20240116; t=1743637202; c=relaxed/simple;
+	bh=eZXamGcUFJf3JGdwncfEXWIL6WpV0YiWQeC2ZjusWE0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=U7su7pw+NHbDDEijtM16rCUvSpYNUvcuJC17j+Hvi7tiMO5nVX9RheOS3QZ85WG8mDaAMhLJn0s4eXc4V9EuHMUlGk8ZeI179Lb689NLkXwY+K2+avygGlGXYl+0TV4O5AkzZvJZIbOPzw2mx6aXYlrHKRprm36E2mZxUJmPX3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bGoVU0Fs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 966BAC4CEE7;
-	Wed,  2 Apr 2025 23:40:00 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=IW5y6wKhfuebkQ4ninITVvLfPDnup1BJL49B7rKN2sQCr0yaFF9Trc44cPePEzUd4n5/MBPQ66fw0AKMYy/gYyz0KESC/PCMBp3aqgBjat5Et5aTJCCB4zkICeuv5dovGRStaCKx0scduByUFcbs7IgMzPI8Qtgi+JdmopE+bpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kjqa7y2t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3C05C4CEE7;
+	Wed,  2 Apr 2025 23:40:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743637200;
-	bh=zm4Rc4GCeKZtCxD8lh7jO+Cixg48kBq8dl95C4HpKZ4=;
+	s=k20201202; t=1743637202;
+	bh=eZXamGcUFJf3JGdwncfEXWIL6WpV0YiWQeC2ZjusWE0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bGoVU0FsSU6GDWCo3pnbqXK3+BFJmOOHV3EqsemhTdl9X+/LYRzg+tMrdKTSEzyBQ
-	 Az15YlPEdBu55OxBulcqrfJDbQLYQgMASyEN569S5T0GC0usjvLFAsHRIMVR3hr5h5
-	 6jirO612BJ4IUHlzxSBUBs7g2FQNP9HBdw6UstIcOJp2qMm3dJvMfflIYcZT8HjH/N
-	 ZGLrwOspbPX6/IDw2kWQNvEaaAy/zgbUBBxb9wna2PPjcKm/KcJUH/zR2AwAqAKVo0
-	 n+Y6QH5Ek/FFAOADhXD7FWctsxtpK+spHahl7WrrnZNJd7JxuHmNHf2dxFWmvi2kvR
-	 mAHd/i+yxx7Cg==
+	b=kjqa7y2tpyv/zYp5Y7Q88FZgSsgr3TKgHJpi+hgfontj2x9rkchFqiatbtnhCnXNg
+	 fhRAbBNxx3MC4TRH10VM2F29JGD2kRmkg0Cl/9LgTDsgG6u7qvHeCfil5hxdOXEIul
+	 Btayg8Mhx/vqGhfgD/LBP1NL6XFcHqV6GkWMzFSewtlvuM+PBcwBK+CZJm1lItuWqN
+	 7b8InAWs2JxTS88HYB5uBrnPh9YX16b2GATwk7VRfWcgeQ5Frg4jW48d1ULERvcsuH
+	 /iIo2C2OReU6lsgiG16ECXzbhyDr+E8VQW3h4sFzS4tYdMvEAALVzKyQrFpSJcDi6E
+	 /VMbnRvpNC2jA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE5FB380CEE3;
-	Wed,  2 Apr 2025 23:40:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EC00B380CEE3;
+	Wed,  2 Apr 2025 23:40:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] selftests: tc-testing: fix nat regex matching
+Subject: Re: [PATCH] eth: mlx4: select PAGE_POOL
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174363723725.1716091.11846384965576414092.git-patchwork-notify@kernel.org>
-Date: Wed, 02 Apr 2025 23:40:37 +0000
-References: <20250401144908.568140-1-pctammela@mojatatu.com>
-In-Reply-To: <20250401144908.568140-1-pctammela@mojatatu.com>
-To: Pedro Tammela <pctammela@mojatatu.com>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, shuah@kernel.org, linux-kselftest@vger.kernel.org,
- horms@kernel.org
+ <174363723874.1716091.9449335720888818915.git-patchwork-notify@kernel.org>
+Date: Wed, 02 Apr 2025 23:40:38 +0000
+References: <20250401015315.2306092-1-gthelen@google.com>
+In-Reply-To: <20250401015315.2306092-1-gthelen@google.com>
+To: Greg Thelen <gthelen@google.com>
+Cc: kuba@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  1 Apr 2025 11:49:08 -0300 you wrote:
-> In iproute 6.14, the nat ip mask logic was fixed to remove an undefined
-> behaviour[1]. So now instead of reporting '0.0.0.0/32' on x86 and potentially
-> '0.0.0.0/0' in other platforms, it reports '0.0.0.0/0' in all platforms.
+On Mon, 31 Mar 2025 18:53:15 -0700 you wrote:
+> With commit 8533b14b3d65 ("eth: mlx4: create a page pool for Rx") mlx4
+> started using functions guarded by PAGE_POOL. This change introduced
+> build errors when CONFIG_MLX4_EN is set but CONFIG_PAGE_POOL is not:
 > 
-> [1] https://lore.kernel.org/netdev/20250306112520.188728-1-torben.nielsen@prevas.dk/
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+>   ld: vmlinux.o: in function `mlx4_en_alloc_frags':
+>   en_rx.c:(.text+0xa5eaf9): undefined reference to `page_pool_alloc_pages'
+>   ld: vmlinux.o: in function `mlx4_en_create_rx_ring':
+>   (.text+0xa5ee91): undefined reference to `page_pool_create'
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] selftests: tc-testing: fix nat regex matching
-    https://git.kernel.org/netdev/net/c/ca9e5d3d9a4d
+  - eth: mlx4: select PAGE_POOL
+    https://git.kernel.org/netdev/net/c/d3210dabda8d
 
 You are awesome, thank you!
 -- 
