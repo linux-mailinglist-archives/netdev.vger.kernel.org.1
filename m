@@ -1,235 +1,195 @@
-Return-Path: <netdev+bounces-178850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50289A79344
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 18:35:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0CD8A79352
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 18:37:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55AD13B7562
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 16:32:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DFFC1886DF0
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 16:37:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15796192D6B;
-	Wed,  2 Apr 2025 16:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3F3C139D0A;
+	Wed,  2 Apr 2025 16:37:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EKNP9K5O"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="GN0WJ0Zj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F669192B75;
-	Wed,  2 Apr 2025 16:29:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E311D38DE1
+	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 16:37:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743611367; cv=none; b=ilxYQ9x+EIoOII1tpQrGIwHtwc5n4q9TmslWmQnZO2uwN1KzO+7+SzY5XoPhW4Cn6p5Tkn2MdbA8TkWVS20PqyhdPUeGYieHeXOZ83hvsuqiPQX50OrEd+5f3FZ5uGbpLFeknj8Bl/UOZDbf6wz3bs1nzrWkKZZ9CgNBP2DA7LU=
+	t=1743611843; cv=none; b=UOqi7/IsNsKscqIFPR4vHvCuKGjr6LwOosf/WpqsJ0Nq/GZ0k/quIz2yggmDZARiHB5v5Nz7x9KrecRazPt9tvGOKRd2oKsPcXgVhzxlVHpsfn/3jWPFjW2DsREF26+VWKBPQ4PiEu6Wtm3KT8/C5UHq/jH/TiHC4Qn7EDr8S5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743611367; c=relaxed/simple;
-	bh=hpNglcGCD/ImR4MbnHVfaGtof3Zs/Gn5mxoDcxHVy5M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DMTLhK2IkGubVE2Cw5iB9YB1a1nZrTfnHXEpIptXds39VsK7YwreRNLqXf7TwzdhfbQBxSHuOPs2c2GIginwaH2SjWK01E1dwgd++Isd5CtWSUhGXdok5iQVucM3kxEfGiAIri1GlftO/pJRZgFNL41u941WBp8OqlmKzvUmD5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EKNP9K5O; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7c546334bdeso513844785a.2;
-        Wed, 02 Apr 2025 09:29:25 -0700 (PDT)
+	s=arc-20240116; t=1743611843; c=relaxed/simple;
+	bh=mVGXjs7EjzbGMXbUjCDpLyUQ28by9M213f9XFKq/VZA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BenZhcs/d9cy88XUCK4C5f6OZjlgDeSJTBFc215xh7isAa5pT47eJU+ikh82VnXyiw1CrNA4SOtvZHss0uqM1wBaOBNjRlc5Hk8qkaiDLHXZCzviFgYuPmLl8WtC7l6NrOH6Z9PKqcGq1CjffVV3FTArq0O5LhQaPYQA9vFYgWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=GN0WJ0Zj; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5e8be1c6ff8so28171a12.1
+        for <netdev@vger.kernel.org>; Wed, 02 Apr 2025 09:37:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743611364; x=1744216164; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FNud7VaCUDeA+FyZPSt2bHJdSWzIBv4EDqJHrTjrcSI=;
-        b=EKNP9K5O2o3ZWV1AtLjwedC37+zomjYHxZqt/6WfqY7fLtfHyZ0RPqMO5zVBUGFOal
-         JZBegA5LDj5SLnzbCa42TU7igPjUbalYoVNQAYQbdrdGouussVRaFBi7TPr9DGWCBayi
-         i9fQoJwKb4cJh++P5lOOdP6p2og1LHs0ro4KMRfKNxtEtiSkGRcpbuw+4xN4geX/0Sza
-         WUO3B95LvvOEK34bhHP1zKJ+WmKSCjkNP8gAUNQ0+hLICTLExIgLRpnCQYj91ooelrpm
-         vBoxg3WEEM/6g/y13IiydpQcyMOPJJyGI/FhpzmiL09FfI6pGD7ylgaqSLFMNz/zZxvb
-         wv1g==
+        d=broadcom.com; s=google; t=1743611840; x=1744216640; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=mVGXjs7EjzbGMXbUjCDpLyUQ28by9M213f9XFKq/VZA=;
+        b=GN0WJ0ZjcpL8QrYNkXTi1CbhILv1Snew3wQLFB9c5lB13RrUfp6QGebceNZIPHbuSl
+         AgkLDeUSGtp4FlVrr/X0VB5OFBt9xn7NDsOcueRTp2qcWlUUW7TJhTqAXe7+rZgWm4Oj
+         riKfFI7/FaLLPG+mGlRKhCiqtEn3U8xv45wno=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743611364; x=1744216164;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FNud7VaCUDeA+FyZPSt2bHJdSWzIBv4EDqJHrTjrcSI=;
-        b=kD+VSykTy1piL9jmLa38D2DPe/EAl2lMwPUyO5JhskZ6jXBwmq8GUdHEEO7cbwHs0y
-         yjwbeRzyke31q8XLgyUlQVm/N7btlUGlpIt+0qu0RS0wOnO0NWUq4FzqkVsAk84EpQDY
-         ri/fJqZeqnJ6QYV74bFad3XghQGMtfME+Ewa4Riw2/UgHzx4SUKhszfwuoAAWBrEv5JD
-         tXb+1dkXdocyFrfy1BgGx05YYB5S+zbMkPzN9uMyjZVfDKEIjSlZ34cEyVWr0ipFsy+2
-         nOFNX75lAtghdZZAyvto6HLDySPHF8TQqWb/xutVburXiydCKwGjasnisLdGCCuVPk3a
-         XSkA==
-X-Forwarded-Encrypted: i=1; AJvYcCV9aXEUyv7GLYPuoc+Aa4sP9jF0q/OUnf23Knk+o5pmV0ot1PH+paAIgwYlHykHTpDTIWkmH1yvt27EQs4=@vger.kernel.org, AJvYcCVjy6VaHiWWN1pnIGSxY0ECR0JawoBfdP2xcm/ESFw0AvEig+qZErVIvQDvx7NybzqvfHBR/ePOuUhzhAdBuXc=@vger.kernel.org, AJvYcCWMyPc40PGAtT/FmZCkv4RaY4dwNrdi3b0j/Fmr3wpzFbXihI8GYJWuqIk103lzSNW9G/0ViTp3@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzk+XMBIgeDjEReFYHwjpIXfFnWFm2aVT63SAMikI3EHAPcz6lQ
-	9XEXyNDt+n2DMAjgConlU3zh+jVWb44E7iJ/ptxZxi2ymW9AM3vk
-X-Gm-Gg: ASbGnctud2EjVlZ4tN/0IBJrM5Tx8pGgTYYXdCFDGRt5Pp9/0jx+sIDgA9GoNMcVzyB
-	ggTSMKMDcVFwNI9/YxU0Mmrgs2lWbZI8v1C64INECsRyLcbEaboSYGijePdvydgU/8551Ya4dET
-	N0s5T0f/K9mNWzRfVfY3XOJbWewc72N6//RZJgTAfmTjNfJC1onuddvCCJObjRBQUKbgq6LRGdj
-	xyzdZtuULN/idJK9WGaKzzu+3bjS9u3OegLOyt8kzQWT30P0CD/5ZhH3yqj8gZxPyMiX9NE3rE/
-	NjE2g2R7W3Aiyn88XoyaIdvmrDI+58u/LnYsWx/HFSZSCh54vOrg4bPvXoDor3HxUjlbtqMG7Fo
-	Q+CwEuU1vjNNXbweuzItgmTVKQgy36ZPMB4M=
-X-Google-Smtp-Source: AGHT+IEp0HORSr1/7mlmiTWemxCFPiCAqmQppHiDsaiqEfJoplVhG4xWytAzoUDxpOw1aGDKv6oBhg==
-X-Received: by 2002:a05:620a:c51:b0:7c5:b90a:54a6 with SMTP id af79cd13be357-7c6865ecef4mr2469143785a.13.1743611364038;
-        Wed, 02 Apr 2025 09:29:24 -0700 (PDT)
-Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c5f7682e57sm805481085a.39.2025.04.02.09.29.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Apr 2025 09:29:23 -0700 (PDT)
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailfauth.phl.internal (Postfix) with ESMTP id AA1F41200043;
-	Wed,  2 Apr 2025 12:29:22 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-11.internal (MEProxy); Wed, 02 Apr 2025 12:29:22 -0400
-X-ME-Sender: <xms:4mXtZ8woKWkRmc6VaQ-rIcgyTGESwQvikWY8xkJYUxOR4tmoFHdDZg>
-    <xme:4mXtZwTDM43jX0f8oRqX0xR8iAFLgOgLpE0XaWm7m-XV6ArMWhyuYHKVf5D_DYxvZ
-    9Am9SzkPOFdQnQbKQ>
-X-ME-Received: <xmr:4mXtZ-X4T9elYX3BYdy0dkbtAx6frPy3TW91RgUMNG6dZINpxoZ-ed1Cobk>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddukeeiudegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
-    vdenucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrih
-    hlrdgtohhmqeenucggtffrrghtthgvrhhnpedvgeeifeehtddtffehffffvdfgjedtieek
-    heefgedtteeluddvheefjefgffejteenucffohhmrghinheprhhushhtqdhfohhrqdhlih
-    hnuhigrdgtohhmpdhgihhthhhusgdrtghomhdpudeirdihohhunecuvehluhhsthgvrhfu
-    ihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsghoqhhunhdomhgvshhmthhprg
-    huthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieegqddujeejkeehheehvddqsgho
-    qhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihmvgdrnhgrmhgvpdhnsggprh
-    gtphhtthhopeefgedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepfhhujhhithgr
-    rdhtohhmohhnohhrihesghhmrghilhdrtghomhdprhgtphhtthhopegrrdhhihhnuggsoh
-    hrgheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepthhglhigsehlihhnuhhtrhhonhhi
-    gidruggvpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvg
-    hlrdhorhhgpdhrtghpthhtoheprhhushhtqdhfohhrqdhlihhnuhigsehvghgvrhdrkhgv
-    rhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrd
-    horhhgpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhk
-    rghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepthhmghhrohhsshesuh
-    hmihgthhdrvgguuh
-X-ME-Proxy: <xmx:4mXtZ6gjqtRfsx2orknyTbTJ0tqj1-ho7s1qgQvsr4Kdf26SgtDtdQ>
-    <xmx:4mXtZ-DinTPeuo_LSa-tRxhcFC-wuMEc-z35r74kGpFsITa8OKc6gg>
-    <xmx:4mXtZ7J1dbuACXpbSA72vqOv_A39r_I_YOhLDRkBIt9OVQJXK0PAhw>
-    <xmx:4mXtZ1CadqeRsHajfSSAt9OrlDIUWmeb81E5EwE0NDH6XaE5OPa26A>
-    <xmx:4mXtZ-xglIbgDySJhM9CoXucF1DHhWWVtaS8LMrLnjXd_wMNcantbHkG>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 2 Apr 2025 12:29:22 -0400 (EDT)
-Date: Wed, 2 Apr 2025 09:29:18 -0700
-From: Boqun Feng <boqun.feng@gmail.com>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: a.hindborg@kernel.org, tglx@linutronix.de, linux-kernel@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org,
-	andrew@lunn.ch, hkallweit1@gmail.com, tmgross@umich.edu,
-	ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net,
-	bjorn3_gh@protonmail.com, benno.lossin@proton.me,
-	a.hindborg@samsung.com, aliceryhl@google.com,
-	anna-maria@linutronix.de, frederic@kernel.org, arnd@arndb.de,
-	jstultz@google.com, sboyd@kernel.org, mingo@redhat.com,
-	peterz@infradead.org, juri.lelli@redhat.com,
-	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
-	vschneid@redhat.com, tgunders@redhat.com, me@kloenk.dev,
-	david.laight.linux@gmail.com
-Subject: Re: [PATCH v11 6/8] MAINTAINERS: rust: Add new sections for
- DELAY/SLEEP and TIMEKEEPING API
-Message-ID: <Z-1l3mgsOi4y4N_c@boqun-archlinux>
-References: <Z96zstZIiPsP4mSF@Mac.home>
- <871puoelnj.fsf@kernel.org>
- <Z-qgo5gl6Qly-Wur@Mac.home>
- <20250402.231627.270393242231849699.fujita.tomonori@gmail.com>
+        d=1e100.net; s=20230601; t=1743611840; x=1744216640;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mVGXjs7EjzbGMXbUjCDpLyUQ28by9M213f9XFKq/VZA=;
+        b=TuhHBEVQzKNX0VRLPfUxOoG1IKZqDWPCxUhI4YETIHNf/mNo0m0sO+IefUboaNr6uB
+         YVNKwkFxkGvPIsC3Pjm8TeDGqR+7FOYe58jTmCLNuCVIXu2j4rHn2PKD68KLXoUEIEL4
+         JSQetPxCpWKce4PCZatMdwmePMz+DQjd+XJNv53VLNvFfYzKGJRB/JfKLvqt31tImqEg
+         gDdZrICSJj2NLTMCrMmT83xeVKobSfK6q1+RwRU1xitoqHyI+ifNjuO9NtWNxaV2IDba
+         c4R+DuvQCNVRaX7e7kqbjFRr2fvKQX8mneeSClLeIZwW1kDLEFK5B59/Seze9WPhKr0a
+         qA1g==
+X-Forwarded-Encrypted: i=1; AJvYcCV6YlLco2ymX3dt7yH4pkOsOwFBfF2QId2o+5PgPKpZufd7SXQAw6c1X//HShQrXSz4wXczMzo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+FlI1ZXEpdWaKWwN46L/AAmyr8ZHvdOc6KQb4Q11OHj6ZH226
+	3LByETT6CXCgPY6KmhgMtCjtO1iixvHebrcun6m6rSI/+dQP662GwW9S9QKN1YqnyM6wit9HIQB
+	Ru58l4AtLAeV5wQSJLy6y70+VeRJsRgxsDa80j6GHrcHJIRc=
+X-Gm-Gg: ASbGncuhOw4Oyr6Yz8hLt8IqzNFPVARJ0qyHb5YWlvpU7SX5ZnU+i6QQa3hTVNsbLao
+	lvsWZ5QXxc0+bPyq2F5xKi9XxivI5t5VIqSbvHpIlGYQHgUVDkEdYFq9mqTMp2/XIdBKNpgjAmV
+	8m0uco2WPspFCmC4u+tNSele0mk/o=
+X-Google-Smtp-Source: AGHT+IHCEuj6Zsd+vJNnX5Tu9jkeVHT+w2hCjqENcAc35AIEVCUNXAREHgJCq/YWsWpuXZcJmg/y+NJ6hvxv/JGopIM=
+X-Received: by 2002:a05:6402:c44:b0:5ec:cdb6:f29c with SMTP id
+ 4fb4d7f45d1cf-5edfd9f72c3mr16272547a12.25.1743611434056; Wed, 02 Apr 2025
+ 09:30:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250402.231627.270393242231849699.fujita.tomonori@gmail.com>
+References: <20250402133123.840173-1-ap420073@gmail.com>
+In-Reply-To: <20250402133123.840173-1-ap420073@gmail.com>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Wed, 2 Apr 2025 09:30:14 -0700
+X-Gm-Features: AQ5f1JqbM1zjxxS1br7-xBmFATKNFvDatsebuoTiYh1xb4O_-NWZorjZ11DkWT0
+Message-ID: <CACKFLi=9ys55FqofX7oFtSOtYwrZbm5Cmkpts6mAGie_0ajAHg@mail.gmail.com>
+Subject: Re: [PATCH net] eth: bnxt: fix deadlock in the mgmt_ops
+To: Taehee Yoo <ap420073@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	pavan.chebbi@broadcom.com, netdev@vger.kernel.org, romieu@fr.zoreil.com, 
+	kuniyu@amazon.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000060aba50631ce4436"
 
-On Wed, Apr 02, 2025 at 11:16:27PM +0900, FUJITA Tomonori wrote:
-> On Mon, 31 Mar 2025 07:03:15 -0700
-> Boqun Feng <boqun.feng@gmail.com> wrote:
-> 
-> >> My recommendation would be to take all of `rust/kernel/time` under one
-> >> entry for now. I suggest the following, folding in the hrtimer entry as
-> >> well:
-> >> 
-> >> DELAY, SLEEP, TIMEKEEPING, TIMERS [RUST]
-> >> M:	Andreas Hindborg <a.hindborg@kernel.org>
-> > 
-> > Given you're the one who would handle the patches, I think this make
-> > more sense.
-> > 
-> >> R:	Boqun Feng <boqun.feng@gmail.com>
-> >> R:	FUJITA Tomonori <fujita.tomonori@gmail.com>
-> > 
-> > Tomo, does this look good to you?
-> 
-> Fine by me.
-> 
-> So a single entry for all the Rust time stuff, which isn't aligned
-> with C's MAINTAINERS entries. It's just for now?
-> 
+--00000000000060aba50631ce4436
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Given Andreas is the one who's going to handle the PRs, and he will put
-all the things in one branch. I think it's fine even for long term, and
-we got all relevant reviewers covered. If the Rust timekeeping + hrtimer
-community expands in the future, we can also add more entries. We don't
-necessarily need to copy all maintainer structures from C ;-)
+On Wed, Apr 2, 2025 at 6:31=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wrot=
+e:
+>
+> When queue is being reset, callbacks of mgmt_ops are called by
+> netdev_nl_bind_rx_doit().
+> The netdev_nl_bind_rx_doit() first acquires netdev_lock() and then calls
+> callbacks.
+> So, mgmt_ops callbacks should not acquire netdev_lock() internaly.
+>
+> The bnxt_queue_{start | stop}() calls napi_{enable | disable}() but they
+> internally acquire netdev_lock().
+> So, deadlock occurs.
+>
+> To avoid deadlock, napi_{enable | disable}_locked() should be used
+> instead.
+>
+> Fixes: 413f0271f396 ("net: protect NAPI enablement with netdev_lock()")
+> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 
-> 
-> >> R:	Lyude Paul <lyude@redhat.com>
-> >> R:	Frederic Weisbecker <frederic@kernel.org>
-> >> R:	Thomas Gleixner <tglx@linutronix.de>
-> >> R:	Anna-Maria Behnsen <anna-maria@linutronix.de>
-> >> R:	John Stultz <jstultz@google.com>
-> > 
-> > We should add:
-> > 
-> > R:      Stephen Boyd <sboyd@kernel.org>
-> > 
-> > If Stephen is not against it.
-> > 
-> >> L:	rust-for-linux@vger.kernel.org
-> >> S:	Supported
-> >> W:	https://rust-for-linux.com
-> >> B:	https://github.com/Rust-for-Linux/linux/issues
-> >> T:	git https://github.com/Rust-for-Linux/linux.git rust-timekeeping-next
-> >> F:	rust/kernel/time.rs
-> >> F:	rust/kernel/time/
-> >> 
-> >> If that is acceptable to everyone, it is very likely that I can pick 2-6
-> >> for v6.16.
-> >> 
-> > 
-> > You will need to fix something because patch 2-6 removes `Ktime` ;-)
-> 
-> I'll take care of it in the next version.
-> 
+Thanks.
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 
-Thanks!
+--00000000000060aba50631ce4436
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-> >> I assume patch 1 will go through the sched/core tree, and then Miguel
-> >> can pick 7.
-> >> 
-> > 
-> > Patch 1 & 7 probably should go together, but we can decide it later.
-> 
-> Since nothing has moved forward for quite a while, maybe it's time to
-> drop patch 1.
-
-No, I think we should keep it. Because otherwise we will use a macro
-version of read_poll_timeout(), which is strictly worse. I'm happy to
-collect patch #1 and the cpu_relax() patch of patch #7, and send an PR
-to tip. Could you split them a bit:
-
-* Move the Rust might_sleep() in patch #7 to patch #1 and put it at
-  kernel::task, also if we EXPORT_SYMBOL(__might_sleep_precision), we
-  don't need the rust_helper for it.
-
-* Have a separate containing the cpu_relax() bit.
-
-* Also you may want to put #[inline] at cpu_relax() and might_resched().
-
-and we can start from there. Sounds good?
-
-Regards,
-Boqun
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJgMIIC
+XAIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggccwLwYJKoZIhvcNAQkEMSIEIL2zviF8QPcQjByqFX7QdZYlvvSmb0z5
+z9KlpA7341SVMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDQw
+MjE2MzcyMFowXAYJKoZIhvcNAQkPMU8wTTALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQcwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEB
+AQUABIIBAIWwfrGZ1SuCzu6eN0gmmwuGCGxNb6xfGlttydo8GTgaEkYoSc8r3TF/W6VU9e/bfr0s
+dKnax9AgrKsRF9IlOe6MdVK7L0+3bpoQv+GLbYZa8710RiekPnRwK74bis9jg4hkWHKRU5hvdvhD
+USBlFIK7uO21jEoF64pAZvZGHERj4gC7mdLK1S5KP7DVLpScOfoz1TAdX9XqPhAPdcVN2db/nLho
+V91FVhVZ17AjWMmVO3lP0pMMErdUfWFfKKFcae1WHA40c8TwKP2re2+kMyJIdALTjFv4+jbYwxJW
+8/+br93lTtuye3Y+x79VQT3Lk+dAacwzlzXBbqMV/yeoonA=
+--00000000000060aba50631ce4436--
 
