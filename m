@@ -1,157 +1,115 @@
-Return-Path: <netdev+bounces-178727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F20EA787A1
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 07:43:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43CA5A7884D
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 08:47:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B86A7A2B25
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 05:42:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16E643AABB6
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 06:47:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23AEB230BE3;
-	Wed,  2 Apr 2025 05:43:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CF22231CB0;
+	Wed,  2 Apr 2025 06:47:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m5TNYqzv"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="QXUCBHUN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E7302E3360;
-	Wed,  2 Apr 2025 05:43:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1984119049B;
+	Wed,  2 Apr 2025 06:47:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743572619; cv=none; b=tHKTWN9TebDnn3fkcLldIld0+bw3vhHtOn3OqjdnGe1mCMt/tfjKxLIMI/O/dPKReamlKoJl56aqH9lzqZCHZzTVcPeRijmzWliNUKukMf+9N/xrLTfwEpITCamqDoTfbLJaqE8oZ8yfF8QOMi5HVarXaFMnia2o0Z/5YvgnehA=
+	t=1743576447; cv=none; b=NUAXND6KBzuG1MijcHByVdWkkORjn6zCRKKcxpSdMFtEQX2nlqvDZGyF9XVLacQRbrW+dVqRqS0o812Y3Sn4WcBKlWlyM9MNWyrHojtWP8w8E1UXL8HKFbTEELhYpmZ5zlGIuVu20EfqDNhuI8JjdApmdoYxxoZOP+paeJeEEmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743572619; c=relaxed/simple;
-	bh=4YodOXIyddgrUGXCDpWh7pKVlP0DqqsIUu4EW1rqHZU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Njtdr4wO6l2X5cIMrR1kBjL544GlH2VfxUQQBjiuui88RaJmnrlPAVAsc0sn0SL6AtAOAdX64dYUPfKBHcljXC28cinuPT70ER05z01ELncn2LHB5fqkbKvWmZCaMygnjwaWh6DAnCHxeELLutcBFrpqAkbKFTJEfsgRdD+y/5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m5TNYqzv; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-301e05b90caso10842925a91.2;
-        Tue, 01 Apr 2025 22:43:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743572617; x=1744177417; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7oMFt6rTiybYoRdpooKvYV5UYutJybr7cfusGu3htIA=;
-        b=m5TNYqzv15bXRjG04zu1R2qoTvZYtpwYNcXckGw0dyM/Z4WngShcMCJQqAE9kdvh/G
-         7+4N9p1JMXKm70KdpvUuhu6WE8+qReIGsRS3RaPO1JF6cgCF/lG6uqo4Q3VfzFCglVIH
-         uWKdP69QgSrh6SK8N+8HGB+oeONjfWCAxdG1+EBho7LhJzK6UpX1mO7lGqkvvBnLkqmp
-         DwzJ8srdFT54P+y/IaXBXKDi5qDjYv+vPAJ0Um1vV2kKVG+rPMvO1e8HNukKEqXVj2JY
-         pbkn4fZT7rTAcL2AZESx/gNMtBfyU0U7Cvev+AJGbueHsasaRRKnnJAkZCMYXwUXndI2
-         cdIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743572617; x=1744177417;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7oMFt6rTiybYoRdpooKvYV5UYutJybr7cfusGu3htIA=;
-        b=GBn0RZbtb9YoXmPOfJfGGQqX7YsXb2ERUYgJo7DhB8RLEM7p1Bzz/KUiOrWSPxaIc4
-         3lFRHbotz6wSByjhlsTEg3X/8wejEElSygyQAfNsUEs/7KFJrZzXe8REujHEq4+Pex5R
-         5ix7qDnQCboX0+DAwxHIqzMvGthLoGTqAWT6FKqIpUM0f8yTQZGoEZXgrbUw1G7U8TPT
-         PKf0a3DmyCM2OAgXSurJZ+zn27tYlW6e7n8B34DtOdeSGcXWiy/C2W23NhYSXsgebIl2
-         t5UQgbntFJqmLe1pAduW23DZB5R2XNe1ZYLSf2knGSGFUMIVyxR7iK6Tbz/5tkcztpUA
-         mfww==
-X-Forwarded-Encrypted: i=1; AJvYcCUcTEdXZJs7aRvfDEceIazcDU5duSe1oWZH0OZc4HdyrmSSaumNGWh8LrWLMX/9DHuRIsCLswme@vger.kernel.org, AJvYcCVSJDyxtnKLIQZww9YB+zsPoKs1bzibfsIiXXGMIk2iBBOMHaay/+nVhiHIgKAH1IBGHpHYIT9TinoUANT3@vger.kernel.org, AJvYcCWKRtrDEE6A2RUJPM+OB3llapuFT2GfKLb6K8ZoFbId+ZO3gTuQ0YGGH4pqmp12VNLZ8w4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSTt+jrj5K0hUAZWI5bcxGrbT1iUvMRffJSSO1uXzBGKdG4fPz
-	9QpxyXHJrOm4Hqu165gOy4Rse/KJQ21iIq6aPF3Hf2cIPU07tu/a
-X-Gm-Gg: ASbGncul4SMwqY2BSF+CBfJp491qzk9J24GAeWyb2BiW8hKuGIDALhGkEngne8ErqNp
-	ov064JbMbA7J7i5Oe4i2kJqP/2yr0tnBCPSNxCNs2h6BHL0PV/OfXOlnSWcTolGs5d/zEHbd7BN
-	hEBLSUFsOZ4+Lh/7DKhssTe/SW9MW9h7YQaVEs1hObiugXWCuqu5+nAnQCUcZrHJljeEMkphlrQ
-	hic2PZS0EZFqAtcZHg++YOlqg4jzy3dchqcgX2bvtcAwHJf82XeaW8qDWFr62hIthQ6SXTcuGXO
-	oRovcVCsUTpH0LREctnINn3/nUwpc/XoDJ+s+5zxh31ReYa7ONJlBKTsVZ4Z
-X-Google-Smtp-Source: AGHT+IEic+6AY+ZdBrLSKJCMvjDVGOhMYUP1QxYWYvLdMiiVD00LmEfJ4lEnY8i5M2nghj2SBWMTbA==
-X-Received: by 2002:a17:90b:5210:b0:2ee:9d49:3ae6 with SMTP id 98e67ed59e1d1-30531f93127mr25734500a91.10.1743572616792;
-        Tue, 01 Apr 2025 22:43:36 -0700 (PDT)
-Received: from minh.192.168.1.1 ([2001:ee0:4f4e:bd30:194b:b252:cf33:1fe5])
-        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-3056f83c93asm720529a91.14.2025.04.01.22.43.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Apr 2025 22:43:36 -0700 (PDT)
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-To: virtualization@lists.linux.dev
-Cc: "Michael S . Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Bui Quang Minh <minhquangbui99@gmail.com>
-Subject: [PATCH] virtio-net: disable delayed refill when setting up xdp
-Date: Wed,  2 Apr 2025 12:42:10 +0700
-Message-ID: <20250402054210.67623-1-minhquangbui99@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1743576447; c=relaxed/simple;
+	bh=n2QGawQ++618BOMU9y2B5+lGS8jDmBhY05os0N8/WkI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WlPX2FlqIGaUQetQsy1wjkcFoJOQU5iHup/2t+9rHrtnGgBONsfM343ooaHwT6bh5LTm/mACp5oFdO1boZrVrt/OzE9pw6tSeIgUAYpwX74aERzdGTbLVXn2RZ9GEz7o+yaPGN2qVJh8f0FZbqtmWDXBLLO/R6L1JuCB6ECvw2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=QXUCBHUN; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 15CDB4432F;
+	Wed,  2 Apr 2025 06:47:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1743576442;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=91QabIyHUeDDbVbgDDW38HeCEEGmj7YCmJ79O7+U7QQ=;
+	b=QXUCBHUNUfi1vLcXOftm6Wj0p9c/FfloQ6SezD61YmMYPA3m8FcDc9A7A5C1VBwS1/4VM6
+	el1ik/ux7jYuCcCMUNnyQXiJ1dpobRl4Q+mplDZUuUb5l/lFJ35wI3/xc6t13vfxS/XvcL
+	gaWvZboR58uI/7CTkylFBvl+TjfefxRTIVXb9/5JPwRkMlyJ6/018NQEPmlC8ejjDqoXJN
+	Y7+VOnTBpK6R9nPdbIMiAnMmWbYvpQeCaL87vxT7YXxGpu8MUaQmyEMlDjHPChxdcGyeAt
+	vKzDxmEZuGFSYrz4LMt2oOqqLl8wi0juYqNTrCXir501yVdHNqWTB4hlUPrajg==
+Date: Wed, 2 Apr 2025 08:47:15 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Alexander H Duyck <alexander.duyck@gmail.com>, davem@davemloft.net,
+ Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
+ <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ Simon Horman <horms@kernel.org>, Romain Gantois
+ <romain.gantois@bootlin.com>
+Subject: Re: [PATCH net-next v5 09/13] net: phylink: Use phy_caps_lookup for
+ fixed-link configuration
+Message-ID: <20250402084715.3090c6c2@fedora.home>
+In-Reply-To: <Z-wQ1Ml_9xNz0XtV@shell.armlinux.org.uk>
+References: <20250307173611.129125-1-maxime.chevallier@bootlin.com>
+	<20250307173611.129125-10-maxime.chevallier@bootlin.com>
+	<8d3a9c9bb76b1c6bc27d2bd01f4831b2cac83f7f.camel@gmail.com>
+	<20250328090621.2d0b3665@fedora-2.home>
+	<CAKgT0Ue_JzmJAPKBhe6XaMkDCy+YNNg5_5VvzOR6CCbqcaQg3Q@mail.gmail.com>
+	<20250331091449.155e14a4@fedora-2.home>
+	<3517cb7b3b10c29a6bf407f2e35fdebaf7a271e3.camel@gmail.com>
+	<Z-wQ1Ml_9xNz0XtV@shell.armlinux.org.uk>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddukeegleelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddtpdhrtghpthhtoheplhhinhhugiesrghrmhhlihhnuhigrdhorhhgrdhukhdprhgtphhtthhopegrlhgvgigrnhguvghrrdguuhihtghksehgmhgrihhlrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlo
+ hhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhm
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-When setting up XDP for a running interface, we call napi_disable() on
-the receive queue's napi. In delayed refill_work, it also calls
-napi_disable() on the receive queue's napi. This can leads to deadlock
-when napi_disable() is called on an already disabled napi. This commit
-fixes this by disabling future and cancelling all inflight delayed
-refill works before calling napi_disabled() in virtnet_xdp_set.
 
-Fixes: 4941d472bf95 ("virtio-net: do not reset during XDP set")
-Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
----
- drivers/net/virtio_net.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+> > Basically we still need the value to be screened by the pl->supported.
+> > The one change is that we have to run the extra screening on the
+> > intersect instead of skipping the screening, or doing it before we even
+> > start providing bits.
+> > 
+> > With this approach we will even allow people to use non twisted pair
+> > setups regardless of speed as long as they don't provide any twisted
+> > pair modes in the standard set.
+> > 
+> > I will try to get this tested today and if it works out I will submit
+> > it for net. I just need to test this and an SFP ksettings_set issue I
+> > found when we aren't using autoneg.  
+> 
+> This code used to be so simple... and that makes me wonder whether
+> Maxime's work is really the best approach. It seems that the old way
+> was better precisely because it was more simple.
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 7e4617216a4b..33406d59efe2 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -5956,6 +5956,15 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
- 	if (!prog && !old_prog)
- 		return 0;
- 
-+	/*
-+	 * Make sure refill_work does not run concurrently to
-+	 * avoid napi_disable race which leads to deadlock.
-+	 */
-+	if (netif_running(dev)) {
-+		disable_delayed_refill(vi);
-+		cancel_delayed_work_sync(&vi->refill);
-+	}
-+
- 	if (prog)
- 		bpf_prog_add(prog, vi->max_queue_pairs - 1);
- 
-@@ -6004,6 +6013,8 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
- 			virtnet_napi_tx_enable(&vi->sq[i]);
- 		}
- 	}
-+	if (netif_running(dev))
-+		enable_delayed_refill(vi);
- 
- 	return 0;
- 
-@@ -6019,6 +6030,7 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
- 			virtnet_napi_enable(&vi->rq[i]);
- 			virtnet_napi_tx_enable(&vi->sq[i]);
- 		}
-+		enable_delayed_refill(vi);
- 	}
- 	if (prog)
- 		bpf_prog_sub(prog, vi->max_queue_pairs - 1);
--- 
-2.43.0
+Sorry to hear you say that. Fixed-link was the main pain point with
+this work, I've stressed it out. I agree that for fixed-link, it
+ends-up not looking too good, hopefully the rest of the series
+compensate for that.
 
+Maxime
 
