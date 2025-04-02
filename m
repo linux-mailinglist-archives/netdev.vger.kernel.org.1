@@ -1,82 +1,94 @@
-Return-Path: <netdev+bounces-178777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99EC6A78DF2
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 14:12:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 725ABA78DF4
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 14:13:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FC5E3AFF38
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 12:12:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1268716A7F6
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 12:13:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9341238166;
-	Wed,  2 Apr 2025 12:12:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3537238D2B;
+	Wed,  2 Apr 2025 12:13:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q7Om3u2q"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAF0E23371D;
-	Wed,  2 Apr 2025 12:12:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB252356DF;
+	Wed,  2 Apr 2025 12:13:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743595947; cv=none; b=bkts13eEkXiA7VT4E4KsPGvOjUNSiLC20uawM4nTLq6uH0CyT9u5B+djnUXa8H+PiMzy7vpUW9FWUw4BVxclY3ITTB/gspWov4l5ZrCHK9g9+oZxkh/j9o+IbfNwM4zsBARHxJH/7AJrjj6pm9XxDvBq+BhVL6Li6rzeLOphBUg=
+	t=1743596023; cv=none; b=JiS+CNvDkZDrhIaU0jOjHCCyUymkPmjOdHqJ9gW0akGs+AROlQEkCLNi2nZUt6APXNhhdv7yVMKIMhn96XB2dVDhGZZTAeZRtKexizcAExtMtIuxhpASvs4Vgx7gabJDZlUdcH0ekc25ZlXD9xYC8BIyy3kFTBYc7yT1DYdHOeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743595947; c=relaxed/simple;
-	bh=93MsZgHZPuKgHFlXUFE5ODJyARsiBlTJ4w2tRPzDcsY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Z+zceAKZd4dHM4ZTI0Ns1wJpf9tpTxL/hDDSU1GDOA8O7KggwXaHrE0tgNTKrP2qkW5fIWG1U8wiUwwySKCL+REp7vupVQg7OeR8ACFU2yCtvxFpfHbKTgxeb5eki6VpGyDaQJZ1NRk45nmc3JV3SmgL66Mu6cyU2sjO/6JEB3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4ZSNxS5C5BztQfs;
-	Wed,  2 Apr 2025 20:10:52 +0800 (CST)
-Received: from kwepemg200016.china.huawei.com (unknown [7.202.181.67])
-	by mail.maildlp.com (Postfix) with ESMTPS id D71F518007F;
-	Wed,  2 Apr 2025 20:12:17 +0800 (CST)
-Received: from localhost.localdomain (10.175.124.27) by
- kwepemg200016.china.huawei.com (7.202.181.67) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 2 Apr 2025 20:12:17 +0800
-From: gaoxingwang <gaoxingwang1@huawei.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<davem@davemloft.net>, <kuznet@ms2.inr.ac.ru>, <yoshfuji@linux-ipv6.org>
-CC: <kuba@kernel.org>, <yanan@huawei.com>
-Subject: [Discuss]ipv6: send ns packet while dad
-Date: Wed, 2 Apr 2025 20:12:05 +0800
-Message-ID: <20250402121205.305919-1-gaoxingwang1@huawei.com>
-X-Mailer: git-send-email 2.27.0
+	s=arc-20240116; t=1743596023; c=relaxed/simple;
+	bh=O7oesmgNvnpeMIG+T0CoO9IemBq179dATBp4McwmeYY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KEihw0jJGM0RPGgG3zukZVDF2IetefjFU0tNUtFbaf2+ae1fwE+sVDnQJmssDO4lAeoGmlqaDEzm+fYTbcRx9fQEGffYiuhm/1GJ/ryCZoybq6bJfL25JfDLNFT9rqY3Io9WLNJwsKC43elCzomR+Hg9j8mIyiTnPcVq/RXPy6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q7Om3u2q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06D08C4CEDD;
+	Wed,  2 Apr 2025 12:13:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743596022;
+	bh=O7oesmgNvnpeMIG+T0CoO9IemBq179dATBp4McwmeYY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Q7Om3u2qOXHzmCKvzl9SNmhsvqIglkLX1PkahL07EHm7zSQpi6dW1zTwhYqk8ZHmM
+	 x6DNred9+HEQYWmXIYOHr57SFmRQtzrdjLXlJc2Y3ZF7XTyZzR9fQ8Qr0nVyjZSudi
+	 fIYtm0cRR3ac/1lGXMvT4+Dshb55UoAuLZCuQMD5IN6CoQhxVkZdoasZNNKrhhVVsB
+	 ZHIGSvVXXRDIeNPo9ID0pIV9QF7ileqKyQh6PgZR+QkfI2Fl0tDeLupw7WGa1hpfs4
+	 vYMgEh7qRm0ABFLDbep4yM9YdaC4sztiHoTMtcO+9omJ9MSyuODqGXQk54fyvoG0BV
+	 m8KO/ji5p/lVA==
+Message-ID: <a6f3b75c-2781-4d77-a5fb-ebf5d4a36c4a@kernel.org>
+Date: Wed, 2 Apr 2025 15:13:35 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemg200016.china.huawei.com (7.202.181.67)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3 1/3] net: ti: icssg-prueth: Fix kernel warning
+ while bringing down network interface
+To: Meghana Malladi <m-malladi@ti.com>, dan.carpenter@linaro.org,
+ pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+ davem@davemloft.net, andrew+netdev@lunn.ch
+Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ namcao@linutronix.de, javier.carrasco.cruz@gmail.com, diogo.ivo@siemens.com,
+ horms@kernel.org, jacob.e.keller@intel.com, john.fastabend@gmail.com,
+ hawk@kernel.org, daniel@iogearbox.net, ast@kernel.org, srk@ti.com,
+ Vignesh Raghavendra <vigneshr@ti.com>, danishanwar@ti.com
+References: <20250328102403.2626974-1-m-malladi@ti.com>
+ <20250328102403.2626974-2-m-malladi@ti.com>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20250328102403.2626974-2-m-malladi@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello, everyone:
 
-I have an RFC-related question when using ipv6.
 
-Configure an IPv6 address on network adapter A. The IP address is being used for DAD and is unavailable.
-In this case, the application sends an NS packet to resolve the tentative IP address. The target address
-in the multicast packet contains the tentative IP address, and the source address is set to the link-local address.
-Is this allowed to be sent? Does it contradict the following description in the RFC 4862?
-(https://datatracker.ietf.org/doc/html/rfc4862#section-5.4)
+On 28/03/2025 12:24, Meghana Malladi wrote:
+> During network interface initialization, the NIC driver needs to register
+> its Rx queue with the XDP, to ensure the incoming XDP buffer carries a
+> pointer reference to this info and is stored inside xdp_rxq_info.
+> 
+> While this struct isn't tied to XDP prog, if there are any changes in
+> Rx queue, the NIC driver needs to stop the Rx queue by unregistering
+> with XDP before purging and reallocating memory. Drop page_pool destroy
+> during Rx channel reset as this is already handled by XDP during
+> xdp_rxq_info_unreg (Rx queue unregister), failing to do will cause the
+> following warning:
+> 
+> warning logs: https://gist.github.com/MeghanaMalladiTI/eb627e5dc8de24e42d7d46572c13e576
+> 
+> Fixes: 46eeb90f03e0 ("net: ti: icssg-prueth: Use page_pool API for RX buffer allocation")
+> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
 
->Other packets addressed to the
->tentative address should be silently discarded.  Note that the "other
->packets" include Neighbor Solicitation and Advertisement messages
->that have the tentative (i.e., unicast) address as the IP destination
->address and contain the tentative address in the Target Address field.
+Reviewed-by: Roger Quadros <rogerq@kernel.org>
 
-Or is this description just for receiving packets?
-
-The actual problem I encountered was that when proxy ND was enabled
-on the switch, the reply ND packet would cause the dad to fail. 
-So I'm not sure if it's the NS sending problem.
-Thank you very much, if anyone can reply!
 
