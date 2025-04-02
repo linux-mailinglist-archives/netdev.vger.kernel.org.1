@@ -1,94 +1,92 @@
-Return-Path: <netdev+bounces-178750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9316CA78B1D
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 11:32:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A2E7A78B28
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 11:36:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7DD5189365A
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 09:32:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B70A03B0C98
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 09:36:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8700C23498F;
-	Wed,  2 Apr 2025 09:32:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F7DC233D92;
+	Wed,  2 Apr 2025 09:36:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gpLZVzwj"
 X-Original-To: netdev@vger.kernel.org
-Received: from ssh248.corpemail.net (ssh248.corpemail.net [210.51.61.248])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B47720DD4B;
-	Wed,  2 Apr 2025 09:32:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.51.61.248
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAB1A16BE17;
+	Wed,  2 Apr 2025 09:36:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743586363; cv=none; b=A3uPQbhZG7tNyVZIjhACS2CpEdFmdJCm8BoUNgzVFprQq4wFWkZYFfJHWSbj4Mn09jgAvLXLC+0igyfGRcHsROT1RCvecN6dZCizAMeQO/lq4v3Otk8G5vzFw2olsuSw7jyb5Y1TK4bSMV4JlIXxRRwFaUzr13FStONa8zWlfZg=
+	t=1743586574; cv=none; b=C+tAmSSxRwvQoM0F06M1au6td3C47peBW2NO2peAFrC9eqo+lHtwvXoQyDm4YAcRpATYFyaaR0aPyM1czfknPjeO2FRM8w0h/a70DUiBbHwfWmJdndSsP27Zx2FttYV//OJQg4YSGQVJh8JdnwqVCE8lZ1gJM7QblEbRdlmRsUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743586363; c=relaxed/simple;
-	bh=2PAdBlm2iE+helgRQkij09k015rNc1HojNJjuskui2U=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XW3TZZdS97OGJK8j5KJo6yvQMoKd9tFit/c67wBAMnK3M3HcAoFEdaenafjXyEKIvZ0eyumPkCFu7IoA3ZdgyNZxDpXr02KcbWDfiwX9DMikKSevae+6P5Ie/Gx3P2ZK1CxoOjiVmQJMnqDkhEbdGJXuiM8vKfi3fI8RttryIdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com; spf=pass smtp.mailfrom=inspur.com; arc=none smtp.client-ip=210.51.61.248
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inspur.com
-Received: from Jtjnmail201616.home.langchao.com
-        by ssh248.corpemail.net ((D)) with ASMTP (SSL) id 202504021732240994;
-        Wed, 02 Apr 2025 17:32:24 +0800
-Received: from jtjnmail201607.home.langchao.com (10.100.2.7) by
- Jtjnmail201616.home.langchao.com (10.100.2.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 2 Apr 2025 17:32:24 +0800
-Received: from locahost.localdomain.com (10.94.17.92) by
- jtjnmail201607.home.langchao.com (10.100.2.7) with Microsoft SMTP Server id
- 15.1.2507.39; Wed, 2 Apr 2025 17:32:23 +0800
-From: Charles Han <hanchunchao@inspur.com>
-To: <saeedm@nvidia.com>, <tariqt@nvidia.com>, <leon@kernel.org>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <maord@nvidia.com>,
-	<lariel@nvidia.com>, <paulb@nvidia.com>
-CC: <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Charles Han <hanchunchao@inspur.com>
-Subject: [PATCH] net/mlx5e: fix potential null dereference in mlx5e_tc_nic_create_miss_table
-Date: Wed, 2 Apr 2025 17:32:20 +0800
-Message-ID: <20250402093221.3253-1-hanchunchao@inspur.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1743586574; c=relaxed/simple;
+	bh=G1RWy73ojl3qG3hlsUMk08tmX8YtZkW4GbYJeVymtog=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z5kylx/67BtspqYV0I8Yoj3/z7/mhdUnw0rz91z1mskHwNQdIS7nGwmvtCVVGSTpSkIlSZ14Fr1v+P/UoOrt32mAm3ucOy6ilVeZGN89Sep7vIKJfKXU3LjR+NVzRVMO/E9oFXDw20pXhL3+qhq98RJ66tMLiNvgU+N7PhV1HYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gpLZVzwj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCB0DC4CEDD;
+	Wed,  2 Apr 2025 09:36:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743586573;
+	bh=G1RWy73ojl3qG3hlsUMk08tmX8YtZkW4GbYJeVymtog=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gpLZVzwjgIHIzfOAbLFxcZRqMm90MrAweJjoIwUOf3gaFJBeIhHzb7mVWej2Lz9ow
+	 vjOte9ntM+nGfIdS89C04B6MJSaivBkmmGHgYSN9SeFVhf0ReADjFWveiuSvJjD77G
+	 oQH4ObwFl/ql/lOnsVsXelG9YzSZygO66mbu+5qCFr6348ci3tBwOhtN4b+xlJMnlP
+	 /x37CRslYuwVTCwxO9p0HmUf21GSTeaVc9LLMRf4/Wk2MbB44O9rEAi3YAHPspQ+Jd
+	 ZpIQcdGeTVtuvbW4bHhO4vPFAh5DtDK9rudgLoAe5LKhgLDGGCl2/ZkVnFtyUTJUPh
+	 MCQAClHgULaWA==
+Date: Wed, 2 Apr 2025 10:36:09 +0100
+From: Simon Horman <horms@kernel.org>
+To: Debin Zhu <mowenroot@163.com>
+Cc: pabeni@redhat.com, 1985755126@qq.com, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	paul@paul-moore.com
+Subject: Re: [PATCH v3] netlabel: Fix NULL pointer exception caused by
+ CALIPSO on IPv4 sockets
+Message-ID: <20250402093609.GK214849@horms.kernel.org>
+References: <2a4f2c24-62a8-4627-88c0-776c0e005163@redhat.com>
+ <20250401124018.4763-1-mowenroot@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-tUid: 2025402173224611767681e19845ec8a9450d9d607af6
-X-Abuse-Reports-To: service@corp-email.com
-Abuse-Reports-To: service@corp-email.com
-X-Complaints-To: service@corp-email.com
-X-Report-Abuse-To: service@corp-email.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250401124018.4763-1-mowenroot@163.com>
 
-mlx5_get_flow_namespace() may return a NULL pointer, dereferencing it
-without NULL check may lead to NULL dereference.
-Add a NULL check for ns.
+On Tue, Apr 01, 2025 at 08:40:18PM +0800, Debin Zhu wrote:
+> When calling netlbl_conn_setattr(), addr->sa_family is used
+> to determine the function behavior. If sk is an IPv4 socket,
+> but the connect function is called with an IPv6 address,
+> the function calipso_sock_setattr() is triggered.
+> Inside this function, the following code is executed:
+> 
+> sk_fullsock(__sk) ? inet_sk(__sk)->pinet6 : NULL;
+> 
+> Since sk is an IPv4 socket, pinet6 is NULL, leading to a
+> null pointer dereference.
+> 
+> This patch fixes the issue by checking if inet6_sk(sk)
+> returns a NULL pointer before accessing pinet6.
+> 
+> Fixes: ceba1832b1b2("calipso: Set the calipso socket label to match the secattr.")
 
-Fixes: 66cb64e292d2 ("net/mlx5e: TC NIC mode, fix tc chains miss table")
-Signed-off-by: Charles Han <hanchunchao@inspur.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en_tc.c | 4 ++++
- 1 file changed, 4 insertions(+)
+There is probably no need to repost for this, but
+there is a missing space in the Fixes tag. It should be like this:
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-index 9ba99609999f..9c524d8c0e5a 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-@@ -5216,6 +5216,10 @@ static int mlx5e_tc_nic_create_miss_table(struct mlx5e_priv *priv)
- 	ft_attr.level = MLX5E_TC_MISS_LEVEL;
- 	ft_attr.prio = 0;
- 	ns = mlx5_get_flow_namespace(priv->mdev, MLX5_FLOW_NAMESPACE_KERNEL);
-+	if (!ns) {
-+		mlx5_core_warn(priv->mdev, "Failed to get flow namespace\n");
-+		return -EOPNOTSUPP;
-+	}
- 
- 	*ft = mlx5_create_auto_grouped_flow_table(ns, &ft_attr);
- 	if (IS_ERR(*ft)) {
--- 
-2.43.0
+Fixes: ceba1832b1b2 ("calipso: Set the calipso socket label to match the secattr.")
 
+> Signed-off-by: Debin Zhu <mowenroot@163.com>
+> Signed-off-by: Bitao Ouyang <1985755126@qq.com>
+> Acked-by: Paul Moore <paul@paul-moore.com>
+
+...
 
