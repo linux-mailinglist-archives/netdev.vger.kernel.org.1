@@ -1,67 +1,59 @@
-Return-Path: <netdev+bounces-178852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 901D1A79353
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 18:37:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D0AAA79369
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 18:45:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 041C61886E26
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 16:37:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 903881890F1D
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 16:45:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB9FF18B484;
-	Wed,  2 Apr 2025 16:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD9D719006B;
+	Wed,  2 Apr 2025 16:44:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ujsYrf83"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lr0YY29M"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6C6215575B
-	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 16:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2093137C2A;
+	Wed,  2 Apr 2025 16:44:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743611853; cv=none; b=ETBOreoGUrSJkoHgFrHM+oXrh+KRpkrwygp067Qh57OwtLcEbFQOaXRFIR8cSN6YmIxOsLgbSnZvEx/DOhj7Hh/bn672MZs5VLov2AhCfoxlKURrZ9nFOXf2dO9Gz0o/KMmPWp2v/Us0xUbaJVY5qUxuCCoBA7KA3nUMHHBQByU=
+	t=1743612299; cv=none; b=RnKRNaTh5djXVao8HgeOb66BUJRzTaBqt1/kpHoN2U9PHAYlRxnshVKIX+yMqdNoNAbv3DTq3AQeUo0bHx2gWuqo7NyzoY3M4CUOQVrlJXQNCoYv+pMKDlkQWHjY5DXwNCCt9dHJp8RO2Q0PwzwEM8FkV9emgDNyVlcGSJtb0I4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743611853; c=relaxed/simple;
-	bh=FeJQZ6x/C6rNa6jX7GODmmr4tL7W5sikvccp2xr9j/A=;
+	s=arc-20240116; t=1743612299; c=relaxed/simple;
+	bh=HXqeqOATsb2lLDAXPM18S+nzMz70mVg6ZGTGA1YS26k=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=S5qPzrdq2mHY8fj8jXHOMM2CtZNSZ8nXCIq+vq+eQKT0/KlzeM8mmtU9qNlraYOyXC2h8cQanIT3mqA6l3+5VHF+QtrMQ9N0ThPXSfeWcFh26ecKg7nQZ/R8vMhlH8B/mRef1MpzTHm8qbfErDBwdUoM7AAMyZ3DfvhXv1Td72Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ujsYrf83; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B33CFC4CEDD;
-	Wed,  2 Apr 2025 16:37:32 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ltjTXVVmn8F/1oGJ2ksmKgC2Qg7BpkHdC5WCkZiLQCwG1Mvrug//4HW71KtmSMB0GD6Vy46Ol0GvoPt0NigHp4oH1xe57nIs2WdZpLrQ7s0Nt3hq3anVO/1nRs8eiIU3UTdPLh6OUe2qer4VLZkjipe12x5fUCySRWBcCqjhrOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lr0YY29M; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC860C4CEDD;
+	Wed,  2 Apr 2025 16:44:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743611853;
-	bh=FeJQZ6x/C6rNa6jX7GODmmr4tL7W5sikvccp2xr9j/A=;
+	s=k20201202; t=1743612299;
+	bh=HXqeqOATsb2lLDAXPM18S+nzMz70mVg6ZGTGA1YS26k=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ujsYrf83hmPYBDY+Sv0MYiAHPJeXwMYq6PIif506rY1KUZhgz6sBWqGhQaRLJqxvT
-	 cpUXpAOpprQrIwBiqSk98graUPXPblEo5uxyFhz9X5Y7cjNXjPPwh0XEdFe9fwKCx/
-	 jwmGRFC3ef8yPaq1IyISivQ8xrBjnM8FChbIDOKdGr3JhJ7SP03XBW8f0za7X0UZMi
-	 EnpNkaDKK2Pl1DsDYHh0bEHCoCnyGsxkukZG8ONDA/a1IWoyfM4Et9ZlgV8c+CQaui
-	 1LPjzSXXe0zHmDgnDHBgf4WiCdMwDnEtzjCmPiNNeSqV/w/AkmGsH0G+Ji2HjR4rSW
-	 Lv+bZYug8/LCA==
-Date: Wed, 2 Apr 2025 09:37:31 -0700
+	b=Lr0YY29Mq4oyVE8lwZ0BOzfB5oUb/zgtaKUfkqp5U0DCmhSC1r4nh9PLIfmpSefyF
+	 Jv6hquMQAZy5I2wwQVsXnOQXmeN0TryfO/8VJ9D/HktEpa7TN+0OMhzbSF9kxPZ9fn
+	 0qbk6fBGT4zK+4ZVF68fKyoKpeoK5Dct9PD61JIab0WL1ZgYA7m+CDczGUXwt+xM86
+	 O1OWmt/khZkr7G2PhySzNWzaz4+OlQIxsfipQN3k/Bqm0Fql89k8m1IxgZIJ8Zv7m6
+	 ORJO97h+FC1o2xxP1292R6RfAJu+DjM2ofx1fJomvSRIMEFqAjP0+iQBy8ce7xr7tw
+	 cN5C4TR6FOHzA==
+Date: Wed, 2 Apr 2025 09:44:58 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Olech, Milena" <milena.olech@intel.com>
-Cc: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "davem@davemloft.net"
- <davem@davemloft.net>, "pabeni@redhat.com" <pabeni@redhat.com>, "Dumazet,
- Eric" <edumazet@google.com>, "andrew+netdev@lunn.ch"
- <andrew+netdev@lunn.ch>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "Kolacinski, Karol"
- <karol.kolacinski@intel.com>, "richardcochran@gmail.com"
- <richardcochran@gmail.com>, "Lobakin, Aleksander"
- <aleksander.lobakin@intel.com>, Willem de Bruijn <willemb@google.com>,
- "Mina Almasry" <almasrymina@google.com>, "Salin, Samuel"
- <samuel.salin@intel.com>
-Subject: Re: [PATCH net-next 04/10] idpf: negotiate PTP capabilities and get
- PTP clock
-Message-ID: <20250402093731.1230cff9@kernel.org>
-In-Reply-To: <MW4PR11MB588909DAED47807C491FE7C38EAF2@MW4PR11MB5889.namprd11.prod.outlook.com>
-References: <20250318161327.2532891-1-anthony.l.nguyen@intel.com>
-	<20250318161327.2532891-5-anthony.l.nguyen@intel.com>
-	<20250325054956.3f62eef8@kernel.org>
-	<MW4PR11MB588909DAED47807C491FE7C38EAF2@MW4PR11MB5889.namprd11.prod.outlook.com>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Justin Iurman <justin.iurman@uliege.be>, Paolo Abeni
+ <pabeni@redhat.com>, Alexei Starovoitov <alexei.starovoitov@gmail.com>, bpf
+ <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
+Subject: Re: new splat
+Message-ID: <20250402094458.006ba2a7@kernel.org>
+In-Reply-To: <Z-wYH-gIvMd89-3d@mini-arch>
+References: <CAADnVQJFWn3dBFJtY+ci6oN1pDFL=TzCmNbRgey7MdYxt_AP2g@mail.gmail.com>
+	<647c3886-72fd-4e49-bdd0-4512f0319e8c@redhat.com>
+	<d24ea1cc-4d32-44f9-9051-0c874f73f1c5@uliege.be>
+	<Z-wYH-gIvMd89-3d@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,15 +63,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 2 Apr 2025 15:23:53 +0000 Olech, Milena wrote:
-> >So hi is latched when lo is read? Or the timer may wrap between 
-> >the reads? Can reads happen in parallel (re-latching hi)?  
+On Tue, 1 Apr 2025 09:45:19 -0700 Stanislav Fomichev wrote:
+> > Correct, I came to the same conclusion based on that trace. However, I can't
+> > reproduce it with a PREEMPT kernel. It goes through without problem and the
+> > output is (as expected), i.e., "lwtunnel_xmit(): recursion limit reached on
+> > datapath".  
 > 
-> Actually we have HW support to latch both values simultaneously.
-> 
-> Hi and Lo are latched in idpf_ptp_enable_shtime function, so I will move
-> lo right after ptp_read_system_postts.
+> For me adding the following to the config did the trick:
+> CONFIG_PREEMPT
+> CONFIG_DEBUG_PREEMPT
 
-You may need a lock, too, with two concurrent readers one can "re-latch"
-the value for the other?
+Could you send a patch to set these in kernel/configs/debug.config ?
 
