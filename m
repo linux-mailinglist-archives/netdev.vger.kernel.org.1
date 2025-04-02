@@ -1,59 +1,57 @@
-Return-Path: <netdev+bounces-178853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D0AAA79369
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 18:45:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 851FFA7937A
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 18:52:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 903881890F1D
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 16:45:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49F16165B83
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 16:52:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD9D719006B;
-	Wed,  2 Apr 2025 16:44:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FE6015A86B;
+	Wed,  2 Apr 2025 16:51:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lr0YY29M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X/nnXIPX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2093137C2A;
-	Wed,  2 Apr 2025 16:44:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B22926AFB
+	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 16:51:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743612299; cv=none; b=RnKRNaTh5djXVao8HgeOb66BUJRzTaBqt1/kpHoN2U9PHAYlRxnshVKIX+yMqdNoNAbv3DTq3AQeUo0bHx2gWuqo7NyzoY3M4CUOQVrlJXQNCoYv+pMKDlkQWHjY5DXwNCCt9dHJp8RO2Q0PwzwEM8FkV9emgDNyVlcGSJtb0I4=
+	t=1743612719; cv=none; b=etb101WuIyvhzBR9grDmqcwgT6txTz7l3Q/7B/OdCl9lWrYwh4JzT0OaiZ55BL1AFK1JlTNhVEIfvWUZJNTLGSkVbdGRd5u8oSXiBBbrpmaGETwx7nou3y1l7laTHeSL6wvO4KqCivvivM5+3BvjdL2ayj33asAhBUIqqadQjDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743612299; c=relaxed/simple;
-	bh=HXqeqOATsb2lLDAXPM18S+nzMz70mVg6ZGTGA1YS26k=;
+	s=arc-20240116; t=1743612719; c=relaxed/simple;
+	bh=LJo7WwFyzDLvp0Kn687ErqQCSKtPyCI0rckGbbD8zyo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ltjTXVVmn8F/1oGJ2ksmKgC2Qg7BpkHdC5WCkZiLQCwG1Mvrug//4HW71KtmSMB0GD6Vy46Ol0GvoPt0NigHp4oH1xe57nIs2WdZpLrQ7s0Nt3hq3anVO/1nRs8eiIU3UTdPLh6OUe2qer4VLZkjipe12x5fUCySRWBcCqjhrOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lr0YY29M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC860C4CEDD;
-	Wed,  2 Apr 2025 16:44:58 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ig9tLcR2rsparZ6YF5F8SEvnLepFrI04VmGHlKiLUkcFBQevLQjJLLkR97HdpKb1oWMiQHko4C6WmdIA9x9Fm0MtdiuBFJ+rQBSMWi9oMxg09pCMtlgdzJmJVP+MeCAwtV+qEOFfIOI1V3jSLTgckpgAh6aZ+gT5NvK+2aDMUUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X/nnXIPX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 250F9C4CEDD;
+	Wed,  2 Apr 2025 16:51:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743612299;
-	bh=HXqeqOATsb2lLDAXPM18S+nzMz70mVg6ZGTGA1YS26k=;
+	s=k20201202; t=1743612718;
+	bh=LJo7WwFyzDLvp0Kn687ErqQCSKtPyCI0rckGbbD8zyo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Lr0YY29Mq4oyVE8lwZ0BOzfB5oUb/zgtaKUfkqp5U0DCmhSC1r4nh9PLIfmpSefyF
-	 Jv6hquMQAZy5I2wwQVsXnOQXmeN0TryfO/8VJ9D/HktEpa7TN+0OMhzbSF9kxPZ9fn
-	 0qbk6fBGT4zK+4ZVF68fKyoKpeoK5Dct9PD61JIab0WL1ZgYA7m+CDczGUXwt+xM86
-	 O1OWmt/khZkr7G2PhySzNWzaz4+OlQIxsfipQN3k/Bqm0Fql89k8m1IxgZIJ8Zv7m6
-	 ORJO97h+FC1o2xxP1292R6RfAJu+DjM2ofx1fJomvSRIMEFqAjP0+iQBy8ce7xr7tw
-	 cN5C4TR6FOHzA==
-Date: Wed, 2 Apr 2025 09:44:58 -0700
+	b=X/nnXIPXOjmry5SX1HAFpqCgwK8fUCGi5nSqzH5nK9RraRKmRkA5IjsFggYrfWDxg
+	 yBovlGGD1y3oqxV22Ah/ukBWMBk/fCBvcFj+zqWhf7DGZOHb8A4k9rNAyqNTAF5LML
+	 zGQ7cdzUi+TiKDg6onk3Fwaqrva77McTbBDlZ0xxMX0G3ITCtpoywsUZxAQuGVeZEQ
+	 dXxglrhC/sVIYEwBZ1tWOaTYMtKaljnghz4PZDBYR3xUxljBWF7mW8j376TipsZqFr
+	 Q7FbycL39Pd9mfJ0oKxTK6GysISFJnofJQPLqHKHY+a7QGIbU+ZeeCm0ESITgyvdQf
+	 g6kSRPJ9oNs/Q==
+Date: Wed, 2 Apr 2025 09:51:57 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Justin Iurman <justin.iurman@uliege.be>, Paolo Abeni
- <pabeni@redhat.com>, Alexei Starovoitov <alexei.starovoitov@gmail.com>, bpf
- <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
-Subject: Re: new splat
-Message-ID: <20250402094458.006ba2a7@kernel.org>
-In-Reply-To: <Z-wYH-gIvMd89-3d@mini-arch>
-References: <CAADnVQJFWn3dBFJtY+ci6oN1pDFL=TzCmNbRgey7MdYxt_AP2g@mail.gmail.com>
-	<647c3886-72fd-4e49-bdd0-4512f0319e8c@redhat.com>
-	<d24ea1cc-4d32-44f9-9051-0c874f73f1c5@uliege.be>
-	<Z-wYH-gIvMd89-3d@mini-arch>
+To: Taehee Yoo <ap420073@gmail.com>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, michael.chan@broadcom.com,
+ pavan.chebbi@broadcom.com, netdev@vger.kernel.org, romieu@fr.zoreil.com,
+ kuniyu@amazon.com
+Subject: Re: [PATCH net] eth: bnxt: fix deadlock in the mgmt_ops
+Message-ID: <20250402095157.4d7c53ee@kernel.org>
+In-Reply-To: <20250402133123.840173-1-ap420073@gmail.com>
+References: <20250402133123.840173-1-ap420073@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,15 +61,26 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 1 Apr 2025 09:45:19 -0700 Stanislav Fomichev wrote:
-> > Correct, I came to the same conclusion based on that trace. However, I can't
-> > reproduce it with a PREEMPT kernel. It goes through without problem and the
-> > output is (as expected), i.e., "lwtunnel_xmit(): recursion limit reached on
-> > datapath".  
+On Wed,  2 Apr 2025 13:31:23 +0000 Taehee Yoo wrote:
+> When queue is being reset, callbacks of mgmt_ops are called by
+> netdev_nl_bind_rx_doit().
+> The netdev_nl_bind_rx_doit() first acquires netdev_lock() and then calls
+> callbacks.
+> So, mgmt_ops callbacks should not acquire netdev_lock() internaly.
 > 
-> For me adding the following to the config did the trick:
-> CONFIG_PREEMPT
-> CONFIG_DEBUG_PREEMPT
+> The bnxt_queue_{start | stop}() calls napi_{enable | disable}() but they
+> internally acquire netdev_lock().
+> So, deadlock occurs.
+> 
+> To avoid deadlock, napi_{enable | disable}_locked() should be used
+> instead.
+> 
+> Fixes: 413f0271f396 ("net: protect NAPI enablement with netdev_lock()")
 
-Could you send a patch to set these in kernel/configs/debug.config ?
+Too far back, v6.14 doesn't need this fix. I think the Fixes tags
+should be:
+
+Fixes: cae03e5bdd9e ("net: hold netdev instance lock during queue operations")
+
+No need to repost, I'll change when applying. Unless I'm wrong.
 
