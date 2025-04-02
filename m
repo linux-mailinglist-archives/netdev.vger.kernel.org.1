@@ -1,66 +1,79 @@
-Return-Path: <netdev+bounces-178796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12205A78F0A
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 14:51:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B02FA78F2E
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 14:56:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C505B7A372C
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 12:50:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1A0A16800D
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 12:55:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DB2324167B;
-	Wed,  2 Apr 2025 12:48:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0CEF23959D;
+	Wed,  2 Apr 2025 12:55:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UFpZgsLj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LSs8p4TL"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E923D23BCE7;
-	Wed,  2 Apr 2025 12:48:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3296E218ADD;
+	Wed,  2 Apr 2025 12:55:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743598089; cv=none; b=YGunlsKyuW2pcWK1R7xfMUUVtjF0fYrM1wy0eIjLU0kfykUbZDIdmrxYbrEqXRINUaZrnIDlwmvGdmetA/oG48A4DWa1Rd18V/d7DrugGSe4ymtKtCarIKVzsgFDI3aDjmgleVelwwX6sOx1tGa9hV9fOXzxMk05VXJNKp6o47E=
+	t=1743598545; cv=none; b=hvMKQmYQ1Eqd+T/JQf2YOk0qAeNMnGRaKwTFFbGcA3ljdOmhfhvq7AlZBAxmvUCSyPakvBs07vG1TVdhG6+DCcNAgalfjplIBmAdLGzgYpaJFTsOLLMakgwuu1BWuCh4PFAxHrfCx8UehoVBVKOsVGY+8Y0ci4CMnJcLMAD+S6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743598089; c=relaxed/simple;
-	bh=ZbrgI1QMiyPzXZtbXyqIrXqGXB55hdcp4jkmMe1pbUU=;
+	s=arc-20240116; t=1743598545; c=relaxed/simple;
+	bh=TXtLquoRRAqtrc02VbnTtQ9X9BjOAMh9LtUpk4wHJVY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I1YUHZApkZTIiTdq2laLdCyq7lWgB+YZ4xPWEI22oPUJl3Cyvkv7KJn3E8Ux0n5UKa6EVPx+NySoQueOG6NM2dYNjaPPaCqAn9jSUkNKPSN1QunFIGs88pzfwSnzliRqMGbOQBBNsXb40sfRLomW5jbIPusbrs/dDR7IiQYQLwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UFpZgsLj; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=yibjlCzMj7db36Ncl+n+k08WtHR8TCTohVRGWqYmZg0=; b=UFpZgsLjYa47uMUX+kbAWXcqXj
-	EAXRsVbFGjyOEQDht4LLsjdX2i6zX1P/detZLCGKl4B2bZqBP3vuGsDj76g6F2j2Je6VWPDl7nVYP
-	UatDa/505MPVEy3wGGZrB+COxlRk+tMXa/YhSgMarkAYW4y/gXTQkgS/PzfN31YyzEdo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tzxVc-007n1N-8p; Wed, 02 Apr 2025 14:47:56 +0200
-Date: Wed, 2 Apr 2025 14:47:56 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 4/4] net: mtip: The L2 switch driver for imx287
-Message-ID: <8f431197-474e-4cd5-9c3e-d573c3f3e6b5@lunn.ch>
-References: <20250331103116.2223899-1-lukma@denx.de>
- <20250331103116.2223899-5-lukma@denx.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HNoFK9zuKGOX64cpRiTU8MaSLZIwLur4E34V/MNt5rMaI+3Oj4BW8SvtWEpZR2xIS0frE6IqIZ3QYfrj7EsBnBj5/+ygiq7vhEYH1Hw/TuDb5kF+dRAnKuP+Sb+nDpf21xoXgAoaEws0WUKYXMKfO7i9ReemIlTVkridj6ghvN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LSs8p4TL; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1743598545; x=1775134545;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=TXtLquoRRAqtrc02VbnTtQ9X9BjOAMh9LtUpk4wHJVY=;
+  b=LSs8p4TLXKntODjuiLjsV3xe8XE1hMKVbTOLuYg7aLvJJZWapRbXcjU/
+   XKNgUjBDeOEykp+XFBr2koeVRtETY7fCI6KooWWQLdYYAHsxwVwD/MFfD
+   nJ13QaRIod5DKhI7dPECALqveoW4yDloFIW+D0XOqQPnaZFXiWSY299u7
+   6iPitRKgev4ou10EZsuRyqAoTUAZ7s/MZP8tmNIi3pBSpZMqNXKBibFk8
+   yNPPIllo/iCiVvCLcHJnUQcrUT6MECkWu+0vOWb7bSXmQdV+CsOiBhrSW
+   F7huz5TWeXUbHaBCX7JgHHnw/W6WdbEHkuzTaKx8lTtPiwtlT2X7ZdgxU
+   Q==;
+X-CSE-ConnectionGUID: 6zoZj8oeSYW8RhVMqWAKFQ==
+X-CSE-MsgGUID: SxfbFDUPRFauchmAwORIHQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11392"; a="55955133"
+X-IronPort-AV: E=Sophos;i="6.15,182,1739865600"; 
+   d="scan'208";a="55955133"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2025 05:55:44 -0700
+X-CSE-ConnectionGUID: zOjX9rwPToG2JDLyvrPKUA==
+X-CSE-MsgGUID: LT6rlRGDQG61zNwAkljtKg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,182,1739865600"; 
+   d="scan'208";a="126650218"
+Received: from smile.fi.intel.com ([10.237.72.58])
+  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Apr 2025 05:55:42 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98.2)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1tzxd4-00000008ToG-2Zb4;
+	Wed, 02 Apr 2025 15:55:38 +0300
+Date: Wed, 2 Apr 2025 15:55:38 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, vbabka@suse.cz,
+	torvalds@linux-foundation.org, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org
+Subject: Re: [RFC] slab: introduce auto_kfree macro
+Message-ID: <Z-0zykUvrF-73MXI@smile.fi.intel.com>
+References: <20250401134408.37312-1-przemyslaw.kitszel@intel.com>
+ <Z-0SU8cYkTTbprSh@smile.fi.intel.com>
+ <20250402122104.GK25239@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,131 +82,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250331103116.2223899-5-lukma@denx.de>
+In-Reply-To: <20250402122104.GK25239@noisy.programming.kicks-ass.net>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-> +static void read_atable(struct switch_enet_private *fep, int index,
-> +			unsigned long *read_lo, unsigned long *read_hi)
-> +{
-> +	unsigned long atable_base = (unsigned long)fep->hwentry;
-> +
-> +	*read_lo = readl((const void *)atable_base + (index << 3));
-> +	*read_hi = readl((const void *)atable_base + (index << 3) + 4);
-> +}
-> +
-> +static void write_atable(struct switch_enet_private *fep, int index,
-> +			 unsigned long write_lo, unsigned long write_hi)
-> +{
-> +	unsigned long atable_base = (unsigned long)fep->hwentry;
-> +
-> +	writel(write_lo, (void *)atable_base + (index << 3));
-> +	writel(write_hi, (void *)atable_base + (index << 3) + 4);
-> +}
+On Wed, Apr 02, 2025 at 02:21:04PM +0200, Peter Zijlstra wrote:
+> On Wed, Apr 02, 2025 at 01:32:51PM +0300, Andy Shevchenko wrote:
+> > What would be better in my opinion is to have it something like DEFINE_*()
+> > type, which will look more naturally in the current kernel codebase
+> > (as we have tons of DEFINE_FOO().
+> > 
+> > 	DEFINE_AUTO_KFREE_VAR(name, struct foo);
+> 
+> Still weird. Much better to have the compiler complain about the
+> obvious use of uninitialized.
 
-It would be nice to have the mtip_ prefix on all functions.
+That would be ideal!
 
-> +static int mtip_open(struct net_device *dev)
-> +{
-> +	struct mtip_ndev_priv *priv = netdev_priv(dev);
-> +	struct switch_enet_private *fep = priv->fep;
-> +	int ret, port_idx = priv->portnum - 1;
-> +
-> +	if (fep->usage_count == 0) {
-> +		clk_enable(fep->clk_ipg);
-> +		netif_napi_add(dev, &fep->napi, mtip_rx_napi);
-> +
-> +		ret = mtip_alloc_buffers(dev);
-> +		if (ret)
-> +			return ret;
+-- 
+With Best Regards,
+Andy Shevchenko
 
-nitpick: You might want to turn the clock off before returning the
-error.
 
-> +	}
-> +
-> +	fep->link[port_idx] = 0;
-> +
-> +	/* Probe and connect to PHY when open the interface, if already
-> +	 * NOT done in the switch driver probe (or when the device is
-> +	 * re-opened).
-> +	 */
-> +	ret = mtip_mii_probe(dev);
-> +	if (ret) {
-> +		mtip_free_buffers(dev);
-
-I've not checked. Does this do the opposite of netif_napi_add()?
-
-> +static void mtip_set_multicast_list(struct net_device *dev)
-> +{
-> +	unsigned int i, bit, data, crc;
-> +
-> +	if (dev->flags & IFF_PROMISC) {
-> +		dev_info(&dev->dev, "%s: IFF_PROMISC\n", __func__);
-
-You can save one level of indentation with a return here.
-
-> +	} else {
-> +		if (dev->flags & IFF_ALLMULTI) {
-> +			dev_info(&dev->dev, "%s: IFF_ALLMULTI\n", __func__);
-
-and other level here.
-
-> +		} else {
-> +			struct netdev_hw_addr *ha;
-> +			u_char *addrs;
-> +
-> +			netdev_for_each_mc_addr(ha, dev) {
-> +				addrs = ha->addr;
-> +				/* Only support group multicast for now */
-> +				if (!(*addrs & 1))
-> +					continue;
-
-You could pull there CRC caluclation out into a helper. You might also
-want to search the tree and see if it exists somewhere else.
-
-> +
-> +				/* calculate crc32 value of mac address */
-> +				crc = 0xffffffff;
-> +
-> +				for (i = 0; i < 6; i++) {
-
-Is 6 the lengh of a MAC address? There is a #define for that.
-
-> +					data = addrs[i];
-> +					for (bit = 0; bit < 8;
-> +					     bit++, data >>= 1) {
-> +						crc = (crc >> 1) ^
-> +						(((crc ^ data) & 1) ?
-> +						CRC32_POLY : 0);
-> +					}
-> +				}
-> +			}
-> +		}
-> +	}
-> +}
-> +
-
-> +struct switch_enet_private *mtip_netdev_get_priv(const struct net_device *ndev)
-> +{
-> +	if (ndev->netdev_ops == &mtip_netdev_ops)
-> +		return netdev_priv(ndev);
-> +
-> +	return NULL;
-> +}
-> +
-
-> +static int __init mtip_switch_dma_init(struct switch_enet_private *fep)
-> +{
-> +	struct cbd_t *bdp, *cbd_base;
-> +	int ret, i;
-> +
-> +	/* Check mask of the streaming and coherent API */
-> +	ret = dma_set_mask_and_coherent(&fep->pdev->dev, DMA_BIT_MASK(32));
-> +	if (ret < 0) {
-> +		dev_warn(&fep->pdev->dev, "No suitable DMA available\n");
-
-Can you recover from this? Or should it be dev_err()?
-
-More later...
-
-	Andrew
 
