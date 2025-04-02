@@ -1,173 +1,135 @@
-Return-Path: <netdev+bounces-178894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B49C1A7969F
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 22:32:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96D47A796BF
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 22:46:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D12C16F4B9
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 20:32:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D0707A55B0
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 20:45:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AFFD1C860F;
-	Wed,  2 Apr 2025 20:32:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 385B01F3BA9;
+	Wed,  2 Apr 2025 20:46:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="cB0Osj83";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="EwkjwFn4"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="G5N9J/ao"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A1EE1917E7;
-	Wed,  2 Apr 2025 20:32:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712CC1F30A9
+	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 20:46:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743625971; cv=none; b=cWXMI5Bvo23cngGD0uqAcR6OyPqnBUbnPQEt8zDhKL3i3crz2sAhtms+fJIJZbXVHx2ZAhRnbeLp68PSf+9iyPIw1irscDfZKHHcmVXcHTYTnaeCbLGj7ZYkc/nKfI+zM7EWtErm2a1cC8PAE8svlydrlbdJqxxogIPB0FaZTT4=
+	t=1743626796; cv=none; b=h5+0q2DauTzNwbUeSpOtVFkbaab1HMO56XIPUDuLRp3Q53myW6qGwO8ETgY7W4iRBG8icsiNiFAujNyDMl2fKco3FhwQa4No+FgfOC7UCzeu/Xp/tf2Po44/OxOhE+rQSc09qu8bCTCi6WuzF1FcSGBxpUYbRYZJX20Djv9rWwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743625971; c=relaxed/simple;
-	bh=d4MvzayjTJDhDr/w5zPNUK64K5DzyQ9aacwoWN8HqmI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jo8k6nu2Sg+QddlPvuIJDQ7UdAdxI0r/4ssWQi72VVk99lKAGPU2xbugFrFeDMP/TzmdosLo5x83fE6OUZW6mx2+IXKEfSIgHYmzcW3yrSUXHKLMukiDgWf9p3t4kfcqO4BvkhwCMbvc4NlKqbCwn54LZYVfxd/KtoaTCU9pu5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=cB0Osj83; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=EwkjwFn4; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id 43A9560601; Wed,  2 Apr 2025 22:32:46 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1743625966;
-	bh=Nf7B5wRQso4mcg595INPxNR2H8+fc/l2wffrQzzm3oo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cB0Osj8352rP5RBFXVUzpIlcDxOLUZ3lb5qU59jMOIexRykwFliMqVswz8Y9H1lLc
-	 40wVWMUZR15S6F6Bch1TDV18xkTVgEvDt57fAytOiEXiyXF/qvRDQ+6KysOY61/bpP
-	 U9Ma9b+ImMMw2DkI6PgDqXTm5DksNUcFr8ddTMEangrbDWmPUhaUAhsCd4j5gxPqwn
-	 gTmoBcDxk8xp0KZFY/yBwfVwq7UlV3/HExsEUGjz63UFGkN7ZbKBA+NPgzwtLHPn7Y
-	 969FtqN7vklVL8ITeX/t/sgaOLE+v0a0VcA4HXNMYtxVNGLBKNWyLWRhKZwJX3VMmP
-	 pWIuY1N81X0Pg==
-X-Spam-Level: 
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id B3615605C6;
-	Wed,  2 Apr 2025 22:32:42 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1743625962;
-	bh=Nf7B5wRQso4mcg595INPxNR2H8+fc/l2wffrQzzm3oo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EwkjwFn4HlmEJ6EB//3J2Tm6tOvNyJBQ8vIFIUBh5pUvgxGpgsffoYbRg24GRGZXj
-	 xcBDNomjeR3R/94mmMIByyClhAAJ6Nqu+Kh+A1B1y/e8Q4sOw+jHPbh/VIgaCSYAnU
-	 88TVqhPzqrwupsFV0tJmS/2BXudW4TrhihJGDkKJ25CfKSHKsn1gqB8XJtsRtw5tRR
-	 2+YZnbJ/B7iFadGka/pNAne9SqYSSQYOK6LXM74hBAks/Cpd9g7SlMhVS1Oi9XhMPy
-	 QtX5PgY3z6ajslXqDgIgiSEDNACpkYgS/gISZYmVwKYq6wny+e8Td9elXeE9KdLrH6
-	 J7tgOX0wrVDyA==
-Date: Wed, 2 Apr 2025 22:32:39 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Lin Ma <linma@zju.edu.cn>
-Cc: kadlec@netfilter.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	lucien.xin@gmail.com, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net] netfilter: nft_tunnel: fix geneve_opt type confusion
- addition
-Message-ID: <Z-2e1xaxEw3DSZjd@calendula>
-References: <20250402170026.9696-1-linma@zju.edu.cn>
- <Z-2NkQkl18OSJJuG@calendula>
+	s=arc-20240116; t=1743626796; c=relaxed/simple;
+	bh=Z6VGfryL+DXhRvEzoDwFshgf+Bq2wOzL73N/iVKq/zY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=O6sfOgduloR8Q6VrZRuIRe94ivcqVwC/vWXBrCkZWCdVFGtwozQPdzHw7uchQhXCnndsmBnV8OwCNjHX/b+lTaoryyFINeuE/kz8/v+E2DpBWpdfHNodFztA4eu5IgHICLmewBwBsXEBSwF8kWfMUe98IelB08KXzQaVzhd7RIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=G5N9J/ao; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-af9065f0fc0so171006a12.2
+        for <netdev@vger.kernel.org>; Wed, 02 Apr 2025 13:46:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1743626793; x=1744231593; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LYWx+i7p/0sR+VEtIUymF7YgwTfDU8eIqUYc1GEpg1c=;
+        b=G5N9J/aopIKYdo+sMdUFG2nI1TR3absavUvt1OtSNCl321wt6b7EefsVG+I9W7qstG
+         IyJETzvAnFdLSil+W+/0hZfDC0xzb0GG/0oV6yJ9GJO66YdXWHHcoaIDw/fWlb7QEDq5
+         6vD7KEgemgQcFZQjPs0b7Fb4jtyxalwpfFgmpdHThp62WjZpu7rPL8DsBfMHgkhHcGYO
+         pd07FQqhm/TmxODJRw4hpO6udNKUEyRfKgaO6979XPDaatKgPNC5boAA2nrfFl3Lx8jM
+         9LbPg8ZPfxxwO/hCQCDGqHLoQYTMSyhipps8BfFSBBkToVuEtr8KODzTSyZogCjwrXMm
+         +65g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743626793; x=1744231593;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LYWx+i7p/0sR+VEtIUymF7YgwTfDU8eIqUYc1GEpg1c=;
+        b=tE+D1Z7ZjbQW6eJSqIAJN22i5t4NUh7OoIHOBdD7Kvrcui24pegAvMe9+Z42ZJzpxo
+         62kC2itUbbDhtufMXw+cCDa+HHxXUXCoeWh5dIsE5CYkEuZBYSQ14FC6lHgLNFiQYv2O
+         /n9A2KN9oSxAJkVBd2PFUYkZ/dbLrjQgNHrqT3OZhUgBDlZwIUBAJScTDaXwQ5/HEjdS
+         hHWrTNUF6s+bIlpxniyIl/XtUmMXb7UiN9EM2nNsVRJY4SDUVbdx8w+1KmkGjvhVs672
+         3SQYMOU07z3bYAGpRXr0PalE9mR2nwDUhB6QvCUJf1E+uU2+b3q9YyjYIcfiA9z7d8/+
+         ZU4A==
+X-Forwarded-Encrypted: i=1; AJvYcCUX7mC3OwiioYm8sKKq8Rx4JWG31BVVd16GvFBrANn2nZ5RUvHqNtpZPPgCKiA+yJUj9qb13u8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhY//BjC+/Q6VZ96RAgIpDq93ueoZvoUZWh2aNjixXVXyCy1RZ
+	oEynCQPwl1MVBzw0X3g2pGqZ5p1CAkl1xc76YDMwCf30RljLb1QPBDW2uWacYJs=
+X-Gm-Gg: ASbGncsv2mZbaOp7dGGbNXE3zaJMohJXo2QmTHwKiJmLv2JSJk9RKeV9FnUBhc7hgxt
+	C4C5IvTanmymcyKp2SA4yTA79PKci1orJQ9b1phkBps784AB8EidQu50xzsi7IaJAXAw3A6FERY
+	ZcY3wju9bvV3PTyyLR1zQuqOcAahKzG+z5+W8pgObtNVT8RfkqW1EJbwIFIaD56J0YMdKpE7VxH
+	ZtBNjxMU/zXCf5Sw7sbtURh8I29mzrLR357D2yHw75ab062838wRqBfU9hH6rSYuNzffrQvAkS9
+	64+qUwQJdWxiRO9K/IrQIjjlpRtU6bRQB4nM438ChxKVx6znXzQ1AqB7kfVth2UF5QtFRaJWzHO
+	Jhy1W9ETEuCMe7XdotLnN
+X-Google-Smtp-Source: AGHT+IE2IlcG36tD6ac4xnnI3ezFBh9fd2IwtdxGG1TNb6l19jnIZfsYC2vcDFMoteFnTSE92h8Htg==
+X-Received: by 2002:a17:90a:dfcd:b0:2ee:d63f:d73 with SMTP id 98e67ed59e1d1-3057cb34876mr220395a91.11.1743626793575;
+        Wed, 02 Apr 2025 13:46:33 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3056f80ee73sm2179684a91.6.2025.04.02.13.46.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Apr 2025 13:46:33 -0700 (PDT)
+Date: Wed, 2 Apr 2025 13:46:31 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Octavian Purdila <tavip@google.com>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net v2 1/3] net_sched: sch_sfq: use a temporary work
+ area for validating configuration
+Message-ID: <20250402134631.5af060dc@hermes.local>
+In-Reply-To: <20250402162750.1671155-2-tavip@google.com>
+References: <20250402162750.1671155-1-tavip@google.com>
+	<20250402162750.1671155-2-tavip@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Z-2NkQkl18OSJJuG@calendula>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 02, 2025 at 09:18:44PM +0200, Pablo Neira Ayuso wrote:
-> Hi,
-> 
-> On Thu, Apr 03, 2025 at 01:00:26AM +0800, Lin Ma wrote:
-> > When handling multiple NFTA_TUNNEL_KEY_OPTS_GENEVE attributes, the
-> > parsing logic should place every geneve_opt structure one by one
-> > compactly. Hence, when deciding the next geneve_opt position, the
-> > pointer addition should be in units of char *.
-> > 
-> > However, the current implementation erroneously does type conversion
-> > before the addition, which will lead to heap out-of-bounds write.
-> 
-> Patch LGTM, I can take it through nf.git, I am preparing a pull
-> request now.
+On Wed,  2 Apr 2025 09:27:48 -0700
+Octavian Purdila <tavip@google.com> wrote:
 
-Actually, this chunk is missing in this patch:
+> diff --git a/net/sched/sch_sfq.c b/net/sched/sch_sfq.c
+> index 65d5b59da583..1af06cd5034a 100644
+> --- a/net/sched/sch_sfq.c
+> +++ b/net/sched/sch_sfq.c
+> @@ -631,6 +631,16 @@ static int sfq_change(struct Qdisc *sch, struct nlattr *opt,
+>  	struct red_parms *p = NULL;
+>  	struct sk_buff *to_free = NULL;
+>  	struct sk_buff *tail = NULL;
+> +	/* work area for validating changes before committing them */
+Unnecessary comment.
+> +	int limit;
+> +	unsigned int divisor;
+> +	unsigned int maxflows;
+> +	int perturb_period;
+> +	unsigned int quantum;
+> +	u8 headdrop;
+> +	u8 maxdepth;
+> +	u8 flags;
+> +
 
-diff --git a/net/netfilter/nft_tunnel.c b/net/netfilter/nft_tunnel.c
-index 2df4b2a02f27..2e40f575aed9 100644
---- a/net/netfilter/nft_tunnel.c
-+++ b/net/netfilter/nft_tunnel.c
-@@ -625,7 +625,7 @@ static int nft_tunnel_opts_dump(struct sk_buff *skb,
-                if (!inner)
-                        goto failure;
-                while (opts->len > offset) {
--                       opt = (struct geneve_opt *)opts->u.data + offset;
-+                       opt = (struct geneve_opt *)(opts->u.data + offset);
-                        if (nla_put_be16(skb, NFTA_TUNNEL_KEY_GENEVE_CLASS,
-                                         opt->opt_class) ||
-                            nla_put_u8(skb, NFTA_TUNNEL_KEY_GENEVE_TYPE,
+Network code prefers reverse christmas tree style declaration order.
 
-> > [    6.989857] ==================================================================
-> > [    6.990293] BUG: KASAN: slab-out-of-bounds in nft_tunnel_obj_init+0x977/0xa70
-> > [    6.990725] Write of size 124 at addr ffff888005f18974 by task poc/178
-> > [    6.991162]
-> > [    6.991259] CPU: 0 PID: 178 Comm: poc-oob-write Not tainted 6.1.132 #1
-> > [    6.991655] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-> > [    6.992281] Call Trace:
-> > [    6.992423]  <TASK>
-> > [    6.992586]  dump_stack_lvl+0x44/0x5c
-> > [    6.992801]  print_report+0x184/0x4be
-> > [    6.993790]  kasan_report+0xc5/0x100
-> > [    6.994252]  kasan_check_range+0xf3/0x1a0
-> > [    6.994486]  memcpy+0x38/0x60
-> > [    6.994692]  nft_tunnel_obj_init+0x977/0xa70
-> > [    6.995677]  nft_obj_init+0x10c/0x1b0
-> > [    6.995891]  nf_tables_newobj+0x585/0x950
-> > [    6.996922]  nfnetlink_rcv_batch+0xdf9/0x1020
-> > [    6.998997]  nfnetlink_rcv+0x1df/0x220
-> > [    6.999537]  netlink_unicast+0x395/0x530
-> > [    7.000771]  netlink_sendmsg+0x3d0/0x6d0
-> > [    7.001462]  __sock_sendmsg+0x99/0xa0
-> > [    7.001707]  ____sys_sendmsg+0x409/0x450
-> > [    7.002391]  ___sys_sendmsg+0xfd/0x170
-> > [    7.003145]  __sys_sendmsg+0xea/0x170
-> > [    7.004359]  do_syscall_64+0x5e/0x90
-> > [    7.005817]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
-> > [    7.006127] RIP: 0033:0x7ec756d4e407
-> > [    7.006339] Code: 48 89 fa 4c 89 df e8 38 aa 00 00 8b 93 08 03 00 00 59 5e 48 83 f8 fc 74 1a 5b c3 0f 1f 84 00 00 00 00 00 48 8b 44 24 10 0f 05 <5b> c3 0f 1f 80 00 00 00 00 83 e2 39 83 faf
-> > [    7.007364] RSP: 002b:00007ffed5d46760 EFLAGS: 00000202 ORIG_RAX: 000000000000002e
-> > [    7.007827] RAX: ffffffffffffffda RBX: 00007ec756cc4740 RCX: 00007ec756d4e407
-> > [    7.008223] RDX: 0000000000000000 RSI: 00007ffed5d467f0 RDI: 0000000000000003
-> > [    7.008620] RBP: 00007ffed5d468a0 R08: 0000000000000000 R09: 0000000000000000
-> > [    7.009039] R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
-> > [    7.009429] R13: 00007ffed5d478b0 R14: 00007ec756ee5000 R15: 00005cbd4e655cb8
-> > 
-> > Fix this bug with correct pointer addition and conversion.
-> > 
-> > Fixes: 925d844696d9 ("netfilter: nft_tunnel: add support for geneve opts")
-> > Signed-off-by: Lin Ma <linma@zju.edu.cn>
-> > ---
-> >  net/netfilter/nft_tunnel.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/net/netfilter/nft_tunnel.c b/net/netfilter/nft_tunnel.c
-> > index 681301b46aa4..2df4b2a02f27 100644
-> > --- a/net/netfilter/nft_tunnel.c
-> > +++ b/net/netfilter/nft_tunnel.c
-> > @@ -341,7 +341,7 @@ static const struct nla_policy nft_tunnel_opts_geneve_policy[NFTA_TUNNEL_KEY_GEN
-> >  static int nft_tunnel_obj_geneve_init(const struct nlattr *attr,
-> >  				      struct nft_tunnel_opts *opts)
-> >  {
-> > -	struct geneve_opt *opt = (struct geneve_opt *)opts->u.data + opts->len;
-> > +	struct geneve_opt *opt = (struct geneve_opt *)(opts->u.data + opts->len);
-> >  	struct nlattr *tb[NFTA_TUNNEL_KEY_GENEVE_MAX + 1];
-> >  	int err, data_len;
-> >  
-> > -- 
-> > 2.17.1
-> > 
++	/* copy configuration to work area */
++	limit = q->limit;
++	divisor = q->divisor;
++	headdrop = q->headdrop;
++	maxdepth = q->maxdepth;
++	maxflows = q->maxflows;
++	perturb_period = q->perturb_period;
++	quantum = q->quantum;
++	flags = q->flags;
+
+Comment is unneeded. Rather than doing individual fields, why not just use
+a whole temporary structure?
 
