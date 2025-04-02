@@ -1,142 +1,181 @@
-Return-Path: <netdev+bounces-178865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA831A793CE
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 19:25:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8AF3A793D4
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 19:25:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 336E0163751
-	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 17:25:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FC7F189430F
+	for <lists+netdev@lfdr.de>; Wed,  2 Apr 2025 17:26:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1B5119F419;
-	Wed,  2 Apr 2025 17:25:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 047161A5B84;
+	Wed,  2 Apr 2025 17:25:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="AlEN19kK"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RMl6pwh7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2A51519A7
-	for <netdev@vger.kernel.org>; Wed,  2 Apr 2025 17:25:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5159919F419;
+	Wed,  2 Apr 2025 17:25:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743614704; cv=none; b=rK3Tk5Rj9YUWXjHaU9XnPJrVkZlVfgWWrvoiboXqwsH+zP+r9cW6CfbuAOxHqMeA1s92c11YJeZoR+QfxTebQ5sHkuzAgyOvcnjfj997FGfvfDfhpnvQ+k/wD/EOijTmHrOW6pq/Su93PYB54CtpFWAd9Rnjrffq/9IGQcpGuzM=
+	t=1743614734; cv=none; b=rioZif87PY8xKJhKbfngjnJlFkcOsJ0agXucAI3QVZImgeq2lTbi+CMMtAOlAiTdT1Zix4GI3jGyYCfPzDRyHdr9YDSSsH7kER+C0TSD/i5b3c4ayMDDUjS1TTZ6NzYxi6tpKLUfiPjsXViY7q+LisHaJSwj6ZVkTqbAf9NpX9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743614704; c=relaxed/simple;
-	bh=fOiC6Hiuda03aNQg4vRQ/rSLcFRDP8t43svVgEeXdEA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RvNRzRHXyPNue2MSRnrYUMAeEd/Gdyc43v/KKUWtDBmfLrVlSBPz+kXoOT7TjsBhkEO00m0u4fuIs2oQdbk/ZlBGHnqMgXt54bsydg1pn8ycNGdFqsWaItEXA0EGylV0wCKBA+FOqeH092uqOQ+kF7NrVYVOx70zOa0J+I9TLxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=AlEN19kK; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2254e0b4b79so1036425ad.2
-        for <netdev@vger.kernel.org>; Wed, 02 Apr 2025 10:25:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1743614702; x=1744219502; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=xn3IXbD9u4lsSxpjVk10/JAE9D6FY55+ZqseSA0nMuA=;
-        b=AlEN19kKCpOU/HJWbsXY30H7BtW9U8owAJvuNzNwOjyKfoxi8Y9+5880SIqdFa6jRj
-         HKmuSr5gA7stFsZcYE3jAmHJ/dYGovUu6xF+696fyS3auiKTY95z4lDwADq688xmAdZT
-         PXEVY/vdukA11shdiF02tcPP0uAuEKewym6FiGjQ8dyPdrhCpIT4wuCk/pnIkCwpuh3e
-         yKd8GgRfNxa8ZQ7DTml6hpqSHctwkjsJoc/+/cEuUh6BGzZ+2EzeBgmQLSdaAprP7dH4
-         UmRKdtAyPeZmHO0b7uYOwrkpHw7YVEOjZ7ISG5EN2+0m3C4miGQpnAJAXoqyywGuW5PE
-         9LSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743614702; x=1744219502;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xn3IXbD9u4lsSxpjVk10/JAE9D6FY55+ZqseSA0nMuA=;
-        b=jMy9+yYptXD430MZXoyVpwGvVG4vvEwxGR9xOCSH30Yt7oMK0JKYmcggxnG8uU5J8O
-         XTpeLE8gYMTqX24Y9HhkO15DQdfrnWsP/VJIWh2YFHDPAr2VPCvhrSTZuaSjEXowXIah
-         UwAPox8YT9A6zO03ujebEbiNy5q5PJHFEuS7wJup4wAb/NFfvaDSYnnwUNl0RhjQDzts
-         13uMDvOAfzkx/xPTc4N0DuFp5HIwo/ACoMjX+fybj5jhWFOo8SB63XfrRJ8Lmh931Ttc
-         GKJcI58m76kQCdRufvT8TzfYPMUMoNFoFyFF0WWLgGvzXbu941CN1UhW7LCuBmrkHKmB
-         SybQ==
-X-Gm-Message-State: AOJu0YzzFbZytTTM1eQXASWgXbf8MTYWgv0XCQasjhGSrmHpdU+k0WCn
-	wPRkXHGd2jTb1LGkuAufrFx5XXkQiN5pNsxxWOs2biPDhkAQL94ZftAzcjjQ7snrmv9HMkvgBbp
-	A
-X-Gm-Gg: ASbGncvdWlC7vNoWBmD3wQ59m0xLkhzCaPCjijbJFRhRhw4tHV+PhjaCergYHGjALD4
-	wD3M1A98BSLmeKbyMhOF4SY68D9CrRjGXroj9bjzWMJDMNLY52sxIV6AapBaBOrNQwwKDjrgaaA
-	ZfGa3fqdCPST2A10ylTLm8qcESqPXR05IEQrRP/wZjkoFGLb2+/08XTtvMOekWPzMSLWz9J6+lY
-	+VViXHWE4mcsyNJeYEzb6MASpmegpf2vA03rOORfA4+hb9mAPC2hxlc19TC1sT3RkHWAvEU3k45
-	ydkhdAPQOLwEy+PHOcf9o0YYqPCgGAhi0hORr5LYaA==
-X-Google-Smtp-Source: AGHT+IGfzuEy4cbopAmt7XwpZhK64D04u8piY8NJQ60QzD9/cEtm9dD6NFDY5C99mRU7IobBgAbXmQ==
-X-Received: by 2002:a17:902:ea03:b0:220:c813:dfcc with SMTP id d9443c01a7336-2292f9fa333mr294073445ad.40.1743614702327;
-        Wed, 02 Apr 2025 10:25:02 -0700 (PDT)
-Received: from localhost ([2a03:2880:2ff:74::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2291eec71dbsm111145075ad.1.2025.04.02.10.25.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Apr 2025 10:25:02 -0700 (PDT)
-From: David Wei <dw@davidwei.uk>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>
-Subject: [PATCH net] io_uring/zcrx: fix selftests w/ updated netdev Python helpers
-Date: Wed,  2 Apr 2025 10:24:14 -0700
-Message-ID: <20250402172414.895276-1-dw@davidwei.uk>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1743614734; c=relaxed/simple;
+	bh=LfkI45sM3YwHB2enwUiXol6GeCWXUbXnj6SA8oIs1Mw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UCUF45iHzfHUsvcXaktJe/36FD5GS5KKNFm0HGO5TRcaVV4SGFZt0zVfNuFlvYvJMm5l1RaUDI8rdMhPul2hrrzGUQ38ZGlRxHfdofybhmIGBRSqSHmd5ETtP5ax7SyZ7J5MiS1xBjX5xJN9trSnC9MmKXWapRckzDi2o14atiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RMl6pwh7; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=xjco1YDCuCbUrUVk9eoDRqqrWkwQL1ZF+I2sBO+WXM0=; b=RMl6pwh75Bzrg4n8XUqQumdAhq
+	r7bf/esLZkLWq5tdGo7DCRJjs6s+20yHYnFhS8xLJFGqxl8IN/xYZPnl44qzWgc2FKbixRjYxUb5a
+	S8EUYlG1ovYbe545rofh7kSeu3eZzgH6MFGZOOiTvvYgX4xkuMJSAvk1K4S30TmQSM7o=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u01q7-007pcw-SY; Wed, 02 Apr 2025 19:25:23 +0200
+Date: Wed, 2 Apr 2025 19:25:23 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v3 4/4] net: mtip: The L2 switch driver for imx287
+Message-ID: <33394d5b-9a67-4acc-bdd1-bf43dc3bd8ab@lunn.ch>
+References: <20250331103116.2223899-1-lukma@denx.de>
+ <20250331103116.2223899-5-lukma@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250331103116.2223899-5-lukma@denx.de>
 
-Fix io_uring zero copy rx selftest with updated netdev Python helpers.
+> +struct switch_enet_private *mtip_netdev_get_priv(const struct net_device *ndev)
+> +{
+> +	if (ndev->netdev_ops == &mtip_netdev_ops)
+> +		return netdev_priv(ndev);
+> +
+> +	return NULL;
+> +}
 
-Signed-off-by: David Wei <dw@davidwei.uk>
----
- tools/testing/selftests/drivers/net/hw/iou-zcrx.py | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+> +static bool mtip_port_dev_check(const struct net_device *ndev)
+> +{
+> +	if (!mtip_netdev_get_priv(ndev))
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
 
-diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-index d301d9b356f7..9f271ab6ec04 100755
---- a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-+++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-@@ -27,7 +27,7 @@ def _set_flow_rule(cfg, chan):
- 
- 
- def test_zcrx(cfg) -> None:
--    cfg.require_v6()
-+    cfg.require_ipver('6')
- 
-     combined_chans = _get_combined_channels(cfg)
-     if combined_chans < 2:
-@@ -40,7 +40,7 @@ def test_zcrx(cfg) -> None:
-         flow_rule_id = _set_flow_rule(cfg, combined_chans - 1)
- 
-         rx_cmd = f"{cfg.bin_remote} -s -p 9999 -i {cfg.ifname} -q {combined_chans - 1}"
--        tx_cmd = f"{cfg.bin_local} -c -h {cfg.remote_v6} -p 9999 -l 12840"
-+        tx_cmd = f"{cfg.bin_local} -c -h {cfg.remote_addr_v['6']} -p 9999 -l 12840"
-         with bkg(rx_cmd, host=cfg.remote, exit_wait=True):
-             wait_port_listen(9999, proto="tcp", host=cfg.remote)
-             cmd(tx_cmd)
-@@ -51,7 +51,7 @@ def test_zcrx(cfg) -> None:
- 
- 
- def test_zcrx_oneshot(cfg) -> None:
--    cfg.require_v6()
-+    cfg.require_ipver('6')
- 
-     combined_chans = _get_combined_channels(cfg)
-     if combined_chans < 2:
-@@ -64,7 +64,7 @@ def test_zcrx_oneshot(cfg) -> None:
-         flow_rule_id = _set_flow_rule(cfg, combined_chans - 1)
- 
-         rx_cmd = f"{cfg.bin_remote} -s -p 9999 -i {cfg.ifname} -q {combined_chans - 1} -o 4"
--        tx_cmd = f"{cfg.bin_local} -c -h {cfg.remote_v6} -p 9999 -l 4096 -z 16384"
-+        tx_cmd = f"{cfg.bin_local} -c -h {cfg.remote_addr_v['6']} -p 9999 -l 4096 -z 16384"
-         with bkg(rx_cmd, host=cfg.remote, exit_wait=True):
-             wait_port_listen(9999, proto="tcp", host=cfg.remote)
-             cmd(tx_cmd)
--- 
-2.47.1
+Rearranging the code a bit to make my point....
 
+mtip_port_dev_check() tells us if this ndev is one of the ports of
+this switch.
+
+> +/* netdev notifier */
+> +static int mtip_netdevice_event(struct notifier_block *unused,
+> +				unsigned long event, void *ptr)
+> +{
+> +	struct net_device *ndev = netdev_notifier_info_to_dev(ptr);
+> +	struct netdev_notifier_changeupper_info *info;
+> +	int ret = NOTIFY_DONE;
+> +
+> +	if (!mtip_port_dev_check(ndev))
+> +		return NOTIFY_DONE;
+
+We have received a notification about some interface. This filters out
+all but the switches interfaces.
+
+> +
+> +	switch (event) {
+> +	case NETDEV_CHANGEUPPER:
+> +		info = ptr;
+
+CHANGERUPPER is that a netdev has been added or removed from a bridge,
+or some other sort of master device, e.g. a bond.
+
+> +
+> +		if (netif_is_bridge_master(info->upper_dev)) {
+> +			if (info->linking)
+> +				ret = mtip_ndev_port_link(ndev,
+> +							  info->upper_dev);
+
+Call mtip_ndev_port_link() has been added to some bridge.
+
+> +static int mtip_ndev_port_link(struct net_device *ndev,
+> +			       struct net_device *br_ndev)
+> +{
+> +	struct mtip_ndev_priv *priv = netdev_priv(ndev);
+> +	struct switch_enet_private *fep = priv->fep;
+> +
+> +	dev_dbg(&ndev->dev, "%s: ndev: %s br: %s fep: 0x%x\n",
+> +		__func__, ndev->name,  br_ndev->name, (unsigned int)fep);
+> +
+> +	/* Check if MTIP switch is already enabled */
+> +	if (!fep->br_offload) {
+> +		if (!priv->master_dev)
+> +			priv->master_dev = br_ndev;
+> +
+> +		fep->br_offload = 1;
+> +		mtip_switch_dis_port_separation(fep);
+> +		mtip_clear_atable(fep);
+> +	}
+
+So lets consider
+
+ip link add br0 type bridge
+ip link add br1 type bridge
+ip link set dev lan1 master br0
+
+We create two bridges, and add the first port to one of the bridges.
+
+fep->br_offload should be False
+priv->master_dev should be NULL.
+
+So fep->br_offload is set to 1, priv->master_dev is set to br0 and the
+separation between the ports is removed.
+
+It seems like the hardware will now be bridging packets between the
+two interfaces, despite lan2 not being a member of any bridge....
+
+Now
+
+ip link set dev lan2 master br1
+
+I make the second port a member of some other bridge. fep->br_offload
+is True, so nothing happens.
+
+This is why i said this code needs expanding.
+
+If you look at other switch drivers, you will see each port keeps
+track of what bridge it has been joined to. There is then logic which
+iterates over the ports, finds which ports are members of the same
+bridge, and enables packets to flow between those ports.
+
+With only two ports, you can make some simplifications, but you should
+only disable the separation once both ports are the member of the same
+bridge.
+
+	Andrew
 
