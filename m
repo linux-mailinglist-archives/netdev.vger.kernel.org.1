@@ -1,94 +1,92 @@
-Return-Path: <netdev+bounces-179205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 789F6A7B1FC
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 00:21:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FA33A7B20E
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 00:31:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0A3A189AB2D
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 22:21:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E02C3BA1AA
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 22:31:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C8001E8351;
-	Thu,  3 Apr 2025 22:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49881AB6F1;
+	Thu,  3 Apr 2025 22:31:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CA60vHK7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Htf1EKTi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680F61E7C01
-	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 22:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD29119F416;
+	Thu,  3 Apr 2025 22:31:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743718803; cv=none; b=S5CVFnkoB2+ye7MIFmWq9yfHgrXVy85AVcwojEtQ81M5Ek3Z8hEqLTegNTQy/hxXnKiFX/YcSGNXgfAemSifb6F0f42njTp2c6aBDCaoTNbOXqioyooAhcTg5fzPwzueM9zSGEAiN5cAmHxWJHG3dj2Ea3urq17jEZZPW2H85qM=
+	t=1743719492; cv=none; b=e+8sDc8gJsPaDhJ9wR1aGnYt9fiUme+Iu9U4Au2gbQtJmAzkdeI5riOuS4P/YMMXiFZ/+9oFpOGFodIXVfTPyIm7KvK8sBGh59/S76E6BiaWIYEUygLKr/LEiMYCy/hSSZSlRLUmcdK6ZJKLhuw9LEu12J74orutTQNrwXXDBgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743718803; c=relaxed/simple;
-	bh=rSAnTxcjBcLSFN50gW5YrU941og66JkBOAEm0xtRkNg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=o/HsPcHCm4ItDRY+29GD+PW0fQ/Tvljur2OkJRn16p8A7DfVppNLBNK0m+DPxGDE/fM2CiUgcRas2Cg0jsM3xVWI06F+taWa/+62DV3ZVo//5Xh4pQi5EhxQGoDQRHdt2D6/mCzHmSjAnw+XdlIgFHMqqe+4InO15vLEfdFu65c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CA60vHK7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A788C4CEE3;
-	Thu,  3 Apr 2025 22:20:03 +0000 (UTC)
+	s=arc-20240116; t=1743719492; c=relaxed/simple;
+	bh=q7aT1Vc9FCJL3FCej7Qo+diDR5o13VyLs2ps027u9VQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HD/DAlSavmh+jvjE8LDRWB48TG8GZBNA8KySz8a8KPNyxDzHvYEG8hKtSP0Prtrn9xtxT6Imrl+aNiCjmkYo9iHUIgUuCvgddPCxgjyRI3efY51fXbE4irrgNmCyz2AdSKeEOjPMs0B/11YRVrm34sdE5pfAB9NjA9SPA0FcrLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Htf1EKTi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A635C4CEE3;
+	Thu,  3 Apr 2025 22:31:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743718803;
-	bh=rSAnTxcjBcLSFN50gW5YrU941og66JkBOAEm0xtRkNg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CA60vHK7AG3sI1Zb/3r+GAkr2/yQ+MGMyoIuqJ8KabBQwN6ui0ieef/nk4wskWSPX
-	 4ksODe+DS0Siyef9TmWZV5NjQXdi5pLCdxlC7j8vVrNWX2JA7ccS+EA8z0PFQnxZrV
-	 voBt61KFCSJwv+xNUaQ5OBybLlqCyh0CbWWcziyRoY3FBkfDMfLrNU57/hsCFy74nj
-	 Qi3sFmuci0/aFawDAVE401ln0DHDS/GswULDmQsko6U7aavHtbf4cxZ5fB2rG4+oW9
-	 dIAg/GOjeNnpxewL8+LL5oMiZRY5qtvfhbTVgQfnWCzA1Dqrg5CKEhxWKbZifNDnIc
-	 31DzYkn+6jQWQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71771380664C;
-	Thu,  3 Apr 2025 22:20:41 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1743719491;
+	bh=q7aT1Vc9FCJL3FCej7Qo+diDR5o13VyLs2ps027u9VQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Htf1EKTiwevBUPUymLkFuUGQbfKsvyB4rrmwSzMbJK8Y/m0/v0q6tpcET1MnXN4No
+	 s+7bbLHyQGG8IzECdarQuPoOBHhuoFrdFHRIj/UD/8Wq5NTGnOT1W5BpFwN/Oh9wec
+	 Gk21QN/coOp4Da8BO1qw+o8tUURfcZJ4AiyPFO4Kc7avSRMH0ybdosuxga7Tg7V22a
+	 LHKUDGTZmmN3Mb00N3PM0d9jtHHHUzooslffkmBUccQVJnTNHMJXnGgu38hPZ9jHO8
+	 CKMBaRVDJSPqwdt9GdbqbE635vMX6nDVo8UFwIqrHaTSMHdG8B9PTKFqR/SYWm4Z3B
+	 81/zCJ2RElWcA==
+Date: Thu, 3 Apr 2025 15:31:29 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
+ <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Simon
+ Horman <horms@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Mina
+ Almasry <almasrymina@google.com>, Yonglong Liu <liuyonglong@huawei.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>, Pavel Begunkov
+ <asml.silence@gmail.com>, Matthew Wilcox <willy@infradead.org>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-mm@kvack.org, Qiuling Ren <qren@redhat.com>, Yuying Ma
+ <yuma@redhat.com>
+Subject: Re: [PATCH net-next v6 2/2] page_pool: Track DMA-mapped pages and
+ unmap them when destroying the pool
+Message-ID: <20250403153129.013a7bdd@kernel.org>
+In-Reply-To: <20250401-page-pool-track-dma-v6-2-8b83474870d4@redhat.com>
+References: <20250401-page-pool-track-dma-v6-0-8b83474870d4@redhat.com>
+	<20250401-page-pool-track-dma-v6-2-8b83474870d4@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] ipv6: fix omitted netlink attributes when using
- RTEXT_FILTER_SKIP_STATS
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174371883999.2702664.13276567361004177734.git-patchwork-notify@kernel.org>
-Date: Thu, 03 Apr 2025 22:20:39 +0000
-References: <20250402121751.3108-1-ffmancera@riseup.net>
-In-Reply-To: <20250402121751.3108-1-ffmancera@riseup.net>
-To: Fernando Fernandez Mancera <ffmancera@riseup.net>
-Cc: netdev@vger.kernel.org, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Tue, 01 Apr 2025 11:27:19 +0200 Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+> +	if (err) {
+> +		WARN_ONCE(1, "couldn't track DMA mapping, please report to netdev@");
+>  		goto unmap_failed;
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+FWIW I second Pavel's concern about the warning being too drastic.
+I have the feeling Meta's fleet will hit this.
+How about WARN_ONCE(err !=3D -ENOMEM, ... ? I presume you care mostly
+about the array filling up so -EBUSY
 
-On Wed,  2 Apr 2025 14:17:51 +0200 you wrote:
-> Using RTEXT_FILTER_SKIP_STATS is incorrectly skipping non-stats IPv6
-> netlink attributes on link dump. This causes issues on userspace tools,
-> e.g iproute2 is not rendering address generation mode as it should due
-> to missing netlink attribute.
-> 
-> Move the filling of IFLA_INET6_STATS and IFLA_INET6_ICMP6STATS to a
-> helper function guarded by a flag check to avoid hitting the same
-> situation in the future.
-> 
-> [...]
+> +	}
+> =20
+> +	if (page_pool_set_dma_addr_netmem(netmem, dma)) {
+> +		WARN_ONCE(1, "unexpected DMA address, please report to netdev@");
+> +		goto unmap_failed;
+> +	}
 
-Here is the summary with links:
-  - [net,v2] ipv6: fix omitted netlink attributes when using RTEXT_FILTER_SKIP_STATS
-    https://git.kernel.org/netdev/net/c/7ac6ea4a3e08
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I think this is ever so slightly leaking the id, if it ever happens?
 
