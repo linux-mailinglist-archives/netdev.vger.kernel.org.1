@@ -1,394 +1,172 @@
-Return-Path: <netdev+bounces-179107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EA40A7A965
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 20:30:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96697A7A971
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 20:33:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8643C18853D3
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 18:31:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06FE316F4DF
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 18:32:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B59E3253358;
-	Thu,  3 Apr 2025 18:30:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0791E2517A8;
+	Thu,  3 Apr 2025 18:32:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="N8pW6y6H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZRXVjO2b"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A408250BF5
-	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 18:30:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310FE24CEE8;
+	Thu,  3 Apr 2025 18:32:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743705035; cv=none; b=e5Pv3XYwqYCumgPEkA/CTbFW9Iiomm+Klqf0omDnbEXqalGQW2rTozCGkst3eWX+7IY1hwFTl0t0aopJGXBGwJKWbaBKJZBTlIFkTlXfik2r4NKhRqdvAfLBrSFcTwYqiAURIz9lfFbZP3/9a1GjE4vPfvWuGKkOy/zStWIDKkk=
+	t=1743705141; cv=none; b=iwQZCuQR/ndOqh6MAB7xyAz0LPj9yJysCaN7p188jz1Zh98CFACaYTlRIVUH3JM2fdPbCfzNuqhkPTIgS145WPBOTjZ+nL319KrJzLXHo5rYkT+i9tjzWHsuyI04YVb3ktjuDL5SoSLRpzFoJlWBi21vEBgQ6cqCrFus5raiYng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743705035; c=relaxed/simple;
-	bh=/oCj0Hk1g+sUvQ3GIO57Vo8U9NcTvnSSJUK+gndZU1w=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nSckxeWi9sNaMmYK9HImNZm/1keaOl+QRHgGc4FL0PM7I+ZzscrVvW5iPE8LPV2iF6lHR1tZcIKwu/8mBJUV8XvIXdRbOZCO20sJoOLEKNAycfSd6ZnXSlcenwZICHme3bzXvQ0C1I/AVg1byFr6CwFWeDpQc+p5Y3YM2hv3x4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=N8pW6y6H; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743705031;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UdDp1sO0IopfH7Iy+tgmsR53cIFBoLuTkzWc5BMhUC0=;
-	b=N8pW6y6HFbeE9hCyE1ExGSseCusV1hXW05RIrKkHvLtrxfI0VTomHeIxrLZT6ZmnQ3pmZh
-	lSJXxwl818uHQhTcRf7gnBYyXmnKddjhdtmAQLXBkvJhnGvL1/TCvKqwoRYKfZBYrMzjjA
-	ZKlIFMCwdhALDB+60jfyWeIu+JHt1/4=
-From: Sean Anderson <sean.anderson@linux.dev>
-To: netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	upstream@airoha.com,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	devicetree@vger.kernel.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Naveen N Rao <naveen@kernel.org>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	linuxppc-dev@lists.ozlabs.org,
-	Sean Anderson <sean.anderson@linux.dev>
-Subject: [RFC net-next PATCH 13/13] powerpc: dts: Add compatible strings for Lynx PCSs
-Date: Thu,  3 Apr 2025 14:30:23 -0400
-Message-Id: <20250403183023.1948676-1-sean.anderson@linux.dev>
-In-Reply-To: <20250403181907.1947517-1-sean.anderson@linux.dev>
-References: <20250403181907.1947517-1-sean.anderson@linux.dev>
+	s=arc-20240116; t=1743705141; c=relaxed/simple;
+	bh=oYSOgbE2T0F5zKIQaRgihuLpcmjBkxqOSl5cApaGi38=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AzT3dmlSQ37MDl3vKi+8ekt+HV0N80Q/JYhR2+I8Ma6/5/NXuLj5K3BrTLJieTGTKzM28NxjhlGFcaj4ezQm6wHCW0tx8NLv+Q3JCxAIdM+cVyeqqDcr0PaannFGkzMTK0pgut0rH1hL9snykntziKs1oKAekVNX0HEMG2GHyG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZRXVjO2b; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43cf680d351so13490135e9.0;
+        Thu, 03 Apr 2025 11:32:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743705138; x=1744309938; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=W+2VbAG4hh+12ycsguwdRu57K4kt6OAXOvTs23LZ8oU=;
+        b=ZRXVjO2b5CahGR05P/I+tUp1UeNjnx8JqL9NAgQw3IJ/IYgp8xiz89MQHd/c0+PeH4
+         XlhadJygUNjzyqhf1fPtfnR9Izd4vVAiFrhxm+wJ0Wucyzlxz5MFrJwN1usfGZIdFCUi
+         22iWDfuu9aiyOoZh2EYWugMULaf1m9KafnRViPbs6DtWmwkREbDLCjCRkDd9fz7L5mHO
+         5LEfVImCC2zUCWubwITo7sOou3YMv6cKkVR6mXuCH7C4MHvjPOX6raXjqVk7O3PR41ts
+         qMhTtEAjI7WFT228HjL0LqejdldfO8SduyNFwLsB0x12UWQuLOfhdGaimqX63APPRVoZ
+         xM2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743705138; x=1744309938;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=W+2VbAG4hh+12ycsguwdRu57K4kt6OAXOvTs23LZ8oU=;
+        b=FsgBmx34xAaZEL0jVHG9V3mh40r9ysa8t5W9zzyQ3ImC/pohgZozjN0/xMv6XzpHfK
+         MSTfzVpOkXgyW9altj0qBhwmSmk9nNl9R+qbnTNSRcnqQdfoFEgH2imxCaQ/tbLZptQu
+         uad+TeyBPE7PM8trncJBMrcbP4ahZdpVsSOMHQpX0xkA9kiOU+xMoeEsjRPjjYcK5B1p
+         /VEId4t69iNYYsEhzCYCcQimA+8HK5LjU0UrYJjMVH1ROr52bbMeeV/mdO0lotiEGhC+
+         PwaRZeVcnWBOi8Iw/hxaWttgeWN05mKKZOpeb/3jCto7HwR7CEg2dXIUTfgd3yZmYjHH
+         mqYA==
+X-Forwarded-Encrypted: i=1; AJvYcCVgd7/cLzDr5jr/cYvAurkc4tDwiuX+zgEqGJ9kq0pX8QkIB1S0y0PHQfS5AnJy7gyp7/mk2ypTwDxWEYQ=@vger.kernel.org, AJvYcCWBI+p2Wl9ZWvFjx1wDeZye8CFMEhdIQi8twdSF/+KmsNnFRZDvPhunDb46Y7t/LMN3T0QKYkFBG0IHlg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGagDPq3f7cO39fKFpUIxkf3RSQro1Fs1DEEhNP4d03JdZ45HX
+	yI/hCCyKotgU3Ef4mDY1cxfO/SKay8TFpZLhPk9cviXiwcGvn5iC
+X-Gm-Gg: ASbGnctZ4Xw1O94L6Gs0JVXv4DyTduc491aExQXfyn8ZxiGTGSRIH4i/dsdg8bdcEFb
+	ISec7/LKaD+ei7Xf2RejUAF2OaGO3m1WsBCWrcodWLjtLxRQ3HvF90iZbZRpf+zFWEWcsl0wp4w
+	ZKUe42hFxGTKdMOvCaeHSJbScvNfKqFyJOj0YB07yHUbqxxTgbkGfgK3b+7UpEZPiKN8lPJq79Q
+	H0FckV3hPsbINZvc/s+BXBra5uIPCZdwcBmTnNYdZZBpbgCG4nXz2ZelfAwXUBY0kJY4REjOW9z
+	FVpd7RfvziYKlbZL4NOXPmwh7+UrPKN1QtbN2IyAGz/WuZ4zTRHH5oh0wMVK8wF9pQ==
+X-Google-Smtp-Source: AGHT+IGgiRqgZDKhOZADM7Mh+G25jDg+2rg96YfC4/Oqm9d/ZkZEjtND1wzeIXtq4qMNKHz/8JM21A==
+X-Received: by 2002:a5d:64e7:0:b0:38d:e0a9:7e5e with SMTP id ffacd0b85a97d-39c2e5f4fe8mr4307153f8f.6.1743705138211;
+        Thu, 03 Apr 2025 11:32:18 -0700 (PDT)
+Received: from [172.27.62.155] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec366b571sm25367675e9.40.2025.04.03.11.32.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Apr 2025 11:32:17 -0700 (PDT)
+Message-ID: <d78fa6dc-5820-46b6-9b7d-0986f9a70da2@gmail.com>
+Date: Thu, 3 Apr 2025 21:32:14 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net/mlx5: fix potential null dereference when enable
+ shared FDB
+To: =?UTF-8?B?Q2hhcmxlcyBIYW4o6Z+p5pil6LaFKQ==?= <hanchunchao@inspur.com>,
+ "przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "saeedm@nvidia.com" <saeedm@nvidia.com>, "leon@kernel.org"
+ <leon@kernel.org>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "markzhang@nvidia.com" <markzhang@nvidia.com>,
+ "mbloch@nvidia.com" <mbloch@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
+References: <526e6240c8964fefa80b4bc759c44c04@inspur.com>
+ <a23ccc3b-bb4d-4352-bd7e-ab0f3ef82585@gmail.com>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <a23ccc3b-bb4d-4352-bd7e-ab0f3ef82585@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-This adds appropriate compatible strings for Lynx PCSs on PowerPC QorIQ
-platforms. This also changes the node name to avoid warnings from
-ethernet-phy.yaml.
 
-Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
----
 
- arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-0-best-effort.dtsi | 3 ++-
- arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-0.dtsi             | 3 ++-
- arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1-best-effort.dtsi | 3 ++-
- arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1.dtsi             | 3 ++-
- arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-2.dtsi             | 3 ++-
- arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-3.dtsi             | 3 ++-
- arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-0.dtsi              | 3 ++-
- arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-1.dtsi              | 3 ++-
- arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-2.dtsi              | 3 ++-
- arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-3.dtsi              | 3 ++-
- arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-4.dtsi              | 3 ++-
- arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-5.dtsi              | 3 ++-
- arch/powerpc/boot/dts/fsl/qoriq-fman3-1-10g-0.dtsi             | 3 ++-
- arch/powerpc/boot/dts/fsl/qoriq-fman3-1-10g-1.dtsi             | 3 ++-
- arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-0.dtsi              | 3 ++-
- arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-1.dtsi              | 3 ++-
- arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-2.dtsi              | 3 ++-
- arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-3.dtsi              | 3 ++-
- arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-4.dtsi              | 3 ++-
- arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-5.dtsi              | 3 ++-
- 20 files changed, 40 insertions(+), 20 deletions(-)
+On 03/04/2025 17:03, Tariq Toukan wrote:
+> 
+> 
+> On 03/04/2025 12:52, Charles Han(韩春超) wrote:
+>> -ENXIO indicates "No such device or address". I've found that in mlx5/ 
+>> core, if mlx5_get_flow_namespace() returns null, it basically returns 
+>> -EOPNOTSUPP.
+>>
+> 
+> Please do not top-post.
+> 
+> +1.
+> If namespace is not found it's due to lack of support.
+> 
+> 
+>> -----邮件原件-----
+>> 发件人: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+>> 发送时间: 2025年4月2日 19:02
+>> 收件人: Charles Han(韩春超) <hanchunchao@inspur.com>
+>> 抄送: netdev@vger.kernel.org; linux-rdma@vger.kernel.org; linux- 
+>> kernel@vger.kernel.org; saeedm@nvidia.com; leon@kernel.org; 
+>> tariqt@nvidia.com; andrew+netdev@lunn.ch; davem@davemloft.net; 
+>> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com; 
+>> markzhang@nvidia.com; mbloch@nvidia.com
+>> 主题: Re: [PATCH] net/mlx5: fix potential null dereference when enable 
+>> shared FDB
+>>
+>> On 4/2/25 11:43, Charles Han wrote:
+>>> mlx5_get_flow_namespace() may return a NULL pointer, dereferencing it
+>>> without NULL check may lead to NULL dereference.
+>>> Add a NULL check for ns.
+>>>
+>>> Fixes: db202995f503 ("net/mlx5: E-Switch, add logic to enable shared
+>>> FDB")
+>>> Signed-off-by: Charles Han <hanchunchao@inspur.com>
+> 
+> Acked-by: Tariq Toukan <tariqt@nvidia.com>
+> 
 
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-0-best-effort.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-0-best-effort.dtsi
-index 7e70977f282a..61d52044e7b4 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-0-best-effort.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-0-best-effort.dtsi
-@@ -66,7 +66,8 @@ mdio@e1000 {
- 		reg = <0xe1000 0x1000>;
- 		fsl,erratum-a011043; /* must ignore read errors */
- 
--		pcsphy0: ethernet-phy@0 {
-+		pcsphy0: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-0.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-0.dtsi
-index 5f89f7c1761f..78d6e49655f4 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-0.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-0.dtsi
-@@ -70,7 +70,8 @@ mdio@f1000 {
- 		reg = <0xf1000 0x1000>;
- 		fsl,erratum-a011043; /* must ignore read errors */
- 
--		pcsphy6: ethernet-phy@0 {
-+		pcsphy6: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1-best-effort.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1-best-effort.dtsi
-index 71eb75e82c2e..5ffd1c2efaee 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1-best-effort.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1-best-effort.dtsi
-@@ -73,7 +73,8 @@ mdio@e3000 {
- 		reg = <0xe3000 0x1000>;
- 		fsl,erratum-a011043; /* must ignore read errors */
- 
--		pcsphy1: ethernet-phy@0 {
-+		pcsphy1: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1.dtsi
-index fb7032ddb7fc..e0325f09ce5f 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1.dtsi
-@@ -70,7 +70,8 @@ mdio@f3000 {
- 		reg = <0xf3000 0x1000>;
- 		fsl,erratum-a011043; /* must ignore read errors */
- 
--		pcsphy7: ethernet-phy@0 {
-+		pcsphy7: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-2.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-2.dtsi
-index 6b3609574b0f..8e6f6c5f0f2e 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-2.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-2.dtsi
-@@ -38,7 +38,8 @@ mdio@e1000 {
- 		reg = <0xe1000 0x1000>;
- 		fsl,erratum-a011043; /* must ignore read errors */
- 
--		pcsphy0: ethernet-phy@0 {
-+		pcsphy0: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-3.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-3.dtsi
-index 28ed1a85a436..2cd3f0688cb1 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-3.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-3.dtsi
-@@ -38,7 +38,8 @@ mdio@e3000 {
- 		reg = <0xe3000 0x1000>;
- 		fsl,erratum-a011043; /* must ignore read errors */
- 
--		pcsphy1: ethernet-phy@0 {
-+		pcsphy1: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-0.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-0.dtsi
-index 1089d6861bfb..9f8c38a629cb 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-0.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-0.dtsi
-@@ -62,7 +62,8 @@ mdio@e1000 {
- 		reg = <0xe1000 0x1000>;
- 		fsl,erratum-a011043; /* must ignore read errors */
- 
--		pcsphy0: ethernet-phy@0 {
-+		pcsphy0: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-1.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-1.dtsi
-index a95bbb4fc827..248a57129d40 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-1.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-1.dtsi
-@@ -69,7 +69,8 @@ mdio@e3000 {
- 		reg = <0xe3000 0x1000>;
- 		fsl,erratum-a011043; /* must ignore read errors */
- 
--		pcsphy1: ethernet-phy@0 {
-+		pcsphy1: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-2.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-2.dtsi
-index 7d5af0147a25..73cef28db890 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-2.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-2.dtsi
-@@ -69,7 +69,8 @@ mdio@e5000 {
- 		reg = <0xe5000 0x1000>;
- 		fsl,erratum-a011043; /* must ignore read errors */
- 
--		pcsphy2: ethernet-phy@0 {
-+		pcsphy2: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-3.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-3.dtsi
-index 61e5466ec854..4657b6a8fb78 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-3.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-3.dtsi
-@@ -69,7 +69,8 @@ mdio@e7000 {
- 		reg = <0xe7000 0x1000>;
- 		fsl,erratum-a011043; /* must ignore read errors */
- 
--		pcsphy3: ethernet-phy@0 {
-+		pcsphy3: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-4.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-4.dtsi
-index 3ba0cdafc069..ac322e5803c2 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-4.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-4.dtsi
-@@ -62,7 +62,8 @@ mdio@e9000 {
- 		reg = <0xe9000 0x1000>;
- 		fsl,erratum-a011043; /* must ignore read errors */
- 
--		pcsphy4: ethernet-phy@0 {
-+		pcsphy4: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-5.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-5.dtsi
-index 51748de0a289..68ffa2c65e03 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-5.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-5.dtsi
-@@ -69,7 +69,8 @@ mdio@eb000 {
- 		reg = <0xeb000 0x1000>;
- 		fsl,erratum-a011043; /* must ignore read errors */
- 
--		pcsphy5: ethernet-phy@0 {
-+		pcsphy5: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-10g-0.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-10g-0.dtsi
-index ee4f5170f632..caf28fcbd55c 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-10g-0.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-10g-0.dtsi
-@@ -70,7 +70,8 @@ mdio@f1000 {
- 		reg = <0xf1000 0x1000>;
- 		fsl,erratum-a011043; /* must ignore read errors */
- 
--		pcsphy14: ethernet-phy@0 {
-+		pcsphy14: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-10g-1.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-10g-1.dtsi
-index 83d2e0ce8f7b..6128b9fb5381 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-10g-1.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-10g-1.dtsi
-@@ -70,7 +70,8 @@ mdio@f3000 {
- 		reg = <0xf3000 0x1000>;
- 		fsl,erratum-a011043; /* must ignore read errors */
- 
--		pcsphy15: ethernet-phy@0 {
-+		pcsphy15: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-0.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-0.dtsi
-index 3132fc73f133..a7dffe6bbe5b 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-0.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-0.dtsi
-@@ -62,7 +62,8 @@ mdio@e1000 {
- 		reg = <0xe1000 0x1000>;
- 		fsl,erratum-a011043; /* must ignore read errors */
- 
--		pcsphy8: ethernet-phy@0 {
-+		pcsphy8: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-1.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-1.dtsi
-index 75e904d96602..d0ad92f2ca2d 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-1.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-1.dtsi
-@@ -69,7 +69,8 @@ mdio@e3000 {
- 		reg = <0xe3000 0x1000>;
- 		fsl,erratum-a011043; /* must ignore read errors */
- 
--		pcsphy9: ethernet-phy@0 {
-+		pcsphy9: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-2.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-2.dtsi
-index 69f2cc7b8f19..b4b893eead2a 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-2.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-2.dtsi
-@@ -69,7 +69,8 @@ mdio@e5000 {
- 		reg = <0xe5000 0x1000>;
- 		fsl,erratum-a011043; /* must ignore read errors */
- 
--		pcsphy10: ethernet-phy@0 {
-+		pcsphy10: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-3.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-3.dtsi
-index b3aaf01d7da0..6c15a6ff0926 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-3.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-3.dtsi
-@@ -69,7 +69,8 @@ mdio@e7000 {
- 		reg = <0xe7000 0x1000>;
- 		fsl,erratum-a011043; /* must ignore read errors */
- 
--		pcsphy11: ethernet-phy@0 {
-+		pcsphy11: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-4.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-4.dtsi
-index 18e020432807..14fa4d067ffd 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-4.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-4.dtsi
-@@ -62,7 +62,8 @@ mdio@e9000 {
- 		reg = <0xe9000 0x1000>;
- 		fsl,erratum-a011043; /* must ignore read errors */
- 
--		pcsphy12: ethernet-phy@0 {
-+		pcsphy12: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-5.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-5.dtsi
-index 55f329d13f19..64737187a577 100644
---- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-5.dtsi
-+++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-5.dtsi
-@@ -69,7 +69,8 @@ mdio@eb000 {
- 		reg = <0xeb000 0x1000>;
- 		fsl,erratum-a011043; /* must ignore read errors */
- 
--		pcsphy13: ethernet-phy@0 {
-+		pcsphy13: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
--- 
-2.35.1.1320.gc452695387.dirty
+Re-visiting this...
+See comment below.
+
+>>> ---
+>>>    .../net/ethernet/mellanox/mlx5/core/eswitch_offloads.c | 10 ++++++ 
+>>> ++++
+>>>    drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c       |  5 +++++
+>>>    2 files changed, 15 insertions(+)
+>>>
+>>> diff --git
+>>> a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+>>> b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+>>> index a6a8eea5980c..dc58e4c2d786 100644
+>>> --- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+>>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
+>>> @@ -2667,6 +2667,11 @@ static int esw_set_slave_root_fdb(struct 
+>>> mlx5_core_dev *master,
+>>>        if (master) {
+>>>            ns = mlx5_get_flow_namespace(master,
+>>>                             MLX5_FLOW_NAMESPACE_FDB);
+>>> +        if (!ns) {
+>>> +            mlx5_core_warn(master, "Failed to get flow namespace\n");
+
+Use esw_warn(), for all new instances.
 
 
