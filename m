@@ -1,253 +1,148 @@
-Return-Path: <netdev+bounces-179014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46D08A7A07E
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 11:52:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A98C8A7A089
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 11:58:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F37F188E794
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 09:52:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD8AD3B38DC
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 09:58:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A128024397B;
-	Thu,  3 Apr 2025 09:52:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B4C221D8E;
+	Thu,  3 Apr 2025 09:58:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="Unq4Y2Ev"
 X-Original-To: netdev@vger.kernel.org
-Received: from unicom145.biz-email.net (unicom145.biz-email.net [210.51.26.145])
+Received: from fanzine2.igalia.com (fanzine.igalia.com [178.60.130.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243312E3385;
-	Thu,  3 Apr 2025 09:52:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.51.26.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 608DC13D531;
+	Thu,  3 Apr 2025 09:58:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.60.130.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743673963; cv=none; b=dxgJfu6eGlNE1GuVNnjjsqBL7XXsZhNingiBlWocsRsJEUa6ADsksguqJeowF3uku4AYkLApVzwGsNrUozk6/ut6bc2av8sQQ0u9HUxDg7y96VsJJreZq7FUtSMx/Q9FNaSEk/bjzBfnqRe4sELPNHQT7QSwrNlri+rf6d551eM=
+	t=1743674306; cv=none; b=E1PWa908OQ2XqyVi86y8Z0t6YWTJsq/GHfoV9AD0GugutfR24znw0OEVvc8x85Z8Fkt2f2i8JoObkYvIvwd4G5W542NPYftkYoVL0+kx93liYJ0KS/fj5xpWBlCxUi9OWZG89a2KliPu6WhPC5PH5OEiqcD7cl8bVBD8r27bE6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743673963; c=relaxed/simple;
-	bh=3yiiA2JhKvLrYXs0WXZvH3KfWbuhniiLUzYYsdf6K0I=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=ZPQ6Cptu2tddExZGQp+0Oqm9fXUBY1ryQhUpz5c5TLUXjCQkgjl9ARQMSf4H2Vpd/6OfyiO0q/Rid4phMKAK/vs9eZ0AIFxUPLVWC7M0EO4BW2uMZWcDwbb+OGF/QlpzoMSiR4WLS7JN7tpiqIFES4CTPvBk79VnO6omsJj/mP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com; spf=pass smtp.mailfrom=inspur.com; arc=none smtp.client-ip=210.51.26.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inspur.com
-Received: from jtjnmail201612.home.langchao.com
-        by unicom145.biz-email.net ((D)) with ASMTP (SSL) id 202504031752289983;
-        Thu, 03 Apr 2025 17:52:28 +0800
-Received: from jtjnmail201607.home.langchao.com (10.100.2.7) by
- jtjnmail201612.home.langchao.com (10.100.2.12) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 3 Apr 2025 17:52:27 +0800
-Received: from jtjnmail201607.home.langchao.com ([fe80::c5ea:abc2:7a50:1de9])
- by jtjnmail201607.home.langchao.com ([fe80::c5ea:abc2:7a50:1de9%8]) with mapi
- id 15.01.2507.039; Thu, 3 Apr 2025 17:52:27 +0800
-From: =?utf-8?B?Q2hhcmxlcyBIYW4o6Z+p5pil6LaFKQ==?= <hanchunchao@inspur.com>
-To: "przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"saeedm@nvidia.com" <saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>,
-	"tariqt@nvidia.com" <tariqt@nvidia.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"markzhang@nvidia.com" <markzhang@nvidia.com>, "mbloch@nvidia.com"
-	<mbloch@nvidia.com>
-Subject: Re: [PATCH] net/mlx5: fix potential null dereference when enable
- shared FDB
-Thread-Topic: [PATCH] net/mlx5: fix potential null dereference when enable
- shared FDB
-Thread-Index: AdukfhISoqHM3HXCoEeU3JbpPsETNA==
-Date: Thu, 3 Apr 2025 09:52:27 +0000
-Message-ID: <526e6240c8964fefa80b4bc759c44c04@inspur.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: yes
-X-MS-TNEF-Correlator:
-Content-Type: multipart/signed; protocol="application/x-pkcs7-signature";
-	micalg=SHA1; boundary="----=_NextPart_000_0006_01DBA4C1.28DD0B60"
+	s=arc-20240116; t=1743674306; c=relaxed/simple;
+	bh=Znl9X9FpTIGF2OsT13x7/fGoEi2ygGGP8eazYnBsR6A=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=DZAK7iUvkYXr/ShoipniM3CoH0aCwz4w+jmhGaFaxEQ+hYk6BOM7kPytY8NNbS5CFyijTcdITth1FCRXQ20KqioEEQuGkKMnfaetfd2Cam4miulBO2KmeKUH5NbMONyYeB5pKRPQv0ftgPG99zk3b9eZSNPGKM9Tzvy+8SzgA94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=Unq4Y2Ev; arc=none smtp.client-ip=178.60.130.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Content-Type:MIME-Version:Message-ID:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Sender:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ayy35oKwof2JTIj+vzq+S1Uxz24/XsuIZVSRWIasD48=; b=Unq4Y2EvB3btFhXlJJiS8SM/co
+	L1SuZeV2mtqzIQoDm6yRLtSJAvnk23toy7h3vA4nHYWyXe6OCFr8a1hqQawkftGC8NMbRpQTFeZ1C
+	ySrqrpHoTvcsMpIdAWAVry/mFFTryMoWaYbgNHsqhblaV3YHSlTjnN+PHCLg8lE1k6ZNDpVpR+8N4
+	hVD6dqG22FykwegIrWHkPLSglwor0Nkp3kIt/YWJluyDB8N+FGRvNTN1WZNDJfAEPdGoKc+IqgtFz
+	WUuuVmfMkPT6vaF0k9VtEFyWAseniKNrq0MzBZc7AhCHBgaDvb3XE6kPMLZ1fodGv55sNBuVwwHnF
+	I15qP7nA==;
+Received: from 79.red-83-60-111.dynamicip.rima-tde.net ([83.60.111.79] helo=localhost)
+	by fanzine2.igalia.com with utf8esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
+	id 1u0HKp-00AljK-Qd; Thu, 03 Apr 2025 11:58:07 +0200
+From: Ricardo =?utf-8?Q?Ca=C3=B1uelo?= Navarro <rcn@igalia.com>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, kernel-dev@igalia.com, linux-sctp@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+Subject: Re: [PATCH] sctp: check transport existence before processing a
+ send primitive
+In-Reply-To: <CADvbK_dTX3c9wgMa8bDW-Hg-5gGJ7sJzN5s8xtGwwYW9FE=rcg@mail.gmail.com>
+References: <20250402-kasan_slab-use-after-free_read_in_sctp_outq_select_transport-v1-1-da6f5f00f286@igalia.com>
+ <CADvbK_dTX3c9wgMa8bDW-Hg-5gGJ7sJzN5s8xtGwwYW9FE=rcg@mail.gmail.com>
+Date: Thu, 03 Apr 2025 11:58:00 +0200
+Message-ID: <87tt75efdj.fsf@igalia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-tUid: 2025403175228178847127886bb845e3717d21d93ef67
-X-Abuse-Reports-To: service@corp-email.com
-Abuse-Reports-To: service@corp-email.com
-X-Complaints-To: service@corp-email.com
-X-Report-Abuse-To: service@corp-email.com
+Content-Type: text/plain
 
-------=_NextPart_000_0006_01DBA4C1.28DD0B60
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Thanks for reviewing, answers below:
 
--ENXIO indicates "No such device or address". I've found that in =
-mlx5/core, if mlx5_get_flow_namespace() returns null, it basically =
-returns -EOPNOTSUPP.
+On Wed, Apr 02 2025 at 15:40:56, Xin Long <lucien.xin@gmail.com> wrote:
+> The data send path:
+>
+>   sctp_endpoint_lookup_assoc() ->
+>   sctp_sendmsg_to_asoc()
+>
+> And the transport removal path:
+>
+>   sctp_sf_do_asconf() ->
+>   sctp_process_asconf() ->
+>   sctp_assoc_rm_peer()
+>
+> are both protected by the same socket lock.
+>
+> Additionally, when a path is removed, sctp_assoc_rm_peer() updates the
+> transport of all existing chunks in the send queues (peer->transmitted
+> and asoc->outqueue.out_chunk_list) to NULL.
+>
+> It will be great if you can reproduce the issue locally and help check
+> how the potential race occurs.
 
------=E9=82=AE=E4=BB=B6=E5=8E=9F=E4=BB=B6-----
-=E5=8F=91=E4=BB=B6=E4=BA=BA: Przemek Kitszel =
-<przemyslaw.kitszel@intel.com>=20
-=E5=8F=91=E9=80=81=E6=97=B6=E9=97=B4: 2025=E5=B9=B44=E6=9C=882=E6=97=A5 =
-19:02
-=E6=94=B6=E4=BB=B6=E4=BA=BA: Charles Han(=E9=9F=A9=E6=98=A5=E8=B6=85) =
-<hanchunchao@inspur.com>
-=E6=8A=84=E9=80=81: netdev@vger.kernel.org; linux-rdma@vger.kernel.org; =
-linux-kernel@vger.kernel.org; saeedm@nvidia.com; leon@kernel.org; =
-tariqt@nvidia.com; andrew+netdev@lunn.ch; davem@davemloft.net; =
-edumazet@google.com; kuba@kernel.org; pabeni@redhat.com; =
-markzhang@nvidia.com; mbloch@nvidia.com
-=E4=B8=BB=E9=A2=98: Re: [PATCH] net/mlx5: fix potential null dereference =
-when enable shared FDB
+That's true but if there isn't enough space in the send buffer, then
+sctp_sendmsg_to_asoc() will release the lock temporarily.
 
-On 4/2/25 11:43, Charles Han wrote:
-> mlx5_get_flow_namespace() may return a NULL pointer, dereferencing it=20
-> without NULL check may lead to NULL dereference.
-> Add a NULL check for ns.
->=20
-> Fixes: db202995f503 ("net/mlx5: E-Switch, add logic to enable shared=20
-> FDB")
-> Signed-off-by: Charles Han <hanchunchao@inspur.com>
-> ---
->   .../net/ethernet/mellanox/mlx5/core/eswitch_offloads.c | 10 =
-++++++++++
->   drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c       |  5 +++++
->   2 files changed, 15 insertions(+)
->=20
-> diff --git=20
-> a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c=20
-> b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-> index a6a8eea5980c..dc58e4c2d786 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-> @@ -2667,6 +2667,11 @@ static int esw_set_slave_root_fdb(struct =
-mlx5_core_dev *master,
->   	if (master) {
->   		ns =3D mlx5_get_flow_namespace(master,
->   					     MLX5_FLOW_NAMESPACE_FDB);
-> +		if (!ns) {
-> +			mlx5_core_warn(master, "Failed to get flow namespace\n");
-> +			return -EOPNOTSUPP;
+The scenario that the reproducer generates is the following:
 
-I would return -ENXIO in such cases, you were searching and not found =
-that.
-
-IOW it is obvious that dereferencing a null ptr is not supported.
-
-If you agree, please apply the same comment for your other patch:
-https://lore.kernel.org/netdev/20250402093221.3253-1-hanchunchao@inspur.c=
-om/T/#u
-
-> +		}
-> +
->   		root =3D find_root(&ns->node);
->   		mutex_lock(&root->chain_lock);
->   		MLX5_SET(set_flow_table_root_in, in, @@ -2679,6 +2684,11 @@ static =
-
-> int esw_set_slave_root_fdb(struct mlx5_core_dev *master,
->   	} else {
->   		ns =3D mlx5_get_flow_namespace(slave,
->   					     MLX5_FLOW_NAMESPACE_FDB);
-> +		if (!ns) {
-> +			mlx5_core_warn(slave, "Failed to get flow namespace\n");
-> +			return -EOPNOTSUPP;
-> +		}
-> +
->   		root =3D find_root(&ns->node);
->   		mutex_lock(&root->chain_lock);
->   		MLX5_SET(set_flow_table_root_in, in, table_id, diff --git=20
-> a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c=20
-> b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
-> index a47c29571f64..18e59f6a0f2d 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
-> @@ -186,6 +186,11 @@ static int mlx5_cmd_set_slave_root_fdb(struct =
-mlx5_core_dev *master,
->   	} else {
->   		ns =3D mlx5_get_flow_namespace(slave,
->   					     MLX5_FLOW_NAMESPACE_FDB);
-> +		if (!ns) {
-> +			mlx5_core_warn(slave, "Failed to get flow namespace\n");
-> +			return -EOPNOTSUPP;
-> +		}
-> +
->   		root =3D find_root(&ns->node);
->   		MLX5_SET(set_flow_table_root_in, in, table_id,
->   			 root->root_ft->id);
+        Thread A                                  Thread B
+        --------------------                      --------------------
+(1)     sctp_sendmsg()
+          lock_sock()
+          sctp_sendmsg_to_asoc()
+            sctp_wait_for_sndbuf()
+              release_sock()
+                                                  sctp_setsockopt(SCTP_SOCKOPT_BINDX_REM)
+                                                    lock_sock()
+                                                    sctp_setsockopt_bindx()
+                                                    sctp_send_asconf_del_ip()
+                                                      ...
+                                                    release_sock()
+                                                      process rcv backlog:
+                                                        sctp_do_sm()
+                                                          sctp_sf_do_asconf()
+                                                            ...
+                                                              sctp_assoc_rm_peer()
+              lock_sock()
+(2)          chunk->transport = transport
+             sctp_primitive_SEND()
+               ...
+               sctp_outq_select_transport()
+*BUG*            switch (new_transport->state)
 
 
-------=_NextPart_000_0006_01DBA4C1.28DD0B60
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
+Notes:
+------
 
-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
-AQUFBwMEMAwGCisGAQQBgjcKAwQwRAYJKoZIhvcNAQkPBDcwNTAOBggqhkiG9w0DAgICAIAwDgYI
-KoZIhvcNAwQCAgCAMAcGBSsOAwIHMAoGCCqGSIb3DQMHMB0GA1UdDgQWBBT7zLhcTtRnG/DUzvnf
-bTyU6LH+GjAfBgNVHSMEGDAWgBReWQOmtExYYJFO9h61pTmmMsE1ajCCAQ8GA1UdHwSCAQYwggEC
-MIH/oIH8oIH5hoG6bGRhcDovLy9DTj1JTlNQVVItQ0EsQ049SlRDQTIwMTIsQ049Q0RQLENOPVB1
-YmxpYyUyMEtleSUyMFNlcnZpY2VzLENOPVNlcnZpY2VzLENOPUNvbmZpZ3VyYXRpb24sREM9aG9t
-ZSxEQz1sYW5nY2hhbyxEQz1jb20/Y2VydGlmaWNhdGVSZXZvY2F0aW9uTGlzdD9iYXNlP29iamVj
-dENsYXNzPWNSTERpc3RyaWJ1dGlvblBvaW50hjpodHRwOi8vSlRDQTIwMTIuaG9tZS5sYW5nY2hh
-by5jb20vQ2VydEVucm9sbC9JTlNQVVItQ0EuY3JsMIIBKQYIKwYBBQUHAQEEggEbMIIBFzCBsQYI
-KwYBBQUHMAKGgaRsZGFwOi8vL0NOPUlOU1BVUi1DQSxDTj1BSUEsQ049UHVibGljJTIwS2V5JTIw
-U2VydmljZXMsQ049U2VydmljZXMsQ049Q29uZmlndXJhdGlvbixEQz1ob21lLERDPWxhbmdjaGFv
-LERDPWNvbT9jQUNlcnRpZmljYXRlP2Jhc2U/b2JqZWN0Q2xhc3M9Y2VydGlmaWNhdGlvbkF1dGhv
-cml0eTBhBggrBgEFBQcwAoZVaHR0cDovL0pUQ0EyMDEyLmhvbWUubGFuZ2NoYW8uY29tL0NlcnRF
-bnJvbGwvSlRDQTIwMTIuaG9tZS5sYW5nY2hhby5jb21fSU5TUFVSLUNBLmNydDBJBgNVHREEQjBA
-oCYGCisGAQQBgjcUAgOgGAwWaGFuY2h1bmNoYW9AaW5zcHVyLmNvbYEWaGFuY2h1bmNoYW9AaW5z
-cHVyLmNvbTANBgkqhkiG9w0BAQsFAAOCAQEAMkzghq4SHO2Fi0jhZ+VOCkTi/CTHr498pTYAVLS0
-sn5HIh5mWwendN0n32AyOhH6rsbFvddJ0fpH3B86HtXSc20xlnq902GTXbW//53nIGrZ4h/JQvyd
-rEd/LXg7eg2MnGwRkF5+4FgA49bazD0rNDgrEWmJxZKw8AKtAbdPwxy1Ht1SnxmzK00VSG2z3SgI
-0Jm9SSBrytasx8AtE28UXL3uda2/agWd7LsHcApmqPBkdBxS4WotiWyEJfYbU4KQhdSB+v8utqmB
-akOC+gFarxuIilfCjNjh0b9jlTgRo5/vG6kpCUBiy1yiOQ9rTi6NjGzDfVCBJ745tySGx7xZYDGC
-A5MwggOPAgEBMHAwWTETMBEGCgmSJomT8ixkARkWA2NvbTEYMBYGCgmSJomT8ixkARkWCGxhbmdj
-aGFvMRQwEgYKCZImiZPyLGQBGRYEaG9tZTESMBAGA1UEAxMJSU5TUFVSLUNBAhN+AAC/VCtcoMk3
-ynmeAAAAAL9UMAkGBSsOAwIaBQCgggH4MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZI
-hvcNAQkFMQ8XDTI1MDQwMzA5NTIyNVowIwYJKoZIhvcNAQkEMRYEFPuUhRywDRP65b+S7JnVjimR
-ADAtMH8GCSsGAQQBgjcQBDFyMHAwWTETMBEGCgmSJomT8ixkARkWA2NvbTEYMBYGCgmSJomT8ixk
-ARkWCGxhbmdjaGFvMRQwEgYKCZImiZPyLGQBGRYEaG9tZTESMBAGA1UEAxMJSU5TUFVSLUNBAhN+
-AAC/VCtcoMk3ynmeAAAAAL9UMIGBBgsqhkiG9w0BCRACCzFyoHAwWTETMBEGCgmSJomT8ixkARkW
-A2NvbTEYMBYGCgmSJomT8ixkARkWCGxhbmdjaGFvMRQwEgYKCZImiZPyLGQBGRYEaG9tZTESMBAG
-A1UEAxMJSU5TUFVSLUNBAhN+AAC/VCtcoMk3ynmeAAAAAL9UMIGTBgkqhkiG9w0BCQ8xgYUwgYIw
-CwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQBFjAKBggqhkiG9w0DBzALBglghkgBZQMEAQIwDgYIKoZI
-hvcNAwICAgCAMA0GCCqGSIb3DQMCAgFAMAcGBSsOAwIaMAsGCWCGSAFlAwQCAzALBglghkgBZQME
-AgIwCwYJYIZIAWUDBAIBMA0GCSqGSIb3DQEBAQUABIIBAM4hrLUdN4eh5UgH8Jg8ZV1HomgvIpTi
-zXWcgc7A+8MQI4cGUMUNOdXLuS6TfXZY9cJIE4J2hOYimQlXCWXFFiB9HJyeTDNGne0ilDo+Cm9Y
-zzkPVCU+g3H+Tu2UDg26urtUhux6h0izVzw4W8GmiPLCBwb2rvfhawj42A891I6bB+VkrteODnOO
-7FtbPyskBHlTC/PEBTzfbJKf2Bivts0xre8e1fVHWZNfV8yYpjSvCLbDzWYROrJI0tTtFcssmCkb
-8RqahHZbVEkZ3mkn4n3tz0/5dEgRm7sb0IDhr4sYcGrkZ1Lnj6JSMsyuS3zE4wExafhHFUBEYCiE
-QsBWvAMAAAAAAAA=
+Both threads operate on the same socket.
 
-------=_NextPart_000_0006_01DBA4C1.28DD0B60--
+1. Here, sctp_endpoint_lookup_assoc() finds and returns an existing
+association and transport.
+
+2. At this point, `transport` is already deleted. chunk->transport is
+not set to NULL because sctp_assoc_rm_peer() ran _before_ the transport
+was assigned to the chunk.
+
+> We should avoid an extra hashtable lookup on this hot TX path, as it would
+> negatively impact performance.
+
+Good point. I can't really tell the performance impact of the lookup
+here, my experience with the SCTP implementation is very limited. Do you
+have any suggestions or alternatives about how to deal with this?
+
+Thanks,
+Ricardo
 
