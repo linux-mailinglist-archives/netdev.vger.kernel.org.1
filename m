@@ -1,172 +1,137 @@
-Return-Path: <netdev+bounces-179108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96697A7A971
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 20:33:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18F13A7A980
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 20:34:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06FE316F4DF
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 18:32:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65C0C189989E
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 18:34:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0791E2517A8;
-	Thu,  3 Apr 2025 18:32:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF1DF253342;
+	Thu,  3 Apr 2025 18:33:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZRXVjO2b"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wv7FXSdH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310FE24CEE8;
-	Thu,  3 Apr 2025 18:32:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C54C1E87B
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 18:33:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743705141; cv=none; b=iwQZCuQR/ndOqh6MAB7xyAz0LPj9yJysCaN7p188jz1Zh98CFACaYTlRIVUH3JM2fdPbCfzNuqhkPTIgS145WPBOTjZ+nL319KrJzLXHo5rYkT+i9tjzWHsuyI04YVb3ktjuDL5SoSLRpzFoJlWBi21vEBgQ6cqCrFus5raiYng=
+	t=1743705215; cv=none; b=Cr/G178LHO6kshXXQdq2YbVoAIR+0k+PrIQ0H3Wp0lf66j0+KfeehdmR5HHViGm/2RWPrjJQEDX4dx80i4IMoPktv4vIOj2Re73+QSph6c9utoCJUngk73QaNeZEpfYun+sBhYHghXX2DQ9tYBySrK7QsNrkXYOp1Y0mfl3mCWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743705141; c=relaxed/simple;
-	bh=oYSOgbE2T0F5zKIQaRgihuLpcmjBkxqOSl5cApaGi38=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AzT3dmlSQ37MDl3vKi+8ekt+HV0N80Q/JYhR2+I8Ma6/5/NXuLj5K3BrTLJieTGTKzM28NxjhlGFcaj4ezQm6wHCW0tx8NLv+Q3JCxAIdM+cVyeqqDcr0PaannFGkzMTK0pgut0rH1hL9snykntziKs1oKAekVNX0HEMG2GHyG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZRXVjO2b; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43cf680d351so13490135e9.0;
-        Thu, 03 Apr 2025 11:32:19 -0700 (PDT)
+	s=arc-20240116; t=1743705215; c=relaxed/simple;
+	bh=nTZuGsFING6MIGVPoQQdW0z8/bAf29Sjd0udlbQBoTI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IhDlMPnOpZ6OkzIvm7VGeZConyLU6o8cOm1b8pRsljM6b90XNw2kYJWg2E66+Z+DAQIlYhT9AiKjXJuS6jWmcyIocaw3vzTtRXHadUFF+8lv61JKxQ9eVEpMXFe9Lyo0ZKkWE4y8gH5/4Mo851f2OuBV2KYqQwvFpoRZ+497Zpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wv7FXSdH; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-54998f865b8so1168915e87.3
+        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 11:33:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743705138; x=1744309938; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=W+2VbAG4hh+12ycsguwdRu57K4kt6OAXOvTs23LZ8oU=;
-        b=ZRXVjO2b5CahGR05P/I+tUp1UeNjnx8JqL9NAgQw3IJ/IYgp8xiz89MQHd/c0+PeH4
-         XlhadJygUNjzyqhf1fPtfnR9Izd4vVAiFrhxm+wJ0Wucyzlxz5MFrJwN1usfGZIdFCUi
-         22iWDfuu9aiyOoZh2EYWugMULaf1m9KafnRViPbs6DtWmwkREbDLCjCRkDd9fz7L5mHO
-         5LEfVImCC2zUCWubwITo7sOou3YMv6cKkVR6mXuCH7C4MHvjPOX6raXjqVk7O3PR41ts
-         qMhTtEAjI7WFT228HjL0LqejdldfO8SduyNFwLsB0x12UWQuLOfhdGaimqX63APPRVoZ
-         xM2w==
+        d=google.com; s=20230601; t=1743705212; x=1744310012; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I6FpVBVSrBp6UsJLd/05pqTv+7X/fXLRZyX/z8dAfA8=;
+        b=wv7FXSdHa96vMLpr6yHrQSyYr8WYW6zUP1oQoGYY4KOe5lhIS8GCaqX4Zcvpzdw7UB
+         Bh7GANwgOBT8ncAxuX7ETRoq9QvRn9z9vQYtQZbCym9bbnL79aEgX5oboNbTUlRhfAa2
+         yDq3ZdmyTEzPYWZoiBacthaSOeHp8BsqG4cDUDWNRcumsKzW7+84Ehf2s9luiiMXoODs
+         4GMQHyhgkGO6lcuD1+KgDPqZoikTOud33RpHgSB2CGIu3Uli+CSBKq33WR3yp463Jzja
+         LeQYj8kWSCY3uCwnGTGDRH5o9TzFcgYyHKGBt1Iu17T/lY2J+Vds1cQiWIQ8bIL7yl2U
+         GAaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743705138; x=1744309938;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W+2VbAG4hh+12ycsguwdRu57K4kt6OAXOvTs23LZ8oU=;
-        b=FsgBmx34xAaZEL0jVHG9V3mh40r9ysa8t5W9zzyQ3ImC/pohgZozjN0/xMv6XzpHfK
-         MSTfzVpOkXgyW9altj0qBhwmSmk9nNl9R+qbnTNSRcnqQdfoFEgH2imxCaQ/tbLZptQu
-         uad+TeyBPE7PM8trncJBMrcbP4ahZdpVsSOMHQpX0xkA9kiOU+xMoeEsjRPjjYcK5B1p
-         /VEId4t69iNYYsEhzCYCcQimA+8HK5LjU0UrYJjMVH1ROr52bbMeeV/mdO0lotiEGhC+
-         PwaRZeVcnWBOi8Iw/hxaWttgeWN05mKKZOpeb/3jCto7HwR7CEg2dXIUTfgd3yZmYjHH
-         mqYA==
-X-Forwarded-Encrypted: i=1; AJvYcCVgd7/cLzDr5jr/cYvAurkc4tDwiuX+zgEqGJ9kq0pX8QkIB1S0y0PHQfS5AnJy7gyp7/mk2ypTwDxWEYQ=@vger.kernel.org, AJvYcCWBI+p2Wl9ZWvFjx1wDeZye8CFMEhdIQi8twdSF/+KmsNnFRZDvPhunDb46Y7t/LMN3T0QKYkFBG0IHlg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGagDPq3f7cO39fKFpUIxkf3RSQro1Fs1DEEhNP4d03JdZ45HX
-	yI/hCCyKotgU3Ef4mDY1cxfO/SKay8TFpZLhPk9cviXiwcGvn5iC
-X-Gm-Gg: ASbGnctZ4Xw1O94L6Gs0JVXv4DyTduc491aExQXfyn8ZxiGTGSRIH4i/dsdg8bdcEFb
-	ISec7/LKaD+ei7Xf2RejUAF2OaGO3m1WsBCWrcodWLjtLxRQ3HvF90iZbZRpf+zFWEWcsl0wp4w
-	ZKUe42hFxGTKdMOvCaeHSJbScvNfKqFyJOj0YB07yHUbqxxTgbkGfgK3b+7UpEZPiKN8lPJq79Q
-	H0FckV3hPsbINZvc/s+BXBra5uIPCZdwcBmTnNYdZZBpbgCG4nXz2ZelfAwXUBY0kJY4REjOW9z
-	FVpd7RfvziYKlbZL4NOXPmwh7+UrPKN1QtbN2IyAGz/WuZ4zTRHH5oh0wMVK8wF9pQ==
-X-Google-Smtp-Source: AGHT+IGgiRqgZDKhOZADM7Mh+G25jDg+2rg96YfC4/Oqm9d/ZkZEjtND1wzeIXtq4qMNKHz/8JM21A==
-X-Received: by 2002:a5d:64e7:0:b0:38d:e0a9:7e5e with SMTP id ffacd0b85a97d-39c2e5f4fe8mr4307153f8f.6.1743705138211;
-        Thu, 03 Apr 2025 11:32:18 -0700 (PDT)
-Received: from [172.27.62.155] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec366b571sm25367675e9.40.2025.04.03.11.32.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Apr 2025 11:32:17 -0700 (PDT)
-Message-ID: <d78fa6dc-5820-46b6-9b7d-0986f9a70da2@gmail.com>
-Date: Thu, 3 Apr 2025 21:32:14 +0300
+        d=1e100.net; s=20230601; t=1743705212; x=1744310012;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I6FpVBVSrBp6UsJLd/05pqTv+7X/fXLRZyX/z8dAfA8=;
+        b=YanVN5mBQQLo3NYlXs+qJueKAXCkPx3FmDa2QxJT+MQNb1AWkZMzCY7s1H+7IAiKBF
+         3eDLgjsTA039JI/2XLkDrtzLjULsi9ZESaZX6qVAW/lYP9brkX1lvoUfjS/nsScqr1iV
+         gOSDGwchDM/NVPmEhSpAXtJsMNaFopWI6LCufdu2cZ29xLMx+cSTRQvc1ndBDAX3ULAv
+         JRhW19S46YcEZP6roakltSNfjEx8LXYemS2T8B8y/SiKSw787W5Df4Bpta5CvP3YJ/uA
+         Qo/ejliQYUn5H7mJR2dkNC1ZnM9aFrA84EmcXzLtiuFmYG6vflis/4p56z1JdyWi6K/q
+         l2gQ==
+X-Gm-Message-State: AOJu0Yza4wWHFV1wqGgTDirAnyHMnDaTOSbiigo0l+gfM7S8Uqo98vlC
+	RQFGGV5IPnAyvQsDGNxCVRM5G7pnWFemASUpSzCXb5VY0rjqwsio1nSlaYxSAZYlGICDOKSGQ0h
+	+l33SP/qUqdfdNclkkZZvrtkWSc0NR41A/qnu
+X-Gm-Gg: ASbGnctk9JaQ1OYxhRkb2dTvO5jo6cEiLJsbrFryFAvqidTx7mdSOSU2Bb7kte3vz+4
+	HaHFiwivWeuH4a4Ud/vxNv8vh+camSroDyzen+WNnXJWjj9iDs052vEdnJihU95i5UbhM140dcj
+	7HP4sjc+4iulpnZ+bxFo5mCNHklpysYOYh2bfGJATqnNcgCWQNXyXK
+X-Google-Smtp-Source: AGHT+IGGElQxxzJStMl02DU8ACSS/S4gavMbWxl4jrrkrwKF8pltAulp7F6pmLGK9uI2hw2C8NndmdlVm47F388sLto=
+X-Received: by 2002:a05:6512:3b85:b0:54a:c4af:18 with SMTP id
+ 2adb3069b0e04-54c22784b65mr66148e87.22.1743705211956; Thu, 03 Apr 2025
+ 11:33:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/mlx5: fix potential null dereference when enable
- shared FDB
-To: =?UTF-8?B?Q2hhcmxlcyBIYW4o6Z+p5pil6LaFKQ==?= <hanchunchao@inspur.com>,
- "przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "saeedm@nvidia.com" <saeedm@nvidia.com>, "leon@kernel.org"
- <leon@kernel.org>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "markzhang@nvidia.com" <markzhang@nvidia.com>,
- "mbloch@nvidia.com" <mbloch@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
-References: <526e6240c8964fefa80b4bc759c44c04@inspur.com>
- <a23ccc3b-bb4d-4352-bd7e-ab0f3ef82585@gmail.com>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <a23ccc3b-bb4d-4352-bd7e-ab0f3ef82585@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20250403181907.1947517-1-sean.anderson@linux.dev> <20250403182758.1948569-1-sean.anderson@linux.dev>
+In-Reply-To: <20250403182758.1948569-1-sean.anderson@linux.dev>
+From: Saravana Kannan <saravanak@google.com>
+Date: Thu, 3 Apr 2025 11:32:55 -0700
+X-Gm-Features: AQ5f1Joj6PPNXYtzD5r8kgx1fQnzai2slPTaoQvR1K8EcGM4YKlTmyOgm6rJ8rM
+Message-ID: <CAGETcx9v610XhvU705R=Mjth=iAbCU04rqNnQPhQua37Jc4TRQ@mail.gmail.com>
+Subject: Re: [RFC net-next PATCH 11/13] of: property: Add device link support
+ for PCS
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Russell King <linux@armlinux.org.uk>, Christian Marangi <ansuelsmth@gmail.com>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, linux-kernel@vger.kernel.org, upstream@airoha.com, 
+	Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Apr 3, 2025 at 11:28=E2=80=AFAM Sean Anderson <sean.anderson@linux.=
+dev> wrote:
+>
+> This adds device link support for PCS devices, providing
+> better probe ordering.
+>
+> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+> ---
+>
+>  drivers/of/property.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/of/property.c b/drivers/of/property.c
+> index c1feb631e383..f3e0c390ddba 100644
+> --- a/drivers/of/property.c
+> +++ b/drivers/of/property.c
+> @@ -1379,6 +1379,7 @@ DEFINE_SIMPLE_PROP(pses, "pses", "#pse-cells")
+>  DEFINE_SIMPLE_PROP(power_supplies, "power-supplies", NULL)
+>  DEFINE_SUFFIX_PROP(regulators, "-supply", NULL)
+>  DEFINE_SUFFIX_PROP(gpio, "-gpio", "#gpio-cells")
+> +DEFINE_SIMPLE_PROP(pcs_handle, "pcs-handle", NULL)
+>
+>  static struct device_node *parse_gpios(struct device_node *np,
+>                                        const char *prop_name, int index)
+> @@ -1535,6 +1536,7 @@ static const struct supplier_bindings of_supplier_b=
+indings[] =3D {
+>                 .parse_prop =3D parse_post_init_providers,
+>                 .fwlink_flags =3D FWLINK_FLAG_IGNORE,
+>         },
+> +       { .parse_prop =3D parse_pcs_handle, },
 
+Can you add this in the right order please? All the simple ones come
+before the SUFFIX ones so that it's less expensive/fewer comparisons
+before you parse the simple properties.
 
-On 03/04/2025 17:03, Tariq Toukan wrote:
-> 
-> 
-> On 03/04/2025 12:52, Charles Han(韩春超) wrote:
->> -ENXIO indicates "No such device or address". I've found that in mlx5/ 
->> core, if mlx5_get_flow_namespace() returns null, it basically returns 
->> -EOPNOTSUPP.
->>
-> 
-> Please do not top-post.
-> 
-> +1.
-> If namespace is not found it's due to lack of support.
-> 
-> 
->> -----邮件原件-----
->> 发件人: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->> 发送时间: 2025年4月2日 19:02
->> 收件人: Charles Han(韩春超) <hanchunchao@inspur.com>
->> 抄送: netdev@vger.kernel.org; linux-rdma@vger.kernel.org; linux- 
->> kernel@vger.kernel.org; saeedm@nvidia.com; leon@kernel.org; 
->> tariqt@nvidia.com; andrew+netdev@lunn.ch; davem@davemloft.net; 
->> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com; 
->> markzhang@nvidia.com; mbloch@nvidia.com
->> 主题: Re: [PATCH] net/mlx5: fix potential null dereference when enable 
->> shared FDB
->>
->> On 4/2/25 11:43, Charles Han wrote:
->>> mlx5_get_flow_namespace() may return a NULL pointer, dereferencing it
->>> without NULL check may lead to NULL dereference.
->>> Add a NULL check for ns.
->>>
->>> Fixes: db202995f503 ("net/mlx5: E-Switch, add logic to enable shared
->>> FDB")
->>> Signed-off-by: Charles Han <hanchunchao@inspur.com>
-> 
-> Acked-by: Tariq Toukan <tariqt@nvidia.com>
-> 
+-Saravana
 
-Re-visiting this...
-See comment below.
-
->>> ---
->>>    .../net/ethernet/mellanox/mlx5/core/eswitch_offloads.c | 10 ++++++ 
->>> ++++
->>>    drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c       |  5 +++++
->>>    2 files changed, 15 insertions(+)
->>>
->>> diff --git
->>> a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
->>> b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
->>> index a6a8eea5980c..dc58e4c2d786 100644
->>> --- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
->>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
->>> @@ -2667,6 +2667,11 @@ static int esw_set_slave_root_fdb(struct 
->>> mlx5_core_dev *master,
->>>        if (master) {
->>>            ns = mlx5_get_flow_namespace(master,
->>>                             MLX5_FLOW_NAMESPACE_FDB);
->>> +        if (!ns) {
->>> +            mlx5_core_warn(master, "Failed to get flow namespace\n");
-
-Use esw_warn(), for all new instances.
-
+>         {}
+>  };
+>
+> --
+> 2.35.1.1320.gc452695387.dirty
+>
 
