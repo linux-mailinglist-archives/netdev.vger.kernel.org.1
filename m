@@ -1,112 +1,337 @@
-Return-Path: <netdev+bounces-178994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89ABEA79E1B
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 10:26:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DFA1A79E1D
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 10:27:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F768174DBE
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 08:26:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBD4A173B3C
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 08:27:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 558A6241CA6;
-	Thu,  3 Apr 2025 08:25:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33C062417F8;
+	Thu,  3 Apr 2025 08:27:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I+XA+igo"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01DA4241CB2;
-	Thu,  3 Apr 2025 08:25:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4981C23F40C
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 08:27:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743668755; cv=none; b=f5yTzElpw+fob74AyWPe7dV3Gr4JaNmlv7JWX5jA7vR5MQYMxJPW7ZgMmT/zyEQ1jwg6G72fzAXc7slV9vPNiPi6+VdS3as65Wpo8NpnRykXWVmd5cQtheBl4aMkB4aEwBGutK+saDmAyNBDfKQTjYco6Q6Yc+J4/HIRkexG9N8=
+	t=1743668834; cv=none; b=h5higZ38QIPA5vxmJwOWoCEuNhhTxT8FYxPVM5GMbEdEAxNDRhov9iF6392D8E2HBPGQuxFm7idWBbEWeOqdWFM96Pn85UJXx/pyIbc8fSHkWM3Pv4ShGLPZmAjQsdVABgqT1bM1y9TEIxqTdekTSlWh4Uqg+bardasmZ168KyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743668755; c=relaxed/simple;
-	bh=LMGWh7K8oa5KrX+W3kbg21yUcMQUNfXpXVe35Aqq1Mo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nvUHYn1qTtLQCTr4yfsdxeEaJsmNaBDBji3pTzYnFRJG7NoQgDhUGZS4vi6nr5YcnXszKnxL23sIyHCjtExZ/E6lHYONzfdCDIHSD8gOGJH8ewcJ1HS+aFV1vfiq8B1JGJLUOUaCSkUZ2cztEw/galAa9s7Idk9ra/50YlbTq80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [124.16.141.245])
-	by APP-01 (Coremail) with SMTP id qwCowAA32vr1Re5ndMVvBQ--.37834S2;
-	Thu, 03 Apr 2025 16:25:30 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: m.chetan.kumar@intel.com,
-	loic.poulain@linaro.org,
-	ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>
-Subject: [PATCH] IPC MUX: Add error handling for ipc_mux_dl_acb_send_cmds().
-Date: Thu,  3 Apr 2025 16:24:49 +0800
-Message-ID: <20250403082449.2183-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.42.0.windows.2
+	s=arc-20240116; t=1743668834; c=relaxed/simple;
+	bh=mBEnZJfbHssNSwDuQ4ZoDefTpQJ0psPNYc+XIeueAiM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nu7hUKyOthqO32GqCK7EgBNTRswv0ftnDMOE/5Xdlxj5QXkg1eZa+guXH4rmzCSN6ffS82FvGgNKOYOaZBa5CVP6ORXTUYcwrqYfVeGzEFCYtHiK0WWDM/BURVmYdsD4dT5aMwc+MADWEjl4ox+82fkKbYldXfPRots/kW/PSvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I+XA+igo; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743668831;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8H3/cfOpLLMF7vHGtp8a2sFO6dkZAsrx2IPt+e+ewfY=;
+	b=I+XA+igoaZibTp6iKCIujc4ZP5GT5kZLZqcrCop2QpTtXf9aa0j22TvRYFpV+5y7m+1plY
+	GCaeqf0ryCn9fjR2soUX7Y2SeZOz8HtMQ7GylKMGrVMh7Vdn8oeH7VUfn5jPy184GObQyM
+	xCkOYE9H4znKFCPUUzwlYtP3x2sdndk=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-680-ZfoJ2qn_OgyF82mOeTqgog-1; Thu, 03 Apr 2025 04:27:10 -0400
+X-MC-Unique: ZfoJ2qn_OgyF82mOeTqgog-1
+X-Mimecast-MFC-AGG-ID: ZfoJ2qn_OgyF82mOeTqgog_1743668829
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-391345e3aa3so380928f8f.0
+        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 01:27:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743668829; x=1744273629;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8H3/cfOpLLMF7vHGtp8a2sFO6dkZAsrx2IPt+e+ewfY=;
+        b=SOIHzCsUvSHp8BCkByKovILdfQND3B+kyJ3fCwP2wXQf5zmloma+EsNPU4yn1RgkK2
+         k2/8XCqgbp4oCJuJOh4otBplJtohbcaVr5o+7J38ylDALNPJUWyDTCsAmdvm1U1VSz+f
+         hmVlUrmFLZQpaVfL46pIUUq5f9Nugz9AbA472tNUqvrvKasjJRUdgynPU+9aJx+jQFZX
+         R0Ht/R1x6rzGf+2VxGcWfrkJ5UDebvtKZF1nn5TQfQ7Y9CmoeE6xKTQhF20K5vDkC508
+         Y0L2UUG4gUdLMOH1uVzz9OuPTar3iHI/OYgP3C0agTEuBAB8g+tOmFYT6qJz05MYywsG
+         5egA==
+X-Gm-Message-State: AOJu0YyyLzcRVRD/2wQrL1s38kkV/LqvQfKxiHx8OkUkNl20OE/IV8iz
+	Fepd2yqjhrncRbfAe0YZ8sZmqq8U4YwqIcAausz41n1oji6pNng5cWJq2Q6AGY+VrotuIc0PUyy
+	Lq0O0TWZBK/w1M+P9Ycpqe58zsmK9myKo2p6GL9ncc7qzJVVVw0KYSg==
+X-Gm-Gg: ASbGnctujvteA4aCRnFme9IxAd17RcIGT+V92b+3TASqhSo91yCSIOald+9sTpvZ4IK
+	M9vv7u9k7/M258BJSdvmd5FHfZKctdeZ3pEVcI5DfsoHtgRcWX2OtWMnkod43ZTnb+68l8owa6Q
+	D5pouc082fdXek0DmRMQJBa51sioZ0cQTmkXk2zS7IlvdKYqcLFNxEJOW6IDfjhh0k30P/FWTdI
+	BFYflA2tk8l/n4kwRV2+QAMdiaNm1gQnXylJM7mLPpZRT4mluRyxocZxZ1CD3xj0A+kg9AW5sML
+	1NXZDIFlvbiSi/3HcbtW7Xvjk7pSur5EJQjURKkCnT+IMPl/kQcToFt/s98=
+X-Received: by 2002:a05:6000:1787:b0:38d:badf:9df5 with SMTP id ffacd0b85a97d-39c2975344dmr5198688f8f.17.1743668829072;
+        Thu, 03 Apr 2025 01:27:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEkJasUVCkOzYkOOW0hF0pl3+LvSOwHmjYa1Gj63xQYPYwtDCufaqDLic/I99b7VKxwX6pLBg==
+X-Received: by 2002:a05:6000:1787:b0:38d:badf:9df5 with SMTP id ffacd0b85a97d-39c2975344dmr5198641f8f.17.1743668828602;
+        Thu, 03 Apr 2025 01:27:08 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-11-6-59.retail.telecomitalia.it. [87.11.6.59])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec364ce6esm11031055e9.30.2025.04.03.01.27.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Apr 2025 01:27:07 -0700 (PDT)
+Date: Thu, 3 Apr 2025 10:27:03 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Alexander Graf <graf@amazon.com>
+Cc: netdev@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev, kvm@vger.kernel.org, 
+	Asias He <asias@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
+	nh-open-source@amazon.com, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH v3] vsock/virtio: Remove queued_replies pushback logic
+Message-ID: <qmhbvdned3ozt366ndshqkrc4p3d22wuo5obpziuaj5oqfwvw7@4cxvxilmt4du>
+References: <20250402150646.42855-1-graf@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowAA32vr1Re5ndMVvBQ--.37834S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Cw4DArW3JFyrKrWDKF48Zwb_yoW8Gry7pF
-	WrWw109F98AF4rAa18CrWDZa4YqayDXr97Kw1jv3Z5WFsrCr47trWxX3429rn7JF45W3Zr
-	Ar4jyry3G3WUGF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9F14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v26r
-	xl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
-	6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr
-	0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E
-	8cxan2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFV
-	Cjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWl
-	x4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r
-	1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_
-	JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcS
-	sGvfC2KfnxnUUI43ZEXa7VUb8hL5UUUUU==
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBgwBA2fuKah3xQAAsy
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250402150646.42855-1-graf@amazon.com>
 
-The ipc_mux_dl_acbcmd_decode() calls the ipc_mux_dl_acb_send_cmds(),
-but does not report the error if ipc_mux_dl_acb_send_cmds() fails.
-This makes it difficult to detect command sending failures. A proper
-implementation can be found in ipc_mux_dl_cmd_decode().
+On Wed, Apr 02, 2025 at 03:06:46PM +0000, Alexander Graf wrote:
+>Ever since the introduction of the virtio vsock driver, it included
+>pushback logic that blocks it from taking any new RX packets until the
+>TX queue backlog becomes shallower than the virtqueue size.
+>
+>This logic works fine when you connect a user space application on the
+>hypervisor with a virtio-vsock target, because the guest will stop
+>receiving data until the host pulled all outstanding data from the VM.
+>
+>With Nitro Enclaves however, we connect 2 VMs directly via vsock:
+>
+>  Parent      Enclave
+>
+>    RX -------- TX
+>    TX -------- RX
+>
+>This means we now have 2 virtio-vsock backends that both have the pushback
+>logic. If the parent's TX queue runs full at the same time as the
+>Enclave's, both virtio-vsock drivers fall into the pushback path and
+>no longer accept RX traffic. However, that RX traffic is TX traffic on
+>the other side which blocks that driver from making any forward
+>progress. We're now in a deadlock.
+>
+>To resolve this, let's remove that pushback logic altogether and rely on
+>higher levels (like credits) to ensure we do not consume unbounded
+>memory.
+>
+>RX and TX queues share the same work queue. To prevent starvation of TX
+>by an RX flood and vice versa now that the pushback logic is gone, let's
+>deliberately reschedule RX and TX work after a fixed threshold (256) of
+>packets to process.
+>
+>Fixes: 0ea9e1d3a9e3 ("VSOCK: Introduce virtio_transport.ko")
+>Signed-off-by: Alexander Graf <graf@amazon.com>
 
-Add error reporting to the call, logging an error message using dev_err()
-if the command sending fails.
+There is a good point from Stefan on v2:
+https://lore.kernel.org/virtualization/20250402161424.GA305204@fedora/
 
-Fixes: 1f52d7b62285 ("net: wwan: iosm: Enable M.2 7360 WWAN card support")
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- drivers/net/wwan/iosm/iosm_ipc_mux_codec.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+So, I'm not sure we can merge this as it is.
 
-diff --git a/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c b/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c
-index bff46f7ca59f..478c9c8b638b 100644
---- a/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c
-+++ b/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c
-@@ -509,8 +509,11 @@ static void ipc_mux_dl_acbcmd_decode(struct iosm_mux *ipc_mux,
- 			return;
- 			}
- 		trans_id = le32_to_cpu(cmdh->transaction_id);
--		ipc_mux_dl_acb_send_cmds(ipc_mux, cmd, cmdh->if_id,
--					 trans_id, cmd_p, size, false, true);
-+		if (ipc_mux_dl_acb_send_cmds(ipc_mux, cmd, cmdh->if_id,
-+					     trans_id, cmd_p, size, false, true))
-+			dev_err(ipc_mux->dev,
-+				"if_id %d: cmd send failed",
-+				cmdh->if_id);
- 	}
- }
- 
--- 
-2.42.0.windows.2
+Thanks,
+Stefano
+
+>
+>---
+>
+>v1 -> v2:
+>
+>  - Rework to use fixed threshold
+>
+>v2 -> v3:
+>
+>  - Remove superfluous reply variable
+>---
+> net/vmw_vsock/virtio_transport.c | 73 +++++++++-----------------------
+> 1 file changed, 19 insertions(+), 54 deletions(-)
+>
+>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>index f0e48e6911fc..6ae30bf8c85c 100644
+>--- a/net/vmw_vsock/virtio_transport.c
+>+++ b/net/vmw_vsock/virtio_transport.c
+>@@ -26,6 +26,12 @@ static struct virtio_vsock __rcu *the_virtio_vsock;
+> static DEFINE_MUTEX(the_virtio_vsock_mutex); /* protects the_virtio_vsock */
+> static struct virtio_transport virtio_transport; /* forward declaration */
+>
+>+/*
+>+ * Max number of RX packets transferred before requeueing so we do
+>+ * not starve TX traffic because they share the same work queue.
+>+ */
+>+#define VSOCK_MAX_PKTS_PER_WORK 256
+>+
+> struct virtio_vsock {
+> 	struct virtio_device *vdev;
+> 	struct virtqueue *vqs[VSOCK_VQ_MAX];
+>@@ -44,8 +50,6 @@ struct virtio_vsock {
+> 	struct work_struct send_pkt_work;
+> 	struct sk_buff_head send_pkt_queue;
+>
+>-	atomic_t queued_replies;
+>-
+> 	/* The following fields are protected by rx_lock.  vqs[VSOCK_VQ_RX]
+> 	 * must be accessed with rx_lock held.
+> 	 */
+>@@ -158,7 +162,7 @@ virtio_transport_send_pkt_work(struct work_struct *work)
+> 		container_of(work, struct virtio_vsock, send_pkt_work);
+> 	struct virtqueue *vq;
+> 	bool added = false;
+>-	bool restart_rx = false;
+>+	int pkts = 0;
+>
+> 	mutex_lock(&vsock->tx_lock);
+>
+>@@ -169,32 +173,24 @@ virtio_transport_send_pkt_work(struct work_struct *work)
+>
+> 	for (;;) {
+> 		struct sk_buff *skb;
+>-		bool reply;
+> 		int ret;
+>
+>+		if (++pkts > VSOCK_MAX_PKTS_PER_WORK) {
+>+			/* Allow other works on the same queue to run */
+>+			queue_work(virtio_vsock_workqueue, work);
+>+			break;
+>+		}
+>+
+> 		skb = virtio_vsock_skb_dequeue(&vsock->send_pkt_queue);
+> 		if (!skb)
+> 			break;
+>
+>-		reply = virtio_vsock_skb_reply(skb);
+>-
+> 		ret = virtio_transport_send_skb(skb, vq, vsock, GFP_KERNEL);
+> 		if (ret < 0) {
+> 			virtio_vsock_skb_queue_head(&vsock->send_pkt_queue, skb);
+> 			break;
+> 		}
+>
+>-		if (reply) {
+>-			struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
+>-			int val;
+>-
+>-			val = atomic_dec_return(&vsock->queued_replies);
+>-
+>-			/* Do we now have resources to resume rx processing? */
+>-			if (val + 1 == virtqueue_get_vring_size(rx_vq))
+>-				restart_rx = true;
+>-		}
+>-
+> 		added = true;
+> 	}
+>
+>@@ -203,9 +199,6 @@ virtio_transport_send_pkt_work(struct work_struct *work)
+>
+> out:
+> 	mutex_unlock(&vsock->tx_lock);
+>-
+>-	if (restart_rx)
+>-		queue_work(virtio_vsock_workqueue, &vsock->rx_work);
+> }
+>
+> /* Caller need to hold RCU for vsock.
+>@@ -261,9 +254,6 @@ virtio_transport_send_pkt(struct sk_buff *skb)
+> 	 */
+> 	if (!skb_queue_empty_lockless(&vsock->send_pkt_queue) ||
+> 	    virtio_transport_send_skb_fast_path(vsock, skb)) {
+>-		if (virtio_vsock_skb_reply(skb))
+>-			atomic_inc(&vsock->queued_replies);
+>-
+> 		virtio_vsock_skb_queue_tail(&vsock->send_pkt_queue, skb);
+> 		queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
+> 	}
+>@@ -277,7 +267,7 @@ static int
+> virtio_transport_cancel_pkt(struct vsock_sock *vsk)
+> {
+> 	struct virtio_vsock *vsock;
+>-	int cnt = 0, ret;
+>+	int ret;
+>
+> 	rcu_read_lock();
+> 	vsock = rcu_dereference(the_virtio_vsock);
+>@@ -286,17 +276,7 @@ virtio_transport_cancel_pkt(struct vsock_sock *vsk)
+> 		goto out_rcu;
+> 	}
+>
+>-	cnt = virtio_transport_purge_skbs(vsk, &vsock->send_pkt_queue);
+>-
+>-	if (cnt) {
+>-		struct virtqueue *rx_vq = vsock->vqs[VSOCK_VQ_RX];
+>-		int new_cnt;
+>-
+>-		new_cnt = atomic_sub_return(cnt, &vsock->queued_replies);
+>-		if (new_cnt + cnt >= virtqueue_get_vring_size(rx_vq) &&
+>-		    new_cnt < virtqueue_get_vring_size(rx_vq))
+>-			queue_work(virtio_vsock_workqueue, &vsock->rx_work);
+>-	}
+>+	virtio_transport_purge_skbs(vsk, &vsock->send_pkt_queue);
+>
+> 	ret = 0;
+>
+>@@ -367,18 +347,6 @@ static void virtio_transport_tx_work(struct work_struct *work)
+> 		queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
+> }
+>
+>-/* Is there space left for replies to rx packets? */
+>-static bool virtio_transport_more_replies(struct virtio_vsock *vsock)
+>-{
+>-	struct virtqueue *vq = vsock->vqs[VSOCK_VQ_RX];
+>-	int val;
+>-
+>-	smp_rmb(); /* paired with atomic_inc() and atomic_dec_return() */
+>-	val = atomic_read(&vsock->queued_replies);
+>-
+>-	return val < virtqueue_get_vring_size(vq);
+>-}
+>-
+> /* event_lock must be held */
+> static int virtio_vsock_event_fill_one(struct virtio_vsock *vsock,
+> 				       struct virtio_vsock_event *event)
+>@@ -613,6 +581,7 @@ static void virtio_transport_rx_work(struct work_struct *work)
+> 	struct virtio_vsock *vsock =
+> 		container_of(work, struct virtio_vsock, rx_work);
+> 	struct virtqueue *vq;
+>+	int pkts = 0;
+>
+> 	vq = vsock->vqs[VSOCK_VQ_RX];
+>
+>@@ -627,11 +596,9 @@ static void virtio_transport_rx_work(struct work_struct *work)
+> 			struct sk_buff *skb;
+> 			unsigned int len;
+>
+>-			if (!virtio_transport_more_replies(vsock)) {
+>-				/* Stop rx until the device processes already
+>-				 * pending replies.  Leave rx virtqueue
+>-				 * callbacks disabled.
+>-				 */
+>+			if (++pkts > VSOCK_MAX_PKTS_PER_WORK) {
+>+				/* Allow other works on the same queue to run */
+>+				queue_work(virtio_vsock_workqueue, work);
+> 				goto out;
+> 			}
+>
+>@@ -675,8 +642,6 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
+> 	vsock->rx_buf_max_nr = 0;
+> 	mutex_unlock(&vsock->rx_lock);
+>
+>-	atomic_set(&vsock->queued_replies, 0);
+>-
+> 	ret = virtio_find_vqs(vdev, VSOCK_VQ_MAX, vsock->vqs, vqs_info, NULL);
+> 	if (ret < 0)
+> 		return ret;
+>-- 
+>2.47.1
+>
+>
 
 
