@@ -1,157 +1,231 @@
-Return-Path: <netdev+bounces-179083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D76CA7A858
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:01:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03A97A7A880
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:21:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 845FD3AE2F5
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 16:59:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 452BB16F37D
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 17:21:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD1382512FA;
-	Thu,  3 Apr 2025 16:59:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 412D32517A0;
+	Thu,  3 Apr 2025 17:21:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OisHarl2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PgLh4RGd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9372A250C15;
-	Thu,  3 Apr 2025 16:59:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 939FA250C1F;
+	Thu,  3 Apr 2025 17:21:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743699584; cv=none; b=i5+V7RIvssp1bpFN1lpdQoxwwUV33QyDDAnXPyZ1Qn8WXfhdEan0beXOM3ppqu8aluLNBO+kYF36KsSk1U3CxYI4504q/9Kjlcd5SJz7qY9LCrduLrFjAUNz7mshvsKLTD6Yji2x/B9sWpHY3tfvCfvWYgN9CkRJtloMB0acrF0=
+	t=1743700878; cv=none; b=avOkBNSew9lIHXK3XjRZfOSh0G2OmWmPpfyb99+CHe6U3GVdB171Q8mtAd5MO6OJlbwohVPMjzAv3s18e/PjGU1xfGEwaZLv2sC+OGoLn93zWSF1hm9o8VlmFkoiB/PhBCVHAYMnMRQKxkffFjLUIeArlfNG5rnpoeNliJenqLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743699584; c=relaxed/simple;
-	bh=lwCLOrKjqeBhvraMsNIzlF4vAoIOPP0pmmDtxveRJqg=;
+	s=arc-20240116; t=1743700878; c=relaxed/simple;
+	bh=oNNkfpGAGIC6Rj/xYeHoWwnRfy9RHnR//yCu6fr7RXg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l68nO2gIRZsDDM4ZAq39js5urn5J5d8uegFXTypphiab+YbP+x7x5YP3Y8p4ojZ7q8rDdbQkXqzFWbtYb4QO1Cfcn5a0gPdCoZPt6nvBmWrFRC7OVZ2kdNgcPoWB8Ic2CfAl6LrIbpnDxt4qfBzAtsGKYhgnu4eVxCJPAcfphjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OisHarl2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BA35C4CEE3;
-	Thu,  3 Apr 2025 16:59:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743699584;
-	bh=lwCLOrKjqeBhvraMsNIzlF4vAoIOPP0pmmDtxveRJqg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OisHarl2Us9CgvsWT11VflIIAJ0QwjMDmVoWz4CDXVhOGuxfeXWJp60H92QVPkP7S
-	 Z/Ar2eg8aLxbxF5Xl5bniVmOvfrhJ80xpgphbJNPU4Xo63HromqJ3baeudaEJ7C7MV
-	 tsVmk6clyNFwj4K3OKSqIxzy19yhVTLB4XDboAtVEDcY3TWh/FI95zpVpSTGbPPmbB
-	 eB7h1JRHJE276B5g0fGUtu7Vpe61y6hL4NDyTEJDx3cpJ6t3v+QAz7UnTdzli+U5bL
-	 6rktoftwaMyE5uOIOIH/sGow2JtP41V/obKNb5K4NvGesWVB37ukxmSVYIHgGDKC61
-	 FYKQCpMYwUmgg==
-Date: Thu, 3 Apr 2025 09:59:41 -0700
-From: Kees Cook <kees@kernel.org>
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	torvalds@linux-foundation.org, peterz@infradead.org,
-	Jann Horn <jannh@google.com>, andriy.shevchenko@linux.intel.com,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Harry Yoo <harry.yoo@oracle.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Christoph Lameter <cl@gentwo.org>
-Subject: Re: [RFC] slab: introduce auto_kfree macro
-Message-ID: <202504030955.5C4B7D82@keescook>
-References: <20250401134408.37312-1-przemyslaw.kitszel@intel.com>
- <3f387b13-5482-46ed-9f52-4a9ed7001e67@suse.cz>
+	 Content-Type:Content-Disposition:In-Reply-To; b=UILeAuUj1/ozkLo/TCFyd4r+0NIpbqj9+vdA+SdWUEowipm6AyGcaFbBr2HUG3kurG4hWLumuMLd+rMkSq/jxnyyQFVOqXMRPykKh38+1C3+A5y9DllMwgQ3mTX30F6i57PVPcuBf+c+W0hPEEMEsTVNH74Z+TyhxP3OWUKUc5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PgLh4RGd; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-736ad42dfd6so981923b3a.3;
+        Thu, 03 Apr 2025 10:21:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743700875; x=1744305675; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=euhNXLFz4b0ZhIhda+mqm57e9fUemRJmR15xFO1Si/0=;
+        b=PgLh4RGd4jsyN0Eq2ELh0inczWmSfLaTKz4vgygK3wRU0f8jWi5t0AVRRjBJOdtHZV
+         VLKoXCAWa6imM39K5JtRvt5le/YCo65QSWO7qIkBH58haqXRAQucQFvqqJXN3u/PvkhM
+         3YngBFdrGiKc55ESXGAR+bVlkx9ivVwd04g33l9IzYOyPnt70Dj0sNE5SKHrviH4CZYH
+         6VDpljhlDZuJQIExRKtG6A9oKbEDL7yNlT7qHVawzXPVW2X9mqZ5ceC+3fGGpmuBsprX
+         0C5tOHhplgF1kKzGCs5EniO5SgiQRWlby011SMmV+u5fS62dqfARYSNrmQE7zuLluc1I
+         PN4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743700875; x=1744305675;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=euhNXLFz4b0ZhIhda+mqm57e9fUemRJmR15xFO1Si/0=;
+        b=hPIystpqI+X/a+kp98CW6+35gJ6YmTkd2uuQg52rFb1+1RFFmBFx00tBHADZQtuuM9
+         44W6qJHHMp3lFCIaBEq0a/mrNWHcdKh4vm2mfaReeiL2+VSxDo5wMtmWRAXXqj5tke9V
+         zgxQgEGD4pi4JTIHNnvzdASuv7PPdhMK4j1hlIbodnC0g7ipLxO9Pjpu5UU8Iq3CUtsr
+         LwMkAfh8UPYBDZDO53J4NrbFmqljJAaWA05CDyuHypm+IP7iCdXGKWhgiCag7oAfqyar
+         uDi1oquT9dTiLSrOgHnRWRyvo3vgCjKvFCv/b3U7sAMZNIAB8gcShAeWG1zPm50wAH5o
+         zj1g==
+X-Forwarded-Encrypted: i=1; AJvYcCXduDa3ewSeyhquVS9XV8gbCa4v/dzyhaVBgXU73AliaHSK0DbCg+KopvvFOYdCQyk0uyUkhko=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4aw3Hky5o0IRT/N0Ry/L8n49vDFJHDLeYiBjyzX+gRgIkPMe2
+	ErHFBJBEKY+eiBaBvelIJTsOJ9rAuDmiiP1+lS1YPNjwmtObwas=
+X-Gm-Gg: ASbGncvxCY97Jno8ZKxJKleed1gS/51xV1Dh7m2FLm4bR7MkSKo9YKCc1ViebqIS9xZ
+	Q0NlQ59vGECskP/0NAbQfoJKxYN4V66QdDcvTIkDys3wEXAuTLoHrICB67hdX50Vn9m2789ZEg7
+	XA4jB1r3McjFzUKlkzmGcxyw9982aJ1FyMEfnk9GSz2l+f4HBw2ohesWBfxMnCz0EN33BmuVF/E
+	ehwQ6kY7/Rroa5IuAJ2LuhRUsOlvDyFdA3MobTxZh5Ry+IIh1/VKOdN79mDV/izyjpFo7JX1CPC
+	lKMq4wK7mI5t1Jmq0W/EopyLPxDVzviMXAmRg+L1RLAG
+X-Google-Smtp-Source: AGHT+IFOac54yi7HzbHiogqYFMaHrIHWswlsiEsK0GFqlFyetTT4/TGUjTa8roOw0oW8AG+IWLB0+Q==
+X-Received: by 2002:a17:90a:c88d:b0:2fe:99cf:f566 with SMTP id 98e67ed59e1d1-306a481eeaamr507633a91.13.1743700874671;
+        Thu, 03 Apr 2025 10:21:14 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-3058494a3dfsm1781230a91.14.2025.04.03.10.21.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Apr 2025 10:21:14 -0700 (PDT)
+Date: Thu, 3 Apr 2025 10:21:13 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
+	daniel@iogearbox.net, john.fastabend@gmail.com,
+	Willem de Bruijn <willemb@google.com>,
+	Matt Moeller <moeller.matt@gmail.com>,
+	Maciej =?utf-8?Q?=C5=BBenczykowski?= <maze@google.com>
+Subject: Re: [PATCH bpf 1/2] bpf: support SKF_NET_OFF and SKF_LL_OFF on skb
+ frags
+Message-ID: <Z-7DiZWkOQ_n5aXw@mini-arch>
+References: <20250403140846.1268564-1-willemdebruijn.kernel@gmail.com>
+ <20250403140846.1268564-2-willemdebruijn.kernel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <3f387b13-5482-46ed-9f52-4a9ed7001e67@suse.cz>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250403140846.1268564-2-willemdebruijn.kernel@gmail.com>
 
-On Wed, Apr 02, 2025 at 12:44:50PM +0200, Vlastimil Babka wrote:
-> Cc Kees and others from his related efforts:
+On 04/03, Willem de Bruijn wrote:
+> From: Willem de Bruijn <willemb@google.com>
 > 
-> https://lore.kernel.org/all/20250321202620.work.175-kees@kernel.org/
-
-I think, unfortunately, the consensus is that "invisible side-effects"
-are not going to be tolerated. After I finish with kmalloc_obj(), I'd
-like to take another run at this for basically providing something like:
-
-static inline __must_check
-void *kfree(void *p) { __kfree(p); return NULL; }
-
-And then switch all:
-
-	kfree(s->ptr);
-
-to
-
-	s->ptr = kfree(s->ptr);
-
-Where s->ptr isn't used again.
-
--Kees
-
+> Classic BPF socket filters with SKB_NET_OFF and SKB_LL_OFF fail to
+> read when these offsets extend into frags.
 > 
-> On 4/1/25 15:44, Przemek Kitszel wrote:
-> > Add auto_kfree macro that acts as a higher level wrapper for manual
-> > __free(kfree) invocation, and sets the pointer to NULL - to have both
-> > well defined behavior also for the case code would lack other assignement.
-> > 
-> > Consider the following code:
-> > int my_foo(int arg)
-> > {
-> > 	struct my_dev_foo *foo __free(kfree); /* no assignement */
-> > 
-> > 	foo = kzalloc(sizeof(*foo), GFP_KERNEL);
-> > 	/* ... */
-> > }
-> > 
-> > So far it is fine and even optimal in terms of not assigning when
-> > not needed. But it is typical to don't touch (and sadly to don't
-> > think about) code that is not related to the change, so let's consider
-> > an extension to the above, namely an "early return" style to check
-> > arg prior to allocation:
-> > int my_foo(int arg)
-> > {
-> >         struct my_dev_foo *foo __free(kfree); /* no assignement */
-> > +
-> > +	if (!arg)
-> > +		return -EINVAL;
-> >         foo = kzalloc(sizeof(*foo), GFP_KERNEL);
-> >         /* ... */
-> > }
-> > Now we have uninitialized foo passed to kfree, what likely will crash.
-> > One could argue that `= NULL` should be added to this patch, but it is
-> > easy to forgot, especially when the foo declaration is outside of the
-> > default git context.
-> > 
-> > With new auto_kfree, we simply will start with
-> > 	struct my_dev_foo *foo auto_kfree;
-> > and be safe against future extensions.
-> > 
-> > I believe this will open up way for broader adoption of Scope Based
-> > Resource Management, say in networking.
-> > I also believe that my proposed name is special enough that it will
-> > be easy to know/spot that the assignement is hidden.
-> > 
-> > Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> > ---
-> >  include/linux/slab.h | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/include/linux/slab.h b/include/linux/slab.h
-> > index 98e07e9e9e58..b943be0ce626 100644
-> > --- a/include/linux/slab.h
-> > +++ b/include/linux/slab.h
-> > @@ -471,6 +471,7 @@ void kfree_sensitive(const void *objp);
-> >  size_t __ksize(const void *objp);
-> >  
-> >  DEFINE_FREE(kfree, void *, if (!IS_ERR_OR_NULL(_T)) kfree(_T))
-> > +#define auto_kfree __free(kfree) = NULL
-> >  DEFINE_FREE(kfree_sensitive, void *, if (_T) kfree_sensitive(_T))
-> >  
-> >  /**
+> This has been observed with iwlwifi and reproduced with tun with
+> IFF_NAPI_FRAGS. The below straightforward socket filter on UDP port,
+> applied to a RAW socket, will silently miss matching packets.
 > 
+>     const int offset_proto = offsetof(struct ip6_hdr, ip6_nxt);
+>     const int offset_dport = sizeof(struct ip6_hdr) + offsetof(struct udphdr, dest);
+>     struct sock_filter filter_code[] = {
+>             BPF_STMT(BPF_LD  + BPF_B   + BPF_ABS, SKF_AD_OFF + SKF_AD_PKTTYPE),
+>             BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, PACKET_HOST, 0, 4),
+>             BPF_STMT(BPF_LD  + BPF_B   + BPF_ABS, SKF_NET_OFF + offset_proto),
+>             BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, IPPROTO_UDP, 0, 2),
+>             BPF_STMT(BPF_LD  + BPF_H   + BPF_ABS, SKF_NET_OFF + offset_dport),
+> 
+> This is unexpected behavior. Socket filter programs should be
+> consistent regardless of environment. Silent misses are
+> particularly concerning as hard to detect.
+> 
+> Use skb_copy_bits for offsets outside linear, same as done for
+> non-SKF_(LL|NET) offsets.
+> 
+> Offset is always positive after subtracting the reference threshold
+> SKB_(LL|NET)_OFF, so is always >= skb_(mac|network)_offset. The sum of
+> the two is an offset against skb->data, and may be negative, but it
+> cannot point before skb->head, as skb_(mac|network)_offset would too.
+> 
+> This appears to go back to when frag support was introduced to
+> sk_run_filter in linux-2.4.4, before the introduction of git.
+> 
+> The amount of code change and 8/16/32 bit duplication are unfortunate.
+> But any attempt I made to be smarter saved very few LoC while
+> complicating the code.
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Link: https://lore.kernel.org/netdev/20250122200402.3461154-1-maze@google.com/
+> Link: https://elixir.bootlin.com/linux/2.4.4/source/net/core/filter.c#L244
+> Reported-by: Matt Moeller <moeller.matt@gmail.com>
+> Co-developed-by: Maciej Żenczykowski <maze@google.com>
+> Signed-off-by: Maciej Żenczykowski <maze@google.com>
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
+> ---
+>  include/linux/filter.h |  3 --
+>  kernel/bpf/core.c      | 21 ------------
+>  net/core/filter.c      | 75 +++++++++++++++++++++++-------------------
+>  3 files changed, 42 insertions(+), 57 deletions(-)
+> 
+> diff --git a/include/linux/filter.h b/include/linux/filter.h
+> index f5cf4d35d83e..708ac7e0cd36 100644
+> --- a/include/linux/filter.h
+> +++ b/include/linux/filter.h
+> @@ -1496,9 +1496,6 @@ static inline u16 bpf_anc_helper(const struct sock_filter *ftest)
+>  	}
+>  }
+>  
+> -void *bpf_internal_load_pointer_neg_helper(const struct sk_buff *skb,
+> -					   int k, unsigned int size);
+> -
+>  static inline int bpf_tell_extensions(void)
+>  {
+>  	return SKF_AD_MAX;
+> diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+> index ba6b6118cf50..0e836b5ac9a0 100644
+> --- a/kernel/bpf/core.c
+> +++ b/kernel/bpf/core.c
+> @@ -68,27 +68,6 @@
+>  struct bpf_mem_alloc bpf_global_ma;
+>  bool bpf_global_ma_set;
+>  
+> -/* No hurry in this branch
+> - *
+> - * Exported for the bpf jit load helper.
+> - */
+> -void *bpf_internal_load_pointer_neg_helper(const struct sk_buff *skb, int k, unsigned int size)
+> -{
+> -	u8 *ptr = NULL;
+> -
+> -	if (k >= SKF_NET_OFF) {
+> -		ptr = skb_network_header(skb) + k - SKF_NET_OFF;
+> -	} else if (k >= SKF_LL_OFF) {
+> -		if (unlikely(!skb_mac_header_was_set(skb)))
+> -			return NULL;
+> -		ptr = skb_mac_header(skb) + k - SKF_LL_OFF;
+> -	}
+> -	if (ptr >= skb->head && ptr + size <= skb_tail_pointer(skb))
+> -		return ptr;
+> -
+> -	return NULL;
+> -}
+> -
+>  /* tell bpf programs that include vmlinux.h kernel's PAGE_SIZE */
+>  enum page_size_enum {
+>  	__PAGE_SIZE = PAGE_SIZE
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index bc6828761a47..b232b70dd10d 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -221,21 +221,24 @@ BPF_CALL_3(bpf_skb_get_nlattr_nest, struct sk_buff *, skb, u32, a, u32, x)
+>  BPF_CALL_4(bpf_skb_load_helper_8, const struct sk_buff *, skb, const void *,
+>  	   data, int, headlen, int, offset)
+>  {
+> -	u8 tmp, *ptr;
+> +	u8 tmp;
+>  	const int len = sizeof(tmp);
+>  
+> -	if (offset >= 0) {
+> -		if (headlen - offset >= len)
+> -			return *(u8 *)(data + offset);
+> -		if (!skb_copy_bits(skb, offset, &tmp, sizeof(tmp)))
+> -			return tmp;
+> -	} else {
+> -		ptr = bpf_internal_load_pointer_neg_helper(skb, offset, len);
+> -		if (likely(ptr))
+> -			return *(u8 *)ptr;
 
--- 
-Kees Cook
+[..]
+
+> +	if (offset < 0) {
+> +		if (offset >= SKF_NET_OFF)
+> +			offset += skb_network_offset(skb) - SKF_NET_OFF;
+> +		else if (offset >= SKF_LL_OFF && skb_mac_header_was_set(skb))
+> +			offset += skb_mac_offset(skb) - SKF_LL_OFF;
+> +		else
+> +			return -EFAULT;
+>  	}
+
+nit: we now repeat the same logic three times, maybe still worth it to put it
+into a helper? bpf_resolve_classic_offset or something. 
 
