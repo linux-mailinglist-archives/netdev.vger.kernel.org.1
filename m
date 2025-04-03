@@ -1,252 +1,94 @@
-Return-Path: <netdev+bounces-179151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83300A7ACE7
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:52:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA7CEA7ACB6
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:48:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C7CA16BAC1
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:47:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C60CE188D556
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:44:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 793932853F8;
-	Thu,  3 Apr 2025 19:08:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99EBE280CDD;
+	Thu,  3 Apr 2025 19:08:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DlZjqlkV"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="qM9zA1Ei"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ECDA2853F4;
-	Thu,  3 Apr 2025 19:08:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3AE7258CEC;
+	Thu,  3 Apr 2025 19:08:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743707320; cv=none; b=NuC8eGF2nnFZHVFYYg7Nw8I9jq04xHjWfwVy2xE/hDQf1gElqwT93Gt44hQF8E2xp3Wzld1rIaOh0KdipmQm0FZYYZicpqnPdeIfsYrWcQJnHsrwuB9jtfKSrIeWLobNEXL4YBAS/r6zSeI7ITST/330fFbYkgHZ+4oYwFgVvIU=
+	t=1743707298; cv=none; b=N5qt4KGwWL0O99ryb52lrjEMsXQfgUrubgtt+llSpnyO86eZyHVwNn3H5B6PCWHARGJFGlH7KFrIRaAQnF5JmzGngBSiLtC9iXqdmq3qKbWUgyxDDn5FLovCCt2KXJpeeco/63UrOhmWmcdqX3c1XSzc29e6bzH9XM2hFuoAq2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743707320; c=relaxed/simple;
-	bh=L5vFB5r8aMORdTeQkOD8xuBnB8C5DCukkgoxM5N73H8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lBxwv9C6jMDKt+UjxUFhV5V01XSR30mtvhL48GPapzPtjuMGofEXqXSucY7hZ4rf5IV/zT0oNxclRP5L91FI4HrWnYjUj6EX+40ufARiLZAxlWGJ4AB3PKpu3l1tkf+4LTCNkcjavkecVOhkH6zD+alINSXmNBPC8I2WVQgfT6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DlZjqlkV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7DEAC4CEE3;
-	Thu,  3 Apr 2025 19:08:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743707320;
-	bh=L5vFB5r8aMORdTeQkOD8xuBnB8C5DCukkgoxM5N73H8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DlZjqlkVo+Mo++jPzsU3CCDynad4OOPI5i8UpMiw6F2TmsbpTGAsNkCSdDcXbc5uX
-	 6rGqQ/IYVdZ9PDzKGFVvywHlmRnKMqNW/qLFPp2NnR/eh1AGcwQUdJAuZ4j53SVOUg
-	 mNwVEbna8yfEfUzWuVNNhcKkpbeIdbXX+I/GRymAeSACEv5E5+uHxOTn/ObtcUhaPq
-	 eBQvJ9PY45COMrCgIZ27nX9XVi9WC0wXow1+IbfxdB6heun+Ms+VbnPfv4OmCEYtQs
-	 0fw7Ie5I7d1hK7D0wMLGpR8DHlvd9HYwVGZ9wK8FqiGqRLfRynJl4QALS8fNQe3/1Z
-	 0vwMihPpyfl/w==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Stanislav Fomichev <sdf@fomichev.me>,
-	syzbot+b0c03d76056ef6cd12a6@syzkaller.appspotmail.com,
-	Simon Horman <horms@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sasha Levin <sashal@kernel.org>,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	aleksander.lobakin@intel.com,
-	kory.maincent@bootlin.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 23/26] net: vlan: don't propagate flags on open
-Date: Thu,  3 Apr 2025 15:07:42 -0400
-Message-Id: <20250403190745.2677620-23-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250403190745.2677620-1-sashal@kernel.org>
-References: <20250403190745.2677620-1-sashal@kernel.org>
+	s=arc-20240116; t=1743707298; c=relaxed/simple;
+	bh=Wh5Ni6yEb9pzYvSxle13v0riTVmFQqhjt3k27dRwEqU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BM0mon2wq3kziWhd6hkxUhDrQuF2pOYgUz0HMPWsKLbFC+MPN5Kb7yKJlEXm2cunPqgJMSQxJsmyslpEvYYTFUWuDOVRGnrFsPGEN+oDIcD6bdDlfP3eyEmQH1DR+V4WAzkkBfBAM5S19tclxo1OBS7LiKfN+m1YvRBfG+hjUGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=qM9zA1Ei; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from [192.168.1.58] (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 63D01200C241;
+	Thu,  3 Apr 2025 21:08:12 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 63D01200C241
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1743707292;
+	bh=KrNpRha9b/ZPtCbTWmlK4b+wJzbqizSsJUCYeP/vmhM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=qM9zA1EiDlk+7qhQ8c6mnOQ1pr5QfQpd47HEslS4xQMoOsPV5T8d5YiGznPUP2E6d
+	 /1A4Eg0M4CABN777HIiwuDICp9qnhSdsnNDggzYLM4bvtqxdvsGt8VK66gXwlti6MP
+	 n8MlSINUJ5oF5oGD2s3oJEOWE5b8cOVV4ZGMqW5WGzUZ0LNGJ/CDN5IUGqcFg+sMlr
+	 leiwED4EV8fMHHShsXYuhOnHHe03wQuH3M+dpu+Togus0hxfDkc2TvZAfN1q98SkzH
+	 AIGk4+Ca7QNhQlOUXyuj9xW2AdUhLy2T8x3k7BGwXIgoso+roiSXe3q1sX23DlLy/a
+	 M8oxqd7Z2DMgQ==
+Message-ID: <cb0df409-ebbf-4970-b10c-4ea9f863ff00@uliege.be>
+Date: Thu, 3 Apr 2025 21:08:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.85
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: lwtunnel: disable preemption when required
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, kuniyu@amazon.com,
+ Alexei Starovoitov <alexei.starovoitov@gmail.com>, bpf <bpf@vger.kernel.org>
+References: <20250403083956.13946-1-justin.iurman@uliege.be>
+ <Z-62MSCyMsqtMW1N@mini-arch>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@uliege.be>
+In-Reply-To: <Z-62MSCyMsqtMW1N@mini-arch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Stanislav Fomichev <sdf@fomichev.me>
+On 4/3/25 18:24, Stanislav Fomichev wrote:
+> On 04/03, Justin Iurman wrote:
+>> In lwtunnel_{input|output|xmit}(), dev_xmit_recursion() may be called in
+>> preemptible scope for PREEMPT kernels. This patch disables preemption
+>> before calling dev_xmit_recursion(). Preemption is re-enabled only at
+>> the end, since we must ensure the same CPU is used for both
+>> dev_xmit_recursion_inc() and dev_xmit_recursion_dec() (and any other
+>> recursion levels in some cases) in order to maintain valid per-cpu
+>> counters.
+> 
+> Dummy question: CONFIG_PREEMPT_RT uses current->net_xmit.recursion to
+> track the recursion. Any reason not to do it in the generic PREEMPT case?
 
-[ Upstream commit 27b918007d96402aba10ed52a6af8015230f1793 ]
-
-With the device instance lock, there is now a possibility of a deadlock:
-
-[    1.211455] ============================================
-[    1.211571] WARNING: possible recursive locking detected
-[    1.211687] 6.14.0-rc5-01215-g032756b4ca7a-dirty #5 Not tainted
-[    1.211823] --------------------------------------------
-[    1.211936] ip/184 is trying to acquire lock:
-[    1.212032] ffff8881024a4c30 (&dev->lock){+.+.}-{4:4}, at: dev_set_allmulti+0x4e/0xb0
-[    1.212207]
-[    1.212207] but task is already holding lock:
-[    1.212332] ffff8881024a4c30 (&dev->lock){+.+.}-{4:4}, at: dev_open+0x50/0xb0
-[    1.212487]
-[    1.212487] other info that might help us debug this:
-[    1.212626]  Possible unsafe locking scenario:
-[    1.212626]
-[    1.212751]        CPU0
-[    1.212815]        ----
-[    1.212871]   lock(&dev->lock);
-[    1.212944]   lock(&dev->lock);
-[    1.213016]
-[    1.213016]  *** DEADLOCK ***
-[    1.213016]
-[    1.213143]  May be due to missing lock nesting notation
-[    1.213143]
-[    1.213294] 3 locks held by ip/184:
-[    1.213371]  #0: ffffffff838b53e0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock+0x1b/0xa0
-[    1.213543]  #1: ffffffff84e5fc70 (&net->rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock+0x37/0xa0
-[    1.213727]  #2: ffff8881024a4c30 (&dev->lock){+.+.}-{4:4}, at: dev_open+0x50/0xb0
-[    1.213895]
-[    1.213895] stack backtrace:
-[    1.213991] CPU: 0 UID: 0 PID: 184 Comm: ip Not tainted 6.14.0-rc5-01215-g032756b4ca7a-dirty #5
-[    1.213993] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.3-1-1 04/01/2014
-[    1.213994] Call Trace:
-[    1.213995]  <TASK>
-[    1.213996]  dump_stack_lvl+0x8e/0xd0
-[    1.214000]  print_deadlock_bug+0x28b/0x2a0
-[    1.214020]  lock_acquire+0xea/0x2a0
-[    1.214027]  __mutex_lock+0xbf/0xd40
-[    1.214038]  dev_set_allmulti+0x4e/0xb0 # real_dev->flags & IFF_ALLMULTI
-[    1.214040]  vlan_dev_open+0xa5/0x170 # ndo_open on vlandev
-[    1.214042]  __dev_open+0x145/0x270
-[    1.214046]  __dev_change_flags+0xb0/0x1e0
-[    1.214051]  netif_change_flags+0x22/0x60 # IFF_UP vlandev
-[    1.214053]  dev_change_flags+0x61/0xb0 # for each device in group from dev->vlan_info
-[    1.214055]  vlan_device_event+0x766/0x7c0 # on netdevsim0
-[    1.214058]  notifier_call_chain+0x78/0x120
-[    1.214062]  netif_open+0x6d/0x90
-[    1.214064]  dev_open+0x5b/0xb0 # locks netdevsim0
-[    1.214066]  bond_enslave+0x64c/0x1230
-[    1.214075]  do_set_master+0x175/0x1e0 # on netdevsim0
-[    1.214077]  do_setlink+0x516/0x13b0
-[    1.214094]  rtnl_newlink+0xaba/0xb80
-[    1.214132]  rtnetlink_rcv_msg+0x440/0x490
-[    1.214144]  netlink_rcv_skb+0xeb/0x120
-[    1.214150]  netlink_unicast+0x1f9/0x320
-[    1.214153]  netlink_sendmsg+0x346/0x3f0
-[    1.214157]  __sock_sendmsg+0x86/0xb0
-[    1.214160]  ____sys_sendmsg+0x1c8/0x220
-[    1.214164]  ___sys_sendmsg+0x28f/0x2d0
-[    1.214179]  __x64_sys_sendmsg+0xef/0x140
-[    1.214184]  do_syscall_64+0xec/0x1d0
-[    1.214190]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[    1.214191] RIP: 0033:0x7f2d1b4a7e56
-
-Device setup:
-
-     netdevsim0 (down)
-     ^        ^
-  bond        netdevsim1.100@netdevsim1 allmulticast=on (down)
-
-When we enslave the lower device (netdevsim0) which has a vlan, we
-propagate vlan's allmuti/promisc flags during ndo_open. This causes
-(re)locking on of the real_dev.
-
-Propagate allmulti/promisc on flags change, not on the open. There
-is a slight semantics change that vlans that are down now propagate
-the flags, but this seems unlikely to result in the real issues.
-
-Reproducer:
-
-  echo 0 1 > /sys/bus/netdevsim/new_device
-
-  dev_path=$(ls -d /sys/bus/netdevsim/devices/netdevsim0/net/*)
-  dev=$(echo $dev_path | rev | cut -d/ -f1 | rev)
-
-  ip link set dev $dev name netdevsim0
-  ip link set dev netdevsim0 up
-
-  ip link add link netdevsim0 name netdevsim0.100 type vlan id 100
-  ip link set dev netdevsim0.100 allmulticast on down
-  ip link add name bond1 type bond mode 802.3ad
-  ip link set dev netdevsim0 down
-  ip link set dev netdevsim0 master bond1
-  ip link set dev bond1 up
-  ip link show
-
-Reported-by: syzbot+b0c03d76056ef6cd12a6@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/Z9CfXjLMKn6VLG5d@mini-arch/T/#m15ba130f53227c883e79fb969687d69d670337a0
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://patch.msgid.link/20250313100657.2287455-1-sdf@fomichev.me
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/8021q/vlan_dev.c | 31 ++++---------------------------
- 1 file changed, 4 insertions(+), 27 deletions(-)
-
-diff --git a/net/8021q/vlan_dev.c b/net/8021q/vlan_dev.c
-index 2a7f1b15714ab..e9326f322d7a2 100644
---- a/net/8021q/vlan_dev.c
-+++ b/net/8021q/vlan_dev.c
-@@ -273,17 +273,6 @@ static int vlan_dev_open(struct net_device *dev)
- 			goto out;
- 	}
- 
--	if (dev->flags & IFF_ALLMULTI) {
--		err = dev_set_allmulti(real_dev, 1);
--		if (err < 0)
--			goto del_unicast;
--	}
--	if (dev->flags & IFF_PROMISC) {
--		err = dev_set_promiscuity(real_dev, 1);
--		if (err < 0)
--			goto clear_allmulti;
--	}
--
- 	ether_addr_copy(vlan->real_dev_addr, real_dev->dev_addr);
- 
- 	if (vlan->flags & VLAN_FLAG_GVRP)
-@@ -297,12 +286,6 @@ static int vlan_dev_open(struct net_device *dev)
- 		netif_carrier_on(dev);
- 	return 0;
- 
--clear_allmulti:
--	if (dev->flags & IFF_ALLMULTI)
--		dev_set_allmulti(real_dev, -1);
--del_unicast:
--	if (!ether_addr_equal(dev->dev_addr, real_dev->dev_addr))
--		dev_uc_del(real_dev, dev->dev_addr);
- out:
- 	netif_carrier_off(dev);
- 	return err;
-@@ -315,10 +298,6 @@ static int vlan_dev_stop(struct net_device *dev)
- 
- 	dev_mc_unsync(real_dev, dev);
- 	dev_uc_unsync(real_dev, dev);
--	if (dev->flags & IFF_ALLMULTI)
--		dev_set_allmulti(real_dev, -1);
--	if (dev->flags & IFF_PROMISC)
--		dev_set_promiscuity(real_dev, -1);
- 
- 	if (!ether_addr_equal(dev->dev_addr, real_dev->dev_addr))
- 		dev_uc_del(real_dev, dev->dev_addr);
-@@ -490,12 +469,10 @@ static void vlan_dev_change_rx_flags(struct net_device *dev, int change)
- {
- 	struct net_device *real_dev = vlan_dev_priv(dev)->real_dev;
- 
--	if (dev->flags & IFF_UP) {
--		if (change & IFF_ALLMULTI)
--			dev_set_allmulti(real_dev, dev->flags & IFF_ALLMULTI ? 1 : -1);
--		if (change & IFF_PROMISC)
--			dev_set_promiscuity(real_dev, dev->flags & IFF_PROMISC ? 1 : -1);
--	}
-+	if (change & IFF_ALLMULTI)
-+		dev_set_allmulti(real_dev, dev->flags & IFF_ALLMULTI ? 1 : -1);
-+	if (change & IFF_PROMISC)
-+		dev_set_promiscuity(real_dev, dev->flags & IFF_PROMISC ? 1 : -1);
- }
- 
- static void vlan_dev_set_rx_mode(struct net_device *vlan_dev)
--- 
-2.39.5
-
+I'd say PREEMPT_RT is a different beast. IMO, softirqs can be 
+preempted/migrated in RT kernels, which is not true for non-RT kernels. 
+Maybe RT kernels could use __this_cpu_* instead of "current" though, but 
+it would be less trivial. For example, see commit ecefbc09e8ee ("net: 
+softnet_data: Make xmit per task.") on why it makes sense to use 
+"current" in RT kernels. I guess the opposite as you suggest (i.e., 
+non-RT kernels using "current") would be technically possible, but there 
+must be a reason it is defined the way it is... so probably incorrect or 
+inefficient?
 
