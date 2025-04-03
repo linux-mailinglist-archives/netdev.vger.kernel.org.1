@@ -1,290 +1,394 @@
-Return-Path: <netdev+bounces-179106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8158A7A96F
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 20:31:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EA40A7A965
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 20:30:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CC5D16EEE8
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 18:30:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8643C18853D3
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 18:31:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77C00253331;
-	Thu,  3 Apr 2025 18:30:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B59E3253358;
+	Thu,  3 Apr 2025 18:30:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gdaD3uGK"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="N8pW6y6H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67ACA18BC1D
-	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 18:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A408250BF5
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 18:30:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743705034; cv=none; b=UmNaeCYkpe+Z24wT+0DNfEkDTNnE8fdGucTUO80K8OaUD9DtYfckbrkRG2UispkljRMfxogBXUSxkyyfqEgVCmontQRUsPUr3WFa+Sxz0bt5PD9I0wvM2onG+H9HvBc2iXkQ5F8DFqgGXiQJGlunJlLDfJqi8O/5R1xTwbGnz88=
+	t=1743705035; cv=none; b=e5Pv3XYwqYCumgPEkA/CTbFW9Iiomm+Klqf0omDnbEXqalGQW2rTozCGkst3eWX+7IY1hwFTl0t0aopJGXBGwJKWbaBKJZBTlIFkTlXfik2r4NKhRqdvAfLBrSFcTwYqiAURIz9lfFbZP3/9a1GjE4vPfvWuGKkOy/zStWIDKkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743705034; c=relaxed/simple;
-	bh=PkslLZ+LloU6B+v0EstCj9Qw0blZGQA2AGI0/JXULwk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=G1HTgkCQziFgb+cFIRN58gaUMl3E3p0GZ4LOH68HeY8QdnNlmqYGSju32xc4Ne2TvC0TZP6OZ9iQBjhvtf5qrD3lOUeZA4Mu6a8/Vc/OP7fVhrQ72q0VJ157/JdimzwxrA5AFdS2rrtLuoDEDzCkIybhnb0I9iU7plv0o1w/gmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gdaD3uGK; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5dbfc122b82so1621a12.0
-        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 11:30:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743705031; x=1744309831; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iYMGgH2/Vqv1R7Ax+V3E+Ngy/7HRiyWg2fEaUXEJVfU=;
-        b=gdaD3uGKuP5b+COSrcW5u2sHHjf09/F/AwYc/RtAHgOpxeD1Gj42vfK8yJ6Kt+nx+2
-         G/dxLKk5IxQewJq40V422aSd6VA/QtPtoszuJVKxgZ7odvTK0ZAWBoT8hJPHotvxWkKU
-         0sqs0cwHGGYuhHLU4b8rYsUVn8c4+wjBnigibQtY6Vz8yGfeXHQU4BOrekTAddKV8ROD
-         rwty4CALZSqzmFHXJovcCDl3w8NINyG7rq5gkyJwK2jHwpvU8DIDJevaHMZvVzTtN5Ok
-         e40NfAtEdMqhFNzCM5x2JVb5NyDpPlvovk08Q3X9v1xTx5S24e+qYuvt0L6gIxWLsUAi
-         tRRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743705031; x=1744309831;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iYMGgH2/Vqv1R7Ax+V3E+Ngy/7HRiyWg2fEaUXEJVfU=;
-        b=KcSqDwY6bLyWT6CU/48OL2sLQLKk0GGfwKJS8Y0J9l5mGA5vPJh4EBAHERh40gY+CC
-         wUXk7WH3BL6j9MSzVS8H1wjtSTa1pZjS32PygF931vlPqFtAyr2dv0F780n81agR+0az
-         LYZWEkduc0iBW4GJYqD3IysxD2hpmV6BfoQgWChNHPwOiZetK9uL+MyY1zNb8WJvwrKP
-         juZcvf9BWrZuj7EZ/mRwzMcs43b/Id3kXU/kmC9pORD4WoR/CEAEhk6afVG36f9AmVG/
-         ceIlB4yJ3siW02HPmldVBt2lu+CL/xYndOIYAlptLLSVDrFX+9s6jlC5v41B+UDqIgz+
-         JTjg==
-X-Forwarded-Encrypted: i=1; AJvYcCUIJP5BZThXswuAem4QKyZKWXjeVkc7Wuj9jEpzCddPaKOlUJAIjl5kYbRv6jrH3obJvLFZ7ig=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwT6/dVRwKlw8nwiH53Dd7gu53f1K3W0netIivtpNqe6w9ZVEy0
-	pz+rKomRXqFxBXGcJPvit6jASfprnplyvV2Mp6sGkN/8+wDLn/lhMPMwOBMtkbcAJb8NL6YnfQ9
-	Gm5hWs6Uu9oyd0JDHYvzLxlyvuniAQhntwi+n
-X-Gm-Gg: ASbGncvIK5EMC/J0GCYhq5KJ7KmtYni3oZNblFitU8Q9AjGuHl39oEZA9QGbVOmGmkc
-	M4HbUX5d/e1OQV4mMK1Ow+uVtgEHY4V632vBQdYA9drvvqICB7dbm6VgCrmb7srcZEJ+lslGODO
-	ixuDXzKicGLvbLfkESWK2Yk84hVwav0b5K77C1nUCiahUBrsdfZ8jXSATz
-X-Google-Smtp-Source: AGHT+IGN3xjfeCsv6yU/ijhQ9l/fdxnM1CkdyiU+66cHrRD4FhUygubAdMQnp2osyUBvjMPoNgXxTXybIBkTRkjpgMo=
-X-Received: by 2002:a05:6402:1858:b0:5eb:5d50:4fec with SMTP id
- 4fb4d7f45d1cf-5f0b32e46b3mr10995a12.0.1743705030162; Thu, 03 Apr 2025
- 11:30:30 -0700 (PDT)
+	s=arc-20240116; t=1743705035; c=relaxed/simple;
+	bh=/oCj0Hk1g+sUvQ3GIO57Vo8U9NcTvnSSJUK+gndZU1w=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=nSckxeWi9sNaMmYK9HImNZm/1keaOl+QRHgGc4FL0PM7I+ZzscrVvW5iPE8LPV2iF6lHR1tZcIKwu/8mBJUV8XvIXdRbOZCO20sJoOLEKNAycfSd6ZnXSlcenwZICHme3bzXvQ0C1I/AVg1byFr6CwFWeDpQc+p5Y3YM2hv3x4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=N8pW6y6H; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1743705031;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UdDp1sO0IopfH7Iy+tgmsR53cIFBoLuTkzWc5BMhUC0=;
+	b=N8pW6y6HFbeE9hCyE1ExGSseCusV1hXW05RIrKkHvLtrxfI0VTomHeIxrLZT6ZmnQ3pmZh
+	lSJXxwl818uHQhTcRf7gnBYyXmnKddjhdtmAQLXBkvJhnGvL1/TCvKqwoRYKfZBYrMzjjA
+	ZKlIFMCwdhALDB+60jfyWeIu+JHt1/4=
+From: Sean Anderson <sean.anderson@linux.dev>
+To: netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>
+Cc: Christian Marangi <ansuelsmth@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	linux-kernel@vger.kernel.org,
+	upstream@airoha.com,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	devicetree@vger.kernel.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Naveen N Rao <naveen@kernel.org>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	linuxppc-dev@lists.ozlabs.org,
+	Sean Anderson <sean.anderson@linux.dev>
+Subject: [RFC net-next PATCH 13/13] powerpc: dts: Add compatible strings for Lynx PCSs
+Date: Thu,  3 Apr 2025 14:30:23 -0400
+Message-Id: <20250403183023.1948676-1-sean.anderson@linux.dev>
+In-Reply-To: <20250403181907.1947517-1-sean.anderson@linux.dev>
+References: <20250403181907.1947517-1-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250403140846.1268564-1-willemdebruijn.kernel@gmail.com>
- <20250403140846.1268564-2-willemdebruijn.kernel@gmail.com>
- <Z-7DiZWkOQ_n5aXw@mini-arch> <67eec501d0d58_14b7b229490@willemb.c.googlers.com.notmuch>
- <Z-7G8cBIW7-dVeH8@mini-arch>
-In-Reply-To: <Z-7G8cBIW7-dVeH8@mini-arch>
-From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
-Date: Thu, 3 Apr 2025 11:30:18 -0700
-X-Gm-Features: AQ5f1JojtrAQfQuBrxXtrkvPht_OtIyL0GibAHcLZ4neOaOKwSrpH4h5ePglz5I
-Message-ID: <CANP3RGe8ZjcX8yGhCPs+Q1x7ijpGKthjawztFiXSeDQazgSrpA@mail.gmail.com>
-Subject: Re: [PATCH bpf 1/2] bpf: support SKF_NET_OFF and SKF_LL_OFF on skb frags
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	john.fastabend@gmail.com, Willem de Bruijn <willemb@google.com>, 
-	Matt Moeller <moeller.matt@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Apr 3, 2025 at 10:35=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
-l.com> wrote:
->
-> On 04/03, Willem de Bruijn wrote:
-> > Stanislav Fomichev wrote:
-> > > On 04/03, Willem de Bruijn wrote:
-> > > > From: Willem de Bruijn <willemb@google.com>
-> > > >
-> > > > Classic BPF socket filters with SKB_NET_OFF and SKB_LL_OFF fail to
-> > > > read when these offsets extend into frags.
-> > > >
-> > > > This has been observed with iwlwifi and reproduced with tun with
-> > > > IFF_NAPI_FRAGS. The below straightforward socket filter on UDP port=
-,
-> > > > applied to a RAW socket, will silently miss matching packets.
-> > > >
-> > > >     const int offset_proto =3D offsetof(struct ip6_hdr, ip6_nxt);
-> > > >     const int offset_dport =3D sizeof(struct ip6_hdr) + offsetof(st=
-ruct udphdr, dest);
-> > > >     struct sock_filter filter_code[] =3D {
-> > > >             BPF_STMT(BPF_LD  + BPF_B   + BPF_ABS, SKF_AD_OFF + SKF_=
-AD_PKTTYPE),
-> > > >             BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, PACKET_HOST, 0, 4),
-> > > >             BPF_STMT(BPF_LD  + BPF_B   + BPF_ABS, SKF_NET_OFF + off=
-set_proto),
-> > > >             BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, IPPROTO_UDP, 0, 2),
-> > > >             BPF_STMT(BPF_LD  + BPF_H   + BPF_ABS, SKF_NET_OFF + off=
-set_dport),
-> > > >
-> > > > This is unexpected behavior. Socket filter programs should be
-> > > > consistent regardless of environment. Silent misses are
-> > > > particularly concerning as hard to detect.
-> > > >
-> > > > Use skb_copy_bits for offsets outside linear, same as done for
-> > > > non-SKF_(LL|NET) offsets.
-> > > >
-> > > > Offset is always positive after subtracting the reference threshold
-> > > > SKB_(LL|NET)_OFF, so is always >=3D skb_(mac|network)_offset. The s=
-um of
-> > > > the two is an offset against skb->data, and may be negative, but it
-> > > > cannot point before skb->head, as skb_(mac|network)_offset would to=
-o.
-> > > >
-> > > > This appears to go back to when frag support was introduced to
-> > > > sk_run_filter in linux-2.4.4, before the introduction of git.
-> > > >
-> > > > The amount of code change and 8/16/32 bit duplication are unfortuna=
-te.
-> > > > But any attempt I made to be smarter saved very few LoC while
-> > > > complicating the code.
-> > > >
-> > > > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> > > > Link: https://lore.kernel.org/netdev/20250122200402.3461154-1-maze@=
-google.com/
-> > > > Link: https://elixir.bootlin.com/linux/2.4.4/source/net/core/filter=
-.c#L244
-> > > > Reported-by: Matt Moeller <moeller.matt@gmail.com>
-> > > > Co-developed-by: Maciej =C5=BBenczykowski <maze@google.com>
-> > > > Signed-off-by: Maciej =C5=BBenczykowski <maze@google.com>
-> > > > Signed-off-by: Willem de Bruijn <willemb@google.com>
-> > > > ---
-> > > >  include/linux/filter.h |  3 --
-> > > >  kernel/bpf/core.c      | 21 ------------
-> > > >  net/core/filter.c      | 75 +++++++++++++++++++++++---------------=
-----
-> > > >  3 files changed, 42 insertions(+), 57 deletions(-)
-> > > >
-> > > > diff --git a/include/linux/filter.h b/include/linux/filter.h
-> > > > index f5cf4d35d83e..708ac7e0cd36 100644
-> > > > --- a/include/linux/filter.h
-> > > > +++ b/include/linux/filter.h
-> > > > @@ -1496,9 +1496,6 @@ static inline u16 bpf_anc_helper(const struct=
- sock_filter *ftest)
-> > > >   }
-> > > >  }
-> > > >
-> > > > -void *bpf_internal_load_pointer_neg_helper(const struct sk_buff *s=
-kb,
-> > > > -                                    int k, unsigned int size);
-> > > > -
-> > > >  static inline int bpf_tell_extensions(void)
-> > > >  {
-> > > >   return SKF_AD_MAX;
-> > > > diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
-> > > > index ba6b6118cf50..0e836b5ac9a0 100644
-> > > > --- a/kernel/bpf/core.c
-> > > > +++ b/kernel/bpf/core.c
-> > > > @@ -68,27 +68,6 @@
-> > > >  struct bpf_mem_alloc bpf_global_ma;
-> > > >  bool bpf_global_ma_set;
-> > > >
-> > > > -/* No hurry in this branch
-> > > > - *
-> > > > - * Exported for the bpf jit load helper.
-> > > > - */
-> > > > -void *bpf_internal_load_pointer_neg_helper(const struct sk_buff *s=
-kb, int k, unsigned int size)
-> > > > -{
-> > > > - u8 *ptr =3D NULL;
-> > > > -
-> > > > - if (k >=3D SKF_NET_OFF) {
-> > > > -         ptr =3D skb_network_header(skb) + k - SKF_NET_OFF;
-> > > > - } else if (k >=3D SKF_LL_OFF) {
-> > > > -         if (unlikely(!skb_mac_header_was_set(skb)))
-> > > > -                 return NULL;
-> > > > -         ptr =3D skb_mac_header(skb) + k - SKF_LL_OFF;
-> > > > - }
-> > > > - if (ptr >=3D skb->head && ptr + size <=3D skb_tail_pointer(skb))
-> > > > -         return ptr;
-> > > > -
-> > > > - return NULL;
-> > > > -}
-> > > > -
-> > > >  /* tell bpf programs that include vmlinux.h kernel's PAGE_SIZE */
-> > > >  enum page_size_enum {
-> > > >   __PAGE_SIZE =3D PAGE_SIZE
-> > > > diff --git a/net/core/filter.c b/net/core/filter.c
-> > > > index bc6828761a47..b232b70dd10d 100644
-> > > > --- a/net/core/filter.c
-> > > > +++ b/net/core/filter.c
-> > > > @@ -221,21 +221,24 @@ BPF_CALL_3(bpf_skb_get_nlattr_nest, struct sk=
-_buff *, skb, u32, a, u32, x)
-> > > >  BPF_CALL_4(bpf_skb_load_helper_8, const struct sk_buff *, skb, con=
-st void *,
-> > > >      data, int, headlen, int, offset)
-> > > >  {
-> > > > - u8 tmp, *ptr;
-> > > > + u8 tmp;
-> > > >   const int len =3D sizeof(tmp);
-> > > >
-> > > > - if (offset >=3D 0) {
-> > > > -         if (headlen - offset >=3D len)
-> > > > -                 return *(u8 *)(data + offset);
-> > > > -         if (!skb_copy_bits(skb, offset, &tmp, sizeof(tmp)))
-> > > > -                 return tmp;
-> > > > - } else {
-> > > > -         ptr =3D bpf_internal_load_pointer_neg_helper(skb, offset,=
- len);
-> > > > -         if (likely(ptr))
-> > > > -                 return *(u8 *)ptr;
-> > >
-> > > [..]
-> > >
-> > > > + if (offset < 0) {
-> > > > +         if (offset >=3D SKF_NET_OFF)
-> > > > +                 offset +=3D skb_network_offset(skb) - SKF_NET_OFF=
-;
-> > > > +         else if (offset >=3D SKF_LL_OFF && skb_mac_header_was_set=
-(skb))
-> > > > +                 offset +=3D skb_mac_offset(skb) - SKF_LL_OFF;
-> > > > +         else
-> > > > +                 return -EFAULT;
-> > > >   }
-> > >
-> > > nit: we now repeat the same logic three times, maybe still worth it t=
-o put it
-> > > into a helper? bpf_resolve_classic_offset or something.
-> >
-> > I definitely tried this in various ways. But since the core logic is
-> > only four lines and there is an early return on error, no helper
-> > really simplifies anything. It just adds a layer of indirection and
-> > more code in the end.
->
-> More code, but at least it de-duplicates the logic of translating
-> SKF_XXX_OFF? Something like the following below, but yeah, a matter
-> of preference, up to you.
->
-> static int bpf_skb_resolve_offset(skb, offset) {
->         if (offset >=3D 0)
->                 return offset;
->
->         if (offset >=3D SKF_NET_OFF)
->                 offset +=3D skb_network_offset(skb) - SKF_NET_OFF;
->         else if (offset >=3D SKF_LL_OFF && skb_mac_header_was_set(skb))
->                 offset +=3D skb_mac_offset(skb) - SKF_LL_OFF;
->
->         return -1;
-> }
->
-> BPF_CALL_4(bpf_skb_load_helper_8, const struct sk_buff *, skb, const void=
- *,
->            data, int, headlen, int, offset)
-> {
->         offset =3D bpf_skb_resolve_offset(skb, offset);
->         if (offset < 0)
->                 return -EFAULT;
+This adds appropriate compatible strings for Lynx PCSs on PowerPC QorIQ
+platforms. This also changes the node name to avoid warnings from
+ethernet-phy.yaml.
 
-this is incorrect, as offset can be legally negative here.
+Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+---
 
->
->         ...
-> }
+ arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-0-best-effort.dtsi | 3 ++-
+ arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-0.dtsi             | 3 ++-
+ arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1-best-effort.dtsi | 3 ++-
+ arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1.dtsi             | 3 ++-
+ arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-2.dtsi             | 3 ++-
+ arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-3.dtsi             | 3 ++-
+ arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-0.dtsi              | 3 ++-
+ arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-1.dtsi              | 3 ++-
+ arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-2.dtsi              | 3 ++-
+ arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-3.dtsi              | 3 ++-
+ arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-4.dtsi              | 3 ++-
+ arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-5.dtsi              | 3 ++-
+ arch/powerpc/boot/dts/fsl/qoriq-fman3-1-10g-0.dtsi             | 3 ++-
+ arch/powerpc/boot/dts/fsl/qoriq-fman3-1-10g-1.dtsi             | 3 ++-
+ arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-0.dtsi              | 3 ++-
+ arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-1.dtsi              | 3 ++-
+ arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-2.dtsi              | 3 ++-
+ arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-3.dtsi              | 3 ++-
+ arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-4.dtsi              | 3 ++-
+ arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-5.dtsi              | 3 ++-
+ 20 files changed, 40 insertions(+), 20 deletions(-)
 
---
-Maciej =C5=BBenczykowski, Kernel Networking Developer @ Google
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-0-best-effort.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-0-best-effort.dtsi
+index 7e70977f282a..61d52044e7b4 100644
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-0-best-effort.dtsi
++++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-0-best-effort.dtsi
+@@ -66,7 +66,8 @@ mdio@e1000 {
+ 		reg = <0xe1000 0x1000>;
+ 		fsl,erratum-a011043; /* must ignore read errors */
+ 
+-		pcsphy0: ethernet-phy@0 {
++		pcsphy0: ethernet-pcs@0 {
++			compatible = "fsl,lynx-pcs";
+ 			reg = <0x0>;
+ 		};
+ 	};
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-0.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-0.dtsi
+index 5f89f7c1761f..78d6e49655f4 100644
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-0.dtsi
++++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-0.dtsi
+@@ -70,7 +70,8 @@ mdio@f1000 {
+ 		reg = <0xf1000 0x1000>;
+ 		fsl,erratum-a011043; /* must ignore read errors */
+ 
+-		pcsphy6: ethernet-phy@0 {
++		pcsphy6: ethernet-pcs@0 {
++			compatible = "fsl,lynx-pcs";
+ 			reg = <0x0>;
+ 		};
+ 	};
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1-best-effort.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1-best-effort.dtsi
+index 71eb75e82c2e..5ffd1c2efaee 100644
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1-best-effort.dtsi
++++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1-best-effort.dtsi
+@@ -73,7 +73,8 @@ mdio@e3000 {
+ 		reg = <0xe3000 0x1000>;
+ 		fsl,erratum-a011043; /* must ignore read errors */
+ 
+-		pcsphy1: ethernet-phy@0 {
++		pcsphy1: ethernet-pcs@0 {
++			compatible = "fsl,lynx-pcs";
+ 			reg = <0x0>;
+ 		};
+ 	};
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1.dtsi
+index fb7032ddb7fc..e0325f09ce5f 100644
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1.dtsi
++++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-1.dtsi
+@@ -70,7 +70,8 @@ mdio@f3000 {
+ 		reg = <0xf3000 0x1000>;
+ 		fsl,erratum-a011043; /* must ignore read errors */
+ 
+-		pcsphy7: ethernet-phy@0 {
++		pcsphy7: ethernet-pcs@0 {
++			compatible = "fsl,lynx-pcs";
+ 			reg = <0x0>;
+ 		};
+ 	};
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-2.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-2.dtsi
+index 6b3609574b0f..8e6f6c5f0f2e 100644
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-2.dtsi
++++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-2.dtsi
+@@ -38,7 +38,8 @@ mdio@e1000 {
+ 		reg = <0xe1000 0x1000>;
+ 		fsl,erratum-a011043; /* must ignore read errors */
+ 
+-		pcsphy0: ethernet-phy@0 {
++		pcsphy0: ethernet-pcs@0 {
++			compatible = "fsl,lynx-pcs";
+ 			reg = <0x0>;
+ 		};
+ 	};
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-3.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-3.dtsi
+index 28ed1a85a436..2cd3f0688cb1 100644
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-3.dtsi
++++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-10g-3.dtsi
+@@ -38,7 +38,8 @@ mdio@e3000 {
+ 		reg = <0xe3000 0x1000>;
+ 		fsl,erratum-a011043; /* must ignore read errors */
+ 
+-		pcsphy1: ethernet-phy@0 {
++		pcsphy1: ethernet-pcs@0 {
++			compatible = "fsl,lynx-pcs";
+ 			reg = <0x0>;
+ 		};
+ 	};
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-0.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-0.dtsi
+index 1089d6861bfb..9f8c38a629cb 100644
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-0.dtsi
++++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-0.dtsi
+@@ -62,7 +62,8 @@ mdio@e1000 {
+ 		reg = <0xe1000 0x1000>;
+ 		fsl,erratum-a011043; /* must ignore read errors */
+ 
+-		pcsphy0: ethernet-phy@0 {
++		pcsphy0: ethernet-pcs@0 {
++			compatible = "fsl,lynx-pcs";
+ 			reg = <0x0>;
+ 		};
+ 	};
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-1.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-1.dtsi
+index a95bbb4fc827..248a57129d40 100644
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-1.dtsi
++++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-1.dtsi
+@@ -69,7 +69,8 @@ mdio@e3000 {
+ 		reg = <0xe3000 0x1000>;
+ 		fsl,erratum-a011043; /* must ignore read errors */
+ 
+-		pcsphy1: ethernet-phy@0 {
++		pcsphy1: ethernet-pcs@0 {
++			compatible = "fsl,lynx-pcs";
+ 			reg = <0x0>;
+ 		};
+ 	};
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-2.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-2.dtsi
+index 7d5af0147a25..73cef28db890 100644
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-2.dtsi
++++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-2.dtsi
+@@ -69,7 +69,8 @@ mdio@e5000 {
+ 		reg = <0xe5000 0x1000>;
+ 		fsl,erratum-a011043; /* must ignore read errors */
+ 
+-		pcsphy2: ethernet-phy@0 {
++		pcsphy2: ethernet-pcs@0 {
++			compatible = "fsl,lynx-pcs";
+ 			reg = <0x0>;
+ 		};
+ 	};
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-3.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-3.dtsi
+index 61e5466ec854..4657b6a8fb78 100644
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-3.dtsi
++++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-3.dtsi
+@@ -69,7 +69,8 @@ mdio@e7000 {
+ 		reg = <0xe7000 0x1000>;
+ 		fsl,erratum-a011043; /* must ignore read errors */
+ 
+-		pcsphy3: ethernet-phy@0 {
++		pcsphy3: ethernet-pcs@0 {
++			compatible = "fsl,lynx-pcs";
+ 			reg = <0x0>;
+ 		};
+ 	};
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-4.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-4.dtsi
+index 3ba0cdafc069..ac322e5803c2 100644
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-4.dtsi
++++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-4.dtsi
+@@ -62,7 +62,8 @@ mdio@e9000 {
+ 		reg = <0xe9000 0x1000>;
+ 		fsl,erratum-a011043; /* must ignore read errors */
+ 
+-		pcsphy4: ethernet-phy@0 {
++		pcsphy4: ethernet-pcs@0 {
++			compatible = "fsl,lynx-pcs";
+ 			reg = <0x0>;
+ 		};
+ 	};
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-5.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-5.dtsi
+index 51748de0a289..68ffa2c65e03 100644
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-5.dtsi
++++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-0-1g-5.dtsi
+@@ -69,7 +69,8 @@ mdio@eb000 {
+ 		reg = <0xeb000 0x1000>;
+ 		fsl,erratum-a011043; /* must ignore read errors */
+ 
+-		pcsphy5: ethernet-phy@0 {
++		pcsphy5: ethernet-pcs@0 {
++			compatible = "fsl,lynx-pcs";
+ 			reg = <0x0>;
+ 		};
+ 	};
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-10g-0.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-10g-0.dtsi
+index ee4f5170f632..caf28fcbd55c 100644
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-10g-0.dtsi
++++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-10g-0.dtsi
+@@ -70,7 +70,8 @@ mdio@f1000 {
+ 		reg = <0xf1000 0x1000>;
+ 		fsl,erratum-a011043; /* must ignore read errors */
+ 
+-		pcsphy14: ethernet-phy@0 {
++		pcsphy14: ethernet-pcs@0 {
++			compatible = "fsl,lynx-pcs";
+ 			reg = <0x0>;
+ 		};
+ 	};
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-10g-1.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-10g-1.dtsi
+index 83d2e0ce8f7b..6128b9fb5381 100644
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-10g-1.dtsi
++++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-10g-1.dtsi
+@@ -70,7 +70,8 @@ mdio@f3000 {
+ 		reg = <0xf3000 0x1000>;
+ 		fsl,erratum-a011043; /* must ignore read errors */
+ 
+-		pcsphy15: ethernet-phy@0 {
++		pcsphy15: ethernet-pcs@0 {
++			compatible = "fsl,lynx-pcs";
+ 			reg = <0x0>;
+ 		};
+ 	};
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-0.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-0.dtsi
+index 3132fc73f133..a7dffe6bbe5b 100644
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-0.dtsi
++++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-0.dtsi
+@@ -62,7 +62,8 @@ mdio@e1000 {
+ 		reg = <0xe1000 0x1000>;
+ 		fsl,erratum-a011043; /* must ignore read errors */
+ 
+-		pcsphy8: ethernet-phy@0 {
++		pcsphy8: ethernet-pcs@0 {
++			compatible = "fsl,lynx-pcs";
+ 			reg = <0x0>;
+ 		};
+ 	};
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-1.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-1.dtsi
+index 75e904d96602..d0ad92f2ca2d 100644
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-1.dtsi
++++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-1.dtsi
+@@ -69,7 +69,8 @@ mdio@e3000 {
+ 		reg = <0xe3000 0x1000>;
+ 		fsl,erratum-a011043; /* must ignore read errors */
+ 
+-		pcsphy9: ethernet-phy@0 {
++		pcsphy9: ethernet-pcs@0 {
++			compatible = "fsl,lynx-pcs";
+ 			reg = <0x0>;
+ 		};
+ 	};
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-2.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-2.dtsi
+index 69f2cc7b8f19..b4b893eead2a 100644
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-2.dtsi
++++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-2.dtsi
+@@ -69,7 +69,8 @@ mdio@e5000 {
+ 		reg = <0xe5000 0x1000>;
+ 		fsl,erratum-a011043; /* must ignore read errors */
+ 
+-		pcsphy10: ethernet-phy@0 {
++		pcsphy10: ethernet-pcs@0 {
++			compatible = "fsl,lynx-pcs";
+ 			reg = <0x0>;
+ 		};
+ 	};
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-3.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-3.dtsi
+index b3aaf01d7da0..6c15a6ff0926 100644
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-3.dtsi
++++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-3.dtsi
+@@ -69,7 +69,8 @@ mdio@e7000 {
+ 		reg = <0xe7000 0x1000>;
+ 		fsl,erratum-a011043; /* must ignore read errors */
+ 
+-		pcsphy11: ethernet-phy@0 {
++		pcsphy11: ethernet-pcs@0 {
++			compatible = "fsl,lynx-pcs";
+ 			reg = <0x0>;
+ 		};
+ 	};
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-4.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-4.dtsi
+index 18e020432807..14fa4d067ffd 100644
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-4.dtsi
++++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-4.dtsi
+@@ -62,7 +62,8 @@ mdio@e9000 {
+ 		reg = <0xe9000 0x1000>;
+ 		fsl,erratum-a011043; /* must ignore read errors */
+ 
+-		pcsphy12: ethernet-phy@0 {
++		pcsphy12: ethernet-pcs@0 {
++			compatible = "fsl,lynx-pcs";
+ 			reg = <0x0>;
+ 		};
+ 	};
+diff --git a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-5.dtsi b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-5.dtsi
+index 55f329d13f19..64737187a577 100644
+--- a/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-5.dtsi
++++ b/arch/powerpc/boot/dts/fsl/qoriq-fman3-1-1g-5.dtsi
+@@ -69,7 +69,8 @@ mdio@eb000 {
+ 		reg = <0xeb000 0x1000>;
+ 		fsl,erratum-a011043; /* must ignore read errors */
+ 
+-		pcsphy13: ethernet-phy@0 {
++		pcsphy13: ethernet-pcs@0 {
++			compatible = "fsl,lynx-pcs";
+ 			reg = <0x0>;
+ 		};
+ 	};
+-- 
+2.35.1.1320.gc452695387.dirty
+
 
