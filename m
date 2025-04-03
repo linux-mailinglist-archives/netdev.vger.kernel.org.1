@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-178989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79A27A79DE4
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 10:20:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61B54A79DE9
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 10:21:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECE561894854
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 08:21:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A7713B3B3A
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 08:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D682417E0;
-	Thu,  3 Apr 2025 08:20:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4636924293D;
+	Thu,  3 Apr 2025 08:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="oGx6box0"
+	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="geHrIMk1"
 X-Original-To: netdev@vger.kernel.org
-Received: from ksmg01.maxima.ru (ksmg01.maxima.ru [81.200.124.38])
+Received: from ksmg01.maxima.ru (ksmg01.mt-integration.ru [81.200.124.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87AB82417DD;
-	Thu,  3 Apr 2025 08:20:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2EC81EF092;
+	Thu,  3 Apr 2025 08:20:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.200.124.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743668448; cv=none; b=Jet538WVuGl9RgC3QiPbMmwMt0sOc/uB3mQH5xcEQwEwr17OxknpJtBq53dF4uxHpGV9wg05sxTHgMt1rd9QLknYc5x+oaq9wMOgSF9e6E8R6UerT6R2vdjNeBXiLt4bg87773lvtqyxSO0yEjq3/C06EMeL9o6Qe7LoVkq7YQE=
+	t=1743668450; cv=none; b=NshUltrjcK7w/W4oQEnmcRB6GfYdJwwZevyKqrxrWWfMb+TlCv54pT4Cyv3jGxwVcV5CwG0VB04AweLTxKVziEifP/lF5gviE7q8MsMGINVWHhOVASVCLUAffidNs4+DCH898ip4knsVhJR9AGbH3N+oEaaK7QrLp33lx131xZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743668448; c=relaxed/simple;
-	bh=WJ51JsD3b6s+V/hEkDAk9Rl8dDqfB+TKiwWItWIoBW8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PHw0JaCPIHLRNOqjr5OEMaprO16EYazQqIKqSzt8IreBkQzXHV/fedyFHgUGAddVGi6NGCeHxE3YBXbPNhvYjVDWem6hCTvj63h7G6M8K/KYbTEzxEs2QeHWBrNBcjMzg3l0skiNZ4RsLUK3YX348RqnaUe4vNTnU4/Rkru3iHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=oGx6box0; arc=none smtp.client-ip=81.200.124.38
+	s=arc-20240116; t=1743668450; c=relaxed/simple;
+	bh=oOy9SaCetbLIxPQj/SNMUa2FKbe0MxO6KmEYLKcGSDE=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SijKz92KhGt9BpLVx97Eb6EaEFC7Ge9Q75JprWDbWU0UYrl8maGmffg7FjBApXGwXynPdBwEQIbTRP+TAM/9tr85oLBDiq65P1iebYe9FqfSs+/5UoQwe7yD3N1eZ4xEcSZlKh3EkEpuOEQi5wsWnXGjqR8MMZ4Xf70edZIocUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=geHrIMk1; arc=none smtp.client-ip=81.200.124.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mt-integration.ru
 Received: from ksmg01.maxima.ru (localhost [127.0.0.1])
-	by ksmg01.maxima.ru (Postfix) with ESMTP id 9712DC0004;
-	Thu,  3 Apr 2025 11:20:35 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg01.maxima.ru 9712DC0004
+	by ksmg01.maxima.ru (Postfix) with ESMTP id CCCB8C0019;
+	Thu,  3 Apr 2025 11:20:39 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg01.maxima.ru CCCB8C0019
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mt-integration.ru;
-	s=sl; t=1743668435; bh=TeptcISo66cYrwTbg5r7b9qgrP/6fr4eK+YncGTZQew=;
+	s=sl; t=1743668439; bh=YTS2HHkGl6vv90e1u0OfipkGJc4P/NO4h3v6E9uRqq4=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=oGx6box0EsxyTa2CTS0I5fMPopASgvfJ2zBAM24edXWvrP/c9RlSS+QCOzFSrG+hG
-	 eyoeiDZk5kNW5t+iqDN4hh966YbqsAooXGqUSvin+DWoZfQHH8fqyXZbwS+8iZqAfg
-	 nBAOrKtS3qjg72+h29wfu3mR/6Dxc3pPPi0RM9SLjrTyd60WLwjLiOI9jB4vsHvDTr
-	 NuXlf/jviSqGLZLJA1RrmQFI4tHcKqvzmr044VB8/8/kcSFWPqPSbDAsrvgSPXQetN
-	 MPqz7VWAJ8chJyr7uCWjhCwJZq30ctnmWLUpuh1EViwkCN9CKLLBE2oljkD9dMKfI7
-	 EOaxdd+ST/02Q==
+	b=geHrIMk1MGDCl+aVe19qoNl946keFH3Np8EziP6hHBi2NgIICG6cAUi/XpTRUCQ5U
+	 G9frMkHkTw5Y7dDyeMeGfzeqMk2edT2K/2x2UGyyzgQ4M5xkt29Mwmlp2TL+nAb30q
+	 1nHltz/X5y/oZXp/bMeSwvNKN0ACrksGmGQhjr7k0kYF6ymRIWrBdYs9fJu4abrLpp
+	 28FduAw2yvOTnkcYON4HDy2PYxCzfBuW35+5XYwE6dbmLysiKbMGh+dLH6ZlyX0aJS
+	 CkzPOMahqac3Yi1EISt0ZvTLlFrysqVuBBqsEOtkGcLzCP2+Rg8VNg53A0t4F02fyB
+	 ZeH8BSGbFWG8Q==
 Received: from ksmg01.maxima.ru (autodiscover.maxima.ru [81.200.124.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(Client CN "*.maxima.ru", Issuer "GlobalSign GCC R3 DV TLS CA 2020" (verified OK))
 	by ksmg01.maxima.ru (Postfix) with ESMTPS;
-	Thu,  3 Apr 2025 11:20:35 +0300 (MSK)
+	Thu,  3 Apr 2025 11:20:39 +0300 (MSK)
 Received: from db126-1-abramov-14-d-mosos.mti-lab.com (172.25.20.118) by
  mmail-p-exch01.mt.ru (81.200.124.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 3 Apr 2025 11:20:34 +0300
+ 15.2.1544.4; Thu, 3 Apr 2025 11:20:39 +0300
 From: Ivan Abramov <i.abramov@mt-integration.ru>
 To: Alexander Aring <alex.aring@gmail.com>
 CC: Ivan Abramov <i.abramov@mt-integration.ru>, Stefan Schmidt
@@ -61,10 +62,12 @@ CC: Ivan Abramov <i.abramov@mt-integration.ru>, Stefan Schmidt
  Horman <horms@kernel.org>, <linux-wpan@vger.kernel.org>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<lvc-project@linuxtesting.org>
-Subject: [PATCH net v2 0/3] Avoid calling WARN_ON() on allocation failure in cfg802154_switch_netns()
-Date: Thu, 3 Apr 2025 11:20:18 +0300
-Message-ID: <20250403082021.990667-1-i.abramov@mt-integration.ru>
+Subject: [PATCH net v2 1/3] ieee802154: Restore initial state on failed device_rename() in cfg802154_switch_netns()
+Date: Thu, 3 Apr 2025 11:20:19 +0300
+Message-ID: <20250403082021.990667-2-i.abramov@mt-integration.ru>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250403082021.990667-1-i.abramov@mt-integration.ru>
+References: <20250403082021.990667-1-i.abramov@mt-integration.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,53 +94,82 @@ X-KSMG-LinksScanning: NotDetected
 X-KSMG-Message-Action: skipped
 X-KSMG-Rule-ID: 7
 
-This series was inspired by Syzkaller report on warning in
-cfg802154_switch_netns().
+Currently, the return value of device_rename() is not acted upon.
 
-WARNING: CPU: 0 PID: 5837 at net/ieee802154/core.c:258 cfg802154_switch_netns+0x3c7/0x3d0 net/ieee802154/core.c:258
-Modules linked in:
-CPU: 0 UID: 0 PID: 5837 Comm: syz-executor125 Not tainted 6.13.0-rc6-syzkaller-00918-g7b24f164cf00 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-RIP: 0010:cfg802154_switch_netns+0x3c7/0x3d0 net/ieee802154/core.c:258
-Call Trace:
- <TASK>
- nl802154_wpan_phy_netns+0x13d/0x210 net/ieee802154/nl802154.c:1292
- genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2543
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
- netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1348
- netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1892
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:726
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2594
- ___sys_sendmsg net/socket.c:2648 [inline]
- __sys_sendmsg+0x269/0x350 net/socket.c:2680
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+To avoid an inconsistent state in case of failure, roll back the changes
+made before the device_rename() call.
 
-This warning is caused by Syzkaller's fault injection, which causes
-kstrdup() in device_rename() to fail, so device_rename() returns -ENOMEM.
+Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
 
-Since practically such failure is not possible, avoid it, additionally
-fixing similar pointless allocation-related warnings.
+Fixes: 66e5c2672cd1 ("ieee802154: add netns support")
+Signed-off-by: Ivan Abramov <i.abramov@mt-integration.ru>
+---
+v2: Make sure to commit against latest netdev/net.
 
-v2: Add tags to patch 2. Also make sure to commit against latest
-netdev/net.
+ net/ieee802154/core.c | 45 ++++++++++++++++++++++++-------------------
+ 1 file changed, 25 insertions(+), 20 deletions(-)
 
-Ivan Abramov (3):
-  ieee802154: Restore initial state on failed device_rename() in
-    cfg802154_switch_netns()
-  ieee802154: Avoid calling WARN_ON() on -ENOMEM in
-    cfg802154_switch_netns()
-  ieee802154: Remove WARN_ON() in cfg802154_pernet_exit()
-
- net/ieee802154/core.c | 51 ++++++++++++++++++++++++-------------------
- 1 file changed, 29 insertions(+), 22 deletions(-)
-
+diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
+index 89b671b12600..84d514430e45 100644
+--- a/net/ieee802154/core.c
++++ b/net/ieee802154/core.c
+@@ -233,31 +233,36 @@ int cfg802154_switch_netns(struct cfg802154_registered_device *rdev,
+ 		wpan_dev->netdev->netns_immutable = true;
+ 	}
+ 
+-	if (err) {
+-		/* failed -- clean up to old netns */
+-		net = wpan_phy_net(&rdev->wpan_phy);
+-
+-		list_for_each_entry_continue_reverse(wpan_dev,
+-						     &rdev->wpan_dev_list,
+-						     list) {
+-			if (!wpan_dev->netdev)
+-				continue;
+-			wpan_dev->netdev->netns_immutable = false;
+-			err = dev_change_net_namespace(wpan_dev->netdev, net,
+-						       "wpan%d");
+-			WARN_ON(err);
+-			wpan_dev->netdev->netns_immutable = true;
+-		}
+-
+-		return err;
+-	}
+-
+-	wpan_phy_net_set(&rdev->wpan_phy, net);
++	if (err)
++		goto errout;
+ 
+ 	err = device_rename(&rdev->wpan_phy.dev, dev_name(&rdev->wpan_phy.dev));
+ 	WARN_ON(err);
+ 
++	if (err)
++		goto errout;
++
++	wpan_phy_net_set(&rdev->wpan_phy, net);
++
+ 	return 0;
++
++errout:
++	/* failed -- clean up to old netns */
++	net = wpan_phy_net(&rdev->wpan_phy);
++
++	list_for_each_entry_continue_reverse(wpan_dev,
++					     &rdev->wpan_dev_list,
++					     list) {
++		if (!wpan_dev->netdev)
++			continue;
++		wpan_dev->netdev->netns_immutable = false;
++		err = dev_change_net_namespace(wpan_dev->netdev, net,
++					       "wpan%d");
++		WARN_ON(err);
++		wpan_dev->netdev->netns_immutable = true;
++	}
++
++	return err;
+ }
+ 
+ void cfg802154_dev_free(struct cfg802154_registered_device *rdev)
 -- 
 2.39.5
 
