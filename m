@@ -1,190 +1,280 @@
-Return-Path: <netdev+bounces-179065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86B0CA7A517
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 16:27:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BA16A7A526
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 16:32:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1CFD168677
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 14:25:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D08A188E30F
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 14:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B2524EAB4;
-	Thu,  3 Apr 2025 14:25:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 960A924EAB1;
+	Thu,  3 Apr 2025 14:27:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CGts9A16"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e37LRQeV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B98C24EA90;
-	Thu,  3 Apr 2025 14:25:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C394124BCF9;
+	Thu,  3 Apr 2025 14:26:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743690315; cv=none; b=qdJdBn1OamqUP0NslYJRI2JRiwMd6JC3J3xvDxlgaWhMkff5niqenXDd8KCL33jzfKhs+PaYCovBKWBxbtrNkdLXB0CkFw2eRyFdJ3wEK/HIcBLTrU0ZqxJWtoqu57276HbOZKh6bJJch1JLBWKM5cJUc03FIJNW5WM3Ftg+mKw=
+	t=1743690420; cv=none; b=ZJFQsWyK/PFwcDBqNBmc6dRyESLc3PyIeVITyPmF3d44uupx+p9nicC11XspNLMQ2ZW/vCdb5IYad6yrraKKk0GQyKvV6WVoNv03yaz5gtZBlzPDCE8XDRNFENcKW/nhTVE04TZY4vKBBKYMXRxALn9AjtbXWHRFpqP8UP0ocz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743690315; c=relaxed/simple;
-	bh=tKG4mgxr/waIXYy3UE25TN/Cf98+hnU2uITZp+axu1Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=towyJEHmxYeaA5ZWm1XAILh2Zeysr1I+MclcqkHZ5urKbQnGl2HOpN6lD+pjV8b6KHLaN0xSF+NquMayoocY2Kgg5QooDPe9uuIvYuxsL8SQwhsT+W4iT48FQfVWv2SDqmF7yGWOwrbxqLiC2tgwi8WrLBhyJ1+I3moOd8xuZcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CGts9A16; arc=none smtp.client-ip=209.85.128.45
+	s=arc-20240116; t=1743690420; c=relaxed/simple;
+	bh=3H/q3VCbKUvTmxT5KHpB3sPOrrtaG+j/5ZoBSAeRGAk=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Tqcq4Oh7zYxZ0sxf3kE0qQSwUZxsKCq2k4ko78kY0Pe56NvEU/GKQg/NRAX/Le+XLeRc5GCqx5VnZIE+qRL7SI0cmyKEcXyqmp+Arcd9erJ6UmDsgIL+6xJLGTG6GGo+W06Od2khjFqertxN140Z8cL4Asq3xizjv2N2Z607cJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e37LRQeV; arc=none smtp.client-ip=209.85.219.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-43d0782d787so6340625e9.0;
-        Thu, 03 Apr 2025 07:25:13 -0700 (PDT)
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6e8f94c2698so5775796d6.0;
+        Thu, 03 Apr 2025 07:26:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743690312; x=1744295112; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1743690417; x=1744295217; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bYt3/DwYVuXN5SPjLpQjF/KbDAzdmiI9+JL6XuVsme4=;
-        b=CGts9A16taOdsG7gm1S5QeyBfdl/JTbajDjeV8bO4RBcxL9lWd1FEL9SE8zC2dSplG
-         EMzy7B93b4v34nYprCYwTv0n/vCgnQ0pp4QIXZznGZtDSTNMmyDcCkyy6f+a9vYO/9aY
-         Q2KNJndfS8ObjqOfD2+9g90qRq2+GmFy/0DB8bumF3W0h358z6XxK+2B42iLhrj83kVB
-         8mBiv9uRvVjwCkJeU3vJhwlFQ5IClk20GUqgsGZBbXBSPAtuJ7KITASYLEP9l3/ibYDL
-         gSuGCWtuKgQbnBiqQU4FatFj1gkbN0u94z2sstImS5rbp5zggs/dKNhT0p2MX8eqvkzA
-         EHbA==
+        bh=1CZAmNn5KUIQDDBuM8wsmsl+fKPlZ/xNdDm5B7P8SPg=;
+        b=e37LRQeVR4EO1+wvB7v342uUP+UYlXPtsHMWHQvx6b7yrq8YM5gY/ZQ2i+peJtcg4Z
+         yc1097wsAH4Sv9E6z/zOPF7ksUK7egKhu0NcsFwVz2OmNUabPwadH/aQuoWFcSUkpDFF
+         DJSR+6Qawk6qol5g170yJTaV4N/6CMs8U5Y0gAD49gYvzu3Cn/OGqBZL0JR1gEbnhVLm
+         3kZln9/GHYj9w8mjb9L9tHg7KDA3fDhVO9fd7nnjkBSzAdFgyTpxnQ8tDuZ/4snp+1z8
+         7/VvweiNpLLmrevFe4rtk8TFMMX+kXqAmZfg/0TcPVMvpmKsS61lp5U+WOpGbi7NCsSZ
+         R3wA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743690312; x=1744295112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bYt3/DwYVuXN5SPjLpQjF/KbDAzdmiI9+JL6XuVsme4=;
-        b=AXivcSxbACqfwfi6eOpMcvI5Bjh1VTHxD4xLIFF+O8COg6qGlijztF+Sr2wvFZ6oPY
-         TTmWFvt1pNkC91/kczTh+RFsTER586AKsx5hwgLDrCqsuOkihmjxhkYWC6QmN4r+EONC
-         OJTt8cPShcOjUI5Ky0nIMXStSVPVfcQHk8xGObCgdYrx5bKOdRAmpMk8jGO7fOVAVh8N
-         P+Hvjd2dsAvH/XOrdZqDKV2bPiHAvZF9zOU46kNbHe49l1oUuLjP29HlkKEhxyy5Leva
-         LbY6yPN0+prbiSI6YamtgzOI+eT54kDPTTOZ4XSqD9oafn90J8bTFYi1t0v2izenhq+t
-         dfYw==
-X-Forwarded-Encrypted: i=1; AJvYcCUmdh2IpD2pDTL/dG6Mdyf1OzG0L8+h4Q6yBt7r9w6N67KE8ChCbiayzISXml7yTqVIIW0tC8pCuHui/iAk1S2+@vger.kernel.org, AJvYcCUmgOA1ehczkB9hZEsmCs6gf16JN5WoyC8EyA+UF7I+KSyBRBLVg5ciAh7lqXS5p1Xdq/becMsM@vger.kernel.org, AJvYcCV0Z4EfcaBJPm02t1xKcx9KrPRvW8JEpqhiEF/qkgEgHRuRKKcowMzjnzk6msF72uzELl8i89L9HhTfP3I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3kCEEmg1/0C1jFHk+l5AOCZ5sy19+P9SvfkJJpyM82c+yntBy
-	WelkTAdq5VkXaRAHRfgtH8NmH96EeHLxXzp5Gpf0OgnWMagx7J6VFxk4OE/gW47JnuwonIDD9I8
-	NzY64c6JDoDKT/1kTKpc+Ova2Vrk=
-X-Gm-Gg: ASbGncv9UXOoIfpzk4sOquGBiPH7f3yl4UMmA37/3Dt2KiuksUtsshosNrhuOcVCamq
-	loYYlSp06RJH05scdGjqe/FPsZ+Qy6M2BLohru0sGWu/wv3zrgr9OLhGloNHjiSn6vns4Hisoz3
-	B3SPLXgZ2t8boDX/WLLnF6U5rucygk3+7jkuIQoCJRgw==
-X-Google-Smtp-Source: AGHT+IHUkOyw3ev23XqXHBt0KxfVIhLR/1X4BbNWvcbsg0kdXKegScCaWHDKnAMpZBX6hw7sIGdWPn1U4w8qAoQQkB0=
-X-Received: by 2002:a05:6000:1862:b0:390:f6aa:4e7c with SMTP id
- ffacd0b85a97d-39c120e0bc1mr17240592f8f.28.1743690312134; Thu, 03 Apr 2025
- 07:25:12 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743690417; x=1744295217;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=1CZAmNn5KUIQDDBuM8wsmsl+fKPlZ/xNdDm5B7P8SPg=;
+        b=l9ImyEVuTkIwOKoNA34OfctvalO1QqSDpgjwEpf9iZAqY5AiglxK80tIoNXzT2MCdB
+         oENF8I+ygywtAfYnTh3zjcmu2ZSuAU3i5f1QMYvfrfI5igNwXqMunepHpYvDTmzvcl1i
+         SeiCBXCx+cYcmQcX3MdWO4LJDQEZSf75q+HwCdsYuSsYX0t+dFhnmywwX16r6I7ui8h1
+         1LCsQx7RZA4a7ymLLwfEoXJx3lRff4Hc2etsdebLa9iwvUe8Lz1rasnDcOn/sNYFUIPL
+         Ih/e8RRz0SmCCcBL6ux6aRPR8JXN+jipAnH+513AVHZKE3O10ND4NxuN0ZEVG/zOZ0oa
+         1dBA==
+X-Forwarded-Encrypted: i=1; AJvYcCUpfkswZNtAWSXjGn71bjVF9wm8bKibJz3ULO6RdSMYEilz0cNohn0I1EuFELZ7NaP8ySXci/e+@vger.kernel.org, AJvYcCX484qhorCThZo4DLiD4tecoMX0hv7TdNe4TlHzDXDrd7oSIbT8XDx6XBfkvB7V5RscD2bNNBGzqjB9ELM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQLYbP/K+ciubeNG2J8h6wgkbNOzqd88caCiaWLY31WaW5TPhJ
+	DAdG8NvsZae03NL67vlxqX5tWvRtYQ2RMlMZAxQAU76LCzfZnPUpscGYHA==
+X-Gm-Gg: ASbGncvtfkTCbC8FK2XsSIYBOXoEExqCWrwIxHOtqmOg++LVAcMHHYj6oyaBCVYT9au
+	pLk4YNTOgsmLX50q/qtjpSWPxItlf/I3LTyjb8vkC97k04BFwduX6dl5U6jTTJqXGK+uB9c7WSF
+	dKlgOP/xx595/W258mrsistMSB8xC89ieZwPH677uniHvTZVvN5CtOs8gLlRxy324qvHdJDyF/z
+	j3uONYt4f5xH+zTV5GmBO5iEpnp6FqgqgcYhcsnELj6O1dgCkivzRC3W1sOsf+Y30FsRIkUPfz0
+	/LFGN98u7FH7fwxDfZ6lE0Ami5xB40X2tC59Px1vSP37rEGGH4OY/8vaH8sZJyC7J4PbaDfjRjH
+	92+UJuY/RlCEun95XQphLRA==
+X-Google-Smtp-Source: AGHT+IFlRHBw2ikpgIutCACR/qwVGVZnnXg5ZN0d8jVb1lzRGOGU/wMd718oZ4+RUAzNMauzG0xZww==
+X-Received: by 2002:a05:6214:20c3:b0:6e8:955b:141e with SMTP id 6a1803df08f44-6eed6023f5bmr348001696d6.21.1743690417447;
+        Thu, 03 Apr 2025 07:26:57 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ef0f00f2e0sm8170696d6.36.2025.04.03.07.26.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Apr 2025 07:26:57 -0700 (PDT)
+Date: Thu, 03 Apr 2025 10:26:56 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, 
+ Markus Fohrer <markus.fohrer@webked.de>
+Cc: virtualization@lists.linux-foundation.org, 
+ jasowang@redhat.com, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Message-ID: <67ee9ab0a1665_136b7c29412@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250403100206-mutt-send-email-mst@kernel.org>
+References: <1d388413ab9cfd765cd2c5e05b5e69cdb2ec5a10.camel@webked.de>
+ <20250403090001-mutt-send-email-mst@kernel.org>
+ <f8909f5bbc2532ea234cdaa8dbdb46a48249803f.camel@webked.de>
+ <20250403100206-mutt-send-email-mst@kernel.org>
+Subject: Re: [REGRESSION] Massive virtio-net throughput drop in guest VM with
+ Linux 6.8+
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250331032354.75808-1-jiayuan.chen@linux.dev> <20250331032354.75808-2-jiayuan.chen@linux.dev>
-In-Reply-To: <20250331032354.75808-2-jiayuan.chen@linux.dev>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 3 Apr 2025 07:24:58 -0700
-X-Gm-Features: ATxdqUHpnDryxsVQqbU7wXWf5I9AbRjQwuexib-K1AFMMQc4NlaNR5RWjUUlZVo
-Message-ID: <CAADnVQJ6NPGuY=c8kbpX_nLYq4oOxOBAxbDPFLuw+yr4WrQQOQ@mail.gmail.com>
-Subject: Re: [PATCH bpf v2 1/2] bpf, xdp: clean head/meta when expanding it
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: bpf <bpf@vger.kernel.org>, Jiayuan Chen <mrpre@163.com>, 
-	syzbot+0e6ddb1ef80986bdfe64@syzkaller.appspotmail.com, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
-	Shuah Khan <shuah@kernel.org>, Willem de Bruijn <willemb@google.com>, 
-	Jason Xing <kerneljasonxing@gmail.com>, Anton Protopopov <aspsk@isovalent.com>, 
-	Abhishek Chauhan <quic_abchauha@quicinc.com>, Jordan Rome <linux@jordanrome.com>, 
-	Martin Kelly <martin.kelly@crowdstrike.com>, David Lechner <dlechner@baylibre.com>, 
-	LKML <linux-kernel@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Mar 30, 2025 at 8:27=E2=80=AFPM Jiayuan Chen <jiayuan.chen@linux.de=
-v> wrote:
->
-> The device allocates an skb, it additionally allocates a prepad size
-> (usually equal to NET_SKB_PAD or XDP_PACKET_HEADROOM) but leaves it
-> uninitialized.
->
-> The bpf_xdp_adjust_head function moves skb->data forward, which allows
-> users to access data belonging to other programs, posing a security risk.
->
-> Reported-by: syzbot+0e6ddb1ef80986bdfe64@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/all/00000000000067f65105edbd295d@google.c=
-om/T/
-> Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
-> ---
->  include/uapi/linux/bpf.h       | 8 +++++---
->  net/core/filter.c              | 5 ++++-
->  tools/include/uapi/linux/bpf.h | 6 ++++--
->  3 files changed, 13 insertions(+), 6 deletions(-)
->
-> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> index defa5bb881f4..be01a848cbbf 100644
-> --- a/include/uapi/linux/bpf.h
-> +++ b/include/uapi/linux/bpf.h
-> @@ -2760,8 +2760,9 @@ union bpf_attr {
->   *
->   * long bpf_xdp_adjust_head(struct xdp_buff *xdp_md, int delta)
->   *     Description
-> - *             Adjust (move) *xdp_md*\ **->data** by *delta* bytes. Note=
- that
-> - *             it is possible to use a negative value for *delta*. This =
-helper
-> + *             Adjust (move) *xdp_md*\ **->data** by *delta* bytes. Note=
- that
-> + *             it is possible to use a negative value for *delta*. If *d=
-elta*
-> + *             is negative, the new header will be memset to zero. This =
-helper
->   *             can be used to prepare the packet for pushing or popping
->   *             headers.
->   *
-> @@ -2989,7 +2990,8 @@ union bpf_attr {
->   * long bpf_xdp_adjust_meta(struct xdp_buff *xdp_md, int delta)
->   *     Description
->   *             Adjust the address pointed by *xdp_md*\ **->data_meta** b=
-y
-> - *             *delta* (which can be positive or negative). Note that th=
-is
-> + *             *delta* (which can be positive or negative). If *delta* i=
-s
-> + *             negative, the new meta will be memset to zero. Note that =
-this
->   *             operation modifies the address stored in *xdp_md*\ **->da=
-ta**,
->   *             so the latter must be loaded only after the helper has be=
-en
->   *             called.
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 46ae8eb7a03c..5f01d373b719 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -3947,6 +3947,8 @@ BPF_CALL_2(bpf_xdp_adjust_head, struct xdp_buff *, =
-xdp, int, offset)
->         if (metalen)
->                 memmove(xdp->data_meta + offset,
->                         xdp->data_meta, metalen);
-> +       if (offset < 0)
-> +               memset(data, 0, -offset);
->         xdp->data_meta +=3D offset;
->         xdp->data =3D data;
->
-> @@ -4239,7 +4241,8 @@ BPF_CALL_2(bpf_xdp_adjust_meta, struct xdp_buff *, =
-xdp, int, offset)
->                 return -EINVAL;
->         if (unlikely(xdp_metalen_invalid(metalen)))
->                 return -EACCES;
-> -
-> +       if (offset < 0)
-> +               memset(meta, 0, -offset);
+Michael S. Tsirkin wrote:
+> On Thu, Apr 03, 2025 at 03:51:01PM +0200, Markus Fohrer wrote:
+> > Am Donnerstag, dem 03.04.2025 um 09:04 -0400 schrieb Michael S.
+> > Tsirkin:
+> > > On Wed, Apr 02, 2025 at 11:12:07PM +0200, Markus Fohrer wrote:
+> > > > Hi,
+> > > > =
 
-Let's make everyone pay a performance penalty to silence
-KMSAN warning?
+> > > > I'm observing a significant performance regression in KVM guest V=
+Ms
+> > > > using virtio-net with recent Linux kernels (6.8.1+ and 6.14).
+> > > > =
 
-I don't think it's a good trade off.
+> > > > When running on a host system equipped with a Broadcom NetXtreme-=
+E
+> > > > (bnxt_en) NIC and AMD EPYC CPUs, the network throughput in the
+> > > > guest drops to 100=E2=80=93200 KB/s. The same guest configuration=
+ performs
+> > > > normally (~100 MB/s) when using kernel 6.8.0 or when the VM is
+> > > > moved to a host with Intel NICs.
+> > > > =
 
-Soft nack.
+> > > > Test environment:
+> > > > - Host: QEMU/KVM, Linux 6.8.1 and 6.14.0
+> > > > - Guest: Linux with virtio-net interface
+> > > > - NIC: Broadcom BCM57416 (bnxt_en driver, no issues at host level=
+)
+> > > > - CPU: AMD EPYC
+> > > > - Storage: virtio-scsi
+> > > > - VM network: virtio-net, virtio-scsi (no CPU or IO bottlenecks)
+> > > > - Traffic test: iperf3, scp, wget consistently slow in guest
+> > > > =
+
+> > > > This issue is not present:
+> > > > - On 6.8.0 =
+
+> > > > - On hosts with Intel NICs (same VM config)
+> > > > =
+
+> > > > I have bisected the issue to the following upstream commit:
+> > > > =
+
+> > > > =C2=A0 49d14b54a527 ("virtio-net: Suppress tx timeout warning for=
+ small
+> > > > tx")
+> > > > =C2=A0 https://git.kernel.org/linus/49d14b54a527
+> > > =
+
+> > > Thanks a lot for the info!
+> > > =
+
+> > > =
+
+> > > both the link and commit point at:
+> > > =
+
+> > > commit 49d14b54a527289d09a9480f214b8c586322310a
+> > > Author: Eric Dumazet <edumazet@google.com>
+> > > Date:=C2=A0=C2=A0 Thu Sep 26 16:58:36 2024 +0000
+> > > =
+
+> > > =C2=A0=C2=A0=C2=A0 net: test for not too small csum_start in virtio=
+_net_hdr_to_skb()
+> > > =C2=A0=C2=A0=C2=A0 =
+
+> > > =
+
+> > > is this what you mean?
+> > > =
+
+> > > I don't know which commit is "virtio-net: Suppress tx timeout warni=
+ng
+> > > for small tx"
+> > > =
+
+> > > =
+
+> > > =
+
+> > > > Reverting this commit restores normal network performance in
+> > > > affected guest VMs.
+> > > > =
+
+> > > > I=E2=80=99m happy to provide more data or assist with testing a p=
+otential
+> > > > fix.
+> > > > =
+
+> > > > Thanks,
+> > > > Markus Fohrer
+> > > =
+
+> > > =
+
+> > > Thanks! First I think it's worth checking what is the setup, e.g.
+> > > which offloads are enabled.
+> > > Besides that, I'd start by seeing what's doing on. Assuming I'm rig=
+ht
+> > > about
+> > > Eric's patch:
+> > > =
+
+> > > diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.=
+h
+> > > index 276ca543ef44d8..02a9f4dc594d02 100644
+> > > --- a/include/linux/virtio_net.h
+> > > +++ b/include/linux/virtio_net.h
+> > > @@ -103,8 +103,10 @@ static inline int virtio_net_hdr_to_skb(struct=
+
+> > > sk_buff *skb,
+> > > =C2=A0
+> > > =C2=A0		if (!skb_partial_csum_set(skb, start, off))
+> > > =C2=A0			return -EINVAL;
+> > > +		if (skb_transport_offset(skb) < nh_min_len)
+> > > +			return -EINVAL;
+> > > =C2=A0
+> > > -		nh_min_len =3D max_t(u32, nh_min_len,
+> > > skb_transport_offset(skb));
+> > > +		nh_min_len =3D skb_transport_offset(skb);
+> > > =C2=A0		p_off =3D nh_min_len + thlen;
+> > > =C2=A0		if (!pskb_may_pull(skb, p_off))
+> > > =C2=A0			return -EINVAL;
+> > > =
+
+> > > =
+
+> > > sticking a printk before return -EINVAL to show the offset and
+> > > nh_min_len
+> > > would be a good 1st step. Thanks!
+> > > =
+
+> > =
+
+> > =
+
+> > Hi Eric,
+> > =
+
+> > thanks a lot for the quick response =E2=80=94 and yes, you're absolut=
+ely right.
+> > =
+
+> > Apologies for the confusion: I mistakenly wrote the wrong commit
+> > description in my initial mail.
+> > =
+
+> > The correct commit is indeed:
+> > =
+
+> > commit 49d14b54a527289d09a9480f214b8c586322310a
+> > Author: Eric Dumazet <edumazet@google.com>
+> > Date:   Thu Sep 26 16:58:36 2024 +0000
+> > =
+
+> >     net: test for not too small csum_start in virtio_net_hdr_to_skb()=
+
+> > =
+
+> > This is the one I bisected and which causes the performance regressio=
+n
+> > in my environment.
+
+This commit is introduced in v6.12.
+
+You say 6.8 is good, but 6.8.1 is bad. This commit is not in 6.8.1.
+Nor any virtio-net related change:
+
+$ git log --oneline linux/v6.8..linux/v6.8.1 -- include/linux/virtio_net.=
+h drivers/net/virtio_net.c | wc -l
+0
+
+Is it perhaps a 6.8.1 derived distro kernel?
+
+That patch detects silly packets created by a fuzzer. It should not
+affect sane traffic. Not saying your analysis is wrong. We just need
+more data to understand the regression better.=
 
