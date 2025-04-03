@@ -1,461 +1,307 @@
-Return-Path: <netdev+bounces-179193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B456A7B1A6
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 23:49:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45022A7B1B0
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 23:54:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2059716619D
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:49:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A27B51888A31
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:54:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F4C2171E49;
-	Thu,  3 Apr 2025 21:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84BAF18CBFB;
+	Thu,  3 Apr 2025 21:54:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HEU98b8R"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fAP5Bksl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE7513B58A;
-	Thu,  3 Apr 2025 21:49:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 655A316F0FE
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 21:54:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743716973; cv=none; b=ni8bV3IK66PTznDHG9f87gOOJVltNSCt/uDVrmI4UsYyr+ZTwjDl1Oqu8jELAUkSuQ+gGuNf3cejb352v1oWzRb7HIUF3n6BxaYekM5gtfFtYL3ZNuB6Zyj3QDu39EZ8ekp5U7lxmWx94/9c3uauHn8ZRXV/0knE2KAGBk1oIY0=
+	t=1743717243; cv=none; b=hcaB5FxvoMKoz/9zyt0vXGVS2m64gAUfdSD5RQ0OMZeh9DIM1AqF4rsXcjSzAAFhn3/UA4VDBIPyxpRM14ZIu9ohyzRJtuRGpRojXiEvsV73fo3ROekbwk4gAnAUVH8Vp+YINUDcgj6ppnhZtCIeHQyyGomexFdHTBz4GMX7S6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743716973; c=relaxed/simple;
-	bh=u7AQGhdP8wwu5y0NXxgS3JBSSjiIqpyA3oFwxYn53tU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=OMxziRYRlehGxRhGOzh+cE9A0qzjUvmSMvQTyil6yVSg9oFg/Zzq8aIVqSLGN3avxxkn7ijOBmFJO/l+jCAv3TnpGiWWPC1qqYqB2g4Va7nlNwosKIYX07KZSO9sM4NMcQDe1AcTj3g4NFIC3YGve7iGsWeOP1WH730DX9LyCJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HEU98b8R; arc=none smtp.client-ip=209.85.222.173
+	s=arc-20240116; t=1743717243; c=relaxed/simple;
+	bh=Urd33bxq1a5stv1Pb/vT/2rG2h6Ysukr/iGwX1XqmEo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WJ8AGBI7+rYtaNWap1o8UiCRRJnU45VR6k4wbvwrOqjPMluBKIydaIjg5qdMtDh/Bp6fx8ZI9r9N6lFgVVRVO5tUbEf602xNZh++9jUalpcjH9rSxKcIiuHi8CSOzbRtGGSbOOv870EQyEhoIYGtSGjqXAGj8o+iw/sUhVPfz+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fAP5Bksl; arc=none smtp.client-ip=209.85.221.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7c08fc20194so251466685a.2;
-        Thu, 03 Apr 2025 14:49:31 -0700 (PDT)
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3912fdddf8fso1599924f8f.1
+        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 14:54:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743716970; x=1744321770; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1743717239; x=1744322039; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lwdCiSeO1xvvNjIyf9l/dZZzNmp3/0c+LarNj3baQlI=;
-        b=HEU98b8R5Z3xoeQrxSKSED4aFEvhmQ7x5/qVJgkNMlH33EymlEa+4VMKGONCwnoStJ
-         CnKfCIAGNcsPE9/XF0x7pUaOUNGuXifscXcJaL6TyT3mEWJbgOjUTTY3y9hLkE4OBN2S
-         kR0o4/c/0kOjtUBGK7vbAHUSC6DdFk4cDPXh+lsKOoekQ0wVxksSV6wR/R4Mz0hy5o18
-         VoCJg7WTAF1CrIaPx4J89HLLSUz+Cy3CrjQvHNfbZN+m/VNFxZC0KhJXX+ioAPsJHLFG
-         Cb73BjKKWHMoxEzM8pIMRGvvIwdlT5IeEBaSSOOmUtwEWwWWE5MuJwjPQpDGQPpkZ5+i
-         192w==
+        bh=wWJQ445Ouv7UcpvFzboL1nD7c8uYnY2ecoKz1+J6Jbk=;
+        b=fAP5BkslGnqAC0xOjxfeswymMeLUCAo1gRjJFxe1pw8TN1wFa3COnE9Wrkefakzz6P
+         9UcwliXJfaGpsBwZ1it3SLMeHNQLOHejs0WX/71jiSRwiRos5ofOHKipCOAU1ikWfM7R
+         dAIOxQf2mLgJg+VVTwLJZnhJkkwrqw4djNZzVqiD8J7xUGl/tQm8AM9b05Auis0q+iOV
+         awN+vkplzwZCff1mTOjrQRAh2AtSaqBsJm9itdJjS6wgahlNjbKdaTdPKk1lquIuNYID
+         BltgywhkQlQHU027uJkXfo9+dhj5VzQaCqE1BZvWoKhZskcKNJlLiFNba02UXzE4BTA2
+         ircg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743716970; x=1744321770;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=lwdCiSeO1xvvNjIyf9l/dZZzNmp3/0c+LarNj3baQlI=;
-        b=A/SfLVtHdM0zlGsKPW+55KgfixzPtqhQFDZz/+2RCDAMwKu82Z814wHfcz0bSBCU0R
-         7oPdOHmGNjwazlmaYAHV0xW67GLzoOjUtKYMQ9NL3kbPZk8K22QJUMkTbsgzBPEG52vk
-         iT2UbtqFPVyDj4e/irxtkzddFs0DOIJXWb2NZsH1/PPdhDkUtZ4a1+p4+xsVdBqzN5wG
-         W83ewpzD78e5mqapqE2SwlHbMnVcH1Uoxe9qD6ZL6BEn1yDk0WCdUIHRn5ZAIHU2p8uM
-         N6HkFNip1o6izPyjPjZmkhnTMWIev5pE0BTHEdbK6U79lJEtoiVePxBbxUwTfPkor96d
-         i5tA==
-X-Forwarded-Encrypted: i=1; AJvYcCUjvnQFxLUxDnorr0oiO9tiiDgg67UKi/Vmql6J5DSXtV1j0HhSRGrTAlQN7o2+JoaRBxPz8T93nZ1x5uI=@vger.kernel.org, AJvYcCVRknVtZLvWrQ4KJCJIJzabhknNynkOL4MqeUlHkFaUS7HRvltmf8v7m1Mg6Yyb0FP5X07bK+ep@vger.kernel.org
-X-Gm-Message-State: AOJu0YybrKsW39d1hqj2ulFvU0G9ZVtZF0OzlG6rrhIobMIixxcpQzSW
-	ZvYbl4zpoca9OQKxWI/FDlyLz8q5HUMeih/wDhT4+LCEwpOSfHgZ
-X-Gm-Gg: ASbGnctwLI71XiLFIH+yYITv4/YT6czHxyWJTtte3fnUPY7/LrnciPzEe4iEVM/n0x3
-	3x7RUfHQ+WmaNti3I1mn0g+Zbs5KPGUeHv/+HT/J7C8iKFnyuSIXDOAFApRGKIRMgGMTy493/2O
-	VdbkCt1rzvhxGDZmCXfOoe/KKI6noyZwILoZbRUTRPuHs2tq7tpdDV966EJPgHerDRIpH0pLr6w
-	2GeQTVsCsOsT9CONociXylOYPH/U04bLYlrJY7h3/iPGnou5UQsd/Esvjiau21I+zjojPZ8zPCF
-	vA/gAl0jeRIXR49vvoxm5u7HXIVU0SgxmOS762OTSKvjpyioraCBz+IN+ZC85sp9Fqjn9xKm+Ud
-	f8JiHTWeH2z/baXCN6aODsQ==
-X-Google-Smtp-Source: AGHT+IHo4zz+oMWNU7UOvj13ffKg6+LGTPlqhUZ5WCoh5aBtOqBUTsBBgu72O02X7eBPrMvptYzYoA==
-X-Received: by 2002:a05:620a:19a0:b0:7c5:4c6d:7fa5 with SMTP id af79cd13be357-7c774df7822mr127042885a.48.1743716970342;
-        Thu, 03 Apr 2025 14:49:30 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4791b121decsm12556091cf.62.2025.04.03.14.49.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Apr 2025 14:49:29 -0700 (PDT)
-Date: Thu, 03 Apr 2025 17:49:29 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Markus Fohrer <markus.fohrer@webked.de>, 
- "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtualization@lists.linux-foundation.org, 
- jasowang@redhat.com, 
- davem@davemloft.net, 
- edumazet@google.com, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <67ef02693c647_16fa6c294c4@willemb.c.googlers.com.notmuch>
-In-Reply-To: <fa9aec4d5d5148cff37a17d076b90ab835b8c7ef.camel@webked.de>
-References: <1d388413ab9cfd765cd2c5e05b5e69cdb2ec5a10.camel@webked.de>
- <20250403090001-mutt-send-email-mst@kernel.org>
- <f8909f5bbc2532ea234cdaa8dbdb46a48249803f.camel@webked.de>
- <20250403100206-mutt-send-email-mst@kernel.org>
- <da1c8647c4efcfcf7e7d2ba7e6235afc7b0f63ae.camel@webked.de>
- <20250403170543-mutt-send-email-mst@kernel.org>
- <fa9aec4d5d5148cff37a17d076b90ab835b8c7ef.camel@webked.de>
-Subject: Re: [REGRESSION] Massive virtio-net throughput drop in guest VM with
- Linux 6.8+
+        d=1e100.net; s=20230601; t=1743717239; x=1744322039;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wWJQ445Ouv7UcpvFzboL1nD7c8uYnY2ecoKz1+J6Jbk=;
+        b=NYkTcucKM4vONmCnOZlXH7I37twIESGhKzpZZuOJUIMvGEQ+mUoGg9DiE9ilhWxoYh
+         GmiN7ruL+5shJizFKdS1uHdKHY/uzzuq5wg4ue4h6HbMjX82FPRoBTib3Ymfdu57iSGK
+         YM3fCcyJS0QQYom1g9m8cCKcuKQkv92XJzMvrAaUguQFQbJKHijc4Ob+iRwkxuCdZTHL
+         kKxZfg1eIKnoBr4D/32S6rsTDO37K+QagVLUSb+NPF4oc+mCa0oK5EV4tSCS4MpWMiw4
+         1rT8LHPznLh39/500nIFiuJX/OIZMRmoBOT/GIU0p0um5K1nDch5qCeyWwrJ9+rfppf9
+         ot1w==
+X-Forwarded-Encrypted: i=1; AJvYcCWq/DYFJoYMML4YJ256fawFccYp6otOd9E6Tdxh9kMyHk4fumhfvK0K+G7387loMM0gy0exygc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUTyTVutFUC9huTJQm00MdFTeMFbihPCx73ScgMY41KcgPwvjW
+	8x0nZRgKUQMA+XJjHiK0PwdqfPzW/8bIBZwanb+UyYQV7eRblG2szvKPzxubpZ9tn4EoqGTEBEr
+	FNfFFAVdBLWi3bjKKGSO8JuxRkDw=
+X-Gm-Gg: ASbGnctdh0V4TMgmhNXK0dSI1feVxSup+6dNrctpv48FcJWgJFz0TNQBz5/wdsqB3WT
+	WxNScBY1y96eMHVSlfaQ/6foyp0v7P66XXOECASOirTiTm+abOtAVmgESwDoyaPvmZbJJHGv8wo
+	ytUZVonoVdAq0pVhoOUBEXzoCI+aK3x/RLaZv7i2DymfLJJwt4GhQwnuUdRys=
+X-Google-Smtp-Source: AGHT+IGbCVKr8IL3kwtYKeE0K5X6jm1zWrjcqGJg3ccOS83gQIwvQbocyx0AkI+m1WB3agXV/N68jnRfZ4RFlHjg+xI=
+X-Received: by 2002:a05:6000:40cd:b0:390:dec3:2780 with SMTP id
+ ffacd0b85a97d-39cba94d1eemr809536f8f.24.1743717239365; Thu, 03 Apr 2025
+ 14:53:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+References: <174354264451.26800.7305550288043017625.stgit@ahduyck-xeon-server.home.arpa>
+ <174354300640.26800.16674542763242575337.stgit@ahduyck-xeon-server.home.arpa>
+ <Z-6hcQGI8tgshtMP@shell.armlinux.org.uk> <20250403172953.5da50762@fedora.home>
+ <de19e9f1-4ae3-4193-981c-e366c243352d@lunn.ch>
+In-Reply-To: <de19e9f1-4ae3-4193-981c-e366c243352d@lunn.ch>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Thu, 3 Apr 2025 14:53:22 -0700
+X-Gm-Features: ATxdqUHs_Q2OmWzFMALS0im0OxYzDGd54IUX_-Rq-Q4v4WyWZpZVVIZCUHX_3OE
+Message-ID: <CAKgT0UdhTT=g+ODpzR5uoTEOkC8u+cfCp7H-8718Zphd=24buw@mail.gmail.com>
+Subject: Re: [net PATCH 1/2] net: phy: Cleanup handling of recent changes to phy_lookup_setting
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+	"Russell King (Oracle)" <linux@armlinux.org.uk>, netdev@vger.kernel.org, hkallweit1@gmail.com, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Markus Fohrer wrote:
-> Am Donnerstag, dem 03.04.2025 um 17:06 -0400 schrieb Michael S.
-> Tsirkin:
-> > On Thu, Apr 03, 2025 at 10:07:12PM +0200, Markus Fohrer wrote:
-> > > Am Donnerstag, dem 03.04.2025 um 10:03 -0400 schrieb Michael S.
-> > > Tsirkin:
-> > > > On Thu, Apr 03, 2025 at 03:51:01PM +0200, Markus Fohrer wrote:
-> > > > > Am Donnerstag, dem 03.04.2025 um 09:04 -0400 schrieb Michael S.=
-
-> > > > > Tsirkin:
-> > > > > > On Wed, Apr 02, 2025 at 11:12:07PM +0200, Markus Fohrer
-> > > > > > wrote:
-> > > > > > > Hi,
-> > > > > > > =
-
-> > > > > > > I'm observing a significant performance regression in KVM
-> > > > > > > guest
-> > > > > > > VMs
-> > > > > > > using virtio-net with recent Linux kernels (6.8.1+ and
-> > > > > > > 6.14).
-> > > > > > > =
-
-> > > > > > > When running on a host system equipped with a Broadcom
-> > > > > > > NetXtreme-E
-> > > > > > > (bnxt_en) NIC and AMD EPYC CPUs, the network throughput in
-> > > > > > > the
-> > > > > > > guest drops to 100=E2=80=93200 KB/s. The same guest configu=
-ration
-> > > > > > > performs
-> > > > > > > normally (~100 MB/s) when using kernel 6.8.0 or when the VM=
-
-> > > > > > > is
-> > > > > > > moved to a host with Intel NICs.
-> > > > > > > =
-
-> > > > > > > Test environment:
-> > > > > > > - Host: QEMU/KVM, Linux 6.8.1 and 6.14.0
-> > > > > > > - Guest: Linux with virtio-net interface
-> > > > > > > - NIC: Broadcom BCM57416 (bnxt_en driver, no issues at host=
-
-> > > > > > > level)
-> > > > > > > - CPU: AMD EPYC
-> > > > > > > - Storage: virtio-scsi
-> > > > > > > - VM network: virtio-net, virtio-scsi (no CPU or IO
-> > > > > > > bottlenecks)
-> > > > > > > - Traffic test: iperf3, scp, wget consistently slow in
-> > > > > > > guest
-> > > > > > > =
-
-> > > > > > > This issue is not present:
-> > > > > > > - On 6.8.0 =
-
-> > > > > > > - On hosts with Intel NICs (same VM config)
-> > > > > > > =
-
-> > > > > > > I have bisected the issue to the following upstream commit:=
-
-> > > > > > > =
-
-> > > > > > > =C2=A0 49d14b54a527 ("virtio-net: Suppress tx timeout warni=
-ng
-> > > > > > > for
-> > > > > > > small
-> > > > > > > tx")
-> > > > > > > =C2=A0 https://git.kernel.org/linus/49d14b54a527
-> > > > > > =
-
-> > > > > > Thanks a lot for the info!
-> > > > > > =
-
-> > > > > > =
-
-> > > > > > both the link and commit point at:
-> > > > > > =
-
-> > > > > > commit 49d14b54a527289d09a9480f214b8c586322310a
-> > > > > > Author: Eric Dumazet <edumazet@google.com>
-> > > > > > Date:=C2=A0=C2=A0 Thu Sep 26 16:58:36 2024 +0000
-> > > > > > =
-
-> > > > > > =C2=A0=C2=A0=C2=A0 net: test for not too small csum_start in
-> > > > > > virtio_net_hdr_to_skb()
-> > > > > > =C2=A0=C2=A0=C2=A0 =
-
-> > > > > > =
-
-> > > > > > is this what you mean?
-> > > > > > =
-
-> > > > > > I don't know which commit is "virtio-net: Suppress tx timeout=
-
-> > > > > > warning
-> > > > > > for small tx"
-> > > > > > =
-
-> > > > > > =
-
-> > > > > > =
-
-> > > > > > > Reverting this commit restores normal network performance
-> > > > > > > in
-> > > > > > > affected guest VMs.
-> > > > > > > =
-
-> > > > > > > I=E2=80=99m happy to provide more data or assist with testi=
-ng a
-> > > > > > > potential
-> > > > > > > fix.
-> > > > > > > =
-
-> > > > > > > Thanks,
-> > > > > > > Markus Fohrer
-> > > > > > =
-
-> > > > > > =
-
-> > > > > > Thanks! First I think it's worth checking what is the setup,
-> > > > > > e.g.
-> > > > > > which offloads are enabled.
-> > > > > > Besides that, I'd start by seeing what's doing on. Assuming
-> > > > > > I'm
-> > > > > > right
-> > > > > > about
-> > > > > > Eric's patch:
-> > > > > > =
-
-> > > > > > diff --git a/include/linux/virtio_net.h
-> > > > > > b/include/linux/virtio_net.h
-> > > > > > index 276ca543ef44d8..02a9f4dc594d02 100644
-> > > > > > --- a/include/linux/virtio_net.h
-> > > > > > +++ b/include/linux/virtio_net.h
-> > > > > > @@ -103,8 +103,10 @@ static inline int
-> > > > > > virtio_net_hdr_to_skb(struct
-> > > > > > sk_buff *skb,
-> > > > > > =C2=A0
-> > > > > > =C2=A0		if (!skb_partial_csum_set(skb, start, off))
-> > > > > > =C2=A0			return -EINVAL;
-> > > > > > +		if (skb_transport_offset(skb) < nh_min_len)
-> > > > > > +			return -EINVAL;
-> > > > > > =C2=A0
-> > > > > > -		nh_min_len =3D max_t(u32, nh_min_len,
-> > > > > > skb_transport_offset(skb));
-> > > > > > +		nh_min_len =3D skb_transport_offset(skb);
-> > > > > > =C2=A0		p_off =3D nh_min_len + thlen;
-> > > > > > =C2=A0		if (!pskb_may_pull(skb, p_off))
-> > > > > > =C2=A0			return -EINVAL;
-> > > > > > =
-
-> > > > > > =
-
-> > > > > > sticking a printk before return -EINVAL to show the offset
-> > > > > > and
-> > > > > > nh_min_len
-> > > > > > would be a good 1st step. Thanks!
-> > > > > > =
-
-> > > > > =
-
-> > > > > =
-
-> > > > > Hi Eric,
-> > > > > =
-
-> > > > > thanks a lot for the quick response =E2=80=94 and yes, you're
-> > > > > absolutely
-> > > > > right.
-> > > > > =
-
-> > > > > Apologies for the confusion: I mistakenly wrote the wrong
-> > > > > commit
-> > > > > description in my initial mail.
-> > > > > =
-
-> > > > > The correct commit is indeed:
-> > > > > =
-
-> > > > > commit 49d14b54a527289d09a9480f214b8c586322310a
-> > > > > Author: Eric Dumazet <edumazet@google.com>
-> > > > > Date:=C2=A0=C2=A0 Thu Sep 26 16:58:36 2024 +0000
-> > > > > =
-
-> > > > > =C2=A0=C2=A0=C2=A0 net: test for not too small csum_start in
-> > > > > virtio_net_hdr_to_skb()
-> > > > > =
-
-> > > > > This is the one I bisected and which causes the performance
-> > > > > regression
-> > > > > in my environment.
-> > > > > =
-
-> > > > > Thanks again,
-> > > > > Markus
-> > > > =
-
-> > > > =
-
-> > > > I'm not Eric but good to know.
-> > > > Alright, so I would start with the two items: device features and=
-
-> > > > printk.
-> > > > =
-
-> > > =
-
-> > > as requested, here=E2=80=99s the device/feature information from th=
-e guest
-> > > running kernel 6.14 (mainline):
-> > > =
-
-> > > Interface: ens18
-> > > =
-
-> > > ethtool -i ens18:
-> > > driver: virtio_net
-> > > version: 1.0.0
-> > > firmware-version: =
-
-> > > expansion-rom-version: =
-
-> > > bus-info: 0000:00:12.0
-> > > supports-statistics: yes
-> > > supports-test: no
-> > > supports-eeprom-access: no
-> > > supports-register-dump: no
-> > > supports-priv-flags: no
-> > > =
-
-> > > =
-
-> > > ethtool -k ens18:
-> > > Features for ens18:
-> > > rx-checksumming: on [fixed]
-> > > tx-checksumming: on
-> > > 	tx-checksum-ipv4: off [fixed]
-> > > 	tx-checksum-ip-generic: on
-> > > 	tx-checksum-ipv6: off [fixed]
-> > > 	tx-checksum-fcoe-crc: off [fixed]
-> > > 	tx-checksum-sctp: off [fixed]
-> > > scatter-gather: on
-> > > 	tx-scatter-gather: on
-> > > 	tx-scatter-gather-fraglist: off [fixed]
-> > > tcp-segmentation-offload: on
-> > > 	tx-tcp-segmentation: on
-> > > 	tx-tcp-ecn-segmentation: on
-> > > 	tx-tcp-mangleid-segmentation: off
-> > > 	tx-tcp6-segmentation: on
-> > > generic-segmentation-offload: on
-> > > generic-receive-offload: on
-> > > large-receive-offload: off [fixed]
-> > > rx-vlan-offload: off [fixed]
-> > > tx-vlan-offload: off [fixed]
-> > > ntuple-filters: off [fixed]
-> > > receive-hashing: off [fixed]
-> > > highdma: on [fixed]
-> > > rx-vlan-filter: on [fixed]
-> > > vlan-challenged: off [fixed]
-> > > tx-gso-robust: on [fixed]
-> > > tx-fcoe-segmentation: off [fixed]
-> > > tx-gre-segmentation: off [fixed]
-> > > tx-gre-csum-segmentation: off [fixed]
-> > > tx-ipxip4-segmentation: off [fixed]
-> > > tx-ipxip6-segmentation: off [fixed]
-> > > tx-udp_tnl-segmentation: off [fixed]
-> > > tx-udp_tnl-csum-segmentation: off [fixed]
-> > > tx-gso-partial: off [fixed]
-> > > tx-tunnel-remcsum-segmentation: off [fixed]
-> > > tx-sctp-segmentation: off [fixed]
-> > > tx-esp-segmentation: off [fixed]
-> > > tx-udp-segmentation: off
-> > > tx-gso-list: off [fixed]
-> > > tx-nocache-copy: off
-> > > loopback: off [fixed]
-> > > rx-fcs: off [fixed]
-> > > rx-all: off [fixed]
-> > > tx-vlan-stag-hw-insert: off [fixed]
-> > > rx-vlan-stag-hw-parse: off [fixed]
-> > > rx-vlan-stag-filter: off [fixed]
-> > > l2-fwd-offload: off [fixed]
-> > > hw-tc-offload: off [fixed]
-> > > esp-hw-offload: off [fixed]
-> > > esp-tx-csum-hw-offload: off [fixed]
-> > > rx-udp_tunnel-port-offload: off [fixed]
-> > > tls-hw-tx-offload: off [fixed]
-> > > tls-hw-rx-offload: off [fixed]
-> > > rx-gro-hw: on
-> > > tls-hw-record: off [fixed]
-> > > rx-gro-list: off
-> > > macsec-hw-offload: off [fixed]
-> > > rx-udp-gro-forwarding: off
-> > > hsr-tag-ins-offload: off [fixed]
-> > > hsr-tag-rm-offload: off [fixed]
-> > > hsr-fwd-offload: off [fixed]
-> > > hsr-dup-offload: off [fixed]
-> > > =
-
-> > > ethtool ens18:
-> > > Settings for ens18:
-> > > 	Supported ports: [=C2=A0 ]
-> > > 	Supported link modes:=C2=A0=C2=A0 Not reported
-> > > 	Supported pause frame use: No
-> > > 	Supports auto-negotiation: No
-> > > 	Supported FEC modes: Not reported
-> > > 	Advertised link modes:=C2=A0 Not reported
-> > > 	Advertised pause frame use: No
-> > > 	Advertised auto-negotiation: No
-> > > 	Advertised FEC modes: Not reported
-> > > 	Speed: Unknown!
-> > > 	Duplex: Unknown! (255)
-> > > 	Auto-negotiation: off
-> > > 	Port: Other
-> > > 	PHYAD: 0
-> > > 	Transceiver: internal
-> > > netlink error: Operation not permitted
-> > > 	Link detected: yes
-> > > =
-
-> > > =
-
-> > > Kernel log (journalctl -k):
-> > > Apr 03 19:50:37 kb-test.allod.com kernel: virtio_scsi virtio2:
-> > > 4/0/0
-> > > default/read/poll queues=C2=A0 =
-
-> > > Apr 03 19:50:37 kb-test.allod.com kernel: virtio_net virtio1 ens18:=
-
-> > > renamed from eth0
-> > > =
-
-> > > Let me know if you=E2=80=99d like comparison data from kernel 6.11 =
-or any
-> > > additional tests
-> > =
-
-> > =
-
-> > I think let's redo bisect first then I will suggest which traces to
-> > add.
-> > =
-
-> =
-
-> The build with the added printk is currently running. I=E2=80=99ll test=
- it
-> shortly and report the results.
-> =
-
-> Should the bisect be done between v6.11 and v6.12, or v6.11 and v6.14?
-
-If reverting one specific patch resolved it, that's a big smoking gun.
-No need to bisect a huge stack of patches then again, imho.
-
-Maybe check-out that SHA1 and the one before and verify that that
-matches your earlier experience?
-
+On Thu, Apr 3, 2025 at 9:34=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Thu, Apr 03, 2025 at 05:29:53PM +0200, Maxime Chevallier wrote:
+> > On Thu, 3 Apr 2025 15:55:45 +0100
+> > "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+> >
+> > > On Tue, Apr 01, 2025 at 02:30:06PM -0700, Alexander Duyck wrote:
+> > > > From: Alexander Duyck <alexanderduyck@fb.com>
+> > > >
+> > > > The blamed commit introduced an issue where it was limiting the lin=
+k
+> > > > configuration so that we couldn't use fixed-link mode for any setti=
+ngs
+> > > > other than twisted pair modes 10G or less. As a result this was cau=
+sing the
+> > > > driver to lose any advertised/lp_advertised/supported modes when se=
+tup as a
+> > > > fixed link.
+> > > >
+> > > > To correct this we can add a check to identify if the user is in fa=
+ct
+> > > > enabling a TP mode and then apply the mask to select only 1 of each=
+ speed
+> > > > for twisted pair instead of applying this before we know the number=
+ of bits
+> > > > set.
+> > > >
+> > > > Fixes: de7d3f87be3c ("net: phylink: Use phy_caps_lookup for fixed-l=
+ink configuration")
+> > > > Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
+> > > > ---
+> > > >  drivers/net/phy/phylink.c |   15 +++++++++++----
+> > > >  1 file changed, 11 insertions(+), 4 deletions(-)
+> > > >
+> > > > diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> > > > index 16a1f31f0091..380e51c5bdaa 100644
+> > > > --- a/drivers/net/phy/phylink.c
+> > > > +++ b/drivers/net/phy/phylink.c
+> > > > @@ -713,17 +713,24 @@ static int phylink_parse_fixedlink(struct phy=
+link *pl,
+> > > >           phylink_warn(pl, "fixed link specifies half duplex for %d=
+Mbps link?\n",
+> > > >                        pl->link_config.speed);
+> > > >
+> > > > - linkmode_zero(pl->supported);
+> > > > - phylink_fill_fixedlink_supported(pl->supported);
+> > > > -
+> > > > + linkmode_fill(pl->supported);
+> > > >   linkmode_copy(pl->link_config.advertising, pl->supported);
+> > > >   phylink_validate(pl, pl->supported, &pl->link_config);
+> > > >
+> > > >   c =3D phy_caps_lookup(pl->link_config.speed, pl->link_config.dupl=
+ex,
+> > > >                       pl->supported, true);
+> > > > - if (c)
+> > > > + if (c) {
+> > > >           linkmode_and(match, pl->supported, c->linkmodes);
+> > > >
+> > > > +         /* Compatbility with the legacy behaviour:
+> > > > +          * Report one single BaseT mode.
+> > > > +          */
+> > > > +         phylink_fill_fixedlink_supported(mask);
+> > > > +         if (linkmode_intersects(match, mask))
+> > > > +                 linkmode_and(match, match, mask);
+> > > > +         linkmode_zero(mask);
+> > > > + }
+> > > > +
+> > >
+> > > I'm still wondering about the wiseness of exposing more than one link
+> > > mode for something that's supposed to be fixed-link.
+> > >
+> > > For gigabit fixed links, even if we have:
+> > >
+> > >     phy-mode =3D "1000base-x";
+> > >     speed =3D <1000>;
+> > >     full-duplex;
+> > >
+> > > in DT, we still state to ethtool:
+> > >
+> > >         Supported link modes:   1000baseT/Full
+> > >         Advertised link modes:  1000baseT/Full
+> > >         Link partner advertised link modes:  1000baseT/Full
+> > >         Link partner advertised auto-negotiation: No
+> > >         Speed: 1000Mb/s
+> > >         Duplex: Full
+> > >         Auto-negotiation: on
+> > >
+> > > despite it being a 1000base-X link. This is perfectly reasonable,
+> > > because of the origins of fixed-links - these existed as a software
+> > > emulated baseT PHY no matter what the underlying link was.
+> > >
+> > > So, is getting the right link mode for the underlying link important
+> > > for fixed-links? I don't think it is. Does it make sense to publish
+> > > multiple link modes for a fixed-link? I don't think it does, because
+> > > if multiple link modes are published, it means that it isn't fixed.
+> >
+> > That's a good point. The way I saw that was :
+> >
+> >   "we report all the modes because, being fixed-link, it can be
+> >   any of these modes."
+> >
+> > But I agree with you in that this doesn't show that "this is fixed,
+> > don't try to change that, this won't work". So, I do agree with you now=
+.
+> >
+> > > As for arguments about the number of lanes, that's a property of the
+> > > PHY_INTERFACE_MODE_xxx. There's a long history of this, e.g. MII/RMII
+> > > is effectively a very early illustration of reducing the number of
+> > > lanes, yet we don't have separate link modes for these.
+> > >
+> > > So, I'm still uneasy about this approach.
+> >
+> > So, how about extending the compat list of "first link of each speed"
+> > to all the modes, then once the "mediums" addition from the phy_port
+> > lands, we simplify it down the following way :
+> >
+> > Looking at the current list of elegible fixed-link linkmodes, we have
+> > (I'm taking this from one of your mails) :
+> >
+> > speed duplex  linkmode
+> > 10M   Half    10baseT_Half
+> > 10M   Full    10baseT_Full
+> > 100M  Half    100baseT_Half
+> > 100M  Full    100baseT_Full
+> > 1G    Half    1000baseT_Half
+> > 1G    Full    1000baseT_Full (this changed over time)
+> > 2.5G  Full    2500baseT_Full
+> > 5G    Full    5000baseT_Full
+> > 10G   Full    10000baseCR_Full (used to be 10000baseKR_Full)
+> > 20G   Full    20000baseKR2_Full =3D> there's no 20GBaseCR*
+> > 25G   Full    25000baseCR_Full
+> > 40G   Full    40000baseCR4_Full
+> > 50G   Full    50000baseCR2_Full
+> > 56G   Full    56000baseCR4_Full
+> > 100G  Full    100000baseCR4_Full
+> >
+> > To avoid maintaining a hardcoded list, we could clearly specifying
+> > what we report in fixed-link :
+> >
+> >  1 : Any BaseT mode for the given speed duplex (BaseT and not BaseT1)
+> >  2 : If there's none, Any BaseK mode for that speed/duplex
+> >  3 : If there's none, Any BaseC mode for that speed/duplex
+> >
+> > That's totally arbitrary of course, and if one day someone adds, say,
+> > 25GBaseT, fixed-link linkmode will change. Another issue us 10G,
+> > 10GBaseT exists, but wasn't the first choice.
+>
+> Maybe go back to why fixed-link exists? It is basically a hack to make
+> MAC configuration easier. It was originally used for MAC to MAC
+> connections, e.g. a NIC connected to a switch, without PHYs in the
+> middle. By faking a PHY, there was no need to add any special
+> configuration API to the MAC, the phylib adjust_link callback would be
+> sufficient to tell the MAC to speed and duplex to use. For {R}{G}MII,
+> or SGMII, that is all you need to know. The phy-mode told you to
+> configure the MAC to MII, GMII, SGMII.
+
+Another issue is that how you would define the connection between the
+two endpoints is changing. Maxime is basing his data off of
+speed/duplex however to source that he is pulling data from
+link_mode_params that is starting to broaden including things like
+lanes. I really think going forward lanes is going to start playing a
+role as we get into the higher speeds and it is already becoming a
+standard config item to use to strip out unsupported modes when
+configuring the interface via autoneg.
+
+> But things evolved since then. We started having PHYs which change
+> their host side depending on their media side. SGMII for <=3D 1G,
+> 2500BaseX, 5GBaseX, 10GBaseX. It became necessary for the adjust_link
+> callback to look at more than just the speed/duplex, it also needed to
+> look at the phy_interface_t. phy-mode looses its meaning, it might be
+> considered the default until we know better.
+
+I am wondering about that. I know I specified we were XLGMII for fbnic
+but that has proven problematic since we aren't actually 40G. So we
+are still essentially just reporting link up/down using that. That is
+why I was looking at going with a fixed mode as I can at least specify
+the correct speed duplex for the one speed I am using if I want to use
+ethtool_ksettings_get.
+
+I have a patch to add the correct phy_interface_t modes for 50, and
+100G links. However one thing I am seeing is that after I set the
+initial interface type I cannot change the interface type without the
+SFP code added. One thing I was wondering. Should I just ignore the
+phy_interface_t on the pcs_config call and use the link mode mask
+flags in autoneg and the speed/duplex/lanes in non-autoneg to
+configure the link? It seems like that is what the SFP code itself is
+doing based on my patch 2 in the set.
+
+> But consider the use case, a hack to allow configuration of a MAC to
+> MAC connection. The link mode does not change depending on the media,
+> there is no media. The switch will not be changing its port
+> configuration. The link really is fixed. phy-mode tells you the basic
+> configuration, and then adjust_link/mac_link_up tells you the
+> speed/dupex if there are multiple speeds/duplex supported,
+> e.g. RGMII/SGMII.
+>
+> What Alex is trying to do is abuse fixed link for something which is
+> not a MAC-MAC connection, something which is not fixed. Do we want to
+> support that?
+
+How is it not a fixed link? If anything it was going to be more fixed
+than what you described above. In our case the connection type is
+indicated by the FW and we aren't meant to change it unless we want to
+be without a link. The link goes up and down and that would be about
+it. So we essentially advertise one link mode bit and are locked on
+the interface configured at creation. I was basically taking that
+config from the FW, creating a SW node with it, and then using that to
+set up the link w/o permitting changes. The general idea was that I
+would use that to limp along until I could get the QSFP support added
+and then add support for configuring the link with the
+ethtool_ksettings_set call. Mainly we just need that functionality for
+our own testing as the production case is non-autoneg fixed links
+only.
 
