@@ -1,560 +1,131 @@
-Return-Path: <netdev+bounces-179105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68463A7A95F
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 20:29:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E401A7A95B
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 20:29:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62A381896804
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 18:29:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9050B3A7C69
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 18:28:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA9422517B5;
-	Thu,  3 Apr 2025 18:29:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D341F2517B9;
+	Thu,  3 Apr 2025 18:29:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="B8UEX75y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mZwuFLae"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 406131F5825
-	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 18:29:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2435C8E0;
+	Thu,  3 Apr 2025 18:29:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743704952; cv=none; b=QaU90A4pdeCqyMxXS98aI/TrIRxGL87lFkZwaoUx7nKNzVBm8slNQkkq07gEAkcswxG6en7sM5kdbdkDTD2eX8G6VTUgdxSw+pUhEw6A7IiLvndNR110KtH+gXlTJkb2gtpRdtPj9VqkxtP9pPezsvCqZdMHzaD4P4l8AhDFkzk=
+	t=1743704945; cv=none; b=OkYjhuAzm+hPC1fbKgYilk8TpNbQISpO7laqJt3+KlOGomJyjqSQf99k9Xuifu77CySmX18T1+NLOMr8U3PpC/qwHI9V7lHG39zmo+CfcIhk0Fdu8b1A5RW+TXv2Mq6FdyGYrav5+Qd3QrWdpvh5MxE6pJQwcYlcuRpIV4G1rA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743704952; c=relaxed/simple;
-	bh=HN+XU8zxOY9v+u7xi1yyfNDtRZMv+NsuI/w5Pm9w0+I=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EMYdkeiCCrUKrTawv38uUasef9bCCOUrP0X+xcIZ72Eoqka8KoSG3sofbVHLhnIJQSGnJ4lY+J4s+ejpcsIVK4N7+t5FDnT6or1B3J4vdeloaeSOBE5WBTLGk/59fsUp0lBuyPWBJ58TEJJhiuczpUKJP+kzFAzv6mGA6YHkMOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=B8UEX75y; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743704947;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mXdo8X1aVFus8jE/gRSOm5/KUGBwL/O5S+xQKTEpQaY=;
-	b=B8UEX75yftNaMWqMjuzVMQ8ZtlkozjWueZndzzk4X6TgFgpCsRRqZqctcf0qXjOp7XPKGP
-	KH49HUHtCsx1vc6XrFCr02LYJNg/I3gULLOMAsI5HKMquOONmuBp/fNLMisW1XfnwuXBey
-	ZGlpAJQqWZqGlawBSrmO0BGHpBY0+Ic=
-From: Sean Anderson <sean.anderson@linux.dev>
-To: netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	linux-kernel@vger.kernel.org,
-	upstream@airoha.com,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Shawn Guo <shawnguo@kernel.org>,
-	devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Sean Anderson <sean.anderson@linux.dev>
-Subject: [RFC net-next PATCH 12/13] arm64: dts: Add compatible strings for Lynx PCSs
-Date: Thu,  3 Apr 2025 14:28:55 -0400
-Message-Id: <20250403182855.1948615-1-sean.anderson@linux.dev>
-In-Reply-To: <20250403181907.1947517-1-sean.anderson@linux.dev>
-References: <20250403181907.1947517-1-sean.anderson@linux.dev>
+	s=arc-20240116; t=1743704945; c=relaxed/simple;
+	bh=BJ6MF4X3xZZJF9aGkDdtTPJx0QtX8gqmfIDuSD47caI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aS45SHz7fUwTFeeZkB2HaHVNan3NwMqbfO9euXKoxv9EUpF9MTjzFMdaHqYdHEHghu5f7mcNXayo+69yXAT/p3Q52yEzk/SW8Xa+y4EFcmFyevmpFFzMUa7Z+vdKPiQVAaDw1RDYfHA9X3PlTKlgabTJr4VjY9ybYAmE+YOtihE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mZwuFLae; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43ce71582e9so8564445e9.1;
+        Thu, 03 Apr 2025 11:29:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743704942; x=1744309742; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=l0xXXnmcQUMSAV1rDZydtKV9m1RhcaPoKdR17ygBDjk=;
+        b=mZwuFLaeOj4GM/hourMDy7pI6zSktu+gkXmQoiNqfIfx5LWsUZeQvcf3hXGrXrj9J+
+         oH7jktlNOnZ6SVzNX+8kQE+5ndql7PiY9ymIpyKX3qB0l7wzOKSDywTjS70gwvCBAczi
+         2Kt0PhY+zwTNXEyaScRvSwkcJdCfI61jHEkVIZaVG/TFFI2Wp9/vyJ4mUiSezqS9rwJm
+         pmCDGKMeEi30yzJ5Iox4FITjB4rG1Nz0/91VdPbl/dB5o/rEv6UECmhGDWnQFBp+ZzUe
+         JR1p0/KRff3xAVNJWWktDDYumldQxWW4lnyylr7sRVEagFXijmfweBB8VcgHB+37/Ptd
+         Fm9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743704942; x=1744309742;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=l0xXXnmcQUMSAV1rDZydtKV9m1RhcaPoKdR17ygBDjk=;
+        b=VtWixn7J6nNvCHs7IaZwPywR5fWrkIMUtlPHeDo8kvS0ENJ6F0cmvMpXF6RTEkf+8E
+         FB7S2SF98IaP+yA2WDBW7yIyFHnML16E1GzLfMvghvmMYMP5gQj4pLy6JJpe5zbqG2Nl
+         +KoA/8xZtvYDJUSgHyArH+TptkZOKKub/i0V06rZ/J4KMo/PHHE7+4N26s+FgfbVRD4p
+         i9o9PanI3HuEerHt3UEux7TiqhawFuBEO4/LUKLGWzFFm2pskoED78XqoRI/yY2pXLNZ
+         zU/EughUHpHnkxmMCF4nY+FAYg5UDJluj44g+P1m6Qg2bZUX53CRoMVKr/3NawESHsUx
+         MaJA==
+X-Forwarded-Encrypted: i=1; AJvYcCUQad/ERMSetDgZqJXlLbNVtNWzPSv9x1V3VrpOiCUVRyw3TbCrzBPlC1nEKS+7KLSpKLETQREt+/PH3A==@vger.kernel.org, AJvYcCXuUEZ8Bdoqiudv2f9zT4ibhJdib7ZH57pm3iH+j5JfJF7WB7Q1d4tl10eLR/yBW2iwjzrfhRZ+SfwRRWg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywd+K4zerJAb0/lhlzd3gqzpIYDW+3yHmvzHaz0DoiMJFveaU34
+	jg6AuTO6kOgb3gVhXyOJsVCEqSO4JwZbS5ybyEWaY9j+IX/qnjSb
+X-Gm-Gg: ASbGnct/36rqeHY8P6PVVXCnvQR1B87XR1avffVlVz/ommIYnvxC9Ju/1mNl5/5mw6e
+	G+Pel9aJ+pCWHD1dJjfsJsj/sPgwjlWTJN5I995X12hVNdH6THoOrJQP0JC8bVBWtBQ9ab/SQgJ
+	Mc5F1c7b9ofaNBlxT89Sy0YO+9ERAo9HSC70tSKiAbSQwF+GtJ9BB3j3MW9xk0R7/gLuRFm788D
+	KEwX00xdRyZDwQ8EoIAiXSKbcXnrUlXQL+OJCWF4gEfC+ygtytQAEb65UfRiezczdVSMqDsrnAE
+	4tWGDDPdvj8zHUNxofgkuDMeuQ42fUwu/vzukJ6XGys0TxfUMMPQZ5JcsqOgW0r5Qg==
+X-Google-Smtp-Source: AGHT+IH7ukEB039raJgrsIcDoJubZVtxahaG0Ai1QHumd2mPTT/OvQNVxuZUvzclFKZ2rMvZDmDwnw==
+X-Received: by 2002:a05:600c:46ca:b0:43d:54a:221c with SMTP id 5b1f17b1804b1-43ecfa45a81mr1044925e9.18.1743704941876;
+        Thu, 03 Apr 2025 11:29:01 -0700 (PDT)
+Received: from [172.27.62.155] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c3020d943sm2459508f8f.74.2025.04.03.11.28.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Apr 2025 11:29:01 -0700 (PDT)
+Message-ID: <0e08292e-9280-4ef6-baf7-e9f642d33177@gmail.com>
+Date: Thu, 3 Apr 2025 21:28:57 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net/mlx5e: fix potential null dereference in
+ mlx5e_tc_nic_create_miss_table
+To: Charles Han <hanchunchao@inspur.com>, saeedm@nvidia.com, leon@kernel.org,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, maord@nvidia.com, lariel@nvidia.com,
+ paulb@nvidia.com
+Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>
+References: <20250402093221.3253-1-hanchunchao@inspur.com>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20250402093221.3253-1-hanchunchao@inspur.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This adds appropriate compatible strings for Lynx PCSs on arm64 QorIQ
-platforms. This also changes the node name to avoid warnings from
-ethernet-phy.yaml.
 
-Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
----
 
- .../arm64/boot/dts/freescale/fsl-ls208xa.dtsi | 48 +++++++++++------
- .../arm64/boot/dts/freescale/fsl-lx2160a.dtsi | 54 ++++++++++++-------
- .../dts/freescale/qoriq-fman3-0-10g-0.dtsi    |  3 +-
- .../dts/freescale/qoriq-fman3-0-10g-1.dtsi    |  3 +-
- .../dts/freescale/qoriq-fman3-0-1g-0.dtsi     |  3 +-
- .../dts/freescale/qoriq-fman3-0-1g-1.dtsi     |  3 +-
- .../dts/freescale/qoriq-fman3-0-1g-2.dtsi     |  3 +-
- .../dts/freescale/qoriq-fman3-0-1g-3.dtsi     |  3 +-
- .../dts/freescale/qoriq-fman3-0-1g-4.dtsi     |  3 +-
- .../dts/freescale/qoriq-fman3-0-1g-5.dtsi     |  3 +-
- 10 files changed, 84 insertions(+), 42 deletions(-)
+On 02/04/2025 12:32, Charles Han wrote:
+> mlx5_get_flow_namespace() may return a NULL pointer, dereferencing it
+> without NULL check may lead to NULL dereference.
+> Add a NULL check for ns.
+> 
+> Fixes: 66cb64e292d2 ("net/mlx5e: TC NIC mode, fix tc chains miss table")
+> Signed-off-by: Charles Han <hanchunchao@inspur.com>
+> ---
+>   drivers/net/ethernet/mellanox/mlx5/core/en_tc.c | 4 ++++
+>   1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> index 9ba99609999f..9c524d8c0e5a 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> @@ -5216,6 +5216,10 @@ static int mlx5e_tc_nic_create_miss_table(struct mlx5e_priv *priv)
+>   	ft_attr.level = MLX5E_TC_MISS_LEVEL;
+>   	ft_attr.prio = 0;
+>   	ns = mlx5_get_flow_namespace(priv->mdev, MLX5_FLOW_NAMESPACE_KERNEL);
+> +	if (!ns) {
+> +		mlx5_core_warn(priv->mdev, "Failed to get flow namespace\n");
 
-diff --git a/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi b/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi
-index 9421fdd7e30e..90c1631c958e 100644
---- a/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi
-+++ b/arch/arm64/boot/dts/freescale/fsl-ls208xa.dtsi
-@@ -554,7 +554,8 @@ pcs_mdio1: mdio@8c07000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs1: ethernet-phy@0 {
-+			pcs1: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -567,7 +568,8 @@ pcs_mdio2: mdio@8c0b000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs2: ethernet-phy@0 {
-+			pcs2: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -580,7 +582,8 @@ pcs_mdio3: mdio@8c0f000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs3: ethernet-phy@0 {
-+			pcs3: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -593,7 +596,8 @@ pcs_mdio4: mdio@8c13000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs4: ethernet-phy@0 {
-+			pcs4: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -606,7 +610,8 @@ pcs_mdio5: mdio@8c17000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs5: ethernet-phy@0 {
-+			pcs5: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -619,7 +624,8 @@ pcs_mdio6: mdio@8c1b000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs6: ethernet-phy@0 {
-+			pcs6: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -632,7 +638,8 @@ pcs_mdio7: mdio@8c1f000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs7: ethernet-phy@0 {
-+			pcs7: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -645,7 +652,8 @@ pcs_mdio8: mdio@8c23000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs8: ethernet-phy@0 {
-+			pcs8: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -658,7 +666,8 @@ pcs_mdio9: mdio@8c27000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs9: ethernet-phy@0 {
-+			pcs9: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -671,7 +680,8 @@ pcs_mdio10: mdio@8c2b000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs10: ethernet-phy@0 {
-+			pcs10: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -684,7 +694,8 @@ pcs_mdio11: mdio@8c2f000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs11: ethernet-phy@0 {
-+			pcs11: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -697,7 +708,8 @@ pcs_mdio12: mdio@8c33000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs12: ethernet-phy@0 {
-+			pcs12: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -710,7 +722,8 @@ pcs_mdio13: mdio@8c37000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs13: ethernet-phy@0 {
-+			pcs13: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -723,7 +736,8 @@ pcs_mdio14: mdio@8c3b000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs14: ethernet-phy@0 {
-+			pcs14: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -736,7 +750,8 @@ pcs_mdio15: mdio@8c3f000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs15: ethernet-phy@0 {
-+			pcs15: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -749,7 +764,8 @@ pcs_mdio16: mdio@8c43000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs16: ethernet-phy@0 {
-+			pcs16: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-diff --git a/arch/arm64/boot/dts/freescale/fsl-lx2160a.dtsi b/arch/arm64/boot/dts/freescale/fsl-lx2160a.dtsi
-index c9541403bcd8..f35da67b6e61 100644
---- a/arch/arm64/boot/dts/freescale/fsl-lx2160a.dtsi
-+++ b/arch/arm64/boot/dts/freescale/fsl-lx2160a.dtsi
-@@ -1474,7 +1474,8 @@ pcs_mdio1: mdio@8c07000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs1: ethernet-phy@0 {
-+			pcs1: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -1487,7 +1488,8 @@ pcs_mdio2: mdio@8c0b000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs2: ethernet-phy@0 {
-+			pcs2: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -1500,7 +1502,8 @@ pcs_mdio3: mdio@8c0f000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs3: ethernet-phy@0 {
-+			pcs3: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -1513,7 +1516,8 @@ pcs_mdio4: mdio@8c13000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs4: ethernet-phy@0 {
-+			pcs4: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -1526,7 +1530,8 @@ pcs_mdio5: mdio@8c17000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs5: ethernet-phy@0 {
-+			pcs5: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -1539,7 +1544,8 @@ pcs_mdio6: mdio@8c1b000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs6: ethernet-phy@0 {
-+			pcs6: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -1552,7 +1558,8 @@ pcs_mdio7: mdio@8c1f000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs7: ethernet-phy@0 {
-+			pcs7: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -1565,7 +1572,8 @@ pcs_mdio8: mdio@8c23000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs8: ethernet-phy@0 {
-+			pcs8: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -1578,7 +1586,8 @@ pcs_mdio9: mdio@8c27000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs9: ethernet-phy@0 {
-+			pcs9: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -1591,7 +1600,8 @@ pcs_mdio10: mdio@8c2b000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs10: ethernet-phy@0 {
-+			pcs10: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -1604,7 +1614,8 @@ pcs_mdio11: mdio@8c2f000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs11: ethernet-phy@0 {
-+			pcs11: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -1617,7 +1628,8 @@ pcs_mdio12: mdio@8c33000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs12: ethernet-phy@0 {
-+			pcs12: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -1630,7 +1642,8 @@ pcs_mdio13: mdio@8c37000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs13: ethernet-phy@0 {
-+			pcs13: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -1643,7 +1656,8 @@ pcs_mdio14: mdio@8c3b000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs14: ethernet-phy@0 {
-+			pcs14: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -1656,7 +1670,8 @@ pcs_mdio15: mdio@8c3f000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs15: ethernet-phy@0 {
-+			pcs15: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -1669,7 +1684,8 @@ pcs_mdio16: mdio@8c43000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs16: ethernet-phy@0 {
-+			pcs16: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -1682,7 +1698,8 @@ pcs_mdio17: mdio@8c47000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs17: ethernet-phy@0 {
-+			pcs17: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-@@ -1695,7 +1712,8 @@ pcs_mdio18: mdio@8c4b000 {
- 			#size-cells = <0>;
- 			status = "disabled";
- 
--			pcs18: ethernet-phy@0 {
-+			pcs18: ethernet-pcs@0 {
-+				compatible = "fsl,lynx-pcs";
- 				reg = <0>;
- 			};
- 		};
-diff --git a/arch/arm64/boot/dts/freescale/qoriq-fman3-0-10g-0.dtsi b/arch/arm64/boot/dts/freescale/qoriq-fman3-0-10g-0.dtsi
-index 1b2b20c6126d..e11c6ddab457 100644
---- a/arch/arm64/boot/dts/freescale/qoriq-fman3-0-10g-0.dtsi
-+++ b/arch/arm64/boot/dts/freescale/qoriq-fman3-0-10g-0.dtsi
-@@ -36,7 +36,8 @@ mdio@f1000 {
- 		compatible = "fsl,fman-memac-mdio";
- 		reg = <0xf1000 0x1000>;
- 
--		pcsphy6: ethernet-phy@0 {
-+		pcsphy6: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/arm64/boot/dts/freescale/qoriq-fman3-0-10g-1.dtsi b/arch/arm64/boot/dts/freescale/qoriq-fman3-0-10g-1.dtsi
-index 55d78f6f7c6c..c8b7f2c61a8f 100644
---- a/arch/arm64/boot/dts/freescale/qoriq-fman3-0-10g-1.dtsi
-+++ b/arch/arm64/boot/dts/freescale/qoriq-fman3-0-10g-1.dtsi
-@@ -36,7 +36,8 @@ mdio@f3000 {
- 		compatible = "fsl,fman-memac-mdio";
- 		reg = <0xf3000 0x1000>;
- 
--		pcsphy7: ethernet-phy@0 {
-+		pcsphy7: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-0.dtsi b/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-0.dtsi
-index 18916a860c2e..1a4bcb38646e 100644
---- a/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-0.dtsi
-+++ b/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-0.dtsi
-@@ -35,7 +35,8 @@ mdio@e1000 {
- 		compatible = "fsl,fman-memac-mdio";
- 		reg = <0xe1000 0x1000>;
- 
--		pcsphy0: ethernet-phy@0 {
-+		pcsphy0: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-1.dtsi b/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-1.dtsi
-index e90af445a293..6a4d55f9d045 100644
---- a/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-1.dtsi
-+++ b/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-1.dtsi
-@@ -35,7 +35,8 @@ mdio@e3000 {
- 		compatible = "fsl,fman-memac-mdio";
- 		reg = <0xe3000 0x1000>;
- 
--		pcsphy1: ethernet-phy@0 {
-+		pcsphy1: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-2.dtsi b/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-2.dtsi
-index fec93905bc81..0de30065aa3b 100644
---- a/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-2.dtsi
-+++ b/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-2.dtsi
-@@ -35,7 +35,8 @@ mdio@e5000 {
- 		compatible = "fsl,fman-memac-mdio";
- 		reg = <0xe5000 0x1000>;
- 
--		pcsphy2: ethernet-phy@0 {
-+		pcsphy2: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-3.dtsi b/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-3.dtsi
-index 2aa953faa62b..2f8064b1039f 100644
---- a/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-3.dtsi
-+++ b/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-3.dtsi
-@@ -35,7 +35,8 @@ mdio@e7000 {
- 		compatible = "fsl,fman-memac-mdio";
- 		reg = <0xe7000 0x1000>;
- 
--		pcsphy3: ethernet-phy@0 {
-+		pcsphy3: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-4.dtsi b/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-4.dtsi
-index 948e39411415..6246f1fdac2d 100644
---- a/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-4.dtsi
-+++ b/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-4.dtsi
-@@ -35,7 +35,8 @@ mdio@e9000 {
- 		compatible = "fsl,fman-memac-mdio";
- 		reg = <0xe9000 0x1000>;
- 
--		pcsphy4: ethernet-phy@0 {
-+		pcsphy4: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
-diff --git a/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-5.dtsi b/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-5.dtsi
-index 01b78c0463a7..c205e1e8bfc8 100644
---- a/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-5.dtsi
-+++ b/arch/arm64/boot/dts/freescale/qoriq-fman3-0-1g-5.dtsi
-@@ -34,7 +34,8 @@ mdio@eb000 {
- 		compatible = "fsl,fman-memac-mdio";
- 		reg = <0xeb000 0x1000>;
- 
--		pcsphy5: ethernet-phy@0 {
-+		pcsphy5: ethernet-pcs@0 {
-+			compatible = "fsl,lynx-pcs";
- 			reg = <0x0>;
- 		};
- 	};
--- 
-2.35.1.1320.gc452695387.dirty
+In this function netdev_err API is being used for error prints.
+
+> +		return -EOPNOTSUPP;
+> +	}
+>   
+>   	*ft = mlx5_create_auto_grouped_flow_table(ns, &ft_attr);
+>   	if (IS_ERR(*ft)) {
 
 
