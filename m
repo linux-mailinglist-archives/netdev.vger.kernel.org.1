@@ -1,92 +1,113 @@
-Return-Path: <netdev+bounces-179207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FA33A7B20E
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 00:31:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5905BA7B220
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 00:50:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E02C3BA1AA
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 22:31:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA5D57A3E5A
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 22:48:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49881AB6F1;
-	Thu,  3 Apr 2025 22:31:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88C518DB29;
+	Thu,  3 Apr 2025 22:49:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Htf1EKTi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/+YNXsc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD29119F416;
-	Thu,  3 Apr 2025 22:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84EC32E62BA
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 22:49:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743719492; cv=none; b=e+8sDc8gJsPaDhJ9wR1aGnYt9fiUme+Iu9U4Au2gbQtJmAzkdeI5riOuS4P/YMMXiFZ/+9oFpOGFodIXVfTPyIm7KvK8sBGh59/S76E6BiaWIYEUygLKr/LEiMYCy/hSSZSlRLUmcdK6ZJKLhuw9LEu12J74orutTQNrwXXDBgg=
+	t=1743720596; cv=none; b=EP1RpY6V91YIfmi8DReCj5JiIo9DyWNhPOZebNMBmn++WqMAjo5QVd5dnO5DCnJGujUyLsKTCFCO+qP4fXZM5ziP/g5KRW+mOMSSO6b5o/X5ODql0AoPZiu/CIJxU1J4uzrPYOeDh633q9DMjaAEKPfGIUz4SxtZQpVjCCWQLPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743719492; c=relaxed/simple;
-	bh=q7aT1Vc9FCJL3FCej7Qo+diDR5o13VyLs2ps027u9VQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HD/DAlSavmh+jvjE8LDRWB48TG8GZBNA8KySz8a8KPNyxDzHvYEG8hKtSP0Prtrn9xtxT6Imrl+aNiCjmkYo9iHUIgUuCvgddPCxgjyRI3efY51fXbE4irrgNmCyz2AdSKeEOjPMs0B/11YRVrm34sdE5pfAB9NjA9SPA0FcrLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Htf1EKTi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A635C4CEE3;
-	Thu,  3 Apr 2025 22:31:30 +0000 (UTC)
+	s=arc-20240116; t=1743720596; c=relaxed/simple;
+	bh=sQWeYNF3NbI8bDYoXRa9NVLEFFi8aMWkfhbqREvAAA8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=cqsg529RPubKzwpegcYRRKFN4YqaNNM2pLNeHDe4KQZ2cr+XBh/W0RjhIFmFTTFNj2WVkgYjbR0m37SwKBngEsdN/s2uE6saO5LCmkrtaaYKEd8WPpRAgQ6PIDUMzSDIwLBmWN1YdVovMD1/YSiTg3r1QFG1Xz1jYGBVy8yT18U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/+YNXsc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03EC8C4CEE3;
+	Thu,  3 Apr 2025 22:49:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743719491;
-	bh=q7aT1Vc9FCJL3FCej7Qo+diDR5o13VyLs2ps027u9VQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Htf1EKTiwevBUPUymLkFuUGQbfKsvyB4rrmwSzMbJK8Y/m0/v0q6tpcET1MnXN4No
-	 s+7bbLHyQGG8IzECdarQuPoOBHhuoFrdFHRIj/UD/8Wq5NTGnOT1W5BpFwN/Oh9wec
-	 Gk21QN/coOp4Da8BO1qw+o8tUURfcZJ4AiyPFO4Kc7avSRMH0ybdosuxga7Tg7V22a
-	 LHKUDGTZmmN3Mb00N3PM0d9jtHHHUzooslffkmBUccQVJnTNHMJXnGgu38hPZ9jHO8
-	 CKMBaRVDJSPqwdt9GdbqbE635vMX6nDVo8UFwIqrHaTSMHdG8B9PTKFqR/SYWm4Z3B
-	 81/zCJ2RElWcA==
-Date: Thu, 3 Apr 2025 15:31:29 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
- <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Simon
- Horman <horms@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Mina
- Almasry <almasrymina@google.com>, Yonglong Liu <liuyonglong@huawei.com>,
- Yunsheng Lin <linyunsheng@huawei.com>, Pavel Begunkov
- <asml.silence@gmail.com>, Matthew Wilcox <willy@infradead.org>,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-mm@kvack.org, Qiuling Ren <qren@redhat.com>, Yuying Ma
- <yuma@redhat.com>
-Subject: Re: [PATCH net-next v6 2/2] page_pool: Track DMA-mapped pages and
- unmap them when destroying the pool
-Message-ID: <20250403153129.013a7bdd@kernel.org>
-In-Reply-To: <20250401-page-pool-track-dma-v6-2-8b83474870d4@redhat.com>
-References: <20250401-page-pool-track-dma-v6-0-8b83474870d4@redhat.com>
-	<20250401-page-pool-track-dma-v6-2-8b83474870d4@redhat.com>
+	s=k20201202; t=1743720596;
+	bh=sQWeYNF3NbI8bDYoXRa9NVLEFFi8aMWkfhbqREvAAA8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=D/+YNXscqJcXYQLjIwaJR3U6ZtupslAQTE+yhkdZtvaYCnXeO4LqgLNQ3Cm7kZb/O
+	 hSKZg/h67KTnAQ+ukyYvqQZE74mOpjSGL0p90WQhNEddXaRNHl2+Fn4PUkepjqKetX
+	 ZQ37xItklF58NvCpKxohdKWouTSBA7R9QJFRg2yv8V4jBLvshy8D0LT4I+vWt0c+HV
+	 LpJ7uNmrkRKrBWHI0slz9ufmSgO8fGHnVV9W5sAvcCyKlxkNhi/izKpzRiFPCYaEvd
+	 YZ7EeuaqXYlsZxtm8O4vp2crlvEPFdft/FX9M0/eWQ8OjAl4OSk8BQaqQ9B55bzoFu
+	 G2LlWR7PNhuJA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D80380664C;
+	Thu,  3 Apr 2025 22:50:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v5 00/11] net: hold instance lock during
+ NETDEV_UP/REGISTER
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174372063301.2709734.14320566471718210495.git-patchwork-notify@kernel.org>
+Date: Thu, 03 Apr 2025 22:50:33 +0000
+References: <20250401163452.622454-1-sdf@fomichev.me>
+In-Reply-To: <20250401163452.622454-1-sdf@fomichev.me>
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
 
-On Tue, 01 Apr 2025 11:27:19 +0200 Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> +	if (err) {
-> +		WARN_ONCE(1, "couldn't track DMA mapping, please report to netdev@");
->  		goto unmap_failed;
+Hello:
 
-FWIW I second Pavel's concern about the warning being too drastic.
-I have the feeling Meta's fleet will hit this.
-How about WARN_ONCE(err !=3D -ENOMEM, ... ? I presume you care mostly
-about the array filling up so -EBUSY
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> +	}
-> =20
-> +	if (page_pool_set_dma_addr_netmem(netmem, dma)) {
-> +		WARN_ONCE(1, "unexpected DMA address, please report to netdev@");
-> +		goto unmap_failed;
-> +	}
+On Tue,  1 Apr 2025 09:34:41 -0700 you wrote:
+> Solving the issue reported by Cosmin in [0] requires consistent
+> lock during NETDEV_UP/REGISTER notifiers. This series
+> addresses that (along with some other fixes in net/ipv4/devinet.c
+> and net/ipv6/addrconf.c) and appends the patches from Jakub
+> that were conditional on consistent locking in NETDEV_UNREGISTER.
+> 
+> 0: https://lore.kernel.org/netdev/700fa36b94cbd57cfea2622029b087643c80cbc9.camel@nvidia.com/
+> 
+> [...]
 
-I think this is ever so slightly leaking the id, if it ever happens?
+Here is the summary with links:
+  - [net,v5,01/11] net: switch to netif_disable_lro in inetdev_init
+    https://git.kernel.org/netdev/net/c/d2ccd0560d96
+  - [net,v5,02/11] net: hold instance lock during NETDEV_REGISTER/UP
+    https://git.kernel.org/netdev/net/c/4c975fd70002
+  - [net,v5,03/11] net: use netif_disable_lro in ipv6_add_dev
+    https://git.kernel.org/netdev/net/c/8965c160b8f7
+  - [net,v5,04/11] net: rename rtnl_net_debug to lock_debug
+    https://git.kernel.org/netdev/net/c/b912d599d3d8
+  - [net,v5,05/11] netdevsim: add dummy device notifiers
+    https://git.kernel.org/netdev/net/c/1901066aab76
+  - [net,v5,06/11] net: dummy: request ops lock
+    https://git.kernel.org/netdev/net/c/dbfc99495d96
+  - [net,v5,07/11] docs: net: document netdev notifier expectations
+    https://git.kernel.org/netdev/net/c/ee705fa21fdc
+  - [net,v5,08/11] selftests: net: use netdevsim in netns test
+    https://git.kernel.org/netdev/net/c/56c8a23f8a0f
+  - [net,v5,09/11] net: designate XSK pool pointers in queues as "ops protected"
+    (no matching commit)
+  - [net,v5,10/11] netdev: add "ops compat locking" helpers
+    (no matching commit)
+  - [net,v5,11/11] netdev: don't hold rtnl_lock over nl queue info get when possible
+    (no matching commit)
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
