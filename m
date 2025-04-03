@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-179158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38A0FA7AD78
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 22:05:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55948A7AD88
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 22:07:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 330B73BDC5A
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:59:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86FCA18912DC
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 20:02:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B0DE2D4B75;
-	Thu,  3 Apr 2025 19:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A4EB28CF7F;
+	Thu,  3 Apr 2025 19:11:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fxnkyLJ1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gm/7OSR+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C992D4B6D;
-	Thu,  3 Apr 2025 19:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30EEB28CF7B;
+	Thu,  3 Apr 2025 19:11:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743707433; cv=none; b=qezIWiGD6F6/G0SC0R2EXSWtOErFZ7B5ehD4yiOyKPBsr6WTVINYlj5ty0D3AZoukGFNmadiNSc14AuNsi7KhzY03DJz/5SUDfBltaaYGbVVx3bVulvAPXV1avokfkLsLiPid7p4hsjWrFGw6o40kPcSvrcxzaCEs7+x/W7/CHY=
+	t=1743707466; cv=none; b=Cm2o6b04TIH9MXUG53FtH32r8bLLweD5Q0sxXs751ozEsjsWk/QaSxak+x+YtzfQKZo++jQkZgUhKblAW8ETsf6+po6WjZt/im8RURFiHI9ciVO9teWj+YJk32XPBI5n15a/7fEMsRnFlexTZCZB3r3W6ZQL6ItfiKv/REpTImU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743707433; c=relaxed/simple;
-	bh=yXB0wxK1GASHmpvuGZKRg1aOJuQfKJ8rvUUm5RcBOt0=;
+	s=arc-20240116; t=1743707466; c=relaxed/simple;
+	bh=de1jFVQtR3y6oRI9+cUq+fr8n5hKjGQCT92qXxMafS0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RruQdQpNKbjcpO2m8slhpYBE34mSyZT58re383PQ41uZ71qp2RR0SDLZhM6n2pbyndx9Jn75hqVozj4NxlvMuNPAo6hz8CLxam3VGJGrbW8QYC95OmNKghKiUsov8ixpmjBoU8kzvXBVjHqI8oifNLTlXdNIQyGstF0+yBrD6us=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fxnkyLJ1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7023C4CEE3;
-	Thu,  3 Apr 2025 19:10:31 +0000 (UTC)
+	 MIME-Version; b=OR/cujnGM4G2BKEJ5fRlRIYrAXTGjIqMvaDBvTId9GxYmdlHciNwFRJLOnkY/3pizmNHWwcbaRH0F+HAp362WflBwOoKz1kNhptizxvUdtyNw/J9d7g1z7dZzS19zZoM6feTlxrmCRi1EU4ZyYu5BnBQ2cPLnYnLyen4LZWEiAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gm/7OSR+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D7EDC4CEE3;
+	Thu,  3 Apr 2025 19:11:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743707433;
-	bh=yXB0wxK1GASHmpvuGZKRg1aOJuQfKJ8rvUUm5RcBOt0=;
+	s=k20201202; t=1743707466;
+	bh=de1jFVQtR3y6oRI9+cUq+fr8n5hKjGQCT92qXxMafS0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fxnkyLJ19y05Mmb9Uw87Y3eVt5dRznVs6ymjho98sf7zcoOwp7nJ9lsfE3wQ1sWj3
-	 6DxSzdupCt7wRv2HsPlrSSB7n1UZgd4l0BZiynu+1PxdgUA1jylLjaHIHXFt1643XQ
-	 WfyRaehCRLszmjIQ/fA9lOxWH6bcz5pPaHszOY/US3wDtOzsHJw1+DMY3Y3thQ9bQX
-	 STmNsElF0IA/k5oW/vl9JV9vXzX1oB7l3VIEnt24rUBMErPDtaS/mcX79E3Cmsafmi
-	 kt9t0/SknIDqFQq7LoIWVtt/7DsXxjkti3NL/0CLZjXi9J9SnXN01u4ep8m6TqLNIM
-	 k5sZZXzAaVCIQ==
+	b=Gm/7OSR+HmZSWeB61ojQcMBx/ES7Nebb+nzhHPH3Vlg5s+NejTJiVKeWI79P8Vhcr
+	 3O5hCgdFcHa0Ly+UlB02bvKRu5o0VwT52GsBv+EuHoJ4DGeNINcH/y+S1Sc5E4Q3e4
+	 fIm0ppIScagxseCpACSJ/L/JcVxB6a7cdSb83B8X4nCUuSxUcRxyjX6G4wqNGyprAl
+	 7fTTFa0hDFVyDHDnXKyjdtrvzHpG3NEUr6u6Y6qJ9J+avbz11WAp/3Ffc3LOBhpEtS
+	 WXJZLEs18L0PzqLk8lP3/yLjmJv1eQNGf0yL5w7mAvIyXsU8V9F1LZcu4+CcLLMmof
+	 KqBaYkeBa09aQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -55,12 +55,12 @@ Cc: Stanislav Fomichev <sdf@fomichev.me>,
 	aleksander.lobakin@intel.com,
 	kory.maincent@bootlin.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 13/15] net: vlan: don't propagate flags on open
-Date: Thu,  3 Apr 2025 15:10:00 -0400
-Message-Id: <20250403191002.2678588-13-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 12/14] net: vlan: don't propagate flags on open
+Date: Thu,  3 Apr 2025 15:10:34 -0400
+Message-Id: <20250403191036.2678799-12-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250403191002.2678588-1-sashal@kernel.org>
-References: <20250403191002.2678588-1-sashal@kernel.org>
+In-Reply-To: <20250403191036.2678799-1-sashal@kernel.org>
+References: <20250403191036.2678799-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,7 +69,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.235
+X-stable-base: Linux 5.4.291
 Content-Transfer-Encoding: 8bit
 
 From: Stanislav Fomichev <sdf@fomichev.me>
@@ -184,10 +184,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 4 insertions(+), 27 deletions(-)
 
 diff --git a/net/8021q/vlan_dev.c b/net/8021q/vlan_dev.c
-index b7cf430006e55..c134f8210b21b 100644
+index b5384e5fb781d..67bedd3a5128d 100644
 --- a/net/8021q/vlan_dev.c
 +++ b/net/8021q/vlan_dev.c
-@@ -272,17 +272,6 @@ static int vlan_dev_open(struct net_device *dev)
+@@ -273,17 +273,6 @@ static int vlan_dev_open(struct net_device *dev)
  			goto out;
  	}
  
@@ -205,7 +205,7 @@ index b7cf430006e55..c134f8210b21b 100644
  	ether_addr_copy(vlan->real_dev_addr, real_dev->dev_addr);
  
  	if (vlan->flags & VLAN_FLAG_GVRP)
-@@ -296,12 +285,6 @@ static int vlan_dev_open(struct net_device *dev)
+@@ -297,12 +286,6 @@ static int vlan_dev_open(struct net_device *dev)
  		netif_carrier_on(dev);
  	return 0;
  
@@ -218,7 +218,7 @@ index b7cf430006e55..c134f8210b21b 100644
  out:
  	netif_carrier_off(dev);
  	return err;
-@@ -314,10 +297,6 @@ static int vlan_dev_stop(struct net_device *dev)
+@@ -315,10 +298,6 @@ static int vlan_dev_stop(struct net_device *dev)
  
  	dev_mc_unsync(real_dev, dev);
  	dev_uc_unsync(real_dev, dev);
@@ -229,7 +229,7 @@ index b7cf430006e55..c134f8210b21b 100644
  
  	if (!ether_addr_equal(dev->dev_addr, real_dev->dev_addr))
  		dev_uc_del(real_dev, dev->dev_addr);
-@@ -474,12 +453,10 @@ static void vlan_dev_change_rx_flags(struct net_device *dev, int change)
+@@ -475,12 +454,10 @@ static void vlan_dev_change_rx_flags(struct net_device *dev, int change)
  {
  	struct net_device *real_dev = vlan_dev_priv(dev)->real_dev;
  
