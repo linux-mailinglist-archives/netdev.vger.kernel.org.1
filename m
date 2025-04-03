@@ -1,199 +1,204 @@
-Return-Path: <netdev+bounces-179068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2981AA7A576
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 16:42:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6210AA7A588
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 16:44:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6043A1899E17
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 14:39:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F066188B9D1
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 14:42:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8197024EF7E;
-	Thu,  3 Apr 2025 14:39:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6924424EF91;
+	Thu,  3 Apr 2025 14:42:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eAskKQkl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BQhtYpCY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E06762E3386;
-	Thu,  3 Apr 2025 14:39:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB42A24EF7D;
+	Thu,  3 Apr 2025 14:42:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743691157; cv=none; b=RjsbccIMbHhFIYGyZcdWroTK/wEdR9BbmKygPb4lSTQ8Ql4HGkR50w/jQw11Qi8bqFnMDiKHkZsZxFCD78uN2ej5elYJWh/A15s4VeegdxczJoz6UJnmg6QpDZOjcwQ6YM50uer7CUXFSN1s434VWEq2a6NGivDNC/mnUUnafqU=
+	t=1743691342; cv=none; b=ICyYrfwEFo50LNkk1YjJ3dKSs3YQ8YSk783Xe/2n7L85ccRPVE7Hrhxp34IJQaA3j8AhSfVYo6sR5tMQYfRySnCaIyf2aVy3EFFseEZh2f0WNK4Kpn9ONKCqp/mkGmJoYJG9tK8856EobaFv6fNcAO5l0EyeN6K2vPcHpKKgzbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743691157; c=relaxed/simple;
-	bh=dmX8ClR6s2gT1VOXeNIIzH890lXaEbUlMlb3oILAje8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IBwfeOS4YfngygK02SN5AACj7zftNNAQval20PsfpjWo/0fc5KH/p/zqY0yDFuS24gnGHEuLnJLNzwww/bk/f9WBDWLFxyzCz1VWGy3nmvxRejO/gqjvU6QJ8bLao143GSaitXSU7lcQNA/bQLGu0EUyoXP88pLmITwH4CbdTlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eAskKQkl; arc=none smtp.client-ip=209.85.210.171
+	s=arc-20240116; t=1743691342; c=relaxed/simple;
+	bh=Zry1Yrol56/KX1aeEhCxv0Cg25fLUtDNop8HonNdjPM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XMtiw2YCSTYjMG47BE9v5cWT4ovC8hf/xDJ/QogSbNMQwMX6yApPltNLjbRxkdUTL/+LUZ02L4Z564tqnVyG5l28J69Nd1mlcPl4Ux0bO5xzDRdJNGxbuLhcFKeMs52QekYDtRa4fbPl01Wp9nWEW/3t4MAeI1z0QTwdDBwJcec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BQhtYpCY; arc=none smtp.client-ip=209.85.166.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-736b98acaadso1027972b3a.1;
-        Thu, 03 Apr 2025 07:39:15 -0700 (PDT)
+Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-85d9a87660fso88182739f.1;
+        Thu, 03 Apr 2025 07:42:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743691155; x=1744295955; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Rvr0XxDHh05/lDdFnQkqZ5aBAiK03CfkHR41QzNZGHs=;
-        b=eAskKQklC12e/ry9l7cH1ctbUMIvWFD4TYd+Df4dYRw2MC0E39OFsWe5QTt/E3G8GJ
-         r1EWWiYTzJxHSZlI68BwRgwZ+46IkTs3uT4tcRHLY1j/z3zNwjzKXprH36WBLbMTvHnf
-         ULTyq8ufdIImCpA9cL8e3XGNqKwM3VCAldYVJlcYP3+BUbS2e0TdM1A5KI/Tyv1UzYg3
-         JvytZZaGh4Tf9RChBwXBGw/RINa4IV5SnSOvFXopClfhiHY47PwifbYgot1tB9KuYJmI
-         cDnULyHfKNVTfXN2XYwujI4dtEieH0toB5EB20D0Obc+6IRFsH8H0n2jFu8R9XdtV+Tz
-         okxA==
+        d=gmail.com; s=20230601; t=1743691340; x=1744296140; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zeoDb9T68HON4+pT2o4m+OL30KX0Z6zhqrCCdtzjaWI=;
+        b=BQhtYpCYRdqQhScW52gcZgDHo/5auY8GDde5ivG+tpeeFEKQZB/CFa1/IhAhehsapR
+         GDowryAeH/DuEJuC1nT4np75jaS8o9sY+1w2a43olEo4An6ht+JJUYyQ/vF3lgslb24c
+         upHMeouJnIBhyAMQ29eQap398rsmcffO8+w9qUgvt43cdgHtdLt9VcNIM0eoHz/tbieJ
+         YQ3LeFVHABEZq9m0GZKpr5Akgtp6BSRUSWY++cyvGvgZl0aw8TFyEK2Yp0e9OPp21lVq
+         ofSPCkSe9MH4Yq/cgaPj50ojOg7hncxt7pS0dI09fJjNvKr2BA8otPL/sn9J86k8TAf7
+         2ujw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743691155; x=1744295955;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Rvr0XxDHh05/lDdFnQkqZ5aBAiK03CfkHR41QzNZGHs=;
-        b=QZpcmZ6rlls4IJSFgVD+R/YZrrxb9La8xo+Zzyjrwb/yjhOslL1irjMdXFHd1+Areq
-         f49god6HTJ+j3PnViha9kzO+aj7F6pCjcATWGhuUrbu2EAmQ9eZ4kVosVzEZrqD+di6r
-         36gPo3kLhVhFWxfc4TO0YuoHqZ9OlRN9Ti1S2WtoKowm+dyED4KDt+ukNsjkDmBQlZZL
-         /yjoNIkeBd9Sh3QuJMVUC2iO4N9WjS9IZWlbmbe/ZQCuD6KpvH/eT54a8H14Yrp1qIYg
-         Ae3+i4Nyg/bW+yYvb/qSe6d3aONoMRVCoQhl6nA1oi4Vqsv2d7e7bKHkRKS5z8yglDrB
-         YGVg==
-X-Forwarded-Encrypted: i=1; AJvYcCULsmrXYjV3MR8aKW5NGpQGcjvtbX4F4BBKNHzlpS3bMN3Hn6MX06LgrZjP3KwPc/Tr3E+YEOVZL3aANxct@vger.kernel.org, AJvYcCVVyDCqKTv/BVOXJ+ZAog2oZ8DwAeCrnDqvUViBOMJaaHqezE9WY7TkpB72h0SahbJ9hCU=@vger.kernel.org, AJvYcCVkj66LdSHEy530I8aZeqamjYlHjOAQC0YOorcQzb5uzQYa0hPxm17gqf+YcOsJXsZNCnNMgm9jnHqlgyBk6LA=@vger.kernel.org, AJvYcCWNpRm+bZ2OfwF03+IQzwg5IPkmBMz3VUk+ElB9szPqxtmAMMy1YF060H+0+NbJUVF0CyEH4PgoGrTBD88=@vger.kernel.org, AJvYcCXdFDrfQinB7VgtZUO6m4N68JX3qqA8SI8JjIbcMKbrh467BX2yrvUm/d/6RwIl7Rs/oR7zV4eQpdM79WY=@vger.kernel.org, AJvYcCXdosafBjnlO4vBbMVNH6aeN5rve+E5sStyeJq+/u+phIkm+A6YkNmzKNoPe7HayAk3Y7H8SZufmfz4E3Zy@vger.kernel.org, AJvYcCXffW0RFwDS2KuMuQKhgIBFeephHrqFyhlUmUubFc3LOdV0KP1WBvC7NvMwuWP02tVU/Gzo85t5@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOSBzuInOu5hDkoYPKwMEZHPRLnl3GpMhl95fXRinQggvK4oDD
-	bWho26PoaldQOtHBbg4gPY26A88xr/h6C4VlDQMNVhyWj81yFoOT
-X-Gm-Gg: ASbGncuNQ0yG1NE8l6aaInEn9HvjEMCM5LffqR7KdGxE8ggeLV+9Oxhd+x9MxpUTUTo
-	7nNp4gktau9DA5l1rFId/phnTNKKFy3kuDa0CoJXPv5bUXQzllV4OEisf7YUNALiyRHPkAFeGxk
-	4z28sK3bSpMRRQ5CG3X+FFlFcJ2V6OTKLjSVC5EL9vMMqVcQk/fem9tZJcuvqi8iEw0iMG9kxBU
-	pnzkNh5Hsqc1D2OmGLD07lKcZZGDWr8bUHoTlS9uo/V8nu7Z4WSoub9K0rb+to5DPprljtQMQnl
-	UacM/tsauEhwUr33g0qoEFSlwtuuhT7fcTV3glcZrZPW8tl7jvrUrt1LsvWvIDWmW1w0cFD2
-X-Google-Smtp-Source: AGHT+IEBLhxF2I4CcVDE0Ip1aaBG/9qxfajK2d8loqdQY51JgxIHQayN0kr/iRs9O5E0K4MztoDo5g==
-X-Received: by 2002:a05:6a20:6f04:b0:1fd:e9c8:cf3b with SMTP id adf61e73a8af0-200e4cc69c1mr11499641637.30.1743691154910;
-        Thu, 03 Apr 2025 07:39:14 -0700 (PDT)
-Received: from visitorckw-System-Product-Name ([140.113.216.168])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af9bc2d331csm1285435a12.12.2025.04.03.07.39.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Apr 2025 07:39:13 -0700 (PDT)
-Date: Thu, 3 Apr 2025 22:39:03 +0800
-From: Kuan-Wei Chiu <visitorckw@gmail.com>
-To: "H. Peter Anvin" <hpa@zytor.com>, Yury Norov <yury.norov@gmail.com>
-Cc: Yury Norov <yury.norov@gmail.com>,
-	David Laight <david.laight.linux@gmail.com>,
-	Andrew Cooper <andrew.cooper3@citrix.com>,
-	Laurent.pinchart@ideasonboard.com, airlied@gmail.com,
-	akpm@linux-foundation.org, alistair@popple.id.au,
-	andrew+netdev@lunn.ch, andrzej.hajda@intel.com,
-	arend.vanspriel@broadcom.com, awalls@md.metrocast.net, bp@alien8.de,
-	bpf@vger.kernel.org, brcm80211-dev-list.pdl@broadcom.com,
-	brcm80211@lists.linux.dev, dave.hansen@linux.intel.com,
-	davem@davemloft.net, dmitry.torokhov@gmail.com,
-	dri-devel@lists.freedesktop.org, eajames@linux.ibm.com,
-	edumazet@google.com, eleanor15x@gmail.com,
-	gregkh@linuxfoundation.org, hverkuil@xs4all.nl,
-	jernej.skrabec@gmail.com, jirislaby@kernel.org, jk@ozlabs.org,
-	joel@jms.id.au, johannes@sipsolutions.net, jonas@kwiboo.se,
-	jserv@ccns.ncku.edu.tw, kuba@kernel.org, linux-fsi@lists.ozlabs.org,
-	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
-	linux-serial@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linux@rasmusvillemoes.dk, louis.peens@corigine.com,
-	maarten.lankhorst@linux.intel.com, mchehab@kernel.org,
-	mingo@redhat.com, miquel.raynal@bootlin.com, mripard@kernel.org,
-	neil.armstrong@linaro.org, netdev@vger.kernel.org,
-	oss-drivers@corigine.com, pabeni@redhat.com,
-	parthiban.veerasooran@microchip.com, rfoss@kernel.org,
-	richard@nod.at, simona@ffwll.ch, tglx@linutronix.de,
-	tzimmermann@suse.de, vigneshr@ti.com, x86@kernel.org
-Subject: Re: [PATCH v3 00/16] Introduce and use generic parity16/32/64 helper
-Message-ID: <Z+6dh1ZVIKWWOKaP@visitorckw-System-Product-Name>
-References: <20250307195310.58abff8c@pumpkin>
- <EB85C3C1-8A0D-4CB9-B501-BFEABDF3E977@zytor.com>
- <Z824SgB9Dt5zdWYc@visitorckw-System-Product-Name>
- <Z9CyuowYsZyez36c@thinkpad>
- <80771542-476C-493E-858A-D2AF6A355CC1@zytor.com>
- <Z9GtcNJie8TRKywZ@thinkpad>
- <Z9G2Tyypb3iLoBjn@visitorckw-System-Product-Name>
- <Z9KMKwnZXA2mkD2s@visitorckw-System-Product-Name>
- <Z+AlyB461xwMxMtG@visitorckw-System-Product-Name>
- <eec0dfd7-5e4f-4a08-928c-b7714dbc4a17@zytor.com>
+        d=1e100.net; s=20230601; t=1743691340; x=1744296140;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zeoDb9T68HON4+pT2o4m+OL30KX0Z6zhqrCCdtzjaWI=;
+        b=bC3Zs6BUCUUrKEHnn0BJULI2jG5bSj5r89VOdMZmjxb/StoMgo64Y67nh4jMm0AC3+
+         dGJ3byA7OydJdnYVqfCb/U4kggcbQOAd07by1HYeMmllUjgRmszvIk1J0FuM0nbs1WxH
+         4aZWEXD8W0Wch5X9vFE/Lw7GkWDfrIJjp3Z0cVgVcMfqje0qwRgBwHpl1QaakHHYVCwy
+         fuDhvnayI9O7oxnbH+juiVFkTgilHCFsLQvLrPWOEFS0HBDhfsM5TQtnKblXH0VBLHBS
+         ath39NjM8HDc2H48prDczRncsvPgJshNC6RbLBgLsvvUcsLjEGIVFAa+JgX9KX4gXo4U
+         Eugw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/kKh0odlXTDynai+yrkQcKAawUK9I9EeBVFr6vW4nHiDoQk+3YJMNCmJRPnH5zaTmsd5xiqPmHHxlExk=@vger.kernel.org, AJvYcCU3TKQ1IkHJ2ajPLk26UX2ARtb4YYVY7IQMozyjxgle4VYjtCpYDv3nns/DemTGeSkL4dL1uNixhwzqBg==@vger.kernel.org, AJvYcCUOx9wAftOQxRKmjfWP/i3lkLCtn8p3aV2DQUKcAygwHvv0TgTkXr+2MirsozjO1F8Oa6CY4q7C@vger.kernel.org, AJvYcCVBUyPMKsnlOdJE8l3RuqsGl95e19cbaXahXMMnUwOSjIG8U26Tq4L0zNy8J0DD47sEfUsFEcWL@vger.kernel.org
+X-Gm-Message-State: AOJu0YyP5cDwBqSOfTLcWhZ6iGnhnNgOwpIvkQ1/rQaQs1QpTybGWdSK
+	T30yeBWD4dN5dE3J6/8pZ5WFp4AdEfGXgbbjPWF4RdK5Tzlwy70goYoH40GcIl25mKVAyQXMetP
+	hDl3HueZwwmuxYOEfDgeFJ2PO+pI=
+X-Gm-Gg: ASbGncsYJxVHC1hzxNXSDHFsq/5RJbK5ntvz/50NdOQHLRISp3VT1nbT8BwfpUNtC9Q
+	69fQT/OF+/IyEjuUsV7AOv75GPIG95V6nry+Z40RIkWrLnPuPw4Mt+SptEZjZD2xX1ho4Bm0nTu
+	Y2TBhPjrVMJ3JfOUq/XFQNR4DNqYHozP3hN3dYrvbFaCQMIh7WNzHBYV311OU=
+X-Google-Smtp-Source: AGHT+IGNRyxDi7DahaAnymdSbr7DQycN0ZdLw//2LEvSHgTrzxm8aOaPQKMKp2kUdY5SWnF/e0614nQcpCl/EzjRxG4=
+X-Received: by 2002:a05:6e02:12ec:b0:3d6:d179:a182 with SMTP id
+ e9e14a558f8ab-3d6dd824cb5mr37846045ab.20.1743691339808; Thu, 03 Apr 2025
+ 07:42:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <eec0dfd7-5e4f-4a08-928c-b7714dbc4a17@zytor.com>
+References: <20250402-kasan_slab-use-after-free_read_in_sctp_outq_select_transport-v1-1-da6f5f00f286@igalia.com>
+ <CADvbK_dTX3c9wgMa8bDW-Hg-5gGJ7sJzN5s8xtGwwYW9FE=rcg@mail.gmail.com> <87tt75efdj.fsf@igalia.com>
+In-Reply-To: <87tt75efdj.fsf@igalia.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Thu, 3 Apr 2025 10:42:08 -0400
+X-Gm-Features: ATxdqUHaFX6L76fecmJqYz3mIbUdj6YZ5tkatolAjwkKUce-j3bzGLhgqW-KjgY
+Message-ID: <CADvbK_c69AoVyFDX2YduebF9DG8YyZM7aP7aMrMyqJi7vMmiSA@mail.gmail.com>
+Subject: Re: [PATCH] sctp: check transport existence before processing a send primitive
+To: =?UTF-8?Q?Ricardo_Ca=C3=B1uelo_Navarro?= <rcn@igalia.com>
+Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, kernel-dev@igalia.com, linux-sctp@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 25, 2025 at 12:43:25PM -0700, H. Peter Anvin wrote:
-> On 3/23/25 08:16, Kuan-Wei Chiu wrote:
-> > 
-> > Interface 3: Multiple Functions
-> > Description: bool parity_odd8/16/32/64()
-> > Pros: No need for explicit casting; easy to integrate
-> >        architecture-specific optimizations; except for parity8(), all
-> >        functions are one-liners with no significant code duplication
-> > Cons: More functions may increase maintenance burden
-> > Opinions: Only I support this approach
-> > 
-> 
-> OK, so I responded to this but I can't find my reply or any of the
-> followups, so let me go again:
-> 
-> I prefer this option, because:
-> 
-> a. Virtually all uses of parity is done in contexts where the sizes of the
-> items for which parity is to be taken are well-defined, but it is *really*
-> easy for integer promotion to cause a value to be extended to 32 bits
-> unnecessarily (sign or zero extend, although for parity it doesn't make any
-> difference -- if the compiler realizes it.)
-> 
-> b. It makes it easier to add arch-specific implementations, notably using
-> __builtin_parity on architectures where that is known to generate good code.
-> 
-> c. For architectures where only *some* parity implementations are
-> fast/practical, the generic fallbacks will either naturally synthesize them
-> from components via shift-xor, or they can be defined to use a larger
-> version; the function prototype acts like a cast.
-> 
-> d. If there is a reason in the future to add a generic version, it is really
-> easy to do using the size-specific functions as components; this is
-> something we do literally all over the place, using a pattern so common that
-> it, itself, probably should be macroized:
-> 
-> #define parity(x) 				\
-> ({						\
-> 	typeof(x) __x = (x);			\
-> 	bool __y;				\
-> 	switch (sizeof(__x)) {			\
-> 		case 1:				\
-> 			__y = parity8(__x);	\
-> 			break;			\
-> 		case 2:				\
-> 			__y = parity16(__x);	\
-> 			break;			\
-> 		case 4:				\
-> 			__y = parity32(__x);	\
-> 			break;			\
-> 		case 8:				\
-> 			__y = parity64(__x);	\
-> 			break;			\
-> 		default:			\
-> 			BUILD_BUG();		\
-> 			break;			\
-> 	}					\
-> 	__y;					\
-> })
+On Thu, Apr 3, 2025 at 5:58=E2=80=AFAM Ricardo Ca=C3=B1uelo Navarro <rcn@ig=
+alia.com> wrote:
 >
-Thank you for your detailed response and for explaining the rationale
-behind your preference. The points you outlined in (a)–(d) all seem
-quite reasonable to me.
+> Thanks for reviewing, answers below:
+>
+> On Wed, Apr 02 2025 at 15:40:56, Xin Long <lucien.xin@gmail.com> wrote:
+> > The data send path:
+> >
+> >   sctp_endpoint_lookup_assoc() ->
+> >   sctp_sendmsg_to_asoc()
+> >
+> > And the transport removal path:
+> >
+> >   sctp_sf_do_asconf() ->
+> >   sctp_process_asconf() ->
+> >   sctp_assoc_rm_peer()
+> >
+> > are both protected by the same socket lock.
+> >
+> > Additionally, when a path is removed, sctp_assoc_rm_peer() updates the
+> > transport of all existing chunks in the send queues (peer->transmitted
+> > and asoc->outqueue.out_chunk_list) to NULL.
+> >
+> > It will be great if you can reproduce the issue locally and help check
+> > how the potential race occurs.
+>
+> That's true but if there isn't enough space in the send buffer, then
+> sctp_sendmsg_to_asoc() will release the lock temporarily.
+>
+Oh right, I missed that. Thanks.
 
-Yury,
-do you have any feedback on this?
-Thank you.
+> The scenario that the reproducer generates is the following:
+>
+>         Thread A                                  Thread B
+>         --------------------                      --------------------
+> (1)     sctp_sendmsg()
+>           lock_sock()
+>           sctp_sendmsg_to_asoc()
+>             sctp_wait_for_sndbuf()
+>               release_sock()
+>                                                   sctp_setsockopt(SCTP_SO=
+CKOPT_BINDX_REM)
+>                                                     lock_sock()
+>                                                     sctp_setsockopt_bindx=
+()
+>                                                     sctp_send_asconf_del_=
+ip()
+>                                                       ...
+>                                                     release_sock()
+>                                                       process rcv backlog=
+:
+>                                                         sctp_do_sm()
+>                                                           sctp_sf_do_asco=
+nf()
+>                                                             ...
+>                                                               sctp_assoc_=
+rm_peer()
+>               lock_sock()
+> (2)          chunk->transport =3D transport
+>              sctp_primitive_SEND()
+>                ...
+>                sctp_outq_select_transport()
+> *BUG*            switch (new_transport->state)
+>
+>
+> Notes:
+> ------
+>
+> Both threads operate on the same socket.
+>
+> 1. Here, sctp_endpoint_lookup_assoc() finds and returns an existing
+> association and transport.
+>
+> 2. At this point, `transport` is already deleted. chunk->transport is
+> not set to NULL because sctp_assoc_rm_peer() ran _before_ the transport
+> was assigned to the chunk.
+>
+> > We should avoid an extra hashtable lookup on this hot TX path, as it wo=
+uld
+> > negatively impact performance.
+>
+> Good point. I can't really tell the performance impact of the lookup
+> here, my experience with the SCTP implementation is very limited. Do you
+> have any suggestions or alternatives about how to deal with this?
+>
+I think the correct approach is to follow how sctp_assoc_rm_peer()
+handles this.
 
-Regards,
-Kuan-Wei
+You can use asoc->peer.last_sent_to (which isn't really used elsewhere)
+to temporarily store the transport before releasing the socket lock and
+sleeping in sctp_sendmsg_to_asoc(). After waking up and reacquiring the
+lock, restore the transport back to asoc->peer.last_sent_to.
 
+Additionally, during an ASCONF update, ensure asoc->peer.last_sent_to
+is set to a valid transport if it matches the transport being removed.
+
+For example:
+
+in sctp_wait_for_sndbuf():
+
+    asoc->peer.last_sent_to =3D *tp;
+    release_sock(sk);
+    current_timeo =3D schedule_timeout(current_timeo);
+    lock_sock(sk);
+    *tp =3D asoc->peer.last_sent_to;
+    asoc->peer.last_sent_to =3D NULL;
+
+in sctp_assoc_rm_peer():
+
+    if (asoc->peer.last_sent_to =3D=3D peer)
+        asoc->peer.last_sent_to =3D transport;
 
