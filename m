@@ -1,184 +1,291 @@
-Return-Path: <netdev+bounces-179009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B026CA79FFA
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 11:25:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 703BDA7A019
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 11:34:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28BBF188E6F6
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 09:25:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35F483B60D4
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 09:33:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1D36224891;
-	Thu,  3 Apr 2025 09:25:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39804245018;
+	Thu,  3 Apr 2025 09:33:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b="iVDWoYI+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JNIGSAqD"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2057.outbound.protection.outlook.com [40.107.241.57])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC4A1F12F1
-	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 09:24:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.241.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743672301; cv=fail; b=hs5OtQCnjrc7WtFQlRYEw46c2typhBO+7s1sI72Ie2vQ5Nrv87Psj6vqz0pau3YTSwVhQd7rifL+TOKt+zjG21pFsmsJmMeZHS+4KrH06lKqrKvxozlzxLgRzIAdlHzsCED+aYH2ywNT8hOQCoh7SITi5kZI4ns5qeNGFHFC+LE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743672301; c=relaxed/simple;
-	bh=WAqZWBaFYNwP3g1Iis+UPxY+zGoQckJmNBSE0r+b+lw=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=S3meOejNGgRq9fa7eTNAZYLvjU0vYfFZfYo6SkdO1tDetj0XD9dVriyaxH26QsiXecwC/eKryLi7cb2Gzs3XFzzxxeK7noey4vtqVPaAY1hU1k/XfzzcxZOEeAQq0AWTqEXs3T7pj7x0v4caMdcTk2a26cFwtzGoKc14fa89RvY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (2048-bit key) header.d=est.tech header.i=@est.tech header.b=iVDWoYI+; arc=fail smtp.client-ip=40.107.241.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=est.tech
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=E8EWJM9flDLTKLU6lxgu66PdIQPegJz4pk3dAEhtjlBuqxFBR/0+0EcFeQ7ajZtgykkKHdC5EN+CWlGr+bBaTHYhma/EKmM3ki/mtXkkSKAED/UC0d6Exj7hBJxZS8C5iMdvf/MHMC537MWWVOF1M11zFEYR18ovVHUJ2j1Q06yO4s4iVhh049pFbyKxivfW/52xbVHH3x24hwxhXBA0gOKaQv3GlnfYwZ2NjXA0oqmio27XD6FAk2YidiEfy0eL0oWD4YLwxBL/WIEOrAC7dic7qwoK6zqlRLyj+vUgoT5g1NIvpJnTUgzjsjBNu4IiS48yASSGWeH7hUCYDqhBng==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qT7zT1hEuzYyQwZCdh7i0CzTLFqLmKqH/p2fNwejFZ8=;
- b=xxNzxXLkGItQ0Kwv+AprIPX/d1aMj4mJn11MJaVxE7PE8kSMdTQrD8aTVE8kedZEHxNSW3eJYq80xBO7dTtzzkK7VQ/ExDQqu1R+aQnKz+pMLesgGW5Tcmm9sqDb9cBA9BLZpiZRzhgymLy/38M83M4lqT6hO5IwfaaEE9FHSoHayEdX4U3BLc+i4/4IsubNWwnpubWyve3EsqVSrC6+KlyUvJB/1dNrVGpYLwY/0GkZhiFqvqSoUVDyozI+h0Ri35tczU2FDTHLIDU5JDI+oEETTtLVpnxRDSekyIyP9V9jOaMK0e1TDPKyPapSFIw6G8caf1yXXQHxDIZQlZNXbA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
- dkim=pass header.d=est.tech; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qT7zT1hEuzYyQwZCdh7i0CzTLFqLmKqH/p2fNwejFZ8=;
- b=iVDWoYI+soqiRIl4McWCpkGwAd6mjW271XMKVg6q5VTDOvXRpQcZefINmEPOUhokQ7gDejXDEoQvpZ2h3SuzkQo5ntXcjJ6lG3hdcHyZX4CHSX5mtJhH8xuDGXVloAxucBTTM9F8nKkpSSdPo6MQUewwXvIyzXKDa0vRYZhBl8wpvWbvIUfuzC2WIdvQZ8Fdf+dX0CJj2z4npl+bnAM4RyGVV/Pe4X682ta815zznbwDz1MeDday4ACG1lty4wAlU9tgGz7JXbNNwtAMqN4nvSElakxbh+s+sRY2schl9IvVdCubOzQUDrlcxta90cXKy/ACmnsgrRJAighzDFEp8A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=est.tech;
-Received: from PRAP189MB1897.EURP189.PROD.OUTLOOK.COM (2603:10a6:102:290::22)
- by GV1P189MB2218.EURP189.PROD.OUTLOOK.COM (2603:10a6:150:9e::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.44; Thu, 3 Apr
- 2025 09:24:54 +0000
-Received: from PRAP189MB1897.EURP189.PROD.OUTLOOK.COM
- ([fe80::91d:6a2d:65d3:3da4]) by PRAP189MB1897.EURP189.PROD.OUTLOOK.COM
- ([fe80::91d:6a2d:65d3:3da4%4]) with mapi id 15.20.8534.043; Thu, 3 Apr 2025
- 09:24:54 +0000
-From: Tung Nguyen <tung.quang.nguyen@est.tech>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	jmaloy@redhat.com,
-	Tung Nguyen <tung.quang.nguyen@est.tech>
-Subject: [PATCH net] tipc: fix memory leak in tipc_link_xmit
-Date: Thu,  3 Apr 2025 09:24:31 +0000
-Message-Id: <20250403092431.514063-1-tung.quang.nguyen@est.tech>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SG2PR01CA0157.apcprd01.prod.exchangelabs.com
- (2603:1096:4:28::13) To PRAP189MB1897.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:102:290::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 583D2243364
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 09:33:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743672806; cv=none; b=VP29RGNZpOLk+T9Arhdbwoy91aAL4MqhHn7R95E1rcPPX2jUfm7NcN58oCR/7Wa2YHOLpJ1TQU6rAI+q7JEqZmFLMFeLf/KV5grrsZzDaGT/O0p+w744TZXDTOMAfpYaj8T+4er2gYJZ6tbFj7h//x1ElkDyXhQCaMzgvdmJm9s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743672806; c=relaxed/simple;
+	bh=LH9g7+QOO+5iyOXAKlu6xac6HnVSx+io/5yzLBo5fnY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ip0SN7PCF6kK+/nt4VOH0m1YJ8oHNM6oqTpE39Ihm4+7Kcrq1IBzQN1wjuUR0CePTbrch+cA0ThHbKx7hBww8cKQGZ/f2CTT8iDIpyCy749n6a/mQtER82re7RAdSSNLgyn9Yip2BUG5457BiDUcCoCXCfYc3T0XvZNoWGwOBks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JNIGSAqD; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743672803;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4sThZhr8FIHFH8ocyys2dja74pOa3boFKyAWA+JFfOI=;
+	b=JNIGSAqD1g0tVf2YoZnt5rKIf66f8x+TO5R8VdqRHunC0puT/rSJSTbkQwZtQiAVUaf+3q
+	Xh2P38aGtTJnMsttpGuIWaf/YvuM2q5DPgWxZmUIB6p/+s9/1hJNtdZ0C8rFkNUmBNIg0M
+	+XukismG1tA+8cUzvsdLRLrTltoBUNM=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-107-p_GheG9gNLWSvvAsSVI6Pg-1; Thu, 03 Apr 2025 05:33:21 -0400
+X-MC-Unique: p_GheG9gNLWSvvAsSVI6Pg-1
+X-Mimecast-MFC-AGG-ID: p_GheG9gNLWSvvAsSVI6Pg_1743672800
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3912fc9861cso305309f8f.1
+        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 02:33:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743672800; x=1744277600;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4sThZhr8FIHFH8ocyys2dja74pOa3boFKyAWA+JFfOI=;
+        b=E9f3SyDBvYfaavRYdQEX4fURaHbG0Z/iSfXIZq+1M3OQlrchOhtywzA5jTrxkOgJX/
+         sGbK/rABMacyyJZsDkobB70GmJ23xs6Ik1ZlXv/r1ChAaQshVT1SHsCky6MVik+J6yDR
+         1TszVo9sb5ItoH0aF6BilU3L7KRGrV6BDrW/kRNUF0lZexFlmN8FmczAmcmoPkJrUVC6
+         ReLoeUKTIGk+SmMgiY4Y3icGfm9TYLInzms8I3eycJBoQva5F6tufvvYBium7bS6Kw+J
+         dwJsXyl+vJQILspZDbBp3N0Uf7jSMZezf3CzCP9sLZVIpx7RekEG6hezY+xgWowi/Au3
+         cmWA==
+X-Forwarded-Encrypted: i=1; AJvYcCU2l+O6Az+jXyo0LvJcuwZ+IlrwaaVCg5jOY7Fur0Amt9bUVj2TJWzdxbJ/YTjkhDVCR2bke9s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6TvTEj4GY7Sh4lglsbg8KhggtxS8/ewH5QGSO8Yq+W3ItTILk
+	ZBGUYzn2ncWKeeh9w6aIVKXIPMDQsWi1fENZd+o8ZOG1O1vWV9ebt7xlAKv+zxunoJxKvs6vEdQ
+	WjqOgIvOXszvalN+iKJ05/SKmlvyyvbLO6bHWjxsatywXEcMrp6C5sQ==
+X-Gm-Gg: ASbGncscPRwvDkMBhtdjLS8o70dq9Z6jKgBUIDhC7f8oS4QA/bLwR7c2uVjt45zR9U/
+	gKxkgDaUWb19/io0ZIpS28e3uJwqFBj6RpPDOFxXcs6LNc9PXSJtH/ebJj8oDv7aqiaA1bK8QaL
+	VtyqnB3l2CXqWUd18AHD+aYTuGpr1jNv3kXUwoyKRCQ0NK5KqRvPmE8MfixAriLjo2S11uOIAKZ
+	7qP0HOtn6JDLxNhmzzLNoWQ9+SZeRSobLJYsbQSBm719Fba0XZ8Sif4nJno3ctQ0rfGEGQgIVd8
+	3PbGOQMwBdS6AWWRjhwXCWDGGxu1xns23i10fO5oLXY5EwFEJGNgcg/FLHE=
+X-Received: by 2002:a5d:59a9:0:b0:397:8f09:600 with SMTP id ffacd0b85a97d-39c120dc885mr17363650f8f.13.1743672800217;
+        Thu, 03 Apr 2025 02:33:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE4vxZl4LLon5hCph3Xcs7lAFUmmbHfNQzzEHDWPTgxlqRHCfjkIkKq1EFJXLE6RtiycnXaaQ==
+X-Received: by 2002:a5d:59a9:0:b0:397:8f09:600 with SMTP id ffacd0b85a97d-39c120dc885mr17363594f8f.13.1743672799604;
+        Thu, 03 Apr 2025 02:33:19 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-11-6-59.retail.telecomitalia.it. [87.11.6.59])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c301a7586sm1307915f8f.38.2025.04.03.02.33.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Apr 2025 02:33:19 -0700 (PDT)
+Date: Thu, 3 Apr 2025 11:33:14 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Bryan Tan <bryan-bt.tan@broadcom.com>, 
+	Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, "David S. Miller" <davem@davemloft.net>, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] vsock: add namespace support to vhost-vsock
+Message-ID: <4c2xz3xhpdjvb6jmdw7ctsebpza5lcs4gevr5wlwwyt64usr2i@o5qt2msfyvvw>
+References: <20250312-vsock-netns-v2-0-84bffa1aa97a@gmail.com>
+ <r6a6ihjw3etlb5chqsb65u7uhcav6q6pjxu65iqpp76423w2wd@kmctvoaywmbu>
+ <Z-w47H3qUXZe4seQ@redhat.com>
+ <Z+yDCKt7GpubbTKJ@devvm6277.cco0.facebook.com>
+ <CAGxU2F7=64HHaAD+mYKYLqQD8rHg1CiF1YMDUULgSFw0WSY-Aw@mail.gmail.com>
+ <Z-0BoF4vkC2IS1W4@redhat.com>
+ <Z+23pbK9t5ckSmLl@devvm6277.cco0.facebook.com>
+ <Z+26A3sslT+w+wOI@devvm6277.cco0.facebook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PRAP189MB1897:EE_|GV1P189MB2218:EE_
-X-MS-Office365-Filtering-Correlation-Id: faa22719-b253-41b7-e635-08dd72916436
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?lEQ6B9Niymx43amhfgvuT9F9H9VYeEg7Asm0c6D9Q3cxGBzE8Uj6ZwC1I2m+?=
- =?us-ascii?Q?cvjmSvS6cOcuCzRDl4PcwWlOGEyi+Q9SlGxa5mZgc80kMNVvMYL02bRYTQlz?=
- =?us-ascii?Q?VJwci4nphvTj1vGLEbIqN2f/ewSwlU3039B+AEQ3fYqPbMV2zqzwUXkrZfVe?=
- =?us-ascii?Q?LPMbZaKDnpUXfy/aDZpvDdxNrDq4IwQIA5FBZzvC95tAQkTwoYLn3dzIaigT?=
- =?us-ascii?Q?o3B0xetI3Xb5czAqSuoVZohzI9IuoeH0r00KYWEiVenVJjeGCRECGzBUUcsT?=
- =?us-ascii?Q?zztvOYyqph5LvI/WS3sLm19y+0/UUQQ4qVgmx3wRvPcf+gZCiDH90/hvy2eU?=
- =?us-ascii?Q?C4IRXO7crBH1bwxDw0IqKjxZBjkrFCdpsIdhpcGxn2tkVyipfxFwoGInz/an?=
- =?us-ascii?Q?INold7Q0kR+x6MdDOY81IxtXFXcvP1YVZTHKJQCpW9R0rXOYPFbwYv0UVcAv?=
- =?us-ascii?Q?ki0EdjC27W9wEYRjtkpEPz3RhZ6IB0EQgeoDwn6T82W+ddwVV1YQbxxyIBMB?=
- =?us-ascii?Q?zKtvHwmgXajdoIDurXBrzAIjfjwZ9TBSyaJeCfJVZ7XNyTcTmYmqzE/W01F0?=
- =?us-ascii?Q?s/uZX0Bk4xwC2q2JldmR5zZji8LzGmEjyQDgFn2So4iOvLJRQK9hvJvaVtCe?=
- =?us-ascii?Q?S0KAz22MJUGKYtU5BgjPBJJSR4N2BZP4H8gJRH7siRmmeoIl2aUQbKSQCrka?=
- =?us-ascii?Q?O2tCwBcHhA60QKaJTonYImCG+c+HehuDq2Ffz1XdpoC6FGhaCm6qcpEEldtr?=
- =?us-ascii?Q?KuLLd3A+y5/dfS11I7SFfSnRoqJ1pLDV7Y76VfHOmlBnet0wn4J409bspNCL?=
- =?us-ascii?Q?QYU6Yiflzz2oFSgHraEilan4s7D0qcRcFvxlD5o5aW/RxKC2MFYRTKYmTGPL?=
- =?us-ascii?Q?1iHNM/hqMoejA4p6PUbX/A8Py+mDGc/uTuMuh3FVu17Ek4sOZkry9Gh8ZtIV?=
- =?us-ascii?Q?nxo+fNaq9KnoHdXFeWDVvIOL3dhaO8f8b/QEOBsn9YnsYI8p/FVNeudzjSbn?=
- =?us-ascii?Q?0+0OLzC33D+niXmNnfCONedra1gRdF+BB2SOSFJthrfyBviAgAz27hBkYP06?=
- =?us-ascii?Q?+eqSL9XqAIW5KeZtUCQV43745/AbAt4XEvC53rL/FhzTO8i04BS7Amy0tTpr?=
- =?us-ascii?Q?NTOpJBkNo0RMGBN90dBrFXJRcqJ+MBBLsM6MiAKE78SViOTyPYJG/boMsXIV?=
- =?us-ascii?Q?BqpWxplKBCCOk63g8AhtUy1YboRGJmOV3zNa6eveiTleYjDwfT6bJdtBoC6D?=
- =?us-ascii?Q?zlJ/DRz84rVov8au+b57sna9oyfnVEjHMuGve52/MiW0U0WqUcH7jd3+IXQy?=
- =?us-ascii?Q?simk2stClzOg7OhsUhy5JelfCA9k7VAhY+bYyGg+8pbspjP6QnYKYUGjEADN?=
- =?us-ascii?Q?gIhV2yYcC3pY6MwNTvNTyEsyKIsn?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PRAP189MB1897.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?VlIuKj/OuzNqH5S0IwV9kyYEs5jP9FU7B+7G2INGOYGLoS43bqs6XWr+CJJX?=
- =?us-ascii?Q?r7zZ93kaHsYSIyfnNWi+vORxMv8tOkuVnwJOE3xfW9MOerdMtYemifk2O2xi?=
- =?us-ascii?Q?M1poC7P/Q3WGyvgLodBaNR66I9ybVbsJ1K5ZC0acAp4H2xdkot2PmdETtmen?=
- =?us-ascii?Q?r/36JqxkkKzlqQStQar1XkFzSxMaEOFfHpGZA+fUkzZERjNAWknYIBs1FzFG?=
- =?us-ascii?Q?PC6kGRg8Zp5yQb8mQZqy5tmW8A0MINvJRq0OZLLUbTILf6iIhKOYj5B+mPtW?=
- =?us-ascii?Q?bXEDNI+D2Urpnk3IwOAPSNIo3xd/a5MsZmR5x9gVJ1r3o5b5q3I/UDqeXjSK?=
- =?us-ascii?Q?fp0rRtTVzjsLLq/B9HfdH6x+LTlvV1xZV9oOtv6UrPOyNA3TzcyRJcqUsnUs?=
- =?us-ascii?Q?iH8a/tCw36LEEFWvgwb6cv2PgYXzGKbeqLkDHLNrJ18efGGtnhTkAhU66y9P?=
- =?us-ascii?Q?Z/gASYtPuKTrTq9SsiNCllGnc5rYufXQPp22o5Kp1KsRZEdsCPGNaYDjJOFk?=
- =?us-ascii?Q?MxBlgmhnLj8bzRS9v30xMWnEL6hD6uBELLPkUDZX7JaH3Wjh9KYHByIRYcm5?=
- =?us-ascii?Q?INh9s8KwVXIhSWuaRffS7Wdtc1DaJo2ltt8PuJGbKTKb34EXh5v3Ucjk0FH1?=
- =?us-ascii?Q?t3i5iwQxROsy6EXpoVJPXp3jtMb0hKAjcVvHoOPtVHAWLm/3lXDQa07ReqVi?=
- =?us-ascii?Q?RkMc84GffTBr0SBGRUG034EWnC2E3LXhfbChUyTvIoY3wmbTu2QqCScUijmj?=
- =?us-ascii?Q?JOS6oi68HMT49r5nI53VeO+7MzDLZVIcB+Yt2Mgxam/d4vjDSH3bzJuBtzSh?=
- =?us-ascii?Q?yb9vq9BEUG7Sl06+ksv1m6zHaMnQE8Fy7QKG6I7srZrlgZMAq1lCY2sJIOFb?=
- =?us-ascii?Q?0MovLXGhWP9tdxHcRPWhrSgdbRxkd7T6ogNxQVP2EHpgu5t5cjNaTBSjfBOm?=
- =?us-ascii?Q?QRvxClTuJ6hgSQKZrYkJlZEJ0GOsmAlhnvqNi84sKuCl83ZC7kE52giILuVM?=
- =?us-ascii?Q?te96MvtQd90q7S1MN52GL8etd+f7j5g2NEWEgztAJL55MyN00PcQLJn3/HLi?=
- =?us-ascii?Q?HXqdz99DgVi8OMzMfh65uzmRL0OMBT7+wmuVrH9fZgCmt5qRlgsWDvZFJpEN?=
- =?us-ascii?Q?CqGvWtYl4XKOEkIGPqF8F0RiO7HZPR+hXL1XM5eLPKYXp7MN8kHFLI0OJqcs?=
- =?us-ascii?Q?H6jJARe2sTv9EWvX8IuRSaXZ2KK0aCIAweiA8GvykRhJZpdsgzdNOT6DMJgI?=
- =?us-ascii?Q?1GRT39n36DAOAi33VZJO2ahbsU6ULjzkiPd+bwvk/bH79jbFcZEhki+NeQKq?=
- =?us-ascii?Q?qAfPBirnHYEfXJLSkujgqrLHAnU/PkLprEkRql+FvUtK1jiN+xd6+fNz85lQ?=
- =?us-ascii?Q?HP3Htu/oRbU59uoWqzy/K4lcSSB4tpOEZaey+prcUnN4Jxj9/I1uBHLJU0DD?=
- =?us-ascii?Q?zEKm8L/99M36OOI37Hesus9et2VLkNQ6aFBchdd8weGvg8GVz+7HsO8dU04I?=
- =?us-ascii?Q?r/vIiHQhHxOJrLyA8z0g38BWIzcvxAg5xgzVQUcjT1ifRKpmgTLW34k1kPYr?=
- =?us-ascii?Q?r7lbakjPiVumKpJrxeyIK/x79MkY8sZNtr0CKVLDz9jJjZKboIRTmxgP9fKR?=
- =?us-ascii?Q?Lg=3D=3D?=
-X-OriginatorOrg: est.tech
-X-MS-Exchange-CrossTenant-Network-Message-Id: faa22719-b253-41b7-e635-08dd72916436
-X-MS-Exchange-CrossTenant-AuthSource: PRAP189MB1897.EURP189.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2025 09:24:54.4054
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: L6e2sOhGtVpgQ74iV/7lsisGYmHU/lHLgLKg+McrEGix6fCIKRhAPxl6MbtKjfUv7F8Cn8EfBrbSrcv+6uQRUgUhwdbhzfBbc6lnCiea9c8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1P189MB2218
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z+26A3sslT+w+wOI@devvm6277.cco0.facebook.com>
 
-In case the backlog transmit queue for system-importance messages is overloaded,
-tipc_link_xmit() returns -ENOBUFS but the skb list is not purged. This leads to
-memory leak and failure when a skb is allocated.
+On Wed, Apr 02, 2025 at 03:28:19PM -0700, Bobby Eshleman wrote:
+>On Wed, Apr 02, 2025 at 03:18:13PM -0700, Bobby Eshleman wrote:
+>> On Wed, Apr 02, 2025 at 10:21:36AM +0100, Daniel P. Berrangé wrote:
+>> > On Wed, Apr 02, 2025 at 10:13:43AM +0200, Stefano Garzarella wrote:
+>> > > On Wed, 2 Apr 2025 at 02:21, Bobby Eshleman <bobbyeshleman@gmail.com> wrote:
+>> > > >
+>> > > > I do like Stefano's suggestion to add a sysctl for a "strict" mode,
+>> > > > Since it offers the best of both worlds, and still tends conservative in
+>> > > > protecting existing applications... but I agree, the non-strict mode
+>> > > > vsock would be unique WRT the usual concept of namespaces.
+>> > >
+>> > > Maybe we could do the opposite, enable strict mode by default (I think
+>> > > it was similar to what I had tried to do with the kernel module in v1, I
+>> > > was young I know xD)
+>> > > And provide a way to disable it for those use cases where the user wants
+>> > > backward compatibility, while paying the cost of less isolation.
+>> >
+>> > I think backwards compatible has to be the default behaviour, otherwise
+>> > the change has too high risk of breaking existing deployments that are
+>> > already using netns and relying on VSOCK being global. Breakage has to
+>> > be opt in.
+>> >
+>> > > I was thinking two options (not sure if the second one can be done):
+>> > >
+>> > >   1. provide a global sysfs/sysctl that disables strict mode, but this
+>> > >   then applies to all namespaces
+>> > >
+>> > >   2. provide something that allows disabling strict mode by namespace.
+>> > >   Maybe when it is created there are options, or something that can be
+>> > >   set later.
+>> > >
+>> > > 2 would be ideal, but that might be too much, so 1 might be enough. In
+>> > > any case, 2 could also be a next step.
+>> > >
+>> > > WDYT?
+>> >
+>> > It occured to me that the problem we face with the CID space usage is
+>> > somewhat similar to the UID/GID space usage for user namespaces.
+>> >
+>> > In the latter case, userns has exposed /proc/$PID/uid_map & gid_map, to
+>> > allow IDs in the namespace to be arbitrarily mapped onto IDs in the host.
+>> >
+>> > At the risk of being overkill, is it worth trying a similar kind of
+>> > approach for the vsock CID space ?
+>> >
+>> > A simple variant would be a /proc/net/vsock_cid_outside specifying a set
+>> > of CIDs which are exclusively referencing /dev/vhost-vsock associations
+>> > created outside the namespace. Anything not listed would be exclusively
+>> > referencing associations created inside the namespace.
+>> >
+>> > A more complex variant would be to allow a full remapping of CIDs as is
+>> > done with userns, via a /proc/net/vsock_cid_map, which the same three
+>> > parameters, so that CID=15 association outside the namespace could be
+>> > remapped to CID=9015 inside the namespace, allow the inside namespace
+>> > to define its out association for CID=15 without clashing.
+>> >
+>> > IOW, mapped CIDs would be exclusively referencing /dev/vhost-vsock
+>> > associations created outside namespace, while unmapped CIDs would be
+>> > exclusively referencing /dev/vhost-vsock associations inside the
+>> > namespace.
+>> >
+>> > A likely benefit of relying on a kernel defined mapping/partition of
+>> > the CID space is that apps like QEMU don't need changing, as there's
+>> > no need to invent a new /dev/vhost-vsock-netns device node.
+>> >
+>> > Both approaches give the desirable security protection whereby the
+>> > inside namespace can be prevented from accessing certain CIDs that
+>> > were associated outside the namespace.
+>> >
+>> > Some rule would need to be defined for updating the /proc/net/vsock_cid_map
+>> > file as it is the security control mechanism. If it is write-once then
+>> > if the container mgmt app initializes it, nothing later could change
+>> > it.
+>> >
+>> > A key question is do we need the "first come, first served" behaviour
+>> > for CIDs where a CID can be arbitrarily used by outside or inside namespace
+>> > according to whatever tries to associate a CID first ?
+>>
+>> I think with /proc/net/vsock_cid_outside, instead of disallowing the CID
+>> from being used, this could be solved by disallowing remapping the CID
+>> while in use?
+>>
+>> The thing I like about this is that users can check
+>> /proc/net/vsock_cid_outside to figure out what might be going on,
+>> instead of trying to check lsof or ps to figure out if the VMM processes
+>> have used /dev/vhost-vsock vs /dev/vhost-vsock-netns.
 
-This commit fixes this issue by purging the skb list before tipc_link_xmit()
-returns.
+Yes, although the user in theory should not care about this information,
+right?
+I mean I don't even know if it makes sense to expose the contents of
+/proc/net/vsock_cid_outside in the namespace.
 
-Fixes: 365ad353c256 ("tipc: reduce risk of user starvation during link congestion")
-Signed-off-by: Tung Nguyen <tung.quang.nguyen@est.tech>
----
- net/tipc/link.c | 1 +
- 1 file changed, 1 insertion(+)
+>>
+>> Just to check I am following... I suppose we would have a few typical
+>> configurations for /proc/net/vsock_cid_outside. Following uid_map file
+>> format of:
+>> 	"<local cid start>		<global cid start>		<range size>"
 
-diff --git a/net/tipc/link.c b/net/tipc/link.c
-index 50c2e0846ea4..18be6ff4c3db 100644
---- a/net/tipc/link.c
-+++ b/net/tipc/link.c
-@@ -1046,6 +1046,7 @@ int tipc_link_xmit(struct tipc_link *l, struct sk_buff_head *list,
- 	if (unlikely(l->backlog[imp].len >= l->backlog[imp].limit)) {
- 		if (imp == TIPC_SYSTEM_IMPORTANCE) {
- 			pr_warn("%s<%s>, link overflow", link_rst_msg, l->name);
-+			__skb_queue_purge(list);
- 			return -ENOBUFS;
- 		}
- 		rc = link_schedule_user(l, hdr);
--- 
-2.34.1
+This seems to relate more to /proc/net/vsock_cid_map, for
+/proc/net/vsock_cid_outside I think 2 parameters are enough
+(CID, range), right?
+
+>>
+>> 	1. Identity mapping, current namespace CID is global CID (default
+>> 	setting for new namespaces):
+>>
+>> 		# empty file
+>>
+>> 				OR
+>>
+>> 		0    0    4294967295
+>>
+>> 	2. Complete isolation from global space (initialized, but no mappings):
+>>
+>> 		0    0    0
+>>
+>> 	3. Mapping in ranges of global CIDs
+>>
+>> 	For example, global CID space starts at 7000, up to 32-bit max:
+>>
+>> 		7000    0    4294960295
+>> 	
+>> 	Or for multiple mappings (0-100 map to 7000-7100, 1000-1100 map to
+>> 	8000-8100) :
+>>
+>> 		7000    0       100
+>> 		8000    1000    100
+>>
+>>
+>> One thing I don't love is that option 3 seems to not be addressing a
+>> known use case. It doesn't necessarily hurt to have, but it will add
+>> complexity to CID handling that might never get used?
+
+Yes, as I also mentioned in the previous email, we could also do a
+step-by-step thing.
+
+IMHO we can define /proc/net/vsock_cid_map (with the structure you just
+defined), but for now only support 1-1 mapping (with the ranges of
+course, I mean the first two parameters should always be the same) and
+then add option 3 in the future.
+
+>>
+>> Since options 1/2 could also be represented by a boolean (yes/no
+>> "current ns shares CID with global"), I wonder if we could either A)
+>> only support the first two options at first, or B) add just
+>> /proc/net/vsock_ns_mode at first, which supports only "global" and
+>> "local", and later add a "mapped" mode plus /proc/net/vsock_cid_outside
+>> or the full mapping if the need arises?
+
+I think option A is the same as I meant above :-)
+
+>>
+>> This could also be how we support Option 2 from Stefano's last email of
+>> supporting per-namespace opt-in/opt-out.
+
+Hmm, how can we do it by namespace? Isn't that global?
+
+>>
+>> Any thoughts on this?
+>>
+>
+>Stefano,
+>
+>Would only supporting 1/2 still support the Kata use case?
+
+I think so, actually I was thinking something similar in the message I 
+just sent.
+
+By default (if the file is empty), nothing should change, so that's fine 
+IMO. As Paolo suggested, we absolutely have to have tests to verify 
+these things.
+
+Thanks,
+Stefano
 
 
