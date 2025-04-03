@@ -1,204 +1,167 @@
-Return-Path: <netdev+bounces-179069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6210AA7A588
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 16:44:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84ED5A7A5CB
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 16:57:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F066188B9D1
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 14:42:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6EAC3B08F9
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 14:55:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6924424EF91;
-	Thu,  3 Apr 2025 14:42:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79A922500D0;
+	Thu,  3 Apr 2025 14:55:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BQhtYpCY"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="BxUrl5yb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB42A24EF7D;
-	Thu,  3 Apr 2025 14:42:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 619BB2459EE
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 14:55:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743691342; cv=none; b=ICyYrfwEFo50LNkk1YjJ3dKSs3YQ8YSk783Xe/2n7L85ccRPVE7Hrhxp34IJQaA3j8AhSfVYo6sR5tMQYfRySnCaIyf2aVy3EFFseEZh2f0WNK4Kpn9ONKCqp/mkGmJoYJG9tK8856EobaFv6fNcAO5l0EyeN6K2vPcHpKKgzbs=
+	t=1743692157; cv=none; b=kpjxpcXDD0mGOyGhEUTdz2YN7NhP3lHm/+B3M1l2HnuE39wBdb1IcXxSspg+9Z5uQBK35uWuFaOhbe4EOvWt5Qd+TdHS7hBbck4lXnKcEqi5irttamnMKOA20V4Nv96/W8mKAr1frBj7VHyVPzIT/mOoqWrSNWf14XuZSoAOJ4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743691342; c=relaxed/simple;
-	bh=Zry1Yrol56/KX1aeEhCxv0Cg25fLUtDNop8HonNdjPM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XMtiw2YCSTYjMG47BE9v5cWT4ovC8hf/xDJ/QogSbNMQwMX6yApPltNLjbRxkdUTL/+LUZ02L4Z564tqnVyG5l28J69Nd1mlcPl4Ux0bO5xzDRdJNGxbuLhcFKeMs52QekYDtRa4fbPl01Wp9nWEW/3t4MAeI1z0QTwdDBwJcec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BQhtYpCY; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-85d9a87660fso88182739f.1;
-        Thu, 03 Apr 2025 07:42:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743691340; x=1744296140; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zeoDb9T68HON4+pT2o4m+OL30KX0Z6zhqrCCdtzjaWI=;
-        b=BQhtYpCYRdqQhScW52gcZgDHo/5auY8GDde5ivG+tpeeFEKQZB/CFa1/IhAhehsapR
-         GDowryAeH/DuEJuC1nT4np75jaS8o9sY+1w2a43olEo4An6ht+JJUYyQ/vF3lgslb24c
-         upHMeouJnIBhyAMQ29eQap398rsmcffO8+w9qUgvt43cdgHtdLt9VcNIM0eoHz/tbieJ
-         YQ3LeFVHABEZq9m0GZKpr5Akgtp6BSRUSWY++cyvGvgZl0aw8TFyEK2Yp0e9OPp21lVq
-         ofSPCkSe9MH4Yq/cgaPj50ojOg7hncxt7pS0dI09fJjNvKr2BA8otPL/sn9J86k8TAf7
-         2ujw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743691340; x=1744296140;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zeoDb9T68HON4+pT2o4m+OL30KX0Z6zhqrCCdtzjaWI=;
-        b=bC3Zs6BUCUUrKEHnn0BJULI2jG5bSj5r89VOdMZmjxb/StoMgo64Y67nh4jMm0AC3+
-         dGJ3byA7OydJdnYVqfCb/U4kggcbQOAd07by1HYeMmllUjgRmszvIk1J0FuM0nbs1WxH
-         4aZWEXD8W0Wch5X9vFE/Lw7GkWDfrIJjp3Z0cVgVcMfqje0qwRgBwHpl1QaakHHYVCwy
-         fuDhvnayI9O7oxnbH+juiVFkTgilHCFsLQvLrPWOEFS0HBDhfsM5TQtnKblXH0VBLHBS
-         ath39NjM8HDc2H48prDczRncsvPgJshNC6RbLBgLsvvUcsLjEGIVFAa+JgX9KX4gXo4U
-         Eugw==
-X-Forwarded-Encrypted: i=1; AJvYcCU/kKh0odlXTDynai+yrkQcKAawUK9I9EeBVFr6vW4nHiDoQk+3YJMNCmJRPnH5zaTmsd5xiqPmHHxlExk=@vger.kernel.org, AJvYcCU3TKQ1IkHJ2ajPLk26UX2ARtb4YYVY7IQMozyjxgle4VYjtCpYDv3nns/DemTGeSkL4dL1uNixhwzqBg==@vger.kernel.org, AJvYcCUOx9wAftOQxRKmjfWP/i3lkLCtn8p3aV2DQUKcAygwHvv0TgTkXr+2MirsozjO1F8Oa6CY4q7C@vger.kernel.org, AJvYcCVBUyPMKsnlOdJE8l3RuqsGl95e19cbaXahXMMnUwOSjIG8U26Tq4L0zNy8J0DD47sEfUsFEcWL@vger.kernel.org
-X-Gm-Message-State: AOJu0YyP5cDwBqSOfTLcWhZ6iGnhnNgOwpIvkQ1/rQaQs1QpTybGWdSK
-	T30yeBWD4dN5dE3J6/8pZ5WFp4AdEfGXgbbjPWF4RdK5Tzlwy70goYoH40GcIl25mKVAyQXMetP
-	hDl3HueZwwmuxYOEfDgeFJ2PO+pI=
-X-Gm-Gg: ASbGncsYJxVHC1hzxNXSDHFsq/5RJbK5ntvz/50NdOQHLRISp3VT1nbT8BwfpUNtC9Q
-	69fQT/OF+/IyEjuUsV7AOv75GPIG95V6nry+Z40RIkWrLnPuPw4Mt+SptEZjZD2xX1ho4Bm0nTu
-	Y2TBhPjrVMJ3JfOUq/XFQNR4DNqYHozP3hN3dYrvbFaCQMIh7WNzHBYV311OU=
-X-Google-Smtp-Source: AGHT+IGNRyxDi7DahaAnymdSbr7DQycN0ZdLw//2LEvSHgTrzxm8aOaPQKMKp2kUdY5SWnF/e0614nQcpCl/EzjRxG4=
-X-Received: by 2002:a05:6e02:12ec:b0:3d6:d179:a182 with SMTP id
- e9e14a558f8ab-3d6dd824cb5mr37846045ab.20.1743691339808; Thu, 03 Apr 2025
- 07:42:19 -0700 (PDT)
+	s=arc-20240116; t=1743692157; c=relaxed/simple;
+	bh=M9BC9cmfcjPwGJJRxuVT1l3E/BUHTdGEDFZ7Jl1dOAw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NE9rZ2suH76B0iau37sDSSFgcp22vgnvB/MZP7gywIaVcI2qvSCCG7BH7+8t3xRYyrfasX1/H8olPJ6ISo1qgb2zEj3MPkCPvQYDqX8DRjeMuGcP3S4gzAuEe79zeofnZwfu7a3+L2+RQsp14T5C6oyONc0y6Z8133HV2Rpyty4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=BxUrl5yb; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=kuiVlbx2kfYIhaf81qOxtGTTxyZS4KbiOR1XX91AjLs=; b=BxUrl5ybBFQJoec8dQxfDqtWw0
+	wUNjAzxjUlujJEXB0euJ8NMRaWiEPKgGRhSiZ6RkVY75AWVOTxRJEK+qjXkNK9NlO+gINEjWh4xpD
+	fmMUJ0lbLd9BpwDgztq9XpRUyANfufgWZfMCbvSnkb/i3819GRNt6Fg2n0bLlo4UDmYXb+rzl0v+B
+	BefhgfHrt9UvZ0tGz9xUOw8otwN6fApKN+o/KEYxdlS3HTqULcRqTodwMmUnDg2nCNq94zxghmNHZ
+	QKcjOpfCFEEbqnqdBSVwZsOtUBXVF19aCd2iYdcBOBNUlx2j7h+xo+3F1W0r3wtZvMWc8MbEXb2mC
+	23Nsfg2w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44000)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u0Lyu-0000Xt-34;
+	Thu, 03 Apr 2025 15:55:49 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u0Lyr-0004pe-1K;
+	Thu, 03 Apr 2025 15:55:45 +0100
+Date: Thu, 3 Apr 2025 15:55:45 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	maxime.chevallier@bootlin.com
+Subject: Re: [net PATCH 1/2] net: phy: Cleanup handling of recent changes to
+ phy_lookup_setting
+Message-ID: <Z-6hcQGI8tgshtMP@shell.armlinux.org.uk>
+References: <174354264451.26800.7305550288043017625.stgit@ahduyck-xeon-server.home.arpa>
+ <174354300640.26800.16674542763242575337.stgit@ahduyck-xeon-server.home.arpa>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250402-kasan_slab-use-after-free_read_in_sctp_outq_select_transport-v1-1-da6f5f00f286@igalia.com>
- <CADvbK_dTX3c9wgMa8bDW-Hg-5gGJ7sJzN5s8xtGwwYW9FE=rcg@mail.gmail.com> <87tt75efdj.fsf@igalia.com>
-In-Reply-To: <87tt75efdj.fsf@igalia.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 3 Apr 2025 10:42:08 -0400
-X-Gm-Features: ATxdqUHaFX6L76fecmJqYz3mIbUdj6YZ5tkatolAjwkKUce-j3bzGLhgqW-KjgY
-Message-ID: <CADvbK_c69AoVyFDX2YduebF9DG8YyZM7aP7aMrMyqJi7vMmiSA@mail.gmail.com>
-Subject: Re: [PATCH] sctp: check transport existence before processing a send primitive
-To: =?UTF-8?Q?Ricardo_Ca=C3=B1uelo_Navarro?= <rcn@igalia.com>
-Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, kernel-dev@igalia.com, linux-sctp@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <174354300640.26800.16674542763242575337.stgit@ahduyck-xeon-server.home.arpa>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Apr 3, 2025 at 5:58=E2=80=AFAM Ricardo Ca=C3=B1uelo Navarro <rcn@ig=
-alia.com> wrote:
->
-> Thanks for reviewing, answers below:
->
-> On Wed, Apr 02 2025 at 15:40:56, Xin Long <lucien.xin@gmail.com> wrote:
-> > The data send path:
-> >
-> >   sctp_endpoint_lookup_assoc() ->
-> >   sctp_sendmsg_to_asoc()
-> >
-> > And the transport removal path:
-> >
-> >   sctp_sf_do_asconf() ->
-> >   sctp_process_asconf() ->
-> >   sctp_assoc_rm_peer()
-> >
-> > are both protected by the same socket lock.
-> >
-> > Additionally, when a path is removed, sctp_assoc_rm_peer() updates the
-> > transport of all existing chunks in the send queues (peer->transmitted
-> > and asoc->outqueue.out_chunk_list) to NULL.
-> >
-> > It will be great if you can reproduce the issue locally and help check
-> > how the potential race occurs.
->
-> That's true but if there isn't enough space in the send buffer, then
-> sctp_sendmsg_to_asoc() will release the lock temporarily.
->
-Oh right, I missed that. Thanks.
+On Tue, Apr 01, 2025 at 02:30:06PM -0700, Alexander Duyck wrote:
+> From: Alexander Duyck <alexanderduyck@fb.com>
+> 
+> The blamed commit introduced an issue where it was limiting the link
+> configuration so that we couldn't use fixed-link mode for any settings
+> other than twisted pair modes 10G or less. As a result this was causing the
+> driver to lose any advertised/lp_advertised/supported modes when setup as a
+> fixed link.
+> 
+> To correct this we can add a check to identify if the user is in fact
+> enabling a TP mode and then apply the mask to select only 1 of each speed
+> for twisted pair instead of applying this before we know the number of bits
+> set.
+> 
+> Fixes: de7d3f87be3c ("net: phylink: Use phy_caps_lookup for fixed-link configuration")
+> Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
+> ---
+>  drivers/net/phy/phylink.c |   15 +++++++++++----
+>  1 file changed, 11 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> index 16a1f31f0091..380e51c5bdaa 100644
+> --- a/drivers/net/phy/phylink.c
+> +++ b/drivers/net/phy/phylink.c
+> @@ -713,17 +713,24 @@ static int phylink_parse_fixedlink(struct phylink *pl,
+>  		phylink_warn(pl, "fixed link specifies half duplex for %dMbps link?\n",
+>  			     pl->link_config.speed);
+>  
+> -	linkmode_zero(pl->supported);
+> -	phylink_fill_fixedlink_supported(pl->supported);
+> -
+> +	linkmode_fill(pl->supported);
+>  	linkmode_copy(pl->link_config.advertising, pl->supported);
+>  	phylink_validate(pl, pl->supported, &pl->link_config);
+>  
+>  	c = phy_caps_lookup(pl->link_config.speed, pl->link_config.duplex,
+>  			    pl->supported, true);
+> -	if (c)
+> +	if (c) {
+>  		linkmode_and(match, pl->supported, c->linkmodes);
+>  
+> +		/* Compatbility with the legacy behaviour:
+> +		 * Report one single BaseT mode.
+> +		 */
+> +		phylink_fill_fixedlink_supported(mask);
+> +		if (linkmode_intersects(match, mask))
+> +			linkmode_and(match, match, mask);
+> +		linkmode_zero(mask);
+> +	}
+> +
 
-> The scenario that the reproducer generates is the following:
->
->         Thread A                                  Thread B
->         --------------------                      --------------------
-> (1)     sctp_sendmsg()
->           lock_sock()
->           sctp_sendmsg_to_asoc()
->             sctp_wait_for_sndbuf()
->               release_sock()
->                                                   sctp_setsockopt(SCTP_SO=
-CKOPT_BINDX_REM)
->                                                     lock_sock()
->                                                     sctp_setsockopt_bindx=
-()
->                                                     sctp_send_asconf_del_=
-ip()
->                                                       ...
->                                                     release_sock()
->                                                       process rcv backlog=
-:
->                                                         sctp_do_sm()
->                                                           sctp_sf_do_asco=
-nf()
->                                                             ...
->                                                               sctp_assoc_=
-rm_peer()
->               lock_sock()
-> (2)          chunk->transport =3D transport
->              sctp_primitive_SEND()
->                ...
->                sctp_outq_select_transport()
-> *BUG*            switch (new_transport->state)
->
->
-> Notes:
-> ------
->
-> Both threads operate on the same socket.
->
-> 1. Here, sctp_endpoint_lookup_assoc() finds and returns an existing
-> association and transport.
->
-> 2. At this point, `transport` is already deleted. chunk->transport is
-> not set to NULL because sctp_assoc_rm_peer() ran _before_ the transport
-> was assigned to the chunk.
->
-> > We should avoid an extra hashtable lookup on this hot TX path, as it wo=
-uld
-> > negatively impact performance.
->
-> Good point. I can't really tell the performance impact of the lookup
-> here, my experience with the SCTP implementation is very limited. Do you
-> have any suggestions or alternatives about how to deal with this?
->
-I think the correct approach is to follow how sctp_assoc_rm_peer()
-handles this.
+I'm still wondering about the wiseness of exposing more than one link
+mode for something that's supposed to be fixed-link.
 
-You can use asoc->peer.last_sent_to (which isn't really used elsewhere)
-to temporarily store the transport before releasing the socket lock and
-sleeping in sctp_sendmsg_to_asoc(). After waking up and reacquiring the
-lock, restore the transport back to asoc->peer.last_sent_to.
+For gigabit fixed links, even if we have:
 
-Additionally, during an ASCONF update, ensure asoc->peer.last_sent_to
-is set to a valid transport if it matches the transport being removed.
+	phy-mode = "1000base-x";
+	speed = <1000>;
+	full-duplex;
 
-For example:
+in DT, we still state to ethtool:
 
-in sctp_wait_for_sndbuf():
+        Supported link modes:   1000baseT/Full
+        Advertised link modes:  1000baseT/Full
+        Link partner advertised link modes:  1000baseT/Full
+        Link partner advertised auto-negotiation: No
+        Speed: 1000Mb/s
+        Duplex: Full
+        Auto-negotiation: on
 
-    asoc->peer.last_sent_to =3D *tp;
-    release_sock(sk);
-    current_timeo =3D schedule_timeout(current_timeo);
-    lock_sock(sk);
-    *tp =3D asoc->peer.last_sent_to;
-    asoc->peer.last_sent_to =3D NULL;
+despite it being a 1000base-X link. This is perfectly reasonable,
+because of the origins of fixed-links - these existed as a software
+emulated baseT PHY no matter what the underlying link was.
 
-in sctp_assoc_rm_peer():
+So, is getting the right link mode for the underlying link important
+for fixed-links? I don't think it is. Does it make sense to publish
+multiple link modes for a fixed-link? I don't think it does, because
+if multiple link modes are published, it means that it isn't fixed.
 
-    if (asoc->peer.last_sent_to =3D=3D peer)
-        asoc->peer.last_sent_to =3D transport;
+As for arguments about the number of lanes, that's a property of the
+PHY_INTERFACE_MODE_xxx. There's a long history of this, e.g. MII/RMII
+is effectively a very early illustration of reducing the number of
+lanes, yet we don't have separate link modes for these.
+
+So, I'm still uneasy about this approach.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
