@@ -1,99 +1,99 @@
-Return-Path: <netdev+bounces-179042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82175A7A2CC
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 14:25:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B609A7A330
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 14:58:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FE5F3B20DC
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 12:23:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A5F77A61B6
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 12:56:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02A9324EA83;
-	Thu,  3 Apr 2025 12:23:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2B3324E003;
+	Thu,  3 Apr 2025 12:57:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jyAqiKtu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AvwLL3V1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D18924BC14;
-	Thu,  3 Apr 2025 12:23:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BDB24C07E;
+	Thu,  3 Apr 2025 12:57:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743683020; cv=none; b=iLJS77Atw839LRps8g/069KgaaPpZ4a96LBMxD8wmas8nafE3TYkHZAZyHZm38berR5rs3+Ih8dNspKHJyEjMimc0fZNP8iPXp4sGy5zawWHL3BLEjX+GtjFg0cdrr3wb5clr/Xby8MgAM6EMWfMW9yrnZyvMXkcJnZHxh7/OcQ=
+	t=1743685075; cv=none; b=fWwwRcZmJnwhZiN4ejSzfyE2gbLRQ3YGgYthosqril01oNkPrzKE9rPHyU/Yh5XIel8fvzToOMpkUOEP4XHJzYR0IICab//L5AN3rrdu0wSAtHOFcQozz20ccQHTu1Fm2fD69rsJalifkHJVOM7gJSIp/Nwn+jEDSDcxMNBWN9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743683020; c=relaxed/simple;
-	bh=75jP0jjWRAn+w4GK8dONkj/SHDBrOsKdM4Zl9GE0ymM=;
+	s=arc-20240116; t=1743685075; c=relaxed/simple;
+	bh=/1YxCcRTRvpxQ9KkKuxghPk2ylXH2ipD9xLYdo4JcEU=;
 	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=Xzz3NY79VAzbvI+aefdohYBbWQe1ZG0H5dkZAYFNkQVXHn2r7f4TR2d/QiXYKWlYKd0MA+06CV2eFMJ/EyyWkTjlKVKsTe5ykvOPcmKUqfh6wTOdDxtdthIvnxzxO6aZ6GqgSux9/qwxHNdAY1LYy8dilALqEeMcyw8ZmaLTE9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jyAqiKtu; arc=none smtp.client-ip=209.85.215.172
+	 Mime-Version:Content-Type; b=edWlphV4OuTR5YUnYdLd2lgp6Ml/xveG/9yyaNyEH3sDMVDas9NEUy7r+DsSjDPNGWlha7M8FLM/Zsk/PFiOspkiITU3wsAmLgXF0jvXAicJngx4UC4lAnQLt4AS64vquDl3lbPNt0bWxO6C1MqYuzj+MhAtz49bYn24wG+2j1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AvwLL3V1; arc=none smtp.client-ip=209.85.210.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-af5cdf4a2f8so639582a12.3;
-        Thu, 03 Apr 2025 05:23:39 -0700 (PDT)
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7396f13b750so912292b3a.1;
+        Thu, 03 Apr 2025 05:57:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743683019; x=1744287819; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1743685073; x=1744289873; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to:from
          :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=uWu7/YhckerqLoieu5Vj2zXv6+3iK41HvBe41obBUw4=;
-        b=jyAqiKtu2Nq9KUzyzazKO2AMKDORnCctGoB4YKRsR2I+r9nbF0KA50RA/oFzIvu9Gy
-         7wTXuGaEZuk52YKfhgH60l3ZAwqZlGhH5US4GVY7vsM8VzeE8pSdYdrzxFtYntc+PHCe
-         Xu4/Uuk489SYKEVZWly2eZLzvchKxvTowqhjiRexbGb+TOSW4voeGPLOgfWQQQYTHPbI
-         tLGxIsoTrJxGrfhnA7OgeGNJQLGQ7TmNGAMEhFRCiwVjvxVKRNl87nStZuHFc6/nXgXL
-         eTmN5Fz3qloAW7/8CBFh0Mw4Chzf+oK29liK+6cRc2aMUEWbYc7Vjbsmm0QjpSGIbbnV
-         GhEg==
+        bh=xMvo80YrC/OUar0noVKvQwzuCcaGDRGPGFcmSwrZcwA=;
+        b=AvwLL3V1aQGnMZv3+csMYdrPTa0JoMc2a6yqDwIpIJhsnBrvtEM5S+7Iv8tQX+ZU+r
+         AzsdwR2xoVsZAwBo3jY7zlKCbhwOFGdKVrAejh45D7xDZDctuNbSKuwtljOBa/jD3MVt
+         j8gFd3Tl6qgA3e6v66jP4Wse2k3qfhqG6hRjUd6xxE6foeCXtNvcNLJRiaGd9i388pg8
+         Qj0dRiL3PbzbOtU2riNk5xtKIZ3O/EBT6OEcfp3c4h3cFeKHRnp43qejaMtnT8ot8+Vz
+         2WhGX2I/xsfmyvlJfFphB916ZHuMwJAwk6sSKSPJlBCgziAvXfmJwK9OMBLWmbQekpJa
+         Ir2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743683019; x=1744287819;
+        d=1e100.net; s=20230601; t=1743685073; x=1744289873;
         h=content-transfer-encoding:mime-version:references:in-reply-to:from
          :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=uWu7/YhckerqLoieu5Vj2zXv6+3iK41HvBe41obBUw4=;
-        b=OedKsfUAYo9ggL8rVxRA1J7QsCVoUIWk0tUaPsDWIE1hWOf78R0fZoCeYYU1OaWjBN
-         4+ZEIw63ce4ugAnjFw4tqByDosctO/NPmug1Vi2ogZZ+qD9JEbfbdY3jLGbLLK9PQjvg
-         mHStMSV/3WXqCDwMFf96ZlQqqUBux4se6tMN0TL+Sr9lPax7ZiY/VrJQ6XtXEyleiMQS
-         VgAJLWy88YVesZ9VDUrOiH7KVnQHmzO+rTUesn9BGZ8X0/Go6W+ux/8f6s0GEOh5zs83
-         ERpughKZ5CpTqh+8f7GkrNXtktkMo8ZZ+60+zHofbTKIPvafnOE3MXD1O+h0jyzf7N8l
-         1j0w==
-X-Forwarded-Encrypted: i=1; AJvYcCVb2HhDvpyN8e81bCGL9dKkVi3by7jp8eFXlcbfMkupoeesxLZD4LhQp714g5bdIqEhjYQlvRCttG1f8bA9IcA=@vger.kernel.org, AJvYcCW6ofGz6cKbhACrOUdtfHkNV4Hg0anH/liKap86q++HUI1HMVKz+/DtMyZY5RMZrBIdwvVDA8Ow@vger.kernel.org, AJvYcCXJGFSRIjozeQ788QYF3/WXW06aqVtWm8LWBT2SuNC3jHP289A+/k2X77OHYaJtR4j/e0l4A0f9LEzMRWc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwHNG6LxDeXlwTh2p/q8oFhw7qZxZVSRgKhfiqP0DdbrcxhQBV
-	u2S+RFiMKlNxSlBejowEkYJRAsa6DnPhqIXEkcjZgIHCsP7mESfU
-X-Gm-Gg: ASbGncuxQooIH1KvbSfFgWwE8/ilAgRewf1AZEgEl6q2MhiqXq6zESCUOCDdfiwuKXN
-	G94EXyYa0ukIBK30RQgwbXRaOUuspcIm7uEEApd+2wC6ruN+MyGjcgk/o69R4FV6QpWDr0J7oHc
-	xsKPmUKrPudob1eLon6QwW9xHVFrcyorrv+KaoLtWjU2a1PX+tUZxUKxsz40hc8uJofEirGusX1
-	k3wmBOv/cstLOsFf01njtwwPeAZdN8bu8Tc2yDa9FPBqlPkrwTO0AMJnZLOTgeSycLU7JTnrNWu
-	05AXNCl+mtLB32pc6nb1xb/FpiAe62O++8DMB+jnthYlhv7i+LF6GQvQdLoFvDB/NuTO2iW5WFI
-	8H3Z+pWCdGa0oOg/LXzWfsAXN9G0=
-X-Google-Smtp-Source: AGHT+IHWLK7u10H6D/cVi4q6t3KxterddYAML60wsBpmngVZJjls9MS5MkrlB/PbbH20ExQsFasSFQ==
-X-Received: by 2002:a17:903:2a83:b0:223:fb3a:8631 with SMTP id d9443c01a7336-22993c1cc8emr33592245ad.24.1743683018706;
-        Thu, 03 Apr 2025 05:23:38 -0700 (PDT)
+        bh=xMvo80YrC/OUar0noVKvQwzuCcaGDRGPGFcmSwrZcwA=;
+        b=OL6/KcHGZPyciwmNKEdrQl8V3v2ybKaM+grCZr+foM/lNZP4yO0UtOWJacZuZqT7bC
+         RKybe5Lsge1IXGlTTXjhWriySviHH6+zyevbckBHtuHdD4rGSLwJege2+//sgCDN62K6
+         Nw6umMcUJWBrkyExU2vQ2Alqojf1KRiDkCMUpza2aOWachNaBdZ4taRDsH+BG6IaBn3d
+         ig/w0R1ciF30KWRv3qsWMhSaJsy6yALZCOhGPYx6fleyeMOp7opYK0O47u2+szXmrpHQ
+         5/YwHdUDPGqrP1UDXeC++ecXsmNZyR4Sssdb3tUE21kXhAfk0V8p4PCSwqPjQHKTl8q2
+         9i1A==
+X-Forwarded-Encrypted: i=1; AJvYcCUb3i/wfhz7ZVUSlhQ+cu18SeTxuDoWyaWpzPdcv+SiINCamE6HXPRZup+6ca1tQ7ifdyQn5GRE6h3OQvS9MvI=@vger.kernel.org, AJvYcCXIfunzFlLecWVxuWm5zfUuBmJTTciFfvaze8K70LE03ZtZ/E1GbxZO/LCiTIFcOxQeTRtoK8EyMbfpTl0=@vger.kernel.org, AJvYcCXj2GEGhnADq2lt+Hc2oxUSUr0l2TZdiNT3QoR+y/Bg29YxFa5ChrTAr2b/EraMuYEKqFhHn1uL@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpRf4YlWFulImolciz39qQsNCfLlKe1a6popDnrQRiWoSZdeOl
+	c1K4bPxTE7fez2mHewpEKJlohY4aGV7YRqKUGkx0g+VRG76d1JAW
+X-Gm-Gg: ASbGncvE3TkR/XUW2K8K9PzQC2tklGZLhhErFioydn2U5dSx11G/9hksYjqxbhJPHuI
+	Jg4ZFtaUeoJIDSuLHIAa+sW3nJC31gvWbTmDHFi6Qd7P5nNLPCpKRQapUf6XQhHiWyoQuEQxwxi
+	MPlzOb35ergTMXpj+J9adYu7a9bPTAZtPkJqtv8n1HQA6qgZkkPRUou/Mbdg2IJVzSImkOnqxgn
+	6CfqcHLNLD6q6SHd+uXerBXN1gXg1Ur9sr7fdFAXUljF2dgc2GQieP05e/DgiF4IDIwHYbgWNBD
+	5T8bFWOfhF1qjZtBpUxA7Zkf8sKwBlBr7V61iNEQxnARsaJXjMUHbSlUscIcsijvLT5CgY5SGvF
+	JjU5fTXM2wxrbJUOhLvqZVDkUJVM=
+X-Google-Smtp-Source: AGHT+IHiovceFK2chizolznq/Ml1WNiyNYVynJX9L1MmVpIhUck/y8sRKLzHQWYsF3XMiynXIRoDvg==
+X-Received: by 2002:a05:6a00:238a:b0:736:5822:74b4 with SMTP id d2e1a72fcca58-739c7965d2dmr7803994b3a.21.1743685073171;
+        Thu, 03 Apr 2025 05:57:53 -0700 (PDT)
 Received: from localhost (p4204131-ipxg22701hodogaya.kanagawa.ocn.ne.jp. [153.160.176.131])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-229785adaf9sm12964285ad.27.2025.04.03.05.23.29
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-739d97ee7absm1415045b3a.58.2025.04.03.05.57.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Apr 2025 05:23:38 -0700 (PDT)
-Date: Thu, 03 Apr 2025 21:23:27 +0900 (JST)
-Message-Id: <20250403.212327.2029028318504480690.fujita.tomonori@gmail.com>
+        Thu, 03 Apr 2025 05:57:52 -0700 (PDT)
+Date: Thu, 03 Apr 2025 21:57:45 +0900 (JST)
+Message-Id: <20250403.215745.2138534529135480572.fujita.tomonori@gmail.com>
 To: a.hindborg@kernel.org
-Cc: fujita.tomonori@gmail.com, linux-kernel@vger.kernel.org,
- daniel.almeida@collabora.com, boqun.feng@gmail.com, gary@garyguo.net,
- me@kloenk.dev, rust-for-linux@vger.kernel.org, netdev@vger.kernel.org,
- andrew@lunn.ch, hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
- alex.gaynor@gmail.com, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+Cc: fujita.tomonori@gmail.com, boqun.feng@gmail.com, tglx@linutronix.de,
+ linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+ gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
  a.hindborg@samsung.com, aliceryhl@google.com, anna-maria@linutronix.de,
- frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de,
- jstultz@google.com, sboyd@kernel.org, mingo@redhat.com,
- peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
- dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
- mgorman@suse.de, vschneid@redhat.com, tgunders@redhat.com,
- david.laight.linux@gmail.com
-Subject: Re: [PATCH v11 4/8] rust: time: Introduce Instant type
+ frederic@kernel.org, arnd@arndb.de, jstultz@google.com, sboyd@kernel.org,
+ mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
+ vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org,
+ bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
+ tgunders@redhat.com, me@kloenk.dev, david.laight.linux@gmail.com
+Subject: Re: [PATCH v11 6/8] MAINTAINERS: rust: Add new sections for
+ DELAY/SLEEP and TIMEKEEPING API
 From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <87cydtv85r.fsf@kernel.org>
-References: <pk-Wz6K7ID9UBJQ5yv7aHqGztuRNqPlZv0ACr8K6kOMOzdan60fYn3vqlQFrf4NwwY5cXXp0jnYlX1nKpdlaGA==@protonmail.internalid>
-	<20250403.134038.2188356790179825602.fujita.tomonori@gmail.com>
-	<87cydtv85r.fsf@kernel.org>
+In-Reply-To: <877c41v7kf.fsf@kernel.org>
+References: <RK_ErPB4YECyHEkLg8UNaclPYHIV40KuRFSNkYGroL8uT39vud-G3iRgR2a7c11Sb7mXgU6oeb_pukIeTOk9sQ==@protonmail.internalid>
+	<20250403.171809.1101736852312477056.fujita.tomonori@gmail.com>
+	<877c41v7kf.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,30 +103,36 @@ Mime-Version: 1.0
 Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 
-On Thu, 03 Apr 2025 12:41:52 +0200
+On Thu, 03 Apr 2025 12:54:40 +0200
 Andreas Hindborg <a.hindborg@kernel.org> wrote:
 
->>> As Boqun mentioned, we should make this generic over `ClockId` when the
->>> hrtimer patches land.
+>>>> You will need to fix something because patch 2-6 removes `Ktime` ;-)
+>>>
+>>> Yea, but `Instant` is almost a direct substitution, right? Anyway, Tomo
+>>> can send a new spin and change all the uses of Ktime, or I can do it. It
+>>> should be straight forward. Either way is fine with me.
 >>
->> Seems that I overlooked his mail. Can you give me a pointer?
->>
->> I assume that you want the Instance type to vary depending on the
->> clock source.
+>> `Delta`? Not `Instant`.
 > 
-> Yea, basically it is only okay to subtract instants if they are derived
-> from the same clock source. Boqun suggested here [1] before hrtimer
-> patches landed I think.
+> It depends. Current hrtimer takes `Ktime` and supports
+> `HrTimerMode::Absolute` and `HrTimerMode::Relative`. With `Delta` and
+> `Instant` we should take `Instant` for `HrTimerMode::Absolute` and
+> `Delta` for `HrTimerMode::Relative`. The API needs to be modified a bit
+> to make that work though. Probably we need to make the start function
+> generic over the expiration type or something.
 > 
-> At any rate, now we have `kernel::time::ClockId`. It is an enum though,
-> so I am not sure how to go about it in practice. But we would want
-> `Instant<RealTime> - Instant<BootTime>` to give a compiler error.
+> If you want to, you can fix that. If not, you can use `Instant` for the
+> relative case as well, and we shall interpret it as duration. Then I
+> will fix it up later. Your decision.
+> 
+>> All Ktime in hrtimer are passed to hrtimer_start_range_ns(), right?
+> 
+> Yes, that is where they end up.
 
-Understood, thanks!
+Ah, I found that __hrtimer_start_range_ns() handles ktime_t
+differently in HRTIMER_MODE_REL mode.
 
-If we need a compile error for this, I don't think that the enum
-works; I guess that we need a distinct type for each of RealTime,
-BootTime, and so on.
+As you said, looks like the API needs to be updated and I think that
+it's best to leave that to you. I'll just use `Instant` for all cases.
 
-Once the current patchset is merged, I'll work on that.
 
