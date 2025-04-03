@@ -1,94 +1,137 @@
-Return-Path: <netdev+bounces-179148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA7CEA7ACB6
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:48:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE7F6A7ACF9
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:54:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C60CE188D556
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:44:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 536D73A7D08
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:48:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99EBE280CDD;
-	Thu,  3 Apr 2025 19:08:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD09D28F94D;
+	Thu,  3 Apr 2025 19:08:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="qM9zA1Ei"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K4V7R8Vj"
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3AE7258CEC;
-	Thu,  3 Apr 2025 19:08:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824C228F94A;
+	Thu,  3 Apr 2025 19:08:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743707298; cv=none; b=N5qt4KGwWL0O99ryb52lrjEMsXQfgUrubgtt+llSpnyO86eZyHVwNn3H5B6PCWHARGJFGlH7KFrIRaAQnF5JmzGngBSiLtC9iXqdmq3qKbWUgyxDDn5FLovCCt2KXJpeeco/63UrOhmWmcdqX3c1XSzc29e6bzH9XM2hFuoAq2w=
+	t=1743707331; cv=none; b=dB3OIEer0PrLLi2cyNxVTzkgLFkoHaEuJfN1/dd05bwd3MaPr4UNgsCHYF/WF8tJAidBiGJcavHllnQOuGpZP5ItEUYiZ0GBw/7jkzO4BlZZKkE03uZzPVhD/sZQiQKh++7SQ42ASLSGfJ05+poPqfBRSo7ca/FGvCDYyxnxY2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743707298; c=relaxed/simple;
-	bh=Wh5Ni6yEb9pzYvSxle13v0riTVmFQqhjt3k27dRwEqU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BM0mon2wq3kziWhd6hkxUhDrQuF2pOYgUz0HMPWsKLbFC+MPN5Kb7yKJlEXm2cunPqgJMSQxJsmyslpEvYYTFUWuDOVRGnrFsPGEN+oDIcD6bdDlfP3eyEmQH1DR+V4WAzkkBfBAM5S19tclxo1OBS7LiKfN+m1YvRBfG+hjUGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=qM9zA1Ei; arc=none smtp.client-ip=139.165.32.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
-Received: from [192.168.1.58] (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 63D01200C241;
-	Thu,  3 Apr 2025 21:08:12 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 63D01200C241
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1743707292;
-	bh=KrNpRha9b/ZPtCbTWmlK4b+wJzbqizSsJUCYeP/vmhM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=qM9zA1EiDlk+7qhQ8c6mnOQ1pr5QfQpd47HEslS4xQMoOsPV5T8d5YiGznPUP2E6d
-	 /1A4Eg0M4CABN777HIiwuDICp9qnhSdsnNDggzYLM4bvtqxdvsGt8VK66gXwlti6MP
-	 n8MlSINUJ5oF5oGD2s3oJEOWE5b8cOVV4ZGMqW5WGzUZ0LNGJ/CDN5IUGqcFg+sMlr
-	 leiwED4EV8fMHHShsXYuhOnHHe03wQuH3M+dpu+Togus0hxfDkc2TvZAfN1q98SkzH
-	 AIGk4+Ca7QNhQlOUXyuj9xW2AdUhLy2T8x3k7BGwXIgoso+roiSXe3q1sX23DlLy/a
-	 M8oxqd7Z2DMgQ==
-Message-ID: <cb0df409-ebbf-4970-b10c-4ea9f863ff00@uliege.be>
-Date: Thu, 3 Apr 2025 21:08:12 +0200
+	s=arc-20240116; t=1743707331; c=relaxed/simple;
+	bh=LDbu8uXt0d1UXaKxpy9Fvn0W+p4eV+OX+1BdO9p6BM8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=D73hpDM7IaNniaGqeQEasCa9bNuVlI6ylw8FvRwKm5Xrr2r4P0mJH1UX7VcWD268SCGPsOvlMQ5KXaKQYKiykHq+0ceUQkh7Ey1o95FqXHFNHebBMQhJL5owxwiSB2wzJp0LD1NqMNYY3jewrPeKQeXCTeh35GHZ+hpRlHNHdLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K4V7R8Vj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CEBDC4CEE9;
+	Thu,  3 Apr 2025 19:08:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743707331;
+	bh=LDbu8uXt0d1UXaKxpy9Fvn0W+p4eV+OX+1BdO9p6BM8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=K4V7R8VjJy3gEfFJnJt4SW9P6+KLxsPg1tjBL645T6lWSMfAL3S4jXPbXiEN8gwXR
+	 yyMfo1PPIfGrXTn1F5npsfX54CaM1qj4Z6Kq76tEMpbMyXzVAtkoFJ2O6+ngpaOOQu
+	 oIsypIY7DUPtiDRiYKc1gHawmCpL2TFstm/Tq0wV+JTxojJMkuHXc/ijodAJqUvks7
+	 AjctZzbWVJIVwB/FsMTLFJ58eoOiBRKsffUcE7wOcojM8/nrRMHFT0FgrBQTbbkKR8
+	 myHg2cYsB/xRl1vl1M6hNi1YPsuIHUpK1gm9uk9RzLhoXGJsnBoYsE6X/qdZxqQFFY
+	 QawOYTm+USifQ==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Jason Xing <kerneljasonxing@gmail.com>,
+	Mina Almasry <almasrymina@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sasha Levin <sashal@kernel.org>,
+	hawk@kernel.org,
+	ilias.apalodimas@linaro.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.1 02/18] page_pool: avoid infinite loop to schedule delayed worker
+Date: Thu,  3 Apr 2025 15:08:28 -0400
+Message-Id: <20250403190845.2678025-2-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250403190845.2678025-1-sashal@kernel.org>
+References: <20250403190845.2678025-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: lwtunnel: disable preemption when required
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, kuniyu@amazon.com,
- Alexei Starovoitov <alexei.starovoitov@gmail.com>, bpf <bpf@vger.kernel.org>
-References: <20250403083956.13946-1-justin.iurman@uliege.be>
- <Z-62MSCyMsqtMW1N@mini-arch>
-Content-Language: en-US
-From: Justin Iurman <justin.iurman@uliege.be>
-In-Reply-To: <Z-62MSCyMsqtMW1N@mini-arch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.1.132
+Content-Transfer-Encoding: 8bit
 
-On 4/3/25 18:24, Stanislav Fomichev wrote:
-> On 04/03, Justin Iurman wrote:
->> In lwtunnel_{input|output|xmit}(), dev_xmit_recursion() may be called in
->> preemptible scope for PREEMPT kernels. This patch disables preemption
->> before calling dev_xmit_recursion(). Preemption is re-enabled only at
->> the end, since we must ensure the same CPU is used for both
->> dev_xmit_recursion_inc() and dev_xmit_recursion_dec() (and any other
->> recursion levels in some cases) in order to maintain valid per-cpu
->> counters.
-> 
-> Dummy question: CONFIG_PREEMPT_RT uses current->net_xmit.recursion to
-> track the recursion. Any reason not to do it in the generic PREEMPT case?
+From: Jason Xing <kerneljasonxing@gmail.com>
 
-I'd say PREEMPT_RT is a different beast. IMO, softirqs can be 
-preempted/migrated in RT kernels, which is not true for non-RT kernels. 
-Maybe RT kernels could use __this_cpu_* instead of "current" though, but 
-it would be less trivial. For example, see commit ecefbc09e8ee ("net: 
-softnet_data: Make xmit per task.") on why it makes sense to use 
-"current" in RT kernels. I guess the opposite as you suggest (i.e., 
-non-RT kernels using "current") would be technically possible, but there 
-must be a reason it is defined the way it is... so probably incorrect or 
-inefficient?
+[ Upstream commit 43130d02baa137033c25297aaae95fd0edc41654 ]
+
+We noticed the kworker in page_pool_release_retry() was waken
+up repeatedly and infinitely in production because of the
+buggy driver causing the inflight less than 0 and warning
+us in page_pool_inflight()[1].
+
+Since the inflight value goes negative, it means we should
+not expect the whole page_pool to get back to work normally.
+
+This patch mitigates the adverse effect by not rescheduling
+the kworker when detecting the inflight negative in
+page_pool_release_retry().
+
+[1]
+[Mon Feb 10 20:36:11 2025] ------------[ cut here ]------------
+[Mon Feb 10 20:36:11 2025] Negative(-51446) inflight packet-pages
+...
+[Mon Feb 10 20:36:11 2025] Call Trace:
+[Mon Feb 10 20:36:11 2025]  page_pool_release_retry+0x23/0x70
+[Mon Feb 10 20:36:11 2025]  process_one_work+0x1b1/0x370
+[Mon Feb 10 20:36:11 2025]  worker_thread+0x37/0x3a0
+[Mon Feb 10 20:36:11 2025]  kthread+0x11a/0x140
+[Mon Feb 10 20:36:11 2025]  ? process_one_work+0x370/0x370
+[Mon Feb 10 20:36:11 2025]  ? __kthread_cancel_work+0x40/0x40
+[Mon Feb 10 20:36:11 2025]  ret_from_fork+0x35/0x40
+[Mon Feb 10 20:36:11 2025] ---[ end trace ebffe800f33e7e34 ]---
+Note: before this patch, the above calltrace would flood the
+dmesg due to repeated reschedule of release_dw kworker.
+
+Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+Link: https://patch.msgid.link/20250214064250.85987-1-kerneljasonxing@gmail.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/core/page_pool.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index caf6d950d54ad..acc1d0d055cdd 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -841,7 +841,13 @@ static void page_pool_release_retry(struct work_struct *wq)
+ 	int inflight;
+ 
+ 	inflight = page_pool_release(pool);
+-	if (!inflight)
++	/* In rare cases, a driver bug may cause inflight to go negative.
++	 * Don't reschedule release if inflight is 0 or negative.
++	 * - If 0, the page_pool has been destroyed
++	 * - if negative, we will never recover
++	 * in both cases no reschedule is necessary.
++	 */
++	if (inflight <= 0)
+ 		return;
+ 
+ 	/* Periodic warning */
+-- 
+2.39.5
+
 
