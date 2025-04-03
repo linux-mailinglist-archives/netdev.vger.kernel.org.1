@@ -1,89 +1,89 @@
-Return-Path: <netdev+bounces-179020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3435A7A0F9
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 12:28:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 152D1A7A0FA
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 12:28:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCA3B1893324
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 10:28:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A640D1898109
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 10:28:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A81662459F0;
-	Thu,  3 Apr 2025 10:27:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7558B24888A;
+	Thu,  3 Apr 2025 10:27:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PS8aGrz5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="efFBcoKK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63833241CA0
-	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 10:27:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF27A243387
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 10:27:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743676077; cv=none; b=TND+biBs5K1IPo78y3R7j/qJeBZZLn6bxqtBVR1V3n4kY20/K9TcvHX0ddzM95xaBc62dKChqCPEs0q/Etol4AoUMSOncFPmYTgNgAPjSUeXmq86eqzDi0uSyfOohey3PxD4fYfNC2f4nethwVdeewMCttK1EnPrmV0B+3efdsg=
+	t=1743676078; cv=none; b=C8THg9hGqzjaW+e1gtlH3astMr7wd2yD3ak8dqApKuixH1f2YQp670bnaWnWmSE+F7Vp0B3J8fMcAlOFw12ZuCR9f3EwWuBzC3VbGeT/9GxcJw+7MtCPWZmlQGZJoc3IgyozVYAtyCCy2XyGRNYRTcaOVN7sp1FQxKI2T7Ua/8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743676077; c=relaxed/simple;
-	bh=BjkO4Ok2EF5qBA434UpfkG12RhFwhV8Wfq16I2T5BTs=;
+	s=arc-20240116; t=1743676078; c=relaxed/simple;
+	bh=7k2gAfLv/TjbmU2E9gLEUu/B+940PJmwXWnljiaXSe4=;
 	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=PbNj8ttPoCri6zbqKTvA/SRrOo8U6IlzL5JNrcwtg8JcoUfysPdyFvAqD8jeCa/8ruwUlU4aQZLHwFffjsWBNy+CchtlMY1Q2eYQqxYHsCGPZMAAQNVh+V6xGd/3/4ukfluxeZmFPOzn65VuGM9T3wmfyKQ6OCcJouA0n32dlNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PS8aGrz5; arc=none smtp.client-ip=209.85.221.53
+	 MIME-Version:Content-Type; b=ppq8wWsvpIgyapNJpIzm+TmCZ2YAdPygyP4SnySBei5R5TVK6IV/4QiJjGGnC/zi+/ch4GtTu62BoADJXyzn22rXrBDwX8j1yE98ei6BDcOtwdWoHvEy/8YYEDUBno7bf6j/uHK2s2+VEdWJxO5whw0FbyUy/kReHboJjVJAnlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=efFBcoKK; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-39c2688619bso451173f8f.1
-        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 03:27:55 -0700 (PDT)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4394a823036so6674405e9.0
+        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 03:27:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743676074; x=1744280874; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1743676075; x=1744280875; darn=vger.kernel.org;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YDPxr04aT2xdATTj6LclbyOnYJ90s0UlaOSwL43Og20=;
-        b=PS8aGrz5LMPsi3Esxx31u9SC9bgzQabvuMCpu99zhD3IZOCCAMXM7dw/qBY0x8zjjc
-         WT59YJIQ7+3HlM6mI22fgZcC3jnM/A6kV740xS3SjuninHHFJSnTA5nDg0Uyf5Kg2TV4
-         34kf2Xg1/dp++mxNlzz7EOHRarPoHYxSjPip0sWUelekqG1D1y1FHZv8EDg6cFxRgT9a
-         imXLzcIi2lzn4MevctQI0Kzy9wPkPwC+NWmjaEtrvmqTEzyAVQyGwloj/g8kHIYQonqS
-         +wFW5sCoPCztGz93elYfyaEqXrSx+QpzpUcoPrgm0wJ+WeQ8WfA9BIb1K3hS7abLZqHW
-         JUqQ==
+        bh=IEjPesjuUhxFCerSHMCc2d+CamBtL2ZeC+dIG1aIsUU=;
+        b=efFBcoKKTGh2J9mFJoMuEXTT2W60SxZxUXQUnlClKaNk2kJNCA66uLiAU6Srievr1y
+         OBAWmpfBhMaub+UMiXaCu1WgHtUzNB+2DGsl1r7EEe9vHgcwp//ljIbMTwNMltfoDd92
+         mYFHxKe+VjOQkLnOPxiAMJdaUVG/HCA8ImfgoHOTguzxXncMqJjwrIFKJQk8nvQodWLf
+         IMv6+2+HNQajijimpnjS4DkTub1T0uwcFBrau/346S6H6B/GCKHtJGnN9WhDFZZxUuqk
+         oLOPM2lK3FAlJRfWkIbeFRQdpmWL/TnZZagLknp8pb2o4c+yqmiTxkm+1q3x8WdhR63M
+         0RUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743676074; x=1744280874;
+        d=1e100.net; s=20230601; t=1743676075; x=1744280875;
         h=mime-version:user-agent:references:message-id:date:in-reply-to
          :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YDPxr04aT2xdATTj6LclbyOnYJ90s0UlaOSwL43Og20=;
-        b=brE4MTAQA1bWNMrE+v3Fp7FDfx0QYR8YVIHTerMeKy2wNvZ1P+rgleatYsKuECxpsr
-         m7QPhpUoyu4mYbEIsQNifPlGEmf3QAwBt0yrrS1s23PH0iswasvZIsQn/Jawvy4d4bsK
-         Sj98fBMLB6cMEBkEhwj/1TRV2Wv3csKSZII1jqL4bvwpUndOrCwVhBa4A+q8xh//VlsJ
-         jsfTpZ0a4U4EpA9XkEOI4GuaozYeDCqwISW0FNVt9FQC5DcrhUcO32JnjTRE+dvFEW8D
-         7DkrgLU8KkPPTk9JNmBaYdcHPU+L0wSnuZkPpSRvf1v/dY/9q0msyOeW2H+OUzuj2E1N
-         cVCA==
-X-Forwarded-Encrypted: i=1; AJvYcCU5Oqg/7Zpx5UVQmhkmk+T1evDxmNJ1ZSt+Ev/I3Kf6qkF67dL+dx91HE5ZN2vV9bLvs5qkwXQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwB2tFB+veX0b1RMUZ4ImqA6fQdGbt24YO/FZNf/gOxmQq0cDE/
-	0UIAEa4JgcCyaPiTN4XwH8ARqGkzEfoPJoMBJEbk51b09M6iDdjA
-X-Gm-Gg: ASbGncv0y/anM0c+xKCL0UAPJzwrPcywaXOMNiIVdv3z+ZgBucRBdutFZ6NGtz81etg
-	Q6aHFYRKERkiMM7ozvPxyoJZ2//QgmBPWfW5aLjIMT2D3pBmRkSeKFgyv3FcsIxOpwaci6DmW7G
-	A/JJaSgff9MCEYQk/t/stqJWz4b3A432a2hDk0lw3o/MAfQ3GYV95Cbs4pbWUY9Rkr3W5swUDSZ
-	i6HcTpZrHT2FJTfy/IobI+L8Pf3UHvuUVLAIL/e28Ruvc10sZcm2wIWiTO06eoMU9s2i5vOtGJg
-	eOm/H8SBlQ1e9gsiH1Bragp3MQhS1Xo0ZVX0CRpjjJGSiz8bdmazu710BA==
-X-Google-Smtp-Source: AGHT+IHnEYGymMIXQhLXYj3C2/8XymcgOYEJb5uDE1ymVvTR6+oTIWEylEFRIltfguYnZs+X2Jg60Q==
-X-Received: by 2002:a05:6000:1a8a:b0:39c:1257:feb8 with SMTP id ffacd0b85a97d-39c303ae5c6mr1599588f8f.56.1743676073466;
-        Thu, 03 Apr 2025 03:27:53 -0700 (PDT)
+        bh=IEjPesjuUhxFCerSHMCc2d+CamBtL2ZeC+dIG1aIsUU=;
+        b=JFJ2nrO4R82iVf6BX1H4A3MPZ69mbVXL9YRyW4n/sQqGsB1WlOauZZ32SoiX5gfQ72
+         VJLVpmcggsJkt6ZjAcdBC2AmLuvXFmrfSxmxDNNCk+W2PsTY6zuKLpZK9S+vVZii2NmS
+         RoVkt6/7ex2ntNyZc+9ywhtEh/ZfqdvEhBjmFavo+8an3JIOAihqa397npg/0CdlWCg1
+         NiDlPx34M4NNpN4TfHO6ZAkYwZ02xO7IOW8GTrE815NzjxFSXqN1uYCDvsVoAIRD6kUW
+         NRrBOqG07BPRqprUH+Jei7YgGHj0CtSkPAU8oEVuM4JHlULpDnjKqJXj4IFjDMzKc0WE
+         YaUw==
+X-Forwarded-Encrypted: i=1; AJvYcCX3TGNux2rmqo6gJaw1VPXIzwBvwGDUzpSc5hvxyAktbOkeT71NUiU2CvDtqyElZAxM2nXMpLk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/ENXbzW+5NtE9BARUt0C+KmI54CkvjBisLxBvldcHr8ZvM3zw
+	pK3/h/ZiXkPhdlfqLrOm3dkOfICwVEEPFaU7nSAw7DRYukvVrBrvyHrqcA==
+X-Gm-Gg: ASbGncvQRnsQjMW5l8Vq0bZCwvYsiF/m4nwrdUGFG/k5vbevKWow2f15x3j2vW432/Q
+	tRO2Tlu+ABrTTEod0IADwVoOd4KI7XGpGERaja0V6JRYbl6hmhx4fErn2k+LJaZFfMJe1+yYC3W
+	J/lDWfpgkflaAMT6b8meLHFxp2T4bAAuhCPdc8tAC7tURf6vy6I8Gyc85V/4jtGnBC60ELNdmcE
+	kOfQp5ai0ZMYHTF+QWdXPrg9+P27Q6I+X4aHcJgml7ITNGTdk+IH/bSyf5zadm5gyc5mUviPF/M
+	ctBlNpkWDBBJL3i/sluv5ip4PDiwHCsL7YfTfAXfQCWAFeLypbzXLXvkog==
+X-Google-Smtp-Source: AGHT+IEPXQYP8luHSEIpYK2Qe6EvbPJ3TDE7i9D0/9DxugxkxC4KzrCBikvU8T2FDvXc8nymRtiDEw==
+X-Received: by 2002:a05:600c:a01:b0:43d:4686:5cfb with SMTP id 5b1f17b1804b1-43eb5cd1a5dmr53483585e9.27.1743676074981;
+        Thu, 03 Apr 2025 03:27:54 -0700 (PDT)
 Received: from imac ([2a02:8010:60a0:0:45fa:4ac2:175f:2ea9])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c301a6ae5sm1431937f8f.32.2025.04.03.03.27.52
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c3020d92dsm1407051f8f.71.2025.04.03.03.27.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Apr 2025 03:27:52 -0700 (PDT)
+        Thu, 03 Apr 2025 03:27:54 -0700 (PDT)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
   pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
   yuyanghuang@google.com,  jacob.e.keller@intel.com
-Subject: Re: [PATCH net v3 2/4] netlink: specs: rt_addr: fix get multi
- command name
-In-Reply-To: <20250403013706.2828322-3-kuba@kernel.org> (Jakub Kicinski's
-	message of "Wed, 2 Apr 2025 18:37:04 -0700")
-Date: Thu, 03 Apr 2025 09:34:23 +0100
-Message-ID: <m2cydthcds.fsf@gmail.com>
+Subject: Re: [PATCH net v3 3/4] netlink: specs: rt_addr: pull the ifa-
+ prefix out of the names
+In-Reply-To: <20250403013706.2828322-4-kuba@kernel.org> (Jakub Kicinski's
+	message of "Wed, 2 Apr 2025 18:37:05 -0700")
+Date: Thu, 03 Apr 2025 09:36:55 +0100
+Message-ID: <m28qohhc9k.fsf@gmail.com>
 References: <20250403013706.2828322-1-kuba@kernel.org>
-	<20250403013706.2828322-3-kuba@kernel.org>
+	<20250403013706.2828322-4-kuba@kernel.org>
 User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -95,46 +95,17 @@ Content-Type: text/plain
 
 Jakub Kicinski <kuba@kernel.org> writes:
 
-> Command names should match C defines, codegens may depend on it.
+> YAML specs don't normally include the C prefix name in the name
+> of the YAML attr. Remove the ifa- prefix from all attributes
+> in addr-attrs and specify name-prefix instead.
 >
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> Fixes: 4f280376e531 ("selftests/net: Add selftest for IPv4 RTM_GETMULTICAST support")
+> This is a bit risky, hopefully there aren't many users out there.
+>
+> Fixes: dfb0f7d9d979 ("doc/netlink: Add spec for rt addr messages")
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
 > v3:
->  - fix the op name in the test
-> v2: https://lore.kernel.org/20250402010300.2399363-3-kuba@kernel.org
-> ---
->  Documentation/netlink/specs/rt_addr.yaml | 2 +-
->  tools/testing/selftests/net/rtnetlink.py | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/Documentation/netlink/specs/rt_addr.yaml b/Documentation/netlink/specs/rt_addr.yaml
-> index 3bc9b6f9087e..1650dc3f091a 100644
-> --- a/Documentation/netlink/specs/rt_addr.yaml
-> +++ b/Documentation/netlink/specs/rt_addr.yaml
-> @@ -169,7 +169,7 @@ protonum: 0
->            value: 20
->            attributes: *ifaddr-all
->      -
-> -      name: getmaddrs
-> +      name: getmulticast
->        doc: Get / dump IPv4/IPv6 multicast addresses.
->        attribute-set: addr-attrs
->        fixed-header: ifaddrmsg
-> diff --git a/tools/testing/selftests/net/rtnetlink.py b/tools/testing/selftests/net/rtnetlink.py
-> index 80950888800b..69436415d56e 100755
-> --- a/tools/testing/selftests/net/rtnetlink.py
-> +++ b/tools/testing/selftests/net/rtnetlink.py
-> @@ -12,7 +12,7 @@ IPV4_ALL_HOSTS_MULTICAST = b'\xe0\x00\x00\x01'
->      At least the loopback interface should have this address.
->      """
->  
-> -    addresses = rtnl.getmaddrs({"ifa-family": socket.AF_INET}, dump=True)
-> +    addresses = rtnl.getmulticast({"ifa-family": socket.AF_INET}, dump=True)
->  
->      all_host_multicasts = [
->          addr for addr in addresses if addr['ifa-multicast'] == IPV4_ALL_HOSTS_MULTICAST
+>  - don't remove prefix from the struct name
 
 Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
