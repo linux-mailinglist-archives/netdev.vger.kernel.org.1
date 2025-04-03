@@ -1,92 +1,100 @@
-Return-Path: <netdev+bounces-179195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 639E0A7B1D2
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 00:04:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57B0AA7B1DB
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 00:06:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28786177AC7
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 22:04:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10904177B16
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 22:06:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B68A62E62CE;
-	Thu,  3 Apr 2025 22:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7E001A76D4;
+	Thu,  3 Apr 2025 22:05:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="myK+Beci"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iLEy5trh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1AD2E62A2
-	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 22:04:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B0C2E62A2
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 22:05:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743717850; cv=none; b=imIMtjeSgWhns7Dt/3W9At492RI/3/art+7LaFnhfprr/httQfZP/QmK4KBGQRePDAALXChy/WzDdF65k0EMEjeoh1H3RXDelEdjF03aPqXC0N0b0gKUaYi26hcL61UL0bRLEdjgQFwaVP+42Lko+JJr0BfQh7mhLcqLzLKxcy8=
+	t=1743717955; cv=none; b=X4jfkz0vsyXTo58P6kx1c4kNuy/PeN/q5jt7kStzaWgo5ArGecRsJ6dVD+Zf58x3NhemhXTFjseMZocfx4gmg4bZgX0abAIk6KyQzk41xfPJ6EZgOzDi3RwwEth7K8ppnlYumMS8Z7jDzh33VcoSm2zuHNJpmlh76sebWQYCUJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743717850; c=relaxed/simple;
-	bh=mMElvFv8+DMnnhekOQNr71I2sINIvOfnNKCsS186ZP0=;
+	s=arc-20240116; t=1743717955; c=relaxed/simple;
+	bh=eKqzYyjIi2T79dBU8LcLsXkzWmFMmVDyNb6oq7/9R+I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o9wVV1ca4xOTiCmxW/GK93IMDEm5AOOAeq0hygLyJzqE/zFdr2k2brfBc1VqO6WLGuQRoT3pGiogDgyV43sqmzPz4LTGm7GQFwFjXrnxJ8n7ve2C8cZOPkd52SkSqynNjmVteMBV5IgW5NcjJXDCjUog0irtq99oHTORUxRnqDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=myK+Beci; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-223fd89d036so16749375ad.1
-        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 15:04:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743717848; x=1744322648; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=M2AmsvjjHC86qKy4tDPP+dR04etOfsO5G+CBWvsHs2s=;
-        b=myK+BecicpWykBugO7DxVz6uwlIgt9s1iHXFKsryFlQsbAf63JgORGT/f3CXrU6ZUp
-         N/rzDYVnih+t9BTRmCO/IbosB5MTEo44Izw+Q17vDbcoftwta0zj6EcY+SmXTuZ1sbTy
-         bWCzL7N7ulQOHQpRv3Y3LFeURTSOiR7BqI/UinXN+0w52QGBvTyki+4i6eCvnfALjUFB
-         lXx4vMlAIpWVTKIHYFxtVYdyCaKl53TWVaKt70KG3kWn6agt8Z32d0DSlnDVuA58PIjZ
-         yNmdWHt+eUSOGi+4UHPX11yDFSQyKV4z7P1PC5y0N1WZNxNLt3uHjUQfX1A0Se+7UJLd
-         pVmg==
+	 Content-Type:Content-Disposition:In-Reply-To; b=NWrPWMEcgZcWGE6JA4ktuJ4nNrlFSmQI/kPG+2/+aGctWHnX+3J32g4Cy+/jt06oycHdfkO1TnWCwTEyHizQGeLA5uXg3zF8Qo0KgVdoIQ041Vh6JWaiFuH3gPWv5p/Ydv7Ogkvzm2lSkyuHNBhBuEd0Y1lTyaRVfDHvrjv+qdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iLEy5trh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743717951;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QAVFBnpk4VtqkCeBmziZc7aEtpDNjYwZQhVxgdIMsz4=;
+	b=iLEy5trhOODlJjU5O36gvmgzH0Vg35ZiNPi5YaG+kTM91G5HYpokaa/RKxFsfJgAB+vHue
+	PSuTi0oMhRFjflJPIcmi1Ji0zX2ooaPXcxVPtKgNyWoxBOvj3gyFwwg0Ku4PlhAYYP8g2J
+	gE81JLYP6gjeOmKc96g1HH3XL/21buU=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-60-EfLWLR0sNpmLTbvPGZtAGA-1; Thu, 03 Apr 2025 18:05:49 -0400
+X-MC-Unique: EfLWLR0sNpmLTbvPGZtAGA-1
+X-Mimecast-MFC-AGG-ID: EfLWLR0sNpmLTbvPGZtAGA_1743717948
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43cec217977so8528515e9.0
+        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 15:05:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743717848; x=1744322648;
+        d=1e100.net; s=20230601; t=1743717948; x=1744322748;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=M2AmsvjjHC86qKy4tDPP+dR04etOfsO5G+CBWvsHs2s=;
-        b=n2fJKj+RHpjK8SDYwKFVqfN5QcbrtpLfv6prn51KLasHCrUhDvALISvtS1ufa1C/34
-         6qzJMgEDOAnYS5lI+kzppO/ZaIc7MAw6XCUxUg5xW7fknOKBCkB+Q3rUMHw++8l9zkSw
-         DII/MzxZBwN6RUHuEF1R1r1OVRufUjBZ0rJhfDdFhGVaMzCE+pD2iI9Tff+V4gBsFauT
-         C0NJt+1Q9578ADvGOMcINA3+j0k8iRsiCWWA1KSShoLlcxYVGkei5qeK5UdwZ5H8NYhn
-         DnE7bT48Jk9OEOU3cOcex0HmGXsRQ1wI4ZxpUJIsKDqQYGZSdBwAFP2Bv+ElQqSvssiH
-         ukBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVkVbSZmkBvR5fTSW+CprKCyNQrf8Z1luoEev3JByrnYkQ9y+2ZDYNds2OH6N6mV35nemfshPA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzzwhk1HBbzwkHXfqTMxC+RZRpaqfcnqiqEgW7jCjm2LaQNGmgB
-	M8G1yJzQTod64ty+n56qnjoiE+SiRRnh4Cx9r13a/6xBeRbe0Y4=
-X-Gm-Gg: ASbGncuZY/1r8bym71tMBwWCMQNLIx50MdU3LaP5rSmlK2myVuODjZHRLW2KzOKbf9o
-	XfLFP1xqXGeCb04KK5h/ucQ1InWHl1ahJwRNiW2//CUjLRSrvNx5A1Z7ZlY7mq0TTyFDZknKPe8
-	A/JsGtxI5ABWuNnL3di1tiJBsb8TixjPN05VUC7pGtwLLM+EQYzv5j3IFbftc4Po6QzfRgxlHXP
-	jsL9vwMnB4L40m6cwwKA/TD7W89LXQn7zUG03/8iCZdFm7n7weuZlTYPixtKouoP4CAg6zp0Vew
-	MLej9sTuOaaH0VUBTuXmc1tIhl+Dooj0bK+a7pu4uYwU
-X-Google-Smtp-Source: AGHT+IH5xb0AJsQ7vokRNOotdT7V1qJncDwt3B2zGK2fbMqGU974BEKpAk1hsWAjNEZPDSsw3bPhHA==
-X-Received: by 2002:a17:903:1a24:b0:225:ac99:ae0d with SMTP id d9443c01a7336-22a8a045e34mr12314835ad.10.1743717847867;
-        Thu, 03 Apr 2025 15:04:07 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2297865c1ffsm19623425ad.126.2025.04.03.15.04.07
+        bh=QAVFBnpk4VtqkCeBmziZc7aEtpDNjYwZQhVxgdIMsz4=;
+        b=C4PaQafHENy6PuEewBQ6GmYjKGeJCBg8boi/95zb1uk/hRqqLvVYQlD3u6iLR0qDO7
+         v1ZUdry29x9gnCdKW3z3mLRXMyAs+L62qn1TIZ3ITA3N8pRr9rho+bNlrJdOzN2EWGwa
+         d2sY4F1TYugMJnPBfInGxhdHXtEAASMibgBl5pudale7gj0PJ7nYgd200XL3ApHVg95M
+         fIQfBBYDWebHnlPK5+i9A0PzCwoXZ1wa/SLlTZeeaQ9miQ6+toT/7eeMJW4huzTLKAJW
+         LlF81vRd2eKiJ+m+0Fbm4kb5KTCH/l0U/b6IGkcXTnpPq75WVtqIpD0x779bERJIC4yU
+         qELg==
+X-Forwarded-Encrypted: i=1; AJvYcCUpHvgrrWXUwnavMf0qgGEc2vRgKCH5XD8CZdksONvQShH3wzkMSUprZ74sdFSZtzCW/7SER5k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMzzOb0UFfSo6gXgcrSaCw+GBjiSM7pFxG8lvPwQ//xilS0X/Q
+	yK5Qp/av2v546F2NVqugRkHfQESv9gTZZp8A+WOMDN1JuQpBy3bKJtrM8XVWWm8UsbacemU9pUH
+	1956A8+dqLMS4e3Tx0YKn6mXWG5BvYVehEO+wWdJK4ty3lrFInzZXng==
+X-Gm-Gg: ASbGnct+9O+ea7qhyacKzrmVRESnH+dHP81Aa6VptBakhpK9qeGOAM3MemkGqGM2wva
+	14UjFen5c2rFQ8QcuCCXof10yCKTPZY+B36d3I0cciydmY46vn5jYH2gBMivbQwBQLI9wLNDBBh
+	0Y3GNHPcdOQu8rj7MxA5/mnzR+MrLQOaQeFXZPAwhcS/XRah0Aq+zUe/Evi42sfbFU8Eu7NzDZE
+	CqGEKCCE7YQi//DKMomU3Hnz1hMZCWrPnX8hthJwULaIawfyfV1fX+leZ387yeDkGUdFcUuGOeH
+	+xKkHPkpeA==
+X-Received: by 2002:a05:6000:220b:b0:39c:2692:4259 with SMTP id ffacd0b85a97d-39cb35981fdmr851929f8f.21.1743717948376;
+        Thu, 03 Apr 2025 15:05:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEW79kGoZJtIy40Yyv2kYOF7XH99mDIi3DHMq1I1roAepV4AIJGqkODQhQwHwIeDrJwacw5tw==
+X-Received: by 2002:a05:6000:220b:b0:39c:2692:4259 with SMTP id ffacd0b85a97d-39cb35981fdmr851912f8f.21.1743717947920;
+        Thu, 03 Apr 2025 15:05:47 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c301a6a60sm2740151f8f.29.2025.04.03.15.05.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Apr 2025 15:04:07 -0700 (PDT)
-Date: Thu, 3 Apr 2025 15:04:06 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: "pabeni@redhat.com" <pabeni@redhat.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"sdf@fomichev.me" <sdf@fomichev.me>,
-	"kuba@kernel.org" <kuba@kernel.org>
-Subject: Re: another netdev instance lock bug in ipv6_add_dev
-Message-ID: <Z-8F1qAvQDGf9SXV@mini-arch>
-References: <aac073de8beec3e531c86c101b274d434741c28e.camel@nvidia.com>
- <Z-3GVgPJHZSyxfaI@mini-arch>
- <c4b1397ffa83c73dfdab6bcbce51e564592e18c8.camel@nvidia.com>
- <Z-61sxcLSA6z9eoy@mini-arch>
+        Thu, 03 Apr 2025 15:05:47 -0700 (PDT)
+Date: Thu, 3 Apr 2025 18:05:43 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Markus Fohrer <markus.fohrer@webked.de>
+Cc: virtualization@lists.linux-foundation.org, jasowang@redhat.com,
+	davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [REGRESSION] Massive virtio-net throughput drop in guest VM with
+ Linux 6.8+
+Message-ID: <20250403180403-mutt-send-email-mst@kernel.org>
+References: <1d388413ab9cfd765cd2c5e05b5e69cdb2ec5a10.camel@webked.de>
+ <20250403090001-mutt-send-email-mst@kernel.org>
+ <f8909f5bbc2532ea234cdaa8dbdb46a48249803f.camel@webked.de>
+ <20250403100206-mutt-send-email-mst@kernel.org>
+ <da1c8647c4efcfcf7e7d2ba7e6235afc7b0f63ae.camel@webked.de>
+ <20250403170543-mutt-send-email-mst@kernel.org>
+ <fa9aec4d5d5148cff37a17d076b90ab835b8c7ef.camel@webked.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,370 +104,292 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z-61sxcLSA6z9eoy@mini-arch>
+In-Reply-To: <fa9aec4d5d5148cff37a17d076b90ab835b8c7ef.camel@webked.de>
 
-On 04/03, Stanislav Fomichev wrote:
-> On 04/03, Cosmin Ratiu wrote:
-> > On Wed, 2025-04-02 at 16:20 -0700, Stanislav Fomichev wrote:
-> > > On 04/02, Cosmin Ratiu wrote:
-> > > > Hi,
+On Thu, Apr 03, 2025 at 11:24:43PM +0200, Markus Fohrer wrote:
+> Am Donnerstag, dem 03.04.2025 um 17:06 -0400 schrieb Michael S.
+> Tsirkin:
+> > On Thu, Apr 03, 2025 at 10:07:12PM +0200, Markus Fohrer wrote:
+> > > Am Donnerstag, dem 03.04.2025 um 10:03 -0400 schrieb Michael S.
+> > > Tsirkin:
+> > > > On Thu, Apr 03, 2025 at 03:51:01PM +0200, Markus Fohrer wrote:
+> > > > > Am Donnerstag, dem 03.04.2025 um 09:04 -0400 schrieb Michael S.
+> > > > > Tsirkin:
+> > > > > > On Wed, Apr 02, 2025 at 11:12:07PM +0200, Markus Fohrer
+> > > > > > wrote:
+> > > > > > > Hi,
+> > > > > > > 
+> > > > > > > I'm observing a significant performance regression in KVM
+> > > > > > > guest
+> > > > > > > VMs
+> > > > > > > using virtio-net with recent Linux kernels (6.8.1+ and
+> > > > > > > 6.14).
+> > > > > > > 
+> > > > > > > When running on a host system equipped with a Broadcom
+> > > > > > > NetXtreme-E
+> > > > > > > (bnxt_en) NIC and AMD EPYC CPUs, the network throughput in
+> > > > > > > the
+> > > > > > > guest drops to 100–200 KB/s. The same guest configuration
+> > > > > > > performs
+> > > > > > > normally (~100 MB/s) when using kernel 6.8.0 or when the VM
+> > > > > > > is
+> > > > > > > moved to a host with Intel NICs.
+> > > > > > > 
+> > > > > > > Test environment:
+> > > > > > > - Host: QEMU/KVM, Linux 6.8.1 and 6.14.0
+> > > > > > > - Guest: Linux with virtio-net interface
+> > > > > > > - NIC: Broadcom BCM57416 (bnxt_en driver, no issues at host
+> > > > > > > level)
+> > > > > > > - CPU: AMD EPYC
+> > > > > > > - Storage: virtio-scsi
+> > > > > > > - VM network: virtio-net, virtio-scsi (no CPU or IO
+> > > > > > > bottlenecks)
+> > > > > > > - Traffic test: iperf3, scp, wget consistently slow in
+> > > > > > > guest
+> > > > > > > 
+> > > > > > > This issue is not present:
+> > > > > > > - On 6.8.0 
+> > > > > > > - On hosts with Intel NICs (same VM config)
+> > > > > > > 
+> > > > > > > I have bisected the issue to the following upstream commit:
+> > > > > > > 
+> > > > > > >   49d14b54a527 ("virtio-net: Suppress tx timeout warning
+> > > > > > > for
+> > > > > > > small
+> > > > > > > tx")
+> > > > > > >   https://git.kernel.org/linus/49d14b54a527
+> > > > > > 
+> > > > > > Thanks a lot for the info!
+> > > > > > 
+> > > > > > 
+> > > > > > both the link and commit point at:
+> > > > > > 
+> > > > > > commit 49d14b54a527289d09a9480f214b8c586322310a
+> > > > > > Author: Eric Dumazet <edumazet@google.com>
+> > > > > > Date:   Thu Sep 26 16:58:36 2024 +0000
+> > > > > > 
+> > > > > >     net: test for not too small csum_start in
+> > > > > > virtio_net_hdr_to_skb()
+> > > > > >     
+> > > > > > 
+> > > > > > is this what you mean?
+> > > > > > 
+> > > > > > I don't know which commit is "virtio-net: Suppress tx timeout
+> > > > > > warning
+> > > > > > for small tx"
+> > > > > > 
+> > > > > > 
+> > > > > > 
+> > > > > > > Reverting this commit restores normal network performance
+> > > > > > > in
+> > > > > > > affected guest VMs.
+> > > > > > > 
+> > > > > > > I’m happy to provide more data or assist with testing a
+> > > > > > > potential
+> > > > > > > fix.
+> > > > > > > 
+> > > > > > > Thanks,
+> > > > > > > Markus Fohrer
+> > > > > > 
+> > > > > > 
+> > > > > > Thanks! First I think it's worth checking what is the setup,
+> > > > > > e.g.
+> > > > > > which offloads are enabled.
+> > > > > > Besides that, I'd start by seeing what's doing on. Assuming
+> > > > > > I'm
+> > > > > > right
+> > > > > > about
+> > > > > > Eric's patch:
+> > > > > > 
+> > > > > > diff --git a/include/linux/virtio_net.h
+> > > > > > b/include/linux/virtio_net.h
+> > > > > > index 276ca543ef44d8..02a9f4dc594d02 100644
+> > > > > > --- a/include/linux/virtio_net.h
+> > > > > > +++ b/include/linux/virtio_net.h
+> > > > > > @@ -103,8 +103,10 @@ static inline int
+> > > > > > virtio_net_hdr_to_skb(struct
+> > > > > > sk_buff *skb,
+> > > > > >  
+> > > > > >  		if (!skb_partial_csum_set(skb, start, off))
+> > > > > >  			return -EINVAL;
+> > > > > > +		if (skb_transport_offset(skb) < nh_min_len)
+> > > > > > +			return -EINVAL;
+> > > > > >  
+> > > > > > -		nh_min_len = max_t(u32, nh_min_len,
+> > > > > > skb_transport_offset(skb));
+> > > > > > +		nh_min_len = skb_transport_offset(skb);
+> > > > > >  		p_off = nh_min_len + thlen;
+> > > > > >  		if (!pskb_may_pull(skb, p_off))
+> > > > > >  			return -EINVAL;
+> > > > > > 
+> > > > > > 
+> > > > > > sticking a printk before return -EINVAL to show the offset
+> > > > > > and
+> > > > > > nh_min_len
+> > > > > > would be a good 1st step. Thanks!
+> > > > > > 
+> > > > > 
+> > > > > 
+> > > > > Hi Eric,
+> > > > > 
+> > > > > thanks a lot for the quick response — and yes, you're
+> > > > > absolutely
+> > > > > right.
+> > > > > 
+> > > > > Apologies for the confusion: I mistakenly wrote the wrong
+> > > > > commit
+> > > > > description in my initial mail.
+> > > > > 
+> > > > > The correct commit is indeed:
+> > > > > 
+> > > > > commit 49d14b54a527289d09a9480f214b8c586322310a
+> > > > > Author: Eric Dumazet <edumazet@google.com>
+> > > > > Date:   Thu Sep 26 16:58:36 2024 +0000
+> > > > > 
+> > > > >     net: test for not too small csum_start in
+> > > > > virtio_net_hdr_to_skb()
+> > > > > 
+> > > > > This is the one I bisected and which causes the performance
+> > > > > regression
+> > > > > in my environment.
+> > > > > 
+> > > > > Thanks again,
+> > > > > Markus
 > > > > 
-> > > > Not sure if it's reported already, but I encountered a bug while
-> > > > testing with the new locking scheme.
-> > > > This is the call trace:
 > > > > 
-> > > > [ 3454.975672] WARNING: CPU: 1 PID: 58237 at
-> > > > ./include/net/netdev_lock.h:54 ipv6_add_dev+0x370/0x620
-> > > > [ 3455.008776]  ? ipv6_add_dev+0x370/0x620
-> > > > [ 3455.010097]  ipv6_find_idev+0x96/0xe0
-> > > > [ 3455.010725]  addrconf_add_dev+0x1e/0xa0
-> > > > [ 3455.011382]  addrconf_init_auto_addrs+0xb0/0x720
-> > > > [ 3455.013537]  addrconf_notify+0x35f/0x8d0
-> > > > [ 3455.014214]  notifier_call_chain+0x38/0xf0
-> > > > [ 3455.014903]  netdev_state_change+0x65/0x90
-> > > > [ 3455.015586]  linkwatch_do_dev+0x5a/0x70
-> > > > [ 3455.016238]  rtnl_getlink+0x241/0x3e0
-> > > > [ 3455.019046]  rtnetlink_rcv_msg+0x177/0x5e0
+> > > > I'm not Eric but good to know.
+> > > > Alright, so I would start with the two items: device features and
+> > > > printk.
 > > > > 
-> > > > The call chain is rtnl_getlink -> linkwatch_sync_dev ->
-> > > > linkwatch_do_dev -> netdev_state_change -> ...
-> > > > 
-> > > > Nothing on this path acquires the netdev lock, resulting in a
-> > > > warning.
-> > > > Perhaps rtnl_getlink should acquire it, in addition to the RTNL
-> > > > already
-> > > > held by rtnetlink_rcv_msg?
-> > > > 
-> > > > The same thing can be seen from the regular linkwatch wq:
-> > > > 
-> > > > [ 3456.637014] WARNING: CPU: 16 PID: 83257 at
-> > > > ./include/net/netdev_lock.h:54 ipv6_add_dev+0x370/0x620
-> > > > [ 3456.655305] Call Trace:
-> > > > [ 3456.655610]  <TASK>
-> > > > [ 3456.655890]  ? __warn+0x89/0x1b0
-> > > > [ 3456.656261]  ? ipv6_add_dev+0x370/0x620
-> > > > [ 3456.660039]  ipv6_find_idev+0x96/0xe0
-> > > > [ 3456.660445]  addrconf_add_dev+0x1e/0xa0
-> > > > [ 3456.660861]  addrconf_init_auto_addrs+0xb0/0x720
-> > > > [ 3456.661803]  addrconf_notify+0x35f/0x8d0
-> > > > [ 3456.662236]  notifier_call_chain+0x38/0xf0
-> > > > [ 3456.662676]  netdev_state_change+0x65/0x90
-> > > > [ 3456.663112]  linkwatch_do_dev+0x5a/0x70
-> > > > [ 3456.663529]  __linkwatch_run_queue+0xeb/0x200
-> > > > [ 3456.663990]  linkwatch_event+0x21/0x30
-> > > > [ 3456.664399]  process_one_work+0x211/0x610
-> > > > [ 3456.664828]  worker_thread+0x1cc/0x380
-> > > > [ 3456.665691]  kthread+0xf4/0x210
-> > > > 
-> > > > In this case, __linkwatch_run_queue seems like a good place to grab
-> > > > a
-> > > > device lock before calling linkwatch_do_dev.
 > > > 
-> > > Thanks for the report! What about linkwatch_sync_dev in
-> > > netdev_run_todo
-> > > and carrier_show? Should probably also need to be wrapped?
+> > > as requested, here’s the device/feature information from the guest
+> > > running kernel 6.14 (mainline):
+> > > 
+> > > Interface: ens18
+> > > 
+> > > ethtool -i ens18:
+> > > driver: virtio_net
+> > > version: 1.0.0
+> > > firmware-version: 
+> > > expansion-rom-version: 
+> > > bus-info: 0000:00:12.0
+> > > supports-statistics: yes
+> > > supports-test: no
+> > > supports-eeprom-access: no
+> > > supports-register-dump: no
+> > > supports-priv-flags: no
+> > > 
+> > > 
+> > > ethtool -k ens18:
+> > > Features for ens18:
+> > > rx-checksumming: on [fixed]
+> > > tx-checksumming: on
+> > > 	tx-checksum-ipv4: off [fixed]
+> > > 	tx-checksum-ip-generic: on
+> > > 	tx-checksum-ipv6: off [fixed]
+> > > 	tx-checksum-fcoe-crc: off [fixed]
+> > > 	tx-checksum-sctp: off [fixed]
+> > > scatter-gather: on
+> > > 	tx-scatter-gather: on
+> > > 	tx-scatter-gather-fraglist: off [fixed]
+> > > tcp-segmentation-offload: on
+> > > 	tx-tcp-segmentation: on
+> > > 	tx-tcp-ecn-segmentation: on
+> > > 	tx-tcp-mangleid-segmentation: off
+> > > 	tx-tcp6-segmentation: on
+> > > generic-segmentation-offload: on
+> > > generic-receive-offload: on
+> > > large-receive-offload: off [fixed]
+> > > rx-vlan-offload: off [fixed]
+> > > tx-vlan-offload: off [fixed]
+> > > ntuple-filters: off [fixed]
+> > > receive-hashing: off [fixed]
+> > > highdma: on [fixed]
+> > > rx-vlan-filter: on [fixed]
+> > > vlan-challenged: off [fixed]
+> > > tx-gso-robust: on [fixed]
+> > > tx-fcoe-segmentation: off [fixed]
+> > > tx-gre-segmentation: off [fixed]
+> > > tx-gre-csum-segmentation: off [fixed]
+> > > tx-ipxip4-segmentation: off [fixed]
+> > > tx-ipxip6-segmentation: off [fixed]
+> > > tx-udp_tnl-segmentation: off [fixed]
+> > > tx-udp_tnl-csum-segmentation: off [fixed]
+> > > tx-gso-partial: off [fixed]
+> > > tx-tunnel-remcsum-segmentation: off [fixed]
+> > > tx-sctp-segmentation: off [fixed]
+> > > tx-esp-segmentation: off [fixed]
+> > > tx-udp-segmentation: off
+> > > tx-gso-list: off [fixed]
+> > > tx-nocache-copy: off
+> > > loopback: off [fixed]
+> > > rx-fcs: off [fixed]
+> > > rx-all: off [fixed]
+> > > tx-vlan-stag-hw-insert: off [fixed]
+> > > rx-vlan-stag-hw-parse: off [fixed]
+> > > rx-vlan-stag-filter: off [fixed]
+> > > l2-fwd-offload: off [fixed]
+> > > hw-tc-offload: off [fixed]
+> > > esp-hw-offload: off [fixed]
+> > > esp-tx-csum-hw-offload: off [fixed]
+> > > rx-udp_tunnel-port-offload: off [fixed]
+> > > tls-hw-tx-offload: off [fixed]
+> > > tls-hw-rx-offload: off [fixed]
+> > > rx-gro-hw: on
+> > > tls-hw-record: off [fixed]
+> > > rx-gro-list: off
+> > > macsec-hw-offload: off [fixed]
+> > > rx-udp-gro-forwarding: off
+> > > hsr-tag-ins-offload: off [fixed]
+> > > hsr-tag-rm-offload: off [fixed]
+> > > hsr-fwd-offload: off [fixed]
+> > > hsr-dup-offload: off [fixed]
+> > > 
+> > > ethtool ens18:
+> > > Settings for ens18:
+> > > 	Supported ports: [  ]
+> > > 	Supported link modes:   Not reported
+> > > 	Supported pause frame use: No
+> > > 	Supports auto-negotiation: No
+> > > 	Supported FEC modes: Not reported
+> > > 	Advertised link modes:  Not reported
+> > > 	Advertised pause frame use: No
+> > > 	Advertised auto-negotiation: No
+> > > 	Advertised FEC modes: Not reported
+> > > 	Speed: Unknown!
+> > > 	Duplex: Unknown! (255)
+> > > 	Auto-negotiation: off
+> > > 	Port: Other
+> > > 	PHYAD: 0
+> > > 	Transceiver: internal
+> > > netlink error: Operation not permitted
+> > > 	Link detected: yes
+> > > 
+> > > 
+> > > Kernel log (journalctl -k):
+> > > Apr 03 19:50:37 kb-test.allod.com kernel: virtio_scsi virtio2:
+> > > 4/0/0
+> > > default/read/poll queues  
+> > > Apr 03 19:50:37 kb-test.allod.com kernel: virtio_net virtio1 ens18:
+> > > renamed from eth0
+> > > 
+> > > Let me know if you’d like comparison data from kernel 6.11 or any
+> > > additional tests
 > > 
-> > Done, here's the patch I'm testing with which works for all tests I
-> > could get my hands on. Will you officially propose it (maybe in a
-> > slightly different form) please?
+> > 
+> > I think let's redo bisect first then I will suggest which traces to
+> > add.
+> > 
 > 
-> I'm thinking maybe we should push down the locking a bit? To the
-> level of netdev_state_change. Since, in theory, every NETDEV_CHANGE
-> can reach addrconf_notify. I was playing with the patch below,
-> but I think the ethtool will lockup, so I need to fix that at least...
-> Let me spend a bit more time today chasing down the callers...
+> The build with the added printk is currently running. I’ll test it
+> shortly and report the results.
+> 
+> Should the bisect be done between v6.11 and v6.12, or v6.11 and v6.14?
 
-Ok, so the final patch is gonna look like this. LMK if you can give it
-a test on your side.
+The commit you showed is between 6.11 and 6.12. Having said that,
+you can manually checkout 49d14b54a527289d09a9480f214b8c586322310a
+and 49d14b54a527289d09a9480f214b8c586322310a~1 and record
+the results with git bisect bad/good and if it works
+then git bisect will stop immediately for you.
 
-diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
-index 6c2d8945f597..eab601ab2db0 100644
---- a/Documentation/networking/netdevices.rst
-+++ b/Documentation/networking/netdevices.rst
-@@ -338,10 +338,11 @@ operations directly under the netdev instance lock.
- Devices drivers are encouraged to rely on the instance lock where possible.
- 
- For the (mostly software) drivers that need to interact with the core stack,
--there are two sets of interfaces: ``dev_xxx`` and ``netif_xxx`` (e.g.,
--``dev_set_mtu`` and ``netif_set_mtu``). The ``dev_xxx`` functions handle
--acquiring the instance lock themselves, while the ``netif_xxx`` functions
--assume that the driver has already acquired the instance lock.
-+there are two sets of interfaces: ``dev_xxx``/``netdev_xxx`` and ``netif_xxx``
-+(e.g., ``dev_set_mtu`` and ``netif_set_mtu``). The ``dev_xxx``/``netdev_xxx``
-+functions handle acquiring the instance lock themselves, while the
-+``netif_xxx`` functions assume that the driver has already acquired
-+the instance lock.
- 
- Notifiers and netdev instance lock
- ==================================
-@@ -354,6 +355,7 @@ For devices with locked ops, currently only the following notifiers are
- running under the lock:
- * ``NETDEV_REGISTER``
- * ``NETDEV_UP``
-+* ``NETDEV_CHANGE``
- 
- The following notifiers are running without the lock:
- * ``NETDEV_UNREGISTER``
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 9fb03a292817..b3a162105129 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -4430,6 +4430,7 @@ void linkwatch_fire_event(struct net_device *dev);
-  * pending work list (if queued).
-  */
- void linkwatch_sync_dev(struct net_device *dev);
-+void __linkwatch_sync_dev(struct net_device *dev);
- 
- /**
-  *	netif_carrier_ok - test if carrier present
-@@ -4975,6 +4976,7 @@ void dev_set_rx_mode(struct net_device *dev);
- int dev_set_promiscuity(struct net_device *dev, int inc);
- int netif_set_allmulti(struct net_device *dev, int inc, bool notify);
- int dev_set_allmulti(struct net_device *dev, int inc);
-+void netif_state_change(struct net_device *dev);
- void netdev_state_change(struct net_device *dev);
- void __netdev_notify_peers(struct net_device *dev);
- void netdev_notify_peers(struct net_device *dev);
-diff --git a/include/linux/rtnetlink.h b/include/linux/rtnetlink.h
-index ccaaf4c7d5f6..ea39dd23a197 100644
---- a/include/linux/rtnetlink.h
-+++ b/include/linux/rtnetlink.h
-@@ -240,6 +240,6 @@ rtnl_notify_needed(const struct net *net, u16 nlflags, u32 group)
- 	return (nlflags & NLM_F_ECHO) || rtnl_has_listeners(net, group);
- }
- 
--void netdev_set_operstate(struct net_device *dev, int newstate);
-+void netif_set_operstate(struct net_device *dev, int newstate);
- 
- #endif	/* __LINUX_RTNETLINK_H */
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 87cba93fa59f..d4a5c07a0d73 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -1567,15 +1567,7 @@ void netdev_features_change(struct net_device *dev)
- }
- EXPORT_SYMBOL(netdev_features_change);
- 
--/**
-- *	netdev_state_change - device changes state
-- *	@dev: device to cause notification
-- *
-- *	Called to indicate a device has changed state. This function calls
-- *	the notifier chains for netdev_chain and sends a NEWLINK message
-- *	to the routing socket.
-- */
--void netdev_state_change(struct net_device *dev)
-+void netif_state_change(struct net_device *dev)
- {
- 	if (dev->flags & IFF_UP) {
- 		struct netdev_notifier_change_info change_info = {
-@@ -1587,7 +1579,6 @@ void netdev_state_change(struct net_device *dev)
- 		rtmsg_ifinfo(RTM_NEWLINK, dev, 0, GFP_KERNEL, 0, NULL);
- 	}
- }
--EXPORT_SYMBOL(netdev_state_change);
- 
- /**
-  * __netdev_notify_peers - notify network peers about existence of @dev,
-diff --git a/net/core/dev_api.c b/net/core/dev_api.c
-index 90bafb0b1b8c..6c6ca15ef2a3 100644
---- a/net/core/dev_api.c
-+++ b/net/core/dev_api.c
-@@ -327,3 +327,19 @@ int dev_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf)
- 	return ret;
- }
- EXPORT_SYMBOL_GPL(dev_xdp_propagate);
-+
-+/**
-+ *	netdev_state_change - device changes state
-+ *	@dev: device to cause notification
-+ *
-+ *	Called to indicate a device has changed state. This function calls
-+ *	the notifier chains for netdev_chain and sends a NEWLINK message
-+ *	to the routing socket.
-+ */
-+void netdev_state_change(struct net_device *dev)
-+{
-+	netdev_lock_ops(dev);
-+	netif_state_change(dev);
-+	netdev_unlock_ops(dev);
-+}
-+EXPORT_SYMBOL(netdev_state_change);
-diff --git a/net/core/link_watch.c b/net/core/link_watch.c
-index cb04ef2b9807..864f3bbc3a4c 100644
---- a/net/core/link_watch.c
-+++ b/net/core/link_watch.c
-@@ -183,7 +183,7 @@ static void linkwatch_do_dev(struct net_device *dev)
- 		else
- 			dev_deactivate(dev);
- 
--		netdev_state_change(dev);
-+		netif_state_change(dev);
- 	}
- 	/* Note: our callers are responsible for calling netdev_tracker_free().
- 	 * This is the reason we use __dev_put() instead of dev_put().
-@@ -240,7 +240,9 @@ static void __linkwatch_run_queue(int urgent_only)
- 		 */
- 		netdev_tracker_free(dev, &dev->linkwatch_dev_tracker);
- 		spin_unlock_irq(&lweventlist_lock);
-+		netdev_lock_ops(dev);
- 		linkwatch_do_dev(dev);
-+		netdev_unlock_ops(dev);
- 		do_dev--;
- 		spin_lock_irq(&lweventlist_lock);
- 	}
-@@ -253,25 +255,41 @@ static void __linkwatch_run_queue(int urgent_only)
- 	spin_unlock_irq(&lweventlist_lock);
- }
- 
--void linkwatch_sync_dev(struct net_device *dev)
-+static bool linkwatch_clean_dev(struct net_device *dev)
- {
- 	unsigned long flags;
--	int clean = 0;
-+	bool clean = false;
- 
- 	spin_lock_irqsave(&lweventlist_lock, flags);
- 	if (!list_empty(&dev->link_watch_list)) {
- 		list_del_init(&dev->link_watch_list);
--		clean = 1;
-+		clean = true;
- 		/* We must release netdev tracker under
- 		 * the spinlock protection.
- 		 */
- 		netdev_tracker_free(dev, &dev->linkwatch_dev_tracker);
- 	}
- 	spin_unlock_irqrestore(&lweventlist_lock, flags);
--	if (clean)
-+
-+	return clean;
-+}
-+
-+void __linkwatch_sync_dev(struct net_device *dev)
-+{
-+	netdev_ops_assert_locked(dev);
-+
-+	if (linkwatch_clean_dev(dev))
- 		linkwatch_do_dev(dev);
- }
- 
-+void linkwatch_sync_dev(struct net_device *dev)
-+{
-+	if (linkwatch_clean_dev(dev)) {
-+		netdev_lock_ops(dev);
-+		linkwatch_do_dev(dev);
-+		netdev_unlock_ops(dev);
-+	}
-+}
- 
- /* Must be called with the rtnl semaphore held */
- void linkwatch_run_queue(void)
-diff --git a/net/core/lock_debug.c b/net/core/lock_debug.c
-index 72e522a68775..c442bf52dbaf 100644
---- a/net/core/lock_debug.c
-+++ b/net/core/lock_debug.c
-@@ -20,11 +20,11 @@ int netdev_debug_event(struct notifier_block *nb, unsigned long event,
- 	switch (cmd) {
- 	case NETDEV_REGISTER:
- 	case NETDEV_UP:
-+	case NETDEV_CHANGE:
- 		netdev_ops_assert_locked(dev);
- 		fallthrough;
- 	case NETDEV_DOWN:
- 	case NETDEV_REBOOT:
--	case NETDEV_CHANGE:
- 	case NETDEV_UNREGISTER:
- 	case NETDEV_CHANGEMTU:
- 	case NETDEV_CHANGEADDR:
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index c23852835050..d8d03ff87a3b 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -1043,7 +1043,7 @@ int rtnl_put_cacheinfo(struct sk_buff *skb, struct dst_entry *dst, u32 id,
- }
- EXPORT_SYMBOL_GPL(rtnl_put_cacheinfo);
- 
--void netdev_set_operstate(struct net_device *dev, int newstate)
-+void netif_set_operstate(struct net_device *dev, int newstate)
- {
- 	unsigned int old = READ_ONCE(dev->operstate);
- 
-@@ -1052,9 +1052,9 @@ void netdev_set_operstate(struct net_device *dev, int newstate)
- 			return;
- 	} while (!try_cmpxchg(&dev->operstate, &old, newstate));
- 
--	netdev_state_change(dev);
-+	netif_state_change(dev);
- }
--EXPORT_SYMBOL(netdev_set_operstate);
-+EXPORT_SYMBOL(netif_set_operstate);
- 
- static void set_operstate(struct net_device *dev, unsigned char transition)
- {
-@@ -1080,7 +1080,7 @@ static void set_operstate(struct net_device *dev, unsigned char transition)
- 		break;
- 	}
- 
--	netdev_set_operstate(dev, operstate);
-+	netif_set_operstate(dev, operstate);
- }
- 
- static unsigned int rtnl_dev_get_flags(const struct net_device *dev)
-@@ -3396,7 +3396,7 @@ static int do_setlink(const struct sk_buff *skb, struct net_device *dev,
- errout:
- 	if (status & DO_SETLINK_MODIFIED) {
- 		if ((status & DO_SETLINK_NOTIFY) == DO_SETLINK_NOTIFY)
--			netdev_state_change(dev);
-+			netif_state_change(dev);
- 
- 		if (err < 0)
- 			net_warn_ratelimited("A link change request failed with some changes committed already. Interface %s may have been left with an inconsistent configuration, please check.\n",
-@@ -3676,8 +3676,11 @@ struct net_device *rtnl_create_link(struct net *net, const char *ifname,
- 				nla_len(tb[IFLA_BROADCAST]));
- 	if (tb[IFLA_TXQLEN])
- 		dev->tx_queue_len = nla_get_u32(tb[IFLA_TXQLEN]);
--	if (tb[IFLA_OPERSTATE])
-+	if (tb[IFLA_OPERSTATE]) {
-+		netdev_lock_ops(dev);
- 		set_operstate(dev, nla_get_u8(tb[IFLA_OPERSTATE]));
-+		netdev_unlock_ops(dev);
-+	}
- 	if (tb[IFLA_LINKMODE])
- 		dev->link_mode = nla_get_u8(tb[IFLA_LINKMODE]);
- 	if (tb[IFLA_GROUP])
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index 221639407c72..8262cc10f98d 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -60,7 +60,7 @@ static struct devlink *netdev_to_devlink_get(struct net_device *dev)
- u32 ethtool_op_get_link(struct net_device *dev)
- {
- 	/* Synchronize carrier state with link watch, see also rtnl_getlink() */
--	linkwatch_sync_dev(dev);
-+	__linkwatch_sync_dev(dev);
- 
- 	return netif_carrier_ok(dev) ? 1 : 0;
- }
-diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
-index 439cfb7ad5d1..1b1b700ec05e 100644
---- a/net/hsr/hsr_device.c
-+++ b/net/hsr/hsr_device.c
-@@ -33,14 +33,14 @@ static void hsr_set_operstate(struct hsr_port *master, bool has_carrier)
- 	struct net_device *dev = master->dev;
- 
- 	if (!is_admin_up(dev)) {
--		netdev_set_operstate(dev, IF_OPER_DOWN);
-+		netif_set_operstate(dev, IF_OPER_DOWN);
- 		return;
- 	}
- 
- 	if (has_carrier)
--		netdev_set_operstate(dev, IF_OPER_UP);
-+		netif_set_operstate(dev, IF_OPER_UP);
- 	else
--		netdev_set_operstate(dev, IF_OPER_LOWERLAYERDOWN);
-+		netif_set_operstate(dev, IF_OPER_LOWERLAYERDOWN);
- }
- 
- static bool hsr_check_carrier(struct hsr_port *master)
 
