@@ -1,97 +1,97 @@
-Return-Path: <netdev+bounces-178930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46E4BA79967
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 02:25:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 883DFA7996A
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 02:30:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC54E18929B7
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 00:25:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10A123B1B76
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 00:29:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A941A11CBA;
-	Thu,  3 Apr 2025 00:24:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27B95CA52;
+	Thu,  3 Apr 2025 00:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hUBQ8sUK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="djXc35wq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7001574E09;
-	Thu,  3 Apr 2025 00:24:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 038FC2907
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 00:29:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743639889; cv=none; b=aeGhNEAVFHAvHd/EQjMwzxTd4Kv7hsERu19hA+Nv9d63bcXxTVBPbS8kRGQ8gpE3eY1hrHAIsXZ5biOmYv8qm58z0sqHogHHJxfQVe2WnhujFyILNDex9lJQSemPtgTiy/swu3OHyhLlh7yZV6GFtCUBrlKOZkcbrrRnug8SmtA=
+	t=1743640197; cv=none; b=suR2aVLeAsj6TNGXEY6WHAc1dcwX5NSd3TfGzN7bpxNDzn9J4EWR6M6kGoZvGl09PwPmipBFq+RszDZqXlSXNc2a98bDQy3KY6fwpWaFmlbHmZN62Ya0GcXFa+XQuYgUf0WpRXbDy3tNsh/GBqApDwG1Tqw3y22I8fqa/x9UY7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743639889; c=relaxed/simple;
-	bh=mz5lyvN7h0nt/sY0f+AgxhZJiaKZQnYXi9YxDfQH9QA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GE9PEefTXDhCnLMGkZQFnH9uDMzUYGSf50W3HE7xYk/XDFOejhZeDSqNLMFCB7bZENt+KE1KHAeeOa0wqrUh/8l+r0S7eq3ytW00sN1+6gIGkRg3zsGgtF4kQfK7pY7WOy4iAtSrEkjo8Ai+uUme9gtZFRww1OEP4TnzO43KZMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hUBQ8sUK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFC06C4CEDD;
-	Thu,  3 Apr 2025 00:24:47 +0000 (UTC)
+	s=arc-20240116; t=1743640197; c=relaxed/simple;
+	bh=GMwqHQVII7100EiyJtvMks5ZEQM7JkLN2Se9mNI9dd8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=p9lWNkgf3qUY24qYwnRoBdXvExyui3Q+VLIJ0HjxG8StqEgaiCcTtSkCDVI4AynA6nGaNo8/LyPrUiDCjs3w9fmRgZ8KJcf+gPFpvcFNcIqgNrRQqAGuhrpg0LBolUnBQZyD3aHFP6xX9JbZyZ38RnlJ4qwfl8fhIkYmM54n/+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=djXc35wq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F605C4CEDD;
+	Thu,  3 Apr 2025 00:29:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743639888;
-	bh=mz5lyvN7h0nt/sY0f+AgxhZJiaKZQnYXi9YxDfQH9QA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hUBQ8sUK083D/NSf6uKRioMj2OOyOuQ71SxeXZrcdfIxsvc6p71V2o0wTm8gQ2RdI
-	 SMmbH8KjZdzQQozFuo1hm38a8xHSimfVP8QK2sV1++UaFMXy0r3z9cOpUFe/VF8SQJ
-	 /powehxfHXJuXe3Gpiy9ruUljnBpCgOR2TaM488Lxju4COyQqaJlyxNRVh+u1DbiwD
-	 hVSeKyjdzkvgIpxuliu5xZZBG6wkss9FVFr4Jj9jzIijDka2/lYM2gjuvP8U0e2bE0
-	 K/8gffs8AkSrPn06h2S34OLtyMjCrlzmhgbpvO7ku+YVjjQfWOVuiCMaXHzWhNev9I
-	 7xTAlnUnqqVtw==
-Date: Wed, 2 Apr 2025 17:24:47 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: bpf@vger.kernel.org, mrpre@163.com, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
- <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard
- Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
- <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
- Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jesper Dangaard
- Brouer <hawk@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan
- <shuah@kernel.org>, Willem de Bruijn <willemb@google.com>, Jason Xing
- <kerneljasonxing@gmail.com>, Anton Protopopov <aspsk@isovalent.com>,
- Abhishek Chauhan <quic_abchauha@quicinc.com>, Jordan Rome
- <linux@jordanrome.com>, Martin Kelly <martin.kelly@crowdstrike.com>, David
- Lechner <dlechner@baylibre.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH bpf v2 2/2] selftests/bpf: add perf test for
- adjust_{head,meta}
-Message-ID: <20250402172447.75ed447f@kernel.org>
-In-Reply-To: <20250331032354.75808-3-jiayuan.chen@linux.dev>
-References: <20250331032354.75808-1-jiayuan.chen@linux.dev>
-	<20250331032354.75808-3-jiayuan.chen@linux.dev>
+	s=k20201202; t=1743640196;
+	bh=GMwqHQVII7100EiyJtvMks5ZEQM7JkLN2Se9mNI9dd8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=djXc35wqKDEzKOvtdaWeljE+HZv0njWYulHNt424qGSOKiJRVrygzEgnqdAkiY2ea
+	 lKvezYjVmp28NjZveTcXpIUWuwFNsLeUZ7QbblBmZrxwvolqBRfhqaVqO0npVe4fB5
+	 n+8lR6enusUti+VZhoBeCWNHmZgPwxu7+LVgKpagyT5pfMULjiCx3w69WKeyvcWhMm
+	 5r15w+QYUi3UKYWoQ47CeLV6EioUBTlZYAbnOewsVCLz31p2lcAyPmtFwfsF6hRwZK
+	 IblaVWBUzS2t0ZyBTUC2L/Ik5tQXbKBV/idmESXSWQLqOCq70EIsNJZYMMKUTO+ebK
+	 jj4UpIcqBBn0w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F84380CEE3;
+	Thu,  3 Apr 2025 00:30:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v5 net 0/2] udp: Fix two integer overflows when sk->sk_rcvbuf
+ is close to INT_MAX.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174364023325.1731187.12666225758668243399.git-patchwork-notify@kernel.org>
+Date: Thu, 03 Apr 2025 00:30:33 +0000
+References: <20250401184501.67377-1-kuniyu@amazon.com>
+In-Reply-To: <20250401184501.67377-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ kuni1840@gmail.com, netdev@vger.kernel.org
 
-On Mon, 31 Mar 2025 11:23:45 +0800 Jiayuan Chen wrote:
-> which is negligible for the net stack.
-> 
-> Before memset
-> ./test_progs -a xdp_adjust_head_perf -v
-> run adjust head with size 6 cost 56 ns
-> run adjust head with size 20 cost 56 ns
-> run adjust head with size 40 cost 56 ns
-> run adjust head with size 200 cost 56 ns
-> 
-> After memset
-> ./test_progs -a xdp_adjust_head_perf -v
-> run adjust head with size 6 cost 58 ns
-> run adjust head with size 20 cost 58 ns
-> run adjust head with size 40 cost 58 ns
-> run adjust head with size 200 cost 66 ns
+Hello:
 
-FWIW I'm not sure if this is "negligible" for XDP like you say,
-but I defer to Jesper :)
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 1 Apr 2025 11:44:41 -0700 you wrote:
+> I got a report that UDP mem usage in /proc/net/sockstat did not
+> drop even after an application was terminated.
+> 
+> The issue could happen if sk->sk_rmem_alloc wraps around due
+> to a large sk->sk_rcvbuf, which was INT_MAX in our case.
+> 
+> The patch 2 fixes the issue, and the patch 1 fixes yet another
+> overflow I found while investigating the issue.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v5,net,1/2] udp: Fix multiple wraparounds of sk->sk_rmem_alloc.
+    https://git.kernel.org/netdev/net/c/5a465a0da13e
+  - [v5,net,2/2] udp: Fix memory accounting leak.
+    https://git.kernel.org/netdev/net/c/df207de9d9e7
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
