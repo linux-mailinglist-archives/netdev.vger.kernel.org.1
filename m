@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-178937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32902A79993
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 03:21:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 55302A7999C
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 03:23:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28EA63AD78D
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 01:21:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0917D3B35CE
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 01:22:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D380113632B;
-	Thu,  3 Apr 2025 01:21:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A24A17D3F4;
+	Thu,  3 Apr 2025 01:22:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7621278F39;
-	Thu,  3 Apr 2025 01:21:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A795CBA42;
+	Thu,  3 Apr 2025 01:22:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743643287; cv=none; b=TYc1HMDjG1WmTjLkvOLagEFCK5amVf7DUGxjt9ckdrrMlZCwWJnitHvJJDy8ZFIrz12O8E8MxMGcvMxJDeO6gK4TZ6bqsYZ3HTJYOPjynrO5ShGPU3tYVpcg4J8Oud9iVIaH2FjH1pfP+c1rdiv0Mwdye+MbUOUzzE4jS8MXTZ0=
+	t=1743643367; cv=none; b=soxwlnXCMTPXWDMi6CWrAC+sAgYUueqECfeAVUxxn80s3daJ3zJjua3+hHQ1i6pIG1b8krDB7polPBFvaHQhi1BxrdMo9U554dOoAEasszvM8WxBmPet+bQT1qePMZZ3JDhSBCVLDW2ub+aRxL52ymMfdpKRkR4ZwlrJ6drvQ8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743643287; c=relaxed/simple;
-	bh=tgs0e8XeIN7q0WyRcw+06bmb50vMDJ4P4L/t0bTxsUs=;
+	s=arc-20240116; t=1743643367; c=relaxed/simple;
+	bh=ZaRFeTDI8y5EzpT4O56/SvLj7eJGOdqWo5wVkXuzcPY=;
 	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=DjygnorW/ts+TZ8WDjBOKEFlNkRYgiHly/5nEzL6AH6I4X7NTFtcfoJPLHkmLANmg1rtJZpyR3rNEmcTxL3T8Xctrx6sFmrsF+QJXuwvdmLejod/xlHxYMlTxqU864nSjE6NsXEEeLOWFTvolWGFsW+9c7WrwrL+MYGTInu7F0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+	 In-Reply-To:Content-Type; b=btLBBMeo8EZTSv6uYNyYMVjGrBhrJ9yug+1aA8qKrlguJ7tIQDOfyJBMu3W+PUMoPvdbD+/ZUUbxgXmSC3xmtn4fNilG3sN+sMoMJL3mv8V87OxEavoXPFe92v0fR12v44zc7E9UM0Q2ibdlQoX+CaCu8jLkvSttuqziBAitydE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4ZSkNy1VJMzvWs8;
-	Thu,  3 Apr 2025 09:17:22 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4ZSkPX4hCTz2RTZP;
+	Thu,  3 Apr 2025 09:17:52 +0800 (CST)
 Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5D0061800E4;
-	Thu,  3 Apr 2025 09:21:22 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id C0A51140144;
+	Thu,  3 Apr 2025 09:22:41 +0800 (CST)
 Received: from [10.67.120.192] (10.67.120.192) by
  kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 3 Apr 2025 09:21:21 +0800
-Message-ID: <88dcf938-f43d-44f8-a943-ab84aa2edf2b@huawei.com>
-Date: Thu, 3 Apr 2025 09:21:20 +0800
+ 15.2.1544.11; Thu, 3 Apr 2025 09:22:40 +0800
+Message-ID: <b1b63a84-e043-414e-b1af-c2d6e5855b08@huawei.com>
+Date: Thu, 3 Apr 2025 09:22:40 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,63 +54,39 @@ CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
 	<chenhao418@huawei.com>, <jonathan.cameron@huawei.com>,
 	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net 3/3] net: hns3: store rx VLAN tag offload state for VF
+Subject: Re: [PATCH net 2/3] net: hns3: fix spelling mistake "reg_um" ->
+ "reg_num"
 To: Simon Horman <horms@kernel.org>
 References: <20250402121001.663431-1-shaojijie@huawei.com>
- <20250402121001.663431-4-shaojijie@huawei.com>
- <20250402140155.GR214849@horms.kernel.org>
+ <20250402121001.663431-3-shaojijie@huawei.com>
+ <20250402135902.GQ214849@horms.kernel.org>
 From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20250402140155.GR214849@horms.kernel.org>
+In-Reply-To: <20250402135902.GQ214849@horms.kernel.org>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
 X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
  kwepemk100013.china.huawei.com (7.202.194.61)
 
 
-on 2025/4/2 22:01, Simon Horman wrote:
-> On Wed, Apr 02, 2025 at 08:10:01PM +0800, Jijie Shao wrote:
->> From: Jian Shen <shenjian15@huawei.com>
+on 2025/4/2 21:59, Simon Horman wrote:
+> On Wed, Apr 02, 2025 at 08:10:00PM +0800, Jijie Shao wrote:
+>> From: Hao Lan <lanhao@huawei.com>
 >>
->> The VF driver missed to store the rx VLAN tag strip state when
->> user change the rx VLAN tag offload state. And it will default
->> to enable the rx vlan tag strip when re-init VF device after
->> reset. So if user disable rx VLAN tag offload, and trig reset,
->> then the HW will still strip the VLAN tag from packet nad fill
->> into RX BD, but the VF driver will ignore it for rx VLAN tag
->> offload disabled. It may cause the rx VLAN tag dropped.
+>> There are spelling mistakes in hclgevf_get_regs. Fix them.
 >>
->> Fixes: b2641e2ad456 ("net: hns3: Add support of hardware rx-vlan-offload to HNS3 VF driver")
->> Signed-off-by: Jian Shen <shenjian15@huawei.com>
+>> Signed-off-by: Hao Lan <lanhao@huawei.com>
 >> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-> Overall this looks good to me.
+> Hi,
 >
-> Reviewed-by: Simon Horman <horms@kernel.org>
->
-> ...
->
->> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.h b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.h
->> index cccef3228461..1e452b14b04e 100644
->> --- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.h
->> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.h
->> @@ -252,7 +252,8 @@ struct hclgevf_dev {
->>   	u16 *vector_status;
->>   	int *vector_irq;
->>   
->> -	bool gro_en;
->> +	u32 gro_en :1;
->> +	u32 rxvtag_strip_en :1;
-> FWIIW, as there is space I would have used two bools here.
+> I agree this is a nice change. But I would lean to it being a clean-up
+> and thus material for net-next (when it reopens) rather than a (bug) fix
+> for net.
 
-ok, I will change to bool in v2
+ok, Thanks!
 
-Thanks,
 Jijie Shao
 
 >
->>   
->>   	unsigned long vlan_del_fail_bmap[BITS_TO_LONGS(VLAN_N_VID)];
->>   
->> -- 
->> 2.33.0
->>
+> ...
+>
 
