@@ -1,335 +1,121 @@
-Return-Path: <netdev+bounces-179206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDB95A7B206
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 00:28:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F0B3A7B1ED
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 00:10:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD2003B1C19
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 22:27:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 118D71894898
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 22:11:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D91D19F471;
-	Thu,  3 Apr 2025 22:27:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA6051A254E;
+	Thu,  3 Apr 2025 22:10:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="da/mwRbM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WeQZU8xb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A763A2E62AE
-	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 22:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 597B9161320
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 22:10:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743719277; cv=none; b=pxGrYFNVu140dzUzL+LWAevMReUZUu4uM0YqzIOZE+oxzuxdUlo3JvOIpGrh9MexAg6Pzi17c5uzacNt5vX59UYfVAdT1aO7+S/L5JE1TaftbtWrH5HrrjmZhhHsPqikEP4hVQyMHM48pHDqsyOzuVfv+/Xr7iB6Y+J7ejtNkFQ=
+	t=1743718254; cv=none; b=sD5FjxPFmgHzMTJQGt7BUr8CPzwcNWksgDnQ9cHdn047McxU08BBJSYsH5kjFl8uWcHvVHEiCV7k264uroU7SIGH1vYYDDkKR20ThgVsc3NGS+vZhRkZizN8fpi0fATbHXZLetN+aldkGLGsOB8/2+8gnzWg4Jl/Q7h0V9Vw8iA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743719277; c=relaxed/simple;
-	bh=qH3fJl0q59Mny9rkqtHSYI6oZZzxEjNK7rETaxK7VxY=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=a248a1/gELXeUtN7ei7XBt2ApI/wxezA9zid8gbKc4RwdYdLtWFiIzVocMgFfhHYf68dESnGV3bO/rOzmLhabmi8lD9Vjh8oMo+PzwVSOfvJbYdd8mmg5XNQcnOlefu53OrdP+RJ5+V/+PttII/HCgOpl19rGjD6hH7Cmd8FsyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=da/mwRbM; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1u0Si5-001qPN-5X; Fri, 04 Apr 2025 00:06:53 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
-	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
-	bh=Qql1xClaNY85wlNMfqVKN49eDbeiQf2bCrIo/uVuuL0=; b=da/mwRbMsJRyvzAeuLEuhVy+uu
-	mXDwfaq6vs88HuUTEz5UA6rH8ZnwW4B/QSdfHmUUrxlHxoG5D/N/ERBssDjX/iZOfqN7xqgfSIaka
-	/wyDN8adAsAFtVolClsjxv00qZ4V8W0I2C7pAIS7rLqI1nnam45D/buCMn7NBfLkC8V7NrRh9mlMb
-	8PskpPo+VBYl2XeZERyVC2X8bDowaPVScZUWS5gGfQDULAXqEdLb2AMLA8g9w1GDiy5WsmXtQHaTg
-	tfagFmimODOK7nTwO5MqPSjuYeJYkfc+XZCiBveqjnTptw/N5SvI9phUgK47IUIjm8dJfv/buk5Wv
-	zmBBet9Q==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1u0Si4-0007Tr-Fv; Fri, 04 Apr 2025 00:06:52 +0200
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1u0Shq-003NAP-6H; Fri, 04 Apr 2025 00:06:38 +0200
-Message-ID: <7566fe52-23b7-46cc-95ef-63cbbd3071a1@rbox.co>
-Date: Fri, 4 Apr 2025 00:06:36 +0200
+	s=arc-20240116; t=1743718254; c=relaxed/simple;
+	bh=KxcyHQ5GwXehTashBkvBpQWrHTU2AjmJDuaE9V4rGNA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F45U6XLaS+XFcR0RiOsXytq7NK1QEkQG+63HZLBtt5BMyfrRXpK0LHsvYJ4X8OEa0YAoc6SalN6jH+pJYUgM54BA0HzYIKUOyeF35OutEm7K15HeBBz6QpW19+hzBS1DCR8AeVRHBH+wTQp3Sd+3jGQqMNW5EibTT2GvOZ4YuJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WeQZU8xb; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-af548cb1f83so1299482a12.3
+        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 15:10:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743718253; x=1744323053; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xrJJ67tnSxIkqSC7vF2ewZHoRj6tQeQHJJDf4OYEMAo=;
+        b=WeQZU8xbBQM0SRmkqdMVrgSLelqowLX3ykC5JLtUSvogIPkjSxLkKgQmEpVW4Zg06e
+         2M9U6VfBl8+cIVNewf4a/LPIQ3QQ+d40jG1XSpxgZCV3didLUzuwdhvmFC2GVFythnU+
+         ExiaKLzW1PFKjVprvbg7F2OscnCyTfHmXMx1S4E6cy9VSG5Th//75qWz3Z8Y3d/QM7v1
+         stqdCCSWSOGbvbua8hQKBeeKJEwZSmJjuZOfAZGiumYZTXOjEwRvmD52Wb2qsLm79NHn
+         7LicbOPh+8tG3CrCm5b7kYuIxZmaZS6ecmfl+a4JSiFTFlqml13MWtg4689N5WQJPdZZ
+         qxfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743718253; x=1744323053;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xrJJ67tnSxIkqSC7vF2ewZHoRj6tQeQHJJDf4OYEMAo=;
+        b=IcUP76nu7+MAVZr6sqE1rHLehS0PCM0n/OGFMFWN8GEZLE/rCL4i5CkYibTBW8wJmX
+         SntZts/7zhBcXVfbVPzbQYJxHapOIaq5pzpSOEw0Zgxs9tnUn7MIWqgtibVaiyZ3QaKz
+         NwFX5q8qQqlsmlKtfxDv0Vzzfciy1S+t7+r2vUgMpTjlSdInaGStGvzjvY+3S4xFj3bv
+         SQcs++D2gBtNa6q9iflxVI8sJ1p548exbiMEmCeF+NdjlqNc/Msxss0/xgFt8/WqCd7D
+         JaGvQ9veAeO216MOnou5DkM7ycmSLdYQtoFQslKGOC8BI2QLn89OLuhtXxDqgsN03eoG
+         xfoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVSDE2iV5G0Frg9sRpQzsR1tCkmT6outGioRh5TCq+bR0kfzA3O2u1hHhxRHup78KMSJO+Y3IM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeN4qNvPpsdgz40yMWTGjD1QsZ5FYPbleBYt9gBQMZU/ImGEhr
+	dWqgH6+P78AR3wuvoiP9AEKDHZ4PXoEvrfTnIcLfj+W0mDzpVwdS
+X-Gm-Gg: ASbGncuMXrsIbb+0RFDQ9Qxb4uIjf+Q4dKLxUHYtK2nFwRIucrJcg/QCjQn3IsL6GAK
+	EzO7FTLoKOwNuItvnaHSHLBXc379dO9ATqyMerWlLf963/PAczZ8Y/KSzwx33IlmYEdGsw4zy5w
+	TbDdLi4ylGeHgCNMSvPbUobj/c+Jmzs8BEyqxdvxT/g/CJyPgr1h4oUZdCJT54mar935PYI1zM9
+	gGi+W34uEvUnF/50Knv/Q8AnhHgQA9yZx50TW4t70CeG2Aewg2crfT6gdxOFVOnwM7IQuwOyaiC
+	DbEraH8pv0IFGwi7Dhh/YVqFF1h1AzKaDw+3/sSSak5dnXZt
+X-Google-Smtp-Source: AGHT+IEVvfv/xnKcEWkUOhtohFPem/sqKY1xdInT06b3URrXwVVMpvJa5efu3ZPs+HiAz9zauUZEMA==
+X-Received: by 2002:a17:90b:56c6:b0:2ff:6aa6:47a3 with SMTP id 98e67ed59e1d1-306a4892e9cmr1696512a91.25.1743718252675;
+        Thu, 03 Apr 2025 15:10:52 -0700 (PDT)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3057ca1f49csm2504504a91.1.2025.04.03.15.10.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Apr 2025 15:10:52 -0700 (PDT)
+Date: Thu, 3 Apr 2025 15:10:51 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Lin Ma <linma@zju.edu.cn>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	pablo@netfilter.org, kadlec@netfilter.org, jhs@mojatatu.com,
+	jiri@resnulli.us, lucien.xin@gmail.com,
+	pieter.jansenvanvuuren@netronome.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: fix geneve_opt length integer overflow
+Message-ID: <Z+8Ha5m911k4H7ew@pop-os.localdomain>
+References: <20250402165632.6958-1-linma@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Michal Luczaj <mhal@rbox.co>
-Subject: Re: [PATCH net 2/2] vsock/test: Add test for SO_LINGER null ptr deref
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org
-References: <20250204-vsock-linger-nullderef-v1-0-6eb1760fa93e@rbox.co>
- <20250204-vsock-linger-nullderef-v1-2-6eb1760fa93e@rbox.co>
- <n3azri2tr3mzyo2ahwtrddkcwfsgyzdyuowekl34kkehk4zgf7@glvhh6bg4rsi>
- <5c19a921-8d4d-44a3-8d82-849e95732726@rbox.co>
- <vsghmgwurw3rxzw32najvwddolmrbroyryquzsoqt5jr3trzif@4rjr7kwlaowa>
- <df2d51fd-03e7-477f-8aea-938446f47864@rbox.co>
- <xafz4xrgpi5m3wedkbhfx6qoqbbpogryxycrvawwzerge3l4t3@d6r6jbnpiyhs>
- <f201fcb6-9db9-4751-b778-50c44c957ef2@rbox.co>
- <hkhwrfz4dzhaco4mb25st5zyfybimchac3zcqsgzmtim53sq5o@o4u6privahp3>
- <aa00af3b-2bb1-4c09-8222-edeec0520ae1@rbox.co>
- <cd7chdxitqx7pvusgt45p7s4s4cddyloqog2koases4ocvpayg@ryndsxdgm5ul>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <cd7chdxitqx7pvusgt45p7s4s4cddyloqog2koases4ocvpayg@ryndsxdgm5ul>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250402165632.6958-1-linma@zju.edu.cn>
 
-On 4/1/25 12:32, Stefano Garzarella wrote:
-> On Tue, Mar 25, 2025 at 02:22:45PM +0100, Michal Luczaj wrote:
->> On 3/20/25 12:31, Stefano Garzarella wrote:
->>> On Fri, Mar 14, 2025 at 04:25:16PM +0100, Michal Luczaj wrote:
->>>> On 3/10/25 16:24, Stefano Garzarella wrote:
->>>>> On Fri, Mar 07, 2025 at 10:49:52AM +0100, Michal Luczaj wrote:
->>>>>> ...
->>>>>> I've tried modifying the loop to make close()/shutdown() linger until
->>>>>> unsent_bytes() == 0. No idea if this is acceptable:
->>>>>
->>>>> Yes, that's a good idea, I had something similar in mind, but reusing
->>>>> unsent_bytes() sounds great to me.
->>>>>
->>>>> The only problem I see is that in the driver in the guest, the packets
->>>>> are put in the virtqueue and the variable is decremented only when the
->>>>> host sends us an interrupt to say that it has copied the packets and
->>>>> then the guest can free the buffer. Is this okay to consider this as
->>>>> sending?
->>>>>
->>>>> I think so, though it's honestly not clear to me if instead by sending
->>>>> we should consider when the driver copies the bytes into the virtqueue,
->>>>> but that doesn't mean they were really sent. We should compare it to
->>>>> what the network devices or AF_UNIX do.
->>>>
->>>> I had a look at AF_UNIX. SO_LINGER is not supported. Which makes sense;
->>>> when you send a packet, it directly lands in receiver's queue. As for
->>>> SIOCOUTQ handling: `return sk_wmem_alloc_get(sk)`. So I guess it's more of
->>>> an "unread bytes"?
->>>
->>> Yes, I see, actually for AF_UNIX it is simple.
->>> It's hard for us to tell when the user on the other pear actually read
->>> the data, we could use the credit mechanism, but that sometimes isn't
->>> sent unless explicitly requested, so I'd say unsent_bytes() is fine.
->>
->> One more option: keep the semantics (in a state of not-what-`man 7 socket`-
->> says) and, for completeness, add the lingering to shutdown()?
+On Thu, Apr 03, 2025 at 12:56:32AM +0800, Lin Ma wrote:
+> struct geneve_opt uses 5 bit length for each single option, which
+> means every vary size option should be smaller than 128 bytes.
 > 
-> Sorry, I'm getting lost!
-> That's because we had a different behavior between close() and 
-> shutdown() right?
+> However, all current related Netlink policies cannot promise this
+> length condition and the attacker can exploit a exact 128-byte size
+> option to *fake* a zero length option and confuse the parsing logic,
+> further achieve heap out-of-bounds read.
 > 
-> If it's the case, I would say let's fix at least that for now.
-
-Yeah, okay, let's keep things simple. I'll post the patch once net-next opens.
-
->>>>>> ...
->>>>>> This works, but I find it difficult to test without artificially slowing
->>>>>> the kernel down. It's a race against workers as they quite eagerly do
->>>>>> virtio_transport_consume_skb_sent(), which decrements vvs->bytes_unsent.
->>>>>> I've tried reducing SO_VM_SOCKETS_BUFFER_SIZE as you've suggested, but
->>>>>> send() would just block until peer had available space.
->>>>>
->>>>> Did you test with loopback or virtio-vsock with a VM?
->>>>
->>>> Both, but I may be missing something. Do you see a way to stop (or don't
->>>> schedule) the worker from processing queue (and decrementing bytes_unsent)?
->>>
->>> Without touching the driver (which I don't want to do) I can't think of
->>> anything, so I'd say it's okay.
->>
->> Turns out there's a way to purge the loopback queue before worker processes
->> it (I had no success with g2h). If you win that race, bytes_unsent stays
->> elevated until kingdom come. Then you can close() the socket and watch as
->> it lingers.
->>
->> connect(s)
->>  lock_sock
->>  while (sk_state != TCP_ESTABLISHED)
->>    release_sock
->>    schedule_timeout
->>
->> // virtio_transport_recv_connecting
->> //   sk_state = TCP_ESTABLISHED
->>
->>                                       send(s, 'x')
->>                                         lock_sock
->>                                         virtio_transport_send_pkt_info
->>                                           virtio_transport_get_credit
->>                                    (!)      vvs->bytes_unsent += ret
->>                                           vsock_loopback_send_pkt
->>                                             virtio_vsock_skb_queue_tail
->>                                         release_sock
->>                                       kill()
->>    lock_sock
->>    if signal_pending
->>      vsock_loopback_cancel_pkt
->>        virtio_transport_purge_skbs (!)
->>
->> That said, I may be missing a bigger picture, but is it worth supporting
->> this "signal disconnects TCP_ESTABLISHED" behaviour in the first place?
+... 
+> Fix these issues by enforing correct length condition in related
+> policies.
 > 
-> Can you elaborate a bit?
+> Fixes: 925d844696d9 ("netfilter: nft_tunnel: add support for geneve opts")
+> Fixes: 4ece47787077 ("lwtunnel: add options setting and dumping for geneve")
+> Fixes: 0ed5269f9e41 ("net/sched: add tunnel option support to act_tunnel_key")
+> Fixes: 0a6e77784f49 ("net/sched: allow flower to match tunnel options")
+> Signed-off-by: Lin Ma <linma@zju.edu.cn>
 
-There isn't much to it. I just wondered if connect() -- that has already
-established a connection -- could ignore the signal (or pretend it came too
-late), to avoid carrying out this kind of disconnect.
 
->> Removing it would make the race above (and the whole [1] series) moot.
->> Plus, it appears to be broken: when I hit this condition and I try to
->> re-connect to the same listener, I get ETIMEDOUT for loopback and
->> ECONNRESET for g2h virtio; see [2].
-> 
-> Could this be related to the fix I sent some days ago?
-> https://lore.kernel.org/netdev/20250328141528.420719-1-sgarzare@redhat.com/
+Maybe it is time to define a max option length in include/net/geneve.h,
+but this is not a big deal. So:
 
-I've tried that. I've also took a hint from your other mail and attempted
-flushing the listener queue, but to no avail. Crude code below. Is there
-something wrong with it?
+Acked-by: Cong Wang <xiyou.wangcong@gmail.com>
 
-#include <stdio.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <signal.h>
-#include <pthread.h>
-#include <sys/socket.h>
-#include <linux/vm_sockets.h>
-
-static void die(const char *msg)
-{
-	perror(msg);
-	exit(-1);
-}
-
-static void barrier(pthread_barrier_t *barr)
-{
-	errno = pthread_barrier_wait(barr);
-	if (errno && errno != PTHREAD_BARRIER_SERIAL_THREAD)
-		die("pthread_barrier_wait");
-}
-
-static void flush_accept(int s)
-{
-	int p = accept(s, NULL, NULL);
-	if (p < 0) {
-		if (errno != EAGAIN)
-			perror("accept");
-		return;
-	}
-
-	printf("accept: drained\n");
-	close(p);
-}
-
-static void handler(int signum)
-{
-	/* nop */
-}
-
-void static set_accept_timeout(int s)
-{
-	struct timeval tv = { .tv_sec = 1 };
-	if (setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)))
-		die("setsockopt SO_RCVTIMEO");
-}
-
-void static set_connect_timeout(int s)
-{
-	struct timeval tv = { .tv_sec = 1 };
-	if (setsockopt(s, AF_VSOCK, SO_VM_SOCKETS_CONNECT_TIMEOUT, &tv,
-		       sizeof(tv)))
-		die("setsockopt SO_VM_SOCKETS_CONNECT_TIMEOUT");
-}
-
-static void *killer(void *arg)
-{
-	pthread_barrier_t *barr = (pthread_barrier_t *)arg;
-	pid_t pid = getpid();
-
-	if ((errno = pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,
-					   NULL)))
-		die("pthread_setcanceltype");
-
-	for (;;) {
-		barrier(barr);
-		if (kill(pid, SIGUSR1))
-			die("kill");
-		barrier(barr);
-	}
-
-	return NULL;
-}
-
-int main(void)
-{
-	struct sockaddr_vm addr = {
-		.svm_family = AF_VSOCK,
-		.svm_cid = VMADDR_CID_LOCAL,
-		.svm_port = 1234
-	};
-	socklen_t alen = sizeof(addr);
-	pthread_barrier_t barr;
-	pthread_t tid;
-	int s, c;
-
-	if ((errno = pthread_barrier_init(&barr, NULL, 2)))
-		die("pthread_barrier_init");
-
-	if (signal(SIGUSR1, handler) == SIG_ERR)
-		die("signal");
-
-	s = socket(AF_VSOCK, SOCK_STREAM, 0);
-	if (s < 0)
-		die("socket s");
-	set_accept_timeout(s);
-
-	if (bind(s, (struct sockaddr *)&addr, alen))
-		die("bind");
-
-	if (listen(s, 64))
-		die("listen");
-
-	if ((errno = pthread_create(&tid, NULL, killer, &barr)))
-		die("pthread_create");
-
-	for (;;) {
-		c = socket(AF_VSOCK, SOCK_STREAM, 0);
-		if (c < 0)
-			die("socket c");
-
-		barrier(&barr);
-		if (connect(c, (struct sockaddr *)&addr, sizeof(addr)) &&
-		    errno == EINTR) {
-		    	printf("connect: EINTR\n");
-			break;
-		}
-		barrier(&barr);
-
-		close(c);
-		flush_accept(s);
-	}
-
-	if ((errno = pthread_cancel(tid)))
-		die("pthread_cancel");
-
-	if ((errno = pthread_join(tid, NULL)))
-		die("pthread_join");
-
-	flush_accept(s);
-	set_connect_timeout(c);
-	if (connect(c, (struct sockaddr *)&addr, sizeof(addr)))
-		die("re-connect");
-
-	printf("okay?\n");
-
-	return 0;
-}
-
+Thanks!
 
