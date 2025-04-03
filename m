@@ -1,46 +1,86 @@
-Return-Path: <netdev+bounces-178982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CD19A79C99
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 09:09:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 23BDDA79CDB
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 09:24:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFABC189638A
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 07:09:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B1BD188D9EA
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 07:24:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08EE423F413;
-	Thu,  3 Apr 2025 07:09:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 400DD2405ED;
+	Thu,  3 Apr 2025 07:24:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fZye6mhy"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E22523F289;
-	Thu,  3 Apr 2025 07:09:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D5623FC4C
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 07:24:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743664161; cv=none; b=C84yd3Lo3ICXRsbH6KNEx7huGVrSbUK5GPz3cwSN+220Tcp9GiIfeuFQBBUGaqdm0pcHsVyFbVKVw+VLEQ+eREwlqIjc5k7yZaCEr2McPwhH+OXDPZ8xbbSNOyo99qCMixAsiEzpwI5fgjLYWE4CUS/th+Z/tCHO+/2Ni6ZHtVI=
+	t=1743665054; cv=none; b=QL4+uId08W/kTw8R0fYK+Crzw4tmwDC2lEVyfST1rTzGZVvSavRhLiNiI0dGbKoSJKMHA0JmHal0jTP6rK+6QIRBFxMMq5iJBkzRy+xzUbEN1mLbiAnAgGcxKZtNi0ZmDpzmpmfMIwuNWFT7UuwMy5a3iOj+XmMYK2BMa9qmcfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743664161; c=relaxed/simple;
-	bh=sLbbJwrNJuWZdLBKeEw5OjHjp4yxNXKpIbq8folZ0l8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=rsffKESi8xoC0MetHJ/f30vIICV5G2IB8mJLtGnuism38F1U+xNSjkyNeg8O/kjNanRE5rtfSftYpwuHLFFHrWi6AaPxuIRH/TF65LBYHDgB3IY+jEHh2v8UbhLfqS7aXIUfGZ3Bbf610RyMaD+imMpjoJTBEtcjj8lROScDwNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4ZSt5R0F0nz1k1Gy;
-	Thu,  3 Apr 2025 15:04:27 +0800 (CST)
-Received: from kwepemg200005.china.huawei.com (unknown [7.202.181.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 44BD31A0188;
-	Thu,  3 Apr 2025 15:09:16 +0800 (CST)
-Received: from [10.174.176.70] (10.174.176.70) by
- kwepemg200005.china.huawei.com (7.202.181.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 3 Apr 2025 15:09:14 +0800
-Message-ID: <fd31d24b-8a34-4da5-b7ed-3ebf9aa30d1d@huawei.com>
-Date: Thu, 3 Apr 2025 15:09:13 +0800
+	s=arc-20240116; t=1743665054; c=relaxed/simple;
+	bh=BmGXNVrTqxXAkUExqcGcIkfGVthayzRf/XdQRf0ErJs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QKYdqfCmUnwLKKSCKzB3zVlpNgm14XWZANU5aYluyPDOLm+88F2L7CUihaJAVjHdYF8QzOaVxmxU5mSR3ahVzExgtODx0zmIftW7bM9CTwg2Qp2JDch7VxWKKCCl4kkgufF/Eyvi7jap+ra9cu8+sxFBYKIf6pZm2RuoOXaObDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fZye6mhy; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743665051;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=i4GpbdVAioAsBhxItBe3Gp1I1aqveVV1B4xHRWy2NlY=;
+	b=fZye6mhylmx+dpbsv2k4N6OZMzqaOgsvd/qgqR3DLbEhi59sHTr3QISe97Kbsb37eQ8zkz
+	LOCrYZC5lSV2SNy/d5dycRKQ6pMfY3l5n4acDkgOSsJDRl5qsmBRUyR3wLZ9wsafMeyTU5
+	q6vcxp/WPWcnxpEcj91COc/s4cm6nYI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-424-I0lCar_WNtCAszSk2Y_W4g-1; Thu, 03 Apr 2025 03:24:10 -0400
+X-MC-Unique: I0lCar_WNtCAszSk2Y_W4g-1
+X-Mimecast-MFC-AGG-ID: I0lCar_WNtCAszSk2Y_W4g_1743665049
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43cf5196c25so2998415e9.0
+        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 00:24:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743665049; x=1744269849;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=i4GpbdVAioAsBhxItBe3Gp1I1aqveVV1B4xHRWy2NlY=;
+        b=DFmQ3oQHo8H79t5h29FYBNtKt0Ax1IXwfXRFu0Y6fNC1lZMjElahHxEbkOkl6luJws
+         5lpEYziNNmC9PKEILhZH7l0p+8vRnm483pg2SzR3jwVCO2EgljD5POsd3acorDRivXVA
+         ZG+ipgr9M4h4OZTjSVUYRnRlwIcBUy865neM9Wu4hsYM2+zzQl/oYni9e0yIZ4zRc1OC
+         MQYgIXZe3aFtiHlefjP2pxZ+7lrhZTOxsI91QkXw1FC3s2hv4f/Yw9CCNfBmsmOjPoFs
+         gk8tW5JEbRfyNwJvubMbZNX2WPdkFmY4ggHBVA9QHiOz6kWKElyyzeafFJrAl7vhFCab
+         YhOA==
+X-Forwarded-Encrypted: i=1; AJvYcCVcnqYQZkTIKArwzEdZ+abH9vnw8+GBcFWb+wFcQfig276uq/bblU6gntmizzUO9M9AXSRpAzk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+OV/zjDBMIjtgTobk0HxDfpqN47koxMj0p237PH5h4skQaa/G
+	A23Y0F6sgv0WqzsWi5er5vF0xaBQ9a74umq/aGuvw6E/QMA69fdwcXBHnIqKqMB973c40Srh0uv
+	0qkrXipkZZ7uy3/46MwAGBMGR2t5JqeaJOJ24st3IoLQ2dzrpVc2gsg==
+X-Gm-Gg: ASbGncsexFWmCjmDA8OpprNplkrLH2rcpUb8hoA/LXuB5KvqAqh7axsILHlluT9bepE
+	02WUIARDaUQ7pPeaNCS3XEJ2KTmexewfgrnOAik8DlMZkHpaDCPLq0xFWsC5Gyi1xojNpQPJkO0
+	cISEc9Z2uscoSi+e4XlvJvJ5PLm0CCGxqJHtTZwew7brpxOJGbG/BflMlgxKGffconcGF6JJ6H7
+	0z5sgA/1dhzCmrVws1bTgsxHlCSiyX93MBtOt9wVY68zNmKFWXDVB+uvWMZFS2bmxqYM8I1yMaW
+	0/vDQY7q0FaAYV2PKMl1QfMp0Bzkv5TBLT1gFC58w/W/aw==
+X-Received: by 2002:a5d:6d8a:0:b0:39c:dcc:f589 with SMTP id ffacd0b85a97d-39c120dd036mr17302216f8f.20.1743665049145;
+        Thu, 03 Apr 2025 00:24:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFLjiN+esCynIJ2+bi2OUprGrFibkCQORORxWzFxwa+nAcvodEQofseNEFH/q+D6t/l5rRnhg==
+X-Received: by 2002:a5d:6d8a:0:b0:39c:dcc:f589 with SMTP id ffacd0b85a97d-39c120dd036mr17302194f8f.20.1743665048726;
+        Thu, 03 Apr 2025 00:24:08 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-68-231.dyn.eolo.it. [146.241.68.231])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c3020d68esm975281f8f.67.2025.04.03.00.24.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Apr 2025 00:24:08 -0700 (PDT)
+Message-ID: <4b3bea7c-110d-48eb-bcf6-58f4b2cd1999@redhat.com>
+Date: Thu, 3 Apr 2025 09:24:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,106 +88,62 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/smc: fix general protection fault in
- __smc_diag_dump
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-CC: Paolo Abeni <pabeni@redhat.com>, <wenjia@linux.ibm.com>,
-	<jaka@linux.ibm.com>, <tonylu@linux.alibaba.com>, <guwen@linux.alibaba.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<horms@kernel.org>, <ubraun@linux.vnet.ibm.com>, <yanjun.zhu@linux.dev>,
-	<yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
-	<linux-rdma@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20250331081003.1503211-1-wangliang74@huawei.com>
- <37f86471-5abc-4f04-954e-c6fb5f2b653a@redhat.com>
- <99f284be-bf1d-4bc4-a629-77b268522fff@huawei.com>
- <20250402072010.GA110656@j66a10360.sqa.eu95>
-From: Wang Liang <wangliang74@huawei.com>
-In-Reply-To: <20250402072010.GA110656@j66a10360.sqa.eu95>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemg200005.china.huawei.com (7.202.181.32)
+Subject: Re: [PATCH] virtio-net: disable delayed refill when setting up xdp
+To: Bui Quang Minh <minhquangbui99@gmail.com>, virtualization@lists.linux.dev
+Cc: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+References: <20250402054210.67623-1-minhquangbui99@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250402054210.67623-1-minhquangbui99@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 4/2/25 7:42 AM, Bui Quang Minh wrote:
+> When setting up XDP for a running interface, we call napi_disable() on
+> the receive queue's napi. In delayed refill_work, it also calls
+> napi_disable() on the receive queue's napi. This can leads to deadlock
+> when napi_disable() is called on an already disabled napi. This commit
+> fixes this by disabling future and cancelling all inflight delayed
+> refill works before calling napi_disabled() in virtnet_xdp_set.
+> 
+> Fixes: 4941d472bf95 ("virtio-net: do not reset during XDP set")
+> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+> ---
+>  drivers/net/virtio_net.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 7e4617216a4b..33406d59efe2 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -5956,6 +5956,15 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+>  	if (!prog && !old_prog)
+>  		return 0;
+>  
+> +	/*
+> +	 * Make sure refill_work does not run concurrently to
+> +	 * avoid napi_disable race which leads to deadlock.
+> +	 */
+> +	if (netif_running(dev)) {
+> +		disable_delayed_refill(vi);
+> +		cancel_delayed_work_sync(&vi->refill);
 
-在 2025/4/2 15:20, D. Wythe 写道:
-> On Wed, Apr 02, 2025 at 10:37:24AM +0800, Wang Liang wrote:
->> 在 2025/4/1 19:01, Paolo Abeni 写道:
->>> On 3/31/25 10:10 AM, Wang Liang wrote:
->>>> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->>>> index 3e6cb35baf25..454801188514 100644
->>>> --- a/net/smc/af_smc.c
->>>> +++ b/net/smc/af_smc.c
->>>> @@ -371,6 +371,7 @@ void smc_sk_init(struct net *net, struct sock *sk, int protocol)
->>>>   	sk->sk_protocol = protocol;
->>>>   	WRITE_ONCE(sk->sk_sndbuf, 2 * READ_ONCE(net->smc.sysctl_wmem));
->>>>   	WRITE_ONCE(sk->sk_rcvbuf, 2 * READ_ONCE(net->smc.sysctl_rmem));
->>>> +	smc->clcsock = NULL;
->>>>   	INIT_WORK(&smc->tcp_listen_work, smc_tcp_listen_work);
->>>>   	INIT_WORK(&smc->connect_work, smc_connect_work);
->>>>   	INIT_DELAYED_WORK(&smc->conn.tx_work, smc_tx_work);
->>> The syzkaller report has a few reproducers, have you tested this? AFAICS
->>> the smc socket is already zeroed on allocation by sk_alloc().
->>
->> Yes, I test it by the C repro:
->> https://syzkaller.appspot.com/text?tag=ReproC&x=13d2dc98580000
->>
->> The C repro is provided by the 2025/02/27 15:16 crash from
->>    https://syzkaller.appspot.com/bug?extid=271fed3ed6f24600c364
->>
->> After apply my patch, the crash no longer happens when running the C repro.
->>
->> "the smc socket is already zeroed on allocation by sk_alloc()", That
->> is right.
->> However, smc->clcsock may be modified indirectly in inet6_create().
->> The process like this:
->>
->>    __sys_socket
->>      __sys_socket_create
->>        sock_create
->>          __sock_create
->>            # pf->create
->>            inet6_create
->>              // init smc->clcsock = 0
->>              sk = sk_alloc()
->>
->>              // set smc->clcsock to invalid address
->>              inet = inet_sk(sk);
->>              inet_assign_bit(IS_ICSK, sk, INET_PROTOSW_ICSK & answer_flags);
->>              inet6_set_bit(MC6_LOOP, sk);
->>              inet6_set_bit(MC6_ALL, sk);
->>
->>              smc_inet_init_sock
->>                smc_sk_init
->>                  // add sk to smc_hash
->>                  smc_hash_sk
->>                    sk_add_node(sk, head);
->>                smc_create_clcsk
->>                  // set smc->clcsock
->>                  sock_create_kern(..., &smc->clcsock);)
->>
->> So initialize smc->clcsock to NULL explicitly in smc_sk_init() can fix
->> this crash scene. If the problem can be reproduced after this patch, I
->> guess it is not the same reason, and fix it by another patch is more
->> appropriate.
->>
-> This is actually because the current smc_sock is not an inet_sock,
-> leading to two modules simultaneously modifying the same offset in
-> memory but interpreting its structure differently. I previously proposed
-> embedding an inet(6)_sock at the beginning of smc_sock, but the
-> community had some objections...
->
-> I'm not sure on the community's current stance on this matter, but if a
-> fix is absolutely necessary, my recommendation would still be to embed
-> an inet(6)_sock within the smc_sock structure
->
-> D.
+AFAICS at this point refill_work() could still be running, why don't you
+need to call flush_delayed_work()?
 
-At present, I think initializing the smc in smc_sk_init() may be the 
-most simple and effective method. :P
+@Jason: somewhat related, why virtnet_close() does not use
+flush_delayed_work(), too?
 
->
->>> /P
->>>
->>>
+Thanks,
+
+Paolo
+
 
