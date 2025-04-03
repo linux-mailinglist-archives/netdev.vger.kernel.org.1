@@ -1,92 +1,146 @@
-Return-Path: <netdev+bounces-179168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58440A7B02F
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 23:11:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FAA6A7B049
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 23:13:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 327F9188AA88
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:07:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B4C0189B216
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:09:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0184A33997;
-	Thu,  3 Apr 2025 20:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 013521F4CA8;
+	Thu,  3 Apr 2025 20:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iX67A27P"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="UL/+Kbaq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC5B11C84A4;
-	Thu,  3 Apr 2025 20:19:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD58219E4;
+	Thu,  3 Apr 2025 20:27:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743711597; cv=none; b=E/g3N8mTU4oov5RjViTxC65wRBzlVKQnAMAiZ8a437LG8+86DETjbVdZHSdKPrgf4cvmDPZeJTA+lqLyQuR1gDGh1XWJfXjhCAzYejT35AOzmgh+rqCs8Dm227vX//einJ8zSBVYkAw1BbbXuXP/ffv9RFmOqK9OQuK/7FElg3U=
+	t=1743712055; cv=none; b=q6OxMdr95JYtcBqaZsQ9UwLrZk7bXzPanhZD2LMf38MRIbggMkJnq57GMBpcRwJrjQhuVT/m9wMNZl2Yy+3jS0Syo0nIXSWRR1hKAtxEzDuVrXn38Vna2pQFs5oHduv/CyVdPiNLZFdtz9zIGeZmMLm+OH4/ij9cuNcxQwU0tSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743711597; c=relaxed/simple;
-	bh=n+xsBSSSDBvOWYIKnxdxot3uNBzuLOElrpN4A/mo16M=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qDyN23akk/d9aiGrMsLn5vLJlUgp7S5EWrMHlh9gGQQKikOAuRJBVCfS8KkyD0AJy34Acebhv+ddRRiblVD4JgKBF01POIy0Y6ah5YJ68Ut5AqrjDaASd035Ibsn3ldDS5f3PxEL9wOxCRJgsB3YoHaK+H3+SNi5TbqyNKml6as=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iX67A27P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46303C4AF09;
-	Thu,  3 Apr 2025 20:19:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743711597;
-	bh=n+xsBSSSDBvOWYIKnxdxot3uNBzuLOElrpN4A/mo16M=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iX67A27PeVh70gNmLtfNLcJqmgfQfyyy/NAheS6PRrVa1Thb0nNN9mXGg4AFJD/xO
-	 9X9jPP+AeZsmEvSm3yABINm/fgDHDmePhuDI24X/3cXqw3Cbw6DH6srTwHettb3OxV
-	 aF/JOHQ91htUZQXnE6fEq8GrpHg6HJFbnPFFgvpL4hfCEea8IVY+FYejSjN0vXjNN2
-	 exAhOXD15/0fRh19BJM3TyeoJ2zmju2WfCtUttEV1hIdfqXQEtMF3LZytzZWzLkJ8+
-	 IlEEy+ai6FPVfG5jAuOLJQ/UbPL8YYDmvD8rbrbwj0PtjY1R5ccRnu+6qMfol5WyzG
-	 pVgCFSDwTKRpA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 710C4380664C;
-	Thu,  3 Apr 2025 20:20:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1743712055; c=relaxed/simple;
+	bh=z20xVVv3gTB8lJMCA/nIoSqVAYFn3QUgaQn044WvAA0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KrLuhhKkU1rdDjFbE6dMqSGp56+hvd8gmIp/zu8PQO99k2eT4f2juTI5KVyRbBW2PJUnXbLiBUi62eafBUnmPYroxMlsAsb3sS3r7RXL0Axl8ehrOt0DHvHoNAypt+CKhg7tnj+jb1YJP+75VUY/SYtjTkI1+/5t6uWMl/RQE0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=UL/+Kbaq; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ikKQhOvjTFsxhuP/UUycw802kvwD0C3mBIi4Nalcuk0=; b=UL/+KbaqYkQjwWdJ/s1IhbWwr8
+	CEdOBhqCajp9OPBlHlITyxVYIfTpLVzJFHSLB4ngKCbhDcJENF9PDg4bAUbBsqreZGc9IR8fw17gY
+	6hoPotAgb+LuDYkgtY4XBJ2s7ujD8aJ7EFe+hj1vhYHF5JIICVMua7rK+7fs9uQb1pnSf7WfbtkfJ
+	FJJKqYBjz4c95HCzZMC6iSLYQawU7yofU1w8pDOXFmJHFqrOA4MdFi+W6XK6YZ0cfJNNq6hVdpdFI
+	YQb5q0ZY+1sw9SqqiopiTBwBEmyU62Q+jyi5HwnAAqwWS63KumrPKnGMeQ5vDla8ctpoRjrec0YwT
+	FHPCemxQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50296)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u0R9i-0000ts-2k;
+	Thu, 03 Apr 2025 21:27:20 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u0R9e-00053J-03;
+	Thu, 03 Apr 2025 21:27:14 +0100
+Date: Thu, 3 Apr 2025 21:27:13 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Christian Marangi <ansuelsmth@gmail.com>, upstream@airoha.com,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Michal Simek <michal.simek@amd.com>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Robert Hancock <robert.hancock@calian.com>,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [RFC net-next PATCH 07/13] net: pcs: Add Xilinx PCS driver
+Message-ID: <Z-7vIbvtjIGS5hzr@shell.armlinux.org.uk>
+References: <20250403181907.1947517-1-sean.anderson@linux.dev>
+ <20250403181907.1947517-8-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: increment TX timestamping tskey always for stream
- sockets
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <174371163427.2672071.7073463393326839454.git-patchwork-notify@kernel.org>
-Date: Thu, 03 Apr 2025 20:20:34 +0000
-References: <cf8e3a5bd2f4dbdba54d785d744e2b1970b28301.1743699406.git.pav@iki.fi>
-In-Reply-To: <cf8e3a5bd2f4dbdba54d785d744e2b1970b28301.1743699406.git.pav@iki.fi>
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- willemdebruijn.kernel@gmail.com, kerneljasonxing@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250403181907.1947517-8-sean.anderson@linux.dev>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello:
+On Thu, Apr 03, 2025 at 02:19:01PM -0400, Sean Anderson wrote:
+> +static int xilinx_pcs_validate(struct phylink_pcs *pcs,
+> +			       unsigned long *supported,
+> +			       const struct phylink_link_state *state)
+> +{
+> +	__ETHTOOL_DECLARE_LINK_MODE_MASK(xilinx_supported) = { 0 };
+> +
+> +	phylink_set_port_modes(xilinx_supported);
+> +	phylink_set(xilinx_supported, Autoneg);
+> +	phylink_set(xilinx_supported, Pause);
+> +	phylink_set(xilinx_supported, Asym_Pause);
+> +	switch (state->interface) {
+> +	case PHY_INTERFACE_MODE_SGMII:
+> +		/* Half duplex not supported */
+> +		phylink_set(xilinx_supported, 10baseT_Full);
+> +		phylink_set(xilinx_supported, 100baseT_Full);
+> +		phylink_set(xilinx_supported, 1000baseT_Full);
+> +		break;
+> +	case PHY_INTERFACE_MODE_1000BASEX:
+> +		phylink_set(xilinx_supported, 1000baseX_Full);
+> +		break;
+> +	case PHY_INTERFACE_MODE_2500BASEX:
+> +		phylink_set(xilinx_supported, 2500baseX_Full);
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	linkmode_and(supported, supported, xilinx_supported);
+> +	return 0;
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+You can not assume that an interface mode implies any particular media.
+For example, you can not assume that just because you have SGMII, that
+the only supported media is BaseT. This has been a fundamental principle
+in phylink's validation since day one.
 
-On Thu,  3 Apr 2025 19:57:59 +0300 you wrote:
-> Documentation/networking/timestamping.rst implies TX timestamping OPT_ID
-> tskey increments for each sendmsg.  In practice: TCP socket increments
-> it for all sendmsg, timestamping on or off, but UDP only when
-> timestamping is on. The user-visible counter resets when OPT_ID is
-> turned on, so difference can be seen only if timestamping is enabled for
-> some packets only (eg. via SO_TIMESTAMPING CMSG).
-> 
-> [...]
+Phylink documentation for the pcs_validate() callback states:
 
-Here is the summary with links:
-  - Bluetooth: increment TX timestamping tskey always for stream sockets
-    https://git.kernel.org/bluetooth/bluetooth-next/c/2c1cf148c1fa
+ * Validate the interface mode, and advertising's autoneg bit, removing any
+ * media ethtool link modes that would not be supportable from the supported
+ * mask. Phylink will propagate the changes to the advertising mask. See the
+ * &struct phylink_mac_ops validate() method.
 
-You are awesome, thank you!
+and if we look at the MAC ops validate (before it was removed):
+
+- * Clear bits in the @supported and @state->advertising masks that
+- * are not supportable by the MAC.
+- *
+- * Note that the PHY may be able to transform from one connection
+- * technology to another, so, eg, don't clear 1000BaseX just
+- * because the MAC is unable to BaseX mode. This is more about
+- * clearing unsupported speeds and duplex settings. The port modes
+- * should not be cleared; phylink_set_port_modes() will help with this.
+
+PHYs can and do take SGMII and provide both BaseT and BaseX or BaseR
+connections. A PCS that is not directly media facing can not dictate
+the link modes.
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
