@@ -1,129 +1,178 @@
-Return-Path: <netdev+bounces-179017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AE3EA7A0DB
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 12:20:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DBC3A7A0FD
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 12:29:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 230BE3B4D18
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 10:20:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 749D6189379E
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 10:29:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBDEA24BBEE;
-	Thu,  3 Apr 2025 10:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 410E92459F0;
+	Thu,  3 Apr 2025 10:29:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="aXPUFQvb"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="BL1hUM+w";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="umQ/pjeZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from ksmg01.maxima.ru (ksmg01.maxima.ru [81.200.124.38])
+Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECBD424A055;
-	Thu,  3 Apr 2025 10:20:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.200.124.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98AB9161320;
+	Thu,  3 Apr 2025 10:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743675602; cv=none; b=n2RToUnKIgfTDWgANE9nYGSYETRN2MPq2d5Kqbo8ZNejhEVc8pJy3BvuBg3hFZNba6Qwwh3C4GJdejIzHqf7K5VGFyxei363ZBdj0zAgXXGYHKdYI1PstXzf4QE80U6Zh7YOx0ETxvvQ7ikcDoe/+oSTf/P4cbLS1unpWupOiYk=
+	t=1743676142; cv=none; b=a+7ZmIU+TTRyZnNdeX1LBn4LrdaWhelZ6gIKf+1tsy5dsXG/DtxGQ5lIKI3LLv0mLEInlxDQzWWFnBuHa4JvILMHLijcv0KHCdRnbxxgl6mGyYnDZBXNVFqap2ol09iQCuw2Qmydb6GoG8pDu8v5EQezcxy/g8KOdVIYg1beHIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743675602; c=relaxed/simple;
-	bh=RPXyeFu3hLGAwb60oZcpOdtZIfP7WSaxI6mPPTvu0Z8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VL1TSj6MZMsqTumVV6/lQnc7iTL4X8ToUlNfqsKIQ1Xv4d87eVQ4+BpLpsgewlz1NlMl9S5222bjt5zGdiom13JnKn1eD/oyURcUWVFr0qRUAHnVddoi9HZmAVTBbMM6bWg1dM7bPEWZYwMPnIb5EHXnsFShRe+9tmbDrmpZQII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=aXPUFQvb; arc=none smtp.client-ip=81.200.124.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mt-integration.ru
-Received: from ksmg01.maxima.ru (localhost [127.0.0.1])
-	by ksmg01.maxima.ru (Postfix) with ESMTP id CD814C001E;
-	Thu,  3 Apr 2025 13:19:58 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg01.maxima.ru CD814C001E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mt-integration.ru;
-	s=sl; t=1743675598; bh=N6N25JmQAuicJL+q493OEXAu4U2lX1+1kyO9BOM/ZaM=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=aXPUFQvbjl6QYqhi99iXBe5b1I2eLTBn8L1X24bXuzGRGzY2LJUw3PH9dh7dJDPde
-	 +1IWuSxf5N1sfjfITVh7a7i/94GnePJc809+JEVz5LtGqw+/VklOR1mcR3geCJaX2y
-	 gMOOBpRLPT1BPaNGu7YkTcygPpF3UD5Mr/T2tLcCoSFHR57aJDcG/5CinpGU1SVNqC
-	 39lHdftaXOPLrA5wxVvC80z85slXGgybPTOWCknqVl4gAAXHkRxVBHsPMpxXNn4/m+
-	 RPY+LZFFp7eF3GTxYBd5rcrshhycxXw3+93pwZyL6jxrnmej47cNYf38emkqrraSUA
-	 qz+nnqRPDCvog==
-Received: from ksmg01.maxima.ru (mail.maxima.ru [81.200.124.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "*.maxima.ru", Issuer "GlobalSign GCC R3 DV TLS CA 2020" (verified OK))
-	by ksmg01.maxima.ru (Postfix) with ESMTPS;
-	Thu,  3 Apr 2025 13:19:58 +0300 (MSK)
-Received: from db126-1-abramov-14-d-mosos.mti-lab.com (172.25.20.118) by
- mmail-p-exch01.mt.ru (81.200.124.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 3 Apr 2025 13:19:57 +0300
-From: Ivan Abramov <i.abramov@mt-integration.ru>
-To: Alexander Aring <alex.aring@gmail.com>
-CC: Ivan Abramov <i.abramov@mt-integration.ru>, Miquel Raynal
-	<miquel.raynal@bootlin.com>, Stefan Schmidt <stefan@datenfreihafen.org>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, <linux-wpan@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>
-Subject: [PATCH net v3 3/3] ieee802154: Remove WARN_ON() in cfg802154_pernet_exit()
-Date: Thu, 3 Apr 2025 13:19:34 +0300
-Message-ID: <20250403101935.991385-4-i.abramov@mt-integration.ru>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250403101935.991385-1-i.abramov@mt-integration.ru>
-References: <20250403101935.991385-1-i.abramov@mt-integration.ru>
+	s=arc-20240116; t=1743676142; c=relaxed/simple;
+	bh=dSF/aEX68vuzGeThjYeo1cpD+4IU5IGww9tyfUfsONM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lkk+8mjBiDmh/JGje01GDpBzX02zDq9D5h86ziJxMSJa349+3G7aSb/DpGvznW9dsrneWlnOVKRNMcYu4rwK4lUPquuzZ8xncyfmAuphaLFIVnzfPNutLe/QJBU6kFwKP0CMHVfc+qc96mAtf730Ak46p7yU0GK42oX4fHMURgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=BL1hUM+w; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=umQ/pjeZ; arc=none smtp.client-ip=103.168.172.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 5BD8D1140191;
+	Thu,  3 Apr 2025 06:28:57 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Thu, 03 Apr 2025 06:28:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1743676137; x=
+	1743762537; bh=9eS8zf1c2sh6XxZbfPo1lRB/F6Yx563j0n/tE8GwJV8=; b=B
+	L1hUM+wl5huEtZ5zjWrChkA96ajf1EBJoDnu98E1tWmdhxp3Qac6+Oc7pD08AFDE
+	i+6i1HX4pOlEmYMKhUNstcAcoquMK5kfwnaD/qzoKgb+7sSkl5j9w6AZufVFKd7b
+	ei/q99roZcU+h1nbQ8cCoxQpFt+J5eY0DqEBR3HsdKkUgfesXzUG0eRJ99rlrFGZ
+	pj13TsZc6ahya8wobI6zn0GGHW/9M40Ipf3S17LfyqgfNYZAKO3DB1z/Ncyy43Sx
+	GytRyHyFR+xFOpsI0LXi769dUITZnlqNa9+wafCYP/xneqX9+3F9kzE0FSTdUQbF
+	wmAatTm6+kqrZsgswr78g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1743676137; x=1743762537; bh=9eS8zf1c2sh6XxZbfPo1lRB/F6Yx563j0n/
+	tE8GwJV8=; b=umQ/pjeZEguT9efjgGYHkLOf+FV3/XAqVdDWTScNQFBK/LW/8T1
+	746Dkzpgd4vzIxXfsmsOTNmA/KDX/85X/721lKWKu8GDuP9D7QEPf06U8FG+IZZl
+	PRsOa+N/RaGV6CCxG+HgVHXPOVD2lI5dGpbdO35EkPqikqalUY4ZAhn4XG5yW9t6
+	xWvlGod78tAXpRkZX6huIeWtNALwSzmih83l/IMGLR3hl0iWSeofTUa6UrFbLxrX
+	roZkR2xxKBJkSrU1quZEgRw5xSX0EfgPno5fnMonnsq+M+Kd1htodlZwJXPz0SWU
+	95mYkJyviGpPToow7YVLx3ZbzlF1McAusQA==
+X-ME-Sender: <xms:6GLuZzaI8u1YS6lGepNy2-uoOk0uibOJfsbw7js9ZlIBTbzdxwp3ow>
+    <xme:6GLuZyafYuQCls5-9Cuj63b70sm9LE6tio9kG05dlgzqiS2rj0BqZ5KM8OztNKYRx
+    oxeTS7GLMvxXLJvj_w>
+X-ME-Received: <xmr:6GLuZ18_YnvmTn4MPo1q7j1RmnKZ_M8KJiE3FktvyQl9g677Ijdtw70kEDxH>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddukeekfeefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
+    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
+    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdef
+    hfekgeetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhn
+    sggprhgtphhtthhopedvtddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheplhhiuh
+    hhrghnghgsihhnsehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgv
+    rhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslh
+    hunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhr
+    tghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuh
+    gsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdr
+    tghomhdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhope
+    hshhhurghhsehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:6GLuZ5rBO-D58IJZVnEPHDZwCI9qYDO8hgdheII9DE8RJXpeXNbRlg>
+    <xmx:6GLuZ-qOnWuydf0bGgWcywmy4ySMIURBjXUjsH7cahqWUMhY9Tpo6Q>
+    <xmx:6GLuZ_SxGo13c4GlfYEiDZhdWsB4xXTQ_QqRPemLIiTj5GrPK4TnPQ>
+    <xmx:6GLuZ2qOzCdtuyeQt23DQddRVDPjAG0PTKlItIAk8FO6D7evZWv37w>
+    <xmx:6WLuZyPRBfYlQy088CtY7M4H8_GEvl3GqBBimBaDZjNRlsareqa56UYa>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 3 Apr 2025 06:28:55 -0400 (EDT)
+Date: Thu, 3 Apr 2025 12:28:54 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Xiao Liang <shaw.leon@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Venkat Venkatsubra <venkat.x.venkatsubra@oracle.com>,
+	Etienne Champetier <champetier.etienne@gmail.com>,
+	Di Zhu <zhudi21@huawei.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Travis Brown <travisb@arista.com>,
+	Suresh Krishnan <skrishnan@arista.com>,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net 1/3] ipvlan: fix NETDEV_UP/NETDEV_DOWN event handling
+Message-ID: <Z-5i5rsrIyE0fM-V@krikkit>
+References: <20250403085857.17868-1-liuhangbin@gmail.com>
+ <20250403085857.17868-2-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: mmail-p-exch02.mt.ru (81.200.124.62) To
- mmail-p-exch01.mt.ru (81.200.124.61)
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Auth: dmarc=none header.from=mt-integration.ru;spf=none smtp.mailfrom=mt-integration.ru;dkim=none
-X-KSMG-AntiSpam-Envelope-From: i.abramov@mt-integration.ru
-X-KSMG-AntiSpam-Info: LuaCore: 54 0.3.54 464169e973265e881193cca5ab7aa5055e5b7016, {rep_avail}, {Tracking_from_domain_doesnt_match_to}, ksmg01.maxima.ru:7.1.1;mt-integration.ru:7.1.1;127.0.0.199:7.1.2;81.200.124.61:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s, ApMailHostAddress: 81.200.124.61
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 192331 [Apr 03 2025]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.11
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/04/03 07:23:00 #27851719
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 7
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250403085857.17868-2-liuhangbin@gmail.com>
 
-There's no need to call WARN_ON() in cfg802154_pernet_exit(), since
-every point of failure in cfg802154_switch_netns() is covered with
-WARN_ON(), so remove it.
+Hello Hangbin,
 
-Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
+2025-04-03, 08:58:55 +0000, Hangbin Liu wrote:
+> When setting the lower-layer link up/down, the ipvlan device synchronizes
+> its state via netif_stacked_transfer_operstate(), which only checks the
+> carrier state. However, setting the link down does not necessarily change
+> the carrier state for virtual interfaces like bonding. This causes the
+> ipvlan state to become out of sync with the lower-layer link state.
+> 
+> If the lower link and ipvlan are in the same namespace, this issue is
+> hidden because ip link show checks the link state in IFLA_LINK and has
+> a m_flag to control the state, displaying M-DOWN in the flags. However,
+> if the ipvlan and the lower link are in different namespaces, this
+> information is not available, and the ipvlan link state remains unchanged.
 
-Fixes: 66e5c2672cd1 ("ieee802154: add netns support")
-Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
-Signed-off-by: Ivan Abramov <i.abramov@mt-integration.ru>
----
-v3: Add Reviewed-by tag.
-v2: Make sure to commit against latest netdev/net.
+Is the issue with the actual behavior (sending/receiving packets,
+etc), or just in how it's displayed by iproute?
 
- net/ieee802154/core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> For example:
+> 
+>   1. Add an ipvlan over bond0.
+>   2. Move the ipvlan to a separate namespace and bring it up.
+>   3. Set bond0 link down.
+>   4. The ipvlan remains up.
+> 
+> This issue affects containers and pods, causing them to display an
+> incorrect link state for ipvlan. Fix this by explicitly changing the
+> IFF_UP flag, similar to how VLAN handles it.
 
-diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
-index 987c633e2c54..c0b8712018a1 100644
---- a/net/ieee802154/core.c
-+++ b/net/ieee802154/core.c
-@@ -358,7 +358,7 @@ static void __net_exit cfg802154_pernet_exit(struct net *net)
- 	rtnl_lock();
- 	list_for_each_entry(rdev, &cfg802154_rdev_list, list) {
- 		if (net_eq(wpan_phy_net(&rdev->wpan_phy), net))
--			WARN_ON(cfg802154_switch_netns(rdev, &init_net));
-+			cfg802154_switch_netns(rdev, &init_net);
- 	}
- 	rtnl_unlock();
- }
+I'm not sure this change of behavior can be done anymore. And I'm not
+convinced vlan's behavior is better (commit 5e7565930524 ("vlan:
+support "loose binding" to the underlying network device") describes
+why it's not always wanted). IMO it makes sense to have admin state
+separate from link state.
+
+If you want a consistent behavior, the admin should also not be
+allowed to set the link UP again while its lower device is not, like
+VLAN does:
+
+static int vlan_dev_open(struct net_device *dev)
+{
+	struct vlan_dev_priv *vlan = vlan_dev_priv(dev);
+	struct net_device *real_dev = vlan->real_dev;
+	int err;
+
+	if (!(real_dev->flags & IFF_UP) &&
+	    !(vlan->flags & VLAN_FLAG_LOOSE_BINDING))
+		return -ENETDOWN;
+
+
+(but that would almost certainly break someone's scripts)
+
 -- 
-2.39.5
-
+Sabrina
 
