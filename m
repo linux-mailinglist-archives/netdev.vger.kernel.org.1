@@ -1,67 +1,66 @@
-Return-Path: <netdev+bounces-179123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E194AA7AB71
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:20:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0D1CA7AB99
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:22:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B7F71798D4
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:15:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FD84176A63
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:17:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 600F525E839;
-	Thu,  3 Apr 2025 19:04:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35A4726136F;
+	Thu,  3 Apr 2025 19:04:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t9QKwvcl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XvIst5IJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8ED25E831;
-	Thu,  3 Apr 2025 19:04:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AC35261361;
+	Thu,  3 Apr 2025 19:04:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743707047; cv=none; b=DEZKABBoDMJBfiaBnx60p1/pMUPKteYj855ugyHVAT1FVH+4ls1XJiiLsq2gBLFglnemjOwFgj63YhD8MSQIeYcUuX6y6vP8QzTWgYytvhz9rmunX44ovWPlhzMOG9c/0zGiLU4zEFLWubL4ZvuwsQKrarOciYKeMmmdnuO2usk=
+	t=1743707067; cv=none; b=W6KWkfQEvez7yAujGfYBRh6go3Vm1rmw4xQDyCFveUbAZ2ry8qjnlb3UgO3ccmErFCzKtV2+Lor9Xj9zlZj/twxPA6zgxn6hnNv944iZkdrhjn/dPU08A+LSrzH2F4rY9lY5rcnc/tdAxnBbwFGnOFyqVSHyVnRDsLw2oY2LV6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743707047; c=relaxed/simple;
-	bh=bpPpE/rG6+ikuFZ4ik6t/fonvsCano5SoUQii6vDr84=;
+	s=arc-20240116; t=1743707067; c=relaxed/simple;
+	bh=eFB6fsPsXp9xhVhM7YxjbxdKgahOf8vjLvHyf7iWNiI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Ta0yBHdWZyQ0V0uYnZe5DnijGmqPBy2m8Gshjbi+A5svO5nInqmpKO2hGYeO3wbQXNsKPKrhK3TpXgQil07TbYszfyeeHSNekerLwCJXvb1pcIjzyaE0Jm23N8acdf4/oYskGqTbIhW/vDaMwwalE9CkPsJfnuQgF03bCfgBpbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t9QKwvcl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E1A8C4CEE3;
-	Thu,  3 Apr 2025 19:04:05 +0000 (UTC)
+	 MIME-Version; b=qRE0kCirRudkKgwCYvn7lEFO4hrfrqo78qtGkm1kV59xprb8eLEvNWHNbs59fITJA+T4QY3aSEOw1bszRu14mhCd+mAx4GsQj3ofwsICUsxg7Je3YkZB/PgBotKyF3z7iGyNW7CiN/GxfdHTpLuPYT5y//TSHPoKj9km8Bxqzp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XvIst5IJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 880C6C4CEE3;
+	Thu,  3 Apr 2025 19:04:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743707047;
-	bh=bpPpE/rG6+ikuFZ4ik6t/fonvsCano5SoUQii6vDr84=;
+	s=k20201202; t=1743707066;
+	bh=eFB6fsPsXp9xhVhM7YxjbxdKgahOf8vjLvHyf7iWNiI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=t9QKwvclQm51sSK+76vKEu6ukn+mR5dZGJ9Jr/0qbeL8Z2e5fMeyahappIWw+FCpb
-	 B1NlVbz6ynCbxvBtapAsHInzA73rv5/r6JnkgnmGEjIHSYEHt0GZiXfBZA0bkukfHN
-	 Qc/63KVshd4hV840T++Y5gWIDYc37jl9qV6vMZ+IvYKX18kouTqDDO+OFH3HxZUqSe
-	 dYCoUb+J1rVqbiuPJL4UXnRy9VnTpYkze8E3lStjAheqfVilTfBGsjuYiCeaG/wVRM
-	 TummnDdhqFqa8aWbHMBWXLoIFvfMpN4egyo356wJTnwmBt8ylpdofl161DseNJ2lFf
-	 bFYDJectYBoWw==
+	b=XvIst5IJHjZsld9luTFlo7lLAetcdVYsahJy55b5hRBbLYiVs90AcZdIQTVj+j8Gk
+	 vrC+Q7jjMk0CVe/uZibGG+SU1Wi3a1s7lqTbtmRLlq18AYf9suX39GQapaWh59a8lS
+	 pFzr+aRJ2S+VumNZnB3EmltT6/PDRDY+xCL2dIGFV07ht4q3mawfyndEG+0n/iqy37
+	 BP7fpcV6zgwxVBoIUQxfBvbfbzUPqn9b4wtTcnUpFHpSRoklHXEhIa3Uev3JJ6P3Uf
+	 O10f4gPsz8VdGGdjJuYp3O3nZiWLgLn/wg6XEZepUY4ud66lUMT+zcxzUyd1Qw5efK
+	 Z4zOYL0JAYssg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Pedro Nishiyama <nishiyama.pedro@gmail.com>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+Cc: Pavel Begunkov <asml.silence@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Mina Almasry <almasrymina@google.com>,
+	David Wei <dw@davidwei.uk>,
 	Sasha Levin <sashal@kernel.org>,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-bluetooth@vger.kernel.org,
+	willemb@google.com,
+	sjordhani@gmail.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 54/54] Bluetooth: Add quirk for broken READ_PAGE_SCAN_TYPE
-Date: Thu,  3 Apr 2025 15:02:09 -0400
-Message-Id: <20250403190209.2675485-54-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.13 08/49] net: page_pool: don't cast mp param to devmem
+Date: Thu,  3 Apr 2025 15:03:27 -0400
+Message-Id: <20250403190408.2676344-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250403190209.2675485-1-sashal@kernel.org>
-References: <20250403190209.2675485-1-sashal@kernel.org>
+In-Reply-To: <20250403190408.2676344-1-sashal@kernel.org>
+References: <20250403190408.2676344-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,57 +69,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.14
+X-stable-base: Linux 6.13.9
 Content-Transfer-Encoding: 8bit
 
-From: Pedro Nishiyama <nishiyama.pedro@gmail.com>
+From: Pavel Begunkov <asml.silence@gmail.com>
 
-[ Upstream commit 127881334eaad639e0a19a399ee8c91d6c9dc982 ]
+[ Upstream commit 8d522566ae9cb3f0609ddb2a6ce3f4f39988043c ]
 
-Some fake controllers cannot be initialized because they return a smaller
-report than expected for READ_PAGE_SCAN_TYPE.
+page_pool_check_memory_provider() is a generic path and shouldn't assume
+anything about the actual type of the memory provider argument. It's
+fine while devmem is the only provider, but cast away the devmem
+specific binding types to avoid confusion.
 
-Signed-off-by: Pedro Nishiyama <nishiyama.pedro@gmail.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+Signed-off-by: David Wei <dw@davidwei.uk>
+Link: https://patch.msgid.link/20250204215622.695511-2-dw@davidwei.uk
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- include/net/bluetooth/hci.h | 8 ++++++++
- net/bluetooth/hci_sync.c    | 3 ++-
- 2 files changed, 10 insertions(+), 1 deletion(-)
+ net/core/page_pool_user.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 295d97e312e1d..aa684d2b079fa 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -362,6 +362,14 @@ enum {
- 	 * This quirk must be set before hci_register_dev is called.
- 	 */
- 	HCI_QUIRK_BROKEN_READ_VOICE_SETTING,
-+
-+	/* When this quirk is set, the HCI_OP_READ_PAGE_SCAN_TYPE command is
-+	 * skipped. This is required for a subset of the CSR controller clones
-+	 * which erroneously claim to support it.
-+	 *
-+	 * This quirk must be set before hci_register_dev is called.
-+	 */
-+	HCI_QUIRK_BROKEN_READ_PAGE_SCAN_TYPE,
- };
+diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
+index 6677e0c2e2565..d5e214c30c310 100644
+--- a/net/core/page_pool_user.c
++++ b/net/core/page_pool_user.c
+@@ -356,7 +356,7 @@ void page_pool_unlist(struct page_pool *pool)
+ int page_pool_check_memory_provider(struct net_device *dev,
+ 				    struct netdev_rx_queue *rxq)
+ {
+-	struct net_devmem_dmabuf_binding *binding = rxq->mp_params.mp_priv;
++	void *binding = rxq->mp_params.mp_priv;
+ 	struct page_pool *pool;
+ 	struct hlist_node *n;
  
- /* HCI device flags */
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 0c6a85abba2c5..cf60a8da943a5 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -4132,7 +4132,8 @@ static int hci_read_page_scan_type_sync(struct hci_dev *hdev)
- 	 * support the Read Page Scan Type command. Check support for
- 	 * this command in the bit mask of supported commands.
- 	 */
--	if (!(hdev->commands[13] & 0x01))
-+	if (!(hdev->commands[13] & 0x01) ||
-+	    test_bit(HCI_QUIRK_BROKEN_READ_PAGE_SCAN_TYPE, &hdev->quirks))
- 		return 0;
- 
- 	return __hci_cmd_sync_status(hdev, HCI_OP_READ_PAGE_SCAN_TYPE,
 -- 
 2.39.5
 
