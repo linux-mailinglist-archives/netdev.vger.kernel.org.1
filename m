@@ -1,154 +1,461 @@
-Return-Path: <netdev+bounces-179192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83106A7B1A1
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 23:46:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B456A7B1A6
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 23:49:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EE5B188377C
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:46:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2059716619D
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:49:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8E6119258E;
-	Thu,  3 Apr 2025 21:46:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F4C2171E49;
+	Thu,  3 Apr 2025 21:49:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iUrRfy1W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HEU98b8R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32E981494CC;
-	Thu,  3 Apr 2025 21:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE7513B58A;
+	Thu,  3 Apr 2025 21:49:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743716799; cv=none; b=Mfjt215B38x7/1y7p9VUzY5Px8ySdtMys29lq23ojM1NbYNP6K1zY7zW2mtwiy7Jl9HDK2f4HPUs6RQthlReyVwOi0aBAxcglKTm47Ilb3StPQaYGwChHZmxrsLHXJ6WeUCwhZZpNwGvOd9QwjJVbJ9tnl8W4ucMjykfKIYNmUg=
+	t=1743716973; cv=none; b=ni8bV3IK66PTznDHG9f87gOOJVltNSCt/uDVrmI4UsYyr+ZTwjDl1Oqu8jELAUkSuQ+gGuNf3cejb352v1oWzRb7HIUF3n6BxaYekM5gtfFtYL3ZNuB6Zyj3QDu39EZ8ekp5U7lxmWx94/9c3uauHn8ZRXV/0knE2KAGBk1oIY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743716799; c=relaxed/simple;
-	bh=UoHi17w8zgHvpFGQto+G13hZRwmTH8OcIzC9cvweJ94=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=k/yE0ExhFegSk2qAYx5hpcGsSnUc/F4roKdH21S8jzxWUppk186ROrLzGcrn8Z74PjZ5/m3a22qgUnY3ehpCIN4Z3Zh27u+RIS77O3yfMR11GlCVgHywrX48mypur6kvqvQVRNU88KryWrMy0ZJSnJnOHzfBADXeaSmXg90pqhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iUrRfy1W; arc=none smtp.client-ip=209.85.128.44
+	s=arc-20240116; t=1743716973; c=relaxed/simple;
+	bh=u7AQGhdP8wwu5y0NXxgS3JBSSjiIqpyA3oFwxYn53tU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=OMxziRYRlehGxRhGOzh+cE9A0qzjUvmSMvQTyil6yVSg9oFg/Zzq8aIVqSLGN3avxxkn7ijOBmFJO/l+jCAv3TnpGiWWPC1qqYqB2g4Va7nlNwosKIYX07KZSO9sM4NMcQDe1AcTj3g4NFIC3YGve7iGsWeOP1WH730DX9LyCJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HEU98b8R; arc=none smtp.client-ip=209.85.222.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43ce71582e9so9529495e9.1;
-        Thu, 03 Apr 2025 14:46:37 -0700 (PDT)
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7c08fc20194so251466685a.2;
+        Thu, 03 Apr 2025 14:49:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743716796; x=1744321596; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KDLT5jaOfTvnXrHcbjmxYiedZsavDNsVTNdUJK4Wfl8=;
-        b=iUrRfy1Wmpgodg/UJzrDsD4g5H6fiotEQ5YmUlhWVGHsJQNgXES/1uqHdL6Slkpbcz
-         WdBnxnsle+MaVPMvc+z/hqQ0cU6FeMtvor0scjWivwcrukxwF5RTk+nlwbGfjVG+mj48
-         UzLRe9Y/IDsuXoSTQJhAAWAUkr7zXWiekoMYR6EXfmrL+JjFPQSVxTPucxMDIqsf4MyH
-         xldk+/mkxoH4wSpgvS9qkaKVfOi8RC7Pd/JggUzqq5lyHmpcEifobiCj8y2CLqH252Il
-         saGmsrT/SpNQPrm/fIqRnt1QUM3VPsp8BFnMGO7euGEM9kajDalsEBLzdu7xdkntjMLR
-         ZH2w==
+        d=gmail.com; s=20230601; t=1743716970; x=1744321770; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lwdCiSeO1xvvNjIyf9l/dZZzNmp3/0c+LarNj3baQlI=;
+        b=HEU98b8R5Z3xoeQrxSKSED4aFEvhmQ7x5/qVJgkNMlH33EymlEa+4VMKGONCwnoStJ
+         CnKfCIAGNcsPE9/XF0x7pUaOUNGuXifscXcJaL6TyT3mEWJbgOjUTTY3y9hLkE4OBN2S
+         kR0o4/c/0kOjtUBGK7vbAHUSC6DdFk4cDPXh+lsKOoekQ0wVxksSV6wR/R4Mz0hy5o18
+         VoCJg7WTAF1CrIaPx4J89HLLSUz+Cy3CrjQvHNfbZN+m/VNFxZC0KhJXX+ioAPsJHLFG
+         Cb73BjKKWHMoxEzM8pIMRGvvIwdlT5IeEBaSSOOmUtwEWwWWE5MuJwjPQpDGQPpkZ5+i
+         192w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743716796; x=1744321596;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KDLT5jaOfTvnXrHcbjmxYiedZsavDNsVTNdUJK4Wfl8=;
-        b=vbJBKtg45OtZErigGqTCKC8zrolj6u57pDauhgKGy02jV1g9K0lDFspF/A2QMfFweM
-         Eiwk3riSjPo6G2N+1kdj0WmG69572dW2I1SuGoZiLNRfeRi2r5LgkLi4D31fnJlXH9tC
-         j2qFHvvTvxgVAILRkHaxL6Hhn0WgTHZgHdwv/OtJk6r7wPolcBwb3ke3iHlxNC0Pg9Rn
-         xBi4Qx0jxKcKcoQL/DrNxUPz5HYGyaEasCgeVOLzU/ctv/4/Y7pV4oyOcgQNnGf1mt4J
-         eqHhuLgdh+eGmpDvO4S5VMvQOtwxMoNZBpCpo7aBISjjNUWuIcnDh2cDFl8W8mAl9ltT
-         XdPA==
-X-Forwarded-Encrypted: i=1; AJvYcCULI1tVethUEb+iCThqXaZ/hFQD+fx0xkCTducu6N19rieQaCzsw5afP7Oh+YbGZW/3eEsxAvQj@vger.kernel.org, AJvYcCXMmQzXsW9N4dSXmFqD18K6RBneP5vPInrrnMY9UwJ4CqKzjKeNwrJWfsc9FmGdHdEvH5DM+fYjqtnLc9k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQdeGgFiAdpiPh7UalCEIje46PEX38Z98t0DyqYGJZDUBvkfmM
-	AXVbYJdpZ4pIDZLVFK4GMWyA3VEhiv4CUttqIpeZCf8RTKAAh0tv
-X-Gm-Gg: ASbGncsDqXkA96baBKRlleHWFttKDmbSZ8EvK9iH7i2UAZAznE5sJaCKq9MOi/YNV/S
-	jGhd9FyZ17BDm5pXr037eaEuepGGqB9Lio2TfxPc3ORi/bdVve5Td2ksV1F89FnE2JdpEQjN08D
-	RivzUd499bW+SQ7KLswkVUZqLCixYod/Hj1tnfRC6PoQpXzNYy/jQL5LfRe5Z3hz3t+m/z25hVN
-	GkmdOAy3FGJRB3agVZB8uNFPBWPHzJ7hOi7JBu8Ix5WJBwPDi1lu+Q018T0+jbzJTQrkeb6zPbx
-	vg0U/MEHVob1Gqeyqy6SZljduYYRQhVhIHV0tjfFbluPtn4ep/tDGy2Cej0=
-X-Google-Smtp-Source: AGHT+IFtF/KVAoDcggALyJa6yUnhhZ7LhPdgH+LEEouPBpTHX9lLc/XZJT72W1VXptDBNhM5KaENqg==
-X-Received: by 2002:a05:600c:1d12:b0:43c:fd72:f028 with SMTP id 5b1f17b1804b1-43ed0db3ba4mr2585675e9.29.1743716796219;
-        Thu, 03 Apr 2025 14:46:36 -0700 (PDT)
-Received: from [192.168.0.2] ([212.50.121.5])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c301b76f2sm2788425f8f.53.2025.04.03.14.46.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Apr 2025 14:46:34 -0700 (PDT)
-Message-ID: <f0798724-d5dd-498b-89be-7d7521ac4930@gmail.com>
-Date: Fri, 4 Apr 2025 00:47:01 +0300
+        d=1e100.net; s=20230601; t=1743716970; x=1744321770;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=lwdCiSeO1xvvNjIyf9l/dZZzNmp3/0c+LarNj3baQlI=;
+        b=A/SfLVtHdM0zlGsKPW+55KgfixzPtqhQFDZz/+2RCDAMwKu82Z814wHfcz0bSBCU0R
+         7oPdOHmGNjwazlmaYAHV0xW67GLzoOjUtKYMQ9NL3kbPZk8K22QJUMkTbsgzBPEG52vk
+         iT2UbtqFPVyDj4e/irxtkzddFs0DOIJXWb2NZsH1/PPdhDkUtZ4a1+p4+xsVdBqzN5wG
+         W83ewpzD78e5mqapqE2SwlHbMnVcH1Uoxe9qD6ZL6BEn1yDk0WCdUIHRn5ZAIHU2p8uM
+         N6HkFNip1o6izPyjPjZmkhnTMWIev5pE0BTHEdbK6U79lJEtoiVePxBbxUwTfPkor96d
+         i5tA==
+X-Forwarded-Encrypted: i=1; AJvYcCUjvnQFxLUxDnorr0oiO9tiiDgg67UKi/Vmql6J5DSXtV1j0HhSRGrTAlQN7o2+JoaRBxPz8T93nZ1x5uI=@vger.kernel.org, AJvYcCVRknVtZLvWrQ4KJCJIJzabhknNynkOL4MqeUlHkFaUS7HRvltmf8v7m1Mg6Yyb0FP5X07bK+ep@vger.kernel.org
+X-Gm-Message-State: AOJu0YybrKsW39d1hqj2ulFvU0G9ZVtZF0OzlG6rrhIobMIixxcpQzSW
+	ZvYbl4zpoca9OQKxWI/FDlyLz8q5HUMeih/wDhT4+LCEwpOSfHgZ
+X-Gm-Gg: ASbGnctwLI71XiLFIH+yYITv4/YT6czHxyWJTtte3fnUPY7/LrnciPzEe4iEVM/n0x3
+	3x7RUfHQ+WmaNti3I1mn0g+Zbs5KPGUeHv/+HT/J7C8iKFnyuSIXDOAFApRGKIRMgGMTy493/2O
+	VdbkCt1rzvhxGDZmCXfOoe/KKI6noyZwILoZbRUTRPuHs2tq7tpdDV966EJPgHerDRIpH0pLr6w
+	2GeQTVsCsOsT9CONociXylOYPH/U04bLYlrJY7h3/iPGnou5UQsd/Esvjiau21I+zjojPZ8zPCF
+	vA/gAl0jeRIXR49vvoxm5u7HXIVU0SgxmOS762OTSKvjpyioraCBz+IN+ZC85sp9Fqjn9xKm+Ud
+	f8JiHTWeH2z/baXCN6aODsQ==
+X-Google-Smtp-Source: AGHT+IHo4zz+oMWNU7UOvj13ffKg6+LGTPlqhUZ5WCoh5aBtOqBUTsBBgu72O02X7eBPrMvptYzYoA==
+X-Received: by 2002:a05:620a:19a0:b0:7c5:4c6d:7fa5 with SMTP id af79cd13be357-7c774df7822mr127042885a.48.1743716970342;
+        Thu, 03 Apr 2025 14:49:30 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4791b121decsm12556091cf.62.2025.04.03.14.49.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Apr 2025 14:49:29 -0700 (PDT)
+Date: Thu, 03 Apr 2025 17:49:29 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Markus Fohrer <markus.fohrer@webked.de>, 
+ "Michael S. Tsirkin" <mst@redhat.com>
+Cc: virtualization@lists.linux-foundation.org, 
+ jasowang@redhat.com, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Message-ID: <67ef02693c647_16fa6c294c4@willemb.c.googlers.com.notmuch>
+In-Reply-To: <fa9aec4d5d5148cff37a17d076b90ab835b8c7ef.camel@webked.de>
+References: <1d388413ab9cfd765cd2c5e05b5e69cdb2ec5a10.camel@webked.de>
+ <20250403090001-mutt-send-email-mst@kernel.org>
+ <f8909f5bbc2532ea234cdaa8dbdb46a48249803f.camel@webked.de>
+ <20250403100206-mutt-send-email-mst@kernel.org>
+ <da1c8647c4efcfcf7e7d2ba7e6235afc7b0f63ae.camel@webked.de>
+ <20250403170543-mutt-send-email-mst@kernel.org>
+ <fa9aec4d5d5148cff37a17d076b90ab835b8c7ef.camel@webked.de>
+Subject: Re: [REGRESSION] Massive virtio-net throughput drop in guest VM with
+ Linux 6.8+
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: GNSS support for Qualcomm PCIe modem device
-To: Muhammad Nuzaihan <zaihan@unrealasia.net>, Slark Xiao <slark_xiao@163.com>
-Cc: Loic Poulain <loic.poulain@linaro.org>, manivannan.sadhasivam@linaro.org,
- netdev@vger.kernel.org, Qiang Yu <quic_qianyu@quicinc.com>,
- johan@kernel.org, mhi@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <2703842b.58be.195fa426e5e.Coremail.slark_xiao@163.com>
- <DBU4US.LSH9IZJH4Q933@unrealasia.net> <W6W4US.MQDIW3EU4I8R2@unrealasia.net>
-Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <W6W4US.MQDIW3EU4I8R2@unrealasia.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Slark, Zaihan,
+Markus Fohrer wrote:
+> Am Donnerstag, dem 03.04.2025 um 17:06 -0400 schrieb Michael S.
+> Tsirkin:
+> > On Thu, Apr 03, 2025 at 10:07:12PM +0200, Markus Fohrer wrote:
+> > > Am Donnerstag, dem 03.04.2025 um 10:03 -0400 schrieb Michael S.
+> > > Tsirkin:
+> > > > On Thu, Apr 03, 2025 at 03:51:01PM +0200, Markus Fohrer wrote:
+> > > > > Am Donnerstag, dem 03.04.2025 um 09:04 -0400 schrieb Michael S.=
 
-Zaihn, congratulations with the progress, curious to see the result.
+> > > > > Tsirkin:
+> > > > > > On Wed, Apr 02, 2025 at 11:12:07PM +0200, Markus Fohrer
+> > > > > > wrote:
+> > > > > > > Hi,
+> > > > > > > =
 
-Slark, thank you for remind me. It's a good moment. Lets see how we can 
-prototype it. Will try to do it this weekend and send some RFC next week.
+> > > > > > > I'm observing a significant performance regression in KVM
+> > > > > > > guest
+> > > > > > > VMs
+> > > > > > > using virtio-net with recent Linux kernels (6.8.1+ and
+> > > > > > > 6.14).
+> > > > > > > =
 
-On 03.04.2025 11:42, Muhammad Nuzaihan wrote:
-> Hi Slark,
-> 
-> I just implemented it in the wwan subsystem since it works for me (even 
-> without flow control). I wanted to port it to use GPS subsystem, 
-> however, debugging in GPS subsystem is too troublesome, especially when 
-> the driver crashes.
-> 
-> Unless i can have some VM with direct access to the Quectel hardware so 
-> i don't need to keep rebooting my machine if it crashes.
-> 
-> For now, i am getting GNSS/NMEA data from Quectel with MHI wwan 
-> modifications.
-> 
-> Regards,
-> Zaihan
-> 
-> 
-> On Thu, Apr 3 2025 at 04:02:01 PM +0800, Muhammad Nuzaihan 
-> <zaihan@unrealasia.net> wrote:
->> Hi Slark,
->>
->> I just implemented it in the wwan subsystem since it works for me 
->> (even without flow control). I wanted to port it to use GPS subsystem, 
->> however, debugging in GPS subsystem is too troublesome, especially 
->> when the driver crashes.
->>
->> Unless i can have some VM with direct access to the Quectel hardware 
->> so i don't need to keep rebooting my machine if it crashes.
->>
->> For now, i am getting GNSS/NMEA data from Quectel with MHI wwan 
->> modifications.
->>
->> Regards,
->> Zaihan
->>
->> On Thu, Apr 3 2025 at 02:06:52 PM +0800, Slark Xiao 
->> <slark_xiao@163.com> wrote:
->>>
->>> Hi Sergey, Muhammad,
->>> This is Slark. We have a discussion about the feature of GNSS/NMEA 
->>> over QC PCIe modem
->>> device since 2024/12.May I know if we have any progress on this feature?
->>>
->>> It's really a common requirement for modem device since we have 
->>> received some complaint
->>> from our customer. Please help provide your advice.
+> > > > > > > When running on a host system equipped with a Broadcom
+> > > > > > > NetXtreme-E
+> > > > > > > (bnxt_en) NIC and AMD EPYC CPUs, the network throughput in
+> > > > > > > the
+> > > > > > > guest drops to 100=E2=80=93200 KB/s. The same guest configu=
+ration
+> > > > > > > performs
+> > > > > > > normally (~100 MB/s) when using kernel 6.8.0 or when the VM=
 
---
-Sergey
+> > > > > > > is
+> > > > > > > moved to a host with Intel NICs.
+> > > > > > > =
+
+> > > > > > > Test environment:
+> > > > > > > - Host: QEMU/KVM, Linux 6.8.1 and 6.14.0
+> > > > > > > - Guest: Linux with virtio-net interface
+> > > > > > > - NIC: Broadcom BCM57416 (bnxt_en driver, no issues at host=
+
+> > > > > > > level)
+> > > > > > > - CPU: AMD EPYC
+> > > > > > > - Storage: virtio-scsi
+> > > > > > > - VM network: virtio-net, virtio-scsi (no CPU or IO
+> > > > > > > bottlenecks)
+> > > > > > > - Traffic test: iperf3, scp, wget consistently slow in
+> > > > > > > guest
+> > > > > > > =
+
+> > > > > > > This issue is not present:
+> > > > > > > - On 6.8.0 =
+
+> > > > > > > - On hosts with Intel NICs (same VM config)
+> > > > > > > =
+
+> > > > > > > I have bisected the issue to the following upstream commit:=
+
+> > > > > > > =
+
+> > > > > > > =C2=A0 49d14b54a527 ("virtio-net: Suppress tx timeout warni=
+ng
+> > > > > > > for
+> > > > > > > small
+> > > > > > > tx")
+> > > > > > > =C2=A0 https://git.kernel.org/linus/49d14b54a527
+> > > > > > =
+
+> > > > > > Thanks a lot for the info!
+> > > > > > =
+
+> > > > > > =
+
+> > > > > > both the link and commit point at:
+> > > > > > =
+
+> > > > > > commit 49d14b54a527289d09a9480f214b8c586322310a
+> > > > > > Author: Eric Dumazet <edumazet@google.com>
+> > > > > > Date:=C2=A0=C2=A0 Thu Sep 26 16:58:36 2024 +0000
+> > > > > > =
+
+> > > > > > =C2=A0=C2=A0=C2=A0 net: test for not too small csum_start in
+> > > > > > virtio_net_hdr_to_skb()
+> > > > > > =C2=A0=C2=A0=C2=A0 =
+
+> > > > > > =
+
+> > > > > > is this what you mean?
+> > > > > > =
+
+> > > > > > I don't know which commit is "virtio-net: Suppress tx timeout=
+
+> > > > > > warning
+> > > > > > for small tx"
+> > > > > > =
+
+> > > > > > =
+
+> > > > > > =
+
+> > > > > > > Reverting this commit restores normal network performance
+> > > > > > > in
+> > > > > > > affected guest VMs.
+> > > > > > > =
+
+> > > > > > > I=E2=80=99m happy to provide more data or assist with testi=
+ng a
+> > > > > > > potential
+> > > > > > > fix.
+> > > > > > > =
+
+> > > > > > > Thanks,
+> > > > > > > Markus Fohrer
+> > > > > > =
+
+> > > > > > =
+
+> > > > > > Thanks! First I think it's worth checking what is the setup,
+> > > > > > e.g.
+> > > > > > which offloads are enabled.
+> > > > > > Besides that, I'd start by seeing what's doing on. Assuming
+> > > > > > I'm
+> > > > > > right
+> > > > > > about
+> > > > > > Eric's patch:
+> > > > > > =
+
+> > > > > > diff --git a/include/linux/virtio_net.h
+> > > > > > b/include/linux/virtio_net.h
+> > > > > > index 276ca543ef44d8..02a9f4dc594d02 100644
+> > > > > > --- a/include/linux/virtio_net.h
+> > > > > > +++ b/include/linux/virtio_net.h
+> > > > > > @@ -103,8 +103,10 @@ static inline int
+> > > > > > virtio_net_hdr_to_skb(struct
+> > > > > > sk_buff *skb,
+> > > > > > =C2=A0
+> > > > > > =C2=A0		if (!skb_partial_csum_set(skb, start, off))
+> > > > > > =C2=A0			return -EINVAL;
+> > > > > > +		if (skb_transport_offset(skb) < nh_min_len)
+> > > > > > +			return -EINVAL;
+> > > > > > =C2=A0
+> > > > > > -		nh_min_len =3D max_t(u32, nh_min_len,
+> > > > > > skb_transport_offset(skb));
+> > > > > > +		nh_min_len =3D skb_transport_offset(skb);
+> > > > > > =C2=A0		p_off =3D nh_min_len + thlen;
+> > > > > > =C2=A0		if (!pskb_may_pull(skb, p_off))
+> > > > > > =C2=A0			return -EINVAL;
+> > > > > > =
+
+> > > > > > =
+
+> > > > > > sticking a printk before return -EINVAL to show the offset
+> > > > > > and
+> > > > > > nh_min_len
+> > > > > > would be a good 1st step. Thanks!
+> > > > > > =
+
+> > > > > =
+
+> > > > > =
+
+> > > > > Hi Eric,
+> > > > > =
+
+> > > > > thanks a lot for the quick response =E2=80=94 and yes, you're
+> > > > > absolutely
+> > > > > right.
+> > > > > =
+
+> > > > > Apologies for the confusion: I mistakenly wrote the wrong
+> > > > > commit
+> > > > > description in my initial mail.
+> > > > > =
+
+> > > > > The correct commit is indeed:
+> > > > > =
+
+> > > > > commit 49d14b54a527289d09a9480f214b8c586322310a
+> > > > > Author: Eric Dumazet <edumazet@google.com>
+> > > > > Date:=C2=A0=C2=A0 Thu Sep 26 16:58:36 2024 +0000
+> > > > > =
+
+> > > > > =C2=A0=C2=A0=C2=A0 net: test for not too small csum_start in
+> > > > > virtio_net_hdr_to_skb()
+> > > > > =
+
+> > > > > This is the one I bisected and which causes the performance
+> > > > > regression
+> > > > > in my environment.
+> > > > > =
+
+> > > > > Thanks again,
+> > > > > Markus
+> > > > =
+
+> > > > =
+
+> > > > I'm not Eric but good to know.
+> > > > Alright, so I would start with the two items: device features and=
+
+> > > > printk.
+> > > > =
+
+> > > =
+
+> > > as requested, here=E2=80=99s the device/feature information from th=
+e guest
+> > > running kernel 6.14 (mainline):
+> > > =
+
+> > > Interface: ens18
+> > > =
+
+> > > ethtool -i ens18:
+> > > driver: virtio_net
+> > > version: 1.0.0
+> > > firmware-version: =
+
+> > > expansion-rom-version: =
+
+> > > bus-info: 0000:00:12.0
+> > > supports-statistics: yes
+> > > supports-test: no
+> > > supports-eeprom-access: no
+> > > supports-register-dump: no
+> > > supports-priv-flags: no
+> > > =
+
+> > > =
+
+> > > ethtool -k ens18:
+> > > Features for ens18:
+> > > rx-checksumming: on [fixed]
+> > > tx-checksumming: on
+> > > 	tx-checksum-ipv4: off [fixed]
+> > > 	tx-checksum-ip-generic: on
+> > > 	tx-checksum-ipv6: off [fixed]
+> > > 	tx-checksum-fcoe-crc: off [fixed]
+> > > 	tx-checksum-sctp: off [fixed]
+> > > scatter-gather: on
+> > > 	tx-scatter-gather: on
+> > > 	tx-scatter-gather-fraglist: off [fixed]
+> > > tcp-segmentation-offload: on
+> > > 	tx-tcp-segmentation: on
+> > > 	tx-tcp-ecn-segmentation: on
+> > > 	tx-tcp-mangleid-segmentation: off
+> > > 	tx-tcp6-segmentation: on
+> > > generic-segmentation-offload: on
+> > > generic-receive-offload: on
+> > > large-receive-offload: off [fixed]
+> > > rx-vlan-offload: off [fixed]
+> > > tx-vlan-offload: off [fixed]
+> > > ntuple-filters: off [fixed]
+> > > receive-hashing: off [fixed]
+> > > highdma: on [fixed]
+> > > rx-vlan-filter: on [fixed]
+> > > vlan-challenged: off [fixed]
+> > > tx-gso-robust: on [fixed]
+> > > tx-fcoe-segmentation: off [fixed]
+> > > tx-gre-segmentation: off [fixed]
+> > > tx-gre-csum-segmentation: off [fixed]
+> > > tx-ipxip4-segmentation: off [fixed]
+> > > tx-ipxip6-segmentation: off [fixed]
+> > > tx-udp_tnl-segmentation: off [fixed]
+> > > tx-udp_tnl-csum-segmentation: off [fixed]
+> > > tx-gso-partial: off [fixed]
+> > > tx-tunnel-remcsum-segmentation: off [fixed]
+> > > tx-sctp-segmentation: off [fixed]
+> > > tx-esp-segmentation: off [fixed]
+> > > tx-udp-segmentation: off
+> > > tx-gso-list: off [fixed]
+> > > tx-nocache-copy: off
+> > > loopback: off [fixed]
+> > > rx-fcs: off [fixed]
+> > > rx-all: off [fixed]
+> > > tx-vlan-stag-hw-insert: off [fixed]
+> > > rx-vlan-stag-hw-parse: off [fixed]
+> > > rx-vlan-stag-filter: off [fixed]
+> > > l2-fwd-offload: off [fixed]
+> > > hw-tc-offload: off [fixed]
+> > > esp-hw-offload: off [fixed]
+> > > esp-tx-csum-hw-offload: off [fixed]
+> > > rx-udp_tunnel-port-offload: off [fixed]
+> > > tls-hw-tx-offload: off [fixed]
+> > > tls-hw-rx-offload: off [fixed]
+> > > rx-gro-hw: on
+> > > tls-hw-record: off [fixed]
+> > > rx-gro-list: off
+> > > macsec-hw-offload: off [fixed]
+> > > rx-udp-gro-forwarding: off
+> > > hsr-tag-ins-offload: off [fixed]
+> > > hsr-tag-rm-offload: off [fixed]
+> > > hsr-fwd-offload: off [fixed]
+> > > hsr-dup-offload: off [fixed]
+> > > =
+
+> > > ethtool ens18:
+> > > Settings for ens18:
+> > > 	Supported ports: [=C2=A0 ]
+> > > 	Supported link modes:=C2=A0=C2=A0 Not reported
+> > > 	Supported pause frame use: No
+> > > 	Supports auto-negotiation: No
+> > > 	Supported FEC modes: Not reported
+> > > 	Advertised link modes:=C2=A0 Not reported
+> > > 	Advertised pause frame use: No
+> > > 	Advertised auto-negotiation: No
+> > > 	Advertised FEC modes: Not reported
+> > > 	Speed: Unknown!
+> > > 	Duplex: Unknown! (255)
+> > > 	Auto-negotiation: off
+> > > 	Port: Other
+> > > 	PHYAD: 0
+> > > 	Transceiver: internal
+> > > netlink error: Operation not permitted
+> > > 	Link detected: yes
+> > > =
+
+> > > =
+
+> > > Kernel log (journalctl -k):
+> > > Apr 03 19:50:37 kb-test.allod.com kernel: virtio_scsi virtio2:
+> > > 4/0/0
+> > > default/read/poll queues=C2=A0 =
+
+> > > Apr 03 19:50:37 kb-test.allod.com kernel: virtio_net virtio1 ens18:=
+
+> > > renamed from eth0
+> > > =
+
+> > > Let me know if you=E2=80=99d like comparison data from kernel 6.11 =
+or any
+> > > additional tests
+> > =
+
+> > =
+
+> > I think let's redo bisect first then I will suggest which traces to
+> > add.
+> > =
+
+> =
+
+> The build with the added printk is currently running. I=E2=80=99ll test=
+ it
+> shortly and report the results.
+> =
+
+> Should the bisect be done between v6.11 and v6.12, or v6.11 and v6.14?
+
+If reverting one specific patch resolved it, that's a big smoking gun.
+No need to bisect a huge stack of patches then again, imho.
+
+Maybe check-out that SHA1 and the one before and verify that that
+matches your earlier experience?
+
 
