@@ -1,51 +1,50 @@
-Return-Path: <netdev+bounces-179118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86B42A7AA53
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:11:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A07AA7AA58
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:11:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFA0D3B504E
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:07:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2262B7A17E6
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:08:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94BFC258CEB;
-	Thu,  3 Apr 2025 19:03:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACD8025486A;
+	Thu,  3 Apr 2025 19:03:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EehvkJUm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E1Dx7J+m"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B1F258CE4;
-	Thu,  3 Apr 2025 19:03:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838B325486D;
+	Thu,  3 Apr 2025 19:03:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743706994; cv=none; b=maTOyYuL+a0j35KT8ZBecCzIybFCeHDByNmbMKp3LN+lylWGiTIGedHRJIuX+GUE5mcO0SBguk6RrZeqWTr/k7EbPsFnf7CNlj9fF5DUqycrUW/PGgy7cTClKklbISSpXrbmwToj8gcjhppq4w3v9JgXmDiCSbBCBHJ79CEb6FQ=
+	t=1743707005; cv=none; b=RnoYPxarNTu9f+Oii3jxEUb4mhms2empNKRuIohMQA0eMohSVwU3dJAoRLTkDMeicPPtB/ss5KnKLMvw09ETgYwb8+8HrPUSVgdp8PT2f7GWJGMcwzkO4X+PeXs5dmT4jNWwXHyKeqLi3/7MNwzfguBWb+j55ArsPWG82mm+5X8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743706994; c=relaxed/simple;
-	bh=I8F4Utz+tR4jnkzKolBk0CeIpK7ElkWVUGIJsszsnUc=;
+	s=arc-20240116; t=1743707005; c=relaxed/simple;
+	bh=gXsEj8UjjtOmll3mukiHGHK0tAM8sjldPqEV7KznP/8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=RTQzeN4TjcdFtGmLwEWEAnvDOoRwRb4L1oNCnb8ACJhEdkDAc+X1UDkL0uMNzOjdv8jwncnqIjazkKqPBprV9hIgyIn8V4o/buHVTWmBWZv1k3evtaLiN75bquPOibp6nrKG5lD74vMkdmZhc6d9AgMzNfgGED5zoXeMxidbY+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EehvkJUm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAAB1C4CEE9;
-	Thu,  3 Apr 2025 19:03:12 +0000 (UTC)
+	 MIME-Version; b=qq9HdhX7h8bLAQDPMLCaqngaydh+aNSSgzZlpx101xwSp/IfMIb3+Dpr/vG4GkRKl9E4AA6gCoP0y4ytCD4fDybhku4DKBv8H2ZjkgSabOvWnrRoyjRRFL9qFSe2kLmlwXvhJEl7u7ni1Y8F1Tmma5/UTIUUdpTinR4qprI3s5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E1Dx7J+m; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A348C4CEE3;
+	Thu,  3 Apr 2025 19:03:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743706994;
-	bh=I8F4Utz+tR4jnkzKolBk0CeIpK7ElkWVUGIJsszsnUc=;
+	s=k20201202; t=1743707005;
+	bh=gXsEj8UjjtOmll3mukiHGHK0tAM8sjldPqEV7KznP/8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EehvkJUmZ1GlFrbdZdggHv/b+07pMIqoH0IkKirACZsEIEXKYIXQe88RqtCaKVs62
-	 P2ocXrMOjMdbeIAEfinOMkFOcZ5hfLbznVqlqeJoX30u+ySm1Jdi/avVzrg5lkIuDH
-	 OMn8m8+L8HsGwkjkhtyR3gkIlI26L7GkHvV9iCqYBAHCjmSLBbOzfxFEb8TyUEeo3O
-	 fZgWPlPP6/MRXYdZ8KVxtDg+pCmFYeMzm0a6UY4fZxGszB4NTdvk2HiEgwYPip1BZV
-	 gZiLvvLIfXCXEufdYOakdrHokxM7M1gbqZt3T7kYwfoQc0x3aDV7XkpgOjyjWN4vzy
-	 yzYJt6VnL/hsw==
+	b=E1Dx7J+mk/cDmj+KiG1ZZ0i6CsZUhLaWpcPA3fln4XWxpCH/ORxTJfgUSTpeM1toV
+	 faL1/EjjsbYqgsM3ea/3rdnSzsNSwfqxgg34squ1pOk3dc7F7rgatYfaboiuiflydj
+	 f31FQp5mgWf781P7hr1myiDDv+KAN3iQ7Wn4yPDptKIgZSTJL7R3h6QiaUQ52LbjHY
+	 9J2vERpOK5Pz6BjVVrfQ3h5vqL5OWddXl9xWgcEdGApuR+wKlB0jZ2AjjafiVhjyCe
+	 VyI/RiUZg6/tHq5Ks8kcIEG9p8bT/l/o4QmOI7SCFx3nerZGJCAufE3csBrMrqdyDB
+	 2YAo/aE9lO9kA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Birger Koblitz <mail@birger-koblitz.de>,
-	Daniel Golle <daniel@makrotopia.org>,
+Cc: Martin Schiller <ms@dev.tdt.de>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	linux@armlinux.org.uk,
@@ -55,9 +54,9 @@ Cc: Birger Koblitz <mail@birger-koblitz.de>,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 27/54] net: sfp: add quirk for 2.5G OEM BX SFP
-Date: Thu,  3 Apr 2025 15:01:42 -0400
-Message-Id: <20250403190209.2675485-27-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.14 31/54] net: sfp: add quirk for FS SFP-10GM-T copper SFP+ module
+Date: Thu,  3 Apr 2025 15:01:46 -0400
+Message-Id: <20250403190209.2675485-31-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250403190209.2675485-1-sashal@kernel.org>
 References: <20250403190209.2675485-1-sashal@kernel.org>
@@ -72,40 +71,58 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.14
 Content-Transfer-Encoding: 8bit
 
-From: Birger Koblitz <mail@birger-koblitz.de>
+From: Martin Schiller <ms@dev.tdt.de>
 
-[ Upstream commit a85035561025063125f81090e4f2bd65da368c83 ]
+[ Upstream commit 05ec5c085eb7ae044d49e04a3cff194a0b2a3251 ]
 
-The OEM SFP-2.5G-BX10-D/U SFP module pair is meant to operate with
-2500Base-X. However, in their EEPROM they incorrectly specify:
-Transceiver codes   : 0x00 0x12 0x00 0x00 0x12 0x00 0x01 0x05 0x00
-BR, Nominal         : 2500MBd
+Add quirk for a copper SFP that identifies itself as "FS" "SFP-10GM-T".
+It uses RollBall protocol to talk to the PHY and needs 4 sec wait before
+probing the PHY.
 
-Use sfp_quirk_2500basex for this module to allow 2500Base-X mode anyway.
-Tested on BananaPi R3.
-
-Signed-off-by: Birger Koblitz <mail@birger-koblitz.de>
-Reviewed-by: Daniel Golle <daniel@makrotopia.org>
-Link: https://patch.msgid.link/20250218-b4-lkmsub-v1-1-1e51dcabed90@birger-koblitz.de
+Signed-off-by: Martin Schiller <ms@dev.tdt.de>
+Link: https://patch.msgid.link/20250227071058.1520027-1-ms@dev.tdt.de
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/phy/sfp.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/net/phy/sfp.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index 7dbcbf0a4ee26..9369f52977694 100644
+index 9369f52977694..c88217af44a14 100644
 --- a/drivers/net/phy/sfp.c
 +++ b/drivers/net/phy/sfp.c
-@@ -515,6 +515,8 @@ static const struct sfp_quirk sfp_quirks[] = {
+@@ -385,7 +385,7 @@ static void sfp_fixup_rollball(struct sfp *sfp)
+ 	sfp->phy_t_retry = msecs_to_jiffies(1000);
+ }
  
- 	SFP_QUIRK_F("OEM", "SFP-10G-T", sfp_fixup_rollball_cc),
- 	SFP_QUIRK_M("OEM", "SFP-2.5G-T", sfp_quirk_oem_2_5g),
-+	SFP_QUIRK_M("OEM", "SFP-2.5G-BX10-D", sfp_quirk_2500basex),
-+	SFP_QUIRK_M("OEM", "SFP-2.5G-BX10-U", sfp_quirk_2500basex),
- 	SFP_QUIRK_F("OEM", "RTSFP-10", sfp_fixup_rollball_cc),
- 	SFP_QUIRK_F("OEM", "RTSFP-10G", sfp_fixup_rollball_cc),
- 	SFP_QUIRK_F("Turris", "RTSFP-2.5G", sfp_fixup_rollball),
+-static void sfp_fixup_fs_2_5gt(struct sfp *sfp)
++static void sfp_fixup_rollball_wait4s(struct sfp *sfp)
+ {
+ 	sfp_fixup_rollball(sfp);
+ 
+@@ -399,7 +399,7 @@ static void sfp_fixup_fs_2_5gt(struct sfp *sfp)
+ static void sfp_fixup_fs_10gt(struct sfp *sfp)
+ {
+ 	sfp_fixup_10gbaset_30m(sfp);
+-	sfp_fixup_fs_2_5gt(sfp);
++	sfp_fixup_rollball_wait4s(sfp);
+ }
+ 
+ static void sfp_fixup_halny_gsfp(struct sfp *sfp)
+@@ -479,9 +479,10 @@ static const struct sfp_quirk sfp_quirks[] = {
+ 	// PHY.
+ 	SFP_QUIRK_F("FS", "SFP-10G-T", sfp_fixup_fs_10gt),
+ 
+-	// Fiberstore SFP-2.5G-T uses Rollball protocol to talk to the PHY and
+-	// needs 4 sec wait before probing the PHY.
+-	SFP_QUIRK_F("FS", "SFP-2.5G-T", sfp_fixup_fs_2_5gt),
++	// Fiberstore SFP-2.5G-T and SFP-10GM-T uses Rollball protocol to talk
++	// to the PHY and needs 4 sec wait before probing the PHY.
++	SFP_QUIRK_F("FS", "SFP-2.5G-T", sfp_fixup_rollball_wait4s),
++	SFP_QUIRK_F("FS", "SFP-10GM-T", sfp_fixup_rollball_wait4s),
+ 
+ 	// Fiberstore GPON-ONU-34-20BI can operate at 2500base-X, but report 1.2GBd
+ 	// NRZ in their EEPROM
 -- 
 2.39.5
 
