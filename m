@@ -1,62 +1,66 @@
-Return-Path: <netdev+bounces-179155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 580ACA7AD1E
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:57:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C556AA7AD15
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:56:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59ABC189F4B4
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:52:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 996947A6960
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:54:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5798825A2DE;
-	Thu,  3 Apr 2025 19:09:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6444F2BE7A2;
+	Thu,  3 Apr 2025 19:09:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FZtW8Gwi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DcrwqGmf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ABA825A2D9;
-	Thu,  3 Apr 2025 19:09:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AC692BD590;
+	Thu,  3 Apr 2025 19:09:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743707370; cv=none; b=JfRBSosq/iX6waZ30Sfbs158EEQJJmvCjqvPmCpHBL5nU9G2vS+YO1A2zasJgx5p0yvck8RIfQ2OHqMt0F6VwS9Wc5nKjI+lhF9BFJvrlZRGQ4eqAkmeoGjbuBVcgnAWnWE8xyBA2YAwwW9n4hvMVFm0CHtu/k1IfePz3ahmnqw=
+	t=1743707399; cv=none; b=T85V3nS0s+3BPXI29dqgYPRHHIZ41fRJd2Xnify/nlSXg61P/KC+nuC7Dyyws/oDtNPjHJZkHJPKmqxj7xDEKs3JzGkqmPpk7mIUSSXuzGWegI4IaOhhELx/qX9fuQoIPa/Uh+zRJePSMiUrg1i8wRo83QB9m2wEzAQgg2/NE4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743707370; c=relaxed/simple;
-	bh=6csg7lD3PhrFQZR4E3Q4CG4jjknvEMYAhVJ00Ba8LBo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XzLS3+B0rHyaCwpoEx5M4jhf1Ni0IVRyWUnEpaDSTS1pE1mJTDb8WQXWhh7hM12GDOKDQo9qx+XCZ2pcRffZJQRKMrpsTA0gIr3nX8hZSCFqZ2zrPIEOXL4mupaWIrRArpUkbG2FwL+DxD4zFGXK3I9NdF4/N++j1nVi0aT41gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FZtW8Gwi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B058BC4CEE3;
-	Thu,  3 Apr 2025 19:09:28 +0000 (UTC)
+	s=arc-20240116; t=1743707399; c=relaxed/simple;
+	bh=eAm1KQMMf1mi+wlPZMvvsX3nJD5gf3vLDzIA/zZwvsY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=NHDJKbRBVCzgegU1Y1kqq9C3kqhOZhKB/TWzyQTP+vxHg8Z/uC+PUo9h8vrkDjqTeHjp4mFL6JKcQ6BXDZO1+K2jj9/78miFspWlIJtO587R/310+nutCfLV/IlFXmBrJkaJwzIfwDSt+AmQj9Iu24G+8Xd0kUlltKh8seYvrbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DcrwqGmf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55C26C4CEE8;
+	Thu,  3 Apr 2025 19:09:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743707370;
-	bh=6csg7lD3PhrFQZR4E3Q4CG4jjknvEMYAhVJ00Ba8LBo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=FZtW8GwirKqS86JYgVFQis182VFbqkj2Z+pKGnifNacE63upjFBU8R2CDfqRtQFWL
-	 81wFE77greGthfF4ybRnpVM+0TptewEkb7BzxqyrMQZ7XTmckRtAkdsJrxQ7/fhRZD
-	 uLBPPGi6KPfm4aVHOceTZ41Ukn0rgkS3kJoJW5n7n6z0DOD2XC1O5HdWmcLQ9azo5o
-	 PBGskfBu3Iz8Faf8DWXJeYwXJgNrOikl1jvpFwFavF+5TlbAwZ9tlwh7ltQ5a5qHVV
-	 +fNDp4nkm0tXRHmx9S/ZI80snJeBeUrhBfQxCPFdaeDUm/nv6G/uUITsNWxj0p/O9n
-	 eH5udkY9+cGXQ==
+	s=k20201202; t=1743707398;
+	bh=eAm1KQMMf1mi+wlPZMvvsX3nJD5gf3vLDzIA/zZwvsY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=DcrwqGmfqxMVy/tIBGTNbsO1AA91QTcwrCTXBaGQwvEmN47neytHtRnSClzy4epGB
+	 AawQBiNrejr3NDgCwigvwrMNDycENlowYMaeJlDlXGZencHd6h05/76SKlqQf+BeDO
+	 R6o57pUcuYJozZ8w3gymc7EccYf9SsLul+aI0pNsP990MnDDe7Ay6IN8oUdwhDPZYl
+	 uhHfU4ghGepd+58FnZ5PZfCX96HavRsaOEzdHu9S5CUa/sMLEtYpoMpmcaotLGVqhh
+	 vfYVvkW8sHWyTwL89VtT8AHCeozRTRxJUXQjbYIfP1T08sB6g7z2WkSjEnDwZ+dHfC
+	 bnGIPekrS2iMg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Jason Xing <kerneljasonxing@gmail.com>,
-	Mina Almasry <almasrymina@google.com>,
+Cc: Stanislav Fomichev <sdf@fomichev.me>,
+	syzbot+b0c03d76056ef6cd12a6@syzkaller.appspotmail.com,
+	Simon Horman <horms@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	hawk@kernel.org,
-	ilias.apalodimas@linaro.org,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
+	aleksander.lobakin@intel.com,
+	kory.maincent@bootlin.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 01/16] page_pool: avoid infinite loop to schedule delayed worker
-Date: Thu,  3 Apr 2025 15:09:09 -0400
-Message-Id: <20250403190924.2678291-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 14/16] net: vlan: don't propagate flags on open
+Date: Thu,  3 Apr 2025 15:09:22 -0400
+Message-Id: <20250403190924.2678291-14-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250403190924.2678291-1-sashal@kernel.org>
+References: <20250403190924.2678291-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,66 +72,180 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.15.179
 Content-Transfer-Encoding: 8bit
 
-From: Jason Xing <kerneljasonxing@gmail.com>
+From: Stanislav Fomichev <sdf@fomichev.me>
 
-[ Upstream commit 43130d02baa137033c25297aaae95fd0edc41654 ]
+[ Upstream commit 27b918007d96402aba10ed52a6af8015230f1793 ]
 
-We noticed the kworker in page_pool_release_retry() was waken
-up repeatedly and infinitely in production because of the
-buggy driver causing the inflight less than 0 and warning
-us in page_pool_inflight()[1].
+With the device instance lock, there is now a possibility of a deadlock:
 
-Since the inflight value goes negative, it means we should
-not expect the whole page_pool to get back to work normally.
+[    1.211455] ============================================
+[    1.211571] WARNING: possible recursive locking detected
+[    1.211687] 6.14.0-rc5-01215-g032756b4ca7a-dirty #5 Not tainted
+[    1.211823] --------------------------------------------
+[    1.211936] ip/184 is trying to acquire lock:
+[    1.212032] ffff8881024a4c30 (&dev->lock){+.+.}-{4:4}, at: dev_set_allmulti+0x4e/0xb0
+[    1.212207]
+[    1.212207] but task is already holding lock:
+[    1.212332] ffff8881024a4c30 (&dev->lock){+.+.}-{4:4}, at: dev_open+0x50/0xb0
+[    1.212487]
+[    1.212487] other info that might help us debug this:
+[    1.212626]  Possible unsafe locking scenario:
+[    1.212626]
+[    1.212751]        CPU0
+[    1.212815]        ----
+[    1.212871]   lock(&dev->lock);
+[    1.212944]   lock(&dev->lock);
+[    1.213016]
+[    1.213016]  *** DEADLOCK ***
+[    1.213016]
+[    1.213143]  May be due to missing lock nesting notation
+[    1.213143]
+[    1.213294] 3 locks held by ip/184:
+[    1.213371]  #0: ffffffff838b53e0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock+0x1b/0xa0
+[    1.213543]  #1: ffffffff84e5fc70 (&net->rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock+0x37/0xa0
+[    1.213727]  #2: ffff8881024a4c30 (&dev->lock){+.+.}-{4:4}, at: dev_open+0x50/0xb0
+[    1.213895]
+[    1.213895] stack backtrace:
+[    1.213991] CPU: 0 UID: 0 PID: 184 Comm: ip Not tainted 6.14.0-rc5-01215-g032756b4ca7a-dirty #5
+[    1.213993] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.3-1-1 04/01/2014
+[    1.213994] Call Trace:
+[    1.213995]  <TASK>
+[    1.213996]  dump_stack_lvl+0x8e/0xd0
+[    1.214000]  print_deadlock_bug+0x28b/0x2a0
+[    1.214020]  lock_acquire+0xea/0x2a0
+[    1.214027]  __mutex_lock+0xbf/0xd40
+[    1.214038]  dev_set_allmulti+0x4e/0xb0 # real_dev->flags & IFF_ALLMULTI
+[    1.214040]  vlan_dev_open+0xa5/0x170 # ndo_open on vlandev
+[    1.214042]  __dev_open+0x145/0x270
+[    1.214046]  __dev_change_flags+0xb0/0x1e0
+[    1.214051]  netif_change_flags+0x22/0x60 # IFF_UP vlandev
+[    1.214053]  dev_change_flags+0x61/0xb0 # for each device in group from dev->vlan_info
+[    1.214055]  vlan_device_event+0x766/0x7c0 # on netdevsim0
+[    1.214058]  notifier_call_chain+0x78/0x120
+[    1.214062]  netif_open+0x6d/0x90
+[    1.214064]  dev_open+0x5b/0xb0 # locks netdevsim0
+[    1.214066]  bond_enslave+0x64c/0x1230
+[    1.214075]  do_set_master+0x175/0x1e0 # on netdevsim0
+[    1.214077]  do_setlink+0x516/0x13b0
+[    1.214094]  rtnl_newlink+0xaba/0xb80
+[    1.214132]  rtnetlink_rcv_msg+0x440/0x490
+[    1.214144]  netlink_rcv_skb+0xeb/0x120
+[    1.214150]  netlink_unicast+0x1f9/0x320
+[    1.214153]  netlink_sendmsg+0x346/0x3f0
+[    1.214157]  __sock_sendmsg+0x86/0xb0
+[    1.214160]  ____sys_sendmsg+0x1c8/0x220
+[    1.214164]  ___sys_sendmsg+0x28f/0x2d0
+[    1.214179]  __x64_sys_sendmsg+0xef/0x140
+[    1.214184]  do_syscall_64+0xec/0x1d0
+[    1.214190]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+[    1.214191] RIP: 0033:0x7f2d1b4a7e56
 
-This patch mitigates the adverse effect by not rescheduling
-the kworker when detecting the inflight negative in
-page_pool_release_retry().
+Device setup:
 
-[1]
-[Mon Feb 10 20:36:11 2025] ------------[ cut here ]------------
-[Mon Feb 10 20:36:11 2025] Negative(-51446) inflight packet-pages
-...
-[Mon Feb 10 20:36:11 2025] Call Trace:
-[Mon Feb 10 20:36:11 2025]  page_pool_release_retry+0x23/0x70
-[Mon Feb 10 20:36:11 2025]  process_one_work+0x1b1/0x370
-[Mon Feb 10 20:36:11 2025]  worker_thread+0x37/0x3a0
-[Mon Feb 10 20:36:11 2025]  kthread+0x11a/0x140
-[Mon Feb 10 20:36:11 2025]  ? process_one_work+0x370/0x370
-[Mon Feb 10 20:36:11 2025]  ? __kthread_cancel_work+0x40/0x40
-[Mon Feb 10 20:36:11 2025]  ret_from_fork+0x35/0x40
-[Mon Feb 10 20:36:11 2025] ---[ end trace ebffe800f33e7e34 ]---
-Note: before this patch, the above calltrace would flood the
-dmesg due to repeated reschedule of release_dw kworker.
+     netdevsim0 (down)
+     ^        ^
+  bond        netdevsim1.100@netdevsim1 allmulticast=on (down)
 
-Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-Reviewed-by: Mina Almasry <almasrymina@google.com>
-Link: https://patch.msgid.link/20250214064250.85987-1-kerneljasonxing@gmail.com
+When we enslave the lower device (netdevsim0) which has a vlan, we
+propagate vlan's allmuti/promisc flags during ndo_open. This causes
+(re)locking on of the real_dev.
+
+Propagate allmulti/promisc on flags change, not on the open. There
+is a slight semantics change that vlans that are down now propagate
+the flags, but this seems unlikely to result in the real issues.
+
+Reproducer:
+
+  echo 0 1 > /sys/bus/netdevsim/new_device
+
+  dev_path=$(ls -d /sys/bus/netdevsim/devices/netdevsim0/net/*)
+  dev=$(echo $dev_path | rev | cut -d/ -f1 | rev)
+
+  ip link set dev $dev name netdevsim0
+  ip link set dev netdevsim0 up
+
+  ip link add link netdevsim0 name netdevsim0.100 type vlan id 100
+  ip link set dev netdevsim0.100 allmulticast on down
+  ip link add name bond1 type bond mode 802.3ad
+  ip link set dev netdevsim0 down
+  ip link set dev netdevsim0 master bond1
+  ip link set dev bond1 up
+  ip link show
+
+Reported-by: syzbot+b0c03d76056ef6cd12a6@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/Z9CfXjLMKn6VLG5d@mini-arch/T/#m15ba130f53227c883e79fb969687d69d670337a0
+Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Link: https://patch.msgid.link/20250313100657.2287455-1-sdf@fomichev.me
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/core/page_pool.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ net/8021q/vlan_dev.c | 31 ++++---------------------------
+ 1 file changed, 4 insertions(+), 27 deletions(-)
 
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 069d6ba0e33fb..416be038e1cae 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -699,7 +699,13 @@ static void page_pool_release_retry(struct work_struct *wq)
- 	int inflight;
+diff --git a/net/8021q/vlan_dev.c b/net/8021q/vlan_dev.c
+index ad2d3ad34b7d7..945a5bb7402d2 100644
+--- a/net/8021q/vlan_dev.c
++++ b/net/8021q/vlan_dev.c
+@@ -272,17 +272,6 @@ static int vlan_dev_open(struct net_device *dev)
+ 			goto out;
+ 	}
  
- 	inflight = page_pool_release(pool);
--	if (!inflight)
-+	/* In rare cases, a driver bug may cause inflight to go negative.
-+	 * Don't reschedule release if inflight is 0 or negative.
-+	 * - If 0, the page_pool has been destroyed
-+	 * - if negative, we will never recover
-+	 * in both cases no reschedule is necessary.
-+	 */
-+	if (inflight <= 0)
- 		return;
+-	if (dev->flags & IFF_ALLMULTI) {
+-		err = dev_set_allmulti(real_dev, 1);
+-		if (err < 0)
+-			goto del_unicast;
+-	}
+-	if (dev->flags & IFF_PROMISC) {
+-		err = dev_set_promiscuity(real_dev, 1);
+-		if (err < 0)
+-			goto clear_allmulti;
+-	}
+-
+ 	ether_addr_copy(vlan->real_dev_addr, real_dev->dev_addr);
  
- 	/* Periodic warning */
+ 	if (vlan->flags & VLAN_FLAG_GVRP)
+@@ -296,12 +285,6 @@ static int vlan_dev_open(struct net_device *dev)
+ 		netif_carrier_on(dev);
+ 	return 0;
+ 
+-clear_allmulti:
+-	if (dev->flags & IFF_ALLMULTI)
+-		dev_set_allmulti(real_dev, -1);
+-del_unicast:
+-	if (!ether_addr_equal(dev->dev_addr, real_dev->dev_addr))
+-		dev_uc_del(real_dev, dev->dev_addr);
+ out:
+ 	netif_carrier_off(dev);
+ 	return err;
+@@ -314,10 +297,6 @@ static int vlan_dev_stop(struct net_device *dev)
+ 
+ 	dev_mc_unsync(real_dev, dev);
+ 	dev_uc_unsync(real_dev, dev);
+-	if (dev->flags & IFF_ALLMULTI)
+-		dev_set_allmulti(real_dev, -1);
+-	if (dev->flags & IFF_PROMISC)
+-		dev_set_promiscuity(real_dev, -1);
+ 
+ 	if (!ether_addr_equal(dev->dev_addr, real_dev->dev_addr))
+ 		dev_uc_del(real_dev, dev->dev_addr);
+@@ -474,12 +453,10 @@ static void vlan_dev_change_rx_flags(struct net_device *dev, int change)
+ {
+ 	struct net_device *real_dev = vlan_dev_priv(dev)->real_dev;
+ 
+-	if (dev->flags & IFF_UP) {
+-		if (change & IFF_ALLMULTI)
+-			dev_set_allmulti(real_dev, dev->flags & IFF_ALLMULTI ? 1 : -1);
+-		if (change & IFF_PROMISC)
+-			dev_set_promiscuity(real_dev, dev->flags & IFF_PROMISC ? 1 : -1);
+-	}
++	if (change & IFF_ALLMULTI)
++		dev_set_allmulti(real_dev, dev->flags & IFF_ALLMULTI ? 1 : -1);
++	if (change & IFF_PROMISC)
++		dev_set_promiscuity(real_dev, dev->flags & IFF_PROMISC ? 1 : -1);
+ }
+ 
+ static void vlan_dev_set_rx_mode(struct net_device *vlan_dev)
 -- 
 2.39.5
 
