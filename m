@@ -1,131 +1,290 @@
-Return-Path: <netdev+bounces-179104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E401A7A95B
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 20:29:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8158A7A96F
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 20:31:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9050B3A7C69
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 18:28:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CC5D16EEE8
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 18:30:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D341F2517B9;
-	Thu,  3 Apr 2025 18:29:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77C00253331;
+	Thu,  3 Apr 2025 18:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mZwuFLae"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gdaD3uGK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2435C8E0;
-	Thu,  3 Apr 2025 18:29:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67ACA18BC1D
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 18:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743704945; cv=none; b=OkYjhuAzm+hPC1fbKgYilk8TpNbQISpO7laqJt3+KlOGomJyjqSQf99k9Xuifu77CySmX18T1+NLOMr8U3PpC/qwHI9V7lHG39zmo+CfcIhk0Fdu8b1A5RW+TXv2Mq6FdyGYrav5+Qd3QrWdpvh5MxE6pJQwcYlcuRpIV4G1rA8=
+	t=1743705034; cv=none; b=UmNaeCYkpe+Z24wT+0DNfEkDTNnE8fdGucTUO80K8OaUD9DtYfckbrkRG2UispkljRMfxogBXUSxkyyfqEgVCmontQRUsPUr3WFa+Sxz0bt5PD9I0wvM2onG+H9HvBc2iXkQ5F8DFqgGXiQJGlunJlLDfJqi8O/5R1xTwbGnz88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743704945; c=relaxed/simple;
-	bh=BJ6MF4X3xZZJF9aGkDdtTPJx0QtX8gqmfIDuSD47caI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aS45SHz7fUwTFeeZkB2HaHVNan3NwMqbfO9euXKoxv9EUpF9MTjzFMdaHqYdHEHghu5f7mcNXayo+69yXAT/p3Q52yEzk/SW8Xa+y4EFcmFyevmpFFzMUa7Z+vdKPiQVAaDw1RDYfHA9X3PlTKlgabTJr4VjY9ybYAmE+YOtihE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mZwuFLae; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43ce71582e9so8564445e9.1;
-        Thu, 03 Apr 2025 11:29:03 -0700 (PDT)
+	s=arc-20240116; t=1743705034; c=relaxed/simple;
+	bh=PkslLZ+LloU6B+v0EstCj9Qw0blZGQA2AGI0/JXULwk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=G1HTgkCQziFgb+cFIRN58gaUMl3E3p0GZ4LOH68HeY8QdnNlmqYGSju32xc4Ne2TvC0TZP6OZ9iQBjhvtf5qrD3lOUeZA4Mu6a8/Vc/OP7fVhrQ72q0VJ157/JdimzwxrA5AFdS2rrtLuoDEDzCkIybhnb0I9iU7plv0o1w/gmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gdaD3uGK; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5dbfc122b82so1621a12.0
+        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 11:30:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743704942; x=1744309742; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=l0xXXnmcQUMSAV1rDZydtKV9m1RhcaPoKdR17ygBDjk=;
-        b=mZwuFLaeOj4GM/hourMDy7pI6zSktu+gkXmQoiNqfIfx5LWsUZeQvcf3hXGrXrj9J+
-         oH7jktlNOnZ6SVzNX+8kQE+5ndql7PiY9ymIpyKX3qB0l7wzOKSDywTjS70gwvCBAczi
-         2Kt0PhY+zwTNXEyaScRvSwkcJdCfI61jHEkVIZaVG/TFFI2Wp9/vyJ4mUiSezqS9rwJm
-         pmCDGKMeEi30yzJ5Iox4FITjB4rG1Nz0/91VdPbl/dB5o/rEv6UECmhGDWnQFBp+ZzUe
-         JR1p0/KRff3xAVNJWWktDDYumldQxWW4lnyylr7sRVEagFXijmfweBB8VcgHB+37/Ptd
-         Fm9A==
+        d=google.com; s=20230601; t=1743705031; x=1744309831; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iYMGgH2/Vqv1R7Ax+V3E+Ngy/7HRiyWg2fEaUXEJVfU=;
+        b=gdaD3uGKuP5b+COSrcW5u2sHHjf09/F/AwYc/RtAHgOpxeD1Gj42vfK8yJ6Kt+nx+2
+         G/dxLKk5IxQewJq40V422aSd6VA/QtPtoszuJVKxgZ7odvTK0ZAWBoT8hJPHotvxWkKU
+         0sqs0cwHGGYuhHLU4b8rYsUVn8c4+wjBnigibQtY6Vz8yGfeXHQU4BOrekTAddKV8ROD
+         rwty4CALZSqzmFHXJovcCDl3w8NINyG7rq5gkyJwK2jHwpvU8DIDJevaHMZvVzTtN5Ok
+         e40NfAtEdMqhFNzCM5x2JVb5NyDpPlvovk08Q3X9v1xTx5S24e+qYuvt0L6gIxWLsUAi
+         tRRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743704942; x=1744309742;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=l0xXXnmcQUMSAV1rDZydtKV9m1RhcaPoKdR17ygBDjk=;
-        b=VtWixn7J6nNvCHs7IaZwPywR5fWrkIMUtlPHeDo8kvS0ENJ6F0cmvMpXF6RTEkf+8E
-         FB7S2SF98IaP+yA2WDBW7yIyFHnML16E1GzLfMvghvmMYMP5gQj4pLy6JJpe5zbqG2Nl
-         +KoA/8xZtvYDJUSgHyArH+TptkZOKKub/i0V06rZ/J4KMo/PHHE7+4N26s+FgfbVRD4p
-         i9o9PanI3HuEerHt3UEux7TiqhawFuBEO4/LUKLGWzFFm2pskoED78XqoRI/yY2pXLNZ
-         zU/EughUHpHnkxmMCF4nY+FAYg5UDJluj44g+P1m6Qg2bZUX53CRoMVKr/3NawESHsUx
-         MaJA==
-X-Forwarded-Encrypted: i=1; AJvYcCUQad/ERMSetDgZqJXlLbNVtNWzPSv9x1V3VrpOiCUVRyw3TbCrzBPlC1nEKS+7KLSpKLETQREt+/PH3A==@vger.kernel.org, AJvYcCXuUEZ8Bdoqiudv2f9zT4ibhJdib7ZH57pm3iH+j5JfJF7WB7Q1d4tl10eLR/yBW2iwjzrfhRZ+SfwRRWg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywd+K4zerJAb0/lhlzd3gqzpIYDW+3yHmvzHaz0DoiMJFveaU34
-	jg6AuTO6kOgb3gVhXyOJsVCEqSO4JwZbS5ybyEWaY9j+IX/qnjSb
-X-Gm-Gg: ASbGnct/36rqeHY8P6PVVXCnvQR1B87XR1avffVlVz/ommIYnvxC9Ju/1mNl5/5mw6e
-	G+Pel9aJ+pCWHD1dJjfsJsj/sPgwjlWTJN5I995X12hVNdH6THoOrJQP0JC8bVBWtBQ9ab/SQgJ
-	Mc5F1c7b9ofaNBlxT89Sy0YO+9ERAo9HSC70tSKiAbSQwF+GtJ9BB3j3MW9xk0R7/gLuRFm788D
-	KEwX00xdRyZDwQ8EoIAiXSKbcXnrUlXQL+OJCWF4gEfC+ygtytQAEb65UfRiezczdVSMqDsrnAE
-	4tWGDDPdvj8zHUNxofgkuDMeuQ42fUwu/vzukJ6XGys0TxfUMMPQZ5JcsqOgW0r5Qg==
-X-Google-Smtp-Source: AGHT+IH7ukEB039raJgrsIcDoJubZVtxahaG0Ai1QHumd2mPTT/OvQNVxuZUvzclFKZ2rMvZDmDwnw==
-X-Received: by 2002:a05:600c:46ca:b0:43d:54a:221c with SMTP id 5b1f17b1804b1-43ecfa45a81mr1044925e9.18.1743704941876;
-        Thu, 03 Apr 2025 11:29:01 -0700 (PDT)
-Received: from [172.27.62.155] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c3020d943sm2459508f8f.74.2025.04.03.11.28.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Apr 2025 11:29:01 -0700 (PDT)
-Message-ID: <0e08292e-9280-4ef6-baf7-e9f642d33177@gmail.com>
-Date: Thu, 3 Apr 2025 21:28:57 +0300
+        d=1e100.net; s=20230601; t=1743705031; x=1744309831;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iYMGgH2/Vqv1R7Ax+V3E+Ngy/7HRiyWg2fEaUXEJVfU=;
+        b=KcSqDwY6bLyWT6CU/48OL2sLQLKk0GGfwKJS8Y0J9l5mGA5vPJh4EBAHERh40gY+CC
+         wUXk7WH3BL6j9MSzVS8H1wjtSTa1pZjS32PygF931vlPqFtAyr2dv0F780n81agR+0az
+         LYZWEkduc0iBW4GJYqD3IysxD2hpmV6BfoQgWChNHPwOiZetK9uL+MyY1zNb8WJvwrKP
+         juZcvf9BWrZuj7EZ/mRwzMcs43b/Id3kXU/kmC9pORD4WoR/CEAEhk6afVG36f9AmVG/
+         ceIlB4yJ3siW02HPmldVBt2lu+CL/xYndOIYAlptLLSVDrFX+9s6jlC5v41B+UDqIgz+
+         JTjg==
+X-Forwarded-Encrypted: i=1; AJvYcCUIJP5BZThXswuAem4QKyZKWXjeVkc7Wuj9jEpzCddPaKOlUJAIjl5kYbRv6jrH3obJvLFZ7ig=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwT6/dVRwKlw8nwiH53Dd7gu53f1K3W0netIivtpNqe6w9ZVEy0
+	pz+rKomRXqFxBXGcJPvit6jASfprnplyvV2Mp6sGkN/8+wDLn/lhMPMwOBMtkbcAJb8NL6YnfQ9
+	Gm5hWs6Uu9oyd0JDHYvzLxlyvuniAQhntwi+n
+X-Gm-Gg: ASbGncvIK5EMC/J0GCYhq5KJ7KmtYni3oZNblFitU8Q9AjGuHl39oEZA9QGbVOmGmkc
+	M4HbUX5d/e1OQV4mMK1Ow+uVtgEHY4V632vBQdYA9drvvqICB7dbm6VgCrmb7srcZEJ+lslGODO
+	ixuDXzKicGLvbLfkESWK2Yk84hVwav0b5K77C1nUCiahUBrsdfZ8jXSATz
+X-Google-Smtp-Source: AGHT+IGN3xjfeCsv6yU/ijhQ9l/fdxnM1CkdyiU+66cHrRD4FhUygubAdMQnp2osyUBvjMPoNgXxTXybIBkTRkjpgMo=
+X-Received: by 2002:a05:6402:1858:b0:5eb:5d50:4fec with SMTP id
+ 4fb4d7f45d1cf-5f0b32e46b3mr10995a12.0.1743705030162; Thu, 03 Apr 2025
+ 11:30:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/mlx5e: fix potential null dereference in
- mlx5e_tc_nic_create_miss_table
-To: Charles Han <hanchunchao@inspur.com>, saeedm@nvidia.com, leon@kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, maord@nvidia.com, lariel@nvidia.com,
- paulb@nvidia.com
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>
-References: <20250402093221.3253-1-hanchunchao@inspur.com>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250402093221.3253-1-hanchunchao@inspur.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250403140846.1268564-1-willemdebruijn.kernel@gmail.com>
+ <20250403140846.1268564-2-willemdebruijn.kernel@gmail.com>
+ <Z-7DiZWkOQ_n5aXw@mini-arch> <67eec501d0d58_14b7b229490@willemb.c.googlers.com.notmuch>
+ <Z-7G8cBIW7-dVeH8@mini-arch>
+In-Reply-To: <Z-7G8cBIW7-dVeH8@mini-arch>
+From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
+Date: Thu, 3 Apr 2025 11:30:18 -0700
+X-Gm-Features: AQ5f1JojtrAQfQuBrxXtrkvPht_OtIyL0GibAHcLZ4neOaOKwSrpH4h5ePglz5I
+Message-ID: <CANP3RGe8ZjcX8yGhCPs+Q1x7ijpGKthjawztFiXSeDQazgSrpA@mail.gmail.com>
+Subject: Re: [PATCH bpf 1/2] bpf: support SKF_NET_OFF and SKF_LL_OFF on skb frags
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	john.fastabend@gmail.com, Willem de Bruijn <willemb@google.com>, 
+	Matt Moeller <moeller.matt@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Apr 3, 2025 at 10:35=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
+l.com> wrote:
+>
+> On 04/03, Willem de Bruijn wrote:
+> > Stanislav Fomichev wrote:
+> > > On 04/03, Willem de Bruijn wrote:
+> > > > From: Willem de Bruijn <willemb@google.com>
+> > > >
+> > > > Classic BPF socket filters with SKB_NET_OFF and SKB_LL_OFF fail to
+> > > > read when these offsets extend into frags.
+> > > >
+> > > > This has been observed with iwlwifi and reproduced with tun with
+> > > > IFF_NAPI_FRAGS. The below straightforward socket filter on UDP port=
+,
+> > > > applied to a RAW socket, will silently miss matching packets.
+> > > >
+> > > >     const int offset_proto =3D offsetof(struct ip6_hdr, ip6_nxt);
+> > > >     const int offset_dport =3D sizeof(struct ip6_hdr) + offsetof(st=
+ruct udphdr, dest);
+> > > >     struct sock_filter filter_code[] =3D {
+> > > >             BPF_STMT(BPF_LD  + BPF_B   + BPF_ABS, SKF_AD_OFF + SKF_=
+AD_PKTTYPE),
+> > > >             BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, PACKET_HOST, 0, 4),
+> > > >             BPF_STMT(BPF_LD  + BPF_B   + BPF_ABS, SKF_NET_OFF + off=
+set_proto),
+> > > >             BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, IPPROTO_UDP, 0, 2),
+> > > >             BPF_STMT(BPF_LD  + BPF_H   + BPF_ABS, SKF_NET_OFF + off=
+set_dport),
+> > > >
+> > > > This is unexpected behavior. Socket filter programs should be
+> > > > consistent regardless of environment. Silent misses are
+> > > > particularly concerning as hard to detect.
+> > > >
+> > > > Use skb_copy_bits for offsets outside linear, same as done for
+> > > > non-SKF_(LL|NET) offsets.
+> > > >
+> > > > Offset is always positive after subtracting the reference threshold
+> > > > SKB_(LL|NET)_OFF, so is always >=3D skb_(mac|network)_offset. The s=
+um of
+> > > > the two is an offset against skb->data, and may be negative, but it
+> > > > cannot point before skb->head, as skb_(mac|network)_offset would to=
+o.
+> > > >
+> > > > This appears to go back to when frag support was introduced to
+> > > > sk_run_filter in linux-2.4.4, before the introduction of git.
+> > > >
+> > > > The amount of code change and 8/16/32 bit duplication are unfortuna=
+te.
+> > > > But any attempt I made to be smarter saved very few LoC while
+> > > > complicating the code.
+> > > >
+> > > > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> > > > Link: https://lore.kernel.org/netdev/20250122200402.3461154-1-maze@=
+google.com/
+> > > > Link: https://elixir.bootlin.com/linux/2.4.4/source/net/core/filter=
+.c#L244
+> > > > Reported-by: Matt Moeller <moeller.matt@gmail.com>
+> > > > Co-developed-by: Maciej =C5=BBenczykowski <maze@google.com>
+> > > > Signed-off-by: Maciej =C5=BBenczykowski <maze@google.com>
+> > > > Signed-off-by: Willem de Bruijn <willemb@google.com>
+> > > > ---
+> > > >  include/linux/filter.h |  3 --
+> > > >  kernel/bpf/core.c      | 21 ------------
+> > > >  net/core/filter.c      | 75 +++++++++++++++++++++++---------------=
+----
+> > > >  3 files changed, 42 insertions(+), 57 deletions(-)
+> > > >
+> > > > diff --git a/include/linux/filter.h b/include/linux/filter.h
+> > > > index f5cf4d35d83e..708ac7e0cd36 100644
+> > > > --- a/include/linux/filter.h
+> > > > +++ b/include/linux/filter.h
+> > > > @@ -1496,9 +1496,6 @@ static inline u16 bpf_anc_helper(const struct=
+ sock_filter *ftest)
+> > > >   }
+> > > >  }
+> > > >
+> > > > -void *bpf_internal_load_pointer_neg_helper(const struct sk_buff *s=
+kb,
+> > > > -                                    int k, unsigned int size);
+> > > > -
+> > > >  static inline int bpf_tell_extensions(void)
+> > > >  {
+> > > >   return SKF_AD_MAX;
+> > > > diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+> > > > index ba6b6118cf50..0e836b5ac9a0 100644
+> > > > --- a/kernel/bpf/core.c
+> > > > +++ b/kernel/bpf/core.c
+> > > > @@ -68,27 +68,6 @@
+> > > >  struct bpf_mem_alloc bpf_global_ma;
+> > > >  bool bpf_global_ma_set;
+> > > >
+> > > > -/* No hurry in this branch
+> > > > - *
+> > > > - * Exported for the bpf jit load helper.
+> > > > - */
+> > > > -void *bpf_internal_load_pointer_neg_helper(const struct sk_buff *s=
+kb, int k, unsigned int size)
+> > > > -{
+> > > > - u8 *ptr =3D NULL;
+> > > > -
+> > > > - if (k >=3D SKF_NET_OFF) {
+> > > > -         ptr =3D skb_network_header(skb) + k - SKF_NET_OFF;
+> > > > - } else if (k >=3D SKF_LL_OFF) {
+> > > > -         if (unlikely(!skb_mac_header_was_set(skb)))
+> > > > -                 return NULL;
+> > > > -         ptr =3D skb_mac_header(skb) + k - SKF_LL_OFF;
+> > > > - }
+> > > > - if (ptr >=3D skb->head && ptr + size <=3D skb_tail_pointer(skb))
+> > > > -         return ptr;
+> > > > -
+> > > > - return NULL;
+> > > > -}
+> > > > -
+> > > >  /* tell bpf programs that include vmlinux.h kernel's PAGE_SIZE */
+> > > >  enum page_size_enum {
+> > > >   __PAGE_SIZE =3D PAGE_SIZE
+> > > > diff --git a/net/core/filter.c b/net/core/filter.c
+> > > > index bc6828761a47..b232b70dd10d 100644
+> > > > --- a/net/core/filter.c
+> > > > +++ b/net/core/filter.c
+> > > > @@ -221,21 +221,24 @@ BPF_CALL_3(bpf_skb_get_nlattr_nest, struct sk=
+_buff *, skb, u32, a, u32, x)
+> > > >  BPF_CALL_4(bpf_skb_load_helper_8, const struct sk_buff *, skb, con=
+st void *,
+> > > >      data, int, headlen, int, offset)
+> > > >  {
+> > > > - u8 tmp, *ptr;
+> > > > + u8 tmp;
+> > > >   const int len =3D sizeof(tmp);
+> > > >
+> > > > - if (offset >=3D 0) {
+> > > > -         if (headlen - offset >=3D len)
+> > > > -                 return *(u8 *)(data + offset);
+> > > > -         if (!skb_copy_bits(skb, offset, &tmp, sizeof(tmp)))
+> > > > -                 return tmp;
+> > > > - } else {
+> > > > -         ptr =3D bpf_internal_load_pointer_neg_helper(skb, offset,=
+ len);
+> > > > -         if (likely(ptr))
+> > > > -                 return *(u8 *)ptr;
+> > >
+> > > [..]
+> > >
+> > > > + if (offset < 0) {
+> > > > +         if (offset >=3D SKF_NET_OFF)
+> > > > +                 offset +=3D skb_network_offset(skb) - SKF_NET_OFF=
+;
+> > > > +         else if (offset >=3D SKF_LL_OFF && skb_mac_header_was_set=
+(skb))
+> > > > +                 offset +=3D skb_mac_offset(skb) - SKF_LL_OFF;
+> > > > +         else
+> > > > +                 return -EFAULT;
+> > > >   }
+> > >
+> > > nit: we now repeat the same logic three times, maybe still worth it t=
+o put it
+> > > into a helper? bpf_resolve_classic_offset or something.
+> >
+> > I definitely tried this in various ways. But since the core logic is
+> > only four lines and there is an early return on error, no helper
+> > really simplifies anything. It just adds a layer of indirection and
+> > more code in the end.
+>
+> More code, but at least it de-duplicates the logic of translating
+> SKF_XXX_OFF? Something like the following below, but yeah, a matter
+> of preference, up to you.
+>
+> static int bpf_skb_resolve_offset(skb, offset) {
+>         if (offset >=3D 0)
+>                 return offset;
+>
+>         if (offset >=3D SKF_NET_OFF)
+>                 offset +=3D skb_network_offset(skb) - SKF_NET_OFF;
+>         else if (offset >=3D SKF_LL_OFF && skb_mac_header_was_set(skb))
+>                 offset +=3D skb_mac_offset(skb) - SKF_LL_OFF;
+>
+>         return -1;
+> }
+>
+> BPF_CALL_4(bpf_skb_load_helper_8, const struct sk_buff *, skb, const void=
+ *,
+>            data, int, headlen, int, offset)
+> {
+>         offset =3D bpf_skb_resolve_offset(skb, offset);
+>         if (offset < 0)
+>                 return -EFAULT;
 
+this is incorrect, as offset can be legally negative here.
 
-On 02/04/2025 12:32, Charles Han wrote:
-> mlx5_get_flow_namespace() may return a NULL pointer, dereferencing it
-> without NULL check may lead to NULL dereference.
-> Add a NULL check for ns.
-> 
-> Fixes: 66cb64e292d2 ("net/mlx5e: TC NIC mode, fix tc chains miss table")
-> Signed-off-by: Charles Han <hanchunchao@inspur.com>
-> ---
->   drivers/net/ethernet/mellanox/mlx5/core/en_tc.c | 4 ++++
->   1 file changed, 4 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-> index 9ba99609999f..9c524d8c0e5a 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-> @@ -5216,6 +5216,10 @@ static int mlx5e_tc_nic_create_miss_table(struct mlx5e_priv *priv)
->   	ft_attr.level = MLX5E_TC_MISS_LEVEL;
->   	ft_attr.prio = 0;
->   	ns = mlx5_get_flow_namespace(priv->mdev, MLX5_FLOW_NAMESPACE_KERNEL);
-> +	if (!ns) {
-> +		mlx5_core_warn(priv->mdev, "Failed to get flow namespace\n");
+>
+>         ...
+> }
 
-In this function netdev_err API is being used for error prints.
-
-> +		return -EOPNOTSUPP;
-> +	}
->   
->   	*ft = mlx5_create_auto_grouped_flow_table(ns, &ft_attr);
->   	if (IS_ERR(*ft)) {
-
+--
+Maciej =C5=BBenczykowski, Kernel Networking Developer @ Google
 
