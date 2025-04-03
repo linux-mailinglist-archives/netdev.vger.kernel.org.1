@@ -1,62 +1,68 @@
-Return-Path: <netdev+bounces-179140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CCE1A7AC66
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:39:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DB7EA7AC73
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:41:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2424163232
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:35:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A69F7163544
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:36:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B30F1270EA5;
-	Thu,  3 Apr 2025 19:07:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F33B277028;
+	Thu,  3 Apr 2025 19:07:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="inGOpBJQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gzJzPOaR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A2F26FDBF;
-	Thu,  3 Apr 2025 19:07:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0F9253F35;
+	Thu,  3 Apr 2025 19:07:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743707227; cv=none; b=YCun1QQjAG5CQeeGsNIlPyYJkOeaIiOwHlqY8w+Ja/Xw+vHRxQNZobLLhOKtp641AeUWp4qRG9QvA6dhTnnJivnLcsKTX/c7nBFC5jhthavSr/GXL7qf9jt4JsP7AhdRYPD/jIikJHdTXI+OTH67k/bN0PnW31QHWXa/4ryu+1s=
+	t=1743707239; cv=none; b=UXY6wU5oTRT3U+nVpLKgdH0mswnfyJUgm07hOk0Tj6oJqXEgQf03Ryz2g0crUPeVSRk5piq0zB0ahpQY8O3ROd9nma5tvuiQvUBGfCT2A/w+vXwJKtA8CLUJOMFSzczOLN818xSg4LvM93QHKeGdu8Skte45cS5Krthc/aHehs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743707227; c=relaxed/simple;
-	bh=Xxspr6XRpl8ZiS0CyiHskloMrMzy5bkF/MsYq5SU6i0=;
+	s=arc-20240116; t=1743707239; c=relaxed/simple;
+	bh=RzUQhRXe/+OGT7kgCPvHqBz2OlKqXhNnYBz8/RhX7ho=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Do3a6Vkx+OZA6dep1Uz3IUyY945CC78cptCVSTBaUSaZlklExXRdm28asBWQVFoWFP5zJxmN1glPXgtv/TmXDyVreWG3Awqfk2fAfmWlZgUCtlzs9qEf0coM8dJ3nx6fSwx4KBIMywcbIwfV7StlWzwdw1NpzRRbXYLAf0BcLOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=inGOpBJQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22B65C4CEEB;
-	Thu,  3 Apr 2025 19:07:06 +0000 (UTC)
+	 MIME-Version; b=Je9ypUB04ri9+kdfuRIK5Ga+XSYWZXLHlpqPz7l51hH6uli8BOVr/DnOV8wMDLWRnavrEjR5bOHV7SiAnMtdc1KOO1G8UEpy2T6cCSh+iofFeZjL0wTrdQM4TuoEKPRfGsXw4Qg7KE5FLYBkmEA1MXw5ius5qUQeLjc87PPWufo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gzJzPOaR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B834C4CEE8;
+	Thu,  3 Apr 2025 19:07:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743707227;
-	bh=Xxspr6XRpl8ZiS0CyiHskloMrMzy5bkF/MsYq5SU6i0=;
+	s=k20201202; t=1743707239;
+	bh=RzUQhRXe/+OGT7kgCPvHqBz2OlKqXhNnYBz8/RhX7ho=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=inGOpBJQAo59Pp5SLMmAJ+jMeAkrPfrRydoF+7YeKb3RtOAy5w8cGogR4NjJEjv9S
-	 jxE50N+h3Q+GzBkRh8iMUGBw6PoDUZ731Ojv+5CmNbHysHgmgoORBTcybNocBvnwSQ
-	 C+BEMjq+PiEC7TUi63TiT89SZuoDxJz908+/GySAT+od8ChfLuRv/oVmjImshz5MMi
-	 L1m5o5REFCSzAK9fy2XZDIp/NHuUoH/MNRsy4ZL7ajWhZ5T2FGbrOe7HiCU7NIxRMp
-	 JFvVdHPb3sxe8INOL45iWWBITVXjZzFbiOdxQxtpOhdTNCY4x4ErqZDhv54K0s15s1
-	 FPci6D+ICIMYw==
+	b=gzJzPOaR8I+9tVtxetV5lR/GVaYVUgDRZ7b9XInmWXohevQAdNLrzL154Sgh8nlkU
+	 VG8YSk4IcZPgyAOEw3xa0h1jJd3GMkDTZuds+6gftBS3cb3VpwX0DK8kwLaB6bt5YZ
+	 Xb8Hw6RF8Im1W+zF0/5Et0x00RyxTjQ9cTjM8Z8tnt63QKJNkJwyYK2lJCJWDLIjaq
+	 7iwPoLRiAS6RekGhehrEsyZn0e+fOA/tZJ4UFbuTY/8ODo/MyMfts/OOwqI2IzCMuW
+	 VTOXMQ5WgeQfwNuO0C/ITwpFDXfqoHGdxIi0LrZdzA3K3f+EkDWRO5wwNPtAs114v7
+	 EWTs/WGqUcibA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Martin Schiller <ms@dev.tdt.de>,
+Cc: Philipp Hahn <phahn-oss@avm.de>,
+	Leon Schuermann <leon@is.currently.online>,
 	Jakub Kicinski <kuba@kernel.org>,
+	Oliver Neukum <oliver@neukum.org>,
+	netdev@vger.kernel.org,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	linux@armlinux.org.uk,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 28/47] net: sfp: add quirk for FS SFP-10GM-T copper SFP+ module
-Date: Thu,  3 Apr 2025 15:05:36 -0400
-Message-Id: <20250403190555.2677001-28-sashal@kernel.org>
+	hayeswang@realtek.com,
+	horms@kernel.org,
+	dianders@chromium.org,
+	ste3ls@gmail.com,
+	linux-usb@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.12 33/47] cdc_ether|r8152: ThinkPad Hybrid USB-C/A Dock quirk
+Date: Thu,  3 Apr 2025 15:05:41 -0400
+Message-Id: <20250403190555.2677001-33-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250403190555.2677001-1-sashal@kernel.org>
 References: <20250403190555.2677001-1-sashal@kernel.org>
@@ -71,58 +77,113 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.12.21
 Content-Transfer-Encoding: 8bit
 
-From: Martin Schiller <ms@dev.tdt.de>
+From: Philipp Hahn <phahn-oss@avm.de>
 
-[ Upstream commit 05ec5c085eb7ae044d49e04a3cff194a0b2a3251 ]
+[ Upstream commit a07f23ad9baf716cbf7746e452c92960536ceae6 ]
 
-Add quirk for a copper SFP that identifies itself as "FS" "SFP-10GM-T".
-It uses RollBall protocol to talk to the PHY and needs 4 sec wait before
-probing the PHY.
+Lenovo ThinkPad Hybrid USB-C with USB-A Dock (17ef:a359) is affected by
+the same problem as the Lenovo Powered USB-C Travel Hub (17ef:721e):
+Both are based on the Realtek RTL8153B chip used to use the cdc_ether
+driver. However, using this driver, with the system suspended the device
+constantly sends pause-frames as soon as the receive buffer fills up.
+This causes issues with other devices, where some Ethernet switches stop
+forwarding packets altogether.
 
-Signed-off-by: Martin Schiller <ms@dev.tdt.de>
-Link: https://patch.msgid.link/20250227071058.1520027-1-ms@dev.tdt.de
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Using the Realtek driver (r8152) fixes this issue. Pause frames are no
+longer sent while the host system is suspended.
+
+Cc: Leon Schuermann <leon@is.currently.online>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Oliver Neukum <oliver@neukum.org> (maintainer:USB CDC ETHERNET DRIVER)
+Cc: netdev@vger.kernel.org (open list:NETWORKING DRIVERS)
+Link: https://git.kernel.org/netdev/net/c/cb82a54904a9
+Link: https://git.kernel.org/netdev/net/c/2284bbd0cf39
+Link: https://www.lenovo.com/de/de/p/accessories-and-software/docking/docking-usb-docks/40af0135eu
+Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
+Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+Link: https://patch.msgid.link/484336aad52d14ccf061b535bc19ef6396ef5120.1741601523.git.p.hahn@avm.de
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/phy/sfp.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ drivers/net/usb/cdc_ether.c | 7 +++++++
+ drivers/net/usb/r8152.c     | 6 ++++++
+ drivers/net/usb/r8153_ecm.c | 6 ++++++
+ 3 files changed, 19 insertions(+)
 
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index 9a5de80acd2f7..7b33993f7001e 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -385,7 +385,7 @@ static void sfp_fixup_rollball(struct sfp *sfp)
- 	sfp->phy_t_retry = msecs_to_jiffies(1000);
- }
+diff --git a/drivers/net/usb/cdc_ether.c b/drivers/net/usb/cdc_ether.c
+index a6469235d904e..a032c1ded4063 100644
+--- a/drivers/net/usb/cdc_ether.c
++++ b/drivers/net/usb/cdc_ether.c
+@@ -783,6 +783,13 @@ static const struct usb_device_id	products[] = {
+ 	.driver_info = 0,
+ },
  
--static void sfp_fixup_fs_2_5gt(struct sfp *sfp)
-+static void sfp_fixup_rollball_wait4s(struct sfp *sfp)
++/* Lenovo ThinkPad Hybrid USB-C with USB-A Dock (40af0135eu, based on Realtek RTL8153) */
++{
++	USB_DEVICE_AND_INTERFACE_INFO(LENOVO_VENDOR_ID, 0xa359, USB_CLASS_COMM,
++			USB_CDC_SUBCLASS_ETHERNET, USB_CDC_PROTO_NONE),
++	.driver_info = 0,
++},
++
+ /* Aquantia AQtion USB to 5GbE Controller (based on AQC111U) */
  {
- 	sfp_fixup_rollball(sfp);
+ 	USB_DEVICE_AND_INTERFACE_INFO(AQUANTIA_VENDOR_ID, 0xc101,
+diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
+index 468c739740463..96fa3857d8e25 100644
+--- a/drivers/net/usb/r8152.c
++++ b/drivers/net/usb/r8152.c
+@@ -785,6 +785,7 @@ enum rtl8152_flags {
+ #define DEVICE_ID_THINKPAD_USB_C_DONGLE			0x720c
+ #define DEVICE_ID_THINKPAD_USB_C_DOCK_GEN2		0xa387
+ #define DEVICE_ID_THINKPAD_USB_C_DOCK_GEN3		0x3062
++#define DEVICE_ID_THINKPAD_HYBRID_USB_C_DOCK		0xa359
  
-@@ -399,7 +399,7 @@ static void sfp_fixup_fs_2_5gt(struct sfp *sfp)
- static void sfp_fixup_fs_10gt(struct sfp *sfp)
- {
- 	sfp_fixup_10gbaset_30m(sfp);
--	sfp_fixup_fs_2_5gt(sfp);
-+	sfp_fixup_rollball_wait4s(sfp);
- }
+ struct tally_counter {
+ 	__le64	tx_packets;
+@@ -9787,6 +9788,7 @@ static bool rtl8152_supports_lenovo_macpassthru(struct usb_device *udev)
+ 		case DEVICE_ID_THINKPAD_USB_C_DOCK_GEN2:
+ 		case DEVICE_ID_THINKPAD_USB_C_DOCK_GEN3:
+ 		case DEVICE_ID_THINKPAD_USB_C_DONGLE:
++		case DEVICE_ID_THINKPAD_HYBRID_USB_C_DOCK:
+ 			return 1;
+ 		}
+ 	} else if (vendor_id == VENDOR_ID_REALTEK && parent_vendor_id == VENDOR_ID_LENOVO) {
+@@ -10064,6 +10066,8 @@ static const struct usb_device_id rtl8152_table[] = {
+ 	{ USB_DEVICE(VENDOR_ID_MICROSOFT, 0x0927) },
+ 	{ USB_DEVICE(VENDOR_ID_MICROSOFT, 0x0c5e) },
+ 	{ USB_DEVICE(VENDOR_ID_SAMSUNG, 0xa101) },
++
++	/* Lenovo */
+ 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x304f) },
+ 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x3054) },
+ 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x3062) },
+@@ -10074,7 +10078,9 @@ static const struct usb_device_id rtl8152_table[] = {
+ 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x720c) },
+ 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x7214) },
+ 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x721e) },
++	{ USB_DEVICE(VENDOR_ID_LENOVO,  0xa359) },
+ 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0xa387) },
++
+ 	{ USB_DEVICE(VENDOR_ID_LINKSYS, 0x0041) },
+ 	{ USB_DEVICE(VENDOR_ID_NVIDIA,  0x09ff) },
+ 	{ USB_DEVICE(VENDOR_ID_TPLINK,  0x0601) },
+diff --git a/drivers/net/usb/r8153_ecm.c b/drivers/net/usb/r8153_ecm.c
+index 20b2df8d74ae1..8d860dacdf49b 100644
+--- a/drivers/net/usb/r8153_ecm.c
++++ b/drivers/net/usb/r8153_ecm.c
+@@ -135,6 +135,12 @@ static const struct usb_device_id products[] = {
+ 				      USB_CDC_SUBCLASS_ETHERNET, USB_CDC_PROTO_NONE),
+ 	.driver_info = (unsigned long)&r8153_info,
+ },
++/* Lenovo ThinkPad Hybrid USB-C with USB-A Dock (40af0135eu, based on Realtek RTL8153) */
++{
++	USB_DEVICE_AND_INTERFACE_INFO(VENDOR_ID_LENOVO, 0xa359, USB_CLASS_COMM,
++				      USB_CDC_SUBCLASS_ETHERNET, USB_CDC_PROTO_NONE),
++	.driver_info = (unsigned long)&r8153_info,
++},
  
- static void sfp_fixup_halny_gsfp(struct sfp *sfp)
-@@ -479,9 +479,10 @@ static const struct sfp_quirk sfp_quirks[] = {
- 	// PHY.
- 	SFP_QUIRK_F("FS", "SFP-10G-T", sfp_fixup_fs_10gt),
- 
--	// Fiberstore SFP-2.5G-T uses Rollball protocol to talk to the PHY and
--	// needs 4 sec wait before probing the PHY.
--	SFP_QUIRK_F("FS", "SFP-2.5G-T", sfp_fixup_fs_2_5gt),
-+	// Fiberstore SFP-2.5G-T and SFP-10GM-T uses Rollball protocol to talk
-+	// to the PHY and needs 4 sec wait before probing the PHY.
-+	SFP_QUIRK_F("FS", "SFP-2.5G-T", sfp_fixup_rollball_wait4s),
-+	SFP_QUIRK_F("FS", "SFP-10GM-T", sfp_fixup_rollball_wait4s),
- 
- 	// Fiberstore GPON-ONU-34-20BI can operate at 2500base-X, but report 1.2GBd
- 	// NRZ in their EEPROM
+ 	{ },		/* END */
+ };
 -- 
 2.39.5
 
