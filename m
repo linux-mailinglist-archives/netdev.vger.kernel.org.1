@@ -1,119 +1,91 @@
-Return-Path: <netdev+bounces-179077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36464A7A7A9
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 18:14:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DF99A7A7D7
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 18:22:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9237C18904A9
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 16:14:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 979731887C87
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 16:22:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB2B42512C5;
-	Thu,  3 Apr 2025 16:14:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6122D2512C7;
+	Thu,  3 Apr 2025 16:22:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="brNiMAKg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z1ZhJjcG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42BB924BC06;
-	Thu,  3 Apr 2025 16:14:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C1E1A23BA
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 16:22:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743696849; cv=none; b=iEJAQa1sN0IDZeUF3QEu0ya+nDFxt9H7Wfbx0MDZwJYwnCZY6cMGRMisAPUmqB+BnQDKWyTTaN+/M57Nw7JgBDRjl/IjrRvz2AAsa4OU5yyMw/yTYEulsk9W3JEr2OScj5nMynYpgj/8qJOPaUH27mVIBFsE1+1PVzjcKiCnZfQ=
+	t=1743697335; cv=none; b=ePD2Q8a8vmSgeE3GkFbOmPC7EI3MEhIO5vwGM/w5cnmAKdS9WrzlfswWXo5aD6zZYEMHLH0X2KcSDJiDVokVa23Qryu8bHrjwAyEX02Ck80AAi9fYVZTs9Udu0MCzi7QxRqAQ9hAKPM54IuWMrg8Uainxi7utsgDisAHDfSVly4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743696849; c=relaxed/simple;
-	bh=g4yIIhJXJS+2HpRtFLQZWDfTqppjtp/hIdH2G/MZEpY=;
+	s=arc-20240116; t=1743697335; c=relaxed/simple;
+	bh=tXnsV3mUN0wVSlraXDzI/9Dzjaw+JaiWTsN7w8G+VqE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LAUn17NXigHs4Tr6bbQZ8TO4yBH10u+K7BSUCJescHHgPb5jWgw3rNR1S/2P9dAI33+yz3u5D+9ZKGvnkQZ1wr4/COTuDprgykfLb1yb106dBD+F2cU27q8rtUkLqSJ+Flezu8rQaCzFE2wLBQekkHktaT/MRJ0+xdDHtvT+3no=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=brNiMAKg; arc=none smtp.client-ip=209.85.210.170
+	 Content-Type:Content-Disposition:In-Reply-To; b=IwXxl1a0n7N4HadTHKeoZyTRdYZJQ1Px1KEtBlGjvLRU8qtSPeEg/Xq/AO3UE9sfxnStsfOY9GMct9wCIaven1ATL8ofMdt/ZpIQpjT2YHdBRQZFJBLRdYEzvy/eBVrmNprdJaMJATGUUFH3W2vNTh4XpOjsO9L1koLQQrgpKgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z1ZhJjcG; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-736dd9c4b40so1263891b3a.0;
-        Thu, 03 Apr 2025 09:14:08 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2240b4de12bso16871215ad.2
+        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 09:22:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743696847; x=1744301647; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1743697332; x=1744302132; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=NsvCi3xr0wqbxukv6gNk2KWJs6cd/sHgcwpQSSqpQSc=;
-        b=brNiMAKgQ5lYjAZkAYVtcNERGXdLqBOX+G5GqlptHN+NtWr2A9+2pgwWcZmYt9uVQ5
-         tTI5LDRiGRKUXzg3fKgL7A7rFW2a8VNuJ1fI39JaNuz1OAwTy4umz2X42OkPkw+6kDR/
-         CsNOSVR6n82KCKOU8D7yhUtocKIZxz9FoSRzKLlVxVuvlhockGwYc0BrrR3TM/lPHIWc
-         3EEQ2xgtyv7Zt5lqwSYezOMCEC3q5cPv7sbORbkWjvCI+GAZv3uqpoC3Ox642/1MxDdv
-         YOn0XQBSR0lnKqZ+AUjdkvNkHJJRV46yaP8BNWF3RbAkro+qNMaJnwOPxqtCsjaPHxx0
-         Jo2Q==
+        bh=3GV0JOKexzEoVhEuF0ABk0n64KAUncmRtUJF6G+2pL8=;
+        b=Z1ZhJjcGkL/gukMB/3YgWkTsKE1/bUZDpKmR7xrc2bSpjozeeIv+QSFqzy/9pfDlEu
+         /ssVdY+W63TtzvrXIe/K8XP4gDj6d+ubRsjW4XaJFCHrcFLJllf55X+Zn50WCdrVz8Uu
+         6ntJEgR0Np3oXsZCB3LDm5UcEjAIpj0o7qDpQn1O0GvVqIvdewC17yRjAecsyq/7ZZzE
+         zYyZUcthY4s3epGay9SxzIkTvK6oqBXPEPu3B5H8aCO6rPzpN/qma8GCREu2kWwo2qDd
+         JA6ACWuw5kg7Lg+UtW9QGLBmBPMJzPzWZx1Y2QoxYALabmKVH3LB13jKKNZjdpFVsgXi
+         lxlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743696847; x=1744301647;
+        d=1e100.net; s=20230601; t=1743697332; x=1744302132;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NsvCi3xr0wqbxukv6gNk2KWJs6cd/sHgcwpQSSqpQSc=;
-        b=finE4JZ6/YTDs3xq32zJNAiWJZdy72r8IS26MYxdiyMzsANnnr62T4eBbyJUt0d1Qh
-         VEFLmhDgXXyGffVeJrE8KAOLy9ybBAI2ILoYPxV09yCXWOaIdpHtXV1nwOGuKpAZTH8w
-         ue2pGjbRk5hVx+/j1y/7aMdn8Iy+SGWhItXHOQAolS+SebmrfKu9X722gFJMleUH3Qpa
-         DxU0CANnZImndiyLYiCSTARenp92cLCrlBpuYouMOWJgswu9Z6pTsMrdfvLcUy0iewLE
-         ZoD5HkNijrLtD1pSBVS3z+9LG+DT/PFtScA18veeulDK4PxneRe6zfp2NScoL6G/fQHv
-         qGGw==
-X-Forwarded-Encrypted: i=1; AJvYcCUMjLt6Lj+ERjWzezq6iS6+JPMrN2O5lyAxNGrV02TGfjQTlun9EKQEEI0YyXnVDbh8/A90nf0wQUGpgY4=@vger.kernel.org, AJvYcCUukxQ/WBEbsub/WfyUUjq3BbnyVcGLFuCEdUA/oug9j8GyX8RH9c4/+3rKg959EKeHtwYNgbGIb2XMh5Sm@vger.kernel.org, AJvYcCUzx8wFxPpmr4+OPhdEBVf+XhMkjRgBtVHzateiPZRypb1YP000uiXOmLoJt4RmWwX/Rq9DcAqx8hgsgyBD+i0=@vger.kernel.org, AJvYcCV+9FI+GQoyuZJ7iDKB9LI5v6M3ZGKL7EHjO6XwPa/aSinFxAeNR3n9cM9/Y5Q3jW4UROBthB+3vYa5MDJI@vger.kernel.org, AJvYcCWoyKQdZ2r3cA0hOtSry3DUsd7w2ZUp0Ah7l+Lr9RULrFcRehfP3eR24krDe9xGLPBFiTujXG0V@vger.kernel.org, AJvYcCWzuNPaQIsKxSx+tK+ucExPWy97ZDupiPjbTQdAKxor1/+/qJungRam7E5Kc8Z/CxHGxaY=@vger.kernel.org, AJvYcCXCB3hR1/XxvrRWL830rH+De7r7l9F2ewuKL9m4QQ7sifPvtjFsFkoI84ZTxUy9V2D+GZk+5jEuMjvsQus=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhMJchLPNdKptWD56607MUA7M2lUHH6sq7pobwNHwjE/7lqkHi
-	Tpma00taXC9E0gDgH3tYeiUkugzZQSBERR+XVReDEMEOhSACssr4
-X-Gm-Gg: ASbGncsUFk13MZukUHAP2PUbnrEaCgI7DGbtGCiP3vpKDG5zunQDgISHshmCZxyz1AY
-	WU+tXwFF+7fsFPc0+6aKSsjc5nTrLs3nsggyzKTykSh0rzcc9+S6sPQII5PqAV51fchhWfwA3RU
-	1u3n2xp6zUF+bY0XjK8lskvUyVTpgdZKFeIdX+qRvasuMellp7WpFcOOZylxMPNvEJWiNZH6Yk+
-	kb6Pk8sWSlq0Q6GyiUuS4ynw6v1kuzRfL0ge5u2WYC3vI4tvJ5mVSLJL3GLA27ssKSfyYbYk36k
-	1QWFW2yRyNoAWKswgb9LAieFFlY85lNmQgXeCnvljwnQ
-X-Google-Smtp-Source: AGHT+IGVU2+2TkhGwc9XcrbXTU+jprAkGrGQEy4B9m6YI+h73paRxRK7YqS+QjyFE8ZrGike3yIkRw==
-X-Received: by 2002:a05:6a20:c886:b0:1ee:47e7:7e00 with SMTP id adf61e73a8af0-200f55ecf4dmr5333762637.13.1743696847264;
-        Thu, 03 Apr 2025 09:14:07 -0700 (PDT)
-Received: from localhost ([216.228.125.129])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af9bc3fd41dsm1416486a12.50.2025.04.03.09.14.05
+        bh=3GV0JOKexzEoVhEuF0ABk0n64KAUncmRtUJF6G+2pL8=;
+        b=GIo+2YCwEBg5oXGkLH95b6H+H2mrJuayPwjLRcOp0wR2NMpcwXqCVbtAsGNPwfL4Ci
+         fNRsXJUl8bvP9+Ly2FdPnZh2Yd7Q48fIoEG6Cqw7eBZYfibaBi5IzMfEvNv4IzsxQXMd
+         OmdAshbkrWiwBzl6oDTZdJTSFXj7i2qRhVyXRJf8t3VYkUCDRfDjqoR9S1YIRM6e57m3
+         +8qCprqz/63W3+GzVraaPH+Jo2XeI/sZO1Bwtit2IG1OCXGMELwdAO6y/xufCMmpXMkj
+         ngag/q7qQ6C6U5Ljys/AGHGy1lDkE3elxl+gsHgU/L//3vX13/nxyMM25DMvaXS9FUf7
+         9qIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV6SR80uB/A6pDalL+MAcfJ0TtqBtS0ay795LwoWFTTzSADOh5GMfk6Db4uBRdSk346edlF8Uo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YySickorwDlMXJB/pp0by7ExlXqBy3sFXh6S9L3pmSYNqOIdloI
+	qR/hJ8NgE1exPkv1KHwApXX63wUKxsOyLXPV68BwRuSG6U75BAI=
+X-Gm-Gg: ASbGncukfcPqdToWF9XSO227k0fCHG6ANDoaKHFCyaW2s6R6KXRjzI+wdUeQCrFNV7l
+	SzLzN22t8gH7Md39LvouNgmdlLS4CSKAmNlTbFnva+A1HvWMIo/SIwu9hM1Q6lPEUvpRLtT1MMu
+	EAzzaqJcLP/Vv+rZvGBK05qh6oZ2lWtO94NGJtOwJ31habq7+5bMuEZc+c5WcBKVACn2rS/gYoZ
+	166fIjNoB00iGJhoyn/TCfWZfV+o70Ru+AHtqgwqk+jsXrJr2V72VcW+jDbFSPR9Qv7NU+i1k9O
+	wz8O2tFSCOJAbTeoy2/JRzxsVnvrL0JSlJtobSKHoqYB
+X-Google-Smtp-Source: AGHT+IFJ6i4agO3m3pmVpsBU38vPI8DM2Bh9QKufZugMK2vofsayHm07eJuyYCcqpZZm9O1svRQSSA==
+X-Received: by 2002:a17:903:166d:b0:220:e023:8fa6 with SMTP id d9443c01a7336-22977dff077mr48696125ad.50.1743697332445;
+        Thu, 03 Apr 2025 09:22:12 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22978771c6csm16530275ad.213.2025.04.03.09.22.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Apr 2025 09:14:06 -0700 (PDT)
-Date: Thu, 3 Apr 2025 12:14:04 -0400
-From: Yury Norov <yury.norov@gmail.com>
-To: Kuan-Wei Chiu <visitorckw@gmail.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	David Laight <david.laight.linux@gmail.com>,
-	Andrew Cooper <andrew.cooper3@citrix.com>,
-	Laurent.pinchart@ideasonboard.com, airlied@gmail.com,
-	akpm@linux-foundation.org, alistair@popple.id.au,
-	andrew+netdev@lunn.ch, andrzej.hajda@intel.com,
-	arend.vanspriel@broadcom.com, awalls@md.metrocast.net, bp@alien8.de,
-	bpf@vger.kernel.org, brcm80211-dev-list.pdl@broadcom.com,
-	brcm80211@lists.linux.dev, dave.hansen@linux.intel.com,
-	davem@davemloft.net, dmitry.torokhov@gmail.com,
-	dri-devel@lists.freedesktop.org, eajames@linux.ibm.com,
-	edumazet@google.com, eleanor15x@gmail.com,
-	gregkh@linuxfoundation.org, hverkuil@xs4all.nl,
-	jernej.skrabec@gmail.com, jirislaby@kernel.org, jk@ozlabs.org,
-	joel@jms.id.au, johannes@sipsolutions.net, jonas@kwiboo.se,
-	jserv@ccns.ncku.edu.tw, kuba@kernel.org, linux-fsi@lists.ozlabs.org,
-	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
-	linux-serial@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linux@rasmusvillemoes.dk, louis.peens@corigine.com,
-	maarten.lankhorst@linux.intel.com, mchehab@kernel.org,
-	mingo@redhat.com, miquel.raynal@bootlin.com, mripard@kernel.org,
-	neil.armstrong@linaro.org, netdev@vger.kernel.org,
-	oss-drivers@corigine.com, pabeni@redhat.com,
-	parthiban.veerasooran@microchip.com, rfoss@kernel.org,
-	richard@nod.at, simona@ffwll.ch, tglx@linutronix.de,
-	tzimmermann@suse.de, vigneshr@ti.com, x86@kernel.org
-Subject: Re: [PATCH v3 00/16] Introduce and use generic parity16/32/64 helper
-Message-ID: <Z-6zzP2O-Q7zvTLt@thinkpad>
-References: <EB85C3C1-8A0D-4CB9-B501-BFEABDF3E977@zytor.com>
- <Z824SgB9Dt5zdWYc@visitorckw-System-Product-Name>
- <Z9CyuowYsZyez36c@thinkpad>
- <80771542-476C-493E-858A-D2AF6A355CC1@zytor.com>
- <Z9GtcNJie8TRKywZ@thinkpad>
- <Z9G2Tyypb3iLoBjn@visitorckw-System-Product-Name>
- <Z9KMKwnZXA2mkD2s@visitorckw-System-Product-Name>
- <Z+AlyB461xwMxMtG@visitorckw-System-Product-Name>
- <eec0dfd7-5e4f-4a08-928c-b7714dbc4a17@zytor.com>
- <Z+6dh1ZVIKWWOKaP@visitorckw-System-Product-Name>
+        Thu, 03 Apr 2025 09:22:11 -0700 (PDT)
+Date: Thu, 3 Apr 2025 09:22:11 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: "pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"sdf@fomichev.me" <sdf@fomichev.me>,
+	"kuba@kernel.org" <kuba@kernel.org>
+Subject: Re: another netdev instance lock bug in ipv6_add_dev
+Message-ID: <Z-61sxcLSA6z9eoy@mini-arch>
+References: <aac073de8beec3e531c86c101b274d434741c28e.camel@nvidia.com>
+ <Z-3GVgPJHZSyxfaI@mini-arch>
+ <c4b1397ffa83c73dfdab6bcbce51e564592e18c8.camel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -123,105 +95,248 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z+6dh1ZVIKWWOKaP@visitorckw-System-Product-Name>
+In-Reply-To: <c4b1397ffa83c73dfdab6bcbce51e564592e18c8.camel@nvidia.com>
 
-On Thu, Apr 03, 2025 at 10:39:03PM +0800, Kuan-Wei Chiu wrote:
-> On Tue, Mar 25, 2025 at 12:43:25PM -0700, H. Peter Anvin wrote:
-> > On 3/23/25 08:16, Kuan-Wei Chiu wrote:
+On 04/03, Cosmin Ratiu wrote:
+> On Wed, 2025-04-02 at 16:20 -0700, Stanislav Fomichev wrote:
+> > On 04/02, Cosmin Ratiu wrote:
+> > > Hi,
 > > > 
-> > > Interface 3: Multiple Functions
-> > > Description: bool parity_odd8/16/32/64()
-> > > Pros: No need for explicit casting; easy to integrate
-> > >        architecture-specific optimizations; except for parity8(), all
-> > >        functions are one-liners with no significant code duplication
-> > > Cons: More functions may increase maintenance burden
-> > > Opinions: Only I support this approach
+> > > Not sure if it's reported already, but I encountered a bug while
+> > > testing with the new locking scheme.
+> > > This is the call trace:
 > > > 
+> > > [ 3454.975672] WARNING: CPU: 1 PID: 58237 at
+> > > ./include/net/netdev_lock.h:54 ipv6_add_dev+0x370/0x620
+> > > [ 3455.008776]  ? ipv6_add_dev+0x370/0x620
+> > > [ 3455.010097]  ipv6_find_idev+0x96/0xe0
+> > > [ 3455.010725]  addrconf_add_dev+0x1e/0xa0
+> > > [ 3455.011382]  addrconf_init_auto_addrs+0xb0/0x720
+> > > [ 3455.013537]  addrconf_notify+0x35f/0x8d0
+> > > [ 3455.014214]  notifier_call_chain+0x38/0xf0
+> > > [ 3455.014903]  netdev_state_change+0x65/0x90
+> > > [ 3455.015586]  linkwatch_do_dev+0x5a/0x70
+> > > [ 3455.016238]  rtnl_getlink+0x241/0x3e0
+> > > [ 3455.019046]  rtnetlink_rcv_msg+0x177/0x5e0
+> > > 
+> > > The call chain is rtnl_getlink -> linkwatch_sync_dev ->
+> > > linkwatch_do_dev -> netdev_state_change -> ...
+> > > 
+> > > Nothing on this path acquires the netdev lock, resulting in a
+> > > warning.
+> > > Perhaps rtnl_getlink should acquire it, in addition to the RTNL
+> > > already
+> > > held by rtnetlink_rcv_msg?
+> > > 
+> > > The same thing can be seen from the regular linkwatch wq:
+> > > 
+> > > [ 3456.637014] WARNING: CPU: 16 PID: 83257 at
+> > > ./include/net/netdev_lock.h:54 ipv6_add_dev+0x370/0x620
+> > > [ 3456.655305] Call Trace:
+> > > [ 3456.655610]  <TASK>
+> > > [ 3456.655890]  ? __warn+0x89/0x1b0
+> > > [ 3456.656261]  ? ipv6_add_dev+0x370/0x620
+> > > [ 3456.660039]  ipv6_find_idev+0x96/0xe0
+> > > [ 3456.660445]  addrconf_add_dev+0x1e/0xa0
+> > > [ 3456.660861]  addrconf_init_auto_addrs+0xb0/0x720
+> > > [ 3456.661803]  addrconf_notify+0x35f/0x8d0
+> > > [ 3456.662236]  notifier_call_chain+0x38/0xf0
+> > > [ 3456.662676]  netdev_state_change+0x65/0x90
+> > > [ 3456.663112]  linkwatch_do_dev+0x5a/0x70
+> > > [ 3456.663529]  __linkwatch_run_queue+0xeb/0x200
+> > > [ 3456.663990]  linkwatch_event+0x21/0x30
+> > > [ 3456.664399]  process_one_work+0x211/0x610
+> > > [ 3456.664828]  worker_thread+0x1cc/0x380
+> > > [ 3456.665691]  kthread+0xf4/0x210
+> > > 
+> > > In this case, __linkwatch_run_queue seems like a good place to grab
+> > > a
+> > > device lock before calling linkwatch_do_dev.
 > > 
-> > OK, so I responded to this but I can't find my reply or any of the
-> > followups, so let me go again:
-> > 
-> > I prefer this option, because:
-> > 
-> > a. Virtually all uses of parity is done in contexts where the sizes of the
-> > items for which parity is to be taken are well-defined, but it is *really*
-> > easy for integer promotion to cause a value to be extended to 32 bits
-> > unnecessarily (sign or zero extend, although for parity it doesn't make any
-> > difference -- if the compiler realizes it.)
-> > 
-> > b. It makes it easier to add arch-specific implementations, notably using
-> > __builtin_parity on architectures where that is known to generate good code.
-> > 
-> > c. For architectures where only *some* parity implementations are
-> > fast/practical, the generic fallbacks will either naturally synthesize them
-> > from components via shift-xor, or they can be defined to use a larger
-> > version; the function prototype acts like a cast.
-> > 
-> > d. If there is a reason in the future to add a generic version, it is really
-> > easy to do using the size-specific functions as components; this is
-> > something we do literally all over the place, using a pattern so common that
-> > it, itself, probably should be macroized:
-> > 
-> > #define parity(x) 				\
-> > ({						\
-> > 	typeof(x) __x = (x);			\
-> > 	bool __y;				\
-> > 	switch (sizeof(__x)) {			\
-> > 		case 1:				\
-> > 			__y = parity8(__x);	\
-> > 			break;			\
-> > 		case 2:				\
-> > 			__y = parity16(__x);	\
-> > 			break;			\
-> > 		case 4:				\
-> > 			__y = parity32(__x);	\
-> > 			break;			\
-> > 		case 8:				\
-> > 			__y = parity64(__x);	\
-> > 			break;			\
-> > 		default:			\
-> > 			BUILD_BUG();		\
-> > 			break;			\
-> > 	}					\
-> > 	__y;					\
-> > })
-> >
-> Thank you for your detailed response and for explaining the rationale
-> behind your preference. The points you outlined in (a)–(d) all seem
-> quite reasonable to me.
+> > Thanks for the report! What about linkwatch_sync_dev in
+> > netdev_run_todo
+> > and carrier_show? Should probably also need to be wrapped?
 > 
-> Yury,
-> do you have any feedback on this?
-> Thank you.
+> Done, here's the patch I'm testing with which works for all tests I
+> could get my hands on. Will you officially propose it (maybe in a
+> slightly different form) please?
 
-My feedback to you:
+I'm thinking maybe we should push down the locking a bit? To the
+level of netdev_state_change. Since, in theory, every NETDEV_CHANGE
+can reach addrconf_notify. I was playing with the patch below,
+but I think the ethtool will lockup, so I need to fix that at least...
+Let me spend a bit more time today chasing down the callers...
 
-I asked you to share any numbers about each approach. Asm listings,
-performance tests, bloat-o-meter. But you did nothing or very little
-in that department. You move this series, and it means you should be
-very well aware of alternative solutions, their pros and cons.
-
-Instead, you started a poll to pick the best solution. This is not
-what I expected, and this is not how the best solution can be found.
-
-To H. Peter and everyone:
-
-Thank you for sharing your opinion on this fixed parity(). Your
-arguments may or may not be important, depending on what existing
-users actually need. Unfortunately, Kuan-Wei didn't collect
-performance numbers and opinions from those proposed users.
-
-I already told that, and I will say again: with the lack of any
-evidence that performance and/or code generation is important here,
-the best solution is one that minimizes maintainers' (my!) burden.
-
-In other words, bool parity(unsigned long long). I'm OK to maintain
-a macro, as well. I understand that more complicated solutions may be
-more effective. I will take them only if they will be well advocated.
-
-I hope this will help us to stop moving this discussion back and forth
-and save our time, guys.
-
-Thanks,
-Yury
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 9fb03a292817..f5a322b63e37 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -4975,6 +4975,7 @@ void dev_set_rx_mode(struct net_device *dev);
+ int dev_set_promiscuity(struct net_device *dev, int inc);
+ int netif_set_allmulti(struct net_device *dev, int inc, bool notify);
+ int dev_set_allmulti(struct net_device *dev, int inc);
++void netif_state_change(struct net_device *dev);
+ void netdev_state_change(struct net_device *dev);
+ void __netdev_notify_peers(struct net_device *dev);
+ void netdev_notify_peers(struct net_device *dev);
+diff --git a/include/linux/rtnetlink.h b/include/linux/rtnetlink.h
+index ccaaf4c7d5f6..ea39dd23a197 100644
+--- a/include/linux/rtnetlink.h
++++ b/include/linux/rtnetlink.h
+@@ -240,6 +240,6 @@ rtnl_notify_needed(const struct net *net, u16 nlflags, u32 group)
+ 	return (nlflags & NLM_F_ECHO) || rtnl_has_listeners(net, group);
+ }
+ 
+-void netdev_set_operstate(struct net_device *dev, int newstate);
++void netif_set_operstate(struct net_device *dev, int newstate);
+ 
+ #endif	/* __LINUX_RTNETLINK_H */
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 87cba93fa59f..d4a5c07a0d73 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -1567,15 +1567,7 @@ void netdev_features_change(struct net_device *dev)
+ }
+ EXPORT_SYMBOL(netdev_features_change);
+ 
+-/**
+- *	netdev_state_change - device changes state
+- *	@dev: device to cause notification
+- *
+- *	Called to indicate a device has changed state. This function calls
+- *	the notifier chains for netdev_chain and sends a NEWLINK message
+- *	to the routing socket.
+- */
+-void netdev_state_change(struct net_device *dev)
++void netif_state_change(struct net_device *dev)
+ {
+ 	if (dev->flags & IFF_UP) {
+ 		struct netdev_notifier_change_info change_info = {
+@@ -1587,7 +1579,6 @@ void netdev_state_change(struct net_device *dev)
+ 		rtmsg_ifinfo(RTM_NEWLINK, dev, 0, GFP_KERNEL, 0, NULL);
+ 	}
+ }
+-EXPORT_SYMBOL(netdev_state_change);
+ 
+ /**
+  * __netdev_notify_peers - notify network peers about existence of @dev,
+diff --git a/net/core/dev_api.c b/net/core/dev_api.c
+index 90bafb0b1b8c..6c6ca15ef2a3 100644
+--- a/net/core/dev_api.c
++++ b/net/core/dev_api.c
+@@ -327,3 +327,19 @@ int dev_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf)
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(dev_xdp_propagate);
++
++/**
++ *	netdev_state_change - device changes state
++ *	@dev: device to cause notification
++ *
++ *	Called to indicate a device has changed state. This function calls
++ *	the notifier chains for netdev_chain and sends a NEWLINK message
++ *	to the routing socket.
++ */
++void netdev_state_change(struct net_device *dev)
++{
++	netdev_lock_ops(dev);
++	netif_state_change(dev);
++	netdev_unlock_ops(dev);
++}
++EXPORT_SYMBOL(netdev_state_change);
+diff --git a/net/core/lock_debug.c b/net/core/lock_debug.c
+index 72e522a68775..c442bf52dbaf 100644
+--- a/net/core/lock_debug.c
++++ b/net/core/lock_debug.c
+@@ -20,11 +20,11 @@ int netdev_debug_event(struct notifier_block *nb, unsigned long event,
+ 	switch (cmd) {
+ 	case NETDEV_REGISTER:
+ 	case NETDEV_UP:
++	case NETDEV_CHANGE:
+ 		netdev_ops_assert_locked(dev);
+ 		fallthrough;
+ 	case NETDEV_DOWN:
+ 	case NETDEV_REBOOT:
+-	case NETDEV_CHANGE:
+ 	case NETDEV_UNREGISTER:
+ 	case NETDEV_CHANGEMTU:
+ 	case NETDEV_CHANGEADDR:
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index c23852835050..d8d03ff87a3b 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -1043,7 +1043,7 @@ int rtnl_put_cacheinfo(struct sk_buff *skb, struct dst_entry *dst, u32 id,
+ }
+ EXPORT_SYMBOL_GPL(rtnl_put_cacheinfo);
+ 
+-void netdev_set_operstate(struct net_device *dev, int newstate)
++void netif_set_operstate(struct net_device *dev, int newstate)
+ {
+ 	unsigned int old = READ_ONCE(dev->operstate);
+ 
+@@ -1052,9 +1052,9 @@ void netdev_set_operstate(struct net_device *dev, int newstate)
+ 			return;
+ 	} while (!try_cmpxchg(&dev->operstate, &old, newstate));
+ 
+-	netdev_state_change(dev);
++	netif_state_change(dev);
+ }
+-EXPORT_SYMBOL(netdev_set_operstate);
++EXPORT_SYMBOL(netif_set_operstate);
+ 
+ static void set_operstate(struct net_device *dev, unsigned char transition)
+ {
+@@ -1080,7 +1080,7 @@ static void set_operstate(struct net_device *dev, unsigned char transition)
+ 		break;
+ 	}
+ 
+-	netdev_set_operstate(dev, operstate);
++	netif_set_operstate(dev, operstate);
+ }
+ 
+ static unsigned int rtnl_dev_get_flags(const struct net_device *dev)
+@@ -3396,7 +3396,7 @@ static int do_setlink(const struct sk_buff *skb, struct net_device *dev,
+ errout:
+ 	if (status & DO_SETLINK_MODIFIED) {
+ 		if ((status & DO_SETLINK_NOTIFY) == DO_SETLINK_NOTIFY)
+-			netdev_state_change(dev);
++			netif_state_change(dev);
+ 
+ 		if (err < 0)
+ 			net_warn_ratelimited("A link change request failed with some changes committed already. Interface %s may have been left with an inconsistent configuration, please check.\n",
+@@ -3676,8 +3676,11 @@ struct net_device *rtnl_create_link(struct net *net, const char *ifname,
+ 				nla_len(tb[IFLA_BROADCAST]));
+ 	if (tb[IFLA_TXQLEN])
+ 		dev->tx_queue_len = nla_get_u32(tb[IFLA_TXQLEN]);
+-	if (tb[IFLA_OPERSTATE])
++	if (tb[IFLA_OPERSTATE]) {
++		netdev_lock_ops(dev);
+ 		set_operstate(dev, nla_get_u8(tb[IFLA_OPERSTATE]));
++		netdev_unlock_ops(dev);
++	}
+ 	if (tb[IFLA_LINKMODE])
+ 		dev->link_mode = nla_get_u8(tb[IFLA_LINKMODE]);
+ 	if (tb[IFLA_GROUP])
+diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
+index 439cfb7ad5d1..1b1b700ec05e 100644
+--- a/net/hsr/hsr_device.c
++++ b/net/hsr/hsr_device.c
+@@ -33,14 +33,14 @@ static void hsr_set_operstate(struct hsr_port *master, bool has_carrier)
+ 	struct net_device *dev = master->dev;
+ 
+ 	if (!is_admin_up(dev)) {
+-		netdev_set_operstate(dev, IF_OPER_DOWN);
++		netif_set_operstate(dev, IF_OPER_DOWN);
+ 		return;
+ 	}
+ 
+ 	if (has_carrier)
+-		netdev_set_operstate(dev, IF_OPER_UP);
++		netif_set_operstate(dev, IF_OPER_UP);
+ 	else
+-		netdev_set_operstate(dev, IF_OPER_LOWERLAYERDOWN);
++		netif_set_operstate(dev, IF_OPER_LOWERLAYERDOWN);
+ }
+ 
+ static bool hsr_check_carrier(struct hsr_port *master)
 
