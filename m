@@ -1,94 +1,161 @@
-Return-Path: <netdev+bounces-179030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9D8EA7A1BA
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 13:15:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39323A7A1CB
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 13:25:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 09ED77A67EF
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 11:13:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF6BD175621
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 11:25:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02E5924BD0C;
-	Thu,  3 Apr 2025 11:14:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4130624BD04;
+	Thu,  3 Apr 2025 11:25:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I7s8+41e"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CLXKiPXV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A9724BD04
-	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 11:14:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56494746E
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 11:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743678893; cv=none; b=ipK8YZnxg3I4owM3kvaD77HrM1uXa2BmqeL+lvkVrlxru58v0qqczwLVqLoVoJH1WnSGZGiBRKZhkr6t91HUkghI3wDHsYGQI8b+ObA0tXJd8KCjMQQLV/nhJ5cG4Phbi2Jr59FfNAC9TrEKfoRbXAztbqLMNbEeqdOPAG3bX0w=
+	t=1743679542; cv=none; b=t9G2xJTexYkb8LBIM2BZxld1Q6BLsinX58piV1gJ3T2QXGEwPkhSRQH+fra1opmeU8zwr/6eAsDMapvq6E3HjzaiQ3bKZWnHmLKjdsuszkgHMRGiNsW5EofnRVJ5P3lSJofzilEa2rP+Uq5bBy1c5h7UcIaelbkcdu6/qbWv2UI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743678893; c=relaxed/simple;
-	bh=pc+J5u3rZeyam7gSABUDka++ts+lmH5JkSxFNMyvk1A=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=V5SE4G4Xzs95wx68jdchhHn+hdK4PGr1x1ENi87g0oaNdldhUJ1aoUMQ+ht51y4tQgdbRqgQ9e3Wefzv4DUbS/hMGvmrYva0bVoKgLNFoDSEonbYN34rtb1GKQ9CTPklt3cfUEaPxH0SDSdbBf89UrmcUTEignvYpHx6dfMZHzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I7s8+41e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D6CDC4CEE7;
-	Thu,  3 Apr 2025 11:14:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743678893;
-	bh=pc+J5u3rZeyam7gSABUDka++ts+lmH5JkSxFNMyvk1A=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=I7s8+41eSnrzSjh6aoNV+iHDC8PpquILe0AqDckbRRmsDL5N37UbJpGDQgVnqwcrN
-	 OzAXcRLdnGabW3FCvIUNqia6cyr5OUR/9chQn4/TewsB51b4mc6H3lajomaoFNnxKw
-	 AXW6WXMepdQD2ngF6n2TUt0SFNqqSPKjLtI9/PdEfajoHhiO7LWJAMCO9shRBHuix2
-	 tCMhmKii2ejggq1G2sc/fSFZx/tVEPnnLbnHcVZZhiUDN1yU/NJn84LE3tac/vCyTv
-	 gVafhkwS998UcZ9c0sTtmpGRw/nJENdjNyoo7Beocfc/dFsrhJpZhC9D2GDWtixlvK
-	 vUYgnohLkjXtg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DF4380664C;
-	Thu,  3 Apr 2025 11:15:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1743679542; c=relaxed/simple;
+	bh=uJzeXkywSQw59n4/+BNNQlcbbq6h3WRlXGrN3bCMe1A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z4UlV0qw6hYfhIJYir2DOCCXyF4zfTPiA4PCRJ6pPdRBOBOU7GIIkNd7WmPD2i4nAuEW66K3tjCHjsbHyXhkLORmDIGxKpnrTKTL9mpP7oRa7edTVf7U4lyd4JaOrXqUPH9j74boMUmFngpl984QeLjD7pbDeLy5zjcK5UC32g0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CLXKiPXV; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743679539;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hV+9b+/x+gelznBEtZ/wkU6VCh9E1FOzg+skZ59VIBg=;
+	b=CLXKiPXV6+NvKiTPH/bGnGmJiaqgHU6rHHvgqpvJo/QIEhGowqgE1YY2sAVSuHAfwml/7O
+	8lRDheiNqBKeF6esAij8wGi3rYaWcdhJh/VsuoseYcn4fkfFa5M9TVoYGKvecqCh0jbS7/
+	rGhye27SF3mRiDm9sLuz42tEDMmRQJA=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-49-1K2fp0wbNjWor8BfQrX9fg-1; Thu, 03 Apr 2025 07:25:38 -0400
+X-MC-Unique: 1K2fp0wbNjWor8BfQrX9fg-1
+X-Mimecast-MFC-AGG-ID: 1K2fp0wbNjWor8BfQrX9fg_1743679537
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-39123912ff0so362191f8f.2
+        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 04:25:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743679537; x=1744284337;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hV+9b+/x+gelznBEtZ/wkU6VCh9E1FOzg+skZ59VIBg=;
+        b=cB+4UOaijBj96jW6RlyFN3kDsU4OSIDF2KtnvE5YwGlczL03CCUBtcKNLhyUW/9NQ9
+         nDPiKzusGHP+z440S5w+8S+AoBdVOZVZ+RuR8ilbQawozYmI5O9aUXnWnP88uBeuLrld
+         RjutwWMrAT+b5wnIyBCjRxXxb3ag/w3XqUvivbrCFKy4lKKNdyYNuiEs1YlZljyRAjRX
+         P+466Y3nRYZUztkc/+E5vW1OrU/BDWUAEQCcp8pRxhaacKWLApLwMtVCu6Bq8J5vMiNn
+         d4TSLaw6om9SU42sU0OzSY3Kmd8TP53FhpLOgvuJ3M8tP2XwCEAht0nol+NWaBSFyHVE
+         AbNw==
+X-Forwarded-Encrypted: i=1; AJvYcCVotWdHbcA5CIK3uQ023xuVIRGaivH97K3yZkjk1k/i7dSeZ2wOfLmZq7wyIgFdFQRxVW1k+Ys=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhrzO9eVrPVW+c6FTQvlU4J/kSAHZ28R5RDLpELJQeMDNi11qv
+	+7bFkZ7LoL9FetzWnRL1iolIFKWjEGRAaZt8jbvx1JPkDCqV+cng4/IsKpbhpEQQ1QMAEF2uWo3
+	z2aKPMgqrjmsogGatEAGoWHeOxf2OBKOlFRLEXj8HO/6osYGgCw2S1g==
+X-Gm-Gg: ASbGncvm1E/KnEdUIiQ6wTzE+d5FVnm7UWH/bdjjTXp/lzuOXoVzWtQ1brp7r7i/iwa
+	c8ZwSllgwKng9/5jPFIz9BE9N8mx4n3jC3LWVTS+w9xv4kxIXyUwF0ijHNLEgwh6Jc1eFqe70S9
+	mGGxzscGSkIZXIeoxcwKLFoSelBtSoomWKteAciJGj5P9lwXHzmUHPRw6aJWzS4cWvNGv2uf4sR
+	uC1w1RKjK9yCoas7+7B/jpYXUZLvmpqBmwVnUKxR7I/IeSxDEkt6WlxyoiUQj5eQ7LOEZlNbHUj
+	5aIvhzYIleIDZ+eNK/HNSZKKBgvM9WQE9yJSpqoKERHMUg==
+X-Received: by 2002:a5d:598d:0:b0:391:3b70:2dab with SMTP id ffacd0b85a97d-39c120dc668mr18372142f8f.17.1743679536893;
+        Thu, 03 Apr 2025 04:25:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEgUyiwXd0iBaKJMkSQX6B1609ESCGRfex5vbqPGGdlcsOk42Ie119Ej9VIa8cCmWscFQJXiA==
+X-Received: by 2002:a5d:598d:0:b0:391:3b70:2dab with SMTP id ffacd0b85a97d-39c120dc668mr18372105f8f.17.1743679536479;
+        Thu, 03 Apr 2025 04:25:36 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-68-231.dyn.eolo.it. [146.241.68.231])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec17b3572sm18994295e9.39.2025.04.03.04.25.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Apr 2025 04:25:35 -0700 (PDT)
+Message-ID: <469fd8d0-c72e-4ca6-87a9-2f42b180276b@redhat.com>
+Date: Thu, 3 Apr 2025 13:25:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] tunnels: Accept PACKET_HOST in skb_tunnel_check_pmtu().
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174367892998.2450004.7630299613826047058.git-patchwork-notify@kernel.org>
-Date: Thu, 03 Apr 2025 11:15:29 +0000
-References: <eac941652b86fddf8909df9b3bf0d97bc9444793.1743208264.git.gnault@redhat.com>
-In-Reply-To: <eac941652b86fddf8909df9b3bf0d97bc9444793.1743208264.git.gnault@redhat.com>
-To: Guillaume Nault <gnault@redhat.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, horms@kernel.org,
- dsahern@kernel.org, pshelar@ovn.org, aconole@redhat.com, echaudro@redhat.com,
- sbrivio@redhat.com, dev@openvswitch.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3 3/3] net: ti: icss-iep: Fix possible NULL pointer
+ dereference for perout request
+To: "Malladi, Meghana" <m-malladi@ti.com>, Roger Quadros <rogerq@kernel.org>,
+ dan.carpenter@linaro.org, kuba@kernel.org, edumazet@google.com,
+ davem@davemloft.net, andrew+netdev@lunn.ch
+Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ namcao@linutronix.de, javier.carrasco.cruz@gmail.com, diogo.ivo@siemens.com,
+ horms@kernel.org, jacob.e.keller@intel.com, john.fastabend@gmail.com,
+ hawk@kernel.org, daniel@iogearbox.net, ast@kernel.org, srk@ti.com,
+ Vignesh Raghavendra <vigneshr@ti.com>, danishanwar@ti.com
+References: <20250328102403.2626974-1-m-malladi@ti.com>
+ <20250328102403.2626974-4-m-malladi@ti.com>
+ <0fb67fc2-4915-49af-aa20-8bdc9bed4226@kernel.org>
+ <b0a099a6-33b2-49f9-9af7-580c60b98f55@ti.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <b0a099a6-33b2-49f9-9af7-580c60b98f55@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 29 Mar 2025 01:33:44 +0100 you wrote:
-> Because skb_tunnel_check_pmtu() doesn't handle PACKET_HOST packets,
-> commit 30a92c9e3d6b ("openvswitch: Set the skbuff pkt_type for proper
-> pmtud support.") forced skb->pkt_type to PACKET_OUTGOING for
-> openvswitch packets that are sent using the OVS_ACTION_ATTR_OUTPUT
-> action. This allowed such packets to invoke the
-> iptunnel_pmtud_check_icmp() or iptunnel_pmtud_check_icmpv6() helpers
-> and thus trigger PMTU update on the input device.
+On 4/2/25 2:37 PM, Malladi, Meghana wrote:
+> On 4/2/2025 5:58 PM, Roger Quadros wrote:
+>> On 28/03/2025 12:24, Meghana Malladi wrote:
+>>> ICSS IEP driver has flags to check if perout or pps has been enabled
+>>> at any given point of time. Whenever there is request to enable or
+>>> disable the signal, the driver first checks its enabled or disabled
+>>> and acts accordingly.
+>>>
+>>> After bringing the interface down and up, calling PPS/perout enable
+>>> doesn't work as the driver believes PPS is already enabled,
+>>
+>> How? aren't we calling icss_iep_pps_enable(iep, false)?
+>> wouldn't this disable the IEP and clear the iep->pps_enabled flag?
+>>
 > 
-> [...]
+> The whole purpose of calling icss_iep_pps_enable(iep, false) is to clear 
+> iep->pps_enabled flag, because if this flag is not cleared it hinders 
+> generating new pps signal (with the newly loaded firmware) once any of 
+> the interfaces are up (check icss_iep_perout_enable()), so instead of 
+> calling icss_iep_pps_enable(iep, false) I am just clearing the 
+> iep->pps_enabled flag.
 
-Here is the summary with links:
-  - [net] tunnels: Accept PACKET_HOST in skb_tunnel_check_pmtu().
-    https://git.kernel.org/netdev/net/c/8930424777e4
+IDK what Roger thinks, but the above is not clear to me. I read it as
+you are stating that icss_iep_pps_enable() indeed clears the flag, so i
+don't see/follow the reasoning behind this change.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Skimmir over the code, icss_iep_pps_enable() could indeed avoid clearing
+the flag under some circumstances is that the reason?
 
+Possibly a more describing commit message would help.
+
+>> And, what if you brought 2 interfaces of the same ICSS instances up
+>> but put only 1 interface down and up?
+>>
+> 
+> Then the flag need not be disabled if only one interface is brought down 
+> because the IEP is still alive and all the IEP configuration (including 
+> pps/perout) is still valid.
+
+I read the above as stating this fix is not correct in such scenario,
+leading to the wrong final state.
+
+I think it would be better to either give a better reasoning about this
+change in the commit message or refactor it to handle even such scenario,
+
+Thanks,
+
+Paolo
 
 
