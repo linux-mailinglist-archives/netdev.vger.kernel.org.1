@@ -1,85 +1,86 @@
-Return-Path: <netdev+bounces-178984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D26F0A79D01
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 09:30:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A105A79D73
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 09:54:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 297D7189045C
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 07:31:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F6DA7A518D
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 07:53:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35A991A0BFA;
-	Thu,  3 Apr 2025 07:30:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DD7F23F419;
+	Thu,  3 Apr 2025 07:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A05E+WU+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RsQefNoq"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 652B82A8D0
-	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 07:30:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EFD4DDA9
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 07:54:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743665453; cv=none; b=sJXT5B3xBR3XaAI2hJ7yYS4/aSWk76SaVwCxrGwTXjsWpQXMDDR22lGxpWDl0VypS7m2pUwMBUlc2f6YJlhrapfwY+RtH6T6xwvj4bIkOEyWQ4laEeS9c6MXBAhxIbXJsV3bFYI6AGfEAkX5jd2jYPZleEmKHIXZIEKl5SXmZ7A=
+	t=1743666882; cv=none; b=D1sRGjPDG355KjQ9+LVfQnwgqjc3qSXurXM9FoAtqclC31voZLJU5M43o8yONJ3bNibcZut1mpW5L2Z+aZ+Nl1yoehJAg0uSuQQ93IqsWr/NwsfH4ubPlUPdeB1zw3IlL4N4+BSXSrGLMF4PtKya7pLbnRH2d9nbIAWtvDSqXLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743665453; c=relaxed/simple;
-	bh=dpl7bk3zxrfUvX8Qn3SA1RTjpFP8x6HWUUrKuatCZlI=;
+	s=arc-20240116; t=1743666882; c=relaxed/simple;
+	bh=gf6i0CVAAzE10h7dA00ZSf1pRHDUOoM/SpLiNoBF0BQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RrDwik/0ybmfALZGHra9hQb2qpsFeVW3qtqwPvVbQXCsZGc5zyaA9ipZ1Z+s0AFDkmSKq5sTAG+5COClxKKLF2Ugag2P2EUL5Z4e0RPJ1PWtNrHbPY/JwGbiwja9+V5U25puAk9tdhzPnv4UJLTgOB9FIhg52Pan0g5vMOaAY6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A05E+WU+; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=QEFsq1ZaaYWsftOU0DOM21JHx1N067BIWUJGgiH01z6Z9eh9Dk9NHLGhJO4u5yW8V5hD5bYNQCC/bAn65ufzXXxdP2bbBbRxzwszniXAVyHNECVuLT3hCgUTaCuYt+mXBRz4dnqVkhVvBvSfAne+FJDHdfXP653vfAgDimjdZrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RsQefNoq; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743665450;
+	s=mimecast20190719; t=1743666879;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=qvqByI/L6b/XJ2HJVELnCm3U+HbyNA6GAMZmcDdB3dM=;
-	b=A05E+WU+qQqbNNLKwY2WOsnO6pozzn93XLAE5wZ20Q9fejLr2CzxvH3fu6/Sm5F67Z2uR/
-	851gj/u3cKrNjL+4e2D6Ug73W122ibpM47b0+iWTbK0glZQ/eD0z5yzdKZmLWCpcqjusV3
-	0VAkVjcyh4LoR5dhdP4V9JoKTVYfMZQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=mz1m2Mglph/2wgaShkIRZ/HYGAaWZeLEqP3Em69Ffko=;
+	b=RsQefNoqWVQmriIDr5uFtMp+hfViELQrXalHmc+ycUuyTvm+erchVxGmDs5H4ZBbPrLnPT
+	EbmBjfVYocxRKKjQn4CnlPYOxDwu73OuoklO2KlufFIr+IhHBwrh3utHrCYbbNhjvlQ5uT
+	489aLcOVhAEchmnMOqRJrJaSccTditk=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-41-W5oyXMzSPImtkyHIcxkK2g-1; Thu, 03 Apr 2025 03:30:46 -0400
-X-MC-Unique: W5oyXMzSPImtkyHIcxkK2g-1
-X-Mimecast-MFC-AGG-ID: W5oyXMzSPImtkyHIcxkK2g_1743665445
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-391345e3aa3so350172f8f.0
-        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 00:30:46 -0700 (PDT)
+ us-mta-193-KbYLsNAANAezoRjyjt4jlg-1; Thu, 03 Apr 2025 03:54:38 -0400
+X-MC-Unique: KbYLsNAANAezoRjyjt4jlg-1
+X-Mimecast-MFC-AGG-ID: KbYLsNAANAezoRjyjt4jlg_1743666877
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3913d8d7c3eso342167f8f.0
+        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 00:54:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743665445; x=1744270245;
+        d=1e100.net; s=20230601; t=1743666877; x=1744271677;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qvqByI/L6b/XJ2HJVELnCm3U+HbyNA6GAMZmcDdB3dM=;
-        b=GWNDuwd5ywiLN7261BX2qgxqVKocn94ih+SVXgfwOvEmRWIK3Vay2vOUSPTAS/8QI7
-         94Sd3juFu7Pg0Qe582jONyLiCVquUimyzLw1Tb+fC0hYqz031+7j2UNR29Z7l9GDEVDv
-         i4wvoHyydldNcg+xfXV8zLkWbzbVB37fOBTlDI5T3TepJ6N2MbA8AQ0uddE6hsoAQXt5
-         +4BiwV5UvnBD5Nw50oSvSNTPIn5pivuObr3UWbXFuALsH+lxnD6KmNF6AuCRxVyQP6e5
-         SV9zir/UtLMcTV2iMuZVaGhVIagihiN3Y2OUq3DayGy9jCtX0QVnYJagF8+6ixyYc/7Q
-         vZGQ==
-X-Gm-Message-State: AOJu0YzXtBaDPMQeka2xdrsjPOziY6KW4QSLvRwX+ZaKQ9L63hQKWBR+
-	21HrSLTcL1PLje7tr8ZSdlTMNd+4kqU7agr5Oc5h18Hs92xa4+V7uztG6FrVLc5hcfPNhIkd2vq
-	Stas0KvHrVsKE5qAyQBOmDBClqrcnvJTYtx0gFzvT+h14+VLcc9sccw==
-X-Gm-Gg: ASbGncvuaA3U35J/2fwnP7zo7AesfE+d1qmL/xDL3JmbUvzHew+n+I68peqIN5CQwu9
-	LrX0d0KMpi+n0oaz9WEsztUfP3m2fl/vQupwMeuqrh0ydfn8SaygflbtzfDYVMzUF7bgK2J/AXS
-	ER9ObpLcOpUbxJu/l1TYoC7sLCM1/yOZ4WIqoXnJq6bdhuW2q8esHjYUWd5tDJD+TGDMhLIrV3g
-	ivyCxK0b8dtcBrcxQrApP1qMTLjGAh4mdRfWUnp7JOEZOkDhaD2flEuN8NNCyh14FIV/2zeFVwr
-	JQCszR5XNhEaLxQBovZDh7mMPzf/I1LavDBxTOEXC4HbHA==
-X-Received: by 2002:a5d:64aa:0:b0:39c:30fd:ca7 with SMTP id ffacd0b85a97d-39c30fd0d18mr656643f8f.7.1743665445503;
-        Thu, 03 Apr 2025 00:30:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE+lNFS2je41M2jSOllRUK4YaCcFAGiVZTLhILMcGSQdXFLtyr7e/6X5pueyK8fMJPhqBd6ug==
-X-Received: by 2002:a5d:64aa:0:b0:39c:30fd:ca7 with SMTP id ffacd0b85a97d-39c30fd0d18mr656611f8f.7.1743665445097;
-        Thu, 03 Apr 2025 00:30:45 -0700 (PDT)
+        bh=mz1m2Mglph/2wgaShkIRZ/HYGAaWZeLEqP3Em69Ffko=;
+        b=OEMYZ8Db1zG4brVUCi7/p3Q4b5B3pw/XzK4Uaog4AsfzOdV3chCktyvlcJ01aNni8X
+         Yl1vwtTyjdyqFgNEfZX4fQAvR8S9AldHM/ivbgp2vpC4ria++R/O0eDsBQ5jZx6rzoCy
+         Yaro0diWWr8F+46k6rbxv4fhvmTIMMWTzCpOEFXdezZygs+57l5vG8tuROynq+79y3tc
+         BGJNGvOahy/wpsawUE6HEcL2QzavQeQ0GU3LkzfLbzU2H/bifQbwMAOMOxNgt9ojOKuS
+         FOEiqjc10k67QE+aIUiDHOkHpEr7Up5mkrkQV5etRlLlWej/ZDd2xHAMwU3CqiPYMEcr
+         NIeA==
+X-Forwarded-Encrypted: i=1; AJvYcCUDtHBS6PrgLv2dv9aMUFMAKovk7Sex1dLo7uKSwN9CY01499TQPjR/iXOh03SiI2CaUQqRKwg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+CU4WXL4+Roi5fsNaNchp6T1G8s9eJ48V1fgOYFefE2MnVV1Q
+	X0wXusse+vGqoQqB7BVhuFbUnZQXeDiZM2KCJiuqkKd4izcBOyl8JMmnYiLqIYqTTLHJibQjEJJ
+	czrjoA4PtxC0e9hkk1yAQeTBQwMPFKfhQCpqW8jXT4+VVMzjL7ITYGA==
+X-Gm-Gg: ASbGncs59w1b9SHsReH3SsUfkxeQdjJ4pFius2HhvZiwcnVA9sdtd29EdMPZXxIstFS
+	GrreubjQpvrpA1ugFTrBWuCvxy6USo6AZ9OsttoFMo6wEvsRDV0/GkL0tHaUwxCMEFRjBoRI2+c
+	7gpZvHR6FLtx72VTxooUATOv+Ossr64pOvLRPCzYLMJWAdKjTZvfURbooSjiYd8FirHLNmFpaI9
+	mvVzYnTeZkhYFev0zjSOQ2lM5XnGeRHF2Y3UL99Bi65waJGdbzVhlSwwgqWnoHQ60KbGyiaH/19
+	0xwu/G6nMFNcSB1CEcXhc6phXLAMYVPspxRHjj31cbORoA==
+X-Received: by 2002:a5d:588a:0:b0:391:3fa7:bf77 with SMTP id ffacd0b85a97d-39c120e3519mr15921203f8f.31.1743666877172;
+        Thu, 03 Apr 2025 00:54:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE1And0QrQEVjir4GMSk2Lsi+httiSOnojJoqQ368wxmdq0Sn4aBnwA8LOogIOGQwQQEQgNOw==
+X-Received: by 2002:a5d:588a:0:b0:391:3fa7:bf77 with SMTP id ffacd0b85a97d-39c120e3519mr15921182f8f.31.1743666876820;
+        Thu, 03 Apr 2025 00:54:36 -0700 (PDT)
 Received: from [192.168.88.253] (146-241-68-231.dyn.eolo.it. [146.241.68.231])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec17b46bbsm13134995e9.36.2025.04.03.00.30.44
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c30096964sm1069807f8f.15.2025.04.03.00.54.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Apr 2025 00:30:44 -0700 (PDT)
-Message-ID: <03151db3-61fe-478d-b91b-549d18648738@redhat.com>
-Date: Thu, 3 Apr 2025 09:30:43 +0200
+        Thu, 03 Apr 2025 00:54:36 -0700 (PDT)
+Message-ID: <58ad78a8-f84c-4249-b95c-e74d3edf1149@redhat.com>
+Date: Thu, 3 Apr 2025 09:54:35 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,73 +88,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: decrease cached dst counters in dst_release
-To: Antoine Tenart <atenart@kernel.org>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org,
- Steffen Klassert <steffen.klassert@secunet.com>
-Cc: netdev@vger.kernel.org
-References: <20250326173634.31096-1-atenart@kernel.org>
- <89dcde93-8e5a-4193-aa01-fde5dd5ee1fd@redhat.com>
- <174358103232.4506.6967775691343340999@kwain>
+Subject: Re: [Discuss]ipv6: send ns packet while dad
+To: gaoxingwang <gaoxingwang1@huawei.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, davem@davemloft.net, kuznet@ms2.inr.ac.ru,
+ yoshfuji@linux-ipv6.org, David Ahern <dsahern@kernel.org>
+Cc: kuba@kernel.org, yanan@huawei.com
+References: <20250402121205.305919-1-gaoxingwang1@huawei.com>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <174358103232.4506.6967775691343340999@kwain>
+In-Reply-To: <20250402121205.305919-1-gaoxingwang1@huawei.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Adding Steffen
+Adding David,
 
-On 4/2/25 10:03 AM, Antoine Tenart wrote:
-> Quoting Paolo Abeni (2025-04-01 10:00:56)
->> On 3/26/25 6:36 PM, Antoine Tenart wrote:
->>>
->>> diff --git a/net/core/dst.c b/net/core/dst.c
->>> index 9552a90d4772..6d76b799ce64 100644
->>> --- a/net/core/dst.c
->>> +++ b/net/core/dst.c
->>> @@ -165,6 +165,14 @@ static void dst_count_dec(struct dst_entry *dst)
->>>  void dst_release(struct dst_entry *dst)
->>>  {
->>>       if (dst && rcuref_put(&dst->__rcuref)) {
->>> +#ifdef CONFIG_DST_CACHE
->>> +             if (dst->flags & DST_METADATA) {
->>> +                     struct metadata_dst *md_dst = (struct metadata_dst *)dst;
->>> +
->>> +                     if (md_dst->type == METADATA_IP_TUNNEL)
->>> +                             dst_cache_reset_now(&md_dst->u.tun_info.dst_cache);
->>
->> I think the fix is correct, but I'm wondering if we have a similar issue
->> for the METADATA_XFRM meta-dst. Isn't:
->>
->>         dst_release(md_dst->u.xfrm_info.dst_orig);
->>
->> in metadata_dst_free() going to cause the same UaF? Why don't we need to
->> clean such dst here, too?
+On 4/2/25 2:12 PM, gaoxingwang wrote:
+> I have an RFC-related question when using ipv6.
 > 
-> I don't know much about XFRM but if the orig_dst doesn't have
-> DST_NOCOUNT (which I guess is the case) you're right. Also Eric noted in
-> ac888d58869b,
+> Configure an IPv6 address on network adapter A. The IP address is being used for DAD and is unavailable.
+> In this case, the application sends an NS packet to resolve the tentative IP address. The target address
+> in the multicast packet contains the tentative IP address, and the source address is set to the link-local address.
+> Is this allowed to be sent? Does it contradict the following description in the RFC 4862?
+> (https://datatracker.ietf.org/doc/html/rfc4862#section-5.4)
 > 
-> """
->     1) in CONFIG_XFRM case, dst_destroy() can call
->        dst_release_immediate(child), this might also cause UAF
->        if the child does not have DST_NOCOUNT set.
->        IPSEC maintainers might take a look and see how to address this.
-> """
+>> Other packets addressed to the
+>> tentative address should be silently discarded.  Note that the "other
+>> packets" include Neighbor Solicitation and Advertisement messages
+>> that have the tentative (i.e., unicast) address as the IP destination
+>> address and contain the tentative address in the Target Address field.
 > 
-> but here I'm not sure if that is the case nor of the implications of
-> moving that release.
-> 
-> As the dst_orig one seems logical I can move it to dst_release too, but
-> it seems a deeper look by XFRM experts would be needed in any way.
+> Or is this description just for receiving packets?
 
-I also feel like the XFRM side needs some deeper look and the most
-straight forward fix could have negative side effects, so I'm fine with
-this patch dealing with dst_cache only.
+Yes, AFAICT the above paragraph refers to incoming packets targeting the
+tentative address. Outgoing NS packet must include the tentative address
+in the target field, otherwise DaD can't work.
 
-@Steffen: could you please have a look at the possible UaF mentioned above?
+> The actual problem I encountered was that when proxy ND was enabled
+> on the switch, the reply ND packet would cause the dad to fail. 
 
-Thanks,
+I think more details on the problematic scenario could help. Who is
+sending the ND reply? who is performing DaD? possibly a diagram could help.
+
+thanks,
 
 Paolo
 
