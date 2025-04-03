@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-179157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93685A7AD47
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 22:01:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1532CA7AD3E
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 22:00:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31DBB171760
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:56:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D39D7A60B5
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:59:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BCE128153D;
-	Thu,  3 Apr 2025 19:10:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D4428A3F6;
+	Thu,  3 Apr 2025 19:10:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kN2rZuUf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oJUvs7dS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4D7F25A62F;
-	Thu,  3 Apr 2025 19:10:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B445A28A3EE;
+	Thu,  3 Apr 2025 19:10:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743707407; cv=none; b=e5WbUcWFuSriF9nJqnUVRSfj5JgbWLT2cLWpIysVuBUMbOii8Hg9jIPa0DcCXdTkp1SXTiMKt5foQlOk8jXiwFrpG5AT8HAOIoYhsQtU0Z7SCueE8kGDhLSf4JMfQ/l90sG8Q7OiKoDNTtLDLtOxxm96t9LubAZbXl9o/GaKJM8=
+	t=1743707441; cv=none; b=c/qrLspKzy4gYHnRLb2j3+1XI+8l/Hb1g5hGzhCk/9MDbTweMEjUnmNrjnApimOzCJSCmAD24ULJDflwTm9uiuUnA5lFKyOwd9hSF6NUBmxBjlMPXGMWGjbRzqYcQ5ZUXjeh0BdS3yhFqA0tJoT2ZABfN+/xK97IfiC148OS/mI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743707407; c=relaxed/simple;
-	bh=EgZcr+RgILfzlkPmUksAITZJ2kvsOf2hzqEDPvIfHU8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=j4P9kC10nzaxHw/FLIkanRk6MswUH1cW3jGRe2TvpqPHprDL7wqBdsMtpN4+a0LM4bZCc/AL3Uzpr563I6cRXLmN29uWRFvuOFeelgEcBJwxfTJMDJWo8Q9l3Fbjhwicugk0zF2910TWn3v4WdxuoafHZaMWL8EUIzXk6eiL8cQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kN2rZuUf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AEE9C4CEE3;
-	Thu,  3 Apr 2025 19:10:05 +0000 (UTC)
+	s=arc-20240116; t=1743707441; c=relaxed/simple;
+	bh=M7lFV45Fx+2+0E22nSVxRdUTHbc4t70UypBkKOnWtR8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RmotBm5PBfOQFiCxN8/HiVG2RcOxbzQUC6fp7YOZ91CsWRCSYwg2BMa+iYcsQRLEJ/3qm/vG2yxGUuRh/0Zt0+q0CrGgrG1buWZT8QxEQ6v4u4CVYPdfw/chju7Ro+iAX3noaFxEvlIPajf562xe8LMKwHi1UEKN+jsOMa0RE1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oJUvs7dS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D507C4CEE3;
+	Thu,  3 Apr 2025 19:10:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743707407;
-	bh=EgZcr+RgILfzlkPmUksAITZJ2kvsOf2hzqEDPvIfHU8=;
+	s=k20201202; t=1743707441;
+	bh=M7lFV45Fx+2+0E22nSVxRdUTHbc4t70UypBkKOnWtR8=;
 	h=From:To:Cc:Subject:Date:From;
-	b=kN2rZuUfgIFKK6r6aQhi86Cz331vgLhAD3Km+lJUFkXZhkw9dbZdbkL3Huj3qVEvG
-	 ieRRs4etJ+uM6ktiXY/D+nL9Z2TXmaIAar9iBjC3w1sd256ZKsdJOLdujSJtIrwl3q
-	 0FX9Q2OKnCqOCROsTqjZh+lerj2Trj7fUXHeWr0X99uVwITKcIyuF5c5DGwjQXHZ2X
-	 oda1Ttf9/E2cqzr3gSmqOqL3mJ2Ejjnt5EHCdkDPDbtssJ2tzbzqHZCzvnxspv8k8h
-	 m+S5ZjuJ7263q6PfMkpYdKT3viStXEphl/+7qTePvx+PeJZJHLh7Gf3/ABHQzHKwT6
-	 9usb8aPJZrgcw==
+	b=oJUvs7dSqSiAVgFqnYEKz53/CAUlAWYBlZ5O2P4pELOhef+ShMJo7YkLK0wi/16MH
+	 7YMydJK+UgeIz91ZyMMUnT9y/v4cznf8HD5yYj3ptP6TdXkukeoyTTzp5+zP+ISrrh
+	 +75YcF9PXLsb0s86RgNizwTn6E2mH3BVxdPl+5T/GxOtoOwRKGO4KUkiW2kS+pu3Yr
+	 zuvnd2ycmueWHMJgLA6U+HIOPaXek42JJ4Pn5Q9c6/xW33V+ck03CgdO6VL4OjIXPN
+	 lwtANlRIxSzbIRsk1ckqwuXqtrD3hxp6B/rjQ0waC53Y7XIZ6QyZ3Vp+G625tSbJTq
+	 4QbLtieb4hz7A==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -53,9 +53,9 @@ Cc: Jason Xing <kerneljasonxing@gmail.com>,
 	edumazet@google.com,
 	kuba@kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 01/15] page_pool: avoid infinite loop to schedule delayed worker
-Date: Thu,  3 Apr 2025 15:09:48 -0400
-Message-Id: <20250403191002.2678588-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 01/14] page_pool: avoid infinite loop to schedule delayed worker
+Date: Thu,  3 Apr 2025 15:10:23 -0400
+Message-Id: <20250403191036.2678799-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -65,7 +65,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.235
+X-stable-base: Linux 5.4.291
 Content-Transfer-Encoding: 8bit
 
 From: Jason Xing <kerneljasonxing@gmail.com>
@@ -110,10 +110,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index 08fbf4049c108..a11809b3149b4 100644
+index 335f68eaaa05c..dbe0489e46035 100644
 --- a/net/core/page_pool.c
 +++ b/net/core/page_pool.c
-@@ -485,7 +485,13 @@ static void page_pool_release_retry(struct work_struct *wq)
+@@ -387,7 +387,13 @@ static void page_pool_release_retry(struct work_struct *wq)
  	int inflight;
  
  	inflight = page_pool_release(pool);
