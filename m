@@ -1,62 +1,67 @@
-Return-Path: <netdev+bounces-179135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AFECA7AC28
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:34:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7CD2A7AC40
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:36:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EA8B3B3D52
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:30:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9F1C17AD96
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:31:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 411C926A08A;
-	Thu,  3 Apr 2025 19:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3526426AAAE;
+	Thu,  3 Apr 2025 19:06:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fRjg6VEL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FTAR191I"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18DD32571C7;
-	Thu,  3 Apr 2025 19:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C782571DA;
+	Thu,  3 Apr 2025 19:06:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743707177; cv=none; b=r5IL1wftESZSRA8Iyn7MO6Khgz9xsoPmMZJ4MESU9WHtEqD8cvQW1Fw5mhWMcFbdn1VXtUcY41F9SF4JsmS1A+aCQ3B/Pc3anUHELFDPJ/hZ7V6TBWG4zrLatxF9pD37Z64XwN86UPhq3LyyISG8LVno/Vy8CQBvh+9g62UHvV4=
+	t=1743707187; cv=none; b=CIVjdyssdxYJNcxIrfzfsoGaIf1KHa0oKuuMRyivUddf5kGX9iLmC49hV0YcUrpZMHsIvwgaMekgFeQF0tJSzzlMASBKEvX8nFYFmovln3puh3s1CQEGZTzwLOBKhly/AWJ0uWlorFSvnldNFXwGgz9DGTd/hpJcOsnOVtkNt14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743707177; c=relaxed/simple;
-	bh=1CcKXbqfhtHVfxqUZK34l1DDHU0gxjtEXW3/+5xuIMc=;
+	s=arc-20240116; t=1743707187; c=relaxed/simple;
+	bh=kJ2jEXmnju3HLRFGJ99O6SI8AOeIJq7v6im4cDEw3pY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=iz+mpEpU3Nl5QKl/EXxOIzDl5Tk7GgwDJYB4yv+uEwCDSIAlkcn7UDTCllOEfHx4uM9uCa9YHzojIosYEzobQO7HhX+VKXzZNGRxPLnSMt2mbBYlQ3aCLa4JqemaJ5010tU3+jelVqrsEaWYs4/Zl8Esd4zF9Yq6/tnl7f1lgk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fRjg6VEL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1A44C4CEE8;
-	Thu,  3 Apr 2025 19:06:15 +0000 (UTC)
+	 MIME-Version; b=Xhl2L/EPKN/jTUDRNBUnw6wGHIc//5ebFzJ5WZQ7OPG1xdsiijQCJ1Mm03CcPghah9NnqU1RAFkDmRPDHm3IUmKMq2Gw/k8XJZ8TsbFswUGx/cb64ewfv0cLgocnc4hSCfWa5rw1M3+s3YRMBCWlOPUfVl/vNjBiAyM6g4GeXHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FTAR191I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A47D8C4CEE3;
+	Thu,  3 Apr 2025 19:06:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743707177;
-	bh=1CcKXbqfhtHVfxqUZK34l1DDHU0gxjtEXW3/+5xuIMc=;
+	s=k20201202; t=1743707186;
+	bh=kJ2jEXmnju3HLRFGJ99O6SI8AOeIJq7v6im4cDEw3pY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fRjg6VELJuARNP64DEOqTR3ZB4+xaamqmXSNGPIIaFI8D8QIbyGUM5fBEL+9sShhj
-	 Znk/epr4Gr25Ml/Tm5a54YbAA0HXrNYk2aT5neuDsGcphVR5xm9nu8US/FyVJ7FDzm
-	 VwhqzDddsUHbjceErpwssZqKWQz8MCmfAgr4/rwLqtRpYjSBJcSVcp9jsUUQpa2ek0
-	 CPDuiZ0nqr5mVJT83v+Vp3uFE3Lay68nEfw4hkfP1OHeDfYc1Iub9UQvM6DUx5UAGi
-	 haloumLDWEvS3UqUn+4nWIprKZbWhs3XfsKMeVYfeH0iO/Aw1tw0k0clA0dWBba5fE
-	 fsKKZJPllotOw==
+	b=FTAR191IksHEw1Oyn0SNvFx00FcH25IZKnf0hgEE5Zo+xDUVd+AmiiqDuUmVlbbka
+	 /gruoi7fY0oJm+OAGQTfpgTxLY84nhe+OEUh8QSf99vkYIn5ceHj/m9eP9kqB92+TK
+	 Ccg5qJ2qXkstzv07xY3wrnmt5yz4HFN6ughXy3iWycT3meaZylBUebQtFkUWJ/v/QC
+	 uOYAxcheMvJXnRqIb/hcbSd1hQ9RT8isGMGELAtZ1Q06gmarHuz39UgMW3fyDeqv6S
+	 vqt0+P1EwE3Av3WIJnAk/KDRQi648qczL3b+80SYC3ZUT9Ry9HFcXVvZoz9cYa0dZS
+	 I8k+8mb60/Hlw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Pavel Begunkov <asml.silence@gmail.com>,
+Cc: Max Schulze <max.schulze@online.de>,
+	David Hollis <dhollis@davehollis.com>,
+	Sven Kreiensen <s.kreiensen@lyconsys.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Mina Almasry <almasrymina@google.com>,
-	David Wei <dw@davidwei.uk>,
 	Sasha Levin <sashal@kernel.org>,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	sjordhani@gmail.com,
+	shannon.nelson@amd.com,
+	jacob.e.keller@intel.com,
+	sd@queasysnail.net,
+	horms@kernel.org,
+	linux-usb@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 08/47] net: page_pool: don't cast mp param to devmem
-Date: Thu,  3 Apr 2025 15:05:16 -0400
-Message-Id: <20250403190555.2677001-8-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.12 13/47] net: usb: asix_devices: add FiberGecko DeviceID
+Date: Thu,  3 Apr 2025 15:05:21 -0400
+Message-Id: <20250403190555.2677001-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250403190555.2677001-1-sashal@kernel.org>
 References: <20250403190555.2677001-1-sashal@kernel.org>
@@ -71,39 +76,58 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.12.21
 Content-Transfer-Encoding: 8bit
 
-From: Pavel Begunkov <asml.silence@gmail.com>
+From: Max Schulze <max.schulze@online.de>
 
-[ Upstream commit 8d522566ae9cb3f0609ddb2a6ce3f4f39988043c ]
+[ Upstream commit 4079918ae720e842ed7dff65fedeb9980b374995 ]
 
-page_pool_check_memory_provider() is a generic path and shouldn't assume
-anything about the actual type of the memory provider argument. It's
-fine while devmem is the only provider, but cast away the devmem
-specific binding types to avoid confusion.
+The FiberGecko is a small USB module that connects a 100 Mbit/s SFP
 
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
-Reviewed-by: Mina Almasry <almasrymina@google.com>
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-Signed-off-by: David Wei <dw@davidwei.uk>
-Link: https://patch.msgid.link/20250204215622.695511-2-dw@davidwei.uk
+Signed-off-by: Max Schulze <max.schulze@online.de>
+Tested-by: Max Schulze <max.schulze@online.de>
+Suggested-by: David Hollis <dhollis@davehollis.com>
+Reported-by: Sven Kreiensen <s.kreiensen@lyconsys.com>
+Link: https://patch.msgid.link/20250212150957.43900-2-max.schulze@online.de
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/core/page_pool_user.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/usb/asix_devices.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
-index 48335766c1bfd..8d31c71bea1a3 100644
---- a/net/core/page_pool_user.c
-+++ b/net/core/page_pool_user.c
-@@ -353,7 +353,7 @@ void page_pool_unlist(struct page_pool *pool)
- int page_pool_check_memory_provider(struct net_device *dev,
- 				    struct netdev_rx_queue *rxq)
- {
--	struct net_devmem_dmabuf_binding *binding = rxq->mp_params.mp_priv;
-+	void *binding = rxq->mp_params.mp_priv;
- 	struct page_pool *pool;
- 	struct hlist_node *n;
+diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
+index 57d6e5abc30e8..da24941a6e444 100644
+--- a/drivers/net/usb/asix_devices.c
++++ b/drivers/net/usb/asix_devices.c
+@@ -1421,6 +1421,19 @@ static const struct driver_info hg20f9_info = {
+ 	.data = FLAG_EEPROM_MAC,
+ };
  
++static const struct driver_info lyconsys_fibergecko100_info = {
++	.description = "LyconSys FiberGecko 100 USB 2.0 to SFP Adapter",
++	.bind = ax88178_bind,
++	.status = asix_status,
++	.link_reset = ax88178_link_reset,
++	.reset = ax88178_link_reset,
++	.flags = FLAG_ETHER | FLAG_FRAMING_AX | FLAG_LINK_INTR |
++		 FLAG_MULTI_PACKET,
++	.rx_fixup = asix_rx_fixup_common,
++	.tx_fixup = asix_tx_fixup,
++	.data = 0x20061201,
++};
++
+ static const struct usb_device_id	products [] = {
+ {
+ 	// Linksys USB200M
+@@ -1578,6 +1591,10 @@ static const struct usb_device_id	products [] = {
+ 	// Linux Automation GmbH USB 10Base-T1L
+ 	USB_DEVICE(0x33f7, 0x0004),
+ 	.driver_info = (unsigned long) &lxausb_t1l_info,
++}, {
++	/* LyconSys FiberGecko 100 */
++	USB_DEVICE(0x1d2a, 0x0801),
++	.driver_info = (unsigned long) &lyconsys_fibergecko100_info,
+ },
+ 	{ },		// END
+ };
 -- 
 2.39.5
 
