@@ -1,117 +1,230 @@
-Return-Path: <netdev+bounces-179091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C77C4A7A91B
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 20:16:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57975A7A920
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 20:19:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91106175F6D
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 18:16:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F28C3B28E6
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 18:19:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 024F82500C9;
-	Thu,  3 Apr 2025 18:16:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EC532528EA;
+	Thu,  3 Apr 2025 18:19:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="YvSvT3nd"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oqJjLXic"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8861BC8E0
-	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 18:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C18A2517A0
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 18:19:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743704166; cv=none; b=r45O8GaoEE59hvWfXHBqvoG7oBLXY04+kGDQGyIbEZoPKMc1xvGIVNm09iqb1Pdw6RXFOVYJUdi0c9VHVfc79irrqgC3tIWLyYgWsMvah+WeUOi8yUGQ4RXbTY4JCu9O80pOrAymPnArnOoO1JkABrnXW5nhIB6jVSdAci3IqmI=
+	t=1743704368; cv=none; b=mPJV+AXMI+ngTjOIqgfrIoWXhG5BmnZEL9wlE9ufwXyfG8afRSuuLnu5mabSPZanzA3UTXj1FNbRAMEyeAEiN5Uyyn64p+I5Jlvgs2UH6p9ogjC6NzQ4P5fZ5tuPvctGz6UlVcEMZ6Lit6blKkHf5ekqwOHN2PllT7yIKEYQiJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743704166; c=relaxed/simple;
-	bh=AAxrM2iRqdWg4dPkxTdNI3Bm2YqyYSHNciLHcBw4rKQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=erw6nv3NpMbPYy4zVDdCfX+QEWeNzOw7XpWDVTYrBe0Ym/OylhHsKsnPrBeYvcVHysKK2uHjaS2CzolCGJSVNqdSzIapBIHKWA1yYEVnvWmn8UZcFElM326bHQ1nSFuP2krBO+QHwyoIfpg73rEDsbr4ZqVRLqbJh2GQRv7DtqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=YvSvT3nd; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-ac3b12e8518so228637166b.0
-        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 11:16:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1743704162; x=1744308962; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=FJlcXXP2FukqGEHv0z1cQI88EHr2Dv5R3LlDfDt2A4c=;
-        b=YvSvT3ndW5dF+05wpB2s1HAcjsulUMy9zZc6IQJJr5IFJH5/Az6mDANHLIZeOSdlIv
-         dip3xprggzULcTk+9TCh7aCU9dl68Hrj537o5x/ejUXx4+5gU5/HP6QZOCuJHaeKzDre
-         p8l8Jku0gbe5kJLclfbflI2dstT3uzw5KB+C0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743704162; x=1744308962;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FJlcXXP2FukqGEHv0z1cQI88EHr2Dv5R3LlDfDt2A4c=;
-        b=Jdo0tbHeqho9MdbTDB5o3oTzLWlutP7U/Bgwk5pIWOcK4ghcHG46T2Z9hcjD37XVYv
-         bEqtO+CVkal5/oA46ZaeLCZPbaL1vEEMm0Dr0uQruZdwy34PdkdzkNc6c3tdJuJcF6xi
-         klgic34+RugR0E9WS8B4OBeV86grXKImgP2PN1W4OH6fl24xEGoxQKpwyVuJ1FJkOIau
-         J4lYuHDyGeGu8+T71ASM3T6Z6HEY059cspYr95xStwQyVJij1/8HaM48ZV8V6m3fFktN
-         FzbuQiXstUnj+cdCQVkYWPcqgcpva11xpPwJp3lkp8L7mWBFfbzB9DjjFr6WoauMYA9f
-         nigA==
-X-Forwarded-Encrypted: i=1; AJvYcCVaYVTBs4Ty86sXBV2yTrBKXdDB3JwJW9YjPeJv+lAVR/9/m1QoKo9vgjJXIg7fkHJgD70c+M0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMK9oYUQlfoqTzZrOvPb2M2HFlPW8k1TpPLIGreobw5pSQkQAZ
-	ggNoIxlfXnnXoZDYeRCharlekdXEF1UqjqS49JTBxHE62InyYGKVr0KLdykgm9+/6mx4aEw1w29
-	MMvY=
-X-Gm-Gg: ASbGncurW6xOwlOwcIOKa7BrLFk+xj3Up0RceBC+klulAA9aN14SA/2gCLIxkyQzPni
-	Ext09b1/eQZNMyM7G5tLN2w31qO9qxASv2njjX8oh3JkmgxAdqKzbvcninCa4xqxCAkSG2pNzXS
-	pXgYQ47Hh3Om/0nORKfOkwegCaY0OMVmrvuA8nVy+IVONVS5zyxc1o8O6AkU0SQBsK+XbqCiBtZ
-	loasZpnXN6j4htHhL6mUj91lg2BtMJ/8+MliTyUo6b/Sl5mPsK8BvavcGdgTZxnSzlRfBLiHRr6
-	hEPx038M385yIFNEbZ7fYMeXvOGqB0USTQacMtDzR2WSxLSupbqTBUCUPtuSeQ4zpc9SA87s/p/
-	229mu2CBN+4Fyag8XbUE=
-X-Google-Smtp-Source: AGHT+IHNuTabrhYAAaOA4J/6mSB8Q1DL0NTtelbUUzbiZfa4FNDSpJH79OY98qRvtrKDckyR90Y/vA==
-X-Received: by 2002:a17:907:7daa:b0:ac3:97f4:9c08 with SMTP id a640c23a62f3a-ac7d191ac70mr54462766b.31.1743704162591;
-        Thu, 03 Apr 2025 11:16:02 -0700 (PDT)
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com. [209.85.208.41])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac7c013ec0esm128726866b.98.2025.04.03.11.16.01
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Apr 2025 11:16:01 -0700 (PDT)
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5e535e6739bso1866148a12.1
-        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 11:16:01 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWdaLv+pKid7Tn4F529KfW8XBnrW9EaSvkhaLyqEd92r//a0a1+TtfZ9P26sp0pC7Vp9Ac+Sv0=@vger.kernel.org
-X-Received: by 2002:a17:907:9728:b0:ac7:41c:748d with SMTP id
- a640c23a62f3a-ac7d1b27f38mr53718566b.38.1743704161358; Thu, 03 Apr 2025
- 11:16:01 -0700 (PDT)
+	s=arc-20240116; t=1743704368; c=relaxed/simple;
+	bh=/+6DPyFwTnaFmg9nRktkNbaJvZmpgYXIP9E5uSGzYtU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DUNk/X96PGAftz2txHn91eYj4gTUTn7uPz+ZAGvmSSXwHblAVG5vyGQeiudAcBaavL21G+qXy8pZ0kyZED+2FzOyuswSvQcZw9BHyE+uuxNj97tEoWwMYWPEMcycHhC+WQXe0JDmpqKRgfZAq6Kbr372aHxBvch8pa37iboZ6Qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oqJjLXic; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1743704362;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=QQ9ehOHdnNhPXlhSQHsn/YYloB24QsMZgMcRBGUNIcw=;
+	b=oqJjLXicDLB2K2GOySnF9TOdTFATrWvb4Yu0Uym/Yvvbqo8wb2O/9nyu/3cfIgWnCgK1hR
+	5oGoOyc+pNZhKhE/DpxQtt2NKVH10DMj5/VWwcJoT1hJWj81a7OBX0yIUtc8sGk/q42wcm
+	QZOhFDml4siMzAGqTEOdE4tCtJ0IT9w=
+From: Sean Anderson <sean.anderson@linux.dev>
+To: netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>
+Cc: linux-kernel@vger.kernel.org,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	upstream@airoha.com,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Sean Anderson <sean.anderson@linux.dev>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Claudiu Beznea <claudiu.beznea@microchip.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Joyce Ooi <joyce.ooi@intel.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Li Yang <leoyang.li@nxp.com>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Michal Simek <michal.simek@amd.com>,
+	Naveen N Rao <naveen@kernel.org>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Robert Hancock <robert.hancock@calian.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	UNGLinuxDriver@microchip.com,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Wei Fang <wei.fang@nxp.com>,
+	devicetree@vger.kernel.org,
+	imx@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linuxppc-dev@lists.ozlabs.org
+Subject: [RFC net-next PATCH 00/13] Add PCS core support
+Date: Thu,  3 Apr 2025 14:18:54 -0400
+Message-Id: <20250403181907.1947517-1-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250401134408.37312-1-przemyslaw.kitszel@intel.com>
-In-Reply-To: <20250401134408.37312-1-przemyslaw.kitszel@intel.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Thu, 3 Apr 2025 11:15:44 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wjvh_LUpa=864joG2JJXs3+viO-kLzLidR2JLyMr4MNwA@mail.gmail.com>
-X-Gm-Features: AQ5f1Jqqq_S2O0OJpyEjcg88KSOkVuR9PdTbHkE7So44nAp-S1DtNbZhUbWjRJI
-Message-ID: <CAHk-=wjvh_LUpa=864joG2JJXs3+viO-kLzLidR2JLyMr4MNwA@mail.gmail.com>
-Subject: Re: [RFC] slab: introduce auto_kfree macro
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, vbabka@suse.cz, 
-	peterz@infradead.org, andriy.shevchenko@linux.intel.com, 
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 1 Apr 2025 at 06:50, Przemek Kitszel
-<przemyslaw.kitszel@intel.com> wrote:
->
-> With new auto_kfree, we simply will start with
->         struct my_dev_foo *foo auto_kfree;
-> and be safe against future extensions.
+This series adds support for creating PCSs as devices on a bus with a
+driver (patch 3). As initial users,
 
-Honestly, I'd much rather just see any auto-freeing *always* assigning
-the value.
+- The Lynx PCS (and all of its users) is converted to this system (patch 5)
+- The Xilinx PCS is broken out from the AXI Ethernet driver (patches 6-8)
+- The Cadence MACB driver is converted to support external PCSs (namely
+  the Xilinx PCS) (patches 9-10).
 
-We used to have a rule that declarations had to be at the top of a
-block, which made that not an option, but that rule went out the
-window exactly because you can't do that with the cleanup macros.
+The last few patches add device links for pcs-handle to improve boot times,
+and add compatibles for all Lynx PCSs.
 
-So just make the rule be that __free() without an assignment is simply a bug.
+Care has been taken to ensure backwards-compatibility. The main source
+of this is that many PCS devices lack compatibles and get detected as
+PHYs. To address this, pcs_get_by_fwnode_compat allows drivers to edit
+the devicetree to add appropriate compatibles.
 
-               Linus
+This is technically a v3 (with [1,2] being v1 and v2, respectively), but
+there have been so many architectural changes that I didn't bother
+maintaining the series changelog. I think it is best to review this
+series independently of its past iterations. I submitted this as an RFC
+since net-next is closed, but I believe this series is fully tested and
+ready to be applied.
+
+[1] https://lore.kernel.org/netdev/20211004191527.1610759-1-sean.anderson@seco.com/
+[2] https://lore.kernel.org/netdev/20221103210650.2325784-1-sean.anderson@seco.com/
+
+
+Sean Anderson (12):
+  dt-bindings: net: Add binding for Xilinx PCS
+  net: phylink: Support setting PCS link change callbacks
+  net: pcs: Add subsystem
+  net: pcs: lynx: Convert to an MDIO driver
+  net: phy: Export some functions
+  net: pcs: Add Xilinx PCS driver
+  net: axienet: Convert to use PCS subsystem
+  net: macb: Move most of mac_config to mac_prepare
+  net: macb: Support external PCSs
+  of: property: Add device link support for PCS
+  arm64: dts: Add compatible strings for Lynx PCSs
+  powerpc: dts: Add compatible strings for Lynx PCSs
+
+Vladimir Oltean (1):
+  net: dsa: ocelot: suppress PHY device scanning on the internal MDIO
+    bus
+
+ .../devicetree/bindings/net/xilinx,pcs.yaml   | 129 ++++
+ Documentation/networking/index.rst            |   1 +
+ Documentation/networking/kapi.rst             |   4 +
+ Documentation/networking/pcs.rst              |  99 +++
+ MAINTAINERS                                   |   8 +
+ .../arm64/boot/dts/freescale/fsl-ls208xa.dtsi |  48 +-
+ .../arm64/boot/dts/freescale/fsl-lx2160a.dtsi |  54 +-
+ .../dts/freescale/qoriq-fman3-0-10g-0.dtsi    |   3 +-
+ .../dts/freescale/qoriq-fman3-0-10g-1.dtsi    |   3 +-
+ .../dts/freescale/qoriq-fman3-0-1g-0.dtsi     |   3 +-
+ .../dts/freescale/qoriq-fman3-0-1g-1.dtsi     |   3 +-
+ .../dts/freescale/qoriq-fman3-0-1g-2.dtsi     |   3 +-
+ .../dts/freescale/qoriq-fman3-0-1g-3.dtsi     |   3 +-
+ .../dts/freescale/qoriq-fman3-0-1g-4.dtsi     |   3 +-
+ .../dts/freescale/qoriq-fman3-0-1g-5.dtsi     |   3 +-
+ .../fsl/qoriq-fman3-0-10g-0-best-effort.dtsi  |   3 +-
+ .../boot/dts/fsl/qoriq-fman3-0-10g-0.dtsi     |   3 +-
+ .../fsl/qoriq-fman3-0-10g-1-best-effort.dtsi  |   3 +-
+ .../boot/dts/fsl/qoriq-fman3-0-10g-1.dtsi     |   3 +-
+ .../boot/dts/fsl/qoriq-fman3-0-10g-2.dtsi     |   3 +-
+ .../boot/dts/fsl/qoriq-fman3-0-10g-3.dtsi     |   3 +-
+ .../boot/dts/fsl/qoriq-fman3-0-1g-0.dtsi      |   3 +-
+ .../boot/dts/fsl/qoriq-fman3-0-1g-1.dtsi      |   3 +-
+ .../boot/dts/fsl/qoriq-fman3-0-1g-2.dtsi      |   3 +-
+ .../boot/dts/fsl/qoriq-fman3-0-1g-3.dtsi      |   3 +-
+ .../boot/dts/fsl/qoriq-fman3-0-1g-4.dtsi      |   3 +-
+ .../boot/dts/fsl/qoriq-fman3-0-1g-5.dtsi      |   3 +-
+ .../boot/dts/fsl/qoriq-fman3-1-10g-0.dtsi     |   3 +-
+ .../boot/dts/fsl/qoriq-fman3-1-10g-1.dtsi     |   3 +-
+ .../boot/dts/fsl/qoriq-fman3-1-1g-0.dtsi      |   3 +-
+ .../boot/dts/fsl/qoriq-fman3-1-1g-1.dtsi      |   3 +-
+ .../boot/dts/fsl/qoriq-fman3-1-1g-2.dtsi      |   3 +-
+ .../boot/dts/fsl/qoriq-fman3-1-1g-3.dtsi      |   3 +-
+ .../boot/dts/fsl/qoriq-fman3-1-1g-4.dtsi      |   3 +-
+ .../boot/dts/fsl/qoriq-fman3-1-1g-5.dtsi      |   3 +-
+ drivers/net/dsa/ocelot/Kconfig                |   4 +
+ drivers/net/dsa/ocelot/felix_vsc9959.c        |  15 +-
+ drivers/net/dsa/ocelot/seville_vsc9953.c      |  16 +-
+ drivers/net/ethernet/altera/Kconfig           |   2 +
+ drivers/net/ethernet/altera/altera_tse_main.c |   7 +-
+ drivers/net/ethernet/cadence/macb.h           |   1 +
+ drivers/net/ethernet/cadence/macb_main.c      | 229 ++++--
+ drivers/net/ethernet/freescale/dpaa/Kconfig   |   2 +-
+ drivers/net/ethernet/freescale/dpaa2/Kconfig  |   3 +
+ .../net/ethernet/freescale/dpaa2/dpaa2-mac.c  |  11 +-
+ drivers/net/ethernet/freescale/enetc/Kconfig  |   2 +
+ .../net/ethernet/freescale/enetc/enetc_pf.c   |   8 +-
+ .../net/ethernet/freescale/enetc/enetc_pf.h   |   1 -
+ .../freescale/enetc/enetc_pf_common.c         |   4 +-
+ drivers/net/ethernet/freescale/fman/Kconfig   |   4 +-
+ .../net/ethernet/freescale/fman/fman_memac.c  |  27 +-
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |   3 +
+ .../ethernet/stmicro/stmmac/dwmac-socfpga.c   |   6 +-
+ drivers/net/ethernet/xilinx/Kconfig           |   1 +
+ drivers/net/ethernet/xilinx/xilinx_axienet.h  |   4 +-
+ .../net/ethernet/xilinx/xilinx_axienet_main.c | 104 +--
+ drivers/net/pcs/Kconfig                       |  51 +-
+ drivers/net/pcs/Makefile                      |   4 +
+ drivers/net/pcs/core.c                        | 701 ++++++++++++++++++
+ drivers/net/pcs/pcs-lynx.c                    | 115 +--
+ drivers/net/pcs/pcs-xilinx.c                  | 481 ++++++++++++
+ drivers/net/phy/mdio_device.c                 |   1 +
+ drivers/net/phy/phy_device.c                  |   3 +-
+ drivers/net/phy/phylink.c                     |  24 +-
+ drivers/of/property.c                         |   2 +
+ include/linux/pcs-lynx.h                      |  13 +-
+ include/linux/pcs-xilinx.h                    |  36 +
+ include/linux/pcs.h                           | 122 +++
+ include/linux/phy.h                           |   1 +
+ include/linux/phylink.h                       |  27 +-
+ 70 files changed, 2104 insertions(+), 358 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/xilinx,pcs.yaml
+ create mode 100644 Documentation/networking/pcs.rst
+ create mode 100644 drivers/net/pcs/core.c
+ create mode 100644 drivers/net/pcs/pcs-xilinx.c
+ create mode 100644 include/linux/pcs-xilinx.h
+ create mode 100644 include/linux/pcs.h
+
+-- 
+2.35.1.1320.gc452695387.dirty
+
 
