@@ -1,48 +1,65 @@
-Return-Path: <netdev+bounces-179012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4BD1A7A02B
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 11:37:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95493A7A07D
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 11:51:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7D3137A58F7
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 09:36:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2DF5C7A24B1
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 09:50:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D53A2475CB;
-	Thu,  3 Apr 2025 09:37:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D2B42E3385;
+	Thu,  3 Apr 2025 09:51:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ig+s+hYa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AMV4S2ef"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495FD248868;
-	Thu,  3 Apr 2025 09:37:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FF79243364
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 09:51:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743673049; cv=none; b=nKtltPSprvliOdX2RYkMFG/jA+5A7GV1FJq3b4AQGJ0t8uzz+8GsVdZt1FvcHbCqc2RG7bo7mN0mmsQyjrnu+FHNL/l4nWRo8SCD2sTZjBtES7f6z9MXg5z+RHooiBCtkSz5QEJjdkqLtQzrNbELVSyM/vlttY3Xti7U3x5M+bw=
+	t=1743673900; cv=none; b=bUxVTNY2OBAcljx5OLPt8VlwiLkJp/CZtBknvFbcE8EciupschiDvQMbUo+odB6HuIpXAb6dsNSe3eQ7v7YPj3BNOvPn6C16eujnEleAQl/BgQ0NbvEkU4IN9DeIkxcE98taPHjaNL/GwzMD73gfgQ/grW5zU7vk8woGn6rB3lE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743673049; c=relaxed/simple;
-	bh=Coan5fmk6E+RdsNlnuGPbdLAJylFKtntjKLClwzjJaM=;
+	s=arc-20240116; t=1743673900; c=relaxed/simple;
+	bh=MtcQ7DZ5Rlv3F5xnlhEZiUe0iQ16fg6nrovE73Yt0LI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dzi1PXCwaV3gXAw88T6tFy7BknM1j0pihjDnZfbbiSSYMAwergX2vqUvHwpl3GhwczX7C8f+432rBAz/2p2d+DkAFWE37BcZgx2DRwIzdgzDxVNQrramaH5Y5+gzsbpUdN59vADeHtOX2NLLUOPO7oDd6UwZuaZreI+EE2TNIJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ig+s+hYa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5BCFC4CEE3;
-	Thu,  3 Apr 2025 09:37:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743673048;
-	bh=Coan5fmk6E+RdsNlnuGPbdLAJylFKtntjKLClwzjJaM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ig+s+hYaQHzELTAg91ITV3teiTpfEPSBqrj1zwv+43dLClfpkRJkweKQjDhZi5/DD
-	 60T+pB1Vsw8mwP1oep0aPlOJB3J1sbGZD7lp7GYk6YOedMHnmUAQRf0zVwyIoRUDsq
-	 JQjwivrt7PURqX7GDdNgCHbrHqJQlKZsTlKbRmHVATsX7EOD8Wo1dAZVyp9S4z9JzS
-	 q0B+Xx8rUulz4PdpXr+1A5LEZS/AERYSxxHDdJT9A0NtWH17lr3ClT3RPpzmty4d4o
-	 MziNvs8DbfXpSbqeH4MLoUf+23Pamfd4fXKme6Rp4ccnEZv+rBVl5CT1SPb16UNyjm
-	 C0mrk8uMmXKlg==
-Message-ID: <78b2d2ad-4e0e-41b7-95b4-b7fe945dfe13@kernel.org>
-Date: Thu, 3 Apr 2025 11:37:19 +0200
+	 In-Reply-To:Content-Type; b=IPiRZdAPFZa2zzSMkBxDOmHJybrNTblxn3ZzEerSJC1GRpUdeR8LCS1Xj4S2OaeXb3CEcDhD97zH3IY1tGApQ/hDiuFN6UWz+p3ovWOT3xmdISDFzkSo4NC+Tbz5kCbF9MtDcU5r4gEbSHcd1moGQqIRLU0vQxhnmd5cTIwGym4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AMV4S2ef; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1743673899; x=1775209899;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=MtcQ7DZ5Rlv3F5xnlhEZiUe0iQ16fg6nrovE73Yt0LI=;
+  b=AMV4S2ef8xwWeUaqZV5+rzBdKN54j6dOfLax+dkheYj/6OwMirENXuf3
+   wLSfAwQ1FGSqJ1hmxvfaYDChhDRBe8ISLOGJ2kgnGuFaqqgnTTBOfaE0v
+   z61cTVK603obcIhfCI52dqeikP97iNwhn7bUzKB7RakzpDzxkAhcymew4
+   kSZdI+fcGryuzCytu0b4CGdYGbbieAPTm4yTWH4qR/xL1+EigPSmf5DeP
+   9UFdgFUYQd1oZvbDfijDXFRV/MweTp822pW1rBoIaZr72fxpMLuIJbkB1
+   XUPZn9UgnsIkNaxLDQqun6U5JIVk8nJEFK6JcA6kZ/lff1Yo+B0yw1nzR
+   g==;
+X-CSE-ConnectionGUID: pO+VFcUPSduDtd3rrOuJgg==
+X-CSE-MsgGUID: K8H2BlU8QFyQvc7dNhj+fg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11392"; a="55701496"
+X-IronPort-AV: E=Sophos;i="6.15,184,1739865600"; 
+   d="scan'208";a="55701496"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2025 02:51:38 -0700
+X-CSE-ConnectionGUID: EIPOIixUSbOSW6P+fdJU4g==
+X-CSE-MsgGUID: GIjPAyN5TX+hQT/KPhPjKQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,184,1739865600"; 
+   d="scan'208";a="126952994"
+Received: from mszapar-mobl1.ger.corp.intel.com (HELO [10.246.0.161]) ([10.246.0.161])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2025 02:51:37 -0700
+Message-ID: <125533c8-44fe-4a87-af16-d934800b82d2@linux.intel.com>
+Date: Thu, 3 Apr 2025 11:51:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,86 +67,75 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf v2 2/2] selftests/bpf: add perf test for
- adjust_{head,meta}
-To: Jakub Kicinski <kuba@kernel.org>, Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: bpf@vger.kernel.org, mrpre@163.com, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, Willem de Bruijn <willemb@google.com>,
- Jason Xing <kerneljasonxing@gmail.com>,
- Anton Protopopov <aspsk@isovalent.com>,
- Abhishek Chauhan <quic_abchauha@quicinc.com>,
- Jordan Rome <linux@jordanrome.com>,
- Martin Kelly <martin.kelly@crowdstrike.com>,
- David Lechner <dlechner@baylibre.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- kernel-team <kernel-team@cloudflare.com>
-References: <20250331032354.75808-1-jiayuan.chen@linux.dev>
- <20250331032354.75808-3-jiayuan.chen@linux.dev>
- <20250402172447.75ed447f@kernel.org>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next] ice: improve error message for
+ insufficient filter space
+To: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>,
+ Simon Horman <horms@kernel.org>
+Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+References: <20250314081110.34694-2-martyna.szapar-mudlaw@linux.intel.com>
+ <20250319121743.GB280585@kernel.org>
+ <PH0PR11MB5013F63C43277D7466F4F95896AC2@PH0PR11MB5013.namprd11.prod.outlook.com>
 Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20250402172447.75ed447f@kernel.org>
+From: "Szapar-Mudlaw, Martyna" <martyna.szapar-mudlaw@linux.intel.com>
+In-Reply-To: <PH0PR11MB5013F63C43277D7466F4F95896AC2@PH0PR11MB5013.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+Hi Sujai,
 
+I reverified the issue, and with the patch, I am now getting the correct 
+error about insufficient space, when attempting to add to many rules. 
+The error you’re encountering might be caused by a different issue.
 
-On 03/04/2025 02.24, Jakub Kicinski wrote:
-> On Mon, 31 Mar 2025 11:23:45 +0800 Jiayuan Chen wrote:
->> which is negligible for the net stack.
->>
->> Before memset
->> ./test_progs -a xdp_adjust_head_perf -v
->> run adjust head with size 6 cost 56 ns
->> run adjust head with size 20 cost 56 ns
->> run adjust head with size 40 cost 56 ns
->> run adjust head with size 200 cost 56 ns
->>
->> After memset
->> ./test_progs -a xdp_adjust_head_perf -v
->> run adjust head with size 6 cost 58 ns
->> run adjust head with size 20 cost 58 ns
->> run adjust head with size 40 cost 58 ns
->> run adjust head with size 200 cost 66 ns
+Could you please test it again or send me offline the set of rules you 
+are adding? It seems to be working fine on my side.
+
+Regards,
+Martyna
+
+On 4/1/2025 11:49 AM, Buvaneswaran, Sujai wrote:
+> Hi,
 > 
-> FWIW I'm not sure if this is "negligible" for XDP like you say,
-> but I defer to Jesper :)
+> I tried to add tc rules to the HW beyond the maximum limit and still noticing the below error message instead of error message mentioned in the patch.
+> 
+> [root@dell-cnv-sut ~]# tc filter add dev ens5f0np0 ingress protocol ip prio 0 flower skip_sw dst_mac 00:f0:01:00:00:0E action mirred egress redirect dev ens5f0npf0vf0
+> Error: ice: Unable to add filter due to error.
+> We have an error talking to the kernel
+> 
+> [root@dell-cnv-sut ~]# tc filter show dev ens5f0np0 root | grep -c in_hw
+> 16306
+> 
+> Please check it.
+> 
+> Thanks,
+> Sujai B
+> 
+>> -----Original Message-----
+>> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+>> Simon Horman
+>> Sent: Wednesday, March 19, 2025 5:48 PM
+>> To: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+>> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Michal
+>> Swiatkowski <michal.swiatkowski@linux.intel.com>
+>> Subject: Re: [Intel-wired-lan] [PATCH iwl-next] ice: improve error message for
+>> insufficient filter space
+>>
+>> On Fri, Mar 14, 2025 at 09:11:11AM +0100, Martyna Szapar-Mudlaw wrote:
+>>> When adding a rule to switch through tc, if the operation fails due to
+>>> not enough free recipes (-ENOSPC), provide a clearer error message:
+>>> "Unable to add filter: insufficient space available."
+>>>
+>>> This improves user feedback by distinguishing space limitations from
+>>> other generic failures.
+>>>
+>>> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+>>> Signed-off-by: Martyna Szapar-Mudlaw
+>>> <martyna.szapar-mudlaw@linux.intel.com>
+>>
+>> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
+> 
 
-It would be too much for the XDP_DROP use-case, e.g. DDoS protection and
-driver hardware eval. But this is changing a BPF-helper, which means it
-is opt-in by the BPF-programmer.  Thus, we can accept larger perf
-overhead here.
-
-I suspect your 2 nanosec overhead primarily comes from the function call
-overhead.  On my AMD production system with SRSO mitigation enabled I
-expect to see around 6 ns overhead (5.699 ns), which is sad.
-
-I've done a lot of benchmarking of memset (see [1]). One take-away is
-that memset with small const values will get compiled into very fast
-code that avoids the function call (basically QWORD MOVs).  E.g. memset
-with const 32 is extremely fast[2], on my system it takes 0.673 ns (and
-0.562 ns comes from for-loop overhead).  Thus, it is possible to do
-something faster, as we are clearing very small values. I.e. using a
-duff's device construct like I did for remainder in [2].
-
-In this case, as this is a BPF-helper, I am uncertain if it is worth the
-complexity to add such optimizations... I guess not.
-This turned into a long way of saying, I'm okay with this change.
-
-[1] 
-https://github.com/netoptimizer/prototype-kernel/blob/master/kernel/lib/time_bench_memset.c
-
-[2] 
-https://github.com/netoptimizer/prototype-kernel/blob/35b1716d0c300e7fa2c8b6d8cfed2ec81df8f3a4/kernel/lib/time_bench_memset.c#L520-L521
-
---Jesper
 
