@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-178931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 883DFA7996A
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 02:30:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81C58A7996B
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 02:30:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10A123B1B76
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 00:29:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FA007A4E09
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 00:29:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27B95CA52;
-	Thu,  3 Apr 2025 00:29:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F5371EB3E;
+	Thu,  3 Apr 2025 00:29:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="djXc35wq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WLAHl2ln"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 038FC2907
-	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 00:29:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303A21CD3F;
+	Thu,  3 Apr 2025 00:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743640197; cv=none; b=suR2aVLeAsj6TNGXEY6WHAc1dcwX5NSd3TfGzN7bpxNDzn9J4EWR6M6kGoZvGl09PwPmipBFq+RszDZqXlSXNc2a98bDQy3KY6fwpWaFmlbHmZN62Ya0GcXFa+XQuYgUf0WpRXbDy3tNsh/GBqApDwG1Tqw3y22I8fqa/x9UY7s=
+	t=1743640198; cv=none; b=AGFP6Ar6iJhbCoa12P4Z1XGLteCmZ9uWwHx03f3pDYTpx78F55Y4IDxgqJGZY+iuglGI7+CfBPDTbf7shuV1vQr6ueg7p7FzIYpa9OsJcNuccTUx6AiAG4bMIDEMoPM7GbI+mqPz/fP7wcUTBaux0k7jyIwsPL/tiHSKdO9HYao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743640197; c=relaxed/simple;
-	bh=GMwqHQVII7100EiyJtvMks5ZEQM7JkLN2Se9mNI9dd8=;
+	s=arc-20240116; t=1743640198; c=relaxed/simple;
+	bh=xO9f4a/9WuPC3/ni2fkmii8ud0YKfXLKcQsP1T8GuzA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=p9lWNkgf3qUY24qYwnRoBdXvExyui3Q+VLIJ0HjxG8StqEgaiCcTtSkCDVI4AynA6nGaNo8/LyPrUiDCjs3w9fmRgZ8KJcf+gPFpvcFNcIqgNrRQqAGuhrpg0LBolUnBQZyD3aHFP6xX9JbZyZ38RnlJ4qwfl8fhIkYmM54n/+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=djXc35wq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F605C4CEDD;
-	Thu,  3 Apr 2025 00:29:56 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=oN/iBLHhvX3LWKNnVG9zPWht+sWtgOOJXHia9sfBefout/S/q7ci02BSkA04XepzCMhs+RlQ7slyzhRfhjUAbF/CxQ/kXPZy+0lv48jrgiJ1jQcV8+250OxEn8J7xSHkzcMBX+YuCvrbE04P7UCoDiThlJ7ZoM6d7or8yVVjLno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WLAHl2ln; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E163C4CEEB;
+	Thu,  3 Apr 2025 00:29:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743640196;
-	bh=GMwqHQVII7100EiyJtvMks5ZEQM7JkLN2Se9mNI9dd8=;
+	s=k20201202; t=1743640197;
+	bh=xO9f4a/9WuPC3/ni2fkmii8ud0YKfXLKcQsP1T8GuzA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=djXc35wqKDEzKOvtdaWeljE+HZv0njWYulHNt424qGSOKiJRVrygzEgnqdAkiY2ea
-	 lKvezYjVmp28NjZveTcXpIUWuwFNsLeUZ7QbblBmZrxwvolqBRfhqaVqO0npVe4fB5
-	 n+8lR6enusUti+VZhoBeCWNHmZgPwxu7+LVgKpagyT5pfMULjiCx3w69WKeyvcWhMm
-	 5r15w+QYUi3UKYWoQ47CeLV6EioUBTlZYAbnOewsVCLz31p2lcAyPmtFwfsF6hRwZK
-	 IblaVWBUzS2t0ZyBTUC2L/Ik5tQXbKBV/idmESXSWQLqOCq70EIsNJZYMMKUTO+ebK
-	 jj4UpIcqBBn0w==
+	b=WLAHl2lnRjMlYIAv4qOQ4+6LNMVfiA+1pgkerdgr/i+cHV9gX2Irx8zvvN2wPR1Kl
+	 RJDId1DSsBOjeDJTK+4jBl/YupSPL/YLQwJamoRkvzyl+7x2AV7xQ4KlGwr6KGL9Ol
+	 /gH3Dua9H67t6BWI7lydsCIvC0nt9ivZjhB1ALwh7I0fGfBqQGRLQAtxqeOVkHpV8/
+	 RPZxMrp6EXTH1IHlZiMxEAkvJy7CX7qG2vcWEVoA1ITIZOcW/HHaXYHI/B4P8mnI8e
+	 4HrvPOjX11LfqvATv2HF6GsMfoNI5Q06cm11EQOcD+nMH65oyNBnu5xNPkb5h+Sad5
+	 WRNOdPrV0QfXQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F84380CEE3;
-	Thu,  3 Apr 2025 00:30:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AF77F380CEE3;
+	Thu,  3 Apr 2025 00:30:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v5 net 0/2] udp: Fix two integer overflows when sk->sk_rcvbuf
- is close to INT_MAX.
+Subject: Re: [PATCH net] vsock: avoid timeout during connect() if the socket is
+ closing
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174364023325.1731187.12666225758668243399.git-patchwork-notify@kernel.org>
-Date: Thu, 03 Apr 2025 00:30:33 +0000
-References: <20250401184501.67377-1-kuniyu@amazon.com>
-In-Reply-To: <20250401184501.67377-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- kuni1840@gmail.com, netdev@vger.kernel.org
+ <174364023450.1731187.2572806115256964093.git-patchwork-notify@kernel.org>
+Date: Thu, 03 Apr 2025 00:30:34 +0000
+References: <20250328141528.420719-1-sgarzare@redhat.com>
+In-Reply-To: <20250328141528.420719-1-sgarzare@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, mhal@rbox.co, pabeni@redhat.com,
+ georgezhang@vmware.com, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, acking@vmware.com, edumazet@google.com,
+ davem@davemloft.net, kuba@kernel.org, dtor@vmware.com, horms@kernel.org,
+ leonardi@redhat.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 1 Apr 2025 11:44:41 -0700 you wrote:
-> I got a report that UDP mem usage in /proc/net/sockstat did not
-> drop even after an application was terminated.
+On Fri, 28 Mar 2025 15:15:28 +0100 you wrote:
+> From: Stefano Garzarella <sgarzare@redhat.com>
 > 
-> The issue could happen if sk->sk_rmem_alloc wraps around due
-> to a large sk->sk_rcvbuf, which was INT_MAX in our case.
-> 
-> The patch 2 fixes the issue, and the patch 1 fixes yet another
-> overflow I found while investigating the issue.
+> When a peer attempts to establish a connection, vsock_connect() contains
+> a loop that waits for the state to be TCP_ESTABLISHED. However, the
+> other peer can be fast enough to accept the connection and close it
+> immediately, thus moving the state to TCP_CLOSING.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v5,net,1/2] udp: Fix multiple wraparounds of sk->sk_rmem_alloc.
-    https://git.kernel.org/netdev/net/c/5a465a0da13e
-  - [v5,net,2/2] udp: Fix memory accounting leak.
-    https://git.kernel.org/netdev/net/c/df207de9d9e7
+  - [net] vsock: avoid timeout during connect() if the socket is closing
+    https://git.kernel.org/netdev/net/c/fccd2b711d96
 
 You are awesome, thank you!
 -- 
