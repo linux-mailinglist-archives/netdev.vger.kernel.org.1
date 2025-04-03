@@ -1,140 +1,157 @@
-Return-Path: <netdev+bounces-179082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA2A2A7A84A
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 18:58:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D76CA7A858
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:01:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 934EB172736
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 16:58:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 845FD3AE2F5
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 16:59:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C95882512E8;
-	Thu,  3 Apr 2025 16:58:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD1382512FA;
+	Thu,  3 Apr 2025 16:59:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="FAnzjTMy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OisHarl2"
 X-Original-To: netdev@vger.kernel.org
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 269952D052;
-	Thu,  3 Apr 2025 16:58:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743699501; cv=pass; b=SXkYgf6vTNEC7T6hiewJ5X9NZlSXD/60NgtqYr1BfDxrKMZkTY527vcFsIuaUZldQQcU1zwr6kLJPoyvlIdCJd37W0N+lTIZ9LHe3SQxxy35KqrEOOx9+DDQIGqTJkMWMRK4qkyDoQN1M6neycXgalAaswc8jvX3b1f76r1LpBc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743699501; c=relaxed/simple;
-	bh=IMK0vRqPB1kvZoixPsMjAMEMXNTIwq4WAJ2xK2pug88=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AgAqqxbwyK2HpoCN2+EHPLZhG4c4NJXoIK0pZKnoDpmOoRlyTN2fKlUpflEEW3OtmAwBLJHj33yhueOm27DmMWr6yk2c9G+o2M5OFyZGUc/iT/ZZvCheZiL3OhR8Q7eh5l//Ijsp0GXZ5+vRCShNbe4aP34JPzIRQTeEp3Oq3iE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=FAnzjTMy; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
-Received: from monolith.lan (unknown [193.138.7.138])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4ZT7GN2K3Nz49Pxf;
-	Thu,  3 Apr 2025 19:58:03 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1743699485;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=bTZRIVsiORj7EbfVIazfg3T+z6IiFqu0YVKqgFaKKdg=;
-	b=FAnzjTMy1GiWHfakFYG16XC17kub0XF1RMQRgKtcO6ueGDC6D9qc1FYkPp0/APi/z7eT6P
-	xQ77u32mtfET5t4OsDEa7DFJ3o5i2LdA2JSgRPuFDBgVn1fDvNWCG/nNu6maxevSxJhrLh
-	SiWLXDF9C0kB+nrvtAapKYN6KK5fx9VqkbWbs1dCoi1NdakkPMhmw8pkqge0XNeyrpZdP6
-	oo9rCaDpwP6j/xc2oXYHQPIYcWrhkNpa46eRam7ZVLejnD+p2XqHvave0gWtn166UypQgd
-	tEwOhcwxRasgjm6ddabv1At9hmi/vlLUsqXNBPbl253XZlBSybdwdd/IymzpoA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1743699485;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=bTZRIVsiORj7EbfVIazfg3T+z6IiFqu0YVKqgFaKKdg=;
-	b=KoiHNzqGUYahpaZkpaHxuZGdvTcACfUCo++A6CTHK10/dVgONdzL1bMRggz3ae4QGnslQe
-	yLwyLaJWIECK4E2uRzfhP2WT/cjBUUHMWcaMzOGJDCcX0+jFkDR5phAfqHvOnqv0xOm2YP
-	G1I9ttkij25DnDyomom1fwwKVsb+0MKpQBTdaTWclN2i9UsNIPbmXXh+2NN0Mpu4E6KlG5
-	aCbOxBhcIBkynJunUp+3fCRWm64PVHKUWpqJMbvsJ884L2FLQmJySO6bq2ofQNOjPgDVuP
-	T7l7kUyxbnXyw+fY/7LLqMUrrvRT30G4P6yGcbefTG4WZsJkAlRcw+VBfZHSrg==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1743699485; a=rsa-sha256;
-	cv=none;
-	b=dzhUY9ntXt3tmrvdevv2iALtvgCXQDEVVJ7Etqec3OGPdHs5skFRRsS0h3wQ86DHMYAS2n
-	8H6AYmvxYvVnA2J37aMpk2sv+J8eVa6NdbavAesNHswRG8nJVn7WJTMkYCQv4fqNMv48XB
-	uDcf7MuJYp06xEbnBWiZ4xUm5fyQnHhiBxNt4KbIF5/N2jsNPXH3WJmu9XEVo80XTRQRKu
-	tSZolKbMD0jjMIyP4lloyMVGuTUcBPvE8n+k4UIp+WBPXKH4l5ESaDgKP9yinFoc+ocbP5
-	j9l2UXw3s49ftZ7BHkgdP/GRWQR5lOaMfmOCFq5o6FNdtf7Eu2CWhwnzcq48TA==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>,
-	netdev@vger.kernel.org,
-	willemdebruijn.kernel@gmail.com,
-	kerneljasonxing@gmail.com
-Subject: [PATCH] Bluetooth: increment TX timestamping tskey always for stream sockets
-Date: Thu,  3 Apr 2025 19:57:59 +0300
-Message-ID: <cf8e3a5bd2f4dbdba54d785d744e2b1970b28301.1743699406.git.pav@iki.fi>
-X-Mailer: git-send-email 2.49.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9372A250C15;
+	Thu,  3 Apr 2025 16:59:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743699584; cv=none; b=i5+V7RIvssp1bpFN1lpdQoxwwUV33QyDDAnXPyZ1Qn8WXfhdEan0beXOM3ppqu8aluLNBO+kYF36KsSk1U3CxYI4504q/9Kjlcd5SJz7qY9LCrduLrFjAUNz7mshvsKLTD6Yji2x/B9sWpHY3tfvCfvWYgN9CkRJtloMB0acrF0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743699584; c=relaxed/simple;
+	bh=lwCLOrKjqeBhvraMsNIzlF4vAoIOPP0pmmDtxveRJqg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l68nO2gIRZsDDM4ZAq39js5urn5J5d8uegFXTypphiab+YbP+x7x5YP3Y8p4ojZ7q8rDdbQkXqzFWbtYb4QO1Cfcn5a0gPdCoZPt6nvBmWrFRC7OVZ2kdNgcPoWB8Ic2CfAl6LrIbpnDxt4qfBzAtsGKYhgnu4eVxCJPAcfphjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OisHarl2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BA35C4CEE3;
+	Thu,  3 Apr 2025 16:59:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743699584;
+	bh=lwCLOrKjqeBhvraMsNIzlF4vAoIOPP0pmmDtxveRJqg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OisHarl2Us9CgvsWT11VflIIAJ0QwjMDmVoWz4CDXVhOGuxfeXWJp60H92QVPkP7S
+	 Z/Ar2eg8aLxbxF5Xl5bniVmOvfrhJ80xpgphbJNPU4Xo63HromqJ3baeudaEJ7C7MV
+	 tsVmk6clyNFwj4K3OKSqIxzy19yhVTLB4XDboAtVEDcY3TWh/FI95zpVpSTGbPPmbB
+	 eB7h1JRHJE276B5g0fGUtu7Vpe61y6hL4NDyTEJDx3cpJ6t3v+QAz7UnTdzli+U5bL
+	 6rktoftwaMyE5uOIOIH/sGow2JtP41V/obKNb5K4NvGesWVB37ukxmSVYIHgGDKC61
+	 FYKQCpMYwUmgg==
+Date: Thu, 3 Apr 2025 09:59:41 -0700
+From: Kees Cook <kees@kernel.org>
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	torvalds@linux-foundation.org, peterz@infradead.org,
+	Jann Horn <jannh@google.com>, andriy.shevchenko@linux.intel.com,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Harry Yoo <harry.yoo@oracle.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Christoph Lameter <cl@gentwo.org>
+Subject: Re: [RFC] slab: introduce auto_kfree macro
+Message-ID: <202504030955.5C4B7D82@keescook>
+References: <20250401134408.37312-1-przemyslaw.kitszel@intel.com>
+ <3f387b13-5482-46ed-9f52-4a9ed7001e67@suse.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3f387b13-5482-46ed-9f52-4a9ed7001e67@suse.cz>
 
-Documentation/networking/timestamping.rst implies TX timestamping OPT_ID
-tskey increments for each sendmsg.  In practice: TCP socket increments
-it for all sendmsg, timestamping on or off, but UDP only when
-timestamping is on. The user-visible counter resets when OPT_ID is
-turned on, so difference can be seen only if timestamping is enabled for
-some packets only (eg. via SO_TIMESTAMPING CMSG).
+On Wed, Apr 02, 2025 at 12:44:50PM +0200, Vlastimil Babka wrote:
+> Cc Kees and others from his related efforts:
+> 
+> https://lore.kernel.org/all/20250321202620.work.175-kees@kernel.org/
 
-Fix BT sockets to work in the same way: stream sockets increment tskey
-for all sendmsg (seqpacket already increment for timestamped only).
+I think, unfortunately, the consensus is that "invisible side-effects"
+are not going to be tolerated. After I finish with kmalloc_obj(), I'd
+like to take another run at this for basically providing something like:
 
-Fixes: 134f4b39df7b ("Bluetooth: add support for skb TX SND/COMPLETION timestamping")
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
----
- net/bluetooth/hci_conn.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+static inline __must_check
+void *kfree(void *p) { __kfree(p); return NULL; }
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 95972fd4c784..7e1b53857648 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -3072,6 +3072,7 @@ void hci_setup_tx_timestamp(struct sk_buff *skb, size_t key_offset,
- 			    const struct sockcm_cookie *sockc)
- {
- 	struct sock *sk = skb ? skb->sk : NULL;
-+	int key;
- 
- 	/* This shall be called on a single skb of those generated by user
- 	 * sendmsg(), and only when the sendmsg() does not return error to
-@@ -3087,13 +3088,16 @@ void hci_setup_tx_timestamp(struct sk_buff *skb, size_t key_offset,
- 
- 	sock_tx_timestamp(sk, sockc, &skb_shinfo(skb)->tx_flags);
- 
-+	if (sk->sk_type == SOCK_STREAM)
-+		key = atomic_add_return(key_offset, &sk->sk_tskey);
-+
- 	if (sockc->tsflags & SOF_TIMESTAMPING_OPT_ID &&
- 	    sockc->tsflags & SOF_TIMESTAMPING_TX_RECORD_MASK) {
- 		if (sockc->tsflags & SOCKCM_FLAG_TS_OPT_ID) {
- 			skb_shinfo(skb)->tskey = sockc->ts_opt_id;
- 		} else {
--			int key = atomic_add_return(key_offset, &sk->sk_tskey);
--
-+			if (sk->sk_type != SOCK_STREAM)
-+				key = atomic_inc_return(&sk->sk_tskey);
- 			skb_shinfo(skb)->tskey = key - 1;
- 		}
- 	}
+And then switch all:
+
+	kfree(s->ptr);
+
+to
+
+	s->ptr = kfree(s->ptr);
+
+Where s->ptr isn't used again.
+
+-Kees
+
+> 
+> On 4/1/25 15:44, Przemek Kitszel wrote:
+> > Add auto_kfree macro that acts as a higher level wrapper for manual
+> > __free(kfree) invocation, and sets the pointer to NULL - to have both
+> > well defined behavior also for the case code would lack other assignement.
+> > 
+> > Consider the following code:
+> > int my_foo(int arg)
+> > {
+> > 	struct my_dev_foo *foo __free(kfree); /* no assignement */
+> > 
+> > 	foo = kzalloc(sizeof(*foo), GFP_KERNEL);
+> > 	/* ... */
+> > }
+> > 
+> > So far it is fine and even optimal in terms of not assigning when
+> > not needed. But it is typical to don't touch (and sadly to don't
+> > think about) code that is not related to the change, so let's consider
+> > an extension to the above, namely an "early return" style to check
+> > arg prior to allocation:
+> > int my_foo(int arg)
+> > {
+> >         struct my_dev_foo *foo __free(kfree); /* no assignement */
+> > +
+> > +	if (!arg)
+> > +		return -EINVAL;
+> >         foo = kzalloc(sizeof(*foo), GFP_KERNEL);
+> >         /* ... */
+> > }
+> > Now we have uninitialized foo passed to kfree, what likely will crash.
+> > One could argue that `= NULL` should be added to this patch, but it is
+> > easy to forgot, especially when the foo declaration is outside of the
+> > default git context.
+> > 
+> > With new auto_kfree, we simply will start with
+> > 	struct my_dev_foo *foo auto_kfree;
+> > and be safe against future extensions.
+> > 
+> > I believe this will open up way for broader adoption of Scope Based
+> > Resource Management, say in networking.
+> > I also believe that my proposed name is special enough that it will
+> > be easy to know/spot that the assignement is hidden.
+> > 
+> > Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> > ---
+> >  include/linux/slab.h | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/include/linux/slab.h b/include/linux/slab.h
+> > index 98e07e9e9e58..b943be0ce626 100644
+> > --- a/include/linux/slab.h
+> > +++ b/include/linux/slab.h
+> > @@ -471,6 +471,7 @@ void kfree_sensitive(const void *objp);
+> >  size_t __ksize(const void *objp);
+> >  
+> >  DEFINE_FREE(kfree, void *, if (!IS_ERR_OR_NULL(_T)) kfree(_T))
+> > +#define auto_kfree __free(kfree) = NULL
+> >  DEFINE_FREE(kfree_sensitive, void *, if (_T) kfree_sensitive(_T))
+> >  
+> >  /**
+> 
+
 -- 
-2.49.0
-
+Kees Cook
 
