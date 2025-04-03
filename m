@@ -1,69 +1,63 @@
-Return-Path: <netdev+bounces-179150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86A9DA7ACB2
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:48:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83300A7ACE7
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:52:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D28607A67CB
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:45:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C7CA16BAC1
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:47:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC347283CA4;
-	Thu,  3 Apr 2025 19:08:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 793932853F8;
+	Thu,  3 Apr 2025 19:08:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cGVhSG2z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DlZjqlkV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEBDA259C82;
-	Thu,  3 Apr 2025 19:08:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ECDA2853F4;
+	Thu,  3 Apr 2025 19:08:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743707312; cv=none; b=NAJoyjrKXaP/cNIeSin5DsYvnqgYXezEsncEUzj5YKc9HzpM9epe6ziN54ut41QJ9lSsCGab+DydImgXVDFPsqhTxiqkMOfyNn/62ZtxekDG43EO9xLPPM0sq61zITpDMk9dpOKQMdWJ5dP2GzxE4L0gpzGyJg2pDeA9yudqkKM=
+	t=1743707320; cv=none; b=NuC8eGF2nnFZHVFYYg7Nw8I9jq04xHjWfwVy2xE/hDQf1gElqwT93Gt44hQF8E2xp3Wzld1rIaOh0KdipmQm0FZYYZicpqnPdeIfsYrWcQJnHsrwuB9jtfKSrIeWLobNEXL4YBAS/r6zSeI7ITST/330fFbYkgHZ+4oYwFgVvIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743707312; c=relaxed/simple;
-	bh=j4J4BeUGJ2aw/+jH4WtM/iU9xUymAcPJ4xF5NewUOTU=;
+	s=arc-20240116; t=1743707320; c=relaxed/simple;
+	bh=L5vFB5r8aMORdTeQkOD8xuBnB8C5DCukkgoxM5N73H8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qDdOeaFrxy+djDvJcjnkmS/cn6Wf4d2CbCELFiej8SdTk1T4rFTo38MrvXQL5+6/8yZNx9g3XFqV36ng4xsUKdxDGYt6O+BJ6OfP9Ws4myCQ5BMqqywBdHEyyHAelEvYCXC80yW82XsNKgFUUZd9X1cpOv69/KHK54kKbJY8dNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cGVhSG2z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACF41C4CEE3;
-	Thu,  3 Apr 2025 19:08:30 +0000 (UTC)
+	 MIME-Version; b=lBxwv9C6jMDKt+UjxUFhV5V01XSR30mtvhL48GPapzPtjuMGofEXqXSucY7hZ4rf5IV/zT0oNxclRP5L91FI4HrWnYjUj6EX+40ufARiLZAxlWGJ4AB3PKpu3l1tkf+4LTCNkcjavkecVOhkH6zD+alINSXmNBPC8I2WVQgfT6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DlZjqlkV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7DEAC4CEE3;
+	Thu,  3 Apr 2025 19:08:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743707312;
-	bh=j4J4BeUGJ2aw/+jH4WtM/iU9xUymAcPJ4xF5NewUOTU=;
+	s=k20201202; t=1743707320;
+	bh=L5vFB5r8aMORdTeQkOD8xuBnB8C5DCukkgoxM5N73H8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cGVhSG2z9nbJRMmozfmWaL/1Bjmk4tIxtP2/pBJHRUTZSklZZ+fRy/7Dqt0LPvH2E
-	 wAMrcKjU/RC81iu4E0pFH0QrYTWsdcFf53RtH8cDYC8ROxFSkoxiT2tYX7Yry937cI
-	 t4iho7oDyglFXri+Vv1X8s5gay9AbAZS3Nwr1W2A6Dm7FySDOVQdCiUyEyzsDIEShh
-	 TuM8f0mb6a9Yhjv8X9tLYNvO+xMU+VZU3/XfsDZsCSy+Gi3eI3ZbzWAhk4GAuOuCo1
-	 SluxqcN+PrLT3DT809d/yHXV+b5bg0loiwvY2cwlpqxENEcsmd+Q6ds3j1D0jhEwIR
-	 wD8nopnqOcgHg==
+	b=DlZjqlkVo+Mo++jPzsU3CCDynad4OOPI5i8UpMiw6F2TmsbpTGAsNkCSdDcXbc5uX
+	 6rGqQ/IYVdZ9PDzKGFVvywHlmRnKMqNW/qLFPp2NnR/eh1AGcwQUdJAuZ4j53SVOUg
+	 mNwVEbna8yfEfUzWuVNNhcKkpbeIdbXX+I/GRymAeSACEv5E5+uHxOTn/ObtcUhaPq
+	 eBQvJ9PY45COMrCgIZ27nX9XVi9WC0wXow1+IbfxdB6heun+Ms+VbnPfv4OmCEYtQs
+	 0fw7Ie5I7d1hK7D0wMLGpR8DHlvd9HYwVGZ9wK8FqiGqRLfRynJl4QALS8fNQe3/1Z
+	 0vwMihPpyfl/w==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Philipp Hahn <phahn-oss@avm.de>,
-	Leon Schuermann <leon@is.currently.online>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Oliver Neukum <oliver@neukum.org>,
-	netdev@vger.kernel.org,
-	Kory Maincent <kory.maincent@bootlin.com>,
+Cc: Stanislav Fomichev <sdf@fomichev.me>,
+	syzbot+b0c03d76056ef6cd12a6@syzkaller.appspotmail.com,
+	Simon Horman <horms@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	hayeswang@realtek.com,
-	dianders@chromium.org,
-	horms@kernel.org,
-	ste3ls@gmail.com,
-	olek2@wp.pl,
-	linux-usb@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 20/26] cdc_ether|r8152: ThinkPad Hybrid USB-C/A Dock quirk
-Date: Thu,  3 Apr 2025 15:07:39 -0400
-Message-Id: <20250403190745.2677620-20-sashal@kernel.org>
+	kuba@kernel.org,
+	aleksander.lobakin@intel.com,
+	kory.maincent@bootlin.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.6 23/26] net: vlan: don't propagate flags on open
+Date: Thu,  3 Apr 2025 15:07:42 -0400
+Message-Id: <20250403190745.2677620-23-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250403190745.2677620-1-sashal@kernel.org>
 References: <20250403190745.2677620-1-sashal@kernel.org>
@@ -78,113 +72,180 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.85
 Content-Transfer-Encoding: 8bit
 
-From: Philipp Hahn <phahn-oss@avm.de>
+From: Stanislav Fomichev <sdf@fomichev.me>
 
-[ Upstream commit a07f23ad9baf716cbf7746e452c92960536ceae6 ]
+[ Upstream commit 27b918007d96402aba10ed52a6af8015230f1793 ]
 
-Lenovo ThinkPad Hybrid USB-C with USB-A Dock (17ef:a359) is affected by
-the same problem as the Lenovo Powered USB-C Travel Hub (17ef:721e):
-Both are based on the Realtek RTL8153B chip used to use the cdc_ether
-driver. However, using this driver, with the system suspended the device
-constantly sends pause-frames as soon as the receive buffer fills up.
-This causes issues with other devices, where some Ethernet switches stop
-forwarding packets altogether.
+With the device instance lock, there is now a possibility of a deadlock:
 
-Using the Realtek driver (r8152) fixes this issue. Pause frames are no
-longer sent while the host system is suspended.
+[    1.211455] ============================================
+[    1.211571] WARNING: possible recursive locking detected
+[    1.211687] 6.14.0-rc5-01215-g032756b4ca7a-dirty #5 Not tainted
+[    1.211823] --------------------------------------------
+[    1.211936] ip/184 is trying to acquire lock:
+[    1.212032] ffff8881024a4c30 (&dev->lock){+.+.}-{4:4}, at: dev_set_allmulti+0x4e/0xb0
+[    1.212207]
+[    1.212207] but task is already holding lock:
+[    1.212332] ffff8881024a4c30 (&dev->lock){+.+.}-{4:4}, at: dev_open+0x50/0xb0
+[    1.212487]
+[    1.212487] other info that might help us debug this:
+[    1.212626]  Possible unsafe locking scenario:
+[    1.212626]
+[    1.212751]        CPU0
+[    1.212815]        ----
+[    1.212871]   lock(&dev->lock);
+[    1.212944]   lock(&dev->lock);
+[    1.213016]
+[    1.213016]  *** DEADLOCK ***
+[    1.213016]
+[    1.213143]  May be due to missing lock nesting notation
+[    1.213143]
+[    1.213294] 3 locks held by ip/184:
+[    1.213371]  #0: ffffffff838b53e0 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock+0x1b/0xa0
+[    1.213543]  #1: ffffffff84e5fc70 (&net->rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock+0x37/0xa0
+[    1.213727]  #2: ffff8881024a4c30 (&dev->lock){+.+.}-{4:4}, at: dev_open+0x50/0xb0
+[    1.213895]
+[    1.213895] stack backtrace:
+[    1.213991] CPU: 0 UID: 0 PID: 184 Comm: ip Not tainted 6.14.0-rc5-01215-g032756b4ca7a-dirty #5
+[    1.213993] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.3-1-1 04/01/2014
+[    1.213994] Call Trace:
+[    1.213995]  <TASK>
+[    1.213996]  dump_stack_lvl+0x8e/0xd0
+[    1.214000]  print_deadlock_bug+0x28b/0x2a0
+[    1.214020]  lock_acquire+0xea/0x2a0
+[    1.214027]  __mutex_lock+0xbf/0xd40
+[    1.214038]  dev_set_allmulti+0x4e/0xb0 # real_dev->flags & IFF_ALLMULTI
+[    1.214040]  vlan_dev_open+0xa5/0x170 # ndo_open on vlandev
+[    1.214042]  __dev_open+0x145/0x270
+[    1.214046]  __dev_change_flags+0xb0/0x1e0
+[    1.214051]  netif_change_flags+0x22/0x60 # IFF_UP vlandev
+[    1.214053]  dev_change_flags+0x61/0xb0 # for each device in group from dev->vlan_info
+[    1.214055]  vlan_device_event+0x766/0x7c0 # on netdevsim0
+[    1.214058]  notifier_call_chain+0x78/0x120
+[    1.214062]  netif_open+0x6d/0x90
+[    1.214064]  dev_open+0x5b/0xb0 # locks netdevsim0
+[    1.214066]  bond_enslave+0x64c/0x1230
+[    1.214075]  do_set_master+0x175/0x1e0 # on netdevsim0
+[    1.214077]  do_setlink+0x516/0x13b0
+[    1.214094]  rtnl_newlink+0xaba/0xb80
+[    1.214132]  rtnetlink_rcv_msg+0x440/0x490
+[    1.214144]  netlink_rcv_skb+0xeb/0x120
+[    1.214150]  netlink_unicast+0x1f9/0x320
+[    1.214153]  netlink_sendmsg+0x346/0x3f0
+[    1.214157]  __sock_sendmsg+0x86/0xb0
+[    1.214160]  ____sys_sendmsg+0x1c8/0x220
+[    1.214164]  ___sys_sendmsg+0x28f/0x2d0
+[    1.214179]  __x64_sys_sendmsg+0xef/0x140
+[    1.214184]  do_syscall_64+0xec/0x1d0
+[    1.214190]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+[    1.214191] RIP: 0033:0x7f2d1b4a7e56
 
-Cc: Leon Schuermann <leon@is.currently.online>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Oliver Neukum <oliver@neukum.org> (maintainer:USB CDC ETHERNET DRIVER)
-Cc: netdev@vger.kernel.org (open list:NETWORKING DRIVERS)
-Link: https://git.kernel.org/netdev/net/c/cb82a54904a9
-Link: https://git.kernel.org/netdev/net/c/2284bbd0cf39
-Link: https://www.lenovo.com/de/de/p/accessories-and-software/docking/docking-usb-docks/40af0135eu
-Signed-off-by: Philipp Hahn <phahn-oss@avm.de>
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
-Link: https://patch.msgid.link/484336aad52d14ccf061b535bc19ef6396ef5120.1741601523.git.p.hahn@avm.de
+Device setup:
+
+     netdevsim0 (down)
+     ^        ^
+  bond        netdevsim1.100@netdevsim1 allmulticast=on (down)
+
+When we enslave the lower device (netdevsim0) which has a vlan, we
+propagate vlan's allmuti/promisc flags during ndo_open. This causes
+(re)locking on of the real_dev.
+
+Propagate allmulti/promisc on flags change, not on the open. There
+is a slight semantics change that vlans that are down now propagate
+the flags, but this seems unlikely to result in the real issues.
+
+Reproducer:
+
+  echo 0 1 > /sys/bus/netdevsim/new_device
+
+  dev_path=$(ls -d /sys/bus/netdevsim/devices/netdevsim0/net/*)
+  dev=$(echo $dev_path | rev | cut -d/ -f1 | rev)
+
+  ip link set dev $dev name netdevsim0
+  ip link set dev netdevsim0 up
+
+  ip link add link netdevsim0 name netdevsim0.100 type vlan id 100
+  ip link set dev netdevsim0.100 allmulticast on down
+  ip link add name bond1 type bond mode 802.3ad
+  ip link set dev netdevsim0 down
+  ip link set dev netdevsim0 master bond1
+  ip link set dev bond1 up
+  ip link show
+
+Reported-by: syzbot+b0c03d76056ef6cd12a6@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/Z9CfXjLMKn6VLG5d@mini-arch/T/#m15ba130f53227c883e79fb969687d69d670337a0
+Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Link: https://patch.msgid.link/20250313100657.2287455-1-sdf@fomichev.me
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/usb/cdc_ether.c | 7 +++++++
- drivers/net/usb/r8152.c     | 6 ++++++
- drivers/net/usb/r8153_ecm.c | 6 ++++++
- 3 files changed, 19 insertions(+)
+ net/8021q/vlan_dev.c | 31 ++++---------------------------
+ 1 file changed, 4 insertions(+), 27 deletions(-)
 
-diff --git a/drivers/net/usb/cdc_ether.c b/drivers/net/usb/cdc_ether.c
-index 6d61052353f07..a04f758b3ba07 100644
---- a/drivers/net/usb/cdc_ether.c
-+++ b/drivers/net/usb/cdc_ether.c
-@@ -782,6 +782,13 @@ static const struct usb_device_id	products[] = {
- 	.driver_info = 0,
- },
+diff --git a/net/8021q/vlan_dev.c b/net/8021q/vlan_dev.c
+index 2a7f1b15714ab..e9326f322d7a2 100644
+--- a/net/8021q/vlan_dev.c
++++ b/net/8021q/vlan_dev.c
+@@ -273,17 +273,6 @@ static int vlan_dev_open(struct net_device *dev)
+ 			goto out;
+ 	}
  
-+/* Lenovo ThinkPad Hybrid USB-C with USB-A Dock (40af0135eu, based on Realtek RTL8153) */
-+{
-+	USB_DEVICE_AND_INTERFACE_INFO(LENOVO_VENDOR_ID, 0xa359, USB_CLASS_COMM,
-+			USB_CDC_SUBCLASS_ETHERNET, USB_CDC_PROTO_NONE),
-+	.driver_info = 0,
-+},
-+
- /* Aquantia AQtion USB to 5GbE Controller (based on AQC111U) */
+-	if (dev->flags & IFF_ALLMULTI) {
+-		err = dev_set_allmulti(real_dev, 1);
+-		if (err < 0)
+-			goto del_unicast;
+-	}
+-	if (dev->flags & IFF_PROMISC) {
+-		err = dev_set_promiscuity(real_dev, 1);
+-		if (err < 0)
+-			goto clear_allmulti;
+-	}
+-
+ 	ether_addr_copy(vlan->real_dev_addr, real_dev->dev_addr);
+ 
+ 	if (vlan->flags & VLAN_FLAG_GVRP)
+@@ -297,12 +286,6 @@ static int vlan_dev_open(struct net_device *dev)
+ 		netif_carrier_on(dev);
+ 	return 0;
+ 
+-clear_allmulti:
+-	if (dev->flags & IFF_ALLMULTI)
+-		dev_set_allmulti(real_dev, -1);
+-del_unicast:
+-	if (!ether_addr_equal(dev->dev_addr, real_dev->dev_addr))
+-		dev_uc_del(real_dev, dev->dev_addr);
+ out:
+ 	netif_carrier_off(dev);
+ 	return err;
+@@ -315,10 +298,6 @@ static int vlan_dev_stop(struct net_device *dev)
+ 
+ 	dev_mc_unsync(real_dev, dev);
+ 	dev_uc_unsync(real_dev, dev);
+-	if (dev->flags & IFF_ALLMULTI)
+-		dev_set_allmulti(real_dev, -1);
+-	if (dev->flags & IFF_PROMISC)
+-		dev_set_promiscuity(real_dev, -1);
+ 
+ 	if (!ether_addr_equal(dev->dev_addr, real_dev->dev_addr))
+ 		dev_uc_del(real_dev, dev->dev_addr);
+@@ -490,12 +469,10 @@ static void vlan_dev_change_rx_flags(struct net_device *dev, int change)
  {
- 	USB_DEVICE_AND_INTERFACE_INFO(AQUANTIA_VENDOR_ID, 0xc101,
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index 3e5998555f981..bbcefcc7ef8f0 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -784,6 +784,7 @@ enum rtl8152_flags {
- #define DEVICE_ID_THINKPAD_USB_C_DONGLE			0x720c
- #define DEVICE_ID_THINKPAD_USB_C_DOCK_GEN2		0xa387
- #define DEVICE_ID_THINKPAD_USB_C_DOCK_GEN3		0x3062
-+#define DEVICE_ID_THINKPAD_HYBRID_USB_C_DOCK		0xa359
+ 	struct net_device *real_dev = vlan_dev_priv(dev)->real_dev;
  
- struct tally_counter {
- 	__le64	tx_packets;
-@@ -9734,6 +9735,7 @@ static bool rtl8152_supports_lenovo_macpassthru(struct usb_device *udev)
- 		case DEVICE_ID_THINKPAD_USB_C_DOCK_GEN2:
- 		case DEVICE_ID_THINKPAD_USB_C_DOCK_GEN3:
- 		case DEVICE_ID_THINKPAD_USB_C_DONGLE:
-+		case DEVICE_ID_THINKPAD_HYBRID_USB_C_DOCK:
- 			return 1;
- 		}
- 	} else if (vendor_id == VENDOR_ID_REALTEK && parent_vendor_id == VENDOR_ID_LENOVO) {
-@@ -10011,6 +10013,8 @@ static const struct usb_device_id rtl8152_table[] = {
- 	{ USB_DEVICE(VENDOR_ID_MICROSOFT, 0x0927) },
- 	{ USB_DEVICE(VENDOR_ID_MICROSOFT, 0x0c5e) },
- 	{ USB_DEVICE(VENDOR_ID_SAMSUNG, 0xa101) },
-+
-+	/* Lenovo */
- 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x304f) },
- 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x3054) },
- 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x3062) },
-@@ -10021,7 +10025,9 @@ static const struct usb_device_id rtl8152_table[] = {
- 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x720c) },
- 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x7214) },
- 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x721e) },
-+	{ USB_DEVICE(VENDOR_ID_LENOVO,  0xa359) },
- 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0xa387) },
-+
- 	{ USB_DEVICE(VENDOR_ID_LINKSYS, 0x0041) },
- 	{ USB_DEVICE(VENDOR_ID_NVIDIA,  0x09ff) },
- 	{ USB_DEVICE(VENDOR_ID_TPLINK,  0x0601) },
-diff --git a/drivers/net/usb/r8153_ecm.c b/drivers/net/usb/r8153_ecm.c
-index 20b2df8d74ae1..8d860dacdf49b 100644
---- a/drivers/net/usb/r8153_ecm.c
-+++ b/drivers/net/usb/r8153_ecm.c
-@@ -135,6 +135,12 @@ static const struct usb_device_id products[] = {
- 				      USB_CDC_SUBCLASS_ETHERNET, USB_CDC_PROTO_NONE),
- 	.driver_info = (unsigned long)&r8153_info,
- },
-+/* Lenovo ThinkPad Hybrid USB-C with USB-A Dock (40af0135eu, based on Realtek RTL8153) */
-+{
-+	USB_DEVICE_AND_INTERFACE_INFO(VENDOR_ID_LENOVO, 0xa359, USB_CLASS_COMM,
-+				      USB_CDC_SUBCLASS_ETHERNET, USB_CDC_PROTO_NONE),
-+	.driver_info = (unsigned long)&r8153_info,
-+},
+-	if (dev->flags & IFF_UP) {
+-		if (change & IFF_ALLMULTI)
+-			dev_set_allmulti(real_dev, dev->flags & IFF_ALLMULTI ? 1 : -1);
+-		if (change & IFF_PROMISC)
+-			dev_set_promiscuity(real_dev, dev->flags & IFF_PROMISC ? 1 : -1);
+-	}
++	if (change & IFF_ALLMULTI)
++		dev_set_allmulti(real_dev, dev->flags & IFF_ALLMULTI ? 1 : -1);
++	if (change & IFF_PROMISC)
++		dev_set_promiscuity(real_dev, dev->flags & IFF_PROMISC ? 1 : -1);
+ }
  
- 	{ },		/* END */
- };
+ static void vlan_dev_set_rx_mode(struct net_device *vlan_dev)
 -- 
 2.39.5
 
