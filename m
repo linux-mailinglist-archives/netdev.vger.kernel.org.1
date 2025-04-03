@@ -1,138 +1,229 @@
-Return-Path: <netdev+bounces-179058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D564DA7A490
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 16:05:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FF4BA7A489
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 16:03:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25D113A51A1
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 14:02:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EEE27A5DCE
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 14:02:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68A7824E4AC;
-	Thu,  3 Apr 2025 14:02:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E214324EAB9;
+	Thu,  3 Apr 2025 14:03:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O169bmn9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a20IpYlO"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68709433D1
-	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 14:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71473433D1
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 14:03:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743688964; cv=none; b=V9k4LLLg4BZJLeBbeun9uHnQDtwCRLIMkmHXhNmh3VNJ+NQ/tlqVmmQ8MY57Lds6x5I+OMccWEn/SlxyEbePCTt7KWBB4b6uPkV/hJsskRaGVr1L4ZZhA1blBNoSOeUU2Olp6CYgeOSxIjiY98fdQaICV9wzfaA/fMpe2o11vAU=
+	t=1743688996; cv=none; b=BKQwtWJ+LYQL0ObYmd+DB16o/M+X12AmpIKLHR0jMLmOZs/ZQy4sN7mm+KyjOtIb5xNZx2dHZPIsDRWnUQ/8c3foxK0BaNrnNHdW4Ho6EDvAOgMu10m/ZVKEj8olt38AP18HT4/FsdS+ot3HaJWsJUMWL1YE9IJx1msn6ZLoalg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743688964; c=relaxed/simple;
-	bh=S2I5uMGMmzaswrHxMNr8vYNfkMq3kEcFyspItbcpvic=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uqmucMEjukyCXsLbTnZ9ywWuvP377+HsUtfg4El0h5Im7dqjs8fSvgxZGdG/amANw5SmzT4rk8WF/zw9/z/I10Dl+OoTR26S+h05fKGYIk+uu0unZqG2lDnUVJ1xQzemwryHO7ArE7B6866bG4Qxq2bNEqPqjf4CacAQ9WtvLIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O169bmn9; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1743688996; c=relaxed/simple;
+	bh=PLIry9I5MN5+p97bRNx+HoFhgLJY0z5+1qZUMALAcao=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AbBcaL+z4FJNrtn/WOPH1Ys+r8doM4M1efWk3h8hT0E9AC60+rxeoFqUaetzjczUXNMSSpyWNrVc0Gl0f23wxb1ICw7zmwZqFmYQREs8i/eL36Kh1sNwu7CZNjiNBsBmsagsc4XxxuRNp97F6vLJuToN2Yzq1OChsah80V/KGvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a20IpYlO; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743688961;
+	s=mimecast20190719; t=1743688993;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=3kWqXe38cLRXw8rlot99ne3jbC4BOsP79Qw7Xj1goMU=;
-	b=O169bmn9WDd1eI+syv3gii335dHdmeatx75fCdAhPxn135p7WbKOa6CYwEHsJfGE+1Znlv
-	JR8nM7J7DSrMcOlGFbFGxX6v85SZ92OVDDPsG6DySbIYVAzv/Oa+Jk0U/l5NCeTApaEn4H
-	uKWsykX9fglGCsI4dB5TcY4cOsiV6vY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=4WBThcQneZqddzRwqfMjSBi+IuLp0YfEk4vsedSbljI=;
+	b=a20IpYlOYoAi1Bm0ivLJPA0bn6fi3hUVpfwjekn3s/Z5YiEKc0EF8xZWHcM32g+6di5FDB
+	60JQBZi6L4wkZTer0wOHkd5kPQVO58g7GsMHhpVOKXLiTKmsTqI1kqVIVWC+1QUFjocQHx
+	6eEVGxq05QoMlosKDSxKowGq4eUJqMY=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-451-bsODjmkjMMyFfbl-rkS3oQ-1; Thu, 03 Apr 2025 10:02:40 -0400
-X-MC-Unique: bsODjmkjMMyFfbl-rkS3oQ-1
-X-Mimecast-MFC-AGG-ID: bsODjmkjMMyFfbl-rkS3oQ_1743688956
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43ce245c5acso11135875e9.2
-        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 07:02:37 -0700 (PDT)
+ us-mta-39-9rmqNNd1PlObhdYDK1xiaA-1; Thu, 03 Apr 2025 10:03:11 -0400
+X-MC-Unique: 9rmqNNd1PlObhdYDK1xiaA-1
+X-Mimecast-MFC-AGG-ID: 9rmqNNd1PlObhdYDK1xiaA_1743688990
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3912fe32a30so478970f8f.1
+        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 07:03:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743688956; x=1744293756;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1743688990; x=1744293790;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3kWqXe38cLRXw8rlot99ne3jbC4BOsP79Qw7Xj1goMU=;
-        b=RmbQxuqoSFSwRlmTyfKp8NImhbJH9SYviCRUvhXE6F6PvbNzz3ohuGH900wCKscuPP
-         boZefxDVvSc5J0NIzcKNXwZwJZTivWTmNn3MgPkouHOOEPMkCtAcnulXH5OPAYGaEh9C
-         JBQ0ViNOHNWzgnSBVurUGCrTW10sCGv87iT/LAVke9mEaK5Qgfc+ZvXoLsVnOYqcam62
-         3wNJBxFZxYxwXN7qUETWqq/ALXO3Ir0P+TPpVGMiJcP0z77YdXS4vTQomaOZHblRrC5T
-         TT9SO1w5zFQ5ygVQ2PjNYluLSUAhBL+aj5k34Jlti7PcTZXMYY4fBf1FoBaasuDMHbjg
-         EX8w==
-X-Forwarded-Encrypted: i=1; AJvYcCX5hhU5CI1zeGPbY8JOmZ6t/q8ilPe8a3nToGJbyW9J7nKO6UDn06rqijuN7y+kZjdiBM5d7Nc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwuBGyTZxMw+pJ48Tkhw6zpZHoxNIWAnCM0K6k7/um2luByftVP
-	dhIFhELTXZ5HhRf5O4AhyKoH8bXrwaiH0GIzw26R305zVDwgvCe/HIlm6x/ryJpdu1UuN9kprqQ
-	8rMgZCOhXNFftkgFyfp156+Lmfbof6+1tk+ilFXIsP9WII02qykinxQ==
-X-Gm-Gg: ASbGncsX1PqeyUUfpcWhdlNvNWKj94pPmlbWBbW7FYbmDy/MGfIZtsxZIn0ut4V+oOl
-	teL+Mrx5bbCfiuBzsuotuFhNF8YlfowhpPDHSxAlDfmh9ksAU6fLIWtskfKFXy4FKD2XrLqKA1Q
-	EORqmKcWsQJpjM2pDllHYEmUqJ84HLFC9Ik8Y2odWkX/GZBjucIfLUSPAx2AuiZWscR4GEj2DNL
-	UVVrfh+2r5esioYy2fh+E8yTzb7Vzl3wTTweRVF9C8ba0G3WaB9kz1p/IlvCeEwGZAYromN9TF2
-	h9J2ghiI+TizZYsrm6ZXMFKXI9RJ7AoNjwtYZRKkB33cww==
-X-Received: by 2002:a05:600c:1e0d:b0:43d:2313:7b54 with SMTP id 5b1f17b1804b1-43db61d78c9mr209456395e9.3.1743688956067;
-        Thu, 03 Apr 2025 07:02:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHEcH3URdYpyXxENBkWaOZCl6SCATd9gstr45DnynhqDGmUUru1LNLrjf8EszoAacInIZ8pkg==
-X-Received: by 2002:a05:600c:1e0d:b0:43d:2313:7b54 with SMTP id 5b1f17b1804b1-43db61d78c9mr209455765e9.3.1743688955644;
-        Thu, 03 Apr 2025 07:02:35 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-68-231.dyn.eolo.it. [146.241.68.231])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ea978378esm51169005e9.1.2025.04.03.07.02.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Apr 2025 07:02:35 -0700 (PDT)
-Message-ID: <d99b52d7-bdd7-4c67-9be5-f5c48edc8afa@redhat.com>
-Date: Thu, 3 Apr 2025 16:02:33 +0200
+        bh=4WBThcQneZqddzRwqfMjSBi+IuLp0YfEk4vsedSbljI=;
+        b=ST2IH0xP1WuKRsXPUf7lIBA/H4jgK6Ra0F6WtCajWgCUQCwFuoQXu2vXc/cO5T+5nB
+         VITnK5ituQkQD4bfHbwZ5M9NRDekZr6WmGPApqfSxte0UshkD8sNbU7WMWZwP0sdYiHj
+         21vygT+yFdKeJ5lbB3QV+dBswI6VKZPSzFoMZZzIeR9WOg74TnLZhGJgE56qivEzwi3W
+         QjgcuQIWIY4vUH18h+g2Kc56FNCGhFJ14PCI0ssvFJd+hsp7oK2Kg4d+u8/y3UwZlZYo
+         fo5dQ6eLiRkcZYT1QCuxfQkgWik6FT2p54ps4iFLLpZ7zcdiqm+22bLSggttg9hGc8kF
+         5INw==
+X-Forwarded-Encrypted: i=1; AJvYcCVRwLeQrdtt3l6HsQx36BwRu8bgkQt81Uy0L4paFN9W/Pfu36YZxFtnPVE66zhbGs+tVVXJowQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKGOJgCdP6ma4B+HC1qGLthjTQ8KpCLLx7JdscHPftleCJM6De
+	WxIEeCxJGl83E5699wEj0cV+WAYYOyaKAn0cJ47pSJD8kaHZu0E7/nZ8M6iDU5LLj3m0IsZs5uo
+	Q5heweYpugOKjwAiMuIzpAw0heOI8elWOgTSHxT9wPhwcp6FiUjkvgg==
+X-Gm-Gg: ASbGncvJeUD1FK9f4C4O65h4MRf2w/lIflCauZu1sEVdWhDykvwSjhY8XoVvi6TfZR7
+	pSPBrC2Ldt28LMzXMyP3mrXN6a4FShAr/GDv992/4QEv4RAwnn7hFLexjvtIIWckljSxav8xWHL
+	C7xLj3o5wse4/Iny2ZilFUKyvLq6/AvZK/UtxZoCGwXSJmCBwC9+XlchdWPt/ElhR+lPD3L5Pch
+	rYnGkyxQfSPjha5OnrlL0vavkPmU8mWDzi9RW3Pw++G3YNqGgC/DlSKxm86USji/wZ7OFkRNTNb
+	2vAtYDFekQ==
+X-Received: by 2002:a05:6000:250e:b0:391:39fb:59c8 with SMTP id ffacd0b85a97d-39c30338008mr2275600f8f.25.1743688990040;
+        Thu, 03 Apr 2025 07:03:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHC2+/8ybqHkABA5XplMD4M48h+miairALBzMuE16io0YC/ba6y7OVR2eUT30wn6NDVL3wRjQ==
+X-Received: by 2002:a05:6000:250e:b0:391:39fb:59c8 with SMTP id ffacd0b85a97d-39c30338008mr2275550f8f.25.1743688989617;
+        Thu, 03 Apr 2025 07:03:09 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ea9a88b70sm44441485e9.3.2025.04.03.07.03.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Apr 2025 07:03:09 -0700 (PDT)
+Date: Thu, 3 Apr 2025 10:03:06 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Markus Fohrer <markus.fohrer@webked.de>
+Cc: virtualization@lists.linux-foundation.org, jasowang@redhat.com,
+	davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [REGRESSION] Massive virtio-net throughput drop in guest VM with
+ Linux 6.8+
+Message-ID: <20250403100206-mutt-send-email-mst@kernel.org>
+References: <1d388413ab9cfd765cd2c5e05b5e69cdb2ec5a10.camel@webked.de>
+ <20250403090001-mutt-send-email-mst@kernel.org>
+ <f8909f5bbc2532ea234cdaa8dbdb46a48249803f.camel@webked.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] bonding: use permanent address for MAC swapping if
- device address is same
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>,
- Simon Horman <horms@kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>,
- linux-kernel@vger.kernel.org, Liang Li <liali@redhat.com>
-References: <20250319080947.2001-1-liuhangbin@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250319080947.2001-1-liuhangbin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f8909f5bbc2532ea234cdaa8dbdb46a48249803f.camel@webked.de>
 
-On 3/19/25 9:09 AM, Hangbin Liu wrote:
-> Similar with a951bc1e6ba5 ("bonding: correct the MAC address for "follow"
-> fail_over_mac policy"). The fail_over_mac follow mode requires the formerly
-> active slave to swap MAC addresses with the newly active slave during
-> failover. However, the slave's MAC address can be same under certain
-> conditions:
+On Thu, Apr 03, 2025 at 03:51:01PM +0200, Markus Fohrer wrote:
+> Am Donnerstag, dem 03.04.2025 um 09:04 -0400 schrieb Michael S.
+> Tsirkin:
+> > On Wed, Apr 02, 2025 at 11:12:07PM +0200, Markus Fohrer wrote:
+> > > Hi,
+> > > 
+> > > I'm observing a significant performance regression in KVM guest VMs
+> > > using virtio-net with recent Linux kernels (6.8.1+ and 6.14).
+> > > 
+> > > When running on a host system equipped with a Broadcom NetXtreme-E
+> > > (bnxt_en) NIC and AMD EPYC CPUs, the network throughput in the
+> > > guest drops to 100–200 KB/s. The same guest configuration performs
+> > > normally (~100 MB/s) when using kernel 6.8.0 or when the VM is
+> > > moved to a host with Intel NICs.
+> > > 
+> > > Test environment:
+> > > - Host: QEMU/KVM, Linux 6.8.1 and 6.14.0
+> > > - Guest: Linux with virtio-net interface
+> > > - NIC: Broadcom BCM57416 (bnxt_en driver, no issues at host level)
+> > > - CPU: AMD EPYC
+> > > - Storage: virtio-scsi
+> > > - VM network: virtio-net, virtio-scsi (no CPU or IO bottlenecks)
+> > > - Traffic test: iperf3, scp, wget consistently slow in guest
+> > > 
+> > > This issue is not present:
+> > > - On 6.8.0 
+> > > - On hosts with Intel NICs (same VM config)
+> > > 
+> > > I have bisected the issue to the following upstream commit:
+> > > 
+> > >   49d14b54a527 ("virtio-net: Suppress tx timeout warning for small
+> > > tx")
+> > >   https://git.kernel.org/linus/49d14b54a527
+> > 
+> > Thanks a lot for the info!
+> > 
+> > 
+> > both the link and commit point at:
+> > 
+> > commit 49d14b54a527289d09a9480f214b8c586322310a
+> > Author: Eric Dumazet <edumazet@google.com>
+> > Date:   Thu Sep 26 16:58:36 2024 +0000
+> > 
+> >     net: test for not too small csum_start in virtio_net_hdr_to_skb()
+> >     
+> > 
+> > is this what you mean?
+> > 
+> > I don't know which commit is "virtio-net: Suppress tx timeout warning
+> > for small tx"
+> > 
+> > 
+> > 
+> > > Reverting this commit restores normal network performance in
+> > > affected guest VMs.
+> > > 
+> > > I’m happy to provide more data or assist with testing a potential
+> > > fix.
+> > > 
+> > > Thanks,
+> > > Markus Fohrer
+> > 
+> > 
+> > Thanks! First I think it's worth checking what is the setup, e.g.
+> > which offloads are enabled.
+> > Besides that, I'd start by seeing what's doing on. Assuming I'm right
+> > about
+> > Eric's patch:
+> > 
+> > diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+> > index 276ca543ef44d8..02a9f4dc594d02 100644
+> > --- a/include/linux/virtio_net.h
+> > +++ b/include/linux/virtio_net.h
+> > @@ -103,8 +103,10 @@ static inline int virtio_net_hdr_to_skb(struct
+> > sk_buff *skb,
+> >  
+> >  		if (!skb_partial_csum_set(skb, start, off))
+> >  			return -EINVAL;
+> > +		if (skb_transport_offset(skb) < nh_min_len)
+> > +			return -EINVAL;
+> >  
+> > -		nh_min_len = max_t(u32, nh_min_len,
+> > skb_transport_offset(skb));
+> > +		nh_min_len = skb_transport_offset(skb);
+> >  		p_off = nh_min_len + thlen;
+> >  		if (!pskb_may_pull(skb, p_off))
+> >  			return -EINVAL;
+> > 
+> > 
+> > sticking a printk before return -EINVAL to show the offset and
+> > nh_min_len
+> > would be a good 1st step. Thanks!
+> > 
 > 
-> 1) ip link set eth0 master bond0
->    bond0 adopts eth0's MAC address (MAC0).
 > 
-> 1) ip link set eth1 master bond0
->    eth1 is added as a backup with its own MAC (MAC1).
+> Hi Eric,
 > 
-> 3) ip link set eth0 nomaster
->    eth0 is released and restores its MAC (MAC0).
->    eth1 becomes the active slave, and bond0 assigns MAC0 to eth1.
+> thanks a lot for the quick response — and yes, you're absolutely right.
+> 
+> Apologies for the confusion: I mistakenly wrote the wrong commit
+> description in my initial mail.
+> 
+> The correct commit is indeed:
+> 
+> commit 49d14b54a527289d09a9480f214b8c586322310a
+> Author: Eric Dumazet <edumazet@google.com>
+> Date:   Thu Sep 26 16:58:36 2024 +0000
+> 
+>     net: test for not too small csum_start in virtio_net_hdr_to_skb()
+> 
+> This is the one I bisected and which causes the performance regression
+> in my environment.
+> 
+> Thanks again,
+> Markus
 
-It was not immediately clear to me that the mac-dance in the code below
-happens only at failover time.
 
-I second Jakub's doubt, I think it would be better to change eth0 mac
-address here (possibly to permanent eth1 mac, to preserve some consistency?)
+I'm not Eric but good to know.
+Alright, so I would start with the two items: device features and
+printk.
 
-Doing that in ndo_del_slave() should allow bonding to change the mac
-while still owning the old slave and avoid races with user-space.
-
-WDYT?
-
-Thanks,
-
-Paolo
+-- 
+MST
 
 
