@@ -1,126 +1,155 @@
-Return-Path: <netdev+bounces-179172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1576A7B06D
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 23:17:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7BC3A7B067
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 23:16:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60EE8171BE4
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:11:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33AD97A673B
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:14:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34FED1FECD9;
-	Thu,  3 Apr 2025 20:35:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30E992E62D8;
+	Thu,  3 Apr 2025 20:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OS2Df7Ja"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cMkY1rnL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6097A1FECBA;
-	Thu,  3 Apr 2025 20:35:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81F4610B
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 20:51:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743712525; cv=none; b=NBoXhQkMW1zWsSs2qVT7wTW1pdAHsO1ocIUSli9D6VcHLf0PWXldggkcR1/U7HgsYqGRuf0jvi/o9hOBIaBHcWMSgyBbZqcckcvmzJv/4n82w7x1uolTNnKH/7/6xJyCmlJcWL5ZHfV5rHCpa1PA+XT2/T7RLw8Z9PrP+ewibQ8=
+	t=1743713520; cv=none; b=GLOjEvieC5AWTG6dMkW3n7GAQgbM99RwZcMleOJxT24vv5maEOSaQzK38xptX8Dmrp2dkKl7sMWDRQD3Spd+94QK+E0zOCMzlJJxDTSgtYYvJ9DeGlJnr9hkcreKaRXr0R35ynyaEBSIMZN7eANr3rIZu4GxX+qBJpeboBNEttA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743712525; c=relaxed/simple;
-	bh=/Wr+De8aYTAPyPrxtzWeHutGqhqMA3Y8gKZr6gv9Nyk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PzLmIUzPraS4LkqtiY1DeirhXUIz+q2BDh7tnymMM0bsRWPWYTI6bZNLzG8/kRAbgjlH7DEBQisPjbtr/6h1ksb7jfIN/VcO07ivjrSd9m3Fj/nSFUjj4lxKpEQHYflALAXySXvTURDl0+66fRb3W5B8abOiKuHbWiQvQBz6B+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OS2Df7Ja; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43cebe06e9eso8640165e9.3;
-        Thu, 03 Apr 2025 13:35:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743712521; x=1744317321; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/Wr+De8aYTAPyPrxtzWeHutGqhqMA3Y8gKZr6gv9Nyk=;
-        b=OS2Df7JajUg7XB3wpMMyYZWCYzFxK1TFTeew1CsOlefwdjQFc0vjiNXf3rUBjoVPQU
-         jCi8J+nne1iADvo0TYwgKREbWRTI0a8RqyJu3D5lYV2UyEIM06VemIPsrkGVtxcRZ+JL
-         b9YQ1ItC5oc9nkwjcq8f34Hq19ejKGWfsW4PUOjR78ks7F96454yQ9XxCNciRxSbY24R
-         L8HfYZJ6w4acy5k7o1IZrqJNlyIgu5JQf2+eNmIeK/VNlu+xRoWKohQkaqgt3wa+FFwH
-         d7SVKrsyhP2bC2KZDpMiCWrnb5Px7MgmFGfam/Y5lnHSAoTz+PNxkop5s81LBYrEWeIA
-         i+8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743712521; x=1744317321;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/Wr+De8aYTAPyPrxtzWeHutGqhqMA3Y8gKZr6gv9Nyk=;
-        b=IV/QVBVH5qdPbHMS2rDxv07XGU4cXyjmw8P5LyEftcEaerfCzxMj/+hKoCzbJW4Jl0
-         JfC0pglHrtw5oc/FMs+HNW+5Ft4X3VCFTmILA2ZZ3CuzWUzVO0ed1IROeo66Wpd1oOO0
-         IUEwSGTw3U6jVIhDphkccvdC6jCeRlavIgDe6FE7Zxc0MtZsZJQwkMXfRXIjUHlU591N
-         hPBXFjtD2qZBBwgzEaqB0owVTrXb30DUVPFVwzQGiwWYxfh46u46wjIWpry/he7gU+ck
-         t2jfdsgNL3K8OhpkPsJP+LmChcVSFc+QINxrDGPeVUPtEhc/rJcUZFvtBvTIaY+km4Ms
-         wlfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUuA+xTKaufsRtRInInPQ3zdlbuCO27xxmXQmawGqmQquwD17Fh292GvEiC/tDn2+Jkn3I=@vger.kernel.org, AJvYcCXxtVR7WFsKnEL+iJq98WF2iM18v02DS8k7QXCSB5KRJ7ENdLgiykxjt7olMNBybZ2R7x8t+FOd@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyd0Tisb3U4oKxAVzwOVkbFcn5jPvFagpHSXoTSutEZ/5ddsllf
-	deDYpEXHDE1JlhP0WSfNIdwRxPXruYi1KH6N9ITiRvcvliRNHOIC4jZJt5sXPq9+tCOmqWPSbAY
-	cqsSs5Q3Nsz21DE+XiUal2WQMIsc=
-X-Gm-Gg: ASbGncvxlFdnpKoWEbRKfWnl/zchN1ccvVPUBDjtblRzxtkmbbdhHEOenccPnxQnF3V
-	WBuuLAApsvp4mXZEw7tyr9Dagp23qAp3VA2M9CJ8q/oUxjQ+Nh9K6zM+YHpFPHsUdQk1ePAtDxv
-	XZgBdbKDdY2bxmCFQPDDhp5MjVp8ytWtzwvCcoe5nQmQ==
-X-Google-Smtp-Source: AGHT+IEIo0arv2FrOFFQjtalHYTnun5hmCjMio+8gW+CtIMdtp5L+XkccqOdcnnjtpmS3LegJ67paXSeq1yD3j5e0/M=
-X-Received: by 2002:a05:600c:1d86:b0:43d:934:ea97 with SMTP id
- 5b1f17b1804b1-43ecfa35fd6mr3783355e9.27.1743712521511; Thu, 03 Apr 2025
- 13:35:21 -0700 (PDT)
+	s=arc-20240116; t=1743713520; c=relaxed/simple;
+	bh=qR0BN8zygPj833XKcZhKGDt/M7Fne6j13JD9702Jrqs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PuXXwjar+l2akjxGtcPCpHy757m1iFgpqb/QSom3JKSGunptxBLcrCDl1oT/I3tZSpZQoTBc8M8AKuXYMlmnMXByA09va1ax1Z+4xDKpdiJeIkApuF9KsLZ+B5ngEHfjXr/CwSqsCZ/SoiNqLGnxhijDrP4KtAmBzDMVMMnLGVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cMkY1rnL; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <528bb5d2-e0ce-4125-b11b-8b873230b0fc@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1743713505;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jqnZi9xNGdDH/jnXjuRYKr/qyvU7hVYZoGPox9WqvZQ=;
+	b=cMkY1rnLjoCSutN0LnPrIIbeiylbgHUF5siqjvtpqrEHhbFlfd8tJGNtFZasaXQ/yxzbhW
+	rkY68sQU1f29x398O13gAAraIgukeEYGwwK/Dl+zcdHn8UgLAL9iQK0jEE8/veZde+0LEZ
+	BTBjSb6S0sqhRd2HfKeRKtiYSgY0NEk=
+Date: Thu, 3 Apr 2025 16:51:39 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250403083956.13946-1-justin.iurman@uliege.be>
- <Z-62MSCyMsqtMW1N@mini-arch> <cb0df409-ebbf-4970-b10c-4ea9f863ff00@uliege.be>
-In-Reply-To: <cb0df409-ebbf-4970-b10c-4ea9f863ff00@uliege.be>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 3 Apr 2025 13:35:10 -0700
-X-Gm-Features: ATxdqUFfG_KTUPwWMYOrHRjOO3sypxV6hn2k5bGj-_5jN1n54OV_NlNnc2Y-uVI
-Message-ID: <CAADnVQLiM5MA3Xyrkqmubku6751ZPrDk6v-HmC1jnOaL47=t+g@mail.gmail.com>
-Subject: Re: [PATCH net] net: lwtunnel: disable preemption when required
-To: Justin Iurman <justin.iurman@uliege.be>, Sebastian Sewior <bigeasy@linutronix.de>
-Cc: Stanislav Fomichev <stfomichev@gmail.com>, Network Development <netdev@vger.kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, bpf <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [RFC net-next PATCH 07/13] net: pcs: Add Xilinx PCS driver
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+ Christian Marangi <ansuelsmth@gmail.com>, upstream@airoha.com,
+ Heiner Kallweit <hkallweit1@gmail.com>, Michal Simek <michal.simek@amd.com>,
+ Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ Robert Hancock <robert.hancock@calian.com>,
+ linux-arm-kernel@lists.infradead.org
+References: <20250403181907.1947517-1-sean.anderson@linux.dev>
+ <20250403181907.1947517-8-sean.anderson@linux.dev>
+ <Z-7vIbvtjIGS5hzr@shell.armlinux.org.uk>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <Z-7vIbvtjIGS5hzr@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Apr 3, 2025 at 12:08=E2=80=AFPM Justin Iurman <justin.iurman@uliege=
-.be> wrote:
->
-> On 4/3/25 18:24, Stanislav Fomichev wrote:
-> > On 04/03, Justin Iurman wrote:
-> >> In lwtunnel_{input|output|xmit}(), dev_xmit_recursion() may be called =
-in
-> >> preemptible scope for PREEMPT kernels. This patch disables preemption
-> >> before calling dev_xmit_recursion(). Preemption is re-enabled only at
-> >> the end, since we must ensure the same CPU is used for both
-> >> dev_xmit_recursion_inc() and dev_xmit_recursion_dec() (and any other
-> >> recursion levels in some cases) in order to maintain valid per-cpu
-> >> counters.
-> >
-> > Dummy question: CONFIG_PREEMPT_RT uses current->net_xmit.recursion to
-> > track the recursion. Any reason not to do it in the generic PREEMPT cas=
-e?
->
-> I'd say PREEMPT_RT is a different beast. IMO, softirqs can be
-> preempted/migrated in RT kernels, which is not true for non-RT kernels.
-> Maybe RT kernels could use __this_cpu_* instead of "current" though, but
-> it would be less trivial. For example, see commit ecefbc09e8ee ("net:
-> softnet_data: Make xmit per task.") on why it makes sense to use
-> "current" in RT kernels. I guess the opposite as you suggest (i.e.,
-> non-RT kernels using "current") would be technically possible, but there
-> must be a reason it is defined the way it is... so probably incorrect or
-> inefficient?
+On 4/3/25 16:27, Russell King (Oracle) wrote:
+> On Thu, Apr 03, 2025 at 02:19:01PM -0400, Sean Anderson wrote:
+>> +static int xilinx_pcs_validate(struct phylink_pcs *pcs,
+>> +			       unsigned long *supported,
+>> +			       const struct phylink_link_state *state)
+>> +{
+>> +	__ETHTOOL_DECLARE_LINK_MODE_MASK(xilinx_supported) = { 0 };
+>> +
+>> +	phylink_set_port_modes(xilinx_supported);
+>> +	phylink_set(xilinx_supported, Autoneg);
+>> +	phylink_set(xilinx_supported, Pause);
+>> +	phylink_set(xilinx_supported, Asym_Pause);
+>> +	switch (state->interface) {
+>> +	case PHY_INTERFACE_MODE_SGMII:
+>> +		/* Half duplex not supported */
+>> +		phylink_set(xilinx_supported, 10baseT_Full);
+>> +		phylink_set(xilinx_supported, 100baseT_Full);
+>> +		phylink_set(xilinx_supported, 1000baseT_Full);
+>> +		break;
+>> +	case PHY_INTERFACE_MODE_1000BASEX:
+>> +		phylink_set(xilinx_supported, 1000baseX_Full);
+>> +		break;
+>> +	case PHY_INTERFACE_MODE_2500BASEX:
+>> +		phylink_set(xilinx_supported, 2500baseX_Full);
+>> +		break;
+>> +	default:
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	linkmode_and(supported, supported, xilinx_supported);
+>> +	return 0;
+> 
+> You can not assume that an interface mode implies any particular media.
+> For example, you can not assume that just because you have SGMII, that
+> the only supported media is BaseT. This has been a fundamental principle
+> in phylink's validation since day one.
+> 
+> Phylink documentation for the pcs_validate() callback states:
+> 
+>  * Validate the interface mode, and advertising's autoneg bit, removing any
+>  * media ethtool link modes that would not be supportable from the supported
+>  * mask. Phylink will propagate the changes to the advertising mask. See the
+>  * &struct phylink_mac_ops validate() method.
+> 
+> and if we look at the MAC ops validate (before it was removed):
+> 
+> - * Clear bits in the @supported and @state->advertising masks that
+> - * are not supportable by the MAC.
+> - *
+> - * Note that the PHY may be able to transform from one connection
+> - * technology to another, so, eg, don't clear 1000BaseX just
+> - * because the MAC is unable to BaseX mode. This is more about
+> - * clearing unsupported speeds and duplex settings. The port modes
+> - * should not be cleared; phylink_set_port_modes() will help with this.
+> 
+> PHYs can and do take SGMII and provide both BaseT and BaseX or BaseR
+> connections. A PCS that is not directly media facing can not dictate
+> the link modes.
+> 
 
-Stating the obvious...
-Sebastian did a lot of work removing preempt_disable from the networking
-stack.
-We're certainly not adding them back.
-This patch is no go.
+OK, how about this:
+
+static int xilinx_pcs_validate(struct phylink_pcs *pcs,
+			       unsigned long *supported,
+			       const struct phylink_link_state *state)
+{
+	__ETHTOOL_DECLARE_LINK_MODE_MASK(xilinx_supported) = { 0 };
+	unsigned long caps = phy_caps_from_interface(state->interface);
+
+	phylink_set_port_modes(xilinx_supported);
+	phylink_set(xilinx_supported, Autoneg);
+	phylink_set(xilinx_supported, Pause);
+	phylink_set(xilinx_supported, Asym_Pause);
+	/* Half duplex not supported */
+	caps &= ~(LINK_CAPA_10HD | LINK_CAPA_100HD | LINK_CAPA_1000HD);
+	phy_caps_linkmodes(caps, xilinx_supported);
+	linkmode_and(supported, supported, xilinx_supported);
+	return 0;
+}
+
+--Sean
 
