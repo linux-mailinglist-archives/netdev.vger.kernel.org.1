@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-179204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89A43A7B1FD
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 00:21:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 789F6A7B1FC
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 00:21:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C54AE179051
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 22:20:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0A3A189AB2D
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 22:21:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F9051DF73D;
-	Thu,  3 Apr 2025 22:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C8001E8351;
+	Thu,  3 Apr 2025 22:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ghXcijl5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CA60vHK7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 017ED1DE8A5;
-	Thu,  3 Apr 2025 22:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680F61E7C01
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 22:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743718802; cv=none; b=aNLA/2LMoQVwervVVdt1Gsi/Kp6Ywb4lN6zmc74BpBS+hYGB9fgCSnVua07EfsdAtFFekS6oVBbAe0hTCMvbDoh6u1uoJ33WzGqkT89TRiQ0V0f+XtRh0Mm2eKgvZoUDkhkR5P/lP6MoxjCyya5RACO5NP2Ocx5TrFsESUUPtyM=
+	t=1743718803; cv=none; b=S5CVFnkoB2+ye7MIFmWq9yfHgrXVy85AVcwojEtQ81M5Ek3Z8hEqLTegNTQy/hxXnKiFX/YcSGNXgfAemSifb6F0f42njTp2c6aBDCaoTNbOXqioyooAhcTg5fzPwzueM9zSGEAiN5cAmHxWJHG3dj2Ea3urq17jEZZPW2H85qM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743718802; c=relaxed/simple;
-	bh=KCyh8+9JyuYBei8WB62qFtgrhc58EZrZTkUcsFfLPro=;
+	s=arc-20240116; t=1743718803; c=relaxed/simple;
+	bh=rSAnTxcjBcLSFN50gW5YrU941og66JkBOAEm0xtRkNg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FApOd3AuMHVhsbjZPnYXhwLaNagu+iZUXscLCLmimc/TZl6jHlGuVFICLuhjzYaMusOy9Yh38YqNFLnQBFIMgX2iKba/DYBxz1h/+drz3VOmRZP2y6LFwe5m8FyiiKRH2TlZ7Euy+Ot/T1mpaB65XGHsTq/dOWfPIdL4JiUkA28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ghXcijl5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C39C8C4CEE3;
-	Thu,  3 Apr 2025 22:20:01 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=o/HsPcHCm4ItDRY+29GD+PW0fQ/Tvljur2OkJRn16p8A7DfVppNLBNK0m+DPxGDE/fM2CiUgcRas2Cg0jsM3xVWI06F+taWa/+62DV3ZVo//5Xh4pQi5EhxQGoDQRHdt2D6/mCzHmSjAnw+XdlIgFHMqqe+4InO15vLEfdFu65c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CA60vHK7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A788C4CEE3;
+	Thu,  3 Apr 2025 22:20:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743718801;
-	bh=KCyh8+9JyuYBei8WB62qFtgrhc58EZrZTkUcsFfLPro=;
+	s=k20201202; t=1743718803;
+	bh=rSAnTxcjBcLSFN50gW5YrU941og66JkBOAEm0xtRkNg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ghXcijl5DsA64XBakK5GZReIVkouk8DPSuzayMQ+wpewU9xagYbKoS4JehTZ3X51P
-	 1b7jUFE3W0DLBngLqDSPY1ve063PZJpbMItOzNrxUvwtkUKNfchRPkkL7xMbW/DdQe
-	 G6RbMomFoqRMO1pbdTxuEPSAZcdUm2o8uRcWsECfp0BgMfbeliBc7SkWkLbSsGI8q2
-	 UsyIHD+j4j9eU4VCLnnS3VWUZWCEINRs9n4tCeLxS8sxTcvzvWlRMQJgkzkR61eaRH
-	 r4CtTYH2ARnzBs4P1M9NioNqKqIc1f9CApRvurFAKT4b6DHPlL0pPtswT2wkgTg2cB
-	 i8TFe+Yxo8EkA==
+	b=CA60vHK7AG3sI1Zb/3r+GAkr2/yQ+MGMyoIuqJ8KabBQwN6ui0ieef/nk4wskWSPX
+	 4ksODe+DS0Siyef9TmWZV5NjQXdi5pLCdxlC7j8vVrNWX2JA7ccS+EA8z0PFQnxZrV
+	 voBt61KFCSJwv+xNUaQ5OBybLlqCyh0CbWWcziyRoY3FBkfDMfLrNU57/hsCFy74nj
+	 Qi3sFmuci0/aFawDAVE401ln0DHDS/GswULDmQsko6U7aavHtbf4cxZ5fB2rG4+oW9
+	 dIAg/GOjeNnpxewL8+LL5oMiZRY5qtvfhbTVgQfnWCzA1Dqrg5CKEhxWKbZifNDnIc
+	 31DzYkn+6jQWQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEB4380664C;
-	Thu,  3 Apr 2025 22:20:39 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71771380664C;
+	Thu,  3 Apr 2025 22:20:41 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,46 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net/selftests: Add loopback link local route for
- self-connect
+Subject: Re: [PATCH net v2] ipv6: fix omitted netlink attributes when using
+ RTEXT_FILTER_SKIP_STATS
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174371883849.2702664.8391877286405723636.git-patchwork-notify@kernel.org>
-Date: Thu, 03 Apr 2025 22:20:38 +0000
-References: <20250402-tcp-ao-selfconnect-flake-v1-1-8388d629ef3d@gmail.com>
-In-Reply-To: <20250402-tcp-ao-selfconnect-flake-v1-1-8388d629ef3d@gmail.com>
-To: Dmitry Safonov <0x7f454c46@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <174371883999.2702664.13276567361004177734.git-patchwork-notify@kernel.org>
+Date: Thu, 03 Apr 2025 22:20:39 +0000
+References: <20250402121751.3108-1-ffmancera@riseup.net>
+In-Reply-To: <20250402121751.3108-1-ffmancera@riseup.net>
+To: Fernando Fernandez Mancera <ffmancera@riseup.net>
+Cc: netdev@vger.kernel.org, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 02 Apr 2025 01:59:31 +0100 you wrote:
-> From: Dmitry Safonov <0x7f454c46@gmail.com>
+On Wed,  2 Apr 2025 14:17:51 +0200 you wrote:
+> Using RTEXT_FILTER_SKIP_STATS is incorrectly skipping non-stats IPv6
+> netlink attributes on link dump. This causes issues on userspace tools,
+> e.g iproute2 is not rendering address generation mode as it should due
+> to missing netlink attribute.
 > 
-> self-connect-ipv6 got slightly flaky on netdev:
-> > # timeout set to 120
-> > # selftests: net/tcp_ao: self-connect_ipv6
-> > # 1..5
-> > # # 708[lib/setup.c:250] rand seed 1742872572
-> > # TAP version 13
-> > # # 708[lib/proc.c:213]    Snmp6            Ip6OutNoRoutes: 0 => 1
-> > # not ok 1 # error 708[self-connect.c:70] failed to connect()
-> > # ok 2 No unexpected trace events during the test run
-> > # # Planned tests != run tests (5 != 2)
-> > # # Totals: pass:1 fail:0 xfail:0 xpass:0 skip:0 error:1
-> > ok 1 selftests: net/tcp_ao: self-connect_ipv6
+> Move the filling of IFLA_INET6_STATS and IFLA_INET6_ICMP6STATS to a
+> helper function guarded by a flag check to avoid hitting the same
+> situation in the future.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net/selftests: Add loopback link local route for self-connect
-    https://git.kernel.org/netdev/net/c/e5ddf19dbc3e
+  - [net,v2] ipv6: fix omitted netlink attributes when using RTEXT_FILTER_SKIP_STATS
+    https://git.kernel.org/netdev/net/c/7ac6ea4a3e08
 
 You are awesome, thank you!
 -- 
