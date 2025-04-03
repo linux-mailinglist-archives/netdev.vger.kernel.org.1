@@ -1,112 +1,110 @@
-Return-Path: <netdev+bounces-179125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69692A7AB7A
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:20:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AFECA7AC28
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:34:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71D187A1AA4
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:16:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EA8B3B3D52
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 19:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEF54261383;
-	Thu,  3 Apr 2025 19:04:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 411C926A08A;
+	Thu,  3 Apr 2025 19:06:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Jn7Fb+Ug"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fRjg6VEL"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1B7925FA3B
-	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 19:04:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18DD32571C7;
+	Thu,  3 Apr 2025 19:06:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743707067; cv=none; b=TqgUP/Fglmqxql7pc/ueyIBn9m5ovDIG4n1+tQ0kyuElu8FNP942mko36YKVyA0nwuMwOhEFxVfNkm7t6MP8BYXRws8W4IlIQX57irTyHFCzIKROdLhbR9+pQuOkkAPOhI/R4suPOPVCs5tN3TRVGZKa1Z65Ec4JT+dVIPqybmM=
+	t=1743707177; cv=none; b=r5IL1wftESZSRA8Iyn7MO6Khgz9xsoPmMZJ4MESU9WHtEqD8cvQW1Fw5mhWMcFbdn1VXtUcY41F9SF4JsmS1A+aCQ3B/Pc3anUHELFDPJ/hZ7V6TBWG4zrLatxF9pD37Z64XwN86UPhq3LyyISG8LVno/Vy8CQBvh+9g62UHvV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743707067; c=relaxed/simple;
-	bh=iuOOwB3RhF2+wmWM3TB/6mKD+N4PJ/l0AgT6T28qZdc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gR2wmvM6NWs8n9bj2ZML09DrN3osVSECmXZZT3L4h02b0//nmZpKMjp0ZaZuNu+5V2QNuv6e4IEEuhWtu2ZE3fF16LPHyBq0J4LItajT6phKXFHL/zIOsfd8n9PMsmqupNq/vc3smKhzi0sm8tpZa/Lym6WHScGjh7xx5uIy4ZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Jn7Fb+Ug; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <0eb36d4f-ab6c-4bb3-aad0-99c09bcd56ec@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1743707053;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OR6tAQCdTqWMdGnoueGRPKReRRRQNdIbvhVIHJWD5vI=;
-	b=Jn7Fb+UgY/OlS/fnuFJSgz2OVlcdAmgKv8H1oVFoc46n/wT4ubopRD4mJlVLWxZMgP1Wnu
-	05Q7iiyh/mwHPQ6Dw+H10z3jRi2jjgr8S6+WImf8VczgxbWlw9h7NRIvnmN38tQ9ge6NVM
-	kpjzXJKKqFnlUwXJb1TnwDaYvPaqCNs=
-Date: Thu, 3 Apr 2025 15:04:08 -0400
+	s=arc-20240116; t=1743707177; c=relaxed/simple;
+	bh=1CcKXbqfhtHVfxqUZK34l1DDHU0gxjtEXW3/+5xuIMc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=iz+mpEpU3Nl5QKl/EXxOIzDl5Tk7GgwDJYB4yv+uEwCDSIAlkcn7UDTCllOEfHx4uM9uCa9YHzojIosYEzobQO7HhX+VKXzZNGRxPLnSMt2mbBYlQ3aCLa4JqemaJ5010tU3+jelVqrsEaWYs4/Zl8Esd4zF9Yq6/tnl7f1lgk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fRjg6VEL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1A44C4CEE8;
+	Thu,  3 Apr 2025 19:06:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743707177;
+	bh=1CcKXbqfhtHVfxqUZK34l1DDHU0gxjtEXW3/+5xuIMc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=fRjg6VELJuARNP64DEOqTR3ZB4+xaamqmXSNGPIIaFI8D8QIbyGUM5fBEL+9sShhj
+	 Znk/epr4Gr25Ml/Tm5a54YbAA0HXrNYk2aT5neuDsGcphVR5xm9nu8US/FyVJ7FDzm
+	 VwhqzDddsUHbjceErpwssZqKWQz8MCmfAgr4/rwLqtRpYjSBJcSVcp9jsUUQpa2ek0
+	 CPDuiZ0nqr5mVJT83v+Vp3uFE3Lay68nEfw4hkfP1OHeDfYc1Iub9UQvM6DUx5UAGi
+	 haloumLDWEvS3UqUn+4nWIprKZbWhs3XfsKMeVYfeH0iO/Aw1tw0k0clA0dWBba5fE
+	 fsKKZJPllotOw==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Pavel Begunkov <asml.silence@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Mina Almasry <almasrymina@google.com>,
+	David Wei <dw@davidwei.uk>,
+	Sasha Levin <sashal@kernel.org>,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	sjordhani@gmail.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.12 08/47] net: page_pool: don't cast mp param to devmem
+Date: Thu,  3 Apr 2025 15:05:16 -0400
+Message-Id: <20250403190555.2677001-8-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250403190555.2677001-1-sashal@kernel.org>
+References: <20250403190555.2677001-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC net-next PATCH 11/13] of: property: Add device link support
- for PCS
-To: Saravana Kannan <saravanak@google.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- Christian Marangi <ansuelsmth@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, linux-kernel@vger.kernel.org,
- upstream@airoha.com, Rob Herring <robh@kernel.org>,
- devicetree@vger.kernel.org
-References: <20250403181907.1947517-1-sean.anderson@linux.dev>
- <20250403182758.1948569-1-sean.anderson@linux.dev>
- <CAGETcx9v610XhvU705R=Mjth=iAbCU04rqNnQPhQua37Jc4TRQ@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <CAGETcx9v610XhvU705R=Mjth=iAbCU04rqNnQPhQua37Jc4TRQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.12.21
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-On 4/3/25 14:32, Saravana Kannan wrote:
-> On Thu, Apr 3, 2025 at 11:28 AM Sean Anderson <sean.anderson@linux.dev> wrote:
->>
->> This adds device link support for PCS devices, providing
->> better probe ordering.
->>
->> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
->> ---
->>
->>  drivers/of/property.c | 2 ++
->>  1 file changed, 2 insertions(+)
->>
->> diff --git a/drivers/of/property.c b/drivers/of/property.c
->> index c1feb631e383..f3e0c390ddba 100644
->> --- a/drivers/of/property.c
->> +++ b/drivers/of/property.c
->> @@ -1379,6 +1379,7 @@ DEFINE_SIMPLE_PROP(pses, "pses", "#pse-cells")
->>  DEFINE_SIMPLE_PROP(power_supplies, "power-supplies", NULL)
->>  DEFINE_SUFFIX_PROP(regulators, "-supply", NULL)
->>  DEFINE_SUFFIX_PROP(gpio, "-gpio", "#gpio-cells")
->> +DEFINE_SIMPLE_PROP(pcs_handle, "pcs-handle", NULL)
->>
->>  static struct device_node *parse_gpios(struct device_node *np,
->>                                        const char *prop_name, int index)
->> @@ -1535,6 +1536,7 @@ static const struct supplier_bindings of_supplier_bindings[] = {
->>                 .parse_prop = parse_post_init_providers,
->>                 .fwlink_flags = FWLINK_FLAG_IGNORE,
->>         },
->> +       { .parse_prop = parse_pcs_handle, },
-> 
-> Can you add this in the right order please? All the simple ones come
-> before the SUFFIX ones so that it's less expensive/fewer comparisons
-> before you parse the simple properties.
+From: Pavel Begunkov <asml.silence@gmail.com>
 
-Ah, I couldn't figure out what the intended order was so I just stuck
-it at the end.
+[ Upstream commit 8d522566ae9cb3f0609ddb2a6ce3f4f39988043c ]
 
---Sean
+page_pool_check_memory_provider() is a generic path and shouldn't assume
+anything about the actual type of the memory provider argument. It's
+fine while devmem is the only provider, but cast away the devmem
+specific binding types to avoid confusion.
+
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+Signed-off-by: David Wei <dw@davidwei.uk>
+Link: https://patch.msgid.link/20250204215622.695511-2-dw@davidwei.uk
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/core/page_pool_user.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
+index 48335766c1bfd..8d31c71bea1a3 100644
+--- a/net/core/page_pool_user.c
++++ b/net/core/page_pool_user.c
+@@ -353,7 +353,7 @@ void page_pool_unlist(struct page_pool *pool)
+ int page_pool_check_memory_provider(struct net_device *dev,
+ 				    struct netdev_rx_queue *rxq)
+ {
+-	struct net_devmem_dmabuf_binding *binding = rxq->mp_params.mp_priv;
++	void *binding = rxq->mp_params.mp_priv;
+ 	struct page_pool *pool;
+ 	struct hlist_node *n;
+ 
+-- 
+2.39.5
+
 
