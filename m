@@ -1,91 +1,221 @@
-Return-Path: <netdev+bounces-178997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 410D7A79E45
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 10:35:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 680F0A79E5C
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 10:40:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 231D93B6C55
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 08:34:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B45B81896E86
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 08:40:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55BE024169D;
-	Thu,  3 Apr 2025 08:34:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48A5C1F099D;
+	Thu,  3 Apr 2025 08:40:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="UvRQap42"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="qC4mrEeX"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C84051A0731;
-	Thu,  3 Apr 2025 08:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C35D81F03CB;
+	Thu,  3 Apr 2025 08:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743669259; cv=none; b=jjoDkYcOWEYTH9zNYruSVpxCp2njBEGm+Bh6zmzqQUCjvuEKPnJdXw81A/yyrY2JUe+kVglOxeLtVBFHuNj9Aib6cCiqzhBE4x+HgxONrrOchiJ3Ipww/3jZB1mvXvyqLbtR2UX2jN+5PAgdF1gjWHZq8Zoid3a8C+yvg81SvvE=
+	t=1743669637; cv=none; b=QY4j5b+0dTqbugrhxbokB/AnGYobhKbjG1+joXwGP7PCv7FUPYoxud2jl3pXMKy2JnELyOcaOfyV+SjOzOQ69oauRqJ0ejcXvX6ceScajXS437oOpv5+LxTtVR1fnZ3MYX/viqp+mL+2KalUyG0DbBUR3ffMEPZu6rMZZnMOT+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743669259; c=relaxed/simple;
-	bh=wsQILO7hA49jzp8HRadJYXymQRE4ziUNrNRVayRBDFM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=twdKpq+wxPvVqsPr/ZutX1Fx66Ab+eN9pxb/7PX9pfODE68jzgu1kxbmD5uZ4NCq/7eIsKVXvPWFe3T5cVp7ooSgxT8BCl0iHL6awZLvxkPq96I9zibpZQtdZWDyxrdGqEw7Ba2ZVWL049ZeJfiqOQ7/8Z/1NKeLe7CBJk5ngUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=UvRQap42; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D30DF4314D;
-	Thu,  3 Apr 2025 08:34:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1743669248;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wsQILO7hA49jzp8HRadJYXymQRE4ziUNrNRVayRBDFM=;
-	b=UvRQap427zmxaiWhYahVbFqmNWa61FRKhjZQkeZct7xnRE5tb0GbVKvIZHWZ9e18RdcLx0
-	tEMtVvdMfZ98W7nAZT0sWmylth0yFpFOHnCDNn4fA6UfydGxyrQIlHzgYEjTqAJymqP/fL
-	SlhA7NWn633IdcYY5pkofOuBwyjvjyt9wolYrxVw9IF8qxlGdje/PPHdpvk5RDNGyKlebv
-	KpOqZElnQzBfcgDbPXoH2HxUl0ymxstZIJDGjrjjh6kGm7VGleUzUwBRC/xUb2kMx2DXIU
-	qQssf2U3w+8chvvK9kP+7kzPDurS5YUG/to5QJ1vO1B+YNmvwyBEDAfUBrnWrQ==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Ivan Abramov <i.abramov@mt-integration.ru>
-Cc: Alexander Aring <alex.aring@gmail.com>,  Stefan Schmidt
- <stefan@datenfreihafen.org>,  "David S. Miller" <davem@davemloft.net>,
-  Eric Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,
-  Paolo Abeni <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,
-  <linux-wpan@vger.kernel.org>,  <netdev@vger.kernel.org>,
-  <linux-kernel@vger.kernel.org>,  <lvc-project@linuxtesting.org>
-Subject: Re: [PATCH net v2 0/3] Avoid calling WARN_ON() on allocation
- failure in cfg802154_switch_netns()
-In-Reply-To: <20250403082021.990667-1-i.abramov@mt-integration.ru> (Ivan
-	Abramov's message of "Thu, 3 Apr 2025 11:20:18 +0300")
-References: <20250403082021.990667-1-i.abramov@mt-integration.ru>
-User-Agent: mu4e 1.12.7; emacs 29.4
-Date: Thu, 03 Apr 2025 10:34:06 +0200
-Message-ID: <87plhtmyo1.fsf@bootlin.com>
+	s=arc-20240116; t=1743669637; c=relaxed/simple;
+	bh=adNmKijgwJ0/HuyYribCZ1SflALgeVpdt9ZDAd8R8f8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gBT3na7UD4mdsnp056Vydde7dL/x3JfyhLGKcJL/ao5PshnwJNrWZReT2AgOtI/DMh+NsFQKuA7Wf16x848uBflSDlH20eBtWBzbnNQL1l+UO+vAcfVFBXo/QaggKaqinpSW+mVUgeiCouTAgwfvfIaAZu8CwUF9HkNOMe9POGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=qC4mrEeX; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from ubuntu.home (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id D00A9200A728;
+	Thu,  3 Apr 2025 10:40:25 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be D00A9200A728
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1743669626;
+	bh=94DJ7KtPQKubwfSja/wln0B8MjCkiuH0R9N/UpDkdu8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=qC4mrEeXIlQbcEHZIvGjHX2tGfByiQQd7iOyDqXJmls0X1oYFndmOj9uE36Y3jQOH
+	 3jNjR0GCM2LZAqEO99ZohOCxP/JqBc3d/38sSAMgZIB5BiDwjiRAPmyxIJjjkJtB/x
+	 1SKJyTUjxMyy7bcBaRuAj0/dUVkwt3myWYU5qzZRaK/0TuBwI2etY6HXOvf1b7vqif
+	 2zWm8FDfZrCY81vqhnGqJydUkPQsijjqvxUOEXUcqn7pKFuVLagE69wfNnUrM58tI7
+	 3cZ/R/N8UiaMevmSYCwN6iVIGrDB5iNYduprAwatAb5bxyuqDlW7UkTM+C+mP2XT3J
+	 WtvpqvjKa3+pA==
+From: Justin Iurman <justin.iurman@uliege.be>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	kuniyu@amazon.com,
+	justin.iurman@uliege.be,
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	bpf <bpf@vger.kernel.org>,
+	Stanislav Fomichev <stfomichev@gmail.com>
+Subject: [PATCH net] net: lwtunnel: disable preemption when required
+Date: Thu,  3 Apr 2025 10:39:56 +0200
+Message-Id: <20250403083956.13946-1-justin.iurman@uliege.be>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddukeektdelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufgjfhgffffkgggtgfesthhqredttderjeenucfhrhhomhepofhiqhhuvghlucftrgihnhgrlhcuoehmihhquhgvlhdrrhgrhihnrghlsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeffgefhjedtfeeigeduudekudejkedtiefhleelueeiueevheekvdeludehiedvfeenucfkphepledvrddukeegrdduuddtrdduleelnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledvrddukeegrdduuddtrdduleelpdhhvghloheplhhotggrlhhhohhsthdpmhgrihhlfhhrohhmpehmihhquhgvlhdrrhgrhihnrghlsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduvddprhgtphhtthhopehirdgrsghrrghmohhvsehmthdqihhnthgvghhrrghtihhonhdrrhhupdhrtghpthhtoheprghlvgigrdgrrhhinhhgsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhtvghfrghnsegurghtvghnfhhrvghihhgrfhgvnhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrt
- ghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrgh
-X-GND-Sasl: miquel.raynal@bootlin.com
+Content-Transfer-Encoding: 8bit
 
-On 03/04/2025 at 11:20:18 +03, Ivan Abramov <i.abramov@mt-integration.ru> w=
-rote:
+In lwtunnel_{input|output|xmit}(), dev_xmit_recursion() may be called in
+preemptible scope for PREEMPT kernels. This patch disables preemption
+before calling dev_xmit_recursion(). Preemption is re-enabled only at
+the end, since we must ensure the same CPU is used for both
+dev_xmit_recursion_inc() and dev_xmit_recursion_dec() (and any other
+recursion levels in some cases) in order to maintain valid per-cpu
+counters.
 
-> This series was inspired by Syzkaller report on warning in
-> cfg802154_switch_netns().
+Reported-by: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Closes: https://lore.kernel.org/netdev/CAADnVQJFWn3dBFJtY+ci6oN1pDFL=TzCmNbRgey7MdYxt_AP2g@mail.gmail.com/
+Fixes: 986ffb3a57c5 ("net: lwtunnel: fix recursion loops")
+Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
+---
+Cc: bpf <bpf@vger.kernel.org>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Stanislav Fomichev <stfomichev@gmail.com>
+---
+ net/core/lwtunnel.c | 47 ++++++++++++++++++++++++++++-----------------
+ 1 file changed, 29 insertions(+), 18 deletions(-)
 
-This series has received reviews under the form of Reviewed-by tags. You
-are in charge of carrying those tags over versions. Please collect and
-resubmit the series with all of them (a tag on the cover letter applies
-to all patches).
+diff --git a/net/core/lwtunnel.c b/net/core/lwtunnel.c
+index e39a459540ec..a9ad068e5707 100644
+--- a/net/core/lwtunnel.c
++++ b/net/core/lwtunnel.c
+@@ -333,6 +333,8 @@ int lwtunnel_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 	struct dst_entry *dst;
+ 	int ret;
+ 
++	preempt_disable();
++
+ 	if (dev_xmit_recursion()) {
+ 		net_crit_ratelimited("%s(): recursion limit reached on datapath\n",
+ 				     __func__);
+@@ -345,11 +347,13 @@ int lwtunnel_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 		ret = -EINVAL;
+ 		goto drop;
+ 	}
+-	lwtstate = dst->lwtstate;
+ 
++	lwtstate = dst->lwtstate;
+ 	if (lwtstate->type == LWTUNNEL_ENCAP_NONE ||
+-	    lwtstate->type > LWTUNNEL_ENCAP_MAX)
+-		return 0;
++	    lwtstate->type > LWTUNNEL_ENCAP_MAX) {
++		ret = 0;
++		goto out;
++	}
+ 
+ 	ret = -EOPNOTSUPP;
+ 	rcu_read_lock();
+@@ -364,11 +368,11 @@ int lwtunnel_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+ 	if (ret == -EOPNOTSUPP)
+ 		goto drop;
+ 
+-	return ret;
+-
++	goto out;
+ drop:
+ 	kfree_skb(skb);
+-
++out:
++	preempt_enable();
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(lwtunnel_output);
+@@ -380,6 +384,8 @@ int lwtunnel_xmit(struct sk_buff *skb)
+ 	struct dst_entry *dst;
+ 	int ret;
+ 
++	preempt_disable();
++
+ 	if (dev_xmit_recursion()) {
+ 		net_crit_ratelimited("%s(): recursion limit reached on datapath\n",
+ 				     __func__);
+@@ -394,10 +400,11 @@ int lwtunnel_xmit(struct sk_buff *skb)
+ 	}
+ 
+ 	lwtstate = dst->lwtstate;
+-
+ 	if (lwtstate->type == LWTUNNEL_ENCAP_NONE ||
+-	    lwtstate->type > LWTUNNEL_ENCAP_MAX)
+-		return 0;
++	    lwtstate->type > LWTUNNEL_ENCAP_MAX) {
++		ret = 0;
++		goto out;
++	}
+ 
+ 	ret = -EOPNOTSUPP;
+ 	rcu_read_lock();
+@@ -412,11 +419,11 @@ int lwtunnel_xmit(struct sk_buff *skb)
+ 	if (ret == -EOPNOTSUPP)
+ 		goto drop;
+ 
+-	return ret;
+-
++	goto out;
+ drop:
+ 	kfree_skb(skb);
+-
++out:
++	preempt_enable();
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(lwtunnel_xmit);
+@@ -428,6 +435,8 @@ int lwtunnel_input(struct sk_buff *skb)
+ 	struct dst_entry *dst;
+ 	int ret;
+ 
++	preempt_disable();
++
+ 	if (dev_xmit_recursion()) {
+ 		net_crit_ratelimited("%s(): recursion limit reached on datapath\n",
+ 				     __func__);
+@@ -440,11 +449,13 @@ int lwtunnel_input(struct sk_buff *skb)
+ 		ret = -EINVAL;
+ 		goto drop;
+ 	}
+-	lwtstate = dst->lwtstate;
+ 
++	lwtstate = dst->lwtstate;
+ 	if (lwtstate->type == LWTUNNEL_ENCAP_NONE ||
+-	    lwtstate->type > LWTUNNEL_ENCAP_MAX)
+-		return 0;
++	    lwtstate->type > LWTUNNEL_ENCAP_MAX) {
++		ret = 0;
++		goto out;
++	}
+ 
+ 	ret = -EOPNOTSUPP;
+ 	rcu_read_lock();
+@@ -459,11 +470,11 @@ int lwtunnel_input(struct sk_buff *skb)
+ 	if (ret == -EOPNOTSUPP)
+ 		goto drop;
+ 
+-	return ret;
+-
++	goto out;
+ drop:
+ 	kfree_skb(skb);
+-
++out:
++	preempt_enable();
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(lwtunnel_input);
+-- 
+2.34.1
 
-Thanks,
-Miqu=C3=A8l
 
