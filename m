@@ -1,129 +1,132 @@
-Return-Path: <netdev+bounces-179036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179037-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2646A7A237
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 13:56:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D0C9A7A23A
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 13:58:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6C5E3B554C
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 11:56:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A445A174253
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 11:58:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D627C24BD1F;
-	Thu,  3 Apr 2025 11:56:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DBBB24C667;
+	Thu,  3 Apr 2025 11:58:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e5bruwKw"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="FuxlYov5";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="qDvpy8UF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A58C224B0C
-	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 11:56:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7990C24C08A;
+	Thu,  3 Apr 2025 11:58:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743681410; cv=none; b=gF5DF8da5rqDDYSzL103+PBWU9a1PUL5zFy9v2iSuT5JB29K7Vwd7xmDaOvLoInISOJ7tlDZwmyQmJmMCZ5gSj1rdA/INef7GSDpTJhAv2PVXyRP+j8fqQZ27MAzuZPkGHnGalRM2Akil0H+2x7TKnYhLjaRwSwq70y8XGuvVzM=
+	t=1743681486; cv=none; b=aGLLyjTJS5b+aUvllyaKDYCCQMgyeOiUqRT8lUHs7qXbnYH+Vy3nylMCBnNhNfBahCDfO2Y9Lr7mbf6GZO8Vm9PKE5ZJ0LUz1bUgPGB/HFsAinYzQ0xI5/nw/uePi5XkM+GCN93V4edD8yXaBuPevs2x8p17bYCbwO6UabEZsBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743681410; c=relaxed/simple;
-	bh=CQW3LvrpYLZr2hfNBWwV9hoIx59/BSsLvUr5/tUTLg4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f2PxzG5jWAGZSV9f8EGmmosypWV/aKEfmJkaPMmoVR/YZ0zZt6dXWBW3jtqCvck/DWUXrjdEFnke+CLADRIfnQUN7PyoJnP1PXSrl7RbjCUaMxbSNPZvtePBbFIycywXK4/yUVUURXNj0bc6lHz0ifSQ059cPkt+W8HGw63QwX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e5bruwKw; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743681408;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0H5/xBFkSHvSdkgm2kc89t+j93IWUj4d38uiubvlMZM=;
-	b=e5bruwKwUMT4tt+QiTJNYJavlYuv4hbUJKdK9RgQ2o4bFHf0JnjF6izRBjo89oAHr6Gjaz
-	psaqDAwlCv2ZxCHn4GcjaRNWENuMzbxaEsPdf2rjTuEoHDY9qDPne1aI6LWaMyVv9l/qTb
-	oI6OSGAMsRlhia5jWEtGGff5ZGRGsnU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-396-UK_MWUzXPsKBmflojJf6bA-1; Thu, 03 Apr 2025 07:56:16 -0400
-X-MC-Unique: UK_MWUzXPsKBmflojJf6bA-1
-X-Mimecast-MFC-AGG-ID: UK_MWUzXPsKBmflojJf6bA_1743681375
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43d733063cdso6471155e9.0
-        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 04:56:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743681375; x=1744286175;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0H5/xBFkSHvSdkgm2kc89t+j93IWUj4d38uiubvlMZM=;
-        b=ldeKdnIb+iCZRL9OWXpdB+IPRRhtmJPchVUPM5ARASAQX/wBYPipBy+od/lZeUJg+3
-         QqLAliRRVapM5K5K1GaXm3KK/ee41/OqtOkhKFxibk6CgZTMZP41EN+6htZr7h9mCkU+
-         P89nCN5dNSNE9N4npFM4XJV++wV63E0F7itMpujQ4+bpwCqYh3PsF1cbijZE+Nwbn9Bq
-         THW2tr/+veh9xLs7/q2wWDRvPYgEM6LiE/hdaee69ihYv2j4PPQEnpjywo7scN9cZxEZ
-         LVH9Z29mgFM2hio1FFzggdW4JEfD6NDp5mk2DJdpGih6f5wSbQdzYZV0FwJiOEQsUVrs
-         8eAw==
-X-Forwarded-Encrypted: i=1; AJvYcCXXGTW/sUPRkdiRyOfHGSQ7spc0P7/mOCcv0s1t93ptjv9mDXkG76F2Jgn2jy4V8WwImwAHTAA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRI2G4SROebXV9y02vN2ic8rlT6INXK277dqGs4iJPaGtOQu6P
-	AmSPFXvPbqn1ZQuHxXHdQBX6/Lj/Fx6KIMtGz/7uahhl76XIE0TnbjuMhqkrntspeJ9CYC5ZQtz
-	+eCJOMxheeLXQj4c0EAziMImEjCculNe5oAPAHObh+Jwyl13BoxfFwA==
-X-Gm-Gg: ASbGncsiWtqN7xdOgB0BUO8J+m8fy/ZPdP7siJrSLZR5eJNTvcyqKWbFQ25NdUNVRx8
-	iOENqS1ZIJUimXSpPC4NXHFwFHr5PIYW4budnON0b4NxqTzUi+r7+/y9ay3upq1eDuLq32CV7ho
-	ZAcT7pKJRGlgqxEah89rm/jkxR4Amz77pgUv4bF62Vnx5RZvPmsY3/6bxtcNFnziccos/mGZN82
-	wfNAGd7JBxG7Z3hcR3S1oNsVHAd9n8mB27T0xSEMhiM19yHthZKHB/G3FZWIWjnCzGI5lurzmHX
-	a4h7t2qqUN4dvRagzKXkXbyUpBEtcgDqmwFukZwx4Eaycg==
-X-Received: by 2002:a05:6000:22c6:b0:39c:1efc:1c1c with SMTP id ffacd0b85a97d-39c2976984emr5568302f8f.34.1743681374885;
-        Thu, 03 Apr 2025 04:56:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGe9epn8RH+1tWTOrW9iJCz/QsoiUwz7lwD5Ai/FLreIW9iTiIUclOnBL+eTfQUeG5/OFX1zA==
-X-Received: by 2002:a05:6000:22c6:b0:39c:1efc:1c1c with SMTP id ffacd0b85a97d-39c2976984emr5568275f8f.34.1743681374535;
-        Thu, 03 Apr 2025 04:56:14 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-68-231.dyn.eolo.it. [146.241.68.231])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c30226acfsm1558796f8f.88.2025.04.03.04.56.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Apr 2025 04:56:14 -0700 (PDT)
-Message-ID: <4ea9e4da-636a-4573-a0b0-78ae3972bdb0@redhat.com>
-Date: Thu, 3 Apr 2025 13:56:12 +0200
+	s=arc-20240116; t=1743681486; c=relaxed/simple;
+	bh=BZSEIcPDVgue+kWdhRGkx7XFNZAIaTtxTIT3Ou6jJGs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oYhBikg6wFv3+NWWMjj9rYleyERK40aWiUA0koR2VJ+pwl4qhRfBuaJf2TmUsmQiQWb+MWbTVRQI0OtnhzGxFI5ZEbVPS40pz7uAdKMqi3VlSVERIGXb3tN3EtU8dLuPSAUlSSRVRc+8Hn804LywiuFeKJ3fE+CCxEbeBEj7fDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=FuxlYov5; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=qDvpy8UF; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id 7B6C860645; Thu,  3 Apr 2025 13:58:01 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1743681481;
+	bh=gRcqbrxOs8E+UCpi55/AKva5s6oFFzo3AKH//MIjJMs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=FuxlYov57hHtXo7xTOOLiQyrpiaqfEbf8yOjXjKBXdpbzM55cbFAnEN2gBo/embCD
+	 M4BEYsuwXXHABRXWpuvvfd2eserOeMOciOUiihMgfPtZ9PCeZITesc1Cu5HXG3w8ju
+	 VrPUEgmdy47shvnwtfz1KH5VvQmI9InwvTesoBkCFHW8QedtCKHvtz2QT+a2yStlDK
+	 qrxfUfdf3QwEdFVtgz6EOmrIzrh0MtzEljdBPz8c7nKDbGPutsjUfku2jPAqKMWYf6
+	 n5QoViLW9lvbilYEoVNK+x0Bbtxaq/YttnjHmT4svsEERlcdh2XlOdjkNTtftvkRLh
+	 Iro3Va4QzaDIQ==
+X-Spam-Level: 
+Received: from localhost.localdomain (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 58B2D60639;
+	Thu,  3 Apr 2025 13:57:59 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1743681479;
+	bh=gRcqbrxOs8E+UCpi55/AKva5s6oFFzo3AKH//MIjJMs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=qDvpy8UFnMI02gn5+sW+VeqAVWesT6z/cUQRkIz24XvYq9f3hfwlq/jvSvHco7L8E
+	 YNTTDg8p63YmSoKGn7Ug7SNUsYp2I7qo4146KIU6CIh6KbVRl3GwCoKLoBY+bsPEPC
+	 6uEr8jR1onHJOdTvkOALQ8S165vLaSVGxR3AWk5k6UPEeI37UKCr29k/7EhJT3zkbd
+	 RSMG+Iq2IUXijzUIV6j0/vtIZOQ8KaVS5/L1BCupnCBnaRt+tISf7musSETZbM9KJJ
+	 sjmXgNP4dHu1rjoH4Smlc2XwCiGU9TGWZtiJH/LAoxI2xvtluQaipBB5lh+ehslFiO
+	 f3kJylYTFrLig==
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de,
+	horms@kernel.org
+Subject: [PATCH net 0/3] Netfilter fixes for net
+Date: Thu,  3 Apr 2025 13:57:49 +0200
+Message-Id: <20250403115752.19608-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: octeontx2: Handle XDP_ABORTED and XDP invalid as
- XDP_DROP
-To: Lorenzo Bianconi <lorenzo@kernel.org>,
- Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>,
- Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>,
- Bharat Bhushan <bbhushan2@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>
-Cc: Sunil Goutham <sgoutham@cavium.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20250401-octeontx2-xdp-abort-fix-v1-1-f0587c35a0b9@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250401-octeontx2-xdp-abort-fix-v1-1-f0587c35a0b9@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 4/1/25 11:02 AM, Lorenzo Bianconi wrote:
-> In the current implementation octeontx2 manages XDP_ABORTED and XDP
-> invalid as XDP_PASS forwarding the skb to the networking stack.
-> Align the behaviour to other XDP drivers handling XDP_ABORTED and XDP
-> invalid as XDP_DROP.
-> Please note this patch has just compile tested.
-> 
-> Fixes: 06059a1a9a4a5 ("octeontx2-pf: Add XDP support to netdev PF")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+Hi,
 
-The patch LGTM, but I would appreciate some feedback from someone that
-could actually run the code on real H/W before sending it all the way to
-stable.
+The following batch contains Netfilter fixes for net:
 
-Thanks!
+1) conncount incorrectly removes element for non-dynamic sets,
+   these elements represent a static control plane configuration,
+   leave them in place.
 
-Paolo
+2) syzbot found a way to unregister a basechain that has been never
+   registered from the chain update path, fix from Florian Westphal.
 
+3) Fix incorrect pointer arithmetics in geneve support for tunnel,
+   from Lin Ma.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-25-04-03
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit ed3ba9b6e280e14cc3148c1b226ba453f02fa76c:
+
+  net: Remove RTNL dance for SIOCBRADDIF and SIOCBRDELIF. (2025-03-21 22:10:06 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-25-04-03
+
+for you to fetch changes up to 1b755d8eb1ace3870789d48fbd94f386ad6e30be:
+
+  netfilter: nft_tunnel: fix geneve_opt type confusion addition (2025-04-03 13:32:03 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 25-04-03
+
+----------------------------------------------------------------
+Florian Westphal (1):
+      netfilter: nf_tables: don't unregister hook when table is dormant
+
+Lin Ma (1):
+      netfilter: nft_tunnel: fix geneve_opt type confusion addition
+
+Pablo Neira Ayuso (1):
+      netfilter: nft_set_hash: GC reaps elements with conncount for dynamic sets only
+
+ net/netfilter/nf_tables_api.c | 4 ++--
+ net/netfilter/nft_set_hash.c  | 3 ++-
+ net/netfilter/nft_tunnel.c    | 4 ++--
+ 3 files changed, 6 insertions(+), 5 deletions(-)
 
