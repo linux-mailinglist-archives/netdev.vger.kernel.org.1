@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-179209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4F3BA7B221
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 00:50:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 061C8A7B238
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 01:11:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D765189B86B
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 22:50:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0894E1734F3
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 23:10:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EFAC1C84AB;
-	Thu,  3 Apr 2025 22:49:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6DC11A5BAC;
+	Thu,  3 Apr 2025 23:09:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YmJoPO28"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qWqdNvTh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08CD02E62BA
-	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 22:49:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91EB415575C
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 23:09:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743720599; cv=none; b=NR2dTRaxYl6zb5NXyY2HrMnvx9QZpDlz2j1DfXbwZQZ16yZ5QDu6tLKbuq+igX37HoZsNkRZ3DRAbyLp63WYMsEgy46w0ukFuJqXdBoR3pY/nbJIuGtftXe3mygtAOUwDP9v2PMR3/M17nyf/Cmrj9Y1UBS03hkTx6FCmu1NV3U=
+	t=1743721796; cv=none; b=csK0FUX9nn7atmVFxb/daieQRkaGmtYVo6EXNbkD2I1k+VVsBHxuM2T0DsoyopVdTZHWkmKIXPhJAIOZlu2W929DY3nGZqYIjt3eUTbaHEFQQFCqbMMnXUUE+P5wWtnNGJm6SEk3SqEXgXDNadLVRc26j+u91mQInMMFlzNk8vE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743720599; c=relaxed/simple;
-	bh=8Kg/t2RqkZte6lOZ5o3u94WA0oTskjj8aJjrgnHYWv4=;
+	s=arc-20240116; t=1743721796; c=relaxed/simple;
+	bh=kl/CXr8lLgpnSjZoO4Kg1lU9wPFN6qLKcTt/qcjKIk4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=j5ZW5rEpqQpRoaKtYV+6qFs56USIuPvDMsfg+zoMoJkoHUcLqWZaFqtjwaEhHT5pc9lFBJFxmsmKzydKJHP/E/4HRmoG6yj/R/ylEWoi1Z+ty9Whkn5OsEmPsIC7my4QYaOlOHA7UDUzYHJSGhdBb/tLHnzdguKcC83fe1HIufc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YmJoPO28; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FD26C4CEE8;
-	Thu,  3 Apr 2025 22:49:57 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=shBkWK45eR4U0HVmYoxIZwixwVLeCMUsaJ+eVcR+tKqzVPCFVinfe/A6og+MJUmIUeO3q4kCg6Gicf574f1RLuUImFqTCeW0Kw0cbENQzBZjQJcPAbL4XMZGjkb6Q7uJbCeFtD5vtOpbQxJ378ZIyxr2+W4H+19JX8u06Lbog2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qWqdNvTh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C657C4CEE3;
+	Thu,  3 Apr 2025 23:09:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743720597;
-	bh=8Kg/t2RqkZte6lOZ5o3u94WA0oTskjj8aJjrgnHYWv4=;
+	s=k20201202; t=1743721795;
+	bh=kl/CXr8lLgpnSjZoO4Kg1lU9wPFN6qLKcTt/qcjKIk4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YmJoPO28sntJNdov6hfpPioOgUIChFYyaNcVAq5XQ1Ea/Qt2bDEShy6y4VWAXObcx
-	 1zb2T1wNHVMALD/WjoNyfIn0mxJ4nENsdncxzdFJgshnDefBscSqRPQqgwamy+4toW
-	 nvsS3QHInywPZcMR3PX2q1BdB5ocWlgLxz/tM5Q2pBJCPe8BsSyZ/TizQKpnXwK+y4
-	 wtijEf1pqC6K5D/LgTd2I4mM9n8GM6OBWhtH1wKauYmuPJw4MWvlJ2x5Vs2WUV+B8a
-	 gkKNCMo6r1NJWxea4Amgv3ZggxvTwkTJsAOJ7DlDpRTaYI6oyBqiHCZc3KKu2xJfM/
-	 1658t8SJrAFYQ==
+	b=qWqdNvTh85OsCDvsrffJKqMmglIFIhebeVIsVcDt2wM8VSIpVYOvOOTjbV8vzkSM2
+	 vaf7DfeRsBzG2A/aAUI+/pf8frOiZd/DL0PD2cZJWr8BCNHSedjQtyReM3G/qhKhSO
+	 7dTWMUI+iOI3zbI300HfzFfUGWFM9KHvassbjbRJnBmj4bF/TzHp635v43OsDILUeT
+	 yMH7VWUwFyvoCT4eRsgkUD3jthv1RDRMw+cuuUklhzePDuScD86qTZz4hlUcI80VmY
+	 durmjEFBAhgRROsKa+oxo4V0ueeZtLLBB6aejLIMasiKsPmhePtAvi2bYU43HcrPzh
+	 uS6v0s8N4lr2Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B0455380664C;
-	Thu,  3 Apr 2025 22:50:35 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33EBB380664C;
+	Thu,  3 Apr 2025 23:10:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v4] net: airoha: Validate egress gdm port in
- airoha_ppe_foe_entry_prepare()
+Subject: Re: [PATCH net 0/5][pull request] Intel Wired LAN Driver Updates
+ 2025-04-02 (igc, e1000e, ixgbe, idpf)
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174372063424.2709734.9248725253121002171.git-patchwork-notify@kernel.org>
-Date: Thu, 03 Apr 2025 22:50:34 +0000
-References: <20250401-airoha-validate-egress-gdm-port-v4-1-c7315d33ce10@kernel.org>
-In-Reply-To: <20250401-airoha-validate-egress-gdm-port-v4-1-c7315d33ce10@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+ <174372183200.2713510.8157446029269788483.git-patchwork-notify@kernel.org>
+Date: Thu, 03 Apr 2025 23:10:32 +0000
+References: <20250402173900.1957261-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20250402173900.1957261-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to netdev/net.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
 
-On Tue, 01 Apr 2025 11:42:30 +0200 you wrote:
-> Dev pointer in airoha_ppe_foe_entry_prepare routine is not strictly
-> a device allocated by airoha_eth driver since it is an egress device
-> and the flowtable can contain even wlan, pppoe or vlan devices. E.g:
+On Wed,  2 Apr 2025 10:38:52 -0700 you wrote:
+> For igc:
+> Joe Damato removes unmapping of XSK queues from NAPI instance.
 > 
-> flowtable ft {
->         hook ingress priority filter
->         devices = { eth1, lan1, lan2, lan3, lan4, wlan0 }
->         flags offload                               ^
->                                                     |
->                      "not allocated by airoha_eth" --
-> }
+> Zdenek Bouska swaps condition checks/call to prevent AF_XDP Tx drops
+> with low budget value.
+> 
+> For e1000e:
+> Vitaly adjusts Kumeran interface configuration to prevent MDI errors.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v4] net: airoha: Validate egress gdm port in airoha_ppe_foe_entry_prepare()
-    https://git.kernel.org/netdev/net/c/09bccf56db36
+  - [net,1/5] igc: Fix XSK queue NAPI ID mapping
+    https://git.kernel.org/netdev/net/c/dddeeaa16ce9
+  - [net,2/5] igc: Fix TX drops in XDP ZC
+    https://git.kernel.org/netdev/net/c/d931cf9b38da
+  - [net,3/5] e1000e: change k1 configuration on MTP and later platforms
+    https://git.kernel.org/netdev/net/c/efaaf344bc29
+  - [net,4/5] ixgbe: fix media type detection for E610 device
+    https://git.kernel.org/netdev/net/c/40206599beec
+  - [net,5/5] idpf: fix adapter NULL pointer dereference on reboot
+    https://git.kernel.org/netdev/net/c/4c9106f4906a
 
 You are awesome, thank you!
 -- 
