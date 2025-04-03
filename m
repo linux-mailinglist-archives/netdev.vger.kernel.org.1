@@ -1,145 +1,119 @@
-Return-Path: <netdev+bounces-179027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0A16A7A143
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 12:46:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00789A7A16F
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 12:55:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 935C616D722
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 10:46:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 75E1518961B0
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 10:55:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 158A7224AFC;
-	Thu,  3 Apr 2025 10:46:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53BCB24A07E;
+	Thu,  3 Apr 2025 10:54:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lQBwy5QW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FxA0WqbV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0ED178F4A;
-	Thu,  3 Apr 2025 10:46:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242D92E3385;
+	Thu,  3 Apr 2025 10:54:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743677209; cv=none; b=R4ux1R6KevQVqW1YwCiyglakPQLOxWqAvnx1q3BTLoKJOqWPlYIa10fvm31g1QW3RJtpIdJPN7p1iN8K4///QWdX9jxkndYdwVExYpY85C4duPVHQ0riwT1LVLhvxWVVgi9w5+V/8o54wdtJ8kOHu3hpLmkQ+UY0rZ09o08ZZfo=
+	t=1743677696; cv=none; b=pV0NbWrVFi3XtxnC+RQ9rzb2FYeJDdQ9Q2JZCQjs3qmGhxrSBtCUpQVk3OsLLMUriSoJT86zfUJavHdjp5fs5qCB/Srhq4PNQSMzi+PC+jMIfllpwxahPubblKGWUrJK7XqvQuLlPynFNPqIgKEjrVoNKbLwT1H9nDR1gfXfyJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743677209; c=relaxed/simple;
-	bh=qyF6NlsqjuXIZk7BNuFhhlz6ZmRikxCvwok3Rz69B9k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MDXzzg9WZTvt9/tepBrzDKMATYxEAAeEWf0xT4lDfBXH0+MMHcVBj2VEeK4y0MfTMaK7I3/cjvCO5gsX5Z9R8VUAldpWHnFSQsenEWbjHbQ+u/JYWpabsxxyeihwwg5aAKlNxDuSgwzqtZRSo7l7klBJPKoWLNsXXyACKX8aO0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lQBwy5QW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85C12C4CEE3;
-	Thu,  3 Apr 2025 10:46:45 +0000 (UTC)
+	s=arc-20240116; t=1743677696; c=relaxed/simple;
+	bh=QvBZ5cyCcgLfkLnVqPUR4UnS84sKWcyrUwMg47MI12g=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=fbiyGhQPx5rAVoiGMRsSy8T2RTOMyzs02vfLBofspyPeB5X/64b69c7KSNlwh6dt/zvRFiAAexgsEw54kLBT7bZ/cUywxDfubC3VSwSSxssqVXuWi0AVnJZgkldLPnpeYP7zBXPe0FP6TbNvjJXj5WitcDNer+NZRVU+2yKhyMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FxA0WqbV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59CB6C4CEE3;
+	Thu,  3 Apr 2025 10:54:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743677208;
-	bh=qyF6NlsqjuXIZk7BNuFhhlz6ZmRikxCvwok3Rz69B9k=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=lQBwy5QWshTJknX6CVJICsD6twEzip6coMitPYV2JCqjYIODOtucm0ZDL+jtmADnt
-	 Mp7RIeFbWjemqR3QQbsO6haaV7Z3itv6waGFPiD2pQ9TiUbwtH0f4Dk+svENmWTf+b
-	 sn8spK9bV/weY9fVRdPbVI6d9xDnNGyxsDX4C8FV7ySd+REEwnTjwuNKyIZoZItegg
-	 7CtSq3/ofeJRlSELeSKJmYUb684LDL15D2gNfAnW2apxLdzEdr0Lz3SRjD2RkklV+q
-	 h4PKB0lSFfTQBg53I9/sVWYMHdzj6+A+IIAoYaZ7hzeYHF6g3Vj3TFt5Vr74rpHpao
-	 VI2i3MfrWLjhw==
-Message-ID: <568f7245-05c9-4061-b2f4-5d9d38b5c212@kernel.org>
-Date: Thu, 3 Apr 2025 12:46:43 +0200
+	s=k20201202; t=1743677694;
+	bh=QvBZ5cyCcgLfkLnVqPUR4UnS84sKWcyrUwMg47MI12g=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=FxA0WqbVF19+zdRqfr6x5kfvdJ8YdjP5uyJ2p/z4+2NiyereeXESF4KB5CIT/cGuB
+	 vy96fQVrYb8WDNyGbxsJdY9Z7EuuES/q7zhfI+Yc5tnjm8X1oQV11oCGUzENisE1UH
+	 21tYkCZR5jKvNbubvUvnlFne3vi7PebKAezEvhyJcxjI2WCKrkBrOp6sstJqK/YHU7
+	 RUOFM/8J56RwjotFNqTAse1EpXvh+t+yR4rf562VwgPQJh+V8flTcU3ZkoZ7cveb0s
+	 3Omkr0evvEnoHJrnq/3b+V5R+9w22p41h/lc3DglBBa7/eVg2JlXKKsWOBzFxDXAZo
+	 6aGSBZjCuIDIw==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: "FUJITA Tomonori" <fujita.tomonori@gmail.com>
+Cc: <boqun.feng@gmail.com>,  <tglx@linutronix.de>,
+  <linux-kernel@vger.kernel.org>,  <rust-for-linux@vger.kernel.org>,
+  <netdev@vger.kernel.org>,  <andrew@lunn.ch>,  <hkallweit1@gmail.com>,
+  <tmgross@umich.edu>,  <ojeda@kernel.org>,  <alex.gaynor@gmail.com>,
+  <gary@garyguo.net>,  <bjorn3_gh@protonmail.com>,
+  <benno.lossin@proton.me>,  <a.hindborg@samsung.com>,
+  <aliceryhl@google.com>,  <anna-maria@linutronix.de>,
+  <frederic@kernel.org>,  <arnd@arndb.de>,  <jstultz@google.com>,
+  <sboyd@kernel.org>,  <mingo@redhat.com>,  <peterz@infradead.org>,
+  <juri.lelli@redhat.com>,  <vincent.guittot@linaro.org>,
+  <dietmar.eggemann@arm.com>,  <rostedt@goodmis.org>,
+  <bsegall@google.com>,  <mgorman@suse.de>,  <vschneid@redhat.com>,
+  <tgunders@redhat.com>,  <me@kloenk.dev>,  <david.laight.linux@gmail.com>
+Subject: Re: [PATCH v11 6/8] MAINTAINERS: rust: Add new sections for
+ DELAY/SLEEP and TIMEKEEPING API
+In-Reply-To: <20250403.171809.1101736852312477056.fujita.tomonori@gmail.com>
+	(FUJITA Tomonori's message of "Thu, 03 Apr 2025 17:18:09 +0900")
+References: <RGjlasf3jfs3sL9TWhGeAJxH0MNvvn0DDqGl9FVo2JNvwTDpUqrr_V515QzLaEp0T4B1m6PJ0z7Jpw1obiG58w==@protonmail.internalid>
+	<Z-qgo5gl6Qly-Wur@Mac.home> <87ecyd3s09.fsf@kernel.org>
+	<RK_ErPB4YECyHEkLg8UNaclPYHIV40KuRFSNkYGroL8uT39vud-G3iRgR2a7c11Sb7mXgU6oeb_pukIeTOk9sQ==@protonmail.internalid>
+	<20250403.171809.1101736852312477056.fujita.tomonori@gmail.com>
+User-Agent: mu4e 1.12.7; emacs 29.4
+Date: Thu, 03 Apr 2025 12:54:40 +0200
+Message-ID: <877c41v7kf.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 net] net: Fix null-ptr-deref by
- sock_lock_init_class_and_name() and rmmod.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemb@google.com>
-Cc: Simon Horman <horms@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Steve French <sfrench@samba.org>, Enzo Matsumiya <ematsumiya@suse.de>,
- Wang Zhaolong <wangzhaolong1@huawei.com>,
- Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
- stable@vger.kernel.org
-References: <20250403020837.51664-1-kuniyu@amazon.com>
-Content-Language: en-US
-From: Jiri Slaby <jirislaby@kernel.org>
-Autocrypt: addr=jirislaby@kernel.org; keydata=
- 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
-In-Reply-To: <20250403020837.51664-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On 03. 04. 25, 4:07, Kuniyuki Iwashima wrote:
-...
-> --- a/net/core/sock.c
-> +++ b/net/core/sock.c
-> @@ -2324,6 +2324,12 @@ static void __sk_destruct(struct rcu_head *head)
->   		__netns_tracker_free(net, &sk->ns_tracker, false);
->   		net_passive_dec(net);
->   	}
-> +
-> +#if IS_ENABLED(CONFIG_PROVE_LOCKING) && IS_ENABLED(CONFIG_MODULES)
+"FUJITA Tomonori" <fujita.tomonori@gmail.com> writes:
 
-I don't know if this is the right approach at all (it appears not to 
-me), but:
+> On Mon, 31 Mar 2025 21:43:50 +0200
+> Andreas Hindborg <a.hindborg@kernel.org> wrote:
+>
+>>>> If that is acceptable to everyone, it is very likely that I can pick 2-6
+>>>> for v6.16.
+>>>>
+>>>
+>>> You will need to fix something because patch 2-6 removes `Ktime` ;-)
+>>
+>> Yea, but `Instant` is almost a direct substitution, right? Anyway, Tomo
+>> can send a new spin and change all the uses of Ktime, or I can do it. It
+>> should be straight forward. Either way is fine with me.
+>
+> `Delta`? Not `Instant`.
 
-Having this check in random files looks error prone. Perhaps you want to 
-introduce some macro like SOCK_NEEDS_OWNER? Or you introduce sk_put_owner().
+It depends. Current hrtimer takes `Ktime` and supports
+`HrTimerMode::Absolute` and `HrTimerMode::Relative`. With `Delta` and
+`Instant` we should take `Instant` for `HrTimerMode::Absolute` and
+`Delta` for `HrTimerMode::Relative`. The API needs to be modified a bit
+to make that work though. Probably we need to make the start function
+generic over the expiration type or something.
 
-> +	if (sk->sk_owner)
+If you want to, you can fix that. If not, you can use `Instant` for the
+relative case as well, and we shall interpret it as duration. Then I
+will fix it up later. Your decision.
 
-The if is not needed.
+> All Ktime in hrtimer are passed to hrtimer_start_range_ns(), right?
 
-> +		module_put(sk->sk_owner);
-> +#endif
-> +
->   	sk_prot_free(sk->sk_prot_creator, sk);
->   }
->   
+Yes, that is where they end up.
 
--- 
-js
-suse labs
+> I'll send a new version shortly.
+
+Great :)
+
+
+Best regards,
+Andreas Hindborg
+
 
 
