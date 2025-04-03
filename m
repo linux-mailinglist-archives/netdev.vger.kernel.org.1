@@ -1,265 +1,318 @@
-Return-Path: <netdev+bounces-179111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CCB3A7A9A8
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 20:44:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F90CA7A9C2
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 20:54:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE4B217573E
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 18:44:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3176D171E34
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 18:54:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EA60253B42;
-	Thu,  3 Apr 2025 18:44:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3859E25178B;
+	Thu,  3 Apr 2025 18:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b0zKHO7+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C4INoqj1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A04D41A254E;
-	Thu,  3 Apr 2025 18:44:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 477041E87B;
+	Thu,  3 Apr 2025 18:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743705872; cv=none; b=NN4nrohwmm51uqwqE0i9dDJDKxAFbNrzKcwdtdUGgEdjCPLZUZkEDCGctqOuAXMTrFNvuU+yO/pFwvF765fuifsZvV2OjNeh9CWn5lXTCcxKSinGuxKCLyMwOuB9RjTLyMxUMv03czsfMzfnZIoUzsK7Kzo2iaqgEUUnEtQKZFo=
+	t=1743706482; cv=none; b=TfBBFOBJ+UWuqs+rmuX8JsSIPtHGeym0IInWoF8i8zzYEIxdH6xPH2BYu2WnxvhmLfz40aiUxuMGEWZVqcuarXldmkE9RFedFh1xN7kM0+SSB5MJdP/L1syC7flHQ3merQtgf8yu8KBVy7+K8RoAG3G/HhAVvtPqPqkVI8XKGGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743705872; c=relaxed/simple;
-	bh=ZnDAKb4E5SESrBZi2hnMBJ+G8kgc6x5Zm2X/BBtxvSM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LDGp35OpRdWb8XCDN10YR8H3kpAgVDm0oGitk4dJCJNOfyxgg+2m4uO632rgwRs/j125/EcXqkyZCSI1dVw86fmgv0uHACLE20aA8N9R4Oj/1Qrf6+FfNLtw5q3QSSyFY+3X7mP5kw3HC+VBs5zgywHabU3Nt75vNVr4HQCMaSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b0zKHO7+; arc=none smtp.client-ip=209.85.166.178
+	s=arc-20240116; t=1743706482; c=relaxed/simple;
+	bh=C1FBcDaAVK1uwh+G94FF6tFU7E/4QQ7RC9zYw+17n1c=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=pADn0JVpOXhlI0og5a2ZW7+4QzlXuL/IKzCB1vFdRM/B4gQCJCPMiaCMas8j42eq8lmM3r743QAg+qsWHI0NsJVt3OlDKdVhZrE2CHCDowSyniViOEi8AqgWFCDdwcIQCJxuJhwjlFalrqL+wDLt14nrQdbXlajBOiy2khIYeW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C4INoqj1; arc=none smtp.client-ip=209.85.222.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3d6d6d82633so3943025ab.0;
-        Thu, 03 Apr 2025 11:44:30 -0700 (PDT)
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7c5ba363f1aso156034585a.0;
+        Thu, 03 Apr 2025 11:54:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743705870; x=1744310670; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1743706479; x=1744311279; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ap0HUHPX7yXUq/lh+vMdCs7sdd0w6Sp3v7hjIJ93Fms=;
-        b=b0zKHO7+8Z82dJ+Xvn1FpFRQilI1Z4vgWO5MM4laO9lNrt2kCLULyiSaO//sGUrd1G
-         56ZaRJKtc418vQihE1UHZpFAJGj93e3VHuQrFevOSfFJS+Wvv4OqHJerwl2ikKgS7foC
-         IqDsUAzhm2/54kHmrUv9giEAbDKeaJuqlPtZqoR7YvpRH6Hga9dR/I/lvYqCRsAvDXQA
-         xX+DQuOYWAaW6KbYnoJ3Cc8TEEzc2l6VcJftSepcjYBiR0t9BOwF6yhijG/kIV95W94j
-         o5OCHlDQNF1YtSMnPzAUmEwFcgLAZeEKZHwykO40zpfjAsf5oOrZTkFqQJiz4Y3zuH9d
-         0Ktg==
+        bh=FMHBtl9xVpe2paA6VM6NhRj4hgDpCE/8p2jTkeAf0Ds=;
+        b=C4INoqj1VnLKP958SUifjbGY++vGh3f15cmmtMGz3bQLZI37WQVXJHbqcWM2cdHRLI
+         3HMwbXOFf0QBmQjiuMRBFZerbTqRdjpfz09evHFslHZVDe9ibveVUSCga+hnCXuklmX8
+         jL+xdfy7Q9tE54NUkNZeymdB+mtEP5QjImUhaEBfQNtAYP7SbWoVgpQ88RRJwn7gXJhQ
+         L5XvyfJGqurYQavR6ve514r0u1Ihe9GaGxBE2fuB0Yio5o16731kXSrxOLM83Iv6itpW
+         hxCa8UjLY43BZK5NH9z/+wW9MITfOgSe045xI/2+SqxjhcIdPKpL+7C17AJzYAUWWOqZ
+         JM9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743705870; x=1744310670;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ap0HUHPX7yXUq/lh+vMdCs7sdd0w6Sp3v7hjIJ93Fms=;
-        b=OFzJl7FdJq14e5EYDg/81JlSIO+wYCLx4+TI8eR5qRTjAZj602IpE+W6RpD0ooJYGb
-         hPW6DimLtbsoOH/SocoFpkZjiHVWDQGPvvZTUTJKDY/eMB2WAYcwWzeTX5pVhCPRtwWp
-         LD2D3oIzM1emGkCVB2pd5Ye+Wwco53xvGy88rZAvY7d6iSiz4uBA7WrGYa3gfqwLHoeM
-         QeNDknkAKa/yTKL+JJl1ERAne9/a2C2cZT0Z+aWnmHVda7raif6nC8aJHHd91oFv3Vu9
-         mKnY8ARCeJ0VwiohmAJgPDd327s2tw+ZNRC4V328QNT3Pr3LP3O0RYY1E2+acH387w0V
-         m7Zw==
-X-Forwarded-Encrypted: i=1; AJvYcCUB3KsBkJK3aVmstXao8RMZ7Z6hi2PpXLxLz72bWW/CTIXY8o5up/VvWt8SpFNZ8xdcRez/0+gmAaPsPo0=@vger.kernel.org, AJvYcCVQrVytZRDzsKsgPKKS3HlwR8dap4siQpyLryFcvvMQu9nHb7be2042dPybdmQFWnR1NH6swsX45TCZiQ==@vger.kernel.org, AJvYcCVRuuv3h5hssXmvQ6cp+/8THI+48prBtiVuJfzOtI4zBUOFHgZ8J42s1QpZ2jBRBip/76iAEDzS@vger.kernel.org, AJvYcCXT3Ch2d41VT8SGZGCxf0vXBcYbB03ghufdbUlK6uTQUx24BAB5WzYZecmwj7o0/7RFknEv+yCf@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMGYKMOJJiJ+jJe9lCBuU6ouv7HRt7JPoZIo02lLYc7hDVkh2P
-	oIOwlPElCKM8jRjAIn4oWX1iRpFu4zWVE2K/lcrspWBoGq9ZjagXOClYBoFQaw/l6QiKeL5OGLB
-	UnL8CvaGBZzClFNR7lGF2tEjOg5Y=
-X-Gm-Gg: ASbGncs3jx7CTbbwIoaOwYPtJ7rR4vch9GLJULNkEd0sUKLBH/6Fil2igtsDVs0G7+y
-	TOgtj1F05xWFyE2Jw2FG+/V2L/rLC9keLXCll2GoG7oDafw/ZkGOhxb6AGYPzyuGTUc74PY0xyy
-	IcS7EWqKZnezmsMrX7hp98Ll7VKXlHHcDl5G0QC2VXazXer5/AWKNt+DJHuQ==
-X-Google-Smtp-Source: AGHT+IGy9EpjSboQltyoKMDikw04CcYkoaMH/cZSG5fCTOWx22QAPIh/PUcBjfUk+1NqmiwA4oDxlfqv3yYsBcjaanA=
-X-Received: by 2002:a05:6e02:16cb:b0:3d0:4b3d:75ba with SMTP id
- e9e14a558f8ab-3d6e3ee1632mr6821575ab.4.1743705869636; Thu, 03 Apr 2025
- 11:44:29 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743706479; x=1744311279;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=FMHBtl9xVpe2paA6VM6NhRj4hgDpCE/8p2jTkeAf0Ds=;
+        b=KsBWkDyE3jYU03dFq96FKONBAnqBdPfqK5LpDtXI9aHo++6uBWrMCkQDduhRCJREfy
+         9+/a71ivZV+c61rl3vbNpF4s2jBup1b5C9oeJ/nnJB8NieccWk2FgCXJidbhXDOqFeCl
+         VpnU3pTfs6h0CAW+Onga7j5DwEGhZOQ/U+jzukMdPE1bK9LM+ReR4fF4x//aMT/CBS4N
+         WktUPkclo0ALcBDh39v/OnYmL+P0zAzKmCUBOxz0dr6B00XZTnNsj1G8voXiXPHsQYBB
+         uPwacLbidNoq6cw7vjcWdJP2eVZdX432pcEpFxyAglvDDtIrhlm055v+pYSmxerKxb/Q
+         HKzg==
+X-Forwarded-Encrypted: i=1; AJvYcCUW48xEAVLCBiH0PQBLU/ATC/0RbWRAPKC9SaRZxaDMFULKIgMm4f58ATQmtAikUTpM9hZu+Rrq@vger.kernel.org, AJvYcCXOkKXTcucBkmHHou86p0A4BgpFpMTCmi9pgmskd59vRMEh1V4JaNZbsrV6ClgdpEXXnHo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyO6ySjQltIx9u3gesDfOWaAzJcJfPY2+JDtjNfFJ9agl8bPyIw
+	o26WjgkGAaOWw/1xIg3k3NCdpHW971/fTuZVOiLuaS6Lh9bx09Hl
+X-Gm-Gg: ASbGncstSVXHrEbXF2GGH8nynn1mBSoIDig0jvK8TDz1WsWYZ0uaC+p973wS3ImyI8Y
+	bqx670NtUtFsQbxnBJPX7OP4VHGb/Yq8kNQRf5/0LND8JcVnyppB8VOrT9PkqYmThcbHYJSlEBJ
+	1AEYmj7PNpK2rpfUWaUFFEQMRZFqzHkBAnPqyDxJmto8UOU32yDj3lCzhLIi0wy26DYXvxgkhNH
+	1aZyWD18lfviJ/fEQ2GSpd/6DAd0BLMLbGOUjCyz3F7tgZKRsaHJdca2Eg87rBNEyOS4GoAbFpo
+	YPLUWCRd34WrlvH56UypoWmthMMtel1RApMWoKf2iFLo1EhbRoO1KMyvFJ7f3EK+6THuG7uuf81
+	PIbXV0OdZWfTR8LkBz0KITQ==
+X-Google-Smtp-Source: AGHT+IGimAQSATFXuluPG4ZScnHaw1NfaxvDSGwfLcrI5K0t2HAN7GsU2bY+68sJrVrZfDDPo5DHAA==
+X-Received: by 2002:a05:620a:319f:b0:7c5:5800:ddba with SMTP id af79cd13be357-7c774d526ecmr51949485a.22.1743706478914;
+        Thu, 03 Apr 2025 11:54:38 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c76ea9022dsm109068585a.104.2025.04.03.11.54.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Apr 2025 11:54:38 -0700 (PDT)
+Date: Thu, 03 Apr 2025 14:54:38 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: =?UTF-8?B?TWFjaWVqIMW7ZW5jenlrb3dza2k=?= <maze@google.com>, 
+ Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ bpf@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ john.fastabend@gmail.com, 
+ Willem de Bruijn <willemb@google.com>, 
+ Matt Moeller <moeller.matt@gmail.com>
+Message-ID: <67eed96e15750_15e1b32945a@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CANP3RGe8ZjcX8yGhCPs+Q1x7ijpGKthjawztFiXSeDQazgSrpA@mail.gmail.com>
+References: <20250403140846.1268564-1-willemdebruijn.kernel@gmail.com>
+ <20250403140846.1268564-2-willemdebruijn.kernel@gmail.com>
+ <Z-7DiZWkOQ_n5aXw@mini-arch>
+ <67eec501d0d58_14b7b229490@willemb.c.googlers.com.notmuch>
+ <Z-7G8cBIW7-dVeH8@mini-arch>
+ <CANP3RGe8ZjcX8yGhCPs+Q1x7ijpGKthjawztFiXSeDQazgSrpA@mail.gmail.com>
+Subject: Re: [PATCH bpf 1/2] bpf: support SKF_NET_OFF and SKF_LL_OFF on skb
+ frags
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250402-kasan_slab-use-after-free_read_in_sctp_outq_select_transport-v1-1-da6f5f00f286@igalia.com>
- <CADvbK_dTX3c9wgMa8bDW-Hg-5gGJ7sJzN5s8xtGwwYW9FE=rcg@mail.gmail.com>
- <87tt75efdj.fsf@igalia.com> <CADvbK_c69AoVyFDX2YduebF9DG8YyZM7aP7aMrMyqJi7vMmiSA@mail.gmail.com>
-In-Reply-To: <CADvbK_c69AoVyFDX2YduebF9DG8YyZM7aP7aMrMyqJi7vMmiSA@mail.gmail.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 3 Apr 2025 14:44:18 -0400
-X-Gm-Features: ATxdqUF6iNWCUFr5K6P8ICqDN6O1PHfQdnvpw-okfkrtHPA4T7S5O3Q6KScPzFs
-Message-ID: <CADvbK_d+vr-t7D1GZJ86gG6oS+Nzy7MDVh_+7Je6hqCdez4Axw@mail.gmail.com>
-Subject: Re: [PATCH] sctp: check transport existence before processing a send primitive
-To: =?UTF-8?Q?Ricardo_Ca=C3=B1uelo_Navarro?= <rcn@igalia.com>
-Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, kernel-dev@igalia.com, linux-sctp@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 3, 2025 at 10:42=E2=80=AFAM Xin Long <lucien.xin@gmail.com> wro=
-te:
->
-> On Thu, Apr 3, 2025 at 5:58=E2=80=AFAM Ricardo Ca=C3=B1uelo Navarro <rcn@=
-igalia.com> wrote:
+Maciej =C5=BBenczykowski wrote:
+> On Thu, Apr 3, 2025 at 10:35=E2=80=AFAM Stanislav Fomichev <stfomichev@=
+gmail.com> wrote:
 > >
-> > Thanks for reviewing, answers below:
-> >
-> > On Wed, Apr 02 2025 at 15:40:56, Xin Long <lucien.xin@gmail.com> wrote:
-> > > The data send path:
+> > On 04/03, Willem de Bruijn wrote:
+> > > Stanislav Fomichev wrote:
+> > > > On 04/03, Willem de Bruijn wrote:
+> > > > > From: Willem de Bruijn <willemb@google.com>
+> > > > >
+> > > > > Classic BPF socket filters with SKB_NET_OFF and SKB_LL_OFF fail=
+ to
+> > > > > read when these offsets extend into frags.
+> > > > >
+> > > > > This has been observed with iwlwifi and reproduced with tun wit=
+h
+> > > > > IFF_NAPI_FRAGS. The below straightforward socket filter on UDP =
+port,
+> > > > > applied to a RAW socket, will silently miss matching packets.
+> > > > >
+> > > > >     const int offset_proto =3D offsetof(struct ip6_hdr, ip6_nxt=
+);
+> > > > >     const int offset_dport =3D sizeof(struct ip6_hdr) + offseto=
+f(struct udphdr, dest);
+> > > > >     struct sock_filter filter_code[] =3D {
+> > > > >             BPF_STMT(BPF_LD  + BPF_B   + BPF_ABS, SKF_AD_OFF + =
+SKF_AD_PKTTYPE),
+> > > > >             BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, PACKET_HOST, 0,=
+ 4),
+> > > > >             BPF_STMT(BPF_LD  + BPF_B   + BPF_ABS, SKF_NET_OFF +=
+ offset_proto),
+> > > > >             BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, IPPROTO_UDP, 0,=
+ 2),
+> > > > >             BPF_STMT(BPF_LD  + BPF_H   + BPF_ABS, SKF_NET_OFF +=
+ offset_dport),
+> > > > >
+> > > > > This is unexpected behavior. Socket filter programs should be
+> > > > > consistent regardless of environment. Silent misses are
+> > > > > particularly concerning as hard to detect.
+> > > > >
+> > > > > Use skb_copy_bits for offsets outside linear, same as done for
+> > > > > non-SKF_(LL|NET) offsets.
+> > > > >
+> > > > > Offset is always positive after subtracting the reference thres=
+hold
+> > > > > SKB_(LL|NET)_OFF, so is always >=3D skb_(mac|network)_offset. T=
+he sum of
+> > > > > the two is an offset against skb->data, and may be negative, bu=
+t it
+> > > > > cannot point before skb->head, as skb_(mac|network)_offset woul=
+d too.
+> > > > >
+> > > > > This appears to go back to when frag support was introduced to
+> > > > > sk_run_filter in linux-2.4.4, before the introduction of git.
+> > > > >
+> > > > > The amount of code change and 8/16/32 bit duplication are unfor=
+tunate.
+> > > > > But any attempt I made to be smarter saved very few LoC while
+> > > > > complicating the code.
+> > > > >
+> > > > > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> > > > > Link: https://lore.kernel.org/netdev/20250122200402.3461154-1-m=
+aze@google.com/
+> > > > > Link: https://elixir.bootlin.com/linux/2.4.4/source/net/core/fi=
+lter.c#L244
+> > > > > Reported-by: Matt Moeller <moeller.matt@gmail.com>
+> > > > > Co-developed-by: Maciej =C5=BBenczykowski <maze@google.com>
+> > > > > Signed-off-by: Maciej =C5=BBenczykowski <maze@google.com>
+> > > > > Signed-off-by: Willem de Bruijn <willemb@google.com>
+> > > > > ---
+> > > > >  include/linux/filter.h |  3 --
+> > > > >  kernel/bpf/core.c      | 21 ------------
+> > > > >  net/core/filter.c      | 75 +++++++++++++++++++++++-----------=
+--------
+> > > > >  3 files changed, 42 insertions(+), 57 deletions(-)
+> > > > >
+> > > > > diff --git a/include/linux/filter.h b/include/linux/filter.h
+> > > > > index f5cf4d35d83e..708ac7e0cd36 100644
+> > > > > --- a/include/linux/filter.h
+> > > > > +++ b/include/linux/filter.h
+> > > > > @@ -1496,9 +1496,6 @@ static inline u16 bpf_anc_helper(const st=
+ruct sock_filter *ftest)
+> > > > >   }
+> > > > >  }
+> > > > >
+> > > > > -void *bpf_internal_load_pointer_neg_helper(const struct sk_buf=
+f *skb,
+> > > > > -                                    int k, unsigned int size);=
+
+> > > > > -
+> > > > >  static inline int bpf_tell_extensions(void)
+> > > > >  {
+> > > > >   return SKF_AD_MAX;
+> > > > > diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+> > > > > index ba6b6118cf50..0e836b5ac9a0 100644
+> > > > > --- a/kernel/bpf/core.c
+> > > > > +++ b/kernel/bpf/core.c
+> > > > > @@ -68,27 +68,6 @@
+> > > > >  struct bpf_mem_alloc bpf_global_ma;
+> > > > >  bool bpf_global_ma_set;
+> > > > >
+> > > > > -/* No hurry in this branch
+> > > > > - *
+> > > > > - * Exported for the bpf jit load helper.
+> > > > > - */
+> > > > > -void *bpf_internal_load_pointer_neg_helper(const struct sk_buf=
+f *skb, int k, unsigned int size)
+> > > > > -{
+> > > > > - u8 *ptr =3D NULL;
+> > > > > -
+> > > > > - if (k >=3D SKF_NET_OFF) {
+> > > > > -         ptr =3D skb_network_header(skb) + k - SKF_NET_OFF;
+> > > > > - } else if (k >=3D SKF_LL_OFF) {
+> > > > > -         if (unlikely(!skb_mac_header_was_set(skb)))
+> > > > > -                 return NULL;
+> > > > > -         ptr =3D skb_mac_header(skb) + k - SKF_LL_OFF;
+> > > > > - }
+> > > > > - if (ptr >=3D skb->head && ptr + size <=3D skb_tail_pointer(sk=
+b))
+> > > > > -         return ptr;
+> > > > > -
+> > > > > - return NULL;
+> > > > > -}
+> > > > > -
+> > > > >  /* tell bpf programs that include vmlinux.h kernel's PAGE_SIZE=
+ */
+> > > > >  enum page_size_enum {
+> > > > >   __PAGE_SIZE =3D PAGE_SIZE
+> > > > > diff --git a/net/core/filter.c b/net/core/filter.c
+> > > > > index bc6828761a47..b232b70dd10d 100644
+> > > > > --- a/net/core/filter.c
+> > > > > +++ b/net/core/filter.c
+> > > > > @@ -221,21 +221,24 @@ BPF_CALL_3(bpf_skb_get_nlattr_nest, struc=
+t sk_buff *, skb, u32, a, u32, x)
+> > > > >  BPF_CALL_4(bpf_skb_load_helper_8, const struct sk_buff *, skb,=
+ const void *,
+> > > > >      data, int, headlen, int, offset)
+> > > > >  {
+> > > > > - u8 tmp, *ptr;
+> > > > > + u8 tmp;
+> > > > >   const int len =3D sizeof(tmp);
+> > > > >
+> > > > > - if (offset >=3D 0) {
+> > > > > -         if (headlen - offset >=3D len)
+> > > > > -                 return *(u8 *)(data + offset);
+> > > > > -         if (!skb_copy_bits(skb, offset, &tmp, sizeof(tmp)))
+> > > > > -                 return tmp;
+> > > > > - } else {
+> > > > > -         ptr =3D bpf_internal_load_pointer_neg_helper(skb, off=
+set, len);
+> > > > > -         if (likely(ptr))
+> > > > > -                 return *(u8 *)ptr;
+> > > >
+> > > > [..]
+> > > >
+> > > > > + if (offset < 0) {
+> > > > > +         if (offset >=3D SKF_NET_OFF)
+> > > > > +                 offset +=3D skb_network_offset(skb) - SKF_NET=
+_OFF;
+> > > > > +         else if (offset >=3D SKF_LL_OFF && skb_mac_header_was=
+_set(skb))
+> > > > > +                 offset +=3D skb_mac_offset(skb) - SKF_LL_OFF;=
+
+> > > > > +         else
+> > > > > +                 return -EFAULT;
+> > > > >   }
+> > > >
+> > > > nit: we now repeat the same logic three times, maybe still worth =
+it to put it
+> > > > into a helper? bpf_resolve_classic_offset or something.
 > > >
-> > >   sctp_endpoint_lookup_assoc() ->
-> > >   sctp_sendmsg_to_asoc()
-> > >
-> > > And the transport removal path:
-> > >
-> > >   sctp_sf_do_asconf() ->
-> > >   sctp_process_asconf() ->
-> > >   sctp_assoc_rm_peer()
-> > >
-> > > are both protected by the same socket lock.
-> > >
-> > > Additionally, when a path is removed, sctp_assoc_rm_peer() updates th=
-e
-> > > transport of all existing chunks in the send queues (peer->transmitte=
-d
-> > > and asoc->outqueue.out_chunk_list) to NULL.
-> > >
-> > > It will be great if you can reproduce the issue locally and help chec=
-k
-> > > how the potential race occurs.
-> >
-> > That's true but if there isn't enough space in the send buffer, then
-> > sctp_sendmsg_to_asoc() will release the lock temporarily.
-> >
-> Oh right, I missed that. Thanks.
->
-> > The scenario that the reproducer generates is the following:
-> >
-> >         Thread A                                  Thread B
-> >         --------------------                      --------------------
-> > (1)     sctp_sendmsg()
-> >           lock_sock()
-> >           sctp_sendmsg_to_asoc()
-> >             sctp_wait_for_sndbuf()
-> >               release_sock()
-> >                                                   sctp_setsockopt(SCTP_=
-SOCKOPT_BINDX_REM)
-> >                                                     lock_sock()
-> >                                                     sctp_setsockopt_bin=
-dx()
-> >                                                     sctp_send_asconf_de=
-l_ip()
-> >                                                       ...
-> >                                                     release_sock()
-> >                                                       process rcv backl=
-og:
-> >                                                         sctp_do_sm()
-> >                                                           sctp_sf_do_as=
-conf()
-> >                                                             ...
-> >                                                               sctp_asso=
-c_rm_peer()
-> >               lock_sock()
-> > (2)          chunk->transport =3D transport
-> >              sctp_primitive_SEND()
-> >                ...
-> >                sctp_outq_select_transport()
-> > *BUG*            switch (new_transport->state)
-> >
-> >
-> > Notes:
-> > ------
-> >
-> > Both threads operate on the same socket.
-> >
-> > 1. Here, sctp_endpoint_lookup_assoc() finds and returns an existing
-> > association and transport.
-> >
-> > 2. At this point, `transport` is already deleted. chunk->transport is
-> > not set to NULL because sctp_assoc_rm_peer() ran _before_ the transport
-> > was assigned to the chunk.
-> >
-> > > We should avoid an extra hashtable lookup on this hot TX path, as it =
-would
-> > > negatively impact performance.
-> >
-> > Good point. I can't really tell the performance impact of the lookup
-> > here, my experience with the SCTP implementation is very limited. Do yo=
-u
-> > have any suggestions or alternatives about how to deal with this?
-> >
-> I think the correct approach is to follow how sctp_assoc_rm_peer()
-> handles this.
->
-> You can use asoc->peer.last_sent_to (which isn't really used elsewhere)
-> to temporarily store the transport before releasing the socket lock and
-> sleeping in sctp_sendmsg_to_asoc(). After waking up and reacquiring the
-> lock, restore the transport back to asoc->peer.last_sent_to.
->
-> Additionally, during an ASCONF update, ensure asoc->peer.last_sent_to
-> is set to a valid transport if it matches the transport being removed.
->
-> For example:
->
-> in sctp_wait_for_sndbuf():
->
->     asoc->peer.last_sent_to =3D *tp;
->     release_sock(sk);
->     current_timeo =3D schedule_timeout(current_timeo);
->     lock_sock(sk);
->     *tp =3D asoc->peer.last_sent_to;
->     asoc->peer.last_sent_to =3D NULL;
->
-> in sctp_assoc_rm_peer():
->
->     if (asoc->peer.last_sent_to =3D=3D peer)
->         asoc->peer.last_sent_to =3D transport;
-This change introduces a side effect: when multiple threads send data
-on the same asoc using different daddrs, they may interfere with each
-other while waiting for buffer space, as each thread updates
-asoc->peer.last_sent_to.
+> > > I definitely tried this in various ways. But since the core logic i=
+s
+> > > only four lines and there is an early return on error, no helper
+> > > really simplifies anything. It just adds a layer of indirection and=
 
-You may consider holding a refcnt to the transport (similar to how the
-asoc refcnt is held) in sctp_wait_for_sndbuf(), as shown below:
+> > > more code in the end.
+> >
+> > More code, but at least it de-duplicates the logic of translating
+> > SKF_XXX_OFF? Something like the following below, but yeah, a matter
+> > of preference, up to you.
 
-@@ -9225,7 +9225,9 @@ static int sctp_wait_for_sndbuf(struct
-sctp_association *asoc, long *timeo_p,
-        pr_debug("%s: asoc:%p, timeo:%ld, msg_len:%zu\n", __func__, asoc,
-                 *timeo_p, msg_len);
+I see your point. No strong opinion from me. Will revise,
+assuming you don't mind the workaround below:
 
--       /* Increment the association's refcnt.  */
-+       /* Increment the transport and association's refcnt.  */
-+       if (t)
-+               sctp_transport_hold(t);
-        sctp_association_hold(asoc);
+> > static int bpf_skb_resolve_offset(skb, offset) {
+> >         if (offset >=3D 0)
+> >                 return offset;
+> >
+> >         if (offset >=3D SKF_NET_OFF)
+> >                 offset +=3D skb_network_offset(skb) - SKF_NET_OFF;
+> >         else if (offset >=3D SKF_LL_OFF && skb_mac_header_was_set(skb=
+))
+> >                 offset +=3D skb_mac_offset(skb) - SKF_LL_OFF;
+> >
+> >         return -1;
+> > }
+> >
+> > BPF_CALL_4(bpf_skb_load_helper_8, const struct sk_buff *, skb, const =
+void *,
+> >            data, int, headlen, int, offset)
+> > {
+> >         offset =3D bpf_skb_resolve_offset(skb, offset);
+> >         if (offset < 0)
+> >                 return -EFAULT;
+> =
 
-        /* Wait on the association specific sndbuf space. */
-@@ -9234,7 +9236,7 @@ static int sctp_wait_for_sndbuf(struct
-sctp_association *asoc, long *timeo_p,
-                                          TASK_INTERRUPTIBLE);
-                if (asoc->base.dead)
-                        goto do_dead;
--               if (!*timeo_p)
-+               if (!*timeo_p || (t && t->dead))
-                        goto do_nonblock;
-                if (sk->sk_err || asoc->state >=3D SCTP_STATE_SHUTDOWN_PEND=
-ING)
-                        goto do_error;
-@@ -9259,7 +9261,9 @@ static int sctp_wait_for_sndbuf(struct
-sctp_association *asoc, long *timeo_p,
- out:
-        finish_wait(&asoc->wait, &wait);
+> this is incorrect, as offset can be legally negative here.
 
--       /* Release the association's refcnt.  */
-+       /* Release the transport and association's refcnt.  */
-+       if (t)
-+               sctp_transport_put(t);
-        sctp_association_put(asoc);
-
-
-You will need to reintroduce the dead bit in struct sctp_transport and
-set it in sctp_transport_free(). Note this field was previously removed in:
-
-commit 47faa1e4c50ec26e6e75dcd1ce53f064bd45f729
-Author: Xin Long <lucien.xin@gmail.com>
-Date:   Fri Jan 22 01:49:09 2016 +0800
-
-    sctp: remove the dead field of sctp_transport
-
-Thanks.
+Yeah, this needs a special case like INT_MIN to communicate error,
+or pass-by-value. Exactly the kind of workarounds that gave me pause.
 
