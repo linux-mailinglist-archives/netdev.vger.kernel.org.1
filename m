@@ -1,307 +1,465 @@
-Return-Path: <netdev+bounces-179194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45022A7B1B0
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 23:54:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 639E0A7B1D2
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 00:04:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A27B51888A31
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 21:54:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28786177AC7
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 22:04:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84BAF18CBFB;
-	Thu,  3 Apr 2025 21:54:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B68A62E62CE;
+	Thu,  3 Apr 2025 22:04:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fAP5Bksl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="myK+Beci"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 655A316F0FE
-	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 21:54:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1AD2E62A2
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 22:04:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743717243; cv=none; b=hcaB5FxvoMKoz/9zyt0vXGVS2m64gAUfdSD5RQ0OMZeh9DIM1AqF4rsXcjSzAAFhn3/UA4VDBIPyxpRM14ZIu9ohyzRJtuRGpRojXiEvsV73fo3ROekbwk4gAnAUVH8Vp+YINUDcgj6ppnhZtCIeHQyyGomexFdHTBz4GMX7S6k=
+	t=1743717850; cv=none; b=imIMtjeSgWhns7Dt/3W9At492RI/3/art+7LaFnhfprr/httQfZP/QmK4KBGQRePDAALXChy/WzDdF65k0EMEjeoh1H3RXDelEdjF03aPqXC0N0b0gKUaYi26hcL61UL0bRLEdjgQFwaVP+42Lko+JJr0BfQh7mhLcqLzLKxcy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743717243; c=relaxed/simple;
-	bh=Urd33bxq1a5stv1Pb/vT/2rG2h6Ysukr/iGwX1XqmEo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WJ8AGBI7+rYtaNWap1o8UiCRRJnU45VR6k4wbvwrOqjPMluBKIydaIjg5qdMtDh/Bp6fx8ZI9r9N6lFgVVRVO5tUbEf602xNZh++9jUalpcjH9rSxKcIiuHi8CSOzbRtGGSbOOv870EQyEhoIYGtSGjqXAGj8o+iw/sUhVPfz+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fAP5Bksl; arc=none smtp.client-ip=209.85.221.48
+	s=arc-20240116; t=1743717850; c=relaxed/simple;
+	bh=mMElvFv8+DMnnhekOQNr71I2sINIvOfnNKCsS186ZP0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o9wVV1ca4xOTiCmxW/GK93IMDEm5AOOAeq0hygLyJzqE/zFdr2k2brfBc1VqO6WLGuQRoT3pGiogDgyV43sqmzPz4LTGm7GQFwFjXrnxJ8n7ve2C8cZOPkd52SkSqynNjmVteMBV5IgW5NcjJXDCjUog0irtq99oHTORUxRnqDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=myK+Beci; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3912fdddf8fso1599924f8f.1
-        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 14:54:00 -0700 (PDT)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-223fd89d036so16749375ad.1
+        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 15:04:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743717239; x=1744322039; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wWJQ445Ouv7UcpvFzboL1nD7c8uYnY2ecoKz1+J6Jbk=;
-        b=fAP5BkslGnqAC0xOjxfeswymMeLUCAo1gRjJFxe1pw8TN1wFa3COnE9Wrkefakzz6P
-         9UcwliXJfaGpsBwZ1it3SLMeHNQLOHejs0WX/71jiSRwiRos5ofOHKipCOAU1ikWfM7R
-         dAIOxQf2mLgJg+VVTwLJZnhJkkwrqw4djNZzVqiD8J7xUGl/tQm8AM9b05Auis0q+iOV
-         awN+vkplzwZCff1mTOjrQRAh2AtSaqBsJm9itdJjS6wgahlNjbKdaTdPKk1lquIuNYID
-         BltgywhkQlQHU027uJkXfo9+dhj5VzQaCqE1BZvWoKhZskcKNJlLiFNba02UXzE4BTA2
-         ircg==
+        d=gmail.com; s=20230601; t=1743717848; x=1744322648; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=M2AmsvjjHC86qKy4tDPP+dR04etOfsO5G+CBWvsHs2s=;
+        b=myK+BecicpWykBugO7DxVz6uwlIgt9s1iHXFKsryFlQsbAf63JgORGT/f3CXrU6ZUp
+         N/rzDYVnih+t9BTRmCO/IbosB5MTEo44Izw+Q17vDbcoftwta0zj6EcY+SmXTuZ1sbTy
+         bWCzL7N7ulQOHQpRv3Y3LFeURTSOiR7BqI/UinXN+0w52QGBvTyki+4i6eCvnfALjUFB
+         lXx4vMlAIpWVTKIHYFxtVYdyCaKl53TWVaKt70KG3kWn6agt8Z32d0DSlnDVuA58PIjZ
+         yNmdWHt+eUSOGi+4UHPX11yDFSQyKV4z7P1PC5y0N1WZNxNLt3uHjUQfX1A0Se+7UJLd
+         pVmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743717239; x=1744322039;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wWJQ445Ouv7UcpvFzboL1nD7c8uYnY2ecoKz1+J6Jbk=;
-        b=NYkTcucKM4vONmCnOZlXH7I37twIESGhKzpZZuOJUIMvGEQ+mUoGg9DiE9ilhWxoYh
-         GmiN7ruL+5shJizFKdS1uHdKHY/uzzuq5wg4ue4h6HbMjX82FPRoBTib3Ymfdu57iSGK
-         YM3fCcyJS0QQYom1g9m8cCKcuKQkv92XJzMvrAaUguQFQbJKHijc4Ob+iRwkxuCdZTHL
-         kKxZfg1eIKnoBr4D/32S6rsTDO37K+QagVLUSb+NPF4oc+mCa0oK5EV4tSCS4MpWMiw4
-         1rT8LHPznLh39/500nIFiuJX/OIZMRmoBOT/GIU0p0um5K1nDch5qCeyWwrJ9+rfppf9
-         ot1w==
-X-Forwarded-Encrypted: i=1; AJvYcCWq/DYFJoYMML4YJ256fawFccYp6otOd9E6Tdxh9kMyHk4fumhfvK0K+G7387loMM0gy0exygc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUTyTVutFUC9huTJQm00MdFTeMFbihPCx73ScgMY41KcgPwvjW
-	8x0nZRgKUQMA+XJjHiK0PwdqfPzW/8bIBZwanb+UyYQV7eRblG2szvKPzxubpZ9tn4EoqGTEBEr
-	FNfFFAVdBLWi3bjKKGSO8JuxRkDw=
-X-Gm-Gg: ASbGnctdh0V4TMgmhNXK0dSI1feVxSup+6dNrctpv48FcJWgJFz0TNQBz5/wdsqB3WT
-	WxNScBY1y96eMHVSlfaQ/6foyp0v7P66XXOECASOirTiTm+abOtAVmgESwDoyaPvmZbJJHGv8wo
-	ytUZVonoVdAq0pVhoOUBEXzoCI+aK3x/RLaZv7i2DymfLJJwt4GhQwnuUdRys=
-X-Google-Smtp-Source: AGHT+IGbCVKr8IL3kwtYKeE0K5X6jm1zWrjcqGJg3ccOS83gQIwvQbocyx0AkI+m1WB3agXV/N68jnRfZ4RFlHjg+xI=
-X-Received: by 2002:a05:6000:40cd:b0:390:dec3:2780 with SMTP id
- ffacd0b85a97d-39cba94d1eemr809536f8f.24.1743717239365; Thu, 03 Apr 2025
- 14:53:59 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743717848; x=1744322648;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=M2AmsvjjHC86qKy4tDPP+dR04etOfsO5G+CBWvsHs2s=;
+        b=n2fJKj+RHpjK8SDYwKFVqfN5QcbrtpLfv6prn51KLasHCrUhDvALISvtS1ufa1C/34
+         6qzJMgEDOAnYS5lI+kzppO/ZaIc7MAw6XCUxUg5xW7fknOKBCkB+Q3rUMHw++8l9zkSw
+         DII/MzxZBwN6RUHuEF1R1r1OVRufUjBZ0rJhfDdFhGVaMzCE+pD2iI9Tff+V4gBsFauT
+         C0NJt+1Q9578ADvGOMcINA3+j0k8iRsiCWWA1KSShoLlcxYVGkei5qeK5UdwZ5H8NYhn
+         DnE7bT48Jk9OEOU3cOcex0HmGXsRQ1wI4ZxpUJIsKDqQYGZSdBwAFP2Bv+ElQqSvssiH
+         ukBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVkVbSZmkBvR5fTSW+CprKCyNQrf8Z1luoEev3JByrnYkQ9y+2ZDYNds2OH6N6mV35nemfshPA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzzwhk1HBbzwkHXfqTMxC+RZRpaqfcnqiqEgW7jCjm2LaQNGmgB
+	M8G1yJzQTod64ty+n56qnjoiE+SiRRnh4Cx9r13a/6xBeRbe0Y4=
+X-Gm-Gg: ASbGncuZY/1r8bym71tMBwWCMQNLIx50MdU3LaP5rSmlK2myVuODjZHRLW2KzOKbf9o
+	XfLFP1xqXGeCb04KK5h/ucQ1InWHl1ahJwRNiW2//CUjLRSrvNx5A1Z7ZlY7mq0TTyFDZknKPe8
+	A/JsGtxI5ABWuNnL3di1tiJBsb8TixjPN05VUC7pGtwLLM+EQYzv5j3IFbftc4Po6QzfRgxlHXP
+	jsL9vwMnB4L40m6cwwKA/TD7W89LXQn7zUG03/8iCZdFm7n7weuZlTYPixtKouoP4CAg6zp0Vew
+	MLej9sTuOaaH0VUBTuXmc1tIhl+Dooj0bK+a7pu4uYwU
+X-Google-Smtp-Source: AGHT+IH5xb0AJsQ7vokRNOotdT7V1qJncDwt3B2zGK2fbMqGU974BEKpAk1hsWAjNEZPDSsw3bPhHA==
+X-Received: by 2002:a17:903:1a24:b0:225:ac99:ae0d with SMTP id d9443c01a7336-22a8a045e34mr12314835ad.10.1743717847867;
+        Thu, 03 Apr 2025 15:04:07 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2297865c1ffsm19623425ad.126.2025.04.03.15.04.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Apr 2025 15:04:07 -0700 (PDT)
+Date: Thu, 3 Apr 2025 15:04:06 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: "pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"sdf@fomichev.me" <sdf@fomichev.me>,
+	"kuba@kernel.org" <kuba@kernel.org>
+Subject: Re: another netdev instance lock bug in ipv6_add_dev
+Message-ID: <Z-8F1qAvQDGf9SXV@mini-arch>
+References: <aac073de8beec3e531c86c101b274d434741c28e.camel@nvidia.com>
+ <Z-3GVgPJHZSyxfaI@mini-arch>
+ <c4b1397ffa83c73dfdab6bcbce51e564592e18c8.camel@nvidia.com>
+ <Z-61sxcLSA6z9eoy@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <174354264451.26800.7305550288043017625.stgit@ahduyck-xeon-server.home.arpa>
- <174354300640.26800.16674542763242575337.stgit@ahduyck-xeon-server.home.arpa>
- <Z-6hcQGI8tgshtMP@shell.armlinux.org.uk> <20250403172953.5da50762@fedora.home>
- <de19e9f1-4ae3-4193-981c-e366c243352d@lunn.ch>
-In-Reply-To: <de19e9f1-4ae3-4193-981c-e366c243352d@lunn.ch>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Thu, 3 Apr 2025 14:53:22 -0700
-X-Gm-Features: ATxdqUHs_Q2OmWzFMALS0im0OxYzDGd54IUX_-Rq-Q4v4WyWZpZVVIZCUHX_3OE
-Message-ID: <CAKgT0UdhTT=g+ODpzR5uoTEOkC8u+cfCp7H-8718Zphd=24buw@mail.gmail.com>
-Subject: Re: [net PATCH 1/2] net: phy: Cleanup handling of recent changes to phy_lookup_setting
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, 
-	"Russell King (Oracle)" <linux@armlinux.org.uk>, netdev@vger.kernel.org, hkallweit1@gmail.com, 
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z-61sxcLSA6z9eoy@mini-arch>
 
-On Thu, Apr 3, 2025 at 9:34=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> On Thu, Apr 03, 2025 at 05:29:53PM +0200, Maxime Chevallier wrote:
-> > On Thu, 3 Apr 2025 15:55:45 +0100
-> > "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
-> >
-> > > On Tue, Apr 01, 2025 at 02:30:06PM -0700, Alexander Duyck wrote:
-> > > > From: Alexander Duyck <alexanderduyck@fb.com>
-> > > >
-> > > > The blamed commit introduced an issue where it was limiting the lin=
-k
-> > > > configuration so that we couldn't use fixed-link mode for any setti=
-ngs
-> > > > other than twisted pair modes 10G or less. As a result this was cau=
-sing the
-> > > > driver to lose any advertised/lp_advertised/supported modes when se=
-tup as a
-> > > > fixed link.
-> > > >
-> > > > To correct this we can add a check to identify if the user is in fa=
-ct
-> > > > enabling a TP mode and then apply the mask to select only 1 of each=
- speed
-> > > > for twisted pair instead of applying this before we know the number=
- of bits
-> > > > set.
-> > > >
-> > > > Fixes: de7d3f87be3c ("net: phylink: Use phy_caps_lookup for fixed-l=
-ink configuration")
-> > > > Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
-> > > > ---
-> > > >  drivers/net/phy/phylink.c |   15 +++++++++++----
-> > > >  1 file changed, 11 insertions(+), 4 deletions(-)
-> > > >
-> > > > diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-> > > > index 16a1f31f0091..380e51c5bdaa 100644
-> > > > --- a/drivers/net/phy/phylink.c
-> > > > +++ b/drivers/net/phy/phylink.c
-> > > > @@ -713,17 +713,24 @@ static int phylink_parse_fixedlink(struct phy=
-link *pl,
-> > > >           phylink_warn(pl, "fixed link specifies half duplex for %d=
-Mbps link?\n",
-> > > >                        pl->link_config.speed);
-> > > >
-> > > > - linkmode_zero(pl->supported);
-> > > > - phylink_fill_fixedlink_supported(pl->supported);
-> > > > -
-> > > > + linkmode_fill(pl->supported);
-> > > >   linkmode_copy(pl->link_config.advertising, pl->supported);
-> > > >   phylink_validate(pl, pl->supported, &pl->link_config);
-> > > >
-> > > >   c =3D phy_caps_lookup(pl->link_config.speed, pl->link_config.dupl=
-ex,
-> > > >                       pl->supported, true);
-> > > > - if (c)
-> > > > + if (c) {
-> > > >           linkmode_and(match, pl->supported, c->linkmodes);
-> > > >
-> > > > +         /* Compatbility with the legacy behaviour:
-> > > > +          * Report one single BaseT mode.
-> > > > +          */
-> > > > +         phylink_fill_fixedlink_supported(mask);
-> > > > +         if (linkmode_intersects(match, mask))
-> > > > +                 linkmode_and(match, match, mask);
-> > > > +         linkmode_zero(mask);
-> > > > + }
-> > > > +
-> > >
-> > > I'm still wondering about the wiseness of exposing more than one link
-> > > mode for something that's supposed to be fixed-link.
-> > >
-> > > For gigabit fixed links, even if we have:
-> > >
-> > >     phy-mode =3D "1000base-x";
-> > >     speed =3D <1000>;
-> > >     full-duplex;
-> > >
-> > > in DT, we still state to ethtool:
-> > >
-> > >         Supported link modes:   1000baseT/Full
-> > >         Advertised link modes:  1000baseT/Full
-> > >         Link partner advertised link modes:  1000baseT/Full
-> > >         Link partner advertised auto-negotiation: No
-> > >         Speed: 1000Mb/s
-> > >         Duplex: Full
-> > >         Auto-negotiation: on
-> > >
-> > > despite it being a 1000base-X link. This is perfectly reasonable,
-> > > because of the origins of fixed-links - these existed as a software
-> > > emulated baseT PHY no matter what the underlying link was.
-> > >
-> > > So, is getting the right link mode for the underlying link important
-> > > for fixed-links? I don't think it is. Does it make sense to publish
-> > > multiple link modes for a fixed-link? I don't think it does, because
-> > > if multiple link modes are published, it means that it isn't fixed.
-> >
-> > That's a good point. The way I saw that was :
-> >
-> >   "we report all the modes because, being fixed-link, it can be
-> >   any of these modes."
-> >
-> > But I agree with you in that this doesn't show that "this is fixed,
-> > don't try to change that, this won't work". So, I do agree with you now=
-.
-> >
-> > > As for arguments about the number of lanes, that's a property of the
-> > > PHY_INTERFACE_MODE_xxx. There's a long history of this, e.g. MII/RMII
-> > > is effectively a very early illustration of reducing the number of
-> > > lanes, yet we don't have separate link modes for these.
-> > >
-> > > So, I'm still uneasy about this approach.
-> >
-> > So, how about extending the compat list of "first link of each speed"
-> > to all the modes, then once the "mediums" addition from the phy_port
-> > lands, we simplify it down the following way :
-> >
-> > Looking at the current list of elegible fixed-link linkmodes, we have
-> > (I'm taking this from one of your mails) :
-> >
-> > speed duplex  linkmode
-> > 10M   Half    10baseT_Half
-> > 10M   Full    10baseT_Full
-> > 100M  Half    100baseT_Half
-> > 100M  Full    100baseT_Full
-> > 1G    Half    1000baseT_Half
-> > 1G    Full    1000baseT_Full (this changed over time)
-> > 2.5G  Full    2500baseT_Full
-> > 5G    Full    5000baseT_Full
-> > 10G   Full    10000baseCR_Full (used to be 10000baseKR_Full)
-> > 20G   Full    20000baseKR2_Full =3D> there's no 20GBaseCR*
-> > 25G   Full    25000baseCR_Full
-> > 40G   Full    40000baseCR4_Full
-> > 50G   Full    50000baseCR2_Full
-> > 56G   Full    56000baseCR4_Full
-> > 100G  Full    100000baseCR4_Full
-> >
-> > To avoid maintaining a hardcoded list, we could clearly specifying
-> > what we report in fixed-link :
-> >
-> >  1 : Any BaseT mode for the given speed duplex (BaseT and not BaseT1)
-> >  2 : If there's none, Any BaseK mode for that speed/duplex
-> >  3 : If there's none, Any BaseC mode for that speed/duplex
-> >
-> > That's totally arbitrary of course, and if one day someone adds, say,
-> > 25GBaseT, fixed-link linkmode will change. Another issue us 10G,
-> > 10GBaseT exists, but wasn't the first choice.
->
-> Maybe go back to why fixed-link exists? It is basically a hack to make
-> MAC configuration easier. It was originally used for MAC to MAC
-> connections, e.g. a NIC connected to a switch, without PHYs in the
-> middle. By faking a PHY, there was no need to add any special
-> configuration API to the MAC, the phylib adjust_link callback would be
-> sufficient to tell the MAC to speed and duplex to use. For {R}{G}MII,
-> or SGMII, that is all you need to know. The phy-mode told you to
-> configure the MAC to MII, GMII, SGMII.
+On 04/03, Stanislav Fomichev wrote:
+> On 04/03, Cosmin Ratiu wrote:
+> > On Wed, 2025-04-02 at 16:20 -0700, Stanislav Fomichev wrote:
+> > > On 04/02, Cosmin Ratiu wrote:
+> > > > Hi,
+> > > > 
+> > > > Not sure if it's reported already, but I encountered a bug while
+> > > > testing with the new locking scheme.
+> > > > This is the call trace:
+> > > > 
+> > > > [ 3454.975672] WARNING: CPU: 1 PID: 58237 at
+> > > > ./include/net/netdev_lock.h:54 ipv6_add_dev+0x370/0x620
+> > > > [ 3455.008776]  ? ipv6_add_dev+0x370/0x620
+> > > > [ 3455.010097]  ipv6_find_idev+0x96/0xe0
+> > > > [ 3455.010725]  addrconf_add_dev+0x1e/0xa0
+> > > > [ 3455.011382]  addrconf_init_auto_addrs+0xb0/0x720
+> > > > [ 3455.013537]  addrconf_notify+0x35f/0x8d0
+> > > > [ 3455.014214]  notifier_call_chain+0x38/0xf0
+> > > > [ 3455.014903]  netdev_state_change+0x65/0x90
+> > > > [ 3455.015586]  linkwatch_do_dev+0x5a/0x70
+> > > > [ 3455.016238]  rtnl_getlink+0x241/0x3e0
+> > > > [ 3455.019046]  rtnetlink_rcv_msg+0x177/0x5e0
+> > > > 
+> > > > The call chain is rtnl_getlink -> linkwatch_sync_dev ->
+> > > > linkwatch_do_dev -> netdev_state_change -> ...
+> > > > 
+> > > > Nothing on this path acquires the netdev lock, resulting in a
+> > > > warning.
+> > > > Perhaps rtnl_getlink should acquire it, in addition to the RTNL
+> > > > already
+> > > > held by rtnetlink_rcv_msg?
+> > > > 
+> > > > The same thing can be seen from the regular linkwatch wq:
+> > > > 
+> > > > [ 3456.637014] WARNING: CPU: 16 PID: 83257 at
+> > > > ./include/net/netdev_lock.h:54 ipv6_add_dev+0x370/0x620
+> > > > [ 3456.655305] Call Trace:
+> > > > [ 3456.655610]  <TASK>
+> > > > [ 3456.655890]  ? __warn+0x89/0x1b0
+> > > > [ 3456.656261]  ? ipv6_add_dev+0x370/0x620
+> > > > [ 3456.660039]  ipv6_find_idev+0x96/0xe0
+> > > > [ 3456.660445]  addrconf_add_dev+0x1e/0xa0
+> > > > [ 3456.660861]  addrconf_init_auto_addrs+0xb0/0x720
+> > > > [ 3456.661803]  addrconf_notify+0x35f/0x8d0
+> > > > [ 3456.662236]  notifier_call_chain+0x38/0xf0
+> > > > [ 3456.662676]  netdev_state_change+0x65/0x90
+> > > > [ 3456.663112]  linkwatch_do_dev+0x5a/0x70
+> > > > [ 3456.663529]  __linkwatch_run_queue+0xeb/0x200
+> > > > [ 3456.663990]  linkwatch_event+0x21/0x30
+> > > > [ 3456.664399]  process_one_work+0x211/0x610
+> > > > [ 3456.664828]  worker_thread+0x1cc/0x380
+> > > > [ 3456.665691]  kthread+0xf4/0x210
+> > > > 
+> > > > In this case, __linkwatch_run_queue seems like a good place to grab
+> > > > a
+> > > > device lock before calling linkwatch_do_dev.
+> > > 
+> > > Thanks for the report! What about linkwatch_sync_dev in
+> > > netdev_run_todo
+> > > and carrier_show? Should probably also need to be wrapped?
+> > 
+> > Done, here's the patch I'm testing with which works for all tests I
+> > could get my hands on. Will you officially propose it (maybe in a
+> > slightly different form) please?
+> 
+> I'm thinking maybe we should push down the locking a bit? To the
+> level of netdev_state_change. Since, in theory, every NETDEV_CHANGE
+> can reach addrconf_notify. I was playing with the patch below,
+> but I think the ethtool will lockup, so I need to fix that at least...
+> Let me spend a bit more time today chasing down the callers...
 
-Another issue is that how you would define the connection between the
-two endpoints is changing. Maxime is basing his data off of
-speed/duplex however to source that he is pulling data from
-link_mode_params that is starting to broaden including things like
-lanes. I really think going forward lanes is going to start playing a
-role as we get into the higher speeds and it is already becoming a
-standard config item to use to strip out unsupported modes when
-configuring the interface via autoneg.
+Ok, so the final patch is gonna look like this. LMK if you can give it
+a test on your side.
 
-> But things evolved since then. We started having PHYs which change
-> their host side depending on their media side. SGMII for <=3D 1G,
-> 2500BaseX, 5GBaseX, 10GBaseX. It became necessary for the adjust_link
-> callback to look at more than just the speed/duplex, it also needed to
-> look at the phy_interface_t. phy-mode looses its meaning, it might be
-> considered the default until we know better.
-
-I am wondering about that. I know I specified we were XLGMII for fbnic
-but that has proven problematic since we aren't actually 40G. So we
-are still essentially just reporting link up/down using that. That is
-why I was looking at going with a fixed mode as I can at least specify
-the correct speed duplex for the one speed I am using if I want to use
-ethtool_ksettings_get.
-
-I have a patch to add the correct phy_interface_t modes for 50, and
-100G links. However one thing I am seeing is that after I set the
-initial interface type I cannot change the interface type without the
-SFP code added. One thing I was wondering. Should I just ignore the
-phy_interface_t on the pcs_config call and use the link mode mask
-flags in autoneg and the speed/duplex/lanes in non-autoneg to
-configure the link? It seems like that is what the SFP code itself is
-doing based on my patch 2 in the set.
-
-> But consider the use case, a hack to allow configuration of a MAC to
-> MAC connection. The link mode does not change depending on the media,
-> there is no media. The switch will not be changing its port
-> configuration. The link really is fixed. phy-mode tells you the basic
-> configuration, and then adjust_link/mac_link_up tells you the
-> speed/dupex if there are multiple speeds/duplex supported,
-> e.g. RGMII/SGMII.
->
-> What Alex is trying to do is abuse fixed link for something which is
-> not a MAC-MAC connection, something which is not fixed. Do we want to
-> support that?
-
-How is it not a fixed link? If anything it was going to be more fixed
-than what you described above. In our case the connection type is
-indicated by the FW and we aren't meant to change it unless we want to
-be without a link. The link goes up and down and that would be about
-it. So we essentially advertise one link mode bit and are locked on
-the interface configured at creation. I was basically taking that
-config from the FW, creating a SW node with it, and then using that to
-set up the link w/o permitting changes. The general idea was that I
-would use that to limp along until I could get the QSFP support added
-and then add support for configuring the link with the
-ethtool_ksettings_set call. Mainly we just need that functionality for
-our own testing as the production case is non-autoneg fixed links
-only.
+diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
+index 6c2d8945f597..eab601ab2db0 100644
+--- a/Documentation/networking/netdevices.rst
++++ b/Documentation/networking/netdevices.rst
+@@ -338,10 +338,11 @@ operations directly under the netdev instance lock.
+ Devices drivers are encouraged to rely on the instance lock where possible.
+ 
+ For the (mostly software) drivers that need to interact with the core stack,
+-there are two sets of interfaces: ``dev_xxx`` and ``netif_xxx`` (e.g.,
+-``dev_set_mtu`` and ``netif_set_mtu``). The ``dev_xxx`` functions handle
+-acquiring the instance lock themselves, while the ``netif_xxx`` functions
+-assume that the driver has already acquired the instance lock.
++there are two sets of interfaces: ``dev_xxx``/``netdev_xxx`` and ``netif_xxx``
++(e.g., ``dev_set_mtu`` and ``netif_set_mtu``). The ``dev_xxx``/``netdev_xxx``
++functions handle acquiring the instance lock themselves, while the
++``netif_xxx`` functions assume that the driver has already acquired
++the instance lock.
+ 
+ Notifiers and netdev instance lock
+ ==================================
+@@ -354,6 +355,7 @@ For devices with locked ops, currently only the following notifiers are
+ running under the lock:
+ * ``NETDEV_REGISTER``
+ * ``NETDEV_UP``
++* ``NETDEV_CHANGE``
+ 
+ The following notifiers are running without the lock:
+ * ``NETDEV_UNREGISTER``
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 9fb03a292817..b3a162105129 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -4430,6 +4430,7 @@ void linkwatch_fire_event(struct net_device *dev);
+  * pending work list (if queued).
+  */
+ void linkwatch_sync_dev(struct net_device *dev);
++void __linkwatch_sync_dev(struct net_device *dev);
+ 
+ /**
+  *	netif_carrier_ok - test if carrier present
+@@ -4975,6 +4976,7 @@ void dev_set_rx_mode(struct net_device *dev);
+ int dev_set_promiscuity(struct net_device *dev, int inc);
+ int netif_set_allmulti(struct net_device *dev, int inc, bool notify);
+ int dev_set_allmulti(struct net_device *dev, int inc);
++void netif_state_change(struct net_device *dev);
+ void netdev_state_change(struct net_device *dev);
+ void __netdev_notify_peers(struct net_device *dev);
+ void netdev_notify_peers(struct net_device *dev);
+diff --git a/include/linux/rtnetlink.h b/include/linux/rtnetlink.h
+index ccaaf4c7d5f6..ea39dd23a197 100644
+--- a/include/linux/rtnetlink.h
++++ b/include/linux/rtnetlink.h
+@@ -240,6 +240,6 @@ rtnl_notify_needed(const struct net *net, u16 nlflags, u32 group)
+ 	return (nlflags & NLM_F_ECHO) || rtnl_has_listeners(net, group);
+ }
+ 
+-void netdev_set_operstate(struct net_device *dev, int newstate);
++void netif_set_operstate(struct net_device *dev, int newstate);
+ 
+ #endif	/* __LINUX_RTNETLINK_H */
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 87cba93fa59f..d4a5c07a0d73 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -1567,15 +1567,7 @@ void netdev_features_change(struct net_device *dev)
+ }
+ EXPORT_SYMBOL(netdev_features_change);
+ 
+-/**
+- *	netdev_state_change - device changes state
+- *	@dev: device to cause notification
+- *
+- *	Called to indicate a device has changed state. This function calls
+- *	the notifier chains for netdev_chain and sends a NEWLINK message
+- *	to the routing socket.
+- */
+-void netdev_state_change(struct net_device *dev)
++void netif_state_change(struct net_device *dev)
+ {
+ 	if (dev->flags & IFF_UP) {
+ 		struct netdev_notifier_change_info change_info = {
+@@ -1587,7 +1579,6 @@ void netdev_state_change(struct net_device *dev)
+ 		rtmsg_ifinfo(RTM_NEWLINK, dev, 0, GFP_KERNEL, 0, NULL);
+ 	}
+ }
+-EXPORT_SYMBOL(netdev_state_change);
+ 
+ /**
+  * __netdev_notify_peers - notify network peers about existence of @dev,
+diff --git a/net/core/dev_api.c b/net/core/dev_api.c
+index 90bafb0b1b8c..6c6ca15ef2a3 100644
+--- a/net/core/dev_api.c
++++ b/net/core/dev_api.c
+@@ -327,3 +327,19 @@ int dev_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf)
+ 	return ret;
+ }
+ EXPORT_SYMBOL_GPL(dev_xdp_propagate);
++
++/**
++ *	netdev_state_change - device changes state
++ *	@dev: device to cause notification
++ *
++ *	Called to indicate a device has changed state. This function calls
++ *	the notifier chains for netdev_chain and sends a NEWLINK message
++ *	to the routing socket.
++ */
++void netdev_state_change(struct net_device *dev)
++{
++	netdev_lock_ops(dev);
++	netif_state_change(dev);
++	netdev_unlock_ops(dev);
++}
++EXPORT_SYMBOL(netdev_state_change);
+diff --git a/net/core/link_watch.c b/net/core/link_watch.c
+index cb04ef2b9807..864f3bbc3a4c 100644
+--- a/net/core/link_watch.c
++++ b/net/core/link_watch.c
+@@ -183,7 +183,7 @@ static void linkwatch_do_dev(struct net_device *dev)
+ 		else
+ 			dev_deactivate(dev);
+ 
+-		netdev_state_change(dev);
++		netif_state_change(dev);
+ 	}
+ 	/* Note: our callers are responsible for calling netdev_tracker_free().
+ 	 * This is the reason we use __dev_put() instead of dev_put().
+@@ -240,7 +240,9 @@ static void __linkwatch_run_queue(int urgent_only)
+ 		 */
+ 		netdev_tracker_free(dev, &dev->linkwatch_dev_tracker);
+ 		spin_unlock_irq(&lweventlist_lock);
++		netdev_lock_ops(dev);
+ 		linkwatch_do_dev(dev);
++		netdev_unlock_ops(dev);
+ 		do_dev--;
+ 		spin_lock_irq(&lweventlist_lock);
+ 	}
+@@ -253,25 +255,41 @@ static void __linkwatch_run_queue(int urgent_only)
+ 	spin_unlock_irq(&lweventlist_lock);
+ }
+ 
+-void linkwatch_sync_dev(struct net_device *dev)
++static bool linkwatch_clean_dev(struct net_device *dev)
+ {
+ 	unsigned long flags;
+-	int clean = 0;
++	bool clean = false;
+ 
+ 	spin_lock_irqsave(&lweventlist_lock, flags);
+ 	if (!list_empty(&dev->link_watch_list)) {
+ 		list_del_init(&dev->link_watch_list);
+-		clean = 1;
++		clean = true;
+ 		/* We must release netdev tracker under
+ 		 * the spinlock protection.
+ 		 */
+ 		netdev_tracker_free(dev, &dev->linkwatch_dev_tracker);
+ 	}
+ 	spin_unlock_irqrestore(&lweventlist_lock, flags);
+-	if (clean)
++
++	return clean;
++}
++
++void __linkwatch_sync_dev(struct net_device *dev)
++{
++	netdev_ops_assert_locked(dev);
++
++	if (linkwatch_clean_dev(dev))
+ 		linkwatch_do_dev(dev);
+ }
+ 
++void linkwatch_sync_dev(struct net_device *dev)
++{
++	if (linkwatch_clean_dev(dev)) {
++		netdev_lock_ops(dev);
++		linkwatch_do_dev(dev);
++		netdev_unlock_ops(dev);
++	}
++}
+ 
+ /* Must be called with the rtnl semaphore held */
+ void linkwatch_run_queue(void)
+diff --git a/net/core/lock_debug.c b/net/core/lock_debug.c
+index 72e522a68775..c442bf52dbaf 100644
+--- a/net/core/lock_debug.c
++++ b/net/core/lock_debug.c
+@@ -20,11 +20,11 @@ int netdev_debug_event(struct notifier_block *nb, unsigned long event,
+ 	switch (cmd) {
+ 	case NETDEV_REGISTER:
+ 	case NETDEV_UP:
++	case NETDEV_CHANGE:
+ 		netdev_ops_assert_locked(dev);
+ 		fallthrough;
+ 	case NETDEV_DOWN:
+ 	case NETDEV_REBOOT:
+-	case NETDEV_CHANGE:
+ 	case NETDEV_UNREGISTER:
+ 	case NETDEV_CHANGEMTU:
+ 	case NETDEV_CHANGEADDR:
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index c23852835050..d8d03ff87a3b 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -1043,7 +1043,7 @@ int rtnl_put_cacheinfo(struct sk_buff *skb, struct dst_entry *dst, u32 id,
+ }
+ EXPORT_SYMBOL_GPL(rtnl_put_cacheinfo);
+ 
+-void netdev_set_operstate(struct net_device *dev, int newstate)
++void netif_set_operstate(struct net_device *dev, int newstate)
+ {
+ 	unsigned int old = READ_ONCE(dev->operstate);
+ 
+@@ -1052,9 +1052,9 @@ void netdev_set_operstate(struct net_device *dev, int newstate)
+ 			return;
+ 	} while (!try_cmpxchg(&dev->operstate, &old, newstate));
+ 
+-	netdev_state_change(dev);
++	netif_state_change(dev);
+ }
+-EXPORT_SYMBOL(netdev_set_operstate);
++EXPORT_SYMBOL(netif_set_operstate);
+ 
+ static void set_operstate(struct net_device *dev, unsigned char transition)
+ {
+@@ -1080,7 +1080,7 @@ static void set_operstate(struct net_device *dev, unsigned char transition)
+ 		break;
+ 	}
+ 
+-	netdev_set_operstate(dev, operstate);
++	netif_set_operstate(dev, operstate);
+ }
+ 
+ static unsigned int rtnl_dev_get_flags(const struct net_device *dev)
+@@ -3396,7 +3396,7 @@ static int do_setlink(const struct sk_buff *skb, struct net_device *dev,
+ errout:
+ 	if (status & DO_SETLINK_MODIFIED) {
+ 		if ((status & DO_SETLINK_NOTIFY) == DO_SETLINK_NOTIFY)
+-			netdev_state_change(dev);
++			netif_state_change(dev);
+ 
+ 		if (err < 0)
+ 			net_warn_ratelimited("A link change request failed with some changes committed already. Interface %s may have been left with an inconsistent configuration, please check.\n",
+@@ -3676,8 +3676,11 @@ struct net_device *rtnl_create_link(struct net *net, const char *ifname,
+ 				nla_len(tb[IFLA_BROADCAST]));
+ 	if (tb[IFLA_TXQLEN])
+ 		dev->tx_queue_len = nla_get_u32(tb[IFLA_TXQLEN]);
+-	if (tb[IFLA_OPERSTATE])
++	if (tb[IFLA_OPERSTATE]) {
++		netdev_lock_ops(dev);
+ 		set_operstate(dev, nla_get_u8(tb[IFLA_OPERSTATE]));
++		netdev_unlock_ops(dev);
++	}
+ 	if (tb[IFLA_LINKMODE])
+ 		dev->link_mode = nla_get_u8(tb[IFLA_LINKMODE]);
+ 	if (tb[IFLA_GROUP])
+diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
+index 221639407c72..8262cc10f98d 100644
+--- a/net/ethtool/ioctl.c
++++ b/net/ethtool/ioctl.c
+@@ -60,7 +60,7 @@ static struct devlink *netdev_to_devlink_get(struct net_device *dev)
+ u32 ethtool_op_get_link(struct net_device *dev)
+ {
+ 	/* Synchronize carrier state with link watch, see also rtnl_getlink() */
+-	linkwatch_sync_dev(dev);
++	__linkwatch_sync_dev(dev);
+ 
+ 	return netif_carrier_ok(dev) ? 1 : 0;
+ }
+diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
+index 439cfb7ad5d1..1b1b700ec05e 100644
+--- a/net/hsr/hsr_device.c
++++ b/net/hsr/hsr_device.c
+@@ -33,14 +33,14 @@ static void hsr_set_operstate(struct hsr_port *master, bool has_carrier)
+ 	struct net_device *dev = master->dev;
+ 
+ 	if (!is_admin_up(dev)) {
+-		netdev_set_operstate(dev, IF_OPER_DOWN);
++		netif_set_operstate(dev, IF_OPER_DOWN);
+ 		return;
+ 	}
+ 
+ 	if (has_carrier)
+-		netdev_set_operstate(dev, IF_OPER_UP);
++		netif_set_operstate(dev, IF_OPER_UP);
+ 	else
+-		netdev_set_operstate(dev, IF_OPER_LOWERLAYERDOWN);
++		netif_set_operstate(dev, IF_OPER_LOWERLAYERDOWN);
+ }
+ 
+ static bool hsr_check_carrier(struct hsr_port *master)
 
