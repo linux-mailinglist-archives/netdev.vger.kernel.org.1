@@ -1,402 +1,137 @@
-Return-Path: <netdev+bounces-178953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-178954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72B7BA799C3
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 03:37:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2C9CA799D2
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 03:55:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60051188C43D
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 01:37:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86655169A7D
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 01:55:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42E4B16F0FE;
-	Thu,  3 Apr 2025 01:37:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 928B81442E8;
+	Thu,  3 Apr 2025 01:55:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QSjgYTfn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ls8p/otg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D9001624F4
-	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 01:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA8FE2EAE5
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 01:55:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743644244; cv=none; b=P+Tvg648NlpVzBctKnawiRyCEtETHjGkeEs/1hFqIOzhT7hLSZdiQ1gYIkjtKdR4e2LGMrM+t6Glm3oicA5BcGMJw5JffNxA6ok6F60cZN4S40RBCWNb4GPI9M7OLJteKdsz2kV3QIOKBj7Q5uD/OGkMDBP7UxNUaKBvSq3Mh6A=
+	t=1743645328; cv=none; b=X67lyQ3L756ceMHhpEVNN+5v1CKMMFMR0fHeXJ3GDkYJn3rycoYA+mNfdbo2igJHG6vQz3yuLEcjhvMx9GVvYyI9vvsiCl8OtwdxdPDCM5hNFrc6ovQVm1vFQqJi0Pf6XKMCF+f9Xea0vroRqVeEfFe1ymxSGbrtQ/MI/xPjoxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743644244; c=relaxed/simple;
-	bh=4lkbtWQCafKDqoBGuszddW3O5DhmIG1mKt40EKTaqRI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mfnBhD0KCCWfVBrP+i1HIP2Wia9ptbmJCCkb7jCL00sS1+5Xb+TnOspJstMFS4CfOgiCXNH2ojAd6MqF2vGJn7+SIuAdXeYzO9QWc+YJq/2SUxxBFcIRIGPm/0QtEtBFH1YVf9Y6yV1vqA6RHBR19cBynNML4YWpCldQFKinTQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QSjgYTfn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51A23C4CEDD;
-	Thu,  3 Apr 2025 01:37:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743644243;
-	bh=4lkbtWQCafKDqoBGuszddW3O5DhmIG1mKt40EKTaqRI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QSjgYTfnNULMYrX5bfoCU9IuT9gq0njNrewN35kFacUVrRsUz3JJkdt98WOHXQJSN
-	 i93i1FMkBASCOBgm61myKiFTMoJzMcq9UsIEPra2gpwjubSmnv9jNbsIFjrw1JcppH
-	 yQf97Ym+WukqtuA64Ex/e2jK2wKV8k0qOIq9eWeCfh41k3mc2tw6l/yEICu88QvO5L
-	 aEGnHsiMWwh8GlWQejBEe6wsTCgwL5W2m+jqkfMf0BIuJw99REhpvBztsbJeaz0UQT
-	 fWWyYLt8bWyR1PDebZxJH5pRPn+MiPlXfvc1vEWm30wHj3ZAwj+Gu3OtVox+ASBYKe
-	 rmGlcZ2VvABMg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	donald.hunter@gmail.com,
-	yuyanghuang@google.com,
-	jacob.e.keller@intel.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net v3 4/4] netlink: specs: rt_route: pull the ifa- prefix out of the names
-Date: Wed,  2 Apr 2025 18:37:06 -0700
-Message-ID: <20250403013706.2828322-5-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250403013706.2828322-1-kuba@kernel.org>
-References: <20250403013706.2828322-1-kuba@kernel.org>
+	s=arc-20240116; t=1743645328; c=relaxed/simple;
+	bh=mT5uzeRJGBr0jJ9kHKaWV5/vH/CeaXxlltpuyALgAzI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uaz+YA5bfoZbaDcHypOsTB94cP4+fCwHyWYOsTXt5lm2yN0EPuubvPoKh3I7ZzA6iNv5hDFVv2fciA1EB86durAguyA7IYNUuSKIKsEY7ucWasQeWJaORLiT3N2O/NIQyn1i/b/cI6/GmgU3FfYfgCB9rKhiGaz7DXm43iXhMeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ls8p/otg; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5e5c9662131so694180a12.3
+        for <netdev@vger.kernel.org>; Wed, 02 Apr 2025 18:55:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743645325; x=1744250125; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=niBS3q+mbbE+k62UK+xBZ45ZjLbJkl6zZwsg/SLggnw=;
+        b=Ls8p/otgse5Dz2AIXSL1yR5IJL8I1vZPJg9U/EM/CipFA1ZcFFrRh1s1XcuyLHi3U/
+         dNsBSWcHJSq1V9Doggb/5j5HtPwJvero1PLiGI5yQTfu7TBn1f271yAOdv8pX7IxTn8+
+         Xynrp+I3XY+QdQxTESW296cPrgQMxmCmtFzw278PsH6q//Ap56VwpPn9ZTcfctBcruzG
+         HdbKFGnTmesb6OOYzr6rlEU1TM7LGWqqTZcoyE+7qKHIU7V0f1cj0mwKfF0cYIq0chOs
+         jFkoEPWkVxUTSrUgBnSYKJ/UcScwd8wdHW3I+tQ8MtUBVanpWyY065id8VORnlMEWRbl
+         TWZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743645325; x=1744250125;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=niBS3q+mbbE+k62UK+xBZ45ZjLbJkl6zZwsg/SLggnw=;
+        b=Y5coeAaFkHpAkB7srhtfm6UTlWdWh6tWbgmhUcII79bLf0yIkthLaXl6FM994zU9kW
+         lGMikLrgaznTwRA6mp29ab2j208lAWl5unSgzUcWet8TZ3Gj0PSwDWEIHaw5fKmVh8pZ
+         H4728HsowSIqdHNg3Ewg8h5Ginym37WV2RWtnRVJnVLxIA16GiCqeseTUwdqlVuceyNV
+         hI5jlZrcdx2lzm5QCWkJaIKBZD/ZdUWZFCPHpCZfubmB3pN/VZsaJiF1s/k0RhT63Wq1
+         vpayRRmLkUN4WQA1fS9Lk75lY2TXfCUhr/COUOQJ84hc2wtQfLOMCbirpCM3Vxuf5xea
+         R5HA==
+X-Forwarded-Encrypted: i=1; AJvYcCUbyLI5scW/F8McXx/qO7movJ5juSpPxaAFd2KAusYPIn3Juy4TyuRKJv5wJnyesfD4BRbIIro=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCq9+adWgYQO9LSjHTo2NWf/7mbyg7JxOtE1g7gyB+UfXx93lg
+	yata8p2gJN7nI280Y0j0NJocEvu1U8wppCOzRa8eH6Q58WWWIoLbmOuX/MphfmUttLNXyX1d8+S
+	YG35h+v029KBCUZzZy1SQITp1tRA=
+X-Gm-Gg: ASbGnctOXgwlYhHd5uNh71lEJzQrZD8+nEJFFhCRjQdOhLUdmgEcz2UCSU7/6eHWhJ0
+	pzqLCxbmG48oQ7q1CXYNEhFU6Nb1WFY1G2zX3yZ5L82+Lq/FNW+9I+dpi8D2KmDh0rRZX6Re57Y
+	4jdeb5CdSTZIIQTKtVgV/SUevQO3UC
+X-Google-Smtp-Source: AGHT+IFQKqdiTxYMnf+eSmJdtwq5PweiofrIbpDeOSyOPOAgZJ5ThPee8B2fSAnVQex/E+1g6010bnNU+TVBVm9G1pA=
+X-Received: by 2002:a05:6402:5204:b0:5ec:96a6:e1cd with SMTP id
+ 4fb4d7f45d1cf-5edfcc3c23cmr13319673a12.2.1743645324680; Wed, 02 Apr 2025
+ 18:55:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250331114729.594603-1-ap420073@gmail.com> <20250331114729.594603-3-ap420073@gmail.com>
+ <CAHS8izOSaXcLB-8U5gFD2sj+pLuq+jMvPHPUj8bsaHzqG4cTsA@mail.gmail.com>
+In-Reply-To: <CAHS8izOSaXcLB-8U5gFD2sj+pLuq+jMvPHPUj8bsaHzqG4cTsA@mail.gmail.com>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Thu, 3 Apr 2025 10:55:13 +0900
+X-Gm-Features: AQ5f1JrxVs4jSBXk-F4MzmmOk3SW5Thi4ae9B6xLpiTvKZjsgabKxKu2Uv3spAM
+Message-ID: <CAMArcTVn_SmvrsewzoYaFa-sqT=9bS-3W2qwmSnsQc49-eZWWg@mail.gmail.com>
+Subject: Re: [RFC net-next 2/2] eth: bnxt: add support rx side device memory TCP
+To: Mina Almasry <almasrymina@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	michael.chan@broadcom.com, pavan.chebbi@broadcom.com, 
+	ilias.apalodimas@linaro.org, dw@davidwei.uk, netdev@vger.kernel.org, 
+	kuniyu@amazon.com, sdf@fomichev.me, aleksander.lobakin@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-YAML specs don't normally include the C prefix name in the name
-of the YAML attr. Remove the ifa- prefix from all attributes
-in route-attrs and metrics and specify name-prefix instead.
+On Thu, Apr 3, 2025 at 7:17=E2=80=AFAM Mina Almasry <almasrymina@google.com=
+> wrote:
+>
 
-This is a bit risky, hopefully there aren't many users out there.
+Hi Mina,
+Thanks a lot for the review!
 
-Fixes: 023289b4f582 ("doc/netlink: Add spec for rt route messages")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v3:
- - new
----
- Documentation/netlink/specs/rt_route.yaml | 180 +++++++++++-----------
- 1 file changed, 91 insertions(+), 89 deletions(-)
+> On Mon, Mar 31, 2025 at 4:48=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> w=
+rote:
+>
+> > -static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
+> > -                                  struct bnxt_rx_ring_info *rxr,
+> > -                                  int numa_node)
+> > +static int bnxt_alloc_rx_netmem_pool(struct bnxt *bp,
+> > +                                    struct bnxt_rx_ring_info *rxr,
+> > +                                    int numa_node)
+> >  {
+> >         struct page_pool_params pp =3D { 0 };
+> >         struct page_pool *pool;
+> > @@ -3779,15 +3799,20 @@ static int bnxt_alloc_rx_page_pool(struct bnxt =
+*bp,
+> >         pp.dev =3D &bp->pdev->dev;
+> >         pp.dma_dir =3D bp->rx_dir;
+> >         pp.max_len =3D PAGE_SIZE;
+> > -       pp.flags =3D PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
+> > +       pp.flags =3D PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV |
+> > +                  PP_FLAG_ALLOW_UNREADABLE_NETMEM;
+>
+> I was expecting to see a check that hdr_split is enabled and threshold
+> is 0 before you allow unreadable netmem. Or are you relying on the
+> core check at devmem/io_uring binding time to do that for you?
 
-diff --git a/Documentation/netlink/specs/rt_route.yaml b/Documentation/netlink/specs/rt_route.yaml
-index a674103e5bc4..292469c7d4b9 100644
---- a/Documentation/netlink/specs/rt_route.yaml
-+++ b/Documentation/netlink/specs/rt_route.yaml
-@@ -80,165 +80,167 @@ protonum: 0
- attribute-sets:
-   -
-     name: route-attrs
-+    name-prefix: rta-
-     attributes:
-       -
--        name: rta-dst
-+        name: dst
-         type: binary
-         display-hint: ipv4
-       -
--        name: rta-src
-+        name: src
-         type: binary
-         display-hint: ipv4
-       -
--        name: rta-iif
-+        name: iif
-         type: u32
-       -
--        name: rta-oif
-+        name: oif
-         type: u32
-       -
--        name: rta-gateway
-+        name: gateway
-         type: binary
-         display-hint: ipv4
-       -
--        name: rta-priority
-+        name: priority
-         type: u32
-       -
--        name: rta-prefsrc
-+        name: prefsrc
-         type: binary
-         display-hint: ipv4
-       -
--        name: rta-metrics
-+        name: metrics
-         type: nest
--        nested-attributes: rta-metrics
-+        nested-attributes: metrics
-       -
--        name: rta-multipath
-+        name: multipath
-         type: binary
-       -
--        name: rta-protoinfo # not used
-+        name: protoinfo # not used
-         type: binary
-       -
--        name: rta-flow
-+        name: flow
-         type: u32
-       -
--        name: rta-cacheinfo
-+        name: cacheinfo
-         type: binary
-         struct: rta-cacheinfo
-       -
--        name: rta-session # not used
-+        name: session # not used
-         type: binary
-       -
--        name: rta-mp-algo # not used
-+        name: mp-algo # not used
-         type: binary
-       -
--        name: rta-table
-+        name: table
-         type: u32
-       -
--        name: rta-mark
-+        name: mark
-         type: u32
-       -
--        name: rta-mfc-stats
-+        name: mfc-stats
-         type: binary
-       -
--        name: rta-via
-+        name: via
-         type: binary
-       -
--        name: rta-newdst
-+        name: newdst
-         type: binary
-       -
--        name: rta-pref
-+        name: pref
-         type: u8
-       -
--        name: rta-encap-type
-+        name: encap-type
-         type: u16
-       -
--        name: rta-encap
-+        name: encap
-         type: binary # tunnel specific nest
-       -
--        name: rta-expires
-+        name: expires
-         type: u32
-       -
--        name: rta-pad
-+        name: pad
-         type: binary
-       -
--        name: rta-uid
-+        name: uid
-         type: u32
-       -
--        name: rta-ttl-propagate
-+        name: ttl-propagate
-         type: u8
-       -
--        name: rta-ip-proto
-+        name: ip-proto
-         type: u8
-       -
--        name: rta-sport
-+        name: sport
-         type: u16
-       -
--        name: rta-dport
-+        name: dport
-         type: u16
-       -
--        name: rta-nh-id
-+        name: nh-id
-         type: u32
-       -
--        name: rta-flowlabel
-+        name: flowlabel
-         type: u32
-         byte-order: big-endian
-         display-hint: hex
-   -
--    name: rta-metrics
-+    name: metrics
-+    name-prefix: rtax-
-     attributes:
-       -
--        name: rtax-unspec
-+        name: unspec
-         type: unused
-         value: 0
-       -
--        name: rtax-lock
-+        name: lock
-         type: u32
-       -
--        name: rtax-mtu
-+        name: mtu
-         type: u32
-       -
--        name: rtax-window
-+        name: window
-         type: u32
-       -
--        name: rtax-rtt
-+        name: rtt
-         type: u32
-       -
--        name: rtax-rttvar
-+        name: rttvar
-         type: u32
-       -
--        name: rtax-ssthresh
-+        name: ssthresh
-         type: u32
-       -
--        name: rtax-cwnd
-+        name: cwnd
-         type: u32
-       -
--        name: rtax-advmss
-+        name: advmss
-         type: u32
-       -
--        name: rtax-reordering
-+        name: reordering
-         type: u32
-       -
--        name: rtax-hoplimit
-+        name: hoplimit
-         type: u32
-       -
--        name: rtax-initcwnd
-+        name: initcwnd
-         type: u32
-       -
--        name: rtax-features
-+        name: features
-         type: u32
-       -
--        name: rtax-rto-min
-+        name: rto-min
-         type: u32
-       -
--        name: rtax-initrwnd
-+        name: initrwnd
-         type: u32
-       -
--        name: rtax-quickack
-+        name: quickack
-         type: u32
-       -
--        name: rtax-cc-algo
-+        name: cc-algo
-         type: string
-       -
--        name: rtax-fastopen-no-cookie
-+        name: fastopen-no-cookie
-         type: u32
- 
- operations:
-@@ -254,18 +256,18 @@ protonum: 0
-           value: 26
-           attributes:
-             - rtm-family
--            - rta-src
-+            - src
-             - rtm-src-len
--            - rta-dst
-+            - dst
-             - rtm-dst-len
--            - rta-iif
--            - rta-oif
--            - rta-ip-proto
--            - rta-sport
--            - rta-dport
--            - rta-mark
--            - rta-uid
--            - rta-flowlabel
-+            - iif
-+            - oif
-+            - ip-proto
-+            - sport
-+            - dport
-+            - mark
-+            - uid
-+            - flowlabel
-         reply:
-           value: 24
-           attributes: &all-route-attrs
-@@ -278,34 +280,34 @@ protonum: 0
-             - rtm-scope
-             - rtm-type
-             - rtm-flags
--            - rta-dst
--            - rta-src
--            - rta-iif
--            - rta-oif
--            - rta-gateway
--            - rta-priority
--            - rta-prefsrc
--            - rta-metrics
--            - rta-multipath
--            - rta-flow
--            - rta-cacheinfo
--            - rta-table
--            - rta-mark
--            - rta-mfc-stats
--            - rta-via
--            - rta-newdst
--            - rta-pref
--            - rta-encap-type
--            - rta-encap
--            - rta-expires
--            - rta-pad
--            - rta-uid
--            - rta-ttl-propagate
--            - rta-ip-proto
--            - rta-sport
--            - rta-dport
--            - rta-nh-id
--            - rta-flowlabel
-+            - dst
-+            - src
-+            - iif
-+            - oif
-+            - gateway
-+            - priority
-+            - prefsrc
-+            - metrics
-+            - multipath
-+            - flow
-+            - cacheinfo
-+            - table
-+            - mark
-+            - mfc-stats
-+            - via
-+            - newdst
-+            - pref
-+            - encap-type
-+            - encap
-+            - expires
-+            - pad
-+            - uid
-+            - ttl-propagate
-+            - ip-proto
-+            - sport
-+            - dport
-+            - nh-id
-+            - flowlabel
-       dump:
-         request:
-           value: 26
--- 
-2.49.0
+Yes, it relies on the core.
+The core already checks conditions very well, such as HDS.
+So I think drivers don't need to check these conditions again.
 
+Thanks a lot!
+Taehee Yoo
+
+>
+> --
+> Thanks,
+> Mina
 
