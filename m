@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-179208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5905BA7B220
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 00:50:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4F3BA7B221
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 00:50:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA5D57A3E5A
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 22:48:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D765189B86B
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 22:50:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88C518DB29;
-	Thu,  3 Apr 2025 22:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EFAC1C84AB;
+	Thu,  3 Apr 2025 22:49:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/+YNXsc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YmJoPO28"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84EC32E62BA
-	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 22:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08CD02E62BA
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 22:49:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743720596; cv=none; b=EP1RpY6V91YIfmi8DReCj5JiIo9DyWNhPOZebNMBmn++WqMAjo5QVd5dnO5DCnJGujUyLsKTCFCO+qP4fXZM5ziP/g5KRW+mOMSSO6b5o/X5ODql0AoPZiu/CIJxU1J4uzrPYOeDh633q9DMjaAEKPfGIUz4SxtZQpVjCCWQLPs=
+	t=1743720599; cv=none; b=NR2dTRaxYl6zb5NXyY2HrMnvx9QZpDlz2j1DfXbwZQZ16yZ5QDu6tLKbuq+igX37HoZsNkRZ3DRAbyLp63WYMsEgy46w0ukFuJqXdBoR3pY/nbJIuGtftXe3mygtAOUwDP9v2PMR3/M17nyf/Cmrj9Y1UBS03hkTx6FCmu1NV3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743720596; c=relaxed/simple;
-	bh=sQWeYNF3NbI8bDYoXRa9NVLEFFi8aMWkfhbqREvAAA8=;
+	s=arc-20240116; t=1743720599; c=relaxed/simple;
+	bh=8Kg/t2RqkZte6lOZ5o3u94WA0oTskjj8aJjrgnHYWv4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cqsg529RPubKzwpegcYRRKFN4YqaNNM2pLNeHDe4KQZ2cr+XBh/W0RjhIFmFTTFNj2WVkgYjbR0m37SwKBngEsdN/s2uE6saO5LCmkrtaaYKEd8WPpRAgQ6PIDUMzSDIwLBmWN1YdVovMD1/YSiTg3r1QFG1Xz1jYGBVy8yT18U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/+YNXsc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03EC8C4CEE3;
-	Thu,  3 Apr 2025 22:49:56 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=j5ZW5rEpqQpRoaKtYV+6qFs56USIuPvDMsfg+zoMoJkoHUcLqWZaFqtjwaEhHT5pc9lFBJFxmsmKzydKJHP/E/4HRmoG6yj/R/ylEWoi1Z+ty9Whkn5OsEmPsIC7my4QYaOlOHA7UDUzYHJSGhdBb/tLHnzdguKcC83fe1HIufc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YmJoPO28; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FD26C4CEE8;
+	Thu,  3 Apr 2025 22:49:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743720596;
-	bh=sQWeYNF3NbI8bDYoXRa9NVLEFFi8aMWkfhbqREvAAA8=;
+	s=k20201202; t=1743720597;
+	bh=8Kg/t2RqkZte6lOZ5o3u94WA0oTskjj8aJjrgnHYWv4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=D/+YNXscqJcXYQLjIwaJR3U6ZtupslAQTE+yhkdZtvaYCnXeO4LqgLNQ3Cm7kZb/O
-	 hSKZg/h67KTnAQ+ukyYvqQZE74mOpjSGL0p90WQhNEddXaRNHl2+Fn4PUkepjqKetX
-	 ZQ37xItklF58NvCpKxohdKWouTSBA7R9QJFRg2yv8V4jBLvshy8D0LT4I+vWt0c+HV
-	 LpJ7uNmrkRKrBWHI0slz9ufmSgO8fGHnVV9W5sAvcCyKlxkNhi/izKpzRiFPCYaEvd
-	 YZ7EeuaqXYlsZxtm8O4vp2crlvEPFdft/FX9M0/eWQ8OjAl4OSk8BQaqQ9B55bzoFu
-	 G2LlWR7PNhuJA==
+	b=YmJoPO28sntJNdov6hfpPioOgUIChFYyaNcVAq5XQ1Ea/Qt2bDEShy6y4VWAXObcx
+	 1zb2T1wNHVMALD/WjoNyfIn0mxJ4nENsdncxzdFJgshnDefBscSqRPQqgwamy+4toW
+	 nvsS3QHInywPZcMR3PX2q1BdB5ocWlgLxz/tM5Q2pBJCPe8BsSyZ/TizQKpnXwK+y4
+	 wtijEf1pqC6K5D/LgTd2I4mM9n8GM6OBWhtH1wKauYmuPJw4MWvlJ2x5Vs2WUV+B8a
+	 gkKNCMo6r1NJWxea4Amgv3ZggxvTwkTJsAOJ7DlDpRTaYI6oyBqiHCZc3KKu2xJfM/
+	 1658t8SJrAFYQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D80380664C;
-	Thu,  3 Apr 2025 22:50:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B0455380664C;
+	Thu,  3 Apr 2025 22:50:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,57 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v5 00/11] net: hold instance lock during
- NETDEV_UP/REGISTER
+Subject: Re: [PATCH net v4] net: airoha: Validate egress gdm port in
+ airoha_ppe_foe_entry_prepare()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174372063301.2709734.14320566471718210495.git-patchwork-notify@kernel.org>
-Date: Thu, 03 Apr 2025 22:50:33 +0000
-References: <20250401163452.622454-1-sdf@fomichev.me>
-In-Reply-To: <20250401163452.622454-1-sdf@fomichev.me>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
+ <174372063424.2709734.9248725253121002171.git-patchwork-notify@kernel.org>
+Date: Thu, 03 Apr 2025 22:50:34 +0000
+References: <20250401-airoha-validate-egress-gdm-port-v4-1-c7315d33ce10@kernel.org>
+In-Reply-To: <20250401-airoha-validate-egress-gdm-port-v4-1-c7315d33ce10@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  1 Apr 2025 09:34:41 -0700 you wrote:
-> Solving the issue reported by Cosmin in [0] requires consistent
-> lock during NETDEV_UP/REGISTER notifiers. This series
-> addresses that (along with some other fixes in net/ipv4/devinet.c
-> and net/ipv6/addrconf.c) and appends the patches from Jakub
-> that were conditional on consistent locking in NETDEV_UNREGISTER.
+On Tue, 01 Apr 2025 11:42:30 +0200 you wrote:
+> Dev pointer in airoha_ppe_foe_entry_prepare routine is not strictly
+> a device allocated by airoha_eth driver since it is an egress device
+> and the flowtable can contain even wlan, pppoe or vlan devices. E.g:
 > 
-> 0: https://lore.kernel.org/netdev/700fa36b94cbd57cfea2622029b087643c80cbc9.camel@nvidia.com/
+> flowtable ft {
+>         hook ingress priority filter
+>         devices = { eth1, lan1, lan2, lan3, lan4, wlan0 }
+>         flags offload                               ^
+>                                                     |
+>                      "not allocated by airoha_eth" --
+> }
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v5,01/11] net: switch to netif_disable_lro in inetdev_init
-    https://git.kernel.org/netdev/net/c/d2ccd0560d96
-  - [net,v5,02/11] net: hold instance lock during NETDEV_REGISTER/UP
-    https://git.kernel.org/netdev/net/c/4c975fd70002
-  - [net,v5,03/11] net: use netif_disable_lro in ipv6_add_dev
-    https://git.kernel.org/netdev/net/c/8965c160b8f7
-  - [net,v5,04/11] net: rename rtnl_net_debug to lock_debug
-    https://git.kernel.org/netdev/net/c/b912d599d3d8
-  - [net,v5,05/11] netdevsim: add dummy device notifiers
-    https://git.kernel.org/netdev/net/c/1901066aab76
-  - [net,v5,06/11] net: dummy: request ops lock
-    https://git.kernel.org/netdev/net/c/dbfc99495d96
-  - [net,v5,07/11] docs: net: document netdev notifier expectations
-    https://git.kernel.org/netdev/net/c/ee705fa21fdc
-  - [net,v5,08/11] selftests: net: use netdevsim in netns test
-    https://git.kernel.org/netdev/net/c/56c8a23f8a0f
-  - [net,v5,09/11] net: designate XSK pool pointers in queues as "ops protected"
-    (no matching commit)
-  - [net,v5,10/11] netdev: add "ops compat locking" helpers
-    (no matching commit)
-  - [net,v5,11/11] netdev: don't hold rtnl_lock over nl queue info get when possible
-    (no matching commit)
+  - [net,v4] net: airoha: Validate egress gdm port in airoha_ppe_foe_entry_prepare()
+    https://git.kernel.org/netdev/net/c/09bccf56db36
 
 You are awesome, thank you!
 -- 
