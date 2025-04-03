@@ -1,230 +1,161 @@
-Return-Path: <netdev+bounces-179162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8558CA7ADF9
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 22:17:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82FCAA7AFC0
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 22:59:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16C94189241E
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 20:12:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9780E3BB4B4
+	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 20:51:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 612402989B5;
-	Thu,  3 Apr 2025 19:15:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5A32264FB6;
+	Thu,  3 Apr 2025 19:33:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iC7gOp9t"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PNEQIhWh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332F92989B4;
-	Thu,  3 Apr 2025 19:15:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EECB257434
+	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 19:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743707703; cv=none; b=UFh3LBdpA5+U7/zVnHCRQ/VKr/yweGVdDvPca1QwZ9AabWMuGU6qiO7ZM1i2rK8gqi1lrjH6VhFmoJBaUhdpvJp0Y2HI6tQRgwDLzzBMxc2BkuD+LBAq7BA84WUq5QKwENpIylHz6bDOwEB8OJRxSHnuk0bDbTxH5OQPVpY65zU=
+	t=1743708783; cv=none; b=eqoiIlZx7fssTsYHnRkrDD/Bwk9/VS5VxJu0AYbPAgooz06iizKAGSS/regchi0p+o/1ZIV6TcOFn/90TZM4PElomOdIyM5hxn0UAYblEz1JPw2lm5OsKy6upHUl/wzpdJndP3njBbdcwsa8ViVhNMGicXbsjtblP7TYKg2ndqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743707703; c=relaxed/simple;
-	bh=adClCm1nphhGtk98Brbo2vPo0yvjrBadq/WuJneXcD0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tm53wuFceWF/qaWdKtoaxePTYOZgm6hsrXzi90OwF7/dlyCYIrDI8SdxYS5Lk/sgwtniUchKBCKOJ/qyPppzaUFWYfEZNU+T+U8JT6QNsK3N/MF+IUidbjNUfhQZ3FqEllmqg4hCMTXbhARO3fac5w9mtctae56hqtB+E+9T2/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iC7gOp9t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40BE2C4CEE3;
-	Thu,  3 Apr 2025 19:15:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743707703;
-	bh=adClCm1nphhGtk98Brbo2vPo0yvjrBadq/WuJneXcD0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=iC7gOp9t6aJEqOf6d2QqXXyuuSv7pcuDGXlYpvpp1I4Pks83ohpLmwFck8BthLosH
-	 ngfhDKFkS5BwloKy0NryvjbHely78kPJvgWCwsazXx6VSymAKxbkqrqCtSXVx3TV0c
-	 FXZ8dJVU1lVlnb6vO25VgP5vMivwl5qZKU18B6tQmJ+dtxrBV61UgJF+A6KF5JDHAJ
-	 wo3GBvoW9rSKW94N/kD8VJtgUZ3sItCwRQVS+b0AkgB4oAYNa/rdCYkx030xwZoXO9
-	 XcsihN8DHgjV45ow8SRCxCcdJ3pbaV4z0dp435sG+RuwjXpURqKLwKYTgs2OZ1OrW0
-	 MJbsHZMGf0hTg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Niklas Schnelle <schnelle@linux.ibm.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Sasha Levin <sashal@kernel.org>,
-	hca@linux.ibm.com,
-	gor@linux.ibm.com,
-	agordeev@linux.ibm.com,
-	gerald.schaefer@linux.ibm.com,
-	wintera@linux.ibm.com,
-	twinkler@linux.ibm.com,
-	mjrosato@linux.ibm.com,
-	gbayer@linux.ibm.com,
-	jroedel@suse.de,
-	lukas@wunner.de,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.14 38/44] s390/pci: Support mmap() of PCI resources except for ISM devices
-Date: Thu,  3 Apr 2025 15:13:07 -0400
-Message-Id: <20250403191313.2679091-38-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250403191313.2679091-1-sashal@kernel.org>
-References: <20250403191313.2679091-1-sashal@kernel.org>
+	s=arc-20240116; t=1743708783; c=relaxed/simple;
+	bh=3CgQkx8UWwaD7m8AIjs2T1Fy5H8UYRM2DMDxPk4fp1c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tzT25G4+ISpSDpkj+WEG2LT3b/78U/oiThTeFFxwi6fwBBaPqN/kGDzuN0+08hZmPbe0Pg5iWEq1IJJIKcBjK2qPO1obN/P8HeM3AU0fd1GYJ3CW07q+vfsZpa0pa/xgueu4uHUqAQW0cgp4Z2GpYoZ4z2TpnnHwb+dv01M4bno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PNEQIhWh; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2243803b776so19612135ad.0
+        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 12:33:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743708781; x=1744313581; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=hBVGkwIN3bH1YdJRremHwWR90E2XpYOKI37roaIorwA=;
+        b=PNEQIhWhsFaWMOEIUrsADvCBgFsn5tImzQp5oX9AGrY4WmLlQHB3tG3FVjkFYqEdYA
+         pvB2zbOv6IZdLY6+5DMEbgzPtjOkL7SLKzRp20iLQFgfnqbBeydUFhJv7uU5fLbepaAI
+         n+XXaK0g7KPq64oJZbZrUjmnPYD4ns3pqDjoNjoTix3w0E6I/2YwXE+wn6jWF8S/gz/t
+         wsoUWbGRjPM+8be7SC5IcsaPweDHnhmEIgXnTc2CfrUNO3JQwav45eleMwDw+tclILu+
+         v4jRQb/rlDzOOLve/2F1lIK6hm7M3RtUZqLnVsczpYw3voXuk0SA996r0fgTUfcCRZ+Y
+         naIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743708781; x=1744313581;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hBVGkwIN3bH1YdJRremHwWR90E2XpYOKI37roaIorwA=;
+        b=o+v64ng6QhYWsxyoF9K6fAExpZhP9mWV+lESBQjCegzdE1TwHw9u0ypMmsTA3ZZD2a
+         Dt60nfJkbZ/SqYJWLXN3uvIA90qyzW2jpO1NbLe+c9+EvL6xOE40HytKHbBUZyK79nFi
+         avAbF40IY5oDPTHAvVohF9KxG0NbcTDiJBYsGOjonTM2No5CArmXsJX3MyQ6zQqGIUww
+         3xpLL7lSs9dfFtPsdEfyQRBP8ziNbEMf6BhG0UWTwTRsuDIAOMCDIFr7YmYVfTXCS85h
+         lYX4B5f4NeTajf3/JwERwslwTLcNtwB3sfAXzzQnaA4UF9jb621nJKCCRPRK3BHRCrcu
+         4JHQ==
+X-Gm-Message-State: AOJu0Yyit+01M6i3RxU7grN5aab1uW2+zmJzj82PE/a9Ct866V8awwCn
+	K2p7GkG6/IXNMdhZQaxuFemgcbVKAGP8OxxjsXurP1fWMeMXabXgmRj0AQ==
+X-Gm-Gg: ASbGncsmH8dreOsT/mCNaRxKx8/6wiKSTzuXLSKPEsy4rYPnx+gRNnozJ9BbwEpaA5B
+	szVuSxq/XAOSoMYFRWw9CDV1hr6QLofPthdoncbY1obrX//Wiy/KZmzDxdN00obYvXpNaRsewPZ
+	OLfrPYI2rsi/ePsNgg0r1d+FtQoPmvZZu2M/9Rh3pokfhE2krDZ6hLs+3+YKdhZcXojJdapTIwo
+	gLh/0px6F9GYMmWPcoEtWmE+5U//2qALTgZ5qPRFNGRqXsaz/jzoRV1Coi3keJ6Sx/lF7IBwRdc
+	2a54HSs74qkQdKp8wXnUyxjv3KImOymaij9rics+5Q8vYtoh
+X-Google-Smtp-Source: AGHT+IEe+k1a5cqu5WMjT/nJJWCpVKiyIM3l3KRdzo0Jf4Gi7oxOdVhuAq9l3mVN+FI3zHvNUliaOw==
+X-Received: by 2002:a17:903:3d0d:b0:224:7a4:b2a with SMTP id d9443c01a7336-22a8a045ceamr5367905ad.11.1743708781184;
+        Thu, 03 Apr 2025 12:33:01 -0700 (PDT)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af9bc41a65asm1590659a12.69.2025.04.03.12.33.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Apr 2025 12:33:00 -0700 (PDT)
+Date: Thu, 3 Apr 2025 12:32:59 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Victor Nogueira <victor@mojatatu.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
+	edumazet@google.com, gerrard.tai@starlabs.sg,
+	Pedro Tammela <pctammela@mojatatu.com>
+Subject: Re: [Patch net 08/12] selftests/tc-testing: Add a test case for
+ CODEL with HTB parent
+Message-ID: <Z+7ia0FZK2F232gu@pop-os.localdomain>
+References: <20250320232211.485785-1-xiyou.wangcong@gmail.com>
+ <20250320232539.486091-1-xiyou.wangcong@gmail.com>
+ <20250320232539.486091-8-xiyou.wangcong@gmail.com>
+ <3a60ae0c-0b5f-44e9-8063-29d0d290699c@mojatatu.com>
+ <Z+cIB3YrShvCtQry@pop-os.localdomain>
+ <9a1b0c60-57d2-4e6d-baa2-38c3e4b7d3d5@mojatatu.com>
+ <Z+nUiSlKoARY0Lj/@pop-os.localdomain>
+ <CAM_iQpW7f5QJRXBpEMAmMVNvF5aGk_2YNLVF=bcnoZhMhjDU4A@mail.gmail.com>
+ <90069d47-8963-4caf-acdf-0577c19e999d@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.14
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <90069d47-8963-4caf-acdf-0577c19e999d@mojatatu.com>
 
-From: Niklas Schnelle <schnelle@linux.ibm.com>
+On Wed, Apr 02, 2025 at 10:23:22PM -0300, Victor Nogueira wrote:
+> On 02/04/2025 21:40, Cong Wang wrote:
+> > On Sun, Mar 30, 2025 at 4:32 PM Cong Wang <xiyou.wangcong@gmail.com> wrote:
+> > > 
+> > > On Sun, Mar 30, 2025 at 06:05:06PM -0300, Victor Nogueira wrote:
+> > > > On 28/03/2025 17:35, Cong Wang wrote:
+> > > > > On Sun, Mar 23, 2025 at 07:48:39PM -0300, Victor Nogueira wrote:
+> > > > > > On 20/03/2025 20:25, Cong Wang wrote:
+> > > > > > > Add a test case for CODEL with HTB parent to verify packet drop
+> > > > > > > behavior when the queue becomes empty. This helps ensure proper
+> > > > > > > notification mechanisms between qdiscs.
+> > > > > > > 
+> > > > > > > Note this is best-effort, it is hard to play with those parameters
+> > > > > > > perfectly to always trigger ->qlen_notify().
+> > > > > > > 
+> > > > > > > Cc: Pedro Tammela <pctammela@mojatatu.com>
+> > > > > > > Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
+> > > > > > 
+> > > > > > Cong, can you double check this test?
+> > > > > > I ran all of your other tests and they all succeeded, however
+> > > > > > this one specifically is always failing:
+> > > > > 
+> > > > > Interesting, I thought I completely fixed this before posting after several
+> > > > > rounds of playing with the parameters. I will double check it, maybe it
+> > > > > just becomes less reproducible.
+> > > > 
+> > > > I see.
+> > > > I experimented with it a bit today and found out that changing the ping
+> > > > command to:
+> > > > 
+> > > > ping -c 2 -i 0 -s 1500 -I $DUMMY 10.10.10.1 > /dev/null || true
+> > > > 
+> > > > makes the test pass consistently (at least in my environment).
+> > > > So essentially just changing the "-s" option to 1500.
+> > > > 
+> > > > If you could, please try it out as well.
+> > > > Maybe I just got lucky.
+> > > 
+> > > Sure, I will change it to 1500.
+> > 
+> > Hmm, it failed on my side:
+> > 
+> > Test a4bd: Test CODEL with HTB parent - force packet drop with empty queue
+> > [...]
+> 
+> I see, this test seems to be very environment sensitive.
+> I think it will be better if we do what you suggested earlier.
+> It's not fair to stall this set because of this single test.
+> Can you resend your patches excluding this test?
 
-[ Upstream commit aa9f168d55dc47c0de564f7dfe0e90467c9fee71 ]
+Sure, will do. It sounds like a good plan.
 
-So far s390 does not allow mmap() of PCI resources to user-space via the
-usual mechanisms, though it does use it for RDMA. For the PCI sysfs
-resource files and /proc/bus/pci it defines neither HAVE_PCI_MMAP nor
-ARCH_GENERIC_PCI_MMAP_RESOURCE. For vfio-pci s390 previously relied on
-disabled VFIO_PCI_MMAP and now relies on setting pdev->non_mappable_bars
-for all devices.
+> I can try and figure this one out later so that we can
+> unblock.
 
-This is partly because access to mapped PCI resources from user-space
-requires special PCI load/store memory-I/O (MIO) instructions, or the
-special MMIO syscalls when these are not available. Still, such access is
-possible and useful not just for RDMA, in fact not being able to mmap() PCI
-resources has previously caused extra work when testing devices.
+I really appreciate this.
 
-One thing that doesn't work with PCI resources mapped to user-space though
-is the s390 specific virtual ISM device. Not only because the BAR size of
-256 TiB prevents mapping the whole BAR but also because access requires use
-of the legacy PCI instructions which are not accessible to user-space on
-systems with the newer MIO PCI instructions.
-
-Now with the pdev->non_mappable_bars flag ISM can be excluded from mapping
-its resources while making this functionality available for all other PCI
-devices. To this end introduce a minimal implementation of PCI_QUIRKS and
-use that to set pdev->non_mappable_bars for ISM devices only. Then also set
-ARCH_GENERIC_PCI_MMAP_RESOURCE to take advantage of the generic
-implementation of pci_mmap_resource_range() enabling only the newer sysfs
-mmap() interface. This follows the recommendation in
-Documentation/PCI/sysfs-pci.rst.
-
-Link: https://lore.kernel.org/r/20250226-vfio_pci_mmap-v7-3-c5c0f1d26efd@linux.ibm.com
-Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
-Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- arch/s390/Kconfig           |  4 +---
- arch/s390/include/asm/pci.h |  3 +++
- arch/s390/pci/Makefile      |  2 +-
- arch/s390/pci/pci_fixup.c   | 23 +++++++++++++++++++++++
- drivers/s390/net/ism_drv.c  |  1 -
- include/linux/pci_ids.h     |  1 +
- 6 files changed, 29 insertions(+), 5 deletions(-)
- create mode 100644 arch/s390/pci/pci_fixup.c
-
-diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
-index 9c9ec08d78c71..e48741e001476 100644
---- a/arch/s390/Kconfig
-+++ b/arch/s390/Kconfig
-@@ -41,9 +41,6 @@ config AUDIT_ARCH
- config NO_IOPORT_MAP
- 	def_bool y
- 
--config PCI_QUIRKS
--	def_bool n
--
- config ARCH_SUPPORTS_UPROBES
- 	def_bool y
- 
-@@ -258,6 +255,7 @@ config S390
- 	select PCI_DOMAINS		if PCI
- 	select PCI_MSI			if PCI
- 	select PCI_MSI_ARCH_FALLBACKS	if PCI_MSI
-+	select PCI_QUIRKS		if PCI
- 	select SPARSE_IRQ
- 	select SWIOTLB
- 	select SYSCTL_EXCEPTION_TRACE
-diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
-index 474e1f8d1d3c2..d2086af3434c0 100644
---- a/arch/s390/include/asm/pci.h
-+++ b/arch/s390/include/asm/pci.h
-@@ -11,6 +11,9 @@
- #include <asm/pci_insn.h>
- #include <asm/sclp.h>
- 
-+#define ARCH_GENERIC_PCI_MMAP_RESOURCE	1
-+#define arch_can_pci_mmap_wc()		1
-+
- #define PCIBIOS_MIN_IO		0x1000
- #define PCIBIOS_MIN_MEM		0x10000000
- 
-diff --git a/arch/s390/pci/Makefile b/arch/s390/pci/Makefile
-index df73c5182990a..1810e0944a4ed 100644
---- a/arch/s390/pci/Makefile
-+++ b/arch/s390/pci/Makefile
-@@ -5,6 +5,6 @@
- 
- obj-$(CONFIG_PCI)	+= pci.o pci_irq.o pci_clp.o \
- 			   pci_event.o pci_debug.o pci_insn.o pci_mmio.o \
--			   pci_bus.o pci_kvm_hook.o pci_report.o
-+			   pci_bus.o pci_kvm_hook.o pci_report.o pci_fixup.o
- obj-$(CONFIG_PCI_IOV)	+= pci_iov.o
- obj-$(CONFIG_SYSFS)	+= pci_sysfs.o
-diff --git a/arch/s390/pci/pci_fixup.c b/arch/s390/pci/pci_fixup.c
-new file mode 100644
-index 0000000000000..35688b6450983
---- /dev/null
-+++ b/arch/s390/pci/pci_fixup.c
-@@ -0,0 +1,23 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Exceptions for specific devices,
-+ *
-+ * Copyright IBM Corp. 2025
-+ *
-+ * Author(s):
-+ *   Niklas Schnelle <schnelle@linux.ibm.com>
-+ */
-+#include <linux/pci.h>
-+
-+static void zpci_ism_bar_no_mmap(struct pci_dev *pdev)
-+{
-+	/*
-+	 * ISM's BAR is special. Drivers written for ISM know
-+	 * how to handle this but others need to be aware of their
-+	 * special nature e.g. to prevent attempts to mmap() it.
-+	 */
-+	pdev->non_mappable_bars = 1;
-+}
-+DECLARE_PCI_FIXUP_EARLY(PCI_VENDOR_ID_IBM,
-+			PCI_DEVICE_ID_IBM_ISM,
-+			zpci_ism_bar_no_mmap);
-diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
-index 2f34761e64135..60ed70a39d2cc 100644
---- a/drivers/s390/net/ism_drv.c
-+++ b/drivers/s390/net/ism_drv.c
-@@ -20,7 +20,6 @@
- MODULE_DESCRIPTION("ISM driver for s390");
- MODULE_LICENSE("GPL");
- 
--#define PCI_DEVICE_ID_IBM_ISM 0x04ED
- #define DRV_NAME "ism"
- 
- static const struct pci_device_id ism_device_table[] = {
-diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
-index 2a9ca3dbaa0e9..5bd122a9afdc6 100644
---- a/include/linux/pci_ids.h
-+++ b/include/linux/pci_ids.h
-@@ -518,6 +518,7 @@
- #define PCI_DEVICE_ID_IBM_ICOM_V2_ONE_PORT_RVX_ONE_PORT_MDM	0x0251
- #define PCI_DEVICE_ID_IBM_ICOM_V2_ONE_PORT_RVX_ONE_PORT_MDM_PCIE 0x0361
- #define PCI_DEVICE_ID_IBM_ICOM_FOUR_PORT_MODEL	0x252
-+#define PCI_DEVICE_ID_IBM_ISM		0x04ed
- 
- #define PCI_SUBVENDOR_ID_IBM		0x1014
- #define PCI_SUBDEVICE_ID_IBM_SATURN_SERIAL_ONE_PORT	0x03d4
--- 
-2.39.5
-
+Thanks!
 
