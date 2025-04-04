@@ -1,171 +1,77 @@
-Return-Path: <netdev+bounces-179259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E139CA7B98A
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 11:04:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90A91A7BA02
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 11:33:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32FB7188AB71
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 09:04:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AA5F7A5D16
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 09:31:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A66D61A23BC;
-	Fri,  4 Apr 2025 09:03:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 138AA1A9B28;
+	Fri,  4 Apr 2025 09:33:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="a1xOuNoT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nq1cnFY2"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738E819D8BC;
-	Fri,  4 Apr 2025 09:03:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E035B1A38E3;
+	Fri,  4 Apr 2025 09:32:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743757411; cv=none; b=RJNAr7FBt++NgWuOhzGR9bcXCr7y+N+znUsZWwbskgNiYNUtQ1VG4CaGdYz++y0ib9pkZouFZiK2zfDgXAlK5HaQahRhqjiQv4LyPhatz50DumJAIuyCfeZQe49S+3Ldg8gxzrV3R71hKu2SdextX0XDO52X2PZGXY26wNeCn2k=
+	t=1743759180; cv=none; b=rON21FEvjJErQKI4ol6kxExdJ1HOWy4oNEYMBTdW4k7gZMvMoKfNHvTiYEnWuvTHiR6Cp0/O1XQ/pfsLda8LwC9MgrfT719dpnHpjZL8r0Fv24yAAf6qp2/UEoTP3n9d3y6sUXBqlJafo6fhwy1//tRw17IZ4AWPZ6/uAAXGAGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743757411; c=relaxed/simple;
-	bh=08remofodMl9NndC97QoQQcun+/9trhhteGAAv+OQ4U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=JwatXotCNyLrm9Eo9C6uyUAEwVi/fQX2ykRw73W1DbXvku/g8xQKqPrSScUZaK4wSwQ0tfxdlhyA0EQ/O1JGv7uj2Vv0/HxtFivPtDSysdFPriOZ+1hJNnnKyIs60ZOzHt6GdzbecEjWqGp4MBkSzfCV/4M2o1NSNtMIQMi+Lz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=a1xOuNoT; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 53492efm3905742
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 4 Apr 2025 04:02:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1743757360;
-	bh=9r3rjhSZYe9kTQKj1A2IGsaMEllubj0HxqoQkvuRJWA=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=a1xOuNoTOoGYlZq8rwTVaFTaCB9vZW/Pr91RqeQ5DLIC7EI/3kJgwJYpt/m3CcAF2
-	 8tNw1JqKIhy9HKS2uItCSiGMsnqUxO23c9kCfumfDatr/a2sBfu91H1vlwu+RKXZFJ
-	 5shN6Sh448Drw63Gu7dCbf87KyHnkZj0lEPv/X3g=
-Received: from DFLE109.ent.ti.com (dfle109.ent.ti.com [10.64.6.30])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 53492enC068812
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 4 Apr 2025 04:02:40 -0500
-Received: from DFLE107.ent.ti.com (10.64.6.28) by DFLE109.ent.ti.com
- (10.64.6.30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 4
- Apr 2025 04:02:39 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE107.ent.ti.com
- (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 4 Apr 2025 04:02:39 -0500
-Received: from [172.24.23.235] (lt9560gk3.dhcp.ti.com [172.24.23.235])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 53492XVJ083733;
-	Fri, 4 Apr 2025 04:02:34 -0500
-Message-ID: <fccd824b-58dc-4ab1-91c0-77c2436914c9@ti.com>
-Date: Fri, 4 Apr 2025 14:32:33 +0530
+	s=arc-20240116; t=1743759180; c=relaxed/simple;
+	bh=x/htCtnL4bJbQP2vXMg/bxEFFPbS11UpyoiMOMuZhvU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BRl2M9BVxfbT77z3e6AJLdFciRLMtL6rEN0xITRVTuC489BHnc6MEPmUrCPfInwudvcuJxgaTqmyv+JPPX1ApRMrgsbwwnDUetlBlYogxgpdyX3JW+HJsECR9735gC9MrWIicTTMCraJvJQ/3i4ZNbVV5ObF145ohWAWbdi2krk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nq1cnFY2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC6BDC4CEDD;
+	Fri,  4 Apr 2025 09:32:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743759179;
+	bh=x/htCtnL4bJbQP2vXMg/bxEFFPbS11UpyoiMOMuZhvU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=nq1cnFY2+4/Yt4lih9yaYqSrPLqIoT1sqSPa/3a54HfC32ZzPeiCvxzJDZ3o3GQ2c
+	 GVq6c5d/AIuGVHJqgXhJHgP3Lw2Zz2irdSPow+o0xa0oR0uEFTflEH/dho8HadSQuR
+	 a1jk056yjABFzETI3RLW0Q1OJRaD6QGlDuFb8uhFd5XnVcgt+k/wY7q6y4TEJjRfaJ
+	 ZgGKXZtrK6v8/SLdO5Xbo/jKoP69FCEUEfYQz7NOOX4ifwpIgMMhxsCXPx6AOMQjRP
+	 MyDVWksd4rHqFXhOeZwSuWioXXbo8utI3YOES21FaFi21yDM/dff5LNL6uAvrHWXX7
+	 R6EDtGdg+micA==
+Date: Fri, 4 Apr 2025 10:32:54 +0100
+From: Simon Horman <horms@kernel.org>
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, paulmck@kernel.org,
+	joel@joelfernandes.org, steven.price@arm.com,
+	akpm@linux-foundation.org, matttbe@kernel.org,
+	anshuman.khandual@arm.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] configs/debug: run and debug PREEMPT
+Message-ID: <20250404093254.GC214849@horms.kernel.org>
+References: <20250402172305.1775226-1-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3 3/3] net: ti: icss-iep: Fix possible NULL pointer
- dereference for perout request
-To: Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        <dan.carpenter@linaro.org>, <kuba@kernel.org>, <edumazet@google.com>,
-        <davem@davemloft.net>, <andrew+netdev@lunn.ch>
-CC: <bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <namcao@linutronix.de>, <javier.carrasco.cruz@gmail.com>,
-        <diogo.ivo@siemens.com>, <horms@kernel.org>,
-        <jacob.e.keller@intel.com>, <john.fastabend@gmail.com>,
-        <hawk@kernel.org>, <daniel@iogearbox.net>, <ast@kernel.org>,
-        <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
-        <danishanwar@ti.com>
-References: <20250328102403.2626974-1-m-malladi@ti.com>
- <20250328102403.2626974-4-m-malladi@ti.com>
- <0fb67fc2-4915-49af-aa20-8bdc9bed4226@kernel.org>
- <b0a099a6-33b2-49f9-9af7-580c60b98f55@ti.com>
- <469fd8d0-c72e-4ca6-87a9-2f42b180276b@redhat.com>
- <58d26423-04da-4491-9318-d4a7a1f12005@kernel.org>
-Content-Language: en-US
-From: "Malladi, Meghana" <m-malladi@ti.com>
-In-Reply-To: <58d26423-04da-4491-9318-d4a7a1f12005@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250402172305.1775226-1-sdf@fomichev.me>
 
-Hi Roger,
-
-On 4/4/2025 1:17 PM, Roger Quadros wrote:
+On Wed, Apr 02, 2025 at 10:23:05AM -0700, Stanislav Fomichev wrote:
+> Recent change [0] resulted in a "BUG: using __this_cpu_read() in
+> preemptible" splat [1]. PREEMPT kernels have additional requirements
+> on what can and can not run with/without preemption enabled.
+> Expose those constrains in the debug kernels.
 > 
+> 0: https://lore.kernel.org/netdev/20250314120048.12569-2-justin.iurman@uliege.be/
+> 1: https://lore.kernel.org/netdev/20250402094458.006ba2a7@kernel.org/T/#mbf72641e9d7d274daee9003ef5edf6833201f1bc
 > 
-> On 03/04/2025 14:25, Paolo Abeni wrote:
->> On 4/2/25 2:37 PM, Malladi, Meghana wrote:
->>> On 4/2/2025 5:58 PM, Roger Quadros wrote:
->>>> On 28/03/2025 12:24, Meghana Malladi wrote:
->>>>> ICSS IEP driver has flags to check if perout or pps has been enabled
->>>>> at any given point of time. Whenever there is request to enable or
->>>>> disable the signal, the driver first checks its enabled or disabled
->>>>> and acts accordingly.
->>>>>
->>>>> After bringing the interface down and up, calling PPS/perout enable
->>>>> doesn't work as the driver believes PPS is already enabled,
->>>>
->>>> How? aren't we calling icss_iep_pps_enable(iep, false)?
->>>> wouldn't this disable the IEP and clear the iep->pps_enabled flag?
->>>>
->>>
->>> The whole purpose of calling icss_iep_pps_enable(iep, false) is to clear
->>> iep->pps_enabled flag, because if this flag is not cleared it hinders
->>> generating new pps signal (with the newly loaded firmware) once any of
->>> the interfaces are up (check icss_iep_perout_enable()), so instead of
->>> calling icss_iep_pps_enable(iep, false) I am just clearing the
->>> iep->pps_enabled flag.
->>
->> IDK what Roger thinks, but the above is not clear to me. I read it as
->> you are stating that icss_iep_pps_enable() indeed clears the flag, so i
->> don't see/follow the reasoning behind this change.
->>
->> Skimmir over the code, icss_iep_pps_enable() could indeed avoid clearing
->> the flag under some circumstances is that the reason?
->>
->> Possibly a more describing commit message would help.
-> 
-> I would expect that modifying the xxx_enabled flag should be done only
-> in the icss_iep_xxx_enable() function. Doing it anywhere else will be difficult
-> to track/debug in the long term.
-> 
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 
-There is no problem with calling icss_iep_pps_enable() for clearing the 
-pps_enable flag. Problem comes with icss_iep_perout_enable(), causing 
-null pointer dereference for the NULL perout request argument we are 
-passing just for clearing the perout_enable flag.
-
-> I don't see why the flag needs to be set anywhere else. Maye better to
-> improve logic inside icss_iep_pps_enable() like Paolo suggests.
-> 
-
-Ok, one thing I can do is create a ptp_perout_request to disable perout 
-instead of passing NULL to icss_iep_perout_enable(). What are your 
-thoughts on this ?
-
->>
->>>> And, what if you brought 2 interfaces of the same ICSS instances up
->>>> but put only 1 interface down and up?
->>>>
->>>
->>> Then the flag need not be disabled if only one interface is brought down
->>> because the IEP is still alive and all the IEP configuration (including
->>> pps/perout) is still valid.
->>
->> I read the above as stating this fix is not correct in such scenario,
->> leading to the wrong final state.
->>
->> I think it would be better to either give a better reasoning about this
->> change in the commit message or refactor it to handle even such scenario,
->>
->> Thanks,
->>
->> Paolo
->>
-> 
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
