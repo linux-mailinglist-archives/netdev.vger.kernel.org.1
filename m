@@ -1,143 +1,157 @@
-Return-Path: <netdev+bounces-179263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AAE6A7BA3D
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 11:53:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 798AAA7BA62
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 12:05:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47CC21771E2
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 09:53:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 069BC7A9595
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 10:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A45019E83E;
-	Fri,  4 Apr 2025 09:53:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71574186295;
+	Fri,  4 Apr 2025 10:05:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q0iEAhm8"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="iZJN6S78"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from fanzine2.igalia.com (fanzine.igalia.com [178.60.130.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 645101624C9
-	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 09:53:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2886C28E8;
+	Fri,  4 Apr 2025 10:05:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.60.130.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743760415; cv=none; b=Tinf7+wh5G/5qvQRyJiQryM3532hWlGbmstuJOoAE+RAAbZWvetFGYVaSAfvwyQ5FSNT198GDRhqm4j4izPAfMafoKcwc0AcIm+1PqCmiog3JRNfdfSoQFpzbD4JcrUdnYmV7/kh5MfCaGcwytWBAPefPfP8h96/Fyp4zYKQ7eY=
+	t=1743761117; cv=none; b=ChYUsNSuNsOuXNeY0diBZcgQ+CNBHm70R3QQsFokqDOyXF+8ulJQHbwc7giv9dvuSno3Le6OWH7VoTXbK4ulp77WQYblc9hTUFp6tboG2qA4lMC4s+HmNZnxHYTku0DTvfvhgWHS6qIdrCdNMvxBoDTZIfPhGgCIxi7X+kvx9qg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743760415; c=relaxed/simple;
-	bh=idfTmf4ycwMLOUECqnSVWwqShx0XOcb7QDlksx8VU6Q=;
+	s=arc-20240116; t=1743761117; c=relaxed/simple;
+	bh=zFq7mQzzUKzXv8BAv4y0LWPUsASDiuJfhCEHgQT2SVg=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=OMylR2NXm+XgRliejKI8w0zvwP06sNjJ3UqIOI2m1o3oSDMtyVtujSylua3u2Hsq0f5SuAC06VVTN538ho1YZYeKspVCczGqKqpwfjw9O2Slx+6zIXAh+jW2VzwgObAjHqcH2BvYeEugkaFCJmZ/qAgE37iYbDIF1QsB51OKPJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q0iEAhm8; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743760412;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LVGQCiVyZHkGXnn98AxsiJpRPwaHkCR4E26XV5UfwnI=;
-	b=Q0iEAhm8NcYPXa/hg3KAp1puMVD5XjkeCBlSYGVBmD/oWYszRaDFxWCVV5JuWAfYbnDBF2
-	CfeeW/BR6DP6RYCDxuP2qWvUzs35YukhH5MYfk2zaXIlV4Ik+FOAThnreTvTAeCrNqPqG9
-	rFLqYc9H8etuSx+73XCdrO6Qq1dVjF4=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-81-Jb6021mDOaWi05iU7woRfA-1; Fri, 04 Apr 2025 05:53:30 -0400
-X-MC-Unique: Jb6021mDOaWi05iU7woRfA-1
-X-Mimecast-MFC-AGG-ID: Jb6021mDOaWi05iU7woRfA_1743760409
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-ac3df3f1193so146900966b.2
-        for <netdev@vger.kernel.org>; Fri, 04 Apr 2025 02:53:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743760409; x=1744365209;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LVGQCiVyZHkGXnn98AxsiJpRPwaHkCR4E26XV5UfwnI=;
-        b=WWX+C52LZfweSYu1aufAk+Fy/hkGKgHwVNv0LztILsDoWxipxdckapiHqh0/ckiUec
-         nz8QTTQ/7hmOIt7paINznPK+B7L4Q3N3VMONTLvN3jeKDZVIMO+997P7buLtTDftA4S+
-         HMlW/G2qTgUSWEbIZMByVh3NQLGw+DackrySzIIo+qMhoHf65b70c0MtprD7hrZJg8A9
-         vPmNRokzi7KB3RHFoVCvmZsBgd1ORtT/voB2j+oFc29MHjx4LXph8w9Z0OcCUUN80eaq
-         uIo3hoXJkO/3D2nMF532/gxy7WyQlCmyYfT5KNsdMNEv9wFscZnZ7jZ2QIbpr0x0SZvI
-         1mJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXeCdpQa0EWRpbpaGEuIqocMtCoVoOevxniplGTNFWj8HyMXg/sug/WgZXHqPUAFgJrBQg1V8U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywkm4ZsKPTUshKjqNOvZUfiFOJiEIfgiqH37iLv7oz+OQ6gJVx7
-	vLNX6UDeEsHn7qYXSV0+yOhbWgHeCozs39WKwpJ8isLHGjqVhAs7EP5JCG3MR46MewlahI7LfVV
-	J/jlrkOtN4QEAbMF5FHViAK5JDp6+azdbWyP5Czk0GT8eHNw6LUvnxQ==
-X-Gm-Gg: ASbGnct2zSeAVKEqiL2vPuNCpclycKKtOKj/8WYXZQkUHHttD7NQqKvNHttTgxTO1SC
-	LLay2VA8PQaUbcEHOj6rXC1pYxTWdPNS8MvFMe+xbtkk/0ALv9kEf6MduYA2zvvJTSWq/dRNFfp
-	k1Y/qFQd6jR7eHJR8sHFgAoCv74tTQXovRsVSE9Q/20O4SkQfUShTmMnBzFgIo9ld9cEjn8unrD
-	zn1aACTLv34EJUucEDb5PsgOoSbcAilzfKri6/VS3e7CuXmn73bxs6C1fMXVJ6eK3r7OvkroZdq
-	5FKB6OqnXjqswT5zMJDG12XwBme7UJgL2ajWoGTb
-X-Received: by 2002:a17:907:2da1:b0:abf:6db5:c9a9 with SMTP id a640c23a62f3a-ac7d6e07489mr142802066b.39.1743760409205;
-        Fri, 04 Apr 2025 02:53:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH1XTUa7Ek2WhdvH5WJS2AIV0agLDZZ/Z+JEVHEXzqYzD3Mqsj3alR3nhhtT2rdlTKU/t/FhQ==
-X-Received: by 2002:a17:907:2da1:b0:abf:6db5:c9a9 with SMTP id a640c23a62f3a-ac7d6e07489mr142800266b.39.1743760408780;
-        Fri, 04 Apr 2025 02:53:28 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac7c0185726sm224898366b.137.2025.04.04.02.53.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Apr 2025 02:53:28 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id C858818FD70F; Fri, 04 Apr 2025 11:53:26 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
- <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Simon
- Horman <horms@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Mina
- Almasry <almasrymina@google.com>, Yonglong Liu <liuyonglong@huawei.com>,
- Yunsheng Lin <linyunsheng@huawei.com>, Pavel Begunkov
- <asml.silence@gmail.com>, Matthew Wilcox <willy@infradead.org>,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-mm@kvack.org, Qiuling Ren <qren@redhat.com>, Yuying Ma
- <yuma@redhat.com>
-Subject: Re: [PATCH net-next v6 2/2] page_pool: Track DMA-mapped pages and
- unmap them when destroying the pool
-In-Reply-To: <20250403153129.013a7bdd@kernel.org>
-References: <20250401-page-pool-track-dma-v6-0-8b83474870d4@redhat.com>
- <20250401-page-pool-track-dma-v6-2-8b83474870d4@redhat.com>
- <20250403153129.013a7bdd@kernel.org>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 04 Apr 2025 11:53:26 +0200
-Message-ID: <87tt74l0bt.fsf@toke.dk>
+	 MIME-Version:Content-Type; b=rRuIy8OwpVu5K2kmSwILvbhEkVNROAxVx6m+8Vqdga8dl1v/PEs/YSAEgd0LcfjjqzBi2rtOQzXWGcJbRp36yBP5PRvMUiCaWWnFarHqlIIHULMdLBFzF03l+Vs3h1WBtUq2e0wLDwrTu5d0e78WfQV1fO1YhqCC6N0D+Osxd1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=iZJN6S78; arc=none smtp.client-ip=178.60.130.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Content-Type:MIME-Version:Message-ID:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Sender:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=SG8iVfOnCjDC7IzPwnGOEf1BZhPJmATD83TCzmahlB4=; b=iZJN6S78C4QR3vLPkGcsCde4Dv
+	KhCFXysQVBI3a4rGyA+LslXPNpVBhGEsLxe7ePwztABogCBipl0KDW3QOaZRws8GzUSRyZbIfDkrA
+	hX8rIYWKG//JzQG314ip791hQ9szOL41N+ofBKwI44u0DMqYXzCf5mqjCWybpOAkAu+nqjqDxDRuB
+	0rMll4dg9zosFy/ha9oKwPb7uJiEsFB2VW1zPmQ5RLIYDm44FobJ8JiJXRYoZX0K36deTR6nutreZ
+	DFCUiMeDycfSNXuawNrPq+cPPHVSkj1gwCFHz6kyXJfjm9FF158w1N7J2IWXr4iy/QCnsHf7VqrU6
+	hGE5RXSw==;
+Received: from 79.red-83-60-111.dynamicip.rima-tde.net ([83.60.111.79] helo=localhost)
+	by fanzine2.igalia.com with utf8esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
+	id 1u0duz-00BJ8r-Ro; Fri, 04 Apr 2025 12:04:57 +0200
+From: Ricardo =?utf-8?Q?Ca=C3=B1uelo?= Navarro <rcn@igalia.com>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, kernel-dev@igalia.com, linux-sctp@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+Subject: Re: [PATCH] sctp: check transport existence before processing a
+ send primitive
+In-Reply-To: <CADvbK_d+vr-t7D1GZJ86gG6oS+Nzy7MDVh_+7Je6hqCdez4Axw@mail.gmail.com>
+References: <20250402-kasan_slab-use-after-free_read_in_sctp_outq_select_transport-v1-1-da6f5f00f286@igalia.com>
+ <CADvbK_dTX3c9wgMa8bDW-Hg-5gGJ7sJzN5s8xtGwwYW9FE=rcg@mail.gmail.com>
+ <87tt75efdj.fsf@igalia.com>
+ <CADvbK_c69AoVyFDX2YduebF9DG8YyZM7aP7aMrMyqJi7vMmiSA@mail.gmail.com>
+ <CADvbK_d+vr-t7D1GZJ86gG6oS+Nzy7MDVh_+7Je6hqCdez4Axw@mail.gmail.com>
+Date: Fri, 04 Apr 2025 12:04:57 +0200
+Message-ID: <87r028dyye.fsf@igalia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-Jakub Kicinski <kuba@kernel.org> writes:
+Thanks for the suggestion!
 
-> On Tue, 01 Apr 2025 11:27:19 +0200 Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> +	if (err) {
->> +		WARN_ONCE(1, "couldn't track DMA mapping, please report to netdev@");
->>  		goto unmap_failed;
+On Thu, Apr 03 2025 at 14:44:18, Xin Long <lucien.xin@gmail.com> wrote:
+
+> @@ -9234,7 +9236,7 @@ static int sctp_wait_for_sndbuf(struct
+> sctp_association *asoc, long *timeo_p,
+>                                           TASK_INTERRUPTIBLE);
+>                 if (asoc->base.dead)
+>                         goto do_dead;
+> -               if (!*timeo_p)
+> +               if (!*timeo_p || (t && t->dead))
+>                         goto do_nonblock;
+>                 if (sk->sk_err || asoc->state >= SCTP_STATE_SHUTDOWN_PENDING)
+>                         goto do_error;
+
+I suppose checking t->dead should be done after locking the socket
+again, where sctp_assoc_rm_peer() may have had a chance to run, rather
+than here?
+
+Something like this:
+
+@@ -9225,7 +9227,9 @@ static int sctp_wait_for_sndbuf(struct sctp_association *asoc, long *timeo_p,
+ 	pr_debug("%s: asoc:%p, timeo:%ld, msg_len:%zu\n", __func__, asoc,
+ 		 *timeo_p, msg_len);
+ 
+-	/* Increment the association's refcnt.  */
++	/* Increment the transport and association's refcnt. */
++	if (transport)
++		sctp_transport_hold(transport);
+ 	sctp_association_hold(asoc);
+ 
+ 	/* Wait on the association specific sndbuf space. */
+@@ -9252,6 +9256,8 @@ static int sctp_wait_for_sndbuf(struct sctp_association *asoc, long *timeo_p,
+ 		lock_sock(sk);
+ 		if (sk != asoc->base.sk)
+ 			goto do_error;
++		if (transport && transport->dead)
++			goto do_nonblock;
+ 
+ 		*timeo_p = current_timeo;
+ 	}
+@@ -9259,7 +9265,9 @@ static int sctp_wait_for_sndbuf(struct sctp_association *asoc, long *timeo_p,
+ out:
+ 	finish_wait(&asoc->wait, &wait);
+ 
+-	/* Release the association's refcnt.  */
++	/* Release the transport and association's refcnt. */
++	if (transport)
++		sctp_transport_put(transport);
+ 	sctp_association_put(asoc);
+ 
+ 	return err;
+
+
+So by the time the sending thread re-claims the socket lock it can tell
+whether someone else removed the transport by checking transport->dead
+(set in sctp_transport_free()) and there's a guarantee that the
+transport hasn't been freed yet because we hold a reference to it.
+
+If the whole receive path through sctp_assoc_rm_peer() is protected by
+the same socket lock, as you said, this should be safe. The tests I ran
+seem to work fine. If you're ok with it I'll send another patch to
+supersede this one.
+
+
+> You will need to reintroduce the dead bit in struct sctp_transport and
+> set it in sctp_transport_free(). Note this field was previously removed in:
 >
-> FWIW I second Pavel's concern about the warning being too drastic.
-> I have the feeling Meta's fleet will hit this.
-> How about WARN_ONCE(err !=3D -ENOMEM, ... ? I presume you care mostly
-> about the array filling up so -EBUSY
-
-Ah yes, that's a good solution, will do!
-
->> +	}
->>=20=20
->> +	if (page_pool_set_dma_addr_netmem(netmem, dma)) {
->> +		WARN_ONCE(1, "unexpected DMA address, please report to netdev@");
->> +		goto unmap_failed;
->> +	}
+> commit 47faa1e4c50ec26e6e75dcd1ce53f064bd45f729
+> Author: Xin Long <lucien.xin@gmail.com>
+> Date:   Fri Jan 22 01:49:09 2016 +0800
 >
-> I think this is ever so slightly leaking the id, if it ever happens?
+>     sctp: remove the dead field of sctp_transport
 
-Good catch! Will swap the order of the operations.
+I understand that none of the transport->dead checks from that commit
+are necessary anymore, since they were replaced by refcnt checks, and
+that we'll only bring the bit back for this particular check we're doing
+now, correct?
 
--Toke
-
+Cheers,
+Ricardo
 
