@@ -1,131 +1,173 @@
-Return-Path: <netdev+bounces-179355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A63DA7C193
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 18:33:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF554A7C197
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 18:34:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF7A87A7C5F
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 16:32:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C72C1B60356
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 16:34:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14D971F4282;
-	Fri,  4 Apr 2025 16:33:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CBF6206F23;
+	Fri,  4 Apr 2025 16:34:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tEv/3P0V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bXJRurK4"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02EC81E1DE5
-	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 16:33:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB7601E1DE5;
+	Fri,  4 Apr 2025 16:34:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743784415; cv=none; b=MqeqEBe+lI4ixA6OSVycMwpH55cRXAkqmVi6nbRb5GJNmhHDT68o0s5UGSFN/kavTUoYEV6uJDf1KtKdARMJER4NOBvHQisyJzA18BoXJpcp/BTzWp9ct/8pRxCw81tmxNA52LTXOAGpUQzc1KO2nlmnkmObjnwGKDm/xcLQRQY=
+	t=1743784453; cv=none; b=g9EIPGBPivAraTZVyTVgpPTF9ktaB4xMfWNQISWMMeWjkJSGwcG0Lrvvtu02koy3BHxWRMf2Cm0oBrwZ75kRTPaKzMnRkGp1HUTmouCG3kPjTSqFzbIlzGbOG2lxR4VE2pFsDVyh5C6MpfiBcqvm9vYyFXE4JUbMJ4ByLSz6PqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743784415; c=relaxed/simple;
-	bh=DYpsEZ0F/B0jeAg5F8F+hIVilOxHCU5XT9sciDSnFb8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QsGkSdpDd+yFjV3P0us9ofobfXPFsxWpPd2k8pAcLWnYClkRNCZHg/ml3t1KygcpmqQHreIWFvEuJTKcuCTa83pUymHjYsjPsBeLaS7I84WwJDz0HyfRjOu9tPOP5ATDWRAS3w6hM84pZ3oF9678ImauJ+W0EcLm9R/knD3mwmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tEv/3P0V; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=rIaP0Oe52Rsj+tzF4BQOcrLCL+WZ6dkzbOdGTYBx0gA=; b=tEv/3P0V6FX86a+LYcFPruAaW5
-	VAvzAJLe0q5r5XFYPI1Tgs7qhc7H+iKpqZdGkIgUam2Z+KZJfO4g0awfLklBBTlMGzCrrxV8UZCfc
-	LpUcWMrryVPwb0BYkv9oiSfdVlS6QlpWw1ndS0ha9Z1OZ0+UOA8mm8xIGoXf3rRHdsyE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u0jyw-0084Ek-1Q; Fri, 04 Apr 2025 18:33:26 +0200
-Date: Fri, 4 Apr 2025 18:33:26 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org, hkallweit1@gmail.com, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [net PATCH 1/2] net: phy: Cleanup handling of recent changes to
- phy_lookup_setting
-Message-ID: <3087356b-305f-402a-9666-4776bb6206a1@lunn.ch>
-References: <174354264451.26800.7305550288043017625.stgit@ahduyck-xeon-server.home.arpa>
- <174354300640.26800.16674542763242575337.stgit@ahduyck-xeon-server.home.arpa>
- <Z-6hcQGI8tgshtMP@shell.armlinux.org.uk>
- <20250403172953.5da50762@fedora.home>
- <de19e9f1-4ae3-4193-981c-e366c243352d@lunn.ch>
- <CAKgT0UdhTT=g+ODpzR5uoTEOkC8u+cfCp7H-8718Zphd=24buw@mail.gmail.com>
- <Z-8XZiNHDoEawqww@shell.armlinux.org.uk>
- <CAKgT0UepS3X-+yiXcMhAC-F87Zcd74W2-2RDzLEBZpL3ceGNUw@mail.gmail.com>
+	s=arc-20240116; t=1743784453; c=relaxed/simple;
+	bh=7NsrsI+l9rLHQLNr/hGGlPATfpYv1HbnbKsMZR2yAlo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h4ZZTINhtEZIbLEgATzWHoRRMVr2WK+fH/xmJDrh+8flNCB51gjA8XAIHv+eAEqtpDkkBUbNpeXYJQdl8PnKzcYU6LXAOYLCWlGKZfsbV7x2DbZhLe79Fxpz2NaDoh+G/AvwXOWr4QmBAbWnR01ahWxWv8NJtPZqPOfS3gwbBws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bXJRurK4; arc=none smtp.client-ip=209.85.128.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-703cd93820fso22560277b3.2;
+        Fri, 04 Apr 2025 09:34:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743784450; x=1744389250; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0uDKWqUJ1Mh2votuVohBMKz8iyjVCjktErRfvKYZ0lQ=;
+        b=bXJRurK41MOiBYICTCDPdRA+6jRd+j5rF8A1Z1wbEh5UzZFBtSJl8vo495/IbfVJNI
+         JQZImvLgf44vEOJH6lbyuP6Uwjo53IJtvI57lTnBPMdxr1yihOfcr7uSXx+y+v439sXs
+         cfQtnme5J1O22LcUyidkNVPi9iobjRxqsVgyXhqKQpQnRI4UhX5cdye8uDlUI0M4o/ng
+         onz7r2W7SiQyvXrmgBhjyYCUIJioG5AcNYnh1rlond5tXAfc6e49n99yG5NGIW+GqUlv
+         PmAvBil6uQcoRch11Vu3MP+3kbymeUDUd92oREIWg77Q0kTN8o6v5bwdHkhkPoD7EtVU
+         12jQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743784450; x=1744389250;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0uDKWqUJ1Mh2votuVohBMKz8iyjVCjktErRfvKYZ0lQ=;
+        b=jsy1r0tvK1IJEmiErEZ+JruyUS6IwuBYcg6KmLJcjPn12gru85ECeZqHv1Cg5QpyJP
+         AwRhSw0lEZNL0eutZPxoe3HjMxvNF6+7yiDqhRBCjYzJOg8yg5FvIPC56sTlfl54Llfo
+         UqEfP4ywhUzw6Wzv/X6W0XHTRbwD6QRTXI/ORsmBZPjW30b6iTn/ufNIJ3eet+JGEWWm
+         DbaPTOgsUlvuN8q8PA3pp2/UWZbqnqxeY7d9w2/uXjocMI0a1+GXQegZpwZiwJ5EePBz
+         l8N5CKPjxPs9vP95O5ubE0CviYFPMq/nTZn7zKh5YQgQOSMAYLRQArzHs5rSV4ICl/o+
+         2nMA==
+X-Forwarded-Encrypted: i=1; AJvYcCV4qOX89ou0DL4uAAfiQqcj1kETgKSLTvMeXtvRrdiSLBujUiBpgLdRJRqUJtfmgrogLZF1V28=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDVFKx6op//3Zl55/hya449RqsRukkIj2uJA+zJW9zZnSYGRgX
+	ghW+pB3IzQAxXsxxIOvMzbCsJSQN3b/vViBt+9IgjKEj/X6sKiwH7bpsN+AncreiQ1VPQWEngIT
+	6iDBj9BBtk5Kc0fFRfFiqXzXV4MM=
+X-Gm-Gg: ASbGncu+swtXI/gAPGxjSRJkyAwSqZjKIwfIF7pyuLib4c+IjOJUxLsPy0YWGqiOl+o
+	yY6qbMbC6JuhnFAnccWFlWb+9Wb6DLBoU/jDv9NzKQCfpEhCyjyljEYw7969k5P7spKfU4uroG+
+	PyvuKev0I9xPS+iQoKkZXNHkQDOgSZPFiZy3ogha7IPJi3ObkCl1Pn/aQ9olY=
+X-Google-Smtp-Source: AGHT+IFbpwxn+U5U/hEEWv/ztsjgATFwKY0FzTLpSFYuWGcdr3UTKhJhAbnUKcpmp9n9SoOXMGsIJttcTuxUh6lHX2I=
+X-Received: by 2002:a05:690c:7207:b0:6fe:d759:b178 with SMTP id
+ 00721157ae682-703e1503ed8mr66647567b3.6.1743784450672; Fri, 04 Apr 2025
+ 09:34:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKgT0UepS3X-+yiXcMhAC-F87Zcd74W2-2RDzLEBZpL3ceGNUw@mail.gmail.com>
+References: <20250404142633.1955847-1-willemdebruijn.kernel@gmail.com>
+ <20250404142633.1955847-2-willemdebruijn.kernel@gmail.com> <584071a3-10df-443a-ad8c-1fa7bc82d821@iogearbox.net>
+In-Reply-To: <584071a3-10df-443a-ad8c-1fa7bc82d821@iogearbox.net>
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Fri, 4 Apr 2025 12:33:33 -0400
+X-Gm-Features: AQ5f1JrD3F-2-QTzwjzpusEu57CQQT8S1sb5ZfpbJ5Y54G7m1VYHc6lgSPEGZY0
+Message-ID: <CAF=yD-+ccY58AAneA7tLokuUahrj=8cdDtPPopGH0h8mK-hMbQ@mail.gmail.com>
+Subject: Re: [PATCH bpf v2 1/2] bpf: support SKF_NET_OFF and SKF_LL_OFF on skb frags
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org, 
+	john.fastabend@gmail.com, Willem de Bruijn <willemb@google.com>, 
+	Matt Moeller <moeller.matt@gmail.com>, =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Part of the issue is that I think I may be mixing terms up and I have
-> to be careful of that. If I am not mistaken you refer to the PHY as
-> the full setup from the MII down to the other side of the PMA or maybe
-> PMD. I also have to resist calling our PMA a PHY as it is a SerDes
-> PHY, not an Ethernet PHY.
+On Fri, Apr 4, 2025 at 12:11=E2=80=AFPM Daniel Borkmann <daniel@iogearbox.n=
+et> wrote:
+>
+> Hi Willem,
+>
+> On 4/4/25 4:23 PM, Willem de Bruijn wrote:
+> [...]
+> > v1->v2
+> >    - introduce bfp_skb_load_helper_convert_offset to avoid open coding
+> > ---
+> >   include/linux/filter.h |  3 --
+> >   kernel/bpf/core.c      | 21 -----------
+> >   net/core/filter.c      | 80 +++++++++++++++++++++++------------------=
+-
+> >   3 files changed, 44 insertions(+), 60 deletions(-)
+> >
+> > diff --git a/include/linux/filter.h b/include/linux/filter.h
+> > index f5cf4d35d83e..708ac7e0cd36 100644
+> > --- a/include/linux/filter.h
+> > +++ b/include/linux/filter.h
+> > @@ -1496,9 +1496,6 @@ static inline u16 bpf_anc_helper(const struct soc=
+k_filter *ftest)
+> >       }
+> >   }
+> >
+> > -void *bpf_internal_load_pointer_neg_helper(const struct sk_buff *skb,
+> > -                                        int k, unsigned int size);
+> > -
+> >   static inline int bpf_tell_extensions(void)
+> >   {
+> >       return SKF_AD_MAX;
+> > diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+> > index ba6b6118cf50..0e836b5ac9a0 100644
+> > --- a/kernel/bpf/core.c
+> > +++ b/kernel/bpf/core.c
+> > @@ -68,27 +68,6 @@
+> >   struct bpf_mem_alloc bpf_global_ma;
+> >   bool bpf_global_ma_set;
+> >
+> > -/* No hurry in this branch
+> > - *
+> > - * Exported for the bpf jit load helper.
+> > - */
+> > -void *bpf_internal_load_pointer_neg_helper(const struct sk_buff *skb, =
+int k, unsigned int size)
+> > -{
+> > -     u8 *ptr =3D NULL;
+> > -
+> > -     if (k >=3D SKF_NET_OFF) {
+> > -             ptr =3D skb_network_header(skb) + k - SKF_NET_OFF;
+> > -     } else if (k >=3D SKF_LL_OFF) {
+> > -             if (unlikely(!skb_mac_header_was_set(skb)))
+> > -                     return NULL;
+> > -             ptr =3D skb_mac_header(skb) + k - SKF_LL_OFF;
+> > -     }
+> > -     if (ptr >=3D skb->head && ptr + size <=3D skb_tail_pointer(skb))
+> > -             return ptr;
+> > -
+> > -     return NULL;
+> > -}
+>
+> Wouldn't this break sparc 32bit JIT which still calls into this?
+>
+> arch/sparc/net/bpf_jit_asm_32.S :
+>
+> #define bpf_negative_common(LEN)                        \
+>          save    %sp, -SAVE_SZ, %sp;                     \
+>          mov     %i0, %o0;                               \
+>          mov     r_OFF, %o1;                             \
+>          SIGN_EXTEND(%o1);                               \
+>          call    bpf_internal_load_pointer_neg_helper;   \
+>           mov    (LEN), %o2;                             \
+>          mov     %o0, r_TMP;                             \
+>          cmp     %o0, 0;                                 \
+>          BE_PTR(bpf_error);                              \
+>           restore;
 
-For us, a PHY is something like:
+Argh, good catch. Thanks Daniel.
 
-https://www.marvell.com/content/dam/marvell/en/public-collateral/phys-transceivers/marvell-phys-transceivers-alaska-88e151x-datasheet.pdf
-
-https://www.ti.com/lit/ds/symlink/dp83867ir.pdf
-
-It has an MII interface one side, and a Base-T interface the other,
-where you connect magnetics and an RJ-45.
-
-It gets a bit more complex with devices like the Marvell 10G PHY,
-which can be used as an MII to MII converter typically used to convert
-the MII output from the MAC to something you can connect to an SFP
-cage.
-
-PHYs are not necessarily soldered to the board, they can also be
-inside SFPs. Copper 1G SFPs typically use a Marvell m88e1111 PHY.
-
-Just to add more confusion, Linux also has generic PHYs, which came
-later than PHYs, drivers/phy. A SERDES interface can be pretty
-generic, and can be used for multiple protocols. Some SoCs have SERDES
-interfaces which you can configure for USB, SATA, or
-networking. Generic PHYs hand this protocol switch. For some, you even
-need to configure the subprotocol SGMII, 1000BaseX, 2500BaseX.
-
-All this terminology has been driven mostly from SoCs, because x86
-systems either hid all this in firmware, or like the intel drivers,
-wrote there own MDIO and PHY drivers inside there MAC drivers.
-
-So for a long time we talked about MII, GMII, RGMII, which are
-relatively simple MII interfaces. Things got more complex with SGMII,
-1000BaseX, 2500BaseX, 10GBaseX since you then have a PCS, and the PCS
-is an active part, performing signalling, negotiation, except when
-vendors broke it because why run SGMII at 2.5 times the clock speed
-and call it 2500BaseX, which is it not...
-
-We needed something to represent that negotiation, so drivers/net/pcs
-was born, with a lot of helpers for devices which follow 802.3
-registers.
-
-So for us, we have:
-
-MAC - PHY
-MAC - PCS - PHY
-MAC - PCS - SFP cage
-MAC - PCS - PHY - SFP cage
-
-This is why i keep saying you are pushing the envelope. SoC currently
-top out at 10GbaseX. There might be 4 lanes to implement that 10G, or
-1 lane, but we don't care, they all get connected to a PHY, and BaseT
-comes out the other side.
-
-	Andrew
+I'll drop the removal of bpf_internal_load_pointer_neg_helper from the patc=
+h.
 
