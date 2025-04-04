@@ -1,101 +1,118 @@
-Return-Path: <netdev+bounces-179252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B48C8A7B905
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 10:38:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B783A7B93A
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 10:49:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 773303B79F3
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 08:37:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D4723B6E31
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 08:47:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DF3019CC28;
-	Fri,  4 Apr 2025 08:37:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2D251B0F0A;
+	Fri,  4 Apr 2025 08:46:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="McSve8l1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WS0Jj/WI"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B83E19994F
-	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 08:37:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365651A238E;
+	Fri,  4 Apr 2025 08:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743755866; cv=none; b=hFXJnAGcaXpniVtclD8v0INQnQsoqDg8XY6qGQR1sbRuMYIhgdZMPBHuxfsVOIedAOxRqXc+jot+eQhfl++HyrT3JXOT79t7HgUAf48zJ52K4C7NvwzO0Wd79kjwV0yFXsqz4q+0cda4A6FyjYaAU4deb4PcHbjYc5454XhGZWM=
+	t=1743756409; cv=none; b=L4i7m/APlXM+8/5rw+OeT4oJPVaTjMdtkYQwHilsz8S+tK1n1yh80VeeIuE4Ugrf/uZNeF84ZH1adm+Y0iwYH7tbVQj2Gj2dRNsln3oZy8/bUeoRV9Ji+OuViUHYYKXcZ1RZTaRVJLgThbFD8NQaxCzF8NehvuRFDCWS/dGcSNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743755866; c=relaxed/simple;
-	bh=QAhyu4E7HQ19zzaz86rUGI9nPrmZDX3iMt2qJViTveA=;
+	s=arc-20240116; t=1743756409; c=relaxed/simple;
+	bh=E2lc2A+7vFvspOZs4wP9g6ue5EEm94LtW39cVKvUsXc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KXrqctbXOqDJr1wEeO7o3K8CedISjcP8QypVY3jwMo6TapBYqIDFpuSLJ4iGpYifs1IOx3lKNx9Rv/4/AeP4DkgUXA0evqBbqmUhOt1OR0qwcW/Dm4yNUsCMl4mxGCiU6ux3qRsJYu+UdsiSYd9xkQLwYgFnAgBWpo4roPr1JCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=McSve8l1; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743755863;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OI1Zt3NFcFi/P6TNraRk0oZkTYZ+LV6TSig6Xx970e4=;
-	b=McSve8l1yAtjAIJGkbT24GjnRJmi/TAnGmIC45h82EM7zuGHzwa2EM3+CvZ84RKxCLfydX
-	/7zg7w7M+KUPLqEn/cN5WTPGEes5tQX3n9I0Q+O6vyFlxJJEzwcUWL7Kp4sHMKrevD23Js
-	4E9iHYD0O0ek6pMIYC+71OglSxIkK5A=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-262-Qxd6mnnmPTeZKY8-B9ADKw-1; Fri, 04 Apr 2025 04:37:41 -0400
-X-MC-Unique: Qxd6mnnmPTeZKY8-B9ADKw-1
-X-Mimecast-MFC-AGG-ID: Qxd6mnnmPTeZKY8-B9ADKw_1743755861
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-39c30f26e31so1137657f8f.3
-        for <netdev@vger.kernel.org>; Fri, 04 Apr 2025 01:37:41 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=MFWN7V1EuPFEO+BYSSg6xxG2mQ1fjP0rukA5l2pEM8ya2htr+mBWNAViW/E/ikE0rFDq9glU9LU7YW81OtjwDAmvbpJZI3dV20mq78XnAWVwL4YbVoltdx3hS2iFamH3U5LydbDiGfqbOIZ3tUHOhAvLzHVmN63x/qyEmdrXedM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WS0Jj/WI; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-736ab1c43c4so1589794b3a.1;
+        Fri, 04 Apr 2025 01:46:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743756407; x=1744361207; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XEr/lesTAhWcQcf7iA9OshZymqi1lesrw8RKfhNHVDw=;
+        b=WS0Jj/WIMfjvE+Ems1F5CF/UzxGixVeue8oC1ZN3PMlUsHZNUiLYR+PzHZc0VdlPZ7
+         MfdWCByMK3/+fnLnMNXEL1x+U5EVd1xsi059XRuM2i8svGCN2LADmKKITurRS90BzaXj
+         nbOONk8A8gRh1cWZHJtbIhe2PrPVnd/GVAThbCT7oQl7aLSFS+Q1I0M8VcnBO4uiQXYP
+         NM6mczyl1c/xmRlr7wNCKkegOmx+NTsu7W31QS3YwxD5qXlUF/h9UTov/oQBY52pNVnb
+         rfwU0FG4Sl0G2Ju7ex+w6h9DJj5tsFXm+sT8KXii0Ekgo03eTCgDshX/tMdgh2FwJGsS
+         uXag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743755860; x=1744360660;
+        d=1e100.net; s=20230601; t=1743756407; x=1744361207;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OI1Zt3NFcFi/P6TNraRk0oZkTYZ+LV6TSig6Xx970e4=;
-        b=XBMioMgYiggEdC27mjYPZydz8A2qXPR2DKLXvZsMv5NytWVqqYZNEuqHcuHsZyRWRF
-         Jnqm+LmlpmKKDlj69eo7/rbzmxST8dB5OzINeY1Rto1UDqVBhhup9LV34j5qi4TC0KwU
-         IuTVqPuLSEpHwuYus22dA/6NVqtVaZ5iZZO0P5H8+DrMQigTSSu3JCx3XbtY4wEdNdsz
-         boD8BNku4HkfCdPoOD/M4g7Pya5f4kEnXmnhcvk8EZXbDp2lNYweHNitnWl0vdS0BAR+
-         SYMuDvhZXJO77fnx/J6gKNcx5LIla6d7K4an1K5g4iZmA/C0FU7grkb4sBKWGKwvTgyS
-         EYqw==
-X-Forwarded-Encrypted: i=1; AJvYcCVj8PVvoWkuZldxaYV/Fh6daMmRjUKMnpjrFJ92bHdrW+AVRqy0I4btjCR73Qbt2l+EZuCQwGQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmVjshgZO5iGIU6e5E4LS8rSLZKH6lGqpeq0zASxwrkxuzuXjN
-	hZKz7PO2Vm6Ml8rgkVUXo6Php8s7N9LJTikyQA9etF4yMUu99Ic8xBKlrff4jY060PIvjEydSRe
-	vJSVY30Z5SFYK5CxTJOvGneRjd24GygLaCjnaCACNAHEvF0PDGXRvig==
-X-Gm-Gg: ASbGnctNxjVn826z/DoRXU7vYVbvajcZos9BlXh9hG4zJ8PTP5YpyxALQOELYPDvNCT
-	3mz9fjsHoILpgXhiT/KqC4zI2lJY5uqfUi4PwuPQ3qZx0BXDuJTL3siwus1wM5FlAFBffJAw2ik
-	UyNRQMH8ymZoQb64c0iH2Mq8NDbCsic3LIUvQ9D8QvnelZNcpjDyw3LiEQ6VtW3k8ZxDouP6mkt
-	8q4DR6s49ysDmKFSf41bkjhfefENE4hkxRd8b6Er1gyI70ZhyW18dMdGTvN99zpk42LW9S9q4k1
-	WHOwrhc0Kw==
-X-Received: by 2002:a05:6000:430c:b0:391:2e31:c7e5 with SMTP id ffacd0b85a97d-39cb36b2ab2mr2013770f8f.6.1743755860545;
-        Fri, 04 Apr 2025 01:37:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEeh87271OU/aKTaskLblwGps7bO+cJZTClXWXzF8apC0wBecu3MvRM0wP/QWFDltqL8vhYdA==
-X-Received: by 2002:a05:6000:430c:b0:391:2e31:c7e5 with SMTP id ffacd0b85a97d-39cb36b2ab2mr2013743f8f.6.1743755860159;
-        Fri, 04 Apr 2025 01:37:40 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c301a7225sm3768866f8f.26.2025.04.04.01.37.38
+        bh=XEr/lesTAhWcQcf7iA9OshZymqi1lesrw8RKfhNHVDw=;
+        b=sW6cDM6nQOdfcivbGUid1jFtI/SWjkebfzw3ndC85UVEIktwI0FKsXxoLJO6C10+1J
+         j0T7p0OAkLvuTpDMQ2+KWlD0/UAygO9/lIJLkaiYr4PMZGI3j9NtKPLv9wfahH44Nikf
+         O45H6dGw/AL8qEIt8c8B+IAqSATDH1cpiKHfk2d/3XP7+ewhpE/0Z9/aYvLHQw3NOpjI
+         K5+59IW5MCDoa8m9jivVXBt9k/U9Df4LLOY5xWFAA2M2oQ0E6zYApE2eISZnJnUuv7k7
+         WckZA5IV760mj4VnFWz/yWdCjz/H2Uu09lTubfj0lzo+do/Yte18G8CD7bAY4mFSw3Hk
+         DqZg==
+X-Forwarded-Encrypted: i=1; AJvYcCUW8LqmqkWj/gfaYjiuXQfalAf212n5z1YcD8Oedy7nOosY9e8IxxFqs1gPndA17ZvaNV0VhYKo@vger.kernel.org, AJvYcCUnuOkHc1jfdrlaYdynh37tSEKapDvxDpW783+Hg0+ZLQPWF/yHcxEdNfGW3r61gPNAG9VYtPas6lksZkkF@vger.kernel.org, AJvYcCVbLNCTSQPGtfSlOlISUwKacoZn+5S4GJVr64gtkEdVyD34dYIRtEe1mLEm0XTznlncA+U=@vger.kernel.org, AJvYcCW4aonmU0Xg2tMOW0xb01EY2mRBiLK+LTQzVEv7XV8kcTlPsY7Je7Uv4h6Y9kOb0Byr86BMX6uCB0iHK8Q=@vger.kernel.org, AJvYcCWRGq0KFlKjzzeXN/sCF/k99JTZHh02u7+VrOnwV0iEVtctQu48wc573EQxHEomcaFv5X+yy3kS7xM/0cA=@vger.kernel.org, AJvYcCXDa/2UE9HlvzUxKyFwQ2BaqRNPt+Rx1p6ph4N1BPxzNL57FsYIlkTJHQOnNVGL4kEPhnTy58WXKXukhEbD@vger.kernel.org, AJvYcCXI3Imsd9LMiSJ9rZxKVRbNoNFUEZtHj4ajkSrqYClAX74gE3QMaUwO+1MWWSM3pxwfGNzSyEXM1HrYe683FUc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEOwdLC7SZ3wHLr+XKDyTh1A1IA8PJ9q4gGaOHy2XeqAV+haRV
+	nc1YaLzk9zaoYeFDlBekWFRs6aa7+7/zznrgCSsO3g3op7l8u7Bf
+X-Gm-Gg: ASbGnctUhvD24SoA3Rhdke22bMB/3qpAotgXntZG7PX/2Of4Z+4jPPvn2K0vNXx6rtt
+	2cLhCd596CTlpk2cIxihmSS4gd1CenKVoD757VSc+GYiUUyo4jqnhwbRYkFb6vsvcgg5KypmIA7
+	9R6aMj7owGiIYVC1tiwtBTbQ4ULdGQwfpaLpPqBFufQGx8y3JEoI1MuUKvWan54qTqW6SZbqc2+
+	zPzQO1LnLBYGuUxPzOoP/Opmeycbf3ojEmpQ4gfXysacdN405XoLeCJJnce3thFS9TxpCTXxIcY
+	hbih546jmE4vFa9dI3QfB2p3LoOjXOS1AmMBBWYM3hGuxu/1xT8YjDFpIPa2rJMzR1lLkg01
+X-Google-Smtp-Source: AGHT+IGnBuGwhOqlkhsoqT0zhJln64liGpkRA7l3PCCq0BqnYRQF3lpkwuYz5g4xSoDa+vLjvXq3Yw==
+X-Received: by 2002:a05:6a21:483:b0:1fe:61a4:71d8 with SMTP id adf61e73a8af0-20104666844mr3980332637.22.1743756407334;
+        Fri, 04 Apr 2025 01:46:47 -0700 (PDT)
+Received: from visitorckw-System-Product-Name ([140.113.216.168])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af9bc34ec32sm2448099a12.35.2025.04.04.01.46.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Apr 2025 01:37:39 -0700 (PDT)
-Date: Fri, 4 Apr 2025 04:37:36 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Alexander Graf <graf@amazon.com>, Stefan Hajnoczi <stefanha@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev, kvm@vger.kernel.org,
-	Asias He <asias@redhat.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>, nh-open-source@amazon.com
-Subject: Re: [PATCH v2] vsock/virtio: Remove queued_replies pushback logic
-Message-ID: <20250404043326-mutt-send-email-mst@kernel.org>
-References: <20250401201349.23867-1-graf@amazon.com>
- <20250402161424.GA305204@fedora>
- <20250403073111-mutt-send-email-mst@kernel.org>
- <32ca5221-5b25-4bfd-acd7-9eebae8c3635@amazon.com>
- <20250404041050-mutt-send-email-mst@kernel.org>
- <fiyxlnv7gglcfkr7ue4tiaktqjptdkr5or6skrr6f7dof26d56@wmg3zhhqlcoj>
+        Fri, 04 Apr 2025 01:46:46 -0700 (PDT)
+Date: Fri, 4 Apr 2025 16:46:37 +0800
+From: Kuan-Wei Chiu <visitorckw@gmail.com>
+To: Jeremy Kerr <jk@ozlabs.org>
+Cc: Yury Norov <yury.norov@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>,
+	David Laight <david.laight.linux@gmail.com>,
+	Andrew Cooper <andrew.cooper3@citrix.com>,
+	Laurent.pinchart@ideasonboard.com, airlied@gmail.com,
+	akpm@linux-foundation.org, alistair@popple.id.au,
+	andrew+netdev@lunn.ch, andrzej.hajda@intel.com,
+	arend.vanspriel@broadcom.com, awalls@md.metrocast.net, bp@alien8.de,
+	bpf@vger.kernel.org, brcm80211-dev-list.pdl@broadcom.com,
+	brcm80211@lists.linux.dev, dave.hansen@linux.intel.com,
+	davem@davemloft.net, dmitry.torokhov@gmail.com,
+	dri-devel@lists.freedesktop.org, eajames@linux.ibm.com,
+	edumazet@google.com, eleanor15x@gmail.com,
+	gregkh@linuxfoundation.org, hverkuil@xs4all.nl,
+	jernej.skrabec@gmail.com, jirislaby@kernel.org, joel@jms.id.au,
+	johannes@sipsolutions.net, jonas@kwiboo.se, jserv@ccns.ncku.edu.tw,
+	kuba@kernel.org, linux-fsi@lists.ozlabs.org,
+	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
+	linux-serial@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux@rasmusvillemoes.dk, louis.peens@corigine.com,
+	maarten.lankhorst@linux.intel.com, mchehab@kernel.org,
+	mingo@redhat.com, miquel.raynal@bootlin.com, mripard@kernel.org,
+	neil.armstrong@linaro.org, netdev@vger.kernel.org,
+	oss-drivers@corigine.com, pabeni@redhat.com,
+	parthiban.veerasooran@microchip.com, rfoss@kernel.org,
+	richard@nod.at, simona@ffwll.ch, tglx@linutronix.de,
+	tzimmermann@suse.de, vigneshr@ti.com, x86@kernel.org
+Subject: Re: [PATCH v3 00/16] Introduce and use generic parity16/32/64 helper
+Message-ID: <Z++cbTTp8leOJ5O+@visitorckw-System-Product-Name>
+References: <Z9CyuowYsZyez36c@thinkpad>
+ <80771542-476C-493E-858A-D2AF6A355CC1@zytor.com>
+ <Z9GtcNJie8TRKywZ@thinkpad>
+ <Z9G2Tyypb3iLoBjn@visitorckw-System-Product-Name>
+ <Z9KMKwnZXA2mkD2s@visitorckw-System-Product-Name>
+ <Z+AlyB461xwMxMtG@visitorckw-System-Product-Name>
+ <eec0dfd7-5e4f-4a08-928c-b7714dbc4a17@zytor.com>
+ <Z+6dh1ZVIKWWOKaP@visitorckw-System-Product-Name>
+ <Z-6zzP2O-Q7zvTLt@thinkpad>
+ <3ebd280e6697790da55f88a5e9e87b4cab407253.camel@ozlabs.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,135 +121,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <fiyxlnv7gglcfkr7ue4tiaktqjptdkr5or6skrr6f7dof26d56@wmg3zhhqlcoj>
+In-Reply-To: <3ebd280e6697790da55f88a5e9e87b4cab407253.camel@ozlabs.org>
 
-On Fri, Apr 04, 2025 at 10:30:43AM +0200, Stefano Garzarella wrote:
-> On Fri, Apr 04, 2025 at 04:14:51AM -0400, Michael S. Tsirkin wrote:
-> > On Fri, Apr 04, 2025 at 10:04:38AM +0200, Alexander Graf wrote:
-> > > 
-> > > On 03.04.25 14:21, Michael S. Tsirkin wrote:
-> > > > On Wed, Apr 02, 2025 at 12:14:24PM -0400, Stefan Hajnoczi wrote:
-> > > > > On Tue, Apr 01, 2025 at 08:13:49PM +0000, Alexander Graf wrote:
-> > > > > > Ever since the introduction of the virtio vsock driver, it included
-> > > > > > pushback logic that blocks it from taking any new RX packets until the
-> > > > > > TX queue backlog becomes shallower than the virtqueue size.
-> > > > > >
-> > > > > > This logic works fine when you connect a user space application on the
-> > > > > > hypervisor with a virtio-vsock target, because the guest will stop
-> > > > > > receiving data until the host pulled all outstanding data from the VM.
-> > > > > >
-> > > > > > With Nitro Enclaves however, we connect 2 VMs directly via vsock:
-> > > > > >
-> > > > > >    Parent      Enclave
-> > > > > >
-> > > > > >      RX -------- TX
-> > > > > >      TX -------- RX
-> > > > > >
-> > > > > > This means we now have 2 virtio-vsock backends that both have the pushback
-> > > > > > logic. If the parent's TX queue runs full at the same time as the
-> > > > > > Enclave's, both virtio-vsock drivers fall into the pushback path and
-> > > > > > no longer accept RX traffic. However, that RX traffic is TX traffic on
-> > > > > > the other side which blocks that driver from making any forward
-> > > > > > progress. We're now in a deadlock.
-> > > > > >
-> > > > > > To resolve this, let's remove that pushback logic altogether and rely on
-> > > > > > higher levels (like credits) to ensure we do not consume unbounded
-> > > > > > memory.
-> > > > > The reason for queued_replies is that rx packet processing may emit tx
-> > > > > packets. Therefore tx virtqueue space is required in order to process
-> > > > > the rx virtqueue.
-> > > > >
-> > > > > queued_replies puts a bound on the amount of tx packets that can be
-> > > > > queued in memory so the other side cannot consume unlimited memory. Once
-> > > > > that bound has been reached, rx processing stops until the other side
-> > > > > frees up tx virtqueue space.
-> > > > >
-> > > > > It's been a while since I looked at this problem, so I don't have a
-> > > > > solution ready. In fact, last time I thought about it I wondered if the
-> > > > > design of virtio-vsock fundamentally suffers from deadlocks.
-> > > > >
-> > > > > I don't think removing queued_replies is possible without a replacement
-> > > > > for the bounded memory and virtqueue exhaustion issue though. Credits
-> > > > > are not a solution - they are about socket buffer space, not about
-> > > > > virtqueue space, which includes control packets that are not accounted
-> > > > > by socket buffer space.
-> > > >
-> > > > Hmm.
-> > > > Actually, let's think which packets require a response.
-> > > >
-> > > > VIRTIO_VSOCK_OP_REQUEST
-> > > > VIRTIO_VSOCK_OP_SHUTDOWN
-> > > > VIRTIO_VSOCK_OP_CREDIT_REQUEST
-> > > >
-> > > >
-> > > > the response to these always reports a state of an existing socket.
-> > > > and, only one type of response is relevant for each socket.
-> > > >
-> > > > So here's my suggestion:
-> > > > stop queueing replies on the vsock device, instead,
-> > > > simply store the response on the socket, and create a list of sockets
-> > > > that have replies to be transmitted
-> > > >
-> > > >
-> > > > WDYT?
-> > > 
-> > > 
-> > > Wouldn't that create the same problem again? The socket will eventually push
-> > > back any new data that it can take because its FIFO is full. At that point,
-> > > the "other side" could still have a queue full of requests on exactly that
-> > > socket that need to get processed. We can now not pull those packets off the
-> > > virtio queue, because we can not enqueue responses.
-> > 
-> > Either I don't understand what you wrote or I did not explain myself
-> > clearly.
-> 
-> I didn't fully understand either, but with this last message of yours it's
-> clear to me and I like the idea!
-> 
-> > 
-> > In this idea there needs to be a single response enqueued
-> > like this in the socket, because, no more than one ever needs to
-> > be outstanding per socket.
-> > 
-> > For example, until VIRTIO_VSOCK_OP_REQUEST
-> > is responded to, the socket is not active and does not need to
-> > send anything.
-> 
-> One case I see is responding when we don't have the socket listening (e.g.
-> the port is not open), so if before the user had a message that the port was
-> not open, now instead connect() will timeout. So we could respond if we have
-> space in the virtqueue, otherwise discard it without losing any important
-> information or guarantee of a lossless channel.
-> 
-> So in summary:
-> 
-> - if we have an associated socket, then always respond (possibly
->   allocating memory in the intermediate queue if the virtqueue is full
->   as we already do). We need to figure out if a flood of
->   VIRTIO_VSOCK_OP_CREDIT_REQUEST would cause problems, but we can always
->   decide not to respond if we have sent this identical information
->   before.
+Hi Jeremy,
 
-If taking this path, need to consider not responding is within spec or not.
-But again, credit update needed is just a single flag we need to set
-on a socket. If we have anything we need to send, it can also update
-the credits.
-
-
-> - if there is no associated socket, we only respond if virtqueue has
->   space.
+On Fri, Apr 04, 2025 at 10:51:55AM +0800, Jeremy Kerr wrote:
+> Hi Yuri & Kuan-Wei:
 > 
-> I like it and it seems feasible without changing anything in the
-> specification.
+> > Thank you for sharing your opinion on this fixed parity(). Your
+> > arguments may or may not be important, depending on what existing
+> > users actually need. Unfortunately, Kuan-Wei didn't collect
+> > performance numbers and opinions from those proposed users.
 > 
-> Did I get it right?
+> For the fsi-i2c side: this isn't a performance-critical path, and any
+> reasonable common approach would likely perform better that the current
+> per-bit implementation.
 > 
-> Thanks,
-> Stefano
+> Our common targets for this driver would be arm and powerpc64le. In case
+> it's useful as a reference, using the kernel compilers I have to hand, a
+> __builtin_parity() is a library call on the former, and a two-instruction
+> sequence for the latter.
+> 
+Thanks for your feedback.
 
-That was the idea, yes.
+IIUC, from the fsi-i2c perspective, parity efficiency isn't a major
+concern, but you still prefer optimizing with methods like
+__builtin_parity(). I'm just unsure if this aligns with Yury's point
+about needing "evidence that performance and/or code generation is
+important here."
 
--- 
-MST
-
+Regards,
+Kuna-Wei
 
