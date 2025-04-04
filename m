@@ -1,48 +1,80 @@
-Return-Path: <netdev+bounces-179382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19EC0A7C434
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 21:52:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EA7AA7C4BE
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 22:13:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BFC2168679
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 19:52:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58D0C8828CA
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 20:07:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12B7225EF80;
-	Fri,  4 Apr 2025 19:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4266D2206A7;
+	Fri,  4 Apr 2025 20:04:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EDS71LQn"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="nhBbnOcr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEFA325E815;
-	Fri,  4 Apr 2025 19:51:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42C3821D59A
+	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 20:04:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743796275; cv=none; b=NIWukNOFnvgtMd+CJ46SEL+3GsYNkhQO2GLW/FXg3f7U+PITG71roHKZ8mYgZ3alAH55YLF2owQXdAYCwiFHToVWFxxdfi41KUp8SKHGCsmlzQQ2VpksDJgB6IyPHQ26zMF7qk7Nc7SyqmT8cQLfTBQd8c7asVUCNN2hzN3zSVc=
+	t=1743797050; cv=none; b=OY0Z8PWrTDyO78PrI/wO4zDS/3ekSIhUd6zMfmtRVmPiDU4uvDEtTz+2IP3hLC5a0ZPrmGKzWbSvrNe6bmf3lKuXEnG3pOoeNVwp8mcuBk4RE9oNuH3fjdy4rrOVfa54hWFkfI59tcYQi0jJr4YXvRmFJRNb1zmNqc4RUHx9n2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743796275; c=relaxed/simple;
-	bh=kOr+EGTekftgoaz4VXSPNyinCBvwKujNyUxGSfOVZv8=;
+	s=arc-20240116; t=1743797050; c=relaxed/simple;
+	bh=ouROHuQWcAD3W9eytP+HmLUDp18dNL1U5cg3yioIUq8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CjIIGzc6CD7WMmsnIwyW/zH+Y8F0aPuo64rAcjszzPxs0OvflC9jnlglZGy8dWDMgfQEhvLCzMd8RwlKz/TEXjMwd415nBGxahgJelBdJmvSTcnNHwxK68iq4x351MfhRA+IizgiXXJxdqJW7BjsBKExZcb5EzPMbTRF1o0+5fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EDS71LQn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C143CC4CEDD;
-	Fri,  4 Apr 2025 19:51:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743796274;
-	bh=kOr+EGTekftgoaz4VXSPNyinCBvwKujNyUxGSfOVZv8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EDS71LQnXwn8d7lz9hTGSvSxS/bcsZAAzYuQD20g+MhAvBixPHGHs8+DuvsCTUL7K
-	 CHaWepYBlU/8KNM1D326PA4c12LJRwq3rfwLYmfdLs+XJB8RpyKzM8mD1/mBXW3qFg
-	 T3EpkFlPegJwTB1RNUy50oGdeLfgu73w8v7Bp3c4kw9EvzlInFSX+5RKnFQvI0Z4rt
-	 j9LAcwjLOD8rXmVHy4rC8XtTtDuUddZnSrk5R+x6jgrLOgAOC21HZZHeR3YzBJsu1o
-	 IOxPSuyRMeTuHcakhxVlm06obAK5yXNX35ENielEfoUOi8CM34hnnb9DYf0mMESc5N
-	 1xNZk6Ypfixcw==
-Message-ID: <be490131-5f47-41c8-9262-5dc19bc65fb6@kernel.org>
-Date: Fri, 4 Apr 2025 21:51:10 +0200
+	 In-Reply-To:Content-Type; b=B2/TLBtFhdzzDMzq84TYA+WfX9nADcGiV97Nz1mZ/0QztO61XPwnSxeC+heqtAzqMr0eQU1U9rVKJNB951HWYBbQzpgCC2vlS92lj/ZMD22Yn6rFexgLTmc2mOKoJFYiRV3BeTpqSQwSyjy+QRhRUuytlSk67mBITKb/u5J41jE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=nhBbnOcr; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-43cebe06e9eso15873005e9.3
+        for <netdev@vger.kernel.org>; Fri, 04 Apr 2025 13:04:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1743797046; x=1744401846; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zP03ijhZ2aqQsthTQz8RL6yLJtMw3d+tIA07mCuHO+w=;
+        b=nhBbnOcrIqWB0T05XzOHUD5eFlb2gue27HNrW1UqvfEZBoCkYT2t/5KauD91hH4nXJ
+         EfPUNNdjmz3THQX/2ajgm7w8d4KjwjIjMBt2bHFxuLRCYJsFetoscTqATbHSUGHqct5K
+         iBXrCV/0ZOCFOPeISfSRuq3fnj8dBh8ghvOYiUEkFwoWMPu+KNAB+HPiJxNpLCShIa7y
+         eiJzogjm534RWzjdEoyEcvBjpFrqel2iA0DtlSvlaHQiQVjBu2BagA1b6W+1fjfKQRln
+         tERNUy780Oy2nzMCp+7LRCbxF+dwd39ikCE/QgzMKDr5/TtkRjDV1ESZ8rWAO7zudujf
+         J2HA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743797046; x=1744401846;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zP03ijhZ2aqQsthTQz8RL6yLJtMw3d+tIA07mCuHO+w=;
+        b=Mic4A8NWOgNbVtil4E4cNB98LKct1rdVVmKZAC9NGGoOQ/h8ObwZr5yG4r9PLuyrtK
+         gVXHjV9CN09/yR1dgfoMX0qIQGf2qRyzUMAe+S1FbsS39MDJFxa8YygzYf7DUVvmtDkj
+         u1zoYUZQcjvdAFiSQQnkcxX/BTKt9iQtNxbcmvuk5LKckohhnJTG4i6x1MPl7VZodgPf
+         thH43BFKTEiIUEFYTq2zQ+V2TJjY+NE8o7KlG5hni5u5+DdWo39DacbLlSPzzfhpNQkr
+         SPwaAFi/uZ9jkF+xX5Q8S8nSXbNx21zCL2ge96BhTHHfD0Em7EE27U1zMl6fWxDeLpOB
+         TD6w==
+X-Forwarded-Encrypted: i=1; AJvYcCWAKLDL5S2ofJmktm8K45sPeZIlu3faRPf5bMhiXfpolIH7rc1ggGflHmOFe+mKOLh1j9jV/aU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2Q9vyqlEmi9Rb4Loz1V5y6Gz9ye/llI2gDrE005gzEaZWWmCm
+	9wCu2gnxVECchPh49JzxE2G52bJ7+HQewdr7fKOvwfhaWsJzRGLcnl/tcrUJX6Q=
+X-Gm-Gg: ASbGnct4sBSk1kROFVz+VlnuaTZxZYC+c204X/IIqlhd8txSQJ2/rZJYWSA6Pi1PRky
+	nI1Y76INZMdUTYxRp9MMdMrk9YUa2E8WzE0KRgb6st6JLmfsWOd3HQ0dIHmPDLRVzkfc3v7mCg4
+	6qdZr4VpXB+JEkf+QOUq0UaACJjM0BKdF3dtuxxSLJDqlG/F0pjRUtG8z7wa3z7GhCjejPhCy0O
+	z74e5eZBUFm0Nv2O44CikWNhqYWMio51yBsObPKxfylr8lmAgddJ93NKV3y56gksb4LbQythQNv
+	fX4leuynp68XI8GYFHWrQc49KxuQLpHr+JVRGgjOPexVbWnabUV0EuY6s2Gst1nL/iR7u7lFBbq
+	1
+X-Google-Smtp-Source: AGHT+IEjIxLY0tbFxlyNpcjKXrg78y2ZQb0LH2OPyUVnkkSD5YRsGWUpiwLCyDgfBVWGGqcG57xffQ==
+X-Received: by 2002:a05:600c:4513:b0:43c:ea1a:720a with SMTP id 5b1f17b1804b1-43ecf823163mr37804015e9.1.1743797046189;
+        Fri, 04 Apr 2025 13:04:06 -0700 (PDT)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec34af0e6sm55209205e9.16.2025.04.04.13.04.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Apr 2025 13:04:05 -0700 (PDT)
+Message-ID: <abb9e2c1-c4b5-4ffa-b2e3-8b204da5efca@blackwall.org>
+Date: Fri, 4 Apr 2025 23:04:04 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,196 +82,80 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next] veth: apply qdisc backpressure on full
- ptr_ring to reduce TX drops
-To: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
-Cc: bpf@vger.kernel.org, tom@herbertland.com,
- Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
- kernel-team@cloudflare.com
-References: <174377814192.3376479.16481605648460889310.stgit@firesoul>
+Subject: Re: [Patch v2 net-next 3/3] net: bridge: mcast: Notify on mdb offload
+ failure
+To: Joseph Huang <joseph.huang.2024@gmail.com>,
+ Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Roopa Prabhu <roopa@nvidia.com>, Simon Horman <horms@kernel.org>,
+ linux-kernel@vger.kernel.org, bridge@lists.linux.dev
+References: <20250403234412.1531714-1-Joseph.Huang@garmin.com>
+ <20250403234412.1531714-4-Joseph.Huang@garmin.com>
+ <36c7286d-b410-4695-b069-f79605feade4@blackwall.org>
+ <917d4124-c389-4623-836d-357150b45240@gmail.com>
 Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <174377814192.3376479.16481605648460889310.stgit@firesoul>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <917d4124-c389-4623-836d-357150b45240@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+On 4/4/25 18:25, Joseph Huang wrote:
+> On 4/4/2025 6:29 AM, Nikolay Aleksandrov wrote:
+>> On 4/4/25 02:44, Joseph Huang wrote:
+>>> Notify user space on mdb offload failure if mdb_offload_fail_notification
+>>> is set.
+>>>
+>>> Signed-off-by: Joseph Huang <Joseph.Huang@garmin.com>
+>>> ---
+>>>   net/bridge/br_mdb.c       | 26 +++++++++++++++++++++-----
+>>>   net/bridge/br_private.h   |  9 +++++++++
+>>>   net/bridge/br_switchdev.c |  4 ++++
+>>>   3 files changed, 34 insertions(+), 5 deletions(-)
+>>>
+>>
+>> The patch looks good, but one question - it seems we'll mark mdb entries with
+>> "offload failed" when we get -EOPNOTSUPP as an error as well. Is that intended?
+>>
+>> That is, if the option is enabled and we have mixed bridge ports, we'll mark mdbs
+>> to the non-switch ports as offload failed, but it is not due to a switch offload
+>> error.
+> 
+> Good catch. No, that was not intended.
+> 
+> What if we short-circuit and just return like you'd suggested initially if err == -EOPNOTSUPP?
+> 
+>>> diff --git a/net/bridge/br_switchdev.c b/net/bridge/br_switchdev.c
+>>> index 40f0b16e4df8..9b5005d0742a 100644
+>>> --- a/net/bridge/br_switchdev.c
+>>> +++ b/net/bridge/br_switchdev.c
+>>> @@ -504,6 +504,7 @@ static void br_switchdev_mdb_complete(struct net_device *dev, int err, void *pri
+>>>       struct net_bridge_mdb_entry *mp;
+>>>       struct net_bridge_port *port = data->port;
+>>>       struct net_bridge *br = port->br;
+>>> +    u8 old_flags;
+>>>   
+> 
+> +    if (err == -EOPNOTSUPP)
+> +        goto notsupp;
+> 
+>>>       spin_lock_bh(&br->multicast_lock);
+>>>       mp = br_mdb_ip_get(br, &data->ip);
+>>> @@ -514,7 +515,10 @@ static void br_switchdev_mdb_complete(struct net_device *dev, int err, void *pri
+>>>           if (p->key.port != port)
+>>>               continue;
+>>>   +        old_flags = p->flags;
+>>>           br_multicast_set_pg_offload_flags(p, !err);
+>>> +        if (br_mdb_should_notify(br, old_flags ^ p->flags))
+>>> +            br_mdb_flag_change_notify(br->dev, mp, p);
+>>>       }
+>>>   out:
+>>>       spin_unlock_bh(&br->multicast_lock);
+>>
+> 
+> + notsupp:
+>     kfree(priv);
 
-
-On 04/04/2025 16.49, Jesper Dangaard Brouer wrote:
-> In production, we're seeing TX drops on veth devices when the ptr_ring
-> fills up. This can occur when NAPI mode is enabled, though it's
-> relatively rare. However, with threaded NAPI - which we use in
-> production - the drops become significantly more frequent.
-> 
-> The underlying issue is that with threaded NAPI, the consumer often runs
-> on a different CPU than the producer. This increases the likelihood of
-> the ring filling up before the consumer gets scheduled, especially under
-> load, leading to drops in veth_xmit() (ndo_start_xmit()).
-> 
-> This patch introduces backpressure by returning NETDEV_TX_BUSY when the
-> ring is full, signaling the qdisc layer to requeue the packet. The txq
-> (netdev queue) is stopped in this condition and restarted once
-> veth_poll() drains entries from the ring, ensuring coordination between
-> NAPI and qdisc.
-> 
-> Backpressure is only enabled when a qdisc is attached. Without a qdisc,
-> the driver retains its original behavior - dropping packets immediately
-> when the ring is full. This avoids unexpected behavior changes in setups
-> without a configured qdisc.
-> 
-> With a qdisc in place (e.g. fq, sfq) this allows Active Queue Management
-> (AQM) to fairly schedule packets across flows and reduce collateral
-> damage from elephant flows.
-> 
-> A known limitation of this approach is that the full ring sits in front
-> of the qdisc layer, effectively forming a FIFO buffer that introduces
-> base latency. While AQM still improves fairness and mitigates flow
-> dominance, the latency impact is measurable.
-> 
-> In hardware drivers, this issue is typically addressed using BQL (Byte
-> Queue Limits), which tracks in-flight bytes needed based on physical link
-> rate. However, for virtual drivers like veth, there is no fixed bandwidth
-> constraint - the bottleneck is CPU availability and the scheduler's ability
-> to run the NAPI thread. It is unclear how effective BQL would be in this
-> context.
-> 
-> This patch serves as a first step toward addressing TX drops. Future work
-> may explore adapting a BQL-like mechanism to better suit virtual devices
-> like veth.
-> 
-> Reported-by: Yan Zhai <yan@cloudflare.com>
-> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
-> ---
->   drivers/net/veth.c |   58 +++++++++++++++++++++++++++++++++++++++++++++-------
->   1 file changed, 50 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-> index 7bb53961c0ea..fff2b615781e 100644
-> --- a/drivers/net/veth.c
-> +++ b/drivers/net/veth.c
-> @@ -308,11 +308,10 @@ static void __veth_xdp_flush(struct veth_rq *rq)
->   static int veth_xdp_rx(struct veth_rq *rq, struct sk_buff *skb)
->   {
->   	if (unlikely(ptr_ring_produce(&rq->xdp_ring, skb))) {
-> -		dev_kfree_skb_any(skb);
-> -		return NET_RX_DROP;
-> +		return NETDEV_TX_BUSY; /* signal qdisc layer */
->   	}
->   
-> -	return NET_RX_SUCCESS;
-> +	return NET_RX_SUCCESS; /* same as NETDEV_TX_OK */
->   }
->   
->   static int veth_forward_skb(struct net_device *dev, struct sk_buff *skb,
-> @@ -342,15 +341,26 @@ static bool veth_skb_is_eligible_for_gro(const struct net_device *dev,
->   		 rcv->features & (NETIF_F_GRO_FRAGLIST | NETIF_F_GRO_UDP_FWD));
->   }
->   
-> +/* Does specific txq have a real qdisc attached? - see noqueue_init() */
-> +static inline bool txq_has_qdisc(struct netdev_queue *txq)
-> +{
-> +	struct Qdisc *q;
-> +
-> +	q = rcu_dereference(txq->qdisc);
-> +	if (q->enqueue)
-> +		return true;
-> +	else
-> +		return false;
-> +}
-> +
->   static netdev_tx_t veth_xmit(struct sk_buff *skb, struct net_device *dev)
->   {
->   	struct veth_priv *rcv_priv, *priv = netdev_priv(dev);
->   	struct veth_rq *rq = NULL;
-> -	int ret = NETDEV_TX_OK;
->   	struct net_device *rcv;
->   	int length = skb->len;
->   	bool use_napi = false;
-> -	int rxq;
-> +	int ret, rxq;
->   
->   	rcu_read_lock();
->   	rcv = rcu_dereference(priv->peer);
-> @@ -373,17 +383,39 @@ static netdev_tx_t veth_xmit(struct sk_buff *skb, struct net_device *dev)
->   	}
->   
->   	skb_tx_timestamp(skb);
-> -	if (likely(veth_forward_skb(rcv, skb, rq, use_napi) == NET_RX_SUCCESS)) {
-> +
-> +	ret = veth_forward_skb(rcv, skb, rq, use_napi);
-> +	switch(ret) {
-> +	case NET_RX_SUCCESS: /* same as NETDEV_TX_OK */
->   		if (!use_napi)
->   			dev_sw_netstats_tx_add(dev, 1, length);
->   		else
->   			__veth_xdp_flush(rq);
-> -	} else {
-> +		break;
-> +	case NETDEV_TX_BUSY:
-> +		/* If a qdisc is attached to our virtual device, returning
-> +		 * NETDEV_TX_BUSY is allowed.
-> +		 */
-> +		struct netdev_queue *txq = netdev_get_tx_queue(dev, rxq);
-> +
-> +		if (!txq_has_qdisc(txq)) {
-> +			dev_kfree_skb_any(skb);
-> +			goto drop;
-> +		}
-> +		netif_tx_stop_queue(txq); /* Unconditional netif_txq_try_stop */
-> +		if (use_napi)
-> +			__veth_xdp_flush(rq);
-> +
-
-Found a bug here... I need to skb_push back Ethernet header, because
-__dev_forward_skb() via eth_type_trans() pulled it off.
-
-Code fix:
-		__skb_push(skb, ETH_HLEN)
-
-
-> +		break;
-> +	case NET_RX_DROP: /* same as NET_XMIT_DROP */
->   drop:
->   		atomic64_inc(&priv->dropped);
->   		ret = NET_XMIT_DROP;
-> +		break;
-> +	default:
-> +		net_crit_ratelimited("veth_xmit(%s): Invalid return code(%d)",
-> +				     dev->name, ret);
->   	}
-> -
->   	rcu_read_unlock();
->   
->   	return ret;
-> @@ -874,9 +906,16 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
->   			struct veth_xdp_tx_bq *bq,
->   			struct veth_stats *stats)
->   {
-> +	struct veth_priv *priv = netdev_priv(rq->dev);
-> +	int queue_idx = rq->xdp_rxq.queue_index;
-> +	struct netdev_queue *peer_txq;
-> +	struct net_device *peer_dev;
->   	int i, done = 0, n_xdpf = 0;
->   	void *xdpf[VETH_XDP_BATCH];
->   
-> +	peer_dev = priv->peer;
-> +	peer_txq = netdev_get_tx_queue(peer_dev, queue_idx);
-> +
->   	for (i = 0; i < budget; i++) {
->   		void *ptr = __ptr_ring_consume(&rq->xdp_ring);
->   
-> @@ -925,6 +964,9 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
->   	rq->stats.vs.xdp_packets += done;
->   	u64_stats_update_end(&rq->stats.syncp);
->   
-> +	if (unlikely(netif_tx_queue_stopped(peer_txq)))
-> +		netif_tx_wake_queue(peer_txq);
-> +
->   	return done;
->   }
->   
-> 
-> 
+Looks good to me. Thanks!
 
