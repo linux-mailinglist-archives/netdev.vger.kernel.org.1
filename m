@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-179388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4440DA7C556
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 23:15:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5BD9A7C55A
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 23:15:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F73D3ADD3C
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 21:15:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 494131B61568
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 21:15:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E20821D5B1;
-	Fri,  4 Apr 2025 21:15:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB90F221573;
+	Fri,  4 Apr 2025 21:15:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EfOsY+J3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I6hKXNN3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9157521507F
-	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 21:15:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3845621D59A
+	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 21:15:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743801308; cv=none; b=NIGJmPdFjK/u7w3tBxHpl27g7Bv7XCYj62waapLcMiYxxyLT/7PUCVnhRF59yJSunXLzczMwYgFxo0vg83Lx9ap0Uoun2NNwuq11FtoojiTEm+ZR9yZgcQ0I27VTx6pZ2L1dFmfk6N1eneHTExQo4jfPb1m9LDaFrg01EcXhfEM=
+	t=1743801309; cv=none; b=UxNKCOs3f3bazG9nPfGJEDfLy/vfi2WCILizttO15Mmuf5KB3ZsEBSZMCTtphiEHqbiQ+TS+jIlTuze3ifR/x9qoPI9Raf5ZVKEwhNgR3zaQHo3bIAH69x3wFhLuzVcxA6zvJ4pMUjv+7WDz1nti1+rvrhQe7j3vIlYMXMRA2l0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743801308; c=relaxed/simple;
-	bh=3eQJAa9cubM3sOJ48FmMAgTG/qqYFR22T28SrTWB6pw=;
+	s=arc-20240116; t=1743801309; c=relaxed/simple;
+	bh=lt3v4NByeuFhsRflhATM2AU2H0rLtGPyZ6uc0g0P4aA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=txU/Nx/16FdOk4jtMi0SDP1GJlEDF/Au6HV/zdkygHMC5eDnkQBp7KIBIB127F8xRemmCMOKy/Rqvn2Oc10bAE/hVQWEJfhWk6uZSbEa1jZBhGzmSqJWc5GUI23V/By6fmrzcR8KYVVJ6sWNxEnCKLx4TIu5ECy9pJsJPlkiCk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EfOsY+J3; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=Mmsv3KOQ6JeADRNtorSMkK2ZKBOh0XdYjl7rGippmjm8fDxq1FLElLAhlbj00XotPQ90GqpL8CPtG3nuBcNSj6O7adtKQTEjEBJnUIPeklb3W59syDoSFVpMkRVVa+a+3VsViGmataQLeUY99JxjIFRlcs8VHA+FcwPUXloOjwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I6hKXNN3; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-227a8cdd272so22374335ad.2
-        for <netdev@vger.kernel.org>; Fri, 04 Apr 2025 14:15:06 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ff6af1e264so3642367a91.3
+        for <netdev@vger.kernel.org>; Fri, 04 Apr 2025 14:15:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743801306; x=1744406106; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1743801307; x=1744406107; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=BV0n160bdAMJIwF9gIdsee0gSXMixk7gnYOIwMBSkTY=;
-        b=EfOsY+J3Evu+cdhO1HPL7EDI03ImmRIYF1A7PuHvIEFMhk5UvDwD522hXpb0XwDHJW
-         nzvVcLngrduWzo7d9x+x0diqFCq6iGo9FFNuEWI+86kSKSKTHx/sOLEt0M4cW+brQVBY
-         uiroOjTm5+Jiwia87wnXKX+5bWN+/mawF9sfZJhrEm+Xy5wHM6vvJsuVtud1J5bB6XKg
-         pOaLmA91rZv6OWfZDHKcPap1yWOIqTCrvDuIgW77EtiiKOcjoBo8WhiHT7pvUAcvfjnm
-         /BaoeKPccn0D7xL6mdd3bGO2S5CN8leinwGIfALc5NfI0OE7NFyXQ8IhNndIauMeDX+f
-         3Nww==
+        bh=Uj98VhLI5wUP0/dBD7V9/B8uk5MsLM5FlS2oO+5uLWg=;
+        b=I6hKXNN33W6fvlYWWn1oGiSxM3RrDcFoDvq8grXNLQUld+mA8s1zWeg924FpZkYXd1
+         s7/1Qfa3FhzA6ERTjNsRhJSW2V3j466Wb9ojTb76tOmWteyZZkvpbRMOh+VDzcSWIZkE
+         kyFxyQlgFR0nvn82xlUU4qTa3Gjop6aFKBDrlCCcRQOnfDw/Cq/9+/ew/9JdJg5Q5sTC
+         cDZzd04jFIWz8xZOZCHeCb5b4O6VgWxIicjcHQJn1uls4pP+fHRqGKy4kUf3t1Hr9EIx
+         RhbZmEDw+B8uSLiOwig5SCG5n4Et7XKmNMWLbKRx4mcOl+Nx2obnGPKS/hlCVPqQxSfR
+         JA7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743801306; x=1744406106;
+        d=1e100.net; s=20230601; t=1743801307; x=1744406107;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=BV0n160bdAMJIwF9gIdsee0gSXMixk7gnYOIwMBSkTY=;
-        b=XD/p4u84Q4DnjXo2Rtq7C/ghh4ZElNSyNOr7mBC+jXM6GtMz3nS1sfvv+P0TyVG3JG
-         Idn2SuSalBuEaNGreXN5okaPxIiNUmdioHY4aOIXa0fpvaiWWzIw9DIu+NS3c5o201p+
-         M5ok9+VUYsd+HznbBEWwnSMofXrHKV7BOJ/QGRg7cGkSPtMqxRANWymuuyfH3Up/P2uW
-         hp6KTUPo6JFzBnMREANAl8nTbgMEtgMnR7Sgzdd2eFCgY+hpQ6oqBw2qliPwCB3p7zKo
-         AGlnvwZw91+WUTtR7s6dtc3pvqOp5/ZjrdSfeWaMtqeKBgjVmJkPbq5aMoOzpCUEsnrO
-         /BnA==
-X-Forwarded-Encrypted: i=1; AJvYcCVLSaYy4E4Obj8doMWMTalCZKdpUfCcU3p+H1J/8ss2Ww5KES6PT8dC5QEQHMPRCLuiNC85swk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqQmDkqN4MfNcAROpSFPsjP0HgsDF05J6Ptczl4l6E/SJ1pyjo
-	S1v8QcGKZZbvjA7guLIDKFM+vspoPiIkzWKGxgbZkle0fnxIsbfZ4l3otxVxsgU1EblxqR2Pubn
-	hkw==
-X-Google-Smtp-Source: AGHT+IHGnE8XslHm/Dp26htMuuamh5CyH4BkTccpSE3E94306LmR6+QWCeFh1nKaosRJPLYDlX1yhMluHf0=
-X-Received: from pfcf1.prod.google.com ([2002:a05:6a00:2381:b0:732:858a:729f])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e883:b0:224:255b:c932
- with SMTP id d9443c01a7336-22a8a04a526mr44725315ad.3.1743801305822; Fri, 04
- Apr 2025 14:15:05 -0700 (PDT)
+        bh=Uj98VhLI5wUP0/dBD7V9/B8uk5MsLM5FlS2oO+5uLWg=;
+        b=alz4yebychahOM7SoIysqAs5qQ8CU+D+By6qDvCKTPjD721OqPEtxtJcRVTKRnBW5c
+         KN/38zlFmnKHu4PGe1H6ixFY8v3/c2BhAvmc8mAtiKqP3RE91FxdjEP49lrHF28xllVb
+         TJlHsJCFQj4Xo4ObYlCX6Dr7o4e0QNWDOsJsQ9QNb5q4/yew2IYA6/cSj247/aYsg/wc
+         uRNcJGjkaaOqCJiVh0QQ4HzMwfn00eXY6Hyrt4Hq1SOLYJjuI6qz60GHMTf7B8d1S7g6
+         +eHO60r9jU4S2Ny4RmvAMgM8geM5TP1TU1BMRs445ljYiGU02Y54krjz4Ea6ZeohO9IE
+         nZNg==
+X-Forwarded-Encrypted: i=1; AJvYcCUwV5gHJf/Yh8r6PtTiNzW5TKrvL3FHxlJwUO6G0dPQYnB2Jvy/B9o+CARVZx2Lo72Egp9mHkE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlTxsH2gNKEK5qJo/vJiQvCxjhMg9L6rU8P3WPl8B76yWVJMnB
+	3I7bMXaY/p3Y7i/fYlihp6seUIQCKvsGqRwEYc2MneJqzilksdXXJoJ/272tbJf5/WMTI8i042a
+	TRQ==
+X-Google-Smtp-Source: AGHT+IFMRINuT3JO84ktvwx/JXf2G4VgNPaO3sJJsL1cqLAvtapdb4dYJmi4mlrlNRrGxzPd+4aTdmn2mM0=
+X-Received: from pjboe14.prod.google.com ([2002:a17:90b:394e:b0:2fc:e37d:85dc])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3d47:b0:2f6:f32e:90ac
+ with SMTP id 98e67ed59e1d1-306a6154f18mr5792179a91.11.1743801307592; Fri, 04
+ Apr 2025 14:15:07 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  4 Apr 2025 14:14:43 -0700
+Date: Fri,  4 Apr 2025 14:14:44 -0700
 In-Reply-To: <20250404211449.1443336-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250404211449.1443336-1-seanjc@google.com>
 X-Mailer: git-send-email 2.49.0.504.g3bcea36a83-goog
-Message-ID: <20250404211449.1443336-2-seanjc@google.com>
-Subject: [PATCH 1/7] irqbypass: Drop pointless and misleading THIS_MODULE get/put
+Message-ID: <20250404211449.1443336-3-seanjc@google.com>
+Subject: [PATCH 2/7] irqbypass: Drop superfluous might_sleep() annotations
 From: Sean Christopherson <seanjc@google.com>
 To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
 	Paolo Bonzini <pbonzini@redhat.com>, Alex Williamson <alex.williamson@redhat.com>
@@ -88,106 +88,54 @@ Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev,
 	Yong He <alexyonghe@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Drop irqbypass.ko's superfluous and misleading get/put calls on
-THIS_MODULE.  A module taking a reference to itself is useless; no amount
-of checks will prevent doom and destruction if the caller hasn't already
-guaranteed the liveliness of the module (this goes for any module).  E.g.
-if try_module_get() fails because irqbypass.ko is being unloaded, then the
-kernel has already hit a use-after-free by virtue of executing code whose
-lifecycle is tied to irqbypass.ko.
+Drop superfluous might_sleep() annotations from irqbypass, mutex_lock()
+provides all of the necessary tracking.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- virt/lib/irqbypass.c | 20 --------------------
- 1 file changed, 20 deletions(-)
+ virt/lib/irqbypass.c | 8 --------
+ 1 file changed, 8 deletions(-)
 
 diff --git a/virt/lib/irqbypass.c b/virt/lib/irqbypass.c
-index 28fda42e471b..080c706f3b01 100644
+index 080c706f3b01..28a4d933569a 100644
 --- a/virt/lib/irqbypass.c
 +++ b/virt/lib/irqbypass.c
-@@ -92,9 +92,6 @@ int irq_bypass_register_producer(struct irq_bypass_producer *producer)
+@@ -90,8 +90,6 @@ int irq_bypass_register_producer(struct irq_bypass_producer *producer)
+ 	if (!producer->token)
+ 		return -EINVAL;
  
- 	might_sleep();
- 
--	if (!try_module_get(THIS_MODULE))
--		return -ENODEV;
+-	might_sleep();
 -
  	mutex_lock(&lock);
  
  	list_for_each_entry(tmp, &producers, node) {
-@@ -120,7 +117,6 @@ int irq_bypass_register_producer(struct irq_bypass_producer *producer)
- 	return 0;
- out_err:
- 	mutex_unlock(&lock);
--	module_put(THIS_MODULE);
- 	return ret;
- }
- EXPORT_SYMBOL_GPL(irq_bypass_register_producer);
-@@ -142,9 +138,6 @@ void irq_bypass_unregister_producer(struct irq_bypass_producer *producer)
+@@ -136,8 +134,6 @@ void irq_bypass_unregister_producer(struct irq_bypass_producer *producer)
+ 	if (!producer->token)
+ 		return;
  
- 	might_sleep();
- 
--	if (!try_module_get(THIS_MODULE))
--		return; /* nothing in the list anyway */
+-	might_sleep();
 -
  	mutex_lock(&lock);
  
  	list_for_each_entry(tmp, &producers, node) {
-@@ -159,13 +152,10 @@ void irq_bypass_unregister_producer(struct irq_bypass_producer *producer)
- 		}
+@@ -176,8 +172,6 @@ int irq_bypass_register_consumer(struct irq_bypass_consumer *consumer)
+ 	    !consumer->add_producer || !consumer->del_producer)
+ 		return -EINVAL;
  
- 		list_del(&producer->node);
--		module_put(THIS_MODULE);
- 		break;
- 	}
- 
- 	mutex_unlock(&lock);
--
--	module_put(THIS_MODULE);
- }
- EXPORT_SYMBOL_GPL(irq_bypass_unregister_producer);
- 
-@@ -188,9 +178,6 @@ int irq_bypass_register_consumer(struct irq_bypass_consumer *consumer)
- 
- 	might_sleep();
- 
--	if (!try_module_get(THIS_MODULE))
--		return -ENODEV;
+-	might_sleep();
 -
  	mutex_lock(&lock);
  
  	list_for_each_entry(tmp, &consumers, node) {
-@@ -216,7 +203,6 @@ int irq_bypass_register_consumer(struct irq_bypass_consumer *consumer)
- 	return 0;
- out_err:
- 	mutex_unlock(&lock);
--	module_put(THIS_MODULE);
- 	return ret;
- }
- EXPORT_SYMBOL_GPL(irq_bypass_register_consumer);
-@@ -238,9 +224,6 @@ void irq_bypass_unregister_consumer(struct irq_bypass_consumer *consumer)
+@@ -222,8 +216,6 @@ void irq_bypass_unregister_consumer(struct irq_bypass_consumer *consumer)
+ 	if (!consumer->token)
+ 		return;
  
- 	might_sleep();
- 
--	if (!try_module_get(THIS_MODULE))
--		return; /* nothing in the list anyway */
+-	might_sleep();
 -
  	mutex_lock(&lock);
  
  	list_for_each_entry(tmp, &consumers, node) {
-@@ -255,12 +238,9 @@ void irq_bypass_unregister_consumer(struct irq_bypass_consumer *consumer)
- 		}
- 
- 		list_del(&consumer->node);
--		module_put(THIS_MODULE);
- 		break;
- 	}
- 
- 	mutex_unlock(&lock);
--
--	module_put(THIS_MODULE);
- }
- EXPORT_SYMBOL_GPL(irq_bypass_unregister_consumer);
 -- 
 2.49.0.504.g3bcea36a83-goog
 
