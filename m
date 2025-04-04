@@ -1,746 +1,388 @@
-Return-Path: <netdev+bounces-179407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CE70A7C627
-	for <lists+netdev@lfdr.de>; Sat,  5 Apr 2025 00:04:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF20AA7C628
+	for <lists+netdev@lfdr.de>; Sat,  5 Apr 2025 00:05:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 315917A928F
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 22:02:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FE2E172871
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 22:05:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50E6C2206B8;
-	Fri,  4 Apr 2025 22:03:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="mDnE97Du"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B12919E998;
+	Fri,  4 Apr 2025 22:05:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com [209.85.128.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 444B421D594
-	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 22:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD514689;
+	Fri,  4 Apr 2025 22:05:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743804197; cv=none; b=KELGSN9SAHqtIh4f0g4thumB3tkD2jDnqaN1iQGjYP+WqVj0aKxe3E4MnxYXc1YbRZ/y+sxyiBmSpn8BdlHluJjwbJHXtHEBft6jOWh5Qup1w7I0IZ4lK6YCiYPAvwhWhhQlsaMD8LNpFshxPs2sjVjZTI9+1Fthv/LaMnf4J9s=
+	t=1743804317; cv=none; b=S9moG7udqXReOtaTP3VVn2mXieucKy0C+YRKt10YcyRkQzc6YtB/9dRp9nOCuCaT9rLmrWspXauEMUGLK8wM0fPkBMRPUXNHV6AS1sk98TvaRPTaeQ/2M2dI3cfY390qmJsxaREeursI0FhJADLU0AL7t8S3vP5ePShmg0FOeas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743804197; c=relaxed/simple;
-	bh=fysN7BOOimodnUE+D5Mvb38ma1hNEwUVmjUQW6P/QKs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sL6lHEU7xNeBPp0eyv3AlxzGrsqQBR3r8wgUs5WlmfL8kR62VbUa6pTGGI1GT+P9gSrLQ7eJ78b7npv+Cl3plCnG4kF4/DRp2ebu6cyc9TGbPnNFgqhnFF8xeA2eTHfacx6skWVFBTrnpmSwgyfiVTjEFXFZ534ugDmfXOQXZyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=mDnE97Du; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-736ac19918cso468465b3a.2
-        for <netdev@vger.kernel.org>; Fri, 04 Apr 2025 15:03:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1743804194; x=1744408994; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hPJ5/8rU3Fc/CeE93x1caPdyk9wqOorDNqVlsu9SRZw=;
-        b=mDnE97Du8aLwfWZoGkDyrR9JxyG+U73tG924n3CkN9tySgyZegAQZPoPCcoBqYBC2F
-         XanKnHtZxsoB85Y6gnWJ9uhHoJjPHXDE68CFwj2wOkYkUMMHhUthGgme+lyx19I9LFaU
-         g7b8ZXVa2erFtXFIpt7pSyYkoD+54td8HbTHijhuJW5H+P1pYkVam3dVUtN5+J9G343F
-         d7Ugde2cZJinUnW30i+aLbi1oxeKgJAkg+lyRHLw4igiySYdeTcSbdh8YfilzS23R7yO
-         plbRq2vfwpyf4N+4ZFRxIHCQv4BD/qqFIASetgqN9RNqmlB+2i5M5kuzfxIDZqk52KWA
-         JE9Q==
+	s=arc-20240116; t=1743804317; c=relaxed/simple;
+	bh=NQb8QRU2q3flJql7F4O6wzu4m0gUW38uFyjUaUzKznI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iALaMjwTaXWvFSN6Mt51eQNtzJ8+Fp0M0yoGyDuFTcAlAxZFGPnCjtGwfVLOs6hQx2kXO6zf+3ADSi4SawNSGHduygjy+nzKaqta5XN59FSZ9ILRjM+GWJ6gfXP74COoVHgiK4AQoMhrdD8IuaNMmtNceUZyGE2eoBW7D536Psk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f66.google.com with SMTP id 5b1f17b1804b1-4394a0c65fcso23453375e9.1;
+        Fri, 04 Apr 2025 15:05:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743804194; x=1744408994;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hPJ5/8rU3Fc/CeE93x1caPdyk9wqOorDNqVlsu9SRZw=;
-        b=KYQ9LzFKXXM86ECYbMcYo1StUM69VI13SxcdsEc6B5w6CRlcubDYNXFwBnVxNkUKRF
-         4ZLRPmn58ZDP8L/jnU7J1SdQyb1OJEDaHwrMXXDXqNYeJQremC1kyzyUp3KMeOr6N2ui
-         ofYDYrG3301+BY1OCdMsQQPeN/5L2ZXKxGDUzfdOIh6AvH8TZ+owRqXz6bXsF5MhgrGl
-         +9QY3nmUsopanTvKHb+IP0zUJBmKjzDhShqI4GoKzv/7FCrQbLFl28KY/OeEoVENOaco
-         TRoL5qgXPBm0+JxlpRYm6MY1YwfkReDFkENq4Ajbh3qteopEmOaEhgjjWNZrcYJh14cx
-         2V2Q==
-X-Gm-Message-State: AOJu0YzTovEE5jGwWvX4o9iEcuI38FfFugh2zH5UvBvZ/IswFYmgtGUe
-	PgeET3Whx+11GLxID5Ud9DYJ+0kenrQHwjsGfy3/gQzPmquBFr0PJASNaXYaqa8Lp/VfWfN4S6g
-	Azes=
-X-Gm-Gg: ASbGncudCjmvmUfUJzcVKDcY8fafJlWs747qmBFLfCgXFfHh+lQanCHgFGQBjPHt3Ve
-	hi9azArP4WyUY5zwY16ZdNafOtjzBnqLwkWO7rtnwgqL65W2Cyu/1TgzJLcgs2IaqKYfxh4vkPf
-	bgi2EdyPIgNw4pT8cNsnPCvvtuznMxAs9NvwV0fVgcl5IeFbF5BPk/lOMLXbivd5tBW4B6PpoH8
-	9IUHj+Ky2SPOQlZEHjcSa7lUAg43I+rELLLj5OyuICY5A2a/0YAJKRACE3rFwbtHn9cyO1vgS/i
-	U6Y3b9xAO9sqVikGWDqcs4TyA5kxH1gbHQ==
-X-Google-Smtp-Source: AGHT+IFE14GJT5K5BjFNizKAAoe+BXegKSeNPyojXV4l5hl04oOrSSrOtpHAYnouvxwsVjU/Qo5lsg==
-X-Received: by 2002:a05:6a00:2394:b0:736:a9b0:6f0a with SMTP id d2e1a72fcca58-739e4c06483mr2355872b3a.4.1743804193670;
-        Fri, 04 Apr 2025 15:03:13 -0700 (PDT)
-Received: from t14.. ([2001:5a8:4528:b100:d158:c069:399b:1ed0])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-739da0deddfsm3953570b3a.162.2025.04.04.15.03.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Apr 2025 15:03:13 -0700 (PDT)
-From: Jordan Rife <jordan@jrife.io>
-To: netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Cc: Jordan Rife <jordan@jrife.io>,
-	Aditi Ghag <aditi.ghag@isovalent.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Subject: [RFC PATCH bpf-next 3/3] selftests/bpf: Add tests for bucket resume logic in UDP socket iterators
-Date: Fri,  4 Apr 2025 15:02:18 -0700
-Message-ID: <20250404220221.1665428-4-jordan@jrife.io>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250404220221.1665428-1-jordan@jrife.io>
-References: <20250404220221.1665428-1-jordan@jrife.io>
+        d=1e100.net; s=20230601; t=1743804313; x=1744409113;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4flYMgBhFeJhObgzKMwspMZZsPDbsL3222BuxIrtZ1w=;
+        b=FJaH0lAVimYvNMM7IsnDH04Za7Zsg2fYwmEriskQgfZeQfc86naLICLrkSGLiqZZcz
+         qbH3DFFXhF8mPUzZ1ggGY67ujUTKrTY7o1d0nnAi7fpxUoGzgOv1BE2gOCDseOUmbaVO
+         qSFHsvBv+bWRCYB1U7lq0MFH0KFZBD5n7cHpj/gng3gQ5anVIEgXtBb/nIkKJirICMlX
+         EJMLC+BglGpb64oTSufaNXipoaoIyHFglRm3tBXR2kQDf+GPhB4RmAO9qd6/2eXru9aY
+         ++J6xovaCCD/l7Jz6FhYIn9mwdjA3TWNPh6hkeISEeCEhu5aeMQpIiCMUvdw3hBg3YYg
+         O59w==
+X-Forwarded-Encrypted: i=1; AJvYcCWYV/dgqRO3n6MzHkgLOvukvh/H3d8IZSrddftBMFGyGrhP3ViNCz5QmbReGwoqeUULavZzrmOC@vger.kernel.org, AJvYcCXO1AKuu9DFzApkycv84T0ituJPhgTiLz+u+n/n4/6N6WmKrerXhd6GcX34L1ef27nUEtKbjHF932lswMs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpzJ8mqdZm7A5MrXXy3usPquL1Ghr2+8zrdq1nDVtx4ixCZFbs
+	zJTjcjr7HgYd7XXA9e8y2DAAhuXZaW1eH8/DPO9U1jHR99jsG1tq
+X-Gm-Gg: ASbGncsuE8gTaVIWRk6Hvi+viT4+xPPj0quvM2KapEcMv/LtcJdEPNYCEzdze+7EHoJ
+	gEfInrd4Qh9l3KocNeNfqAsiqBjQmDYxfvgPV2HTbCHo65fz5vhT614wG3Vicqpc+Z9apBTSZtT
+	8lNo7EFPmD5NukpYLJRV7mkpm4G+hUKH8BaUd3BMoSUNjAkknIJwLwX0eQ5teqAjzKvtSSiclpI
+	7lSUKVX/IoGTr7xXq49UEPPg4eP8Vybym/y7CTXuc3YlBbnzWqmhm5bSCyPPfmo6Px0ydhzLsnW
+	9kUcMlh4lPnyWEC8jPvqi03mz5QXUGSyXXCMmMeKrud/EinDv6Woy3KVmJkqduulzEqiTRwCQdq
+	c3w==
+X-Google-Smtp-Source: AGHT+IHzFUlbTGz8j0vcRxTxtpDT/OrTAjMVEEJmCbYc8vdVu8DIV6HSlfCRNn8cTj0OVwzz4XrR4w==
+X-Received: by 2002:a05:600c:444b:b0:43c:fffc:7855 with SMTP id 5b1f17b1804b1-43ecf8f2a65mr43427595e9.15.1743804312776;
+        Fri, 04 Apr 2025 15:05:12 -0700 (PDT)
+Received: from [192.168.0.234] (ip-86-49-44-151.bb.vodafone.cz. [86.49.44.151])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec1795243sm60291295e9.32.2025.04.04.15.05.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Apr 2025 15:05:12 -0700 (PDT)
+Message-ID: <d50c0384-4607-4890-8012-e2e7032a5354@ovn.org>
+Date: Sat, 5 Apr 2025 00:05:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REGRESSION] Massive virtio-net throughput drop in guest VM with
+ Linux 6.8+
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Markus Fohrer <markus.fohrer@webked.de>, "Michael S. Tsirkin"
+ <mst@redhat.com>
+Cc: virtualization@lists.linux-foundation.org, jasowang@redhat.com,
+ davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, i.maximets@ovn.org
+References: <1d388413ab9cfd765cd2c5e05b5e69cdb2ec5a10.camel@webked.de>
+ <20250403090001-mutt-send-email-mst@kernel.org>
+ <11c5cb52d024a5158c5b8c5e69e2e4639a055a31.camel@webked.de>
+ <20250404042711-mutt-send-email-mst@kernel.org>
+ <e75cb5881a97485b08cdd76efd8a7d2191ecd106.camel@webked.de>
+ <3b02f37ee12232359672a6a6c2bccaa340fbb6ff.camel@webked.de>
+ <67eff7303df69_1ddca829490@willemb.c.googlers.com.notmuch>
+Content-Language: en-US
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <67eff7303df69_1ddca829490@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-First, extend the iter_udp_soreuse and iter_tcp_soreuse to write the
-cookie of the current socket so that we can track the identity of the
-sockets that the iterator has seen so far in the test code. Update the
-existing do_test function to account for this change to the iterator
-program output.
+On 4/4/25 5:13 PM, Willem de Bruijn wrote:
+> Markus Fohrer wrote:
+>> Am Freitag, dem 04.04.2025 um 10:52 +0200 schrieb Markus Fohrer:
+>>> Am Freitag, dem 04.04.2025 um 04:29 -0400 schrieb Michael S. Tsirkin:
+>>>> On Fri, Apr 04, 2025 at 10:16:55AM +0200, Markus Fohrer wrote:
+>>>>> Am Donnerstag, dem 03.04.2025 um 09:04 -0400 schrieb Michael S.
+>>>>> Tsirkin:
+>>>>>> On Wed, Apr 02, 2025 at 11:12:07PM +0200, Markus Fohrer wrote:
+>>>>>>> Hi,
+>>>>>>>
+>>>>>>> I'm observing a significant performance regression in KVM
+>>>>>>> guest
+>>>>>>> VMs
+>>>>>>> using virtio-net with recent Linux kernels (6.8.1+ and 6.14).
+>>>>>>>
+>>>>>>> When running on a host system equipped with a Broadcom
+>>>>>>> NetXtreme-E
+>>>>>>> (bnxt_en) NIC and AMD EPYC CPUs, the network throughput in
+>>>>>>> the
+>>>>>>> guest drops to 100–200 KB/s. The same guest configuration
+>>>>>>> performs
+>>>>>>> normally (~100 MB/s) when using kernel 6.8.0 or when the VM
+>>>>>>> is
+>>>>>>> moved to a host with Intel NICs.
+>>>>>>>
+>>>>>>> Test environment:
+>>>>>>> - Host: QEMU/KVM, Linux 6.8.1 and 6.14.0
+>>>>>>> - Guest: Linux with virtio-net interface
+>>>>>>> - NIC: Broadcom BCM57416 (bnxt_en driver, no issues at host
+>>>>>>> level)
+>>>>>>> - CPU: AMD EPYC
+>>>>>>> - Storage: virtio-scsi
+>>>>>>> - VM network: virtio-net, virtio-scsi (no CPU or IO
+>>>>>>> bottlenecks)
+>>>>>>> - Traffic test: iperf3, scp, wget consistently slow in guest
+>>>>>>>
+>>>>>>> This issue is not present:
+>>>>>>> - On 6.8.0 
+>>>>>>> - On hosts with Intel NICs (same VM config)
+>>>>>>>
+>>>>>>> I have bisected the issue to the following upstream commit:
+>>>>>>>
+>>>>>>>   49d14b54a527 ("virtio-net: Suppress tx timeout warning for
+>>>>>>> small
+>>>>>>> tx")
+>>>>>>>   https://git.kernel.org/linus/49d14b54a527
+>>>>>>
+>>>>>> Thanks a lot for the info!
+>>>>>>
+>>>>>>
+>>>>>> both the link and commit point at:
+>>>>>>
+>>>>>> commit 49d14b54a527289d09a9480f214b8c586322310a
+>>>>>> Author: Eric Dumazet <edumazet@google.com>
+>>>>>> Date:   Thu Sep 26 16:58:36 2024 +0000
+>>>>>>
+>>>>>>     net: test for not too small csum_start in
+>>>>>> virtio_net_hdr_to_skb()
+>>>>>>     
+>>>>>>
+>>>>>> is this what you mean?
+>>>>>>
+>>>>>> I don't know which commit is "virtio-net: Suppress tx timeout
+>>>>>> warning
+>>>>>> for small tx"
+>>>>>>
+>>>>>>
+>>>>>>
+>>>>>>> Reverting this commit restores normal network performance in
+>>>>>>> affected guest VMs.
+>>>>>>>
+>>>>>>> I’m happy to provide more data or assist with testing a
+>>>>>>> potential
+>>>>>>> fix.
+>>>>>>>
+>>>>>>> Thanks,
+>>>>>>> Markus Fohrer
+>>>>>>
+>>>>>>
+>>>>>> Thanks! First I think it's worth checking what is the setup,
+>>>>>> e.g.
+>>>>>> which offloads are enabled.
+>>>>>> Besides that, I'd start by seeing what's doing on. Assuming I'm
+>>>>>> right
+>>>>>> about
+>>>>>> Eric's patch:
+>>>>>>
+>>>>>> diff --git a/include/linux/virtio_net.h
+>>>>>> b/include/linux/virtio_net.h
+>>>>>> index 276ca543ef44d8..02a9f4dc594d02 100644
+>>>>>> --- a/include/linux/virtio_net.h
+>>>>>> +++ b/include/linux/virtio_net.h
+>>>>>> @@ -103,8 +103,10 @@ static inline int
+>>>>>> virtio_net_hdr_to_skb(struct
+>>>>>> sk_buff *skb,
+>>>>>>  
+>>>>>>  		if (!skb_partial_csum_set(skb, start, off))
+>>>>>>  			return -EINVAL;
+>>>>>> +		if (skb_transport_offset(skb) < nh_min_len)
+>>>>>> +			return -EINVAL;
+>>>>>>  
+>>>>>> -		nh_min_len = max_t(u32, nh_min_len,
+>>>>>> skb_transport_offset(skb));
+>>>>>> +		nh_min_len = skb_transport_offset(skb);
+>>>>>>  		p_off = nh_min_len + thlen;
+>>>>>>  		if (!pskb_may_pull(skb, p_off))
+>>>>>>  			return -EINVAL;
+>>>>>>
+>>>>>>
+>>>>>> sticking a printk before return -EINVAL to show the offset and
+>>>>>> nh_min_len
+>>>>>> would be a good 1st step. Thanks!
+>>>>>>
+>>>>>
+>>>>> I added the following printk inside virtio_net_hdr_to_skb():
+>>>>>
+>>>>>     if (skb_transport_offset(skb) < nh_min_len){
+>>>>>         printk(KERN_INFO "virtio_net: 3 drop,
+>>>>> transport_offset=%u,
+>>>>> nh_min_len=%u\n",
+>>>>>                skb_transport_offset(skb), nh_min_len);
+>>>>>         return -EINVAL;
+>>>>>     }
+>>>>>
+>>>>> Built and installed the kernel, then triggered a large download
+>>>>> via:
+>>>>>
+>>>>>     wget http://speedtest.belwue.net/10G
+>>>>>
+>>>>> Relevant output from `dmesg -w`:
+>>>>>
+>>>>> [   57.327943] virtio_net: 3 drop, transport_offset=34,
+>>>>> nh_min_len=40  
+>>>>> [   57.428942] virtio_net: 3 drop, transport_offset=34,
+>>>>> nh_min_len=40  
+>>>>> [   57.428962] virtio_net: 3 drop, transport_offset=34,
+>>>>> nh_min_len=40  
+>>>>> [   57.553068] virtio_net: 3 drop, transport_offset=34,
+>>>>> nh_min_len=40  
+>>>>> [   57.553088] virtio_net: 3 drop, transport_offset=34,
+>>>>> nh_min_len=40  
+>>>>> [   57.576678] virtio_net: 3 drop, transport_offset=34,
+>>>>> nh_min_len=40  
+>>>>> [   57.618438] virtio_net: 3 drop, transport_offset=34,
+>>>>> nh_min_len=40  
+>>>>> [   57.618453] virtio_net: 3 drop, transport_offset=34,
+>>>>> nh_min_len=40  
+>>>>> [   57.703077] virtio_net: 3 drop, transport_offset=34,
+>>>>> nh_min_len=40  
+>>>>> [   57.823072] virtio_net: 3 drop, transport_offset=34,
+>>>>> nh_min_len=40  
+>>>>> [   57.891982] virtio_net: 3 drop, transport_offset=34,
+>>>>> nh_min_len=40  
+>>>>> [   57.946190] virtio_net: 3 drop, transport_offset=34,
+>>>>> nh_min_len=40  
+>>>>> [   58.218686] virtio_net: 3 drop, transport_offset=34,
+>>>>> nh_min_len=40  
+>>>>
+>>>> Hmm indeed. And what about these values?
+>>>>                 u32 start = __virtio16_to_cpu(little_endian, hdr-
+>>>>> csum_start);
+>>>>                 u32 off = __virtio16_to_cpu(little_endian, hdr-
+>>>>> csum_offset);
+>>>>                 u32 needed = start + max_t(u32, thlen, off +
+>>>> sizeof(__sum16));
+>>>> print them too?
+>>>>
+>>>>
+>>>>
+>>>>> I would now do the test with commit
+>>>>> 49d14b54a527289d09a9480f214b8c586322310a and commit
+>>>>> 49d14b54a527289d09a9480f214b8c586322310a~1
+>>>>>
+>>>>
+>>>> Worth checking though it seems likely now the hypervisor is doing
+>>>> weird
+>>>> things. what kind of backend is it? qemu? tun? vhost-user? vhost-
+>>>> net?
+>>>>
+>>>
+>>> Backend: QEMU/KVM hypervisor (Proxmox)
+>>>
+>>>
+>>> printk output:
+>>>
+>>> [   58.641906] virtio_net: drop, transport_offset=34  start=34,
+>>> off=16,
+>>> needed=54, nh_min_len=40
+>>> [   58.678048] virtio_net: drop, transport_offset=34  start=34,
+>>> off=16,
+>>> needed=54, nh_min_len=40
+>>> [   58.952871] virtio_net: drop, transport_offset=34  start=34,
+>>> off=16,
+>>> needed=54, nh_min_len=40
+>>> [   58.962157] virtio_net: drop, transport_offset=34  start=34,
+>>> off=16,
+>>> needed=54, nh_min_len=40
+>>> [   59.071645] virtio_net: drop, transport_offset=34  start=34,
+>>> off=16,
+>>> needed=54, nh_min_len=40
+> 
+> So likely a TCP/IPv4 packet, but with VIRTIO_NET_HDR_GSO_TCPV6.
 
-Next, introduce a set of tests that exercise various bucket resume
-scenarios:
 
-* remove_seen resumes iteration after removing a socket from the bucket
-  that we've already processed. Before, with the offset-based approach,
-  this test would have skipped an unseen socket after resuming
-  iteration. With the cookie-based approach, we now see all sockets
-  exactly once.
-* remove_unseen exercises the condition where the next socket that we
-  would have seen is removed from the bucket before we resume iteration.
-  This tests the scenario where we need to scan past the first cookie in
-  our remembered cookies list to find the socket from which to resume
-  iteration.
-* remove_all exercises the condition where all sockets we remembered
-  were removed from the bucket to make sure iteration terminates and
-  returns no more results.
-* add_some exercises the condition where a few, but not enough to
-  trigger a realloc, sockets are added to the head of the current bucket
-  between reads. Before, with the offset-based approach, this test would
-  have repeated sockets we've already seen. With the cookie-based
-  approach, we now see all sockets exactly once.
-* force_realloc exercises the condition that we need to realloc the
-  batch on a subsequent read, since more sockets than can be held in the
-  current batch array were added to the current bucket. This exercies
-  the logic inside bpf_iter_udp_realloc_batch that copies cookies into
-  the new batch to make sure nothing is skipped or repeated.
+Hi, Markus.
 
-Signed-off-by: Jordan Rife <jordan@jrife.io>
----
- .../bpf/prog_tests/sock_iter_batch.c          | 452 +++++++++++++++++-
- .../selftests/bpf/progs/bpf_tracing_net.h     |   1 +
- .../selftests/bpf/progs/sock_iter_batch.c     |  24 +-
- 3 files changed, 460 insertions(+), 17 deletions(-)
+Given this and the fact that the issue depends on the bnxt_en NIC on the
+hist, I'd make an educated guess that the problem is the host NIC driver.
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c b/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
-index d56e18b25528..dc44115bd078 100644
---- a/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sock_iter_batch.c
-@@ -1,20 +1,444 @@
- // SPDX-License-Identifier: GPL-2.0
- // Copyright (c) 2024 Meta
- 
-+#include "linux/bpf.h"
- #include <test_progs.h>
- #include "network_helpers.h"
- #include "sock_iter_batch.skel.h"
- 
- #define TEST_NS "sock_iter_batch_netns"
- 
-+static const int init_batch_size = 16;
- static const int nr_soreuse = 4;
- 
-+struct iter_out {
-+	int idx;
-+	__u64 cookie;
-+} __packed;
-+
-+struct sock_count {
-+	__u64 cookie;
-+	int count;
-+};
-+
-+static int insert(__u64 cookie, struct sock_count counts[], int counts_len)
-+{
-+	int insert = -1;
-+	int i = 0;
-+
-+	for (; i < counts_len; i++) {
-+		if (!counts[i].cookie) {
-+			insert = i;
-+		} else if (counts[i].cookie == cookie) {
-+			insert = i;
-+			break;
-+		}
-+	}
-+	if (insert < 0)
-+		return insert;
-+
-+	counts[insert].cookie = cookie;
-+	counts[insert].count++;
-+
-+	return counts[insert].count;
-+}
-+
-+static int read_n(int iter_fd, int n, struct sock_count counts[],
-+		  int counts_len)
-+{
-+	struct iter_out out;
-+	int nread = 1;
-+	int i = 0;
-+
-+	for (; nread > 0 && (n < 0 || i < n); i++) {
-+		nread = read(iter_fd, &out, sizeof(out));
-+		if (!nread || !ASSERT_GE(nread, 1, "nread"))
-+			break;
-+		ASSERT_GE(insert(out.cookie, counts, counts_len), 0, "insert");
-+	}
-+
-+	ASSERT_TRUE(n < 0 || i == n, "n < 0 || i == n");
-+
-+	return i;
-+}
-+
-+static __u64 socket_cookie(int fd)
-+{
-+	__u64 cookie;
-+	socklen_t cookie_len = sizeof(cookie);
-+	static __u32 duration;	/* for CHECK macro */
-+
-+	if (CHECK(getsockopt(fd, SOL_SOCKET, SO_COOKIE, &cookie, &cookie_len) < 0,
-+		  "getsockopt(SO_COOKIE)", "%s\n", strerror(errno)))
-+		return 0;
-+	return cookie;
-+}
-+
-+static bool was_seen(int fd, struct sock_count counts[], int counts_len)
-+{
-+	__u64 cookie = socket_cookie(fd);
-+	int i = 0;
-+
-+	for (; cookie && i < counts_len; i++)
-+		if (cookie == counts[i].cookie)
-+			return true;
-+
-+	return false;
-+}
-+
-+static int get_seen_socket(int *fds, struct sock_count counts[], int n)
-+{
-+	int i = 0;
-+
-+	for (; i < n; i++)
-+		if (was_seen(fds[i], counts, n))
-+			return i;
-+	return -1;
-+}
-+
-+static int get_nth_socket(int *fds, int fds_len, struct bpf_link *link, int n)
-+{
-+	int i, nread, iter_fd;
-+	int nth_sock_idx = -1;
-+	struct iter_out out;
-+
-+	iter_fd = bpf_iter_create(bpf_link__fd(link));
-+	if (!ASSERT_GE(iter_fd, 0, "bpf_iter_create"))
-+		return -1;
-+
-+	for (; n >= 0; n--) {
-+		nread = read(iter_fd, &out, sizeof(out));
-+		if (!nread || !ASSERT_GE(nread, 1, "nread"))
-+			goto done;
-+	}
-+
-+	for (i = 0; i < fds_len && nth_sock_idx < 0; i++)
-+		if (fds[i] >= 0 && socket_cookie(fds[i]) == out.cookie)
-+			nth_sock_idx = i;
-+done:
-+	if (iter_fd < 0)
-+		close(iter_fd);
-+	return nth_sock_idx;
-+}
-+
-+static int get_seen_count(int fd, struct sock_count counts[], int n)
-+{
-+	__u64 cookie = socket_cookie(fd);
-+	int count = 0;
-+	int i = 0;
-+
-+	for (; cookie && !count && i < n; i++)
-+		if (cookie == counts[i].cookie)
-+			count = counts[i].count;
-+
-+	return count;
-+}
-+
-+static void check_n_were_seen_once(int *fds, int fds_len, int n,
-+				   struct sock_count counts[], int counts_len)
-+{
-+	int seen_once = 0;
-+	int seen_cnt;
-+	int i = 0;
-+
-+	for (; i < fds_len; i++) {
-+		/* Skip any sockets that were closed or that weren't seen
-+		 * exactly once.
-+		 */
-+		if (fds[i] < 0)
-+			continue;
-+		seen_cnt = get_seen_count(fds[i], counts, counts_len);
-+		if (seen_cnt && ASSERT_EQ(seen_cnt, 1, "seen_cnt"))
-+			seen_once++;
-+	}
-+
-+	ASSERT_EQ(seen_once, n, "seen_once");
-+}
-+
-+static void remove_seen(int family, int sock_type, const char *addr, __u16 port,
-+			int *socks, int socks_len, struct sock_count *counts,
-+			int counts_len, struct bpf_link *link, int iter_fd)
-+{
-+	int close_idx;
-+
-+	/* Iterate through the first socks_len - 1 sockets. */
-+	read_n(iter_fd, socks_len - 1, counts, counts_len);
-+
-+	/* Make sure we saw socks_len - 1 sockets exactly once. */
-+	check_n_were_seen_once(socks, socks_len, socks_len - 1, counts,
-+			       counts_len);
-+
-+	/* Close a socket we've already seen to remove it from the bucket. */
-+	close_idx = get_seen_socket(socks, counts, counts_len);
-+	if (!ASSERT_GE(close_idx, 0, "close_idx"))
-+		return;
-+	close(socks[close_idx]);
-+	socks[close_idx] = -1;
-+
-+	/* Iterate through the rest of the sockets. */
-+	read_n(iter_fd, -1, counts, counts_len);
-+
-+	/* Make sure the last socket wasn't skipped and that there were no
-+	 * repeats.
-+	 */
-+	check_n_were_seen_once(socks, socks_len, socks_len - 1, counts,
-+			       counts_len);
-+}
-+
-+static void remove_unseen(int family, int sock_type, const char *addr,
-+			  __u16 port, int *socks, int socks_len,
-+			  struct sock_count *counts, int counts_len,
-+			  struct bpf_link *link, int iter_fd)
-+{
-+	int close_idx;
-+
-+	/* Iterate through the first socket. */
-+	read_n(iter_fd, 1, counts, counts_len);
-+
-+	/* Make sure we saw a socket from fds. */
-+	check_n_were_seen_once(socks, socks_len, 1, counts, counts_len);
-+
-+	/* Close what would be the next socket in the bucket to exercise the
-+	 * condition where we need to skip past the first cookie we remembered.
-+	 */
-+	close_idx = get_nth_socket(socks, socks_len, link, 1);
-+	if (!ASSERT_GE(close_idx, 0, "close_idx"))
-+		return;
-+	close(socks[close_idx]);
-+	socks[close_idx] = -1;
-+
-+	/* Iterate through the rest of the sockets. */
-+	read_n(iter_fd, -1, counts, counts_len);
-+
-+	/* Make sure the remaining sockets were seen exactly once and that we
-+	 * didn't repeat the socket that was already seen.
-+	 */
-+	check_n_were_seen_once(socks, socks_len, socks_len - 1, counts,
-+			       counts_len);
-+}
-+
-+static void remove_all(int family, int sock_type, const char *addr,
-+		       __u16 port, int *socks, int socks_len,
-+		       struct sock_count *counts, int counts_len,
-+		       struct bpf_link *link, int iter_fd)
-+{
-+	int close_idx, i;
-+
-+	/* Iterate through the first socket. */
-+	read_n(iter_fd, 1, counts, counts_len);
-+
-+	/* Make sure we saw a socket from fds. */
-+	check_n_were_seen_once(socks, socks_len, 1, counts, counts_len);
-+
-+	/* Close all remaining sockets to exhaust the list of saved cookies and
-+	 * exit without putting any sockets into the batch on the next read.
-+	 */
-+	for (i = 0; i < socks_len - 1; i++) {
-+		close_idx = get_nth_socket(socks, socks_len, link, 1);
-+		if (!ASSERT_GE(close_idx, 0, "close_idx"))
-+			return;
-+		close(socks[close_idx]);
-+		socks[close_idx] = -1;
-+	}
-+
-+	/* Make sure there are no more sockets returned */
-+	ASSERT_EQ(read_n(iter_fd, -1, counts, counts_len), 0, "read_n");
-+}
-+
-+static void add_some(int family, int sock_type, const char *addr, __u16 port,
-+		     int *socks, int socks_len, struct sock_count *counts,
-+		     int counts_len, struct bpf_link *link, int iter_fd)
-+{
-+	int *new_socks = NULL;
-+
-+	/* Iterate through the first socks_len - 1 sockets. */
-+	read_n(iter_fd, socks_len - 1, counts, counts_len);
-+
-+	/* Make sure we saw socks_len - 1 sockets exactly once. */
-+	check_n_were_seen_once(socks, socks_len, socks_len - 1, counts,
-+			       counts_len);
-+
-+	/* Double the number of sockets in the bucket. */
-+	new_socks = start_reuseport_server(family, sock_type, addr, port, 0,
-+					   socks_len);
-+	if (!ASSERT_OK_PTR(new_socks, "start_reuseport_server"))
-+		goto done;
-+
-+	/* Iterate through the rest of the sockets. */
-+	read_n(iter_fd, -1, counts, counts_len);
-+
-+	/* Make sure each of the original sockets was seen exactly once. */
-+	check_n_were_seen_once(socks, socks_len, socks_len, counts,
-+			       counts_len);
-+done:
-+	if (new_socks)
-+		free_fds(new_socks, socks_len);
-+}
-+
-+static void force_realloc(int family, int sock_type, const char *addr,
-+			  __u16 port, int *socks, int socks_len,
-+			  struct sock_count *counts, int counts_len,
-+			  struct bpf_link *link, int iter_fd)
-+{
-+	int *new_socks = NULL;
-+
-+	/* Iterate through the first socket just to initialize the batch. */
-+	read_n(iter_fd, 1, counts, counts_len);
-+
-+	/* Double the number of sockets in the bucket to force a realloc on the
-+	 * next read.
-+	 */
-+	new_socks = start_reuseport_server(family, sock_type, addr, port, 0,
-+					   socks_len);
-+	if (!ASSERT_OK_PTR(new_socks, "start_reuseport_server"))
-+		goto done;
-+
-+	/* Iterate through the rest of the sockets. */
-+	read_n(iter_fd, -1, counts, counts_len);
-+
-+	/* Make sure each socket from the first set was seen exactly once. */
-+	check_n_were_seen_once(socks, socks_len, socks_len, counts,
-+			       counts_len);
-+done:
-+	if (new_socks)
-+		free_fds(new_socks, socks_len);
-+}
-+
-+struct test_case {
-+	void (*test)(int family, int sock_type, const char *addr, __u16 port,
-+		     int *socks, int socks_len, struct sock_count *counts,
-+		     int counts_len, struct bpf_link *link, int iter_fd);
-+	const char *description;
-+	int init_socks;
-+	int max_socks;
-+	int sock_type;
-+	int family;
-+};
-+
-+static struct test_case resume_tests[] = {
-+	{
-+		.description = "udp: resume after removing a seen socket",
-+		.init_socks = nr_soreuse,
-+		.max_socks = nr_soreuse,
-+		.sock_type = SOCK_DGRAM,
-+		.family = AF_INET6,
-+		.test = remove_seen,
-+	},
-+	{
-+		.description = "udp: resume after removing one unseen socket",
-+		.init_socks = nr_soreuse,
-+		.max_socks = nr_soreuse,
-+		.sock_type = SOCK_DGRAM,
-+		.family = AF_INET6,
-+		.test = remove_unseen,
-+	},
-+	{
-+		.description = "udp: resume after removing all unseen sockets",
-+		.init_socks = nr_soreuse,
-+		.max_socks = nr_soreuse,
-+		.sock_type = SOCK_DGRAM,
-+		.family = AF_INET6,
-+		.test = remove_all,
-+	},
-+	{
-+		.description = "udp: resume after adding a few sockets",
-+		.init_socks = nr_soreuse,
-+		.max_socks = nr_soreuse,
-+		.sock_type = SOCK_DGRAM,
-+		/* Use AF_INET so that new sockets are added to the head of the
-+		 * bucket's list.
-+		 */
-+		.family = AF_INET,
-+		.test = add_some,
-+	},
-+	{
-+		.description = "udp: force a realloc to occur",
-+		.init_socks = init_batch_size,
-+		.max_socks = init_batch_size * 2,
-+		.sock_type = SOCK_DGRAM,
-+		/* Use AF_INET6 so that new sockets are added to the tail of the
-+		 * bucket's list, needing to be added to the next batch to force
-+		 * a realloc.
-+		 */
-+		.family = AF_INET6,
-+		.test = force_realloc,
-+	},
-+};
-+
-+static void do_resume_test(struct test_case *tc)
-+{
-+	static const __u16 port = 10001;
-+	struct bpf_link *link = NULL;
-+	struct sock_iter_batch *skel;
-+	struct sock_count *counts;
-+	int err, iter_fd = -1;
-+	const char *addr;
-+	int *fds;
-+
-+	counts = calloc(tc->max_socks, sizeof(*counts));
-+	if (!counts)
-+		return;
-+	skel = sock_iter_batch__open();
-+	if (!ASSERT_OK_PTR(skel, "sock_iter_batch__open"))
-+		return;
-+
-+	/* Prepare a bucket of sockets in the kernel hashtable */
-+	int local_port;
-+
-+	addr = tc->family == AF_INET6 ? "::1" : "127.0.0.1";
-+	fds = start_reuseport_server(tc->family, tc->sock_type, addr, port, 0,
-+				     tc->init_socks);
-+	if (!ASSERT_OK_PTR(fds, "start_reuseport_server"))
-+		goto done;
-+	local_port = get_socket_local_port(*fds);
-+	if (!ASSERT_GE(local_port, 0, "get_socket_local_port"))
-+		goto done;
-+	skel->rodata->ports[0] = ntohs(local_port);
-+	skel->rodata->sf = tc->family;
-+
-+	err = sock_iter_batch__load(skel);
-+	if (!ASSERT_OK(err, "sock_iter_batch__load"))
-+		goto done;
-+
-+	link = bpf_program__attach_iter(tc->sock_type == SOCK_STREAM ?
-+					skel->progs.iter_tcp_soreuse :
-+					skel->progs.iter_udp_soreuse,
-+					NULL);
-+	if (!ASSERT_OK_PTR(link, "bpf_program__attach_iter"))
-+		goto done;
-+
-+	iter_fd = bpf_iter_create(bpf_link__fd(link));
-+	if (!ASSERT_GE(iter_fd, 0, "bpf_iter_create"))
-+		goto done;
-+
-+	tc->test(tc->family, tc->sock_type, addr, port, fds, tc->init_socks,
-+		 counts, tc->max_socks, link, iter_fd);
-+done:
-+	free_fds(fds, tc->init_socks);
-+	if (iter_fd < 0)
-+		close(iter_fd);
-+	bpf_link__destroy(link);
-+	sock_iter_batch__destroy(skel);
-+}
-+
-+static void do_resume_tests(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(resume_tests); i++) {
-+		if (test__start_subtest(resume_tests[i].description)) {
-+			do_resume_test(&resume_tests[i]);
-+		}
-+	}
-+}
-+
- static void do_test(int sock_type, bool onebyone)
- {
- 	int err, i, nread, to_read, total_read, iter_fd = -1;
--	int first_idx, second_idx, indices[nr_soreuse];
-+	struct iter_out outputs[nr_soreuse];
- 	struct bpf_link *link = NULL;
- 	struct sock_iter_batch *skel;
-+	int first_idx, second_idx;
- 	int *fds[2] = {};
- 
- 	skel = sock_iter_batch__open();
-@@ -34,6 +458,7 @@ static void do_test(int sock_type, bool onebyone)
- 			goto done;
- 		skel->rodata->ports[i] = ntohs(local_port);
- 	}
-+	skel->rodata->sf = AF_INET6;
- 
- 	err = sock_iter_batch__load(skel);
- 	if (!ASSERT_OK(err, "sock_iter_batch__load"))
-@@ -55,38 +480,38 @@ static void do_test(int sock_type, bool onebyone)
- 	 * from a bucket and leave one socket out from
- 	 * that bucket on purpose.
- 	 */
--	to_read = (nr_soreuse - 1) * sizeof(*indices);
-+	to_read = (nr_soreuse - 1) * sizeof(*outputs);
- 	total_read = 0;
- 	first_idx = -1;
- 	do {
--		nread = read(iter_fd, indices, onebyone ? sizeof(*indices) : to_read);
--		if (nread <= 0 || nread % sizeof(*indices))
-+		nread = read(iter_fd, outputs, onebyone ? sizeof(*outputs) : to_read);
-+		if (nread <= 0 || nread % sizeof(*outputs))
- 			break;
- 		total_read += nread;
- 
- 		if (first_idx == -1)
--			first_idx = indices[0];
--		for (i = 0; i < nread / sizeof(*indices); i++)
--			ASSERT_EQ(indices[i], first_idx, "first_idx");
-+			first_idx = outputs[0].idx;
-+		for (i = 0; i < nread / sizeof(*outputs); i++)
-+			ASSERT_EQ(outputs[i].idx, first_idx, "first_idx");
- 	} while (total_read < to_read);
--	ASSERT_EQ(nread, onebyone ? sizeof(*indices) : to_read, "nread");
-+	ASSERT_EQ(nread, onebyone ? sizeof(*outputs) : to_read, "nread");
- 	ASSERT_EQ(total_read, to_read, "total_read");
- 
- 	free_fds(fds[first_idx], nr_soreuse);
- 	fds[first_idx] = NULL;
- 
- 	/* Read the "whole" second bucket */
--	to_read = nr_soreuse * sizeof(*indices);
-+	to_read = nr_soreuse * sizeof(*outputs);
- 	total_read = 0;
- 	second_idx = !first_idx;
- 	do {
--		nread = read(iter_fd, indices, onebyone ? sizeof(*indices) : to_read);
--		if (nread <= 0 || nread % sizeof(*indices))
-+		nread = read(iter_fd, outputs, onebyone ? sizeof(*outputs) : to_read);
-+		if (nread <= 0 || nread % sizeof(*outputs))
- 			break;
- 		total_read += nread;
- 
--		for (i = 0; i < nread / sizeof(*indices); i++)
--			ASSERT_EQ(indices[i], second_idx, "second_idx");
-+		for (i = 0; i < nread / sizeof(*outputs); i++)
-+			ASSERT_EQ(outputs[i].idx, second_idx, "second_idx");
- 	} while (total_read <= to_read);
- 	ASSERT_EQ(nread, 0, "nread");
- 	/* Both so_reuseport ports should be in different buckets, so
-@@ -128,6 +553,7 @@ void test_sock_iter_batch(void)
- 		do_test(SOCK_DGRAM, true);
- 		do_test(SOCK_DGRAM, false);
- 	}
-+	do_resume_tests();
- 	close_netns(nstoken);
- 
- done:
-diff --git a/tools/testing/selftests/bpf/progs/bpf_tracing_net.h b/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
-index 659694162739..17db400f0e0d 100644
---- a/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
-+++ b/tools/testing/selftests/bpf/progs/bpf_tracing_net.h
-@@ -128,6 +128,7 @@
- #define sk_refcnt		__sk_common.skc_refcnt
- #define sk_state		__sk_common.skc_state
- #define sk_net			__sk_common.skc_net
-+#define sk_rcv_saddr		__sk_common.skc_rcv_saddr
- #define sk_v6_daddr		__sk_common.skc_v6_daddr
- #define sk_v6_rcv_saddr		__sk_common.skc_v6_rcv_saddr
- #define sk_flags		__sk_common.skc_flags
-diff --git a/tools/testing/selftests/bpf/progs/sock_iter_batch.c b/tools/testing/selftests/bpf/progs/sock_iter_batch.c
-index 96531b0d9d55..8f483337e103 100644
---- a/tools/testing/selftests/bpf/progs/sock_iter_batch.c
-+++ b/tools/testing/selftests/bpf/progs/sock_iter_batch.c
-@@ -17,6 +17,12 @@ static bool ipv6_addr_loopback(const struct in6_addr *a)
- 		a->s6_addr32[2] | (a->s6_addr32[3] ^ bpf_htonl(1))) == 0;
- }
- 
-+static bool ipv4_addr_loopback(__be32 a)
-+{
-+	return a == bpf_ntohl(0x7f000001);
-+}
-+
-+volatile const unsigned int sf;
- volatile const __u16 ports[2];
- unsigned int bucket[2];
- 
-@@ -26,16 +32,20 @@ int iter_tcp_soreuse(struct bpf_iter__tcp *ctx)
- 	struct sock *sk = (struct sock *)ctx->sk_common;
- 	struct inet_hashinfo *hinfo;
- 	unsigned int hash;
-+	__u64 sock_cookie;
- 	struct net *net;
- 	int idx;
- 
- 	if (!sk)
- 		return 0;
- 
-+	sock_cookie = bpf_get_socket_cookie(sk);
- 	sk = bpf_core_cast(sk, struct sock);
--	if (sk->sk_family != AF_INET6 ||
-+	if (sk->sk_family != sf ||
- 	    sk->sk_state != TCP_LISTEN ||
--	    !ipv6_addr_loopback(&sk->sk_v6_rcv_saddr))
-+	    sk->sk_family == AF_INET6 ?
-+	    !ipv6_addr_loopback(&sk->sk_v6_rcv_saddr) :
-+	    !ipv4_addr_loopback(sk->sk_rcv_saddr))
- 		return 0;
- 
- 	if (sk->sk_num == ports[0])
-@@ -52,6 +62,7 @@ int iter_tcp_soreuse(struct bpf_iter__tcp *ctx)
- 	hinfo = net->ipv4.tcp_death_row.hashinfo;
- 	bucket[idx] = hash & hinfo->lhash2_mask;
- 	bpf_seq_write(ctx->meta->seq, &idx, sizeof(idx));
-+	bpf_seq_write(ctx->meta->seq, &sock_cookie, sizeof(sock_cookie));
- 
- 	return 0;
- }
-@@ -63,14 +74,18 @@ int iter_udp_soreuse(struct bpf_iter__udp *ctx)
- {
- 	struct sock *sk = (struct sock *)ctx->udp_sk;
- 	struct udp_table *udptable;
-+	__u64 sock_cookie;
- 	int idx;
- 
- 	if (!sk)
- 		return 0;
- 
-+	sock_cookie = bpf_get_socket_cookie(sk);
- 	sk = bpf_core_cast(sk, struct sock);
--	if (sk->sk_family != AF_INET6 ||
--	    !ipv6_addr_loopback(&sk->sk_v6_rcv_saddr))
-+	if (sk->sk_family != sf ||
-+	    sk->sk_family == AF_INET6 ?
-+	    !ipv6_addr_loopback(&sk->sk_v6_rcv_saddr) :
-+	    !ipv4_addr_loopback(sk->sk_rcv_saddr))
- 		return 0;
- 
- 	if (sk->sk_num == ports[0])
-@@ -84,6 +99,7 @@ int iter_udp_soreuse(struct bpf_iter__udp *ctx)
- 	udptable = sk->sk_net.net->ipv4.udp_table;
- 	bucket[idx] = udp_sk(sk)->udp_portaddr_hash & udptable->mask;
- 	bpf_seq_write(ctx->meta->seq, &idx, sizeof(idx));
-+	bpf_seq_write(ctx->meta->seq, &sock_cookie, sizeof(sock_cookie));
- 
- 	return 0;
- }
--- 
-2.43.0
+There are some known GRO issues in the nbxt_en driver fixed recently in
+
+  commit de37faf41ac55619dd329229a9bd9698faeabc52
+  Author: Michael Chan <michael.chan@broadcom.com>
+  Date:   Wed Dec 4 13:59:17 2024 -0800
+
+    bnxt_en: Fix GSO type for HW GRO packets on 5750X chips
+
+It's not clear to me what's your host kernel version.  But the commit
+above was introduced in 6.14 and may be in fairly recent stable kernels.
+The oldest is v6.12.6 AFAICT.  Can you try one of these host kernels?
+
+Also, to confirm and workaround the problem, please, try disabling HW GRO
+on the bnxt_en NIC first:
+
+  ethtool -K <BNXT_EN NIC IFACE> rx-gro-hw off
+
+If that doesn't help, then the problem is likely something different.
+
+Best regards, Ilya Maximets.
+
+> 
+> This is observed in the guest on the ingress path, right? In
+> virtnet_receive_done.
+> 
+> Is this using vhost-net in the host for pass-through? IOW, is
+> the host writing the virtio_net_hdr too?
+> 
+>>>
+>>>
+>>>
+>>>
+>>
+>> I just noticed that commit 17bd3bd82f9f79f3feba15476c2b2c95a9b11ff8
+>> (tcp_offload.c: gso fix) also touches checksum handling and may
+>> affect how skb state is passed to virtio_net_hdr_to_skb().
+>>
+>> Is it possible that the regression only appears due to the combination
+>> of 17bd3bd8 and 49d14b54a5?
+> 
+> That patch only affects packets with SKB_GSO_FRAGLIST. Which is only
+> set on forwarding if NETIF_F_FRAGLIST is set. I don 
 
 
