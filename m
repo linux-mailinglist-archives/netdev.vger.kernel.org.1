@@ -1,73 +1,68 @@
-Return-Path: <netdev+bounces-179307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6481AA7BEF6
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 16:20:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E9F8A7BEFF
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 16:21:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4749F3BA325
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 14:19:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10F76189B97C
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 14:21:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ECBC1F30B2;
-	Fri,  4 Apr 2025 14:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4CFC1F3BA4;
+	Fri,  4 Apr 2025 14:21:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="SWzKLc2c";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="yzosCgw/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZI2ZReU1"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A4A628E3F;
-	Fri,  4 Apr 2025 14:19:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D2231EF088;
+	Fri,  4 Apr 2025 14:21:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743776401; cv=none; b=JJSGTRYVlC+VaS4vnhHo9HszOkRb63Jdv07OKXAP1rVxOTzKqsGusFVBGlZ1zT884EHXvmVrgVeP7SBVlNY+xfvOdlRYLx+2RH8xr2L5Q27+I8gRTPO0WZJpHuVbfH4FUg42ICjf4PqWrqYkA8iIS6Xd3iuwNVwJWZEyjXXCB3M=
+	t=1743776483; cv=none; b=lpO5C2tIHro7jQ03W+WvUTkTcDiMSXxTrrCOW6/p8ZNNTXV0UB7vsPCvTlg80+e+B1asNalx2Pe86PFVpD6Fl543e0OMsRZY2o4ZxWor+qxKH8LM0Zjls6ICGq56qbg+9+S5SCt5qZeVRhGJAepoUK+2/3/zyLsNVHZo/XzzmYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743776401; c=relaxed/simple;
-	bh=/2aEIo4PTu9z/sYVwRw5ohvcBLPPiG/NlbsJlADStM0=;
+	s=arc-20240116; t=1743776483; c=relaxed/simple;
+	bh=jWDI/Zr0/C5m752YjHWoRmTDwZdbUMKMz0DGgxY/xNE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TlVhHHj+2IbNCw5xGAfzHPTIW51LLwg3G9xROjxSimAIFJ5RvaBBI1wVIP4sylVWEiyraHSEFksYMuXJq1efUfxEhVPN+jbqGA2ZmLY8a347r3cAX0HsicsHNBIep6PspESfyV+YksFRc474c/c4PyEK3O8kTCEmiZzaNqg+N8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=SWzKLc2c; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=yzosCgw/; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Fri, 4 Apr 2025 16:19:55 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1743776396;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/2aEIo4PTu9z/sYVwRw5ohvcBLPPiG/NlbsJlADStM0=;
-	b=SWzKLc2ctXrmW44PKGL6CcCaS+hl9rjHHYYydFdyT39Eh9irFmzRJK2waz2vSNSgG+HBKR
-	u1cgHkttkBo8vPLTnUGcPGUa8gx699yT86ULNPWa/OFd8oxkwPaYu67FTZsxXHB+oWkxe9
-	/Ddd2bHUt92cbKfHUCdyR/pTfacvC6OhikGde9rejr6zwSreLshxw34yjDYQooGk5AZjPr
-	6l78nJyPs4lwa+PytA181sl1+jKSPDDel3rx+8MZTG3/BIYANCqqK9wprK5WhOyFZcn8vG
-	7bOuMjiRTxVtLrpABMCzw83xOBaiKG67ZhlLmTEqqnq1/2vHSflRS49kEpnA6w==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1743776396;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/2aEIo4PTu9z/sYVwRw5ohvcBLPPiG/NlbsJlADStM0=;
-	b=yzosCgw/DorY+XXIp2bDiFycqfnFwFwJ1P09MN3jCa/0Gci95AWugeaSE3uY+caX3djPfA
-	Tc4MpQ+XqJfFW6CQ==
-From: Sebastian Sewior <bigeasy@linutronix.de>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Justin Iurman <justin.iurman@uliege.be>,
-	Stanislav Fomichev <stfomichev@gmail.com>,
-	Network Development <netdev@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>, bpf <bpf@vger.kernel.org>
-Subject: Re: [PATCH net] net: lwtunnel: disable preemption when required
-Message-ID: <20250404141955.7Rcvv7nB@linutronix.de>
-References: <20250403083956.13946-1-justin.iurman@uliege.be>
- <Z-62MSCyMsqtMW1N@mini-arch>
- <cb0df409-ebbf-4970-b10c-4ea9f863ff00@uliege.be>
- <CAADnVQLiM5MA3Xyrkqmubku6751ZPrDk6v-HmC1jnOaL47=t+g@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=IrTQXu+dsNcUxHMuYna4jRB1v/hJMn2iOaGFtlNl4wMXCzzCZsigIrJkB9ViOzYp71Eh0bPP1n6LxZ83a/+HFd2C1W+JvMtzyixUQZhT0H8MH30PDqQqUBMSoqdqzWTMSw2N/VU+LbKqtBiFRG+vz9UuMlnXTdKspsxMMMCMnfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZI2ZReU1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FE8BC4CEDD;
+	Fri,  4 Apr 2025 14:21:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743776482;
+	bh=jWDI/Zr0/C5m752YjHWoRmTDwZdbUMKMz0DGgxY/xNE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZI2ZReU12jWJWtPcM6Zm1LelBbJ0IuB+ZYdQ7zGoAY01nrTX6icYXg4hfo2ZyPR/+
+	 TFb1QP2U3vi83K2SB7wMXVlsv1EbaDFkYO93Mc5MRJBLjVRpEt6wyuftu1pys508Q1
+	 Gx+P7JYHB1gAJu9Yv6ilupRA2fljBJJ49WLHLNCGYF7+54yAeGb/jDky7C4mmN/q69
+	 Mq2bCatP/Tk8s7PcP4ffGxHflKt1rfBNzO0xml2yN6JtsStcODOsuXkLf1VuzpZqYr
+	 q/yjX+XsM/G5Vkse2Syb9zEvHs9AkAKqmAi/+ehVlpC9sBls8pyb0+4Ujf7OXU3HaU
+	 7bTLp2ns2VbTg==
+Date: Fri, 4 Apr 2025 15:21:15 +0100
+From: Lee Jones <lee@kernel.org>
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, linus.walleij@linaro.org, brgl@bgdev.pl,
+	andi.shyti@kernel.org, mkl@pengutronix.de,
+	mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net,
+	jdelvare@suse.com, alexandre.belloni@bootlin.com,
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
+	linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH v8 1/7] mfd: Add core driver for Nuvoton NCT6694
+Message-ID: <20250404142115.GC278642@google.com>
+References: <20250225081644.3524915-1-a0282524688@gmail.com>
+ <20250225081644.3524915-2-a0282524688@gmail.com>
+ <20250307011542.GE8350@google.com>
+ <CAOoeyxUgiTqtSksfHopEDhZHwNkUq9+d-ojo8ma3PX2dosuwyQ@mail.gmail.com>
+ <20250320145042.GS3890718@google.com>
+ <CAOoeyxXZmrzBSNRdRx9vK84m5Z5y8T_A+wY98vVrPUZ7f4w4iw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,19 +71,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAADnVQLiM5MA3Xyrkqmubku6751ZPrDk6v-HmC1jnOaL47=t+g@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAOoeyxXZmrzBSNRdRx9vK84m5Z5y8T_A+wY98vVrPUZ7f4w4iw@mail.gmail.com>
 
-Alexei, thank you for the Cc.
+On Wed, 26 Mar 2025, Ming Yu wrote:
 
-On 2025-04-03 13:35:10 [-0700], Alexei Starovoitov wrote:
-> Stating the obvious...
-> Sebastian did a lot of work removing preempt_disable from the networking
-> stack.
-> We're certainly not adding them back.
-> This patch is no go.
+> Lee Jones <lee@kernel.org> 於 2025年3月20日 週四 下午10:50寫道：
+> >
+> ...
+> > > > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x1),
+> > > >
+> > > > IDs are usually given in base-10.
+> > > >
+> > >
+> > > Fix it in v9.
+> > >
+> > > > Why are you manually adding the device IDs?
+> > > >
+> > > > PLATFORM_DEVID_AUTO doesn't work for you?
+> > > >
+> > >
+> > > I need to manage these IDs to ensure that child devices can be
+> > > properly utilized within their respective modules.
+> >
+> > How?  Please explain.
+> >
+> > This numbering looks sequential and arbitrary.
+> >
+> > What does PLATFORM_DEVID_AUTO do differently such that it is not useful?
+> >
+> 
+> As far as I know, PLATFORM_DEVID_AUTO assigns dynamic IDs to devices,
+> but I need fixed IDs.
+> For example, the GPIO driver relies on these IDs to determine the
+> group, allowing the firmware to identify which GPIO group to operate
+> on through the API.
 
-While looking through the code, it looks as if lwtunnel_xmit() lacks a
-local_bh_disable().
+PLATFORM_DEVID_AUTO will allocate IDs 0 through 16, the same as you've
+done here.  These lines do not have any differentiating attributes, so
+either way we are not allocating specific IDs to specific pieces of the
+H/W.  I still do not understand why you need to allocate them manually.
 
-Sebastian
+> > > > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x2),
+> > > > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x3),
+> > > > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x4),
+> > > > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x5),
+> > > > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x6),
+> > > > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x7),
+> > > > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x8),
+> > > > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x9),
+> > > > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0xA),
+> > > > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0xB),
+> > > > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0xC),
+> > > > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0xD),
+> > > > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0xE),
+> > > > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0xF),
+> 
+> 
+> Thanks,
+> Ming
+
+-- 
+Lee Jones [李琼斯]
 
