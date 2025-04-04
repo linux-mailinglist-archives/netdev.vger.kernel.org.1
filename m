@@ -1,421 +1,277 @@
-Return-Path: <netdev+bounces-179334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94FF8A7C05C
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 17:14:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B918FA7C074
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 17:19:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D46683B79BE
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 15:13:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71A51189BD88
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 15:20:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 581B01F4632;
-	Fri,  4 Apr 2025 15:13:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 299131F543F;
+	Fri,  4 Apr 2025 15:19:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lchpsflx"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TEdwwrAv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B9D1F427D;
-	Fri,  4 Apr 2025 15:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D241F5413
+	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 15:19:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743779636; cv=none; b=MXPrvLPw/RZjgs+z48unkNcsfqlqHGEhEGF9H3H0TErmtb0LZpX2iHLFf192uQfivz6ZNGNlA1vbSgOUKQd51kI0S2xBUM90ykR+tMGoII4NgxYFsDV4/guHUQ6tq91llgx+/bVp9miCUVbleV1b2s44uxOelkhzWfSiTiGbzC0=
+	t=1743779979; cv=none; b=u/F06D6PfvRLL/GSMoENqpDObGPi8wlaT1NIcEbw9Ugr5Xcn2Kxs9XK+NIbmEA/YOa9DK257pNiz4OBC6OpXc4QhlexNHnM0zC5R0BWMOH99nW5iayO9WLYJviHhcpefZUWCjJDLtxSmlU3EIKFAtmlX6yXwvQ/UF++HqlOkBLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743779636; c=relaxed/simple;
-	bh=WQbI3dyKllE7gweQpwKdM6+FVHrPveHLAJaHhBAMGzY=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=kO8RHXwsY+mCjLlUgcL3/XY6S5g8d8LjMyJgAfqX+PhO/alMn77/TOWmdZO6Koi4RHrtli/ZpdI3hb0W3j/sTL+buaztCS3cP0KbJ5aMGRv7Zh3TLocbaUX8PDFFI13mDkxiJ62JfoeAxqJupAkPMLYKqDvGqdQI8VLzMU2DmGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lchpsflx; arc=none smtp.client-ip=209.85.222.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7c56a3def84so195906985a.0;
-        Fri, 04 Apr 2025 08:13:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743779633; x=1744384433; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T/gFZeVnc+kSH/zqiFoTPbQDrc4DhywqySchfhRCUGg=;
-        b=lchpsflx9nNXF8AEVPat8zM/fM2dOWSB5/8w7s3uV9K6bP2XrD4gHqAMJ4EdAQqxGp
-         ooq9q+MMZseTuKQOjhs+RJH4SlASVc8XZMYCvDLOCFrte2GJcp2HFxUF+1/QJkuqSZQD
-         ZrQR8gxxsTkg9MPndEFjRdWHLYpkNsYwaqI0T9PV4sNkfSx4MxPg3RYPlQBOJ/tpohi3
-         8av3fjXVnrwX2VDWjIzqmzqRBe2jlICFV/pofiJRuNco0zFOXOBu2v8pwaIUT8SOVUBV
-         uHqB7FWMGuHyaHIOuPMTEo9HS4c04YuHhexZXAYxeU2aRy7pyJsur7uYfO7k0H4m1H8X
-         D12w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743779633; x=1744384433;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=T/gFZeVnc+kSH/zqiFoTPbQDrc4DhywqySchfhRCUGg=;
-        b=JkWUvWKbYrzvCvNEgiB8Ng+dMpQHPHW35JzVcGXzhUCmJ6ZI9Abq66jareEEK5luNq
-         W1euEMpywONQjF3FjR0PNNCE0yLB27aTyzOdXWbxsGzRPXxl1WGNPQeRdfamf/Sle5Ub
-         KUqPqySSToZKm2TWVLMTZ1hjHibNpdTqEg0sFjHPCPFu8Aio6C7GHeQchTSYhXk0vA82
-         UhQlTkEXkRSHnkzDVgTFxmRyxF671IEQ2BR5zV9XWLUzKztI7scnSKjVYlv3vXdV0qxQ
-         jll+4xFG/Alf05hlvGFE7oLVpXBKoDhC+4fXnropeiRzwwaMHjJtJX+gJnAtyrCtlque
-         A1Yg==
-X-Forwarded-Encrypted: i=1; AJvYcCVIel9rORlz6eEm0P+0pbl6uHZWoT7zfiwlQsvWb3Xv1+zxkQ3n9fPlSrULkSCVcRw8ewFyHAw4@vger.kernel.org, AJvYcCWF6FvBkbhchSbfxPOQ+0x2nDF989gUN4jsPXGDl2rb5yAc2MapQAoYUGRVWYCtI1lQ3Ga+tk1zrlAsRxk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/yyxoQEtslhvtqDyf7DZ+2c+yHDOct+5gDVgn+I+4ztzU/S7G
-	2GuHMUmDFZlKiPSsPioRPFjp1nfo+Yr+4ndRGO1e7GyHj4fjB2uz
-X-Gm-Gg: ASbGncsEFk5Oak8brXupEQDQnmRzD0hZro+0iH/gM+Ita157s/oWgXdSxML9QtUlsR/
-	IUwNq2Ft0DXY2HL46PhtN7iT0A9a16hDwvmkLcbEbHRAQaKMzat/Q3mzXScTqiyEmcS+bZOZE8t
-	NuGHDv3GdbLaRPntZ3j5NsdOjcebKigYKAfOAusxh0KV8GqAM+hueEIPWcolvvkWpHwiag0AKD4
-	ujG57+tC/RUY+jLwcItbXHAFfj81AcbAqHOSf5l1v5ciEevahOOzPvVzwStDGsV7mcngqNoaQYx
-	BxVKmAvnD7/Swl/7cZyCHUYtKpe28vsVsSbc/S3MOznkI879mXYgKTp4ts5PHIZdp8RpP5YU/Sp
-	zshekcOkofkAt5QvrNhlALQ==
-X-Google-Smtp-Source: AGHT+IFJi2tzpNLKZWpEPzGAGH5aga7+T+NCkeMlRPFClkmPT1RGO2gImTS1cr49l3Tpn3kkj8Il4Q==
-X-Received: by 2002:a05:620a:4449:b0:7c5:f6be:bdae with SMTP id af79cd13be357-7c774d205eamr466302885a.20.1743779633097;
-        Fri, 04 Apr 2025 08:13:53 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c76e96e566sm228375685a.63.2025.04.04.08.13.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Apr 2025 08:13:52 -0700 (PDT)
-Date: Fri, 04 Apr 2025 11:13:52 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Markus Fohrer <markus.fohrer@webked.de>, 
- "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtualization@lists.linux-foundation.org, 
- jasowang@redhat.com, 
- davem@davemloft.net, 
- edumazet@google.com, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <67eff7303df69_1ddca829490@willemb.c.googlers.com.notmuch>
-In-Reply-To: <3b02f37ee12232359672a6a6c2bccaa340fbb6ff.camel@webked.de>
-References: <1d388413ab9cfd765cd2c5e05b5e69cdb2ec5a10.camel@webked.de>
- <20250403090001-mutt-send-email-mst@kernel.org>
- <11c5cb52d024a5158c5b8c5e69e2e4639a055a31.camel@webked.de>
- <20250404042711-mutt-send-email-mst@kernel.org>
- <e75cb5881a97485b08cdd76efd8a7d2191ecd106.camel@webked.de>
- <3b02f37ee12232359672a6a6c2bccaa340fbb6ff.camel@webked.de>
-Subject: Re: [REGRESSION] Massive virtio-net throughput drop in guest VM with
- Linux 6.8+
+	s=arc-20240116; t=1743779979; c=relaxed/simple;
+	bh=eBQ9nNxE6lSXQIeYzj1Cau9JY6Jgqp7mRdU8CLlxMig=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=f/TboGuHsSiq5RZxiQLUrkwSu9tW1xMaiF95OQxJgA5HDd+6VZ7iwWq4qPmT1u6dfp5+icpFxp5/s5/cr3fidWwecGFG/8Gz9fj6ggmLtODhKEyzJwZkIbKR/omAKJtV+Na/0Sz2jGH8ndwuNT41M9oJSMiO8jtN8+TZeEwocs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TEdwwrAv; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c9a69eda-e066-49e1-979a-b6ec5ef115ba@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1743779964;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UWX0HTz4vZa+tHFvj8jM2lcjDzCYW7m/OUMpzGk+52s=;
+	b=TEdwwrAv1AvChzcWpwOAmY9TNVC9ryZeMsF2AhYAiE/SgE2zWcHO8rgoiPlQPfmHpm4vZJ
+	Y1GrWAgWka1x006GeZk12ELJxehJ/BhINMU6qRe05vINZ1hdeBV6jC6Y4yd516v/7ToMd2
+	6HZ7ZSJdudDFrdTfrWqn+5cOVYysmC8=
+Date: Fri, 4 Apr 2025 11:19:18 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-Markus Fohrer wrote:
-> Am Freitag, dem 04.04.2025 um 10:52 +0200 schrieb Markus Fohrer:
-> > Am Freitag, dem 04.04.2025 um 04:29 -0400 schrieb Michael S. Tsirkin:=
-
-> > > On Fri, Apr 04, 2025 at 10:16:55AM +0200, Markus Fohrer wrote:
-> > > > Am Donnerstag, dem 03.04.2025 um 09:04 -0400 schrieb Michael S.
-> > > > Tsirkin:
-> > > > > On Wed, Apr 02, 2025 at 11:12:07PM +0200, Markus Fohrer wrote:
-> > > > > > Hi,
-> > > > > > =
-
-> > > > > > I'm observing a significant performance regression in KVM
-> > > > > > guest
-> > > > > > VMs
-> > > > > > using virtio-net with recent Linux kernels (6.8.1+ and 6.14).=
-
-> > > > > > =
-
-> > > > > > When running on a host system equipped with a Broadcom
-> > > > > > NetXtreme-E
-> > > > > > (bnxt_en) NIC and AMD EPYC CPUs, the network throughput in
-> > > > > > the
-> > > > > > guest drops to 100=E2=80=93200 KB/s. The same guest configura=
-tion
-> > > > > > performs
-> > > > > > normally (~100 MB/s) when using kernel 6.8.0 or when the VM
-> > > > > > is
-> > > > > > moved to a host with Intel NICs.
-> > > > > > =
-
-> > > > > > Test environment:
-> > > > > > - Host: QEMU/KVM, Linux 6.8.1 and 6.14.0
-> > > > > > - Guest: Linux with virtio-net interface
-> > > > > > - NIC: Broadcom BCM57416 (bnxt_en driver, no issues at host
-> > > > > > level)
-> > > > > > - CPU: AMD EPYC
-> > > > > > - Storage: virtio-scsi
-> > > > > > - VM network: virtio-net, virtio-scsi (no CPU or IO
-> > > > > > bottlenecks)
-> > > > > > - Traffic test: iperf3, scp, wget consistently slow in guest
-> > > > > > =
-
-> > > > > > This issue is not present:
-> > > > > > - On 6.8.0 =
-
-> > > > > > - On hosts with Intel NICs (same VM config)
-> > > > > > =
-
-> > > > > > I have bisected the issue to the following upstream commit:
-> > > > > > =
-
-> > > > > > =C2=A0 49d14b54a527 ("virtio-net: Suppress tx timeout warning=
- for
-> > > > > > small
-> > > > > > tx")
-> > > > > > =C2=A0 https://git.kernel.org/linus/49d14b54a527
-> > > > > =
-
-> > > > > Thanks a lot for the info!
-> > > > > =
-
-> > > > > =
-
-> > > > > both the link and commit point at:
-> > > > > =
-
-> > > > > commit 49d14b54a527289d09a9480f214b8c586322310a
-> > > > > Author: Eric Dumazet <edumazet@google.com>
-> > > > > Date:=C2=A0=C2=A0 Thu Sep 26 16:58:36 2024 +0000
-> > > > > =
-
-> > > > > =C2=A0=C2=A0=C2=A0 net: test for not too small csum_start in
-> > > > > virtio_net_hdr_to_skb()
-> > > > > =C2=A0=C2=A0=C2=A0 =
-
-> > > > > =
-
-> > > > > is this what you mean?
-> > > > > =
-
-> > > > > I don't know which commit is "virtio-net: Suppress tx timeout
-> > > > > warning
-> > > > > for small tx"
-> > > > > =
-
-> > > > > =
-
-> > > > > =
-
-> > > > > > Reverting this commit restores normal network performance in
-> > > > > > affected guest VMs.
-> > > > > > =
-
-> > > > > > I=E2=80=99m happy to provide more data or assist with testing=
- a
-> > > > > > potential
-> > > > > > fix.
-> > > > > > =
-
-> > > > > > Thanks,
-> > > > > > Markus Fohrer
-> > > > > =
-
-> > > > > =
-
-> > > > > Thanks! First I think it's worth checking what is the setup,
-> > > > > e.g.
-> > > > > which offloads are enabled.
-> > > > > Besides that, I'd start by seeing what's doing on. Assuming I'm=
-
-> > > > > right
-> > > > > about
-> > > > > Eric's patch:
-> > > > > =
-
-> > > > > diff --git a/include/linux/virtio_net.h
-> > > > > b/include/linux/virtio_net.h
-> > > > > index 276ca543ef44d8..02a9f4dc594d02 100644
-> > > > > --- a/include/linux/virtio_net.h
-> > > > > +++ b/include/linux/virtio_net.h
-> > > > > @@ -103,8 +103,10 @@ static inline int
-> > > > > virtio_net_hdr_to_skb(struct
-> > > > > sk_buff *skb,
-> > > > > =C2=A0
-> > > > > =C2=A0		if (!skb_partial_csum_set(skb, start, off))
-> > > > > =C2=A0			return -EINVAL;
-> > > > > +		if (skb_transport_offset(skb) < nh_min_len)
-> > > > > +			return -EINVAL;
-> > > > > =C2=A0
-> > > > > -		nh_min_len =3D max_t(u32, nh_min_len,
-> > > > > skb_transport_offset(skb));
-> > > > > +		nh_min_len =3D skb_transport_offset(skb);
-> > > > > =C2=A0		p_off =3D nh_min_len + thlen;
-> > > > > =C2=A0		if (!pskb_may_pull(skb, p_off))
-> > > > > =C2=A0			return -EINVAL;
-> > > > > =
-
-> > > > > =
-
-> > > > > sticking a printk before return -EINVAL to show the offset and
-> > > > > nh_min_len
-> > > > > would be a good 1st step. Thanks!
-> > > > > =
-
-> > > > =
-
-> > > > I added the following printk inside virtio_net_hdr_to_skb():
-> > > > =
-
-> > > > =C2=A0=C2=A0=C2=A0 if (skb_transport_offset(skb) < nh_min_len){
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 printk(KERN_INFO "virt=
-io_net: 3 drop,
-> > > > transport_offset=3D%u,
-> > > > nh_min_len=3D%u\n",
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 skb_transport_offset(skb), nh_min_len);
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EINVAL;
-> > > > =C2=A0=C2=A0=C2=A0 }
-> > > > =
-
-> > > > Built and installed the kernel, then triggered a large download
-> > > > via:
-> > > > =
-
-> > > > =C2=A0=C2=A0=C2=A0 wget http://speedtest.belwue.net/10G
-> > > > =
-
-> > > > Relevant output from `dmesg -w`:
-> > > > =
-
-> > > > [=C2=A0=C2=A0 57.327943] virtio_net: 3 drop, transport_offset=3D3=
-4,
-> > > > nh_min_len=3D40=C2=A0 =
-
-> > > > [=C2=A0=C2=A0 57.428942] virtio_net: 3 drop, transport_offset=3D3=
-4,
-> > > > nh_min_len=3D40=C2=A0 =
-
-> > > > [=C2=A0=C2=A0 57.428962] virtio_net: 3 drop, transport_offset=3D3=
-4,
-> > > > nh_min_len=3D40=C2=A0 =
-
-> > > > [=C2=A0=C2=A0 57.553068] virtio_net: 3 drop, transport_offset=3D3=
-4,
-> > > > nh_min_len=3D40=C2=A0 =
-
-> > > > [=C2=A0=C2=A0 57.553088] virtio_net: 3 drop, transport_offset=3D3=
-4,
-> > > > nh_min_len=3D40=C2=A0 =
-
-> > > > [=C2=A0=C2=A0 57.576678] virtio_net: 3 drop, transport_offset=3D3=
-4,
-> > > > nh_min_len=3D40=C2=A0 =
-
-> > > > [=C2=A0=C2=A0 57.618438] virtio_net: 3 drop, transport_offset=3D3=
-4,
-> > > > nh_min_len=3D40=C2=A0 =
-
-> > > > [=C2=A0=C2=A0 57.618453] virtio_net: 3 drop, transport_offset=3D3=
-4,
-> > > > nh_min_len=3D40=C2=A0 =
-
-> > > > [=C2=A0=C2=A0 57.703077] virtio_net: 3 drop, transport_offset=3D3=
-4,
-> > > > nh_min_len=3D40=C2=A0 =
-
-> > > > [=C2=A0=C2=A0 57.823072] virtio_net: 3 drop, transport_offset=3D3=
-4,
-> > > > nh_min_len=3D40=C2=A0 =
-
-> > > > [=C2=A0=C2=A0 57.891982] virtio_net: 3 drop, transport_offset=3D3=
-4,
-> > > > nh_min_len=3D40=C2=A0 =
-
-> > > > [=C2=A0=C2=A0 57.946190] virtio_net: 3 drop, transport_offset=3D3=
-4,
-> > > > nh_min_len=3D40=C2=A0 =
-
-> > > > [=C2=A0=C2=A0 58.218686] virtio_net: 3 drop, transport_offset=3D3=
-4,
-> > > > nh_min_len=3D40=C2=A0 =
-
-> > > =
-
-> > > Hmm indeed. And what about these values?
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 u32 start =3D __virtio16_to_cpu(little_endian, hdr-=
-
-> > > > csum_start);
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 u32 off =3D __virtio16_to_cpu(little_endian, hdr-
-> > > > csum_offset);
-> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 u32 needed =3D start + max_t(u32, thlen, off +
-> > > sizeof(__sum16));
-> > > print them too?
-> > > =
-
-> > > =
-
-> > > =
-
-> > > > I would now do the test with commit
-> > > > 49d14b54a527289d09a9480f214b8c586322310a and commit
-> > > > 49d14b54a527289d09a9480f214b8c586322310a~1
-> > > > =
-
-> > > =
-
-> > > Worth checking though it seems likely now the hypervisor is doing
-> > > weird
-> > > things. what kind of backend is it? qemu? tun? vhost-user? vhost-
-> > > net?
-> > > =
-
-> > =
-
-> > Backend: QEMU/KVM hypervisor (Proxmox)
-> > =
-
-> > =
-
-> > printk output:
-> > =
-
-> > [=C2=A0=C2=A0 58.641906] virtio_net: drop, transport_offset=3D34=C2=A0=
- start=3D34,
-> > off=3D16,
-> > needed=3D54, nh_min_len=3D40
-> > [=C2=A0=C2=A0 58.678048] virtio_net: drop, transport_offset=3D34=C2=A0=
- start=3D34,
-> > off=3D16,
-> > needed=3D54, nh_min_len=3D40
-> > [=C2=A0=C2=A0 58.952871] virtio_net: drop, transport_offset=3D34=C2=A0=
- start=3D34,
-> > off=3D16,
-> > needed=3D54, nh_min_len=3D40
-> > [=C2=A0=C2=A0 58.962157] virtio_net: drop, transport_offset=3D34=C2=A0=
- start=3D34,
-> > off=3D16,
-> > needed=3D54, nh_min_len=3D40
-> > [=C2=A0=C2=A0 59.071645] virtio_net: drop, transport_offset=3D34=C2=A0=
- start=3D34,
-> > off=3D16,
-> > needed=3D54, nh_min_len=3D40
-
-So likely a TCP/IPv4 packet, but with VIRTIO_NET_HDR_GSO_TCPV6.
-
-This is observed in the guest on the ingress path, right? In
-virtnet_receive_done.
-
-Is this using vhost-net in the host for pass-through? IOW, is
-the host writing the virtio_net_hdr too?
-
-> > =
-
-> > =
-
-> > =
-
-> > =
-
-> =
-
-> I just noticed that commit 17bd3bd82f9f79f3feba15476c2b2c95a9b11ff8
-> (tcp_offload.c: gso fix) also touches checksum handling and may
-> affect how skb state is passed to virtio_net_hdr_to_skb().
-> =
-
-> Is it possible that the regression only appears due to the combination
-> of 17bd3bd8 and 49d14b54a5?
-
-That patch only affects packets with SKB_GSO_FRAGLIST. Which is only
-set on forwarding if NETIF_F_FRAGLIST is set. I don =
-
+MIME-Version: 1.0
+Subject: Re: [RFC net-next PATCH 01/13] dt-bindings: net: Add binding for
+ Xilinx PCS
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ linux-kernel@vger.kernel.org, Christian Marangi <ansuelsmth@gmail.com>,
+ upstream@airoha.com, Heiner Kallweit <hkallweit1@gmail.com>,
+ Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Michal Simek <michal.simek@amd.com>,
+ Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ Rob Herring <robh@kernel.org>, Robert Hancock <robert.hancock@calian.com>,
+ devicetree@vger.kernel.org
+References: <20250403181907.1947517-1-sean.anderson@linux.dev>
+ <20250403181907.1947517-2-sean.anderson@linux.dev>
+ <20250404-tench-of-heavenly-beauty-fb4ed1@shite>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <20250404-tench-of-heavenly-beauty-fb4ed1@shite>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+
+On 4/4/25 06:37, Krzysztof Kozlowski wrote:
+> On Thu, Apr 03, 2025 at 02:18:55PM GMT, Sean Anderson wrote:
+>> This adds a binding for the Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII
+> 
+> Incomplete review, since this is an RFC.
+
+Only an RFC due to netdev's rules. I consider this patchset complete.
+
+> Please do not use "This commit/patch/change", but imperative mood. See
+> longer explanation here:
+> https://elixir.bootlin.com/linux/v5.17.1/source/Documentation/process/submitting-patches.rst#L95
+> 
+> A nit, subject: drop second/last, redundant "binding for". The
+> "dt-bindings" prefix is already stating that these are bindings.
+> See also:
+> https://elixir.bootlin.com/linux/v6.7-rc8/source/Documentation/devicetree/bindings/submitting-patches.rst#L18
+> 
+>> LogiCORE IP. This device is a soft device typically used to adapt
+>> between GMII and SGMII or 1000BASE-X (possbilty in combination with a
+>> serdes). pcs-modes reflects the modes available with the as configured
+>> when the device is synthesized. Multiple modes may be specified if
+>> dynamic reconfiguration is supported.
+>> 
+>> One PCS may contain "shared logic in core" which can be connected to
+>> other PCSs with "shared logic in example design." This primarily refers
+>> to clocking resources, allowing a reference clock to be shared by a bank
+>> of PCSs. To support this, if #clock-cells is defined then the PCS will
+>> register itself as a clock provider for other PCSs.
+>> 
+>> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+>> ---
+>> 
+>>  .../devicetree/bindings/net/xilinx,pcs.yaml   | 129 ++++++++++++++++++
+>>  1 file changed, 129 insertions(+)
+>>  create mode 100644 Documentation/devicetree/bindings/net/xilinx,pcs.yaml
+>> 
+>> diff --git a/Documentation/devicetree/bindings/net/xilinx,pcs.yaml b/Documentation/devicetree/bindings/net/xilinx,pcs.yaml
+>> new file mode 100644
+>> index 000000000000..56a3ce0c4ef0
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/net/xilinx,pcs.yaml
+>> @@ -0,0 +1,129 @@
+>> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+>> +%YAML 1.2
+>> +---
+>> +$id: http://devicetree.org/schemas/net/xilinx,pcs.yaml#
+>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>> +
+>> +title: Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII LogiCORE IP
+>> +
+>> +maintainers:
+>> +  - Sean Anderson <sean.anderson@seco.com>
+>> +
+>> +description:
+>> +  This is a soft device which implements the PCS and (depending on
+>> +  configuration) PMA layers of an IEEE Ethernet PHY. On the MAC side, it
+>> +  implements GMII. It may have an attached SERDES (internal or external), or
+>> +  may directly use LVDS IO resources. Depending on the configuration, it may
+>> +  implement 1000BASE-X, SGMII, 2500BASE-X, or 2.5G SGMII.
+>> +
+>> +  This device has a notion of "shared logic" such as reset and clocking
+>> +  resources which must be shared between multiple PCSs using the same I/O
+>> +  banks. Each PCS can be configured to have the shared logic in the "core"
+>> +  (instantiated internally and made available to other PCSs) or in the "example
+>> +  design" (provided by another PCS). PCSs with shared logic in the core are
+>> +  reset controllers, and generally provide several resets for other PCSs in the
+>> +  same bank.
+>> +
+>> +allOf:
+>> +  - $ref: ethernet-controller.yaml#
+>> +
+>> +properties:
+>> +  compatible:
+>> +    contains:
+> 
+> From where did you get such syntax? What do you want to express?
+
+The compatible should contain this value, but we don't really care what else it
+contains. This aligns with how the kernel matches drivers to devices.
+
+>> +      const: xilinx,pcs-16.2
+> 
+> What does the number mean?
+
+It's the version of the IP. 
+
+>> +
+>> +  reg:
+>> +    maxItems: 1
+>> +
+>> +  "#clock-cells":
+>> +    const: 0
+>> +    description:
+>> +      Register a clock representing the clocking resources shared with other
+>> +      PCSs.
+> 
+> Drop description, redundant.
+> 
+>> +
+>> +  clocks:
+>> +    items:
+>> +      - description:
+>> +          The reference clock for the PCS. Depending on your setup, this may be
+>> +          the gtrefclk, refclk, clk125m signal, or clocks from another PCS.
+>> +
+>> +  clock-names:
+>> +    const: refclk
+>> +
+>> +  done-gpios:
+>> +    maxItems: 1
+>> +    description:
+>> +      GPIO connected to the reset-done output, if present.
+>> +
+>> +  interrupts:
+>> +    items:
+>> +      - description:
+>> +          The an_interrupt autonegotiation-complete interrupt.
+>> +
+>> +  interrupt-names:
+>> +    const: an
+>> +
+>> +  pcs-modes:
+>> +    description:
+>> +      The interfaces that the PCS supports.
+>> +    oneOf:
+>> +      - const: sgmii
+>> +      - const: 1000base-x
+>> +      - const: 2500base-x
+>> +      - items:
+>> +          - const: sgmii
+>> +          - const: 1000base-x
+> 
+> This is confusing. Why fallbacks? Shouldn't this be just enum? And
+> where is the type or constraints about number of items?
+
+As stated in the commit message, multiple modes may be specified if
+dynamic reconfiguration is supported. So I want to allow
+
+	pcs-modes = "sgmii"
+	pcs-modes = "1000base-x"
+	pcs-modes = "2500base-x"
+	pcs-modes = "sgmii", "1000base-x"
+
+>> +
+>> +  reset-gpios:
+>> +    maxItems: 1
+>> +    description:
+>> +      GPIO connected to the reset input.
+>> +
+>> +required:
+>> +  - compatible
+>> +  - reg
+>> +  - pcs-modes
+>> +
+>> +additionalProperties: false
+>> +
+>> +examples:
+>> +  - |
+>> +    #include <dt-bindings/gpio/gpio.h>
+>> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
+>> +    #include <dt-bindings/interrupt-controller/irq.h>
+>> +
+>> +    mdio {
+>> +        #address-cells = <1>;
+>> +        #size-cells = <0>;
+>> +
+>> +        pcs0: ethernet-pcs@0 {
+>> +            #clock-cells = <0>;
+> 
+> Follow DTS coding style. clock-cells are never the first property.
+
+Where is this documented?
+
+>> +            compatible = "xlnx,pcs-16.2";
+>> +            reg = <0>;
+>> +            clocks = <&si570>;
+>> +            clock-names = "refclk";
+>> +            interrupts-extended = <&gic GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>;
+>> +            interrupt-names = "an";
+>> +            reset-gpios = <&gpio 5 GPIO_ACTIVE_HIGH>;
+>> +            done-gpios = <&gpio 6 GPIO_ACTIVE_HIGH>;
+>> +            pcs-modes = "sgmii", "1000base-x";
+>> +        };
+>> +
+>> +        pcs1: ethernet-pcs@1 {
+>> +            compatible = "xlnx,pcs-16.2";
+>> +            reg = <1>;
+>> +            clocks = <&pcs0>;
+>> +            clock-names = "refclk";
+>> +            interrupts-extended = <&gic GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>;
+>> +            interrupt-names = "an";
+>> +            reset-gpios = <&gpio 7 GPIO_ACTIVE_HIGH>;
+>> +            done-gpios = <&gpio 8 GPIO_ACTIVE_HIGH>;
+>> +            pcs-modes = "sgmii", "1000base-x";
+> 
+> Drop example, basically the same as previous.
+> 
+> Best regards,
+> Krzysztof
+> 
 
