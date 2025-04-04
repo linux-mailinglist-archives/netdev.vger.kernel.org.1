@@ -1,388 +1,195 @@
-Return-Path: <netdev+bounces-179408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF20AA7C628
-	for <lists+netdev@lfdr.de>; Sat,  5 Apr 2025 00:05:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 52F13A7C671
+	for <lists+netdev@lfdr.de>; Sat,  5 Apr 2025 00:47:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FE2E172871
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 22:05:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13FE417CED0
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 22:47:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B12919E998;
-	Fri,  4 Apr 2025 22:05:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBEEB19D8A4;
+	Fri,  4 Apr 2025 22:47:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q9LWTOlH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com [209.85.128.66])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD514689;
-	Fri,  4 Apr 2025 22:05:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E578AAD58
+	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 22:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743804317; cv=none; b=S9moG7udqXReOtaTP3VVn2mXieucKy0C+YRKt10YcyRkQzc6YtB/9dRp9nOCuCaT9rLmrWspXauEMUGLK8wM0fPkBMRPUXNHV6AS1sk98TvaRPTaeQ/2M2dI3cfY390qmJsxaREeursI0FhJADLU0AL7t8S3vP5ePShmg0FOeas=
+	t=1743806838; cv=none; b=NG5MpxD2+iQVuQeuKjdrqoVHQMLkVPsNWCZHq04tQ11OEqtDguueGj596mYc81Xl/qpYBxL3irwfEDC1/k667FoG4jbtC1C+Bkcy6hf8CM39fWFcED5pY0LUNDhCkadIpGocVtgdEjWd51wEk8RtLyhiVvwpT7sy3CZ2Tel8yJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743804317; c=relaxed/simple;
-	bh=NQb8QRU2q3flJql7F4O6wzu4m0gUW38uFyjUaUzKznI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iALaMjwTaXWvFSN6Mt51eQNtzJ8+Fp0M0yoGyDuFTcAlAxZFGPnCjtGwfVLOs6hQx2kXO6zf+3ADSi4SawNSGHduygjy+nzKaqta5XN59FSZ9ILRjM+GWJ6gfXP74COoVHgiK4AQoMhrdD8IuaNMmtNceUZyGE2eoBW7D536Psk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+	s=arc-20240116; t=1743806838; c=relaxed/simple;
+	bh=sFxcgYNvwgchrDGRA03IlKE0w+90pHKs4qD6AQ37/E8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=E+Jb2PgID4p9UwerQe/M/wtP4gIlO4RnoFrMvEmZH88PR72BQOLCb+5yRO+/XCo58NieJ4P2D8/XGg5/x232JynvIovaBvK5EPLJs70/cOWs2EdCmsijSqLFVgK0oIH+crZJX+505SRV0MBCD+Jz32AehCFGZM92h8q3z/Jllso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q9LWTOlH; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f66.google.com with SMTP id 5b1f17b1804b1-4394a0c65fcso23453375e9.1;
-        Fri, 04 Apr 2025 15:05:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743804313; x=1744409113;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3912fdddf8fso2286252f8f.1
+        for <netdev@vger.kernel.org>; Fri, 04 Apr 2025 15:47:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743806835; x=1744411635; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4flYMgBhFeJhObgzKMwspMZZsPDbsL3222BuxIrtZ1w=;
-        b=FJaH0lAVimYvNMM7IsnDH04Za7Zsg2fYwmEriskQgfZeQfc86naLICLrkSGLiqZZcz
-         qbH3DFFXhF8mPUzZ1ggGY67ujUTKrTY7o1d0nnAi7fpxUoGzgOv1BE2gOCDseOUmbaVO
-         qSFHsvBv+bWRCYB1U7lq0MFH0KFZBD5n7cHpj/gng3gQ5anVIEgXtBb/nIkKJirICMlX
-         EJMLC+BglGpb64oTSufaNXipoaoIyHFglRm3tBXR2kQDf+GPhB4RmAO9qd6/2eXru9aY
-         ++J6xovaCCD/l7Jz6FhYIn9mwdjA3TWNPh6hkeISEeCEhu5aeMQpIiCMUvdw3hBg3YYg
-         O59w==
-X-Forwarded-Encrypted: i=1; AJvYcCWYV/dgqRO3n6MzHkgLOvukvh/H3d8IZSrddftBMFGyGrhP3ViNCz5QmbReGwoqeUULavZzrmOC@vger.kernel.org, AJvYcCXO1AKuu9DFzApkycv84T0ituJPhgTiLz+u+n/n4/6N6WmKrerXhd6GcX34L1ef27nUEtKbjHF932lswMs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpzJ8mqdZm7A5MrXXy3usPquL1Ghr2+8zrdq1nDVtx4ixCZFbs
-	zJTjcjr7HgYd7XXA9e8y2DAAhuXZaW1eH8/DPO9U1jHR99jsG1tq
-X-Gm-Gg: ASbGncsuE8gTaVIWRk6Hvi+viT4+xPPj0quvM2KapEcMv/LtcJdEPNYCEzdze+7EHoJ
-	gEfInrd4Qh9l3KocNeNfqAsiqBjQmDYxfvgPV2HTbCHo65fz5vhT614wG3Vicqpc+Z9apBTSZtT
-	8lNo7EFPmD5NukpYLJRV7mkpm4G+hUKH8BaUd3BMoSUNjAkknIJwLwX0eQ5teqAjzKvtSSiclpI
-	7lSUKVX/IoGTr7xXq49UEPPg4eP8Vybym/y7CTXuc3YlBbnzWqmhm5bSCyPPfmo6Px0ydhzLsnW
-	9kUcMlh4lPnyWEC8jPvqi03mz5QXUGSyXXCMmMeKrud/EinDv6Woy3KVmJkqduulzEqiTRwCQdq
-	c3w==
-X-Google-Smtp-Source: AGHT+IHzFUlbTGz8j0vcRxTxtpDT/OrTAjMVEEJmCbYc8vdVu8DIV6HSlfCRNn8cTj0OVwzz4XrR4w==
-X-Received: by 2002:a05:600c:444b:b0:43c:fffc:7855 with SMTP id 5b1f17b1804b1-43ecf8f2a65mr43427595e9.15.1743804312776;
-        Fri, 04 Apr 2025 15:05:12 -0700 (PDT)
-Received: from [192.168.0.234] (ip-86-49-44-151.bb.vodafone.cz. [86.49.44.151])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec1795243sm60291295e9.32.2025.04.04.15.05.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Apr 2025 15:05:12 -0700 (PDT)
-Message-ID: <d50c0384-4607-4890-8012-e2e7032a5354@ovn.org>
-Date: Sat, 5 Apr 2025 00:05:10 +0200
+        bh=sFxcgYNvwgchrDGRA03IlKE0w+90pHKs4qD6AQ37/E8=;
+        b=Q9LWTOlHtpeN7XSs1qXUKZTg+sL6W/sbt0S5RED+DRuM+6SyeygPX3Ml/hpJAtAucv
+         V/TwfRt36NGOub+a7GxzYIv7AvqtD347p7OESkccoOOw4GS1N5yrpx8T8NEM7b3kQi3H
+         zgfi9aS/muVd0BayGGp+Z+2RPafwzL0lXyLjB3NhD9eQ/Y+WE11jChxYoneT7e6TL+3X
+         zlXwCYy7krBMxfF/u8EIWDyBO89T1shWufBuNxuDARVf32hZIO+Am0MXSW1enpWJHG3t
+         zNLxj+xfFyqq6ZbgXDgSGE2bqdaBsX/hj2QlgAVqE/erz0L0v7SSXm+8LsybddsWeSdq
+         GbfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743806835; x=1744411635;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sFxcgYNvwgchrDGRA03IlKE0w+90pHKs4qD6AQ37/E8=;
+        b=H+Co5bgJqhZk6rOIMs5xyT06Dl48j9xnEj5rbSo3XqddAbjMvPs3E5zze78Op3WKRZ
+         9Ec4rfZCpqLW45AWDTXAhf6Kv/A5BEAR2OK8b/Asw+aM6wfGZqXP5rI4HA9mtHCqfg8W
+         AWVj8vQsElTT4BfJzq49hd/80evEUj8ATk2enM0G4DQlJww8E3RvO3PxBSKeseCONWXO
+         OrP0Oa4yoWIKN8TPdhxlv8pkLVc/r2z78x1waUoiGYS6g0Vt5cbkbABS1W4I0pLb4dmf
+         mGsYW7XbZXtErXbmhGJ3Ccw4NEXYEWLU7NSXEO/NZgP4dpFYcGCAid5WI4vJ3webdoe0
+         8Zuw==
+X-Forwarded-Encrypted: i=1; AJvYcCX94etJ1JhGm+pqwYTENqO48ubsha3z+XdWmLR7ubSBPamn5grPtUPGaAAJ770tor5etlYWK18=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyi+ms52ZR+qGFR0Sad3GeSs9O00xlIAaHxDZ5eelck3g33ZZvN
+	JFlBcYHOCAa36VJ7DRjPSekDog7ePnqPF+Z/03sOc1mNhGiBtA6bO5mB57VI/Yc0Ftb+DoObriR
+	PySyateZHXSqpe3l9XTDZ1ZtABAM=
+X-Gm-Gg: ASbGncsuqW++Zek8t4S0SQVzSoJx14NvC6njiYOS5MRH1KZO/GFPiUzQqMg9/Usn+/L
+	rqm4Do2hJrxbMoNGnIRVGQ1h8T9Q691RR8lrBhJTtdyKRw2KYWHnZsyuHm+36Nn5SPY/Caa4UIN
+	BUXfHz7jodQbR08WTqrucBwWQny32u99XTXWbQHQ1B1T+JktsOfUg4B7wysQA=
+X-Google-Smtp-Source: AGHT+IG1Hhoghe0IzIKo7RuR/x5399u/eutk0IObjtYrxt3iVtdk59+I6txyCFOd2WAoaMwD8P2Oh7ZAxUknHLPphJA=
+X-Received: by 2002:a05:6000:4027:b0:39c:12ce:105c with SMTP id
+ ffacd0b85a97d-39cb35a180amr4134099f8f.6.1743806834864; Fri, 04 Apr 2025
+ 15:47:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION] Massive virtio-net throughput drop in guest VM with
- Linux 6.8+
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Markus Fohrer <markus.fohrer@webked.de>, "Michael S. Tsirkin"
- <mst@redhat.com>
-Cc: virtualization@lists.linux-foundation.org, jasowang@redhat.com,
- davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, i.maximets@ovn.org
-References: <1d388413ab9cfd765cd2c5e05b5e69cdb2ec5a10.camel@webked.de>
- <20250403090001-mutt-send-email-mst@kernel.org>
- <11c5cb52d024a5158c5b8c5e69e2e4639a055a31.camel@webked.de>
- <20250404042711-mutt-send-email-mst@kernel.org>
- <e75cb5881a97485b08cdd76efd8a7d2191ecd106.camel@webked.de>
- <3b02f37ee12232359672a6a6c2bccaa340fbb6ff.camel@webked.de>
- <67eff7303df69_1ddca829490@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <67eff7303df69_1ddca829490@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <174354264451.26800.7305550288043017625.stgit@ahduyck-xeon-server.home.arpa>
+ <174354300640.26800.16674542763242575337.stgit@ahduyck-xeon-server.home.arpa>
+ <Z-6hcQGI8tgshtMP@shell.armlinux.org.uk> <20250403172953.5da50762@fedora.home>
+ <de19e9f1-4ae3-4193-981c-e366c243352d@lunn.ch> <CAKgT0UdhTT=g+ODpzR5uoTEOkC8u+cfCp7H-8718Zphd=24buw@mail.gmail.com>
+ <Z-8XZiNHDoEawqww@shell.armlinux.org.uk> <CAKgT0UepS3X-+yiXcMhAC-F87Zcd74W2-2RDzLEBZpL3ceGNUw@mail.gmail.com>
+ <3087356b-305f-402a-9666-4776bb6206a1@lunn.ch>
+In-Reply-To: <3087356b-305f-402a-9666-4776bb6206a1@lunn.ch>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Fri, 4 Apr 2025 15:46:38 -0700
+X-Gm-Features: ATxdqUGZU7v3VOiNmoPhvFkVamEp5PwJCSdlnDr-wNav7_L1lbdiuB64H1lq69M
+Message-ID: <CAKgT0UfG6Du3RepV4v0hyta4f5jcUt3P1Bh7E2Jo2Cn4kWJtGw@mail.gmail.com>
+Subject: Re: [net PATCH 1/2] net: phy: Cleanup handling of recent changes to phy_lookup_setting
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org, 
+	hkallweit1@gmail.com, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/4/25 5:13 PM, Willem de Bruijn wrote:
-> Markus Fohrer wrote:
->> Am Freitag, dem 04.04.2025 um 10:52 +0200 schrieb Markus Fohrer:
->>> Am Freitag, dem 04.04.2025 um 04:29 -0400 schrieb Michael S. Tsirkin:
->>>> On Fri, Apr 04, 2025 at 10:16:55AM +0200, Markus Fohrer wrote:
->>>>> Am Donnerstag, dem 03.04.2025 um 09:04 -0400 schrieb Michael S.
->>>>> Tsirkin:
->>>>>> On Wed, Apr 02, 2025 at 11:12:07PM +0200, Markus Fohrer wrote:
->>>>>>> Hi,
->>>>>>>
->>>>>>> I'm observing a significant performance regression in KVM
->>>>>>> guest
->>>>>>> VMs
->>>>>>> using virtio-net with recent Linux kernels (6.8.1+ and 6.14).
->>>>>>>
->>>>>>> When running on a host system equipped with a Broadcom
->>>>>>> NetXtreme-E
->>>>>>> (bnxt_en) NIC and AMD EPYC CPUs, the network throughput in
->>>>>>> the
->>>>>>> guest drops to 100–200 KB/s. The same guest configuration
->>>>>>> performs
->>>>>>> normally (~100 MB/s) when using kernel 6.8.0 or when the VM
->>>>>>> is
->>>>>>> moved to a host with Intel NICs.
->>>>>>>
->>>>>>> Test environment:
->>>>>>> - Host: QEMU/KVM, Linux 6.8.1 and 6.14.0
->>>>>>> - Guest: Linux with virtio-net interface
->>>>>>> - NIC: Broadcom BCM57416 (bnxt_en driver, no issues at host
->>>>>>> level)
->>>>>>> - CPU: AMD EPYC
->>>>>>> - Storage: virtio-scsi
->>>>>>> - VM network: virtio-net, virtio-scsi (no CPU or IO
->>>>>>> bottlenecks)
->>>>>>> - Traffic test: iperf3, scp, wget consistently slow in guest
->>>>>>>
->>>>>>> This issue is not present:
->>>>>>> - On 6.8.0 
->>>>>>> - On hosts with Intel NICs (same VM config)
->>>>>>>
->>>>>>> I have bisected the issue to the following upstream commit:
->>>>>>>
->>>>>>>   49d14b54a527 ("virtio-net: Suppress tx timeout warning for
->>>>>>> small
->>>>>>> tx")
->>>>>>>   https://git.kernel.org/linus/49d14b54a527
->>>>>>
->>>>>> Thanks a lot for the info!
->>>>>>
->>>>>>
->>>>>> both the link and commit point at:
->>>>>>
->>>>>> commit 49d14b54a527289d09a9480f214b8c586322310a
->>>>>> Author: Eric Dumazet <edumazet@google.com>
->>>>>> Date:   Thu Sep 26 16:58:36 2024 +0000
->>>>>>
->>>>>>     net: test for not too small csum_start in
->>>>>> virtio_net_hdr_to_skb()
->>>>>>     
->>>>>>
->>>>>> is this what you mean?
->>>>>>
->>>>>> I don't know which commit is "virtio-net: Suppress tx timeout
->>>>>> warning
->>>>>> for small tx"
->>>>>>
->>>>>>
->>>>>>
->>>>>>> Reverting this commit restores normal network performance in
->>>>>>> affected guest VMs.
->>>>>>>
->>>>>>> I’m happy to provide more data or assist with testing a
->>>>>>> potential
->>>>>>> fix.
->>>>>>>
->>>>>>> Thanks,
->>>>>>> Markus Fohrer
->>>>>>
->>>>>>
->>>>>> Thanks! First I think it's worth checking what is the setup,
->>>>>> e.g.
->>>>>> which offloads are enabled.
->>>>>> Besides that, I'd start by seeing what's doing on. Assuming I'm
->>>>>> right
->>>>>> about
->>>>>> Eric's patch:
->>>>>>
->>>>>> diff --git a/include/linux/virtio_net.h
->>>>>> b/include/linux/virtio_net.h
->>>>>> index 276ca543ef44d8..02a9f4dc594d02 100644
->>>>>> --- a/include/linux/virtio_net.h
->>>>>> +++ b/include/linux/virtio_net.h
->>>>>> @@ -103,8 +103,10 @@ static inline int
->>>>>> virtio_net_hdr_to_skb(struct
->>>>>> sk_buff *skb,
->>>>>>  
->>>>>>  		if (!skb_partial_csum_set(skb, start, off))
->>>>>>  			return -EINVAL;
->>>>>> +		if (skb_transport_offset(skb) < nh_min_len)
->>>>>> +			return -EINVAL;
->>>>>>  
->>>>>> -		nh_min_len = max_t(u32, nh_min_len,
->>>>>> skb_transport_offset(skb));
->>>>>> +		nh_min_len = skb_transport_offset(skb);
->>>>>>  		p_off = nh_min_len + thlen;
->>>>>>  		if (!pskb_may_pull(skb, p_off))
->>>>>>  			return -EINVAL;
->>>>>>
->>>>>>
->>>>>> sticking a printk before return -EINVAL to show the offset and
->>>>>> nh_min_len
->>>>>> would be a good 1st step. Thanks!
->>>>>>
->>>>>
->>>>> I added the following printk inside virtio_net_hdr_to_skb():
->>>>>
->>>>>     if (skb_transport_offset(skb) < nh_min_len){
->>>>>         printk(KERN_INFO "virtio_net: 3 drop,
->>>>> transport_offset=%u,
->>>>> nh_min_len=%u\n",
->>>>>                skb_transport_offset(skb), nh_min_len);
->>>>>         return -EINVAL;
->>>>>     }
->>>>>
->>>>> Built and installed the kernel, then triggered a large download
->>>>> via:
->>>>>
->>>>>     wget http://speedtest.belwue.net/10G
->>>>>
->>>>> Relevant output from `dmesg -w`:
->>>>>
->>>>> [   57.327943] virtio_net: 3 drop, transport_offset=34,
->>>>> nh_min_len=40  
->>>>> [   57.428942] virtio_net: 3 drop, transport_offset=34,
->>>>> nh_min_len=40  
->>>>> [   57.428962] virtio_net: 3 drop, transport_offset=34,
->>>>> nh_min_len=40  
->>>>> [   57.553068] virtio_net: 3 drop, transport_offset=34,
->>>>> nh_min_len=40  
->>>>> [   57.553088] virtio_net: 3 drop, transport_offset=34,
->>>>> nh_min_len=40  
->>>>> [   57.576678] virtio_net: 3 drop, transport_offset=34,
->>>>> nh_min_len=40  
->>>>> [   57.618438] virtio_net: 3 drop, transport_offset=34,
->>>>> nh_min_len=40  
->>>>> [   57.618453] virtio_net: 3 drop, transport_offset=34,
->>>>> nh_min_len=40  
->>>>> [   57.703077] virtio_net: 3 drop, transport_offset=34,
->>>>> nh_min_len=40  
->>>>> [   57.823072] virtio_net: 3 drop, transport_offset=34,
->>>>> nh_min_len=40  
->>>>> [   57.891982] virtio_net: 3 drop, transport_offset=34,
->>>>> nh_min_len=40  
->>>>> [   57.946190] virtio_net: 3 drop, transport_offset=34,
->>>>> nh_min_len=40  
->>>>> [   58.218686] virtio_net: 3 drop, transport_offset=34,
->>>>> nh_min_len=40  
->>>>
->>>> Hmm indeed. And what about these values?
->>>>                 u32 start = __virtio16_to_cpu(little_endian, hdr-
->>>>> csum_start);
->>>>                 u32 off = __virtio16_to_cpu(little_endian, hdr-
->>>>> csum_offset);
->>>>                 u32 needed = start + max_t(u32, thlen, off +
->>>> sizeof(__sum16));
->>>> print them too?
->>>>
->>>>
->>>>
->>>>> I would now do the test with commit
->>>>> 49d14b54a527289d09a9480f214b8c586322310a and commit
->>>>> 49d14b54a527289d09a9480f214b8c586322310a~1
->>>>>
->>>>
->>>> Worth checking though it seems likely now the hypervisor is doing
->>>> weird
->>>> things. what kind of backend is it? qemu? tun? vhost-user? vhost-
->>>> net?
->>>>
->>>
->>> Backend: QEMU/KVM hypervisor (Proxmox)
->>>
->>>
->>> printk output:
->>>
->>> [   58.641906] virtio_net: drop, transport_offset=34  start=34,
->>> off=16,
->>> needed=54, nh_min_len=40
->>> [   58.678048] virtio_net: drop, transport_offset=34  start=34,
->>> off=16,
->>> needed=54, nh_min_len=40
->>> [   58.952871] virtio_net: drop, transport_offset=34  start=34,
->>> off=16,
->>> needed=54, nh_min_len=40
->>> [   58.962157] virtio_net: drop, transport_offset=34  start=34,
->>> off=16,
->>> needed=54, nh_min_len=40
->>> [   59.071645] virtio_net: drop, transport_offset=34  start=34,
->>> off=16,
->>> needed=54, nh_min_len=40
-> 
-> So likely a TCP/IPv4 packet, but with VIRTIO_NET_HDR_GSO_TCPV6.
+On Fri, Apr 4, 2025 at 9:33=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> > Part of the issue is that I think I may be mixing terms up and I have
+> > to be careful of that. If I am not mistaken you refer to the PHY as
+> > the full setup from the MII down to the other side of the PMA or maybe
+> > PMD. I also have to resist calling our PMA a PHY as it is a SerDes
+> > PHY, not an Ethernet PHY.
+>
+> For us, a PHY is something like:
+>
+> https://www.marvell.com/content/dam/marvell/en/public-collateral/phys-tra=
+nsceivers/marvell-phys-transceivers-alaska-88e151x-datasheet.pdf
+>
+> https://www.ti.com/lit/ds/symlink/dp83867ir.pdf
+>
+> It has an MII interface one side, and a Base-T interface the other,
+> where you connect magnetics and an RJ-45.
 
+I'm familiar with that stuff, although I was dealing with it closer to
+20 years ago back when I was working on e1000/e1000e/igb.
 
-Hi, Markus.
+> It gets a bit more complex with devices like the Marvell 10G PHY,
+> which can be used as an MII to MII converter typically used to convert
+> the MII output from the MAC to something you can connect to an SFP
+> cage.
+>
+> PHYs are not necessarily soldered to the board, they can also be
+> inside SFPs. Copper 1G SFPs typically use a Marvell m88e1111 PHY.
+>
+> Just to add more confusion, Linux also has generic PHYs, which came
+> later than PHYs, drivers/phy. A SERDES interface can be pretty
+> generic, and can be used for multiple protocols. Some SoCs have SERDES
+> interfaces which you can configure for USB, SATA, or
+> networking. Generic PHYs hand this protocol switch. For some, you even
+> need to configure the subprotocol SGMII, 1000BaseX, 2500BaseX.
 
-Given this and the fact that the issue depends on the bnxt_en NIC on the
-hist, I'd make an educated guess that the problem is the host NIC driver.
+Yeah, we heard about that a month ago at netdev. We are likely going
+to have to convert our PMA over to that, but it looks like there has
+already been some precedent for that.
 
-There are some known GRO issues in the nbxt_en driver fixed recently in
+> All this terminology has been driven mostly from SoCs, because x86
+> systems either hid all this in firmware, or like the intel drivers,
+> wrote there own MDIO and PHY drivers inside there MAC drivers.
 
-  commit de37faf41ac55619dd329229a9bd9698faeabc52
-  Author: Michael Chan <michael.chan@broadcom.com>
-  Date:   Wed Dec 4 13:59:17 2024 -0800
+Admittedly with my background being Intel my first preference was to
+essentially place all of that code in the MAC driver, thus why
+everything for now is ending up in fbnic_mac.c. I might have to think
+about splitting some of that up before I submit the patches.
 
-    bnxt_en: Fix GSO type for HW GRO packets on 5750X chips
+> So for a long time we talked about MII, GMII, RGMII, which are
+> relatively simple MII interfaces. Things got more complex with SGMII,
+> 1000BaseX, 2500BaseX, 10GBaseX since you then have a PCS, and the PCS
+> is an active part, performing signalling, negotiation, except when
+> vendors broke it because why run SGMII at 2.5 times the clock speed
+> and call it 2500BaseX, which is it not...
 
-It's not clear to me what's your host kernel version.  But the commit
-above was introduced in 6.14 and may be in fairly recent stable kernels.
-The oldest is v6.12.6 AFAICT.  Can you try one of these host kernels?
+That is some of my confusion about XLGMII. I'm wondering if I should
+call it that or not since the documentation refers to our PCS as using
+XLGMII but everything seems to indicate it is clocked at 1.25x to get
+it to 50G. Then in addition the PCS is referring to RXLAUI for the
+lower end of the link which I opted to just call LAUI since in our
+case we are running at the 50G speeds anyway so that is probably the
+correct term for it.
 
-Also, to confirm and workaround the problem, please, try disabling HW GRO
-on the bnxt_en NIC first:
+> We needed something to represent that negotiation, so drivers/net/pcs
+> was born, with a lot of helpers for devices which follow 802.3
+> registers.
+>
+> So for us, we have:
+>
+> MAC - PHY
+> MAC - PCS - PHY
+> MAC - PCS - SFP cage
+> MAC - PCS - PHY - SFP cage
 
-  ethtool -K <BNXT_EN NIC IFACE> rx-gro-hw off
+Is this last one correct? I would have thought it would be MAC - PCS -
+SFP cage - PHY. At least that is how I remember it being with some of
+the igb setups I worked on back in the day.
 
-If that doesn't help, then the problem is likely something different.
+> This is why i keep saying you are pushing the envelope. SoC currently
+> top out at 10GbaseX. There might be 4 lanes to implement that 10G, or
+> 1 lane, but we don't care, they all get connected to a PHY, and BaseT
+> comes out the other side.
 
-Best regards, Ilya Maximets.
+I know we are pushing the envelope. That was one of the complaints we
+had when you insisted that we switch this over to phylink. If anything
+50G sounds like it will give the 2500BaseX a run for its money in
+terms of being even more confusing and complicated.
 
-> 
-> This is observed in the guest on the ingress path, right? In
-> virtnet_receive_done.
-> 
-> Is this using vhost-net in the host for pass-through? IOW, is
-> the host writing the virtio_net_hdr too?
-> 
->>>
->>>
->>>
->>>
->>
->> I just noticed that commit 17bd3bd82f9f79f3feba15476c2b2c95a9b11ff8
->> (tcp_offload.c: gso fix) also touches checksum handling and may
->> affect how skb state is passed to virtio_net_hdr_to_skb().
->>
->> Is it possible that the regression only appears due to the combination
->> of 17bd3bd8 and 49d14b54a5?
-> 
-> That patch only affects packets with SKB_GSO_FRAGLIST. Which is only
-> set on forwarding if NETIF_F_FRAGLIST is set. I don 
-
+If anything we most closely resemble the setup with just the SFP cage
+and no PHY. So I suspect we will probably need that whole set in place
+in order for things to function as expected. That was one of the
+reasons why I was thinking of using fixed-link as a crutch to get the
+driver up initially while we enable the 3 new interface modes. The
+only spot where they seem like they will matter is just to the PCS
+since the link_up function is essentially just passed the speed, and
+as far as the MAC config function it is mostly just setting up pause
+frames, MTUs, and fairly mundane items unrelated to the lower levels
+of the link.
 
