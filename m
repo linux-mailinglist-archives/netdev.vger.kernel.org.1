@@ -1,80 +1,48 @@
-Return-Path: <netdev+bounces-179381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB2A6A7C3A5
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 21:07:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19EC0A7C434
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 21:52:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE0FF3BE1A9
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 19:05:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BFC2168679
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 19:52:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266A521CC55;
-	Fri,  4 Apr 2025 19:03:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12B7225EF80;
+	Fri,  4 Apr 2025 19:51:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="zVw6GkWW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EDS71LQn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72EE617A318
-	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 19:03:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEFA325E815;
+	Fri,  4 Apr 2025 19:51:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743793418; cv=none; b=Ug8BkIKzZ4zSibZfQeLuRHhvVEVGiHJzTUonhbznekjUZ18ZeRZiFimxMgw/0zySXCvdbvxUMiujB3syDcN3bFNd1jN5IFhFIbdU/lHwlh3I9dXWru2IUetQIV7LWc0B4okW+qWQCJr3VoFH5kfaY6GM5RC0raODd3xX89MSc38=
+	t=1743796275; cv=none; b=NIWukNOFnvgtMd+CJ46SEL+3GsYNkhQO2GLW/FXg3f7U+PITG71roHKZ8mYgZ3alAH55YLF2owQXdAYCwiFHToVWFxxdfi41KUp8SKHGCsmlzQQ2VpksDJgB6IyPHQ26zMF7qk7Nc7SyqmT8cQLfTBQd8c7asVUCNN2hzN3zSVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743793418; c=relaxed/simple;
-	bh=kDpA9bw7tIP9rQ70HT/F3y51e+3Sme/oGjyukvEZO1M=;
+	s=arc-20240116; t=1743796275; c=relaxed/simple;
+	bh=kOr+EGTekftgoaz4VXSPNyinCBvwKujNyUxGSfOVZv8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sS1QxSmi7sQeK6Fz28MPzGlNsXRMfeyFm5NGAmeWYYVUTdyOvl8TwnCpLEjGByOGgvILnKhbDT4Ndb10Yt3imL1Val58HWfh+/lu6Kggedx8sQ6WRfgT7bTXjr/lCKrANcgWWg1cu7vkeX3BsNacDmSWZbRCiOxif4yTjsWTPJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=zVw6GkWW; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-22622ddcc35so31905935ad.2
-        for <netdev@vger.kernel.org>; Fri, 04 Apr 2025 12:03:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1743793415; x=1744398215; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dH2hxZRu+9FwNeyFyLJe8fSFMPlqTXV1JQLEbcO7L6Y=;
-        b=zVw6GkWWMiRJmbTfmYj+515J8naYr/rHmoYnmGyBnH3slM7W3ivcIhxNrreCD11Q4h
-         YpRRzSp4oVbctbYVRBxe05cdNSxD2mCivC9kTwRyoZdRumC81pVNoj+2qUYPusIdi5Wo
-         k1vGS6N/Ot77AaGRUM6iIF50GsQoWanClS1kYj7mIt/v4rlivYVqCJb9LenA/DSQu97x
-         0uQMSkkhB51o2rF0XZy48psPxJAY8xFOh04ouko03QlW19kmZw8MqZslxNj8GUPfQtIr
-         UIkng9RehTRXrMu2yVQwrK3fB/G/bKdzjSx6X4LybuDZ+riua7NQzO6Q7uRJbfbB+fCU
-         j7MQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743793415; x=1744398215;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dH2hxZRu+9FwNeyFyLJe8fSFMPlqTXV1JQLEbcO7L6Y=;
-        b=GQyDjZUCmTin2yQNo2M+UQPyaeCyV2DnJzKBhCjP6YsLCuRcHOUkT9qBGCPOoHT/Qg
-         CKlsjmFQFyXTzuCjxT0/dy1BDKvVF46oDPgdUNziwYHmugOxxOCcZ/fpL6qWP+u+/r/f
-         8rFEywpogdbitpzr+QH4sMQ/MmhJCJW/D+wNIfUBVz5U7ZiqTpWnKlcnj0vLop+7psVL
-         yLV87kb4pOmIjOvgQUs3zKMKW1bMtGa0UG8C2vSQ5EyVIF5qEskiTFhHOeLpo/136p8t
-         je74GWx7Fp9+MrXANTcDBIlGqj2rNa5t0JhN0OLOFJt6JtGxZ2gdF4xhnJ6rD8JZeMwK
-         MBtw==
-X-Forwarded-Encrypted: i=1; AJvYcCX5MIttVXwt80cIrpOKnzs5IICCitCIlVyDwlhGqY95b8Yq3nyUmPui25gg34YW6vKcm8lQuCM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlNDnAD9qOHNcBOLXFKpTtlq5drNCD0bBrgth8XV79Cbii9tlV
-	H5YZ0U0I8dCb2V/Bg9gd6CGngfKofFejcNLEn2ZgriSKksP9DxTccrNL99le+g==
-X-Gm-Gg: ASbGncsaKZddSHShsTdOtS0BMtBbVdeClWCwFrEKjb0o4aKK039xwRY2b1E9EKNyMcq
-	kD2w+qDXN/jT/qIhT9ulZ14Y7JctQYYu5EK67Qj7Il+PpcL/YiV4diZOQE4AYSITP1vBvKqV+Y5
-	7mrHubELFtJU/dqYui9+Q3V2EJj1ZYyZnKSgwahZSXgIwUpunJfVYYoBLxHdETgmegfF86soKcD
-	xqMaiADjfJjr8JbRFZJa2ZZLHktxc+Z4/uZuyiXZeTkAmwE/dggpflBDTgM/ND4QRjdVZr+VOK2
-	SO43xzFakpQuPAxjCg31LtWuT5s+GAG9iU4aUgvLioR9Ne6N4bMMcbKt1CxITD49O0aSIhTY2KI
-	wDRB4ybWsurs5g6Q=
-X-Google-Smtp-Source: AGHT+IGAs4f9a+7nrDVm3VKvorD+MW5EnW+gSbU4tnowK4SNySgFx0Q3Dy0vJIRaY8zSc2Azgf+GHg==
-X-Received: by 2002:a17:903:1aac:b0:224:10a2:cad5 with SMTP id d9443c01a7336-22a954f9e54mr10170775ad.10.1743793415610;
-        Fri, 04 Apr 2025 12:03:35 -0700 (PDT)
-Received: from ?IPV6:2804:7f1:e2c3:8485:ad62:3938:da65:566f? ([2804:7f1:e2c3:8485:ad62:3938:da65:566f])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-229785ad95esm36167935ad.10.2025.04.04.12.03.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Apr 2025 12:03:35 -0700 (PDT)
-Message-ID: <00bd48eb-eb2d-4194-a458-6203aeba6a81@mojatatu.com>
-Date: Fri, 4 Apr 2025 16:03:26 -0300
+	 In-Reply-To:Content-Type; b=CjIIGzc6CD7WMmsnIwyW/zH+Y8F0aPuo64rAcjszzPxs0OvflC9jnlglZGy8dWDMgfQEhvLCzMd8RwlKz/TEXjMwd415nBGxahgJelBdJmvSTcnNHwxK68iq4x351MfhRA+IizgiXXJxdqJW7BjsBKExZcb5EzPMbTRF1o0+5fo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EDS71LQn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C143CC4CEDD;
+	Fri,  4 Apr 2025 19:51:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743796274;
+	bh=kOr+EGTekftgoaz4VXSPNyinCBvwKujNyUxGSfOVZv8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=EDS71LQnXwn8d7lz9hTGSvSxS/bcsZAAzYuQD20g+MhAvBixPHGHs8+DuvsCTUL7K
+	 CHaWepYBlU/8KNM1D326PA4c12LJRwq3rfwLYmfdLs+XJB8RpyKzM8mD1/mBXW3qFg
+	 T3EpkFlPegJwTB1RNUy50oGdeLfgu73w8v7Bp3c4kw9EvzlInFSX+5RKnFQvI0Z4rt
+	 j9LAcwjLOD8rXmVHy4rC8XtTtDuUddZnSrk5R+x6jgrLOgAOC21HZZHeR3YzBJsu1o
+	 IOxPSuyRMeTuHcakhxVlm06obAK5yXNX35ENielEfoUOi8CM34hnnb9DYf0mMESc5N
+	 1xNZk6Ypfixcw==
+Message-ID: <be490131-5f47-41c8-9262-5dc19bc65fb6@kernel.org>
+Date: Fri, 4 Apr 2025 21:51:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,48 +50,196 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [Patch net v2 11/11] selftests/tc-testing: Add a test case for
- FQ_CODEL with ETS parent
-To: Jakub Kicinski <kuba@kernel.org>, Pedro Tammela <pctammela@mojatatu.com>
-Cc: Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org,
- jhs@mojatatu.com, jiri@resnulli.us
-References: <20250403211033.166059-1-xiyou.wangcong@gmail.com>
- <20250403211636.166257-1-xiyou.wangcong@gmail.com>
- <20250403211636.166257-6-xiyou.wangcong@gmail.com>
- <8bd1d8be-b7ee-4c32-83a9-9560f8985628@mojatatu.com>
- <20250404114123.727bc324@kernel.org>
+Subject: Re: [RFC PATCH net-next] veth: apply qdisc backpressure on full
+ ptr_ring to reduce TX drops
+To: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
+Cc: bpf@vger.kernel.org, tom@herbertland.com,
+ Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+ kernel-team@cloudflare.com
+References: <174377814192.3376479.16481605648460889310.stgit@firesoul>
 Content-Language: en-US
-From: Victor Nogueira <victor@mojatatu.com>
-In-Reply-To: <20250404114123.727bc324@kernel.org>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <174377814192.3376479.16481605648460889310.stgit@firesoul>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 04/04/2025 15:41, Jakub Kicinski wrote:
-> On Fri, 4 Apr 2025 13:59:39 -0300 Victor Nogueira wrote:
->> On 03/04/2025 18:16, Cong Wang wrote:
->>> Add a test case for FQ_CODEL with ETS parent to verify packet drop
->>> behavior when the queue becomes empty. This helps ensure proper
->>> notification mechanisms between qdiscs.
->>>
->>> Note this is best-effort, it is hard to play with those parameters
->>> perfectly to always trigger ->qlen_notify().
->>>
->>> Cc: Pedro Tammela <pctammela@mojatatu.com>
->>> Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
->>
->> Reviewed-by: Victor Nogueira <victor@mojatatu.com>
-> 
-> Hi!
-> 
-> Any ideas what is causing the IFE failure? Looks like it started
-> happening when this series landed in the testing tree but I don't
-> see how it could be related ?
 
-Yes, I saw that, but since it succeeded on retry and, as you said,
-it doesn't seem to be related to this series, it looks more like
-those IFE tests are a bit unstable. I talked to Pedro and we are
-taking a look at it.
 
-cheers,
-Victor
+On 04/04/2025 16.49, Jesper Dangaard Brouer wrote:
+> In production, we're seeing TX drops on veth devices when the ptr_ring
+> fills up. This can occur when NAPI mode is enabled, though it's
+> relatively rare. However, with threaded NAPI - which we use in
+> production - the drops become significantly more frequent.
+> 
+> The underlying issue is that with threaded NAPI, the consumer often runs
+> on a different CPU than the producer. This increases the likelihood of
+> the ring filling up before the consumer gets scheduled, especially under
+> load, leading to drops in veth_xmit() (ndo_start_xmit()).
+> 
+> This patch introduces backpressure by returning NETDEV_TX_BUSY when the
+> ring is full, signaling the qdisc layer to requeue the packet. The txq
+> (netdev queue) is stopped in this condition and restarted once
+> veth_poll() drains entries from the ring, ensuring coordination between
+> NAPI and qdisc.
+> 
+> Backpressure is only enabled when a qdisc is attached. Without a qdisc,
+> the driver retains its original behavior - dropping packets immediately
+> when the ring is full. This avoids unexpected behavior changes in setups
+> without a configured qdisc.
+> 
+> With a qdisc in place (e.g. fq, sfq) this allows Active Queue Management
+> (AQM) to fairly schedule packets across flows and reduce collateral
+> damage from elephant flows.
+> 
+> A known limitation of this approach is that the full ring sits in front
+> of the qdisc layer, effectively forming a FIFO buffer that introduces
+> base latency. While AQM still improves fairness and mitigates flow
+> dominance, the latency impact is measurable.
+> 
+> In hardware drivers, this issue is typically addressed using BQL (Byte
+> Queue Limits), which tracks in-flight bytes needed based on physical link
+> rate. However, for virtual drivers like veth, there is no fixed bandwidth
+> constraint - the bottleneck is CPU availability and the scheduler's ability
+> to run the NAPI thread. It is unclear how effective BQL would be in this
+> context.
+> 
+> This patch serves as a first step toward addressing TX drops. Future work
+> may explore adapting a BQL-like mechanism to better suit virtual devices
+> like veth.
+> 
+> Reported-by: Yan Zhai <yan@cloudflare.com>
+> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+> ---
+>   drivers/net/veth.c |   58 +++++++++++++++++++++++++++++++++++++++++++++-------
+>   1 file changed, 50 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+> index 7bb53961c0ea..fff2b615781e 100644
+> --- a/drivers/net/veth.c
+> +++ b/drivers/net/veth.c
+> @@ -308,11 +308,10 @@ static void __veth_xdp_flush(struct veth_rq *rq)
+>   static int veth_xdp_rx(struct veth_rq *rq, struct sk_buff *skb)
+>   {
+>   	if (unlikely(ptr_ring_produce(&rq->xdp_ring, skb))) {
+> -		dev_kfree_skb_any(skb);
+> -		return NET_RX_DROP;
+> +		return NETDEV_TX_BUSY; /* signal qdisc layer */
+>   	}
+>   
+> -	return NET_RX_SUCCESS;
+> +	return NET_RX_SUCCESS; /* same as NETDEV_TX_OK */
+>   }
+>   
+>   static int veth_forward_skb(struct net_device *dev, struct sk_buff *skb,
+> @@ -342,15 +341,26 @@ static bool veth_skb_is_eligible_for_gro(const struct net_device *dev,
+>   		 rcv->features & (NETIF_F_GRO_FRAGLIST | NETIF_F_GRO_UDP_FWD));
+>   }
+>   
+> +/* Does specific txq have a real qdisc attached? - see noqueue_init() */
+> +static inline bool txq_has_qdisc(struct netdev_queue *txq)
+> +{
+> +	struct Qdisc *q;
+> +
+> +	q = rcu_dereference(txq->qdisc);
+> +	if (q->enqueue)
+> +		return true;
+> +	else
+> +		return false;
+> +}
+> +
+>   static netdev_tx_t veth_xmit(struct sk_buff *skb, struct net_device *dev)
+>   {
+>   	struct veth_priv *rcv_priv, *priv = netdev_priv(dev);
+>   	struct veth_rq *rq = NULL;
+> -	int ret = NETDEV_TX_OK;
+>   	struct net_device *rcv;
+>   	int length = skb->len;
+>   	bool use_napi = false;
+> -	int rxq;
+> +	int ret, rxq;
+>   
+>   	rcu_read_lock();
+>   	rcv = rcu_dereference(priv->peer);
+> @@ -373,17 +383,39 @@ static netdev_tx_t veth_xmit(struct sk_buff *skb, struct net_device *dev)
+>   	}
+>   
+>   	skb_tx_timestamp(skb);
+> -	if (likely(veth_forward_skb(rcv, skb, rq, use_napi) == NET_RX_SUCCESS)) {
+> +
+> +	ret = veth_forward_skb(rcv, skb, rq, use_napi);
+> +	switch(ret) {
+> +	case NET_RX_SUCCESS: /* same as NETDEV_TX_OK */
+>   		if (!use_napi)
+>   			dev_sw_netstats_tx_add(dev, 1, length);
+>   		else
+>   			__veth_xdp_flush(rq);
+> -	} else {
+> +		break;
+> +	case NETDEV_TX_BUSY:
+> +		/* If a qdisc is attached to our virtual device, returning
+> +		 * NETDEV_TX_BUSY is allowed.
+> +		 */
+> +		struct netdev_queue *txq = netdev_get_tx_queue(dev, rxq);
+> +
+> +		if (!txq_has_qdisc(txq)) {
+> +			dev_kfree_skb_any(skb);
+> +			goto drop;
+> +		}
+> +		netif_tx_stop_queue(txq); /* Unconditional netif_txq_try_stop */
+> +		if (use_napi)
+> +			__veth_xdp_flush(rq);
+> +
+
+Found a bug here... I need to skb_push back Ethernet header, because
+__dev_forward_skb() via eth_type_trans() pulled it off.
+
+Code fix:
+		__skb_push(skb, ETH_HLEN)
+
+
+> +		break;
+> +	case NET_RX_DROP: /* same as NET_XMIT_DROP */
+>   drop:
+>   		atomic64_inc(&priv->dropped);
+>   		ret = NET_XMIT_DROP;
+> +		break;
+> +	default:
+> +		net_crit_ratelimited("veth_xmit(%s): Invalid return code(%d)",
+> +				     dev->name, ret);
+>   	}
+> -
+>   	rcu_read_unlock();
+>   
+>   	return ret;
+> @@ -874,9 +906,16 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
+>   			struct veth_xdp_tx_bq *bq,
+>   			struct veth_stats *stats)
+>   {
+> +	struct veth_priv *priv = netdev_priv(rq->dev);
+> +	int queue_idx = rq->xdp_rxq.queue_index;
+> +	struct netdev_queue *peer_txq;
+> +	struct net_device *peer_dev;
+>   	int i, done = 0, n_xdpf = 0;
+>   	void *xdpf[VETH_XDP_BATCH];
+>   
+> +	peer_dev = priv->peer;
+> +	peer_txq = netdev_get_tx_queue(peer_dev, queue_idx);
+> +
+>   	for (i = 0; i < budget; i++) {
+>   		void *ptr = __ptr_ring_consume(&rq->xdp_ring);
+>   
+> @@ -925,6 +964,9 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
+>   	rq->stats.vs.xdp_packets += done;
+>   	u64_stats_update_end(&rq->stats.syncp);
+>   
+> +	if (unlikely(netif_tx_queue_stopped(peer_txq)))
+> +		netif_tx_wake_queue(peer_txq);
+> +
+>   	return done;
+>   }
+>   
+> 
+> 
 
