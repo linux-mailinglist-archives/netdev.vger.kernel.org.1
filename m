@@ -1,79 +1,130 @@
-Return-Path: <netdev+bounces-179369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBC37A7C208
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 19:02:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3C23A7C24C
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 19:20:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43B8B7A70F5
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 17:01:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93EAE17B8C5
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 17:20:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3830421CFEA;
-	Fri,  4 Apr 2025 17:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RQnd8n6L"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A978721480B;
+	Fri,  4 Apr 2025 17:20:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E04121CC71;
-	Fri,  4 Apr 2025 17:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 440301F3D45;
+	Fri,  4 Apr 2025 17:20:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743786090; cv=none; b=SPC1lLd8pjJTMWDiEmgYkFH/gKC7aCbA1yB803Tx+J1FD1Igp2PYY3WmwXYZs77k52sn/7Uaxl6SRiIu96hseqLa/sKfnBo0RTWrTMnw5IgMs66IGNd+jCKAFdISyx6UqfE4CuQOeIP2f2X2xhc+v0rrgBk2RhgwZJ3bgiV4W/A=
+	t=1743787213; cv=none; b=cz59c2jTgDAdsVfWLERAtZbBtDFUrBmAx1GEiHysuGb2tSGIrhLmLxow2FHx44xWtbZYGc3H5RHfS72MVQJZU88xZjNvRRnYQJNeAMlAGp6fUhBpwiweiBBzUg6FyKZuLilaienvgGGVEhrG6AyTNp2as4GJadTALEr9QvbO/Zo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743786090; c=relaxed/simple;
-	bh=yDEgfToI0azkjzwGKpdSnQNZWmiu/orvhvGPgjxnYpw=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=OB8aX7vrtwqIXOWry8O4hJYMe4AXd9dns7YuZBD0pXbxyXlKjZCSfMZtChaUVGdL95/QefXrfO+glRDSv5w5qX6xpcWQZpsJoox6+JG+2oYm4zQYwh72GuToiw1waN5Vi4sp3scAet9CF+2D1DNZ1M51KdhP4lBuCREu+fv17f4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RQnd8n6L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE57FC4CEDD;
-	Fri,  4 Apr 2025 17:01:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743786089;
-	bh=yDEgfToI0azkjzwGKpdSnQNZWmiu/orvhvGPgjxnYpw=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=RQnd8n6LAaL0kn1uoXFJvM7k7CR5uu+O0P5l4lL70V7tjoxXuTJSBCSJL5V7ynbtH
-	 AudF5jSUCyVabF/yk3STXBZIqoyF6tX71vzywX/pg5CDJJ8AgYDJCtX7NktvJDOlLr
-	 DWhe2ycXWhlc5qdFPBpDYYhrRj8A3E/9YtYB4G9a4j+afDgmkyAoWvyOyHrsQZuTnO
-	 5ix1MbMHm66yp5pi3H3GUJKmB2NHhMYk8v1lgQqYsgKbB0wfsuImKL3+/3mrCk3kKy
-	 gIJCYJY9eRdSM64EJP1NJ3XfD4FbdSpdWmpc1gLw0PUpOGjdOmBH7aZyJpZz7NGkSB
-	 Fb9WRcXkjICrQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DC43822D28;
-	Fri,  4 Apr 2025 17:02:08 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v6.15-rc1
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20250404153457.2339036-1-kuba@kernel.org>
-References: <20250404153457.2339036-1-kuba@kernel.org>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20250404153457.2339036-1-kuba@kernel.org>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.15-rc1
-X-PR-Tracked-Commit-Id: 94f68c0f99a548d33a102672690100bf76a7c460
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 61f96e684edd28ca40555ec49ea1555df31ba619
-Message-Id: <174378612666.3331400.6497225289380252542.pr-tracker-bot@kernel.org>
-Date: Fri, 04 Apr 2025 17:02:06 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
+	s=arc-20240116; t=1743787213; c=relaxed/simple;
+	bh=HA1xCpYpiuBjQTt/pfzcIBhSFbPJbNH4yu1fa14YH+E=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LrgcZRzSoarwsFNtT8Z3NQaWlAOyQ+vE0yw4tv4rkAizVdBRSYoX0nxGjuwUF/blSUTkiGSQsp0ABqpVzkRth1gEvY4w75O7WKxssYQdwiFFD2BqA3JXNKOIXAfaomow6xUzF2QZtLzBcZBG9N0P1FS9NwUZP5rq4KJbBh+Zhpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZTld74xBKz6K9J8;
+	Sat,  5 Apr 2025 01:16:27 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id BEE601402C7;
+	Sat,  5 Apr 2025 01:20:08 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 4 Apr
+ 2025 19:20:07 +0200
+Date: Fri, 4 Apr 2025 18:20:06 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: "=?ISO-8859-1?Q?N=EDcolas?= F. R. A. Prado" <nfraprado@collabora.com>
+CC: Andrew Morton <akpm@linux-foundation.org>, Jonathan Corbet
+	<corbet@lwn.net>, Vinod Koul <vkoul@kernel.org>, Eric Biggers
+	<ebiggers@kernel.org>, "Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim
+	<jaegeuk@kernel.org>, Jonathan Cameron <jic23@kernel.org>, "Lars-Peter
+ Clausen" <lars@metafoo.de>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, "Maxime
+ Chevallier" <maxime.chevallier@bootlin.com>, James Bottomley
+	<James.Bottomley@HansenPartnership.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+	Mimi Zohar <zohar@linux.ibm.com>, Jaroslav Kysela <perex@perex.cz>, Takashi
+ Iwai <tiwai@suse.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Richard
+ Weinberger <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>, <kernel@collabora.com>,
+	<linux-mm@kvack.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <dmaengine@vger.kernel.org>,
+	<linux-fscrypt@vger.kernel.org>, <linux-iio@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <workflows@vger.kernel.org>,
+	<linux-integrity@vger.kernel.org>, <keyrings@vger.kernel.org>,
+	<linux-sound@vger.kernel.org>, <linux-media@vger.kernel.org>,
+	<linux-um@lists.infradead.org>
+Subject: Re: [PATCH] docs: Remove literal markup from Documentation/ paths
+Message-ID: <20250404182006.000038cc@huawei.com>
+In-Reply-To: <20250404-doc-paths-unliteral-v1-1-74718785444e@collabora.com>
+References: <20250404-doc-paths-unliteral-v1-1-74718785444e@collabora.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-The pull request you sent on Fri,  4 Apr 2025 08:34:57 -0700:
+On Fri, 04 Apr 2025 11:37:28 -0400
+N=EDcolas F. R. A. Prado <nfraprado@collabora.com> wrote:
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.15-rc1
+> Given that the automarkup Sphinx plugin cross-references
+> "Documentation/*.rst" strings in the text to the corresponding
+> documents, surrounding those strings with the literal markup (``) not
+> only adds unnecessary markup in the source files, but actually prevents
+> the automatic cross-referencing to happen (as it doesn't happen in
+> literal blocks).
+>=20
+> Remove all the occurrences of the literal markup in
+> "Documentation/*.rst" paths, except when the actual source file is being
+> referred. Also change the surrounding text when needed so it reads well
+> both in the source and the web page (eg. 'see file Doc...' -> 'see
+> Doc...').
+>=20
+> Signed-off-by: N=EDcolas F. R. A. Prado <nfraprado@collabora.com>
+> ---
+>  Documentation/admin-guide/mm/numa_memory_policy.rst       | 2 +-
+>  Documentation/admin-guide/serial-console.rst              | 2 +-
+>  Documentation/driver-api/dmaengine/client.rst             | 2 +-
+>  Documentation/driver-api/nvdimm/security.rst              | 2 +-
+>  Documentation/filesystems/fscrypt.rst                     | 4 ++--
+>  Documentation/iio/adis16475.rst                           | 4 ++--
+>  Documentation/iio/adis16480.rst                           | 4 ++--
+>  Documentation/iio/adis16550.rst                           | 4 ++--
+>  Documentation/iio/adxl380.rst                             | 4 ++--
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/61f96e684edd28ca40555ec49ea1555df31ba619
+Split patch up by subsystem would be a good thing here as we may
+get other changes to these docs during the cycle and resulting
+merge conflicts if this all goes in as one patch.
 
-Thank you!
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+>  Documentation/kernel-hacking/hacking.rst                  | 6 +++---
+>  Documentation/kernel-hacking/locking.rst                  | 2 +-
+>  Documentation/networking/dsa/b53.rst                      | 2 +-
+>  Documentation/networking/dsa/bcm_sf2.rst                  | 2 +-
+>  Documentation/networking/dsa/dsa.rst                      | 2 +-
+>  Documentation/networking/dsa/lan9303.rst                  | 2 +-
+>  Documentation/networking/phy-link-topology.rst            | 2 +-
+>  Documentation/process/adding-syscalls.rst                 | 2 +-
+>  Documentation/process/submit-checklist.rst                | 7 ++++---
+>  Documentation/security/keys/trusted-encrypted.rst         | 4 ++--
+>  Documentation/sound/kernel-api/writing-an-alsa-driver.rst | 2 +-
+>  Documentation/userspace-api/media/v4l/dev-sliced-vbi.rst  | 2 +-
+>  Documentation/userspace-api/media/v4l/diff-v4l.rst        | 2 +-
+>  Documentation/userspace-api/media/v4l/ext-ctrls-codec.rst | 4 ++--
+>  Documentation/virt/uml/user_mode_linux_howto_v2.rst       | 2 +-
+>  24 files changed, 36 insertions(+), 35 deletions(-)
 
