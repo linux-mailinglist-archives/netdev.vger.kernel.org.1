@@ -1,99 +1,241 @@
-Return-Path: <netdev+bounces-179225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40563A7B430
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 02:34:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2494BA7B45B
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 02:38:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB8A43AED4A
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 00:32:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CECE017C0F1
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 00:37:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B091219D886;
-	Fri,  4 Apr 2025 00:19:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18327192B81;
+	Fri,  4 Apr 2025 00:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oeqTGg6k"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="o0pYuFHS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8662917A317;
-	Fri,  4 Apr 2025 00:19:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C31B19048F
+	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 00:27:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743725996; cv=none; b=DRGdIJE+mvZ9brfK4GU8GlAkau8TSmD+PIu36OPayqdS6Q0QP1FVrlkPs1dy+fFx/eHAyr1t7mPWWhSGap/w/ci3GQ4kt6KtvzLsOatCqzQMQshkNR4mbiIY5A5IAIN357kaIBZNXiBoTmXLXuPzR1EO/r7K2lw4GTzXxXZHa+g=
+	t=1743726480; cv=none; b=D1SB/jD6DZJqduTcb0ZNLi4DR7jL7uqMw7J9zXiDkYmDAJTu+KM5qPu6V1eSjKZFjskEci5yRIJTJWceDJiZsHpqvkPBhGFyqg9PNNx9gSBn5KKyLxxwUewoWLbKrvLNRp6isFYqbKJgmx3cuJBnZVFbrfTMRBn5g5uoXOJ6yVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743725996; c=relaxed/simple;
-	bh=+/Ic4+vp4AFTX37HfBOPK7D8KX5wnRymFcm+lBoVFU4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BcvORpws+LgZhH1uDMVm+7RsEHrox2Qjw0VZ83g6uJitkTl1CVMea00FlcM7wZV3NpVZ0rs6HlG+Z3kZYt7qqgRGhYIzrugoPH4LDoCG7EBUyKSmBYfAzerhpP8fLEbD+Bba0ypY3NdbnFT4SOEHkRVWz+D+rqEIpTm8Os18zNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oeqTGg6k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06B58C4CEE3;
-	Fri,  4 Apr 2025 00:19:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743725995;
-	bh=+/Ic4+vp4AFTX37HfBOPK7D8KX5wnRymFcm+lBoVFU4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=oeqTGg6kqhActm+2jbD4g5QFov+eWR/e/SHs6QQcVV7uRjxEbIxeXC6pa6nrMUbW6
-	 f1p7WAlfviw1vjuQ9GTCiZTwlUZ1dp6m7fTvLZ9+7GQfEK9vEw9yUUNcrgakgU4WWE
-	 SyjCFnzPlIPYkI3IWirOhg7gYXftR9azZgSWo7TgPIugWHEFXYcUZ/q88Y1BkEoDQk
-	 TAw0gKqqpAMeCuv5FGNKhACzDoUs9gxTaYbP1VUsMKPAdRAaN72XTrGm7CCtCa49Cd
-	 GA1wWO7q2KN3eNAmD8V3pvugLNFWyOTK1umkh2XsLKVnvKGNtLrxwtCaESwRIZtE6I
-	 23UaBTBkMN3lQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34FA3380664C;
-	Fri,  4 Apr 2025 00:20:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1743726480; c=relaxed/simple;
+	bh=sZCuFd4nf1NVtLGFqso9PSbFQ53jt5gd2JBpo8x0AYk=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=optkZ9rfSvpuCrI0UrhXMu4REkOzPWySV35ttJPlu+LZrWRJL3JLxaAh71bXpKRSrhsbU4JZRKLy6rIcPazj+I2JgRkoTgLSt1P0cjio9vy+B6pmDt/2HS0ZoKRiygFZ+5tsEt7eLlxhC5LhWo6+Wu8D/6BN4zykwhG4y8e7UcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=o0pYuFHS; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/3] netfilter: nft_set_hash: GC reaps elements with
- conncount for dynamic sets only
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174372603200.2734712.7906268134976015940.git-patchwork-notify@kernel.org>
-Date: Fri, 04 Apr 2025 00:20:32 +0000
-References: <20250403115752.19608-2-pablo@netfilter.org>
-In-Reply-To: <20250403115752.19608-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de, horms@kernel.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1743726466;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xBkmuETqkFanCorV9XII3T38OpLgK/5FcDlEGxS6XPw=;
+	b=o0pYuFHS4a16tKKp9qPixsi8OkmZfIh/VoQNM467L8R0c/GR+tYyqm5x2K/ZHU2ZArSZ0M
+	EpIEZ+nb7humYj32cSPTWpEq8Uat13ol/fFWrg0y8UVvTfBPWLDD713oUl/Hf3NPpULtDL
+	aYvRGeZ7p9Pt3qbOd8TXVpYiVsAUulQ=
+Date: Fri, 04 Apr 2025 00:27:42 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
+Message-ID: <ce4a0aacecb2db7d232e94a324150dc5936c803a@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH bpf v2 1/2] bpf, xdp: clean head/meta when expanding it
+To: "Alexei Starovoitov" <alexei.starovoitov@gmail.com>
+Cc: "bpf" <bpf@vger.kernel.org>, "Jiayuan Chen" <mrpre@163.com>,
+ syzbot+0e6ddb1ef80986bdfe64@syzkaller.appspotmail.com, "Alexei
+ Starovoitov" <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>,
+ "Andrii Nakryiko" <andrii@kernel.org>, "Martin KaFai Lau"
+ <martin.lau@linux.dev>, "Eduard Zingerman" <eddyz87@gmail.com>, "Song
+ Liu" <song@kernel.org>, "Yonghong Song" <yonghong.song@linux.dev>, "John
+ Fastabend" <john.fastabend@gmail.com>, "KP Singh" <kpsingh@kernel.org>,
+ "Stanislav Fomichev" <sdf@fomichev.me>, "Hao Luo" <haoluo@google.com>,
+ "Jiri Olsa" <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
+ "Jesper Dangaard Brouer" <hawk@kernel.org>, "Mykola Lysenko"
+ <mykolal@fb.com>, "Shuah Khan" <shuah@kernel.org>, "Willem de Bruijn"
+ <willemb@google.com>, "Jason Xing" <kerneljasonxing@gmail.com>, "Anton
+ Protopopov" <aspsk@isovalent.com>, "Abhishek Chauhan"
+ <quic_abchauha@quicinc.com>, "Jordan Rome" <linux@jordanrome.com>,
+ "Martin Kelly" <martin.kelly@crowdstrike.com>, "David Lechner"
+ <dlechner@baylibre.com>, "LKML" <linux-kernel@vger.kernel.org>, "Network
+ Development" <netdev@vger.kernel.org>, "open list:KERNEL SELFTEST
+ FRAMEWORK" <linux-kselftest@vger.kernel.org>
+In-Reply-To: <CAADnVQJ6NPGuY=c8kbpX_nLYq4oOxOBAxbDPFLuw+yr4WrQQOQ@mail.gmail.com>
+References: <20250331032354.75808-1-jiayuan.chen@linux.dev>
+ <20250331032354.75808-2-jiayuan.chen@linux.dev>
+ <CAADnVQJ6NPGuY=c8kbpX_nLYq4oOxOBAxbDPFLuw+yr4WrQQOQ@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
-
-On Thu,  3 Apr 2025 13:57:50 +0200 you wrote:
-> conncount has its own GC handler which determines when to reap stale
-> elements, this is convenient for dynamic sets. However, this also reaps
-> non-dynamic sets with static configurations coming from control plane.
-> Always run connlimit gc handler but honor feedback to reap element if
-> this set is dynamic.
-> 
-> Fixes: 290180e2448c ("netfilter: nf_tables: add connlimit support")
-> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,1/3] netfilter: nft_set_hash: GC reaps elements with conncount for dynamic sets only
-    https://git.kernel.org/netdev/net/c/9d74da1177c8
-  - [net,2/3] netfilter: nf_tables: don't unregister hook when table is dormant
-    https://git.kernel.org/netdev/net/c/688c15017d5c
-  - [net,3/3] netfilter: nft_tunnel: fix geneve_opt type confusion addition
-    https://git.kernel.org/netdev/net/c/1b755d8eb1ac
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+April 3, 2025 at 22:24, "Alexei Starovoitov" <alexei.starovoitov@gmail.co=
+m> wrote:
 
 
+
+>=20
+>=20On Sun, Mar 30, 2025 at 8:27 PM Jiayuan Chen <jiayuan.chen@linux.dev>=
+ wrote:
+>=20
+>=20>=20
+>=20> The device allocates an skb, it additionally allocates a prepad siz=
+e
+> >=20
+>=20>  (usually equal to NET_SKB_PAD or XDP_PACKET_HEADROOM) but leaves i=
+t
+> >=20
+>=20>  uninitialized.
+> >=20
+>=20>  The bpf_xdp_adjust_head function moves skb->data forward, which al=
+lows
+> >=20
+>=20>  users to access data belonging to other programs, posing a securit=
+y risk.
+> >=20
+>=20>  Reported-by: syzbot+0e6ddb1ef80986bdfe64@syzkaller.appspotmail.com
+> >=20
+>=20>  Closes: https://lore.kernel.org/all/00000000000067f65105edbd295d@g=
+oogle.com/T/
+> >=20
+>=20>  Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> >=20
+>=20>  ---
+> >=20
+>=20>  include/uapi/linux/bpf.h | 8 +++++---
+> >=20
+>=20>  net/core/filter.c | 5 ++++-
+> >=20
+>=20>  tools/include/uapi/linux/bpf.h | 6 ++++--
+> >=20
+>=20>  3 files changed, 13 insertions(+), 6 deletions(-)
+> >=20
+>=20>  diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> >=20
+>=20>  index defa5bb881f4..be01a848cbbf 100644
+> >=20
+>=20>  --- a/include/uapi/linux/bpf.h
+> >=20
+>=20>  +++ b/include/uapi/linux/bpf.h
+> >=20
+>=20>  @@ -2760,8 +2760,9 @@ union bpf_attr {
+> >=20
+>=20>  *
+> >=20
+>=20>  * long bpf_xdp_adjust_head(struct xdp_buff *xdp_md, int delta)
+> >=20
+>=20>  * Description
+> >=20
+>=20>  - * Adjust (move) *xdp_md*\ **->data** by *delta* bytes. Note that
+> >=20
+>=20>  - * it is possible to use a negative value for *delta*. This helpe=
+r
+> >=20
+>=20>  + * Adjust (move) *xdp_md*\ **->data** by *delta* bytes. Note that
+> >=20
+>=20>  + * it is possible to use a negative value for *delta*. If *delta*
+> >=20
+>=20>  + * is negative, the new header will be memset to zero. This helpe=
+r
+> >=20
+>=20>  * can be used to prepare the packet for pushing or popping
+> >=20
+>=20>  * headers.
+> >=20
+>=20>  *
+> >=20
+>=20>  @@ -2989,7 +2990,8 @@ union bpf_attr {
+> >=20
+>=20>  * long bpf_xdp_adjust_meta(struct xdp_buff *xdp_md, int delta)
+> >=20
+>=20>  * Description
+> >=20
+>=20>  * Adjust the address pointed by *xdp_md*\ **->data_meta** by
+> >=20
+>=20>  - * *delta* (which can be positive or negative). Note that this
+> >=20
+>=20>  + * *delta* (which can be positive or negative). If *delta* is
+> >=20
+>=20>  + * negative, the new meta will be memset to zero. Note that this
+> >=20
+>=20>  * operation modifies the address stored in *xdp_md*\ **->data**,
+> >=20
+>=20>  * so the latter must be loaded only after the helper has been
+> >=20
+>=20>  * called.
+> >=20
+>=20>  diff --git a/net/core/filter.c b/net/core/filter.c
+> >=20
+>=20>  index 46ae8eb7a03c..5f01d373b719 100644
+> >=20
+>=20>  --- a/net/core/filter.c
+> >=20
+>=20>  +++ b/net/core/filter.c
+> >=20
+>=20>  @@ -3947,6 +3947,8 @@ BPF_CALL_2(bpf_xdp_adjust_head, struct xdp_b=
+uff *, xdp, int, offset)
+> >=20
+>=20>  if (metalen)
+> >=20
+>=20>  memmove(xdp->data_meta + offset,
+> >=20
+>=20>  xdp->data_meta, metalen);
+> >=20
+>=20>  + if (offset < 0)
+> >=20
+>=20>  + memset(data, 0, -offset);
+> >=20
+>=20>  xdp->data_meta +=3D offset;
+> >=20
+>=20>  xdp->data =3D data;
+> >=20
+>=20>  @@ -4239,7 +4241,8 @@ BPF_CALL_2(bpf_xdp_adjust_meta, struct xdp_b=
+uff *, xdp, int, offset)
+> >=20
+>=20>  return -EINVAL;
+> >=20
+>=20>  if (unlikely(xdp_metalen_invalid(metalen)))
+> >=20
+>=20>  return -EACCES;
+> >=20
+>=20>  -
+> >=20
+>=20>  + if (offset < 0)
+> >=20
+>=20>  + memset(meta, 0, -offset);
+> >=20
+>=20
+> Let's make everyone pay a performance penalty to silence
+> KMSAN warning?
+> I don't think it's a good trade off.
+> Soft nack.
+>
+
+It's not just about simply suppressing KMSAN warnings, but for security
+considerations.
+
+So I'd like to confirm: currently, loading an XDP program only requires
+CAP_NET_ADMIN and CAP_BPF permissions. If we consider this as a super
+privilege, then even if uninitialized memory is exposed, I think it's oka=
+y,
+as it's the developer's responsibility, for example, like the CVE in meta
+https://vuldb.com/?id.246309.
+
+Or I'm thinking, can we rely on the verifier to force the initialization
+of the newly added packet boundary behavior, specifically for this specia=
+l
+case (although it won't be easy to implement).
 
