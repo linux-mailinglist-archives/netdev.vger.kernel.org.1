@@ -1,114 +1,140 @@
-Return-Path: <netdev+bounces-179243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE9F3A7B840
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 09:29:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49589A7B860
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 09:47:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80CD21898388
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 07:29:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D6BF3B049A
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 07:47:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEEC1146A60;
-	Fri,  4 Apr 2025 07:29:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2020318FDD5;
+	Fri,  4 Apr 2025 07:47:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b="mnTdbCMf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CC5HlRub"
 X-Original-To: netdev@vger.kernel.org
-Received: from ksmg01.maxima.ru (ksmg01.maxima.ru [81.200.124.38])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B788117A305;
-	Fri,  4 Apr 2025 07:29:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.200.124.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2BB51552E3;
+	Fri,  4 Apr 2025 07:47:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743751751; cv=none; b=F0nA7q4TftxaCXWLpgxsYJPeUFpoOZAnpwKAGitrMGMNAHehcYJpiUdfnJOlVCKYjHdTpeCehO9kKDVOgKiSmfTmj22gvEw6EHNXhdT1qXw97dYr0RbT491fZnMWqLL9C/C8umOG8YoPvgWRNAxBIeVe0+KqlNALjxdACxLChfg=
+	t=1743752860; cv=none; b=DMpZd6uwwrK33E9hds6K3y4bwUy4jzmo1qZ0BTZM9+h9TgdMosVlFE94JEK/LlM9sB1RNm7exhkE4PSkWta0zUSD0xg7rtcU0PmWDbV5Lvs8u3VXwtKt4YJrEHW2yhq4V8Rb5Kr1x7kJ+CNPKTsAsY9psuWU0Ioqau6/dBBlEtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743751751; c=relaxed/simple;
-	bh=Gdy034SGP0SVYJpBA4vja/eidsXwrx3GcUylpIrFV2Y=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NwPEAs5iQPRMiwuUsjXBz3rK2BbaAN2V9RO5X82Ce0e69/B6hQLeqcNF/dLWlAqvlRHw5m+DKiLwt3WDUAp70Y+JBZExTRnyUOLAvbPnud+fczXaVd3OcToBxtpNepyM08HOM356AN5YSbIpUQa26ZSLxzsG98dSmkH7pgeJzpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru; spf=pass smtp.mailfrom=mt-integration.ru; dkim=pass (2048-bit key) header.d=mt-integration.ru header.i=@mt-integration.ru header.b=mnTdbCMf; arc=none smtp.client-ip=81.200.124.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mt-integration.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mt-integration.ru
-Received: from ksmg01.maxima.ru (localhost [127.0.0.1])
-	by ksmg01.maxima.ru (Postfix) with ESMTP id 8A8EEC0004;
-	Fri,  4 Apr 2025 10:29:03 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ksmg01.maxima.ru 8A8EEC0004
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mt-integration.ru;
-	s=sl; t=1743751743; bh=Gdy034SGP0SVYJpBA4vja/eidsXwrx3GcUylpIrFV2Y=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:From;
-	b=mnTdbCMfKEVKSaMs7ivR/LkdrKfuzXKZ8XGuIxDHi73W1H7AHeVn/zPEQewzmh8tU
-	 L/2N9WhHFOhXGa+3wITlrZgfzVDkKGJhsPuoaGHD3M7GpEcdG9q1loNfYNKQCo6Id/
-	 WnWRnZdRKmnGTc8F1J1emtNq4Gx3pZIYTnWwve4qfhvIgiKPqoaqp2VdAnoDpAy2WH
-	 6q/rmLKqNhJRrVK5uXdG6st6hxL6W6cMC4iZLXtF0P3sBFmmLtoKOXb5+Mgr2+XmT3
-	 NEOKwHGuwwXPRTsOoZlt6CVjRFUe56dvHo7zZ0fU+YyVQCF2tcJTNgVs2j6tw9EXVL
-	 O0AVOFKX6QE1g==
-Received: from ksmg01.maxima.ru (autodiscover.maxima.ru [81.200.124.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(Client CN "*.maxima.ru", Issuer "GlobalSign GCC R3 DV TLS CA 2020" (verified OK))
-	by ksmg01.maxima.ru (Postfix) with ESMTPS;
-	Fri,  4 Apr 2025 10:29:03 +0300 (MSK)
-Received: from ws-8313-abramov.mti-lab.com (172.25.5.19) by
- mmail-p-exch01.mt.ru (81.200.124.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Fri, 4 Apr 2025 10:29:02 +0300
-Date: Fri, 4 Apr 2025 10:29:19 +0300
-From: Ivan Abramov <i.abramov@mt-integration.ru>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-CC: "David S. Miller" <davem@davemloft.net>,
-	<syzbot+1df6ffa7a6274ae264db@syzkaller.appspotmail.com>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima
-	<kuniyu@amazon.com>, Stanislav Fomichev <sdf@fomichev.me>, Ahmed Zaki
-	<ahmed.zaki@intel.com>, Alexander Lobakin <aleksander.lobakin@intel.com>,
-	"Eric W. Biederman" <ebiederm@xmission.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
-Subject: Re: [PATCH net v2] net: Avoid calling WARN_ON() on -ENOMEM in
- netif_change_net_namespace()
-Message-ID: <20250404102919.8d08a70102d5200788d1f091@mt-integration.ru>
-In-Reply-To: <Z-7N60DKIDLS2GXe@mini-arch>
-References: <20250403113519.992462-1-i.abramov@mt-integration.ru>
-	<Z-7N60DKIDLS2GXe@mini-arch>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.30; i686-pc-mingw32)
+	s=arc-20240116; t=1743752860; c=relaxed/simple;
+	bh=n3WVEOSVyo5twplGrYfxLFXNkYDXkXuKVIkLlw7ygbk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GeR0ot0eARwDW9owUf7TPHvIVAx1qg9Cd0IZvTj9sF4/UpqPOSTb23f6j0kiy7mr6vaj706IcKLMttEeRMElp3VYaMOZ9yVhQ/8ncb5r5ToKgw5kRxE8Y8QDLcI5inTO9By/GoAwUE2AJXuE610EzBY0d1GzOIweYVOM9J0t0O0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CC5HlRub; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 648B5C4CEDD;
+	Fri,  4 Apr 2025 07:47:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743752859;
+	bh=n3WVEOSVyo5twplGrYfxLFXNkYDXkXuKVIkLlw7ygbk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=CC5HlRubywiTUHDH3GzqNyIgC1CyFlxgDXREVTm98WIyeYzkFtFs1a/eZoA1kVwWy
+	 OQury3Z2olmo+RsZFmcEkI9l2TlvcYevXb6UpYO36+NuZLGzgGohMhfUzUUkOeR3ZE
+	 GsyjJqoQatJnwtYUJxI385nqicOS+N5RxwEyl3ayC7VhmCQYA+yQZIFc0njrKNU3Vt
+	 bYaJjiUwN2dEOIEadffJuZIZ+TGdEkMwNpJ/EVOrzlgARVxCK6wTSh0jyurUNsP/it
+	 7WkwttaqqGemqoIwLYqZvVcPffwhGG1EXh/aH9PJ/nKWsgAS2Cwi8c0wyf3bQgm/He
+	 dVGBSaXr9RaRw==
+Message-ID: <58d26423-04da-4491-9318-d4a7a1f12005@kernel.org>
+Date: Fri, 4 Apr 2025 10:47:31 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3 3/3] net: ti: icss-iep: Fix possible NULL pointer
+ dereference for perout request
+To: Paolo Abeni <pabeni@redhat.com>, "Malladi, Meghana" <m-malladi@ti.com>,
+ dan.carpenter@linaro.org, kuba@kernel.org, edumazet@google.com,
+ davem@davemloft.net, andrew+netdev@lunn.ch
+Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ namcao@linutronix.de, javier.carrasco.cruz@gmail.com, diogo.ivo@siemens.com,
+ horms@kernel.org, jacob.e.keller@intel.com, john.fastabend@gmail.com,
+ hawk@kernel.org, daniel@iogearbox.net, ast@kernel.org, srk@ti.com,
+ Vignesh Raghavendra <vigneshr@ti.com>, danishanwar@ti.com
+References: <20250328102403.2626974-1-m-malladi@ti.com>
+ <20250328102403.2626974-4-m-malladi@ti.com>
+ <0fb67fc2-4915-49af-aa20-8bdc9bed4226@kernel.org>
+ <b0a099a6-33b2-49f9-9af7-580c60b98f55@ti.com>
+ <469fd8d0-c72e-4ca6-87a9-2f42b180276b@redhat.com>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <469fd8d0-c72e-4ca6-87a9-2f42b180276b@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: mmail-p-exch02.mt.ru (81.200.124.62) To
- mmail-p-exch01.mt.ru (81.200.124.61)
-X-KSMG-AntiPhishing: NotDetected
-X-KSMG-AntiSpam-Auth: dmarc=none header.from=mt-integration.ru;spf=none smtp.mailfrom=mt-integration.ru;dkim=none
-X-KSMG-AntiSpam-Envelope-From: i.abramov@mt-integration.ru
-X-KSMG-AntiSpam-Info: LuaCore: 54 0.3.54 464169e973265e881193cca5ab7aa5055e5b7016, {rep_avail}, {Prob_CN_TRASH_MAILERS}, {Tracking_arrow_text}, {Tracking_from_domain_doesnt_match_to}, 81.200.124.61:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;mt-integration.ru:7.1.1;ksmg01.maxima.ru:7.1.1, FromAlignment: s, ApMailHostAddress: 81.200.124.61
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiSpam-Lua-Profiles: 192369 [Apr 04 2025]
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Rate: 40
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Version: 6.1.1.11
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.1.1.8310, bases: 2025/04/04 04:51:00 #27854642
-X-KSMG-AntiVirus-Status: NotDetected, skipped
-X-KSMG-LinksScanning: NotDetected
-X-KSMG-Message-Action: skipped
-X-KSMG-Rule-ID: 7
 
-On Thu, 3 Apr 2025 11:05:31 -0700, Stanislav Fomichev wrote:
-> On 04/03, Ivan Abramov wrote:
->> It's pointless to call WARN_ON() in case of an allocation failure in
->> device_rename(), since it only leads to useless splats caused by deliberate
->> fault injections, so avoid it.
 
-> What if this happens in a non-fault injection environment? Suppose
-> the user shows up and says that he's having an issue with device
-> changing its name after netns change. There will be no way to diagnose
-> it, right?
 
-Failure to allocate a few hundred bytes in kstrdup doesn't seem
-practically possible and happens only in fault injection scenarios. Other
-types of failures in device_rename will still trigger WARN_ON.
+On 03/04/2025 14:25, Paolo Abeni wrote:
+> On 4/2/25 2:37 PM, Malladi, Meghana wrote:
+>> On 4/2/2025 5:58 PM, Roger Quadros wrote:
+>>> On 28/03/2025 12:24, Meghana Malladi wrote:
+>>>> ICSS IEP driver has flags to check if perout or pps has been enabled
+>>>> at any given point of time. Whenever there is request to enable or
+>>>> disable the signal, the driver first checks its enabled or disabled
+>>>> and acts accordingly.
+>>>>
+>>>> After bringing the interface down and up, calling PPS/perout enable
+>>>> doesn't work as the driver believes PPS is already enabled,
+>>>
+>>> How? aren't we calling icss_iep_pps_enable(iep, false)?
+>>> wouldn't this disable the IEP and clear the iep->pps_enabled flag?
+>>>
+>>
+>> The whole purpose of calling icss_iep_pps_enable(iep, false) is to clear 
+>> iep->pps_enabled flag, because if this flag is not cleared it hinders 
+>> generating new pps signal (with the newly loaded firmware) once any of 
+>> the interfaces are up (check icss_iep_perout_enable()), so instead of 
+>> calling icss_iep_pps_enable(iep, false) I am just clearing the 
+>> iep->pps_enabled flag.
+> 
+> IDK what Roger thinks, but the above is not clear to me. I read it as
+> you are stating that icss_iep_pps_enable() indeed clears the flag, so i
+> don't see/follow the reasoning behind this change.
+> 
+> Skimmir over the code, icss_iep_pps_enable() could indeed avoid clearing
+> the flag under some circumstances is that the reason?
+> 
+> Possibly a more describing commit message would help.
+
+I would expect that modifying the xxx_enabled flag should be done only
+in the icss_iep_xxx_enable() function. Doing it anywhere else will be difficult
+to track/debug in the long term.
+
+I don't see why the flag needs to be set anywhere else. Maye better to
+improve logic inside icss_iep_pps_enable() like Paolo suggests.
+
+> 
+>>> And, what if you brought 2 interfaces of the same ICSS instances up
+>>> but put only 1 interface down and up?
+>>>
+>>
+>> Then the flag need not be disabled if only one interface is brought down 
+>> because the IEP is still alive and all the IEP configuration (including 
+>> pps/perout) is still valid.
+> 
+> I read the above as stating this fix is not correct in such scenario,
+> leading to the wrong final state.
+> 
+> I think it would be better to either give a better reasoning about this
+> change in the commit message or refactor it to handle even such scenario,
+> 
+> Thanks,
+> 
+> Paolo
+> 
+
+-- 
+cheers,
+-roger
+
 
