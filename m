@@ -1,170 +1,192 @@
-Return-Path: <netdev+bounces-179266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D1E2A7BA72
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 12:12:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E2E2A7BA88
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 12:19:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D8D9189F39C
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 10:12:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EC551777BE
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 10:19:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF1B11A7044;
-	Fri,  4 Apr 2025 10:12:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89EFF1C6FF0;
+	Fri,  4 Apr 2025 10:18:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ktG/eGSw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X2RXwUQn"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2053.outbound.protection.outlook.com [40.107.243.53])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26CD61624C9
-	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 10:12:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743761563; cv=fail; b=r8XpQ8L8bNgUrj+ENBGPDxXmnEstmLGSKXEgAr2n32X7EqjdpW4nn+4FYL0R2JuTwD4C20uNw1l7YOS2kbtBIEYyk4Yr/simWyvJ7K3OiO4QDUfrcsWs0uGWmzoXizTPZu/mw1/XPTBUmXawJEr/roVyYfV/D+mA/HKA9cG3Clc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743761563; c=relaxed/simple;
-	bh=F8TvsJx9TiFwmDMKaPJ5Ok/tqa+BCGhNa1Ouuawpp7Q=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 Content-Type:MIME-Version; b=S5tYFqJv4umxOpWY5DOImqAP2XLUoB3GClFQkmZBL4lVGZWdAlgKpNWz+IYq0rBwo8EtU9h1idr5TY9HBjuNqn6Cfl7t6uvAbBaXa76cMN1O/5Q1oBUaQBo6WO7rAhQe1hemUtBMzvzVdcRhtKt3bdpJSsT6wRGysCTryXVVcig=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ktG/eGSw; arc=fail smtp.client-ip=40.107.243.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SdYU6Pg6o5ueEGWdtrl/k3dg6P6Iw4hBezLe34SbsllCJJbnwJPnA4/ysnwGtcPqsQ8hU/nw9sPx8361607oQiA5+hMjbA3+KhfMRH3iZUGP0as8X/ANqKcmaNza9JIaFxitsuAebAgxiNllskRNIhuw5N8jFjYRyGIdjvybikVutl44E/CGVvFVBrTJ8/sluYKI7mESB12R/C4/FjPuTcYwDJP+OYLLIZBhZn2YHL1k+gpc9arwWNJLp1ZWRe0pDf7mCk0JDsApKtqcsss3cnA515x11TXrG332P9SurE5UGpGLubCSYzFPfTcaK9D+RtzaOxJLLpVBRq+3sFLoGQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=F8TvsJx9TiFwmDMKaPJ5Ok/tqa+BCGhNa1Ouuawpp7Q=;
- b=L4l/tf8tlohGGdUBGZxUnVImGCa1+EXNJj+cEa+oP5ocQTQ+Hy4xrzmdi1GlQD7qBcRNK3FGD3PAp96Hx4kcifgOlAYb1+dtjhMeS1eRa7BdaWRI7XpoiUrfiyZXhDWRhGZ0wCeutIhwFXYYuSsnB4LaEPTRjZfwyo/DoeJUbxfvb/Oug0XxNsmnLfaA+ZN5mNL4NHBIaZUCtKaXX1krwdfNO5ZjN/YfbMSNS9JyeEJwz0Hioi2e1g5SrmPwLcaGbl1nMvE5uGCkRGlOKQsgZyjwVWZA/cgcgx4t8ESSwJfRL2I5bDd9VYSpMOTfynSNUg4uclXSAeqgpDEq5bohjg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=F8TvsJx9TiFwmDMKaPJ5Ok/tqa+BCGhNa1Ouuawpp7Q=;
- b=ktG/eGSwJmDw+6l+/oVZqxe7vU5YjIO0pRMq4BcdKOehuiFVs6eFP1kJlUOW3dIKxeFwyWo6fohXOZRLvaGhSAOkEfxBsEXcCLDHywJexdKfz3g56olbpTv4GCKXnkhqtO886/hdwcsRFY60i9NTWJvuEHAPNpJ0PL0kyJd9JOFLGQ4a0wCZWIGtrTOqq4gs5EhEqeGSpTo6nv8B7xPQbyFz3UA4atglBwhm4cg1yQbkNsnCSvLTO3M8h/Zs9oRcJ2KVhsFXyJO7K9wmYq97ASG+Y98gUqY79W2J41UwaucHtILUmtlGAvzA9k3P/NZiKjueHIISL8dO4dL6my4F/w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SJ2PR12MB8943.namprd12.prod.outlook.com (2603:10b6:a03:547::17)
- by IA1PR12MB6601.namprd12.prod.outlook.com (2603:10b6:208:3a3::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.44; Fri, 4 Apr
- 2025 10:12:39 +0000
-Received: from SJ2PR12MB8943.namprd12.prod.outlook.com
- ([fe80::7577:f32f:798c:87cc]) by SJ2PR12MB8943.namprd12.prod.outlook.com
- ([fe80::7577:f32f:798c:87cc%5]) with mapi id 15.20.8606.027; Fri, 4 Apr 2025
- 10:12:38 +0000
-From: Aurelien Aptel <aaptel@nvidia.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Simon Horman <horms@kernel.org>, kuba@kernel.org,
- linux-nvme@lists.infradead.org, netdev@vger.kernel.org, sagi@grimberg.me,
- hch@lst.de, kbusch@kernel.org, axboe@fb.com, chaitanyak@nvidia.com,
- davem@davemloft.net, aurelien.aptel@gmail.com, smalin@nvidia.com,
- malin1024@gmail.com, ogerlitz@nvidia.com, yorayz@nvidia.com,
- borisp@nvidia.com, galshalom@nvidia.com, mgurtovoy@nvidia.com,
- tariqt@nvidia.com
-Subject: Re: [PATCH v27 15/20] net/mlx5e: NVMEoTCP, use KLM UMRs for buffer
- registration
-In-Reply-To: <20250403044320.GA22803@lst.de>
-References: <20250303095304.1534-1-aaptel@nvidia.com>
- <20250303095304.1534-16-aaptel@nvidia.com>
- <20250304174510.GI3666230@kernel.org> <253jz8cyqst.fsf@nvidia.com>
- <20250403044320.GA22803@lst.de>
-Date: Fri, 04 Apr 2025 13:12:35 +0300
-Message-ID: <253h634z14c.fsf@nvidia.com>
-Content-Type: text/plain
-X-ClientProxiedBy: FR4P281CA0387.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:f7::12) To SJ2PR12MB8943.namprd12.prod.outlook.com
- (2603:10b6:a03:547::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9581A238E
+	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 10:18:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743761933; cv=none; b=qO02kfnIZUQB1iqsv0hLJUKRi7rStgbwCMo81kvFqS9BCN/vVTeF5eMmKH48tMfLCgCfNKR+D1F5KevEL81w3ByNHq1ZjPR+8LnQYO+LVjjsNPHWda/dj0ugcvW8PT00ejU1JukTwYLjl8HGY1+C4xT5sXWRm8VmprvTP1LKrFs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743761933; c=relaxed/simple;
+	bh=LXZ9/vk+POSfcKSx9sqdr7qvqqBdI7C6a+Nl5sTnVg4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=L2VkYkS0wnSesCqKD5q79h50OZa9ND04le4PhgCk871R731cV33rA5y6I5lqQSQp+awsOGzeU1D5O5dByVtrEUgmreOhqfR8WIegd1RZiT26zhSPZh2C6MqzBDIGHnwVAvSe2XJQ5pMpJ3gWPyHICJRnPHkpwjHTIv6TGhNpFMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X2RXwUQn; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1743761930;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=5M+rOyW1P59pNZ57TipRkSHKMefjk2AQHbLsm27xPvw=;
+	b=X2RXwUQnnrVC9WZwumj+Pb8/Vu8CReIrVdPmVGRBI6gjAZdPmYCXqEfSsbcZKz42h137vP
+	sbP9vBGO9r94IMPpzy7cT8yusEBJLUv9iSo87OWwl02H1kogrDydGobmjuUP3353KOQpvB
+	ZZ0+rYMFekxXbLZDjyCp1SLOwMpJeIQ=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-37-0frnSWiKPNS2hLbXR4Kzfg-1; Fri, 04 Apr 2025 06:18:49 -0400
+X-MC-Unique: 0frnSWiKPNS2hLbXR4Kzfg-1
+X-Mimecast-MFC-AGG-ID: 0frnSWiKPNS2hLbXR4Kzfg_1743761928
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-30bf647866aso8741421fa.1
+        for <netdev@vger.kernel.org>; Fri, 04 Apr 2025 03:18:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743761928; x=1744366728;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5M+rOyW1P59pNZ57TipRkSHKMefjk2AQHbLsm27xPvw=;
+        b=Yyra8Y7ABjIKalhyFmSYKvejnLazGms8Cu0Zp731pjnN5IOrMfFuBt67d95pYsz6dW
+         nfLjdNlxCgrTySz5FieKz5RFbEDpJuC6XRoykeUDxNTSJZCTp7cy99IHJTeg+6tgZbdf
+         YBTupmtPknRCKHSwHqTz0pJtGBUpLWTiMqvQVirZgt7p5e08pQPg27olBWtrkXSq3x07
+         dl2xK6X6vsy5ckq7NTb9rAUeWYjL4sLf3BMiO930742vxZ95XpN/ukQdf2ucAcNht8ri
+         2jlmPLSX4ZlrgR1B9G4G7cKe30C1sRCZziRxHTkTvntIMBbOeEhdmUlxiqPuVIXGod8+
+         fjRw==
+X-Gm-Message-State: AOJu0YxGclAdwCAnYUGcvbpMvd730/9XiwJukluTWGTBcHxhUhuv6o/e
+	Sb6hIJDZmxuwvJRibcgpJ5fEByKj98znJ9EaAoKt07Gf1petqMraP6kxsW4/SLGeQzOLhfX3fiA
+	uwvjx1hadCyMjpMKKOaQApKxMYbY5nWrVHDuGNB5FOH0Cd0GvuEh02w==
+X-Gm-Gg: ASbGncstpK9t2Aynwt0vtbfNX6D4dkgct7WVIV+6lRHCulJEhu6dxR1L119LMbjLY9+
+	0HHwrsmK8B306MQLZeBOpBl+4pm4wrL3pKxqVzXxDJhzZaxvOq5/oPQ5EJ+O30vfJHjpiImYXMh
+	rn5MQ1UaSX7j/sFevLv4Q/xSDxxv7h1iSOHrqIoxZJd8yOVKmsHcUh5gqU1E9FLzSK1z+Ysbhmd
+	L3Idrnc/9WNZaVt9xH/GkAmDQn1hUnST90nVqbMm+iZtS11W85SYq0lOmxHwW9je42eeNR3aRTB
+	Sr0RHKq37ORVJEPf6XPqZnt/jhATC/ueWIfiyxxl
+X-Received: by 2002:a2e:a5c9:0:b0:30b:fdc0:5e5d with SMTP id 38308e7fff4ca-30f0a0ee84emr8785061fa.4.1743761927632;
+        Fri, 04 Apr 2025 03:18:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFUiX5YdBxTzl44jWDQITU1CT7/li+YPbg+WN6Bv/W9Q984Oh34yiDzKProh3dcMOWAJ4tAlQ==
+X-Received: by 2002:a2e:a5c9:0:b0:30b:fdc0:5e5d with SMTP id 38308e7fff4ca-30f0a0ee84emr8784931fa.4.1743761927260;
+        Fri, 04 Apr 2025 03:18:47 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-30f031ce997sm4982351fa.92.2025.04.04.03.18.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Apr 2025 03:18:46 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 8A14B18FD725; Fri, 04 Apr 2025 12:18:44 +0200 (CEST)
+From: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Subject: [PATCH net-next v7 0/2] Fix late DMA unmap crash for page pool
+Date: Fri, 04 Apr 2025 12:18:34 +0200
+Message-Id: <20250404-page-pool-track-dma-v7-0-ad34f069bc18@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ2PR12MB8943:EE_|IA1PR12MB6601:EE_
-X-MS-Office365-Filtering-Correlation-Id: c53afb40-ea03-437c-f934-08dd73613a83
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?+8KKebxInSjNG+DCX9ysReZjcutV1Lohd7he9f4iV9rNyKHNGewUnwCWQeC3?=
- =?us-ascii?Q?jxE9jDmzaWA2P0x5VNFDBrjRr6ind9gMxS/Ar5IFVXKK66elj4lHgQcQA/Cx?=
- =?us-ascii?Q?7zntboPZztr03NVXN8Z0mUcdGKXhU6WClXCj1EdZsGi3X0MUbtH7qZONhXsu?=
- =?us-ascii?Q?dkR90gg4Yy18u6B+IAKK9ZjzidgDVvYcCzhqW12dwl1Qp68/iRk4rEOTaEtW?=
- =?us-ascii?Q?s4ECnfpljz5P8NE+pACQqCREItzlnX9BO15z1juTIJfceHSsD9u8tz+sJUjL?=
- =?us-ascii?Q?s8+VyKPtXBppO5JRlH+v3OISayoUGT5I8aL+dTTDcFfmbaHbKXYoONjo+1hR?=
- =?us-ascii?Q?DtL4O78bEoxt/DR+vVBLGo/D4uGml3N02LnKJe2WFXrXkagzHZx0crOrSf4K?=
- =?us-ascii?Q?QXNjY/pJhbunXmeiEN6lwfu9ENcKzdrUEsjVwrKcbiLZ85iOTfuPoSBTo1wz?=
- =?us-ascii?Q?xuE0xOGtLYFnicgzD+bA9BvX6hitGjECdzrKj5TTJtGXhOVzGbYDH006hQGj?=
- =?us-ascii?Q?RTaw2+6Dee0G9rnvU2Wh2gHLokwQItaoq/Z/JJdHTJ+tcKqhKaV/P5NZ6+wu?=
- =?us-ascii?Q?O90WURkJLs3bJI3oOcBdAQmplKfiNlsrOBYtLqQWH/ygsxvWaK86IZJkPduf?=
- =?us-ascii?Q?pNE46ku3BH1kMfZkSsdgHGTBAdGODhKi94K26rVEfF1dMVsDevwl6fj4XmYl?=
- =?us-ascii?Q?tI5xe/9FTiVT95gDZtnyWp25/Oglkku4l7pLQhaXqHIl1L2kHIOHP+69NGQO?=
- =?us-ascii?Q?EbAJKDYNBUU5LDIRsegc06gVAzfB2GhHQriq9u2h1AsFigW1P0H/CZmYj8tf?=
- =?us-ascii?Q?DuFeV4DUXtvOZt9hhsP1FGkkCTws7M4F5W7gK8ZeQGp0SO46n8pKod2/+4sD?=
- =?us-ascii?Q?50lGoQNsOY9FmiIMrhOVdckWhifGZ8lvMJWPf8TkLz8u+gQwk9uWjRzrJnjq?=
- =?us-ascii?Q?15G1dJDFrPYnYRZH2GSPlT0PpPeEuTxV/hZscfGttutgKyu5VPPH6SLvoLNK?=
- =?us-ascii?Q?NPUGOWI2BYL4h3vBVCJj2RL7GieuhUMwDmnIUkr/sQsoFwUjgkJNz7NtBhoR?=
- =?us-ascii?Q?yFoO0A5XHKhhlfXYmimG5t/3WSVlR2TPRrR+k/yau5VxguNY6TzBD6mzOgqZ?=
- =?us-ascii?Q?AWIVG5dGIoO1aV1t9tEOiesSTMHEU6+Y8NhU00qajZwGeP9x6poRWlk/Je3R?=
- =?us-ascii?Q?w4xOQZZcCg2crv0xXouVHxeG3sg7CnOYJyYPQIVCgbYvXkTtoacZjwUTcjqu?=
- =?us-ascii?Q?L6dF7OvpOEjNXcYx75Ls7/AktZpnw/bfzIPbR+X4g+uNYZfXMbQWQn2A0PV9?=
- =?us-ascii?Q?d4WY6SmImFivMonO8XIsNxa+6R3dlcH2TI6XAJX0Skf9htGawtyZE7hOAz4K?=
- =?us-ascii?Q?bNUqCoAPpNmCQfFxaQ33XhjSgur5SNWGbdUPMgUYWLqWjS3KagTJyP0k0uhO?=
- =?us-ascii?Q?LHUlqtWzQGE=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR12MB8943.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?zb3c+v9l0r2xOcg3GVa1diLEXlbVHyFUTcbfaiNES86Tl40cxIOF/OxZTYdE?=
- =?us-ascii?Q?7xHRe1mJBkHXsXx6RoY1vSBB8bs5TPaWw51PVvFiMD3IncFNot6mKftsdVxT?=
- =?us-ascii?Q?i1lRqavMkWksO+ZX7EAGHy+3tLbe6Qo8peJDyB/24r5J/vFRFHsogCUyFgXq?=
- =?us-ascii?Q?zx6vfv7G+77nacLvrFZ++n/EuJaYr3yRxq0hoO4FFj4M7PkWc+FuEyHHWowP?=
- =?us-ascii?Q?2Wcafthxj+CzmtzB7lemxQumpvr33aQ2zJ/HxJsZaJaH8EpOVL6oXV88oUve?=
- =?us-ascii?Q?S5+jqSFCglRyTiP+eGkSxaqRClHpqpX2kq7xVKh2j3XrzHqoag3yTj0NE+JY?=
- =?us-ascii?Q?5kRWLZHnLrIBZSfMIcPVV+yOl5105tgz+KIsEBeNRYpDZeAcf0RU0UrBS0MR?=
- =?us-ascii?Q?o21rdOOyZjNhnnjzxoOESdPVK/ISyuCKEsp/6/fKn1mZk9NlUUfNxKaTjdpy?=
- =?us-ascii?Q?YBqe0xQ/zLK4bZet3rIShfrCkmLC1O6Ozv3ZruxveAttSyxH1OwAerG2q+w/?=
- =?us-ascii?Q?NkMbXveeUYRGxl3RarsID1Q+YKrVRmVmG82On2ms0BI7FNao7WEwnV5h9yNl?=
- =?us-ascii?Q?JNEw/Sty8aJYlW9E9xfXh4Xtkh72cta5+0h12kZlV4YFAmcujXBh34wd22eR?=
- =?us-ascii?Q?jockr3Yl5uNRanO1OqGsAmevizAVbiAlJwoX/YNyf+Od6HEEEHzpc30SDIkf?=
- =?us-ascii?Q?0+j5yXkrv1WAzYXDcv/7/bjRG3fa6zy2CM8chTwXcx+2XD1RYWzVxO9hjCSh?=
- =?us-ascii?Q?dLPr0ZjIspVfBgJz3MLJwHBm6B4K3mGmxNB5x6jMeoPtTS3RM+OLfQ48J55q?=
- =?us-ascii?Q?sKnPQ3LGDRefochLkY1YkAazv67iV0DhKoEeD6P1UZ6rzcx1uqfkms3wN+kB?=
- =?us-ascii?Q?79eCbmBAeVIjkJ89a1sNsiH3O+tm7FYVqp76CvWnKTRnNkcnsLuaECquYbY1?=
- =?us-ascii?Q?kYf/G6k+WlemtB6KGSuwpCYJEqTDzz3Mil7hTasIBrjpRguEgGiCRg9zxYzK?=
- =?us-ascii?Q?pI4z3puZvYMRP6/V6kJOvfVbCXtlX3Da7DU4hBXlihgE4fpg5feRp6PIVho7?=
- =?us-ascii?Q?/NDpE6v6IOvKS3qgz/bwPRBwz4u3NSjYAdZqHR5eALQN2ujUX9tFypwBbmxP?=
- =?us-ascii?Q?EHvl6IxU9Yv1h6dbehq6/nS9P0ykmtfEhrN1/r+uklODBqVRHWTaShGjX8Vy?=
- =?us-ascii?Q?215xBq0fLMTiTIypBZQ87HUHzDjhhpL8EtKWLDwkYlrhrqUZRmGD+hUPbY0O?=
- =?us-ascii?Q?TnRnlFxj4NS0RyCLDjnzdfovTARitf4KB1IT4a+z47VgUm7sY1+t6XEOZ71C?=
- =?us-ascii?Q?+3iLfe0TYqdhTwUyDWR6Sxb5xRN5qt0J97kP/1PvGxV9tfsSoEqqPbHt54XW?=
- =?us-ascii?Q?pKMCWWUUd4oUqVU4Au97s34bz8fmhMXJdgJTUhGLtszPj4YVjpYhzkz31oKr?=
- =?us-ascii?Q?GTaz59JJdJT70tjH1DWllr9IvXoGwLu0jvsgH9mrb5e1ydM0fH1AhirX2d+8?=
- =?us-ascii?Q?PI2S1esY4QXF/HWNUQelLSKifkt9gK/Ba/MX4hVeJLa/fca9ziPZfuFFLG1P?=
- =?us-ascii?Q?jLWX7TL7XKCSX2aWLmwcvYApwGfYME2eRzNh9d+I?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c53afb40-ea03-437c-f934-08dd73613a83
-X-MS-Exchange-CrossTenant-AuthSource: SJ2PR12MB8943.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Apr 2025 10:12:38.8842
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /FD33ujnXb1k1rnI70yGBs4KUzUQJWdGeEclAbnoGeAcjwM4Jq+wYiCaJi8SFZLvFzkOMgIxE3WYt1QbtDds7A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6601
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAPqx72cC/23P0U6FMAwG4Fc52bUz3dpt6JXvYbwYW5FFD5BBy
+ DEnvLuTmIhhl+2ffm3vYuaceBbPl7vIvKY5jUMp3MNFhN4P7yxTLLXQoA2gAjn50pvG8VMu2Yc
+ PGa9eAqJGQk8WWJTJKXOXbrv6KgZe5MC3RbyVpE/zMuavfd2q9vxXpqq8KgkyaKXZOO8o6JfMs
+ ffLYxivO7jqA6JNHdEFUQq5DeqJbIcnBI+IrSNYkIbJEijL4MMJoSPi6ggVpMUGYrAObIQTYo5
+ IU0dMQYwB0L6zDfp4QuwfUq6tI/bnnbZBctQ4iPQP2bbtGyKAyvkaAgAA
+X-Change-ID: 20250310-page-pool-track-dma-0332343a460e
+To: "David S. Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+ Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+ Simon Horman <horms@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+ Mina Almasry <almasrymina@google.com>, 
+ Yonglong Liu <liuyonglong@huawei.com>, 
+ Yunsheng Lin <linyunsheng@huawei.com>, 
+ Pavel Begunkov <asml.silence@gmail.com>, 
+ Matthew Wilcox <willy@infradead.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, linux-rdma@vger.kernel.org, 
+ linux-mm@kvack.org, 
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>, 
+ Qiuling Ren <qren@redhat.com>, Yuying Ma <yuma@redhat.com>
+X-Mailer: b4 0.14.2
 
-> Btw, just as a reminder nvme code has to go through the nvme tree, and
-> there is absolutely no consesnsus on this feature yet.
+This series fixes the late dma_unmap crash for page pool first reported
+by Yonglong Liu in [0]. It is an alternative approach to the one
+submitted by Yunsheng Lin, most recently in [1]. The first commit just
+wraps some tests in a helper function, in preparation of the main change
+in patch 2. See the commit message of patch 2 for the details.
 
-The series was acked by Sagi, and the discussion with Jakub is about the
-CI (which was just resolved from our side), not about the feature.
+-Toke
 
-Can you please help us to understand the concerns?
+[0] https://lore.kernel.org/lkml/8067f204-1380-4d37-8ffd-007fc6f26738@kernel.org/T/
+[1] https://lore.kernel.org/r/20250307092356.638242-1-linyunsheng@huawei.com
+
+Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+---
+Changes in v7:
+- Change WARN_ON logic if xarray alloc fails
+- Don't leak xarray ID if page_pool_set_dma_addr_netmem() fails
+- Unconditionally init xarray in page_pool_init()
+- Rebase on current net-next
+- Link to v6: https://lore.kernel.org/r/20250401-page-pool-track-dma-v6-0-8b83474870d4@redhat.com
+
+Changes in v6:
+- Add READ_ONCE() around both reads of pp->dma_sync
+- Link to v5: https://lore.kernel.org/r/20250328-page-pool-track-dma-v5-0-55002af683ad@redhat.com
+
+Changes in v5:
+- Dereferencing pp->p.dev if pp->pma_sync is unset could lead to a
+  crash, so make sure we don't do that.
+- With the change above, patch 2 was just changing a single field, so
+  squash it into patch 3
+- Link to v4: https://lore.kernel.org/r/20250327-page-pool-track-dma-v4-0-b380dc6706d0@redhat.com
+
+Changes in v4:
+- Rebase on net-next
+- Collect tags
+- Link to v3: https://lore.kernel.org/r/20250326-page-pool-track-dma-v3-0-8e464016e0ac@redhat.com
+
+Changes in v3:
+- Use a full-width bool for pp->dma_sync instead of a full unsigned
+  long (in patch 2), and leave pp->dma_sync_cpu alone.
+
+- Link to v2: https://lore.kernel.org/r/20250325-page-pool-track-dma-v2-0-113ebc1946f3@redhat.com
+
+Changes in v2:
+- Always leave two bits at the top of pp_magic as zero, instead of one
+
+- Add an rcu_read_lock() around __page_pool_dma_sync_for_device()
+
+- Add a comment in poison.h with a reference to the bitmask definition
+
+- Add a longer description of the logic of the bitmask definitions to
+  the comment in types.h, and a summary of the security implications of
+  using the pp_magic field to the commit message of patch 3
+
+- Collect Mina's Reviewed-by and Yonglong's Tested-by tags
+
+- Link to v1: https://lore.kernel.org/r/20250314-page-pool-track-dma-v1-0-c212e57a74c2@redhat.com
+
+---
+Toke Høiland-Jørgensen (2):
+      page_pool: Move pp_magic check into helper functions
+      page_pool: Track DMA-mapped pages and unmap them when destroying the pool
+
+ drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c |  4 +-
+ include/linux/poison.h                           |  4 ++
+ include/net/page_pool/types.h                    | 63 +++++++++++++++++-
+ mm/page_alloc.c                                  |  9 +--
+ net/core/netmem_priv.h                           | 33 +++++++++-
+ net/core/page_pool.c                             | 81 ++++++++++++++++++++----
+ net/core/skbuff.c                                | 16 +----
+ net/core/xdp.c                                   |  4 +-
+ 8 files changed, 175 insertions(+), 39 deletions(-)
+---
+base-commit: acc4d5ff0b61eb1715c498b6536c38c1feb7f3c1
+change-id: 20250310-page-pool-track-dma-0332343a460e
+
 
