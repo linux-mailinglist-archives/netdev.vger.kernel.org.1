@@ -1,197 +1,248 @@
-Return-Path: <netdev+bounces-179234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79770A7B709
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 07:08:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88D1FA7B727
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 07:27:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36B2D1758EE
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 05:08:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29A5C3B8C3E
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 05:27:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21B51465A1;
-	Fri,  4 Apr 2025 05:08:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A17361632E6;
+	Fri,  4 Apr 2025 05:27:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y+yPvcj2"
+	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="W0pI6xZo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0018FE57D;
-	Fri,  4 Apr 2025 05:08:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743743314; cv=none; b=KaIE4bqbop9KhJmf1QO8gWTVWhweCgqi55pP0hlydYIR1LjEbp+oUuS5fGFyrE6aTEn6JpQw5xUAwDgssT/hz8qZp4McI+RgZsd5DqApOtKEljnR5g4pvtkIGcR5BuUBU1lSzRAir+bkd+gVmy5ebnznQwlnP6/v7AROp94g+1o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743743314; c=relaxed/simple;
-	bh=JoldXrkm+WuPDC2D+3ZXyfTf6gFSbkAdwf5bTVVPB/g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mpYOuttSjk77C5xie+EQxhA3lkJfvgvd3S2AVZ/WJN/xUiEYIu9ngTR8uXJp94aOt+vds1yCHAXkL41NKVgxeZSRbQOMyZF3q4MXpXi2+bvo/D64SP8QGS7m10IMfKUDgMvPiTmTkR4K3QTX9jQ1oOn6mqzX1C2AzdB5vdcseL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y+yPvcj2; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5e5c9662131so2690339a12.3;
-        Thu, 03 Apr 2025 22:08:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743743311; x=1744348111; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hxmqoiN7GgZYQQd4K4xM2K9htfgsC3Kosny6eqV4vRU=;
-        b=Y+yPvcj2ieCQU84k5TTT0EJcvFXoeEA0CilL/Sils14tSn5qigQPGRgVAopeJbBay+
-         SNM96vqrrOxWH8QEm/kMPQlW0FPX/5NisW2hERcXuau1TwXHNIncs8IWRzvNqgw3/6vh
-         F1qRej6u6bLXHCLdBUU1nPjH/Tm1QbMdzrrS7S3IiHeaU6Sa6TOovWc692UwH3qdX2vq
-         CoziC2AE1v6crQy42Lpi1DgBiJ4dRh0HcL6bdV3UX43II2aKfaFC3kzVY0ZqxOfkZcAr
-         0/mEX05RVwJKOUrXXiZty7qQ39OosWMRS7bjvpObyfGXM5GIJ7q/H/hQL2LLbd7uyOjA
-         VMeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743743311; x=1744348111;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hxmqoiN7GgZYQQd4K4xM2K9htfgsC3Kosny6eqV4vRU=;
-        b=NkTPO/5eZOvGl7Fq1zU6nchgEQ4h4boAqkFmDFkcVUIRjlBCKBWIKhVc72Otp7Iw+N
-         lmDf2i4nmIJIR9x7lQ9rFuYs7JJQEIq92fEFJDcsgqHpVix+GJNKvVrkf6n+7AwnppHG
-         aIhFl6u4xRcFt2mmUZLpeMynZS8+sbVXSsStshMaYycyKD+v1NAemLqhf8I7TGutEtrg
-         P9jC3VkO/zSbgKggeZapb9Y0fqzjvbjz6DxYYJNkd6W1B2ZLSRoOzLykLBFbqefp2bWm
-         FW731TTaTTvVrnILiKf8nl2Di1aNL9u8GoSsm+sXucJ2syGa38pxvJZiJyyobTwAKzfH
-         AszQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUECbzCtogekbfVQwy+oqsJguvXGvahpDMWuWvObbiAcG7DVjKE+guRBSxdrqp9ClC5+9/OwNtJ@vger.kernel.org, AJvYcCXz1pVUs9mnn1B8420zjNnhzFhjd/jZh69Mng4+gLI0hWqKv3BOcoGe+zGfVKbrwqnbIxYANB79l0/7DUgnW8k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOCUcnX0ko1fQ4ovc+rSjdZoj4Lakv7tc9prAaQV05zwzwlFcP
-	mwj8MUCzh4yzr7Mk/8mNzMn2IRfFOjEdCFYhN9E8LvRWWhkx4b1mVoZUWwT71+jzodg4/thLxRK
-	FJywOny2761eF2ByuTeyOZDRbqz4=
-X-Gm-Gg: ASbGncv+E/duZB36ONTLZnjUauxKyvfONu5DI9AZAkOiAQW0bRmEXlWHcWslwEqFmGW
-	xJijgKLwA47FEMDHl2Dc2qYZgw4SHO53I2yCIzsMiHM5umI3fWy5HJcYNDwaZL/i/iorINsTHTH
-	vA6obhnUVGaXvMwtcIpC/tDlFzCEon
-X-Google-Smtp-Source: AGHT+IFeFzn9/+2gXc4a2Ug1a/lI3ESc7/s0uO654IwvUMD3t8HFyaP7kJW7ciMxg61XYdcx+9R986eq6cTrdMsDflM=
-X-Received: by 2002:a05:6402:524b:b0:5eb:cc1c:bb9e with SMTP id
- 4fb4d7f45d1cf-5f0b5d82c73mr994109a12.7.1743743310726; Thu, 03 Apr 2025
- 22:08:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F8A15990C;
+	Fri,  4 Apr 2025 05:26:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743744421; cv=fail; b=jk+6Uh6r0/D5xw/T4mdzYgHjUAkHDr6wO0fK7o9Xu404wLAyjxqfMFflREA5nm7fvKG85oJ2aiQZBG4ojoPboGr1Lj693CsVEPV9/JopSaNKFxrX33KbiHzrLQOwglvV6kjFtfz58LrNYC+KdHVxnYvyLhN/yDaMVaDOnHY+gqM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743744421; c=relaxed/simple;
+	bh=g0x3kfJI+mNn+MRRd4LSl41QrSmzfmdN5xWbE1o/HC8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=q/un+K4jBpHRacPrhPYWSX/xR7CIgJn5xmWiN1NTsPr6KyAEGoCY5iGkp4lBpCGz085FjvVKkXYTVSs7UsfIbjsPLFh6NHdG8l6CeJtiPfCbWCXNc/kOTk+LHMgIXwfwsC5dQSYs/mIwum+4JhWYyHNzDL6sKQY4z+uyebnrFXI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=W0pI6xZo; arc=fail smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5345FZT0030869;
+	Thu, 3 Apr 2025 22:22:19 -0700
+Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2046.outbound.protection.outlook.com [104.47.70.46])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 45t94b008m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 03 Apr 2025 22:22:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=aqZOstez8yfpCL4tHVnzssYMuHLGCTc23obLrI0/u+KRF39fHs21YfFtE8mbFAwywv9g956vBBo52nDFTxBtv6QpHmI5DpBS4fv8KRYcFWVe3qJDz1gGVQa0fu8CLVn1G0aE7PtlGEhQ/d4SPxmq2d9MaB9MdV8iUkTEyVCfC75TwaduoNXthVO3l+1pbcVm6s6ohkw6f/yIibcTp3ECIGqPlUTdOB6hswIvHXplI/OKK+bATYv90BY61j/X7X6HVEuju4r+9XP19dnZhWVioz81RZ9EZgSqY2/EOFrFmWpiGxJYpbjBLCh7xdqKyo+UDD+bFCwCw17jI6QjvKeuig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DLPgVA7hl8aZVxM/ul7Yd+FBBgmF8GcWUsaXRARiYzs=;
+ b=mnT6/pxeI8K1F2JtrfiADCwaDPgnbp/CcTAWnHd0GKkhSe0r1EKJ419px0KZpRCGnfo/gRk02UWyTiDsXNy0pH784iqgNOLIXz3Zuh1Be4H8UeCkum4QA03rU5Ot9ORzf7ePmDf672NbOslIXDPn/7bR2KYMoxMEH1McyCsLaxUlzGFEDZUvqdmF/j2ZqvsiU50/+CpmzWqYPtZvP32S4EnGlNngxAae+Y+v7tDI148ifdws7sLUGx5RWPad5zJiyZLb9Ky7HVM4XKDHbRQJLmrcLAa/DZ2wT/YKc4701VN1hzB5XX80wKzxGGcDukaPWritT21Sah4xBets/IkiwA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DLPgVA7hl8aZVxM/ul7Yd+FBBgmF8GcWUsaXRARiYzs=;
+ b=W0pI6xZoKAKMc+L3TBbdXP6R6qnGVH4rqgNp0k59gkwo8zB0gwYW0sFhNRqbHnmONwjenuynfx7+Cj8z1Fr9ZlaNpkWjrV/7JvmIRpnzj98zXHHZO/uLHIFtkXvHiU5MnzGXvGPG911XwVPj57/ivclLElim5O6y9NZrzt8C1Hw=
+Received: from CO1PR18MB4666.namprd18.prod.outlook.com (2603:10b6:303:e5::24)
+ by SN7PR18MB3901.namprd18.prod.outlook.com (2603:10b6:806:10f::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.50; Fri, 4 Apr
+ 2025 05:22:16 +0000
+Received: from CO1PR18MB4666.namprd18.prod.outlook.com
+ ([fe80::b3e1:2252:a09b:a64e]) by CO1PR18MB4666.namprd18.prod.outlook.com
+ ([fe80::b3e1:2252:a09b:a64e%7]) with mapi id 15.20.8583.043; Fri, 4 Apr 2025
+ 05:22:16 +0000
+From: Subbaraya Sundeep Bhatta <sbhatta@marvell.com>
+To: Wentao Liang <vulab@iscas.ac.cn>,
+        Sunil Kovvuri Goutham
+	<sgoutham@marvell.com>,
+        Geethasowjanya Akula <gakula@marvell.com>,
+        Hariprasad
+ Kelam <hkelam@marvell.com>,
+        "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] octeontx2-pf:  Add error handling for
+ cn10k_map_unmap_rq_policer().
+Thread-Topic: [PATCH] octeontx2-pf:  Add error handling for
+ cn10k_map_unmap_rq_policer().
+Thread-Index: AQHbpSGH0QCd+ErTRUiwi0AjsSnhjw==
+Date: Fri, 4 Apr 2025 05:22:16 +0000
+Message-ID:
+ <CO1PR18MB4666D076ED0162018D4256B2A1A92@CO1PR18MB4666.namprd18.prod.outlook.com>
+References: <20250403151303.2280-1-vulab@iscas.ac.cn>
+In-Reply-To: <20250403151303.2280-1-vulab@iscas.ac.cn>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CO1PR18MB4666:EE_|SN7PR18MB3901:EE_
+x-ms-office365-filtering-correlation-id: 995ca811-ae7c-4591-05f5-08dd7338a9df
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?3iBL+Wy0swqEG181Qq8IftXF3ag4NhtyGq16+3lCnlcb33ppzd4me8OMRgph?=
+ =?us-ascii?Q?TFsccOBY9/RC2uYeIniCgy+m+wcbNUMPnldsSFzBaYAL7APE9BVL3LZt9ED1?=
+ =?us-ascii?Q?fHPUe2Vu2g8AB55SzYz7ZUpjzoeR8uOYtI0o4AhjSnLfGShTvRjfnRr2iHtR?=
+ =?us-ascii?Q?+UzAyKtVjV8SIxCeh5lcKE5cYyV8+rNS8i/IJd+6Z+4NQHUTlUsh6Wfcv7cm?=
+ =?us-ascii?Q?gMl2cytIDNO9qwUw1+hEBBZYDUC+QOXfEI6I7ZeavEFCyYAUnGfZn8ZhfzdH?=
+ =?us-ascii?Q?H4U0GB86FcAzFM7QbBM2n1vKMNrbJBLWCYAawgsZKp1M86mhlpakxL1JGWH2?=
+ =?us-ascii?Q?vwWf/GsR9nzhCc4pxMQjj51kpHs3Tlt+3VO5ldAMmROgbQb6Pxhi5JOYHxYB?=
+ =?us-ascii?Q?MBFKqFch4RF9fXvzXjvYUXsecdm8QFeLrnNZRT5Hfvc1EYS35DDzJTq6lXv0?=
+ =?us-ascii?Q?1g9ZKpuyML2nAAcpKdkD38OXxiw1fefRZcKmng7Vf4qkLdUWGuLTi8pZvI42?=
+ =?us-ascii?Q?Llro53kbLiNPYdlA9okB+lojp6gZp8V3uJie0DbhSWjeS6Knz81IqIIHgRTJ?=
+ =?us-ascii?Q?qgxT3ccMt46D5AEEF/2cM/VMnSjSSHjMZ6N1e3iBRnICnohHQC51wci8QuN4?=
+ =?us-ascii?Q?Qw6D7kvJnbaS3u2FZgNdPMSBpQcKnoQ1gHVUasHSHpPyJJWAIX/sMynP5uK5?=
+ =?us-ascii?Q?cOCNbn9d2JAUDvOAfG6FDyiUUzns4E8F0zHraW1zzm31Lqg2WeqN8lxtguNR?=
+ =?us-ascii?Q?QonH0dCIGluPQwNSXI7F+Jt36Vi3K+n8ds978avG9Tmf6glrJmXjvjd4mBgW?=
+ =?us-ascii?Q?EMeFG1AWQ8fiEhomg0BTRGm/DqhWGox5S6ihiQfYQUzEvU/LbTTFwW/lolYn?=
+ =?us-ascii?Q?moqZIKEzNsXcxSrWhz0l3Mzum/egg9lcEHFp7DOgbw2ksNr2ykBvNN83zcRz?=
+ =?us-ascii?Q?VVc0c9GN7uwHtCGF7cQN5AzS1NXILUJiGO5MI9MYlhKTrd9BQVSM2YXVmnVa?=
+ =?us-ascii?Q?8/9arwqDqEl4maO1eQUIreqhKqMmon1YIiudxYNulCZ/u0rl/7KnDXER8vZd?=
+ =?us-ascii?Q?hviw73cpePTwlf76GnDrPJoHwt5HqncUL8a79eZjxBheURzalm2GnEGrzOae?=
+ =?us-ascii?Q?uhl6YP9pS7MFw96b6gMEJKzTk5QgFV8xYtSYJYwgmmyC5R27qt6FP5clUUNR?=
+ =?us-ascii?Q?2055/gVKge1Vn+XMzZuSWyrgCSyYfuCMDKSARLoIkBP0umBa9ruO15PFy06s?=
+ =?us-ascii?Q?ZvDCYBdoEQPjPpb9KaelmlOhczVmwD2uZY7C0vcWaBrIpukq30U9E1kcfPpy?=
+ =?us-ascii?Q?ALjZug7lM/TsJgIMaxEivLjvdi1UO28OcR/4Q5THfmY591PCdqXdUcCWSV6G?=
+ =?us-ascii?Q?J85fwXXCN5UBe+C3F20GnlOkrvcUN84/zBJS3NB9K/4o6PPlyVpje2ROk/RB?=
+ =?us-ascii?Q?9ERRbmI9P5ca5v4QhFv2WSLYUKzAdJn7?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR18MB4666.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?pYSjEqN3k3JpN23QyGrejNSRkbbee31vsLLa4s/LSZiN/03SGFQeeJb427sE?=
+ =?us-ascii?Q?8cJrNfhMOgAe9OY5BkTjmo4wKQhgHsaq3D2dGpgVCtJi1DWbgKCu+8xHo4k/?=
+ =?us-ascii?Q?AoHN4iWx8RCCxabuiZZtmtQh9ntZfBrh8fXSmMi/u2dpW3t/85lJoGer6LyU?=
+ =?us-ascii?Q?+d8AXPTOQNDERIx88scANzDI5IdYisyGA6/0ymbNBB5g/tterdi0dgMqvmHt?=
+ =?us-ascii?Q?2zmGEGPRjgFenbsrn7/tIYqi8Vr8QewOD8tr64shFjZiytEO1qOKZI4pNvrf?=
+ =?us-ascii?Q?8grTcUtBom/JKXnD5qfMHQg9yVgJVTHoBXR6pHcdtsLqyHUqqxd4+0ON/fPM?=
+ =?us-ascii?Q?hTSyEl2xJFsQoe8wPch9Y/zz3tWacwdnnAlPI2aiPLU0iIJS+mXj/PLui5By?=
+ =?us-ascii?Q?7UG30emxh8SfzpZvecJ6UDmxBhzS/2vhxNPG2Miq3+QGb8OLPWOxZ6wZmuig?=
+ =?us-ascii?Q?arxd3Y0uVihK4ocPl83VgDDLDDS0Q6IFoRW2q8gHBg6+B7h0eLQPon0oxedh?=
+ =?us-ascii?Q?l/cJHqgLzItQI9Cq8Ir28Awit/bo2Sg/kkx4V+FF997qamGvvFCu8iv4K+fl?=
+ =?us-ascii?Q?uyyvZI4CIhzn8siikbVet9VF5mf2LdIJF/KIzQihDWOXW9S2AySfCPVP834E?=
+ =?us-ascii?Q?Zijxf9ZVz0ZPETrGGoJlDjNEd4r6Ajn3oJ43pA7UPvI06Z/PRGYlLToRVDBW?=
+ =?us-ascii?Q?oB81LXWmZgWrDqvHLmu/tvo8HYuJYDTGgxbiun7AK7hnxmGhGhkrbV8P9QNc?=
+ =?us-ascii?Q?x11y1dEeP4TfdbHg0D6j7SvUkH7tHp2E0LmaOg2jy0Dxy9/XSDF3Bm3/xe6q?=
+ =?us-ascii?Q?PEyEYkr7NzwTKthaWH7qhiSPLtdlc62x96Oj3tJS2TbNaN770HzTesR1rlQH?=
+ =?us-ascii?Q?APydtnZDZilFJfFlSDJbmLj666o7YisItIVlN57PUJc4H0xKdinb6IJWYbZy?=
+ =?us-ascii?Q?L8RFfjKRrkm2V7mhfRhnhPm0js5O1eKHr4YOTH7uscfR4bER9vnQkmbcdiJK?=
+ =?us-ascii?Q?JrYzYIn9mVVlt2bkd5DfdT2XPvzs/Gn990beeYsErAX6yOwxstkJ5m1cjjE0?=
+ =?us-ascii?Q?WTK+yPMSfysSxgk6OmI5q+N9t8DMbzItZN41+ezakOzXDYUbAJ1vStgbMs5b?=
+ =?us-ascii?Q?cclzpEZhPE5+Gt3TVB7L9k5KJVPP/XB2OPjfD1OJGQ+PfT4r0tM4Qe35K4fr?=
+ =?us-ascii?Q?aRH89rIhsP6ilotbZxPSDlqx7GeABHluQ+fhnOSarqV9u11dPtKfTjf/twIt?=
+ =?us-ascii?Q?qaWgPH0Rt4uH4LdQcZPbfhrgX+KqJh855ol8FjEgkLZh0lYoRCeo8EcOaf8Q?=
+ =?us-ascii?Q?1syTGJTIGi6oqBNjIAY2lTAGKB6uhhVrumsUwd9InULl+RMNYfakiY+PFpEy?=
+ =?us-ascii?Q?VMuu/EWhxoEvw3AaSkxrc7CSo85rfD0EDWSQ3IibezdxrqEPm1d3qrSGKZoe?=
+ =?us-ascii?Q?kV2qk/79XU9o2phGeOp9GKAemZuAcM2B9JonCxFZsQbmpDEcOBoBqXqe8ksa?=
+ =?us-ascii?Q?mTfYRlOajCMu3i9hpMp6dAXx+FhJBfqrDbLOA0v/ygAT5BXF4uOeSTWs0mYR?=
+ =?us-ascii?Q?fn2DIHHD9IqLCUw9CpXwgSNfsli6cRupsRTqNgsT?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250403145636.2891166-1-kuba@kernel.org>
-In-Reply-To: <20250403145636.2891166-1-kuba@kernel.org>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Fri, 4 Apr 2025 14:08:19 +0900
-X-Gm-Features: ATxdqUFQyIMwV3KsoHGd_UjIvZwgQhhyJ10i-T6QuOgLJ4ne_2Fwp_Tx7MtQPWk
-Message-ID: <CAMArcTWoxuPUJFN=mOzwTeSbnb6CiusnWusAocFEWgX-gx4B5A@mail.gmail.com>
-Subject: Re: [PATCH net] selftests: net: amt: indicate progress in the stress test
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR18MB4666.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 995ca811-ae7c-4591-05f5-08dd7338a9df
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Apr 2025 05:22:16.1367
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: rm9VXfMnfkMLvpSI9D3Fk0v/CE92TsVjVSdgZF8o3NxCF9xe864Tr3bSod1+vOSaSIZRSyvT43wDG3FkMoXwIQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR18MB3901
+X-Proofpoint-GUID: HvSCv489tYzWINwYD2FEHJZn8ymAHtYX
+X-Proofpoint-ORIG-GUID: HvSCv489tYzWINwYD2FEHJZn8ymAHtYX
+X-Authority-Analysis: v=2.4 cv=CO4qXQrD c=1 sm=1 tr=0 ts=67ef6c8b cx=c_pps a=IwUfk5KXFkOzJxXNjnChew==:117 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=XR8D0OoHHMoA:10 a=-AAbraWEqlQA:10 a=M5GUcnROAAAA:8 a=J1Y8HTJGAAAA:8 a=1XWaLZrsAAAA:8 a=VwQbUJbxAAAA:8 a=20KFwNOVAAAA:8 a=zB_nYMf46UciNYmz8joA:9 a=CjuIK1q_8ugA:10 a=OBjm3rFKGHvpk9ecZwUJ:22 a=y1Q9-5lHfBjTkpIzbSAN:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-04_01,2025-04-03_03,2024-11-22_01
 
-On Thu, Apr 3, 2025 at 11:56=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
+Hi,
 
-Hi Jakub,
-Thanks a lot for this work!
+From: Wentao Liang <vulab@iscas.ac.cn>=20
+Sent: Thursday, April 3, 2025 8:43 PM
+To: Sunil Kovvuri Goutham <sgoutham@marvell.com>; Geethasowjanya Akula <gak=
+ula@marvell.com>; Subbaraya Sundeep Bhatta <sbhatta@marvell.com>; Hariprasa=
+d Kelam <hkelam@marvell.com>; andrew+netdev@lunn.ch; davem@davemloft.net; e=
+dumazet@google.com; kuba@kernel.org; pabeni@redhat.com
+Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org; Wentao Liang <vul=
+ab@iscas.ac.cn>
+Subject: [PATCH] octeontx2-pf: Add error handling for cn10k_map_unmap_rq_po=
+licer().
 
-> Our CI expects output from the test at least once every 10 minutes.
-> The AMT test when running on debug kernel is just on the edge
-> of that time for the stress test. Improve the output:
->  - print the name of the test first, before starting it,
->  - output a dot every 10% of the way.
->
-> Output after:
->
->   TEST: amt discovery                                                 [ O=
-K ]
->   TEST: IPv4 amt multicast forwarding                                 [ O=
-K ]
->   TEST: IPv6 amt multicast forwarding                                 [ O=
-K ]
->   TEST: IPv4 amt traffic forwarding torture               ..........  [ O=
-K ]
->   TEST: IPv6 amt traffic forwarding torture               ..........  [ O=
-K ]
->
+The cn10k_free_matchall_ipolicer() calls the cn10k_map_unmap_rq_policer()
+for each queue in a for loop without checking for any errors. A proper
+implementation can be found in cn10k_set_matchall_ipolicer_rate().
 
-Reviewed-by: Taehee Yoo <ap420073@gmail.com>
+Check the return value of the cn10k_map_unmap_rq_policer() function during
+each loop. Jump to unlock function and return the error code if the
+funciton fails to unmap policer.
 
-I tested it, and it works well.
+Fixes: 2ca89a2c3752 ("octeontx2-pf: TC_MATCHALL ingress ratelimiting offloa=
+d")
+Signed-off-by: Wentao Liang <mailto:vulab@iscas.ac.cn>
+---
+ drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-TEST: amt discovery                                                 [ OK ]
-TEST: IPv4 amt multicast forwarding                                 [ OK ]
-TEST: IPv6 amt multicast forwarding                                 [ OK ]
-TEST: IPv4 amt traffic forwarding torture               ..........  [ OK ]
-TEST: IPv6 amt traffic forwarding torture               ..........  [ OK ]
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c b/drivers/n=
+et/ethernet/marvell/octeontx2/nic/cn10k.c
+index a15cc86635d6..ce58ad61198e 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
+@@ -353,11 +353,13 @@ int cn10k_free_matchall_ipolicer(struct otx2_nic *pfv=
+f)
+=20
+ 	/* Remove RQ's policer mapping */
+ 	for (qidx =3D 0; qidx < hw->rx_queues; qidx++)
+-		cn10k_map_unmap_rq_policer(pfvf, qidx,
+-					   hw->matchall_ipolicer, false);
++		rc =3D cn10k_map_unmap_rq_policer(pfvf, qidx, hw->matchall_ipolicer, fal=
+se);
++		if (rc)
++			goto out;
+=20
+Intentionally we do not bail out when unmapping one of the queues is failed=
+. The reason is during teardown if one of the queues is failed then
+we end up not tearing down rest of the queues and those queues cannot be us=
+ed later which is bad. So leave whatever queues have failed and proceed
+with tearing down the rest. Hence all we can do is print an error for the f=
+ailed queue and continue.
 
-Thanks a lot!
-Taehee Yoo
+Thanks,
+Sundeep
 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> Since net-next is closed I'm sending this for net.
-> We enabled DEBUG_PREEMPT in the debug flavor and the test now
-> times out most of the time.
->
-> CC: ap420073@gmail.com
-> CC: shuah@kernel.org
-> CC: linux-kselftest@vger.kernel.org
-> ---
->  tools/testing/selftests/net/amt.sh | 20 ++++++++++++++------
->  1 file changed, 14 insertions(+), 6 deletions(-)
->
-> diff --git a/tools/testing/selftests/net/amt.sh b/tools/testing/selftests=
-/net/amt.sh
-> index d458b45c775b..3ef209cacb8e 100755
-> --- a/tools/testing/selftests/net/amt.sh
-> +++ b/tools/testing/selftests/net/amt.sh
-> @@ -194,15 +194,21 @@ test_remote_ip()
->
->  send_mcast_torture4()
->  {
-> -       ip netns exec "${SOURCE}" bash -c \
-> -               'cat /dev/urandom | head -c 1G | nc -w 1 -u 239.0.0.1 400=
-1'
-> +       for i in `seq 10`; do
-> +               ip netns exec "${SOURCE}" bash -c \
-> +                  'cat /dev/urandom | head -c 100M | nc -w 1 -u 239.0.0.=
-1 4001'
-> +               echo -n "."
-> +       done
->  }
->
->
->  send_mcast_torture6()
->  {
-> -       ip netns exec "${SOURCE}" bash -c \
-> -               'cat /dev/urandom | head -c 1G | nc -w 1 -u ff0e::5:6 600=
-1'
-> +       for i in `seq 10`; do
-> +               ip netns exec "${SOURCE}" bash -c \
-> +                  'cat /dev/urandom | head -c 100M | nc -w 1 -u ff0e::5:=
-6 6001'
-> +               echo -n "."
-> +       done
->  }
->
->  check_features()
-> @@ -278,10 +284,12 @@ wait $pid || err=3D$?
->  if [ $err -eq 1 ]; then
->         ERR=3D1
->  fi
-> +printf "TEST: %-50s" "IPv4 amt traffic forwarding torture"
->  send_mcast_torture4
-> -printf "TEST: %-60s  [ OK ]\n" "IPv4 amt traffic forwarding torture"
-> +printf "  [ OK ]\n"
-> +printf "TEST: %-50s" "IPv6 amt traffic forwarding torture"
->  send_mcast_torture6
-> -printf "TEST: %-60s  [ OK ]\n" "IPv6 amt traffic forwarding torture"
-> +printf "  [ OK ]\n"
->  sleep 5
->  if [ "${ERR}" -eq 1 ]; then
->          echo "Some tests failed." >&2
-> --
-> 2.49.0
->
+ 	rc =3D cn10k_free_leaf_profile(pfvf, hw->matchall_ipolicer);
+=20
++out:
+ 	mutex_unlock(&pfvf->mbox.lock);
+ 	return rc;
+ }
+--=20
+2.42.0.windows.2
+
 
