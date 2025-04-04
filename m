@@ -1,266 +1,261 @@
-Return-Path: <netdev+bounces-179254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AA83A7B942
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 10:50:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FBEEA7B952
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 10:52:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D345F17A64C
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 08:49:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E8B51798E2
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 08:52:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 554021A3156;
-	Fri,  4 Apr 2025 08:48:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c/tABtJg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A763319E804;
+	Fri,  4 Apr 2025 08:52:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from webmail.webked.de (webmail.webked.de [159.69.203.94])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99AAC1A2393;
-	Fri,  4 Apr 2025 08:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6915C1953AD;
+	Fri,  4 Apr 2025 08:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.203.94
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743756491; cv=none; b=G9dDbGhBWmHUdyEjlTAh8Bs6bSsREuMA4pDKhrKWFokkPV5vnCZsZ3Pvid/KpQCLFpsSg9784PHZGBR+2EdEGG39dvJzOrZ8BfUtBHXXVAu6NMu+Ps6X7eRF2WyUlsFf5jncS40iN3GF89v9K3eWKU4TldAiTubitsz/B9VBF/U=
+	t=1743756742; cv=none; b=SGQN+MlZ5vrNSc5C1WSLdC4Q6YMeVx0kEcYFkOOGWs4buRRcKJtiRW6nuXgY8SXs33pHdxUwVQk4DaWs5A9kmHsuR6kQuv9wRbn7eLOyqMEe/hTQoorFyZYzt+/6+rf/aHHoeOYdDuXFUITqmUHi4VtAidhhFAV0B8bHYNzTOrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743756491; c=relaxed/simple;
-	bh=ZQOEb8u3RDoF68oLgxFL7DOVXtidnbHC/aIeLuWknxs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gBO1+pw0Qoxxg/DOcNpLqs6+oizHJq9aFxSEhOoTKCAYCxao7qNKPnogdIHoFwVcMAU2GmnZM1AmdaAHGlVh6Z9/06CxRQ3Sy4r/F85HWM18Lw32IRwO2ovL+RTqZsEGQVIqey5NhVZo1aHjtc2DqOG6syhLIfA+zpqxK9QorRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c/tABtJg; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-af51596da56so1611299a12.0;
-        Fri, 04 Apr 2025 01:48:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743756489; x=1744361289; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=GKYFZl2hMBVvq/tGTvaEyWP0BJSuPsnZGbFqpvTq3m8=;
-        b=c/tABtJgu+1wJsUkjKrBPvwHxlYzTfKx5KLtxrrgzhfwGhnw/6hl78TLrW9GE5gZLN
-         mI+cdtbZozoF4ENePLzbBuob6zSGuyzOVZZ8R0iPpoPK0HqMi0HGj6ryOTfeqfIGSfTK
-         pAMxja0NTobZT/w/Lgg//t9A4/GjDCkldDNK+MVjaz5/VjZLw4G991iQZdAIQJ7XfODq
-         TNp7/9IjOkmeqRr0gleYDD8SWOYuZgPpFTMqoR9vmorBYSfMczWP+9qes8FCBX8ZMkZ4
-         8Wgc6IU/4UzzS5HWxTplc1N3HEIDlsfproGpT5rDScNdUu5vDDlvxrsI51+288VcWt79
-         Q9pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743756489; x=1744361289;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GKYFZl2hMBVvq/tGTvaEyWP0BJSuPsnZGbFqpvTq3m8=;
-        b=gbT87ZTSv41xMXleiQCkS52QCQ/SguaEStLV2SMtdBL2LCVmHEOTZqLknQsdv41uKU
-         zAb0Ucer2fbARH/u25UKUYyg9QjGnm9dJQ8o78hbYDA56DW4MVLxW+EU4rvRDpiUMFm8
-         036pckZg0Y6yvVjiUglpHOfSsHCP/mb7QEhwOBNjqRV/hjE6suCrrAKPKyoZGMALDlqa
-         u7bpG3i6XRIVnFYo8EKjzmRY4CqeU5GJYAJjE2xOAoFWEO9NAmsxjmcB2y/tooc3V4q/
-         2U70dVingvqB6zCeHUQhb/ykg1+fzoS4wcw2MtRyfswAgoM3+NgizgnaoFPXjJ1ebxhi
-         sq4A==
-X-Forwarded-Encrypted: i=1; AJvYcCUOtJPBRc5IioM0MW3jFu0MMGXcFrb28zqqD7OckVHxBF8crXx9ww8zsToeBpKF85NtGI23/Vuf3j694bw=@vger.kernel.org, AJvYcCV0TrUz1p8A53RwzcsYcJXW8pfivWu8Yt85TGBd4S3hjzRzm7ixpc70T+17hO4p+1I5Wj0=@vger.kernel.org, AJvYcCW0b3wu7OK+/DWh0/EB65e3kBCAroWppkRrG65nqNUThRS3ZtNeAeQkfMQhGUTUYl2MAXFxbBrSxMJaJAJA@vger.kernel.org, AJvYcCWBIyiuXGIrWc6fLzF1IxJMvw3+0LUNFwnO4Ud4/QWiHh+e8RxMeaOo/6rVExCggf5iNxW9F9ZD2JXsnh98@vger.kernel.org, AJvYcCWJQ/bFk24O5Hp0JZV0XFJhNR4kxbJYnBgRCuzlm2K/5tmLXvLybylL2HJ+yV2TZsYwqKRfssoRwFON4f7vfp8=@vger.kernel.org, AJvYcCWVX06+Jmb1/qFd+FIYYK49QQriTeK0e+YunmPqYugJYDo9NIDl6+zXA+ZeLXAitjjhoBlhNb9w@vger.kernel.org, AJvYcCX/mZk2ieEmy+t92MdHcUygsboq5iZ0SqdlX5kc7F8HcLb9DpCS1zzaTPNKFKGzpusSRSmfr7hcSoBsuSE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzT7zSbRSPqDnGUtSv16T1bKfA6vLhno9VQU5t1+t6taJeB69yD
-	/2gnWmPEGDHklhEr417S7xiG6j4mIeb+JGc+RfRa5saC6MKupRSH
-X-Gm-Gg: ASbGncvTfwN7HF3F4A+oXR2eUK2jaHcm+kJMIDrK4fE8i1QuufdBRgpjzUah5prUH5Y
-	iGg/EXVCunVVxag0mIAospw0i5XmUUkZb8GBMpuqP/aSTgjqXASHNNlc8reLwMCTU9+Z5Ud1pZn
-	q5XVL7LUScxUKksRra62grNeCIGmS3DqSNrYNHLecDuTdy7LJaVeozJ8Qb2KAIpiIBCWnsTy7i4
-	BR0Uqi/EZQeIpWvgrY4xyc2dhJEle+As2TPY//wKAZSvYNXu98GuVYpsNLtPiCz5CjvBuIGa3hN
-	i/Egu+iZOIER5Wxvr0/a94tNVHjZEodRT7EhVJLKFHk2cw+E+opN+6UrhvjwVOYMTPgtQ3ZN
-X-Google-Smtp-Source: AGHT+IHQy54LZ/NyiSvEoks7UryUue+uQARWbnhEUMyhIJqZeMH+xfpWnZ/jGnglOqtjlSonVKNhIw==
-X-Received: by 2002:a05:6a21:999d:b0:1f5:8748:76cc with SMTP id adf61e73a8af0-20108188cdemr3659983637.31.1743756488698;
-        Fri, 04 Apr 2025 01:48:08 -0700 (PDT)
-Received: from visitorckw-System-Product-Name ([140.113.216.168])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af9bc32c999sm2377463a12.19.2025.04.04.01.47.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Apr 2025 01:48:07 -0700 (PDT)
-Date: Fri, 4 Apr 2025 16:47:58 +0800
-From: Kuan-Wei Chiu <visitorckw@gmail.com>
-To: Yury Norov <yury.norov@gmail.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>,
-	David Laight <david.laight.linux@gmail.com>,
-	Andrew Cooper <andrew.cooper3@citrix.com>,
-	Laurent.pinchart@ideasonboard.com, airlied@gmail.com,
-	akpm@linux-foundation.org, alistair@popple.id.au,
-	andrew+netdev@lunn.ch, andrzej.hajda@intel.com,
-	arend.vanspriel@broadcom.com, awalls@md.metrocast.net, bp@alien8.de,
-	bpf@vger.kernel.org, brcm80211-dev-list.pdl@broadcom.com,
-	brcm80211@lists.linux.dev, dave.hansen@linux.intel.com,
-	davem@davemloft.net, dmitry.torokhov@gmail.com,
-	dri-devel@lists.freedesktop.org, eajames@linux.ibm.com,
-	edumazet@google.com, eleanor15x@gmail.com,
-	gregkh@linuxfoundation.org, hverkuil@xs4all.nl,
-	jernej.skrabec@gmail.com, jirislaby@kernel.org, jk@ozlabs.org,
-	joel@jms.id.au, johannes@sipsolutions.net, jonas@kwiboo.se,
-	jserv@ccns.ncku.edu.tw, kuba@kernel.org, linux-fsi@lists.ozlabs.org,
-	linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
-	linux-serial@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linux@rasmusvillemoes.dk, louis.peens@corigine.com,
-	maarten.lankhorst@linux.intel.com, mchehab@kernel.org,
-	mingo@redhat.com, miquel.raynal@bootlin.com, mripard@kernel.org,
-	neil.armstrong@linaro.org, netdev@vger.kernel.org,
-	oss-drivers@corigine.com, pabeni@redhat.com,
-	parthiban.veerasooran@microchip.com, rfoss@kernel.org,
-	richard@nod.at, simona@ffwll.ch, tglx@linutronix.de,
-	tzimmermann@suse.de, vigneshr@ti.com, x86@kernel.org
-Subject: Re: [PATCH v3 00/16] Introduce and use generic parity16/32/64 helper
-Message-ID: <Z++cvrLOz2VAaUkO@visitorckw-System-Product-Name>
-References: <Z824SgB9Dt5zdWYc@visitorckw-System-Product-Name>
- <Z9CyuowYsZyez36c@thinkpad>
- <80771542-476C-493E-858A-D2AF6A355CC1@zytor.com>
- <Z9GtcNJie8TRKywZ@thinkpad>
- <Z9G2Tyypb3iLoBjn@visitorckw-System-Product-Name>
- <Z9KMKwnZXA2mkD2s@visitorckw-System-Product-Name>
- <Z+AlyB461xwMxMtG@visitorckw-System-Product-Name>
- <eec0dfd7-5e4f-4a08-928c-b7714dbc4a17@zytor.com>
- <Z+6dh1ZVIKWWOKaP@visitorckw-System-Product-Name>
- <Z-6zzP2O-Q7zvTLt@thinkpad>
+	s=arc-20240116; t=1743756742; c=relaxed/simple;
+	bh=Y/iH1wk4bgH4xibIUWVmQXY/sVGMZAhzE5PSW0nKRek=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=tHfKh7OkUHK7n2FZYxXAjVvUAemTCDXpibLFuIYZ5NL1Nn5OKuP/YbH74wLmGkF4TsdS3hGmvcRkK0cVsBfZs3RFadq7zS7yQEy2I2bTiZMRnUz5dTofelqIOm0Jf+AZrEtsIitV8i+y+GCFepJe9l2nEW/geLQ7w6+KgxNoz7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=webked.de; spf=pass smtp.mailfrom=webked.de; arc=none smtp.client-ip=159.69.203.94
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=webked.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=webked.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C106E62BAA;
+	Fri,  4 Apr 2025 10:52:09 +0200 (CEST)
+Message-ID: <e75cb5881a97485b08cdd76efd8a7d2191ecd106.camel@webked.de>
+Subject: Re: [REGRESSION] Massive virtio-net throughput drop in guest VM
+ with Linux 6.8+
+From: Markus Fohrer <markus.fohrer@webked.de>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: virtualization@lists.linux-foundation.org, jasowang@redhat.com, 
+	davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Date: Fri, 04 Apr 2025 10:52:09 +0200
+In-Reply-To: <20250404042711-mutt-send-email-mst@kernel.org>
+References: <1d388413ab9cfd765cd2c5e05b5e69cdb2ec5a10.camel@webked.de>
+	 <20250403090001-mutt-send-email-mst@kernel.org>
+	 <11c5cb52d024a5158c5b8c5e69e2e4639a055a31.camel@webked.de>
+	 <20250404042711-mutt-send-email-mst@kernel.org>
+Organization: WEBKED IT Markus Fohrer
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z-6zzP2O-Q7zvTLt@thinkpad>
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Thu, Apr 03, 2025 at 12:14:04PM -0400, Yury Norov wrote:
-> On Thu, Apr 03, 2025 at 10:39:03PM +0800, Kuan-Wei Chiu wrote:
-> > On Tue, Mar 25, 2025 at 12:43:25PM -0700, H. Peter Anvin wrote:
-> > > On 3/23/25 08:16, Kuan-Wei Chiu wrote:
-> > > > 
-> > > > Interface 3: Multiple Functions
-> > > > Description: bool parity_odd8/16/32/64()
-> > > > Pros: No need for explicit casting; easy to integrate
-> > > >        architecture-specific optimizations; except for parity8(), all
-> > > >        functions are one-liners with no significant code duplication
-> > > > Cons: More functions may increase maintenance burden
-> > > > Opinions: Only I support this approach
-> > > > 
-> > > 
-> > > OK, so I responded to this but I can't find my reply or any of the
-> > > followups, so let me go again:
-> > > 
-> > > I prefer this option, because:
-> > > 
-> > > a. Virtually all uses of parity is done in contexts where the sizes of the
-> > > items for which parity is to be taken are well-defined, but it is *really*
-> > > easy for integer promotion to cause a value to be extended to 32 bits
-> > > unnecessarily (sign or zero extend, although for parity it doesn't make any
-> > > difference -- if the compiler realizes it.)
-> > > 
-> > > b. It makes it easier to add arch-specific implementations, notably using
-> > > __builtin_parity on architectures where that is known to generate good code.
-> > > 
-> > > c. For architectures where only *some* parity implementations are
-> > > fast/practical, the generic fallbacks will either naturally synthesize them
-> > > from components via shift-xor, or they can be defined to use a larger
-> > > version; the function prototype acts like a cast.
-> > > 
-> > > d. If there is a reason in the future to add a generic version, it is really
-> > > easy to do using the size-specific functions as components; this is
-> > > something we do literally all over the place, using a pattern so common that
-> > > it, itself, probably should be macroized:
-> > > 
-> > > #define parity(x) 				\
-> > > ({						\
-> > > 	typeof(x) __x = (x);			\
-> > > 	bool __y;				\
-> > > 	switch (sizeof(__x)) {			\
-> > > 		case 1:				\
-> > > 			__y = parity8(__x);	\
-> > > 			break;			\
-> > > 		case 2:				\
-> > > 			__y = parity16(__x);	\
-> > > 			break;			\
-> > > 		case 4:				\
-> > > 			__y = parity32(__x);	\
-> > > 			break;			\
-> > > 		case 8:				\
-> > > 			__y = parity64(__x);	\
-> > > 			break;			\
-> > > 		default:			\
-> > > 			BUILD_BUG();		\
-> > > 			break;			\
-> > > 	}					\
-> > > 	__y;					\
-> > > })
-> > >
-> > Thank you for your detailed response and for explaining the rationale
-> > behind your preference. The points you outlined in (a)–(d) all seem
-> > quite reasonable to me.
-> > 
-> > Yury,
-> > do you have any feedback on this?
-> > Thank you.
-> 
-> My feedback to you:
-> 
-> I asked you to share any numbers about each approach. Asm listings,
-> performance tests, bloat-o-meter. But you did nothing or very little
-> in that department. You move this series, and it means you should be
-> very well aware of alternative solutions, their pros and cons.
-> 
-It seems the concern is that I didn't provide assembly results and
-performance numbers. While I believe that listing these numbers alone
-cannot prove which users really care about parity efficiency, I have
-included the assembly results and my initial observations below. Some
-differences, like mov vs movzh, are likely difficult to measure.
+Am Freitag, dem 04.04.2025 um 04:29 -0400 schrieb Michael S. Tsirkin:
+> On Fri, Apr 04, 2025 at 10:16:55AM +0200, Markus Fohrer wrote:
+> > Am Donnerstag, dem 03.04.2025 um 09:04 -0400 schrieb Michael S.
+> > Tsirkin:
+> > > On Wed, Apr 02, 2025 at 11:12:07PM +0200, Markus Fohrer wrote:
+> > > > Hi,
+> > > >=20
+> > > > I'm observing a significant performance regression in KVM guest
+> > > > VMs
+> > > > using virtio-net with recent Linux kernels (6.8.1+ and 6.14).
+> > > >=20
+> > > > When running on a host system equipped with a Broadcom
+> > > > NetXtreme-E
+> > > > (bnxt_en) NIC and AMD EPYC CPUs, the network throughput in the
+> > > > guest drops to 100=E2=80=93200 KB/s. The same guest configuration
+> > > > performs
+> > > > normally (~100 MB/s) when using kernel 6.8.0 or when the VM is
+> > > > moved to a host with Intel NICs.
+> > > >=20
+> > > > Test environment:
+> > > > - Host: QEMU/KVM, Linux 6.8.1 and 6.14.0
+> > > > - Guest: Linux with virtio-net interface
+> > > > - NIC: Broadcom BCM57416 (bnxt_en driver, no issues at host
+> > > > level)
+> > > > - CPU: AMD EPYC
+> > > > - Storage: virtio-scsi
+> > > > - VM network: virtio-net, virtio-scsi (no CPU or IO
+> > > > bottlenecks)
+> > > > - Traffic test: iperf3, scp, wget consistently slow in guest
+> > > >=20
+> > > > This issue is not present:
+> > > > - On 6.8.0=20
+> > > > - On hosts with Intel NICs (same VM config)
+> > > >=20
+> > > > I have bisected the issue to the following upstream commit:
+> > > >=20
+> > > > =C2=A0 49d14b54a527 ("virtio-net: Suppress tx timeout warning for
+> > > > small
+> > > > tx")
+> > > > =C2=A0 https://git.kernel.org/linus/49d14b54a527
+> > >=20
+> > > Thanks a lot for the info!
+> > >=20
+> > >=20
+> > > both the link and commit point at:
+> > >=20
+> > > commit 49d14b54a527289d09a9480f214b8c586322310a
+> > > Author: Eric Dumazet <edumazet@google.com>
+> > > Date:=C2=A0=C2=A0 Thu Sep 26 16:58:36 2024 +0000
+> > >=20
+> > > =C2=A0=C2=A0=C2=A0 net: test for not too small csum_start in
+> > > virtio_net_hdr_to_skb()
+> > > =C2=A0=C2=A0=C2=A0=20
+> > >=20
+> > > is this what you mean?
+> > >=20
+> > > I don't know which commit is "virtio-net: Suppress tx timeout
+> > > warning
+> > > for small tx"
+> > >=20
+> > >=20
+> > >=20
+> > > > Reverting this commit restores normal network performance in
+> > > > affected guest VMs.
+> > > >=20
+> > > > I=E2=80=99m happy to provide more data or assist with testing a
+> > > > potential
+> > > > fix.
+> > > >=20
+> > > > Thanks,
+> > > > Markus Fohrer
+> > >=20
+> > >=20
+> > > Thanks! First I think it's worth checking what is the setup, e.g.
+> > > which offloads are enabled.
+> > > Besides that, I'd start by seeing what's doing on. Assuming I'm
+> > > right
+> > > about
+> > > Eric's patch:
+> > >=20
+> > > diff --git a/include/linux/virtio_net.h
+> > > b/include/linux/virtio_net.h
+> > > index 276ca543ef44d8..02a9f4dc594d02 100644
+> > > --- a/include/linux/virtio_net.h
+> > > +++ b/include/linux/virtio_net.h
+> > > @@ -103,8 +103,10 @@ static inline int
+> > > virtio_net_hdr_to_skb(struct
+> > > sk_buff *skb,
+> > > =C2=A0
+> > > =C2=A0		if (!skb_partial_csum_set(skb, start, off))
+> > > =C2=A0			return -EINVAL;
+> > > +		if (skb_transport_offset(skb) < nh_min_len)
+> > > +			return -EINVAL;
+> > > =C2=A0
+> > > -		nh_min_len =3D max_t(u32, nh_min_len,
+> > > skb_transport_offset(skb));
+> > > +		nh_min_len =3D skb_transport_offset(skb);
+> > > =C2=A0		p_off =3D nh_min_len + thlen;
+> > > =C2=A0		if (!pskb_may_pull(skb, p_off))
+> > > =C2=A0			return -EINVAL;
+> > >=20
+> > >=20
+> > > sticking a printk before return -EINVAL to show the offset and
+> > > nh_min_len
+> > > would be a good 1st step. Thanks!
+> > >=20
+> >=20
+> > I added the following printk inside virtio_net_hdr_to_skb():
+> >=20
+> > =C2=A0=C2=A0=C2=A0 if (skb_transport_offset(skb) < nh_min_len){
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 printk(KERN_INFO "virtio_net=
+: 3 drop, transport_offset=3D%u,
+> > nh_min_len=3D%u\n",
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 skb_transport_offset(skb), nh_min_len);
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return -EINVAL;
+> > =C2=A0=C2=A0=C2=A0 }
+> >=20
+> > Built and installed the kernel, then triggered a large download
+> > via:
+> >=20
+> > =C2=A0=C2=A0=C2=A0 wget http://speedtest.belwue.net/10G
+> >=20
+> > Relevant output from `dmesg -w`:
+> >=20
+> > [=C2=A0=C2=A0 57.327943] virtio_net: 3 drop, transport_offset=3D34,
+> > nh_min_len=3D40=C2=A0=20
+> > [=C2=A0=C2=A0 57.428942] virtio_net: 3 drop, transport_offset=3D34,
+> > nh_min_len=3D40=C2=A0=20
+> > [=C2=A0=C2=A0 57.428962] virtio_net: 3 drop, transport_offset=3D34,
+> > nh_min_len=3D40=C2=A0=20
+> > [=C2=A0=C2=A0 57.553068] virtio_net: 3 drop, transport_offset=3D34,
+> > nh_min_len=3D40=C2=A0=20
+> > [=C2=A0=C2=A0 57.553088] virtio_net: 3 drop, transport_offset=3D34,
+> > nh_min_len=3D40=C2=A0=20
+> > [=C2=A0=C2=A0 57.576678] virtio_net: 3 drop, transport_offset=3D34,
+> > nh_min_len=3D40=C2=A0=20
+> > [=C2=A0=C2=A0 57.618438] virtio_net: 3 drop, transport_offset=3D34,
+> > nh_min_len=3D40=C2=A0=20
+> > [=C2=A0=C2=A0 57.618453] virtio_net: 3 drop, transport_offset=3D34,
+> > nh_min_len=3D40=C2=A0=20
+> > [=C2=A0=C2=A0 57.703077] virtio_net: 3 drop, transport_offset=3D34,
+> > nh_min_len=3D40=C2=A0=20
+> > [=C2=A0=C2=A0 57.823072] virtio_net: 3 drop, transport_offset=3D34,
+> > nh_min_len=3D40=C2=A0=20
+> > [=C2=A0=C2=A0 57.891982] virtio_net: 3 drop, transport_offset=3D34,
+> > nh_min_len=3D40=C2=A0=20
+> > [=C2=A0=C2=A0 57.946190] virtio_net: 3 drop, transport_offset=3D34,
+> > nh_min_len=3D40=C2=A0=20
+> > [=C2=A0=C2=A0 58.218686] virtio_net: 3 drop, transport_offset=3D34,
+> > nh_min_len=3D40=C2=A0=20
+>=20
+> Hmm indeed. And what about these values?
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 u32 start =3D __virtio16_to_cpu(little_endian, hdr-
+> >csum_start);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 u32 off =3D __virtio16_to_cpu(little_endian, hdr-
+> >csum_offset);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 u32 needed =3D start + max_t(u32, thlen, off +
+> sizeof(__sum16));
+> print them too?
+>=20
+>=20
+>=20
+> > I would now do the test with commit
+> > 49d14b54a527289d09a9480f214b8c586322310a and commit
+> > 49d14b54a527289d09a9480f214b8c586322310a~1
+> >=20
+>=20
+> Worth checking though it seems likely now the hypervisor is doing
+> weird
+> things. what kind of backend is it? qemu? tun? vhost-user? vhost-net?
+>=20
 
-Compilation on x86-64 using GCC 14.2 with O2 Optimization:
+Backend: QEMU/KVM hypervisor (Proxmox)
 
-Link to Godbolt: https://godbolt.org/z/EsqPMz8cq
 
-For u8 Input:
-- #2 and #3 generate exactly the same assembly code, while #1 replaces
-  one `mov` instruction with `movzh`, which may slightly slow down the
-  performance due to zero extension.
-- Efficiency: #2 = #3 > #1
+printk output:
 
-For u16 Input:
-- As with u8 input, #1 performs an unnecessary zero extension, while #3
-  replaces one of the `shr` instructions in #2 with a `mov`, making it
-  slightly faster.
-- Efficiency: #3 > #2 > #1
+[   58.641906] virtio_net: drop, transport_offset=3D34  start=3D34, off=3D1=
+6,
+needed=3D54, nh_min_len=3D40
+[   58.678048] virtio_net: drop, transport_offset=3D34  start=3D34, off=3D1=
+6,
+needed=3D54, nh_min_len=3D40
+[   58.952871] virtio_net: drop, transport_offset=3D34  start=3D34, off=3D1=
+6,
+needed=3D54, nh_min_len=3D40
+[   58.962157] virtio_net: drop, transport_offset=3D34  start=3D34, off=3D1=
+6,
+needed=3D54, nh_min_len=3D40
+[   59.071645] virtio_net: drop, transport_offset=3D34  start=3D34, off=3D1=
+6,
+needed=3D54, nh_min_len=3D40
 
-For u32 Input:
-- #1 has an additional `mov` instruction compared to #2, and #2 has an
-  extra `shr` instruction compared to #3.
-- Efficiency: #3 > #2 > #1
 
-For u64 Input:
-- #1 and #2 generate the same code, but #3 has one less `shr`
-  instruction compared to the others.
-- Efficiency: #3 > #1 = #2
 
----
 
-Adding -m32 Flag to View Assembly for 32-bit Machine:
 
-Link to Godbolt: https://godbolt.org/z/GrPa86Eq5
-
-For u8 Input:
-- #2 and #3 generate identical assembly code, whereas #1 has additional
-  `mov`, `shr`, and `push/pop` instructions.
-- Efficiency: #2 = #3 > #1
-
-For u16 Input:
-- #1 uses a lot of `xmm` register operations, making it slower than #2
-  and #3. Additionally, #2 has an extra `shr` instruction compared to #3.
-- Efficiency: #3 > #2 > #1
-
-For u32 Input:
-- #1 again uses a lot of `xmm` register operations, so it is slower
-  than #2 and #3, and #2 has an additional `shr` instruction compared to #3.
-- Efficiency: #3 > #2 > #1
-
-For u64 Input:
-- Both #1 and #2 use `xmm` register operations, but #1 has a few extra
-  `movdqa` instructions. #3 is more concise, using a few `shr`, `xor`,
-  and `mov` instructions to complete the operation.
-- Efficiency: #3 > #2 > #1
-
-Regards,
-Kuan-Wei
 
