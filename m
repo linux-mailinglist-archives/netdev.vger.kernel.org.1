@@ -1,81 +1,80 @@
-Return-Path: <netdev+bounces-179364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56C57A7C1EF
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 18:58:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A306AA7C1EE
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 18:58:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44A6D1896FF7
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 16:57:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86A803BA41F
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 16:57:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E4020E33E;
-	Fri,  4 Apr 2025 16:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E606F20E70F;
+	Fri,  4 Apr 2025 16:58:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="2v4QAORQ"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="1yZH7P4g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD711F181F
-	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 16:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4819A1F181F
+	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 16:58:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743785861; cv=none; b=WLmIK2OHZ9yj3ZqHiqQE84TE8fmRaxXfyB62SaF57R8Q2zS++1KWKMidQYD+wDDrSBEfrLcE1k2qiCIpNlX/kCiZXOgIJ3rQWC3F60ish798Cn8xxI6UAzoq3P5505Q8oMKQXXqCeefVjJtyFuHDD48C5l97b3/TGbb+UXIVzqs=
+	t=1743785890; cv=none; b=f1MpmfgBbvzEvQ9De1fN/+F/oe5JhE4DwRrp4dq9rqR6l7Ow2h7xYp1CEk7RhJ77GDTRNuqz0DPo6cDWUX6Znb23Owxvhlhxw6MLD7ikebAd29jwWYH4XtUsSjK4HbrX/Y0UBCgRJhCfBiDeMupa3MfSOanVHgLF1GIqwj4XYXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743785861; c=relaxed/simple;
-	bh=C1WHNjVICirt+LcG92/pa9gnj51Y+6daX3GfTCAZfVI=;
+	s=arc-20240116; t=1743785890; c=relaxed/simple;
+	bh=0f4sIAwB/txu2+Y8aqKgm2n4KFXcEOR60Pr9wd9MbWk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NVf0Qq5c9hUINIp4eyGSCt2ib4ne3gAqpDli57z8NeyIUXvu1zknz1FT5I0ioJ6ewfSaSqyzmR/pOaDP+0r9c0/Yzj29E/tqzdeSiVyYin8c47gWVktqUxvZtDnm/T2fj21aCzSMppTFBGvQBm+C88KOIYYbQrWP6CVTg0VDlgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=2v4QAORQ; arc=none smtp.client-ip=209.85.215.175
+	 In-Reply-To:Content-Type; b=uHf5otc01F+Wobb9bUqsIxQHFV6KP4O6GD87JsJ/zGrFYDd1oMVWXgJ8oMNvvoNFHn2lSdAIZ4mutvb30zO/Z1ju/4y59hutbsqhyNL42p9kNabCw0LvnoZTA8KwbPM7dAUtaLBuzOFlUyTUD5Z1zDxaYdmUY3ZOxjbjqhgfBY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=1yZH7P4g; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-af579e46b5dso1515056a12.3
-        for <netdev@vger.kernel.org>; Fri, 04 Apr 2025 09:57:39 -0700 (PDT)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-736b350a22cso1989254b3a.1
+        for <netdev@vger.kernel.org>; Fri, 04 Apr 2025 09:58:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1743785859; x=1744390659; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1743785888; x=1744390688; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=QoQh2N77bzJpmFltxTMJKWKzZDSJM18BFg7QwacmcxE=;
-        b=2v4QAORQPLiM2oXzf0JzobZkvmMd0dt8PtCaljMuz4Xhoc9TPff7cb+h/meeUDWYBW
-         zYEY+9BNrylPju9LM19qijNuszStJ1Bi1zG552hoUWk+I7QRYyHiZM84Odmro80AeHAr
-         j/yKqjEVh7b4zNh0o134SRh0KV+MjOC8RSEXFT9qtw0YhNAT6aZDqmwp8EEBUagbkMfu
-         wPsJUDRbT9J+FOeqldog8RQ4fJ2rp/fd4zBqhP+NDhm1n4JZ9X0RfPjzb0lquh4zwbjg
-         69ZmLuzD4rf+1vFg17DuL3zfrCApZiSPpP/OJQ/GkQWg9gzLTR76fAwHSwVkUDnjDStp
-         SVrg==
+        bh=b4Xtf/uy6pUyPN0X11nFkGKiKsix5v+wUmZCvk1oqD8=;
+        b=1yZH7P4gu8AVO1E24tQU1Ca5+HxYlQuoOD9tkn6OlS1/KGY/F2WwkJrsCUehbPB+Zf
+         SYYwNVRsZOW7RmrzoK4/FMqn81/CE72Bfcc6+13GSnOMW5uK2x0P5qVGaibv3kaWf1Hw
+         Wop3EAWemDo15oHwTVAG9ae4nPmNagz5UA/Vc1Wz4HfPg38idJnOuIMYLg1QWb2fibXC
+         nCeIlQNiUruAs/2rvBR7x6LXqMzxLgzmZO34ln3gcPC2LVExNLXmxbaOERg680BMdV4P
+         XiZ07Eilw1u2mwCt0EnIbbtIkkhRXPx9FWoVYUAfaiwDZApKEfLt+3cMQSauwiBFkd6q
+         EKJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743785859; x=1744390659;
+        d=1e100.net; s=20230601; t=1743785888; x=1744390688;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QoQh2N77bzJpmFltxTMJKWKzZDSJM18BFg7QwacmcxE=;
-        b=XfuCIHtIZNHwcXD/q2hQhTzSJzQ2UTTQY3lYJ3+z8FngWMX7/K2IfUdlHE5qKrc6Lf
-         9MGTi9ycsK8G1T/+XSABlym6gMn9VnjQvn85yUJWD1eiqXc2gapmS0BrPM9sfPftwOWj
-         K43xwSfmqnanxxQtG5yQtH5GYfNTstlMmrsOYjH/J7Kr/kjuRHaV2+EAmMAKAFcPXlRB
-         GkvFt93V6ffYj0eD5nXT8wm1sjDp6WKx7LZFE86sbOxrbYFsPh+KPovUk4sJ5fHXPh2t
-         gAyFUTl3+OWy/WHCwGGM5GLTkCrYS9iYM+xWq11PlfZa8bP6QoPdxV9PbBVLTxUDq+Q/
-         q3eA==
-X-Forwarded-Encrypted: i=1; AJvYcCXyJGDOLruFXLk50yOfECeltXfkK03lOmoyq+EwqQUW67vKI6oIs+G+Wpciays+ySXXyBy8coM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/LAJkbmBgjTot6/c2dMLJxnqsp9zl8k1Q6+LFsFu7e15PO9ey
-	pEW1TXH1s1OBXmVWaAltEIVAgoPkr0dCRSFHrWpHKy8iCcOtWZEcIzXxwTbGsDlcC/4Fnpus8hY
-	=
-X-Gm-Gg: ASbGnctfGgIQ4Aa1lG4X9CaSPbYfvJ/Q02VK1xP3svz68ZeHU2ESOa7rkzBK5CLip+G
-	IKrCpG/pXi0WSfwkPMriRj9JjeEbRmaB157hL3qia3Si7bnlghGOw/Ep3XmHAj1AWsEBl8PNSET
-	7S1tXPyGSekVWAGb21eWhKnQuyFF2WWm7+LBY2lulWxpca40FIShVTkDgtTH5NUtKki3PtrKUSQ
-	kr+XjMFnpe4JFjufmSDpgeOMaYWHDH2H5G5eRYL05MrsdcBK/kimGY5H/xByeogtRw4NuiiFUnN
-	jt7iutuTeNdzYoFEoDWptVM/ywugMCfp8fOxLccpXge2nbTR4eaqbbHHnZ5V01oPVsY7C05Vkr2
-	yBAj/trEGLYHMu30=
-X-Google-Smtp-Source: AGHT+IENQwoHrXYT+cSs1JmeVMdjXN5NqBRta5pYDWWQ9ED81OJuaqDOaYqlJ/zy9Gg9pEaYMsOitQ==
-X-Received: by 2002:a17:90a:f950:b0:2ff:5357:1c7f with SMTP id 98e67ed59e1d1-306a6240e1bmr4305214a91.30.1743785859092;
-        Fri, 04 Apr 2025 09:57:39 -0700 (PDT)
+        bh=b4Xtf/uy6pUyPN0X11nFkGKiKsix5v+wUmZCvk1oqD8=;
+        b=ZtO3AuvLR8ZNdXPP1X9SFeHOaY/AEboVSicb928Mf4893+3KK3jaLf56ZFh1lY4nFY
+         93bu6Cq3u2goxVOdubazJ6lX720p0B1V4CYeVm732QuFFTfBIWgBKAPxz+q4BMNSCSOy
+         jaRYUgA8hcTXVZM0LjS5a8kuY1/xSL9Yhe8KkAhu6vlZVOHr9n85JEYDXHPjcUBfGyKj
+         jd5Lid+Re8uuf4x9DNKhl2720K2Dosk0tJdd50V0jhE37I9xsWzW0F/Q/wIkV35OkVD9
+         tyVu4bGxASECFi7a+ZT1KMSCFjc+r2gGC6SSw/c14iJulLuwdP1Z9X6H9QqUPmcDYipu
+         gglA==
+X-Forwarded-Encrypted: i=1; AJvYcCVFVYVTO/dZhWa5Lzm3Dfg8qjFw5YQZgWezjVLRZiNlonajhJB4eNYrH2JyCXRiUecCkEoJSIQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxwMvCKpVoKrVaGHMu1nWj6NVE5hErYlK5Lk76H6oOZ9BuAXJ00
+	MaYoLv3i1i+EXtB+rPInqaP46I4ilisBHU0SIvhhVCeUo2UJemJMWWoDo0TajA==
+X-Gm-Gg: ASbGncvp3GgrtKEr6hVsyeAN8pw8tz8fpGgkPhc+hSDIVV946zM3d+iIlvJjHtx0W1s
+	voZLSD/masJLhiVkeYy8JP11KRnfB0wsZGwxk1xHcYnXH1ApfaSWVIJWrvUnEYIIVBfWM23av5n
+	nLd6DLus+KwgvHtj151aZD5fJ2lQywSADJEUH95E/Z1pF2JF4eMiY5YdF2+rXgTMiIyhNeCxux9
+	Kug3vKZhuAdxQ5Q9F7iaSMJ7K/MoBQm3BPqE1iTyJXe4OJhmK6JV+YoqXcy5sYH9fgLMNxypW3/
+	8l1ahTfr8KYBSG7c5w2g5pdNKKWqfLMuK7Y5EHkiGjbMa4gD0rCbLdwZvzcqLgL9G2tbqh0wxZP
+	eNcd1Mjg2oksaF/M=
+X-Google-Smtp-Source: AGHT+IFh74IzWtwPVl9j819LxAcNdkSl8OIHk2uahPV0zU62Uxtx640olCxrCld6HVTW6WtbIN/PNw==
+X-Received: by 2002:a05:6a00:1743:b0:730:79bf:c893 with SMTP id d2e1a72fcca58-739e48cf340mr5143184b3a.4.1743785888289;
+        Fri, 04 Apr 2025 09:58:08 -0700 (PDT)
 Received: from ?IPV6:2804:7f1:e2c3:8485:ad62:3938:da65:566f? ([2804:7f1:e2c3:8485:ad62:3938:da65:566f])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30584761e65sm3732814a91.13.2025.04.04.09.57.37
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-739d9e9dcc6sm3726950b3a.99.2025.04.04.09.58.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Apr 2025 09:57:38 -0700 (PDT)
-Message-ID: <f2ce7673-fe7b-4474-a760-9aad245b5151@mojatatu.com>
-Date: Fri, 4 Apr 2025 13:57:35 -0300
+        Fri, 04 Apr 2025 09:58:07 -0700 (PDT)
+Message-ID: <0f0fd21a-b614-4423-a8a7-8f4ca3b1d411@mojatatu.com>
+Date: Fri, 4 Apr 2025 13:58:04 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,21 +82,21 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [Patch net v2 07/11] selftests/tc-testing: Add a test case for
- FQ_CODEL with HTB parent
+Subject: Re: [Patch net v2 08/11] selftests/tc-testing: Add a test case for
+ FQ_CODEL with QFQ parent
 To: Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org
 Cc: jhs@mojatatu.com, jiri@resnulli.us, Pedro Tammela <pctammela@mojatatu.com>
 References: <20250403211033.166059-1-xiyou.wangcong@gmail.com>
  <20250403211636.166257-1-xiyou.wangcong@gmail.com>
- <20250403211636.166257-2-xiyou.wangcong@gmail.com>
+ <20250403211636.166257-3-xiyou.wangcong@gmail.com>
 Content-Language: en-US
 From: Victor Nogueira <victor@mojatatu.com>
-In-Reply-To: <20250403211636.166257-2-xiyou.wangcong@gmail.com>
+In-Reply-To: <20250403211636.166257-3-xiyou.wangcong@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 03/04/2025 18:16, Cong Wang wrote:
-> Add a test case for FQ_CODEL with HTB parent to verify packet drop
+> Add a test case for FQ_CODEL with QFQ parent to verify packet drop
 > behavior when the queue becomes empty. This helps ensure proper
 > notification mechanisms between qdiscs.
 > 
