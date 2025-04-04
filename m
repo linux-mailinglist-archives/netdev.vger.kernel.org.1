@@ -1,131 +1,147 @@
-Return-Path: <netdev+bounces-179378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 827D0A7C317
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 20:13:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F33B8A7C33B
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 20:28:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24883189967B
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 18:13:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C11E517CF96
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 18:28:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD5062144DC;
-	Fri,  4 Apr 2025 18:13:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB421212B3F;
+	Fri,  4 Apr 2025 18:28:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XutMckpm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EIMTbIAZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C95207E03
-	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 18:13:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9AE33FD;
+	Fri,  4 Apr 2025 18:28:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743790391; cv=none; b=rGG6bMkOKr226yrD1s/PIp8piHXjMtve4FaTqdMweklupfp/FUGAv/tVwJgCudsHFTGHupQn4FhKQx2tsUU04AKcdrNpCHFQpl7xzT2fdtd7RDMcYY0Ygzf6OkjwvWRaI3nPEcRq/n3T8CSkVYFL482psUgphSeY+b5zFip5r6A=
+	t=1743791289; cv=none; b=jbF/8/Fxbfgm9lXyBLjW/ul4SDjBhhZdwDdUvOXpKCqkpYHlrJY1qD6jb9QG9YrJOnrseV0GvBVRhdSYO1bdjttp5Jm0J8ZSFlWhPBiMI3itXvJImP+4AVCjtQR6SB8We0nPXd0UZsQ/tomC6IVt8rbJIglHElv2gcIB6aASCJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743790391; c=relaxed/simple;
-	bh=jvLFkmcF+UWRdcko5n6Ibt6uNx/djCRbhMUSFcaoSBA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ooKoKXAD9oM3uyMXAf4j+9wB88ZCc8ZntOa+IbbOtlkbWCyY9PSZyZwdRae7xPdhCO82Tv2CfbaPPqE08aRTuafF5heVAbPC5AIrTquN4rl9CQpOSJXoXXoOSFJPADone53VzL6TADVZ3veKMvrh666/iIvqx6UsTgaSenkzu3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XutMckpm; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4769b16d4fbso12879801cf.2
-        for <netdev@vger.kernel.org>; Fri, 04 Apr 2025 11:13:09 -0700 (PDT)
+	s=arc-20240116; t=1743791289; c=relaxed/simple;
+	bh=DglMbpkzGjQtfTLrGwSVvvXlRQMXQ19ZNDS/51mvNp8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=j7txwyLoPo/mrvMjZOBjx9cNkFOm35QAf74WMTsdjE2uLnsfziIfTIp4LkMZMv1vxvC9e3zu8v8OPF+RaSYmzT/vwlHPncVV14yg2LmAZRpj947KCCLRJNHpSaP7QKvYGte3lmNsohwdPhO9bl3yM7Gad7vZLx1XJVdNrZi++mY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EIMTbIAZ; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43ede096d73so2612465e9.2;
+        Fri, 04 Apr 2025 11:28:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743790389; x=1744395189; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iNZHnO9azwdmk8ZVPakWgyvrwcECvxnPeBR2pzgJtZI=;
-        b=XutMckpmVStySbOO2ZxDZZNtMlZVaDSKkehXaxMBUyqZiclO/JbrbUAo/FXqB2yOMk
-         wQyHhd5uYPJ6y1YII6iA4AM2TBOWNNKvjA6C0OZoCVnlzLNNflHekuLNr3v+s597nOee
-         P9Iaa84KVQ89Bvm8v3sAt6PydDRWQOe0NxHOpwLa5sBZ5KSBxokizJD1xLtaD5ezKp9Z
-         WVZSQhplccAUyAI8Yu36Izs4afKUxKyeDoA43j9ByJ1ROjVstYVLYkCbHdmyWSvlQaUd
-         BZtM7/DvUC0Jw7/NjqT/Gps8NCxu9fMbSBMDAAGNx+8Hp2WZQK2nV/twzovDHElZ4k3H
-         ElWg==
+        d=gmail.com; s=20230601; t=1743791286; x=1744396086; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9vX8L3znb4PiOY8Mv51B0TXVAFHt79CJkCJAUGNMOpc=;
+        b=EIMTbIAZwPmnRsQ+Bwz383haT8R3IA/hoYjGBM/kCXHiSbravgkrSmY8moak2M5f/l
+         /X/17Dtk/BUgeETMiki10RuWdS7viNGedCgzanCABgSzGvvxMy8BuaxQ3KkZOPbarzSF
+         E59YIFyntfDtFpNT5B30n1HZ5bwNAAtjcZ8c+PPq1Pz2kfPNHCd5vwjdg1YJWm++fSZH
+         Olh83uyf16Oi9Igda1qCWXXFDBpOopFi1qtb7Sjjix2+Bowqb4RjcmProx87L0Aa2ZGp
+         j024w5Ecn9Cwi+xs07FfRQFS9rSHZQQqs85xMKQ3FAUB6LOa47Oq/qbLCrHXyzHPKb7Z
+         7cNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743790389; x=1744395189;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iNZHnO9azwdmk8ZVPakWgyvrwcECvxnPeBR2pzgJtZI=;
-        b=rWFaqn96+j5vYVBa6eGYJsdArQtMfmKM/M/ZjQ1F4xUfy1eDXP30JukKVie1+nx89Z
-         021MBmBQX9oomADFiqjYO68no3UgzLq0hWXiSHLgYimlrM+nrX7kg/ehm/uiCOjRuoGO
-         tVzs7nzTjyoDWyyoHvqA7JQwALF+t3ImYgyKyVXi9yWIHDQt+vPphtGeNW5AQzvE3Io5
-         gzovDJND/HQu/Vtp20hA/jiA2pV8z1qdcbfiaemHzgHFhdqIHm5NE2LCUMz7jDoB5pXj
-         +A+VnrDXS8SES1YUnjXgu9G/hd63qBlL/Z5XYWWj4iARllW+tkRVUpOlgWM9rUINxfJp
-         +zSg==
-X-Forwarded-Encrypted: i=1; AJvYcCU9o3TAnyy4iSz5gDS0FXe2ALPgXfUhtDqOdyOjTftMSYYFdMe+SMuJFC0RCnDJM4SRGBKrCh0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyql81KUjmOebw6J33cVKfIkjfBhLajdMWjF1ViVf+VbDzTDK3T
-	NxdNvMdJNLEjyNyzYJMDFRdFCk1XmXwFpraWieIPtEmueOTY710RFrju6nex6MwI0wC88Qm9V78
-	+78ow4OalbqnaoOg+ezFlcbd30cQNOH8Ev+G3
-X-Gm-Gg: ASbGncvXU6SiLh/QsRIkUpZJMsHhsgJj/+J/jTDdC/kkTpGjRSh4XVd4+fYHVPzNMXb
-	Vu9GHonhgv+BCW2nnVgDcF/YfJYM9fruoj9F03pHHFtP3szuNGh64/4klgYZgPrDoO/OrpcsuNu
-	3/eBmaRbDJlq6fuzPTYiLfnvBRVF8=
-X-Google-Smtp-Source: AGHT+IHRNIoP+uM76kPY/WP6ajnpgwoc2J2uO2qtrTDuTr9vc1VFQ29YMER3UekpU+HYTl3jr4CwX2LfHHX8rElldxk=
-X-Received: by 2002:a05:622a:164d:b0:476:a895:7e82 with SMTP id
- d75a77b69052e-47925a737b6mr65362141cf.50.1743790388720; Fri, 04 Apr 2025
- 11:13:08 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743791286; x=1744396086;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9vX8L3znb4PiOY8Mv51B0TXVAFHt79CJkCJAUGNMOpc=;
+        b=NnA0lWXKVBFFcelt9QrN4HFzsf058D7pozJA7PzE0da+fLJpgqIko7KCFV9qauf99e
+         CeJzNnysGWZZJVk0JvAL5oWLtD20onxYRzzvtxYaQG+/cpv+wLG7OWI3gIGCd5+cNNE4
+         XEQzrKxKaTjXqdSCyyKnnPDcBh1+T1XiyumfYikGxTmwYhrG2qxMnyCABZxiFj0AdbWJ
+         fVqPtz2TGl2debGr23tspc7zoGMD5ZQEy6WgrRhybOSJLRZrpy3HcR5uAGOO8KfZ1rT9
+         8H96XRNzrxG6B1M4VTp7c23ExJRt7kihEzuiWspllmwBtKH0gfBXfjb75Tzj+0E1HoQ8
+         zy9w==
+X-Forwarded-Encrypted: i=1; AJvYcCVjSjgyWjG3eV5MHxxCtajRsnmFAX1yUwZJ11W4ePblm856TXo+C1dcdPqCfOYtG2aWyyz8ht4HLp1JcQw=@vger.kernel.org, AJvYcCXzjXxprGLll3kVIhMDJz+8CurYGaxBcR60WGmQp56nJoVpnhOzCuhpJmojmha0+uWZ2Mc/0xen@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZIttuCMjZ9C+Rfu8N2FldQCtALfX6k5lQ4PmfUnnmCrVRjhIW
+	daKXnp6J4DuIrGRENpN+wlZ9k6F6W3gutSSAiBLS/Wf3UNZJ+cUF
+X-Gm-Gg: ASbGncuSkzL2ax7OBB45fQWCitvW81RlCUHskNZaYmEukLcE2jd1cznCCYbDEidNjOw
+	AZVFghlYxS4o6zeKzDi3ZCMd6jZD139OfyVjkNMk07XLudRM9MPCq9Rl8ax07ZcM5nlF/BjhiJs
+	fjf1wJEvRitycneSQtIz7T3zkJX8051eUvctHVEqoc5XFaYRGlxDS2NzKxXb1Bj2wQCJ/8liOTb
+	w9rF8hrNP/f/aKxDUAbcVhePTc2w7yUIw/PVHFJfaf/wc0dsX4YOov0tmFwbyq8/V7kjL74ZCPt
+	I0cFGVuy+F3ZtXz2E6OeNj8+eYNqOb2DpcgJiGzUkikdq7se
+X-Google-Smtp-Source: AGHT+IF1/eepOaIp9QlGAjPtm96uos5iqsoWF//NfMBRrB0cNjIUFBWoUTRNSgw0T5NT7ur5UFRN0Q==
+X-Received: by 2002:a05:600c:4e47:b0:43d:ed:acd5 with SMTP id 5b1f17b1804b1-43ed0bc8dbbmr47581745e9.10.1743791285972;
+        Fri, 04 Apr 2025 11:28:05 -0700 (PDT)
+Received: from [192.168.0.2] ([212.50.121.5])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec1630de9sm55476465e9.1.2025.04.04.11.28.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Apr 2025 11:28:05 -0700 (PDT)
+Message-ID: <d74daaaf-4e66-4cc7-a74d-eb5d89e017f1@gmail.com>
+Date: Fri, 4 Apr 2025 21:28:33 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250404180334.3224206-1-kuba@kernel.org>
-In-Reply-To: <20250404180334.3224206-1-kuba@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 4 Apr 2025 20:12:57 +0200
-X-Gm-Features: AQ5f1JrOecq0sWQc_ZCBzMu1sQvGNYTS0n6SUYVZFp7AxLo6cxzPRdzxlKkih9s
-Message-ID: <CANn89i+pgjE_zNSnnUAvC3NKyV1cvfz8=aG8KOW7W-jk-MPv1g@mail.gmail.com>
-Subject: Re: [PATCH net 1/2] net: tls: explicitly disallow disconnect
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
-	andrew+netdev@lunn.ch, horms@kernel.org, borisp@nvidia.com, 
-	john.fastabend@gmail.com, sd@queasysnail.net, 
-	syzbot+b4cd76826045a1eb93c1@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net: wwan: Add error handling for
+ ipc_mux_dl_acb_send_cmds().
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+ Wentao Liang <vulab@iscas.ac.cn>
+Cc: m.chetan.kumar@intel.com, loic.poulain@linaro.org,
+ johannes@sipsolutions.net, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250403084800.2247-1-vulab@iscas.ac.cn>
+ <Z++G8b6DBd3uCd1x@mev-dev.igk.intel.com>
+Content-Language: en-US
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <Z++G8b6DBd3uCd1x@mev-dev.igk.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 4, 2025 at 8:03=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> syzbot discovered that it can disconnect a TLS socket and then
-> run into all sort of unexpected corner cases. I have a vague
-> recollection of Eric pointing this out to us a long time ago.
-> Supporting disconnect is really hard, for one thing if offload
-> is enabled we'd need to wait for all packets to be _acked_.
-> Disconnect is not commonly used, disallow it.
+On 04.04.2025 10:14, Michal Swiatkowski wrote:
+> On Thu, Apr 03, 2025 at 04:48:00PM +0800, Wentao Liang wrote:
+>> The ipc_mux_dl_acbcmd_decode() calls the ipc_mux_dl_acb_send_cmds(),
+>> but does not report the error if ipc_mux_dl_acb_send_cmds() fails.
+>> This makes it difficult to detect command sending failures. A proper
+>> implementation can be found in ipc_mux_dl_cmd_decode().
+>>
+>> Add error reporting to the call, logging an error message using dev_err()
+>> if the command sending fails.
+>>
+>> Fixes: 1f52d7b62285 ("net: wwan: iosm: Enable M.2 7360 WWAN card support")
+>> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+>> ---
+>>   drivers/net/wwan/iosm/iosm_ipc_mux_codec.c | 7 +++++--
+>>   1 file changed, 5 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c b/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c
+>> index bff46f7ca59f..478c9c8b638b 100644
+>> --- a/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c
+>> +++ b/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c
+>> @@ -509,8 +509,11 @@ static void ipc_mux_dl_acbcmd_decode(struct iosm_mux *ipc_mux,
+>>   			return;
+>>   			}
+>>   		trans_id = le32_to_cpu(cmdh->transaction_id);
+>> -		ipc_mux_dl_acb_send_cmds(ipc_mux, cmd, cmdh->if_id,
+>> -					 trans_id, cmd_p, size, false, true);
+>> +		if (ipc_mux_dl_acb_send_cmds(ipc_mux, cmd, cmdh->if_id,
+>> +					     trans_id, cmd_p, size, false, true))
+>> +			dev_err(ipc_mux->dev,
+>> +				"if_id %d: cmd send failed",
+>> +				cmdh->if_id);
+> 
+> Shouldn't it go to the net-next? It isn't fixing anything, just adding
+> error message.
 
-Indeed.
+Michal, you are right. Patch does not fix a user's problem.
 
-We have sk->sk_disconnects for protocols that have/want to support disconne=
-ct.
+Wentao, could you resend the patch without 'Fixes' tag and targeting 
+'net-next' tree (the subject should be 'PATH net-next v?').
 
-Anyone interested would have to look at commit 419ce133ab928ab5 ("tcp:
-allow again tcp_disconnect() when threads are waiting")
+> 
+>>   	}
+>>   }
+>>   
+>> -- 
+>> 2.42.0.windows.2
 
->
-> The immediate problem syzbot run into is the warning in the strp,
-> but that's just the easiest bug to trigger:
->
->   WARNING: CPU: 0 PID: 5834 at net/tls/tls_strp.c:486 tls_strp_msg_load+0=
-x72e/0xa80 net/tls/tls_strp.c:486
->   RIP: 0010:tls_strp_msg_load+0x72e/0xa80 net/tls/tls_strp.c:486
->   Call Trace:
->    <TASK>
->    tls_rx_rec_wait+0x280/0xa60 net/tls/tls_sw.c:1363
->    tls_sw_recvmsg+0x85c/0x1c30 net/tls/tls_sw.c:2043
->    inet6_recvmsg+0x2c9/0x730 net/ipv6/af_inet6.c:678
->    sock_recvmsg_nosec net/socket.c:1023 [inline]
->    sock_recvmsg+0x109/0x280 net/socket.c:1045
->    __sys_recvfrom+0x202/0x380 net/socket.c:2237
->
-> Fixes: 3c4d7559159b ("tls: kernel TLS support")
-> Reported-by: syzbot+b4cd76826045a1eb93c1@syzkaller.appspotmail.com
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-Reviewed-by: Eric Dumazet <edumazet@google.com>
 
