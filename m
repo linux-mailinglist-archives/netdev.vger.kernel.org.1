@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-179376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6657CA7C30A
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 20:03:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A19B0A7C30B
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 20:03:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 979143B87A3
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 18:03:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3A4E17A088
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 18:03:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E02311EF370;
-	Fri,  4 Apr 2025 18:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 364B421507F;
+	Fri,  4 Apr 2025 18:03:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aHfcrMKw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CxPXmsYf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB64B166F1A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1275F20B1E6
 	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 18:03:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743789819; cv=none; b=Ya1oypRkoibNB3iCQA8KzCYd41rdTxC/INYgEM56SbgmeOLuGSx05Fe0kLnUP9QrFKuIpD9UOjv51koBEQa0Y4TQgNgf6GevU0+hgkNlAQNKyNZmkras6Ta1bDcSO4fB4Np8+gbcoD1Wvmz79rNNA8R9M58aTyiMEr4Vvb8I530=
+	t=1743789820; cv=none; b=XmSLWBaoLRjE59YPL7hsxWaLT46Ys6Kyvsh1VXjffhp1TlhYsLZfpRkBlAMvkbxHkKtzQB4S9c5urPUPwqbg7tbQiMcAOpxd4IpCgEq1NpmuDNau4U+O3rXAiVaCEI1Zz66aJNDr5E3JlZkJdpl1vyfW5mmRqueWe5+hUcXZSuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743789819; c=relaxed/simple;
-	bh=rcuNmjTWXODGtiSdwJOUAMZnFnJ5jgecFQn66xgVni8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IeILfygsq009d9EmPLs5eZvLFnM0hCwVlFXmfI+LsgnzBd55a6R9yz7XKHD8sGghJCHgwfdj41WrAe1h9//QXfZdgOvR4BXNyfDoT2tjTf0cXAJ2DX2/Cpk4GMvUMaX+dxmmd/tnRNG+O3UEBNxulgywV3MMO3qXrnLV+rqUkTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aHfcrMKw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEE6FC4CEDD;
-	Fri,  4 Apr 2025 18:03:37 +0000 (UTC)
+	s=arc-20240116; t=1743789820; c=relaxed/simple;
+	bh=wwAureJpjqzJmcpkfkDLddhXNM3W12blEwp0TIkkFVE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=KqFaaRln4QjpZTc8aP4cV8vXPXTWKLTOxKXVB9g93a+CGvYCJjIqcrBFHlrVLJ4ZXphVp0M2ydWclEQdKsrOAl6LPM+RdJChv7gbDo9O0+ed9XUMpMVZNFEVJij+P3OJqi0ATYteXqgyasq9Bg31lbHBIS3HF1pE3AtRTFezuhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CxPXmsYf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5690AC4CEEA;
+	Fri,  4 Apr 2025 18:03:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1743789819;
-	bh=rcuNmjTWXODGtiSdwJOUAMZnFnJ5jgecFQn66xgVni8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=aHfcrMKw+1udwqJ7lWaqfqHrqnXAsxsU/2PdPs8X8jQl8R5dwp6Er2NOCmFLJLIOi
-	 B6kMhDPc4WbQW6+w7xa5RZnzg6wTC7NnDNpCCGzusD3Qmrct7vAH12sXphPtHfyiEU
-	 0IQpZX6RoSggL6tu761wbd1+5BTTw2f47q99N1dYLf4zkNjsJ64GUS9aMLdJVXt7/a
-	 qd9K3KddvE3TUny7AGJ7mYiNHh5zzCH+Zaxcqg3vleqaLZNTgmn+1gu/mh/shvNjfN
-	 vBuRpqNRvQm5obx9k24emAtG475gwpF9YSEG8H2uIrYnlcPK5pMeW4umgUNzNNdbei
-	 XrQXCdw3PdNPA==
+	bh=wwAureJpjqzJmcpkfkDLddhXNM3W12blEwp0TIkkFVE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=CxPXmsYfwUmEkDBf2KWBCelUPL3MY9o1JuTxUGZqbB5v0kDiLbWjCE0CMiYf4vlhh
+	 u9HYTrFYWxBK0LNEjKAmcs7MsLcBIbgpgefweFfvSYJIPS7BLMB3Ak3KfcJtbY647a
+	 IlPI7qA7QPM7TQlI0fIJcaPkbYCbP+6kBhNfxqxhrwFDE9KbPJdcbex67SnXLnv7dk
+	 xL+QyyVBl47v30hOFyrdZfT/1ClzgmijeoilQirKP5SzyhuHBLZau8ZDkiCUuOD8sX
+	 gyXi+jKf3bV04ubOjf8EQwwkxTkLuuwy4mM1DIiCZ7jnc1ow12CXttyJRS6D2aZwhs
+	 Wez9xX/3kuvPA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -50,12 +51,13 @@ Cc: netdev@vger.kernel.org,
 	borisp@nvidia.com,
 	john.fastabend@gmail.com,
 	sd@queasysnail.net,
-	Jakub Kicinski <kuba@kernel.org>,
-	syzbot+b4cd76826045a1eb93c1@syzkaller.appspotmail.com
-Subject: [PATCH net 1/2] net: tls: explicitly disallow disconnect
-Date: Fri,  4 Apr 2025 11:03:33 -0700
-Message-ID: <20250404180334.3224206-1-kuba@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net 2/2] selftests: tls: check that disconnect does nothing
+Date: Fri,  4 Apr 2025 11:03:34 -0700
+Message-ID: <20250404180334.3224206-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250404180334.3224206-1-kuba@kernel.org>
+References: <20250404180334.3224206-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,58 +66,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-syzbot discovered that it can disconnect a TLS socket and then
-run into all sort of unexpected corner cases. I have a vague
-recollection of Eric pointing this out to us a long time ago.
-Supporting disconnect is really hard, for one thing if offload
-is enabled we'd need to wait for all packets to be _acked_.
-Disconnect is not commonly used, disallow it.
+"Inspired" by syzbot test, pre-queue some data, disconnect()
+and try to receive(). This used to trigger a warning in TLS's strp.
+Now we expect the disconnect() to have almost no effect.
 
-The immediate problem syzbot run into is the warning in the strp,
-but that's just the easiest bug to trigger:
-
-  WARNING: CPU: 0 PID: 5834 at net/tls/tls_strp.c:486 tls_strp_msg_load+0x72e/0xa80 net/tls/tls_strp.c:486
-  RIP: 0010:tls_strp_msg_load+0x72e/0xa80 net/tls/tls_strp.c:486
-  Call Trace:
-   <TASK>
-   tls_rx_rec_wait+0x280/0xa60 net/tls/tls_sw.c:1363
-   tls_sw_recvmsg+0x85c/0x1c30 net/tls/tls_sw.c:2043
-   inet6_recvmsg+0x2c9/0x730 net/ipv6/af_inet6.c:678
-   sock_recvmsg_nosec net/socket.c:1023 [inline]
-   sock_recvmsg+0x109/0x280 net/socket.c:1045
-   __sys_recvfrom+0x202/0x380 net/socket.c:2237
-
-Fixes: 3c4d7559159b ("tls: kernel TLS support")
-Reported-by: syzbot+b4cd76826045a1eb93c1@syzkaller.appspotmail.com
+Link: https://lore.kernel.org/67e6be74.050a0220.2f068f.007e.GAE@google.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- net/tls/tls_main.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ tools/testing/selftests/net/tls.c | 36 +++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index cb86b0bf9a53..a3ccb3135e51 100644
---- a/net/tls/tls_main.c
-+++ b/net/tls/tls_main.c
-@@ -852,6 +852,11 @@ static int tls_setsockopt(struct sock *sk, int level, int optname,
- 	return do_tls_setsockopt(sk, optname, optval, optlen);
+diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
+index 9a85f93c33d8..5ded3b3a7538 100644
+--- a/tools/testing/selftests/net/tls.c
++++ b/tools/testing/selftests/net/tls.c
+@@ -1753,6 +1753,42 @@ TEST_F(tls_basic, rekey_tx)
+ 	EXPECT_EQ(memcmp(buf, test_str, send_len), 0);
  }
  
-+static int tls_disconnect(struct sock *sk, int flags)
++TEST_F(tls_basic, disconnect)
 +{
-+	return -EOPNOTSUPP;
++	char const *test_str = "test_message";
++	int send_len = strlen(test_str) + 1;
++	struct tls_crypto_info_keys key;
++	struct sockaddr_in addr;
++	char buf[20];
++	int ret;
++
++	if (self->notls)
++		return;
++
++	tls_crypto_info_init(TLS_1_3_VERSION, TLS_CIPHER_AES_GCM_128,
++			     &key, 0);
++
++	ret = setsockopt(self->fd, SOL_TLS, TLS_TX, &key, key.len);
++	ASSERT_EQ(ret, 0);
++
++	/* Pre-queue the data so that setsockopt parses it but doesn't
++	 * dequeue it from the TCP socket. recvmsg would dequeue.
++	 */
++	EXPECT_EQ(send(self->fd, test_str, send_len, 0), send_len);
++
++	ret = setsockopt(self->cfd, SOL_TLS, TLS_RX, &key, key.len);
++	ASSERT_EQ(ret, 0);
++
++	addr.sin_family = AF_UNSPEC;
++	addr.sin_addr.s_addr = htonl(INADDR_ANY);
++	addr.sin_port = 0;
++	ret = connect(self->cfd, &addr, sizeof(addr));
++	EXPECT_EQ(ret, -1);
++	EXPECT_EQ(errno, EOPNOTSUPP);
++
++	EXPECT_EQ(recv(self->cfd, buf, send_len, 0), send_len);
 +}
 +
- struct tls_context *tls_ctx_create(struct sock *sk)
+ TEST_F(tls, rekey)
  {
- 	struct inet_connection_sock *icsk = inet_csk(sk);
-@@ -947,6 +952,7 @@ static void build_protos(struct proto prot[TLS_NUM_CONFIG][TLS_NUM_CONFIG],
- 	prot[TLS_BASE][TLS_BASE] = *base;
- 	prot[TLS_BASE][TLS_BASE].setsockopt	= tls_setsockopt;
- 	prot[TLS_BASE][TLS_BASE].getsockopt	= tls_getsockopt;
-+	prot[TLS_BASE][TLS_BASE].disconnect	= tls_disconnect;
- 	prot[TLS_BASE][TLS_BASE].close		= tls_sk_proto_close;
- 
- 	prot[TLS_SW][TLS_BASE] = prot[TLS_BASE][TLS_BASE];
+ 	char const *test_str_1 = "test_message_before_rekey";
 -- 
 2.49.0
 
