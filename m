@@ -1,252 +1,178 @@
-Return-Path: <netdev+bounces-179345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCA56A7C10E
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 17:57:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F2B09A7C135
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 18:03:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8747F3B3090
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 15:56:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD0743A80A1
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 16:03:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21391FDA96;
-	Fri,  4 Apr 2025 15:56:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NV9kGc8B"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B977A202987;
+	Fri,  4 Apr 2025 16:03:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F351FCF65
-	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 15:56:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87C18F40;
+	Fri,  4 Apr 2025 16:03:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743782219; cv=none; b=ifZV6S9okY3EmU+Pk89BBXu1O2kJ2WaV6wR7kOZIh9Qk1GFqkRZQ6rD+qnOE+Rn0ayNVAFLKTfkQhM8tW+BnAXNVatsC+DryQA+pMlYnUGZq7ihcUppSG5c7Yn+fx421TCURHZkkXPMo+vIAgZEFqLRwmZuDsGufpvijnP5Hmyg=
+	t=1743782617; cv=none; b=EEDl8yOeLRZSEUg+hsPWl/XdlO92UJ8EA4nHtEliextpnq2OZtPFPHyu8LpIxw6q115gkDNpCBKR4Lp+dlJouvTZEnnouaERey08YSkSVPDMzFhfVjkZ7fX9BvGdFSuZFlNWoSB1oSPOZlzyXUAcOfZMcrDmJDdSh7tf64mjsEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743782219; c=relaxed/simple;
-	bh=oEinWYn2WzMXpFrS19fFmjPcheL0H/1c3+VVimA367w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lYxyuu7KnNfCCHAO/XrW1OqUhiPlpSmCJZM711IayGDme07vlyrpnU6C5uuq7mwH1ZE5PqwPPK692WbvQ7eW0lXSyg53WmPITqYo0h8D3svSoU7Tn3yPVEa5ty6GVjsq8lKTDZ1l7RToqfqUrjou8ThSLbMGHSEA/eTcQnHcv28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NV9kGc8B; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-39c0dfba946so1449830f8f.3
-        for <netdev@vger.kernel.org>; Fri, 04 Apr 2025 08:56:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743782216; x=1744387016; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oEinWYn2WzMXpFrS19fFmjPcheL0H/1c3+VVimA367w=;
-        b=NV9kGc8Ba5QZ8VrSzZNhl917Cc3yN8CbdqXJfAywyzMjAzrUipJT7RaaqpThdiegcT
-         8PO6St/RJKv+iq3AvPEUOoxOVjNh6xXHsfD1XbZ1i0mFpuF7aKEDzZ52OweJsJ7OnlIa
-         SBoTx+LNxesBleyiTow1wezELMffsKE96/03wTZpApzmaRC2mWRK8n0MwbYtHYlBQZfd
-         8w2gY6vvrt2eOdcyXhVgrOzcjjQ6ZDlKsFW4JDb4ZloXcDsDl/Ou4cRNzC7HqtaudOpV
-         TRTjYVvlCAYf/3Mf7V/7Ak0SjRDtNTtzO/owcwQYElKSa1lRg4OzZ5pqLyYDK3KLFDRb
-         nRBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743782216; x=1744387016;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oEinWYn2WzMXpFrS19fFmjPcheL0H/1c3+VVimA367w=;
-        b=NiEUtWczDC5xvuSmuJ/tK1VsXbp6313pxVlMslel8/4IzOCeqcYg/E0wpLh2F09daN
-         Mu591yjxc4jiAIuhTzODOsiJ/u6zM+Et5CFG8+7BPC7BHoKr8exsagjoYLzno+awm+nS
-         f/8H4WfnDFo6pTZQ7KoO4tsv40hWe3udY0xJ7de0NexO83VBRZFOIcWw3ZL+aivr211k
-         Y3yLBlprGcmew1x64SNEu5psr6Hmr3uSijKUbKphEsjH3zCyVCdhczkIMB0tCJZkSwkX
-         atdwgc2SJZ4xmaDMXhNd4PHQFCNWl7IEAFeJIvFSuDOQlyW9C9X+2zE47A9Pg4hEcBfk
-         hzpg==
-X-Forwarded-Encrypted: i=1; AJvYcCW+ar8sWLXzTGlqRF+7DypkvX2aXeEWFfe0A84WJHtg04iQ9CKJJL0BESVLFTJmZap8M6sMbWQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7MDDRfL0D8wUo96ShXDZG/rHSy05jCC7D1PyV4SGhN3vDHivc
-	EEwJn10SBRa07gBEPzqnLmq8fCParSlIQYCsG+pL/weDFo6LgmhVp8pjFbDTw+/Sg6tpvxIc4IR
-	ILjTa71Er53Xe/QuuQzwUS4lee/Q=
-X-Gm-Gg: ASbGncupZCS6qs49mY0jLTbnP5GSiNxT9oCAnL328INPlF2sMuc1bLmrJ1SDmCTnBFq
-	SZ1qW6o7LQpCaH5t9gdQjqFFuP9zjAOI1MpsXhC0huSjQKYVHPz4nuPNyD/GW4n7kAI7iqQBlt3
-	peMxAxyL8KTbG90ZHTwz80zZ7J6sCzO+YrGiRDVqgPPEjuhlfuzs5EJ4b1+ZC2ovGy6cUeVQ==
-X-Google-Smtp-Source: AGHT+IHOYm1A9mTHfW0EPFbxWKPYIZ1MEvU6dQHWyo37Nlc775xMPnIz2fjR+tg0YrVZYbm6T7oTqIRhmPhk5nGTIQU=
-X-Received: by 2002:a5d:6d8b:0:b0:390:eacd:7009 with SMTP id
- ffacd0b85a97d-39cba9337bbmr2998454f8f.42.1743782215835; Fri, 04 Apr 2025
- 08:56:55 -0700 (PDT)
+	s=arc-20240116; t=1743782617; c=relaxed/simple;
+	bh=LB0+aQivlJstFj1AeTFb88pnHKFXp1QfCPKZ3HMMlOE=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DKiACEL9Gfp7ScLgDSS6rSGm8jmMQtPbXylMm+SVM+KsUvuP20tzpx3k7jQFfAqv4HxRlHrGi31eLygfxv31kiGAsjh0SOUf8eyHmNuL/vfnXgJUtkXkAj4mAUH1HYhVaNZ1w+L0sYNNfof5nOQyNY1sf6OhXgtKK+bQXcn4lTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZTjwk6JXwz6K5qq;
+	Fri,  4 Apr 2025 23:59:50 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id CD0E514050C;
+	Sat,  5 Apr 2025 00:03:31 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 4 Apr
+ 2025 18:03:31 +0200
+Date: Fri, 4 Apr 2025 17:03:29 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: <alejandro.lucero-palau@amd.com>
+CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<dave.jiang@intel.com>, Alejandro Lucero <alucerop@amd.com>, Ben Cheatham
+	<benjamin.cheatham@amd.com>
+Subject: Re: [PATCH v12 05/23] cxl: add function for type2 cxl regs setup
+Message-ID: <20250404170329.00000401@huawei.com>
+In-Reply-To: <20250331144555.1947819-6-alejandro.lucero-palau@amd.com>
+References: <20250331144555.1947819-1-alejandro.lucero-palau@amd.com>
+	<20250331144555.1947819-6-alejandro.lucero-palau@amd.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <174354264451.26800.7305550288043017625.stgit@ahduyck-xeon-server.home.arpa>
- <174354300640.26800.16674542763242575337.stgit@ahduyck-xeon-server.home.arpa>
- <Z-6hcQGI8tgshtMP@shell.armlinux.org.uk> <20250403172953.5da50762@fedora.home>
- <de19e9f1-4ae3-4193-981c-e366c243352d@lunn.ch> <CAKgT0UdhTT=g+ODpzR5uoTEOkC8u+cfCp7H-8718Zphd=24buw@mail.gmail.com>
- <Z-8XZiNHDoEawqww@shell.armlinux.org.uk>
-In-Reply-To: <Z-8XZiNHDoEawqww@shell.armlinux.org.uk>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Fri, 4 Apr 2025 08:56:19 -0700
-X-Gm-Features: ATxdqUEhr1mJCwCVBiNZOgioKEP2bpwqv4o5YtoXmMB50e3a1BgatSSLlTgCuMQ
-Message-ID: <CAKgT0UepS3X-+yiXcMhAC-F87Zcd74W2-2RDzLEBZpL3ceGNUw@mail.gmail.com>
-Subject: Re: [net PATCH 1/2] net: phy: Cleanup handling of recent changes to phy_lookup_setting
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Maxime Chevallier <maxime.chevallier@bootlin.com>, 
-	netdev@vger.kernel.org, hkallweit1@gmail.com, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500009.china.huawei.com (7.191.174.84) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-On Thu, Apr 3, 2025 at 4:19=E2=80=AFPM Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
->
-> On Thu, Apr 03, 2025 at 02:53:22PM -0700, Alexander Duyck wrote:
-> > On Thu, Apr 3, 2025 at 9:34=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wro=
-te:
-> > > Maybe go back to why fixed-link exists? It is basically a hack to mak=
-e
-> > > MAC configuration easier. It was originally used for MAC to MAC
-> > > connections, e.g. a NIC connected to a switch, without PHYs in the
-> > > middle. By faking a PHY, there was no need to add any special
-> > > configuration API to the MAC, the phylib adjust_link callback would b=
-e
-> > > sufficient to tell the MAC to speed and duplex to use. For {R}{G}MII,
-> > > or SGMII, that is all you need to know. The phy-mode told you to
-> > > configure the MAC to MII, GMII, SGMII.
-> >
-> > Another issue is that how you would define the connection between the
-> > two endpoints is changing. Maxime is basing his data off of
-> > speed/duplex however to source that he is pulling data from
-> > link_mode_params that is starting to broaden including things like
-> > lanes.
->
-> Just a quick correction - this is not entirely correct. It's speed,
-> duplex and "lanes" is defined by interface mode.
->
-> For example, 10GBASER is a single lane, as is SGMII, 1000BASE-X,
-> 2500BASE-X. XLGMII and CGMII are defined by 802.3 as 8 lanes (clause
-> 81.)
->
-> speed and duplex just define the speed operated over the link defined
-> by the PHY interface mode.
->
-> (I've previously described why we don't go to that depth with fixed
-> links, but to briefly state it, it's what we've done in the past and
-> it's visible to the user, and we try to avoid breaking userspace.)
+On Mon, 31 Mar 2025 15:45:37 +0100
+alejandro.lucero-palau@amd.com wrote:
 
-Part of the issue is that I think I may be mixing terms up and I have
-to be careful of that. If I am not mistaken you refer to the PHY as
-the full setup from the MII down to the other side of the PMA or maybe
-PMD. I also have to resist calling our PMA a PHY as it is a SerDes
-PHY, not an Ethernet PHY. Am I understanding that correctly? The PMD
-is where we get into the media types, but the reason why I am focused
-on lanes is because my interfaces are essentially defined by the
-combination of an MII on the top, and coming out the bottom at the PMA
-we have either one or two lanes operating in NRZ or PAM4 giving us at
-least 4 total combinations that I am concerned with excluding the
-media type since I am essentially running chip to module.
+> From: Alejandro Lucero <alucerop@amd.com>
+> 
+> Create a new function for a type2 device initialising
+> cxl_dev_state struct regarding cxl regs setup and mapping.
+> 
+> Export the capabilities found for checking them against the
+> expected ones by the driver.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
+> ---
+>  drivers/cxl/core/pci.c | 52 ++++++++++++++++++++++++++++++++++++++++++
+>  include/cxl/cxl.h      |  5 ++++
+>  2 files changed, 57 insertions(+)
+> 
+> diff --git a/drivers/cxl/core/pci.c b/drivers/cxl/core/pci.c
+> index 05399292209a..e48320e16a4f 100644
+> --- a/drivers/cxl/core/pci.c
+> +++ b/drivers/cxl/core/pci.c
+> @@ -1095,6 +1095,58 @@ int cxl_pci_setup_regs(struct pci_dev *pdev, enum cxl_regloc_type type,
+>  }
+>  EXPORT_SYMBOL_NS_GPL(cxl_pci_setup_regs, "CXL");
+>  
+> +static int cxl_pci_setup_memdev_regs(struct pci_dev *pdev,
+> +				     struct cxl_dev_state *cxlds,
+> +				     unsigned long *caps)
+> +{
+> +	struct cxl_register_map map;
+> +	int rc;
+> +
+> +	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_MEMDEV, &map, caps);
+> +	/*
+> +	 * This call can return -ENODEV if regs not found. This is not an error
+> +	 * for Type2 since these regs are not mandatory. If they do exist then
+> +	 * mapping them should not fail. If they should exist, it is with driver
+> +	 * calling cxl_pci_check_caps where the problem should be found.
 
-> > I really think going forward lanes is going to start playing a
-> > role as we get into the higher speeds and it is already becoming a
-> > standard config item to use to strip out unsupported modes when
-> > configuring the interface via autoneg.
->
-> Don't vendors already implement downshift for cases where there are
-> problems with lanes/cabling?
+Good to put () on end of functions when mentioned in comments.
 
-One issue with doing any sort of downshift is that RSFEC and the
-alignment markers are different for each configuration. As such I
-don't think downshifting is an option without changing interface
-modes. If the other end is 50R2 and one of the lanes is dead then the
-link is dead. No optional downshift to 25R.
+> +	 */
+> +	if (rc == -ENODEV)
+> +		return 0;
 
-> > I am wondering about that. I know I specified we were XLGMII for fbnic
-> > but that has proven problematic since we aren't actually 40G.
->
-> If you aren't actually 40G, then you aren't actually XLGMII as
-> defined by 802.3... so that begs the question - what are you!
+Hmm. I don't mind hugely but I'd expect the -ENODEV handler in the
+clearly accelerator specific code that follows not here.
 
-Confused.. Sadly confused..
+That would require cxl_map_device_regs() to definitely not return
+-ENODEV though which is a bit ugly so I guess this is ok.
 
-So I am still trying to grok all this but I think I am getting there.
-The issue is that XLGMII was essentially overclocked to get to the
-50GMII. That is what we do have. Our hardware supports a 50GMII with
-open loop rate matching to 25G, and CGMII, but they refer to the
-50GMII as XLGMII throughout the documentation which led to my initial
-confusion when I implemented the limited support we have upstream now.
-On the PMA end of things like I mentioned we support NRZ (25.78125) or
-PAM4 (26.5625*2) and 1 or 2 lanes.
+I'm not entirely convinced this helper makes sense though given
+the 2 parts of the component regs are just done inline in 
+cxl_pci_accel_setup_regs() and if you did that then this
+accelerator specific 'carry on anyway' would be in the function
+with accel in the name.
 
-To complicate things 50G is a mess in and of itself. There are two
-specifications for the 50R2 w/ RS setup. One is the IEEE which uses
-RS544 and the other is the Ethernet Consortium which uses RS528. If I
-reference LAUI or LAUI-2 that is the the setup the IEEE referred to in
-their 50G setup w/o FEC. Since that was the common overlap between the
-two setups I figured I would use that to refer to this mode. I am also
-overloading the meaning of it to reference 50G with RS528 or BASER.
+	You'd need a
+	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_MEMDEV, &map, caps);
+	if (rc) {
+		if (rc != -ENODEV)
+			return rc;
+	} else {
+		rc = cxl_map_device_regs();
+		if (rc)
+			return rc;	
+	}	
+though which is a little messy.
 
-> > So we
-> > are still essentially just reporting link up/down using that. That is
-> > why I was looking at going with a fixed mode as I can at least specify
-> > the correct speed duplex for the one speed I am using if I want to use
-> > ethtool_ksettings_get.
-> >
-> > I have a patch to add the correct phy_interface_t modes for 50, and
-> > 100G links. However one thing I am seeing is that after I set the
-> > initial interface type I cannot change the interface type without the
-> > SFP code added. One thing I was wondering. Should I just ignore the
-> > phy_interface_t on the pcs_config call and use the link mode mask
-> > flags in autoneg and the speed/duplex/lanes in non-autoneg to
-> > configure the link? It seems like that is what the SFP code itself is
-> > doing based on my patch 2 in the set.
->
-> That is most certainly *not* what the SFP code is doing. As things stand
-> today, everything respects the PHY interface mode, if it says SGMII then
-> we get SGMII. If it says 1000BASE-X, we get 1000BASE-X. If it says
-> 2500BASE-X, then that's what we get... and so on.
+> +
+> +	if (rc)
+> +		return rc;
+> +
+> +	return cxl_map_device_regs(&map, &cxlds->regs.device_regs);
+> +}
+> +
+> +int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct cxl_dev_state *cxlds,
+> +			      unsigned long *caps)
+> +{
+> +	int rc;
+> +
+> +	rc = cxl_pci_setup_memdev_regs(pdev, cxlds, caps);
+> +	if (rc)
+> +		return rc;
+> +
+> +	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_COMPONENT,
+> +				&cxlds->reg_map, caps);
+> +	if (rc) {
+> +		dev_warn(&pdev->dev, "No component registers (%d)\n", rc);
+> +		return rc;
+> +	}
+> +
+> +	if (!caps || !test_bit(CXL_CM_CAP_CAP_ID_RAS, caps))
 
-I think I may be starting to understand where my confusing came from.
-While the SFP code may be correctly behaved I don't think other PCS
-drivers are, either that or they were implemented for much more than
-what they support. For example looking at the xpcs
-(https://elixir.bootlin.com/linux/v6.14-rc6/C/ident/xpcs_get_max_xlgmii_spe=
-ed)
-I don't see how you are getting 100G out of an XLGMII interface. I'm
-guessing somebody is checking for bits that will never be set.
+As before. Why not just mandate caps?  If someone really doesn't
+care they can provide a bitmap and ignore it.  Seems like a simpler
+interface to me.
 
-So then if I am understanding correctly the expectation right now is
-that once an interface mode is set, it is set. Do I have that right?
-Is it acceptable for pcs_get_state to return an interface value other
-than what is currently set? Based on the code I would assume that is
-the case, but currently that won't result in a change without a
-phydev.
+> +		return 0;
+> +
+> +	rc = cxl_map_component_regs(&cxlds->reg_map,
+> +				    &cxlds->regs.component,
+> +				    BIT(CXL_CM_CAP_CAP_ID_RAS));
+> +	if (rc)
+> +		dev_dbg(&pdev->dev, "Failed to map RAS capability.\n");
+> +
+> +	return rc;
+> +}
+> +EXPORT_SYMBOL_NS_GPL(cxl_pci_accel_setup_regs, "CXL");
 
-> The SFP code has added support to switch between 2500BASE-X and
-> 1000BASE-X because this is a use case with optical SFPs that can operate
-> at either speed. That's why this happens for the SFP case.
-
-Okay, so it looks like I will have to add code for new use cases then
-as essentially there are standards in place for how to autoneg between
-one or two lane modes as long as we stick to either NRZ or PAM4.
-
-> For PHYs, modern PHYs switch their host facing interface, so we support
-> the interface mode changing there - under the control of the PHY and
-> most certainly not under user control (the user doesn't know how the
-> PHY has been configured and whether the PHY does switch or rate
-> adapt.)
-
-I think I see what I am missing. The issue I have is that, assuming I
-can ever get autoneg code added, we can essentially get autoneg that
-tells us to jump between 50R or 100R2, or 25R and 50R2. If I am not
-mistaken based on the current model each of those would be a different
-interface mode.
-
-Now there are 2 ways we can get there. The first would be to have the
-user specify it. With the SFP code as it is I think that solution
-should be mostly addressed. The issue is what happens if I do get
-autoneg up and running. That is the piece it sounds like we will need
-more code for.
-
-> For everything else, we're in fixed host interface mode, because that
-> is how we've been - and to do anything else is new development.
-
-Yeah, that is the part I need to dig into I guess. As it stands I have
-patches in the works to add the interface modes and support for
-QSFP+/28. Looks like I will need to add support for allowing the PCS
-to provide enough info to switch interface modes.
 
