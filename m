@@ -1,221 +1,267 @@
-Return-Path: <netdev+bounces-179236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37624A7B724
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 07:27:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CF88A7B76A
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 07:38:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5E98189D3B8
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 05:27:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 916613B7987
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 05:38:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E01155CB3;
-	Fri,  4 Apr 2025 05:27:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D24C81607A4;
+	Fri,  4 Apr 2025 05:38:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QRHv+aGI"
+	dkim=pass (2048-bit key) header.d=hazent-com.20230601.gappssmtp.com header.i=@hazent-com.20230601.gappssmtp.com header.b="PwUx4SRV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3991514F6;
-	Fri,  4 Apr 2025 05:26:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C36972E62C0
+	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 05:38:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743744420; cv=none; b=qKeJt9FL0lV9D7KgTlTfEczRLYCsqY+kV0NGxzaWd/jRU81YvPpIep9UGmkHMkwdtedcxb1bSRh0UO+DyjNhcIcVjWcudrKWEnyTGVXlhDzQj22ntu4yxx0rD2dUWafW3pWLOVg159O/WuWycsfUTO7cA1C2G5ZLCM5qkTAwimE=
+	t=1743745095; cv=none; b=pQW1REsqAt4pnkJh2LlKsp3WTPURUMz+ks62DVI922TQ1IqD61AWKrvaeg/Nfam4//tUxKJxq5Swki+7lOt/q3rZYT+bwZJvw3AxYih2NUdjFuqfr+8BLYBVTL19hsg/XUGlmBYFD/l7IyHjAsIZul3SwH7K1C9VGggQ0cOjuLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743744420; c=relaxed/simple;
-	bh=C0lYSua6fDsvQmLvI+OydGXMoruw7uB1CrIim3MA25U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qpkRK+g72oKSu2W1Sa1CryTZ9w9p14svKyupH3+KnWc1BOv8pr7wCpCUWlNAW8sUq2MTaca3e+D8KviydC5oiLdr1Rl9saE3M/JW7/gYqeciZuTNHIZm8Rjej7tyhK3Vt0ZoDSGxcUiJpgN9glJfxVvx6m304jjKbGdW8BpMBEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QRHv+aGI; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5e6167d0536so2899973a12.1;
-        Thu, 03 Apr 2025 22:26:58 -0700 (PDT)
+	s=arc-20240116; t=1743745095; c=relaxed/simple;
+	bh=bUWd7xCg056Sy9z/tW+OrUOp3iWjHzxnGOqnESFpaQY=;
+	h=Message-ID:Subject:From:To:Date:References:Content-Type:
+	 MIME-Version; b=QBixVFhDEEVsb9CeRDHTtE0Bw7P7rBcMhakLk/Y0Pi8dMfJnPCTCKtLW19vMyzkg6xS+YRVVbJpCgg9eF4Pra6EBE+OFTwWu0wCfS92GiqvIU7nkb0AXoX5dUjzLYvjA/W4dsbE1KagpA7AIMPwuRCtbzAXL4dOFtL7IjNjbEVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hazent.com; spf=pass smtp.mailfrom=hazent.com; dkim=pass (2048-bit key) header.d=hazent-com.20230601.gappssmtp.com header.i=@hazent-com.20230601.gappssmtp.com header.b=PwUx4SRV; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hazent.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hazent.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-39c266c1389so1084438f8f.1
+        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 22:38:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743744416; x=1744349216; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qy+e4bb9BRoQ0to6ueXIVMI4Q4x2sVS+j5MkPGS0Bqc=;
-        b=QRHv+aGI0N7ad2A0O/AdFc0JmNNx0IUkPhUw2fePDVTccTaXZPIOAwA+HlKWuq2NJn
-         iaAEmJWZu8vh46+a+wUoUQzY/o2pBKlgTHkm3/Gd4ss1Iybbm+tS6zd++Bbv0GGIEjU8
-         jv2P30yrjYb1zubvjRiemezIqdeLr26+gSlVUGzZmb8TqEaOfgod2tgQ1Vyuoy8UJ32N
-         ccs0hC2ijt8vTOQrRRJba2P/EsTpfKCtS1u39PIwFBJu4mSgqWdn3YN2SOw0vzk9hAHk
-         SmvbW7q/16lgjCjkQg9R04tWllxkywHe+/fKUkz73yv4K10JP88SufJ00pI6bgnrQ9U1
-         lLKg==
+        d=hazent-com.20230601.gappssmtp.com; s=20230601; t=1743745091; x=1744349891; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references:date
+         :to:from:subject:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rxUJeQ/M4IrY8FL/vOcMQiOKK+o3pje6beF8kdDLlWU=;
+        b=PwUx4SRVzogPkdWAwB0ln+CorvaqFXEVqphk23SRaafhsZ591Y+InNkFwscT6uXoR2
+         /HuzQ1KZEaPdRcQgv9kE3j1KIk/hpfoo+27AVQmTBTnzG8xusrsasQU/cD2jKItisxhB
+         e9vxSUK7E1/5Gswi/ifKgg6J1gGEa1Ywdtvu2iM9w0LvLLdr+V51wcamA0GVVVUHN+aF
+         EQ6uNXLzLx61keNlAeEumfKOQ8qlyZTBQDJkkRPI/XzZ8ftm7fYdPjRlClNVAfLXXVyj
+         GMC7wYQBfN3YZzbrlEaqY9f0BD/dsrb+V94XEV4Kpt6ZketW1Z1nhCvcM45hpbHu/zMg
+         uikw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743744416; x=1744349216;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qy+e4bb9BRoQ0to6ueXIVMI4Q4x2sVS+j5MkPGS0Bqc=;
-        b=e7paw+py0CFq8ZixV73o/ZeGX1LWaJsJoeVBjFR0KjXLKQdX9S4crwVNySICQHI5FX
-         f8uM3TWLD/RauFIrUyQNdypgYjJ/iOPuXtF5R08EEd4xR8Eg6EfqXgYEdc5f4Kw+me7j
-         k601RMaW42B1EDmMGExiQdWkxe4ffRuAC4RGD4soLcDf6Pw5pT+XAlKgJ5up8bby30mH
-         pcOHBXmUhq5XiuQjZPKx7/ccwMfjZt4uSGcfGk5rUuKu//VkpNfak7YytuAUiYDLwvEF
-         o0dQV+XjAxb8vT7AfjX9vIFyxeqgID3yeT70zAGLoGFJlJlea+PhIy1lKjUTDiL+hXiA
-         VYIA==
-X-Forwarded-Encrypted: i=1; AJvYcCVrgQDp290g/8sSHqfXuLaiIFoU2ueuP0nkdVk5YD9k0T0Xn4ada8+cjgtYlUF3MItv/Fz1AatJcksJOW2XeV0=@vger.kernel.org, AJvYcCWD1UX9Wkp0uNbBbVCyu3YDcggrfJ+cqJS3dRqRTGBfbDVLRhyLsHk+Z32yt4qteYjB7slKOmGQ@vger.kernel.org
-X-Gm-Message-State: AOJu0YzukdJi6Jz0D2OwTvZW29U7uQJLeNQV3Z5vP05stSudydXt5njN
-	1WxscwivFwykKTo4VqSDb31EiJgZgx9+t/jeUN9dfFt2yUfrVEp1AZv3cb8UXO9fbXwFMYxtMxs
-	juB2An3bT4D5Sq56KBBYaiFAZ1to=
-X-Gm-Gg: ASbGncv3CDAVtLBCv06b31UiQ0zld550mcGGj/r7vcLcmSAAQB2E8oMREoogeX6hL9E
-	tfQQcT76AHCHaebRCDIEuu5GumEg5Fl/JtSgpEwW9r6AWNIbZjOzGZ+IbLKaz3mQ3Thn5XIKsf1
-	VpJeLeIMEfEsc0YwyYJSjGNCUBAQZd+wMUpUnmka4=
-X-Google-Smtp-Source: AGHT+IEcjKP2DTqW6Dispo7VWlGa1QY7FyMsbyTJnCxp3oSVcKtMJhWbPm53ZKUo+HoZnLghMVs+u1TCve9CPZFp190=
-X-Received: by 2002:a05:6402:1ed0:b0:5ec:9352:7b20 with SMTP id
- 4fb4d7f45d1cf-5f0b3098f92mr1629339a12.0.1743744416017; Thu, 03 Apr 2025
- 22:26:56 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1743745091; x=1744349891;
+        h=mime-version:user-agent:content-transfer-encoding:references:date
+         :to:from:subject:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rxUJeQ/M4IrY8FL/vOcMQiOKK+o3pje6beF8kdDLlWU=;
+        b=QqlfPq4ESE4mt/+zgN4n2boKaiCGQbaQObQKdkguYEg1C+6mYBR4AnwQDwkLDQyxJj
+         afmifoV+ame+TsaoPB5xe9bivW+jHADdKAcpV2kUVHq3gIrULUqaqJzNE/XuJd0GnX4K
+         l8FzXwP6J5T6X676skMAC2R+7R9MwRxrtxoyD1TP8oVcdlQfzfcH5VE9r7EtA2JmOvyZ
+         9H6czvFJjnJhbI89i6cPNvIztF9zU48YZ4apysO8NSyDrip4WvOU2TNnVJR4FyS1hIh5
+         pJMXZ6Ec6ePdWCMBgss875Tcs/zDOhZF1KYG6Mo4H8kRnxheAPQZA5a8v2mQLK1pexy8
+         ZDDA==
+X-Gm-Message-State: AOJu0YxS35cnt94TTbyV0DYX/wJbHWpoaIX37VYvlpo3gy5/PxBJZRUb
+	d9OXufXppCVsjKkZjTTsIuFUfOzh9Mu7HRZ9fc0oLV/QoODcwUUgSs5YSCa7iKpyk5VqjCU8t2g
+	drg==
+X-Gm-Gg: ASbGncuLml4LZsm0KiNu/rE+RV5Ex9lTqAAMKMtL97FzQSzFgdKUoM3Wpy1oAVkLNJq
+	gzrz+F2HNkTJxyYCaXFOF2gJ5yHc/41c+faCNqe/FplSMQVJX2+wI8MpUzbp0rIoPcMjRr+dZYF
+	2nfpgQN+4tanORI1sCDzcHuaKtshn1Tqa7yF6C8L0rifSjuf29RoqWe9vcGroowSpGmMa5RnJym
+	iRBhd6jgETBh0mGygnPCBFBN4FYZc2UCivi7I7TkoZFVN+2MBSeNRhJIo4UVVd1z3WytpblPFU/
+	BVt/IGTi0HC5x64jDCG7g5JvdEXDzhiq0PrSBoRQX++Hf6NiPkBj
+X-Google-Smtp-Source: AGHT+IG7w3/pxPhwuQTumDr+KGzqWxQ45Gr+jnXzY57hmrQCbZu/d5JEf5E/oGpJMWCEMwfusB1q2g==
+X-Received: by 2002:a5d:64cd:0:b0:390:eebc:6f32 with SMTP id ffacd0b85a97d-39d1466220fmr841271f8f.48.1743745090503;
+        Thu, 03 Apr 2025 22:38:10 -0700 (PDT)
+Received: from [192.168.2.3] ([109.227.147.74])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c30226b39sm3383738f8f.85.2025.04.03.22.38.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Apr 2025 22:38:10 -0700 (PDT)
+Message-ID: <4909677fbf94dcbe5949a2a88292439302109920.camel@hazent.com>
+Subject: Fwd: Re: Issue with AMD Xilinx AXI Ethernet (xilinx_axienet) on
+ MicroBlaze: Packets only received after some buffer is full
+From: =?ISO-8859-1?Q?=C1lvaro?= "G. M." <alvaro.gamez@hazent.com>
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jakub Kicinski
+	 <kuba@kernel.org>, "Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>
+Date: Fri, 04 Apr 2025 07:38:09 +0200
+References: <c9861f0b98ecd199873585e188099b6fa877cc56.camel@hazent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.0-1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250403060423.1209435-1-ap420073@gmail.com> <20250403060423.1209435-3-ap420073@gmail.com>
-In-Reply-To: <20250403060423.1209435-3-ap420073@gmail.com>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Fri, 4 Apr 2025 14:26:44 +0900
-X-Gm-Features: ATxdqUGOs0AuEO4WvYTuBmixNzS8_qiL4-yaXIguazEm_h5TsUnaWTszF2wfxCw
-Message-ID: <CAMArcTWRnAqBNZd+dgULkm7saw24S_0f1Pw2X6e7Mfgd6zEpbQ@mail.gmail.com>
-Subject: Re: [PATCH net 2/2] selftests: drv-net: test random value for hds-thresh
-To: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	shuah@kernel.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc: kory.maincent@bootlin.com, willemb@google.com, 
-	aleksander.lobakin@intel.com, ecree.xilinx@gmail.com, almasrymina@google.com, 
-	daniel.zahka@gmail.com, jianbol@nvidia.com, gal@nvidia.com, 
-	michael.chan@broadcom.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 3, 2025 at 3:04=E2=80=AFPM Taehee Yoo <ap420073@gmail.com> wrot=
-e:
->
-> hds.py has been testing 0(set_hds_thresh_zero()),
-> MAX(set_hds_thresh_max()), GT(set_hds_thresh_gt()) values for hds-thresh.
-> However if a hds-thresh value was already 0, set_hds_thresh_zero()
-> can't test properly.
-> So, it tests random value first and then tests 0, MAX, GT values.
->
-> Testing bnxt:
->     TAP version 13
->     1..13
->     ok 1 hds.get_hds
->     ok 2 hds.get_hds_thresh
->     ok 3 hds.set_hds_disable # SKIP disabling of HDS not supported by
->     the device
->     ok 4 hds.set_hds_enable
->     ok 5 hds.set_hds_thresh_random
->     ok 6 hds.set_hds_thresh_zero
->     ok 7 hds.set_hds_thresh_max
->     ok 8 hds.set_hds_thresh_gt
->     ok 9 hds.set_xdp
->     ok 10 hds.enabled_set_xdp
->     ok 11 hds.ioctl
->     ok 12 hds.ioctl_set_xdp
->     ok 13 hds.ioctl_enabled_set_xdp
->     # Totals: pass:12 fail:0 xfail:0 xpass:0 skip:1 error:0
->
-> Testing lo:
->     TAP version 13
->     1..13
->     ok 1 hds.get_hds # SKIP tcp-data-split not supported by device
->     ok 2 hds.get_hds_thresh # SKIP hds-thresh not supported by device
->     ok 3 hds.set_hds_disable # SKIP ring-set not supported by the device
->     ok 4 hds.set_hds_enable # SKIP ring-set not supported by the device
->     ok 5 hds.set_hds_thresh_random # SKIP hds-thresh not supported by
->     device
->     ok 6 hds.set_hds_thresh_zero # SKIP ring-set not supported by the
->     device
->     ok 7 hds.set_hds_thresh_max # SKIP hds-thresh not supported by
->     device
->     ok 8 hds.set_hds_thresh_gt # SKIP hds-thresh not supported by device
->     ok 9 hds.set_xdp # SKIP tcp-data-split not supported by device
->     ok 10 hds.enabled_set_xdp # SKIP tcp-data-split not supported by
->     device
->     ok 11 hds.ioctl # SKIP tcp-data-split not supported by device
->     ok 12 hds.ioctl_set_xdp # SKIP tcp-data-split not supported by
->     device
->     ok 13 hds.ioctl_enabled_set_xdp # SKIP tcp-data-split not supported
->     by device
->     # Totals: pass:0 fail:0 xfail:0 xpass:0 skip:13 error:0
->
-> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> ---
->  tools/testing/selftests/drivers/net/hds.py | 28 +++++++++++++++++++++-
->  1 file changed, 27 insertions(+), 1 deletion(-)
->
-> diff --git a/tools/testing/selftests/drivers/net/hds.py b/tools/testing/s=
-elftests/drivers/net/hds.py
-> index 8b7f6acad15f..3ba8e4d69c4c 100755
-> --- a/tools/testing/selftests/drivers/net/hds.py
-> +++ b/tools/testing/selftests/drivers/net/hds.py
-> @@ -6,7 +6,7 @@ import os
->  from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_raises, KsftSkipEx
->  from lib.py import CmdExitFailure, EthtoolFamily, NlError
->  from lib.py import NetDrvEnv
-> -from lib.py import defer, ethtool, ip
-> +from lib.py import defer, ethtool, ip, random
->
->
->  def _get_hds_mode(cfg, netnl) -> str:
-> @@ -109,6 +109,31 @@ def set_hds_thresh_zero(cfg, netnl) -> None:
->
->      ksft_eq(0, rings['hds-thresh'])
->
-> +def set_hds_thresh_random(cfg, netnl) -> None:
-> +    try:
-> +        rings =3D netnl.rings_get({'header': {'dev-index': cfg.ifindex}}=
-)
-> +    except NlError as e:
-> +        raise KsftSkipEx('ring-get not supported by device')
-> +    if 'hds-thresh' not in rings:
-> +        raise KsftSkipEx('hds-thresh not supported by device')
-> +    if 'hds-thresh-max' not in rings:
-> +        raise KsftSkipEx('hds-thresh-max not defined by device')
-> +
-> +    while True:
-> +        hds_thresh =3D random.randint(1, rings['hds-thresh-max'])
+Sorry, I'm resending this email in text-only mode, I sent HTML version and =
+got rejected by the list.
 
-If a hds-thresh-max value is too small, it will not work.
-As far as I know, the gve's hds-thresh-max would be 0.
+Hi Suraj,
 
-I will send a v2 patch to fix this.
+On Thu, 2025-04-03 at 13:58 +0000, Gupta, Suraj wrote:
+> >=20
+> > If I remove "dmas" entry and provide a "axistream-connected" one, thing=
+s get a little
+> > better (but see at the end for some DTS notes). In this mode, in which =
+dmaengine is
+> > not used but legacy DMA code inside axienet itself, tcpdump -vv shows p=
+ackets
+> > incoming at a normal rate. However, the system is not answering to ARP =
+requests:
+> >=20
+> Could you please check ifconfig for any packet drop/error?
 
-Thanks!
-Taehee Yoo
+In all three cases (using old dma style, using dmaengine with default value=
+s and using dmaengine with buffers set to 128)
+the behavior is the same:
 
-> +        if hds_thresh !=3D rings['hds-thresh']:
-> +            break
-> +
-> +    try:
-> +        netnl.rings_set({'header': {'dev-index': cfg.ifindex}, 'hds-thre=
-sh': hds_thresh})
-> +    except NlError as e:
-> +        if e.error =3D=3D errno.EINVAL:
-> +            raise KsftSkipEx("hds-thresh-set not supported by the device=
-")
-> +        elif e.error =3D=3D errno.EOPNOTSUPP:
-> +            raise KsftSkipEx("ring-set not supported by the device")
-> +    rings =3D netnl.rings_get({'header': {'dev-index': cfg.ifindex}})
-> +    ksft_eq(hds_thresh, rings['hds-thresh'])
-> +
->  def set_hds_thresh_max(cfg, netnl) -> None:
->      try:
->          rings =3D netnl.rings_get({'header': {'dev-index': cfg.ifindex}}=
-)
-> @@ -243,6 +268,7 @@ def main() -> None:
->                    get_hds_thresh,
->                    set_hds_disable,
->                    set_hds_enable,
-> +                  set_hds_thresh_random,
->                    set_hds_thresh_zero,
->                    set_hds_thresh_max,
->                    set_hds_thresh_gt,
-> --
-> 2.34.1
->
+After a few udp packets:
+
+eth0      Link encap:Ethernet  HWaddr 06:00:0A:BC:8C:02 =20
+          inet addr:10.188.140.2  Bcast:10.188.143.255  Mask:255.255.248.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:213 errors:0 dropped:81 overruns:0 frame:0
+          TX packets:17 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000=20
+          RX bytes:95233 (93.0 KiB)  TX bytes:738 (738.0 B)
+
+After manually adding =C2=A0ARP entries and running a short run of iperf3:
+
+# iperf3 -c 10.188.139.1
+Connecting to host 10.188.139.1, port 5201
+[  5] local 10.188.140.2 port 54004 connected to 10.188.139.1 port 5201
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5]   0.00-1.01   sec  3.38 MBytes  28.2 Mbits/sec    0    133 KBytes    =
+  =20
+[  5]   1.01-2.00   sec  3.75 MBytes  31.5 Mbits/sec    0    133 KBytes    =
+  =20
+[  5]   2.00-3.01   sec  3.75 MBytes  31.4 Mbits/sec    0    133 KBytes    =
+  =20
+[  5]   3.01-4.01   sec  3.63 MBytes  30.4 Mbits/sec    0    133 KBytes    =
+  =20
+[  5]   4.01-5.00   sec  3.75 MBytes  31.6 Mbits/sec    0    133 KBytes    =
+  =20
+[  5]   5.00-6.00   sec  3.63 MBytes  30.4 Mbits/sec    0    133 KBytes    =
+  =20
+[  5]   6.00-7.00   sec  3.75 MBytes  31.5 Mbits/sec    0    133 KBytes    =
+  =20
+[  5]   7.00-8.01   sec  3.63 MBytes  30.2 Mbits/sec    0    133 KBytes    =
+  =20
+[  5]   8.01-9.01   sec  3.63 MBytes  30.4 Mbits/sec    0    133 KBytes    =
+  =20
+
+^C[  5]   9.01-46.69  sec  4.50 MBytes  1.00 Mbits/sec    0    133 KBytes  =
+    =20
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-46.69  sec  37.5 MBytes  6.74 Mbits/sec    0            sender
+[  5]   0.00-46.69  sec  0.00 Bytes  0.00 bits/sec                  receive=
+r
+iperf3: interrupt - the client has terminated
+# ifconfig=20
+eth0      Link encap:Ethernet  HWaddr 06:00:0A:BC:8C:02 =20
+          inet addr:10.188.140.2  Bcast:10.188.143.255  Mask:255.255.248.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:14121 errors:0 dropped:106 overruns:0 frame:0
+          TX packets:27360 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000=20
+          RX bytes:1015380 (991.5 KiB)  TX bytes:41127297 (39.2 MiB)
+
+The number of RX and dropped packets (81/213 vs 106/14121) doesn't seem pro=
+portional to the number of received packets.
+
+I've been able to gather that dropped packets increase by 1 with each arpin=
+g that I send to the microblaze, but
+*only* if tcpdump is *not* running.
+
+So, I can run tcpdump -vv, send quite a lot of arping, I see them all on sc=
+reen and dropped number of packets do not increase.
+Once I stop tcpdump, I send a single arping and tx dropped packets increase=
+ by 1, every time.
+
+
+> > On the other hand, and since I don't know how to debug this ARP issue, =
+I went back
+> > to see if I could diagnose what's happening in DMA Engine mode, so I pe=
+eked at the
+> > code and I saw an asymmetry between RX and TX, which sounded good given=
+ that
+> > in dmaengine mode TX works perfectly (or so it seems) and RX is heavily=
+ buffered.
+> > This asymmetry lies precisely on the number of SG blocks and number of =
+skb
+> > buffers.
+> >=20
+
+> > I couldn't see what was wrong with new code, so I just went and replace=
+d the
+> > RX_BD_NUM_DEFAULT value from 1024 down to 128, so it's now the same siz=
+e as
+> > its TX counterpart, but the kernel segfaulted again when trying to meas=
+ure
+> > throughput. Sadly, my kernel debugging abilities are not much stronger =
+than this, so
+> > I'm stuck at this point but firmly believe there's something wrong here=
+, although I
+> > can't see what it is.
+> >=20
+> > Any help will be greatly appreciated.
+> >=20
+> This doesn't looks like be the reason as driver doesn't uses lp->rx_bd_nu=
+m  and lp->tx_bd_num to traverse skb ring in DMAengine flow. It uses axiene=
+t_get_rx_desc() and axienet_get_tx_desc() respectively, which uses same siz=
+e as allocated.
+> Only difference between working and non-working I can see is increasing R=
+x skb ring size. But later you mentioned you tried to bring it down to 128,=
+ could you please confirm small size transfer still works?
+
+Setting this number to a low value seems to solve the buffering issue, but =
+not the thing about missed ARP packets.
+
+
+> FYI, basic ping and iperf both works for us in DMAengine flow for AXI eth=
+ernet 1G designs. We tested for full-duplex mode. But I can see half duplex=
+ in your case, could you please confirm if that is expected and correct?
+
+Our connection is via a fiber SFP =C2=A0(should've mentioned that earlier, =
+sorry) or with an cabled SFP
+(which I am using right now), through dp83620, which in this mode does not =
+support autonegotiation
+but as far as I know init should support full duplex, I'll check it out and=
+ reach back.
+
+Now that you noticed this, I can tell you that kernel 4.4.43 reported full =
+duplex, and kernel 6.13
+reports full duplex only in dmaengine mode, in old dma mode it reports half=
+ duplex.
+
+Old kernel:
+# ethtool eth0
+Settings for eth0:
+        Supported ports: [ TP MII ]
+        Supported link modes:   10baseT/Half 10baseT/Full=20
+                                100baseT/Half 100baseT/Full=20
+        Supported pause frame use: No
+        Supports auto-negotiation: Yes
+        Advertised link modes:  100baseT/Full=20
+        Advertised pause frame use: No
+        Advertised auto-negotiation: No
+        Speed: 100Mb/s
+        Duplex: Full
+        Port: MII
+        PHYAD: 1
+        Transceiver: external
+        Auto-negotiation: off
+        Link detected: yes
+
+
+Configuring network: xilinx_axienet 40c00000.ethernet eth0: PHY [axienet-40=
+c00000:01] driver [TI DP83620 10/100 Mbps PHY] (irq=3DPOLL)
+xilinx_axienet 40c00000.ethernet eth0: configuring for phy/mii link mode
+xilinx_axienet 40c00000.ethernet eth0: Link is Up - 100Mbps/Full - flow con=
+trol off
+
+
+Thanks, best regards,
+
+--=C2=A0
+=C3=81lvaro G. M.
+
 
