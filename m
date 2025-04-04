@@ -1,178 +1,297 @@
-Return-Path: <netdev+bounces-179346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2B09A7C135
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 18:03:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB51CA7C1D7
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 18:54:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD0743A80A1
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 16:03:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D6AC17D5E0
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 16:54:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B977A202987;
-	Fri,  4 Apr 2025 16:03:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EDAD214A6F;
+	Fri,  4 Apr 2025 16:53:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b="guydS8fA"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87C18F40;
-	Fri,  4 Apr 2025 16:03:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743782617; cv=none; b=EEDl8yOeLRZSEUg+hsPWl/XdlO92UJ8EA4nHtEliextpnq2OZtPFPHyu8LpIxw6q115gkDNpCBKR4Lp+dlJouvTZEnnouaERey08YSkSVPDMzFhfVjkZ7fX9BvGdFSuZFlNWoSB1oSPOZlzyXUAcOfZMcrDmJDdSh7tf64mjsEI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743782617; c=relaxed/simple;
-	bh=LB0+aQivlJstFj1AeTFb88pnHKFXp1QfCPKZ3HMMlOE=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DKiACEL9Gfp7ScLgDSS6rSGm8jmMQtPbXylMm+SVM+KsUvuP20tzpx3k7jQFfAqv4HxRlHrGi31eLygfxv31kiGAsjh0SOUf8eyHmNuL/vfnXgJUtkXkAj4mAUH1HYhVaNZ1w+L0sYNNfof5nOQyNY1sf6OhXgtKK+bQXcn4lTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZTjwk6JXwz6K5qq;
-	Fri,  4 Apr 2025 23:59:50 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id CD0E514050C;
-	Sat,  5 Apr 2025 00:03:31 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 4 Apr
- 2025 18:03:31 +0200
-Date: Fri, 4 Apr 2025 17:03:29 +0100
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: <alejandro.lucero-palau@amd.com>
-CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<dave.jiang@intel.com>, Alejandro Lucero <alucerop@amd.com>, Ben Cheatham
-	<benjamin.cheatham@amd.com>
-Subject: Re: [PATCH v12 05/23] cxl: add function for type2 cxl regs setup
-Message-ID: <20250404170329.00000401@huawei.com>
-In-Reply-To: <20250331144555.1947819-6-alejandro.lucero-palau@amd.com>
-References: <20250331144555.1947819-1-alejandro.lucero-palau@amd.com>
-	<20250331144555.1947819-6-alejandro.lucero-palau@amd.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FD9D20E704;
+	Fri,  4 Apr 2025 16:53:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.143.35
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743785599; cv=fail; b=qjR2QOaC0dyhwLcB8RKUn0lhOFM+zIWV2zJQZCA62qkS0E4tG+GFJFeblnt9V7AnsXm3RxLxUdtPPvEs+EAFW2cQDa6zHymT1ls18QGghR8uM4nJ4koL1LwgEmalD9rdleO+IAmt6/Cb2WdjcCvwq4cv9SlSkCm3g5+QVIJfn74=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743785599; c=relaxed/simple;
+	bh=b3D3DsOZPemH2zpWnYC49HY8P1tevwyy6Y2/HOBwYjc=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=aP59QGabxXMZ/Lcre2xH0xr3oY/ISQR2UHKavFuhG/PUNIVapTXINzxUL6+Ca1bhgMZHBsRFlmgJ5oQFm2qkvc+Wl3roNNvePaqirbvxI8CXCVaYj/Woc4njYmwt2CLx3otjhOuwd8+OHTUpUBc2FCBepiefGrNmxIM6upTzGXM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com; spf=pass smtp.mailfrom=hpe.com; dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b=guydS8fA; arc=fail smtp.client-ip=148.163.143.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
+Received: from pps.filterd (m0150245.ppops.net [127.0.0.1])
+	by mx0b-002e3701.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 534G2T6i015413;
+	Fri, 4 Apr 2025 16:04:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pps0720; bh=wo
+	YsYtTB4IY75TMTAUcRtlZjOR3d/8kWXHsSxnzm/sA=; b=guydS8fAmI9y2J9ltM
+	OZ7W7arFZWX0Vs7gaMElP4TlGmnFUnMfybrWcq1m2Gxd1GV68Y0dxgqb9TZuE7pD
+	bWfd6jasv2DcY3hk7V/UbgEgfDrtg2gn68L2kfDDz1ljzCFW0PdwIkAbCP82EI0Y
+	DxweF0s8C8gp/sav/Bn+tqkfeLlK+kvx/KNek2c/bMLIoyBnrVbsDuA5RKxsyWTZ
+	f9OPfigXe9bbnDJRtqaHxzwf1KS7BCu9Y3a0QxvX0GALmi4nMjJUUR1OYEt1gYWT
+	aTJbvkuXSdBLZR7Pbo1X5gBg2NlPKHL5asyYRQppeTAK378Uj3NfKYuYDr6kB6qY
+	wNgQ==
+Received: from p1lg14879.it.hpe.com ([16.230.97.200])
+	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 45t2c7r0r6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 04 Apr 2025 16:04:00 +0000 (GMT)
+Received: from p1wg14923.americas.hpqcorp.net (unknown [10.119.18.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by p1lg14879.it.hpe.com (Postfix) with ESMTPS id 3A0E7130B4;
+	Fri,  4 Apr 2025 16:03:59 +0000 (UTC)
+Received: from p1wg14927.americas.hpqcorp.net (10.119.18.117) by
+ p1wg14923.americas.hpqcorp.net (10.119.18.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 4 Apr 2025 04:03:48 -1200
+Received: from p1wg14920.americas.hpqcorp.net (16.230.19.123) by
+ p1wg14927.americas.hpqcorp.net (10.119.18.117) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11 via Frontend Transport; Fri, 4 Apr 2025 04:03:48 -1200
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (192.58.206.35)
+ by edge.it.hpe.com (16.230.19.123) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 4 Apr 2025 04:03:48 -1200
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=yXQSUd63lpyqY+pNRi8vEoAC8D/g2sZGv0RVZaXcbYIMnx73UcQNyLio8yK3jvtfL0UWzupOgwAj4H4LeUuhRn1pwdDQr/A+QHPkanPPvexGR2U5Nwhv3AZ+hcB2mB3doEGM7g+ez5p7eltyWZM8Y1/jpoxsuMACK9Si0zYIczFugD3ZiRrulI4h4arz2MVwBPDqGbPCfMMecJgaPfAk7NXQGuA3hoCFN+rLg1Q6u0yxpPLYgk/hUnWBql5GxEMz88+8WYyC1FQpT0qOyNfEh/N9tY+U2RxU5BecLpeZoLSBAycBHLDCyV5h8CyboYIpJEUpJtLWAGW2uGLv0qWFEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=woYsYtTB4IY75TMTAUcRtlZjOR3d/8kWXHsSxnzm/sA=;
+ b=zDvEGayIgoiWIaLOkarmNTrRvlHIv4hauD3D3KoyldcOKuzOCNI4ZJVdTk7GdBREtzEXJNLQYbEyDrEMboPiNZT5i62SPJryQYaMYWJsAsaIF5CeL3YcM3J9is346Tq4tLWKZKmAzgi+LvtWKYw1IeIdKHo5gQ4sju+2Hj+HUDg6g5P5yZO8q0i9UCceTYtdR/jyY6+lsUG3w9aLSqQv0qCxIXoV5p1fsFH83XHmN6+8zf2Z3NZBwV62CuOy/U3yPu9nFULH9MTBnkeK1TETKywEizNh2M6Yk+/ijE+33ykDkiIwCjcbLacJyiggFA4zojObTYCEcxwn+bjbjVKgFg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
+ header.d=hpe.com; arc=none
+Received: from DM4PR84MB1447.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:8:4a::16) by
+ DM4PR84MB1421.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:8:48::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8606.27; Fri, 4 Apr 2025 16:03:46 +0000
+Received: from DM4PR84MB1447.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::6781:5ecc:8646:f06b]) by DM4PR84MB1447.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::6781:5ecc:8646:f06b%3]) with mapi id 15.20.8583.041; Fri, 4 Apr 2025
+ 16:03:46 +0000
+Message-ID: <56088224-14ce-4289-bd98-1c47d09c0f76@hpe.com>
+Date: Fri, 4 Apr 2025 11:03:43 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 00/13] Ultra Ethernet driver introduction
+To: Jason Gunthorpe <jgg@nvidia.com>, Sean Hefty <shefty@nvidia.com>
+CC: Bernard Metzler <BMT@zurich.ibm.com>,
+        Roland Dreier
+	<roland@enfabrica.net>,
+        Nikolay Aleksandrov <nikolay@enfabrica.net>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "shrijeet@enfabrica.net"
+	<shrijeet@enfabrica.net>,
+        "alex.badea@keysight.com"
+	<alex.badea@keysight.com>,
+        "eric.davis@broadcom.com"
+	<eric.davis@broadcom.com>,
+        "rip.sohan@amd.com" <rip.sohan@amd.com>,
+        "dsahern@kernel.org" <dsahern@kernel.org>,
+        "winston.liu@keysight.com"
+	<winston.liu@keysight.com>,
+        "dan.mihailescu@keysight.com"
+	<dan.mihailescu@keysight.com>,
+        Kamal Heib <kheib@redhat.com>,
+        "parth.v.parikh@keysight.com" <parth.v.parikh@keysight.com>,
+        Dave Miller
+	<davem@redhat.com>,
+        "andrew.tauferner@cornelisnetworks.com"
+	<andrew.tauferner@cornelisnetworks.com>,
+        "welch@hpe.com" <welch@hpe.com>,
+        "rakhahari.bhunia@keysight.com" <rakhahari.bhunia@keysight.com>,
+        "kingshuk.mandal@keysight.com" <kingshuk.mandal@keysight.com>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "kuba@kernel.org"
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <BN8PR15MB25131FB51A63577B5795614399A72@BN8PR15MB2513.namprd15.prod.outlook.com>
+ <DM6PR12MB431329322A0C0CCB7D5F85E6BDA72@DM6PR12MB4313.namprd12.prod.outlook.com>
+ <Z+QTD7ihtQSYI0bl@nvidia.com>
+ <DM6PR12MB43137AE666F19784D2832030BDA62@DM6PR12MB4313.namprd12.prod.outlook.com>
+ <Z+Qi+XxYizfhr06P@nvidia.com>
+ <DM6PR12MB431345D07D958CF0B784AE0EBDA62@DM6PR12MB4313.namprd12.prod.outlook.com>
+ <Z+VSFRFG1gIbGsLQ@nvidia.com>
+ <DM6PR12MB431332A6407547B225849F88BDAD2@DM6PR12MB4313.namprd12.prod.outlook.com>
+ <20250401130413.GB291154@nvidia.com>
+ <DM6PR12MB43130D3131B760AF2A0C569ABDAC2@DM6PR12MB4313.namprd12.prod.outlook.com>
+ <20250401193920.GD325917@nvidia.com>
+Content-Language: en-US
+From: "Ziemba, Ian" <ian.ziemba@hpe.com>
+In-Reply-To: <20250401193920.GD325917@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN7P220CA0020.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:806:123::25) To DM4PR84MB1447.NAMPRD84.PROD.OUTLOOK.COM
+ (2603:10b6:8:4a::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500009.china.huawei.com (7.191.174.84) To
- frapeml500008.china.huawei.com (7.182.85.71)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR84MB1447:EE_|DM4PR84MB1421:EE_
+X-MS-Office365-Filtering-Correlation-Id: d9b5a58a-6530-4b3a-cafe-08dd739247d4
+X-LD-Processed: 105b2061-b669-4b31-92ac-24d304d195dc,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?a3R2b3FndC9BNzdLV0ViTjg3ZU9OVmtkd2ZGUHJlVkNwd01lR3RPKzZ2Z2Nz?=
+ =?utf-8?B?c09ic3BmYjBVa1pMYlVYdThobXo0WmRvK0V2RWJ3L25Hb2JKS1p4dkZnL3ph?=
+ =?utf-8?B?aW1YNFdVakFQaEV1SFdTaVlpaTA5L3RlaGVibUFQWit0Q2doSW00ZVptSkFV?=
+ =?utf-8?B?cnNKZmJqQ3ZFSGE4RjlNc2luL0lUUlIrVjkrenVaZEI5UkpuRG93TkQ3cmJn?=
+ =?utf-8?B?VWd1MWxYQ3FOQTlYZ0dDMW1sV0xERTU0dmFLalJxRnFzUndaQ0V0dzE0Y0pr?=
+ =?utf-8?B?STB1dmd6SVVjTGJ3Tk1GTm40SGdwdUU1cDdtRlRrb0FqenlEaFhuZnBrT1Bm?=
+ =?utf-8?B?QUE2L29KVGw4ZW96R2JCQ2FBOVhwZUxRNFdQMGNlWmVtMGdaaVF3T0ZZRkh2?=
+ =?utf-8?B?OXE3OTFybXRDRUxBYTh1UCs5UytqbnpSZU0vR3lqYkNUaDQ4eWhFd2Q3VXVj?=
+ =?utf-8?B?bUNMUzFqby9oUnNBVUhMTmdsajE0c3N4VnVEeEd4VHg0NFNsaEhMRnpnVTlp?=
+ =?utf-8?B?VDNhTmlqL1J2Y0J4M2RwRWo0K0J5TSsralMyNjBqNVNmRGNQY0U0ajVrNlhG?=
+ =?utf-8?B?SjZJOHZ5MWlVL3V0U3RFcEZCY0dZQ2V5UUJWMGpSRW9BQVVCYlQ3MTJsRmRl?=
+ =?utf-8?B?Rk02OHZFQVQ1YXVzdEd3aGJ1T2ZXLzFxY0lxNDhFMzljdGtaQmtYWnhYajhK?=
+ =?utf-8?B?QWxZMzAyNEV4dTFGUzNobGFwYXdGWkx2M1NURndWb0g1U2xGWVJJSityby92?=
+ =?utf-8?B?R0hlWE9NazJqRWxtSnRMdk9pcUpTek9TS01tRVJJWmFaSFVIT2VxUUJKeTlq?=
+ =?utf-8?B?dG5xUWJRZjJWZVl2bUs3MzRDaHg4WWI1TWhTVldVK0IwVktiMVMwa1ZNRmdU?=
+ =?utf-8?B?aHNqcmZVdFBFVjcyU09qUDBhaGk3cHM1ZTdac1hLNml6Sk5jL3NEcTVhTlll?=
+ =?utf-8?B?eGFlV2hLcFZJbmFReVZHNldKQThOT04vbHRlbllnaElZMW1BTXRUVnBFbEN5?=
+ =?utf-8?B?UjNYZ2lOam1STjdHakVLcFM1dG1FZnJHTDhVSjlpY0ttQkNTOUNOczN4Nm9T?=
+ =?utf-8?B?T1FMMEdrNlRxWURsVHRQYmF5eFEySlJHWm9KYzZTYmN1WHFJczh5S0ZCZUQ3?=
+ =?utf-8?B?TUlCNG5xRWIwQ3NLTU9KWVF5elFMNndtTnZ1SlZoclkyNVh5NUZsN1BwR1Bz?=
+ =?utf-8?B?Q2gxMXMzcUt3Y3dHYUJrVkc1V1F2TmIrbjZZOVhMWno4dEtWd01xUEhSU1Ey?=
+ =?utf-8?B?K280L3pFTjJGcDlVVnExUSt3WW9xVk1LY3JoQXpCOFJNdkFCbW1OVFdBK3Yr?=
+ =?utf-8?B?WlJ1ZXl5YnhpbG1PZVozbUYvTC9PT3JwbTJWSWJUckZLWCtobW1FSnVDYnFW?=
+ =?utf-8?B?WHZzOU4vMGw1K3dLYjhKcWxVOG9VWVVnVEhPekZyeUxrMXV2b1pPYlVxcTVO?=
+ =?utf-8?B?T3M2Nmo3YW9SMUd2ZDIwNmRJUjZVL3o2MzAxWHRTM2MrNktkVXZHbVl5blQ2?=
+ =?utf-8?B?SW5BcmN1N0JWM1MwV283ZEk5T1l6VmxPM1p0YnI3MFdUb1AxVVQrWFVCYkY1?=
+ =?utf-8?B?K0NRUDZBamhyLzBmcTBVaEIrenF5ZW1odkMyUEZxdnh0dFBMTzAwQkVMRjJ4?=
+ =?utf-8?B?Z2tWOUhjZUx0THpnaVpCcTROT0VrTnJHbEl1OU1INkpxSGdvdmZpSmplV3Bw?=
+ =?utf-8?B?MG5iZWNGVFg2VS80MVd3OXA2dk1uMjQ2bTVSTm1SUUU2ZnFGV2srZ253N1Vl?=
+ =?utf-8?B?Wjc2SkZBb1ZoWFhnNFAxTEljd2ZwazNJMFJiYWZwdGhYdEM1L0VaOEJKNjQv?=
+ =?utf-8?B?cGF4NlczY3BUem8vOEJIbUZlZXVkaVZhNnlNMjRPKzlCYXdYdk1aNFk3YU5v?=
+ =?utf-8?Q?Pm7+MGE6xPz2K?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR84MB1447.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NFEyeDVCUzU4TU13M1RxWnpzbTAydnBQRTJHOXZLVWNIMk0zN043RWY1NGNt?=
+ =?utf-8?B?NXJ0Y3lXV3NvUGFVTjl3WDdjWHdabnpZQXhEVmFYSmJkZ1NpdWFNY0NpNVI2?=
+ =?utf-8?B?dm9ObnlrbkpNZVlxQi9wejhzVW5JekE0dEFvb2hyN2twMFdvVmEvcFVVcnVh?=
+ =?utf-8?B?MUJGandOMjNMbm12c0oyM2lLL0FEbEExZUE5WjJBSmtBTXdXVlp2aDJmbzVv?=
+ =?utf-8?B?bEo4cHlHamtnMHh3dmZ1NzduN2VBQitaVC9tN3dRQ3lpRjhSWmNqNXp0eFRQ?=
+ =?utf-8?B?Rzg3SG82QXlFMlFvYkQrRHRRU1FNNFl1VzVEclA1d3VmblpTWUM0bWkrL0dY?=
+ =?utf-8?B?bjY0Z0Vsb1FybU5ibTdRUkFYSG1DRzBxbXFxSVBONXhwai85QjlPb0FUQ2FB?=
+ =?utf-8?B?WTNBOWNWYjVaa0NYeW8zQlROV1cxa2ZmR2Q4M1dlRm55WmRKRWNNSmZ1clZm?=
+ =?utf-8?B?QW45N1I3V2tjZ2djY3BRbWlLQjIrbzhpYU5RaDVuNVlRK2VxV1VJSThWaWVI?=
+ =?utf-8?B?UitOcVZCZWdzZGdmdmpnNmw3L0F5SDJEVDAwTXJxZUpuaWdBRXF3QjhzMk9H?=
+ =?utf-8?B?eC9TcmdKQm9iaWlYdCtZOUgzeHVRNUVMWjdlenlHZnVWblhyVGNaSzhJbmN0?=
+ =?utf-8?B?aTZUOE9DZmFrQUZTSHV5YUNkTjdmakE1MkZmdjZQdFNCY1EyTVdLTmErM2Rm?=
+ =?utf-8?B?cmk3RUg3K1J3eWtqTkZ0ejA3VW9FdVNLRGtSQmFwbzdVLzRDOGlBUTVkOE9G?=
+ =?utf-8?B?OFpiZW9KcWVRNmFuS09PeXNKZ2tQNStrdmQvQWIxOG9CK0ZaemcrWEpCZlNO?=
+ =?utf-8?B?WG80Z3UwdVpoOC9jOHdxTmhFSngxdndSU083ejc3RTNBWkppMWlNaFoycHBS?=
+ =?utf-8?B?a2IvWlhTOGR5UllFMHRob0UyNThMQnRJUitBN1JzV25rQ2N6emhjWkZVOW5M?=
+ =?utf-8?B?OUhucXYvTlkzeExOOUMxR2pBVjB2VWtJZjF6Sms1RFpqWU9vdFBuOHlGY3lr?=
+ =?utf-8?B?YmhiMm9OUnJFZVZPMVYxbzFkV25YakVwS1hsSm1BeVA2bXZWSmYxdWs3OVYy?=
+ =?utf-8?B?bkp0V0tWOThKWGMrTWRSMEFkUDU5M1YrL0MyNDdGS1VMMFU1UXJsVk80UFlz?=
+ =?utf-8?B?YlZIYUlEcE4vLzJtSjlNWGVxVXkySjlDMVkvbmp4aWZYYVFQakpOS1ZlTEEx?=
+ =?utf-8?B?aWVvOGZhQnptQ2JVWm4xQXVMMG13MGY2V09wd29JV0pNNGhPS3lJS2FjRHo4?=
+ =?utf-8?B?QWZBZ2RMb3lCQVlKZjVhWDdmREtVOTBUcVdiYW1MN1NJWW5GdUR6ZHI5aDVB?=
+ =?utf-8?B?eW5uakdDcGVkSGpBK00zUDFOdkVyM0ZXem5vOGVQZTNwcnZRbjRUN3NVY00w?=
+ =?utf-8?B?eElaTCtrTWNuSUY0V3pWWjZMdXlwNmlQSnNleVFFNHNsQ3ZFd25hbUdrZFhP?=
+ =?utf-8?B?T3Ezc2ZnMmlONGhkUWhIdkJ0NjhDOCtZZ0x5VFlLUUV0WHRaZHFKSUpyQlJH?=
+ =?utf-8?B?STRvYkxTOSs1V09NTEVYOTV2K0FmbktHckRVa3NPUzkyOEF5RURwb21wY3Qr?=
+ =?utf-8?B?YmY4Skc2RzB2ZVVCY29qTTl4WnQ5Rm9mbVErdkxDYzR3VWlDRDRwZ0VFQUkw?=
+ =?utf-8?B?YVV6SC93WWtIVkNMOHlDWXNOcEQ2T3g4ajBuR3FOTi9VVk82ZHhmeVdsTlQx?=
+ =?utf-8?B?Qi9JMHduUkpoVERFVlJPcXB6RTRNU3BZV2k2TU5Dc1dacUJIN2hnNkltdm5v?=
+ =?utf-8?B?L2VRVi9TMWcvVDFOSllLZkdlZStpVnVlaEhBT0xMQ3FXaHo5YTFmKzZ3YWM5?=
+ =?utf-8?B?bE5NdWp6aGdndSttV1Nsa0lTZzhqQjMzUDJLSmd2MjhnMHozdW5TVkU3N0E1?=
+ =?utf-8?B?WHZDejNLelBvUHlEYVMxb2cxY0hScTRjSlBQNnBtZVMzWk9zOWE1Tk11YlVN?=
+ =?utf-8?B?bFpSc1NFanBZL3h3Ujl3YnBoNVgvNTdVRXdHVmpvYUh5Z0hJSU1YWnNnTU1l?=
+ =?utf-8?B?amFUSzBSM1RjdlBWSlptdEtpNkpnTW9mdCtWMDFScDY2Vm5Za3F1SkZ2U1ph?=
+ =?utf-8?B?WDgxaFNyMnBreHlzTGs5Wm9BUEh0OS8zUFpwNmxPMVNLNTd3TTZDTFhoRDlt?=
+ =?utf-8?Q?tVrdv9CzPqJBCDt6WWdRzJtpH?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d9b5a58a-6530-4b3a-cafe-08dd739247d4
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR84MB1447.NAMPRD84.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Apr 2025 16:03:46.5547
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 105b2061-b669-4b31-92ac-24d304d195dc
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: T0XQyRQ5j8TyQeATnfoTQ0qR/Lpqg02s1Lnq5emnp9tKy5eyku+Px7Ow4xjZw/z0ubVYX4pXcpSUTz7GcZiU5g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR84MB1421
+X-OriginatorOrg: hpe.com
+X-Proofpoint-GUID: AQccwFw-wUNysfavDIiYnboMUuNNEZWu
+X-Proofpoint-ORIG-GUID: AQccwFw-wUNysfavDIiYnboMUuNNEZWu
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-04_07,2025-04-03_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ phishscore=0 spamscore=0 bulkscore=0 adultscore=0 impostorscore=0
+ clxscore=1011 mlxscore=0 priorityscore=1501 malwarescore=0 suspectscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502280000 definitions=main-2504040110
 
-On Mon, 31 Mar 2025 15:45:37 +0100
-alejandro.lucero-palau@amd.com wrote:
-
-> From: Alejandro Lucero <alucerop@amd.com>
+On 4/1/2025 2:39 PM, Jason Gunthorpe wrote:
+>> I don't know that I can talk about the UEC spec, 
 > 
-> Create a new function for a type2 device initialising
-> cxl_dev_state struct regarding cxl regs setup and mapping.
-> 
-> Export the capabilities found for checking them against the
-> expected ones by the driver.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>
-> ---
->  drivers/cxl/core/pci.c | 52 ++++++++++++++++++++++++++++++++++++++++++
->  include/cxl/cxl.h      |  5 ++++
->  2 files changed, 57 insertions(+)
-> 
-> diff --git a/drivers/cxl/core/pci.c b/drivers/cxl/core/pci.c
-> index 05399292209a..e48320e16a4f 100644
-> --- a/drivers/cxl/core/pci.c
-> +++ b/drivers/cxl/core/pci.c
-> @@ -1095,6 +1095,58 @@ int cxl_pci_setup_regs(struct pci_dev *pdev, enum cxl_regloc_type type,
->  }
->  EXPORT_SYMBOL_NS_GPL(cxl_pci_setup_regs, "CXL");
->  
-> +static int cxl_pci_setup_memdev_regs(struct pci_dev *pdev,
-> +				     struct cxl_dev_state *cxlds,
-> +				     unsigned long *caps)
-> +{
-> +	struct cxl_register_map map;
-> +	int rc;
-> +
-> +	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_MEMDEV, &map, caps);
-> +	/*
-> +	 * This call can return -ENODEV if regs not found. This is not an error
-> +	 * for Type2 since these regs are not mandatory. If they do exist then
-> +	 * mapping them should not fail. If they should exist, it is with driver
-> +	 * calling cxl_pci_check_caps where the problem should be found.
+> Right, it is too early to talk about UEC and Linux until people can
+> freely talk about what it actually needs.
 
-Good to put () on end of functions when mentioned in comments.
+While the UE specs are not yet out, concepts can be discussed. I
+recognize this may be annoying without specs.
 
-> +	 */
-> +	if (rc == -ENODEV)
-> +		return 0;
+The following is my understanding of the UE job model.
 
-Hmm. I don't mind hugely but I'd expect the -ENODEV handler in the
-clearly accelerator specific code that follows not here.
+A job ID identifies "who am I." There are two different operational
+modes:
 
-That would require cxl_map_device_regs() to definitely not return
--ENODEV though which is a bit ugly so I guess this is ok.
+1. Relative Addressing
 
-I'm not entirely convinced this helper makes sense though given
-the 2 parts of the component regs are just done inline in 
-cxl_pci_accel_setup_regs() and if you did that then this
-accelerator specific 'carry on anyway' would be in the function
-with accel in the name.
+   The endpoint address is only valid within the scope of the job ID.
+   Endpoints can only transmit and receive on the associated job ID.
+   Parallel applications will use this to restrict communication to
+   only processes within the job.
+   
+   Processes must be granted access to the job ID. In addition,
+   multiple processes may share a job ID. Some mechanism is required to
+   restrict what job IDs an endpoint can be configured against. Having
+   a device-level RDMA job object and a path to associate the job
+   object with an endpoint seems reasonable.
 
-	You'd need a
-	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_MEMDEV, &map, caps);
-	if (rc) {
-		if (rc != -ENODEV)
-			return rc;
-	} else {
-		rc = cxl_map_device_regs();
-		if (rc)
-			return rc;	
-	}	
-though which is a little messy.
+2. Absolute Addressing
 
-> +
-> +	if (rc)
-> +		return rc;
-> +
-> +	return cxl_map_device_regs(&map, &cxlds->regs.device_regs);
-> +}
-> +
-> +int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct cxl_dev_state *cxlds,
-> +			      unsigned long *caps)
-> +{
-> +	int rc;
-> +
-> +	rc = cxl_pci_setup_memdev_regs(pdev, cxlds, caps);
-> +	if (rc)
-> +		return rc;
-> +
-> +	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_COMPONENT,
-> +				&cxlds->reg_map, caps);
-> +	if (rc) {
-> +		dev_warn(&pdev->dev, "No component registers (%d)\n", rc);
-> +		return rc;
-> +	}
-> +
-> +	if (!caps || !test_bit(CXL_CM_CAP_CAP_ID_RAS, caps))
+   The target endpoint address is outside the scope of the job ID. This
+   behavior allows an endpoint to receive on all job IDs and transmit
+   on only authorized job IDs. This mode enables server endpoints to
+   support multiple clients with different job IDs.
 
-As before. Why not just mandate caps?  If someone really doesn't
-care they can provide a bitmap and ignore it.  Seems like a simpler
-interface to me.
+   Since this mode impacts the job IDs transmitted in packets,
+   processes must be granted access. A device-level RDMA job object
+   seems reasonable for this as well.
 
-> +		return 0;
-> +
-> +	rc = cxl_map_component_regs(&cxlds->reg_map,
-> +				    &cxlds->regs.component,
-> +				    BIT(CXL_CM_CAP_CAP_ID_RAS));
-> +	if (rc)
-> +		dev_dbg(&pdev->dev, "Failed to map RAS capability.\n");
-> +
-> +	return rc;
-> +}
-> +EXPORT_SYMBOL_NS_GPL(cxl_pci_accel_setup_regs, "CXL");
+   An optional mechanism to restrict a receive buffer and MR to a
+   specific job ID is needed. This enables a server endpoint to have
+   per client job ID resources. Job ID verification is unnecessary
+   since the job ID associated with a receive buffer or MR does not
+   impact the packet job ID.
 
+UE is going to need some object to restrict registered user-space
+memory. Having the PD as the object supporting local memory
+registration isolation seems ok. The UE object relationship could look
+like job  <- 1 --- 0..* ->  endpoint  <- 0..* --- 1 ->  PD.
+
+Thanks,
+
+Ian
 
