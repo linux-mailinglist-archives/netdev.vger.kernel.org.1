@@ -1,271 +1,500 @@
-Return-Path: <netdev+bounces-179223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0E60A7B29C
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 01:55:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 26783A7B2BE
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 02:01:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D793F1797B6
-	for <lists+netdev@lfdr.de>; Thu,  3 Apr 2025 23:55:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6BBE1798D1
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 00:01:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15E101E1C1A;
-	Thu,  3 Apr 2025 23:55:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE930611E;
+	Fri,  4 Apr 2025 00:01:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=garmin.com header.i=@garmin.com header.b="F4sdTMJ9";
-	dkim=pass (2048-bit key) header.d=garmin.com header.i=@garmin.com header.b="gcqzvSr1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JzyV3c47"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-000eb902.pphosted.com (mx0b-000eb902.pphosted.com [205.220.177.212])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7F21E0083
-	for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 23:55:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.212
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743724533; cv=fail; b=a3PL5z6pw7zqOviFwHbvnJtcmxYvylOzzF3LWgxjEinjNPO5HU9igoeIp/H7hYbwUepjHTKT5AhZ3WOUFs/QgDUKNpqWkDqJys5IcWNpa9tiwhZg5KCppOGmnosIh3Rz12X0murz0J/cHEvag7glh8mCJbDlGqE59gAJnf9Mhms=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743724533; c=relaxed/simple;
-	bh=s5HeGzX3nxeK6ua2673jriVYoMkSF4oNL3DNryMRH7Y=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dK8s9p328zwg9sDIyIAfwAUOhjhSQyYWYgbkI4PAAe5yWmzQ3yrhaXfbKZ1iTm/ItcYhYsh+KtpwKZm7Mi4ZFX/Dfp81WSlNSc+9LFVmDWu/tnA2GwPRNOiIIEdRYPX086b4huQ84R50BFEJjP2Q03yGA64qx/rZeYsBKVldCNM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=garmin.com; spf=pass smtp.mailfrom=garmin.com; dkim=pass (2048-bit key) header.d=garmin.com header.i=@garmin.com header.b=F4sdTMJ9; dkim=pass (2048-bit key) header.d=garmin.com header.i=@garmin.com header.b=gcqzvSr1; arc=fail smtp.client-ip=205.220.177.212
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=garmin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garmin.com
-Received: from pps.filterd (m0220299.ppops.net [127.0.0.1])
-	by mx0a-000eb902.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 533NfMcB004746;
-	Thu, 3 Apr 2025 18:55:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garmin.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps1; bh=huJSe
-	/0k3K4HxOqSJmsUQk2I/wmwvJOqkJz1/8m7JE0=; b=F4sdTMJ9Efr+mF7wdU+LB
-	68fmnOb7WecULT9uvzRroXdvciA3bUx5mj6k7ciOeTPMNs+s/Uiq8kK9p0tafD3y
-	DKte4kviZ9XN0xrEZoWQJxsyqrRFpWSMB4UyATARIskNpHBlrNrYCiWGJmnA2Eeo
-	2kWsLTJerRRiVl94KIm76QteQP71NXk5Y9XcxpuW0ydmQgeSNyu9hwp4IqA7G7pE
-	WapG02MmWis+i7T+FI2tnmllqwbZKHN+kYniovCrQIm+r8EBmtG6oZJpRWv+6RFU
-	X0v0rfb7x3rupC2ljxwEsLm793qOjCC1O9blNH+/XOsKPFdmgPAYqiKPV2KGJTlL
-	w==
-Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam04lp2043.outbound.protection.outlook.com [104.47.73.43])
-	by mx0a-000eb902.pphosted.com (PPS) with ESMTPS id 45stmn9824-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 03 Apr 2025 18:55:29 -0500 (CDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=B1pU2yrOOxD9xzHQ2YGR92Rvm0UOL2zYOF0GdntRlCr30NzKsIxZs5qDYHLZhk+o3AFVA4YQboaEEHgP0HGEODZARbajZUVO5bTF+Fonz1UrFWFc5OYyzU6ckTtjpdO2qUHFhqEVfLgY306zJT19J+yW+5Ghs9p0PQ/hCqQWbfC4sHjv7t7DODQ74cz2NPnVnnDgegVf70jIOdlva7JP5ZwaNywrzOAJj5Tz+RFmWemFG8mdXTQbM9JzmZs31NiaJ9msvsqlSljvGtN4cfuWga3y0/X+QvvmiNvwE6MyzFU1vS6jseg3nQDJ+ulFOT7f6KxTV7369RwcRzuHYZuVqQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=huJSe/0k3K4HxOqSJmsUQk2I/wmwvJOqkJz1/8m7JE0=;
- b=jc9qloHPFkR2lTEkHlnslYn5Ir+jMVO5YPzsfUWH31j0XmOF6Af4G/UhPE3DkMCqcqLOQHl4MVaiNew3NcnxV+zR8SUB5dWZUdQHN2P81Ex31F50X6I19n91lDVbl1NdDT4ENcDGxs8aeJNSgHUA0kGOYkNLEbz8AIjVgYtAZWb1ju8X1vWcxgPK7lDpIAMOhiIpt2h/traPSuaghL4K6him4/XdROsD1bjZ9UwTbWx8sGgp739ZkLxqZK5YzyYlA8BAPF7Rp/3nmAtj+zwQ6TMApBgrVDe1aT+mTNyhapJkASXSgu50a/Qn1dZoBjjVEIBnYXZV6IuTfiuJgs9/4Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 204.77.163.244) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=garmin.com;
- dmarc=pass (p=reject sp=quarantine pct=100) action=none
- header.from=garmin.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garmin.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=huJSe/0k3K4HxOqSJmsUQk2I/wmwvJOqkJz1/8m7JE0=;
- b=gcqzvSr1Eu3jT2afXrwizGKQ5v24MsRjes9TKN5uJ42D3m899XV8P17N/G2fosgf1awYW9j6yOK5F3BdAgaCXEsASYk0nNoQzO3eRtMPeQtHWXxLVdwXArtvuIpY6uKAJdQvCbB9ceHL2OfnSY4fJB59oGwV2SlctYRsI11PHO6jpTBq2T26a8V9U+dcJCKrt/opnG2FiV57FtDkVAwIb0vC9Qp1x/snXP4btySI6T4ydXk6L1VyYrCeGyKs5RvvCpfB9+AMfY+GBOMcfr6gesTDRNh+Xua/Im/Blmx8bcJMsTddADmBRBcEWNaP1/Qkbhx04nbHLzsyLzSWjI5RSg==
-Received: from PH7P221CA0010.NAMP221.PROD.OUTLOOK.COM (2603:10b6:510:32a::18)
- by DS0PR04MB9415.namprd04.prod.outlook.com (2603:10b6:8:1f3::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.50; Thu, 3 Apr
- 2025 23:55:25 +0000
-Received: from CY4PEPF0000FCC1.namprd03.prod.outlook.com
- (2603:10b6:510:32a:cafe::65) by PH7P221CA0010.outlook.office365.com
- (2603:10b6:510:32a::18) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8606.24 via Frontend Transport; Thu,
- 3 Apr 2025 23:55:24 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 204.77.163.244)
- smtp.mailfrom=garmin.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=garmin.com;
-Received-SPF: Pass (protection.outlook.com: domain of garmin.com designates
- 204.77.163.244 as permitted sender) receiver=protection.outlook.com;
- client-ip=204.77.163.244; helo=edgetransport.garmin.com; pr=C
-Received: from edgetransport.garmin.com (204.77.163.244) by
- CY4PEPF0000FCC1.mail.protection.outlook.com (10.167.242.103) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8606.22 via Frontend Transport; Thu, 3 Apr 2025 23:55:24 +0000
-Received: from kc3wpa-exmb6.ad.garmin.com (10.65.32.86) by cv1wpa-edge3
- (10.60.4.253) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 3 Apr 2025
- 18:55:08 -0500
-Received: from cv1wpa-exmb1.ad.garmin.com (10.5.144.71) by
- kc3wpa-exmb6.ad.garmin.com (10.65.32.86) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Thu, 3 Apr 2025 18:55:10 -0500
-Received: from cv1wpa-exmb2.ad.garmin.com (10.5.144.72) by
- CV1WPA-EXMB1.ad.garmin.com (10.5.144.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 3 Apr 2025 18:55:09 -0500
-Received: from CAR-4RCMR33.ad.garmin.com (10.5.209.17) by smtp.garmin.com
- (10.5.144.72) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
- Transport; Thu, 3 Apr 2025 18:55:09 -0500
-From: Joseph Huang <Joseph.Huang@garmin.com>
-To: <netdev@vger.kernel.org>
-CC: Joseph Huang <Joseph.Huang@garmin.com>,
-        Joseph Huang
-	<joseph.huang.2024@gmail.com>
-Subject: [RFC v2 iproute2-next 2/2] iplink_bridge: Add mdb_offload_fail_notification
-Date: Thu, 3 Apr 2025 19:54:52 -0400
-Message-ID: <20250403235452.1534269-3-Joseph.Huang@garmin.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250403235452.1534269-1-Joseph.Huang@garmin.com>
-References: <20250403235452.1534269-1-Joseph.Huang@garmin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958902F32
+	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 00:01:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743724909; cv=none; b=g+g1Vg1ow8aL4vY6Q+YTdYlV2JwL9fITGM0bmO8yQARuc6m8toVTu6mt7yiLWER7z7gfYPbpQT782Y8aC2KgjEx2wYAhBR+ZbGj3Y5Ibuc9oUqKG4bnMESwQ9ZTp8ISV292nYlD/3DaKjUHjvV3Kc+y9yo5IhLyYhKHf/F5KvQ0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743724909; c=relaxed/simple;
+	bh=U755Bl33iKtXqm1dKA3RtxHBctDud3GkIJLaXiykny4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=awpbEShqQNS9rd/ov4lZKYVx3kX7nWsvu+2Cjpph//FBzBty13xWj5GDB7ODKSvw4bO0SHQRwH/7f9W4K0RwI3OArucYex1SbIA1BJuugjFOhEqo084P0/g5T3atnGLHoFrTp5Czvgq1hV1rdKjHfQMOU3rYFCN6HVWTWEPu/tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JzyV3c47; arc=none smtp.client-ip=209.85.219.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e53ef7462b6so1546671276.3
+        for <netdev@vger.kernel.org>; Thu, 03 Apr 2025 17:01:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1743724906; x=1744329706; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qzNokZyik5m2a6lO92h6tJAliyNG+dHHgXZYMJhAwLA=;
+        b=JzyV3c47blF1KVblBrEGjB5mdIum1h9AlolV3YMczSWneaQ2yAuUs6LHunDWMB6cQh
+         Ot+5R7QEvRdwPSMFZRi6bDap/0RWaa/5nvn3ki9E24Y4zWVHWpOu1L7P0tfoGsCw3Ub5
+         4K5zkG6tNDViEhZQXuyEdJGCo3SOyLN3Hyu+h7uIb0FAhH/sAX/3eiI8skCTK5u7QI3Q
+         8iBP9+A1H/vnE4+dqAomaiGLvvDmZiITTDhG/vGerX8QBViZkm6ZIbIeEFSQHo1kesNX
+         3C5/JILiPYgbtDr7UE/Rr9HYXgPSJeBCcX2pPPPoB3hfTxCfBZvyYKySkIH67tH6SWcs
+         8EKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743724906; x=1744329706;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qzNokZyik5m2a6lO92h6tJAliyNG+dHHgXZYMJhAwLA=;
+        b=q5q+K2X6+TvnBGYtqunEsZ+ZYAX4NgdQNTnt/+M/VBPklXwzwvwJQ0PYP0ndcCsp4/
+         5VEdiVO6CSA5Rr0TTHAKvwSp2iee4fzNdsqsZ812H6tXYbXRAKpE/wRhtYbF22/GLSNo
+         qKQ4se2CYWnnEbO6ZcohpGx/tJa5iO8k2oHPo+uRNaU8MFpLVxZcQLVmGOvZOy/WMzu0
+         tfyQ5KLhMyKWU9pH3FJ4+3qdayncZOBlAnGV2QzZuZPDH276zG5ChMvjJ0HVa/sAeHUx
+         xxioYs507hTmvrzcJmbpfxpUJrWl4uJrpKwo/IY6jgQRvFxH+LWKochkNDrEvO99wnxl
+         9RtA==
+X-Forwarded-Encrypted: i=1; AJvYcCVI0OcXjjC2lCWwWAdxY9V92k9KxLSayJe0qD6OaHe2TI+KmutZhFuaM7WhUsACnp1gqGidVhA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXWtklnp6wn3aXX1JUHd+AYx2LUBqTZTcb+/fEdkB3DH72B1EN
+	MoVb7BcKQ1eSMtmRTvn8Eocx+m7Z2M2K/+JJg/wdW9QqNldPEkzbkNFmLu9Z3S2+XnwcZ16me1o
+	R/6VT8FX/hjJTOPzPzMtiQZcxG+fk1BCD/1Rm
+X-Gm-Gg: ASbGncubfG/50Z/EJe+eG4XVSuGGBaz0ohznsGaEFMNG7FweA0FQK7aXq8OFcHDlUwb
+	Id02zVl1xKgqG0+B1PLT/ALZUgsV127x396gZdH6HSyWf4/ZqzMNuFhgnFlP1CoFAZc/82rz3SO
+	04L17TVZJTV7NrTSYRhRGFU6+c
+X-Google-Smtp-Source: AGHT+IGX2/adv48rfkB8blGhWn9VXzU+Qz6gotcDZzJmRi9h4HhcHMIRFlTjScBU7KKqx/dWvbPAEtFjUIK6uy4jcV0=
+X-Received: by 2002:a05:690c:64c6:b0:6fe:c1c8:ac59 with SMTP id
+ 00721157ae682-703e14f8218mr27017187b3.1.1743724906208; Thu, 03 Apr 2025
+ 17:01:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCC1:EE_|DS0PR04MB9415:EE_
-X-MS-Office365-Filtering-Correlation-Id: b331e605-a3e5-474b-498e-08dd730b009c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?gffVuFL9DEzjoW4v/i1OHwwzI7RioErsxHklOxLw/suaRmTdrGZ5BrffKe3p?=
- =?us-ascii?Q?TyzpV2deQj626AmBTBRWeGBE2L1xQGWH6aDcup1AtaOcayUcyV5DxGD714XV?=
- =?us-ascii?Q?C+WpMm8eZVZTbtSjHQw/z/AqH9jshNsVysU6izemGLNdMUX0jCSzpjgTdPUV?=
- =?us-ascii?Q?5s/tPCcnU52IEc4ShIgiKATAPVYJr0RASH59059gjPUGw6jo0xTpZJyWKeQX?=
- =?us-ascii?Q?rIAyIgAgquCDRQ9QZX+lTJzaIzNtGMOUV5OV6CboPNaPHOoW6A4XdRE2+zOT?=
- =?us-ascii?Q?BRGzvjVp5YvVjGSA8rVljpm1W7nqzZDfnmLzehWqOIBZQOO6Ngc/SWTDJjgx?=
- =?us-ascii?Q?Cj/9Q0xcQSFFBWbmYVRzcbbJH7ePqk/Ce/PEpd6bzsHe/+7btrzoVuHJTez0?=
- =?us-ascii?Q?Uh/3a2s92bPwK1cx35ot7OsPfInh3X3PPqP2OLyGZnWndv+aCGYyOCr4Qoy3?=
- =?us-ascii?Q?stSlfFlc8yVxg5/punXSm9UEOBFcJN/AqjZ6rcYFinvuVQecRodUx0I40UGt?=
- =?us-ascii?Q?A+e5kSsFslA6dFRzcOxtnPwqPP829G7Qs6qHkJokfT3ZcYCC2gUaUzETq0hM?=
- =?us-ascii?Q?THrIFTrHdKiDnv1e/y2Oz4FBra6oEcfVUWeU4RgWIKSRHneg6anNO8e4VB4U?=
- =?us-ascii?Q?Wl7pKhUfznTiN4xntJ7XNz4EzCodOMdrgduwznARSRd/x1w/+XgF/oT/X4Js?=
- =?us-ascii?Q?RqdAY39wEmdq4ZPxUp02McJ4QqM7oLv5DOw6Lie+0fF0WDETL3Y0c8eWyRsQ?=
- =?us-ascii?Q?yF8PV8/a9x7GKA88/EhiYb3v1aziOYOCBIavFnp3psThHAeBVBzxB4ZhpxsY?=
- =?us-ascii?Q?ioYOVn6lEJUc+t/mXNwyNoUb9G7Sl/brg/Oje3GDGGO217n6sQHvzR84/m5O?=
- =?us-ascii?Q?akcCAvkvOfqqALAyGVSufDVHRqfNCM0wFoVokDLbP3TDVEHkEeRmRBH0M86z?=
- =?us-ascii?Q?grVioVVwF5cT8SFbHF0hNPVBnBSprK0xHK5fLtg5pq+auqt3bGzByklqeZtS?=
- =?us-ascii?Q?2s5Tp4M4YiNMaC8jzZuLbu1rVZqe/mb9CIJEHMPFHQmWatpsIIhYmRPfFYpI?=
- =?us-ascii?Q?rtrkiEJfnCPExexMOA9R8EKSaCWZXBOY2sWTCrFiOY4EXjybZ0QtWKznEab2?=
- =?us-ascii?Q?/UIQRwrIpygpC2x8ZCy1eCdbEPBglEhfAHn1NXTq/Vtin5yYgPB+TY1QqM3w?=
- =?us-ascii?Q?bJN6BAraKl3WoxalmrSlcZx+voDXOUcU+ILC8NqDlos2LcJX/EB9gjwSFuzF?=
- =?us-ascii?Q?WYuhv5T7GwjQa3rsATCJhX5UIK6Zi8ATEA+31gx9h9BbO2pCE56XkfQWuIA9?=
- =?us-ascii?Q?N7fG7ke+68rpecMq5FhVBXEKEwrFLL3jcN8J1PJoT2XqoxAkyzP+ZxVNBUZH?=
- =?us-ascii?Q?yIsJulpXJ0+yIPUK1BggFFiZIMSufYCAJcjOnDqiFdxVqxRvkJnHHlF++Y5P?=
- =?us-ascii?Q?uKayXN6oacPLe2jL5FqlivNeVpXf04nC6lKXhBxti/SlSmKFekZDCQvE08pW?=
- =?us-ascii?Q?nFqsf9xzhyj0cNIu9J/vIpCtS92uYmHHLw4O?=
-X-Forefront-Antispam-Report:
-	CIP:204.77.163.244;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:edgetransport.garmin.com;PTR:extedge.garmin.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1102;
-X-OriginatorOrg: garmin.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Apr 2025 23:55:24.6992
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b331e605-a3e5-474b-498e-08dd730b009c
-X-MS-Exchange-CrossTenant-Id: 38d0d425-ba52-4c0a-a03e-2a65c8e82e2d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=38d0d425-ba52-4c0a-a03e-2a65c8e82e2d;Ip=[204.77.163.244];Helo=[edgetransport.garmin.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000FCC1.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR04MB9415
-X-Authority-Analysis: v=2.4 cv=a90w9VSF c=1 sm=1 tr=0 ts=67ef1ff1 cx=c_pps a=YmitjTGdGiwdiEq1Q8pHfg==:117 a=YA0UzX50FYCGjWi3QxTvkg==:17 a=h8e1o3o8w34MuCiiGQrqVE4VwXA=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=XR8D0OoHHMoA:10
- a=qm69fr9Wx_0A:10 a=NbHB2C0EAAAA:8 a=Vz2XUcs1E-zsfEpk1-EA:9 cc=ntf
-X-Proofpoint-ORIG-GUID: JmpVoORgv6kpjc4JHAtIhNH-thqkrksI
-X-Proofpoint-GUID: JmpVoORgv6kpjc4JHAtIhNH-thqkrksI
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-03_11,2025-04-03_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 mlxscore=0 lowpriorityscore=0 bulkscore=0 mlxlogscore=855
- suspectscore=0 adultscore=0 impostorscore=0 spamscore=0 malwarescore=0
- clxscore=1031 classifier=spam authscore=0 authtc=n/a authcc=notification
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.21.0-2502280000
- definitions=main-2504030127
+References: <20250402162737.3271704-1-chharry@google.com> <CABBYNZJhxZOa30z1jxbnNpYJJb=QM1RZtpnL-Hp+beE_1VOZqg@mail.gmail.com>
+In-Reply-To: <CABBYNZJhxZOa30z1jxbnNpYJJb=QM1RZtpnL-Hp+beE_1VOZqg@mail.gmail.com>
+From: Hsin-chen Chuang <chharry@google.com>
+Date: Fri, 4 Apr 2025 08:01:09 +0800
+X-Gm-Features: AQ5f1JodoRLAWf66FQ3bVsGLpyvFYJBMM9mNouxI123X_-RJqd2dOJS2IoMnRCY
+Message-ID: <CADg1FFd2PA-j8ck258i=QUjLD7Ah2PyUjY5rq1s7CcU0M78GiA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Introduce HCI Driver Packet
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Hsin-chen Chuang <chharry@chromium.org>, chromeos-bluetooth-upstreaming@chromium.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Marcel Holtmann <marcel@holtmann.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Ying Hsu <yinghsu@chromium.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add mdb_offload_fail_notification option support.
+Hi Luiz,
 
-Signed-off-by: Joseph Huang <Joseph.Huang@garmin.com>
----
- ip/iplink_bridge.c    | 19 +++++++++++++++++++
- man/man8/ip-link.8.in |  7 +++++++
- 2 files changed, 26 insertions(+)
+On Fri, Apr 4, 2025 at 4:01=E2=80=AFAM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Hsin-chen,
+>
+> On Wed, Apr 2, 2025 at 12:28=E2=80=AFPM Hsin-chen Chuang <chharry@google.=
+com> wrote:
+> >
+> > From: Hsin-chen Chuang <chharry@chromium.org>
+> >
+> > Although commit 75ddcd5ad40e ("Bluetooth: btusb: Configure altsetting
+> > for HCI_USER_CHANNEL") has enabled the HCI_USER_CHANNEL user to send ou=
+t
+> > SCO data through USB Bluetooth chips, it's observed that with the patch
+> > HFP is flaky on most of the existing USB Bluetooth controllers: Intel
+> > chips sometimes send out no packet for Transparent codec; MTK chips may
+> > generate SCO data with a wrong handle for CVSD codec; RTK could split
+> > the data with a wrong packet size for Transparent codec; ... etc.
+> >
+> > To address the issue above one needs to reset the altsetting back to
+> > zero when there is no active SCO connection, which is the same as the
+> > BlueZ behavior, and another benefit is the bus doesn't need to reserve
+> > bandwidth when no SCO connection.
+> >
+> > This patch introduces a fundamental solution that lets the user space
+> > program to configure the altsetting freely:
+> > - Define the new packet type HCI_DRV_PKT which is specifically used for
+> >   communication between the user space program and the Bluetooth drvier=
+s
+> > - Define the btusb driver command HCI_DRV_OP_SWITCH_ALT_SETTING which
+> >   indicates the expected altsetting from the user space program
+> > - btusb intercepts the command and adjusts the Isoc endpoint
+> >   correspondingly
+> >
+> > This patch is tested on ChromeOS devices. The USB Bluetooth models
+> > (CVSD, TRANS alt3, and TRANS alt6) could pass the stress HFP test narro=
+w
+> > band speech and wide band speech.
+> >
+> > Cc: chromeos-bluetooth-upstreaming@chromium.org
+> > Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control =
+USB alt setting")
+> > Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
+> > ---
+> >
+> >  drivers/bluetooth/btusb.c       | 112 ++++++++++++++++++++++++++++++++
+> >  drivers/bluetooth/hci_drv_pkt.h |  62 ++++++++++++++++++
+> >  include/net/bluetooth/hci.h     |   1 +
+> >  include/net/bluetooth/hci_mon.h |   2 +
+> >  net/bluetooth/hci_core.c        |   2 +
+> >  net/bluetooth/hci_sock.c        |  12 +++-
+> >  6 files changed, 189 insertions(+), 2 deletions(-)
+> >  create mode 100644 drivers/bluetooth/hci_drv_pkt.h
+> >
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index 5012b5ff92c8..644a0f13f8ee 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -26,6 +26,7 @@
+> >  #include "btbcm.h"
+> >  #include "btrtl.h"
+> >  #include "btmtk.h"
+> > +#include "hci_drv_pkt.h"
+> >
+> >  #define VERSION "0.8"
+> >
+> > @@ -2151,6 +2152,111 @@ static int submit_or_queue_tx_urb(struct hci_de=
+v *hdev, struct urb *urb)
+> >         return 0;
+> >  }
+> >
+> > +static int btusb_switch_alt_setting(struct hci_dev *hdev, int new_alts=
+);
+> > +
+> > +static int btusb_drv_process_cmd(struct hci_dev *hdev, struct sk_buff =
+*cmd_skb)
+> > +{
+> > +       struct hci_drv_cmd_hdr *hdr;
+> > +       u16 opcode, cmd_len;
+> > +
+> > +       hdr =3D skb_pull_data(cmd_skb, sizeof(*hdr));
+> > +       if (!hdr)
+> > +               return -EILSEQ;
+> > +
+> > +       opcode =3D le16_to_cpu(hdr->opcode);
+> > +       cmd_len =3D le16_to_cpu(hdr->len);
+> > +       if (cmd_len !=3D cmd_skb->len)
+> > +               return -EILSEQ;
+> > +
+> > +       switch (opcode) {
+> > +       case HCI_DRV_OP_READ_SUPPORTED_DRIVER_COMMANDS: {
+> > +               struct hci_drv_resp_read_supported_driver_commands *res=
+p;
+> > +               struct sk_buff *resp_skb;
+> > +               struct btusb_data *data =3D hci_get_drvdata(hdev);
+> > +               int ret;
+> > +               u16 num_commands =3D 1; /* SUPPORTED_DRIVER_COMMANDS */
+> > +
+> > +               if (data->isoc)
+> > +                       num_commands++; /* SWITCH_ALT_SETTING */
+> > +
+> > +               resp_skb =3D hci_drv_skb_alloc(
+> > +                       opcode, sizeof(*resp) + num_commands * sizeof(_=
+_le16),
+> > +                       GFP_KERNEL);
+> > +               if (!resp_skb)
+> > +                       return -ENOMEM;
+> > +
+> > +               resp =3D skb_put(resp_skb,
+> > +                              sizeof(*resp) + num_commands * sizeof(__=
+le16));
+> > +               resp->status =3D HCI_DRV_STATUS_SUCCESS;
+> > +               resp->num_commands =3D cpu_to_le16(num_commands);
+> > +               resp->commands[0] =3D
+> > +                       cpu_to_le16(HCI_DRV_OP_READ_SUPPORTED_DRIVER_CO=
+MMANDS);
+> > +
+> > +               if (data->isoc)
+> > +                       resp->commands[1] =3D
+> > +                               cpu_to_le16(HCI_DRV_OP_SWITCH_ALT_SETTI=
+NG);
+> > +
+> > +               ret =3D hci_recv_frame(hdev, resp_skb);
+> > +               if (ret)
+> > +                       return ret;
+> > +
+> > +               kfree_skb(cmd_skb);
+> > +               return 0;
+> > +       }
+>
+> If you have to enclose a case with {} then it probably makes more
+> sense to add a dedicated function to do that, that said it would
+> probably be best to add a struct table that can be used to define
+> supported commands. I also recommend splitting the commit adding the
+> command from the introduction of HCI_DRV_PKT.
+>
+> > +       case HCI_DRV_OP_SWITCH_ALT_SETTING: {
+> > +               struct hci_drv_cmd_switch_alt_setting *cmd;
+> > +               struct hci_drv_resp_status *resp;
+> > +               struct sk_buff *resp_skb;
+> > +               int ret;
+> > +               u8 status;
+> > +
+> > +               resp_skb =3D hci_drv_skb_alloc(opcode, sizeof(*resp), G=
+FP_KERNEL);
+> > +               if (!resp_skb)
+> > +                       return -ENOMEM;
+> > +
+> > +               cmd =3D skb_pull_data(cmd_skb, sizeof(*cmd));
+> > +               if (!cmd || cmd_skb->len || cmd->new_alt > 6) {
+> > +                       status =3D HCI_DRV_STATUS_INVALID_PARAMETERS;
+> > +               } else {
+> > +                       ret =3D btusb_switch_alt_setting(hdev, cmd->new=
+_alt);
+> > +                       if (ret)
+> > +                               status =3D HCI_DRV_STATUS_UNSPECIFIED_E=
+RROR;
+> > +                       else
+> > +                               status =3D HCI_DRV_STATUS_SUCCESS;
+> > +               }
+> > +
+> > +               resp =3D skb_put(resp_skb, sizeof(*resp));
+> > +               resp->status =3D status;
+> > +
+> > +               ret =3D hci_recv_frame(hdev, resp_skb);
+> > +               if (ret)
+> > +                       return ret;
+> > +
+> > +               kfree_skb(cmd_skb);
+> > +               return 0;
+> > +       }
+> > +       default: {
+> > +               struct hci_drv_resp_status *resp;
+> > +               struct sk_buff *resp_skb;
+> > +               int ret;
+> > +
+> > +               resp_skb =3D hci_drv_skb_alloc(opcode, sizeof(*resp), G=
+FP_KERNEL);
+> > +               if (!resp_skb)
+> > +                       return -ENOMEM;
+> > +
+> > +               resp =3D skb_put(resp_skb, sizeof(*resp));
+> > +               resp->status =3D HCI_DRV_STATUS_UNKNOWN_COMMAND;
+> > +
+> > +               ret =3D hci_recv_frame(hdev, resp_skb);
+> > +               if (ret)
+> > +                       return ret;
+> > +
+> > +               kfree_skb(cmd_skb);
+> > +               return 0;
+> > +       }
+> > +       }
+> > +}
+> > +
+> >  static int btusb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+> >  {
+> >         struct urb *urb;
+> > @@ -2192,6 +2298,9 @@ static int btusb_send_frame(struct hci_dev *hdev,=
+ struct sk_buff *skb)
+> >                         return PTR_ERR(urb);
+> >
+> >                 return submit_or_queue_tx_urb(hdev, urb);
+> > +
+> > +       case HCI_DRV_PKT:
+> > +               return btusb_drv_process_cmd(hdev, skb);
+> >         }
+> >
+> >         return -EILSEQ;
+> > @@ -2669,6 +2778,9 @@ static int btusb_send_frame_intel(struct hci_dev =
+*hdev, struct sk_buff *skb)
+> >                         return PTR_ERR(urb);
+> >
+> >                 return submit_or_queue_tx_urb(hdev, urb);
+> > +
+> > +       case HCI_DRV_PKT:
+> > +               return btusb_drv_process_cmd(hdev, skb);
+> >         }
+> >
+> >         return -EILSEQ;
+> > diff --git a/drivers/bluetooth/hci_drv_pkt.h b/drivers/bluetooth/hci_dr=
+v_pkt.h
+> > new file mode 100644
+> > index 000000000000..800e0090f816
+> > --- /dev/null
+> > +++ b/drivers/bluetooth/hci_drv_pkt.h
+> > @@ -0,0 +1,62 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +/*
+> > + * Copyright (C) 2025 Google Corporation
+> > + */
+> > +
+> > +#include <net/bluetooth/bluetooth.h>
+> > +#include <net/bluetooth/hci.h>
+> > +
+> > +struct hci_drv_cmd_hdr {
+> > +       __le16  opcode;
+> > +       __le16  len;
+> > +} __packed;
+> > +
+> > +struct hci_drv_resp_hdr {
+> > +       __le16  opcode;
+> > +       __le16  len;
+> > +} __packed;
+> > +
+> > +struct hci_drv_resp_status {
+> > +       __u8    status;
+> > +} __packed;
+> > +
+> > +#define HCI_DRV_STATUS_SUCCESS                 0x00
+> > +#define HCI_DRV_STATUS_UNSPECIFIED_ERROR       0x01
+> > +#define HCI_DRV_STATUS_UNKNOWN_COMMAND         0x02
+> > +#define HCI_DRV_STATUS_INVALID_PARAMETERS      0x03
+> > +
+> > +/* Common commands that make sense on all drivers start from 0x0000. *=
+/
+> > +
+> > +#define HCI_DRV_OP_READ_SUPPORTED_DRIVER_COMMANDS      0x0000
+> > +struct hci_drv_resp_read_supported_driver_commands {
+> > +       __u8    status;
+> > +       __le16  num_commands;
+> > +       __le16  commands[];
+> > +} __packed;
+> > +
+> > +/* btusb specific commands start from 0x1135.
+> > + * No particular reason - It's my lucky number.
+> > + */
+> > +
+> > +#define HCI_DRV_OP_SWITCH_ALT_SETTING  0x1135
+>
+> Id actually start from 0x00, each driver can have its own command
 
-diff --git a/ip/iplink_bridge.c b/ip/iplink_bridge.c
-index 1fe89551..2233e47d 100644
---- a/ip/iplink_bridge.c
-+++ b/ip/iplink_bridge.c
-@@ -62,6 +62,7 @@ static void print_explain(FILE *f)
- 		"		  [ nf_call_iptables NF_CALL_IPTABLES ]\n"
- 		"		  [ nf_call_ip6tables NF_CALL_IP6TABLES ]\n"
- 		"		  [ nf_call_arptables NF_CALL_ARPTABLES ]\n"
-+		"		  [ mdb_offload_fail_notification MDB_OFFLOAD_FAIL_NOTIFICATION ]\n"
- 		"\n"
- 		"Where: VLAN_PROTOCOL := { 802.1Q | 802.1ad }\n"
- 	);
-@@ -413,6 +414,18 @@ static int bridge_parse_opt(struct link_util *lu, int argc, char **argv,
- 
- 			addattr8(n, 1024, IFLA_BR_NF_CALL_ARPTABLES,
- 				 nf_call_arpt);
-+		} else if (matches(*argv, "mdb_offload_fail_notification") == 0) {
-+			__u32 mofn_bit = 1 << BR_BOOLOPT_MDB_OFFLOAD_FAIL_NOTIFICATION;
-+			__u8 mofn;
-+
-+			NEXT_ARG();
-+			if (get_u8(&mofn, *argv, 0))
-+				invarg("invalid mdb_offload_fail_notification", *argv);
-+			bm.optmask |= 1 << BR_BOOLOPT_MDB_OFFLOAD_FAIL_NOTIFICATION;
-+			if (mofn)
-+				bm.optval |= mofn_bit;
-+			else
-+				bm.optval &= ~mofn_bit;
- 		} else if (matches(*argv, "help") == 0) {
- 			explain();
- 			return -1;
-@@ -623,6 +636,7 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 		__u32 mcvl_bit = 1 << BR_BOOLOPT_MCAST_VLAN_SNOOPING;
- 		__u32 no_ll_learn_bit = 1 << BR_BOOLOPT_NO_LL_LEARN;
- 		__u32 mst_bit = 1 << BR_BOOLOPT_MST_ENABLE;
-+		__u32 mofn_bit = 1 << BR_BOOLOPT_MDB_OFFLOAD_FAIL_NOTIFICATION;
- 		struct br_boolopt_multi *bm;
- 
- 		bm = RTA_DATA(tb[IFLA_BR_MULTI_BOOLOPT]);
-@@ -641,6 +655,11 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
- 				   "mst_enabled",
- 				   "mst_enabled %u ",
- 				   !!(bm->optval & mst_bit));
-+		if (bm->optmask & mofn_bit)
-+			print_uint(PRINT_ANY,
-+				   "mdb_offload_fail_notification",
-+				   "mdb_offload_fail_notification %u ",
-+				   !!(bm->optval & mofn_bit));
- 	}
- 
- 	if (tb[IFLA_BR_MCAST_ROUTER])
-diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
-index efb62481..3a7d1045 100644
---- a/man/man8/ip-link.8.in
-+++ b/man/man8/ip-link.8.in
-@@ -1753,6 +1753,8 @@ the following additional arguments are supported:
- .BI nf_call_ip6tables " NF_CALL_IP6TABLES "
- ] [
- .BI nf_call_arptables " NF_CALL_ARPTABLES "
-+] [
-+.BI mdb_offload_fail_notification " MDB_OFFLOAD_FAIL_NOTIFICATION "
- ]
- 
- .in +8
-@@ -1977,6 +1979,11 @@ or disable
- .RI ( NF_CALL_ARPTABLES " == 0) "
- arptables hooks on the bridge.
- 
-+.BI mdb_offload_fail_notification " MDB_OFFLOAD_FAIL_NOTIFICATION "
-+- turn mdb offload fail notification on
-+.RI ( MDB_OFFLOAD_FAIL_NOTIFICATION " > 0) "
-+or off
-+.RI ( MDB_OFFLOAD_FAIL_NOTIFICATION " == 0). "
- 
- .in -8
- 
--- 
-2.49.0
+If each driver can have its own command opcodes, how could the user
+know which one to begin with?
+I think at least the opcode of the Read Supported Driver Commands
+shall be the same across all drivers. And if we do so, don't we
+reserve some space in case there are more commands that need to be
+shared?
 
+We could make a small change here - not btusb specific, but "driver
+specific" - that is, starting from this code the meaning could be
+different on each driver.
+
+> opcodes, and we can probably add a description to Read Supported
+
+Do you mean a human readable description? I doubt that's really useful
+if we have the opcode well defined and by human readable it's hard for
+the user space program to parse.
+
+> Driver Commands in case it is not clear or for decoding purposes, we
+> could also return some driver info so the upper layers know what is
+> the driver.
+>
+> > +struct hci_drv_cmd_switch_alt_setting {
+> > +       __u8    new_alt;
+> > +} __packed;
+> > +
+> > +static inline struct sk_buff *hci_drv_skb_alloc(u16 opcode, u16 plen, =
+gfp_t how)
+> > +{
+> > +       struct hci_drv_resp_hdr *hdr;
+> > +       struct sk_buff *skb;
+> > +
+> > +       skb =3D bt_skb_alloc(sizeof(*hdr) + plen, how);
+> > +       if (!skb)
+> > +               return NULL;
+> > +
+> > +       hdr =3D skb_put(skb, sizeof(*hdr));
+> > +       hdr->opcode =3D __cpu_to_le16(opcode);
+> > +       hdr->len =3D __cpu_to_le16(plen);
+> > +
+> > +       hci_skb_pkt_type(skb) =3D HCI_DRV_PKT;
+> > +
+> > +       return skb;
+> > +}
+> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> > index a8586c3058c7..e297b312d2b7 100644
+> > --- a/include/net/bluetooth/hci.h
+> > +++ b/include/net/bluetooth/hci.h
+> > @@ -494,6 +494,7 @@ enum {
+> >  #define HCI_EVENT_PKT          0x04
+> >  #define HCI_ISODATA_PKT                0x05
+> >  #define HCI_DIAG_PKT           0xf0
+> > +#define HCI_DRV_PKT            0xf1
+> >  #define HCI_VENDOR_PKT         0xff
+> >
+> >  /* HCI packet types */
+> > diff --git a/include/net/bluetooth/hci_mon.h b/include/net/bluetooth/hc=
+i_mon.h
+> > index 082f89531b88..bbd752494ef9 100644
+> > --- a/include/net/bluetooth/hci_mon.h
+> > +++ b/include/net/bluetooth/hci_mon.h
+> > @@ -51,6 +51,8 @@ struct hci_mon_hdr {
+> >  #define HCI_MON_CTRL_EVENT     17
+> >  #define HCI_MON_ISO_TX_PKT     18
+> >  #define HCI_MON_ISO_RX_PKT     19
+> > +#define HCI_MON_DRV_TX_PKT     20
+> > +#define HCI_MON_DRV_RX_PKT     21
+> >
+> >  struct hci_mon_new_index {
+> >         __u8            type;
+> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > index 5eb0600bbd03..bb4e1721edc2 100644
+> > --- a/net/bluetooth/hci_core.c
+> > +++ b/net/bluetooth/hci_core.c
+> > @@ -2911,6 +2911,8 @@ int hci_recv_frame(struct hci_dev *hdev, struct s=
+k_buff *skb)
+> >                 break;
+> >         case HCI_ISODATA_PKT:
+> >                 break;
+> > +       case HCI_DRV_PKT:
+> > +               break;
+> >         default:
+> >                 kfree_skb(skb);
+> >                 return -EINVAL;
+> > diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+> > index 022b86797acd..428ee5c7de7e 100644
+> > --- a/net/bluetooth/hci_sock.c
+> > +++ b/net/bluetooth/hci_sock.c
+> > @@ -234,7 +234,8 @@ void hci_send_to_sock(struct hci_dev *hdev, struct =
+sk_buff *skb)
+> >                         if (hci_skb_pkt_type(skb) !=3D HCI_EVENT_PKT &&
+> >                             hci_skb_pkt_type(skb) !=3D HCI_ACLDATA_PKT =
+&&
+> >                             hci_skb_pkt_type(skb) !=3D HCI_SCODATA_PKT =
+&&
+> > -                           hci_skb_pkt_type(skb) !=3D HCI_ISODATA_PKT)
+> > +                           hci_skb_pkt_type(skb) !=3D HCI_ISODATA_PKT =
+&&
+> > +                           hci_skb_pkt_type(skb) !=3D HCI_DRV_PKT)
+> >                                 continue;
+> >                 } else {
+> >                         /* Don't send frame to other channel types */
+> > @@ -391,6 +392,12 @@ void hci_send_to_monitor(struct hci_dev *hdev, str=
+uct sk_buff *skb)
+> >                 else
+> >                         opcode =3D cpu_to_le16(HCI_MON_ISO_TX_PKT);
+> >                 break;
+> > +       case HCI_DRV_PKT:
+> > +               if (bt_cb(skb)->incoming)
+> > +                       opcode =3D cpu_to_le16(HCI_MON_DRV_RX_PKT);
+> > +               else
+> > +                       opcode =3D cpu_to_le16(HCI_MON_DRV_TX_PKT);
+> > +               break;
+> >         case HCI_DIAG_PKT:
+> >                 opcode =3D cpu_to_le16(HCI_MON_VENDOR_DIAG);
+> >                 break;
+> > @@ -1860,7 +1867,8 @@ static int hci_sock_sendmsg(struct socket *sock, =
+struct msghdr *msg,
+> >                 if (hci_skb_pkt_type(skb) !=3D HCI_COMMAND_PKT &&
+> >                     hci_skb_pkt_type(skb) !=3D HCI_ACLDATA_PKT &&
+> >                     hci_skb_pkt_type(skb) !=3D HCI_SCODATA_PKT &&
+> > -                   hci_skb_pkt_type(skb) !=3D HCI_ISODATA_PKT) {
+> > +                   hci_skb_pkt_type(skb) !=3D HCI_ISODATA_PKT &&
+> > +                   hci_skb_pkt_type(skb) !=3D HCI_DRV_PKT) {
+> >                         err =3D -EINVAL;
+> >                         goto drop;
+> >                 }
+> > --
+> > 2.49.0.504.g3bcea36a83-goog
+> >
+>
+>
+> --
+> Luiz Augusto von Dentz
 
