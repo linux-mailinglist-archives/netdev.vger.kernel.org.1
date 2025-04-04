@@ -1,121 +1,96 @@
-Return-Path: <netdev+bounces-179231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE4E0A7B5F4
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 04:52:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E640A7B68F
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 05:07:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C94893B8755
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 02:52:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A74BA179A9D
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 03:06:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EBE27404E;
-	Fri,  4 Apr 2025 02:52:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6CD72940B;
+	Fri,  4 Apr 2025 03:06:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ozlabs.org header.i=@ozlabs.org header.b="cECX35JO"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="PLLOeVPC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9670A79D2;
-	Fri,  4 Apr 2025 02:52:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A720F282EB;
+	Fri,  4 Apr 2025 03:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743735135; cv=none; b=WDnVBNQ1n29HiyYFahCTHdlC419ap+10DrpIDFF/2obZ50IsuLXW9VhtzyaNl2OofBb5PvjhO8beBg14U6bth2L2xLu4N6345NdsLcB3DNQ8vm3YXo88ajDLWBSFr51KgRFPA21UQaBEDJ/qY/fgTU4wY/HyWQHQ2DMyS69y+nE=
+	t=1743735979; cv=none; b=DGQViXAu+w/nB6DBWaXA+Ir4htWWQKf3BxGNGimhw4vdjoJkmp/5FkEoMfKAsGuLtP5QEvSFpuJBPpheWZplg1cEBTjpaW3sD4CfvT/ZJyKA3VKqJgO4ibvI5khMzrD4dz/WkIvvh74x9qIgX1RpUwb2MTQ3mJ7GYdA033HyHOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743735135; c=relaxed/simple;
-	bh=bD316i6CC1/1PO6OVutB+NKMwcDuOGm8uB+gBAMy1aY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=K7BGAXgRJBaYgy882XwyrAGUE7OjA/N4hFsX9ey+kymaBRjwO3yN6l4dRLGfjrA97YpKku27AfnqjIRh8vTOIfQcVUFjd31XetXHelOeHeOO50AOT3W3khcAjZFDDMWpo4LzLclk2EARQZB9mbONUSW1/4bR72ziS8FO1eUhawI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ozlabs.org; spf=pass smtp.mailfrom=ozlabs.org; dkim=pass (2048-bit key) header.d=ozlabs.org header.i=@ozlabs.org header.b=cECX35JO; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ozlabs.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ozlabs.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ozlabs.org;
-	s=201707; t=1743735129;
-	bh=bD316i6CC1/1PO6OVutB+NKMwcDuOGm8uB+gBAMy1aY=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=cECX35JOUju7Gk7KN9dGvxDxapcSnbwiA6dOiSg+vBhsG/elnQAFs/XdV5+g6WWt6
-	 SLCnm/Ucw8BBGVyk5Ijw+fksySSB6WceeM1CY3gFBmJT9wI6tsBebEb6+o92tkuHS5
-	 W86JYzh62/EpgW4D48keOw4sg7Ga/HdeNdrRLxuxYO34VtQbiLDviSnDbvtFpckqcj
-	 TGdMnQGS1Jnjggap/FvXRhM0sVlGzBGbEYD9iWoiIUwTri9g8KO5FCGJ0q8N8pRRps
-	 Oit9X8P5fuYFOcEsQWRIudq6HVF68PYjzIGIF6CP6n5FfeUTK/dStmQfFMHikk8lv2
-	 VEX5mekmjKhpA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4ZTNRc5mVdz4wyh;
-	Fri,  4 Apr 2025 13:51:56 +1100 (AEDT)
-Message-ID: <3ebd280e6697790da55f88a5e9e87b4cab407253.camel@ozlabs.org>
-Subject: Re: [PATCH v3 00/16] Introduce and use generic parity16/32/64 helper
-From: Jeremy Kerr <jk@ozlabs.org>
-To: Yury Norov <yury.norov@gmail.com>, Kuan-Wei Chiu <visitorckw@gmail.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, David Laight
- <david.laight.linux@gmail.com>, Andrew Cooper <andrew.cooper3@citrix.com>, 
- Laurent.pinchart@ideasonboard.com, airlied@gmail.com,
- akpm@linux-foundation.org,  alistair@popple.id.au, andrew+netdev@lunn.ch,
- andrzej.hajda@intel.com,  arend.vanspriel@broadcom.com,
- awalls@md.metrocast.net, bp@alien8.de,  bpf@vger.kernel.org,
- brcm80211-dev-list.pdl@broadcom.com,  brcm80211@lists.linux.dev,
- dave.hansen@linux.intel.com, davem@davemloft.net, 
- dmitry.torokhov@gmail.com, dri-devel@lists.freedesktop.org, 
- eajames@linux.ibm.com, edumazet@google.com, eleanor15x@gmail.com, 
- gregkh@linuxfoundation.org, hverkuil@xs4all.nl, jernej.skrabec@gmail.com, 
- jirislaby@kernel.org, joel@jms.id.au, johannes@sipsolutions.net,
- jonas@kwiboo.se,  jserv@ccns.ncku.edu.tw, kuba@kernel.org,
- linux-fsi@lists.ozlabs.org,  linux-input@vger.kernel.org,
- linux-kernel@vger.kernel.org,  linux-media@vger.kernel.org,
- linux-mtd@lists.infradead.org,  linux-serial@vger.kernel.org,
- linux-wireless@vger.kernel.org,  linux@rasmusvillemoes.dk,
- louis.peens@corigine.com,  maarten.lankhorst@linux.intel.com,
- mchehab@kernel.org, mingo@redhat.com,  miquel.raynal@bootlin.com,
- mripard@kernel.org, neil.armstrong@linaro.org,  netdev@vger.kernel.org,
- oss-drivers@corigine.com, pabeni@redhat.com, 
- parthiban.veerasooran@microchip.com, rfoss@kernel.org, richard@nod.at, 
- simona@ffwll.ch, tglx@linutronix.de, tzimmermann@suse.de, vigneshr@ti.com, 
- x86@kernel.org
-Date: Fri, 04 Apr 2025 10:51:55 +0800
-In-Reply-To: <Z-6zzP2O-Q7zvTLt@thinkpad>
-References: <EB85C3C1-8A0D-4CB9-B501-BFEABDF3E977@zytor.com>
-	 <Z824SgB9Dt5zdWYc@visitorckw-System-Product-Name>
-	 <Z9CyuowYsZyez36c@thinkpad>
-	 <80771542-476C-493E-858A-D2AF6A355CC1@zytor.com>
-	 <Z9GtcNJie8TRKywZ@thinkpad>
-	 <Z9G2Tyypb3iLoBjn@visitorckw-System-Product-Name>
-	 <Z9KMKwnZXA2mkD2s@visitorckw-System-Product-Name>
-	 <Z+AlyB461xwMxMtG@visitorckw-System-Product-Name>
-	 <eec0dfd7-5e4f-4a08-928c-b7714dbc4a17@zytor.com>
-	 <Z+6dh1ZVIKWWOKaP@visitorckw-System-Product-Name>
-	 <Z-6zzP2O-Q7zvTLt@thinkpad>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1743735979; c=relaxed/simple;
+	bh=OOzjTNsaoeztiuaUUEKgQnbbeDt20tTPv/xP9IFlZAs=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=FxgxYeFXWfT4u6fkLItuEoZNvrHVAS2r8M9FrwbJq2FoR/m775wbaVNNO/A1jHaCsEaGCI73e+3K52T8JEscMCKeWfGDP6WMwsmq518u8NkAPDgE85PgNYcz3eTIFpUU8gThRjBm9pAPuZimjAiVse4UivVMvc6i7rW7N4aaDwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=PLLOeVPC; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
+	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=EULONde+eAu9B+Vu7ZbRkaj2yQsdB6BaOde6KnVIdgw=; b=PLLOeVPCiEoRmTAy3V+XWdfKbz
+	MtLQ4ECjLWfSgKRowAkLnJJ+mUeei24k7Xe8qgAwyXziEOu0KHy8QpiPte+WLsYgdUb42vr3q0B8C
+	jovztRg5dbvuyLeRg8ykOyzg3Q1k8aapoh2hQke1irk4/z4a9oVDrPG5HakgJQgjW8KIe0a7k6Vca
+	tAZrZASU+q4V2rONS+17ksOLelT1FjV/eCKCB0XtUSJAV8WmzcCURGzFiUfSYg4Ztu0bhW5xWIsBY
+	+iUte5VlcfyFvCxWkUdGyiJI0PE4tkbRqiXf34bXa6YK8+wyOJgD6JE15VGkYAmLsZwwOSh9uNE1X
+	715mazCQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1u0XNI-00Ci7R-1K;
+	Fri, 04 Apr 2025 11:05:45 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 04 Apr 2025 11:05:44 +0800
+Date: Fri, 4 Apr 2025 11:05:44 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: andriy.shevchenko@linux.intel.com, przemyslaw.kitszel@intel.com,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, vbabka@suse.cz,
+	torvalds@linux-foundation.org, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, linux-toolchains@vger.kernel.org
+Subject: Re: [RFC] slab: introduce auto_kfree macro
+Message-ID: <Z-9MiJ0nuBxYCaV2@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250402121935.GJ25239@noisy.programming.kicks-ass.net>
+X-Newsgroups: apana.lists.os.linux.kernel,apana.lists.os.linux.netdev
 
-Hi Yuri & Kuan-Wei:
+Peter Zijlstra <peterz@infradead.org> wrote:
+>
+> The compiler *should* complain. But neither GCC nor clang actually
+> appear to warn in this case.
 
-> Thank you for sharing your opinion on this fixed parity(). Your
-> arguments may or may not be important, depending on what existing
-> users actually need. Unfortunately, Kuan-Wei didn't collect
-> performance numbers and opinions from those proposed users.
+Linus turned that warning off in 2020:
 
-For the fsi-i2c side: this isn't a performance-critical path, and any
-reasonable common approach would likely perform better that the current
-per-bit implementation.
+commit 78a5255ffb6a1af189a83e493d916ba1c54d8c75
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sat May 9 13:57:10 2020 -0700
 
-Our common targets for this driver would be arm and powerpc64le. In case
-it's useful as a reference, using the kernel compilers I have to hand, a
-__builtin_parity() is a library call on the former, and a two-instruction
-sequence for the latter.
+    Stop the ad-hoc games with -Wno-maybe-initialized
+
+You need to enable it by hand to see the warning:
+
+make KBUILD_CFLAGS_KERNEL=-Wmaybe-uninitialized CFLAGS_MODULE=-Wmaybe-uninitialized
+
+W=2 enables it too but it also enables lots of other crap so it's
+useless.
 
 Cheers,
-
-
-Jeremy
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
