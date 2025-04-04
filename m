@@ -1,118 +1,181 @@
-Return-Path: <netdev+bounces-179256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85F11A7B95B
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 10:54:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70C0DA7B95F
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 10:56:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7BA23B9BE3
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 08:53:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9BA107A87BE
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 08:54:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B1C01A01BF;
-	Fri,  4 Apr 2025 08:53:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C561A08CA;
+	Fri,  4 Apr 2025 08:55:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V/nATDAD"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="fIwd/wjv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A950219E804
-	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 08:53:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7035ADF49;
+	Fri,  4 Apr 2025 08:55:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743756830; cv=none; b=TCniRSU9PEBK/dxNuZ9qbuB1Z5WtNsmmjwV3r8Z4vud6uvTqGIG791cqTlM78V8fNFX2caMZ3vgseD0Ylhne+gq5cmUshuGljBsZFGJNP2cPSpRVgWWQPaZou86C2j/ONw/D8ZvT7o5ckmlEE6kWimBTAaH7u7ZEy4j8ALoO+ic=
+	t=1743756952; cv=none; b=XdJjqqGylET8Jy0fJOhTJxy5z/U3kn0kHQI0tRxKQj5lbZRXbwXyBLBD+pQ7SKrfaz1HkY62gDfUufc2cjg+B//A6NyiKzeZ1aOTiUd/HMtjJrXkHvrRe27zgAl3Sslj+WpvZy8rPGiLYS1ok4vkt5tlQ+mpfSUJUCqoPb9r0Xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743756830; c=relaxed/simple;
-	bh=ujMPWAnf1O+bgsUZ8iB+TMoPNAqGfSKZOUzSlaV5O/s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BklIhObEUQQS1l2vYmAFKpIpwkA0vmJmqKV4THUTx1bGwMV6uFP8jO78xlz257yDj29+T/wteqjNZpUZb2HyQrDX/dF/GaTPAdeBfr13S4XXBMwQBIOB2T7W3625S24xMdcc5G+T42Q2y+SLshrNbVWtBmvDZMrwdrOLyLx16kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V/nATDAD; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4766cb762b6so18289691cf.0
-        for <netdev@vger.kernel.org>; Fri, 04 Apr 2025 01:53:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1743756827; x=1744361627; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ujMPWAnf1O+bgsUZ8iB+TMoPNAqGfSKZOUzSlaV5O/s=;
-        b=V/nATDADvlhYMGWhL6TB4FAfT6QqAXbN5VzqgzAVN+TAwFjUsZlP0rlqZaNXOiOIYY
-         ccBeDPyvZhYmwz9DePK3mCqLnRlmYrDnSUjAIM0lhbIR8PgxHaGTnDEEJWlqqhhW6XIn
-         3NQGD+PyTHbQ4SvlK00Dsod9O7oVbVuZQTjCZC0kXw71M5QTn5D5iuEZU8yiif4Tlg+n
-         pQ0Gd4O2/JLW5gPngK6yyi2VN6o1mcBTWtFBA+PXYNOFyvb2OYpsp0R6F3CXO/T+wc+n
-         dsgDYhCPGKcaYs4xouwbloDmyqb3+80P/dhpg+LwA0yZ7e6sukPHKCInjmK1545Ufymi
-         5+2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743756827; x=1744361627;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ujMPWAnf1O+bgsUZ8iB+TMoPNAqGfSKZOUzSlaV5O/s=;
-        b=u4hHLVxz6Njkqr7CCOyQ2O7PyAmbJwZ+jWTAsNVCwLzwJH+UkoF+8X2jNr5BzhpUlM
-         B7KLyXOmaFvHekc2ilGk+nn/w/JsGWiSCsCHq9eFYS6DBLALYJRVG+9e5Iu//mTqWQGG
-         1qlIgtuYGPOkgszSwuYeZEwFLEjhoBwElcqafdIIyjEzCDxBpSuNQwdDB9KUbQLZvEht
-         fP+BV+0Nsm9TWMEG3RgntvophI1lMSR3P8gKb3jau9BaaMgDYcYdtT+fe0FimADgezPv
-         /kpGbnOuYho/rrextH22urlhFQfS5es9z6drz1NH8x2SHGo6RfBswKVv35uT+4PZuuk7
-         BWtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVWeCc6lfYpMDGm/udbC65eku9iSUIu0/9HhiE4ngJCkbtV4PGqQ/fseMeJ8siuNWXhg+VO7b8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3tkHnIxkdAjtQBcY1wDzbCmvIDZPMGGYIBKZ/bcO4ZbSxAJIN
-	73FzB7lVgTn3hqeORdqGKUre/Q0a9+GQDL/z2S1IiiN+7Y+QJUPHuIak6pCKMXGdvgL88psc7G7
-	S0HrXQzxlR27lhFFS6c2rC6FIYWsSw6x2HbQr
-X-Gm-Gg: ASbGncuE8gZX56L5rI+jpc++yavNfh3bbXZnAJNQHAbtQt/Auh24qISx3M52jypWl2R
-	u2ess8J3/t/5UOAJDjGnsylQAgijiimiQ+/KguO+WbvLd05bBUNGaYjxKGbZ/t3i+reW8/u3LqK
-	BrhmyhoW7RtUfwINcMDCe7Nj/CXoM=
-X-Google-Smtp-Source: AGHT+IEDvlcZZb4tFOjewKa5T6ATIyDdRK4SGeqCi554xhUd6jIH4AI3nWrbMiUMVwr+yZJxTIpJVIPkAIzZLyWMSKc=
-X-Received: by 2002:ac8:578c:0:b0:476:6df0:954f with SMTP id
- d75a77b69052e-47924c86329mr33561751cf.10.1743756827275; Fri, 04 Apr 2025
- 01:53:47 -0700 (PDT)
+	s=arc-20240116; t=1743756952; c=relaxed/simple;
+	bh=yxBCbzoKp7KS7YTX84wHYXDQoY79bzGvyNbzcmYejE8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=mv3sYvI6FR5z038f/3bsnOPFmxeFDRvr29ro4ZhOkrwdHtQ4UKsyGbCzJcfpPQ5ev+xB+6apFJG9G6MLR2kJQOo6NGhdMsK3dwlWWUdwjnHTg5IrpYNpQcyrDmbXAMlx/scs+6/eJ96MWH5QAfc7gexgyqblONvf81vpOP4aOm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=fIwd/wjv; arc=none smtp.client-ip=198.47.19.245
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 5348sv783766828
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 4 Apr 2025 03:54:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1743756897;
+	bh=CYUW+JoyF/G12mMwzahnbc23eTPvuYAy1EdgeaJckFw=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=fIwd/wjv9tNPGAqWuceipoxKdjUosBvrfZmw8J6brluxUGRxZXWtDFLp9q2ZJ/L65
+	 7/l11pcAprXbl2tvlbAGCi1BnOCF7vdiOReLao8ExUXRmO8ncRWKyTJNaTGCH91PXP
+	 qpunLiWN3HI6KJ/zWz+0USFzErUZnqPkxQjp+Sjc=
+Received: from DLEE109.ent.ti.com (dlee109.ent.ti.com [157.170.170.41])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 5348svC1091374
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 4 Apr 2025 03:54:57 -0500
+Received: from DLEE109.ent.ti.com (157.170.170.41) by DLEE109.ent.ti.com
+ (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 4
+ Apr 2025 03:54:57 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE109.ent.ti.com
+ (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 4 Apr 2025 03:54:57 -0500
+Received: from [172.24.23.235] (lt9560gk3.dhcp.ti.com [172.24.23.235])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 5348sonl071093;
+	Fri, 4 Apr 2025 03:54:51 -0500
+Message-ID: <d54d6d16-8422-4506-8f9a-24628dd95471@ti.com>
+Date: Fri, 4 Apr 2025 14:24:50 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250403113519.992462-1-i.abramov@mt-integration.ru>
- <Z-7N60DKIDLS2GXe@mini-arch> <20250404102919.8d08a70102d5200788d1f091@mt-integration.ru>
-In-Reply-To: <20250404102919.8d08a70102d5200788d1f091@mt-integration.ru>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 4 Apr 2025 10:53:35 +0200
-X-Gm-Features: AQ5f1JrJvO-P7srrVogKZHZUEQyOXnDzIFSrTNnEmr8jIXDbBAMV3uDIAoT6Pfs
-Message-ID: <CANn89i+UQQ6GqhWisHQEL0ECNFoQqVrO+2Ee3oDzysdR7dh=Ag@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: Avoid calling WARN_ON() on -ENOMEM in netif_change_net_namespace()
-To: Ivan Abramov <i.abramov@mt-integration.ru>
-Cc: Stanislav Fomichev <stfomichev@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	syzbot+1df6ffa7a6274ae264db@syzkaller.appspotmail.com, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Stanislav Fomichev <sdf@fomichev.me>, Ahmed Zaki <ahmed.zaki@intel.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, "Eric W. Biederman" <ebiederm@xmission.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	lvc-project@linuxtesting.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [EXTERNAL] Re: [PATCH net v3 3/3] net: ti: icss-iep: Fix possible
+ NULL pointer dereference for perout request
+To: Paolo Abeni <pabeni@redhat.com>, Roger Quadros <rogerq@kernel.org>,
+        <dan.carpenter@linaro.org>, <kuba@kernel.org>, <edumazet@google.com>,
+        <davem@davemloft.net>, <andrew+netdev@lunn.ch>
+CC: <bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <namcao@linutronix.de>, <javier.carrasco.cruz@gmail.com>,
+        <diogo.ivo@siemens.com>, <horms@kernel.org>,
+        <jacob.e.keller@intel.com>, <john.fastabend@gmail.com>,
+        <hawk@kernel.org>, <daniel@iogearbox.net>, <ast@kernel.org>,
+        <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+        <danishanwar@ti.com>
+References: <20250328102403.2626974-1-m-malladi@ti.com>
+ <20250328102403.2626974-4-m-malladi@ti.com>
+ <0fb67fc2-4915-49af-aa20-8bdc9bed4226@kernel.org>
+ <b0a099a6-33b2-49f9-9af7-580c60b98f55@ti.com>
+ <469fd8d0-c72e-4ca6-87a9-2f42b180276b@redhat.com>
+Content-Language: en-US
+From: "Malladi, Meghana" <m-malladi@ti.com>
+In-Reply-To: <469fd8d0-c72e-4ca6-87a9-2f42b180276b@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Fri, Apr 4, 2025 at 9:29=E2=80=AFAM Ivan Abramov <i.abramov@mt-integrati=
-on.ru> wrote:
->
-> On Thu, 3 Apr 2025 11:05:31 -0700, Stanislav Fomichev wrote:
-> > On 04/03, Ivan Abramov wrote:
-> >> It's pointless to call WARN_ON() in case of an allocation failure in
-> >> device_rename(), since it only leads to useless splats caused by delib=
-erate
-> >> fault injections, so avoid it.
->
-> > What if this happens in a non-fault injection environment? Suppose
-> > the user shows up and says that he's having an issue with device
-> > changing its name after netns change. There will be no way to diagnose
-> > it, right?
->
-> Failure to allocate a few hundred bytes in kstrdup doesn't seem
-> practically possible and happens only in fault injection scenarios. Other
-> types of failures in device_rename will still trigger WARN_ON.
 
-If you want to fix this, fix it properly.
 
-Do not paper around the issue by silencing a warning.
+On 4/3/2025 4:55 PM, Paolo Abeni wrote:
+> On 4/2/25 2: 37 PM, Malladi, Meghana wrote: > On 4/2/2025 5: 58 PM, 
+> Roger Quadros wrote: >> On 28/03/2025 12: 24, Meghana Malladi wrote: >>> 
+> ICSS IEP driver has flags to check if perout or pps has been enabled >>> at
+> ZjQcmQRYFpfptBannerStart
+> This message was sent from outside of Texas Instruments.
+> Do not click links or open attachments unless you recognize the source 
+> of this email and know the content is safe.
+> Report Suspicious
+> <https://us-phishalarm-ewt.proofpoint.com/EWT/v1/G3vK! 
+> updqndalvOwRqgXOXDPJf9wy4vKojW68gavBCIsz5DlBLvSeawwT53qgFGcvIm0ULRBQkJv028AcR194Ei9ZDPp5ily-uAw$>
+> ZjQcmQRYFpfptBannerEnd
+> 
+> On 4/2/25 2:37 PM, Malladi, Meghana wrote:
+>> On 4/2/2025 5:58 PM, Roger Quadros wrote:
+>>> On 28/03/2025 12:24, Meghana Malladi wrote:
+>>>> ICSS IEP driver has flags to check if perout or pps has been enabled
+>>>> at any given point of time. Whenever there is request to enable or
+>>>> disable the signal, the driver first checks its enabled or disabled
+>>>> and acts accordingly.
+>>>>
+>>>> After bringing the interface down and up, calling PPS/perout enable
+>>>> doesn't work as the driver believes PPS is already enabled,
+>>>
+>>> How? aren't we calling icss_iep_pps_enable(iep, false)?
+>>> wouldn't this disable the IEP and clear the iep->pps_enabled flag?
+>>>
+>> 
+>> The whole purpose of calling icss_iep_pps_enable(iep, false) is to clear 
+>> iep->pps_enabled flag, because if this flag is not cleared it hinders 
+>> generating new pps signal (with the newly loaded firmware) once any of 
+>> the interfaces are up (check icss_iep_perout_enable()), so instead of 
+>> calling icss_iep_pps_enable(iep, false) I am just clearing the 
+>> iep->pps_enabled flag.
+> 
+> IDK what Roger thinks, but the above is not clear to me. I read it as
+> you are stating that icss_iep_pps_enable() indeed clears the flag, so i
+> don't see/follow the reasoning behind this change.
+> 
+
+The reason behind this change is to fix the possible null pointer 
+dereference which will occur when icss_iep_perout_enable(iep, NULL, 
+false) is called during icss_iep_exit(), my bad for not mentioning it 
+clearly in the commit message.
+
+> Skimmir over the code, icss_iep_pps_enable() could indeed avoid clearing
+> the flag under some circumstances is that the reason?
+> 
+
+icss_iep_pps_enable() does indeed clear the flag, but 
+icss_iep_perout_enable() doesn't due to the null pointer dereference. So 
+instead of calling these functions for clearing the flag, we can simply 
+just clear the flag directly.
+
+> Possibly a more describing commit message would help.
+> 
+
+Yes agreed. I will update it for v4.
+
+>>> And, what if you brought 2 interfaces of the same ICSS instances up
+>>> but put only 1 interface down and up?
+>>>
+>> 
+>> Then the flag need not be disabled if only one interface is brought down 
+>> because the IEP is still alive and all the IEP configuration (including 
+>> pps/perout) is still valid.
+> 
+> I read the above as stating this fix is not correct in such scenario,
+> leading to the wrong final state.
+> 
+
+No it is the correct scenario. When you bring down all the existing 
+interfaces (be it one or two, when whatever is up goes down) you unload 
+the existing firmware and clear the all the driver configuration (this 
+flag also needs to be cleared) to ensure everything starts with a clean 
+state.
+
+> I think it would be better to either give a better reasoning about this
+> change in the commit message or refactor it to handle even such scenario,
+> 
+> Thanks,
+> 
+> Paolo
+> 
+
 
