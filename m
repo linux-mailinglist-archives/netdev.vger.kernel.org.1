@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-179314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88586A7BF3E
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 16:30:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2E41A7BF49
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 16:31:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 007143B56F7
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 14:29:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9288A17B9DE
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 14:30:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E76D1F3FF1;
-	Fri,  4 Apr 2025 14:30:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5938F1F4195;
+	Fri,  4 Apr 2025 14:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jQy8WR9i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b6dNVx3t"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53F961F0E36;
-	Fri,  4 Apr 2025 14:30:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE961EB1A9;
+	Fri,  4 Apr 2025 14:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743777009; cv=none; b=WNbSi6m84hBQebEEEpuU975f6GyS+FuztVqd3AEdi+UH+xmgq/Qijgittg9Azj8Viv1PjvQ4GaIS7auBdCZ4wkNUQI/FaU3JCk5YzOHvJs6tPq0Tya3Cp9UiCJFxyaO+bRuOPQ6xYX9iWJBO4hdzqWyUj+91K5M/6iBsompuK1k=
+	t=1743777010; cv=none; b=Xa/SmWP1zhBZNCsaq6z919Km4hyGK0ZU9PMJn02h0LOP9n+70RihDrP2OfEVgkax7kUnx/WTrjg7yRa88sg1X1tjMywY6WHojCaCfYry2u0Ujwk8Hc4Ran++iPMAm/Ds7CcanOiyOF5VFjB+115FQ9Z5tno5Xnpnx6f7JhsoR1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743777009; c=relaxed/simple;
-	bh=/RiolJ1HzX5yqvyukJJnFdUT+5hRJg+Fx5YJ51dj/rE=;
+	s=arc-20240116; t=1743777010; c=relaxed/simple;
+	bh=wTP+D4IXKBwvsj7zTnOsBaG/zgIJXbKgSf+ZGdl7G00=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RV+Gx+gO4O1lfs+7+vyneAwYRCf+aS4i/Kv5NwxuSaNp6RtYxL+TNqV5MXsY+2hze16b5gfBGEpLe6b7jIXHe+ruvPYPEsEarq2go9bTMi3tVPpP/YMUZS0K6vCl3FqLbJtoVwoNIVkHurhxFp/l6gTTZIsqkDlsz/G1Ha5gthk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jQy8WR9i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD8DDC4CEEA;
-	Fri,  4 Apr 2025 14:30:08 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=oZg5cYlIm/Vm8hyPyP9aBgr8eVMY9gn4gBGkeCZjVA/+xN54v0DUjd2kC85vUVY1ZqKC42TH2VPef4pdxi4X4pS7hCCV65cPeDKqRV6cPC8jfuM9iBzb7COKha8rqbEPPCSEA+NPNQITkKKZtp/EcZ93ARDYlzSgxBEvkjTlbAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b6dNVx3t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBB42C4CEEC;
+	Fri,  4 Apr 2025 14:30:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743777008;
-	bh=/RiolJ1HzX5yqvyukJJnFdUT+5hRJg+Fx5YJ51dj/rE=;
+	s=k20201202; t=1743777010;
+	bh=wTP+D4IXKBwvsj7zTnOsBaG/zgIJXbKgSf+ZGdl7G00=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jQy8WR9iJmgt7msrSm/+lj9mnefB+c15X8a6CKXzl9wCZrT49sE4LsfjFww7g+jvV
-	 gy0p7irmWIwp3Uqu/b32fl6a/VdVN25ywbiUHbm69/ksESU5L1pAz7rIhEVc0vb+RO
-	 Q/IZtBW5kEQ3hnMaikrdknkhSkpPBPLY4ahmXA7Jz27U9+3U5cD7kKd3jKre7Rnreg
-	 oNuh7FimTkte4VkGe/8LjmvCkwEn4imfP4H90/14Pw/yb+gfaqL7Y4zPfs1PIqb74Y
-	 Y0gzbkOGrXceVkn4oz8fiagQY5WXKfSiSqzsiFuIMojA4tchKZth0teXqeWZVyfzGD
-	 S1YSbMlm8lNDA==
+	b=b6dNVx3teeL8lUgEUSRmHqYqUzXA1JtIg5ncxTL3o9kYORzEQ+2/xb9SkZwPL8lmM
+	 /H4DcE9hggLrCueV82UC7YjQYRDUbSLe4JLk4XneDUE7GUHjtUjTpV/jHYJmIm/sv8
+	 enFLih/8RqAwFUGKPZC/jvbS+B5+gQuvXEs2zRH4+z1a7Q/FNTD8Ze7d4kXNYAHC7a
+	 SbIYkNwwLpNDS6YQ4V+Vm92Fsa7iGY6P5O44rhYrsU3bYWU+YTtrRjk54Ltd1JFvpe
+	 do+w9mqG1B9FHxSdc1QUkK2St8wjK9sy/2SuNzyMcop1jBKwqeSf2yz4lC28Q5scwT
+	 Md6DyU4DasLPQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADDA3822D28;
-	Fri,  4 Apr 2025 14:30:46 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FC93822D28;
+	Fri,  4 Apr 2025 14:30:48 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: octeontx2: Handle XDP_ABORTED and XDP invalid as
- XDP_DROP
+Subject: Re: [PATCH v4 0/1] usbnet:fix NPE during rx_complete
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174377704546.3279917.13889466734313681619.git-patchwork-notify@kernel.org>
-Date: Fri, 04 Apr 2025 14:30:45 +0000
-References: <20250401-octeontx2-xdp-abort-fix-v1-1-f0587c35a0b9@kernel.org>
-In-Reply-To: <20250401-octeontx2-xdp-abort-fix-v1-1-f0587c35a0b9@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
- hkelam@marvell.com, bbhushan2@marvell.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
- john.fastabend@gmail.com, sgoutham@cavium.com, netdev@vger.kernel.org,
- bpf@vger.kernel.org
+ <174377704699.3279917.8004013265274717921.git-patchwork-notify@kernel.org>
+Date: Fri, 04 Apr 2025 14:30:46 +0000
+References: <cover.1743584159.git.luying1@xiaomi.com>
+In-Reply-To: <cover.1743584159.git.luying1@xiaomi.com>
+To: Ying Lu <luying526@gmail.com>
+Cc: oneukum@suse.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-kernel@vger.kernel.org, gregkh@linuxfoundation.org, luying1@xiaomi.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 01 Apr 2025 11:02:12 +0200 you wrote:
-> In the current implementation octeontx2 manages XDP_ABORTED and XDP
-> invalid as XDP_PASS forwarding the skb to the networking stack.
-> Align the behaviour to other XDP drivers handling XDP_ABORTED and XDP
-> invalid as XDP_DROP.
-> Please note this patch has just compile tested.
+On Wed,  2 Apr 2025 16:58:58 +0800 you wrote:
+> From: Ying Lu <luying1@xiaomi.com>
 > 
-> Fixes: 06059a1a9a4a5 ("octeontx2-pf: Add XDP support to netdev PF")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> The patchset fix the issue caused by the following modifications:
+> commit 04e906839a053f092ef53f4fb2d610983412b904
+> (usbnet: fix cyclical race on disconnect with work queue)
+> 
+> The issue:
+> The usb_submit_urb function lacks a usbnet_going_away validation,
+> whereas __usbnet_queue_skb includes this check. This inconsistency
+> creates a race condition where: A URB request may succeed, but
+> the corresponding SKB data fails to be queued.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: octeontx2: Handle XDP_ABORTED and XDP invalid as XDP_DROP
-    https://git.kernel.org/netdev/net/c/2a8377720a0a
+  - [v4,1/1] usbnet:fix NPE during rx_complete
+    https://git.kernel.org/netdev/net/c/51de36000934
 
 You are awesome, thank you!
 -- 
