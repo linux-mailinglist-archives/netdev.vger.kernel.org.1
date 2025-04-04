@@ -1,163 +1,221 @@
-Return-Path: <netdev+bounces-179235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A34CA7B720
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 07:26:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37624A7B724
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 07:27:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F8A53B84BD
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 05:26:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5E98189D3B8
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 05:27:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A6BD14EC5B;
-	Fri,  4 Apr 2025 05:26:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E01155CB3;
+	Fri,  4 Apr 2025 05:27:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EeHExF6r"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QRHv+aGI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9ABE376;
-	Fri,  4 Apr 2025 05:26:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3991514F6;
+	Fri,  4 Apr 2025 05:26:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743744406; cv=none; b=DjumwgnrP4Qy9aZ6P5PSmqbtFdkVpR2QVzQlzo1kcJxo89LWBCC+2GaGnaj/Sc80lkx53USyyZDMkNTXDsKBzl29K/AyMuzODS4lcfKCGo61Vx6Ezh0krhQYnVMMnNFGyvMkbqWx6gCMbhysuetfdEgCoAchrlbobFb/xO71zc0=
+	t=1743744420; cv=none; b=qKeJt9FL0lV9D7KgTlTfEczRLYCsqY+kV0NGxzaWd/jRU81YvPpIep9UGmkHMkwdtedcxb1bSRh0UO+DyjNhcIcVjWcudrKWEnyTGVXlhDzQj22ntu4yxx0rD2dUWafW3pWLOVg159O/WuWycsfUTO7cA1C2G5ZLCM5qkTAwimE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743744406; c=relaxed/simple;
-	bh=hxG7XUIYapHRht25SbZ3ZRVuIMEJ3wDob6N+23gcygo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OuJQ93Aw4hN/ZHO4RB6d1gPV+kWvhGLGZW+2HqjluJv+8/6yLZlNk6v+OxbebiQJVrMFlM2dBHVS+Kb9FDlRH2bnzn0hWo5OjD3x0RbWCuSjSR6tkqFNuv0Y6lzamPlXx8yO1p8Xf2JFfNdkgOV/kv1tVwJwa1j9REk18MVbSpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EeHExF6r; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1743744405; x=1775280405;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=hxG7XUIYapHRht25SbZ3ZRVuIMEJ3wDob6N+23gcygo=;
-  b=EeHExF6rbDU4GXpFVvTluMrCyUW5UpgW3/7ezHjKgIgq3WkPUgYFtcIu
-   PvlsO7uhg09BA9oAZM68Vo+AgnOyiodPa35s8BsomKV99FbJ2bKp4atrZ
-   wbv2v/FV2S+5iqlQfTCuCN/cPLBMadp0w6v3u4Ee/ePC8ZEVU/8KHLHOL
-   7DCffrCq/WcXjU+aegNZ8+7xNY6A2oB/N3ZC9XE3myFIhW/kvFXBWlSjo
-   5bGZ+wJ7sGpKP/YOA6gB4YbOa+8MvOOkheEwfYTuul93yyLeO0ZRw8ZQJ
-   3T3z6DpEo4LcCgwPSkzkIfZ57ymqoM77ohKmuGEC11+YkgTD4PfDWzELD
-   w==;
-X-CSE-ConnectionGUID: pTs9/s7BThmvpGGijanK4Q==
-X-CSE-MsgGUID: 7ZoDtRujQo2oeO/x9rGRqw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11393"; a="45317193"
-X-IronPort-AV: E=Sophos;i="6.15,187,1739865600"; 
-   d="scan'208";a="45317193"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2025 22:26:44 -0700
-X-CSE-ConnectionGUID: F4BjJeSBQMiY54SPtgeH7Q==
-X-CSE-MsgGUID: IFo6QtE0STu5tmvl0TDz/g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,187,1739865600"; 
-   d="scan'208";a="127020693"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Apr 2025 22:26:40 -0700
-Date: Fri, 4 Apr 2025 07:26:29 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	shenjian15@huawei.com, wangpeiyang1@huawei.com,
-	liuyonglong@huawei.com, chenhao418@huawei.com,
-	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
-	salil.mehta@huawei.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2 1/7] net: hibmcge: fix incorrect pause frame
- statistics issue
-Message-ID: <Z+9thcHaDkdAOX01@mev-dev.igk.intel.com>
-References: <20250403135311.545633-1-shaojijie@huawei.com>
- <20250403135311.545633-2-shaojijie@huawei.com>
+	s=arc-20240116; t=1743744420; c=relaxed/simple;
+	bh=C0lYSua6fDsvQmLvI+OydGXMoruw7uB1CrIim3MA25U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qpkRK+g72oKSu2W1Sa1CryTZ9w9p14svKyupH3+KnWc1BOv8pr7wCpCUWlNAW8sUq2MTaca3e+D8KviydC5oiLdr1Rl9saE3M/JW7/gYqeciZuTNHIZm8Rjej7tyhK3Vt0ZoDSGxcUiJpgN9glJfxVvx6m304jjKbGdW8BpMBEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QRHv+aGI; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5e6167d0536so2899973a12.1;
+        Thu, 03 Apr 2025 22:26:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743744416; x=1744349216; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qy+e4bb9BRoQ0to6ueXIVMI4Q4x2sVS+j5MkPGS0Bqc=;
+        b=QRHv+aGI0N7ad2A0O/AdFc0JmNNx0IUkPhUw2fePDVTccTaXZPIOAwA+HlKWuq2NJn
+         iaAEmJWZu8vh46+a+wUoUQzY/o2pBKlgTHkm3/Gd4ss1Iybbm+tS6zd++Bbv0GGIEjU8
+         jv2P30yrjYb1zubvjRiemezIqdeLr26+gSlVUGzZmb8TqEaOfgod2tgQ1Vyuoy8UJ32N
+         ccs0hC2ijt8vTOQrRRJba2P/EsTpfKCtS1u39PIwFBJu4mSgqWdn3YN2SOw0vzk9hAHk
+         SmvbW7q/16lgjCjkQg9R04tWllxkywHe+/fKUkz73yv4K10JP88SufJ00pI6bgnrQ9U1
+         lLKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743744416; x=1744349216;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qy+e4bb9BRoQ0to6ueXIVMI4Q4x2sVS+j5MkPGS0Bqc=;
+        b=e7paw+py0CFq8ZixV73o/ZeGX1LWaJsJoeVBjFR0KjXLKQdX9S4crwVNySICQHI5FX
+         f8uM3TWLD/RauFIrUyQNdypgYjJ/iOPuXtF5R08EEd4xR8Eg6EfqXgYEdc5f4Kw+me7j
+         k601RMaW42B1EDmMGExiQdWkxe4ffRuAC4RGD4soLcDf6Pw5pT+XAlKgJ5up8bby30mH
+         pcOHBXmUhq5XiuQjZPKx7/ccwMfjZt4uSGcfGk5rUuKu//VkpNfak7YytuAUiYDLwvEF
+         o0dQV+XjAxb8vT7AfjX9vIFyxeqgID3yeT70zAGLoGFJlJlea+PhIy1lKjUTDiL+hXiA
+         VYIA==
+X-Forwarded-Encrypted: i=1; AJvYcCVrgQDp290g/8sSHqfXuLaiIFoU2ueuP0nkdVk5YD9k0T0Xn4ada8+cjgtYlUF3MItv/Fz1AatJcksJOW2XeV0=@vger.kernel.org, AJvYcCWD1UX9Wkp0uNbBbVCyu3YDcggrfJ+cqJS3dRqRTGBfbDVLRhyLsHk+Z32yt4qteYjB7slKOmGQ@vger.kernel.org
+X-Gm-Message-State: AOJu0YzukdJi6Jz0D2OwTvZW29U7uQJLeNQV3Z5vP05stSudydXt5njN
+	1WxscwivFwykKTo4VqSDb31EiJgZgx9+t/jeUN9dfFt2yUfrVEp1AZv3cb8UXO9fbXwFMYxtMxs
+	juB2An3bT4D5Sq56KBBYaiFAZ1to=
+X-Gm-Gg: ASbGncv3CDAVtLBCv06b31UiQ0zld550mcGGj/r7vcLcmSAAQB2E8oMREoogeX6hL9E
+	tfQQcT76AHCHaebRCDIEuu5GumEg5Fl/JtSgpEwW9r6AWNIbZjOzGZ+IbLKaz3mQ3Thn5XIKsf1
+	VpJeLeIMEfEsc0YwyYJSjGNCUBAQZd+wMUpUnmka4=
+X-Google-Smtp-Source: AGHT+IEcjKP2DTqW6Dispo7VWlGa1QY7FyMsbyTJnCxp3oSVcKtMJhWbPm53ZKUo+HoZnLghMVs+u1TCve9CPZFp190=
+X-Received: by 2002:a05:6402:1ed0:b0:5ec:9352:7b20 with SMTP id
+ 4fb4d7f45d1cf-5f0b3098f92mr1629339a12.0.1743744416017; Thu, 03 Apr 2025
+ 22:26:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250403135311.545633-2-shaojijie@huawei.com>
+References: <20250403060423.1209435-1-ap420073@gmail.com> <20250403060423.1209435-3-ap420073@gmail.com>
+In-Reply-To: <20250403060423.1209435-3-ap420073@gmail.com>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Fri, 4 Apr 2025 14:26:44 +0900
+X-Gm-Features: ATxdqUGOs0AuEO4WvYTuBmixNzS8_qiL4-yaXIguazEm_h5TsUnaWTszF2wfxCw
+Message-ID: <CAMArcTWRnAqBNZd+dgULkm7saw24S_0f1Pw2X6e7Mfgd6zEpbQ@mail.gmail.com>
+Subject: Re: [PATCH net 2/2] selftests: drv-net: test random value for hds-thresh
+To: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	shuah@kernel.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc: kory.maincent@bootlin.com, willemb@google.com, 
+	aleksander.lobakin@intel.com, ecree.xilinx@gmail.com, almasrymina@google.com, 
+	daniel.zahka@gmail.com, jianbol@nvidia.com, gal@nvidia.com, 
+	michael.chan@broadcom.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 03, 2025 at 09:53:05PM +0800, Jijie Shao wrote:
-> The driver supports pause frames,
-> but does not pass pause frames based on rx pause enable configuration,
-> resulting in incorrect pause frame statistics.
-> 
-> like this:
-> mz eno3 '01 80 c2 00 00 01 00 18 2d 04 00 9c 88 08 00 01 ff ff' \
-> 	-p 64 -c 100
-> 
-> ethtool -S enp132s0f2 | grep -v ": 0"
-> NIC statistics:
->      rx_octets_total_filt_cnt: 6800
->      rx_filt_pkt_cnt: 100
-> 
-> The rx pause frames are filtered by the MAC hardware.
-> 
-> This patch configures pass pause frames based on the
-> rx puase enable status to ensure that
-> rx pause frames are not filtered.
-> 
-> mz eno3 '01 80 c2 00 00 01 00 18 2d 04 00 9c 88 08 00 01 ff ff' \
->         -p 64 -c 100
-> 
-> ethtool --include-statistics -a enp132s0f2
-> Pause parameters for enp132s0f2:
-> Autonegotiate:	on
-> RX:		on
-> TX:		on
-> RX negotiated: on
-> TX negotiated: on
-> Statistics:
->   tx_pause_frames: 0
->   rx_pause_frames: 100
-> 
-> Fixes: 3a03763f3876 ("net: hibmcge: Add pauseparam supported in this module")
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+On Thu, Apr 3, 2025 at 3:04=E2=80=AFPM Taehee Yoo <ap420073@gmail.com> wrot=
+e:
+>
+> hds.py has been testing 0(set_hds_thresh_zero()),
+> MAX(set_hds_thresh_max()), GT(set_hds_thresh_gt()) values for hds-thresh.
+> However if a hds-thresh value was already 0, set_hds_thresh_zero()
+> can't test properly.
+> So, it tests random value first and then tests 0, MAX, GT values.
+>
+> Testing bnxt:
+>     TAP version 13
+>     1..13
+>     ok 1 hds.get_hds
+>     ok 2 hds.get_hds_thresh
+>     ok 3 hds.set_hds_disable # SKIP disabling of HDS not supported by
+>     the device
+>     ok 4 hds.set_hds_enable
+>     ok 5 hds.set_hds_thresh_random
+>     ok 6 hds.set_hds_thresh_zero
+>     ok 7 hds.set_hds_thresh_max
+>     ok 8 hds.set_hds_thresh_gt
+>     ok 9 hds.set_xdp
+>     ok 10 hds.enabled_set_xdp
+>     ok 11 hds.ioctl
+>     ok 12 hds.ioctl_set_xdp
+>     ok 13 hds.ioctl_enabled_set_xdp
+>     # Totals: pass:12 fail:0 xfail:0 xpass:0 skip:1 error:0
+>
+> Testing lo:
+>     TAP version 13
+>     1..13
+>     ok 1 hds.get_hds # SKIP tcp-data-split not supported by device
+>     ok 2 hds.get_hds_thresh # SKIP hds-thresh not supported by device
+>     ok 3 hds.set_hds_disable # SKIP ring-set not supported by the device
+>     ok 4 hds.set_hds_enable # SKIP ring-set not supported by the device
+>     ok 5 hds.set_hds_thresh_random # SKIP hds-thresh not supported by
+>     device
+>     ok 6 hds.set_hds_thresh_zero # SKIP ring-set not supported by the
+>     device
+>     ok 7 hds.set_hds_thresh_max # SKIP hds-thresh not supported by
+>     device
+>     ok 8 hds.set_hds_thresh_gt # SKIP hds-thresh not supported by device
+>     ok 9 hds.set_xdp # SKIP tcp-data-split not supported by device
+>     ok 10 hds.enabled_set_xdp # SKIP tcp-data-split not supported by
+>     device
+>     ok 11 hds.ioctl # SKIP tcp-data-split not supported by device
+>     ok 12 hds.ioctl_set_xdp # SKIP tcp-data-split not supported by
+>     device
+>     ok 13 hds.ioctl_enabled_set_xdp # SKIP tcp-data-split not supported
+>     by device
+>     # Totals: pass:0 fail:0 xfail:0 xpass:0 skip:13 error:0
+>
+> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 > ---
-> ChangeLog:
-> v1 -> v2:
->   - Add more details in commit log, suggested by Simon Horman.
->   v1: https://lore.kernel.org/all/20250402133905.895421-1-shaojijie@huawei.com/
-> ---
->  drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c  | 3 +++
->  drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h | 1 +
->  2 files changed, 4 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-> index 74a18033b444..7d3bbd3e2adc 100644
-> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-> @@ -242,6 +242,9 @@ void hbg_hw_set_pause_enable(struct hbg_priv *priv, u32 tx_en, u32 rx_en)
->  			    HBG_REG_PAUSE_ENABLE_TX_B, tx_en);
->  	hbg_reg_write_field(priv, HBG_REG_PAUSE_ENABLE_ADDR,
->  			    HBG_REG_PAUSE_ENABLE_RX_B, rx_en);
+>  tools/testing/selftests/drivers/net/hds.py | 28 +++++++++++++++++++++-
+>  1 file changed, 27 insertions(+), 1 deletion(-)
+>
+> diff --git a/tools/testing/selftests/drivers/net/hds.py b/tools/testing/s=
+elftests/drivers/net/hds.py
+> index 8b7f6acad15f..3ba8e4d69c4c 100755
+> --- a/tools/testing/selftests/drivers/net/hds.py
+> +++ b/tools/testing/selftests/drivers/net/hds.py
+> @@ -6,7 +6,7 @@ import os
+>  from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_raises, KsftSkipEx
+>  from lib.py import CmdExitFailure, EthtoolFamily, NlError
+>  from lib.py import NetDrvEnv
+> -from lib.py import defer, ethtool, ip
+> +from lib.py import defer, ethtool, ip, random
+>
+>
+>  def _get_hds_mode(cfg, netnl) -> str:
+> @@ -109,6 +109,31 @@ def set_hds_thresh_zero(cfg, netnl) -> None:
+>
+>      ksft_eq(0, rings['hds-thresh'])
+>
+> +def set_hds_thresh_random(cfg, netnl) -> None:
+> +    try:
+> +        rings =3D netnl.rings_get({'header': {'dev-index': cfg.ifindex}}=
+)
+> +    except NlError as e:
+> +        raise KsftSkipEx('ring-get not supported by device')
+> +    if 'hds-thresh' not in rings:
+> +        raise KsftSkipEx('hds-thresh not supported by device')
+> +    if 'hds-thresh-max' not in rings:
+> +        raise KsftSkipEx('hds-thresh-max not defined by device')
 > +
-> +	hbg_reg_write_field(priv, HBG_REG_REC_FILT_CTRL_ADDR,
-> +			    HBG_REG_REC_FILT_CTRL_PAUSE_FRM_PASS_B, rx_en);
->  }
->  
->  void hbg_hw_get_pause_enable(struct hbg_priv *priv, u32 *tx_en, u32 *rx_en)
-> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
-> index cc2cc612770d..fd623cfd13de 100644
-> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
-> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
-> @@ -68,6 +68,7 @@
->  #define HBG_REG_TRANSMIT_CTRL_AN_EN_B		BIT(5)
->  #define HBG_REG_REC_FILT_CTRL_ADDR		(HBG_REG_SGMII_BASE + 0x0064)
->  #define HBG_REG_REC_FILT_CTRL_UC_MATCH_EN_B	BIT(0)
-> +#define HBG_REG_REC_FILT_CTRL_PAUSE_FRM_PASS_B	BIT(4)
->  #define HBG_REG_RX_OCTETS_TOTAL_OK_ADDR		(HBG_REG_SGMII_BASE + 0x0080)
->  #define HBG_REG_RX_OCTETS_BAD_ADDR		(HBG_REG_SGMII_BASE + 0x0084)
->  #define HBG_REG_RX_UC_PKTS_ADDR			(HBG_REG_SGMII_BASE + 0x0088)
-> -- 
+> +    while True:
+> +        hds_thresh =3D random.randint(1, rings['hds-thresh-max'])
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+If a hds-thresh-max value is too small, it will not work.
+As far as I know, the gve's hds-thresh-max would be 0.
 
-> 2.33.0
+I will send a v2 patch to fix this.
+
+Thanks!
+Taehee Yoo
+
+> +        if hds_thresh !=3D rings['hds-thresh']:
+> +            break
+> +
+> +    try:
+> +        netnl.rings_set({'header': {'dev-index': cfg.ifindex}, 'hds-thre=
+sh': hds_thresh})
+> +    except NlError as e:
+> +        if e.error =3D=3D errno.EINVAL:
+> +            raise KsftSkipEx("hds-thresh-set not supported by the device=
+")
+> +        elif e.error =3D=3D errno.EOPNOTSUPP:
+> +            raise KsftSkipEx("ring-set not supported by the device")
+> +    rings =3D netnl.rings_get({'header': {'dev-index': cfg.ifindex}})
+> +    ksft_eq(hds_thresh, rings['hds-thresh'])
+> +
+>  def set_hds_thresh_max(cfg, netnl) -> None:
+>      try:
+>          rings =3D netnl.rings_get({'header': {'dev-index': cfg.ifindex}}=
+)
+> @@ -243,6 +268,7 @@ def main() -> None:
+>                    get_hds_thresh,
+>                    set_hds_disable,
+>                    set_hds_enable,
+> +                  set_hds_thresh_random,
+>                    set_hds_thresh_zero,
+>                    set_hds_thresh_max,
+>                    set_hds_thresh_gt,
+> --
+> 2.34.1
+>
 
