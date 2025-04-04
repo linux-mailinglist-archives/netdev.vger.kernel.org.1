@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-179330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 379A1A7C044
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 17:10:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE898A7C045
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 17:10:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 059EB176011
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 15:10:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 469A37A74C5
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 15:09:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A31C21F3FE5;
-	Fri,  4 Apr 2025 15:09:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F7FA1F461B;
+	Fri,  4 Apr 2025 15:10:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yy1sNhqK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oTUwIruW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D4FD1F3D58
-	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 15:09:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0C81F460F
+	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 15:09:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743779398; cv=none; b=u6mOOzZeQzf4rNxVtWMv51KiFqq/4L7e1v4mKAZ3YMQpDCSknW3FqQfFt4TIpBF+m0kd1IRaF3eyJ1HUnsHBrrzTY/wN8q68/pPM27MOM2CZgtz6BE1CKSh/+7LuOY6yGaVau7wo2nMYN5Qqo4jtu67c4SsZ9yLvJCxYCOh9HXQ=
+	t=1743779399; cv=none; b=Smrj7jhuuWEQD3HH00SiGXpPniaOLUtnU5i3zK9d2BwqOiXY69hqYGpYmYiHs/cU5MrOillkJr8k7WxiMFmA7h1T4ioHXUPEhd9ASyVATLOpPh0Um5Rd8G5fEvjU70LFACimXkdz31PiUKZPftNoZjvKBQMSDeYVcUlQVMLnwVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743779398; c=relaxed/simple;
-	bh=VctWM4mw6f1CpNj3DK7jyqi78oGyDMTpzVgxONEemhw=;
+	s=arc-20240116; t=1743779399; c=relaxed/simple;
+	bh=3wT/+nd3TaVjmmVfI2u8Rai3Y5/Xm0FEgZgmwoHSWW4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JseSAUik3eEMrUAn71RY+9kiSRexBK0pLQC0EYbfBJrGhQKiEL7GTRNmgu99lEUHD88yeLMFjkKoAPes+SeeZsX/fUUrCNuwjyD3dxclpUKIQUX+4nWzOosIJ/VQ6ugx1KFGKNuWFmv6Q8M6kaLTkxIi/B24Iyh64gFMCPxESUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yy1sNhqK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6C52C4CEDD;
-	Fri,  4 Apr 2025 15:09:57 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=WM7ZZcNKXYw8I7TVvCt3kH7qk1JDxqBqPQXO9HZaRiz/riWemoe1SQyFhes33cufGCBSaWVy93vOBZGRgdk/TfUH2BkI9AzKA1y2tTE+pTSiQyvU4lvZikNSROg6sRGdHA1qZzpz36H2ENlAowGbctOKKR+tHv+v2JAaTXgSe94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oTUwIruW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EDC3C4CEE8;
+	Fri,  4 Apr 2025 15:09:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743779398;
-	bh=VctWM4mw6f1CpNj3DK7jyqi78oGyDMTpzVgxONEemhw=;
+	s=k20201202; t=1743779399;
+	bh=3wT/+nd3TaVjmmVfI2u8Rai3Y5/Xm0FEgZgmwoHSWW4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Yy1sNhqK5M0aMrU45JvdbD0swtkbxHFzGo4FVztNTu1T9e2ZwJcsGybHV2bi4vpT2
-	 GBp3le1p+y43yGbm6IACcNiYuQ7Sqe4Dlr8eYl6qQb1uruho9YSgiF6CiTTQIs/htC
-	 ALeMHV3dyLcULakbH687oEHBR23NY3vBflTjb8hqq8Vyiqt9yZ3LyzeG0IUeHL2cYH
-	 YBJcmlks4BUPjW2XpX8ac58ClaqXjpzicHP6B7k6BS0iOj4vfiLQaeta6wbx96KYYt
-	 41jyqCmZCQW+YobxCud1aqXO4+3/HXYkO3mKfmiy8JVe2MXfXkRVABrGJYUYSxY81K
-	 yYEKBYwZAiXqw==
+	b=oTUwIruW6scK+ii4pl6DPbjgrDu3WI07WUEGvdn1yYojUe4Oq0kpbkI6RK6n88dEv
+	 aEcVPkK6gH9y+Uegd1zzhzoombGiapbEaEQMTDjxtQBv6Om48oNztP1v7P6+8uGkFk
+	 EAiG8sb2HdGu/ukdAjxMVyp8vCtTuP5Ux3lQMaTii8d06HZ/I3wWzTcMd4cAFpg8E6
+	 qoEXQPto9cQp7usCBig0v/icKV2ABe6rgHLzL6n/ljfxSExEPmfP/I5uPKPkW3KOQy
+	 vZouJ0UFOkx6a5yIL9hHTLPAEl18YyzF8KhZV2MhmIXYC6xUfcgKrkD8dybkuX+4/W
+	 +g9PawB1SM+Tg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FCD3822D28;
-	Fri,  4 Apr 2025 15:10:36 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE0723822D28;
+	Fri,  4 Apr 2025 15:10:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,48 +52,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 0/2] net: make memory provider install / close paths
- more common
+Subject: Re: [PATCH net v3 0/4] netlink: specs: rt_addr: fix problems revealed by
+ C codegen
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174377943501.3293273.13049725354845035230.git-patchwork-notify@kernel.org>
-Date: Fri, 04 Apr 2025 15:10:35 +0000
-References: <20250403013405.2827250-1-kuba@kernel.org>
-In-Reply-To: <20250403013405.2827250-1-kuba@kernel.org>
+ <174377943625.3293273.12224629792815197216.git-patchwork-notify@kernel.org>
+Date: Fri, 04 Apr 2025 15:10:36 +0000
+References: <20250403013706.2828322-1-kuba@kernel.org>
+In-Reply-To: <20250403013706.2828322-1-kuba@kernel.org>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
  pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- ap420073@gmail.com, almasrymina@google.com, asml.silence@gmail.com,
- dw@davidwei.uk, sdf@fomichev.me
+ donald.hunter@gmail.com, yuyanghuang@google.com, jacob.e.keller@intel.com
 
 Hello:
 
 This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  2 Apr 2025 18:34:03 -0700 you wrote:
-> We seem to be fixing bugs in config path for devmem which also exist
-> in the io_uring ZC path. Let's try to make the two paths more common,
-> otherwise this is bound to keep happening.
+On Wed,  2 Apr 2025 18:37:02 -0700 you wrote:
+> I put together basic YNL C support for classic netlink. This revealed
+> a few problems in the rt_addr spec.
 > 
-> Found by code inspection and compile tested only.
-> 
+> v3:
+>  - fixes from Donald on patch 2 and 3
+>  - patch 4 is new
 > v2:
->  - [patch 1] add to commit msg
->  - [patch 1] fix arg naming in the header
->  - [patch 2] don't split the registration check, it may cause a race
->    if we just bail on the registration state and not on the MP being
->    present, as we drop and re-take the instance lock after setting
->    reg_state
-> v1: https://lore.kernel.org/20250331194201.2026422-1-kuba@kernel.org
+>  - fix the Fixes tag on patch 1
+>  - add 2 more patches
+> v1: https://lore.kernel.org/20250401012939.2116915-1-kuba@kernel.org
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2,1/2] net: move mp dev config validation to __net_mp_open_rxq()
-    https://git.kernel.org/netdev/net/c/ec304b70d46b
-  - [net,v2,2/2] net: avoid false positive warnings in __net_mp_close_rxq()
-    https://git.kernel.org/netdev/net/c/34f71de3f548
+  - [net,v3,1/4] netlink: specs: rt_addr: fix the spec format / schema failures
+    https://git.kernel.org/netdev/net/c/0802c32d4b03
+  - [net,v3,2/4] netlink: specs: rt_addr: fix get multi command name
+    https://git.kernel.org/netdev/net/c/524c03585fda
+  - [net,v3,3/4] netlink: specs: rt_addr: pull the ifa- prefix out of the names
+    https://git.kernel.org/netdev/net/c/0c8e30252d9f
+  - [net,v3,4/4] netlink: specs: rt_route: pull the ifa- prefix out of the names
+    https://git.kernel.org/netdev/net/c/1a1eba0e9899
 
 You are awesome, thank you!
 -- 
