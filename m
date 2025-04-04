@@ -1,427 +1,170 @@
-Return-Path: <netdev+bounces-179265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19467A7BA67
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 12:07:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D1E2A7BA72
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 12:12:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 062B41899057
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 10:07:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D8D9189F39C
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 10:12:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0295D28E8;
-	Fri,  4 Apr 2025 10:07:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF1B11A7044;
+	Fri,  4 Apr 2025 10:12:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ktG/eGSw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpgw-1-2.nogo.comp.nus.edu.sg (84-20.comp.nus.edu.sg [137.132.84.20])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2053.outbound.protection.outlook.com [40.107.243.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 359C719EEBD
-	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 10:07:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=137.132.84.20
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743761246; cv=none; b=eYDynCvJ9jyVdXdw64hOIHYUNaF/cq+LlciTHjozAvpdznoDKkwo2vT0dLy4XxTZUb50SxPoQwdUpOiI6M8OEOFXjxk4nLwHctsbpCdtu+U9uVbk/0FqCdJBtPyg4156QpW9/Zv09++kbtWGvhmtH5QwqpXuFI8FaxHoQQHeCSw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743761246; c=relaxed/simple;
-	bh=3897f+7hwiKaoRxyUmq7GI7ztVqgyFGJt5e3hNj/ndw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qGood/5Jf8i9uA6yuWRKwdsb5f6h9v5ivvf9VHs4eYhrtfKf0qE/RAuiNEzdSByonS9pBBmjcHgahZRxpqYYk6pK4jfjEPadj8HfvDV2fPunTI0Ftl5f7Tb/GCWKozTRvqfI9jOBStstnXyuw+3UYPU0sPD5zGb0V7Gkw1JVUnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=comp.nus.edu.sg; spf=pass smtp.mailfrom=comp.nus.edu.sg; arc=none smtp.client-ip=137.132.84.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=comp.nus.edu.sg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=comp.nus.edu.sg
-Received: from localhost (localhost [127.0.0.1])
-	by smtpgw-1-2.nogo.comp.nus.edu.sg (Postfix) with ESMTP id 9AF631612EA
-	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 18:07:15 +0800 (+08)
-X-Virus-Scanned: Debian amavisd-new at smtpgw-1-2.comp.nus.edu.sg
-Received: from smtpgw-1-2.nogo.comp.nus.edu.sg ([127.0.0.1])
-	by localhost (smtpgw-1-2.comp.nus.edu.sg [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Yj6HE7_l5uYg for <netdev@vger.kernel.org>;
-	Fri,  4 Apr 2025 18:07:13 +0800 (+08)
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com [209.85.221.72])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtpgw-1-2.nogo.comp.nus.edu.sg (Postfix) with ESMTPS
-	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 18:07:13 +0800 (+08)
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-39979ad285bso1118682f8f.2
-        for <netdev@vger.kernel.org>; Fri, 04 Apr 2025 03:07:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743761231; x=1744366031;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3ZpNezVgO9x7n4qO105SQS96YwFjL8olWX+bTsb/hm8=;
-        b=ZsGjoRjQmsKrp8VTTf+sJsVcxGccQv7l1xnBw7yxagG29jU1wYXajuEmUtc5U6RKrr
-         r0OAjHJH2kG2mF8emaMhVq+aOSzPJMAGcKDwHcUMj+QYCgNYktjKw4e19LIM3BXu+BkO
-         OGamxLo1mn6svir716ePJ0dSmk/eoypruXhO77v7f0SCmAOvpEFa2wwXf6+nG6z7WqDz
-         afpO6f54rSS2vBm/Wx+shELEj1jVjShUUVEsv03Ury1OZL+7HSQkw74Hm9h1w6eG9+Pa
-         Jj3ABqhzujVrSjrYE3bkfwVDVssT3P12l9FJHxi8h0MNjUMAhsCZKWosZknWcMD3Xr58
-         Ypfg==
-X-Forwarded-Encrypted: i=1; AJvYcCVi11cK07wb8UzegkRvVVOxnxwpIMKfIXYYl9AqJZ8TMlOshvtEB7Siz2FLE0VBncVWmlL4aOo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVwLcXAlE9TMICjKPNWZbj+xNXYaGDEBSiXnISRpn/fIKQPKhb
-	Dde8xZ4EmbMM2ZAg/jBiw0ocVxn7sl6UBrIjPCfDvWLxvEcftaTUXxJC+kg7Sd4pexdDVb/FG/J
-	YqDe8yPZz9Bsu4w8fUYtLxFsj3t00+0UQO5Xxyo9lhQ3Xs1R0joCnNXb7TlDumTlLN/AZ4k7SyL
-	/jFYGlZ/5h/m7qG7a/ZtGsQFNfxK1k84c=
-X-Gm-Gg: ASbGncvEhzFj+txKqDdkBiIA3GqYpT4jmeOysG1mK3zbdvlMd61P7ZXN3OhHICo0hZC
-	ChPZwp7knki17HZuMDFECSUSD7ZHYP70gKBUIBP8lZvLZjKlgKgiT+LP6NUvljaHHFsH2cZxi
-X-Received: by 2002:a05:6000:250a:b0:391:12a5:3cb3 with SMTP id ffacd0b85a97d-39d0873fd19mr1961969f8f.3.1743761231026;
-        Fri, 04 Apr 2025 03:07:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFnV9UwamRIyUKW4GOeVIE6okjNq3Qre3D7SkA3sH+0E9q8u3+uxXUpzfrOeOLdg3VB/t7Fg1OQd0ITTfIEdyI=
-X-Received: by 2002:a05:6000:250a:b0:391:12a5:3cb3 with SMTP id
- ffacd0b85a97d-39d0873fd19mr1961925f8f.3.1743761230468; Fri, 04 Apr 2025
- 03:07:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26CD61624C9
+	for <netdev@vger.kernel.org>; Fri,  4 Apr 2025 10:12:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743761563; cv=fail; b=r8XpQ8L8bNgUrj+ENBGPDxXmnEstmLGSKXEgAr2n32X7EqjdpW4nn+4FYL0R2JuTwD4C20uNw1l7YOS2kbtBIEYyk4Yr/simWyvJ7K3OiO4QDUfrcsWs0uGWmzoXizTPZu/mw1/XPTBUmXawJEr/roVyYfV/D+mA/HKA9cG3Clc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743761563; c=relaxed/simple;
+	bh=F8TvsJx9TiFwmDMKaPJ5Ok/tqa+BCGhNa1Ouuawpp7Q=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 Content-Type:MIME-Version; b=S5tYFqJv4umxOpWY5DOImqAP2XLUoB3GClFQkmZBL4lVGZWdAlgKpNWz+IYq0rBwo8EtU9h1idr5TY9HBjuNqn6Cfl7t6uvAbBaXa76cMN1O/5Q1oBUaQBo6WO7rAhQe1hemUtBMzvzVdcRhtKt3bdpJSsT6wRGysCTryXVVcig=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ktG/eGSw; arc=fail smtp.client-ip=40.107.243.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SdYU6Pg6o5ueEGWdtrl/k3dg6P6Iw4hBezLe34SbsllCJJbnwJPnA4/ysnwGtcPqsQ8hU/nw9sPx8361607oQiA5+hMjbA3+KhfMRH3iZUGP0as8X/ANqKcmaNza9JIaFxitsuAebAgxiNllskRNIhuw5N8jFjYRyGIdjvybikVutl44E/CGVvFVBrTJ8/sluYKI7mESB12R/C4/FjPuTcYwDJP+OYLLIZBhZn2YHL1k+gpc9arwWNJLp1ZWRe0pDf7mCk0JDsApKtqcsss3cnA515x11TXrG332P9SurE5UGpGLubCSYzFPfTcaK9D+RtzaOxJLLpVBRq+3sFLoGQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=F8TvsJx9TiFwmDMKaPJ5Ok/tqa+BCGhNa1Ouuawpp7Q=;
+ b=L4l/tf8tlohGGdUBGZxUnVImGCa1+EXNJj+cEa+oP5ocQTQ+Hy4xrzmdi1GlQD7qBcRNK3FGD3PAp96Hx4kcifgOlAYb1+dtjhMeS1eRa7BdaWRI7XpoiUrfiyZXhDWRhGZ0wCeutIhwFXYYuSsnB4LaEPTRjZfwyo/DoeJUbxfvb/Oug0XxNsmnLfaA+ZN5mNL4NHBIaZUCtKaXX1krwdfNO5ZjN/YfbMSNS9JyeEJwz0Hioi2e1g5SrmPwLcaGbl1nMvE5uGCkRGlOKQsgZyjwVWZA/cgcgx4t8ESSwJfRL2I5bDd9VYSpMOTfynSNUg4uclXSAeqgpDEq5bohjg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=F8TvsJx9TiFwmDMKaPJ5Ok/tqa+BCGhNa1Ouuawpp7Q=;
+ b=ktG/eGSwJmDw+6l+/oVZqxe7vU5YjIO0pRMq4BcdKOehuiFVs6eFP1kJlUOW3dIKxeFwyWo6fohXOZRLvaGhSAOkEfxBsEXcCLDHywJexdKfz3g56olbpTv4GCKXnkhqtO886/hdwcsRFY60i9NTWJvuEHAPNpJ0PL0kyJd9JOFLGQ4a0wCZWIGtrTOqq4gs5EhEqeGSpTo6nv8B7xPQbyFz3UA4atglBwhm4cg1yQbkNsnCSvLTO3M8h/Zs9oRcJ2KVhsFXyJO7K9wmYq97ASG+Y98gUqY79W2J41UwaucHtILUmtlGAvzA9k3P/NZiKjueHIISL8dO4dL6my4F/w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SJ2PR12MB8943.namprd12.prod.outlook.com (2603:10b6:a03:547::17)
+ by IA1PR12MB6601.namprd12.prod.outlook.com (2603:10b6:208:3a3::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.44; Fri, 4 Apr
+ 2025 10:12:39 +0000
+Received: from SJ2PR12MB8943.namprd12.prod.outlook.com
+ ([fe80::7577:f32f:798c:87cc]) by SJ2PR12MB8943.namprd12.prod.outlook.com
+ ([fe80::7577:f32f:798c:87cc%5]) with mapi id 15.20.8606.027; Fri, 4 Apr 2025
+ 10:12:38 +0000
+From: Aurelien Aptel <aaptel@nvidia.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Simon Horman <horms@kernel.org>, kuba@kernel.org,
+ linux-nvme@lists.infradead.org, netdev@vger.kernel.org, sagi@grimberg.me,
+ hch@lst.de, kbusch@kernel.org, axboe@fb.com, chaitanyak@nvidia.com,
+ davem@davemloft.net, aurelien.aptel@gmail.com, smalin@nvidia.com,
+ malin1024@gmail.com, ogerlitz@nvidia.com, yorayz@nvidia.com,
+ borisp@nvidia.com, galshalom@nvidia.com, mgurtovoy@nvidia.com,
+ tariqt@nvidia.com
+Subject: Re: [PATCH v27 15/20] net/mlx5e: NVMEoTCP, use KLM UMRs for buffer
+ registration
+In-Reply-To: <20250403044320.GA22803@lst.de>
+References: <20250303095304.1534-1-aaptel@nvidia.com>
+ <20250303095304.1534-16-aaptel@nvidia.com>
+ <20250304174510.GI3666230@kernel.org> <253jz8cyqst.fsf@nvidia.com>
+ <20250403044320.GA22803@lst.de>
+Date: Fri, 04 Apr 2025 13:12:35 +0300
+Message-ID: <253h634z14c.fsf@nvidia.com>
+Content-Type: text/plain
+X-ClientProxiedBy: FR4P281CA0387.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:f7::12) To SJ2PR12MB8943.namprd12.prod.outlook.com
+ (2603:10b6:a03:547::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAJeEPuJHMKo9T3GcAQH2+X3Rke3b4YH3_S6FmnBp4tQqLciYxA@mail.gmail.com>
- <d9a7af40-84f9-446e-a708-d989b322a675@redhat.com>
-In-Reply-To: <d9a7af40-84f9-446e-a708-d989b322a675@redhat.com>
-From: Dylan Wolff <wolffd@comp.nus.edu.sg>
-Date: Fri, 4 Apr 2025 11:06:54 +0100
-X-Gm-Features: ATxdqUGjSovVAVF6K8PXa6s9vuuhQUTiYOJzVc35JHTkd4RbECGCtmQYxgPvbLQ
-Message-ID: <CAJeEPuLOz45eOt0_Uab-XtOxYwEOpw4Mq3SZDw21T=wUBVL2TQ@mail.gmail.com>
-Subject: Re: Concurrent slab-use-after-free in netdev_next_lower_dev
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>, 
-	"D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>, 
-	Wen Gu <guwen@linux.alibaba.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Jiacheng Xu <3170103308@zju.edu.cn>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR12MB8943:EE_|IA1PR12MB6601:EE_
+X-MS-Office365-Filtering-Correlation-Id: c53afb40-ea03-437c-f934-08dd73613a83
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?+8KKebxInSjNG+DCX9ysReZjcutV1Lohd7he9f4iV9rNyKHNGewUnwCWQeC3?=
+ =?us-ascii?Q?jxE9jDmzaWA2P0x5VNFDBrjRr6ind9gMxS/Ar5IFVXKK66elj4lHgQcQA/Cx?=
+ =?us-ascii?Q?7zntboPZztr03NVXN8Z0mUcdGKXhU6WClXCj1EdZsGi3X0MUbtH7qZONhXsu?=
+ =?us-ascii?Q?dkR90gg4Yy18u6B+IAKK9ZjzidgDVvYcCzhqW12dwl1Qp68/iRk4rEOTaEtW?=
+ =?us-ascii?Q?s4ECnfpljz5P8NE+pACQqCREItzlnX9BO15z1juTIJfceHSsD9u8tz+sJUjL?=
+ =?us-ascii?Q?s8+VyKPtXBppO5JRlH+v3OISayoUGT5I8aL+dTTDcFfmbaHbKXYoONjo+1hR?=
+ =?us-ascii?Q?DtL4O78bEoxt/DR+vVBLGo/D4uGml3N02LnKJe2WFXrXkagzHZx0crOrSf4K?=
+ =?us-ascii?Q?QXNjY/pJhbunXmeiEN6lwfu9ENcKzdrUEsjVwrKcbiLZ85iOTfuPoSBTo1wz?=
+ =?us-ascii?Q?xuE0xOGtLYFnicgzD+bA9BvX6hitGjECdzrKj5TTJtGXhOVzGbYDH006hQGj?=
+ =?us-ascii?Q?RTaw2+6Dee0G9rnvU2Wh2gHLokwQItaoq/Z/JJdHTJ+tcKqhKaV/P5NZ6+wu?=
+ =?us-ascii?Q?O90WURkJLs3bJI3oOcBdAQmplKfiNlsrOBYtLqQWH/ygsxvWaK86IZJkPduf?=
+ =?us-ascii?Q?pNE46ku3BH1kMfZkSsdgHGTBAdGODhKi94K26rVEfF1dMVsDevwl6fj4XmYl?=
+ =?us-ascii?Q?tI5xe/9FTiVT95gDZtnyWp25/Oglkku4l7pLQhaXqHIl1L2kHIOHP+69NGQO?=
+ =?us-ascii?Q?EbAJKDYNBUU5LDIRsegc06gVAzfB2GhHQriq9u2h1AsFigW1P0H/CZmYj8tf?=
+ =?us-ascii?Q?DuFeV4DUXtvOZt9hhsP1FGkkCTws7M4F5W7gK8ZeQGp0SO46n8pKod2/+4sD?=
+ =?us-ascii?Q?50lGoQNsOY9FmiIMrhOVdckWhifGZ8lvMJWPf8TkLz8u+gQwk9uWjRzrJnjq?=
+ =?us-ascii?Q?15G1dJDFrPYnYRZH2GSPlT0PpPeEuTxV/hZscfGttutgKyu5VPPH6SLvoLNK?=
+ =?us-ascii?Q?NPUGOWI2BYL4h3vBVCJj2RL7GieuhUMwDmnIUkr/sQsoFwUjgkJNz7NtBhoR?=
+ =?us-ascii?Q?yFoO0A5XHKhhlfXYmimG5t/3WSVlR2TPRrR+k/yau5VxguNY6TzBD6mzOgqZ?=
+ =?us-ascii?Q?AWIVG5dGIoO1aV1t9tEOiesSTMHEU6+Y8NhU00qajZwGeP9x6poRWlk/Je3R?=
+ =?us-ascii?Q?w4xOQZZcCg2crv0xXouVHxeG3sg7CnOYJyYPQIVCgbYvXkTtoacZjwUTcjqu?=
+ =?us-ascii?Q?L6dF7OvpOEjNXcYx75Ls7/AktZpnw/bfzIPbR+X4g+uNYZfXMbQWQn2A0PV9?=
+ =?us-ascii?Q?d4WY6SmImFivMonO8XIsNxa+6R3dlcH2TI6XAJX0Skf9htGawtyZE7hOAz4K?=
+ =?us-ascii?Q?bNUqCoAPpNmCQfFxaQ33XhjSgur5SNWGbdUPMgUYWLqWjS3KagTJyP0k0uhO?=
+ =?us-ascii?Q?LHUlqtWzQGE=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR12MB8943.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?zb3c+v9l0r2xOcg3GVa1diLEXlbVHyFUTcbfaiNES86Tl40cxIOF/OxZTYdE?=
+ =?us-ascii?Q?7xHRe1mJBkHXsXx6RoY1vSBB8bs5TPaWw51PVvFiMD3IncFNot6mKftsdVxT?=
+ =?us-ascii?Q?i1lRqavMkWksO+ZX7EAGHy+3tLbe6Qo8peJDyB/24r5J/vFRFHsogCUyFgXq?=
+ =?us-ascii?Q?zx6vfv7G+77nacLvrFZ++n/EuJaYr3yRxq0hoO4FFj4M7PkWc+FuEyHHWowP?=
+ =?us-ascii?Q?2Wcafthxj+CzmtzB7lemxQumpvr33aQ2zJ/HxJsZaJaH8EpOVL6oXV88oUve?=
+ =?us-ascii?Q?S5+jqSFCglRyTiP+eGkSxaqRClHpqpX2kq7xVKh2j3XrzHqoag3yTj0NE+JY?=
+ =?us-ascii?Q?5kRWLZHnLrIBZSfMIcPVV+yOl5105tgz+KIsEBeNRYpDZeAcf0RU0UrBS0MR?=
+ =?us-ascii?Q?o21rdOOyZjNhnnjzxoOESdPVK/ISyuCKEsp/6/fKn1mZk9NlUUfNxKaTjdpy?=
+ =?us-ascii?Q?YBqe0xQ/zLK4bZet3rIShfrCkmLC1O6Ozv3ZruxveAttSyxH1OwAerG2q+w/?=
+ =?us-ascii?Q?NkMbXveeUYRGxl3RarsID1Q+YKrVRmVmG82On2ms0BI7FNao7WEwnV5h9yNl?=
+ =?us-ascii?Q?JNEw/Sty8aJYlW9E9xfXh4Xtkh72cta5+0h12kZlV4YFAmcujXBh34wd22eR?=
+ =?us-ascii?Q?jockr3Yl5uNRanO1OqGsAmevizAVbiAlJwoX/YNyf+Od6HEEEHzpc30SDIkf?=
+ =?us-ascii?Q?0+j5yXkrv1WAzYXDcv/7/bjRG3fa6zy2CM8chTwXcx+2XD1RYWzVxO9hjCSh?=
+ =?us-ascii?Q?dLPr0ZjIspVfBgJz3MLJwHBm6B4K3mGmxNB5x6jMeoPtTS3RM+OLfQ48J55q?=
+ =?us-ascii?Q?sKnPQ3LGDRefochLkY1YkAazv67iV0DhKoEeD6P1UZ6rzcx1uqfkms3wN+kB?=
+ =?us-ascii?Q?79eCbmBAeVIjkJ89a1sNsiH3O+tm7FYVqp76CvWnKTRnNkcnsLuaECquYbY1?=
+ =?us-ascii?Q?kYf/G6k+WlemtB6KGSuwpCYJEqTDzz3Mil7hTasIBrjpRguEgGiCRg9zxYzK?=
+ =?us-ascii?Q?pI4z3puZvYMRP6/V6kJOvfVbCXtlX3Da7DU4hBXlihgE4fpg5feRp6PIVho7?=
+ =?us-ascii?Q?/NDpE6v6IOvKS3qgz/bwPRBwz4u3NSjYAdZqHR5eALQN2ujUX9tFypwBbmxP?=
+ =?us-ascii?Q?EHvl6IxU9Yv1h6dbehq6/nS9P0ykmtfEhrN1/r+uklODBqVRHWTaShGjX8Vy?=
+ =?us-ascii?Q?215xBq0fLMTiTIypBZQ87HUHzDjhhpL8EtKWLDwkYlrhrqUZRmGD+hUPbY0O?=
+ =?us-ascii?Q?TnRnlFxj4NS0RyCLDjnzdfovTARitf4KB1IT4a+z47VgUm7sY1+t6XEOZ71C?=
+ =?us-ascii?Q?+3iLfe0TYqdhTwUyDWR6Sxb5xRN5qt0J97kP/1PvGxV9tfsSoEqqPbHt54XW?=
+ =?us-ascii?Q?pKMCWWUUd4oUqVU4Au97s34bz8fmhMXJdgJTUhGLtszPj4YVjpYhzkz31oKr?=
+ =?us-ascii?Q?GTaz59JJdJT70tjH1DWllr9IvXoGwLu0jvsgH9mrb5e1ydM0fH1AhirX2d+8?=
+ =?us-ascii?Q?PI2S1esY4QXF/HWNUQelLSKifkt9gK/Ba/MX4hVeJLa/fca9ziPZfuFFLG1P?=
+ =?us-ascii?Q?jLWX7TL7XKCSX2aWLmwcvYApwGfYME2eRzNh9d+I?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c53afb40-ea03-437c-f934-08dd73613a83
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR12MB8943.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Apr 2025 10:12:38.8842
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /FD33ujnXb1k1rnI70yGBs4KUzUQJWdGeEclAbnoGeAcjwM4Jq+wYiCaJi8SFZLvFzkOMgIxE3WYt1QbtDds7A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6601
 
-> Please share the decoded syzkaller/kasan splat in plaintext instead of
-describing it in natural language, and please avoid attachments unless
-explicitly asked for.
+> Btw, just as a reminder nvme code has to go through the nvme tree, and
+> there is absolutely no consesnsus on this feature yet.
 
-Got it! Here is the report:
+The series was acked by Sagi, and the discussion with Jakub is about the
+CI (which was just resolved from our side), not about the feature.
 
-```
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-BUG: KASAN: slab-use-after-free in netdev_next_lower_dev
-net/core/dev.c:7522 [inline]
-BUG: KASAN: slab-use-after-free in
-netdev_walk_all_lower_dev+0x1e6/0x4f0 net/core/dev.c:7570
-Read of size 8 at addr ffff888058cdc1b8 by task syz-executor.3/14127
-
-CPU: 1 UID: 0 PID: 14127 Comm: syz-executor.3 Not tainted 6.13.0-rc4 #2
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/=
-2014
-Sched_ext: serialise (enabled+all), task: runnable_at=3D-10ms
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x229/0x350 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0x164/0x530 mm/kasan/report.c:489
- kasan_report+0x147/0x180 mm/kasan/report.c:602
- netdev_next_lower_dev net/core/dev.c:7522 [inline]
- netdev_walk_all_lower_dev+0x1e6/0x4f0 net/core/dev.c:7570
- smc_vlan_by_tcpsk+0x45a/0x5b0 net/smc/smc_core.c:1904
- __smc_connect+0x391/0x1af0 net/smc/af_smc.c:1517
- smc_connect+0x610/0x8e0 net/smc/af_smc.c:1693
- __sys_connect+0x181/0x220 net/socket.c:2074
- __do_sys_connect net/socket.c:2080 [inline]
- __se_sys_connect net/socket.c:2077 [inline]
- __x64_sys_connect+0x9e/0xb0 net/socket.c:2077
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf6/0x210 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f168ca903ad
-Code: c3 e8 a7 2b 00 00 0f 1f 80 00 00 00 00 f3 0f 1e fa 48 89 f8 48
-89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
-01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f168d843fc8 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
-RAX: ffffffffffffffda RBX: 00007f168cbcc050 RCX: 00007f168ca903ad
-RDX: 000000000000001c RSI: 0000000020000080 RDI: 000000000000000a
-RBP: 00007f168cbcc050 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f168cbcc050 R14: 00007f168ca4fc90 R15: 00007f168d824000
- </TASK>
-
-Allocated by task 11284:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
- __kasan_kmalloc+0x89/0xa0 mm/kasan/common.c:394
- kasan_kmalloc include/linux/kasan.h:260 [inline]
- __do_kmalloc_node mm/slub.c:4298 [inline]
- __kmalloc_node_noprof+0x28c/0x530 mm/slub.c:4304
- __kvmalloc_node_noprof+0x70/0x180 mm/util.c:650
- alloc_netdev_mqs+0xa7/0x1870 net/core/dev.c:11209
- rtnl_create_link+0x371/0xeb0 net/core/rtnetlink.c:3595
- rtnl_newlink_create+0x257/0x690 net/core/rtnetlink.c:3771
- __rtnl_newlink net/core/rtnetlink.c:3897 [inline]
- rtnl_newlink+0x13a9/0x1ac0 net/core/rtnetlink.c:4012
- rtnetlink_rcv_msg+0x8e1/0xf50 net/core/rtnetlink.c:6922
- netlink_rcv_skb+0x248/0x4e0 net/netlink/af_netlink.c:2542
- netlink_unicast_kernel net/netlink/af_netlink.c:1321 [inline]
- netlink_unicast+0x7b8/0x8e0 net/netlink/af_netlink.c:1347
- netlink_sendmsg+0xb42/0xe90 net/netlink/af_netlink.c:1891
- sock_sendmsg_nosec+0x1f5/0x250 net/socket.c:711
- __sock_sendmsg net/socket.c:726 [inline]
- __sys_sendto+0x45d/0x5d0 net/socket.c:2197
- __do_sys_sendto net/socket.c:2204 [inline]
- __se_sys_sendto net/socket.c:2200 [inline]
- __x64_sys_sendto+0x128/0x140 net/socket.c:2200
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf6/0x210 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 14126:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:582
- poison_slab_object mm/kasan/common.c:247 [inline]
- __kasan_slab_free+0x5a/0x70 mm/kasan/common.c:264
- kasan_slab_free include/linux/kasan.h:233 [inline]
- slab_free_hook mm/slub.c:2353 [inline]
- slab_free mm/slub.c:4613 [inline]
- kfree+0x196/0x450 mm/slub.c:4761
- device_release+0xbd/0x220
- kobject_cleanup lib/kobject.c:689 [inline]
- kobject_release lib/kobject.c:720 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x248/0x490 lib/kobject.c:737
- netdev_run_todo+0x10e0/0x1280 net/core/dev.c:10924
- rtnl_unlock net/core/rtnetlink.c:152 [inline]
- rtnl_net_unlock include/linux/rtnetlink.h:133 [inline]
- rtnl_dellink+0x850/0x9c0 net/core/rtnetlink.c:3526
- rtnetlink_rcv_msg+0x8e1/0xf50 net/core/rtnetlink.c:6922
- netlink_rcv_skb+0x248/0x4e0 net/netlink/af_netlink.c:2542
- netlink_unicast_kernel net/netlink/af_netlink.c:1321 [inline]
- netlink_unicast+0x7b8/0x8e0 net/netlink/af_netlink.c:1347
- netlink_sendmsg+0xb42/0xe90 net/netlink/af_netlink.c:1891
- sock_sendmsg_nosec+0x1f5/0x250 net/socket.c:711
- __sock_sendmsg net/socket.c:726 [inline]
- sock_write_iter+0x3a5/0x4f0 net/socket.c:1147
- new_sync_write fs/read_write.c:586 [inline]
- vfs_write+0x7dd/0x950 fs/read_write.c:679
- ksys_write+0x24d/0x400 fs/read_write.c:731
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf6/0x210 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Last potentially related work creation:
- kasan_save_stack+0x3e/0x60 mm/kasan/common.c:47
- __kasan_record_aux_stack+0xaa/0xc0 mm/kasan/generic.c:544
- insert_work+0x3d/0x330 kernel/workqueue.c:2183
- __queue_work+0xc87/0xf50 kernel/workqueue.c:2339
- queue_work_on+0x1c8/0x390 kernel/workqueue.c:2390
- queue_work include/linux/workqueue.h:662 [inline]
- schedule_work include/linux/workqueue.h:723 [inline]
- __rhashtable_remove_fast_one include/linux/rhashtable.h:1069 [inline]
- __rhashtable_remove_fast include/linux/rhashtable.h:1093 [inline]
- rhashtable_remove_fast+0xbd7/0xc60 include/linux/rhashtable.h:1122
- br_multicast_del_mdb_entry+0x7d/0x300 net/bridge/br_multicast.c:642
- br_multicast_dev_del+0x11e/0x2d0 net/bridge/br_multicast.c:4366
- br_dev_uninit+0x1c/0x40 net/bridge/br_device.c:155
- unregister_netdevice_many_notify+0x1a4f/0x2110 net/core/dev.c:11548
- rtnl_delete_link net/core/rtnetlink.c:3476 [inline]
- rtnl_dellink+0x6de/0x9c0 net/core/rtnetlink.c:3518
- rtnetlink_rcv_msg+0x8e1/0xf50 net/core/rtnetlink.c:6922
- netlink_rcv_skb+0x248/0x4e0 net/netlink/af_netlink.c:2542
- netlink_unicast_kernel net/netlink/af_netlink.c:1321 [inline]
- netlink_unicast+0x7b8/0x8e0 net/netlink/af_netlink.c:1347
- netlink_sendmsg+0xb42/0xe90 net/netlink/af_netlink.c:1891
- sock_sendmsg_nosec+0x1f5/0x250 net/socket.c:711
- __sock_sendmsg net/socket.c:726 [inline]
- sock_write_iter+0x3a5/0x4f0 net/socket.c:1147
- new_sync_write fs/read_write.c:586 [inline]
- vfs_write+0x7dd/0x950 fs/read_write.c:679
- ksys_write+0x24d/0x400 fs/read_write.c:731
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf6/0x210 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Second to last potentially related work creation:
- kasan_save_stack+0x3e/0x60 mm/kasan/common.c:47
- __kasan_record_aux_stack+0xaa/0xc0 mm/kasan/generic.c:544
- insert_work+0x3d/0x330 kernel/workqueue.c:2183
- __queue_work+0xc87/0xf50 kernel/workqueue.c:2339
- queue_work_on+0x1c8/0x390 kernel/workqueue.c:2390
- br_multicast_dev_del+0x11e/0x2d0 net/bridge/br_multicast.c:4366
- br_dev_uninit+0x1c/0x40 net/bridge/br_device.c:155
- unregister_netdevice_many_notify+0x1a4f/0x2110 net/core/dev.c:11548
- rtnl_delete_link net/core/rtnetlink.c:3476 [inline]
- rtnl_dellink+0x6de/0x9c0 net/core/rtnetlink.c:3518
- rtnetlink_rcv_msg+0x8e1/0xf50 net/core/rtnetlink.c:6922
- netlink_rcv_skb+0x248/0x4e0 net/netlink/af_netlink.c:2542
- netlink_unicast_kernel net/netlink/af_netlink.c:1321 [inline]
- netlink_unicast+0x7b8/0x8e0 net/netlink/af_netlink.c:1347
- netlink_sendmsg+0xb42/0xe90 net/netlink/af_netlink.c:1891
- sock_sendmsg_nosec+0x1f5/0x250 net/socket.c:711
- __sock_sendmsg net/socket.c:726 [inline]
- sock_write_iter+0x3a5/0x4f0 net/socket.c:1147
- new_sync_write fs/read_write.c:586 [inline]
- vfs_write+0x7dd/0x950 fs/read_write.c:679
- ksys_write+0x24d/0x400 fs/read_write.c:731
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf6/0x210 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-The buggy address belongs to the object at ffff888058cdc000
- which belongs to the cache kmalloc-cg-8k of size 8192
-The buggy address is located 440 bytes inside of
- freed 8192-byte region [ffff888058cdc000, ffff888058cde000)
-
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000
-index:0xffff888058cdc000 pfn:0x58cd8
-head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-memcg:ffff888056dd42c1
-flags: 0x4fff00000000040(head|node=3D1|zone=3D1|lastcpupid=3D0x7ff)
-page_type: f5(slab)
-raw: 04fff00000000040 ffff88801d44f640 ffffea000050d800 dead000000000004
-raw: ffff888058cdc000 0000000000020001 00000001f5000000 ffff888056dd42c1
-head: 04fff00000000040 ffff88801d44f640 ffffea000050d800 dead000000000004
-head: ffff888058cdc000 0000000000020001 00000001f5000000 ffff888056dd42c1
-head: 04fff00000000003 ffffea0001633601 ffffffffffffffff 0000000000000000
-head: 0000000000000008 0000000000000000 00000000ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask
-0xd60c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_RETRY_MAYFAIL|__GFP_NORETRY|__=
-GFP_COMP|__GFP_NOMEMALLOC),
-pid 9657, tgid 9657 (syz-executor.2), ts 72098481985, free_ts
-71817430134
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x1f6/0x240 mm/page_alloc.c:1558
- prep_new_page mm/page_alloc.c:1566 [inline]
- get_page_from_freelist+0x3586/0x36d0 mm/page_alloc.c:3476
- __alloc_pages_noprof+0x260/0x680 mm/page_alloc.c:4753
- alloc_pages_mpol_noprof+0x3c8/0x650 mm/mempolicy.c:2269
- alloc_slab_page+0x6a/0x110 mm/slub.c:2423
- allocate_slab+0x5f/0x2b0 mm/slub.c:2589
- new_slab mm/slub.c:2642 [inline]
- ___slab_alloc+0xbdf/0x1490 mm/slub.c:3830
- __slab_alloc mm/slub.c:3920 [inline]
- __slab_alloc_node mm/slub.c:3995 [inline]
- slab_alloc_node mm/slub.c:4156 [inline]
- __do_kmalloc_node mm/slub.c:4297 [inline]
- __kmalloc_node_noprof+0x314/0x530 mm/slub.c:4304
- __kvmalloc_node_noprof+0x70/0x180 mm/util.c:650
- alloc_netdev_mqs+0xa7/0x1870 net/core/dev.c:11209
- rtnl_create_link+0x371/0xeb0 net/core/rtnetlink.c:3595
- rtnl_newlink_create+0x257/0x690 net/core/rtnetlink.c:3771
- __rtnl_newlink net/core/rtnetlink.c:3897 [inline]
- rtnl_newlink+0x13a9/0x1ac0 net/core/rtnetlink.c:4012
- rtnetlink_rcv_msg+0x8e1/0xf50 net/core/rtnetlink.c:6922
- netlink_rcv_skb+0x248/0x4e0 net/netlink/af_netlink.c:2542
- netlink_unicast_kernel net/netlink/af_netlink.c:1321 [inline]
- netlink_unicast+0x7b8/0x8e0 net/netlink/af_netlink.c:1347
-page last free pid 98 tgid 98 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1127 [inline]
- free_unref_folios+0xe03/0x1860 mm/page_alloc.c:2706
- shrink_folio_list+0x5304/0x5c80 mm/vmscan.c:1551
- evict_folios+0x3b12/0x5610 mm/vmscan.c:4593
- try_to_shrink_lruvec+0x941/0xc10 mm/vmscan.c:4789
- shrink_one+0x20e/0x870 mm/vmscan.c:4834
- shrink_many mm/vmscan.c:4897 [inline]
- lru_gen_shrink_node mm/vmscan.c:4975 [inline]
- shrink_node+0x3862/0x3f20 mm/vmscan.c:5956
- kswapd_shrink_node mm/vmscan.c:6785 [inline]
- balance_pgdat mm/vmscan.c:6977 [inline]
- kswapd+0x1c9f/0x36f0 mm/vmscan.c:7246
- kthread+0x2c3/0x360 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-Memory state around the buggy address:
- ffff888058cdc080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888058cdc100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff888058cdc180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                        ^
- ffff888058cdc200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888058cdc280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-```
-
-> Also, can you reproduce the issue on top of the current net tree?
-
-No, but we are having trouble reproducing it even on 6.13.0-rc4. Since
-I don't fully understand the root cause, it's hard to say if it is
-fixed in the current tree or just hard to reproduce.
-
-> netdev_walk_all_lower_dev() should not need additional refcounting, as
-it is traversing the list under rtnl lock, and device should be removed
-from the adjacency list before the actual device free under such lock, too.
-
-I see. Then I confess I'm really not sure what is happening with this
-crash. If you have any pointers for where to look or why it is so
-difficult to reproduce, let me know. Otherwise I will keep working on
-trying to find a reproducible setup.
-
-Thanks for your help!
-Dylan
-On Tue, Apr 1, 2025 at 8:45=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> On 3/31/25 3:00 PM, Dylan Wolff wrote:
-> > From the report, it looks like the net_device is freed at the end of an
-> > rtnl critical section in netdev_run_todo. At the time of the crash, the
-> > *use* thread has acquired rtnl_lock() in smc_vlan_by_tcpsk. The crash
-> > occurred at the line preceded by `>>>` below in 6.13 rc4 while iteratin=
-g
-> > over devices with netdev_walk_all_lower_dev:
-> >
-> > ```
-> > static struct net_device *netdev_next_lower_dev(struct net_device *dev,
-> > struct list_head **iter)
-> > {
-> > struct netdev_adjacent *lower;
-> >
-> >>>> lower =3D list_entry((*iter)->next, struct netdev_adjacent, list);
-> >
-> > if (&lower->list =3D=3D &dev->adj_list.lower)
-> > return NULL;
-> >
-> > *iter =3D &lower->list;
-> >
-> > return lower->dev;
-> > }
-> > ```
->
-> Please share the decoded syzkaller/kasan splat in plaintext instead of
-> describing it in natural language, and please avoid attachments unless
-> explicitly asked for.
->
-> Also, can you reproduce the issue on top of the current net tree?
->
-> > This looks to me like it is an issue with reference counting; I see tha=
-t
-> > netdev_refcnt_read is checked in netdev_run_todo before the device is
-> > freed, but I don't see anything in netdev_walk_all_lower_dev /
-> > netdev_next_lower_dev that is incrementing netdev_refcnt_read when it i=
-s
-> > iterating over the devices. I'm guessing the fix is to either add refer=
-ence
-> > counting to netdev_walk_all_lower_dev or to use a different,
-> > concurrency-safe iterator over the devices in the caller (smc_vlan_by_t=
-cpsk
-> > ).
-> >
-> > Could someone confirm if I am on the right track here? If so I am happy=
- to
-> > try to come up with the patch.
->
-> netdev_walk_all_lower_dev() should not need additional refcounting, as
-> it is traversing the list under rtnl lock, and device should be removed
-> from the adjacency list  before the actual device free under such lock, t=
-oo.
->
-> Thanks,
->
-> Paolo
->
+Can you please help us to understand the concerns?
 
