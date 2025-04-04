@@ -1,199 +1,158 @@
-Return-Path: <netdev+bounces-179337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96D2FA7C07C
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 17:24:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABE91A7C080
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 17:26:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 050CC189C8BE
-	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 15:24:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65A563BB3ED
+	for <lists+netdev@lfdr.de>; Fri,  4 Apr 2025 15:25:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA7781F4CB7;
-	Fri,  4 Apr 2025 15:24:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C93BF1F4CBE;
+	Fri,  4 Apr 2025 15:25:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HO2ug1Xr"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f196.google.com (mail-yw1-f196.google.com [209.85.128.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9542B86344;
-	Fri,  4 Apr 2025 15:24:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32AFE3D6F;
+	Fri,  4 Apr 2025 15:25:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743780277; cv=none; b=QlK42YUYoXVthteFy6CDKf58gv5QS4hL6oCkEGMq/Px/M4YsWs822RZt+KT3jkI7a+uCreM6CkniXRVcoA6snm3/hojiiXKRUo0MK4tGgfffvKe/7vXvGN4pvLyOJTa7+BEOwwu9VooZubImzDk8XdwUHCDygIEixGylI9Dam54=
+	t=1743780357; cv=none; b=B3qQFRKIlpxoK+7aalivwm0PS9Xy9wZy2vkUcIixNuT2pNhiH0Crm2oLE49FdYDB9Ce99dpy5sWm/51fwVa2p3HPtTqWslLIVBCx5HHVPL4/+O5H0/PHsaArAiHN7twkYwya4IEj7fE+H5juYvjIe1EGkPZdQq+VaYQF8suU8uM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743780277; c=relaxed/simple;
-	bh=XIaT9WsyFMUG1vEDalOP24NzQJ+j12Xrs+RDtxU2IwM=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SOMJUEBzueXtiYVHJ/ILHgUURmYLJvKRTsnf4tq1HBiCTxqHuqgfh/ngzDqyq2DA8rOaUHtx0gdBzD/3BfUbv2U+/wpErdSZesdRA3ukU6pPfY3PIGbpp2h5I9FC1I20VOLKQOrPbvKCvLOyxIXwPk5X2oUJHYUiAvYRxPl33dA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZTj792bTmz6L4vt;
-	Fri,  4 Apr 2025 23:23:49 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 165C2140595;
-	Fri,  4 Apr 2025 23:24:32 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 4 Apr
- 2025 17:24:31 +0200
-Date: Fri, 4 Apr 2025 16:24:29 +0100
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: <alejandro.lucero-palau@amd.com>
-CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<dave.jiang@intel.com>, Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v12 01/23] cxl: add type2 device basic support
-Message-ID: <20250404162429.00007907@huawei.com>
-In-Reply-To: <20250331144555.1947819-2-alejandro.lucero-palau@amd.com>
-References: <20250331144555.1947819-1-alejandro.lucero-palau@amd.com>
-	<20250331144555.1947819-2-alejandro.lucero-palau@amd.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1743780357; c=relaxed/simple;
+	bh=xJg7HCoe0mVfJeMYzbUm1cWmxH+o1mewNNRakDyEJ2c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=P1V0s5DrpO4uv6FiM+bB5fhslDKLoFeioNGwI6zMmLtmr+mpJlQPthBkKxuUO2Y5Ntgzo9/MGidPa1GMYsBKFvlLAp+HOLSVWjbl0Z4Y8cT7y5/TchoG/vg6uw5S5DzoKGGBplG7Ixfol/qamsH7q3sunvMFk4MgR0fskio5WLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HO2ug1Xr; arc=none smtp.client-ip=209.85.128.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f196.google.com with SMTP id 00721157ae682-6febbd3b75cso21127387b3.0;
+        Fri, 04 Apr 2025 08:25:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743780355; x=1744385155; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vK21i6Cm/oBnMUPYizwWzpUy62AvakVph2bcyRattBA=;
+        b=HO2ug1Xr+0bmVBmbHzK02pgFRli/6i0OYbQVi6kDNvmnxLLPtMks5ZMOxGduN3+jKy
+         2NfT2sL4CaukS6/uT51iSw2Z6ZE/c7wfDggEahCiPdlxj83m7Lx7ozXUrdvvoyVsuKvu
+         k8/n7qEFxfVJCAARtYLsAlPNW28KCOYVzHksZQpFd4tOS3L2gp0pkiXSCD2Zl5RhbjV+
+         0V8CgvBf0O/ocjKLGWnV7CatgQ5Rx/KrtRUQ39dXsWJZ6Ued3ZGdxIoXPZ8fSvoCXBav
+         roHk/qQOdbhHkjFpSYg/cO3PQ6cWDSjtC4FGhQIW112nskTX9bQoKsJy4ILxBVStVL4N
+         ZHaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743780355; x=1744385155;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vK21i6Cm/oBnMUPYizwWzpUy62AvakVph2bcyRattBA=;
+        b=ENxOlgk8munFE3UggurQdmo4zbKCDZyp651kUCUOI4dLmZ1BqiHbGtyBdc0vp5btML
+         b0GpbBs9hsVu7Zt4KdpHLoI7vVFGxfW+utpfi/s2TqMpibkslVdwhZOwfxKD5/FZnZ9g
+         qpmeJ7o19h83Qty7KmtDzmtrLlhUPVrU4kexF6I2tadSrBb9TTWMfxoP/VwFdmHipHdU
+         Wu0dGbgKfSlQx7ZXEAXoXqJy33gnUa9zSxnHyPQAmzENCL4nmJUkCiEX0Lpvy493IWGp
+         ZpfGSbC7kTIck7UMoSM8C/uf4Vw3nCCadNMxtz4yCraITZ3F8YSxn+E/NEILdJbVPJYE
+         7SaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWBAM/H+ZJOWb6w/EXTrUoqTNMI52ukYh3kMH0OB4HToNAeLF6VtkZzzal3hgCMVG8HyyMwxbzHQr/fxHM=@vger.kernel.org, AJvYcCWQvpVI1AHGy4IoDMairPVgyRl57T8uhpu9RpuvKxjlOpmgNWrdt+4V+MXx0zDT3uYF3m4+Rb2N@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFMDaJp/8l4r/ydhYTGozh7UqnS1n69/kRHHuKyeNfXhvVrPzM
+	GlontyLVdIuULcE5SCkwGBI/WARhgs3aHavNdERtFN87njA/0T0X
+X-Gm-Gg: ASbGncvv1D1ccRBUxZqpEgaPF61AklGzAGpkn85mL/N9inBQPnTn6vegPC/f5STuspH
+	FaT2gyxSQIkMQwvtUTauHyon95k/xyGiuzCPIYb8WodJMBvPeBi9DQGu1VpRJO69FHYmMiduisO
+	+Rk/VqGr6IaDDMt7o0fqSgY191suqv1b1jzvxuv1uXPiPW0cJLAaJfFndGyGJXy5SqP6cs4CzcJ
+	QKfsTV3OhMWsNn5octz8lanwNMQBOkDg4+pdHpbr8N/6DfWdXNLJ1HPDP+2A+fFeWa9n2yZHmz6
+	ma21Z9QbfGgWk7IfFZmDriAd54lhT61uXjmOMqo7v78kXnqqcOH+9x4cwPUKFCz3JH4=
+X-Google-Smtp-Source: AGHT+IG/ho+VI52OyNB7S66WowmtRGN4XNsDzBAzrRZShq7geFV74ZMq2NsftP++30euSownAh+xnQ==
+X-Received: by 2002:a05:690c:c8c:b0:6f9:97af:b594 with SMTP id 00721157ae682-703e151b83dmr63946907b3.10.1743780355016;
+        Fri, 04 Apr 2025 08:25:55 -0700 (PDT)
+Received: from [10.102.6.66] ([208.97.243.82])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-703d1e8ac79sm9284137b3.60.2025.04.04.08.25.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Apr 2025 08:25:54 -0700 (PDT)
+Message-ID: <917d4124-c389-4623-836d-357150b45240@gmail.com>
+Date: Fri, 4 Apr 2025 11:25:54 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Patch v2 net-next 3/3] net: bridge: mcast: Notify on mdb offload
+ failure
+To: Nikolay Aleksandrov <razor@blackwall.org>,
+ Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Roopa Prabhu <roopa@nvidia.com>, Simon Horman <horms@kernel.org>,
+ linux-kernel@vger.kernel.org, bridge@lists.linux.dev
+References: <20250403234412.1531714-1-Joseph.Huang@garmin.com>
+ <20250403234412.1531714-4-Joseph.Huang@garmin.com>
+ <36c7286d-b410-4695-b069-f79605feade4@blackwall.org>
+Content-Language: en-US
+From: Joseph Huang <joseph.huang.2024@gmail.com>
+In-Reply-To: <36c7286d-b410-4695-b069-f79605feade4@blackwall.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
- frapeml500008.china.huawei.com (7.182.85.71)
 
-On Mon, 31 Mar 2025 15:45:33 +0100
-alejandro.lucero-palau@amd.com wrote:
-
-> From: Alejandro Lucero <alucerop@amd.com>
+On 4/4/2025 6:29 AM, Nikolay Aleksandrov wrote:
+> On 4/4/25 02:44, Joseph Huang wrote:
+>> Notify user space on mdb offload failure if mdb_offload_fail_notification
+>> is set.
+>>
+>> Signed-off-by: Joseph Huang <Joseph.Huang@garmin.com>
+>> ---
+>>   net/bridge/br_mdb.c       | 26 +++++++++++++++++++++-----
+>>   net/bridge/br_private.h   |  9 +++++++++
+>>   net/bridge/br_switchdev.c |  4 ++++
+>>   3 files changed, 34 insertions(+), 5 deletions(-)
+>>
 > 
-> Differentiate CXL memory expanders (type 3) from CXL device accelerators
-> (type 2) with a new function for initializing cxl_dev_state and a macro
-> for helping accel drivers to embed cxl_dev_state inside a private
-> struct.
+> The patch looks good, but one question - it seems we'll mark mdb entries with
+> "offload failed" when we get -EOPNOTSUPP as an error as well. Is that intended?
 > 
-> Move structs to include/cxl as the size of the accel driver private
-> struct embedding cxl_dev_state needs to know the size of this struct.
+> That is, if the option is enabled and we have mixed bridge ports, we'll mark mdbs
+> to the non-switch ports as offload failed, but it is not due to a switch offload
+> error.
+
+Good catch. No, that was not intended.
+
+What if we short-circuit and just return like you'd suggested initially 
+if err == -EOPNOTSUPP?
+
+>> diff --git a/net/bridge/br_switchdev.c b/net/bridge/br_switchdev.c
+>> index 40f0b16e4df8..9b5005d0742a 100644
+>> --- a/net/bridge/br_switchdev.c
+>> +++ b/net/bridge/br_switchdev.c
+>> @@ -504,6 +504,7 @@ static void br_switchdev_mdb_complete(struct net_device *dev, int err, void *pri
+>>   	struct net_bridge_mdb_entry *mp;
+>>   	struct net_bridge_port *port = data->port;
+>>   	struct net_bridge *br = port->br;
+>> +	u8 old_flags;
+>>   
+
++	if (err == -EOPNOTSUPP)
++		goto notsupp;
+
+>>   	spin_lock_bh(&br->multicast_lock);
+>>   	mp = br_mdb_ip_get(br, &data->ip);
+>> @@ -514,7 +515,10 @@ static void br_switchdev_mdb_complete(struct net_device *dev, int err, void *pri
+>>   		if (p->key.port != port)
+>>   			continue;
+>>   
+>> +		old_flags = p->flags;
+>>   		br_multicast_set_pg_offload_flags(p, !err);
+>> +		if (br_mdb_should_notify(br, old_flags ^ p->flags))
+>> +			br_mdb_flag_change_notify(br->dev, mp, p);
+>>   	}
+>>   out:
+>>   	spin_unlock_bh(&br->multicast_lock);
 > 
-> Use same new initialization with the type3 pci driver.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-Hi Alejandro,
 
-I'd have been tempted to break out a few trivial things to make
-this patch more digestible. Things like the movement of DVSEC devices
-to include/cxl/pci.h and the other bits that are cut and paste into
-include/cxl/cxl.h  Whilst I know some prefer that in the patch that
-needs it, when the code movement is large I'd rather have a noop
-patch first.
-
-Maybe also pushing the serial number down into cxl_memdev_state_create()
-to avoid the changes in signature affecting the main patch.
-
-Anyhow, up to you (or comments from others). It isn't that bad as a single patch
-
-I'm not sure we long term want to expose a bunch of private data
-with a comment saying 'don't touch' but it will do for now.
-
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-
-> diff --git a/drivers/cxl/cxlpci.h b/drivers/cxl/cxlpci.h
-> index 54e219b0049e..f7f6c2222cc0 100644
-> --- a/drivers/cxl/cxlpci.h
-> +++ b/drivers/cxl/cxlpci.h
-> @@ -1,35 +1,14 @@
->  /* SPDX-License-Identifier: GPL-2.0-only */
->  /* Copyright(c) 2020 Intel Corporation. All rights reserved. */
-> -#ifndef __CXL_PCI_H__
-> -#define __CXL_PCI_H__
-> +#ifndef __CXLPCI_H__
-> +#define __CXLPCI_H__
-
-Might be reasonable, but I don't think it belongs in this patch.
-
-
-> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
-> new file mode 100644
-> index 000000000000..1383fd724cf6
-> --- /dev/null
-> +++ b/include/cxl/cxl.h
-> @@ -0,0 +1,209 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/* Copyright(c) 2025 Advanced Micro Devices, Inc. */
-
-Given at least some of this is cut and paste from drivers/cxl/cxl.h
-probably makes sense to keep the Intel copyright notice as well.
-
-> +
-> +#ifndef __CXL_H
-> +#define __CXL_H
-
-Similar to below. I think we need the guards here and in
-drivers/cxl/cxl.h to be more different.
-
-> +
-> +#include <linux/cdev.h>
-> +#include <linux/node.h>
-> +#include <linux/ioport.h>
-> +#include <cxl/mailbox.h>
-> +
-> +/*
-
-/**
-
-Let's make this valid kernel-doc
-
-Make sure to then run the kernel-docs script over it and fixup any
-warnings etc.  Maybe this is a thing for another day though as it
-is just code movement in this patch.
-
-
-> + * enum cxl_devtype - delineate type-2 from a generic type-3 device
-> + * @CXL_DEVTYPE_DEVMEM - Vendor specific CXL Type-2 device implementing HDM-D or
-> + *			 HDM-DB, no requirement that this device implements a
-> + *			 mailbox, or other memory-device-standard manageability
-> + *			 flows.
-> + * @CXL_DEVTYPE_CLASSMEM - Common class definition of a CXL Type-3 device with
-> + *			   HDM-H and class-mandatory memory device registers
-> + */
-
-> diff --git a/include/cxl/pci.h b/include/cxl/pci.h
-> new file mode 100644
-> index 000000000000..c5a3ecad7ebf
-> --- /dev/null
-> +++ b/include/cxl/pci.h
-> @@ -0,0 +1,23 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/* Copyright(c) 2020 Intel Corporation. All rights reserved. */
-> +
-> +#ifndef __CXL_PCI_H
-That is pretty close to the define in drivers/cxl/cxlpci.h
-which is __CXL_PCI_H__
-
-Maybe we need something more obvious in the defines so that
-we definitely don't have them clash in the future?
-
-
-> +#define __CXL_PCI_H
-> +
-> +/* CXL 2.0 8.1.3: PCIe DVSEC for CXL Device */
-> +#define CXL_DVSEC_PCIE_DEVICE					0
-> +#define   CXL_DVSEC_CAP_OFFSET		0xA
-> +#define     CXL_DVSEC_MEM_CAPABLE	BIT(2)
-> +#define     CXL_DVSEC_HDM_COUNT_MASK	GENMASK(5, 4)
-> +#define   CXL_DVSEC_CTRL_OFFSET		0xC
-> +#define     CXL_DVSEC_MEM_ENABLE	BIT(2)
-> +#define   CXL_DVSEC_RANGE_SIZE_HIGH(i)	(0x18 + ((i) * 0x10))
-> +#define   CXL_DVSEC_RANGE_SIZE_LOW(i)	(0x1C + ((i) * 0x10))
-> +#define     CXL_DVSEC_MEM_INFO_VALID	BIT(0)
-> +#define     CXL_DVSEC_MEM_ACTIVE	BIT(1)
-> +#define     CXL_DVSEC_MEM_SIZE_LOW_MASK	GENMASK(31, 28)
-> +#define   CXL_DVSEC_RANGE_BASE_HIGH(i)	(0x20 + ((i) * 0x10))
-> +#define   CXL_DVSEC_RANGE_BASE_LOW(i)	(0x24 + ((i) * 0x10))
-> +#define     CXL_DVSEC_MEM_BASE_LOW_MASK	GENMASK(31, 28)
-> +
-> +#endif
-
-
++ notsupp:
+	kfree(priv);
 
