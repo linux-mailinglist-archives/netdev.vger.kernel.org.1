@@ -1,156 +1,152 @@
-Return-Path: <netdev+bounces-179430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E574EA7C920
-	for <lists+netdev@lfdr.de>; Sat,  5 Apr 2025 14:50:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AD54A7C9C0
+	for <lists+netdev@lfdr.de>; Sat,  5 Apr 2025 16:51:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9369A3BB771
-	for <lists+netdev@lfdr.de>; Sat,  5 Apr 2025 12:49:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A059179B33
+	for <lists+netdev@lfdr.de>; Sat,  5 Apr 2025 14:51:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB2371DF727;
-	Sat,  5 Apr 2025 12:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E31941CD1F;
+	Sat,  5 Apr 2025 14:51:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IhCb+tAk"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fRUmw2JH"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FE01DD88E
-	for <netdev@vger.kernel.org>; Sat,  5 Apr 2025 12:50:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7E846FC3
+	for <netdev@vger.kernel.org>; Sat,  5 Apr 2025 14:51:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743857408; cv=none; b=O+GRB+W01Jxor0UGgTG4VTvmTSCOqlarO0ueWgtFHBVz6+qPlwXWmI0ZSvBFswINFgeN7tPcRXxCtbnuedn05acAc9X26ulj1uehVGkCxko1rpw/nPFUtEsxoJ8FdrMdirV3dBayGGjmEbeiNSC/cRVNBe4imXxTgSxhy5Dfr8c=
+	t=1743864707; cv=none; b=iKCylpATX4bcQv5QXe4Zt2IukgDedC03u2RuPydk4ZqHqyW9N0A0maT+8LsaMJDLgUDLuutNGdbPBF+JIBbNOMpfj3K+/0nONiHOv6xICWESKPkpexkCekI1+YnDRQXguKqOVOS7CJyJikzBlsoJY9H8KAI1clFhxE16r5L64/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743857408; c=relaxed/simple;
-	bh=OqPlxZ84MvDuvuYdDMJebOtv4kfa7e9q+LZcfQb1DD8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=MALrE8+N9o/5XffCFZdCoKg5Qwg3E6TwR+1HBTDtgGGEftFmTeRQeD4bee18ualOzke63QQWzBbgLXOkuaOa8eP6QTjppLiW/EKLYiAx7KFQ95DBqIag0Er9SIkwndj/FTXjDixIFlSzwQKFe5PAEZe2t1a3EH39VTw9dZWWQbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IhCb+tAk; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743857405;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KJSSsQi4y9qy6Jap/bBqkOsEFxIFhRATV85xzgJwngA=;
-	b=IhCb+tAk9flxAFGQiNa7SocPsgZAfHC9Y5AFdHuY0d+m06294DF8/9+3SG2tpToxv1Mpyl
-	w3kjmYe7TCFcq+LeQsBvxbPXAB8ryYQ2vru2frEY3anYVXwpSNmv21rcLpcep7Np+V4T8t
-	rBNbiocsYengBa4lkOSjFX2TZX1vWHU=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-653-oGi0UBUlM12PxiIHcEQlFQ-1; Sat, 05 Apr 2025 08:50:04 -0400
-X-MC-Unique: oGi0UBUlM12PxiIHcEQlFQ-1
-X-Mimecast-MFC-AGG-ID: oGi0UBUlM12PxiIHcEQlFQ_1743857403
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-30d8de3f91eso17104571fa.3
-        for <netdev@vger.kernel.org>; Sat, 05 Apr 2025 05:50:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743857403; x=1744462203;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KJSSsQi4y9qy6Jap/bBqkOsEFxIFhRATV85xzgJwngA=;
-        b=QUdLMyVBTZg8pn8Gi9fLINwou1raem0TVWmwKAIFG6o4R7PIIoSjRhP9QNXvbjsW5N
-         KQYbASm7fHMi4/i+63KlgL9j/li02Y1OJSucofNK6oImbEYrZezm2ZAqdzpBwyzMJrI4
-         8ewhtJWF7lTyCnh2r3g25qcxkP/FA1RWbagbMfnfnld6K4M3lbUazxV1BxovqZDBuI3X
-         ybzT8E+K6fDu9A60LyhsIVRe9vKIkJJCiaWNhiri7Hwd3MOUDQNOUgMuOdMYMou1XVpX
-         AoH/n41h3pQE1MITgTeUolYZB3A1tg41rZdj3APeu437TTus9cHntBAX7oW+z/jC0EwJ
-         2snw==
-X-Forwarded-Encrypted: i=1; AJvYcCVvQwqbe4u6R02A+39nvNuMbWHkcE2aZ2IeHuVW3rq078vo5tFOCTGlNHUHrsPIQ+vmlWSmyWk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjF5zh5TpwXYCVLvbq33uw/WBbYSYgRRWKZMwOsgVWML91PqhN
-	sUJtuxfeQjwTx1Scf5gS3o0hW416GKZnttK2E429ZYq6fmgnkNgSITLhxHxVv0ARET2PKNBXuI0
-	39tGCs03z4ylybRxZzycWBZb16AKo2NZP5XCz2si/EjQhui3v0wSCAQ==
-X-Gm-Gg: ASbGncuhom+hKBdlFds6vyOIJnIfY+czEEy6oM9qyBeOa8PhuNQG2H7nTpx86MtmB2h
-	m8CvP1joI34T2Bla5/zp0LXSjbL/+nj4wUEnCrMIBuNmlqxRzfiLbOnhvbu6Io04NnvCgbC5wGr
-	gVPOu0ic30k6LRpaKdOEiT0l46cV1P2erBh/sXmcUm4SsPSgC0lC8JQqA/cezW7RL5eFjtK923l
-	qhIGV8ZI92KrBldPDzDxvzH4b0yJuqhRnelQcVbO90v60AtJsYxG8V5GnbxDlI5gP3ktFGx+CtZ
-	M2cBlJGf9w/nNYy/Mh3gv7F7M3ZhqmfkVQysvH3K
-X-Received: by 2002:a2e:ab0c:0:b0:30d:694d:173b with SMTP id 38308e7fff4ca-30f165a2ea4mr10764681fa.33.1743857402902;
-        Sat, 05 Apr 2025 05:50:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHB21V3mnevjJOBuKtDbkjuEQHYW7vTlUl/JuKqTWWRK9nD5+it91BDmAxcHGGPPFWJPz3EEg==
-X-Received: by 2002:a2e:ab0c:0:b0:30d:694d:173b with SMTP id 38308e7fff4ca-30f165a2ea4mr10764381fa.33.1743857402525;
-        Sat, 05 Apr 2025 05:50:02 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-30f031ce793sm8871321fa.107.2025.04.05.05.50.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Apr 2025 05:50:01 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id D0AC618FD793; Sat, 05 Apr 2025 14:50:00 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, Saeed
- Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq
- Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>, Simon Horman <horms@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>, Mina Almasry
- <almasrymina@google.com>, Yonglong Liu <liuyonglong@huawei.com>, Yunsheng
- Lin <linyunsheng@huawei.com>, Pavel Begunkov <asml.silence@gmail.com>,
- Matthew Wilcox <willy@infradead.org>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-rdma@vger.kernel.org, linux-mm@kvack.org,
- Qiuling Ren <qren@redhat.com>, Yuying Ma <yuma@redhat.com>
-Subject: Re: [PATCH net-next v7 2/2] page_pool: Track DMA-mapped pages and
- unmap them when destroying the pool
-In-Reply-To: <d7780007-6df7-45f0-9a08-2e6acf589a6f@intel.com>
-References: <20250404-page-pool-track-dma-v7-0-ad34f069bc18@redhat.com>
- <20250404-page-pool-track-dma-v7-2-ad34f069bc18@redhat.com>
- <3b933890-7ff2-4aaf-aea5-06e5889ca087@intel.com>
- <d7780007-6df7-45f0-9a08-2e6acf589a6f@intel.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Sat, 05 Apr 2025 14:50:00 +0200
-Message-ID: <87jz7yhix3.fsf@toke.dk>
+	s=arc-20240116; t=1743864707; c=relaxed/simple;
+	bh=lVS8NG/WW8Dgiuz1mUDWt3Q1RcE7vy7nq26q1HaYRaM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xoi6zVC1WRImc+be4wWW3wNiX5eDA/exzy1CPG0Q57uEbA5O8OY51sOJmH+c33u67Xza5nu9EK93PtWbracEqGuF6UvFmTuKXdmEQKjKm376SA7OIzVr8BlN503gp9YR+5Z7ot4UNpxaJVQ067IDM2TNtHSsMpcIjBbrk3xWSEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fRUmw2JH; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Ig/Qieq34fEJAEvoha2/8ZSw5WTFebYKjCsCHnYmXGo=; b=fRUmw2JHSTw0yIQMlaf3thkFrW
+	H0ipu5PK1NpNMZLVUwxbFQ7VCZBn0dwEJk8OSLcXycRlx14Se66TibeZ6Td0FIUTL1l5sWcwVfWwG
+	EDiHfH7pOzM8Yw+mHjaTAwl6ahZDy8BxzBx105pssQZsuv7nsfbjl527pOg+k6NYP3sI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u14rq-0087O5-QI; Sat, 05 Apr 2025 16:51:30 +0200
+Date: Sat, 5 Apr 2025 16:51:30 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org, hkallweit1@gmail.com, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [net PATCH 1/2] net: phy: Cleanup handling of recent changes to
+ phy_lookup_setting
+Message-ID: <eb115770-a8b1-4806-b8b9-ec98f44a98ee@lunn.ch>
+References: <174354264451.26800.7305550288043017625.stgit@ahduyck-xeon-server.home.arpa>
+ <174354300640.26800.16674542763242575337.stgit@ahduyck-xeon-server.home.arpa>
+ <Z-6hcQGI8tgshtMP@shell.armlinux.org.uk>
+ <20250403172953.5da50762@fedora.home>
+ <de19e9f1-4ae3-4193-981c-e366c243352d@lunn.ch>
+ <CAKgT0UdhTT=g+ODpzR5uoTEOkC8u+cfCp7H-8718Zphd=24buw@mail.gmail.com>
+ <Z-8XZiNHDoEawqww@shell.armlinux.org.uk>
+ <CAKgT0UepS3X-+yiXcMhAC-F87Zcd74W2-2RDzLEBZpL3ceGNUw@mail.gmail.com>
+ <3087356b-305f-402a-9666-4776bb6206a1@lunn.ch>
+ <CAKgT0UfG6Du3RepV4v0hyta4f5jcUt3P1Bh7E2Jo2Cn4kWJtGw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKgT0UfG6Du3RepV4v0hyta4f5jcUt3P1Bh7E2Jo2Cn4kWJtGw@mail.gmail.com>
 
-Alexander Lobakin <aleksander.lobakin@intel.com> writes:
+> > So for us, we have:
+> >
+> > MAC - PHY
+> > MAC - PCS - PHY
+> > MAC - PCS - SFP cage
+> > MAC - PCS - PHY - SFP cage
+> 
+> Is this last one correct? I would have thought it would be MAC - PCS -
+> SFP cage - PHY. At least that is how I remember it being with some of
+> the igb setups I worked on back in the day.
 
-> From: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Date: Fri, 4 Apr 2025 17:55:43 +0200
->
->> From: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
->> Date: Fri, 04 Apr 2025 12:18:36 +0200
->>=20
->>> When enabling DMA mapping in page_pool, pages are kept DMA mapped until
->>> they are released from the pool, to avoid the overhead of re-mapping the
->>> pages every time they are used. This causes resource leaks and/or
->>> crashes when there are pages still outstanding while the device is torn
->>> down, because page_pool will attempt an unmap through a non-existent DMA
->>> device on the subsequent page return.
->>=20
->> [...]
->>=20
->>> -#define PP_MAGIC_MASK ~0x3UL
->>> +#define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
->>>=20=20
->>>  /**
->>>   * struct page_pool_params - page pool parameters
->>> @@ -173,10 +212,10 @@ struct page_pool {
->>>  	int cpuid;
->>>  	u32 pages_state_hold_cnt;
->>>=20=20
->>> -	bool has_init_callback:1;	/* slow::init_callback is set */
->>> +	bool dma_sync;			/* Perform DMA sync for device */
->>=20
->> Yunsheng said this change to a full bool is redundant in the v6 thread
->> =C2=AF\_(=E3=83=84)_/=C2=AF
+This PHY is acting as an MII converter. What comes out of the PCS
+cannot be directly connected to the SFP cage, it needs a
+translation. The Marvell 10G PHY can do this, you see this with some
+of the Marvell reference designs.
 
-AFAIU, the comment was that the second READ_ONCE() when reading the
-field was redundant, because of the rcu_read_lock(). Which may be the
-case, but I think keeping it makes the intent of the code clearer. And
-in any case, it has nothing to do with changing the type of the field...
+There could also be a PHY inside the SFP cage, if the media is
+Base-T. Linux is not great at describing that situation, multiple PHYs
+for one link, but it is getting better at that, thanks to the work
+Bootlin is doing.
 
--Toke
+> 
+> > This is why i keep saying you are pushing the envelope. SoC currently
+> > top out at 10GbaseX. There might be 4 lanes to implement that 10G, or
+> > 1 lane, but we don't care, they all get connected to a PHY, and BaseT
+> > comes out the other side.
+> 
+> I know we are pushing the envelope. That was one of the complaints we
+> had when you insisted that we switch this over to phylink. If anything
+> 50G sounds like it will give the 2500BaseX a run for its money in
+> terms of being even more confusing and complicated.
 
+Well, 2500BaseX itself it straight forward. It is the vendors that
+make it complex by having broken implementations.
+
+Does your 50G mode follow the standard?
+
+SoC vendors tend to follow the standard, which is why there is so much
+code sharing possible. They often just purchase IP to implement the
+boring parts like the PCS, there is no magic sauce there, all the
+vendor differentiation is in the MAC, if they try to differentiate at
+all in networking.
+
+The current market is SoCs have 10G. Microchip does have a 25G link in
+its switches, which uses phylink. We might see more 25G, or we might
+see a jump to 40G.
+
+I know your register layout does not follow the standard, but i hope
+the registers themselves do. So i guess what will happen is when
+somebody else has a 40G PCS, maybe even the same licensed IP, they
+will write a translation layer on top of yours to make your registers
+standards compliment, and then reuse your driver. This assumes you are
+following the standard, plus/minus some integration quirks.
+
+If you have thrown the standard out the window, and nothing is going
+to be reusable then maybe you should hide it away in the MAC
+driver.
+
+> If anything we most closely resemble the setup with just the SFP cage
+> and no PHY. So I suspect we will probably need that whole set in place
+> in order for things to function as expected.
+
+That is how we have seen new link modes added. Going from 2.5G to 5G
+to 10G is not that big, so the patchsets are reasonably small. But the
+jump from 10G to 40G is probably bigger.
+
+If you internally use fixed-link as a development crutch, that is not
+a problem. If however you want it in mainline, then we need to look at
+the big picture, does it fit with what fixed-link is meant to be?
+
+What is also going to make things complex is the BMC. SoCs and
+switches don't have BMCs, Linux via phylink and all the other pieces
+of the puzzle are in complete control of driving the hardware. We
+don't have a good story for when Linux is only partially in control of
+the hardware, because the BMC is also controlling some of it.
+
+	Andrew
 
