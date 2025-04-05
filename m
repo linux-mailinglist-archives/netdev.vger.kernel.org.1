@@ -1,76 +1,85 @@
-Return-Path: <netdev+bounces-179433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BEE8A7C9EE
-	for <lists+netdev@lfdr.de>; Sat,  5 Apr 2025 17:32:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D71F5A7C9F3
+	for <lists+netdev@lfdr.de>; Sat,  5 Apr 2025 17:34:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 038043BB9DD
-	for <lists+netdev@lfdr.de>; Sat,  5 Apr 2025 15:32:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05D137A7A62
+	for <lists+netdev@lfdr.de>; Sat,  5 Apr 2025 15:33:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DAC7151990;
-	Sat,  5 Apr 2025 15:32:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77BCF85260;
+	Sat,  5 Apr 2025 15:34:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jVK6JF8R"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="Z6Ga4AML"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE337404E;
-	Sat,  5 Apr 2025 15:32:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54B047404E
+	for <netdev@vger.kernel.org>; Sat,  5 Apr 2025 15:34:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743867135; cv=none; b=d36Pwr56D6G4cyCQN2SY8MZKD75n/dxTNYNElzkSQvD1kwmg/HBOBaM+AiGjH7jLnYOKU7ddmNDXHQCymIKOrjfBi1Lz2L4TvfhOwojMBTB8pdrg1VW/1yAoGhmpjzjXy5kpphZhwVQjjRbkXfJqTZ5eBoe8VcvPXROjeEwDtNE=
+	t=1743867280; cv=none; b=k5Uh4FSXsIKgWLo5CUTo+HMXp9KNDeeNN9QPteft7kYtRe3TAN6PQiwirBu76agJhnf+gf6GtAhiAwKVA/LvdgGvAfSmf2HFTk1ST54Vb8fLx6wLKwW4RV2JHzD1zrT5dT7ANiYN6O+8OH4Qy0YDrQ71UeyBAtl0fW2vYAVfoDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743867135; c=relaxed/simple;
-	bh=RdPSb3R/N8g0+oYT6+2V0LNQyAZKsrTfROQEnTne+ak=;
+	s=arc-20240116; t=1743867280; c=relaxed/simple;
+	bh=dhg0s+Tdxt0Yh/GYXSr6JRcjMAkmHu2c5yWv9Ek5S4c=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=i9ukhjP9rSkq2+bxD6dDUDlaAbQAyCLWIvM2aKxmqIU+OP8jSQ1BmrFr17uEspx9SDJW/YNux1ZKpbG6loYeFOVGwoT8JpgOz3uFiHCrWMp9hgT4GD5twxzQ8c0P0jgI/2bRwoUh3SMH0YOkQN7edndpQ25C+GSBAFxQARJvtDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jVK6JF8R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23B8AC4CEE4;
-	Sat,  5 Apr 2025 15:32:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1743867134;
-	bh=RdPSb3R/N8g0+oYT6+2V0LNQyAZKsrTfROQEnTne+ak=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jVK6JF8RzIa2fTbodJS2FISwWudNboXPBdoMoty0m2mNay6iJThuDSiveMToI7V8O
-	 6g42eS8E8LtVI1QtvaMdw0SCKHNRCfLy0HhQZ9huqFtTKXXYLeE0vgxLVvbbhyeWV9
-	 /2AcgLtXGwCv+ZtdoJsPxpFgNHty72ixEgcls3MiRRT57BMJNjgXWrqquPIHsgUjWo
-	 Xrc3yG2qtgjXemyHrcmVgYcq10cFR7TTNYhQzl+nTvdm+Ef7qp75wk6UO/6XQFrscS
-	 v1OjaKgVM6dR70zKrI+gtG7dOiGVaMpbieSrkNOSwc3LpO/u9ElY/UEveU82g3GLiz
-	 NgnIiJ3gmDWxw==
-Date: Sat, 5 Apr 2025 16:31:58 +0100
-From: Jonathan Cameron <jic23@kernel.org>
-To: Jonathan Corbet <corbet@lwn.net>
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>, "=?UTF-8?B?TsOtY29s?=
- =?UTF-8?B?YXM=?= F. R. A. Prado" <nfraprado@collabora.com>, Andrew Morton
- <akpm@linux-foundation.org>, Vinod Koul <vkoul@kernel.org>, Eric Biggers
- <ebiggers@kernel.org>, "Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim
- <jaegeuk@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Maxime Chevallier <maxime.chevallier@bootlin.com>,
- James Bottomley <James.Bottomley@HansenPartnership.com>, Jarkko Sakkinen
- <jarkko@kernel.org>, Mimi Zohar <zohar@linux.ibm.com>, Jaroslav Kysela
- <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Mauro Carvalho Chehab
- <mchehab@kernel.org>, Richard Weinberger <richard@nod.at>, Anton Ivanov
- <anton.ivanov@cambridgegreys.com>, Johannes Berg
- <johannes@sipsolutions.net>, kernel@collabora.com, linux-mm@kvack.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- dmaengine@vger.kernel.org, linux-fscrypt@vger.kernel.org,
- linux-iio@vger.kernel.org, netdev@vger.kernel.org,
- workflows@vger.kernel.org, linux-integrity@vger.kernel.org,
- keyrings@vger.kernel.org, linux-sound@vger.kernel.org,
- linux-media@vger.kernel.org, linux-um@lists.infradead.org
-Subject: Re: [PATCH] docs: Remove literal markup from Documentation/ paths
-Message-ID: <20250405163158.55935fdf@jic23-huawei>
-In-Reply-To: <874iz3g6w1.fsf@trenco.lwn.net>
-References: <20250404-doc-paths-unliteral-v1-1-74718785444e@collabora.com>
-	<20250404182006.000038cc@huawei.com>
-	<874iz3g6w1.fsf@trenco.lwn.net>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-pc-linux-gnu)
+	 MIME-Version:Content-Type; b=sr3mJOOiILwv90YkAuxPztTr5rSAARCxJ9oBnG8Ty5PPeG4SWEHfyI38jzS/EU5TmHz2Z41NIblIQpo+Ytfee6dtGz1ejAuW6andPadyeSIKiimC5emFzh8aygSAjBj1w6aznFodhn1EVCKiNmtC139gEzKUapEBGdsauoRdfJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=Z6Ga4AML; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2ff784dc055so2610222a91.1
+        for <netdev@vger.kernel.org>; Sat, 05 Apr 2025 08:34:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1743867277; x=1744472077; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m8eigrRGHoZoaYacdnXkJxiXpQ3oRUsVusC+XuAzhcI=;
+        b=Z6Ga4AMLG2lD1muZXH+j7pJ9t2BeBAf+gmiB1mw1C6kY1UWAcLTVgVY5nhCuwmgBlb
+         /ZdSuZTOAb2CPJF5xv8a6E3fdgYXThU3DwF9laskVSJe3zDMQ5IX12h8pnzX3sGVaIzE
+         ktVi3XM3D1BXT2SC4ro1RqpFPonofYp9Ltn9NFPtU7uYrsJ7mwj4F1ZZxkzfrTaM6Bvq
+         kC3/YqV+pmmTLuhr34/NCog55GShv36R7MsTjOS9Ja/mK2nueCvDFJChwCnbAwp+JoiY
+         Y+nuZgsgpgUS+aMgb2NeeWu44mul2N3g6mbF4zUebY+kBrgwuXf7wo7iwJTBxRnuB8Hy
+         Is7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1743867277; x=1744472077;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=m8eigrRGHoZoaYacdnXkJxiXpQ3oRUsVusC+XuAzhcI=;
+        b=ZYhPcL4763uaghl+vOQw2CYulZQM78Gjg9n45e02SuWiAgMyZFMi1hv56MogDxMq6I
+         9IYCB7tHwcQRLu5omBthxiphH1R4s2yLkx/ZV77Ob27aBugcHYtaUHu9bkBYAH0cON7u
+         YNXfwuyC1JmCt7Jv0fwW+vplOSNRW20vTOdwuOHeVC+HJ+J0IWULf/aONl5G/dTQ9pXj
+         EUt7a1O+J9Uwlz0+fbFN9vLCPvLtLMw6upJJBeBw3oTBsa5/ZrDSt62M00YDpjPIRkq/
+         2EX/mKV8r6sq4UsvdO2mdHY3d+ufe+M82cLgT3dPygaxvcI23zkqpKm0PZMYrnX/UYTt
+         7qBQ==
+X-Gm-Message-State: AOJu0YzHIbZ+ZLqGNanY2RsKkHWMkiCtGULJfWe8iSqn9RTqxnTYmYM6
+	cQifJn+FRMnN+S574Tbj3qKmf438bmkvnOvLb9jndHlGnk/squgouQgU0oGqYYU=
+X-Gm-Gg: ASbGncs8QSspaZ1eZM7bYn+V+dJUvNse3QHkulMWCqMg3p3RSoDZ5PhMNAt9SntFO7X
+	Ta77hPtPGrnTuMGeYLSoxQi18aszP8TrSULlfMeOKMPZpcRJFrrLkvmC1reCn0tzxiniKm4tpqX
+	wg5iBNAPlcJldPDOd5p8piJhvBL/zYyeha0qccbq2ZdmoN/BmoJNZ05mgfC+ak4N/ZrDNMdSaLc
+	gpO+DBqajh6uphzXXOnsI2Kl78/55D+apxzb/wQgCbXMJdafuBuZtbu34V3G3VlmTQz9W5fdpp9
+	kh1c8b1YHXvzWdyubmmWA5MM9kIjXtIFbnMT2l4z6lGQcrY3CqQw9bz67ZD0Ps6emUQL7ffZgau
+	FJRHwzesSigx+ZwqODQBM
+X-Google-Smtp-Source: AGHT+IF1pGISQYn8g6REp9KhbqWdODmg15tXukFVlRCVjTSHD9RYrYP4y5xSdEv71qX/r6GhOC+qiw==
+X-Received: by 2002:a17:90b:274b:b0:2ff:5a9d:937f with SMTP id 98e67ed59e1d1-306af789740mr4788105a91.24.1743867277527;
+        Sat, 05 Apr 2025 08:34:37 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30584761e65sm5573963a91.13.2025.04.05.08.34.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 05 Apr 2025 08:34:37 -0700 (PDT)
+Date: Sat, 5 Apr 2025 08:34:34 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: "=?UTF-8?B?5p2O5a2Q5aWl?=" <23110240084@m.fudan.edu.cn>
+Cc: "netdev" <netdev@vger.kernel.org>
+Subject: Re: [PATCH iproute2] nstat: Fix NULL Pointer Dereference
+Message-ID: <20250405083434.1c5b329e@hermes.local>
+In-Reply-To: <tencent_6D7BD943688C4B5A68509FED@qq.com>
+References: <tencent_6D7BD943688C4B5A68509FED@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,53 +89,48 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 04 Apr 2025 11:42:54 -0600
-Jonathan Corbet <corbet@lwn.net> wrote:
+On Sat, 5 Apr 2025 17:42:20 +0800
+"=E6=9D=8E=E5=AD=90=E5=A5=A5" <23110240084@m.fudan.edu.cn> wrote:
 
-> Jonathan Cameron <Jonathan.Cameron@huawei.com> writes:
+> The vulnerability happens in load_ugly_table(), misc/nstat.c, in the late=
+st version of iproute2.
+> The vulnerability can be triggered by:
+> 1. db is set to NULL at struct nstat_ent *db =3D NULL;
+> 2. n is set to NULL at n =3D db;
+> 3. NULL dereference of variable n happens at sscanf(p+1, "%llu", &n->val)=
+ !=3D 1
 >=20
-> > On Fri, 04 Apr 2025 11:37:28 -0400
-> > N=C3=ADcolas F. R. A. Prado <nfraprado@collabora.com> wrote:
-> > =20
-> >> Given that the automarkup Sphinx plugin cross-references
-> >> "Documentation/*.rst" strings in the text to the corresponding
-> >> documents, surrounding those strings with the literal markup (``) not
-> >> only adds unnecessary markup in the source files, but actually prevents
-> >> the automatic cross-referencing to happen (as it doesn't happen in
-> >> literal blocks).
-> >>=20
-> >> Remove all the occurrences of the literal markup in
-> >> "Documentation/*.rst" paths, except when the actual source file is bei=
-ng
-> >> referred. Also change the surrounding text when needed so it reads well
-> >> both in the source and the web page (eg. 'see file Doc...' -> 'see
-> >> Doc...').
-> >>=20
-> >> Signed-off-by: N=C3=ADcolas F. R. A. Prado <nfraprado@collabora.com>
-> >> ---
-> >>  Documentation/admin-guide/mm/numa_memory_policy.rst       | 2 +-
-> >>  Documentation/admin-guide/serial-console.rst              | 2 +-
-> >>  Documentation/driver-api/dmaengine/client.rst             | 2 +-
-> >>  Documentation/driver-api/nvdimm/security.rst              | 2 +-
-> >>  Documentation/filesystems/fscrypt.rst                     | 4 ++--
-> >>  Documentation/iio/adis16475.rst                           | 4 ++--
-> >>  Documentation/iio/adis16480.rst                           | 4 ++--
-> >>  Documentation/iio/adis16550.rst                           | 4 ++--
-> >>  Documentation/iio/adxl380.rst                             | 4 ++-- =20
-> >
-> > Split patch up by subsystem would be a good thing here as we may
-> > get other changes to these docs during the cycle and resulting
-> > merge conflicts if this all goes in as one patch. =20
+> Subject: [PATCH] Fix Null Dereference when no entries are specified
 >=20
-> That seems like a way to add a significant amount of pain to a basic
-> (but indeed useful) cleanup patch like this.  If the relevant
-> maintainers insist on it then that's how it has to be done, but I bet I
-> could just take the whole thing through docs with almost no trouble.
+> Signed-off-by: Ziao Li <leeziao0331@gmail.com>
+> ---
+> misc/nstat.c | 4 ++++
+> 1 file changed, 4 insertions(+)
 >=20
-hmm.  I'll go with maybe. Let's cross fingers then.
+> diff --git a/misc/nstat.c b/misc/nstat.c
+> index fce3e9c1..b2e19bde 100644
+> --- a/misc/nstat.c
+> +++ b/misc/nstat.c
+> @@ -218,6 +218,10 @@ static void load_ugly_table(FILE *fp)
+>            p =3D next;
+>        }
+>        n =3D db;
+> +       if (n =3D=3D NULL) {
+> +           fprintf(stderr, "Error: Invalid input =E2=80=93 line has ':' =
+but no entries. Add values after ':'.\n");
+> +           exit(-2);
+> +       }
+>        nread =3D getline(&buf, &buflen, fp);
+>        if (nread =3D=3D -1) {
+>            fprintf(stderr, "%s:%d: error parsing history file\n",
+> --
+> 2.34.1
 
-Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Better, but your mailer is still confusing the patch.
+You may have to resort to using an attachment.
 
-> jon
+Also, iproute2 uses kernel coding style and indentation is done with
+tabs not spaces.
 
+If this is all too hard for you to fix, I can just do it manually.
 
