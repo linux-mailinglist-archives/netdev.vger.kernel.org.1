@@ -1,194 +1,150 @@
-Return-Path: <netdev+bounces-179419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBD9AA7C83E
-	for <lists+netdev@lfdr.de>; Sat,  5 Apr 2025 10:18:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4182BA7C863
+	for <lists+netdev@lfdr.de>; Sat,  5 Apr 2025 10:58:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67F34189E97D
-	for <lists+netdev@lfdr.de>; Sat,  5 Apr 2025 08:18:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 787823BAF2E
+	for <lists+netdev@lfdr.de>; Sat,  5 Apr 2025 08:57:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95CAA1BD4F7;
-	Sat,  5 Apr 2025 08:18:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10311D6DB7;
+	Sat,  5 Apr 2025 08:58:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="RwJCZILD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AZdypMTR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f65.google.com (mail-wm1-f65.google.com [209.85.128.65])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51281A7044
-	for <netdev@vger.kernel.org>; Sat,  5 Apr 2025 08:17:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0AE1D63CF;
+	Sat,  5 Apr 2025 08:58:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743841080; cv=none; b=bC4tbEV88Fkx77V+8M2cZO68Dn1ygTWsNV+Lsg+FzS6c9IqsNxNARUx4QVSg+xj8XflgEipXUv4oqOpsWmsRAK7rraHRWmiVJoHIglFo8OxwjhPtp8lhS6t7bI6zYRGSwFULnwKKnPIn5ZJ3lSQTboJ47oqlyY+e646Jvq3EXK0=
+	t=1743843486; cv=none; b=QMJHeBpqKpV6OAdY2IoFTLm+UdLUaxCTFY7/N6WN9nSB45mG8msdYDAqOvE1yr8kDZ5Tdhna4JwTxWLiGsJkoB5e4E7yVwqeyYdqe3VxmfAYzESUyG0hvUa0RVLfcfpxzBQKpEjiasa5L7mG3O/AsRzsnciB0my+UGrP5Kg/cLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743841080; c=relaxed/simple;
-	bh=Sk5EfWtbpIrDoBOQs1tLfZu5DMGKFwD+3E8Z91flcBY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pnOGYOXJ0d4H5b2uegTGBZiji1aSi+hQZ5XyX1m2oGXGBPi812clv9mI9JgQi5RcIlHjWp3PQysanjU4xj55ZdVkPiuTaO7Uydj/PfLCvpudTxSSVAdBMHP10lFq+ybd1MKxEXv82Sn6C4fKqfOPQJCEmbbRnnotZUvvg2yuoQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=RwJCZILD; arc=none smtp.client-ip=209.85.128.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wm1-f65.google.com with SMTP id 5b1f17b1804b1-43cef035a3bso18401035e9.1
-        for <netdev@vger.kernel.org>; Sat, 05 Apr 2025 01:17:56 -0700 (PDT)
+	s=arc-20240116; t=1743843486; c=relaxed/simple;
+	bh=4B11vuoLMqSqCKCDLheQ3yvoV6EToF4tR4XWH1h7miA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VFhjVhrJz4iAZF3ubnzAqi0p99q+m94VxRy/Kj6EPQTBePoAKyHcgcCweN/KHQ13ZqCw76abmdJk8QRCLFNAPB8Yf4+8+h6OxbogXPh8zd7MyW08PgnmZfQfJXTrRzItAY5PDgfk2DGNu9Kt4frB16Ysow5ru8LmKobT2q/nrL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AZdypMTR; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-227914acd20so35966425ad.1;
+        Sat, 05 Apr 2025 01:58:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1743841075; x=1744445875; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gmh8VzGlGccoq62Okq7lLmPwtkx48Yd7cBlyMiMYKeA=;
-        b=RwJCZILDIJxmEheMbCSIeVmS+K4Tgo0gVCzciGgphupEFDa8Vd///nb/133l0BnwG7
-         0efO0XdcplGYxO7WiWVg7cXrfB/7WhVXiaTNwNqSk+lynSrIHK/yTm4RfPieqipKu7/a
-         izsbkp8wr+s7s+xQ/NMC0OMsk/M1WMM595v4pUB0FjJMlu76CLkBp6lkS7FxcUhsQTEI
-         akDuxd3gWfEzgiZWiLKPs6grCvKgmSuimP43uVs5nFzARHrABFYRCE2JJH7VSisflgZ3
-         f0tMTgEgon++Hg/1tRxH9SxA6KgrxcgaU6xRDbCkSHCEtYIjnci+Nn7TmCmatwswG91G
-         vjnA==
+        d=gmail.com; s=20230601; t=1743843484; x=1744448284; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wpj+U6LiNLvKI0gORxBfuo1ew0BWKjiW55LLe8Lju64=;
+        b=AZdypMTRWKvjCEEUGFrTCy0Zo6JS0BJPwF4O2FpXWk6p4gIwMIDZ2q2ZLk7lsifBbB
+         dvz2tM5G71y2rEglDNu8+QGDK5NBhXRS1/RfxYtWNDhBt3AkpCgbxmsQxXu9i/DBPQL9
+         gKM+cS+3o1VRYYVVqckaRZmnatrzStvc/1Wm9D8NAbAwG5ZMuvHYsL48iKWomMuaS8U+
+         VQbvYmAApuVWFOY9GlqUajoSC8LEc2zbD5zM+kuLzcCb1h1s7vDVvYhx9/yMkCnmF5hu
+         fpLkMBdVPesRqX3DD9DAvmAc4el9hYnW2pcDbW3dOle6m/qenBC0zG4AeSJ1SOpD4tWx
+         4TIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743841075; x=1744445875;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gmh8VzGlGccoq62Okq7lLmPwtkx48Yd7cBlyMiMYKeA=;
-        b=D9ze+9qBOmGlYM20NtngcBhh+X0kSKg5q73f9Q9J4vEvw+N6N60Rjj1dabeUrvi9Vt
-         eGZRYdPiRKMX+WglepYYBLZMmkVvOb81pUXm7epoZnNY5AnfeNhexKN+BXo/pCzlBNjk
-         z3GbWcVTNqFjc9gGmsemqk+ANC7ssL6NTq2TgUySjLYhe7bw5wZSeyml7Do1bZc3Hneq
-         Vpd3eLQNravdh1wqZFH3TBLpWGYzVC+8HbVD6C/CKt5F1EfZwN+mdKqOZSGs2J32Jjlq
-         fMxTlj3RuzogRH7gyQDh+XHpVA/H/x4qyF2uUI+rldtnzlzLMGY6zEo48n+g97dW5Zda
-         o1+A==
-X-Forwarded-Encrypted: i=1; AJvYcCX/B1+lX2T1IXjJWJ5g6pm3hjJBEUBp4OGXuW2fRSijbVvFVH7ZwVbHLuLfwmBp8/EbeDE7bKU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzoa7/Tj1Wqzl8KhteZNCgJxsdCtx9vSiExOk17rLH6r8TYuxGR
-	Jwelm6usQnkfFTdYcE1sDRj8hEFuZThfFFYCHBUTl4z6wIEN+F7cOnUVjYilOrVuh54ld+Jg6Pg
-	tZcC7iQ==
-X-Gm-Gg: ASbGncvouqLukng4wtSBU43rf99mInp/Hxz5sTlLbQMliEQinBBsBu1sHihUDK1D8aT
-	FEwaisGK0OlH6QOqebfNUHYO5Fz5/kvxzI+2wSmPtTyHQhmFa91hTiItHv00KaqC+ttND3xEiPk
-	HkDZhWUGYvfhrQmp+kMqsFlK034aEEMsZvVhMocX8prM66P5GCPBhGUETHrkL6UNrrOhIy43CJ8
-	6DoJafHGRJ/YPADusMGcjb6JNl4PTaCy/BWviw+7jKtt+cOertrRywOMgLASBkwYZgpdB2S9UPU
-	yhpXFnY2yTBz5NeCIxUL05aiqhfKs6lnx0VXmlKr3yRaEAQNA4B8MTutPTP0UHqyW+0UvCF2zKm
-	A
-X-Google-Smtp-Source: AGHT+IEXH45zB9LxZqysktVTid75uKBWXT5GBeIvYEtODK5u/9rwtAa53Qy+v47CfQV3MHceLwM1jg==
-X-Received: by 2002:a05:600c:c1a:b0:43d:45a:8fca with SMTP id 5b1f17b1804b1-43ecfa06fd2mr69792675e9.30.1743841070178;
-        Sat, 05 Apr 2025 01:17:50 -0700 (PDT)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec147c9dbsm71352615e9.0.2025.04.05.01.17.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 05 Apr 2025 01:17:49 -0700 (PDT)
-Message-ID: <d20cb48c-116c-44ca-84c5-db67d9f934ae@blackwall.org>
-Date: Sat, 5 Apr 2025 11:17:49 +0300
+        d=1e100.net; s=20230601; t=1743843484; x=1744448284;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wpj+U6LiNLvKI0gORxBfuo1ew0BWKjiW55LLe8Lju64=;
+        b=samBYriT68bD4fSqYLwHIRWe1eNLApZtjryZ8/eiNnknfHR3cnqj2+d7x/OlMlDZum
+         a/w4rsCotOSLM6R+p1+bxo0vNjuus4rO7eA5UrylOUQxhb4xHnNmr0cVfphrPFy53HTy
+         eMTzEo4XM6i88Jzc8u/UFr84vZVdkFVuUyZuGf1JY96cN+ZQFHGVNaZ9rC5XzNlRY6+k
+         NiHFzPD+L2QJ1ZABC5mphPfwMGaUgHuY8fZsTEYccCj0agoIukccOIcbbKyo1hS55+bS
+         wU9AUR3I5HFZUspGzpEuX9+bRZsJJehSQpLyzF5h9o4BPC+2ZOo0BGwPpqErZJJ1q+o+
+         hwww==
+X-Forwarded-Encrypted: i=1; AJvYcCW2KehZJ81zbKo440oZVfRPPsWMvH5XpRFFO37yJX1MYFs56CrC8OwdD1kP2WDF03HaOqxo2jk8@vger.kernel.org, AJvYcCXYVlE/sY+Hhnz/6cPlaOf7QOoFqramQYjTor8Xl+biDlKieP9nYRxigGHzaUNIWO/1YdJ8nuXZP+a0+qg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzDR/oWkCcE4n/LspK73ZsVGQuQhYuoHRQAcyBuxITZmpA0V5KN
+	5OYY7hVdhulJYmklbpuv6MMQbCOXpZq2ohin9sQkhm9wkyYcT+2y
+X-Gm-Gg: ASbGncvHtSznJ+1B1UTlPu3tGAexXsOAkM9Kjt48gJLc7SXQcDrYkPdEBS/NTBPg+nM
+	jSr87IdvVmbS55rSTn0bWR+QrxufmZJvyCHTxmkdR6yram9piaXhfGYFnxxXQbi/n9L6eL3EL0J
+	2KKzFVWayXuUXrcGvbi/BuoSj2Y/axVtOVMW8xrNAAHcdS7fpwTCOYps51Hx/MIUk6hCvL7mjRv
+	8s5Kb/iCGBJWcmakWJ2kUpZ4+UvG7KGetRqc6qMULtfPINxeze+r5gQ08gKIBuMlimtQGU5vI/L
+	aujw+UVoqcT5kPdrsekJt8s9e2YrWKvWaaW7s7/3LdKFkpAEbIn+jaZGLT3mvtw7JisyxWQz
+X-Google-Smtp-Source: AGHT+IG5yymPElohyIpCvRwLjjd8mcIsrLt6BLzCEe2+J4N5vd5JyR9PUE7RxV9on84tC2TCWuScEQ==
+X-Received: by 2002:a17:903:8d0:b0:224:24d3:60fb with SMTP id d9443c01a7336-229765bdf6cmr148765415ad.10.1743843484445;
+        Sat, 05 Apr 2025 01:58:04 -0700 (PDT)
+Received: from vaxr-BM6660-BM6360 ([2001:288:7001:2703:fb4b:850a:b504:c8c8])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-229785aea7fsm45347855ad.2.2025.04.05.01.58.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 05 Apr 2025 01:58:03 -0700 (PDT)
+Date: Sat, 5 Apr 2025 16:57:58 +0800
+From: I Hsin Cheng <richard120310@gmail.com>
+To: Florian Westphal <fw@strlen.de>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
+	linux-kernel-mentees@lists.linux.dev
+Subject: Re: [RFC PATCH] net: sched: em_text: Replace strncpy() with
+ strscpy_pad()
+Message-ID: <Z_Dwlvrvwzq0ZQv7@vaxr-BM6660-BM6360>
+References: <20250327143733.187438-1-richard120310@gmail.com>
+ <20250327162325.GA30844@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC v3 iproute2-next 2/2] iplink_bridge: Add
- mdb_offload_fail_notification
-To: Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org
-Cc: Ido Schimmel <idosch@nvidia.com>, bridge@lists.linux-foundation.org,
- Joseph Huang <joseph.huang.2024@gmail.com>
-References: <20250404215328.1843239-1-Joseph.Huang@garmin.com>
- <20250404215328.1843239-3-Joseph.Huang@garmin.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250404215328.1843239-3-Joseph.Huang@garmin.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250327162325.GA30844@breakpoint.cc>
 
-On 4/5/25 00:53, Joseph Huang wrote:
-> Add mdb_offload_fail_notification option support.
+On Thu, Mar 27, 2025 at 05:23:25PM +0100, Florian Westphal wrote:
+> I Hsin Cheng <richard120310@gmail.com> wrote:
+> > The content within "conf.algo" should be a valid NULL-terminated string,
+> > however "strncpy()" doesn't guarantee that. Use strscpy_pad() to replace
+> > it to make sure "conf.algo" is NULL-terminated. ( trailing NULL-padding
+> > if source buffer is shorter. )
+> >
+> > Link: https://github.com/KSPP/linux/issues/90
+> > Signed-off-by: I Hsin Cheng <richard120310@gmail.com>
+> > ---
+> >  net/sched/em_text.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/net/sched/em_text.c b/net/sched/em_text.c
+> > index 420c66203b17..c78b82931dc4 100644
+> > --- a/net/sched/em_text.c
+> > +++ b/net/sched/em_text.c
+> > @@ -108,7 +108,7 @@ static int em_text_dump(struct sk_buff *skb, struct tcf_ematch *m)
+> >  	struct text_match *tm = EM_TEXT_PRIV(m);
+> >  	struct tcf_em_text conf;
+> >  
+> > -	strncpy(conf.algo, tm->config->ops->name, sizeof(conf.algo) - 1);
+> > +	strscpy_pad(conf.algo, tm->config->ops->name, sizeof(conf.algo) - 1);
 > 
-> Signed-off-by: Joseph Huang <Joseph.Huang@garmin.com>
-> ---
->  ip/iplink_bridge.c    | 19 +++++++++++++++++++
->  man/man8/ip-link.8.in |  7 +++++++
->  2 files changed, 26 insertions(+)
+> Please drop the 3rd argument and then resend with a fixes tag:
+> Fixes: d675c989ed2d ("[PKT_SCHED]: Packet classification based on textsearch (ematch)")
 > 
+> As is, the last byte remains uninitialised.
 
-Sorry, but a few more things I just noticed below,
+Hello Florian,
 
-> diff --git a/ip/iplink_bridge.c b/ip/iplink_bridge.c
-> index 1fe89551..c730aa68 100644
-> --- a/ip/iplink_bridge.c
-> +++ b/ip/iplink_bridge.c
-> @@ -62,6 +62,7 @@ static void print_explain(FILE *f)
->  		"		  [ nf_call_iptables NF_CALL_IPTABLES ]\n"
->  		"		  [ nf_call_ip6tables NF_CALL_IP6TABLES ]\n"
->  		"		  [ nf_call_arptables NF_CALL_ARPTABLES ]\n"
-> +		"		  [ mdb_offload_fail_notification MDB_OFFLOAD_FAIL_NOTIFICATION ]\n"
->  		"\n"
->  		"Where: VLAN_PROTOCOL := { 802.1Q | 802.1ad }\n"
->  	);
-> @@ -413,6 +414,18 @@ static int bridge_parse_opt(struct link_util *lu, int argc, char **argv,
->  
->  			addattr8(n, 1024, IFLA_BR_NF_CALL_ARPTABLES,
->  				 nf_call_arpt);
-> +		} else if (strcmp(*argv, "mdb_offload_fail_notification") == 0) {
-> +			__u32 mofn_bit = 1 << BR_BOOLOPT_MDB_OFFLOAD_FAIL_NOTIFICATION;
-> +			__u8 mofn;
-> +
-> +			NEXT_ARG();
-> +			if (get_u8(&mofn, *argv, 0))
-> +				invarg("invalid mdb_offload_fail_notification", *argv);
-> +			bm.optmask |= 1 << BR_BOOLOPT_MDB_OFFLOAD_FAIL_NOTIFICATION;
-> +			if (mofn)
-> +				bm.optval |= mofn_bit;
-> +			else
-> +				bm.optval &= ~mofn_bit;
->  		} else if (matches(*argv, "help") == 0) {
->  			explain();
->  			return -1;
-> @@ -623,6 +636,7 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
->  		__u32 mcvl_bit = 1 << BR_BOOLOPT_MCAST_VLAN_SNOOPING;
->  		__u32 no_ll_learn_bit = 1 << BR_BOOLOPT_NO_LL_LEARN;
->  		__u32 mst_bit = 1 << BR_BOOLOPT_MST_ENABLE;
-> +		__u32 mofn_bit = 1 << BR_BOOLOPT_MDB_OFFLOAD_FAIL_NOTIFICATION;
+Thanks for your kindly review!
+Sorry for the late reply, I was on a short school vacation.
 
-Please keep this arranged in reverse xmas tree, i.e. longest to shortest line.
+> Please drop the 3rd argument and then resend with a fixes tag:
+> Fixes: d675c989ed2d ("[PKT_SCHED]: Packet classification based on textsearch (ematch)")
 
->  		struct br_boolopt_multi *bm;
->  
->  		bm = RTA_DATA(tb[IFLA_BR_MULTI_BOOLOPT]);
-> @@ -641,6 +655,11 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
->  				   "mst_enabled",
->  				   "mst_enabled %u ",
->  				   !!(bm->optval & mst_bit));
-> +		if (bm->optmask & mofn_bit)
-> +			print_uint(PRINT_ANY,
-> +				   "mdb_offload_fail_notification",
-> +				   "mdb_offload_fail_notification %u ",
-> +				   !!(bm->optval & mofn_bit));
->  	}
->  
->  	if (tb[IFLA_BR_MCAST_ROUTER])
-> diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
-> index efb62481..3a7d1045 100644
-> --- a/man/man8/ip-link.8.in
-> +++ b/man/man8/ip-link.8.in
-> @@ -1753,6 +1753,8 @@ the following additional arguments are supported:
->  .BI nf_call_ip6tables " NF_CALL_IP6TABLES "
->  ] [
->  .BI nf_call_arptables " NF_CALL_ARPTABLES "
-> +] [
-> +.BI mdb_offload_fail_notification " MDB_OFFLOAD_FAIL_NOTIFICATION "
->  ]
->  
->  .in +8
-> @@ -1977,6 +1979,11 @@ or disable
->  .RI ( NF_CALL_ARPTABLES " == 0) "
->  arptables hooks on the bridge.
->  
-> +.BI mdb_offload_fail_notification " MDB_OFFLOAD_FAIL_NOTIFICATION "
-> +- turn mdb offload fail notification on
-> +.RI ( MDB_OFFLOAD_FAIL_NOTIFICATION " > 0) "
-> +or off
-> +.RI ( MDB_OFFLOAD_FAIL_NOTIFICATION " == 0). "
+Sure, I'll do that and send v2.
 
+> As is, the last byte remains uninitialised.
+I see, may I ask the reason for the last byte to remain uninit? It's not
+going to be used so we can save the time to initialize it?
 
-Please add also what is the default value.
-Other than that the patches look good and you can drop the RFC.
+And why does dropping 3rd argument can make the last byte uninit? I
+think "strscpy_pad()" always makes the trailing bytes in destination
+buffer to be NULL, so it'll always be init, shouldn't we use "strscpy()"
+instread ?
 
-Thanks,
- Nik
+Let me know if I misunderstand it, thanks!
+
+Best regards,
+I Hsin Cheng
+
 
