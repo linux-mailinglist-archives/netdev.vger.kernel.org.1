@@ -1,243 +1,410 @@
-Return-Path: <netdev+bounces-179470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA06CA7CEBF
-	for <lists+netdev@lfdr.de>; Sun,  6 Apr 2025 17:38:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4B90A7CEDA
+	for <lists+netdev@lfdr.de>; Sun,  6 Apr 2025 18:01:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EF83188CA1B
-	for <lists+netdev@lfdr.de>; Sun,  6 Apr 2025 15:38:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C6AA3AFB4A
+	for <lists+netdev@lfdr.de>; Sun,  6 Apr 2025 16:01:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A55A8220686;
-	Sun,  6 Apr 2025 15:37:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95EDE22154E;
+	Sun,  6 Apr 2025 16:01:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Tq6xkQr+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nu0S56rn"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2067.outbound.protection.outlook.com [40.107.223.67])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED90F4A24
-	for <netdev@vger.kernel.org>; Sun,  6 Apr 2025 15:37:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743953879; cv=fail; b=g+m5b9i1zhWR5Xc/dARjmQSaUL/dsAv4Z6RTfGKUPUp0p4DE/dzmSxy1irb3GvdroN59rW3LML9YinhbnS3ZBY5y4X86q5cL6Y26SmoiC2XwqlzCzDkHtwKApAsSjhZHGRwF3AcbojvHOZQAYjvsl8APsbyeJH67vzcdlP5YojA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743953879; c=relaxed/simple;
-	bh=FY/pCx36jxv25Me6/xybk+ESRrJmHo/9QPpxadd0G2w=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=XtJSqdgjBoC8feTSRQgaDKAY9D/2NdA3TAyzHJsbEtfyE9ioZCz0fuM4W21iy/m3N90JIbbQjQt8PATzUaZPQ6mBFZuujhretmfHsgu0lV9QoC/KqCKpMMD8bS2A34IrdAjNxGgSFj+F6E2dHUo+qtQKBALc0FOE7/gJuYDevNI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Tq6xkQr+; arc=fail smtp.client-ip=40.107.223.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=k7mBny+n0rudseSteNZR0nTmf9hDjP1jcccjzgAzr9cQogtdvC9pzUSSgmIZA98JEQ0LAw8OecAt5GeDv6SQ9EXv4hu2qpbuEdL94T6XFJUAgOl72X26dzCaz5BkqkmkqgZLQldBiTeTQdwmi+HG6XhjVA2P8HZO5cDBSukRxR5YNFESg7Ci+F9CzOiiTlAehBjkdgyyq8awhNGx9x/dlqc+HGbhurECVHuqjO3mf5jU5V0xQCPO7iS/MDasFjLJ9Frw23OGVGCBKKOHHPHuV2tYd1zFWHFwZxhphAlGkbFdEsWfI2fkm0p7nUA1NQxd5eZykmdMCFYKM4yxD7NytQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RVmss72mVOcbrAi96ezm1eLfZSLqY4YjjeOgh8lkE4g=;
- b=v+Gma9bQed8IiYDqyULcUzNHI+vF1Yle62sTZCVynH+vxppevd/uyzQmSVPRnfFc0Dt1aEK4MiwdgEh5KMvnladYf4QAgU4/QZZLrdsAEo3/2x3kCY5yWZyfjERrcjPWYvEUas//gcTC2tQ6m6B8LgV7U9GocU8/ZBQ9/7ywxTROH9wfwQi25h+DvmDqCODLilBIJ2NsLA4Rr87ong3xKSkk+AlYnEMup627SGzEdJM7N3FWP7YnN16+ILO09KG2li8eWhZEBSz1Oy2ONPkvvrCWY50LA0eTYNz/r3WxopXUYpdwQZEqvcO1eNzu/iWjWGjIms4ENGnu5ZjCBA0rwg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RVmss72mVOcbrAi96ezm1eLfZSLqY4YjjeOgh8lkE4g=;
- b=Tq6xkQr+W3PDJQeueZ/KZgWAWOat7jyccGwS6msGVoA1BblsA66NlA16+ltUvI3mmTk5WDWA+ufxyC9z2hO7GGkNodrejkZIPP6jv1NpkmG4RuxL0ciOwi155KlldkK5FGGAbwLQYFZQRmJ9wO2IRU5tlSC5BjzCFuwSfY2/aN0luqmPDXNM8S9QBT1E3cRw+7SRkoZHr7HlF42YP0+ILlpst18pcimUB3TU3yfStYqr8nts/HrHHQM7IM2J40pZMoG7PdrLXeUIIfzmrC+y+MLG073K/bKxx37iwQSgeqNcsUoK02jSlhT0iCTW6srUXpepyGgoQN1ZMAA/pW+5NA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SN6PR12MB2847.namprd12.prod.outlook.com (2603:10b6:805:76::10)
- by PH7PR12MB5617.namprd12.prod.outlook.com (2603:10b6:510:133::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.29; Sun, 6 Apr
- 2025 15:37:54 +0000
-Received: from SN6PR12MB2847.namprd12.prod.outlook.com
- ([fe80::1b1e:e01d:667:9d6b]) by SN6PR12MB2847.namprd12.prod.outlook.com
- ([fe80::1b1e:e01d:667:9d6b%2]) with mapi id 15.20.8583.043; Sun, 6 Apr 2025
- 15:37:54 +0000
-Message-ID: <615fdc6d-0c8b-4f09-a03e-996410bd0a65@nvidia.com>
-Date: Sun, 6 Apr 2025 18:37:49 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 net 2/3] net: Fix dev_net(dev) race in
- unregister_netdevice_notifier_dev_net().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
- kuba@kernel.org, kuni1840@gmail.com, netdev@vger.kernel.org,
- pabeni@redhat.com
-References: <6ce063ee-85cc-4930-839a-36b3155c9820@nvidia.com>
- <20250401220735.94909-1-kuniyu@amazon.com>
-Content-Language: en-US
-From: Yael Chemla <ychemla@nvidia.com>
-In-Reply-To: <20250401220735.94909-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LO4P123CA0506.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:272::19) To SN6PR12MB2847.namprd12.prod.outlook.com
- (2603:10b6:805:76::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ED1C14A82;
+	Sun,  6 Apr 2025 16:01:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1743955284; cv=none; b=N8zW9IkzSBO5DlBpaiKTuWAvnzhS3rEF3dIrHn0f2uY+wvx5/bBlNMB53pZ10schVzEFP+UAL10wiu0XVwsA8Bd/OiUHYtqMPoVnDdh2w7wISdUik7txlQIwad7DoBG+kb0z+d/X+3icXLtUiwGTGtZQ3ZTFDJhEFuaGy4ZDoQo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1743955284; c=relaxed/simple;
+	bh=xiYT3OXSwrXnf48Kqo+AeUKLe4LHpkaxA4SGgwPbfk4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=penBVpV9AmIOq3Q2UE/JTSyla2J9jrzS6Q/zpR/7x69CsiILryKfGNe4OxlyhpctSExEl4Me738ep9gT0YRliV7E3KYXBtnrlJoOaZ3nkMtI+86ovtZNbnKUyGpOgwyPqmCrOkDbROfEIKhV+4qIvweM3pCbm0F1QUq7RDHYPlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nu0S56rn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32215C4CEE3;
+	Sun,  6 Apr 2025 16:01:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1743955283;
+	bh=xiYT3OXSwrXnf48Kqo+AeUKLe4LHpkaxA4SGgwPbfk4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nu0S56rnZGLVOf5sZzzAgHErmGBZT2nk1Mm6ebz9+qcFK9VLpELK9y799JB9UvAES
+	 Y46/AcM32/K48BBaEPK/htz4p4rCoX8tvuGt48J+DVSxdzU+yfh9HPT9xCpBEdh4ES
+	 M9mN8uDJ6i16NTFmA5Htwd1EYhJk0wbOHAWHpL4r19clnsyiRDlGnFMEr988ldQolG
+	 y+EQNvgn9sXsY1F3VaU3rX/chASZ9ay9vIe2wIqK+W/ESxDrv6LV4J6J89DhD8AAFU
+	 kYGCMQdDPNMAZ8kyzVd0uCCLtPyTh2OI4wkHGazx8iykI/76pP6K7Ex9cC31AuM7N/
+	 fD7hkehpT/MSg==
+Date: Sun, 6 Apr 2025 17:01:11 +0100
+From: Jonathan Cameron <jic23@kernel.org>
+To: Yassine Oudjana <y.oudjana@protonmail.com>
+Cc: Lars-Peter Clausen <lars@metafoo.de>, Bjorn Andersson
+ <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, Manivannan
+ Sadhasivam <manivannan.sadhasivam@linaro.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Nathan
+ Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>,
+ Alexander Sverdlin <alexander.sverdlin@gmail.com>, Sean Nyekjaer
+ <sean@geanix.com>, Javier Carrasco <javier.carrasco.cruz@gmail.com>, Matti
+ Vaittinen <mazziesaccount@gmail.com>, Antoniu Miclaus
+ <antoniu.miclaus@analog.com>, Ramona Gradinariu
+ <ramona.gradinariu@analog.com>, "Yo-Jung (Leo) Lin" <0xff07@gmail.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Neil Armstrong
+ <neil.armstrong@linaro.org>, =?UTF-8?B?QmFybmFiw6FzIEN6w6ltw6Fu?=
+ <barnabas.czeman@mainlining.org>, Danila Tikhonov <danila@jiaxyga.com>,
+ Antoni Pokusinski <apokusinski01@gmail.com>, Vasileios Amoiridis
+ <vassilisamir@gmail.com>, Petar Stoykov <pd.pstoykov@gmail.com>, shuaijie
+ wang <wangshuaijie@awinic.com>, Yasin Lee <yasin.lee.x@gmail.com>,
+ "Borislav Petkov (AMD)" <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, Tony Luck <tony.luck@intel.com>, Pawan Gupta
+ <pawan.kumar.gupta@linux.intel.com>, Ingo Molnar <mingo@kernel.org>,
+ Yassine Oudjana <yassine.oudjana@gmail.com>, linux-kernel@vger.kernel.org,
+ linux-iio@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH 1/3] net: qrtr: Turn QRTR into a bus
+Message-ID: <20250406170111.7a11437a@jic23-huawei>
+In-Reply-To: <20250406140706.812425-2-y.oudjana@protonmail.com>
+References: <20250406140706.812425-1-y.oudjana@protonmail.com>
+	<20250406140706.812425-2-y.oudjana@protonmail.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2847:EE_|PH7PR12MB5617:EE_
-X-MS-Office365-Filtering-Correlation-Id: fa805a08-466e-4a84-da2c-08dd7520ff9c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?cWhlUXppTG4wYTgwWEh0T2dDUnFadXB2RUZhdjF5dnBzNGR6ZXFtakMyam5Y?=
- =?utf-8?B?RWd6OCtLV2EveERnRE5xRjBUeHVGSzhwZjcrMlRiRFFzb3RSdk45YmYvYnNU?=
- =?utf-8?B?aFV2em9FQW5UMStPQjBsRTRxQ0U3L0hvakxEdEcyaGJ6RjQraG0yVXRNM0RL?=
- =?utf-8?B?Lzl2Ylc3VUZ6UjEzOU15djdBL2VMUkV2WkhkaDQvNkhJNC9OSEZCRCtaUWJv?=
- =?utf-8?B?MkdjZjdud1NwQ0s1aW5jd1p0aXUwVC95bnZYUDk4RkYwSFcwcWZnZlJIRHdw?=
- =?utf-8?B?TEdxZEFZcFdYK0hpM2pzcDVEYnFkVk1kWUlSbDBwazdWOUFyMm5pcERPb1ZN?=
- =?utf-8?B?ZVM5YVRPYmF4MXh3UjRpay9oUTFFT1lYVG10dnl2YUU5VHJiTVJkSi9ldVl5?=
- =?utf-8?B?Q2FsTGlGTWtqNzRUUStRb1hRR012aXBGSWI1R0lZUUR6Rm51ZWVVSlV6NXlQ?=
- =?utf-8?B?UDZTK2czZGllM1VzL2lBZzc5WUJmcktjc2s5VzA2WjNZN3gwb1QycHAyY1JC?=
- =?utf-8?B?U2lwVjJvU0ZaeEJMYWVXZHhjUytYb1pDR2dFd3NXd05PTGYrVnJNT1RITUNh?=
- =?utf-8?B?T2NOQ0lPV3ZqMFY5a1pENGw5V25wSi8zYmIyU0s2cmRJTWs0TmgwY3ZjVWpU?=
- =?utf-8?B?ZGRPdm5zUDQrWklWMjlQK0lCZGdHWmthUE9ta25qTkx2WFVHdGF0aWZiY3hw?=
- =?utf-8?B?RVF1bkFEZklZRU1jblpLZjY5SFRuMXdsUGxsaHN4QWJSYUVvSzBjRGIrT1ox?=
- =?utf-8?B?enRvdmZPSU0wVTA5NkZIVThBTUZBbHdpbFRqVCtOV2RuWW04WklyeUdva3No?=
- =?utf-8?B?Ti9EYVpRRjNHcnU1MnFhWTdyQkR2MkpmdEVGYU9tQkxibjlYRGhHVmdlcFlS?=
- =?utf-8?B?Vi9MWE01dmxFVmZRbE5TTU9YT3A5YXZOditLVVBadGZWQTUxUC91amFpU2tG?=
- =?utf-8?B?V3NxYnpMYzJuaDJ0YlZuaGRicmlJaDBIUndCWEt1M3A4bUxIZEs4MHhuVC9N?=
- =?utf-8?B?NDJRYW9HZzZNam13VUUwMUpUWWpWcDIyTFo3STBBdFF0K09md0loNTFjQk9q?=
- =?utf-8?B?a2VJV1hSVUxTck9vMGcvMitBSEVPTUZvQTlTSlNyYjJ2ZllVc1ZZVXhEZ1lI?=
- =?utf-8?B?aXJPZXkzVkc4R2RJVm1hMGtzVTZSVVpnbk9iWE42cmZQbTdybTVmdWpOZlVH?=
- =?utf-8?B?RVNya3IvRElwd21OKzBFclZyK1Erakk5Zm84R1g2RXZmM3hEYkJma2p2Z3NS?=
- =?utf-8?B?QVU3bTladUNLNGxneXRJeHFja3hpVDc0UU5GTEs2djJGNzczdVlNdkZBOWdB?=
- =?utf-8?B?WDBYMDBpdVNaM00wbjBsNXowNU03ZmFFVisxaGorenhrTkhQd2lHbTZrVE5U?=
- =?utf-8?B?TVE5S253WCtyTlRyRlRBK2RPaGsrVXZnSDBWWVZyckp1MDd1RDdXY096NTk3?=
- =?utf-8?B?Wk84czQxZDFrQXVmSnR1T3lwQnVvbDJQcjZIRmFRSDJLeG5UbVphRWZEODdn?=
- =?utf-8?B?bVVKVWlSdTVtVHhrQ3RaSDBUTU1FV0dYSnNTMmdSbDBlOWFCSEw5R2tKRmFl?=
- =?utf-8?B?NUYxNk5UWk1YbGpZUHpEb2hEcmplVUtjRUtlRFZnSURQUHdvNVNSaDNjbGlZ?=
- =?utf-8?B?bUkwcys5UTNpZTBSTWhPVkJ2bVBldVkvUHJhdWNRMWxZQjk5U1U1Z05DOFVy?=
- =?utf-8?B?Z0NTelRqVHplNnhZaERzNlRQVXFYNHk5T1RLWGcrVmNpb3U1bVU5Kzlqb1hs?=
- =?utf-8?B?T05ucVVwNFFhdnoxTE5zWDFlT24wSlNlWFduOHZ2aXZlRndURTJGc3hQSEVi?=
- =?utf-8?B?ZnkzYVpVaDJsWkdVa1FiWVg5MXlTZkhYYTJVWE9iN05mdE8yWFhVbGswbjd6?=
- =?utf-8?Q?u1vDeRfLIAJ4n?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2847.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MkNGaWIyUVROcVk4bzd4cWNXcFllL1RjNUYvNHIrSkNRYklqdXNDd3JiYWQ0?=
- =?utf-8?B?YlJiUXJ0NDNSZ2pSWVRVaUdNV2NnUUR4dmVWcG9GaXAyU3BCT0srL0FneTVm?=
- =?utf-8?B?Zng1S2g2OEhEVlU3M21pN3NudTR6WDlMT3Q5dXdqcUpFRjhUa2tJYzVNMnlM?=
- =?utf-8?B?SWV2cGF3VUgwbVg5cTRLSmJqaFZGb2FxR05OTVEzRGZZNVlEaXlBWGRXK1d5?=
- =?utf-8?B?dFdyMDZPNkd5V0RzTE1EdVlEUnR2K0k2R0tFTVBNK29UbmNtU3RRQVRVSUJU?=
- =?utf-8?B?bXJZWmMrcFk3NkRHMldlTkN2V2pITUY0SEtzR3U2YlFKaW5hUUNBajFybmM4?=
- =?utf-8?B?T01MWHh4MXRVUTJTQ0J1V2ZrRFpMOGhtUTh3UmFYcWI3VDlJVTJBQU5Pek1F?=
- =?utf-8?B?VGlsS3ltUWllSHpyQ3dEUGFSS1VoVjFNcklYYUViVlNJM3Z4LzdYQmZUQnFV?=
- =?utf-8?B?NnNyYk51QW9NRG5EcXdvdytqVk55cmhQK3JYN0lvdVNjRHlRN09kc1dqM2pY?=
- =?utf-8?B?QnJhWWlPKzUzNHFSeTV2RmFnZzh2bjZwRnZLbWVGamxodlhjZUV3OTNhOURX?=
- =?utf-8?B?ci85WWxKcGhYVjBSb3JZTVdlM3hXTGRIZ1huK2NrU1ZHRzhNcW13MkhRNVNF?=
- =?utf-8?B?aUQvc0I3Zk9EYk02c1UyNkZaYjZpTlQyRkNWMi8zUXhjSFpBYkJDSVZFeHNj?=
- =?utf-8?B?WXpsTjNyUnRYZi8zK2VmNExRZTd5bWdPVW4xYmo2VnJ1RVh2U0JCUklyTk0r?=
- =?utf-8?B?ZjlHNTBOeHhTaTV6YUt6RWdxSzJpS3BCUEF5YTdmaGpkUEtqQjR0ek8vNjUw?=
- =?utf-8?B?MGFQeDgvYWMyM0pza3dNU2ttOFc1WXJkVTIrNVhYZTdhMmN0Vm9wdGN2elNn?=
- =?utf-8?B?eVlvQXdJQjdFSjcrOUIyMHRNc0YxOHpRa3Q4K25kUFJTaXorQ2VZTHpQU0lB?=
- =?utf-8?B?NzZGZFYzdjBQV0tVMGdndldISHVKelk0QStDbmRNM3l2dnpOZGNyai9Mdno0?=
- =?utf-8?B?d202WUtMejJaUDdNUGFUQjVCdlpGaUptc0Exa2xlOGpkTDEzV3JVMTgydmhm?=
- =?utf-8?B?WWZUMFp0SXlpZWNOOEEzS2hRUTBEYnNMdklQdlkrM3RaeWxZenc5bEg5KzFn?=
- =?utf-8?B?RWE5VEVtTXJZL1JOVEdmdjJDUUp6MFdrejFQcHR5dGNEUW16bWl6QU5rTXk4?=
- =?utf-8?B?cG5TcVpkZnIwdnJHY0EzU1JJWEtEb29RUS9aLzBkQ0t2M0c4OWdrS1NmMEhl?=
- =?utf-8?B?NVNUUHVsWkxnMzhiZ0ZudEFGQktpYXpuYzhySmQyb1pLS0NQMUFBT1F3RTR6?=
- =?utf-8?B?enVpaTg3MXV1dzFvOWVHR0JsaDJwa2pZUWJiRjRIQ3loOStyUitCd0JxNEVl?=
- =?utf-8?B?WDZLa1hGcUhVY0lFRGcxZkdoYm5iS3pzYkhlL2w5ck45cVI5VnNvbFg3RU1j?=
- =?utf-8?B?N29KaTdocGpuMTZoZzloWUQvWStEM1F5QTVibVM4bmVzanZmaElZbm9zaTFX?=
- =?utf-8?B?bzFNeThJRytVaFR2ZmlrQXpCZnhYcFBUbUR3ckFRMEVZWTFBakJZcStLSTdM?=
- =?utf-8?B?WnpHNjEyZ3VDZlFUOVpaTzYzTmpQT2NKbHFZck55ZC8xR1VnaXJ2QUJDekNr?=
- =?utf-8?B?cFZHZUxubXlMUFBhYTh0R1VXaXBvL2JtSXE4MVVmeUZFZzlqcm9TTlZXeklx?=
- =?utf-8?B?QkZvemZIVEQ2Y0ZUcHlQTm50Ny9aSlQyUzg0UkMzM1ZOd1p6b3RMMVE0OExu?=
- =?utf-8?B?aGJnKzJ2am9YS0dVMXFWS0RyTkpicWRjWXZlQXBYL0g0aWF3MWRSMHhveWFV?=
- =?utf-8?B?bVRQMGlrZWNGNVp5MlpQL2NWT1J3V0pJcUhoOW9wKzI2WmNxc3N2Sjk0UDJJ?=
- =?utf-8?B?RE95dTBJS014dkFKTndtVWwrenVGSXdvTlB4V1hVbHhYV0ZXOTVVMDBkWU84?=
- =?utf-8?B?YWhWL3B4cjdTc2VEUXBERlIycjB2ZlFNSXZUazgySExaK3R4czhjYlozTytI?=
- =?utf-8?B?WGJMNzFuZzBiZis4dkhqQ1lndkwzMzRzUEdQWUpzYW1XbnRiME96ODJiOTJV?=
- =?utf-8?B?RkdMME1ZL3o2NEVXMTdlSTZsSm1NeUZpOWJrL2djK2JWTjlxcFRTT2p4ZkRI?=
- =?utf-8?Q?8KfkN996u/nFKsNcl+PwXxL12?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fa805a08-466e-4a84-da2c-08dd7520ff9c
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2847.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Apr 2025 15:37:54.6413
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IiBxRDgfkw7YnsqEOFw8gCLaxDwh/IlxPPOzgaKXx9KRxEA/9filZ323rDNNR67NZONTn6cS9u5HKWeIW1xWKA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5617
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 02/04/2025 0:58, Kuniyuki Iwashima wrote:
-> Hi Yael,
-> 
-> Thanks for testing!
-> 
-> From: Yael Chemla <ychemla@nvidia.com>
-> Date: Tue, 1 Apr 2025 23:49:42 +0300
->> Hi Kuniyuki,
->> Sorry for the delay (I was OOO). I tested your patch, and while the race
->> occurs much less frequently, it still happens—see the warnings and call
->> traces below.
->> Additionally, in some cases, the test which reproduce the race hang.
->> Debugging shows that we're stuck in an endless loop inside
->> rtnl_net_dev_lock because the passive refcount is already zero, causing
->> net_passive_inc_not_zero to return false, thus it go to "again" and this
->> repeats without ending.
->> I suspect, as you mentioned before, that in such cases, the passive
->> refcount was decreased from cleanup_net.
-> 
-> This sounds weird.
-> 
-> We assumed vif will be moved to init_net, then the infinite loop
-> should never happen.
-> 
-> So the assumption was wrong and vif belonged to the dead netns and
-> was not moved to init_net ... ??
-> 
-> Even if dev_change_net_namespace() fails, it leads to BUG().
-> 
+On Sun, 06 Apr 2025 14:07:43 +0000
+Yassine Oudjana <y.oudjana@protonmail.com> wrote:
 
-Hi Kuniyuki,
-In failure scenarios, we observe that cleanup_net is invoked, followed
-by net_passive_dec, which reduces the passive refcount to zero. These
-are called before the call to unregister_netdevice_notifier_dev_net.
-
-During the test, dev_change_net_namespace is called once, but it
-operates on different net_device poiner than the one passed to final
-call of unregister_netdevice_notifier_dev_net, a call which enter
-infinite loop (with net->passive=0 and net->ns.count=0, inside
-rtnl_net_dev_lock, as explained in previous mail).
-
-Do you need additional debug information, perhaps specific details
-regarding reassigning the netns to init_net? Please let me know how I
-can help further.
-
->>
->>
->> warnings and call traces:
->>
->> refcount_t: addition on 0; use-after-free.
+> Implement a QRTR bus to allow for creating drivers for individual QRTR
+> services. With this in place, devices are dynamically registered for QRTR
+> services as they become available, and drivers for these devices are
+> matched using service and instance IDs.
 > 
-> I guess this is from the old log or the test patch was not applied
-> because _inc_not_zero() will trigger REFCOUNT_ADD_NOT_ZERO_OVF and
-> then the message will be
+> In smd.c, replace all current occurences of qdev with qsdev in order to
+> distinguish between the newly added QRTR device which represents a QRTR
+> service with the existing QRTR SMD device which represents the endpoint
+> through which services are provided.
 > 
->   refcount_t: saturated; leaking memory
-> 
-> , see __refcount_add_not_zero() and refcount_warn_saturate().
-> 
+> Signed-off-by: Yassine Oudjana <y.oudjana@protonmail.com>
+Hi Yassine
 
-you are right it's a mistake, i was unable to reproduce another failure
-with call trace info. Test either succeeds or hang (infinite loop).
+Just took a quick look through.
 
-> 
->> WARNING: CPU: 4 PID: 27219 at lib/refcount.c:25 refcount_warn_saturate
->> (/usr/work/linux/lib/refcount.c:25 (discriminator 1))
+It might make more sense to do this with an auxiliary_bus rather
+than defining a new bus.
 
+I'd also split out the renames as a precursor patch.
+
+Various other comments inline.
+
+Jonathan
+
+> diff --git a/net/qrtr/af_qrtr.c b/net/qrtr/af_qrtr.c
+> index 00c51cf693f3..e11682fd7960 100644
+> --- a/net/qrtr/af_qrtr.c
+> +++ b/net/qrtr/af_qrtr.c
+> @@ -435,6 +435,7 @@ static void qrtr_node_assign(struct qrtr_node *node, unsigned int nid)
+>  int qrtr_endpoint_post(struct qrtr_endpoint *ep, const void *data, size_t len)
+>  {
+>  	struct qrtr_node *node = ep->node;
+> +	const struct qrtr_ctrl_pkt *pkt;
+>  	const struct qrtr_hdr_v1 *v1;
+>  	const struct qrtr_hdr_v2 *v2;
+>  	struct qrtr_sock *ipc;
+> @@ -443,6 +444,7 @@ int qrtr_endpoint_post(struct qrtr_endpoint *ep, const void *data, size_t len)
+>  	size_t size;
+>  	unsigned int ver;
+>  	size_t hdrlen;
+> +	int ret = 0;
+>  
+>  	if (len == 0 || len & 3)
+>  		return -EINVAL;
+> @@ -516,12 +518,24 @@ int qrtr_endpoint_post(struct qrtr_endpoint *ep, const void *data, size_t len)
+>  
+>  	qrtr_node_assign(node, cb->src_node);
+>  
+> +	pkt = data + hdrlen;
+> +
+>  	if (cb->type == QRTR_TYPE_NEW_SERVER) {
+>  		/* Remote node endpoint can bridge other distant nodes */
+> -		const struct qrtr_ctrl_pkt *pkt;
+> -
+> -		pkt = data + hdrlen;
+>  		qrtr_node_assign(node, le32_to_cpu(pkt->server.node));
+> +
+> +		/* Create a QRTR device */
+> +		ret = ep->add_device(ep, le32_to_cpu(pkt->server.node),
+> +					       le32_to_cpu(pkt->server.port),
+> +					       le32_to_cpu(pkt->server.service),
+> +					       le32_to_cpu(pkt->server.instance));
+> +		if (ret)
+> +			goto err;
+> +	} else if (cb->type == QRTR_TYPE_DEL_SERVER) {
+> +		/* Remove QRTR device corresponding to service */
+> +		ret = ep->del_device(ep, le32_to_cpu(pkt->server.port));
+> +		if (ret)
+> +			goto err;
+>  	}
+>  
+>  	if (cb->type == QRTR_TYPE_RESUME_TX) {
+> @@ -543,8 +557,7 @@ int qrtr_endpoint_post(struct qrtr_endpoint *ep, const void *data, size_t len)
+>  
+>  err:
+>  	kfree_skb(skb);
+> -	return -EINVAL;
+> -
+> +	return ret ? ret : -EINVAL;
+How do we get here with non error value given we couldn't before?
+
+
+>  }
+>  EXPORT_SYMBOL_GPL(qrtr_endpoint_post);
+>  
+
+> diff --git a/net/qrtr/smd.c b/net/qrtr/smd.c
+> index c91bf030fbc7..fd5ad6a8d1c3 100644
+> --- a/net/qrtr/smd.c
+> +++ b/net/qrtr/smd.c
+> @@ -7,6 +7,7 @@
+
+> +
+> +static int qcom_smd_qrtr_uevent(const struct device *dev, struct kobj_uevent_env *env)
+> +{
+> +	const struct qrtr_device *qdev = to_qrtr_device(dev);
+> +
+> +	return add_uevent_var(env, "MODALIAS=%s%x:%x", QRTR_MODULE_PREFIX, qdev->service,
+> +			      qdev->instance);
+> +}
+
+
+> +void qrtr_driver_unregister(struct qrtr_driver *drv)
+> +{
+> +	driver_unregister(&drv->driver);
+> +}
+> +EXPORT_SYMBOL_GPL(qrtr_driver_unregister);
+
+Given this is a 'new thing' maybe namespace it from the start?
+EXPORT_SYMBOL_NS_GPL();
+
+
+> +
+> +static int qcom_smd_qrtr_match_device_by_port(struct device *dev, const void *data)
+> +{
+> +	struct qrtr_device *qdev = to_qrtr_device(dev);
+> +	unsigned int port = *(unsigned int *)data;
+	unsinged int *port = data;
+	
+	return qdev->port == *port;
+
+> +
+> +	return qdev->port == port;
+> +}
+> +
+> +static void qcom_smd_qrtr_add_device_worker(struct work_struct *work)
+> +{
+> +	struct qrtr_new_server *new_server = container_of(work, struct qrtr_new_server, work);
+> +	struct qrtr_smd_dev *qsdev = new_server->parent;
+> +	struct qrtr_device *qdev;
+> +	int ret;
+> +
+> +	qdev = kzalloc(sizeof(*qdev), GFP_KERNEL);
+> +	if (!qdev)
+> +		return;
+> +
+Maybe 
+	*qdev = (struct qrtr_device *) {
+	};
+and free new_server after all of these are filled in.
+	
+> +	qdev->node = new_server->node;
+> +	qdev->port = new_server->port;
+> +	qdev->service = new_server->service;
+> +	qdev->instance = new_server->instance;
+> +
+> +	devm_kfree(qsdev->dev, new_server);
+
+As below.
+
+> +
+> +	dev_set_name(&qdev->dev, "%d-%d", qdev->node, qdev->port);
+> +
+> +	qdev->dev.bus = &qrtr_bus;
+> +	qdev->dev.parent = qsdev->dev;
+> +	qdev->dev.release = qcom_smd_qrtr_dev_release;
+> +	qdev->dev.driver = NULL;
+
+it's kzalloc'd so no need to set this.
+
+> +
+> +	ret = device_register(&qdev->dev);
+> +	if (ret) {
+> +		dev_err(qsdev->dev, "Failed to register QRTR device: %pe\n", ERR_PTR(ret));
+> +		put_device(&qdev->dev);
+> +	}
+> +}
+> +
+> +static void qcom_smd_qrtr_del_device_worker(struct work_struct *work)
+> +{
+> +	struct qrtr_del_server *del_server = container_of(work, struct qrtr_del_server, work);
+> +	struct qrtr_smd_dev *qsdev = del_server->parent;
+> +	struct device *dev = device_find_child(qsdev->dev, &del_server->port,
+> +					       qcom_smd_qrtr_match_device_by_port);
+> +
+> +	devm_kfree(qsdev->dev, del_server);
+If we are always going to free what was alocated in qcom_smd_qrtr_del_device()
+why use devm at all?  
+> +
+> +	if (dev)
+> +		device_unregister(dev);
+If this doesn't match anything I'm guessing it's a bug?   So maybe an error message?
+
+> +}
+> +
+> +static int qcom_smd_qrtr_add_device(struct qrtr_endpoint *parent, unsigned int node,
+> +				    unsigned int port, u16 service, u16 instance)
+> +{
+> +	struct qrtr_smd_dev *qsdev = container_of(parent, struct qrtr_smd_dev, ep);
+> +	struct qrtr_new_server *new_server;
+> +
+> +	new_server = devm_kzalloc(qsdev->dev, sizeof(struct qrtr_new_server), GFP_KERNEL);
+
+As below. sizeof(*new_server)
+
+> +	if (!new_server)
+> +		return -ENOMEM;
+> +
+	*new_server = (struct qtr_new_server) {
+		.parent = qsdev,
+		.ndoe = node,
+...
+	};
+
+perhaps a tiny bit easier to read?
+
+> +	new_server->parent = qsdev;
+> +	new_server->node = node;
+> +	new_server->port = port;
+> +	new_server->service = service;
+> +	new_server->instance = instance;
+> +
+> +	INIT_WORK(&new_server->work, qcom_smd_qrtr_add_device_worker);
+> +	schedule_work(&new_server->work);
+> +
+> +	return 0;
+> +}
+> +
+> +static int qcom_smd_qrtr_del_device(struct qrtr_endpoint *parent, unsigned int port)
+> +{
+> +	struct qrtr_smd_dev *qsdev = container_of(parent, struct qrtr_smd_dev, ep);
+> +	struct qrtr_del_server *del_server;
+> +
+> +	del_server = devm_kzalloc(qsdev->dev, sizeof(struct qrtr_del_server), GFP_KERNEL);
+
+sizeof(*del_server)
+preferred as then no one has to check types match.
+
+> +	if (!del_server)
+> +		return -ENOMEM;
+> +
+> +	del_server->parent = qsdev;
+> +	del_server->port = port;
+> +
+> +	INIT_WORK(&del_server->work, qcom_smd_qrtr_del_device_worker);
+> +	schedule_work(&del_server->work);
+> +
+> +	return 0;
+> +}
+> +
+> +static int qcom_smd_qrtr_device_unregister(struct device *dev, void *data)
+> +{
+> +	device_unregister(dev);
+
+One option that may simplify this is to do the device_unregister() handling
+a devm_action_or_reset() handler that is using the parent device as it's dev
+but unregistering the children.  That way the unregister is called in the
+reverse order of setup and you only register a handler for those devices
+registered (rather walking children).  I did this in the CXL pmu driver
+for instance.
+
+> +
+> +	return 0;
+> +}
+> +
+
+> @@ -82,9 +276,11 @@ static int qcom_smd_qrtr_probe(struct rpmsg_device *rpdev)
+>  
+>  static void qcom_smd_qrtr_remove(struct rpmsg_device *rpdev)
+>  {
+> -	struct qrtr_smd_dev *qdev = dev_get_drvdata(&rpdev->dev);
+> +	struct qrtr_smd_dev *qsdev = dev_get_drvdata(&rpdev->dev);
+
+May be worth doing the rename in a precursor patch to simplify a little what is
+in this one.
+
+> +
+> +	device_for_each_child(qsdev->dev, NULL, qcom_smd_qrtr_device_unregister);
+>  
+> -	qrtr_endpoint_unregister(&qdev->ep);
+> +	qrtr_endpoint_unregister(&qsdev->ep);
+>  
+>  	dev_set_drvdata(&rpdev->dev, NULL);
+>  }
+> @@ -104,7 +300,27 @@ static struct rpmsg_driver qcom_smd_qrtr_driver = {
+>  	},
+>  };
+>  
+> -module_rpmsg_driver(qcom_smd_qrtr_driver);
+> +static int __init qcom_smd_qrtr_init(void)
+> +{
+> +	int ret;
+> +
+> +	ret = bus_register(&qrtr_bus);
+> +	if (!ret)
+> +		ret = register_rpmsg_driver(&qcom_smd_qrtr_driver);
+This style tends to extend badly. Go with more conventional errors
+out of line style.
+
+	if (ret)
+		return ret;
+
+	ret = register_rpmsg_driver(&qcom_smd_qrtr_driver);
+	if (ret) {
+		bus_unregister(&qtr_bus);
+		return ret;		
+	}
+
+	return 0;
+
+> +	else
+> +		bus_unregister(&qrtr_bus);
+> +
+> +	return ret;
+> +}
+> +
+> +static void __exit qcom_smd_qrtr_exit(void)
+> +{
+> +	bus_unregister(&qrtr_bus);
+
+Order should be the reverse of what happened in probe so swap these round.
+
+> +	unregister_rpmsg_driver(&qcom_smd_qrtr_driver);
+> +}
+> +
+> +subsys_initcall(qcom_smd_qrtr_init);
+> +module_exit(qcom_smd_qrtr_exit);
+>  
+>  MODULE_ALIAS("rpmsg:IPCRTR");
+>  MODULE_DESCRIPTION("Qualcomm IPC-Router SMD interface driver");
+>
 
