@@ -1,165 +1,196 @@
-Return-Path: <netdev+bounces-179450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBC8CA7CC7A
-	for <lists+netdev@lfdr.de>; Sun,  6 Apr 2025 03:37:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90E0FA7CC7E
+	for <lists+netdev@lfdr.de>; Sun,  6 Apr 2025 03:44:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3636E3B5010
-	for <lists+netdev@lfdr.de>; Sun,  6 Apr 2025 01:36:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35F2F3B545B
+	for <lists+netdev@lfdr.de>; Sun,  6 Apr 2025 01:44:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00A3B13AA53;
-	Sun,  6 Apr 2025 01:35:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8C583595A;
+	Sun,  6 Apr 2025 01:44:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YdrAySVH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YDPbLhHO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67848136351;
-	Sun,  6 Apr 2025 01:35:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 075DC3209;
+	Sun,  6 Apr 2025 01:44:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743903351; cv=none; b=Rk7NNoH4cqh1Ig42drrbNP5RvPbumG4Uo3CP7sdCcguFkVzGPbrXKe2PWklLuukY4y3J0ojcQP5J1TLbATQqT+DhF/YKnrm7W5ZiF22bO+9JVSHp2QFFq1ZJyzXcoxqA/YddQwGAtdXg0SXKrXDK6Nmf/bvW0R8mHRN2UUCyoQI=
+	t=1743903894; cv=none; b=lmmxGDZSMYijDfFY3k3PdmKYd/wVzRe/Wg/ZZUh5VON3vBMqk8g4k79M6DS70U+u7uH54g4Sjc4lBPHk5xtSe+LQ5cYCIQt0FpAHImetDbodkP06syzXDmYrwM3gcPZCfkr60/lsCsFp2e74sLIKBBUspnARByTZtZbzUzpLuzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743903351; c=relaxed/simple;
-	bh=SRzA+4cwuLWbi3l+rrGRpJ0i0ekQpxdDzlpPMeSGvI8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X/WlOtoT8GJDNSZrkc0GZ3HZXkrgOmKkL+3KSC2nqnE0FV5eAuD2KC79xZ5ziHiOhTszkyv2ZlSnqQcKgN/ijGODTPdYJ2DGdmNMQjxqDpKxbGO2ezfIINU56x7DNGPg/7aKFM8e897Hs2a/puQFUE5LHhPSq9Rt9HBQ75pnNww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YdrAySVH; arc=none smtp.client-ip=209.85.210.171
+	s=arc-20240116; t=1743903894; c=relaxed/simple;
+	bh=8RC7QwudAyzPGBGJQN7D8ZucYJPlh3FGVV7toCCmh28=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DHWEaQrEHmmizmicacgIetK9WRb2AAQDxexn5QBJ750WPxBJBOZSA19tsKcW6QmsV3PaFTFMXTivqqlKWbU1ySUtO/GOglS89lTdK0oG65TQHxWi+JPv8Fm2GSIam8MtEhVtV3in+r97pmMfVxB/NCqNW8N9kIq4Sy+h8nQZAUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YDPbLhHO; arc=none smtp.client-ip=209.85.219.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-736b98acaadso3082245b3a.1;
-        Sat, 05 Apr 2025 18:35:50 -0700 (PDT)
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6ecf0e07947so33115896d6.0;
+        Sat, 05 Apr 2025 18:44:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1743903349; x=1744508149; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1743903892; x=1744508692; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AfV6c322LhNIzDcptdQq7JkAT5PgJ5P9MLOfezDMm4c=;
-        b=YdrAySVHJ2opsTq4DSUOh3RzauNGVleIdvb2AX20zGIxTtJJnz1n8Qxhj6/Fu+1itf
-         9rn7fwYI4ZWA9cld+QirLHThoWq1zWWvf/a4J8IGEyUsez6lDSfMSBXAKdrZHvmMquk7
-         ykiuK/xWhzvGSOkclhuQ2syQED52hUwP0vkhUp6BHXK2kNgTjEcWPdAMHokXtTKS7F9L
-         HXrgW00nqRFHPFDBcQCLxghXVwZrCKsdDQbCjHfdfIIEZtwRk6BUVHaeSWOTYed9JA03
-         Xk7PY6f0nJ8SNnY/BZhkKtW1Nl2fDdSN3vse1Is2Neq/rhrlwQQNKer/b5rlPv+Lwl/Y
-         gNTA==
+        bh=6QACGbmtqg43G4pECaXD+iso0W8xk8gg2NY7DQvW93E=;
+        b=YDPbLhHOFgSrGHo340dEKuLkyqne7ybqtjGO2Y5qjJ3hzcMBqL3hHiCNB8hiksGFQH
+         40scaSXnL7LsZdHN5NS3Ji5MmgSpUelt598DdhOr2Cole5jnF0XG/U3VH2hhd2HlPloU
+         hnR9xS1E80COf+8su4L+P3YRU9N2PhXubSHWQbndEjBLnVLXRKIrlv8hd685M3FeEDUr
+         e00u1lU2LNG2yutWsZrEaQ+1W56+N7rKumjxMrpHOfFizudNqP+ZlVN817YVKmILsOR/
+         aqAUuP8vU3zROQ+PB9ZrYVetO1YFIsZJH4Em7OoEYp5eBbHTB1/TYaym4YaJdG1fnAY3
+         WhjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743903349; x=1744508149;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1743903892; x=1744508692;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=AfV6c322LhNIzDcptdQq7JkAT5PgJ5P9MLOfezDMm4c=;
-        b=U9+OlQBhi2S+Wh2dsHPg2l56OD2B9gZd4+nNp66TIA+UATBWbAhAaN5ozXyO5OwHug
-         yDDG2pufHzjxavO9wt8OpGAR3MNhTebSQD6rYisE/htbaoOsDsxUvQgw2BBBykYr9rKv
-         Mil1qCNHe68Ar0xWQM5dPRo4vYvu/2HnvyNVS3mEkT1d9tHb7Nh2j8QwuT+VQ3k3w4ew
-         r0UELruP52rnjEye4yvwYVvjDophiuya2HHU7bnDcsku3B73cA6YXPOyjV2V0O0GD2+v
-         84INkA666lRCo+gCMDNl86wtHcB3VD1ieuBRpWWMrjiRfjvPKjK1QUdcHo6Ai0k3EWe5
-         aHAA==
-X-Forwarded-Encrypted: i=1; AJvYcCUcK9b1F3pyS2VSG504LGNN4FFVa9s1wnLVz093st/xNgzXK3WBqEzaa6k3OA7qICgY6QV/p5U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOgV69NKJvkMjswB9SsM1G1QBlHZLf684EM+i+qQNrRJ7MD+6/
-	d3P1LIV/OEKu3kH5VlvbDHUKBQpc3Dy/GC7yxUQWxH7BKvjfZkM+dhw3UJFp
-X-Gm-Gg: ASbGncvlXxhRb4XKiazVd0lMUTaPW+4NM4RPqcydlAw/YR++F5kJJ7dapK4tdhqSowa
-	i2xGaP5jZNhr8OdglvA//xKbTtDOhs1TeeiQ+8EbELPLutwvSJAUj33kS9KM81FEjswOCf/emmF
-	rTKOYQxCejmPZ/zqwhzMAHo99VRKIN9fJRhGSD+DlPGViN/DUKWoYF91FwPz/BP9YtH7Sj0yGUd
-	pDlVIJ2THuSlcdKlt1W3rDoSJBI1xwCJOdEekbOF8pT54eVMF/oZvwAshoKLtObfdCty1v2D77E
-	onM0zCsvKeiJZr2UKK0+3iBK6oTJBRcm5I+6/0x1bFOwU5odLuKLkbRaeDKdO2hkLC+iBwLe6gt
-	CulPuL73li7GQQ2YkgYQaQA==
-X-Google-Smtp-Source: AGHT+IEpUDhA1POUXQPRGA+uLs2g/QiNP48C8u7+VJ4QKBtX6WUHQsTe3TvseG7lQb9C2WXizf1tAw==
-X-Received: by 2002:a05:6a00:14d4:b0:736:476b:fcd3 with SMTP id d2e1a72fcca58-73b6b8fd296mr6864136b3a.24.1743903349373;
-        Sat, 05 Apr 2025 18:35:49 -0700 (PDT)
-Received: from mew.. (p4204131-ipxg22701hodogaya.kanagawa.ocn.ne.jp. [153.160.176.131])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-739da0bc052sm5846849b3a.156.2025.04.05.18.35.43
+        bh=6QACGbmtqg43G4pECaXD+iso0W8xk8gg2NY7DQvW93E=;
+        b=wYQXO7+A0fCz/2dGBiuVOXJWq8fnSQd1AwhnmaoVBymEsvU0eyzFGPZlVyZ0RrfA/0
+         YsJxDiKm2NlRs6gYZsV5FlKFD3/AE9gqleIvBNJSdC6N+LPDcKWZTgQsEppfm/51/ME2
+         d75wxTw6HBUlO5Me9aWWmTUyCJGLRpBC/KtLp7eOJLYgtYYzthoEOMq/UF+VADzwP2Jq
+         RYuKj6qJ0fxOiM/Sv+fGHONEuXJ+B+A+bU8IxJGodzXeWl9cvYRZRP7uXG6jfNxfOLgH
+         5RbdmzSZ7IBv6yso3LvIoElg0pUhcMzuvO9ph/2yOWoJjhRUJTP4A3WAnw1KTkazGPVR
+         QpjA==
+X-Forwarded-Encrypted: i=1; AJvYcCVmTWkft8Elxhv83tJmS9C+fVPsWQQ/hqn6NuPq5nlWjr1ewXwVX0RfXa2cSsWrLhu6ZC/o5Kp4WDroeMI=@vger.kernel.org, AJvYcCX9bkPNZGRxwyu4+96cD1jkRcgDDMdzj/ZGYYweKP39mRLrq4GBOk782Xjm4ka0bETmix4CiIT2@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxrao0wui7O8QY9/lwO3HM6iHfJbW7m4fYIzwVVfoNU8e6k9fdt
+	DAbRWOmWYqPpBBT8NkBb0WQnA1XPWBtGiq4mvnZTeoRujtyUhG64
+X-Gm-Gg: ASbGncuYe/fdIXLuxpLToxPZ36IIwtcvHEyag4AahcZ34JZ4QHr2hkgsiLx8scgy3LF
+	j1qZlIPxqQ3vRXx0okjaonbHxx3/ZbUZPmYtmRTh9sHQ98kd/kFTcmX4DTk63Vt+YarX3U+elrO
+	9HDAvKxLv1xoL1xeNcM7KL7CuyzlkPeuM8rtor3lFlzwpDhOrQBd6/u58NHqvpT3uzTFw7b1rj5
+	jNnlOBQMCUUoK5LzpVOawbTASniPJhiPohBJOeNtx8cvcIupg138kV4u46SIBHb5fBgUzGSIhax
+	9Z87bthl3y+fDNL6yCTx3VXuoSTmNnATN6ZgvX5S5HWPLGEe77hV4ryJEswxGhI0QatTribAi0V
+	kT3oA3csLqm5hgwnkNkNMu32eLuKZrr1i0Jk=
+X-Google-Smtp-Source: AGHT+IFfEFeLh+crN4i6bkp1VhALfpSSl6XUzLYqSSbmUR8EbBIu01VtE/Wd2jfQs5cWIZ19w33Vzg==
+X-Received: by 2002:a05:6214:dc6:b0:6e6:5b8e:7604 with SMTP id 6a1803df08f44-6eff55136d3mr149062256d6.12.1743903891778;
+        Sat, 05 Apr 2025 18:44:51 -0700 (PDT)
+Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ef0f14cf41sm41196026d6.105.2025.04.05.18.44.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Apr 2025 18:35:49 -0700 (PDT)
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-To: rust-for-linux@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	tmgross@umich.edu,
-	ojeda@kernel.org,
-	alex.gaynor@gmail.com,
-	gary@garyguo.net,
-	bjorn3_gh@protonmail.com,
-	benno.lossin@proton.me,
-	a.hindborg@samsung.com,
-	aliceryhl@google.com,
-	anna-maria@linutronix.de,
-	frederic@kernel.org,
-	tglx@linutronix.de,
-	arnd@arndb.de,
-	jstultz@google.com,
-	sboyd@kernel.org,
-	mingo@redhat.com,
-	peterz@infradead.org,
-	juri.lelli@redhat.com,
-	vincent.guittot@linaro.org,
-	dietmar.eggemann@arm.com,
-	rostedt@goodmis.org,
-	bsegall@google.com,
-	mgorman@suse.de,
-	vschneid@redhat.com,
-	tgunders@redhat.com,
-	me@kloenk.dev,
+        Sat, 05 Apr 2025 18:44:51 -0700 (PDT)
+Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 5FB2E1200043;
+	Sat,  5 Apr 2025 21:44:50 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-05.internal (MEProxy); Sat, 05 Apr 2025 21:44:50 -0400
+X-ME-Sender: <xms:ktzxZ24UDty0S3Nw2Qtv3Rpqg4wFnnAdZKy2ALiug-KDBWg_Be-6pg>
+    <xme:ktzxZ_6it9nINOF12f3cMSApqRmD3EoYopTeZHIz7sLEOxVFsrRFqNYsGShVBOKv5
+    bxQVzO0D2X4k853BA>
+X-ME-Received: <xmr:ktzxZ1fyKC08q784YHtAS3qVHbcoqxvmHJ6ZJuDFj9R_FGv_e0vm9jyzm9Q>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduleehleejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
+    vdenucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrih
+    hlrdgtohhmqeenucggtffrrghtthgvrhhnpeejteffieehudffvdejtddugeefvdeftdek
+    gfegtddutddtkeefleeihfekteefieenucffohhmrghinheprhhushhtqdhfohhrqdhlih
+    hnuhigrdgtohhmpdhgihhthhhusgdrtghomhenucevlhhushhtvghrufhiiigvpedtnecu
+    rfgrrhgrmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgruhhthhhpvghrsh
+    honhgrlhhithihqdeiledvgeehtdeigedqudejjeekheehhedvqdgsohhquhhnrdhfvghn
+    gheppehgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvgdpnhgspghrtghpthhtohepfe
+    efpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehfuhhjihhtrgdrthhomhhonhho
+    rhhisehgmhgrihhlrdgtohhmpdhrtghpthhtoheprhhushhtqdhfohhrqdhlihhnuhigse
+    hvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghl
+    sehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrh
+    drkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhr
+    tghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepth
+    hmghhrohhsshesuhhmihgthhdrvgguuhdprhgtphhtthhopehojhgvuggrsehkvghrnhgv
+    lhdrohhrghdprhgtphhtthhopegrlhgvgidrghgrhihnohhrsehgmhgrihhlrdgtohhm
+X-ME-Proxy: <xmx:ktzxZzLFQCO4FNOwGmwyrIcbDC6pCQCA_x2LLFsXLjNB0JMxUI4VTg>
+    <xmx:ktzxZ6KmGpaGhZGwxCI-B3XymUstD_e5ePOTMyRz5SLUEccCI8NMiA>
+    <xmx:ktzxZ0wbTXUXKRImnleC1SFahZ2CYH0urimP3A2QM4SvGgDXsfh3KQ>
+    <xmx:ktzxZ-J4CL350Izwtkfbf-EbHQWrSj3UH9SskoSs5yA-2bnsHFzQLA>
+    <xmx:ktzxZxZRP4624vTRS2qlLPtTUBJW50ZE22UJBgg2UjbQ29YA2Ryui7V8>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 5 Apr 2025 21:44:49 -0400 (EDT)
+Date: Sat, 5 Apr 2025 18:44:35 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+	gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+	a.hindborg@samsung.com, aliceryhl@google.com,
+	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
+	arnd@arndb.de, jstultz@google.com, sboyd@kernel.org,
+	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+	vschneid@redhat.com, tgunders@redhat.com, me@kloenk.dev,
 	david.laight.linux@gmail.com
-Subject: [PATCH v12 5/5] MAINTAINERS: rust: Add a new section for all of the time stuff
-Date: Sun,  6 Apr 2025 10:34:45 +0900
-Message-ID: <20250406013445.124688-6-fujita.tomonori@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250406013445.124688-1-fujita.tomonori@gmail.com>
+Subject: Re: [PATCH v12 5/5] MAINTAINERS: rust: Add a new section for all of
+ the time stuff
+Message-ID: <Z_Hcg32LhKjqFkVG@boqun-archlinux>
 References: <20250406013445.124688-1-fujita.tomonori@gmail.com>
+ <20250406013445.124688-6-fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250406013445.124688-6-fujita.tomonori@gmail.com>
 
-Add a new section for all of the time stuff to MAINTAINERS file, with
-the existing hrtimer entry fold.
+On Sun, Apr 06, 2025 at 10:34:45AM +0900, FUJITA Tomonori wrote:
+> Add a new section for all of the time stuff to MAINTAINERS file, with
+> the existing hrtimer entry fold.
+> 
+> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
 
-Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
----
- MAINTAINERS | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+Reviewed-by: Boqun Feng <boqun.feng@gmail.com>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index d32ce85c5c66..fafb79c42ac3 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10581,20 +10581,23 @@ F:	kernel/time/timer_list.c
- F:	kernel/time/timer_migration.*
- F:	tools/testing/selftests/timers/
- 
--HIGH-RESOLUTION TIMERS [RUST]
-+DELAY, SLEEP, TIMEKEEPING, TIMERS [RUST]
- M:	Andreas Hindborg <a.hindborg@kernel.org>
- R:	Boqun Feng <boqun.feng@gmail.com>
-+R:	FUJITA Tomonori <fujita.tomonori@gmail.com>
- R:	Frederic Weisbecker <frederic@kernel.org>
- R:	Lyude Paul <lyude@redhat.com>
- R:	Thomas Gleixner <tglx@linutronix.de>
- R:	Anna-Maria Behnsen <anna-maria@linutronix.de>
-+R:	John Stultz <jstultz@google.com>
-+R:	Stephen Boyd <sboyd@kernel.org>
- L:	rust-for-linux@vger.kernel.org
- S:	Supported
- W:	https://rust-for-linux.com
- B:	https://github.com/Rust-for-Linux/linux/issues
--T:	git https://github.com/Rust-for-Linux/linux.git hrtimer-next
--F:	rust/kernel/time/hrtimer.rs
--F:	rust/kernel/time/hrtimer/
-+T:	git https://github.com/Rust-for-Linux/linux.git rust-timekeeping-next
-+F:	rust/kernel/time/
-+F:	rust/kernel/time/time.rs
- 
- HIGH-SPEED SCC DRIVER FOR AX.25
- L:	linux-hams@vger.kernel.org
--- 
-2.43.0
+> ---
+>  MAINTAINERS | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index d32ce85c5c66..fafb79c42ac3 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -10581,20 +10581,23 @@ F:	kernel/time/timer_list.c
+>  F:	kernel/time/timer_migration.*
+>  F:	tools/testing/selftests/timers/
+>  
+> -HIGH-RESOLUTION TIMERS [RUST]
+> +DELAY, SLEEP, TIMEKEEPING, TIMERS [RUST]
+>  M:	Andreas Hindborg <a.hindborg@kernel.org>
+>  R:	Boqun Feng <boqun.feng@gmail.com>
+> +R:	FUJITA Tomonori <fujita.tomonori@gmail.com>
+>  R:	Frederic Weisbecker <frederic@kernel.org>
+>  R:	Lyude Paul <lyude@redhat.com>
+>  R:	Thomas Gleixner <tglx@linutronix.de>
+>  R:	Anna-Maria Behnsen <anna-maria@linutronix.de>
+> +R:	John Stultz <jstultz@google.com>
+> +R:	Stephen Boyd <sboyd@kernel.org>
+>  L:	rust-for-linux@vger.kernel.org
+>  S:	Supported
+>  W:	https://rust-for-linux.com
+>  B:	https://github.com/Rust-for-Linux/linux/issues
+> -T:	git https://github.com/Rust-for-Linux/linux.git hrtimer-next
+> -F:	rust/kernel/time/hrtimer.rs
+> -F:	rust/kernel/time/hrtimer/
+> +T:	git https://github.com/Rust-for-Linux/linux.git rust-timekeeping-next
 
+@Andreas, this branch is currently missing, right?
+
+Regards,
+Boqun
+
+> +F:	rust/kernel/time/
+> +F:	rust/kernel/time/time.rs
+>  
+>  HIGH-SPEED SCC DRIVER FOR AX.25
+>  L:	linux-hams@vger.kernel.org
+> -- 
+> 2.43.0
+> 
+> 
 
