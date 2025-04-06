@@ -1,145 +1,156 @@
-Return-Path: <netdev+bounces-179455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99934A7CCB1
-	for <lists+netdev@lfdr.de>; Sun,  6 Apr 2025 06:27:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D4E7A7CCC2
+	for <lists+netdev@lfdr.de>; Sun,  6 Apr 2025 06:28:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A88DB7A776F
-	for <lists+netdev@lfdr.de>; Sun,  6 Apr 2025 04:26:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC22E169774
+	for <lists+netdev@lfdr.de>; Sun,  6 Apr 2025 04:28:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A91C5154423;
-	Sun,  6 Apr 2025 04:27:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 074E21BCA0F;
+	Sun,  6 Apr 2025 04:28:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="YofjdEWw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R4equr5S"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D8A02AEF5;
-	Sun,  6 Apr 2025 04:27:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06F292AEF5;
+	Sun,  6 Apr 2025 04:28:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743913624; cv=none; b=J7JcYFiNfGx24uUpjruR2odbD0Rt1V5vHgAFXKMIzs7FgC0KYs6dJpUHE0sd5OX4NQNSz8Ud0TqBRknpKpc9f8csHGi2DeR5DGOMvrJ7rGeyR8G0PpzcQT3TZHfQEoCC/BttsXfcXW1YSEJ1D+T3tIUejhOsW3ysKZ8QB5Fq34g=
+	t=1743913720; cv=none; b=MvB3RrCi/MmlIzovRY0nU4TNaEdGuuqXylNgxCF0MlBMwW+AF2SAhW2/h0r9vQXd1Q7LcJ3vP77ZzQu0sYZfKtOyKKXsziBYaLs6kphlptJTPM4RYX+4tDYjFT1P+CBkvU9rMgzmFvY+jeamX9QnWanrZfN5UN2m61F1RonJcC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743913624; c=relaxed/simple;
-	bh=+RqTH+WwDC/q3Tesjnz+n8In0t2ukkDocy2CyRC65Zs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GAd19fdoz69tJaEhwOYpGI8gg9TsPrk86JNLQpSh0uAHmMurxHBW0epja56xKUTbYGFVDaXrbP3S68Fq/ugaE3H5EeIxDUgtwHgSKSLGjwCxJ7yCupQbJ5wx3t2XtnQhHfr/PqNgZPCg5Gil55x/Di58Jfp/0aCG1SW4l56jPhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=YofjdEWw; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1743913623; x=1775449623;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=C8jroJ36qQUTrzsnbdQAdnYICUTvU857L8wJQ/dSBCA=;
-  b=YofjdEWwV+JAqxaVyRolKmV/NqANEssLfmbrRk2rN3dlervODgejevEp
-   kt0xyYyT8p0D009bTk2pdN7NJoF44gL2e79D3hj4QjSUTdor0usIZrrZ4
-   KK0VcGCOCoHBGwJ1ow/XNjoaj5tAGGayGNoB6qy8w2vhgA4hllOLACygG
-   M=;
-X-IronPort-AV: E=Sophos;i="6.15,192,1739836800"; 
-   d="scan'208";a="733225926"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2025 04:26:59 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:33208]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.132:2525] with esmtp (Farcaster)
- id 5d617adf-83b7-4a91-bb31-67a1b4467eca; Sun, 6 Apr 2025 04:26:57 +0000 (UTC)
-X-Farcaster-Flow-ID: 5d617adf-83b7-4a91-bb31-67a1b4467eca
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Sun, 6 Apr 2025 04:26:57 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.187.170.50) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Sun, 6 Apr 2025 04:26:54 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <syzbot+be6f4b383534d88989f7@syzkaller.appspotmail.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<syzkaller-bugs@googlegroups.com>, <kuniyu@amazon.com>
-Subject: Re: [syzbot] [net?] possible deadlock in ipv6_sock_ac_close (4)
-Date: Sat, 5 Apr 2025 21:26:42 -0700
-Message-ID: <20250406042646.72721-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <67f08cd7.050a0220.0a13.0228.GAE@google.com>
-References: <67f08cd7.050a0220.0a13.0228.GAE@google.com>
+	s=arc-20240116; t=1743913720; c=relaxed/simple;
+	bh=4BH94r9eFHWd7jK1gh/ArWcfPCsUQZMfgHuoqE5hS94=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LjZk9JjR4Yvbs0FKr831KTBps7VKG19zARsDUXwdhxm1eyKjsliPhlkJsKBU8Mo5j4NS05reIsy0aP/nKEvX57s8VRXmSNLF6WTW7Wre6gpM02vN7dqer5Gom/tdJ9ZmvAM+2UE20cRhvbW0OBDsV/L2wHUgM5SqHVCY9Q2d9Jk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R4equr5S; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1743913719; x=1775449719;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=4BH94r9eFHWd7jK1gh/ArWcfPCsUQZMfgHuoqE5hS94=;
+  b=R4equr5SQ1KHsLtMq8WXDlmeyZiPX3MpxZ4xVwRpd3AHN8sYJTO4uVS7
+   58vYOnaP5i5fEz2OaopowPQDE+fSXqCOn2qZrI8k+LyBlcF7S44FLT8y+
+   Ur+J/Q7FxkjyknrUkQLZ6tv2DRsPy9Nd4KGfasaG7zsWUI1p26iMLUKyd
+   B2qQT84TFRlGnC6thAFYoqIjrhT6Vn4vmxjOLLdSgXN0Wr+o+Omx0DRuP
+   YhBl+WFq8bNbhqIEt1uBm7LivzUiTAMnPi6k313EFl28jmZiJ51LSsn+c
+   /Z+w2i84eMX/40RAFG1A7QG14JeLHvjq0c1rGFdoUjD4nHbcA7eBlQWHd
+   Q==;
+X-CSE-ConnectionGUID: BiwFMpqNR1GuNxWs2Pi9PQ==
+X-CSE-MsgGUID: 2Kc/7TV6RQSHKWdeiZeidw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11395"; a="56681021"
+X-IronPort-AV: E=Sophos;i="6.15,192,1739865600"; 
+   d="scan'208";a="56681021"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Apr 2025 21:28:38 -0700
+X-CSE-ConnectionGUID: 1bedKDMXRJKqCrYs7nazqw==
+X-CSE-MsgGUID: acvAGZQMQzmFa8Oa3eIpPg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,192,1739865600"; 
+   d="scan'208";a="158617337"
+Received: from lkp-server01.sh.intel.com (HELO b207828170a5) ([10.239.97.150])
+  by fmviesa001.fm.intel.com with ESMTP; 05 Apr 2025 21:28:31 -0700
+Received: from kbuild by b207828170a5 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1u1HcT-0002RH-1k;
+	Sun, 06 Apr 2025 04:28:29 +0000
+Date: Sun, 6 Apr 2025 12:27:29 +0800
+From: kernel test robot <lkp@intel.com>
+To: Blaise Boscaccy <bboscaccy@linux.microsoft.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	David Howells <dhowells@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nicolas Schier <nicolas@fjasle.eu>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
+	=?iso-8859-1?Q?G=FCnther?= Noack <gnoack@google.com>,
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Jan Stancek <jstancek@redhat.com>, Neal Gompa <neal@gompa.dev>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-security-module@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
+	llvm@lists.linux.dev
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 security-next 1/4] security: Hornet LSM
+Message-ID: <202504061441.FMnrO665-lkp@intel.com>
+References: <20250404215527.1563146-2-bboscaccy@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D033UWC004.ant.amazon.com (10.13.139.225) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250404215527.1563146-2-bboscaccy@linux.microsoft.com>
 
-From: syzbot <syzbot+be6f4b383534d88989f7@syzkaller.appspotmail.com>
-Date: Fri, 04 Apr 2025 18:52:23 -0700
-> syzbot has found a reproducer for the following issue on:
-> 
-> HEAD commit:    e48e99b6edf4 Merge tag 'pull-fixes' of git://git.kernel.or..
-> git tree:       upstream
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=12afa7cf980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=f2054704dd53fb80
-> dashboard link: https://syzkaller.appspot.com/bug?extid=be6f4b383534d88989f7
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=140a294c580000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1486994c580000
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/b03407c4ab24/disk-e48e99b6.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/03f6746c0414/vmlinux-e48e99b6.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/4b3909ad8728/bzImage-e48e99b6.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+be6f4b383534d88989f7@syzkaller.appspotmail.com
-[...]
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
+Hi Blaise,
 
-#syz test
+kernel test robot noticed the following build errors:
 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 323892066def..87e7d8043322 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -235,7 +235,7 @@ static struct lock_class_key af_family_kern_slock_keys[AF_MAX];
-   x "AF_RXRPC" ,	x "AF_ISDN"     ,	x "AF_PHONET"   , \
-   x "AF_IEEE802154",	x "AF_CAIF"	,	x "AF_ALG"      , \
-   x "AF_NFC"   ,	x "AF_VSOCK"    ,	x "AF_KCM"      , \
--  x "AF_QIPCRTR",	x "AF_SMC"	,	x "AF_XDP"	, \
-+  x "AF_QIPCRTR",	x "43"		,	x "AF_XDP"	, \
-   x "AF_MCTP"  , \
-   x "AF_MAX"
- 
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index 3e6cb35baf25..3760131f1484 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -362,6 +362,9 @@ static void smc_destruct(struct sock *sk)
- 		return;
- }
- 
-+static struct lock_class_key smc_key;
-+static struct lock_class_key smc_slock_key;
-+
- void smc_sk_init(struct net *net, struct sock *sk, int protocol)
- {
- 	struct smc_sock *smc = smc_sk(sk);
-@@ -375,6 +378,8 @@ void smc_sk_init(struct net *net, struct sock *sk, int protocol)
- 	INIT_WORK(&smc->connect_work, smc_connect_work);
- 	INIT_DELAYED_WORK(&smc->conn.tx_work, smc_tx_work);
- 	INIT_LIST_HEAD(&smc->accept_q);
-+	sock_lock_init_class_and_name(sk, "slock-AF_SMC", &smc_slock_key,
-+				      "sk_lock-AF_SMC", &smc_key);
- 	spin_lock_init(&smc->accept_q_lock);
- 	spin_lock_init(&smc->conn.send_lock);
- 	sk->sk_prot->hash(sk);
+[auto build test ERROR on shuah-kselftest/next]
+[also build test ERROR on shuah-kselftest/fixes herbert-cryptodev-2.6/master herbert-crypto-2.6/master masahiroy-kbuild/for-next masahiroy-kbuild/fixes v6.14]
+[cannot apply to linus/master next-20250404]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Blaise-Boscaccy/security-Hornet-LSM/20250405-055741
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/shuah/linux-kselftest.git next
+patch link:    https://lore.kernel.org/r/20250404215527.1563146-2-bboscaccy%40linux.microsoft.com
+patch subject: [PATCH v2 security-next 1/4] security: Hornet LSM
+config: sh-allmodconfig (https://download.01.org/0day-ci/archive/20250406/202504061441.FMnrO665-lkp@intel.com/config)
+compiler: sh4-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250406/202504061441.FMnrO665-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202504061441.FMnrO665-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from security/hornet/hornet_lsm.c:10:
+>> security/hornet/hornet_lsm.c:221:38: error: initialization of 'int (*)(struct bpf_prog *, union bpf_attr *, struct bpf_token *)' from incompatible pointer type 'int (*)(struct bpf_prog *, union bpf_attr *, struct bpf_token *, bool)' {aka 'int (*)(struct bpf_prog *, union bpf_attr *, struct bpf_token *, _Bool)'} [-Wincompatible-pointer-types]
+     221 |         LSM_HOOK_INIT(bpf_prog_load, hornet_bpf_prog_load),
+         |                                      ^~~~~~~~~~~~~~~~~~~~
+   include/linux/lsm_hooks.h:136:35: note: in definition of macro 'LSM_HOOK_INIT'
+     136 |                 .hook = { .NAME = HOOK }                \
+         |                                   ^~~~
+   security/hornet/hornet_lsm.c:221:38: note: (near initialization for 'hornet_hooks[0].hook.bpf_prog_load')
+     221 |         LSM_HOOK_INIT(bpf_prog_load, hornet_bpf_prog_load),
+         |                                      ^~~~~~~~~~~~~~~~~~~~
+   include/linux/lsm_hooks.h:136:35: note: in definition of macro 'LSM_HOOK_INIT'
+     136 |                 .hook = { .NAME = HOOK }                \
+         |                                   ^~~~
+
+
+vim +221 security/hornet/hornet_lsm.c
+
+   219	
+   220	static struct security_hook_list hornet_hooks[] __ro_after_init = {
+ > 221		LSM_HOOK_INIT(bpf_prog_load, hornet_bpf_prog_load),
+   222	};
+   223	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
