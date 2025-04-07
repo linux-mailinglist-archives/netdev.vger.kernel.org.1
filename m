@@ -1,135 +1,183 @@
-Return-Path: <netdev+bounces-179975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE7B6A7F04E
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 00:28:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4F94A7F053
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 00:30:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 634E03A9CC3
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 22:27:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87C0E18945B0
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 22:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A47B223710;
-	Mon,  7 Apr 2025 22:28:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DFA6192D8F;
+	Mon,  7 Apr 2025 22:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A2N0LuQM"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZjQcfVvQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 915D1199235
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 22:27:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4B8189B84
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 22:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744064880; cv=none; b=ZOqUuhMg3X6JJQHwb5Csrkel2Qa5NVJWL1sDldls2BgoQryoq7fZQtMk6PL61uZ8F1cjPM2WGl1qxrmQTS3cxf4BvsHpHfCBBXzyR+tIEIcmeNABj7hTiULOrs+0WkdOQIS8Au+56SgFQaf5nMGMNU7g8PF76JCZTP5NBsLB89U=
+	t=1744065015; cv=none; b=Mddu9sQ0SOH18Aw9upl+C2XPFMfJkNbICNSB9Sz4EY3RRD3WdlZYpXY14ZQ8xVxlHZlieymG14IuB2k5V2LV59D3swlFxNNtYhhoyjgIVm+rWK6fnOwQVDiaiEpPRyBoNs6dlc0DnnsUiRaRQwQMh1TkHCFTbB5u7230GsqvBNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744064880; c=relaxed/simple;
-	bh=hpS31OidI1u1n619ZrpB0oeuFlCs2qG1imG8iMq5PZ8=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=cG6R9a516jGC6Dvh82ZnSQhEPGPTNhSUuF5MhnhZBIwJ7UKP2ZrSgz2BPE+C57xhly5wi2eT4oBb/gPjs9rdtTkSUrOR7bvrITnPlVHgjIy6wGHlsrceG06Fu9ouRpYso78e/UQQhmOPl598DX0EzNiJ6+cLnMe53jTXsa8DJHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A2N0LuQM; arc=none smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6e8fce04655so48148286d6.3
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 15:27:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744064877; x=1744669677; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2iTkYZ2z/iJ6mmWy9lefMkRZbYfPGltl7Qb840MKyJM=;
-        b=A2N0LuQMvlhwIqYw7w+8fQN1VVGj0a7Kfiste2EOhJYsSfyzSqLnb+q356wEpSRjlU
-         2Sxj1PQvl3yBQ7pYCoiTYh0unLExYAIjHoVXj0n2ukMaLzICUUY6Cql8lguLoFydnBnB
-         mCl+PMXRKkZDIIv1X9quHlPdx5ONa0ep+rukwISWy+PqwI6/pbehk/I5zM3xs4Yf7Lo3
-         P1kIM+Wo3xpWcwXAFu0BxXpGBNsDQ26fxMfvIdv/OF5u9PuvZa5nkUKXhvFgfpucMjy4
-         9IzPpKq4nNr9ZXxvDlM/tmIfAMRHjxI4a/gFq748azMGmmYhm+yD6qQ9+3iU8r/0mgtk
-         UZIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744064877; x=1744669677;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=2iTkYZ2z/iJ6mmWy9lefMkRZbYfPGltl7Qb840MKyJM=;
-        b=X78TL2XHxIEyh6W8WQ0S6T+6oBkqxrinI5c5eDEh6aUfL4icjwx/ZPbTOcKHANLVtW
-         KDUszRlHsOQt8kZVNHYYW6MSU866v31MTIrr1pxEdHdfcOSnSZysICPFLRVir7ooFXbg
-         kkw8scnmXWwcRUzhDulB8D3tXU4oytE7/mzadewLrwxmGa53ihSYo5V4jZGS+szVmCE6
-         3tbkxB34ZSh73bsVuyJfxP3CKpzSA8SnSFMyIj392V4UhWcOvLixroGqW/cJpYiKD6WV
-         5e+ObjSLNvPkk/Agy5IZnm/A2bdN048GHLn5sd7Cs7NGJXXXEGGYp1+uDsunfdLLogig
-         unjA==
-X-Forwarded-Encrypted: i=1; AJvYcCXIF9qM8fprOO0+dj4C6rp9Wu/77RcJfczNkL8tcNAEX2oP6xlj+hp8e8WKgcvydnF7eTjn6zw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz6mgZYc/TGilXamLstn8ww79Sq/PpdZPTE98kRzrg8JXhfuaXA
-	J2lSAKk4JECfJ4IUuvMz4jOzwCdY6l2k6nmj+9tH+RX41sOh6ECg
-X-Gm-Gg: ASbGncvMKStXstsmZNF7THY3WHbItbqbLraZEWzLWeYQbPkEKrJ4v6R4j2zTIFpPPr6
-	hNW1FYfcrzqSjDkqKXYktp52/CF4HZJ1MQ6cWuh1dAVJulGWzXmQ4NseEKfQsIN1DEPNK1ySxN0
-	faV3k/y4t+2hj7da3znkkURtnr0gZ3Cm+7+V9BRERkdpWiiOkWevs8J4BHTSFjARKnF51M8ALUH
-	JAwvnwEIqWdDo//9v7i6t8X8scyo33ZE3DW8H7vG3KqJroJxwrsi8Z6Pcufb8CmFqr/fBxndkdz
-	QnNjq6NrnMabWz1VjQHDkzS3GX01xomDUv5pCuiZMRTHhAiGGS+3eHrCmc9SglQzRxhH1DU+v4j
-	BCJPDK7ncnjo7msBvDlDLmg==
-X-Google-Smtp-Source: AGHT+IF7wH3xLK/rYNlyIjb0HK9OfoQ9BkV4iUYdrI1TogzY9W47TsRN6dfXhLaPj18ZdjmIjuHjrQ==
-X-Received: by 2002:ad4:5e89:0:b0:6e8:9dfa:d932 with SMTP id 6a1803df08f44-6f0b74133demr153644686d6.15.1744064877390;
-        Mon, 07 Apr 2025 15:27:57 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ef0f14e993sm64386416d6.112.2025.04.07.15.27.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 15:27:56 -0700 (PDT)
-Date: Mon, 07 Apr 2025 18:27:56 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Simon Horman <horms@kernel.org>, 
- David Ahern <dsahern@kernel.org>
-Message-ID: <67f4516c97bac_3bfc83294be@willemb.c.googlers.com.notmuch>
-In-Reply-To: <41d16bc8d1257d567f9344c445b4ae0b4a91ede4.1744040675.git.pabeni@redhat.com>
-References: <cover.1744040675.git.pabeni@redhat.com>
- <41d16bc8d1257d567f9344c445b4ae0b4a91ede4.1744040675.git.pabeni@redhat.com>
-Subject: Re: [PATCH net-next v5 1/2] udp_tunnel: create a fastpath GRO lookup.
+	s=arc-20240116; t=1744065015; c=relaxed/simple;
+	bh=VT5e2QPJpXKPCyt+xyHhkKuDO/O11DKdFu/Gm0y60i8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bTeMGfFf5VQbL6YuSNly9GXWFnxHFFYm8Mcu8yVDsl7cNpoe6At/aLgoL+lnNTSvv6tZ+Q1j9ccYWxy1JdqN9UJLL78eCMdb+Dnrhw0QUSTiD/Gq4edEN840u8r0/l3JnjNuYZGyWmu7XFeipWqtGFN/ySCgTr4xOlJ9GoVDk1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZjQcfVvQ; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <b9a75b48-9572-482c-9f8d-0dfae41f09a1@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1744065011;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1yvXU5VmWeqiR0pVuAEpxZIKJoqNCtLLKDriulf8zQ8=;
+	b=ZjQcfVvQKYGxrfUAMfNwzHXmYQ6RCmx/NFE+B7cq67P0q/LGw1Wd8xTkUCSxKUYRpTxXld
+	85utElGLAoEcSGxmFLZ1ieGEePJNEHqKAfSTNh3FYwpreN0e4DHa6JydwRlPbq98rI5xFt
+	/nr+38u12DjTy7RGq1sjZElYGI1yGaA=
+Date: Mon, 7 Apr 2025 15:30:06 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Subject: Re: [PATCH 3/3] [RFC] Bluetooth: enable bpf TX timestamping
+To: Pauli Virtanen <pav@iki.fi>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, willemdebruijn.kernel@gmail.com,
+ kerneljasonxing@gmail.com
+References: <cover.1743337403.git.pav@iki.fi>
+ <bbd7fa454ed03ebba9bfe79590fb78a75d4f07db.1743337403.git.pav@iki.fi>
+ <3546b79d-a09b-4971-abd7-ce18696a9536@linux.dev>
+ <db7f317539cbda89df7e87efaea9b22328af610a.camel@iki.fi>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <db7f317539cbda89df7e87efaea9b22328af610a.camel@iki.fi>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Paolo Abeni wrote:
-> Most UDP tunnels bind a socket to a local port, with ANY address, no
-> peer and no interface index specified.
-> Additionally it's quite common to have a single tunnel device per
-> namespace.
+On 4/2/25 9:56 AM, Pauli Virtanen wrote:
+> Hi,
 > 
-> Track in each namespace the UDP tunnel socket respecting the above.
-> When only a single one is present, store a reference in the netns.
-> 
-> When such reference is not NULL, UDP tunnel GRO lookup just need to
-> match the incoming packet destination port vs the socket local port.
-> 
-> The tunnel socket never sets the reuse[port] flag[s]. When bound to no
-> address and interface, no other socket can exist in the same netns
-> matching the specified local port.
-> 
-> Matching packets with non-local destination addresses will be
-> aggregated, and eventually segmented as needed - no behavior changes
-> intended.
-> 
-> Restrict the optimization to kernel sockets only: it covers all the
-> relevant use-cases, and user-space owned sockets could be disconnected
-> and rebound after setup_udp_tunnel_sock(), breaking the uniqueness
-> assumption
-> 
-> Note that the UDP tunnel socket reference is stored into struct
-> netns_ipv4 for both IPv4 and IPv6 tunnels. That is intentional to keep
-> all the fastpath-related netns fields in the same struct and allow
-> cacheline-based optimization. Currently both the IPv4 and IPv6 socket
-> pointer share the same cacheline as the `udp_table` field.
-> 
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> ti, 2025-04-01 kello 18:34 -0700, Martin KaFai Lau kirjoitti:
+>> On 3/30/25 5:23 AM, Pauli Virtanen wrote:
+>>> Emit timestamps also for BPF timestamping.
+>>>
+>>> ***
+>>>
+>>> The tskey management here is not quite right: see cover letter.
+>>> ---
+>>>    include/net/bluetooth/bluetooth.h |  1 +
+>>>    net/bluetooth/hci_conn.c          | 21 +++++++++++++++++++--
+>>>    2 files changed, 20 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+>>> index bbefde319f95..3b2e59cedd2d 100644
+>>> --- a/include/net/bluetooth/bluetooth.h
+>>> +++ b/include/net/bluetooth/bluetooth.h
+>>> @@ -383,6 +383,7 @@ struct bt_sock {
+>>>    	struct list_head accept_q;
+>>>    	struct sock *parent;
+>>>    	unsigned long flags;
+>>> +	atomic_t bpf_tskey;
+>>>    	void (*skb_msg_name)(struct sk_buff *, void *, int *);
+>>>    	void (*skb_put_cmsg)(struct sk_buff *, struct msghdr *, struct sock *);
+>>>    };
+>>> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+>>> index 95972fd4c784..7430df1c5822 100644
+>>> --- a/net/bluetooth/hci_conn.c
+>>> +++ b/net/bluetooth/hci_conn.c
+>>> @@ -28,6 +28,7 @@
+>>>    #include <linux/export.h>
+>>>    #include <linux/debugfs.h>
+>>>    #include <linux/errqueue.h>
+>>> +#include <linux/bpf-cgroup.h>
+>>>    
+>>>    #include <net/bluetooth/bluetooth.h>
+>>>    #include <net/bluetooth/hci_core.h>
+>>> @@ -3072,6 +3073,7 @@ void hci_setup_tx_timestamp(struct sk_buff *skb, size_t key_offset,
+>>>    			    const struct sockcm_cookie *sockc)
+>>>    {
+>>>    	struct sock *sk = skb ? skb->sk : NULL;
+>>> +	bool have_tskey = false;
+>>>    
+>>>    	/* This shall be called on a single skb of those generated by user
+>>>    	 * sendmsg(), and only when the sendmsg() does not return error to
+>>> @@ -3096,6 +3098,20 @@ void hci_setup_tx_timestamp(struct sk_buff *skb, size_t key_offset,
+>>>    
+>>>    			skb_shinfo(skb)->tskey = key - 1;
+>>>    		}
+>>> +		have_tskey = true;
+>>> +	}
+>>> +
+>>> +	if (cgroup_bpf_enabled(CGROUP_SOCK_OPS) &&
+>>> +	    SK_BPF_CB_FLAG_TEST(sk, SK_BPF_CB_TX_TIMESTAMPING)) {
+>>> +		struct bt_sock *bt_sk = container_of(sk, struct bt_sock, sk);
+>>> +		int key = atomic_inc_return(&bt_sk->bpf_tskey);
+>>
+>> I don't think it needs to add "atomic_t bpf_tskey". Allow the bpf to decide what
+>> the skb_shinfo(skb)->tskey should be if it is not set by the userspace.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+The idea was that the bpf prog can directly set the skb_shinfo(skb)->tskey if it 
+is not used by the userspace. iirc, it is where the discussion left at during 
+the earlier UDP support thread.
+
+
+> Ok. So if I understand correctly, the plan is that for UDP and
+> Bluetooth seqpacket sockets it works like this:
+> 
+> bpf_sock_ops_enable_tx_tstamp() does not set tskey.
+
+The bpf_sock_ops_enable_tx_tstamp() has an used "u64 flags" argument. 
+Potentially, it can use the higher 32bits to specify the tskey.
+
+> 
+> Socket timestamping sets tskey the same way as previously.
+> 
+> So when both are in play, it shall work like:
+> 
+> * attach BPF timestamping
+> * setsockopt(SOF_TIMESTAMPING_SOFTWARE | SOF_TIMESTAMPING_OPT_ID)
+> * sendmsg() CMSG SO_TIMESTAMPING = 0
+> => tskey 0 (unset)
+> * sendmsg() CMSG SO_TIMESTAMPING = SOF_TIMESTAMPING_TX_SOFTWARE
+> => tskey 0
+> * sendmsg() CMSG SO_TIMESTAMPING = SOF_TIMESTAMPING_TX_SOFTWARE
+> => tskey 1
+> * sendmsg() CMSG SO_TIMESTAMPING = 0
+> => tskey 0 (unset)
+> * sendmsg() CMSG SO_TIMESTAMPING = 0
+> => tskey 0 (unset)
+> * sendmsg() CMSG SO_TIMESTAMPING = 0
+> => tskey 0 (unset)
+> * sendmsg() CMSG SO_TIMESTAMPING = SOF_TIMESTAMPING_TX_SOFTWARE
+> => tskey 2
+> 
+> and BPF program has to handle the (unset) cases itself.
+> 
+>>
+>>> +
+>>> +		if (!have_tskey)
+>>> +			skb_shinfo(skb)->tskey = key - 1;
+>>> +
+>>> +		bpf_skops_tx_timestamping(sk, skb,
+>>> +					  BPF_SOCK_OPS_TSTAMP_SENDMSG_CB);
+>>> +
+>>>    	}
+>>>    }
+>>>    
+>>
+>>
+> 
+
 
