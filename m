@@ -1,124 +1,99 @@
-Return-Path: <netdev+bounces-179519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6398CA7D478
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 08:48:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 53408A7D513
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 09:10:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4145F16B1F4
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 06:48:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05F2617286E
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 07:10:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0C3419F111;
-	Mon,  7 Apr 2025 06:48:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E9DE225A29;
+	Mon,  7 Apr 2025 07:10:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="fxZJWd3T"
 X-Original-To: netdev@vger.kernel.org
-Received: from ssh248.corpemail.net (ssh248.corpemail.net [210.51.61.248])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sg-1-13.ptr.blmpb.com (sg-1-13.ptr.blmpb.com [118.26.132.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE20618FDAF;
-	Mon,  7 Apr 2025 06:48:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.51.61.248
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D1F0225403
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 07:10:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744008498; cv=none; b=n09OCIVWcc2iosqvK4Wbqs0vTQoc961sQIOuOQx22iNeyvPe+7GzHRn7EXSSmtykyhuQqrffbooKJYexwP3hYUTPUOvBoPkdXAQYLfKEFul1oUDkCQwrD8ZGtTShr7T3N7014T6miUCgZFpbhPEwkXjUgGvbQ7w94FeXWL+C6jU=
+	t=1744009819; cv=none; b=BcbTITjZW9/iTxf/hUAkNo2k6Q7Sz9vgbdS+I1BfCRM8IHjQmcAct7xvxlg8gFepWBjbB5USScL5frFGZRroBMaBI//vZFwwUiFNU5VG9AXxnxFQDjdvL5JRLFxIqzh2w2ca6f8oFXMXvbwf8kfJD6YdEb0alMvyWIPfrAGsqtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744008498; c=relaxed/simple;
-	bh=kha/C7psTA4PR1BaWZuqN+3qr52MiLnUlLjXeCPDKas=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bT8x8A09GiQCgVPOUxKarXYxAT4b5dXu66J/NdF07SbijoZahLRsxeUPCg492IOyBUhATh0jonYtxSKiPsUTscC/d/4OZoJHNoEkE4k1c3/Gwao9l0xbgjzH7AKRBNHKOcXaqHdRfBWpVqhQwU7RezhqaNBBHeyncrJRerWjk+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com; spf=pass smtp.mailfrom=inspur.com; arc=none smtp.client-ip=210.51.61.248
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inspur.com
-Received: from jtjnmail201606.home.langchao.com
-        by ssh248.corpemail.net ((D)) with ASMTP (SSL) id 202504071447595486;
-        Mon, 07 Apr 2025 14:47:59 +0800
-Received: from locahost.localdomain.com (10.94.5.217) by
- jtjnmail201606.home.langchao.com (10.100.2.6) with Microsoft SMTP Server id
- 15.1.2507.39; Mon, 7 Apr 2025 14:47:59 +0800
-From: Charles Han <hanchunchao@inspur.com>
-To: <ttoukan.linux@gmail.com>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<hanchunchao@inspur.com>, <kuba@kernel.org>, <leon@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<markzhang@nvidia.com>, <mbloch@nvidia.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <przemyslaw.kitszel@intel.com>, <saeedm@nvidia.com>,
-	<tariqt@nvidia.com>
-Subject: [PATCH V2] net/mlx5: fix potential null dereference when enable shared FDB
-Date: Mon, 7 Apr 2025 14:47:56 +0800
-Message-ID: <20250407064757.4266-1-hanchunchao@inspur.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <d78fa6dc-5820-46b6-9b7d-0986f9a70da2@gmail.com>
-References: <d78fa6dc-5820-46b6-9b7d-0986f9a70da2@gmail.com>
+	s=arc-20240116; t=1744009819; c=relaxed/simple;
+	bh=nfpPY1X5tmnzcqw/MzHCKftk1OWFRNZ+dd8GLUhKi8s=;
+	h=Cc:Date:In-Reply-To:References:To:Subject:Message-Id:From:
+	 Mime-Version:Content-Type; b=UGIM+XgffU1f8ICBZeZnvBdmp3fYbz4NeJnj1DBQQy3psHM2e0Fg18Ng62/bTQVWRdp1uujzRddRAzhqeYaB9FllE4JYnjpqpa96T2gjP5T1DczPcZHcjCkKb3hVnBfOyl0IwcbmJcA1z3+0N3AHPlz1UYaQPNvGa/fY9kqGWSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=fxZJWd3T; arc=none smtp.client-ip=118.26.132.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=feishu2403070942; d=yunsilicon.com; t=1744008992; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=4AVdVkQRZeWLwL0m28ODgoKJTO+xC3dHgFx/UIT1gcI=;
+ b=fxZJWd3TqRG4ENWj/d58sf6bnWb5T88izPgHldsIC8aMrujvelS4PKJXSe5DxCOz5zeCcP
+ TT9rfUyj3FJSc9J+kSa6kfENsKIkE3303czKhaXY5MUcePPtcjCzMxcKcZwlmKcDat5aNl
+ p54fCKlxJPBK0GzkAU2y5LmpGbQZ2l2GkJHCUJq4iMJx57C//BfcVT6BX4jPKDGlmRuBzn
+ Wa16PPC7R4WeKmZWjuNOJI+ZMdnM6Lz+kmu87O3PM9MeA5UfUTdyJDPvrkOzxRst0vPw1B
+ PPTm5obbCivOeTcMfRhAFyDqwvPsv0YIk1qb2yQF75cG7K9TrkdBEzjYCor1Yw==
+X-Original-From: Xin Tian <tianx@yunsilicon.com>
+Cc: <netdev@vger.kernel.org>, <leon@kernel.org>, <andrew+netdev@lunn.ch>, 
+	<pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>, 
+	<jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>, 
+	<weihg@yunsilicon.com>, <wanry@yunsilicon.com>, <jacky@yunsilicon.com>, 
+	<horms@kernel.org>, <parthiban.veerasooran@microchip.com>, 
+	<masahiroy@kernel.org>, <kalesh-anakkur.purayil@broadcom.com>, 
+	<geert+renesas@glider.be>, <geert@linux-m68k.org>
+Date: Mon, 7 Apr 2025 14:56:34 +0800
+In-Reply-To: <20250325051150.65c02e32@kernel.org>
+References: <20250318151449.1376756-1-tianx@yunsilicon.com> <20250318151459.1376756-6-tianx@yunsilicon.com> <20250325051150.65c02e32@kernel.org>
+To: "Jakub Kicinski" <kuba@kernel.org>
+Subject: Re: [PATCH net-next v9 05/14] xsc: Add eq and alloc
+Message-Id: <8b64c52d-38bd-46ed-b327-59f5ca5ada52@yunsilicon.com>
+Content-Transfer-Encoding: quoted-printable
+X-Lms-Return-Path: <lba+267f3771e+1d5011+vger.kernel.org+tianx@yunsilicon.com>
+User-Agent: Mozilla Thunderbird
+From: "Xin Tian" <tianx@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-tUid: 20254071447593c415bb46cf06b7f270ce99be5561875
-X-Abuse-Reports-To: service@corp-email.com
-Abuse-Reports-To: service@corp-email.com
-X-Complaints-To: service@corp-email.com
-X-Report-Abuse-To: service@corp-email.com
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Received: from [127.0.0.1] ([116.231.163.61]) by smtp.feishu.cn with ESMTPS; Mon, 07 Apr 2025 14:56:29 +0800
 
-mlx5_get_flow_namespace() may return a NULL pointer, dereferencing it
-without NULL check may lead to NULL dereference.
-Add a NULL check for ns.
+On 2025/3/25 20:11, Jakub Kicinski wrote:
+> On Tue, 18 Mar 2025 23:15:00 +0800 Xin Tian wrote:
+>> +		for (i =3D 0; i < buf->nbufs; i++) {
+>> +			buf->page_list[i].buf =3D
+>> +				dma_alloc_coherent(&xdev->pdev->dev, PAGE_SIZE,
+>> +						   &t, GFP_KERNEL | __GFP_ZERO);
+> DMA allocations are always zeroed, no need for GFP_ZERO.
+OK=EF=BC=8C will remove that.
+>
+>> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.h b/drivers/n=
+et/ethernet/yunsilicon/xsc/pci/alloc.h
+>> new file mode 100644
+>> index 000000000..a1c4b92a5
+>> --- /dev/null
+>> +++ b/drivers/net/ethernet/yunsilicon/xsc/pci/alloc.h
+>> @@ -0,0 +1,17 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +/* Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
+>> + * All rights reserved.
+>> + */
+>> +
+>> +#ifndef __ALLOC_H
+>> +#define __ALLOC_H
+> Please use less generic names for header guards.
 
-Fixes: db202995f503 ("net/mlx5: E-Switch, add logic to enable shared FDB")
-Signed-off-by: Charles Han <hanchunchao@inspur.com>
----
- .../net/ethernet/mellanox/mlx5/core/eswitch_offloads.c | 10 ++++++++++
- drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c       |  5 +++++
- 2 files changed, 15 insertions(+)
+I'll add "XSC_" prefix in next version.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-index a6a8eea5980c..5405134e74b6 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-@@ -2667,6 +2667,11 @@ static int esw_set_slave_root_fdb(struct mlx5_core_dev *master,
- 	if (master) {
- 		ns = mlx5_get_flow_namespace(master,
- 					     MLX5_FLOW_NAMESPACE_FDB);
-+		if (!ns) {
-+			esw_warn(master, "Failed to get flow namespace\n");
-+			return -EOPNOTSUPP;
-+		}
-+
- 		root = find_root(&ns->node);
- 		mutex_lock(&root->chain_lock);
- 		MLX5_SET(set_flow_table_root_in, in,
-@@ -2679,6 +2684,11 @@ static int esw_set_slave_root_fdb(struct mlx5_core_dev *master,
- 	} else {
- 		ns = mlx5_get_flow_namespace(slave,
- 					     MLX5_FLOW_NAMESPACE_FDB);
-+		if (!ns) {
-+			esw_warn(slave, "Failed to get flow namespace\n");
-+			return -EOPNOTSUPP;
-+		}
-+
- 		root = find_root(&ns->node);
- 		mutex_lock(&root->chain_lock);
- 		MLX5_SET(set_flow_table_root_in, in, table_id,
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
-index a47c29571f64..18e59f6a0f2d 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
-@@ -186,6 +186,11 @@ static int mlx5_cmd_set_slave_root_fdb(struct mlx5_core_dev *master,
- 	} else {
- 		ns = mlx5_get_flow_namespace(slave,
- 					     MLX5_FLOW_NAMESPACE_FDB);
-+		if (!ns) {
-+			mlx5_core_warn(slave, "Failed to get flow namespace\n");
-+			return -EOPNOTSUPP;
-+		}
-+
- 		root = find_root(&ns->node);
- 		MLX5_SET(set_flow_table_root_in, in, table_id,
- 			 root->root_ft->id);
--- 
-2.43.0
-
+Thanks
 
