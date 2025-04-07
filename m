@@ -1,117 +1,129 @@
-Return-Path: <netdev+bounces-179972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2883EA7F033
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 00:14:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F097AA7F03E
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 00:22:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D6F53AD74C
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 22:12:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9957F7A5899
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 22:21:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BA3222370C;
-	Mon,  7 Apr 2025 22:12:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4446B207A34;
+	Mon,  7 Apr 2025 22:22:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HzE1iM4q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kXxN0y2B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 317EF16F8F5;
-	Mon,  7 Apr 2025 22:12:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1343618E743;
+	Mon,  7 Apr 2025 22:22:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744063931; cv=none; b=uCl6vDxRkVULo7Tu2+KjiDEYtYe/BS9OaTQwpEJZ2eqlGS+ZERnrznztiTtM15NTzcwhzT4oT4dX5sDpUVy7B1WAXcUVzCuyEoeZy87NNJTL4iqqKfJKG1McnnKAM7jKAvFM1hNoGcuxskNTVkp5PugDqFhKob6djZObKGRBY9E=
+	t=1744064537; cv=none; b=N0EoEEvLfX6m0c6zKrlAFwwB6oHegnrQXUAaYZ1zMJb/9ptA1lUkaD7GUHIGOtyO8vui3DB5hJd2o1BXP1Mgs6Jxx+ZbOJw3SuQbdmhlUTyKPJEMhusBEDp0wrmvYgu2e0jIgfpEgkXD8rExi12vFaXPTWHg8WsDFzhYfZtXZsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744063931; c=relaxed/simple;
-	bh=+KO5FDR9NB3gjHpmBOa8QAjj0hR5oW3JHAtOLCvZUOk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hgIbI8FbFsuKhH4OYss0PVYnY42fQ3dkTW75LajORhZcul1V6OHctr907bcu5L3Wp7NMRGlmd8Zux+eX9GlEnzYoGZ4eOgCCW1vZnc7tejSCIf4vhi8ijSP0Zi21rOAL2P44osVd/+Fmeo6cyLtD6NiYIUbYe8+oNkGxeQI++3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HzE1iM4q; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2255003f4c6so43715045ad.0;
-        Mon, 07 Apr 2025 15:12:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744063929; x=1744668729; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+KO5FDR9NB3gjHpmBOa8QAjj0hR5oW3JHAtOLCvZUOk=;
-        b=HzE1iM4qxJ0O8Cj6hufFRBxkgGDfuvi83oyhtkuCYMeH2nTgI7bjHO6eRyP/I7gyj5
-         LBJO+dZPWOBiTQPTK6/sdVrGbG1Py6AunvHQ9MGufGAnYfJ8hRVX274nGXxcoex3Nlsb
-         3Ja/7GPhKtfVhhQjGcC2viBLelN/opxIVlMWhDmzF8oGKsWRs+QIXh4PaeD8otxJtSbI
-         K6LmgM7sF0y06fVie2ZdUrCyc7t0wK+1540wFfR8/kaHp7AoxSFyvA0M8KX8No6eej8J
-         CKKXC1xy+jsR2QKBD6aL7wREYDVsG95E3IYzqA5njKx/rDnvemJSj03F1h+7RxJbaLmA
-         pCZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744063929; x=1744668729;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+KO5FDR9NB3gjHpmBOa8QAjj0hR5oW3JHAtOLCvZUOk=;
-        b=uxLdB/qi5r7lX1DFiGwhcYe9fq5KOhKMA9tCdGN8qP6Gn22w89MiFc5bD0rY8lBIju
-         ETXgu6WZlqC+4mJII3aieXDltSTrZwYeErjgm5EiSkDULqmUdEHouvqWGw2Y/mfruayZ
-         fTHX/uLlyhXl9XJa8FPIb2b+XreOW5hIX0P5QvcM8zh/vZs3/ULP8+laBEXavcnRiMR4
-         GSyvPK2sIh9x+0lDz5gCCoO8rSmDiB5+wxyxl/6fXv7+EvYgRoG2TohBh9OxFN20v+OI
-         mRvlnlWtTUs7ONtuOhzfyYdu8N8VagxVXbfZVQrW+xVk42x0zMySZbm1CHUEaRoTYPHb
-         s1fw==
-X-Forwarded-Encrypted: i=1; AJvYcCUrst8ZeGTGwCUoxH4igWhM7vZpsoq18yYJBwPMfia1kNCJ4lSszZ8CdwqUclUBYfI62VouiX4vX2/XoT8=@vger.kernel.org, AJvYcCVW6sJSouL9lDn7ZyOGGydmfFGi4P84tX0eMKbffQlf4/0oqfS2PNicTOTyyWjQBtmwZqTXCdsg@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZXwkry1mx2PwdQhDBQtNxtQ7nFgAOHcD5guyZp007v7AtET7f
-	D5MaDZwYb+1otl2e7QDkshHE+kjSVLLdT3pgP96d9q2/PKzRAInU
-X-Gm-Gg: ASbGncueJIo1w2m4Jtiw5cV++sbi9PpAtkeyZKCElKaJHPtJg2rhWmaoPxAnf1m1Pea
-	qS7/Sh++LQdHU0JNEdzNSlPJdyyfqWg2mvrHadNxh8zsduYhGVN2bKEhmDEd6ehQbRCAB0f9Lto
-	k26oei2wD1/EeAzpmE/SwR4BU5BWSK+New14zonk8VMzrGtrUmhO+jrF6+MRuChPCcz5nneoGV9
-	/SHq8D2mHihS0K8g7sxTPCWyBVc1yTt5Dyt4aXfJanuNplPHN/mw/+iaJupJb0MkozTy84p5bLg
-	+HNTyWVfiFFnhmIGyMPDme0rQPe218MfEhJOkk3sehM=
-X-Google-Smtp-Source: AGHT+IEvjikd/I77m2fm22oAI4Ks5ABnEUbcCmTxIM1VAO9N8vzwrz5hN/axnWQLVcFkyCGKsBihsA==
-X-Received: by 2002:a17:902:f646:b0:229:1717:8826 with SMTP id d9443c01a7336-22a8a06d686mr210345955ad.28.1744063929357;
-        Mon, 07 Apr 2025 15:12:09 -0700 (PDT)
-Received: from mythos-cloud ([125.138.201.7])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-229785ad9a0sm86483995ad.39.2025.04.07.15.12.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 15:12:08 -0700 (PDT)
-Date: Tue, 8 Apr 2025 07:12:04 +0900
-From: Moon Yeounsu <yyyynoom@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v6] net: dlink: add support for reporting stats
- via `ethtool -S` and `ip -s -s link show`
-Message-ID: <Z_RNtOY5PPS5A9v4@mythos-cloud>
-References: <20250407134930.124307-1-yyyynoom@gmail.com>
- <122f35a6-a8b6-446a-a76d-9b761c716dfe@lunn.ch>
+	s=arc-20240116; t=1744064537; c=relaxed/simple;
+	bh=Qbr5F8RaLt4BsGe+R2HawfHCgZ7qW7CDs6Mf/m1Ffaw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=qG0K8OO14HllUeem4FS+OcgkGDZOkAu170RlRUDstTsHhSKIx5zlWy5tkEXlsyX0q9enUjwIttKgPx09xJRDCNqmSy8de2xlot/ozOOk156rxQXRzZogh80pHMcso+Uk4tTbkpN0iHaPoKnGjUwH99l8dp4dbOkYIm0n8FN0dSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kXxN0y2B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B60BC4CEDD;
+	Mon,  7 Apr 2025 22:22:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744064536;
+	bh=Qbr5F8RaLt4BsGe+R2HawfHCgZ7qW7CDs6Mf/m1Ffaw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=kXxN0y2BhzjZaHDvsi/NwsAmlYkOIDnfhmqeYyDtXHq0fucuJoVLN6Hi6iNkkrwHQ
+	 1ILN7T2kdZInG9IjsK0hDUQsKlRNejU5PaUSUm9amZdp/S5h6klGsojJxD3bd60IN3
+	 K5Ow9/AGEMstbMs2UHUF9ZMwj/w9Ikqpm63/9biC2U9TQ4PGrYIuPUwHpyFt7xaYKn
+	 jaRzRICdLww3xlHfsJJw9IOt/nE8kjfMHtOBWgOd5wgc01HI5lh8uxoAQ1Dy54/CKZ
+	 XuvaRRsWE7rh/irz9+0nhTkzBgo+Js78Dg0upa8WUUajzXyx7ggfW/MoJNIqeT+akV
+	 b+Ey9bHwhaIwQ==
+Date: Mon, 7 Apr 2025 17:22:14 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Michael Chan <mchan@broadcom.com>,
+	Potnuri Bharat Teja <bharat@chelsio.com>, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Leon Romanovsky <leon@kernel.org>
+Subject: Re: PCI VPD checksum ambiguity
+Message-ID: <20250407222214.GA204460@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <122f35a6-a8b6-446a-a76d-9b761c716dfe@lunn.ch>
+In-Reply-To: <CALs4sv3awP3oA3-mvjSUmHCk=KZjF5F75SnnaE79ZUGqDC=orw@mail.gmail.com>
 
-On Mon, Apr 07, 2025 at 10:43:41PM +0200, Andrew Lunn wrote:
+On Wed, Apr 02, 2025 at 04:03:42PM +0530, Pavan Chebbi wrote:
+> > > >
+> > > > Any idea how devices in the field populate their VPD?
+> 
+> I took a quick look at our manufacturing tool, and it does look like
+> the computation simply starts at address 0.
+> 
+> > > > Can you share any VPD dumps from devices that include an RV keyword
+> > > > item?
+> 
+> A couple of devices I could find: hope it helps..
+> 000100: 822f0042 726f6164 636f6d20 4e657458 7472656d 65204769 67616269 74204574
+> 000120: 6865726e 65742043 6f6e7472 6f6c6c65 7200904b 00504e08 42434d39 35373230
+> 000140: 45430931 30363637 392d3135 534e0a30 31323334 35363738 394d4e04 31346534
+> 000160: 52561d1d 00000000 00000000 00000000 000000
+> 
+> 000100: 822f0042 726f6164 636f6d20 4e657458 7472656d 65204769 67616269 74204574
+> 000120: 6865726e 65742043 6f6e7472 6f6c6c65 7200904b 00504e08 42434d39 35373139
+> 000140: 45430931 30363637 392d3135 534e0a30 31323334 35363738 394d4e04 31346534
+> 000160: 52561d15 00000000 00000000 00000000 00000000 00000000 00000000 00000000
 
-> That is an odd way of doing it. It would be better to repeat the
-> static const struct dlink_stats.
+Thanks a lot for this!
 
-Oh, I see — sorry about that. I wasn’t aware it might be considered an odd approach.
-If you don’t mind, could you please explain a bit more about why it seems problematic to you?
+I put each of these in a file ("vpd.txt") and computed the checksum
+with this:
 
-Let me briefly share my reasoning behind the current design:
-Each ethtool stats function (e.g., get_ethtool_XXX) gathers a specific group of related statistics.
-You can see this grouping in action in my patch.
-So, I thought managing each stat group in that way would make the code more intuitive,
-and help simplify the logic for developers who use or extend it.
+  addr=0; sum=0; xxd -r -c 32 vpd.txt | xxd -p -g1 -c1 x.bin | while read X; do sum=$(($sum + "0x$X")); printf "addr 0x%04x: 0x%02x sum 0x%02x\n" $addr "0x$X" $(($sum % 256)); addr=$(($addr + 1)); done
 
-I'm still new to kernel development, so there are many things I don't fully understand yet.
-I'd appreciate it if you could feel free to point out anything.
+In both cases the sum came out to 0x00 as it should.
 
-Thank you for reviewing my patch!
+So it looks like Broadcom interpreted the spec the same way Linux
+pci_vpd_check_csum() does: the checksum includes all bytes from the
+beginning of VPD up to and including the RV checksum byte, not just
+the VPD-R list.
+
+These dumps start at 0x100 (not 0), which seems a little weird.  But
+"xxd -r" assumes zeros for the 0-0xff range, so it doesn't affect the
+checksum.
+
+I manually decoded the first one, which looked like this.  Nothing
+surprising here:
+
+  00000100: 822f 0042 726f 6164 636f 6d20 4e65 7458  ./.Broadcom NetX
+  00000110: 7472 656d 6520 4769 6761 6269 7420 4574  treme Gigabit Et
+  00000120: 6865 726e 6574 2043 6f6e 7472 6f6c 6c65  hernet Controlle
+  00000130: 7200                                     r.
+
+    82 == large resource tag 0x02 (Identifier String), data item length 0x2f
+      "Broadcom NetXtreme Gigabit Ethernet Controller"
+
+  00000132:      904b 0050 4e08 4243 4d39 3537 3230    .K.PN.BCM95720
+  00000140: 4543 0931 3036 3637 392d 3135 534e 0a30  EC.106679-15SN.0
+  00000150: 3132 3334 3536 3738 394d 4e04 3134 6534  123456789MN.14e4
+  00000160: 5256 1d1d 0000 0000 0000 0000 0000 0000  RV..............
+  00000170: 0000 00                                  ...
+
+    90 == large resource tag 1_0000b (0x10, VPD-R), data item length 0x4b
+    50 4e PN keyword, length 0x08: 4243 4d39 3537 3230:       "BCM95720"
+    45 43 EC keyword, length 0x09: 31 3036 3637 392d 3135:    "106679-15"
+    53 4e SN keyword, length 0x0a: 30 3132 3334 3536 3738 39: "0123456789"
+    4d 4e MN keyword, length 0x04: 3134 6534:                 "14e4"
+    52 56 RV keyword, length 0x1d: 1d
+      (last byte of VPD-R is 0x162 + 0x1d == 0x17f)
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/pci/vpd.c?id=v6.14#n520
 
