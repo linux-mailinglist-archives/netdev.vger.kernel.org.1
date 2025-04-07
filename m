@@ -1,165 +1,194 @@
-Return-Path: <netdev+bounces-179765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8660DA7E7B7
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:04:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62BC1A7E795
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:00:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79FF31899AF2
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:58:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF6457A35C7
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:59:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 922D12144C8;
-	Mon,  7 Apr 2025 16:57:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6FEE214A9C;
+	Mon,  7 Apr 2025 17:00:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j7nJZdcM"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="X97KDpLR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1BEE4879B
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 16:57:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F80126AEC
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 17:00:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744045044; cv=none; b=sdBnNzzxBfNtsesTkKrNeDFMICpu+ONlrL2Sp6PLtRuAT9wGA6dxTp+bX4ZLsNz52Mn2LHoysmyzpRAoxch3QBb27fwjb3Vv78/5ChfDA0G/Df53c1k7wS3Ss82rR5LM+Dp4ApIwfAr0EprpDdnEwMrOLjEd2lgQIwQruuzlSxw=
+	t=1744045248; cv=none; b=mkeJGs27rnkBF7EgJ4pY+cAnjIILhVCMiQeX6BG96FDp0mi4pK53ojuLyTg6pkr+NrfOKc2+2r/mkg3cvS7kHW2I38+TBr9vneM7MJ1IDkPYveevB2I9idcQunx+Tor+bWJdhUnlHVMEVjRdgA0v0hpCt7kq0i8F6uJ6FL2r0Cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744045044; c=relaxed/simple;
-	bh=xavmz/HAokZzT87/ICDfarP0MdbzGAYxW789N0zQSwo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eos6uEnRXfNZxV/LU0bpoiU8Y+sGivS3s3QSyitw1+Ui449+hz1GZ2caSjQGVtevrc7jZc/NmPpm6D7jYg/4OVIhBP7xDHh8NB0vT0SCzxC1pN9Z+mjWd+PV5PygQPyAulw3XdAKa9RpppenJuJUwxwyuujmDlnAep241it2esM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j7nJZdcM; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-223f4c06e9fso41715305ad.1
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 09:57:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744045042; x=1744649842; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OjN3AtqnRZmTtL8CjWIY99mZuRYU5a+XRqA80N2gGrM=;
-        b=j7nJZdcMJi86P8S/oyxD8vUnCzYvF3mVV6+OXy4xl3WvSSuL5kBI1iFbclwTlw6Jb1
-         33jtbx/vw2PEMY26cTUNZjqBA/F/LLrIird5NYavi28fQtufXtX8jJPL64lMfcS+YKvI
-         spgA4d4C8zeXtNQ0LwNvJvpk2S81Qn5TcuZPww2esiF3CDDPLv0lO/u36VQDudi75yUo
-         NgDO9FjRm05dqG4vZASSFxkCDsRHUB+fVDZoThdGcN0jY1TKhwVnLjl3c8Fd890DHHu5
-         wUhbM2Om7GH2JDxXoFCkxg81rY/UWCvZWFjG6zEL8RX1/SmQhX3SR6eFkoyiN36G9Yu5
-         cKWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744045042; x=1744649842;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OjN3AtqnRZmTtL8CjWIY99mZuRYU5a+XRqA80N2gGrM=;
-        b=kKJj5hl4bNP0mycm7hSRMwiAoyX3lVj4hXnT+OC57LPZ3AsvkbhAXk4NKuG3+va3A5
-         MoVXqCUETcGg6tf7Va4ph7fmYMnrWtEoJnLgMO/VJljpNteXUO4ZzhxZJrq0pOm7NqAA
-         0sOTG6W1EPxP419Htiky1QOHa9d7uq8m24hf/vPJk4pMx7vo6Mq0G79PORVXgTGsVTRT
-         98pXTiaKTT0GBDBQBH3WSzsV4QVniHOpHWzOcQDOfk5VUputdo4XYhoXgtlobY1pOWml
-         eTpqeFUjP86wSpsuCZ3rTJuP94j8ceSxxwDgjCvUOh22X9s3UljuF0qK/CW+rtbnukYT
-         o8Kw==
-X-Forwarded-Encrypted: i=1; AJvYcCX9w0Hvvop7Jugzj8cwsqtuQDRQgfOj4D5x93djBA90I9sYm05WooPM354feVbYkHO/wb6JvIk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJSAdQw1vOQGOJsfyh16ozUgmbp/zvmgBXNoHG+ZKqkoclD+DI
-	TdLc+n72zuZ45c8dsURsZa+z4dxIcv7a8Bkj0tdKMixR2tdjbFQ=
-X-Gm-Gg: ASbGncuY7Vu6q8xWm9EAHDJ8+pK+dER1loxHpy1zCfENKfFvCQ3JBBBIjKWK8UGucPW
-	o0PTCmyK5Ygq2mqMsaJ5UzPw7WcAd4fJcB0PTIjZ0d7T5nKvCcSk/VpsFfmvxiyLfx9OfTbPuFP
-	1CFAg70ryL2MgoB9GHbUfW9oZd54JcgL/e71TmI8Nzjop32y32/AhOTU6HFhE2qOuLShBz5hzgQ
-	E7vmRsPlE3mSJKRtq7tGLFb9XXgt/4W67Q+Lw50IyN1SxWPca5Is4sKI4/y/OO2pgcl19X0SS5C
-	eg6x8+WRECx+s29Yj3qHQxxFq5zsuTMMZ+ouJkaYOhyV
-X-Google-Smtp-Source: AGHT+IEXHuh4nUJQHvgcnTBT5ZfLB5zHUwrruKt4E+2QQo2ck+e1uxd+zA60zlTOv4yqoe5vBwHN3g==
-X-Received: by 2002:a17:902:f686:b0:21f:1348:10e6 with SMTP id d9443c01a7336-22ab5e377e0mr2700745ad.13.1744045042123;
-        Mon, 07 Apr 2025 09:57:22 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-229787728cfsm83641225ad.228.2025.04.07.09.57.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 09:57:21 -0700 (PDT)
-Date: Mon, 7 Apr 2025 09:57:20 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
-	syzbot+45016fe295243a7882d3@syzkaller.appspotmail.com
-Subject: Re: [PATCH v1 net] rtnetlink: Fix bad unlock balance in do_setlink().
-Message-ID: <Z_QD8CX_M1ISSC0b@mini-arch>
-References: <20250407164229.24414-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1744045248; c=relaxed/simple;
+	bh=8EEyvQc+5pIBnE2p/7oYhHwo0mC7KQRRPdeL6ZI6qiw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fgef/L8CDf2iMNsnzhfFQrEOSHPeLfA1aGT0Wdum/7i/sa5IlWoSrz9k8cIOQZ+/uXIlTgZ3LRJ3H0pF2m3e2spjeZV8Hffg9VitBjaLqbQZ4JRvNlcn7MMrx2LYc0QsBuJZ0wtkU5FbgVOgJRYBWqWFBoyjkMxaceU8gKUyRjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=X97KDpLR; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <1aec6dab-ed03-4ca3-8cd1-9cfbb807be10@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1744045243;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oLDAmjclRasSVpfEYONAaYZO702FQiJJq0bMQnxY2As=;
+	b=X97KDpLRfMghEYf9sxoBxmw793lbUNyIZX2MhCZr0epog6FScf9fPv/rbXMCRI4WlxGsF1
+	ACaKep6rqwnu785TYkn30Pqnpl9BJRWA+kOGZfrTVeDuXFPVxZz98GZ//C62FkDo4bfBee
+	qs640GM1x6TnhIGk7qK8bfPHB7/TZxI=
+Date: Mon, 7 Apr 2025 13:00:34 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250407164229.24414-1-kuniyu@amazon.com>
+Subject: Re: [RFC net-next PATCH 00/13] Add PCS core support
+To: "Christian Marangi (Ansuel)" <ansuelsmth@gmail.com>
+Cc: Kory Maincent <kory.maincent@bootlin.com>, netdev@vger.kernel.org,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
+ upstream@airoha.com, Heiner Kallweit <hkallweit1@gmail.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Clark Wang <xiaoning.wang@nxp.com>,
+ Claudiu Beznea <claudiu.beznea@microchip.com>,
+ Claudiu Manoil <claudiu.manoil@nxp.com>, Conor Dooley <conor+dt@kernel.org>,
+ Ioana Ciornei <ioana.ciornei@nxp.com>, Jonathan Corbet <corbet@lwn.net>,
+ Joyce Ooi <joyce.ooi@intel.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Li Yang <leoyang.li@nxp.com>, Madalin Bucur <madalin.bucur@nxp.com>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Michal Simek <michal.simek@amd.com>,
+ Naveen N Rao <naveen@kernel.org>, Nicholas Piggin <npiggin@gmail.com>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ Rob Herring <robh+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+ Robert Hancock <robert.hancock@calian.com>,
+ Saravana Kannan <saravanak@google.com>, Shawn Guo <shawnguo@kernel.org>,
+ UNGLinuxDriver@microchip.com, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Wei Fang <wei.fang@nxp.com>, devicetree@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-doc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linuxppc-dev@lists.ozlabs.org
+References: <20250403181907.1947517-1-sean.anderson@linux.dev>
+ <20250407182738.498d96b0@kmaincent-XPS-13-7390>
+ <720b6db8-49c5-47e7-98da-f044fc38fc1a@linux.dev>
+ <CA+_ehUyAo7fMTe_P0ws_9zrcbLEWVwBXDKbezcKVkvDUUNg0rg@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <CA+_ehUyAo7fMTe_P0ws_9zrcbLEWVwBXDKbezcKVkvDUUNg0rg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On 04/07, Kuniyuki Iwashima wrote:
-> When validate_linkmsg() fails in do_setlink(), we jump to the errout
-> label and calls netdev_unlock_ops() even though we have not called
-> netdev_lock_ops() as reported by syzbot.  [0]
+On 4/7/25 12:46, Christian Marangi (Ansuel) wrote:
+> Il giorno lun 7 apr 2025 alle ore 18:33 Sean Anderson
+> <sean.anderson@linux.dev> ha scritto:
+>>
+>> On 4/7/25 12:27, Kory Maincent wrote:
+>> > On Thu,  3 Apr 2025 14:18:54 -0400
+>> > Sean Anderson <sean.anderson@linux.dev> wrote:
+>> >
+>> >> This series adds support for creating PCSs as devices on a bus with a
+>> >> driver (patch 3). As initial users,
+>> >>
+>> >> - The Lynx PCS (and all of its users) is converted to this system (patch 5)
+>> >> - The Xilinx PCS is broken out from the AXI Ethernet driver (patches 6-8)
+>> >> - The Cadence MACB driver is converted to support external PCSs (namely
+>> >>   the Xilinx PCS) (patches 9-10).
+>> >>
+>> >> The last few patches add device links for pcs-handle to improve boot times,
+>> >> and add compatibles for all Lynx PCSs.
+>> >>
+>> >> Care has been taken to ensure backwards-compatibility. The main source
+>> >> of this is that many PCS devices lack compatibles and get detected as
+>> >> PHYs. To address this, pcs_get_by_fwnode_compat allows drivers to edit
+>> >> the devicetree to add appropriate compatibles.
+>> >
+>> > I don't dive into your patch series and I don't know if you have heard about it
+>> > but Christian Marangi is currently working on fwnode for PCS:
+>> > https://lore.kernel.org/netdev/20250406221423.9723-1-ansuelsmth@gmail.com
+>> >
+>> > Maybe you should sync with him!
+>>
+>> I saw that series and made some comments. He is CC'd on this one.
+>>
+>> I think this approach has two advantages:
+>>
+>> - It completely solves the problem of the PCS being unregistered while the netdev
+>>   (or whatever) is up
+>> - I have designed the interface to make it easy to convert existing
+>>   drivers that may not be able to use the "standard" probing process
+>>   (because they have to support other devicetree structures for
+>>   backwards-compatibility).
+>>
 > 
-> Let's return an error directly in such a case.
-> 
-> [0]
-> WARNING: bad unlock balance detected!
-> 6.14.0-syzkaller-12504-g8bc251e5d874 #0 Not tainted
-> 
-> syz-executor814/5834 is trying to release lock (&dev_instance_lock_key) at:
-> [<ffffffff89f41f56>] netdev_unlock include/linux/netdevice.h:2756 [inline]
-> [<ffffffff89f41f56>] netdev_unlock_ops include/net/netdev_lock.h:48 [inline]
-> [<ffffffff89f41f56>] do_setlink+0xc26/0x43a0 net/core/rtnetlink.c:3406
-> but there are no more locks to release!
-> 
-> other info that might help us debug this:
-> 1 lock held by syz-executor814/5834:
->  #0: ffffffff900fc408 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_lock net/core/rtnetlink.c:80 [inline]
->  #0: ffffffff900fc408 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_nets_lock net/core/rtnetlink.c:341 [inline]
->  #0: ffffffff900fc408 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_newlink+0xd68/0x1fe0 net/core/rtnetlink.c:4064
-> 
-> stack backtrace:
-> CPU: 0 UID: 0 PID: 5834 Comm: syz-executor814 Not tainted 6.14.0-syzkaller-12504-g8bc251e5d874 #0 PREEMPT(full)
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-> Call Trace:
->  <TASK>
->  __dump_stack lib/dump_stack.c:94 [inline]
->  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
->  print_unlock_imbalance_bug+0x185/0x1a0 kernel/locking/lockdep.c:5296
->  __lock_release kernel/locking/lockdep.c:5535 [inline]
->  lock_release+0x1ed/0x3e0 kernel/locking/lockdep.c:5887
->  __mutex_unlock_slowpath+0xee/0x800 kernel/locking/mutex.c:907
->  netdev_unlock include/linux/netdevice.h:2756 [inline]
->  netdev_unlock_ops include/net/netdev_lock.h:48 [inline]
->  do_setlink+0xc26/0x43a0 net/core/rtnetlink.c:3406
->  rtnl_group_changelink net/core/rtnetlink.c:3783 [inline]
->  __rtnl_newlink net/core/rtnetlink.c:3937 [inline]
->  rtnl_newlink+0x1619/0x1fe0 net/core/rtnetlink.c:4065
->  rtnetlink_rcv_msg+0x80f/0xd70 net/core/rtnetlink.c:6955
->  netlink_rcv_skb+0x208/0x480 net/netlink/af_netlink.c:2534
->  netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
->  netlink_unicast+0x7f8/0x9a0 net/netlink/af_netlink.c:1339
->  netlink_sendmsg+0x8c3/0xcd0 net/netlink/af_netlink.c:1883
->  sock_sendmsg_nosec net/socket.c:712 [inline]
->  __sock_sendmsg+0x221/0x270 net/socket.c:727
->  ____sys_sendmsg+0x523/0x860 net/socket.c:2566
->  ___sys_sendmsg net/socket.c:2620 [inline]
->  __sys_sendmsg+0x271/0x360 net/socket.c:2652
->  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->  do_syscall_64+0xf3/0x230 arch/x86/entry/syscall_64.c:94
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7f8427b614a9
-> Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007fff9b59f3a8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 00007fff9b59f578 RCX: 00007f8427b614a9
-> RDX: 0000000000000000 RSI: 0000200000000300 RDI: 0000000000000004
-> RBP: 00007f8427bd4610 R08: 000000000000000c R09: 00007fff9b59f578
-> R10: 000000000000001b R11: 0000000000000246 R12: 0000000000000001
-> R13:
-> 
-> Fixes: 4c975fd70002 ("net: hold instance lock during NETDEV_REGISTER/UP")
-> Reported-by: syzbot+45016fe295243a7882d3@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=45016fe295243a7882d3
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> I notice this and it's my fault for taking too long to post v2 of the PCS patch.
+> There was also this idea of entering the wrapper hell but I scrapped that early
+> as I really feel it's a workaround to the current problem present for
+> PCS handling.
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+It's no workaround. The fundamental problem is that drivers can become
+unbound at any time, and we cannot make consumers drop their references.
+Every subsystem must deal with this reality, or suffer from
+user-after-free bugs. See [1-3] for discussion of this problem in
+relation to PCSs and PHYs, and [4] for more discussion of my approach.
+
+[1] https://lore.kernel.org/netdev/YV7Kp2k8VvN7J0fY@shell.armlinux.org.uk/
+[2] https://lore.kernel.org/netdev/20220816163701.1578850-1-sean.anderson@seco.com/
+[3] https://lore.kernel.org/netdev/9747f8ef-66b3-0870-cbc0-c1783896b30d@seco.com/
+[3] https://lpc.events/event/17/contributions/1627/
+
+> And the real problem IMHO is that currently PCS handling is fragile and with too
+> many assumptions. With Daniel we also discussed backwards-compatibility.
+> (mainly needed for mt7621 and mt7986 (for mediatek side those are the 2
+> that slipped in before it was correctly complained that things were
+> taking a bad path)
+> 
+> We feel v2 permits correct support of old implementations.
+> The ""legacy"" implementation pose the assumption that PCS is never removed
+> (unless the MAC driver is removed)
+> That fits v2 where a MAC has to initially provide a list of PCS to
+> phylink instance.
+
+And what happens when the driver is unbound from the device and suddenly
+a PCS on that list is free'd memory but is in active use by a netdev?
+
+> With this implementation, a MAC can manually parse whatever PCS node structure
+> is in place and fill the PCS.
+> 
+> As really the "late" removal/addition of a PCS can only be supported with fwnode
+> implementation as dedicated PCS driver will make use of that.
+
+I agree that a "cells" approach would require this, but
+
+- There are no in-tree examples of where this is necessary
+- I think this would be easy to add when necessary
+
+> I honestly hope we can skip having to enter the wrapper hell.
+
+Unfortunately, this is required by the kernel driver model :l
+
+> Anyway I also see you made REALLY GOOD documentation.
+
+Thanks. One of my peeves is subsystems that have zero docs...
+
+> Would be ideal to
+> collaborate for that. Anyway it's up to net maintainers on what path to follow.
+> 
+> Just my 2 cent on the PCS topic.
+
+--Sean
 
