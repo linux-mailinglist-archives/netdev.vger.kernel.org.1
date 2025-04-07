@@ -1,247 +1,191 @@
-Return-Path: <netdev+bounces-179691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4C06A7E24C
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:43:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 968B2A7E2C6
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:57:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E273517E08C
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 14:38:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 409F34267F4
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 14:46:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D628F1F7902;
-	Mon,  7 Apr 2025 14:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDBAE1DED64;
+	Mon,  7 Apr 2025 14:43:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ROnqe2g5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LpufQ4SM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C431F63D6
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 14:31:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC401A5BAE;
+	Mon,  7 Apr 2025 14:43:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744036305; cv=none; b=CTBh8r1rD0IXkIC6aGjfcKxW+XsbSA1//0IVJD1TrDzuqMLp3KRZIQTfFIKN3DzpOOseJUmQKQnLH4DjqOxIJfLucuknBljE4BLDH9jUSNjlWBGwKs+VVS1Gip/1RXOVkc97OLTWaKPpbiNLds+Y22OMgofMUBS+19wIYcn1FeQ=
+	t=1744037037; cv=none; b=CkmUc2Mk8pK/xcFqBholE1Uljmu+MhzcaYD2sISOyfaJbup75EnGPYPSTOrPuxY8sSAyOLgO4Z0IDgPWkM/7LtbBbTp0oMwJ9U5DfqvjQ6ZEt9SrXVXdk2HQIi19pK1tzIQqtQQtfrlyib6XwjwGchSOlzNHPa/sMKmc38JAaqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744036305; c=relaxed/simple;
-	bh=9ywF6Dm1SAB2jK6uFXvL1W1al4TRr8CmwBz2C6smRjY=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=f5b1QlLvGhvmYrPlLJwI6/gujN5gVxf7dDe+e401K9NZxxCFjimQTSSxlh9rmYK+nyDSqqqL+nPzGLjzaySyl8KFvppGJ3Io2E7JkRm5561q9fU+VSaa995nsMOp7aAXhLnSOMi05Ip0a3tnifuQYJHlfywLkGO2kniTHp/91+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ROnqe2g5; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6e8ec399427so37307946d6.2
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 07:31:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744036303; x=1744641103; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LkyNQlmKxRVaLWZGMx5AJLvS3Rif50GQKIVBJXpxBnI=;
-        b=ROnqe2g5gKQsi6rLdDXF4ZeJBQDFLdV1mf+IsRCJHMrg8rCFoyRrcYrddNPyMvtJAs
-         Z+KAkE70PjbKcUthpw4r1lvwndgQM56MEPLAbwgh6Za88pOiq67WqfLJApcqrVjAlXT8
-         B8yxgPCa+QwiEJjLS1CLV4BcHdvcDwG8CkSb7iPzqK9k7TafbwIMV64T/tRqDn5LMxF7
-         eYZ09yu4rftgjfAYkGfcuPdsNKN4lqIOj34bI4IWGG+Z8IohpT743NJvfqXuuECvMKAl
-         hW0mE9w7bRKaqD+JOkF/RfSD12qnJNRuRbI4lP0o1bdVICTee1m6HG5whWqwBhAAE1pX
-         VAFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744036303; x=1744641103;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=LkyNQlmKxRVaLWZGMx5AJLvS3Rif50GQKIVBJXpxBnI=;
-        b=fuMadMl3gO83z7zCs55tAKlbTkgVnYPRHTmYeRPx36yv3KIbxfFsnfaL8x2iOFo503
-         B/iwjjTn6tKZeQuBj0lrN7CwYMFXUAE99q8WfndJBbayjvaX1k/kD8kvcVwjfeszzcQ1
-         ZddJK8pFRT+7EWBsb8I//SCLl06vWrI33vCE8UdC5OA4iZiQavIgZrj3gewRCO2oVn1V
-         /GZ/i+1FLh8Jtx/zo83O0By9a0F1OPBKzGqUFY4WMLiYn7QKHCQt8bIGzcTJYKKZBRSV
-         b2vK3tEbDhKVzPxGlAbgSfrjdaU1w0goqZPdn5/DrB4mGlNJ6vTRyYjjPN2mcHbrPQAd
-         +3Sw==
-X-Gm-Message-State: AOJu0YzIMPrQ0LYNcmAKgU5CcI5qquoEM1RWOXum1qO0bW5zpF7RPSnF
-	GymiZSUX/hSUnz/Odlcz95S2JTBzC5C1JIZphCRWegKdrM7APipE
-X-Gm-Gg: ASbGncvGhMAFni12pkwi7cyEK6OMKVXhFAyqZF1N8qWZSjvmfKZgdPR0mSLVCbWwhg3
-	b7fLyHnMC6m8afanOCFE2H8Jvz1QtC+WUGpB6k12Jgy2a73SkKZn+tDj6Czy89XR2yEyViUt3yb
-	e2xw2wwjkCSLVqD5MWVZxXk/mcjg6v4/cUJB8Nas1SoVUFbrRm6PzNirtlaNeuPP2SSqtuQlauk
-	Bwcpa+uP/5jBcNyxdmF9aI1jID31N+X0HiXREK9C1/esZAiIAFf/gb1oAZx4VG/B1YYozL+ggxX
-	BwIdVFvuZ/nXqMrdCJMsS/S8nYKlvBpYaL1DpHggyv5DRAcbtuwMtBR3o578L3AAu6krQeDe1wD
-	a1snR+bTfS+vwitSSFVLJ6xrD6MeCGtME
-X-Google-Smtp-Source: AGHT+IE5T8tOl65z1FrDaDAPIuSFq8/049zyMmd3PbaP+Mvcn2jQIxmGmKwq1rFGL1Yu0Riq6migHQ==
-X-Received: by 2002:a05:6214:242a:b0:6e6:698f:cafd with SMTP id 6a1803df08f44-6f0b751a2c8mr147807436d6.37.1744036302524;
-        Mon, 07 Apr 2025 07:31:42 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ef0f137937sm58774086d6.80.2025.04.07.07.31.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 07:31:41 -0700 (PDT)
-Date: Mon, 07 Apr 2025 10:31:41 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Ido Schimmel <idosch@nvidia.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, 
- davem@davemloft.net, 
- pabeni@redhat.com, 
- edumazet@google.com, 
- dsahern@kernel.org, 
- horms@kernel.org, 
- gnault@redhat.com, 
- stfomichev@gmail.com
-Message-ID: <67f3e1cd271f1_38ecd3294ae@willemb.c.googlers.com.notmuch>
-In-Reply-To: <Z_NzAqmXB4rvKn-G@shredder>
-References: <20250402114224.293392-1-idosch@nvidia.com>
- <20250402114224.293392-2-idosch@nvidia.com>
- <67efef607bc41_1ddca82948c@willemb.c.googlers.com.notmuch>
- <Z_KFZ5cm7tOaBvw0@shredder>
- <67f2c83b70eb3_30e359294d4@willemb.c.googlers.com.notmuch>
- <Z_NzAqmXB4rvKn-G@shredder>
-Subject: Re: [PATCH net 1/2] ipv6: Start path selection from the first nexthop
+	s=arc-20240116; t=1744037037; c=relaxed/simple;
+	bh=qNa5SnpYvPxSF+sauTUnQwpMRyj/0mKfqIpcvOwWmbw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SzNTKqDYLDYHyO9KKLSlN8g7cVf1pPIH82aJLK4lzcxzokhMk9RZ7UB0lZ8ahVRpQaTXqXdtBUzpjhj3uWxnpCpmXuMzLLmc5add+LVnp/OFQ0OEUY2X0wPE1D8Eah2QRNa6wg+tP6l+iHwUoy0BMv4Wx5x4tp7sPdFSwyHjAcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LpufQ4SM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC694C4CEE7;
+	Mon,  7 Apr 2025 14:43:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744037037;
+	bh=qNa5SnpYvPxSF+sauTUnQwpMRyj/0mKfqIpcvOwWmbw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=LpufQ4SMtmAw34AH1lg4HaJpmi5uB/ITZaRXFjPtqQ5Jplj8LEJjg+voE3cdUfG+S
+	 Aff6Q90IfGj5NjihzGJi/2j6vzVQWb9amgjl3th/e4b/1QRRgnT0ynXRmsTVPLHLBV
+	 Fc66kZZ6DNvwLPaLfw0gzaiqid4TaVavtDVxSS/LJm+Fva+m8nzggXgUXT4xLU18Yo
+	 WkoTUnJXITYzzQOMzRxNtcMyR6O3kRsa+s0KyueBzgKtHRGJcKCj92N/XX/X84bLQz
+	 uDsO/MHk8D+kEiQ2o2Sr6pD8B6aINN8DBRIfBq/ik5khBvl2w4ylI6AOJjb6CJidsg
+	 tqK4TWZbxsZOw==
+Message-ID: <4d35bda2-d032-49db-bb6e-b1d70f10d436@kernel.org>
+Date: Mon, 7 Apr 2025 16:43:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 1/2] page_pool: Move pp_magic check into
+ helper functions
+To: Zi Yan <ziy@nvidia.com>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
+ <toke@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Simon Horman <horms@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
+ Mina Almasry <almasrymina@google.com>, Yonglong Liu
+ <liuyonglong@huawei.com>, Yunsheng Lin <linyunsheng@huawei.com>,
+ Pavel Begunkov <asml.silence@gmail.com>, Matthew Wilcox
+ <willy@infradead.org>, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-mm@kvack.org,
+ kernel-team <kernel-team@cloudflare.com>
+References: <20250404-page-pool-track-dma-v7-0-ad34f069bc18@redhat.com>
+ <20250404-page-pool-track-dma-v7-1-ad34f069bc18@redhat.com>
+ <D8ZSA9FSRHX2.2Q6MA2HLESONR@nvidia.com> <87cydoxsgs.fsf@toke.dk>
+ <DF12251B-E50F-4724-A2FA-FE5AAF3E63DF@nvidia.com> <87v7rgw1us.fsf@toke.dk>
+ <E9D0B5C7-B387-46A9-82CC-8F29623BFF6C@nvidia.com>
+ <893B4BFD-1FDA-46DE-82D5-9E5CBDD90068@nvidia.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <893B4BFD-1FDA-46DE-82D5-9E5CBDD90068@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Ido Schimmel wrote:
-> On Sun, Apr 06, 2025 at 02:30:19PM -0400, Willem de Bruijn wrote:
-> > Ido Schimmel wrote:
-> > > Hi Willem,
-> > > 
-> > > Thanks for taking a look
-> > > 
-> > > On Fri, Apr 04, 2025 at 10:40:32AM -0400, Willem de Bruijn wrote:
-> > > > Ido Schimmel wrote:
-> > > > > Cited commit transitioned IPv6 path selection to use hash-threshold
-> > > > > instead of modulo-N. With hash-threshold, each nexthop is assigned a
-> > > > > region boundary in the multipath hash function's output space and a
-> > > > > nexthop is chosen if the calculated hash is smaller than the nexthop's
-> > > > > region boundary.
-> > > > > 
-> > > > > Hash-threshold does not work correctly if path selection does not start
-> > > > > with the first nexthop. For example, if fib6_select_path() is always
-> > > > > passed the last nexthop in the group, then it will always be chosen
-> > > > > because its region boundary covers the entire hash function's output
-> > > > > space.
-> > > > > 
-> > > > > Fix this by starting the selection process from the first nexthop and do
-> > > > > not consider nexthops for which rt6_score_route() provided a negative
-> > > > > score.
-> > > > > 
-> > > > > Fixes: 3d709f69a3e7 ("ipv6: Use hash-threshold instead of modulo-N")
-> > > > > Reported-by: Stanislav Fomichev <stfomichev@gmail.com>
-> > > > > Closes: https://lore.kernel.org/netdev/Z9RIyKZDNoka53EO@mini-arch/
-> > > > > Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> > > > > ---
-> > > > >  net/ipv6/route.c | 38 +++++++++++++++++++++++++++++++++++---
-> > > > >  1 file changed, 35 insertions(+), 3 deletions(-)
-> > > > > 
-> > > > > diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-> > > > > index c3406a0d45bd..864f0002034b 100644
-> > > > > --- a/net/ipv6/route.c
-> > > > > +++ b/net/ipv6/route.c
-> > > > > @@ -412,11 +412,35 @@ static bool rt6_check_expired(const struct rt6_info *rt)
-> > > > >  	return false;
-> > > > >  }
-> > > > >  
-> > > > > +static struct fib6_info *
-> > > > > +rt6_multipath_first_sibling_rcu(const struct fib6_info *rt)
-> > > > > +{
-> > > > > +	struct fib6_info *iter;
-> > > > > +	struct fib6_node *fn;
-> > > > > +
-> > > > > +	fn = rcu_dereference(rt->fib6_node);
-> > > > > +	if (!fn)
-> > > > > +		goto out;
-> > > > > +	iter = rcu_dereference(fn->leaf);
-> > > > > +	if (!iter)
-> > > > > +		goto out;
-> > > > > +
-> > > > > +	while (iter) {
-> > > > > +		if (iter->fib6_metric == rt->fib6_metric &&
-> > > > > +		    rt6_qualify_for_ecmp(iter))
-> > > > > +			return iter;
-> > > > > +		iter = rcu_dereference(iter->fib6_next);
-> > > > > +	}
-> > > > > +
-> > > > > +out:
-> > > > > +	return NULL;
-> > > > > +}
-> > > > 
-> > > > The rcu counterpart to rt6_multipath_first_sibling, which is used when
-> > > > computing the ranges in rt6_multipath_rebalance.
-> > > 
-> > > Right
-> > > 
-> > > > 
-> > > > > +
-> > > > >  void fib6_select_path(const struct net *net, struct fib6_result *res,
-> > > > >  		      struct flowi6 *fl6, int oif, bool have_oif_match,
-> > > > >  		      const struct sk_buff *skb, int strict)
-> > > > >  {
-> > > > > -	struct fib6_info *match = res->f6i;
-> > > > > +	struct fib6_info *first, *match = res->f6i;
-> > > > >  	struct fib6_info *sibling;
-> > > > >  
-> > > > >  	if (!match->nh && (!match->fib6_nsiblings || have_oif_match))
-> > > > > @@ -440,10 +464,18 @@ void fib6_select_path(const struct net *net, struct fib6_result *res,
-> > > > >  		return;
-> > > > >  	}
-> > > > >  
-> > > > > -	if (fl6->mp_hash <= atomic_read(&match->fib6_nh->fib_nh_upper_bound))
-> > > > > +	first = rt6_multipath_first_sibling_rcu(match);
-> > > > > +	if (!first)
-> > > > >  		goto out;
-> > > > >  
-> > > > > -	list_for_each_entry_rcu(sibling, &match->fib6_siblings,
-> > > > > +	if (fl6->mp_hash <= atomic_read(&first->fib6_nh->fib_nh_upper_bound) &&
-> > > > > +	    rt6_score_route(first->fib6_nh, first->fib6_flags, oif,
-> > > > > +			    strict) >= 0) {
-> > > > 
-> > > > Does this fix address two issues in one patch: start from the first
-> > > > sibling, and check validity of the sibling?
-> > > 
-> > > The loop below will only choose a nexthop ('match = sibling') if its
-> > > score is not negative. The purpose of the check here is to do the same
-> > > for the first nexthop. That is, only choose a nexthop when calculated
-> > > hash is smaller than the nexthop's region boundary and the nexthop has a
-> > > non negative score.
-> > > 
-> > > This was not done before for 'match' because the caller already chose
-> > > 'match' based on its score.
-> > > 
-> > > > The behavior on negative score for the first_sibling appears
-> > > > different from that on subsequent siblings in the for_each below:
-> > > > in that case the loop breaks, while for the first it skips?
-> > > > 
-> > > >                 if (fl6->mp_hash > nh_upper_bound)
-> > > >                         continue;
-> > > >                 if (rt6_score_route(nh, sibling->fib6_flags, oif, strict) < 0)
-> > > >                         break;
-> > > >                 match = sibling;
-> > > >                 break;
-> > > > 
-> > > > Am I reading that correct and is that intentional?
-> > > 
-> > > Hmm, I see. I think it makes sense to have the same behavior for all
-> > > nexthops. That is, if nexthop fits in terms of hash but has a negative
-> > > score, then fallback to 'match'. How about the following diff?
-> > 
-> > That unifies the behavior.
-> > 
-> > Is match guaranteed to be an acceptable path, i.e., having a positive
-> > score?
-> 
-> It can be negative (-1) if there isn't a neighbour associated with the
-> nexthop which isn't necessarily a bad sign. Even if this is the case,
-> it's the nexthop the kernel chose after evaluating the others.
-> 
-> > Else just the first valid sibling after the matching, but invalid,
-> > sibling, may be the most robust solution.
-> 
-> AFAICT, the kernel has been falling back to 'match' upon a negative
-> sibling score since 2013, so my preference would be to keep this
-> behavior.
 
-Good point.
+
+On 07/04/2025 16.15, Zi Yan wrote:
+> On 7 Apr 2025, at 9:36, Zi Yan wrote:
+> 
+>> On 7 Apr 2025, at 9:14, Toke Høiland-Jørgensen wrote:
+>>
+>>> Zi Yan<ziy@nvidia.com>  writes:
+>>>
+>>>> Resend to fix my signature.
+>>>>
+>>>> On 7 Apr 2025, at 4:53, Toke Høiland-Jørgensen wrote:
+>>>>
+>>>>> "Zi Yan"<ziy@nvidia.com>  writes:
+>>>>>
+>>>>>> On Fri Apr 4, 2025 at 6:18 AM EDT, Toke Høiland-Jørgensen wrote:
+>>>>>>> Since we are about to stash some more information into the pp_magic
+>>>>>>> field, let's move the magic signature checks into a pair of helper
+>>>>>>> functions so it can be changed in one place.
+>>>>>>>
+>>>>>>> Reviewed-by: Mina Almasry<almasrymina@google.com>
+>>>>>>> Tested-by: Yonglong Liu<liuyonglong@huawei.com>
+>>>>>>> Acked-by: Jesper Dangaard Brouer<hawk@kernel.org>
+>>>>>>> Reviewed-by: Ilias Apalodimas<ilias.apalodimas@linaro.org>
+>>>>>>> Signed-off-by: Toke Høiland-Jørgensen<toke@redhat.com>
+>>>>>>> ---
+>>>>>>>   drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c |  4 ++--
+>>>>>>>   include/net/page_pool/types.h                    | 18 ++++++++++++++++++
+>>>>>>>   mm/page_alloc.c                                  |  9 +++------
+>>>>>>>   net/core/netmem_priv.h                           |  5 +++++
+>>>>>>>   net/core/skbuff.c                                | 16 ++--------------
+>>>>>>>   net/core/xdp.c                                   |  4 ++--
+>>>>>>>   6 files changed, 32 insertions(+), 24 deletions(-)
+>>>>>>>
+>>>>>> <snip>
+[...]
+
+>>>>>>> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+>>>>>>> index f51aa6051a99867d2d7d8c70aa7c30e523629951..347a3cc2c188f4a9ced85e0d198947be7c503526 100644
+>>>>>>> --- a/mm/page_alloc.c
+>>>>>>> +++ b/mm/page_alloc.c
+>>>>>>> @@ -55,6 +55,7 @@
+>>>>>>>   #include <linux/delayacct.h>
+>>>>>>>   #include <linux/cacheinfo.h>
+>>>>>>>   #include <linux/pgalloc_tag.h>
+>>>>>>> +#include <net/page_pool/types.h>
+>>>>>>>   #include <asm/div64.h>
+>>>>>>>   #include "internal.h"
+>>>>>>>   #include "shuffle.h"
+>>>>>>> @@ -897,9 +898,7 @@ static inline bool page_expected_state(struct page *page,
+>>>>>>>   #ifdef CONFIG_MEMCG
+>>>>>>>   			page->memcg_data |
+>>>>>>>   #endif
+>>>>>>> -#ifdef CONFIG_PAGE_POOL
+>>>>>>> -			((page->pp_magic & ~0x3UL) == PP_SIGNATURE) |
+>>>>>>> -#endif
+>>>>>>> +			page_pool_page_is_pp(page) |
+>>>>>>>   			(page->flags & check_flags)))
+>>>>>>>   		return false;
+>>>>>>>
+>>>>>>> @@ -926,10 +925,8 @@ static const char *page_bad_reason(struct page *page, unsigned long flags)
+>>>>>>>   	if (unlikely(page->memcg_data))
+>>>>>>>   		bad_reason = "page still charged to cgroup";
+>>>>>>>   #endif
+>>>>>>> -#ifdef CONFIG_PAGE_POOL
+>>>>>>> -	if (unlikely((page->pp_magic & ~0x3UL) == PP_SIGNATURE))
+>>>>>>> +	if (unlikely(page_pool_page_is_pp(page)))
+>>>>>>>   		bad_reason = "page_pool leak";
+>>>>>>> -#endif
+>>>>>>>   	return bad_reason;
+>>>>>>>   }
+>>>>>>>
+>>>>>> I wonder if it is OK to make page allocation depend on page_pool from
+>>>>>> net/page_pool.
+>>>>> Why? It's not really a dependency, just a header include with a static
+>>>>> inline function...
+>>>> The function is checking, not even modifying, an core mm data structure,
+>>>> struct page, which is also used by almost all subsystems. I do not get
+>>>> why the function is in net subsystem.
+>>> Well, because it's using details of the PP definitions, so keeping it
+>>> there nicely encapsulates things. I mean, that's the whole point of
+>>> defining a wrapper function - encapsulating the logic 🙂
+>>>
+>>>>>> Would linux/mm.h be a better place for page_pool_page_is_pp()?
+>>>>> That would require moving all the definitions introduced in patch 2,
+>>>>> which I don't think is appropriate.
+>>>> Why? I do not see page_pool_page_is_pp() or PP_SIGNATURE is used anywhere
+>>>> in patch 2.
+>>> Look again. Patch 2 redefines PP_MAGIC_MASK in terms of all the other
+>>> definitions.
+>> OK. Just checked. Yes, the function depends on PP_MAGIC_MASK.
+>>
+>> But net/types.h has a lot of unrelated page_pool functions and data structures
+>> mm/page_alloc.c does not care about. Is there a way of moving page_pool_page_is_pp()
+>> and its dependency to a separate header and including that in mm/page_alloc.c?
+>>
+>> Looking at the use of page_pool_page_is_pp() in mm/page_alloc.c, it seems to be
+>> just error checking. Why can't page_pool do the error checking?
+ >
+> Or just remove page_pool_page_is_pp() in mm/page_alloc.c. Has it really been used?
+
+We have actually used this at Cloudflare to catch some page_pool bugs.
+And this have been backported to our 6.1 and 6.6 kernels and we have
+enabled needed config CONFIG_DEBUG_VM (which we measured have low enough
+overhead to enable in production).  AFAIK this is also enabled for our
+6.12 kernels.
+
+--Jesper
+
 
