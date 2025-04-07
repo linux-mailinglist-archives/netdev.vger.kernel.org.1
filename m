@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-179882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41D7BA7ECBE
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 21:24:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35E47A7ECC3
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 21:24:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29ED01890D93
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:19:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70999445BEE
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:18:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E161025D1E4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAC0525D1E2;
 	Mon,  7 Apr 2025 19:01:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sKJSp5DH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qc2/5blT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCDD325C71F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B754325C71D
 	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 19:01:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744052481; cv=none; b=LWuvgy3sgOWGmUrSRd8Iy7CRShW4huxSdwwlH+Gx0uSM0rrgQgrZkRcVo7JE1axPXI1Qx0oAo0TR9ZnM757in6JyhzsU0JjRg24gxxCy4zOBLYQXm6APvlH849nKtMOtdLAPlcMu4O303pdStoS5OgWwopeeXxY/stkE9RGxFO0=
+	t=1744052481; cv=none; b=KwxcQBFhVHp3axZZ9Oy18QmlaRUWNXeeVSdtsU1ZaY1msLMsQKDE/ZhS2W8swDM9ip7iJdTFCG5Xd5TjYeWBpSLkPTTk4jpPG5Bq2witdMyIkMxnA354KaG0yxLaXrDyUvZ9E9B2K/uj6lR3xw8aUD9zRLnah4MyO9iBb6OiIhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1744052481; c=relaxed/simple;
-	bh=MTerOXBwlfPdrpMfMLV4IMxJf8zcYyqKG0YVeEs0Lbg=;
+	bh=bnY6roFw4wBUzLkKqV/QhjP+bqrrZdZbcwFS3O6/h/k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OXodpj9MAdMZieIyG2c5qvvsxcN1DJz9wEQENVxJy1y2weJhOnxSiqCcTwm0fRG9sh5MBr7BoIViTtndWIB2H/oDAKHcWWoZEhk7++/JyQmlL5Ov7v+KESwwdtj/7RmwcblwO4K8YgPF/4YtLtuwj72otNPedtWGVveyBrKRtpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sKJSp5DH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD36BC4CEDD;
-	Mon,  7 Apr 2025 19:01:20 +0000 (UTC)
+	 MIME-Version; b=QGlUwYsbvHo8aD/JBFn0aVLrCsmWZ3mR6j02H5LPoUqzi+cKBgwvHUpDPnoL+SHiGFyPy0IxHhOfRpVTAYgiVF/eErmoOWBjbFK3A2bwfOVLqeTeyKQ+ZnQoGGCSVTmX+6nI8sRnhJtvP2ZcTp7bJh69I5qW0eBnbs0SlaRCxM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qc2/5blT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 541F5C4CEE7;
+	Mon,  7 Apr 2025 19:01:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1744052481;
-	bh=MTerOXBwlfPdrpMfMLV4IMxJf8zcYyqKG0YVeEs0Lbg=;
+	bh=bnY6roFw4wBUzLkKqV/QhjP+bqrrZdZbcwFS3O6/h/k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sKJSp5DHQReZiG5h2yo/7r2b6NpN2kg9/ezfIF/zNIR7qrWzewdWacmg+x8SclWQG
-	 C1JHLt2Ti5AoZSKAoo1NeZjQqeMsWOHFIrzb7wfpDxcXKbJXS6rPEh9kgu9eiNldXq
-	 ajhFMT+/m709q8/0f/PA+yHqVgBVQo6O+oO7ytbnvRGQJREc6CuQFrUh2rnDLT9Gry
-	 X45aGyDlkJrN/RzdxOD/UvvZsjVXce8hg56xjhm16XupBo/FcYOS7zmtoSw+2/DdTi
-	 UDu0EoswJVopULTc9aCu/RWT75O81bzBCwmJwk7qJkNv+qe0USUJHc9Z7nIE/1ifBa
-	 JUZrNeIbmpyZA==
+	b=Qc2/5blTCBjjRh72/eH3YyZhK1PFCKj9QFo/Zknbxf9s5vBwFLRvfEO0brjuj/S4A
+	 XD71V9SOL715qvkCF+0nwEQ6mdmg7ZGG4ViCP2bJkk1scPHy6258esbE5NgTJQBM0Y
+	 ONKqqcVKzr9duJsA2nEZtLW418HCQnBX9eNSJRAD8AhYg7j23rvHLSXV+7jkuA5QBW
+	 qNwl9FT+XHLcmfPNoqL2PGCZG/gf8i7YzXPX4ZbYv1JOfdADayHj61nBETlaBKvdzH
+	 HudCktPjFAFrD9n5r7Dt5nH/WgTzyNLTnZoDNoejNus8kpKmdEzI5s3YNiW9grAOBv
+	 mSR2+pJxYNTkQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -52,9 +52,9 @@ Cc: netdev@vger.kernel.org,
 	hramamurthy@google.com,
 	kuniyu@amazon.com,
 	jdamato@fastly.com
-Subject: [PATCH net-next 7/8] docs: netdev: break down the instance locking info per ops struct
-Date: Mon,  7 Apr 2025 12:01:16 -0700
-Message-ID: <20250407190117.16528-8-kuba@kernel.org>
+Subject: [PATCH net-next 8/8] netdev: depend on netdev->lock for qstats in ops locked drivers
+Date: Mon,  7 Apr 2025 12:01:17 -0700
+Message-ID: <20250407190117.16528-9-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250407190117.16528-1-kuba@kernel.org>
 References: <20250407190117.16528-1-kuba@kernel.org>
@@ -66,95 +66,103 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Explicitly list all the ops structs and what locking they provide.
-Use "ops locked" as a term for drivers which have ops called under
-the instance lock.
+We mostly needed rtnl_lock in qstat to make sure the queue count
+is stable while we work. For "ops locked" drivers the instance
+lock protects the queue count, so we don't have to take rtnl_lock.
+
+For currently ops-locked drivers: netdevsim and bnxt need
+the protection from netdev going down while we dump, which
+instance lock provides. gve doesn't care.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/networking/netdevices.rst | 54 +++++++++++++++++++------
- 1 file changed, 42 insertions(+), 12 deletions(-)
+ Documentation/networking/netdevices.rst |  6 +++++
+ include/net/netdev_queues.h             |  4 +++-
+ net/core/netdev-genl.c                  | 29 +++++++++++++++----------
+ 3 files changed, 26 insertions(+), 13 deletions(-)
 
 diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
-index d6357472d3f1..0cfff56b436e 100644
+index 0cfff56b436e..ec9d9a2cefe7 100644
 --- a/Documentation/networking/netdevices.rst
 +++ b/Documentation/networking/netdevices.rst
-@@ -314,13 +314,8 @@ struct napi_struct synchronization rules
- 		 softirq
- 		 will be called with interrupts disabled by netconsole.
+@@ -356,6 +356,12 @@ Similarly to ``ndos`` the instance lock is only held for select drivers.
+ For "ops locked" drivers all ethtool ops without an exception should
+ be called under the instance lock.
  
--struct netdev_queue_mgmt_ops synchronization rules
--==================================================
--
--All queue management ndo callbacks are holding netdev instance lock.
--
--RTNL and netdev instance lock
--=============================
-+netdev instance lock
-+====================
++struct netdev_stat_ops
++----------------------
++
++"qstat" ops are invoked under the instance lock for "ops locked" drivers,
++and under rtnl_lock for all other drivers.
++
+ struct net_shaper_ops
+ ---------------------
  
- Historically, all networking control operations were protected by a single
- global lock known as ``rtnl_lock``. There is an ongoing effort to replace this
-@@ -328,10 +323,13 @@ global lock with separate locks for each network namespace. Additionally,
- properties of individual netdev are increasingly protected by per-netdev locks.
+diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
+index 825141d675e5..ea709b59d827 100644
+--- a/include/net/netdev_queues.h
++++ b/include/net/netdev_queues.h
+@@ -85,9 +85,11 @@ struct netdev_queue_stats_tx {
+  * for some of the events is not maintained, and reliable "total" cannot
+  * be provided).
+  *
++ * Ops are called under the instance lock if netdev_need_ops_lock()
++ * returns true, otherwise under rtnl_lock.
+  * Device drivers can assume that when collecting total device stats,
+  * the @get_base_stats and subsequent per-queue calls are performed
+- * "atomically" (without releasing the rtnl_lock).
++ * "atomically" (without releasing the relevant lock).
+  *
+  * Device drivers are encouraged to reset the per-queue statistics when
+  * number of queues change. This is because the primary use case for
+diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+index 8c58261de969..b64c614a00c4 100644
+--- a/net/core/netdev-genl.c
++++ b/net/core/netdev-genl.c
+@@ -795,26 +795,31 @@ int netdev_nl_qstats_get_dumpit(struct sk_buff *skb,
+ 	if (info->attrs[NETDEV_A_QSTATS_IFINDEX])
+ 		ifindex = nla_get_u32(info->attrs[NETDEV_A_QSTATS_IFINDEX]);
  
- For device drivers that implement shaping or queue management APIs, all control
--operations will be performed under the netdev instance lock. Currently, this
--instance lock is acquired within the context of ``rtnl_lock``. The drivers
--can also explicitly request instance lock to be acquired via
--``request_ops_lock``. In the future, there will be an option for individual
-+operations will be performed under the netdev instance lock.
-+Drivers can also explicitly request instance lock to be held during ops
-+by setting ``request_ops_lock`` to true. Code comments and docs refer
-+to drivers which have ops called under the instance lock as "ops locked".
-+See also the documentation of the ``lock`` member of struct net_device.
+-	rtnl_lock();
+ 	if (ifindex) {
+-		netdev = __dev_get_by_index(net, ifindex);
+-		if (netdev && netdev->stat_ops) {
++		netdev = netdev_get_by_index_lock_ops_compat(net, ifindex);
++		if (!netdev) {
++			NL_SET_BAD_ATTR(info->extack,
++					info->attrs[NETDEV_A_QSTATS_IFINDEX]);
++			return -ENODEV;
++		}
++		if (netdev->stat_ops) {
+ 			err = netdev_nl_qstats_get_dump_one(netdev, scope, skb,
+ 							    info, ctx);
+ 		} else {
+ 			NL_SET_BAD_ATTR(info->extack,
+ 					info->attrs[NETDEV_A_QSTATS_IFINDEX]);
+-			err = netdev ? -EOPNOTSUPP : -ENODEV;
+-		}
+-	} else {
+-		for_each_netdev_dump(net, netdev, ctx->ifindex) {
+-			err = netdev_nl_qstats_get_dump_one(netdev, scope, skb,
+-							    info, ctx);
+-			if (err < 0)
+-				break;
++			err = -EOPNOTSUPP;
+ 		}
++		netdev_unlock_ops_compat(netdev);
++		return err;
++	}
 +
-+In the future, there will be an option for individual
- drivers to opt out of using ``rtnl_lock`` and instead perform their control
- operations directly under the netdev instance lock.
++	for_each_netdev_lock_ops_compat_scoped(net, netdev, ctx->ifindex) {
++		err = netdev_nl_qstats_get_dump_one(netdev, scope, skb,
++						    info, ctx);
++		if (err < 0)
++			break;
+ 	}
+-	rtnl_unlock();
  
-@@ -343,8 +341,40 @@ there are two sets of interfaces: ``dev_xxx`` and ``netif_xxx`` (e.g.,
- acquiring the instance lock themselves, while the ``netif_xxx`` functions
- assume that the driver has already acquired the instance lock.
- 
-+struct net_device_ops
-+---------------------
-+
-+``ndos`` are called without holding the instance lock for most drivers.
-+
-+"Ops locked" drivers will have most of the ``ndos`` invoked under
-+the instance lock.
-+
-+struct ethtool_ops
-+------------------
-+
-+Similarly to ``ndos`` the instance lock is only held for select drivers.
-+For "ops locked" drivers all ethtool ops without an exception should
-+be called under the instance lock.
-+
-+struct net_shaper_ops
-+---------------------
-+
-+All net shaper callbacks are invoked while holding the netdev instance
-+lock. ``rtnl_lock`` may or may not be held.
-+
-+Note that supporting net shapers automatically enables "ops locking".
-+
-+struct netdev_queue_mgmt_ops
-+----------------------------
-+
-+All queue management callbacks are invoked while holding the netdev instance
-+lock. ``rtnl_lock`` may or may not be held.
-+
-+Note that supporting struct netdev_queue_mgmt_ops automatically enables
-+"ops locking".
-+
- Notifiers and netdev instance lock
--==================================
-+----------------------------------
- 
- For device drivers that implement shaping or queue management APIs,
- some of the notifiers (``enum netdev_cmd``) are running under the netdev
+ 	return err;
+ }
 -- 
 2.49.0
 
