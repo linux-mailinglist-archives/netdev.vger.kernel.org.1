@@ -1,215 +1,358 @@
-Return-Path: <netdev+bounces-179823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15F55A7E94E
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 20:06:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 330C7A7E94B
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 20:05:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E8513B966A
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:04:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6ADAB7A5215
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:04:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74A3D218E83;
-	Mon,  7 Apr 2025 18:04:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kQ0lTDne"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9ED421A458;
+	Mon,  7 Apr 2025 18:05:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A0618C31;
-	Mon,  7 Apr 2025 18:04:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE54B219A68;
+	Mon,  7 Apr 2025 18:05:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744049076; cv=none; b=OhWTNH5TmsoHkV18cS8btEOUivrXMfcdAgIlijcT3wbW5G6LpJccv+fIv1TOVKj0j/Gh84+rOYgYP7rfO/y8np577BZX2iaAaRcyJU+1DQvNdb8qqHJLjBx/SSGJcY2pNgmIaklK8WnieVQCCx4YlHq7IKayoWukhpwr8/Rw3bA=
+	t=1744049112; cv=none; b=mZqfp8uHt300oV672ShLPbp7S9WDme4hxeq8rJoY3RgpLSATIe4sdCSfdG2aeuztqi3E39m+xFPz4gWv7wCJilAPovTTFy+anzC/6xcGI+S2RYn0oQLdCt5IKLi6HlvJOTgJU7us+vL+bWvvE5KI332JEYL4kpJo+vCY0ijqMpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744049076; c=relaxed/simple;
-	bh=qq406OyfbZqR5Lr+xDNdCNLUQZRFdKMk4sWTOaf5174=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kweoC5wzAscP8XxwZD+yEQ7mh+vs5kX8GUnFP0QAfRfX4zDAaoBlZfsUs0D7SzGHhWByVdX7/rXbuPx4qtYiAzcvC+D2r1rSBbwoycj7kpjRPlLbwsgxHQAbu3RCJrS4Qg+oJdLcR+oS6Iqugf3h4g31kD0Jp+dNK8oPYxNSc3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kQ0lTDne; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0A6BC4CEDD;
-	Mon,  7 Apr 2025 18:04:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744049075;
-	bh=qq406OyfbZqR5Lr+xDNdCNLUQZRFdKMk4sWTOaf5174=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=kQ0lTDne9D49aDkh9A9qwERQUxh+8Xo4iGd4MwsqlgEePOgiRt3YYobySLETN+q2D
-	 nYQNNnkynDiwcOby6oaqtuhuQDhxI3OATYkcIYB2ewy1an6i6PsN1ue5b/U9IZtA4x
-	 DVdD+2ySmX1rxmkOubnbghRW/2FNeHe3Hr8+wucENlcUmAHCltOo2Yh5uABQGj3mio
-	 GcblCAg9XUkiZQaRUdWrlBJlTHc4oaJJbC0mrnEzi2aIDG3inVmGF96igAhkzfvP6O
-	 FOYlNOm1l2R19ZAiQC1GcKMoA30hV7zlZYa8NmHQRAlhZHmDXpIKjbOhBPZNajd2aP
-	 3nmSQHMNFwV4Q==
-Message-ID: <7dfede37-2434-4892-8c8d-4d005fa1072b@kernel.org>
-Date: Mon, 7 Apr 2025 20:04:26 +0200
+	s=arc-20240116; t=1744049112; c=relaxed/simple;
+	bh=GWY+4jbGf74Lr4jGPW9p9agatnx3TjXPtC6JeVX+bvM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ELiQbTn5KVu4159NjJRIpidII1CB6UcTs5DnFZvWgCiOooKUaQI8WktcU8NtgaZzmrtvRf+SzeMWa/RGIGXJZLblX4jUGzLoqzM7RFdGZSOam218mVWXpWs9g+XlwYpc3BzkgJqCVqy93c6bT6T3jwaRlz48T+Q2eDVcHmF6Dlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
+X-CSE-ConnectionGUID: dN8wMzzLSlK5zr4RfyOsRg==
+X-CSE-MsgGUID: zDICQ2MaQnGxOlqv2DhjyA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11397"; a="45619736"
+X-IronPort-AV: E=Sophos;i="6.15,194,1739865600"; 
+   d="scan'208";a="45619736"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2025 11:05:09 -0700
+X-CSE-ConnectionGUID: F0Zc/u4LRZCvaUc6K5OZDQ==
+X-CSE-MsgGUID: 46ux0XD4S32SPynHnnNvfA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,194,1739865600"; 
+   d="scan'208";a="151218455"
+Received: from smile.fi.intel.com ([10.237.72.58])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2025 11:05:06 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98.2)
+	(envelope-from <andy@kernel.org>)
+	id 1u1qqF-0000000A9jI-24aI;
+	Mon, 07 Apr 2025 21:05:03 +0300
+Date: Mon, 7 Apr 2025 21:05:03 +0300
+From: Andy Shevchenko <andy@kernel.org>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH 01/28] mfd: Add Microchip ZL3073x support
+Message-ID: <Z_QTzwXvxcSh53Cq@smile.fi.intel.com>
+References: <20250407172836.1009461-1-ivecera@redhat.com>
+ <20250407172836.1009461-2-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 16/28] dt-bindings: dpll: Add support for Microchip
- Azurite chip family
-To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
-Cc: Michal Schmidt <mschmidt@redhat.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
- Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
- Andy Shevchenko <andy@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <20250407172836.1009461-1-ivecera@redhat.com>
- <20250407173149.1010216-7-ivecera@redhat.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20250407173149.1010216-7-ivecera@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250407172836.1009461-2-ivecera@redhat.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On 07/04/2025 19:31, Ivan Vecera wrote:
-> This adds DT bindings schema for Microchip Azurite DPLL chip family.
-
-Please do not use "This commit/patch/change", but imperative mood. See
-longer explanation here:
-https://elixir.bootlin.com/linux/v5.17.1/source/Documentation/process/submitting-patches.rst#L95
-
-> These bindings are used by zl3073x driver and specifies this device
-> that can be connected either to I2C or SPI bus.
-
-Bindings are for hardware, not driver. Explain the hardware.
-
+On Mon, Apr 07, 2025 at 07:28:28PM +0200, Ivan Vecera wrote:
+> This adds base MFD driver for Microchip Azurite ZL3073x chip family.
+> These chips provide DPLL and PHC (PTP) functionality and they can
+> be connected over I2C or SPI bus.
 > 
-> The schema inherits existing dpll-device and dpll-pin schemas.
+> The MFD driver provide basic communication and synchronization
+> over the bus and common functionality that are used by the DPLL
+> driver (later in this series) and by the PTP driver (will be
+> added later).
 > 
+> The chip family is characterized by following properties:
+> * 2 separate DPLL units (channels)
+> * 5 synthesizers
+> * 10 input pins (references)
+> * 10 outputs
+> * 20 output pins (output pin pair shares one output)
+> * Each reference and output can act in differential or single-ended
+>   mode (reference or output in differential mode consumes 2 pins)
+> * Each output is connected to one of the synthesizers
+> * Each synthesizer is driven by one of the DPLL unit
+.
+The comments below are applicable to entire series, take your time and fix
+*all* stylic and header issues before sending v2.
 
-Do not explain what schema does - we see  it. Explain the hardware which
-we do not see here, because we (or to be precise: I) know nothing about.
+...
 
-> Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-> ---
->  .../bindings/dpll/microchip,zl3073x.yaml      | 74 +++++++++++++++++++
->  MAINTAINERS                                   |  1 +
->  2 files changed, 75 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/dpll/microchip,zl3073x.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/dpll/microchip,zl3073x.yaml b/Documentation/devicetree/bindings/dpll/microchip,zl3073x.yaml
-> new file mode 100644
-> index 0000000000000..38a6cc00bc026
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/dpll/microchip,zl3073x.yaml
-> @@ -0,0 +1,74 @@
-> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/dpll/microchip,zl3073x.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
++ array_size.h
++ bits.h
+
++ device/devres.h
+
+> +#include <linux/module.h>
+
+This file uses *much* amore than that.
+
++ regmap.h
+
+
+> +#include "zl3073x.h"
+
+...
+
+> +/*
+> + * Regmap ranges
+> + */
+> +#define ZL3073x_PAGE_SIZE	128
+> +#define ZL3073x_NUM_PAGES	16
+> +#define ZL3073x_PAGE_SEL	0x7F
 > +
-> +title: Microchip Azurite DPLL device
+> +static const struct regmap_range_cfg zl3073x_regmap_ranges[] = {
+> +	{
+> +		.range_min	= 0,
+
+Are you sure you get the idea of virtual address pages here?
+
+> +		.range_max	= ZL3073x_NUM_PAGES * ZL3073x_PAGE_SIZE,
+> +		.selector_reg	= ZL3073x_PAGE_SEL,
+> +		.selector_mask	= GENMASK(3, 0),
+> +		.selector_shift	= 0,
+> +		.window_start	= 0,
+> +		.window_len	= ZL3073x_PAGE_SIZE,
+> +	},
+> +};
+
+...
+
+> +struct zl3073x_dev *zl3073x_dev_alloc(struct device *dev)
+> +{
+> +	struct zl3073x_dev *zldev;
 > +
-> +maintainers:
-> +  - Ivan Vecera <ivecera@redhat.com>
+> +	return devm_kzalloc(dev, sizeof(*zldev), GFP_KERNEL);
+> +}
+> +EXPORT_SYMBOL_NS_GPL(zl3073x_dev_alloc, "ZL3073X");
 > +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - microchip,zl3073x-i2c
-> +      - microchip,zl3073x-spi
+> +int zl3073x_dev_init(struct zl3073x_dev *zldev)
+> +{
+> +	devm_mutex_init(zldev->dev, &zldev->lock);
 
-1. No, you do not get two compatibles. Only one.
-2. What is 'x'? Wildcard? If so, drop and use specific compatibles.
+Missing check.
 
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_NS_GPL(zl3073x_dev_init, "ZL3073X");
+> +
+> +void zl3073x_dev_exit(struct zl3073x_dev *zldev)
+> +{
+> +}
+> +EXPORT_SYMBOL_NS_GPL(zl3073x_dev_exit, "ZL3073X");
+
+What's the point in these stubs?
+
+...
+
+> +#include <linux/i2c.h>
+
+> +#include <linux/kernel.h>
+
+No usual driver should include kernel.h, please follow IWYU principle.
+
+> +#include <linux/module.h>
+
+Again, this is just a random list of headers, see above and follow the IWYU
+principle.
+
+> +#include "zl3073x.h"
+
+...
+
+> +static const struct i2c_device_id zl3073x_i2c_id[] = {
+> +	{ "zl3073x-i2c", },
+
+Redundant inner comma.
+
+> +	{ /* sentinel */ },
+
+No comma for the sentinel.
+
+> +};
+
+...
+
+> +static const struct of_device_id zl3073x_i2c_of_match[] = {
+> +	{ .compatible = "microchip,zl3073x-i2c" },
+> +	{ /* sentinel */ },
+
+No comma.
+
+> +};
+
+> +static int zl3073x_i2c_probe(struct i2c_client *client)
+> +{
+> +	struct device *dev = &client->dev;
+> +	const struct i2c_device_id *id;
+> +	struct zl3073x_dev *zldev;
+
+> +	int rc = 0;
+
+Useless assignment.
+
+> +	zldev = zl3073x_dev_alloc(dev);
+> +	if (!zldev)
+> +		return -ENOMEM;
+> +
+> +	id = i2c_client_get_device_id(client);
+> +	zldev->dev = dev;
+> +
+> +	zldev->regmap = devm_regmap_init_i2c(client,
+> +					     zl3073x_get_regmap_config());
+
+It's perfectly a single line.
+
+> +	if (IS_ERR(zldev->regmap)) {
+> +		rc = PTR_ERR(zldev->regmap);
+> +		dev_err(dev, "Failed to allocate register map: %d\n", rc);
+> +		return rc;
+
+		return dev_err_probe(...);
+
+> +	}
+> +
+> +	i2c_set_clientdata(client, zldev);
+> +
+> +	return zl3073x_dev_init(zldev);
+> +}
+
+...
+
+> +static void zl3073x_i2c_remove(struct i2c_client *client)
+> +{
+
+> +	struct zl3073x_dev *zldev;
+> +
+> +	zldev = i2c_get_clientdata(client);
+
+Just make it one line definition + assignment.
+
+> +	zl3073x_dev_exit(zldev);
+
+This is a red flag and because you haven't properly named the calls (i.e. devm
+to show that they are only for probe stage and use managed resources) this is
+not easy to catch.
+
+> +}
+> +
+> +static struct i2c_driver zl3073x_i2c_driver = {
+> +	.driver = {
+> +		.name = "zl3073x-i2c",
+> +		.of_match_table = of_match_ptr(zl3073x_i2c_of_match),
+
+Please, never use of_match_ptr() or ACPI_PTR() in a new code.
+
+> +	},
+> +	.probe = zl3073x_i2c_probe,
+> +	.remove = zl3073x_i2c_remove,
+> +	.id_table = zl3073x_i2c_id,
+> +};
 
 > +
-> +  reg:
-> +    maxItems: 1
+
+Redundant blank line.
+
+> +module_i2c_driver(zl3073x_i2c_driver);
+
+...
+
+> +#include <linux/kernel.h>
+
+Just no. You should know what you are doing in the driver.
+
+> +#include <linux/module.h>
+
+> +#include <linux/of.h>
+
+Just no. Use agnostic APIs.
+
+> +#include <linux/spi/spi.h>
+> +#include "zl3073x.h"
+
+...
+
+> +static const struct spi_device_id zl3073x_spi_id[] = {
+> +	{ "zl3073x-spi", },
+> +	{ /* sentinel */ },
+> +};
+> +MODULE_DEVICE_TABLE(spi, zl3073x_spi_id);
 > +
-> +required:
-> +  - compatible
-> +  - reg
+> +static const struct of_device_id zl3073x_spi_of_match[] = {
+> +	{ .compatible = "microchip,zl3073x-spi" },
+> +	{ /* sentinel */ },
+> +};
+> +MODULE_DEVICE_TABLE(of, zl3073x_spi_of_match);
+
+Move the above closer to its user.
+
+...
+
+> +static int zl3073x_spi_probe(struct spi_device *spidev)
+
+Usual name is spi for the above, it's shorter and allows to tidy up the code.
+
+And below same comments as for i2c part of the driver.
+
+...
+
+> +#ifndef __ZL3073X_CORE_H
+> +#define __ZL3073X_CORE_H
+
+> +#include <linux/mfd/zl3073x.h>
+
+How is it used here, please?
+
+> +struct zl3073x_dev *zl3073x_dev_alloc(struct device *dev);
+> +int zl3073x_dev_init(struct zl3073x_dev *zldev);
+> +void zl3073x_dev_exit(struct zl3073x_dev *zldev);
+> +const struct regmap_config *zl3073x_get_regmap_config(void);
 > +
-> +allOf:
-> +  - $ref: /schemas/dpll/dpll-device.yaml
-> +
-> +unevaluatedProperties: false
-> +
-> +examples:
-> +  - |
-> +    i2c {
-> +      #address-cells = <1>;
-> +      #size-cells = <0>;
-> +
-> +      dpll@70 {
-> +        compatible = "microchip,zl3073x-i2c";
+> +#endif /* __ZL3073X_CORE_H */
 
-> +        #address-cells = <0>;
-> +        #size-cells = <0>;
+...
 
-Again, why do you need them if you are not using these two?
+> +#ifndef __LINUX_MFD_ZL3073X_H
+> +#define __LINUX_MFD_ZL3073X_H
 
-> +        reg = <0x70>;
-> +        status = "okay";
+> +#include <linux/device.h>
+> +#include <linux/regmap.h>
 
-Drop
+Ditto. Two unused headers and one which must be included is missed.
 
-Also, follow DTS coding style and order properties properly.
+> +struct zl3073x_dev {
+> +	struct device		*dev;
+> +	struct regmap		*regmap;
+> +	struct mutex		lock;
+> +};
 
-> +
-> +        num-dplls = <2>;
-> +        dpll-types = "pps", "eec";
-> +
+-- 
+With Best Regards,
+Andy Shevchenko
 
 
-
-
-Best regards,
-Krzysztof
 
