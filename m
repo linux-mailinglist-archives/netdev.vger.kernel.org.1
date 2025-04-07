@@ -1,109 +1,110 @@
-Return-Path: <netdev+bounces-180009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ECCDA7F0FA
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 01:31:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5F3DA7F11F
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 01:39:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C9321891095
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 23:31:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5CE93AE229
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 23:39:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9C252163B8;
-	Mon,  7 Apr 2025 23:31:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA4E822A7E5;
+	Mon,  7 Apr 2025 23:39:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="YwtDhTTz"
+	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="oeEvrwgi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA41801
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 23:30:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E2A8229B28
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 23:39:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744068660; cv=none; b=d369568Zn9BNXWO8HrCPX62QhWk1mmFWYYpT6JnaqSzBsUHGVFjDaG+QcU1xld3ASm60qkKqIBOrt7jBOz4aZA34E/2ssv0a4dcdLgSgczum0QkremJYTgyGxX2F683M5O7T2ej/aLBiGpm0+od8c7CTYch1m8PyjHyMLmneQ3E=
+	t=1744069179; cv=none; b=tfGvfjne/kYLglpDcbZTs+1dvFBVvnk10cscfo+wKwcY+XfWp97KBvEkgbxe8w2sfp3pK8kQBy12j8g2OZPcrEtsMHtyJ+0fsC/W7GrbNg/iP/FRSPWQf/Dndh9ydsN8AWhZbGETrh+UopWlK4Bue3u7GnCDglJ8V7qXKdddmmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744068660; c=relaxed/simple;
-	bh=Qroc7zYgO5GtS+tS1cfZmKHbrc5oFJJrEnDs4f+7dKw=;
+	s=arc-20240116; t=1744069179; c=relaxed/simple;
+	bh=3UH7Z7Dq8GEREWQ6P+Sm1ZE59Mnz1DfU7JXq75pFA78=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=D/FT2362jWlZfIbM6B/DWKTBoq5kZPDS2E+2EnYMZFuZlr2qGwx96+gnSjjpbpFcWCBOgF44FuUM8/Dy+0J5oWEMmgqt+0ZKq8S6pMcw5k4ydmtyZviDnU6KgzKsKHfG1ONvdfLG49q3ltanH813Eg8uVE2/zCCj6LY5f3fKjsk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=YwtDhTTz; arc=none smtp.client-ip=209.85.219.47
+	 To:Cc:Content-Type; b=AhhiVN7Xhj22SzsdbwUpBf993Q7kf5TFvLSj/7mQtCY3DAyquLKB94nab1QxJqnhQHBsRYRNT1lgDxcMB9FcyOl0bskDyG7mIYI+BxpbfEH+fMIwGzaxzm0ERPwwsKi/Y+gBlnr5ktxHRyXO0nj2y75NWuz6p7nSKKyfX6L2dlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=oeEvrwgi; arc=none smtp.client-ip=209.85.219.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6eae4819112so5350816d6.3
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 16:30:58 -0700 (PDT)
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6eee95fb531so4368616d6.2
+        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 16:39:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1744068658; x=1744673458; darn=vger.kernel.org;
+        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1744069177; x=1744673977; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qroc7zYgO5GtS+tS1cfZmKHbrc5oFJJrEnDs4f+7dKw=;
-        b=YwtDhTTzQBPj6jf4bUHIfJ8JrbslawTGtx0iQfw3uUDNd80l9ostyQOxuo8tv5CGmz
-         bz6GBI7bgjMGle1bdbKU90GviRm6UdeBb+GzUL3LWZdAkaMroRHUELSJVz6FtSwEHIka
-         UIb1vVZPiIiUyEclyC3dJCTxrwqLU2VPhURzuims5DoYW4vuTcTZ0qs0JHqHW0VIbC0t
-         WlddW3BlQLiL6XfBcyRvP2T0tHhZ10yRAoj2zzvyrf0F03o575t6TZX9iOXodpTyiPfm
-         8Aa9zrGf3VCfBjOtj8r/sjVt20Sbi9CajVj+03k1X4iMm7ZoJf2Wtyby5YHuM2se+PHL
-         17Mw==
+        bh=3UH7Z7Dq8GEREWQ6P+Sm1ZE59Mnz1DfU7JXq75pFA78=;
+        b=oeEvrwgi59Ho8A6y8nD67HJS+7fjlVyHR8W5RdVNr5cEY9zPHUcQYwntJCSyy+GFhd
+         8eF2xpEGzgJiWnoJCMVdBA4sdn8RU2oOX9giCUQtX/sK/5wEr0a5y9tWHtlgJXpJdSYR
+         1K25zYDTc5JYd2UzIf+sQF11ZbVoyv/Q+A5gAVp2ToxGwxQ2UPUs+KZDt2jtZrMPrMa3
+         PpJadHCCm4zH7bJ7K/WXCo2Op4M0pkWxiyrhQ6M8iRR1RMj0P685Cq9pP5aeaPNqUk/5
+         WDm51Ea0aOg2lio7qBXf++yiSsQnDzLXgAjLFXbJvSl2KK+IDjXRNv2+IWWRCqyTCD68
+         pCuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744068658; x=1744673458;
+        d=1e100.net; s=20230601; t=1744069177; x=1744673977;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Qroc7zYgO5GtS+tS1cfZmKHbrc5oFJJrEnDs4f+7dKw=;
-        b=hfFA1eEh2yJ6NL3jEl5KSfHEDHMTEvJKiYHeLRJ4CS22bfd9ZUm3qG4mEEZGkHUOTj
-         lCo43CruP2mXfdbBo4L0mgL6pVG6cqxng9q/QEg88AFkFUAj8NAhsjMFYGUrN3i/TGYE
-         +5qkxjpQMtGeaUH0OYBuvVhO+FodRuRxykFCjkgcbu7G2YN4vxs+zwBXhP72Z96ALSxG
-         iYF1ypICtYTPQxEzhg6KG4GYX6qzlwAqNCFDS9Sgm8E4/EuJsZcBEzQu3vJggvLI7s+9
-         LxKCWuQ3aQQ5yGlVkPbQNPcQvMnmDUcxQ054dCZsJp8i0PbD5GqK7cN3nciY56uiDpib
-         ohgw==
-X-Forwarded-Encrypted: i=1; AJvYcCUX/07tIb9JrXXxSmilN9RoAX4bso5YBR+LenWbA003X+ROb5gzCTlv6PcMVHgJzRhfIfMbnLs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMXC5Y/SKmMPEPzcEZy9/GsxWix5DKQL5hRwi14GjcodsO749/
-	+IhbofK5dGcSNPB01oRFFu00qSxVrHbQbWs1J/CSgoleakN+56a4AvqsC7ns+rbNqhbQ4qaxPfd
-	aABa/TceaOfpOaLD3hc/1RL+70Ayb4hYdJDHdGQ==
-X-Gm-Gg: ASbGncsaxM6MHYiv2Bibc/iRyhW/JoW+uTO2Gc5cUL/xqvFaFDtS21x8PYVhtYfZJ8q
-	1+UeDkqFaMUy0ppPpov/OQZbJvR2dSekquzlaT4mmwhq0oclxXvRPjgXF9uXi8b3VXxc4OcSfNa
-	IzE/ol8Kpb63oZ7sctwzxANTBJMyH1O/qapB7u5jN5cVdhqFOAMpN16LjSkg==
-X-Google-Smtp-Source: AGHT+IHhiCTRGlht8elOD+UVIUjl9aUsadYnn3EhdHTdvFS4AvvMPLcKoB1jRXmegFpEnN+3wGcgtz/u64tJZ+JrYUc=
-X-Received: by 2002:ad4:5c8e:0:b0:6e8:f88f:b96a with SMTP id
- 6a1803df08f44-6f00de91910mr93078266d6.1.1744068657938; Mon, 07 Apr 2025
- 16:30:57 -0700 (PDT)
+        bh=3UH7Z7Dq8GEREWQ6P+Sm1ZE59Mnz1DfU7JXq75pFA78=;
+        b=qnuoSXxfj3a+YJNfLITresa2qfD3HNRbOu0KAQMar6dXVTkXSFy+GAUaGQB7P/BYH3
+         Sx16VicSjCZS3D18OwcG8XlisKzUQLGNq3LHzZHbqj7fP09Cz4w1Itmc2Vje0kJXhWt/
+         lXyoxnm1jJRGyQ2andEltGFdPHNJ46GdERU7BXaLvINsybfrjUphCYFLUR+R/QcpXdfi
+         2lEdX7mV4blApxDcTAou4uhi6+0rpIdTkrt+GN4yUZl49gvSelgQOUG4ReYLMXLdsxHo
+         Y1d036xUZUMNwUZavVN4zS6dii9YN2pLwV5xR5DRkqUc9XCWCPpsmSanqG+nOkdnszfJ
+         xDVw==
+X-Gm-Message-State: AOJu0YzdMhWOYA9MLf+7r10sz/J8U6JTS+MOl3OZkV8gPoBUVE2Fo7pF
+	NjA3uCNqzY1aquX5L5AswMTOdwzZK5I0WE4WD3h61J29Dg5sm0QkpOx5PUqyq17/a5bu5/bdwdS
+	JHogzQoC7Za4dvn53TCUNRTkfpuBpBruIbJ4org==
+X-Gm-Gg: ASbGncuZGOpwRwdjJPl/HO4ZDBL2DoK657MtUWfQ/Zq2zXwwgYulGe7Z9udRj9Acl8A
+	flaW5gELHvEKSfMk/KotKA6/Hl1ZINCCe4AoiF+xYF80zaRN9K7JKEicZhFp7Hz7wIHO7bfqira
+	bsEflR7MEyET5f3nTEMrlCiGNV4VQTDyAsYClWw9AOIdBhKxCc+wplqH30Lg==
+X-Google-Smtp-Source: AGHT+IHc42AQVEkUwmZmXJGyXnkAedrIOrsc4+/x3i8NlRUwiXXfJffVYHjAOYvbfVZebfi+P4uO9GfeMWy1QYlRqng=
+X-Received: by 2002:a05:620a:444e:b0:7c5:ac1b:83a7 with SMTP id
+ af79cd13be357-7c774dc30eemr752344585a.12.1744069176967; Mon, 07 Apr 2025
+ 16:39:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250404220221.1665428-3-jordan@jrife.io> <20250404232228.99744-1-kuniyu@amazon.com>
-In-Reply-To: <20250404232228.99744-1-kuniyu@amazon.com>
+References: <20250404220221.1665428-1-jordan@jrife.io> <20250404220221.1665428-3-jordan@jrife.io>
+ <58bfc722-5dc4-4119-9c5c-49fb6b3da6cd@linux.dev>
+In-Reply-To: <58bfc722-5dc4-4119-9c5c-49fb6b3da6cd@linux.dev>
 From: Jordan Rife <jordan@jrife.io>
-Date: Mon, 7 Apr 2025 16:30:46 -0700
-X-Gm-Features: ATxdqUEjHSDiXYJqgh7obzV9QzLEoE7sCfD1sQC-LIOJ4P8NJ52rOMS3eMphom0
-Message-ID: <CABi4-ogLNdQw=gLTRZ4aJ8qiQWiovHaO19sx5uz29Es6du8GKg@mail.gmail.com>
+Date: Mon, 7 Apr 2025 16:39:25 -0700
+X-Gm-Features: ATxdqUF9MoPCdK8Xa8UMGrgTqCHK5hhzVuewwPy99zP09jIB_-XAntGwFXLlzCw
+Message-ID: <CABi4-oiXH+H=6=LaajcQK5faqDn20tUQ86cTJXF0Om-zcxNSUQ@mail.gmail.com>
 Subject: Re: [RFC PATCH bpf-next 2/3] bpf: udp: Avoid socket skips and repeats
  during iteration
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: aditi.ghag@isovalent.com, bpf@vger.kernel.org, daniel@iogearbox.net, 
-	martin.lau@linux.dev, netdev@vger.kernel.org, willemdebruijn.kernel@gmail.com
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	Aditi Ghag <aditi.ghag@isovalent.com>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 
-> We may need to iterate all visited sockets again in this bucket if all
-> unvisited sockets disappear from the previous iteration.
+> nit. It is to get the first entry? May be directly do
+> hlist_entry_safe(hslot2->head.first, ... ) instead.
 
-If the next socket disappears between iterator stop and start, the
-outer loop would need to keep going until it finds a socket from last
-time that still exists. In most cases, it seems unlikely that the next
-socket will disappear between iterator reads, so in general the outer
-loop would only need to iterate once; the common case should perform
-the same as before with the offset approach. The worst case indeed
-would be if all the sockets disappear between reads. Then you'd have
-to scan through all items in the bucket n_cookies times. Again though,
-this is hopefully a rare case.
+Sure, I can change this and drop the RFC tag for the next iteration of
+this series.
 
-> When the number of the unvisited sockets is small like 1, the duplicated
-> records will not be rare and rather more often than before ?
+> My understanding is that it may or may not batch something newer than the last
+> stop(). This behavior should be similar to the current offset approach also. I
+> think it is fine. The similar situation is true for the next bucket anyway.
 
-Sorry if I'm missing something, but what's the relationship between
-the number of unvisited sockets and rarity of duplicated records?
+Assuming it's rare that the first unvisited socket disappears between
+stop and start, which seems like a reasonable assumption, you should
+generally only need to scan through the list once to find that socket
+(similar amount of work to offset). Worst case is if every socket from
+last time is no longer there. Then you'd end up scanning through the
+full list end_cookie - find_cookie times. And yeah, I think the
+iterator shouldn't really care if new sockets are seen or not as long
+as you see all sockets that were there when you started iterating.
 
 -Jordan
 
