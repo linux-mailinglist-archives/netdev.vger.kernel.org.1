@@ -1,159 +1,165 @@
-Return-Path: <netdev+bounces-179828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F512A7E977
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 20:10:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6AFCA7E984
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 20:13:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBAE4188D406
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:09:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAED31782EF
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:10:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43C6F21ABAF;
-	Mon,  7 Apr 2025 18:08:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0314A221731;
+	Mon,  7 Apr 2025 18:09:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hyy16AvU"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Cbj8Ztff"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C3E21ABA5;
-	Mon,  7 Apr 2025 18:08:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA5922171B
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 18:09:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744049298; cv=none; b=jyPEQbwgKjBlwmb3CTzsgfVvSH7q6tYydYsXSyKxxoNqAbznUjMhqDU3jB6UEzxRgYsRZFmEevKFB/GIR3vvunXTca10gTXjRgzSsl4/akDPLFYuU80kxBYjXiWKPDxotXOf8vc8ko8q15RP9rcFJjl5E1+QgBTXtIns7dGaf1k=
+	t=1744049357; cv=none; b=M8NxKHt7c8Xy2Y8mCQh6jSrfIVkH/iusrlVo3qKPxDt8PBcf2z+iNdI648XDUjRJRJBsSnLcfYnSFIEK9q+XhiYoLREgmrVlzlwRvnxn92uMCf2ylxvJR5/eU9bAvF2hUdRUoHn2AuWVAbYCjnlAbnYaPSEm4roCXQ6zYSmz1TY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744049298; c=relaxed/simple;
-	bh=zppETyWlX1xNN0UfvJJbIMgschxxq5W1Ofqr3d0nTg0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eNKFgjHU1ye/KzhdqH+/v7AH4ifp0V3N8X3S9UOj1rEWkr+tJ48LDcJI/rNxucGA6ovpWAeFV0YfwXCT01h1QyO/lq1cSYldKl7PB5FL/xQRpW6nbBo5ZM1NGZRjoNUKwQeDkGusZEcfumhoDxuV73mHUunUizSdEplQBTcRIQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hyy16AvU; arc=none smtp.client-ip=209.85.221.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-52617ceae0dso1510383e0c.0;
-        Mon, 07 Apr 2025 11:08:16 -0700 (PDT)
+	s=arc-20240116; t=1744049357; c=relaxed/simple;
+	bh=IBZucvcqT4kByOB/2qkqY3AG1+DBDmog6A5GixPbISQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KKtjxCef5BnEvVXaM9v6sHLwMdFSK/m765HschYHsz6FxXixaEeeoltvfmKdB7yRgiE0FH4fRccU8K5KsPLkq0qIGRd4Py2gWISyuc8DgyW+p5oUfFkwSS9cBKeu9/wKUhR8FCCzDmEjTdbFGDCZe54VEU0eE3z8D0dVYsuHCPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Cbj8Ztff; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-227cf12df27so35234745ad.0
+        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 11:09:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744049295; x=1744654095; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jUuYsrCNZuom26Ku72dSBPeeyC8punlJl9ufLVLiqm4=;
-        b=Hyy16AvUUxNdjxie6HwpuoyqWdGa6x6rVCUZdPYusm36/eSAlSm7RH3m5cPvcgfOfI
-         ryAZy3VpnhWo4WZf1Sc68+2o/HRMej+01ajPqpgT0Vf3GZBWgVEUsVBTwMWTCcwJfGb7
-         +womiQRQJifSgdJUp4Co03sV2M2qEcwE+y29EpBPUhC2p8sxEdPmbokFE9mJxKzg8a3J
-         Q+2S9jSOV5O0sxTYMK/2EAw/Pes1EweMMBSa/MbzdioyuQzQMgLdy4qLL3Fmgf+6A6pR
-         P8E43Ki0PQ+QBxqY0zdEB0yr70xACV2yYwPYP2Vq+I9h6c9DO25EwcQcgoND5Sp5ZEZq
-         Xw/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744049295; x=1744654095;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=fastly.com; s=google; t=1744049354; x=1744654154; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jUuYsrCNZuom26Ku72dSBPeeyC8punlJl9ufLVLiqm4=;
-        b=PSjpmu+P2EMo6mQ0488v7cU/It1Pq0CVdNQ8qn35jdLS/TjK4XZlvfQUCE0y7nhd+j
-         9/Hq0M2pNZMyn9xW6SXua4CapwRThmrqKiFdBpf1zWB+MH4e6zFdvWqOVZ3TXjx/tYC5
-         HmiwzIBOMNqjCyDExb37XF40rX+jiwDjb6L/KiePHQEdJ90zpHAzPDtCxCL0dMyByymC
-         5farixpcRMJvtz6vnSI8wbHFfZ8Pi4q7hiX1QtHOTnquhkxjo8iMKqhrCAQefm32gSXW
-         woSK9EvO6kG7Zm3QaZtFiHkArURk/DdgFujalqgCC7M02d/jTqeLU+JiHAau2UfDSgBE
-         SX8g==
-X-Forwarded-Encrypted: i=1; AJvYcCVSMGXb03Tlw9TghAeM4wGBiMlv8/CG76BD7xbvUG34CWm29hrrT+ka7LHu6iFxyKHrJCpxhXfV@vger.kernel.org, AJvYcCW5YbdiVCfxpYTpzC2+a//y8UlEjKadTQ4Knuthh9Z/RrFkgaBai1lxTLJ1ICezU9oluF3DoYW9l1PgkJKY@vger.kernel.org, AJvYcCWkUAjmH0fBMvI+MbFdGjhgQMZcxEeKI/JZ8Qyf/VrqAD3t5Ojce7SIPEDYgMOXTlOUWM0xyS9gvNulz/ztOC/uViE=@vger.kernel.org, AJvYcCX6wbBRndkRNeRPiNGdNaOOV0w7NyiifBNN6Xm/Q6mhQmmzFR5QdI6FQKcY21Y55hYWDKR1TIKBxHm5@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYKcew5zV7pkMid/bdoHOCkeFijS8jGZtmdYt/DhknI6KiApgc
-	lK7eWT0rXUeCEa8B1YVBrd1BcYqzpju+SvtZE4BpEEEhhrTfCsF2itC/3p2ARzxj0EPCyuBPj+j
-	NSORhIgjv++1bNrMM4ZROVLOPbMo=
-X-Gm-Gg: ASbGncv5WKvQyas9K+vD0qp4+1awTT1HAC+QzrtAZJWfZG9luV8K1zSgYq007rDxQcz
-	9ysgk/jFB67keCgmqA0sOBLZUsQcQwTLThdrky3lrmjiEpPBQXRXjfHq4Q3OVtcc2VR2ZnpAy77
-	VQGZ0UOtQ/X4M2xtSXfX5nvMJGbbgNAKaZCGkxVLogLhlfNEqFw4CyZEIBk/4=
-X-Google-Smtp-Source: AGHT+IEN6rDHodvyUoowo8BFuQsI+M3qkHprXMun6ue2nFvUns/xZBc98c1/xylp9Sz4+dM00gUNYRdzmCwmGkE0JHw=
-X-Received: by 2002:a05:6122:16a6:b0:526:1ddd:8953 with SMTP id
- 71dfb90a1353d-527642e498emr8513099e0c.0.1744049295202; Mon, 07 Apr 2025
- 11:08:15 -0700 (PDT)
+        bh=goTb4dVxB6asAZ8vEe4CdQ+UwUmo6qha4hQXKVTgnGs=;
+        b=Cbj8ZtffRvqbsEfa+ASeW2SwD2/XJxb+tCMIiUHlQqi90fgQ+PT97Hsdh6pYA9cBvv
+         00oWWfky1Qr2l8pcMIsnHLgJI9oKD3M3KhjgTVVU5d5CCu/rCCfzwCPnuC6jYZITwwiH
+         gC5SeDlz4EPL3J+/XX5UDSFAqxAyT+HfVIYro=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744049354; x=1744654154;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=goTb4dVxB6asAZ8vEe4CdQ+UwUmo6qha4hQXKVTgnGs=;
+        b=ZnZeGlNa/+86KwJOj5btTLpbO3096bI+FtSU2H8QeHQWSJCGJs9xVU5Z1DQIb70us4
+         2fWK2FaQMTAsqlL8ghefxbEi1XqpIbb1PoSojTT6XLMNBoI/s+bwUeUqhZ6ecTDUMLZx
+         aYLnzBsl6c8Q6DaMUZwhQZyoSZdnItiHYfef2YpGtq3fpE47r0W9rYshCq/CGUHl7Pwz
+         qydsVk30nibX8aUiHQGMNj+eftGzM4B0BR7sFNNv4VSv1pZqouAEwWwYoFFDYap1NK+E
+         UTa8rXopQZ5F68B4rYoYm1u3EvI9BsJRzq11p1G+dGb7jKNLcRuIcnry5Zdlo8nK8vZr
+         5TwA==
+X-Forwarded-Encrypted: i=1; AJvYcCWpRrMIEVqJF5Fv5NyJtiGysqIyEzlW0IiS6VjbtaW8RflMqOatzINLg5ar8zOCpAZ73dZj8as=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSnLP+mOcjnRqg6eI4EhXPNejZL2/2R8gV8rXHMFq0MaWiI1x1
+	h4GEK9tafbOk9/DoKqmfaHToZsnQqUOrAQ1Td0825jIVe63sge+QU/6SsU9HUIY=
+X-Gm-Gg: ASbGncuGOc+EhAZ/3r75/9EfQ9+Tu3yP0hYAFjVOB++Nppt9dDJQBmwTBvVxf+swc+7
+	vjOKbHnXK0UdN/BixKAp84u1UYxhi1bwyndaaYw2jVVzr/Q+jqJHKpdvGcvO8pb8hhi21ggTp8C
+	19v1+8zZ98rAzpJkrs1i9pto55gXUYpW6PRRIDf6H9qhUVPP49DUHhhUa+EoQJmlsabsGHBu779
+	AwEuDDm02EDdBaxTiVzpJJcYIKk0mMcRnFmj5+XKXKUJe7ddmEqqoy18fPu+YDGNaHGTLmrLy52
+	iS1cdVictWxM2SPwiWjtr26bHdJCAz20hl3CGMWi9KjNg9gZC3JmNzDy9KhLydCr8JabVWAeQj2
+	SrOStJVOdHkc=
+X-Google-Smtp-Source: AGHT+IFLFsq6DRleDxDBCSlGG/JwhggVdYbV8Uae51gZrs6k16xW2fXW9cgZsr1hVDVTIFkLlBCTbw==
+X-Received: by 2002:a17:903:1a08:b0:215:9eac:1857 with SMTP id d9443c01a7336-22ab5df17cbmr6648305ad.5.1744049354385;
+        Mon, 07 Apr 2025 11:09:14 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2297866cf04sm83985115ad.161.2025.04.07.11.09.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Apr 2025 11:09:13 -0700 (PDT)
+Date: Mon, 7 Apr 2025 11:09:11 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: Shay Agroskin <shayagr@amazon.com>,
+	Arthur Kiyanovski <akiyano@amazon.com>,
+	David Arinzon <darinzon@amazon.com>,
+	Saeed Bishara <saeedb@amazon.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v1 net-next] net: ena: Support persistent per-NAPI config.
+Message-ID: <Z_QUx7c-7LxPEuor@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Shay Agroskin <shayagr@amazon.com>,
+	Arthur Kiyanovski <akiyano@amazon.com>,
+	David Arinzon <darinzon@amazon.com>,
+	Saeed Bishara <saeedb@amazon.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+References: <20250407164802.25184-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250407120317.127056-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250407120317.127056-4-prabhakar.mahadev-lad.rj@bp.renesas.com> <Z_QSHpvSK7I--xPq@shell.armlinux.org.uk>
-In-Reply-To: <Z_QSHpvSK7I--xPq@shell.armlinux.org.uk>
-From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Date: Mon, 7 Apr 2025 19:07:49 +0100
-X-Gm-Features: ATxdqUGJm_OgZHRFfu9Amyd2UVOtmAsyuknbI3Y7Xd-HEEICL3GbzjhydkDONtY
-Message-ID: <CA+V-a8vgavmN7c9KYjc-3tm-9GC1_aVUkF-dF=Ws9axTBmSa5g@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 3/3] net: stmmac: Add DWMAC glue layer for
- Renesas GBETH
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
-	Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250407164802.25184-1-kuniyu@amazon.com>
 
-On Mon, Apr 7, 2025 at 6:58=E2=80=AFPM Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
->
-> On Mon, Apr 07, 2025 at 01:03:17PM +0100, Prabhakar wrote:
-> > +static struct clk *renesas_gbeth_find_clk(struct plat_stmmacenet_data =
-*plat_dat,
-> > +                                       const char *name)
-> > +{
-> > +     for (unsigned int i =3D 0; i < plat_dat->num_clks; i++)
-> > +             if (!strcmp(plat_dat->clks[i].id, name))
-> > +                     return plat_dat->clks[i].clk;
-> > +
-> > +     return NULL;
-> > +}
->
-> In addition to Jakub's request, I'll ask that you hold off for a week
-> because I have the following that I'd like to submit:
->
-Ack, please add me in Cc while you post this patch.
+On Mon, Apr 07, 2025 at 09:47:59AM -0700, Kuniyuki Iwashima wrote:
+> Let's pass the queue index to netif_napi_add_config() to preserve
+> per-NAPI config.
+> 
+> Test:
+> 
+> Set 100 to defer-hard-irqs (default is 0) and check the value after
+> link down & up.
+> 
+>   $ cat /sys/class/net/enp39s0/napi_defer_hard_irqs
+>   0
+> 
+>   $ ./tools/net/ynl/pyynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+>     --dump napi-get --json='{"ifindex": 2}'
+>   [{'defer-hard-irqs': 0,
+>     'gro-flush-timeout': 0,
+>     'id': 65,
+>     'ifindex': 2,
+>     'irq': 29,
+>     'irq-suspend-timeout': 0}]
+> 
+>   $ sudo ./tools/net/ynl/pyynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+>     --do napi-set --json='{"id": 65, "defer-hard-irqs": 100}'
+> 
+>   $ sudo ip link set enp39s0 down && sudo ip link set enp39s0 up
+> 
+> Without patch:
+> 
+>   $ ./tools/net/ynl/pyynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+>     --dump napi-get --json='{"ifindex": 2}'
+>   [{'defer-hard-irqs': 0,  <------------------- Reset to 0
+>     'gro-flush-timeout': 0,
+>     'id': 66,  <------------------------------- New ID
+>     'ifindex': 2,
+>     'irq': 29,
+>     'irq-suspend-timeout': 0}]
+> 
+> With patch:
+> 
+>   $ ./tools/net/ynl/pyynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+>     --dump napi-get --json='{"ifindex": 2}'
+>   [{'defer-hard-irqs': 100,  <--------------+-- Preserved
+>     'gro-flush-timeout': 0,                 |
+>     'id': 65,  <----------------------------'
+>     'ifindex': 2,
+>     'irq': 29,
+>     'irq-suspend-timeout': 0}]
+> 
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+>  drivers/net/ethernet/amazon/ena/ena_netdev.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Cheers,
-Prabhakar
+Thank you for adding support for this!
 
-> bbc73b8b6dfd net: stmmac: provide stmmac_pltfr_find_clk()
->
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/driv=
-ers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> index c73eff6a56b8..43c869f64c39 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> @@ -709,6 +709,17 @@ devm_stmmac_probe_config_dt(struct platform_device *=
-pdev, u8 *mac)
->  #endif /* CONFIG_OF */
->  EXPORT_SYMBOL_GPL(devm_stmmac_probe_config_dt);
->
-> +struct clk *stmmac_pltfr_find_clk(struct plat_stmmacenet_data *plat_dat,
-> +                                 const char *name)
-> +{
-> +       for (int i =3D 0; i < plat_dat->num_clks; i++)
-> +               if (strcmp(plat_dat->clks[i].id, name) =3D=3D 0)
-> +                       return plat_dat->clks[i].clk;
-> +
-> +       return NULL;
-> +}
-> +EXPORT_SYMBOL_GPL(stmmac_pltfr_find_clk);
-> +
-> ...
->
-> which will avoid glue drivers duplicating this functionality. This will
-> be part of the first sets of patches I'm going to be submitting.
->
-> Thanks.
->
-> --
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
