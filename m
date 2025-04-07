@@ -1,110 +1,116 @@
-Return-Path: <netdev+bounces-179839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E030A7EB0A
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 20:45:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29805A7EB8A
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 20:55:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 327E27A4C18
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:42:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E263C188AFFB
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:53:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D59426B961;
-	Mon,  7 Apr 2025 18:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CC102580F4;
+	Mon,  7 Apr 2025 18:19:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uhHBcldp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ME+Zy0sR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18BEC255E38;
-	Mon,  7 Apr 2025 18:15:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8172580EC;
+	Mon,  7 Apr 2025 18:19:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744049760; cv=none; b=ase8k9UCAwGeOPw+GD15bLKz3NocJWDAfD/ofHUDAqsuDcmxJzZMjpVEUQl56YQhXC1XxnFYG6Kod8yyUuwDpXJuBADhxdv1Y+4y1A9RwcxNZkdmM6ufmhFI0tgfrQgO3W9pxLcWgXmUJjq/PIATT71CycjBikU8Jut3FRswqUY=
+	t=1744049995; cv=none; b=DE6dv9fwQToNtl8ZYvIlBUBUxptsLPM5azsBWu+MwrksxPIFIU0dioWa5Byj54vwNnNIg/oY1SfrQ2k29iSSZ1qSpqp789PYrdNIKpEqXqYAB8+t/FPxK4oVDnivtVHo83M69Pa0VvYuPrjdp/665BHHrP4EG8SQpi+08vHET2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744049760; c=relaxed/simple;
-	bh=k13xiQCaT/GS6dWcuXlaBInjqnzPmqms2Dv69by3/rE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FPjWI8ABFE98cOk2y/9n28yLvfk1w0Q5fNxHLyscjvgAWSLz+6fzvD3zGTuMm9WEx1xC5uh353j83D9D4zVkij64u+ddw6YOzTIEtneIw7pe6PlMP5CPQovJJPyhFmjGTj4eW9a3MylTc1sRKpiQtnQHuWql5NuLoLWpfbkGyjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uhHBcldp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33B4FC4CEDD;
-	Mon,  7 Apr 2025 18:15:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744049759;
-	bh=k13xiQCaT/GS6dWcuXlaBInjqnzPmqms2Dv69by3/rE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=uhHBcldpetwj+Px1tlBUuWitjT07SZP+IoP3R9vvpPEOWbLi8eKgSyPqXXjDd99d5
-	 SD1kdDcqxtHEt8+TKorNtwYKWKztXuIBgxmfJqtKWgTtNO6n6a+r+uFOgtZr4k8hHP
-	 V5vGz/SdpNfX2wGjsQAdADsYL/nk+5uACGIOqYngshyIEhWoJXKRrCjiMYHyqmic2X
-	 AcbNGhrZNhRjnp4ErPrGyD2eZSEJzynZRWYb3hYkrapgqx0foxf7BffNp5cETvDIzZ
-	 Lo6AEiw378Xfb7aX22M1HJocqeS37bitc6+d6P22TXh33hd+BPQFuq2oWqwqYJLFDn
-	 EM3urwhIEDsOA==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Chenyuan Yang <chenyuan0y@gmail.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Sasha Levin <sashal@kernel.org>,
-	joel@jms.id.au,
-	andrew@codeconstruct.com.au,
-	richardcochran@gmail.com,
-	linux-usb@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-aspeed@lists.ozlabs.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 3/3] usb: gadget: aspeed: Add NULL pointer check in ast_vhub_init_dev()
-Date: Mon,  7 Apr 2025 14:15:48 -0400
-Message-Id: <20250407181550.3184047-3-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250407181550.3184047-1-sashal@kernel.org>
-References: <20250407181550.3184047-1-sashal@kernel.org>
+	s=arc-20240116; t=1744049995; c=relaxed/simple;
+	bh=8t9I3M/OoDdOwuvx+sh5pUZ+oo+lNCu+25qg/OpdLq8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VHXuw5TApjX45MgWlRvlPEW3OpvrEKPYYvdx1JxFj5jyeD5aPEL9Z2bdP1IFVBL/inmTzyqcBKXIx0o7rQLijQ3Bc8F1h6/FlvtNScrrF75suSylU1Tb18vHnTjY59YOvRZd6LTjdz/MH944JlveOd58cFJevWpOWMhJrMpr2pA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ME+Zy0sR; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-227d6b530d8so40349495ad.3;
+        Mon, 07 Apr 2025 11:19:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744049993; x=1744654793; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y92qqv7Si8DM+cyIuUMii4FZ1oGPZ3qD/oWMPhfaWak=;
+        b=ME+Zy0sRlmdMGKOHMJpXfYEW7+Z1QbnxZeT9HCqZWgp3HBeY/U8KuEt3wSfhucSVMY
+         5YRq+5/7C8EVe03QJaza0kuhaLygFrpc5QvFjxm4teFvdAr4GQPVJX3crb+btLp5gLIn
+         TVGe6QPTkmcUA2cUokpn++5dwgcesZ4dxqgv4ixH5WAWa2q+Y+5wBDlIbL9IT0doh0g7
+         MSydcSnhL1d84DLEYpcBjbr9UbblG7u85XheQV+nTglLKm5xAqISzOXIgGTD0w2gEn8q
+         RM1pso3GW6CV1JPHdzBp1EXrVbttAv4+WItwhAIn39q/d2OytAmoVmTPP4mbDfCdLlyL
+         u+5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744049993; x=1744654793;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Y92qqv7Si8DM+cyIuUMii4FZ1oGPZ3qD/oWMPhfaWak=;
+        b=T27a1Afp62DkA60UFfzl/XzcCPHp0AWdKQH4k+mhi2BySJTwY9kUmfHqmuasOz3AIz
+         oZZeLjo6w11ZonBIAdxgnZjg5a30iToMN0/8izsTsQ0zFxrJssGdb3YwgvSRhgKW7t/Q
+         yx1mkGEbHURUVU5aCfLUiW6Qb7xFiLsr0J6khXfvg5iPh48xpJcu10CQ8PUTasZx3/V5
+         TROS8E6jGmWDFUfj5j3of4yl0obTn5JDS8hBdCAhRe65sN1bEzpfV8wrrPtiAloo0riD
+         tfsZdnFxUbqxx42pS/dU3CyIx3UXV0mgG4BmaZ799YyJWdlAt0wbxdjWL09IOT6lbF7h
+         3hMw==
+X-Forwarded-Encrypted: i=1; AJvYcCWTt+MbxbSPwxH64j5wa96GQzGB6O/mEDFiC5qiIQklaH7A+lYRPL4wS9rVvJs+sdizk+sjl7ujcOborY4=@vger.kernel.org, AJvYcCXwrPVMof1WtOC66dEfSMmIuZ6FK72NRzUmYWPmwB86Z7Z0meAqFrDrdG6wp6mPsvHOFcF3FINV@vger.kernel.org
+X-Gm-Message-State: AOJu0YztzNkWlQumZDAItZQlBQFcBqzs94g8hgsh5as7Q54q2OdPnqBz
+	awliLecSlJzA68FHxz9gOoNlQcT53F82hYyIbELfc3vcu1QvyZI=
+X-Gm-Gg: ASbGncsQcWKQ5JY1pxN93EVu3mlY4J9ZQM0W+Nujxc31dgWXy8epyTZBEk1IvwRW3t9
+	KWoGK/+CJCFvb4g6s5TMTyyC2SBuLxhp2sl240NW3iq2N9QLSQqF/fayrg5Pz5TVXMpFVc9kjXa
+	fYawJwgL8ZeDjTtB1WSStw697JW44x34c24NAFS1KmM5G1Km0/fyEsz5yetIVC/JMD6Kk7msFH5
+	ZR0aXPcXcFFZ6ZtK4yu/obG/jBsd5l9oJZuwixRf00/XDBRxN02onvD0h6WiveVQcNV7gwIre0W
+	EFUFiSm4ZTXdTMDoGuEnIHpX/IFFgvMwcjpbcf9iwW2u3rMLAKrIHdGra9FGKpKnMytkL/5gUHg
+	=
+X-Google-Smtp-Source: AGHT+IGpX9h4LkoziHaRfryu8mhOvj9TvgeigMtuO3BC1wBWT5M21Mp4xRJUif7kKVU1fH4pOq5YJQ==
+X-Received: by 2002:a17:902:f683:b0:220:eade:d77e with SMTP id d9443c01a7336-22a8a0a3a86mr201394445ad.40.1744049993129;
+        Mon, 07 Apr 2025 11:19:53 -0700 (PDT)
+Received: from L1HF02V04E1.TheFacebook.com ([2620:10d:c090:500::4:6c4e])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-739da0bc052sm8809243b3a.156.2025.04.07.11.19.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Apr 2025 11:19:52 -0700 (PDT)
+From: kalavakunta.hari.prasad@gmail.com
+To: sam@mendozajonas.com,
+	fercerpav@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: npeacock@meta.com,
+	akozlov@meta.com,
+	Hari Kalavakunta <kalavakunta.hari.prasad@gmail.com>
+Subject: [PATCH net-next 0/2] GCPS Spec Compliance Patch Set
+Date: Mon,  7 Apr 2025 11:19:47 -0700
+Message-Id: <cover.1744048182.git.kalavakunta.hari.prasad@gmail.com>
+X-Mailer: git-send-email 2.37.1.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.4.291
 Content-Transfer-Encoding: 8bit
 
-From: Chenyuan Yang <chenyuan0y@gmail.com>
+From: Hari Kalavakunta <kalavakunta.hari.prasad@gmail.com>
 
-[ Upstream commit 8c75f3e6a433d92084ad4e78b029ae680865420f ]
+Make Get Controller Packet Statistics (GCPS) 64-bit member variables
+spec-compliant, as per DSP0222 v1.0.0 and forward specs
 
-The variable d->name, returned by devm_kasprintf(), could be NULL.
-A pointer check is added to prevent potential NULL pointer dereference.
-This is similar to the fix in commit 3027e7b15b02
-("ice: Fix some null pointer dereference issues in ice_ptp.c").
+Hari Kalavakunta (2):
+  net: ncsi: Format structure for longer names
+  net: ncsi: Fix GCPS 64-bit member variables
 
-This issue is found by our static analysis tool
+ net/ncsi/internal.h | 21 +++++-----
+ net/ncsi/ncsi-pkt.h | 95 +++++++++++++++++++++++++--------------------
+ net/ncsi/ncsi-rsp.c | 31 +++++++++------
+ 3 files changed, 82 insertions(+), 65 deletions(-)
 
-Signed-off-by: Chenyuan Yang <chenyuan0y@gmail.com>
-Link: https://lore.kernel.org/r/20250311012705.1233829-1-chenyuan0y@gmail.com
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/usb/gadget/udc/aspeed-vhub/dev.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/usb/gadget/udc/aspeed-vhub/dev.c b/drivers/usb/gadget/udc/aspeed-vhub/dev.c
-index 4008e7a511889..89d7d3b24718d 100644
---- a/drivers/usb/gadget/udc/aspeed-vhub/dev.c
-+++ b/drivers/usb/gadget/udc/aspeed-vhub/dev.c
-@@ -542,6 +542,9 @@ int ast_vhub_init_dev(struct ast_vhub *vhub, unsigned int idx)
- 	d->vhub = vhub;
- 	d->index = idx;
- 	d->name = devm_kasprintf(parent, GFP_KERNEL, "port%d", idx+1);
-+	if (!d->name)
-+		return -ENOMEM;
-+
- 	d->regs = vhub->regs + 0x100 + 0x10 * idx;
- 
- 	ast_vhub_init_ep0(vhub, &d->ep0, d);
 -- 
-2.39.5
+2.47.1
 
 
