@@ -1,138 +1,145 @@
-Return-Path: <netdev+bounces-179850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34928A7EBCC
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 21:01:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04737A7EBEA
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 21:04:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DFE4C7A5702
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:58:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AA36189B26B
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:01:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C78C125D1EE;
-	Mon,  7 Apr 2025 18:26:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D576B22172D;
+	Mon,  7 Apr 2025 18:31:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TS+QrSO/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="caqttTO6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95C0525D1E6;
-	Mon,  7 Apr 2025 18:26:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 155C4253B61
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 18:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744050409; cv=none; b=FdpocF1um6XB0T8mwwInmnhufcP3EuK2nTfP9B0GmA4kRwfBdgrDCW3ZmpBa7G4a6F6zxjVdVIbfH3JwOsaF9QYQD0xuSMLf71IU42xxiRoAqkdqQGxx6DFOFqy6Z0QKJ0x+tGAyUgS7kxv6lzKnOUJUsyQ8vpbBpVTt3GT5nn4=
+	t=1744050670; cv=none; b=IG8nKrqVKBqYZ7dIEoRmJFfNakL+KPP/h4D1CM4VMxymNilepZ3V11QaxDuQMaHkiXtdZ+MzXTKoYPeSuODbvOz2VatVJTKEAGBRWlMMilyACL22Mv2rMawdO5+cSr9/wQkfGRHjpV6DNJzx9vHxjsMA7dLV5qmZ5J4RrL+TNp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744050409; c=relaxed/simple;
-	bh=MyHd0TjRnbf2Mh2HU4okOIGQEKf8vyY86oBFFW5OTAE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Y+SRucYB/Sn0oVsE8IFr4clRbvieRqkdBR33t/y5wa0ohhs9+wjAjEuXvv1JaCFk6N4AGEYX8Ttk3hsqxjr+1hurPRJ8YwgKUuTj/mVdVAT4dL/aR/ONTO7R9NLq6p7onu3hIkDzSceo20bG7mJurYHHoVHg575GchltZpEd6VI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TS+QrSO/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F4A1C4CEDD;
-	Mon,  7 Apr 2025 18:26:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744050409;
-	bh=MyHd0TjRnbf2Mh2HU4okOIGQEKf8vyY86oBFFW5OTAE=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=TS+QrSO/66kDHas/i6aI/fa+aEcoXxEe0MZBm76l8899NeQjiVhm6i5HcizWEAJCa
-	 aDnKh4Em5FDzcz5tSOCgoUHKj+M8pwD74xhhEYtNFWWUc/RicnIKYjCHvi2ESwcHKU
-	 sit9HlBXGyJibOuUGFcd27/SLk5UIocTtdnRTEAREL77j6FmW5B4J3RtgjatFsQ6UP
-	 bUuMgDcDaO0HyoYneLH9aitvfHFTTzgxW7uS7TTElc4HHZ7iAEkXvZDL1AISFrxy/z
-	 BZ1R0tSc7pc/b4Gg+dvy5JC0wAaut4ALTZOs9tjkKvMddjiXe9pdL4wfLv+fjSzFvC
-	 8bnmeEUbwKFOQ==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Mon, 07 Apr 2025 20:26:33 +0200
-Subject: [PATCH net 2/2] selftests: mptcp: validate MPJoin HMacFailure
- counters
+	s=arc-20240116; t=1744050670; c=relaxed/simple;
+	bh=CxC8lM6vEnJ81VYdUD7FZJLMDi6KW5OylQzkmiEQeg4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lyat6ee2qQL40erorRayegSk4csJxU3fNaAMwh5mFcivbpN2wYB8d3wWmAo2KrPuCqGOFO4cMS41IV72VFgGN7+zWIZ2jtcu4BMJOIL2uzsLiB4lvWGlW7jg4bBtkMFHEI21+pv04SeUvb2Fzvv6gq4SPdp0aaKYmt5aCYVRJsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=caqttTO6; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43edb40f357so23033615e9.0
+        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 11:31:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744050667; x=1744655467; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=I/2q9Qpv6P3mzb6KZLuIOqkm3rWI7ZxLFwbSGgZgMMc=;
+        b=caqttTO6nRNpf2wwhz80zVvm8Sdhgk03E87ynYUQRA+jj1SSHDUrrDX3t11GoZDMiF
+         fvVX9JF5yig19OT/x8asdLuboRP5R6V3qE44OX9qRGIZw7J0cHi8rERnJDQYFH76XSvE
+         O1MJPg85TU9g59PInnPogNQpVzKBur6WsnV50l4zQfezaP9oo0Ks4/LiJWULYNMYjv4a
+         f8g7VNgQj+nbkuZIWP08Yohv55Jsgmsbw93nJmcY8JHHrtsqcbP41otWdjzO4d63Ndfn
+         X044ql2IPLBxLJWN0Ll0vaTagomuYkWwOZjD+l0avqBtaPf6ErT/GD1pQ2pFUZdeUht5
+         Dkpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744050667; x=1744655467;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=I/2q9Qpv6P3mzb6KZLuIOqkm3rWI7ZxLFwbSGgZgMMc=;
+        b=A0oH7iC4KdI4eldsXHV/0tBBXCPwxY8X+9lajOBY1L1fd4GbpQwRxrYWXD3b86uAfX
+         XDm9qhS2zANHm7CHpp8xddlCijyOUdgaURknwJ7uq4BopkJWnMHk3qX0cOmsc3iuC29u
+         YAdkwrO0F54rcdDCsQrdf1XHnxyX2rWHJasAkDv3k/WfeOKoxXQ4WU/DNIVSvfLmym8/
+         F6Q8V77t7QrHZeMA+qqTtiT0HrTnfKqP6og73MA2FI4r2fNPsPryokK5GGDqS3WX+k1T
+         e009YBKDkaVuU9rhTkIcBDuCQek8sNYQ4Rq5z1ZGq9ZQ1FkGPlde19+teTITyOXC7IIZ
+         RkQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUuvFtgJiW4ft0ASQwaEiwYK9HkoiOZhv9t+x5oI/z9oxvdJZJg+yBD1ifCvOpr1FQDMBm+MXQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZ0mPQXB3SUfuUu4A39ALCSRDYS9vsdKk11M/ZzHm/rHYVOkd9
+	HUoTh/4CXCkSAF9Plk6d8Tq3XHqCBDnIOF6sKJzUkul5OF/1AW6L
+X-Gm-Gg: ASbGncuGjvM4/u0sLilq9POmYW4lBlwaXaJhGTcEYbkCHa/B3/vROVtWS0yjFKPJ+q2
+	sA0cMJxro9fhxLoHOzSYFntvTl2O4x7EW6D+BLnhixHPPQuAQG+tbLcpgITn63/0FfLYmVp6/0w
+	raaNDLEFyfGBZaC5T4X0YD8nK3qJ7Jinz/ziofVN7XXZ9JC2kgF3Om0dHbWCCotqKFLTmIuwLv2
+	F/hfsMIeAjc5Lnopsq05o+zSMVx97Uo4Xp2QwJnEEE+rP7q/njQ4JlJBdlr9ZGzK2dkpsytnfMt
+	mnYMEmTsU2IuAaENpVNpNiDwE3btihZUso2epEuMh/0yzvBXMQAZyHQKulE=
+X-Google-Smtp-Source: AGHT+IEBQBTUZukT8NQNYa8jEn6F/ieubLZi1PrX5Xx7e2NajFdd9fBfpRy5XzgmC5J8ZUNxSX16Ug==
+X-Received: by 2002:a5d:6d8a:0:b0:39a:cc34:2f9b with SMTP id ffacd0b85a97d-39d6fc291b3mr7896942f8f.16.1744050667157;
+        Mon, 07 Apr 2025 11:31:07 -0700 (PDT)
+Received: from localhost.localdomain ([78.170.183.130])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec364ec90sm137729995e9.27.2025.04.07.11.31.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Apr 2025 11:31:06 -0700 (PDT)
+From: Baris Can Goral <goralbaris@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: horms@kernel.org,
+	netdev@vger.kernel.org,
+	allison.henderson@oracle.com,
+	skhan@linuxfoundation.org,
+	Baris Can Goral <goralbaris@gmail.com>
+Subject: [PATCH] net: rds transform strncpy to strscpy
+Date: Mon,  7 Apr 2025 21:30:53 +0300
+Message-Id: <20250407183052.8763-1-goralbaris@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250407-net-mptcp-hmac-failure-mib-v1-2-3c9ecd0a3a50@kernel.org>
-References: <20250407-net-mptcp-hmac-failure-mib-v1-0-3c9ecd0a3a50@kernel.org>
-In-Reply-To: <20250407-net-mptcp-hmac-failure-mib-v1-0-3c9ecd0a3a50@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1783; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=MyHd0TjRnbf2Mh2HU4okOIGQEKf8vyY86oBFFW5OTAE=;
- b=owEBbQKS/ZANAwAKAfa3gk9CaaBzAcsmYgBn9Bjg1Gtym9sISXFIzb2ww3e06wI6gWVSgTfH1
- yphsTczaXqJAjMEAAEKAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ/QY4AAKCRD2t4JPQmmg
- cwdqEACUb/JbM+TljiOqLHuRMZxE3Sezd2TIZU4UFTVNCCo+OfZBy9VA/KAAeXki3x34CgZh75H
- 7cAoZacSWacZjDyUHN+c0Y14qlMM3bXuy9Y6G40Crsg7Sg+CE+qFk4mreedn+s94Rc7vg4Gki+j
- kLznkDLwZsuhJfA02c73xdjtcRFO98GvPkZXb8yN3egUJi1Vwb546JwhiBeXgihNtESYhTkb+tZ
- xW3+q1PV1iOyu6MmRwTwcO7zQCB65BlM6rvHqVQez00kZE6FJXQQQAOQGMH3+pXQ3tCrlOHTBxZ
- 2Lhoe6btlD0mi+NRvE34hzOiXweAooZyjU1EHe3iQXUSVYtGiwx7Ak0gl2jgNcxQuSIQuRlpLHY
- vCTIDJqkRowDHX/GAiXDpQF/kWGFWhU1Wv6r3nTT61FvfQEcpRfZBB8WPjv4j0o3ATQ6cgvoZQV
- XdUGB8HoZOTT36VcG4eKwmyEpIab9PuHc0NP0T18Xu8iGeJDu1+alBOQ2nSyiIwKI6yL0Jjh9zO
- 3HqAY79sa1c8fGd+lKWEhE1NcE+uG25dG1vwVJBUuHROuDerDZYD0t31caraNqWrZq68wAB/eTs
- x8ZIa1GnmtCxhSY3Q+367d2UgZ8wRWbmKcwo7+rmfwEpAJw/1yMKtBNq+kylevpeuIFLFOypC8s
- XRLLEptn9EJje/A==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+Content-Transfer-Encoding: 8bit
 
-The parent commit fixes an issue around these counters where one of them
--- MPJoinAckHMacFailure -- was wrongly incremented in some cases.
+Hi,
+The strncpy() function is actively dangerous to use since it may not
+NULL-terminate the destination string,resulting in potential memory
+content exposures, unbounded reads, or crashes.
+Link:https://github.com/KSPP/linux/issues/90
 
-This makes sure the counter is always 0. It should be incremented only
-in case of corruption, or a wrong implementation, which should not be
-the case in these selftests.
-
-Reviewed-by: Geliang Tang <geliang@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Signed-off-by: Baris Can Goral <goralbaris@gmail.com>
 ---
- tools/testing/selftests/net/mptcp/mptcp_join.sh | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ net/rds/connection.c | 4 ++--
+ net/rds/stats.c      | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-index 13a3b68181ee14eb628a858e5738094c3c936b74..befa66f5a366bb738f8e6d6d84677f5c07488720 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-@@ -1441,6 +1441,15 @@ chk_join_nr()
- 		fi
- 	fi
+diff --git a/net/rds/connection.c b/net/rds/connection.c
+index c749c5525b40..fb2f14a1279a 100644
+--- a/net/rds/connection.c
++++ b/net/rds/connection.c
+@@ -749,7 +749,7 @@ static int rds_conn_info_visitor(struct rds_conn_path *cp, void *buffer)
+ 	cinfo->laddr = conn->c_laddr.s6_addr32[3];
+ 	cinfo->faddr = conn->c_faddr.s6_addr32[3];
+ 	cinfo->tos = conn->c_tos;
+-	strncpy(cinfo->transport, conn->c_trans->t_name,
++	strscpy(cinfo->transport, conn->c_trans->t_name,
+ 		sizeof(cinfo->transport));
+ 	cinfo->flags = 0;
  
-+	count=$(mptcp_lib_get_counter ${ns2} "MPTcpExtMPJoinSynAckHMacFailure")
-+	if [ -z "$count" ]; then
-+		rc=${KSFT_SKIP}
-+	elif [ "$count" != "0" ]; then
-+		rc=${KSFT_FAIL}
-+		print_check "synack HMAC"
-+		fail_test "got $count JOIN[s] synack HMAC failure expected 0"
-+	fi
-+
- 	count=$(mptcp_lib_get_counter ${ns1} "MPTcpExtMPJoinAckRx")
- 	if [ -z "$count" ]; then
- 		rc=${KSFT_SKIP}
-@@ -1450,6 +1459,15 @@ chk_join_nr()
- 		fail_test "got $count JOIN[s] ack rx expected $ack_nr"
- 	fi
+@@ -775,7 +775,7 @@ static int rds6_conn_info_visitor(struct rds_conn_path *cp, void *buffer)
+ 	cinfo6->next_rx_seq = cp->cp_next_rx_seq;
+ 	cinfo6->laddr = conn->c_laddr;
+ 	cinfo6->faddr = conn->c_faddr;
+-	strncpy(cinfo6->transport, conn->c_trans->t_name,
++	strscpy(cinfo6->transport, conn->c_trans->t_name,
+ 		sizeof(cinfo6->transport));
+ 	cinfo6->flags = 0;
  
-+	count=$(mptcp_lib_get_counter ${ns1} "MPTcpExtMPJoinAckHMacFailure")
-+	if [ -z "$count" ]; then
-+		rc=${KSFT_SKIP}
-+	elif [ "$count" != "0" ]; then
-+		rc=${KSFT_FAIL}
-+		print_check "ack HMAC"
-+		fail_test "got $count JOIN[s] ack HMAC failure expected 0"
-+	fi
-+
- 	print_results "join Rx" ${rc}
+diff --git a/net/rds/stats.c b/net/rds/stats.c
+index 9e87da43c004..63c34dbdf97f 100644
+--- a/net/rds/stats.c
++++ b/net/rds/stats.c
+@@ -89,7 +89,7 @@ void rds_stats_info_copy(struct rds_info_iterator *iter,
  
- 	join_syn_tx="${join_syn_tx:-${syn_nr}}" \
-
+ 	for (i = 0; i < nr; i++) {
+ 		BUG_ON(strlen(names[i]) >= sizeof(ctr.name));
+-		strncpy(ctr.name, names[i], sizeof(ctr.name) - 1);
++		strscpy(ctr.name, names[i], sizeof(ctr.name) - 1);
+ 		ctr.name[sizeof(ctr.name) - 1] = '\0';
+ 		ctr.value = values[i];
+ 
 -- 
-2.48.1
+2.34.1
 
 
