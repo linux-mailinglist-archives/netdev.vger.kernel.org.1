@@ -1,145 +1,81 @@
-Return-Path: <netdev+bounces-179853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04737A7EBEA
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 21:04:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D427A7EC24
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 21:10:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AA36189B26B
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:01:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB9B2446631
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:04:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D576B22172D;
-	Mon,  7 Apr 2025 18:31:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AF1025F97F;
+	Mon,  7 Apr 2025 18:38:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="caqttTO6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZAuAhWCK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 155C4253B61
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 18:31:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2BE825F97D;
+	Mon,  7 Apr 2025 18:37:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744050670; cv=none; b=IG8nKrqVKBqYZ7dIEoRmJFfNakL+KPP/h4D1CM4VMxymNilepZ3V11QaxDuQMaHkiXtdZ+MzXTKoYPeSuODbvOz2VatVJTKEAGBRWlMMilyACL22Mv2rMawdO5+cSr9/wQkfGRHjpV6DNJzx9vHxjsMA7dLV5qmZ5J4RrL+TNp4=
+	t=1744051080; cv=none; b=oc8OxU818gknDdzLxBEbvo0QylLLn705FhdPYv0CoNy+GinUjauUzQO+mYxBnPpyciNi1qlOa9HBSoPUn619XPZ0NZlbBtuVog/saFhqHb7EiimX5wfrwCoc+1UkBhICKgybSXttRTfHCiUiThfvS8oy6couCOeMxsoulODKsT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744050670; c=relaxed/simple;
-	bh=CxC8lM6vEnJ81VYdUD7FZJLMDi6KW5OylQzkmiEQeg4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lyat6ee2qQL40erorRayegSk4csJxU3fNaAMwh5mFcivbpN2wYB8d3wWmAo2KrPuCqGOFO4cMS41IV72VFgGN7+zWIZ2jtcu4BMJOIL2uzsLiB4lvWGlW7jg4bBtkMFHEI21+pv04SeUvb2Fzvv6gq4SPdp0aaKYmt5aCYVRJsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=caqttTO6; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43edb40f357so23033615e9.0
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 11:31:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744050667; x=1744655467; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=I/2q9Qpv6P3mzb6KZLuIOqkm3rWI7ZxLFwbSGgZgMMc=;
-        b=caqttTO6nRNpf2wwhz80zVvm8Sdhgk03E87ynYUQRA+jj1SSHDUrrDX3t11GoZDMiF
-         fvVX9JF5yig19OT/x8asdLuboRP5R6V3qE44OX9qRGIZw7J0cHi8rERnJDQYFH76XSvE
-         O1MJPg85TU9g59PInnPogNQpVzKBur6WsnV50l4zQfezaP9oo0Ks4/LiJWULYNMYjv4a
-         f8g7VNgQj+nbkuZIWP08Yohv55Jsgmsbw93nJmcY8JHHrtsqcbP41otWdjzO4d63Ndfn
-         X044ql2IPLBxLJWN0Ll0vaTagomuYkWwOZjD+l0avqBtaPf6ErT/GD1pQ2pFUZdeUht5
-         Dkpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744050667; x=1744655467;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=I/2q9Qpv6P3mzb6KZLuIOqkm3rWI7ZxLFwbSGgZgMMc=;
-        b=A0oH7iC4KdI4eldsXHV/0tBBXCPwxY8X+9lajOBY1L1fd4GbpQwRxrYWXD3b86uAfX
-         XDm9qhS2zANHm7CHpp8xddlCijyOUdgaURknwJ7uq4BopkJWnMHk3qX0cOmsc3iuC29u
-         YAdkwrO0F54rcdDCsQrdf1XHnxyX2rWHJasAkDv3k/WfeOKoxXQ4WU/DNIVSvfLmym8/
-         F6Q8V77t7QrHZeMA+qqTtiT0HrTnfKqP6og73MA2FI4r2fNPsPryokK5GGDqS3WX+k1T
-         e009YBKDkaVuU9rhTkIcBDuCQek8sNYQ4Rq5z1ZGq9ZQ1FkGPlde19+teTITyOXC7IIZ
-         RkQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUuvFtgJiW4ft0ASQwaEiwYK9HkoiOZhv9t+x5oI/z9oxvdJZJg+yBD1ifCvOpr1FQDMBm+MXQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZ0mPQXB3SUfuUu4A39ALCSRDYS9vsdKk11M/ZzHm/rHYVOkd9
-	HUoTh/4CXCkSAF9Plk6d8Tq3XHqCBDnIOF6sKJzUkul5OF/1AW6L
-X-Gm-Gg: ASbGncuGjvM4/u0sLilq9POmYW4lBlwaXaJhGTcEYbkCHa/B3/vROVtWS0yjFKPJ+q2
-	sA0cMJxro9fhxLoHOzSYFntvTl2O4x7EW6D+BLnhixHPPQuAQG+tbLcpgITn63/0FfLYmVp6/0w
-	raaNDLEFyfGBZaC5T4X0YD8nK3qJ7Jinz/ziofVN7XXZ9JC2kgF3Om0dHbWCCotqKFLTmIuwLv2
-	F/hfsMIeAjc5Lnopsq05o+zSMVx97Uo4Xp2QwJnEEE+rP7q/njQ4JlJBdlr9ZGzK2dkpsytnfMt
-	mnYMEmTsU2IuAaENpVNpNiDwE3btihZUso2epEuMh/0yzvBXMQAZyHQKulE=
-X-Google-Smtp-Source: AGHT+IEBQBTUZukT8NQNYa8jEn6F/ieubLZi1PrX5Xx7e2NajFdd9fBfpRy5XzgmC5J8ZUNxSX16Ug==
-X-Received: by 2002:a5d:6d8a:0:b0:39a:cc34:2f9b with SMTP id ffacd0b85a97d-39d6fc291b3mr7896942f8f.16.1744050667157;
-        Mon, 07 Apr 2025 11:31:07 -0700 (PDT)
-Received: from localhost.localdomain ([78.170.183.130])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec364ec90sm137729995e9.27.2025.04.07.11.31.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 11:31:06 -0700 (PDT)
-From: Baris Can Goral <goralbaris@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: horms@kernel.org,
-	netdev@vger.kernel.org,
-	allison.henderson@oracle.com,
-	skhan@linuxfoundation.org,
-	Baris Can Goral <goralbaris@gmail.com>
-Subject: [PATCH] net: rds transform strncpy to strscpy
-Date: Mon,  7 Apr 2025 21:30:53 +0300
-Message-Id: <20250407183052.8763-1-goralbaris@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1744051080; c=relaxed/simple;
+	bh=zk8wUrlmuDMDL1PuhRcv1wh0/L1IcyraU6qKme+S0p0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bs7nlr/uiIFz6YXeNOab5xn3RB+mGHU3vTnke1y3KsIz+yJkbqt09TRAKXDonIN+cZ6mxYStmRhEClpB/2ya1WifqEBB3sshiP8gW5EYA8xw62KemZ49Lz7bY+lkLio0swAQM4RNWAmMIbozHdoYSQMe4qfiGhK1/pu8pE1xIdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZAuAhWCK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F3A5C4CEDD;
+	Mon,  7 Apr 2025 18:37:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744051079;
+	bh=zk8wUrlmuDMDL1PuhRcv1wh0/L1IcyraU6qKme+S0p0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZAuAhWCKuHgT1/ExnFqAZETSS+WPVhtKy6L/znez7KMIIeY7D4KIJhTcBAjUMi1Xs
+	 iVNys8Y9yQ6d7vMo9nMZa3bBiotopWU8shZ79s8Kw+K1huZLFUTpcU5toVSn+4udU9
+	 1HqUBOMv3TOK4AlAbw9Qq8AOfC7FOj6ohEBmLkyMVBfVI+igw6s48yu8YBbI5N+jMM
+	 9gSVuS0ubG4a5VuVZGXaGuZ9dAy6VFSDLPZxJ8UqPe9Dx10PQvOoT52g35g9iJe28q
+	 nxQWr0j1LzdE08hAU/bfnI19AhPdKyLKFqRth4yIvfblv27n1zlT1Qs2wRh4a3x7ST
+	 hN1Z1WeMWURhw==
+Date: Mon, 7 Apr 2025 11:37:58 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Joseph Huang <joseph.huang.2024@gmail.com>
+Cc: Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Roopa
+ Prabhu <roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>, Simon
+ Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ bridge@lists.linux.dev
+Subject: Re: [Patch v3 net-next 0/3] Add support for mdb offload failure
+ notification
+Message-ID: <20250407113758.2fee3e4a@kernel.org>
+In-Reply-To: <af01e665-08bb-4b60-ba0b-1784dd8a5ce3@gmail.com>
+References: <20250404212940.1837879-1-Joseph.Huang@garmin.com>
+	<20250407102941.4331a41e@kernel.org>
+	<af01e665-08bb-4b60-ba0b-1784dd8a5ce3@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi,
-The strncpy() function is actively dangerous to use since it may not
-NULL-terminate the destination string,resulting in potential memory
-content exposures, unbounded reads, or crashes.
-Link:https://github.com/KSPP/linux/issues/90
+On Mon, 7 Apr 2025 14:15:31 -0400 Joseph Huang wrote:
+> - Should the re-post be v3 (no change) or v4 (bump)?
 
-Signed-off-by: Baris Can Goral <goralbaris@gmail.com>
----
- net/rds/connection.c | 4 ++--
- net/rds/stats.c      | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+Doesn't matter much, but probably v4 is less confusing.
 
-diff --git a/net/rds/connection.c b/net/rds/connection.c
-index c749c5525b40..fb2f14a1279a 100644
---- a/net/rds/connection.c
-+++ b/net/rds/connection.c
-@@ -749,7 +749,7 @@ static int rds_conn_info_visitor(struct rds_conn_path *cp, void *buffer)
- 	cinfo->laddr = conn->c_laddr.s6_addr32[3];
- 	cinfo->faddr = conn->c_faddr.s6_addr32[3];
- 	cinfo->tos = conn->c_tos;
--	strncpy(cinfo->transport, conn->c_trans->t_name,
-+	strscpy(cinfo->transport, conn->c_trans->t_name,
- 		sizeof(cinfo->transport));
- 	cinfo->flags = 0;
- 
-@@ -775,7 +775,7 @@ static int rds6_conn_info_visitor(struct rds_conn_path *cp, void *buffer)
- 	cinfo6->next_rx_seq = cp->cp_next_rx_seq;
- 	cinfo6->laddr = conn->c_laddr;
- 	cinfo6->faddr = conn->c_faddr;
--	strncpy(cinfo6->transport, conn->c_trans->t_name,
-+	strscpy(cinfo6->transport, conn->c_trans->t_name,
- 		sizeof(cinfo6->transport));
- 	cinfo6->flags = 0;
- 
-diff --git a/net/rds/stats.c b/net/rds/stats.c
-index 9e87da43c004..63c34dbdf97f 100644
---- a/net/rds/stats.c
-+++ b/net/rds/stats.c
-@@ -89,7 +89,7 @@ void rds_stats_info_copy(struct rds_info_iterator *iter,
- 
- 	for (i = 0; i < nr; i++) {
- 		BUG_ON(strlen(names[i]) >= sizeof(ctr.name));
--		strncpy(ctr.name, names[i], sizeof(ctr.name) - 1);
-+		strscpy(ctr.name, names[i], sizeof(ctr.name) - 1);
- 		ctr.name[sizeof(ctr.name) - 1] = '\0';
- 		ctr.value = values[i];
- 
--- 
-2.34.1
+> - Do I re-post after 6.15 is released? Around what time frame (so that I 
+> can set a reminder)?
 
+No, no, I mean very soon. Like tomorrow. The merge window is when
+maintainers merge their tress up, rather than when we merge code
+from contributors. It's a bit confusing. Merge window open ==
+normal contribution closed, and vice versa.
 
