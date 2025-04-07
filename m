@@ -1,66 +1,67 @@
-Return-Path: <netdev+bounces-179652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE4CBA7DFD9
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 15:46:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E689FA7DFDF
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 15:47:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1B4C1883C88
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 13:41:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DDC63BC503
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 13:41:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C80F19006F;
-	Mon,  7 Apr 2025 13:41:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37BD11AC882;
+	Mon,  7 Apr 2025 13:41:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A81A18787F;
-	Mon,  7 Apr 2025 13:40:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31B381A3159;
+	Mon,  7 Apr 2025 13:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744033261; cv=none; b=OOx/m5R5Gat8NnTZ2mprMjEDWeMGci/6wG+6z03yUKzCmffybD2zasPpeLHnphA090nVaqtdaEXSqGfPoWgQ08D3okVz2rHna3PYeWMj9KbJCmweibaF1ATEXCE89+JSx9Ppw6f1vWmT474zG9Qu/hpsn6XK9inOrB212dLg+5s=
+	t=1744033263; cv=none; b=Wa/E3HvBuM6gcDFBxzxfHexKJ8ZmUC6hg23yiDvQ8Km6jGVThT+xd8EDxIoOMrvcmVmfoKHSzC8qgx+XB1q8fz1Wh0FkYO4WlVbETaTvCVNY0yG0I5KvaDeV3B1kA0tYyol/YuQOJO9co1Ke63EBTFklGk+7pwRmgl9LyKy4/w4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744033261; c=relaxed/simple;
-	bh=DV9BHzMxrR/ZwOVP/ZKccx7rQ8ZuAbaW1IUu6qvr/HY=;
+	s=arc-20240116; t=1744033263; c=relaxed/simple;
+	bh=9Snlz9SuT/2zVOUbuDlRK3+VEmBqQ+OGh127cCQOO90=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=eoJjV6xItIvIxdg8NHXeCMnFpdoKI5PleJ/PGsdmlcRh9QRgIfTA572nZaQsdafoXRnGhJqRRhkEMYnn6fv6XJWihHCb54VF1EdXRVd2JPh+xOLzMrBDsHOlfuxpHEIvbPQO+G0IQXa3ofl1+cZeF4iBkuBOsz0HMSDTOIXPv7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.53
+	 In-Reply-To:To:Cc; b=kfNoSotXyIbZNR4nw5wJldJXZ9Y6N6bYwQyAUr65qAO1ZbD48oF6JrMcd6sGpoYkF8Sz3NAZ62ZGDzT+pRMEDeFH20vb4kWrRQXrKK2oPyqs6tS6aWJxHimkNmEC2f6QEyYDBCClL2PGjMXuUTv3hkN/rtgrWCxSb3+KvK7J5pU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ac2dfdf3c38so45817766b.3;
-        Mon, 07 Apr 2025 06:40:59 -0700 (PDT)
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-abec8b750ebso743644266b.0;
+        Mon, 07 Apr 2025 06:41:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744033258; x=1744638058;
+        d=1e100.net; s=20230601; t=1744033259; x=1744638059;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3KYeBP1E2i5zOPP9AKVmLtU8AJBSi6KLc5+vFOzRCmU=;
-        b=ZtHxO7BBHMFvqJo2qJfsoYpfn/AzUm1jT+eMJrKYMA2p6BjsW4XPm5UE0q+wPsJhtX
-         EUcyOC+QbhXqJG6A54KSz+l8ljxIDDN1h9aJ836ZTgGSqKgzhcmK0jdkG3ZzpVf/uhVB
-         S9KJt7dAWrlFNxlWJXKm9XpvxIJ0zPtlzytzx3ICA8mTZTO1tDVCnhRuDJDxEmvkhUnQ
-         0M4XD/yPAVrZ2CnU33tBJ+vadPmyd+WEwlRbg1UdiO525E1imMc+Me01kgCeKRIgjFSy
-         0qaVzUrrJ9Xv/80luzV1JqTkZhiOK/7kQZSREM3eX4YekA8ckbWWg4PoVYiX1atZ8jqN
-         wWqg==
-X-Forwarded-Encrypted: i=1; AJvYcCUBH+dd33HIDAHt1pQDOS1lYzkTOxYZfVmxu3lPTCCD7ozDuCjifoAiqgJ2DKOBK1bPD35qA0eA@vger.kernel.org, AJvYcCVWrUdbhBPTgN4vEHcbDpR7LaNnG8GK+YD0OvvkmR5WZxUwCkhrg4PZ2sTPR0YIbprwpuCxi/P1OSIKG+gpCchsKBrP@vger.kernel.org, AJvYcCVegKoDH4o2TPnEvUEGMn/PXsf2RJ222hnpTHfsD4TQ8jmlPGgf6QqUYewGWkvp30ECVsCZv7mKCPMaED0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGhiRIh9N6yJ0NQBjj68ngadun1bWMjCPdhaEmTRUl0uhgbXum
-	UHNHlTXUxBhmqII+zYwoH3QlKyReuWF1pGBotGhHR5PUwyv6kqVu
-X-Gm-Gg: ASbGncvmnZ/2gmntquuxNqAceET4uf2VsrtWGxDQAdAUiPgM7JOQdKbbLbTsiPlkz5/
-	1AqfrMXLu4qzQo8H14lRhQLGO/Rydm3miKIrgYmhjdG6RAOBtGq8g8+2+nlqLnkA366EvEgC8dA
-	YAoozn+DSTcCp+YfU8Sj7f7ejHux5gU4bfvzvW/BDlUQCetAvKx2jZnLINTyXHDozJC0ZevTGrZ
-	yFRvUHgbIKgB4xeF8LkmXML8LXeINNkM/UjIWVu4s9YGNjovE/EXS2Zd+UY1Jbaf3+hDkqsD0HH
-	jJa9UG1aZqBdiOv0ppdPr/tgQy3U0H0Df//v
-X-Google-Smtp-Source: AGHT+IGH9anxuIuZHLzehkaKAk0F8a1rO2GZQtUYp5N0N6TNh4e74UGeQS6842NIP7aMI8pRFVp+sA==
-X-Received: by 2002:a17:907:2d0b:b0:ac2:fd70:dd98 with SMTP id a640c23a62f3a-ac7d18a1f49mr982760966b.22.1744033257561;
-        Mon, 07 Apr 2025 06:40:57 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff:74::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac7c0184d30sm748692466b.133.2025.04.07.06.40.56
+        bh=HVubAsI/sazCBkrI5SX2ql2bcxDP/IcO0dwkdrXNHWk=;
+        b=SuIhMtlfhIU0/E8WLNSUjCK375Nz6O4Ataz6DWyy18n++WObXRlcStGiSxiQ1K0nGp
+         p5nByvUwVf+yxYE0AQ1FGZh+exglfHjrUItCkeScSXuP0tY0DnG6nUeymc6jD5meefuM
+         IA5v2bGb89lBBhvuOHtyenFAfnVBzNNfp7HzOnMPtaTmKyGySuHqoHRJrUVDogj0tpFP
+         NZDMqHT6YE5HDi1aKCYQX1tVmxlM7A45b3pHY3NOY2HpIgLA8qh7BQ4oDtuuK92TQ1hG
+         5lM4OT9xPdUSvWkOItwbw/YAQmKMOIlAeXjIKpfF/e8MzP5GTonXyvlSLtczH2FIdoK9
+         6aaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU9wGLC6vZD2dIM5bi6etLjB8KrWFuX0/LjaaMLhXSf4uilc6IKhH9TWOpRTPyHvG8WVJq1E/9rBky6AHk=@vger.kernel.org, AJvYcCUuYwBQN41bl+gCBeCQJN7Wfi48nq266uWds6WtfaPHSJSKbUUIfPt6SnJAgGXO6KZV3GObvnOQ@vger.kernel.org, AJvYcCVszfRnSBBwGnsQ1q9rpH0YeOSOCfGRXoXRhT3ct9jpYmS4VwMbbQj0z6NQHnqu3T4yfw+N9xEDjpD1aB+kWfKQf1qS@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCpQXveqdxFnGNnxpGGY3+4BkmLXtiFbJo/hlXVMBmEi2LefR9
+	RVlE3KOZY+Nft054fTSCCtmv8fxbBqkm6PctFeDMuXmia2i4OF96
+X-Gm-Gg: ASbGncuP9uGCgczTpE7xx8ip2BDhfzZgyrgty3cRePwMmxBtFYQRYtsk5/sSwjDIBVY
+	83RmHsYLzicz+wfWCTckmkQIInk69AecHsg0b5py78+lA9wdZCpr1roLdN66tg8US61e/UWB8Hy
+	nVuGlq5+sodbR5ziRwTsHK6xIFWj9806JdUIcUek867G7K4Pu+ItBTzlw6oFbtMXBHfs58nZEgQ
+	I6XzQ6xk1rh6ffTkFScy2bx716yYKzZ9/2e/Hr/FJMDzemySUSTt7t+IUdlDEzj3MS1EsPhiQId
+	qSFBTltNhAG62iYdsAdLw99EwdXEGlC15Cc=
+X-Google-Smtp-Source: AGHT+IF+MJUEj4ylRMNfJTbPqy49H2qRMfeGGoj2a2yX7f5x8Hmh+0VIMpyCZxIblLCvIFiCS7U/rQ==
+X-Received: by 2002:a17:906:6893:b0:ac7:eb12:dc69 with SMTP id a640c23a62f3a-ac7eb12ddbcmr630993066b.28.1744033259025;
+        Mon, 07 Apr 2025 06:40:59 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:3::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac7c01c2c13sm736933266b.182.2025.04.07.06.40.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 06:40:57 -0700 (PDT)
+        Mon, 07 Apr 2025 06:40:58 -0700 (PDT)
 From: Breno Leitao <leitao@debian.org>
-Date: Mon, 07 Apr 2025 06:40:43 -0700
-Subject: [PATCH net-next v2 1/2] net: pass const to msg_data_left()
+Date: Mon, 07 Apr 2025 06:40:44 -0700
+Subject: [PATCH net-next v2 2/2] trace: tcp: Add tracepoint for
+ tcp_sendmsg_locked()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,7 +70,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250407-tcpsendmsg-v2-1-9f0ea843ef99@debian.org>
+Message-Id: <20250407-tcpsendmsg-v2-2-9f0ea843ef99@debian.org>
 References: <20250407-tcpsendmsg-v2-0-9f0ea843ef99@debian.org>
 In-Reply-To: <20250407-tcpsendmsg-v2-0-9f0ea843ef99@debian.org>
 To: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
@@ -85,45 +86,89 @@ Cc: Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
  linux-trace-kernel@vger.kernel.org, Breno Leitao <leitao@debian.org>, 
  kernel-team@meta.com
 X-Mailer: b4 0.15-dev-42535
-X-Developer-Signature: v=1; a=openpgp-sha256; l=885; i=leitao@debian.org;
- h=from:subject:message-id; bh=DV9BHzMxrR/ZwOVP/ZKccx7rQ8ZuAbaW1IUu6qvr/HY=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBn89XmK5Gjz/NxHS6gQIk8KPjqaCoRDgwrEjv0g
- XsuJmojagSJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ/PV5gAKCRA1o5Of/Hh3
- bRdPD/925iDb5ftD46wG2LTDwegSmRG0EvHvKa82Kz0ZzuqFu/E4Z+ljQHzAJyOWau0qrXOuAHt
- cEDRn7zJjuNzpsdNVIoeuVvA6s3xrsXt+haGv/zlVwQn1xrb5sXY0GPutz7iM0BwNcTho1HxRPu
- mKFcAZMk84CPMF+TltdAZ+dkF3BICU+UPX0ABYJWHB75CoVkoABtxIuGpcE87W5rSCY6OaxVXI1
- gyzb30iaUoC0kKwH8jmp9fJLJiQC2ifUhwwUUJJ5fT/Cw/kYjK0TgGCV5GJxZlntP1raF8lwzvr
- wv6gKzdVKJXv0XeOwH2Lv7SeOvUotD18neTm2hBxmkFr2m4l1KzUBjFeFNTTLlG0gr0HhRi5NLk
- cBsJgQ0JaICrZERLoY/XKlG3vVD8f1fBvL/AvhJ6JOnb2cwO8tZAwnJDKZuyQmY7u+RjF44i8AN
- 9V78IhX1AQ+JlMAk+jyCLP0NRM0b1AMpwyNcp5ijs3RDOS1atIRnpipQh5//G9hrlYibJ+3nKHz
- PEoq3UEsnQETQGq54Tl0Dz5ovkQVCwQER9R1XhzjY+rudgbWUtKpNF0/vDhTHGwzDEHroha/y9Y
- odEna69p0xgjnQ+dlWFjgODY1B0YSxNFe9X1g9DtvAfl8AnKHPxiAOOlsm33AvxlrGtZ5/e00Fe
- 46J0mbCA+A8aDVQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2337; i=leitao@debian.org;
+ h=from:subject:message-id; bh=9Snlz9SuT/2zVOUbuDlRK3+VEmBqQ+OGh127cCQOO90=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBn89Xm6WKbyYT0sJgsO43vaNk9WcRK93pVnUImt
+ 2QOQanw3NiJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ/PV5gAKCRA1o5Of/Hh3
+ bUivD/wKJNR85jn7cXDGOI1OI4PfopcoBlrmcf6IRm6ZB8zkgQHjA6Q9UiLPVBnzjQA7rfTJcwv
+ J61ZLLAQpYe9YXgAN4r9P+Fwj0LP5kr2XkRJDC0w/NUpCMDDv1gmK1VCNE79kfa672yCczrYD8I
+ IS8pmCtJuHOQ/F0rijx2tAFYzcOsSr6BSlhsBfyHsLDQw1SHSJsgGspHjfNfXZUm1BadXkhPz24
+ jcP90xBlSiv4awliby+XeKP5oATFyG4VNEgvoWJBjLkmwgc/1r35e57J5JmYo2fMY7hNau2aGxW
+ hU1duDV7wVLuJo26FSPPlKrKQqFCMhqCSsB7FCOSE8DrR03AUjRooacR1NfKi5NAIEfTfPYz020
+ jgojVTcqcWVddMiIwEFSP3mmgyfGHkw9l7OotMkUic+tnoK1DQlvEuO2VMBlrpb95obpITzZBs5
+ NaPmhzL4n8BtUV0u7s66s/rSjeep3BKh/Wr/7zYKn8ESWorXykP9oFNkauwSun7gSlDuIpECc0F
+ K2kd58Bqy3kUJUyMCwzwhLsjzI8HI3DYeOdNZN+/TdbhbknwnQZFhFXB2tsi6qcD00JXGr09Xst
+ f/4NtFp36LVojqJ6C2ycqwItU3GYuuB3NHx84LzTbZp+bQ8ml6fOQRm36p99jWyTYpLaDVloqn5
+ jc4sguOmySEjKEQ==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-The msg_data_left() function doesn't modify the struct msghdr parameter,
-so mark it as const. This allows the function to be used with const
-references, improving type safety and making the API more flexible.
+Add a tracepoint to monitor TCP send operations, enabling detailed
+visibility into TCP message transmission.
 
+Create a new tracepoint within the tcp_sendmsg_locked function,
+capturing traditional fields along with size_goal, which indicates the
+optimal data size for a single TCP segment. Additionally, a reference to
+the struct sock sk is passed, allowing direct access for BPF programs.
+The implementation is largely based on David's patch and suggestions.
+
+The implementation is largely based on David's patch[1] and suggestions.
+
+Link: https://lore.kernel.org/all/70168c8f-bf52-4279-b4c4-be64527aa1ac@kernel.org/ [1]
 Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- include/linux/socket.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/trace/events/tcp.h | 24 ++++++++++++++++++++++++
+ net/ipv4/tcp.c             |  2 ++
+ 2 files changed, 26 insertions(+)
 
-diff --git a/include/linux/socket.h b/include/linux/socket.h
-index c3322eb3d6865..3b262487ec060 100644
---- a/include/linux/socket.h
-+++ b/include/linux/socket.h
-@@ -168,7 +168,7 @@ static inline struct cmsghdr * cmsg_nxthdr (struct msghdr *__msg, struct cmsghdr
- 	return __cmsg_nxthdr(__msg->msg_control, __msg->msg_controllen, __cmsg);
- }
+diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
+index 1a40c41ff8c30..cab25504c4f9d 100644
+--- a/include/trace/events/tcp.h
++++ b/include/trace/events/tcp.h
+@@ -259,6 +259,30 @@ TRACE_EVENT(tcp_retransmit_synack,
+ 		  __entry->saddr_v6, __entry->daddr_v6)
+ );
  
--static inline size_t msg_data_left(struct msghdr *msg)
-+static inline size_t msg_data_left(const struct msghdr *msg)
- {
- 	return iov_iter_count(&msg->msg_iter);
- }
++TRACE_EVENT(tcp_sendmsg_locked,
++	TP_PROTO(const struct sock *sk, const struct msghdr *msg,
++		 const struct sk_buff *skb, int size_goal),
++
++	TP_ARGS(sk, msg, skb, size_goal),
++
++	TP_STRUCT__entry(
++		__field(const void *, skb_addr)
++		__field(int, skb_len)
++		__field(int, msg_left)
++		__field(int, size_goal)
++	),
++
++	TP_fast_assign(
++		__entry->skb_addr = skb;
++		__entry->skb_len = skb ? skb->len : 0;
++		__entry->msg_left = msg_data_left(msg);
++		__entry->size_goal = size_goal;
++	),
++
++	TP_printk("skb_addr %p skb_len %d msg_left %d size_goal %d",
++		__entry->skb_addr, __entry->skb_len, __entry->msg_left,
++		__entry->size_goal));
++
+ DECLARE_TRACE(tcp_cwnd_reduction_tp,
+ 	TP_PROTO(const struct sock *sk, int newly_acked_sacked,
+ 		 int newly_lost, int flag),
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index ea8de00f669d0..270ce2c8c2d54 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -1160,6 +1160,8 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
+ 		if (skb)
+ 			copy = size_goal - skb->len;
+ 
++		trace_tcp_sendmsg_locked(sk, msg, skb, size_goal);
++
+ 		if (copy <= 0 || !tcp_skb_can_collapse_to(skb)) {
+ 			bool first_skb;
+ 
 
 -- 
 2.47.1
