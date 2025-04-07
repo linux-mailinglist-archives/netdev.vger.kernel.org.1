@@ -1,262 +1,129 @@
-Return-Path: <netdev+bounces-179580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FDB6A7DB72
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 12:46:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52C49A7DB8D
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 12:53:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 143703AF341
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 10:45:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CDFA188EB4A
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 10:53:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07572227586;
-	Mon,  7 Apr 2025 10:46:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B19A2238148;
+	Mon,  7 Apr 2025 10:53:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k4MF6Fya"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="alyHP/Hu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0EF121E098;
-	Mon,  7 Apr 2025 10:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 059D5237194;
+	Mon,  7 Apr 2025 10:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744022764; cv=none; b=VW955Q8B5MmlPxPX7R6Ng+53SKmK9AGDS30C4Ji1Q+WsFvpLzG9TKEk5cXEtZF0zEL6lFVTVX12sySVZexRjKWyiR1VbbiJ/neZTEYmey6MV7+Z7Uekdme7JDtoyxWk8n8NgdY5TCUlSEoWxSzkSj8q5n+mOG7Eclco9/l4eTe4=
+	t=1744023215; cv=none; b=mCinvOteXHODt8/b+1uDtNco3K6Xd14vyQiqN74zEABjIPtztcz5K2M6frXNdd8Hec+UWN7Nno+8uxl2PbuXUtjZJUe4rmFcdjXVy21b1SDef1ZdKMnFTz9jfeeD/rsD+37G86EDMAikE1Fkp3bC6lNiyEbGqJMy0Nbk+joJE/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744022764; c=relaxed/simple;
-	bh=XP0Gbv/gi6yzl2R1xAKSi1s3xE3TGUz/XRpMic9o6FM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=STCOXODfEpyDsJ9/KohzncEjElmVqyV/+XjUq2YoxdUhBRu1ajuSjC1I0VDOcDCMe/r0Dszo0Z7yJrJpPViM86kAMnyOIik6oJ+W+DtWRm/h7zUOKavJ+hb9IeF3+psmCrLdypLsKkgVrwrK2yxuqGPCzyU8rFvAFb37SgV+TaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k4MF6Fya; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38110C4CEDD;
-	Mon,  7 Apr 2025 10:46:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744022764;
-	bh=XP0Gbv/gi6yzl2R1xAKSi1s3xE3TGUz/XRpMic9o6FM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=k4MF6FyaOA2AaZgbatg5C3hiecn44oypdV7P+3MZ+kzVysjMfjsQCSxtBlm/w5bQC
-	 ehnKh4dtFA3n4UtyVgM6JFPouYkmDmUERnlHyR6pQKmYRYLw7P3GgzW2rPIZbnvCd6
-	 C2p+NykDU0O08ryXe/olBj4gN8PUCWxTNyvG2cmiieIPtjDdVKX+QV6j7YjhucsRQz
-	 wj9EINiCHykCSsuiLKTOaWCztSTcUsI/xZNRLeWnHLMmN/rNc2K317N4mNft/np59V
-	 jT5yMdM6sqVtJ2CgfJtdzk7SW/+U/kX7MePpDU3IudEu0xBnG/7p2ToojzY+GtsTQJ
-	 Rm+4eBsYRR4uQ==
-Date: Mon, 7 Apr 2025 11:45:59 +0100
-From: Simon Horman <horms@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Steve French <sfrench@samba.org>,
-	Enzo Matsumiya <ematsumiya@suse.de>,
-	Wang Zhaolong <wangzhaolong1@huawei.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v2 net] net: Fix null-ptr-deref by
- sock_lock_init_class_and_name() and rmmod.
-Message-ID: <20250407104559.GB395307@horms.kernel.org>
-References: <20250403203619.36648-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1744023215; c=relaxed/simple;
+	bh=GInDbNKfGGjESaMeC4D8+O01PDEzZ/WhFhju/ZTi0Ag=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ElkWx0iMDGU0yKqfXhlrpTjIivygrT7dyoisaB/r5zq3DG723EnZhoJr7EINWR2iukyf+Gkzx2NMnZ+XJMiZyEoOUZDR9rAzAg39VI82fn0DWj2zlTbJMGoWkOs0B8+OjlxoQ6m0UW3ESmllOZnQ0vpyhSe72Z7wFo0Z6WiRqtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=alyHP/Hu; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5372o6nO020246;
+	Mon, 7 Apr 2025 03:53:09 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=NenO193NDkHey5LBSKJMjivOr
+	Ey5IGe18VgLIIxS7u0=; b=alyHP/Hun5wglwK32cpknS33PnZOfav7JaeQzWPys
+	o+qG0auCZ99EZAiGeHg2fmy+TBp34yVK0a+U9c/hSxcf0Z7z9i8xLsrhq4rZmKBb
+	C1eae4qr7AQ6TK1oc7+u35KjwlNmGVnYgVBby80gU9T0j33fuglTXKz0DMjQ9pUs
+	TH3+FD3bPLGGN8A0bCFVO2SSYC4lsMevTyTFFs0vC4/bnZ3UKHhveyJjOnm5GeyB
+	paieRv2CJ8NBCg1jmaNLPEl0JpjlfmEhwTOAOMl4HzXUhJpwHAntSam3sB12ILMY
+	jy/UEAjebF7s1d694RUi3sMerZjOFQ3h2rtq1TKANfXpw==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 45ursc1rnv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 07 Apr 2025 03:53:08 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 7 Apr 2025 03:53:08 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 7 Apr 2025 03:53:08 -0700
+Received: from a9548d409c0b (HY-LT91368.marvell.com [10.29.8.52])
+	by maili.marvell.com (Postfix) with SMTP id E9BA65B6954;
+	Mon,  7 Apr 2025 03:53:04 -0700 (PDT)
+Date: Mon, 7 Apr 2025 10:53:03 +0000
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: Wentao Liang <vulab@iscas.ac.cn>
+CC: <sgoutham@marvell.com>, <gakula@marvell.com>, <hkelam@marvell.com>,
+        <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3] octeontx2-pf: Add error log
+ forcn10k_map_unmap_rq_policer()
+Message-ID: <Z_Ouj7YHfJf0Wd2K@a9548d409c0b>
+References: <20250407081118.1852-1-vulab@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20250403203619.36648-1-kuniyu@amazon.com>
+In-Reply-To: <20250407081118.1852-1-vulab@iscas.ac.cn>
+X-Proofpoint-GUID: kn0Pbm6ZNiCHunPD4TUfLFTGT6UTM6VK
+X-Authority-Analysis: v=2.4 cv=M85NKzws c=1 sm=1 tr=0 ts=67f3ae94 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=kj9zAlcOel0A:10 a=XR8D0OoHHMoA:10 a=M5GUcnROAAAA:8 a=6twwJq9BYjRo9P0tgCAA:9 a=CjuIK1q_8ugA:10
+ a=OBjm3rFKGHvpk9ecZwUJ:22 a=MdnaEeoEtbPGM3ywBibD:22
+X-Proofpoint-ORIG-GUID: kn0Pbm6ZNiCHunPD4TUfLFTGT6UTM6VK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-07_03,2025-04-03_03,2024-11-22_01
 
-On Thu, Apr 03, 2025 at 01:34:31PM -0700, Kuniyuki Iwashima wrote:
-> When I ran the repro [0] and waited a few seconds, I observed two
-> LOCKDEP splats: a warning immediately followed by a null-ptr-deref. [1]
+On 2025-04-07 at 08:11:17, Wentao Liang (vulab@iscas.ac.cn) wrote:
+> The cn10k_free_matchall_ipolicer() calls the cn10k_map_unmap_rq_policer()
+> for each queue in a for loop without checking for any errors.
 > 
-> Reproduction Steps:
+> Check the return value of the cn10k_map_unmap_rq_policer() function during
+> each loop, and report a warning if the function fails.
 > 
->   1) Mount CIFS
->   2) Add an iptables rule to drop incoming FIN packets for CIFS
->   3) Unmount CIFS
->   4) Unload the CIFS module
->   5) Remove the iptables rule
-> 
-> At step 3), the CIFS module calls sock_release() for the underlying
-> TCP socket, and it returns quickly.  However, the socket remains in
-> FIN_WAIT_1 because incoming FIN packets are dropped.
-> 
-> At this point, the module's refcnt is 0 while the socket is still
-> alive, so the following rmmod command succeeds.
-> 
->   # ss -tan
->   State      Recv-Q Send-Q Local Address:Port  Peer Address:Port
->   FIN-WAIT-1 0      477        10.0.2.15:51062   10.0.0.137:445
-> 
->   # lsmod | grep cifs
->   cifs                 1159168  0
-> 
-> This highlights a discrepancy between the lifetime of the CIFS module
-> and the underlying TCP socket.  Even after CIFS calls sock_release()
-> and it returns, the TCP socket does not die immediately in order to
-> close the connection gracefully.
-> 
-> While this is generally fine, it causes an issue with LOCKDEP because
-> CIFS assigns a different lock class to the TCP socket's sk->sk_lock
-> using sock_lock_init_class_and_name().
-> 
-> Once an incoming packet is processed for the socket or a timer fires,
-> sk->sk_lock is acquired.
-> 
-> Then, LOCKDEP checks the lock context in check_wait_context(), where
-> hlock_class() is called to retrieve the lock class.  However, since
-> the module has already been unloaded, hlock_class() logs a warning
-> and returns NULL, triggering the null-ptr-deref.
-> 
-> If LOCKDEP is enabled, we must ensure that a module calling
-> sock_lock_init_class_and_name() (CIFS, NFS, etc) cannot be unloaded
-> while such a socket is still alive to prevent this issue.
-> 
-> Let's hold the module reference in sock_lock_init_class_and_name()
-> and release it when the socket is freed in __sk_destruct().
-> 
-> Note that sock_lock_init() clears sk->sk_owner for svc_create_socket()
-> that calls sock_lock_init_class_and_name() for a listening socket,
-> which clones a socket by sk_clone_lock() without GFP_ZERO.
-> 
-> [0]:
-> CIFS_SERVER="10.0.0.137"
-> CIFS_PATH="//${CIFS_SERVER}/Users/Administrator/Desktop/CIFS_TEST"
-> DEV="enp0s3"
-> CRED="/root/WindowsCredential.txt"
-> 
-> MNT=$(mktemp -d /tmp/XXXXXX)
-> mount -t cifs ${CIFS_PATH} ${MNT} -o vers=3.0,credentials=${CRED},cache=none,echo_interval=1
-> 
-> iptables -A INPUT -s ${CIFS_SERVER} -j DROP
-> 
-> for i in $(seq 10);
-> do
->     umount ${MNT}
->     rmmod cifs
->     sleep 1
-> done
-> 
-> rm -r ${MNT}
-> 
-> iptables -D INPUT -s ${CIFS_SERVER} -j DROP
-> 
-> [1]:
-> DEBUG_LOCKS_WARN_ON(1)
-> WARNING: CPU: 10 PID: 0 at kernel/locking/lockdep.c:234 hlock_class (kernel/locking/lockdep.c:234 kernel/locking/lockdep.c:223)
-> Modules linked in: cifs_arc4 nls_ucs2_utils cifs_md4 [last unloaded: cifs]
-> CPU: 10 UID: 0 PID: 0 Comm: swapper/10 Not tainted 6.14.0 #36
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-> RIP: 0010:hlock_class (kernel/locking/lockdep.c:234 kernel/locking/lockdep.c:223)
-> ...
-> Call Trace:
->  <IRQ>
->  __lock_acquire (kernel/locking/lockdep.c:4853 kernel/locking/lockdep.c:5178)
->  lock_acquire (kernel/locking/lockdep.c:469 kernel/locking/lockdep.c:5853 kernel/locking/lockdep.c:5816)
->  _raw_spin_lock_nested (kernel/locking/spinlock.c:379)
->  tcp_v4_rcv (./include/linux/skbuff.h:1678 ./include/net/tcp.h:2547 net/ipv4/tcp_ipv4.c:2350)
-> ...
-> 
-> BUG: kernel NULL pointer dereference, address: 00000000000000c4
->  PF: supervisor read access in kernel mode
->  PF: error_code(0x0000) - not-present page
-> PGD 0
-> Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
-> CPU: 10 UID: 0 PID: 0 Comm: swapper/10 Tainted: G        W          6.14.0 #36
-> Tainted: [W]=WARN
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-> RIP: 0010:__lock_acquire (kernel/locking/lockdep.c:4852 kernel/locking/lockdep.c:5178)
-> Code: 15 41 09 c7 41 8b 44 24 20 25 ff 1f 00 00 41 09 c7 8b 84 24 a0 00 00 00 45 89 7c 24 20 41 89 44 24 24 e8 e1 bc ff ff 4c 89 e7 <44> 0f b6 b8 c4 00 00 00 e8 d1 bc ff ff 0f b6 80 c5 00 00 00 88 44
-> RSP: 0018:ffa0000000468a10 EFLAGS: 00010046
-> RAX: 0000000000000000 RBX: ff1100010091cc38 RCX: 0000000000000027
-> RDX: ff1100081f09ca48 RSI: 0000000000000001 RDI: ff1100010091cc88
-> RBP: ff1100010091c200 R08: ff1100083fe6e228 R09: 00000000ffffbfff
-> R10: ff1100081eca0000 R11: ff1100083fe10dc0 R12: ff1100010091cc88
-> R13: 0000000000000001 R14: 0000000000000000 R15: 00000000000424b1
-> FS:  0000000000000000(0000) GS:ff1100081f080000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00000000000000c4 CR3: 0000000002c4a003 CR4: 0000000000771ef0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
-> PKRU: 55555554
-> Call Trace:
->  <IRQ>
->  lock_acquire (kernel/locking/lockdep.c:469 kernel/locking/lockdep.c:5853 kernel/locking/lockdep.c:5816)
->  _raw_spin_lock_nested (kernel/locking/spinlock.c:379)
->  tcp_v4_rcv (./include/linux/skbuff.h:1678 ./include/net/tcp.h:2547 net/ipv4/tcp_ipv4.c:2350)
->  ip_protocol_deliver_rcu (net/ipv4/ip_input.c:205 (discriminator 1))
->  ip_local_deliver_finish (./include/linux/rcupdate.h:878 net/ipv4/ip_input.c:234)
->  ip_sublist_rcv_finish (net/ipv4/ip_input.c:576)
->  ip_list_rcv_finish (net/ipv4/ip_input.c:628)
->  ip_list_rcv (net/ipv4/ip_input.c:670)
->  __netif_receive_skb_list_core (net/core/dev.c:5939 net/core/dev.c:5986)
->  netif_receive_skb_list_internal (net/core/dev.c:6040 net/core/dev.c:6129)
->  napi_complete_done (./include/linux/list.h:37 ./include/net/gro.h:519 ./include/net/gro.h:514 net/core/dev.c:6496)
->  e1000_clean (drivers/net/ethernet/intel/e1000/e1000_main.c:3815)
->  __napi_poll.constprop.0 (net/core/dev.c:7191)
->  net_rx_action (net/core/dev.c:7262 net/core/dev.c:7382)
->  handle_softirqs (kernel/softirq.c:561)
->  __irq_exit_rcu (kernel/softirq.c:596 kernel/softirq.c:435 kernel/softirq.c:662)
->  irq_exit_rcu (kernel/softirq.c:680)
->  common_interrupt (arch/x86/kernel/irq.c:280 (discriminator 14))
->   </IRQ>
->  <TASK>
->  asm_common_interrupt (./arch/x86/include/asm/idtentry.h:693)
-> RIP: 0010:default_idle (./arch/x86/include/asm/irqflags.h:37 ./arch/x86/include/asm/irqflags.h:92 arch/x86/kernel/process.c:744)
-> Code: 4c 01 c7 4c 29 c2 e9 72 ff ff ff 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa eb 07 0f 00 2d c3 2b 15 00 fb f4 <fa> c3 cc cc cc cc 66 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90
-> RSP: 0018:ffa00000000ffee8 EFLAGS: 00000202
-> RAX: 000000000000640b RBX: ff1100010091c200 RCX: 0000000000061aa4
-> RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff812f30c5
-> RBP: 000000000000000a R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000001 R11: 0000000000000002 R12: 0000000000000000
-> R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
->  ? do_idle (kernel/sched/idle.c:186 kernel/sched/idle.c:325)
->  default_idle_call (./include/linux/cpuidle.h:143 kernel/sched/idle.c:118)
->  do_idle (kernel/sched/idle.c:186 kernel/sched/idle.c:325)
->  cpu_startup_entry (kernel/sched/idle.c:422 (discriminator 1))
->  start_secondary (arch/x86/kernel/smpboot.c:315)
->  common_startup_64 (arch/x86/kernel/head_64.S:421)
->  </TASK>
-> Modules linked in: cifs_arc4 nls_ucs2_utils cifs_md4 [last unloaded: cifs]
-> CR2: 00000000000000c4
-> 
-> Fixes: ed07536ed673 ("[PATCH] lockdep: annotate nfs/nfsd in-kernel sockets")
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Cc: stable@vger.kernel.org
+> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+
+Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
+
+Thanks,
+Sundeep
+
 > ---
-> v2:
->   * Clear sk_owner in sock_lock_init()
->   * Define helper under the same #if guard
->   * Remove redundant null check before module_put()
+> v3: Add failed queue number and error code to log.
+> v2: Fix error code
 > 
-> v1: https://lore.kernel.org/netdev/20250403020837.51664-1-kuniyu@amazon.com/
-> ---
->  include/net/sock.h | 38 ++++++++++++++++++++++++++++++++++++--
->  net/core/sock.c    |  4 ++++
->  2 files changed, 40 insertions(+), 2 deletions(-)
+>  drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> diff --git a/include/net/sock.h b/include/net/sock.h
-> index 8daf1b3b12c6..4216d7d86150 100644
-> --- a/include/net/sock.h
-> +++ b/include/net/sock.h
-> @@ -547,6 +547,10 @@ struct sock {
->  	struct rcu_head		sk_rcu;
->  	netns_tracker		ns_tracker;
->  	struct xarray		sk_user_frags;
-> +
-> +#if IS_ENABLED(CONFIG_PROVE_LOCKING) && IS_ENABLED(CONFIG_MODULES)
-> +	struct module		*sk_owner;
-> +#endif
-
-Not a proper review, but FWIIW, sk_owner should be added to the Kernel doc
-for struct sock.
-
->  };
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
+> index a15cc86635d6..9113a9b90002 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c
+> @@ -353,8 +353,10 @@ int cn10k_free_matchall_ipolicer(struct otx2_nic *pfvf)
 >  
->  struct sock_bh_locked {
-
-...
+>  	/* Remove RQ's policer mapping */
+>  	for (qidx = 0; qidx < hw->rx_queues; qidx++)
+> -		cn10k_map_unmap_rq_policer(pfvf, qidx,
+> -					   hw->matchall_ipolicer, false);
+> +		rc = cn10k_map_unmap_rq_policer(pfvf, qidx, hw->matchall_ipolicer, false);
+> +		if (rc)
+> +			dev_warn(pfvf->dev, "Failed to unmap RQ %d's policer (error %d).",
+> +				 qidx, rc);
+>  
+>  	rc = cn10k_free_leaf_profile(pfvf, hw->matchall_ipolicer);
+>  
+> -- 
+> 2.42.0.windows.2
+> 
 
