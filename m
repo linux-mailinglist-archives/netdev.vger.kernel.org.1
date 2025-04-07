@@ -1,70 +1,76 @@
-Return-Path: <netdev+bounces-179998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F6BBA7F0E0
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 01:22:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D8024A7F0E3
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 01:22:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 569D73B5186
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 23:20:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F6E43AD661
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 23:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DBD0233141;
-	Mon,  7 Apr 2025 23:18:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A0F7224252;
+	Mon,  7 Apr 2025 23:18:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pZ8xt87C"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="jb33F6aW"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8629523024C
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 23:18:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0445C1C5F06
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 23:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744067908; cv=none; b=DyKe5aDgUpm5W+jJOBcbpZzeKgzbHBevBNvNI9WTjFGr08Ns+zs+whegr+09pytLGwNfn8ZWJWkqpNnga0TLkcs6SIyoGugUZ/y2X7p8u1Qwv+sYjImLDsIQuf6gkBvxLUMZg4u2LXOvZn0cdUkXln7dcJ1W4ptN1PRk0vw75xU=
+	t=1744067931; cv=none; b=nUGoo1oDFjqbVzWnIu58WxUv0lrmfE8pHNc1GuVyveTWmDKqITWE9WKz6+Gn5XJ3KPHqNbWJlOC83OIKHsJt9N1eAPphLZnuI4b1nqDsv2SftdBHsDuRRs0DcALOXzxnOluO4jZV7J7p3K4oe0kSIdoyK3cZ9uMb2yzbLm/Tnmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744067908; c=relaxed/simple;
-	bh=EEoK3DT+bJ0xMbSltsGnLGKVZb4P+MckTguFAXY+Czs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XymQnFCh5+OF2q+awJLwtBKAarAUAAOX8iOAHhGelujnEatnzJiEZLHC5PYiir9Xug+5TriuMbLFeBxERNRD1InW7Jgtyw0mtTV5RVsUoamXywVmuquIC8oj7HM722up5MLF0Gk4keFo3yTFfesLpV7IE04BlJS2lc1K9oOdkps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pZ8xt87C; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744067903;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TKYMxwxVjy4c0E6UOJgL4wQn1gcFPqSkZGw6VG87Wwo=;
-	b=pZ8xt87CO0oGRsi9izZeLLvMjEwrA4OOr78VZbNZouWDDm1PYyf2LDgdzeLw9fa6Lzh7tN
-	Gbada/t6w5aZkb+3zKNF+8UymWzTDjqxKVK94JZcu9mS9XvghZAVudp08aEISpUjnOSjli
-	Nt9InkuyN50VP+WzQfl1Jd4fMLinFow=
-From: Sean Anderson <sean.anderson@linux.dev>
-To: netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>
-Cc: linux-kernel@vger.kernel.org,
-	upstream@airoha.com,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Sean Anderson <sean.anderson@linux.dev>,
-	Michal Simek <michal.simek@amd.com>,
-	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	Robert Hancock <robert.hancock@calian.com>,
-	linux-arm-kernel@lists.infradead.org
-Subject: [net-next PATCH v2 10/14] net: pcs: Add Xilinx PCS driver
-Date: Mon,  7 Apr 2025 19:17:41 -0400
-Message-Id: <20250407231746.2316518-11-sean.anderson@linux.dev>
-In-Reply-To: <20250407231746.2316518-1-sean.anderson@linux.dev>
-References: <20250407231746.2316518-1-sean.anderson@linux.dev>
+	s=arc-20240116; t=1744067931; c=relaxed/simple;
+	bh=jM8SpBmMn4FvUUIji8cI/K34Wj/khhLysmwNLptzuXw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WFFyt+YgrzsWdwLYo0ik5zq8b21zdaKPAxMWttH1UY0ID6dSAdwiU6ZER7FzSbPiUVuTktk4LE3J01uyN/mQp5YQal+k5pr6HKbBt04RWuSDTA5jdMUy2TAUNCFCDB46z6fXBJ4IIPGadSl23ThqhQrlMhDC/6pYdQVjZhv5xXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=jb33F6aW; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744067929; x=1775603929;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=h4oMPUeZhzUTRaCTklolKsR3a827UJUhHNX+wtl+hxw=;
+  b=jb33F6aWFDTEzNE2oCzz96CD/p7Bp0iqLBGlRVCdgDryEoN9keME/GDF
+   LzYsCp3Lf36NH5vCefVlnyet3ljYKvVqHtR7gNTt44w/rf02Bc8cMWNPs
+   ovOyPIEPrJy9N/vK0n3rv2dg1SDu5juKMsuHY/iuevVNOrIX/y5HeQotY
+   k=;
+X-IronPort-AV: E=Sophos;i="6.15,196,1739836800"; 
+   d="scan'208";a="711887747"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2025 23:18:46 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:45138]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.47.226:2525] with esmtp (Farcaster)
+ id bb517e19-357c-4c17-882f-e6eb5568c2fb; Mon, 7 Apr 2025 23:18:44 +0000 (UTC)
+X-Farcaster-Flow-ID: bb517e19-357c-4c17-882f-e6eb5568c2fb
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 7 Apr 2025 23:18:43 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.101.45) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 7 Apr 2025 23:18:39 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, "Neal
+ Cardwell" <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,
+	"Pablo Neira Ayuso" <pablo@netfilter.org>, Jozsef Kadlecsik
+	<kadlec@netfilter.org>, Paul Moore <paul@paul-moore.com>, James Morris
+	<jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, Kuniyuki Iwashima
+	<kuniyu@amazon.com>, "Kuniyuki Iwashima" <kuni1840@gmail.com>,
+	<netdev@vger.kernel.org>
+Subject: [PATCH v1 net-next 0/4] net: Retire DCCP.
+Date: Mon, 7 Apr 2025 16:17:47 -0700
+Message-ID: <20250407231823.95927-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,637 +78,206 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D038UWC001.ant.amazon.com (10.13.139.213) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-This adds support for the Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII device.
-This is a soft device which converts between GMII and either SGMII,
-1000Base-X, or 2500Base-X. If configured correctly, it can also switch
-between SGMII and 1000BASE-X at runtime. Thoretically this is also possible
-for 2500Base-X, but that requires reconfiguring the serdes. The exact
-capabilities depend on synthesis parameters, so they are read from the
-devicetree.
+As announced by commit b144fcaf46d4 ("dccp: Print deprecation
+notice."), it's time to remove DCCP.
 
-This device has a c22-compliant PHY interface, so for the most part we can
-just use the phylink helpers. This device supports an interrupt which is
-triggered on autonegotiation completion. I'm not sure how useful this is,
-since we can never detect a link down (in the PCS).
+The patch 2 removes net/dccp, netfilter/LSM code, doc, and etc,
+leaving the uAPI headers alone.
 
-This device supports sharing some logic between different implementations
-of the device. In this case, one device contains the "shared logic" and the
-clocks are connected to other devices. To coordinate this, one device
-registers a clock that the other devices can request.  The clock is enabled
-in the probe function by releasing the device from reset. There are no othe
-software controls, so the clock ops are empty.
+The patch 3 unexports shared functions for DCCP, and the patch 4
+renames tcp_or_dccp_get_hashinfo() to tcp_get_hashinfo().
 
-Later in this series, we will convert the Xilinx AXI Ethernet driver to use
-this PCS. To help out, we provide a compatibility function to bind this
-driver in the event the MDIO device has no compatible.
+We can do more cleanup; for example, remove IPPROTO_TCP checks in
+__inet6?_check_established(), remove __module_get() for twsk,
+remove timewait_sock_ops.twsk_destructor(), etc, but it will be
+more of TCP stuff, so I'll defer to a later series.
 
-Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
----
 
-Changes in v2:
-- Add support for #pcs-cells
-- Change compatible to just xlnx,pcs
-- Drop PCS_ALTERA_TSE which was accidentally added while rebasing
-- Rework xilinx_pcs_validate to just clear out half-duplex modes instead
-  of constraining modes based on the interface.
+Kuniyuki Iwashima (4):
+  selftest: net: Remove DCCP bits.
+  net: Retire DCCP.
+  net: Unexport shared functions for DCCP.
+  tcp: Rename tcp_or_dccp_get_hashinfo().
 
- MAINTAINERS                  |   6 +
- drivers/net/pcs/Kconfig      |  22 ++
- drivers/net/pcs/Makefile     |   2 +
- drivers/net/pcs/pcs-xilinx.c | 479 +++++++++++++++++++++++++++++++++++
- include/linux/pcs-xilinx.h   |  36 +++
- 5 files changed, 545 insertions(+)
- create mode 100644 drivers/net/pcs/pcs-xilinx.c
- create mode 100644 include/linux/pcs-xilinx.h
+ Documentation/admin-guide/bug-hunting.rst     |    2 +-
+ Documentation/netlink/specs/conntrack.yaml    |   22 -
+ Documentation/networking/dccp.rst             |  219 ---
+ Documentation/networking/index.rst            |    1 -
+ Documentation/networking/ip-sysctl.rst        |    4 +-
+ .../networking/nf_conntrack-sysctl.rst        |    1 -
+ .../zh_CN/admin-guide/bug-hunting.rst         |    2 +-
+ .../zh_TW/admin-guide/bug-hunting.rst         |    2 +-
+ MAINTAINERS                                   |    9 -
+ arch/arm/configs/omap2plus_defconfig          |    1 -
+ arch/loongarch/configs/loongson3_defconfig    |    1 -
+ arch/m68k/configs/amiga_defconfig             |    3 -
+ arch/m68k/configs/apollo_defconfig            |    3 -
+ arch/m68k/configs/atari_defconfig             |    3 -
+ arch/m68k/configs/bvme6000_defconfig          |    3 -
+ arch/m68k/configs/hp300_defconfig             |    3 -
+ arch/m68k/configs/mac_defconfig               |    3 -
+ arch/m68k/configs/multi_defconfig             |    3 -
+ arch/m68k/configs/mvme147_defconfig           |    3 -
+ arch/m68k/configs/mvme16x_defconfig           |    3 -
+ arch/m68k/configs/q40_defconfig               |    3 -
+ arch/m68k/configs/sun3_defconfig              |    3 -
+ arch/m68k/configs/sun3x_defconfig             |    3 -
+ arch/mips/configs/bigsur_defconfig            |    1 -
+ arch/mips/configs/fuloong2e_defconfig         |    1 -
+ arch/mips/configs/gpr_defconfig               |    1 -
+ arch/mips/configs/ip22_defconfig              |    1 -
+ arch/mips/configs/loongson2k_defconfig        |    1 -
+ arch/mips/configs/loongson3_defconfig         |    1 -
+ arch/mips/configs/malta_defconfig             |    1 -
+ arch/mips/configs/malta_kvm_defconfig         |    1 -
+ arch/mips/configs/maltaup_xpa_defconfig       |    1 -
+ arch/mips/configs/mtx1_defconfig              |    1 -
+ arch/mips/configs/rb532_defconfig             |    1 -
+ arch/mips/configs/rm200_defconfig             |    1 -
+ arch/powerpc/configs/cell_defconfig           |    1 -
+ arch/powerpc/configs/pmac32_defconfig         |    1 -
+ arch/powerpc/configs/ppc6xx_defconfig         |    1 -
+ arch/s390/configs/debug_defconfig             |    1 -
+ arch/s390/configs/defconfig                   |    1 -
+ arch/sh/configs/titan_defconfig               |    1 -
+ include/linux/dccp.h                          |  324 ----
+ include/linux/in.h                            |    1 -
+ include/linux/netfilter/nf_conntrack_dccp.h   |   38 -
+ include/linux/tfrc.h                          |   51 -
+ include/net/inet_hashtables.h                 |    7 +-
+ .../net/netfilter/ipv4/nf_conntrack_ipv4.h    |    3 -
+ include/net/netfilter/nf_conntrack.h          |    2 -
+ include/net/netfilter/nf_conntrack_l4proto.h  |   13 -
+ include/net/netfilter/nf_conntrack_tuple.h    |    3 -
+ include/net/netfilter/nf_reject.h             |    1 -
+ include/net/netns/conntrack.h                 |   13 -
+ include/net/rstreason.h                       |    2 +-
+ include/net/secure_seq.h                      |    4 -
+ include/net/sock.h                            |    1 -
+ include/trace/events/sock.h                   |    1 -
+ include/trace/events/sunrpc.h                 |    2 -
+ net/Kconfig                                   |    1 -
+ net/Makefile                                  |    1 -
+ net/bridge/netfilter/ebt_ip.c                 |    3 +-
+ net/bridge/netfilter/ebt_ip6.c                |    3 +-
+ net/bridge/netfilter/ebt_log.c                |    3 +-
+ net/core/flow_dissector.c                     |    4 -
+ net/core/secure_seq.c                         |   42 -
+ net/core/sock.c                               |   24 +-
+ net/core/sock_diag.c                          |    2 -
+ net/dccp/Kconfig                              |   46 -
+ net/dccp/Makefile                             |   30 -
+ net/dccp/ackvec.c                             |  403 -----
+ net/dccp/ackvec.h                             |  136 --
+ net/dccp/ccid.c                               |  219 ---
+ net/dccp/ccid.h                               |  262 ---
+ net/dccp/ccids/Kconfig                        |   55 -
+ net/dccp/ccids/ccid2.c                        |  794 ---------
+ net/dccp/ccids/ccid2.h                        |  121 --
+ net/dccp/ccids/ccid3.c                        |  866 ---------
+ net/dccp/ccids/ccid3.h                        |  148 --
+ net/dccp/ccids/lib/loss_interval.c            |  184 --
+ net/dccp/ccids/lib/loss_interval.h            |   69 -
+ net/dccp/ccids/lib/packet_history.c           |  439 -----
+ net/dccp/ccids/lib/packet_history.h           |  142 --
+ net/dccp/ccids/lib/tfrc.c                     |   46 -
+ net/dccp/ccids/lib/tfrc.h                     |   73 -
+ net/dccp/ccids/lib/tfrc_equation.c            |  702 --------
+ net/dccp/dccp.h                               |  483 -----
+ net/dccp/diag.c                               |   85 -
+ net/dccp/feat.c                               | 1581 -----------------
+ net/dccp/feat.h                               |  133 --
+ net/dccp/input.c                              |  739 --------
+ net/dccp/ipv4.c                               | 1101 ------------
+ net/dccp/ipv6.c                               | 1174 ------------
+ net/dccp/ipv6.h                               |   27 -
+ net/dccp/minisocks.c                          |  266 ---
+ net/dccp/options.c                            |  609 -------
+ net/dccp/output.c                             |  708 --------
+ net/dccp/proto.c                              | 1293 --------------
+ net/dccp/qpolicy.c                            |  136 --
+ net/dccp/sysctl.c                             |  107 --
+ net/dccp/timer.c                              |  272 ---
+ net/dccp/trace.h                              |   82 -
+ net/ipv4/Kconfig                              |    2 +-
+ net/ipv4/af_inet.c                            |    5 +-
+ net/ipv4/inet_connection_sock.c               |   23 +-
+ net/ipv4/inet_diag.c                          |    2 -
+ net/ipv4/inet_hashtables.c                    |   30 +-
+ net/ipv4/inet_timewait_sock.c                 |    6 +-
+ net/ipv6/af_inet6.c                           |    1 -
+ net/ipv6/inet6_connection_sock.c              |    2 -
+ net/ipv6/ip6_output.c                         |    2 +-
+ net/netfilter/Kconfig                         |   22 -
+ net/netfilter/Makefile                        |    2 -
+ net/netfilter/nf_conntrack_core.c             |   10 +-
+ net/netfilter/nf_conntrack_netlink.c          |    1 -
+ net/netfilter/nf_conntrack_proto.c            |    6 -
+ net/netfilter/nf_conntrack_proto_dccp.c       |  826 ---------
+ net/netfilter/nf_conntrack_standalone.c       |   92 -
+ net/netfilter/nf_nat_core.c                   |    6 -
+ net/netfilter/nf_nat_proto.c                  |   44 -
+ net/netfilter/nfnetlink_cttimeout.c           |    5 -
+ net/netfilter/nft_ct.c                        |    1 -
+ net/netfilter/nft_exthdr.c                    |  106 --
+ net/netfilter/xt_dccp.c                       |  185 --
+ net/netfilter/xt_multiport.c                  |    6 +-
+ samples/bpf/sockex2_kern.c                    |    1 -
+ scripts/checkpatch.pl                         |    2 +-
+ security/lsm_audit.c                          |   19 -
+ security/selinux/hooks.c                      |   41 +-
+ security/selinux/include/classmap.h           |    2 -
+ security/selinux/nlmsgtab.c                   |    1 -
+ security/smack/smack_lsm.c                    |    9 +-
+ tools/testing/selftests/net/config            |    1 -
+ .../selftests/net/reuseport_addr_any.c        |   36 +-
+ 132 files changed, 49 insertions(+), 15846 deletions(-)
+ delete mode 100644 Documentation/networking/dccp.rst
+ delete mode 100644 include/linux/dccp.h
+ delete mode 100644 include/linux/netfilter/nf_conntrack_dccp.h
+ delete mode 100644 include/linux/tfrc.h
+ delete mode 100644 net/dccp/Kconfig
+ delete mode 100644 net/dccp/Makefile
+ delete mode 100644 net/dccp/ackvec.c
+ delete mode 100644 net/dccp/ackvec.h
+ delete mode 100644 net/dccp/ccid.c
+ delete mode 100644 net/dccp/ccid.h
+ delete mode 100644 net/dccp/ccids/Kconfig
+ delete mode 100644 net/dccp/ccids/ccid2.c
+ delete mode 100644 net/dccp/ccids/ccid2.h
+ delete mode 100644 net/dccp/ccids/ccid3.c
+ delete mode 100644 net/dccp/ccids/ccid3.h
+ delete mode 100644 net/dccp/ccids/lib/loss_interval.c
+ delete mode 100644 net/dccp/ccids/lib/loss_interval.h
+ delete mode 100644 net/dccp/ccids/lib/packet_history.c
+ delete mode 100644 net/dccp/ccids/lib/packet_history.h
+ delete mode 100644 net/dccp/ccids/lib/tfrc.c
+ delete mode 100644 net/dccp/ccids/lib/tfrc.h
+ delete mode 100644 net/dccp/ccids/lib/tfrc_equation.c
+ delete mode 100644 net/dccp/dccp.h
+ delete mode 100644 net/dccp/diag.c
+ delete mode 100644 net/dccp/feat.c
+ delete mode 100644 net/dccp/feat.h
+ delete mode 100644 net/dccp/input.c
+ delete mode 100644 net/dccp/ipv4.c
+ delete mode 100644 net/dccp/ipv6.c
+ delete mode 100644 net/dccp/ipv6.h
+ delete mode 100644 net/dccp/minisocks.c
+ delete mode 100644 net/dccp/options.c
+ delete mode 100644 net/dccp/output.c
+ delete mode 100644 net/dccp/proto.c
+ delete mode 100644 net/dccp/qpolicy.c
+ delete mode 100644 net/dccp/sysctl.c
+ delete mode 100644 net/dccp/timer.c
+ delete mode 100644 net/dccp/trace.h
+ delete mode 100644 net/netfilter/nf_conntrack_proto_dccp.c
+ delete mode 100644 net/netfilter/xt_dccp.c
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 9d3b3788a005..452096e6b04f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -26160,6 +26160,12 @@ L:	netdev@vger.kernel.org
- S:	Orphan
- F:	drivers/net/ethernet/xilinx/ll_temac*
- 
-+XILINX PCS DRIVER
-+M:	Sean Anderson <sean.anderson@linux.dev>
-+S:	Maintained
-+F:	Documentation/devicetree/bindings/net/xilinx,pcs.yaml
-+F:	drivers/net/pcs/pcs-xilinx.c
-+
- XILINX PWM DRIVER
- M:	Sean Anderson <sean.anderson@seco.com>
- S:	Maintained
-diff --git a/drivers/net/pcs/Kconfig b/drivers/net/pcs/Kconfig
-index 91ff59899aaf..261d2fd29fc7 100644
---- a/drivers/net/pcs/Kconfig
-+++ b/drivers/net/pcs/Kconfig
-@@ -50,4 +50,26 @@ config PCS_RZN1_MIIC
- 	  on RZ/N1 SoCs. This PCS converts MII to RMII/RGMII or can be set in
- 	  pass-through mode for MII.
- 
-+config PCS_XILINX
-+	depends on OF
-+	depends on GPIOLIB
-+	depends on COMMON_CLK
-+	depends on PCS
-+	select MDIO_DEVICE
-+	select PHYLINK
-+	default XILINX_AXI_EMAC
-+	tristate "Xilinx PCS driver"
-+	help
-+	  PCS driver for the Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII device.
-+	  This device can either act as a PCS+PMA for 1000BASE-X or 2500BASE-X,
-+	  or as a GMII-to-SGMII bridge. It can also switch between 1000BASE-X
-+	  and SGMII dynamically if configured correctly when synthesized.
-+	  Typical applications use this device on an FPGA connected to a GEM or
-+	  TEMAC on the GMII side. The other side is typically connected to
-+	  on-device gigabit transceivers, off-device SERDES devices using TBI,
-+	  or LVDS IO resources directly.
-+
-+	  To compile this driver as a module, choose M here: the module
-+	  will be called pcs-xilinx.
-+
- endmenu
-diff --git a/drivers/net/pcs/Makefile b/drivers/net/pcs/Makefile
-index 35e3324fc26e..347afd91f034 100644
---- a/drivers/net/pcs/Makefile
-+++ b/drivers/net/pcs/Makefile
-@@ -10,3 +10,5 @@ obj-$(CONFIG_PCS_XPCS)		+= pcs_xpcs.o
- obj-$(CONFIG_PCS_LYNX)		+= pcs-lynx.o
- obj-$(CONFIG_PCS_MTK_LYNXI)	+= pcs-mtk-lynxi.o
- obj-$(CONFIG_PCS_RZN1_MIIC)	+= pcs-rzn1-miic.o
-+obj-$(CONFIG_PCS_ALTERA_TSE)	+= pcs-altera-tse.o
-+obj-$(CONFIG_PCS_XILINX)	+= pcs-xilinx.o
-diff --git a/drivers/net/pcs/pcs-xilinx.c b/drivers/net/pcs/pcs-xilinx.c
-new file mode 100644
-index 000000000000..3439f140a89a
---- /dev/null
-+++ b/drivers/net/pcs/pcs-xilinx.c
-@@ -0,0 +1,479 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/*
-+ * Copyright 2021-25 Sean Anderson <sean.anderson@seco.com>
-+ *
-+ * This is the driver for the Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII LogiCORE
-+ * IP. A typical setup will look something like
-+ *
-+ * MAC <--GMII--> PCS/PMA <--1000BASE-X--> SFP module (PMD)
-+ *
-+ * The IEEE model mostly describes this device, but the PCS layer has a
-+ * separate sublayer for 8b/10b en/decoding:
-+ *
-+ * - When using a device-specific transceiver (serdes), the serdes handles 8b/10b
-+ *   en/decoding and PMA functions. The IP implements other PCS functions.
-+ * - When using LVDS IO resources, the IP implements PCS and PMA functions,
-+ *   including 8b/10b en/decoding and (de)serialization.
-+ * - When using an external serdes (accessed via TBI), the IP implements all
-+ *   PCS functions, including 8b/10b en/decoding.
-+ *
-+ * The link to the PMD is not modeled by this driver, except for refclk. It is
-+ * assumed that the serdes (if present) needs no configuration, though it
-+ * should be fairly easy to add support. It is also possible to go from SGMII
-+ * to GMII (PHY mode), but this is not supported.
-+ *
-+ * This driver was written with reference to PG047:
-+ * https://docs.amd.com/r/en-US/pg047-gig-eth-pcs-pma
-+ */
-+
-+#include <linux/bitmap.h>
-+#include <linux/clk.h>
-+#include <linux/clk-provider.h>
-+#include <linux/gpio/consumer.h>
-+#include <linux/iopoll.h>
-+#include <linux/mdio.h>
-+#include <linux/of.h>
-+#include <linux/pcs.h>
-+#include <linux/pcs-xilinx.h>
-+#include <linux/phylink.h>
-+#include <linux/property.h>
-+
-+#include "../phy/phy-caps.h"
-+
-+/* Vendor-specific MDIO registers */
-+#define XILINX_PCS_ANICR 16 /* Auto-Negotiation Interrupt Control Register */
-+#define XILINX_PCS_SSR   17 /* Standard Selection Register */
-+
-+#define XILINX_PCS_ANICR_IE BIT(0) /* Interrupt Enable */
-+#define XILINX_PCS_ANICR_IS BIT(1) /* Interrupt Status */
-+
-+#define XILINX_PCS_SSR_SGMII BIT(0) /* Select SGMII standard */
-+
-+/**
-+ * struct xilinx_pcs - Private data for Xilinx PCS devices
-+ * @pcs: The phylink PCS
-+ * @mdiodev: The mdiodevice used to access the PCS
-+ * @refclk: The reference clock for the PMD
-+ * @refclk_out: Optional reference clock for other PCSs using this PCS's shared
-+ *              logic
-+ * @reset: The reset line for the PCS
-+ * @done: Optional GPIO for reset_done
-+ * @irq: IRQ, or -EINVAL if polling
-+ * @enabled: Set if @pcs.link_change is valid and we can call phylink_pcs_change()
-+ */
-+struct xilinx_pcs {
-+	struct phylink_pcs pcs;
-+	struct clk_hw refclk_out;
-+	struct clk *refclk;
-+	struct gpio_desc *reset, *done;
-+	struct mdio_device *mdiodev;
-+	int irq;
-+	bool enabled;
-+};
-+
-+static inline struct xilinx_pcs *pcs_to_xilinx(struct phylink_pcs *pcs)
-+{
-+	return container_of(pcs, struct xilinx_pcs, pcs);
-+}
-+
-+static irqreturn_t xilinx_pcs_an_irq(int irq, void *dev_id)
-+{
-+	struct xilinx_pcs *xp = dev_id;
-+
-+	if (mdiodev_modify_changed(xp->mdiodev, XILINX_PCS_ANICR,
-+				   XILINX_PCS_ANICR_IS, 0) <= 0)
-+		return IRQ_NONE;
-+
-+	/* paired with xilinx_pcs_enable/disable; protects xp->pcs->link_change */
-+	if (smp_load_acquire(&xp->enabled))
-+		phylink_pcs_change(&xp->pcs, true);
-+	return IRQ_HANDLED;
-+}
-+
-+static int xilinx_pcs_enable(struct phylink_pcs *pcs)
-+{
-+	struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
-+	struct device *dev = &xp->mdiodev->dev;
-+	int ret;
-+
-+	if (xp->irq < 0)
-+		return 0;
-+
-+	ret = mdiodev_modify(xp->mdiodev, XILINX_PCS_ANICR, 0,
-+			     XILINX_PCS_ANICR_IE);
-+	if (ret)
-+		dev_err(dev, "could not clear IRQ enable: %d\n", ret);
-+	else
-+		/* paired with xilinx_pcs_an_irq */
-+		smp_store_release(&xp->enabled, true);
-+	return ret;
-+}
-+
-+static void xilinx_pcs_disable(struct phylink_pcs *pcs)
-+{
-+	struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
-+	struct device *dev = &xp->mdiodev->dev;
-+	int err;
-+
-+	if (xp->irq < 0)
-+		return;
-+
-+	WRITE_ONCE(xp->enabled, false);
-+	/* paired with xilinx_pcs_an_irq */
-+	smp_wmb();
-+
-+	err = mdiodev_modify(xp->mdiodev, XILINX_PCS_ANICR,
-+			     XILINX_PCS_ANICR_IE, 0);
-+	if (err)
-+		dev_err(dev, "could not clear IRQ enable: %d\n", err);
-+}
-+
-+static __ETHTOOL_DECLARE_LINK_MODE_MASK(half_duplex) __ro_after_init;
-+
-+static int xilinx_pcs_validate(struct phylink_pcs *pcs,
-+			       unsigned long *supported,
-+			       const struct phylink_link_state *state)
-+{
-+	linkmode_andnot(supported, supported, half_duplex);
-+	return 0;
-+}
-+
-+static void xilinx_pcs_get_state(struct phylink_pcs *pcs,
-+				 unsigned int neg_mode,
-+				 struct phylink_link_state *state)
-+{
-+	struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
-+
-+	phylink_mii_c22_pcs_get_state(xp->mdiodev, neg_mode, state);
-+}
-+
-+static int xilinx_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
-+			     phy_interface_t interface,
-+			     const unsigned long *advertising,
-+			     bool permit_pause_to_mac)
-+{
-+	int ret, changed = 0;
-+	struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
-+
-+	if (test_bit(PHY_INTERFACE_MODE_SGMII, pcs->supported_interfaces) &&
-+	    test_bit(PHY_INTERFACE_MODE_1000BASEX, pcs->supported_interfaces)) {
-+		u16 ssr;
-+
-+		if (interface == PHY_INTERFACE_MODE_SGMII)
-+			ssr = XILINX_PCS_SSR_SGMII;
-+		else
-+			ssr = 0;
-+
-+		changed = mdiodev_modify_changed(xp->mdiodev, XILINX_PCS_SSR,
-+						 XILINX_PCS_SSR_SGMII, ssr);
-+		if (changed < 0)
-+			return changed;
-+	}
-+
-+	ret = phylink_mii_c22_pcs_config(xp->mdiodev, interface, advertising,
-+					 neg_mode);
-+	return ret ?: changed;
-+}
-+
-+static void xilinx_pcs_an_restart(struct phylink_pcs *pcs)
-+{
-+	struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
-+
-+	phylink_mii_c22_pcs_an_restart(xp->mdiodev);
-+}
-+
-+static void xilinx_pcs_link_up(struct phylink_pcs *pcs, unsigned int mode,
-+			       phy_interface_t interface, int speed, int duplex)
-+{
-+	int bmcr;
-+	struct xilinx_pcs *xp = pcs_to_xilinx(pcs);
-+
-+	if (phylink_autoneg_inband(mode))
-+		return;
-+
-+	bmcr = mdiodev_read(xp->mdiodev, MII_BMCR);
-+	if (bmcr < 0) {
-+		dev_err(&xp->mdiodev->dev, "could not read BMCR (err=%d)\n",
-+			bmcr);
-+		return;
-+	}
-+
-+	bmcr &= ~(BMCR_SPEED1000 | BMCR_SPEED100);
-+	switch (speed) {
-+	case SPEED_2500:
-+	case SPEED_1000:
-+		bmcr |= BMCR_SPEED1000;
-+		break;
-+	case SPEED_100:
-+		bmcr |= BMCR_SPEED100;
-+		break;
-+	case SPEED_10:
-+		bmcr |= BMCR_SPEED10;
-+		break;
-+	default:
-+		dev_err(&xp->mdiodev->dev, "invalid speed %d\n", speed);
-+	}
-+
-+	bmcr = mdiodev_write(xp->mdiodev, MII_BMCR, bmcr);
-+	if (bmcr < 0)
-+		dev_err(&xp->mdiodev->dev, "could not write BMCR (err=%d)\n",
-+			bmcr);
-+}
-+
-+static const struct phylink_pcs_ops xilinx_pcs_ops = {
-+	.pcs_validate = xilinx_pcs_validate,
-+	.pcs_enable = xilinx_pcs_enable,
-+	.pcs_disable = xilinx_pcs_disable,
-+	.pcs_get_state = xilinx_pcs_get_state,
-+	.pcs_config = xilinx_pcs_config,
-+	.pcs_an_restart = xilinx_pcs_an_restart,
-+	.pcs_link_up = xilinx_pcs_link_up,
-+};
-+
-+static const struct clk_ops xilinx_pcs_clk_ops = { };
-+
-+static const phy_interface_t xilinx_pcs_interfaces[] = {
-+	PHY_INTERFACE_MODE_SGMII,
-+	PHY_INTERFACE_MODE_1000BASEX,
-+	PHY_INTERFACE_MODE_2500BASEX,
-+};
-+
-+static int xilinx_pcs_probe(struct mdio_device *mdiodev)
-+{
-+	struct device *dev = &mdiodev->dev;
-+	struct fwnode_handle *fwnode = dev->fwnode;
-+	int ret, i, j, mode_count;
-+	struct xilinx_pcs *xp;
-+	const char **modes;
-+	u32 phy_id;
-+
-+	xp = devm_kzalloc(dev, sizeof(*xp), GFP_KERNEL);
-+	if (!xp)
-+		return -ENOMEM;
-+	xp->mdiodev = mdiodev;
-+	dev_set_drvdata(dev, xp);
-+
-+	xp->irq = fwnode_irq_get_byname(fwnode, "an");
-+	/* There's no _optional variant, so this is the best we've got */
-+	if (xp->irq < 0 && xp->irq != -EINVAL)
-+		return dev_err_probe(dev, xp->irq, "could not get IRQ\n");
-+
-+	mode_count = fwnode_property_string_array_count(fwnode,
-+							"xlnx,pcs-modes");
-+	if (!mode_count)
-+		mode_count = -ENODATA;
-+	if (mode_count < 0) {
-+		dev_err(dev, "could not read xlnx,pcs-modes: %d", mode_count);
-+		return mode_count;
-+	}
-+
-+	modes = kcalloc(mode_count, sizeof(*modes), GFP_KERNEL);
-+	if (!modes)
-+		return -ENOMEM;
-+
-+	ret = fwnode_property_read_string_array(fwnode, "xlnx,pcs-modes",
-+						modes, mode_count);
-+	if (ret < 0) {
-+		dev_err(dev, "could not read xlnx,pcs-modes: %d\n", ret);
-+		kfree(modes);
-+		return ret;
-+	}
-+
-+	for (i = 0; i < mode_count; i++) {
-+		for (j = 0; j < ARRAY_SIZE(xilinx_pcs_interfaces); j++) {
-+			if (!strcmp(phy_modes(xilinx_pcs_interfaces[j]), modes[i])) {
-+				__set_bit(xilinx_pcs_interfaces[j],
-+					  xp->pcs.supported_interfaces);
-+				goto next;
-+			}
-+		}
-+
-+		dev_err(dev, "invalid pcs-mode \"%s\"\n", modes[i]);
-+		kfree(modes);
-+		return -EINVAL;
-+next:
-+	}
-+
-+	kfree(modes);
-+	if ((test_bit(PHY_INTERFACE_MODE_SGMII, xp->pcs.supported_interfaces) ||
-+	     test_bit(PHY_INTERFACE_MODE_1000BASEX, xp->pcs.supported_interfaces)) &&
-+	    test_bit(PHY_INTERFACE_MODE_2500BASEX, xp->pcs.supported_interfaces)) {
-+		dev_err(dev,
-+			"Switching from SGMII or 1000Base-X to 2500Base-X not supported\n");
-+		return -EINVAL;
-+	}
-+
-+	xp->reset = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH);
-+	if (IS_ERR(xp->reset))
-+		return dev_err_probe(dev, PTR_ERR(xp->reset),
-+				     "could not get reset gpio\n");
-+
-+	xp->done = devm_gpiod_get_optional(dev, "done", GPIOD_IN);
-+	if (IS_ERR(xp->done))
-+		return dev_err_probe(dev, PTR_ERR(xp->done),
-+				     "could not get done gpio\n");
-+
-+	xp->refclk = devm_clk_get_optional_enabled(dev, "refclk");
-+	if (IS_ERR(xp->refclk))
-+		return dev_err_probe(dev, PTR_ERR(xp->refclk),
-+				     "could not get/enable reference clock\n");
-+
-+	gpiod_set_value_cansleep(xp->reset, 0);
-+	if (xp->done) {
-+		if (read_poll_timeout(gpiod_get_value_cansleep, ret, ret, 1000,
-+				      100000, true, xp->done))
-+			return dev_err_probe(dev, -ETIMEDOUT,
-+					     "timed out waiting for reset\n");
-+	} else {
-+		/* Just wait for a while and hope we're done */
-+		usleep_range(50000, 100000);
-+	}
-+
-+	if (fwnode_property_present(fwnode, "#clock-cells")) {
-+		const char *parent = "refclk";
-+		struct clk_init_data init = {
-+			.name = fwnode_get_name(fwnode),
-+			.ops = &xilinx_pcs_clk_ops,
-+			.parent_names = &parent,
-+			.num_parents = 1,
-+			.flags = 0,
-+		};
-+
-+		xp->refclk_out.init = &init;
-+		ret = devm_clk_hw_register(dev, &xp->refclk_out);
-+		if (ret)
-+			return dev_err_probe(dev, ret,
-+					     "could not register refclk\n");
-+
-+		ret = devm_of_clk_add_hw_provider(dev, of_clk_hw_simple_get,
-+						  &xp->refclk_out);
-+		if (ret)
-+			return dev_err_probe(dev, ret,
-+					     "could not register refclk\n");
-+	}
-+
-+	/* Sanity check */
-+	ret = get_phy_c22_id(mdiodev->bus, mdiodev->addr, &phy_id);
-+	if (ret) {
-+		dev_err_probe(dev, ret, "could not read id\n");
-+		return ret;
-+	}
-+	if ((phy_id & 0xfffffff0) != 0x01740c00)
-+		dev_warn(dev, "unknown phy id %x\n", phy_id);
-+
-+	if (xp->irq < 0) {
-+		xp->pcs.poll = true;
-+	} else {
-+		/* The IRQ is enabled by default; turn it off */
-+		ret = mdiodev_write(xp->mdiodev, XILINX_PCS_ANICR, 0);
-+		if (ret) {
-+			dev_err(dev, "could not disable IRQ: %d\n", ret);
-+			return ret;
-+		}
-+
-+		/* Some PCSs have a bad habit of re-enabling their IRQ!
-+		 * Request the IRQ in probe so we don't end up triggering the
-+		 * spurious IRQ logic.
-+		 */
-+		ret = devm_request_threaded_irq(dev, xp->irq, NULL, xilinx_pcs_an_irq,
-+						IRQF_SHARED | IRQF_ONESHOT,
-+						dev_name(dev), xp);
-+		if (ret) {
-+			dev_err(dev, "could not request IRQ: %d\n", ret);
-+			return ret;
-+		}
-+	}
-+
-+	xp->pcs.ops = &xilinx_pcs_ops;
-+	ret = devm_pcs_register_provider(dev, pcs_xlate_single, &xp->pcs);
-+	if (ret)
-+		return dev_err_probe(dev, ret, "could not register PCS\n");
-+
-+	if (xp->irq < 0)
-+		dev_info(dev, "probed with irq=poll\n");
-+	else
-+		dev_info(dev, "probed with irq=%d\n", xp->irq);
-+	return 0;
-+}
-+
-+static const struct of_device_id xilinx_pcs_of_match[] = {
-+	{ .compatible = "xlnx,pcs", },
-+	{},
-+};
-+MODULE_DEVICE_TABLE(of, xilinx_timer_of_match);
-+
-+static struct mdio_driver xilinx_pcs_driver = {
-+	.probe = xilinx_pcs_probe,
-+	.mdiodrv.driver = {
-+		.name = "xilinx-pcs",
-+		.of_match_table = of_match_ptr(xilinx_pcs_of_match),
-+		.suppress_bind_attrs = true,
-+	},
-+};
-+
-+static int __init xilinx_pcs_init(void)
-+{
-+	phy_caps_linkmodes(LINK_CAPA_10HD | LINK_CAPA_100HD | LINK_CAPA_1000HD,
-+			   half_duplex);
-+	return mdio_driver_register(&xilinx_pcs_driver);
-+}
-+module_init(xilinx_pcs_init);
-+
-+static void __exit xilinx_pcs_exit(void)
-+{
-+	mdio_driver_unregister(&xilinx_pcs_driver);
-+}
-+module_exit(xilinx_pcs_exit)
-+
-+static int axienet_xilinx_pcs_fixup(struct of_changeset *ocs,
-+				    struct device_node *np, void *data)
-+{
-+#ifdef CONFIG_OF_DYNAMIC
-+	unsigned int interface, mode_count, mode = 0;
-+	const unsigned long *interfaces = data;
-+	const char **modes;
-+	int ret;
-+
-+	mode_count = bitmap_weight(interfaces, PHY_INTERFACE_MODE_MAX);
-+	WARN_ON_ONCE(!mode_count);
-+	modes = kcalloc(mode_count, sizeof(*modes), GFP_KERNEL);
-+	if (!modes)
-+		return -ENOMEM;
-+
-+	for_each_set_bit(interface, interfaces, PHY_INTERFACE_MODE_MAX)
-+		modes[mode++] = phy_modes(interface);
-+	ret = of_changeset_add_prop_string_array(ocs, np, "xlnx,pcs-modes",
-+						 modes, mode_count);
-+	kfree(modes);
-+	if (ret)
-+		return ret;
-+
-+	return of_changeset_add_prop_string(ocs, np, "compatible",
-+					    "xlnx,pcs");
-+#else
-+	return -ENODEV;
-+#endif
-+}
-+
-+struct phylink_pcs *axienet_xilinx_pcs_get(struct device *dev,
-+					   const unsigned long *interfaces)
-+{
-+	struct fwnode_reference_args args;
-+	struct phylink_pcs *pcs;
-+	int ret;
-+
-+	ret = pcs_find_fwnode(dev_fwnode(dev), NULL, "phy-handle", false,
-+			      &args);
-+	if (ret)
-+		return ERR_PTR(ret);
-+
-+	pcs = pcs_get_by_fwnode_compat(dev, args.fwnode,
-+				       axienet_xilinx_pcs_fixup,
-+				       (void *)interfaces);
-+	fwnode_handle_put(args.fwnode);
-+	return pcs;
-+}
-+
-+MODULE_ALIAS("platform:xilinx-pcs");
-+MODULE_DESCRIPTION("Xilinx PCS driver");
-+MODULE_LICENSE("GPL");
-diff --git a/include/linux/pcs-xilinx.h b/include/linux/pcs-xilinx.h
-new file mode 100644
-index 000000000000..409057fbdf34
---- /dev/null
-+++ b/include/linux/pcs-xilinx.h
-@@ -0,0 +1,36 @@
-+/* SPDX-License-Identifier: GPL-2.0+ */
-+/*
-+ * Copyright 2024 Sean Anderson <sean.anderson@seco.com>
-+ */
-+
-+#ifndef PCS_XILINX_H
-+#define PCS_XILINX_H
-+
-+#include <linux/err.h>
-+
-+struct device;
-+struct phylink_pcs;
-+
-+#ifdef CONFIG_PCS_XILINX
-+/**
-+ * axienet_xilinx_pcs_get() - Compatibility function for the AXI Ethernet driver
-+ * @dev: The MAC device
-+ * @interfaces: The interfaces to use as a fallback
-+ *
-+ * This is a helper function for the AXI Ethernet driver to ensure backwards
-+ * compatibility with device trees which do not include compatible strings for
-+ * the PCS. It should not be used by new code.
-+ *
-+ * Return: a PCS, or an error pointer
-+ */
-+struct phylink_pcs *axienet_xilinx_pcs_get(struct device *dev,
-+					   const unsigned long *interfaces);
-+#else
-+static inline struct phylink_pcs *
-+axienet_xilinx_pcs_get(struct device *dev, const unsigned long *interfaces)
-+{
-+	return ERR_PTR(-ENODEV);
-+}
-+#endif
-+
-+#endif /* PCS_XILINX_H */
 -- 
-2.35.1.1320.gc452695387.dirty
+2.48.1
 
 
