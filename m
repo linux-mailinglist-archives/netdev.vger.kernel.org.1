@@ -1,124 +1,121 @@
-Return-Path: <netdev+bounces-179633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D92AAA7DE82
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 15:07:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F2A3A7DE93
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 15:11:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B76AF16A8B2
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 13:07:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D46FE3A98DE
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 13:11:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4C924BCF9;
-	Mon,  7 Apr 2025 13:07:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="dn9atQZS";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WrABPWEV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C132D2517B1;
+	Mon,  7 Apr 2025 13:11:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E24715382E
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 13:07:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4172512FD;
+	Mon,  7 Apr 2025 13:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744031237; cv=none; b=Q7zHZuxKDDCK5yR2AgO9XDdKKpesdLF5WNT9BhoPrjw7/A0Vc6yIKYoUfseWaHdrHjanlxijNUq1nnsvJu3xQKfFy2kNop8y0JH8kATLksjHcM49CU665pGTV6YMaEaFYs1TpFXu4DW0XyK81PsKIOC3BrhdBSPzS2bpnZtMg88=
+	t=1744031506; cv=none; b=UciKjM/CQ6K+X1kQS12BpaaIv0cnoYV9aH4/Tcc6wlWPylvssuqL6GPluBWWmzU8JVNrAzNjg1ge6Li8PF8wRvDtcYQU3Xxe4EvzUTmQGccyAbsniutvbgHuYk6VrL8nuEEimRYSL4QVVMfEU8vLjb2eiIZ/frcjFatPeIK0PTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744031237; c=relaxed/simple;
-	bh=qLRSL2DCgQiGtlIJDKWABCEGoSUzkLHXeqejttMgI3o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TsORE6WCvBmtHbGFVi66GMIVabzseBOxA8m2wH6gyTMJrVtAAIs/M/s8Rfdqd1bEBhQ1/kG1IFOgibuTJMJmi3dMy76X27JU+vQu3M5+MWqvcofPUPhmq54F9PFXpufERdcuCx5YYC6gjDbkVVRZzQyv533jULCvP7mxbO3Sd4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=dn9atQZS; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=WrABPWEV; arc=none smtp.client-ip=103.168.172.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailfout.phl.internal (Postfix) with ESMTP id 1EA131380073;
-	Mon,  7 Apr 2025 09:07:13 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-12.internal (MEProxy); Mon, 07 Apr 2025 09:07:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1744031233; x=
-	1744117633; bh=Dz2oiJHXYIg14MzMDL3LNHU+nT2d0wOBZhB1v0XkQ5s=; b=d
-	n9atQZSps9fI6El6nRl/aCjiZ6Z2d+/D0mEGv4g5I/timJbekdKSOSw7xysj+KxR
-	Wq8FlxY/prfNHlF11j4GJnrNUzsPmBiU+lu4r3tyzy3fBq/JH2BOyGtVYOsQgLRc
-	XnTOG2wV18LFz181UlHwg69PU712NjpJQv8fzqAChjS6v4VENVO7OPlczKGvczjk
-	BZ6pl9oqcx3KXc/G5ArimAOCOd6KMWdDMFrBxPRUarcSA3eWXMCOu4iQo18kKMHV
-	VkmJPQo7g19/n5gGhwT67HCt93SDQcQgxu1DKtvlGq6xH3JdzeYW5DpkHuEFgfAL
-	GQ0jkrttH3jcUQ8/NO5gA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1744031233; x=1744117633; bh=Dz2oiJHXYIg14MzMDL3LNHU+nT2d0wOBZhB
-	1v0XkQ5s=; b=WrABPWEVfQo9qdi9nNf1JSygjqe5Ijo7eGvHXLdyvqb2hD4nfIr
-	gripAXWgfPMJYCrylBniSeifwWxcv+NsThVOMynPeCvxZgRCeO3G0Vm2w3e4dfc2
-	Wfcy89obTwIdEbvuz8fU4cozv7gKoz1S+9biWAPqZXMqnyIzTUwXnu6I+HefAZcL
-	dfv2nbv5FdQ1wHRhFmEU0Kk23XDXkhxZFh5To98DpDThd/+rN4nFHzJV8usHT8/F
-	vaaVKJ2WsQMAMrLhZ4qh1C/BdaDZXxv5FJHcwXrYb/eRIB8wZMifKBsg1AB4VZMA
-	1m6mvdwKM8UxPyd1U/+cm57nDZMJezkblhw==
-X-ME-Sender: <xms:AM7zZyaqxmrn7W38EaXFRQcuHOUMze7YQNtyeInaLmUjSgNerxI77A>
-    <xme:AM7zZ1aycgqtBtv3233TorNlbW_BYI5UgmooRs_8AVPGNFBFDTEeI9k8S-Mn0eL3x
-    V_SusiwYoErmnABhPQ>
-X-ME-Received: <xmr:AM7zZ8-Kt3FKc2TPnptUHek8kcJoWr9yiGsyJl8PoKgSsY5Jk95YHWohkoIJ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtddtvdejucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucenucfjughrpeffhf
-    fvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgrucffuhgs
-    rhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrghtthgvrh
-    hnpeeghffftdevudfgkeffjedvieeilefhtefffeefgfehvdevhfejjedvkeefleeggfen
-    ucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenuc
-    frrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhn
-    sggprhgtphhtthhopeelpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehkuhgsrg
-    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdr
-    nhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprh
-    gtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgr
-    sggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvg
-    hvsehluhhnnhdrtghhpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhr
-    tghpthhtohepsghorhhishhpsehnvhhiughirgdrtghomhdprhgtphhtthhopehjohhhnh
-    drfhgrshhtrggsvghnugesghhmrghilhdrtghomh
-X-ME-Proxy: <xmx:AM7zZ0qAkw9U7OHuurMJ5TjvFJsXG1iXTEX6vN-GHTqbdlDbP0aY2g>
-    <xmx:AM7zZ9rfi9O4xhNESne8C6mn2cxLycy0Pfumwuw5xCOo8ixZ-QSTLQ>
-    <xmx:AM7zZyTIiqfETik_10YaoWkZD07gTpCOhbLsqDZC6xMfop0rakwTJA>
-    <xmx:AM7zZ9ogtTFNrLw-4-7hkH-Z5ppn0d-vA4t95EGfc3Fs8CFr7IOMgQ>
-    <xmx:Ac7zZ2EG1xKy52fJ8NM1GwxylM2FocoXKNAQZKDzsFObSeJlMR-rcayE>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 7 Apr 2025 09:07:12 -0400 (EDT)
-Date: Mon, 7 Apr 2025 15:07:10 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	borisp@nvidia.com, john.fastabend@gmail.com
-Subject: Re: [PATCH net 2/2] selftests: tls: check that disconnect does
- nothing
-Message-ID: <Z_PN_iBsuMvkoEck@krikkit>
-References: <20250404180334.3224206-1-kuba@kernel.org>
- <20250404180334.3224206-2-kuba@kernel.org>
+	s=arc-20240116; t=1744031506; c=relaxed/simple;
+	bh=2Kyzltuee9lw0VbxAQZivPwT/I9GE7kNboJtO2TQKb0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ckjsgP2LUOBlmgXLQzLmk67SuinOAuCEYLwiqSjNiNXAf8iR95tyXyFEVPpNjRVEXLSKnb83B6pEbOlLPGNK1q3NQRaogPSrALkOgYJB+kI83TvWXn+T5J0mKvp1OQV8ytYgZtPm0QQctxLsupwIOd3KijhbqMS81Ggf6Lqy82Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [124.16.141.245])
+	by APP-03 (Coremail) with SMTP id rQCowABHtkL+zvNn2JviBg--.35685S2;
+	Mon, 07 Apr 2025 21:11:28 +0800 (CST)
+From: Wentao Liang <vulab@iscas.ac.cn>
+To: ecree.xilinx@gmail.com,
+	habetsm.xilinx@gmail.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-staging@lists.linux.dev,
+	linux-net-drivers@amd.com,
+	linux-kernel@vger.kernel.org,
+	Wentao Liang <vulab@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] sfc: Propagate the return value of devlink_info_serial_number_put()
+Date: Mon,  7 Apr 2025 21:11:10 +0800
+Message-ID: <20250407131110.2394-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.42.0.windows.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250404180334.3224206-2-kuba@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowABHtkL+zvNn2JviBg--.35685S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Kr1fuFyfAry7tw48WryxAFb_yoW8Xr4rpa
+	y3AFyagFyfCFy0ga18uF48uFy3Za1UKFyqgFZ3Kw4ruanxJr4avFsY9a43Kr15ArWkG3Wx
+	tr1UCrWfCFn8ArUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
+	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
+	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
+	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
+	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCT
+	nIWIevJa73UjIFyTuYvjfU52NtDUUUU
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBwoFA2fzvEUKpgABsL
 
-2025-04-04, 11:03:34 -0700, Jakub Kicinski wrote:
-> "Inspired" by syzbot test, pre-queue some data, disconnect()
-> and try to receive(). This used to trigger a warning in TLS's strp.
-> Now we expect the disconnect() to have almost no effect.
-> 
-> Link: https://lore.kernel.org/67e6be74.050a0220.2f068f.007e.GAE@google.com
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+The function efx_devlink_info_board_cfg() calls the function
+devlink_info_serial_number_put(), but does not check its return
+value.
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+Return the error code if either the devlink_info_serial_number_put()
+or the efx_mcdi_get_board_cfg() fails.The control flow of the code is
+changed a little bit to simplify the code. The functionality of the
+code remain the same.
 
+Fixes: 14743ddd2495 ("sfc: add devlink info support for ef100")
+Cc: stable@vger.kernel.org # v6.3+
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+---
+v2: Simplify code logic.
+
+ drivers/net/ethernet/sfc/efx_devlink.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/sfc/efx_devlink.c b/drivers/net/ethernet/sfc/efx_devlink.c
+index 3cd750820fdd..53b17cd252c8 100644
+--- a/drivers/net/ethernet/sfc/efx_devlink.c
++++ b/drivers/net/ethernet/sfc/efx_devlink.c
+@@ -584,11 +584,12 @@ static int efx_devlink_info_board_cfg(struct efx_nic *efx,
+ 	int rc;
+ 
+ 	rc = efx_mcdi_get_board_cfg(efx, (u8 *)mac_address, NULL, NULL);
+-	if (!rc) {
+-		snprintf(sn, EFX_MAX_SERIALNUM_LEN, "%pm", mac_address);
+-		devlink_info_serial_number_put(req, sn);
+-	}
+-	return rc;
++	if (rc)
++		return rc;
++
++	snprintf(sn, EFX_MAX_SERIALNUM_LEN, "%pm", mac_address);
++
++	return devlink_info_serial_number_put(req, sn);
+ }
+ 
+ static int efx_devlink_info_get(struct devlink *devlink,
 -- 
-Sabrina
+2.42.0.windows.2
+
 
