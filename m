@@ -1,159 +1,192 @@
-Return-Path: <netdev+bounces-179561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88B0AA7D9B5
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 11:33:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B24EAA7D9C6
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 11:35:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57DA5168DBA
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 09:33:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A6071188C6D3
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 09:35:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FCB51B3955;
-	Mon,  7 Apr 2025 09:33:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 247BF22FF4E;
+	Mon,  7 Apr 2025 09:35:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ta9ZLSoZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dhBcz9C7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC2201A5BA3
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 09:33:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857FE22A4D6;
+	Mon,  7 Apr 2025 09:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744018414; cv=none; b=dGY89f2C9VsvGPT6mDnJqJxg0Q5b8bO9wUgY5Za6f3GgouSi2r1t8Ad95KpbTuCiTHkInSSW/8VoLVgf8hLh8LxOfVmnsFmgujZuR1CIiqX9Qw5UdheQzXxUl2J5XfTroKltu7V7hyvgZQ+SFf/pNehQz3O30VKe9Hfi1RxGN+g=
+	t=1744018506; cv=none; b=NLISuHtIMpf/3SdnsJZ723jXtLcuMgXErxZljWLeU8KelNGCWJx0XiuTynFo7JZv4SooECfp8yYnVsL2lqsgfdju5DedG08T0Xhh9OkWM1omHTpllsLd89MiiI2Qkf0/QqWqRYDxXzL/lWkHWLdYEP8d2GPG7TvMqxy/yIBEHlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744018414; c=relaxed/simple;
-	bh=tgT1LrnqYgrS5eql63LRpugnK0ui0G5PIUMiBaqknD0=;
+	s=arc-20240116; t=1744018506; c=relaxed/simple;
+	bh=NA/Nd0Ddf2jORatQD4g6yIs1ne9f1uLXUzl99732yc8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jCygnjaF+hsYrxKMlHMtuRHORZX/+otmUfGKGTs0uuOlSVJ9APDI+yQuxyGxEQ0Tc13Cp0MaU+p76sAFGLQREuPQRImq01o8UvIrCbuePXhbD0zNHda9qaPm7YKRZndsgsMTB1dzDUXTfUDtQj3ACZJmMIKvpqhfGm6sdbCngsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ta9ZLSoZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744018411;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=441tE+Tmh6SSSq0pafdr9Ks6zWoEBrFm9sf0mm65S3w=;
-	b=Ta9ZLSoZvh/bA7BqEwIfbL4WTtN7v/b8qbak++RQ7pttYBt/HucTmxCD0Vgw7X3OZp6ZuZ
-	iGxt1DrKgoWVhCfecuHr70wkaQXk+Fv4J59r2zVlgDdxm/S2aGEvKAKgZpa321QpX6qQJT
-	vRFO+uScFzUyfReSQPZJzj0tszsINvg=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-407-I2jYEv_EN6Cbn-cr4hl_sg-1; Mon, 07 Apr 2025 05:33:30 -0400
-X-MC-Unique: I2jYEv_EN6Cbn-cr4hl_sg-1
-X-Mimecast-MFC-AGG-ID: I2jYEv_EN6Cbn-cr4hl_sg_1744018409
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-399744f742bso1171084f8f.1
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 02:33:30 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=iIiZdkTinlIfmmrpJE/O1C/v7u2gbhVWTKKKwepn0j//n/nw7RZM06lHEbXX8JRHxHWI7zG+MMyvkFLfc+2UVtDPfStNy1SE2H/4w76grS511BQf9Aq39QMxjOZNb8KDtwPoRbxRKK78UGbpzL/smrhyu9XoeFXC5ZCKoptHhIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dhBcz9C7; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-224341bbc1dso34729935ad.3;
+        Mon, 07 Apr 2025 02:35:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744018504; x=1744623304; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=e3fVOy8mns/9JIDsaRuopOAvHNx0fO3H/yc9m6/qJXA=;
+        b=dhBcz9C72nOh88cyHuVKzc9Mj1lJ90mOTZ37LCkrBfP8fgPZYxxFwK7oglW6qDjoaW
+         IdCS9gABnZ0jKW08RY4q0lR1Z11SjwkgLVK0N+8v2W1vuM0B1SNalVNEcG4m386Eknjz
+         qM6STO4qejUT5Ed7G1UWNyCGyjQVata3oDAnUsby1UWamTfXluaNeZSJz7IwtK2kaMVj
+         MeLjPLTK56ySUSK63JzT5NfNCSyNOzqfpOT4BXonbn5IhW9778aW4WkMHZGI3NUPI6lF
+         5DjTp8UgFlVxSpAgMhhkFFFX9CUdLt/tUufP56bDa5q+nKx/0qQ/6/oY/kiOiLdCRCyF
+         bjUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744018409; x=1744623209;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=441tE+Tmh6SSSq0pafdr9Ks6zWoEBrFm9sf0mm65S3w=;
-        b=jvQ5tVkNjE4MUPIvxEtVb6+wUUQagF+g0B06JnaeAQyXQj36gBbWnXtJfQ7u6P5Rvo
-         /AC93S3xCZVAuEELP5MbDLuotHvXqNb8Aa0vxASh7KVnriOkDaxUCrA/pZNtMZXUe996
-         tdEUKIBvU5mGRGURaV0d+l478ChmA/HICGh78NzPhm5Mnt7ZVX6ho4WI+4BLvGFYVp5c
-         Nzs6sszq/txjxRnNKW7UVioJmQkge0gvg4G8uqDh1HL1++OS+jxWQXGgH+zSq/i0t+06
-         ynXRKx6/Y79bsmW5gP32yHL9nyLQ6ookE3z4jBCh+jCC/MQRqK4Y1V2eEdgc3jkqBG24
-         OymQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXoKeNMlw3ly6sFCZhI5EqThxI2uaD9nLceGBEnAy5l3qDEryZRWmUyJz46A7WmSJYSNZ9gljU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrGgcwkKZ+ClGDFaShnvH9W1pplx4G8RgD0gI/FT0IgGpAyLBm
-	8OOo2gwhUvN+JZBOL3LJVsRcJ5Ot5b6SqBA5k49uSUY0YGPskE4aGHXCA3NtMRBTTcoKtBiXeEf
-	FAoA93YjooLdHgecLSiYYGYDNk11eALF4Clk0IatIrIk4/lmlAmIu5A==
-X-Gm-Gg: ASbGncs0fzt/37vFFFK/byW+sDT4J4vlxpH3KEwqdMHI1DLIOCuYt8rser3f4fSip8f
-	iBf+k9IdC6h6H81TbFqwDxrI718EEp+Z676wCg398mkQ+8NnSXHYl3XhfO+wnsojbrg1fp8MWv2
-	Uw/hV3QuXUKbY6JV74B+l3UXa6BJLb25NiqZ/gZjN8kNSH35EzvfR42bQNG8536qBcWJ1XuL6mo
-	xTTdEJSgUSP8o3Cja5ZfUREe5AI+dBzNOcNmW9QrNp61R/8FuvOzM7fVhcOQytcFsnOOSS++Z0s
-	bltAnVXHdHZXIJTTC2Fj6DPk2FgMYwebynnjm63k0pyHz1s=
-X-Received: by 2002:a5d:6d8a:0:b0:39a:cc34:2f9b with SMTP id ffacd0b85a97d-39d6fc291b3mr6246163f8f.16.1744018409030;
-        Mon, 07 Apr 2025 02:33:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEBolTQSF/57rvjzSXqBYXmJPqcsNVa8ShQLgffhCmYqYrNC02OtDRXnbbO61LGvPp6q95GEg==
-X-Received: by 2002:a5d:6d8a:0:b0:39a:cc34:2f9b with SMTP id ffacd0b85a97d-39d6fc291b3mr6246139f8f.16.1744018408664;
-        Mon, 07 Apr 2025 02:33:28 -0700 (PDT)
-Received: from jlelli-thinkpadt14gen4.remote.csb ([151.37.215.184])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c30226cf6sm11371971f8f.87.2025.04.07.02.33.25
+        d=1e100.net; s=20230601; t=1744018504; x=1744623304;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=e3fVOy8mns/9JIDsaRuopOAvHNx0fO3H/yc9m6/qJXA=;
+        b=Ja/p0IHTifmAPbYpYhDRNbaOcC6qQFQM1+Fjy2OYGIiLPjfLJXaBYrQjCbqN5JwbTN
+         MeXKT3Un2v+eKP4UxQAuN4Dun0SDMEtA/KMCTTJNhCOz02EFZZG4uXbc8h5yE2rucTBK
+         IQ8l/KyORlM24HUjP/xxXYhSyvo52d39/962zazhvI6UAv/znSeXnzytDtsWv+ovxm/8
+         /oN3ajVBhmi2aiJit65CTMppycgkbFqSYxyhINeTKnx40iitAHuZXaG+eadTMZGmCn4X
+         kiiS67JGV6entGcUNO80kD23QdU/abV4d4XrkkUxMU8OgYIGrnDJfU3DIQHsz0P+W9FO
+         aTtg==
+X-Forwarded-Encrypted: i=1; AJvYcCWdQG7/skepdFaS8xFPyaExNRev4w1J2M9LS2T+WhrUDSKMsOxVCIVjlsvE7F5GeDrmvKCqtghag4I7pRY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yye36hjuOVG8WIsk71dyB6o/nfNDtPpSuze6rxyie8aCtST5fV6
+	zy/EmI0Ek90MMzLKp3Rc6MGK9eUmG/s5YC9LpSNaLaDgOXd6sX3q
+X-Gm-Gg: ASbGncv2KUeVvG4hCyX2BADFhbZiHmZUQ+L/bis5TyZH0mIIvDZilYY95fjqo3y3AWl
+	xLt71KZsRqIpAwxoc8xqjoH16GYRYRnbj2cjjqHM+PeiwqpNdqz8jbvO66+sNkeAOYNRKLE6qMm
+	QAaba793Ha3IqWp8MYTUUXQ5mu2B+mWJ1nJ33ikercMDyhUMW4GWyW4dct5n32rVyZAhIdS6xef
+	nOq25ufkm8QbYrQbP+J+nsOikWgX7hbttX4IOioSJ1ylGQbiSkgT5hhHHX3cpRgdiXo+dcVXsBu
+	7c/f/ZBBawSfF+thzCxZ2YPPel0XKeVb12HKEmh68b2LgCmVyw==
+X-Google-Smtp-Source: AGHT+IFN5Aj47HVwSZNa0w+mDnCZklaD4x92z/LhnYjRYcRlKKi9NZjwjG50B6PZzoYQmqv6RINMmA==
+X-Received: by 2002:a17:902:d485:b0:223:3bf6:7e6a with SMTP id d9443c01a7336-22a95529550mr137783025ad.12.1744018503634;
+        Mon, 07 Apr 2025 02:35:03 -0700 (PDT)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-229785ada7csm76473015ad.31.2025.04.07.02.34.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 02:33:28 -0700 (PDT)
-Date: Mon, 7 Apr 2025 11:33:22 +0200
-From: Juri Lelli <juri.lelli@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Valentin Schneider <vschneid@redhat.com>,
+        Mon, 07 Apr 2025 02:35:02 -0700 (PDT)
+Date: Mon, 7 Apr 2025 09:34:55 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jay Vosburgh <jv@jvosburgh.net>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-	netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH net-next 06/18] netfilter: nf_dup{4, 6}: Move duplication
- check to task_struct.
-Message-ID: <Z_Ob4niUHgSjS5x1@jlelli-thinkpadt14gen4.remote.csb>
-References: <20250309144653.825351-1-bigeasy@linutronix.de>
- <20250309144653.825351-7-bigeasy@linutronix.de>
- <99214ac9-cff7-4a5c-b439-ed9ec2c6877c@redhat.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv2 net] bonding: use permanent address for MAC swapping if
+ device address is same
+Message-ID: <Z_OcP36h_XOhAfjv@fedora>
+References: <20250401090631.8103-1-liuhangbin@gmail.com>
+ <3383533.1743802599@famine>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <99214ac9-cff7-4a5c-b439-ed9ec2c6877c@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <3383533.1743802599@famine>
 
-Hi Paolo,
-
-On 17/03/25 18:29, Paolo Abeni wrote:
-> Hi,
+On Fri, Apr 04, 2025 at 02:36:39PM -0700, Jay Vosburgh wrote:
+> Hangbin Liu <liuhangbin@gmail.com> wrote:
 > 
-> On 3/9/25 3:46 PM, Sebastian Andrzej Siewior wrote:
-> > nf_skb_duplicated is a per-CPU variable and relies on disabled BH for its
-> > locking. Without per-CPU locking in local_bh_disable() on PREEMPT_RT
-> > this data structure requires explicit locking.
-> > 
-> > Due to the recursion involved, the simplest change is to make it a
-> > per-task variable.
-> > 
-> > Move the per-CPU variable nf_skb_duplicated to task_struct and name it
-> > in_nf_duplicate. Add it to the existing bitfield so it doesn't use
-> > additional memory.
-> > 
-> > Cc: Pablo Neira Ayuso <pablo@netfilter.org>
-> > Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
-> > Cc: Ingo Molnar <mingo@redhat.com>
-> > Cc: Peter Zijlstra <peterz@infradead.org>
-> > Cc: Juri Lelli <juri.lelli@redhat.com>
-> > Cc: Vincent Guittot <vincent.guittot@linaro.org>
-> > Cc: Dietmar Eggemann <dietmar.eggemann@arm.com>
-> > Cc: Steven Rostedt <rostedt@goodmis.org>
-> > Cc: Ben Segall <bsegall@google.com>
-> > Cc: Mel Gorman <mgorman@suse.de>
-> > Cc: Valentin Schneider <vschneid@redhat.com>
-> > Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> >Similar with a951bc1e6ba5 ("bonding: correct the MAC address for "follow"
+> >fail_over_mac policy"). The fail_over_mac follow mode requires the formerly
+> >active slave to swap MAC addresses with the newly active slave during
+> >failover. However, the slave's MAC address can be same under certain
+> >conditions:
+> >
+> >1) ip link set eth0 master bond0
+> >   bond0 adopts eth0's MAC address (MAC0).
+> >
+> >1) ip link set eth1 master bond0
+> >   eth1 is added as a backup with its own MAC (MAC1).
+> >
+> >3) ip link set eth0 nomaster
+> >   eth0 is released and restores its MAC (MAC0).
+> >   eth1 becomes the active slave, and bond0 assigns MAC0 to eth1.
 > 
-> I'm not a super-fan of adding more flags to 'struct task', but in this
-> specific case I agree is the better option, as otherwise we should
-> acquire the local lock for a relatively large scope - the whole packet
-> processing by nft, right?
+> 	This step leaves both the bond+eth1 and the independent eth0
+> using the same MAC address.  There is a warning printed for this, and
+> allowing the duplicated MAC address assignment has been the behavior for
+> a very long time, and to my knowledge hasn't caused issues (I presume
+> because swapping interfaces in and out of a bond willy nilly doesn't
+> happen much outside of test cases).
+
+Yes, until the NetworkManager become the default interface configuration tool
+on some release. When set a slave down, the nmcli will remove the interface
+from bond... This causes the issue to be triggered more often.
+
+> >4) ip link set eth0 master bond0
+> >   eth0 is re-added to bond0, but both eth0 and eth1 now have MAC0,
+> >   breaking the follow policy.
+> >
+> >To resolve this issue, we need to swap the new active slave’s permanent
+> >MAC address with the old one. The new active slave then uses the old
+> >dev_addr, ensuring that it matches the bond address. After the fix:
 > 
-> Still this needs some explicit ack from the relevant maintainers.
-> @Peter, @Juri, @Valentin: could you please have a look?
+> 	Which interface is the "new active" in this situation?  Adding
+> eth0 back into the bond should not cause a change of active, eth0 would
+> be added as a backup.
 
-The additional flag fills a hole, so, FWIW, I don't see particular
-problems with it.
+When do fail-over, the "new active" literally. E.g.
 
-Best,
-Juri
+> >5) ip link set bond0 type bond active_slave eth0
+> >   dev_addr is the same, swap old active eth1's MAC (MAC0) with eth0.
+> >   Swap new active eth0's permanent MAC (MAC0) to eth1.
+> >   MAC addresses remain unchanged.
 
+The new active slave is eth0 here.
+> 
+> 
+> 	So this patch's change wouldn't actually resolve the MAC
+> conflict until a failover takes place?  I.e., if we only do step 4 but
+> not step 5 or 6, eth0 and eth1 will both have the same MAC address.  Am
+> I understanding correctly?
+
+Yes, you are right. At step 4, there is no failover, so eth0 is still using
+it's own mac address. How about set the mac at enslave time, with this we
+can get correct mac directly. e.g.
+
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 950d8e4d86f8..0d4e1ddd900d 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -2120,6 +2120,24 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
+ 			slave_err(bond_dev, slave_dev, "Error %d calling set_mac_address\n", res);
+ 			goto err_restore_mtu;
+ 		}
++	} else if (bond->params.fail_over_mac == BOND_FOM_FOLLOW &&
++		   BOND_MODE(bond) == BOND_MODE_ACTIVEBACKUP &&
++		   memcmp(slave_dev->dev_addr, bond_dev->dev_addr, bond_dev->addr_len) == 0) {
++		/* Set slave to current active slave's permanent mac address to
++		 * avoid duplicate mac address.
++		 */
++		curr_active_slave = rcu_dereference(bond->curr_active_slave);
++		if (curr_active_slave) {
++			memcpy(ss.__data, curr_active_slave->perm_hwaddr,
++			       curr_active_slave->dev->addr_len);
++			ss.ss_family = slave_dev->type;
++			res = dev_set_mac_address(slave_dev, (struct sockaddr *)&ss,
++					extack);
++			if (res) {
++				slave_err(bond_dev, slave_dev, "Error %d calling set_mac_address\n", res);
++				goto err_restore_mtu;
++			}
++		}
+ 	}
+
+Thanks
+Hangbin
 
