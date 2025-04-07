@@ -1,256 +1,117 @@
-Return-Path: <netdev+bounces-179709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2342AA7E400
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 17:22:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E47F2A7E3FD
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 17:22:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38F953A4052
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 15:15:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEB073B4634
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 15:15:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F170E1FDA8E;
-	Mon,  7 Apr 2025 15:13:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46101FC0FB;
+	Mon,  7 Apr 2025 15:12:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="pfuotEMN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y/cIxNx7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C8791FCFDF
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 15:13:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37EC51FC0FC
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 15:12:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744038824; cv=none; b=J9q0PrVmtx2ldXNJcsk65MLtqQ5X8omhbgHBWf7VuKEw2bkzmDeOFELYz8WbMIIKdKpPJTIDTUEhaV5p/b+H+8yL16SqIkIwcy3V5C8EsB/4TdxgBo6eanlPt3g7/6ycoYcenLHAU9X6X2AGKRj5UW+oXQQHrj3Hstxdqhz0uEw=
+	t=1744038748; cv=none; b=RkruvwRJCX3HlSA3frStHoB8nK30+CqtA8TL/xysJd5BaVHEzAT/9oDqUvCjnjDJ1FWzECCnDjny98bbBzysfL/VkzAlYn4oppxVlUMoU6GvlR+clhqMZNgXn632SbhJlvGBOU8Pdid+IaZMUSgEt1CvlMZPhQErIDWvfIbHHdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744038824; c=relaxed/simple;
-	bh=lsN2EyijP3HY1AxRbBlStJJZbqh6xNqIM2SpDyt96Ms=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=tzNATa18W7Xz6Cefjo8TSyxFN1KiTmAO2GmHw4ph/nXbqm+w9jix3teDKjsBXCqozoSR8ue0gFa4DVINcdRRI+Sr08UCC0+Rq+s95NKo543ORRD/TXNNWlNanrUMEg7NiAmSSK5ShXMmYV9KXIu4HqSgJRk/WE4Imh/UJinFeQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=permerror (0-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=pfuotEMN; arc=none smtp.client-ip=103.168.172.150; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; arc=none smtp.client-ip=209.85.161.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-6044db4b55cso69362eaf.2
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 08:13:42 -0700 (PDT)
+	s=arc-20240116; t=1744038748; c=relaxed/simple;
+	bh=b1gI8E1E28WQecVQKN5b+DO4ZIEbl/2FOkLqdJv9i5E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IAeUYgTSTJbWuC5AV21TdddB8ZO8wfMasnZaPNBE43TIxmXvA7ClVMGwZtv2AibqGT40Jru/Qih+1QKbVuNU6siuxkQr0Q1Edg83bT5G5iQmvkB6j4/eQY9YplKI0dC3JqS9pJWq/IDvhdaRkYIfvuTuTJG8/PrAqtw7+8V/ksM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y/cIxNx7; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744038746;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+HTubAnjzZxExTxDbZU0avjG6k42VOFqyditg+d66wE=;
+	b=Y/cIxNx7cy1naF00w2/U2Sz81cpjA7AxmViQMvdkkLO1PUvYBt6MGd6QhKT3G3fejDSVSs
+	9UAgvDz9rKugJ8HYSE6UUGV7+vRlyE+xTmXNgRSncITyBVpWi/j5K65MNyBBNgSKxnds9v
+	zU6c2bbd4u/TxwbMsOm8KLaYeBRzh7E=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-645-6H0iXdZqOIS5BXDRzZ0UoA-1; Mon, 07 Apr 2025 11:12:24 -0400
+X-MC-Unique: 6H0iXdZqOIS5BXDRzZ0UoA-1
+X-Mimecast-MFC-AGG-ID: 6H0iXdZqOIS5BXDRzZ0UoA_1744038743
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43d007b2c79so34918965e9.2
+        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 08:12:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744038822; x=1744643622;
-        h=content-disposition:mime-version:list-unsubscribe:list-subscribe
-         :list-id:precedence:feedback-id:dkim-signature:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=StRwAH3c5JQCYa2goJM8UKgAcNvBV16cvxplwCXxZt8=;
-        b=kCfLQLmWfXHG9OgquOy2jjG+K09l3BaqEP7Es2fGZCq57L2ONFraTn4bnH6sJNcWfX
-         iPCy1uLeUbUxYIKSQ2foxAuxEKVmP9h4bGx4re16lsTSs08DaxIT6ORtITGSUjXeWFo3
-         fLDvfgfJpVUhx8Hk6RfVCgl9RJHLzhTA9mfmpEnVOKAWqK52XEBT1ZTXwYc1HnPDZSiE
-         g3KqZYXlJulgmObwRaLJbJsYMYuSXh9r59X6ERIgq+KV9+EtzXGIZ+cIH39/lXOoqeNY
-         sDd8PoSUQoFjT4sehOA+G7TLp6HVmnZ6GalEARJz75UVOE7M3VdeskTFeN29ar1eof58
-         Df6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXvFe2v6O6JjJlA85jsRmBSOBqKnUG458Z3M4a7B+d2OiuXoV6kEnKG4H9tVp4J3YQc6tlYbc0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpIXqjRARzjcqNO9HsbM4a96oV/k6Uyk36Yh7nP0+ibBiP0oAH
-	2PUYBhL0Mxeq0Mx/OtEldp0rgv2b4C0WVnCAyFTvojL78eDPmB244G1noudcJKkFFlGO/39gQnm
-	FrxQ9HUCKuj9jTf0nYEOl0B3bCqkm4K0+ntWVsOL6wak=
-X-Gm-Gg: ASbGncvgwjEmU3D8od9XrB2SX8YRA9dUUudqdbJ6ijs8p3CxeGsd2cI5kjh+MUQodFa
-	N+DV6anuCFJRDUaDKBiOtE6O/k2iD8TgGyWXOAw6/4K6szPJwxu77UXxwTVWIkLMdRs/ILLgEN9
-	tewIjEGxOBteWpiZG/++QK0EUjZkzEyHArfG+bV5kCuSoow9ytL5s75fKMTIlxrPInt6qFXXSGn
-	LmETt/8/apra7gk2PG3bZXq8cMJVintJMI7Bq4LxtTza25Xg+qdymxGy65b1JMg55PTwDjxwRL9
-	7CVRS5Vpu6I0BFLrs+8Vt906cPxlqYi2ekoSa1F1DTMXlv2y/Pd40Cg8c0Tj/h9e89WoL64ehH+
-	/7VCMBxbpqn0RJLQ7SABS0WiZ8SFMQtBk+g==
-X-Google-Smtp-Source: AGHT+IENy1PaEbjydVQw2hFrYJaoXxcnR0VygJ8u5NhF43vHUzkquVOFwMqpKSaLQd1mMJnVPKnETg==
-X-Received: by 2002:a4a:e913:0:b0:603:f973:1b6 with SMTP id 006d021491bc7-6041660fab0mr6271811eaf.5.1744038822076;
-        Mon, 07 Apr 2025 08:13:42 -0700 (PDT)
-Received: from localhost.localdomain ([192.19.224.250])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6040c5ac538sm1785927eaf.33.2025.04.07.08.13.40
+        d=1e100.net; s=20230601; t=1744038743; x=1744643543;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+HTubAnjzZxExTxDbZU0avjG6k42VOFqyditg+d66wE=;
+        b=nyd0puwZHlLEZJ4+TatJFzAqORxQq7JjAZfhJGcstVxQGqNK4c4AsaWZWTBt0b7a4d
+         OzL9lGs5opuSnERiznPSSMdKJm4GNZSyIIVXmXpKpj+TjTCKS7UA1Kevv/8NOK9BCARe
+         xfsQoYJTmupKpyHBO6ap7SCAi7VO/DZf8d6vJGXWnCurhwzItr7e/VaeuzIafEsquGaU
+         hXtpjXPKJO/5QLfxAbEIjOoNdLDe1oAfJV+NHLnHSsAWCNKFxr+wUoP4tt7wU94xBgw4
+         FVllJrnXjyyvtlLetf3SVNILl8UKLN2VlA/pFgIVHhCgwBbMqOdVKSKUE6Nj4sefhorY
+         1XfA==
+X-Gm-Message-State: AOJu0YzeOJDuGQco/11wRCwPor25aTrLI8bXfttiynrnJapuu3OoLTzn
+	ThioxVxLhl7G+OQVAPEKvab9X2IvYGBQ8+dUZNrYEVru3bVdXWdSoTNc5o/tD7JpE8tts1fro/0
+	ZrnBiWrMleIz0oKVPANg5varrLxt21KokSJjC2qGfdpWNk2VC4KGKpA==
+X-Gm-Gg: ASbGncvrUa2y7dXvnHRX670GAbhFEPyl07JJQUC2im258atURobOEn130gSTqA7K6+g
+	zoldSJNw/cMzAEmvT7SBKP+hRQrXdZPOlK0WzDbEhxdZCjVkl29UUL7xrz+xcgW55ju3f1KVkHm
+	hEPLqDzzEc91WqSNJHnRkVIjX7/I0SZwaYeOD6bhP1pspaOQ4HslGzllg4Tqq9hqUHneUbqJUFb
+	V3NJ1aezOu1KFgnKtMhXopdr3aBtyucKSP8I2tuystZP7v6ciTP8yF/aQGJly8V9wHxuHABEXHQ
+	DX8=
+X-Received: by 2002:a05:600c:1e0f:b0:43c:f332:7038 with SMTP id 5b1f17b1804b1-43ee0769282mr63616675e9.21.1744038743544;
+        Mon, 07 Apr 2025 08:12:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEL1DOU6EpsA9RKpIiNPzxLNRI5vP8GcgK4J8ZHpRKGFjwW3EJ3I7RtK906PF9dzkCSyLhiWA==
+X-Received: by 2002:a05:600c:1e0f:b0:43c:f332:7038 with SMTP id 5b1f17b1804b1-43ee0769282mr63616365e9.21.1744038743170;
+        Mon, 07 Apr 2025 08:12:23 -0700 (PDT)
+Received: from debian ([2001:4649:fcb8:0:a45e:6b9:73fc:f9aa])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec34a7615sm132429945e9.9.2025.04.07.08.12.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 08:13:41 -0700 (PDT)
-From: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
-To: damodharam.ammepalli@broadcom.com,
-	Michael Chan <michael.chan@broadcom.com>
-Cc: Ido Schimmel <idosch@idosch.org>,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew@lunn.ch,
-	horms@kernel.org,
-	danieller@nvidia.com,
-	andrew.gospodarek@broadcom.com,
-	petrm@nvidia.com
-Subject: Re: [PATCH net 2/2] ethtool: cmis: use u16 for calculated read_write_len_ext
-Date: Mon,  7 Apr 2025 08:09:56 -0700
-Message-ID: <Z-6jN7aA8ZnYRH6j@shredder>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20250402183123.321036-3-michael.chan@broadcom.com>
-References: <20250402183123.321036-1-michael.chan@broadcom.com> <20250402183123.321036-3-michael.chan@broadcom.com>
-Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150]) (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits)) (No client certificate requested) by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28A2288A2 for <netdev@vger.kernel.org>; Thu,  3 Apr 2025 15:03:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45]) by mailfout.phl.internal (Postfix) with ESMTP id B3A8D13801B6; Thu,  3 Apr 2025 11:03:23 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162]) by phl-compute-05.internal (MEProxy); Thu, 03 Apr 2025 11:03:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d= messagingengine.com; h=cc:cc:content-type:content-type:date:date :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to :message-id:mime-version:references:reply-to:subject:subject:to :to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t= 1743692603; x=1743779003; bh=EQFvJwkP6VeAQja9Q6v64hTg45t1biUr7d2 vxNGzNus=; b=pfuotEMNiDFwq0qdiALf8JTr/HTzDzLyI72TSysdqQREpFNKA5W jrWWxDNzQzl8N5O7M/ap1v8hvGyLJrbRX069ltT0GQG6rqaLsrQ0MD43iCfR1ymN 6jT9oDUj4WUTg4ogGptt/wudw5URNDe+faTojWMd0M2X28K36hMwywLs6r2pCri7 k5HrQX4WWbdy2gneQ4aRVSzMgFsX2Gmuc0/zpPXBj5Gp55KjgviTTsmdFApcz85c CfToR5wLgZZMH+DagiLBfzeIr0M8xTD3QxYJf+SrxNNUuJzemA5gVpE87wyPzUeW K4kffi+TQ78I4iezsT+qK9AJFY66Eop94nQ==
-X-ME-Sender: <xms:O6PuZ1FqrycCE-lF3qv9SmObciP5RUAYRZwxsyqcNmwXMaBLYNA2tA> <xme:O6PuZ6Um1wchPOP68A7a-IqywYYD7weAbYhfCC4MTzSXazI1u0tx_U-WUhJWU7KkQ Rd-VeXnqRfNgcU>
-X-ME-Received: <xmr:O6PuZ3IK0FDXCeqljg7U6GVSCSMu1r5KVvIcYohyeXAgYcan-RA9-_X5qJr9>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddukeekkeejucetufdoteggodetrf
- dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
- pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
- gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
- vdenucfhrhhomhepkfguohcuufgthhhimhhmvghluceoihguohhstghhsehiughoshgthh
- drohhrgheqnecuggftrfgrthhtvghrnhepvddufeevkeehueegfedtvdevfefgudeifedu
- ieefgfelkeehgeelgeejjeeggefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
- hmpehmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrghdpnhgspghrtghp
- thhtohepuddvpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehmihgthhgrvghlrd
- gthhgrnhessghrohgruggtohhmrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgv
- mhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlh
- drohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghp
- thhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrh
- gvughhrghtrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghp
- thhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrnhhivghllh gvrhesnhhvihguihgrrdgtohhm
-X-ME-Proxy: <xmx:O6PuZ7FK8hP9bH9MQIyyZwyT465H_ezYg35iqoRRrf_lV1BGsWdygw> <xmx:O6PuZ7WXtMKDlwZ0SOnOa4nyy6IYxzPG42OJpsXw9I3yTh8k0g1J8Q> <xmx:O6PuZ2PS83jp7ilnToox4ph7Hklq8axxydnElKa8XJ6BACVqE9eMRg> <xmx:O6PuZ60Xt851v2eQeSjoIozLYxunN72p5UQaBnfqhLYd6P09oS5NKw> <xmx:O6PuZ1s3yB1fqXEYeTFr0yuGLJ2byCN7MfowyFWafhw5nvEqIapokFfi>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu, 3 Apr 2025 11:03:22 -0400 (EDT)
-Precedence: bulk
+        Mon, 07 Apr 2025 08:12:22 -0700 (PDT)
+Date: Mon, 7 Apr 2025 17:12:19 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, pabeni@redhat.com,
+	edumazet@google.com, dsahern@kernel.org, horms@kernel.org,
+	stfomichev@gmail.com
+Subject: Re: [PATCH net 0/2] ipv6: Multipath routing fixes
+Message-ID: <Z/PrU2D8pZrJDn9b@debian>
+References: <20250402114224.293392-1-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20250402114224.293392-1-idosch@nvidia.com>
 
-From: Ido Schimmel <idosch@idosch.org>
+On Wed, Apr 02, 2025 at 02:42:22PM +0300, Ido Schimmel wrote:
+> This patchset contains two fixes for IPv6 multipath routing. See the
+> commit messages for more details.
 
-Adding Petr given Danielle is away
+Thanks for fixing this Ido! I've sucessfully tested the patches
+(although it's too late for a Tested-by tag).
 
-On Wed, Apr 02, 2025 at 11:31:23AM -0700, Michael Chan wrote:
-> From: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
+> Ido Schimmel (2):
+>   ipv6: Start path selection from the first nexthop
+>   ipv6: Do not consider link down nexthops in path selection
 > 
-> For EPL (Extended Payload), the maximum calculated size returned by
-> ethtool_cmis_get_max_epl_size() is 2048, so the read_write_len_ext
-> field in struct ethtool_cmis_cdb_cmd_args needs to be changed to u16
-> to hold the value.
+>  net/ipv6/route.c | 42 ++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 38 insertions(+), 4 deletions(-)
 > 
-> To avoid confusion with other u8 read_write_len_ext fields defined
-> by the CMIS spec, change the field name to calc_read_write_len_ext.
-> 
-> Without this change, module flashing can fail:
-> 
-> Transceiver module firmware flashing started for device enp177s0np0
-> Transceiver module firmware flashing in progress for device enp177s0np0
-> Progress: 0%
-> Transceiver module firmware flashing encountered an error for device enp177s0np0
-> Status message: Write FW block EPL command failed, LPL length is longer
-> 	than CDB read write length extension allows.
-> 
-> Fixes: a39c84d79625 ("ethtool: cmis_cdb: Add a layer for supporting CDB commands)
-> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-> Signed-off-by: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
-> ---
->  net/ethtool/cmis.h     | 7 ++++---
->  net/ethtool/cmis_cdb.c | 8 ++++----
->  2 files changed, 8 insertions(+), 7 deletions(-)
-> 
-> diff --git a/net/ethtool/cmis.h b/net/ethtool/cmis.h
-> index 1e790413db0e..51f5d5439e2a 100644
-> --- a/net/ethtool/cmis.h
-> +++ b/net/ethtool/cmis.h
-> @@ -63,8 +63,9 @@ struct ethtool_cmis_cdb_request {
->   * struct ethtool_cmis_cdb_cmd_args - CDB commands execution arguments
->   * @req: CDB command fields as described in the CMIS standard.
->   * @max_duration: Maximum duration time for command completion in msec.
-> - * @read_write_len_ext: Allowable additional number of byte octets to the LPL
-> - *			in a READ or a WRITE commands.
-> + * @calc_read_write_len_ext: Calculated allowable additional number of byte
-> + *			     octets to the LPL or EPL in a READ or WRITE CDB
-> + *			     command.
->   * @msleep_pre_rpl: Waiting time before checking reply in msec.
->   * @rpl_exp_len: Expected reply length in bytes.
->   * @flags: Validation flags for CDB commands.
-> @@ -73,7 +74,7 @@ struct ethtool_cmis_cdb_request {
->  struct ethtool_cmis_cdb_cmd_args {
->  	struct ethtool_cmis_cdb_request req;
->  	u16				max_duration;
-> -	u8				read_write_len_ext;
-> +	u16				calc_read_write_len_ext;
->  	u8				msleep_pre_rpl;
->  	u8                              rpl_exp_len;
->  	u8				flags;
-> diff --git a/net/ethtool/cmis_cdb.c b/net/ethtool/cmis_cdb.c
-> index dba3aa909a95..1f487e1a6347 100644
-> --- a/net/ethtool/cmis_cdb.c
-> +++ b/net/ethtool/cmis_cdb.c
-> @@ -35,13 +35,13 @@ void ethtool_cmis_cdb_compose_args(struct ethtool_cmis_cdb_cmd_args *args,
->  	args->req.lpl_len = lpl_len;
->  	if (lpl) {
->  		memcpy(args->req.payload, lpl, args->req.lpl_len);
-> -		args->read_write_len_ext =
-> +		args->calc_read_write_len_ext =
->  			ethtool_cmis_get_max_lpl_size(read_write_len_ext);
->  	}
->  	if (epl) {
->  		args->req.epl_len = cpu_to_be16(epl_len);
->  		args->req.epl = epl;
-> -		args->read_write_len_ext =
-> +		args->calc_read_write_len_ext =
->  			ethtool_cmis_get_max_epl_size(read_write_len_ext);
-
-AFAIU, a size larger than a page (128 bytes) is only useful when auto
-paging is supported which is something the kernel doesn't currently
-support. Therefore, I think it's misleading to initialize this field to
-a value larger than 128.
-
-How about deleting ethtool_cmis_get_max_epl_size() and moving the
-initialization of 'args->read_write_len_ext' outside of the if block as
-it was before 9a3b0d078bd82?
-
->  	}
->  
-> @@ -590,7 +590,7 @@ ethtool_cmis_cdb_execute_epl_cmd(struct net_device *dev,
->  			space_left = CMIS_CDB_EPL_FW_BLOCK_OFFSET_END - offset + 1;
->  			bytes_to_write = min_t(u16, bytes_left,
->  					       min_t(u16, space_left,
-> -						     args->read_write_len_ext));
-> +						     args->calc_read_write_len_ext));
->  
->  			err = __ethtool_cmis_cdb_execute_cmd(dev, page_data,
->  							     page, offset,
-> @@ -631,7 +631,7 @@ int ethtool_cmis_cdb_execute_cmd(struct net_device *dev,
->  				       offsetof(struct ethtool_cmis_cdb_request,
->  						epl));
->  
-> -	if (args->req.lpl_len > args->read_write_len_ext) {
-> +	if (args->req.lpl_len > args->calc_read_write_len_ext) {
->  		args->err_msg = "LPL length is longer than CDB read write length extension allows";
->  		return -EINVAL;
->  	}
 > -- 
-> 2.30.1
+> 2.49.0
 > 
-> 
 
-This module supports AutoPaging, 255 read_write_len_ext and EPL write mechanism.
-This advertised 0xff (byte2) calculates the args->read_write_len_ext
-to 2048B, which needs u16.
-Hexdump: cmis_cdb_advert_rpl
-Off 0x00 :77 ff 1f 80
-
-With your suggested change, ethtool_cmis_cdb_execute_epl_cmd() is skipped
-since args->req.epl_len is set to zero and download fails.
-
-
--- 
-This electronic communication and the information and any files transmitted 
-with it, or attached to it, are confidential and are intended solely for 
-the use of the individual or entity to whom it is addressed and may contain 
-information that is confidential, legally privileged, protected by privacy 
-laws, or otherwise restricted from disclosure to anyone else. If you are 
-not the intended recipient or the person responsible for delivering the 
-e-mail to the intended recipient, you are hereby notified that any use, 
-copying, distributing, dissemination, forwarding, printing, or copying of 
-this e-mail is strictly prohibited. If you received this e-mail in error, 
-please return the e-mail to the sender, delete it from your computer, and 
-destroy any printed copy of it.
 
