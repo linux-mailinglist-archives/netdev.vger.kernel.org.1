@@ -1,104 +1,112 @@
-Return-Path: <netdev+bounces-179508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9616A7D284
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 05:38:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18678A7D28F
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 05:42:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 088793AD408
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 03:37:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E075A7A1890
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 03:41:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA1F1212B35;
-	Mon,  7 Apr 2025 03:38:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HnP71YQt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D67FC217F32;
+	Mon,  7 Apr 2025 03:42:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32E9B1B042E;
-	Mon,  7 Apr 2025 03:38:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC5219C56C;
+	Mon,  7 Apr 2025 03:42:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743997089; cv=none; b=btgJsRm8pTuEHLzV4XoUuANiA58JkqLAS7FrFQ68hHyKWFC0ae9IWwC5/mljPi7lJQEwNY6f9Enc3glu1ZJhrSskqCOv+FYeW+a2O+diHs5qr0VJFOxC6ZA0YwI4hIpSgakUn7MVFGe2AkI4BLonKLXrADOpoArwlgqlz0aBxxk=
+	t=1743997358; cv=none; b=IkFsX4aVv0Dbitg8x3W5fp54Kk25xcuOzxBfoWewk5R+eVopSQy7myO4afQCMep9XwBDfSouVBbDZXhLR54EU4xhHrAJiLsIpT0A9V3f8WwluSvYnhTJ2NcZsmtqhgSPHccKuL2innJfKVVdsbfFYyff5BITT/VrYSed1pc5LCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743997089; c=relaxed/simple;
-	bh=8qencRNmZDgG+9U6EkM/h4JauXYlhWogl6srWsrJpds=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XzAi3JKONg1em5iWE+EQQTiMXLbOnUK2aZrOVHMD8mnVuogPtZw5mzd1Chduq77GDpJ+3NvY6uUmbc0HUIv3dLIXB+fief0XE1ICGJg+ytlUGPPULVxBEA3MnyR+X3LxiQyKDUtTiOBpXifO+d2DSu/fap/E8AtkyN3C9JaZhzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HnP71YQt; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1743997089; x=1775533089;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=8qencRNmZDgG+9U6EkM/h4JauXYlhWogl6srWsrJpds=;
-  b=HnP71YQtCeRk1VUQIf1ncOisAjMar9Rv2+q2yaQ+vdOr3/CL1BVNiq1B
-   wBE4rOW8QRe/uztnTHXwYuzlgU2cTjYOrd75+5RcZyGF5/475RPaNVwQG
-   35R6JDFAcs9CCBbUBSKwkZKw8C3foo6umUuZhqo1T8e2BHpCfdUSnOaSX
-   gi7kZ6vIPif+2CDfZwxmmGE1KmEjPNWJ7ZfJcK5fMfUV2RYnLKghNraEq
-   LMQk3f2kyg5S6W3RqQU3Ix+Jq+7DbiLdUaO7xJAI0lQRELo4wye9nR/Kb
-   WDizBLNamEcO/csVYff5XbVJZ0MLNw2A5vQd0rc3b/SgKKkenf72T/Gv/
-   A==;
-X-CSE-ConnectionGUID: fAKLeZv1QTiF3Iv6saXF8w==
-X-CSE-MsgGUID: NACh4JOYTxieOBvFNteCGw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11396"; a="55550554"
-X-IronPort-AV: E=Sophos;i="6.15,193,1739865600"; 
-   d="scan'208";a="55550554"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2025 20:38:08 -0700
-X-CSE-ConnectionGUID: wgUIx/3zSni/jjWHS3eELw==
-X-CSE-MsgGUID: GpfUPQYCRY6HooUPVR78XA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,193,1739865600"; 
-   d="scan'208";a="128329325"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.247.168.206]) ([10.247.168.206])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2025 20:38:01 -0700
-Message-ID: <ff11bfee-b78e-4074-8bc6-d7826ad4d8be@linux.intel.com>
-Date: Mon, 7 Apr 2025 11:37:57 +0800
+	s=arc-20240116; t=1743997358; c=relaxed/simple;
+	bh=1E4N30ToQrS4oTEuXMPktjG45U+GwxhykLqwMXbp9JU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Fg9WoG52uAor/lzC2/k94R6T4BEezL3YRFTRfSmmZfQzxC0A2xzW4oD/+NNuBTNQjQhxcbfLfx/ON9pZmvURlIZh7G9dJekQQ7NALgYQiOiupVzUqcTpfSkhbDbKoFjzVd0ytjQdisEzRqEZ86LHS0BoSBEYK6BxrSI1ae9KtG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [124.16.141.245])
+	by APP-01 (Coremail) with SMTP id qwCowADXff6XSfNni_PKBg--.48924S2;
+	Mon, 07 Apr 2025 11:42:21 +0800 (CST)
+From: Wentao Liang <vulab@iscas.ac.cn>
+To: anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wentao Liang <vulab@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] e1000e: Add error handling for e1e_rphy_locked()
+Date: Mon,  7 Apr 2025 11:41:54 +0800
+Message-ID: <20250407034155.1396-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.42.0.windows.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 7/7] irqbypass: Use xarray to track producers and
- consumers
-To: Sean Christopherson <seanjc@google.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>,
- David Matlack <dmatlack@google.com>, Like Xu <like.xu.linux@gmail.com>,
- Yong He <alexyonghe@tencent.com>
-References: <20250404211449.1443336-1-seanjc@google.com>
- <20250404211449.1443336-8-seanjc@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20250404211449.1443336-8-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowADXff6XSfNni_PKBg--.48924S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Aw18ZF1fKry5Jw48CFyDZFb_yoW8Xr1Dpa
+	1q9ayqkw4rJw4avayxGa18A3s0v3yYyrnxCFyxu3sa9w4xAw18Jr18K343XryqyrZ8JFW2
+	yF1UAFnxCFs8Z3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUB014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v26F
+	4UJVW0owAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv
+	7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r
+	1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02
+	628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14v_Gr4l42xK82IYc2Ij64
+	vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
+	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
+	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
+	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUe4SrUUUUU
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAUFA2fzOrdCVwAAsD
 
+The e1000_suspend_workarounds_ich8lan() calls e1e_rphy_locked to disable
+the SMB release, but does not check its return value. A proper
+implementation can be found in e1000_resume_workarounds_pchlan() from
+/source/drivers/net/ethernet/intel/e1000e/ich8lan.c.
 
+Add an error check for e1e_rphy_locked(). Log the error message and jump
+to 'release' label if the e1e_rphy_locked() fails.
 
-On 4/5/2025 5:14 AM, Sean Christopherson wrote:
-> Track IRQ bypass produsers and consumers using an xarray to avoid the O(2n)
-produsers -> producers
+Fixes: 2fbe4526e5aa ("e1000e: initial support for i217")
+Cc: stable@vger.kernel.org # v3.5+
+Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+---
+ drivers/net/ethernet/intel/e1000e/ich8lan.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-> insertion time associated with walking a list to check for duplicate
-> entries, and to search for an partner.
->
-> At low (tens or few hundreds) total producer/consumer counts, using a list
-> is faster due to the need to allocate backing storage for xarray.  But as
-> count creeps into the thousands, xarray wins easily, and can provide
-> several orders of magnitude better latency at high counts.  E.g. hundreds
-> of nanoseconds vs. hundreds of milliseconds.
->
-[...]
+diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.c b/drivers/net/ethernet/intel/e1000e/ich8lan.c
+index 2f9655cf5dd9..d16e3aa50809 100644
+--- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
++++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
+@@ -5497,7 +5497,11 @@ void e1000_suspend_workarounds_ich8lan(struct e1000_hw *hw)
+ 			e1e_wphy_locked(hw, I217_SxCTRL, phy_reg);
+ 
+ 			/* Disable the SMB release on LCD reset. */
+-			e1e_rphy_locked(hw, I217_MEMPWR, &phy_reg);
++			ret_val = e1e_rphy_locked(hw, I217_MEMPWR, &phy_reg);
++			if (ret_val) {
++				e_dbg("Fail to Disable the SMB release on LCD reset.");
++				goto release;
++			}
+ 			phy_reg &= ~I217_MEMPWR_DISABLE_SMB_RELEASE;
+ 			e1e_wphy_locked(hw, I217_MEMPWR, phy_reg);
+ 		}
+-- 
+2.42.0.windows.2
+
 
