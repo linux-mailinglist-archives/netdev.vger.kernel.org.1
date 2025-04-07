@@ -1,113 +1,164 @@
-Return-Path: <netdev+bounces-179873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7477BA7ECB4
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 21:23:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A22D7A7ECE6
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 21:27:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5404440910
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:17:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C3E9420ADF
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:19:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C6FC25A2A1;
-	Mon,  7 Apr 2025 18:59:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28FAB254865;
+	Mon,  7 Apr 2025 19:02:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="aSGIamiJ"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="KDfXqTAF"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540DA259C90
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 18:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBBFB254851;
+	Mon,  7 Apr 2025 19:02:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744052393; cv=none; b=svtBqn68Gh7KcP6rt+fc4PzIDDNrmJyrQ/JgkNfOMid3VLMLBV3ce0JJyDrRlLb0mMawjSiweZ7DzHQQ5TfldqIco0kfrLdEYNVtC1YkTPpNfqDGb/VR5fcwfoBRvl63JIuTZ9j0rbn17J/6q07NAYhDB3zs3UUCqSwk8hVSjqM=
+	t=1744052550; cv=none; b=rZ49V1jcVeSM/yyUDXk9bMbhapUVDqd1b3PQDbTnbvzP/FScJTlgdqQXyAxJa7aGmURh3a1VoKhgVllOqa53b8zgOWoxDgJ8njF3v51o2a5bN+yjT2NuJHZYPTPrs6Wws/SU97R3oRJrqOwt8cCfUZ0rqzZ4T8hX0U/2wrUCV2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744052393; c=relaxed/simple;
-	bh=kLCnRssc8WmKeFbm7JpTO/wcG5Hc89ZUj5kVl6Gn6s4=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=Hmt7H584fDa0GRVcBpqD53SNEIm2mN0y7oZwNYuOeAs4G4Tip9QW4OqraIknbuSvQr5MwxPVbrZBKfy8aXZstbNc0fbGenbKbLb3npNCNvkFtY2CtFLvBF+UxRtJKsjYd/hb9nDD7RV6xDbh1eEHtPcezerhUHPDZtxsgJPzYeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=aSGIamiJ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=g+gTqjr9DCh74fm5MrIN8IfG63yVQfUMTpEsACnoz9g=; b=aSGIamiJukybih316LqvTsGTCU
-	VJrvt/A8Zi349runxTQ69QaQi0QPBl4R2XSxcE7aIP+xD5O1s5Rwajkxo+EHErgJM5Iy63s2KUKmM
-	9bDd2+WP3srjq7mU2Lmxi9a57c6tQropXqxKy76NXPvRL4GWDKng97FpnMbZ7fhDeaAJq1se6+7AJ
-	xLIYV42W3RV4xvEaXvdVpUyrEa8vs4MRHegTVntemDmTkXCAlwFRivqysD9KDJ7VYU6FL0Bkj8GzR
-	WE0lGLkhEiq80lGjbyDZWRpTr+viXLhmvkbpZGECYwfVcH7+IpUBBjLMVT0C4ZCm9Rm/k+Ssudqnc
-	F8zRG/Cw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:43020 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1u1rh9-0006AU-1k;
-	Mon, 07 Apr 2025 19:59:43 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1u1rgd-0013h1-Fz; Mon, 07 Apr 2025 19:59:11 +0100
-In-Reply-To: <Z_QgOTC1hOSkIdur@shell.armlinux.org.uk>
-References: <Z_QgOTC1hOSkIdur@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jon Hunter <jonathanh@nvidia.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Thierry Reding <treding@nvidia.com>
-Subject: [PATCH net-next 5/5] net: stmmac: remove GMAC_1US_TIC_COUNTER
- definition
+	s=arc-20240116; t=1744052550; c=relaxed/simple;
+	bh=yC6QZ/8jVM9KGam6L49RetYOUxCetakx6TQbeX39JKc=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=VNMReDrugZb030ydyausKPYeNsCPWRRRQHX3q5rJMj9sEBKOLFFaCovQN1yiYsy3zff8tMEo96ugX62aeylFQ4qDV4NEFeHIyPO0q85JFWe7LJVqURPGWwYuP6oISQVHW2c+sVZtvs4yui4tgyIXxuBwsXZ7p8HOz7fyMJbc8tM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=KDfXqTAF; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1u1rjh-00Cluc-P9; Mon, 07 Apr 2025 21:02:21 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Cc:To:Message-Id:Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Subject:Date:From;
+	bh=KVp3ZQyloTuaLdQygQMAf/QKWBZdcAiGhMuu41ke8zs=; b=KDfXqTAFYtd1CycSD/yrGuxMFd
+	6keGPaUtFoWvl1mnGl64rwW2xmdVb7Jjvilc4nYtxokgHygmeNSsPOTcmRdTf0Q3+4ZvG0zOWixBt
+	4+bPlFYCbLfJiC7cKpQzmxVgaf4Ga0DBvwGTRb0zltTq14WNLfjYlxWGhTjCDs9LYFyC0ncsUSwiz
+	M4OoB89KuKrIpIxQrQKMut4BklWnSAEAhl1RHHIm8GZpikTon2f3hc1PtMcfZlZivfCxIOyqNUG9x
+	sRnGtJPf53QrRA44sjiKqF8jRKXhvRU9W5uJ0XGJldRL+doLZdtkLsPKHdTwEKrQgG2ged0FR8JWH
+	61quWWHw==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1u1rjg-0001CO-MP; Mon, 07 Apr 2025 21:02:20 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1u1rjN-009Ivh-O1; Mon, 07 Apr 2025 21:02:01 +0200
+From: Michal Luczaj <mhal@rbox.co>
+Date: Mon, 07 Apr 2025 21:01:02 +0200
+Subject: [PATCH net-next] net: Drop unused @sk of
+ __skb_try_recv_from_queue()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1u1rgd-0013h1-Fz@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Mon, 07 Apr 2025 19:59:11 +0100
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250407-cleanup-drop-param-sk-v1-1-cd076979afac@rbox.co>
+X-B4-Tracking: v=1; b=H4sIAO0g9GcC/x3MQQqDMBBA0avIrDuQhkTQq5QuQjLq0DqGiZaAe
+ PcGl2/x/wmFlKnA2J2g9OPCmzQ8Hx3EJchMyKkZrLHeONNj/FKQI2PSLWMOGlYsHxyi9a53yQ/
+ RQ2uz0sT1/r5AaEehusP7uv69hwFQcQAAAA==
+X-Change-ID: 20250406-cleanup-drop-param-sk-9c25464d59c5
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Michal Luczaj <mhal@rbox.co>
+X-Mailer: b4 0.14.2
 
-GMAC_1US_TIC_COUNTER is now no longer used, so remove the definition.
-This was duplicated by GMAC4_MAC_ONEUS_TIC_COUNTER further down in the
-same file.
+__skb_try_recv_from_queue() deals with a queue, @sk is never used.
+Remove sk from function parameters, adapt callers.
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+No functional change intended.
+
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac4.h | 1 -
- 1 file changed, 1 deletion(-)
+ include/linux/skbuff.h | 3 +--
+ net/core/datagram.c    | 5 ++---
+ net/ipv4/udp.c         | 8 ++++----
+ 3 files changed, 7 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4.h b/drivers/net/ethernet/stmicro/stmmac/dwmac4.h
-index 42fe29a4e300..5f387ec27c8c 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac4.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4.h
-@@ -31,7 +31,6 @@
- #define GMAC_RXQ_CTRL3			0x000000ac
- #define GMAC_INT_STATUS			0x000000b0
- #define GMAC_INT_EN			0x000000b4
--#define GMAC_1US_TIC_COUNTER		0x000000dc
- #define GMAC_PCS_BASE			0x000000e0
- #define GMAC_PHYIF_CONTROL_STATUS	0x000000f8
- #define GMAC_PMT			0x000000c0
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index b974a277975a8a7b6f40c362542e9e8522539009..f1381aff0f896220b2b6bc706aaca17b8f28fd8b 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -4105,8 +4105,7 @@ static inline void skb_frag_list_init(struct sk_buff *skb)
+ int __skb_wait_for_more_packets(struct sock *sk, struct sk_buff_head *queue,
+ 				int *err, long *timeo_p,
+ 				const struct sk_buff *skb);
+-struct sk_buff *__skb_try_recv_from_queue(struct sock *sk,
+-					  struct sk_buff_head *queue,
++struct sk_buff *__skb_try_recv_from_queue(struct sk_buff_head *queue,
+ 					  unsigned int flags,
+ 					  int *off, int *err,
+ 					  struct sk_buff **last);
+diff --git a/net/core/datagram.c b/net/core/datagram.c
+index f0693707aece46bb5ffd2143a0773d54c234999c..f0634f0cb8346d69923f65183dbdf000b6993cf9 100644
+--- a/net/core/datagram.c
++++ b/net/core/datagram.c
+@@ -163,8 +163,7 @@ static struct sk_buff *skb_set_peeked(struct sk_buff *skb)
+ 	return skb;
+ }
+ 
+-struct sk_buff *__skb_try_recv_from_queue(struct sock *sk,
+-					  struct sk_buff_head *queue,
++struct sk_buff *__skb_try_recv_from_queue(struct sk_buff_head *queue,
+ 					  unsigned int flags,
+ 					  int *off, int *err,
+ 					  struct sk_buff **last)
+@@ -261,7 +260,7 @@ struct sk_buff *__skb_try_recv_datagram(struct sock *sk,
+ 		 * However, this function was correct in any case. 8)
+ 		 */
+ 		spin_lock_irqsave(&queue->lock, cpu_flags);
+-		skb = __skb_try_recv_from_queue(sk, queue, flags, off, &error,
++		skb = __skb_try_recv_from_queue(queue, flags, off, &error,
+ 						last);
+ 		spin_unlock_irqrestore(&queue->lock, cpu_flags);
+ 		if (error)
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 2742cc7602bb58535e8ef217d9ffc3fea7ff9297..1696cc5a2dcdc4f9c40c65b4d61c722a1cd9ca9a 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -1942,8 +1942,8 @@ struct sk_buff *__skb_recv_udp(struct sock *sk, unsigned int flags,
+ 		error = -EAGAIN;
+ 		do {
+ 			spin_lock_bh(&queue->lock);
+-			skb = __skb_try_recv_from_queue(sk, queue, flags, off,
+-							err, &last);
++			skb = __skb_try_recv_from_queue(queue, flags, off, err,
++							&last);
+ 			if (skb) {
+ 				if (!(flags & MSG_PEEK))
+ 					udp_skb_destructor(sk, skb);
+@@ -1964,8 +1964,8 @@ struct sk_buff *__skb_recv_udp(struct sock *sk, unsigned int flags,
+ 			spin_lock(&sk_queue->lock);
+ 			skb_queue_splice_tail_init(sk_queue, queue);
+ 
+-			skb = __skb_try_recv_from_queue(sk, queue, flags, off,
+-							err, &last);
++			skb = __skb_try_recv_from_queue(queue, flags, off, err,
++							&last);
+ 			if (skb && !(flags & MSG_PEEK))
+ 				udp_skb_dtor_locked(sk, skb);
+ 			spin_unlock(&sk_queue->lock);
+
+---
+base-commit: 61f96e684edd28ca40555ec49ea1555df31ba619
+change-id: 20250406-cleanup-drop-param-sk-9c25464d59c5
+
+Best regards,
 -- 
-2.30.2
+Michal Luczaj <mhal@rbox.co>
 
 
