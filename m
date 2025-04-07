@@ -1,112 +1,115 @@
-Return-Path: <netdev+bounces-179509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18678A7D28F
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 05:42:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA403A7D397
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 07:32:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E075A7A1890
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 03:41:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9D72188A1F1
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 05:32:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D67FC217F32;
-	Mon,  7 Apr 2025 03:42:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A57271C6B4;
+	Mon,  7 Apr 2025 05:32:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CN91DojN"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC5219C56C;
-	Mon,  7 Apr 2025 03:42:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A70A81917ED
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 05:32:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743997358; cv=none; b=IkFsX4aVv0Dbitg8x3W5fp54Kk25xcuOzxBfoWewk5R+eVopSQy7myO4afQCMep9XwBDfSouVBbDZXhLR54EU4xhHrAJiLsIpT0A9V3f8WwluSvYnhTJ2NcZsmtqhgSPHccKuL2innJfKVVdsbfFYyff5BITT/VrYSed1pc5LCk=
+	t=1744003954; cv=none; b=eZMENryj8YlCbF6hHSqDW/0sNd/TcfgKATq1FDdeEnt2rC4nFzp0gD7U+DBDAlqYldXaVF4t7BW9W1IjUWCOhRVn3mOyM7+/AstT/LBiRQgVTjPwxCbUt6JePArPLATaD579l7zXraS0wGEsXF2V/c23a/pfgYxkIue7H1FyoEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743997358; c=relaxed/simple;
-	bh=1E4N30ToQrS4oTEuXMPktjG45U+GwxhykLqwMXbp9JU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Fg9WoG52uAor/lzC2/k94R6T4BEezL3YRFTRfSmmZfQzxC0A2xzW4oD/+NNuBTNQjQhxcbfLfx/ON9pZmvURlIZh7G9dJekQQ7NALgYQiOiupVzUqcTpfSkhbDbKoFjzVd0ytjQdisEzRqEZ86LHS0BoSBEYK6BxrSI1ae9KtG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [124.16.141.245])
-	by APP-01 (Coremail) with SMTP id qwCowADXff6XSfNni_PKBg--.48924S2;
-	Mon, 07 Apr 2025 11:42:21 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] e1000e: Add error handling for e1e_rphy_locked()
-Date: Mon,  7 Apr 2025 11:41:54 +0800
-Message-ID: <20250407034155.1396-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.42.0.windows.2
+	s=arc-20240116; t=1744003954; c=relaxed/simple;
+	bh=SvWZSIdBh5TXMw/vt87mngeXTI1OswjOy822p3sHzL8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P6spL2TGLBu+T59OiL1Ym8NGE0UUFsH2m6hax3dunxRyO8nyKV2T9dGhO1yFnj/quLYc/i30dipupGIvyZJeyj7dzAbuY9QjxJ3ufeMjtT4fVzpOebebz/IVcAKjXSpYab8tB8uVf2Q5QAvcuh9YKSwZ7oVNdocAVev1/8RRjOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CN91DojN; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744003953; x=1775539953;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=SvWZSIdBh5TXMw/vt87mngeXTI1OswjOy822p3sHzL8=;
+  b=CN91DojN0SHWoqhggE1INqNjh+lDPpt2BFHcKFP92w2NBQWSNTxT4w9q
+   upfOrULH5OKEIuTuJsdvZVcspOK3jJeg3+bNnJ6CDnJj2X7f8wnAYZGZu
+   3LPx54N+dUDoD/3uaqaWcAA6N9GUupC2bDPSNtAVBpabM/TEMQnEMffhk
+   2XHbpMHl84sM8gaubhVjeXnT/kPvx8pumWD+GDE9zYYJwHoxMiMnGvUjv
+   6sldZjE0M6A+MZuZH9GM53iQA8AqyIz3WogFUlYF3BaNjTnz03wWNzPXo
+   9UsvhKv7sgLnQi2oHQm5RyYUqfnRnkzbAWSP7en8/Y3pzdVPcwxbuBMwU
+   g==;
+X-CSE-ConnectionGUID: rbjcfjLvSxG8s+u4Owit2Q==
+X-CSE-MsgGUID: 6MKoYFbkSDSSEhsy0NIL4Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11396"; a="62768714"
+X-IronPort-AV: E=Sophos;i="6.15,193,1739865600"; 
+   d="scan'208";a="62768714"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2025 22:32:31 -0700
+X-CSE-ConnectionGUID: 2pMjjKUeT5mlwqz5Bz69gA==
+X-CSE-MsgGUID: S8sW/wFjTgK6PRYICEb7eA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,193,1739865600"; 
+   d="scan'208";a="132993676"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Apr 2025 22:32:28 -0700
+Date: Mon, 7 Apr 2025 07:32:13 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Chenyuan Yang <chenyuan0y@gmail.com>
+Cc: jiawenwu@trustnetic.com, mengyuanlou@net-swift.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	jdamato@fastly.com, duanqiangwen@net-swift.com, dlemoal@kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH] net: libwx: handle page_pool_dev_alloc_pages error
+Message-ID: <Z/NjXSRVFp9c/XmQ@mev-dev.igk.intel.com>
+References: <20250406192351.3850007-1-chenyuan0y@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowADXff6XSfNni_PKBg--.48924S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Aw18ZF1fKry5Jw48CFyDZFb_yoW8Xr1Dpa
-	1q9ayqkw4rJw4avayxGa18A3s0v3yYyrnxCFyxu3sa9w4xAw18Jr18K343XryqyrZ8JFW2
-	yF1UAFnxCFs8Z3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUB014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v26F
-	4UJVW0owAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv
-	7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r
-	1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02
-	628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14v_Gr4l42xK82IYc2Ij64
-	vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
-	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUe4SrUUUUU
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiDAUFA2fzOrdCVwAAsD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250406192351.3850007-1-chenyuan0y@gmail.com>
 
-The e1000_suspend_workarounds_ich8lan() calls e1e_rphy_locked to disable
-the SMB release, but does not check its return value. A proper
-implementation can be found in e1000_resume_workarounds_pchlan() from
-/source/drivers/net/ethernet/intel/e1000e/ich8lan.c.
+On Sun, Apr 06, 2025 at 02:23:51PM -0500, Chenyuan Yang wrote:
+> page_pool_dev_alloc_pages could return NULL. There was a WARN_ON(!page)
+> but it would still proceed to use the NULL pointer and then crash.
+> 
+> This is similar to commit 001ba0902046
+> ("net: fec: handle page_pool_dev_alloc_pages error").
+> 
+> Signed-off-by: Chenyuan Yang <chenyuan0y@gmail.com>
+> ---
+>  drivers/net/ethernet/wangxun/libwx/wx_lib.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+> index 00b0b318df27..d567443b1b20 100644
+> --- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+> +++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
+> @@ -310,7 +310,8 @@ static bool wx_alloc_mapped_page(struct wx_ring *rx_ring,
+>  		return true;
+>  
+>  	page = page_pool_dev_alloc_pages(rx_ring->page_pool);
+> -	WARN_ON(!page);
+> +	if (unlikely(!page))
+> +		return false;
+>  	dma = page_pool_get_dma_addr(page);
+>  
+>  	bi->page_dma = dma;
 
-Add an error check for e1e_rphy_locked(). Log the error message and jump
-to 'release' label if the e1e_rphy_locked() fails.
+Thanks for fixing, it is fine, however you need to add fixes tag.
+Probably:
+Fixes: 3c47e8ae113a ("net: libwx: Support to receive packets in NAPI")
 
-Fixes: 2fbe4526e5aa ("e1000e: initial support for i217")
-Cc: stable@vger.kernel.org # v3.5+
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
- drivers/net/ethernet/intel/e1000e/ich8lan.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.c b/drivers/net/ethernet/intel/e1000e/ich8lan.c
-index 2f9655cf5dd9..d16e3aa50809 100644
---- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
-+++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
-@@ -5497,7 +5497,11 @@ void e1000_suspend_workarounds_ich8lan(struct e1000_hw *hw)
- 			e1e_wphy_locked(hw, I217_SxCTRL, phy_reg);
- 
- 			/* Disable the SMB release on LCD reset. */
--			e1e_rphy_locked(hw, I217_MEMPWR, &phy_reg);
-+			ret_val = e1e_rphy_locked(hw, I217_MEMPWR, &phy_reg);
-+			if (ret_val) {
-+				e_dbg("Fail to Disable the SMB release on LCD reset.");
-+				goto release;
-+			}
- 			phy_reg &= ~I217_MEMPWR_DISABLE_SMB_RELEASE;
- 			e1e_wphy_locked(hw, I217_MEMPWR, phy_reg);
- 		}
--- 
-2.42.0.windows.2
-
+> -- 
+> 2.34.1
 
