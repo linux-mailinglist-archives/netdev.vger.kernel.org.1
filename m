@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-179937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CBAEA7EF2E
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 22:24:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBF9DA7EF34
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 22:25:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6772F188AC0B
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 20:24:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 118037A6299
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 20:23:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F05221D86;
-	Mon,  7 Apr 2025 20:24:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8807C221DB0;
+	Mon,  7 Apr 2025 20:24:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T57ti7Us"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tAc6d0eN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EECE21ABD4
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 20:24:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF3721C16B
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 20:24:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744057470; cv=none; b=pCLDWRZVhW6gWAmUpgZxiNDvLG0jNYMDbSseMsUeIEsF+AUTbioHCvSk0oXHqKboDzYyACRA2JJr9OgRDXa4GY15LA9u6Xb150l7sJMxwOuCPMU9YA0mRDfJNUPmlyGGquJ4Bpvihdo/vrI52FFvMsvvlCAgBdxplrMfeWUH8Z0=
+	t=1744057471; cv=none; b=hPBP0s5M5kuYEOEvcKmsjVW7JPj26PWU2mm04P4fl1JmRNHTgxorrZLLGrLhHNuCeD9/0tm8YENDeSMVgSreJaWG/fmFUrygmmTrUKHNA4wXKO4XFNs++jZfGFw26KLCw3GQ9Qx8InvBfE99vzchhuDaVz3h11DBqGvQ7fJkigU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744057470; c=relaxed/simple;
-	bh=so/FIl3m4zGJkUxqfC8y7RpQ+3s0umMeYYytoKT3a38=;
+	s=arc-20240116; t=1744057471; c=relaxed/simple;
+	bh=Rx70mTC5jrBBGiSG4IDZvWC3O4JrT+23oii0mRg93CM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=R1FSpGZd4tUXACoQb6G8n6FQOuMJuM3G8U0YxJ/Fmexo6+MkM/fKDbYYg1Uip7cy8VC2jMMOrzZNWKQxieCbwvHTH4kcPXpzWLvxCiXC6J49YCzxi3ZGUl4Uv6AQZmTTuTtnkaJweX6Zgi4409L6KXpNxRDTwjpEq7HeoF0+a/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tavip.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T57ti7Us; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=WP6vWuHoc1FqmxGwSG+g+J18gP+c/hTabVHVJVcCz3SYx/bMT24Hu1zUQYdQWYQynXoG5FolaMpKHg2eyBadGL/96b+fXKrsyBHzM+s/X5TRMwa5sntei25JMzv7sZoDRtKTHgCwYKpriK2lH2kHJtjnlJ0kH8mxfuvvGK/ym/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tavip.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tAc6d0eN; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tavip.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-73691c75863so6123222b3a.0
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 13:24:28 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-736c135f695so3547756b3a.0
+        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 13:24:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744057468; x=1744662268; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1744057469; x=1744662269; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=z3zdYEN3GupTQqYb3MoxUmEoHfApnc7WRa+fBMJu3jg=;
-        b=T57ti7UsI5tTXW1NvF4Vu4UmO3S96417R+HGbs49UEFJ4ljJUoA/IM3wyhLDKrVL79
-         +I7eJzSKq33I3goV0AVPgHImw+nsbkyvHYjGbQtDQcFTI2eQxvc5YlT3iCzZq/mmQck4
-         qmtXhT41OxqXJxp15wrDDc7wtE0XMDIqRiuHy3Cutge3p571+SigSAljpNKsYF/baHjC
-         Mh8WGP9lyh/oCTPD7jdrbJEBLyik9rK4CHdvs/pNfCjkNk2DYl8/FvtRISho3PRUETFE
-         U23UlkqOA7JnCvoDTlqUoHdXUv5b8APba4K0UXcBHN56x0IgN1/OjE5aOOBK9eKovuNV
-         SftA==
+        bh=oRmuKCfNcw+sTdkZorrOGMbmyOqx4vxcFhDxrHL5UaE=;
+        b=tAc6d0eN5U45s415gsI40OpBJS5+qWkwLCOepPnKBwRPswTgOZUk3O0WJ/GGDe983O
+         GD2VgURUf1aRYvWRf5I+uEtumQD4j65p5N79KKRqVyFWsSndVTbuDqyNHc9pHciaPZHN
+         piQdaIak11B4thr/PAcok8wkrFL/uHQhDslnR7/hAbk/qk2aiTEDtMqUQzcsiW9GmA9x
+         iTITMmqwKHk82vo94Bzuf/Y6QUBpKutZsjVi+0de/BGAMTWWWErw1jLsKmHHzsCaufbG
+         DEZzwduh0Nu+ewhxSPplL1CUwXJFlq/vSUwd1it4CEFyMbZtMBul9jjFttoB6zt91ndE
+         fpcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744057468; x=1744662268;
+        d=1e100.net; s=20230601; t=1744057469; x=1744662269;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z3zdYEN3GupTQqYb3MoxUmEoHfApnc7WRa+fBMJu3jg=;
-        b=cYotGRAaZF9Kzc6oU3pNhgvJWmqRIDRoryfAf06R9djxr/LI9yCoM/WWBotwGM+3ZB
-         J2xPwbvNq/Bsrnl9f0IMZIVRGXuCkL690T9v9QQPKQy4xHFJoWpAwrUMRwPrGhQe0rhp
-         FVxy9CUjoPPzyyjPnWKDCsOqbc1ELl6E2Cw/UJXceScEJ6Cjw5a6yByjLmENw/vXNGW6
-         ho1SqLlFPhSvXJrCAgsBu5O0MsS4qZRtkp7jNJ+HYgfOcO/hIPnIbAxarqzGjPG3Biwm
-         SGdYlSg3+CNlnY56EvTj5xLO8e9ZR2vqCwliOJLXgBC9qxB666eBwdJtGlA0886VNwnL
-         +raQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUG9fc1RviYDoomNHqE4assFgxs4ccExV2HtwiMDtbxqfTKofHjOLWZxoO7ESmubhal4bpD9lE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgbK6XB4riHj+Wd+8jmcYuqkiNmVK+W+T+9zF13Qij5+vtq0y8
-	IrkIDNjyLeiaWtQBvZWPML94dXnkLpyC8tuZ0ZLXyo0Af+eTizFf68bGRvnogHbJud+1tzYS4g=
+        bh=oRmuKCfNcw+sTdkZorrOGMbmyOqx4vxcFhDxrHL5UaE=;
+        b=cmkdFyJoVtTQ86E8bRmuPXHbUcK50kRbb4DNu5ScCmRUPZyzGuGtBUzUcLQyGfbc8M
+         S3/1Cz3pc/0hMeuOcG0+cBCOoXtmXCPVtEBa2ImMT77fuNa2A4k4zXrQG69Z+KbXCXO8
+         kPlgeWweVx+fQGdraQlMD5mRq4FxN/JLCbHhq8oBmLHzbEDBAPI/UPfWw8NidAsMbC9E
+         F2HKri5/G+hzEmq7JxXr8a7E7CBg3JSznLhiMjjWbgTuj93dsfyuRyhfJDowDtUbV0op
+         2LDQvPLYsSQIY0YUuUD8nYUAlSr+1dRKl52cf744Z2n0dAS16hzNOmPhUB6KAOsrPDcq
+         Xkaw==
+X-Forwarded-Encrypted: i=1; AJvYcCVPG2OOxVQi1+yfJ4r3OWz4tB44VMMMGeAe02SN/pBoGmB1g8I82iHjNqWWdQplgkug/NCIKcA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdcTD4uIG0Nwy2t89OcGteVV8zmWt89Q/1XrbUqaJjbl0+yUny
+	VrJZMm4XCNjayKupVZPocvkpsNlvh+0w/9IwgGtfyMIPq/uPu7oL/0JzM0/nM2nbuJXZzkfapw=
 	=
-X-Google-Smtp-Source: AGHT+IESesL/rXojDRtCr23ih8PeGR5Ul7Az1lhsb+Tjn/k8ZtBRDnIUV3VPK9+IXw2XlP4Ahn3Anzj/VA==
-X-Received: from pflb6.prod.google.com ([2002:a05:6a00:a86:b0:730:7485:6b59])
- (user=tavip job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:179b:b0:736:baa0:2acd
- with SMTP id d2e1a72fcca58-739e7156defmr20051690b3a.20.1744057467930; Mon, 07
- Apr 2025 13:24:27 -0700 (PDT)
-Date: Mon,  7 Apr 2025 13:24:08 -0700
+X-Google-Smtp-Source: AGHT+IH3nFRPIVlql3zijdnAHVFc2+NFbmwhZeb0y6aE45Wdb1wmkVaAr4XinSHW4b5Gb2P7cdUp+3I4cQ==
+X-Received: from pfbdr9.prod.google.com ([2002:a05:6a00:4a89:b0:737:6e43:8e34])
+ (user=tavip job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:2e14:b0:736:4bd3:ffab
+ with SMTP id d2e1a72fcca58-739e4be89demr13941563b3a.17.1744057469335; Mon, 07
+ Apr 2025 13:24:29 -0700 (PDT)
+Date: Mon,  7 Apr 2025 13:24:09 -0700
 In-Reply-To: <20250407202409.4036738-1-tavip@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,86 +74,76 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250407202409.4036738-1-tavip@google.com>
 X-Mailer: git-send-email 2.49.0.504.g3bcea36a83-goog
-Message-ID: <20250407202409.4036738-3-tavip@google.com>
-Subject: [PATCH net v3 2/3] net_sched: sch_sfq: move the limit validation
+Message-ID: <20250407202409.4036738-4-tavip@google.com>
+Subject: [PATCH net v3 3/3] selftests/tc-testing: sfq: check that a derived
+ limit of 1 is rejected
 From: Octavian Purdila <tavip@google.com>
 To: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
 	pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, netdev@vger.kernel.org, 
-	Octavian Purdila <tavip@google.com>, syzbot <syzkaller@googlegroups.com>
+	Octavian Purdila <tavip@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-It is not sufficient to directly validate the limit on the data that
-the user passes as it can be updated based on how the other parameters
-are changed.
+Because the limit is updated indirectly when other parameters are
+updated, there are cases where even though the user requests a limit
+of 2 it can actually be set to 1.
 
-Move the check at the end of the configuration update process to also
-catch scenarios where the limit is indirectly updated, for example
-with the following configurations:
+Add the following test cases to check that the kernel rejects them:
+- limit 2 depth 1 flows 1
+- limit 2 depth 1 divisor 1
 
-tc qdisc add dev dummy0 handle 1: root sfq limit 2 flows 1 depth 1
-tc qdisc add dev dummy0 handle 1: root sfq limit 2 flows 1 divisor 1
-
-This fixes the following syzkaller reported crash:
-
-------------[ cut here ]------------
-UBSAN: array-index-out-of-bounds in net/sched/sch_sfq.c:203:6
-index 65535 is out of range for type 'struct sfq_head[128]'
-CPU: 1 UID: 0 PID: 3037 Comm: syz.2.16 Not tainted 6.14.0-rc2-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 12/27/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x201/0x300 lib/dump_stack.c:120
- ubsan_epilogue lib/ubsan.c:231 [inline]
- __ubsan_handle_out_of_bounds+0xf5/0x120 lib/ubsan.c:429
- sfq_link net/sched/sch_sfq.c:203 [inline]
- sfq_dec+0x53c/0x610 net/sched/sch_sfq.c:231
- sfq_dequeue+0x34e/0x8c0 net/sched/sch_sfq.c:493
- sfq_reset+0x17/0x60 net/sched/sch_sfq.c:518
- qdisc_reset+0x12e/0x600 net/sched/sch_generic.c:1035
- tbf_reset+0x41/0x110 net/sched/sch_tbf.c:339
- qdisc_reset+0x12e/0x600 net/sched/sch_generic.c:1035
- dev_reset_queue+0x100/0x1b0 net/sched/sch_generic.c:1311
- netdev_for_each_tx_queue include/linux/netdevice.h:2590 [inline]
- dev_deactivate_many+0x7e5/0xe70 net/sched/sch_generic.c:1375
-
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Fixes: 10685681bafc ("net_sched: sch_sfq: don't allow 1 packet limit")
 Signed-off-by: Octavian Purdila <tavip@google.com>
 Acked-by: Cong Wang <xiyou.wangcong@gmail.com>
 ---
- net/sched/sch_sfq.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ .../tc-testing/tc-tests/qdiscs/sfq.json       | 36 +++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-diff --git a/net/sched/sch_sfq.c b/net/sched/sch_sfq.c
-index 7714ae94e052..58b42dcf8f20 100644
---- a/net/sched/sch_sfq.c
-+++ b/net/sched/sch_sfq.c
-@@ -661,10 +661,6 @@ static int sfq_change(struct Qdisc *sch, struct nlattr *opt,
- 		if (!p)
- 			return -ENOMEM;
- 	}
--	if (ctl->limit == 1) {
--		NL_SET_ERR_MSG_MOD(extack, "invalid limit");
--		return -EINVAL;
--	}
- 
- 	sch_tree_lock(sch);
- 
-@@ -705,6 +701,12 @@ static int sfq_change(struct Qdisc *sch, struct nlattr *opt,
- 		limit = min_t(u32, ctl->limit, maxdepth * maxflows);
- 		maxflows = min_t(u32, maxflows, limit);
- 	}
-+	if (limit == 1) {
-+		sch_tree_unlock(sch);
-+		kfree(p);
-+		NL_SET_ERR_MSG_MOD(extack, "invalid limit");
-+		return -EINVAL;
-+	}
- 
- 	/* commit configuration */
- 	q->limit = limit;
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/sfq.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/sfq.json
+index 50e8d72781cb..28c6ce6da7db 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/sfq.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/sfq.json
+@@ -228,5 +228,41 @@
+         "matchCount": "0",
+         "teardown": [
+         ]
++    },
++    {
++        "id": "7f8f",
++        "name": "Check that a derived limit of 1 is rejected (limit 2 depth 1 flows 1)",
++        "category": [
++            "qdisc",
++            "sfq"
++        ],
++        "plugins": {
++            "requires": "nsPlugin"
++        },
++        "setup": [],
++        "cmdUnderTest": "$TC qdisc add dev $DUMMY handle 1: root sfq limit 2 depth 1 flows 1",
++        "expExitCode": "2",
++        "verifyCmd": "$TC qdisc show dev $DUMMY",
++        "matchPattern": "sfq",
++        "matchCount": "0",
++        "teardown": []
++    },
++    {
++        "id": "5168",
++        "name": "Check that a derived limit of 1 is rejected (limit 2 depth 1 divisor 1)",
++        "category": [
++            "qdisc",
++            "sfq"
++        ],
++        "plugins": {
++            "requires": "nsPlugin"
++        },
++        "setup": [],
++        "cmdUnderTest": "$TC qdisc add dev $DUMMY handle 1: root sfq limit 2 depth 1 divisor 1",
++        "expExitCode": "2",
++        "verifyCmd": "$TC qdisc show dev $DUMMY",
++        "matchPattern": "sfq",
++        "matchCount": "0",
++        "teardown": []
+     }
+ ]
 -- 
 2.49.0.504.g3bcea36a83-goog
 
