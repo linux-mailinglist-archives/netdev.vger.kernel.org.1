@@ -1,80 +1,136 @@
-Return-Path: <netdev+bounces-179715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FB4DA7E547
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 17:55:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F498A7E546
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 17:55:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E96B188ACF1
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 15:49:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F5F97A1B9A
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 15:54:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FEF52054F0;
-	Mon,  7 Apr 2025 15:48:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFC692066F3;
+	Mon,  7 Apr 2025 15:52:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VkDFHFLu"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="U2EGV97b"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17FE8204879;
-	Mon,  7 Apr 2025 15:48:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5272B204694;
+	Mon,  7 Apr 2025 15:52:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744040932; cv=none; b=bj9Gu8s1qyFHNYQ+AsgE9HIJSKWdXU1ZhIWG2zqpow0tu5M7V1jMhQczC+QWbn7wQ1VLB/28//lwzhSHQX329fFiGhbo+PmIH4AuGaRYygGfY9SMhAxuQYVF4QrnB4pZRzUhGShrl3eLHsYoTXSpYnIoaiSs4tq9OPTtMgr96Tw=
+	t=1744041143; cv=none; b=u3CC5K5vQRDbjuo+QGmWvQzd+RER8lu+syPOmNjtXLRBKOp4xNjsaJDc99aTd0/USc5bTmN2yQkOtJhsIB9qpjwOeUeAIt+lYIH8sRNi68SulNpuNpTOqIxraj2/UYSsJrYy+BklYRc6NePDQzX+whjr22RjgccHOFjs0dif+eA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744040932; c=relaxed/simple;
-	bh=cXlAM7rZ33X+JzSByHY+99QsCWDsAzEWY+O1mXU5b5k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K2LoIn91/pyYiGjfuu3S0Ug519TeJCBDXNSMzLJeDswwMISgI7Pdo6v9MHA1+kuRE76UvoujMoGR1InykuAPbmMjBvCQfhcUcHLZ9/4HpzkRWBmkWFiYB7Gt+/S80fFVdn62YdRhgJrhlejOnHIIjxl0EcvehG46aPzsl0dv7zY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VkDFHFLu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0001CC4CEDD;
-	Mon,  7 Apr 2025 15:48:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744040932;
-	bh=cXlAM7rZ33X+JzSByHY+99QsCWDsAzEWY+O1mXU5b5k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VkDFHFLukG529Eem400b0fyx8KA3ZciF240CH/ar1z6AZxGR5KW1Um2H00xzsakwI
-	 uznTUp+3aZopEdSxbm4QanFh5sHuE1eBExljfeBw4VZ+XfKh8qlSbic2VpBLtLnk+n
-	 eorr+ItFodt/2s2gwBHqADMrZj1kgvdQXpErScJPJvswdxH6OhRh43/yIUVUStsm4u
-	 TQJYeCG9QwlSlwmX1s3PsEFuT/uCLJUHq+A9EZHh3nONGnQRW/AMfWNDQFRXr0DNZ9
-	 231Q23Zuz48ARyAgNDSrFMdAbAm5OkgY6szAqBvze7/70Dk9PriKdHlBeD3W9bXlFj
-	 tmsBeutNB3Tzw==
-Date: Mon, 7 Apr 2025 16:48:46 +0100
-From: Simon Horman <horms@kernel.org>
-To: Julian Vetter <julian@outer-limits.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, Louis Peens <louis.peens@corigine.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Shannon Nelson <shannon.nelson@amd.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Arthur Kiyanovski <akiyano@amazon.com>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	oss-drivers@corigine.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] eth: nfp: remove __get_unaligned_cpu32 from netronome
- drivers
-Message-ID: <20250407154846.GP395307@horms.kernel.org>
-References: <20250407083306.1553921-1-julian@outer-limits.org>
+	s=arc-20240116; t=1744041143; c=relaxed/simple;
+	bh=RO9vA3rEiMpXY2A/myUPJ8wWD9WvtX3M47OGtLYdyvk=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZmQyoscEK62h7NMukfvE7w9wbAUfe2TEmG2+U9q1ZF2xO0EAXU1fpn2ikzKj12fQ+8rIrw7kB0tTN0pgNmZnfNE+SQgWx6sAd27tUHMCU5+2XprD+dtA+t1+xClYkdFltxlyLqWrh2gPFVTGHpTKtDpYb8qnUlEwPRNdFR3A4Sw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=U2EGV97b; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744041139; x=1775577139;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=3kLBT+4Y+IiY2wVdsPc5x6Fuj1savLAG8Rp99+8Cz/Y=;
+  b=U2EGV97bamTA5gVvu2Km6Ei228VXQkqFFk3C9/09GOMhPxAOhYs5bFpG
+   I2bB1MAKh46DA8RJroibOJUv6fjyusCj4SzaGqcsKjPSpqkGjzYPFs0Ha
+   dovr8gxr+YkBm7lWF1FhZHNygXRjQ3oaje6+V58iSjMPdwkTaCoulLu9h
+   s=;
+X-IronPort-AV: E=Sophos;i="6.15,194,1739836800"; 
+   d="scan'208";a="188970982"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2025 15:52:17 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:46015]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.43.57:2525] with esmtp (Farcaster)
+ id f69cf136-479c-4502-a43c-d0c57a16572b; Mon, 7 Apr 2025 15:52:16 +0000 (UTC)
+X-Farcaster-Flow-ID: f69cf136-479c-4502-a43c-d0c57a16572b
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 7 Apr 2025 15:52:16 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.101.45) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 7 Apr 2025 15:52:12 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <ematsumiya@suse.de>, <horms@kernel.org>,
+	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <peterz@infradead.org>,
+	<sfrench@samba.org>, <stable@vger.kernel.org>, <wangzhaolong1@huawei.com>,
+	<willemb@google.com>
+Subject: Re: [PATCH v2 net] net: Fix null-ptr-deref by sock_lock_init_class_and_name() and rmmod.
+Date: Mon, 7 Apr 2025 08:52:02 -0700
+Message-ID: <20250407155204.16501-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <CANn89iKc_7RNordD-YcZv9DPw8CNubnDVkhgYGma20q4cxgAdw@mail.gmail.com>
+References: <CANn89iKc_7RNordD-YcZv9DPw8CNubnDVkhgYGma20q4cxgAdw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250407083306.1553921-1-julian@outer-limits.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D039UWA003.ant.amazon.com (10.13.139.49) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Mon, Apr 07, 2025 at 10:33:06AM +0200, Julian Vetter wrote:
-> The __get_unaligned_cpu32 function is deprecated. So, replace it with
-> the more generic get_unaligned and just cast the input parameter.
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 7 Apr 2025 13:21:11 +0200
+> > diff --git a/net/core/sock.c b/net/core/sock.c
+> > index 323892066def..d426c5f8e20f 100644
+> > --- a/net/core/sock.c
+> > +++ b/net/core/sock.c
+> > @@ -2130,6 +2130,8 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
+> >   */
+> >  static inline void sock_lock_init(struct sock *sk)
+> >  {
+> > +       sk_owner_clear(sk);
+> > +
+> >         if (sk->sk_kern_sock)
+> >                 sock_lock_init_class_and_name(
+> >                         sk,
+> > @@ -2324,6 +2326,8 @@ static void __sk_destruct(struct rcu_head *head)
+> >                 __netns_tracker_free(net, &sk->ns_tracker, false);
+> >                 net_passive_dec(net);
+> >         }
+> > +
+> > +       sk_owner_put(sk);
 > 
-> Signed-off-by: Julian Vetter <julian@outer-limits.org>
+> I am not convinced that the socket lock can be used after this point,
+> now or in the future.
+> 
+> >         sk_prot_free(sk->sk_prot_creator, sk);
+> >  }
+> 
+> Maybe move this in sk_prot_free() instead ?
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Makes sense.
+Will move sk_owner_put() to sk_prot_free() in v3.
+
+Thanks!
+
+
+> 
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 323892066def..9ab149d1584c 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -2226,6 +2226,9 @@ static void sk_prot_free(struct proto *prot,
+> struct sock *sk)
+>         cgroup_sk_free(&sk->sk_cgrp_data);
+>         mem_cgroup_sk_free(sk);
+>         security_sk_free(sk);
+> +
+> +       sk_owner_put(sk);
+> +
+>         if (slab != NULL)
+>                 kmem_cache_free(slab, sk);
+>         else
 
