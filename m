@@ -1,88 +1,57 @@
-Return-Path: <netdev+bounces-179663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 170ECA7E097
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:10:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59D4FA7E08A
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:09:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA60A189C1FB
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 14:03:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA78A17E873
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 14:03:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 960571B653C;
-	Mon,  7 Apr 2025 14:02:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6C621C2443;
+	Mon,  7 Apr 2025 14:02:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oV8ALXIB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sktWr8vf"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5561C6FED
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 14:02:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C16491B87CE
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 14:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744034574; cv=none; b=S9FyV3vHWus0V36BAvhpZw7MSGWDC/9HDI1oOF+z/rFV2oAwuERF41uo87hz2k+Rei4YntwGiP1003RY7FEG41PAE7bSIdFyLSjInKygFo9VnU7nt8qJsiuLI1f0TiiOu1GljInOsdRwbU77mlHrlUCtIwfS85rFWzhWEifrXNU=
+	t=1744034566; cv=none; b=AtphIG6g22sEjmypOrXenixPJsKCg4eq5KYCEExCegwU8+/IwVqwfMC/Ty+Gku9ol9uu1H6jUXAKf4VBZHmRYfeJC0MA/bz46ylimzum7hv/BECx52FkIZe3EcoUH5CFh2ytpxPVoCepGK1hEg8RBSC8UBE+cLQdvS9Hh2jKh6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744034574; c=relaxed/simple;
-	bh=HxGhoNtlDfP6hpjpwJ6XLIxLlAlP8zHYq+tw4sXt/q8=;
+	s=arc-20240116; t=1744034566; c=relaxed/simple;
+	bh=fR7PBr6tXm57kWHmOH6/mTwC1BYD8urfsW/j3fAdi+8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gS/Ro2xJOFCFKWX1th4v1U1nd04I/QnaQDQ5jeZPu8AGlQuZ6UMI+oxA0uCJDxyDuP7hC2kHYcdrtLkYgqj8fr4vDdtqdKvBtD69eF7p6TWwcXMOwfV5v3N0SLgoLppNympAFFvyO/4sAPaU1rQEemk42y3Wh9fDlB39hqAsX8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oV8ALXIB; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=hTBgqkMriWAkHZtnMiMpJOXFutxVKurvl1Qd1YuYFAc=; b=oV8ALXIBz42bR27ZTJHiA5JxzL
-	3m2XQRe5jkyah6Ls0VB91a0uHqDJJOjgon/T9UYHWYliytQJFzs7LnJJNVIhVvpRK65PU16UcqE60
-	4HCW+RbBi9yu5F0xLGHvEKDLRc7h7cB3YmaWon/jk6/kr4jVcErenu6reputFtO1p+Xo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u1n3Z-008EwU-KP; Mon, 07 Apr 2025 16:02:33 +0200
-Date: Mon, 7 Apr 2025 16:02:33 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Arinzon, David" <darinzon@amazon.com>
-Cc: Leon Romanovsky <leon@leon.nu>, Jakub Kicinski <kuba@kernel.org>,
-	David Woodhouse <dwmw2@infradead.org>,
-	David Miller <davem@davemloft.net>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	"Woodhouse, David" <dwmw@amazon.co.uk>,
-	"Machulsky, Zorik" <zorik@amazon.com>,
-	"Matushevsky, Alexander" <matua@amazon.com>,
-	"Bshara, Saeed" <saeedb@amazon.com>,
-	"Wilson, Matt" <msw@amazon.com>,
-	"Liguori, Anthony" <aliguori@amazon.com>,
-	"Bshara, Nafea" <nafea@amazon.com>,
-	"Schmeilin, Evgeny" <evgenys@amazon.com>,
-	"Belgazal, Netanel" <netanel@amazon.com>,
-	"Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>,
-	"Kiyanovski, Arthur" <akiyano@amazon.com>,
-	"Dagan, Noam" <ndagan@amazon.com>,
-	"Bernstein, Amit" <amitbern@amazon.com>,
-	"Allen, Neil" <shayagr@amazon.com>,
-	"Ostrovsky, Evgeny" <evostrov@amazon.com>,
-	"Tabachnik, Ofir" <ofirt@amazon.com>,
-	"Machnikowski, Maciek" <maciek@machnikowski.net>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: Re: [PATCH v8 net-next 5/5] net: ena: Add PHC documentation
-Message-ID: <0294be1a-5530-435a-9717-983f61b94fcf@lunn.ch>
-References: <20250304190504.3743-1-darinzon@amazon.com>
- <20250304190504.3743-6-darinzon@amazon.com>
- <aecb8d12-805b-4592-94f3-4dbfcdcd5cff@lunn.ch>
- <55f9df6241d052a91dfde950af04c70969ea28b2.camel@infradead.org>
- <dc253b7be5082d5623ae8865d5d75eb3df788516.camel@infradead.org>
- <20250402092344.5a12a26a@kernel.org>
- <38966834-1267-4936-ae24-76289b3764d2@app.fastmail.com>
- <f37057d315c34b35b9acd93b5b2dcb41@amazon.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=DI5IASY7O7PiYWe1e6xCXTvyoPOSKti5KPtXP/mJFlgA3gPfK+XIc5rdw9UFtKRUbQId1fDYlWgCYtUU6tIB5fJKXxfJdU/7QXa8o1czqOR+mkMwmQ1cAJbXXHAz0Gyzq1lDB5o4p0ZIj4j8/6H9HI7hLwq6t3842y7MMAA1FvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sktWr8vf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9351BC4CEDD;
+	Mon,  7 Apr 2025 14:02:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744034566;
+	bh=fR7PBr6tXm57kWHmOH6/mTwC1BYD8urfsW/j3fAdi+8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sktWr8vfZzwR4iCxq07Y3isgrQymVdA1eK1vTdZIH01p+zpcGhsWAlsZSdD5jTfWC
+	 r3BMISYilhgVeeSnQMhpE9ENTOKOR7cCRU04HRN1htlhrvAbdEVdpUu2TsG5PHgvAy
+	 BjKKzoIo2LR9men2Rmi4Vfdxe6MnjwX2pmGtO1871I2fhqymPGKEbnwvplma9RIK9n
+	 UzRo7DVEtEk8vvEqVOWswqzhd9sO/QGeheGfjFjO/4ij+mrj5yq5hSpMccZYTnMaLd
+	 hiT8AVXpXT8BLnA5FTd3C/1QorD/mTFFIqCFyzjEqbyzxquLSvBPxncsHWO2NIzZwm
+	 uzVo6vxjg9Fhw==
+Date: Mon, 7 Apr 2025 15:02:42 +0100
+From: Simon Horman <horms@kernel.org>
+To: Xuanqiang Luo <xuanqiang.luo@linux.dev>
+Cc: przemyslaw.kitszel@intel.com, anthony.l.nguyen@intel.com,
+	davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+Subject: Re: [PATCH iwl-net v2] ice: Check VF VSI Pointer Value in
+ ice_vc_add_fdir_fltr()
+Message-ID: <20250407140242.GK395307@horms.kernel.org>
+References: <20250325020149.2041648-1-xuanqiang.luo@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,50 +60,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f37057d315c34b35b9acd93b5b2dcb41@amazon.com>
+In-Reply-To: <20250325020149.2041648-1-xuanqiang.luo@linux.dev>
 
-On Mon, Apr 07, 2025 at 07:01:46AM +0000, Arinzon, David wrote:
-> > >> > I think the sysfs control is the best option here.
-> > >>
-> > >> Actually, it occurs to me that the best option is probably a module
-> > >> parameter. If you have to take the network down and up to change the
-> > >> mode, why not just unload and reload the module?
-> > >
-> > > We have something called devlink params, which support "configuration
-> > > modes" (= what level of reset is required to activate the new setting).
-> > > Maybe devlink param with cmode of "driver init" would be the best fit?
-> > 
-> > I had same feeling when I wrote my auxbus response. There is no reason to
-> > believe that ptp enable/disable knob won't be usable by other drivers
-> > 
-> > It's universally usable, just not related to netdev sysfs layout.
-> > 
-> > Thanks
-> > 
-> > >
-> > > Module params are annoying because they are scoped to code / module
-> > > not instances of the device.
+On Tue, Mar 25, 2025 at 10:01:49AM +0800, Xuanqiang Luo wrote:
+> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 > 
-> Hi Jakub,
+> As mentioned in the commit baeb705fd6a7 ("ice: always check VF VSI
+> pointer values"), we need to perform a null pointer check on the return
+> value of ice_get_vf_vsi() before using it.
 > 
-> Thanks for suggesting the devlink params option for enable/disable, we will
-> explore the option and provide a revised patchset.
+> v2: Add "iwl-net" to the subject and modify the name format.
 > 
-> Given the pushback on custom sysfs utilization, what can be the alternative for exposing 
-> the PHC statistics? If `ethtool -S` is not an option, is there another framework that
-> allows outputting statistics?
-> We've explored devlink health reporter dump, would that be acceptable?
+> Fixes: 6ebbe97a4881 ("ice: Add a per-VF limit on number of FDIR filters")
+> Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
 
-We seem to be going backwards and forwards between this is connected
-to a netdev and it is not connected to a netdev. You have to destroy
-and recreate the netdev in order to make us if it, which might just be
-FUBAR design, but that is what you have. So maybe ethtool -S is an
-option?
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Or take a step back. Are your statistics specific to your hardware, or
-generic about any PTP clock? Could you expand the PTP infrastructure
-to return generic statistics? The problem being, PTP is currently
-IOCTL based, so not very expandable, unlike netlink used for ethtool.
+> ---
+>  drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c b/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
+> index 14e3f0f89c78..53bad68e3f38 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
+> @@ -2092,6 +2092,12 @@ int ice_vc_add_fdir_fltr(struct ice_vf *vf, u8 *msg)
+>  	dev = ice_pf_to_dev(pf);
+>  	vf_vsi = ice_get_vf_vsi(vf);
+>  
 
-	Andrew
+nit, but not need to repost because of this: it's seems nicer
+not to have not to have a blank line here. And instead, if one is
+really wanted, put it above the ice_get_vf_vsi() line.
+
+> +	if (!vf_vsi) {
+> +		dev_err(dev, "Can not get FDIR vf_vsi for VF %u\n", vf->vf_id);
+> +		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
+> +		goto err_exit;
+> +	}
+> +
+>  #define ICE_VF_MAX_FDIR_FILTERS	128
+>  	if (!ice_fdir_num_avail_fltr(&pf->hw, vf_vsi) ||
+>  	    vf->fdir.fdir_fltr_cnt_total >= ICE_VF_MAX_FDIR_FILTERS) {
+> -- 
+> 2.27.0
+> 
+> 
 
