@@ -1,94 +1,84 @@
-Return-Path: <netdev+bounces-179815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5739DA7E8C5
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:46:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72A1AA7E909
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:53:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3858B7A1E13
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 17:45:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C891178E92
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 17:50:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB8CC21B1AA;
-	Mon,  7 Apr 2025 17:44:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B65B92144AD;
+	Mon,  7 Apr 2025 17:50:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rU9Zo7xu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d8Q8/eIP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5A31A3147;
-	Mon,  7 Apr 2025 17:44:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8617E4A02;
+	Mon,  7 Apr 2025 17:50:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744047889; cv=none; b=r1Mg21ZGrlPdLtfNZer318OCZhMhqT8V+K6al4kcy5KL2SxQcjbtFyZfS+srufVhKNpMhSmmJdnrcPa2dMpbeZPq9Pqra+euboDKTqqVfc6f3WPrUh2vv8DSi/n1eB76JvuA0dxrRyactQEIuALvwVF2x+/rVfO64pncK7sTGsc=
+	t=1744048252; cv=none; b=bbtaupTqT/brSrQZ+hEGLbcLWLCgB3L1z2l3+j5+29EbA6qG5TjA0+AFVIrGpquHG1GrHYOCAN504K24wGrHgP//01L4vkpX59thWgRDmV4fJVAMbavdCE2j/1SfGCgiIEzczN+Wzffn8xQTI2hOfwByxYmALPqSh4G6KBkdTSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744047889; c=relaxed/simple;
-	bh=xxHjDP+NyHgWQ2jb/v9uMp+G1hNt7hQcpSlTqvAxzE4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EDxKt91l9rjak8EbXmKRpLozf+geUtvkDCFQnLYdOEulrmzEIlUd63ZfARLvpNOyCmMb/cm7ytAvhUCGzypIgygSmIbqir8PZdwjDbY+nqRkc0rabWQSbevIwyyoGPuYuibKm8qpT6e4Cwmrh2pRYXt7rwRtlpPEAvzQdjOvbJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rU9Zo7xu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43C23C4CEDD;
-	Mon,  7 Apr 2025 17:44:48 +0000 (UTC)
+	s=arc-20240116; t=1744048252; c=relaxed/simple;
+	bh=rXVwFrugrxokQycM4a9ebHzsyPZ14gJZKf3lXGIzVpk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Sk5SLtOyDGnHncMbcXmuk9aQ0jOtEwZdiV77pM7O43jwuc7mjC3GwaC6rIPqPbKIFdORObRPktDAPD6RJYusoR/C6EsBEWhfnr/75e3PoScn8EphHy1jmy0NqsaNm6vrMWnEMMwsE8xS2eGrfxMV5SqI8LIKkdZrpO6CBSeB3sw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d8Q8/eIP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D44E6C4CEDD;
+	Mon,  7 Apr 2025 17:50:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744047889;
-	bh=xxHjDP+NyHgWQ2jb/v9uMp+G1hNt7hQcpSlTqvAxzE4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rU9Zo7xuCU1GBu8ICWZkzwDdIy9JRjkUCAis5IdHL5kK6hev+J2xF9tbUUYJfMJzb
-	 EezmqeGNreOqRpIz+xYQ6Ah4ZhPosPCbLjcb5F0zDUWVrY2kR+nz8l8pEemNiDZc+8
-	 V9I7LLlItTJfExgcXSmsuI1zV+QRxtU6EZfGYOM3+8OEsL7tzsTwvJXyqQiYG8jMKk
-	 I2vTcXm5in4biyuNSWi01hMrjmxQXGcVboly/Ryl2y2I6l4CCacxKAwN31+FuX+8mi
-	 J8nqdG7l4ohdEmGdQg5fiWLIJcHpXqYfchMmeCmhzxo7RGfZSmPjNDw26rzep1J/UQ
-	 Bs9i3oQ1J8LMA==
-Date: Mon, 7 Apr 2025 10:44:47 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Richard Cochran <richardcochran@gmail.com>,
- Philipp Zabel <p.zabel@pengutronix.de>, Geert Uytterhoeven
- <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, "Russell
- King (Oracle)" <rmk+kernel@armlinux.org.uk>, Giuseppe Cavallaro
- <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org,
- Biju Das <biju.das.jz@bp.renesas.com>, Fabrizio Castro
- <fabrizio.castro.jz@renesas.com>, Lad Prabhakar
- <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH net-next v5 0/3] Add GBETH glue layer driver for Renesas
- RZ/V2H(P) SoC
-Message-ID: <20250407104447.072449cd@kernel.org>
-In-Reply-To: <20250407120317.127056-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-References: <20250407120317.127056-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	s=k20201202; t=1744048252;
+	bh=rXVwFrugrxokQycM4a9ebHzsyPZ14gJZKf3lXGIzVpk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=d8Q8/eIP/TDIZeLQg6iF6LA+dmhLoQR7hsg57sLiWgmWESKlDqK4cRYvrxrwMlctF
+	 URE7icx5ykRzTdJ2SZTiyE6TmkKTk5ruW43AbE1jJwSD3s9FEaSyNwjHdXoV+rBz08
+	 gAmal0v7MjnpSEDVnXMuw4eAkpnkouf9uB0UIE2dSNVHOdjAbl0wI7MNdf6tIDK6Yl
+	 Wl5oviMmtzYC71Gtf3EnJEZgk7sY8IyKSQnUoXqPwaB7E27YLilQ3t/0TQ4z62acDm
+	 blhySFhsKTJaoivl9jplDfCfGK/m4/7uUcNlJK+Avi/UnlyJ6mL361yTq7JWleyykY
+	 b7MTEW5kWlldw==
+Date: Mon, 7 Apr 2025 10:50:48 -0700
+From: Kees Cook <kees@kernel.org>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Lee Jones <lee@kernel.org>, Andy Shevchenko <andy@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH 10/28] lib: Allow modules to use strnchrnul
+Message-ID: <202504071050.4D2EC7C@keescook>
+References: <20250407172836.1009461-1-ivecera@redhat.com>
+ <20250407173149.1010216-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250407173149.1010216-1-ivecera@redhat.com>
 
-On Mon,  7 Apr 2025 13:03:14 +0100 Prabhakar wrote:
-> This patch series adds support for the GBETH (Gigabit Ethernet) glue layer
-> driver for the Renesas RZ/V2H(P) SoC. The GBETH IP is integrated with
-> the Synopsys DesignWare MAC (version 5.20). The changes include updating
-> the device tree bindings, documenting the GBETH bindings, and adding the
-> DWMAC glue layer for the Renesas GBETH.
+On Mon, Apr 07, 2025 at 07:31:40PM +0200, Ivan Vecera wrote:
+> Commit 0bee0cece2a6a ("lib/string: add strnchrnul()") added the
+> mentioned function but did not export it so it cannot be used by
+> modules.
+> 
+> Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 
-This was posted prior to the "net-next is OPEN" announcement:
-https://lore.kernel.org/all/20250407055403.7a8f40df@kernel.org/
+Acked-by: Kees Cook <kees@kernel.org>
 
-In the interest of fairness towards those who correctly wait 
-for the tree to be open I will ask you to repost this again,
-in a couple of days.
-
-Thanks!
 -- 
-pw-bot: defer
+Kees Cook
 
