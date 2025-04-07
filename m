@@ -1,245 +1,274 @@
-Return-Path: <netdev+bounces-179594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A87FA7DC3F
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 13:29:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 704BFA7DC17
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 13:21:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4294C1891A46
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 11:27:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 414CF170826
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 11:21:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5086A22B8BC;
-	Mon,  7 Apr 2025 11:27:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA2EC237718;
+	Mon,  7 Apr 2025 11:21:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J4B+QEJz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ULup7bcu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2691323A9B6
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 11:27:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E0522155E
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 11:21:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744025225; cv=none; b=jTY/c4B4V/GhzhepbXqhwaulf3rxuHrnRA5RO18OKoKmfBBdV+5E46zYVYBKjO51lgFadOleZCpoqwx2qAS8gDEdD3ZPJrwav5AkcjkDf0eIc90q2YL2/3BDqFpzrBmSuxx/ZM4B+x9Vl4r2fuzKC7jH1WXwFck0WomJXYie7o0=
+	t=1744024885; cv=none; b=DT3YYMBHyCbIYMOzVfdlduJM+1VMar8k1L8GHOrB2TqL7srI7ktuGJDqFBwL43jnpKH+u8WPFdhjJxYnblN5G/2714MAhLfk0deeYejPvkEl3bK98aeiKGjbWLWZV9S4TopDV+coTlM5PIMa3mk4ifdxv2HtueEyHG0etKC7adE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744025225; c=relaxed/simple;
-	bh=SUSl4c4Gl8Z51q9dI7XNp3Pt/ftgqXSIM2YqGVHgH+Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZvjgrkNgii9xiU3T/h2YMTViEPcgIEq+a7qc+p2cRmtTVF3QPZYJq5hUvk/ln8RWNRJ3rr76JEt8dRDKNmK5zPKt70MXLqFNr1qu4U7uLOJtXe+vHrN455zOwD6ORULuODtTRRT6BtgJZIf5Ie6t+/2y8XXzg85wGM5wmfSThiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J4B+QEJz; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744025223; x=1775561223;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=SUSl4c4Gl8Z51q9dI7XNp3Pt/ftgqXSIM2YqGVHgH+Y=;
-  b=J4B+QEJz27w6dZHA/bR8ZIfoYzAN+CDcE2cxzJ2jrPilh2P6EQxn9FpR
-   flKQ7TuyF8klRnWLlkiLdxwDZmO95af03nLOhHnVQ26WungKP2nOeiQxu
-   zsLFO5Fn19NEiaCysOEV0lkKU0q4CQhSrCVkJ4Hof3H/Kyg5GDY3BvYpK
-   UN9wXpWqHdi120eSUo44AWBLkSpfJh2DUSmfv8e7ZZI8AyLtBZzLFuO/G
-   wCXRn/PrgW9C0TTDy1E3ULFwP28+m3OwWfndgi+MuQpl9weZ5lUKss7r1
-   83h33TysVUoC4jFL9K/8e/2pRJZ/ikY1giL6a9zPbVJDlKeYmFlLI5717
-   A==;
-X-CSE-ConnectionGUID: jn2OpyXQQhyjallY+thtKQ==
-X-CSE-MsgGUID: 84yol2X4QLar3pDE2yzHjA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11397"; a="49200614"
-X-IronPort-AV: E=Sophos;i="6.15,194,1739865600"; 
-   d="scan'208";a="49200614"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2025 04:27:02 -0700
-X-CSE-ConnectionGUID: D1eJWYa4RUiqguvK/G0XuQ==
-X-CSE-MsgGUID: 1nacUgGiQJaL8+mhdboF0w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,194,1739865600"; 
-   d="scan'208";a="132900395"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa004.jf.intel.com with ESMTP; 07 Apr 2025 04:26:59 -0700
-Received: from vecna.igk.intel.com (vecna.igk.intel.com [10.123.220.17])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id F1C9133EBD;
-	Mon,  7 Apr 2025 12:26:57 +0100 (IST)
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: netdev@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Karol Kolacinski <karol.kolacinski@intel.com>,
-	Grzegorz Nitka <grzegorz.nitka@intel.com>,
-	Michal Schmidt <mschmidt@redhat.com>,
-	Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-Subject: [PATCH iwl-net v2] ice: use DSN instead of PCI BDF for ice_adapter index
-Date: Mon,  7 Apr 2025 13:20:05 +0200
-Message-Id: <20250407112005.85468-1-przemyslaw.kitszel@intel.com>
-X-Mailer: git-send-email 2.39.3
+	s=arc-20240116; t=1744024885; c=relaxed/simple;
+	bh=11prt/gCV715SBQ0ZOh1/VbypqW+YjEr9rmshQ6HfYQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NPgujlOsrLjYQXqGIKD0EUmYfyk4oqPj6OOmtfUKz2E2zpiVlGnkuy/08pEOB5sLTK2Am2O44SfO8+zP2epsmyLY14DsLAnh1+ovkDvxKFuPMejqzd4OquDH3YJZhI2CPcfrSgyw7i9K6rohGcsSA563lTAyVuSQwAuYL7kh5q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ULup7bcu; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4766631a6a4so42287841cf.2
+        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 04:21:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1744024883; x=1744629683; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P5UYeCEh2Uy28vzmXLGJt3AaKdB31pSjQ00eMVa3MY0=;
+        b=ULup7bculEUYNatzobNByfjUVvWrZ1wbbThbv1lyZ+NsU5vFT294AYjskVl0FOkhBb
+         pL6DZCGuUOD6HMDjv1D3y4jU0iQMK83tFxuWODLQMtPFDjoj/goeTQivxbHwgaJwMUET
+         lVTViVpjBwlp1hjc9ps4x8EV3iZ1YvPnrBH89N7QUzlCCZuTtr4QpufwxGzxR/pFaEDg
+         nOS0P0DKbhA0FVOvD5NeXR5+HbK8SNeQCo/S4zn4alNVKbOU0wxItAGDTjQRQRIsFyAD
+         PdLLZckx92kiNXISS6kXmivg1gddffLEBDI8t2ElWrsCWd7jsFYXhWcVnJV2heEsZypw
+         6beA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744024883; x=1744629683;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=P5UYeCEh2Uy28vzmXLGJt3AaKdB31pSjQ00eMVa3MY0=;
+        b=Duf1RTPoj0V+skWLxLVfnOGAfojtz4cxvbyWS71joX1PCVji5TWCY9QWhnNrLjgPI7
+         CtIJ7Nf5w4xJEmkeaXf/V5QlFjffJ2eLot1pNZj/5k4Aa3Odou4bhi1yg17wv50Fnw9d
+         4bjLeeNZXn0onCj8nXbXhR/Pj9+7gURpXpC5rcANTFAeBGFQoAPOs1vyAbSvm6WJqo1S
+         bQIFFFcEPkthHA3WGhpfO6zVWHC4xm9dvfRYy+Nw9U6qU4nZuaTiiL7ea+ecgSyjOqrU
+         y+UX/fTzE06wfvN5qrkOYcUeNfmNoYyVQJDlAWFldh+Z2YnKSVFbsDrHvabBGikBLIse
+         oq0A==
+X-Forwarded-Encrypted: i=1; AJvYcCW1CjmWcPcPzmjmdWKXO5s07SArSWsDgHQfFpH6M58NvSqEzh4KHPPdrgAz2Umgr1IJ7Ytjr4o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzV+oJ/m+umouzfeY93LBuZudjAyu6xBCp9+T4Z0dqiyP7Iq/d3
+	Ttt/9QTG+wPWhOzsUuJNOAMJ1zD/2n/yMnBfND5zQExqoJ4pmXMjLyLE65A5ieohD5TyS1NkY50
+	TEmWSA7Bnd29ILG+DW/F3HcwqdwRta061DOAE
+X-Gm-Gg: ASbGncsWXpnBFroOex7oU0ptCcZoddNQ7mApjoQqMwNUy4yhlbnGP5VHH84CiBeipIE
+	vrkeuI0zPbW3QoOPHeENgjMkDHdIt+owQpTKE1Z3urm2EnVfopLvZrDmC2Cbt+l6NzPY2bRtxuW
+	YdAZUuLCYZsxt+SFW0Idv5XO2R5Q==
+X-Google-Smtp-Source: AGHT+IGCSvzTLVJbZTlsgEcGeITrM+ZPQa5PiZLrqW6dw/cEt6aJAAMsg21OT3L1vkCMraFX1Ys9mirDTc4syuaA8mM=
+X-Received: by 2002:ac8:5f95:0:b0:476:ff0d:ed6c with SMTP id
+ d75a77b69052e-479310aa684mr110266311cf.40.1744024882689; Mon, 07 Apr 2025
+ 04:21:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250403203619.36648-1-kuniyu@amazon.com>
+In-Reply-To: <20250403203619.36648-1-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 7 Apr 2025 13:21:11 +0200
+X-Gm-Features: ATxdqUGL77PiWGRjRLcx9J9ZyqpR6P-RpxxvsJoKF9g0EDuwDxExG5vZK153Z-8
+Message-ID: <CANn89iKc_7RNordD-YcZv9DPw8CNubnDVkhgYGma20q4cxgAdw@mail.gmail.com>
+Subject: Re: [PATCH v2 net] net: Fix null-ptr-deref by sock_lock_init_class_and_name()
+ and rmmod.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, Simon Horman <horms@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Steve French <sfrench@samba.org>, 
+	Enzo Matsumiya <ematsumiya@suse.de>, Wang Zhaolong <wangzhaolong1@huawei.com>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Use Device Serial Number instead of PCI bus/device/function for
-index of struct ice_adapter.
-Functions on the same physical device should point to the very same
-ice_adapter instance.
+On Thu, Apr 3, 2025 at 10:36=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> When I ran the repro [0] and waited a few seconds, I observed two
+> LOCKDEP splats: a warning immediately followed by a null-ptr-deref. [1]
+>
+> Reproduction Steps:
+>
+>   1) Mount CIFS
+>   2) Add an iptables rule to drop incoming FIN packets for CIFS
+>   3) Unmount CIFS
+>   4) Unload the CIFS module
+>   5) Remove the iptables rule
+>
+> At step 3), the CIFS module calls sock_release() for the underlying
+> TCP socket, and it returns quickly.  However, the socket remains in
+> FIN_WAIT_1 because incoming FIN packets are dropped.
+>
+> At this point, the module's refcnt is 0 while the socket is still
+> alive, so the following rmmod command succeeds.
+>
+>   # ss -tan
+>   State      Recv-Q Send-Q Local Address:Port  Peer Address:Port
+>   FIN-WAIT-1 0      477        10.0.2.15:51062   10.0.0.137:445
+>
+>   # lsmod | grep cifs
+>   cifs                 1159168  0
+>
+> This highlights a discrepancy between the lifetime of the CIFS module
+> and the underlying TCP socket.  Even after CIFS calls sock_release()
+> and it returns, the TCP socket does not die immediately in order to
+> close the connection gracefully.
+>
+> While this is generally fine, it causes an issue with LOCKDEP because
+> CIFS assigns a different lock class to the TCP socket's sk->sk_lock
+> using sock_lock_init_class_and_name().
+>
+> Once an incoming packet is processed for the socket or a timer fires,
+> sk->sk_lock is acquired.
+>
+> Then, LOCKDEP checks the lock context in check_wait_context(), where
+> hlock_class() is called to retrieve the lock class.  However, since
+> the module has already been unloaded, hlock_class() logs a warning
+> and returns NULL, triggering the null-ptr-deref.
+>
+> I
+>
+> Fixes: ed07536ed673 ("[PATCH] lockdep: annotate nfs/nfsd in-kernel socket=
+s")
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Cc: stable@vger.kernel.org
+> ---
+> v2:
+>   * Clear sk_owner in sock_lock_init()
+>   * Define helper under the same #if guard
+>   * Remove redundant null check before module_put()
+>
+> v1: https://lore.kernel.org/netdev/20250403020837.51664-1-kuniyu@amazon.c=
+om/
+> ---
+>  include/net/sock.h | 38 ++++++++++++++++++++++++++++++++++++--
+>  net/core/sock.c    |  4 ++++
+>  2 files changed, 40 insertions(+), 2 deletions(-)
+>
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index 8daf1b3b12c6..4216d7d86150 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -547,6 +547,10 @@ struct sock {
+>         struct rcu_head         sk_rcu;
+>         netns_tracker           ns_tracker;
+>         struct xarray           sk_user_frags;
+> +
+> +#if IS_ENABLED(CONFIG_PROVE_LOCKING) && IS_ENABLED(CONFIG_MODULES)
+> +       struct module           *sk_owner;
+> +#endif
+>  };
+>
+>  struct sock_bh_locked {
+> @@ -1583,6 +1587,35 @@ static inline void sk_mem_uncharge(struct sock *sk=
+, int size)
+>         sk_mem_reclaim(sk);
+>  }
+>
+> +#if IS_ENABLED(CONFIG_PROVE_LOCKING) && IS_ENABLED(CONFIG_MODULES)
+> +static inline void sk_owner_set(struct sock *sk, struct module *owner)
+> +{
+> +       __module_get(owner);
+> +       sk->sk_owner =3D owner;
+> +}
+> +
+> +static inline void sk_owner_clear(struct sock *sk)
+> +{
+> +       sk->sk_owner =3D NULL;
+> +}
+> +
+> +static inline void sk_owner_put(struct sock *sk)
+> +{
+> +       module_put(sk->sk_owner);
+> +}
+> +#else
+> +static inline void sk_owner_set(struct sock *sk, struct module *owner)
+> +{
+> +}
+> +
+> +static inline void sk_owner_clear(struct sock *sk)
+> +{
+> +}
+> +
+> +static inline void sk_owner_put(struct sock *sk)
+> +{
+> +}
+> +#endif
+>  /*
+>   * Macro so as to not evaluate some arguments when
+>   * lockdep is not enabled.
+> @@ -1592,13 +1625,14 @@ static inline void sk_mem_uncharge(struct sock *s=
+k, int size)
+>   */
+>  #define sock_lock_init_class_and_name(sk, sname, skey, name, key)      \
+>  do {                                                                   \
+> +       sk_owner_set(sk, THIS_MODULE);                                  \
+>         sk->sk_lock.owned =3D 0;                                         =
+ \
+>         init_waitqueue_head(&sk->sk_lock.wq);                           \
+>         spin_lock_init(&(sk)->sk_lock.slock);                           \
+>         debug_check_no_locks_freed((void *)&(sk)->sk_lock,              \
+> -                       sizeof((sk)->sk_lock));                         \
+> +                                  sizeof((sk)->sk_lock));              \
+>         lockdep_set_class_and_name(&(sk)->sk_lock.slock,                \
+> -                               (skey), (sname));                        =
+       \
+> +                                  (skey), (sname));                    \
+>         lockdep_init_map(&(sk)->sk_lock.dep_map, (name), (key), 0);     \
+>  } while (0)
+>
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 323892066def..d426c5f8e20f 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -2130,6 +2130,8 @@ int sk_getsockopt(struct sock *sk, int level, int o=
+ptname,
+>   */
+>  static inline void sock_lock_init(struct sock *sk)
+>  {
+> +       sk_owner_clear(sk);
+> +
+>         if (sk->sk_kern_sock)
+>                 sock_lock_init_class_and_name(
+>                         sk,
+> @@ -2324,6 +2326,8 @@ static void __sk_destruct(struct rcu_head *head)
+>                 __netns_tracker_free(net, &sk->ns_tracker, false);
+>                 net_passive_dec(net);
+>         }
+> +
+> +       sk_owner_put(sk);
 
-This is not only simplification, but also fixes things up when PF
-is passed to VM (and thus has a random BDF).
+I am not convinced that the socket lock can be used after this point,
+now or in the future.
 
-Suggested-by: Jacob Keller <jacob.e.keller@intel.com>
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Suggested-by: Jiri Pirko <jiri@resnulli.us>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
----
-CC: Karol Kolacinski <karol.kolacinski@intel.com>
-CC: Grzegorz Nitka <grzegorz.nitka@intel.com>
-CC: Michal Schmidt <mschmidt@redhat.com>
-CC: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+>         sk_prot_free(sk->sk_prot_creator, sk);
+>  }
 
-v2:
- - target to -net (Jiri)
- - mix both halves of u64 DSN on 32bit systems (Jiri)
- - (no changes in terms of fallbacks for pre-prod HW)
- - warn when there is DSN collision after reducing to 32bit
+Maybe move this in sk_prot_free() instead ?
 
-v1:
-https://lore.kernel.org/netdev/20250306211159.3697-2-przemyslaw.kitszel@intel.com
----
- drivers/net/ethernet/intel/ice/ice_adapter.h |  6 ++-
- drivers/net/ethernet/intel/ice/ice_adapter.c | 43 ++++++++------------
- 2 files changed, 20 insertions(+), 29 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.h b/drivers/net/ethernet/intel/ice/ice_adapter.h
-index e233225848b3..ac15c0d2bc1a 100644
---- a/drivers/net/ethernet/intel/ice/ice_adapter.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adapter.h
-@@ -32,17 +32,19 @@ struct ice_port_list {
-  * @refcount: Reference count. struct ice_pf objects hold the references.
-  * @ctrl_pf: Control PF of the adapter
-  * @ports: Ports list
-+ * @device_serial_number: DSN cached for collision detection on 32bit systems
-  */
- struct ice_adapter {
- 	refcount_t refcount;
- 	/* For access to the GLTSYN_TIME register */
- 	spinlock_t ptp_gltsyn_time_lock;
- 
- 	struct ice_pf *ctrl_pf;
- 	struct ice_port_list ports;
-+	u64 device_serial_number;
- };
- 
--struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev);
--void ice_adapter_put(const struct pci_dev *pdev);
-+struct ice_adapter *ice_adapter_get(struct pci_dev *pdev);
-+void ice_adapter_put(struct pci_dev *pdev);
- 
- #endif /* _ICE_ADAPTER_H */
-diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/ethernet/intel/ice/ice_adapter.c
-index 01a08cfd0090..3df3fa6d5129 100644
---- a/drivers/net/ethernet/intel/ice/ice_adapter.c
-+++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
-@@ -1,7 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0-only
- // SPDX-FileCopyrightText: Copyright Red Hat
- 
--#include <linux/bitfield.h>
- #include <linux/cleanup.h>
- #include <linux/mutex.h>
- #include <linux/pci.h>
-@@ -14,29 +13,13 @@
- static DEFINE_XARRAY(ice_adapters);
- static DEFINE_MUTEX(ice_adapters_mutex);
- 
--/* PCI bus number is 8 bits. Slot is 5 bits. Domain can have the rest. */
--#define INDEX_FIELD_DOMAIN GENMASK(BITS_PER_LONG - 1, 13)
--#define INDEX_FIELD_DEV    GENMASK(31, 16)
--#define INDEX_FIELD_BUS    GENMASK(12, 5)
--#define INDEX_FIELD_SLOT   GENMASK(4, 0)
--
--static unsigned long ice_adapter_index(const struct pci_dev *pdev)
-+static unsigned long ice_adapter_index(u64 dsn)
- {
--	unsigned int domain = pci_domain_nr(pdev->bus);
--
--	WARN_ON(domain > FIELD_MAX(INDEX_FIELD_DOMAIN));
--
--	switch (pdev->device) {
--	case ICE_DEV_ID_E825C_BACKPLANE:
--	case ICE_DEV_ID_E825C_QSFP:
--	case ICE_DEV_ID_E825C_SFP:
--	case ICE_DEV_ID_E825C_SGMII:
--		return FIELD_PREP(INDEX_FIELD_DEV, pdev->device);
--	default:
--		return FIELD_PREP(INDEX_FIELD_DOMAIN, domain) |
--		       FIELD_PREP(INDEX_FIELD_BUS,    pdev->bus->number) |
--		       FIELD_PREP(INDEX_FIELD_SLOT,   PCI_SLOT(pdev->devfn));
--	}
-+#if BITS_PER_LONG == 64
-+	return dsn;
-+#else
-+	return (u32)dsn ^ u32(dsn >> 32);
-+#endif
- }
- 
- static struct ice_adapter *ice_adapter_new(void)
-@@ -77,25 +60,29 @@ static void ice_adapter_free(struct ice_adapter *adapter)
-  * Return:  Pointer to ice_adapter on success.
-  *          ERR_PTR() on error. -ENOMEM is the only possible error.
-  */
--struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev)
-+struct ice_adapter *ice_adapter_get(struct pci_dev *pdev)
- {
--	unsigned long index = ice_adapter_index(pdev);
-+	u64 dsn = pci_get_dsn(pdev);
- 	struct ice_adapter *adapter;
-+	unsigned long index;
- 	int err;
- 
-+	index = ice_adapter_index(dsn);
- 	scoped_guard(mutex, &ice_adapters_mutex) {
- 		err = xa_insert(&ice_adapters, index, NULL, GFP_KERNEL);
- 		if (err == -EBUSY) {
- 			adapter = xa_load(&ice_adapters, index);
- 			refcount_inc(&adapter->refcount);
-+			WARN_ON_ONCE(adapter->device_serial_number != dsn);
- 			return adapter;
- 		}
- 		if (err)
- 			return ERR_PTR(err);
- 
- 		adapter = ice_adapter_new();
- 		if (!adapter)
- 			return ERR_PTR(-ENOMEM);
-+		adapter->device_serial_number = dsn;
- 		xa_store(&ice_adapters, index, adapter, GFP_KERNEL);
- 	}
- 	return adapter;
-@@ -110,11 +97,13 @@ struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev)
-  *
-  * Context: Process, may sleep.
-  */
--void ice_adapter_put(const struct pci_dev *pdev)
-+void ice_adapter_put(struct pci_dev *pdev)
- {
--	unsigned long index = ice_adapter_index(pdev);
-+	u64 dsn = pci_get_dsn(pdev);
- 	struct ice_adapter *adapter;
-+	unsigned long index;
- 
-+	index = ice_adapter_index(dsn);
- 	scoped_guard(mutex, &ice_adapters_mutex) {
- 		adapter = xa_load(&ice_adapters, index);
- 		if (WARN_ON(!adapter))
--- 
-2.39.3
-
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 323892066def..9ab149d1584c 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -2226,6 +2226,9 @@ static void sk_prot_free(struct proto *prot,
+struct sock *sk)
+        cgroup_sk_free(&sk->sk_cgrp_data);
+        mem_cgroup_sk_free(sk);
+        security_sk_free(sk);
++
++       sk_owner_put(sk);
++
+        if (slab !=3D NULL)
+                kmem_cache_free(slab, sk);
+        else
 
