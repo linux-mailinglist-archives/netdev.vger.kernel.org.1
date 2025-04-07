@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-179991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF724A7F0D0
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 01:19:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A883A7F0D4
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 01:20:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7A223AC7AA
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 23:18:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A70D3ADBD0
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 23:18:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EF7C22B5AD;
-	Mon,  7 Apr 2025 23:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10D6122CBD8;
+	Mon,  7 Apr 2025 23:18:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="umOxltOt"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TnnTd38M"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8B922A80D;
-	Mon,  7 Apr 2025 23:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D21C22B8A9
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 23:18:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744067888; cv=none; b=Rhy9lMKZs+U3bRH8/s8oCCVRc4D1W+HKFKoBiqWKJ7j5/2BxxC5tjoviL65iM/RxT6HLeMKreNeFda5DQO5yeGhjpNcGniG7HKuipF7hW4FX+81ogjlhrojmIh1viCAnSrPIFaAXuD26zk0qrQNvxZs4wDn5gWpgiuFrsa3L5Cc=
+	t=1744067890; cv=none; b=TZZw76fDav8VZcjyuGD/mMUzzYbQKDl4Y0hKrB7IBH0nTSoGCBlqtUgI9vzA/cg07N7du7yiJNI9SeEiq0goAto7sM//KUAFecUVDGWY8VsSj5zYgM/xnyClu99NTF0qhXiSmTvqBJ8eGXhiM9aadVN8Mgf4obBCEoa6bXR9Nuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744067888; c=relaxed/simple;
-	bh=dWjOjsTrYbBpz2dj2hY7wJ2k4rrN31bKVK8cHOUCjPw=;
+	s=arc-20240116; t=1744067890; c=relaxed/simple;
+	bh=f3Szwlxp0IuKaC6/PwHFJbjCl8If//ssNgmRzAR1zC8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Vp+Dnj4MR5rAoYZuGDum/ohaZnr7WZjD7kNDOs2Zj3qaMf90MqFlw3YNu1h/tpC+3esuTP+Nvv7Fhs2xLDUHpxmHiCQBkPdFS+P5ePK3EOjmzxyg5AwZ3rkMfd1rc+71uejVdcktnWxD5RLxAk1jwZCTZVNjuSCFV4MW0h/Xhko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=umOxltOt; arc=none smtp.client-ip=91.218.175.180
+	 MIME-Version; b=DJ9CYMAq59Hk6/qHTM0J0RVxPP44gG1TQ0emUGq4aVViz5nYWP2Ktxt7ojPhRsVyxx3CnpfywiFgXhHAOkwNnuYLQDXVJstcquhbKIXkKm20DBYXUfJ3AxsaftYt5Bb6/8wrWOAqaMgaCfscorpjRzOidS8CLlytYgnOZM1eB3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TnnTd38M; arc=none smtp.client-ip=91.218.175.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744067883;
+	t=1744067886;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VpxVE6UWC4i9Tj174l5nfhvQ+bKWt6zi9RLVO+q8jfQ=;
-	b=umOxltOtftHqiVYo//KqTtwdHnQLUiAGn/3t8vNL++anaJxttQft8FaSJUeNrnxZyIlGRe
-	E1LLRZgYh8aQkMAAKyg+E97C+aQ3iuVCw93zaGWWHPT73eRx2D3YZmGytVogYif5nOZVt8
-	5LQZ6IBtHaEI77aDJRrtOiog/8WgvmY=
+	bh=+IMYcqlWO3catu174EvwSBwx0GimnAoT/SGwWBO8cTo=;
+	b=TnnTd38M1xrDMrFE2WjAavhx1E9Y3OsSdP+tkWMkMuh8Su7IovMASDuX1XJPlNC1nvmn3V
+	yzWYT2aLhfiJx/IDMhp4RXBSK/q5sfCY+y3IBIFSnEaSFetykk8nEA2zDEXBM3tj2Qn/Ob
+	hdj+u6HFhgWN7uMSRxmUiKrgmlxS2UI=
 From: Sean Anderson <sean.anderson@linux.dev>
 To: netdev@vger.kernel.org,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -56,9 +56,9 @@ Cc: linux-kernel@vger.kernel.org,
 	Heiner Kallweit <hkallweit1@gmail.com>,
 	Kory Maincent <kory.maincent@bootlin.com>,
 	Sean Anderson <sean.anderson@linux.dev>
-Subject: [net-next PATCH v2 03/14] device property: Add fwnode_property_get_reference_optional_args
-Date: Mon,  7 Apr 2025 19:17:34 -0400
-Message-Id: <20250407231746.2316518-4-sean.anderson@linux.dev>
+Subject: [net-next PATCH v2 04/14] scripts: kernel-doc: fix parsing function-like typedefs (again)
+Date: Mon,  7 Apr 2025 19:17:35 -0400
+Message-Id: <20250407231746.2316518-5-sean.anderson@linux.dev>
 In-Reply-To: <20250407231746.2316518-1-sean.anderson@linux.dev>
 References: <20250407231746.2316518-1-sean.anderson@linux.dev>
 Precedence: bulk
@@ -70,97 +70,41 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Add a fwnode variant of of_parse_phandle_with_optional_args to allow
-nargs_prop to be absent from the referenced node. This improves
-compatibility for references where the devicetree might not always have
-nargs_prop.
+Typedefs like
 
+    typedef struct phylink_pcs *(*pcs_xlate_t)(const u64 *args);
+
+have a typedef_type that ends with a * and therefore has no word
+boundary. Add an extra clause for the final group of the typedef_type so
+we only require a word boundary if we match a word.
+
+Fixes: 7d2c6b1edf79 ("scripts: kernel-doc: fix parsing function-like typedefs")
 Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
 ---
 This commit has been submitted separately as [1] and is included here
 solely so CI will run.
 
-[1] https://lore.kernel.org/all/20250407223714.2287202-3-sean.anderson@linux.dev
+[1] https://lore.kernel.org/all/20250407222134.2280553-1-sean.anderson@linux.dev/
 
 Changes in v2:
 - New
 
- drivers/base/property.c  | 46 ++++++++++++++++++++++++++++++++++++++++
- include/linux/property.h |  4 ++++
- 2 files changed, 50 insertions(+)
+ scripts/kernel-doc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/base/property.c b/drivers/base/property.c
-index 049f8a6088a1..ef13ca32079b 100644
---- a/drivers/base/property.c
-+++ b/drivers/base/property.c
-@@ -618,6 +618,52 @@ int fwnode_property_get_reference_args(const struct fwnode_handle *fwnode,
+diff --git a/scripts/kernel-doc b/scripts/kernel-doc
+index af6cf408b96d..5db23cbf4eb2 100755
+--- a/scripts/kernel-doc
++++ b/scripts/kernel-doc
+@@ -1325,7 +1325,7 @@ sub dump_enum($$) {
+     }
  }
- EXPORT_SYMBOL_GPL(fwnode_property_get_reference_args);
  
-+/**
-+ * fwnode_property_get_reference_optional_args() - Find a reference with optional arguments
-+ * @fwnode:	Firmware node where to look for the reference
-+ * @prop:	The name of the property
-+ * @nargs_prop:	The name of the property telling the number of
-+ *		arguments in the referred node.
-+ * @index:	Index of the reference, from zero onwards.
-+ * @args:	Result structure with reference and integer arguments.
-+ *		May be NULL.
-+ *
-+ * Obtain a reference based on a named property in an fwnode, with
-+ * integer arguments. If @nargs_prop is absent from the referenced node, then
-+ * number of arguments is be assumed to be 0.
-+ *
-+ * The caller is responsible for calling fwnode_handle_put() on the returned
-+ * @args->fwnode pointer.
-+ *
-+ * Return: %0 on success
-+ *	    %-ENOENT when the index is out of bounds, the index has an empty
-+ *		     reference or the property was not found
-+ *	    %-EINVAL on parse error
-+ */
-+int fwnode_property_get_reference_optional_args(const struct fwnode_handle *fwnode,
-+						const char *prop,
-+						const char *nargs_prop,
-+						unsigned int index,
-+						struct fwnode_reference_args *args)
-+{
-+	int ret;
-+
-+	if (IS_ERR_OR_NULL(fwnode))
-+		return -ENOENT;
-+
-+	ret = fwnode_call_int_op(fwnode, get_reference_args, prop, nargs_prop,
-+				 0, index, args);
-+	if (ret == 0)
-+		return ret;
-+
-+	if (IS_ERR_OR_NULL(fwnode->secondary))
-+		return ret;
-+
-+	return fwnode_call_int_op(fwnode->secondary, get_reference_args, prop, nargs_prop,
-+				  0, index, args);
-+}
-+EXPORT_SYMBOL_GPL(fwnode_property_get_reference_optional_args);
-+
- /**
-  * fwnode_find_reference - Find named reference to a fwnode_handle
-  * @fwnode: Firmware node where to look for the reference
-diff --git a/include/linux/property.h b/include/linux/property.h
-index e214ecd241eb..a1662b36d15f 100644
---- a/include/linux/property.h
-+++ b/include/linux/property.h
-@@ -139,6 +139,10 @@ int fwnode_property_get_reference_args(const struct fwnode_handle *fwnode,
- 				       const char *prop, const char *nargs_prop,
- 				       unsigned int nargs, unsigned int index,
- 				       struct fwnode_reference_args *args);
-+int fwnode_property_get_reference_optional_args(const struct fwnode_handle *fwnode,
-+						const char *prop, const char *nargs_prop,
-+						unsigned int index,
-+						struct fwnode_reference_args *args);
+-my $typedef_type = qr { ((?:\s+[\w\*]+\b){1,8})\s* }x;
++my $typedef_type = qr { ((?:\s+[\w\*]+\b){0,7}\s+(?:\w+\b|\*+))\s* }x;
+ my $typedef_ident = qr { \*?\s*(\w\S+)\s* }x;
+ my $typedef_args = qr { \s*\((.*)\); }x;
  
- struct fwnode_handle *fwnode_find_reference(const struct fwnode_handle *fwnode,
- 					    const char *name,
 -- 
 2.35.1.1320.gc452695387.dirty
 
