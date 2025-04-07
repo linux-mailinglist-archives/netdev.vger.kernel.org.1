@@ -1,147 +1,118 @@
-Return-Path: <netdev+bounces-179534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52AA3A7D81D
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 10:37:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70D9FA7D807
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 10:35:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F3C8188935D
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 08:36:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79AE3188DD44
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 08:34:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9A1E2253EF;
-	Mon,  7 Apr 2025 08:36:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE762227BAD;
+	Mon,  7 Apr 2025 08:34:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outer-limits.org header.i=@outer-limits.org header.b="syv7AMso";
-	dkim=permerror (0-bit key) header.d=outer-limits.org header.i=@outer-limits.org header.b="PWbDy5LH"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="qmXG5bxb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.164])
+Received: from mout.web.de (mout.web.de [212.227.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD1E225388;
-	Mon,  7 Apr 2025 08:36:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.164
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744014985; cv=pass; b=AzMyFpr7+0LuPi1mOdah880hb0RaacKnAYZQYO7Mb7RLyosczwxRgp+6onAg6H310r9IdK503HwQApXBSjivDY8q6lr7aibZZTLgKAqeOxnul8uY++9QM0o7CjyidNs23unBeZ+6amfVVZKps6iDHQqzxzXQNhmKJuyBenqDuVc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744014985; c=relaxed/simple;
-	bh=kromgZXIv13kuVYm/VYq9Vqu5/atevF4A48Q60kqXWo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=dCT/7FUECIIleWbyd3JijusIglARKYUvgJdIt6aBlWGi+llia3MiqDl/dS9wZMtE4KAxqpuy2KHCsBuQoCDL1UxzrOG1Zr2RAk1zkTj5o0LaSdi7c+7/cnCWcnjIC9wbR9CW/hHU7B6nDvwJEz98GIwH0EiABXr2OtmBrtID9CY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=outer-limits.org; spf=none smtp.mailfrom=outer-limits.org; dkim=pass (2048-bit key) header.d=outer-limits.org header.i=@outer-limits.org header.b=syv7AMso; dkim=permerror (0-bit key) header.d=outer-limits.org header.i=@outer-limits.org header.b=PWbDy5LH; arc=pass smtp.client-ip=81.169.146.164
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=outer-limits.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=outer-limits.org
-ARC-Seal: i=1; a=rsa-sha256; t=1744014802; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=ar/samsZZ9TJLPgT2eaggsLuoFDEY8sucy5XZhtj4ykVNPFL8v3mTq7MtIq6BizGYI
-    mm0HvsKeaGhFbhcOzkSjXbN/h1lT0Ygc4JAt34w39HeJsyThSB7Q/RVQ9QN6C36WiRdK
-    n+ss8sUg3YMIPGIpMUEOscYmucSKadPwMFGwKe9lsgXRrldF+nkooVRzILgyg53c+Gaz
-    5sLbZorSDHRvTlpSdNvQwpj3Q1TNMMXcCkBxA7NI9KZRpv0pW+g/boFUjDW0H7UNywFT
-    VcHRDyymH/jQO8kdC0Mk9Ow1A4Ytqe5cCkUTdF4LRWo8lYXaljstbWu/ASrU8IMSVBxl
-    2oFQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1744014802;
-    s=strato-dkim-0002; d=strato.com;
-    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=Loa+HXQddwUp8ekjKdhDfBU3F6SSrLNWEPxiN6o32Mk=;
-    b=sxZJ0QnUpW5ROFW3a3Fo+E5vsG8L0Qq4O1JGsRT+LYPQGYnzLtcDTp6pT+9R0IPBxj
-    LEV5uzwibn73Qkd2tkB5Wl90DaP8PrfZ50ykCM97rnWEjJ2/ClgC32ch2x9NhqXwY44r
-    ON7ZRkvWTvIy24WHq3E0Alz4NR5Ynyj69mqRv4TbQ/fHuHczLLD7RgktyZDopkr4l6Ul
-    spFrSHl3zIisCGfj7ug0itrIhDuHsGFcpqy+PLeR+I5Pc9/gw+XG+NXFav/zfgnYW3uk
-    wxdXgGPjhFjSsrkga0DbGA94w/3Sx0pv5ZEuHYR+2Vhn31uvwOEsHyxwGuWq/k78g2HI
-    C/tA==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1744014802;
-    s=strato-dkim-0002; d=outer-limits.org;
-    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=Loa+HXQddwUp8ekjKdhDfBU3F6SSrLNWEPxiN6o32Mk=;
-    b=syv7AMso8I3WJrb2Q7eJX1DJHV+DHZeijOR5kI3keqLzbsEPX4iL5aS+rRRw2SH99l
-    ntZhieKXa7W6T9QZJ+2rLfZPdobdhEOzMuK0+uk8uStQWr+7yDzdwIMhjg0UcrKoY0ik
-    JGpH/JBPdJN3WSZVDy9d0c04ZeNYq/inKZUOldjadqS8kHg764UhIBbC81nDpqtmXbJo
-    1RQwb5UeG9LwYI9NWIpUbMV1JcUc4nKpoPtgPQX+55swIJRn7FC6zEhCMQEJ6dzu1NRv
-    0awzaiOWsfgfnEBlh8CDiW1ht61OpLgP9FeShkJJ/Mcl+HsDOLQAnH+zMzCCa4M8sk5k
-    /t3w==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1744014802;
-    s=strato-dkim-0003; d=outer-limits.org;
-    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=Loa+HXQddwUp8ekjKdhDfBU3F6SSrLNWEPxiN6o32Mk=;
-    b=PWbDy5LHEYN0+YxRVU2VwcIj5wnZHhlMeHUu7f/Z8f6piinZTmSjDbEcqzedfxM28S
-    lMrahhtzIY69RlNo7vBA==
-X-RZG-AUTH: ":JnkIfEGmW/AMJS6HttH4FbRVwc4dHlPLCp4e/IoHo8zEMMHAgwTfqBEHcVJSv9P5mRTGd2ImeA=="
-Received: from ws2104.lan.kalrayinc.com
-    by smtp.strato.de (RZmta 51.3.0 AUTH)
-    with ESMTPSA id J2b1101378XLK0t
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Mon, 7 Apr 2025 10:33:21 +0200 (CEST)
-From: Julian Vetter <julian@outer-limits.org>
-To: Arnd Bergmann <arnd@arndb.de>,
-	Louis Peens <louis.peens@corigine.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shannon Nelson <shannon.nelson@amd.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Arthur Kiyanovski <akiyano@amazon.com>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: oss-drivers@corigine.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Julian Vetter <julian@outer-limits.org>
-Subject: [PATCH] eth: nfp: remove __get_unaligned_cpu32 from netronome drivers
-Date: Mon,  7 Apr 2025 10:33:06 +0200
-Message-Id: <20250407083306.1553921-1-julian@outer-limits.org>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F73225388;
+	Mon,  7 Apr 2025 08:34:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744014867; cv=none; b=KkKZRbAY4hRa0dplPO1IFvnvy2aT8XmeJS5mc4xz76oEQmG2hhCgMqdFG/B+dKie1ITjGPuXisMQ+OoqKcygFheGv5bbGnUWm86Kej4cNjnilVuku5lzDbKzdbqZye+qrdRuAMTM42/d1DN4IpY+QKOQwH0Iv0G9LSG5o1pKurI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744014867; c=relaxed/simple;
+	bh=Vhw4ZA9Ps2+xZXL2K1IJGg3PZdoZzGEMNfgJtyFl5LU=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=MxAcq8xoOlsrUHxHrCEG0wGrKjJVuhC8FBw3rYAWjaynl/6QYgonnE1lhlFb1CXURyUtrzyJ2WUKyxIi2R3VlpuMvTIaoGvWRWYJwMO7yqt0KwtLw2eqFXJtoKwaiiUxDbO/cH5UJmXISZ1maJ6t9Un3Tr24LRKD8TFb31HDL40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=qmXG5bxb; arc=none smtp.client-ip=212.227.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1744014852; x=1744619652; i=markus.elfring@web.de;
+	bh=Dg+LGVaxeCMjrxNASaMRgp1m7d5it9SLyoZVjKU62jc=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=qmXG5bxbKO7ypkQJt1m69ZkaibGHfDtDrfBsZkbKAPVRch/M25tf+hcOY37/XaNe
+	 wa+eNmegJZKqeZLKiPvnKHrYgqSdAtwN8VmXxhZN0N2BQovO9ZwY4pgI5W9cz0+US
+	 2uH7V57MvngGrwpQnc3jMZ1nH3F+8p4cTHieJ4J94OAmQQfK+DhXmA7jS5RJlI+5F
+	 gUq2KU4UV9iKr2YZrvkd3uXpfPRpu9pNr5b+MctVKVA4pVKbXIrKdMuy85ZUsbzPz
+	 3xN1kfghklWH174ii4wMRaciboFrCornfBqJgkN7FLKk6GZ/8bTCtH7f+U8fpoiz8
+	 Fi/tKheFUy4FxauFdA==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.93.4]) by smtp.web.de (mrweb106
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MQ8ao-1tfnMp3iBE-00V9MC; Mon, 07
+ Apr 2025 10:34:11 +0200
+Message-ID: <0d6e4dcc-2646-4694-9961-70049a71e7c1@web.de>
+Date: Mon, 7 Apr 2025 10:34:08 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="us-ascii"
+User-Agent: Mozilla Thunderbird
+To: Henry Martin <bsdhenrymartin@gmail.com>, linux-rdma@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>, Amir Tzin <amirtz@nvidia.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Aya Levin <ayal@nvidia.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
+References: <20250405100017.77498-1-bsdhenrymartin@gmail.com>
+Subject: Re: [PATCH] net/mlx5: Fix null-ptr-deref in
+ mlx5_create_inner_ttc_table()
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20250405100017.77498-1-bsdhenrymartin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:vgSH9jAK64S+GlMEqzoxCCM8UxsPHwh7N4T7u/tAoAQtYmLNIpy
+ f2ifI6mm5og7E5nuypepEbcvk70nFvzNeyjFVpOftRzBdoTyobTtYPdjAKzZ1eotnTHh/K7
+ xkQOBcLWVci1r/x+FtgJvGuM2nzCJsoe6Al+Ug8u8GYgN4hQc0hz8IhuJyqwNCokEM+uvZj
+ 8XAeDOEeZr9FLwhxY9deA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:JwUTb7aw1zw=;ebFimREAd4AzF8Qlft3eYkX4n87
+ S7IEpwvP0PkAm/7psp69QlWYonf1n5Bilzqxc7IP6TGSHeOZBJHJDnhrZhTbRISlvQIbyaYB7
+ S8nqTEb6azesLdGbOY6jmfZeKCt69CYkTl+hGakREm3V33Kg5BcPF8MVwS7k60wngzIJhZOg9
+ yO6jJe8/QN7IzVxVzLpD/vxX+4rhIcpriF2tIxHStVZe/Sc1w7vs5pxgzVJQgJrDjMKtWhbkY
+ UHUS4zLDBb91dtVSv0zdC779kjwiHs8AIcZYG+DbxuKB6XYCGl88SfytL6hSo2Iv953mWrask
+ 5M7tz7no7JvAkOQD2JlGftiYVQpBUSYCHViNuVbJeY1yEDkmwmDj7fe7YYDNOkUiW4X1WBO9K
+ S5+bHShmblrAxm74Op8g6He+8WtZYWQdm4khyfJ/hJ8vFkTuiAAKmCYGxqfxMJ8cqdF429BlX
+ NR6n/bfCULwrj2Y4EgS1KgZ87hdkqwkI37gdtTOfsds4Pp6d0BtP69NPpcLCDd64yUtOedl31
+ NkvvsDuBWWDfjXJTgISXao08G98IzwwvlyihA3eV/rLETCiaixjFwUVM9o5aEYEyM3neDgrBF
+ DClNdoYkkh7kJ8AAqfGE7KxhO2ggIo7uaukB5e75bX7zmT+Ul4HsKdnQ89hNIGX7kXmuvZZTj
+ EEoKp9rtjbcneyk1JdtJxc8qEqPUwvqUMXJTcxo6Z0Z6Q/y+OUCDdkxkLzF0oVjvCvFv4yQIf
+ FIUlUniRMxT66h1wyeX3AGABU6JSVoVllX+V/V4j2wy3M9+E4ALhFM9ZdG6/9rp8uR3H7VP/d
+ kwgFWi99iv0Sp/WH2wm/MYTAU4O7BRnNOYWdNug3GcGr0vYd1YQ6iko9e3HZAD7iKNrXl4FGY
+ 5MBaany6Wl8UdQ7lB22b22rd4xJCaoS6nlQ13AqLhbYuR1wXBrbVX7qnKHX4XSbgVoVADRhsL
+ M3+8g/8KZE24CP/J1VamdpkzlRugpoJb3H8aX7yQMk0OsRcnjdl4Y17yqBkDYwav/DfW5kXgy
+ fl3FJAHYzdvcCXXeA7Xmi7PJX+hgL5zp4B5RIQhch9PuYLWNfk26n1EvaSlPnciFJ1QXh2KaZ
+ aBG9sO9QAFPIxpYBWgm1GLakGy0UAnPGiJ9qcQ6KlQb0iQfOhbR5AY4aqgUW4OT52SjGAZpKB
+ pnZi1k4hnJIkP3ojy7Fqe97nPuCbcz9tAZHKtDlRfYVQx379F5pZwUhgWO5eXYMcpH8CitXzH
+ 7fhT9V5X1A8Q+Ry2O3PkwPsKxUTF131U24rpv27jonTfnX2ZapHteUMzo1wVSnQ4MMWo5qdkl
+ V5pXH0n0zUbYfVD4y52JjVIO4qj+WzZGyfii4EC5vxmc5YFzYRcDSfaC5QZeqPH+otvpRqP5d
+ w91xsC1tnpF16mmWJGGfhtfDneEMvWz81DT1JC/eemBLV9v5LN8kWJtp53l4oM0hJetbzIq/k
+ ndz/PIiTe785u/qD1u9NvQxLS8TMRIOtmHcZKWPKN0qWNnng23g3RG3eVBIhGDO9D1YEAiQ==
 
-The __get_unaligned_cpu32 function is deprecated. So, replace it with
-the more generic get_unaligned and just cast the input parameter.
+> Add NULL check for mlx5_get_flow_namespace() returns in
+> mlx5_create_inner_ttc_table() to prevent NULL pointer dereference.
 
-Signed-off-by: Julian Vetter <julian@outer-limits.org>
----
- drivers/net/ethernet/netronome/nfp/nfd3/dp.c | 2 +-
- drivers/net/ethernet/netronome/nfp/nfdk/dp.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+* You would like to adjust the error handling in some function implementations
+  from a common subdirectory.
+  How do you think about to offer such changes in a corresponding patch series?
 
-diff --git a/drivers/net/ethernet/netronome/nfp/nfd3/dp.c b/drivers/net/ethernet/netronome/nfp/nfd3/dp.c
-index f1c6c47564b1..08086eb76996 100644
---- a/drivers/net/ethernet/netronome/nfp/nfd3/dp.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfd3/dp.c
-@@ -779,7 +779,7 @@ nfp_nfd3_parse_meta(struct net_device *netdev, struct nfp_meta_parsed *meta,
- 		case NFP_NET_META_CSUM:
- 			meta->csum_type = CHECKSUM_COMPLETE;
- 			meta->csum =
--				(__force __wsum)__get_unaligned_cpu32(data);
-+				(__force __wsum)get_unaligned((u32 *)data);
- 			data += 4;
- 			break;
- 		case NFP_NET_META_RESYNC_INFO:
-diff --git a/drivers/net/ethernet/netronome/nfp/nfdk/dp.c b/drivers/net/ethernet/netronome/nfp/nfdk/dp.c
-index ebeb6ab4465c..ab3cd06ed63e 100644
---- a/drivers/net/ethernet/netronome/nfp/nfdk/dp.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfdk/dp.c
-@@ -779,7 +779,7 @@ nfp_nfdk_parse_meta(struct net_device *netdev, struct nfp_meta_parsed *meta,
- 		case NFP_NET_META_CSUM:
- 			meta->csum_type = CHECKSUM_COMPLETE;
- 			meta->csum =
--				(__force __wsum)__get_unaligned_cpu32(data);
-+				(__force __wsum)get_unaligned((u32 *)data);
- 			data += 4;
- 			break;
- 		case NFP_NET_META_RESYNC_INFO:
--- 
-2.34.1
+* Can any other summary phrase variant become more desirable accordingly?
 
+* Would any blank lines become also desirable after added statements?
+
+
+Regards,
+Markus
 
