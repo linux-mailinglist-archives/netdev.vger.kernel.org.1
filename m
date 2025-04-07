@@ -1,142 +1,133 @@
-Return-Path: <netdev+bounces-179524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 845F5A7D6F3
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 09:57:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92ED3A7D793
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 10:19:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42C641889247
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 07:57:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 222337A47FB
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 08:18:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A37F82253FF;
-	Mon,  7 Apr 2025 07:57:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14A3C227EA8;
+	Mon,  7 Apr 2025 08:18:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K/dQG2zQ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="hKV9wWN3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fanzine2.igalia.com (fanzine.igalia.com [178.60.130.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 348901A8F93;
-	Mon,  7 Apr 2025 07:57:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7ABC227E86;
+	Mon,  7 Apr 2025 08:18:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.60.130.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744012635; cv=none; b=YI7LdGphph8l3Y5TzTJAeVFGkiu9PGoAY6ycYSm4K2lkFKfs441fFp5GbOv41fa14VfvX4M68Wtu+MMOr7jedn4uosZb2GCX+KOI+aHE/hBMg7zhUo+vak4CtcaV6DaGVFC1PlU3qfmvqttMarD6gJZM653zl5HqBgl3mJJ7pwQ=
+	t=1744013906; cv=none; b=ZU0aPWMfd3658jbPXMTSVcdGZThhknkTiaiZBhQfYI/zq5PiumZ89EbWXCwlBTek+xkcGu0XdoxlWZ+wMYy014aUmIc15PXQOBRzMX9Iu1nngG1WD95dJ+hs62wc39q1NEixGXvbcUDsncbUgsgbZLNFmKqNbSxx24uRFN3nYBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744012635; c=relaxed/simple;
-	bh=bt92100q8tdkl5vY+RJN4GQR/4KBzXjuLLCjPpRgb0k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bjyzzHBHPWu59UVyncK7SYq7FxZoHCfk4gpbx/dRR+mi+b2wS5HI3Tb3nOoDuTvB98Pa5cyypznXnYmqV6w5hzCirpZCgWgwWFH00c4mmnG4X7+/+iLSZdktbizZx2+Ly+Dv8mwe1/Q8Hw+T/gcmdaMRU2n5VBOyg5X0R4Grfbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K/dQG2zQ; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7396f13b750so4135250b3a.1;
-        Mon, 07 Apr 2025 00:57:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744012633; x=1744617433; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=O0APgzzLBBEMmyyLsOgicTUxIPxJFFTMMFuvPfAMqCE=;
-        b=K/dQG2zQSud9rjLoBysRDydQ1qTtFjP/k4qhky01O0dF11cr5uN84MmnSpUR1jlcJM
-         461hRBe+8ESM4PO3HmRY2k0cMFm5IYVbPzUg0Kdjjw0r8tlGB60APO9XndHoq+trkb+U
-         byi1yD0acS0ZTCy5c06WLzBE6X67Ryn9TxqTKxAFujHaj8WBpxc9EZJ7/QSdiU/hdGSV
-         7arXA5tmg2BT1vd6Nh4wxMoN5SItSe5+IRnnGToMT8nFL2244FZFJRZcEFfpPhySCzfO
-         h3YPRmVmHEXE+1QK7hPaKlnXda9y1tXsVZQsZNu3H8+GViw3nAGgdjDJqacIx/pF7LYb
-         REtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744012633; x=1744617433;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O0APgzzLBBEMmyyLsOgicTUxIPxJFFTMMFuvPfAMqCE=;
-        b=ozxvAbgCaG4VeBTU2kz8KExaz7hLCRKp/pRSzxjBkgk2pAtMkFzKYLHbcFbVpYTiYu
-         mKiiWxB79gtvpvfSwf6ZHkmUFPAunHoOEf++8nIFZWiHv2zORnFYKfsykub+s2d9Cbpm
-         CXnQERe980VYksb+igoQttU81f/3ckIumiDwvQx6Ba/QoY9PO70/M3eZ6Q2INU3lt9Ww
-         QSb0A0ocFeCYNR2VVQnqewIHe0s0lwDhKI5NvO1LG2JBaqqEPaJMQZEbqWVzKtAwVRNY
-         nKXF/q0L3aOQEQbWjkZEb8190Vb6A/xKTDYKoilceAV0eNMSnGEihvYWtoBtnnS6Xp4c
-         aKLA==
-X-Forwarded-Encrypted: i=1; AJvYcCVSlWqv//wpSzJQuTmKy3auReV4a02tPkbMncCQieew/mo3UUmPg9DM1vKVhblc3ZjNRd5+KlAvZrVdAMg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJ2Z15f72TgtAGeAkWkkjIAyfS5/r19tghr4fFIjd4TwYWdBJ1
-	fUjKXXBh4KOKMYBV1QeQtbh2X06JneQv8HOEqVVdAEIFxD/Puziw
-X-Gm-Gg: ASbGncu2hI5WamagcDnAJ0j/XStHG2z0Ngfkn/lUqMVKEbuAXU/Y92nAKy92LcicVwR
-	pxmqFUSQ/823kd76pUnKpr665dNtD1YMvwnHYokxJ9Uh3AuX2Y1KDC5rwIKlhKlSh7IBJOX0yq8
-	aWUD1TppeIhZPclWQiJms9+kLDNOK7SlMbKixOiQ0rI7w9wwb6EFzea6Irw+JbwWcimYxXXDaba
-	I/qOVX6FHgXoXDjNNCaAz0ggkVYCEQ9bjVKamIGKNufb1X7eR4h4rJC6/XwJMxBFLD8SwMN1/W3
-	j8rPaDtuC7dyNXYRhpobUFceMIlgsGs9UngETx1SSkKhRbb1nJnL5SLc9+0V
-X-Google-Smtp-Source: AGHT+IEkI7xynWBdZQXRIHFIofzZPHRUKy2ojEAZzUR9vRgWo9bX3j/cGl6WdQQ7T7e/tWc282/Eow==
-X-Received: by 2002:a05:6a00:1482:b0:730:97a6:f04 with SMTP id d2e1a72fcca58-73b6aa3dca6mr10478734b3a.7.1744012633292;
-        Mon, 07 Apr 2025 00:57:13 -0700 (PDT)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-739d97ef3c2sm8113043b3a.59.2025.04.07.00.57.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 00:57:12 -0700 (PDT)
-Date: Mon, 7 Apr 2025 07:57:05 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>,
-	linux-kernel@vger.kernel.org, Liang Li <liali@redhat.com>
-Subject: Re: [PATCH net] bonding: use permanent address for MAC swapping if
- device address is same
-Message-ID: <Z_OFUaeotDYJ31o7@fedora>
-References: <20250319080947.2001-1-liuhangbin@gmail.com>
- <d99b52d7-bdd7-4c67-9be5-f5c48edc8afa@redhat.com>
+	s=arc-20240116; t=1744013906; c=relaxed/simple;
+	bh=RSCsB9LyBZKImdCS3CO3v6PdojzJl9JVl7oocdENeNE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=j7R4qlUEZFXX3KpdTt8gr6ULQZb5pDc0BeV/Qf4zwNt0kyORjdqGqZkvkNxeEN3leESxd/6JjF9CePlRNackkAhvS60jcVOGui4i86k4ofmk5CY+jyDJ04a99nl1gAxWRirWE4Lu6KseQLx2U0Jf+MAW1I0wKgWSywkNeZnECQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=hKV9wWN3; arc=none smtp.client-ip=178.60.130.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+	s=20170329; h=Content-Type:MIME-Version:Message-ID:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Sender:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=QLfWDAfI2AnhA5OmyBMH2GN+AZpLJ7m9IQNoTTz/1Q4=; b=hKV9wWN32qu+WchUIFvT0Y/SjM
+	2jWOqCMP8azbf0L91SpOxo+jsmyFsk7lkPVPctusn8AFPs+uDq3cXumQ8vwCDqJb37TPEiAKa9bne
+	RbbZxzRlPl0klHLLP90DXY7loMrOTto9cmul4NyOA2xrH3CUjNgiBDwKv3Yr2l9GnMefHeXwxxlQv
+	ltnzBYGSKj5GRTbbRU+qux7UPNP2AGeKxkMA9Js8C8lFn9OvtxS6X8IqDKekKor8QQdM2E0h+TWb8
+	GuzUWCPrSvf0NS6FQ9ojvlb2cFTRyFkE/izVHQN0aBdPIWJ72lnKmNNErX/pewmwHs7Pa7RwoOGht
+	Cpjw6ing==;
+Received: from 79.red-83-60-111.dynamicip.rima-tde.net ([83.60.111.79] helo=localhost)
+	by fanzine2.igalia.com with utf8esmtpsa 
+	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
+	id 1u1h3B-00CmbI-HY; Mon, 07 Apr 2025 09:37:45 +0200
+From: Ricardo =?utf-8?Q?Ca=C3=B1uelo?= Navarro <rcn@igalia.com>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, kernel-dev@igalia.com, linux-sctp@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+Subject: Re: [PATCH] sctp: check transport existence before processing a
+ send primitive
+In-Reply-To: <CADvbK_evR93rj1ZT_bzLKFqNQLPQ2BM0mzKnriGGsO5t07GAHQ@mail.gmail.com>
+References: <20250402-kasan_slab-use-after-free_read_in_sctp_outq_select_transport-v1-1-da6f5f00f286@igalia.com>
+ <CADvbK_dTX3c9wgMa8bDW-Hg-5gGJ7sJzN5s8xtGwwYW9FE=rcg@mail.gmail.com>
+ <87tt75efdj.fsf@igalia.com>
+ <CADvbK_c69AoVyFDX2YduebF9DG8YyZM7aP7aMrMyqJi7vMmiSA@mail.gmail.com>
+ <CADvbK_d+vr-t7D1GZJ86gG6oS+Nzy7MDVh_+7Je6hqCdez4Axw@mail.gmail.com>
+ <87r028dyye.fsf@igalia.com>
+ <CADvbK_evR93rj1ZT_bzLKFqNQLPQ2BM0mzKnriGGsO5t07GAHQ@mail.gmail.com>
+Date: Mon, 07 Apr 2025 09:37:44 +0200
+Message-ID: <87o6x8e81j.fsf@igalia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d99b52d7-bdd7-4c67-9be5-f5c48edc8afa@redhat.com>
+Content-Type: text/plain
 
-On Thu, Apr 03, 2025 at 04:02:33PM +0200, Paolo Abeni wrote:
-> On 3/19/25 9:09 AM, Hangbin Liu wrote:
-> > Similar with a951bc1e6ba5 ("bonding: correct the MAC address for "follow"
-> > fail_over_mac policy"). The fail_over_mac follow mode requires the formerly
-> > active slave to swap MAC addresses with the newly active slave during
-> > failover. However, the slave's MAC address can be same under certain
-> > conditions:
-> > 
-> > 1) ip link set eth0 master bond0
-> >    bond0 adopts eth0's MAC address (MAC0).
-> > 
-> > 1) ip link set eth1 master bond0
-> >    eth1 is added as a backup with its own MAC (MAC1).
-> > 
-> > 3) ip link set eth0 nomaster
-> >    eth0 is released and restores its MAC (MAC0).
-> >    eth1 becomes the active slave, and bond0 assigns MAC0 to eth1.
-> 
-> It was not immediately clear to me that the mac-dance in the code below
-> happens only at failover time.
-> 
-> I second Jakub's doubt, I think it would be better to change eth0 mac
-> address here (possibly to permanent eth1 mac, to preserve some consistency?)
+On Fri, Apr 04 2025 at 10:22:38, Xin Long <lucien.xin@gmail.com> wrote:
 
-I have talked about one of the duplicate mac issue with Jay before [1]. We
-decided to print a warning for that. I will discuss with Jay for this one
-in one new patch thread.
+>> Something like this:
+>>
+>> @@ -9225,7 +9227,9 @@ static int sctp_wait_for_sndbuf(struct sctp_association *asoc, long *timeo_p,
+>>         pr_debug("%s: asoc:%p, timeo:%ld, msg_len:%zu\n", __func__, asoc,
+>>                  *timeo_p, msg_len);
+>>
+>> -       /* Increment the association's refcnt.  */
+>> +       /* Increment the transport and association's refcnt. */
+>> +       if (transport)
+>> +               sctp_transport_hold(transport);
+>>         sctp_association_hold(asoc);
+>>
+>>         /* Wait on the association specific sndbuf space. */
+>> @@ -9252,6 +9256,8 @@ static int sctp_wait_for_sndbuf(struct sctp_association *asoc, long *timeo_p,
+>>                 lock_sock(sk);
+>>                 if (sk != asoc->base.sk)
+>>                         goto do_error;
+>> +               if (transport && transport->dead)
+>> +                       goto do_nonblock;
+>>
+>>                 *timeo_p = current_timeo;
+>>         }
+>> @@ -9259,7 +9265,9 @@ static int sctp_wait_for_sndbuf(struct sctp_association *asoc, long *timeo_p,
+>>  out:
+>>         finish_wait(&asoc->wait, &wait);
+>>
+>> -       /* Release the association's refcnt.  */
+>> +       /* Release the transport and association's refcnt. */
+>> +       if (transport)
+>> +               sctp_transport_put(transport);
+>>         sctp_association_put(asoc);
+>>
+>>         return err;
+>>
+>>
+>> So by the time the sending thread re-claims the socket lock it can tell
+>> whether someone else removed the transport by checking transport->dead
+>> (set in sctp_transport_free()) and there's a guarantee that the
+>> transport hasn't been freed yet because we hold a reference to it.
+>>
+>> If the whole receive path through sctp_assoc_rm_peer() is protected by
+>> the same socket lock, as you said, this should be safe. The tests I ran
+>> seem to work fine. If you're ok with it I'll send another patch to
+>> supersede this one.
+>>
+> LGTM.
 
-[1] https://lore.kernel.org/netdev/Z49yXz1dx2ZzqhC1@fedora
+Good, thanks! I submitted a patch that supersedes this one:
+https://lore.kernel.org/linux-sctp/20250404-kasan_slab-use-after-free_read_in_sctp_outq_select_transport__20250404-v1-1-5ce4a0b78ef2@igalia.com
+so we can drop this.
 
-Thanks
-Hangbin
-> 
-> Doing that in ndo_del_slave() should allow bonding to change the mac
-> while still owning the old slave and avoid races with user-space.
-> 
-> WDYT?
-> 
-> Thanks,
-> 
-> Paolo
-> 
+Cheers,
+Ricardo
 
