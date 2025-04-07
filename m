@@ -1,144 +1,151 @@
-Return-Path: <netdev+bounces-179631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C48AA7DE6D
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 15:03:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 989EFA7DE79
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 15:05:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E393B188B3A4
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 13:03:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B77313A7B5B
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 13:05:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 412C825335B;
-	Mon,  7 Apr 2025 13:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85FBA24A060;
+	Mon,  7 Apr 2025 13:05:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="WAaYGBHD";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="gsHlgeoZ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HRd8o50Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12A9253335
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 13:03:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E59F23A9B6;
+	Mon,  7 Apr 2025 13:05:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744030986; cv=none; b=JGFVrNpaWDyLgsdwWAmbjyitAYqE61kZUnZ8M7N/2pIlHTxSIXGZb4Cf4V9swKNXBTVBdHt92NhmadH7Kd2wlKTvZ41dr7NVNb9Mm2BAEnpREToljwxiFIgic3fE6nuikezqnr53Ivn5mktRFohsS8XSnkp+4YeJsdSej5Sldio=
+	t=1744031122; cv=none; b=Lgb+SdU5mcy03kGVm2StWCP5fOs6AUFOW0zI2LGXBDplD7BRRUNRixSnwz54sRZ284/eZ+C4wjqzT3CVrrZnPWp6UPq47kVHOZaZG6wk0wiCsTzreH38Na20Qi1F5j2w8nfS2L9o4ezcT1p8XAq1h8PctoFwEUD1cWMb/t3bB1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744030986; c=relaxed/simple;
-	bh=NyTHXZ/Qrs8dSngSw3Ynxm59xTABNUuPsWauBIAZp7c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kQfNHoIlfF1JCe6GifGNDs9Zp3ynRg2AavSxSlMIhvUkjajFIpd5I5Y8H6tgc9ahWpxAeoZJHH3U1xnNHoQig7HqkBXZXEqG9mYSaQ60LH3T7LuWN6xP4X8ExKs3yGM0ehG6+vwiI0Zcm10cQyH/s8UN/YXNGLQ9n5h6dObZofY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=WAaYGBHD; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=gsHlgeoZ; arc=none smtp.client-ip=103.168.172.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfout.phl.internal (Postfix) with ESMTP id 931A3138012C;
-	Mon,  7 Apr 2025 09:03:01 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Mon, 07 Apr 2025 09:03:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1744030981; x=
-	1744117381; bh=/43TLzUy9h8C75z2NzRD2KcaDZ6IshxawTIxzk8PLDM=; b=W
-	AaYGBHDBhENEC7Qp9uUnWg/kN4ce6FHtIMOAac7EYaqIvT7P12ifatFbo89Pezlj
-	2LJrgowz9DbBfSixCB2VBh9nkMLSnHKhgwzdlpPXSt0kSu6QlxTXc5UwiHEMBam5
-	vc4FJw8WwxDfa/BTXPigXnnvpTl4ltyWtZgkiqhLByIt59EgnMtId+xG5tcG2WtC
-	M/Ijk0Qzmwu+GZM3Lsf3VEHsBQYgxc1TcjWSZFsD3sNLSfxSDtU88s8f0AvMOvB+
-	Ecq9grat1gAEM3GRIwBdKOoU2l7Jnxih0l2FFzGSo/IFZh3FCV/dGAms+1LNPcBA
-	jO5zV67Kf3iJ4ktTQG5vw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1744030981; x=1744117381; bh=/43TLzUy9h8C75z2NzRD2KcaDZ6IshxawTI
-	xzk8PLDM=; b=gsHlgeoZQupzPgw0UaiYhdGfyTogp2A//kp/U0byJ883ORRYpo+
-	KyEUk4zL5N5JUzme7hwixS1FjYXYHnVPnpInbvWT1cSnOfQnmsyyZhq53UC1uXei
-	KEDKWFJEDknos0x3jCCTlNAdqBr8r0xSSD3hl+do5VkY1tiaenU8FazXO9OIc+Ps
-	x2HVMgJBRa3K3UfL74zBW7AeWtU2iDPznKAZmCGq/2hT4Nx0pLiJ0lKtyjnoJ3Gn
-	m+zVytClU5r802JkG52zllcepuEuMTA+d+Atl3dIYcisl/W2Hb41XYVAbgpSYQLg
-	7mmzpRDZYazpdDY/t8Q/eY+B3uuOVR5ZjOw==
-X-ME-Sender: <xms:BM3zZ3TF1f0Kn6xzO56zxbMSfqbr3rXDKY5-xQUSZAhQUJFhPgzxTQ>
-    <xme:BM3zZ4xmUQpqgOlZ8EqdrByltergFMYvYBwW440-5PKgLRB1dxRcYuK96UEB_mKqL
-    vEMOA2qQ4hDvEwoIXk>
-X-ME-Received: <xmr:BM3zZ83JOm-rpm924LOx57wUFBM885fY3FMjdi3tNEEPUA7Ds-XIy1iA93QT>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtddtvdeiucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucenucfjughrpeffhf
-    fvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgrucffuhgs
-    rhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrghtthgvrh
-    hnpeeuhffhfffgfffhfeeuiedugedtfefhkeegteehgeehieffgfeuvdeuffefgfduffen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqh
-    huvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhm
-    thhpohhuthdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhes
-    vhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhooh
-    hglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgt
-    phhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohephh
-    horhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepsghorhhishhpsehnvhhiughi
-    rgdrtghomhdprhgtphhtthhopehjohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtg
-    homh
-X-ME-Proxy: <xmx:BM3zZ3CGNUGPsiUvP4ethcXIxEHVPqbJuDwIO6KMJPVbP4FHiQr7cw>
-    <xmx:BM3zZwiiFiZcM9li7Re9_BBs7xkEvSvhztSEySTUdd00AaNKCj7vsw>
-    <xmx:BM3zZ7rJfF3rIsW3HluC9BwCuRgYC5IYubz9JxWca-LXgCkN9qSeag>
-    <xmx:BM3zZ7iRdKEchjnQrIHxyLrdT-_4kzB_sqbqzowRx1LXtgoBIrZtVA>
-    <xmx:Bc3zZ4BE5lP47QCjU6l_jS3ypJd5V1_LpvWVsVAkJzQnE5ka7GjtRe_4>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 7 Apr 2025 09:02:59 -0400 (EDT)
-Date: Mon, 7 Apr 2025 15:02:58 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	borisp@nvidia.com, john.fastabend@gmail.com,
-	syzbot+b4cd76826045a1eb93c1@syzkaller.appspotmail.com
-Subject: Re: [PATCH net 1/2] net: tls: explicitly disallow disconnect
-Message-ID: <Z_PNAl-kLE4ExJ8Q@krikkit>
-References: <20250404180334.3224206-1-kuba@kernel.org>
+	s=arc-20240116; t=1744031122; c=relaxed/simple;
+	bh=EP1KymtgMgbZpZqAIGN1ppT0EOijNSsu9AkvWc5csVA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DbooQTWfw/2+FCvCDN+hmRfabdFCUapyv5xZUV2+fGjXJ4Cv8bdRa1/g9lkUbT5+XM81LSaTEQ58Hrw7UVwjYDg7MuTUhyCRyhiTb0IZdTdmsBDIBl2tu0LRC3f15Wip0V3+gTK1wCUFnSjP6ntxSTFgP/xj3gLCD0fQkV/D6rI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HRd8o50Q; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 96A7944310;
+	Mon,  7 Apr 2025 13:05:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1744031116;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=HnHmAe40fcEqMw5EeqY5E54FMr33D6Spd3JkgsCsMDM=;
+	b=HRd8o50Qd6nt4OXCR0ac04aW4HbjdT3y5aIn0pLBFC9Kr+3kEkR6umb2H+AwlkAnmDNgtQ
+	NrqqXHhKYSV2Lum9alkPFQRHs22TwKtkCiSHI2479Mp4C9VUkXcysPSrTN7XWnVW7S0Qez
+	KmqEXBZEaON+AteOQQ2wUVfu6ofG/Nastjw7uJdZyagWymljeFpbI0mE+LTd2+zi1phyxk
+	ZirjJAnOFYRqcpldCkciPa/l16OxXveH21c4rOoznpCENfjpF2oKZpuuZQszfOiEYZb9Jh
+	9ADUrq8C49vmpTYlGBEz+sR0bTu8HvUgOrCnBkXGQul5q/TqdcEfx69V4rh33w==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Simon Horman <horms@kernel.org>,
+	Michal Kubecek <mkubecek@suse.cz>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Kory Maincent <kory.maincent@bootlin.com>
+Subject: [PATCH net v2] net: ethtool: Don't call .cleanup_data when prepare_data fails
+Date: Mon,  7 Apr 2025 15:05:10 +0200
+Message-ID: <20250407130511.75621-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250404180334.3224206-1-kuba@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtddtvdejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhephedtheeufeeutdekudelfedvfefgieduveetveeuhffgffekkeehueffueehhfeunecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudefpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiiv
+ ghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-2025-04-04, 11:03:33 -0700, Jakub Kicinski wrote:
-> syzbot discovered that it can disconnect a TLS socket and then
-> run into all sort of unexpected corner cases. I have a vague
-> recollection of Eric pointing this out to us a long time ago.
-> Supporting disconnect is really hard, for one thing if offload
-> is enabled we'd need to wait for all packets to be _acked_.
-> Disconnect is not commonly used, disallow it.
-> 
-> The immediate problem syzbot run into is the warning in the strp,
-> but that's just the easiest bug to trigger:
-> 
->   WARNING: CPU: 0 PID: 5834 at net/tls/tls_strp.c:486 tls_strp_msg_load+0x72e/0xa80 net/tls/tls_strp.c:486
->   RIP: 0010:tls_strp_msg_load+0x72e/0xa80 net/tls/tls_strp.c:486
->   Call Trace:
->    <TASK>
->    tls_rx_rec_wait+0x280/0xa60 net/tls/tls_sw.c:1363
->    tls_sw_recvmsg+0x85c/0x1c30 net/tls/tls_sw.c:2043
->    inet6_recvmsg+0x2c9/0x730 net/ipv6/af_inet6.c:678
->    sock_recvmsg_nosec net/socket.c:1023 [inline]
->    sock_recvmsg+0x109/0x280 net/socket.c:1045
->    __sys_recvfrom+0x202/0x380 net/socket.c:2237
-> 
-> Fixes: 3c4d7559159b ("tls: kernel TLS support")
-> Reported-by: syzbot+b4cd76826045a1eb93c1@syzkaller.appspotmail.com
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+There's a consistent pattern where the .cleanup_data() callback is
+called when .prepare_data() fails, when it should really be called to
+clean after a successful .prepare_data() as per the documentation.
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+Rewrite the error-handling paths to make sure we don't cleanup
+un-prepared data.
 
-(hopefully nobody complains about this. but since it was broken
-anyway...)
+Fixes: c781ff12a2f3 ("ethtool: Allow network drivers to dump arbitrary EEPROM data")
+Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Michal Kubecek <mkubecek@suse.cz>
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+V2: - Fixed typo in commit log (Simon)
+    - Changed the Fixes tag, as per Jakub's comment. Eeprom appears to
+      be the first potentially problematic case, as we risk freeing
+      twice the eeprom data. I couldn't test that with what I have
+      locally though.
+    - Aggregated Simon and Michal's reviews
 
+
+ net/ethtool/netlink.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
+index a163d40c6431..977beeaaa2f9 100644
+--- a/net/ethtool/netlink.c
++++ b/net/ethtool/netlink.c
+@@ -500,7 +500,7 @@ static int ethnl_default_doit(struct sk_buff *skb, struct genl_info *info)
+ 		netdev_unlock_ops(req_info->dev);
+ 	rtnl_unlock();
+ 	if (ret < 0)
+-		goto err_cleanup;
++		goto err_dev;
+ 	ret = ops->reply_size(req_info, reply_data);
+ 	if (ret < 0)
+ 		goto err_cleanup;
+@@ -560,7 +560,7 @@ static int ethnl_default_dump_one(struct sk_buff *skb, struct net_device *dev,
+ 	netdev_unlock_ops(dev);
+ 	rtnl_unlock();
+ 	if (ret < 0)
+-		goto out;
++		goto out_cancel;
+ 	ret = ethnl_fill_reply_header(skb, dev, ctx->ops->hdr_attr);
+ 	if (ret < 0)
+ 		goto out;
+@@ -569,6 +569,7 @@ static int ethnl_default_dump_one(struct sk_buff *skb, struct net_device *dev,
+ out:
+ 	if (ctx->ops->cleanup_data)
+ 		ctx->ops->cleanup_data(ctx->reply_data);
++out_cancel:
+ 	ctx->reply_data->dev = NULL;
+ 	if (ret < 0)
+ 		genlmsg_cancel(skb, ehdr);
+@@ -793,7 +794,7 @@ static void ethnl_default_notify(struct net_device *dev, unsigned int cmd,
+ 	ethnl_init_reply_data(reply_data, ops, dev);
+ 	ret = ops->prepare_data(req_info, reply_data, &info);
+ 	if (ret < 0)
+-		goto err_cleanup;
++		goto err_rep;
+ 	ret = ops->reply_size(req_info, reply_data);
+ 	if (ret < 0)
+ 		goto err_cleanup;
+@@ -828,6 +829,7 @@ static void ethnl_default_notify(struct net_device *dev, unsigned int cmd,
+ err_cleanup:
+ 	if (ops->cleanup_data)
+ 		ops->cleanup_data(reply_data);
++err_rep:
+ 	kfree(reply_data);
+ 	kfree(req_info);
+ 	return;
 -- 
-Sabrina
+2.49.0
+
 
