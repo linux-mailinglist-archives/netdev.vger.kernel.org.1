@@ -1,147 +1,165 @@
-Return-Path: <netdev+bounces-179498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4D1DA7D211
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 04:15:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 671D9A7D221
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 04:26:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9343188ADA6
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 02:15:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEE353AD57E
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 02:26:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EEAF1AB6D8;
-	Mon,  7 Apr 2025 02:15:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CD67213241;
+	Mon,  7 Apr 2025 02:26:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JwLcE8MQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="klJ2q2hU"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A514212FBA
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 02:15:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D2414AA9;
+	Mon,  7 Apr 2025 02:26:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1743992107; cv=none; b=L97pWZNuDjhINoyAgUvSZoOV1lopvm2knmS6Aodr5RIc9gEfJO+NdosOsXt82a8AzFw3HVTXmGaSsYIl06fFcmPP83KiIJ+r6xbeIIMAl8Dr08FiWK4Oh8q2e938ijlo2m9TRycwT365ZwCTDiZHnss06E+mgZwizLchtXYzh/s=
+	t=1743992772; cv=none; b=Avw+X5duHJNop5wHi/fxNZYmSZsyT/pXBWwC9FTeqKwTGSHpZ9XIWXU/QcocY7pO1xddyirohfno/2kd02NqzEBqtyu1dfv2MwhWccgbSBf7rH6IONTcTw4RUjiTsjdNChTpprT26wXBtaougbX7gV7XJ6oPz7oQk+Qs8kkmFi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1743992107; c=relaxed/simple;
-	bh=5iGnaKTdh8qdUpTGBnIaXxXw7Npl7YWIGBbllmqoExE=;
+	s=arc-20240116; t=1743992772; c=relaxed/simple;
+	bh=qqs+LE0eRz1+HvRjfisMIFt6Lj6/g1vAXELmv46RSi4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ieZFo3EG30r2hF0YkxW0tXZIXDlJE/6Lb8Yq34Xfy6E6aWPuUjXwI9BZT06cEYKjdek1Kv0fu2re5JXb/KxD6+HO5jUjiwkjcrm0AcxSK9DswpRzbWGldx3LD8vyFf1fngQKK7qxrN0OUvAR39vDESoKvzeLobzwqUAofefNsVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JwLcE8MQ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1743992105;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5iGnaKTdh8qdUpTGBnIaXxXw7Npl7YWIGBbllmqoExE=;
-	b=JwLcE8MQsdv0WhuBZVzPSpW1luxfBlpUyqiMMZqIF/qQa3w40ziGZD4fTZTJJWYhccsJHo
-	evyO5Nj7nE+TnglDmmiSf+QVfAtmKSm0HYxX9X+5B9twsenEj4xrrWKAb1xrk2bGSXRlqC
-	Mk+GsYZI7xiKaie51GsWjMk3Y672tVo=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-155-wjwD2JMvMH6wo64ImkPFGw-1; Sun, 06 Apr 2025 22:15:03 -0400
-X-MC-Unique: wjwD2JMvMH6wo64ImkPFGw-1
-X-Mimecast-MFC-AGG-ID: wjwD2JMvMH6wo64ImkPFGw_1743992102
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-73691c75863so5029812b3a.0
-        for <netdev@vger.kernel.org>; Sun, 06 Apr 2025 19:15:03 -0700 (PDT)
+	 To:Cc:Content-Type; b=nt/UT1plSi62tnPUhtD5mfYwdlQ9dViZRArM7AUwAcw1yvC6pOuXrUkjg5U+ZD3q5e63/wzaeSJeXJMNkyPBVgPmVLwPwbu7YhGYMFJTLn0Lt+5iWKlLr0hS93HXX80ME/bj6eJUbRKmyFL487qKz3l6HRamrxPyfigyAU1ZXkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=klJ2q2hU; arc=none smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-6febf391132so35008187b3.1;
+        Sun, 06 Apr 2025 19:26:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1743992769; x=1744597569; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=debS+VRslkmHys5XV5kL/p+TQCO24vSGvmW5DmRp9r4=;
+        b=klJ2q2hU5QK0BhrCPmtHpVURfrT3364cLANBbD1NoggF58lwGZ7V/qLNCtxEOiTjA6
+         DSSic105zW7f34EANeRuZ452rbLPCI6zUYXIjuuJE+PoesQABHl2m/BO96sO+8oZR2qZ
+         ob8oKFhU/AxYTiQqSHa8zYflUVLK2esMw/xCV1+so+pygeR7mGVbQoNvvhAk+dLZh8Kq
+         6AQe/kxuzqwKf0suTzbOJ6ff9o/Yyb2ksPEAsWUA2Xvq74z61Olvtw2nES5TC52+TOUp
+         1eUw8lpCwoVsjenYS6XYBYkg4Es577WzCNsqsFGxES5/2Y9ifFLZDu/ss1sD+FehfejV
+         visA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1743992102; x=1744596902;
+        d=1e100.net; s=20230601; t=1743992769; x=1744597569;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5iGnaKTdh8qdUpTGBnIaXxXw7Npl7YWIGBbllmqoExE=;
-        b=vm0lp066rP0ImEnEpUvHvkOREAFZZN7Q5q+MFMu0Dvx6FTacp6ZxSIbASF9SQIbLxB
-         GEVw+FsWoqV2dK/PkCPeyYV87oP4TRkwvj2Ak16ogpuXR8Fl36lToT1mCPOTdLoQ1ODW
-         QDRzGfsNxTtJr9gybL/Jj33/9wAWPhGUdQM3rNLj1O6wWzwjTIRfEC7gqxkP7RtwAjoE
-         bUxbR3zr6jzmAT0A6nGeZtOQjQBCObBSKnxC0D/5s0ADIgqRD5d1oJLqvSP6+3fwUt/L
-         f4LpY1cIo9uLlMF1/Z3C8qZfoJQ70faenDO9cO3NjGiquCeuiFKV7QaSKbOVvnrqeaW4
-         3Uog==
-X-Forwarded-Encrypted: i=1; AJvYcCXbBkeO9/6SkKtwRhXe3LW5QbUjHWQVWHAGCEdkxwWc+08dKhm+RWRdr8Yr2bkJpBt0f/lCgTM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFeJWrPmk3XfpAXUsFwhXUPFu+gOopcMWroY30SfasT8KXQSMV
-	UjF5AG4h0iseuiCvttxZh9NtPqHP7Qqnsq3PA2ZhPVmo4FCmPfXqTHF13A2wcRJGo55kTqCdsgJ
-	ujVvW9RlvqBeDljEB+Yrbluoa9O0MIyuB9RYjuiayS0iSXh9LcktbcyRkHRrQ4ff6t+TtijK4YD
-	1kndQ1Rh6rDR8mxtdOcok6tNi5zeN7
-X-Gm-Gg: ASbGncvCqi0gJywEBTH2KDWyUf8xjejgqw/YVUs0+ATati/XuqksnuONavIv7WnAwcC
-	YmjtAPHIMzV4lyeJPF6V86ZO762xRn8Nf4q+s5Mes9duV2qNKUW/yhbztVq+GdeuQW9Dozg==
-X-Received: by 2002:a05:6a21:6f01:b0:1f5:8655:3287 with SMTP id adf61e73a8af0-201081894f9mr15997601637.40.1743992102453;
-        Sun, 06 Apr 2025 19:15:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG2xrRUCjmDh8gU4TsrPWubO4RaHlHA1/mZMFsc3k0pvCi4jb3ExJetOAjK+ODkU/PKVNydcIKM1LkzsCQTKWs=
-X-Received: by 2002:a05:6a21:6f01:b0:1f5:8655:3287 with SMTP id
- adf61e73a8af0-201081894f9mr15997577637.40.1743992102154; Sun, 06 Apr 2025
- 19:15:02 -0700 (PDT)
+        bh=debS+VRslkmHys5XV5kL/p+TQCO24vSGvmW5DmRp9r4=;
+        b=WtwRZeFpNqTwQIJWf/qLEwLKcK2lOGv7qZVLoksE8mw3aLH7UyvPa51Co7er1gnv2F
+         JLvJAgU/jdG0C++3j/daALV/KOPRt22msNLTQ55zmJbrzWanrJgD/OKQCa9L95i3avHH
+         LLSpLfqDnomeBEDtooy/zXIHfFkYemTncq5LLwgLN2txBZJD8wS1dG5QJ//rhYm8/Qww
+         z7K+cYJZ3R1bC5J/YTliBiTnPJVM4GQRTZJAlVpttv12rXXnURNqQp+ePRx6I8Xe+N1q
+         xhdLHAvLVSLxotlki3MtlBSJnn73EthBPTuT2x0hUvTDjEaupwNFXJlf2/VnP30s7W7I
+         tqWA==
+X-Forwarded-Encrypted: i=1; AJvYcCUFaNkJXnxj7tkrHPvzm+iFffUJ7QMxkqXZWLuVSalt2OYx/EOm7RTJGKXWlHmC2q1cEvE8q5L3lsbM@vger.kernel.org, AJvYcCUPQiX/SyYLbOq3G2FoOzlJNY8YYkN+iAH7tuitd37I7bw0Upoitt/yUlnO0PisdvDb4g3kypj/8ttJtiwq@vger.kernel.org, AJvYcCUfh5WMlcb4kkJumy8aaXYQQEwejMYJmisobrld8Bpkl+LzIynG3rLtO5hue87/p52Y6DsCOBpKaCkWgZVLD/4=@vger.kernel.org, AJvYcCVE4f6AlsF932Ssa59QX+4x2kuvCfZq1DIkm4Mw065UcrLuHaBr2wDHYj6Va3X/yZk+DB0k8eRZAq3S@vger.kernel.org, AJvYcCVK+gadp8QAPJ+71sPw+uTzElx2dCJ5jnfF6/oeGZcxFRY8gHr3YtpFkyHM28ETCwu8jtnxFHU7I0NVkw==@vger.kernel.org, AJvYcCVKHqH3b01JAjrbEE02F663UFePU3XkAc7WZWeaZG0eBGVXktLgxYzAKtcbd9O13CS5lN9ktNM8tl8=@vger.kernel.org, AJvYcCWJgEqxzZfn3Zd4wUYc35YDricmRlQG3bsnWLMlQAgAN2Jb9csQH4VPY1sYvMrBtkQ5IIoJs8SM@vger.kernel.org, AJvYcCX/S4t4Ghktu+gZv3ALEc6NMC2TPeFGEdEGx9bVIWXG9CjCAIDeonNkzG/RXxDRj5crJrGddF7XhzBB@vger.kernel.org, AJvYcCXCzRN+p8rU/G7+yv84RwX8CQLpwbTLx1hGdwx5greFtJ/mOzm4rLM0J21qPi6XjF/4qCVegODP1Yt2VqU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxC51YS6iW3EVd87P9gX0kGMRMH8sNjNWpUGG2c7yXlqjqmoY2k
+	plyN/MXILVSvC/aB8ZC1iFywSF06vv4e0fzX/32s9TfMwJBSSRBjc5jFFuJgYM5drVg2K1rMLwX
+	5sdbq6R0Ays0BMVZlvbCbsB68yFI=
+X-Gm-Gg: ASbGncu9A5PtZTY7SOOQ0IasZmO80XfQAqRRP01tBlIfcp9ewMUt3oASUCxjrWYDdFV
+	x+gaF/+h6szxX/VuoZGYtXPcML473+PA9o3kv41XI+bsssKyn1CMWBoFsyiitDJllSHZ25kePM2
+	Y7E/dlMnJ6FQ2FjojfEg9jefTKzx05EgycxGAMdn72sFuvr3Hk6CCPFl+5gplkXU1XfDtJMHw=
+X-Google-Smtp-Source: AGHT+IGquV6j7kjxSU5DDbl56LJUWg84NJlvktHpwJEewJUQrkBdAn2Dp3qCJNnObG7k37I2GpH8CM6noQcYsBFXMjQ=
+X-Received: by 2002:a05:690c:670f:b0:6fd:a226:fb76 with SMTP id
+ 00721157ae682-703e31407ddmr182228257b3.14.1743992769361; Sun, 06 Apr 2025
+ 19:26:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250404145241.1125078-1-jon@nutanix.com>
-In-Reply-To: <20250404145241.1125078-1-jon@nutanix.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 7 Apr 2025 10:14:51 +0800
-X-Gm-Features: ATxdqUHS0zfr8JGoyzsGJ5km2ABwTqNENhD1uX4yKsHGytOkPk4bkII2gJMMLUM
-Message-ID: <CACGkMEsFc-URhXBCGZ1=CTMZKcWPf57pYy1TcyKLL=N65u+F0Q@mail.gmail.com>
-Subject: Re: [PATCH] vhost/net: remove zerocopy support
-To: Jon Kohler <jon@nutanix.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+References: <20250225081644.3524915-1-a0282524688@gmail.com>
+ <20250225081644.3524915-2-a0282524688@gmail.com> <20250307011542.GE8350@google.com>
+ <CAOoeyxUgiTqtSksfHopEDhZHwNkUq9+d-ojo8ma3PX2dosuwyQ@mail.gmail.com>
+ <20250320145042.GS3890718@google.com> <CAOoeyxXZmrzBSNRdRx9vK84m5Z5y8T_A+wY98vVrPUZ7f4w4iw@mail.gmail.com>
+ <20250404142115.GC278642@google.com>
+In-Reply-To: <20250404142115.GC278642@google.com>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Mon, 7 Apr 2025 10:25:58 +0800
+X-Gm-Features: ATxdqUEJhGHgxl-DlDPMkzogxSTRCsyaw-VHC_dALxuK6Y_oivsfK0lqdUug0TA
+Message-ID: <CAOoeyxVVgHGkH5ajQT0NGNPv7FmVPLzuZtGjCiF7mRRto70aAg@mail.gmail.com>
+Subject: Re: [PATCH v8 1/7] mfd: Add core driver for Nuvoton NCT6694
+To: Lee Jones <lee@kernel.org>
+Cc: tmyu0@nuvoton.com, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, 
+	linux@roeck-us.net, jdelvare@suse.com, alexandre.belloni@bootlin.com, 
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 4, 2025 at 10:24=E2=80=AFPM Jon Kohler <jon@nutanix.com> wrote:
+Lee Jones <lee@kernel.org> =E6=96=BC 2025=E5=B9=B44=E6=9C=884=E6=97=A5 =E9=
+=80=B1=E4=BA=94 =E4=B8=8B=E5=8D=8810:21=E5=AF=AB=E9=81=93=EF=BC=9A
 >
-> Commit 098eadce3c62 ("vhost_net: disable zerocopy by default") disabled
-> the module parameter for the handle_tx_zerocopy path back in 2019,
-> nothing that many downstream distributions (e.g., RHEL7 and later) had
-> already done the same.
+> > ...
+> > > > > > +     MFD_CELL_BASIC("gpio-nct6694", NULL, NULL, 0, 0x1),
+> > > > >
+> > > > > IDs are usually given in base-10.
+> > > > >
+> > > >
+> > > > Fix it in v9.
+> > > >
+> > > > > Why are you manually adding the device IDs?
+> > > > >
+> > > > > PLATFORM_DEVID_AUTO doesn't work for you?
+> > > > >
+> > > >
+> > > > I need to manage these IDs to ensure that child devices can be
+> > > > properly utilized within their respective modules.
+> > >
+> > > How?  Please explain.
+> > >
+> > > This numbering looks sequential and arbitrary.
+> > >
+> > > What does PLATFORM_DEVID_AUTO do differently such that it is not usef=
+ul?
+> > >
+> >
+> > As far as I know, PLATFORM_DEVID_AUTO assigns dynamic IDs to devices,
+> > but I need fixed IDs.
+> > For example, the GPIO driver relies on these IDs to determine the
+> > group, allowing the firmware to identify which GPIO group to operate
+> > on through the API.
 >
-> Both upstream and downstream disablement suggest this path is rarely
-> used.
+> PLATFORM_DEVID_AUTO will allocate IDs 0 through 16, the same as you've
+> done here.  These lines do not have any differentiating attributes, so
+> either way we are not allocating specific IDs to specific pieces of the
+> H/W.  I still do not understand why you need to allocate them manually.
 >
-> Testing the module parameter shows that while the path allows packet
-> forwarding, the zerocopy functionality itself is broken. On outbound
-> traffic (guest TX -> external), zerocopy SKBs are orphaned by either
-> skb_orphan_frags_rx() (used with the tun driver via tun_net_xmit())
 
-This is by design to avoid DOS.
+I'm using PLATFORM_DEVID_AUTO to allocate child device IDs with
+MFD_CELL_NAME(), like this:
 
-> or
-> skb_orphan_frags() elsewhere in the stack,
+static const struct mfd_cell nct6694_dev[] =3D {
+    MFD_CELL_NAME("nct6694-gpio"),
+    MFD_CELL_NAME("nct6694-gpio"),
+    ......
+    MFD_CELL_NAME("nct6694-gpio"),
+    MFD_CELL_NAME("nct6694-i2c"),
+    MFD_CELL_NAME("nct6694-i2c"),
+    ......
+    MFD_CELL_NAME("nct6694-i2c"),
+    ......
+};
 
-Basically zerocopy is expected to work for guest -> remote case, so
-could we still hit skb_orphan_frags() in this case?
+For example, the device IDs retrieved in gpio-nct6694.c is 1~16, and
+i2c-nct6694.c is 17~22. Does this mean each driver should
+independently handle its dynamically assigned IDs?
+Additionally, I originally referred to cgbc-core.c with i2c-cgbc.c,
+and ab8500-core.c with pwm-ab8500.c for associating child devices. Do
+you think this approach is appropriate in my case?
 
-> as vhost_net does not set
-> SKBFL_DONT_ORPHAN.
->
-> Orphaning enforces a memcpy and triggers the completion callback, which
-> increments the failed TX counter, effectively disabling zerocopy again.
->
-> Even after addressing these issues to prevent SKB orphaning and error
-> counter increments, performance remains poor. By default, only 64
-> messages can be zerocopied, which is immediately exhausted by workloads
-> like iperf, resulting in most messages being memcpy'd anyhow.
->
-> Additionally, memcpy'd messages do not benefit from the XDP batching
-> optimizations present in the handle_tx_copy path.
->
-> Given these limitations and the lack of any tangible benefits, remove
-> zerocopy entirely to simplify the code base.
->
-> Signed-off-by: Jon Kohler <jon@nutanix.com>
 
-Any chance we can fix those issues? Actually, we had a plan to make
-use of vhost-net and its tx zerocopy (or even implement the rx
-zerocopy) in pasta.
-
-Eugenio may explain more here.
-
-Thanks
-
+Thanks,
+Ming
 
