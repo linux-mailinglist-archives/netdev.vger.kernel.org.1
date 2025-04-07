@@ -1,167 +1,186 @@
-Return-Path: <netdev+bounces-179917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9552A7EE5D
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 22:05:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4A6EA7EE6F
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 22:06:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 576653AE54C
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:52:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F54516B516
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 20:00:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37472571C8;
-	Mon,  7 Apr 2025 19:47:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 999F721B1AA;
+	Mon,  7 Apr 2025 19:56:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="GkzAe42M"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="0RDm7DR7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9020E2566F2
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 19:47:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECB9621B9F7
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 19:56:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744055263; cv=none; b=mw+Ur5cS0LJhYaPvClXrn8NfOQaIvPeSoDAvcZRz5ofJA+FZDL17gUIWR9d45p353fkkL45f4dcfpSqIuR2w2ENdw1Lh1iSDClCad6fbJwLskpp/3iiH41NgW0jZvJt6XZBVReWLeZiDs3Jgf4Z1ZkES3BmsZwGujMusnTEcELs=
+	t=1744055789; cv=none; b=An9eE0Nsqwpl6bCFJ6lAIScoSx2RHfxzzOHbw023R2Hm4qoTsNLhwqTcQ7yvkISgJ09QlVSH8dtEhCuFCrt8rFCIvvTQIUg/NdACr/S76jAjC3TjZ3gAUa2LFmiaJrhTBdu6iAws8V2oILRzQzi7jXf3zbBlRiJSl3r2T3Kd+ZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744055263; c=relaxed/simple;
-	bh=p7EPARGgj7SOAKKN0dz6NdkgyLuHiOXuH0ISCFXsGr8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=rKBmgH4M2cW5PMnM2v3WVZyfLyH5iuvmnk1RZcqM+A6OnBWPitDdY88hpNqAHLJI9MjOZgaIsAbzaAakIhh/BC0Y2TKMNUu9+bozMjwtX6YfSZoOENtNNeHim0FR31JlOq09OaqBz7uBkfUx7fglY0I17tYiV6ekb1ZGpnUoYag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=GkzAe42M; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43cfe574976so32949235e9.1
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 12:47:40 -0700 (PDT)
+	s=arc-20240116; t=1744055789; c=relaxed/simple;
+	bh=vZczen8sZQ58OTS/uXGCR9+q3QFexyMu8q1ko9rFzMg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YY1m5wSU4es1IoAsvvwy2KZL+DlFpop0BQe06Xn+/NEpBwgISKUOg4vdR6I85JtF33Ezy42ghIrvPLJOTmUg3iAwR7/qlUgmyoH/W9EMTtZipV2z4TPO9s3eCG9vjEwlfQFImmeR/flTlwEEspYhR77zzZt9g0QJ09ZJO2VYCYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=0RDm7DR7; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-22548a28d0cso65924835ad.3
+        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 12:56:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1744055259; x=1744660059; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bTG+JAVhy7g/2FYXf9MXw9ym7I0+fhRPbhOjScULiXA=;
-        b=GkzAe42MZ6LkN010siMdmp6Kk3vnTevThskm4FyFjHCs09IdM8nPx2p37sNbB5sjGo
-         GtV0E/XkhOx22OBR9EQw9DbyLFrYoU4W0EdkcbySG+wqkkgqdHqwlB3Q9ojl/kdFnJTT
-         J6J3ket6CFKW+A8o3ccGVkBfO0FGvuxcPJC2WNTJq1YlDtE+AEFEa4rshInrSHVXRe21
-         +kXrr183ucyuYPTL95I1+/DNtnw9sBkV4bLKJ8GRyTLO5rVmZbDy45ONA2/XFH/Z3mxm
-         djYkP10j9avXP0EofvaDAvmHuQtPcWpJzWuTiFeQtzsG4q+yvp2MB545KU/zmPq3w9qU
-         8OMg==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1744055787; x=1744660587; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Op29psY/9lPB9GJwxpOGVvo3J4ePmM6GB/+Rn+OKR38=;
+        b=0RDm7DR7xQ9AVpCfHjEuwE+k131dfJFYqXDwnJ3yUKpd+9Qn+DUxlF3l17ouUwUZ7a
+         1cl+0LQtdZQEdqzdnVtGjkd+Tsq1VoWM5vNhtJhag+bBOhIgJUNmmKeFMiiPvpWWoW/9
+         /mG+MdRTxHwwA+s2XG5nTBYssSqMXcdPS/qoFI8DtDBvtH6TbW6ao5tLYxeMqcASLo3R
+         +RaHR0OipG+/dvElevSCEqqWT7yB4zYBQst4YJQlKc2EEX/UtVLmJw1VUemT/573Mr9K
+         Y9rV43rrcECeLDkuPLBeRw8vI+zIPfwzv3P7YChAvX/z6v1LomVeKQJo4REsWVQFHEz7
+         e3cQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744055259; x=1744660059;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1744055787; x=1744660587;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bTG+JAVhy7g/2FYXf9MXw9ym7I0+fhRPbhOjScULiXA=;
-        b=p4U8dS023cjoBXOxQ41qwAcd4boDQ/vZjLfYQFeeSUv/zTWfQqBhK123uOyXYLiZIV
-         0df0y5fzAHYaZzhRw0f7b1rU+G83nlfCs+ox2oWQOq/1XVPUc/UqEHB2d9xJeU5h5GCL
-         q4i/bRv35ybI0GiCFWDOGO+rwr41yDsoF4y5OyKpqXzABnuYeq78k7/N1XUHrxJ2IIwt
-         AjQQ1QYDDZ2osyy1DhYQgE4k2AVZJfI/e4I5DNcx1aa20pGPP+RHIyaF/ZBSedGfTl1Z
-         32KH/zt5OifmXSv8vK0oInQxFwLhX+kkNSrUlQxU1IK6dxRkl1dWGi3iU7RqUK1p5neH
-         Gs0w==
-X-Gm-Message-State: AOJu0Yz6+stHJ70ChedLmu1EnGD44v+w4V5yoL16Iv1M/g/xJRN8qcLD
-	Z09Fqzz8B709wP1Rp2XSjHw+5yBxgtX5+XdYmzRMjRCYvxbC8w7LO3Up0Y0xIHx4kFlIZDz+WRh
-	CYFtOTdQHIi1i7sDhXLPN08BiTWXmUvcDi29429Q/V6sL+2k=
-X-Gm-Gg: ASbGncubRN5/X1QXFhAoKklMuwrEPPIv6loScAnWjgSUVDTzvvEn+WJuACYFCxKpO6e
-	CcYBD24Yvc0icMa3uV2x/FrvmYdkcfHzwVSRO8sEMm7Z+AvSybMkRaDbhXPN6RaYaWhjZEyReY5
-	ghU/o520SUDddoOvwPTlonvIHKECkHOJ3veqN5Mn2KlHCqdKN9fqs0i1fJQHlh6pdzUtIDFdSz+
-	a3eGFHWZga2/s5NjpXi2UIYHlaQn5bmKwXVVZvSM3zqGA/biXVCOJlKy2tKseMzTNz+FLOhLFNV
-	YoZJpqTOHuIXrJZsRSV2Z70MO6HDK2m4+ZOtMgGAbw==
-X-Google-Smtp-Source: AGHT+IHUnyV/qcdqTJGnAyZy+o0NAwfkJ+ys74RDBYpD0u8Kn3sHuMI34ZodEx+o7T4wQu4mhztvTg==
-X-Received: by 2002:a05:600c:1d9a:b0:43c:fe90:1282 with SMTP id 5b1f17b1804b1-43ecf81c644mr120676795e9.7.1744055258867;
-        Mon, 07 Apr 2025 12:47:38 -0700 (PDT)
-Received: from [127.0.0.1] ([2001:67c:2fbc:1:fb98:cd95:3ed6:f7c6])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec342a3dfsm141433545e9.4.2025.04.07.12.47.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 12:47:38 -0700 (PDT)
-From: Antonio Quartulli <antonio@openvpn.net>
-Date: Mon, 07 Apr 2025 21:46:30 +0200
-Subject: [PATCH net-next v25 22/23] ovpn: add basic ethtool support
+        bh=Op29psY/9lPB9GJwxpOGVvo3J4ePmM6GB/+Rn+OKR38=;
+        b=h/b/+s7kCHT0IxzN2AVU16v0MhR6ZaGn0nKU4AOW5xps26qqDLZCvpEz3e24nSXzK6
+         jchlq/EaUYHu5iZlEm9n4x5VpQp3jIjn05nA0m55dHUaxJSQf6LAFgY1gl4a5wSjs6B6
+         x0AfnL6pmXO/G7CeVdoXg9+jKTLg3EoS7e/xPmlxbvqGOAB7Rkq5EntOeyaEhOrUgQIX
+         HXODpROeUiekGoEPkhYZfGKE9kNg9vTsA82PozSGl2SLby5PK7rtCL6NE7dJBQJwvlOB
+         ZRJEb/FOGH55H7gIHrfm5ihcIoggAsj49nvOVv9hvXD+BGHYXJ+0o7Lvvw8q+P+WbVp3
+         3c0g==
+X-Forwarded-Encrypted: i=1; AJvYcCWwZgH9g9HbJAI6KjXtRmR3YZu4NJt2iMka9pM5U5aSgl+S40d9EZaBQMuCa3riH+W4Dn7rPG4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzU+S7ObxmD7Li2BcsoQ5m2MHxawR9XtvXSJHsBNbguenpTQWtS
+	9iqRwBBYg+IHI9E4+xZrSdCb3rxZbPlu+7XtJHTljfEKItWBJ2ojhp9QvAZQ1X4iWPtl97+UtCE
+	+EAJx3KdI08tkcx6De25JZCUsRhJaMkKabKe3
+X-Gm-Gg: ASbGnctjeby0b4Lus7iz01KFbtIKbeUlrl+di1Nf6wNE+CbafgNrx+zUeNTTJIcn95i
+	3m1AS8rFTSf7xXCYMsjahCAWcV1Glj98WuuMWkfTNgNXfrqeUdDxjrgsxz9XoFGWHA+ua86dq8L
+	CvrZbWhGDM/SE262BiSBHTWzRUnQ==
+X-Google-Smtp-Source: AGHT+IEVO08Lp71/L7iX2yXym2sEoAP+4Fjnmdjk+WLFRrxvyL/28SeF0PBuXPyupIUprg9zpRz6MtludW+cYHVgbx0=
+X-Received: by 2002:a17:903:2301:b0:229:1cef:4c83 with SMTP id
+ d9443c01a7336-22a8a84b3cemr197110675ad.4.1744055787096; Mon, 07 Apr 2025
+ 12:56:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250407-b4-ovpn-v25-22-a04eae86e016@openvpn.net>
-References: <20250407-b4-ovpn-v25-0-a04eae86e016@openvpn.net>
-In-Reply-To: <20250407-b4-ovpn-v25-0-a04eae86e016@openvpn.net>
-To: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Donald Hunter <donald.hunter@gmail.com>, 
- Antonio Quartulli <antonio@openvpn.net>, Shuah Khan <shuah@kernel.org>, 
- sd@queasysnail.net, ryazanov.s.a@gmail.com, 
- Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>, 
- Andrew Lunn <andrew@lunn.ch>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1680; i=antonio@openvpn.net;
- h=from:subject:message-id; bh=p7EPARGgj7SOAKKN0dz6NdkgyLuHiOXuH0ISCFXsGr8=;
- b=owEBbQGS/pANAwAIAQtw5TqgONWHAcsmYgBn9Cu2WZQMtfAcsWAzhebYq0vvAVfJfrL6ViK8u
- QB1uGOplo+JATMEAAEIAB0WIQSZq9xs+NQS5N5fwPwLcOU6oDjVhwUCZ/QrtgAKCRALcOU6oDjV
- h1oNB/0eY1nmLk0nKIzQhmCvdsCiXTSJJxKA8lJ9d7PHWt+OxZDjTOY3v9cPn0duB0bssgYbLgj
- hb3wSr0XpNak4C83rwJ6xc711gCzn4q/4Z7Tlb2qoYywVqDfJQ7lWZVIdBVFzEvdbhPKg28f1uv
- isfPWZVIGN6zgPzDKpiRfnMdn8Yc3dBcARKJV+mohlv5Yp0/LWoNZBeR0El+nBWRO9/0ZShkBXb
- MZQ2NWm9teg+mmYrovjPmjS7fQ/TCJ3lk3fZFWRVVXD7TaMGBHSgHQP2enwqXdf6bv0edPx2m8L
- 6RvFNdTBfq12B0yeLUDuWj4SUiMS0vjdq/AtJnRDwCUU7r/x
-X-Developer-Key: i=antonio@openvpn.net; a=openpgp;
- fpr=CABDA1282017C267219885C748F0CCB68F59D14C
+References: <20250407112923.20029-1-toke@redhat.com>
+In-Reply-To: <20250407112923.20029-1-toke@redhat.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 7 Apr 2025 15:56:15 -0400
+X-Gm-Features: ATxdqUGv_znJGwYNWvSEG1MgpSSeYBPNQYwYsJABC6rxy6YQzJwAr7h91C2kBLM
+Message-ID: <CAM0EoM=oC0kPOEcNdng8cmHHGA_kTL+y0mAcwTDXuLfiJhsjyg@mail.gmail.com>
+Subject: Re: [RFC PATCH net] tc: Return an error if filters try to attach too
+ many actions
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Ilya Maximets <i.maximets@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Implement support for basic ethtool functionality.
+On Mon, Apr 7, 2025 at 7:29=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <to=
+ke@redhat.com> wrote:
+>
+> While developing the fix for the buffer sizing issue in [0], I noticed
+> that the kernel will happily accept a long list of actions for a filter,
+> and then just silently truncate that list down to a maximum of 32
+> actions.
+>
+> That seems less than ideal, so this patch changes the action parsing to
+> return an error message and refuse to create the filter in this case.
+> This results in an error like:
+>
+>  # ip link add type veth
+>  # tc qdisc replace dev veth0 root handle 1: fq_codel
+>  # tc -echo filter add dev veth0 parent 1: u32 match u32 0 0 $(for i in $=
+(seq 33); do echo action pedit munge ip dport set 22; done)
+> Error: Only 32 actions supported per filter.
+> We have an error talking to the kernel
+>
+> Instead of just creating a filter with 32 actions and dropping the last
+> one.
+>
+> Sending as an RFC as this is obviously a change in UAPI. But seeing as
+> creating more than 32 filters has never actually *worked*, it could be
+> argued that the change is not likely to break any existing workflows.
+> But, well, OTOH: https://xkcd.com/1172/
+>
+> So what do people think? Worth the risk for saner behaviour?
+>
 
-Note that ovpn is a virtual device driver, therefore
-various ethtool APIs are just not meaningful and thus
-not implemented.
+I dont know anyone using that many actions per filter, but given it's
+a uapi i am more inclined to keep it.
+How about just removing the "return -EINVAL" then it becomes a
+warning? It would need a 2-3 line change to iproute2 to recognize the
+extack with positive ACK from the kernel.
 
-Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
- drivers/net/ovpn/main.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+cheers,
+jamal
 
-diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
-index 0e016d39c95e52515437313064e892aa3038adad..46abbbed384a4a98e87fadf5a3d749adb78d1de2 100644
---- a/drivers/net/ovpn/main.c
-+++ b/drivers/net/ovpn/main.c
-@@ -7,6 +7,7 @@
-  *		James Yonan <james@openvpn.net>
-  */
- 
-+#include <linux/ethtool.h>
- #include <linux/genetlink.h>
- #include <linux/module.h>
- #include <linux/netdevice.h>
-@@ -135,6 +136,19 @@ bool ovpn_dev_is_valid(const struct net_device *dev)
- 	return dev->netdev_ops == &ovpn_netdev_ops;
- }
- 
-+static void ovpn_get_drvinfo(struct net_device *dev,
-+			     struct ethtool_drvinfo *info)
-+{
-+	strscpy(info->driver, "ovpn", sizeof(info->driver));
-+	strscpy(info->bus_info, "ovpn", sizeof(info->bus_info));
-+}
-+
-+static const struct ethtool_ops ovpn_ethtool_ops = {
-+	.get_drvinfo		= ovpn_get_drvinfo,
-+	.get_link		= ethtool_op_get_link,
-+	.get_ts_info		= ethtool_op_get_ts_info,
-+};
-+
- static void ovpn_setup(struct net_device *dev)
- {
- 	netdev_features_t feat = NETIF_F_SG | NETIF_F_GSO |
-@@ -144,6 +158,7 @@ static void ovpn_setup(struct net_device *dev)
- 
- 	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
- 
-+	dev->ethtool_ops = &ovpn_ethtool_ops;
- 	dev->netdev_ops = &ovpn_netdev_ops;
- 
- 	dev->priv_destructor = ovpn_priv_free;
 
--- 
-2.49.0
-
+> [0] https://lore.kernel.org/r/20250407105542.16601-1-toke@redhat.com
+>
+> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> ---
+>  net/sched/act_api.c | 16 ++++++++++++++--
+>  1 file changed, 14 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/sched/act_api.c b/net/sched/act_api.c
+> index 839790043256..057e20cef375 100644
+> --- a/net/sched/act_api.c
+> +++ b/net/sched/act_api.c
+> @@ -1461,17 +1461,29 @@ int tcf_action_init(struct net *net, struct tcf_p=
+roto *tp, struct nlattr *nla,
+>                     struct netlink_ext_ack *extack)
+>  {
+>         struct tc_action_ops *ops[TCA_ACT_MAX_PRIO] =3D {};
+> -       struct nlattr *tb[TCA_ACT_MAX_PRIO + 1];
+> +       struct nlattr *tb[TCA_ACT_MAX_PRIO + 2];
+>         struct tc_action *act;
+>         size_t sz =3D 0;
+>         int err;
+>         int i;
+>
+> -       err =3D nla_parse_nested_deprecated(tb, TCA_ACT_MAX_PRIO, nla, NU=
+LL,
+> +       err =3D nla_parse_nested_deprecated(tb, TCA_ACT_MAX_PRIO + 1, nla=
+, NULL,
+>                                           extack);
+>         if (err < 0)
+>                 return err;
+>
+> +       /* The nested attributes are parsed as types, but they are really=
+ an
+> +        * array of actions. So we parse one more than we can handle, and=
+ return
+> +        * an error if the last one is set (as that indicates that the re=
+quest
+> +        * contained more than the maximum number of actions).
+> +        */
+> +       if (tb[TCA_ACT_MAX_PRIO + 1]) {
+> +               NL_SET_ERR_MSG_FMT(extack,
+> +                                  "Only %d actions supported per filter"=
+,
+> +                                  TCA_ACT_MAX_PRIO);
+> +               return -EINVAL;
+> +       }
+> +
+>         for (i =3D 1; i <=3D TCA_ACT_MAX_PRIO && tb[i]; i++) {
+>                 struct tc_action_ops *a_o;
+>
+> --
+> 2.49.0
+>
 
