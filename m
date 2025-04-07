@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-179805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBF25A7E889
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:39:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E9FDA7E891
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:40:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEE143BC708
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 17:36:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A957189ABA6
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 17:37:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C777D25484B;
-	Mon,  7 Apr 2025 17:33:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75E25254AF2;
+	Mon,  7 Apr 2025 17:33:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DHv6iTZT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f36/GH3c"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B23253F38
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 17:33:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CC3E21B1A3
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 17:33:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744047208; cv=none; b=drTHmwPWbz8q3YBsGIf2+FthHqUzcGuZA1Mr6rpqYKRrUlST6PykczLDfMqUPQc/L72p2/iEz0MBow87cyt1MEwDSyqTwAjHUVNlCYsbxvMY9gowcIWfLldqsW4tl04g+Gm92cV38pUyfgCwxgScCkPry4ZJ4du1Eugq9CbJ/jQ=
+	t=1744047217; cv=none; b=X3gMWT8fpw25zhPeLDzV3+/TOqogS5qQUY7HsA8WaSjjp8xswpzTsKgM5C1FLa451xIKL8LuhIKSrfZdKbFm7nzLSUFbrpv+au1gBAT3IerWwcd4B6v93cFE4uZyRetATsv3TZxoMDUZuBK9Hz2q7G4ya11idoaaoz4IrCFZd2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744047208; c=relaxed/simple;
-	bh=fOinvVF4zjc5mAIV5+YxY0DBJZSXdcUH4zkv4GiwKIA=;
+	s=arc-20240116; t=1744047217; c=relaxed/simple;
+	bh=9tEV12iT+lk/TQbKifPeVzB73FC77sRewfBk494d0R4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bEq0B0j1gGtt/vSVOS5bBP1b4WIul+NpowMCKSp4Ia/BVNwOC/f7qmRcyo26/+YBGQ1+dpvWAlVEqmpovsEqDW2jelHuwk2FanVdlv1h0bd79OqoxOHKpMN/HynR2cOGL8bQGCyK8bfPaeE2JdfgPgKfG0y/nWhbAlwtDAaPkec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DHv6iTZT; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=eB9KHxSp0e8ZccRZnxmIQGDpE7xzsGqnVOrokWx8MdnUetbIIhvAL+NVCXiCtf7bEwQ9kAgqQg23vGN1aOdqrhNCitOgc/rUhtKydZe52YXjcAPlSON8KWSRHUSVPYfzv+gdN05YWd3g5n+6hVioxgK9piThOiyyXAMX8e6C4hU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f36/GH3c; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744047206;
+	s=mimecast20190719; t=1744047214;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Zv+1ZBatY0TmzFGyhm3TfhAvf1Rfkq6eLjmy+v+sptY=;
-	b=DHv6iTZTW7kvEq4QVfOsvMsZqKXBGXf//bOSrRuUkz8yugycjIsdbq33L2Pk2bwl6q7vWq
-	ViME+tJfq2SaT0o5txdDHSkYCuMh4qrcA2pgmfpt1Uf3XabWv8UYXQeOrjdkocjQVVCr3T
-	s40Qac1QGaX5/mDqmW7ydMAYG4TJSXA=
+	bh=nyJ7SczzSvPBvcmVSXKy9h7tEHe7K41VOZ4HgFb0Xyk=;
+	b=f36/GH3cXHYKxu1F7S9tsXcExdRgEu111HEVGwzHQg40qKGrI2/OeScsE417m1FAwFuOLF
+	izX2bQ+dwIm0FuLc2EPDW45biTq470kDLiLgqvhx7MdEg1bIXoQ+N6Qz7nbIgGMyBnJkjL
+	jfAC2mhtgpLAyoth9AGph2eL+sYKb4g=
 Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-652-h0TdVLfoPYyS7zgSHc5bNw-1; Mon,
- 07 Apr 2025 13:33:24 -0400
-X-MC-Unique: h0TdVLfoPYyS7zgSHc5bNw-1
-X-Mimecast-MFC-AGG-ID: h0TdVLfoPYyS7zgSHc5bNw_1744047201
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-312-r7q0JEySM8i0VCg5F-ehuA-1; Mon,
+ 07 Apr 2025 13:33:29 -0400
+X-MC-Unique: r7q0JEySM8i0VCg5F-ehuA-1
+X-Mimecast-MFC-AGG-ID: r7q0JEySM8i0VCg5F-ehuA_1744047207
 Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5170B180AF52;
-	Mon,  7 Apr 2025 17:33:21 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 61CB31801A1A;
+	Mon,  7 Apr 2025 17:33:27 +0000 (UTC)
 Received: from p16v.luc.cera.cz (unknown [10.44.32.4])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BDAB7180B488;
-	Mon,  7 Apr 2025 17:33:15 +0000 (UTC)
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E126C180B488;
+	Mon,  7 Apr 2025 17:33:21 +0000 (UTC)
 From: Ivan Vecera <ivecera@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Michal Schmidt <mschmidt@redhat.com>,
@@ -74,9 +74,9 @@ Cc: Michal Schmidt <mschmidt@redhat.com>,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-hardening@vger.kernel.org
-Subject: [PATCH 22/28] dpll: zl3073x: Add support to get/set frequency on input pins
-Date: Mon,  7 Apr 2025 19:32:55 +0200
-Message-ID: <20250407173301.1010462-3-ivecera@redhat.com>
+Subject: [PATCH 23/28] dpll: zl3073x: Add support to get/set frequency on output pins
+Date: Mon,  7 Apr 2025 19:32:56 +0200
+Message-ID: <20250407173301.1010462-4-ivecera@redhat.com>
 In-Reply-To: <20250407172836.1009461-1-ivecera@redhat.com>
 References: <20250407172836.1009461-1-ivecera@redhat.com>
 Precedence: bulk
@@ -88,232 +88,313 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Add support to get/set frequency from/to input pins. The frequency
-for input pins (references) is computed in the device according this
-formula:
+This adds support to get/set frequencies for output pins. The frequency
+for output pin is determined by the frequency of synthesizer the output
+pin is connected to and divisor of the output to which is the given pin
+belongs. The resulting frequency of the P-pin and the N-pin from this
+output pair depends on the signal format of this output pair.
 
- freq = base_freq * multiplier * (nominator / denominator)
+The device supports so-called N-divided signal formats where for the
+N-pin there is an additional divisor. The frequencies for both pins from
+such output pair are computed:
 
-where the base_freq comes from the list of supported base frequencies
-and other parameters are arbitrary numbers. All these parameters are
-16-bit unsigned integers.
+ P-pin-freq = synth_freq / output_div
+ N-pin-freq = synth_freq / output_div / n_div
 
-Implement necessary callbacks for input pins and helper function
-to factorize a frequency into a base frequency and a multiplier
-(nominator and denominator are used as 1 for now).
+For other signal-format types both P and N pin have the same frequency
+based only synth frequency and output divisor.
+
+Implement output pin callbacks to get and set frequency. The frequency
+setting for the output non-N-divided signal format is simple as we have
+to compute just new output divisor. For N-divided formats it is more
+complex because by changing of output divisor we change frequency for
+both P and N pins. In this case if we are changing frequency for P-pin
+we have to compute also new N-divisor for N-pin to keep its current
+frequency. From this and the above it follows that the frequency of
+the N-pin cannot be higher than the frequency of the P-pin and the
+callback must take this limitation into account.
 
 Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
 Co-developed-by: Prathosh Satish <Prathosh.Satish@microchip.com>
 Signed-off-by: Prathosh Satish <Prathosh.Satish@microchip.com>
 Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 ---
- drivers/dpll/dpll_zl3073x.c | 179 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 179 insertions(+)
+ drivers/dpll/dpll_zl3073x.c | 248 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 248 insertions(+)
 
 diff --git a/drivers/dpll/dpll_zl3073x.c b/drivers/dpll/dpll_zl3073x.c
-index 192e0e56fcdde..965664da9371d 100644
+index 965664da9371d..07a547aaee0f1 100644
 --- a/drivers/dpll/dpll_zl3073x.c
 +++ b/drivers/dpll/dpll_zl3073x.c
-@@ -56,6 +56,14 @@ ZL3073X_REG8_DEF(synth_phase_shift_mask,	0x49f);
- ZL3073X_REG8_DEF(synth_phase_shift_intvl,	0x4a0);
- ZL3073X_REG16_DEF(synth_phase_shift_data,	0x4a1);
+@@ -74,6 +74,14 @@ ZL3073X_REG8_IDX_DEF(dpll_ref_prio,		0x652,
+ #define DPLL_REF_PRIO_MAX			14
+ #define DPLL_REF_PRIO_NONE			15 /* non-selectable */
  
 +/*
-+ * Register Map Page 10, Ref Mailbox
++ * Register Map Page 14, Output Mailbox
 + */
-+ZL3073X_REG16_DEF(ref_freq_base,		0x505);
-+ZL3073X_REG16_DEF(ref_freq_mult,		0x507);
-+ZL3073X_REG16_DEF(ref_ratio_m,			0x509);
-+ZL3073X_REG16_DEF(ref_ratio_n,			0x50b);
++ZL3073X_REG32_DEF(output_div,			0x70c);
++ZL3073X_REG32_DEF(output_width,			0x710);
++ZL3073X_REG32_DEF(output_ndiv_period,		0x714);
++ZL3073X_REG32_DEF(output_ndiv_width,		0x718);
 +
- /*
-  * Register Map Page 12, DPLL Mailbox
-  */
-@@ -218,6 +226,175 @@ zl3073x_dpll_pin_direction_get(const struct dpll_pin *dpll_pin, void *pin_priv,
+ #define ZL3073X_REF_NONE			ZL3073X_NUM_INPUT_PINS
+ #define ZL3073X_REF_IS_VALID(_ref)		((_ref) != ZL3073X_REF_NONE)
+ 
+@@ -787,6 +795,244 @@ zl3073x_dpll_input_pin_prio_set(const struct dpll_pin *dpll_pin, void *pin_priv,
  	return 0;
  }
  
-+/**
-+ * zl3073x_dpll_input_ref_frequency_factorize - factorize given frequency
-+ * @freq: input frequency
-+ * @base_freq: base frequency
-+ * @mult: multiplier
-+ *
-+ * Checks if the given frequency can be factorized using one of the
-+ * supported base frequencies. If so the base frequency and multiplier
-+ * are stored into appropriate parameters if they are not NULL and
-+ * returns 0. If the frequency cannot be factorized then the function
-+ * returns -EINVAL.
-+ */
-+static int
-+zl3073x_dpll_input_ref_frequency_factorize(u64 freq, u16 *base, u16 *mult)
++static u8
++zl3073x_dpll_pin_synth_get(struct zl3073x_dpll_pin *pin)
 +{
-+	static const u16 base_freqs[] = {
-+		1, 2, 4, 5, 8, 10, 16, 20, 25, 32, 40, 50, 64, 80, 100, 125,
-+		128, 160, 200, 250, 256, 320, 400, 500, 625, 640, 800, 1000,
-+		1250, 1280, 1600, 2000, 2500, 3125, 3200, 4000, 5000, 6250,
-+		6400, 8000, 10000, 12500, 15625, 16000, 20000, 25000, 31250,
-+		32000, 40000, 50000, 62500,
-+	};
-+	u32 div, rem;
-+	int i;
++	u8 output = zl3073x_dpll_output_pin_output_get(pin);
 +
-+	for (i = 0; i < ARRAY_SIZE(base_freqs); i++) {
-+		div = div_u64_rem(freq, base_freqs[i], &rem);
-+		if (!rem && div <= U16_MAX) {
-+			if (base)
-+				*base = base_freqs[i];
-+			if (mult)
-+				*mult = div;
-+
-+			return 0;
-+		}
-+	}
-+
-+	return -EINVAL;
++	return zl3073x_output_synth_get(pin_to_dev(pin), output);
 +}
 +
-+/**
-+ * zl3073x_dpll_input_ref_frequency_get - get input reference frequency
-+ * zldev: pointer to device structure
-+ * ref_id: reference id
-+ * frequency: pointer to variable to store frequency
-+ *
-+ * Context: zl3073x_dev.lock has to be held
-+ *
-+ * Reads frequency of given input reference.
-+ *
-+ * Returns 0 in case of success or negative value if error occurred
-+ */
 +static int
-+zl3073x_dpll_input_ref_frequency_get(struct zl3073x_dev *zldev, u8 ref_id,
-+				     u64 *frequency)
++zl3073x_dpll_output_pin_frequency_get(const struct dpll_pin *dpll_pin,
++				      void *pin_priv,
++				      const struct dpll_device *dpll,
++				      void *dpll_priv, u64 *frequency,
++				      struct netlink_ext_ack *extack)
 +{
-+	u16 base_freq, mult, num, denom;
++	struct zl3073x_dpll *zldpll = dpll_priv;
++	struct zl3073x_dev *zldev = zldpll->mfd;
++	struct zl3073x_dpll_pin *pin = pin_priv;
++	u8 output, signal_format, synth;
++	u64 synth_freq;
++	u32 output_div;
 +	int rc;
 +
-+	/* Read reference configuration into mailbox */
-+	rc = zl3073x_mb_ref_read(zldev, ref_id);
++	guard(zl3073x)(zldev);
++
++	output = zl3073x_dpll_output_pin_output_get(pin);
++	synth = zl3073x_dpll_pin_synth_get(pin);
++	synth_freq = zl3073x_synth_freq_get(zldev, synth);
++
++	/* Read output configuration into mailbox */
++	rc = zl3073x_mb_output_read(zldev, output);
 +	if (rc)
 +		return rc;
 +
-+	/* Read base frequency */
-+	rc = zl3073x_read_ref_freq_base(zldev, &base_freq);
++	/* Get divisor */
++	rc = zl3073x_read_output_div(zldev, &output_div);
 +	if (rc)
 +		return rc;
 +
-+	/* Read multiplier */
-+	rc = zl3073x_read_ref_freq_mult(zldev, &mult);
-+	if (rc)
-+		return rc;
-+
-+	/* Write numerator */
-+	rc = zl3073x_read_ref_ratio_m(zldev, &num);
-+	if (rc)
-+		return rc;
-+
-+	/* Write denominator */
-+	rc = zl3073x_read_ref_ratio_n(zldev, &denom);
-+	if (rc)
-+		return rc;
-+
-+	/* Sanity check that HW has not returned zero denominator */
-+	if (!denom) {
++	/* Check output divisor for zero */
++	if (!output_div) {
 +		dev_err(zldev->dev,
-+			"Zero divisor for ref %u frequency got from device\n",
-+			ref_id);
++			"Zero divisor for output %u got from device\n",
++			output);
 +		return -EINVAL;
 +	}
 +
-+	*frequency = mul_u64_u32_div(base_freq * mult, num, denom);
++	/* Read used signal format for the given output */
++	signal_format = zl3073x_output_signal_format_get(zldev, output);
++
++	switch (signal_format) {
++	case OUTPUT_MODE_SIGNAL_FORMAT_TWO_N_DIV:
++	case OUTPUT_MODE_SIGNAL_FORMAT_TWO_N_DIV_INV:
++		/* In case of divided format we have to distiguish between
++		 * given output pin type.
++		 */
++		if (zl3073x_dpll_is_p_pin(pin)) {
++			/* For P-pin the resulting frequency is computed as
++			 * simple division of synth frequency and output
++			 * divisor.
++			 */
++			*frequency = div_u64(synth_freq, output_div);
++		} else {
++			/* For N-pin we have to divide additionally by
++			 * divisor stored in output_ndiv_period register
++			 * that is used as N-pin divisor for these modes.
++			 */
++			u64 divisor;
++			u32 ndiv;
++
++			rc = zl3073x_read_output_ndiv_period(zldev, &ndiv);
++			if (rc)
++				return rc;
++
++			/* Check N-pin divisor for zero */
++			if (!ndiv) {
++				dev_err(zldev->dev,
++					"Zero N-pin divisor for output %u got from device\n",
++					output);
++				return -EINVAL;
++			}
++
++			/* Compute final divisor for N-pin */
++			divisor = mul_u32_u32(output_div, ndiv);
++			*frequency = div64_u64(synth_freq, divisor);
++		}
++		break;
++	default:
++		/* In other modes the resulting frequency is computed as
++		 * division of synth frequency and output divisor.
++		 */
++		*frequency = div_u64(synth_freq, output_div);
++		break;
++	}
 +
 +	return rc;
 +}
 +
 +static int
-+zl3073x_dpll_input_pin_frequency_get(const struct dpll_pin *dpll_pin,
-+				     void *pin_priv,
-+				     const struct dpll_device *dpll,
-+				     void *dpll_priv, u64 *frequency,
-+				     struct netlink_ext_ack *extack)
++zl3073x_dpll_output_pin_frequency_set(const struct dpll_pin *dpll_pin,
++				      void *pin_priv,
++				      const struct dpll_device *dpll,
++				      void *dpll_priv, u64 frequency,
++				      struct netlink_ext_ack *extack)
 +{
 +	struct zl3073x_dpll *zldpll = dpll_priv;
 +	struct zl3073x_dev *zldev = zldpll->mfd;
 +	struct zl3073x_dpll_pin *pin = pin_priv;
-+	u8 ref_id;
-+
-+	/* Take device lock */
-+	guard(zl3073x)(zldev);
-+
-+	/* Get index of the pin */
-+	ref_id = zl3073x_dpll_pin_index_get(pin);
-+
-+	/* Read and return ref frequency */
-+	return zl3073x_dpll_input_ref_frequency_get(zldev, ref_id, frequency);
-+}
-+
-+static int
-+zl3073x_dpll_input_pin_frequency_set(const struct dpll_pin *dpll_pin,
-+				     void *pin_priv,
-+				     const struct dpll_device *dpll,
-+				     void *dpll_priv, u64 frequency,
-+				     struct netlink_ext_ack *extack)
-+{
-+	struct zl3073x_dpll *zldpll = dpll_priv;
-+	struct zl3073x_dev *zldev = zldpll->mfd;
-+	struct zl3073x_dpll_pin *pin = pin_priv;
-+	u16 base_freq, mult;
-+	u8 ref_id;
++	u32 output_n_freq, output_p_freq;
++	u8 output, signal_format, synth;
++	u32 cur_div, new_div, n_div;
++	u64 rem, synth_freq;
 +	int rc;
 +
-+	/* Get base frequency and multiplier for the requested frequency */
-+	rc = zl3073x_dpll_input_ref_frequency_factorize(frequency, &base_freq,
-+							&mult);
-+	if (rc)
-+		return rc;
++	output = zl3073x_dpll_output_pin_output_get(pin);
++	synth = zl3073x_dpll_pin_synth_get(pin);
++	synth_freq = zl3073x_synth_freq_get(zldev, synth);
 +
-+	/* Take device lock */
++	/* Compute new divisor and check the remainder to be zero as
++	 * the requested frequency has to divide synthesizer frequency
++	 */
++	new_div = (u32)div64_u64_rem(synth_freq, frequency, &rem);
++	if (rem) {
++		dev_err(zldev->dev,
++			"The requested frequency must divide %llu Hz\n",
++			synth_freq);
++		return -EINVAL;
++	}
++
 +	guard(zl3073x)(zldev);
 +
-+	/* Write base frequency */
-+	rc = zl3073x_write_ref_freq_base(zldev, base_freq);
++	/* Read output configuration into mailbox */
++	rc = zl3073x_mb_output_read(zldev, output);
 +	if (rc)
 +		return rc;
 +
-+	/* Write multiplier */
-+	rc = zl3073x_write_ref_freq_mult(zldev, mult);
++	/* Get used signal format for the given output */
++	signal_format = zl3073x_output_signal_format_get(zldev, output);
++
++	/* Check signal format */
++	if (signal_format != OUTPUT_MODE_SIGNAL_FORMAT_TWO_N_DIV &&
++	    signal_format != OUTPUT_MODE_SIGNAL_FORMAT_TWO_N_DIV_INV) {
++		/* For non N-divided signal formats the frequency is computed
++		 * as division of synth frequency and output divisor.
++		 */
++		rc = zl3073x_write_output_div(zldev, new_div);
++		if (rc)
++			return rc;
++
++		/* For 50/50 duty cycle the divisor is equal to width */
++		rc = zl3073x_write_output_width(zldev, new_div);
++		if (rc)
++			return rc;
++
++		/* Update output configuration from mailbox */
++		return zl3073x_mb_output_write(zldev, output);
++	}
++
++	/* For N-divided signal format get current divisor */
++	rc = zl3073x_read_output_div(zldev, &cur_div);
 +	if (rc)
 +		return rc;
 +
-+	/* Write numerator */
-+	rc = zl3073x_write_ref_ratio_m(zldev, 1);
++	/* Check output divisor for zero */
++	if (!cur_div) {
++		dev_err(zldev->dev,
++			"Zero divisor for output %u got from device\n",
++			output);
++		return -EINVAL;
++	}
++
++	/* Compute current output frequency for P-pin */
++	output_p_freq = (u32)div_u64(synth_freq, cur_div);
++
++	/* Get N-pin divisor */
++	rc = zl3073x_read_output_ndiv_period(zldev, &n_div);
 +	if (rc)
 +		return rc;
 +
-+	/* Write denominator */
-+	rc = zl3073x_write_ref_ratio_n(zldev, 1);
++	/* Check N-pin divisor for zero */
++	if (!n_div) {
++		dev_err(zldev->dev,
++			"Zero N-pin divisor for output %u got from device\n",
++			output);
++		return -EINVAL;
++	}
++
++	/* Compute current N-pin frequency */
++	output_n_freq = output_p_freq / n_div;
++
++	if (zl3073x_dpll_is_p_pin(pin)) {
++		/* We are going to change output frequency for P-pin but
++		 * if the requested frequency is less than current N-pin
++		 * frequency then indicate a failure as we are not able
++		 * to compute N-pin divisor to keep its frequency unchanged.
++		 */
++		if (frequency <= output_n_freq)
++			return -EINVAL;
++
++		/* Update the register with new divisor */
++		rc = zl3073x_write_output_div(zldev, new_div);
++		if (rc)
++			return rc;
++
++		/* For 50/50 duty cycle the divisor is equal to width */
++		rc = zl3073x_write_output_width(zldev, new_div);
++		if (rc)
++			return rc;
++
++		/* Compute new divisor for N-pin */
++		n_div = (u32)div_u64(frequency, output_n_freq);
++	} else {
++		/* We are going to change frequency of N-pin but if
++		 * the requested freq is greater or equal than freq of P-pin
++		 * in the output pair we cannot compute divisor for the N-pin.
++		 * In this case indicate a failure.
++		 */
++		if (output_p_freq <= frequency)
++			return -EINVAL;
++
++		/* Compute new divisor for N-pin */
++		n_div = output_p_freq / (u32)frequency;
++	}
++
++	/* Update divisor for the N-pin */
++	rc = zl3073x_write_output_ndiv_period(zldev, n_div);
 +	if (rc)
 +		return rc;
 +
-+	/* Get index of the pin */
-+	ref_id = zl3073x_dpll_pin_index_get(pin);
++	/* For 50/50 duty cycle the divisor is equal to width */
++	rc = zl3073x_write_output_ndiv_width(zldev, n_div);
++	if (rc)
++		return rc;
 +
-+	/* Update reference configuration from mailbox */
-+	return zl3073x_mb_ref_write(zldev, ref_id);
++	/* Update output configuration from mailbox */
++	return zl3073x_mb_output_write(zldev, output);
 +}
 +
- /**
-  * zl3073x_dpll_selected_ref_get - get currently selected reference
-  * @zldpll: pointer to zl3073x_dpll
-@@ -685,6 +862,8 @@ zl3073x_dpll_mode_get(const struct dpll_device *dpll, void *dpll_priv,
+ static int
+ zl3073x_dpll_output_pin_state_on_dpll_get(const struct dpll_pin *dpll_pin,
+ 					  void *pin_priv,
+@@ -872,6 +1118,8 @@ static const struct dpll_pin_ops zl3073x_dpll_input_pin_ops = {
  
- static const struct dpll_pin_ops zl3073x_dpll_input_pin_ops = {
+ static const struct dpll_pin_ops zl3073x_dpll_output_pin_ops = {
  	.direction_get = zl3073x_dpll_pin_direction_get,
-+	.frequency_get = zl3073x_dpll_input_pin_frequency_get,
-+	.frequency_set = zl3073x_dpll_input_pin_frequency_set,
- 	.prio_get = zl3073x_dpll_input_pin_prio_get,
- 	.prio_set = zl3073x_dpll_input_pin_prio_set,
- 	.state_on_dpll_get = zl3073x_dpll_input_pin_state_on_dpll_get,
++	.frequency_get = zl3073x_dpll_output_pin_frequency_get,
++	.frequency_set = zl3073x_dpll_output_pin_frequency_set,
+ 	.state_on_dpll_get = zl3073x_dpll_output_pin_state_on_dpll_get,
+ };
+ 
 -- 
 2.48.1
 
