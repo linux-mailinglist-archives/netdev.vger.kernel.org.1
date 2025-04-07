@@ -1,121 +1,144 @@
-Return-Path: <netdev+bounces-179516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BBA6A7D409
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 08:31:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2FA7A7D447
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 08:37:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43067188D09F
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 06:31:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F6D1188BC91
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 06:37:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503D52253BA;
-	Mon,  7 Apr 2025 06:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FCF9224AF0;
+	Mon,  7 Apr 2025 06:37:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=natalenko.name header.i=@natalenko.name header.b="T67kECPf"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="XA46FmkP"
 X-Original-To: netdev@vger.kernel.org
-Received: from prime.voidband.net (prime.voidband.net [199.247.17.104])
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE2A83C0B;
-	Mon,  7 Apr 2025 06:30:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.247.17.104
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92C1823DE;
+	Mon,  7 Apr 2025 06:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744007450; cv=none; b=PEv0759mqsnqS71yjd9BCHWHMNAM3afRgrZoSriKzkY0WwoQBZL2JHng2LkXGqeuxrJ+WxMrjlbINSThqJXhr47DwvEBn39IxqnOW7UexT2aQXi3tAVhOSvmhsifujmie0gO2+JMEUAqmRR8GrRLe43bw3e8d3ZAmSiPBxnc8vY=
+	t=1744007846; cv=none; b=Uxw3dZOG7TLBbykxr2y0f67xcT8AQMnTcb31V9NGSi/xOm79PB+7edIxJgxs8NFnmdAs69TiVu+7SjOY8cnFfn1XDd+c/iwoiFLUTD0J+YiAma2cdDyyl+COSofRn2VbAdDQvw4FhPak1+2iWRSB98GfJBvuQwcFh82K/PmC73Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744007450; c=relaxed/simple;
-	bh=Mbsqq+6fCCPLoE8/BcquABwEHP6K3EYwcjR7Z+gthvk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rm2t49/XqUyS7IlCSLacROzfyUfiDhyD740tpu6OTw/50S0YfJ+kUsOJFiLteNRSn820dSiwbEqKinjR3zVxXrwZubGrnszLanOaqvFfmVpJy5NJf6tXLCrkv2SJDrY09aW1dH0u/26ksctNIQ5Y/Yri7QWojLen0+6m3iQmW/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=natalenko.name; spf=pass smtp.mailfrom=natalenko.name; dkim=pass (1024-bit key) header.d=natalenko.name header.i=@natalenko.name header.b=T67kECPf; arc=none smtp.client-ip=199.247.17.104
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=natalenko.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=natalenko.name
-Received: from spock.localnet (unknown [212.20.115.26])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange x25519 server-signature ECDSA (prime256v1) server-digest SHA256)
-	(No client certificate requested)
-	by prime.voidband.net (Postfix) with ESMTPSA id CB416635B040;
-	Mon, 07 Apr 2025 08:20:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
-	s=dkim-20170712; t=1744006859;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=vjO3TAnFOqalGZ8xSYfbpH7cqt+Bfn6P2ZGcPBU9VrA=;
-	b=T67kECPfT42QpBEFPxPp59Fv0xiLmj2hM27rMbf3PfIKcxYgnmWvIuC9rghujRZRFdM0Lg
-	OXW+pL+q8oqvHeq1MxJ33fg7ygvcgVzndpV6ERoQYM+RUooRVmY8vFRu0DRzGp9UfDT57I
-	jR5vQAtmHZab6o88WIQahsLsJEnageU=
-From: Oleksandr Natalenko <oleksandr@natalenko.name>
-To: linux-kernel@vger.kernel.org
-Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@kernel.org>
-Subject: objtool warning in ice_free_prof_mask
-Date: Mon, 07 Apr 2025 08:20:45 +0200
-Message-ID: <4970551.GXAFRqVoOG@natalenko.name>
+	s=arc-20240116; t=1744007846; c=relaxed/simple;
+	bh=1PLeiOJan5E04enkubnodEdWWhd/M6a1vmpMxhunRCA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kyM5+PijeVPgoQ3TzhZB7XwP89K9F/RajQh2N88hoq5TxS5lPPXIuNvZkqdOjrkLv4bc135oZ6yKm9hG6WRMiQOXAFnTF4FsP80+KWvA9f/Mq33LLpFVuGr6JoairJGtVVq2gM3dsBKLGykfNiuTNCoar3QzQAswwWFL3yEMsSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=XA46FmkP; arc=none smtp.client-ip=52.119.213.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744007846; x=1775543846;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=VLIhyyYceNiIMAaYJakHuJEpyqlifxIxyTlUbCOBkRM=;
+  b=XA46FmkPZmlir7C2spH2HCH6Rg2/9y3EGB2+YuSg3CIocAqW1Y2mrM5w
+   B8GABkMryVNPNV+fAvO4/X7lG9UIxBOeUZCMEGBrDCgvtMQ6kBdIBadHP
+   CZ84jINUbzjNWyTSk2Gnao1pxyxFObB2mgIZ8qO63OtVnS2PEiGVO1YHG
+   A=;
+X-IronPort-AV: E=Sophos;i="6.15,193,1739836800"; 
+   d="scan'208";a="286171158"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2025 06:37:21 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:16998]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.43.57:2525] with esmtp (Farcaster)
+ id 9f665dd0-fa91-4dce-b38f-b6545df837b6; Mon, 7 Apr 2025 06:37:20 +0000 (UTC)
+X-Farcaster-Flow-ID: 9f665dd0-fa91-4dce-b38f-b6545df837b6
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 7 Apr 2025 06:37:20 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.100.47) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 7 Apr 2025 06:37:16 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <syzbot+45016fe295243a7882d3@syzkaller.appspotmail.com>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <sdf@fomichev.me>, <syzkaller-bugs@googlegroups.com>
+Subject: Re: [syzbot] [net?] WARNING: bad unlock balance in do_setlink
+Date: Sun, 6 Apr 2025 23:37:01 -0700
+Message-ID: <20250407063703.20757-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <67f3694f.050a0220.0a13.0280.GAE@google.com>
+References: <67f3694f.050a0220.0a13.0280.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart1916258.tdWV9SEqCh";
- micalg="pgp-sha256"; protocol="application/pgp-signature"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D037UWB002.ant.amazon.com (10.13.138.121) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
---nextPart1916258.tdWV9SEqCh
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
-From: Oleksandr Natalenko <oleksandr@natalenko.name>
-To: linux-kernel@vger.kernel.org
-Subject: objtool warning in ice_free_prof_mask
-Date: Mon, 07 Apr 2025 08:20:45 +0200
-Message-ID: <4970551.GXAFRqVoOG@natalenko.name>
-MIME-Version: 1.0
+From: syzbot <syzbot+45016fe295243a7882d3@syzkaller.appspotmail.com>
+Date: Sun, 06 Apr 2025 22:57:35 -0700
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    8bc251e5d874 Merge tag 'nf-25-04-03' of git://git.kernel.o..
+> git tree:       net
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=1133afb0580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=24f9c4330e7c0609
+> dashboard link: https://syzkaller.appspot.com/bug?extid=45016fe295243a7882d3
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1040823f980000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=151d194c580000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/a500d5daba83/disk-8bc251e5.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/2459c792199a/vmlinux-8bc251e5.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/558655fb055e/bzImage-8bc251e5.xz
+> 
+> The issue was bisected to:
+> 
+> commit dbfc99495d960134bfe1a4f13849fb0d5373b42c
+> Author: Stanislav Fomichev <sdf@fomichev.me>
+> Date:   Tue Apr 1 16:34:47 2025 +0000
+> 
+>     net: dummy: request ops lock
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13233998580000
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=10a33998580000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=17233998580000
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+45016fe295243a7882d3@syzkaller.appspotmail.com
+> Fixes: dbfc99495d96 ("net: dummy: request ops lock")
+> 
+> =====================================
+> WARNING: bad unlock balance detected!
+> 6.14.0-syzkaller-12504-g8bc251e5d874 #0 Not tainted
+> -------------------------------------
+> syz-executor814/5834 is trying to release lock (&dev_instance_lock_key) at:
+> [<ffffffff89f41f56>] netdev_unlock include/linux/netdevice.h:2756 [inline]
+> [<ffffffff89f41f56>] netdev_unlock_ops include/net/netdev_lock.h:48 [inline]
+> [<ffffffff89f41f56>] do_setlink+0xc26/0x43a0 net/core/rtnetlink.c:3406
+> but there are no more locks to release!
 
-Hello.
+#syz test
 
-With v6.15-rc1, CONFIG_OBJTOOL_WERROR=y and gcc 14.2.1 the following happens:
-
-```
-drivers/net/ethernet/intel/ice/ice.o: error: objtool: ice_free_prof_mask.isra.0() falls through to next function ice_free_flow_profs.cold()
-drivers/net/ethernet/intel/ice/ice.o: error: objtool: ice_free_prof_mask.isra.0.cold() is missing an ELF size annotation
-```
-
-If I mark ice_write_prof_mask_reg() as noinline, this warning disappears.
-
-Any idea what's going wrong?
-
-Thank you.
-
--- 
-Oleksandr Natalenko, MSE
---nextPart1916258.tdWV9SEqCh
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEZUOOw5ESFLHZZtOKil/iNcg8M0sFAmfzbr0ACgkQil/iNcg8
-M0vZkhAA1tXUFHurvbvtwTDQNNs1ru9REB1w9TKVmN62Dgv9US35rAtlFot4wulq
-43xzWuIcgR6OrHd9/39OZ9BJE2RVzOBIcBHYexgXCnX9BkH0A+y9LobJA8cMrLt+
-bp/TNhJqxbobWt+YPLAWgIujNANpeepexdN/oJoW857M1dj2QQmLLHkPdAGyOhTv
-jXPA+Ul+TJm4PN+u/q3WdWpUZHhXrWn5ICfyx+dzYqoYRpgQD84B/YMUasqA2R5d
-ClWK5PTQq80ynDVdVLh1KKb3gXBornnQumLcalZijIz/Mwc8ELLfjt9Xv2XNdS5n
-vlCw49IH2rvU+1zYhMx4DLkVh3n22pyL+Msp3UQt8klFlQ88ko8aK9Gh2Y5q+BLr
-oHMokSoj92aZKjznihYWdsBst/QpFOmGTMOEtD0cHtxobZVfQnfHfd/i4yLPHWwS
-ouogXxD5lx0Kx8SS4unDa4UtNP4ZQHcOmUt4l2EYeI0rnwus0NBDWGb7jdGgtuU7
-1IJcJ+zs9uCEELgLDuPV67Q+2WBhqebZlJZC48vgLV47AuZ+r2XQP8BDl2F0Bh6J
-cIDAiz07u3LBAaPByYdTQY0YZVr8z79MvNpGxKwNXt2LYE1yksOgpzmeUsYp+Mjb
-gGBSJckC6a4KwNCG/i2gaYB/65jUaBVypebWMEGnDvF4qSLhFDw=
-=UuCv
------END PGP SIGNATURE-----
-
---nextPart1916258.tdWV9SEqCh--
-
-
-
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index c23852835050..925d634f724e 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -3027,7 +3027,7 @@ static int do_setlink(const struct sk_buff *skb, struct net_device *dev,
+ 
+ 	err = validate_linkmsg(dev, tb, extack);
+ 	if (err < 0)
+-		goto errout;
++		return err;
+ 
+ 	if (tb[IFLA_IFNAME])
+ 		nla_strscpy(ifname, tb[IFLA_IFNAME], IFNAMSIZ);
 
