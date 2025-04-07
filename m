@@ -1,111 +1,142 @@
-Return-Path: <netdev+bounces-179740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10B65A7E687
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:31:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27E04A7E684
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:31:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 345D3165E21
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:22:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EB5F166BB2
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:25:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE9E7209F32;
-	Mon,  7 Apr 2025 16:18:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 051B620C00F;
+	Mon,  7 Apr 2025 16:20:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kVRIsCwT"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="k8iDYmWf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A216F206F3D;
-	Mon,  7 Apr 2025 16:18:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D081EF364;
+	Mon,  7 Apr 2025 16:20:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744042700; cv=none; b=UQWL74iF5LIrp0YhyynvoR4dOSxFS4z0AnheIaPa5phN15lUmrz7hhFQD2Q5QXlG+USSFOQVvMWPKOqbfI99wv/HqDuDl+p7c4V/DqX42kMM6gc1tx+2qrgScStgVAEurvrLbKRsy3MrUa25kvifnXy9pjpNaXTATC+47HvQYoY=
+	t=1744042835; cv=none; b=FQy7lVLY/jZKJeDvn3/2eOzHPB/3tHcYSzFy10pS5YXAxHywsU5YPpONnRgj4y6wT5XKGxoAmALPucrEjJ7slOwTy06e76yxOIJ/hhEBBaCo65qt8AouGBr/UGhdnzyG5MSArdVbJrYr4tDNrMMacRvAITNgsUIudSwjFtLOBpk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744042700; c=relaxed/simple;
-	bh=Npy/xy0YV1ziwkRI72xXbsBU6c5ZpgqGLAv3/5M2HgA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jQ3ucAfkIPp5CRtwWGIVzp7pqNPzJglGilVK66NVFVVwdKqPD40plv0oepGPSyDQgVwbkc6H9wuo5V04x7CRRU8GzRt8VyX3jnU0zeivGW3C+no8q/8JrfFZNAG8sWnHvtd0EVAXLvfQe50QtsGY8AJbW1kj0V3SjSe+LOnaPe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kVRIsCwT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52057C4CEDD;
-	Mon,  7 Apr 2025 16:18:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744042700;
-	bh=Npy/xy0YV1ziwkRI72xXbsBU6c5ZpgqGLAv3/5M2HgA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kVRIsCwT+c6EbalzQ8v601BWz4AtFEcupFLn/1nR//IQRZbJUmUMlOWsp12GLXMzV
-	 R9zN/8xEoglBghyQ1+7ICgEIXdK9WWHoe4gKi067Ltvp4z6C2PKnYUATPq3HBHFS7t
-	 6HP9Yrr+q/3ZhfXa9C5q9qtfGRJyIl4YXh7Hop7JG82R5cVrRHFGeXIXR/zFo/iNrF
-	 UTAomdSPbn88DYS/QwzOuViJhQ8tRVVv1ZXMRFuKhrhMS4rAMQNIUsjWq/VKmFml+p
-	 rfxB9Ii7fedu+nrGnoTwNYfwJ3Kjg/4ZHDx5GfaEeu2BdVbn6sdxhmDDtCUWpCDy8G
-	 r6gUrtGZxLTnw==
-Date: Mon, 7 Apr 2025 17:18:15 +0100
-From: Simon Horman <horms@kernel.org>
-To: Charles Han <hanchunchao@inspur.com>
-Cc: saeedm@nvidia.com, tariqt@nvidia.com, leon@kernel.org,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, lariel@nvidia.com,
-	paulb@nvidia.com, maord@nvidia.com, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V2] net/mlx5e: fix potential null dereference in
- mlx5e_tc_nic_create_miss_table
-Message-ID: <20250407161815.GR395307@horms.kernel.org>
-References: <0e08292e-9280-4ef6-baf7-e9f642d33177@gmail.com>
- <20250407072032.5232-1-hanchunchao@inspur.com>
+	s=arc-20240116; t=1744042835; c=relaxed/simple;
+	bh=TXxyR3B4GcjqANR48pncgbPmMsr2xRFhP8dU3iyGi6w=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IZ6YOH4O4jJhrT1FCFnhczdP31cqFX4f1/SbSNBEcQizKeErDmUg+qRBAwzgkmT2QJu2ptxs06FjqGo2LFRaLDS/jYJDrRgNk1OVzqFclujqr3MBgeu0swBbq7wpFacGQ7MUB+Msp6ZtH8pWS+TxjgK/oJTasHEVUL9nsu7u/iY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=k8iDYmWf; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 0CB7D43310;
+	Mon,  7 Apr 2025 16:20:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1744042831;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3exJDntRzfa6VQ7cc8gO8rKZAJz7OniloKYEXg1rsLY=;
+	b=k8iDYmWfALvmeIFNnOnbPCcJfs9l/2YY0lIaUu6qjkMCKX0So7vt2l6mBm4mdxAv5vMXow
+	mIuGa6Xmd7bei+k748YcovLM6oHAEWNsR6FlBSyRJRTAvqeLTOjJlYo50jM2XwWa9dpksV
+	o9KfjKKCAsmiyJW9G2pHFmD594e9zvE3kdSssFc6VzySII7Z8HrpwpBE1GSRZIopdTMMzd
+	Wcabe30KAQjaI9DjV7sUXX6T3BnJIgGFE8NZzPkrcjb58ZbRKMJtrPQ+bCLkW6cG02VrYG
+	PrIl1BgIVxJSac9yNKjzsBxpTQB9pm2Rtzd7eqxk0+9u996mMd4Uj0ah1Kv7Ng==
+Date: Mon, 7 Apr 2025 18:20:28 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Richard
+ Cochran <richardcochran@gmail.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 0/2] Add Marvell PHY PTP support
+Message-ID: <20250407182028.75531758@kmaincent-XPS-13-7390>
+In-Reply-To: <Z_P3FKEhv1s0y4d7@shell.armlinux.org.uk>
+References: <20250407-feature_marvell_ptp-v2-0-a297d3214846@bootlin.com>
+	<Z_P3FKEhv1s0y4d7@shell.armlinux.org.uk>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250407072032.5232-1-hanchunchao@inspur.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtddtieehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqheftdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepjedvtdevledtjedvkeetheekleefgfefvdetkeduteejheehiefhvdekvdelhfeunecuffhomhgrihhnpehkvghrnhgvlhdrohhrghdpsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedugedprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvt
+ hdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepkhgrsggvlheskhgvrhhnvghlrdhorhhg
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Mon, Apr 07, 2025 at 03:20:31PM +0800, Charles Han wrote:
-> mlx5_get_flow_namespace() may return a NULL pointer, dereferencing it
-> without NULL check may lead to NULL dereference.
-> Add a NULL check for ns.
-> 
-> Fixes: 66cb64e292d2 ("net/mlx5e: TC NIC mode, fix tc chains miss table")
-> Signed-off-by: Charles Han <hanchunchao@inspur.com>
-> ---
->  drivers/net/ethernet/mellanox/mlx5/core/en_tc.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-> index 9ba99609999f..c2f23ac95c3d 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-> @@ -5216,6 +5216,10 @@ static int mlx5e_tc_nic_create_miss_table(struct mlx5e_priv *priv)
->  	ft_attr.level = MLX5E_TC_MISS_LEVEL;
->  	ft_attr.prio = 0;
->  	ns = mlx5_get_flow_namespace(priv->mdev, MLX5_FLOW_NAMESPACE_KERNEL);
-> +	if (!ns) {
-> +		netdev_err(priv->mdev, "Failed to get flow namespace\n");
+On Mon, 7 Apr 2025 17:02:28 +0100
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
 
-Hi Charles,
+> On Mon, Apr 07, 2025 at 04:02:59PM +0200, Kory Maincent wrote:
+> > Add PTP basic support for Marvell 88E151x PHYs.
+> >=20
+> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com> =20
+>=20
+> Is the PTP selection stuff actually sorted now? Last time I tested it
+> after it having been merged into the kernel for a while, it didn't work,
+> and I reported that fact. You haven't told me that you now expect it to
+> work.
 
-This does not seem to be correct. gcc-14.2.0 says:
+The last part of the series, the PTP selection support wasn't merged when y=
+ou
+tested it, although the default PTP choice that causes your regression was
+merged.
+Now it is fully merged, even the ethtool support.
+https://lore.kernel.org/netdev/mjn6eeo6lestvo6z3utb7aemufmfhn5alecyoaz46dt4=
+pwjn6v@4aaaz6qpqd4b/
 
-drivers/net/ethernet/mellanox/mlx5/core/en_tc.c: In function 'mlx5e_tc_nic_create_miss_table':
-drivers/net/ethernet/mellanox/mlx5/core/en_tc.c:5220:32: error: passing argument 1 of 'netdev_err' from incompatible pointer type [-Wincompatible-pointer-types]
- 5220 |                 netdev_err(priv->mdev, "Failed to get flow namespace\n");
-      |                            ~~~~^~~~~~
-      |                                |
-      |                                struct mlx5_core_dev *
-In file included from ./include/linux/skbuff.h:39,
-                 from ./include/linux/netlink.h:7,
-                 from ./include/net/flow_offload.h:6,
-                 from drivers/net/ethernet/mellanox/mlx5/core/en_tc.c:34:
-./include/net/net_debug.h:20:42: note: expected 'const struct net_device *' but argument is of type 'struct mlx5_core_dev *'
-   20 | void netdev_err(const struct net_device *dev, const char *format, ...);
-      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~^~~
+The only issue is the rtln warning from the phy_detach function. About it, I
+have already sent you the work I have done throwing ASSERT_RTNL in phy_deta=
+ch.
+Maybe I should resend it as RFC.
 
-...
+> I don't want this merged until such time that we can be sure that MVPP2
+> platforms can continue using the MVPP2 PTP support, which to me means
+> that the PTP selection between a MAC and PHY needs to work.
 
--- 
-pw-bot: changes-requested
+It should works, the default PTP will be the MAC PTP and you will be able to
+select the current PTP between MAC and PHY with the following command:
+# ethtool --set-hwtimestamp-cfg eth0 index 0 qualifier precise
+Time stamping configuration for eth0:
+Hardware timestamp provider index: 0
+Hardware timestamp provider qualifier: Precise (IEEE 1588 quality)
+Hardware Transmit Timestamp Mode:
+	off
+Hardware Receive Filter Mode:
+	none
+Hardware Flags: none
+# ethtool --set-hwtimestamp-cfg eth0 index 1 qualifier precise
+Time stamping configuration for eth0:
+Hardware timestamp provider index: 1
+Hardware timestamp provider qualifier: Precise (IEEE 1588 quality)
+Hardware Transmit Timestamp Mode:
+	off
+Hardware Receive Filter Mode:
+	none
+Hardware Flags: none
+
+You can list the PTPs with the dump command:
+# ethtool --show-time-stamping "*"
+
+You will need to stop phc2sys and ptp4l during these change as linuxptp may
+face some issues during the PTP change.
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
