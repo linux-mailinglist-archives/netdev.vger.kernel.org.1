@@ -1,101 +1,83 @@
-Return-Path: <netdev+bounces-179576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E60CDA7DB27
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 12:28:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2DEAA7DB3A
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 12:29:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0793D1891EF3
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 10:27:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65A973ADA56
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 10:29:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 697AF230BF4;
-	Mon,  7 Apr 2025 10:27:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1B6D233D88;
+	Mon,  7 Apr 2025 10:29:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="T8Nvcby9"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="TpHI747h"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2084.outbound.protection.outlook.com [40.107.223.84])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F491A8418;
-	Mon,  7 Apr 2025 10:27:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744021641; cv=none; b=t8AVTtQd3vLUrODgtwUaxbzQ9+ylo0Rs+0O7YVP9kRWctCQYEspVVzEMVjdKQoUc4Py+rvcdM7ymkzkhzbdQanM/SbXzrOcuo4QD7LDlmwP/tBz92B2C+q2g26nY+wHzFyD+ldCW0wLZGlM4u5zZQosdkWNP9rMvn2onUqPaGkM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744021641; c=relaxed/simple;
-	bh=zZR0v6IlTRwExUigj8HRNPPmNit2Pq17RnRXTjD4QPI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=n8I1qAbFKLuLA36grhlRlfWyOqedG+hS2sv/PLyn4rQCDwoq96QyXMIFhA8gSvFcvCgWAf9oSWdKdSjP7/SHIKxMjw760+P0/zPLZRKiXmgST5DMP/3KRN2IIMhj0HRO0dpysEMmwyVQreV9YhUfEg/qSVxFK7n6BuRBZHSElCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=T8Nvcby9; arc=none smtp.client-ip=162.240.238.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
-	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=orh6HI15a12oko4XiA6G02yTpeiJCxIZ1TWt4vwoJPQ=; b=T8Nvcby9Gx2rGi6YX7NjJwgYAR
-	RdTG1AAmXDKVZa6zgXZo9sYAklJ+Q059+zRnP9Rh2e215eZF6HyBMQIK/927TAZirJPCEnWUwwHK4
-	GwFNYFI2/trlyMw9a5jvVUDSMvL5LD8wry4MdTgBHspuf5wbxT/6ld5M2ZAfD2ZMVm/Arayr7/irG
-	T1IB3ff/Ac1GIuUSxm1Q22hI8CTDeomThpxrNeWsAZEVp+OttX8TMJzljPMA+P5fiF8D8cDQ+NQk/
-	HJeuktfo5hW7/hM7YZsfjquV7t70iT833RHaOp4ppp8/gJQutnPKa0OLobp07FcsrDrbdLXcLfI+T
-	ASF4in5w==;
-Received: from [122.175.9.182] (port=29724 helo=cypher.couthit.local)
-	by server.wki.vra.mybluehostin.me with esmtpa (Exim 4.98.1)
-	(envelope-from <parvathi@couthit.com>)
-	id 1u1jhB-000000001VV-17yx;
-	Mon, 07 Apr 2025 15:57:13 +0530
-From: Parvathi Pudi <parvathi@couthit.com>
-To: danishanwar@ti.com,
-	rogerq@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	nm@ti.com,
-	ssantosh@kernel.org,
-	tony@atomide.com,
-	richardcochran@gmail.com,
-	glaroque@baylibre.com,
-	schnelle@linux.ibm.com,
-	m-karicheri2@ti.com,
-	rdunlap@infradead.org,
-	diogo.ivo@siemens.com,
-	basharath@couthit.com,
-	parvathi@couthit.com,
-	horms@kernel.org,
-	jacob.e.keller@intel.com,
-	m-malladi@ti.com,
-	javier.carrasco.cruz@gmail.com,
-	afd@ti.com,
-	s-anna@ti.com
-Cc: linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-omap@vger.kernel.org,
-	pratheesh@ti.com,
-	prajith@ti.com,
-	vigneshr@ti.com,
-	praneeth@ti.com,
-	srk@ti.com,
-	rogerq@ti.com,
-	krishna@couthit.com,
-	pmohan@couthit.com,
-	mohan@couthit.com
-Subject: [PATCH net-next v4 03/11] net: ti: prueth: Adds PRUETH HW and SW configuration
-Date: Mon,  7 Apr 2025 15:55:20 +0530
-Message-Id: <20250407102528.1048589-4-parvathi@couthit.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4EF22CBFA;
+	Mon,  7 Apr 2025 10:29:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.84
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744021789; cv=fail; b=cjmC30NfH4PFPHBWKAJHmFnetS+Yf+Jy49Ni3gtCLIc4icSsXuMi9Y5Og63o+QFaEfVHkyisAHEs6YJRGnbjyqyDOX24fIQIymVffSrLSKxAVpHCgj2DLli0IzMSAj+LrhX+rwSWAjRLZRQFnbZwtopsBpQ6gwU7swtxXJS1uZk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744021789; c=relaxed/simple;
+	bh=ZVVaBQDUjnnkv+vBV0yrvDJWHUg188n+YBEoY9j5E7s=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dmSZT9VcKLjciMdqH6tKm6tjYLOXuyQdkoOemaVXqWkTCcdpGlu+MJJnT7/kSm54F2t0JvDhVenCbWQEW0/X6nL3BG9hnmH5daEYx4tdZi5HuogLC2jDqjR9sSgKivMzGWOqfZ5DKMKtFbsQv1X7UKqQjcHp1Td2+e7R/oueRzw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=TpHI747h; arc=fail smtp.client-ip=40.107.223.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=uHD1AHc21+7QhREjopnPsubydHcmkq0WUPMvQ6KzWnrIkFzsfIEUDyL2VRZ1MFcjdqsYE9Pe2wrDU2hxeJf2VI+e31ySuFKqe4U9FUadikjJ1NwEAqvma115viId6d9alqpWCI0+qZcNdwoza7JHjHHTT82t4B5DmdrdJTGdra5KgEjkF3KPISogFlbhgNidHvn75T9qqF2Hh9zBgvRgTV9b3ZstQYeKQJlaHrzFeHLIbCuLFhy0dJjOirDCbfYJr8d4ffx5MhikZ276jPksa+ipKbnogKSK+TFbifcChfSkwYJgCpmgkoMjge/hxP8brVXvZjSkbV1NDpa2G+ZltQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=idRrlMBZ0F/zHSeOPnEjvaEPl54B5ETKBYpuxqB7lQg=;
+ b=TvZk1ogbtRr+67xnne52q/OmFkjYzq2PajQcsMRCc5rJliri8IN6pZ+/gAE6maIF8+QFEUG1Y9oXSe4to+dAttzcuiPIJ3rJbEpJWBcRR8N00HUsQ6s5KnfXovQebx9AKMiGq8x6Ds7zoaStxb+uDVfCJdmjQbBI+r5y3VqAXZwd9omEO604VitdFTBjvKslsxeEzRZ6WMoqAm4NmZ0ZlfYCenDB4g+kLW5jO2VF4bSpEOdcl1iMkN7L2l4C+jc75uT+5XIvzE5Z0EegEPLAn7Hf9lzY0qDwmJ0vEJhbUwL0P4SvuTyjqMTuffdjU5PsS1SIfRMW10zmsMVoKYyUAg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=idRrlMBZ0F/zHSeOPnEjvaEPl54B5ETKBYpuxqB7lQg=;
+ b=TpHI747h2aIqI5h/hoWddfuBGN74Om/Y+4AgK5KLS6t56OkV15uuZeF7jeSEMo1XijSWTCbnk2cmlZ0QAkoWguZWyb0nmKsY1JjLxKdaCJ4kZakur8VbMZbXR4kGtGbcOfgHZClSruyG5j2dHqxWiHI450oDZFSw+1RH5t08a38=
+Received: from BN9PR03CA0380.namprd03.prod.outlook.com (2603:10b6:408:f7::25)
+ by SJ1PR12MB6052.namprd12.prod.outlook.com (2603:10b6:a03:489::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.31; Mon, 7 Apr
+ 2025 10:29:35 +0000
+Received: from BN2PEPF000055DB.namprd21.prod.outlook.com
+ (2603:10b6:408:f7:cafe::40) by BN9PR03CA0380.outlook.office365.com
+ (2603:10b6:408:f7::25) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8606.34 via Frontend Transport; Mon,
+ 7 Apr 2025 10:29:35 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN2PEPF000055DB.mail.protection.outlook.com (10.167.245.5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8655.0 via Frontend Transport; Mon, 7 Apr 2025 10:29:35 +0000
+Received: from airavat.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 7 Apr
+ 2025 05:29:31 -0500
+From: Raju Rangoju <Raju.Rangoju@amd.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<Shyam-sundar.S-k@amd.com>, Raju Rangoju <Raju.Rangoju@amd.com>
+Subject: [PATCH net] amd-xgbe: Convert to SPDX identifier
+Date: Mon, 7 Apr 2025 15:59:13 +0530
+Message-ID: <20250407102913.3063691-1-Raju.Rangoju@amd.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250407102528.1048589-1-parvathi@couthit.com>
-References: <20250407102528.1048589-1-parvathi@couthit.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,981 +85,2098 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: parvathi@couthit.com
-X-Authenticated-Sender: server.wki.vra.mybluehostin.me: parvathi@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF000055DB:EE_|SJ1PR12MB6052:EE_
+X-MS-Office365-Filtering-Correlation-Id: d57a90df-7684-44d9-127a-08dd75bf17b0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Sp6+wX/O38lLVh4q0sMwGkOdrBzUtCiSykv88g7mrBeSn7m9y/VsYg+erT71?=
+ =?us-ascii?Q?KQdN/C51BYoBPUatJoxHKKhvS1EJZwW+LxbPJ0w1AEOScT9e8gSOgRCHSVZR?=
+ =?us-ascii?Q?0TYoAFGlzpFyB3Gy3x7c+KYAmWtYMdatm/yRsyUDyejxODC5kF1vhWxrUtN5?=
+ =?us-ascii?Q?I8bK9tP1uOjKm/ClmvN92AiBvAwLoMTyQls3lxEZbctcTaU8xZqQN40+lctu?=
+ =?us-ascii?Q?8Bycb3eBPI1XeVTyueTdfUEgmof/wtI04aHFn0+AHFPaVkCvkVaqPP+9QJcx?=
+ =?us-ascii?Q?Qr36sJk9w74ylMjuPXZvEA4MrBgNjRiSzrBABMQV6N1pzV8ogBYafzCsbJMl?=
+ =?us-ascii?Q?JT3NBJLO1GlAHwkcvOg3vLYUun4PYpack6AyXQ7tvYXswYyrMv39C6B6lXLE?=
+ =?us-ascii?Q?WZo248apEyJigYF5p1/m5hWl+U5UE3Qw7GlBGb0cMAbdpNJreGEGlVwocItk?=
+ =?us-ascii?Q?6ogWjlkWhoCDdRIO0ukM47D210ZWMhYV0l7e+6f3VKO4WDgsoZThbz9RX+Qy?=
+ =?us-ascii?Q?VcmvDnMsLgekeeIj3FgOvpU6vNK43xLzYarfYyL4aiVE8Klnsk6drk6oCWP8?=
+ =?us-ascii?Q?/B/uekwl+pDJkafF0/BkZzynhfL9E2wbFAqYorPa1pR4ysnircuEn6HCHxn0?=
+ =?us-ascii?Q?CjretF+lvvnlcA6ObsQbXR8sNfT9y3ytP5pW6HMOahBPGG2ClASljSOf4zZa?=
+ =?us-ascii?Q?CY6MIopYCy5ZUqLLrj/cxr6f2OhcOhUTzIWqhOxOm30Islfh1+WspDOOsHyw?=
+ =?us-ascii?Q?9VDI/9J9QH/7uxVYHiIQICxajdIMNGzfhJakLcvJS89Sm4X7GvWuq4qg9tCE?=
+ =?us-ascii?Q?ah2pDDCx3cuYxfP3q4FJcLbO8BtpB5bK+sqRPh81EMzns6Za/4TkZtMYBanV?=
+ =?us-ascii?Q?cuzKqPOuKb4E2brmqXJcVAzqZOi//z92mdjsR8SinHm/y9pFvocEUdDib3Dv?=
+ =?us-ascii?Q?eHqsMKkYEFwqRBVGhU8T8UG3Uz/XnY2MR8vikuq8WlFiVCvcOd2rqPvSGlo8?=
+ =?us-ascii?Q?Y82DBTb1see0WtPfHNuhjSkTK2BeXqDAh9w7qooFnFGo7Avxh4ogUArYVFMZ?=
+ =?us-ascii?Q?otcHA3E2S6sG4qCiOrmgEOK2PWdCKOX+CtDbVfC/On7eLcZF5mZg72/aSgM3?=
+ =?us-ascii?Q?VjIy02+CnpoNlYYl3RJgtLP9aYaRnQ5NYoUbC05LTKzo/JuvEKkkl/aS4klv?=
+ =?us-ascii?Q?QWklXsMxNsoxHkCCv5Kp6mI9YdxE9YYgqQTe13j+ouCzCu6j40nGW6pD/zPx?=
+ =?us-ascii?Q?MFVaPImKKHrvDzzGeltQ8iePqp+N6Gfu0jEqcBdcUrYwABSXMU+XHys5X13q?=
+ =?us-ascii?Q?t17G/3JNlg0SKw8ldouQxKj+Tb1+luPrPLXBUpOsvjTZnorjZ+mWDzNlyOhb?=
+ =?us-ascii?Q?E5HyJs/k4mDqWuokNlTzzlbgbTziqiNRr7yKZ7dQfzrVsxk2yFM52UKizJ7N?=
+ =?us-ascii?Q?rJbUhgDFtvw=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2025 10:29:35.2663
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d57a90df-7684-44d9-127a-08dd75bf17b0
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF000055DB.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6052
 
-From: Roger Quadros <rogerq@ti.com>
+Use SPDX-License-Identifier accross all the files of the xgbe driver to
+ensure compliance with Linux kernel standards, thus removing the
+boiler-plate template license text.
 
-Updates for MII_RT hardware peripheral configuration such as RX and TX
-configuration for PRU0 and PRU1, frame sizes, and MUX config.
-
-Updates for PRU-ICSS firmware register configuration and DRAM, SRAM and
-OCMC memory initialization, which will be used in the runtime for packet
-reception and transmission.
-
-DUAL-EMAC memory allocation for software queues and its supporting
-components such as the buffer descriptors and queue descriptors. These
-software queues are placed in OCMC memory and are shared with CPU by
-PRU-ICSS for packet receive and transmit.
-
-All declarations and macros are being used from common header file
-for various protocols.
-
-Signed-off-by: Roger Quadros <rogerq@ti.com>
-Signed-off-by: Andrew F. Davis <afd@ti.com>
-Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
-Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
+Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
+Acked-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
 ---
- drivers/net/ethernet/ti/icssm/icssm_prueth.c | 418 ++++++++++++++++++-
- drivers/net/ethernet/ti/icssm/icssm_prueth.h | 104 +++++
- drivers/net/ethernet/ti/icssm/icssm_switch.h | 257 ++++++++++++
- 3 files changed, 777 insertions(+), 2 deletions(-)
- create mode 100644 drivers/net/ethernet/ti/icssm/icssm_switch.h
+ drivers/net/ethernet/amd/xgbe/xgbe-common.h   | 117 +-----------------
+ drivers/net/ethernet/amd/xgbe/xgbe-dcb.c      | 117 +-----------------
+ drivers/net/ethernet/amd/xgbe/xgbe-debugfs.c  | 117 +-----------------
+ drivers/net/ethernet/amd/xgbe/xgbe-desc.c     | 117 +-----------------
+ drivers/net/ethernet/amd/xgbe/xgbe-dev.c      | 117 +-----------------
+ drivers/net/ethernet/amd/xgbe/xgbe-drv.c      | 117 +-----------------
+ drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c  | 117 +-----------------
+ drivers/net/ethernet/amd/xgbe/xgbe-i2c.c      | 117 +-----------------
+ drivers/net/ethernet/amd/xgbe/xgbe-main.c     | 117 +-----------------
+ drivers/net/ethernet/amd/xgbe/xgbe-mdio.c     | 117 +-----------------
+ drivers/net/ethernet/amd/xgbe/xgbe-pci.c      | 117 +-----------------
+ drivers/net/ethernet/amd/xgbe/xgbe-phy-v1.c   | 117 +-----------------
+ drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c   | 117 +-----------------
+ drivers/net/ethernet/amd/xgbe/xgbe-platform.c | 117 +-----------------
+ drivers/net/ethernet/amd/xgbe/xgbe-ptp.c      | 117 +-----------------
+ drivers/net/ethernet/amd/xgbe/xgbe.h          | 117 +-----------------
+ 16 files changed, 64 insertions(+), 1808 deletions(-)
 
-diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.c b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
-index b982f148d928..60f911a6e621 100644
---- a/drivers/net/ethernet/ti/icssm/icssm_prueth.c
-+++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
-@@ -29,6 +29,316 @@
- #include <net/pkt_cls.h>
- 
- #include "icssm_prueth.h"
-+#include "../icssg/icssg_mii_rt.h"
-+
-+#define OCMC_RAM_SIZE		(SZ_64K)
-+
-+#define TX_START_DELAY		0x40
-+#define TX_CLK_DELAY_100M	0x6
-+
-+/* Below macro is for 1528 Byte Frame support, to Allow even with
-+ * Redundancy tag
-+ */
-+#define PRUSS_MII_RT_RX_FRMS_MAX_SUPPORT_EMAC  (VLAN_ETH_FRAME_LEN + \
-+						ETH_FCS_LEN + \
-+						ICSSM_LRE_TAG_SIZE)
-+
-+/* ensure that order of PRUSS mem regions is same as enum prueth_mem */
-+static enum pruss_mem pruss_mem_ids[] = { PRUSS_MEM_DRAM0, PRUSS_MEM_DRAM1,
-+					  PRUSS_MEM_SHRD_RAM2 };
-+
-+static const struct prueth_queue_info queue_infos[][NUM_QUEUES] = {
-+	[PRUETH_PORT_QUEUE_HOST] = {
-+		[PRUETH_QUEUE1] = {
-+			P0_Q1_BUFFER_OFFSET,
-+			HOST_QUEUE_DESC_OFFSET,
-+			P0_Q1_BD_OFFSET,
-+			P0_Q1_BD_OFFSET + ((HOST_QUEUE_1_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE2] = {
-+			P0_Q2_BUFFER_OFFSET,
-+			HOST_QUEUE_DESC_OFFSET + 8,
-+			P0_Q2_BD_OFFSET,
-+			P0_Q2_BD_OFFSET + ((HOST_QUEUE_2_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE3] = {
-+			P0_Q3_BUFFER_OFFSET,
-+			HOST_QUEUE_DESC_OFFSET + 16,
-+			P0_Q3_BD_OFFSET,
-+			P0_Q3_BD_OFFSET + ((HOST_QUEUE_3_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE4] = {
-+			P0_Q4_BUFFER_OFFSET,
-+			HOST_QUEUE_DESC_OFFSET + 24,
-+			P0_Q4_BD_OFFSET,
-+			P0_Q4_BD_OFFSET + ((HOST_QUEUE_4_SIZE - 1) * BD_SIZE),
-+		},
-+	},
-+	[PRUETH_PORT_QUEUE_MII0] = {
-+		[PRUETH_QUEUE1] = {
-+			P1_Q1_BUFFER_OFFSET,
-+			P1_Q1_BUFFER_OFFSET + ((QUEUE_1_SIZE - 1) *
-+					ICSS_BLOCK_SIZE),
-+			P1_Q1_BD_OFFSET,
-+			P1_Q1_BD_OFFSET + ((QUEUE_1_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE2] = {
-+			P1_Q2_BUFFER_OFFSET,
-+			P1_Q2_BUFFER_OFFSET + ((QUEUE_2_SIZE - 1) *
-+					ICSS_BLOCK_SIZE),
-+			P1_Q2_BD_OFFSET,
-+			P1_Q2_BD_OFFSET + ((QUEUE_2_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE3] = {
-+			P1_Q3_BUFFER_OFFSET,
-+			P1_Q3_BUFFER_OFFSET + ((QUEUE_3_SIZE - 1) *
-+					ICSS_BLOCK_SIZE),
-+			P1_Q3_BD_OFFSET,
-+			P1_Q3_BD_OFFSET + ((QUEUE_3_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE4] = {
-+			P1_Q4_BUFFER_OFFSET,
-+			P1_Q4_BUFFER_OFFSET + ((QUEUE_4_SIZE - 1) *
-+					ICSS_BLOCK_SIZE),
-+			P1_Q4_BD_OFFSET,
-+			P1_Q4_BD_OFFSET + ((QUEUE_4_SIZE - 1) * BD_SIZE),
-+		},
-+	},
-+	[PRUETH_PORT_QUEUE_MII1] = {
-+		[PRUETH_QUEUE1] = {
-+			P2_Q1_BUFFER_OFFSET,
-+			P2_Q1_BUFFER_OFFSET + ((QUEUE_1_SIZE - 1) *
-+					ICSS_BLOCK_SIZE),
-+			P2_Q1_BD_OFFSET,
-+			P2_Q1_BD_OFFSET + ((QUEUE_1_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE2] = {
-+			P2_Q2_BUFFER_OFFSET,
-+			P2_Q2_BUFFER_OFFSET + ((QUEUE_2_SIZE - 1) *
-+					ICSS_BLOCK_SIZE),
-+			P2_Q2_BD_OFFSET,
-+			P2_Q2_BD_OFFSET + ((QUEUE_2_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE3] = {
-+			P2_Q3_BUFFER_OFFSET,
-+			P2_Q3_BUFFER_OFFSET + ((QUEUE_3_SIZE - 1) *
-+					ICSS_BLOCK_SIZE),
-+			P2_Q3_BD_OFFSET,
-+			P2_Q3_BD_OFFSET + ((QUEUE_3_SIZE - 1) * BD_SIZE),
-+		},
-+		[PRUETH_QUEUE4] = {
-+			P2_Q4_BUFFER_OFFSET,
-+			P2_Q4_BUFFER_OFFSET + ((QUEUE_4_SIZE - 1) *
-+					ICSS_BLOCK_SIZE),
-+			P2_Q4_BD_OFFSET,
-+			P2_Q4_BD_OFFSET + ((QUEUE_4_SIZE - 1) * BD_SIZE),
-+		},
-+	},
-+};
-+
-+static const struct prueth_queue_desc queue_descs[][NUM_QUEUES] = {
-+	[PRUETH_PORT_QUEUE_HOST] = {
-+		{ .rd_ptr = P0_Q1_BD_OFFSET, .wr_ptr = P0_Q1_BD_OFFSET, },
-+		{ .rd_ptr = P0_Q2_BD_OFFSET, .wr_ptr = P0_Q2_BD_OFFSET, },
-+		{ .rd_ptr = P0_Q3_BD_OFFSET, .wr_ptr = P0_Q3_BD_OFFSET, },
-+		{ .rd_ptr = P0_Q4_BD_OFFSET, .wr_ptr = P0_Q4_BD_OFFSET, },
-+	},
-+	[PRUETH_PORT_QUEUE_MII0] = {
-+		{ .rd_ptr = P1_Q1_BD_OFFSET, .wr_ptr = P1_Q1_BD_OFFSET, },
-+		{ .rd_ptr = P1_Q2_BD_OFFSET, .wr_ptr = P1_Q2_BD_OFFSET, },
-+		{ .rd_ptr = P1_Q3_BD_OFFSET, .wr_ptr = P1_Q3_BD_OFFSET, },
-+		{ .rd_ptr = P1_Q4_BD_OFFSET, .wr_ptr = P1_Q4_BD_OFFSET, },
-+	},
-+	[PRUETH_PORT_QUEUE_MII1] = {
-+		{ .rd_ptr = P2_Q1_BD_OFFSET, .wr_ptr = P2_Q1_BD_OFFSET, },
-+		{ .rd_ptr = P2_Q2_BD_OFFSET, .wr_ptr = P2_Q2_BD_OFFSET, },
-+		{ .rd_ptr = P2_Q3_BD_OFFSET, .wr_ptr = P2_Q3_BD_OFFSET, },
-+		{ .rd_ptr = P2_Q4_BD_OFFSET, .wr_ptr = P2_Q4_BD_OFFSET, },
-+	}
-+};
-+
-+static void icssm_prueth_hostconfig(struct prueth *prueth)
-+{
-+	void __iomem *sram_base = prueth->mem[PRUETH_MEM_SHARED_RAM].va;
-+	void __iomem *sram;
-+
-+	/* queue size lookup table */
-+	sram = sram_base + HOST_QUEUE_SIZE_ADDR;
-+	writew(HOST_QUEUE_1_SIZE, sram);
-+	writew(HOST_QUEUE_2_SIZE, sram + 2);
-+	writew(HOST_QUEUE_3_SIZE, sram + 4);
-+	writew(HOST_QUEUE_4_SIZE, sram + 6);
-+
-+	/* queue information table */
-+	sram = sram_base + HOST_Q1_RX_CONTEXT_OFFSET;
-+	memcpy_toio(sram, queue_infos[PRUETH_PORT_QUEUE_HOST],
-+		    sizeof(queue_infos[PRUETH_PORT_QUEUE_HOST]));
-+
-+	/* buffer offset table */
-+	sram = sram_base + HOST_QUEUE_OFFSET_ADDR;
-+	writew(P0_Q1_BUFFER_OFFSET, sram);
-+	writew(P0_Q2_BUFFER_OFFSET, sram + 2);
-+	writew(P0_Q3_BUFFER_OFFSET, sram + 4);
-+	writew(P0_Q4_BUFFER_OFFSET, sram + 6);
-+
-+	/* buffer descriptor offset table*/
-+	sram = sram_base + HOST_QUEUE_DESCRIPTOR_OFFSET_ADDR;
-+	writew(P0_Q1_BD_OFFSET, sram);
-+	writew(P0_Q2_BD_OFFSET, sram + 2);
-+	writew(P0_Q3_BD_OFFSET, sram + 4);
-+	writew(P0_Q4_BD_OFFSET, sram + 6);
-+
-+	/* queue table */
-+	sram = sram_base + HOST_QUEUE_DESC_OFFSET;
-+	memcpy_toio(sram, queue_descs[PRUETH_PORT_QUEUE_HOST],
-+		    sizeof(queue_descs[PRUETH_PORT_QUEUE_HOST]));
-+}
-+
-+static void icssm_prueth_mii_init(struct prueth *prueth)
-+{
-+	struct regmap *mii_rt;
-+	u32 rxcfg_reg, rxcfg;
-+	u32 txcfg_reg, txcfg;
-+
-+	mii_rt = prueth->mii_rt;
-+
-+	rxcfg = PRUSS_MII_RT_RXCFG_RX_ENABLE |
-+		PRUSS_MII_RT_RXCFG_RX_DATA_RDY_MODE_DIS |
-+		PRUSS_MII_RT_RXCFG_RX_L2_EN |
-+		PRUSS_MII_RT_RXCFG_RX_CUT_PREAMBLE |
-+		PRUSS_MII_RT_RXCFG_RX_L2_EOF_SCLR_DIS;
-+
-+	/* Configuration of Port 0 Rx */
-+	rxcfg_reg = PRUSS_MII_RT_RXCFG0;
-+
-+	regmap_write(mii_rt, rxcfg_reg, rxcfg);
-+
-+	/* Configuration of Port 1 Rx */
-+	rxcfg_reg = PRUSS_MII_RT_RXCFG1;
-+
-+	rxcfg |= PRUSS_MII_RT_RXCFG_RX_MUX_SEL;
-+
-+	regmap_write(mii_rt, rxcfg_reg, rxcfg);
-+
-+	txcfg = PRUSS_MII_RT_TXCFG_TX_ENABLE |
-+		PRUSS_MII_RT_TXCFG_TX_AUTO_PREAMBLE |
-+		PRUSS_MII_RT_TXCFG_TX_32_MODE_EN |
-+		(TX_START_DELAY << PRUSS_MII_RT_TXCFG_TX_START_DELAY_SHIFT) |
-+		(TX_CLK_DELAY_100M << PRUSS_MII_RT_TXCFG_TX_CLK_DELAY_SHIFT);
-+
-+	/* Configuration of Port 0 Tx */
-+	txcfg_reg = PRUSS_MII_RT_TXCFG0;
-+
-+	regmap_write(mii_rt, txcfg_reg, txcfg);
-+
-+	txcfg |= PRUSS_MII_RT_TXCFG_TX_MUX_SEL;
-+
-+	/* Configuration of Port 1 Tx */
-+	txcfg_reg = PRUSS_MII_RT_TXCFG1;
-+
-+	regmap_write(mii_rt, txcfg_reg, txcfg);
-+
-+	txcfg_reg = PRUSS_MII_RT_RX_FRMS0;
-+
-+	/* Min frame length should be set to 64 to allow receive of standard
-+	 * Ethernet frames such as PTP, LLDP that will not have the tag/rct.
-+	 * Actual size written to register is size - 1 per TRM. This also
-+	 * includes CRC/FCS.
-+	 */
-+	txcfg = (((PRUSS_MII_RT_RX_FRMS_MIN_FRM - 1) <<
-+			PRUSS_MII_RT_RX_FRMS_MIN_FRM_SHIFT) &
-+			PRUSS_MII_RT_RX_FRMS_MIN_FRM_MASK);
-+
-+	/* For EMAC, set Max frame size to 1528 i.e size with VLAN.
-+	 * Actual size written to register is size - 1 as per TRM.
-+	 * Since driver support run time change of protocol, driver
-+	 * must overwrite the values based on Ethernet type.
-+	 */
-+	txcfg |= (((PRUSS_MII_RT_RX_FRMS_MAX_SUPPORT_EMAC - 1) <<
-+			   PRUSS_MII_RT_RX_FRMS_MAX_FRM_SHIFT)	&
-+			   PRUSS_MII_RT_RX_FRMS_MAX_FRM_MASK);
-+
-+	regmap_write(mii_rt, txcfg_reg, txcfg);
-+
-+	txcfg_reg = PRUSS_MII_RT_RX_FRMS1;
-+
-+	regmap_write(mii_rt, txcfg_reg, txcfg);
-+}
-+
-+static void icssm_prueth_clearmem(struct prueth *prueth, enum prueth_mem region)
-+{
-+	memset_io(prueth->mem[region].va, 0, prueth->mem[region].size);
-+}
-+
-+static void icssm_prueth_hostinit(struct prueth *prueth)
-+{
-+	/* Clear shared RAM */
-+	icssm_prueth_clearmem(prueth, PRUETH_MEM_SHARED_RAM);
-+
-+	/* Clear OCMC RAM */
-+	icssm_prueth_clearmem(prueth, PRUETH_MEM_OCMC);
-+
-+	/* Clear data RAMs */
-+	if (prueth->eth_node[PRUETH_MAC0])
-+		icssm_prueth_clearmem(prueth, PRUETH_MEM_DRAM0);
-+	if (prueth->eth_node[PRUETH_MAC1])
-+		icssm_prueth_clearmem(prueth, PRUETH_MEM_DRAM1);
-+
-+	/* Initialize host queues in shared RAM */
-+	icssm_prueth_hostconfig(prueth);
-+
-+	/* Configure MII_RT */
-+	icssm_prueth_mii_init(prueth);
-+}
-+
-+/* This function initialize the driver in EMAC or HSR or PRP mode
-+ * based on eth_type
-+ */
-+static void icssm_prueth_init_ethernet_mode(struct prueth *prueth)
-+{
-+	icssm_prueth_hostinit(prueth);
-+}
-+
-+static int icssm_prueth_emac_config(struct prueth_emac *emac)
-+{
-+	struct prueth *prueth = emac->prueth;
-+
-+	/* PRU needs local shared RAM address for C28 */
-+	u32 sharedramaddr = ICSS_LOCAL_SHARED_RAM;
-+
-+	/* PRU needs real global OCMC address for C30*/
-+	u32 ocmcaddr = (u32)prueth->mem[PRUETH_MEM_OCMC].pa;
-+	void __iomem *dram_base;
-+	void __iomem *mac_addr;
-+	void __iomem *dram;
-+
-+	/* Clear data RAM */
-+	icssm_prueth_clearmem(prueth, emac->dram);
-+
-+	dram_base = prueth->mem[emac->dram].va;
-+
-+	/* setup mac address */
-+	mac_addr = dram_base + PORT_MAC_ADDR;
-+	memcpy_toio(mac_addr, emac->mac_addr, 6);
-+
-+	/* queue information table */
-+	dram = dram_base + TX_CONTEXT_Q1_OFFSET_ADDR;
-+	memcpy_toio(dram, queue_infos[emac->port_id],
-+		    sizeof(queue_infos[emac->port_id]));
-+
-+	/* queue table */
-+	dram = dram_base + PORT_QUEUE_DESC_OFFSET;
-+	memcpy_toio(dram, queue_descs[emac->port_id],
-+		    sizeof(queue_descs[emac->port_id]));
-+
-+	/* Set in constant table C28 of PRU0 to ICSS Shared memory */
-+	pru_rproc_set_ctable(emac->pru, PRU_C28, sharedramaddr);
-+
-+	/* Set in constant table C30 of PRU0 to OCMC memory */
-+	pru_rproc_set_ctable(emac->pru, PRU_C30, ocmcaddr);
-+
-+	return 0;
-+}
- 
- /* called back by PHY layer if there is change in link state of hw port*/
- static void icssm_emac_adjust_link(struct net_device *ndev)
-@@ -117,15 +427,24 @@ static int icssm_emac_set_boot_pru(struct prueth_emac *emac,
- static int icssm_emac_ndo_open(struct net_device *ndev)
- {
- 	struct prueth_emac *emac = netdev_priv(ndev);
-+	struct prueth *prueth = emac->prueth;
- 	int ret;
- 
-+	/* set h/w MAC as user might have re-configured */
-+	ether_addr_copy(emac->mac_addr, ndev->dev_addr);
-+
-+	if (!prueth->emac_configured)
-+		icssm_prueth_init_ethernet_mode(prueth);
-+
-+	icssm_prueth_emac_config(emac);
-+
- 	ret = icssm_emac_set_boot_pru(emac, ndev);
- 	if (ret)
- 		return ret;
- 
- 	/* start PHY */
- 	phy_start(emac->phydev);
--
-+	prueth->emac_configured |= BIT(emac->port_id);
- 	return 0;
- }
- 
-@@ -221,9 +540,11 @@ static int icssm_prueth_netdev_init(struct prueth *prueth,
- 	/* by default eth_type is EMAC */
- 	switch (port) {
- 	case PRUETH_PORT_MII0:
-+		emac->dram = PRUETH_MEM_DRAM0;
- 		emac->pru = prueth->pru0;
- 		break;
- 	case PRUETH_PORT_MII1:
-+		emac->dram = PRUETH_MEM_DRAM1;
- 		emac->pru = prueth->pru1;
- 		break;
- 	default:
-@@ -293,6 +614,7 @@ static int icssm_prueth_probe(struct platform_device *pdev)
- 	struct device *dev = &pdev->dev;
- 	struct device_node *np;
- 	struct prueth *prueth;
-+	struct pruss *pruss;
- 	int i, ret;
- 
- 	np = dev->of_node;
-@@ -358,6 +680,12 @@ static int icssm_prueth_probe(struct platform_device *pdev)
- 	prueth->eth_node[PRUETH_MAC0] = eth0_node;
- 	prueth->eth_node[PRUETH_MAC1] = eth1_node;
- 
-+	prueth->mii_rt = syscon_regmap_lookup_by_phandle(np, "ti,mii-rt");
-+	if (IS_ERR(prueth->mii_rt)) {
-+		dev_err(dev, "couldn't get mii-rt syscon regmap\n");
-+		return -ENODEV;
-+	}
-+
- 	if (eth0_node) {
- 		prueth->pru0 = pru_rproc_get(np, 0, &pruss_id0);
- 		if (IS_ERR(prueth->pru0)) {
-@@ -378,6 +706,66 @@ static int icssm_prueth_probe(struct platform_device *pdev)
- 		}
- 	}
- 
-+	pruss = pruss_get(prueth->pru0 ? prueth->pru0 : prueth->pru1);
-+	if (IS_ERR(pruss)) {
-+		ret = PTR_ERR(pruss);
-+		dev_err(dev, "unable to get pruss handle\n");
-+		goto put_pru;
-+	}
-+	prueth->pruss = pruss;
-+
-+	/* Configure PRUSS */
-+	if (eth0_node)
-+		pruss_cfg_gpimode(pruss, pruss_id0, PRUSS_GPI_MODE_MII);
-+	if (eth1_node)
-+		pruss_cfg_gpimode(pruss, pruss_id1, PRUSS_GPI_MODE_MII);
-+	pruss_cfg_miirt_enable(pruss, true);
-+	pruss_cfg_xfr_enable(pruss, PRU_TYPE_PRU, true);
-+
-+	/* Get PRUSS mem resources */
-+	/* OCMC is system resource which we get separately */
-+	for (i = 0; i < ARRAY_SIZE(pruss_mem_ids); i++) {
-+		/* skip appropriate DRAM if not required */
-+		if (!eth0_node && i == PRUETH_MEM_DRAM0)
-+			continue;
-+
-+		if (!eth1_node && i == PRUETH_MEM_DRAM1)
-+			continue;
-+
-+		ret = pruss_request_mem_region(pruss, pruss_mem_ids[i],
-+					       &prueth->mem[i]);
-+		if (ret) {
-+			dev_err(dev, "unable to get PRUSS resource %d: %d\n",
-+				i, ret);
-+			goto put_mem;
-+		}
-+	}
-+
-+	prueth->sram_pool = of_gen_pool_get(np, "sram", 0);
-+	if (!prueth->sram_pool) {
-+		dev_err(dev, "unable to get SRAM pool\n");
-+		ret = -ENODEV;
-+		goto put_mem;
-+	}
-+
-+	prueth->ocmc_ram_size = OCMC_RAM_SIZE;
-+	prueth->mem[PRUETH_MEM_OCMC].va =
-+			(void __iomem *)gen_pool_alloc(prueth->sram_pool,
-+						       prueth->ocmc_ram_size);
-+	if (!prueth->mem[PRUETH_MEM_OCMC].va) {
-+		dev_err(dev, "unable to allocate OCMC resource\n");
-+		ret = -ENOMEM;
-+		goto put_mem;
-+	}
-+	prueth->mem[PRUETH_MEM_OCMC].pa = gen_pool_virt_to_phys
-+		(prueth->sram_pool, (unsigned long)
-+		 prueth->mem[PRUETH_MEM_OCMC].va);
-+	prueth->mem[PRUETH_MEM_OCMC].size = prueth->ocmc_ram_size;
-+	dev_dbg(dev, "ocmc: pa %pa va %p size %#zx\n",
-+		&prueth->mem[PRUETH_MEM_OCMC].pa,
-+		prueth->mem[PRUETH_MEM_OCMC].va,
-+		prueth->mem[PRUETH_MEM_OCMC].size);
-+
- 	/* setup netdev interfaces */
- 	if (eth0_node) {
- 		ret = icssm_prueth_netdev_init(prueth, eth0_node);
-@@ -386,7 +774,7 @@ static int icssm_prueth_probe(struct platform_device *pdev)
- 				dev_err(dev, "netdev init %s failed: %d\n",
- 					eth0_node->name, ret);
- 			}
--			goto put_pru;
-+			goto free_pool;
- 		}
- 	}
- 
-@@ -424,6 +812,9 @@ static int icssm_prueth_probe(struct platform_device *pdev)
- 			prueth->emac[PRUETH_MAC1]->ndev;
- 	}
- 
-+	dev_info(dev, "TI PRU ethernet driver initialized: %s EMAC mode\n",
-+		 (!eth0_node || !eth1_node) ? "single" : "dual");
-+
- 	if (eth1_node)
- 		of_node_put(eth1_node);
- 	if (eth0_node)
-@@ -446,6 +837,18 @@ static int icssm_prueth_probe(struct platform_device *pdev)
- 		icssm_prueth_netdev_exit(prueth, eth_node);
- 	}
- 
-+free_pool:
-+	gen_pool_free(prueth->sram_pool,
-+		      (unsigned long)prueth->mem[PRUETH_MEM_OCMC].va,
-+		      prueth->ocmc_ram_size);
-+
-+put_mem:
-+	for (i = PRUETH_MEM_DRAM0; i < PRUETH_MEM_OCMC; i++) {
-+		if (prueth->mem[i].va)
-+			pruss_release_mem_region(pruss, &prueth->mem[i]);
-+	}
-+	pruss_put(prueth->pruss);
-+
- put_pru:
- 	if (eth1_node) {
- 		if (prueth->pru1)
-@@ -483,6 +886,16 @@ static void icssm_prueth_remove(struct platform_device *pdev)
- 		of_node_put(eth_node);
- 	}
- 
-+	gen_pool_free(prueth->sram_pool,
-+		      (unsigned long)prueth->mem[PRUETH_MEM_OCMC].va,
-+		      prueth->ocmc_ram_size);
-+
-+	for (i = PRUETH_MEM_DRAM0; i < PRUETH_MEM_OCMC; i++) {
-+		if (prueth->mem[i].va)
-+			pruss_release_mem_region(prueth->pruss,
-+						 &prueth->mem[i]);
-+	}
-+
- 	pruss_put(prueth->pruss);
- 
- 	if (prueth->eth_node[PRUETH_MAC0])
-@@ -493,6 +906,7 @@ static void icssm_prueth_remove(struct platform_device *pdev)
- 
- /* AM57xx SoC-specific firmware data */
- static struct prueth_private_data am57xx_prueth_pdata = {
-+	.driver_data = PRUSS_AM57XX,
- 	.fw_pru[PRUSS_PRU0] = {
- 		.fw_name[PRUSS_ETHTYPE_EMAC] =
- 			"ti-pruss/am57xx-pru0-prueth-fw.elf",
-diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.h b/drivers/net/ethernet/ti/icssm/icssm_prueth.h
-index 7f857edc6eb2..fc59087c214d 100644
---- a/drivers/net/ethernet/ti/icssm/icssm_prueth.h
-+++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.h
-@@ -13,6 +13,14 @@
- #include <linux/pruss_driver.h>
- #include <linux/remoteproc/pruss.h>
- 
-+#include "icssm_switch.h"
-+
-+/* ICSSM size of redundancy tag */
-+#define ICSSM_LRE_TAG_SIZE	6
-+
-+/* PRUSS local memory map */
-+#define ICSS_LOCAL_SHARED_RAM	0x00010000
-+
- /* PRU Ethernet Type - Ethernet functionality (protocol
-  * implemented) provided by the PRU firmware being loaded.
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-common.h b/drivers/net/ethernet/amd/xgbe/xgbe-common.h
+index 3b70f6737633..e3d33f5b9642 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-common.h
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-common.h
+@@ -1,117 +1,8 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
+ /*
+- * AMD 10Gb Ethernet driver
+- *
+- * This file is available to you under your choice of the following two
+- * licenses:
+- *
+- * License 1: GPLv2
+- *
+- * Copyright (c) 2014-2016 Advanced Micro Devices, Inc.
+- *
+- * This file is free software; you may copy, redistribute and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation, either version 2 of the License, or (at
+- * your option) any later version.
+- *
+- * This file is distributed in the hope that it will be useful, but
+- * WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+- * General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- *
+- * License 2: Modified BSD
+- *
+- * Copyright (c) 2014-2016 Advanced Micro Devices, Inc.
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copyright
+- *       notice, this list of conditions and the following disclaimer in the
+- *       documentation and/or other materials provided with the distribution.
+- *     * Neither the name of Advanced Micro Devices, Inc. nor the
+- *       names of its contributors may be used to endorse or promote products
+- *       derived from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
++ * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
++ * Copyright (c) 2014, Synopsys, Inc.
++ * All rights reserved
   */
-@@ -24,6 +32,50 @@ enum pruss_ethtype {
- 	PRUSS_ETHTYPE_MAX,
- };
  
-+#define PRUETH_IS_EMAC(p)	((p)->eth_type == PRUSS_ETHTYPE_EMAC)
-+#define PRUETH_IS_SWITCH(p)	((p)->eth_type == PRUSS_ETHTYPE_SWITCH)
-+
-+/**
-+ * struct prueth_queue_desc - Queue descriptor
-+ * @rd_ptr:	Read pointer, points to a buffer descriptor in Shared PRU RAM.
-+ * @wr_ptr:	Write pointer, points to a buffer descriptor in Shared PRU RAM.
-+ * @busy_s:	Slave queue busy flag, set by slave(us) to request access from
-+ *		master(PRU).
-+ * @status:	Bit field status register, Bits:
-+ *			0: Master queue busy flag.
-+ *			1: Packet has been placed in collision queue.
-+ *			2: Packet has been discarded due to overflow.
-+ * @max_fill_level:	Maximum queue usage seen.
-+ * @overflow_cnt:	Count of queue overflows.
-+ *
-+ * Each port has up to 4 queues with variable length. The queue is processed
-+ * as ring buffer with read and write pointers. Both pointers are address
-+ * pointers and increment by 4 for each buffer descriptor position. Queue has
-+ * a length defined in constants and a status.
-+ */
-+struct prueth_queue_desc {
-+	u16 rd_ptr;
-+	u16 wr_ptr;
-+	u8 busy_s;
-+	u8 status;
-+	u8 max_fill_level;
-+	u8 overflow_cnt;
-+} __packed;
-+
-+/**
-+ * struct prueth_queue_info - Information about a queue in memory
-+ * @buffer_offset: buffer offset in OCMC RAM
-+ * @queue_desc_offset: queue descriptor offset in Shared RAM
-+ * @buffer_desc_offset: buffer descriptors offset in Shared RAM
-+ * @buffer_desc_end: end address of buffer descriptors in Shared RAM
-+ */
-+struct prueth_queue_info {
-+	u16 buffer_offset;
-+	u16 queue_desc_offset;
-+	u16 buffer_desc_offset;
-+	u16 buffer_desc_end;
-+} __packed;
-+
- /* In switch mode there are 3 real ports i.e. 3 mac addrs.
-  * however Linux sees only the host side port. The other 2 ports
-  * are the switch ports.
-@@ -44,6 +96,34 @@ enum prueth_mac {
- 	PRUETH_MAC_INVALID,
- };
- 
-+/* In both switch & emac modes there are 3 port queues
-+ * EMAC mode:
-+ *     RX packets for both MII0 & MII1 ports come on
-+ *     QUEUE_HOST.
-+ *     TX packets for MII0 go on QUEUE_MII0, TX packets
-+ *     for MII1 go on QUEUE_MII1.
-+ * Switch mode:
-+ *     Host port RX packets come on QUEUE_HOST
-+ *     TX packets might have to go on MII0 or MII1 or both.
-+ *     MII0 TX queue is QUEUE_MII0 and MII1 TX queue is
-+ *     QUEUE_MII1.
-+ */
-+enum prueth_port_queue_id {
-+	PRUETH_PORT_QUEUE_HOST = 0,
-+	PRUETH_PORT_QUEUE_MII0,
-+	PRUETH_PORT_QUEUE_MII1,
-+	PRUETH_PORT_QUEUE_MAX,
-+};
-+
-+/* Each port queue has 4 queues and 1 collision queue */
-+enum prueth_queue_id {
-+	PRUETH_QUEUE1 = 0,
-+	PRUETH_QUEUE2,
-+	PRUETH_QUEUE3,
-+	PRUETH_QUEUE4,
-+	PRUETH_COLQUEUE,        /* collision queue */
-+};
-+
- /**
-  * struct prueth_firmware - PRU Ethernet FW data
-  * @fw_name: firmware names of firmware to run on PRU
-@@ -52,13 +132,31 @@ struct prueth_firmware {
- 	const char *fw_name[PRUSS_ETHTYPE_MAX];
- };
- 
-+/* PRUeth memory range identifiers */
-+enum prueth_mem {
-+	PRUETH_MEM_DRAM0 = 0,
-+	PRUETH_MEM_DRAM1,
-+	PRUETH_MEM_SHARED_RAM,
-+	PRUETH_MEM_OCMC,
-+	PRUETH_MEM_MAX,
-+};
-+
-+enum pruss_device {
-+	PRUSS_AM57XX = 0,
-+	PRUSS_AM43XX,
-+	PRUSS_AM33XX,
-+	PRUSS_K2G
-+};
-+
- /**
-  * struct prueth_private_data - PRU Ethernet private data
-+ * @driver_data: PRU Ethernet device name
-  * @fw_pru: firmware names to be used for PRUSS ethernet usecases
-  * @support_lre: boolean to indicate if lre is enabled
-  * @support_switch: boolean to indicate if switch is enabled
+ #ifndef __XGBE_COMMON_H__
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-dcb.c b/drivers/net/ethernet/amd/xgbe/xgbe-dcb.c
+index c68ace804e37..1474df5544fa 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-dcb.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-dcb.c
+@@ -1,117 +1,8 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
+ /*
+- * AMD 10Gb Ethernet driver
+- *
+- * This file is available to you under your choice of the following two
+- * licenses:
+- *
+- * License 1: GPLv2
+- *
+- * Copyright (c) 2014-2016 Advanced Micro Devices, Inc.
+- *
+- * This file is free software; you may copy, redistribute and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation, either version 2 of the License, or (at
+- * your option) any later version.
+- *
+- * This file is distributed in the hope that it will be useful, but
+- * WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+- * General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- *
+- * License 2: Modified BSD
+- *
+- * Copyright (c) 2014-2016 Advanced Micro Devices, Inc.
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copyright
+- *       notice, this list of conditions and the following disclaimer in the
+- *       documentation and/or other materials provided with the distribution.
+- *     * Neither the name of Advanced Micro Devices, Inc. nor the
+- *       names of its contributors may be used to endorse or promote products
+- *       derived from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
++ * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
++ * Copyright (c) 2014, Synopsys, Inc.
++ * All rights reserved
   */
- struct prueth_private_data {
-+	enum pruss_device driver_data;
- 	const struct prueth_firmware fw_pru[PRUSS_NUM_PRUS];
- 	bool support_lre;
- 	bool support_switch;
-@@ -77,6 +175,7 @@ struct prueth_emac {
- 	int duplex;
  
- 	enum prueth_port port_id;
-+	enum prueth_mem dram;
- 	const char *phy_id;
- 	u8 mac_addr[6];
- 	phy_interface_t phy_if;
-@@ -87,6 +186,9 @@ struct prueth {
- 	struct device *dev;
- 	struct pruss *pruss;
- 	struct rproc *pru0, *pru1;
-+	struct pruss_mem_region mem[PRUETH_MEM_MAX];
-+	struct gen_pool *sram_pool;
-+	struct regmap *mii_rt;
+ #include <linux/netdevice.h>
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-debugfs.c b/drivers/net/ethernet/amd/xgbe/xgbe-debugfs.c
+index b35808d3d07f..d9157c4acde9 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-debugfs.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-debugfs.c
+@@ -1,117 +1,8 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
+ /*
+- * AMD 10Gb Ethernet driver
+- *
+- * This file is available to you under your choice of the following two
+- * licenses:
+- *
+- * License 1: GPLv2
+- *
+- * Copyright (c) 2014 Advanced Micro Devices, Inc.
+- *
+- * This file is free software; you may copy, redistribute and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation, either version 2 of the License, or (at
+- * your option) any later version.
+- *
+- * This file is distributed in the hope that it will be useful, but
+- * WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+- * General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- *
+- * License 2: Modified BSD
+- *
+- * Copyright (c) 2014 Advanced Micro Devices, Inc.
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copyright
+- *       notice, this list of conditions and the following disclaimer in the
+- *       documentation and/or other materials provided with the distribution.
+- *     * Neither the name of Advanced Micro Devices, Inc. nor the
+- *       names of its contributors may be used to endorse or promote products
+- *       derived from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
++ * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
++ * Copyright (c) 2014, Synopsys, Inc.
++ * All rights reserved
+  */
  
- 	const struct prueth_private_data *fw_data;
- 	struct prueth_fw_offsets *fw_offsets;
-@@ -96,5 +198,7 @@ struct prueth {
- 	struct net_device *registered_netdevs[PRUETH_NUM_MACS];
+ #include <linux/debugfs.h>
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-desc.c b/drivers/net/ethernet/amd/xgbe/xgbe-desc.c
+index 230726d7b74f..7dba849bcd6b 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-desc.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-desc.c
+@@ -1,117 +1,8 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
+ /*
+- * AMD 10Gb Ethernet driver
+- *
+- * This file is available to you under your choice of the following two
+- * licenses:
+- *
+- * License 1: GPLv2
+- *
+- * Copyright (c) 2014 Advanced Micro Devices, Inc.
+- *
+- * This file is free software; you may copy, redistribute and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation, either version 2 of the License, or (at
+- * your option) any later version.
+- *
+- * This file is distributed in the hope that it will be useful, but
+- * WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+- * General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- *
+- * License 2: Modified BSD
+- *
+- * Copyright (c) 2014 Advanced Micro Devices, Inc.
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copyright
+- *       notice, this list of conditions and the following disclaimer in the
+- *       documentation and/or other materials provided with the distribution.
+- *     * Neither the name of Advanced Micro Devices, Inc. nor the
+- *       names of its contributors may be used to endorse or promote products
+- *       derived from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
++ * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
++ * Copyright (c) 2014, Synopsys, Inc.
++ * All rights reserved
+  */
  
- 	unsigned int eth_type;
-+	size_t ocmc_ram_size;
-+	u8 emac_configured;
- };
- #endif /* __NET_TI_PRUETH_H */
-diff --git a/drivers/net/ethernet/ti/icssm/icssm_switch.h b/drivers/net/ethernet/ti/icssm/icssm_switch.h
-new file mode 100644
-index 000000000000..b13e0706ccec
---- /dev/null
-+++ b/drivers/net/ethernet/ti/icssm/icssm_switch.h
-@@ -0,0 +1,257 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+
-+/* Copyright (C) 2015-2021 Texas Instruments Incorporated - https://www.ti.com
-+ */
-+
-+#ifndef __ICSS_SWITCH_H
-+#define __ICSS_SWITCH_H
-+
-+/* Basic Switch Parameters
-+ * Used to auto compute offset addresses on L3 OCMC RAM. Do not modify these
-+ * without changing firmware accordingly
-+ */
-+#define SWITCH_BUFFER_SIZE	(64 * 1024)	/* L3 buffer */
-+#define ICSS_BLOCK_SIZE		32		/* data bytes per BD */
-+#define BD_SIZE			4		/* byte buffer descriptor */
-+#define NUM_QUEUES		4		/* Queues on Port 0/1/2 */
-+
-+#define PORT_LINK_MASK		0x1
-+#define PORT_IS_HD_MASK		0x2
-+
-+/* Physical Port queue size (number of BDs). Same for both ports */
-+#define QUEUE_1_SIZE		97	/* Network Management high */
-+#define QUEUE_2_SIZE		97	/* Network Management low */
-+#define QUEUE_3_SIZE		97	/* Protocol specific */
-+#define QUEUE_4_SIZE		97	/* NRT (IP,ARP, ICMP) */
-+
-+/* Host queue size (number of BDs). Each BD points to data buffer of 32 bytes.
-+ * HOST PORT QUEUES can buffer up to 4 full sized frames per queue
-+ */
-+#define	HOST_QUEUE_1_SIZE	194	/* Protocol and VLAN priority 7 & 6 */
-+#define HOST_QUEUE_2_SIZE	194	/* Protocol mid */
-+#define HOST_QUEUE_3_SIZE	194	/* Protocol low */
-+#define HOST_QUEUE_4_SIZE	194	/* NRT (IP, ARP, ICMP) */
-+
-+#define COL_QUEUE_SIZE		0
-+
-+/* NRT Buffer descriptor definition
-+ * Each buffer descriptor points to a max 32 byte block and has 32 bit in size
-+ * to have atomic operation.
-+ * PRU can address bytewise into memory.
-+ * Definition of 32 bit descriptor is as follows
-+ *
-+ * Bits		Name			Meaning
-+ * =============================================================================
-+ * 0..7		Index		points to index in buffer queue, max 256 x 32
-+ *				byte blocks can be addressed
-+ * 6		LookupSuccess	For switch, FDB lookup was successful (source
-+ *				MAC address found in FDB).
-+ *				For RED, NodeTable lookup was successful.
-+ * 7		Flood		Packet should be flooded (destination MAC
-+ *				address found in FDB). For switch only.
-+ * 8..12	Block_length	number of valid bytes in this specific block.
-+ *				Will be <=32 bytes on last block of packet
-+ * 13		More		"More" bit indicating that there are more blocks
-+ * 14		Shadow		indicates that "index" is pointing into shadow
-+ *				buffer
-+ * 15		TimeStamp	indicates that this packet has time stamp in
-+ *				separate buffer - only needed of PTCP runs on
-+ *				host
-+ * 16..17	Port		different meaning for ingress and egress,
-+ *				Ingress: Port = 0 indicates phy port 1 and
-+ *				Port = 1 indicates phy port 2.
-+ *				Egress: 0 sends on phy port 1 and 1 sends on
-+ *				phy port 2. Port = 2 goes over MAC table
-+ *				look-up
-+ * 18..28	Length		11 bit of total packet length which is put into
-+ *				first BD only so that host access only one BD
-+ * 29		VlanTag		indicates that packet has Length/Type field of
-+ *				0x08100 with VLAN tag in following byte
-+ * 30		Broadcast	indicates that packet goes out on both physical
-+ *				ports,	there will be two bd but only one buffer
-+ * 31		Error		indicates there was an error in the packet
-+ */
-+#define PRUETH_BD_START_FLAG_MASK	BIT(0)
-+#define PRUETH_BD_START_FLAG_SHIFT	0
-+
-+#define PRUETH_BD_HSR_FRAME_MASK	BIT(4)
-+#define PRUETH_BD_HSR_FRAME_SHIFT	4
-+
-+#define PRUETH_BD_SUP_HSR_FRAME_MASK	BIT(5)
-+#define PRUETH_BD_SUP_HSR_FRAME_SHIFT	5
-+
-+#define PRUETH_BD_LOOKUP_SUCCESS_MASK	BIT(6)
-+#define PRUETH_BD_LOOKUP_SUCCESS_SHIFT	6
-+
-+#define PRUETH_BD_SW_FLOOD_MASK		BIT(7)
-+#define PRUETH_BD_SW_FLOOD_SHIFT	7
-+
-+#define	PRUETH_BD_SHADOW_MASK		BIT(14)
-+#define	PRUETH_BD_SHADOW_SHIFT		14
-+
-+#define PRUETH_BD_TIMESTAMP_MASK	BIT(15)
-+#define PRUETH_BD_TIMESTAMP_SHIT	15
-+
-+#define PRUETH_BD_PORT_MASK		GENMASK(17, 16)
-+#define PRUETH_BD_PORT_SHIFT		16
-+
-+#define PRUETH_BD_LENGTH_MASK		GENMASK(28, 18)
-+#define PRUETH_BD_LENGTH_SHIFT		18
-+
-+#define PRUETH_BD_BROADCAST_MASK	BIT(30)
-+#define PRUETH_BD_BROADCAST_SHIFT	30
-+
-+#define PRUETH_BD_ERROR_MASK		BIT(31)
-+#define PRUETH_BD_ERROR_SHIFT		31
-+
-+/* The following offsets indicate which sections of the memory are used
-+ * for EMAC internal tasks
-+ */
-+#define DRAM_START_OFFSET		0x1E98
-+#define SRAM_START_OFFSET		0x400
-+
-+/* General Purpose Statistics
-+ * These are present on both PRU0 and PRU1 DRAM
-+ */
-+/* base statistics offset */
-+#define STATISTICS_OFFSET	0x1F00
-+#define STAT_SIZE		0x98
-+
-+/* Offset for storing
-+ * 1. Storm Prevention Params
-+ * 2. PHY Speed Offset
-+ * 3. Port Status Offset
-+ * These are present on both PRU0 and PRU1
-+ */
-+/* 4 bytes */
-+#define STORM_PREVENTION_OFFSET_BC	(STATISTICS_OFFSET + STAT_SIZE)
-+/* 4 bytes */
-+#define PHY_SPEED_OFFSET		(STATISTICS_OFFSET + STAT_SIZE + 4)
-+/* 1 byte */
-+#define PORT_STATUS_OFFSET		(STATISTICS_OFFSET + STAT_SIZE + 8)
-+/* 1 byte */
-+#define COLLISION_COUNTER		(STATISTICS_OFFSET + STAT_SIZE + 9)
-+/* 4 bytes */
-+#define RX_PKT_SIZE_OFFSET		(STATISTICS_OFFSET + STAT_SIZE + 10)
-+/* 4 bytes */
-+#define PORT_CONTROL_ADDR		(STATISTICS_OFFSET + STAT_SIZE + 14)
-+/* 6 bytes */
-+#define PORT_MAC_ADDR			(STATISTICS_OFFSET + STAT_SIZE + 18)
-+/* 1 byte */
-+#define RX_INT_STATUS_OFFSET		(STATISTICS_OFFSET + STAT_SIZE + 24)
-+/* 4 bytes */
-+#define STORM_PREVENTION_OFFSET_MC	(STATISTICS_OFFSET + STAT_SIZE + 25)
-+/* 4 bytes */
-+#define STORM_PREVENTION_OFFSET_UC	(STATISTICS_OFFSET + STAT_SIZE + 29)
-+/* 4 bytes ? */
-+#define STP_INVALID_STATE_OFFSET	(STATISTICS_OFFSET + STAT_SIZE + 33)
-+
-+/* DRAM Offsets for EMAC
-+ * Present on Both DRAM0 and DRAM1
-+ */
-+
-+/* 4 queue descriptors for port tx = 32 bytes */
-+#define TX_CONTEXT_Q1_OFFSET_ADDR	(PORT_QUEUE_DESC_OFFSET + 32)
-+#define PORT_QUEUE_DESC_OFFSET	(ICSS_EMAC_TTS_CYC_TX_SOF + 8)
-+
-+/* EMAC Time Triggered Send Offsets */
-+#define ICSS_EMAC_TTS_CYC_TX_SOF	(ICSS_EMAC_TTS_PREV_TX_SOF + 8)
-+#define ICSS_EMAC_TTS_PREV_TX_SOF	\
-+	(ICSS_EMAC_TTS_MISSED_CYCLE_CNT_OFFSET	+ 4)
-+#define ICSS_EMAC_TTS_MISSED_CYCLE_CNT_OFFSET	(ICSS_EMAC_TTS_STATUS_OFFSET \
-+						 + 4)
-+#define ICSS_EMAC_TTS_STATUS_OFFSET	(ICSS_EMAC_TTS_CFG_TIME_OFFSET + 4)
-+#define ICSS_EMAC_TTS_CFG_TIME_OFFSET	(ICSS_EMAC_TTS_CYCLE_PERIOD_OFFSET + 4)
-+#define ICSS_EMAC_TTS_CYCLE_PERIOD_OFFSET	\
-+	(ICSS_EMAC_TTS_CYCLE_START_OFFSET + 8)
-+#define ICSS_EMAC_TTS_CYCLE_START_OFFSET	ICSS_EMAC_TTS_BASE_OFFSET
-+#define ICSS_EMAC_TTS_BASE_OFFSET	DRAM_START_OFFSET
-+
-+/* Shared RAM offsets for EMAC */
-+
-+/* Queue Descriptors */
-+
-+/* 4 queue descriptors for port 0 (host receive). 32 bytes */
-+#define HOST_QUEUE_DESC_OFFSET		(HOST_QUEUE_SIZE_ADDR + 16)
-+
-+/* table offset for queue size:
-+ * 3 ports * 4 Queues * 1 byte offset = 12 bytes
-+ */
-+#define HOST_QUEUE_SIZE_ADDR		(HOST_QUEUE_OFFSET_ADDR + 8)
-+/* table offset for queue:
-+ * 4 Queues * 2 byte offset = 8 bytes
-+ */
-+#define HOST_QUEUE_OFFSET_ADDR		(HOST_QUEUE_DESCRIPTOR_OFFSET_ADDR + 8)
-+/* table offset for Host queue descriptors:
-+ * 1 ports * 4 Queues * 2 byte offset = 8 bytes
-+ */
-+#define HOST_QUEUE_DESCRIPTOR_OFFSET_ADDR	(HOST_Q4_RX_CONTEXT_OFFSET + 8)
-+
-+/* Host Port Rx Context */
-+#define HOST_Q4_RX_CONTEXT_OFFSET	(HOST_Q3_RX_CONTEXT_OFFSET + 8)
-+#define HOST_Q3_RX_CONTEXT_OFFSET	(HOST_Q2_RX_CONTEXT_OFFSET + 8)
-+#define HOST_Q2_RX_CONTEXT_OFFSET	(HOST_Q1_RX_CONTEXT_OFFSET + 8)
-+#define HOST_Q1_RX_CONTEXT_OFFSET	(EMAC_PROMISCUOUS_MODE_OFFSET + 4)
-+
-+/* Promiscuous mode control */
-+#define EMAC_P1_PROMISCUOUS_BIT		BIT(0)
-+#define EMAC_P2_PROMISCUOUS_BIT		BIT(1)
-+#define EMAC_PROMISCUOUS_MODE_OFFSET	(EMAC_RESERVED + 4)
-+#define EMAC_RESERVED			EOF_48K_BUFFER_BD
-+
-+/* allow for max 48k buffer which spans the descriptors up to 0x1800 6kB */
-+#define EOF_48K_BUFFER_BD	(P0_BUFFER_DESC_OFFSET + HOST_BD_SIZE + \
-+				 PORT_BD_SIZE)
-+
-+#define HOST_BD_SIZE		((HOST_QUEUE_1_SIZE +	\
-+				  HOST_QUEUE_2_SIZE + HOST_QUEUE_3_SIZE + \
-+				  HOST_QUEUE_4_SIZE) * BD_SIZE)
-+#define PORT_BD_SIZE		((QUEUE_1_SIZE + QUEUE_2_SIZE +	\
-+				  QUEUE_3_SIZE + QUEUE_4_SIZE) * 2 * BD_SIZE)
-+
-+#define END_OF_BD_POOL		(P2_Q4_BD_OFFSET + QUEUE_4_SIZE * BD_SIZE)
-+#define P2_Q4_BD_OFFSET		(P2_Q3_BD_OFFSET + QUEUE_3_SIZE * BD_SIZE)
-+#define P2_Q3_BD_OFFSET		(P2_Q2_BD_OFFSET + QUEUE_2_SIZE * BD_SIZE)
-+#define P2_Q2_BD_OFFSET		(P2_Q1_BD_OFFSET + QUEUE_1_SIZE * BD_SIZE)
-+#define P2_Q1_BD_OFFSET		(P1_Q4_BD_OFFSET + QUEUE_4_SIZE * BD_SIZE)
-+#define P1_Q4_BD_OFFSET		(P1_Q3_BD_OFFSET + QUEUE_3_SIZE * BD_SIZE)
-+#define P1_Q3_BD_OFFSET		(P1_Q2_BD_OFFSET + QUEUE_2_SIZE * BD_SIZE)
-+#define P1_Q2_BD_OFFSET		(P1_Q1_BD_OFFSET + QUEUE_1_SIZE * BD_SIZE)
-+#define P1_Q1_BD_OFFSET		(P0_Q4_BD_OFFSET + HOST_QUEUE_4_SIZE * BD_SIZE)
-+#define P0_Q4_BD_OFFSET		(P0_Q3_BD_OFFSET + HOST_QUEUE_3_SIZE * BD_SIZE)
-+#define P0_Q3_BD_OFFSET		(P0_Q2_BD_OFFSET + HOST_QUEUE_2_SIZE * BD_SIZE)
-+#define P0_Q2_BD_OFFSET		(P0_Q1_BD_OFFSET + HOST_QUEUE_1_SIZE * BD_SIZE)
-+#define P0_Q1_BD_OFFSET		P0_BUFFER_DESC_OFFSET
-+#define P0_BUFFER_DESC_OFFSET	SRAM_START_OFFSET
-+
-+/* Memory Usage of L3 OCMC RAM */
-+
-+/* L3 64KB Memory - mainly buffer Pool */
-+#define END_OF_BUFFER_POOL	(P2_Q4_BUFFER_OFFSET + QUEUE_4_SIZE *	\
-+				 ICSS_BLOCK_SIZE)
-+#define P2_Q4_BUFFER_OFFSET	(P2_Q3_BUFFER_OFFSET + QUEUE_3_SIZE *	\
-+				 ICSS_BLOCK_SIZE)
-+#define P2_Q3_BUFFER_OFFSET	(P2_Q2_BUFFER_OFFSET + QUEUE_2_SIZE *	\
-+				 ICSS_BLOCK_SIZE)
-+#define P2_Q2_BUFFER_OFFSET	(P2_Q1_BUFFER_OFFSET + QUEUE_1_SIZE *	\
-+				 ICSS_BLOCK_SIZE)
-+#define P2_Q1_BUFFER_OFFSET	(P1_Q4_BUFFER_OFFSET + QUEUE_4_SIZE *	\
-+				 ICSS_BLOCK_SIZE)
-+#define P1_Q4_BUFFER_OFFSET	(P1_Q3_BUFFER_OFFSET + QUEUE_3_SIZE *	\
-+				 ICSS_BLOCK_SIZE)
-+#define P1_Q3_BUFFER_OFFSET	(P1_Q2_BUFFER_OFFSET + QUEUE_2_SIZE *	\
-+				 ICSS_BLOCK_SIZE)
-+#define P1_Q2_BUFFER_OFFSET	(P1_Q1_BUFFER_OFFSET + QUEUE_1_SIZE *	\
-+				 ICSS_BLOCK_SIZE)
-+#define P1_Q1_BUFFER_OFFSET	(P0_Q4_BUFFER_OFFSET + HOST_QUEUE_4_SIZE * \
-+				 ICSS_BLOCK_SIZE)
-+#define P0_Q4_BUFFER_OFFSET	(P0_Q3_BUFFER_OFFSET + HOST_QUEUE_3_SIZE * \
-+				 ICSS_BLOCK_SIZE)
-+#define P0_Q3_BUFFER_OFFSET	(P0_Q2_BUFFER_OFFSET + HOST_QUEUE_2_SIZE * \
-+				 ICSS_BLOCK_SIZE)
-+#define P0_Q2_BUFFER_OFFSET	(P0_Q1_BUFFER_OFFSET + HOST_QUEUE_1_SIZE * \
-+				 ICSS_BLOCK_SIZE)
-+#define P0_COL_BUFFER_OFFSET	0xEE00
-+#define P0_Q1_BUFFER_OFFSET	0x0000
-+
-+#endif /* __ICSS_SWITCH_H */
+ #include "xgbe.h"
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
+index f393228d41c7..b51a3666dddb 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
+@@ -1,117 +1,8 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
+ /*
+- * AMD 10Gb Ethernet driver
+- *
+- * This file is available to you under your choice of the following two
+- * licenses:
+- *
+- * License 1: GPLv2
+- *
+- * Copyright (c) 2014-2016 Advanced Micro Devices, Inc.
+- *
+- * This file is free software; you may copy, redistribute and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation, either version 2 of the License, or (at
+- * your option) any later version.
+- *
+- * This file is distributed in the hope that it will be useful, but
+- * WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+- * General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- *
+- * License 2: Modified BSD
+- *
+- * Copyright (c) 2014-2016 Advanced Micro Devices, Inc.
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copyright
+- *       notice, this list of conditions and the following disclaimer in the
+- *       documentation and/or other materials provided with the distribution.
+- *     * Neither the name of Advanced Micro Devices, Inc. nor the
+- *       names of its contributors may be used to endorse or promote products
+- *       derived from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
++ * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
++ * Copyright (c) 2014, Synopsys, Inc.
++ * All rights reserved
+  */
+ 
+ #include <linux/phy.h>
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
+index d84a310dfcd4..0697eed1cb72 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-drv.c
+@@ -1,117 +1,8 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
+ /*
+- * AMD 10Gb Ethernet driver
+- *
+- * This file is available to you under your choice of the following two
+- * licenses:
+- *
+- * License 1: GPLv2
+- *
+- * Copyright (c) 2014-2016 Advanced Micro Devices, Inc.
+- *
+- * This file is free software; you may copy, redistribute and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation, either version 2 of the License, or (at
+- * your option) any later version.
+- *
+- * This file is distributed in the hope that it will be useful, but
+- * WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+- * General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- *
+- * License 2: Modified BSD
+- *
+- * Copyright (c) 2014-2016 Advanced Micro Devices, Inc.
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copyright
+- *       notice, this list of conditions and the following disclaimer in the
+- *       documentation and/or other materials provided with the distribution.
+- *     * Neither the name of Advanced Micro Devices, Inc. nor the
+- *       names of its contributors may be used to endorse or promote products
+- *       derived from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
++ * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
++ * Copyright (c) 2014, Synopsys, Inc.
++ * All rights reserved
+  */
+ 
+ #include <linux/module.h>
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
+index 4431ab1c18b3..be0d2c7d08dc 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
+@@ -1,117 +1,8 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
+ /*
+- * AMD 10Gb Ethernet driver
+- *
+- * This file is available to you under your choice of the following two
+- * licenses:
+- *
+- * License 1: GPLv2
+- *
+- * Copyright (c) 2014-2016 Advanced Micro Devices, Inc.
+- *
+- * This file is free software; you may copy, redistribute and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation, either version 2 of the License, or (at
+- * your option) any later version.
+- *
+- * This file is distributed in the hope that it will be useful, but
+- * WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+- * General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- *
+- * License 2: Modified BSD
+- *
+- * Copyright (c) 2014-2016 Advanced Micro Devices, Inc.
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copyright
+- *       notice, this list of conditions and the following disclaimer in the
+- *       documentation and/or other materials provided with the distribution.
+- *     * Neither the name of Advanced Micro Devices, Inc. nor the
+- *       names of its contributors may be used to endorse or promote products
+- *       derived from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
++ * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
++ * Copyright (c) 2014, Synopsys, Inc.
++ * All rights reserved
+  */
+ 
+ #include <linux/spinlock.h>
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-i2c.c b/drivers/net/ethernet/amd/xgbe/xgbe-i2c.c
+index 7a833894f52a..d40011e8ddf2 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-i2c.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-i2c.c
+@@ -1,117 +1,8 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
+ /*
+- * AMD 10Gb Ethernet driver
+- *
+- * This file is available to you under your choice of the following two
+- * licenses:
+- *
+- * License 1: GPLv2
+- *
+- * Copyright (c) 2016 Advanced Micro Devices, Inc.
+- *
+- * This file is free software; you may copy, redistribute and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation, either version 2 of the License, or (at
+- * your option) any later version.
+- *
+- * This file is distributed in the hope that it will be useful, but
+- * WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+- * General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- *
+- * License 2: Modified BSD
+- *
+- * Copyright (c) 2016 Advanced Micro Devices, Inc.
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copyright
+- *       notice, this list of conditions and the following disclaimer in the
+- *       documentation and/or other materials provided with the distribution.
+- *     * Neither the name of Advanced Micro Devices, Inc. nor the
+- *       names of its contributors may be used to endorse or promote products
+- *       derived from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
++ * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
++ * Copyright (c) 2014, Synopsys, Inc.
++ * All rights reserved
+  */
+ 
+ #include <linux/module.h>
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-main.c b/drivers/net/ethernet/amd/xgbe/xgbe-main.c
+index 0e8698928e4d..4ebdd123c435 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-main.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-main.c
+@@ -1,117 +1,8 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
+ /*
+- * AMD 10Gb Ethernet driver
+- *
+- * This file is available to you under your choice of the following two
+- * licenses:
+- *
+- * License 1: GPLv2
+- *
+- * Copyright (c) 2014-2016 Advanced Micro Devices, Inc.
+- *
+- * This file is free software; you may copy, redistribute and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation, either version 2 of the License, or (at
+- * your option) any later version.
+- *
+- * This file is distributed in the hope that it will be useful, but
+- * WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+- * General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- *
+- * License 2: Modified BSD
+- *
+- * Copyright (c) 2014-2016 Advanced Micro Devices, Inc.
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copyright
+- *       notice, this list of conditions and the following disclaimer in the
+- *       documentation and/or other materials provided with the distribution.
+- *     * Neither the name of Advanced Micro Devices, Inc. nor the
+- *       names of its contributors may be used to endorse or promote products
+- *       derived from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
++ * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
++ * Copyright (c) 2014, Synopsys, Inc.
++ * All rights reserved
+  */
+ 
+ #include <linux/module.h>
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-mdio.c b/drivers/net/ethernet/amd/xgbe/xgbe-mdio.c
+index 07f4f3418d01..71449edbb76d 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-mdio.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-mdio.c
+@@ -1,117 +1,8 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
+ /*
+- * AMD 10Gb Ethernet driver
+- *
+- * This file is available to you under your choice of the following two
+- * licenses:
+- *
+- * License 1: GPLv2
+- *
+- * Copyright (c) 2014-2016 Advanced Micro Devices, Inc.
+- *
+- * This file is free software; you may copy, redistribute and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation, either version 2 of the License, or (at
+- * your option) any later version.
+- *
+- * This file is distributed in the hope that it will be useful, but
+- * WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+- * General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- *
+- * License 2: Modified BSD
+- *
+- * Copyright (c) 2014-2016 Advanced Micro Devices, Inc.
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copyright
+- *       notice, this list of conditions and the following disclaimer in the
+- *       documentation and/or other materials provided with the distribution.
+- *     * Neither the name of Advanced Micro Devices, Inc. nor the
+- *       names of its contributors may be used to endorse or promote products
+- *       derived from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
++ * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
++ * Copyright (c) 2014, Synopsys, Inc.
++ * All rights reserved
+  */
+ 
+ #include <linux/interrupt.h>
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-pci.c b/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
+index c636999a6a84..3e9f31256dce 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
+@@ -1,117 +1,8 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
+ /*
+- * AMD 10Gb Ethernet driver
+- *
+- * This file is available to you under your choice of the following two
+- * licenses:
+- *
+- * License 1: GPLv2
+- *
+- * Copyright (c) 2016 Advanced Micro Devices, Inc.
+- *
+- * This file is free software; you may copy, redistribute and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation, either version 2 of the License, or (at
+- * your option) any later version.
+- *
+- * This file is distributed in the hope that it will be useful, but
+- * WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+- * General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- *
+- * License 2: Modified BSD
+- *
+- * Copyright (c) 2016 Advanced Micro Devices, Inc.
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copyright
+- *       notice, this list of conditions and the following disclaimer in the
+- *       documentation and/or other materials provided with the distribution.
+- *     * Neither the name of Advanced Micro Devices, Inc. nor the
+- *       names of its contributors may be used to endorse or promote products
+- *       derived from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
++ * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
++ * Copyright (c) 2014, Synopsys, Inc.
++ * All rights reserved
+  */
+ 
+ #include <linux/module.h>
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v1.c b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v1.c
+index d16eae415f72..2e6b8ffe785c 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v1.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v1.c
+@@ -1,117 +1,8 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
+ /*
+- * AMD 10Gb Ethernet driver
+- *
+- * This file is available to you under your choice of the following two
+- * licenses:
+- *
+- * License 1: GPLv2
+- *
+- * Copyright (c) 2016 Advanced Micro Devices, Inc.
+- *
+- * This file is free software; you may copy, redistribute and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation, either version 2 of the License, or (at
+- * your option) any later version.
+- *
+- * This file is distributed in the hope that it will be useful, but
+- * WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+- * General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- *
+- * License 2: Modified BSD
+- *
+- * Copyright (c) 2016 Advanced Micro Devices, Inc.
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copyright
+- *       notice, this list of conditions and the following disclaimer in the
+- *       documentation and/or other materials provided with the distribution.
+- *     * Neither the name of Advanced Micro Devices, Inc. nor the
+- *       names of its contributors may be used to endorse or promote products
+- *       derived from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
++ * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
++ * Copyright (c) 2014, Synopsys, Inc.
++ * All rights reserved
+  */
+ 
+ #include <linux/module.h>
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
+index 268399dfcf22..7a4dfa4e19c7 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-phy-v2.c
+@@ -1,117 +1,8 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
+ /*
+- * AMD 10Gb Ethernet driver
+- *
+- * This file is available to you under your choice of the following two
+- * licenses:
+- *
+- * License 1: GPLv2
+- *
+- * Copyright (c) 2016 Advanced Micro Devices, Inc.
+- *
+- * This file is free software; you may copy, redistribute and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation, either version 2 of the License, or (at
+- * your option) any later version.
+- *
+- * This file is distributed in the hope that it will be useful, but
+- * WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+- * General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- *
+- * License 2: Modified BSD
+- *
+- * Copyright (c) 2016 Advanced Micro Devices, Inc.
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copyright
+- *       notice, this list of conditions and the following disclaimer in the
+- *       documentation and/or other materials provided with the distribution.
+- *     * Neither the name of Advanced Micro Devices, Inc. nor the
+- *       names of its contributors may be used to endorse or promote products
+- *       derived from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
++ * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
++ * Copyright (c) 2014, Synopsys, Inc.
++ * All rights reserved
+  */
+ 
+ #include <linux/module.h>
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-platform.c b/drivers/net/ethernet/amd/xgbe/xgbe-platform.c
+index 4365bd62942c..47d53e59ccf6 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-platform.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-platform.c
+@@ -1,117 +1,8 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
+ /*
+- * AMD 10Gb Ethernet driver
+- *
+- * This file is available to you under your choice of the following two
+- * licenses:
+- *
+- * License 1: GPLv2
+- *
+- * Copyright (c) 2014-2016 Advanced Micro Devices, Inc.
+- *
+- * This file is free software; you may copy, redistribute and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation, either version 2 of the License, or (at
+- * your option) any later version.
+- *
+- * This file is distributed in the hope that it will be useful, but
+- * WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+- * General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- *
+- * License 2: Modified BSD
+- *
+- * Copyright (c) 2014-2016 Advanced Micro Devices, Inc.
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copyright
+- *       notice, this list of conditions and the following disclaimer in the
+- *       documentation and/or other materials provided with the distribution.
+- *     * Neither the name of Advanced Micro Devices, Inc. nor the
+- *       names of its contributors may be used to endorse or promote products
+- *       derived from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
++ * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
++ * Copyright (c) 2014, Synopsys, Inc.
++ * All rights reserved
+  */
+ 
+ #include <linux/module.h>
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-ptp.c b/drivers/net/ethernet/amd/xgbe/xgbe-ptp.c
+index 7051bd7cf6dc..978c4dd01fa0 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-ptp.c
++++ b/drivers/net/ethernet/amd/xgbe/xgbe-ptp.c
+@@ -1,117 +1,8 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
+ /*
+- * AMD 10Gb Ethernet driver
+- *
+- * This file is available to you under your choice of the following two
+- * licenses:
+- *
+- * License 1: GPLv2
+- *
+- * Copyright (c) 2014 Advanced Micro Devices, Inc.
+- *
+- * This file is free software; you may copy, redistribute and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation, either version 2 of the License, or (at
+- * your option) any later version.
+- *
+- * This file is distributed in the hope that it will be useful, but
+- * WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+- * General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- *
+- * License 2: Modified BSD
+- *
+- * Copyright (c) 2014 Advanced Micro Devices, Inc.
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copyright
+- *       notice, this list of conditions and the following disclaimer in the
+- *       documentation and/or other materials provided with the distribution.
+- *     * Neither the name of Advanced Micro Devices, Inc. nor the
+- *       names of its contributors may be used to endorse or promote products
+- *       derived from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
++ * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
++ * Copyright (c) 2014, Synopsys, Inc.
++ * All rights reserved
+  */
+ 
+ #include <linux/clk.h>
+diff --git a/drivers/net/ethernet/amd/xgbe/xgbe.h b/drivers/net/ethernet/amd/xgbe/xgbe.h
+index d85386cac8d1..e5f5104342aa 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe.h
++++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
+@@ -1,117 +1,8 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
+ /*
+- * AMD 10Gb Ethernet driver
+- *
+- * This file is available to you under your choice of the following two
+- * licenses:
+- *
+- * License 1: GPLv2
+- *
+- * Copyright (c) 2014-2016 Advanced Micro Devices, Inc.
+- *
+- * This file is free software; you may copy, redistribute and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation, either version 2 of the License, or (at
+- * your option) any later version.
+- *
+- * This file is distributed in the hope that it will be useful, but
+- * WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+- * General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- *
+- * License 2: Modified BSD
+- *
+- * Copyright (c) 2014-2016 Advanced Micro Devices, Inc.
+- * All rights reserved.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions are met:
+- *     * Redistributions of source code must retain the above copyright
+- *       notice, this list of conditions and the following disclaimer.
+- *     * Redistributions in binary form must reproduce the above copyright
+- *       notice, this list of conditions and the following disclaimer in the
+- *       documentation and/or other materials provided with the distribution.
+- *     * Neither the name of Advanced Micro Devices, Inc. nor the
+- *       names of its contributors may be used to endorse or promote products
+- *       derived from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY
+- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+- * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+- *
+- * This file incorporates work covered by the following copyright and
+- * permission notice:
+- *     The Synopsys DWC ETHER XGMAC Software Driver and documentation
+- *     (hereinafter "Software") is an unsupported proprietary work of Synopsys,
+- *     Inc. unless otherwise expressly agreed to in writing between Synopsys
+- *     and you.
+- *
+- *     The Software IS NOT an item of Licensed Software or Licensed Product
+- *     under any End User Software License Agreement or Agreement for Licensed
+- *     Product with Synopsys or any supplement thereto.  Permission is hereby
+- *     granted, free of charge, to any person obtaining a copy of this software
+- *     annotated with this license and the Software, to deal in the Software
+- *     without restriction, including without limitation the rights to use,
+- *     copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+- *     of the Software, and to permit persons to whom the Software is furnished
+- *     to do so, subject to the following conditions:
+- *
+- *     The above copyright notice and this permission notice shall be included
+- *     in all copies or substantial portions of the Software.
+- *
+- *     THIS SOFTWARE IS BEING DISTRIBUTED BY SYNOPSYS SOLELY ON AN "AS IS"
+- *     BASIS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+- *     TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+- *     PARTICULAR PURPOSE ARE HEREBY DISCLAIMED. IN NO EVENT SHALL SYNOPSYS
+- *     BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+- *     CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+- *     SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+- *     INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+- *     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+- *     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+- *     THE POSSIBILITY OF SUCH DAMAGE.
++ * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
++ * Copyright (c) 2014, Synopsys, Inc.
++ * All rights reserved
+  */
+ 
+ #ifndef __XGBE_H__
 -- 
 2.34.1
 
