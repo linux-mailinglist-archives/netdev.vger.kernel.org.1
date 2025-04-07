@@ -1,105 +1,249 @@
-Return-Path: <netdev+bounces-179572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EDEEA7DAFF
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 12:24:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A0ACA7DB15
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 12:26:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA1DA18899DD
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 10:24:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 227A87A4EE4
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 10:25:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 493AA230BDA;
-	Mon,  7 Apr 2025 10:23:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2E0A2309B0;
+	Mon,  7 Apr 2025 10:26:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="r1T/c85G"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="cdAI356i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47EACA920
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 10:23:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19BFD1A8418;
+	Mon,  7 Apr 2025 10:26:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744021436; cv=none; b=VzLTdOd1ejF6Q8FEQm/5gchg4I9I/Nf+YRHyNsq49hoN1gbp9ZHyNFmOipZixQAfP4V1LG6phkba+TkdOAm1hOdLBZA81viVuxlYK2+Y+ALjPWe6TjXzdBOk4KEr1VAx/ihPUIgI1DCQY6RKjLERd1c88Ahw2anZyfXFA2FhGJ8=
+	t=1744021569; cv=none; b=jl7LO2WYTnt5A+7ri1GV9ulAYsxN9dJu+B9V109XgGLTmrO8pQdq1ZR5uNB58X8TvpfU7lzBKSUg8WnfJt6yMV3cb+XZl3kxLnWaU5Pz1Xv9RAEu9lSAtPRWmeGZy0zRJ7S4flakr06VfFKp2Q/hLOCoVR+zto4aw9ZoNWwMHo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744021436; c=relaxed/simple;
-	bh=yA2pldDRfyq3TzSzuNn26G6TADLA9fd7bTTyaWZKJDA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dm9IDPR37a8HxazUq18fvhynMOTPfn3mZFs9qOnvmNbTThB6+a5bgdPZzCAvXINkNxEcUjU9SM6ZeBAAi56bV5Iuy2Wi+OUW6Gis9QGg7mwgXDv7mpjIqvgOj3bYf5ulwPuHz4BlQPrrXftNVzZeQU2dsuuISKYyMnfMoAW2kkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=r1T/c85G; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43cf3192f3bso41595795e9.1
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 03:23:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1744021431; x=1744626231; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yA2pldDRfyq3TzSzuNn26G6TADLA9fd7bTTyaWZKJDA=;
-        b=r1T/c85G90I4nMvXd/eYemM7YSsyRSoz8l8TxdYkEOlCUo7MjrMGh3abjkZwjoCf+s
-         jzLCjdoWYUgvaNKIEEfCMZ+WgYgimP+q+4TtxMqJFQw7RQfa//wxyAZYg5jVTbpJqqeS
-         eQ1qSry25P0MmLvTCjPrkQ8ngvGei85Z68MNGxbQBJLayTnJIO2NfB7axFPTifBUFAGH
-         CY7EbnX6uVKTjiwcu2s7TYRe4mpTRYiMHkyN47iw4qqjmaG2k4xLpHPGUuW2pqg4Jo4W
-         vIqY8aaqT99KMx7RvKGs9bpvbgflJFHJuJlUccHCnwYjBVn1coyPIgtgu1cjLsiLhJkI
-         PQsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744021431; x=1744626231;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yA2pldDRfyq3TzSzuNn26G6TADLA9fd7bTTyaWZKJDA=;
-        b=OdnMm4BO2uMSLRERnVQ7iFD8MBJ8sByldMrv4UzwxICNvthZBI6K3gvYGZIZimFioC
-         TfubyjbBzEpVV3bd1d2OFPmgagWVje80USwtxobHxpW1xW8V8k0gpxBglts6doBI+scz
-         4By0Q1J2CPdu5/EQ1VuBH27PJZkp3YZyifmlcfyGRr2G3sc2vlUOOGf6vSARAGs60MDY
-         kYGAlr7YF3PKCHQrXYq/0V/47ZGPQr3VPjdD+PkgaxOeru62rlNkQ0zUtpgP8ZdcM2EC
-         aIByns7kPGu5LiAytTnhJ73jYVJl7uG7BizX7hn6Ym/suLC/X2gRx7sWWgwiziDJ4ma1
-         CMsw==
-X-Forwarded-Encrypted: i=1; AJvYcCXgNUatnaJS3IzD0FRiNp1sl6a3hHCGN5UHdLKG9/HacEJxZ1R+xG8V+ea9ANMBaq0pNXcxtxk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTQl6L14ze5YNO0NI2y9Ed7v1YPCmCq7pTV0ItzSYtSalcQ0Dl
-	5TSSXBHDljWiK50RRhlECXgM2tjGfI2Db99Zj33jZNsW+RMaMWUFbChWFc+w9jA=
-X-Gm-Gg: ASbGnctYB8VZK+EN1WUhUyNVbtu3SaNR1fwZ0oL+vSeGyOQ4bMTG2disfE4dO/aPP2W
-	8dufhE3iNZ6cweuMQU6AcYAZfwmMfEblrZSFyPH4Rkvip1zNg4JvNph5dkxZnvEDherODXWKsZ4
-	w3unRZ+V7YEKO54OFSfg3yNfk63G6EVB/nxJhuaMzwLFZdOVZf/8Mhe1AZmNXEkGiHblOBOSkKH
-	QOYd8CYEfsRHEUy+oEjpGx5EU8/PGFQKo/VJW/v4fFcdaBYr1XnQlV5AVebGpAruHkwpvMMKGwu
-	j9mqwicG+rFabD5T2R1bANDvFLVJ+jTGsEL1iWfS1bUhkzfPMCUu
-X-Google-Smtp-Source: AGHT+IHkDPMugDvDivRAy90+fG08jCXMlXjh7ZNxBKIwM7yJK2W30P08QYdhl0syGJDNl1euvgeCdA==
-X-Received: by 2002:a05:600c:1d16:b0:43d:45a:8fbb with SMTP id 5b1f17b1804b1-43ed0d98e7cmr94394565e9.22.1744021431207;
-        Mon, 07 Apr 2025 03:23:51 -0700 (PDT)
-Received: from jiri-mlt ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec1662feesm127282655e9.12.2025.04.07.03.23.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 03:23:50 -0700 (PDT)
-Date: Mon, 7 Apr 2025 12:23:41 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Thorsten Blum <thorsten.blum@linux.dev>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] rocker: Simplify if condition in
- ofdpa_port_fdb()
-Message-ID: <vumossr2v5hmwjxo5sdevqwkz3cwmorzw3f3pknibh3my42mmw@vhp4fdoq2h65>
-References: <20250407091442.743478-1-thorsten.blum@linux.dev>
+	s=arc-20240116; t=1744021569; c=relaxed/simple;
+	bh=SEw9qVYA2H7iFS9Q6l0glpfOw8v8NLhjS+zyxIuUxi8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fgNlHGV/LFUpEd9lMrUCp8f/qEh83QPurqpAPKCIrmmzMAFPzyjnNEBAJnow4xKtiVQ4gS28uWPjjZPjtCyS3dJWn4l8F5/qRTrF8WbZYEBPDatqLvN2LraZ4BPZnLBrNn5rrZgBytlXx71Vh78TPHkMpYQDuttEYzS0L69PHZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=cdAI356i; arc=none smtp.client-ip=162.240.238.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject
+	:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=ce07kUX/ygxAUIieyEbRPsWLl55YaiOEIOTL6MIVy1I=; b=cdAI356ivw6EKaVUk2M6IhZ5ol
+	vnzPyTcABPoYG4+TjwVADf7x76+R6VJlA2o2zCVDP5dGSEcrYDTjRQ4GKlSdZqD33iSqwMp1sj9L+
+	3dMC/nOInrhdQcRj62VAGV/45uQGSNbJLdFlDyGApro7JGBy7Afn9rlkjjhdej1HOtwrPTMpR1MoM
+	Q8sjg02vGCqvxz0ABhwi/ChUcKxWIUkcI2hKybMoCUCITnMZ6v4HwmQMamnrmHbG7h+e9dDszpRlt
+	xqY+kkPsJxY5aL3cu0sxobF9sGFc6qduTE4ZG9XSgO2dnp7zfYAJpi2Y/XuWirfv0QodVg7zdq5c8
+	ECOeNf+w==;
+Received: from [122.175.9.182] (port=29724 helo=cypher.couthit.local)
+	by server.wki.vra.mybluehostin.me with esmtpa (Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1u1jg0-000000001VV-1TZ9;
+	Mon, 07 Apr 2025 15:56:00 +0530
+From: Parvathi Pudi <parvathi@couthit.com>
+To: danishanwar@ti.com,
+	rogerq@kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	nm@ti.com,
+	ssantosh@kernel.org,
+	tony@atomide.com,
+	richardcochran@gmail.com,
+	glaroque@baylibre.com,
+	schnelle@linux.ibm.com,
+	m-karicheri2@ti.com,
+	rdunlap@infradead.org,
+	diogo.ivo@siemens.com,
+	basharath@couthit.com,
+	parvathi@couthit.com,
+	horms@kernel.org,
+	jacob.e.keller@intel.com,
+	m-malladi@ti.com,
+	javier.carrasco.cruz@gmail.com,
+	afd@ti.com,
+	s-anna@ti.com
+Cc: linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-omap@vger.kernel.org,
+	pratheesh@ti.com,
+	prajith@ti.com,
+	vigneshr@ti.com,
+	praneeth@ti.com,
+	srk@ti.com,
+	rogerq@ti.com,
+	krishna@couthit.com,
+	pmohan@couthit.com,
+	mohan@couthit.com
+Subject: [PATCH net-next v4 00/11] PRU-ICSSM Ethernet Driver
+Date: Mon,  7 Apr 2025 15:55:17 +0530
+Message-Id: <20250407102528.1048589-1-parvathi@couthit.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250407091442.743478-1-thorsten.blum@linux.dev>
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: parvathi@couthit.com
+X-Authenticated-Sender: server.wki.vra.mybluehostin.me: parvathi@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-Mon, Apr 07, 2025 at 11:14:42AM +0200, thorsten.blum@linux.dev wrote:
->Remove the double negation and simplify the if condition.
->
->No functional changes intended.
->
->Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+Hi,
 
-Why not.
+The Programmable Real-Time Unit Industrial Communication Sub-system (PRU-ICSS)
+is available on the TI SOCs in two flavors: Gigabit ICSS (ICSSG) and the older
+Megabit ICSS (ICSSM).
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Support for ICSSG Dual-EMAC mode has already been mainlined [1] and the
+fundamental components/drivers such as PRUSS driver, Remoteproc driver,
+PRU-ICSS INTC, and PRU-ICSS IEP drivers are already available in the mainline
+Linux kernel. The current set of patch series builds on top of these components
+and introduces changes to support the Dual-EMAC using ICSSM on the TI AM57xx,
+AM437x and AM335x devices.
+
+AM335x, AM437x and AM57xx devices may have either one or two PRU-ICSS instances
+with two 32-bit RISC PRU cores. Each PRU core has (a) dedicated Ethernet interface
+(MII, MDIO), timers, capture modules, and serial communication interfaces, and
+(b) dedicated data and instruction RAM as well as shared RAM for inter PRU
+communication within the PRU-ICSS.
+
+These patches add support for the following features:
+- RX and TX over PRU Ethernet ports in Dual-EMAC mode
+- Full duplex with 100 Mbps link speed.
+- VLAN Filtering
+- Multicast Filtering
+- Promiscuous mode
+- Storm prevention
+- Interrupt coalescing
+- Linux PTP (ptp4l) Ordinary clock
+
+Further, note that these are the first set of patches for a single instance of
+PRU-ICSS Ethernet. Switch mode support for AM335x, AM437x and AM57x along with
+support for a second instance of PRU-ICSS on AM57x will be posted subsequently.
+
+The patches presented in this series have gone through the patch verification
+tools and no warnings or errors are reported. Sample test logs obtained from AM33x,
+AM43x and AM57x verifying the functionality on Linux next kernel are available here:
+
+[Interface up Testing](https://gist.github.com/ParvathiPudi/18dbbd143e43c66a7e427a8e63ef7cf8)
+
+[Ping Testing](https://gist.github.com/ParvathiPudi/cc0b05c902e27e98eeabf20ac0cf7eff)
+
+[Iperf Testing](https://gist.github.com/ParvathiPudi/8794e524d4257fb63205bc05678b23c5)
+
+[1] https://lore.kernel.org/all/20230106121046.886863-1-danishanwar@ti.com/
+[2] https://lore.kernel.org/all/20250108125937.10604-1-basharath@couthit.com/
+
+This is the v4 of the patch series [v1]. This version of the patchset
+addresses the comments made on [v3] of the series.
+
+Changes from v3 to v4 :
+
+*) Added support for AM33x and AM43x platforms.
+*) Removed SOC patch [2] and its dependencies.
+*) Addressed Jakub Kicinski, MD Danish Anwar and Nishanth Menon comments on cover
+   letter of the series.
+*) Addressed Rob Herring comments on patch 1 of the series.
+*) Addressed Ratheesh Kannoth comments on patch 2 of the series.
+*) Addressed Maxime Chevallier comments on patch 4 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v2 to v3 :
+
+*) Addressed Conor Dooley comments on patch 1 of the series.
+*) Addressed Simon Horman comments on patch 2, 3, 4, 5 and 6 of the series.
+*) Addressed Joe Damato comments on patch 4 of the series.
+*) Rebased the series on latest net-next.
+
+Changes from v1 to v2 :
+
+*) Addressed Andrew Lunn, Rob Herring comments on patch 1 of the series.
+*) Addressed Andrew Lunn comments on patch 2, 3, and 4 of the series.
+*) Addressed Richard Cochran, Jason Xing comments on patch 6 of the series.
+*) Rebased patchset on next-202401xx linux-next.
+
+[v1] https://lore.kernel.org/all/20250109105600.41297-1-basharath@couthit.com/
+[v2] https://lore.kernel.org/all/20250124122353.1457174-1-basharath@couthit.com/
+[v3] https://lore.kernel.org/all/20250214054702.1073139-1-parvathi@couthit.com/
+
+
+Thanks and Regards,
+Parvathi.
+
+Murali Karicheri (1):
+  net: ti: prueth: Adds support for RX interrupt coalescing/pacing
+
+Parvathi Pudi (1):
+  dt-bindings: net: ti: Adds DUAL-EMAC mode support on PRU-ICSS2 for
+    AM57xx, AM43xx and AM33xx SOCs
+
+Roger Quadros (9):
+  net: ti: prueth: Adds ICSSM Ethernet driver
+  net: ti: prueth: Adds PRUETH HW and SW configuration
+  net: ti: prueth: Adds link detection, RX and TX support.
+  net: ti: prueth: Adds ethtool support for ICSSM PRUETH Driver
+  net: ti: prueth: Adds HW timestamping support for PTP using PRU-ICSS
+    IEP module
+  net: ti: prueth: Adds support for network filters for traffic control
+    supported by PRU-ICSS
+  net: ti: prueth: Adds power management support for PRU-ICSS
+  net: ti: prueth: Adds support for PRUETH on AM33x and AM43x SOCs
+  net: ti: prueth: Adds PTP OC Support for AM335x and AM437x
+
+ .../devicetree/bindings/net/ti,icss-iep.yaml  |   10 +-
+ .../bindings/net/ti,icssm-prueth.yaml         |  233 ++
+ .../bindings/net/ti,pruss-ecap.yaml           |   32 +
+ .../devicetree/bindings/soc/ti/ti,pruss.yaml  |    9 +
+ drivers/net/ethernet/ti/Kconfig               |   24 +
+ drivers/net/ethernet/ti/Makefile              |    5 +
+ drivers/net/ethernet/ti/icssg/icss_iep.c      |  258 +-
+ drivers/net/ethernet/ti/icssg/icss_iep.h      |   11 +
+ drivers/net/ethernet/ti/icssm/icssm_ethtool.c |  357 +++
+ drivers/net/ethernet/ti/icssm/icssm_prueth.c  | 2483 +++++++++++++++++
+ drivers/net/ethernet/ti/icssm/icssm_prueth.h  |  447 +++
+ .../net/ethernet/ti/icssm/icssm_prueth_dos.c  |  225 ++
+ .../net/ethernet/ti/icssm/icssm_prueth_ecap.c |  312 +++
+ .../net/ethernet/ti/icssm/icssm_prueth_ecap.h |   47 +
+ .../net/ethernet/ti/icssm/icssm_prueth_ptp.h  |   85 +
+ drivers/net/ethernet/ti/icssm/icssm_switch.h  |  285 ++
+ .../ti/icssm/icssm_vlan_mcast_filter_mmap.h   |  120 +
+ 17 files changed, 4939 insertions(+), 4 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/ti,icssm-prueth.yaml
+ create mode 100644 Documentation/devicetree/bindings/net/ti,pruss-ecap.yaml
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_ethtool.c
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth.c
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth.h
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_dos.c
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_ecap.c
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_ecap.h
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_ptp.h
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_switch.h
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_vlan_mcast_filter_mmap.h
+
+-- 
+2.34.1
+
 
