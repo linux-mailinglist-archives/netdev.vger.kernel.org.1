@@ -1,138 +1,212 @@
-Return-Path: <netdev+bounces-179693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E89C5A7E2C7
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:57:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB7B2A7E2C2
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:56:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BDA217CBE2
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 14:46:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF734444B57
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 14:48:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 534061E25F7;
-	Mon,  7 Apr 2025 14:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A4231DE3D5;
+	Mon,  7 Apr 2025 14:47:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jdxIJOEa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cwwYeR7t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com [209.85.222.44])
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B2B1E2616
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 14:44:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76DBF1D63E3;
+	Mon,  7 Apr 2025 14:47:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744037050; cv=none; b=aiiZlYj+cgDVi7ws1jKfJ0T4EDmaFXwWTF0HrhEOlI3hSDeg5N1WXrBWXcgse9sufh4EF5K++8EvRh9TCsYje9Ewf02MNhdFWlX1Epaqx9M0SV54f/4UWVuIFdFPkNElfYBs8citUb9IvmC/2KfItXO0ai2dcvJxH3J9mwElz5s=
+	t=1744037275; cv=none; b=BN9kTlfMwPkeEnghiq6FRXq9LqDoQF8LjoFTBfIS2hOjDXjjY5m1cbSqAkwTr2WgO3Z2ROht27kPsk00vQNnQvYEZ/IU7AgEIy2LD1V91JssS7WYKL2vL+PJmkRgJGBBCBQqsuQ6R4lUeahabjj+Y2dcLLEgS/Ny+3ycnYwFu3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744037050; c=relaxed/simple;
-	bh=iAFgVmh1qXM0w1IR6tvKw2avKjMqWvNH45/oak3cYuk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L1IaGb6KGYuitP+SM9JaDqF1PgNC3EjRGsD/T/WFdg67BUTtboGm4ZSxWCt4XjLMku6uxBdavjmfKh3O5hRKLbqT8LzYuJWRrmhkFEnPWQFiNJrPdZPSafkkFpgE2QKjPzDntjNPSRr+W0hHR734ZKuaJ0pGjHcL/S0YYr4lR8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jdxIJOEa; arc=none smtp.client-ip=209.85.222.44
+	s=arc-20240116; t=1744037275; c=relaxed/simple;
+	bh=jMQok4bI/T4dhLvUWRdv1DnEVtFmsxjwBAn6siWlnEA=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=NAJg5LpSL6zNh0bACpL5IJQDGfQM5oB6RIL3i1YlbOkR2qCUXjjEtCXYttoAzn3W2OhxZQh1hcTTftO04iUhzgC1vPpiKaoI1+xGnmFoWRaN1mfWawvP8M/GUt1NsuVujkzwZSorCQMIP2C3ELxRYiArwtP6UXorISHlDeuQNjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cwwYeR7t; arc=none smtp.client-ip=209.85.222.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f44.google.com with SMTP id a1e0cc1a2514c-8641b76c455so241136241.1
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 07:44:08 -0700 (PDT)
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c55500d08cso421732485a.0;
+        Mon, 07 Apr 2025 07:47:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744037047; x=1744641847; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1744037271; x=1744642071; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5Syn5jtXviACUgIGCUheG7PeZdWX6IDJJuYZ5/CxssQ=;
-        b=jdxIJOEa+hj8dWj14HwWILMrAok06a36XmqOTdNy/sGe94nhDQuNKoQBvy1u1RUmXY
-         FKapf0cV2q1eoI4E11NThGZ6ctas6ibUMxFbHZhsWNLdCHxngDXgW6JUiEA0DnfRpC5U
-         P3+jCdvd1Krv+sPg/tXvND/L/oAhWpWnVf53RtCl/G7YidRqiTwEkHKmv8HrxWRf6h0W
-         txQty8lN+lKt76R2qGSiWEe793RxlXxx6BvwmbEJiA/iMoUzUfS3WtxahoLHBhYUuDkV
-         mWG/bbzvMZpaCq4eES5KjxbF5CdjEFeF4PXtI7eZrOfqwcrSbDjn18MIRGEyGnQYstBE
-         1xmw==
+        bh=X767fjj47FPwYyXKcTrgC1NJknM42/VvvzcA6XsLN0U=;
+        b=cwwYeR7t947ki4HuCogZ279igVyFN+VqlUvRvzU7zNoNLIHUhTaYYZZHdbqVA5iDT7
+         gy8Af8bTdh8qRj7+hXlwoegz7oqPpN74QZ9Xn6ZccehB7vDkGLawUhXwu0WOThu7Jjvp
+         Fe4fyIfbIptcFiHO0yGYDLTpMAKiIIkafIInj7H/dQDQH34nxr1vqpA1FDRKjKEGeBuS
+         IXn5jcqzxIaxueI6xg1qy3jTsiyIiidhhZff5zFrnqZ48gq2rDTH/FUeafE5kYCuG8b5
+         BQBz8RZ6/i7JlK6pQoajUcO3u8jLarEbv7kwnEDB/dJw7Vg6QYw/i8XN+CK6SAM1/3uu
+         d5gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744037047; x=1744641847;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5Syn5jtXviACUgIGCUheG7PeZdWX6IDJJuYZ5/CxssQ=;
-        b=FZIX09q3Baky588K9xMkgFj95Ee37N63NDJWFE+2CtReZZ9vUeqF/Ewe0qkkm/rSWL
-         U1qwJqa+8soN7V3BHzUOtmUoSGF4FOUtW1HWH4pSVUVnl4oGKWTLFMy04QZHzGDZqwac
-         NgrRn+IJPLvTSOslugeJovtwifZ9wIP0I7Do69A1yWP/3TeadonwQOLMmeko+MRBy6Sv
-         re6D5nri08Eb+yARghmj8Zc8LA0zgLDriXwChZR3y0NpQwSyqbPAsauuCASAuq58U6pp
-         yVsK6ExXnr4X9SEOvGy+otUdkQCvJW76sQapA518tmVDSygz6CmKo/7oZPLIg3BStgxp
-         RS/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVUOWgJFQgZp/Pjya5RwrW/HsFqiUo6Wg00h01wWcrhuHyJEgflKLY5iONXs9Z22A6Ef1jiSIo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0Inbo2f6KiB89K/rVR+hDOMc3+H2msLwmfQ8lTU1Kd6ot1FWD
-	SOvWx6pbGt8v9ruKareaaPTKgDwmWp5Wm2NF6pt/QAhTqdtbQwAB6JbtTTbaT6YQiue10FpAaHi
-	kJBIK0mkogxtIRLS3Uz0V2TT+bQ==
-X-Gm-Gg: ASbGncsc0pqEX7WEDBfTmMBZSfcCnRQcuIHQ13fI+R7o+0f7E963XijLakV4y9ARrI9
-	y74/wkA7sza0cbbsNH2czoUhN7w/hso9hdTceR60XvPdi6d3eh2Xlpflj4IM1Uqt3Pq9LI4qvaX
-	F4okMuYo2NkCPyShRqQ50z62uqJqU=
-X-Google-Smtp-Source: AGHT+IGNPP3i83/VvPK7WNbXVFQ42DqU/EqMe+KtLDyE+WIfZWrz6Enlu5ttJD2ZTPHhqTRHjXZ98T/zOwlIfbByE04=
-X-Received: by 2002:a05:6122:902:b0:520:5400:ac0f with SMTP id
- 71dfb90a1353d-527645793f4mr2964661e0c.3.1744037047495; Mon, 07 Apr 2025
- 07:44:07 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1744037271; x=1744642071;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=X767fjj47FPwYyXKcTrgC1NJknM42/VvvzcA6XsLN0U=;
+        b=bK+om1HtlXT7a/D0stkwBbYSU9J/4ROdxjn9jiab0xPSJ1wH0Nh/8/PJsNbOkx3eli
+         XBXFV6O5Uq7FK3y/62DbT+2UX/ka1sqTzHGlAQmLIarbk9a9VWU44mXBYgufpyLb4iKC
+         +G+n5FylECm8LD4BaIQN+/EeAyUznQw8VJSVzMKLDPLPPtbOGco78yYgfx6mMQg7fpY+
+         eHoh8TF4MBVwEwAC+91Vvvdx4TwUP1T2zi/aw0aJAzL6lOvu+cH/ORk7RV+3iVSt5Vzq
+         f3O4QP+8OoEPxwOtL2wjM4CYmVo/3NzXsdJ0rljwY6Y/VHC2Evb8rYb40E4cVGdjovgK
+         i1QA==
+X-Forwarded-Encrypted: i=1; AJvYcCXi/e8ymJSsz6HhtpQfw1JwS0AhzxvpsJ/Quu98YAYfhqJqwLhU4E831+gjvaXYOPY2NAyfxWA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3HJHqwI7cajpilWEdwLXdX1TQv3+gQX2dJFC+RaZ2RYynEn5W
+	bwwgGR1xmL7N2Y+kT1Vmc4yPmuklp89ReU450jHHQTEXOgK9EDmd
+X-Gm-Gg: ASbGncsj7c5MFF8mH1MxhVmY2Es9gKJFtGGBZkJrXPDfTiXUtKajPSQrRwQWiOAhs/N
+	IhhsnFdNnapfdaEx8X53aYSALEZEPNcfIstab5rR4x6B5QsHPM0mPd1BqAAbD+u//33MMx8Nscj
+	oRfwLPlkJXtL79uQO5GD6to0r8I3Hz44WBNx0e6Btak/cNBnvzQCrlPj40qSgcUO0GDlP/DgNeH
+	4ZrTq1qmPXrMGGdvQFMwcTtkZFD70oLEz8BOQMjViUFXh/uOUzrexFnpFiYw8v8DhrmJhUT56Jt
+	c5pOLYS5B4oYNL5lUR/G0viOIqOY98NMER5zuYxLS6jd7BMko4r8R8SJT3jt9c56E2Dt+eciis6
+	xgiVBDlIQGKZtCL/LihVhDg==
+X-Google-Smtp-Source: AGHT+IGMGOsQYFoVCy+52vIhT3YVFRKSZf1Q+J0v5pK2L+x6izt+zc3CtZ1x6xUiYrSt4o3ZoxKDhg==
+X-Received: by 2002:a05:620a:4549:b0:7c5:a575:75da with SMTP id af79cd13be357-7c77dd441aemr1320460785a.6.1744037271089;
+        Mon, 07 Apr 2025 07:47:51 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c76e7354bdsm605792985a.20.2025.04.07.07.47.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Apr 2025 07:47:50 -0700 (PDT)
+Date: Mon, 07 Apr 2025 10:47:50 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Daniel Borkmann <daniel@iogearbox.net>, 
+ =?UTF-8?B?TWFjaWVqIMW7ZW5jenlrb3dza2k=?= <maze@google.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: bpf@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ ast@kernel.org, 
+ john.fastabend@gmail.com, 
+ Willem de Bruijn <willemb@google.com>, 
+ Matt Moeller <moeller.matt@gmail.com>
+Message-ID: <67f3e596284c9_38ecd329498@willemb.c.googlers.com.notmuch>
+In-Reply-To: <98b2c012-dcbe-4abf-8b22-2ab37604ccc8@iogearbox.net>
+References: <20250404142633.1955847-1-willemdebruijn.kernel@gmail.com>
+ <20250404142633.1955847-2-willemdebruijn.kernel@gmail.com>
+ <584071a3-10df-443a-ad8c-1fa7bc82d821@iogearbox.net>
+ <CAF=yD-+ccY58AAneA7tLokuUahrj=8cdDtPPopGH0h8mK-hMbQ@mail.gmail.com>
+ <CANP3RGdQNt5Qn9APrUh7V+r2RKoBx9KtzpDfres0wf+UZMeedg@mail.gmail.com>
+ <98b2c012-dcbe-4abf-8b22-2ab37604ccc8@iogearbox.net>
+Subject: Re: [PATCH bpf v2 1/2] bpf: support SKF_NET_OFF and SKF_LL_OFF on skb
+ frags
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250406192351.3850007-1-chenyuan0y@gmail.com> <Z/NjXSRVFp9c/XmQ@mev-dev.igk.intel.com>
-In-Reply-To: <Z/NjXSRVFp9c/XmQ@mev-dev.igk.intel.com>
-From: Chenyuan Yang <chenyuan0y@gmail.com>
-Date: Mon, 7 Apr 2025 09:43:56 -0500
-X-Gm-Features: ATxdqUEzW1g5gHLGkmrrnA1qYZFVRpXWMmkf1_wJ_hd8wRs7s4QRFeddXWYjUFk
-Message-ID: <CALGdzurKz4D3tzbjY-_xES6VUzzg8E2ALmj3mgiFT=4yX=_aCw@mail.gmail.com>
-Subject: Re: [PATCH] net: libwx: handle page_pool_dev_alloc_pages error
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: jiawenwu@trustnetic.com, mengyuanlou@net-swift.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	horms@kernel.org, jdamato@fastly.com, duanqiangwen@net-swift.com, 
-	dlemoal@kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi Michal,
+Daniel Borkmann wrote:
+> On 4/4/25 7:56 PM, Maciej =C5=BBenczykowski wrote:
+> > On Fri, Apr 4, 2025 at 9:34=E2=80=AFAM Willem de Bruijn
+> > <willemdebruijn.kernel@gmail.com> wrote:
+> >> On Fri, Apr 4, 2025 at 12:11=E2=80=AFPM Daniel Borkmann <daniel@ioge=
+arbox.net> wrote:
+> >>>
+> >>> Hi Willem,
+> >>>
+> >>> On 4/4/25 4:23 PM, Willem de Bruijn wrote:
+> >>> [...]
+> >>>> v1->v2
+> >>>>     - introduce bfp_skb_load_helper_convert_offset to avoid open c=
+oding
+> >>>> ---
+> >>>>    include/linux/filter.h |  3 --
+> >>>>    kernel/bpf/core.c      | 21 -----------
+> >>>>    net/core/filter.c      | 80 +++++++++++++++++++++++------------=
+-------
+> >>>>    3 files changed, 44 insertions(+), 60 deletions(-)
+> >>>>
+> >>>> diff --git a/include/linux/filter.h b/include/linux/filter.h
+> >>>> index f5cf4d35d83e..708ac7e0cd36 100644
+> >>>> --- a/include/linux/filter.h
+> >>>> +++ b/include/linux/filter.h
+> >>>> @@ -1496,9 +1496,6 @@ static inline u16 bpf_anc_helper(const struc=
+t sock_filter *ftest)
+> >>>>        }
+> >>>>    }
+> >>>>
+> >>>> -void *bpf_internal_load_pointer_neg_helper(const struct sk_buff *=
+skb,
+> >>>> -                                        int k, unsigned int size)=
+;
+> >>>> -
+> >>>>    static inline int bpf_tell_extensions(void)
+> >>>>    {
+> >>>>        return SKF_AD_MAX;
+> >>>> diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+> >>>> index ba6b6118cf50..0e836b5ac9a0 100644
+> >>>> --- a/kernel/bpf/core.c
+> >>>> +++ b/kernel/bpf/core.c
+> >>>> @@ -68,27 +68,6 @@
+> >>>>    struct bpf_mem_alloc bpf_global_ma;
+> >>>>    bool bpf_global_ma_set;
+> >>>>
+> >>>> -/* No hurry in this branch
+> >>>> - *
+> >>>> - * Exported for the bpf jit load helper.
+> >>>> - */
+> >>>> -void *bpf_internal_load_pointer_neg_helper(const struct sk_buff *=
+skb, int k, unsigned int size)
+> >>>> -{
+> >>>> -     u8 *ptr =3D NULL;
+> >>>> -
+> >>>> -     if (k >=3D SKF_NET_OFF) {
+> >>>> -             ptr =3D skb_network_header(skb) + k - SKF_NET_OFF;
+> >>>> -     } else if (k >=3D SKF_LL_OFF) {
+> >>>> -             if (unlikely(!skb_mac_header_was_set(skb)))
+> >>>> -                     return NULL;
+> >>>> -             ptr =3D skb_mac_header(skb) + k - SKF_LL_OFF;
+> >>>> -     }
+> >>>> -     if (ptr >=3D skb->head && ptr + size <=3D skb_tail_pointer(s=
+kb))
+> >>>> -             return ptr;
+> >>>> -
+> >>>> -     return NULL;
+> >>>> -}
+> >>>
+> >>> Wouldn't this break sparc 32bit JIT which still calls into this?
+> >>>
+> >>> arch/sparc/net/bpf_jit_asm_32.S :
+> >>>
+> >>> #define bpf_negative_common(LEN)                        \
+> >>>           save    %sp, -SAVE_SZ, %sp;                     \
+> >>>           mov     %i0, %o0;                               \
+> >>>           mov     r_OFF, %o1;                             \
+> >>>           SIGN_EXTEND(%o1);                               \
+> >>>           call    bpf_internal_load_pointer_neg_helper;   \
+> >>>            mov    (LEN), %o2;                             \
+> >>>           mov     %o0, r_TMP;                             \
+> >>>           cmp     %o0, 0;                                 \
+> >>>           BE_PTR(bpf_error);                              \
+> >>>            restore;
+> >>
+> >> Argh, good catch. Thanks Daniel.
+> >>
+> >> I'll drop the removal of bpf_internal_load_pointer_neg_helper from t=
+he patch.
+> > =
 
-Thank you for your reply and suggestions.
-Would you like me to send a new patch (for example, [Patch v2]) with
-the "Fix" tag included?
+> > add a 'deprecated only used by sparc32 comment'
+> > =
 
--Chenyuan
+> > hopefully someone that knows sparc32 assembly can fix it
+> =
 
-On Mon, Apr 7, 2025 at 12:32=E2=80=AFAM Michal Swiatkowski
-<michal.swiatkowski@linux.intel.com> wrote:
->
-> On Sun, Apr 06, 2025 at 02:23:51PM -0500, Chenyuan Yang wrote:
-> > page_pool_dev_alloc_pages could return NULL. There was a WARN_ON(!page)
-> > but it would still proceed to use the NULL pointer and then crash.
-> >
-> > This is similar to commit 001ba0902046
-> > ("net: fec: handle page_pool_dev_alloc_pages error").
-> >
-> > Signed-off-by: Chenyuan Yang <chenyuan0y@gmail.com>
-> > ---
-> >  drivers/net/ethernet/wangxun/libwx/wx_lib.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/ethernet/wangxun/libwx/wx_lib.c b/drivers/net/=
-ethernet/wangxun/libwx/wx_lib.c
-> > index 00b0b318df27..d567443b1b20 100644
-> > --- a/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-> > +++ b/drivers/net/ethernet/wangxun/libwx/wx_lib.c
-> > @@ -310,7 +310,8 @@ static bool wx_alloc_mapped_page(struct wx_ring *rx=
-_ring,
-> >               return true;
-> >
-> >       page =3D page_pool_dev_alloc_pages(rx_ring->page_pool);
-> > -     WARN_ON(!page);
-> > +     if (unlikely(!page))
-> > +             return false;
-> >       dma =3D page_pool_get_dma_addr(page);
-> >
-> >       bi->page_dma =3D dma;
->
-> Thanks for fixing, it is fine, however you need to add fixes tag.
-> Probably:
-> Fixes: 3c47e8ae113a ("net: libwx: Support to receive packets in NAPI")
->
-> > --
-> > 2.34.1
+> Alternatively, the bpf_internal_load_pointer_neg_helper() could be move=
+d entirely
+> over into arch/sparc/net/ so that others won't be tempted to reuse.
+
+I'd prefer to keep it as is.
+
+I took a stab, but my Debian has no sparc32 gcc cross compiler anymore,
+and I was unable to cross compile with clang either.=
 
