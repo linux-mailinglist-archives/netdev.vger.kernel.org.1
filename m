@@ -1,104 +1,157 @@
-Return-Path: <netdev+bounces-179682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BE84A7E0F1
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:20:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 344C9A7E160
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:26:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B3607A1F0B
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 14:18:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DBD91882552
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 14:23:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 307BE1D7E3E;
-	Mon,  7 Apr 2025 14:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B93A1DDA3B;
+	Mon,  7 Apr 2025 14:23:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ExVEJrTs"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cEdE/fiW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A3E1D7E5F;
-	Mon,  7 Apr 2025 14:19:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E83217543;
+	Mon,  7 Apr 2025 14:23:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744035598; cv=none; b=qqQVAjdqnliA0mqZz86/jYqSwW4ZV5T/MGW78jEWV3AnHX52QxiTsKdJ8HVDlFFm8vS/3oJO7h7XAoCUqgDP5VXd7Ck3TvufxJIIFn5p9R6KISLqlj+4GfwWrWywgK3I6v19lZzFgMNCOH4VlorLn7HN0wPBfEuELXQMOCF7R2k=
+	t=1744035813; cv=none; b=fd2lZmHijqD0mLe+eBX4v8hQc47BCV69negrjF1xQqCKzCUlfosetc/vwp6t0ENXPASQToxKE0Ie2NmvYIO+w/6AUvV9iIF2+ozPghe+4jwsi+wspcyKyoDaolapW1GuVaBZaaVqjJ0NDKJatdBi4b4TQfJxMmDVUzcGeaJ4fvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744035598; c=relaxed/simple;
-	bh=COo4eTIosiBDvpHNDIDibfVEmpvog3VWcP5SJfo6PGk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MWJPToFgBtCdjQd9DwI0AyuFKpBq7g1PnhMScJDydcN8uSzQs0w/aCdVfppD31GzA8Ut/ARZNAvgAls8o5DEfcDeiYA0diYc2m8n9mJBeefrasfi3NCxyIB1c/H+IHk+VrXtz6boeF2FUgyyfQGBxMQxEDUWwlYv8WZkIhy839Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ExVEJrTs; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7359aca7ef2so6113517b3a.2;
-        Mon, 07 Apr 2025 07:19:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744035596; x=1744640396; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ykkh3Ohmv9ZUd47pCocMHxGpinGV2tHgF6Qucb+8O7Y=;
-        b=ExVEJrTslu2D5AvyvcYzblaDoWpz7wAMqjGYHCcbfIhyLG1zouE/BDkVVHlrT77rMF
-         tLUmKtUmP4Sii5Cu2pAH2EfCDNMxKbhOMqHctP1tFGLAgmu7Hnx6OxYN/MspYVd87DTL
-         lGBo0kUJmELujpABob81bDmqpd4rqf0/twq+GwofdRN+eS7y8lrN/Dsqk5XtEkOQfFof
-         wihiaBoUtTaFwyE/AjyyxPbFyWQ1tmMwlkyHvqFUMhSqAQtzlPeh4erwrGiZ3kuJQjA3
-         q4IQnEBmbItwF12wMkRlYfPT939VvhCJaY7lProj8uRfqS+55Af2BsO0EEUur/wld8my
-         BJJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744035596; x=1744640396;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ykkh3Ohmv9ZUd47pCocMHxGpinGV2tHgF6Qucb+8O7Y=;
-        b=oEcXWetbDVvpzlwB6/yAsumr4fqiq98dZe4h41WkQ/a6iI+PaVQaC4U29k75V7KZC4
-         GEe++gWeISvd2e66dmqS28ZvUPm5pAxGkMXTi2pS2DZUujHA/GIgY5tCbA7/UmoHMXNz
-         J/P+ANfz0UO8z6nzDWwfcflhWjz69L6p8fALRXCGoM3c8m2pkR8MZZQ9GYioO58rpU6L
-         AFTpljL5BsxQ0U/SN5x+lDKS407rT3aJrRWAEtB75sOGXeML920tjHw98JLwWIrk+uvp
-         Id7lu9edP98w2TiOqu4baq/4ZVXUyTUEni26OW0Dd0tFECDC6AQfPuOpYeEJxSYiKULH
-         1zmw==
-X-Forwarded-Encrypted: i=1; AJvYcCUXf6rRIOuth8otkrmwilBJ9ejCAXeZjNXacrOwYvd1ydPJul7E+JDJcvIypunotyuin6jVBVkX/DABvD0=@vger.kernel.org, AJvYcCWjW/BwE9Yc5sUCwadTM/w6Pt5/wfEIVP4Kt+kwQFsawx24u4pq7T+WRof4Kjc9LCjaMCvGljjx@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRsxI8DFsmw8kxYWKhT5rRU4inbcuZWyrcAuKrJ0tYF9a0Jit5
-	oZVScfGl03sisKUhQGYrP8xCIHiskwQX2P3TfrWVUgn7WRIlDWs=
-X-Gm-Gg: ASbGncsP0CAOQ+TvCwl9GXOSB9jqP+xx/ft5gJddvRmsrgn8BcA6mr1RsZ6et/Psvqv
-	83Cu/Lwo5eM0nx8c7a78P24YUgCYdKezdrhTfaK/li5vli4okPak+uLqemV8m0YJpQHR3dJXHAL
-	SKOEEE85pD2DYl6h1Mt5hMkpveYnVE3wZlhmjPDbBEyILv3bUHT7EUvEe86sru/dr7Jonvg5pmW
-	HJgug5R538MHewFaSvHUS4qaiv66NdBs9tivdzrivudXsuWg34BAUAltPy7dskQx0nAN5p6yJgh
-	Y3DfLTk8Smot7ox8lZq/QI5HbCS1GGTVt3jDAQzmRs8c
-X-Google-Smtp-Source: AGHT+IH7qTsg5rAVlTqY22Bx9Y+Mos8itMtbbMRcIw6Seluh6RcUktlYJUma1nx81i4q1ja//ikO/Q==
-X-Received: by 2002:a05:6a00:179b:b0:736:baa0:2acd with SMTP id d2e1a72fcca58-739e7156defmr18489104b3a.20.1744035595875;
-        Mon, 07 Apr 2025 07:19:55 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-739d97ee6b3sm8839062b3a.53.2025.04.07.07.19.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 07:19:54 -0700 (PDT)
-Date: Mon, 7 Apr 2025 07:19:54 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: syzbot <syzbot+45016fe295243a7882d3@syzkaller.appspotmail.com>
-Cc: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	horms@kernel.org, kuba@kernel.org, kuniyu@amazon.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, sdf@fomichev.me, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] WARNING: bad unlock balance in do_setlink
-Message-ID: <Z_PfCosPB7GS4DJl@mini-arch>
-References: <20250407063703.20757-1-kuniyu@amazon.com>
- <67f3890f.050a0220.0a13.0286.GAE@google.com>
+	s=arc-20240116; t=1744035813; c=relaxed/simple;
+	bh=Mho1OhZMPQYWvUWnQkKuL8qqQ0XtidXWn2GdqBHMZvY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Qg09sklQTLvYAKvdf7whNzF8zMDwl/Y7YQQrvy3hVnoABsCrEnPuC7vMz/X2BnUyR9Eblp+eAlQllgnIpfx/ibhRHUHuAZEBXFZzLScAB9UHtircPuDmAkndw/5wslq5UywRzJ7sTs1wgyyuQf96FWXs+nUbIDIG/2XxLOAAxz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cEdE/fiW; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1744035799;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=W4wct51PbY7VBGxtjbRhs1YFFpceh3G8shb37lDzbWo=;
+	b=cEdE/fiWurBuimab6570vjRdY0FrgT2Aa/7nsKqs0pYFRFrKnb63sG8Nb9+acF1GnKRmnl
+	oqZ9lJLAtVXFh7icMb83bpWiufZcEICFC2grkhTNjfnaq9oPAdFBvR+v+ZTkLRgGeNpDGE
+	AoSFYVdpkmkrlbU48LmDiwYyj/32Li4=
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: bpf@vger.kernel.org
+Cc: mrpre@163.com,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH bpf-next v1 0/4] bpf, sockmap: Fix data loss and panic issues
+Date: Mon,  7 Apr 2025 22:21:19 +0800
+Message-ID: <20250407142234.47591-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <67f3890f.050a0220.0a13.0286.GAE@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 04/07, syzbot wrote:
-> Hello,
-> 
-> syzbot has tested the proposed patch but the reproducer is still triggering an issue:
-> unregister_netdevice: waiting for DEV to become free
-> 
-> unregister_netdevice: waiting for batadv0 to become free. Usage count = 3
+I was writing a benchmark based on sockmap + TCP and discovered several
+issues:
 
-So it does fix the lock unbalance issue, but now there is a hang?
+1. When EAGAIN occurs, the direction of skb is incorrect, causing data
+   loss when retry.
+2. When sending partial data, the offset is not recorded, leading to
+   duplicate data being sent when retry.
+3. An unexpected BUG_ON() judgment in skb_linearize is triggered.
+4. The memory of psock->ingress_skb is not limited by the socket buffer
+   and memcg.
+
+Issues 1, 2, and 3 are described in each patch's commit message.
+
+Regarding issue 4, this patchset does not cover it as it is difficult to
+handle in practice, and I am still working on it.
+
+Here is a brief description of the issue:
+When using sockmap to skb/stream redirect, if the receiving end does not
+perform read operations, all data will be buffered in ingress_skb.
+
+For example:
+'''
+// set memory limit to 50G
+cgcreate -g memory:myGroup
+cgset -r memory.max="5000M" myGroup
+
+// start benchmark and disable consumer from reading
+cgexec -g "memory:myGroup" ./bench sockmap -c 2 -p 1 -a --rx-verdict-ingress --delay-consumer=-1 -d 100
+Iter   0 ( 29.179us): Send Speed 2668.548 MB/s (20360.406 calls/s), ... Rcv Speed    0.000 MB/s (   0.000 calls/s)
+Iter   1 ( -7.237us): Send Speed 2694.467 MB/s (20557.149 calls/s), ... Rcv Speed    0.000 MB/s (   0.000 calls/s)
+Iter   2 ( -1.918us): Send Speed 2693.404 MB/s (20548.039 calls/s), ... Rcv Speed    0.000 MB/s (   0.000 calls/s)
+Iter   3 ( -0.684us): Send Speed 2693.138 MB/s (20548.014 calls/s), ... Rcv Speed    0.000 MB/s (   0.000 calls/s)
+Iter   4 (  7.879us): Send Speed 2698.620 MB/s (20588.838 calls/s), ... Rcv Speed    0.000 MB/s (   0.000 calls/s)
+Iter   5 ( -3.224us): Send Speed 2696.553 MB/s (20573.066 calls/s), ... Rcv Speed    0.000 MB/s (   0.000 calls/s)
+Iter   6 ( -5.409us): Send Speed 2699.705 MB/s (20597.111 calls/s), ... Rcv Speed    0.000 MB/s (   0.000 calls/s)
+Iter   7 ( -0.439us): Send Speed 2699.691 MB/s (20597.009 calls/s), ... Rcv Speed    0.000 MB/s (   0.000 calls/s)
+...
+
+// memory usage are not limited
+cat /proc/slabinfo | grep skb
+skbuff_small_head   11824024 11824024    704   46    8 : tunables    0    0    0 : slabdata 257044 257044      0
+skbuff_fclone_cache 11822080 11822080    512   32    4 : tunables    0    0    0 : slabdata 369440 369440      0
+'''
+Thus, a simple socket in a large file upload/download model can eat the
+entire OS memory.
+
+We must charge the skb memory to psock->sk, and if we do not want losing
+skb, we need to feedback the error info to read_sock/read_skb when the
+enqueue operation of psock->ingress_skb fails.
+
+---
+My another patch related to stability also requires maintainers to spare
+some time from their busy schedules for review.
+https://lore.kernel.org/bpf/20250317092257.68760-1-jiayuan.chen@linux.dev/T/#t
+
+
+Jiayuan Chen (4):
+  bpf, sockmap: Fix data lost during EAGAIN retries
+  bpf, sockmap: fix duplicated data transmission
+  bpf, sockmap: Fix panic when calling skb_linearize
+  selftest/bpf/benchs: Add benchmark for sockmap usage
+
+ net/core/skmsg.c                              |  48 +-
+ tools/testing/selftests/bpf/Makefile          |   2 +
+ tools/testing/selftests/bpf/bench.c           |   4 +
+ .../selftests/bpf/benchs/bench_sockmap.c      | 599 ++++++++++++++++++
+ .../selftests/bpf/progs/bench_sockmap_prog.c  |  65 ++
+ 5 files changed, 697 insertions(+), 21 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/benchs/bench_sockmap.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bench_sockmap_prog.c
+
+-- 
+2.47.1
+
 
