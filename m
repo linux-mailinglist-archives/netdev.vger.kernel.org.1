@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-179989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6117EA7F0CD
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 01:18:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BA61A7F0CB
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 01:18:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A378189874C
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 23:18:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D05F7A691B
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 23:17:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BDEA22A4E8;
-	Mon,  7 Apr 2025 23:18:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87E2922ACD3;
+	Mon,  7 Apr 2025 23:18:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="C700KB+D"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="a5d+LaDx"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 904AD22154E;
-	Mon,  7 Apr 2025 23:18:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F30922A1E2
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 23:18:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744067885; cv=none; b=Rb6dJVLxxR+Hq3v6cnh5o9OfKxGilEKX3yD70TXHkrGPdDZmP4yXKr7YiGIgR8eTQ+vkEzTt7xMkql9rGo9+0+FwCOvkzP648QvDEc2nAA9axZcXtxosdKzgWJsezICwrhAFKwwISVpetVzqnKxmMBRQ82aHvKHIZXJKRTTki+I=
+	t=1744067886; cv=none; b=JJ1gvS1A//F85lU/hdWKeD5sz8EI2P5v8dyJ8JWFXMbcj85timFEl0pqoL3dkLH8J/FStppjBitm0Ulkvh70zUdMWIIiYeGHdZ3TtjfjNBIMPPCxibsq3xfB7CMVYrEAj55mcobERh325v2ykjKDqZrljj4FzJq2/0HDwbnIMW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744067885; c=relaxed/simple;
-	bh=hB3Aq7LeLssM64usuWonBqKrLeNBi9Wyr0PP/2aucgM=;
+	s=arc-20240116; t=1744067886; c=relaxed/simple;
+	bh=prlVXMIm/IyzRJG01fRQFtYuEC0d9hNE4jg//LTIq2Q=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=e0RfxCTEOsS9swpzWN7cESqBHlJUjxC9WrnL8AoeWDPAlKNHcRZc+i2mvkxTEccIPVJwIecH6KPaWk0ENTgFRDOUJoJLuLCua4DIy4mCKkj/UKgcmP0MZ9Y5a0poj9oelxUrybaamggU0Xvc8mDtQEOm5730es9evtpHH2K30ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=C700KB+D; arc=none smtp.client-ip=91.218.175.189
+	 MIME-Version; b=nEV8GUhU8aXmUIfsCv5VZgpAos8KV9laxRoHNiuAzcmeidb/EoDgic1dSap9T7OLwvOFzoQNvR4TX1auTli3k82DqkwynyZZ2toqmoNpVcv05tk0ueF2bePdTGg66u7lcpDLWI/OpXRNY19Rmfo/dbkHf23x0Tj/ahujXSRVZEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=a5d+LaDx; arc=none smtp.client-ip=91.218.175.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744067879;
+	t=1744067881;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=eiNFzVR83v0lClJNYmmJdbFn8PIrdjshPBdaoJeIJxs=;
-	b=C700KB+D9PwvQgDbqs20eNMHhajHtMcKtcyh28mfEKGAS9J19rLN5zoUjMWHDi9N9Bpi4m
-	JSjM0+GJcPXwiHdncFtkIcLgnVevSM/K/Q8V4yx6r7WF459IXI99nQJUV1KHKXBnJ/2oVU
-	YLlsQFPgmgCpjFyqZWuAebbNK+bzumU=
+	bh=RBAVY7AqAx/BkqtLYLu/lWNBEK2/ZgF8XsCuXLDoulw=;
+	b=a5d+LaDxluS6fy8BnFbwv+mSyf5epFJ3mhQYNgW0uCtUGMJ86zj60H4JdcbgZ4J/AtSfDe
+	aq+/SIfotJHBP9yzpw2axtmOtqMIjg+XJoleXT+PYbjBBHyBM13PVIO5tToeGyosfGwJAa
+	/vvs7N6PE0ChIhRGuSei5kNbtvfwmEg=
 From: Sean Anderson <sean.anderson@linux.dev>
 To: netdev@vger.kernel.org,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -55,17 +55,10 @@ Cc: linux-kernel@vger.kernel.org,
 	Christian Marangi <ansuelsmth@gmail.com>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
 	Kory Maincent <kory.maincent@bootlin.com>,
-	Sean Anderson <sean.anderson@linux.dev>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Michal Simek <michal.simek@amd.com>,
-	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	Rob Herring <robh@kernel.org>,
-	Robert Hancock <robert.hancock@calian.com>,
-	devicetree@vger.kernel.org
-Subject: [net-next PATCH v2 01/14] dt-bindings: net: Add Xilinx PCS
-Date: Mon,  7 Apr 2025 19:17:32 -0400
-Message-Id: <20250407231746.2316518-2-sean.anderson@linux.dev>
+	Sean Anderson <sean.anderson@linux.dev>
+Subject: [net-next PATCH v2 02/14] device property: Add optional nargs_prop for get_reference_args
+Date: Mon,  7 Apr 2025 19:17:33 -0400
+Message-Id: <20250407231746.2316518-3-sean.anderson@linux.dev>
 In-Reply-To: <20250407231746.2316518-1-sean.anderson@linux.dev>
 References: <20250407231746.2316518-1-sean.anderson@linux.dev>
 Precedence: bulk
@@ -77,155 +70,124 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Add a binding for the Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII LogiCORE
-IP. This device is a soft device typically used to adapt between GMII
-and SGMII or 1000BASE-X (possbilty in combination with a serdes).
-pcs-modes reflects the modes available with the as configured when the
-device is synthesized. Multiple modes may be specified if dynamic
-reconfiguration is supported.
-
-One PCS may contain "shared logic in core" which can be connected to
-other PCSs with "shared logic in example design." This primarily refers
-to clocking resources, allowing a reference clock to be shared by a bank
-of PCSs. To support this, if #clock-cells is defined then the PCS will
-register itself as a clock provider for other PCSs.
+get_reference_args does not permit falling back to nargs when nargs_prop
+is missing. This makes it difficult to support older devicetrees where
+nargs_prop may not be present. Add support for this by converting nargs
+to a signed value. Where before nargs was ignored if nargs_prop was
+passed, now nargs is only ignored if it is strictly negative. When it is
+positive, nargs represents the fallback cells to use if nargs_prop is
+absent.
 
 Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
 ---
+This commit has been submitted separately as [1] and is included here
+solely so CI will run.
+
+[1] https://lore.kernel.org/all/20250407223714.2287202-2-sean.anderson@linux.dev
 
 Changes in v2:
-- Change base compatible to just xlnx,pcs
-- Drop #clock-cells description
-- Move #clock-cells after compatible
-- Remove second example
-- Rename pcs-modes to xlnx,pcs-modes
-- Reword commit message
+- New
 
- .../devicetree/bindings/net/xilinx,pcs.yaml   | 115 ++++++++++++++++++
- 1 file changed, 115 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/xilinx,pcs.yaml
+ drivers/base/property.c |  4 ++--
+ drivers/base/swnode.c   | 13 +++++++++----
+ drivers/of/property.c   | 10 +++-------
+ include/linux/fwnode.h  |  2 +-
+ 4 files changed, 15 insertions(+), 14 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/xilinx,pcs.yaml b/Documentation/devicetree/bindings/net/xilinx,pcs.yaml
-new file mode 100644
-index 000000000000..f9ec032127cf
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/xilinx,pcs.yaml
-@@ -0,0 +1,115 @@
-+# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/xilinx,pcs.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
+diff --git a/drivers/base/property.c b/drivers/base/property.c
+index c1392743df9c..049f8a6088a1 100644
+--- a/drivers/base/property.c
++++ b/drivers/base/property.c
+@@ -606,7 +606,7 @@ int fwnode_property_get_reference_args(const struct fwnode_handle *fwnode,
+ 		return -ENOENT;
+ 
+ 	ret = fwnode_call_int_op(fwnode, get_reference_args, prop, nargs_prop,
+-				 nargs, index, args);
++				 nargs_prop ? -1 : nargs, index, args);
+ 	if (ret == 0)
+ 		return ret;
+ 
+@@ -614,7 +614,7 @@ int fwnode_property_get_reference_args(const struct fwnode_handle *fwnode,
+ 		return ret;
+ 
+ 	return fwnode_call_int_op(fwnode->secondary, get_reference_args, prop, nargs_prop,
+-				  nargs, index, args);
++				  nargs_prop ? -1 : nargs, index, args);
+ }
+ EXPORT_SYMBOL_GPL(fwnode_property_get_reference_args);
+ 
+diff --git a/drivers/base/swnode.c b/drivers/base/swnode.c
+index b1726a3515f6..11af2001478f 100644
+--- a/drivers/base/swnode.c
++++ b/drivers/base/swnode.c
+@@ -503,7 +503,7 @@ software_node_get_named_child_node(const struct fwnode_handle *fwnode,
+ static int
+ software_node_get_reference_args(const struct fwnode_handle *fwnode,
+ 				 const char *propname, const char *nargs_prop,
+-				 unsigned int nargs, unsigned int index,
++				 int nargs, unsigned int index,
+ 				 struct fwnode_reference_args *args)
+ {
+ 	struct swnode *swnode = to_swnode(fwnode);
+@@ -543,10 +543,15 @@ software_node_get_reference_args(const struct fwnode_handle *fwnode,
+ 		error = property_entry_read_int_array(ref->node->properties,
+ 						      nargs_prop, sizeof(u32),
+ 						      &nargs_prop_val, 1);
+-		if (error)
 +
-+title: Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII LogiCORE IP
-+
-+maintainers:
-+  - Sean Anderson <sean.anderson@seco.com>
-+
-+description:
-+  This is a soft device which implements the PCS and (depending on
-+  configuration) PMA layers of an IEEE Ethernet PHY. On the MAC side, it
-+  implements GMII. It may have an attached SERDES (internal or external), or
-+  may directly use LVDS IO resources. Depending on the configuration, it may
-+  implement 1000BASE-X, SGMII, 2500BASE-X, or 2.5G SGMII.
-+
-+  This device has a notion of "shared logic" such as reset and clocking
-+  resources which must be shared between multiple PCSs using the same I/O
-+  banks. Each PCS can be configured to have the shared logic in the "core"
-+  (instantiated internally and made available to other PCSs) or in the "example
-+  design" (provided by another PCS). PCSs with shared logic in the core are
-+  reset controllers, and generally provide several resets for other PCSs in the
-+  same bank.
-+
-+properties:
-+  compatible:
-+    items:
-+      - const: xlnx,pcs-16.2
-+      - const: xlnx,pcs
-+
-+  reg:
-+    maxItems: 1
-+
-+  "#clock-cells":
-+    const: 0
-+
-+  clocks:
-+    items:
-+      - description:
-+          The reference clock for the PCS. Depending on your setup, this may be
-+          the gtrefclk, refclk, clk125m signal, or clocks from another PCS.
-+
-+  clock-names:
-+    const: refclk
-+
-+  done-gpios:
-+    maxItems: 1
-+    description:
-+      GPIO connected to the reset-done output, if present.
-+
-+  interrupts:
-+    items:
-+      - description:
-+          The an_interrupt autonegotiation-complete interrupt.
-+
-+  interrupt-names:
-+    const: an
-+
-+  xlnx,pcs-modes:
-+    description:
-+      The interfaces that the PCS supports. Multiple interfaces may be
-+      specified if dynamic reconfiguration is enabled.
-+    oneOf:
-+      - const: sgmii
-+      - const: 1000base-x
-+      - const: 2500base-x
-+      - items:
-+          - const: sgmii
-+          - const: 1000base-x
-+
-+  reset-gpios:
-+    maxItems: 1
-+    description:
-+      GPIO connected to the reset input.
-+
-+required:
-+  - compatible
-+  - reg
-+  - xlnx,pcs-modes
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/gpio/gpio.h>
-+    #include <dt-bindings/interrupt-controller/arm-gic.h>
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+
-+    mdio {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        pcs0: ethernet-pcs@0 {
-+            compatible = "xlnx,pcs-16.2", "xlnx,pcs";
-+            reg = <0>;
-+            #clock-cells = <0>;
-+            clocks = <&si570>;
-+            clock-names = "refclk";
-+            interrupts-extended = <&gic GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>;
-+            interrupt-names = "an";
-+            reset-gpios = <&gpio 5 GPIO_ACTIVE_HIGH>;
-+            done-gpios = <&gpio 6 GPIO_ACTIVE_HIGH>;
-+            xlnx,pcs-modes = "sgmii", "1000base-x";
-+        };
-+
-+        pcs1: ethernet-pcs@1 {
-+            compatible = "xlnx,pcs-16.2", "xlnx,pcs";
-+            reg = <1>;
-+            xlnx,pcs-modes = "sgmii";
-+            clocks = <&pcs0>;
-+            clock-names = "refclk";
-+        };
-+    };
++		if (error == -EINVAL) {
++			if (nargs < 0)
++				return error;
++		} else if (error) {
+ 			return error;
+-
+-		nargs = nargs_prop_val;
++		} else {
++			nargs = nargs_prop_val;
++		}
+ 	}
+ 
+ 	if (nargs > NR_FWNODE_REFERENCE_ARGS)
+diff --git a/drivers/of/property.c b/drivers/of/property.c
+index c1feb631e383..c41190e47111 100644
+--- a/drivers/of/property.c
++++ b/drivers/of/property.c
+@@ -1116,19 +1116,15 @@ of_fwnode_get_named_child_node(const struct fwnode_handle *fwnode,
+ static int
+ of_fwnode_get_reference_args(const struct fwnode_handle *fwnode,
+ 			     const char *prop, const char *nargs_prop,
+-			     unsigned int nargs, unsigned int index,
++			     int nargs, unsigned int index,
+ 			     struct fwnode_reference_args *args)
+ {
+ 	struct of_phandle_args of_args;
+ 	unsigned int i;
+ 	int ret;
+ 
+-	if (nargs_prop)
+-		ret = of_parse_phandle_with_args(to_of_node(fwnode), prop,
+-						 nargs_prop, index, &of_args);
+-	else
+-		ret = of_parse_phandle_with_fixed_args(to_of_node(fwnode), prop,
+-						       nargs, index, &of_args);
++	ret = __of_parse_phandle_with_args(to_of_node(fwnode), prop, nargs_prop,
++					   nargs, index, &of_args);
+ 	if (ret < 0)
+ 		return ret;
+ 	if (!args) {
+diff --git a/include/linux/fwnode.h b/include/linux/fwnode.h
+index 0731994b9d7c..2f71830a1418 100644
+--- a/include/linux/fwnode.h
++++ b/include/linux/fwnode.h
+@@ -163,7 +163,7 @@ struct fwnode_operations {
+ 				const char *name);
+ 	int (*get_reference_args)(const struct fwnode_handle *fwnode,
+ 				  const char *prop, const char *nargs_prop,
+-				  unsigned int nargs, unsigned int index,
++				  int nargs, unsigned int index,
+ 				  struct fwnode_reference_args *args);
+ 	struct fwnode_handle *
+ 	(*graph_get_next_endpoint)(const struct fwnode_handle *fwnode,
 -- 
 2.35.1.1320.gc452695387.dirty
 
