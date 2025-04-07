@@ -1,82 +1,53 @@
-Return-Path: <netdev+bounces-179521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB49EA7D4EC
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 09:05:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3EAFA7D5DE
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 09:30:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65B6A3B09E9
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 07:04:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21CE5189478F
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 07:28:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41FA0225408;
-	Mon,  7 Apr 2025 07:04:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="T/EQHLxD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91C012356D3;
+	Mon,  7 Apr 2025 07:21:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from unicom146.biz-email.net (unicom146.biz-email.net [210.51.26.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85EEC218ADC;
-	Mon,  7 Apr 2025 07:04:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2643F22DF8C;
+	Mon,  7 Apr 2025 07:21:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.51.26.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744009454; cv=none; b=U3zcQ3H7O9jj4BCirLR4Wxo46P0CwxsbiDQHyxOpr/i1/aW8uqbw86VVaJkKnhlkejc4zLeuhHAYGyUM2+UniHxY7ukBnLBKmLH5P3o/GyqzXyKkN1IP6gZRsdimQ3iPcnO8FPN2eHUlBySLz/zp9It5kpG/UhFlBM6yqKh/BTU=
+	t=1744010519; cv=none; b=tZ8DY7lVW0kLl11RWyAfMFTReleH7X97pNB93pp6vA0ws1iyGG3c46TBQDb1cExwICWx0Yc4j9u7lWJZXK07/ulcyHQ5D0Ii3CQZON5hTKelBWpGTWhxIw2kPKtb7/57rQa/yfPbnrG9tsST3Hm5+e9zY1cvuim3SiZGyxw/FWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744009454; c=relaxed/simple;
-	bh=63hCsI7D4OsJ+8xqEVbujyRPsdm/RcjkVGWNADKmzJ8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=t+icdGjf74ZiBqtPePIB8TnnKrjvB/xLs4ywzKN6eQCkTKdlH6mChT8n/DS46KAVFQf8ERe1kG41JEDtQsLwuz/CSGbspevD5O64o5z3EdWVLWrXraXunHOYVgODIB9Lc6h29mMNDk3JCR9Cg93LdzdiWENbYHs1z7Bsnp6jBH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=T/EQHLxD; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5372oDsE001707;
-	Mon, 7 Apr 2025 00:04:00 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=i/2qzHRAmu7K3gRU9dmtnPl
-	/DCrifDSer7QneKYGT/Q=; b=T/EQHLxDZTHFE988VGOuEZjJPjXdZTOdEACmG9j
-	Tr1XAmyFyJt/jL4ME4/GQrXKR7rjUaGVu/wWa+Nr1mUZMNbyjB5RY++15Ltnu19H
-	7bovwEuQYC8wy8BSAvNwb19jdi2sa/QuoEfa1wZqq6nmrNT/ZJOOjmtK24GOpIL5
-	P60Ey+jPCJVq9R+4naWYMftaf1/qvRED+W6fIoxfD8ooqFT3SQk5+6g1J3dM6c29
-	3C1rzBkDjKeB473iMTKlSZSPKWj6kYQ6QDX4eijKjYvqrBYnx7Pc2F5Ocbo/L1Hd
-	r+YCCfAeFtBku4fEMe/mhMIR/UdRiHoR3DAjaasaA48rThg==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 45un99shtx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 07 Apr 2025 00:04:00 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 7 Apr 2025 00:03:58 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Mon, 7 Apr 2025 00:03:58 -0700
-Received: from test-OptiPlex-Tower-Plus-7010.marvell.com (unknown [10.29.37.157])
-	by maili.marvell.com (Postfix) with ESMTP id 089155E689E;
-	Mon,  7 Apr 2025 00:03:54 -0700 (PDT)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Hariprasad Kelam <hkelam@marvell.com>,
-        Sunil Goutham
-	<sgoutham@marvell.com>,
-        Geetha sowjanya <gakula@marvell.com>,
-        "Subbaraya
- Sundeep" <sbhatta@marvell.com>,
-        Bharat Bhushan <bbhushan2@marvell.com>,
-        "Andrew Lunn" <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        "Eric Dumazet" <edumazet@google.com>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Naveen Mamindlapalli
-	<naveenm@marvell.com>
-Subject: [net PATCH] octeontx2-pf: qos: fix VF root node parent queue index
-Date: Mon, 7 Apr 2025 12:33:41 +0530
-Message-ID: <20250407070341.2765426-1-hkelam@marvell.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1744010519; c=relaxed/simple;
+	bh=gwlbrJ4E+kM2LfDpPto20YwjkS8MNLC7fHkGVJptOIQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Dur0eitt8nXMqTjgO8lFz/DqVNjhhkhkws37IvXv2Rl75r5ikSDk5AvHH1mRi4mSmTUULU2Rc+28hgb5jip5AX6FBhJsCBqDXxlpBzUxd8lqGS9H7Nde/so0FmzO8RGx875wQSxi4f8tXhuWeSIoI7BJqBJctrZHiDZ1Er93ISk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com; spf=pass smtp.mailfrom=inspur.com; arc=none smtp.client-ip=210.51.26.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inspur.com
+Received: from jtjnmail201606.home.langchao.com
+        by unicom146.biz-email.net ((D)) with ASMTP (SSL) id 202504071520345929;
+        Mon, 07 Apr 2025 15:20:34 +0800
+Received: from locahost.localdomain.com (10.94.5.217) by
+ jtjnmail201606.home.langchao.com (10.100.2.6) with Microsoft SMTP Server id
+ 15.1.2507.39; Mon, 7 Apr 2025 15:20:34 +0800
+From: Charles Han <hanchunchao@inspur.com>
+To: <saeedm@nvidia.com>, <tariqt@nvidia.com>, <leon@kernel.org>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <lariel@nvidia.com>,
+	<paulb@nvidia.com>, <maord@nvidia.com>
+CC: <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Charles Han <hanchunchao@inspur.com>
+Subject: [PATCH V2] net/mlx5e: fix potential null dereference in mlx5e_tc_nic_create_miss_table
+Date: Mon, 7 Apr 2025 15:20:31 +0800
+Message-ID: <20250407072032.5232-1-hanchunchao@inspur.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <0e08292e-9280-4ef6-baf7-e9f642d33177@gmail.com>
+References: <0e08292e-9280-4ef6-baf7-e9f642d33177@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,55 +56,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Authority-Analysis: v=2.4 cv=I/JlRMgg c=1 sm=1 tr=0 ts=67f378e0 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=XR8D0OoHHMoA:10 a=M5GUcnROAAAA:8 a=RI5rwOQ5OLZ3BBTcUwgA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-GUID: 5dnN9VO_owPMUbQB8nmQR9P-obmrIhhF
-X-Proofpoint-ORIG-GUID: 5dnN9VO_owPMUbQB8nmQR9P-obmrIhhF
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-07_02,2025-04-03_03,2024-11-22_01
+tUid: 2025407152034ba30f3d455ddc3e2cb5a8f6e9b48885a
+X-Abuse-Reports-To: service@corp-email.com
+Abuse-Reports-To: service@corp-email.com
+X-Complaints-To: service@corp-email.com
+X-Report-Abuse-To: service@corp-email.com
 
-The current code configures the Physical Function (PF) root node at TL1
-and the Virtual Function (VF) root node at TL2.
+mlx5_get_flow_namespace() may return a NULL pointer, dereferencing it
+without NULL check may lead to NULL dereference.
+Add a NULL check for ns.
 
-This ensure at any given point of time PF traffic gets more priority.
-
-                    PF root node
-                      TL1
-                     /  \
-                    TL2  TL2 VF root node
-                    /     \
-                   TL3    TL3
-                   /       \
-                  TL4      TL4
-                  /         \
-                 SMQ        SMQ
-
-Due to a bug in the current code, the TL2 parent queue index on the
-VF interface is not being configured, leading to 'SMQ Flush' errors
-
-Fixes: 5e6808b4c68d ("octeontx2-pf: Add support for HTB offload")
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+Fixes: 66cb64e292d2 ("net/mlx5e: TC NIC mode, fix tc chains miss table")
+Signed-off-by: Charles Han <hanchunchao@inspur.com>
 ---
- drivers/net/ethernet/marvell/octeontx2/nic/qos.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/net/ethernet/mellanox/mlx5/core/en_tc.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
-index 0f844c14485a..35acc07bd964 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
-@@ -165,6 +165,11 @@ static void __otx2_qos_txschq_cfg(struct otx2_nic *pfvf,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+index 9ba99609999f..c2f23ac95c3d 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+@@ -5216,6 +5216,10 @@ static int mlx5e_tc_nic_create_miss_table(struct mlx5e_priv *priv)
+ 	ft_attr.level = MLX5E_TC_MISS_LEVEL;
+ 	ft_attr.prio = 0;
+ 	ns = mlx5_get_flow_namespace(priv->mdev, MLX5_FLOW_NAMESPACE_KERNEL);
++	if (!ns) {
++		netdev_err(priv->mdev, "Failed to get flow namespace\n");
++		return -EOPNOTSUPP;
++	}
  
- 		otx2_config_sched_shaping(pfvf, node, cfg, &num_regs);
- 	} else if (level == NIX_TXSCH_LVL_TL2) {
-+		/* configure parent txschq */
-+		cfg->reg[num_regs] = NIX_AF_TL2X_PARENT(node->schq);
-+		cfg->regval[num_regs] = (u64)hw->tx_link << 16;
-+		num_regs++;
-+
- 		/* configure link cfg */
- 		if (level == pfvf->qos.link_cfg_lvl) {
- 			cfg->reg[num_regs] = NIX_AF_TL3_TL2X_LINKX_CFG(node->schq, hw->tx_link);
+ 	*ft = mlx5_create_auto_grouped_flow_table(ns, &ft_attr);
+ 	if (IS_ERR(*ft)) {
 -- 
-2.34.1
+2.43.0
 
 
