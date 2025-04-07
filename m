@@ -1,165 +1,157 @@
-Return-Path: <netdev+bounces-179829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6AFCA7E984
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 20:13:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B58FBA7E993
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 20:14:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAED31782EF
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:10:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 416271890856
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:12:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0314A221731;
-	Mon,  7 Apr 2025 18:09:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FEC9229B0E;
+	Mon,  7 Apr 2025 18:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Cbj8Ztff"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E6Sepuxp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA5922171B
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 18:09:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B6722652D;
+	Mon,  7 Apr 2025 18:10:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744049357; cv=none; b=M8NxKHt7c8Xy2Y8mCQh6jSrfIVkH/iusrlVo3qKPxDt8PBcf2z+iNdI648XDUjRJRJBsSnLcfYnSFIEK9q+XhiYoLREgmrVlzlwRvnxn92uMCf2ylxvJR5/eU9bAvF2hUdRUoHn2AuWVAbYCjnlAbnYaPSEm4roCXQ6zYSmz1TY=
+	t=1744049414; cv=none; b=ZqLTt3mzsnR2BtdhQjjH4WJW4mZN+5REPvM02epqp4HAAr5d+ioRPIvLulQNS5+QrhzyZ/KEzyeLeBQPISxfGNoepsHj0Mdj6a61DSoKvXrSUpIhatUZsCFsJEBp4uXm2k3Svnq/0KCtop8jxsd3uM4Uo1ie4Zgd6ZsOKaxZusQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744049357; c=relaxed/simple;
-	bh=IBZucvcqT4kByOB/2qkqY3AG1+DBDmog6A5GixPbISQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KKtjxCef5BnEvVXaM9v6sHLwMdFSK/m765HschYHsz6FxXixaEeeoltvfmKdB7yRgiE0FH4fRccU8K5KsPLkq0qIGRd4Py2gWISyuc8DgyW+p5oUfFkwSS9cBKeu9/wKUhR8FCCzDmEjTdbFGDCZe54VEU0eE3z8D0dVYsuHCPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Cbj8Ztff; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-227cf12df27so35234745ad.0
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 11:09:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1744049354; x=1744654154; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=goTb4dVxB6asAZ8vEe4CdQ+UwUmo6qha4hQXKVTgnGs=;
-        b=Cbj8ZtffRvqbsEfa+ASeW2SwD2/XJxb+tCMIiUHlQqi90fgQ+PT97Hsdh6pYA9cBvv
-         00oWWfky1Qr2l8pcMIsnHLgJI9oKD3M3KhjgTVVU5d5CCu/rCCfzwCPnuC6jYZITwwiH
-         gC5SeDlz4EPL3J+/XX5UDSFAqxAyT+HfVIYro=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744049354; x=1744654154;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=goTb4dVxB6asAZ8vEe4CdQ+UwUmo6qha4hQXKVTgnGs=;
-        b=ZnZeGlNa/+86KwJOj5btTLpbO3096bI+FtSU2H8QeHQWSJCGJs9xVU5Z1DQIb70us4
-         2fWK2FaQMTAsqlL8ghefxbEi1XqpIbb1PoSojTT6XLMNBoI/s+bwUeUqhZ6ecTDUMLZx
-         aYLnzBsl6c8Q6DaMUZwhQZyoSZdnItiHYfef2YpGtq3fpE47r0W9rYshCq/CGUHl7Pwz
-         qydsVk30nibX8aUiHQGMNj+eftGzM4B0BR7sFNNv4VSv1pZqouAEwWwYoFFDYap1NK+E
-         UTa8rXopQZ5F68B4rYoYm1u3EvI9BsJRzq11p1G+dGb7jKNLcRuIcnry5Zdlo8nK8vZr
-         5TwA==
-X-Forwarded-Encrypted: i=1; AJvYcCWpRrMIEVqJF5Fv5NyJtiGysqIyEzlW0IiS6VjbtaW8RflMqOatzINLg5ar8zOCpAZ73dZj8as=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSnLP+mOcjnRqg6eI4EhXPNejZL2/2R8gV8rXHMFq0MaWiI1x1
-	h4GEK9tafbOk9/DoKqmfaHToZsnQqUOrAQ1Td0825jIVe63sge+QU/6SsU9HUIY=
-X-Gm-Gg: ASbGncuGOc+EhAZ/3r75/9EfQ9+Tu3yP0hYAFjVOB++Nppt9dDJQBmwTBvVxf+swc+7
-	vjOKbHnXK0UdN/BixKAp84u1UYxhi1bwyndaaYw2jVVzr/Q+jqJHKpdvGcvO8pb8hhi21ggTp8C
-	19v1+8zZ98rAzpJkrs1i9pto55gXUYpW6PRRIDf6H9qhUVPP49DUHhhUa+EoQJmlsabsGHBu779
-	AwEuDDm02EDdBaxTiVzpJJcYIKk0mMcRnFmj5+XKXKUJe7ddmEqqoy18fPu+YDGNaHGTLmrLy52
-	iS1cdVictWxM2SPwiWjtr26bHdJCAz20hl3CGMWi9KjNg9gZC3JmNzDy9KhLydCr8JabVWAeQj2
-	SrOStJVOdHkc=
-X-Google-Smtp-Source: AGHT+IFLFsq6DRleDxDBCSlGG/JwhggVdYbV8Uae51gZrs6k16xW2fXW9cgZsr1hVDVTIFkLlBCTbw==
-X-Received: by 2002:a17:903:1a08:b0:215:9eac:1857 with SMTP id d9443c01a7336-22ab5df17cbmr6648305ad.5.1744049354385;
-        Mon, 07 Apr 2025 11:09:14 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2297866cf04sm83985115ad.161.2025.04.07.11.09.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 11:09:13 -0700 (PDT)
-Date: Mon, 7 Apr 2025 11:09:11 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Shay Agroskin <shayagr@amazon.com>,
-	Arthur Kiyanovski <akiyano@amazon.com>,
-	David Arinzon <darinzon@amazon.com>,
-	Saeed Bishara <saeedb@amazon.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v1 net-next] net: ena: Support persistent per-NAPI config.
-Message-ID: <Z_QUx7c-7LxPEuor@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Shay Agroskin <shayagr@amazon.com>,
-	Arthur Kiyanovski <akiyano@amazon.com>,
-	David Arinzon <darinzon@amazon.com>,
-	Saeed Bishara <saeedb@amazon.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-References: <20250407164802.25184-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1744049414; c=relaxed/simple;
+	bh=iXtslnS0wzQz4pKR0UogzZj88g+7+/4qQOlDzhBkFiA=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=KrpOA+dbKcLaWNVjuCOOv56g43IOv0ScQ15L8vLckEofXFR+MC1bgiNxOrXy87L80oXDkzjUrbybSu/8lgK3f4e8pxy3/e795AaEu5eQICTfrwMNKr/Cj9t2xY1SZLt3cuxhu8LHwdD+Ku1W//S4NCc7u964nqyKnYIC2ksZm0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E6Sepuxp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11878C4CEE7;
+	Mon,  7 Apr 2025 18:10:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744049413;
+	bh=iXtslnS0wzQz4pKR0UogzZj88g+7+/4qQOlDzhBkFiA=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=E6SepuxpH5lUPV9LvkMXHbZMmpBEW0c+BI0taXokZpxs54V4oWQyc0+w3yV3AsQI+
+	 A3tnH96D7188ljxaVlShR3VFjuR0fDzyx+adS2KK5vOoh5jiZ1VpUG3guchkq1Hg9x
+	 C7M6hmk40ep244aJ1ErozbxR6XWgxmA11oKq/fI+stZUoEn+WMsnUvpeo1f7PLkE2j
+	 m7HFIPU4gve/HaRAlc62gVTm+e7eu9kkZ9FEWgDXp1m+Cxu9epMiisnraMBxK4DX4Y
+	 aXu9uXKPHaw6CBqCPU81tpjwY8ZcjfEAFdc1pysZ9agVZn7Imw24SQ2h3tY2JCxPTz
+	 uQ1m7qSeX1GLQ==
+Message-ID: <b1d0a55d-75ab-422b-9e38-2dc2bbd1be91@kernel.org>
+Date: Mon, 7 Apr 2025 20:10:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250407164802.25184-1-kuniyu@amazon.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 15/28] dt-bindings: dpll: Add device tree bindings for
+ DPLL device and pin
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
+Cc: Michal Schmidt <mschmidt@redhat.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
+ Andy Shevchenko <andy@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <20250407172836.1009461-1-ivecera@redhat.com>
+ <20250407173149.1010216-6-ivecera@redhat.com>
+ <74172acd-e649-4613-a408-d1f61ceeba8b@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <74172acd-e649-4613-a408-d1f61ceeba8b@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 07, 2025 at 09:47:59AM -0700, Kuniyuki Iwashima wrote:
-> Let's pass the queue index to netif_napi_add_config() to preserve
-> per-NAPI config.
+On 07/04/2025 20:01, Krzysztof Kozlowski wrote:
+>> +
+>> +  input-pins:
+>> +    type: object
+>> +    description: DPLL input pins
+>> +    unevaluatedProperties: false
 > 
-> Test:
+> So this is all for pinctrl? Or something else? Could not figure out from
+> commit msg. This does not help me either.
 > 
-> Set 100 to defer-hard-irqs (default is 0) and check the value after
-> link down & up.
+>> +
+>> +    properties:
+>> +      "#address-cells":
+>> +        const: 1
 > 
->   $ cat /sys/class/net/enp39s0/napi_defer_hard_irqs
->   0
-> 
->   $ ./tools/net/ynl/pyynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
->     --dump napi-get --json='{"ifindex": 2}'
->   [{'defer-hard-irqs': 0,
->     'gro-flush-timeout': 0,
->     'id': 65,
->     'ifindex': 2,
->     'irq': 29,
->     'irq-suspend-timeout': 0}]
-> 
->   $ sudo ./tools/net/ynl/pyynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
->     --do napi-set --json='{"id": 65, "defer-hard-irqs": 100}'
-> 
->   $ sudo ip link set enp39s0 down && sudo ip link set enp39s0 up
-> 
-> Without patch:
-> 
->   $ ./tools/net/ynl/pyynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
->     --dump napi-get --json='{"ifindex": 2}'
->   [{'defer-hard-irqs': 0,  <------------------- Reset to 0
->     'gro-flush-timeout': 0,
->     'id': 66,  <------------------------------- New ID
->     'ifindex': 2,
->     'irq': 29,
->     'irq-suspend-timeout': 0}]
-> 
-> With patch:
-> 
->   $ ./tools/net/ynl/pyynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
->     --dump napi-get --json='{"ifindex": 2}'
->   [{'defer-hard-irqs': 100,  <--------------+-- Preserved
->     'gro-flush-timeout': 0,                 |
->     'id': 65,  <----------------------------'
->     'ifindex': 2,
->     'irq': 29,
->     'irq-suspend-timeout': 0}]
-> 
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
->  drivers/net/ethernet/amazon/ena/ena_netdev.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Why?
 
-Thank you for adding support for this!
+Ah, I see being used.
 
-Reviewed-by: Joe Damato <jdamato@fastly.com>
+> 
+>> +      "#size-cells":
+>> +        const: 0
+> 
+> Why? I don't see these being used.
+
+And this as well.
+
+> 
+>> +
+>> +    patternProperties:
+>> +      "^pin@[0-9]+$":
+>> +        $ref: /schemas/dpll/dpll-pin.yaml
+>> +        unevaluatedProperties: false
+>> +
+
+
+
+Best regards,
+Krzysztof
 
