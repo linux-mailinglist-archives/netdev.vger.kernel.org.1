@@ -1,66 +1,70 @@
-Return-Path: <netdev+bounces-179814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEDE7A7E8FA
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:51:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5739DA7E8C5
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:46:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 418524200D8
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 17:45:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3858B7A1E13
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 17:45:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EDF621ABD4;
-	Mon,  7 Apr 2025 17:44:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB8CC21B1AA;
+	Mon,  7 Apr 2025 17:44:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PXL7q/iV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rU9Zo7xu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9C521A42C;
-	Mon,  7 Apr 2025 17:44:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5A31A3147;
+	Mon,  7 Apr 2025 17:44:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744047867; cv=none; b=KgywS/Afu7ljybF4lmXQujk43aBFAZq4Lh3KzaMySE9wfjJLwyc8LLgNd7B4b6MYpQ4VVNArOvxIKOHXQqVHfApAARW+m7qKuSZ6Fn5ilC3FnGq3EQPomJGRYG8ekyEsnLMevGThvsLcdnIMPdykm/n5MzHRmi/3Y3QDYaRyHRw=
+	t=1744047889; cv=none; b=r1Mg21ZGrlPdLtfNZer318OCZhMhqT8V+K6al4kcy5KL2SxQcjbtFyZfS+srufVhKNpMhSmmJdnrcPa2dMpbeZPq9Pqra+euboDKTqqVfc6f3WPrUh2vv8DSi/n1eB76JvuA0dxrRyactQEIuALvwVF2x+/rVfO64pncK7sTGsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744047867; c=relaxed/simple;
-	bh=7zVyw8dBACn0jbPMoiyXuDYILfE08Q4qXUzBs6PoXIQ=;
+	s=arc-20240116; t=1744047889; c=relaxed/simple;
+	bh=xxHjDP+NyHgWQ2jb/v9uMp+G1hNt7hQcpSlTqvAxzE4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YgzMzj++ooIBpvTRwCLD9ug/2tgZGgV4u8kGncGeBNyOKAoMNiMW29ZZC7Tiam7Zr0qUJ4S58DfvzhwWA8WwQrKFc8JMmaxE1sv6hsegjA5irC916Zr8K99QTN6yq+upDn04Jv/PJMedFJr6hXG+/e/rbY9R6yz3ZFE1/4gpSfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PXL7q/iV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6486BC4CEDD;
-	Mon,  7 Apr 2025 17:44:25 +0000 (UTC)
+	 MIME-Version:Content-Type; b=EDxKt91l9rjak8EbXmKRpLozf+geUtvkDCFQnLYdOEulrmzEIlUd63ZfARLvpNOyCmMb/cm7ytAvhUCGzypIgygSmIbqir8PZdwjDbY+nqRkc0rabWQSbevIwyyoGPuYuibKm8qpT6e4Cwmrh2pRYXt7rwRtlpPEAvzQdjOvbJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rU9Zo7xu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43C23C4CEDD;
+	Mon,  7 Apr 2025 17:44:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744047866;
-	bh=7zVyw8dBACn0jbPMoiyXuDYILfE08Q4qXUzBs6PoXIQ=;
+	s=k20201202; t=1744047889;
+	bh=xxHjDP+NyHgWQ2jb/v9uMp+G1hNt7hQcpSlTqvAxzE4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PXL7q/iVHF16iYIelGRyJ0X+jvpOeIcd1w/P3IAzcI6dT9KoqugVYED3VssP0vSNh
-	 kN9QOBgSD8ikX3v1pZvrNOugHFgoYkkF4Gx+Z30Pnwdupso0SSk/Io14R+pPQx4Mfd
-	 mIOhSaS+VyaJff5IJ20ScGDdXbl0LS6k11pf3CC39ZUBacwstJseoj/WI1joWkfQwH
-	 RQUXfe6lAROhiiXfjO6xPHrXwIp46MqYgN6YnxAX1ZSgXvgOAsGPavZxTcBts4P3aF
-	 nq35fvxQymYR4SS3TCBSrsMd1cHNcZiRvwJETq3zX5IT7bREZbHNcPlVAhvfBf9xQQ
-	 5DPRZ4BapvsuA==
-Date: Mon, 7 Apr 2025 10:44:24 -0700
+	b=rU9Zo7xuCU1GBu8ICWZkzwDdIy9JRjkUCAis5IdHL5kK6hev+J2xF9tbUUYJfMJzb
+	 EezmqeGNreOqRpIz+xYQ6Ah4ZhPosPCbLjcb5F0zDUWVrY2kR+nz8l8pEemNiDZc+8
+	 V9I7LLlItTJfExgcXSmsuI1zV+QRxtU6EZfGYOM3+8OEsL7tzsTwvJXyqQiYG8jMKk
+	 I2vTcXm5in4biyuNSWi01hMrjmxQXGcVboly/Ryl2y2I6l4CCacxKAwN31+FuX+8mi
+	 J8nqdG7l4ohdEmGdQg5fiWLIJcHpXqYfchMmeCmhzxo7RGfZSmPjNDw26rzep1J/UQ
+	 Bs9i3oQ1J8LMA==
+Date: Mon, 7 Apr 2025 10:44:47 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Parvathi Pudi <parvathi@couthit.com>
-Cc: danishanwar@ti.com, rogerq@kernel.org, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, nm@ti.com,
- ssantosh@kernel.org, tony@atomide.com, richardcochran@gmail.com,
- glaroque@baylibre.com, schnelle@linux.ibm.com, m-karicheri2@ti.com,
- rdunlap@infradead.org, diogo.ivo@siemens.com, basharath@couthit.com,
- horms@kernel.org, jacob.e.keller@intel.com, m-malladi@ti.com,
- javier.carrasco.cruz@gmail.com, afd@ti.com, s-anna@ti.com,
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-omap@vger.kernel.org, pratheesh@ti.com, prajith@ti.com,
- vigneshr@ti.com, praneeth@ti.com, srk@ti.com, rogerq@ti.com,
- krishna@couthit.com, pmohan@couthit.com, mohan@couthit.com
-Subject: Re: [PATCH net-next v4 00/11] PRU-ICSSM Ethernet Driver
-Message-ID: <20250407104424.01cc42f2@kernel.org>
-In-Reply-To: <20250407102528.1048589-1-parvathi@couthit.com>
-References: <20250407102528.1048589-1-parvathi@couthit.com>
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Richard Cochran <richardcochran@gmail.com>,
+ Philipp Zabel <p.zabel@pengutronix.de>, Geert Uytterhoeven
+ <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, "Russell
+ King (Oracle)" <rmk+kernel@armlinux.org.uk>, Giuseppe Cavallaro
+ <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org,
+ Biju Das <biju.das.jz@bp.renesas.com>, Fabrizio Castro
+ <fabrizio.castro.jz@renesas.com>, Lad Prabhakar
+ <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH net-next v5 0/3] Add GBETH glue layer driver for Renesas
+ RZ/V2H(P) SoC
+Message-ID: <20250407104447.072449cd@kernel.org>
+In-Reply-To: <20250407120317.127056-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+References: <20250407120317.127056-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,23 +74,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon,  7 Apr 2025 15:55:17 +0530 Parvathi Pudi wrote:
-> The Programmable Real-Time Unit Industrial Communication Sub-system (PRU-ICSS)
-> is available on the TI SOCs in two flavors: Gigabit ICSS (ICSSG) and the older
-> Megabit ICSS (ICSSM).
-> 
-> Support for ICSSG Dual-EMAC mode has already been mainlined [1] and the
-> fundamental components/drivers such as PRUSS driver, Remoteproc driver,
-> PRU-ICSS INTC, and PRU-ICSS IEP drivers are already available in the mainline
-> Linux kernel. The current set of patch series builds on top of these components
-> and introduces changes to support the Dual-EMAC using ICSSM on the TI AM57xx,
-> AM437x and AM335x devices.
-> 
-> AM335x, AM437x and AM57xx devices may have either one or two PRU-ICSS instances
-> with two 32-bit RISC PRU cores. Each PRU core has (a) dedicated Ethernet interface
-> (MII, MDIO), timers, capture modules, and serial communication interfaces, and
-> (b) dedicated data and instruction RAM as well as shared RAM for inter PRU
-> communication within the PRU-ICSS.
+On Mon,  7 Apr 2025 13:03:14 +0100 Prabhakar wrote:
+> This patch series adds support for the GBETH (Gigabit Ethernet) glue layer
+> driver for the Renesas RZ/V2H(P) SoC. The GBETH IP is integrated with
+> the Synopsys DesignWare MAC (version 5.20). The changes include updating
+> the device tree bindings, documenting the GBETH bindings, and adding the
+> DWMAC glue layer for the Renesas GBETH.
 
 This was posted prior to the "net-next is OPEN" announcement:
 https://lore.kernel.org/all/20250407055403.7a8f40df@kernel.org/
