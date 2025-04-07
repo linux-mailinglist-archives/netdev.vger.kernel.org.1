@@ -1,118 +1,149 @@
-Return-Path: <netdev+bounces-179533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70D9FA7D807
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 10:35:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0ACDCA7D870
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 10:49:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79AE3188DD44
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 08:34:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 324C3171C10
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 08:49:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE762227BAD;
-	Mon,  7 Apr 2025 08:34:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42DDA229B39;
+	Mon,  7 Apr 2025 08:48:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="qmXG5bxb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DWdH8mHz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F73225388;
-	Mon,  7 Apr 2025 08:34:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E001494CF;
+	Mon,  7 Apr 2025 08:48:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744014867; cv=none; b=KkKZRbAY4hRa0dplPO1IFvnvy2aT8XmeJS5mc4xz76oEQmG2hhCgMqdFG/B+dKie1ITjGPuXisMQ+OoqKcygFheGv5bbGnUWm86Kej4cNjnilVuku5lzDbKzdbqZye+qrdRuAMTM42/d1DN4IpY+QKOQwH0Iv0G9LSG5o1pKurI=
+	t=1744015735; cv=none; b=XEdcGT6UD7HvMV8kRRi76/iDHCWggj6Cx6qKgiylAeF5hPHb+12unkZsk6lJYGNLg/aSX8WNGbKP+oNeMdGilPxLIG8bl9aQQJYn7e88gjtlfsR39MIoy3rzoRV8gWXTBLjwiFXJN+7vXLt/S2Tsp03KsRtJfUmTDnvB+rui1kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744014867; c=relaxed/simple;
-	bh=Vhw4ZA9Ps2+xZXL2K1IJGg3PZdoZzGEMNfgJtyFl5LU=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=MxAcq8xoOlsrUHxHrCEG0wGrKjJVuhC8FBw3rYAWjaynl/6QYgonnE1lhlFb1CXURyUtrzyJ2WUKyxIi2R3VlpuMvTIaoGvWRWYJwMO7yqt0KwtLw2eqFXJtoKwaiiUxDbO/cH5UJmXISZ1maJ6t9Un3Tr24LRKD8TFb31HDL40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=qmXG5bxb; arc=none smtp.client-ip=212.227.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1744014852; x=1744619652; i=markus.elfring@web.de;
-	bh=Dg+LGVaxeCMjrxNASaMRgp1m7d5it9SLyoZVjKU62jc=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=qmXG5bxbKO7ypkQJt1m69ZkaibGHfDtDrfBsZkbKAPVRch/M25tf+hcOY37/XaNe
-	 wa+eNmegJZKqeZLKiPvnKHrYgqSdAtwN8VmXxhZN0N2BQovO9ZwY4pgI5W9cz0+US
-	 2uH7V57MvngGrwpQnc3jMZ1nH3F+8p4cTHieJ4J94OAmQQfK+DhXmA7jS5RJlI+5F
-	 gUq2KU4UV9iKr2YZrvkd3uXpfPRpu9pNr5b+MctVKVA4pVKbXIrKdMuy85ZUsbzPz
-	 3xN1kfghklWH174ii4wMRaciboFrCornfBqJgkN7FLKk6GZ/8bTCtH7f+U8fpoiz8
-	 Fi/tKheFUy4FxauFdA==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.93.4]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MQ8ao-1tfnMp3iBE-00V9MC; Mon, 07
- Apr 2025 10:34:11 +0200
-Message-ID: <0d6e4dcc-2646-4694-9961-70049a71e7c1@web.de>
-Date: Mon, 7 Apr 2025 10:34:08 +0200
+	s=arc-20240116; t=1744015735; c=relaxed/simple;
+	bh=72umYHellYaKBHhkLItMF10xOjMbeF9Ggf7D76vY7B0=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Mdb4LTPfyPxpyVEJWLOf2qh7rOUKr90N2v9H/UgsQG/MSmH5aOhcYCXqhIDs9mg7qYP9XIZdTxlLwsCyT7bUulCiHvNPW8yOkyYJ8YP2ZZNDgVe5YF045nxqXrBCUdg95E/dCnFRn0GUR2EXk9ngIpKxqvhGn/w4hmYVWDjgZw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DWdH8mHz; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-43cf034d4abso44009785e9.3;
+        Mon, 07 Apr 2025 01:48:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744015731; x=1744620531; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ETW6l3iz7iXkgvHcK9RtSNHV8piZ5NQWh2YAPd/r8ew=;
+        b=DWdH8mHzaJQa2lo+nNcdOv5W4wUmmOey0wHE1cO/HQzZq1QX3qwiV1kIf12+AdK3GC
+         4QlHR/JQ3acI5gBEuLDFSV8Ty1GpHPJO8H6qh7DXHrYk5fYoUyPVO36DczA9Bd1bSNZf
+         l/08E+n9jeXomjTThuJF68QggZY1G8v8dvNyAqQYIkExybVADXQ/IFA3Rhsl4Leu6YY2
+         F/KSZwXSd9T9YyPHlk3CAvA45WhMj/Vix2XTG5t2npI10i1kql1jYPC45AAAWWgdYUgY
+         llIdzmUONURGp5h9yGmYpDwuNwc/bRK6QP1uKqNuZ/6g1vtUtzij/xsh5/JugkZruXuc
+         tEPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744015731; x=1744620531;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ETW6l3iz7iXkgvHcK9RtSNHV8piZ5NQWh2YAPd/r8ew=;
+        b=VDJc4837QdLHC6INM5SqdAdayR3KWUnbaWAdfQghBI71ZQ+E6ozwdrsFsnkGgCgd+M
+         OlB5p7+8v/awo5S+IhYdb7Udd9hXNH/+RgrSyKsLB6G+H5nYUvVYlF1rbDemY7KkK2Gd
+         o8jlAmXK8JphoVSd2pq2vHebDXC6ICGiq3b+suKa+zVH7RN6NmTnsi4phqKd/XphhENn
+         jxLc0oWMLac07QpjG736nfJpoAQIfFelVezqbIZa8wzwfI0Ad3xna1p4EJAxnSusOnC7
+         0m9Dyf8xc8gs3QAVAPP6PxXRR+ELdBb4JXOSd1fGaqvq7hWvDIpFiFMxzc8bTwKd4wmC
+         mlaw==
+X-Forwarded-Encrypted: i=1; AJvYcCUcuUncPu/LDfchp5wMMqfCuQIad5pWhoYlGgnMqaFrwZu/o3NKR4nBfn07FJJGTParhCdDRdcq@vger.kernel.org, AJvYcCXqVCwnLlKe7tVWs99kNyL2tZ1FST7wtAKE6S4M+GG8bDgryXRBV7/Fmmz3wUJoq8QN9Ug7/nHoTqg259U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEYuiBlZ34d/vE3XEBKUCHFmyUPyCwoOADo3RV07L3PEjfzeI5
+	23vRhF72AOHUnQty4ZdaqHvnHQkt43emEJYFjt1gShpFpdOCxe1G
+X-Gm-Gg: ASbGnctpAifhJWVh6Eo+0iS69Gojyz8o/MxTvKLoFxCSSsYTzzyRVlrqMTYFZT2vFzp
+	vvBGffcO3+ilPfwPsJFS/vsFJNz1cUg0tbdnkTL6gWJmbDNGgfp7kWrDrIlr1wvl8ytwJ9moqY8
+	YGv6u1uITQt1ycXK3KDcPd8+C9u8UDToz/khxZemYnXtt8G3SD+wikXcW/bhAOOAzelousChqne
+	kOI58CjoTibFn/KE3844six+tGzl9EgaA5Bn2B5H5g51Iwtepyux4d00wdbiTOPL1TKckYiJpel
+	iTNE0TqXrTnxcj1Po6JGFFD6EnWNSeqiF3N2gJajHGleXgQOYLcGZmXQ123+qQgdDv1bQzB9IWx
+	kSf/u1rqDbXjNDQmDTlVv089CjLHUER5U
+X-Google-Smtp-Source: AGHT+IEmR58OqtA7yslcFQwqx1FxAvmlaq6osCPJB4WDTae12eKXli6ScxQuK1Lct+W8+ncDM1/mYQ==
+X-Received: by 2002:a5d:6d84:0:b0:391:20ef:6300 with SMTP id ffacd0b85a97d-39d6fd18c1fmr6079508f8f.37.1744015730496;
+        Mon, 07 Apr 2025 01:48:50 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec364ec90sm122839435e9.27.2025.04.07.01.48.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Apr 2025 01:48:50 -0700 (PDT)
+Subject: Re: [PATCH] sfc: Add error handling for
+ devlink_info_serial_number_put()
+To: Wentao Liang <vulab@iscas.ac.cn>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-net-drivers@amd.com,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+ "Lucero Palau, Alejandro" <alejandro.lucero-palau@amd.com>
+References: <20250401130557.2515-1-vulab@iscas.ac.cn>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <be202919-4fd6-bc22-ab43-09c952db1959@gmail.com>
+Date: Mon, 7 Apr 2025 09:48:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Henry Martin <bsdhenrymartin@gmail.com>, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>, Amir Tzin <amirtz@nvidia.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Aya Levin <ayal@nvidia.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>
-References: <20250405100017.77498-1-bsdhenrymartin@gmail.com>
-Subject: Re: [PATCH] net/mlx5: Fix null-ptr-deref in
- mlx5_create_inner_ttc_table()
+In-Reply-To: <20250401130557.2515-1-vulab@iscas.ac.cn>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20250405100017.77498-1-bsdhenrymartin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:vgSH9jAK64S+GlMEqzoxCCM8UxsPHwh7N4T7u/tAoAQtYmLNIpy
- f2ifI6mm5og7E5nuypepEbcvk70nFvzNeyjFVpOftRzBdoTyobTtYPdjAKzZ1eotnTHh/K7
- xkQOBcLWVci1r/x+FtgJvGuM2nzCJsoe6Al+Ug8u8GYgN4hQc0hz8IhuJyqwNCokEM+uvZj
- 8XAeDOEeZr9FLwhxY9deA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:JwUTb7aw1zw=;ebFimREAd4AzF8Qlft3eYkX4n87
- S7IEpwvP0PkAm/7psp69QlWYonf1n5Bilzqxc7IP6TGSHeOZBJHJDnhrZhTbRISlvQIbyaYB7
- S8nqTEb6azesLdGbOY6jmfZeKCt69CYkTl+hGakREm3V33Kg5BcPF8MVwS7k60wngzIJhZOg9
- yO6jJe8/QN7IzVxVzLpD/vxX+4rhIcpriF2tIxHStVZe/Sc1w7vs5pxgzVJQgJrDjMKtWhbkY
- UHUS4zLDBb91dtVSv0zdC779kjwiHs8AIcZYG+DbxuKB6XYCGl88SfytL6hSo2Iv953mWrask
- 5M7tz7no7JvAkOQD2JlGftiYVQpBUSYCHViNuVbJeY1yEDkmwmDj7fe7YYDNOkUiW4X1WBO9K
- S5+bHShmblrAxm74Op8g6He+8WtZYWQdm4khyfJ/hJ8vFkTuiAAKmCYGxqfxMJ8cqdF429BlX
- NR6n/bfCULwrj2Y4EgS1KgZ87hdkqwkI37gdtTOfsds4Pp6d0BtP69NPpcLCDd64yUtOedl31
- NkvvsDuBWWDfjXJTgISXao08G98IzwwvlyihA3eV/rLETCiaixjFwUVM9o5aEYEyM3neDgrBF
- DClNdoYkkh7kJ8AAqfGE7KxhO2ggIo7uaukB5e75bX7zmT+Ul4HsKdnQ89hNIGX7kXmuvZZTj
- EEoKp9rtjbcneyk1JdtJxc8qEqPUwvqUMXJTcxo6Z0Z6Q/y+OUCDdkxkLzF0oVjvCvFv4yQIf
- FIUlUniRMxT66h1wyeX3AGABU6JSVoVllX+V/V4j2wy3M9+E4ALhFM9ZdG6/9rp8uR3H7VP/d
- kwgFWi99iv0Sp/WH2wm/MYTAU4O7BRnNOYWdNug3GcGr0vYd1YQ6iko9e3HZAD7iKNrXl4FGY
- 5MBaany6Wl8UdQ7lB22b22rd4xJCaoS6nlQ13AqLhbYuR1wXBrbVX7qnKHX4XSbgVoVADRhsL
- M3+8g/8KZE24CP/J1VamdpkzlRugpoJb3H8aX7yQMk0OsRcnjdl4Y17yqBkDYwav/DfW5kXgy
- fl3FJAHYzdvcCXXeA7Xmi7PJX+hgL5zp4B5RIQhch9PuYLWNfk26n1EvaSlPnciFJ1QXh2KaZ
- aBG9sO9QAFPIxpYBWgm1GLakGy0UAnPGiJ9qcQ6KlQb0iQfOhbR5AY4aqgUW4OT52SjGAZpKB
- pnZi1k4hnJIkP3ojy7Fqe97nPuCbcz9tAZHKtDlRfYVQx379F5pZwUhgWO5eXYMcpH8CitXzH
- 7fhT9V5X1A8Q+Ry2O3PkwPsKxUTF131U24rpv27jonTfnX2ZapHteUMzo1wVSnQ4MMWo5qdkl
- V5pXH0n0zUbYfVD4y52JjVIO4qj+WzZGyfii4EC5vxmc5YFzYRcDSfaC5QZeqPH+otvpRqP5d
- w91xsC1tnpF16mmWJGGfhtfDneEMvWz81DT1JC/eemBLV9v5LN8kWJtp53l4oM0hJetbzIq/k
- ndz/PIiTe785u/qD1u9NvQxLS8TMRIOtmHcZKWPKN0qWNnng23g3RG3eVBIhGDO9D1YEAiQ==
 
-> Add NULL check for mlx5_get_flow_namespace() returns in
-> mlx5_create_inner_ttc_table() to prevent NULL pointer dereference.
+On 01/04/2025 14:05, Wentao Liang wrote:
+> In  efx_devlink_info_board_cfg(), the return value of
+> devlink_info_serial_number_put() needs to be checked.
+> This could result in silent failures if the function failed.
+> 
+> Add error checking for efx_devlink_info_board_cfg() and
+> propagate any errors immediately to ensure proper
+> error handling and prevents silent failures.
 
-* You would like to adjust the error handling in some function implementations
-  from a common subdirectory.
-  How do you think about to offer such changes in a corresponding patch series?
+Looking at the rest of the file, all the calls to
+ devlink_info_*_put() in this driver ignore the return value, not
+ just this one.  I think this may have been an intentional decision
+ to only report errors in getting the info from FW, which seems
+ reasonable to me.
+If not, then all the calls need fixing, not just this one.
+CCing Alejandro, original author of this code, for his opinion.
 
-* Can any other summary phrase variant become more desirable accordingly?
+-ed
 
-* Would any blank lines become also desirable after added statements?
+> Fixes: 14743ddd2495 ("sfc: add devlink info support for ef100")
+> Cc: stable@vger.kernel.org # v6.3+
+> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
+> ---
+>  drivers/net/ethernet/sfc/efx_devlink.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/sfc/efx_devlink.c b/drivers/net/ethernet/sfc/efx_devlink.c
+> index 3cd750820fdd..17279bbd81d5 100644
+> --- a/drivers/net/ethernet/sfc/efx_devlink.c
+> +++ b/drivers/net/ethernet/sfc/efx_devlink.c
+> @@ -581,12 +581,14 @@ static int efx_devlink_info_board_cfg(struct efx_nic *efx,
+>  {
+>  	char sn[EFX_MAX_SERIALNUM_LEN];
+>  	u8 mac_address[ETH_ALEN];
+> -	int rc;
+> +	int rc, err;
+>  
+>  	rc = efx_mcdi_get_board_cfg(efx, (u8 *)mac_address, NULL, NULL);
+>  	if (!rc) {
+>  		snprintf(sn, EFX_MAX_SERIALNUM_LEN, "%pm", mac_address);
+> -		devlink_info_serial_number_put(req, sn);
+> +		err = devlink_info_serial_number_put(req, sn);
+> +		if (err)
+> +			return err;
+>  	}
+>  	return rc;
+>  }
+> 
 
-
-Regards,
-Markus
 
