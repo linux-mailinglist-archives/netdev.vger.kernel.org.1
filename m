@@ -1,125 +1,135 @@
-Return-Path: <netdev+bounces-179974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9026A7F041
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 00:23:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE7B6A7F04E
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 00:28:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37E081891AC8
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 22:23:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 634E03A9CC3
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 22:27:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFA132222D2;
-	Mon,  7 Apr 2025 22:23:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A47B223710;
+	Mon,  7 Apr 2025 22:28:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iO4IcSr1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A2N0LuQM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3811F4199;
-	Mon,  7 Apr 2025 22:23:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 915D1199235
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 22:27:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744064596; cv=none; b=BawAuNRRMUGPgCHLslgi2G6g/Cm+ixUTv712KR+RnMbasSmzxnFX5v8OlFHhIcZR3lIR7ngeeNeMtidWRsYl76lk/I59uC4cVeOwztgZsXuThb9NRh7lnnVruDMT6uOdOZfYKJ4fNDWtnhIiuh2f1w4+YajniM2TuoPLUDdIrr8=
+	t=1744064880; cv=none; b=ZOqUuhMg3X6JJQHwb5Csrkel2Qa5NVJWL1sDldls2BgoQryoq7fZQtMk6PL61uZ8F1cjPM2WGl1qxrmQTS3cxf4BvsHpHfCBBXzyR+tIEIcmeNABj7hTiULOrs+0WkdOQIS8Au+56SgFQaf5nMGMNU7g8PF76JCZTP5NBsLB89U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744064596; c=relaxed/simple;
-	bh=vOHCcuStpqZxUTDTbE+guySnY7gWbbaPhAY3mPxLucE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lbV0tw4dIY+Hyjp4/7RLc/jbPzfPHGur44PrC/FVPJqSvMdVUFWinXpf7iHmfEYlifM4Rt4ynRjQAaS18CGqGR1fq4ZKTSNbhKAzbNjoN1vZ8BrFMRwWnw7P5BiGwyiQL8SIy48Mrpiwenmuvvm+uw0MFhRdLHmZpfBavwyYN6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iO4IcSr1; arc=none smtp.client-ip=209.85.167.42
+	s=arc-20240116; t=1744064880; c=relaxed/simple;
+	bh=hpS31OidI1u1n619ZrpB0oeuFlCs2qG1imG8iMq5PZ8=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=cG6R9a516jGC6Dvh82ZnSQhEPGPTNhSUuF5MhnhZBIwJ7UKP2ZrSgz2BPE+C57xhly5wi2eT4oBb/gPjs9rdtTkSUrOR7bvrITnPlVHgjIy6wGHlsrceG06Fu9ouRpYso78e/UQQhmOPl598DX0EzNiJ6+cLnMe53jTXsa8DJHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A2N0LuQM; arc=none smtp.client-ip=209.85.219.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-54af20849bbso2337059e87.0;
-        Mon, 07 Apr 2025 15:23:14 -0700 (PDT)
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6e8fce04655so48148286d6.3
+        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 15:27:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744064593; x=1744669393; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1F7HhWO1LnOhK6MSocO4DGoRqA9u+WS41dhl1g2yR/k=;
-        b=iO4IcSr1lyJdq0S1nuVPXRwMA1EKJPqzLPKODdV31MrZCZnT+UiHvpmhCyCx3VVqIL
-         e0+mzS+l0k/udF4T2kEYCgzS96RygGTkt0PSAclg7kisIVpZntFNcS35B3KcEG3QqAO9
-         N/0S1sqRy34lA1sge/y0yskov+jL3v1NuDWIdK6AtNZtxEFH/h/lNYEsWfGPAWxGGYU3
-         TI6aLiZzyEqYfD2peqA8CI473c63wlOMh6r3L6wpkgZiwscWo1uV5I/QSOU35c+jTeqb
-         lWir9WweAnEU4xU5NZSg05Uw3J3u5U/ssNwqOpS9x7v0tDr8EirZBRcSa+dQFQyy/uCL
-         G7kw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744064593; x=1744669393;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1744064877; x=1744669677; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1F7HhWO1LnOhK6MSocO4DGoRqA9u+WS41dhl1g2yR/k=;
-        b=VZAxVRqHIdKT4H859sSocmiEnd63eEcXcbQlMNrqGo/rUzQz6c4UbC3lP3g5uCvjsH
-         HBet71xQwpwk7QxMT5r9YHAaHb9jLefrg+amV9uIsQF43ozXjyY4XkC0/ZQPIByS0C+R
-         aH0YdwiJp0qWbGIEyioPZPetwRZCz85o5BKL9gH3MGB6ra0+zeF80/qBQx9WvEz15ymH
-         B7q2EY+7i1bxqYYlFCwQjr+IUwFxX1ZmDgNBbieiAt8b98mDM1rdGUzTK/rV0Tps+n4G
-         MaaYssOsVtrKF9GCBEwYhe0h4Fux3leP9grTV8RVCfCDQ00U3SJn6vPI42joiEX19MV8
-         7DfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUOGrWi02TnRybEoAoG3J9omHlTuXH0CRjX3vRsnvjkpLJGDpTYzwPQ6WuYQsQVwbyCS/udTeUc@vger.kernel.org, AJvYcCVAOg+uwlWAyfwTA9VfoACSj3POeGNqf38ddtqS9Z0wL13GYkAZFGBJtc8mQu0ytQUyZfKW3qYTu/EdYRE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzk1/XN7oQ8z2NhlloFEAb4CWEhqE367KG0Ggvy1uInhuwuVVqR
-	dYv40S9GyuibjccNfMutjEpFFZ4bPZ0PdJMWlqJnlOJQP991laJf
-X-Gm-Gg: ASbGncuxgSeGSXn2M+SyLYSsTzmYurTE1AlpHZ6Lj4S4u+aUCSflqaFdAZSfkUhmdUv
-	WrplyKvN80xtFf1siCIrtc3dh5QtIlUOpnqe1UAz/W8/8LShmZNisDcma8jxU4WNmSuGSPMMKJg
-	sOtQIcnPDBPY/hB+YF8VZLUfBzBT4AzoFWgYwvmZLrxFvAkB85hKVjN8aPn3qWwNdTUsGhcrYlu
-	Ufr9SHPs9Ggjxot5Gol8RbRcE/sIVUKIykNMyOT3ilpZck/VwrFNg9DOB+aNSy9lbvwrrRKf0lk
-	It1QzOjRl0+GzHLapnnH6j6wTJxR3MqNtoMv6B03JzeZyYvBIGoHdAUFp68=
-X-Google-Smtp-Source: AGHT+IGBsMos3hJsyJXySb8JRnfqGLGz1miXDBT/4t4UOyjZMKfYxKN+E9YRH/z/S/Lnnjv7wz+0Kw==
-X-Received: by 2002:a05:6512:68a:b0:545:9ce:7608 with SMTP id 2adb3069b0e04-54c22808a42mr3848934e87.50.1744064592721;
-        Mon, 07 Apr 2025 15:23:12 -0700 (PDT)
-Received: from home.paul.comp (paulfertser.info. [2001:470:26:54b:226:9eff:fe70:80c2])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54c1e5c1896sm1377554e87.56.2025.04.07.15.23.11
+        bh=2iTkYZ2z/iJ6mmWy9lefMkRZbYfPGltl7Qb840MKyJM=;
+        b=A2N0LuQMvlhwIqYw7w+8fQN1VVGj0a7Kfiste2EOhJYsSfyzSqLnb+q356wEpSRjlU
+         2Sxj1PQvl3yBQ7pYCoiTYh0unLExYAIjHoVXj0n2ukMaLzICUUY6Cql8lguLoFydnBnB
+         mCl+PMXRKkZDIIv1X9quHlPdx5ONa0ep+rukwISWy+PqwI6/pbehk/I5zM3xs4Yf7Lo3
+         P1kIM+Wo3xpWcwXAFu0BxXpGBNsDQ26fxMfvIdv/OF5u9PuvZa5nkUKXhvFgfpucMjy4
+         9IzPpKq4nNr9ZXxvDlM/tmIfAMRHjxI4a/gFq748azMGmmYhm+yD6qQ9+3iU8r/0mgtk
+         UZIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744064877; x=1744669677;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=2iTkYZ2z/iJ6mmWy9lefMkRZbYfPGltl7Qb840MKyJM=;
+        b=X78TL2XHxIEyh6W8WQ0S6T+6oBkqxrinI5c5eDEh6aUfL4icjwx/ZPbTOcKHANLVtW
+         KDUszRlHsOQt8kZVNHYYW6MSU866v31MTIrr1pxEdHdfcOSnSZysICPFLRVir7ooFXbg
+         kkw8scnmXWwcRUzhDulB8D3tXU4oytE7/mzadewLrwxmGa53ihSYo5V4jZGS+szVmCE6
+         3tbkxB34ZSh73bsVuyJfxP3CKpzSA8SnSFMyIj392V4UhWcOvLixroGqW/cJpYiKD6WV
+         5e+ObjSLNvPkk/Agy5IZnm/A2bdN048GHLn5sd7Cs7NGJXXXEGGYp1+uDsunfdLLogig
+         unjA==
+X-Forwarded-Encrypted: i=1; AJvYcCXIF9qM8fprOO0+dj4C6rp9Wu/77RcJfczNkL8tcNAEX2oP6xlj+hp8e8WKgcvydnF7eTjn6zw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6mgZYc/TGilXamLstn8ww79Sq/PpdZPTE98kRzrg8JXhfuaXA
+	J2lSAKk4JECfJ4IUuvMz4jOzwCdY6l2k6nmj+9tH+RX41sOh6ECg
+X-Gm-Gg: ASbGncvMKStXstsmZNF7THY3WHbItbqbLraZEWzLWeYQbPkEKrJ4v6R4j2zTIFpPPr6
+	hNW1FYfcrzqSjDkqKXYktp52/CF4HZJ1MQ6cWuh1dAVJulGWzXmQ4NseEKfQsIN1DEPNK1ySxN0
+	faV3k/y4t+2hj7da3znkkURtnr0gZ3Cm+7+V9BRERkdpWiiOkWevs8J4BHTSFjARKnF51M8ALUH
+	JAwvnwEIqWdDo//9v7i6t8X8scyo33ZE3DW8H7vG3KqJroJxwrsi8Z6Pcufb8CmFqr/fBxndkdz
+	QnNjq6NrnMabWz1VjQHDkzS3GX01xomDUv5pCuiZMRTHhAiGGS+3eHrCmc9SglQzRxhH1DU+v4j
+	BCJPDK7ncnjo7msBvDlDLmg==
+X-Google-Smtp-Source: AGHT+IF7wH3xLK/rYNlyIjb0HK9OfoQ9BkV4iUYdrI1TogzY9W47TsRN6dfXhLaPj18ZdjmIjuHjrQ==
+X-Received: by 2002:ad4:5e89:0:b0:6e8:9dfa:d932 with SMTP id 6a1803df08f44-6f0b74133demr153644686d6.15.1744064877390;
+        Mon, 07 Apr 2025 15:27:57 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ef0f14e993sm64386416d6.112.2025.04.07.15.27.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 15:23:12 -0700 (PDT)
-Received: from home.paul.comp (home.paul.comp [IPv6:0:0:0:0:0:0:0:1])
-	by home.paul.comp (8.15.2/8.15.2/Debian-22+deb11u3) with ESMTP id 537MN7dY011627;
-	Tue, 8 Apr 2025 01:23:09 +0300
-Received: (from paul@localhost)
-	by home.paul.comp (8.15.2/8.15.2/Submit) id 537MN6sR011626;
-	Tue, 8 Apr 2025 01:23:06 +0300
-Date: Tue, 8 Apr 2025 01:23:05 +0300
-From: Paul Fertser <fercerpav@gmail.com>
-To: kalavakunta.hari.prasad@gmail.com
-Cc: sam@mendozajonas.com, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        npeacock@meta.com, akozlov@meta.com
-Subject: Re: [PATCH net-next 2/2] net: ncsi: Fix GCPS 64-bit member variables
-Message-ID: <Z/RQSfwH1CLcDEuT@home.paul.comp>
-References: <cover.1744048182.git.kalavakunta.hari.prasad@gmail.com>
- <1ee392cf6a639b47cf9aa648fbc1c11393e19748.1744048182.git.kalavakunta.hari.prasad@gmail.com>
+        Mon, 07 Apr 2025 15:27:56 -0700 (PDT)
+Date: Mon, 07 Apr 2025 18:27:56 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Simon Horman <horms@kernel.org>, 
+ David Ahern <dsahern@kernel.org>
+Message-ID: <67f4516c97bac_3bfc83294be@willemb.c.googlers.com.notmuch>
+In-Reply-To: <41d16bc8d1257d567f9344c445b4ae0b4a91ede4.1744040675.git.pabeni@redhat.com>
+References: <cover.1744040675.git.pabeni@redhat.com>
+ <41d16bc8d1257d567f9344c445b4ae0b4a91ede4.1744040675.git.pabeni@redhat.com>
+Subject: Re: [PATCH net-next v5 1/2] udp_tunnel: create a fastpath GRO lookup.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1ee392cf6a639b47cf9aa648fbc1c11393e19748.1744048182.git.kalavakunta.hari.prasad@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hello Hari,
+Paolo Abeni wrote:
+> Most UDP tunnels bind a socket to a local port, with ANY address, no
+> peer and no interface index specified.
+> Additionally it's quite common to have a single tunnel device per
+> namespace.
+> 
+> Track in each namespace the UDP tunnel socket respecting the above.
+> When only a single one is present, store a reference in the netns.
+> 
+> When such reference is not NULL, UDP tunnel GRO lookup just need to
+> match the incoming packet destination port vs the socket local port.
+> 
+> The tunnel socket never sets the reuse[port] flag[s]. When bound to no
+> address and interface, no other socket can exist in the same netns
+> matching the specified local port.
+> 
+> Matching packets with non-local destination addresses will be
+> aggregated, and eventually segmented as needed - no behavior changes
+> intended.
+> 
+> Restrict the optimization to kernel sockets only: it covers all the
+> relevant use-cases, and user-space owned sockets could be disconnected
+> and rebound after setup_udp_tunnel_sock(), breaking the uniqueness
+> assumption
+> 
+> Note that the UDP tunnel socket reference is stored into struct
+> netns_ipv4 for both IPv4 and IPv6 tunnels. That is intentional to keep
+> all the fastpath-related netns fields in the same struct and allow
+> cacheline-based optimization. Currently both the IPv4 and IPv6 socket
+> pointer share the same cacheline as the `udp_table` field.
+> 
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 
-Thank you for the patch.
-
-On Mon, Apr 07, 2025 at 11:19:49AM -0700, kalavakunta.hari.prasad@gmail.com wrote:
-> @@ -290,7 +298,8 @@ struct ncsi_rsp_gcps_pkt {
->  	__be32                  tx_1023_frames;    /* Tx 512-1023 bytes frames   */
->  	__be32                  tx_1522_frames;    /* Tx 1024-1522 bytes frames  */
->  	__be32                  tx_9022_frames;    /* Tx 1523-9022 bytes frames  */
-> -	__be32                  rx_valid_bytes;    /* Rx valid bytes             */
-> +	__be32                  rx_valid_bytes_hi; /* Rx valid bytes             */
-> +	__be32                  rx_valid_bytes_lo; /* Rx valid bytes             */
-
-Why not __be64 then?
-
->  	__be32                  rx_runt_pkts;      /* Rx error runt packets      */
->  	__be32                  rx_jabber_pkts;    /* Rx error jabber packets    */
->  	__be32                  checksum;          /* Checksum                   */
-
-I wonder how come this problem you're fixing wasn't spotted earlier,
-as your patch is changing the checksum offset within the struct it
-means the checksum isn't properly checked at all and neither is the
-kernel checking that the size of the returned packet matches the size
-of the struct?
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
