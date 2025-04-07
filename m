@@ -1,169 +1,110 @@
-Return-Path: <netdev+bounces-179881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35E47A7ECC3
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 21:24:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37920A7ED10
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 21:30:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70999445BEE
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:18:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A47A5424D70
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAC0525D1E2;
-	Mon,  7 Apr 2025 19:01:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90582221D98;
+	Mon,  7 Apr 2025 19:04:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qc2/5blT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wru3J/Fg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B754325C71D
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 19:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0561A2222D4
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 19:04:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744052481; cv=none; b=KwxcQBFhVHp3axZZ9Oy18QmlaRUWNXeeVSdtsU1ZaY1msLMsQKDE/ZhS2W8swDM9ip7iJdTFCG5Xd5TjYeWBpSLkPTTk4jpPG5Bq2witdMyIkMxnA354KaG0yxLaXrDyUvZ9E9B2K/uj6lR3xw8aUD9zRLnah4MyO9iBb6OiIhI=
+	t=1744052645; cv=none; b=KAm5k0F0z2XnCtRapActueoGoMvkPKPBp5Dn4v8ZQgb8hfa31Xt22eCdTBSHprSm0gH8So1hDjOpdSPb/341ItrT46HxlvRG7lT1ouY2ChIl3Pk0ghmkaGUjmD1qhX5p93osqcfJfDv2ektPSjlxfgm0ytJjh0g1DEH2aEEeU64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744052481; c=relaxed/simple;
-	bh=bnY6roFw4wBUzLkKqV/QhjP+bqrrZdZbcwFS3O6/h/k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QGlUwYsbvHo8aD/JBFn0aVLrCsmWZ3mR6j02H5LPoUqzi+cKBgwvHUpDPnoL+SHiGFyPy0IxHhOfRpVTAYgiVF/eErmoOWBjbFK3A2bwfOVLqeTeyKQ+ZnQoGGCSVTmX+6nI8sRnhJtvP2ZcTp7bJh69I5qW0eBnbs0SlaRCxM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qc2/5blT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 541F5C4CEE7;
-	Mon,  7 Apr 2025 19:01:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744052481;
-	bh=bnY6roFw4wBUzLkKqV/QhjP+bqrrZdZbcwFS3O6/h/k=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Qc2/5blTCBjjRh72/eH3YyZhK1PFCKj9QFo/Zknbxf9s5vBwFLRvfEO0brjuj/S4A
-	 XD71V9SOL715qvkCF+0nwEQ6mdmg7ZGG4ViCP2bJkk1scPHy6258esbE5NgTJQBM0Y
-	 ONKqqcVKzr9duJsA2nEZtLW418HCQnBX9eNSJRAD8AhYg7j23rvHLSXV+7jkuA5QBW
-	 qNwl9FT+XHLcmfPNoqL2PGCZG/gf8i7YzXPX4ZbYv1JOfdADayHj61nBETlaBKvdzH
-	 HudCktPjFAFrD9n5r7Dt5nH/WgTzyNLTnZoDNoejNus8kpKmdEzI5s3YNiW9grAOBv
-	 mSR2+pJxYNTkQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	sdf@fomichev.me,
-	hramamurthy@google.com,
-	kuniyu@amazon.com,
-	jdamato@fastly.com
-Subject: [PATCH net-next 8/8] netdev: depend on netdev->lock for qstats in ops locked drivers
-Date: Mon,  7 Apr 2025 12:01:17 -0700
-Message-ID: <20250407190117.16528-9-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250407190117.16528-1-kuba@kernel.org>
-References: <20250407190117.16528-1-kuba@kernel.org>
+	s=arc-20240116; t=1744052645; c=relaxed/simple;
+	bh=Pm7uV5pfVrn+fqNuY63WVLzH+Z0MWN3zZ3Hq+12UjPE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Zad62h9HAg42sGonWXW6Lls2p78umNq1xO1KNp24lsF1HdcqKjYuYz2t9Pg1pZAMYiat+t8boJplhptd+7O+P/IP8kDqlojvyDvs4LdwMXtS7hVPiLl8KrTZSxB6pDwn1nureg6F5Z3Ulf8HpX3zWtcSc8WE16tgLF99NtXB1GQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wru3J/Fg; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7c597760323so424694285a.3
+        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 12:04:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744052643; x=1744657443; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OmQkaKfknMj2obvtWYonx9tbA2RMTZd+jmr5zMJiijk=;
+        b=Wru3J/FgR/orHyOUHDb7TjQOsztgm54UfImMCyacAQs3RnTbC+rycOnXXj2F1uyUkI
+         pmaSLf6MJaWDGO1TNBiTy4ON6KysTSJKQUhaUaqagDYAI4zD1mquFwBzeavJO7pvPbr0
+         WGXaVpYat9RffE9KMRQf6NDMrwAyg+wDQWlnC1VBTqXhPquW3mHMwpG04+f4yibYKnBP
+         tKOCn2XA5tK5wAFlZSg6RbwV+GCKkC6CruWhjhsA7nMz306tmyEDH9RJo0bGKxD9Rr1l
+         MlmrTK1MMlPgV7KkjwzRkBbcyxRopW9mPsCzeVtdDKwJvNBy44AHekSvFGS1x6+yCqgQ
+         nIfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744052643; x=1744657443;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=OmQkaKfknMj2obvtWYonx9tbA2RMTZd+jmr5zMJiijk=;
+        b=dPNnc2UHgd719E+XAwuS13xrrlSAxbb/fFbPob9YKd0k8vcXr+FVCYOfXDVurxqIQc
+         JS3V41BK7J/WYW+VkfQXFPYTTSvHeTqUDHPNjDAQgwu16ej32u2J3SGzkw6ipygD19DS
+         Dtgx85O397ucLAaxV05fDcXi5F6cNW5YU4y7ISyn/Rj4fSMa7rD7Lhk1FtVjidR8ACdY
+         t2QWbGTbsi3ZXMjBW3nI+Xh1IiL6t/Qe2j5UsoDBtjzZZpgZc3Yo0ekvBROU0zwSGrGD
+         0qIVfEF5DBIpjthDEhiIJA/o1KzF4nT8AcQ3ZYKXlRqx8m3YYcbx4qZyk4Y5vzHf0I0t
+         Uulw==
+X-Forwarded-Encrypted: i=1; AJvYcCXc9r9mgZpr3CXlYfVFORGZBZ6Bb6tGPPDP32I28Oa8uahKSGbcVmvUNSPX8fqNPc1skIqluVk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyldVDhxdMdqj/hU9pMn5Sm+zmnew0ES2vm7diZrjZymUi00XjP
+	gsSiDPYPJOd4AVTu99S9MGzauvvKX2a0SsJabr0N/H1G7Zrf+VtP
+X-Gm-Gg: ASbGncuAv177zZCAYWbH0KSG8owrT6bUoUPKIJyDFRsi7VzV4uAqq0aWLPZNQ+MehFE
+	nbTOWcxcCEOfUKPPI33JwpYfHknYAwJHSg9/kf+7zRBWyHLWK0csMKs6ftANMJSE3jRWyqNKaFc
+	uvEDTthv4wLVBWKvs3dOW57HHFCHyJZhw2JrOHWm6nCaxMWCeeYjsgYGs3RWcMUIDjEHgmwjQ8Q
+	r3+YNOPSLTrnJGFrvtW9ieJkpZSacXlCRJjpZDOvoJ8nFMWiA1WQ2dAChTHDjadoeItj13mYFVv
+	o5pDkce5qIZrv5qorUf7q49LYJf63M997IuRUcEB+Eopc7gbQHy5r16bUuPStjXySMnNbvp1G0/
+	8ssflvcMdXW8E5Y8vz3fM6A==
+X-Google-Smtp-Source: AGHT+IHWqdPY82z09hKkdEz9v2ue//jMsGYysj3tydGjEyzCU7Xgq4MRCCET9FMfVrdi8zgEq7RUZw==
+X-Received: by 2002:a05:620a:f04:b0:7c5:57c7:9994 with SMTP id af79cd13be357-7c77dd814b1mr1409224385a.32.1744052642822;
+        Mon, 07 Apr 2025 12:04:02 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c76e96a1fcsm632662085a.54.2025.04.07.12.04.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Apr 2025 12:04:01 -0700 (PDT)
+Date: Mon, 07 Apr 2025 15:04:01 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ netdev@vger.kernel.org, 
+ eric.dumazet@gmail.com, 
+ Eric Dumazet <edumazet@google.com>
+Message-ID: <67f421a189e15_3a74d52948b@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250407163602.170356-4-edumazet@google.com>
+References: <20250407163602.170356-1-edumazet@google.com>
+ <20250407163602.170356-4-edumazet@google.com>
+Subject: Re: [PATCH net-next 3/4] net: add data-race annotations in
+ softnet_seq_show()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-We mostly needed rtnl_lock in qstat to make sure the queue count
-is stable while we work. For "ops locked" drivers the instance
-lock protects the queue count, so we don't have to take rtnl_lock.
+Eric Dumazet wrote:
+> softnet_seq_show() reads several fields that might be updated
+> concurrently. Add READ_ONCE() and WRITE_ONCE() annotations.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-For currently ops-locked drivers: netdevsim and bnxt need
-the protection from netdev going down while we dump, which
-instance lock provides. gve doesn't care.
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- Documentation/networking/netdevices.rst |  6 +++++
- include/net/netdev_queues.h             |  4 +++-
- net/core/netdev-genl.c                  | 29 +++++++++++++++----------
- 3 files changed, 26 insertions(+), 13 deletions(-)
-
-diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
-index 0cfff56b436e..ec9d9a2cefe7 100644
---- a/Documentation/networking/netdevices.rst
-+++ b/Documentation/networking/netdevices.rst
-@@ -356,6 +356,12 @@ Similarly to ``ndos`` the instance lock is only held for select drivers.
- For "ops locked" drivers all ethtool ops without an exception should
- be called under the instance lock.
- 
-+struct netdev_stat_ops
-+----------------------
-+
-+"qstat" ops are invoked under the instance lock for "ops locked" drivers,
-+and under rtnl_lock for all other drivers.
-+
- struct net_shaper_ops
- ---------------------
- 
-diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
-index 825141d675e5..ea709b59d827 100644
---- a/include/net/netdev_queues.h
-+++ b/include/net/netdev_queues.h
-@@ -85,9 +85,11 @@ struct netdev_queue_stats_tx {
-  * for some of the events is not maintained, and reliable "total" cannot
-  * be provided).
-  *
-+ * Ops are called under the instance lock if netdev_need_ops_lock()
-+ * returns true, otherwise under rtnl_lock.
-  * Device drivers can assume that when collecting total device stats,
-  * the @get_base_stats and subsequent per-queue calls are performed
-- * "atomically" (without releasing the rtnl_lock).
-+ * "atomically" (without releasing the relevant lock).
-  *
-  * Device drivers are encouraged to reset the per-queue statistics when
-  * number of queues change. This is because the primary use case for
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index 8c58261de969..b64c614a00c4 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -795,26 +795,31 @@ int netdev_nl_qstats_get_dumpit(struct sk_buff *skb,
- 	if (info->attrs[NETDEV_A_QSTATS_IFINDEX])
- 		ifindex = nla_get_u32(info->attrs[NETDEV_A_QSTATS_IFINDEX]);
- 
--	rtnl_lock();
- 	if (ifindex) {
--		netdev = __dev_get_by_index(net, ifindex);
--		if (netdev && netdev->stat_ops) {
-+		netdev = netdev_get_by_index_lock_ops_compat(net, ifindex);
-+		if (!netdev) {
-+			NL_SET_BAD_ATTR(info->extack,
-+					info->attrs[NETDEV_A_QSTATS_IFINDEX]);
-+			return -ENODEV;
-+		}
-+		if (netdev->stat_ops) {
- 			err = netdev_nl_qstats_get_dump_one(netdev, scope, skb,
- 							    info, ctx);
- 		} else {
- 			NL_SET_BAD_ATTR(info->extack,
- 					info->attrs[NETDEV_A_QSTATS_IFINDEX]);
--			err = netdev ? -EOPNOTSUPP : -ENODEV;
--		}
--	} else {
--		for_each_netdev_dump(net, netdev, ctx->ifindex) {
--			err = netdev_nl_qstats_get_dump_one(netdev, scope, skb,
--							    info, ctx);
--			if (err < 0)
--				break;
-+			err = -EOPNOTSUPP;
- 		}
-+		netdev_unlock_ops_compat(netdev);
-+		return err;
-+	}
-+
-+	for_each_netdev_lock_ops_compat_scoped(net, netdev, ctx->ifindex) {
-+		err = netdev_nl_qstats_get_dump_one(netdev, scope, skb,
-+						    info, ctx);
-+		if (err < 0)
-+			break;
- 	}
--	rtnl_unlock();
- 
- 	return err;
- }
--- 
-2.49.0
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
