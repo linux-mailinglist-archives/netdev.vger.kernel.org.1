@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-180007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F918A7F0E1
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 01:22:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27D15A7F0EF
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 01:24:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 93CB67A5095
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 23:21:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 560B4189A5EF
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 23:23:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B7522A7F1;
-	Mon,  7 Apr 2025 23:22:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06B30225779;
+	Mon,  7 Apr 2025 23:23:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="khEuAX2o"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tZmGBxwz"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 029EE225779
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 23:22:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA588229B28
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 23:22:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744068134; cv=none; b=UniVy1IRsVUdlaX+sWGktXxOLG9iIkhHAMNBRLWYUWrhQtIycz0g5wI80i53w9SKpReytzmhE+/b6aMcc/kpKqeanwxioZbfYjE/5LNnsqfOcHWxozMgmQvV+Mk54W756tK5Lx5DNQCi4fn+nmCfW7hj7ggBFJMUAe9xA4rqRgY=
+	t=1744068180; cv=none; b=FoltgRqgVMI9vE1Uucy9Ygpboi7x3kYY0piR5XDnJU2HKETlkASAqJp3VQlY7hk6htClVEUM3WYRl7ElMq+fH5zQf/3fHJSUhAL4+LqZVNQ8dWR2JP93IGHaYCulXmg/r0E236Wdn0tn49XB4snx3peOumwFcNouhvuPmUdARv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744068134; c=relaxed/simple;
-	bh=VAli4Hqoc2udRObGUi3yFrlc+G+LEkaNEDyVuNoc8KQ=;
+	s=arc-20240116; t=1744068180; c=relaxed/simple;
+	bh=qSsi2Z8oWBNlNKblbyEx0tozbbtH7BqcNKuDv/Xe36s=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EIsq4Uv0FZEzPQTDcmmQgm18DY6iex98TKNOQFJUPpn9+UN6VfHxkUw41dA9TR9bnnCf6X7djDPJo2f3eB3TDC/dNaMV8KQMJwwoJ3SHDmj50wJLW5oS9cBAk2FeU66ZScwlxQLHsrxg5w5vsvW3LLNiSDBLeIjZc80ZfLYCHSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=khEuAX2o; arc=none smtp.client-ip=95.215.58.186
+	 MIME-Version; b=EH3z/Bn28B53fkoZ6SlTbHEsMrQHO8/N1DLh+orLAxPI2TgeATi+yRCpCTg7lQI/mVlN+fPVFNcUpKoqzIEKILEpFFxDbw6jajE0VFQGqWgWg7kWfdG/aNUqgRfSkPHubeniibai5/MLPmYFv6qFWxsOobhQxRjjeOUEb8JwxKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tZmGBxwz; arc=none smtp.client-ip=91.218.175.186
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744068129;
+	t=1744068176;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Qq6Vv/CkP4YKiaGHVdsEm6RC9mu+KNutOEDnzksBJgw=;
-	b=khEuAX2oCVnvsuH5zxvIEymWftDOLrcV8HiBaIt/jQCx0rx9aJYCIajcmh7U9qO7Io8Tb3
-	r8Ll+f3aiUHDYJvhaJo8XY+Vz0ROTFcDAg4YnopUTL4RAMGrg3KHQXQSIOmWObgOImqLjc
-	aXmypAaDym8gGwciCQbPcFVhozXkAQ4=
+	bh=QhSfZle2DSr8dqq4HF0QoA56gpikuRobNOyQek6vcqI=;
+	b=tZmGBxwziVLyqZoep9Yr4EZQGQV5GwvrcOH53EFBpvIEMMdoFxJTQ2yqRbqponGiN/LVzO
+	6KZtf1/JWkuWkvriigBIVFaJjziw2XC5Yelr5sX7HRIgq6nq9cHYdJGQnV+OIBm9cejGoo
+	miawXin2jM8+OruUkqAwm/PWyFolxJA=
 From: Sean Anderson <sean.anderson@linux.dev>
 To: netdev@vger.kernel.org,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -55,12 +55,13 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	Kory Maincent <kory.maincent@bootlin.com>,
 	Christian Marangi <ansuelsmth@gmail.com>,
 	linux-kernel@vger.kernel.org,
-	Claudiu Beznea <claudiu.beznea@microchip.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Saravana Kannan <saravanak@google.com>,
+	devicetree@vger.kernel.org,
 	Sean Anderson <sean.anderson@linux.dev>
-Subject: [net-next PATCH v2 13/14] net: macb: Support external PCSs
-Date: Mon,  7 Apr 2025 19:21:52 -0400
-Message-Id: <20250407232152.2317123-1-sean.anderson@linux.dev>
+Subject: [net-next PATCH v2 14/14] of: property: Add device link support for PCS
+Date: Mon,  7 Apr 2025 19:22:49 -0400
+Message-Id: <20250407232249.2317158-1-sean.anderson@linux.dev>
 In-Reply-To: <20250407231746.2316518-1-sean.anderson@linux.dev>
 References: <20250407231746.2316518-1-sean.anderson@linux.dev>
 Precedence: bulk
@@ -72,113 +73,38 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-This adds support for external PCSs. For example, the Xilinx UltraScale+
-processor exposes its GMII interface to the FPGA fabric. This fabric may
-implement PCS to convert GMII to a serial interface such as SGMII or
-1000BASE-X. When present, the external PCS takes precedence over the
-internal PCSs.
+This adds device link support for PCS devices, providing
+better probe ordering.
 
 Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
 ---
 
 Changes in v2:
-- Move update to macb_pcs_get_state to previous patch
+- Reorder pcs_handle to come before suffix props
 
- drivers/net/ethernet/cadence/macb.h      |  1 +
- drivers/net/ethernet/cadence/macb_main.c | 26 ++++++++++++++++++++++--
- 2 files changed, 25 insertions(+), 2 deletions(-)
+ drivers/of/property.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
-index c9a5c8beb2fa..9d310814f052 100644
---- a/drivers/net/ethernet/cadence/macb.h
-+++ b/drivers/net/ethernet/cadence/macb.h
-@@ -1291,6 +1291,7 @@ struct macb {
- 	struct phylink_config	phylink_config;
- 	struct phylink_pcs	phylink_usx_pcs;
- 	struct phylink_pcs	phylink_sgmii_pcs;
-+	struct phylink_pcs	*phylink_ext_pcs;
+diff --git a/drivers/of/property.c b/drivers/of/property.c
+index c41190e47111..86d9afcbfc70 100644
+--- a/drivers/of/property.c
++++ b/drivers/of/property.c
+@@ -1373,6 +1373,7 @@ DEFINE_SIMPLE_PROP(post_init_providers, "post-init-providers", NULL)
+ DEFINE_SIMPLE_PROP(access_controllers, "access-controllers", "#access-controller-cells")
+ DEFINE_SIMPLE_PROP(pses, "pses", "#pse-cells")
+ DEFINE_SIMPLE_PROP(power_supplies, "power-supplies", NULL)
++DEFINE_SIMPLE_PROP(pcs_handle, "pcs-handle", NULL)
+ DEFINE_SUFFIX_PROP(regulators, "-supply", NULL)
+ DEFINE_SUFFIX_PROP(gpio, "-gpio", "#gpio-cells")
  
- 	u32			caps;
- 	unsigned int		dma_burst_length;
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index ed37b1d85212..61810c914270 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -21,6 +21,7 @@
- #include <linux/netdevice.h>
- #include <linux/etherdevice.h>
- #include <linux/dma-mapping.h>
-+#include <linux/pcs.h>
- #include <linux/platform_device.h>
- #include <linux/phylink.h>
- #include <linux/of.h>
-@@ -707,7 +708,10 @@ static struct phylink_pcs *macb_mac_select_pcs(struct phylink_config *config,
- 	struct net_device *ndev = to_net_dev(config->dev);
- 	struct macb *bp = netdev_priv(ndev);
- 
--	if (interface == PHY_INTERFACE_MODE_10GBASER)
-+	if (bp->phylink_ext_pcs &&
-+	    test_bit(interface, bp->phylink_ext_pcs->supported_interfaces))
-+		return bp->phylink_ext_pcs;
-+	else if (interface == PHY_INTERFACE_MODE_10GBASER)
- 		return &bp->phylink_usx_pcs;
- 	else if (interface == PHY_INTERFACE_MODE_SGMII)
- 		return &bp->phylink_sgmii_pcs;
-@@ -733,7 +737,10 @@ static void macb_mac_config(struct phylink_config *config, unsigned int mode,
- 		if (state->interface == PHY_INTERFACE_MODE_RMII)
- 			ctrl |= MACB_BIT(RM9200_RMII);
- 	} else if (macb_is_gem(bp)) {
--		if (macb_mac_select_pcs(config, state->interface))
-+		struct phylink_pcs *pcs = macb_mac_select_pcs(config,
-+							      state->interface);
-+
-+		if (pcs && pcs != bp->phylink_ext_pcs)
- 			ctrl |= GEM_BIT(PCSSEL);
- 		else
- 			ctrl &= ~GEM_BIT(PCSSEL);
-@@ -907,6 +914,14 @@ static int macb_mii_probe(struct net_device *dev)
- 	bp->phylink_sgmii_pcs.ops = &macb_phylink_pcs_ops;
- 	bp->phylink_usx_pcs.ops = &macb_phylink_usx_pcs_ops;
- 
-+	bp->phylink_ext_pcs = pcs_get_by_fwnode_optional(&bp->pdev->dev,
-+							 bp->pdev->dev.fwnode,
-+							 NULL);
-+	if (IS_ERR(bp->phylink_ext_pcs))
-+		return dev_err_probe(&bp->pdev->dev,
-+				     PTR_ERR(bp->phylink_ext_pcs),
-+				     "Could not get external PCS\n");
-+
- 	bp->phylink_config.dev = &dev->dev;
- 	bp->phylink_config.type = PHYLINK_NETDEV;
- 	bp->phylink_config.mac_managed_pm = true;
-@@ -924,6 +939,11 @@ static int macb_mii_probe(struct net_device *dev)
- 	__set_bit(PHY_INTERFACE_MODE_RMII,
- 		  bp->phylink_config.supported_interfaces);
- 
-+	if (bp->phylink_ext_pcs)
-+		phy_interface_or(bp->phylink_config.supported_interfaces,
-+				 bp->phylink_config.supported_interfaces,
-+				 bp->phylink_ext_pcs->supported_interfaces);
-+
- 	/* Determine what modes are supported */
- 	if (macb_is_gem(bp) && (bp->caps & MACB_CAPS_GIGABIT_MODE_AVAILABLE)) {
- 		bp->phylink_config.mac_capabilities |= MAC_1000FD;
-@@ -950,6 +970,7 @@ static int macb_mii_probe(struct net_device *dev)
- 	if (IS_ERR(bp->phylink)) {
- 		netdev_err(dev, "Could not create a phylink instance (%ld)\n",
- 			   PTR_ERR(bp->phylink));
-+		pcs_put(&bp->pdev->dev, bp->phylink_ext_pcs);
- 		return PTR_ERR(bp->phylink);
- 	}
- 
-@@ -5462,6 +5483,7 @@ static void macb_remove(struct platform_device *pdev)
- 					  bp->rx_clk, bp->tsu_clk);
- 			pm_runtime_set_suspended(&pdev->dev);
- 		}
-+		pcs_put(&pdev->dev, bp->phylink_ext_pcs);
- 		phylink_destroy(bp->phylink);
- 		free_netdev(dev);
- 	}
+@@ -1524,6 +1525,7 @@ static const struct supplier_bindings of_supplier_bindings[] = {
+ 	{ .parse_prop = parse_interrupts, },
+ 	{ .parse_prop = parse_interrupt_map, },
+ 	{ .parse_prop = parse_access_controllers, },
++	{ .parse_prop = parse_pcs_handle, },
+ 	{ .parse_prop = parse_regulators, },
+ 	{ .parse_prop = parse_gpio, },
+ 	{ .parse_prop = parse_gpios, },
 -- 
 2.35.1.1320.gc452695387.dirty
 
