@@ -1,92 +1,102 @@
-Return-Path: <netdev+bounces-179788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C68FA7E84F
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:31:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4573DA7E85E
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:33:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 794C31769D1
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 17:31:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 830A217D9A8
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 17:32:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13D2921C17D;
-	Mon,  7 Apr 2025 17:29:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1256E217673;
+	Mon,  7 Apr 2025 17:30:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AM5acAFa"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="HG/bqvnK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3BB21C163;
-	Mon,  7 Apr 2025 17:29:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A9BE211706;
+	Mon,  7 Apr 2025 17:30:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744046984; cv=none; b=u52XnjRFFmyUH0cbdwPQP09WE0Xf2YtxQJkpjnw6a56AgY3p7LEtXdQ5GnpZRJJ1x2U4jNqrE1EDBsmY/Axk+noNh4QnfGt+1KQPxMYHCHAauBrPFEgU1MQNLrAMyV92U4u12G/+auxBZKks0qEq+m5KiHnfWJLkhlvwwIaX2B4=
+	t=1744047056; cv=none; b=PeiBIYArUlqXFRPI/wfSOKnuSdC9AjldEMzz3rcyKQx7HJu7LP6E8FGYs5VTru7E6ixl+mP3m1vbkiz0xJe5edLR+32xtjDrCxqKFpebo7hL/tkUv6z4eohsjw8fwXf7nfNe+dXaCHCafZysRSH6/qj/ov7z17KQRKGuXre+JxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744046984; c=relaxed/simple;
-	bh=40hG6O9bHbt4mq4rIG6FS5DBlcQ1hD3Fc0NtEd9xm2c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ROpv0kSeIRYsevFOadGum7qyAlWZ86kpmFvbzcCLo/JyRCFGW7DzTHD7dhC0lwZc8xvqwX7+9QpycbdL1a/RHyWpcIBsFpfEXctX9cBZtB3DbGRE0BzLFsfGCSYoyMJfBdTTRtbSImHIMSZWRvdgLgpNmFTktdium7JThYkT9qA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AM5acAFa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78B5AC4CEED;
-	Mon,  7 Apr 2025 17:29:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744046983;
-	bh=40hG6O9bHbt4mq4rIG6FS5DBlcQ1hD3Fc0NtEd9xm2c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AM5acAFah7Nu8oz/z0TcWFsRYk+JKhhpYu66P22ntue2yaoUukRMRVZeiLWypxloG
-	 u1oBq+5xWCt++25okkzV5N/dUF77uExfQXvKbe3vy8UaF+OtKz4WyO5HkMXL+Ca6LZ
-	 EM2Mxro6mHVC9UlUfEFctBt+aNgi5pRMmUDlQuJvp5HXh1WwwYQI1s4jgYoUQWvBmf
-	 YTWGnbsxR9TLWnIq1MnpRwGcpBx8VG/v9zZ6z6+afKs5VUXFHaM3mUSDlTiiUN6Nal
-	 5xbsI8KGPz0F4GOxbmB6QF9XQ1yU99/Z11y8DlcWcdadyXl26ybcJccoVd3dnNzxkL
-	 +mGRv+mQhlIaQ==
-Date: Mon, 7 Apr 2025 10:29:41 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joseph Huang <Joseph.Huang@garmin.com>
-Cc: <netdev@vger.kernel.org>, Joseph Huang <joseph.huang.2024@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Roopa Prabhu <roopa@nvidia.com>, Nikolay Aleksandrov
- <razor@blackwall.org>, Simon Horman <horms@kernel.org>,
- <linux-kernel@vger.kernel.org>, <bridge@lists.linux.dev>
-Subject: Re: [Patch v3 net-next 0/3] Add support for mdb offload failure
- notification
-Message-ID: <20250407102941.4331a41e@kernel.org>
-In-Reply-To: <20250404212940.1837879-1-Joseph.Huang@garmin.com>
-References: <20250404212940.1837879-1-Joseph.Huang@garmin.com>
+	s=arc-20240116; t=1744047056; c=relaxed/simple;
+	bh=wnUA7OCiDXFrjQ7bMpg3N+TPEOBGeBxBjWaKqp+LSu8=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KtHkJlHA9F6ZkuOSTT08s+yiCvfQIxW4khU7OYQphgaiSmqpVEya3jmG0kxcvTpAujcgTo4bO31M+xHvxbjDXDyQvpFDWm7FPUad/5UrmEk2VTg+OO+TEN9mEuOZMZTmEI7lIPN/vQGJ30+wC47OBJK8KZNbcxiUsVL5iVJxQf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=HG/bqvnK; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744047055; x=1775583055;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=mRKOQft2e0z8EF/8NpjO7vWzzUvKq2R+xjep8L7DnXQ=;
+  b=HG/bqvnKTmfi1R2bpGk74kbWoLWB2brqpOeeWdsTD7wmXn23Ta4Z3EM6
+   0n2/cvLN79LzczVYkTDKt9R379HE3PYhuEpVzhd+nCXwN2gLPeGXcYuNg
+   7HxOlLI8gcZ8gfKygGQb3IXFxKAAwMkMy3HJswZajxO1TRl8qloWet1ms
+   s=;
+X-IronPort-AV: E=Sophos;i="6.15,194,1739836800"; 
+   d="scan'208";a="481076549"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2025 17:30:50 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:30895]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.47.226:2525] with esmtp (Farcaster)
+ id 3f7e1099-9221-4c0b-bc80-36d24bd3665d; Mon, 7 Apr 2025 17:30:49 +0000 (UTC)
+X-Farcaster-Flow-ID: 3f7e1099-9221-4c0b-bc80-36d24bd3665d
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 7 Apr 2025 17:30:48 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.101.45) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 7 Apr 2025 17:30:45 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <i.abramov@mt-integration.ru>
+CC: <johannes@sipsolutions.net>, <linux-kernel@vger.kernel.org>,
+	<linux-wireless@vger.kernel.org>, <lvc-project@linuxtesting.org>,
+	<netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 0/3] Avoid calling WARN_ON() on allocation failure in cfg80211_switch_netns()
+Date: Mon, 7 Apr 2025 10:29:57 -0700
+Message-ID: <20250407173036.30549-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250407125345.1238818-1-i.abramov@mt-integration.ru>
+References: <20250407125345.1238818-1-i.abramov@mt-integration.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWC003.ant.amazon.com (10.13.139.214) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Fri, 4 Apr 2025 17:29:32 -0400 Joseph Huang wrote:
-> Currently the bridge does not provide real-time feedback to user space
-> on whether or not an attempt to offload an mdb entry was successful.
+From: Ivan Abramov <i.abramov@mt-integration.ru>
+Date: Mon, 7 Apr 2025 15:53:41 +0300
+> This series is inspired by similar series in ieee802154. As far as I know,
+> there were no WARN_ON triggers in this code so far, but since it's almost
+> identical to cfg802154_* counterparts, same changes are proposed.
 > 
-> This patch set adds support to notify user space about failed offload
-> attempts, and is controlled by a new knob mdb_offload_fail_notification.
+> Link to ieee802154 series: https://lore.kernel.org/netdev/20250403101935.991385-1-i.abramov@mt-integration.ru/T/
 > 
-> A break-down of the patches in the series:
+> v2: Add 2 patches. Also make sure to commit against latest
+> netdev/net.
 > 
-> Patch 1 adds offload failed flag to indicate that the offload attempt
-> has failed. The flag is reflected in netlink mdb entry flags.
-> 
-> Patch 2 adds the new bridge bool option mdb_offload_fail_notification.
-> 
-> Patch 3 notifies user space when the result is known, controlled by
-> mdb_offload_fail_notification setting.
+> Ivan Abramov (3):
+>   cfg80211: Restore initial state on failed device_rename() in
+>     cfg80211_switch_netns()
+>   cfg80211: Avoid calling WARN_ON() on -ENOMEM in
+>     cfg80211_switch_netns()
+>   cfg80211: Remove WARN_ON() in cfg80211_pernet_exit()
 
-You submitted this during the merge window, when the net-next tree
-was closed. See: 
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
-Could you repost so that the series will be re-enqueued? 
-
-Thanks!
--- 
-pw-bot: defer
+Let's see how this thread goes first.
+https://lore.kernel.org/netdev/CANn89i+UQQ6GqhWisHQEL0ECNFoQqVrO+2Ee3oDzysdR7dh=Ag@mail.gmail.com/
 
