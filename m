@@ -1,482 +1,291 @@
-Return-Path: <netdev+bounces-179920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D490FA7EE4E
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 22:03:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29EBBA7EEAF
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 22:13:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B69B1894BA1
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 20:02:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49068166802
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 20:07:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2DF8223302;
-	Mon,  7 Apr 2025 19:59:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C983621ADC2;
+	Mon,  7 Apr 2025 20:07:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cVMTeiaW"
+	dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b="fxHhRMj+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADFC4230BE5
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 19:59:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744055970; cv=none; b=QKCLIabnPijyeD7N7WvqMfh4Ha2lXyUi+AuaCGGwDUDOcW6waw02amx06PyHrxQRqG8qdE+AGxJDNyPTAuay6IgSBvzOVSQlVLbs8HQlCyh9C0AnkhOypbMcJIDusJdbC9M9H7yDXpGjThic65dA0NUGAGF1cLaQMmnJJg8wU3w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744055970; c=relaxed/simple;
-	bh=IJJiTiufrBlO5nC2ia/xZN3g7wJxk91IVPvElnFO708=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=nrpdkmQMAspWt1fM7N/tFMEf3HMIAkoOFLrwfbaRdxDFz//mQ8Hyr1M2a3RCFz6ipsmErNCSGs0Uhr0i1UUvRyISGrK3tJJqBDBs68rz4RCuTsXrAQxszmVli3HyAc5ruWkJm3l0aFXE7Hyb89kz8UkRhoQ3VwdcQGkrDKft6tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cVMTeiaW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98640C4CEDD;
-	Mon,  7 Apr 2025 19:59:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744055970;
-	bh=IJJiTiufrBlO5nC2ia/xZN3g7wJxk91IVPvElnFO708=;
-	h=From:Date:Subject:To:Cc:From;
-	b=cVMTeiaWugrMINR7Zm9QDlGlm651K2BHvG7fbQ/FK6FjkkjBsY1f0qO9jf1uye2FE
-	 zirttmNrMrvOOztexIaInvZfWf1bVJAFrcjwasIIawHpKHiokfTKE7czsfnIdb69qc
-	 lp+HGLJi7A5YkGt7kKd0oNXYPCoKAd7gZp7nDoq84vo18oZ4HltK2RI5t9KOAGfV0h
-	 dVgpnVa4iXnlQs/gnGyNakl1kCVjkrYjeEGbFDaezYm40XYS3IZpY7pFZLRhwGuDFV
-	 qg9dUyc3aGe/UvmEPbo09g96E3CA1azn4UrWWpnWZL65woe+cUWsgYb7DjMKJg1ziU
-	 IP5oxfG2jndew==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Mon, 07 Apr 2025 21:59:04 +0200
-Subject: [PATCH net-next] net: airoha: Add matchall filter offload support
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8C52156C69;
+	Mon,  7 Apr 2025 20:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.147.86
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744056433; cv=fail; b=J028X0gTqa9CQeUy1GbpCHjUCeTANizJsCUtJbViCbKImjyi8NahTtBBbfVk+rZR98S/PyVcXvvODFC80VXZeoAGqLW0qSuk2/+mz3KLjtG1ZYu8qmtpvLG/uoZZxKVXR7Uin5rmSa20DL2aOdc3bzvHXkDclQEZnd+L9xO9xPM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744056433; c=relaxed/simple;
+	bh=W2yNVdDcHuQ+qNkyx4gXTIu8YhLVzed/lceIbZ3GmYA=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=kUdcbZwVGu61yHkTrZNkUQLbMg2I3ofD+6c1qpWpoNflsK+w3CFdykG1F1RpS+11z0gd4WjFLx5xJDeyubymYnNJFaMD1wM86dyIDUv3Mxe3sxGRGjsz7Bg7jlzcMWsiUy7shiILcuaHbv537Obz/syFQDbfJ1GkWyCyQ5KyuG4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com; spf=pass smtp.mailfrom=hpe.com; dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b=fxHhRMj+; arc=fail smtp.client-ip=148.163.147.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
+Received: from pps.filterd (m0134422.ppops.net [127.0.0.1])
+	by mx0b-002e3701.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 537I6fsV020751;
+	Mon, 7 Apr 2025 19:33:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pps0720; bh=SO
+	xX6DD1oephlAR+IpCVTe2cP7269Y33Koauo5j3mzs=; b=fxHhRMj+zShaaCb9ao
+	noHPBnpCWNy/g0J7s8uPcl8Qu8GM9VQvZGsuSwTziMAWdFTqCN6h+bT8A/5PL5Cu
+	ef97HFHc2wXKxuMASYzDcZEW+Gglq21itSYt4cROaiO1AqPqLgrw8De+g9yQsTBZ
+	dq/+SKsY+VSdFeII4qbqegrhvuBKbJVGR8bAhdLpOfMI5asL1W+GNANJX0wPEXEy
+	QsbHo6rGfQDUzOWZGlAQgCMad+NREdPU/ZKWKktpRKtaMXuYnnkdMFaVYzNW1rcb
+	sUEhraeUUnNTLYQdofdrQMPiLCU1tqMtqpxVObCiPFnHhKJ0+Dc69hje5Okf5b3a
+	Cl+A==
+Received: from p1lg14881.it.hpe.com ([16.230.97.202])
+	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 45twwkhunr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 07 Apr 2025 19:33:03 +0000 (GMT)
+Received: from p1wg14925.americas.hpqcorp.net (unknown [10.119.18.114])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by p1lg14881.it.hpe.com (Postfix) with ESMTPS id 2B20F808071;
+	Mon,  7 Apr 2025 19:32:44 +0000 (UTC)
+Received: from p1wg14927.americas.hpqcorp.net (10.119.18.117) by
+ p1wg14925.americas.hpqcorp.net (10.119.18.114) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 7 Apr 2025 07:32:43 -1200
+Received: from p1wg14925.americas.hpqcorp.net (10.119.18.114) by
+ p1wg14927.americas.hpqcorp.net (10.119.18.117) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 7 Apr 2025 07:32:39 -1200
+Received: from P1WG14918.americas.hpqcorp.net (16.230.19.121) by
+ p1wg14925.americas.hpqcorp.net (10.119.18.114) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11 via Frontend Transport; Mon, 7 Apr 2025 07:32:39 -1200
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (192.58.206.38)
+ by edge.it.hpe.com (16.230.19.121) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 7 Apr 2025 19:32:39 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Feg2g8xZKo4QdQK7czZEgQw60zdAnUQ35zcbOUDjtgk9zGktN1QzXLNuc5tU4h5obSyq1KmC62Jx4QZqE/vrMAik+rLsXSM9GIUeAGFHQADJG/aLl/dn5Ti7/l1IP+mtlALfGMzKqns3Zin3JxgYy6PQVx9xPJnGxl60MxaBRr7j9lmDPVvsrswjuOximchM0VTr2l5GA6eq3gTwbyuCK2KGxUpc/1zguIdvKCfmrwBJi0NpNtstYzu3FmCwPrlqf1JKws4PFRKDIix3CRlpIOjewF1eJRmS2z6cr92fch37bh1qGL2SLjbQ5i4QvLsMBninJZfpbmNBXLsLNrencA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SOxX6DD1oephlAR+IpCVTe2cP7269Y33Koauo5j3mzs=;
+ b=IkPB3HLabUgZr5DgCtxjRdvlZWIzxKs9ZpK8/qV85R52CHX9qbpiqwOEvTSY+ALq2SIFr3/sNF8RAOA0JMCYVO6HF2uwyeAOkdb3e07lsjyE+6vOUlHBRf0Voq9brfY5fza/vz/p1PNFHwZElgQ+CO5QXTlQaUbvvzT3CeprJ2zbFdK4CIgDCebh6Jx09ITYCH3eelAENUPwwhakuXpisD/obTpFB//+1GXxoaVa3jfUo0YI3+86CuDrHSxSi7m2UG2WqR6R3CzcR3FOvGqHVcJkUj7ugfxdDZi7UFIB9Nt9YbhIPAn5fsXnrss9F9U8A0venmxL92fLeC7N+3tN2Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
+ header.d=hpe.com; arc=none
+Received: from DM4PR84MB1447.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:8:4a::16) by
+ MW5PR84MB1690.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:303:1c1::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.33; Mon, 7 Apr
+ 2025 19:32:37 +0000
+Received: from DM4PR84MB1447.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::6781:5ecc:8646:f06b]) by DM4PR84MB1447.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::6781:5ecc:8646:f06b%3]) with mapi id 15.20.8606.029; Mon, 7 Apr 2025
+ 19:32:37 +0000
+Message-ID: <c1b9d002-85f5-420e-b452-d6f2a11720d4@hpe.com>
+Date: Mon, 7 Apr 2025 14:32:34 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 00/13] Ultra Ethernet driver introduction
+To: Sean Hefty <shefty@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>
+CC: Bernard Metzler <BMT@zurich.ibm.com>,
+        Roland Dreier
+	<roland@enfabrica.net>,
+        Nikolay Aleksandrov <nikolay@enfabrica.net>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "shrijeet@enfabrica.net"
+	<shrijeet@enfabrica.net>,
+        "alex.badea@keysight.com"
+	<alex.badea@keysight.com>,
+        "eric.davis@broadcom.com"
+	<eric.davis@broadcom.com>,
+        "rip.sohan@amd.com" <rip.sohan@amd.com>,
+        "dsahern@kernel.org" <dsahern@kernel.org>,
+        "winston.liu@keysight.com"
+	<winston.liu@keysight.com>,
+        "dan.mihailescu@keysight.com"
+	<dan.mihailescu@keysight.com>,
+        Kamal Heib <kheib@redhat.com>,
+        "parth.v.parikh@keysight.com" <parth.v.parikh@keysight.com>,
+        Dave Miller
+	<davem@redhat.com>,
+        "andrew.tauferner@cornelisnetworks.com"
+	<andrew.tauferner@cornelisnetworks.com>,
+        "welch@hpe.com" <welch@hpe.com>,
+        "rakhahari.bhunia@keysight.com" <rakhahari.bhunia@keysight.com>,
+        "kingshuk.mandal@keysight.com" <kingshuk.mandal@keysight.com>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "kuba@kernel.org"
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <BN8PR15MB25131FB51A63577B5795614399A72@BN8PR15MB2513.namprd15.prod.outlook.com>
+ <DM6PR12MB431329322A0C0CCB7D5F85E6BDA72@DM6PR12MB4313.namprd12.prod.outlook.com>
+ <Z+QTD7ihtQSYI0bl@nvidia.com>
+ <DM6PR12MB43137AE666F19784D2832030BDA62@DM6PR12MB4313.namprd12.prod.outlook.com>
+ <Z+Qi+XxYizfhr06P@nvidia.com>
+ <DM6PR12MB431345D07D958CF0B784AE0EBDA62@DM6PR12MB4313.namprd12.prod.outlook.com>
+ <Z+VSFRFG1gIbGsLQ@nvidia.com>
+ <DM6PR12MB431332A6407547B225849F88BDAD2@DM6PR12MB4313.namprd12.prod.outlook.com>
+ <20250401130413.GB291154@nvidia.com>
+ <DM6PR12MB43130D3131B760AF2A0C569ABDAC2@DM6PR12MB4313.namprd12.prod.outlook.com>
+ <20250401193920.GD325917@nvidia.com>
+ <56088224-14ce-4289-bd98-1c47d09c0f76@hpe.com>
+ <DM6PR12MB4313B2D54F3CA0F84336EB71BDA82@DM6PR12MB4313.namprd12.prod.outlook.com>
+Content-Language: en-US
+From: "Ziemba, Ian" <ian.ziemba@hpe.com>
+In-Reply-To: <DM6PR12MB4313B2D54F3CA0F84336EB71BDA82@DM6PR12MB4313.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH5P222CA0012.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:610:1ee::7) To DM4PR84MB1447.NAMPRD84.PROD.OUTLOOK.COM
+ (2603:10b6:8:4a::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250407-airoha-hw-rx-ratelimit-v1-1-917d092d56fd@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAIcu9GcC/x3MTQqAIBBA4avErBtQK6SuEi0kpxzojzFKiO6et
- PwW7z0QSZgidMUDQhdH3rcMXRYwBrfNhOyzwSjTqEq36Fj24DDcKAnFnbTwyidq72tlydrWNJD
- jQ2ji9I/74X0/IcNwM2gAAAA=
-X-Change-ID: 20250319-airoha-hw-rx-ratelimit-1dd407e77925
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR84MB1447:EE_|MW5PR84MB1690:EE_
+X-MS-Office365-Filtering-Correlation-Id: c4532f50-7350-4171-c1a5-08dd760af3cd
+X-LD-Processed: 105b2061-b669-4b31-92ac-24d304d195dc,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?Y0xZKys0ZXUrUEx6SUNPUjlpT2ZPUVhyTlQwYUhDWHNuaFAvbndSNjlnNzUr?=
+ =?utf-8?B?bjdtWFFaQ3gzOEd1eW9iUHhMdlhuZjNTL3FlVVdCYm5nQm44TTVwM1hUdW1G?=
+ =?utf-8?B?M3dYQitHUXJ2eUN6cEhmamM0MTJWdGNOL2hMVmdwYjVIbG9xcm40RXdPL2dX?=
+ =?utf-8?B?NXNEd1daTlh3VEwyZUZTeEs3RzFkampkK1M4VDMvOTVKczRKVnNydjFUak1Y?=
+ =?utf-8?B?L0wwUEErazMrM056UXZKV2E0Zk9iRzhEV0pkMDc4alBhZitQdWlPZjFVcWRJ?=
+ =?utf-8?B?SEdPYmNyVnFxeFRHN2RDRDQ3WDJ2R1Z4QjV6ZU1SYnJ4QVdLblZ0dG1LMktx?=
+ =?utf-8?B?RXhMcmR5ZjU3YWVqWDRkYkJLRDBPM1FaMVQ1V0E2RUdhN2ZTcHh3bStqaFhl?=
+ =?utf-8?B?UVZ5bU9vNW1qV25qV2ZHSDc1RVRrR1VUZ2RKRTB0L0xNNlV0TlBlVTh3QWsw?=
+ =?utf-8?B?aWpGdXpOMHpCYVNNd1d2Y0ZyazdwT0ZZRk1HMHZHY205Q3hENW4rT2RiQk0x?=
+ =?utf-8?B?Tzc1a3pnVXBJK0tIcHVaUWV6bzFPcml4QnI4OUNYckxLRVlsVHA0bTN1cUNY?=
+ =?utf-8?B?RTA1bEtqMlp2VXhDeWJhdkliT3Q1TVB6cDNMVXUzc3E4dkJsVGlHSk0rbVlx?=
+ =?utf-8?B?QlpBem1NSWpQRE10bnQ3VjRBUlZUZjBZcitzUTlmMWhKbHBkT0wzamJZSnda?=
+ =?utf-8?B?ZzQxdXRKV2VNY2Q0dzZ2NlZ4TGVTRUtUU0hhc2V1d1Q4a0lUaHVVbUwzR1Fy?=
+ =?utf-8?B?Y3Z5dElLRm1BUVAzRVdNTnp4bk9zd2dFNnMzNjNWZUcvWHNYK294eUh2N1RC?=
+ =?utf-8?B?UmJzVnl3a0FtOTJxMyswN0tlSDJwNXl3eVFXbXlwWG40QUc1eFo1dUd2ZU5p?=
+ =?utf-8?B?cVVpNGV1VCtjdWF2b3kzTGx2dzVrcFN3bFdvK2lVSGZieGFMMllJSkZDZW0v?=
+ =?utf-8?B?eUFwWVo4Ukg1R2hFUEtyNEtMYU9LZWs5TkZTc2RocWtVUVRXNGRBeTV5dDhs?=
+ =?utf-8?B?RlptRldLYlIzd0NwZlVqQ2F2bkcvNjMyZ0N6UlRGa3JONTVxc045azc1YmlQ?=
+ =?utf-8?B?cjZuY0kvTThGSjVlUXNuR2FnZGIwNW1EdmxEemJ3dzE3blEyZ1g5QVhCMUd0?=
+ =?utf-8?B?L0NkSjh4UklaaXp6SzlIWElqNjZQelFBYm9CN2tPdnU3dmZnV3M5RkJDY2V3?=
+ =?utf-8?B?Y0pjbGVJdjZYUzJQcEdZV2xXenhqcVMvdUNKd1g0d29wbFRDZlh4KzFvd1JF?=
+ =?utf-8?B?M2VLSmFrRVA1SnpwNDM5NUZoZFd2N3lWWGJzc1NhSU1wc0NacVltaTVJWUYy?=
+ =?utf-8?B?dXZlc210UjFWVi9YeXEyTEx4ZXNnMnhrNUZKSVB2aGQxVXN3TVVOd1FDamhm?=
+ =?utf-8?B?WkJjekozQTdQV0E5a2ZGY1Z0dDlQVWUzb3lSQkE3SXMwQ3BWOUVLQ24zenVk?=
+ =?utf-8?B?Tit5cll5Z3BOSE1sYWxlQnora0RpRm5FNkVWTlFGY2JiWXg1WkY3VERmUEsr?=
+ =?utf-8?B?a1BiTmdvNjc1ZFlwV0YrMmwrV3NXZVpiN2JVemJXV3B3ODZaQkNKb3VJSVpE?=
+ =?utf-8?B?dWltZlU0YXhMQ3FoRzNVNjEwOFcvRVFCMmV0N0JYRmVSdWl3b001SStkUmJT?=
+ =?utf-8?B?eWZxU3BqZWJ0U2phMFY0dkIya2wxMml1K0E0ZlFXN0x1Y1Zlc3IzV3h6SS9x?=
+ =?utf-8?B?TEtOelVia1hZSFlCVGQ3NUIwUGpsTHRnd0NEN1pUMk5GOWRRekpzMlRlWC9h?=
+ =?utf-8?B?NmEwZ0dSTUl1QlZoU25ZekNoMHFyNWk1RmNFQkJIbWo5cldCaEZzTzcxdXBH?=
+ =?utf-8?B?L1JiMUJ1aHhhTnoxVmlXTHhTdGtpQmhzL0pqRkszRVF6cngxdTFobkhmTUlt?=
+ =?utf-8?Q?A4AZ1LU7hGUaT?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR84MB1447.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SmoyRjMvc1pNS0NzallHaThValJVS1hGRitBRktSbW8yN1RBaExxaHo4R2dt?=
+ =?utf-8?B?OXkwbW9JQjZ6VUU2ME8rTlhGdUIyZzNZUk1GRlpEdDhGSWUrZitHa2FSbCtt?=
+ =?utf-8?B?eHlmN0tGUFk2MFIrNlZZajM0NnFXVFAzU05NbmxMcW5DK3ZRcmhYZTI0UDEv?=
+ =?utf-8?B?YTJLVWUzUHlSS3VTaTJ4R29iMUlLaDhraGErN0xZMmJlbGhyTDZFZHd6K1M3?=
+ =?utf-8?B?enpVMGt2N01KcXlSQUoxZWwzVVh4Q0thQnJlcXA1ZzJpTEg1VWNRSGhJeDln?=
+ =?utf-8?B?THN4TmhzY1pSaiswOTlVa3Y4QW1kbDNXU0JoSUl0azdqb3Q3L0JwMDc0Smdl?=
+ =?utf-8?B?cGRLdUI3dnF2Wkx0dFpuZFljWUYvY0lpNTNaelFVWFAzc3pEYjFnT3FsUUN3?=
+ =?utf-8?B?YmpJK1pxRUdablZWS1JXS08zVEx6ZGR6WkdBSFoxVTFjTkwvUDB4dGFCVTdy?=
+ =?utf-8?B?UUlyMEoycnZSNDVJZTdNbE02U1JZOXRGS3liVzRNQ2l4aERNanNINW9BMjA0?=
+ =?utf-8?B?UTlvd3ZUWG1kODYwU0dHdUdOb2hBc0UrbTlXWktXV0FZeXBjMXBYRExtWXp0?=
+ =?utf-8?B?cXJIUFY4cHpKbmtKM1JWOSsvQjBNTUkwakZWSUFkZ01HVWdKNURLQm5LQVNh?=
+ =?utf-8?B?QVFkK0xidTlkY0lUczNwVlMrRjgrcWQ3S2dxRjBhcStEeWx0WE9EZFdvV3lu?=
+ =?utf-8?B?bnJpZVcxdFF0YS96U2tIZUN0QnlKdE9EV1NRNkFWNkhtOGhtRU5CdHI0WHMx?=
+ =?utf-8?B?UlREV0kzWjZ0Wm5LaGl1YXpObHBiRmlVZU9YR0VmdzcxZnVQdUtMbUpGdTBF?=
+ =?utf-8?B?UlA2L1hOTG5NVTRlbndFbXdXUnhhd2ZrMDJpTStKSkQyQWdHSGUzcnZLRVJL?=
+ =?utf-8?B?eUlGYkJ1NittY3kwMXBFYTNBQ3Nld1FBYnRacFdPZnZLQUk0VC9lQ1hSKy9G?=
+ =?utf-8?B?VkoxSzRMNmQ5T2lITVJta3pud1EyK3Q0d0NDTkJxM2pXZ2VkVkIxMWNaZ3Q1?=
+ =?utf-8?B?SU9sK3hwOEhWQ0RNWUVsOFQyWW01Y2d6RDFpV3VMKzJrQ0I2U1NlRkwxNEwx?=
+ =?utf-8?B?cXBJNWljWE5EVmhTUW9ONXNJYnNFK1RlV2dWWFVBUHc0Y1NrUTExNnc0L3Mz?=
+ =?utf-8?B?d3FyelpFMlBwL3ErOW9yR1FXT3pEUCtOUTNnRkNvOENhN0dnMDAvclNWTzlx?=
+ =?utf-8?B?Nm9ScUg2NXl1WDVuemxnekplUThnUXo1SUtWUFhUL3lBb0swdHNHT0RrMk1O?=
+ =?utf-8?B?L2hWVHdZNHNGSmdHc29vWW5ZdUlxQzBMVEw0dWhEY3Z4S0E4L1lubGl5NG1P?=
+ =?utf-8?B?Uy9nOEY5U3h5M3hMNmpicm9NN0hUQUNoRzZRcGxLSmZveXdCMDdNU3lDZWl6?=
+ =?utf-8?B?bi9pV1BGeWM1Uzc4WUM4bEtGcC9IKzZmNkFuL1BpWHpKK01XR2YrQ2F4eXFV?=
+ =?utf-8?B?Y0N1VWdzRlN2NzdhUnpVNlM3bmNOVGJDT1pVK0dLNVl4dzExOHNwYURxL0ly?=
+ =?utf-8?B?SE10SzFwZlpLOUVVVE90MFhoR0RnMmpFUktPTi94bFhpeXlrb0x6UkNaU0hN?=
+ =?utf-8?B?Z2pqLzlsRlREZjVSN1h0NGtEY1k4RytKbWszTWhHNFJrT3JqdHBFTXNncy9o?=
+ =?utf-8?B?QzNrVVh0UWM4V3dyK1VTOU5qMW8zWTVubVFwUVdWbXJPamVoZ2k3TG1iYWdN?=
+ =?utf-8?B?Wmg1dnpvNUNpd1VZWG5iT1RkUFZyaTdldGJicEVHQ2dqQmxMVlRQdUJUMWJl?=
+ =?utf-8?B?dHg5SmV5TWlqeEJCQ0hUaER3UzhiRExaL2lpZ3ZQNmZWcTh2bERiUXVKV1Fh?=
+ =?utf-8?B?K0E4NStqb25lMVF4ZHp1NkI2aE1RT05hbVl0RXM1STdReFhvWU5hVklrT0x1?=
+ =?utf-8?B?WW9TcVorczF3ajRRYVJIeTVFUHRLdDgwNDJENjNSbzZhaWhsOWRralhRNWVE?=
+ =?utf-8?B?WG4xK1Z6OHVERUFkRzZyTWhlTGIrdzdSS3A4YU5XMFBkakRnTkpZTzg1TEFK?=
+ =?utf-8?B?dEIvVVhlYU55Umo3UEhhTExDZHFLeXpVWkN5TUgzZmdybmdsOTZNWVU0V2hV?=
+ =?utf-8?B?VlN3VERZZGVUVzFIZ01vWjVUVUJhdmdRWmFCNUlrSjlDQXRhMXlXODN2Sldl?=
+ =?utf-8?Q?0I2xdIphy5Y6/Dopm/qp3S9I8?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: c4532f50-7350-4171-c1a5-08dd760af3cd
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR84MB1447.NAMPRD84.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2025 19:32:37.0503
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 105b2061-b669-4b31-92ac-24d304d195dc
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: eyRD/1HC/kZrpqTeepgrvsTRIGBocA1U3TQ3I8hfriRUcrnuKD3/AJ47fGFe0nXMaVYbARufD4/QtskCWcthSw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR84MB1690
+X-OriginatorOrg: hpe.com
+X-Proofpoint-ORIG-GUID: o6aAPPKEQvmvDVpTPOr40meuaQU96KJr
+X-Proofpoint-GUID: o6aAPPKEQvmvDVpTPOr40meuaQU96KJr
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-07_05,2025-04-07_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
+ suspectscore=0 spamscore=0 clxscore=1015 priorityscore=1501 bulkscore=0
+ phishscore=0 mlxlogscore=706 mlxscore=0 malwarescore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
+ definitions=main-2504070137
 
-Introduce tc matchall filter offload support in airoha_eth driver.
-Matchall hw filter is used to implement hw rate policing via tc action
-police:
+> There's also the MR relationship:
+> 
+> Job <- 1 --- 0..n -> MR <- 0..n --- 1 -> PD
 
-$tc qdisc add dev eth0 handle ffff: ingress
-$tc filter add dev eth0 parent ffff: matchall action police \
- rate 100mbit burst 1000k drop
+Current UE memory registration is centered around the libfabric
+FI_MR_ENDPOINT mode which states memory regions are associated with an
+endpoint instead of libfabric domain. For remotely accessible UE MRs,
+this translates to the following.
 
-Curennet implementation supports just drop/accept as exceed/notexceed
-actions. Moreover, rate and burst are the only supported configuration
-parameters.
+- Relative Addressing: {job ID, endpoint, RKEY} identifies the MR.
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/airoha/airoha_eth.c  | 275 +++++++++++++++++++++++++++++-
- drivers/net/ethernet/airoha/airoha_eth.h  |   8 +-
- drivers/net/ethernet/airoha/airoha_ppe.c  |   9 +-
- drivers/net/ethernet/airoha/airoha_regs.h |   7 +
- 4 files changed, 288 insertions(+), 11 deletions(-)
+- Absolute Addressing: {endpoint, RKEY} identifies the MR with optional
+  MR job-ID access control check.
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index d748dc6de92367365db9f9548f9af52a7fdac187..1839e44a241ad37c1588c0d040649d93d0fac733 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -527,6 +527,27 @@ static int airoha_fe_init(struct airoha_eth *eth)
- 	/* disable IFC by default */
- 	airoha_fe_clear(eth, REG_FE_CSR_IFC_CFG, FE_IFC_EN_MASK);
- 
-+	airoha_fe_wr(eth, REG_PPE_DFT_CPORT0(0),
-+		     FIELD_PREP(DFT_CPORT_MASK(7), FE_PSE_PORT_CDM1) |
-+		     FIELD_PREP(DFT_CPORT_MASK(6), FE_PSE_PORT_CDM1) |
-+		     FIELD_PREP(DFT_CPORT_MASK(5), FE_PSE_PORT_CDM1) |
-+		     FIELD_PREP(DFT_CPORT_MASK(4), FE_PSE_PORT_CDM1) |
-+		     FIELD_PREP(DFT_CPORT_MASK(4), FE_PSE_PORT_CDM1) |
-+		     FIELD_PREP(DFT_CPORT_MASK(3), FE_PSE_PORT_CDM1) |
-+		     FIELD_PREP(DFT_CPORT_MASK(2), FE_PSE_PORT_CDM1) |
-+		     FIELD_PREP(DFT_CPORT_MASK(1), FE_PSE_PORT_CDM1) |
-+		     FIELD_PREP(DFT_CPORT_MASK(0), FE_PSE_PORT_CDM1));
-+	airoha_fe_wr(eth, REG_PPE_DFT_CPORT0(1),
-+		     FIELD_PREP(DFT_CPORT_MASK(7), FE_PSE_PORT_CDM2) |
-+		     FIELD_PREP(DFT_CPORT_MASK(6), FE_PSE_PORT_CDM2) |
-+		     FIELD_PREP(DFT_CPORT_MASK(5), FE_PSE_PORT_CDM2) |
-+		     FIELD_PREP(DFT_CPORT_MASK(4), FE_PSE_PORT_CDM2) |
-+		     FIELD_PREP(DFT_CPORT_MASK(4), FE_PSE_PORT_CDM2) |
-+		     FIELD_PREP(DFT_CPORT_MASK(3), FE_PSE_PORT_CDM2) |
-+		     FIELD_PREP(DFT_CPORT_MASK(2), FE_PSE_PORT_CDM2) |
-+		     FIELD_PREP(DFT_CPORT_MASK(1), FE_PSE_PORT_CDM2) |
-+		     FIELD_PREP(DFT_CPORT_MASK(0), FE_PSE_PORT_CDM2));
-+
- 	/* enable 1:N vlan action, init vlan table */
- 	airoha_fe_set(eth, REG_MC_VLAN_EN, MC_VLAN_EN_MASK);
- 
-@@ -1631,7 +1652,6 @@ static void airhoha_set_gdm2_loopback(struct airoha_gdm_port *port)
- 
- 	if (port->id == 3) {
- 		/* FIXME: handle XSI_PCE1_PORT */
--		airoha_fe_wr(eth, REG_PPE_DFT_CPORT0(0),  0x5500);
- 		airoha_fe_rmw(eth, REG_FE_WAN_PORT,
- 			      WAN1_EN_MASK | WAN1_MASK | WAN0_MASK,
- 			      FIELD_PREP(WAN0_MASK, HSGMII_LAN_PCIE0_SRCPORT));
-@@ -2109,6 +2129,125 @@ static int airoha_tc_setup_qdisc_ets(struct airoha_gdm_port *port,
- 	}
- }
- 
-+static int airoha_qdma_get_rl_param(struct airoha_qdma *qdma, int queue_id,
-+				    u32 addr, enum trtcm_param_type param,
-+				    u32 *val_low, u32 *val_high)
-+{
-+	u32 idx = QDMA_METER_IDX(queue_id), group = QDMA_METER_GROUP(queue_id);
-+	u32 val, config = FIELD_PREP(RATE_LIMIT_PARAM_TYPE_MASK, param) |
-+			  FIELD_PREP(RATE_LIMIT_METER_GROUP_MASK, group) |
-+			  FIELD_PREP(RATE_LIMIT_PARAM_INDEX_MASK, idx);
-+
-+	airoha_qdma_wr(qdma, REG_TRTCM_CFG_PARAM(addr), config);
-+	if (read_poll_timeout(airoha_qdma_rr, val,
-+			      val & RATE_LIMIT_PARAM_RW_DONE_MASK,
-+			      USEC_PER_MSEC, 10 * USEC_PER_MSEC, true, qdma,
-+			      REG_TRTCM_CFG_PARAM(addr)))
-+		return -ETIMEDOUT;
-+
-+	*val_low = airoha_qdma_rr(qdma, REG_TRTCM_DATA_LOW(addr));
-+	if (val_high)
-+		*val_high = airoha_qdma_rr(qdma, REG_TRTCM_DATA_HIGH(addr));
-+
-+	return 0;
-+}
-+
-+static int airoha_qdma_set_rl_param(struct airoha_qdma *qdma, int queue_id,
-+				    u32 addr, enum trtcm_param_type param,
-+				    u32 val)
-+{
-+	u32 idx = QDMA_METER_IDX(queue_id), group = QDMA_METER_GROUP(queue_id);
-+	u32 config = RATE_LIMIT_PARAM_RW_MASK |
-+		     FIELD_PREP(RATE_LIMIT_PARAM_TYPE_MASK, param) |
-+		     FIELD_PREP(RATE_LIMIT_METER_GROUP_MASK, group) |
-+		     FIELD_PREP(RATE_LIMIT_PARAM_INDEX_MASK, idx);
-+
-+	airoha_qdma_wr(qdma, REG_TRTCM_DATA_LOW(addr), val);
-+	airoha_qdma_wr(qdma, REG_TRTCM_CFG_PARAM(addr), config);
-+
-+	return read_poll_timeout(airoha_qdma_rr, val,
-+				 val & RATE_LIMIT_PARAM_RW_DONE_MASK,
-+				 USEC_PER_MSEC, 10 * USEC_PER_MSEC, true,
-+				 qdma, REG_TRTCM_CFG_PARAM(addr));
-+}
-+
-+static int airoha_qdma_set_rl_config(struct airoha_qdma *qdma, int queue_id,
-+				     u32 addr, bool enable, u32 enable_mask)
-+{
-+	u32 val;
-+	int err;
-+
-+	err = airoha_qdma_get_rl_param(qdma, queue_id, addr, TRTCM_MISC_MODE,
-+				       &val, NULL);
-+	if (err)
-+		return err;
-+
-+	val = enable ? val | enable_mask : val & ~enable_mask;
-+
-+	return airoha_qdma_set_rl_param(qdma, queue_id, addr, TRTCM_MISC_MODE,
-+					val);
-+}
-+
-+static int airoha_qdma_set_rl_token_bucket(struct airoha_qdma *qdma,
-+					   int queue_id, u32 rate_val,
-+					   u32 bucket_size)
-+{
-+	u32 val, config, tick, unit, rate, rate_frac;
-+	int err;
-+
-+	err = airoha_qdma_get_rl_param(qdma, queue_id, REG_INGRESS_TRTCM_CFG,
-+				       TRTCM_MISC_MODE, &config, NULL);
-+	if (err)
-+		return err;
-+
-+	val = airoha_qdma_rr(qdma, REG_INGRESS_TRTCM_CFG);
-+	tick = FIELD_GET(INGRESS_FAST_TICK_MASK, val);
-+	if (config & TRTCM_TICK_SEL)
-+		tick *= FIELD_GET(INGRESS_SLOW_TICK_RATIO_MASK, val);
-+	if (!tick)
-+		return -EINVAL;
-+
-+	unit = (config & TRTCM_PKT_MODE) ? 1000000 / tick : 8000 / tick;
-+	if (!unit)
-+		return -EINVAL;
-+
-+	rate = rate_val / unit;
-+	rate_frac = rate_val % unit;
-+	rate_frac = FIELD_PREP(TRTCM_TOKEN_RATE_MASK, rate_frac) / unit;
-+	rate = FIELD_PREP(TRTCM_TOKEN_RATE_MASK, rate) |
-+	       FIELD_PREP(TRTCM_TOKEN_RATE_FRACTION_MASK, rate_frac);
-+
-+	err = airoha_qdma_set_rl_param(qdma, queue_id, REG_INGRESS_TRTCM_CFG,
-+				       TRTCM_TOKEN_RATE_MODE, rate);
-+	if (err)
-+		return err;
-+
-+	val = bucket_size;
-+	if (!(config & TRTCM_PKT_MODE))
-+		val = max_t(u32, val, MIN_TOKEN_SIZE);
-+	val = min_t(u32, __fls(val), MAX_TOKEN_SIZE_OFFSET);
-+
-+	return airoha_qdma_set_rl_param(qdma, queue_id, REG_INGRESS_TRTCM_CFG,
-+					TRTCM_BUCKETSIZE_SHIFT_MODE, val);
-+}
-+
-+static int airoha_qdma_init_rl_config(struct airoha_qdma *qdma, int queue_id,
-+				      bool enable, enum trtcm_unit_type unit)
-+{
-+	bool tick_sel = queue_id == 0 || queue_id == 2 || queue_id == 8;
-+	enum trtcm_param mode = TRTCM_METER_MODE;
-+	int err;
-+
-+	mode |= unit == TRTCM_PACKET_UNIT ? TRTCM_PKT_MODE : 0;
-+	err = airoha_qdma_set_rl_config(qdma, queue_id, REG_INGRESS_TRTCM_CFG,
-+					enable, mode);
-+	if (err)
-+		return err;
-+
-+	return airoha_qdma_set_rl_config(qdma, queue_id, REG_INGRESS_TRTCM_CFG,
-+					 tick_sel, TRTCM_TICK_SEL);
-+}
-+
- static int airoha_qdma_get_trtcm_param(struct airoha_qdma *qdma, int channel,
- 				       u32 addr, enum trtcm_param_type param,
- 				       enum trtcm_mode_type mode,
-@@ -2273,10 +2412,142 @@ static int airoha_tc_htb_alloc_leaf_queue(struct airoha_gdm_port *port,
- 	return 0;
- }
- 
-+static int airoha_qdma_set_rx_meter(struct airoha_gdm_port *port,
-+				    u32 rate, u32 bucket_size,
-+				    enum trtcm_unit_type unit_type)
-+{
-+	struct airoha_qdma *qdma = port->qdma;
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(qdma->q_rx); i++) {
-+		int err;
-+
-+		if (!qdma->q_rx[i].ndesc)
-+			continue;
-+
-+		err = airoha_qdma_init_rl_config(qdma, i, !!rate, unit_type);
-+		if (err)
-+			return err;
-+
-+		err = airoha_qdma_set_rl_token_bucket(qdma, i, rate,
-+						      bucket_size);
-+		if (err)
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static int airoha_tc_matchall_act_validate(struct tc_cls_matchall_offload *f)
-+{
-+	const struct flow_action *actions = &f->rule->action;
-+	const struct flow_action_entry *act;
-+
-+	if (!flow_action_has_entries(actions)) {
-+		NL_SET_ERR_MSG_MOD(f->common.extack,
-+				   "filter run with no actions");
-+		return -EINVAL;
-+	}
-+
-+	if (!flow_offload_has_one_action(actions)) {
-+		NL_SET_ERR_MSG_MOD(f->common.extack,
-+				   "only once action per filter is supported");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	act = &actions->entries[0];
-+	if (act->id != FLOW_ACTION_POLICE) {
-+		NL_SET_ERR_MSG_MOD(f->common.extack, "unsupported action");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (act->police.exceed.act_id != FLOW_ACTION_DROP) {
-+		NL_SET_ERR_MSG_MOD(f->common.extack,
-+				   "invalid exceed action id");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (act->police.notexceed.act_id != FLOW_ACTION_ACCEPT) {
-+		NL_SET_ERR_MSG_MOD(f->common.extack,
-+				   "invalid notexceed action id");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (act->police.notexceed.act_id == FLOW_ACTION_ACCEPT &&
-+	    !flow_action_is_last_entry(actions, act)) {
-+		NL_SET_ERR_MSG_MOD(f->common.extack,
-+				   "action accept must be last");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (act->police.peakrate_bytes_ps || act->police.avrate ||
-+	    act->police.overhead) {
-+		NL_SET_ERR_MSG_MOD(f->common.extack,
-+				   "peakrate/avrate/overhead not supported");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return 0;
-+}
-+
-+static int airoha_dev_tc_matchall(struct net_device *dev,
-+				  struct tc_cls_matchall_offload *f)
-+{
-+	enum trtcm_unit_type unit_type = TRTCM_BYTE_UNIT;
-+	struct airoha_gdm_port *port = netdev_priv(dev);
-+	u32 rate = 0, bucket_size = 0;
-+
-+	switch (f->command) {
-+	case TC_CLSMATCHALL_REPLACE: {
-+		const struct flow_action_entry *act;
-+		int err;
-+
-+		err = airoha_tc_matchall_act_validate(f);
-+		if (err)
-+			return err;
-+
-+		act = &f->rule->action.entries[0];
-+		if (act->police.rate_pkt_ps) {
-+			rate = act->police.rate_pkt_ps;
-+			bucket_size = act->police.burst_pkt;
-+			unit_type = TRTCM_PACKET_UNIT;
-+		} else {
-+			rate = div_u64(act->police.rate_bytes_ps, 1000);
-+			rate = rate << 3; /* Kbps */
-+			bucket_size = act->police.burst;
-+		}
-+		fallthrough;
-+	}
-+	case TC_CLSMATCHALL_DESTROY:
-+		return airoha_qdma_set_rx_meter(port, rate, bucket_size,
-+						unit_type);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
-+static int airoha_dev_setup_tc_block_cb(enum tc_setup_type type,
-+					void *type_data, void *cb_priv)
-+{
-+	struct net_device *dev = cb_priv;
-+
-+	if (!tc_can_offload(dev))
-+		return -EOPNOTSUPP;
-+
-+	switch (type) {
-+	case TC_SETUP_CLSFLOWER:
-+		return airoha_ppe_setup_tc_block_cb(dev, type_data);
-+	case TC_SETUP_CLSMATCHALL:
-+		return airoha_dev_tc_matchall(dev, type_data);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
- static int airoha_dev_setup_tc_block(struct airoha_gdm_port *port,
- 				     struct flow_block_offload *f)
- {
--	flow_setup_cb_t *cb = airoha_ppe_setup_tc_block_cb;
-+	flow_setup_cb_t *cb = airoha_dev_setup_tc_block_cb;
- 	static LIST_HEAD(block_cb_list);
- 	struct flow_block_cb *block_cb;
- 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-index ec8908f904c61988c3dc973e187596c49af139fb..31ebb46be454c26ec789ed692a2f968c6c1ace03 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.h
-+++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -127,6 +127,11 @@ enum tx_sched_mode {
- 	TC_SCH_WRR2,
- };
- 
-+enum trtcm_unit_type {
-+	TRTCM_BYTE_UNIT,
-+	TRTCM_PACKET_UNIT,
-+};
-+
- enum trtcm_param_type {
- 	TRTCM_MISC_MODE, /* meter_en, pps_mode, tick_sel */
- 	TRTCM_TOKEN_RATE_MODE,
-@@ -536,8 +541,7 @@ bool airoha_is_valid_gdm_port(struct airoha_eth *eth,
- 			      struct airoha_gdm_port *port);
- 
- void airoha_ppe_check_skb(struct airoha_ppe *ppe, u16 hash);
--int airoha_ppe_setup_tc_block_cb(enum tc_setup_type type, void *type_data,
--				 void *cb_priv);
-+int airoha_ppe_setup_tc_block_cb(struct net_device *dev, void *type_data);
- int airoha_ppe_init(struct airoha_eth *eth);
- void airoha_ppe_deinit(struct airoha_eth *eth);
- struct airoha_foe_entry *airoha_ppe_foe_get_entry(struct airoha_ppe *ppe,
-diff --git a/drivers/net/ethernet/airoha/airoha_ppe.c b/drivers/net/ethernet/airoha/airoha_ppe.c
-index f10dab935cab6fad747fdfaa70b67903904c1703..3b14ad1c126ab11ee103de6448c3640244cf7f7f 100644
---- a/drivers/net/ethernet/airoha/airoha_ppe.c
-+++ b/drivers/net/ethernet/airoha/airoha_ppe.c
-@@ -822,18 +822,13 @@ static int airoha_ppe_offload_setup(struct airoha_eth *eth)
- 	return err;
- }
- 
--int airoha_ppe_setup_tc_block_cb(enum tc_setup_type type, void *type_data,
--				 void *cb_priv)
-+int airoha_ppe_setup_tc_block_cb(struct net_device *dev, void *type_data)
- {
--	struct flow_cls_offload *cls = type_data;
--	struct net_device *dev = cb_priv;
- 	struct airoha_gdm_port *port = netdev_priv(dev);
-+	struct flow_cls_offload *cls = type_data;
- 	struct airoha_eth *eth = port->qdma->eth;
- 	int err = 0;
- 
--	if (!tc_can_offload(dev) || type != TC_SETUP_CLSFLOWER)
--		return -EOPNOTSUPP;
--
- 	mutex_lock(&flow_offload_mutex);
- 
- 	if (!eth->npu)
-diff --git a/drivers/net/ethernet/airoha/airoha_regs.h b/drivers/net/ethernet/airoha/airoha_regs.h
-index 8146cde4e8ba370e79b9b1bd87bb66a2caf7649a..29c8f046b9910c371ab4edc34b01f58d7383ae8d 100644
---- a/drivers/net/ethernet/airoha/airoha_regs.h
-+++ b/drivers/net/ethernet/airoha/airoha_regs.h
-@@ -283,6 +283,7 @@
- #define PPE_HASH_SEED				0x12345678
- 
- #define REG_PPE_DFT_CPORT0(_n)			(((_n) ? PPE2_BASE : PPE1_BASE) + 0x248)
-+#define DFT_CPORT_MASK(_n)			GENMASK(3 + ((_n) << 2), ((_n) << 2))
- 
- #define REG_PPE_DFT_CPORT1(_n)			(((_n) ? PPE2_BASE : PPE1_BASE) + 0x24c)
- 
-@@ -691,6 +692,12 @@
- #define REG_TRTCM_DATA_LOW(_n)		((_n) + 0x8)
- #define REG_TRTCM_DATA_HIGH(_n)		((_n) + 0xc)
- 
-+#define RATE_LIMIT_PARAM_RW_MASK	BIT(31)
-+#define RATE_LIMIT_PARAM_RW_DONE_MASK	BIT(30)
-+#define RATE_LIMIT_PARAM_TYPE_MASK	GENMASK(29, 28)
-+#define RATE_LIMIT_METER_GROUP_MASK	GENMASK(27, 26)
-+#define RATE_LIMIT_PARAM_INDEX_MASK	GENMASK(23, 16)
-+
- #define REG_TXWRR_MODE_CFG		0x1020
- #define TWRR_WEIGHT_SCALE_MASK		BIT(31)
- #define TWRR_WEIGHT_BASE_MASK		BIT(3)
+In addition, UE memory registration supports user-defined RKEYs. This
+enables programming model implementations the optimization to use
+well-known per process endpoint RKEYs. For relative addressing, this
+could result in the same RKEY value existing multiple times at the
+{job ID} level, but only once at the {job ID, endpoint} level.
 
----
-base-commit: 61f96e684edd28ca40555ec49ea1555df31ba619
-change-id: 20250319-airoha-hw-rx-ratelimit-1dd407e77925
+The UE remote MR relationship would look like:
 
-Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+Job <- 1 --- 0..n -> EP <- 0..n ---------------------- 1 -> PD
+                      ^                                      ^
+                      |--- 1 --- 0..n -> MR <- 0..n --- 1 ---|
 
+> There's discussion on defining this relationship:
+> 
+> Job <- 0..n --- 1 -> PD
+> 
+> I can't think of a technical reason why that's needed.
+
+From my UE perspective, I agree. UE needs to share job IDs across
+processes while still having inter-process isolation for things like
+local memory registrations.
+
+Thanks,
+
+Ian
 
