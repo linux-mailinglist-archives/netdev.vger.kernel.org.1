@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-179945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2336BA7EF79
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 22:57:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B244A7EF83
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 23:03:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04CC7169475
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 20:57:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 809331791C3
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 21:03:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66FB122331C;
-	Mon,  7 Apr 2025 20:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D5D4221DB0;
+	Mon,  7 Apr 2025 21:03:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="b9+0eRem"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Y/9GI/Ks"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896B521B9F7;
-	Mon,  7 Apr 2025 20:57:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00731EF0A1;
+	Mon,  7 Apr 2025 21:03:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744059462; cv=none; b=IsoiieLXfoj/wEUAvkXS/ivv28t6PvIzaZBVDIi9BC4fvekwdWu5ceWH9q91RuYqrZUA79lepCCQqVJO6Xowd+ioVv+qcl1IXL4TF+KYcmYruCDZ8VYY0CDDskDFH88TTFsQENdmCeaIbJpxO6lOHNk8iNjJywceAhthnITCNq0=
+	t=1744059798; cv=none; b=QIWTOuq7qlPUhzDN2ejGTuGsgjTp5gXgXA4mTPdnB6ZrrkA7bRzRaPwsroYuAcCDZAzSUq9sb2Zq2qWqImZ5YTXsPXDgE3aKvppQgvcqOTyRLcnfuV6OUgfJSYykd5g8WiTl2G7mO0FjNSkjdyG0F8zB7ARYi8RKNv59iSqOHhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744059462; c=relaxed/simple;
-	bh=Mbyrz1Qi5XQlFpRS8zL5PVOBby94colqqkS/+3hWAH4=;
+	s=arc-20240116; t=1744059798; c=relaxed/simple;
+	bh=9qTnwNOMC0AWU39j/+kHj2r1vw3uxvLwrRgiXRRcTiE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gVRBNc7OgiybTIfZOrN/mYWCl/tplaETWPqkSNeSbYI0iCMbI8dNoYpWIirNdys2/ygvUc7sV4ItWHISYc7Io7Ss6fhaW5mZDAVT/XL7oPnKe1Fc0r9Bms/ynrHWg/YnN/+fsExySzvlzK6bCwIRfmmLfvHFkHQpfHPTcsBrrXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=b9+0eRem; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=tmvwfRBwb/x8MOMfI5Pt8EFA02KaWSXa6Qf9qx+4G2oDPgMDH4oHsmi150zvBksiQZidKynwkqn1+KXVGJZpexyHrviFYMRpC9ScV3xBdGo9J4in8Ln7SxzFwMbydxa4QE2PZNDqEi0rbpBeMZGK2XspZliw7Hc3xDW+lECBqn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Y/9GI/Ks; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=FIFzgxgJF3inGAo4BQdXx/+2ik1F0587zeNPteUhJtk=; b=b9+0eRemltOMVqPX+0y1eN3GdM
-	ESLSwdeF0F5WgO05UZl7OHBAglXKWDyr4Hjrf8Iyu8k6DvMz8Jmp2x0vn7W8pawWl2voe79VRIgVZ
-	8S7B9Yec9Ff5IRC0MnfjQ+e69v0D5SU7NpRBHjEw6yvypM6S4es/9EJfF+hbWyhf7s40=;
+	bh=kLNgl0jju5uVhFt8lSFnoVT/LIcWf4ddeNIP99ztnFA=; b=Y/9GI/KsWvPklbZCHXWbAAeG5Q
+	WuPZ697SvDZCFUvvK2jKsok3+zOTDA9DPw7rUElZqBSQYDNNNZFfDUHtgoyrbZ/yJg4vZJdMF5uOb
+	2HSOKEJ9SUmKLY8R9wy7gnqWk2mdCeRQCxN1yny/PbsuHa4PXTVofxkG2nLxvaoUVzxI=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1u1tX1-008J05-O3; Mon, 07 Apr 2025 22:57:23 +0200
-Date: Mon, 7 Apr 2025 22:57:23 +0200
+	id 1u1tcW-008J2N-73; Mon, 07 Apr 2025 23:03:04 +0200
+Date: Mon, 7 Apr 2025 23:03:04 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Ivan Vecera <ivecera@redhat.com>
 Cc: netdev@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>,
@@ -57,10 +57,10 @@ Cc: netdev@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>,
 	Andrew Morton <akpm@linux-foundation.org>,
 	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH 02/28] mfd: zl3073x: Register itself as devlink device
-Message-ID: <262753b0-817a-436c-bfcc-62c375e4bbf6@lunn.ch>
+Subject: Re: [PATCH 03/28] mfd: zl3073x: Add register access helpers
+Message-ID: <bd028787-4695-4d7b-9000-c725a9ae4106@lunn.ch>
 References: <20250407172836.1009461-1-ivecera@redhat.com>
- <20250407172836.1009461-3-ivecera@redhat.com>
+ <20250407172836.1009461-4-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,47 +69,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250407172836.1009461-3-ivecera@redhat.com>
+In-Reply-To: <20250407172836.1009461-4-ivecera@redhat.com>
 
-On Mon, Apr 07, 2025 at 07:28:29PM +0200, Ivan Vecera wrote:
-> Use devlink_alloc() to alloc zl3073x_dev structure and register
-> the device as a devlink device. Follow-up patches add support for
-> devlink device info reporting and devlink flash interface will
-> be later used for flashing firmware and configuration.
-> 
-> Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-> ---
->  drivers/mfd/Kconfig        |  3 +++
->  drivers/mfd/zl3073x-core.c | 27 +++++++++++++++++++++++++--
->  2 files changed, 28 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/mfd/Kconfig b/drivers/mfd/Kconfig
-> index 30b36e3ee8f7f..a838d5dca4579 100644
-> --- a/drivers/mfd/Kconfig
-> +++ b/drivers/mfd/Kconfig
-> @@ -2424,11 +2424,13 @@ config MFD_UPBOARD_FPGA
->  
->  config MFD_ZL3073X_CORE
->  	tristate
-> +	select NET_DEVLINK
->  	select MFD_CORE
->  
->  config MFD_ZL3073X_I2C
->  	tristate "Microchip Azurite DPLL/PTP/SyncE with I2C"
->  	depends on I2C
-> +	depends on NET
->  	select MFD_ZL3073X_CORE
->  	select REGMAP_I2C
->  	help
-> @@ -2441,6 +2443,7 @@ config MFD_ZL3073X_I2C
->  
->  config MFD_ZL3073X_SPI
->  	tristate "Microchip Azurite DPLL/PTP/SyncE with SPI"
-> +	depends on NET
+On Mon, Apr 07, 2025 at 07:28:30PM +0200, Ivan Vecera wrote:
+> Add helpers zl3073x_{read,write}_reg() to access device registers.
+> These functions have to be called with device lock that can be taken
+> by zl3073x_{lock,unlock}() or a caller can use defined guard.
 
-It seems odd that the SPI and I2C drivers need net? It is the core
-which is doing devlink stuff.
+regmap has locking. It would be good to explain in detail why regmap
+locking is not sufficient.
 
 	Andrew
 
