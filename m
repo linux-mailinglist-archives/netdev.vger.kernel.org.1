@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-179835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D01CA7EAB8
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 20:39:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4F00A7EB19
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 20:46:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC8C57A41A6
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:37:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 704AA16FA50
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D96DC2686BE;
-	Mon,  7 Apr 2025 18:15:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC6726A0CB;
+	Mon,  7 Apr 2025 18:15:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lsGfy74I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="thAmL8VY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB33215767;
-	Mon,  7 Apr 2025 18:15:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BB94255221;
+	Mon,  7 Apr 2025 18:15:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744049706; cv=none; b=OYZ69M33a8eb1EMYjE6cwzobeixwqmFfnMrCcJFVJ0ae1k6kk2agtrb9uOyPOzn/mNEO9aBHpq/EpK25Zr+zVC2kMF2GG67omo0+MxP5i9aUmZ4bmoPDMoRs3xAgVSvxH/FFlJcdeUv+HiBtU1F2+OAZ4opA+uAGjPeoJsaJ9DU=
+	t=1744049732; cv=none; b=HOpXiKTR6FxcSVGMc8ZElApJ5LmXP1N0cULhC5m2L8ZfXVnVuSjBflk0eNYs/eIck1gzuS6MaAXdhmgmPbbp4TMbpWCF1JLgIiKec69/onEx2Z834k7GuHGkxhHrfKhqW6AkLYodjIbOnYxUA7e65RlJ/uOuwONtXKXDFspWebs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744049706; c=relaxed/simple;
-	bh=Z5ZlPmDMTP1xihGctDcUIJglsi5pe1J/GU767msqbr4=;
+	s=arc-20240116; t=1744049732; c=relaxed/simple;
+	bh=9lnZvdYWucsD43LgxrIBgPkhCQuCm3u66wDOkTVnmIw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OKhC+3dZE8ePkdlqMu/tmVRwjqneB1fNqz6Uqkq1WaXcUiGuFH+BzgCUydbOoiyg/1F6904FKigGUQPlYftlVas3YkcSibZB29nXTQ119XcKjPZmgRRMFcmfDg277ltgDWRv0eubovdEgYeZlF0SCGgaWSo+HkgtIzP4TWD/ggY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lsGfy74I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2E4DC4CEDD;
-	Mon,  7 Apr 2025 18:15:04 +0000 (UTC)
+	 MIME-Version; b=lBQxHWDvTAp7khoRc/af/285VVAxExb3npCMvsO1b/ZUN+Fp3YBygOVfdPM/nRrIDkQa5pMSmOEj3WYzuaT+u0JRHWvbNIRPRD5OTApSQXGPm9/1D9tsFSgv8LdWiiS/bH3+rAG2pQehP9S4+yx4a0qlB23oAQvcZ9/gMS+2qvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=thAmL8VY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B67B0C4CEEA;
+	Mon,  7 Apr 2025 18:15:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744049706;
-	bh=Z5ZlPmDMTP1xihGctDcUIJglsi5pe1J/GU767msqbr4=;
+	s=k20201202; t=1744049732;
+	bh=9lnZvdYWucsD43LgxrIBgPkhCQuCm3u66wDOkTVnmIw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lsGfy74IQYwnlgSuGF75Kcrk1/TqM4CukckmDSbW2oEzS0n3YD1Lw8kfsPeFKhqrJ
-	 ar2qaSr7+kVYx+PScZ51hyqcyFyym1kjMOqHxAeoG9kuOf2b9uD9Jec9q8OpuB+5z6
-	 BJVzUJOf49i2Dr/SIIAiHOeA1kPTiRdmxpkwvqj+tIcZ5b+VsfGUt3F7TKSooB2CPr
-	 OiBaKmjALqo40/tnPHyim6RYoNfwr6PlJJkQ+mtzazbZfuttsHOP6eQEqf5pmvSS3b
-	 5VtF4LDPfKq5VUTkofAReXK3scDz6Aoa5+qZpT98PCXtdHS/iKpcc6H1w1f/E5V8iM
-	 qd7RwFOQTcBkg==
+	b=thAmL8VY6DYY8a3gSfFzvB4C7s8tzb1EZ8zpMLNfNFsoW4tTdaGwP7THjwWtVKzfd
+	 DmdabyBEfi1gHz8VYgvkPgpGWRJ77cDqskzcLGstl9hzTHV8vykSX2kzUmnD+KEZke
+	 dBuxjWdeVluOLkWK4Trm2p3wuZznFGYIqMlAmrfJBoH3kc56FwvI5IvOji6F+Rt4vM
+	 pcGR7Aic+MeRvqhUAVzak1cc2W+THHhw8AtqxG0QPCiCccPeYobfhVuo9df/qbtWQU
+	 UeSyXle5pH0Ulpq09a0BPVJFTnsIq0jIHcChn/lkr8JesvQAgszyN3TaoqEp65OYoo
+	 F74+fCPU7UBMw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -54,12 +54,12 @@ Cc: Chenyuan Yang <chenyuan0y@gmail.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-aspeed@lists.ozlabs.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 08/13] usb: gadget: aspeed: Add NULL pointer check in ast_vhub_init_dev()
-Date: Mon,  7 Apr 2025 14:14:42 -0400
-Message-Id: <20250407181449.3183687-8-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 7/8] usb: gadget: aspeed: Add NULL pointer check in ast_vhub_init_dev()
+Date: Mon,  7 Apr 2025 14:15:13 -0400
+Message-Id: <20250407181516.3183864-7-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250407181449.3183687-1-sashal@kernel.org>
-References: <20250407181449.3183687-1-sashal@kernel.org>
+In-Reply-To: <20250407181516.3183864-1-sashal@kernel.org>
+References: <20250407181516.3183864-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,7 +68,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.133
+X-stable-base: Linux 5.15.179
 Content-Transfer-Encoding: 8bit
 
 From: Chenyuan Yang <chenyuan0y@gmail.com>
@@ -91,10 +91,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+)
 
 diff --git a/drivers/usb/gadget/udc/aspeed-vhub/dev.c b/drivers/usb/gadget/udc/aspeed-vhub/dev.c
-index 4f3bc27c1c628..73664a123c7a0 100644
+index d918e8b2af3c2..c5f7123837751 100644
 --- a/drivers/usb/gadget/udc/aspeed-vhub/dev.c
 +++ b/drivers/usb/gadget/udc/aspeed-vhub/dev.c
-@@ -549,6 +549,9 @@ int ast_vhub_init_dev(struct ast_vhub *vhub, unsigned int idx)
+@@ -538,6 +538,9 @@ int ast_vhub_init_dev(struct ast_vhub *vhub, unsigned int idx)
  	d->vhub = vhub;
  	d->index = idx;
  	d->name = devm_kasprintf(parent, GFP_KERNEL, "port%d", idx+1);
