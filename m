@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-179936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 822A9A7EF2C
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 22:24:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CBAEA7EF2E
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 22:24:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00C7A188A000
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 20:24:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6772F188AC0B
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 20:24:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A5119B3EE;
-	Mon,  7 Apr 2025 20:24:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F05221D86;
+	Mon,  7 Apr 2025 20:24:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Iz+xRnNQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T57ti7Us"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D7F221573
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 20:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EECE21ABD4
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 20:24:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744057468; cv=none; b=SBpRBUFPWo4s69+vbpTwhQtpEcJIMYqzeopSWyd8VCkBXN5MKBSDRgYQZUgQzSSzYWST5Wl0aoSE38zjDjQ5uOMYe1n69GI8QyR9nvhcl4RlYcp9HEI7EF0QmkYtjPZDAu/80h08gz73nAmHqf5wnXtk5syzeLShHC5/7YBawaQ=
+	t=1744057470; cv=none; b=pCLDWRZVhW6gWAmUpgZxiNDvLG0jNYMDbSseMsUeIEsF+AUTbioHCvSk0oXHqKboDzYyACRA2JJr9OgRDXa4GY15LA9u6Xb150l7sJMxwOuCPMU9YA0mRDfJNUPmlyGGquJ4Bpvihdo/vrI52FFvMsvvlCAgBdxplrMfeWUH8Z0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744057468; c=relaxed/simple;
-	bh=fWqtWj+j04Dms4+/ZRub37PlDBaty2SGPEcitWbpPfw=;
+	s=arc-20240116; t=1744057470; c=relaxed/simple;
+	bh=so/FIl3m4zGJkUxqfC8y7RpQ+3s0umMeYYytoKT3a38=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Z22HSNFGAHwaLYsAaFWp9Sa53o/xume60Y5fOJ60/hWt75LLWA58BsW1gIhthpVvEHx1H34XFeZ5vV3B2XJtJCnWalTwzYcjj28xdt0q5AWwRg7o8j0nIvn8YRXOtcejcKM9Fj9MYH9tBrDZgy4O3NY2MUGIMXQkl7sP7Uz65Yo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tavip.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Iz+xRnNQ; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=R1FSpGZd4tUXACoQb6G8n6FQOuMJuM3G8U0YxJ/Fmexo6+MkM/fKDbYYg1Uip7cy8VC2jMMOrzZNWKQxieCbwvHTH4kcPXpzWLvxCiXC6J49YCzxi3ZGUl4Uv6AQZmTTuTtnkaJweX6Zgi4409L6KXpNxRDTwjpEq7HeoF0+a/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--tavip.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T57ti7Us; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--tavip.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7395095a505so3637963b3a.1
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 13:24:26 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-73691c75863so6123222b3a.0
+        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 13:24:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744057466; x=1744662266; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1744057468; x=1744662268; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CazHsfgcUUVAR7Dxm9NnwcUVkKIk2KUXSdD7C2MV/Js=;
-        b=Iz+xRnNQFTKd9ENld93ecVDhm+6JKi56YZ7KvToxnrudv7Nilu3aERlSv2XcML28Xh
-         McZXNIDYVpRIEVUOxM8aCueXT+LZuTVZ/5egjz7M8r5ulSMWAWnQ5yE/c7yR5JNQ6Ox2
-         SlhR+6iXxov5/frM3D8PafxYSZr2weSwV3JCdbXyixm4sBgTznoFeRIWJm9qVKBC13HA
-         ZJobT1KI1X/TF1f2t3+O1h85+bsYQm7Um4MBYXo7mEkWzyDbwi/Q/spFeAbgZzKEvhyJ
-         XxC8AcZU4oXxQp2JXJgq/GW8EfyFxERgBMs1EmAOwJWWu0jSthpg0NvJqqGyefmDQJHR
-         Zs3Q==
+        bh=z3zdYEN3GupTQqYb3MoxUmEoHfApnc7WRa+fBMJu3jg=;
+        b=T57ti7UsI5tTXW1NvF4Vu4UmO3S96417R+HGbs49UEFJ4ljJUoA/IM3wyhLDKrVL79
+         +I7eJzSKq33I3goV0AVPgHImw+nsbkyvHYjGbQtDQcFTI2eQxvc5YlT3iCzZq/mmQck4
+         qmtXhT41OxqXJxp15wrDDc7wtE0XMDIqRiuHy3Cutge3p571+SigSAljpNKsYF/baHjC
+         Mh8WGP9lyh/oCTPD7jdrbJEBLyik9rK4CHdvs/pNfCjkNk2DYl8/FvtRISho3PRUETFE
+         U23UlkqOA7JnCvoDTlqUoHdXUv5b8APba4K0UXcBHN56x0IgN1/OjE5aOOBK9eKovuNV
+         SftA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744057466; x=1744662266;
+        d=1e100.net; s=20230601; t=1744057468; x=1744662268;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CazHsfgcUUVAR7Dxm9NnwcUVkKIk2KUXSdD7C2MV/Js=;
-        b=vzZ5ZjD0vRMGe5jryQYID6DuT7ziuQOdNnwW+rcP8zQf1LxrLvLHJoqvtT1IwOi2N0
-         hfZXzvlILUYk6QpKXKBztQyCOLmhgi5utKuEh7saaPYIILGuNnto+HhtYfiCg1OMzlLj
-         ZVYKN0PkwDn3sQxgbLDzP6gG6L4x3HFDrwPGX42nxiizDyWUDdLMnu58NBgl6KJHiiKo
-         fm4t4QkCA6gu1iIuUcqclCYh4/reDrg7JdaMA4u+58csvLAuM+byZw7xmv1FMBIJyJYz
-         15X1K1eQty7gdYGTmC1H/jC55QPi7KrD/on8nCT6yXTAdezT8HJ/UZ4JuN4JfhEw6o6H
-         gQjg==
-X-Forwarded-Encrypted: i=1; AJvYcCWUqZ2/xYjjfWoy6Ko31xdkIQPJR2Z4vp7VyKlntCdONw4A8kMlcDc8xS27S8Nb+cViHPVQaew=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxM7xL50lIWcdXZ+WTEJiGSDL9MCczA5d2GDPVlQwXZZQ/hTpbQ
-	BXPOxJ6oq+gptvuZTtoFhRgalyQ/9alwINCGMZ1/e+yGudnX4COKbR97gduviwiAzJilJCSsPg=
+        bh=z3zdYEN3GupTQqYb3MoxUmEoHfApnc7WRa+fBMJu3jg=;
+        b=cYotGRAaZF9Kzc6oU3pNhgvJWmqRIDRoryfAf06R9djxr/LI9yCoM/WWBotwGM+3ZB
+         J2xPwbvNq/Bsrnl9f0IMZIVRGXuCkL690T9v9QQPKQy4xHFJoWpAwrUMRwPrGhQe0rhp
+         FVxy9CUjoPPzyyjPnWKDCsOqbc1ELl6E2Cw/UJXceScEJ6Cjw5a6yByjLmENw/vXNGW6
+         ho1SqLlFPhSvXJrCAgsBu5O0MsS4qZRtkp7jNJ+HYgfOcO/hIPnIbAxarqzGjPG3Biwm
+         SGdYlSg3+CNlnY56EvTj5xLO8e9ZR2vqCwliOJLXgBC9qxB666eBwdJtGlA0886VNwnL
+         +raQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUG9fc1RviYDoomNHqE4assFgxs4ccExV2HtwiMDtbxqfTKofHjOLWZxoO7ESmubhal4bpD9lE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgbK6XB4riHj+Wd+8jmcYuqkiNmVK+W+T+9zF13Qij5+vtq0y8
+	IrkIDNjyLeiaWtQBvZWPML94dXnkLpyC8tuZ0ZLXyo0Af+eTizFf68bGRvnogHbJud+1tzYS4g=
 	=
-X-Google-Smtp-Source: AGHT+IHpTmHJa69Q9JsamNrC1Hqs5CxMujZYLCVPkmKnfLGWkvlD7SesdOYJbbOrPVCebFVhmxdWojyzyw==
-X-Received: from pfbjc3.prod.google.com ([2002:a05:6a00:6c83:b0:736:4313:e6bc])
- (user=tavip job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:3906:b0:736:b402:533a
- with SMTP id d2e1a72fcca58-739e48d58admr17875567b3a.1.1744057466185; Mon, 07
- Apr 2025 13:24:26 -0700 (PDT)
-Date: Mon,  7 Apr 2025 13:24:07 -0700
+X-Google-Smtp-Source: AGHT+IESesL/rXojDRtCr23ih8PeGR5Ul7Az1lhsb+Tjn/k8ZtBRDnIUV3VPK9+IXw2XlP4Ahn3Anzj/VA==
+X-Received: from pflb6.prod.google.com ([2002:a05:6a00:a86:b0:730:7485:6b59])
+ (user=tavip job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:179b:b0:736:baa0:2acd
+ with SMTP id d2e1a72fcca58-739e7156defmr20051690b3a.20.1744057467930; Mon, 07
+ Apr 2025 13:24:27 -0700 (PDT)
+Date: Mon,  7 Apr 2025 13:24:08 -0700
 In-Reply-To: <20250407202409.4036738-1-tavip@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,124 +74,86 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250407202409.4036738-1-tavip@google.com>
 X-Mailer: git-send-email 2.49.0.504.g3bcea36a83-goog
-Message-ID: <20250407202409.4036738-2-tavip@google.com>
-Subject: [PATCH net v3 1/3] net_sched: sch_sfq: use a temporary work area for
- validating configuration
+Message-ID: <20250407202409.4036738-3-tavip@google.com>
+Subject: [PATCH net v3 2/3] net_sched: sch_sfq: move the limit validation
 From: Octavian Purdila <tavip@google.com>
 To: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
 	pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, netdev@vger.kernel.org, 
-	Octavian Purdila <tavip@google.com>
+	Octavian Purdila <tavip@google.com>, syzbot <syzkaller@googlegroups.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Many configuration parameters have influence on others (e.g. divisor
--> flows -> limit, depth -> limit) and so it is difficult to correctly
-do all of the validation before applying the configuration. And if a
-validation error is detected late it is difficult to roll back a
-partially applied configuration.
+It is not sufficient to directly validate the limit on the data that
+the user passes as it can be updated based on how the other parameters
+are changed.
 
-To avoid these issues use a temporary work area to update and validate
-the configuration and only then apply the configuration to the
-internal state.
+Move the check at the end of the configuration update process to also
+catch scenarios where the limit is indirectly updated, for example
+with the following configurations:
 
+tc qdisc add dev dummy0 handle 1: root sfq limit 2 flows 1 depth 1
+tc qdisc add dev dummy0 handle 1: root sfq limit 2 flows 1 divisor 1
+
+This fixes the following syzkaller reported crash:
+
+------------[ cut here ]------------
+UBSAN: array-index-out-of-bounds in net/sched/sch_sfq.c:203:6
+index 65535 is out of range for type 'struct sfq_head[128]'
+CPU: 1 UID: 0 PID: 3037 Comm: syz.2.16 Not tainted 6.14.0-rc2-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 12/27/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x201/0x300 lib/dump_stack.c:120
+ ubsan_epilogue lib/ubsan.c:231 [inline]
+ __ubsan_handle_out_of_bounds+0xf5/0x120 lib/ubsan.c:429
+ sfq_link net/sched/sch_sfq.c:203 [inline]
+ sfq_dec+0x53c/0x610 net/sched/sch_sfq.c:231
+ sfq_dequeue+0x34e/0x8c0 net/sched/sch_sfq.c:493
+ sfq_reset+0x17/0x60 net/sched/sch_sfq.c:518
+ qdisc_reset+0x12e/0x600 net/sched/sch_generic.c:1035
+ tbf_reset+0x41/0x110 net/sched/sch_tbf.c:339
+ qdisc_reset+0x12e/0x600 net/sched/sch_generic.c:1035
+ dev_reset_queue+0x100/0x1b0 net/sched/sch_generic.c:1311
+ netdev_for_each_tx_queue include/linux/netdevice.h:2590 [inline]
+ dev_deactivate_many+0x7e5/0xe70 net/sched/sch_generic.c:1375
+
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Fixes: 10685681bafc ("net_sched: sch_sfq: don't allow 1 packet limit")
 Signed-off-by: Octavian Purdila <tavip@google.com>
 Acked-by: Cong Wang <xiyou.wangcong@gmail.com>
 ---
- net/sched/sch_sfq.c | 56 +++++++++++++++++++++++++++++++++++----------
- 1 file changed, 44 insertions(+), 12 deletions(-)
+ net/sched/sch_sfq.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/net/sched/sch_sfq.c b/net/sched/sch_sfq.c
-index 65d5b59da583..7714ae94e052 100644
+index 7714ae94e052..58b42dcf8f20 100644
 --- a/net/sched/sch_sfq.c
 +++ b/net/sched/sch_sfq.c
-@@ -631,6 +631,15 @@ static int sfq_change(struct Qdisc *sch, struct nlattr *opt,
- 	struct red_parms *p = NULL;
- 	struct sk_buff *to_free = NULL;
- 	struct sk_buff *tail = NULL;
-+	unsigned int maxflows;
-+	unsigned int quantum;
-+	unsigned int divisor;
-+	int perturb_period;
-+	u8 headdrop;
-+	u8 maxdepth;
-+	int limit;
-+	u8 flags;
-+
- 
- 	if (opt->nla_len < nla_attr_size(sizeof(*ctl)))
- 		return -EINVAL;
-@@ -656,36 +665,59 @@ static int sfq_change(struct Qdisc *sch, struct nlattr *opt,
- 		NL_SET_ERR_MSG_MOD(extack, "invalid limit");
- 		return -EINVAL;
+@@ -661,10 +661,6 @@ static int sfq_change(struct Qdisc *sch, struct nlattr *opt,
+ 		if (!p)
+ 			return -ENOMEM;
  	}
-+
+-	if (ctl->limit == 1) {
+-		NL_SET_ERR_MSG_MOD(extack, "invalid limit");
+-		return -EINVAL;
+-	}
+ 
  	sch_tree_lock(sch);
-+
-+	limit = q->limit;
-+	divisor = q->divisor;
-+	headdrop = q->headdrop;
-+	maxdepth = q->maxdepth;
-+	maxflows = q->maxflows;
-+	perturb_period = q->perturb_period;
-+	quantum = q->quantum;
-+	flags = q->flags;
-+
-+	/* update and validate configuration */
- 	if (ctl->quantum)
--		q->quantum = ctl->quantum;
--	WRITE_ONCE(q->perturb_period, ctl->perturb_period * HZ);
-+		quantum = ctl->quantum;
-+	perturb_period = ctl->perturb_period * HZ;
- 	if (ctl->flows)
--		q->maxflows = min_t(u32, ctl->flows, SFQ_MAX_FLOWS);
-+		maxflows = min_t(u32, ctl->flows, SFQ_MAX_FLOWS);
- 	if (ctl->divisor) {
--		q->divisor = ctl->divisor;
--		q->maxflows = min_t(u32, q->maxflows, q->divisor);
-+		divisor = ctl->divisor;
-+		maxflows = min_t(u32, maxflows, divisor);
- 	}
- 	if (ctl_v1) {
- 		if (ctl_v1->depth)
--			q->maxdepth = min_t(u32, ctl_v1->depth, SFQ_MAX_DEPTH);
-+			maxdepth = min_t(u32, ctl_v1->depth, SFQ_MAX_DEPTH);
- 		if (p) {
--			swap(q->red_parms, p);
--			red_set_parms(q->red_parms,
-+			red_set_parms(p,
- 				      ctl_v1->qth_min, ctl_v1->qth_max,
- 				      ctl_v1->Wlog,
- 				      ctl_v1->Plog, ctl_v1->Scell_log,
- 				      NULL,
- 				      ctl_v1->max_P);
- 		}
--		q->flags = ctl_v1->flags;
--		q->headdrop = ctl_v1->headdrop;
-+		flags = ctl_v1->flags;
-+		headdrop = ctl_v1->headdrop;
- 	}
- 	if (ctl->limit) {
--		q->limit = min_t(u32, ctl->limit, q->maxdepth * q->maxflows);
--		q->maxflows = min_t(u32, q->maxflows, q->limit);
-+		limit = min_t(u32, ctl->limit, maxdepth * maxflows);
-+		maxflows = min_t(u32, maxflows, limit);
- 	}
  
-+	/* commit configuration */
-+	q->limit = limit;
-+	q->divisor = divisor;
-+	q->headdrop = headdrop;
-+	q->maxdepth = maxdepth;
-+	q->maxflows = maxflows;
-+	WRITE_ONCE(q->perturb_period, perturb_period);
-+	q->quantum = quantum;
-+	q->flags = flags;
-+	if (p)
-+		swap(q->red_parms, p);
-+
- 	qlen = sch->q.qlen;
- 	while (sch->q.qlen > q->limit) {
- 		dropped += sfq_drop(sch, &to_free);
+@@ -705,6 +701,12 @@ static int sfq_change(struct Qdisc *sch, struct nlattr *opt,
+ 		limit = min_t(u32, ctl->limit, maxdepth * maxflows);
+ 		maxflows = min_t(u32, maxflows, limit);
+ 	}
++	if (limit == 1) {
++		sch_tree_unlock(sch);
++		kfree(p);
++		NL_SET_ERR_MSG_MOD(extack, "invalid limit");
++		return -EINVAL;
++	}
+ 
+ 	/* commit configuration */
+ 	q->limit = limit;
 -- 
 2.49.0.504.g3bcea36a83-goog
 
