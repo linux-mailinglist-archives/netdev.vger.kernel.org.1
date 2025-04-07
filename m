@@ -1,313 +1,199 @@
-Return-Path: <netdev+bounces-179722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FFF1A7E5B1
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:09:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8630A7E618
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:19:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39F557A1B81
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:08:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33C033B2FB8
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:11:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D1722066EC;
-	Mon,  7 Apr 2025 16:06:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50B292066D7;
+	Mon,  7 Apr 2025 16:11:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="EpbPh2OI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e7unm9X4"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2059.outbound.protection.outlook.com [40.107.93.59])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64EF6205ADD;
-	Mon,  7 Apr 2025 16:06:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744042016; cv=fail; b=X4HI0ybo7+wMJG7YSFJnxW+6niZsq+0Xnt3zMWPhZkbqyKT9g+40jmDf8sBliygB0pmpS8tcpfmIJBvRHfTS+5+rUvVEQq75yKHL6VYXQ2YRitDGPpu2BykwIbl1bpaJWvbiaoVN71U1IMAMIYPi+ZpTp61WDq6CWjfafI9C8Uk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744042016; c=relaxed/simple;
-	bh=JgGU5xWZx15w5ptwQK1qpBty7GFxBz42BlPcfaLPJh8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=QFmtvQbq2ZB4wCrqIMNGh66gAMMaPJpH++2b9LpZqhP1n1MP9qTmxpKbDOVpE+O3ESb48V3AKoCALJdr5Umh0cT+2QSYzfe30WSrlAnpUSIAa+w3Sc29NDTLr/QCixGOz81R2C7nzDSN838SeFXH1935Iaw8TcX3qBA3AQw4ess=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=EpbPh2OI; arc=fail smtp.client-ip=40.107.93.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=O1GOR+ID6l6j0xHSpDCX/TDNFT966LUaE9IOzn2DimEeaXMEizxCh2Mw7G9szmO7VE4RM9zBbKlOm5inBJQqMbSVxOe8jKOp4J9CCqIUR/PzvkBFolg/LX9N5pd20R8zTxsSy39/gvVgGd0+3SqnHjALA8IXdY9p8OAkSy0BLeCcIC3l2fl1AvNuQndcsh8NoQyfgTzUljpoa7OmeVk9uaK1RpLP2ebHTY6snfMrI4Rtp0wg/LWAK8euGyWhn782cDARdAk+S7CgxlZp7qhinnCr+lhq5CgOtI+6sfAuZP06kaTjPU/bBvzlGDjIYyJ0i7iROrzRaeZqoF1baDqS3g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bJZBRrUQaj1/1hVsLF3rPV05KKS6vp0zkRmfTb0FHWg=;
- b=PlskpKpUiZ0Bo6RG6JNb1R6IAtWZMPpNkZ/srbOlKg/sl4N4EtJtZLnVYQO0X02UI2Jh3Pp7ECHBegbUW6VMYzzFMvafbm8scXEkX22w7ytaGK1C6I1CZqU18DAMzktx/2F7YlnVAMOMns1m50cWw4k55nw0tXTY3Bfyk4SIfvuYLiQUK2K1U42vz61ySKDHlihHYGK3jhZRXH/72YgDdYXHhjNUSUll4becUUiZEnN1qmZ5N9jSTdWeQVUm0FeCEgx+bbb/rc9VgZsPESltFsRN0YuFmiwQDVOBE105VuiramOCHcUO22eps0QwhnMB0RTpN1JdIPCkOPCV/JrSaA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bJZBRrUQaj1/1hVsLF3rPV05KKS6vp0zkRmfTb0FHWg=;
- b=EpbPh2OIL4yZWHIRHRuq91Dkcy0RC+fyTX9uqGLpyfDNlVkdNOZDsKK8rTj0szZzJku0tRK5JkvWSj38CoB2y8CdUTKGAzKj9dNplnyHBT1Y3q4Z/WepZI8XOv7zj3FncOoseDrNCRohfBjclc2YFEEpoIkRvRc+uuBWv5PZoL4NmIJ8D9l4NU9g7YJo9pgtIywR8ZZ3lpHm0pw2/0BOyJTayvBFGzNn9qGntdEji3W821rsZbb2uHnz3m0Y7LPznpyvvSqpR5o8mW5U5RbOal4JiTVDy0m1teWxmx3aDGmlG5KkZhBbnVnoEaYuf8fszO6Fl9lbg8DFaQ4ahPbiKA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com (2603:10b6:8:252::5) by
- DM6PR12MB4482.namprd12.prod.outlook.com (2603:10b6:5:2a8::23) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8606.33; Mon, 7 Apr 2025 16:06:50 +0000
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::5189:ecec:d84a:133a]) by DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::5189:ecec:d84a:133a%5]) with mapi id 15.20.8583.041; Mon, 7 Apr 2025
- 16:06:50 +0000
-From: Zi Yan <ziy@nvidia.com>
-To: =?utf-8?b?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Simon Horman <horms@kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
- Mina Almasry <almasrymina@google.com>, Yonglong Liu <liuyonglong@huawei.com>,
- Yunsheng Lin <linyunsheng@huawei.com>,
- Pavel Begunkov <asml.silence@gmail.com>,
- Matthew Wilcox <willy@infradead.org>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-rdma@vger.kernel.org, linux-mm@kvack.org,
- kernel-team <kernel-team@cloudflare.com>
-Subject: Re: [PATCH net-next v7 1/2] page_pool: Move pp_magic check into
- helper functions
-Date: Mon, 07 Apr 2025 12:06:47 -0400
-X-Mailer: MailMate (2.0r6241)
-Message-ID: <66692A4A-5747-447A-A1E6-678EBB9A33E0@nvidia.com>
-In-Reply-To: <87plhovtx8.fsf@toke.dk>
-References: <20250404-page-pool-track-dma-v7-0-ad34f069bc18@redhat.com>
- <20250404-page-pool-track-dma-v7-1-ad34f069bc18@redhat.com>
- <D8ZSA9FSRHX2.2Q6MA2HLESONR@nvidia.com> <87cydoxsgs.fsf@toke.dk>
- <DF12251B-E50F-4724-A2FA-FE5AAF3E63DF@nvidia.com> <87v7rgw1us.fsf@toke.dk>
- <E9D0B5C7-B387-46A9-82CC-8F29623BFF6C@nvidia.com>
- <893B4BFD-1FDA-46DE-82D5-9E5CBDD90068@nvidia.com>
- <4d35bda2-d032-49db-bb6e-b1d70f10d436@kernel.org>
- <4185FF99-160F-46A9-A5A4-4CA48CC086D1@nvidia.com> <87plhovtx8.fsf@toke.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: BN8PR15CA0002.namprd15.prod.outlook.com
- (2603:10b6:408:c0::15) To DS7PR12MB9473.namprd12.prod.outlook.com
- (2603:10b6:8:252::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54EB82063D1
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 16:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744042305; cv=none; b=gmujRoMZE48ZCmpkf6ObRAOoLxkAcS9pF5bEMplk4f8LSTEExB1JqPVI20Qucfxe6MgvuM2yzN+cdSypQqOsQ/ZossMwVVwB0Me98MDirsgNRIVzAZochbJvc48/nWnBAUguAjNeeCYnqGKOrc3WrBwzZ2mQqU2T0SD2hC6WLeI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744042305; c=relaxed/simple;
+	bh=BF93SruOi4SJLs3qYKFVD0YuF6aeAyEuwTkG+AFVMug=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oMUb1G/YLx/xTAQd5C2Dr5/5dg0uy6stT2e0Hrm8c///jOYDFWP06otFfzyvcgMGsHL6oAgIxSXatX2CMBxCkPDK+i54390IwSu6SWPVziBp8+mVAVKiacbrG6kCqVD1jtnsftI1yLikOnnS874Pl4Vnb/5a97dRQr4FwdfaypI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e7unm9X4; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744042302;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=4BZS8OzrijhjJ+znuRtZhTpd6m/6rBcT/o0yRbV8pvk=;
+	b=e7unm9X4AZAzMnVf5nUq/C3pdGP7wVRfoJ3ZBhmGSy0knGKG6HsVv8XkAVf4Bi8NPGdqtq
+	XxNDZAMt59d+tfiS0MEO/GsDWMfcgv/7u/J/tMdwdoNtXqQmc1qa5CQLlefS0gpA91+8gw
+	8lqNQmG49z7tD3VqEEdDkgNBSOUk8hs=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-118-H99E9py5NoC5_lZ6coOL2Q-1; Mon,
+ 07 Apr 2025 12:11:40 -0400
+X-MC-Unique: H99E9py5NoC5_lZ6coOL2Q-1
+X-Mimecast-MFC-AGG-ID: H99E9py5NoC5_lZ6coOL2Q_1744042299
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A0518180025F;
+	Mon,  7 Apr 2025 16:11:38 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.40])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DBBDE1828A80;
+	Mon,  7 Apr 2025 16:11:34 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	linux-afs@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2 00/13] rxrpc, afs: Add AFS GSSAPI security class to AF_RXRPC and kafs
+Date: Mon,  7 Apr 2025 17:11:13 +0100
+Message-ID: <20250407161130.1349147-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB9473:EE_|DM6PR12MB4482:EE_
-X-MS-Office365-Filtering-Correlation-Id: ce98ce8c-3c36-471d-8f45-08dd75ee34b8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|376014|7416014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?ZW1JTC9KUitjd3lIcy8vVFc2ZTRMSzFLZGdGem1wTHhOL0U5bC9xVHpaU3pr?=
- =?utf-8?B?VE1meGhrRkZURXNIMTZzQ3pwZ1g5ZVF2RmlvNkExckFXcTlWM0ZqTGlaL1Bl?=
- =?utf-8?B?WmpVbzVmNmZ2Um5KdnZVNEcyQVRSZVVsanZwVmdtWGNNWGJBYklRRDYwSmZ1?=
- =?utf-8?B?MGY1NkJXWFB3RVpHNUQ2clB5eDJnWHBNYWdwZ284L1pYRVI5SmhMcEwvRTF6?=
- =?utf-8?B?N0VZS2dFRkI5bGorT0RDWE1QVm10aWhORllZVmVWOTEvdHRJaW1BTTBrQUZy?=
- =?utf-8?B?cDh6UWF3MG55VTEzOGswMmJUbDRlRzE4NXRHZ1lId2IwczJRS0NFUmtXWU9H?=
- =?utf-8?B?ZjQwV2lYSVhoV1R0UWJuYW5ZTXIxQXFIVHZiNTJZQ1J2ZTcvYTBkb21NVXF5?=
- =?utf-8?B?QnJMTFRyMzZUWGZJQWZqQy84eXo1MXdNZ0d2SWxURExnVFZQZWRqeVRwVHZv?=
- =?utf-8?B?UTZhbHZtNVE2L0xLQ0pnSEN6bTNvdS9mbWx3SE9BVmV6WnBiTUFxbmRReFFn?=
- =?utf-8?B?b3I2K1dUa202bWRXdzJsdXlwd3dRUUczSkwzaXBnSTZEb0l4TGhLWE9LSzZs?=
- =?utf-8?B?UWlBL0hMeEVkSjJYdDNUa2syUmVNTHNBdVBJZGtCOW5nSHRIaWhsVnRvRDBm?=
- =?utf-8?B?R3N6dzJ1Z2R2a3kwZnVqdXBUblV6NU05T3p1ZFFWdGlqa3BhVXp4MVA1Tk13?=
- =?utf-8?B?VGVQZGFVZkNLYm1yWERoN2VkQ0dsb1c4MTU1cTA0Z293aEtJV3lUQ053a1Js?=
- =?utf-8?B?WVM2aTE3em1VQWVuQmlTeExiaDJHV09hVVZ2U0dob0xQaXA2UVFUQWdtdW9u?=
- =?utf-8?B?T3RPcklTRVJjZUZRUE5xUWtUWi9kUDluc0gzYmk5TFZJK082VlZXTTFDWUZM?=
- =?utf-8?B?Y3kvVUJLWmxHWkR0R2RlMzZac1l5ZTdtcXhtS1JSRWI1Y3NxZkVLVU1uN255?=
- =?utf-8?B?WXMveXlZM1A2Q0YwSmRxMW9pbWZMQkZGS212S3RIa3RDRjEwYW9FZ1lGdlJh?=
- =?utf-8?B?blRJaHBuM0VjdW1IQkdjNlVVSVJqL2lIVjlNd0xZRlptVjhzZkVMaDh6bTdy?=
- =?utf-8?B?ZlRXZ0h3YnI1cHlZY0V2VHJ5bGUrN2NRcmZRYkVEYzBDYms4OWxFeDQ5aExr?=
- =?utf-8?B?bG55UlZzbUwyUFc5QW9hM0NLYXhRMm5MVXo3WktDRjZiYXNoYlk4ZTg3bnNa?=
- =?utf-8?B?bGdOMWxIaVZYcXdVLytyU082blVybFBuVjlNalhGME9SMk1ad3VRbUdBeUtD?=
- =?utf-8?B?V0FhaEdZbU9MQ0lkUVBJR0w5aUJEWUtidGhQU0E0RkxOYmpqcFlTTlAxYndr?=
- =?utf-8?B?OFZzWURBTGJDUHZLZkx3MzJOd05Ob3lmcDY2SWUxNnFBbkVZV1hvZlluRG9j?=
- =?utf-8?B?L3lnMG8ydXVyN2VFanRqZEhRamtOTzRCdGFoMDRneTJYKzFvR2I1RkROdGla?=
- =?utf-8?B?aHU3S2c4QVRWa2RLNDY2dkZRaUtUQ0lSRzdUQ0NEK0ZCM04yMkwyS2NjOENV?=
- =?utf-8?B?MGJFV2pIcnJ5MDVrL2UwSXNReDJnbFFLM2V3MER1dWo3RCtlRzdPTEtUdkRK?=
- =?utf-8?B?dWNHcHUwS05lTExCOVZrQmQ0SGZNQ1NIT3A1YW95V1pETnV2V3JIaE84SFhB?=
- =?utf-8?B?N1N5S3pSaW1OR29KT05Ud00yeksrV0I3NWZid0dyYVdtWmhTdm5GTFA2V2pO?=
- =?utf-8?B?ZHBJelhLa2haK2JyQ0RtNXdkRDFHNSs3QUdTd2RIRjk4T2VveHArdU0vaVZr?=
- =?utf-8?B?N1ZkcnoyVTZqcmY1R3kxVGNvRldoSzQyWVNGbkxZZ0k3RkREMU4waVhWdE4r?=
- =?utf-8?B?OW9mQUZFdmdaUGRpV2JkMFJJa1JacTZYakRLUDRjSlhwaWpEdGQvK1I4UWJo?=
- =?utf-8?B?T2ZHdDVOWUVsblR2Nnc2TUlvblIxdUFCazJmSlE3L05uREdneXNmOFd0Q1lC?=
- =?utf-8?Q?w4UITc64Tdk=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB9473.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VmdqZXhtdzhacnJrcC9zU2Y4WkhjcHZFak1qbGNiaDJMaERtWDVzbmRDeU9j?=
- =?utf-8?B?MVdVcVFJbEJZSngyY2JuL1ZYRHQ1aHV4UVl2TVJNYlRibzgrYzlPb1ltMTVQ?=
- =?utf-8?B?TVMxazJqM1V2Z1FLSUlwdkQ1c1dEU0ZzU1NTMXMxZFZ5c0dFMmplMDZhQW9N?=
- =?utf-8?B?aHhLTVEwbEFieFBtWmx4SGpzQzFnK1J2dWZNYWNkSHNYY2tWYk8xMWtxRGky?=
- =?utf-8?B?QWZFZEw5MUF2V0NpMUJpM09ld083a0lTa2FFM1BrZ2E5dXdJb2ZiOC9idXh3?=
- =?utf-8?B?TTJCQTRQVUplTmFRWEZIbWR1T1k3eXVnalNWakNGZ0huRndkdjNKZXRqcWlO?=
- =?utf-8?B?OXRQRml2ZlJSWVIySkZtT0ZvVHROT3d2Y2RZb2picm9LaXdDSWw0WUNEOUZ5?=
- =?utf-8?B?UFRNR3JKRFEwbzFKQUgvekpBMjU2V3cvMCtjMUxlOTlFREg2cnhkSy90OVV1?=
- =?utf-8?B?QkYvTnlaZitib2ZobjJDWHNUNW5iM083eFBrQXFHMmlCK2ZGOVg1ak1uM3Fy?=
- =?utf-8?B?Ti9tWmQzQy9LWFAya2NsR05NTGphcld0dlhhNlJSNkV6RHZjWlJOT2FPOEt5?=
- =?utf-8?B?VU9XSlZ5K2RiUjVmUng2czYzUzM4ZHBNZXRsdHp6a01mQWttM0s5RXBuK1dL?=
- =?utf-8?B?VTlTdnZwVm1RTTFhcmNsVHk2bzFoNXFhSFk1RGsvb3hOL1dNNzlKdjZRd0gy?=
- =?utf-8?B?azRLVE93WjByVjh1M3FEc1hyRnFSOWt1MDUxR21xcTluMkMrYkQwRHluRzFC?=
- =?utf-8?B?TW9LS2RVNjh6UVV2MzRFSWNUbTQ1eUF3bHkrTGpPbFI0SWl4YmtmcFNMeFU0?=
- =?utf-8?B?S0RsMmgzRld2R3gvR09OaUhjblZVcGQxZ05nR3VhNlFEQ0VobG9udUtrQllM?=
- =?utf-8?B?Y21ETEVOb1IwdEJnU0Npbi9IaDlmMTZ6UHNoK2pwSmxUZ3pvbkUvWFI3OXVI?=
- =?utf-8?B?NHdEaGtDcm5Ib1lUek5Ga3ZTcjZRVEhiT0hUYjhMOHJHeTZXYndvb1BrNEs4?=
- =?utf-8?B?Wi9KQmkweEdISWhJRFg4blVOczl3d3AreVo3N3hVc0t3QjN3L1FueFd3QzBY?=
- =?utf-8?B?WDBhZEpDdS9Mbm5idDlTL1VMMGl6U0QwTGEzUk00WmhSZmh0aEdjY2ZUR2lu?=
- =?utf-8?B?ampldmszZU9JelA4MlBYNVhzeEVVbGQ0SnQwRDF0UWRoUFk0VGhYdERNa0wv?=
- =?utf-8?B?M09LY1Ywb3ZLNk5YN1cxQ0szUWVjcWFsK1BMNVM4VVdJWC9RUW9qem9rUEVH?=
- =?utf-8?B?RnV1a0xJTGhsOXpQVm5Ubms1Ny9LY3Y1QXozZm5sNi84NS9QTXU2d0FheUZJ?=
- =?utf-8?B?UXdZVDVDaW5SeHRRVGlwZHdvakRwQzl6S3plU1lSRlkxK09iaC9IckxLUzlt?=
- =?utf-8?B?MlVuVXJIbmhMcGdqVWNQYktXdW9URFZ3cUlYMVA3TDBTWm1QWFlxTmFaNTB0?=
- =?utf-8?B?cm9iNTJOSkZwZElzUnJmaHJ6Vk1kcHJFd1Vid29mSU00SmJIcm5reTkxUFo4?=
- =?utf-8?B?cVgyT2pCMU9WRTRJRHY0UDlZelpYUlF3ZzZFM0djOUhEb2NvM2ZWUFU2N1cy?=
- =?utf-8?B?UTZBM2FnL3NZZGh5U2RaS1dseEEwT0NrMmtYWHlqWWJqSmhjamtjdEZsR1JK?=
- =?utf-8?B?WmpYMjd3cUJvMlYzYVBOT0ljaGNhanpUcFdJSGhRTndvOFkxb05xdXhnd3hE?=
- =?utf-8?B?bDA1a3FzTk80ckZqRXMxSnNhRGtoRXAxNUx1TFpzbTcrZ3l0M3lIU0x3aHJl?=
- =?utf-8?B?NGhGa3lZOWxBc0tGaG5qZm9FQXliZXFjWXNWZmttQ1Bmd1JKT0ZkUnF4K1N6?=
- =?utf-8?B?OTNhWjFIU09KVVpUK1p0eXdvd0cvSHVYbjZTaVZhbGoxMU1kVWlNTXdhUlhJ?=
- =?utf-8?B?RjFxNStnWjdkYzNINnI0dEFxTXFoYmdqNFNqOVhnSWZpS1cxZ0hjNzByVCtm?=
- =?utf-8?B?VWN5MDVFcm1kc0xGUGJHdWI4V24yYTFHN2ZBM1owanN5WUJZeXpOZkdFcHlm?=
- =?utf-8?B?ZDVPR1U0VjNMVVJ0YXE2blk3K0ZhcHRMWkRzbnhMZGFVOXREUEc4YUwwYWVC?=
- =?utf-8?B?b001WVFMcFRYRTlCeTc2ckcrTUwrM2l0d21UR1ZFb0tJYlFTSEFIVFdMeUVy?=
- =?utf-8?Q?CrrLN+oLhCV53fq5YlFeFx0tc?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ce98ce8c-3c36-471d-8f45-08dd75ee34b8
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB9473.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2025 16:06:50.5034
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ECYNwxlRKZZEfwPmnzQGIjBAAG6av12UTVX84EeeVfcHKA0KendYninJ0UxqZvzT
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4482
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On 7 Apr 2025, at 12:05, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+Here's a set of patches to add basic support for the AFS GSSAPI security
+class to AF_RXRPC and kafs.  It provides transport security for keys that
+match the security index 6 (YFS) for connections to the AFS fileserver and
+VL server.
 
-> Zi Yan <ziy@nvidia.com> writes:
->
->> On 7 Apr 2025, at 10:43, Jesper Dangaard Brouer wrote:
->>
->>> On 07/04/2025 16.15, Zi Yan wrote:
->>>> On 7 Apr 2025, at 9:36, Zi Yan wrote:
->>>>
->>>>> On 7 Apr 2025, at 9:14, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->>>>>
->>>>>> Zi Yan<ziy@nvidia.com>  writes:
->>>>>>
->>>>>>> Resend to fix my signature.
->>>>>>>
->>>>>>> On 7 Apr 2025, at 4:53, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->>>>>>>
->>>>>>>> "Zi Yan"<ziy@nvidia.com>  writes:
->>>>>>>>
->>>>>>>>> On Fri Apr 4, 2025 at 6:18 AM EDT, Toke H=C3=B8iland-J=C3=B8rgens=
-en wrote:
->>>>>>>>>> Since we are about to stash some more information into the pp_ma=
-gic
->>>>>>>>>> field, let's move the magic signature checks into a pair of help=
-er
->>>>>>>>>> functions so it can be changed in one place.
->>>>>>>>>>
->>>>>>>>>> Reviewed-by: Mina Almasry<almasrymina@google.com>
->>>>>>>>>> Tested-by: Yonglong Liu<liuyonglong@huawei.com>
->>>>>>>>>> Acked-by: Jesper Dangaard Brouer<hawk@kernel.org>
->>>>>>>>>> Reviewed-by: Ilias Apalodimas<ilias.apalodimas@linaro.org>
->>>>>>>>>> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen<toke@redhat.com>
->>>>>>>>>> ---
->>>>>>>>>>   drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c |  4 ++--
->>>>>>>>>>   include/net/page_pool/types.h                    | 18 ++++++++=
-++++++++++
->>>>>>>>>>   mm/page_alloc.c                                  |  9 +++-----=
--
->>>>>>>>>>   net/core/netmem_priv.h                           |  5 +++++
->>>>>>>>>>   net/core/skbuff.c                                | 16 ++------=
---------
->>>>>>>>>>   net/core/xdp.c                                   |  4 ++--
->>>>>>>>>>   6 files changed, 32 insertions(+), 24 deletions(-)
->>>>>>>>>>
->>>>>>>>> <snip>
->>> [...]
->>>
->>>>>>>>>> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
->>>>>>>>>> index f51aa6051a99867d2d7d8c70aa7c30e523629951..347a3cc2c188f4a9=
-ced85e0d198947be7c503526 100644
->>>>>>>>>> --- a/mm/page_alloc.c
->>>>>>>>>> +++ b/mm/page_alloc.c
->>>>>>>>>> @@ -55,6 +55,7 @@
->>>>>>>>>>   #include <linux/delayacct.h>
->>>>>>>>>>   #include <linux/cacheinfo.h>
->>>>>>>>>>   #include <linux/pgalloc_tag.h>
->>>>>>>>>> +#include <net/page_pool/types.h>
->>>>>>>>>>   #include <asm/div64.h>
->>>>>>>>>>   #include "internal.h"
->>>>>>>>>>   #include "shuffle.h"
->>>>>>>>>> @@ -897,9 +898,7 @@ static inline bool page_expected_state(struc=
-t page *page,
->>>>>>>>>>   #ifdef CONFIG_MEMCG
->>>>>>>>>>   			page->memcg_data |
->>>>>>>>>>   #endif
->>>>>>>>>> -#ifdef CONFIG_PAGE_POOL
->>>>>>>>>> -			((page->pp_magic & ~0x3UL) =3D=3D PP_SIGNATURE) |
->>>>>>>>>> -#endif
->>>>>>>>>> +			page_pool_page_is_pp(page) |
->>>>>>>>>>   			(page->flags & check_flags)))
->>>>>>>>>>   		return false;
->>>>>>>>>>
->>>>>>>>>> @@ -926,10 +925,8 @@ static const char *page_bad_reason(struct p=
-age *page, unsigned long flags)
->>>>>>>>>>   	if (unlikely(page->memcg_data))
->>>>>>>>>>   		bad_reason =3D "page still charged to cgroup";
->>>>>>>>>>   #endif
->>>>>>>>>> -#ifdef CONFIG_PAGE_POOL
->>>>>>>>>> -	if (unlikely((page->pp_magic & ~0x3UL) =3D=3D PP_SIGNATURE))
->>>>>>>>>> +	if (unlikely(page_pool_page_is_pp(page)))
->>>>>>>>>>   		bad_reason =3D "page_pool leak";
->>>>>>>>>> -#endif
->>>>>>>>>>   	return bad_reason;
->>>>>>>>>>   }
->>>>>>>>>>
->>>>>>>>> I wonder if it is OK to make page allocation depend on page_pool =
-from
->>>>>>>>> net/page_pool.
->>>>>>>> Why? It's not really a dependency, just a header include with a st=
-atic
->>>>>>>> inline function...
->>>>>>> The function is checking, not even modifying, an core mm data struc=
-ture,
->>>>>>> struct page, which is also used by almost all subsystems. I do not =
-get
->>>>>>> why the function is in net subsystem.
->>>>>> Well, because it's using details of the PP definitions, so keeping i=
-t
->>>>>> there nicely encapsulates things. I mean, that's the whole point of
->>>>>> defining a wrapper function - encapsulating the logic =F0=9F=99=82
->>>>>>
->>>>>>>>> Would linux/mm.h be a better place for page_pool_page_is_pp()?
->>>>>>>> That would require moving all the definitions introduced in patch =
-2,
->>>>>>>> which I don't think is appropriate.
->>
->> The patch at the bottom moves page_pool_page_is_pp() to mm.h and compile=
-s.
->> The macros and the function use mm=E2=80=99s page->pp_magic, so I am not=
- sure
->> why it is appropriate, especially the user of the macros, net/core/page_=
-pool.c,
->> has already included mm.h.
->
-> Well, I kinda considered those details page_pool-internal. But okay, I
-> can move them if you prefer to have them in mm.h.
+Note that security index 4 (OpenAFS) can also be supported using this, but
+it needs more work as it's slightly different.
 
-Thanks.
+The patches also provide the ability to secure the callback channel -
+connections from the fileserver back to the client that are used to pass
+file change notifications, amongst other things.  When challenged by the
+fileserver, kafs will generate a token specific to that server and include
+it in the RESPONSE packet as the appdata.  The server then extracts this
+and uses it to send callback RPC calls back to the client.
 
-Best Regards,
-Yan, Zi
+It can also be used to provide transport security on the callback channel,
+but a further set of patches is required to provide the token and key to
+set that up when the client responds to the fileserver's challenge.
+
+This makes use of the previously added crypto-krb5 library that is now
+upstream (last commit fc0cf10c04f4).
+
+This series of patches consist of the following parts:
+
+ (0) Update kdoc comments to remove some kdoc builder warnings.
+
+ (1) Push reponding to CHALLENGE packets over to recvmsg() or the kernel
+     equivalent so that the application layer can include user-defined
+     information in the RESPONSE packet.  In a follow-up patch set, this
+     will allow the callback channel to be secured by the AFS filesystem.
+
+ (2) Add the AF_RXRPC RxGK security class that uses a key obtained from the
+     AFS GSS security service to do Kerberos 5-based encryption instead of
+     pcbc(fcrypt) and pcbc(des).
+
+ (3) Add support for callback channel encryption in kafs.
+
+ (4) Provide the test rxperf server module with some fixed krb5 keys.
+
+David
+
+The patches can be found on this branch also:
+
+	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=rxrpc-next
+
+CHANGES
+=======
+ver #2)
+ - Fix use of %zx instead of %lx.
+ - Add a patch to add 'Return:' descriptions into existing kdoc comments.
+ - Add 'Return:' descriptions into new kdoc comments.
+ - Add a function API ref at the end of rxrpc.rst.
+
+David Howells (13):
+  rxrpc: kdoc: Update function descriptions and add link from rxrpc.rst
+  rxrpc: Pull out certain app callback funcs into an ops table
+  rxrpc: Allow CHALLENGEs to the passed to the app for a RESPONSE
+  rxrpc: Add the security index for yfs-rxgk
+  rxrpc: Add YFS RxGK (GSSAPI) security class
+  rxrpc: rxgk: Provide infrastructure and key derivation
+  rxrpc: rxgk: Implement the yfs-rxgk security class (GSSAPI)
+  rxrpc: rxgk: Implement connection rekeying
+  rxrpc: Allow the app to store private data on peer structs
+  rxrpc: Display security params in the afs_cb_call tracepoint
+  afs: Use rxgk RESPONSE to pass token for callback channel
+  rxrpc: Add more CHALLENGE/RESPONSE packet tracing
+  rxrpc: rxperf: Add test RxGK server keys
+
+ Documentation/networking/rxrpc.rst |   15 +
+ fs/afs/Kconfig                     |    1 +
+ fs/afs/Makefile                    |    1 +
+ fs/afs/cm_security.c               |  340 +++++++
+ fs/afs/internal.h                  |   20 +
+ fs/afs/main.c                      |    1 +
+ fs/afs/misc.c                      |   27 +
+ fs/afs/rxrpc.c                     |   40 +-
+ fs/afs/server.c                    |    2 +
+ include/crypto/krb5.h              |    5 +
+ include/keys/rxrpc-type.h          |   17 +
+ include/net/af_rxrpc.h             |   51 +-
+ include/trace/events/afs.h         |   11 +-
+ include/trace/events/rxrpc.h       |  163 +++-
+ include/uapi/linux/rxrpc.h         |   77 +-
+ net/rxrpc/Kconfig                  |   23 +
+ net/rxrpc/Makefile                 |    6 +-
+ net/rxrpc/af_rxrpc.c               |   93 +-
+ net/rxrpc/ar-internal.h            |   78 +-
+ net/rxrpc/call_accept.c            |   34 +-
+ net/rxrpc/call_object.c            |   22 +-
+ net/rxrpc/conn_event.c             |  134 ++-
+ net/rxrpc/conn_object.c            |    2 +
+ net/rxrpc/insecure.c               |   13 +-
+ net/rxrpc/io_thread.c              |   12 +-
+ net/rxrpc/key.c                    |  187 ++++
+ net/rxrpc/oob.c                    |  381 ++++++++
+ net/rxrpc/output.c                 |   60 +-
+ net/rxrpc/peer_object.c            |   22 +-
+ net/rxrpc/protocol.h               |   20 +
+ net/rxrpc/recvmsg.c                |  132 ++-
+ net/rxrpc/rxgk.c                   | 1367 ++++++++++++++++++++++++++++
+ net/rxrpc/rxgk_app.c               |  285 ++++++
+ net/rxrpc/rxgk_common.h            |  139 +++
+ net/rxrpc/rxgk_kdf.c               |  287 ++++++
+ net/rxrpc/rxkad.c                  |  296 +++---
+ net/rxrpc/rxperf.c                 |   78 +-
+ net/rxrpc/security.c               |    3 +
+ net/rxrpc/sendmsg.c                |   22 +-
+ net/rxrpc/server_key.c             |   42 +
+ 40 files changed, 4268 insertions(+), 241 deletions(-)
+ create mode 100644 fs/afs/cm_security.c
+ create mode 100644 net/rxrpc/oob.c
+ create mode 100644 net/rxrpc/rxgk.c
+ create mode 100644 net/rxrpc/rxgk_app.c
+ create mode 100644 net/rxrpc/rxgk_common.h
+ create mode 100644 net/rxrpc/rxgk_kdf.c
+
 
