@@ -1,490 +1,218 @@
-Return-Path: <netdev+bounces-179539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE718A7D8CF
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 10:59:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E1A00A7D8EF
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 11:03:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D474E178E3E
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 08:58:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BCF61791EC
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 09:00:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C6A322687C;
-	Mon,  7 Apr 2025 08:57:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D40D22B598;
+	Mon,  7 Apr 2025 09:00:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hazent-com.20230601.gappssmtp.com header.i=@hazent-com.20230601.gappssmtp.com header.b="eWpTeNlf"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="CSphnPOp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1657A228CA9
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 08:57:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D71224AEB;
+	Mon,  7 Apr 2025 09:00:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744016266; cv=none; b=GbbA8g3cGNKVSoUBraa9952cFHeDYKhBZvlaVNCMV2Z2qOelZAgrmm3CDnhKVBWLlYVjplBg4HN2zA5V/HzPH5ttkPxLf8z9r3teva5hpO/KmYrYX5nkN66tIa9MaIX9xXCmu6/yCNTbdjpazRNvoKVN30pnAfnEfBcXZijKilM=
+	t=1744016451; cv=none; b=im7FmDa9kLChQ2UfqBfuYkhO0nsP9xLFzIbMNO19UmCmYanlgPofJ3jr/qRfIhs6I1RRGachfF1Xuqu+rXupNxO6VkKLZOeNxnXafGaetveZXpp3k4R0GFQgZKoqKRHd/GlmqhM/4JK6DYx05RYs/iMC6pe5ELXlGMulH6SUj0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744016266; c=relaxed/simple;
-	bh=RpbN82QUrdqC04tbCpk+G+olXpWnxygy3kggO/x12Pg=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=UxxGicCfTL8sluio1UvYJTf/DA51W04nMLl5Ee6H5h3gz0JB4pYqpm3j/DR7rVv3QOkzP1nFp9go5Ilxy8nUOP6Z4adklrmcR7QKE5UeSmk8l8R7e3SzEXIN0pYmdu7ONj/pAEkH3Evtbklx2SBrUJOtQ7xQGfdnyKxzQXJZxio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hazent.com; spf=pass smtp.mailfrom=hazent.com; dkim=pass (2048-bit key) header.d=hazent-com.20230601.gappssmtp.com header.i=@hazent-com.20230601.gappssmtp.com header.b=eWpTeNlf; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hazent.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hazent.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43690d4605dso26627085e9.0
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 01:57:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=hazent-com.20230601.gappssmtp.com; s=20230601; t=1744016261; x=1744621061; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:to:from:subject:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RTFgZ0+8zV1IjemYSyGmwV/+Ag+RISmj9XlH++ptlDw=;
-        b=eWpTeNlfAHz9E1gc/dYsmaIyot7fDDxNgeBUzZeJwZwdeir8UVh3LO4BP0jA1sU7S+
-         82LUGWtZLRqYEQAKpkMhvZZJ11pVMH90AJF2ppGTz1+IqatPqWT8mF0I7SKenEfozKxu
-         rMLEMRofGdGwuHbMFnlTbtbOm3Ywm3XKwyxiJC+qQjqVrWOhvCucunlvhUSmC7CNd13F
-         EwziY9Han15841cElYN9etzak+1I23iAOuj8GAlSIHV3HZYnceqJbTY8qi5HqxhAT2MN
-         gA7Hv185dm7lU+dbtAYDd4leWVo1mlnmA5pt3Zf5cI7RkqJawoHcVqZCcP11UQuWGGXp
-         k0NQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744016261; x=1744621061;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=RTFgZ0+8zV1IjemYSyGmwV/+Ag+RISmj9XlH++ptlDw=;
-        b=WWiFhgUP1aa+EWm8yqKQvABJawrAcet7EiKnOV6cGz7cKsGLgL2XFMnpkuoOF/YBPc
-         SfTe3fHSe0C3wKsF+ZtdNe6+Wa8Kh0nlZiPrKkb6ORHcIeV55IQrY7DuIk19vrZV3tk3
-         Y8IKSwJu1LX9F0m4BihAr+zUdZVr2r76r2Rh9LwqahTn4YHefE8A16dD9DKGQ7RD3FYY
-         JRZe8f9fHVQJL9+E+itg6lw02cM/H3Go/pRflL3vp6HmMn/UzFI+CSXJ62Qty6TEN0Tk
-         qhXRqI9xo7S2phyBj9rpQ5+M3iNciK7VCfuN+DCL8OBVwvU3cFWqzMJ03tkSLJh6nzG3
-         hbqw==
-X-Gm-Message-State: AOJu0YwUmo14bIzB4maLv3/ydU+bIMtbBuyWu6NBK0bY9c6fstADahxJ
-	A7cPbuvXWbdxB36UShsZgmwv/92KxK+ZmStAJ1uNfr4uJ2JzXUEHO9CoTXTLxZSZM60m0RLWUeG
-	umQ==
-X-Gm-Gg: ASbGncumW/vHI1JJcgNA0W6cEw7nxOsQpX11LdYjmfuK2QbfbJkb8gb9kfpfeDP6Ox4
-	hvq+N8FNmu/rYxZ4QKGW2whMuSVywBZ0VzL1mr2Q5PGp6L8gKSbhWcj3UQJJVTsSYXSrzElzIhD
-	Zm5tz9JsFWzlugD8lzOUSxHrEFCk8o7OElr1Ob6S4GpAn06vZ2xBmbdcBpoMbv7e2P0Em8pn4gc
-	/lHOiu7LvZiVCNfXGrM7q61Kj7VG/s4fxRCN9u8gdUp2AAX8LN4nCETciRJUaTDJypPrLxvwIkh
-	IVAUjYdjggafV2mboBfI5aVwIak+SdEmw0PjnjZdRPLL0Bccozdh
-X-Google-Smtp-Source: AGHT+IE1Uc0n2vpEVttP+KcmJr13D+HfiuTM3dv+J+hq9pDaKZ8zOttp6gbly61u6lLXOsD9kj5awQ==
-X-Received: by 2002:a05:600c:1385:b0:43d:46de:b0eb with SMTP id 5b1f17b1804b1-43ecf85f4e8mr102702295e9.12.1744016261149;
-        Mon, 07 Apr 2025 01:57:41 -0700 (PDT)
-Received: from [192.168.2.3] ([109.227.147.74])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec1630de9sm125763565e9.1.2025.04.07.01.57.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 01:57:40 -0700 (PDT)
-Message-ID: <2a220c71a7428dd38a18ebd17408f4d7d8e0cc33.camel@hazent.com>
-Subject: Re: Fwd: Re: Issue with AMD Xilinx AXI Ethernet (xilinx_axienet) on
- MicroBlaze: Packets only received after some buffer is full
-From: =?ISO-8859-1?Q?=C1lvaro?= "G. M." <alvaro.gamez@hazent.com>
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jakub Kicinski
-	 <kuba@kernel.org>, "Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>
-Date: Mon, 07 Apr 2025 10:57:39 +0200
-In-Reply-To: <4909677fbf94dcbe5949a2a88292439302109920.camel@hazent.com>
-References: <c9861f0b98ecd199873585e188099b6fa877cc56.camel@hazent.com>
-	 <4909677fbf94dcbe5949a2a88292439302109920.camel@hazent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.0-1 
+	s=arc-20240116; t=1744016451; c=relaxed/simple;
+	bh=w0tWavQl+YpsDHBSzOwcYlHjUFqOxhKwQeLdkmj4vYM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=trNl5YEEij6WZBFfc9fgwyVyQQUH7D4ITrhktoDNq8bCc1H/6Y/AXyNloEkdRYfimO74u8LqybbCCMhOqjYUEfhGvKKWjxnnamuFxFrryCyXpE6vWRSusTqlu7gXoE/NcFLLWJ+N0GTndNS030GxqRopBCu4Xh/LNJi8+/E2sME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=CSphnPOp; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=x0kZSjI5cXDCsU46sqMKWaFM1hZW8VHKFbEkunPM1y8=; b=CSphnPOpIVxyr+laAB0yVjCTUf
+	IdIf8eh/2BoNMPUFevhZisIWzfISy4WPLFjYvqyE9bqmZTAstasoym7a2l3qm8ifXETOP0E+2XsL7
+	x7EDc2noByzRDvl1CecoCtuVzdmRNEhNe5UcNXn0Ge021kz+TWvf0uCKLpAnI3tXix3ehPlw3TeMZ
+	HNZozAzz2V6qIq28DphbJJc1LFxYalW3EyBQbgc4Yfnj59ebky9ktZFYvv+dMtF8NTEHmpehnIDpA
+	vXlXziMG72m/OplRYnnZGlsRiZCoWNk3AYOYM5i9IGhRQGr0zOXbqG2gw3FAuzS5oQZuTNjN3o2Ap
+	ZbOKc0dw==;
+Received: from sslproxy08.your-server.de ([78.47.166.52])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1u1iLP-000M66-12;
+	Mon, 07 Apr 2025 11:00:39 +0200
+Received: from [178.197.249.21] (helo=[192.168.1.114])
+	by sslproxy08.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1u1iLO-000PGR-2g;
+	Mon, 07 Apr 2025 11:00:38 +0200
+Message-ID: <98b2c012-dcbe-4abf-8b22-2ab37604ccc8@iogearbox.net>
+Date: Mon, 7 Apr 2025 11:00:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf v2 1/2] bpf: support SKF_NET_OFF and SKF_LL_OFF on skb
+ frags
+To: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
+ john.fastabend@gmail.com, Willem de Bruijn <willemb@google.com>,
+ Matt Moeller <moeller.matt@gmail.com>
+References: <20250404142633.1955847-1-willemdebruijn.kernel@gmail.com>
+ <20250404142633.1955847-2-willemdebruijn.kernel@gmail.com>
+ <584071a3-10df-443a-ad8c-1fa7bc82d821@iogearbox.net>
+ <CAF=yD-+ccY58AAneA7tLokuUahrj=8cdDtPPopGH0h8mK-hMbQ@mail.gmail.com>
+ <CANP3RGdQNt5Qn9APrUh7V+r2RKoBx9KtzpDfres0wf+UZMeedg@mail.gmail.com>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <CANP3RGdQNt5Qn9APrUh7V+r2RKoBx9KtzpDfres0wf+UZMeedg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 1.0.7/27600/Sun Apr  6 10:29:47 2025)
 
-Hi again
+On 4/4/25 7:56 PM, Maciej Żenczykowski wrote:
+> On Fri, Apr 4, 2025 at 9:34 AM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+>> On Fri, Apr 4, 2025 at 12:11 PM Daniel Borkmann <daniel@iogearbox.net> wrote:
+>>>
+>>> Hi Willem,
+>>>
+>>> On 4/4/25 4:23 PM, Willem de Bruijn wrote:
+>>> [...]
+>>>> v1->v2
+>>>>     - introduce bfp_skb_load_helper_convert_offset to avoid open coding
+>>>> ---
+>>>>    include/linux/filter.h |  3 --
+>>>>    kernel/bpf/core.c      | 21 -----------
+>>>>    net/core/filter.c      | 80 +++++++++++++++++++++++-------------------
+>>>>    3 files changed, 44 insertions(+), 60 deletions(-)
+>>>>
+>>>> diff --git a/include/linux/filter.h b/include/linux/filter.h
+>>>> index f5cf4d35d83e..708ac7e0cd36 100644
+>>>> --- a/include/linux/filter.h
+>>>> +++ b/include/linux/filter.h
+>>>> @@ -1496,9 +1496,6 @@ static inline u16 bpf_anc_helper(const struct sock_filter *ftest)
+>>>>        }
+>>>>    }
+>>>>
+>>>> -void *bpf_internal_load_pointer_neg_helper(const struct sk_buff *skb,
+>>>> -                                        int k, unsigned int size);
+>>>> -
+>>>>    static inline int bpf_tell_extensions(void)
+>>>>    {
+>>>>        return SKF_AD_MAX;
+>>>> diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+>>>> index ba6b6118cf50..0e836b5ac9a0 100644
+>>>> --- a/kernel/bpf/core.c
+>>>> +++ b/kernel/bpf/core.c
+>>>> @@ -68,27 +68,6 @@
+>>>>    struct bpf_mem_alloc bpf_global_ma;
+>>>>    bool bpf_global_ma_set;
+>>>>
+>>>> -/* No hurry in this branch
+>>>> - *
+>>>> - * Exported for the bpf jit load helper.
+>>>> - */
+>>>> -void *bpf_internal_load_pointer_neg_helper(const struct sk_buff *skb, int k, unsigned int size)
+>>>> -{
+>>>> -     u8 *ptr = NULL;
+>>>> -
+>>>> -     if (k >= SKF_NET_OFF) {
+>>>> -             ptr = skb_network_header(skb) + k - SKF_NET_OFF;
+>>>> -     } else if (k >= SKF_LL_OFF) {
+>>>> -             if (unlikely(!skb_mac_header_was_set(skb)))
+>>>> -                     return NULL;
+>>>> -             ptr = skb_mac_header(skb) + k - SKF_LL_OFF;
+>>>> -     }
+>>>> -     if (ptr >= skb->head && ptr + size <= skb_tail_pointer(skb))
+>>>> -             return ptr;
+>>>> -
+>>>> -     return NULL;
+>>>> -}
+>>>
+>>> Wouldn't this break sparc 32bit JIT which still calls into this?
+>>>
+>>> arch/sparc/net/bpf_jit_asm_32.S :
+>>>
+>>> #define bpf_negative_common(LEN)                        \
+>>>           save    %sp, -SAVE_SZ, %sp;                     \
+>>>           mov     %i0, %o0;                               \
+>>>           mov     r_OFF, %o1;                             \
+>>>           SIGN_EXTEND(%o1);                               \
+>>>           call    bpf_internal_load_pointer_neg_helper;   \
+>>>            mov    (LEN), %o2;                             \
+>>>           mov     %o0, r_TMP;                             \
+>>>           cmp     %o0, 0;                                 \
+>>>           BE_PTR(bpf_error);                              \
+>>>            restore;
+>>
+>> Argh, good catch. Thanks Daniel.
+>>
+>> I'll drop the removal of bpf_internal_load_pointer_neg_helper from the patch.
+> 
+> add a 'deprecated only used by sparc32 comment'
+> 
+> hopefully someone that knows sparc32 assembly can fix it
 
-> On Thu, 2025-04-03 at 13:58 +0000, Gupta, Suraj wrote:
-> >=20
-> >=20
-> > FYI, basic ping and iperf both works for us in DMAengine flow for AXI e=
-thernet=C2=A0
-> > 1G designs. We tested for full-duplex mode. But I can see half duplex i=
-n your case,
-> > could you please confirm if that is expected and correct?
+Alternatively, the bpf_internal_load_pointer_neg_helper() could be moved entirely
+over into arch/sparc/net/ so that others won't be tempted to reuse.
 
-I've implemented a very basic block diagram on Vivado for Digilent Nexys Vi=
-deo board,
-which fits a 1G phy from realtek. The behaviour is exactly the same: using =
-dmaengine
-makes it so that a great big chunk of data needs to arrive before it reache=
-s the kernel,
-whereas using old dma code in axienet.c, even though doesn't have that buff=
-ering effect,
-still drops ARP request packets.
-
-The exact same design works in the same kernel I had running on my board, 4=
-.4.43
-
-If you have this tested on other boards, I must assume it's just a matter o=
-f my DTS
-being defective, so I'm attaching the whole thing here alongside kernel con=
-fig,
-and I've created a github repo with the buildroot and Vivado projects in ca=
-se you
-want to take a look at them: https://github.com/agamez/axinet_debug, but it=
-'s
-simply the basics. I've included snapshots of DMA and ethernet configuratio=
-n
-in the repository so you don't even need to create it if you don't want to.
-
-# ifconfig eth0 192.168.99.2
-xilinx_axienet 40c00000.ethernet eth0: PHY [axienet-40c00000:01] driver [RT=
-L8211E Gigabit Ethernet] (irq=3DPOLL)
-xilinx_axienet 40c00000.ethernet eth0: configuring for phy/rgmii link mode
-xilinx_axienet 40c00000.ethernet eth0: Link is Up - 1Gbps/Full - flow contr=
-ol rx/tx
-
-# ifconfig eth0
-eth0      Link encap:Ethernet  HWaddr 02:10:20:30:40:50 =20
-          inet addr:192.168.99.2  Bcast:192.168.99.255  Mask:255.255.255.0
-          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
-          RX packets:2 errors:0 dropped:2 overruns:0 frame:0
-          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
-          collisions:0 txqueuelen:1000=20
-          RX bytes:340 (340.0 B)  TX bytes:0 (0.0 B)
-
-
-
-/dts-v1/;
-/ {
-	#address-cells =3D <1>;
-	#size-cells =3D <1>;
-	compatible =3D "xlnx,microblaze";
-	model =3D "Xilinx MicroBlaze";
-	cpus {
-		#address-cells =3D <1>;
-		#cpus =3D <1>;
-		#size-cells =3D <0>;
-		microblaze_0: cpu@0 {
-			reg =3D <0>;
-			bus-handle =3D <&amba_pl>;
-			clock-frequency =3D <100000000>;
-			clocks =3D <&clk_cpu>;
-			compatible =3D "xlnx,microblaze-9.5";
-			d-cache-baseaddr =3D <0x80000000>;
-			d-cache-highaddr =3D <0x8fffffff>;
-			d-cache-line-size =3D <0x10>;
-			d-cache-size =3D <0x8000>;
-			device_type =3D "cpu";
-			i-cache-baseaddr =3D <0x80000000>;
-			i-cache-highaddr =3D <0x8fffffff>;
-			i-cache-line-size =3D <0x20>;
-			i-cache-size =3D <0x8000>;
-			interrupt-handle =3D <&microblaze_0_axi_intc>;
-			model =3D "microblaze,9.5";
-			timebase-frequency =3D <100000000>;
-			xlnx,addr-tag-bits =3D <0xd>;
-			xlnx,allow-dcache-wr =3D <0x1>;
-			xlnx,allow-icache-wr =3D <0x1>;
-			xlnx,area-optimized =3D <0x0>;
-			xlnx,async-interrupt =3D <0x1>;
-			xlnx,avoid-primitives =3D <0x0>;
-			xlnx,base-vectors =3D <0x00000000>;
-			xlnx,branch-target-cache-size =3D <0x0>;
-			xlnx,cache-byte-size =3D <0x8000>;
-			xlnx,d-axi =3D <0x1>;
-			xlnx,d-lmb =3D <0x1>;
-			xlnx,d-lmb-mon =3D <0x0>;
-			xlnx,data-size =3D <0x20>;
-			xlnx,dc-axi-mon =3D <0x0>;
-			xlnx,dcache-addr-tag =3D <0xd>;
-			xlnx,dcache-always-used =3D <0x1>;
-			xlnx,dcache-byte-size =3D <0x8000>;
-			xlnx,dcache-data-width =3D <0x0>;
-			xlnx,dcache-force-tag-lutram =3D <0x0>;
-			xlnx,dcache-line-len =3D <0x4>;
-			xlnx,dcache-use-writeback =3D <0x0>;
-			xlnx,dcache-victims =3D <0x8>;
-			xlnx,debug-counter-width =3D <0x20>;
-			xlnx,debug-enabled =3D <0x1>;
-			xlnx,debug-event-counters =3D <0x5>;
-			xlnx,debug-external-trace =3D <0x0>;
-			xlnx,debug-latency-counters =3D <0x1>;
-			xlnx,debug-profile-size =3D <0x0>;
-			xlnx,debug-trace-size =3D <0x2000>;
-			xlnx,div-zero-exception =3D <0x1>;
-			xlnx,dp-axi-mon =3D <0x0>;
-			xlnx,dynamic-bus-sizing =3D <0x0>;
-			xlnx,ecc-use-ce-exception =3D <0x0>;
-			xlnx,edge-is-positive =3D <0x1>;
-			xlnx,enable-discrete-ports =3D <0x0>;
-			xlnx,endianness =3D <0x1>;
-			xlnx,fault-tolerant =3D <0x0>;
-			xlnx,fpu-exception =3D <0x0>;
-			xlnx,freq =3D <0x4f64b50>;
-			xlnx,fsl-exception =3D <0x0>;
-			xlnx,fsl-links =3D <0x0>;
-			xlnx,i-axi =3D <0x0>;
-			xlnx,i-lmb =3D <0x1>;
-			xlnx,i-lmb-mon =3D <0x0>;
-			xlnx,ic-axi-mon =3D <0x0>;
-			xlnx,icache-always-used =3D <0x1>;
-			xlnx,icache-data-width =3D <0x0>;
-			xlnx,icache-force-tag-lutram =3D <0x0>;
-			xlnx,icache-line-len =3D <0x8>;
-			xlnx,icache-streams =3D <0x1>;
-			xlnx,icache-victims =3D <0x8>;
-			xlnx,ill-opcode-exception =3D <0x1>;
-			xlnx,imprecise-exceptions =3D <0x0>;
-			xlnx,interconnect =3D <0x2>;
-			xlnx,interrupt-is-edge =3D <0x0>;
-			xlnx,interrupt-mon =3D <0x0>;
-			xlnx,ip-axi-mon =3D <0x0>;
-			xlnx,lockstep-select =3D <0x0>;
-			xlnx,lockstep-slave =3D <0x0>;
-			xlnx,mmu-dtlb-size =3D <0x4>;
-			xlnx,mmu-itlb-size =3D <0x2>;
-			xlnx,mmu-privileged-instr =3D <0x0>;
-			xlnx,mmu-tlb-access =3D <0x3>;
-			xlnx,mmu-zones =3D <0x2>;
-			xlnx,num-sync-ff-clk =3D <0x2>;
-			xlnx,num-sync-ff-clk-debug =3D <0x2>;
-			xlnx,num-sync-ff-clk-irq =3D <0x1>;
-			xlnx,num-sync-ff-dbg-clk =3D <0x1>;
-			xlnx,number-of-pc-brk =3D <0x1>;
-			xlnx,number-of-rd-addr-brk =3D <0x0>;
-			xlnx,number-of-wr-addr-brk =3D <0x0>;
-			xlnx,opcode-0x0-illegal =3D <0x1>;
-			xlnx,optimization =3D <0x0>;
-			xlnx,pc-width =3D <0x20>;
-			xlnx,pvr =3D <0x2>;
-			xlnx,pvr-user1 =3D <0x00>;
-			xlnx,pvr-user2 =3D <0x00000000>;
-			xlnx,reset-msr =3D <0x00000000>;
-			xlnx,sco =3D <0x0>;
-			xlnx,trace =3D <0x0>;
-			xlnx,unaligned-exceptions =3D <0x1>;
-			xlnx,use-barrel =3D <0x1>;
-			xlnx,use-branch-target-cache =3D <0x0>;
-			xlnx,use-config-reset =3D <0x0>;
-			xlnx,use-dcache =3D <0x1>;
-			xlnx,use-div =3D <0x1>;
-			xlnx,use-ext-brk =3D <0x0>;
-			xlnx,use-ext-nm-brk =3D <0x0>;
-			xlnx,use-extended-fsl-instr =3D <0x0>;
-			xlnx,use-fpu =3D <0x0>;
-			xlnx,use-hw-mul =3D <0x2>;
-			xlnx,use-icache =3D <0x1>;
-			xlnx,use-interrupt =3D <0x2>;
-			xlnx,use-mmu =3D <0x3>;
-			xlnx,use-msr-instr =3D <0x1>;
-			xlnx,use-pcmp-instr =3D <0x1>;
-			xlnx,use-reorder-instr =3D <0x1>;
-			xlnx,use-stack-protection =3D <0x0>;
-		};
-	};
-	clocks {
-		#address-cells =3D <1>;
-		#size-cells =3D <0>;
-		clk_cpu: clk_cpu@0 {
-			#clock-cells =3D <0>;
-			clock-frequency =3D <100000000>;
-			clock-output-names =3D "clk_cpu";
-			compatible =3D "fixed-clock";
-			reg =3D <0>;
-		};
-		clk_bus_0: clk_bus_0@1 {
-			#clock-cells =3D <0>;
-			clock-frequency =3D <100000000>;
-			clock-output-names =3D "clk_bus_0";
-			compatible =3D "fixed-clock";
-			reg =3D <1>;
-		};
-	};
-	amba_pl: amba_pl {
-		#address-cells =3D <1>;
-		#size-cells =3D <1>;
-		compatible =3D "simple-bus";
-		ranges ;
-		microblaze_0_axi_intc: interrupt-controller@41200000 {
-			#interrupt-cells =3D <2>;
-			compatible =3D "xlnx,xps-intc-1.00.a";
-			interrupt-controller ;
-			reg =3D <0x41200000 0x10000>;
-			xlnx,kind-of-intr =3D <0x06>;
-			xlnx,num-intr-inputs =3D <0x06>;
-		};
-		axi_timer_0: timer@41c00000 {
-			clock-frequency =3D <100000000>;
-			clocks =3D <&clk_bus_0>;
-			compatible =3D "xlnx,xps-timer-1.00.a";
-			interrupt-parent =3D <&microblaze_0_axi_intc>;
-			interrupts =3D <0 2>;
-			reg =3D <0x41c00000 0x10000>;
-			xlnx,count-width =3D <0x20>;
-			xlnx,gen0-assert =3D <0x1>;
-			xlnx,gen1-assert =3D <0x1>;
-			xlnx,one-timer-only =3D <0x0>;
-			xlnx,trig0-assert =3D <0x1>;
-			xlnx,trig1-assert =3D <0x1>;
-		};
-		axi_uartlite_0: serial@40600000 {
-			clock-frequency =3D <100000000>;
-			clocks =3D <&clk_bus_0>;
-			compatible =3D "xlnx,xps-uartlite-1.00.a";
-			current-speed =3D <115200>;
-			device_type =3D "serial";
-			interrupt-parent =3D <&microblaze_0_axi_intc>;
-			interrupts =3D <1 0>;
-			port-number =3D <0>;
-			reg =3D <0x40600000 0x10000>;
-			xlnx,baudrate =3D <0x2580>;
-			xlnx,data-bits =3D <0x8>;
-			xlnx,odd-parity =3D <0x0>;
-			xlnx,s-axi-aclk-freq-hz-d =3D "100.00";
-			xlnx,use-parity =3D <0x0>;
-		};
-		axi_ethernet_0_dma: dma@41e00000 {
-			compatible =3D "xlnx,axi-dma-1.00.a";
-			#dma-cells =3D <1>;
-			reg =3D <0x41e00000 0x10000>;
-			interrupt-parent =3D <&microblaze_0_axi_intc>;
-			interrupts =3D <4 1 5 1>;
-			xlnx,addrwidth =3D <32>;
-			xlnx,datawidth =3D <32>;
-			xlnx,include-sg;
-			xlnx,sg-length-width =3D <16>;
-			xlnx,include-dre =3D <1>;
-			xlnx,axistream-connected =3D <1>;
-			xlnx,irq-delay =3D <0>;
-			dma-channels =3D <2>;
-			clock-names =3D "s_axi_lite_aclk", "m_axi_mm2s_aclk", "m_axi_s2mm_aclk",=
- "m_axi_sg_aclk";
-			clocks =3D <&clk_bus_0>, <&clk_bus_0>, <&clk_bus_0>, <&clk_bus_0>;
-			dma-channel@41e00000 {
-				compatible =3D "xlnx,axi-dma-mm2s-channel";
-				xlnx,include-dre =3D <1>;
-				interrupts =3D <4 1>;
-				xlnx,datawidth =3D <32>;
-			};
-			dma-channel@41e00030 {
-				compatible =3D "xlnx,axi-dma-s2mm-channel";
-				xlnx,include-dre =3D <1>;
-				interrupts =3D <5 1>;
-				xlnx,datawidth =3D <32>;
-			};
-		};
-		axi_ethernet_eth: ethernet@40c00000 {
-			compatible =3D "xlnx,axi-ethernet-1.00.a";
-			reg =3D <0x40c00000 0x40000>;
-			phy-handle =3D <&phy1>;
-			interrupt-parent =3D <&microblaze_0_axi_intc>;
-			interrupts =3D <3 0>;
-			xlnx,rxmem =3D <0x8000>;
-			max-speed =3D <100000>;
-			phy-mode =3D "rgmii";
-			xlnx,txcsum =3D <0x2>;
-			xlnx,rxcsum =3D <0x2>;
-			clock-names =3D "s_axi_lite_clk", "axis_clk", "ref_clk", "mgt_clk";
-			clocks =3D <&clk_bus_0>, <&clk_bus_0>, <&clk_bus_0>, <&clk_bus_0>;
-			axistream-connected =3D <&axi_ethernet_0_dma>;
-			dmas =3D <&axi_ethernet_0_dma 0>, <&axi_ethernet_0_dma 1>;
-			dma-names =3D "tx_chan0", "rx_chan0";
-			axi_ethernetlite_0_mdio: mdio {
-				#address-cells =3D <1>;
-				#size-cells =3D <0>;
-				phy1: phy@1 {
-				/*	compatible =3D "ethernet-phy-id001c.c915", "realtek,RTL8211E", "ethe=
-rnet-phy-ieee802.3-c22"; */
-					device_type =3D "ethernet-phy";
-					reg =3D <1>;
-				};
-			};
-		};
-
-	};
-};
-/ {
-	chosen {
-		bootargs =3D "console=3DttyUL0,9600 uio_pdrv_genirq.of_id=3Dgeneric-uio";
-		linux,stdout-path =3D &axi_uartlite_0;
-		stdout-path =3D &axi_uartlite_0;
-	};
-	aliases {
-		serial0 =3D &axi_uartlite_0;
-	};
-	memory {
-		device_type =3D "memory";
-		reg =3D <0x80000000 0x0fffffff>;
-	};
-};
-&axi_ethernet_eth {
-	local-mac-address =3D [02 10 20 30 40 50];
-};
-
-
-This is my kernel configuration. Buildroot sets later initramfs.
-
-CONFIG_SYSVIPC=3Dy
-CONFIG_POSIX_MQUEUE=3Dy
-CONFIG_PREEMPT=3Dy
-CONFIG_LOG_BUF_SHIFT=3D16
-CONFIG_KERNEL_BASE_ADDR=3D0x80000000
-CONFIG_XILINX_MICROBLAZE0_FAMILY=3D"artix7"
-CONFIG_XILINX_MICROBLAZE0_USE_MSR_INSTR=3D1
-CONFIG_XILINX_MICROBLAZE0_USE_PCMP_INSTR=3D1
-CONFIG_XILINX_MICROBLAZE0_USE_BARREL=3D1
-CONFIG_XILINX_MICROBLAZE0_USE_DIV=3D1
-CONFIG_XILINX_MICROBLAZE0_USE_HW_MUL=3D2
-CONFIG_XILINX_MICROBLAZE0_USE_FPU=3D2
-CONFIG_XILINX_MICROBLAZE0_HW_VER=3D"8.30.a"
-CONFIG_HZ_100=3Dy
-CONFIG_CMDLINE_BOOL=3Dy
-CONFIG_CMDLINE=3D"earlycon console=3DttyUL0,9600"
-CONFIG_HIGHMEM=3Dy
-CONFIG_NET=3Dy
-CONFIG_PACKET=3Dy
-CONFIG_UNIX=3Dy
-CONFIG_INET=3Dy
-CONFIG_IP_MULTICAST=3Dy
-CONFIG_DEVTMPFS=3Dy
-CONFIG_DEVTMPFS_MOUNT=3Dy
-CONFIG_MTD=3Dy
-CONFIG_MTD_CMDLINE_PARTS=3Dy
-CONFIG_MTD_BLOCK=3Dy
-CONFIG_MTD_SPI_NOR=3Dy
-CONFIG_NETDEVICES=3Dy
-CONFIG_XILINX_AXI_EMAC=3Dy
-CONFIG_REALTEK_PHY=3Dy
-CONFIG_DP83848_PHY=3Dy
-CONFIG_DP83620_PHY=3Dy
-CONFIG_DP83869_PHY=3Dy
-CONFIG_SERIAL_UARTLITE=3Dy
-CONFIG_SERIAL_UARTLITE_CONSOLE=3Dy
-CONFIG_I2C=3Dy
-CONFIG_I2C_CHARDEV=3Dy
-CONFIG_I2C_XILINX=3Dy
-CONFIG_SPI=3Dy
-CONFIG_SPI_XILINX=3Dy
-CONFIG_SPI_SPIDEV=3Dy
-CONFIG_GPIOLIB=3Dy
-CONFIG_GPIO_XILINX=3Dy
-CONFIG_SENSORS_IIO_HWMON=3Dy
-CONFIG_REGULATOR=3Dy
-CONFIG_REGULATOR_FIXED_VOLTAGE=3Dy
-CONFIG_FB=3Dy
-CONFIG_FB_XILINX=3Dy
-CONFIG_DMADEVICES=3Dy
-CONFIG_XILINX_DMA=3Dy
-CONFIG_UIO=3Dy
-CONFIG_UIO_PDRV_GENIRQ=3Dy
-CONFIG_IIO=3Dy
-CONFIG_AD799X=3Dy
-CONFIG_XILINX_XADC=3Dy
-CONFIG_JFFS2_FS=3Dy
-CONFIG_SQUASHFS=3Dy
-CONFIG_SQUASHFS_LZ4=3Dy
-CONFIG_SQUASHFS_4K_DEVBLK_SIZE=3Dy
-CONFIG_ROMFS_FS=3Dy
-CONFIG_ROMFS_BACKED_BY_BOTH=3Dy
-CONFIG_NFS_FS=3Dy
-CONFIG_DEBUG_KERNEL=3Dy
-CONFIG_MAGIC_SYSRQ=3Dy
-
-
-Thanks a lot,
-
---=20
-=C3=81lvaro G. M.
+Cheers,
+Daniel
 
