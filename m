@@ -1,182 +1,150 @@
-Return-Path: <netdev+bounces-179557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 777D1A7D97A
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 11:23:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AD05A7D98E
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 11:25:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4724E1887074
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 09:21:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B4E31895967
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 09:22:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C320B23875A;
-	Mon,  7 Apr 2025 09:19:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59F1422FF44;
+	Mon,  7 Apr 2025 09:21:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="JzV5Q958"
+	dkim=pass (1024-bit key) header.d=natalenko.name header.i=@natalenko.name header.b="HWQ80ZTx"
 X-Original-To: netdev@vger.kernel.org
-Received: from sg-1-21.ptr.blmpb.com (sg-1-21.ptr.blmpb.com [118.26.132.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from prime.voidband.net (prime.voidband.net [199.247.17.104])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A3223716B
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 09:19:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8427422B8B0;
+	Mon,  7 Apr 2025 09:21:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.247.17.104
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744017558; cv=none; b=qA+1ZQtUC0fwwM3iLRqVdkMUtuGthqOKvoNvcgYoztCir4s+1hfPIkq0HPRwk7aV+4cMWBnP3VilVMl8d2yBC1Qi/NgY0WnYcdbSm+HL7HJakt4fac8xFK3dC+jbioWK1U+HzRzKLNL4P6gXn0f0BpBPFhg+8PLsk6QPYw6oXts=
+	t=1744017708; cv=none; b=lwmMJH7vP46+KggaTaumxpJMSCJi/85f7rXWX1/iiYr1Png/6uJEDas8B6EXptS2DYw0g3O0NydOB0onciPQ9z+NzlwWKvR6BUe8EpnbVCWwzzIoPvZCemz8yBV0NMNQITlkUME84WXGd0GlBhLVWMed6bKwb3mOWfFainFZiyQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744017558; c=relaxed/simple;
-	bh=WZhYQVmEzS37DSYHB8fg82yBli+uIkHpjxt3EmTTNGw=;
-	h=Subject:Mime-Version:Content-Type:In-Reply-To:To:Cc:From:Date:
-	 Message-Id:References; b=AOp+2yzOM+a/zU7ZtDAmfPiU0uM1huR/fjRsQsqG1X51ye9b5yrh9R/q/BRFLknA2Rh9w5WZewVwKwatj1Rf+5brTApigBmpvovZ4BmzqCH6a69xTFtvqd392TysUMDcuOZJx2d6XzFQKxANwNeOLTDIrcq5/naibSLpxuSB5qg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=JzV5Q958; arc=none smtp.client-ip=118.26.132.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=feishu2403070942; d=yunsilicon.com; t=1744017410; h=from:subject:
- mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
- mime-version:in-reply-to:message-id;
- bh=V0qnB1MJxRXWqNSZ5w1A1IzePmv/WCb7nczJ3vOV/sU=;
- b=JzV5Q958ZRsAU/klCwRYxKdr3ZY08Z4btI8p1ed/RqND4djHnGXqADk4gWs/TxCAvgWRIO
- h61v9uK8CEwmBLnsb8hvICmLZYMBR0LyO2b4VQ29hMofeoffknYYxVV47xGYou0/Cy7uUz
- b2o1P5eomEOetJjay5mnp5v9nuM8uRBbP29teTUhhnFd5najGBtOlLjpVuxvGQu6PwWgZV
- lYNCgLxGVVGAZxEJc2ybOPS6aldnCcrT1mN+HGkOtm6CvyOJgolO9vQRtLxQsK09MDf7dA
- 4fF+3CVVqqadE/TwK8O5nRsge8Sft9dP4AlGvI7rwTfuUwoAXYALdQGvAEqnYw==
-Subject: Re: [PATCH net-next v9 09/14] xsc: Init net device
+	s=arc-20240116; t=1744017708; c=relaxed/simple;
+	bh=vlHXXG98PgWKxGxcZYLCRP/TU5pgXiI5WxEWwcpmfhA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nDXvoqVaj6J+e7DK2PWOgFmJztC7QA0NKjjxWgoYZ9o4wYEEuS1t4BeLfdc/8d1RO3mebICPCr3Za9aEte3SSVJI3/Bg9frOBjIMlo3ZeUuSbU8ee6EY1J9FZcRusPYmihpn9p5D9XkYS+5IgheNJxWwWHIbpRVC5plzWSA4u6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=natalenko.name; spf=pass smtp.mailfrom=natalenko.name; dkim=pass (1024-bit key) header.d=natalenko.name header.i=@natalenko.name header.b=HWQ80ZTx; arc=none smtp.client-ip=199.247.17.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=natalenko.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=natalenko.name
+Received: from spock.localnet (unknown [212.20.115.26])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	(No client certificate requested)
+	by prime.voidband.net (Postfix) with ESMTPSA id A6A4E62DD1A0;
+	Mon, 07 Apr 2025 11:21:42 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
+	s=dkim-20170712; t=1744017702;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vlHXXG98PgWKxGxcZYLCRP/TU5pgXiI5WxEWwcpmfhA=;
+	b=HWQ80ZTxEG5UnyG7P9JMbkv47UEZourqaoZAbgle4OKb4AEfJSo1zomrOgB+0UCTrsI0El
+	qRpXGKWbr4/a2sG6UBWwEhYeNIAd95Afh+HV9ILmJwr5i1G1BZTp51y1CFGmn5fxURmwji
+	rSNpV3ltsvQ+xQWX+W7qrYb8rO01WRA=
+From: Oleksandr Natalenko <oleksandr@natalenko.name>
+To: linux-kernel@vger.kernel.org,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Peter Zijlstra <peterz@infradead.org>, Josh Poimboeuf <jpoimboe@kernel.org>
+Subject: Re: objtool warning in ice_free_prof_mask
+Date: Mon, 07 Apr 2025 11:21:27 +0200
+Message-ID: <5874052.DvuYhMxLoT@natalenko.name>
+In-Reply-To: <fdb5d23c-8c39-4f73-a89d-32257dac389b@intel.com>
+References:
+ <4970551.GXAFRqVoOG@natalenko.name>
+ <fdb5d23c-8c39-4f73-a89d-32257dac389b@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Received: from [127.0.0.1] ([116.231.163.61]) by smtp.feishu.cn with ESMTPS; Mon, 07 Apr 2025 17:16:48 +0800
-In-Reply-To: <20250325051934.002db3cd@kernel.org>
-X-Original-From: Xin Tian <tianx@yunsilicon.com>
-To: "Jakub Kicinski" <kuba@kernel.org>
-Cc: <netdev@vger.kernel.org>, <leon@kernel.org>, <andrew+netdev@lunn.ch>, 
-	<pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>, 
-	<jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>, 
-	<weihg@yunsilicon.com>, <wanry@yunsilicon.com>, <jacky@yunsilicon.com>, 
-	<horms@kernel.org>, <parthiban.veerasooran@microchip.com>, 
-	<masahiroy@kernel.org>, <kalesh-anakkur.purayil@broadcom.com>, 
-	<geert+renesas@glider.be>, <geert@linux-m68k.org>
-From: "Xin Tian" <tianx@yunsilicon.com>
-Date: Mon, 7 Apr 2025 17:16:53 +0800
-Message-Id: <941d54c4-15d5-43b7-a7af-4eb913448492@yunsilicon.com>
-User-Agent: Mozilla Thunderbird
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="nextPart6142846.lOV4Wx5bFT";
+ micalg="pgp-sha256"; protocol="application/pgp-signature"
+
+--nextPart6142846.lOV4Wx5bFT
 Content-Transfer-Encoding: quoted-printable
-References: <20250318151449.1376756-1-tianx@yunsilicon.com> <20250318151510.1376756-10-tianx@yunsilicon.com> <20250325051934.002db3cd@kernel.org>
-X-Lms-Return-Path: <lba+267f39801+35753b+vger.kernel.org+tianx@yunsilicon.com>
+Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
+From: Oleksandr Natalenko <oleksandr@natalenko.name>
+Subject: Re: objtool warning in ice_free_prof_mask
+Date: Mon, 07 Apr 2025 11:21:27 +0200
+Message-ID: <5874052.DvuYhMxLoT@natalenko.name>
+In-Reply-To: <fdb5d23c-8c39-4f73-a89d-32257dac389b@intel.com>
+MIME-Version: 1.0
 
-On 2025/3/25 20:19, Jakub Kicinski wrote:
-> On Tue, 18 Mar 2025 23:15:11 +0800 Xin Tian wrote:
->> +static int xsc_eth_set_hw_mtu(struct xsc_core_device *xdev,
->> +			      u16 mtu, u16 rx_buf_sz)
->> +{
->> +	struct xsc_set_mtu_mbox_out out;
->> +	struct xsc_set_mtu_mbox_in in;
->> +	int ret;
->> +
->> +	memset(&in, 0, sizeof(struct xsc_set_mtu_mbox_in));
->> +	memset(&out, 0, sizeof(struct xsc_set_mtu_mbox_out));
->> +
->> +	in.hdr.opcode =3D cpu_to_be16(XSC_CMD_OP_SET_MTU);
->> +	in.mtu =3D cpu_to_be16(mtu);
->> +	in.rx_buf_sz_min =3D cpu_to_be16(rx_buf_sz);
->> +	in.mac_port =3D xdev->mac_port;
->> +
->> +	ret =3D xsc_cmd_exec(xdev, &in, sizeof(struct xsc_set_mtu_mbox_in), &o=
-ut,
->> +			   sizeof(struct xsc_set_mtu_mbox_out));
->> +	if (ret || out.hdr.status) {
->> +		netdev_err(((struct xsc_adapter *)xdev->eth_priv)->netdev,
-> Please use temporary variable or define a local print macro.
-> The cast is too ugly.
-OK=EF=BC=8Cwill use temporary variable here
->
->> +			   "failed to set hw_mtu=3D%u rx_buf_sz=3D%u, err=3D%d, status=3D%d\=
-n",
->> +			   mtu, rx_buf_sz, ret, out.hdr.status);
->> +		ret =3D -ENOEXEC;
-> Why are you overwriting the ret code from xsc_cmd_exec() ?
-> And why with such an unusual errno ?
+Hello.
+
+On pond=C4=9Bl=C3=AD 7. dubna 2025 11:03:31, st=C5=99edoevropsk=C3=BD letn=
+=C3=AD =C4=8Das Przemek Kitszel wrote:
+> On 4/7/25 08:20, Oleksandr Natalenko wrote:
+> > Hello.
+> >=20
+> > With v6.15-rc1, CONFIG_OBJTOOL_WERROR=3Dy and gcc 14.2.1 the following =
+happens:
+>=20
+> have you COMPILE_TEST'ed whole kernel and this is the only (new) error?
+
+It's not a new warning, I've observe it for several recent major kernel rel=
+eases already.
+
+I do not build with CONFIG_COMPILE_TEST.
+
+I've also realised I see this warning with -O3 only. I know this is unsuppo=
+rted, so feel free to ignore me, but I do -O3 builds for finding out possib=
+le loose ends in the code, and this is the only place where it breaks.
+
+> > ```
+> > drivers/net/ethernet/intel/ice/ice.o: error: objtool: ice_free_prof_mas=
+k.isra.0() falls through to next function ice_free_flow_profs.cold()
+> > drivers/net/ethernet/intel/ice/ice.o: error: objtool: ice_free_prof_mas=
+k.isra.0.cold() is missing an ELF size annotation
+> > ```
+> >=20
+> > If I mark ice_write_prof_mask_reg() as noinline, this warning disappear=
+s.
+> >=20
+> > Any idea what's going wrong?
+>=20
+> sorry, no idea
+>=20
+> >=20
+> > Thank you.
+
+=2D-=20
+Oleksandr Natalenko, MSE
+--nextPart6142846.lOV4Wx5bFT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEZUOOw5ESFLHZZtOKil/iNcg8M0sFAmfzmRcACgkQil/iNcg8
+M0sq2hAAgv9gMejnpHVI+Cxnx+H+zNepzIt+NeOM1RI95cqJCAWkNIFl2msIJcy5
+fn5ycnUTeVCuIBFi2Rsjs3offXq3B7gARMBL5nE7qKphSjgGsg8Spo4ckSfH7kgJ
+74sgXuPHwNw5n0RaWcvuq75vojemqZ5AmO/YybDdJFXElLyPfy96fDx85DN/wmw0
+9jsbNW+e/p+xpOIMcJqsVrbRmWLtTDMEOYK1jCCq6LX4GHzVhtWIUT0xIZ/hdC8S
+5Sbrq6sLaH0WFfVum1ibwUmqD+pcN4zDsipSorobrkZ5oPG6J9oTmeQPFS+PoO/s
+M6pbP5shs+q+HDcxUTb6XaeVnj4IhFJMBmP5FPNRqhiacj9hWHcXUk7++2VxeANF
+cS8HF38eYZ3DWm89uec0gZR3TGwi5+bTGXfppsbGbrY0FwThbugSMkImCRKgJlGi
+lMLzAujx4S1hYo7vqoPIc7eN0ogPezI1zpY7zb7Nm5qK2X80qX+Ky5KC7piPU363
+vX8Trfl+gPIN7KgKvlafM+0pRjNklrtfGod/rWsHR86lshVzopB/g0HLE47kuXkQ
+0L2Ea4DYfODrXXPZBZZs258wH6IakUGDz9nXBNe52p6eGBSMqvAL/EQR+IZIGXo8
+OnAOqWELkQ30ZaE+FBKfdQhjyPO7IBfyh4TtmouGyTBOQoLWjug=
+=/Gz6
+-----END PGP SIGNATURE-----
+
+--nextPart6142846.lOV4Wx5bFT--
 
 
-Thanks for pointing this out =E2=80=94 it's a mistake.
 
-
-In our old implementation, there were two return values:
-
-the return value of xsc_cmd_exec indicated whether the message was=20
-properly transmitted through CMDQ,
-
-while out.status reflected the result of the command execution in the=20
-firmware.
-
-So we chose -ENOEXEC to cover both types of errors.
-
-
-But now the return value of xsc_cmd_exec already reflects the result of=20
-out.status,
-
-and -ENOEXEC seems not an appropriate return value here.
-
-
-I'll fix this and return the result of xsc_cmd_exec directly.
-
-
->
->> +static int xsc_eth_get_mac(struct xsc_core_device *xdev, char *mac)
->> +{
->> +	struct xsc_query_eth_mac_mbox_out *out;
->> +	struct xsc_query_eth_mac_mbox_in in;
->> +	int err =3D 0;
->> +
->> +	out =3D kzalloc(sizeof(*out), GFP_KERNEL);
->> +	if (!out)
->> +		return -ENOMEM;
->> +
->> +	memset(&in, 0, sizeof(in));
->> +	in.hdr.opcode =3D cpu_to_be16(XSC_CMD_OP_QUERY_ETH_MAC);
->> +
->> +	err =3D xsc_cmd_exec(xdev, &in, sizeof(in), out, sizeof(*out));
->> +	if (err || out->hdr.status) {
->> +		netdev_err(((struct xsc_adapter *)xdev->eth_priv)->netdev,
->> +			   "get mac failed! err=3D%d, out.status=3D%u\n",
->> +			   err, out->hdr.status);
->> +		err =3D -ENOEXEC;
->> +		goto err_free;
->> +	}
->> +
->> +	memcpy(mac, out->mac, 6);
-> 6 -> ETH_ALEN or ether_addr_copy()
-Ack
->
->> +
->> +err_free:
->> +	kfree(out);
->> +	return err;
->> +}
->> +
->> +static void xsc_eth_l2_addr_init(struct xsc_adapter *adapter)
->> +{
->> +	struct net_device *netdev =3D adapter->netdev;
->> +	char mac[6] =3D {0};
->> +	int ret =3D 0;
->> +
->> +	ret =3D xsc_eth_get_mac(adapter->xdev, mac);
->> +	if (ret) {
->> +		netdev_err(netdev, "get mac failed %d, generate random mac...",
->> +			   ret);
->> +		eth_random_addr(mac);
-> eth_hw_addr_random()
-OK, no need for set now. Will change.
->
->> +	}
->> +	dev_addr_mod(netdev, 0, mac, 6);
-> Why not dev_addr_set() ?!
-
-OK=EF=BC=8Cdev_addr_set() is more suitable
-
-Thanks
 
