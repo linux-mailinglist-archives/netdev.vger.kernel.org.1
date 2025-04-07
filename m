@@ -1,163 +1,126 @@
-Return-Path: <netdev+bounces-179970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7495EA7EFFF
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 23:57:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A8D0A7F000
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 23:57:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CC0B167821
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 21:57:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 869343A8327
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 21:56:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7818217F54;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF096221727;
 	Mon,  7 Apr 2025 21:57:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vmstxYt+"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="eh9ot0F3"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427633AC1C
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 21:57:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB6DC199235
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 21:57:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744063026; cv=none; b=PtQeh8mGYskOCvB2JGcFQ48zAF3WBu6hcVK2MTkQtPZUk1stNAk/3H5BtGmAjl91ncBtkvxtDVEuoE4wMe6uA97PjkxNqqsES9TeA/3KX0GZ4FVQfnsqgSNzC5sxPB1Nv4UyCl2YDTqMfwIkR44+1mcxmdtGqYuMOu00EBclSv4=
+	t=1744063026; cv=none; b=UvUVVtu24zsh9z2X6wDazick+AHq2imY/XI6Kt6Ki9hjtY+pP92Oa0AdF7JapZWjgYWs0GBM9pem50rRPv/nnUx84cqlef5a3Y8V9T9V4VfWXH77muYbvq/MbleyRpPNsNY9AjQ2dIH2uGd0POGDUzO6fS1Mg6Wilatu+5py/I8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1744063026; c=relaxed/simple;
-	bh=CXUbkgdb+eusHq7P3yexbWwGbiubwHu070X1U3C8AjE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h+UOmVZRRwC8VM8O+42YxTh2iz0vfAdtbkmCDyhghzUXV9jpSarT8T6iK7LU/3/+UO1pWLvfTGiYepAr9yCLf5NEfE2eZk2mepDKjPcFWiyOLaFtMd1ImD6JUig5CabkVxkhPHwbwBx5IZsL+4mmbsGDDNLwZJEa/nFAn2eJiww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vmstxYt+; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <58bfc722-5dc4-4119-9c5c-49fb6b3da6cd@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744063020;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8FSvbn3NUduRNn7N60McM+103mzS7lUNeC9xApBCbjI=;
-	b=vmstxYt+fi0rwIR2KrnBgXKcNg51M2lgRaLXPQnSQQEhRPRjKZhnmqH/rrsiXl8b8Y8O3b
-	A4PezGM35aUDehoj+xg5Es8XOsjlBDXIfwQOI4iiNpXmWR8SpHMSmTGJJ/OQXAe6gdO2ZC
-	wrN/fyPvXQqB3rKOSgcNzx81BmgfVas=
-Date: Mon, 7 Apr 2025 14:56:54 -0700
+	bh=AtkF0ZBc+Z05dbI8kojFijCH1tuLsLtL+wuYx+B6p7Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tzdPQ/yU7Dmpu1arZC0v83lSYb6B+VqKNb1+/jPejI57JCnVOB6fPG2a63ISNkdxoRc7nvvewL0i4+9ETeYUfxGfQq3IZGARSG6rfM1tHfHdCGObeyDWPk4FQiJkHifAuvAB5mwIvyzd/Nl34MmLRkxDwv0132GkhHuYTq6uKss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=eh9ot0F3; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7399838db7fso4297104b3a.0
+        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 14:57:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1744063024; x=1744667824; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OjONuyVEBabQma13n193abZmpu8eJbu2Vov0N/Hvhgk=;
+        b=eh9ot0F3jiq8LhMaZ6ne8MoT+yarneDrai1k/0P/nhKsF+rhPTQBfJQZaVLGm+HL8g
+         xysK7datB6tVZsQtYjYZkh10/E8UqASto0uwq/ZR+jhwhgmsf7doks/QfS1c0ObX9b2s
+         1YlKVlBDcFkUwAKOLtVbj3y5og4nFr90UX+x3+oT+wu6yx1Mg7qIxx/7u3MHiZqrvGPy
+         2amQQKE6/YA/6PucttDhz2cs2MA8XSOY9BKgb89hW9e/GsPJzAOaARvjvRE9QUnFkRwr
+         KEXQFkMWS1H7GKor7FA9RIbiGm3Gnx0/jSpwezycUeQs9vr8XUR9aZTptdlpY7VUxZoY
+         kcpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744063024; x=1744667824;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OjONuyVEBabQma13n193abZmpu8eJbu2Vov0N/Hvhgk=;
+        b=HBGfUoruo2HtGYqdQ+pX3S5dWHDTgTYXzfB2YsE+fzSXqgX0ppTBxUgGFUaXub9TS0
+         JnIU5YJiFywrZeHyIZ+KjV2Eb9gJxsFyEHUpfFjRTnCb9zNZUkFhhFc7YfD7FxkAmU8b
+         LPKyose98dainxaoQR1DDgzjT401iXYHnC9T13H7/KqMPs4UJ7vbs2kwSbDTrYBo2E/Q
+         hKH9vb5TUU2CoLDQQcHXDWeGb+EXESfIkmoc3aX5uhPcbYpsIGVbKEoM+pwWZOUjFWGs
+         1o96N36z9Vc57a0CJtzIjLIuOULfZUAxexG+Vfvfy2WX1VLtPKEWRrIFSxan9++m9di2
+         6GoQ==
+X-Gm-Message-State: AOJu0Yz9C8XkD1nOS7rHS3qMr9389lsmr4ErEwF0hTeV06ofmQU1sEEi
+	MPdrl22geVRvQ6YaGVJCi0PVX2f5OQSA94ojqacdPp3tGZKWo5TYpQOoWrEmVZsyzeXLYNYGxZw
+	=
+X-Gm-Gg: ASbGnctvAGYT1DRHfzTdKlRHShhtfOPECvdO4sgqxa+Bz8ODHxAYAQzRXBnKTm+cxxR
+	fo5kWy5WRWcXbygku4Kc/510jk/Qsi0N3kjugc9VZFlnOV/vGBcoEesVKkuDqopQfjOeDK+kBEb
+	5bFG1r/DPKrTfhDMX0dY1CEqd1EluCffJb7l7xenBrZV0rH+nfst0jcaIEoWw1vjDc5Jb+nBJqt
+	JgIIHIomXD8egPsjyD8Ie3gfVuCM6iWE+XrgQBxwKR6JZb2v9Jg5JQKYzDAn1co2OjOr2uy/ext
+	/Qt2R3kNfeGcS3aD8TCv92fs3/DQEE/+AzwH9jakI7L0+rnwfm43/PR+/MLahmGtIWzS7ej3pad
+	Bwrw=
+X-Google-Smtp-Source: AGHT+IG5lEHLJyzIz19sfe8HcprikkgM32nxxTCAttYwDTJ3p2LAnqTiHsS4v+jrL5vhkcABNLAkmg==
+X-Received: by 2002:a05:6a00:949c:b0:736:5813:8c46 with SMTP id d2e1a72fcca58-73b9d3d3187mr1735267b3a.8.1744063023748;
+        Mon, 07 Apr 2025 14:57:03 -0700 (PDT)
+Received: from exu-caveira.tail33bf8.ts.net ([2804:7f1:e2c3:b109:bcd7:b61f:e265:af16])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-739d97d19b9sm9016047b3a.23.2025.04.07.14.57.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Apr 2025 14:57:03 -0700 (PDT)
+From: Victor Nogueira <victor@mojatatu.com>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	shuah@kernel.org,
+	pctammela@mojatatu.com,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next] selftests: tc-testing: Pre-load IFE action and its submodules
+Date: Mon,  7 Apr 2025 18:56:56 -0300
+Message-ID: <20250407215656.2535990-1-victor@mojatatu.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH bpf-next 2/3] bpf: udp: Avoid socket skips and repeats
- during iteration
-To: Jordan Rife <jordan@jrife.io>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
- Aditi Ghag <aditi.ghag@isovalent.com>, Daniel Borkmann
- <daniel@iogearbox.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-References: <20250404220221.1665428-1-jordan@jrife.io>
- <20250404220221.1665428-3-jordan@jrife.io>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20250404220221.1665428-3-jordan@jrife.io>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 4/4/25 3:02 PM, Jordan Rife wrote:
-> +static struct sock *bpf_iter_udp_resume(struct sock *first_sk,
-> +					union bpf_udp_iter_batch_item *cookies,
-> +					int n_cookies)
-> +{
-> +	struct sock *sk = NULL;
-> +	int i = 0;
-> +
-> +	for (; i < n_cookies; i++) {
-> +		sk = first_sk;
-> +		udp_portaddr_for_each_entry_from(sk)
-> +			if (cookies[i].cookie == atomic64_read(&sk->sk_cookie))
-> +				goto done;
-> +	}
-> +done:
-> +	return sk;
-> +}
-> +
->   static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
->   {
->   	struct bpf_udp_iter_state *iter = seq->private;
->   	struct udp_iter_state *state = &iter->state;
-> +	unsigned int find_cookie, end_cookie = 0;
->   	struct net *net = seq_file_net(seq);
-> -	int resume_bucket, resume_offset;
->   	struct udp_table *udptable;
->   	unsigned int batch_sks = 0;
->   	bool resized = false;
-> +	int resume_bucket;
->   	struct sock *sk;
->   
->   	resume_bucket = state->bucket;
-> -	resume_offset = iter->offset;
->   
->   	/* The current batch is done, so advance the bucket. */
->   	if (iter->st_bucket_done)
-> @@ -3428,6 +3446,8 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
->   	 * before releasing the bucket lock. This allows BPF programs that are
->   	 * called in seq_show to acquire the bucket lock if needed.
->   	 */
-> +	find_cookie = iter->cur_sk;
-> +	end_cookie = iter->end_sk;
->   	iter->cur_sk = 0;
->   	iter->end_sk = 0;
->   	iter->st_bucket_done = false;
-> @@ -3439,18 +3459,26 @@ static struct sock *bpf_iter_udp_batch(struct seq_file *seq)
->   		if (hlist_empty(&hslot2->head))
->   			continue;
->   
-> -		iter->offset = 0;
->   		spin_lock_bh(&hslot2->lock);
-> -		udp_portaddr_for_each_entry(sk, &hslot2->head) {
-> +		/* Initialize sk to the first socket in hslot2. */
-> +		udp_portaddr_for_each_entry(sk, &hslot2->head)
-> +			break;
+Recently we had some issues in parallel TDC where some of IFE tests are
+failing due to some of IFE's submodules (like act_meta_skbtcindex and
+act_meta_skbprio) taking too long to load [1]. To avoid that issue,
+pre-load IFE and all its submodules before running any of the tests in
+tdc.sh
 
-nit. It is to get the first entry? May be directly do
-hlist_entry_safe(hslot2->head.first, ... ) instead.
+[1] https://lore.kernel.org/netdev/e909b2a0-244e-4141-9fa9-1b7d96ab7d71@mojatatu.com/T/#u
 
-> +		/* Resume from the first (in iteration order) unseen socket from
-> +		 * the last batch that still exists in resume_bucket. Most of
-> +		 * the time this will just be where the last iteration left off
-> +		 * in resume_bucket unless that socket disappeared between
-> +		 * reads.
-> +		 *
-> +		 * Skip this if end_cookie isn't set; this is the first
-> +		 * batch, we're on bucket zero, and we want to start from the
-> +		 * beginning.
-> +		 */
-> +		if (state->bucket == resume_bucket && end_cookie)
-> +			sk = bpf_iter_udp_resume(sk,
-> +						 &iter->batch[find_cookie],
-> +						 end_cookie - find_cookie);
-> +		udp_portaddr_for_each_entry_from(sk) {
->   			if (seq_sk_match(seq, sk)) {
-> -				/* Resume from the last iterated socket at the
-> -				 * offset in the bucket before iterator was stopped.
-> -				 */
-> -				if (state->bucket == resume_bucket &&
-> -				    iter->offset < resume_offset) {
-> -					++iter->offset;
-> -					continue;
-> -				}
->   				if (iter->end_sk < iter->max_sk) {
->   					sock_hold(sk);
->   					iter->batch[iter->end_sk++].sock = sk;
+Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+---
+ tools/testing/selftests/tc-testing/tdc.sh | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-I looked at the details for these two functions. The approach looks good to me. 
-Thanks for trying it.
+diff --git a/tools/testing/selftests/tc-testing/tdc.sh b/tools/testing/selftests/tc-testing/tdc.sh
+index cddff1772e10..589b18ed758a 100755
+--- a/tools/testing/selftests/tc-testing/tdc.sh
++++ b/tools/testing/selftests/tc-testing/tdc.sh
+@@ -31,6 +31,10 @@ try_modprobe act_skbedit
+ try_modprobe act_skbmod
+ try_modprobe act_tunnel_key
+ try_modprobe act_vlan
++try_modprobe act_ife
++try_modprobe act_meta_mark
++try_modprobe act_meta_skbtcindex
++try_modprobe act_meta_skbprio
+ try_modprobe cls_basic
+ try_modprobe cls_bpf
+ try_modprobe cls_cgroup
+-- 
+2.49.0
 
-This should stop the potential duplicates during stop() and then re-start().
-
-My understanding is that it may or may not batch something newer than the last 
-stop(). This behavior should be similar to the current offset approach also. I 
-think it is fine. The similar situation is true for the next bucket anyway.
 
