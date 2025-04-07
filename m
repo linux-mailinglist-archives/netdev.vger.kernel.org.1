@@ -1,84 +1,91 @@
-Return-Path: <netdev+bounces-179677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FD9EA7E180
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:28:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5CBCA7E161
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:26:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65F953A93A8
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 14:18:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C39AF166E79
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 14:19:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E9421D6DD8;
-	Mon,  7 Apr 2025 14:17:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 255ED1D79A6;
+	Mon,  7 Apr 2025 14:18:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CJALCunY"
 X-Original-To: netdev@vger.kernel.org
-Received: from plesk.hostmyservers.fr (plesk.hostmyservers.fr [45.145.164.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7CCD1D79B3;
-	Mon,  7 Apr 2025 14:17:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.164.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31D71D7E5F
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 14:18:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744035475; cv=none; b=DMbF5KpIdsQi0Re1/iIGX12SMexcyNy2hm9WviBBkb219ENN2EwnmI+IZ45n3ImBem5qBx9lOWEF82wfyEIdTA49WHScCCc/i0SXpKoFnI20RU3WBd2ybb8dlosX6V8O/K5BZEm5fvTj/Q2jFCLOo+0L5BYRKYYZNjVbjS+reEI=
+	t=1744035523; cv=none; b=XCeO9wwObcA1wheNJjhxLxOgOndavyL/z4tEZjUZARuxZpNjNGExRrT1cj9Vzz0VGTU5KB6TSTL8p08l9J7aIlrQG2kR+5rg0epyL5ZXeOt9TwLMBw4GFwaEunjy+6+c9kaS8nEO8v3R2IxsccUsX39iND2QiUBDZQ7oJSp9Hv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744035475; c=relaxed/simple;
-	bh=ERmC0VihSwVE+kfQl3h22QpzW0EQ3aDUpCiKyvDOEq0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Eo+ekFPfD7+CvtQ4g6pdvhrspyhFzNklIKJmFw5X4onnfeusOy+DbU2i+pwYOimlYuihGmQQ80babPLnkS2maq4rLZ9t4E5m+JVTm3ADAwxQmSy1ZCc0mROwfVEe3GCLPHQqP/gxLULCYsW8OpnFXzF7u596LatdGWSDolFajgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arnaud-lcm.com; spf=pass smtp.mailfrom=arnaud-lcm.com; arc=none smtp.client-ip=45.145.164.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arnaud-lcm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arnaud-lcm.com
-Received: from arnaudlcm-X570-UD.. (unknown [IPv6:2a01:e0a:3e8:c0d0:3b93:9152:d50e:6d45])
-	by plesk.hostmyservers.fr (Postfix) with ESMTPSA id D37DB28D8AF;
-	Mon,  7 Apr 2025 14:17:51 +0000 (UTC)
-Authentication-Results: Plesk;
-	spf=pass (sender IP is 2a01:e0a:3e8:c0d0:3b93:9152:d50e:6d45) smtp.mailfrom=contact@arnaud-lcm.com smtp.helo=arnaudlcm-X570-UD..
-Received-SPF: pass (Plesk: connection is authenticated)
-From: Arnaud Lecomte <contact@arnaud-lcm.com>
-To: syzbot+29fc8991b0ecb186cf40@syzkaller.appspotmail.com
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-ppp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot]
-Date: Mon,  7 Apr 2025 16:17:47 +0200
-Message-ID: <20250407141747.92874-1-contact@arnaud-lcm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <67ae3912.050a0220.21dd3.0021.GAE@google.com>
-References: <67ae3912.050a0220.21dd3.0021.GAE@google.com>
+	s=arc-20240116; t=1744035523; c=relaxed/simple;
+	bh=DnrMjwW8y80OVJq5tsXLXyJch9UJ6gA4haWZSBKjZGw=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=kO+0CQvE2ue3lOn3afakHGw+JXtakGGm4QHtMMKcqApwLM2c6xkB6GDb0TQBZhIe67HBcSpFgvlpxXJcV7pVMoQg2b25957B48YY7h2bafJpxDY1SjiBr6y27uC0Fn2Sd+jqniG+u/o8u+iTJaVPzlc9KKD1+F8lI5n2j5aysJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CJALCunY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DDAFC4CEE7;
+	Mon,  7 Apr 2025 14:18:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744035522;
+	bh=DnrMjwW8y80OVJq5tsXLXyJch9UJ6gA4haWZSBKjZGw=;
+	h=From:Subject:Date:To:Cc:From;
+	b=CJALCunY5XwA6fJnawsx9DBCukkaaLIXr0IGlmoYPmZNgWE24Uc2Oj8jZBxmTEysv
+	 CRhOPVHuSlXMB+pgd5W91CoFgAw/3aiFj2w6cTaXv1UxOTvU/6UrJFpnYtyMGHYMiG
+	 jMlwk9Y7Y2PpC3O6+dtq1fnpKT0PCuo/oQmQuG/m2BrkV1rpBLeACRcC6FQvVHhKfO
+	 xckGzy+5mPwDiDiV1tYGEuqgaBXMO4Gz72fGIdZIDp+GavAD0YqV5sDRAJtSq22Inm
+	 TPDWihIpBAojtfsSKQxAMS8VPeRlaL7tLTaa1+QwFTH4s6VUIqf75G/eKyXS3srDzG
+	 VGtm9bDXnqdBg==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Subject: [PATCH net-next 0/3] Add L2 hw acceleration for airoha_eth driver
+Date: Mon, 07 Apr 2025 16:18:29 +0200
+Message-Id: <20250407-airoha-flowtable-l2b-v1-0-18777778e568@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-PPP-Message-ID: <174403547232.32667.4417870378199395325@Plesk>
-X-PPP-Vhost: arnaud-lcm.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALXe82cC/x3MPQqAMAxA4atIZgP9sYtXEYdUowaKlVZUKN7d4
+ vgN7xXInIQz9E2BxJdkiXuFbhuYNtpXRpmrwSjjlNUWSVLcCJcQ75N8YAzGIyvv1NyRNdpBTY/
+ Eizz/dhjf9wP4+ayfZgAAAA==
+X-Change-ID: 20250313-airoha-flowtable-l2b-e0b50d4a3215
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+X-Mailer: b4 0.14.2
 
-Author: contact@arnaud-lcm.com
+Introduce the capability to offload L2 traffic defining flower rules in
+the PSE/PPE engine available on EN7581 SoC.
+Since the hw always reports L2/L3/L4 flower rules, link all L2 rules
+sharing the same L2 info (with different L3/L4 info) in the L2 subflows
+list of a given L2 PPE entry.
 
-#syz test
+---
+Lorenzo Bianconi (3):
+      net: airoha: Add l2_flows rhashtable
+      net: airoha: Add airoha_ppe_foe_flow_remove_entry_locked()
+      net: airoha: Add L2 hw acceleration support
 
-diff --git a/drivers/net/ppp/ppp_synctty.c b/drivers/net/ppp/ppp_synctty.c
-index 644e99fc3623..520d895acc60 100644
---- a/drivers/net/ppp/ppp_synctty.c
-+++ b/drivers/net/ppp/ppp_synctty.c
-@@ -506,6 +506,11 @@ ppp_sync_txmunge(struct syncppp *ap, struct sk_buff *skb)
- 	unsigned char *data;
- 	int islcp;
- 
-+	/* Ensure we can safely access protocol field and LCP code */
-+	if (!skb || !pskb_may_pull(skb, 3)) {
-+		kfree_skb(skb);
-+		return NULL;
-+	}
- 	data  = skb->data;
- 	proto = get_unaligned_be16(data);
+ drivers/net/ethernet/airoha/airoha_eth.c |   2 +-
+ drivers/net/ethernet/airoha/airoha_eth.h |  22 ++-
+ drivers/net/ethernet/airoha/airoha_ppe.c | 224 ++++++++++++++++++++++++++-----
+ 3 files changed, 215 insertions(+), 33 deletions(-)
+---
+base-commit: 61f96e684edd28ca40555ec49ea1555df31ba619
+change-id: 20250313-airoha-flowtable-l2b-e0b50d4a3215
+
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
+
 
