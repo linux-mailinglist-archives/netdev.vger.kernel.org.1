@@ -1,96 +1,134 @@
-Return-Path: <netdev+bounces-179708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08479A7E410
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 17:23:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3EB5A7E485
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 17:33:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 503A4189AA2A
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 15:15:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35F5C440F6F
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 15:27:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E15BA1FC0F5;
-	Mon,  7 Apr 2025 15:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OU5XZ7Rf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 454BF1FCFDB;
+	Mon,  7 Apr 2025 15:26:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from plesk.hostmyservers.fr (plesk.hostmyservers.fr [45.145.164.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5B31F8741;
-	Mon,  7 Apr 2025 15:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 352461FCFE5;
+	Mon,  7 Apr 2025 15:26:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.164.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744038816; cv=none; b=TmdKqXSco3anK6iBeoeYdVH0YzwuxpUuX048VvTAhMS4L5jDGwzIPN+7336DiEMrAgdQoWhfXg6to5FsMOzBEYKzvA6rBZfgPlN3pZ4cSiNfZcj9DYEGTv3sLoqVTNN474LzJ9yVDYTph7Un9Ha3FRgOwF4dtgXTZEh6QqF0Xw0=
+	t=1744039592; cv=none; b=Mbl3p4NUyyLuWMVUBMxgjSsM+9zVHEoPEOK3TFb1FwRjRKt6iDvXD0onVeFuwsY5UDOZ3civE4jULd5ToeJLDXm8b8r+y9xupycMWen3XdJFeUApLa/pMqYsXzh4Dm2ToFzrvATp72ri1nYhfXuI77Nw4SWEGdmJ3iAC/iV3yNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744038816; c=relaxed/simple;
-	bh=NXT3oErA7F0ZWAAtUuV6bGlHY2sTX9fZh6zjsrdJZyE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jYACc8qyvqxbAxXpwcmfJPIR3CeLaIAr7x5OgItOyjIdqbwdgbNXBM5piVT5gaB2yHwvab4+uGRvPYUjN/BZEiotk3RgrpDpVibvkyQgbS/YiglzyEYXyeZ+vbHq37NuEm/Kb07Yj2Kg7Whmwl9SvTV/93muzPGtzgmkdQLWWVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OU5XZ7Rf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FC2AC4CEDD;
-	Mon,  7 Apr 2025 15:13:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744038816;
-	bh=NXT3oErA7F0ZWAAtUuV6bGlHY2sTX9fZh6zjsrdJZyE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OU5XZ7RfTIjn1Kb1X8kFW933VNlQk0TkF5g2gwEu/E9oo4VCsz40VM6OLL1mc6zIC
-	 zXHZWDZBoLhkEJaZhzCCWfleI9SpdlucQjXxq5pT6g9k42GCzns1VSnRA3k9EeLVRU
-	 A8af+l6GeHe/j8QoPHiQw4iAkcJIJuG05ExGKm2LdrzfUR6qX2eXDkhn5YEIfv0th+
-	 iEC/tS7yhF7EHMKsQbs1cYLa6exlxeOEnFbtjsbjGTpjdAfSE8SZlFQeLFEuwSvjz3
-	 /EvKIznsYvLqZFZiUvj2K24P9t7lqKOZ2Y6fSgqPKu3sa/udybNPpuj1KwUHHW7Y0d
-	 CMV32vKSJ7I2w==
-Date: Mon, 7 Apr 2025 16:13:32 +0100
-From: Simon Horman <horms@kernel.org>
-To: Hariprasad Kelam <hkelam@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Naveen Mamindlapalli <naveenm@marvell.com>
-Subject: Re: [net PATCH] octeontx2-pf: qos: fix VF root node parent queue
- index
-Message-ID: <20250407151332.GO395307@horms.kernel.org>
-References: <20250407070341.2765426-1-hkelam@marvell.com>
+	s=arc-20240116; t=1744039592; c=relaxed/simple;
+	bh=8rmoI+MLumkyOH9sGcP/FhAE5tgXLwAl3apFYQe0AAY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Nl8WaM/WL6zz/z7Zqtjn3vI7zj6sfiJD3w73emnGsYfBQDpLC/yHh8MGdH3+kVZk209v5+iAcef9NFnlaxOFEKsYpzMPat5yu9gxKPCwo71x7cCZcGzCFMopRGQnNeDwK5PgcjNebS8iFnHcrx5qgLymsFEGj0TjqMX1BhMNTZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arnaud-lcm.com; spf=pass smtp.mailfrom=arnaud-lcm.com; arc=none smtp.client-ip=45.145.164.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=arnaud-lcm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arnaud-lcm.com
+Received: from [127.0.1.1] (unknown [IPv6:2a01:e0a:3e8:c0d0:3b93:9152:d50e:6d45])
+	by plesk.hostmyservers.fr (Postfix) with ESMTPSA id 77E85479E0;
+	Mon,  7 Apr 2025 15:26:26 +0000 (UTC)
+Authentication-Results: Plesk;
+        spf=pass (sender IP is 2a01:e0a:3e8:c0d0:3b93:9152:d50e:6d45) smtp.mailfrom=contact@arnaud-lcm.com smtp.helo=[127.0.1.1]
+Received-SPF: pass (Plesk: connection is authenticated)
+From: Arnaud Lecomte <contact@arnaud-lcm.com>
+Date: Mon, 07 Apr 2025 17:26:21 +0200
+Subject: [PATCH] net: ppp: Add bound checking for skb d on ppp_sync_txmung
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250407070341.2765426-1-hkelam@marvell.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: 
+ <20250407-bound-checking-ppp_txmung-v1-1-cfcd2efe39e3@arnaud-lcm.com>
+X-B4-Tracking: v=1; b=H4sIAJzu82cC/x2MQQqAIBAAvxJ7TrBQkr4SEaWbLZGJZgTh35NuM
+ 4eZFyIGwgh99ULAmyKdrkhTV6C32VlkZIpDy1vJBZdsOZMzTG+od3KWee+n6zlSQaF4p5UUaJS
+ E0vuAKz3/exhz/gAF42cZawAAAA==
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-ppp@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, contact@arnaud-lcm.com,
+ skhan@linuxfoundation.org,
+ syzbot+29fc8991b0ecb186cf40@syzkaller.appspotmail.com
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1744039586; l=1904;
+ i=contact@arnaud-lcm.com; s=20250405; h=from:subject:message-id;
+ bh=8rmoI+MLumkyOH9sGcP/FhAE5tgXLwAl3apFYQe0AAY=;
+ b=M6469qTLfHJ5l/l/pfI2SwTDPs62ZlfhL9gHLufnvBlbu+ZSXJi5pvv87oofaVyVgE7IflGke
+ WLJrJ1oDwCkB4ruypAKnkFkUh1eA9WvqskTQEjyP69bw9cnYSq9jhJ2
+X-Developer-Key: i=contact@arnaud-lcm.com; a=ed25519;
+ pk=Ct5pwYkf/5qSRyUpocKOdGc2XBlQoMYODwgtlFsDk7o=
+X-PPP-Message-ID: <174403958690.22797.5110854261377796838@Plesk>
+X-PPP-Vhost: arnaud-lcm.com
 
-On Mon, Apr 07, 2025 at 12:33:41PM +0530, Hariprasad Kelam wrote:
-> The current code configures the Physical Function (PF) root node at TL1
-> and the Virtual Function (VF) root node at TL2.
-> 
-> This ensure at any given point of time PF traffic gets more priority.
-> 
->                     PF root node
->                       TL1
->                      /  \
->                     TL2  TL2 VF root node
->                     /     \
->                    TL3    TL3
->                    /       \
->                   TL4      TL4
->                   /         \
->                  SMQ        SMQ
-> 
-> Due to a bug in the current code, the TL2 parent queue index on the
-> VF interface is not being configured, leading to 'SMQ Flush' errors
-> 
-> Fixes: 5e6808b4c68d ("octeontx2-pf: Add support for HTB offload")
-> Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+Ensure we have enough data in linear buffer from skb before accessing
+initial bytes. This prevents potential out-of-bounds accesses
+when processing short packets.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+When ppp_sync_txmung receives an incoming package with an empty
+payload:
+(remote) gef➤  p *(struct pppoe_hdr *) (skb->head + skb->network_header)
+$18 = {
+	type = 0x1,
+	ver = 0x1,
+	code = 0x0,
+	sid = 0x2,
+        length = 0x0,
+	tag = 0xffff8880371cdb96
+}
+
+from the skb struct (trimmed)
+      tail = 0x16,
+      end = 0x140,
+      head = 0xffff88803346f400 "4",
+      data = 0xffff88803346f416 ":\377",
+      truesize = 0x380,
+      len = 0x0,
+      data_len = 0x0,
+      mac_len = 0xe,
+      hdr_len = 0x0,
+
+it is not safe to access data[2].
+
+Reported-by: syzbot+29fc8991b0ecb186cf40@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=29fc8991b0ecb186cf40
+Tested-by: syzbot+29fc8991b0ecb186cf40@syzkaller.appspotmail.com
+Fixes: 9946eaf552b1 ("Merge tag 'hardening-v6.14-rc2' of git://git.kernel.org/pub/scm/linux/kernel/git/kees/linux")
+Signed-off-by: Arnaud Lecomte <contact@arnaud-lcm.com>
+---
+ drivers/net/ppp/ppp_synctty.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/net/ppp/ppp_synctty.c b/drivers/net/ppp/ppp_synctty.c
+index 644e99fc3623..520d895acc60 100644
+--- a/drivers/net/ppp/ppp_synctty.c
++++ b/drivers/net/ppp/ppp_synctty.c
+@@ -506,6 +506,11 @@ ppp_sync_txmunge(struct syncppp *ap, struct sk_buff *skb)
+ 	unsigned char *data;
+ 	int islcp;
+ 
++	/* Ensure we can safely access protocol field and LCP code */
++	if (!skb || !pskb_may_pull(skb, 3)) {
++		kfree_skb(skb);
++		return NULL;
++	}
+ 	data  = skb->data;
+ 	proto = get_unaligned_be16(data);
+ 
+
+---
+base-commit: 9946eaf552b194bb352c2945b54ff98c8193b3f1
+change-id: 20250405-bound-checking-ppp_txmung-4807c854ed85
+
+Best regards,
+-- 
+Arnaud Lecomte <contact@arnaud-lcm.com>
 
 
