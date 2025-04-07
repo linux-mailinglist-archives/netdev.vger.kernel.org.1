@@ -1,194 +1,95 @@
-Return-Path: <netdev+bounces-179766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62BC1A7E795
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:00:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99756A7E7C9
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:08:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF6457A35C7
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:59:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 547603A5E29
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 17:01:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6FEE214A9C;
-	Mon,  7 Apr 2025 17:00:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 359BB2144A1;
+	Mon,  7 Apr 2025 17:01:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="X97KDpLR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VXXDKqG7"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F80126AEC
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 17:00:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1137013B2A4
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 17:01:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744045248; cv=none; b=mkeJGs27rnkBF7EgJ4pY+cAnjIILhVCMiQeX6BG96FDp0mi4pK53ojuLyTg6pkr+NrfOKc2+2r/mkg3cvS7kHW2I38+TBr9vneM7MJ1IDkPYveevB2I9idcQunx+Tor+bWJdhUnlHVMEVjRdgA0v0hpCt7kq0i8F6uJ6FL2r0Cw=
+	t=1744045300; cv=none; b=S+FtuB2N4x/TzkGEM2GGvgq0hAAA8HKeiUMHASIt98SuHSMENizflBoIqWDne6Bct3bnun1koUyvdlTpjKdFKzisLejdWYEDkFwA7NcAbsKQp2vllXC5bwW8DUv7KziKDgKDwvlD6kGRwgCN3jJ/+fqNgzdymtMAAb+pXlWaNfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744045248; c=relaxed/simple;
-	bh=8EEyvQc+5pIBnE2p/7oYhHwo0mC7KQRRPdeL6ZI6qiw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fgef/L8CDf2iMNsnzhfFQrEOSHPeLfA1aGT0Wdum/7i/sa5IlWoSrz9k8cIOQZ+/uXIlTgZ3LRJ3H0pF2m3e2spjeZV8Hffg9VitBjaLqbQZ4JRvNlcn7MMrx2LYc0QsBuJZ0wtkU5FbgVOgJRYBWqWFBoyjkMxaceU8gKUyRjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=X97KDpLR; arc=none smtp.client-ip=91.218.175.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <1aec6dab-ed03-4ca3-8cd1-9cfbb807be10@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744045243;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oLDAmjclRasSVpfEYONAaYZO702FQiJJq0bMQnxY2As=;
-	b=X97KDpLRfMghEYf9sxoBxmw793lbUNyIZX2MhCZr0epog6FScf9fPv/rbXMCRI4WlxGsF1
-	ACaKep6rqwnu785TYkn30Pqnpl9BJRWA+kOGZfrTVeDuXFPVxZz98GZ//C62FkDo4bfBee
-	qs640GM1x6TnhIGk7qK8bfPHB7/TZxI=
-Date: Mon, 7 Apr 2025 13:00:34 -0400
+	s=arc-20240116; t=1744045300; c=relaxed/simple;
+	bh=TcYVVMKz+9KUG5j/KFF2VWP+iXlophYUojrRrbk8stM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Kp7reF5+2pvzhqMkmSIQKEwo9NcudDKPI7qmHBbbMdbe/lYRNRlRPL3hT/10qRxC9hqDqRp/MyKg45PgYCA76fFaxvI3ouPp7YPfmt5Z3cUBkwJwSc1L0H6KYKLY8QgH/gm+FSOI/Xilh5GKW/vnzd1SfZzs/Hv9FB6N8Sfsrd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VXXDKqG7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 468B4C4CEDD;
+	Mon,  7 Apr 2025 17:01:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744045299;
+	bh=TcYVVMKz+9KUG5j/KFF2VWP+iXlophYUojrRrbk8stM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VXXDKqG7Wh+Kq3ubkSM1i7O2GXSuM5ZEKhn+lL1XAI7YaVMvrPP/lX8lcjmz56hhn
+	 e/Sa2CHIJRFwFu276k9xpaFgISqng9mYc+v7oh4WmGJIHKNVyg16DM6ZfoyhaEae7P
+	 yxB1oCDLwnb8SK1RiYChHun3/xqov/XQLmT88Srm+aeJn4mdRewZF3W2XQ3U5z/dTd
+	 S6YemgamKEDpxo+BmoQUJ+wFNpRgywBC45Vh7vvsGZhgPPA7LzYopvdDvTILTb6OGg
+	 4DtMXdT1d3tWwIM1VMNCqtZGKwzbodK8yeh2M0wybGpLZkbfn0yvISBEbXIfIAB1vA
+	 Y4ZHkUxsmIG1Q==
+Date: Mon, 7 Apr 2025 10:01:38 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Andrew Lunn
+ <andrew@lunn.ch>, Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ netdev@vger.kernel.org, hkallweit1@gmail.com, davem@davemloft.net,
+ pabeni@redhat.com
+Subject: Re: [net PATCH 1/2] net: phy: Cleanup handling of recent changes to
+ phy_lookup_setting
+Message-ID: <20250407100138.160f5cb7@kernel.org>
+In-Reply-To: <CAKgT0UeJvSSCybrqUwgfXxva6oBq0n9rxM=-97DQZQR1kbL8SQ@mail.gmail.com>
+References: <174354264451.26800.7305550288043017625.stgit@ahduyck-xeon-server.home.arpa>
+	<174354300640.26800.16674542763242575337.stgit@ahduyck-xeon-server.home.arpa>
+	<Z-6hcQGI8tgshtMP@shell.armlinux.org.uk>
+	<20250403172953.5da50762@fedora.home>
+	<de19e9f1-4ae3-4193-981c-e366c243352d@lunn.ch>
+	<CAKgT0UdhTT=g+ODpzR5uoTEOkC8u+cfCp7H-8718Zphd=24buw@mail.gmail.com>
+	<Z-8ZFzlAl1zys63e@shell.armlinux.org.uk>
+	<8acfd058-5baf-4a34-9868-a698f877ea08@lunn.ch>
+	<Z--HZCOqBvyQcmd9@shell.armlinux.org.uk>
+	<CAKgT0UeJvSSCybrqUwgfXxva6oBq0n9rxM=-97DQZQR1kbL8SQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC net-next PATCH 00/13] Add PCS core support
-To: "Christian Marangi (Ansuel)" <ansuelsmth@gmail.com>
-Cc: Kory Maincent <kory.maincent@bootlin.com>, netdev@vger.kernel.org,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
- upstream@airoha.com, Heiner Kallweit <hkallweit1@gmail.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Clark Wang <xiaoning.wang@nxp.com>,
- Claudiu Beznea <claudiu.beznea@microchip.com>,
- Claudiu Manoil <claudiu.manoil@nxp.com>, Conor Dooley <conor+dt@kernel.org>,
- Ioana Ciornei <ioana.ciornei@nxp.com>, Jonathan Corbet <corbet@lwn.net>,
- Joyce Ooi <joyce.ooi@intel.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Li Yang <leoyang.li@nxp.com>, Madalin Bucur <madalin.bucur@nxp.com>,
- Madhavan Srinivasan <maddy@linux.ibm.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Michal Simek <michal.simek@amd.com>,
- Naveen N Rao <naveen@kernel.org>, Nicholas Piggin <npiggin@gmail.com>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
- Rob Herring <robh+dt@kernel.org>, Rob Herring <robh@kernel.org>,
- Robert Hancock <robert.hancock@calian.com>,
- Saravana Kannan <saravanak@google.com>, Shawn Guo <shawnguo@kernel.org>,
- UNGLinuxDriver@microchip.com, Vladimir Oltean <vladimir.oltean@nxp.com>,
- Wei Fang <wei.fang@nxp.com>, devicetree@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-doc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linuxppc-dev@lists.ozlabs.org
-References: <20250403181907.1947517-1-sean.anderson@linux.dev>
- <20250407182738.498d96b0@kmaincent-XPS-13-7390>
- <720b6db8-49c5-47e7-98da-f044fc38fc1a@linux.dev>
- <CA+_ehUyAo7fMTe_P0ws_9zrcbLEWVwBXDKbezcKVkvDUUNg0rg@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <CA+_ehUyAo7fMTe_P0ws_9zrcbLEWVwBXDKbezcKVkvDUUNg0rg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 4/7/25 12:46, Christian Marangi (Ansuel) wrote:
-> Il giorno lun 7 apr 2025 alle ore 18:33 Sean Anderson
-> <sean.anderson@linux.dev> ha scritto:
->>
->> On 4/7/25 12:27, Kory Maincent wrote:
->> > On Thu,  3 Apr 2025 14:18:54 -0400
->> > Sean Anderson <sean.anderson@linux.dev> wrote:
->> >
->> >> This series adds support for creating PCSs as devices on a bus with a
->> >> driver (patch 3). As initial users,
->> >>
->> >> - The Lynx PCS (and all of its users) is converted to this system (patch 5)
->> >> - The Xilinx PCS is broken out from the AXI Ethernet driver (patches 6-8)
->> >> - The Cadence MACB driver is converted to support external PCSs (namely
->> >>   the Xilinx PCS) (patches 9-10).
->> >>
->> >> The last few patches add device links for pcs-handle to improve boot times,
->> >> and add compatibles for all Lynx PCSs.
->> >>
->> >> Care has been taken to ensure backwards-compatibility. The main source
->> >> of this is that many PCS devices lack compatibles and get detected as
->> >> PHYs. To address this, pcs_get_by_fwnode_compat allows drivers to edit
->> >> the devicetree to add appropriate compatibles.
->> >
->> > I don't dive into your patch series and I don't know if you have heard about it
->> > but Christian Marangi is currently working on fwnode for PCS:
->> > https://lore.kernel.org/netdev/20250406221423.9723-1-ansuelsmth@gmail.com
->> >
->> > Maybe you should sync with him!
->>
->> I saw that series and made some comments. He is CC'd on this one.
->>
->> I think this approach has two advantages:
->>
->> - It completely solves the problem of the PCS being unregistered while the netdev
->>   (or whatever) is up
->> - I have designed the interface to make it easy to convert existing
->>   drivers that may not be able to use the "standard" probing process
->>   (because they have to support other devicetree structures for
->>   backwards-compatibility).
->>
+On Fri, 4 Apr 2025 09:18:30 -0700 Alexander Duyck wrote:
+> > > Yep, this is pretty typical of SOHO switches, you use strapping to set
+> > > the port, and it never changes, at least not without a soldering iron
+> > > to take off/add resistors. There are also some SOHO switches which
+> > > have a dedicated 'cpu port' and there is no configuration options at
+> > > all. The CPU MAC must conform to what the switch MAC is doing.  
 > 
-> I notice this and it's my fault for taking too long to post v2 of the PCS patch.
-> There was also this idea of entering the wrapper hell but I scrapped that early
-> as I really feel it's a workaround to the current problem present for
-> PCS handling.
+> I don't think you guys understand my case well either. You seem to
+> think I am more flexible than I actually am in this setup. While I do
+> have the firmware I can ask about settings all it provides me with is
+> fixed link info. I can't talk to the link partner on the other end as
+> it is just configured for whatever the one mode is it has and there is
+> no changing it. Now yes, it isn't physically locked down. However most
+> of the silicon in the "fixed-link" configs likely aren't either until
+> they are put in their embedded setups.
 
-It's no workaround. The fundamental problem is that drivers can become
-unbound at any time, and we cannot make consumers drop their references.
-Every subsystem must deal with this reality, or suffer from
-user-after-free bugs. See [1-3] for discussion of this problem in
-relation to PCSs and PHYs, and [4] for more discussion of my approach.
-
-[1] https://lore.kernel.org/netdev/YV7Kp2k8VvN7J0fY@shell.armlinux.org.uk/
-[2] https://lore.kernel.org/netdev/20220816163701.1578850-1-sean.anderson@seco.com/
-[3] https://lore.kernel.org/netdev/9747f8ef-66b3-0870-cbc0-c1783896b30d@seco.com/
-[3] https://lpc.events/event/17/contributions/1627/
-
-> And the real problem IMHO is that currently PCS handling is fragile and with too
-> many assumptions. With Daniel we also discussed backwards-compatibility.
-> (mainly needed for mt7621 and mt7986 (for mediatek side those are the 2
-> that slipped in before it was correctly complained that things were
-> taking a bad path)
-> 
-> We feel v2 permits correct support of old implementations.
-> The ""legacy"" implementation pose the assumption that PCS is never removed
-> (unless the MAC driver is removed)
-> That fits v2 where a MAC has to initially provide a list of PCS to
-> phylink instance.
-
-And what happens when the driver is unbound from the device and suddenly
-a PCS on that list is free'd memory but is in active use by a netdev?
-
-> With this implementation, a MAC can manually parse whatever PCS node structure
-> is in place and fill the PCS.
-> 
-> As really the "late" removal/addition of a PCS can only be supported with fwnode
-> implementation as dedicated PCS driver will make use of that.
-
-I agree that a "cells" approach would require this, but
-
-- There are no in-tree examples of where this is necessary
-- I think this would be easy to add when necessary
-
-> I honestly hope we can skip having to enter the wrapper hell.
-
-Unfortunately, this is required by the kernel driver model :l
-
-> Anyway I also see you made REALLY GOOD documentation.
-
-Thanks. One of my peeves is subsystems that have zero docs...
-
-> Would be ideal to
-> collaborate for that. Anyway it's up to net maintainers on what path to follow.
-> 
-> Just my 2 cent on the PCS topic.
-
---Sean
+I understand this code the least of all of you, obviously, but FWIW
+in my mind the datacenter use case is more like trying to feed
+set_link_ksettings() from the EEPROM. Rather than a OS config script.
+Maybe call it "stored link" ? Not sure how fruitful arguing whether 
+the term "fixed-link" can be extended to cover this is going to be :S
 
