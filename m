@@ -1,121 +1,126 @@
-Return-Path: <netdev+bounces-179634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F2A3A7DE93
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 15:11:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 795A4A7DE98
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 15:12:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D46FE3A98DE
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 13:11:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E42FF16EA70
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 13:12:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C132D2517B1;
-	Mon,  7 Apr 2025 13:11:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE53125290E;
+	Mon,  7 Apr 2025 13:11:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A/yiDtbP"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4172512FD;
-	Mon,  7 Apr 2025 13:11:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B37F22356D4;
+	Mon,  7 Apr 2025 13:11:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744031506; cv=none; b=UciKjM/CQ6K+X1kQS12BpaaIv0cnoYV9aH4/Tcc6wlWPylvssuqL6GPluBWWmzU8JVNrAzNjg1ge6Li8PF8wRvDtcYQU3Xxe4EvzUTmQGccyAbsniutvbgHuYk6VrL8nuEEimRYSL4QVVMfEU8vLjb2eiIZ/frcjFatPeIK0PTY=
+	t=1744031518; cv=none; b=Sx/1fz7sjrToir2Kxmq4Lr+4YjpDTmb3OpqlU2NuJuUxw9RLJ54tcSQ6ndRztBuC/9E6kczZCBsYw0gB0sATiVtorbBzK3+Q+68dZ/xOltMfjk5p2C7gEZC/Mghu9QKCcGXwaJD7j5Sn4AngjjXppJzU+CBMINviU80ed1HjMog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744031506; c=relaxed/simple;
-	bh=2Kyzltuee9lw0VbxAQZivPwT/I9GE7kNboJtO2TQKb0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ckjsgP2LUOBlmgXLQzLmk67SuinOAuCEYLwiqSjNiNXAf8iR95tyXyFEVPpNjRVEXLSKnb83B6pEbOlLPGNK1q3NQRaogPSrALkOgYJB+kI83TvWXn+T5J0mKvp1OQV8ytYgZtPm0QQctxLsupwIOd3KijhbqMS81Ggf6Lqy82Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [124.16.141.245])
-	by APP-03 (Coremail) with SMTP id rQCowABHtkL+zvNn2JviBg--.35685S2;
-	Mon, 07 Apr 2025 21:11:28 +0800 (CST)
-From: Wentao Liang <vulab@iscas.ac.cn>
-To: ecree.xilinx@gmail.com,
-	habetsm.xilinx@gmail.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-staging@lists.linux.dev,
-	linux-net-drivers@amd.com,
-	linux-kernel@vger.kernel.org,
-	Wentao Liang <vulab@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH v2] sfc: Propagate the return value of devlink_info_serial_number_put()
-Date: Mon,  7 Apr 2025 21:11:10 +0800
-Message-ID: <20250407131110.2394-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.42.0.windows.2
+	s=arc-20240116; t=1744031518; c=relaxed/simple;
+	bh=9RTE6GZFHtGCxccvwtzxwrgeH86aK7UcCNbpZ1d3o2M=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=C0xi9Q1GE9ynWX65JfVEoEl6a32+QAsaOhfcJxZD130aIsdNuZuCfOCglNPxvy4yVO4GuRrTTE5DBwRygV39TiUvoO8s/pko2EhU4tEOGyTrueY9Fmd6HCLW1eYM48bbY4hErkzwbK+ovPak1CZ1zzPr31nfb36kLyp5DZ8fql4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A/yiDtbP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FD75C4CEE7;
+	Mon,  7 Apr 2025 13:11:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744031517;
+	bh=9RTE6GZFHtGCxccvwtzxwrgeH86aK7UcCNbpZ1d3o2M=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=A/yiDtbPopNu2zs1c2ynBpjI20TjuAIXeM3WvFq08r2EdCLHlisMvAJJTZur9LFq5
+	 Nfse6o7IODzaetg6vVPa5qarj6qenz+xX7zkqdOEtB/W0L1zz3CDQ40SRiYhL8FiyW
+	 O4OXw6zBP4XfG0wTKrClQBws9JUtL//XSxjIZBHRK81c/6qzYvmJRCIjdC0/sjztAG
+	 ZOGVyJne768UflKZVZI9FSxD+EoVC2bjc15aXW0KZwTjMgWY5D7rynFMLb+kH7d4R8
+	 SLV90h4mg+xgSroSfe24S4GV/LPrjHiPjeOztUV1bia4+ZoQk4pcOAOt+xtN6PFUIM
+	 ACshBt/r6/Ktg==
+From: Andreas Hindborg <a.hindborg@kernel.org>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: rust-for-linux@vger.kernel.org,  linux-kernel@vger.kernel.org,
+  netdev@vger.kernel.org,  andrew@lunn.ch,  hkallweit1@gmail.com,
+  tmgross@umich.edu,  ojeda@kernel.org,  alex.gaynor@gmail.com,
+  gary@garyguo.net,  bjorn3_gh@protonmail.com,  benno.lossin@proton.me,
+  a.hindborg@samsung.com,  aliceryhl@google.com,  anna-maria@linutronix.de,
+  frederic@kernel.org,  tglx@linutronix.de,  arnd@arndb.de,
+  jstultz@google.com,  sboyd@kernel.org,  mingo@redhat.com,
+  peterz@infradead.org,  juri.lelli@redhat.com,
+  vincent.guittot@linaro.org,  dietmar.eggemann@arm.com,
+  rostedt@goodmis.org,  bsegall@google.com,  mgorman@suse.de,
+  vschneid@redhat.com,  tgunders@redhat.com,  me@kloenk.dev,
+  david.laight.linux@gmail.com
+Subject: Re: [PATCH v12 5/5] MAINTAINERS: rust: Add a new section for all of
+ the time stuff
+In-Reply-To: <20250406013445.124688-6-fujita.tomonori@gmail.com> (FUJITA
+	Tomonori's message of "Sun, 6 Apr 2025 10:34:45 +0900")
+References: <20250406013445.124688-1-fujita.tomonori@gmail.com>
+	<20250406013445.124688-6-fujita.tomonori@gmail.com>
+User-Agent: mu4e 1.12.7; emacs 29.4
+Date: Mon, 07 Apr 2025 15:11:40 +0200
+Message-ID: <871pu4jeur.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowABHtkL+zvNn2JviBg--.35685S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Kr1fuFyfAry7tw48WryxAFb_yoW8Xr4rpa
-	y3AFyagFyfCFy0ga18uF48uFy3Za1UKFyqgFZ3Kw4ruanxJr4avFsY9a43Kr15ArWkG3Wx
-	tr1UCrWfCFn8ArUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9Y14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7x
-	kEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E
-	67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCw
-	CI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1x
-	MIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCT
-	nIWIevJa73UjIFyTuYvjfU52NtDUUUU
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBwoFA2fzvEUKpgABsL
+Content-Type: text/plain
 
-The function efx_devlink_info_board_cfg() calls the function
-devlink_info_serial_number_put(), but does not check its return
-value.
+FUJITA Tomonori <fujita.tomonori@gmail.com> writes:
 
-Return the error code if either the devlink_info_serial_number_put()
-or the efx_mcdi_get_board_cfg() fails.The control flow of the code is
-changed a little bit to simplify the code. The functionality of the
-code remain the same.
+> Add a new section for all of the time stuff to MAINTAINERS file, with
+> the existing hrtimer entry fold.
+>
+> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> ---
+>  MAINTAINERS | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index d32ce85c5c66..fafb79c42ac3 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -10581,20 +10581,23 @@ F:	kernel/time/timer_list.c
+>  F:	kernel/time/timer_migration.*
+>  F:	tools/testing/selftests/timers/
+>  
+> -HIGH-RESOLUTION TIMERS [RUST]
+> +DELAY, SLEEP, TIMEKEEPING, TIMERS [RUST]
+>  M:	Andreas Hindborg <a.hindborg@kernel.org>
+>  R:	Boqun Feng <boqun.feng@gmail.com>
+> +R:	FUJITA Tomonori <fujita.tomonori@gmail.com>
+>  R:	Frederic Weisbecker <frederic@kernel.org>
+>  R:	Lyude Paul <lyude@redhat.com>
+>  R:	Thomas Gleixner <tglx@linutronix.de>
+>  R:	Anna-Maria Behnsen <anna-maria@linutronix.de>
+> +R:	John Stultz <jstultz@google.com>
+> +R:	Stephen Boyd <sboyd@kernel.org>
+>  L:	rust-for-linux@vger.kernel.org
+>  S:	Supported
+>  W:	https://rust-for-linux.com
+>  B:	https://github.com/Rust-for-Linux/linux/issues
+> -T:	git https://github.com/Rust-for-Linux/linux.git hrtimer-next
+> -F:	rust/kernel/time/hrtimer.rs
+> -F:	rust/kernel/time/hrtimer/
+> +T:	git https://github.com/Rust-for-Linux/linux.git rust-timekeeping-next
+> +F:	rust/kernel/time/
+> +F:	rust/kernel/time/time.rs
+>  
+>  HIGH-SPEED SCC DRIVER FOR AX.25
+>  L:	linux-hams@vger.kernel.org
 
-Fixes: 14743ddd2495 ("sfc: add devlink info support for ef100")
-Cc: stable@vger.kernel.org # v6.3+
-Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
----
-v2: Simplify code logic.
 
- drivers/net/ethernet/sfc/efx_devlink.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
 
-diff --git a/drivers/net/ethernet/sfc/efx_devlink.c b/drivers/net/ethernet/sfc/efx_devlink.c
-index 3cd750820fdd..53b17cd252c8 100644
---- a/drivers/net/ethernet/sfc/efx_devlink.c
-+++ b/drivers/net/ethernet/sfc/efx_devlink.c
-@@ -584,11 +584,12 @@ static int efx_devlink_info_board_cfg(struct efx_nic *efx,
- 	int rc;
- 
- 	rc = efx_mcdi_get_board_cfg(efx, (u8 *)mac_address, NULL, NULL);
--	if (!rc) {
--		snprintf(sn, EFX_MAX_SERIALNUM_LEN, "%pm", mac_address);
--		devlink_info_serial_number_put(req, sn);
--	}
--	return rc;
-+	if (rc)
-+		return rc;
-+
-+	snprintf(sn, EFX_MAX_SERIALNUM_LEN, "%pm", mac_address);
-+
-+	return devlink_info_serial_number_put(req, sn);
- }
- 
- static int efx_devlink_info_get(struct devlink *devlink,
--- 
-2.42.0.windows.2
+
+Best regards,
+Andreas Hindborg
+
 
 
