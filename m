@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-179982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B076A7F079
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 00:53:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50F77A7F07A
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 00:53:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F8F87A23E6
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 22:51:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A6B3B189168D
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 22:53:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 923D822B8B8;
-	Mon,  7 Apr 2025 22:51:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CBED22D4E2;
+	Mon,  7 Apr 2025 22:51:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="d5+N0btA"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="QMRlWxcJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2087.outbound.protection.outlook.com [40.107.243.87])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2081.outbound.protection.outlook.com [40.107.236.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4F222ACDC;
-	Mon,  7 Apr 2025 22:51:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C27C522B5A1;
+	Mon,  7 Apr 2025 22:51:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.81
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744066315; cv=fail; b=Go6gnpjxccUyz7FHWqBekPyFtLBIr3ldGYKtBUdT12ckUK0z9peCmlm8+B9JZNnws5Aaxc/6w3HpZ0TIqyUx5J7FDmLbToD6IgI+v3EFONh1lttCFtmFtvDBkQ9TlnL9Rja4/P9aBIF2TFpWt5V2RvpBOkReJKoXRSRv4NLnpS8=
+	t=1744066317; cv=fail; b=q259ZwO2NJ0jGBmzpes4q69/93WWXuPlsxzC1s+ulBSQC3Rb5gkrZcOJx6mRNKePTSlDaDPAYzWESrxQaLEQ2WLSDMEWfo6TGw3f1NX8sZ5Q0/RLyW+SFCUv8V2ivsN0YoxYuM3ECRA91T8GxdWTP05U2KXfjHWDfYHkNNGeWfE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744066315; c=relaxed/simple;
-	bh=KTUTN4rC+085EaXJJjaYdpFiIVXk23GrFrYtJkQJWaQ=;
+	s=arc-20240116; t=1744066317; c=relaxed/simple;
+	bh=iFYXoUdF3W8taZedS1xk0FCTEBI6CgwrfHDv9Cl3jF0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aVTFjjFKvTgSlAitE0e2R18fRq2QZp0AXeuhoLKc9cja3EpCv3WPb0ah4vJg67wi9pDlUC6hFSnmbeiPc7UigQyTdFB3YdQkfR65IMgJr7MC+yjiFKZGGPJ9VJlXPuzNfNvlLRUTifehEm0kT49mWycikfKbQjigg5sgVwxc6Fk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=d5+N0btA; arc=fail smtp.client-ip=40.107.243.87
+	 MIME-Version:Content-Type; b=Sibo47cZxh0tLbvVkLfVBg+Bhq1JH1yksoYgWsO8BKWRG45GWsEOcVvz4hkhBCOYn5oI5UGHOXt2FWL1emR0MVnO5g0l2AAlQj2v/DJGp4oNTStrmNsRnFEw2IHlapqnxf0pYpZkM/HBrWbHSaql7UIgNK/1uZXvbC4K9LtfA5g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=QMRlWxcJ; arc=fail smtp.client-ip=40.107.236.81
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=w68wFb273lrgt9G68G3RXKQO/6gNXEAdLD9QzKUdwpMEuFbbXL7Z9WmfzApPRbi/jTPoEFEcrr9vy0gzwLHLO8WVo37tWkleqcQyMygQztghOt/f6blyIJBeA1htzLTb096UE6jml9xn2BoKw5+ERIkHvg2tT5LiMeN/JgaQ7yaaiRbyIO7Z0AWH26SkWLkrPKe2Mc444uBeO/vSMUKuLPoS3pyo7Gfjs1HXYVWEbnV3Ad00rhHxj8gUd8eybduMYq0HnGpYaiKnfLkx4I4gZAAMp0VcSJtQOdjsDckqapLHdtisYY0m8y8AfY10ducsqYiHbwr3y9DoWnLHTkmfxQ==
+ b=MRo2LCj9KdLrpHrIue0zfu2nEvR9Q0exv+vjlxglTMqST+YQTd+itZYfKK+lxiW58MPPCsIZCX9NLjAhq4dzYBsjwmlkmR9a+kRwcs5FZidzxmI+VWwSLeMEwJhHf4Lg/4QJrvRwh8Exj12daoV9BoVqMGvJABi1qw5mxm22GVGQPK2nNDN5Y2pptSvOF/gQv86X2CnbC+KNBam6qZI/+0UHekz53wVKHVKm1RuRSVlVKYJ4hOMUJJ2JcVPAxqGTev0m7BqrJUrw37v37Zd5TyQHFrxMT4CGEslY7+zlMtuHSZCjtDG1RjyX3HVDBTEdXHogw9/YI0N0G4Ig4vz6UA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=A3LbZWzWQyUkC85Yl2tj6sDaOCdP5KAPH5dPI3+/cmk=;
- b=uRgH3zNNryGKvqdh74arWZs7zHoJYzfYl5FT3/l5ivTEiKNPNW5RjyuKv7ygvvILJDpUZgosJMFtbCzTcQ6UWD2bgzFlEjZHJaraK72Sg070MUpc5iEl+9fMB/ibzf61mdwX/V74DQyx4eiG8u0jUgqiLe2XgYtLfN0iN8LO+hm9iveVZcYRNC/szsdZK38U0GQ4leWn26e9jZnmILMGjXrPu4+GU6SmJDXh2Sr6hGthoNo7MaMdpx/ikZSz13OPDoUyzH+2zUeERXEZ18NAICGnjYda0ciHXb/S+sabVCaW/sOrQmWJ8TYgOWPqO0L588LFqWGghfphCEV2ja+BDg==
+ bh=DbRfsUR9h/xdmIkJ+voPFjdBSud2yuK2UaqSyKlCj4o=;
+ b=ZtmGfYJIrDELDAi4q3P1m2IOonYLyhVAWeYj0IPPAPGTJPyLMEJwb67Y+V3qPxQip+SgZIGEIGyjWPTA4X88Bo3siyu5fIdbSQKFWW30L9UHdqpTmLq9IjxdJyDZpLmTCOQHBfAy0adod376wmbF1TFryC7h7jC13bCAC0Oww9IUS9ZBgOe7avp5lZCoBT/EHsSGETinH/AH45Ho+Kl/TpSe0r98nh7EhvifRf20poc6ZyCDgSmI3mHFmk2Nc9JU9X/5kHvjZ3TvpyqOmhTVcRs91538OerV1reOdJM5Ctx5yZWjgUxG7oKLCQUuRgyugP8x/rgzi7Htpy0QZAvnRw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=A3LbZWzWQyUkC85Yl2tj6sDaOCdP5KAPH5dPI3+/cmk=;
- b=d5+N0btAFfVBf497w03Ob+T61Ow4L/iaBPno4IKbOtpmDgAjuuddpmFMVio122ac2vT8H8ZCL4M3dxYwsETz3DzyQ1IRMXH9Tl5bFOIWLAWiKUjoLNR+T0NzuhvT2YDF1Doyy5q8nlFxa1Ga+nikHImpeEJ34GZUF6TihjQepsE=
-Received: from BN9PR03CA0083.namprd03.prod.outlook.com (2603:10b6:408:fc::28)
- by DS7PR12MB6143.namprd12.prod.outlook.com (2603:10b6:8:99::16) with
+ bh=DbRfsUR9h/xdmIkJ+voPFjdBSud2yuK2UaqSyKlCj4o=;
+ b=QMRlWxcJv11zryobZpH3TvPop/Sd2BSIhBgPFReOFqhZHdW+AdcaTESl9bsCEalK0jcVlBzN9gXaom262F7ynQJlK/f9IcgVpIcNK7XfiqzeEp81YxhlGZRsPDEm+eYU8VnwJXF6zZsRh8JbLSzOUml0mJjwY8tQVgmmPe9NUak=
+Received: from BN9PR03CA0078.namprd03.prod.outlook.com (2603:10b6:408:fc::23)
+ by IA0PPFD7DCFAC03.namprd12.prod.outlook.com (2603:10b6:20f:fc04::be7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.33; Mon, 7 Apr
- 2025 22:51:49 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.27; Mon, 7 Apr
+ 2025 22:51:50 +0000
 Received: from BL6PEPF0001AB53.namprd02.prod.outlook.com
- (2603:10b6:408:fc:cafe::2c) by BN9PR03CA0083.outlook.office365.com
- (2603:10b6:408:fc::28) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8606.32 via Frontend Transport; Mon,
- 7 Apr 2025 22:51:49 +0000
+ (2603:10b6:408:fc:cafe::32) by BN9PR03CA0078.outlook.office365.com
+ (2603:10b6:408:fc::23) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8606.34 via Frontend Transport; Mon,
+ 7 Apr 2025 22:51:50 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -65,20 +65,20 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  BL6PEPF0001AB53.mail.protection.outlook.com (10.167.241.5) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8606.22 via Frontend Transport; Mon, 7 Apr 2025 22:51:49 +0000
+ 15.20.8606.22 via Frontend Transport; Mon, 7 Apr 2025 22:51:50 +0000
 Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 7 Apr
- 2025 17:51:46 -0500
+ 2025 17:51:47 -0500
 From: Shannon Nelson <shannon.nelson@amd.com>
 To: <andrew+netdev@lunn.ch>, <brett.creeley@amd.com>, <davem@davemloft.net>,
 	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
 	<michal.swiatkowski@linux.intel.com>, <linux-kernel@vger.kernel.org>,
 	<netdev@vger.kernel.org>
 CC: Shannon Nelson <shannon.nelson@amd.com>
-Subject: [PATCH net 5/6] pds_core: smaller adminq poll starting interval
-Date: Mon, 7 Apr 2025 15:51:12 -0700
-Message-ID: <20250407225113.51850-6-shannon.nelson@amd.com>
+Subject: [PATCH net 6/6] pds_core: make wait_context part of q_info
+Date: Mon, 7 Apr 2025 15:51:13 -0700
+Message-ID: <20250407225113.51850-7-shannon.nelson@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20250407225113.51850-1-shannon.nelson@amd.com>
 References: <20250407225113.51850-1-shannon.nelson@amd.com>
@@ -93,97 +93,178 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB53:EE_|DS7PR12MB6143:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7f647d00-d987-4309-4b72-08dd7626c804
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB53:EE_|IA0PPFD7DCFAC03:EE_
+X-MS-Office365-Filtering-Correlation-Id: c4abb84b-e0b6-4ed6-a801-08dd7626c882
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700013|1800799024|82310400026;
+	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?BIJL+sWlZ9kp+6soGRvt6O+cjIhN1hwE6mCmPKJnNG/QwAG+fhMTe7eayEOE?=
- =?us-ascii?Q?csO1eOXnklsmxu3VCCfJ+BR+0GTFi/VSz0wDs9TX71XccMy1/2R0YEytiFYz?=
- =?us-ascii?Q?moIGithhOVCJT62TJJSyPNQMwDKX42bF2WUodw/qfgX2htNWn6ccMAo0hrWu?=
- =?us-ascii?Q?Q6snIqPQ50hsfB6GVpqIctDCzY2+A0tThEa2pg3xpcE1HdpGtFs+ErcWhFfM?=
- =?us-ascii?Q?MIEkloNv2LPkDKZUzcKGhBCev7p5GQ6kmda/8a2oyeOZ7IZRv0OZkvgNprfZ?=
- =?us-ascii?Q?nU8v1ZSyR0nKRRwnceL02eh+cLVtq0dbnpwI1gDCuSg3t0Ni4vPkJxeVao5/?=
- =?us-ascii?Q?qVyCVw0bOqlHpERMQ8hNoVFyUuklCZKpdExXKnEeNLS7wKqaqWFXXM/NVSMP?=
- =?us-ascii?Q?zFu4SsaxJrQOBS9oZXUXUWdyNBh5xHsj0SvyPlQJHHME9iAKKkC/U4ZGEOgf?=
- =?us-ascii?Q?RRitKKnhMgV5K8O5c+0AVeaOOmQF7PeARFWHyzDH4Mdq1F0IScfoHK/yQEn7?=
- =?us-ascii?Q?WYn/JkB/Bg+ujWTSKEFC6wt36QS3ryYhQ5fk5vLdVC3bIBntutIy7ifSV6Rm?=
- =?us-ascii?Q?PvI+O6nkjvNZGLsCx3LW7LUHvNOZDXpeOCMW87QWVkHHKw4KYJ7tF1Wxht3h?=
- =?us-ascii?Q?G5GkmnOm2r7H9OS2No52HNK19iPohx0KufWnMcQbSwdTMfMM8Kj4eYRwh215?=
- =?us-ascii?Q?OOgC5ovsf56V6xIw4xZ4oaLXJdHLUwFvYH8vFjznQrDrUsWf6NNeBN+1Mi5c?=
- =?us-ascii?Q?t1gYnakO/1KSqV6jLCy78vmBxsblHguF2UMjLf4TecHaBd4LSZmUxxtzvN7V?=
- =?us-ascii?Q?WL06P2CE4/oj7vzetaogjki3Y9zqQvqT4yQNIMTTBsUSDYQCZ/Y6K97kHazO?=
- =?us-ascii?Q?CU0lpxfQVLvIpxeaOMcp83kcJZjSzwUsUYms2/CMnj9olxUmvIhvbWlacfqT?=
- =?us-ascii?Q?7XoJhkgLMLURboVRHpncAOT4em64hzj0W9oP3UfDDDjx4SIt/6L3InwB6+wQ?=
- =?us-ascii?Q?d/Dn+YKcN5pyQtijnLxKwRDXy+hG9cXVkAWJC0vdisGPrWrd9p46m7m/oWLe?=
- =?us-ascii?Q?6HuLBeMZr1tWEv8hcU/0MbMsKOxe5eLHFjRdUp5T69O2NARAdrXUN5mYyvY3?=
- =?us-ascii?Q?ijUv9DQCLQ99h6TjDfoJrLHocxZ7YHUSWqs8WaS2kdyLIAd0p8s/eesrfEYU?=
- =?us-ascii?Q?gdqG6HakcN4hoW1UjCrtX/tobGq3kwCBNw8XxF2c+IkA+aoTWdKwbHblqGTd?=
- =?us-ascii?Q?90bkc9DHwj57ek5N6fPmfQ4S6HDqgtk445efL5GTSaC2gZa+OsPY1KQhmAWN?=
- =?us-ascii?Q?PUNEEXmdd6b9MFxGW1ZQS5UCtsTsbuQmArcB5OgIewB9BDMsm1+y4o0vx2uE?=
- =?us-ascii?Q?pnxphS8Bv4gGtrubRrbqku1F4KNxZpKbjOZJniy1IZTmOkrVh3Q8YmPrOvV0?=
- =?us-ascii?Q?N6G40Ow/Lc1Xk7YqT9kg3iOnngX4Ek9kM/TBXBLbBsp4TVsvtnnk6g=3D=3D?=
+	=?us-ascii?Q?IWURqKbR7cAZNhHybQH6YmpjVt5h+fMi2LgmQz49E/B8OKW45WZHP4Ih469a?=
+ =?us-ascii?Q?Fh+StW3p65XTb4pqyjly1I/DUPyV5JPSoGNfjru2VAgBFo2XZ0reSsGFr+oh?=
+ =?us-ascii?Q?ZALfCIY/Z71YkC+MiLDzRhWXwUIvHbL8B5u3axV9vesMENGQQRzusHc1gSgG?=
+ =?us-ascii?Q?rDgIrN/DMabJChT4GQJI9f4kjeirgdyvT6nwU47RW7DIPfaI94AhdfKRVBps?=
+ =?us-ascii?Q?/Pix7wNG7w/IhH90KL4aOBZM3Gr0M/MODw7KptraSACV+UFUlhxtFwo5RKe1?=
+ =?us-ascii?Q?YA13vzfVBpoS7rdp/UGure40TbTpycfU5/+tHbZfTtB36wItFFfeaqihkLYN?=
+ =?us-ascii?Q?tS2LAk6e4A28ccr3IZ2bkXVS75HBSXFHCiR7L0SBp3Wv71R0Mv3GGOBHWhjJ?=
+ =?us-ascii?Q?gQrg/Y42upuUqvzTdGK3o3mHjn0IzbkcowWX3jFeTvppIlNozzx365NSkz1R?=
+ =?us-ascii?Q?a6znBnkVk+b37pJdnrPgUNHvXB6dGY6SLKk54LZBVx4VpAdvs1MV+5e5hEnc?=
+ =?us-ascii?Q?SDvtRsFWv9pdFCC1F0TqGlCzgrtwLk+FPLQwSXSXd5pTpBlBsKBvNYTgrT46?=
+ =?us-ascii?Q?haljfmAI0fL+MULQKGZeibCo+/UEyL4pXxOtNrLv2g6YROQVyS8KjTbiqrO2?=
+ =?us-ascii?Q?OE4ZlCtTyOPF7E1HaU8qS8ec8yTcBRywh7kGhydRBKeGe6SW5w27y6Q9W1EF?=
+ =?us-ascii?Q?Dvh+s4AzGDcTFcbCLWN8nNBMP7aXY68P0hgx3xNzolKrsHz0DoxjfTE5PidV?=
+ =?us-ascii?Q?gEEPTauSMSDDcptUTm0wXnFlK9RdXnX6a18bdPL/sREQqrmz0G4O5AQ7Qmpd?=
+ =?us-ascii?Q?L2209sxF7y+jvMbVNqiahY9mfSnMjhxdjeb6lnx70LwYbssZKgdF9164TY3Y?=
+ =?us-ascii?Q?VEWT5bMaFmcU2hP1o786724KAZPpRYRbVq6vlp1SVfwUtFor8Ofp0tJxL93t?=
+ =?us-ascii?Q?dKCcUPmDCdsb3aiGp4icAtg7JSHJh05/JfGQ7uDoA41YdrNUDS5ss0dVOLzm?=
+ =?us-ascii?Q?qRr4zcfsyIeAeuB/0UKktfX/q8rEA0GLdORdagQaNOdSkakrSK9lKuIG97Q6?=
+ =?us-ascii?Q?BXLuP4rL+1ACHtrOUhnNfrY0LmhED7uLks8kqaQI34HtXs8eGxwwM4z5LGIt?=
+ =?us-ascii?Q?FfsFUbD/qMkKE6xomKOVqFVRss7qq9c8QkcWjc97tXIoEyx10G+K4zWX4AZ6?=
+ =?us-ascii?Q?8w9nAW6mQ+oJTBLCebjukcuGiW3hwoi+Can1ZH9iSG94SzfYRhlU1RR6jEI1?=
+ =?us-ascii?Q?WaANhmmKXw2KI8HuwRPNjxLLeBYmCeeXIu9lDyelgAdN4nzXqVkzTvddNg5f?=
+ =?us-ascii?Q?2vfX9wuJkUuTN8kcvODYuJCzpjmh0KW7LurZB0ulZF28kWseeoNy7NZSbyzX?=
+ =?us-ascii?Q?V8Bo32Dv8yv9b611t7VlO8b7FQLf+bO+eDvBLkiApVJfB5jWebJ+dxRVWT4w?=
+ =?us-ascii?Q?/2bKhiY4Ik+XosY5BdziDob2qGRZUsz7NiDAbRzSsoxm0bqneOkmURFKtvLU?=
+ =?us-ascii?Q?YNd1bPARAxHt1qg=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700013)(1800799024)(82310400026);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2025 22:51:49.2569
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Apr 2025 22:51:50.0850
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7f647d00-d987-4309-4b72-08dd7626c804
+X-MS-Exchange-CrossTenant-Network-Message-Id: c4abb84b-e0b6-4ed6-a801-08dd7626c882
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	BL6PEPF0001AB53.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6143
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PPFD7DCFAC03
 
-Shorten the adminq poll starting interval in order to speed
-up the transaction response time.
+Make the wait_context a full part of the q_info struct rather
+than a stack variable that goes away after pdsc_adminq_post()
+is done so that the context is still available after the wait
+loop has given up.
+
+There was a case where a slow development firmware caused
+the adminq request to time out, but then later the FW finally
+finished the request and sent the interrupt.  The handler tried
+to complete_all() the completion context that had been created
+on the stack in pdsc_adminq_post() but no longer existed.
+This caused bad pointer usage, kernel crashes, and much wailing
+and gnashing of teeth.
 
 Fixes: 01ba61b55b20 ("pds_core: Add adminq processing and commands")
 Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 ---
- drivers/net/ethernet/amd/pds_core/adminq.c | 4 ++--
- include/linux/pds/pds_adminq.h             | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/amd/pds_core/adminq.c | 23 +++++++---------------
+ drivers/net/ethernet/amd/pds_core/core.h   |  7 ++++++-
+ 2 files changed, 13 insertions(+), 17 deletions(-)
 
 diff --git a/drivers/net/ethernet/amd/pds_core/adminq.c b/drivers/net/ethernet/amd/pds_core/adminq.c
-index c83a0a80d533..2e840112efea 100644
+index 2e840112efea..86a6371e5821 100644
 --- a/drivers/net/ethernet/amd/pds_core/adminq.c
 +++ b/drivers/net/ethernet/amd/pds_core/adminq.c
-@@ -235,7 +235,7 @@ int pdsc_adminq_post(struct pdsc *pdsc,
- 		.wait_completion =
- 			COMPLETION_INITIALIZER_ONSTACK(wc.wait_completion),
- 	};
--	unsigned long poll_interval = 1;
-+	unsigned long poll_interval = 200;
+@@ -5,11 +5,6 @@
+ 
+ #include "core.h"
+ 
+-struct pdsc_wait_context {
+-	struct pdsc_qcq *qcq;
+-	struct completion wait_completion;
+-};
+-
+ static int pdsc_process_notifyq(struct pdsc_qcq *qcq)
+ {
+ 	union pds_core_notifyq_comp *comp;
+@@ -112,7 +107,7 @@ void pdsc_process_adminq(struct pdsc_qcq *qcq)
+ 		/* Copy out the completion data */
+ 		memcpy(q_info->dest, comp, sizeof(*comp));
+ 
+-		complete_all(&q_info->wc->wait_completion);
++		complete_all(&q_info->wc.wait_completion);
+ 
+ 		if (cq->tail_idx == cq->num_descs - 1)
+ 			cq->done_color = !cq->done_color;
+@@ -162,8 +157,7 @@ irqreturn_t pdsc_adminq_isr(int irq, void *data)
+ static int __pdsc_adminq_post(struct pdsc *pdsc,
+ 			      struct pdsc_qcq *qcq,
+ 			      union pds_core_adminq_cmd *cmd,
+-			      union pds_core_adminq_comp *comp,
+-			      struct pdsc_wait_context *wc)
++			      union pds_core_adminq_comp *comp)
+ {
+ 	struct pdsc_queue *q = &qcq->q;
+ 	struct pdsc_q_info *q_info;
+@@ -205,7 +199,6 @@ static int __pdsc_adminq_post(struct pdsc *pdsc,
+ 	/* Post the request */
+ 	index = q->head_idx;
+ 	q_info = &q->info[index];
+-	q_info->wc = wc;
+ 	q_info->dest = comp;
+ 	memcpy(q_info->desc, cmd, sizeof(*cmd));
+ 
+@@ -231,11 +224,8 @@ int pdsc_adminq_post(struct pdsc *pdsc,
+ 		     union pds_core_adminq_comp *comp,
+ 		     bool fast_poll)
+ {
+-	struct pdsc_wait_context wc = {
+-		.wait_completion =
+-			COMPLETION_INITIALIZER_ONSTACK(wc.wait_completion),
+-	};
+ 	unsigned long poll_interval = 200;
++	struct pdsc_wait_context *wc;
  	unsigned long poll_jiffies;
  	unsigned long time_limit;
  	unsigned long time_start;
-@@ -261,7 +261,7 @@ int pdsc_adminq_post(struct pdsc *pdsc,
+@@ -250,19 +240,20 @@ int pdsc_adminq_post(struct pdsc *pdsc,
+ 		return -ENXIO;
+ 	}
+ 
+-	wc.qcq = &pdsc->adminqcq;
+-	index = __pdsc_adminq_post(pdsc, &pdsc->adminqcq, cmd, comp, &wc);
++	index = __pdsc_adminq_post(pdsc, &pdsc->adminqcq, cmd, comp);
+ 	if (index < 0) {
+ 		err = index;
+ 		goto err_out;
+ 	}
+ 
++	wc = &pdsc->adminqcq.q.info[index].wc;
++	wc->wait_completion = COMPLETION_INITIALIZER_ONSTACK(wc->wait_completion);
+ 	time_start = jiffies;
  	time_limit = time_start + HZ * pdsc->devcmd_timeout;
  	do {
  		/* Timeslice the actual wait to catch IO errors etc early */
--		poll_jiffies = msecs_to_jiffies(poll_interval);
-+		poll_jiffies = usecs_to_jiffies(poll_interval);
- 		remaining = wait_for_completion_timeout(&wc.wait_completion,
+ 		poll_jiffies = usecs_to_jiffies(poll_interval);
+-		remaining = wait_for_completion_timeout(&wc.wait_completion,
++		remaining = wait_for_completion_timeout(&wc->wait_completion,
  							poll_jiffies);
  		if (remaining)
-diff --git a/include/linux/pds/pds_adminq.h b/include/linux/pds/pds_adminq.h
-index 339156113fa5..40ff0ec2b879 100644
---- a/include/linux/pds/pds_adminq.h
-+++ b/include/linux/pds/pds_adminq.h
-@@ -4,7 +4,7 @@
- #ifndef _PDS_CORE_ADMINQ_H_
- #define _PDS_CORE_ADMINQ_H_
+ 			break;
+diff --git a/drivers/net/ethernet/amd/pds_core/core.h b/drivers/net/ethernet/amd/pds_core/core.h
+index 199473112c29..84fd814d7904 100644
+--- a/drivers/net/ethernet/amd/pds_core/core.h
++++ b/drivers/net/ethernet/amd/pds_core/core.h
+@@ -88,6 +88,11 @@ struct pdsc_buf_info {
+ 	u32 len;
+ };
  
--#define PDSC_ADMINQ_MAX_POLL_INTERVAL	256
-+#define PDSC_ADMINQ_MAX_POLL_INTERVAL	256000	/* usecs */
++struct pdsc_wait_context {
++	struct pdsc_qcq *qcq;
++	struct completion wait_completion;
++};
++
+ struct pdsc_q_info {
+ 	union {
+ 		void *desc;
+@@ -96,7 +101,7 @@ struct pdsc_q_info {
+ 	unsigned int bytes;
+ 	unsigned int nbufs;
+ 	struct pdsc_buf_info bufs[PDS_CORE_MAX_FRAGS];
+-	struct pdsc_wait_context *wc;
++	struct pdsc_wait_context wc;
+ 	void *dest;
+ };
  
- enum pds_core_adminq_flags {
- 	PDS_AQ_FLAG_FASTPOLL	= BIT(1),	/* completion poll at 1ms */
 -- 
 2.17.1
 
