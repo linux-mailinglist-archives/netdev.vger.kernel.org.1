@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-179876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BC47A7ECE0
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 21:27:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05C2DA7ECF8
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 21:28:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DF574481DB
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:18:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C93E1426F48
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 19:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B681425B69D;
-	Mon,  7 Apr 2025 19:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2486625C6EB;
+	Mon,  7 Apr 2025 19:01:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vLtp9z6d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qkIkFF9x"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F87223302
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F315422172D
 	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 19:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744052479; cv=none; b=LGp0zDkTaoDvVZqXViblxIDbauo/y5nIzRAVjM2RW4aCzlTbVLaw/aMg+g0FZBzNT9k6X3nU7lifBf7pWOGzFaMvZmTJTV2uGUmvZydyvubxSkjE5VcNdAbJqRsqX7rkSBm9i3EZGX3002PamgxJWfBw6cu575YjfGQGO5ScF3A=
+	t=1744052480; cv=none; b=g/p0uTVUstntZQ/vmJ6RIKXBdqfujSkf9zgA7+Q4NdvdF4qGoLX8KfiEk1MFcrNo10Kb5WsqTc+zWpMC9L4gbT1rSc5evFWpzW2qHLHRmfbPVCMYiNAXTWEUUwfnSUqGLcZDRnm2LIL5IIM4KMqWDLfsZNMSz123ZLmpLhg5PI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744052479; c=relaxed/simple;
-	bh=qiWKN2+V0g2trh+EbLOKdigX+zrLTn13OWq1qeHarIU=;
+	s=arc-20240116; t=1744052480; c=relaxed/simple;
+	bh=+QbQmqZH10sakCr/POrniulCH44DF2n45krBGPyj0Cs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Oj+D+b3bwaNOvWHzu8A6aC+Pja9nihPq0KFeEbjcqAKC98GX5B0SV+Brr2dX3ePah4E9HkXhMwFmATDWhBRY34V+JA65KzUDiJxdJzl7d5r1ngaYbzb1tQzsBkpmUg0A+jP0QfeyJy11CWWfnLfXSwxrEjWYTwkCiATtEEBDN+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vLtp9z6d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A735CC4CEEC;
-	Mon,  7 Apr 2025 19:01:18 +0000 (UTC)
+	 MIME-Version; b=gZR4XITf2UzwYdLu3zarK6OKpocg4Ucv4yp+0VdETtsuy271A1Fd00I6ePuet70YHa25vry/o1fDOGE+aRCBEF6HddGTZ8mL9Bep68M9m8NclDdeOzSfExg9oPABpiKwsTxFguc21XnMHfEPTcytnkYm9xgEURHEnfe24/UkvOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qkIkFF9x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D761C4CEE9;
+	Mon,  7 Apr 2025 19:01:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1744052479;
-	bh=qiWKN2+V0g2trh+EbLOKdigX+zrLTn13OWq1qeHarIU=;
+	bh=+QbQmqZH10sakCr/POrniulCH44DF2n45krBGPyj0Cs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=vLtp9z6dU9MppmKQ7EGmvKqpd22wDpIU596cmtv0EGyUQVU2dJo3tVCm9BZpq5EF9
-	 8yx7T06D9XOGcvTxETYNDHW+zEekI6yQZRZt39AMK5MFQ32qfnSLSZUKn69jD6QOO4
-	 ggLIoJOEo5JuWY72hFkLWqFRvhlcYiEhuWHuF3cYntBGGlAauVLp3KL8japeE1SLR3
-	 ENchIG81AU66UuX9KDBw7Wvsi3QzNKi1yTowXRs8YtcUIqqHjsybz/1oHrfCkaTYVp
-	 9AzGOPFejaZ5VbrVhQOkvdHv9hRlSncQpTPE3qoCM7AV1CqkmJk5pWDQGLGTRtFE8v
-	 CUAhnCw+wMczA==
+	b=qkIkFF9x/8RnzKLXWyOHr5bf37tzjbuLXzCz1Wn5alGIz1lb1ezagX7Y14ccexIaF
+	 NsS5kgljGCrlshvFNTGMRedOTdJN0COSy8yAqNEjMbTVbdi8uvNu/IBl9JjBNk3iMf
+	 M23h1Qvgn+vrFh0rQHHwZnmjuZxE5pSC+mmaWq+5uIiDhkoN5/ZZcpgpdIadLE/6N7
+	 j8ZWPQEeox2hUT7RW3kbt7k2Z0qE4Dgmdl21B1H4WKMBP3kA3DC1UkrPvvdwHB7zmN
+	 ZD0JuyYQ/m8u+evaUNlQPHOGEUDpvYHwzJRYTdPgrJKAk8xj/z1MpHmrOpKmzNnCpQ
+	 7sixwzJ5C5t1Q==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -52,9 +52,9 @@ Cc: netdev@vger.kernel.org,
 	hramamurthy@google.com,
 	kuniyu@amazon.com,
 	jdamato@fastly.com
-Subject: [PATCH net-next 2/8] net: designate XSK pool pointers in queues as "ops protected"
-Date: Mon,  7 Apr 2025 12:01:11 -0700
-Message-ID: <20250407190117.16528-3-kuba@kernel.org>
+Subject: [PATCH net-next 3/8] netdev: add "ops compat locking" helpers
+Date: Mon,  7 Apr 2025 12:01:12 -0700
+Message-ID: <20250407190117.16528-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250407190117.16528-1-kuba@kernel.org>
 References: <20250407190117.16528-1-kuba@kernel.org>
@@ -66,90 +66,159 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Read accesses go via xsk_get_pool_from_qid(), the call coming
-from the core and gve look safe (other "ops locked" drivers
-don't support XSK).
+Add helpers to "lock a netdev in a backward-compatible way",
+which for ops-locked netdevs will mean take the instance lock.
+For drivers which haven't opted into the ops locking we'll take
+rtnl_lock.
 
-Write accesses go via xsk_reg_pool_at_qid() and xsk_clear_pool_at_qid().
-Former is already under the ops lock, latter needs to be locked when
-coming from the workqueue via xp_clear_dev().
+The scoped foreach is dropping and re-taking the lock for each
+device, even if prev and next are both under rtnl_lock.
+I hope that's fine since we expect that netdev nl to be mostly
+supported by modern drivers, and modern drivers should also
+opt into the instance locking.
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+Note that these helpers are mostly needed for queue related state,
+because drivers modify queue config in their ops in a non-atomic
+way. Or differently put, queue changes don't have a clear-cut API
+like NAPI configuration. Any state that can should just use the
+instance lock directly, not the "compat" hacks.
+
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- include/linux/netdevice.h     | 1 +
- include/net/netdev_rx_queue.h | 6 +++---
- net/xdp/xsk.c                 | 2 ++
- net/xdp/xsk_buff_pool.c       | 7 ++++++-
- 4 files changed, 12 insertions(+), 4 deletions(-)
+ include/net/netdev_lock.h | 16 ++++++++++++
+ net/core/dev.h            | 15 ++++++++++++
+ net/core/dev.c            | 51 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 82 insertions(+)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 8e9be80bc167..7242fb8a22fc 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -688,6 +688,7 @@ struct netdev_queue {
- 	/* Subordinate device that the queue has been assigned to */
- 	struct net_device	*sb_dev;
- #ifdef CONFIG_XDP_SOCKETS
-+	/* "ops protected", see comment about net_device::lock */
- 	struct xsk_buff_pool    *pool;
- #endif
+diff --git a/include/net/netdev_lock.h b/include/net/netdev_lock.h
+index c316b551df8d..5706835a660c 100644
+--- a/include/net/netdev_lock.h
++++ b/include/net/netdev_lock.h
+@@ -64,6 +64,22 @@ netdev_ops_assert_locked_or_invisible(const struct net_device *dev)
+ 		netdev_ops_assert_locked(dev);
+ }
  
-diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queue.h
-index b2238b551dce..8cdcd138b33f 100644
---- a/include/net/netdev_rx_queue.h
-+++ b/include/net/netdev_rx_queue.h
-@@ -20,12 +20,12 @@ struct netdev_rx_queue {
- 	struct net_device		*dev;
- 	netdevice_tracker		dev_tracker;
- 
-+	/* All fields below are "ops protected",
-+	 * see comment about net_device::lock
-+	 */
- #ifdef CONFIG_XDP_SOCKETS
- 	struct xsk_buff_pool            *pool;
- #endif
--	/* NAPI instance for the queue
--	 * "ops protected", see comment about net_device::lock
--	 */
- 	struct napi_struct		*napi;
- 	struct pp_memory_provider_params mp_params;
- } ____cacheline_aligned_in_smp;
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index 5696af45bcf7..2ecf063a2c38 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -1654,7 +1654,9 @@ static int xsk_notifier(struct notifier_block *this,
- 				xsk_unbind_dev(xs);
- 
- 				/* Clear device references. */
-+				netdev_lock_ops(dev);
- 				xp_clear_dev(xs->pool);
-+				netdev_unlock_ops(dev);
- 			}
- 			mutex_unlock(&xs->mutex);
- 		}
-diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
-index 25a76c5ce0f1..c7e50fd86c6a 100644
---- a/net/xdp/xsk_buff_pool.c
-+++ b/net/xdp/xsk_buff_pool.c
-@@ -279,9 +279,14 @@ static void xp_release_deferred(struct work_struct *work)
++static inline void netdev_lock_ops_compat(struct net_device *dev)
++{
++	if (netdev_need_ops_lock(dev))
++		netdev_lock(dev);
++	else
++		rtnl_lock();
++}
++
++static inline void netdev_unlock_ops_compat(struct net_device *dev)
++{
++	if (netdev_need_ops_lock(dev))
++		netdev_unlock(dev);
++	else
++		rtnl_unlock();
++}
++
+ static inline int netdev_lock_cmp_fn(const struct lockdep_map *a,
+ 				     const struct lockdep_map *b)
  {
- 	struct xsk_buff_pool *pool = container_of(work, struct xsk_buff_pool,
- 						  work);
-+	struct net_device *netdev = pool->netdev;
+diff --git a/net/core/dev.h b/net/core/dev.h
+index 3cc2d8787c83..3fd7847d6d60 100644
+--- a/net/core/dev.h
++++ b/net/core/dev.h
+@@ -41,6 +41,21 @@ DEFINE_FREE(netdev_unlock, struct net_device *, if (_T) netdev_unlock(_T));
+ 	     (var_name = netdev_xa_find_lock(net, var_name, &ifindex)); \
+ 	     ifindex++)
  
- 	rtnl_lock();
--	xp_clear_dev(pool);
-+	if (netdev) {
-+		netdev_lock_ops(netdev);
-+		xp_clear_dev(pool);
-+		netdev_unlock_ops(netdev);
++struct net_device *
++netdev_get_by_index_lock_ops_compat(struct net *net, int ifindex);
++struct net_device *
++netdev_xa_find_lock_ops_compat(struct net *net, struct net_device *dev,
++			       unsigned long *index);
++
++DEFINE_FREE(netdev_unlock_ops_compat, struct net_device *,
++	    if (_T) netdev_unlock_ops_compat(_T));
++
++#define for_each_netdev_lock_ops_compat_scoped(net, var_name, ifindex)	\
++	for (struct net_device *var_name __free(netdev_unlock_ops_compat) = NULL; \
++	     (var_name = netdev_xa_find_lock_ops_compat(net, var_name,	\
++							&ifindex));	\
++	     ifindex++)
++
+ #ifdef CONFIG_PROC_FS
+ int __init dev_proc_init(void);
+ #else
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 7060c3171cd8..baf615e0ae27 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -1052,6 +1052,20 @@ struct net_device *__netdev_put_lock(struct net_device *dev, struct net *net)
+ 	return dev;
+ }
+ 
++static struct net_device *
++__netdev_put_lock_ops_compat(struct net_device *dev, struct net *net)
++{
++	netdev_lock_ops_compat(dev);
++	if (dev->reg_state > NETREG_REGISTERED ||
++	    dev->moving_ns || !net_eq(dev_net(dev), net)) {
++		netdev_unlock_ops_compat(dev);
++		dev_put(dev);
++		return NULL;
 +	}
- 	rtnl_unlock();
++	dev_put(dev);
++	return dev;
++}
++
+ /**
+  *	netdev_get_by_index_lock() - find a device by its ifindex
+  *	@net: the applicable net namespace
+@@ -1074,6 +1088,18 @@ struct net_device *netdev_get_by_index_lock(struct net *net, int ifindex)
+ 	return __netdev_put_lock(dev, net);
+ }
  
- 	if (pool->fq) {
++struct net_device *
++netdev_get_by_index_lock_ops_compat(struct net *net, int ifindex)
++{
++	struct net_device *dev;
++
++	dev = dev_get_by_index(net, ifindex);
++	if (!dev)
++		return NULL;
++
++	return __netdev_put_lock_ops_compat(dev, net);
++}
++
+ struct net_device *
+ netdev_xa_find_lock(struct net *net, struct net_device *dev,
+ 		    unsigned long *index)
+@@ -1099,6 +1125,31 @@ netdev_xa_find_lock(struct net *net, struct net_device *dev,
+ 	} while (true);
+ }
+ 
++struct net_device *
++netdev_xa_find_lock_ops_compat(struct net *net, struct net_device *dev,
++			       unsigned long *index)
++{
++	if (dev)
++		netdev_unlock_ops_compat(dev);
++
++	do {
++		rcu_read_lock();
++		dev = xa_find(&net->dev_by_index, index, ULONG_MAX, XA_PRESENT);
++		if (!dev) {
++			rcu_read_unlock();
++			return NULL;
++		}
++		dev_hold(dev);
++		rcu_read_unlock();
++
++		dev = __netdev_put_lock_ops_compat(dev, net);
++		if (dev)
++			return dev;
++
++		(*index)++;
++	} while (true);
++}
++
+ static DEFINE_SEQLOCK(netdev_rename_lock);
+ 
+ void netdev_copy_name(struct net_device *dev, char *name)
 -- 
 2.49.0
 
