@@ -1,110 +1,147 @@
-Return-Path: <netdev+bounces-179532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1955CA7D7E2
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 10:31:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52AA3A7D81D
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 10:37:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 413613AEE55
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 08:30:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F3C8188935D
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 08:36:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB65F211A33;
-	Mon,  7 Apr 2025 08:30:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9A1E2253EF;
+	Mon,  7 Apr 2025 08:36:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RPbgpXco"
+	dkim=pass (2048-bit key) header.d=outer-limits.org header.i=@outer-limits.org header.b="syv7AMso";
+	dkim=permerror (0-bit key) header.d=outer-limits.org header.i=@outer-limits.org header.b="PWbDy5LH"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.164])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39634226D1E
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 08:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744014615; cv=none; b=u9HjASYEPD2nPXVjYjcfgl1zyGERQldp8oETZIb9VNFKkE9B02fn/fSPKORdPENPVBgYgZ7mRBVx8vE5xTuDWbOoVIDbZu7uwwSN2Mmax1x4uCR5vLKLW0YHkD33vdcLoq1oeWMWYdIWYbCyVRfLGM9KpoAFWz/m5nBnMBqdZs0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744014615; c=relaxed/simple;
-	bh=NdxrZpkoAS5JiWYgZz3H6UVBi+3AhclDMA55q0fjY8c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S8iUC9Dg5dMWV0kA7ek6B+xEc5KsEhcuGWMPio2kDsohyaunvRmK5gVJnMtSZv3HnHjyS4n8F/9sXF+5KAyK828jUIPAMh97jDt1k/N1SJ1Tq7mJ28dfe08qlX0yDt3MElxue94FnaVVPeNVIOyGZHGFE5FaGdBvu4fQvWSd40k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=RPbgpXco; arc=none smtp.client-ip=103.168.172.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
-	by mailfout.phl.internal (Postfix) with ESMTP id 342A91380228;
-	Mon,  7 Apr 2025 04:30:13 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-07.internal (MEProxy); Mon, 07 Apr 2025 04:30:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1744014613; x=1744101013; bh=SyWehjHb8zpXeJ45viskigR9BtioaZba5Zg
-	A+Lsdhxg=; b=RPbgpXcoQMgTtWqOiV//r6KxMBrhuOw3Cslw11T89Cicmfsl5m+
-	l723C5GdJlMN3CMAXQQAml/xR2wWtigHeoGCoAgSkCfB/nrkR/gRpv7DkVM1007i
-	CDS8criM0ojxh7rQJAFX9oaJA6+uCv7oKdT5YbH+GenTbfRForm0Hkbkx8OA7t9g
-	a/TKOEGNYDDNOrlIOoUljOLzdcY1x1sPWJj5GnexixoRGsOPuCM5lJOvLa4kK+Dh
-	7XjajbyUIn6AJt1PJ4E63BSCj6DtKKeG/FAkKPRHyKJBmSE23LE1gktq23/AF/hT
-	vXdgOWVSy1n0Q1GoE/Qe8E3zPMntJWSJv0w==
-X-ME-Sender: <xms:FI3zZ18U1Ke5vixfd1ZgttVZ_6Z7IPbeKc6lPoVA54VS7JVjAyc3rg>
-    <xme:FI3zZ5siJHF_bZ0tqdPsJz9FyegM4afHnvlYWYwNcbbhfl_G3OZG-NtHpE9sSjCNI
-    Ntoosjf1ehGOVg>
-X-ME-Received: <xmr:FI3zZzBWvuuIkiM_IcbYzmS2jkI_R9yG5kPOoLuozCiljOhclP2p-z-6YUya>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduleeljeduucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
-    vdenucfhrhhomhepkfguohcuufgthhhimhhmvghluceoihguohhstghhsehiughoshgthh
-    drohhrgheqnecuggftrfgrthhtvghrnhephefhtdejvdeiffefudduvdffgeetieeigeeu
-    gfduffdvffdtfeehieejtdfhjeeknecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenuc
-    evlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgt
-    hhesihguohhstghhrdhorhhgpdhnsggprhgtphhtthhopeejpdhmohguvgepshhmthhpoh
-    huthdprhgtphhtthhopehrrgiiohhrsegslhgrtghkfigrlhhlrdhorhhgpdhrtghpthht
-    ohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepsghrih
-    gughgvsehlihhsthhsrdhlihhnuhigqdhfohhunhgurghtihhonhdrohhrghdprhgtphht
-    thhopehrohhophgrsehnvhhiughirgdrtghomhdprhgtphhtthhopehiughoshgthhesnh
-    hvihguihgrrdgtohhmpdhrtghpthhtohepshhtvghphhgvnhesnhgvthifohhrkhhplhhu
-    mhgsvghrrdhorhhgpdhrtghpthhtohepughsrghhvghrnheskhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:FI3zZ5c-nbqP8GJ2V7xC96KeEyKj0nBYfONH3D0AB_jQWiesWLci0w>
-    <xmx:FI3zZ6MUp5yPeUR2hzj2S_ignBk8rwR_JLkMMouNp2c-L7rgpQ4Emg>
-    <xmx:FI3zZ7nX2LCavDzzcUTh4F94_T8lDd0H_CKVQpdjm6KRw0rSgYWMiA>
-    <xmx:FI3zZ0uhTd1Yqp-0zfCfyea35WUkQI1-MeJoP6vo6_hm4mZp-dewgw>
-    <xmx:FY3zZ1O-3RE8nTU9Um103Lb92qmzGra_ZhwjtgOldYXjcQIAp45k_Cu2>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 7 Apr 2025 04:30:11 -0400 (EDT)
-Date: Mon, 7 Apr 2025 11:30:10 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: netdev@vger.kernel.org, bridge@lists.linux-foundation.org,
-	Roopa Prabhu <roopa@nvidia.com>, Ido Schimmel <idosch@nvidia.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	David Ahern <dsahern@kernel.org>
-Subject: Re: [PATCH iproute2] MAINTAINERS: update bridge entry
-Message-ID: <Z_ONEvPRjiAgRRY9@shredder>
-References: <20250405102504.219970-1-razor@blackwall.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD1E225388;
+	Mon,  7 Apr 2025 08:36:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.164
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744014985; cv=pass; b=AzMyFpr7+0LuPi1mOdah880hb0RaacKnAYZQYO7Mb7RLyosczwxRgp+6onAg6H310r9IdK503HwQApXBSjivDY8q6lr7aibZZTLgKAqeOxnul8uY++9QM0o7CjyidNs23unBeZ+6amfVVZKps6iDHQqzxzXQNhmKJuyBenqDuVc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744014985; c=relaxed/simple;
+	bh=kromgZXIv13kuVYm/VYq9Vqu5/atevF4A48Q60kqXWo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=dCT/7FUECIIleWbyd3JijusIglARKYUvgJdIt6aBlWGi+llia3MiqDl/dS9wZMtE4KAxqpuy2KHCsBuQoCDL1UxzrOG1Zr2RAk1zkTj5o0LaSdi7c+7/cnCWcnjIC9wbR9CW/hHU7B6nDvwJEz98GIwH0EiABXr2OtmBrtID9CY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=outer-limits.org; spf=none smtp.mailfrom=outer-limits.org; dkim=pass (2048-bit key) header.d=outer-limits.org header.i=@outer-limits.org header.b=syv7AMso; dkim=permerror (0-bit key) header.d=outer-limits.org header.i=@outer-limits.org header.b=PWbDy5LH; arc=pass smtp.client-ip=81.169.146.164
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=outer-limits.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=outer-limits.org
+ARC-Seal: i=1; a=rsa-sha256; t=1744014802; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=ar/samsZZ9TJLPgT2eaggsLuoFDEY8sucy5XZhtj4ykVNPFL8v3mTq7MtIq6BizGYI
+    mm0HvsKeaGhFbhcOzkSjXbN/h1lT0Ygc4JAt34w39HeJsyThSB7Q/RVQ9QN6C36WiRdK
+    n+ss8sUg3YMIPGIpMUEOscYmucSKadPwMFGwKe9lsgXRrldF+nkooVRzILgyg53c+Gaz
+    5sLbZorSDHRvTlpSdNvQwpj3Q1TNMMXcCkBxA7NI9KZRpv0pW+g/boFUjDW0H7UNywFT
+    VcHRDyymH/jQO8kdC0Mk9Ow1A4Ytqe5cCkUTdF4LRWo8lYXaljstbWu/ASrU8IMSVBxl
+    2oFQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1744014802;
+    s=strato-dkim-0002; d=strato.com;
+    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=Loa+HXQddwUp8ekjKdhDfBU3F6SSrLNWEPxiN6o32Mk=;
+    b=sxZJ0QnUpW5ROFW3a3Fo+E5vsG8L0Qq4O1JGsRT+LYPQGYnzLtcDTp6pT+9R0IPBxj
+    LEV5uzwibn73Qkd2tkB5Wl90DaP8PrfZ50ykCM97rnWEjJ2/ClgC32ch2x9NhqXwY44r
+    ON7ZRkvWTvIy24WHq3E0Alz4NR5Ynyj69mqRv4TbQ/fHuHczLLD7RgktyZDopkr4l6Ul
+    spFrSHl3zIisCGfj7ug0itrIhDuHsGFcpqy+PLeR+I5Pc9/gw+XG+NXFav/zfgnYW3uk
+    wxdXgGPjhFjSsrkga0DbGA94w/3Sx0pv5ZEuHYR+2Vhn31uvwOEsHyxwGuWq/k78g2HI
+    C/tA==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1744014802;
+    s=strato-dkim-0002; d=outer-limits.org;
+    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=Loa+HXQddwUp8ekjKdhDfBU3F6SSrLNWEPxiN6o32Mk=;
+    b=syv7AMso8I3WJrb2Q7eJX1DJHV+DHZeijOR5kI3keqLzbsEPX4iL5aS+rRRw2SH99l
+    ntZhieKXa7W6T9QZJ+2rLfZPdobdhEOzMuK0+uk8uStQWr+7yDzdwIMhjg0UcrKoY0ik
+    JGpH/JBPdJN3WSZVDy9d0c04ZeNYq/inKZUOldjadqS8kHg764UhIBbC81nDpqtmXbJo
+    1RQwb5UeG9LwYI9NWIpUbMV1JcUc4nKpoPtgPQX+55swIJRn7FC6zEhCMQEJ6dzu1NRv
+    0awzaiOWsfgfnEBlh8CDiW1ht61OpLgP9FeShkJJ/Mcl+HsDOLQAnH+zMzCCa4M8sk5k
+    /t3w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1744014802;
+    s=strato-dkim-0003; d=outer-limits.org;
+    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=Loa+HXQddwUp8ekjKdhDfBU3F6SSrLNWEPxiN6o32Mk=;
+    b=PWbDy5LHEYN0+YxRVU2VwcIj5wnZHhlMeHUu7f/Z8f6piinZTmSjDbEcqzedfxM28S
+    lMrahhtzIY69RlNo7vBA==
+X-RZG-AUTH: ":JnkIfEGmW/AMJS6HttH4FbRVwc4dHlPLCp4e/IoHo8zEMMHAgwTfqBEHcVJSv9P5mRTGd2ImeA=="
+Received: from ws2104.lan.kalrayinc.com
+    by smtp.strato.de (RZmta 51.3.0 AUTH)
+    with ESMTPSA id J2b1101378XLK0t
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Mon, 7 Apr 2025 10:33:21 +0200 (CEST)
+From: Julian Vetter <julian@outer-limits.org>
+To: Arnd Bergmann <arnd@arndb.de>,
+	Louis Peens <louis.peens@corigine.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Arthur Kiyanovski <akiyano@amazon.com>,
+	Caleb Sander Mateos <csander@purestorage.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: oss-drivers@corigine.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Julian Vetter <julian@outer-limits.org>
+Subject: [PATCH] eth: nfp: remove __get_unaligned_cpu32 from netronome drivers
+Date: Mon,  7 Apr 2025 10:33:06 +0200
+Message-Id: <20250407083306.1553921-1-julian@outer-limits.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250405102504.219970-1-razor@blackwall.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
 
-On Sat, Apr 05, 2025 at 01:25:04PM +0300, Nikolay Aleksandrov wrote:
-> Sync with the kernel and update the bridge entry with the current bridge
-> maintainers. Roopa decided to withdraw and Ido has agreed to step in.
-> 
-> Link: https://lore.kernel.org/netdev/20250314100631.40999-1-razor@blackwall.org/
-> CC: Roopa Prabhu <roopa@nvidia.com>
-> CC: Ido Schimmel <idosch@nvidia.com>
-> CC: Stephen Hemminger <stephen@networkplumber.org>
-> CC: David Ahern <dsahern@kernel.org>
-> Signed-off-by: Nikolay Aleksandrov <razor@blackwall.org>
+The __get_unaligned_cpu32 function is deprecated. So, replace it with
+the more generic get_unaligned and just cast the input parameter.
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Signed-off-by: Julian Vetter <julian@outer-limits.org>
+---
+ drivers/net/ethernet/netronome/nfp/nfd3/dp.c | 2 +-
+ drivers/net/ethernet/netronome/nfp/nfdk/dp.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/netronome/nfp/nfd3/dp.c b/drivers/net/ethernet/netronome/nfp/nfd3/dp.c
+index f1c6c47564b1..08086eb76996 100644
+--- a/drivers/net/ethernet/netronome/nfp/nfd3/dp.c
++++ b/drivers/net/ethernet/netronome/nfp/nfd3/dp.c
+@@ -779,7 +779,7 @@ nfp_nfd3_parse_meta(struct net_device *netdev, struct nfp_meta_parsed *meta,
+ 		case NFP_NET_META_CSUM:
+ 			meta->csum_type = CHECKSUM_COMPLETE;
+ 			meta->csum =
+-				(__force __wsum)__get_unaligned_cpu32(data);
++				(__force __wsum)get_unaligned((u32 *)data);
+ 			data += 4;
+ 			break;
+ 		case NFP_NET_META_RESYNC_INFO:
+diff --git a/drivers/net/ethernet/netronome/nfp/nfdk/dp.c b/drivers/net/ethernet/netronome/nfp/nfdk/dp.c
+index ebeb6ab4465c..ab3cd06ed63e 100644
+--- a/drivers/net/ethernet/netronome/nfp/nfdk/dp.c
++++ b/drivers/net/ethernet/netronome/nfp/nfdk/dp.c
+@@ -779,7 +779,7 @@ nfp_nfdk_parse_meta(struct net_device *netdev, struct nfp_meta_parsed *meta,
+ 		case NFP_NET_META_CSUM:
+ 			meta->csum_type = CHECKSUM_COMPLETE;
+ 			meta->csum =
+-				(__force __wsum)__get_unaligned_cpu32(data);
++				(__force __wsum)get_unaligned((u32 *)data);
+ 			data += 4;
+ 			break;
+ 		case NFP_NET_META_RESYNC_INFO:
+-- 
+2.34.1
+
 
