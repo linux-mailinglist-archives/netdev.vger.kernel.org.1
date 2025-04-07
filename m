@@ -1,90 +1,110 @@
-Return-Path: <netdev+bounces-179688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99BDCA7E241
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:43:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65810A7E23F
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:42:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC29044256F
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 14:35:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCB4D4412E3
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 14:37:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B84141E1E0A;
-	Mon,  7 Apr 2025 14:26:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 403191F417F;
+	Mon,  7 Apr 2025 14:31:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="N75LMDfh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2288C1E1E08
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 14:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD9B1F3B9C;
+	Mon,  7 Apr 2025 14:31:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744035964; cv=none; b=h4P0M6+sLHyxa3p0co5vENCQPbxSrxcxOmM2xDnZZ3PMPX6DHBMQ2Rmu1Xx6WjtUsrQ6pnowma4cYMYWKLHi++uhBxurICzMUrsALtykted1Rk0sLQbiWYJF7jE7AEMu1BYb4N9LTTV7HPRQIyXwJGPYc8OMoXQwmzZ2Bshhvcc=
+	t=1744036284; cv=none; b=dZYsriucRvN6xE5BVYfvAhq6zt4sY0q5ftElQRuB2fWfI7hRGDV5P8QBJEAfz2dTKd0hPqmlSNYHHLaKJpNiP1dPtyNXJlHd02ARmDrL39cHacLa3vmfZ1iXc4EY7r6G7G4p8QCH8Za43rXY19w1q2tAbg+4Epi/Qw9j9EETxQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744035964; c=relaxed/simple;
-	bh=KV9W6AUrHJdqHLgUBuRoozIFZ9XmFBTpBvPPo4dCfx4=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=bBH+6YOzDoc6h1DT/yN50sAgBEs1/RblPlRZu0GWhE2AnmbOb1NL/0pIfYYir4bzd3twwwZ8DO7qfyhTJgi85gRuTFA1NbOTk1pqFP6Mpzgjid4mZxVZtljXliZjvZUF/McXvJVAeZfpQjPExUKhchULnwG8oIP4qLvIRvyVzsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3d43c0dbe6aso94970925ab.1
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 07:26:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744035962; x=1744640762;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UjUxYvY1YiyC6OoVQvcfUdICOWiC2nlpSbYx2k4dA5E=;
-        b=pJ55VzREaXtcglOx7DAbJm3XTNx7TkO1kFjOkht3FL4K1g6qBQM2EMIttKAzPxXinN
-         6c60KOtQAgNU0/KFAAEpQJD8wNtldomHmYddfnqaWv1lhkTUkogrm2E1PkiTlPzhqxeJ
-         7upkOLZB49yUTEk7KjY3dyq26ZEM5Jlew0teirVmPYCFVhhsmEdcqRR6b8/KbIjMwfUR
-         XsnN/NH0CHxyU/hQ88JDkHGtFuoGpsz4IqsSk29dOeOx5FLx1/6g0c6x8xcate6CRb2N
-         SUmXAxm6eYIEdyS8EoCYAW7JCGNGdVlDM0moDjwzW+vaRGr9EDYTWQFM8nwkYSTZ3m4Z
-         vOCg==
-X-Forwarded-Encrypted: i=1; AJvYcCXKtTNCRzo/MoyMDW1xR3F/fsRS72m5ObctOg8jZ8jpKEeV4LKcMCmn9bmJ9BdbmpO05h+QIIY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVomDnUeo6VkoijiiPT/s73dt6uixlBB7ve7pzDsX3M1+fQINU
-	cy3ufYcjiKi/twlK9HToVsMzkWtIaB7lOSdNxF6TsWIqaksij+3Qf/PoOYR3M5QMi3+dwN0q+rG
-	ml06pO6tBa/Oyrp1Dbz0itv81cDz0HX+ykBQdrp+epkA9JNTpp9xu6Xw=
-X-Google-Smtp-Source: AGHT+IES1QhFs+V/b6s7CUZ53WUmbrsnVac05k1xT+P7gkYs8jsVm0O6hIaL80/furuc5pXCxzZmBCavcYC6KBxWmpBPEquUvWTB
+	s=arc-20240116; t=1744036284; c=relaxed/simple;
+	bh=0hRyxWlx6HgukjGUYoDEVDWNH8w5UOV+wlvIoU3NPho=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=E8dDsI1riDOXe7ntleNoDAVmlb38HQ3NwrA5MZHPfupKrw3NbM5+aqTOavOmhGKvRhfT2RGn9NS30b9+AcARaqaYgDDalwOox1y9jxSsx4uSsfKChTQlGrMuoCJfN6RPoFoaVo2bX5SvAiI9T0YaB3H34PjLCwSmyB78zhBXR3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=N75LMDfh; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 76B2620481;
+	Mon,  7 Apr 2025 14:31:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1744036280;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0hRyxWlx6HgukjGUYoDEVDWNH8w5UOV+wlvIoU3NPho=;
+	b=N75LMDfhdhs+1nDVkmhr1ImBO/G6CckheKTs38STMTGH/vQLrvTONzmmi8OWIxwuEBUVLy
+	DqtFzW2xA0bW0u0hDwQ4r0pMd9s72//69+FLOSIEQ4iUl05JAeimbg6o21w/w0xX8v+9cy
+	HNX+grtC7yUFoO57kRvcpLZTkIP71vzQAev/ig95JzTWJ/Lpe0pCkSHq0542/JVa7GOqp5
+	cZMWj6/p/xnPecHESzao60fOCLu0WwEHqtzZjKBg2ZzWcps64+WDpwp9dSAP/HQIEyBm8q
+	KAsK69QLP2Bv0XHwtutSyfc00LTVcdDU+iUhbEr/NKY4pMlXwZtE6xirqF3Qkg==
+Date: Mon, 7 Apr 2025 16:31:18 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>
+Subject: Re: [PATCH net-next v2 0/2] Add Marvell PHY PTP support
+Message-ID: <20250407163118.6a326a98@kmaincent-XPS-13-7390>
+In-Reply-To: <fdfef9fd-6f9a-428f-b97f-deb52186e2f8@lunn.ch>
+References: <20250407-feature_marvell_ptp-v2-0-a297d3214846@bootlin.com>
+	<fdfef9fd-6f9a-428f-b97f-deb52186e2f8@lunn.ch>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3e91:b0:3d5:8103:1a77 with SMTP id
- e9e14a558f8ab-3d6e3eea919mr161227325ab.1.1744035962257; Mon, 07 Apr 2025
- 07:26:02 -0700 (PDT)
-Date: Mon, 07 Apr 2025 07:26:02 -0700
-In-Reply-To: <20250407140603.91155-1-contact@arnaud-lcm.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67f3e07a.050a0220.396535.0550.GAE@google.com>
-Subject: Re: [syzbot] [ppp?] KMSAN: uninit-value in ppp_sync_send (2)
-From: syzbot <syzbot+29fc8991b0ecb186cf40@syzkaller.appspotmail.com>
-To: andrew@lunn.ch, contact@arnaud-lcm.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-ppp@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtddtgeefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhephfduveekuedtvdeiffduleetvdegteetveetvdelteehhfeuhfegvdeuuedtleegnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghdpsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduhedprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvt
+ hdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepkhgrsggvlheskhgvrhhnvghlrdhorhhg
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Hello,
+On Mon, 7 Apr 2025 16:08:04 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-syzbot tried to test the proposed patch but the build/boot failed:
+> On Mon, Apr 07, 2025 at 04:02:59PM +0200, Kory Maincent wrote:
+> > Add PTP basic support for Marvell 88E151x PHYs. =20
+>=20
+> Russell has repeatedly said this will cause regressions in some setups
+> where there are now two PTP implementations, and the wrong one will be
+> chosen by default. I would expect some comments in the commit message
+> explaining how this has been addressed, so it is clear a regression
+> will not happen.
 
-failed to checkout kernel repo https://github.com/ArnaudLcm/linux/bounds-checking-txmung: failed to run ["git" "fetch" "--force" "98936a0cc8cd68334b039c881b39b10e6f0d7c99" "bounds-checking-txmung"]: exit status 128
-fatal: couldn't find remote ref bounds-checking-txmung
+This was fixed by the following patch series which have parts that get merg=
+ed
+along the way to version 21. It adds support to select the hardware PTP
+provider and change the default to MAC PTP for newly introduced PHY PTP sup=
+port
+(default_timestamp flag in phy_device struct).
+https://lore.kernel.org/netdev/20241212-feature_ptp_netnext-v21-0-2c282a941=
+518@bootlin.com/
 
+I will add the description in v3. I will wait at least one week to let peop=
+le
+review the patch.
 
-
-Tested on:
-
-commit:         [unknown 
-git tree:       https://github.com/ArnaudLcm/linux bounds-checking-txmung
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f20bce78db15972a
-dashboard link: https://syzkaller.appspot.com/bug?extid=29fc8991b0ecb186cf40
-compiler:       
-
-Note: no patches were applied.
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
