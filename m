@@ -1,103 +1,111 @@
-Return-Path: <netdev+bounces-179739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AC54A7E658
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:27:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 10B65A7E687
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:31:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB00C4450EE
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:17:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 345D3165E21
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:22:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D93E720896A;
-	Mon,  7 Apr 2025 16:13:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE9E7209F32;
+	Mon,  7 Apr 2025 16:18:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="dOL6fL8L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kVRIsCwT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F7D2066F9;
-	Mon,  7 Apr 2025 16:13:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A216F206F3D;
+	Mon,  7 Apr 2025 16:18:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744042405; cv=none; b=Hbs99KXQ/GWGAzbj3qzqZdsJhMLRQcvcavdwFBCQEVgd7ehhnNEyvQr40KnCYT/Nt0w55dkHZg+AkfaIweK4lrA/A49EuNYX4/6LxreSYk0BfBr2xU5ffvUGniiSz4sXSFlSo91E8GgeEJ3lPgSFQbDAJLPz4/mKmY6aVlWRn4c=
+	t=1744042700; cv=none; b=UQWL74iF5LIrp0YhyynvoR4dOSxFS4z0AnheIaPa5phN15lUmrz7hhFQD2Q5QXlG+USSFOQVvMWPKOqbfI99wv/HqDuDl+p7c4V/DqX42kMM6gc1tx+2qrgScStgVAEurvrLbKRsy3MrUa25kvifnXy9pjpNaXTATC+47HvQYoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744042405; c=relaxed/simple;
-	bh=2KFVeKdPLKXBfR5EWHDbvkaoyV0vRqU2QFbIw5uPBQU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a0q2HiDestloDoEdACMyxpOyshNDncMCG7xctqBL7Dm9XQlcl48WA4yPI+1GsUP3laYFj/kJEZjIZpQapKkGzkt7a2MxKHOgO1fHdw/26GiAspDBrAJabmXJutP1/sp6C4hxCFtUCg/lo55XYv+7a+B56qp0+yryqZ0Ag/kBvLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=dOL6fL8L; arc=none smtp.client-ip=99.78.197.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1744042404; x=1775578404;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Ax3m+iIFkyYPhqmuuHtqTChmLOMPFAoAyAVCrfKI3uI=;
-  b=dOL6fL8L8q3YIwxqQp/gFi4Mb4HOy9r7hHbjMlraGA07jE9LCsua4pkU
-   bm0irU0Agfnuc5pNm94Mkgi3Qqnrv426N4FSnT+MHSjeOl0GiUQBxlV7s
-   mmt2FPcnMzQ36jiII2FCPcuf4A8IVhOYTEkLBlFjV4C9Tv+RqK6sRYK9i
-   o=;
-X-IronPort-AV: E=Sophos;i="6.15,194,1739836800"; 
-   d="scan'208";a="38499040"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Apr 2025 16:13:21 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:1061]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.49.222:2525] with esmtp (Farcaster)
- id 4e4911d2-5cb4-4150-b7fb-bb7ce2a6281e; Mon, 7 Apr 2025 16:13:21 +0000 (UTC)
-X-Farcaster-Flow-ID: 4e4911d2-5cb4-4150-b7fb-bb7ce2a6281e
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 7 Apr 2025 16:13:20 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.101.45) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 7 Apr 2025 16:13:16 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <stfomichev@gmail.com>
-CC: <andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <sdf@fomichev.me>,
-	<syzbot+45016fe295243a7882d3@syzkaller.appspotmail.com>,
-	<syzkaller-bugs@googlegroups.com>
-Subject: Re: [syzbot] [net?] WARNING: bad unlock balance in do_setlink
-Date: Mon, 7 Apr 2025 09:12:37 -0700
-Message-ID: <20250407161308.19286-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <Z_PfCosPB7GS4DJl@mini-arch>
-References: <Z_PfCosPB7GS4DJl@mini-arch>
+	s=arc-20240116; t=1744042700; c=relaxed/simple;
+	bh=Npy/xy0YV1ziwkRI72xXbsBU6c5ZpgqGLAv3/5M2HgA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jQ3ucAfkIPp5CRtwWGIVzp7pqNPzJglGilVK66NVFVVwdKqPD40plv0oepGPSyDQgVwbkc6H9wuo5V04x7CRRU8GzRt8VyX3jnU0zeivGW3C+no8q/8JrfFZNAG8sWnHvtd0EVAXLvfQe50QtsGY8AJbW1kj0V3SjSe+LOnaPe0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kVRIsCwT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52057C4CEDD;
+	Mon,  7 Apr 2025 16:18:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744042700;
+	bh=Npy/xy0YV1ziwkRI72xXbsBU6c5ZpgqGLAv3/5M2HgA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kVRIsCwT+c6EbalzQ8v601BWz4AtFEcupFLn/1nR//IQRZbJUmUMlOWsp12GLXMzV
+	 R9zN/8xEoglBghyQ1+7ICgEIXdK9WWHoe4gKi067Ltvp4z6C2PKnYUATPq3HBHFS7t
+	 6HP9Yrr+q/3ZhfXa9C5q9qtfGRJyIl4YXh7Hop7JG82R5cVrRHFGeXIXR/zFo/iNrF
+	 UTAomdSPbn88DYS/QwzOuViJhQ8tRVVv1ZXMRFuKhrhMS4rAMQNIUsjWq/VKmFml+p
+	 rfxB9Ii7fedu+nrGnoTwNYfwJ3Kjg/4ZHDx5GfaEeu2BdVbn6sdxhmDDtCUWpCDy8G
+	 r6gUrtGZxLTnw==
+Date: Mon, 7 Apr 2025 17:18:15 +0100
+From: Simon Horman <horms@kernel.org>
+To: Charles Han <hanchunchao@inspur.com>
+Cc: saeedm@nvidia.com, tariqt@nvidia.com, leon@kernel.org,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, lariel@nvidia.com,
+	paulb@nvidia.com, maord@nvidia.com, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V2] net/mlx5e: fix potential null dereference in
+ mlx5e_tc_nic_create_miss_table
+Message-ID: <20250407161815.GR395307@horms.kernel.org>
+References: <0e08292e-9280-4ef6-baf7-e9f642d33177@gmail.com>
+ <20250407072032.5232-1-hanchunchao@inspur.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWA002.ant.amazon.com (10.13.139.39) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250407072032.5232-1-hanchunchao@inspur.com>
 
-From: Stanislav Fomichev <stfomichev@gmail.com>
-Date: Mon, 7 Apr 2025 07:19:54 -0700
-> On 04/07, syzbot wrote:
-> > Hello,
-> > 
-> > syzbot has tested the proposed patch but the reproducer is still triggering an issue:
-> > unregister_netdevice: waiting for DEV to become free
-> > 
-> > unregister_netdevice: waiting for batadv0 to become free. Usage count = 3
+On Mon, Apr 07, 2025 at 03:20:31PM +0800, Charles Han wrote:
+> mlx5_get_flow_namespace() may return a NULL pointer, dereferencing it
+> without NULL check may lead to NULL dereference.
+> Add a NULL check for ns.
 > 
-> So it does fix the lock unbalance issue, but now there is a hang?
+> Fixes: 66cb64e292d2 ("net/mlx5e: TC NIC mode, fix tc chains miss table")
+> Signed-off-by: Charles Han <hanchunchao@inspur.com>
+> ---
+>  drivers/net/ethernet/mellanox/mlx5/core/en_tc.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> index 9ba99609999f..c2f23ac95c3d 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+> @@ -5216,6 +5216,10 @@ static int mlx5e_tc_nic_create_miss_table(struct mlx5e_priv *priv)
+>  	ft_attr.level = MLX5E_TC_MISS_LEVEL;
+>  	ft_attr.prio = 0;
+>  	ns = mlx5_get_flow_namespace(priv->mdev, MLX5_FLOW_NAMESPACE_KERNEL);
+> +	if (!ns) {
+> +		netdev_err(priv->mdev, "Failed to get flow namespace\n");
 
-I think this is an orthogonal issue.
+Hi Charles,
 
-I saw this in another report as well.
-https://lore.kernel.org/netdev/67f208ea.050a0220.0a13.025b.GAE@google.com/
+This does not seem to be correct. gcc-14.2.0 says:
 
-syzbot may want to find a better way to filter this kind of noise.
+drivers/net/ethernet/mellanox/mlx5/core/en_tc.c: In function 'mlx5e_tc_nic_create_miss_table':
+drivers/net/ethernet/mellanox/mlx5/core/en_tc.c:5220:32: error: passing argument 1 of 'netdev_err' from incompatible pointer type [-Wincompatible-pointer-types]
+ 5220 |                 netdev_err(priv->mdev, "Failed to get flow namespace\n");
+      |                            ~~~~^~~~~~
+      |                                |
+      |                                struct mlx5_core_dev *
+In file included from ./include/linux/skbuff.h:39,
+                 from ./include/linux/netlink.h:7,
+                 from ./include/net/flow_offload.h:6,
+                 from drivers/net/ethernet/mellanox/mlx5/core/en_tc.c:34:
+./include/net/net_debug.h:20:42: note: expected 'const struct net_device *' but argument is of type 'struct mlx5_core_dev *'
+   20 | void netdev_err(const struct net_device *dev, const char *format, ...);
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~^~~
+
+...
+
+-- 
+pw-bot: changes-requested
 
