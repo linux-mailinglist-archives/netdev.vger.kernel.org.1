@@ -1,209 +1,191 @@
-Return-Path: <netdev+bounces-179556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 713A5A7D96F
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 11:22:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CF5CA7D93A
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 11:15:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E781172BB6
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 09:19:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B365B188AE80
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 09:15:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41DBF22FF59;
-	Mon,  7 Apr 2025 09:16:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C29E230BE5;
+	Mon,  7 Apr 2025 09:15:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bofbeNc7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QfwkR1Cr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9304B22FDE4
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 09:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D046123098D
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 09:15:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744017375; cv=none; b=s3CiOD44qGUOHZiFLRwws65zfABVOYUsATrypbr8G5vIGB7DpzZh4aF57vjvB/rBbBbRtPuwjj2LaSEzUBraoPxPM0b5IjIwQm/qr9Qh30bgKBWBy6m9OicqHnSLHA9IKM1VYzAbEmaiNIX4rXTtMKJYD8Es7Ld7b37uWRofT1I=
+	t=1744017309; cv=none; b=VIdlelm9GdZOSCb3rwhqmuRvj8FIHtTV5isqGpPBoG4rw6oyIgwj/92Ibu6OqR5ppN4LIYEj3vga5dSp0xXjw9ojB7M11sg2STYeeZQL7shls+Z6x9UQTdbb37DQ+Gy1oaTAucQWRHr97oLJTvGMD0iNOPgEegOdy62HZ9lnKr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744017375; c=relaxed/simple;
-	bh=31vqYQwn/J2VYn5vPyEE1407XeQoddh8cnodS3c1KD8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nttlYO/46oxAKFOMzKwSRVSqgo+Fh4LN0ZdH2wNk1A6KnTcuV7V4CmsksfCG9uzyQd5aoiNIc3mSVozXL7JhL75jxALS0kb6K2MlCOWidGuja2z5EYt+ed9aSbWM5c+AWY+QDvbKA71vUOoz/lQbt2gWWP92FEr6te42KYzWFBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bofbeNc7; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1744017309; c=relaxed/simple;
+	bh=rtv3uKl9VXHeF0/KLPL+wj6KGBUj48JJzaaj2N5fSzQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=YaJcG1rUlLM8Dn2t9TeoTOphsxdFF8Zvj+xtLqxe4VdTt7i6UgL8HHZaHspsXJzy8LIlG+Z/ioU0TJbcOFoW7/rkT14SFt6/z1uZDP6zwo7YWdt1wH5qocy+VuqMUsqTPm5CasTg6iO3v3HqaWHsGNiokF9PE3agoWagkD88IT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QfwkR1Cr; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744017372;
+	s=mimecast20190719; t=1744017306;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=V+GN2gS8lk8pQaqDs/K8fd6AI38wy4xbJjG61joXzQc=;
-	b=bofbeNc7ul4fP3PQUiFFvJP1LyeNw84qiZKVa/IfCWAYicEUe16AKCY4oHBO9+rDaBQGeL
-	x7yxeHI6UBHl4/+i8NY+4UstLDFzxztrkxPvJho3y4GPwcVVISeE+VAJoaK0FW6Y15pKb7
-	nDQ81G8ooABZjVP02vMEWF3cdkt4nNE=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-202-SCyC-SVZMZ2RqwRGG68A2g-1; Mon,
- 07 Apr 2025 05:16:06 -0400
-X-MC-Unique: SCyC-SVZMZ2RqwRGG68A2g-1
-X-Mimecast-MFC-AGG-ID: SCyC-SVZMZ2RqwRGG68A2g_1744017363
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9A0F1180AF52;
-	Mon,  7 Apr 2025 09:16:03 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.40])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3A378192C7C3;
-	Mon,  7 Apr 2025 09:16:00 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	linux-afs@lists.infradead.org,
-	openafs-devel@openafs.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 12/12] rxrpc: rxperf: Add test RxGK server keys
-Date: Mon,  7 Apr 2025 10:14:43 +0100
-Message-ID: <20250407091451.1174056-13-dhowells@redhat.com>
-In-Reply-To: <20250407091451.1174056-1-dhowells@redhat.com>
-References: <20250407091451.1174056-1-dhowells@redhat.com>
+	bh=ZGi2ao5xTS6q7xxogEZT7ErGY12oS2SGlQvSkjIpc0I=;
+	b=QfwkR1CrTfodta3YChKW0JARZOV1D2baAYf0ejTolEPYOQGz39QmhMX3WUcvQ5j7zT+UG7
+	CdYqIhre8dKhgeMfaz6LNCIiitNkOjUBqIosexH0nnP1pvWOTBH7CbldMO6O425HMHwUku
+	awQ8mm2NflEPeLOpNmrvgQZ9YIWbQcQ=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-677--9jVzyjnPJyeKmRIvSoweA-1; Mon, 07 Apr 2025 05:15:03 -0400
+X-MC-Unique: -9jVzyjnPJyeKmRIvSoweA-1
+X-Mimecast-MFC-AGG-ID: -9jVzyjnPJyeKmRIvSoweA_1744017302
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ac737973c9bso316624966b.2
+        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 02:15:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744017302; x=1744622102;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZGi2ao5xTS6q7xxogEZT7ErGY12oS2SGlQvSkjIpc0I=;
+        b=ahC4dJ9XWAWVU+YoEdfqLLls8YLj6oBUYWpmPKCVYd9+tSZFVAxqO8oYWHGyd+cI1/
+         sWeu/goE3IUNm3H5bDBTVu/odAC/Wo2tHLAiX0iyYVlzKvqdu5x7Oeq3t4HBved+aehG
+         SNNut9WteSBL+4qHTHnHZtJGpHHH9BFEGtcAzlpLDkDPIdz7/LvyU/S86RKOMaHuzA2Z
+         RaiAyJpwUK+MLq66dPQXOxMtZ57cpVrF8T2ECKXw7TdTGiaW5HMLT9+HscCqGAWnlsP5
+         RyZVUWztst9g9cdiKM/vB2T78kxiv/iyNquHsP1e7FMtcI+uinOBWBPo5CmzKSCFPysI
+         R0Yg==
+X-Forwarded-Encrypted: i=1; AJvYcCW2+hrF063VhF7iXFa/raihVNyMhdtMQte1CE2aFdiE0RY8ujQTDXDI6fWZzIH+udTHjNgwHV0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDPc8c84XwoSQNtQSlO8y2RNCZ4J40JhAksaeVju5EJYQWpOsU
+	MqzAPMgcNQikQlJ+SL86aVR2t98AgIfW0+rHri86I0BzFoOzAT+fdXSGHHZ/q+/8z1HS/TV4jUh
+	5dJxe0ysaMHdkVUBti0cFJ+6dWS8XGWrukeyF0KINqUM1U/bM4A+YlQ==
+X-Gm-Gg: ASbGncvxA3CZOSSmtuYPSb3f1PHnHKFoisGBvBkjhS/aOH5y4IckSG6nkQDVdR9mRwi
+	9zVvJQFP8j8VrhlxgPYYVBfoXfXaty4J0RI8AoLyzTiGHfbVMtksddNn2JmteEBXDtYJN+Wlb2Q
+	4BFRD7nEbS1keB6TWfMCvY42Wu3hgXxt3T76T5ZxR6dDx0ksNSCO7c9+nIV5IB+xugSv6RwJ06x
+	4sVcNoI8GxOpqj5GiRIiPrwObGvPZQ91bPJv+6bBTS7BrqU7mUGaqRTTcnht3nzsDO21gbBvJHm
+	aUkmK3nEW2MtaxDYwSI8l8j7JN1ePXuGCmWcVuDu
+X-Received: by 2002:a17:907:948c:b0:abf:7636:3cab with SMTP id a640c23a62f3a-ac7d17d874dmr978657066b.29.1744017302197;
+        Mon, 07 Apr 2025 02:15:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG2TSfWBoxbxnNZnNOPTgh1JM4sNEzsnpKewmkg6V6GZg94v/B6Ci2rqDrTGx7DOnxrfL+nGw==
+X-Received: by 2002:a17:907:948c:b0:abf:7636:3cab with SMTP id a640c23a62f3a-ac7d17d874dmr978655366b.29.1744017301660;
+        Mon, 07 Apr 2025 02:15:01 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac7bfe9adc6sm718530366b.59.2025.04.07.02.15.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Apr 2025 02:15:01 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 45B261991862; Mon, 07 Apr 2025 11:15:00 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org, Jakub
+ Kicinski <kuba@kernel.org>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
+ tom@herbertland.com, Eric Dumazet <eric.dumazet@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ kernel-team@cloudflare.com
+Subject: Re: [RFC PATCH net-next] veth: apply qdisc backpressure on full
+ ptr_ring to reduce TX drops
+In-Reply-To: <174377814192.3376479.16481605648460889310.stgit@firesoul>
+References: <174377814192.3376479.16481605648460889310.stgit@firesoul>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Mon, 07 Apr 2025 11:15:00 +0200
+Message-ID: <87a58sxrhn.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain
 
-Add RxGK server keys of bytes containing { 0, 1, 2, 3, 4, ... } to the
-server keyring for the rxperf test server.  This allows the rxperf test
-client to connect to it.
+Jesper Dangaard Brouer <hawk@kernel.org> writes:
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Simon Horman <horms@kernel.org>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
----
- net/rxrpc/rxperf.c | 68 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 65 insertions(+), 3 deletions(-)
+> In production, we're seeing TX drops on veth devices when the ptr_ring
+> fills up. This can occur when NAPI mode is enabled, though it's
+> relatively rare. However, with threaded NAPI - which we use in
+> production - the drops become significantly more frequent.
+>
+> The underlying issue is that with threaded NAPI, the consumer often runs
+> on a different CPU than the producer. This increases the likelihood of
+> the ring filling up before the consumer gets scheduled, especially under
+> load, leading to drops in veth_xmit() (ndo_start_xmit()).
+>
+> This patch introduces backpressure by returning NETDEV_TX_BUSY when the
+> ring is full, signaling the qdisc layer to requeue the packet. The txq
+> (netdev queue) is stopped in this condition and restarted once
+> veth_poll() drains entries from the ring, ensuring coordination between
+> NAPI and qdisc.
 
-diff --git a/net/rxrpc/rxperf.c b/net/rxrpc/rxperf.c
-index c76fbccfbb91..0377301156b0 100644
---- a/net/rxrpc/rxperf.c
-+++ b/net/rxrpc/rxperf.c
-@@ -8,6 +8,7 @@
- #define pr_fmt(fmt) "rxperf: " fmt
- #include <linux/module.h>
- #include <linux/slab.h>
-+#include <crypto/krb5.h>
- #include <net/sock.h>
- #include <net/af_rxrpc.h>
- #define RXRPC_TRACE_ONLY_DEFINE_ENUMS
-@@ -550,9 +551,9 @@ static int rxperf_process_call(struct rxperf_call *call)
- }
- 
- /*
-- * Add a key to the security keyring.
-+ * Add an rxkad key to the security keyring.
-  */
--static int rxperf_add_key(struct key *keyring)
-+static int rxperf_add_rxkad_key(struct key *keyring)
- {
- 	key_ref_t kref;
- 	int ret;
-@@ -578,6 +579,47 @@ static int rxperf_add_key(struct key *keyring)
- 	return ret;
- }
- 
-+#ifdef CONFIG_RXGK
-+/*
-+ * Add a yfs-rxgk key to the security keyring.
-+ */
-+static int rxperf_add_yfs_rxgk_key(struct key *keyring, u32 enctype)
-+{
-+	const struct krb5_enctype *krb5 = crypto_krb5_find_enctype(enctype);
-+	key_ref_t kref;
-+	char name[64];
-+	int ret;
-+	u8 key[32];
-+
-+	if (!krb5 || krb5->key_len > sizeof(key))
-+		return 0;
-+
-+	/* The key is just { 0, 1, 2, 3, 4, ... } */
-+	for (int i = 0; i < krb5->key_len; i++)
-+		key[i] = i;
-+
-+	sprintf(name, "%u:6:1:%u", RX_PERF_SERVICE, enctype);
-+
-+	kref = key_create_or_update(make_key_ref(keyring, true),
-+				    "rxrpc_s", name,
-+				    key, krb5->key_len,
-+				    KEY_POS_VIEW | KEY_POS_READ | KEY_POS_SEARCH |
-+				    KEY_USR_VIEW,
-+				    KEY_ALLOC_NOT_IN_QUOTA);
-+
-+	if (IS_ERR(kref)) {
-+		pr_err("Can't allocate rxperf server key: %ld\n", PTR_ERR(kref));
-+		return PTR_ERR(kref);
-+	}
-+
-+	ret = key_link(keyring, key_ref_to_ptr(kref));
-+	if (ret < 0)
-+		pr_err("Can't link rxperf server key: %d\n", ret);
-+	key_ref_put(kref);
-+	return ret;
-+}
-+#endif
-+
- /*
-  * Initialise the rxperf server.
-  */
-@@ -607,9 +649,29 @@ static int __init rxperf_init(void)
- 		goto error_keyring;
- 	}
- 	rxperf_sec_keyring = keyring;
--	ret = rxperf_add_key(keyring);
-+	ret = rxperf_add_rxkad_key(keyring);
-+	if (ret < 0)
-+		goto error_key;
-+#ifdef CONFIG_RXGK
-+	ret = rxperf_add_yfs_rxgk_key(keyring, KRB5_ENCTYPE_AES128_CTS_HMAC_SHA1_96);
-+	if (ret < 0)
-+		goto error_key;
-+	ret = rxperf_add_yfs_rxgk_key(keyring, KRB5_ENCTYPE_AES256_CTS_HMAC_SHA1_96);
-+	if (ret < 0)
-+		goto error_key;
-+	ret = rxperf_add_yfs_rxgk_key(keyring, KRB5_ENCTYPE_AES128_CTS_HMAC_SHA256_128);
-+	if (ret < 0)
-+		goto error_key;
-+	ret = rxperf_add_yfs_rxgk_key(keyring, KRB5_ENCTYPE_AES256_CTS_HMAC_SHA384_192);
-+	if (ret < 0)
-+		goto error_key;
-+	ret = rxperf_add_yfs_rxgk_key(keyring, KRB5_ENCTYPE_CAMELLIA128_CTS_CMAC);
-+	if (ret < 0)
-+		goto error_key;
-+	ret = rxperf_add_yfs_rxgk_key(keyring, KRB5_ENCTYPE_CAMELLIA256_CTS_CMAC);
- 	if (ret < 0)
- 		goto error_key;
-+#endif
- 
- 	ret = rxperf_open_socket();
- 	if (ret < 0)
+Right, I definitely agree that this is the right solution; having no
+backpressure and a fixed-size ringbuffer is obviously not ideal.
+
+> Backpressure is only enabled when a qdisc is attached. Without a qdisc,
+> the driver retains its original behavior - dropping packets immediately
+> when the ring is full. This avoids unexpected behavior changes in setups
+> without a configured qdisc.
+
+Not sure I like this bit, though; see below.
+
+> With a qdisc in place (e.g. fq, sfq) this allows Active Queue Management
+> (AQM) to fairly schedule packets across flows and reduce collateral
+> damage from elephant flows.
+>
+> A known limitation of this approach is that the full ring sits in front
+> of the qdisc layer, effectively forming a FIFO buffer that introduces
+> base latency. While AQM still improves fairness and mitigates flow
+> dominance, the latency impact is measurable.
+>
+> In hardware drivers, this issue is typically addressed using BQL (Byte
+> Queue Limits), which tracks in-flight bytes needed based on physical link
+> rate. However, for virtual drivers like veth, there is no fixed bandwidth
+> constraint - the bottleneck is CPU availability and the scheduler's ability
+> to run the NAPI thread. It is unclear how effective BQL would be in this
+> context.
+
+So the BQL algorithm tries to tune the maximum number of outstanding
+bytes to be ~twice the maximum that can be completed in one batch. Since
+we're not really limited by bytes in the same sense here (as you point
+out), an approximate equivalent would be the NAPI budget, I guess? I.e.,
+as a first approximation, we could have veth stop the queue once the
+ringbuffer has 2x the NAPI budget packets in it?
+
+> This patch serves as a first step toward addressing TX drops. Future work
+> may explore adapting a BQL-like mechanism to better suit virtual devices
+> like veth.
+>
+> Reported-by: Yan Zhai <yan@cloudflare.com>
+> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+
+[...]
+
+> +/* Does specific txq have a real qdisc attached? - see noqueue_init() */
+> +static inline bool txq_has_qdisc(struct netdev_queue *txq)
+> +{
+> +	struct Qdisc *q;
+> +
+> +	q = rcu_dereference(txq->qdisc);
+> +	if (q->enqueue)
+> +		return true;
+> +	else
+> +		return false;
+> +}
+
+This seems like a pretty ugly layering violation, inspecting the qdisc
+like this in the driver?
+
+AFAICT, __dev_queue_xmit() turns a stopped queue into drops anyway, but
+emits a warning (looks like this, around line 4640 in dev.c):
+
+			net_crit_ratelimited("Virtual device %s asks to queue packet!\n",
+					     dev->name);
+
+As this patch shows, it can clearly be appropriate for a virtual device
+to stop the queue even if there's no qdisc, so how about we just get rid
+of that warning? Then this logic won't be needed at all in the driver..
+
+-Toke
 
 
