@@ -1,151 +1,124 @@
-Return-Path: <netdev+bounces-179632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 989EFA7DE79
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 15:05:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D92AAA7DE82
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 15:07:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B77313A7B5B
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 13:05:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B76AF16A8B2
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 13:07:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85FBA24A060;
-	Mon,  7 Apr 2025 13:05:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4C924BCF9;
+	Mon,  7 Apr 2025 13:07:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HRd8o50Q"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="dn9atQZS";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WrABPWEV"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E59F23A9B6;
-	Mon,  7 Apr 2025 13:05:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E24715382E
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 13:07:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744031122; cv=none; b=Lgb+SdU5mcy03kGVm2StWCP5fOs6AUFOW0zI2LGXBDplD7BRRUNRixSnwz54sRZ284/eZ+C4wjqzT3CVrrZnPWp6UPq47kVHOZaZG6wk0wiCsTzreH38Na20Qi1F5j2w8nfS2L9o4ezcT1p8XAq1h8PctoFwEUD1cWMb/t3bB1A=
+	t=1744031237; cv=none; b=Q7zHZuxKDDCK5yR2AgO9XDdKKpesdLF5WNT9BhoPrjw7/A0Vc6yIKYoUfseWaHdrHjanlxijNUq1nnsvJu3xQKfFy2kNop8y0JH8kATLksjHcM49CU665pGTV6YMaEaFYs1TpFXu4DW0XyK81PsKIOC3BrhdBSPzS2bpnZtMg88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744031122; c=relaxed/simple;
-	bh=EP1KymtgMgbZpZqAIGN1ppT0EOijNSsu9AkvWc5csVA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DbooQTWfw/2+FCvCDN+hmRfabdFCUapyv5xZUV2+fGjXJ4Cv8bdRa1/g9lkUbT5+XM81LSaTEQ58Hrw7UVwjYDg7MuTUhyCRyhiTb0IZdTdmsBDIBl2tu0LRC3f15Wip0V3+gTK1wCUFnSjP6ntxSTFgP/xj3gLCD0fQkV/D6rI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HRd8o50Q; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 96A7944310;
-	Mon,  7 Apr 2025 13:05:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1744031116;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=HnHmAe40fcEqMw5EeqY5E54FMr33D6Spd3JkgsCsMDM=;
-	b=HRd8o50Qd6nt4OXCR0ac04aW4HbjdT3y5aIn0pLBFC9Kr+3kEkR6umb2H+AwlkAnmDNgtQ
-	NrqqXHhKYSV2Lum9alkPFQRHs22TwKtkCiSHI2479Mp4C9VUkXcysPSrTN7XWnVW7S0Qez
-	KmqEXBZEaON+AteOQQ2wUVfu6ofG/Nastjw7uJdZyagWymljeFpbI0mE+LTd2+zi1phyxk
-	ZirjJAnOFYRqcpldCkciPa/l16OxXveH21c4rOoznpCENfjpF2oKZpuuZQszfOiEYZb9Jh
-	9ADUrq8C49vmpTYlGBEz+sR0bTu8HvUgOrCnBkXGQul5q/TqdcEfx69V4rh33w==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Simon Horman <horms@kernel.org>,
-	Michal Kubecek <mkubecek@suse.cz>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Kory Maincent <kory.maincent@bootlin.com>
-Subject: [PATCH net v2] net: ethtool: Don't call .cleanup_data when prepare_data fails
-Date: Mon,  7 Apr 2025 15:05:10 +0200
-Message-ID: <20250407130511.75621-1-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1744031237; c=relaxed/simple;
+	bh=qLRSL2DCgQiGtlIJDKWABCEGoSUzkLHXeqejttMgI3o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TsORE6WCvBmtHbGFVi66GMIVabzseBOxA8m2wH6gyTMJrVtAAIs/M/s8Rfdqd1bEBhQ1/kG1IFOgibuTJMJmi3dMy76X27JU+vQu3M5+MWqvcofPUPhmq54F9PFXpufERdcuCx5YYC6gjDbkVVRZzQyv533jULCvP7mxbO3Sd4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=dn9atQZS; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=WrABPWEV; arc=none smtp.client-ip=103.168.172.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
+	by mailfout.phl.internal (Postfix) with ESMTP id 1EA131380073;
+	Mon,  7 Apr 2025 09:07:13 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-12.internal (MEProxy); Mon, 07 Apr 2025 09:07:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1744031233; x=
+	1744117633; bh=Dz2oiJHXYIg14MzMDL3LNHU+nT2d0wOBZhB1v0XkQ5s=; b=d
+	n9atQZSps9fI6El6nRl/aCjiZ6Z2d+/D0mEGv4g5I/timJbekdKSOSw7xysj+KxR
+	Wq8FlxY/prfNHlF11j4GJnrNUzsPmBiU+lu4r3tyzy3fBq/JH2BOyGtVYOsQgLRc
+	XnTOG2wV18LFz181UlHwg69PU712NjpJQv8fzqAChjS6v4VENVO7OPlczKGvczjk
+	BZ6pl9oqcx3KXc/G5ArimAOCOd6KMWdDMFrBxPRUarcSA3eWXMCOu4iQo18kKMHV
+	VkmJPQo7g19/n5gGhwT67HCt93SDQcQgxu1DKtvlGq6xH3JdzeYW5DpkHuEFgfAL
+	GQ0jkrttH3jcUQ8/NO5gA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1744031233; x=1744117633; bh=Dz2oiJHXYIg14MzMDL3LNHU+nT2d0wOBZhB
+	1v0XkQ5s=; b=WrABPWEVfQo9qdi9nNf1JSygjqe5Ijo7eGvHXLdyvqb2hD4nfIr
+	gripAXWgfPMJYCrylBniSeifwWxcv+NsThVOMynPeCvxZgRCeO3G0Vm2w3e4dfc2
+	Wfcy89obTwIdEbvuz8fU4cozv7gKoz1S+9biWAPqZXMqnyIzTUwXnu6I+HefAZcL
+	dfv2nbv5FdQ1wHRhFmEU0Kk23XDXkhxZFh5To98DpDThd/+rN4nFHzJV8usHT8/F
+	vaaVKJ2WsQMAMrLhZ4qh1C/BdaDZXxv5FJHcwXrYb/eRIB8wZMifKBsg1AB4VZMA
+	1m6mvdwKM8UxPyd1U/+cm57nDZMJezkblhw==
+X-ME-Sender: <xms:AM7zZyaqxmrn7W38EaXFRQcuHOUMze7YQNtyeInaLmUjSgNerxI77A>
+    <xme:AM7zZ1aycgqtBtv3233TorNlbW_BYI5UgmooRs_8AVPGNFBFDTEeI9k8S-Mn0eL3x
+    V_SusiwYoErmnABhPQ>
+X-ME-Received: <xmr:AM7zZ8-Kt3FKc2TPnptUHek8kcJoWr9yiGsyJl8PoKgSsY5Jk95YHWohkoIJ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtddtvdejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucenucfjughrpeffhf
+    fvvefukfhfgggtuggjsehttdertddttdejnecuhfhrohhmpefurggsrhhinhgrucffuhgs
+    rhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtffrrghtthgvrh
+    hnpeeghffftdevudfgkeffjedvieeilefhtefffeefgfehvdevhfejjedvkeefleeggfen
+    ucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhn
+    sggprhgtphhtthhopeelpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehkuhgsrg
+    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdr
+    nhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprh
+    gtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgr
+    sggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvg
+    hvsehluhhnnhdrtghhpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhr
+    tghpthhtohepsghorhhishhpsehnvhhiughirgdrtghomhdprhgtphhtthhopehjohhhnh
+    drfhgrshhtrggsvghnugesghhmrghilhdrtghomh
+X-ME-Proxy: <xmx:AM7zZ0qAkw9U7OHuurMJ5TjvFJsXG1iXTEX6vN-GHTqbdlDbP0aY2g>
+    <xmx:AM7zZ9rfi9O4xhNESne8C6mn2cxLycy0Pfumwuw5xCOo8ixZ-QSTLQ>
+    <xmx:AM7zZyTIiqfETik_10YaoWkZD07gTpCOhbLsqDZC6xMfop0rakwTJA>
+    <xmx:AM7zZ9ogtTFNrLw-4-7hkH-Z5ppn0d-vA4t95EGfc3Fs8CFr7IOMgQ>
+    <xmx:Ac7zZ2EG1xKy52fJ8NM1GwxylM2FocoXKNAQZKDzsFObSeJlMR-rcayE>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 7 Apr 2025 09:07:12 -0400 (EDT)
+Date: Mon, 7 Apr 2025 15:07:10 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	borisp@nvidia.com, john.fastabend@gmail.com
+Subject: Re: [PATCH net 2/2] selftests: tls: check that disconnect does
+ nothing
+Message-ID: <Z_PN_iBsuMvkoEck@krikkit>
+References: <20250404180334.3224206-1-kuba@kernel.org>
+ <20250404180334.3224206-2-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtddtvdejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhephedtheeufeeutdekudelfedvfefgieduveetveeuhffgffekkeehueffueehhfeunecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudefpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiiv
- ghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250404180334.3224206-2-kuba@kernel.org>
 
-There's a consistent pattern where the .cleanup_data() callback is
-called when .prepare_data() fails, when it should really be called to
-clean after a successful .prepare_data() as per the documentation.
+2025-04-04, 11:03:34 -0700, Jakub Kicinski wrote:
+> "Inspired" by syzbot test, pre-queue some data, disconnect()
+> and try to receive(). This used to trigger a warning in TLS's strp.
+> Now we expect the disconnect() to have almost no effect.
+> 
+> Link: https://lore.kernel.org/67e6be74.050a0220.2f068f.007e.GAE@google.com
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Rewrite the error-handling paths to make sure we don't cleanup
-un-prepared data.
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
-Fixes: c781ff12a2f3 ("ethtool: Allow network drivers to dump arbitrary EEPROM data")
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Michal Kubecek <mkubecek@suse.cz>
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
-V2: - Fixed typo in commit log (Simon)
-    - Changed the Fixes tag, as per Jakub's comment. Eeprom appears to
-      be the first potentially problematic case, as we risk freeing
-      twice the eeprom data. I couldn't test that with what I have
-      locally though.
-    - Aggregated Simon and Michal's reviews
-
-
- net/ethtool/netlink.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
-index a163d40c6431..977beeaaa2f9 100644
---- a/net/ethtool/netlink.c
-+++ b/net/ethtool/netlink.c
-@@ -500,7 +500,7 @@ static int ethnl_default_doit(struct sk_buff *skb, struct genl_info *info)
- 		netdev_unlock_ops(req_info->dev);
- 	rtnl_unlock();
- 	if (ret < 0)
--		goto err_cleanup;
-+		goto err_dev;
- 	ret = ops->reply_size(req_info, reply_data);
- 	if (ret < 0)
- 		goto err_cleanup;
-@@ -560,7 +560,7 @@ static int ethnl_default_dump_one(struct sk_buff *skb, struct net_device *dev,
- 	netdev_unlock_ops(dev);
- 	rtnl_unlock();
- 	if (ret < 0)
--		goto out;
-+		goto out_cancel;
- 	ret = ethnl_fill_reply_header(skb, dev, ctx->ops->hdr_attr);
- 	if (ret < 0)
- 		goto out;
-@@ -569,6 +569,7 @@ static int ethnl_default_dump_one(struct sk_buff *skb, struct net_device *dev,
- out:
- 	if (ctx->ops->cleanup_data)
- 		ctx->ops->cleanup_data(ctx->reply_data);
-+out_cancel:
- 	ctx->reply_data->dev = NULL;
- 	if (ret < 0)
- 		genlmsg_cancel(skb, ehdr);
-@@ -793,7 +794,7 @@ static void ethnl_default_notify(struct net_device *dev, unsigned int cmd,
- 	ethnl_init_reply_data(reply_data, ops, dev);
- 	ret = ops->prepare_data(req_info, reply_data, &info);
- 	if (ret < 0)
--		goto err_cleanup;
-+		goto err_rep;
- 	ret = ops->reply_size(req_info, reply_data);
- 	if (ret < 0)
- 		goto err_cleanup;
-@@ -828,6 +829,7 @@ static void ethnl_default_notify(struct net_device *dev, unsigned int cmd,
- err_cleanup:
- 	if (ops->cleanup_data)
- 		ops->cleanup_data(reply_data);
-+err_rep:
- 	kfree(reply_data);
- 	kfree(req_info);
- 	return;
 -- 
-2.49.0
-
+Sabrina
 
