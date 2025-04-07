@@ -1,132 +1,104 @@
-Return-Path: <netdev+bounces-179749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 678B0A7E708
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:44:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D804DA7E704
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:43:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F9B13A168C
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:33:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50417444A4B
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:37:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EBC820DD67;
-	Mon,  7 Apr 2025 16:33:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A847A20DD5E;
+	Mon,  7 Apr 2025 16:36:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UJWGbxFq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Bp3IZy/F"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C15320D518
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 16:33:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C58920967B
+	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 16:36:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744043624; cv=none; b=dlfzxBbKtrC/oD2w+b17xL7J+uYMs1sgKbm3zwB9A1RpZVnxIwyxbDE3LklxhkkzbnpH/qMX5DzeMS6Ik5+iqXtPukFFwOL3hnzdJIb+o4JRV+bztOF8s72jpjtL6xia8MUKSgKdeD1AoKb05cwrNt7s08jkvR2senbtnz6CI54=
+	t=1744043768; cv=none; b=X/O5ZU6lP3c1Ms1+Lx1zKlhXqwVM5W2yHNqvbjPemhzZyX8DkWH+SRBW/xPXpbfKPgc7Jel6LFyTHceGveD2/U0RobsFGOJdYu417GHIzmu9hCpoD1SBjlbbaC/mGDnAi7OH9OKTwwSiBmVZcjM0HG7DjjNPKLuzMsmdGZRGz0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744043624; c=relaxed/simple;
-	bh=anBURer+NUbId9TRyOLh3MVO9AZan0YdjFquvwr88fY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZWhC3wjg2qjlbwbBZ8XfbLcdg00dB1fBzSNMHkJzLV2XNaKx2G0tkWjGJ1DcM2gTVrF6bGShOeZGn7WUn/2wFIxoBZrLxjoEOCBTvBTZgEaySwuvMq2rRk5uFI6t/HEYCZZQBPlzWpjlbqMrAbRWwHGpCFAYWjGWF9ZFrk6VbX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UJWGbxFq; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <720b6db8-49c5-47e7-98da-f044fc38fc1a@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744043618;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KFg4OMSXqyZAd4XoQGwUdaygVVdJ30SNWIcU9tJnxO4=;
-	b=UJWGbxFqDDyMWF8b4G2fYOD53tA+BWAfWoGwac3pflGNx/7Q8PgHH198LIFtBZ+wsx8gh/
-	XnnznK1WuR4pSzwX7dn9Bt8JcNWp1s5DrdqgsT/GTNhH4Vgnu+/qhtSKjA+JF6SZ4FceM1
-	MRxTN0uezDbNPzPZHXbHspuUXvMOgC8=
-Date: Mon, 7 Apr 2025 12:33:28 -0400
+	s=arc-20240116; t=1744043768; c=relaxed/simple;
+	bh=Owk+KfJYj+AVhFREAD0PhsmasWXGNZcNL8kcyoyzGD4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=WQv5qx2+J+B7JPZMB8LWWLHFVUtTAIl6S9zkfEhKmWH/TP5TUtBsYwD7ZfOQ6zymPWA8cI2WOkUD3FLMmAGsccIxyo0TfhhUZbAQy9lez7XeBbt1sXCIzHigSgc641Cv+Cnrs1HQvF1XKP4iwtfgwdLZV00GKYtqFZM1p7b149Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Bp3IZy/F; arc=none smtp.client-ip=209.85.160.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-47689968650so46083251cf.2
+        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 09:36:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1744043766; x=1744648566; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2NIuTPnOvRhqd0lZN6WDhBnrhkj5ZdAa2i8ZUsSLgUk=;
+        b=Bp3IZy/F0YhZFsWVdNbRo/rqy0/DQ9LJwyyEKmtZqjlOSC/ViNoAe2zKlgYoa7Ao7/
+         atgk8GSER+Ag1brGD/eLp5sVmuUGsIk75tW/UGDoHvHgcImDVU34jBiyh1QjHD1xRcs4
+         QQ5JV90oWJL2GLEbq0a2pxWvNYLyakppiMGICUPozWDyLL5n1OW2Iwwm4ijt8kCBpb/X
+         zoKWkYsPs6vrOhDnQg6onErkYq07fb3fh6nB+g88OJumex4zQC+lBoNjII8YQ/4eL64r
+         HNCJZ9Dfl4Gxu1tjLc51OthrIkWuG7mZNygu4lN9kTmfX4TIP8uPnV8H9JGaq74tPAb8
+         dljg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744043766; x=1744648566;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2NIuTPnOvRhqd0lZN6WDhBnrhkj5ZdAa2i8ZUsSLgUk=;
+        b=BCU11FYRn4AJ2rhxaqwkqUfKdzVS5BwQNc6Q0wVj3bQy1HcSbP2BTTrgsRuSf1UiOj
+         CVEigiIJZozTktiB0MA4VFqZihkwdsaUSF3LwymHQvRMvCCWmQMjKiP+pAQjoe8dbzPN
+         ddfBaAITPsOWJCMesyM5ZTPgMm8RubRfJ9UFIAsAKYqmTMEOKXfR6MXdMcB2HRMHSm6p
+         1FQbAL+h/Q8PCwSKFmsvQXUS8mKJVVR6GB0q5KdvLMKoJf7DE6Fuel/6llPoM5JOWH5N
+         LJXGodyN1tuYHMylT54itCq+IPcjO6uxbTatfGPQZFuP4cHDZNL7kqvfCTGb6gSmoZCa
+         lcGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUMjihExLsm66GsZ+7Y26lonr7XkGnlMFnFbi6KcpRPHkUVDFi7zwQDTJm5Tyd/iDvHGVEvYlA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfFRI2XFYZWtCaMtjVZA2e/Gsqli7/iTGsmy+Lqkn3egEbUt/l
+	u9JIMkcPoce4AKdptXnSAAHoRWdWEBe4CetSG6DhA0foPjaPS8WjnpR8vVXRHKCb+XqGVAL5+fU
+	h3L6/4FaAyg==
+X-Google-Smtp-Source: AGHT+IHVXopJezmAt1Ahj7ejA29rQG+2M8lXKPIGtFtbKQ2kuO0je+1Pa+4A7LqLGSRfnxDu13uHmUQvhqqGmA==
+X-Received: from qtbfj14.prod.google.com ([2002:a05:622a:550e:b0:476:8e67:358b])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:622a:1a93:b0:476:7d74:dd10 with SMTP id d75a77b69052e-47925958048mr217706761cf.19.1744043765939;
+ Mon, 07 Apr 2025 09:36:05 -0700 (PDT)
+Date: Mon,  7 Apr 2025 16:35:58 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [RFC net-next PATCH 00/13] Add PCS core support
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-kernel@vger.kernel.org, Christian Marangi <ansuelsmth@gmail.com>,
- upstream@airoha.com, Heiner Kallweit <hkallweit1@gmail.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Clark Wang <xiaoning.wang@nxp.com>,
- Claudiu Beznea <claudiu.beznea@microchip.com>,
- Claudiu Manoil <claudiu.manoil@nxp.com>, Conor Dooley <conor+dt@kernel.org>,
- Ioana Ciornei <ioana.ciornei@nxp.com>, Jonathan Corbet <corbet@lwn.net>,
- Joyce Ooi <joyce.ooi@intel.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Li Yang <leoyang.li@nxp.com>, Madalin Bucur <madalin.bucur@nxp.com>,
- Madhavan Srinivasan <maddy@linux.ibm.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Michal Simek <michal.simek@amd.com>,
- Naveen N Rao <naveen@kernel.org>, Nicholas Piggin <npiggin@gmail.com>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
- Rob Herring <robh+dt@kernel.org>, Rob Herring <robh@kernel.org>,
- Robert Hancock <robert.hancock@calian.com>,
- Saravana Kannan <saravanak@google.com>, Shawn Guo <shawnguo@kernel.org>,
- UNGLinuxDriver@microchip.com, Vladimir Oltean <vladimir.oltean@nxp.com>,
- Wei Fang <wei.fang@nxp.com>, devicetree@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-doc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linuxppc-dev@lists.ozlabs.org
-References: <20250403181907.1947517-1-sean.anderson@linux.dev>
- <20250407182738.498d96b0@kmaincent-XPS-13-7390>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <20250407182738.498d96b0@kmaincent-XPS-13-7390>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.504.g3bcea36a83-goog
+Message-ID: <20250407163602.170356-1-edumazet@google.com>
+Subject: [PATCH net-next 0/4] rps: misc changes
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 4/7/25 12:27, Kory Maincent wrote:
-> On Thu,  3 Apr 2025 14:18:54 -0400
-> Sean Anderson <sean.anderson@linux.dev> wrote:
-> 
->> This series adds support for creating PCSs as devices on a bus with a
->> driver (patch 3). As initial users,
->> 
->> - The Lynx PCS (and all of its users) is converted to this system (patch 5)
->> - The Xilinx PCS is broken out from the AXI Ethernet driver (patches 6-8)
->> - The Cadence MACB driver is converted to support external PCSs (namely
->>   the Xilinx PCS) (patches 9-10).
->> 
->> The last few patches add device links for pcs-handle to improve boot times,
->> and add compatibles for all Lynx PCSs.
->> 
->> Care has been taken to ensure backwards-compatibility. The main source
->> of this is that many PCS devices lack compatibles and get detected as
->> PHYs. To address this, pcs_get_by_fwnode_compat allows drivers to edit
->> the devicetree to add appropriate compatibles.
-> 
-> I don't dive into your patch series and I don't know if you have heard about it
-> but Christian Marangi is currently working on fwnode for PCS:
-> https://lore.kernel.org/netdev/20250406221423.9723-1-ansuelsmth@gmail.com
-> 
-> Maybe you should sync with him!
+Minor changes in rps:
 
-I saw that series and made some comments. He is CC'd on this one.
+skb_flow_limit() is probably unused these days,
+and data-races are quite theoretical.
 
-I think this approach has two advantages:
+Eric Dumazet (4):
+  net: rps: change skb_flow_limit() hash function
+  net: rps: annotate data-races around (struct sd_flow_limit)->count
+  net: add data-race annotations in softnet_seq_show()
+  net: rps: remove kfree_rcu_mightsleep() use
 
-- It completely solves the problem of the PCS being unregistered while the netdev
-  (or whatever) is up
-- I have designed the interface to make it easy to convert existing
-  drivers that may not be able to use the "standard" probing process
-  (because they have to support other devicetree structures for
-  backwards-compatibility).
+ include/net/rps.h          |  5 +++--
+ net/core/dev.c             | 11 +++++++----
+ net/core/dev.h             |  5 +++--
+ net/core/net-procfs.c      |  9 +++++----
+ net/core/sysctl_net_core.c |  6 +++---
+ 5 files changed, 21 insertions(+), 15 deletions(-)
 
---Sean
+-- 
+2.49.0.504.g3bcea36a83-goog
+
 
