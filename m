@@ -1,150 +1,168 @@
-Return-Path: <netdev+bounces-179754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-179755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FFB3A7E72A
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:48:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 84BCEA7E721
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 18:47:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E3CD4206D7
-	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:37:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C66743AA25C
+	for <lists+netdev@lfdr.de>; Mon,  7 Apr 2025 16:39:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B85A211462;
-	Mon,  7 Apr 2025 16:36:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AAFB20E00F;
+	Mon,  7 Apr 2025 16:39:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B6oSbjFq"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PwAsRLai"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f73.google.com (mail-ua1-f73.google.com [209.85.222.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A833E210180
-	for <netdev@vger.kernel.org>; Mon,  7 Apr 2025 16:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E566B20DD5E;
+	Mon,  7 Apr 2025 16:39:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744043775; cv=none; b=sIdcBVto82w5epldXfmYwQAsYWX2aRi/6MRx/g85+jEMxuv0cr80lOwhlLqoDfcV0oUoazTvzFtNKzTGPD1o5EtCcTCyi5xtbgn3FhRZIldWmM6lKrpx4p5qkQsFxodDLwNvKx1TgtMzo0DLL1uZ2/LrdzyF2mEPDKNafqSKIBg=
+	t=1744043961; cv=none; b=tYk5vXjpziVXpZm+f0OvefcGWBYduFPDJ0Y5JUQrbbUrdKoCphxdSyvbcUM2ZUlTd+xZEQP88M5+KKUEEGqkVljgX/kBN8ei/dBFNOb0vnR17D4g2/TYQ5F3Kf78ZWPCaHo/Ju4XYpYVqyJOlE2/p/9HBK8clpZVbuHh7MenttU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744043775; c=relaxed/simple;
-	bh=xuggRy6mQhlUtplVAufQParhzjZOhU465k1NjyDCC/0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=q5zIdXMi6ZZ1yYP9ufoFLmOQymWF3/1rNSWOCXEfjdUMrxc2HNA0Q7ydgrP8OvqiquFsBTY7QRWLjHKBFQJ2TWDXIGUB/88oH2ZpKlohkd4dcrcpgo6cavSdWUpKfdnI5wk1mBn6sCNZ+W0mNsaEt61v7b8fAf3co7JboRCHmqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B6oSbjFq; arc=none smtp.client-ip=209.85.222.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-ua1-f73.google.com with SMTP id a1e0cc1a2514c-86d04803fafso902385241.2
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 09:36:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744043772; x=1744648572; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AvgAsfC3Lgg7mbd7CPHYn/q8k/e5QNtnMft9HSuqvag=;
-        b=B6oSbjFqUz5+oGhOKVX1a/emM7gV0L7YWBx7NoaaW+qQITzXX/YBPRseYn1aV08hJO
-         2f5eb5SYboZTm5s6/KQHT3B8379TeN6Y1O929AqkbNLTc0S4KHwJ6nQm0F4Rwkf3W9BM
-         IUes0jSmfEA7zLr/ADdEHGV4SOqKWIS8WmwRXVIptBHDwgRMzvZ5/D3eSnEeK3T3XbG4
-         Ydp1jbg9iHLRqlNMyBkLOiZ/wwtbeLHfj+fSUNFCwWM3BFU58bxpIkm54iPxMZLFNXGt
-         6fo346EQVyqn+PHqliPIyDqdp8r/jo67ie802OZtQoQdJqh4U6L7tSVwP65whyX4F5IO
-         H1jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744043772; x=1744648572;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AvgAsfC3Lgg7mbd7CPHYn/q8k/e5QNtnMft9HSuqvag=;
-        b=i99xbgCtVgEDHhNHCaLBtcrHT7bbkKm4O63do02K6A0rLCNjmM2p5bYnsGmpY9owm/
-         DoRBFY5kookauilmHGakS+yfyVhDVUuYnZuP1uuvvTEZb2Ovzk0w/lTYS9mbTxjEsfOk
-         JTB6nFiSOQhG4qpHBaKPgAiA3wPNms6wY+O9MTf/IV7E2W8C9upOPJa83DSWYTxMBwY4
-         BfChfZ42G2TfOStkb1Dx8Tu/um1moPFe0qljdS8W7mcCJCakjgG0iWzvFLnhc8HazIEl
-         kVKTRzJMGpJErUXPTNNjh7XIroEi92UikRKArauKFoU5K3uvWAN3VpU03CvqvZZMQxZ9
-         YO5A==
-X-Forwarded-Encrypted: i=1; AJvYcCWSMlEzfCoYgHb20mbwkTYkC7jgI1Q4OQH5M/9/2ZrHMSv3uwTJ4nnZGu435aaHlI/nkdz/eto=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKvtHkbjENTo2Mqd3tD2NqnYW0IkkUIlK9FlOnplyb96LCD9Ht
-	8gMk4hbfwIJ5xxIV1pCTGcdh7GvHqHG9z20VwwLcF2//NWnY1gjlejasZfXIW/f94Diyj+e58cx
-	xQx4CY/JtRg==
-X-Google-Smtp-Source: AGHT+IFIe3AePcNRepfbiONFdWW4h/CX3OP9E5cRWAPj/2v2cVS/Sq6Y7njl7OOVkcnYMEPadJeT5iE9gRCN6A==
-X-Received: from vsvf35.prod.google.com ([2002:a05:6102:1523:b0:4c2:f06a:6e57])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6102:941:b0:4c4:e409:5f9e with SMTP id ada2fe7eead31-4c86362753cmr6540898137.2.1744043772386;
- Mon, 07 Apr 2025 09:36:12 -0700 (PDT)
-Date: Mon,  7 Apr 2025 16:36:02 +0000
-In-Reply-To: <20250407163602.170356-1-edumazet@google.com>
+	s=arc-20240116; t=1744043961; c=relaxed/simple;
+	bh=Dg8o6C0AsxnelO6Xo6Qfc2MXFDv91eVFRd7+6eolJJ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZQoUCvuNyzT+2wQIIvhuGnZzAPcbneJjnK3oi0YCJxgdv8V90lx0mhZqnPN9oVKiaGxiV9AshHGl1EE+azo1f+uh5t/oCd/9hB8p/kELGRMWUXtG88/p/5sZEQTvUe0PxTGPTNKWWvNTw5YnBuVmS+7LnQMepQ8DODfEKvgH/DY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PwAsRLai; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 2B8B620485;
+	Mon,  7 Apr 2025 16:39:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1744043956;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8CH/qp3/AaCHFl3eKPvG4jbQaXjD1BP8zO8PK+bAjXs=;
+	b=PwAsRLaiVpkvg02qQVZERhFznJv4C1gCboEdp20ke9sUHRUBwPvUQReKEvazvJDzSXAzD0
+	6MVzAsi8Iw6gj2UOKrWjE7AWTdWlDFj6aAgt+JEIrdlP0gndWnjzH94ExZDXWbd84L1KZS
+	ETsLaJ9rJhS0tloXjf8jlmEVdGMKsLfuLRCNuifRFdS/YNKH641do5dq6ANpTvO5K/5tdf
+	quZLAn9dkp9DKxgofEDrDbIpo3oEPM5SR3pYezHS37JMSJBqmVzHF54fEQgKmawwZgnRWL
+	Gans8LUwPGjFlhMiBE9nWFljGaSLJF3GJbN/D4LIMHCjVgwIEFE0mQiJLtvG4A==
+Date: Mon, 7 Apr 2025 18:39:14 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Richard
+ Cochran <richardcochran@gmail.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 0/2] Add Marvell PHY PTP support
+Message-ID: <20250407183914.4ec135c8@kmaincent-XPS-13-7390>
+In-Reply-To: <Z_P-K7mEEH6ProlC@shell.armlinux.org.uk>
+References: <20250407-feature_marvell_ptp-v2-0-a297d3214846@bootlin.com>
+	<Z_P3FKEhv1s0y4d7@shell.armlinux.org.uk>
+	<20250407182028.75531758@kmaincent-XPS-13-7390>
+	<Z_P-K7mEEH6ProlC@shell.armlinux.org.uk>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250407163602.170356-1-edumazet@google.com>
-X-Mailer: git-send-email 2.49.0.504.g3bcea36a83-goog
-Message-ID: <20250407163602.170356-5-edumazet@google.com>
-Subject: [PATCH net-next 4/4] net: rps: remove kfree_rcu_mightsleep() use
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtddtieelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhephfduveekuedtvdeiffduleetvdegteetveetvdelteehhfeuhfegvdeuuedtleegnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghdpsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedugedprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvt
+ hdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepkhgrsggvlheskhgvrhhnvghlrdhorhhg
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Add an rcu_head to sd_flow_limit and rps_sock_flow_table structs
-to use the more conventional and predictable k[v]free_rcu().
+On Mon, 7 Apr 2025 17:32:43 +0100
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/rps.h          | 5 +++--
- net/core/dev.h             | 1 +
- net/core/sysctl_net_core.c | 4 ++--
- 3 files changed, 6 insertions(+), 4 deletions(-)
+> On Mon, Apr 07, 2025 at 06:20:28PM +0200, Kory Maincent wrote:
+> > On Mon, 7 Apr 2025 17:02:28 +0100
+> > "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+> >  =20
+> > > On Mon, Apr 07, 2025 at 04:02:59PM +0200, Kory Maincent wrote: =20
+>  [...] =20
+> > >=20
+> > > Is the PTP selection stuff actually sorted now? Last time I tested it
+> > > after it having been merged into the kernel for a while, it didn't wo=
+rk,
+> > > and I reported that fact. You haven't told me that you now expect it =
+to
+> > > work. =20
+> >=20
+> > The last part of the series, the PTP selection support wasn't merged wh=
+en
+> > you tested it, although the default PTP choice that causes your regress=
+ion
+> > was merged.
+> > Now it is fully merged, even the ethtool support.
+> > https://lore.kernel.org/netdev/mjn6eeo6lestvo6z3utb7aemufmfhn5alecyoaz4=
+6dt4pwjn6v@4aaaz6qpqd4b/
+> >=20
+> > The only issue is the rtln warning from the phy_detach function. About =
+it, I
+> > have already sent you the work I have done throwing ASSERT_RTNL in
+> > phy_detach. Maybe I should resend it as RFC.
+> >  =20
+> > > I don't want this merged until such time that we can be sure that MVP=
+P2
+> > > platforms can continue using the MVPP2 PTP support, which to me means
+> > > that the PTP selection between a MAC and PHY needs to work. =20
+> >=20
+> > It should works, the default PTP will be the MAC PTP and you will be ab=
+le to
+> > select the current PTP between MAC and PHY with the following command:
+> > # ethtool --set-hwtimestamp-cfg eth0 index 0 qualifier precise
+> > Time stamping configuration for eth0:
+> > Hardware timestamp provider index: 0
+> > Hardware timestamp provider qualifier: Precise (IEEE 1588 quality)
+> > Hardware Transmit Timestamp Mode:
+> > 	off
+> > Hardware Receive Filter Mode:
+> > 	none
+> > Hardware Flags: none
+> > # ethtool --set-hwtimestamp-cfg eth0 index 1 qualifier precise
+> > Time stamping configuration for eth0:
+> > Hardware timestamp provider index: 1
+> > Hardware timestamp provider qualifier: Precise (IEEE 1588 quality)
+> > Hardware Transmit Timestamp Mode:
+> > 	off
+> > Hardware Receive Filter Mode:
+> > 	none
+> > Hardware Flags: none
+> >=20
+> > You can list the PTPs with the dump command:
+> > # ethtool --show-time-stamping "*"
+> >=20
+> > You will need to stop phc2sys and ptp4l during these change as linuxptp=
+ may
+> > face some issues during the PTP change. =20
+>=20
+> I'm preferring to my emails in connection with:
+>=20
+> https://lore.kernel.org/r/ZzTMhGDoi3WcY6MR@shell.armlinux.org.uk
+>=20
+> when I tested your work last time, it seemed that what was merged hadn't
+> even been tested. In the last email, you said you'd look into it, but I
+> didn't hear anything further. Have the problems I reported been
+> addressed?
 
-diff --git a/include/net/rps.h b/include/net/rps.h
-index e358e9711f27..507f4aa5d39b 100644
---- a/include/net/rps.h
-+++ b/include/net/rps.h
-@@ -57,9 +57,10 @@ struct rps_dev_flow_table {
-  * meaning we use 32-6=26 bits for the hash.
-  */
- struct rps_sock_flow_table {
--	u32	mask;
-+	struct rcu_head	rcu;
-+	u32		mask;
- 
--	u32	ents[] ____cacheline_aligned_in_smp;
-+	u32		ents[] ____cacheline_aligned_in_smp;
- };
- #define	RPS_SOCK_FLOW_TABLE_SIZE(_num) (offsetof(struct rps_sock_flow_table, ents[_num]))
- 
-diff --git a/net/core/dev.h b/net/core/dev.h
-index e855e1cb43fd..710abc05ebdb 100644
---- a/net/core/dev.h
-+++ b/net/core/dev.h
-@@ -15,6 +15,7 @@ struct cpumask;
- /* Random bits of netdevice that don't need to be exposed */
- #define FLOW_LIMIT_HISTORY	(1 << 7)  /* must be ^2 and !overflow buckets */
- struct sd_flow_limit {
-+	struct rcu_head		rcu;
- 	unsigned int		count;
- 	u8			log_buckets;
- 	unsigned int		history_head;
-diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
-index 5cfe76ede523..5dbb2c6f371d 100644
---- a/net/core/sysctl_net_core.c
-+++ b/net/core/sysctl_net_core.c
-@@ -201,7 +201,7 @@ static int rps_sock_flow_sysctl(const struct ctl_table *table, int write,
- 			if (orig_sock_table) {
- 				static_branch_dec(&rps_needed);
- 				static_branch_dec(&rfs_needed);
--				kvfree_rcu_mightsleep(orig_sock_table);
-+				kvfree_rcu(orig_sock_table, rcu);
- 			}
- 		}
- 	}
-@@ -239,7 +239,7 @@ static int flow_limit_cpu_sysctl(const struct ctl_table *table, int write,
- 				     lockdep_is_held(&flow_limit_update_mutex));
- 			if (cur && !cpumask_test_cpu(i, mask)) {
- 				RCU_INIT_POINTER(sd->flow_limit, NULL);
--				kfree_rcu_mightsleep(cur);
-+				kfree_rcu(cur, rcu);
- 			} else if (!cur && cpumask_test_cpu(i, mask)) {
- 				cur = kzalloc_node(len, GFP_KERNEL,
- 						   cpu_to_node(i));
--- 
-2.49.0.504.g3bcea36a83-goog
+It wasn't merged it was 19th version and it worked and was tested, but not
+with the best development design. I have replied to you that I will do some
+change in v20 to address this.
+https://lore.kernel.org/all/20241113171443.697ac278@kmaincent-XPS-13-7390/
 
+It gets finally merged in v21.
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
