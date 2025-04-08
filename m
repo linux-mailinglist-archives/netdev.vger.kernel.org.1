@@ -1,95 +1,54 @@
-Return-Path: <netdev+bounces-180096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 260CBA7F92B
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 11:16:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A723A7F930
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 11:17:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A00E3B3BEE
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 09:16:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC39516E0B3
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 09:17:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E40D21ADC3;
-	Tue,  8 Apr 2025 09:16:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outer-limits.org header.i=@outer-limits.org header.b="YKdHt5h5";
-	dkim=permerror (0-bit key) header.d=outer-limits.org header.i=@outer-limits.org header.b="JbWIdq+j"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 631D0264A77;
+	Tue,  8 Apr 2025 09:17:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.50])
+Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9161264A77;
-	Tue,  8 Apr 2025 09:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744103768; cv=pass; b=kP2CgEKLRkbDX/yu8bfk9Fe0vwg2lvnaWWACE1cd9XSM50QKqn/l03jTiF8YF7qJKyAIE765knYromBcXnlopaBdTuY2/lqMLR/jUbK6a2ZQcl0CO1BtSjsMYfMSVoUqnSYTiisoFf9Kmci8hIkbfCBG4g6qyNQrPCTAmbjATUY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744103768; c=relaxed/simple;
-	bh=j06atkAE5GaJghbZbm7QfVldihTFSd3UlHN8BHnQW38=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=WphHL1CGpaMFEyzF7uJI2m3CPfSEkcMv7F88+aVVP53TXY5lGRiXldokRI8K2cfFxEQzjXpZ3pfr0hQaU3yqK3UP4d0siIzCe22n8HwzEc/mjLTBhdBqrwqO0yZMbWFxkq4EL/gqUnujaM8S0klkTF/ti5UCPlHEsAxSBZCLl2Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=outer-limits.org; spf=none smtp.mailfrom=outer-limits.org; dkim=pass (2048-bit key) header.d=outer-limits.org header.i=@outer-limits.org header.b=YKdHt5h5; dkim=permerror (0-bit key) header.d=outer-limits.org header.i=@outer-limits.org header.b=JbWIdq+j; arc=pass smtp.client-ip=85.215.255.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=outer-limits.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=outer-limits.org
-ARC-Seal: i=1; a=rsa-sha256; t=1744103756; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=Lnj/+Ab+BInSFoJPRhY8Ez4a8zIb2BsVZj0QOZzYZO4aGE+W+MWvcsaJNIFDn9DJ1R
-    d0SKg5NrMu3qW1hzBq2JltkhgeH2FrdRr2/aBGFPBkJlcXeShFnSi3fUa8gUTcE4qO6w
-    izhEFXSJ/rf+hrAaKY0lkrjRLberkAPU+vSUfrhhUQVOdhVuQGLuQ0cWh1Cf0A51kHhm
-    3ullM0pmWbYcnvIjSBqlihwGhpUOaCiJIQ3xW9lIe/0bEa0hbPeZ6FLsL9G6XhF9sXgC
-    KwFmqTCLogsfBDkfqE+vsCQpz/aFEIdc+VJ1YIGoIYJ0FIxi7Ij8rzIh13AKmcda4LUI
-    PITg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1744103756;
-    s=strato-dkim-0002; d=strato.com;
-    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=JH7bAes1a5f2oruGiUBDVJZHj7HNc2J4ERrWSVZgLYw=;
-    b=ox7qEDu9c+9pGu9ZFd9UA5D7mA/tDOb6yleh5Yb59PksyDFBKVEXZ4aMm4dTGuGtPW
-    /Bhh9hEB9Me2CSzYFYL3yko6p6IBtRXRed3+Vm6hqGtLwpIkbh/XXRSMHfARiE4uJhuj
-    KpijiiYIMwm7Orh7RZIP2k8t18M/ZAJColUgibootAOGrou6DSHY6LkqX7wm2XaUFyvJ
-    d+H5iDBYwUXLqIUo6ddWezW5i3Lg3gKZ4lg6drhVtFLRejThy5///rHxApmwY4LLNP8i
-    5lVqTIxeBZJ457HxEFmMnFXwhWQrLa7sYwN/WljdpNmkK5aAiTP5k+nkov9zB51lSbtz
-    gAWQ==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1744103756;
-    s=strato-dkim-0002; d=outer-limits.org;
-    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=JH7bAes1a5f2oruGiUBDVJZHj7HNc2J4ERrWSVZgLYw=;
-    b=YKdHt5h5KEWl9jZf78YV6NH1uPcqvkWqZcz5G2L2C4wdPzTBBvvNby1eZk58nEQJfX
-    r++2aLRB2+S/1QY9drnS9+BPuGDJRD/tIbjHmf7GXefHLc1yvDTAdEKdwO5R7ppb9Pdw
-    9njCFRYO/0+DYO7lSpN+JoDpJjbto+Vfr/mNgBxKvd7CeYehhNtsMx2M6Olhq9JXyqih
-    GndiRc2x6EcjhcJ8CblvNAlS44vluUTDLuXt0Gm/O5DS2nyCpy8gd9EdLtY6/erE6tRy
-    zkuuyXacc1aZUbwiRmAhgN2Xp5kXSPwMAjBd/N0p//UfqOwHptRPpChFxvyRDcZprciN
-    otXg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1744103756;
-    s=strato-dkim-0003; d=outer-limits.org;
-    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
-    bh=JH7bAes1a5f2oruGiUBDVJZHj7HNc2J4ERrWSVZgLYw=;
-    b=JbWIdq+ju8+whTyI81mm2OrXkaFXB3HKVsyuzhzMeQzOLqPJAjPbVG+NzZzuNLKe+W
-    yxJu69g/XSw45vLLPEDA==
-X-RZG-AUTH: ":JnkIfEGmW/AMJS6HttH4FbRVwc4dHlPLCp4e/IoHo8zEMMHAgwTfqBEHcVJSv9P5mRTGd2ImeA=="
-Received: from ws2104.lan.kalrayinc.com
-    by smtp.strato.de (RZmta 51.3.0 AUTH)
-    with ESMTPSA id J2b1101389FtX7t
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Tue, 8 Apr 2025 11:15:55 +0200 (CEST)
-From: Julian Vetter <julian@outer-limits.org>
-To: Arnd Bergmann <arnd@arndb.de>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Julian Vetter <julian@outer-limits.org>
-Subject: [PATCH] net: remove __get_unaligned_cpu32 from macvlan driver
-Date: Tue,  8 Apr 2025 11:15:48 +0200
-Message-Id: <20250408091548.2263911-1-julian@outer-limits.org>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA7EB264634
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 09:17:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744103835; cv=none; b=e7cO2Fg2Ib+vuqX53+QfyLGZOUCTObSekkDvjmk1kccoxTNNOutGvHumYYBSuPZySQin9uNRuGQk+tc+cZ3N26kwIQWNDKMdRegHIODzf37uGYZk9RcXRXr5wYyzBQVsLE2lc4SF5n9BB33pZ03RulDXs/klfO7t3+m2uxOUDx0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744103835; c=relaxed/simple;
+	bh=u2x+V+tPb4xDFZ7lkdGNS63PzEUZk98CNHeAjjEgmi8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cKzBfJzr4jlJWp1+2XZR/tOeBcYW4gNTYQ7VmMahfgOeG00zfeK4JJHCQXU+41GjCmkypHE+oDswg0QECPi4myoSgwyHwYGdoiHUI2ctLPx7D9RS0jYVvsg2G+PKCiIa1B0yJsD3L3vDBikVCxlIr0xll2mRFnduAF7aHg7/lgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=18.194.254.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
+X-QQ-mid: bizesmtpsz3t1744103791tdac832
+X-QQ-Originating-IP: MZ7Yog1ZCeopAavtt9NtFT5WKz+EnMA87pBdBzh6lwU=
+Received: from localhost.localdomain ( [183.159.168.74])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 08 Apr 2025 17:16:25 +0800 (CST)
+X-QQ-SSF: 0001000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 14428587978993665036
+EX-QQ-RecipientCnt: 7
+From: Mengyuan Lou <mengyuanlou@net-swift.com>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	horms@kernel.org,
+	jiawenwu@trustnetic.com,
+	duanqiangwen@net-swift.com,
+	linglingzhang@trustnetic.com,
+	Mengyuan Lou <mengyuanlou@net-swift.com>
+Subject: [PATCH net-next v10 0/6] add sriov support for wangxun NICs
+Date: Tue,  8 Apr 2025 17:15:50 +0800
+Message-ID: <341CBF68787F2620+20250408091556.9640-1-mengyuanlou@net-swift.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,30 +56,92 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="us-ascii"
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: OLsBWtCIHsg65JgQPeTenK5s3neg4gxe0aFTumUikPbT5recDoc+DLn0
+	igYcGNd1EX+OgQGiinMJHnp7T89JSyZVtx24RUYtaO/vyGyw3p4RBqKh4wS75hFq2jlRAyX
+	BFXyXSavPK7ofKYN3zM+GqlA2wotsf+6lkJfAxofbSDIxwKrhOVU8WnmHITNIGAt4OfWSGD
+	oBRoDXHYq2MYZbEphynF66bDW9gZCSAQHrQmgp6q6O2k1+T/TeO/jy+WnXlrtK8GKerDrB9
+	e4JEvrgr1iUoAdSC1yXE7WbojPK3Ic6LmFWcpo4/Um6mLJ5rjXLd0HNKsub2j2ih0oTRKqT
+	96K85cjvwT4alLRldrYBQHrkyVWS646c/n3u2Co4uYFPNUOykfi94dsOHCTxZ+KBKPasBRN
+	ZhSvvXJK/OqLa8k/TV1DP28CftOfcs2IlAs3o47e2b4WmvCL9/gYsIFqXwhhRY6LH1QqckU
+	P28UX7oUmr+QGgEIICTmm57IZuTrV4pDeCPMlsafj82uWJDLdWqaUebHQAyymzHQmlHS+gA
+	yO9Cwu4d5aif7GiZlIg/ImrNjax8NlfPIyXbQnKGMNKriJ/ayO5or76Kvnd+eoiQ+GskoCm
+	OlWFZTc4VXT7z69q/9TNKewXcJkmT2YdYY80i37oyvIrMPEBh5u9kAlhG+JxlhtuuXAyPod
+	QazGBhKx721dl/1GHHp9xnRVG/rS8sHqsef8ykGt4fItlFpHHlboYZ9QFz+3+4jhd43ZwZY
+	TViRHFyPbM+Vi5LcnIyymeb9sXqYvpl6KomPvK4RUfOHQoa1ETiOQ0V9Rbu7NCrDBmDSoJF
+	Tb7i41ZBEw2wyUIXU3qAfr4eojm3Ic9+xEpaxNQqoT92xYsaRdWCjC7tpbtR1N227Xx57IE
+	basBA5KIEagaXNdD1SX5j7zi2jpBjDuZLNyDGcC9eH4iRXlbya6By8sNskc5NJ963RNUhJO
+	EFgxvDuVVzbkV9WVD1Na7pUw7VbQ9XT/6LfM/mehuAvHMr5gWGfg7snnpGP6shs91FPVujD
+	xKoeDZXYu4XlduLGMasJyTO8RLpDDDTE421BvmXw==
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
+X-QQ-RECHKSPAM: 0
 
-The __get_unaligned_cpu32 function is deprecated. So, replace it with
-the more generic get_unaligned and just cast the input parameter.
+v10:
+- Rename the function name for handling ngbe interrupts to make it more readable.
+v9: https://lore.kernel.org/netdev/203E2DE385ACD88C+20250319073356.55085-1-mengyuanlou@net-swift.com/
+- Using FIELD_{GET,PREP} macros makes the code more readable.
+- Add support for the new mac_type aml in the configuration flow.
+v8: https://lore.kernel.org/netdev/20250309154252.79234-1-mengyuanlou@net-swift.com/
+- Request a separate processing function when ngbe num_vfs is equal to 7.
+- Add the comment explains why pf needs to reuse interrupt 0 when the ngbe
+num_vfs equals 7.
+- Remove some useless api version checks because vf will not send commands
+higher than its own api version.
+- Fix some code syntax and logic errors.
+v7: https://lore.kernel.org/netdev/20250206103750.36064-1-mengyuanlou@net-swift.com/
+- Use pci_sriov_set_totalvfs instead of checking the limit manually.
+v6: https://lore.kernel.org/netdev/20250110102705.21846-1-mengyuanlou@net-swift.com/
+- Remove devlink allocation and PF/VF devlink port creation in these patches.
+v5: https://lore.kernel.org/netdev/598334BC407FB6F6+20240804124841.71177-1-mengyuanlou@net-swift.com/
+- Add devlink allocation which will be used to add uAPI.
+- Remove unused EXPORT_SYMBOL.
+- Unify some functions return styles in patch 1/4.
+- Make the code line less than 80 columns.
+v4: https://lore.kernel.org/netdev/3601E5DE87D2BC4F+20240604155850.51983-1-mengyuanlou@net-swift.com/
+- Move wx_ping_vf to patch 6.
+- Modify return section format in Kernel docs.
+v3: https://lore.kernel.org/netdev/587FAB7876D85676+20240415110225.75132-1-mengyuanlou@net-swift.com/
+- Do not accept any new implementations of the old SR-IOV API.
+- So remove ndo_vf_xxx in these patches. Switch mode ops will be added
+- in vf driver which will be submitted later.
+v2: https://lore.kernel.org/netdev/EF19E603F7CCA7B9+20240403092714.3027-1-mengyuanlou@net-swift.com/
+- Fix some used uninitialised.
+- Use poll + yield with delay instead of busy poll of 10 times in mbx_lock obtain.
+- Split msg_task and flow into separate patches.
+v1: https://lore.kernel.org/netdev/DA3033FE3CCBBB84+20240307095755.7130-1-mengyuanlou@net-swift.com/
 
-Signed-off-by: Julian Vetter <julian@outer-limits.org>
----
- drivers/net/macvlan.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Mengyuan Lou (6):
+  net: libwx: Add mailbox api for wangxun pf drivers
+  net: libwx: Add sriov api for wangxun nics
+  net: libwx: Redesign flow when sriov is enabled
+  net: libwx: Add msg task func
+  net: ngbe: add sriov function support
+  net: txgbe: add sriov function support
 
-diff --git a/drivers/net/macvlan.c b/drivers/net/macvlan.c
-index d0dfa6bca6cc..7045b1d58754 100644
---- a/drivers/net/macvlan.c
-+++ b/drivers/net/macvlan.c
-@@ -254,7 +254,7 @@ static u32 macvlan_hash_mix(const struct macvlan_dev *vlan)
- static unsigned int mc_hash(const struct macvlan_dev *vlan,
- 			    const unsigned char *addr)
- {
--	u32 val = __get_unaligned_cpu32(addr + 2);
-+	u32 val = get_unaligned((u32 *)(addr + 2));
- 
- 	val ^= macvlan_hash_mix(vlan);
- 	return hash_32(val, MACVLAN_MC_FILTER_BITS);
+ drivers/net/ethernet/wangxun/libwx/Makefile   |   2 +-
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    | 302 +++++-
+ drivers/net/ethernet/wangxun/libwx/wx_hw.h    |   4 +
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   | 128 ++-
+ drivers/net/ethernet/wangxun/libwx/wx_mbx.c   | 176 ++++
+ drivers/net/ethernet/wangxun/libwx/wx_mbx.h   |  77 ++
+ drivers/net/ethernet/wangxun/libwx/wx_sriov.c | 909 ++++++++++++++++++
+ drivers/net/ethernet/wangxun/libwx/wx_sriov.h |  18 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  93 +-
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  93 +-
+ drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c |   5 +
+ drivers/net/ethernet/wangxun/ngbe/ngbe_type.h |   3 +
+ .../net/ethernet/wangxun/txgbe/txgbe_irq.c    |  21 +-
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  27 +
+ .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |   6 +
+ .../net/ethernet/wangxun/txgbe/txgbe_type.h   |   7 +-
+ 16 files changed, 1837 insertions(+), 34 deletions(-)
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_mbx.c
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_mbx.h
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_sriov.c
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_sriov.h
+
 -- 
-2.34.1
+2.48.1
 
 
