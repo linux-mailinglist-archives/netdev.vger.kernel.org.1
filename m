@@ -1,52 +1,62 @@
-Return-Path: <netdev+bounces-180397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7662A8133E
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 19:08:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 611B0A81347
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 19:12:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46FFE8A0BAC
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 17:08:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE88E8A0F69
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 17:12:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A42D22F38E;
-	Tue,  8 Apr 2025 17:08:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4670322FF4D;
+	Tue,  8 Apr 2025 17:12:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WN85ll5G"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Thl8a6CF"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9C0191F79;
-	Tue,  8 Apr 2025 17:08:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14669191F79;
+	Tue,  8 Apr 2025 17:12:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744132103; cv=none; b=Fk1g3qDG0eUPiE4VzcEt1BKqQWrWo3LCBT2qUSEl+z79/py1VZiE47FOs+6yRouMCbHPwVV70os3cg58Tiu/M18rKcpCTzfxIZ/14/DMETOQVGn8WrgYPmeGsPVV7+VfuOVU6ziUGZLmfSlKc1letu3c1gFI1kwWHQwnWwvdS8s=
+	t=1744132334; cv=none; b=WHSrdq5eTW33GI95FF5vFiA+oHVk+AyWLqCBiWmf2wp9ekc7Rvu+lFE7STxpHIPj/5CQ51vn0d7BWJmMlGwHsir1FAh0BJ5wKiZRTVTx1sNn5GNFpiTLmkRlfatH4Q2QYAfdkHWdq0n+wAxuNp5du4qIIZcRfwVKKwqlbcBfRsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744132103; c=relaxed/simple;
-	bh=ISpJuPdPfR789eM2c+XnQY2Ua5fwbfPzALomy5gPpfc=;
+	s=arc-20240116; t=1744132334; c=relaxed/simple;
+	bh=yKY5XLQEaqSJSV4gfh0aXW5Po1rHXUMEGztGRA/gdT4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E/yWBwtX9F0roosrXNV5U2J0VKF6+Ea9HOZ+MLcmZMBOxUN9huU+ehWvVYHBaLQCat9yNDV5+HEEPOHEgxF8VLLO5NTsQnT0yEPp2QYQ0j3zkMjmew1BMj2zKE3PVi7wytMP32dcNwfxrHwjppCYrUvVTcud1NG0q7l5//iGp1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WN85ll5G; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=m6Zahi0sarElgNiROhFmUN7IZ3Qj0JsjaKqp3OqQl2s=; b=WN85ll5GnP8jm4E5CPBNiYzgcw
-	Nv//yxrxKFc0F5lxcSLQv23LrGyGOuzPv5ortcl1X5SXrJtaoEfCjwvmA5DWY81euYVe2P5nvI/Ph
-	Frgbh6motOShBQOA+igX6ZZT+N3HCHRS6g4pOeTuLjHYsbBka1YP1pNeP3D27uZ+Hymo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u2CQb-008QXY-97; Tue, 08 Apr 2025 19:08:01 +0200
-Date: Tue, 8 Apr 2025 19:08:01 +0200
-From: Andrew Lunn <andrew@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=hg1G6GDclFXuHo+cGz26DMo8UW14WPWNaQ2WgExF4s2qcAmM405gFnCl+HPsBT1Wv5VqdN/xmePe/TqrUuEWj9Ykb/Ydcd5VECFFb6pNSF0e8t23lYvRFfCJ4ybLbCLD3I2tbwlTOoikszFOOoIgRTTgrCX28o4J5XPtu2BojDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Thl8a6CF; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=WgUBUMAXSrDiu5o1PcM1WV7OFPo/LLnKaP5zQX3z7uw=; b=Thl8a6CF3918v/aF9zFB5adZio
+	Upx9kX6X2TGqbZOlrrEmkO6BbcUr7dWBRiNlWgiawdpfa923pKwRYHCSWWHEOXSnvQzq3WbQ6qSfD
+	GbagT2QFnh+i6cS1cElBnPsHV+rxjX4co/eLCmZmiITUij6kOEb8tMF4A6KfDNjjCX3NHGe2wk9wV
+	SuGf+tir2ovNEk+zEAdnPMc5joE/htmKH+7pzMEy/idMRyMuxfim2+bczBiG+JbFlpVC563IsYWT/
+	yWyJuUgJa1xG0GJTiiW7BvtMLMJPLJZOIf/rHLH05LG3NwfsWYakW1RriNeVVjPEAXUOLgBNJbQOL
+	jLkBJ4cg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36344)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u2CUH-0007o5-37;
+	Tue, 08 Apr 2025 18:11:50 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u2CUB-0001bM-2D;
+	Tue, 08 Apr 2025 18:11:43 +0100
+Date: Tue, 8 Apr 2025 18:11:43 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
 To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
@@ -62,7 +72,7 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	linux-mediatek@lists.infradead.or
 Subject: Re: [net-next PATCH 2/2] net: phy: mediatek: add Airoha PHY ID to
  SoC driver
-Message-ID: <7e60d851-1b70-4084-a63f-c8ff7bf81425@lunn.ch>
+Message-ID: <Z_VYz6InC1p4vwku@shell.armlinux.org.uk>
 References: <20250408155321.613868-1-ansuelsmth@gmail.com>
  <20250408155321.613868-2-ansuelsmth@gmail.com>
 Precedence: bulk
@@ -74,19 +84,32 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20250408155321.613868-2-ansuelsmth@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
 On Tue, Apr 08, 2025 at 05:53:14PM +0200, Christian Marangi wrote:
-> Airoha AN7581 SoC ship with a Switch based on the MT753x Switch embedded
-> in other SoC like the MT7581 and the MT7988. Similar to these they
-> require configuring some pin to enable LED PHYs.
-> 
-> Add support for the PHY ID for the Airoha embedded Switch and define a
-> simple probe function to toggle these pins. Also fill the LED functions
-> and add dedicated function to define LED polarity.
-> 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+>  config MEDIATEK_GE_SOC_PHY
+>  	tristate "MediaTek SoC Ethernet PHYs"
+> -	depends on (ARM64 && ARCH_MEDIATEK) || COMPILE_TEST
+> -	depends on NVMEM_MTK_EFUSE || COMPILE_TEST
+> +	depends on (ARM64 && (ARCH_MEDIATEK || ARCH_AIROHA)) || COMPILE_TEST
+> +	depends on (ARCH_MEDIATEK && NVMEM_MTK_EFUSE) || ARCH_AIROHA || COMPILE_TEST
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+So...
+COMPILE_TEST	ARM64	ARCH_AIROHA	ARCH_MEDIATEK	NVMEM_MTK_EFUSE	result
+N		N	x		x		x		N
+N		Y	N		N		x		N
+N		Y	N		Y		N		N
+N		Y	N		Y		Y		Y
+N		Y	Y		x		x		Y
+Y		x	x		x		x		Y
 
-    Andrew
+Hence this simplifies to:
+
+	depends on ARM64 || COMPILE_TEST
+	depends on ARCH_AIROHA || (ARCH_MEDIATEK && NVMEM_MTK_EFUSE) || \
+		   COMPILE_TEST
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
