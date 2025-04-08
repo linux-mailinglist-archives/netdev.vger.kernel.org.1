@@ -1,116 +1,110 @@
-Return-Path: <netdev+bounces-180026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB90CA7F29C
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 04:20:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D171BA7F2A5
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 04:28:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EE3A177021
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 02:20:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA3AF1897556
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 02:28:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A36A5192B86;
-	Tue,  8 Apr 2025 02:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D8F199FC5;
+	Tue,  8 Apr 2025 02:28:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NFCY8Y1d"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="klz8euvx"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D76E4A21
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 02:20:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E7A1DA23
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 02:28:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744078835; cv=none; b=ooXHPVwREZsvAMM7o/tQZJzzs7u3xlt4Ln2P9D4h8txT13HRhv2fNEub3hwPQ8OQbwE03hwe3s0eHzET9K388J3A19Zb+WzJ26N7RpLT8AZjK0wnRG6kESvb6OBGw3b7Ru8JYLOOip2TgFF/c4Qk7duyvaCa9ILaQWMY23htUYo=
+	t=1744079295; cv=none; b=pbb8YMDXdvRj2WBFxfba5FxIhZ81I+9oKpW1/adF+A8irHG5aMkZ4d8d1/UOE+n13Ixy5ivnHrcgabb9+606l2kAIU5VoagNzshEDX8KRH3ZfUyuRUqFbWqXSOL8Z//mbCKFWlmnWh7WKtmZryoazGnc0yiTHX41inj5JxN3P1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744078835; c=relaxed/simple;
-	bh=fcsXNAqVONFErcWct0p5f6TRoJic4GOHW8vfQwN5c3E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cSUnKrITTx+6m1hn0AAV2YkhDm1AxumfsHMwDACuMNrbzQjbZIzigIIOB6xxZr1W9YmbfjAtRznYm29KwFwP4EC+GTxb/lIJSin9MEw5SOT+uPjgAIBNYJ6gNOtjkYLZlzjbWdVKsZC21osz6Qn+SKP36trQa0cjpJEawR/WlW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NFCY8Y1d; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <6c463f96-18e7-4ee9-ba74-524772e008b4@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744078831;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mTadr6hlfyyWPFYhpnPzSUF00n3EJeBKU1nvkMa6B0k=;
-	b=NFCY8Y1dz+KkzOURdbfKAdoFb/kvpmtBEKKkSOhVv/lWdHckn8yhFGmrio62gou0llqR8F
-	nNZD1lvurUHtiBwoPdFh/RlO6qSkOpkSk5gefPoSfRzaI+AeVRMMhHIT7oRWeoYo60qlDp
-	8oNKKm8SHQ1AtqnSrzpKmESCeexcwSU=
-Date: Tue, 8 Apr 2025 10:19:39 +0800
+	s=arc-20240116; t=1744079295; c=relaxed/simple;
+	bh=LOcXy+TslI7xuCm1TJ3wgkZjOYWF/BVhXU5AXZs8/zc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=puPj5ty58Z5fjiVUxEp/BF22oqJFjRGyLRtoOlEIYNL+p+JcGWnsWPFrurQi+rMWWC+8hfkFC8PvU3zG7zxJ7+SVIA2boFHpw9W77qArUNLSJkXLIburdYoYxXB6IIdDEC93s/X5EeKa31z1EjxFMHRpRoy5UzEcI9E7WE/dGyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=klz8euvx; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-739b3fe7ce8so4266482b3a.0
+        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 19:28:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1744079293; x=1744684093; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Khx8xQqGqwLsCVp5u4Rdlaoz4edeU6/N3QDOrUtLDLs=;
+        b=klz8euvxIpQpjsy/AYYmP2lksr1+Nv70OxdZgOLkzflnVfFZIWg2l15RocDtI7zdtj
+         2FO4jV6CzWBUwx4sJjM9U72vsjragb5efVQTPa6/vlbbV+dn+NdEl8Jf98IMbF0qZ8+u
+         hzGnHL6FchfCWM82fPvBe3/vrv/BTkJxlCgCQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744079293; x=1744684093;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Khx8xQqGqwLsCVp5u4Rdlaoz4edeU6/N3QDOrUtLDLs=;
+        b=fjGLYzCOtTlYC1RDXpv9G4c9k4oBtOQCZK9DkMVhS/ajtNO402ijc6rCblP59hp6vY
+         PouFnLDP4VOHGJRdxQXs8ktS4FmaQCtpl2eVACZsc19rEcGJkpzWmMQDjPEm8bYpvG6o
+         yMfmAlo7pASy0ZxdUrP575EGdlXh9Ets1qL9mgRu6+ZwUHUqE1G1OCU/+FBm0sPujGfp
+         4REVb+hOSzX51CS9p3rTo1XAviBno8Ml6IRJ/VvrSV+75EWjnP3dR8Sf0SfzKvofVZr7
+         oi4r1jC8NnEcNGbVl/ccMKzX7U+/21VKeUgW9tqBJYPFsSwFUHoc4crkGTm6qk4zR2aF
+         1pmg==
+X-Forwarded-Encrypted: i=1; AJvYcCWFbblA/auFcBhpf2wJtxIu/kZyHu2NnoCV1QA+AIdImkAoSJZZ5DhLTbry5ntdCyJ8Gwj44RQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuqYuApJbjbjivS3rLpgt1xh8Fu8+4UvZ8a6fR3lZbgZTgTmRQ
+	gR98x7ZrF1wWAKCzAreDAQxkpeSuijKk/bne8Oe8ieWDQLST58p09r43JBf1ii0=
+X-Gm-Gg: ASbGncuZcraXDNCIf7XlL4qEZX7e2kI55GXuVL4mAkyiwXoAqpKnqUWsYonpETvCdkf
+	nNSJlGYhebMUf2RbZH9V/MQF0ztdrMS8hyurdDCkwXtNhaD6i/ae/WT3hH5FgdVdnZmjl8gEDpo
+	6n2ZRIqnM2y+87Wo0VEBzKVZi+cUBt3LorawVhiMdo164Ix/QNJ5lOXnTCNUC9G4+qR0j7LSVdw
+	tpQq/YqCKnF+HqZDxlGs4gRRlA3ax9Ncsu4W1f8v9yeWdlVO8TFcUvUY1iPjntZlKMrk6RU9lkf
+	88ARuMdPXqXj07zje1yFDmXqCZpEGFBDAScVBPTyC6Mz53Dqs1Y3Nq1IEwwBkTlbhHo7q0t1Krn
+	90WR4qh2wr58=
+X-Google-Smtp-Source: AGHT+IFkTkfSS7nzcnvAMunAOXjuvXeAUPtSjtBgUjWPloju4C0SHQ8XMPY4EouBrDQRrBOtu8YxQg==
+X-Received: by 2002:a05:6a21:338b:b0:1fe:90c5:7cfb with SMTP id adf61e73a8af0-20113d27956mr15129094637.27.1744079293233;
+        Mon, 07 Apr 2025 19:28:13 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-739d97f3708sm9533813b3a.62.2025.04.07.19.28.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Apr 2025 19:28:12 -0700 (PDT)
+Date: Mon, 7 Apr 2025 19:28:10 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	sdf@fomichev.me, hramamurthy@google.com, kuniyu@amazon.com
+Subject: Re: [PATCH net-next 4/8] netdev: don't hold rtnl_lock over nl queue
+ info get when possible
+Message-ID: <Z_SJupHRfAAGLe-P@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me,
+	hramamurthy@google.com, kuniyu@amazon.com
+References: <20250407190117.16528-1-kuba@kernel.org>
+ <20250407190117.16528-5-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH iwl-net v2] ice: Check VF VSI Pointer Value in
- ice_vc_add_fdir_fltr()
-To: Simon Horman <horms@kernel.org>
-Cc: przemyslaw.kitszel@intel.com, anthony.l.nguyen@intel.com,
- davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-References: <20250325020149.2041648-1-xuanqiang.luo@linux.dev>
- <20250407140242.GK395307@horms.kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: luoxuanqiang <xuanqiang.luo@linux.dev>
-In-Reply-To: <20250407140242.GK395307@horms.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250407190117.16528-5-kuba@kernel.org>
 
+On Mon, Apr 07, 2025 at 12:01:13PM -0700, Jakub Kicinski wrote:
+> Netdev queue dump accesses: NAPI, memory providers, XSk pointers.
+> All three are "ops protected" now, switch to the op compat locking.
+> rtnl lock does not have to be taken for "ops locked" devices.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  net/core/netdev-genl.c | 18 +++++++-----------
+>  1 file changed, 7 insertions(+), 11 deletions(-)
 
-在 2025/4/7 22:02, Simon Horman 写道:
-> On Tue, Mar 25, 2025 at 10:01:49AM +0800, Xuanqiang Luo wrote:
->> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
->>
->> As mentioned in the commit baeb705fd6a7 ("ice: always check VF VSI
->> pointer values"), we need to perform a null pointer check on the return
->> value of ice_get_vf_vsi() before using it.
->>
->> v2: Add "iwl-net" to the subject and modify the name format.
->>
->> Fixes: 6ebbe97a4881 ("ice: Add a per-VF limit on number of FDIR filters")
->> Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
-> Reviewed-by: Simon Horman <horms@kernel.org>
->
->> ---
->>   drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c | 6 ++++++
->>   1 file changed, 6 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c b/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
->> index 14e3f0f89c78..53bad68e3f38 100644
->> --- a/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
->> +++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
->> @@ -2092,6 +2092,12 @@ int ice_vc_add_fdir_fltr(struct ice_vf *vf, u8 *msg)
->>   	dev = ice_pf_to_dev(pf);
->>   	vf_vsi = ice_get_vf_vsi(vf);
->>   
-> nit, but not need to repost because of this: it's seems nicer
-> not to have not to have a blank line here. And instead, if one is
-> really wanted, put it above the ice_get_vf_vsi() line.
->
-Thank you for the reminder. I will take this into consideration when
-submitting other patches next time. Since vf_vsi and its judgment logic
-are logically adjacent, it's better not to separate them with blank
-lines.
-
->> +	if (!vf_vsi) {
->> +		dev_err(dev, "Can not get FDIR vf_vsi for VF %u\n", vf->vf_id);
->> +		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
->> +		goto err_exit;
->> +	}
->> +
->>   #define ICE_VF_MAX_FDIR_FILTERS	128
->>   	if (!ice_fdir_num_avail_fltr(&pf->hw, vf_vsi) ||
->>   	    vf->fdir.fdir_fltr_cnt_total >= ICE_VF_MAX_FDIR_FILTERS) {
->> -- 
->> 2.27.0
->>
->>
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
