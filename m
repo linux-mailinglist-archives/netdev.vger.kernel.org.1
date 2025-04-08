@@ -1,309 +1,182 @@
-Return-Path: <netdev+bounces-180294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B95AA80E1F
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 16:34:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2226EA80E20
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 16:34:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64C9B4C14F6
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 14:30:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 688654E2FB9
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 14:30:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ACC622D791;
-	Tue,  8 Apr 2025 14:28:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ms25FViM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E050C224887;
+	Tue,  8 Apr 2025 14:28:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68CAD22D783;
-	Tue,  8 Apr 2025 14:28:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2332122D783
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 14:28:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744122511; cv=none; b=jktewyA4SxG03rLl/SmqeZRbCJulUnp3Qq0nOWeYj6x9Gnx2yJ0wcpJqrdLCiM3Eb1Ghv2w4timnsmsaFxU9QE3o3C6qNsdBiUvTPP20tHtARe2gHmciRh6Ga7FKHpB2zopkIi71H432o1IWh1EB1jR7n8NnykYxbC7Z1dzL1TY=
+	t=1744122514; cv=none; b=qkrw6WoBHLzoP2wJIq9CYGQPzucMR8UXKaxZSaL6KlMAAvVos6aIisMgvSUW+ChMHPbdr1X8+hPf/iiMSBWSjeoTBlzmOUgNxgKhA2dTFffHFXHjzI1xjURzULZzCQMPgOyIKzHc5jztpt5ld6hryoVMIUArDEoZfQRW7RUWNBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744122511; c=relaxed/simple;
-	bh=lky3FcPJjN9450c9thmKPQGaNXBjMLxRGG5xD/B9cRA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VGbzKTY3EJQ8sY4a2jjLWP0oY7eipNpHKU4549/bexlOMTPR7959QoKCkNuf+AhrQVWybmi2xBgLeOyx0Suyxb2ifljuOWGYuLOHrIHTtixzJd/7IOuoslZ1AJ7vrfecWKyhwhy7dn3lvlUfPoS6dKuetWD/tlbDjPG7dKPgi5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ms25FViM; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5e6f4b3ebe5so9692566a12.0;
-        Tue, 08 Apr 2025 07:28:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744122508; x=1744727308; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AiIIzC2ENJ2s1K+DNkI8Yhy3iA1yTay52KJr2KclWBQ=;
-        b=Ms25FViM4or9+jGt+4XjYoSr2f6NiYJN+tEBVUq8GNZtMjFQbeaEEPkIKQQmTdXFf7
-         K8cT6WFYq8qM+HdvQFt/IYhNUYkZ0pxGACKU62R+AA4oWsufAsB6NFtqaMrtpFHJs100
-         OIN1/gBsay2GhFtsPKnQ943nU8ebjuUU7Yagmoo5mCyLb+kFP6uHsbIn511T9cADCZAb
-         +PPn9PUDsQJYB4VLlTvXwlyAVdJdP6aawexKyWVNhXtif++XlyB52VgO+hjsfH2XdEf+
-         7ZAAjUIXdJPi0zH1dxqRVq3hl5nM3d1FNHs+prJSMYK8ViAPZamb8APghMMBvXLfDWJx
-         //VA==
+	s=arc-20240116; t=1744122514; c=relaxed/simple;
+	bh=398S5M/+3ThGLSGVOv9sf6n6Yy7e5m97YGbR95ICRxk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=QciJy1uIgLtpiVpQs3DwYJvigQKyb2yMDGkRL054SHkI1irZgvFBgg2y/VgUdSVCfjttto13PGLPi8CtueGtIM9kMm2epFXk2nkkpwVWaPNORo1BckhlynmEm+5WKpCjhOdNhm/SMhXJ4/PfOzK7OhhhGq6it2HgWTUJCVi4DvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3d585d76b79so51291465ab.1
+        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 07:28:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744122508; x=1744727308;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AiIIzC2ENJ2s1K+DNkI8Yhy3iA1yTay52KJr2KclWBQ=;
-        b=qiDJRoa63E3Mvricr7Eayka0s3i2A83hXCD70s7FwrBrp6nMKff4Au3chC10MlKvvO
-         s1cQOVwY2+xgf2UdMeB8sJUMSruF51m1iWNM5RH1oD8eLgKr9mpwW6+Fx6tS+h2x72ug
-         On03T2HvvyOoDOtShz0yUI3beFuFCo+LhM9nD62llQGegvv3pSsdiPp3Zw4v6hpjYvXn
-         nZnXeo0+Re2SgVOJ839rjzuNSY13apJM5dI7vMrQhsIFmtZrnl5puayGCobBilK2Aybz
-         vcJL8Ys03Y+SUp0NIcyYhZqL55j/443U/PYrf4+Hplt6bBA8Qpbt2EyaL9Qi8m8fRbp7
-         HaGw==
-X-Forwarded-Encrypted: i=1; AJvYcCWnPJ4+zRvUMK54KUoTmi61ghEGVz5AQAmBMXTrEN8MTHme/CWAhy6djpiVRj/KtI0MF8o7BDwISp+kuz1m3xk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKVmbdrIwHMQKrvDyv/IA+laq+bzlPC6+Q2f9PvELGp1RXRKoM
-	oUMrsoerZMiH3zJ1yE8CcyAZ1TQwQNDhzc3M/AMKWoIk1Ipjduyt
-X-Gm-Gg: ASbGncu5+ZEfDYe+lAAYq1/VZf1xmvGWXOesnyAqKe3JpPRrWkTEkGEb7KKEIt1d1kA
-	iojWTTmAbqWJ4FNCF0ujqf9X7ERit9GjFArQsIwUJVrOinym/AGEdpDOWhSiMdrycHyIsnVqioO
-	nulWblXlKOxLiereTIU9hkF6dexYkFxDADvH8ol2pJox+zNUGhms4EkyFnh4pL9gBEp2Nza2nz9
-	Czb7rzV3bRbkYf24Jx0I7t71TAZ0tjeN7Hj9Qu+3p5S2kzf6sabnB8LuPuz6lHVzMl/bOdPoauz
-	FYwwe34mV0i3+HkmjOI7dGg3IpQvte0DVE7uYEyJovR8O/dukPMPwE0cEAJTRoc7GYx4Nn1BEY2
-	8ituIf9kGGl1d+VyTcP5e/iwcZKT/0QRr/XpqaheGTSMyHZzwaz+y9GsVC1pzS5KquP6Vr8ETbQ
-	==
-X-Google-Smtp-Source: AGHT+IECIEK0QmJOe0Z95DwXG6+lr5tNjP8GBD5Ogpg0Jfp+vB59Ktc7EyTs4eXPmXmqvPDk2cwD7A==
-X-Received: by 2002:a05:6402:2351:b0:5ed:1262:c607 with SMTP id 4fb4d7f45d1cf-5f0b471a89bmr14334221a12.31.1744122507692;
-        Tue, 08 Apr 2025 07:28:27 -0700 (PDT)
-Received: from localhost.localdomain (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f1549b3fd0sm2236164a12.35.2025.04.08.07.28.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Apr 2025 07:28:25 -0700 (PDT)
-From: Eric Woudstra <ericwouds@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	bridge@lists.linux.dev,
-	Eric Woudstra <ericwouds@gmail.com>
-Subject: [PATCH v11 nf-next 6/6] netfilter: nft_flow_offload: Add bridgeflow to nft_flow_offload_eval()
-Date: Tue,  8 Apr 2025 16:28:02 +0200
-Message-ID: <20250408142802.96101-7-ericwouds@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250408142802.96101-1-ericwouds@gmail.com>
-References: <20250408142802.96101-1-ericwouds@gmail.com>
+        d=1e100.net; s=20230601; t=1744122512; x=1744727312;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JtXuRvcX8C77E5Akswrn1Sl1bpeVKHQo/mJn8kenfR4=;
+        b=AyrQXOLNNP+BDAF46N9A6IKafpH4YcKewt2Xs8Ire1cBQv9YztjvlrBKodI7xu4hL9
+         iR529PnWZ9brdUr7kg6jULg92ohAqbaJcoHVtyfMTGHRj/bIipX3/nyILkxua1JJgLCg
+         FchrImPYwuplxDGXnH7i4IP5F90K6pse9JoQ+SQcGVoR7ySaiVsyrR6z19B0JG+NjgWF
+         LTYxswaE3CaGI7zEdCv1NCaKiyq2Eg7ur+GuFkH3kzq9+MSU4OdF2K9Rfv+fQ0S6t4dD
+         prVnpCS7km2SauWfhqPDNyIZX5Xr3sAHhubUe3pcFYR0Sh3HBiPCATcHLVomOjsP2omO
+         oRbg==
+X-Forwarded-Encrypted: i=1; AJvYcCUqj7p6p0JR+IvZDWMrBI4wTnFTRjiFQnKEhzqGqVB/Vj4qeOrYOghYeE71kbrbuqetXZbjqMU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwscOPMDRYTdQ7YsepEVl0C9yWsAxA+Ms5LMju82R/6OBaVsGab
+	lDf+dSgPaXO/6v5oBjXjsrZWYhyR9+8RtekS4pqvsYZsOSloT0lSMW0qyuTN0yiKnK7kMrlLXID
+	QNWh9hTJhKM+28cFZ7mOQcB6K2SpKQ+CBUX1aO5XpLcQiMSH4g5+uJwQ=
+X-Google-Smtp-Source: AGHT+IFoNpkB/lUnW65pvReYWeDk3+ygf0bApzJMpVPK3YVFmTw/cJxZBHNxhyG9I4g7Z/wiJrhExlo/bMXbwABgnE355CrZyIPx
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:b4e:b0:3d5:bdac:c927 with SMTP id
+ e9e14a558f8ab-3d6ec57ba36mr134066825ab.18.1744122512215; Tue, 08 Apr 2025
+ 07:28:32 -0700 (PDT)
+Date: Tue, 08 Apr 2025 07:28:32 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67f53290.050a0220.12542b.0000.GAE@google.com>
+Subject: [syzbot] [net?] KMSAN: uninit-value in __vxlan_find_mac (2)
+From: syzbot <syzbot+30db32094d453eb54941@syzkaller.appspotmail.com>
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Edit nft_flow_offload_eval() to make it possible to handle a flowtable of
-the nft bridge family.
+Hello,
 
-Use nft_flow_offload_bridge_init() to fill the flow tuples. It uses
-nft_dev_fill_bridge_path() in each direction.
+syzbot found the following issue on:
 
-Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+HEAD commit:    92b71befc349 Merge tag 'objtool-urgent-2025-04-01' of git:..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11cdcfb0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a4ff50689306e9bc
+dashboard link: https://syzkaller.appspot.com/bug?extid=30db32094d453eb54941
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: i386
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/3f382dc1af56/disk-92b71bef.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/f4e92ae0388c/vmlinux-92b71bef.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/bf44161687ac/bzImage-92b71bef.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+30db32094d453eb54941@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in __vxlan_find_mac+0x49a/0x4f0 drivers/net/vxlan/vxlan_core.c:-1
+ __vxlan_find_mac+0x49a/0x4f0 drivers/net/vxlan/vxlan_core.c:-1
+ vxlan_find_mac drivers/net/vxlan/vxlan_core.c:437 [inline]
+ vxlan_xmit+0x174c/0x3e40 drivers/net/vxlan/vxlan_core.c:2785
+ __netdev_start_xmit include/linux/netdevice.h:5201 [inline]
+ netdev_start_xmit include/linux/netdevice.h:5210 [inline]
+ xmit_one net/core/dev.c:3780 [inline]
+ dev_hard_start_xmit+0x296/0xa40 net/core/dev.c:3796
+ __dev_queue_xmit+0x3679/0x57e0 net/core/dev.c:4633
+ dev_queue_xmit include/linux/netdevice.h:3350 [inline]
+ __bpf_tx_skb net/core/filter.c:2135 [inline]
+ __bpf_redirect_common net/core/filter.c:2179 [inline]
+ __bpf_redirect+0x1514/0x1690 net/core/filter.c:2186
+ ____bpf_clone_redirect net/core/filter.c:2460 [inline]
+ bpf_clone_redirect+0x37f/0x500 net/core/filter.c:2430
+ ___bpf_prog_run+0x12fd/0xf0b0 kernel/bpf/core.c:2018
+ __bpf_prog_run512+0xc5/0xf0 kernel/bpf/core.c:2313
+ bpf_dispatcher_nop_func include/linux/bpf.h:1316 [inline]
+ __bpf_prog_run include/linux/filter.h:718 [inline]
+ bpf_prog_run include/linux/filter.h:725 [inline]
+ bpf_test_run+0x546/0xd20 net/bpf/test_run.c:434
+ bpf_prog_test_run_skb+0x1906/0x25b0 net/bpf/test_run.c:1093
+ bpf_prog_test_run+0x5e5/0xa30 kernel/bpf/syscall.c:4427
+ __sys_bpf+0x6ce/0xdf0 kernel/bpf/syscall.c:5852
+ __do_sys_bpf kernel/bpf/syscall.c:5941 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5939 [inline]
+ __ia32_sys_bpf+0xa0/0xe0 kernel/bpf/syscall.c:5939
+ ia32_sys_call+0x2126/0x41f0 arch/x86/include/generated/asm/syscalls_32.h:358
+ do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
+ __do_fast_syscall_32+0xb0/0x110 arch/x86/entry/syscall_32.c:306
+ do_fast_syscall_32+0x38/0x80 arch/x86/entry/syscall_32.c:331
+ do_SYSENTER_32+0x1f/0x30 arch/x86/entry/syscall_32.c:369
+ entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4157 [inline]
+ slab_alloc_node mm/slub.c:4200 [inline]
+ kmem_cache_alloc_node_noprof+0x921/0xe10 mm/slub.c:4252
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:577
+ pskb_expand_head+0x21f/0x1c10 net/core/skbuff.c:2247
+ skb_ensure_writable+0x496/0x520 net/core/skbuff.c:6241
+ __bpf_try_make_writable net/core/filter.c:1665 [inline]
+ bpf_try_make_writable net/core/filter.c:1671 [inline]
+ bpf_try_make_head_writable net/core/filter.c:1679 [inline]
+ ____bpf_clone_redirect net/core/filter.c:2454 [inline]
+ bpf_clone_redirect+0x1c5/0x500 net/core/filter.c:2430
+ ___bpf_prog_run+0x12fd/0xf0b0 kernel/bpf/core.c:2018
+ __bpf_prog_run512+0xc5/0xf0 kernel/bpf/core.c:2313
+ bpf_dispatcher_nop_func include/linux/bpf.h:1316 [inline]
+ __bpf_prog_run include/linux/filter.h:718 [inline]
+ bpf_prog_run include/linux/filter.h:725 [inline]
+ bpf_test_run+0x546/0xd20 net/bpf/test_run.c:434
+ bpf_prog_test_run_skb+0x1906/0x25b0 net/bpf/test_run.c:1093
+ bpf_prog_test_run+0x5e5/0xa30 kernel/bpf/syscall.c:4427
+ __sys_bpf+0x6ce/0xdf0 kernel/bpf/syscall.c:5852
+ __do_sys_bpf kernel/bpf/syscall.c:5941 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5939 [inline]
+ __ia32_sys_bpf+0xa0/0xe0 kernel/bpf/syscall.c:5939
+ ia32_sys_call+0x2126/0x41f0 arch/x86/include/generated/asm/syscalls_32.h:358
+ do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
+ __do_fast_syscall_32+0xb0/0x110 arch/x86/entry/syscall_32.c:306
+ do_fast_syscall_32+0x38/0x80 arch/x86/entry/syscall_32.c:331
+ do_SYSENTER_32+0x1f/0x30 arch/x86/entry/syscall_32.c:369
+ entry_SYSENTER_compat_after_hwframe+0x84/0x8e
+
+CPU: 0 UID: 0 PID: 9482 Comm: syz.5.941 Not tainted 6.14.0-syzkaller-12508-g92b71befc349 #0 PREEMPT(undef) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
+=====================================================
+
+
 ---
- net/netfilter/nft_flow_offload.c | 148 +++++++++++++++++++++++++++++--
- 1 file changed, 143 insertions(+), 5 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/netfilter/nft_flow_offload.c b/net/netfilter/nft_flow_offload.c
-index 889393edc629..05294955881e 100644
---- a/net/netfilter/nft_flow_offload.c
-+++ b/net/netfilter/nft_flow_offload.c
-@@ -195,6 +195,134 @@ static bool nft_flowtable_find_dev(const struct net_device *dev,
- 	return found;
- }
- 
-+static int nft_dev_fill_bridge_path(struct flow_offload *flow,
-+				    struct nft_flowtable *ft,
-+				    enum ip_conntrack_dir dir,
-+				    const struct net_device *src_dev,
-+				    const struct net_device *dst_dev,
-+				    unsigned char *src_ha,
-+				    unsigned char *dst_ha)
-+{
-+	struct flow_offload_tuple_rhash *th = flow->tuplehash;
-+	struct net_device_path_ctx ctx = {};
-+	struct net_device_path_stack stack;
-+	struct nft_forward_info info = {};
-+	int i, j = 0;
-+
-+	for (i = th[dir].tuple.encap_num - 1; i >= 0 ; i--) {
-+		if (info.num_encaps >= NF_FLOW_TABLE_ENCAP_MAX)
-+			return -1;
-+
-+		if (th[dir].tuple.in_vlan_ingress & BIT(i))
-+			continue;
-+
-+		info.encap[info.num_encaps].id = th[dir].tuple.encap[i].id;
-+		info.encap[info.num_encaps].proto = th[dir].tuple.encap[i].proto;
-+		info.num_encaps++;
-+
-+		if (th[dir].tuple.encap[i].proto == htons(ETH_P_PPP_SES))
-+			continue;
-+
-+		if (ctx.num_vlans >= NET_DEVICE_PATH_VLAN_MAX)
-+			return -1;
-+		ctx.vlan[ctx.num_vlans].id = th[dir].tuple.encap[i].id;
-+		ctx.vlan[ctx.num_vlans].proto = th[dir].tuple.encap[i].proto;
-+		ctx.num_vlans++;
-+	}
-+	ctx.dev = src_dev;
-+	ether_addr_copy(ctx.daddr, dst_ha);
-+
-+	if (dev_fill_bridge_path(&ctx, &stack) < 0)
-+		return -1;
-+
-+	nft_dev_path_info(&stack, &info, dst_ha, &ft->data);
-+
-+	if (!info.indev || info.indev != dst_dev)
-+		return -1;
-+
-+	th[!dir].tuple.iifidx = info.indev->ifindex;
-+	for (i = info.num_encaps - 1; i >= 0; i--) {
-+		th[!dir].tuple.encap[j].id = info.encap[i].id;
-+		th[!dir].tuple.encap[j].proto = info.encap[i].proto;
-+		if (info.ingress_vlans & BIT(i))
-+			th[!dir].tuple.in_vlan_ingress |= BIT(j);
-+		j++;
-+	}
-+	th[!dir].tuple.encap_num = info.num_encaps;
-+
-+	th[dir].tuple.mtu = dst_dev->mtu;
-+	ether_addr_copy(th[dir].tuple.out.h_source, src_ha);
-+	ether_addr_copy(th[dir].tuple.out.h_dest, dst_ha);
-+	th[dir].tuple.out.ifidx = info.outdev->ifindex;
-+	th[dir].tuple.out.hw_ifidx = info.hw_outdev->ifindex;
-+	th[dir].tuple.out.bridge_vid = info.bridge_vid;
-+	th[dir].tuple.xmit_type = FLOW_OFFLOAD_XMIT_DIRECT;
-+
-+	return 0;
-+}
-+
-+static int nft_flow_offload_bridge_init(struct flow_offload *flow,
-+					const struct nft_pktinfo *pkt,
-+					enum ip_conntrack_dir dir,
-+					struct nft_flowtable *ft)
-+{
-+	const struct net_device *in_dev, *out_dev;
-+	struct ethhdr *eth = eth_hdr(pkt->skb);
-+	struct flow_offload_tuple *tuple;
-+	int err, i = 0;
-+
-+	in_dev = nft_in(pkt);
-+	if (!in_dev || !nft_flowtable_find_dev(in_dev, ft))
-+		return -1;
-+
-+	out_dev = nft_out(pkt);
-+	if (!out_dev || !nft_flowtable_find_dev(out_dev, ft))
-+		return -1;
-+
-+	tuple =  &flow->tuplehash[!dir].tuple;
-+
-+	if (skb_vlan_tag_present(pkt->skb)) {
-+		tuple->encap[i].id = skb_vlan_tag_get(pkt->skb);
-+		tuple->encap[i].proto = pkt->skb->vlan_proto;
-+		i++;
-+	}
-+
-+	switch (eth_hdr(pkt->skb)->h_proto) {
-+	case htons(ETH_P_8021Q): {
-+		struct vlan_hdr *vhdr = (struct vlan_hdr *)(skb_mac_header(pkt->skb)
-+					 + sizeof(struct ethhdr));
-+		tuple->encap[i].id = ntohs(vhdr->h_vlan_TCI);
-+		tuple->encap[i].proto = htons(ETH_P_8021Q);
-+		i++;
-+		break;
-+	}
-+	case htons(ETH_P_PPP_SES): {
-+		struct pppoe_hdr *phdr = (struct pppoe_hdr *)(skb_mac_header(pkt->skb)
-+					  + sizeof(struct ethhdr));
-+
-+		tuple->encap[i].id = ntohs(phdr->sid);
-+		tuple->encap[i].proto = htons(ETH_P_PPP_SES);
-+		i++;
-+		break;
-+	}
-+	}
-+	tuple->encap_num = i;
-+
-+	err = nft_dev_fill_bridge_path(flow, ft, !dir, out_dev, in_dev,
-+				       eth->h_dest, eth->h_source);
-+	if (err < 0)
-+		return err;
-+
-+	memset(tuple->encap, 0, sizeof(tuple->encap));
-+
-+	err = nft_dev_fill_bridge_path(flow, ft, dir, in_dev, out_dev,
-+				       eth->h_source, eth->h_dest);
-+	if (err < 0)
-+		return err;
-+
-+	return 0;
-+}
-+
- static void nft_dev_forward_path(struct nf_flow_route *route,
- 				 const struct nf_conn *ct,
- 				 enum ip_conntrack_dir dir,
-@@ -315,6 +443,7 @@ static void nft_flow_offload_eval(const struct nft_expr *expr,
- {
- 	struct nft_flow_offload *priv = nft_expr_priv(expr);
- 	struct nf_flowtable *flowtable = &priv->flowtable->data;
-+	bool routing = flowtable->type->family != NFPROTO_BRIDGE;
- 	struct tcphdr _tcph, *tcph = NULL;
- 	struct nf_flow_route route = {};
- 	enum ip_conntrack_info ctinfo;
-@@ -368,14 +497,21 @@ static void nft_flow_offload_eval(const struct nft_expr *expr,
- 		goto out;
- 
- 	dir = CTINFO2DIR(ctinfo);
--	if (nft_flow_route(pkt, ct, &route, dir, priv->flowtable) < 0)
--		goto err_flow_route;
-+	if (routing) {
-+		if (nft_flow_route(pkt, ct, &route, dir, priv->flowtable) < 0)
-+			goto err_flow_route;
-+	}
- 
- 	flow = flow_offload_alloc(ct);
- 	if (!flow)
- 		goto err_flow_alloc;
- 
--	flow_offload_route_init(flow, &route);
-+	if (routing)
-+		flow_offload_route_init(flow, &route);
-+	else
-+		if (nft_flow_offload_bridge_init(flow, pkt, dir, priv->flowtable) < 0)
-+			goto err_flow_add;
-+
- 	if (tcph)
- 		flow_offload_ct_tcp(ct);
- 
-@@ -423,8 +559,10 @@ static void nft_flow_offload_eval(const struct nft_expr *expr,
- err_flow_add:
- 	flow_offload_free(flow);
- err_flow_alloc:
--	dst_release(route.tuple[dir].dst);
--	dst_release(route.tuple[!dir].dst);
-+	if (routing) {
-+		dst_release(route.tuple[dir].dst);
-+		dst_release(route.tuple[!dir].dst);
-+	}
- err_flow_route:
- 	clear_bit(IPS_OFFLOAD_BIT, &ct->status);
- out:
--- 
-2.47.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
