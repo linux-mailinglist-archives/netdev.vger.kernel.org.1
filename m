@@ -1,122 +1,137 @@
-Return-Path: <netdev+bounces-180406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 923EAA81389
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 19:24:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB97AA8139D
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 19:27:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C841E8A1643
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 17:24:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCA114A2000
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 17:27:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40A7123E259;
-	Tue,  8 Apr 2025 17:24:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A785923BD1C;
+	Tue,  8 Apr 2025 17:27:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SiK/7qj+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Gug+5dJk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AACB23DEAD
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 17:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A011D61A2;
+	Tue,  8 Apr 2025 17:27:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744133068; cv=none; b=s5tjRQEZGSU2OTSYOWXVeCxNzMgvSUiKd24jCp7xO13K42zb80YJK4up/eA8ZDDLdDyofAg03IwpYcjSrRHiuHfNC2hnagg9P000yIGNyPG2ZASxnHKkVUmoZ9uqDN5o3VT+dqRheGzorwTfGmZEBb3LPf1yWnJQriDqNS5FglI=
+	t=1744133269; cv=none; b=ut938Oe27ztIxgCAOgc0v+A+/P3byz7VY4yxU/Hy6m1T8p93Ywoslsv2atA/uy9SaI52d17pKGHrMvp2kRyUTdzBgm3NrqsctrzYzcf3uGh264uNIpE+cfge8qFjTist+WkcwT25q2XRHbTNbwMuqjV7pc5WujQyM+tbLKedPx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744133068; c=relaxed/simple;
-	bh=czEDXFnNkqKkADGnIpQkXX/OpJWya2iTcsdE0n02nWA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZkR8PTFWD/bKmQy6zLkWJ330GBMwa+VtgSzyYSzPaTOd+Hf/zWt2Fc9qq6T8Tc/gm/6Qpya484UyqBEXHC32YE6De5+SQ0eK+16NqKc4f3n36jrZMqHgpSrKS5bGIQ9aUU8GXMgt/xNIRPUfI8fa9UmPwxvoYjTMDPnWst0zTRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SiK/7qj+; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744133066; x=1775669066;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=czEDXFnNkqKkADGnIpQkXX/OpJWya2iTcsdE0n02nWA=;
-  b=SiK/7qj+EQiVTlV0DtGLbBv+j1XnlfzPt4oGNsRaZyJDibNSjEZnjarp
-   L1gDOT9+wuMCYrSIcQQErfGlWcFLaUCvTUQnF0qIhIPfWa9p8sDYuPi8b
-   qrciNwCWfVuiqCLLoyKNz189uEaI61eq210iCXNl5rUykUGh1k6euxOQ7
-   KmOlIHVDi0icRwST58uPkWutLBVGOWz4quLgO9SGEX8DehZBZ3eFKPIA2
-   YKAmlN2DcFNbVzyNg3AeMdzSXfdV/n8w8NtIiD4KMf2H/VnFvLfIbnpOe
-   KyOtD8Zt6s0YLXgjj7V0Em5k8uyWmmhRQh92lc5vARGKyXH5FhqNoavRn
-   g==;
-X-CSE-ConnectionGUID: YcZT8gjsSTaP5BDo/F9c6w==
-X-CSE-MsgGUID: /0WYScdnSda37DbkMWIE1A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11397"; a="45744151"
-X-IronPort-AV: E=Sophos;i="6.15,198,1739865600"; 
-   d="scan'208";a="45744151"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2025 10:24:26 -0700
-X-CSE-ConnectionGUID: krcTZdwNToiDmvJwfwVCrg==
-X-CSE-MsgGUID: 6cSsDEVjQIq+wLcTf6kytg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,198,1739865600"; 
-   d="scan'208";a="128839700"
-Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
-  by fmviesa010.fm.intel.com with ESMTP; 08 Apr 2025 10:24:25 -0700
-From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Karol Kolacinski <karol.kolacinski@intel.com>,
-	Milena Olech <milena.olech@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Subject: [PATCH iwl-next v4 3/3] ice: add ice driver PTP pin documentation
-Date: Tue,  8 Apr 2025 19:18:36 +0200
-Message-Id: <20250408171836.998073-4-arkadiusz.kubalewski@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20250408171836.998073-1-arkadiusz.kubalewski@intel.com>
-References: <20250408171836.998073-1-arkadiusz.kubalewski@intel.com>
+	s=arc-20240116; t=1744133269; c=relaxed/simple;
+	bh=iGs2ZZHWszBkgjha1A2dY+//qUbJ939WmeteH4R9VoY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cGide0u/aBZ/dtQPqBxkI4et503S5P78DbZYfBr/GbiNy0XdNNhKnDKXbadb+Lun0kUqIQbScDhK8MyjJ+vqMDkUEsIaywjEr072CrYjEoi78j6CCVPjo7laX5UI2byCC1rYNSpsCGsqdzxU01TfQ1Kq/f2z8Evo9W/gCBbRQWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Gug+5dJk; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Y8RWM2V6ZnehV9xCG2Wi7D3YFpwSdHlPKuNFJkQ/bqQ=; b=Gug+5dJkFQ2rbCZ5IXZX4osrkc
+	z4jCLXuY8M+Deo7TGvO4X3azXzNOY81Pym6BE1wRVtlX0j1A55PWe5bI2sC3crPMPxHw1CeStLy2o
+	/V0QKXahJUMiiC0QA75pZ0B71CSfo3v561yu0Dz00hSkJbrLJPo2YlqRoNq7PJUrXxcRgH84YKKRU
+	OmVjnaBReXWpYspNTe4XnqnxjIhTFm+dq6EUTbPorz00lCBHEMhGAjD6JCR7I3D0tHI4klOBUjGmX
+	WZfuxE+cKAVpE7S62ePuI4c2mcHsgReKBCz99EZlrG7OMoPEVQAv2csuoYJ61Ua+C90ZhC8XailZA
+	nZx7znGQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51470)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u2Cjb-0007pu-0I;
+	Tue, 08 Apr 2025 18:27:39 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u2CjV-0001bg-19;
+	Tue, 08 Apr 2025 18:27:33 +0100
+Date: Tue, 8 Apr 2025 18:27:33 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org, upstream@airoha.com,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Claudiu Beznea <claudiu.beznea@microchip.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Jonathan Corbet <corbet@lwn.net>, Joyce Ooi <joyce.ooi@intel.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Michal Simek <michal.simek@amd.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Rob Herring <robh+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+	Robert Hancock <robert.hancock@calian.com>,
+	Saravana Kannan <saravanak@google.com>,
+	UNGLinuxDriver@microchip.com,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Wei Fang <wei.fang@nxp.com>, devicetree@vger.kernel.org,
+	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [net-next PATCH v2 00/14] Add PCS core support
+Message-ID: <Z_VchfzoKOTvy5TQ@shell.armlinux.org.uk>
+References: <20250407231746.2316518-1-sean.anderson@linux.dev>
+ <20250408075047.69d031a9@kernel.org>
+ <08c0e1eb-2de6-45bf-95a4-e817008209ab@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <08c0e1eb-2de6-45bf-95a4-e817008209ab@linux.dev>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Karol Kolacinski <karol.kolacinski@intel.com>
+On Tue, Apr 08, 2025 at 11:30:43AM -0400, Sean Anderson wrote:
+> On 4/8/25 10:50, Jakub Kicinski wrote:
+> > On Mon,  7 Apr 2025 19:17:31 -0400 Sean Anderson wrote:
+> >> This series depends on [1,2], and they have been included at the
+> >> beginning so CI will run. However, I expect them to be reviewed/applied
+> >> outside the net-next tree.
+> > 
+> > These appear to break the build:
+> > 
+> > drivers/acpi/property.c:1669:39: error: initialization of ‘int (*)(const struct fwnode_handle *, const char *, const char *, int,  unsigned int,  struct fwnode_reference_args *)’ from incompatible pointer type ‘int (*)(const struct fwnode_handle *, const char *, const char *, unsigned int,  unsigned int,  struct fwnode_reference_args *)’ [-Wincompatible-pointer-types]
+> >  1669 |                 .get_reference_args = acpi_fwnode_get_reference_args,   \
+> > 
+> > Could you post as RFC until we can actually merge this? I'm worried 
+> > some sleep deprived maintainer may miss the note in the cover letter
+> > and just apply it all to net-next..
+> 
+> I would really like to keep RFC off the titles since some reviewers don't
+> pay attention to RFC series.
+> 
+> Would [DO NOT MERGE] in the subject be OK?
 
-Add a description of PTP pins support by the adapters to ice driver
-documentation.
+I'd bet that those who have decided "RFC means the patch series is not
+ready" will take such a notice to also mean the same, and ignore it.
 
-Reviewed-by: Milena Olech <milena.olech@intel.com>
-Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
----
-v4: no changes
----
- .../device_drivers/ethernet/intel/ice.rst           | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+I think there needs to be some kind of push-back against these
+maintainers who explicitly state that they ignore RFC series - making
+it basically anti-social behaviour in the kernel community.
 
-diff --git a/Documentation/networking/device_drivers/ethernet/intel/ice.rst b/Documentation/networking/device_drivers/ethernet/intel/ice.rst
-index 3c46a48d99ba..0bca293cf9cb 100644
---- a/Documentation/networking/device_drivers/ethernet/intel/ice.rst
-+++ b/Documentation/networking/device_drivers/ethernet/intel/ice.rst
-@@ -927,6 +927,19 @@ To enable/disable UDP Segmentation Offload, issue the following command::
- 
-   # ethtool -K <ethX> tx-udp-segmentation [off|on]
- 
-+PTP pin interface
-+-----------------
-+All adapters support standard PTP pin interface. SDPs (Software Definable Pin)
-+are single ended pins with both periodic output and external timestamp
-+supported. There are also specific differential input/output pins (TIME_SYNC,
-+1PPS) with only one of the functions supported.
-+
-+There are adapters with DPLL, where pins are connected to the DPLL instead of
-+being exposed on the board. You have to be aware that in those configurations,
-+only SDP pins are exposed and each pin has its own fixed direction.
-+To see input signal on those PTP pins, you need to configure DPLL properly.
-+Output signal is only visible on DPLL and to send it to the board SMA/U.FL pins,
-+DPLL output pins have to be manually configured.
- 
- GNSS module
- -----------
 -- 
-2.38.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
