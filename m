@@ -1,125 +1,150 @@
-Return-Path: <netdev+bounces-180427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4331FA8149C
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 20:27:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48947A814A7
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 20:32:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2632E4C08F2
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 18:26:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7E5B88719C
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 18:32:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D8DA23E334;
-	Tue,  8 Apr 2025 18:26:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TCxFtQ/I"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 099CF2309AF;
+	Tue,  8 Apr 2025 18:32:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D91A23E220;
-	Tue,  8 Apr 2025 18:26:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2624A134B0;
+	Tue,  8 Apr 2025 18:32:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744136780; cv=none; b=VZHv51L8UkNKkl7h9r9V6HBUbY3oZG16og6ULEwAvLZIVi7t7npJ5Gs4aLHeABOrpHFvisHEtL1xQ8igS9hhx7LZcr1LdhXcF2UIUknxqehv4C1HI5ZAFMfCZOmFZKD90DcQq43ovHssBPNrI9yls0nK0sHsgyN90khOJBZ11Qk=
+	t=1744137138; cv=none; b=Ys1PBAe+iDnn1G86de8Lc2A1cV1DsmlKs13bl8/duDPSfED1xGqQpuO/FOMnVEBrhierL11SIyGk1zMWVH+moKst+B9ifqgXxCeCxBJqwObS67B/kr22r3zW/9exhhU79l011RgCTldKR4n+Vm5L03PmRSH4gqvYUcGUkcSekX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744136780; c=relaxed/simple;
-	bh=/HKYNB/i/ctUd4r0fgvBPDY6vg38lIBSYKJ10RXEVnk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D0EAst3G3rs+8RN2XLdGWO4gKlrqlTrcR4bugHxtCNbNvsdUgxjUV0FAHBlHZQqq8rhNK/ib55YY45hZSf+bBKsB41A3TTSeotEg7yZg8KQZmK3np2linDE7X+9JYc51tyROvfMV8ZVANx81C7BMvsYDkfYyIodqtVNBKXxLrBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TCxFtQ/I; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1744137138; c=relaxed/simple;
+	bh=i1BDeE4GSimM+P6Lq3/a9QqpA134jHYI245rl9LGjGs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=l86Chqwf20cfFBEpAsO6LsiJ/7Ff8mTobKFx1g/mHsM4yQZmGGU+O1CQCxILANxrmDPmndjOhChN682VCp/52uzVp6O0MzvD7RKKzE+1Q9RFwft93hDDHNzFcWBzkfbi+tC26Kn1q96vXBWCxCsKer3WDJ1eU+jDtgih5imZBEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-54acc0cd458so7150889e87.0;
-        Tue, 08 Apr 2025 11:26:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744136776; x=1744741576; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EG8hbJaVOVNR0BTvD7eYEE1VvnmYFyZW9r9DtGOsinc=;
-        b=TCxFtQ/IXC+WR52b/75vmLLrJsoIvjgAI+fYMq/GbPqtAzn7wSzfTnRinAC3dDi5ay
-         FHAz4ZDzO65wlAsVYfUbTf/KcX/RW1aMu/0JMMnzU5miKixIJJgYvv0vPHOp9Z1PJuZc
-         StqhwrUcYZKL8lRNe8Jf8yQMPC18Eaql2DAPaaLcbB+Wfp/WKS+h074wELvgjbvtYGvQ
-         Funps6AP6j2nZntcJo9Ki7xbGCkXQ7V6cBm6lpYBFlUyDQOIuRlANR4tdyltzSufivIe
-         rT1oTkols+uX/yAfawXNBn+6T7tSj48qIqDM4bMa2eIF84BUWcs9K8Hj+W0xQBtBQrZQ
-         OZIg==
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-aaf0f1adef8so944477966b.3;
+        Tue, 08 Apr 2025 11:32:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744136776; x=1744741576;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EG8hbJaVOVNR0BTvD7eYEE1VvnmYFyZW9r9DtGOsinc=;
-        b=FlhDf5sV15TNEwhQxysoEbTzcgU8WdrJQgkl/XcCPMEGBvCykDk+6Zx6JFUmJqnAac
-         QKX04Jldz8Ep+SPGfBUr0sq2w4V0jj/pIAL7mIhYE8dNYngbyggQIW7sEnsHSNls+zKP
-         LnWyY9pvD3kC/xFM31sDk0dvF03+w3kLTkUwWNNwS+gxAwIh6TO8GZ9cigslfQteLsOk
-         fFjfd6sDZuIqS7eun5tZmn603wa88vHjjN9vMMHKSn6bET8FHeJiKaqHdKYh2V72EhRH
-         niQlWoETGqIWbbzPEE0PM37YlMa7yJbp0Qa+Vq1LQZvMQe92aIAEw4ykpPmGWf57t/6g
-         y+3A==
-X-Forwarded-Encrypted: i=1; AJvYcCVsqXGNClRZrPpoIctJiN4D1pb/zxRbLsI8bc/BdCcU3wu52wtNfOAmaup9IvWLimXGq5omkx8VjPq+kwg=@vger.kernel.org, AJvYcCWJtQR4cGLZu7UahBVWyMmKcwcVmA8B2ro+JH73QpOtgRcKCWgYIfSydKyDrihDDDDGfssJ+5iv@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsoMNw4YD6F8s1FHBv6mlJ/FVmM76FpEQZ/hparlyAlNBnivUU
-	SzIZeilyScGkHue+dqnSptBG32dvH56tK1c2DRq5n8XMOtYcmoIW
-X-Gm-Gg: ASbGncugM5GP8vWHRobWqvspKbwsvewjbMEI/pVX9RQqc7WzKVbUZVP5eilqGchlsDm
-	xN+Hu289oJamFdEYqth+5gkSY96ExwArfO17KyEo/x2jfxyYyoaYLeLsfdYRr3ozAlIjHsqpVQ9
-	XlOley18vgewRPrp8OoTgZ/rC5UaofIPRescJ6R1dfu/jjMdXHrGc4ApQtJWCv41l1bmb+kSz3R
-	Zef8bunpGZXOBy8HCBWW9TGA4S3mumUJOw6Ubnl/RuDHTLfPzKFL0o6wyMzsnQ22Oajc9IRKHGD
-	NL8Rw5hZwQzM0w5EwSuTHXq8FzYNmiV1jex68LXi99YUxj6JkPfEOcciXk0=
-X-Google-Smtp-Source: AGHT+IGjgrnrLyYLYgARYsscRYnkUgSEmQWQPu3Oav9OLlYYy9bEQE69zUTbH/wGlGq8YNuxP5433A==
-X-Received: by 2002:a05:6512:1325:b0:549:8d07:ff0d with SMTP id 2adb3069b0e04-54c437c1043mr9594e87.45.1744136775989;
-        Tue, 08 Apr 2025 11:26:15 -0700 (PDT)
-Received: from home.paul.comp (paulfertser.info. [2001:470:26:54b:226:9eff:fe70:80c2])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54c1e65d503sm1605915e87.162.2025.04.08.11.26.14
+        d=1e100.net; s=20230601; t=1744137135; x=1744741935;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RUE11QrC21kkAkrsHUVd8QJcWCfol5J1eLabiLpd2K4=;
+        b=tDIECmx96ksHcCq0B0/dImZaP3ScJgGcZssXEsNIBHJ3+T3KH8/VNQH271U+Sw7D6D
+         wPRzwl/0zPK6Z1BFETBpMym78m9iVEyjKwohG6gnTUyMr1I/pqcFjbFjR45UlIUcrvnM
+         4VPb5AZBKKWb44LI1GpbUIIrJYk5znYZEVP+E9+MAA8meowePu+pJYnGFJsqKSKlCJns
+         9Z448MO1jIIpwcQXnwwmGFjE1v9JG0hOvhsPItkbYNYJ/Ahexe3mJ+gJXHbucL1WpwuT
+         f1dYC+VSQmkjwpFCtQ2+hSxRNSgsjjMCmaqnyJ4dMeILcR8gsOrSw+u35GaN+yLd7VLi
+         EIdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV3jizlwcvnkhXduFf3tqVvGWUOCdn8JDhUawiVg/ecU2+YAE32rMoorV/WX+eLWw3MKY8oup2vBTTsdgs=@vger.kernel.org, AJvYcCVfkzkQI1kKsxqyrC/nxcHI9j77beWBxIPUmkZ33LrNyxSB5UUp34ZDH+T4KJoqbqAapug+IHtNqLMzR5F4HcA2Foqo@vger.kernel.org, AJvYcCWlvC5JvdsXT8VtUiGFZxNlpjdU9nBICl1LNKNDj+GaX/3pzz01b+y+kL+5aXqZ2jXPbMQbzO5J@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/l8CZZauL8ZLNP8a0y75d4w07ANoldTfv0Zugw/+WH4Qjtmtt
+	V3u6JGIPU/ZRYUkJ583+P+qtByo/karNZEcwrpiNpFT4u3V1UEp56XYblg==
+X-Gm-Gg: ASbGncv508tAhAwzBoFeDa6q+NBqo7Q9Vlurf9+sYetpunf2zh2AukzOBp/QJjflinJ
+	vDm7YC/6qsJ5polQ9EKcWE0eyhWSSXNovU17vkXbDSAYggmGJieyWFghuIFZmwJePxZ3DLksXI8
+	5Jp1nisMvoyUmyugTvn/GcdeGMFa6BuI6ZI6uPaQd0bLUuoMNPyFiRwGFaoWyDeUF+yeua8Y92s
+	ngIDfyMxrkSsQ8NlKBj2KOm6P2mVTtbO6ExvndO+L6E2ZxiQVkowGhKThR2sOCGzaN8uHrpHU3b
+	8LvAoO5MRyWdylD2uPpYCi8bS45wjH+PQXU=
+X-Google-Smtp-Source: AGHT+IEc3HB5fc5q8HAApvQ9C22fQFLe5843xllZGCqRDVOrC7ML8ay2u3pblmUcU8MAtmbOUvOeTQ==
+X-Received: by 2002:a17:907:9712:b0:aca:9615:3c90 with SMTP id a640c23a62f3a-aca9b74629emr19952966b.52.1744137134815;
+        Tue, 08 Apr 2025 11:32:14 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:6::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac7c013fd7fsm966909266b.107.2025.04.08.11.32.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Apr 2025 11:26:15 -0700 (PDT)
-Received: from home.paul.comp (home.paul.comp [IPv6:0:0:0:0:0:0:0:1])
-	by home.paul.comp (8.15.2/8.15.2/Debian-22+deb11u3) with ESMTP id 538IQBZC024820;
-	Tue, 8 Apr 2025 21:26:12 +0300
-Received: (from paul@localhost)
-	by home.paul.comp (8.15.2/8.15.2/Submit) id 538IQASx024819;
-	Tue, 8 Apr 2025 21:26:10 +0300
-Date: Tue, 8 Apr 2025 21:26:09 +0300
-From: Paul Fertser <fercerpav@gmail.com>
-To: Hari Kalavakunta <kalavakunta.hari.prasad@gmail.com>
-Cc: Sam Mendoza-Jonas <sam@mendozajonas.com>, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        npeacock@meta.com, akozlov@meta.com
-Subject: Re: [PATCH net-next 0/2] GCPS Spec Compliance Patch Set
-Message-ID: <Z/VqQVGI6oP5oEzB@home.paul.comp>
-References: <cover.1744048182.git.kalavakunta.hari.prasad@gmail.com>
- <ee5feee4-e74a-4dc6-ad8e-42cf9c81cb3c@mendozajonas.com>
- <b1abcf84-e187-468f-a05e-e634e825210c@gmail.com>
+        Tue, 08 Apr 2025 11:32:14 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next v3 0/2] trace: add tracepoint for
+ tcp_sendmsg_locked()
+Date: Tue, 08 Apr 2025 11:32:00 -0700
+Message-Id: <20250408-tcpsendmsg-v3-0-208b87064c28@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b1abcf84-e187-468f-a05e-e634e825210c@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAKBr9WcC/23NSwrDIBSF4a3IHcfiK81j1H2UDoxeEwc1QUVSQ
+ vZecFICHR++/xyQMHpMMJIDIhaf/BpgJLIhYBYdZqTewkhAMNEyIRTNZksY7DvNVDmmhbx3Lbc
+ dNAS2iM7vNfaEgJkG3DO8GgKLT3mNn/pSeN3/BQunnE7aMCVNOxjTPyxOXofbGufaKeJnFesuV
+ lBGB8dQ90qiG4aLPc/zC0QIpRLrAAAA
+X-Change-ID: 20250224-tcpsendmsg-4f0a236751d7
+To: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+ Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ Steven Rostedt <rostedt@goodmis.org>, 
+ Masami Hiramatsu <mhiramat@kernel.org>, 
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-trace-kernel@vger.kernel.org, Breno Leitao <leitao@debian.org>, 
+ kernel-team@meta.com
+X-Mailer: b4 0.15-dev-42535
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1609; i=leitao@debian.org;
+ h=from:subject:message-id; bh=i1BDeE4GSimM+P6Lq3/a9QqpA134jHYI245rl9LGjGs=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBn9Wuts26Mlzm+Zc3jDNP3m91BHnRxDLAFRGBZT
+ t6aNoWGNM2JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ/VrrQAKCRA1o5Of/Hh3
+ bSGCD/9gv53RBICy4FUhyPDX4H0FuuNyJUTeP2fIXmg//z0ymVw4tJSXIXFuEbyIbuJwnEOEmVr
+ 1/s8e/uv7jELlNBDvx5d/yICS9zSMHDOF6SxxmOWSGqeZfuvo47vRPzJGRgusQamU8XiFulcqp1
+ bTayMCNkd0DRvhE9f3r1BA2Vr9ptlj7D8HnbeClEp1GbsEcfGb0EDzdv5y75OUgbYVnhkRNC2dy
+ sn3yGOJ5aLYgi1vL1SAV4bZLcvgie5M1ENKlJ4QXZXTNFzbUE4/d20spA67QJ51KQ02rQBVfI5H
+ mBSvkuUNJ+e6ml2yg6peKbWbe9fR3FVRXIIBbKISBH3xmc4tWo6ZHfyoIiWTrXRVQTijKhvW/Iv
+ qWjzn8x8n+yuFCd7obNyC2OIOIFD+M4fLotnYH7e5doptQ4WM5Ko/TXaFWG75MR8L2bMOamcGpf
+ Go8L2rOahXMA1GsN5V98j5xQffGlJokNimbJQdlqQRuj8mBREQawFoaywF0Z1NjK1UgBsXPHIpN
+ FMyzmcfJXfu16sybU+VT0f2sda4/ZNmEN2GlkeX9kfB4N4SXsDxLiGZi2X4p8SC0nSfzfGn1M90
+ 4VF7I+nzAR20cc5CYrUvUFvKLaoX+F7R8jts8vFHUEeDd0QsNIZgg4zuTk0GVqx7zZSQD/EStFm
+ zWeBXg5xC82jqOQ==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Hello Hari,
+Meta has been using BPF programs to monitor tcp_sendmsg() for years,
+indicating significant interest in observing this important
+functionality. Adding a proper tracepoint provides a stable API for all
+users who need visibility into TCP message transmission.
 
-On Tue, Apr 08, 2025 at 10:01:03AM -0700, Hari Kalavakunta wrote:
-> On 4/7/2025 2:44 PM, Sam Mendoza-Jonas wrote:
-> > On 8/04/2025 4:19 am, kalavakunta.hari.prasad@gmail.com wrote:
-> > 
-> > Looking at e.g. DSP0222 1.2.0a, you're right about the field widths, but
-> > it's not particularly explicit about whether the full 64 bits is used.
-> > I'd assume so, but do you see the upper bits of e.g. the packet counters
-> > return expected data? Otherwise looks good.
-> > 
-> It is possible that these statistics have not been previously explored or
-> utilized, which may explain why they went unnoticed. As you pointed out, the
-> checksum offset within the struct is not currently being checked, and
-> similarly, the returned packet sizes are also not being verified.
+David Ahern is using a similar functionality with a custom patch[1]. So,
+this means we have more than a single use case for this request, and it
+might be a good idea to have such feature upstream.
 
-Can you please add the checks so that we are sure that hardware,
-software and the specification all match after your fixes?
+Link: https://lore.kernel.org/all/70168c8f-bf52-4279-b4c4-be64527aa1ac@kernel.org/ [1]
 
-Also, please do provide the example counter values read from real
-hardware (even if they're not yet exposed properly you can still
-obtain them with some hack; don't forget to mention what network card
-they were read from).
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Changes in v3:
+- Fixed identation (Kuniyuki Iwashi)
+- Removed duplicated entry in the commit message (Kuniyuki Iwashi)
+- Added tcp_sendmsg_locked in bpf_raw_tp_null_args[] (Kuniyuki Iwashi)
+- Link to v2: https://lore.kernel.org/r/20250407-tcpsendmsg-v2-0-9f0ea843ef99@debian.org
+
+Changes in v2:
+- Change to a full tracepoint inside tcp_sendmsg_locked(), heavily
+  inspired in David's patch
+- Link to v1: https://lore.kernel.org/r/20250224-tcpsendmsg-v1-1-bac043c59cc8@debian.org
+
+---
+Breno Leitao (2):
+      net: pass const to msg_data_left()
+      trace: tcp: Add tracepoint for tcp_sendmsg_locked()
+
+ include/linux/socket.h     |  2 +-
+ include/trace/events/tcp.h | 24 ++++++++++++++++++++++++
+ kernel/bpf/btf.c           |  1 +
+ net/ipv4/tcp.c             |  2 ++
+ 4 files changed, 28 insertions(+), 1 deletion(-)
+---
+base-commit: 1a9239bb4253f9076b5b4b2a1a4e8d7defd77a95
+change-id: 20250224-tcpsendmsg-4f0a236751d7
+
+Best regards,
+-- 
+Breno Leitao <leitao@debian.org>
+
 
