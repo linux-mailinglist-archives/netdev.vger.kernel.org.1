@@ -1,91 +1,138 @@
-Return-Path: <netdev+bounces-180395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 424FAA81338
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 19:05:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E168A8133B
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 19:06:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A77F38A087D
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 17:04:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C9B41BA35D0
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 17:06:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F106221859D;
-	Tue,  8 Apr 2025 17:05:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E87DC22DFA2;
+	Tue,  8 Apr 2025 17:06:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xhBn5V3I"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L/1JgHNx"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AFE1191F79;
-	Tue,  8 Apr 2025 17:05:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36439191F79;
+	Tue,  8 Apr 2025 17:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744131908; cv=none; b=MVlaWRxZbBYBXO9hr1qNYxLDXDqTJP+Xx4zP14Insf3Pn6APNSbDUVdpD2d9hwODgZDTZT1uVXc4Q71CdH/sZd/kJn0ucbkkaOARe4ZRSnnPgTgx408qCzowjMv5MWMb4s28Zgjz6K9ILq3lFTaPfD3yoFPLDgVbaiQjVbbwbck=
+	t=1744131977; cv=none; b=TxrbAbRfgMi0ikMsxheqnc/JrCTBIA/EYFFGntGHAVJ17mUDoyOnN6GVysYlwMoU+l2zWz10dmQTAX2vcISysSloNG5au8F9NJ9uF+eJWWV1YF10AOfXJSM4fewxMBHIf6MJttkVSnJ2s4HsMdoN3XoPKjFrbZyO8yjNcwDTEdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744131908; c=relaxed/simple;
-	bh=l871zQrHZSos2amQ+bpEq/s7fgGPY32jmr4oopQS62Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JWKtjXQSpVUTBMgbi5I1Pd8ppWM5mmvtb8aBxR3lCp5d7RtJZCxjGuDBe9p1WlJfkKRPW34iRr9/98e9UtaZARNWhtEGsCwzMu1BKUOBHJUJvOjlxeLnOQayatu/0H6WyVZ6OLZBd7pQOx7n4MqLsMojhHqzCIDWNjVFbek6QBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xhBn5V3I; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=VwcgnOMOTP8PgRLFeZ46VJ78kiUR0GDqWl3t9VdHT88=; b=xhBn5V3I6DknS5ads80OZP+U3f
-	g8ewGVzEZO5lTOAKSbIblE5crUh8wqAaguBsEundAk2BZGM+W5MRMugpOuBXId9v6rngQOkKqdY26
-	ETgbVmydMZJjCRvntgAxJjM4C4W4vym6+ynig4CB56uR38iEv70P3C83mX8WqI5qpPUA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u2CNS-008QV9-TG; Tue, 08 Apr 2025 19:04:46 +0200
-Date: Tue, 8 Apr 2025 19:04:46 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Simon Horman <horms@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.or
-Subject: Re: [net-next PATCH 1/2] net: phy: mediatek: permit to compile test
- GE SOC PHY driver
-Message-ID: <bd1fe1f2-897e-4b26-9202-9300eeef480a@lunn.ch>
-References: <20250408155321.613868-1-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1744131977; c=relaxed/simple;
+	bh=yg8Q+fEiwdUlvQz508ND+obDpVahFI5i6bIssELHUWk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GX2S3IwnkmJCSosRb9BrSKD7avw+/FUQxe1gsBsQiqw1qmEJ7noxhe2TTT6ynKLD8zRum0g9pK9ORyErz58L0db0Opgq95fCzat2V1kO6dXEDW7C4X5Ba4ImTzGH7wB+EoYijmeAi46DTjnyRbTB5rEpC80Z8cO82zFIPDYh258=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L/1JgHNx; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-39c0e0bc733so5003773f8f.1;
+        Tue, 08 Apr 2025 10:06:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744131974; x=1744736774; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sVSW1j9sW9KcetgerHbKmVEbcFODFc+WKhghSHuNKnA=;
+        b=L/1JgHNxN+AG0GJY/If+024P7B68PU1XQq0qeyhg0ttP6uu5/v0vImS+jmRycK+iao
+         VSC4SK21AS7GSo0J30LEdPZB9VvqERdnhmJs745QG8XOZbMgtgTBts/8HlPyqEGZQj7+
+         PDLZMA8bQ9uzZE4YhzA1Q0pIBGqwv8GU0S7N9UuR0zyLeB04ZFgWWfqjsUXktDrjhF+M
+         OPhDn6kRyEAj2TaP/4y4ggyq4pume/zQBymExgS4lJZfA3xwL+01yaD33+uMo7QsPc3m
+         2NmbgUrxNfC/aNtg+8d2mzcdDYNL2W0P8Gvu6gdC7IQI6N/3WJWGeqKbCmS1FrXw/LQp
+         hGig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744131974; x=1744736774;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sVSW1j9sW9KcetgerHbKmVEbcFODFc+WKhghSHuNKnA=;
+        b=iBMqRakFsML2E1eriw5y/B+z5raPayxR9NXaje/xClh0u7dPPMtSqq8JJRBrQDopO2
+         9zn2z37HQ7CZUG0/11SHr6Fk5X3jYO0FYZa9sqY2+Xt4LwAV9hflqauSGllMWyRvzIzV
+         s+9K0kg1inqbwc6hJC50WKMnX5abnmVX3yUmUUjOmxqK9QzNy1i8Hd0DVFcUvz4QvsIx
+         OYi5RL5OT6lM29ky65u9x+71Q5uSISztY0h9N9AVjANCozhngnZ8gd9oHd0bzqy/5i12
+         93c8p4Kn+fzuTm7Pu0Uk3RvLrkYsKDbPq7enJ25tY49ghJPPPPXcDMwN+BqDouWybRIt
+         PxzA==
+X-Forwarded-Encrypted: i=1; AJvYcCXbFoHBMpR9JgM+YfxM/lCzAX7ZnA+wRTFRANvEEtp1gLC/sKXLtplm1zNihWEsZ7BCT41xCpr2PoCSbFbbDgM=@vger.kernel.org, AJvYcCXtOZt6q3oZf7yd701/KrGFe7/LYIrAaFxoXAXJuY3lXsI0HfHUhkCE14e4MPm21xk1zYNpMN+t@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/fMRXwvJCxW527adls21S4vSfQPgU9oG3E/8ksZrA8srZfxov
+	wvOzA1wBZqbYqZ35tyWworJGDj8a07WmLM9uPdyYPCRX7DmG5arXXbKWfQ==
+X-Gm-Gg: ASbGncvCXUkgtRY7CfJ7ctc3gJbld3pkRNvJKP2JKPhExJp4SL440ExOPFYWSIO3Web
+	lis+u14B4TL0bBi5c9XD34QOwuKUqm29wSzawuPnMlv6ZVQHMFkmtfvL8ZPub5s4XXhvws3nZI7
+	Qq5QhtuMQFACVQIQ6GQKPYlQhTjZYDS9WLzlkNz0f2hF3WMbu0Rai7TxUchrwVLmz/UHZIAGusL
+	jNoGAlDEjqixhWiyFqaiAzvAHNI6M/aJw0fih0QM3AbL+vCmADFuIzWjG8QaDLbOVXN0CzZbNA0
+	VVhPhyNxiJ0cawS1vBJJ+HOy88meUoqE1rexd5AHmWxJcqiQH+hYJ0+iLDzs0zyx
+X-Google-Smtp-Source: AGHT+IHIATDhMUQX/Pg95o2L3J7jOrSGkWtrg9ahAB0g3lLYbWvYXwbyI8C5zr/IZSnKeRXWF65znw==
+X-Received: by 2002:a05:6000:178b:b0:39c:2678:302e with SMTP id ffacd0b85a97d-39cba98288fmr15120629f8f.45.1744131974074;
+        Tue, 08 Apr 2025 10:06:14 -0700 (PDT)
+Received: from [172.27.62.62] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c3020d943sm15664627f8f.74.2025.04.08.10.06.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Apr 2025 10:06:13 -0700 (PDT)
+Message-ID: <bdd16b2e-13eb-46de-99bf-68a500c960c0@gmail.com>
+Date: Tue, 8 Apr 2025 20:06:08 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250408155321.613868-1-ansuelsmth@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/6] net/mlx5: Avoid using xso.real_dev
+ unnecessarily
+To: Cosmin Ratiu <cratiu@nvidia.com>, netdev@vger.kernel.org
+Cc: Hangbin Liu <liuhangbin@gmail.com>, Jay Vosburgh <jv@jvosburgh.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>, Simon Horman <horms@kernel.org>,
+ Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Jianbo Liu <jianbol@nvidia.com>,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Ayush Sawal <ayush.sawal@chelsio.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>,
+ Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>,
+ Bharat Bhushan <bbhushan2@marvell.com>,
+ Louis Peens <louis.peens@corigine.com>, Leon Romanovsky <leonro@nvidia.com>,
+ linux-kselftest@vger.kernel.org
+References: <20250407133542.2668491-1-cratiu@nvidia.com>
+ <20250407133542.2668491-2-cratiu@nvidia.com>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20250407133542.2668491-2-cratiu@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 08, 2025 at 05:53:13PM +0200, Christian Marangi wrote:
-> When commit 462a3daad679 ("net: phy: mediatek: fix compile-test
-> dependencies") fixed the dependency, it should have also introduced
-> an or on COMPILE_TEST to permit this driver to be compile-tested even if
-> NVMEM_MTK_EFUSE wasn't selected. The driver makes use of NVMEM API that
-> are always compiled (return error) so the driver can actually be
-> compiled even without that config.
+
+
+On 07/04/2025 16:35, Cosmin Ratiu wrote:
+> xso.real_dev is the active device of an offloaded xfrm state and is
+> managed by bonding. As such, it's subject to change when states are
+> migrated to a new device. Using it in places other than
+> offloading/unoffloading the states is risky.
 > 
-> Fixes: 462a3daad679 ("net: phy: mediatek: fix compile-test dependencies")
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> This commit saves the device into the driver-specific struct
+> mlx5e_ipsec_sa_entry and switches mlx5e_ipsec_init_macs() and
+> mlx5e_ipsec_netevent_event() to make use of it.
+> 
+> Additionally, mlx5e_xfrm_update_stats() used xso.real_dev to validate
+> that correct net locks are held. But in a bonding config, the net of the
+> master device is the same as the underlying devices, and the net is
+> already a local var, so use that instead.
+> 
+> The only remaining references to xso.real_dev are now in the
+> .xdo_dev_state_add() / .xdo_dev_state_delete() path.
+> 
+> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+> Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Acked-by: Tariq Toukan <tariqt@nvidia.com>
 
-    Andrew
+Thanks.
 
