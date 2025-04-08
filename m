@@ -1,117 +1,152 @@
-Return-Path: <netdev+bounces-180185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63F26A80110
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 13:37:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F393AA8012B
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 13:38:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18B5D8818D7
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 11:32:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46E421896FE1
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 11:34:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D7F1268FD5;
-	Tue,  8 Apr 2025 11:30:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 925E726981A;
+	Tue,  8 Apr 2025 11:33:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ym6tlaX4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hLDvz2n4"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438B4269AF5
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 11:29:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2EA1267F4F
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 11:33:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744111801; cv=none; b=splCGFaQfG9EPMgFrRA/NKyu4tiat+GXDMOeJjcHPLtnFh5FW14SNsIL/2GCkqWSJ8yt0iyFn23b3F6BTCD6OlKmJ5nT874aCY0bvjnS5VtkMia7uB0d+BwNKIQWzf9dy+xWP43wCoMkfCYJS0qU1xp57+HVGHatu7ts94U4p24=
+	t=1744112011; cv=none; b=Grbj2R5sGMnzLl0XYfNL/5tpZKibIKqY17tIKqoo42CgV6hZeBWFPkOSqOlwdU3Lenpjbvqevm3AkPgWgUOVqMmNqzBMBl8KohYw6hbdWti/eofpEA06Oa31pvq8mnxcJDyQHb91AB0cVzTGvlbHy6DY6nPsM5/sXdJMo+fxNT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744111801; c=relaxed/simple;
-	bh=f0wyTvRh5lpgWiiGO9fwyzoCdEcKmYS3jgl7pHv8Jw0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oRPbdfyErNBE63WUaWsJ0CNRZaiS+NFb2C4telF08Aff7MqHXDZ+7Al4ZN78UQbhMZJ8aDgBy8Sc3gXTYMnC0SCBswPxo8w8ZgT0k+Htw6VKHVc0kcly1vh8dm6h7dcjSUVNaKKmbhPncShziLk+JHJ4gi3984taLLV/qO4bx4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ym6tlaX4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744111798;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oiJcUwgw3G77cyBQmbSkkpxoJDuSwz/pqjPj/WDvIhE=;
-	b=Ym6tlaX4swU649Umu8jjY3uz5Wc79tvzs06YjTOWuOYfJVQguY5DZnEQCXXcE3oQSP3CmD
-	2ieCDWg+kx1JG0y7q4KM/Go19jjbfOd2dGzvMuFkdn30aB7shyhxNDAonjgmkqebZifTxM
-	vIF2vnlsOZOifb9R3mOX3b3ebo2pzmc=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-617-W9GIBbDyOEehpaCG16AWaA-1; Tue, 08 Apr 2025 07:27:49 -0400
-X-MC-Unique: W9GIBbDyOEehpaCG16AWaA-1
-X-Mimecast-MFC-AGG-ID: W9GIBbDyOEehpaCG16AWaA_1744111669
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43941ad86d4so30453255e9.2
-        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 04:27:49 -0700 (PDT)
+	s=arc-20240116; t=1744112011; c=relaxed/simple;
+	bh=pmfB746tZY3x2MSY89UXFLrQP4OguQ2wCGg19gP8NwI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ifTJZ1yA65HcLJDjfo0qxMcfjWzMBcZoKNhIpwZQcgt2ftjW9/xsA2JWKn3X0CrWzRwjpc8VNJLN4RSPJ7MTRATqERF4R7oNsM9lU9v0ertYJU4wNFckAfBhAV6yQGX72nrwagHIdWOLwTPUXCiNuQ1MkjKUo0fcpnM9H9enqgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hLDvz2n4; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4774193fdffso79380481cf.1
+        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 04:33:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1744112009; x=1744716809; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pmfB746tZY3x2MSY89UXFLrQP4OguQ2wCGg19gP8NwI=;
+        b=hLDvz2n4zncsyxwlCeaOot9ouJzADOC+pPLGg14xoZnYiiBN8dnMPxG1pvcNCzQvVT
+         EBNrRvWSAjvx2EoWR79cnWtUPLFL2hJMVXbzlxt5xRkby01eE+07QPUfdahH48Uhfrfy
+         O/TPDaVpGlvR0ihm75KXzzHk6/DlfHrZgZCfYdjnfjqHNUXcdozqLuAfsdbjMFxHkyrK
+         nN5ASQXejQwq5VkKit1c6IYpfiaPqLhw4R/opDzDtg0cg5k713HV+Ogz+DVELURnZ4o0
+         0UKsd6a7LqkfvvcgacM4/0pLOZ4Y1kMow8ZJRAyuohq5y8Mvr/gzG8upCJAhkw1AXkoL
+         HtUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744111668; x=1744716468;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oiJcUwgw3G77cyBQmbSkkpxoJDuSwz/pqjPj/WDvIhE=;
-        b=olf9cBm+YNaQo/pPgRmETEXnPTE8w7IHsATK2DzmCwP2i14GCTeze+V9YjleU1s8p1
-         ByhQOK2qz5ip3EfgBLCojCJ1zK60g/hZ+lbVR0XQDhXRVICT6Ssd13KHCz7hCUfwxLxL
-         x6LpRSqtic/aDwCLI0NedyN+WD/XM4l/8pPjrioNhCbz9cBoGitz4fK3BaH9mt4plkvX
-         g/NEqNl2RZ1knyHNdsgaIjIW6Ry4YskiNzfq+ezZ6DkgN6yJmrYNfwj0ktTDLiPAJ1xo
-         7msYS/HhoeA60wMkXnb8Dm+oLit4vGrQTbD13zOgq9qxWX/6xDToNvbgRda5lMtLdMsJ
-         TbiQ==
-X-Gm-Message-State: AOJu0Yy0HZTfgDh3xv4WoNi+5FVTvghPK8XAeDkEnBderApA4VdjTOL6
-	GoFt8Hiqa65McpO1OD7jm//81AvB+22jp/EhY/RvSKz+eT/W7cfCbY8O6cMpqVT2KzTyLnZnupv
-	M1njXGPI9XeHeziOqgWsLUbGPtwoiD9bNz2YmeH9cLXeKGODCdiRcAw==
-X-Gm-Gg: ASbGncuC7Hq687wU3rJpsEA/2Nhu8TEWOsVNpQwBSoaI+JN18tpgNFnVPMpMap4gl+L
-	u5e7QyhkzJp2Ocs9A2gTfIpr3j6jKxqm7C3soT4QlbWf2TEqDePHIhxXHD8fPy6zZPdGPSyhI5h
-	cX1bQzo/SD7zIknrWkliMkosF+833o+6t4k5R6hLOzAPvX1awYrY/cyvxzi3RXggNqxDhtFGk+t
-	XTHP4URlwUOM/DD8N6dgLBAl/tTmnPredgs2ET4qmARdVkRGrLnHzk7lahQEVzAdZfliqz3Lsvs
-	oQ0guC8m1FiortJSJfZPcwkwQM15vYtVAefZEWnooos=
-X-Received: by 2002:a05:600c:4e52:b0:43c:fab3:4fad with SMTP id 5b1f17b1804b1-43ee069569fmr126983685e9.16.1744111668625;
-        Tue, 08 Apr 2025 04:27:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFJoXZ2/VTIioZNKN80gDIxGBXzvfyGiFohuL9wpJ/xqRl2/l2496Uw3iNHljUOTZLrUqMGVg==
-X-Received: by 2002:a05:600c:4e52:b0:43c:fab3:4fad with SMTP id 5b1f17b1804b1-43ee069569fmr126983395e9.16.1744111668288;
-        Tue, 08 Apr 2025 04:27:48 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-84-24.dyn.eolo.it. [146.241.84.24])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec34bf193sm156859775e9.24.2025.04.08.04.27.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Apr 2025 04:27:47 -0700 (PDT)
-Message-ID: <f8f98783-0aad-4ff7-9fd6-0ebc8c734abc@redhat.com>
-Date: Tue, 8 Apr 2025 13:27:41 +0200
+        d=1e100.net; s=20230601; t=1744112009; x=1744716809;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pmfB746tZY3x2MSY89UXFLrQP4OguQ2wCGg19gP8NwI=;
+        b=UxtrzMFKFTCJRJN2AKur7dVRVlcvfgB9VzVOdG0xJQxDNqLUi6HYHthkAx05HVfnEo
+         Od8xN1ezoILQ3axtBgwfh1Je86gbgNrLIHWJ0JL0CV5gfldz5n4cQfxX2jkTCSE+BXM1
+         cbcFmo8/yaMNKbBqgW4QPDCaAKgQLJEHpFCiSJDVizDYMowTVQxH+gkg+y6qYfYVxUPm
+         550JbKXLVE7+xvmzuZsRI9Q1khU6Lbyi9zv32CZlv/bSFkiMEpYQcZv4FnTA/kKr8NF1
+         4QA/FOT81clpxYBTov5XYlNXb/CIqYQP/aHnaJE310RwA3EWMGH83mvkYsk+dcBTu5bh
+         6uvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUmbX69ayGYS3sIv0trsa+HLulKQnXZsz9DpliOlFipTzqCon68y0Xonb/urqCOk3ESnTeN+ic=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOes9SSAjktgvjqX9dn0dswXN57caoH4CoN9rVRxrzoS/vkLaq
+	u5X9V1X7b72858yxhv5WzwZaQks0s8r8bdpxXjJro2bRWU1edWaKt80iXIdyJwNsaYOzSb2WkV+
+	W+PWwLMxM4/rC2YeyD8XWezuPv4+WBqgT7vHu
+X-Gm-Gg: ASbGncspZwbfRN/dNBAWPO2+y5aWwhT22fHK/nrORqIhms8UK8sSwjQXWMdym8DLs15
+	HjHPn6c9OFl2lZNKX9reHU4B0HAqp5yWJ6ozHCgHXyD75f1L8ba9zQoZ3/+S25rC7RsRrPA6aDi
+	4KBvn1/3GxNdFgXvVTkr0QiPAUi5wn4zy7T1ZGUA==
+X-Google-Smtp-Source: AGHT+IFHPCsvlmhlWeIsCvIClxZz4k+jha4O3x2y574CMDdrnX/ftbN7RQHvNWavGdipp08MXHA6Nt7AXbYnxhDrnfQ=
+X-Received: by 2002:a05:622a:19a4:b0:477:6f1f:e1d6 with SMTP id
+ d75a77b69052e-479249115c3mr252735611cf.3.1744112008415; Tue, 08 Apr 2025
+ 04:33:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] amd-xgbe: Convert to SPDX identifier
-To: Raju Rangoju <Raju.Rangoju@amd.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Shyam-sundar.S-k@amd.com
-References: <20250407102913.3063691-1-Raju.Rangoju@amd.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250407102913.3063691-1-Raju.Rangoju@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <Z_PfCosPB7GS4DJl@mini-arch> <20250407161308.19286-1-kuniyu@amazon.com>
+ <CANp29Y5RjJD3FK8zciRL92f0+tXEaZ=DbzSF3JrnVRGyDmag2A@mail.gmail.com> <CACT4Y+acJ-D6TiynzWef4vAwTNhCNAgey=RmfZHEXDJVrPxDCg@mail.gmail.com>
+In-Reply-To: <CACT4Y+acJ-D6TiynzWef4vAwTNhCNAgey=RmfZHEXDJVrPxDCg@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 8 Apr 2025 13:33:17 +0200
+X-Gm-Features: ATxdqUFoxW4EAQ8DWeKoT-eQ2hIeqNReBAeLwQIOMKacF92_AuEB3gUBe-fWFCk
+Message-ID: <CANn89iK=SrbwSN20nKY5y71huhsabLEdX=OGsdqwMPZOmNW8Gw@mail.gmail.com>
+Subject: Re: [syzbot] [net?] WARNING: bad unlock balance in do_setlink
+To: Dmitry Vyukov <dvyukov@google.com>
+Cc: Aleksandr Nogikh <nogikh@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, stfomichev@gmail.com, 
+	andrew@lunn.ch, davem@davemloft.net, horms@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	sdf@fomichev.me, syzbot+45016fe295243a7882d3@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/7/25 12:29 PM, Raju Rangoju wrote:
-> Use SPDX-License-Identifier accross all the files of the xgbe driver to
-> ensure compliance with Linux kernel standards, thus removing the
-> boiler-plate template license text.
-> 
-> Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
-> Acked-by: Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+On Tue, Apr 8, 2025 at 12:44=E2=80=AFPM Dmitry Vyukov <dvyukov@google.com> =
+wrote:
+>
+> On Tue, 8 Apr 2025 at 10:11, Aleksandr Nogikh <nogikh@google.com> wrote:
+> >
+> > On Mon, Apr 7, 2025 at 6:13=E2=80=AFPM 'Kuniyuki Iwashima' via syzkalle=
+r-bugs
+> > <syzkaller-bugs@googlegroups.com> wrote:
+> > >
+> > > From: Stanislav Fomichev <stfomichev@gmail.com>
+> > > Date: Mon, 7 Apr 2025 07:19:54 -0700
+> > > > On 04/07, syzbot wrote:
+> > > > > Hello,
+> > > > >
+> > > > > syzbot has tested the proposed patch but the reproducer is still =
+triggering an issue:
+> > > > > unregister_netdevice: waiting for DEV to become free
+> > > > >
+> > > > > unregister_netdevice: waiting for batadv0 to become free. Usage c=
+ount =3D 3
+> > > >
+> > > > So it does fix the lock unbalance issue, but now there is a hang?
+> > >
+> > > I think this is an orthogonal issue.
+> > >
+> > > I saw this in another report as well.
+> > > https://lore.kernel.org/netdev/67f208ea.050a0220.0a13.025b.GAE@google=
+.com/
+> > >
+> > > syzbot may want to find a better way to filter this kind of noise.
+> > >
+> >
+> > Syzbot treats this message as a problem worthy of reporting since a
+> > long time (Cc'd Dmitry who may remember the context):
+> > https://github.com/google/syzkaller/commit/7a67784ca8bdc3b26cce2f0ec9a4=
+0d2dd9ec9396
+> >
+> > Since v6.15-rc1, we do observe it happen at least 10x more often than
+> > before, both during fuzzing and while processing #syz test commands:
+> > https://syzkaller.appspot.com/bug?extid=3D881d65229ca4f9ae8c84
+>
+> IIUC this error means a leaked reference count on a device, and the
+> device and everything it references leaked forever + a kernel thread
+> looping forever. This does not look like noise.
+>
+> Eric, should know more. Eric fixed a bunch of these bugs and added a
+> ref count tracker to devices to provide better diagnostics. For some
+> reason I don't see the reftracker output in the console output, but
+> CONFIG_NET_DEV_REFCNT_TRACKER=3Dy is enabled in the config.
 
-You targeted the net tree, but this is IMHO net-next material. Applying
-there as such.
+I think that Kuniyuki patch was fixing the original syzbot report.
 
-Thanks,
+After fixing this trivial bug, another bug showed up,
+and this second bug triggered "syzbot may want to find a better way to
+filter this kind of noise." comment.
 
-Paolo
 
+-ETOOMANYBUGS.
 
