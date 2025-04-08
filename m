@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-180232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7226A80BB6
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 15:20:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6603A80BFD
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 15:24:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D9F71BC40C7
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 13:14:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 063A650664F
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 13:14:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF7D31C5F0E;
-	Tue,  8 Apr 2025 13:04:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C5C51D5ABA;
+	Tue,  8 Apr 2025 13:04:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wt9TlUss"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Qdnrm8BE"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FFFB1C5F08
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 13:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF7D1C5F08
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 13:04:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744117445; cv=none; b=dZPqERwr51LhaJudN6hQr5r8aw6d8xcPMtTBOualBb86/rvP2UTiQFVOGMJcpvJWMPxiO9VCre8LqNXs4xEDGBhoiPco31zj7FaQp3eHHkpdHJQDy5wzQOffzmcl4kFxfJJPekS5JTuY6nf1weG0yQoLZ124OAsz41g/l1w80T4=
+	t=1744117460; cv=none; b=aBY4/JcZXIVzkNmqCi3kzwzEjIlXDH1BMpeMfJmCokqMRKY7K1RlUm8tRi2w1e000JYlDQ5KqqWZq3vv9aC2OUiGPviCvvEuHPPq8lPJmSVCk32wjQicIe+hAD0IENbfqh7pEiIQzsHSFbXDvaG7Zuf8cCvtU5dG+D28qonOb8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744117445; c=relaxed/simple;
-	bh=tz+bfRiFhpi1Vw9bXip/ozFdm0ccAPNiviHCc0CnDU8=;
+	s=arc-20240116; t=1744117460; c=relaxed/simple;
+	bh=SShOKKa4LMqYcTOm6njD8nRn5wiR7lnqI6a0xzjIzG4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YnsrY9/3Ie6jC+hvGtz2hcaSZ6ZnJfYH3kUtQFHUU84Nia6mxh0v1kReSv+cMnJWrkSaicVgCRgDoVMhqB7BnHcUZrGmcn/rDdWXk0DX7s1w/W0IGVFQW9Ej5RlWBnegvovxIToUtwFBXxyb2/7kHr+0gc9nQn7xA8qZTBJrPKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wt9TlUss; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=rdJGemdI6HLdYEYYM1mbYscG1YihchEPE8pAtYFUWtMWJJ+Q/up3ecpw5sGDauZWky12I4t3dW9xvaLUREpdhOfK5teTfmfkovqobrHhBHZBPlaLthV40dyylRIWWBiw/XMw6K7V/IFHT+5nfc8UAn6QOL3Lk7jBASmrhvyYGdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Qdnrm8BE; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=RMK/yH8vtY9JB9PL98uNHWoExGdbmiSXaviteRsYr9U=; b=wt9TlUssAAzTom2YI5g4jj6jao
-	qvhMKYYF248LEQi6kjkaUHjkNJNsvn4qizo8j+Fz8jgqgblUfnAioPC1DK2I3ACnTnTcnnkZClzo4
-	RG5Rm4ARm6CjKlkIvCz+Su6dLDjblITiifbmd9rMgLp3/dhsXI4eAz/b1Z3rDk0uCBUc=;
+	bh=rB/dIvd7bU6zo6n9YdzMajIzzeCmS1EwGXtnalG5tYI=; b=Qdnrm8BEZBNy23lYC19M1XF7Et
+	Kp+5vAHIJY07hxFNlG2cyzxI82LuGlxAdpnBCSX1HCcmFT4O2k4peaJQhTQDULdEaO6iZa8YuYRla
+	OJ/P5KfclV+qVRbN3/GE5+LzbjNWkeAwXt8MPqNdiJPCdno71A5qqo/rDuqQXh6GCksQ=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1u28cK-008OEc-Mr; Tue, 08 Apr 2025 15:03:52 +0200
-Date: Tue, 8 Apr 2025 15:03:52 +0200
+	id 1u28cc-008OFV-52; Tue, 08 Apr 2025 15:04:10 +0200
+Date: Tue, 8 Apr 2025 15:04:10 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 Cc: Heiner Kallweit <hkallweit1@gmail.com>,
@@ -57,10 +57,11 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Prabhakar <prabhakar.csengg@gmail.com>,
 	Thierry Reding <treding@nvidia.com>
-Subject: Re: [PATCH net-next 1/2] net: stmmac: provide stmmac_pltfr_find_clk()
-Message-ID: <96479c3b-70db-4f6e-bb7c-b1ced14463c3@lunn.ch>
+Subject: Re: [PATCH net-next 2/2] net: stmmac: dwc-qos: use
+ stmmac_pltfr_find_clk()
+Message-ID: <0f370f79-6221-48e4-a700-86fc26547f95@lunn.ch>
 References: <Z_Qbw0tZ2ktgBf7c@shell.armlinux.org.uk>
- <E1u1rMq-0013OH-PI@rmk-PC.armlinux.org.uk>
+ <E1u1rMv-0013ON-TJ@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,11 +70,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1u1rMq-0013OH-PI@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1u1rMv-0013ON-TJ@rmk-PC.armlinux.org.uk>
 
-On Mon, Apr 07, 2025 at 07:38:44PM +0100, Russell King (Oracle) wrote:
-> Provide a generic way to find a clock in the bulk data.
-> 
+On Mon, Apr 07, 2025 at 07:38:49PM +0100, Russell King (Oracle) wrote:
 > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
