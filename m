@@ -1,112 +1,121 @@
-Return-Path: <netdev+bounces-180011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ED8DA7F192
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 02:15:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A4DBA7F196
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 02:17:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 001D916A0A6
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 00:15:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5398188EBFB
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 00:17:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE112A921;
-	Tue,  8 Apr 2025 00:15:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F36D812E7F;
+	Tue,  8 Apr 2025 00:17:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LdGDAG2h"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="kUmsmc4I"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4465184F;
-	Tue,  8 Apr 2025 00:15:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52C7CD2FB;
+	Tue,  8 Apr 2025 00:17:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744071302; cv=none; b=Y859hSGpr8HwY+sYITxMCQI/xQBxwPwPtJiXkA32rJBIXQd9mwTUemltuGMEdEMx+LyAsFjVxVPBko8zS4xHoxNTV2lBPY5/8MhHrIZLQeAfA/KbJbBuuBEV8Fh8jPRX5AXxhtSvk0klKDLxxU6pl2umsbGWKpP7PE+4dI34WE4=
+	t=1744071428; cv=none; b=eNLS/3oKs3lMTrPsutXT3m8HByrK9plR9do+0qQpwY1Pw0K6uJTaPv52TWBkDlWGUgmMqOb6ruKQ+BFAfrsiahHOgcAeLudhNBFLwa9HC7BlGrcPVgsB7Hekx35ob2l3ZAVnpahrA2nU1BVoZVBq+PsLKHcCJ34hrDOY3quyu7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744071302; c=relaxed/simple;
-	bh=p6MZUSqU/sLAunm0i5UVvuGHuAIYSf5Oj5/EKR2DRKE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LVKGkE7h6W1fvfBtEvQ+QrTbws7iMZt4JmCVAk5RyRGrlawZc/XO6klcMxxQCGAOp3ZNRUrFz3zrbti1LJZmgBwlLMtVASdVPOJ21fXf4zqtxl2VNqxHATmHxzZ/XIFixLETRv3+SR9g5aBAXDxsm+JLPAuJIsy/jDYjdCQrKsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LdGDAG2h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A05AC4CEDD;
-	Tue,  8 Apr 2025 00:15:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744071302;
-	bh=p6MZUSqU/sLAunm0i5UVvuGHuAIYSf5Oj5/EKR2DRKE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LdGDAG2hgb+NyDTKjmLOYhwyctZI8CG3KVx95SQMiC4tyXDVEOVReqD3wTUk84/MQ
-	 7j3azr1DYeCpYDQFP1fy1l+jZ2cr+LMdDHh5OAJD7iR7qRv+B7YXpliggHVnsc4jaD
-	 2uQI3qK8+T7KJmhI7/Iybfd7jAsUQXV5YH59g18waMkj7NSprj991TBx+SqusjJrwf
-	 tDBzScRmYQjNogmZloPriZL3LjQc4qYCMMpzSohypLsjRAUtW+q+a5Dc3EhFLmN8sD
-	 9Uj89CTBhPupTyhbRY5l/bYYD8aKx0ER+Kvo6Fxvp6gMq2qCwb+0Mqx76U2jGztFie
-	 Kgy38iSJ+0kFQ==
-Date: Mon, 7 Apr 2025 17:14:59 -0700
-From: Josh Poimboeuf <jpoimboe@kernel.org>
-To: Oleksandr Natalenko <oleksandr@natalenko.name>
-Cc: linux-kernel@vger.kernel.org, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org, 
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [Intel-wired-lan] objtool warning in ice_free_prof_mask
-Message-ID: <6nzfoyak4cewjpmdflg5yi7jh2mqqdsfqgljoolx5lvdo2p65p@rwjfl7cqkfoo>
-References: <4970551.GXAFRqVoOG@natalenko.name>
- <5874052.DvuYhMxLoT@natalenko.name>
- <ficwjo5aa6enekhu6nsmsi5vfp6ms7dgyc326yqknda22pthdn@puk4cdrmem23>
- <2983242.e9J7NaK4W3@natalenko.name>
+	s=arc-20240116; t=1744071428; c=relaxed/simple;
+	bh=z1sI6zqI2KbmUuNZWR9OauLNqva1J0bVTTZtuwY6uO0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=b8OJBfwISDViSOfqaxWx0K/jrI/ywpZCRtkcYFfddzYThIJOB/sb9zhygAL2iS3cXwM65Bhi1NcygORf8Q2jXBNXxNW0ZwmGcPMW8kIKUEqTYjaPLt2p18qAcjHzs8UV9pfTjsndj6h/O+BJjxY2hOn+kgNdj2GlBbfazotD+xI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=kUmsmc4I; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744071427; x=1775607427;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=8yOCsx+nkQGqiyaA8CKVjQ4hpZeCm+ILtzKq52dhCgE=;
+  b=kUmsmc4IgiFwHOlxD6Lxujd+JK/V/QIeWkwyo7cL5quJcB5Y2zD3m5wM
+   ulq8b+eCGQnlxqLhf+abOxbcgIRIw0q79x6AQmcU5dsSeuUcdBX3d3nsd
+   TYlou+uFvmWalgZjL5+YdZ68h8Uf2OO8YnS9bZ3V5iNuuQR6ZoXC5g29O
+   0=;
+X-IronPort-AV: E=Sophos;i="6.15,196,1739836800"; 
+   d="scan'208";a="814162670"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2025 00:17:02 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:41354]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.25.120:2525] with esmtp (Farcaster)
+ id 1a6f8aa9-6343-4351-ae86-e3271abdc5f1; Tue, 8 Apr 2025 00:17:01 +0000 (UTC)
+X-Farcaster-Flow-ID: 1a6f8aa9-6343-4351-ae86-e3271abdc5f1
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 8 Apr 2025 00:17:01 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.101.45) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 8 Apr 2025 00:16:58 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <jordan@jrife.io>
+CC: <aditi.ghag@isovalent.com>, <bpf@vger.kernel.org>, <daniel@iogearbox.net>,
+	<kuniyu@amazon.com>, <martin.lau@linux.dev>, <netdev@vger.kernel.org>,
+	<willemdebruijn.kernel@gmail.com>
+Subject: Re: [RFC PATCH bpf-next 2/3] bpf: udp: Avoid socket skips and repeats during iteration
+Date: Mon, 7 Apr 2025 17:16:25 -0700
+Message-ID: <20250408001649.5560-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <CABi4-ogLNdQw=gLTRZ4aJ8qiQWiovHaO19sx5uz29Es6du8GKg@mail.gmail.com>
+References: <CABi4-ogLNdQw=gLTRZ4aJ8qiQWiovHaO19sx5uz29Es6du8GKg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2983242.e9J7NaK4W3@natalenko.name>
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D042UWA003.ant.amazon.com (10.13.139.44) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Mon, Apr 07, 2025 at 11:49:35PM +0200, Oleksandr Natalenko wrote:
-> $ make drivers/net/ethernet/intel/ice/ice.o
-> …
->   LD [M]  drivers/net/ethernet/intel/ice/ice.o
-> drivers/net/ethernet/intel/ice/ice.o: error: objtool: ice_free_prof_mask.isra.0() falls through to next function ice_free_flow_profs.cold()
-> drivers/net/ethernet/intel/ice/ice.o: error: objtool: ice_free_prof_mask.isra.0.cold() is missing an ELF size annotation
+From: Jordan Rife <jordan@jrife.io>
+Date: Mon, 7 Apr 2025 16:30:46 -0700
+> > We may need to iterate all visited sockets again in this bucket if all
+> > unvisited sockets disappear from the previous iteration.
+> 
+> If the next socket disappears between iterator stop and start, the
+> outer loop would need to keep going until it finds a socket from last
+> time that still exists. In most cases, it seems unlikely that the next
+> socket will disappear between iterator reads, so in general the outer
+> loop would only need to iterate once; the common case should perform
+> the same as before with the offset approach. The worst case indeed
+> would be if all the sockets disappear between reads. Then you'd have
+> to scan through all items in the bucket n_cookies times. Again though,
+> this is hopefully a rare case.
+> 
+> > When the number of the unvisited sockets is small like 1, the duplicated
+> > records will not be rare and rather more often than before ?
+> 
+> Sorry if I'm missing something, but what's the relationship between
+> the number of unvisited sockets and rarity of duplicated records?
 
-Thanks, I was able to recreate.
+Sorry, I misread the code, and s/duplicated/skipped/.
 
-This is the -O3 optimizer noticing that ice_write_prof_mask_reg() is
-only called with ICE_BLK_RSS or ICE_BLK_FD.  So it optimizes out the
-impossible 'default' case in this switch statement:
+I was thinking that rarity of such unwanted events depends on how
+many unvisited sockets are left before restarting.
 
-	switch (blk) {
-	case ICE_BLK_RSS:
-		offset = GLQF_HMASK(mask_idx);
-		val = FIELD_PREP(GLQF_HMASK_MSK_INDEX_M, idx);
-		val |= FIELD_PREP(GLQF_HMASK_MASK_M, mask);
-		break;
-	case ICE_BLK_FD:
-		offset = GLQF_FDMASK(mask_idx);
-		val = FIELD_PREP(GLQF_FDMASK_MSK_INDEX_M, idx);
-		val |= FIELD_PREP(GLQF_FDMASK_MASK_M, mask);
-		break;
-	default:
-		ice_debug(hw, ICE_DBG_PKG, "No profile masks for block %d\n",
-			  blk);
-		return;
-	}
+Let's say batch has 16 sockets and the iterator stopped at 15,
+it's more likely that a single socket disappear.
 
-Unfortunately, instead of finishing the optimization, it inserts
-undefined behavior for the 'default' case by branching off to some
-random code.
+This should be fine given the batch size normally covers the full
+bucket of the hash, and it's unlikely that many sockets are added
+in the bucket between stop and restart.
 
-So there doesn't seem to be any underlying bug, it's just that objtool
-doesn't like undefined behavior.
+In the worst case, where vmalloc() fails and the batch does not
+cover full bucket, say the batch size is 16 but the list length
+is 256, if the iterator stops at sk15 and sk16 disappers,
+sk17 ~ sk256 will be skipped in the next iteration.
 
-So for building with -O3 I'd recommend just disabling
-CONFIG_OBJTOOL_WERROR and ignoring any objtool warnings.
-
--- 
-Josh
+ sk1 -> ... sk15 -> sk16 -> sk17 -> ... -> sk256
 
