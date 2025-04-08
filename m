@@ -1,53 +1,54 @@
-Return-Path: <netdev+bounces-180300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE110A80E48
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 16:36:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6FFBA80E52
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 16:37:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 181241BA3E0B
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 14:32:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0444E5003EE
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 14:33:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C0AF1C84C2;
-	Tue,  8 Apr 2025 14:32:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12C45219A90;
+	Tue,  8 Apr 2025 14:32:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="QYOYgi25"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="gY0LVSL8"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F372CCC0;
-	Tue,  8 Apr 2025 14:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7504B18784A;
+	Tue,  8 Apr 2025 14:32:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744122762; cv=none; b=NMI+6JXg0WGwklnl1pfwxn/c3p1Gq5LPanxhRer1x/zx9NxbOI50xt6pUIMfwvhwpwdC13YMDz9J4I3LRN1fEVsYgQpjQDSYMAGR2GDlefFNNjPWKmjqscooc1VP7u7+hK6HIN4DpwsBXGkbpb8fCj3yaLFNPDmIT/5CVdq4sVI=
+	t=1744122764; cv=none; b=DiwY7rVnF9Q39qa4/W8CoFMhXTNI1JyWlu4965v86xGOUiOxIGfdVh5E//kIFVLzMclQhAOstpmBfphulsr5ZDautmfWLj5y2Pok8+GV8WoJhvBpKvi1Qf+92e3CJuB17yHv6FxHLcvFamDUKnkDNLr9NhjR7UGOa/hNEY/oufI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744122762; c=relaxed/simple;
-	bh=S8HQFCAgRYCK9VleZ1xfxlvdTab7w9flM6ttpKFL0K0=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=kSQ/ZQhMfcf+gCS1XiY8zHD9Y7aDP6xYvwdKsY66GlmJg8lbmGkykJb7R7IU3HJQuTnd+ZHW/s7Y4XUZimEKtO5YLpcvImfDJvo8IfwJjnM1SKYsW0hsrXTr8hGk+pcVyRoU/Rhqq8JAtJEYRvV2m07ONRp4bZNAK9DpPfnOREs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=QYOYgi25; arc=none smtp.client-ip=217.70.183.194
+	s=arc-20240116; t=1744122764; c=relaxed/simple;
+	bh=2IzeeJjzK/oltC0Tf05JtTXe+LT1f0/5nYgueblLEwI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=OFcjrD2cs4VgtX/S5AebxySEPi3xm+kQ+KmX614hVj/1P4fkgC2VEQEgDR4L/Pil2OAH77MJHTo9iF6Q9sBLZ83LvPWZda9cU5svlRcuqoJyuHXFJX9d8HXR9KQJnjoxKs+SdHdevnSndHAFkufpX286FAV/0SwxPbdGaBsSX2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=gY0LVSL8; arc=none smtp.client-ip=217.70.183.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 36DDB441AA;
-	Tue,  8 Apr 2025 14:32:31 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 39810441BF;
+	Tue,  8 Apr 2025 14:32:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1744122753;
+	t=1744122754;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=jKZ2nZ/YDVQxetnaoa6rVSZtxDIyGQTUnyWlkWNbPEw=;
-	b=QYOYgi251QkCNRplRBx6erON2BBQBzYRDjQWAnm3vJjtX5r/2bDBBees95n8rqtCiY7Wbc
-	PQpHUJKli4z+ftZemcOTqMt+WwdhacCvAiUd8T/vPnX0jXV6WiPakE9zESDw1Swns29JVb
-	7r1KXteWFzC8r4EuEcv3czmf1/grO/4smocbwQYMf5fIrMUiWmjM56cst2fFh+Yo2kIT2+
-	HnOEx6yKX7Plckidry7Vh9kADkh1dhtryIPaRdKi/9IKtU9LBz2glnluqCYE4DJxMjqAfT
-	DsPlOA7suTrNz5VIlt/BECzSYYAdEVEj4fqLn/oabyct73drDjCNAGYPJrg+dg==
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1zGOv6ApdajX/tkIHkaB/u2JQAUI8IB8rFk0O3gWTbU=;
+	b=gY0LVSL8XLDgWT8RHOu+Vaf3hAW7dFcauVBVXQk6yX04YlKWJKnFBJzhWDN38ZsDoUCQB5
+	KHhZm3ncFSURZzwhmxi0UGzUCLNNjD9i3xTVT4j9GLvJF6JRuVtq3HwOTF46jQd6PE3OiX
+	JDeQeMkz9xYb5qXTc3QHKtM/7Q3ZMS9UyAc4Q0YHbPplMI18Mnv84TivZml3rHD+Mpv4gN
+	1kFzrO05SBQ8KtsZpCFQZl7dNZZD5fISZAvWTQrjoyI3k8KaWO3Qqh6ZIxgNddZdqQ1A7G
+	PkXyKbmTOSM4oF7hBvRtfIFULo/YhM2I4EegkDVhIL0fpIqaV37yg7ZpVUdKVA==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Subject: [PATCH net-next v7 00/13] Add support for PSE budget evaluation
- strategy
-Date: Tue, 08 Apr 2025 16:32:09 +0200
-Message-Id: <20250408-feature_poe_port_prio-v7-0-9f5fc9e329cd@bootlin.com>
+Date: Tue, 08 Apr 2025 16:32:10 +0200
+Subject: [PATCH net-next v7 01/13] net: ethtool: Add support for
+ ethnl_info_init_ntf helper function
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,12 +56,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-B4-Tracking: v=1; b=H4sIAGkz9WcC/3XO3WoDIRAF4FcJXtei49/aq75HCcHq2AitLq5dE
- sK+e81CScuyF3NxOMw3cyMT1oQTeTncSMU5TankHszTgfizyx9IU+iZAAPJLBc0omvfFU9juU9
- tp7GmQp3iDoMRAtCTvjtWjOmyum8kY6MZL40ce3NOUyv1uh6c+drfbc4Y7Ngzp4yawTAlo5EY1
- Ot7Ke0z5WdfvlZzhj+OYHsOdMcqZTUAojRu64iHw4HvOaI7gwBro9NWG7915K+jWH9oz5HdCd5
- yJzzzfDBbRz0c4MOeo7ojgpODRhWDlv+dZVl+AHGACwzmAQAA
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250408-feature_poe_port_prio-v7-1-9f5fc9e329cd@bootlin.com>
+References: <20250408-feature_poe_port_prio-v7-0-9f5fc9e329cd@bootlin.com>
+In-Reply-To: <20250408-feature_poe_port_prio-v7-0-9f5fc9e329cd@bootlin.com>
 To: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -76,149 +75,72 @@ Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
  Dent Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, 
  Maxime Chevallier <maxime.chevallier@bootlin.com>, 
  devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>, 
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+ "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>
 X-Mailer: b4 0.15-dev-8cb71
 X-GND-State: clean
 X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtdeffeegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhufffkfggtgfgvfevofesthekredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeduhfevudetfffgkedvhfevheeghedtleeghfffudeiffefvdehfeegieeivdekteenucffohhmrghinhepkhgvrhhnvghlrdhorhhgpdgsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopegluddvjedrtddruddrudgnpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdekpdhrtghpthhtohepuggvvhhitggvthhrvggvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhihlhgvrdhsfigvnhhsohhnsegvshhtrdhtvggthhdprhgtphhtthhopegsrhhoohhnihgvsehkvghrnhgvlhdrohhrghdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgto
- hhmpdhrtghpthhtohepohdrrhgvmhhpvghlsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopehlihhnuhigqdguohgtsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhm
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtdeffeegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhfffugggtgffkfhgjvfevofesthejredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeevgfdvgfektefgfefggeekudfggffhtdfffedtueetheejtddvledvvdelhedtveenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghloheplgduvdejrddtrddurddungdpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvjedprhgtphhtthhopeguvghvihgtvghtrhgvvgesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehkhihlvgdrshifvghnshhonhesvghsthdrthgvtghhpdhrtghpthhtohepsghrohhonhhivgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepughonhgrlhgurdhhuhhnthgvrhesghhmrghilhdrtghomhdprhgtphhtthhopehordhrvghmphgvlhesphgvnhhguhhtrhhonhhig
+ idruggvpdhrtghpthhtoheplhhinhhugidqughotgesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomh
 X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-This series brings support for budget evaluation strategy in the PSE
-subsystem. PSE controllers can set priorities to decide which ports should
-be turned off in case of special events like over-current.
-
-This patch series adds support for two budget evaluation strategy.
-1. Static Method:
-
-   This method involves distributing power based on PD classification.
-   It’s straightforward and stable, the PSE core keeping track of the
-   budget and subtracting the power requested by each PD’s class.
-
-   Advantages: Every PD gets its promised power at any time, which
-   guarantees reliability.
-
-   Disadvantages: PD classification steps are large, meaning devices
-   request much more power than they actually need. As a result, the power
-   supply may only operate at, say, 50% capacity, which is inefficient and
-   wastes money.
-
-2. Dynamic Method:
-
-   To address the inefficiencies of the static method, vendors like
-   Microchip have introduced dynamic power budgeting, as seen in the
-   PD692x0 firmware. This method monitors the current consumption per port
-   and subtracts it from the available power budget. When the budget is
-   exceeded, lower-priority ports are shut down.
-
-   Advantages: This method optimizes resource utilization, saving costs.
-
-   Disadvantages: Low-priority devices may experience instability.
-
-The UAPI allows adding support for software port priority mode managed from
-userspace later if needed.
-
-Patches 1-2: Add support for interrupt event report in PSE core, ethtool
-	     and ethtool specs.
-Patch 3: Adds support for interrupt and event report in TPS23881 driver.
-Patches 4,5: Add support for PSE power domain in PSE core and ethtool.
-Patches 6-8: Add support for budget evaluation strategy in PSE core,
-	     ethtool and ethtool specs.
-Patches 9-11: Add support for port priority and power supplies in PD692x0
-	      drivers.
-Patches 12,13: Add support for port priority in TPS23881 drivers.
+Introduce support for the ethnl_info_init_ntf helper function to enable
+initialization of ethtool notifications outside of the netlink.c file.
+This change allows for more flexible notification handling.
 
 Signed-off-by: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 ---
-Changes in v7:
-- Add reference count and mutex lock for PSE power domain.
-- Add support to retry enabling port that failed to be powered in case of
-  port disconnection or priority change.
-- Use flags definition for pse events in ethtool specs.
-- Small changes in the TPS23881 driver.
-- Link to v6: https://lore.kernel.org/r/20250304-feature_poe_port_prio-v6-0-3dc0c5ebaf32@bootlin.com
-
-Changes in v6:
-- Few typos.
-- Use uint instead of bitset for PSE_EVENT.
-- Remove report of budget evaluation strategy in the uAPI.
-- Link to v5: https://lore.kernel.org/r/20250218-feature_poe_port_prio-v5-0-3da486e5fd64@bootlin.com
-
-Changes in v5:
-- Remove the first part of the patch series which tackled PSE
-  improvement and already gets merged:
-  https://lore.kernel.org/netdev/20250110-b4-feature_poe_arrange-v3-0-142279aedb94@bootlin.com/
-- Remove the PSE index support which is useless for now. The PSE power
-  domain ID is sufficient.
-- Add support for PD692x0 power supplies other than Vmain which was already
-  in the patch series.
-- Few other small fixes.
-- Link to v4: https://lore.kernel.org/r/20250103-feature_poe_port_prio-v4-0-dc91a3c0c187@bootlin.com
-
 Changes in v4:
-- Remove disconnection policy.
-- Rename port priority mode to budget evaluation strategy.
-- Add cosmetic changes in PSE core.
-- Add support for port priority in PD692x0 driver.
-- Link to v3: https://lore.kernel.org/r/20241121-feature_poe_port_prio-v3-0-83299fa6967c@bootlin.com
-
-Changes in v3:
-- Move power budget to regulator core.
-- Add disconnection policies with PIs using the same priority.
-- Several fixes on the TPS23881 drivers.
-- Several new cosmetic patches.
-- Link to v2: https://lore.kernel.org/r/20241030-feature_poe_port_prio-v2-0-9559622ee47a@bootlin.com
+- Use the new helper in ethnl_default_notify function.
 
 Changes in v2:
-- Rethink the port priority management.
-- Add PSE id.
-- Add support for PSE power domains.
-- Add get power budget regulator constraint.
-- Link to v1: https://lore.kernel.org/r/20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com
-
+- new patch.
 ---
-Kory Maincent (13):
-      net: ethtool: Add support for ethnl_info_init_ntf helper function
-      net: pse-pd: Add support for reporting events
-      net: pse-pd: tps23881: Add support for PSE events and interrupts
-      net: pse-pd: Add support for PSE power domains
-      net: ethtool: Add support for new power domains index description
-      net: pse-pd: Add helper to report hardware enable status of the PI
-      net: pse-pd: Add support for budget evaluation strategies
-      net: ethtool: Add PSE port priority support feature
-      net: pse-pd: pd692x0: Add support for PSE PI priority feature
-      net: pse-pd: pd692x0: Add support for controller and manager power supplies
-      dt-bindings: net: pse-pd: microchip,pd692x0: Add manager regulator supply
-      net: pse-pd: tps23881: Add support for static port priority feature
-      dt-bindings: net: pse-pd: ti,tps23881: Add interrupt description
+ net/ethtool/netlink.c | 7 ++++++-
+ net/ethtool/netlink.h | 2 ++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
- .../bindings/net/pse-pd/microchip,pd692x0.yaml     |  22 +-
- .../bindings/net/pse-pd/ti,tps23881.yaml           |   8 +
- Documentation/netlink/specs/ethtool.yaml           |  47 +
- Documentation/networking/ethtool-netlink.rst       |  49 ++
- drivers/net/mdio/fwnode_mdio.c                     |  26 +-
- drivers/net/pse-pd/pd692x0.c                       | 225 +++++
- drivers/net/pse-pd/pse_core.c                      | 980 ++++++++++++++++++++-
- drivers/net/pse-pd/tps23881.c                      | 404 ++++++++-
- include/linux/ethtool_netlink.h                    |   9 +
- include/linux/pse-pd/pse.h                         |  90 +-
- include/uapi/linux/ethtool.h                       |  34 +
- include/uapi/linux/ethtool_netlink_generated.h     |  12 +
- net/ethtool/netlink.c                              |   7 +-
- net/ethtool/netlink.h                              |   2 +
- net/ethtool/pse-pd.c                               |  67 ++
- 15 files changed, 1923 insertions(+), 59 deletions(-)
----
-base-commit: cdf176f04d6ce5a3c7a4971265c267141919f42a
-change-id: 20240913-feature_poe_port_prio-a51aed7332ec
+diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
+index a163d40c6431..970bd115b40d 100644
+--- a/net/ethtool/netlink.c
++++ b/net/ethtool/netlink.c
+@@ -769,7 +769,7 @@ static void ethnl_default_notify(struct net_device *dev, unsigned int cmd,
+ 	int reply_len;
+ 	int ret;
+ 
+-	genl_info_init_ntf(&info, &ethtool_genl_family, cmd);
++	ethnl_info_init_ntf(&info, cmd);
+ 
+ 	if (WARN_ONCE(cmd > ETHTOOL_MSG_KERNEL_MAX ||
+ 		      !ethnl_default_notify_ops[cmd],
+@@ -838,6 +838,11 @@ static void ethnl_default_notify(struct net_device *dev, unsigned int cmd,
+ typedef void (*ethnl_notify_handler_t)(struct net_device *dev, unsigned int cmd,
+ 				       const void *data);
+ 
++void ethnl_info_init_ntf(struct genl_info *info, u8 cmd)
++{
++	genl_info_init_ntf(info, &ethtool_genl_family, cmd);
++}
++
+ static const ethnl_notify_handler_t ethnl_notify_handlers[] = {
+ 	[ETHTOOL_MSG_LINKINFO_NTF]	= ethnl_default_notify,
+ 	[ETHTOOL_MSG_LINKMODES_NTF]	= ethnl_default_notify,
+diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
+index ec6ab5443a6f..4d4ad3824bbb 100644
+--- a/net/ethtool/netlink.h
++++ b/net/ethtool/netlink.h
+@@ -323,6 +323,8 @@ struct ethnl_sock_priv {
+ int ethnl_sock_priv_set(struct sk_buff *skb, struct net_device *dev, u32 portid,
+ 			enum ethnl_sock_type type);
+ 
++void ethnl_info_init_ntf(struct genl_info *info, u8 cmd);
++
+ /**
+  * struct ethnl_request_ops - unified handling of GET and SET requests
+  * @request_cmd:      command id for request (GET)
 
-Best regards,
 -- 
-Köry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+2.34.1
 
 
