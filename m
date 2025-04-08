@@ -1,89 +1,74 @@
-Return-Path: <netdev+bounces-180050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F35BA7F499
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 08:07:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2523A7F4B9
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 08:11:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36951188B6B5
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 06:07:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC5CB3A64FF
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 06:10:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 536E525FA07;
-	Tue,  8 Apr 2025 06:06:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB24261366;
+	Tue,  8 Apr 2025 06:08:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d4m3sMq4"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="stRNo9MQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCDF725F97C
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 06:06:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C861B21AA;
+	Tue,  8 Apr 2025 06:08:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744092410; cv=none; b=os3JPWFkvIZ/k2WccjpbDxWlLgxwPbqA0m3jhjxFkkSxKQa7DauPMtf3eAekxCQdkNFX+dsoJuemv+7OcKHBNw1TbiOXrTuHjMN78K8Afmcf/+M6+2vPXNA4jgJ+Sw3fpE9f/bwDmLty3mGWxNtfHYg3Nr19p/QuyQZ0fKcE54k=
+	t=1744092509; cv=none; b=Hx+nCdjboT1kTilWdexsa+sjAbGMuhDn2SJMg7Khbw6AuxmbzG4tk9ZZ0qnY5LdJ7VVuVe/+tq74tv+Y7FakN254f3YcNoVFzvnl8J9dYG1xwRRnYEGFIs7vdApesSrDIpq8snShKvyJ3ChYukzr8Kb+AIWJlQJdV3VuI/5Y9AM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744092410; c=relaxed/simple;
-	bh=Aox3+Xmg9wuZmnWQdftzB8q4LDSIC/qS2G2THM27hKQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JL2PlFYZyvYYuhwm5vW/UdK5+DZaxqXQPsLZY4iLNuZn7ULi1vNznMLrh1qYWDuKQ/RXmr8872coi0+j7DCFVxxYqRi5p9wID8rYN+MNqD3m2l5mAnI4f3no+YpQ6YbE2Gc/mVxznwM6nL/uoG9SPHYKJa+S9IbR0dSZ/D6A+FI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d4m3sMq4; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-227b650504fso45631915ad.0
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 23:06:48 -0700 (PDT)
+	s=arc-20240116; t=1744092509; c=relaxed/simple;
+	bh=dE/3mxg4aDk8ZVqEmroY44DZ5XwUFIHKJcLTBMq23Qw=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QdIJARo9dboLTYAgG3fyw7qKV7iE6MC+qNLNldHzFUdOdJKQ2xXUkJzkY2dfbbWUciOUIq9wE8W7EVbC8mEozaNyAS83sdnPsxrT7MKDFqqT507dleAdD5f0YhPGlR0jzAy4vBUIlZpUsIv1Pb0LnsX83evvFCfjI/cp/LW878U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=stRNo9MQ; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744092408; x=1744697208; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zBoKJwOj2t61kw/H1gYwHjk6Tol9PSX6vbFvxa+NUA0=;
-        b=d4m3sMq4xMj4rWw1oqY/ssL5kRGbG/Yvt/sNjtn7XG4onwn3QXAaHxowuj39OjJcib
-         kV6zcly/YAjx6s9LerxIP62Np9Fs9E8aCZL+kNqemSOUvOqcgOQJRVZ2pgm/tloEhlun
-         RcdGF0JjuprCpom/BrjPb5wLI4B4OtTWy5hQlss0smRNC/Y8bBgvXv6eJNhQN6VHFJrH
-         3QqiHu+7qvV68KGEqbziAVn3F3TytupbpmlciRoAg8dKgVWosaiaQAHI+2lE/+cY38PC
-         FEKuOodpIZSlARvH2mQSeygZxbqyDE9+LzeCp/lDNCFmrwBlBOjPa9oP8h0jVnwt9vJF
-         Snbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744092408; x=1744697208;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zBoKJwOj2t61kw/H1gYwHjk6Tol9PSX6vbFvxa+NUA0=;
-        b=kBPHEViCwcn3t4bWT0jNw7p+LyO8lI3U0pt0v73Z1C0z6c9w73hBmrdMxdPX4OzRuv
-         B3mSFi54hlurX+1JoUef3Ymf7rkm9+paZx9ZfBvFcJpCT79HxQ4w55THF/uHTmn9OXx8
-         fuVhp7wYUvDugu117w0C2epOOXGigIOaAzGrajTP8Z4fPnZuj/IjDN44MJX070Z8Q8Uv
-         OqYYMnVXrgHbR4ck4EpqtOmfgKw7G/x5Q8kEBFFmiDKG1Q4Bd8QNG4y16hwxqdCNrN56
-         CEPkJi8XDiNJRCEC6hxeVTJHwkRVhRQzQNmrqwMLchcyM9QHm+e4rjtFdFHYDPXoV0Mv
-         r2RA==
-X-Forwarded-Encrypted: i=1; AJvYcCUdwi8VocCMSzd42yQQdHHViMz6wSuQB8QLbDuL+f4uQTsDgmHT6RSRH3cHxiz21Ko0Sfh3IzM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcDpirD3he8r1lwoRgoN0xKPFPa93xxUHHBghfshjCiMm4Qgrg
-	eCht8hmi8gFuYbq9bNzq/3+iaibIcs77YsLxe7MBMiAAgG1OZbt3
-X-Gm-Gg: ASbGnctJoHep/Oa/lD60VD1kkFEznZyz6nDUU3/o3WUqU+dnqKiTREQn1EwmfI5OeGM
-	f+49gIN7Dg6g4R4mioxCkM4ERk73SyEQUnbTfP7BSXE37O7toQhtui5wZaZahX2X9CKccZhD63Z
-	yzwPrLYIwSDHEGcB+J2sJQ9x+FVf3U3e8IgqvmcUSf+tT741JDb59flfehsWiR92jyeAlR85kZ0
-	rsazhxRViidCPo7qgOq93A4nBvkZW5PASgpFRnQkmmaj9SbjfFJ/hGjtxyVCt/CVox/iaCcTD52
-	QfcXrj07ghAURtvPL/6U08cm1nQhPHKjKQ==
-X-Google-Smtp-Source: AGHT+IEEK3gl4d5pXzMqOEvc66OPoEguSxC9r1drmvaVmsMPhOzHKBtyNlRNzuLYOu8lt+ghOLvz4g==
-X-Received: by 2002:a17:903:906:b0:223:619e:71e9 with SMTP id d9443c01a7336-22a8a04a7fdmr215823735ad.11.1744092406845;
-        Mon, 07 Apr 2025 23:06:46 -0700 (PDT)
-Received: from ap.. ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-229785c0127sm91922605ad.91.2025.04.07.23.06.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 23:06:46 -0700 (PDT)
-From: Taehee Yoo <ap420073@gmail.com>
-To: mkubecek@suse.cz,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	netdev@vger.kernel.org
-Cc: ap420073@gmail.com
-Subject: [PATCH ethtool-next] ethtool: Add support for configuring hds-thresh
-Date: Tue,  8 Apr 2025 06:06:25 +0000
-Message-Id: <20250408060625.2180330-1-ap420073@gmail.com>
-X-Mailer: git-send-email 2.34.1
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744092507; x=1775628507;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=nkQR+Pqjxb7qD2vxoEoYXOmPzl6qLR7UVCq3LQivBf8=;
+  b=stRNo9MQ6mAp2KV/6Khe0tF4/IEOXpegBc6Hn7pR0m87de0ux6aJlbdt
+   enair4U0FrO2HVDnEpzaPWEOkejPJkPLXSfekRBmvz6R0yhsACx+sGBHq
+   ZjbYlrMInPFuNg6wHkIgnBh2z+MJOYoKQEJTyNRRsW9dcgsSih8P5aPqJ
+   E=;
+X-IronPort-AV: E=Sophos;i="6.15,197,1739836800"; 
+   d="scan'208";a="814217596"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2025 06:08:22 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:35289]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.132:2525] with esmtp (Farcaster)
+ id 7e2c9346-85be-47ed-8283-ea868b0c771a; Tue, 8 Apr 2025 06:08:21 +0000 (UTC)
+X-Farcaster-Flow-ID: 7e2c9346-85be-47ed-8283-ea868b0c771a
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 8 Apr 2025 06:08:21 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.101.45) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 8 Apr 2025 06:08:17 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <hch@lst.de>
+CC: <axboe@kernel.dk>, <gechangzhong@cestc.cn>, <kbusch@kernel.org>,
+	<kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
+	<linux-nvme@lists.infradead.org>, <netdev@vger.kernel.org>,
+	<sagi@grimberg.me>, <shaopeijie@cestc.cn>, <zhang.guanghui@cestc.cn>
+Subject: Re: [PATCH v2] nvme-tcp: Fix netns UAF introduced by commit 1be52169c348
+Date: Mon, 7 Apr 2025 23:08:05 -0700
+Message-ID: <20250408060810.19654-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250408055830.GA708@lst.de>
+References: <20250408055830.GA708@lst.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,113 +76,18 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWC004.ant.amazon.com (10.13.139.205) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-HDS(Header Data Split) threshold value is used by header-data-split.
-If received packet's length is larger than hds-thresh value,
-header/data of packet will be splited.
+From: Christoph Hellwig <hch@lst.de>
+Date: Tue, 8 Apr 2025 07:58:30 +0200
+> On Mon, Apr 07, 2025 at 10:55:27PM -0700, Kuniyuki Iwashima wrote:
+> > Which branch/tag should be based on, for-next or nvme-6.15 ?
+> > http://git.infradead.org/nvme.git
+> 
+> nvme-6.15 is the canonical tree, but for bug fixes I'm fine with
+> almost anything :)
 
-ethtool -g|--get-ring <interface name> hds-thresh
-ethtool -G|--set-ring <interface name> hds-thresh <0 - MAX>
-
-The minimum value is 0, which indicates header/data will be splited
-for all receive packets.
-The maximum value is up to hardware limitation.
-
-Signed-off-by: Taehee Yoo <ap420073@gmail.com>
----
-
-RFC -> PATCH v1:
- - No changes.
-
- ethtool.8.in           |  4 ++++
- ethtool.c              |  1 +
- netlink/desc-ethtool.c |  2 ++
- netlink/rings.c        | 10 ++++++++++
- 4 files changed, 17 insertions(+)
-
-diff --git a/ethtool.8.in b/ethtool.8.in
-index 76a67c8..c910035 100644
---- a/ethtool.8.in
-+++ b/ethtool.8.in
-@@ -210,6 +210,7 @@ ethtool \- query or control network driver and hardware settings
- .BN tx
- .BN rx\-buf\-len
- .B3 tcp\-data\-split auto on off
-+.BN hds\-thresh
- .BN cqe\-size
- .BN tx\-push
- .BN rx\-push
-@@ -692,6 +693,9 @@ Changes the size of a buffer in the Rx ring.
- .BI tcp\-data\-split \ auto|on|off
- Specifies the state of TCP data split.
- .TP
-+.BI hds\-thresh \ N
-+Specifies the threshold value of tcp data split
-+.TP
- .BI cqe\-size \ N
- Changes the size of completion queue event.
- .TP
-diff --git a/ethtool.c b/ethtool.c
-index c4b49c9..6817baf 100644
---- a/ethtool.c
-+++ b/ethtool.c
-@@ -5874,6 +5874,7 @@ static const struct option args[] = {
- 			  "		[ tx-push on|off ]\n"
- 			  "		[ rx-push on|off ]\n"
- 			  "		[ tx-push-buf-len N]\n"
-+			  "		[ hds-thresh N ]\n"
- 	},
- 	{
- 		.opts	= "-k|--show-features|--show-offload",
-diff --git a/netlink/desc-ethtool.c b/netlink/desc-ethtool.c
-index 32a9eb3..e4529d5 100644
---- a/netlink/desc-ethtool.c
-+++ b/netlink/desc-ethtool.c
-@@ -161,6 +161,8 @@ static const struct pretty_nla_desc __rings_desc[] = {
- 	NLATTR_DESC_BOOL(ETHTOOL_A_RINGS_RX_PUSH),
- 	NLATTR_DESC_U32(ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN),
- 	NLATTR_DESC_U32(ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN_MAX),
-+	NLATTR_DESC_U32(ETHTOOL_A_RINGS_HDS_THRESH),
-+	NLATTR_DESC_U32(ETHTOOL_A_RINGS_HDS_THRESH_MAX),
- };
- 
- static const struct pretty_nla_desc __channels_desc[] = {
-diff --git a/netlink/rings.c b/netlink/rings.c
-index f9eb67a..5c695ab 100644
---- a/netlink/rings.c
-+++ b/netlink/rings.c
-@@ -51,6 +51,8 @@ int rings_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 	show_u32("tx-max", "TX:\t\t\t", tb[ETHTOOL_A_RINGS_TX_MAX]);
- 	show_u32("tx-push-buff-max-len", "TX push buff len:\t",
- 		 tb[ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN_MAX]);
-+	show_u32("hds-thresh-max", "HDS thresh:\t\t",
-+		 tb[ETHTOOL_A_RINGS_HDS_THRESH_MAX]);
- 	print_string(PRINT_FP, NULL, "Current hardware settings:\n", NULL);
- 	show_u32("rx", "RX:\t\t\t", tb[ETHTOOL_A_RINGS_RX]);
- 	show_u32("rx-mini", "RX Mini:\t\t", tb[ETHTOOL_A_RINGS_RX_MINI]);
-@@ -83,6 +85,8 @@ int rings_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 		print_string(PRINT_ANY, tcp_hds_key, tcp_hds_fmt, tcp_hds_buf);
- 		break;
- 	}
-+	show_u32("hds-thresh", "HDS thresh:\t\t",
-+		 tb[ETHTOOL_A_RINGS_HDS_THRESH]);
- 
- 	close_json_object();
- 
-@@ -194,6 +198,12 @@ static const struct param_parser sring_params[] = {
- 		.handler        = nl_parse_u8bool,
- 		.min_argc       = 1,
- 	},
-+	{
-+		.arg		= "hds-thresh",
-+		.type		= ETHTOOL_A_RINGS_HDS_THRESH,
-+		.handler	= nl_parse_direct_u32,
-+		.min_argc	= 0,
-+	},
- 	{}
- };
- 
--- 
-2.34.1
-
+Thanks, will post a patch tomorrow :)
 
