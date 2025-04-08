@@ -1,140 +1,158 @@
-Return-Path: <netdev+bounces-180163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02211A7FD00
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 12:54:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E548A7FD92
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 13:04:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 634A5420F41
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 10:47:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F282416DBBA
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 10:59:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D73D1267712;
-	Tue,  8 Apr 2025 10:44:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B041126A0B3;
+	Tue,  8 Apr 2025 10:57:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MHeRZ4vZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PVrGzplw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD392266F17
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 10:44:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092F926A0A6
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 10:57:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744109069; cv=none; b=G69xhDODijYAbLvUVLb3+ULcEfdb43mMVmrZGrkE80PmPpgA4ZJWjfPYUTHgLZvjfJoQ0q0XK5Cf72IcoUhsjwnA8hMqF+XfzRgrGIZC8FemCT6DDuor6tBbgXduNd316EPSSMM0txFdVo49JeVmA0rZ//7gzqge18AAtj2+cl4=
+	t=1744109836; cv=none; b=dIk0f7gQudOnOzMh2XihrJ85hJwEL5lc7+yRdVOfHjy9UtgZ7DRhnymabNFRojx91vuOYjeUFvoxWdqzGUxZ25+0jXumMtmbZs4os0618SIONxvqSmHafwVn2ZhnI39yEkKxLAxjmJjYCUj0K+WTgFRqFrRLxRz7glrBYgLyRJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744109069; c=relaxed/simple;
-	bh=419p2jfIVuqswVnYCpxVb4C1tmk/VU4wbdwBrDE6ZDA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b6cTBedmnPUkqJyBi8SoR261rQWkUQdqxlnfmUgGbjER33ltezk6sV073zcJfFDyvX2my9BefKPa6GD9f93yO7h/P44I9VrZiSyC+aUj/vhOGY/TeVxeSNu6HeBY2gEh7CJ1GNwjos0ouCHKyk1Zpm5gJ4aBUJpNXbLiNhXXWNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MHeRZ4vZ; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5499c5d9691so6100559e87.2
-        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 03:44:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744109066; x=1744713866; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=419p2jfIVuqswVnYCpxVb4C1tmk/VU4wbdwBrDE6ZDA=;
-        b=MHeRZ4vZf5FEQKyHlkzdCIIwaregR8Y6Fw4PSdv9coXXVvLZjJNDda4AZmjoNgI5sX
-         VXmXCBthHCqSiesSSAvexe5gIsKWR/sLRzo1eu0H3DFgGsWXncfOin4cBCHI+uCLvOis
-         H0t/UFaCra02LPQ5Cs/YzRnKMwlzH1ZXP1ZnybkA117QCdmv23HLverdC8oR2eefjWv6
-         +8DCeIOiNYM7013YNV99BtOm52JnIfBg3m2ZHPtLXQIO05gySvwaMYZElkMzrqCQ8CET
-         ZZkOaOooLuEov06BNWLr/KMl7BIS6GjVQEV//ZLiXx5IeePaBXtzm+MqKmsNbBZ2uxET
-         xWPA==
+	s=arc-20240116; t=1744109836; c=relaxed/simple;
+	bh=o93kT3HUr6PSKVXUdV14Bgz9/0yB1U6VVEQHCXqgg2E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C4ZuunB7Es0QpR21cuEDTvsxOUceENoF6SyKrc/QltlRfmoiLvftLU6IEVEvp4bOo0BXdyeRn8CoiERcgb43kiZs9vLjWhEwA5t0dxqKJuQeEgC8NZz8JLyUC1SzFvUtl1kv+rq9zb/mCW3a8MxZ2fghYWQkK8iiZXcpxn7EWxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PVrGzplw; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744109833;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WiB8QLkLLCMptXLpQ+Fs8eV4CmtpBvO8mQtuoLcCE5Q=;
+	b=PVrGzplwvnQhUU5vbiWq1Gft93ial6P4TdhYZAt/2CrIszeRSG2Vs+pF7IY/wGKW9Qk7r1
+	4b5B+skN9wPD8xa9R+sQ2x/ba+ZSVkxEVHVL1azImMYmc1dKE3jXukJNgfN+INtnhAxs9r
+	QDLTriK3qNUjk6awUzDWaQwZIqbe13Y=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-493-d6l6WB3cMYW7gsKptLVdRg-1; Tue, 08 Apr 2025 06:57:10 -0400
+X-MC-Unique: d6l6WB3cMYW7gsKptLVdRg-1
+X-Mimecast-MFC-AGG-ID: d6l6WB3cMYW7gsKptLVdRg_1744109829
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4394c489babso26830105e9.1
+        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 03:57:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744109066; x=1744713866;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=419p2jfIVuqswVnYCpxVb4C1tmk/VU4wbdwBrDE6ZDA=;
-        b=Bf1PelKkzlScvBGZa16cLup2/cybCB80DdvFqW9vLIiUIx1clQb6yTy2qdKkJ3JV9O
-         7D/yw/eBsPBCaUIoIkP/ElCqZSsHu07XZi1QKZLKM4Bx+pE/M4xgnhaBRllgAeBMURHe
-         SF+Bw0t3FPycD8Zd2qFisuAWdRm6qOcYo96UiZYOqmt3jBFCTaXi47HpijCtglxeCSah
-         rA/q1pT8F7ri/mQCQTIctbmI3gLSgTL0+S45Rb2BQwQQqhJEVSRYJPbxfzTVR7Qb+qVS
-         k76ByPZ/jJ6OIM3ABtZ0bkvLM8yXuruxZkkHaUiHbtTey8IJRIvKj83Jt0AUpLo9tqjY
-         qyVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXPAC2NnDAZTHr7tz75nEL2/IrYhR60RuXjdZo82HNEdg489VLnFxiiDMCRlrwhvnvCDhM3sQY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsBHvYvYyqZUIjJiaoQ1Z4NKIKXBNF58vx3OGMiQAUrnqDVVeP
-	ez79Nfx/HCZ5RYO8Q9V7Eli/ihUH/ByBACuTdig8n0rHUMyWo6geo1E1vbAaFn4pqNms3f2gzQV
-	Sp7bvXL7wqT5pMHRWbkqiIU08JX+Uz1pSV/vQ
-X-Gm-Gg: ASbGnctNKlJTeS2rmhtMS8XW/ylWjeEOhA1w0+2/4PPRCuGXQOuLx47WGQrwOYUXkD4
-	+iOhNHcPv7VT/OyqsNjwe7fg2XxdPtb28iCRSMj8zuaAM+P1zKijzAGGuIKK2tnzG1POhigl4j6
-	A1bfC5eddLUY7SmziestT0tXvw4irVcxfSIWuzPr8V6jZ6cU1GCMrALM7v
-X-Google-Smtp-Source: AGHT+IE6Mo63+aNLgjUy0hwr7ZFaZKS1coMjIhw5cBTkTQK/+wn9m6TH3/wwl0cHKC7QrTe670eB2PBOcctoSbdy6wA=
-X-Received: by 2002:a05:651c:1585:b0:2ff:56a6:2992 with SMTP id
- 38308e7fff4ca-30f0a1d8ac4mr49263491fa.37.1744109065757; Tue, 08 Apr 2025
- 03:44:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1744109829; x=1744714629;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WiB8QLkLLCMptXLpQ+Fs8eV4CmtpBvO8mQtuoLcCE5Q=;
+        b=b4GNCIbbJ2ohaD94klEbIx1QRB4WGtVzW89Virze4/kuz4pVfcf8MJr6+7RRUY7tKk
+         cDpjtVYlu0g62DRbkSO1og6l3J8LqUoxAowcRAqLscDKVRjGPkevW4xhNw06MEHkZz5f
+         9CfwM5oHz92urfO9zXIz2e32axTew5iBUfsizON/Mskr9P+PGFPZLrzROTczxfdLtgcR
+         +tpQ3OHT5nK+AQe/CeqFnbpICUNGIGX8zEulLky3Y1ul8W2zjXuixILHqBNh3DLlUsYu
+         Tx2CIK57DS3b7NBPrt9VzaPQ+eu7lhp39qLRJy85YlWZkk7xgG8H56kyvsIm5H4eM2Sw
+         KOXw==
+X-Forwarded-Encrypted: i=1; AJvYcCWaZHp05JpXCvXGzuXcoD4X7QARLUb0sC08ZH6eqdx1YZVJ1iJku2jHR6dUGCRBDC8zUuKAf5w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSZqxgxr/VNcuOb2Bd/kVKn2iwMdxxtA1lK+pW+B0NzGblHTSY
+	dg7VqsuTW+/p7Gs959SbnJ67nQv6xOZobcNT4py0O06f+XqsdlzH1tma+YTaBBY3WZDXRr7pJ6+
+	8XKEtwHNy7JLrl5jtU+o6xzCOcv92a0Cwb1DgiF0oDLA45+hp4sabNA==
+X-Gm-Gg: ASbGncsTj7CG1ihorEBxcDTK40Eq2SpH9votgLCZM4pGmVfrmNG/VjLx7En2CgJLLTX
+	lfN6hfRBqMRrXa/cd+T3b18gu6SpBRn+x2NkpoW16N/OqR0wvA1qy8W11xDS+98FUmarw2YBL9B
+	sxCs7vzOULxkfEaqcesmwqsQWH543hPFToLDEq9M32t4ng31x+5xnH3prvykC64MR1BZmQ72AJ1
+	yEAHFx7AXhjSONDOpsrxya08eAK7ZMMSz3KlliIPrrazqvtD6EcQvcKyeQdxz/zWHFMxfdG+DRh
+	tfxTTPomPOj9iCVXZz7yjv4wQkty9eBrDM35PuOIGCY=
+X-Received: by 2002:a05:600c:3b94:b0:43d:649:4e50 with SMTP id 5b1f17b1804b1-43f0ab8c6d2mr41519755e9.13.1744109829436;
+        Tue, 08 Apr 2025 03:57:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHucF/g2LzNPlKjjAwHyVa6MKKp0vRxRscl5LXt0EXHIloC4uTn5GNaY61HCGJgRWXZ/jCvhA==
+X-Received: by 2002:a05:600c:3b94:b0:43d:649:4e50 with SMTP id 5b1f17b1804b1-43f0ab8c6d2mr41519505e9.13.1744109829064;
+        Tue, 08 Apr 2025 03:57:09 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-84-24.dyn.eolo.it. [146.241.84.24])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c301b6321sm14290396f8f.44.2025.04.08.03.57.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Apr 2025 03:57:08 -0700 (PDT)
+Message-ID: <c4b1219d-a42d-4339-93aa-89987cc6ad2f@redhat.com>
+Date: Tue, 8 Apr 2025 12:57:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <Z_PfCosPB7GS4DJl@mini-arch> <20250407161308.19286-1-kuniyu@amazon.com>
- <CANp29Y5RjJD3FK8zciRL92f0+tXEaZ=DbzSF3JrnVRGyDmag2A@mail.gmail.com>
-In-Reply-To: <CANp29Y5RjJD3FK8zciRL92f0+tXEaZ=DbzSF3JrnVRGyDmag2A@mail.gmail.com>
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Tue, 8 Apr 2025 12:44:14 +0200
-X-Gm-Features: ATxdqUFyy-54YLVuSp15WzCbaleB-jiZZ-DebC9ojvDiy-cfPHkfhgKLdRQnP6k
-Message-ID: <CACT4Y+acJ-D6TiynzWef4vAwTNhCNAgey=RmfZHEXDJVrPxDCg@mail.gmail.com>
-Subject: Re: [syzbot] [net?] WARNING: bad unlock balance in do_setlink
-To: Aleksandr Nogikh <nogikh@google.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, stfomichev@gmail.com, andrew@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	sdf@fomichev.me, syzbot+45016fe295243a7882d3@syzkaller.appspotmail.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] selftests: mptcp: add comment for getaddrinfo
+To: zhenwei pi <pizhenwei@bytedance.com>, Geliang Tang <geliang@kernel.org>,
+ linux-kernel@vger.kernel.org, mptcp@lists.linux.dev,
+ linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
+Cc: matttbe@kernel.org, martineau@kernel.org, viktor.soderqvist@est.tech,
+ zhenwei pi <zhenwei.pi@linux.dev>
+References: <20250407085122.1203489-1-pizhenwei@bytedance.com>
+ <ae367fb7158e2f1c284a4acaea86f96a7a95b0c4.camel@kernel.org>
+ <0de20ab7-9f1c-4a13-a8d2-295f94161c4e@bytedance.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <0de20ab7-9f1c-4a13-a8d2-295f94161c4e@bytedance.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, 8 Apr 2025 at 10:11, Aleksandr Nogikh <nogikh@google.com> wrote:
->
-> On Mon, Apr 7, 2025 at 6:13=E2=80=AFPM 'Kuniyuki Iwashima' via syzkaller-=
-bugs
-> <syzkaller-bugs@googlegroups.com> wrote:
-> >
-> > From: Stanislav Fomichev <stfomichev@gmail.com>
-> > Date: Mon, 7 Apr 2025 07:19:54 -0700
-> > > On 04/07, syzbot wrote:
-> > > > Hello,
-> > > >
-> > > > syzbot has tested the proposed patch but the reproducer is still tr=
-iggering an issue:
-> > > > unregister_netdevice: waiting for DEV to become free
-> > > >
-> > > > unregister_netdevice: waiting for batadv0 to become free. Usage cou=
-nt =3D 3
-> > >
-> > > So it does fix the lock unbalance issue, but now there is a hang?
-> >
-> > I think this is an orthogonal issue.
-> >
-> > I saw this in another report as well.
-> > https://lore.kernel.org/netdev/67f208ea.050a0220.0a13.025b.GAE@google.c=
-om/
-> >
-> > syzbot may want to find a better way to filter this kind of noise.
-> >
->
-> Syzbot treats this message as a problem worthy of reporting since a
-> long time (Cc'd Dmitry who may remember the context):
-> https://github.com/google/syzkaller/commit/7a67784ca8bdc3b26cce2f0ec9a40d=
-2dd9ec9396
->
-> Since v6.15-rc1, we do observe it happen at least 10x more often than
-> before, both during fuzzing and while processing #syz test commands:
-> https://syzkaller.appspot.com/bug?extid=3D881d65229ca4f9ae8c84
+On 4/8/25 5:09 AM, zhenwei pi wrote:
+> On 4/8/25 09:43, Geliang Tang wrote:
+>> On Mon, 2025-04-07 at 16:51 +0800, zhenwei pi wrote:
+>>> mptcp_connect.c is a startup tutorial of MPTCP programming, however
+>>> there is a lack of ai_protocol(IPPROTO_MPTCP) usage. Add comment for
+>>> getaddrinfo MPTCP support.
+>>>
+>>> Signed-off-by: zhenwei pi <zhenwei.pi@linux.dev>
+>>> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
+>>> ---
+>>>   tools/testing/selftests/net/mptcp/mptcp_connect.c | 12 ++++++++++++
+>>>   1 file changed, 12 insertions(+)
+>>>
+>>> diff --git a/tools/testing/selftests/net/mptcp/mptcp_connect.c
+>>> b/tools/testing/selftests/net/mptcp/mptcp_connect.c
+>>> index c83a8b47bbdf..6b9031273964 100644
+>>> --- a/tools/testing/selftests/net/mptcp/mptcp_connect.c
+>>> +++ b/tools/testing/selftests/net/mptcp/mptcp_connect.c
+>>> @@ -179,6 +179,18 @@ static void xgetnameinfo(const struct sockaddr
+>>> *addr, socklen_t addrlen,
+>>>   	}
+>>>   }
+>>>   
+>>> +/* There is a lack of MPTCP support from glibc, these code leads
+>>> error:
+>>> + *	struct addrinfo hints = {
+>>> + *		.ai_protocol = IPPROTO_MPTCP,
+>>> + *		...
+>>> + *	};
+>>> + *	err = getaddrinfo(node, service, &hints, res);
+>>> + *	...
+>>> + * So using IPPROTO_TCP to resolve, and use TCP/MPTCP to create
+>>> socket.
+>>> + *
+>>> + * glibc starts to support MPTCP since v2.42.
+>>> + * Link:
+>>> https://sourceware.org/git/?p=glibc.git;a=commit;h=a8e9022e0f82
+>>
+>> Thanks for adding getaddrinfo mptcp support to glibc. I think we should
+>> not only add a comment for getaddrinfo mptcp here, but also add an
+>> example of using it in mptcp_connect.c. I will work with you to
+>> implement this example in v2.
 
-IIUC this error means a leaked reference count on a device, and the
-device and everything it references leaked forever + a kernel thread
-looping forever. This does not look like noise.
+While at that, please also clean-up the tag area: only a single SoB is
+required. If you submit using a different mail address WRT the SoB tag,
+you should add a 'From: ' header. See
+Documentation/process/submitting-patches.rst for the details.
 
-Eric, should know more. Eric fixed a bunch of these bugs and added a
-ref count tracker to devices to provide better diagnostics. For some
-reason I don't see the reftracker output in the console output, but
-CONFIG_NET_DEV_REFCNT_TRACKER=3Dy is enabled in the config.
+Thanks,
+
+Paolo
+
 
