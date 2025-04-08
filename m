@@ -1,168 +1,94 @@
-Return-Path: <netdev+bounces-180453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D3F2A815BD
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 21:22:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A42DDA815D4
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 21:33:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22F901B84AE7
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 19:22:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC00D7A8449
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 19:31:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47098237163;
-	Tue,  8 Apr 2025 19:22:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 472A4243958;
+	Tue,  8 Apr 2025 19:32:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="v3nzJNZQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kpacp7lY"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3F1720E332;
-	Tue,  8 Apr 2025 19:22:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180712405F5;
+	Tue,  8 Apr 2025 19:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744140134; cv=none; b=Zeni5Ca0JcqqchaWU2JOGA7mexoNecgufYyNa2lnddCncg22QjZFZHS8kvgFb5X32aRLBEdzV5AZYO9k7U0ThnzD0ekoITrtIhDm8EmPMW4bb+Q69czYHN7PqNTzA5jiIjTr5cRAJO3BhGe0/GXlroXHRyO4sV3K5W2t094JY4c=
+	t=1744140754; cv=none; b=twEBVeLMNrcketxJEhT1UI5QDzTg9pPVNLakZIO6vXCorNHO1FJE3wtua5uE9+BGxQM69T+sLRBxH6G2imZeAvZUpVgtkR1mIoxtRp6x3Ccei14kNBSkfUz6ioXw/CtP2qEW4WbViEbqIIrbB50UkRLgBdmvQpPe4PArVsODSwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744140134; c=relaxed/simple;
-	bh=Sq6qE3bdNlKrIH+jwg54WcNbmrQhN9OHUYTXKi+ZC1w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GqI1o59DmqV0ec1BwSAfkkZcJB4LjFd7qWWw85NoM2QNIhhu+YxsEYRU4zUh3cNwmXGiPXjOVNKyrYjvl8D49EJpUvYjiQPC4r6h2Ct0ykS/VeMNDMRxm+9BuSKLjFJKPBgBZDZSapeYG4eS+ZX9onB/y/OSIdZp9PShoEvogxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=v3nzJNZQ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=nWdwAmsvl+J4jdX1SK8QB+Dmfqlg71MkeOOS1luZS08=; b=v3nzJNZQ07pfSxqfTgz07yzMp+
-	FG0I65PEHs5mB4C0ahp50VogmivCjZldf3RPq8CoFwTzr7q6ZDDzn2yY1GZ6w+m5BPiafKX6QGEe5
-	jiOHwbp5dp7njlnVsXfSRX/AsSZOVII7irdWqZpm7W84mcNnodWQsPXj2WMqKRhLpMbs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u2EWE-008RUU-Dj; Tue, 08 Apr 2025 21:21:58 +0200
-Date: Tue, 8 Apr 2025 21:21:58 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Michael Klein <michael@fossekall.de>
-Cc: Joe Damato <jdamato@fastly.com>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RESEND net-next v5 2/4] net: phy: realtek: Clean up RTL8211E
- ExtPage access
-Message-ID: <4d26d92e-f083-4a5c-88b5-93c45c6a51a5@lunn.ch>
-References: <20250407182155.14925-1-michael@fossekall.de>
- <20250407182155.14925-3-michael@fossekall.de>
- <Z_SQTi-uKk4wqRcL@LQ3V64L9R2>
- <Z_VvOG91oPZZejye@a98shuttle.de>
+	s=arc-20240116; t=1744140754; c=relaxed/simple;
+	bh=W2dDfp+6u530Uuogb1eaOEl6QW1bQx+CZ05zi1+pviA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eQu35ere/I5bIk7L9OgjztKdtL+iHajrIf7eJG7UgBG1vZuL3/JZAvzAi+qRmhhMXGB1CewVVh134ODjOboYrEEUJQyc3MXFtLRXc+fXLng4Qj3nM7E/RajIoICO/jdBazzVmsnuLl3GoSeLqLnukj/wR8IG5CscyitTEQbWfuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kpacp7lY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF541C4CEE8;
+	Tue,  8 Apr 2025 19:32:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744140753;
+	bh=W2dDfp+6u530Uuogb1eaOEl6QW1bQx+CZ05zi1+pviA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Kpacp7lYjuknjeAUWo5lS7cD5D5R+2q49I1ToQQmf3CwzY2vKGxLFvIl/+yMDjTND
+	 8z/bPR/98nlFDyN1yZUcQgYmuybBx4nVHL8XDlMtMNzVYgzxRIRMaVjImdkTzM37+L
+	 SmfNM2mC1lkqirTYweGVBb2sYCFaozT69SxJG/q6J7Tew2e5jc9xxUDJ5psd+akeHH
+	 pOZ3YS//QOzJveCqT9R1ZkBg+drHdvnvOvi4re2ewjDrV8Ko/0DJlG7p/yRxzahwXQ
+	 nfJFLIORTZjE+OTzvN8e24ILmdssYNetW2JarrgM5ZJNKk1FuE8lLHbA/ga07uFNZh
+	 7SVSbMgh7g4Fg==
+Message-ID: <fcf2d508-d44e-43c3-b381-8f33fec11859@kernel.org>
+Date: Tue, 8 Apr 2025 13:32:32 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z_VvOG91oPZZejye@a98shuttle.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 2/2] trace: tcp: Add tracepoint for
+ tcp_sendmsg_locked()
+Content-Language: en-US
+To: Breno Leitao <leitao@debian.org>, Eric Dumazet <edumazet@google.com>,
+ Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, kernel-team@meta.com
+References: <20250408-tcpsendmsg-v3-0-208b87064c28@debian.org>
+ <20250408-tcpsendmsg-v3-2-208b87064c28@debian.org>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250408-tcpsendmsg-v3-2-208b87064c28@debian.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 08, 2025 at 08:47:20PM +0200, Michael Klein wrote:
-> On Mon, Apr 07, 2025 at 07:56:14PM -0700, Joe Damato wrote:
-> > > - Factor out RTL8211E extension page access code to
-> > >   rtl8211e_modify_ext_page() and clean up rtl8211e_config_init()
-> > > 
-> > > Signed-off-by: Michael Klein <michael@fossekall.de>
-> > > ---
-> > >  drivers/net/phy/realtek/realtek_main.c | 38 +++++++++++++++-----------
-> > >  1 file changed, 22 insertions(+), 16 deletions(-)
-> > > 
-> > > diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-> > > index b27c0f995e56..e60c18551a4e 100644
-> > > --- a/drivers/net/phy/realtek/realtek_main.c
-> > > +++ b/drivers/net/phy/realtek/realtek_main.c
-> > > @@ -37,9 +37,11 @@
-> > > 
-> > >  #define RTL821x_INSR				0x13
-> > > 
-> > > -#define RTL821x_EXT_PAGE_SELECT			0x1e
-> > >  #define RTL821x_PAGE_SELECT			0x1f
-> > > 
-> > > +#define RTL8211E_EXT_PAGE_SELECT		0x1e
-> > > +#define RTL8211E_SET_EXT_PAGE			0x07
-> > > +
-> > >  #define RTL8211E_CTRL_DELAY			BIT(13)
-> > >  #define RTL8211E_TX_DELAY			BIT(12)
-> > >  #define RTL8211E_RX_DELAY			BIT(11)
-> > > @@ -135,6 +137,21 @@ static int rtl821x_write_page(struct phy_device *phydev, int page)
-> > >  	return __phy_write(phydev, RTL821x_PAGE_SELECT, page);
-> > >  }
-> > > 
-> > > +static int rtl8211e_modify_ext_page(struct phy_device *phydev, u16 ext_page,
-> > > +				    u32 regnum, u16 mask, u16 set)
-> > > +{
-> > > +	int oldpage, ret = 0;
-> > > +
-> > > +	oldpage = phy_select_page(phydev, RTL8211E_SET_EXT_PAGE);
-> > > +	if (oldpage >= 0) {
-> > > +		ret = __phy_write(phydev, RTL8211E_EXT_PAGE_SELECT, ext_page);
-> > > +		if (ret == 0)
-> > > +			ret = __phy_modify(phydev, regnum, mask, set);
-> > > +	}
-> > > +
-> > > +	return phy_restore_page(phydev, oldpage, ret);
-> > > +}
-> > > +
-> > >  static int rtl821x_probe(struct phy_device *phydev)
-> > >  {
-> > >  	struct device *dev = &phydev->mdio.dev;
-> > > @@ -607,7 +624,9 @@ static int rtl8211f_led_hw_control_set(struct phy_device *phydev, u8 index,
-> > > 
-> > >  static int rtl8211e_config_init(struct phy_device *phydev)
-> > >  {
-> > > -	int ret = 0, oldpage;
-> > > +	const u16 delay_mask = RTL8211E_CTRL_DELAY |
-> > > +			       RTL8211E_TX_DELAY |
-> > > +			       RTL8211E_RX_DELAY;
-> > >  	u16 val;
-> > > 
-> > >  	/* enable TX/RX delay for rgmii-* modes, and disable them for rgmii. */
-> > > @@ -637,20 +656,7 @@ static int rtl8211e_config_init(struct phy_device *phydev)
-> > >  	 * 12 = RX Delay, 11 = TX Delay
-> > >  	 * 10:0 = Test && debug settings reserved by realtek
-> > >  	 */
-> > > -	oldpage = phy_select_page(phydev, 0x7);
-> > > -	if (oldpage < 0)
-> > > -		goto err_restore_page;
-> > > -
-> > > -	ret = __phy_write(phydev, RTL821x_EXT_PAGE_SELECT, 0xa4);
-> > > -	if (ret)
-> > > -		goto err_restore_page;
-> > > -
-> > > -	ret = __phy_modify(phydev, 0x1c, RTL8211E_CTRL_DELAY
-> > > -			   | RTL8211E_TX_DELAY | RTL8211E_RX_DELAY,
-> > > -			   val);
-> > > -
-> > > -err_restore_page:
-> > > -	return phy_restore_page(phydev, oldpage, ret);
-> > > +	return rtl8211e_modify_ext_page(phydev, 0xa4, 0x1c, delay_mask, val);
-> > >  }
-> > 
-> > Seems good to add RTL8211E_SET_EXT_PAGE to remove a constant from
-> > the code. Any reason to avoid adding constants for 0xa4 and 0x1c ?
+On 4/8/25 12:32 PM, Breno Leitao wrote:
+> Add a tracepoint to monitor TCP send operations, enabling detailed
+> visibility into TCP message transmission.
 > 
-> My copy of the datasheet does not document this register, so I did not
-> feel qualified to come up with a meaningful name.
+> Create a new tracepoint within the tcp_sendmsg_locked function,
+> capturing traditional fields along with size_goal, which indicates the
+> optimal data size for a single TCP segment. Additionally, a reference to
+> the struct sock sk is passed, allowing direct access for BPF programs.
+> The implementation is largely based on David's patch[1] and suggestions.
+> 
+> Link: https://lore.kernel.org/all/70168c8f-bf52-4279-b4c4-be64527aa1ac@kernel.org/ [1]
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
+>  include/trace/events/tcp.h | 24 ++++++++++++++++++++++++
+>  kernel/bpf/btf.c           |  1 +
+>  net/ipv4/tcp.c             |  2 ++
+>  3 files changed, 27 insertions(+)
+> 
 
-Is the page documented?
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-As for the register, it appears to contain RGMII delay configuration,
-so why not call it RTL8211E_RGMII_DELAY ?
-
-Sometimes you just have to make names up. If somebody has a datasheet
-which lists it and wants to rename it, they can.
-
-   Andrew
 
 
