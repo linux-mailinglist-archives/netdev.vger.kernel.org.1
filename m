@@ -1,78 +1,86 @@
-Return-Path: <netdev+bounces-180387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A814DA812CC
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 18:49:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E624A812DB
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 18:51:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A6234E217C
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 16:49:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F9324222B1
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 16:49:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD21C22FF40;
-	Tue,  8 Apr 2025 16:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F14B22FF42;
+	Tue,  8 Apr 2025 16:49:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KqhxmG0H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q33ff+Sk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8EBD22FAD4
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 16:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6922422B5AC;
+	Tue,  8 Apr 2025 16:49:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744130941; cv=none; b=W67WK2sDddGDrCu24Ot1APQYdEguLARGAQIMaf/0F41sG1tfy28XwOBD5BTsxSg20tOyv1vrAn2Hi4EFiYILDxU4oJonJ1BluKkCvDxcC0OLkvAtJJ3bXZ+1IJ4ZIfr7ZZYaM+5JqFvPfaJzqc9+e57BPSJxA8IkQZf9v+S0kYQ=
+	t=1744130975; cv=none; b=Uadem+aiEkwxEJpESfIBeA5b6YQGUuFfW03eDJrmn+U5YLMcdRKZXgXP5LMTV/j1zfhmyRh57Y0sQKqlWzlbRl1hyWHXdKx/2zMeprVmI3kU1VG2/WjfCX1hTukn6uc+jQFfuykz2+4r3HVqqKJVm9eDleH4bSwHIZkuuehHdhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744130941; c=relaxed/simple;
-	bh=X7N2hbIsyPBF+25/X/M47qsPBaj+pnUoqE0FzGYRtjc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aJLulGVwVA2yt5mhi5rFbWLlOqcC6Hc28rEuN/4EM7dI3bYkeG1PNFffF0HsaLVyEA/2Lmf61mWcdwI/77tRhGf0c+c4YkM2oA90y+24uxs1No+7iH+pnTldxTwx/lw8gcCjKd00LQFgfd2rtSjKub6UZ6xVH1ftFIMicxPqE+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KqhxmG0H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1900EC4CEE5;
-	Tue,  8 Apr 2025 16:49:01 +0000 (UTC)
+	s=arc-20240116; t=1744130975; c=relaxed/simple;
+	bh=+jZsPvQTIMoF2l2DyJq1cw3AEzqCD7vE7q8SNeELS6o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=imc7rbW2UR1d/Duuciigy0s87tF1oZyYdJCI2QtpVtD57UK9tqk+lYOhUcWT7sRP8ceJFTEDr/XVmX4LXZljol94tAK/VTvLTBOsBlJ65KFgXxpC0uJAAVKjhhWGWC9NOmTznN1NPNb++GrVzZPWkJ5efAjgvQxlYbklo+Cm2Tg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q33ff+Sk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82A22C4CEE5;
+	Tue,  8 Apr 2025 16:49:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744130941;
-	bh=X7N2hbIsyPBF+25/X/M47qsPBaj+pnUoqE0FzGYRtjc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=KqhxmG0HkFgh3TyEBq/XmGM980vKRJhxKEqjZ6WupSwIGo76sOTfthVPwu/X/5NL9
-	 Yqr3SDkOLFLg5erd0MKNI31LXJ67zqMgjU8b9WY5LJ9JBh7H1zaMFNhPVdZJr5MK0/
-	 7iNhsz6wphZjcbxHC4CaD5rhxVXDOnBkIuEGVHK9ddXT+jPtpeQYfIOWXB76JbQL6V
-	 spM3LjmQT7CsiJvZRPHxifyC7GxOaVPZcJjg/VFjA+omwpQG4X7g0iLD2PJx9gTsKb
-	 wy7RoEUTVsXHQVD18FkraAINMhaC6duy9vabhzddpO/BV4263D1q6pt7xd/xV2uBVH
-	 +3WUFnyYwxE4Q==
-Message-ID: <e8acfa25-0cc4-4976-97e5-1639dc049c59@kernel.org>
-Date: Tue, 8 Apr 2025 10:49:00 -0600
+	s=k20201202; t=1744130974;
+	bh=+jZsPvQTIMoF2l2DyJq1cw3AEzqCD7vE7q8SNeELS6o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=q33ff+SkaKH1AGj8srqndNhCTJLNWqj0GaNNNDlEb1jyZ7zWYO9P4VEOeM47NsUak
+	 ym646T4k11Urv9dcA8Rs3XLguz66PPeCn7pEC4jVn1ndM4LE6I1uYFlAqzkgxK7sjg
+	 APTpIrJsWqoXLi54hof22fpErOU73zOvtH5nSFHsFnSx476PRwRSp8ybmZIgR7yixi
+	 8ZbTWnivZWlekWJp7ofr9vL3RCrikk9nxBL/bNImLJvurzwNUnNguYbUqixCsa5qdC
+	 ik+pNTFUXU5DQrTPL6ca24L7VHVh+q5f97eA0h5UdDcGjZyibktJmai2lYo80NMoTb
+	 M/RWJciJuJmgg==
+Date: Tue, 8 Apr 2025 17:49:30 +0100
+From: Simon Horman <horms@kernel.org>
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net 1/2] mptcp: only inc MPJoinAckHMacFailure for HMAC
+ failures
+Message-ID: <20250408164930.GF395307@horms.kernel.org>
+References: <20250407-net-mptcp-hmac-failure-mib-v1-0-3c9ecd0a3a50@kernel.org>
+ <20250407-net-mptcp-hmac-failure-mib-v1-1-3c9ecd0a3a50@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: VRF Routing Rule Matching Issue: oif Rules Not Working After
- Commit 40867d74c374
-Content-Language: en-US
-To: hanhuihui <hanhuihui5@huawei.com>, idosch@idosch.org
-Cc: kuba@kernel.org, netdev@vger.kernel.org
-References: <Z_OMzrUFJawqfYe5@shredder>
- <20250408161756.422830-1-hanhuihui5@huawei.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20250408161756.422830-1-hanhuihui5@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250407-net-mptcp-hmac-failure-mib-v1-1-3c9ecd0a3a50@kernel.org>
 
-On 4/8/25 10:17 AM, hanhuihui wrote:
-> Before the patch is installed, oif/iif rules can be configured for traffic from the VRF and traffic can be forwarded normally. 
-> However, in this patch, traffic from the VRF resets fl->flowi_oif in l3mdev_update_flow. As a result, the 'rule->oifindex != fl->flowi_oif' 
-> condition in fib_rule_match cannot be met, the oif rule cannot be matched. The patch also mentions "oif set to L3mdev directs lookup to its table; 
-> reset to avoid oif match in fib_lookup" in the modification, which seems to be intentional. I'm rather confused about this. Does the modification 
-> ignore the scenario where the oif/iif rule is configured on the VRF, or is the usage of the oif/iif rule no longer supported by the community after 
-> the patch is installed, or is the usage of the oif/iif rule incorrectly used?
-> Any reply would be greatly appreciated.
+On Mon, Apr 07, 2025 at 08:26:32PM +0200, Matthieu Baerts (NGI0) wrote:
+> Recently, during a debugging session using local MPTCP connections, I
+> noticed MPJoinAckHMacFailure was not zero on the server side. The
+> counter was in fact incremented when the PM rejected new subflows,
+> because the 'subflow' limit was reached.
 > 
+> The fix is easy, simply dissociating the two cases: only the HMAC
+> validation check should increase MPTCP_MIB_JOINACKMAC counter.
+> 
+> Fixes: 4cf8b7e48a09 ("subflow: introduce and use mptcp_can_accept_new_subflow()")
+> Cc: stable@vger.kernel.org
+> Reviewed-by: Geliang Tang <geliang@kernel.org>
+> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
-oif/iif rules per VRF does not scale; the l3mdev rule was added to
-address that problem.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
