@@ -1,181 +1,195 @@
-Return-Path: <netdev+bounces-180286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98881A80E36
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 16:35:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45763A80E44
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 16:36:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B2713BF711
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 14:29:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B84CB426D46
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 14:29:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34C0422A4EE;
-	Tue,  8 Apr 2025 14:27:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35F021E4929;
+	Tue,  8 Apr 2025 14:28:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i+BiNbRA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C7D522A1D4;
-	Tue,  8 Apr 2025 14:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55FE51DB148;
+	Tue,  8 Apr 2025 14:28:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744122476; cv=none; b=QCl7mY612Uo30oRvVe1+ob0sXilymU/BnzKQ50b7mhrHXQ0RTo3zbaOenOWV0eVEppx1FcQmEgDy7j9F/36lM/iYItmPMm0sBezKks50UPm4BlBV8/WgNlyCo2Vm9G2utqHsptCe+7Ivwww0fiAUSApiun1rramMPDf/gI9ZZUU=
+	t=1744122499; cv=none; b=Q4GpWUkDWsbIRvIYcpZA1xn9GdrTF0uS/5g8j/Lsr0kmLr1tgefOmHN1gtXqvx+VcERHcGiK735GG3wz9zGoFKF3z5oQ/qs3RUwe+yDG3+DOgK9meIwqpo19OKbnKSvrCb4hnyIiw8PE99fHU9GM8FhckdOg+FZ9bSWVYXpYyT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744122476; c=relaxed/simple;
-	bh=xCQx6pVBQuY50n/ThS6l3eDpdCQ0n7uANGpFPi/NPf0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uQ5lDWUDJWZ8xCQqULUU1Tx+3C+fWCeo/zWrHRXdnallq5XfQJSgDs7rFO0BW/YWV0YoPsqPTWrL323uyhNkRovoVU0/RgzjkUrmxdyNn4Wv7r+J/DclXwL8GFsfzOj6RWYeQHviZUv0x4j8TvUEt+6X4Mody0Fuu8QylFUE5VQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1744122499; c=relaxed/simple;
+	bh=lErjI/YqIYRsXvXQflvwzYfNLYFv4Um1Zmu0i4NiNm8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rEzFIdWjYOGzvPmrnyJy5Yi3aLep+eh9796SMgQNbu6qIpS2+06EtMdmut5UGpZ6wq84cb4DPdc8qBSkKx4rxlseoPKYiJ/tl3Rhx+1lPA+gqPe9w0Qt6j+L14Unq66DclFobDUEvY68XFDhTrG65kJVen1oOpWU16yO5I2lRD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i+BiNbRA; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-ac2c663a3daso1048706566b.2;
-        Tue, 08 Apr 2025 07:27:53 -0700 (PDT)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5e5e63162a0so8956166a12.3;
+        Tue, 08 Apr 2025 07:28:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744122495; x=1744727295; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5BFzr+RmGXXOsHTXqFyGDkv5yWiKdI5zdAeFPopjpSg=;
+        b=i+BiNbRAPOkK3WUetE02h67yVLSpYfu+1DsIiddwRnZVdI/suSSCTn3Y7ZVNJfvcUY
+         GXHiSd5+54aNXB3XQInZojuJWAibJj0w5QQciBDia4u09Kp7cxshR6t7IRWkaUzlxhXm
+         m0z9/q6z/iord8ZS2WJN8d2SibynOrpMNkQiYB9iujfaRZdOjjm69K0nZ+IWEJSn+fPZ
+         NbP2lMeD6O7dHL/FHd+KA3ncpAfndO9izpf5JoipX2iuXLPcvgwNli5FtEkgfO5BbvrT
+         iplo0O80FTpnBIbEyvtcKCXjQgI9M94SeP6ldGstWnhUe395/9OHBbrwYXWEx01fH6jF
+         Q5VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744122472; x=1744727272;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SznZ6qZnobtkHQp+nWu8KywESKsAZVjAuQpll7td4h0=;
-        b=kM6UYY4ppU0bIHMfIpLqDC0eQd3sg/cMUL933Ejdfz9K8lkLmG4Iiwbw7Fc9NAWRev
-         dZZKfKHlDTiHX7mnxVxn6On4z+R2j04qUdTxs2FByl8pF1vFtSDkaOWB4ONliQAQQhuQ
-         /ltCKywfr5hJqs5Js7rfH8dzcDw/hwQM7cbywWCT8WNS0x+UHn733kiwJdAwYdQHuSYS
-         nwXRDyR2PoEskfkXsE7rnKI1dyyTf5tCsjAZKrNxmZ9GIw4XGEr6dg0oFw+gIuBdXB4I
-         7MNbulBHxq7mka5vb818IuEqRW6It8mPgYuOq0qaSEBBG6zp4vfw3ydJkOdwy9jgl/Qy
-         Litw==
-X-Forwarded-Encrypted: i=1; AJvYcCVL9ufNNsgyPqxTbKBzjZelXuk03yANFDbiMo42HcoIiZ/RsCV9ZWlN4eEe4bjChwCXvmuQ2rm/AAX11dkP+QI1HTeK@vger.kernel.org, AJvYcCVVoFfjgBk1zlVPLiuHDNYuqYNCl3lezs2d1+g21yi0Oes4ThAfhLc5w8GvlEbcC5kly8QAgDTOSslqwJY=@vger.kernel.org, AJvYcCW0JT0KUimyaqVUnGm+UDCTVBfNBR4Mu3mTK6xh5juVqGR7w0RvKccD58yEG6YfxbW+Q1uFUJTq@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwhArUAT8ZZUoP3frmYahyNUbrlBy74jln0ArRtVq2VmX5RIJC
-	Kf/m8KlgCY0AEsuJQbQn/MJ3C9WQtMO8pGVtcSMxsNF8QDtbyz5Y
-X-Gm-Gg: ASbGncsLVqHFl6HMeDh8amNCG54qVpwjjheXcpio5ncVhXnv2l+Sb5BHxzSa8tGtONE
-	JwSGb/NLhy4kTjNwf9uIjy4e1Dyq8Vu9AwnO5KJimXuTgnUIi70talVOW2OZ4QENzbwxpYRnxQz
-	te/F1c3mkcbfpn4/Cs+dIBPtSledTwCRV8qeeX/Z1tAC2OqQlSwvYE9GAJdGlw5z455LknjcM7a
-	AO1MhmRP8hVXndreDz6MUGTkz15DS+rwMhmUg1mszP2bsLPrMlI6lPi7mLkrwdVdTVHb5q8/RK0
-	WRw/4IRJcSVaJX9N89aY4Aos0SmAfC2X+PnXY4FYHmuQIdw=
-X-Google-Smtp-Source: AGHT+IGett8TErJin1Ya7KdCWqWrSSa5r8YUYvZ4okNkGjCVk5JAd1RrGPiUJkuyGAwb5+W3jA2waA==
-X-Received: by 2002:a17:907:1c0e:b0:ac3:bdd2:e70c with SMTP id a640c23a62f3a-ac7d195c0e2mr1468071966b.35.1744122472109;
-        Tue, 08 Apr 2025 07:27:52 -0700 (PDT)
-Received: from gmail.com ([2a03:2880:30ff:73::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac7bfe988b3sm909323166b.40.2025.04.08.07.27.50
+        d=1e100.net; s=20230601; t=1744122495; x=1744727295;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5BFzr+RmGXXOsHTXqFyGDkv5yWiKdI5zdAeFPopjpSg=;
+        b=O/RKCqjFIrt6Us7wCQvJjEJgntXTZO0IkqWNNPpA+o/kiIeQSc0D2WilprFlFDbv+K
+         iWiZSOeBj2kPvH5Pb83kdmJAV42+by2wqxgjctIAWLz6AMBnfgldlX9YzqEZz4JAOoCl
+         BnDCbeTF41Rd5q7f02GaoW/iAZMAdCvoxgUQxy0cm0cVxNbqCvhcFjEBCTXocog/g+pr
+         SuD4bBeAqEgXclMGdXrHQ7/ZSi/WZtEbkVgOEKlN/jar4OcVpp4D8tn62pAmKNrtnNWT
+         JgDHHnhJIefOUaAGuTGTlh8miaD5rKIRIoevXTgHj7qPCzzlex4GIDA2tAWQuFSGQqP5
+         6kFg==
+X-Forwarded-Encrypted: i=1; AJvYcCU+gEDh8ld+pvGhrtnHwaz1a6JNZVzG5witZhuMvCV2CJjNbaGH7pxuR1IdQ9IWKnryIEvedzCG+a/4Ow6oZYk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuhPW3uuPxeO+Yb670YD7wc7PUnH0/GI9WVN4bnP4SUONMUEIB
+	YPG53G54S9fpFuClKxkaQaoGyAw9kbflNuCQQBGpfjODhBURIoEn
+X-Gm-Gg: ASbGncsMLHT0aVPPInv0KA5xAq/2/ATIxaYV2CYR88jxvj+BfXtSqW3Y0AI11OSY6X6
+	xu4EDaTTlCI4cxtk02ORxmLsR4+DyNtBSnafL8dOc0ph7sw0dpf30kUyCbRAajQdJrRiAQKnEGg
+	fzk4MLZhrYLbt41oK66g6E7nyGVPaQIQUCHZWx2paI2wMi1Zc+TiJUnyQ2oCe7si4VhFD3lKSHR
+	LvhLULrwEq0IERas1lK2/LVt5yO4Aw25Ii+CQZX/aXgi062zOmY++1aceoDrF0Szz2DG18rOcFo
+	gKi4PadVPnN9cORTuyFWGOog4oOluHPVm743TJsuU1qPWIxm1DZxWrYS+pIqnPpNNtl8rAlaZ6r
+	2TBwN7RuQe7Sl1FLEhBOWnoVo7T/wEbhgTdTjY40QL5UFO6V0J8qGQPmQiTCPuUQ=
+X-Google-Smtp-Source: AGHT+IGGUQrSOB4qpE3QjNkiYb11QRJ+mj4qPf57cTWASVDr2tmbCOxluKgRKa8GJjYOmWsNRMZVYw==
+X-Received: by 2002:a05:6402:c45:b0:5e4:cfe8:3502 with SMTP id 4fb4d7f45d1cf-5f0b3bc9216mr16012511a12.17.1744122495447;
+        Tue, 08 Apr 2025 07:28:15 -0700 (PDT)
+Received: from localhost.localdomain (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f1549b3fd0sm2236164a12.35.2025.04.08.07.28.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Apr 2025 07:27:51 -0700 (PDT)
-Date: Tue, 8 Apr 2025 07:27:48 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-	horms@kernel.org, kernel-team@meta.com, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	mathieu.desnoyers@efficios.com, mhiramat@kernel.org,
-	ncardwell@google.com, netdev@vger.kernel.org, pabeni@redhat.com,
-	rostedt@goodmis.org, song@kernel.org, yonghong.song@linux.dev
-Subject: Re: [PATCH net-next v2 2/2] trace: tcp: Add tracepoint for
- tcp_sendmsg_locked()
-Message-ID: <Z/UyZNiYUq9qrZds@gmail.com>
-References: <20250407-tcpsendmsg-v2-2-9f0ea843ef99@debian.org>
- <20250408010143.11193-1-kuniyu@amazon.com>
+        Tue, 08 Apr 2025 07:28:14 -0700 (PDT)
+From: Eric Woudstra <ericwouds@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	bridge@lists.linux.dev,
+	Eric Woudstra <ericwouds@gmail.com>
+Subject: [PATCH v11 nf-next 0/6] netfilter: Add bridge-fastpath
+Date: Tue,  8 Apr 2025 16:27:56 +0200
+Message-ID: <20250408142802.96101-1-ericwouds@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250408010143.11193-1-kuniyu@amazon.com>
+Content-Transfer-Encoding: 8bit
 
-Hello Kuniyuki,
+This patchset makes it possible to set up a software fastpath between
+bridged interfaces. One patch adds the flow rule for the hardware
+fastpath. This creates the possibility to have a hardware offloaded
+fastpath between bridged interfaces. More patches are added to solve
+issues found with the existing code.
 
-On Mon, Apr 07, 2025 at 06:00:35PM -0700, Kuniyuki Iwashima wrote:
-> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > index ea8de00f669d0..270ce2c8c2d54 100644
-> > --- a/net/ipv4/tcp.c
-> > +++ b/net/ipv4/tcp.c
-> > @@ -1160,6 +1160,8 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
-> >  		if (skb)
-> >  			copy = size_goal - skb->len;
-> >  
-> > +		trace_tcp_sendmsg_locked(sk, msg, skb, size_goal);
-> 
-> skb could be NULL, so I think raw_tp_null_args[] needs to be updated.
-> 
-> Maybe try attaching a bpf prog that dereferences skb unconditionally
-> and see if the bpf verifier rejects it.
+To set up the fastpath, add this extra flowtable (with or
+without 'flags offload'):
 
-I've been trying to dereference skb (while 0), and bpf verifier rejects
-it.
+table bridge filter {
+        flowtable fb {
+                hook ingress priority filter
+                devices = { lan0, lan1, lan2, lan3, lan4, wlan0, wlan1 }
+                flags offload
+        }
+        chain forward {
+                type filter hook forward priority filter; policy accept;
+		ct state established flow add @fb
+        }
+}
 
-Here is the code I wrote to test:
+Creating a separate fastpath for bridges.
 
-	SEC("tracepoint/tcp/tcp_sendmsg_locked")
-	int bpf_tcp_sendmsg_locked(struct tcp_sendmsg_locked_args *ctx)
-	{
-		bpf_printk("TCP: skb_addr %p skb_len %d msg_left %d size_goal %d",
-			ctx->skb_addr, ctx->skb_len, ctx->msg_left, ctx->size_goal);
-	
-		return 0;
-	}
+         forward fastpath bypass
+ .----------------------------------------.
+/                                          \
+|                        IP - forwarding    |
+|                       /                \  v
+|                      /                  wan ...
+|                     /
+|                     |
+|                     |
+|                   brlan.1
+|                     |
+|    +-------------------------------+
+|    |           vlan 1              |
+|    |                               |
+|    |     brlan (vlan-filtering)    |
+|    +---------------+               |
+|    |  DSA-SWITCH   |               |
+|    |               |    vlan 1     |
+|    |               |      to       |
+|    |   vlan 1      |   untagged    |
+|    +---------------+---------------+
+.         /                   \
+ ------>lan0                 wlan1
+        .  ^                 ^
+        .  |                 |
+        .  \_________________/
+        .  bridge fastpath bypass
+        .
+        ^
+     vlan 1 tagged packets
 
-And it matches the tracepoint, but, trying to dereference skb_addr fails
-in all forms. I tried with a proper dereference, or, something as simple
-as the following, and the program is not loaded.
+Note: While testing direct transmit in the software forward-fastpath,
+without the capability of setting the offload flag, it is sometimes useful
+to enslave the wan interface to another bridge, brwan. This will make
+sure both directions of the software forward-fastpath use direct transmit,
+which also happens when the offload flag is set.
 
-	bpf_printk("deref %d\n", *(int *) ctx->skb_addr);
+Changes in v11:
+- Dropped "Introduce DEV_PATH_BR_VLAN_KEEP_HW for bridge-fastpath" from
+   this patch-set, it has moved to another patch-set.
+- Updated nft_flow_offload_bridge_init() changing the way of accessing
+   headers after fixing nft_do_chain_bridge().
 
-Here is all it returns.
+v10 split from patch-set: bridge-fastpath and related improvements v9
 
-	libbpf: prog 'bpf_tcp_sendmsg_locked': BPF program load failed: Permission denied
-	libbpf: prog 'bpf_tcp_sendmsg_locked': -- BEGIN PROG LOAD LOG --
-	0: R1=ctx() R10=fp0
-	; int bpf_tcp_sendmsg_locked(struct tcp_sendmsg_locked_args *ctx) @ tcp_sendmsg_locked_bpf.c:16
-	0: (bf) r6 = r1                       ; R1=ctx() R6_w=ctx()
-	; bpf_printk("TCP: skb_addr %p skb_len %d msg_left %d size_goal %d", @ tcp_sendmsg_locked_bpf.c:19
-	1: (79) r1 = *(u64 *)(r6 +8)          ; R1_w=scalar() R6_w=ctx()
-	2: (7b) *(u64 *)(r10 -32) = r1        ; R1_w=scalar(id=1) R10=fp0 fp-32_w=scalar(id=1)
-	3: (61) r1 = *(u32 *)(r6 +16)         ; R1_w=scalar(smin=0,smax=umax=0xffffffff,var_off=(0x0; 0xffffffff)) R6_w=ctx()
-	4: (67) r1 <<= 32                     ; R1_w=scalar(smax=0x7fffffff00000000,umax=0xffffffff00000000,smin32=0,smax32=umax32=0,var_off=(0x0; 0xffffffff00000000))
-	5: (c7) r1 s>>= 32                    ; R1_w=scalar(smin=0xffffffff80000000,smax=0x7fffffff)
-	6: (7b) *(u64 *)(r10 -24) = r1        ; R1_w=scalar(id=2,smin=0xffffffff80000000,smax=0x7fffffff) R10=fp0 fp-24_w=scalar(id=2,smin=0xffffffff80000000,smax=0x7fffffff)
-	7: (61) r1 = *(u32 *)(r6 +20)         ; R1_w=scalar(smin=0,smax=umax=0xffffffff,var_off=(0x0; 0xffffffff)) R6_w=ctx()
-	8: (67) r1 <<= 32                     ; R1_w=scalar(smax=0x7fffffff00000000,umax=0xffffffff00000000,smin32=0,smax32=umax32=0,var_off=(0x0; 0xffffffff00000000))
-	9: (c7) r1 s>>= 32                    ; R1_w=scalar(smin=0xffffffff80000000,smax=0x7fffffff)
-	10: (7b) *(u64 *)(r10 -16) = r1       ; R1_w=scalar(id=3,smin=0xffffffff80000000,smax=0x7fffffff) R10=fp0 fp-16_w=scalar(id=3,smin=0xffffffff80000000,smax=0x7fffffff)
-	11: (61) r1 = *(u32 *)(r6 +24)        ; R1_w=scalar(smin=0,smax=umax=0xffffffff,var_off=(0x0; 0xffffffff)) R6_w=ctx()
-	12: (67) r1 <<= 32                    ; R1_w=scalar(smax=0x7fffffff00000000,umax=0xffffffff00000000,smin32=0,smax32=umax32=0,var_off=(0x0; 0xffffffff00000000))
-	13: (c7) r1 s>>= 32                   ; R1_w=scalar(smin=0xffffffff80000000,smax=0x7fffffff)
-	14: (7b) *(u64 *)(r10 -8) = r1        ; R1_w=scalar(id=4,smin=0xffffffff80000000,smax=0x7fffffff) R10=fp0 fp-8_w=scalar(id=4,smin=0xffffffff80000000,smax=0x7fffffff)
-	15: (bf) r3 = r10                     ; R3_w=fp0 R10=fp0
-	16: (07) r3 += -32                    ; R3_w=fp-32
-	17: (18) r1 = 0xff1100010965cdd8      ; R1_w=map_value(map=tcp_send.rodata,ks=4,vs=63)
-	19: (b7) r2 = 53                      ; R2_w=53
-	20: (b7) r4 = 32                      ; R4_w=32
-	21: (85) call bpf_trace_vprintk#177   ; R0_w=scalar()
-	; bpf_printk("deref %d\n", *(int *) ctx->skb_addr); @ tcp_sendmsg_locked_bpf.c:22
-	22: (79) r1 = *(u64 *)(r6 +8)         ; R1_w=scalar() R6_w=ctx()
-	23: (61) r3 = *(u32 *)(r1 +0)
-	R1 invalid mem access 'scalar'
-	processed 23 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
-	-- END PROG LOAD LOG --
-	libbpf: prog 'bpf_tcp_sendmsg_locked': failed to load: -13
-	libbpf: failed to load object 'tcp_sendmsg_locked_bpf.o'
-	Failed to load BPF object: -13
+Eric Woudstra (6):
+  bridge: Add filling forward path from port to port
+  net: core: dev: Add dev_fill_bridge_path()
+  netfilter :nf_flow_table_offload: Add nf_flow_rule_bridge()
+  netfilter: nf_flow_table_inet: Add nf_flowtable_type flowtable_bridge
+  netfilter: nft_flow_offload: Add NFPROTO_BRIDGE to validate
+  netfilter: nft_flow_offload: Add bridgeflow to nft_flow_offload_eval()
 
-I've pushed this example to the following URL, if you want to experiment
-as well:
+ include/linux/netdevice.h             |   2 +
+ include/net/netfilter/nf_flow_table.h |   3 +
+ net/bridge/br_device.c                |  19 +++-
+ net/bridge/br_private.h               |   2 +
+ net/bridge/br_vlan.c                  |   6 +-
+ net/core/dev.c                        |  66 ++++++++---
+ net/netfilter/nf_flow_table_inet.c    |  13 +++
+ net/netfilter/nf_flow_table_offload.c |  13 +++
+ net/netfilter/nft_flow_offload.c      | 151 +++++++++++++++++++++++++-
+ 9 files changed, 250 insertions(+), 25 deletions(-)
 
-	https://github.com/leitao/debug/blob/main/bpf/tracepoint/tcp_sendmsg_locked_bpf.c
+-- 
+2.47.1
 
-> See this commit for the similar issue:
-> 
-> commit 5da7e15fb5a12e78de974d8908f348e279922ce9
-> Author: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Date:   Fri Jan 31 19:01:42 2025 -0800
-> 
->     net: Add rx_skb of kfree_skb to raw_tp_null_args[].
-> 
-
-Thanks for the heads-up. I can populate raw_tp_null_args with this new
-tracepoint function, if that is the right thing to do, even without
-being able to reproduce the issue above.
-
-Thanks for the review,
---breno
 
