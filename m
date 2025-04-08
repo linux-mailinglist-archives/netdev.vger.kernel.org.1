@@ -1,143 +1,116 @@
-Return-Path: <netdev+bounces-180025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58A4FA7F299
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 04:17:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB90CA7F29C
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 04:20:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BD86177F3D
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 02:17:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EE3A177021
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 02:20:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B58E157E6B;
-	Tue,  8 Apr 2025 02:17:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A36A5192B86;
+	Tue,  8 Apr 2025 02:20:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="pVgGvw7p"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NFCY8Y1d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B011F4A21
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 02:17:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D76E4A21
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 02:20:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744078663; cv=none; b=A7jVUzc5RxK1aLUqwjwI9i+ntU194xKO3UuFJxRUg0uJNKz7vSpBy5cpEpV7azrWEz7h7/oZ+H+1AVYm+u9hw+FMJaA+ijdzqX1pQYdpaqrj/7uyWflb51ZcbxBj1nGFZNozRI3zLRX57RL/Mn4Ckw2s2nUkAOMa5CHP6NhL89I=
+	t=1744078835; cv=none; b=ooXHPVwREZsvAMM7o/tQZJzzs7u3xlt4Ln2P9D4h8txT13HRhv2fNEub3hwPQ8OQbwE03hwe3s0eHzET9K388J3A19Zb+WzJ26N7RpLT8AZjK0wnRG6kESvb6OBGw3b7Ru8JYLOOip2TgFF/c4Qk7duyvaCa9ILaQWMY23htUYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744078663; c=relaxed/simple;
-	bh=f8nqsIoSrB2UoWBStxPg4auyhzxwOet/IZUuESTb9iM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aqQhf+iDBY3cuJrc/8zB4Dtbi4eTZTuv4SsURGCyUYt/+v8VhUDd6UElm1KOGUpS+Xqo/+yJY5LVISEKq6zVEJ9FXB5qUERjbCFKzQLwFrq6Yh2A6Lehfq7GWmnYKFiF+tzYefbUm+QYgS1tVC0xcr4gd4WdPparXF+GqzjFeRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=pVgGvw7p; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-224191d92e4so46456485ad.3
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 19:17:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1744078660; x=1744683460; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0bLq9b6JKP4taz9O+M53IYvCvMkStISKatzDVjrYTh4=;
-        b=pVgGvw7pWP3ZVNAd8zMeoC7yZI9l/Na82rMttANOr/9E0G/n1sFgyPzXaHK/8Ey9tg
-         1v9mpy+TyfhONTCWp/TLc9uJyR4zyHXffh2StGj6yUffPutvrM2JGhoqDxp1l2+0LKus
-         8OPfodvXqv4iq++zkkxFbsI4YDVvblbW6xBqk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744078660; x=1744683460;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0bLq9b6JKP4taz9O+M53IYvCvMkStISKatzDVjrYTh4=;
-        b=CBEP6clqRoJjQoysbsfIiIKyU8CNeOkTELfxWKkoBGh/GGEf3QVtfGcX/GwdrqLD7O
-         HaZ51PL5mhk2iKcMs21rMs0P3O/HKps5wkfeKYuEqsmMHz7krEUk38+Nq+AChg465CT6
-         du9xRJ1fd/6ewGjJrwNthyqLg9DjyMyWnK7qhTJgsGRI+K0Ux3bFGcLdX85G56fFiGQH
-         /MX5+gwwulRpDEglPZ03IryObdRzUCobh35V6Voixh/lXczQuR1gqu+ysL3HcApAY9Jw
-         gHysWvIBktORO0uTc+LMLqYEfCdcZif68j9CRa0xEE0CalLJziGtHLBw7XXNebbDgO0e
-         pKeA==
-X-Forwarded-Encrypted: i=1; AJvYcCW0ZTPOguUd6eS3fHrpW3wq75whjSajogl5AQP2lhOszr7ruGhFaHmbLQAkhjEiXfviG0DdtUo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTp+ojFK8CHkNixip+VI/aFDm7moYW8J0maGYSX383PlEg66yT
-	QI0JIzO81pEnKLeI+xuuFdmrWkrsWWqJjRzlnYkk0Z2hihcephH7XpjubYw3WNM=
-X-Gm-Gg: ASbGncvqkuXQk28J8vgZXG3FEzfgRZuWytB+2kr5UVpFB0FhYgj6J8ogGuo0ECk3yJg
-	1c3gREvtfXiiIXh4DBAtzqWY/qnKk+rQygm+oFIN/l4+F4MZN//c2KsoaPRxxNKwqdL6j9XBBFc
-	OiwwBqHfcOYb1+sUh+Qy+wglSn69lneHfOdLCAH/aI9KWpvUQFiyBqd6StzcgnKEmF4/owUX3iZ
-	PCi3KaCuWHYYecfne6Ii4ElW3ifg7oPeTHY2N+089G7rWYd00IUShr28JguHQU/zRkH9eNCy3/D
-	YLq4NJWCuOSoLJj3RpKpKonF9vObExAi2TkuXorOKVngdF4Qv3zhsdXExcVF4JC1BwAstpyDtmc
-	sonCHPGoKLc8=
-X-Google-Smtp-Source: AGHT+IH3XAHDID2zF+QyFX7OhdUf3f/RnrL/3hvWvV3+PcTbs3I/Ft1IaxedMCC0YZ0uple9U2X/mQ==
-X-Received: by 2002:a17:903:246:b0:223:faf5:c82 with SMTP id d9443c01a7336-22a8a045fe5mr170320385ad.8.1744078659911;
-        Mon, 07 Apr 2025 19:17:39 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-229785adae3sm88909645ad.16.2025.04.07.19.17.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 19:17:39 -0700 (PDT)
-Date: Mon, 7 Apr 2025 19:17:36 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	sdf@fomichev.me, hramamurthy@google.com, kuniyu@amazon.com
-Subject: Re: [PATCH net-next 2/8] net: designate XSK pool pointers in queues
- as "ops protected"
-Message-ID: <Z_SHQJ_pLOgz9vpM@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me,
-	hramamurthy@google.com, kuniyu@amazon.com
-References: <20250407190117.16528-1-kuba@kernel.org>
- <20250407190117.16528-3-kuba@kernel.org>
+	s=arc-20240116; t=1744078835; c=relaxed/simple;
+	bh=fcsXNAqVONFErcWct0p5f6TRoJic4GOHW8vfQwN5c3E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cSUnKrITTx+6m1hn0AAV2YkhDm1AxumfsHMwDACuMNrbzQjbZIzigIIOB6xxZr1W9YmbfjAtRznYm29KwFwP4EC+GTxb/lIJSin9MEw5SOT+uPjgAIBNYJ6gNOtjkYLZlzjbWdVKsZC21osz6Qn+SKP36trQa0cjpJEawR/WlW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NFCY8Y1d; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <6c463f96-18e7-4ee9-ba74-524772e008b4@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1744078831;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mTadr6hlfyyWPFYhpnPzSUF00n3EJeBKU1nvkMa6B0k=;
+	b=NFCY8Y1dz+KkzOURdbfKAdoFb/kvpmtBEKKkSOhVv/lWdHckn8yhFGmrio62gou0llqR8F
+	nNZD1lvurUHtiBwoPdFh/RlO6qSkOpkSk5gefPoSfRzaI+AeVRMMhHIT7oRWeoYo60qlDp
+	8oNKKm8SHQ1AtqnSrzpKmESCeexcwSU=
+Date: Tue, 8 Apr 2025 10:19:39 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250407190117.16528-3-kuba@kernel.org>
+Subject: Re: [PATCH iwl-net v2] ice: Check VF VSI Pointer Value in
+ ice_vc_add_fdir_fltr()
+To: Simon Horman <horms@kernel.org>
+Cc: przemyslaw.kitszel@intel.com, anthony.l.nguyen@intel.com,
+ davem@davemloft.net, edumazet@google.com, netdev@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+References: <20250325020149.2041648-1-xuanqiang.luo@linux.dev>
+ <20250407140242.GK395307@horms.kernel.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: luoxuanqiang <xuanqiang.luo@linux.dev>
+In-Reply-To: <20250407140242.GK395307@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Apr 07, 2025 at 12:01:11PM -0700, Jakub Kicinski wrote:
-> Read accesses go via xsk_get_pool_from_qid(), the call coming
-> from the core and gve look safe (other "ops locked" drivers
-> don't support XSK).
-> 
-> Write accesses go via xsk_reg_pool_at_qid() and xsk_clear_pool_at_qid().
-> Former is already under the ops lock, latter needs to be locked when
-> coming from the workqueue via xp_clear_dev().
-> 
-> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> ---
->  include/linux/netdevice.h     | 1 +
->  include/net/netdev_rx_queue.h | 6 +++---
->  net/xdp/xsk.c                 | 2 ++
->  net/xdp/xsk_buff_pool.c       | 7 ++++++-
->  4 files changed, 12 insertions(+), 4 deletions(-)
 
-[...]
+在 2025/4/7 22:02, Simon Horman 写道:
+> On Tue, Mar 25, 2025 at 10:01:49AM +0800, Xuanqiang Luo wrote:
+>> From: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+>>
+>> As mentioned in the commit baeb705fd6a7 ("ice: always check VF VSI
+>> pointer values"), we need to perform a null pointer check on the return
+>> value of ice_get_vf_vsi() before using it.
+>>
+>> v2: Add "iwl-net" to the subject and modify the name format.
+>>
+>> Fixes: 6ebbe97a4881 ("ice: Add a per-VF limit on number of FDIR filters")
+>> Signed-off-by: Xuanqiang Luo <luoxuanqiang@kylinos.cn>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+>
+>> ---
+>>   drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c | 6 ++++++
+>>   1 file changed, 6 insertions(+)
+>>
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c b/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
+>> index 14e3f0f89c78..53bad68e3f38 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
+>> +++ b/drivers/net/ethernet/intel/ice/ice_virtchnl_fdir.c
+>> @@ -2092,6 +2092,12 @@ int ice_vc_add_fdir_fltr(struct ice_vf *vf, u8 *msg)
+>>   	dev = ice_pf_to_dev(pf);
+>>   	vf_vsi = ice_get_vf_vsi(vf);
+>>   
+> nit, but not need to repost because of this: it's seems nicer
+> not to have not to have a blank line here. And instead, if one is
+> really wanted, put it above the ice_get_vf_vsi() line.
+>
+Thank you for the reminder. I will take this into consideration when
+submitting other patches next time. Since vf_vsi and its judgment logic
+are logically adjacent, it's better not to separate them with blank
+lines.
 
-> diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
-> index 25a76c5ce0f1..c7e50fd86c6a 100644
-> --- a/net/xdp/xsk_buff_pool.c
-> +++ b/net/xdp/xsk_buff_pool.c
-> @@ -279,9 +279,14 @@ static void xp_release_deferred(struct work_struct *work)
->  {
->  	struct xsk_buff_pool *pool = container_of(work, struct xsk_buff_pool,
->  						  work);
-> +	struct net_device *netdev = pool->netdev;
->  
->  	rtnl_lock();
-> -	xp_clear_dev(pool);
-> +	if (netdev) {
-> +		netdev_lock_ops(netdev);
-> +		xp_clear_dev(pool);
-> +		netdev_unlock_ops(netdev);
-> +	}
->  	rtnl_unlock();
-
-Is it actually possible for netdev to be NULL here?
-
-I feel like it probably isn't, but if it were possible we'd need an
-else case here to xp_clear_dev(pool) without the netdev_lock_ops?
+>> +	if (!vf_vsi) {
+>> +		dev_err(dev, "Can not get FDIR vf_vsi for VF %u\n", vf->vf_id);
+>> +		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
+>> +		goto err_exit;
+>> +	}
+>> +
+>>   #define ICE_VF_MAX_FDIR_FILTERS	128
+>>   	if (!ice_fdir_num_avail_fltr(&pf->hw, vf_vsi) ||
+>>   	    vf->fdir.fdir_fltr_cnt_total >= ICE_VF_MAX_FDIR_FILTERS) {
+>> -- 
+>> 2.27.0
+>>
+>>
 
