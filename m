@@ -1,131 +1,136 @@
-Return-Path: <netdev+bounces-180077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C8BDA7F756
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 10:11:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42994A7F761
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 10:12:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AF6F3AE193
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 08:11:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1DA2179C5A
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 08:12:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A87C263C74;
-	Tue,  8 Apr 2025 08:11:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E91762641F5;
+	Tue,  8 Apr 2025 08:11:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fIIoJFUd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qzp9zD1f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B962420459F
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 08:11:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45DD2641CB
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 08:11:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744099884; cv=none; b=hSi8TvKlzgjYaPH4iJsALMlEJ8qivbHzHQvBsQKlTbybpq/p/vyawCdyta/2YiFcyevzhptYSrTdrzfOfyhCLChXT7M6BYXPFhZFM+Fr1IkO0kt+Y/ZpDkEDSKTpjl0oLJAHscP+glLDM5g0LKJ8ZuTsCsEZbkT15B9CaFBcUow=
+	t=1744099908; cv=none; b=DzBF+87HgZYdlg3t9mGxMaboQAG5YId4Pjr5vhSszykkH3bkXnDtITrjRL46dh35cxinvXCMFC2H3jrxGNlJY/h+Pp4+4O/9Om7W5WnBtnRLPQFaFzLkSEt5NMP5Z+biMs+VFj58FdUxXkIa42uh7H/QmTWdyDU1PocxHZ9I+fI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744099884; c=relaxed/simple;
-	bh=HNeRbYF4/v2655du+OhPlrYqgFpc4HO0WwSrHFA5Wvk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bYA9v18GTvy7RPVKP1uBOf4lP1R77jBKBrUhMz1UkWUtZwI1Jku47E4Alw/ozLKYuOI5dcjczeJu9BsGkYKCev2rZVSGEhHnK+cEomFKw6OjE0EdwwAMeC+Uk9jOO6FeohFh3VDi52hUg+TcvFOzHbr3lzLsXiVnybY5cGwDbRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fIIoJFUd; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2295d78b45cso67782685ad.0
-        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 01:11:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744099881; x=1744704681; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HNeRbYF4/v2655du+OhPlrYqgFpc4HO0WwSrHFA5Wvk=;
-        b=fIIoJFUdoObj6pLnLKymgmHqDL1Kn+AYCSRTQyNUsdbRbH1Z24unMEj8egSOgIlQ4w
-         MwUjlWuYlKj2prZlIJQI/FHgbLjcXCYwWt3AfuLgErb/zm/YoDxSFFXJoVyNnqFfURlN
-         0v3Avb+D7sLQf1IYh6VXeX/lyAOSmaqI+xAFjhbkoNYRTShz3DWE2d4w7nMeikKESUx2
-         VaRtB1MpBTNd3szxMp9I1321TGWYD6Xw/63Kd8AnYeR0jfWmq8rKKyvl7RAJmMFtC1u8
-         8XM/S8dpGFa1Gw/9RJ70E0Y8+0c5V7Ivik/4ZPpFtgaoBA7HagD2aPfdUuqdIy17I0RM
-         DWLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744099881; x=1744704681;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HNeRbYF4/v2655du+OhPlrYqgFpc4HO0WwSrHFA5Wvk=;
-        b=XBNLCcswswdrptAxb8d4iy6obATcXj1PfF0GEWk3xYLQsX+LvCyVrj7VWw6nPDRAmS
-         qx1acsW2fVitPvJzXg+gz8K6YbiERKeS2mopWDPcAQbVodhUn11YccEmkPgF/ERg3nVb
-         MJq5VrGAT4el9LPnm3PP8YmB4/3vomWaXS1rd+9hrtY3yqrPBQovKWh+SENAhJAn2DD3
-         2sQSPyFDVgZYL5TPbCeH0sA1dJ/k92Rfsqs6hSUfAYr328RcFLCpJP7AI0kct+x9bqLh
-         2g+0zn8x735VfmEj9eQHfiV4RKunJ0se0mYpD6tSD4PUrGG8Y+ipaa6QiOfPely4i0qb
-         qBhg==
-X-Forwarded-Encrypted: i=1; AJvYcCWbeqhehVN/hBVZBFXWryOuxxhyRWgEZcXlLqy4Fs9ciKTOwFNEycBZkixECtIysMjnq0rvHy8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypGpOzTx5od3GKWqkYGrsEeUKpt51EhgpYCeGZANV0oYunNCeh
-	O9ttulVfgTVavKTTgUSUs+WftRWqBMURdAJAhqDXgyewbrV0dAXnuUXkbMDL2mNaR7EM1/zD4dy
-	91HWUdUdi6NilsIqWA6CqyN0HnVOzAUojayzf
-X-Gm-Gg: ASbGnctpRNpj9b9uq240hDBqr/XBJf+9EwTkaWIqQ+DoopdqxsG7vzZ6UEs4AyQ9JNu
-	kTI4jOy0wVFyja0Xvl/X7hUyXRTWpYZrjBN66H4oWBMMB+IEwUPdUxNFOIKva01ACM9t7K5KOr2
-	w51vrYj45fte7HjHTGnp/WSB85oNb0lqnkKJCDN3G+DVCGqbka/mN8N+zy
-X-Google-Smtp-Source: AGHT+IFQWcX8la3mf3erxygnc0Yxk6VdfJlO+R1O7xgLJNRsvV6Nb+bNzo3lRucwwrpQVJHAsLqHfIHBTUxDqrFrZkE=
-X-Received: by 2002:a17:903:1cb:b0:21f:7a8b:d675 with SMTP id
- d9443c01a7336-22a8a0428b8mr221441315ad.4.1744099880739; Tue, 08 Apr 2025
- 01:11:20 -0700 (PDT)
+	s=arc-20240116; t=1744099908; c=relaxed/simple;
+	bh=sdci4lJsO/FOikKIVq4yCkhQfnhsn9Us40sQtnVw+Xs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E4SQYaJ+bUPDOybj+ToVkd5bo9vKC5YQLTfrfUWsHiASGZJ/PcKXCF75rFKyY8alSqUlrXHUqXol0BtT6YzY+MtXeMysnftkdxvnU7WlXg4ypZ9Ka8z3IKktbZrLIb8z8yzQ/zLxJSQYGTwJvje7Vds76r9S4a7oO8v9oEeiR1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qzp9zD1f; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD2C7C4CEE9;
+	Tue,  8 Apr 2025 08:11:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744099908;
+	bh=sdci4lJsO/FOikKIVq4yCkhQfnhsn9Us40sQtnVw+Xs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Qzp9zD1fw7vRDLwtT0qI/gIR/GHnf3Qv752bVzjp7b5VGG06sX7xDK5fp961WVTEf
+	 WPEAfUv/c2tzI+IBLGZ+y1Rx/KE1w9Q7Yf/tHlA3lLIe5QufpOu0k3puZt4WL4a5Is
+	 VrpCeIsEhZrQ4QP1zM3Xn3XrPRmsgXFEfDQE+Qo1PAvmatJiHf3B/XPntRYegpfMYr
+	 r8E9sOE+bqEf+25D9ZvKx626KgpcFQnDkzCvTVZVzat7FuIBUxJDU6QKvFIrMuhodP
+	 ntQLt9UlAtCulJpHCkWXZy7RvYHOPdM/BZVkbc/fUibXacHQVeleZ7US4z/TeZ7cio
+	 XP3uLDDN3mb8g==
+Date: Tue, 8 Apr 2025 10:11:45 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Davide Caratti <dcaratti@redhat.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: airoha: Add matchall filter offload support
+Message-ID: <Z_TaQbEeTZnKL9ei@lore-desk>
+References: <20250407-airoha-hw-rx-ratelimit-v1-1-917d092d56fd@kernel.org>
+ <CAKa-r6tNa+Ltxb61g6E3h66pxW0XTDb76T6Wc2XMJCu8xuAvPg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <Z_PfCosPB7GS4DJl@mini-arch> <20250407161308.19286-1-kuniyu@amazon.com>
-In-Reply-To: <20250407161308.19286-1-kuniyu@amazon.com>
-From: Aleksandr Nogikh <nogikh@google.com>
-Date: Tue, 8 Apr 2025 10:11:09 +0200
-X-Gm-Features: ATxdqUEJdhoVuF1kE17SFFqgm4y9d22GopYGugK8_wlLPzMs2KTVHWjwqJHr5p4
-Message-ID: <CANp29Y5RjJD3FK8zciRL92f0+tXEaZ=DbzSF3JrnVRGyDmag2A@mail.gmail.com>
-Subject: Re: [syzbot] [net?] WARNING: bad unlock balance in do_setlink
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, Dmitry Vyukov <dvyukov@google.com>
-Cc: stfomichev@gmail.com, andrew@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, horms@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	sdf@fomichev.me, syzbot+45016fe295243a7882d3@syzkaller.appspotmail.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="cf4oqZqIraZr0Mc3"
+Content-Disposition: inline
+In-Reply-To: <CAKa-r6tNa+Ltxb61g6E3h66pxW0XTDb76T6Wc2XMJCu8xuAvPg@mail.gmail.com>
+
+
+--cf4oqZqIraZr0Mc3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 7, 2025 at 6:13=E2=80=AFPM 'Kuniyuki Iwashima' via syzkaller-bu=
-gs
-<syzkaller-bugs@googlegroups.com> wrote:
->
-> From: Stanislav Fomichev <stfomichev@gmail.com>
-> Date: Mon, 7 Apr 2025 07:19:54 -0700
-> > On 04/07, syzbot wrote:
-> > > Hello,
-> > >
-> > > syzbot has tested the proposed patch but the reproducer is still trig=
-gering an issue:
-> > > unregister_netdevice: waiting for DEV to become free
-> > >
-> > > unregister_netdevice: waiting for batadv0 to become free. Usage count=
- =3D 3
+> hello Lorenzo, thanks for this patch!
+
+Hi Davide,
+
+thx for the review.
+
+>=20
+> On Mon, Apr 7, 2025 at 10:04=E2=80=AFPM Lorenzo Bianconi <lorenzo@kernel.=
+org> wrote:
 > >
-> > So it does fix the lock unbalance issue, but now there is a hang?
->
-> I think this is an orthogonal issue.
->
-> I saw this in another report as well.
-> https://lore.kernel.org/netdev/67f208ea.050a0220.0a13.025b.GAE@google.com=
-/
->
-> syzbot may want to find a better way to filter this kind of noise.
->
+> > Introduce tc matchall filter offload support in airoha_eth driver.
+> > Matchall hw filter is used to implement hw rate policing via tc action
+> > police:
+> >
+> > $tc qdisc add dev eth0 handle ffff: ingress
+> > $tc filter add dev eth0 parent ffff: matchall action police \
+> >  rate 100mbit burst 1000k drop
+> >
+> > Curennet implementation supports just drop/accept as exceed/notexceed
+> > actions. Moreover, rate and burst are the only supported configuration
+> > parameters.
+> >
+> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+>=20
+> [...]
+>=20
+> > +
+> > +       if (act->police.peakrate_bytes_ps || act->police.avrate ||
+> > +           act->police.overhead) {
+> > +               NL_SET_ERR_MSG_MOD(f->common.extack,
+> > +                                  "peakrate/avrate/overhead not suppor=
+ted");
+> > +               return -EOPNOTSUPP;
+> > +       }
+>=20
+> I think the driver should also validate the so-called "mtu policing"
+> parameter. E.g, configuring it in the hardware if it has non-zero
+> value in act->police, or alternatively reject offloading of police
+> rules where act->police.mtu is non-zero (like done in the hunk above).
+> WDYT?
 
-Syzbot treats this message as a problem worthy of reporting since a
-long time (Cc'd Dmitry who may remember the context):
-https://github.com/google/syzkaller/commit/7a67784ca8bdc3b26cce2f0ec9a40d2d=
-d9ec9396
+ack, right, I missed it. I will add it in v2.
 
-Since v6.15-rc1, we do observe it happen at least 10x more often than
-before, both during fuzzing and while processing #syz test commands:
-https://syzkaller.appspot.com/bug?extid=3D881d65229ca4f9ae8c84
+Regards,
+Lorenzo
 
---=20
-Aleksandr
+> --=20
+> davide
+>=20
+
+--cf4oqZqIraZr0Mc3
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ/TaQQAKCRA6cBh0uS2t
+rO5FAP9IPAyg0FFzsbCQb+ZqLZXr+62jP0nLzaeO/Mklx3HefwEAloAoGjXka5kn
+3FvimlCwCpSabbKDUFgb6Nl9SpTVnQk=
+=NtS5
+-----END PGP SIGNATURE-----
+
+--cf4oqZqIraZr0Mc3--
 
