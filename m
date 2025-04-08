@@ -1,64 +1,50 @@
-Return-Path: <netdev+bounces-180086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AD07A7F7AB
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 10:21:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20CCCA7F7A7
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 10:21:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AC6B3AFA40
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 08:18:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 156041899A16
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 08:20:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3796D263C74;
-	Tue,  8 Apr 2025 08:18:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ED63254B1A;
+	Tue,  8 Apr 2025 08:19:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="mww3B8Jj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VgKpIZ+V"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B2E1FE45C;
-	Tue,  8 Apr 2025 08:17:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB6682594
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 08:19:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744100282; cv=none; b=MVb0V1+2BDnziwyFi4L1wLpYMCeT69dlbLWpA60JjhaflFiBDP6RblTtBLSAQcvR3gNAtjHEcRGlaoBczq5S5WPpFpryCSLZgPDvmNihkrFuLLxaeTysScEHTW8ljIEcIAuxEtmV568ib8AFfLyb6xKZo3/DYj0nI3fPrkrqtSo=
+	t=1744100398; cv=none; b=W6kLOLmM+uFfhJJLbidyk/MmpocbcVDnPujae9Mn0h71GMX3I17OK2rVBs0J6OnEw4Ktqg8WeglWFHsLUV1q2V079wkfng8b4MLBJ9hIYPUPlCaH0CSDOD/q2orb0svMotrGXjp9w8bhxYEv49giJufnxqcqM/JAEsQJRlFT5Hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744100282; c=relaxed/simple;
-	bh=z7C9+Aw9Lnh/zalZF4spiWpABhbIENKNGZqrSXIAjgo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OYEcJ9u/pPt5vrZxT5K0eatseSvPNim2W5yWOVQDe+u6lsjBJtso/u4FVkrknjAimc0ybEZftvKtXrGFLXwP/gOeRxv1AAXNql282WgXqXExzN48f4v7POggIeLrK8BoySJ7A8XOH3DQ8YVAt8VpzTf7DB1tY879IO8gWz/rIn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=mww3B8Jj; arc=none smtp.client-ip=117.135.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=NbkKe
-	gcA71YkI2H7dpP2G2+hQQJI+Zb1D4aPq7daL3U=; b=mww3B8JjD3DUBROqLEOsa
-	y8/AkAmBfI7ip2WaPfbtmPa20YhgTpVLB/7vwO8/pgPXvmH++AWkjzd0cJvby+uh
-	qBtmwuhxIFCnx2LKp866PSIDK5qMm7TuQDLOggu0XiDjUgiyTopYKakAqQlwPWTq
-	e7RfAe3Tnq4ev+3grFBRew=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g0-2 (Coremail) with SMTP id _____wAXLdSI2_RnL8PbEw--.43400S4;
-	Tue, 08 Apr 2025 16:17:14 +0800 (CST)
-From: lvxiafei <xiafei_xupt@163.com>
-To: fw@strlen.de
-Cc: coreteam@netfilter.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	kadlec@netfilter.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvxiafei@sensetime.com,
-	netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	pabeni@redhat.com,
-	pablo@netfilter.org,
-	xiafei_xupt@163.com
-Subject: Re: [PATCH] netfilter: netns nf_conntrack: per-netns net.netfilter.nf_conntrack_max sysctl
-Date: Tue,  8 Apr 2025 16:17:12 +0800
-Message-Id: <20250408081712.54037-1-xiafei_xupt@163.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20250407101352.GA10818@breakpoint.cc>
-References: <20250407101352.GA10818@breakpoint.cc>
+	s=arc-20240116; t=1744100398; c=relaxed/simple;
+	bh=b5OAQmbLJ7VnJvfAaJBBQriQpTl5GUEPjznNGdJlXi8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=TALD5B8aMOPTJzEl1WubSBR+AqHVRrPePsORrLzouV6oOXpJI/LJHYuK3OtyJIAkuI6zIOIqr+WkJ9UQD/wxhV9WExU1JvA9ZxqXr4KP+oQIHtAN3uhKPBjiLEIhIe2zFLmT2ugnZe7S2pLzPqSjNpP6XhUGRmlA13960Rq+F28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VgKpIZ+V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63E84C4CEE5;
+	Tue,  8 Apr 2025 08:19:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744100397;
+	bh=b5OAQmbLJ7VnJvfAaJBBQriQpTl5GUEPjznNGdJlXi8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=VgKpIZ+VBTl3pRt0iSNOcvBmaJS9fWAarXs+EC6BydvN+1jQOUFaPqFqMXYX35NWa
+	 9ljeOIqYXnVBO2LsF2HfLIpJ9G6a//3qGE0FGPtouafyKNRLJbSkX5nKNkn8zwjI5+
+	 eSbLYjfPL98QoMpvtn4aYCM5kcNHv8u79+0XOerY8GUzrqNBbv0XkpqWbLHVhuXUVF
+	 ajo05PmP3sKpmxD4V9lt6yrkHz66PUYA/84lpB9OMxYjPzWg6uDu/PMN0cGzDbG7Q9
+	 /SMaPesfGCSUzcB9mE7aq/2EiQAHsHi5PFjajq87aVl87H6+xcv0AosJYv4oX2Mc8Y
+	 L4/tHaoF38D6w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB10938111D4;
+	Tue,  8 Apr 2025 08:20:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,37 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wAXLdSI2_RnL8PbEw--.43400S4
-X-Coremail-Antispam: 1Uf129KBjvdXoWrtryfCw4xXw13Xw1xCr43trb_yoWDGrcEqr
-	Wqgry8Gw4Uu3ZxXan3t3Wxu3yUKay0yF4kAw47Zr4Sq3Z3tr97GFs09r1rZ3yxJw4DGrnI
-	krn8JF129rnIvjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7VUjEfO7UUUUU==
-X-CM-SenderInfo: x0ldwvplb031rw6rljoofrz/xtbBMQwpU2f02DVkxAAAsZ
+Subject: Re: [PATCH net] tipc: fix memory leak in tipc_link_xmit
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174410043476.1814045.4887693638217026540.git-patchwork-notify@kernel.org>
+Date: Tue, 08 Apr 2025 08:20:34 +0000
+References: <20250403092431.514063-1-tung.quang.nguyen@est.tech>
+In-Reply-To: <20250403092431.514063-1-tung.quang.nguyen@est.tech>
+To: Tung Nguyen <tung.quang.nguyen@est.tech>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, jmaloy@redhat.com
 
-On Monday 2025-04-07 12:13, Florian Westphal wrote:
->lvxiafei <xiafei_xupt@163.com> wrote:
->> The modification of nf_conntrack_max in one netns
->> should not affect the value in another one.
->
->nf_conntrack_max can only be changed in init_net.
->
->Given the check isn't removed:
->   /* Don't allow non-init_net ns to alter global sysctls */
->   if (!net_eq(&init_net, net)) {
->       table[NF_SYSCTL_CT_MAX].mode = 0444;
->
->... this patch seems untested?
->
->But, removing this check would allow any netns to consume
->arbitrary amount of kernel memory.
->
->How do you prevent this?
+Hello:
 
-Yes, this check needs to be deleted
-All netns share the original nf_conntrack_max. The nf_conntrack_max
-limit does not limit the total ct_count of all netns. When it is changed
-to a netns-level parameter, the default value is the same as the original
-default value (=max_factor*nf_conntrack_htable_size), which is a global
-(ancestral) limit, and kernel memory consumption is not affected.
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Thu,  3 Apr 2025 09:24:31 +0000 you wrote:
+> In case the backlog transmit queue for system-importance messages is overloaded,
+> tipc_link_xmit() returns -ENOBUFS but the skb list is not purged. This leads to
+> memory leak and failure when a skb is allocated.
+> 
+> This commit fixes this issue by purging the skb list before tipc_link_xmit()
+> returns.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] tipc: fix memory leak in tipc_link_xmit
+    https://git.kernel.org/netdev/net/c/69ae94725f4f
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
