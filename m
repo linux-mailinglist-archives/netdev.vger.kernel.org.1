@@ -1,103 +1,126 @@
-Return-Path: <netdev+bounces-180319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 581E2A80EEE
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 16:54:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36EE7A80F23
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 17:02:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4C0D1BA62A8
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 14:51:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85EDC3AABD8
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 14:57:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D41F1DF99C;
-	Tue,  8 Apr 2025 14:50:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE60B218584;
+	Tue,  8 Apr 2025 14:57:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NSMi+sI6"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oGmqxoT0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571261B6CE5;
-	Tue,  8 Apr 2025 14:50:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05B81553AA
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 14:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744123850; cv=none; b=Xfm3AgpghcPGAW8x3X86IvNRrH+joONuFMR+87e7cHnwo/Dsw/MoP1ZHbeDcjnXVE/lCC1CuWYzsacxT6pcwwF3UaTuaFqSbMKg+Vr1y5n4A2s4Jmms5fJzLUpe7qrlpx8gg4fSdzfyG7gUv2LRBIA+AOx4t0slnwSP3qSPZKJA=
+	t=1744124267; cv=none; b=V9tMj0XhYgtdY5T+V8dPzoGkstzJet7WWZC5vCQLzQmzSAe4NQAJHwa/qLogT5k52Wy4zs3uML9xwAlLQlEDnEbIKKWw8GMHqPLqwPf2wasmvCgtby3SnMMP9F2Ol6cUthQGupj1CGlKUjXBXGNfEvRdPb+GbuA/IJVKIOSgRkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744123850; c=relaxed/simple;
-	bh=iippsYe8qLb/2X9/I9NX6d/fzC9lDY7Hh/+44sczz4g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GOTPjnP0bdLaMceaM9YEhfPBd6btnj+0ZSqlxy/rwfMXjvlrjyy6/VKqFsbJGnF7xI68s3cS+6sJ7DfCn/yb01JVIErdq58W3goerRPmeM/77TbjVGhwwXV5cZv/6wzwgxu+JirMn9fZnTubZI/DTO4C2iQMeDxV9XdNVAGMuRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NSMi+sI6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2297AC4CEE5;
-	Tue,  8 Apr 2025 14:50:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744123849;
-	bh=iippsYe8qLb/2X9/I9NX6d/fzC9lDY7Hh/+44sczz4g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NSMi+sI6BfxNdjGVuI7k1YPEEB3cI1ZteuMz/i77RX6ZKVVtc7G5wTT1aSxozuebA
-	 XMflo8Dg43jH0NMQTNts8wq5qxJk/KX2JwIt/jhxJDVCZ4nfBlEdutImR4Y8TcCGYr
-	 a/LZp8xVwK5rZ8s5TpytyreXMUjrkSIDT3dfjZA+mKTMjzNxb00w63F9LCi2sDaXhM
-	 TIDpgJYw9Skn+WXlBrEQ6c6lH13pqYKgkqZjUgH+ju6TbeV8JhlZv2pzeLBH9H8w9a
-	 hApED5WPIbOVRA8ssP34+b8l6uizHChdo0YvbYvAoSbbprKSYOk6daNln8naVIVuOY
-	 ngrqmh3HwUXXQ==
-Date: Tue, 8 Apr 2025 07:50:47 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-kernel@vger.kernel.org, upstream@airoha.com, Christian Marangi
- <ansuelsmth@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, Kory
- Maincent <kory.maincent@bootlin.com>, Alexandre Belloni
- <alexandre.belloni@bootlin.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Clark Wang <xiaoning.wang@nxp.com>, Claudiu
- Beznea <claudiu.beznea@microchip.com>, Claudiu Manoil
- <claudiu.manoil@nxp.com>, Conor Dooley <conor+dt@kernel.org>, Ioana Ciornei
- <ioana.ciornei@nxp.com>, Jonathan Corbet <corbet@lwn.net>, Joyce Ooi
- <joyce.ooi@intel.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Madalin
- Bucur <madalin.bucur@nxp.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Michal Simek <michal.simek@amd.com>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Radhey Shyam Pandey
- <radhey.shyam.pandey@amd.com>, Rob Herring <robh+dt@kernel.org>, Rob
- Herring <robh@kernel.org>, Robert Hancock <robert.hancock@calian.com>,
- Saravana Kannan <saravanak@google.com>, UNGLinuxDriver@microchip.com,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>,
- devicetree@vger.kernel.org, imx@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [net-next PATCH v2 00/14] Add PCS core support
-Message-ID: <20250408075047.69d031a9@kernel.org>
-In-Reply-To: <20250407231746.2316518-1-sean.anderson@linux.dev>
-References: <20250407231746.2316518-1-sean.anderson@linux.dev>
+	s=arc-20240116; t=1744124267; c=relaxed/simple;
+	bh=UdQjo7GX3+JoHxf1FCW1rvspbShM7CTaNouAZV4fgUk=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=MEn9R7MO4Gf0caeMBcRF4MmNJcXRUDT1LGeTxfbF3USF/ARX2Ot9Wn7WE2sQmzKbNhgdoHl1epo3jFVXWFzYppXjQhEXPvP11bFPkorC3Jdbxubxp/P+IkLcnTnFVDckY+ruS37Qc0gnFJBjpSq3rrgf4yhLSGPjeInebrn67fU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oGmqxoT0; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1744124253;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2VRMkAdXCE8Xz+ZVJqgl2Gets4GXYhybM2zk48uTnfE=;
+	b=oGmqxoT07NQyejq3aH5h02F4c2zBmQPIsf6QnKSuYQ23Asn6guo1iwqQpkfDzQYjcGD9mW
+	+UY5pS8A9X5kqN2+oG0cZ587M7TLVN3Pd1BgMFu/X3jr31RZwWqPxDwX6RGiW+OA95CqhR
+	u6Ah9TZgqERxHcfo3ZkdkpM6jSloR94=
+Date: Tue, 08 Apr 2025 14:57:29 +0000
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
+Message-ID: <46c9a3cd5888df36ec17bcc5bfd57aab687d4273@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH RESEND net-next v3 2/2] tcp: add
+ LINUX_MIB_PAWS_TW_REJECTED counter
+To: "Eric Dumazet" <edumazet@google.com>
+Cc: bpf@vger.kernel.org, mrpre@163.com, "David S. Miller"
+ <davem@davemloft.net>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
+ <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>, "Jonathan Corbet"
+ <corbet@lwn.net>, "Neal Cardwell" <ncardwell@google.com>, "Kuniyuki
+ Iwashima" <kuniyu@amazon.com>, "David Ahern" <dsahern@kernel.org>,
+ "Steffen Klassert" <steffen.klassert@secunet.com>, "Sabrina Dubroca"
+ <sd@queasysnail.net>, "Nicolas Dichtel" <nicolas.dichtel@6wind.com>,
+ "Antony Antony" <antony.antony@secunet.com>, "Christian Hopps"
+ <chopps@labn.net>, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+In-Reply-To: <CANn89iJRyEkfiUWbxhpCuKjEm0J+g7DiEa2JQPBQdqBmLBJq+w@mail.gmail.com>
+References: <20250407140001.13886-1-jiayuan.chen@linux.dev>
+ <20250407140001.13886-3-jiayuan.chen@linux.dev>
+ <CANn89iJRyEkfiUWbxhpCuKjEm0J+g7DiEa2JQPBQdqBmLBJq+w@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon,  7 Apr 2025 19:17:31 -0400 Sean Anderson wrote:
-> This series depends on [1,2], and they have been included at the
-> beginning so CI will run. However, I expect them to be reviewed/applied
-> outside the net-next tree.
+April 8, 2025 at 22:18, "Eric Dumazet" <edumazet@google.com> wrote:
 
-These appear to break the build:
 
-drivers/acpi/property.c:1669:39: error: initialization of =E2=80=98int (*)(=
-const struct fwnode_handle *, const char *, const char *, int,  unsigned in=
-t,  struct fwnode_reference_args *)=E2=80=99 from incompatible pointer type=
- =E2=80=98int (*)(const struct fwnode_handle *, const char *, const char *,=
- unsigned int,  unsigned int,  struct fwnode_reference_args *)=E2=80=99 [-W=
-incompatible-pointer-types]
- 1669 |                 .get_reference_args =3D acpi_fwnode_get_reference_a=
-rgs,   \
 
-Could you post as RFC until we can actually merge this? I'm worried=20
-some sleep deprived maintainer may miss the note in the cover letter
-and just apply it all to net-next..
---=20
-pw-bot: cr
+>=20
+>=20On Mon, Apr 7, 2025 at 4:00 PM Jiayuan Chen <jiayuan.chen@linux.dev> =
+wrote:
+>=20
+>=20>=20
+>=20> When TCP is in TIME_WAIT state, PAWS verification uses
+> >  LINUX_PAWSESTABREJECTED, which is ambiguous and cannot be distinguis=
+hed
+> >  from other PAWS verification processes.
+> >  Moreover, when PAWS occurs in TIME_WAIT, we typically need to pay sp=
+ecial
+> >  attention to upstream network devices, so we added a new counter, li=
+ke the
+> >  existing PAWS_OLD_ACK one.
+> >=20
+>=20
+> I really dislike the repetition of "upstream network devices".
+> Is it mentioned in some RFC ?
+
+I used this term to refer to devices that are located in the path of the
+TCP connection, such as firewalls, NATs, or routers, which can perform
+SNAT or DNAT and these network devices use addresses from their own limit=
+ed
+address pools to masquerade the source address during forwarding, this
+can cause PAWS verification to fail more easily.
+
+You are right that this term is not mentioned in RFC but it's commonly us=
+ed
+in IT infrastructure contexts. Sorry to have caused misunderstandings.
+
+Thanks.
+> >=20
+>=20> Also we update the doc with previously missing PAWS_OLD_ACK.
+> >  usage:
+> >=20
+>=20>  '''
+> >  nstat -az | grep PAWSTimewait
+> >  TcpExtPAWSTimewait 1 0.0
+> >  '''
+> >=20
+>=20>  Suggested-by: Eric Dumazet <edumazet@google.com>
+> >  Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> >=20
+>=20
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
+>
 
