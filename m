@@ -1,138 +1,92 @@
-Return-Path: <netdev+bounces-180396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E168A8133B
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 19:06:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7662A8133E
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 19:08:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C9B41BA35D0
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 17:06:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46FFE8A0BAC
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 17:08:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E87DC22DFA2;
-	Tue,  8 Apr 2025 17:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A42D22F38E;
+	Tue,  8 Apr 2025 17:08:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L/1JgHNx"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WN85ll5G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36439191F79;
-	Tue,  8 Apr 2025 17:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9C0191F79;
+	Tue,  8 Apr 2025 17:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744131977; cv=none; b=TxrbAbRfgMi0ikMsxheqnc/JrCTBIA/EYFFGntGHAVJ17mUDoyOnN6GVysYlwMoU+l2zWz10dmQTAX2vcISysSloNG5au8F9NJ9uF+eJWWV1YF10AOfXJSM4fewxMBHIf6MJttkVSnJ2s4HsMdoN3XoPKjFrbZyO8yjNcwDTEdw=
+	t=1744132103; cv=none; b=Fk1g3qDG0eUPiE4VzcEt1BKqQWrWo3LCBT2qUSEl+z79/py1VZiE47FOs+6yRouMCbHPwVV70os3cg58Tiu/M18rKcpCTzfxIZ/14/DMETOQVGn8WrgYPmeGsPVV7+VfuOVU6ziUGZLmfSlKc1letu3c1gFI1kwWHQwnWwvdS8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744131977; c=relaxed/simple;
-	bh=yg8Q+fEiwdUlvQz508ND+obDpVahFI5i6bIssELHUWk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GX2S3IwnkmJCSosRb9BrSKD7avw+/FUQxe1gsBsQiqw1qmEJ7noxhe2TTT6ynKLD8zRum0g9pK9ORyErz58L0db0Opgq95fCzat2V1kO6dXEDW7C4X5Ba4ImTzGH7wB+EoYijmeAi46DTjnyRbTB5rEpC80Z8cO82zFIPDYh258=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L/1JgHNx; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-39c0e0bc733so5003773f8f.1;
-        Tue, 08 Apr 2025 10:06:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744131974; x=1744736774; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sVSW1j9sW9KcetgerHbKmVEbcFODFc+WKhghSHuNKnA=;
-        b=L/1JgHNxN+AG0GJY/If+024P7B68PU1XQq0qeyhg0ttP6uu5/v0vImS+jmRycK+iao
-         VSC4SK21AS7GSo0J30LEdPZB9VvqERdnhmJs745QG8XOZbMgtgTBts/8HlPyqEGZQj7+
-         PDLZMA8bQ9uzZE4YhzA1Q0pIBGqwv8GU0S7N9UuR0zyLeB04ZFgWWfqjsUXktDrjhF+M
-         OPhDn6kRyEAj2TaP/4y4ggyq4pume/zQBymExgS4lJZfA3xwL+01yaD33+uMo7QsPc3m
-         2NmbgUrxNfC/aNtg+8d2mzcdDYNL2W0P8Gvu6gdC7IQI6N/3WJWGeqKbCmS1FrXw/LQp
-         hGig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744131974; x=1744736774;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sVSW1j9sW9KcetgerHbKmVEbcFODFc+WKhghSHuNKnA=;
-        b=iBMqRakFsML2E1eriw5y/B+z5raPayxR9NXaje/xClh0u7dPPMtSqq8JJRBrQDopO2
-         9zn2z37HQ7CZUG0/11SHr6Fk5X3jYO0FYZa9sqY2+Xt4LwAV9hflqauSGllMWyRvzIzV
-         s+9K0kg1inqbwc6hJC50WKMnX5abnmVX3yUmUUjOmxqK9QzNy1i8Hd0DVFcUvz4QvsIx
-         OYi5RL5OT6lM29ky65u9x+71Q5uSISztY0h9N9AVjANCozhngnZ8gd9oHd0bzqy/5i12
-         93c8p4Kn+fzuTm7Pu0Uk3RvLrkYsKDbPq7enJ25tY49ghJPPPPXcDMwN+BqDouWybRIt
-         PxzA==
-X-Forwarded-Encrypted: i=1; AJvYcCXbFoHBMpR9JgM+YfxM/lCzAX7ZnA+wRTFRANvEEtp1gLC/sKXLtplm1zNihWEsZ7BCT41xCpr2PoCSbFbbDgM=@vger.kernel.org, AJvYcCXtOZt6q3oZf7yd701/KrGFe7/LYIrAaFxoXAXJuY3lXsI0HfHUhkCE14e4MPm21xk1zYNpMN+t@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/fMRXwvJCxW527adls21S4vSfQPgU9oG3E/8ksZrA8srZfxov
-	wvOzA1wBZqbYqZ35tyWworJGDj8a07WmLM9uPdyYPCRX7DmG5arXXbKWfQ==
-X-Gm-Gg: ASbGncvCXUkgtRY7CfJ7ctc3gJbld3pkRNvJKP2JKPhExJp4SL440ExOPFYWSIO3Web
-	lis+u14B4TL0bBi5c9XD34QOwuKUqm29wSzawuPnMlv6ZVQHMFkmtfvL8ZPub5s4XXhvws3nZI7
-	Qq5QhtuMQFACVQIQ6GQKPYlQhTjZYDS9WLzlkNz0f2hF3WMbu0Rai7TxUchrwVLmz/UHZIAGusL
-	jNoGAlDEjqixhWiyFqaiAzvAHNI6M/aJw0fih0QM3AbL+vCmADFuIzWjG8QaDLbOVXN0CzZbNA0
-	VVhPhyNxiJ0cawS1vBJJ+HOy88meUoqE1rexd5AHmWxJcqiQH+hYJ0+iLDzs0zyx
-X-Google-Smtp-Source: AGHT+IHIATDhMUQX/Pg95o2L3J7jOrSGkWtrg9ahAB0g3lLYbWvYXwbyI8C5zr/IZSnKeRXWF65znw==
-X-Received: by 2002:a05:6000:178b:b0:39c:2678:302e with SMTP id ffacd0b85a97d-39cba98288fmr15120629f8f.45.1744131974074;
-        Tue, 08 Apr 2025 10:06:14 -0700 (PDT)
-Received: from [172.27.62.62] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c3020d943sm15664627f8f.74.2025.04.08.10.06.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Apr 2025 10:06:13 -0700 (PDT)
-Message-ID: <bdd16b2e-13eb-46de-99bf-68a500c960c0@gmail.com>
-Date: Tue, 8 Apr 2025 20:06:08 +0300
+	s=arc-20240116; t=1744132103; c=relaxed/simple;
+	bh=ISpJuPdPfR789eM2c+XnQY2Ua5fwbfPzALomy5gPpfc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E/yWBwtX9F0roosrXNV5U2J0VKF6+Ea9HOZ+MLcmZMBOxUN9huU+ehWvVYHBaLQCat9yNDV5+HEEPOHEgxF8VLLO5NTsQnT0yEPp2QYQ0j3zkMjmew1BMj2zKE3PVi7wytMP32dcNwfxrHwjppCYrUvVTcud1NG0q7l5//iGp1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WN85ll5G; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=m6Zahi0sarElgNiROhFmUN7IZ3Qj0JsjaKqp3OqQl2s=; b=WN85ll5GnP8jm4E5CPBNiYzgcw
+	Nv//yxrxKFc0F5lxcSLQv23LrGyGOuzPv5ortcl1X5SXrJtaoEfCjwvmA5DWY81euYVe2P5nvI/Ph
+	Frgbh6motOShBQOA+igX6ZZT+N3HCHRS6g4pOeTuLjHYsbBka1YP1pNeP3D27uZ+Hymo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u2CQb-008QXY-97; Tue, 08 Apr 2025 19:08:01 +0200
+Date: Tue, 8 Apr 2025 19:08:01 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Simon Horman <horms@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.or
+Subject: Re: [net-next PATCH 2/2] net: phy: mediatek: add Airoha PHY ID to
+ SoC driver
+Message-ID: <7e60d851-1b70-4084-a63f-c8ff7bf81425@lunn.ch>
+References: <20250408155321.613868-1-ansuelsmth@gmail.com>
+ <20250408155321.613868-2-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/6] net/mlx5: Avoid using xso.real_dev
- unnecessarily
-To: Cosmin Ratiu <cratiu@nvidia.com>, netdev@vger.kernel.org
-Cc: Hangbin Liu <liuhangbin@gmail.com>, Jay Vosburgh <jv@jvosburgh.net>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Nikolay Aleksandrov <razor@blackwall.org>, Simon Horman <horms@kernel.org>,
- Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- Jianbo Liu <jianbol@nvidia.com>,
- Steffen Klassert <steffen.klassert@secunet.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- Ayush Sawal <ayush.sawal@chelsio.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>,
- Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>,
- Bharat Bhushan <bbhushan2@marvell.com>,
- Louis Peens <louis.peens@corigine.com>, Leon Romanovsky <leonro@nvidia.com>,
- linux-kselftest@vger.kernel.org
-References: <20250407133542.2668491-1-cratiu@nvidia.com>
- <20250407133542.2668491-2-cratiu@nvidia.com>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250407133542.2668491-2-cratiu@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250408155321.613868-2-ansuelsmth@gmail.com>
 
-
-
-On 07/04/2025 16:35, Cosmin Ratiu wrote:
-> xso.real_dev is the active device of an offloaded xfrm state and is
-> managed by bonding. As such, it's subject to change when states are
-> migrated to a new device. Using it in places other than
-> offloading/unoffloading the states is risky.
+On Tue, Apr 08, 2025 at 05:53:14PM +0200, Christian Marangi wrote:
+> Airoha AN7581 SoC ship with a Switch based on the MT753x Switch embedded
+> in other SoC like the MT7581 and the MT7988. Similar to these they
+> require configuring some pin to enable LED PHYs.
 > 
-> This commit saves the device into the driver-specific struct
-> mlx5e_ipsec_sa_entry and switches mlx5e_ipsec_init_macs() and
-> mlx5e_ipsec_netevent_event() to make use of it.
+> Add support for the PHY ID for the Airoha embedded Switch and define a
+> simple probe function to toggle these pins. Also fill the LED functions
+> and add dedicated function to define LED polarity.
 > 
-> Additionally, mlx5e_xfrm_update_stats() used xso.real_dev to validate
-> that correct net locks are held. But in a bonding config, the net of the
-> master device is the same as the underlying devices, and the net is
-> already a local var, so use that instead.
-> 
-> The only remaining references to xso.real_dev are now in the
-> .xdo_dev_state_add() / .xdo_dev_state_delete() path.
-> 
-> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
-> Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 
-Acked-by: Tariq Toukan <tariqt@nvidia.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Thanks.
+    Andrew
 
