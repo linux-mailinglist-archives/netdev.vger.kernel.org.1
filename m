@@ -1,136 +1,154 @@
-Return-Path: <netdev+bounces-180367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A2C2A8119E
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 18:11:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2D0CA8117F
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 18:08:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AE281BA58FB
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 16:04:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EF2E881CEB
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 16:02:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E7A23BCE4;
-	Tue,  8 Apr 2025 15:58:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB202550A2;
+	Tue,  8 Apr 2025 15:56:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="OrAdb8Gi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xonx/cjf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f98.google.com (mail-io1-f98.google.com [209.85.166.98])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAFE723A991
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 15:58:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70ECC22D7AE;
+	Tue,  8 Apr 2025 15:56:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744127928; cv=none; b=GViSCavh3fdn2y2bNIAFXp4n6mG2Uh0D83O7EycPA2Bs5eYZnmDdhIigvcZvHYdZMJGfh3ypunZX471i+ygEi9wiFwU6ooI4VUecDRQ//g23FjFAA8R19At5L6ZeEIYB2Qod6g4taxsemc3sjFjArhlAvqj6n6LrI440Yl7AQKA=
+	t=1744127802; cv=none; b=cW4pkVN3boZRfco55QWvAA1gm0KQEXgW6Qa+OAwMNfZHZOTiOSyXZQ/kThCCRWFWnKznYRt8ElY+//BCeli7QCkZaUhSnLGi9Cs9lhXTtT198Zjq4AfkhnF2+uGCQJuCUuiyyMcRGstMaqt4q09xP3PKWyCEoMt00kaj/ocigWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744127928; c=relaxed/simple;
-	bh=RWDIxjKULERd9rKieT1KlSktqFsibzwWfqHPe/4cIa0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References; b=p0/HGwXt2bAsLnAoBK8kqH7jyOh3ifd8r6bEGhp22YikviMQ9q5DQacvBnsBc/BPdaNQ01VzcRKwfTksWnNctvOFm4AvbryMO0vV8AaLZYxLflgA71R0zRUDQIStMIUcvqkPh6r7dV93mrtTAIexv0JnczCwPiwzMDe41z/lq2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=OrAdb8Gi; arc=none smtp.client-ip=209.85.166.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-io1-f98.google.com with SMTP id ca18e2360f4ac-85dac9729c3so381763939f.2
-        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 08:58:46 -0700 (PDT)
+	s=arc-20240116; t=1744127802; c=relaxed/simple;
+	bh=NuCi+nDF9crUQoMi5wM+LePlLWUwiPgvZOlIzO5vlCc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZI2nax/q/cmyVrbOvIjSoFtqedWzivThEYi5+yZPlyoeuWHlZsmUOcpW2mKWrfoNec9cOSyQ17hDDxEPpaT5Xzaqp44g8w1TQRaKEQ4r/OGXJZkuawfS1TzCrPg65tIJXOLtsvGws2AihFOFt6bI/eH8gE/M9ClTf23PlFNnrXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xonx/cjf; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2295d78b45cso76244375ad.0;
+        Tue, 08 Apr 2025 08:56:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744127800; x=1744732600; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=affzJlfeuyLH/afrS0PgLg2pJtDzPDL4GjLq78Ev2zs=;
+        b=Xonx/cjfJj77hfmjxpdNTTxPi6OOYU3xr1OO4ToV5MhpnhhrvsYpNm3ZFZ0LGTQ2c1
+         jfCw71L1ZqgB8YHcrfme71aal2dMGpJyyrzVmUE1r+RoqjemKA4yv3TdVIvqJ3ACBcIJ
+         SQSvL2250anGyhBCT/UXqVGWSbaP8vvKsph2gUVMiJwskxyF3nt2VE5x0MJrR/eM7e81
+         CW3J8h5qCP6F88OLwJb5jhIRYsZPnqy+eYdtUvB8TbGn+d9uLXpOsawT4Hv+IHMaSiNt
+         047i12bRtHOfpg2+zS+uRNgnukptZBEu/3caZX1rBxe5IbSEu7hs1rJVksORE1hJpFjc
+         nkEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744127926; x=1744732726;
-        h=content-transfer-encoding:references:in-reply-to:message-id:date
-         :subject:cc:to:from:dkim-signature:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jaVO28FUsf/+j+eVB0JXUktqw+0W3V93Ws76bANlpTw=;
-        b=xNtF5eScKL8jml1WaNQnNOb1NJ4/QPSyb+9+sF9ajV3/AilOVIS1662shD+G4YwqJn
-         eVVfXLcyRb+hAEmOPI18sK2r6GAlhGvm9imMdGoFtfPdVDCfX6RiceWf7jaUZCXidYba
-         uG1pdl2F7M4RJACt9oSTTfTf6XEtYUTQpKFtzVdve9nKVgumKgiuL7qrYHPoHVoHhp7Q
-         bKOchDOgImO84XT6Ov4Edp7aH7/Bkx8yfjUl5SuoeAKpt8s2YqQ5OITxBRYdF1xkLUnP
-         rFN2wYxC/+v5w7aR2ruXVAdH0M2f5lQhsvW9jFJuId4VRJWbgIQfjxM+nA9tqeP2qbWB
-         H1iw==
-X-Forwarded-Encrypted: i=1; AJvYcCU7elAzTxnvuGS+xjV/1sz808v7Vq/aR9DZlwIJ6pLvGWmxEmeRVSKB6Yi1hgxUWstAZ4Whypg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVzMIIVUcTJCF6KVId4Rf49Ty2iXQKgLqlifI5ZIGa8Dv9XajY
-	z+F0R1CTCiBQ0dgPrfvIMqa/l9kasTlzNeMEFLQf8Bc3cLPcb/pFMaqUSif79S4n9InyDLsv6i+
-	J8+zKn+wugnfjAgHwrW0v+oJ2TGbf9w==
-X-Gm-Gg: ASbGncv11O6tYgAy7+bcT+7vjXexkleBTAE1pq/SbN9wj2pymeS+RDPqeIJqCz5mVUV
-	YekocrJXvexn9t+Cu+4x9OEUa7qyOlzE3BlvBdJ3b7Xh0Cv/8jkc3673XYHDH4gRPmU+sZwuIhx
-	3t5NN0P2IN4aeNnXEMPQhozXJ4daYe2e+pmutv/MYQlnyF/bw+F1JDhJ7AGkdFqaliVOgj6ndnI
-	M63QJr2I3ksSTRvASotiuaOQWujSf+jRKA3D+B21tUZY5W3FunSn1r4U4hU8b62410Z+GcdWETj
-	A+P+VAElEMB0esTN9HZ1w8uWCbk=
-X-Google-Smtp-Source: AGHT+IEUKMpwu6G2eNbCLy7G2hpZnc7p/3gu0cXPUTvBdg3n05YEdQqhBspTylBX68cRhCoAQd3hqLSwSNn3
-X-Received: by 2002:a05:6e02:1aab:b0:3d4:3fed:81f7 with SMTP id e9e14a558f8ab-3d6ec594cbbmr139695615ab.19.1744127925943;
-        Tue, 08 Apr 2025 08:58:45 -0700 (PDT)
-Received: from smtp.aristanetworks.com ([74.123.28.25])
-        by smtp-relay.gmail.com with ESMTPS id e9e14a558f8ab-3d703b6c997sm1199585ab.9.2025.04.08.08.58.45
+        d=1e100.net; s=20230601; t=1744127800; x=1744732600;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=affzJlfeuyLH/afrS0PgLg2pJtDzPDL4GjLq78Ev2zs=;
+        b=ARbkrP77+AtA3+zOCvgkbonRuZ5/SYqBvirbUNhqvHRnFM9i0pjTXeHwEbTGp3mYNv
+         wt92Y+STnaE9i1a83ud0oYAVkepoXGYq3cE8gNK3CYArvYeyBJ52KOmSsGpoKUerS9ee
+         Vy3zeuvrGzVos4ySlF0OUXnkCGJ+bRSO1RWyqFFm+2FWRHrsIDe27zPYGo8ITBk0+3bR
+         k4LDtJ095lrRK1oOriaLnl8iyTWPeBzoddx5FXwvXzEQX2EnZ2ed+39RvTdAax0+Q4kb
+         84bpjPcVNMaCvufL0O5DRgT3A8GKdgdrBT5+O+lyiOhGM3bnrM9C4afOeqLat4UfB9cC
+         EYNA==
+X-Forwarded-Encrypted: i=1; AJvYcCVopc7wfXawUki8BBIu7VvN+X03CllL7Ox93754viRyqQnTbeim+fQtWBS8bI9VnztvE5WSN4tY@vger.kernel.org, AJvYcCWr+tuUkN8oWsSIfW2lK6ZT4R+jnf29EFf153FSzjP4XvuUdy5ISNzWEkA5HPqNcoYF7CaC0H8jevS6uio=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWWNICuBr5CAkWjk2TGv5tSotSM9VE92hA/E8nsntBINhXHVd6
+	OZGIdTXLZMB0mg6R2olTbmhIyyn9Ur3lQcxTz0Btn8KDtmEWem8=
+X-Gm-Gg: ASbGncuI8737nwIq4iU1In56HPRpP46Tyl+TNDPBvOAckamWOzeVRZglhVL8xfSRriu
+	3LMwOWv+WIvg90xmSwR1nQOShz7SDS27uWTyFA3+IobBeujwHpxBohCt7MpRntcscMzM00X/Xxy
+	Tq0prACpEB47XbjLCOtSh3bpmyfjQqDs+gQ2kJ62/XKo9rl9swy+jM5/hQe/m75e5RR0MOmeMSX
+	nQfjlk4KjAYpKOmWoyzl0GLmDBrdRpvFMLZaoWAVCKVdJHY//ILAr0FUFtEdgR5I6YIBZd3HUEa
+	VEQrDkvRf3n/eukv36wF/FYukYMinTDqtcFBCbkwIW+g
+X-Google-Smtp-Source: AGHT+IG0zZw727VjBHQVHWXJeTmxJ3mhCgj6F2p95LiwEhiwGMKetvFsZh6wJSLG0xQ8S40XBA0ttw==
+X-Received: by 2002:a17:902:db09:b0:224:255b:c92e with SMTP id d9443c01a7336-22a8a0431ffmr193175125ad.3.1744127799574;
+        Tue, 08 Apr 2025 08:56:39 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2297866e4c2sm101866535ad.199.2025.04.08.08.56.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Apr 2025 08:58:45 -0700 (PDT)
-X-Relaying-Domain: arista.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arista.com;
-	s=Arista-A; t=1744127925;
-	bh=jaVO28FUsf/+j+eVB0JXUktqw+0W3V93Ws76bANlpTw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OrAdb8Gi7kK42a9cG8OQD4nUjCJBGi3FAoNaKh8E2cXUj+0b3ObrsD39TrEIr8Pgv
-	 K3rGJSm2AKRAHDr+BfxIR3xB1yps+6az/gW1yk8PJR8mSi5Pe+TXE95xk3pDKPAQMD
-	 QaY5pqM0eq61PLuqJvFSMbSNqIO8B2+pPCgspfh5xbH/sPQqej0dYzxBoT9uGJ/HQe
-	 8+wMntox3LmSshqP+t7fxT8Ul/9wilvWW8s29wlI0+YV+dSdxnGqrSWZrd/2DZcnKS
-	 eGcg+waTMhSNxsbA9DdQpV8LYrNfq5kWyXYp9iTxhWuzgoQhqsX9pUgq0Xls9nCbig
-	 QCYIX+BOAtxCg==
-Received: from mpazdan-home-zvfkk.localdomain (dhcp-244-168-54.sjc.aristanetworks.com [10.244.168.54])
-	by smtp.aristanetworks.com (Postfix) with ESMTP id 0C1B610023B;
-	Tue,  8 Apr 2025 15:58:45 +0000 (UTC)
-Received: by mpazdan-home-zvfkk.localdomain (Postfix, from userid 91835)
-	id 0560440B1D; Tue,  8 Apr 2025 15:58:45 +0000 (UTC)
-X-SMTP-Authentication: Allow-List-permitted
-X-SMTP-Authentication: Allow-List-permitted
-From: Marek Pazdan <mpazdan@arista.com>
-To: kory.maincent@bootlin.com
-Cc: aleksander.lobakin@intel.com,
-	almasrymina@google.com,
-	andrew+netdev@lunn.ch,
-	anthony.l.nguyen@intel.com,
-	daniel.zahka@gmail.com,
-	davem@davemloft.net,
-	ecree.xilinx@gmail.com,
-	edumazet@google.com,
-	gal@nvidia.com,
-	horms@kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	jianbol@nvidia.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	mpazdan@arista.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	przemyslaw.kitszel@intel.com,
-	willemb@google.com
-Subject: Re: [Intel-wired-lan] [PATCH 1/2] ethtool: transceiver reset and presence pin control
-Date: Tue,  8 Apr 2025 15:54:14 +0000
-Message-ID: <20250408155844.30790-1-mpazdan@arista.com>
-In-Reply-To: <20250407153203.0a3037d7@kmaincent-XPS-13-7390>
-References: <20250407153203.0a3037d7@kmaincent-XPS-13-7390>
-Content-Transfer-Encoding: 8bit
+        Tue, 08 Apr 2025 08:56:39 -0700 (PDT)
+Date: Tue, 8 Apr 2025 08:56:38 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: syzbot <syzbot+48c14f61594bdfadb086@syzkaller.appspotmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+	kuba@kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] WARNING in __linkwatch_sync_dev
+Message-ID: <Z_VHNtNQ5hqZx33v@mini-arch>
+References: <67f4d325.050a0220.396535.0558.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <67f4d325.050a0220.396535.0558.GAE@google.com>
 
-On  Mon, 7 Apr 2025 15:32:03 +0200 Kory Maincent wrote:
-> ETHTOOL_PHY_G/STUNABLE IOCTLs are targeting the PHY of the NIC but IIUC in your
-> case you are targeting the reset of the QSFP module. Maybe phylink API is more
-> appropriate for this feature.
+On 04/08, syzbot wrote:
+> Hello,
 > 
-> You have to add net-next prefix in the subject like this [PATCH net-next 1/2]
-> when you add new support to net subsystem.
+> syzbot found the following issue on:
+> 
+> HEAD commit:    7702d0130dc0 Add linux-next specific files for 20250408
+> git tree:       linux-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=15fe8070580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=91edf513888f57d7
+> dashboard link: https://syzkaller.appspot.com/bug?extid=48c14f61594bdfadb086
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> 
+> Unfortunately, I don't have any reproducer for this issue yet.
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/0603dd3556b9/disk-7702d013.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/d384baaee881/vmlinux-7702d013.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/1ac172735b6c/bzImage-7702d013.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+48c14f61594bdfadb086@syzkaller.appspotmail.com
+> 
+> ------------[ cut here ]------------
+> RTNL: assertion failed at ./include/net/netdev_lock.h (56)
+> WARNING: CPU: 1 PID: 2971 at ./include/net/netdev_lock.h:56 netdev_ops_assert_locked include/net/netdev_lock.h:56 [inline]
+> WARNING: CPU: 1 PID: 2971 at ./include/net/netdev_lock.h:56 __linkwatch_sync_dev+0x30d/0x360 net/core/link_watch.c:279
+> Modules linked in:
+> CPU: 1 UID: 0 PID: 2971 Comm: kworker/u8:8 Not tainted 6.15.0-rc1-next-20250408-syzkaller #0 PREEMPT(full) 
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
+> Workqueue: bond0 bond_mii_monitor
+> RIP: 0010:netdev_ops_assert_locked include/net/netdev_lock.h:56 [inline]
+> RIP: 0010:__linkwatch_sync_dev+0x30d/0x360 net/core/link_watch.c:279
+> Code: 7c fe ff ff e8 f4 63 cc f7 c6 05 83 28 53 06 01 90 48 c7 c7 60 5c 51 8d 48 c7 c6 8a 9b 67 8e ba 38 00 00 00 e8 04 6b 8b f7 90 <0f> 0b 90 90 e9 4d fe ff ff 89 d9 80 e1 07 38 c1 0f 8c 19 fd ff ff
+> RSP: 0018:ffffc9000b767710 EFLAGS: 00010246
+> RAX: bb6ea754fa006300 RBX: 0000000000000000 RCX: ffff888030979e00
+> RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
+> RBP: 0000000000000000 R08: ffffffff81824ed2 R09: 1ffffffff20c01c6
+> R10: dffffc0000000000 R11: fffffbfff20c01c7 R12: 0000000000000000
+> R13: dffffc0000000000 R14: ffff88805d768008 R15: ffff88805d768000
+> FS:  0000000000000000(0000) GS:ffff888125089000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f85e8c4df98 CR3: 000000006a050000 CR4: 00000000003526f0
+> DR0: 0000000000000099 DR1: 0000000000000000 DR2: 000000000000000b
+> DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  ethtool_op_get_link+0x15/0x60 net/ethtool/ioctl.c:63
+>  bond_check_dev_link+0x1fb/0x4b0 drivers/net/bonding/bond_main.c:864
+>  bond_miimon_inspect drivers/net/bonding/bond_main.c:2734 [inline]
+>  bond_mii_monitor+0x49d/0x3170 drivers/net/bonding/bond_main.c:2956
+>  process_one_work kernel/workqueue.c:3238 [inline]
+>  process_scheduled_works+0xac3/0x18e0 kernel/workqueue.c:3319
+>  worker_thread+0x870/0xd50 kernel/workqueue.c:3400
+>  kthread+0x7b7/0x940 kernel/kthread.c:464
+>  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+>  </TASK>
 
-Thanks for review.
-From up to now replies I see that there are concerns regarding usage phy-tunable ethtool
-option for this purpose, so I will post updated patches after we clarify proper way to go. 
-I need to check more on phylink API, from the overview I read:
-"phylink is a mechanism to support hot-pluggable networking modules directly connected
-to a MAC without needing to re-initialise the adapter on hot-plug events.
-
-phylink supports conventional phylib-based setups, fixed link setups
-and SFP (Small Formfactor Pluggable) modules at present."
-
-I don't see QSFP modules are being supported but I need to verify impact of this.
-As I mentioned in other reply this API should allow for transceiver module reset 
-from user space if orchestration agent detects transceiver failure state or when
-it gets direct request from Cli.
+This needs ops lock/unlock around get_link in bond_check_dev_link, will
+follow up.
 
