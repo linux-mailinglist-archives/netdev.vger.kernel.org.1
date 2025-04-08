@@ -1,117 +1,132 @@
-Return-Path: <netdev+bounces-180033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D71AA7F2BF
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 04:40:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F7F7A7F2C1
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 04:40:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E48B5169BF8
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 02:40:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 745D216A005
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 02:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 930E8222594;
-	Tue,  8 Apr 2025 02:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D208222594;
+	Tue,  8 Apr 2025 02:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="PkG2pKQU"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="OOYznk+o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF8F379CF
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 02:39:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3CA5134B0
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 02:40:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744079997; cv=none; b=P6NbcxgxaBuLBwLQhDxpooAR28SzQDJrAmrz1zypgtW1ai0r0PcqF40IPDymitZSn7DD3iYf7wlA0VcT46Szwl1PXDr2/wUC1GqBYJEXr5w8EyFW7OAOuktrgECt7H+INAeIgA5WMR4ag5QPt46GrRKGdcfc0CilBFoi8DrB0FY=
+	t=1744080026; cv=none; b=MWxrcI1gpGVeUolcHSqVlnaH9eVq4j3WR6454LUFlPs3UaNF568CH8VWMpCFB6P2iMFOQV4hZsxSkzpGYk7UpHq2Zs2pLP6aVAI8D8o8txvTefEdqKYor6CqvWYTljU03LiKTXBRfEY2+js9Wb1akT6UNHfb97d8iCj1mZEBIAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744079997; c=relaxed/simple;
-	bh=M31VxOzVmZnycXapvIBZosqTUyiTH9P4jML+1afoVLI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Rs7fc5H23coU4KfzMnWdHmllcdjErbmvHbdoXFrlO120c9uYHGKasZ50Pl+/taJSBxmh5dxTtayp/gafO+buRaLXniWDrog+A/Aov1oDG3FbxQ7n7su9TfuLu5HStLgWUXuCBOAlm9I7i0CCW7YIskYos+VG51lsl3lkqJpHC+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=PkG2pKQU; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7c57f2f5a1bso57683485a.1
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 19:39:55 -0700 (PDT)
+	s=arc-20240116; t=1744080026; c=relaxed/simple;
+	bh=GclX1/Hz3iq2deM9AiUAa1x8irbsRBQP4M+KO8hV3Ng=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CBQIBn0fi92PVmdzruqSY745MDfEKMWsRajjEOHC9EjILlKucN5iKopjMxdgNOGRIdOy5K7dWt6Z1m4fYSH44ffLyqxPDsxZkgaExZ666pfTXbkd3Pi/OOvHFsdHqOZf4aKm/TM+n+Zyjoam8TiuGGzkY/gASrJFFiiBsdF77XU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=OOYznk+o; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7376dd56f60so3632507b3a.3
+        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 19:40:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1744079995; x=1744684795; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=M31VxOzVmZnycXapvIBZosqTUyiTH9P4jML+1afoVLI=;
-        b=PkG2pKQUlLCKRprYTfO8R01aYeegvO2ZcukPta9qWRBZvE1xaWz1SnZjJFQlKpdwAN
-         VmWb50mWFr4q7XpNpnHJ46ZkPxIP9Au9KG4Ti2OOTwQPteSFndreAgDRO0T7g4QrcktE
-         64sdByegSR25hUo0bNEn5lzsUP1GE/CmzpaE0c/1lEU8UnCQMl8qucIaSXg+2OGo9WKm
-         FVF4uWLrHtTbLRlFhC4KNV9aB2FpJ77KGRp5oDVpFSfwdQhaWh6xapR1zKVAEZVGX7kn
-         OgCDzw/1zP7ExOOhMEw3gKmFmU6o/gKtG9+lbwfRDcJROqpoNEac7fQb3Hgt5GLPTotW
-         8MDw==
+        d=fastly.com; s=google; t=1744080024; x=1744684824; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/gWF+V5aqsXVIqd0oMQvYZjR+8xVKhb52hKX0MLImFg=;
+        b=OOYznk+ozTGWM4dCh0HT8SsxYU/lvDTJ2ZwnfpWLfwLAob1ra7t0JbxlBziEWPzWAt
+         3LN0t+U+Dr/gJUJSa0T08MTvltN0gPWx0/5KV1ELvRE/5OyKNKcwtw1ujg3sGqPBDE6V
+         5v+KE9ek3jf1HoHDM1ruk0i5A2Bp7sb4WJEW4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744079995; x=1744684795;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=M31VxOzVmZnycXapvIBZosqTUyiTH9P4jML+1afoVLI=;
-        b=C64Brx8gNuI1b7i0L2GHdRg031QBbiX6IYVnb2YOfxYjCjFntdN33e53GcshgnX4mp
-         qNM14EkHGdjDO46aPpg7NvO23WYDnQ83yUD9mlf7x2WNnw717nyhTtFUfF95bCNOxOFS
-         zghdVNoIRqr/VBbyRUMchnvVXnJHsnStsrw7WQBhXE+aFFLexQrQsujb6YnRHQZYPb6n
-         w6Rf8DMbwHkksp2EZKUP2DyNyB0eXVdGBJPfYHr8hj0rmAUorzRxWyGB1E4WDq72elIC
-         asbYmVv8DkDS+zXojv67s34RSAkWh16sVNxHjWCCQIhAavUYKoQZGhy6Zm+OZOGMkW7p
-         X0qQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX2gETCaRZUQQqmsY/nmHxo0kUThBGlxlSXqIH3t+k6rJtWLDPFzn2uR/wxKoPreERHBny2A6w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YycQhyv+KfutXVQRBrVDHEiggcEsEVAVaUYK4LHy891bPcxiJaf
-	Emj/wbnlJBwdpVzUspsTJRF8BmVimjYqGiqMERFNzXlyCUkUv3vMby047u1vux0S6NriLHhiQor
-	Epucqj/IPc+qsPe48ThYgeUYYeqHGCqh0FsYj4A==
-X-Gm-Gg: ASbGnctzbc+irLHcuE/Dk5qeXeyCf99qNM9aGeEZ+wkX61pVfBl8Ri/A0PmH5lhgSsS
-	RMWl4GTn/iYvTjAz4v96UiVCYN9SKP8u81NLzuqpjU2BPfCsuHDtCO62Y8OgkLZkGsXl4hE4ndY
-	XXidx0Y72ZAZewWg+Mb1rtEAuWRBPJtdw8fnwHjxJKteTXENVwPCutHAmp1CM=
-X-Google-Smtp-Source: AGHT+IHpSLU3oa6SVfByXmuw4k5+J+vcfz1hIimEpRpnPeruT5HxoV3Dp5AbBE5EUCxZstJmeFto1r2adE6kVPlUl0A=
-X-Received: by 2002:a05:620a:2706:b0:7c3:cccc:8790 with SMTP id
- af79cd13be357-7c774d259demr885538185a.5.1744079994828; Mon, 07 Apr 2025
- 19:39:54 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1744080024; x=1744684824;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/gWF+V5aqsXVIqd0oMQvYZjR+8xVKhb52hKX0MLImFg=;
+        b=EKa5VowuR3QspEzeG4CMLJCFb62jri+XbsIUrFmELlhM3tv+dLI7cwZWRBneUuTslJ
+         rWjrNsq4Fb6cKSbDsvNHKwCDR4QoCglI3qQgbv0RNp2ppoD7XhsNyfPkTmOeKLhLSEZV
+         0Wo92friN4MUruKwiV9kBsjpEBiwm+Ll3bRejn8Yl4Mhhh9nVJLnv5XssksIodYX3bs0
+         UXL1e0fmN1myi9+9wZ5PbTlJyapDxfmtYK+RzUWm1AeqEnK9bSO/oZUc28B5hpGovInn
+         XsxLZqKpvvn3QIlypvdny4B+7XtdbP1wvBnMam9UBTbEZowgdjgL5QEwsSNEMSMLqf7l
+         W6aQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWKwreJtdAbpyQy32FyJimxz6/w8hLu3nPwyVxDjboPv8xCN71AePBUkmEVXeZ5xgWaJIOAaZk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMNKKQfsAjEcbj5PN3afb/Myd/zpe1FBjbabeLFrTLISsUfGv2
+	praTWH5GssAyd6bMSOrLw3eXSjrMA4FiLClVgjQ2ym0Mvpdd/1y5LXB+M1P/rDw=
+X-Gm-Gg: ASbGncuN+UEZTybNoAcmbVHd47fqqn8QpdFe+fHnpKLz0cNjOhgByjH+y+QM2hCD1+h
+	MRauuFKBJhatjxEdHdU3csHCj9xdk6/Q2LkSn/9CxiFZXOoVHU2y3uuYUufxCAtJpuEgHnS344t
+	nW4TovLP3+ZJ2Ctmq37GS7wsUKuCWscA5vspsQso/WBVQ9nnD2IK5x2WaY3jyBYte6PmLD4NBDE
+	EIIbR91qo4MpLy9fGtXYwekmztQDjlzMbm6XSuWjrKCbWkjjx2p5uNxYallS6RECRVpWLmxmmCp
+	t1+BYGzoMBL/obnZKfROwmRzW1eixsneA8/mfupqXDz0YxukxEKn4vt2cK58elSLdQiiX8tHTqX
+	9IwEP5tMKfXE=
+X-Google-Smtp-Source: AGHT+IGItW8oU02VdzwuAOICAExk7txLelYHV3/6HN2oQp8IwkrZ6XPi3+H/mdREURCTlzD952MRyw==
+X-Received: by 2002:a17:90b:568b:b0:2ef:31a9:95c6 with SMTP id 98e67ed59e1d1-306a6153940mr21433400a91.14.1744080024030;
+        Mon, 07 Apr 2025 19:40:24 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-30588a2f626sm9680533a91.21.2025.04.07.19.40.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Apr 2025 19:40:23 -0700 (PDT)
+Date: Mon, 7 Apr 2025 19:40:21 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	sdf@fomichev.me, hramamurthy@google.com, kuniyu@amazon.com
+Subject: Re: [PATCH net-next 1/8] net: avoid potential race between
+ netdev_get_by_index_lock() and netns switch
+Message-ID: <Z_SMlQBO2rmtkJwC@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me,
+	hramamurthy@google.com, kuniyu@amazon.com
+References: <20250407190117.16528-1-kuba@kernel.org>
+ <20250407190117.16528-2-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CABi4-ogLNdQw=gLTRZ4aJ8qiQWiovHaO19sx5uz29Es6du8GKg@mail.gmail.com>
- <20250408001649.5560-1-kuniyu@amazon.com>
-In-Reply-To: <20250408001649.5560-1-kuniyu@amazon.com>
-From: Jordan Rife <jordan@jrife.io>
-Date: Mon, 7 Apr 2025 19:39:44 -0700
-X-Gm-Features: ATxdqUGyx7acR0AtEZl7zRjwptuF_xH_VJRTNQaNyV1ofxqMXhsBnJNdNQ_k2cU
-Message-ID: <CABi4-ogUtMrH8-NVB6W8Xg_F_KDLq=yy-yu-tKr2udXE2Mu1Lg@mail.gmail.com>
-Subject: Re: [RFC PATCH bpf-next 2/3] bpf: udp: Avoid socket skips and repeats
- during iteration
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: aditi.ghag@isovalent.com, bpf@vger.kernel.org, daniel@iogearbox.net, 
-	martin.lau@linux.dev, netdev@vger.kernel.org, willemdebruijn.kernel@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250407190117.16528-2-kuba@kernel.org>
 
-> In the worst case, where vmalloc() fails and the batch does not
-> cover full bucket, say the batch size is 16 but the list length
-> is 256, if the iterator stops at sk15 and sk16 disappers,
-> sk17 ~ sk256 will be skipped in the next iteration.
->
-> sk1 -> ... sk15 -> sk16 -> sk17 -> ... -> sk256
+On Mon, Apr 07, 2025 at 12:01:10PM -0700, Jakub Kicinski wrote:
+> netdev_get_by_index_lock() performs following steps:
+> 
+>   rcu_lock();
+>   dev = lookup(netns, ifindex);
+>   dev_get(dev);
+>   rcu_unlock();
+>   [... lock & validate the dev ...]
+>   return dev
+> 
+> Validation right now only checks if the device is registered but since
+> the lookup is netns-aware we must also protect against the device
+> switching netns right after we dropped the RCU lock. Otherwise
+> the caller in netns1 may get a pointer to a device which has just
+> switched to netns2.
+> 
+> We can't hold the lock for the entire netns change process (because of
+> the NETDEV_UNREGISTER notifier), and there's no existing marking to
+> indicate that the netns is unlisted because of netns move, so add one.
+> 
+> AFAIU none of the existing netdev_get_by_index_lock() callers can
+> suffer from this problem (NAPI code double checks the netns membership
+> and other callers are either under rtnl_lock or not ns-sensitive),
+> so this patch does not have to be treated as a fix.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  include/linux/netdevice.h |  6 +++++-
+>  net/core/dev.h            |  2 +-
+>  net/core/dev.c            | 25 ++++++++++++++++++-------
+>  3 files changed, 24 insertions(+), 9 deletions(-)
 
-Ah yes, this is true. Thank you for clarifying, you bring up a good
-point. In case vmalloc() fails, the batch size can't cover the whole
-bucket in one go, and none of the saved cookies from last time are in
-the bucket, there's currently no great option. You'd need to do one of
-the following:
-
-1) Start from the beginning of the list, assuming none of the sockets
-had been seen so far. This risks repeating sockets you've already
-seen, however.
-2) Skip the rest of the sockets to avoid repeating sockets you've
-already seen. You might skip sockets that you didn't want to skip.
-
-I actually wonder if a third option might be better in this case though:
-
-3) If vmalloc fails, propagate ENOMEM up to userspace and stop
-iteration instead of making the tradeoff of possibly repeating or
-skipping sockets. seq_read can already return ENOMEM in some cases, so
-IMO this feels more correct. WDYT?
-
--Jordan
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
