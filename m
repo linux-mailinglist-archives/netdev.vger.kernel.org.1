@@ -1,122 +1,249 @@
-Return-Path: <netdev+bounces-180498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25EF0A8183C
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 00:02:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CF72A81856
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 00:15:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E33A11BA30E9
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 22:02:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 055F11BA5AA1
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 22:15:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC6592192F5;
-	Tue,  8 Apr 2025 22:02:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 858612417D4;
+	Tue,  8 Apr 2025 22:15:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T+AKZKle"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rNZR50W7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 672D3801;
-	Tue,  8 Apr 2025 22:02:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D872D215782
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 22:15:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744149739; cv=none; b=GIdbdlyWgyTNFEYJokYzdk32BoImcd/uF4ZvuV3G3naQf1fIxPs1NIdlsXZw+bSopQRVsHsR3wF24JDWXJyDPGSLtopmblQVOK9WsP6wgy6tpsQFlGwdh+WJxFiIvRvSQPQR9GlLQq6wkFfSzlOEtLI0QYR9NCaUQPtWVvFo4To=
+	t=1744150525; cv=none; b=Gw5yHkyzafYUl3I363y6+EOo71rbU2M41uAaWnlrip0r8LAXxcY4d3gLOgcQkQrjMyzBpRdm7dI8w1ST/kKpKEzUtseLQ3gaw+NFPZpodph8GgGJGoaFBAv8KJi5K3f12MdO/MohPTJu1/ckg5xjZllYU4AcjrETT6H65oF2CIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744149739; c=relaxed/simple;
-	bh=9lX8wh61BYIq6E4SXmVUNndEK6nzrq+wZuS8HRjbnA4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Vt0U2QxLc+kdlBt5zLweZLW9A2cGqSWZbRjCM4VS8PWktq6LeEL7ZxFXXusBb03LbQ9JQ+wxWuYiq3QecC2xWvFx9bHi5xNSzAiXULXnRlq8ABO7DRwJoxjcn8tc/UCQ+sWrT0b5tRAMn60fxtwwjrENACGMnWjDLRVIWtbFLPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T+AKZKle; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-736ad42dfd6so4996990b3a.3;
-        Tue, 08 Apr 2025 15:02:17 -0700 (PDT)
+	s=arc-20240116; t=1744150525; c=relaxed/simple;
+	bh=ymX4dIRPic9zvrJACKLYLv1G02mB9g/rcSTLeciphJk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=E/PJqKIX6Fv+2JvqwjXbPvILTGs9Z/0oNul/KTphCAU6J6LxDFazITZrOVgG6hl18Y/2xv6s5UOnVXgsXfR3yRnJUbZO5/G9TzUm5PhdAORWpo53ix9DKyuquR308tRO73k9IHLwhKgAkfvsg8DC+LtcsPpvsFtS0M0kyDvqIYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rNZR50W7; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2242ac37caeso24135ad.1
+        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 15:15:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744149736; x=1744754536; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CKLxdjoJBD9fIc5Dhkkx8uZiXNwOxA2THYRoD8HoSis=;
-        b=T+AKZKleq8qIASX5nmEOaInRiAxEafoZc0PvpQFasy3MLKuN41UMl41Li7tSUeOYw5
-         xiEYZxyQGpt1IuUN6qrGC4bNXSWuyEunMq0xb/d+BTyzll5lGmoMtqArxQCbbq3dVEsC
-         wn1hAfpvQQF21Tx1kMdjYIt7nD3Or9xBny6366SK6zMESrzpYWGkRWQyvleowRfrN2Hg
-         9N3iR5zRtiYn2buTHLle31tSVA6cU9fI+1bkcZeYoyd9rNJdqf+YvBgBjNeUZcJGtjqU
-         RlWQT+YSgUY0fMBIVh3p+nqVW5kkW950CcwWfmwe4SLUxn56ARkvcv58u4YJ8FrsqqvZ
-         0L7g==
+        d=google.com; s=20230601; t=1744150523; x=1744755323; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R26j2r5S96z2OcbbsW34VxJDiG5NKr0WT7wRGF+QFDQ=;
+        b=rNZR50W7a/7L39Fz8t6BJj0jUATGpxVHdvHyEE0/HJShqL9+fM/mP2lGlVbGvRO6hW
+         i6XOY3g4wX6lf5gnb1JudJSXLwWMMOPHj1oqrV9tGNVhoDFGpb9kMo6s6RHrKFiTkzHQ
+         06c8KBsImD7YJZiKYhS2KTek915SjynKttUuHk8bFR3aQi5QjAxfaf1BvK6EmlxVi/31
+         YXg+XEou7FdobvXWKOSaqBydJLqvkSXOj74Ou66wKYrhDXimL+JqipsazQgWI3j78IEv
+         weSEez+hHGwpfhVf7bNoqr/zvX6Kn9ElP1WOce8j/RpuWIfJ7Rs1N2BYoGcfcmBHovib
+         iMCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744149736; x=1744754536;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CKLxdjoJBD9fIc5Dhkkx8uZiXNwOxA2THYRoD8HoSis=;
-        b=pKD6Bd5hkke8lfSRC7D7M390Ww+k5oVHAqJI6Nx9oiWC9iTXEtBxmdwVAXl66PI8EP
-         zV77YLzMwPFixQNrbzlESBtzU74UkEpMxI6JWfavhbTGoVgmFHRMuRgP0krqA+slZLW2
-         8Q+ZfJQ3Xq7yrwaYCYr+KZYbVoIfLhxEZDnV0nmTLeEgM1HsRj8Ppqt9e9UZifT5p8ZV
-         LjJYKwJn1BLzoQQYfLVFRCJuyrPGMfNNTioFSHZW4rXxoiMe94DJnfVBzf4zZfgL6+r3
-         Y1a1/egVbaO/fOGOdJxPzGkD4NvJJlxaCuLp4osE3HVmSAvoZNCGQIi85dHaIhr4BwWi
-         NGOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVsDlgW0LYFYSQS7l7TEkCwjP7FMhAV+8OZ+zKJGBcwCY0dIQ/BtBJpSlhGEuO0tb0a8JzgtcbcECmLsxg=@vger.kernel.org, AJvYcCWvY0soMXCwfUfFrUtxb6+M/kVFxPoaTliDw6N7/5Pntd3EtY4R8l8HI9uAPyM2nBDa24pett/7@vger.kernel.org
-X-Gm-Message-State: AOJu0YySJo7TL68ZNViV6N4OGa9+ZwFKLqrA08/n6g3sukFGVEFEmZKK
-	NeblyWVHtmZrMrkoVWOZJ3bQvwjcpcjLiOhclUMFJ/ozxXFDG8U=
-X-Gm-Gg: ASbGncuaXbeyJe5BhdIdI2xVgCJazF9od+Pt9QdWHWTziTRnRx10SQNTxfu5jNFboN4
-	q89thVi9gHzW/BwNOQhmftwcBXfQRqEXJxuRgKfGnfAjFp+hCzvxeM1p1DQ2GQlqSJ3cGu4ANRy
-	g3hyrz/4rfmtegbXQMQ9q7xEqyKZdtRjon0SKuezs6Bm4CLyfhcY9EiKuMfLRUMJlCZljVXBRgp
-	6JlvoD9fAdN3Eq5UVj0cRe4NKy8Jtb0d7dbhfKZjK6Y8A6YbhrcOnNZymaP/vpzm/f8pGdbtvff
-	d7KKJRB1VGYadSL7h0cSpObHlaMslv2hhz9Lx8Cjqu5WvAa6oLBzw8sYVhlaPqq3V9pjqGpGcS4
-	cCWuJ4wuzzhPXXIkStaLw
-X-Google-Smtp-Source: AGHT+IG/kgNyg6qxRCHE/ao52Xup57eS+G5VAFerGvjti+r9yE7Rso5856iKNaa0+/lCxBkNE8xN7Q==
-X-Received: by 2002:a05:6a00:21c1:b0:730:7600:aeab with SMTP id d2e1a72fcca58-73bae4d52admr645416b3a.13.1744149736478;
-        Tue, 08 Apr 2025 15:02:16 -0700 (PDT)
-Received: from ?IPV6:2a03:83e0:115c:1:f94c:8e92:7ff5:32bf? ([2620:10d:c090:500::4:98ff])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-739da0e371esm11166055b3a.168.2025.04.08.15.02.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Apr 2025 15:02:16 -0700 (PDT)
-Message-ID: <b1d373d7-77e5-4341-a685-07a617935db5@gmail.com>
-Date: Tue, 8 Apr 2025 15:02:14 -0700
+        d=1e100.net; s=20230601; t=1744150523; x=1744755323;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=R26j2r5S96z2OcbbsW34VxJDiG5NKr0WT7wRGF+QFDQ=;
+        b=XldGfUyjDCjwUKPO3Z/lRkZXeLpwXWXF7v8BW4YeBVx0rplZZXcO5sbrL9PvLD5FpK
+         4OEyMsW9sIeRiEgeY3dSm3feEt1UVG7sFbNZDDmtq+/63r+1+Ac71WScn3AQz5Jio32r
+         cyBL54rmsKouHs6EZq4ZKz1eLWXIukwaSsPy+pSDzMKsENa/DvC8eluYUf2ivSa29jpW
+         eO7dCkaqj8I3ZBju/B9yljyS4CWig38zq4e92kiyllxCGome4IPmWJNwWhlw4ms3+ne+
+         qOmEoinxh8iS+PArB8w52zzV2aoEP0RlYqUiMl8GO6NjIGzI6ilfdv+0YT0GEnMYOpZu
+         BXjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWu3lnbLBRBW7tFuvDlBxeLZJkNMe0/Fo6aEKQ83prchlB+9XO/Js13SSRQp2HebEBFvSLlRG4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGT0lmVyazyLvVHzC7ZKMMgpGCGf9fwyv9wnXCypi1BulNCmec
+	ZzrBN4v9usqa55RKRbLbtYIs+oZSToLEtBiUVDsN2WgQMt/YFK+uE6AgaRHMHLQuj7TdHxv/5dv
+	JRtCpBxbg5zVDz1h+psZSCn2HCQKNaXI2zBRx
+X-Gm-Gg: ASbGncs/zQQoTbHXeKA/LcJjbbD9EAk8HhP/1EmRwA7/IX42EGOkiB7+BubHFz1hd39
+	SJbCs4vrMQ+KZrv0kriNwhYfYyfcJlqMADpmlPXPpwG8azkWzXQg6DLtEpmlFaPm7+l/hcauiH7
+	UsKtoOjFXL+eTHDSWvQN/rGgqnhxwmpovDEJlXIvpA6N6i/qCujDqRuEhjS3U=
+X-Google-Smtp-Source: AGHT+IG+GD1sHLOio8gHHG3tzHr9TSJKtxR8zCr6vFgKg2jgSG3XTHZ9peLGjGPw2DRtPzUvaHXE7kanOLr7rmSOeyA=
+X-Received: by 2002:a17:903:2308:b0:223:5182:6246 with SMTP id
+ d9443c01a7336-22ac4742f75mr347255ad.23.1744150522798; Tue, 08 Apr 2025
+ 15:15:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/2] GCPS Spec Compliance Patch Set
-To: Paul Fertser <fercerpav@gmail.com>
-Cc: Sam Mendoza-Jonas <sam@mendozajonas.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, npeacock@meta.com,
- akozlov@meta.com
-References: <cover.1744048182.git.kalavakunta.hari.prasad@gmail.com>
- <ee5feee4-e74a-4dc6-ad8e-42cf9c81cb3c@mendozajonas.com>
- <b1abcf84-e187-468f-a05e-e634e825210c@gmail.com>
- <Z/VqQVGI6oP5oEzB@home.paul.comp>
- <1d570fb8-1da0-4aa6-99f5-052adf559091@gmail.com>
- <Z/V2pCKe8N6Uxa0O@home.paul.comp>
-Content-Language: en-US
-From: Hari Kalavakunta <kalavakunta.hari.prasad@gmail.com>
-In-Reply-To: <Z/V2pCKe8N6Uxa0O@home.paul.comp>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250408195956.412733-1-kuba@kernel.org> <20250408195956.412733-6-kuba@kernel.org>
+In-Reply-To: <20250408195956.412733-6-kuba@kernel.org>
+From: Harshitha Ramamurthy <hramamurthy@google.com>
+Date: Tue, 8 Apr 2025 15:15:11 -0700
+X-Gm-Features: ATxdqUEdjiK0IWvoFzsP1Bcr3yzshtA1cru5eQcy4iyyuERPPzhSJe9eIUn48s0
+Message-ID: <CAEAWyHcqNagO86fPe4TLVTU3XopRiNU1zcj7wTSf8bZH3Sg8YA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 5/8] xdp: double protect netdev->xdp_flags
+ with netdev->lock
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me, 
+	kuniyu@amazon.com, jdamato@fastly.com, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/8/2025 12:19 PM, Paul Fertser wrote:
+On Tue, Apr 8, 2025 at 1:00=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> Protect xdp_features with netdev->lock. This way pure readers
+> no longer have to take rtnl_lock to access the field.
+>
+> This includes calling NETDEV_XDP_FEAT_CHANGE under the lock.
+> Looks like that's fine for bonding, the only "real" listener,
+> it's the same as ethtool feature change.
+>
+> In terms of normal drivers - only GVE need special consideration
+> (other drivers don't use instance lock or don't support XDP).
+> It calls xdp_set_features_flag() helper from gve_init_priv() which
+> in turn is called from gve_reset_recovery() (locked), or prior
+> to netdev registration. So switch to _locked.
+>
+> Reviewed-by: Joe Damato <jdamato@fastly.com>
+> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-> In other words, you're testing your code only with simulated data so
-> there's no way to guarantee it's going to work on any real life
-> hardware (as we know hardware doesn't always exactly match the specs)?
-> That's unsettling. Please do mention it in the commit log, it's an
-> essential point. Better yet, consider going a bit off-centre after the
-> regular verification and do a control run on real hardware.
-> 
-> After all, that's what the code is for so if it all possible it's
-> better to know if it does the actual job before merging (to avoid
-> noise from follow-up patches like yours which fix something that never
-> worked because it was never tested).
+Acked-by: Harshitha Ramamurthy <hramamurthy@google.com>
 
-I would like to request a week's time to integrate a real hardware 
-interface, which will enable me to test and demonstrate end-to-end 
-results. This will also allow me to identify and address any additional 
-issues that may arise during the testing process. Thank you for the 
-feedback.
+> ---
+> CC: bpf@vger.kernel.org
+> ---
+>  Documentation/networking/netdevices.rst    |  1 +
+>  include/linux/netdevice.h                  |  2 +-
+>  include/net/xdp.h                          |  1 +
+>  drivers/net/ethernet/google/gve/gve_main.c |  2 +-
+>  net/core/lock_debug.c                      |  2 +-
+>  net/core/xdp.c                             | 12 +++++++++++-
+>  6 files changed, 16 insertions(+), 4 deletions(-)
+>
+> diff --git a/Documentation/networking/netdevices.rst b/Documentation/netw=
+orking/netdevices.rst
+> index 6c2d8945f597..d6357472d3f1 100644
+> --- a/Documentation/networking/netdevices.rst
+> +++ b/Documentation/networking/netdevices.rst
+> @@ -354,6 +354,7 @@ For devices with locked ops, currently only the follo=
+wing notifiers are
+>  running under the lock:
+>  * ``NETDEV_REGISTER``
+>  * ``NETDEV_UP``
+> +* ``NETDEV_XDP_FEAT_CHANGE``
+>
+>  The following notifiers are running without the lock:
+>  * ``NETDEV_UNREGISTER``
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 7242fb8a22fc..dece2ae396a1 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -2526,7 +2526,7 @@ struct net_device {
+>          *      @net_shaper_hierarchy, @reg_state, @threaded
+>          *
+>          * Double protects:
+> -        *      @up, @moving_ns, @nd_net
+> +        *      @up, @moving_ns, @nd_net, @xdp_flags
+>          *
+>          * Double ops protects:
+>          *      @real_num_rx_queues, @real_num_tx_queues
+> diff --git a/include/net/xdp.h b/include/net/xdp.h
+> index 48efacbaa35d..20e41b5ff319 100644
+> --- a/include/net/xdp.h
+> +++ b/include/net/xdp.h
+> @@ -616,6 +616,7 @@ struct xdp_metadata_ops {
+>  u32 bpf_xdp_metadata_kfunc_id(int id);
+>  bool bpf_dev_bound_kfunc_id(u32 btf_id);
+>  void xdp_set_features_flag(struct net_device *dev, xdp_features_t val);
+> +void xdp_set_features_flag_locked(struct net_device *dev, xdp_features_t=
+ val);
+>  void xdp_features_set_redirect_target(struct net_device *dev, bool suppo=
+rt_sg);
+>  void xdp_features_clear_redirect_target(struct net_device *dev);
+>  #else
+> diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/eth=
+ernet/google/gve/gve_main.c
+> index f9a73c956861..7a249baee316 100644
+> --- a/drivers/net/ethernet/google/gve/gve_main.c
+> +++ b/drivers/net/ethernet/google/gve/gve_main.c
+> @@ -2185,7 +2185,7 @@ static void gve_set_netdev_xdp_features(struct gve_=
+priv *priv)
+>                 xdp_features =3D 0;
+>         }
+>
+> -       xdp_set_features_flag(priv->dev, xdp_features);
+> +       xdp_set_features_flag_locked(priv->dev, xdp_features);
+>  }
+>
+>  static int gve_init_priv(struct gve_priv *priv, bool skip_describe_devic=
+e)
+> diff --git a/net/core/lock_debug.c b/net/core/lock_debug.c
+> index b7f22dc92a6f..598c443ef2f3 100644
+> --- a/net/core/lock_debug.c
+> +++ b/net/core/lock_debug.c
+> @@ -20,6 +20,7 @@ int netdev_debug_event(struct notifier_block *nb, unsig=
+ned long event,
+>         switch (cmd) {
+>         case NETDEV_REGISTER:
+>         case NETDEV_UP:
+> +       case NETDEV_XDP_FEAT_CHANGE:
+>                 netdev_ops_assert_locked(dev);
+>                 fallthrough;
+>         case NETDEV_DOWN:
+> @@ -58,7 +59,6 @@ int netdev_debug_event(struct notifier_block *nb, unsig=
+ned long event,
+>         case NETDEV_OFFLOAD_XSTATS_DISABLE:
+>         case NETDEV_OFFLOAD_XSTATS_REPORT_USED:
+>         case NETDEV_OFFLOAD_XSTATS_REPORT_DELTA:
+> -       case NETDEV_XDP_FEAT_CHANGE:
+>                 ASSERT_RTNL();
+>                 break;
+>
+> diff --git a/net/core/xdp.c b/net/core/xdp.c
+> index f86eedad586a..3cd0db9c9d2d 100644
+> --- a/net/core/xdp.c
+> +++ b/net/core/xdp.c
+> @@ -17,6 +17,7 @@
+>  #include <net/page_pool/helpers.h>
+>
+>  #include <net/hotdata.h>
+> +#include <net/netdev_lock.h>
+>  #include <net/xdp.h>
+>  #include <net/xdp_priv.h> /* struct xdp_mem_allocator */
+>  #include <trace/events/xdp.h>
+> @@ -991,17 +992,26 @@ static int __init xdp_metadata_init(void)
+>  }
+>  late_initcall(xdp_metadata_init);
+>
+> -void xdp_set_features_flag(struct net_device *dev, xdp_features_t val)
+> +void xdp_set_features_flag_locked(struct net_device *dev, xdp_features_t=
+ val)
+>  {
+>         val &=3D NETDEV_XDP_ACT_MASK;
+>         if (dev->xdp_features =3D=3D val)
+>                 return;
+>
+> +       netdev_assert_locked_or_invisible(dev);
+>         dev->xdp_features =3D val;
+>
+>         if (dev->reg_state =3D=3D NETREG_REGISTERED)
+>                 call_netdevice_notifiers(NETDEV_XDP_FEAT_CHANGE, dev);
+>  }
+> +EXPORT_SYMBOL_GPL(xdp_set_features_flag_locked);
+> +
+> +void xdp_set_features_flag(struct net_device *dev, xdp_features_t val)
+> +{
+> +       netdev_lock(dev);
+> +       xdp_set_features_flag_locked(dev, val);
+> +       netdev_unlock(dev);
+> +}
+>  EXPORT_SYMBOL_GPL(xdp_set_features_flag);
+>
+>  void xdp_features_set_redirect_target(struct net_device *dev, bool suppo=
+rt_sg)
+> --
+> 2.49.0
+>
 
