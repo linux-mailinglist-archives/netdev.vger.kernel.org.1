@@ -1,135 +1,202 @@
-Return-Path: <netdev+bounces-180195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 230C7A80448
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 14:07:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3066AA8040D
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 14:05:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 665974667C8
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 11:58:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2552F1B61063
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 12:00:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A03726983B;
-	Tue,  8 Apr 2025 11:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XtNwu0kl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B843269899;
+	Tue,  8 Apr 2025 11:59:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from ni.piap.pl (ni.piap.pl [195.187.100.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF792269885
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 11:57:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 028FCA94A;
+	Tue,  8 Apr 2025 11:59:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.187.100.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744113456; cv=none; b=YXEipjsmPrQLehgHVx+ccqbGWciL198q7nlztq4gvoWzw7eXouTN5v+DeMddeNL4x6uKg5MbPxw53Ri7WnlOpjJVCKUQufFlcuFoXcowImsWQKJSyqoHv27tBvY4HXzPxyHlvRzpcT/+pfbakCden0w+aZNabN8OVfTYjukUgZo=
+	t=1744113586; cv=none; b=P890LR9UQ3KH1xrqM5lBeKZviw4eNz6uKScc8pk2H8IYq32cZ70bzpad8YxLssGLzDhYbWkJFX9nyMe+1SqEWCfkZ4jMHm6wxy6OnmwV2qVjHdZKG0U2TU4a5C62FvmWxzS9upwMW7O31G36jTEom5r4pyMUk+AtVMrwk/SQ+KI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744113456; c=relaxed/simple;
-	bh=QvLcxX6yWCKbIIyEBBiQhqEM3Z9K4VTDnwN+pMqwPsA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pxPNaeogaLWXJTq1lUXHd9UwNSmJBni+d3IzJJWcXsGSSBwLYFfbQAGJ+OfWtCokK2XxipSk5ZWhdr7LRRTJ7mr48b78vPNX4d2ADEk35bn7nAhIqMoFyIEbYkc9NHpIuVTMla2sMUfTMCV2hYQG7mcKfrwLzGC9xqN9o/kc1rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XtNwu0kl; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744113453;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wBvpiZeAl58ooIRNvYADzEYhfHJSYfAIRoqxnjfSxT8=;
-	b=XtNwu0klU5/gOE0WuKvAiCKHa+cHFpHmO5VrJDgl0kgwidkYHD/NpAiHj7c4wrTBODV1VD
-	v1cd2Iww6RQEszb0f2JdvKpjEMYXFfmvkN2p4ew8wqFbPDCY62lvZyURjv5WgQrdiYezVq
-	pBMI9/Ru36uwIbhrb2/cCvMwFTSoySs=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-175-A0gcGfeqN3CrcsLOcbeVIA-1; Tue, 08 Apr 2025 07:57:32 -0400
-X-MC-Unique: A0gcGfeqN3CrcsLOcbeVIA-1
-X-Mimecast-MFC-AGG-ID: A0gcGfeqN3CrcsLOcbeVIA_1744113451
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3912d9848a7so3182762f8f.0
-        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 04:57:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744113451; x=1744718251;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wBvpiZeAl58ooIRNvYADzEYhfHJSYfAIRoqxnjfSxT8=;
-        b=bwSQyQM37ZTJiW99wBLpfqxnwJT5egP4/ws9GFrdgwOgtaahgqhULJAxJzyfWVWf+M
-         gw/s5dCgZiDwe90LFoSzNpjUIB5x+Lo56EJ4CjYRRZsOXB/5jfJxTLaz+axFOI0oZI5S
-         NwXzoLeZAKyvXwCbf8USXxD+QSMOBxVl9lROgbFy8UMMkWhbrOm+30yCozoNGS0xpG1w
-         +OuNCwUeaBOH4J7KBHdwh4GHckhNKHJYiHe5Jx2hYtR4KyDEJcUAYFM7T6ZF+4OhnEIv
-         bCaEhxp+hEX0fZ5cRp2XeUQcCPmMLZD12tGdAbRCAA1Mmv6c+RT9h7XoP+yVrkJI3r0S
-         TBPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUtTa7V1YZ8wkpi5NnXL6klIbedOv6MH8S5XyuNl3Fzg4HJjhwR75f1q9yhBAth/NpRFVvPdvo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzkVPVVxOBk98QYiubzNak5K0xFG84Z9MvCthRsuWtO2hFoX4B6
-	WZ4tM2nhY3HJzZyXfNIFwTAYaDleFCPFbJxMpdDAnjg8Jr/woDU5DhkSB6JE5LfMI62b+Un2eyT
-	hngPW6AsBBEGEU1UQpoixwI3gfRyZ5wbUg40k2UZiYBPhDDJ7wUC9IQ==
-X-Gm-Gg: ASbGncvsD4xUJI2eR26y3JsH657sQkrY4GILn3ZLa79duMNaD9EgHx4Afe/ezV8w/Yo
-	lzcbMr5Z9cYgitJU8lQ67dNGKVaZBsnqwqkZG8Mx993fGI6b9kMT8cNvDK5JWJZjF4qqlEm+blp
-	quybCiKDoNHx91bKBM6DYLgnhBshKDvBwc22zmtqMLRdfUul1Iv2lkFnMhQMx4ydWe3bIfOYCT6
-	kSloaFeoHys3+OU2yBViIpDixSN263IlH5ETrTGRsjncJcfJco6FTP0EX4FgRviGqFBcT/5zzVj
-	8HygpF70bHkkrApISyJfcMpEUgOZeKphuQmlRKTT5d0=
-X-Received: by 2002:a05:6000:2cc:b0:391:952:c74a with SMTP id ffacd0b85a97d-39d820aca79mr2682902f8f.8.1744113451212;
-        Tue, 08 Apr 2025 04:57:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEBGwI8+I+ikQqr9EBAiBMmMVZ65FGBOy3vL+rQixNlh1yzT6KQhdff9n0JVUKlOIIIf1LfaQ==
-X-Received: by 2002:a05:6000:2cc:b0:391:952:c74a with SMTP id ffacd0b85a97d-39d820aca79mr2682882f8f.8.1744113450827;
-        Tue, 08 Apr 2025 04:57:30 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-84-24.dyn.eolo.it. [146.241.84.24])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c3020d938sm14864864f8f.65.2025.04.08.04.57.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Apr 2025 04:57:30 -0700 (PDT)
-Message-ID: <126fa7e1-dbe0-48ff-9cb5-31c1d4dea964@redhat.com>
-Date: Tue, 8 Apr 2025 13:57:29 +0200
+	s=arc-20240116; t=1744113586; c=relaxed/simple;
+	bh=H+sEWRoi0KMWTJdhw9CdKZg4wP0qGCG0W3QopnKON+U=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=PACFX++k+GCNHpRcQt39GezqrACQel2Qt6nvtVPtTr9r5uPF8KcIKX7qfg8se8hG+c0/QmyxzAQlGlhHwh9K7FPTaEvfxOdoEA6rSVToV7SkmrVu7ElUy5MJ2MtzDQ1vljNmRWyAh9MjzNWnrrkG2ED+PMlZJXpSu0OcmHOi12s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=piap.pl; spf=pass smtp.mailfrom=piap.pl; arc=none smtp.client-ip=195.187.100.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=piap.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=piap.pl
+Received: from t19.piap.pl (OSB1819.piap.pl [10.0.9.19])
+	by ni.piap.pl (Postfix) with ESMTPS id 89C76C408283;
+	Tue,  8 Apr 2025 13:59:41 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ni.piap.pl 89C76C408283
+From: =?utf-8?Q?Krzysztof_Ha=C5=82asa?= <khalasa@piap.pl>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: netdev <netdev@vger.kernel.org>,  Oliver Neukum <oneukum@suse.com>,
+  Andrew Lunn <andrew+netdev@lunn.ch>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
+  <linux-usb@vger.kernel.org>,  <linux-kernel@vger.kernel.org>,  Jose
+ Ignacio Tornos Martinez <jtornosm@redhat.com>,  Ming Lei
+ <ming.lei@redhat.com>
+Subject: [PATCH v2] usbnet: asix AX88772: leave the carrier control to phylink
+In-Reply-To: <m3tt6ydfzu.fsf@t19.piap.pl> ("Krzysztof =?utf-8?Q?Ha=C5=82as?=
+ =?utf-8?Q?a=22's?= message of
+	"Tue, 08 Apr 2025 13:55:49 +0200")
+References: <m35xjgdvih.fsf@t19.piap.pl> <Z_PVOWDMzmLObRM6@pengutronix.de>
+	<m3tt6ydfzu.fsf@t19.piap.pl>
+Sender: khalasa@piap.pl
+Date: Tue, 08 Apr 2025 13:59:41 +0200
+Message-ID: <m3plhmdfte.fsf_-_@t19.piap.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] tc: Ensure we have enough buffer space when sending
- filter netlink notifications
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>
-Cc: Ilya Maximets <i.maximets@redhat.com>,
- Frode Nordahl <frode.nordahl@canonical.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org
-References: <20250407105542.16601-1-toke@redhat.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250407105542.16601-1-toke@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 4/7/25 12:55 PM, Toke Høiland-Jørgensen wrote:
-> To trigger this, run the following commands:
-> 
->  # ip link add type veth
->  # tc qdisc replace dev veth0 root handle 1: fq_codel
->  # tc -echo filter add dev veth0 parent 1: u32 match u32 0 0 $(for i in $(seq 32); do echo action pedit munge ip dport set 22; done)
-> 
-> Before this fix, tc just returns:
-> 
-> Not a filter(cmd 2)
-> 
-> After the fix, we get the correct echo:
-> 
-> added filter dev veth0 parent 1: protocol all pref 49152 u32 chain 0 fh 800::800 order 2048 key ht 800 bkt 0 terminal flowid not_in_hw
->   match 00000000/00000000 at 0
-> 	action order 1:  pedit action pass keys 1
->  	index 1 ref 1 bind 1
-> 	key #0  at 20: val 00000016 mask ffff0000
-> [repeated 32 times]
+ASIX AX88772B based USB 10/100 Ethernet adapter doesn't come
+up ("carrier off"), despite the built-in 100BASE-FX PHY positive link
+indication. The internal PHY is configured (using EEPROM) in fixed
+100 Mbps full duplex mode.
 
-I think it would be great if you could follow-up capturing the above in
-a self-test.
+The primary problem appears to be using carrier_netif_{on,off}() while,
+at the same time, delegating carrier management to phylink. Use only the
+latter and remove "manual control" in the asix driver.
 
-Thanks!
+I don't have any other AX88772 board here, but the problem doesn't seem
+specific to a particular board or settings - it's probably
+timing-dependent.
 
-Paolo
+Remove unused asix_adjust_link() as well.
+
+Signed-off-by: Krzysztof Ha=C5=82asa <khalasa@piap.pl>
+
+--- a/drivers/net/usb/asix.h
++++ b/drivers/net/usb/asix.h
+@@ -224,7 +224,6 @@ int asix_write_rx_ctl(struct usbnet *dev, u16 mode, int=
+ in_pm);
+=20
+ u16 asix_read_medium_status(struct usbnet *dev, int in_pm);
+ int asix_write_medium_mode(struct usbnet *dev, u16 mode, int in_pm);
+-void asix_adjust_link(struct net_device *netdev);
+=20
+ int asix_write_gpio(struct usbnet *dev, u16 value, int sleep, int in_pm);
+=20
+--- a/drivers/net/usb/asix_common.c
++++ b/drivers/net/usb/asix_common.c
+@@ -414,28 +414,6 @@ int asix_write_medium_mode(struct usbnet *dev, u16 mod=
+e, int in_pm)
+ 	return ret;
+ }
+=20
+-/* set MAC link settings according to information from phylib */
+-void asix_adjust_link(struct net_device *netdev)
+-{
+-	struct phy_device *phydev =3D netdev->phydev;
+-	struct usbnet *dev =3D netdev_priv(netdev);
+-	u16 mode =3D 0;
+-
+-	if (phydev->link) {
+-		mode =3D AX88772_MEDIUM_DEFAULT;
+-
+-		if (phydev->duplex =3D=3D DUPLEX_HALF)
+-			mode &=3D ~AX_MEDIUM_FD;
+-
+-		if (phydev->speed !=3D SPEED_100)
+-			mode &=3D ~AX_MEDIUM_PS;
+-	}
+-
+-	asix_write_medium_mode(dev, mode, 0);
+-	phy_print_status(phydev);
+-	usbnet_link_change(dev, phydev->link, 0);
+-}
+-
+ int asix_write_gpio(struct usbnet *dev, u16 value, int sleep, int in_pm)
+ {
+ 	int ret;
+--- a/drivers/net/usb/asix_devices.c
++++ b/drivers/net/usb/asix_devices.c
+@@ -752,7 +736,6 @@ static void ax88772_mac_link_down(struct phylink_config=
+ *config,
+ 	struct usbnet *dev =3D netdev_priv(to_net_dev(config->dev));
+=20
+ 	asix_write_medium_mode(dev, 0, 0);
+-	usbnet_link_change(dev, false, false);
+ }
+=20
+ static void ax88772_mac_link_up(struct phylink_config *config,
+@@ -783,7 +766,6 @@ static void ax88772_mac_link_up(struct phylink_config *=
+config,
+ 		m |=3D AX_MEDIUM_RFC;
+=20
+ 	asix_write_medium_mode(dev, m, 0);
+-	usbnet_link_change(dev, true, false);
+ }
+=20
+ static const struct phylink_mac_ops ax88772_phylink_mac_ops =3D {
+@@ -1350,10 +1328,9 @@ static const struct driver_info ax88772_info =3D {
+ 	.description =3D "ASIX AX88772 USB 2.0 Ethernet",
+ 	.bind =3D ax88772_bind,
+ 	.unbind =3D ax88772_unbind,
+-	.status =3D asix_status,
+ 	.reset =3D ax88772_reset,
+ 	.stop =3D ax88772_stop,
+-	.flags =3D FLAG_ETHER | FLAG_FRAMING_AX | FLAG_LINK_INTR | FLAG_MULTI_PAC=
+KET,
++	.flags =3D FLAG_ETHER | FLAG_FRAMING_AX | FLAG_MULTI_PACKET,
+ 	.rx_fixup =3D asix_rx_fixup_common,
+ 	.tx_fixup =3D asix_tx_fixup,
+ };
+@@ -1362,11 +1339,9 @@ static const struct driver_info ax88772b_info =3D {
+ 	.description =3D "ASIX AX88772B USB 2.0 Ethernet",
+ 	.bind =3D ax88772_bind,
+ 	.unbind =3D ax88772_unbind,
+-	.status =3D asix_status,
+ 	.reset =3D ax88772_reset,
+ 	.stop =3D ax88772_stop,
+-	.flags =3D FLAG_ETHER | FLAG_FRAMING_AX | FLAG_LINK_INTR |
+-	         FLAG_MULTI_PACKET,
++	.flags =3D FLAG_ETHER | FLAG_FRAMING_AX | FLAG_MULTI_PACKET,
+ 	.rx_fixup =3D asix_rx_fixup_common,
+ 	.tx_fixup =3D asix_tx_fixup,
+ 	.data =3D FLAG_EEPROM_MAC,
+@@ -1376,11 +1351,9 @@ static const struct driver_info lxausb_t1l_info =3D {
+ 	.description =3D "Linux Automation GmbH USB 10Base-T1L",
+ 	.bind =3D ax88772_bind,
+ 	.unbind =3D ax88772_unbind,
+-	.status =3D asix_status,
+ 	.reset =3D ax88772_reset,
+ 	.stop =3D ax88772_stop,
+-	.flags =3D FLAG_ETHER | FLAG_FRAMING_AX | FLAG_LINK_INTR |
+-		 FLAG_MULTI_PACKET,
++	.flags =3D FLAG_ETHER | FLAG_FRAMING_AX | FLAG_MULTI_PACKET,
+ 	.rx_fixup =3D asix_rx_fixup_common,
+ 	.tx_fixup =3D asix_tx_fixup,
+ 	.data =3D FLAG_EEPROM_MAC,
+@@ -1412,10 +1383,8 @@ static const struct driver_info hg20f9_info =3D {
+ 	.description =3D "HG20F9 USB 2.0 Ethernet",
+ 	.bind =3D ax88772_bind,
+ 	.unbind =3D ax88772_unbind,
+-	.status =3D asix_status,
+ 	.reset =3D ax88772_reset,
+-	.flags =3D FLAG_ETHER | FLAG_FRAMING_AX | FLAG_LINK_INTR |
+-	         FLAG_MULTI_PACKET,
++	.flags =3D FLAG_ETHER | FLAG_FRAMING_AX | FLAG_MULTI_PACKET,
+ 	.rx_fixup =3D asix_rx_fixup_common,
+ 	.tx_fixup =3D asix_tx_fixup,
+ 	.data =3D FLAG_EEPROM_MAC,
+
+--=20
+Krzysztof "Chris" Ha=C5=82asa
+
+Sie=C4=87 Badawcza =C5=81ukasiewicz
+Przemys=C5=82owy Instytut Automatyki i Pomiar=C3=B3w PIAP
+Al. Jerozolimskie 202, 02-486 Warszawa
 
 
