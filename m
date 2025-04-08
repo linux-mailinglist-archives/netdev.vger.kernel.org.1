@@ -1,102 +1,118 @@
-Return-Path: <netdev+bounces-180368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48AFCA81145
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 18:05:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10E65A811B8
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 18:13:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 156FC7AB90A
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 16:03:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48AEF1B669F8
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 16:07:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C12CF22F145;
-	Tue,  8 Apr 2025 15:59:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E485823534E;
+	Tue,  8 Apr 2025 16:03:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="CT4QmlfR";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="f/FWUZle"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9618522CBCC;
-	Tue,  8 Apr 2025 15:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D175122D4F9;
+	Tue,  8 Apr 2025 16:02:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744127946; cv=none; b=Dc+ZKX+P6QIqe03KPnJWOUfNXlQ0FW1cfzMxOzkSAfYHpGyLz7vmm0YEbUNI2b8uAaiXuM3B4rVE1EH3+of4P7KhqtbN2fzHlGREIO5jhXSGoMstsdh/Ym5HD+svCI4PRre3mzM+DHZz1rRFEa+SOXMxEJkV60ws+Xhdu44vCiQ=
+	t=1744128180; cv=none; b=kk/WQCzchByJMfjYaKTDToabeCKTytaRwC6+vag2pNywTM7i8VTnqdMB+/P7nYs8EZGj/mCbrjZJShhe2VxB/YjmNNp7q+HqA4Mg1hhf/C/fQSgToed9c4BaKq3y3GxAF6fZot7CxLXiu32hEyOgpMRQlJZ9pamwb2epWMqX9cI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744127946; c=relaxed/simple;
-	bh=bvEpywJ78FYfk9dzJS3R8rHsthJ1q3NQt8iEloMCFGs=;
+	s=arc-20240116; t=1744128180; c=relaxed/simple;
+	bh=hZt3X6OvWRI5SH/sbZfJe+sNse4XUsMMIFUU1Z1QDtU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GpkjAX0d1jnioBJU7PyT50nPoNW7OAsI/L/mtlk0vweNeWQAi8EueTJex+06wLEU41GASQogI1YPtPyVT6FV54DYM8G7eJkDzL3X/KsbKvmzCOrlGnfk90owhvLPR5xZrtXhMaqD8UAhGR+TZWNcLgRZ+5k20cvOQc22dgRjZIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1u2BLa-000000000U3-0ZJW;
-	Tue, 08 Apr 2025 15:58:46 +0000
-Date: Tue, 8 Apr 2025 16:58:39 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ox1GflYq4VMyQWZ/eZlVMEiehzucBbBQ+DR+xlK0NVEdcTWUReTGDRCqPH2Z5dVBvDthkHJlcfuv+WiQ2wy8nwzMLBBO6/giXRHWF2VNVp3NiuEHg67bXL0CXIXQjmRHfSd+sOyOoAS7PWZHlmEcv14vExGVNOJcqWQYFwXJqCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=CT4QmlfR; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=f/FWUZle; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id D798B603AD; Tue,  8 Apr 2025 18:02:49 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1744128169;
+	bh=gJptIUWpJ6UzYtRB0CDxnMyOu8usVQL/RyAHJ2KjoT8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CT4QmlfRF8tqS695IN3rRFXuimmksjfHqU1bRJRHpUmbJJfh/exLTi9MsZLM2XPn8
+	 rP7lBrmoiwOGNy9+S0zH9laSNJEeCqc1tWOANyir4AE2y31M4TQtK8u2RyAMlwIMY0
+	 r2V2hlZGr7Het3gcXRpNEpIs2ZZNuJh6T1bC5G4t4kxvNA6Ig7g1OC2+qmFur+JXJx
+	 pLw7ZYluYfSLFtPveVlgZLq4xYKv5/IKG8lFNoBrAkAQZzAA4N8VUPB4fhgTzg5yhU
+	 QPrQCfJXkeDiAMiFdAOlFT+2Lz+ZQaV+P8p6vXj4DGlNM63Fn+d58XjSoG6H5yR6hf
+	 dEQbpSNY8KZHQ==
+X-Spam-Level: 
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 6FA5860280;
+	Tue,  8 Apr 2025 18:02:47 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1744128167;
+	bh=gJptIUWpJ6UzYtRB0CDxnMyOu8usVQL/RyAHJ2KjoT8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=f/FWUZleyb1H3NjvVG5hbGi3J1WYxnIe3cfT5MAeeJElzclT12Kfi/WIpq2xAcM/2
+	 5B3UmJw+6n+bWDa05vwGONRfEn+BTVvKinPQzOAqXoq8/guS7tVpDbI4M2ABzxotfd
+	 JdygmZlAFfy7p1YyIVs4XX+Rt/5oKdlO5/IKie8WFjMMO7eK8TrvtamK1Xlt4y15RJ
+	 CHnhh57raPF9LpePk4MCxiq8P+8nj0lkiui3k8YzoeSm9gwwIulZPh/KjweTi2b5Si
+	 xcjwBcifTMfYtq8lgLZV83SX/MJg5+iKan7SwJiKbTfqjBN0OiZNwus7yo8OXDBuHZ
+	 HYUuuPgVKMA3Q==
+Date: Tue, 8 Apr 2025 18:02:45 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Michal Ostrowski <mostrows@earthlink.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Simon Horman <horms@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.or
-Subject: Re: [net-next PATCH 1/2] net: phy: mediatek: permit to compile test
- GE SOC PHY driver
-Message-ID: <Z_VHr8ub-uXJy53y@makrotopia.org>
-References: <20250408155321.613868-1-ansuelsmth@gmail.com>
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Simon Horman <horms@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v11 nf-next 0/2] Add nf_flow_encap_push() for xmit direct
+Message-ID: <Z_VIpa9SP05rsW18@calendula>
+References: <20250408142425.95437-1-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250408155321.613868-1-ansuelsmth@gmail.com>
+In-Reply-To: <20250408142425.95437-1-ericwouds@gmail.com>
 
-On Tue, Apr 08, 2025 at 05:53:13PM +0200, Christian Marangi wrote:
-> When commit 462a3daad679 ("net: phy: mediatek: fix compile-test
-> dependencies") fixed the dependency, it should have also introduced
-> an or on COMPILE_TEST to permit this driver to be compile-tested even if
-> NVMEM_MTK_EFUSE wasn't selected. The driver makes use of NVMEM API that
-> are always compiled (return error) so the driver can actually be
-> compiled even without that config.
+Hi,
+
+Please, one series at a time. You pick a good target to start with.
+
+I already provided a few suggestions on where to start from.
+
+Thanks.
+
+On Tue, Apr 08, 2025 at 04:24:23PM +0200, Eric Woudstra wrote:
+> Patch to add nf_flow_encap_push(), see patch message.
 > 
-> Fixes: 462a3daad679 ("net: phy: mediatek: fix compile-test dependencies")
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-
-Acked-by: Daniel Golle <daniel@makrotopia.org>
-
-> ---
->  drivers/net/phy/mediatek/Kconfig | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Added patch to eliminate array of flexible structures warning.
 > 
-> diff --git a/drivers/net/phy/mediatek/Kconfig b/drivers/net/phy/mediatek/Kconfig
-> index 2a8ac5aed0f8..c80b4c5b7b66 100644
-> --- a/drivers/net/phy/mediatek/Kconfig
-> +++ b/drivers/net/phy/mediatek/Kconfig
-> @@ -16,7 +16,7 @@ config MEDIATEK_GE_PHY
->  config MEDIATEK_GE_SOC_PHY
->  	tristate "MediaTek SoC Ethernet PHYs"
->  	depends on (ARM64 && ARCH_MEDIATEK) || COMPILE_TEST
-> -	depends on NVMEM_MTK_EFUSE
-> +	depends on NVMEM_MTK_EFUSE || COMPILE_TEST
->  	select MTK_NET_PHYLIB
->  	help
->  	  Supports MediaTek SoC built-in Gigabit Ethernet PHYs.
+> Changed in v11:
+> - Only push when tuple.out.ifidx == tuple.out.hw_ifidx
+> - No changes in nft_dev_path_info()
+> 
+> v10 split from patch-set: bridge-fastpath and related improvements v9
+> 
+> Eric Woudstra (2):
+>   net: pppoe: avoid zero-length arrays in struct pppoe_hdr
+>   netfilter: nf_flow_table_offload: Add nf_flow_encap_push() for xmit
+>     direct
+> 
+>  drivers/net/ppp/pppoe.c          |  2 +-
+>  include/uapi/linux/if_pppox.h    |  4 ++
+>  net/netfilter/nf_flow_table_ip.c | 97 +++++++++++++++++++++++++++++++-
+>  3 files changed, 100 insertions(+), 3 deletions(-)
+> 
 > -- 
-> 2.48.1
+> 2.47.1
 > 
 
