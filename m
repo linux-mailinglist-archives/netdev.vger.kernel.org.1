@@ -1,99 +1,127 @@
-Return-Path: <netdev+bounces-180112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9431A7FA24
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 11:46:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CEF4AA7FA3B
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 11:49:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B62C73A891F
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 09:42:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08F6E3A7359
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 09:46:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B0BB267AF7;
-	Tue,  8 Apr 2025 09:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEB2526656D;
+	Tue,  8 Apr 2025 09:46:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j5A1IDII"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PkA6KqER"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B060267AF2;
-	Tue,  8 Apr 2025 09:39:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B515F265CD7
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 09:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744105195; cv=none; b=llkIFgHLgxVXoiXmb5ZER3oYPi6WNKhxmfQrMULguMNxPpyD7ntZSjth6AwrqJ/0o/XVBKUPz0YelSeVni5PQO1kd983pXXAwlR2wCzs5Cl9Y+3mXIDiSdl8b4cFX6PonQUywhmeUW2zPmaoDxp3J6YUY8yVviFM6ytVN/9U/aQ=
+	t=1744105610; cv=none; b=Vh5lxpdoTLQFSCwKgkfAJhZ1RJBZg/Uk3LUnyVx92IV6XvyZOLN6FFhkaY6qPLTixUEli5+zX9WMUUnnoV5w2BSFPkkBsfTBe1bDHZcSxoUPcWVeIYpgUy1GEU4l6QgR5YyitxYOql4QgJ349aZY+p3xOh3eXqxKYqmuWP6l8DA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744105195; c=relaxed/simple;
-	bh=3gDZsk2A3D/pEYugevyHrBygtLAgaecfyjqDZoJz+ls=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ohkyI2kLWLajYs2qNhbQ3xKZgLqMfsMyLPaqjI2U7m8C+89fhs7gR3HzQTjNgMoskQqmiSXEo4qiyap/ukKkVzqb6bf+UB0+8k+jJh7LYQGtYS1tQp6BSEysmDwgVi339ZCTk1OCrmRmIwEphAV5WWY+TaA/ZFg2yaO3hs5HhLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j5A1IDII; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B36CC4CEE8;
-	Tue,  8 Apr 2025 09:39:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744105194;
-	bh=3gDZsk2A3D/pEYugevyHrBygtLAgaecfyjqDZoJz+ls=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=j5A1IDIIFWFx4rOC3LpeaZaioc4nMhF8+bFl07kRiP6CCqTTKHa1YJPC2xFq4lwsF
-	 Dr4NtEgGmcWtgVlQg+KbNKXAJOlbbSAR2FEAiq61TRol93Wk1eIa77PSS2DIABPfOb
-	 A2rQ0ogTUc77v0mCVNurooK7EE0kuotI7daj34wrLy2GqR6J4aoqbUij+RxyRAz8pV
-	 bwZRTZQqVvXF9aWbw3mwCOmiMbnoODuhkcfd9efzulrKh/vf6qNIj0YnFQc+NCxKxn
-	 4D6G9dHTGfjbMojbiOzm39gxmZC5iK8NJHoExd3A7Oo4NY6Rf86WKcBSb1gTostdWW
-	 cY7bIVp72yqLg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 340B638111D4;
-	Tue,  8 Apr 2025 09:40:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1744105610; c=relaxed/simple;
+	bh=kFJHApLzkjjQTZd748UbOGNjaj3R6uugruxTfXbZkHU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IcS6vcJqpkegQvysJJ0DPnq7MRDbrdrT57rLvwfMnitRY59XymfS88cE4Lh98OmlEgh2b0a62aUGcZWiFcmqs5EvEtCAWIDoLghvp2fsNxobGV1GGt4J7G8QLH9vAYNpgX7yFxehDdf1uk24esCI1t6y7s0dAuTtxC7C2DWoTeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PkA6KqER; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744105606;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kFJHApLzkjjQTZd748UbOGNjaj3R6uugruxTfXbZkHU=;
+	b=PkA6KqER8YJkXNODKomHLkiuSyNXmuuEhloqMqqb9n18Hd6LQoXUEW0nqzn2m5RBzj6ZPl
+	frrhwOIZRTtQiML9ZngGhmPLoBWiehrSPIrb9n3QByp9pXQE6xtKGCI2S78R0NixYRXXCy
+	LZfT/eZQalOyzYNF8K/yOnGVPm50Rgg=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-590--Vv2dSXlNqqdTnJHjBvSmw-1; Tue, 08 Apr 2025 05:46:45 -0400
+X-MC-Unique: -Vv2dSXlNqqdTnJHjBvSmw-1
+X-Mimecast-MFC-AGG-ID: -Vv2dSXlNqqdTnJHjBvSmw_1744105604
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-47693206f16so87683131cf.1
+        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 02:46:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744105604; x=1744710404;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kFJHApLzkjjQTZd748UbOGNjaj3R6uugruxTfXbZkHU=;
+        b=S3GSLncrNFSL68l9IDe7e88ju0fqq3r5ZcuZkufaAyWtYPo44IK6z12TzqtIfiLyDd
+         86p7Sg/U2SUUNnz99uBlsEbfd9iVaV24X7wvf9Qkqw64zcXXvQH0LRbWgNA6Jys4xdP+
+         PnIjAW0hjheOQGJsU7pRUFmQDGq50XYgXKZeu+lE9LESUGT49ADgLGcRbuwg7ca/w43I
+         Y2fWLXy6mIvCHM+tNplbAkf8lcnc6kllj8alVcpCEAoCQJiVIR7/WcHgON/gLljY75/8
+         Fo/2LLABUUdYriDIWF+3JjAZ8Qnj/tHOH17g4GGazcnHjlPqrebzA7rOQ+Qq7OUeV2A4
+         L4WA==
+X-Forwarded-Encrypted: i=1; AJvYcCXScszUYI/7uj4wOa3BFfKwSuCqXfixDpTneBAVl32jIAswjKJax7THHHmu78WtRt8Su4eSSHQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzufcLDvlWAfqirVwBLnT2S3+kYCX5FxT/bsttTL+w8d5jxGuUG
+	N3P2LzAWWhCPoEgQbLqQY5yCm2/hcSuWiE/wqJ0cd95+lXkS+ZRmbg4ftlKCJUfJ6eLvcT6NdOK
+	xsuLHAGwiUH75XGXE86lV/L2lrE8I2uiKMXBVhQSB43RBXXIU1fRlUNAypnskUpaERj3AN8VKYX
+	xl+lw/HESaTJg4CC8uCh7cQi5jTb3f
+X-Gm-Gg: ASbGncv7cu/oy+ARp7kA7Dqal1CzrVbhsDI6U4iq7Sot8sLVsEcL/Y+gweu9Bm736LN
+	zWT45v8nX0vH7/kAwKUWeZvIYvB3LrylsI5kVv1gA1tCDFfNtZP/nWcbFMLx/xpdNsJ968kW4lQ
+	==
+X-Received: by 2002:ac8:5987:0:b0:477:4224:9607 with SMTP id d75a77b69052e-47930f92246mr194565651cf.12.1744105604569;
+        Tue, 08 Apr 2025 02:46:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHUGe1WMgdw3266Ixamciimi7c04VwM13sorCvBAziX4GsTGnRMZpS8YF7Y0r3w9ErgRv4v1FDTdG6BwI33w3U=
+X-Received: by 2002:ac8:5987:0:b0:477:4224:9607 with SMTP id
+ d75a77b69052e-47930f92246mr194565531cf.12.1744105604319; Tue, 08 Apr 2025
+ 02:46:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] sctp: detect and prevent references to a freed transport
- in sendmsg
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174410523201.1843579.6108769809547984395.git-patchwork-notify@kernel.org>
-Date: Tue, 08 Apr 2025 09:40:32 +0000
-References: <20250404-kasan_slab-use-after-free_read_in_sctp_outq_select_transport__20250404-v1-1-5ce4a0b78ef2@igalia.com>
-In-Reply-To: <20250404-kasan_slab-use-after-free_read_in_sctp_outq_select_transport__20250404-v1-1-5ce4a0b78ef2@igalia.com>
-To: =?utf-8?q?Ricardo_Ca=C3=B1uelo_Navarro_=3Crcn=40igalia=2Ecom=3E?=@codeaurora.org
-Cc: marcelo.leitner@gmail.com, lucien.xin@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- revest@google.com, kernel-dev@igalia.com, linux-sctp@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+References: <20250328100359.1306072-1-lulu@redhat.com> <20250328100359.1306072-5-lulu@redhat.com>
+ <20250407041540-mutt-send-email-mst@kernel.org> <76a7e782-6a7c-4704-b7c1-2459254c1362@oracle.com>
+In-Reply-To: <76a7e782-6a7c-4704-b7c1-2459254c1362@oracle.com>
+From: Cindy Lu <lulu@redhat.com>
+Date: Tue, 8 Apr 2025 17:45:58 +0800
+X-Gm-Features: ATxdqUEdI-_9frRvmATT_TQ83vcEeyygOtNToq3q3kw5ZPITDti5dWdb32chlc4
+Message-ID: <CACLfguXfRvLLiCF7ysidPLcn7GftU1Jyuem2Q9xr_SMGnP_16A@mail.gmail.com>
+Subject: Re: [PATCH v8 4/8] vhost: Introduce vhost_worker_ops in vhost_worker
+To: Mike Christie <michael.christie@oracle.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, jasowang@redhat.com, sgarzare@redhat.com, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 04 Apr 2025 16:53:21 +0200 you wrote:
-> sctp_sendmsg() re-uses associations and transports when possible by
-> doing a lookup based on the socket endpoint and the message destination
-> address, and then sctp_sendmsg_to_asoc() sets the selected transport in
-> all the message chunks to be sent.
-> 
-> There's a possible race condition if another thread triggers the removal
-> of that selected transport, for instance, by explicitly unbinding an
-> address with setsockopt(SCTP_SOCKOPT_BINDX_REM), after the chunks have
-> been set up and before the message is sent. This can happen if the send
-> buffer is full, during the period when the sender thread temporarily
-> releases the socket lock in sctp_wait_for_sndbuf().
-> 
-> [...]
-
-Here is the summary with links:
-  - sctp: detect and prevent references to a freed transport in sendmsg
-    https://git.kernel.org/netdev/net/c/f1a69a940de5
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+On Tue, Apr 8, 2025 at 12:06=E2=80=AFAM Mike Christie
+<michael.christie@oracle.com> wrote:
+>
+> On 4/7/25 3:17 AM, Michael S. Tsirkin wrote:
+> > On Fri, Mar 28, 2025 at 06:02:48PM +0800, Cindy Lu wrote:
+> >> Abstract vhost worker operations (create/stop/wakeup) into an ops
+> >> structure to prepare for kthread mode support.
+> >>
+> >> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> >
+> > I worry about the overhead of indirect calls here.
+> >
+> > We have the wrappers, and only two options,
+> > why did you decide to add it like this,
+> > with ops?
+> >
+> That was from my review comment. Originally, I thought we
+> could share more code. For example I thought
+> vhost_run_work_kthread_list from patch 2 in this thread and
+> kernel/vhost_task.c:vhost_task_fn could be merged.
+>
+Hi Mike
+I guess you mean function vhost_run_work_list and vhost_run_work_kthread_li=
+st?
+sure, I will try to merge these two functions in next version
+Thanks
+Cindy
 
 
