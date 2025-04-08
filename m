@@ -1,72 +1,62 @@
-Return-Path: <netdev+bounces-180448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53B37A81588
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 21:11:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45480A8158C
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 21:11:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1165E7B8B87
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 19:09:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 260D516A128
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 19:11:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C550324394F;
-	Tue,  8 Apr 2025 19:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3799022AE59;
+	Tue,  8 Apr 2025 19:11:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bdzK3TmE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gDhLcGrX"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A80D244186;
-	Tue,  8 Apr 2025 19:08:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 103231DE894;
+	Tue,  8 Apr 2025 19:11:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744139341; cv=none; b=GNV2lArWosQGf10sSjVrvX1Bg7SpTrS0tWjJHDl8BWw2iDXxsoAsq7TrsJW2UFGmfYjlVSOOwSC6/KhhlLOKwQJhefXa1bNJD9s0eaSAeNl9OdAs/RVFHOLWuPyf8aK+DChjmbHmdcfH0Lj4JcW/9/sxhN/cN5NeFKirL4qjkzw=
+	t=1744139507; cv=none; b=joPQPlnTFsF1wBGqk5JnobEAtP0gcMF1KN6orsHeb1bdiuAmBAZkgqvXJMcRfqfbMFArPIBSXdDtq/NrFFnQ5O8Vvs63Av/We0ysGk49KEKjEdWqr0vwqiBOMiWzE141uHvCCEpCpceZUNq0GU+ojj3tnWpgNlYFb21U5XR9jJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744139341; c=relaxed/simple;
-	bh=1BSh+ertBzbRxr0H6/ZbGlgcEjwV3UpBwzcy7GyoHJg=;
+	s=arc-20240116; t=1744139507; c=relaxed/simple;
+	bh=rvyNXRGr97O6fKSIuIw20r6W2J4nM2TGAOvyPpoll7I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JvBwwjrmWoT2njrSwVm5guDnwt8WVWIIeDp7HKFhkRSM1EfjJScxuUPQZBW21PEvp5B+NjR5H0Vzd5UKOnJ/CtCVsI49f6HHe0h1YH19l0DLdFdV6IDiMzHHfjYc5VyCXOvP+UCUu9geXvqJATybUjAnfBy2x/ZKUwxNyVcMEys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bdzK3TmE; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=k9yTtoxH/xWKG6IZlbraRRY+Xrel+M2msfAmxrJCSPU=; b=bdzK3TmE0IlSyEQdEgOrUaL7Ys
-	n5fZvxOtzOw8wDop7soIXjYwQ+oORRP7cHm8jESLnEEzirqlrUFPsoBWPkkS+PANTlOS9qdA76ARc
-	zt7dKCvUF+ttDpIzf2rPQqrHHqOGHTtc5f1mBviCNNTDL56QgrDaCnQgQmtE5YmUywIo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u2EJc-008ROo-5S; Tue, 08 Apr 2025 21:08:56 +0200
-Date: Tue, 8 Apr 2025 21:08:56 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Boon Khai Ng <boon.khai.ng@altera.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=KgqzT/niaowH5eXegV7DcSmW19TPhzh/yBQR0trpqfztkiALu/MXnbfjFs153D9KPcNDZZGw0QMwdZlKmeK2PguAmqV0SFjpJ5K3BV5eXbdP3+L6/eTDJMUyyXOZ3ih+4mwYC+M/lFFhp2ypd+N5BfmvAKXS0BdT2Pv/tIgZAzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gDhLcGrX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49255C4CEE5;
+	Tue,  8 Apr 2025 19:11:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744139504;
+	bh=rvyNXRGr97O6fKSIuIw20r6W2J4nM2TGAOvyPpoll7I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gDhLcGrXILPU77ehqJ+R362YMFadQGANx7aquJNjrMNTNBIx04AwIqYLB8J2xHq6D
+	 9ULK+7EmQStDFIylO5k1o8mI4zqFKq+xKd/bjsbB0md1WcrmeSTCMmkI4SCe0+1zrw
+	 /rOAQRujwewDTU9/kTSMMalQocoBboOY/Zx1ghVUvAKbc7YUoOghuF7cEA4viI9vtb
+	 lf/kRqkk2Crbr9mtOgqfQpKo55iOsiO56ovKjBpAWwhoZrnrhXegSrQRVKEwJi9NWj
+	 qb5C6kuRd79LS6/a5/5fEqhkeBQBy7/2Hg8ubfscWoCkO85d6oKpyzdLG1AQWdjBQ1
+	 l6rlC1rIjw3MQ==
+Date: Tue, 8 Apr 2025 22:11:38 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Allison Henderson <allison.henderson@oracle.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Matthew Gerlach <matthew.gerlach@altera.com>,
-	Tien Sung Ang <tien.sung.ang@altera.com>,
-	Mun Yew Tham <mun.yew.tham@altera.com>,
-	G Thomas Rohan <rohan.g.thomas@altera.com>
-Subject: Re: [PATCH net-next v3 2/2] net: stmmac: dwxgmac2: Add support for
- HW-accelerated VLAN stripping
-Message-ID: <c65bfe99-a6e1-4485-90ee-aee0b8e0984d@lunn.ch>
-References: <20250408081354.25881-1-boon.khai.ng@altera.com>
- <20250408081354.25881-3-boon.khai.ng@altera.com>
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	rds-devel@oss.oracle.com
+Subject: Re: [PATCH net-next] rds: rely on IB/core to determine if device is
+ ODP capable
+Message-ID: <20250408191138.GF199604@unreal>
+References: <bfc8ffb7ea207ed90c777a4f61a8afe1badef212.1744109826.git.leonro@nvidia.com>
+ <20250408122338.GA1778492@nvidia.com>
+ <20250408123413.GA199604@unreal>
+ <20250408123814.GC1778492@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,16 +65,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250408081354.25881-3-boon.khai.ng@altera.com>
+In-Reply-To: <20250408123814.GC1778492@nvidia.com>
 
-> +static u16 dwxgmac2_wrback_get_rx_vlan_tci(struct dma_desc *p)
-> +{
-> +	return (le32_to_cpu(p->des0) & XGMAC_RDES0_VLAN_TAG_MASK);
-> +}
+On Tue, Apr 08, 2025 at 09:38:14AM -0300, Jason Gunthorpe wrote:
+> On Tue, Apr 08, 2025 at 03:34:13PM +0300, Leon Romanovsky wrote:
+> > On Tue, Apr 08, 2025 at 09:23:38AM -0300, Jason Gunthorpe wrote:
+> > > On Tue, Apr 08, 2025 at 02:04:55PM +0300, Leon Romanovsky wrote:
+> > > > diff --git a/net/rds/ib.c b/net/rds/ib.c
+> > > > index 9826fe7f9d00..c62aa2ff4963 100644
+> > > > --- a/net/rds/ib.c
+> > > > +++ b/net/rds/ib.c
+> > > > @@ -153,14 +153,6 @@ static int rds_ib_add_one(struct ib_device *device)
+> > > >  	rds_ibdev->max_wrs = device->attrs.max_qp_wr;
+> > > >  	rds_ibdev->max_sge = min(device->attrs.max_send_sge, RDS_IB_MAX_SGE);
+> > > >  
+> > > > -	rds_ibdev->odp_capable =
+> > > > -		!!(device->attrs.kernel_cap_flags &
+> > > > -		   IBK_ON_DEMAND_PAGING) &&
+> > > > -		!!(device->attrs.odp_caps.per_transport_caps.rc_odp_caps &
+> > > > -		   IB_ODP_SUPPORT_WRITE) &&
+> > > > -		!!(device->attrs.odp_caps.per_transport_caps.rc_odp_caps &
+> > > > -		   IB_ODP_SUPPORT_READ);
+> > > 
+> > > This patch seems to drop the check for WRITE and READ support on the
+> > > ODP.
+> > 
+> > Right, and they are part of IBK_ON_DEMAND_PAGING support. All ODP
+> > providers support both IB_ODP_SUPPORT_WRITE and IB_ODP_SUPPORT_READ.
+> 
+> Where? mlx5 reads this from FW and I don't see anything blocking
+> IBK_ON_DEMAND_PAGING if the FW is weird.
 
-This appears to be identical to dwmac4_wrback_get_rx_vlan_tci() ?
+As the one who added it, I can assure you that we added these checks not
+because of weird FW, but because these caps existed.
 
-Can it be moved into the shared code, or am i missing something?
+RDS calls to ib_reg_user_mr() with the following access_flags.
 
-	Andrew
+  564                 int access_flags =
+  565                         (IB_ACCESS_LOCAL_WRITE | IB_ACCESS_REMOTE_READ |
+  566                          IB_ACCESS_REMOTE_WRITE | IB_ACCESS_REMOTE_ATOMIC |
+  567                          IB_ACCESS_ON_DEMAND);
+  <...>
+  575
+  576                 ib_mr = ib_reg_user_mr(rds_ibdev->pd, start, length, virt_addr,
+  577                                        access_flags);
+
+If for some reason ODP doesn't support WRITE and/or READ, ib_reg_user_mr() will return an error from FW,
+
+Thanks
+
+
+> 
+> Jason
 
