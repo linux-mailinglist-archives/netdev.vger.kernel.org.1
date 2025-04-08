@@ -1,94 +1,107 @@
-Return-Path: <netdev+bounces-180454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A42DDA815D4
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 21:33:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DA97A815EF
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 21:38:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC00D7A8449
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 19:31:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9906A448B95
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 19:38:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 472A4243958;
-	Tue,  8 Apr 2025 19:32:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D06A724501C;
+	Tue,  8 Apr 2025 19:37:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kpacp7lY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aVHLsyvO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180712405F5;
-	Tue,  8 Apr 2025 19:32:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC19245012
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 19:37:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744140754; cv=none; b=twEBVeLMNrcketxJEhT1UI5QDzTg9pPVNLakZIO6vXCorNHO1FJE3wtua5uE9+BGxQM69T+sLRBxH6G2imZeAvZUpVgtkR1mIoxtRp6x3Ccei14kNBSkfUz6ioXw/CtP2qEW4WbViEbqIIrbB50UkRLgBdmvQpPe4PArVsODSwI=
+	t=1744141078; cv=none; b=ebLze3KE1Kt04pte8j5fEvBjNF0QGY+gfc7kHiLciTIAEK861QBwkDSsMfjQIbgCcsqA9g0KZZYXJZHtzhGmsqscRiqJyiwR7A4vsQSueR6Gv1qLAjgu+iSGaaZu9Zo+qw8xjuhODfcZWB0Sbf52vlnRvsbs1XIuIDf8Cg3SHwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744140754; c=relaxed/simple;
-	bh=W2dDfp+6u530Uuogb1eaOEl6QW1bQx+CZ05zi1+pviA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eQu35ere/I5bIk7L9OgjztKdtL+iHajrIf7eJG7UgBG1vZuL3/JZAvzAi+qRmhhMXGB1CewVVh134ODjOboYrEEUJQyc3MXFtLRXc+fXLng4Qj3nM7E/RajIoICO/jdBazzVmsnuLl3GoSeLqLnukj/wR8IG5CscyitTEQbWfuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kpacp7lY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF541C4CEE8;
-	Tue,  8 Apr 2025 19:32:32 +0000 (UTC)
+	s=arc-20240116; t=1744141078; c=relaxed/simple;
+	bh=85wIl317j4jiqoJgOO4oESIHzu0abN/wXL9l0EY3Ies=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=edglH4qrbUs89bjLcg0qndo09esv14K6ihuIWdiath0Gwbt533AzoM9ECUcg2WObWtJOnOgOViNWcfzcgJkSTtJtq4zFNxl0Ys7o2QS5Cn9og2U8iHGZDkAkQqWhuSWhd4iIRqr9QOHHf23TCR+ys2/0a+qrkbNoQWMecH3SsgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aVHLsyvO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60554C4CEE5;
+	Tue,  8 Apr 2025 19:37:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744140753;
-	bh=W2dDfp+6u530Uuogb1eaOEl6QW1bQx+CZ05zi1+pviA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Kpacp7lYjuknjeAUWo5lS7cD5D5R+2q49I1ToQQmf3CwzY2vKGxLFvIl/+yMDjTND
-	 8z/bPR/98nlFDyN1yZUcQgYmuybBx4nVHL8XDlMtMNzVYgzxRIRMaVjImdkTzM37+L
-	 SmfNM2mC1lkqirTYweGVBb2sYCFaozT69SxJG/q6J7Tew2e5jc9xxUDJ5psd+akeHH
-	 pOZ3YS//QOzJveCqT9R1ZkBg+drHdvnvOvi4re2ewjDrV8Ko/0DJlG7p/yRxzahwXQ
-	 nfJFLIORTZjE+OTzvN8e24ILmdssYNetW2JarrgM5ZJNKk1FuE8lLHbA/ga07uFNZh
-	 7SVSbMgh7g4Fg==
-Message-ID: <fcf2d508-d44e-43c3-b381-8f33fec11859@kernel.org>
-Date: Tue, 8 Apr 2025 13:32:32 -0600
+	s=k20201202; t=1744141077;
+	bh=85wIl317j4jiqoJgOO4oESIHzu0abN/wXL9l0EY3Ies=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aVHLsyvOWP+kNWbam7Tzo8XFBXpS13rzOknrm9cfpuvzhC+LIv/jiBJJCBvHhMHJV
+	 qkeRQSgZYZIx5ci0Cpz93Qet9TDxTvkxuXp4axZajQeQIsf3skDOvNPpPpZOhOL48I
+	 6BlL/FfpNgXaqM4tRvtCmJf4k7HqKBNM8jnZzNy6Ci4oJkZpH1h0+VFOw6Pp4w53Rm
+	 R2yVW4TX03ZXeYfhUcQtuR8TQVpXZxrMC2CkPxiqRPMS+Iiz9wURzXqpB/WtbpLYom
+	 ZeBd3NnBzmEsHDOtEYxnoiYUCEPr9bqSpZOgrufWVzE1vUbv4nbtPwW49rZXTmGD6q
+	 TY535/rH79KRg==
+Date: Tue, 8 Apr 2025 12:37:55 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jon Hunter <jonathanh@nvidia.com>,
+ linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, Paolo Abeni
+ <pabeni@redhat.com>, Prabhakar <prabhakar.csengg@gmail.com>, Thierry Reding
+ <treding@nvidia.com>
+Subject: Re: [PATCH net-next 2/2] net: stmmac: dwc-qos: use
+ stmmac_pltfr_find_clk()
+Message-ID: <20250408123755.1077e29b@kernel.org>
+In-Reply-To: <E1u1rMv-0013ON-TJ@rmk-PC.armlinux.org.uk>
+References: <Z_Qbw0tZ2ktgBf7c@shell.armlinux.org.uk>
+	<E1u1rMv-0013ON-TJ@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 2/2] trace: tcp: Add tracepoint for
- tcp_sendmsg_locked()
-Content-Language: en-US
-To: Breno Leitao <leitao@debian.org>, Eric Dumazet <edumazet@google.com>,
- Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, kernel-team@meta.com
-References: <20250408-tcpsendmsg-v3-0-208b87064c28@debian.org>
- <20250408-tcpsendmsg-v3-2-208b87064c28@debian.org>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20250408-tcpsendmsg-v3-2-208b87064c28@debian.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 4/8/25 12:32 PM, Breno Leitao wrote:
-> Add a tracepoint to monitor TCP send operations, enabling detailed
-> visibility into TCP message transmission.
-> 
-> Create a new tracepoint within the tcp_sendmsg_locked function,
-> capturing traditional fields along with size_goal, which indicates the
-> optimal data size for a single TCP segment. Additionally, a reference to
-> the struct sock sk is passed, allowing direct access for BPF programs.
-> The implementation is largely based on David's patch[1] and suggestions.
-> 
-> Link: https://lore.kernel.org/all/70168c8f-bf52-4279-b4c4-be64527aa1ac@kernel.org/ [1]
-> Signed-off-by: Breno Leitao <leitao@debian.org>
+On Mon, 07 Apr 2025 19:38:49 +0100 Russell King (Oracle) wrote:
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 > ---
->  include/trace/events/tcp.h | 24 ++++++++++++++++++++++++
->  kernel/bpf/btf.c           |  1 +
->  net/ipv4/tcp.c             |  2 ++
->  3 files changed, 27 insertions(+)
+>  .../ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c    | 14 ++------------
+>  1 file changed, 2 insertions(+), 12 deletions(-)
 > 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+> index cd431f84f34f..f5c68e3b4354 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+> @@ -34,16 +34,6 @@ struct tegra_eqos {
+>  	struct gpio_desc *reset;
+>  };
+>  
+> -static struct clk *dwc_eth_find_clk(struct plat_stmmacenet_data *plat_dat,
+> -				    const char *name)
+> -{
+> -	for (int i = 0; i < plat_dat->num_clks; i++)
+> -		if (strcmp(plat_dat->clks[i].id, name) == 0)
+> -			return plat_dat->clks[i].clk;
+> -
+> -	return NULL;
+> -}
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+Missed one user?
 
-
+drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c:355:25: error: call to undeclared function 'dwc_eth_find_clk'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+  355 |         plat_dat->stmmac_clk = dwc_eth_find_clk(plat_dat,
+      |                                ^
+drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c:355:23: error: incompatible integer to pointer conversion assigning to 'struct clk *' from 'int' [-Wint-conversion]
+  355 |         plat_dat->stmmac_clk = dwc_eth_find_clk(plat_dat,
+      |                              ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~
+  356 |                                                 data->stmmac_clk_name);
+      |                                                 ~~~~~~~~~~~~~~~~~~~~~~
+-- 
+pw-bot: cr
 
