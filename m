@@ -1,121 +1,121 @@
-Return-Path: <netdev+bounces-180012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A4DBA7F196
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 02:17:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56361A7F19D
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 02:28:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5398188EBFB
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 00:17:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 829EC188E2F5
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 00:28:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F36D812E7F;
-	Tue,  8 Apr 2025 00:17:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FED6A921;
+	Tue,  8 Apr 2025 00:28:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="kUmsmc4I"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KgchPq7V"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52C7CD2FB;
-	Tue,  8 Apr 2025 00:17:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F75A11CAF
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 00:28:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744071428; cv=none; b=eNLS/3oKs3lMTrPsutXT3m8HByrK9plR9do+0qQpwY1Pw0K6uJTaPv52TWBkDlWGUgmMqOb6ruKQ+BFAfrsiahHOgcAeLudhNBFLwa9HC7BlGrcPVgsB7Hekx35ob2l3ZAVnpahrA2nU1BVoZVBq+PsLKHcCJ34hrDOY3quyu7o=
+	t=1744072110; cv=none; b=bGzBacrzKAcS4jKZTE/hGJ6DxOjJeI8Sx7RIUz2hLzeMtues+kAHJHCy3WD+Iyy97LBy7d1b/hrv8oggl6i2HM+AarRWGfKgOLJtnVvnhfqTTHYZQOX2ry9o5EeciF45HBTH+e0lHvS1+ArWIkK6/Q5pIx3EpHBqq6QNsQTrOpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744071428; c=relaxed/simple;
-	bh=z1sI6zqI2KbmUuNZWR9OauLNqva1J0bVTTZtuwY6uO0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b8OJBfwISDViSOfqaxWx0K/jrI/ywpZCRtkcYFfddzYThIJOB/sb9zhygAL2iS3cXwM65Bhi1NcygORf8Q2jXBNXxNW0ZwmGcPMW8kIKUEqTYjaPLt2p18qAcjHzs8UV9pfTjsndj6h/O+BJjxY2hOn+kgNdj2GlBbfazotD+xI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=kUmsmc4I; arc=none smtp.client-ip=207.171.188.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1744072110; c=relaxed/simple;
+	bh=3/7UROoXHvSlBxrxM9Ivnb+77yLwJSyShgcH/6HYkC0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ei7qXf60uGbolmsOeLj2gPkGLtmovzT1XSEVzY1ucJeOvuF5sPp6bdFQnRsjeiTfLOh9HHJGVtFbuwbv9ZzVzXNxqn8qnCjvl71sATyjaDaPh1p7g5XaC0VEIZl8G587gMSOsOpO1mRaZKjMUMzeocIMa/onKmz9Bs6Hmqm1nXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KgchPq7V; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-736b34a71a1so5860666b3a.0
+        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 17:28:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1744071427; x=1775607427;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=8yOCsx+nkQGqiyaA8CKVjQ4hpZeCm+ILtzKq52dhCgE=;
-  b=kUmsmc4IgiFwHOlxD6Lxujd+JK/V/QIeWkwyo7cL5quJcB5Y2zD3m5wM
-   ulq8b+eCGQnlxqLhf+abOxbcgIRIw0q79x6AQmcU5dsSeuUcdBX3d3nsd
-   TYlou+uFvmWalgZjL5+YdZ68h8Uf2OO8YnS9bZ3V5iNuuQR6ZoXC5g29O
-   0=;
-X-IronPort-AV: E=Sophos;i="6.15,196,1739836800"; 
-   d="scan'208";a="814162670"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2025 00:17:02 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:41354]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.25.120:2525] with esmtp (Farcaster)
- id 1a6f8aa9-6343-4351-ae86-e3271abdc5f1; Tue, 8 Apr 2025 00:17:01 +0000 (UTC)
-X-Farcaster-Flow-ID: 1a6f8aa9-6343-4351-ae86-e3271abdc5f1
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 8 Apr 2025 00:17:01 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.101.45) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 8 Apr 2025 00:16:58 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <jordan@jrife.io>
-CC: <aditi.ghag@isovalent.com>, <bpf@vger.kernel.org>, <daniel@iogearbox.net>,
-	<kuniyu@amazon.com>, <martin.lau@linux.dev>, <netdev@vger.kernel.org>,
-	<willemdebruijn.kernel@gmail.com>
-Subject: Re: [RFC PATCH bpf-next 2/3] bpf: udp: Avoid socket skips and repeats during iteration
-Date: Mon, 7 Apr 2025 17:16:25 -0700
-Message-ID: <20250408001649.5560-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <CABi4-ogLNdQw=gLTRZ4aJ8qiQWiovHaO19sx5uz29Es6du8GKg@mail.gmail.com>
-References: <CABi4-ogLNdQw=gLTRZ4aJ8qiQWiovHaO19sx5uz29Es6du8GKg@mail.gmail.com>
+        d=gmail.com; s=20230601; t=1744072108; x=1744676908; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9rlsn+eAE3yMOuwazA3cH7gPvs+v8B4DVWfJux5HRuM=;
+        b=KgchPq7VyeCSzzHifQtTzgQv07ZHVAx0vhX4fus6dG/erOuWIicSSmp2rI+pFRzSqE
+         8Kkakbl3jW8yGPLtItXDQB4wQpV2I/CMxPeyf1JUA1KBSiMY0eNQOso6wNGQxkZsbuyl
+         hsxZRBA8/qQAFjkQNNOshrq73xnPvE4rszuQhSygczo/E4o6WquJ9Fy+EQ/t6q5/4fLL
+         9rh9I7G39o/B/PwS+IuBybbMJIH24AD1jjLRN8wSpmF838iBsh5vomlPrTCUwjLSEMNB
+         tJ9WoPiuDpdBWiysOI0Fh5agDwJtVcki6uDQ9Z4ZyB6LlPQRNWAKrDX3OsDlv02uZU1K
+         VDng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744072108; x=1744676908;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9rlsn+eAE3yMOuwazA3cH7gPvs+v8B4DVWfJux5HRuM=;
+        b=nFjFiDcsop4FMy9SDm2QGUjHvUppxAg5TADHhTa4DQ+CRPu1kBUuqOxC/Z8oNGCaNY
+         45cTFKyuYy1D9pgzMY1gmIEEIz1ULQsg6+kRi5etgjMQoK0ldocAKcWp96W8uh8FsBnS
+         9rWGdfQXJF7ltMtRjJsdp+sRJ8AnSgfxHxrqpcxqTEO5nmHuanNpkjuW1n80bZlXAAFk
+         mHJLceth87rbJANfHq3BplEPHCC7skc4J0LtcLhpuv3aIeMTqfTLljchyWYNli9EgpFh
+         P8ZEGcH7nmIZ0pqP44ysrdI8s6f6+eUfoUU75A6eULDc4hLgSEIxcHfLbn4pL4WfhHII
+         5CuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUNM9txpen4pfkMePeyVh8sbjiY8j3xlCeKaTL3QU+EUFSUnIdTH5Rvw2fSecYcdlnS/Q2X/WQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkwaULk+sE9/8iXDy9kLEr9Tw1zghQMnIEtPlukUWbmJ5vySDz
+	PsHdaWO+IxV2OvQy5K9yJea3rIrAZ1lvFIKzEvuw94ZMqhiuzDY=
+X-Gm-Gg: ASbGnct25G06v9syOF9oRJy6Hhl+TM+1Yam4EKSPiL489HNAi/2RuYQTu2DddzaovCv
+	txIAMdPAOQQ6PmyQ54N1tMlFJIVjoY2BczmDcejjxihfOSS2GcvvWtAJDmm+KUx0MK9SwWfu2je
+	Egbw7zfqchtA4qMcqvf73s/sPS59MWRRGU1/Z3S4CwReLVeNBlPyHLmtqT9lc1TKRvKWYBSChLJ
+	yzLTMPWUs+jNz5q2vKjm9KseSd/g4giLaODn79aGSzlVQzJQkJJIsG7aMBjpQUMSjl/59gYiq/2
+	ZoYI5HBKblipDqHnbyJ7Nnl3sFHS1cfAM8fIxENjA2F86NcI7rcuqeE=
+X-Google-Smtp-Source: AGHT+IHH0Pw7qoUmOi4hYB4OVTLlt+vqNW3Io/gkKx0rPVpqyi0ADEJFhgFFAe0r+GvlZB+sC//BXQ==
+X-Received: by 2002:a05:6a21:4603:b0:1f5:5b2a:f629 with SMTP id adf61e73a8af0-20104734ccdmr23656227637.30.1744072107539;
+        Mon, 07 Apr 2025 17:28:27 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-af9bc2cfbc9sm7942448a12.9.2025.04.07.17.28.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Apr 2025 17:28:27 -0700 (PDT)
+Date: Mon, 7 Apr 2025 17:28:26 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	sdf@fomichev.me, hramamurthy@google.com, kuniyu@amazon.com,
+	jdamato@fastly.com
+Subject: Re: [PATCH net-next 0/8] net: depend on instance lock for queue
+ related netlink ops
+Message-ID: <Z_RtqpNCsBzwlB8J@mini-arch>
+References: <20250407190117.16528-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWA003.ant.amazon.com (10.13.139.44) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250407190117.16528-1-kuba@kernel.org>
 
-From: Jordan Rife <jordan@jrife.io>
-Date: Mon, 7 Apr 2025 16:30:46 -0700
-> > We may need to iterate all visited sockets again in this bucket if all
-> > unvisited sockets disappear from the previous iteration.
+On 04/07, Jakub Kicinski wrote:
+> netdev-genl used to be protected by rtnl_lock. In previous release
+> we already switched the queue management ops (for Rx zero-copy) to
+> the instance lock. This series converts other ops to depend on the
+> instance lock when possible.
 > 
-> If the next socket disappears between iterator stop and start, the
-> outer loop would need to keep going until it finds a socket from last
-> time that still exists. In most cases, it seems unlikely that the next
-> socket will disappear between iterator reads, so in general the outer
-> loop would only need to iterate once; the common case should perform
-> the same as before with the offset approach. The worst case indeed
-> would be if all the sockets disappear between reads. Then you'd have
-> to scan through all items in the bucket n_cookies times. Again though,
-> this is hopefully a rare case.
+> Unfortunately queue related state is hard to lock (unlike NAPI)
+> as the process of switching the number of queues usually involves
+> a large reconfiguration of the driver. The reconfig process has
+> historically been under rtnl_lock, but for drivers which opt into
+> ops locking it is also under the instance lock. Leverage that
+> and conditionally take rtnl_lock or instance lock depending
+> on the device capabilities.
 > 
-> > When the number of the unvisited sockets is small like 1, the duplicated
-> > records will not be rare and rather more often than before ?
-> 
-> Sorry if I'm missing something, but what's the relationship between
-> the number of unvisited sockets and rarity of duplicated records?
+> Jakub Kicinski (8):
+>   net: avoid potential race between netdev_get_by_index_lock() and netns
+>     switch
+>   net: designate XSK pool pointers in queues as "ops protected"
+>   netdev: add "ops compat locking" helpers
+>   netdev: don't hold rtnl_lock over nl queue info get when possible
+>   xdp: double protect netdev->xdp_flags with netdev->lock
+>   netdev: depend on netdev->lock for xdp features
+>   docs: netdev: break down the instance locking info per ops struct
+>   netdev: depend on netdev->lock for qstats in ops locked drivers
 
-Sorry, I misread the code, and s/duplicated/skipped/.
-
-I was thinking that rarity of such unwanted events depends on how
-many unvisited sockets are left before restarting.
-
-Let's say batch has 16 sockets and the iterator stopped at 15,
-it's more likely that a single socket disappear.
-
-This should be fine given the batch size normally covers the full
-bucket of the hash, and it's unlikely that many sockets are added
-in the bucket between stop and restart.
-
-In the worst case, where vmalloc() fails and the batch does not
-cover full bucket, say the batch size is 16 but the list length
-is 256, if the iterator stops at sk15 and sk16 disappers,
-sk17 ~ sk256 will be skipped in the next iteration.
-
- sk1 -> ... sk15 -> sk16 -> sk17 -> ... -> sk256
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
