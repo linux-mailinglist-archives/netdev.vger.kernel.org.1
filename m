@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-180471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 755BFA81647
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 22:08:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA33DA81665
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 22:10:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C82B4C32D4
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 20:08:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20D8D3A9DDC
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 20:07:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92B952417D4;
-	Tue,  8 Apr 2025 20:08:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0E27246335;
+	Tue,  8 Apr 2025 20:08:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JYm7jurA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DqU0Me33"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DAF823ED56
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 20:08:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACFBA245012
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 20:08:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744142880; cv=none; b=gYqn31VrqNXBF75UzYG3ezZiQJoMfgsdcqfnZAmKCu77OG7UUZ/1m1piVXz2pL3k9fNz9deSRMlCyvNmS6iUjYRtUQHywPOgz/YkMx0909wk5BsynRwaD0vWo92vuKuIRoHUCPdsQhXjwFuLBjBLUovCl0n36yjx82BuCfHqkT4=
+	t=1744142881; cv=none; b=Qb9OTN3Og0E/eB/BKGFJdI9+HQLRXToDGof7mVcDMn6L2OGld+fOCIzC7aDH3Bq0/tlxr/sNu+PtEYd4w1obac+MEvW9esJOD/O8YnPIhak9CF4HLoGPzGoPV1dYAU4iJAbBKBu4UCEJfYQjhu/qaIOeghJpSrRORP2BrhgPcvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744142880; c=relaxed/simple;
-	bh=BqjZhChsfu3nhDBN/EGusiViXUFVIAwCvDCBN0FMt3M=;
+	s=arc-20240116; t=1744142881; c=relaxed/simple;
+	bh=SxlXicYG9Todb1aDurDgFSUvWnxkDG0WTyH6LH3gEHo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ss0OGeY59zhMGMIzpXUKIPKVuPyggOE2dm57O6Vq+zMxdz3NK5mwIhUbzXnMOiP1ugw5wHxlkjXYOoF8I6+0+7njNrAdp000rlXEmQotyii7YeWnv2BHP2Ca25KXSYkJFa4sV0PdxKNkl5UMLNGBkgolcObjc3g7jAxfzHrOOH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JYm7jurA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6951C4CEE5;
-	Tue,  8 Apr 2025 20:07:59 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=TGFiM3WY37838WKtybJuOa3BMUDeNumKY8rJEOvVBPGfMpUAUIgo/zoS28ApAsfgdapowivmSTXnm4cyLXwZNRrqOf9CkYBOOvWZpDDwKBe7uYFabCn6q2qGGi545EeomcMeLHUl/pcYP9Zd37P9BcasPFy38A6FLlXwQIY1IA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DqU0Me33; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C2EBC4CEEA;
+	Tue,  8 Apr 2025 20:08:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744142879;
-	bh=BqjZhChsfu3nhDBN/EGusiViXUFVIAwCvDCBN0FMt3M=;
+	s=k20201202; t=1744142881;
+	bh=SxlXicYG9Todb1aDurDgFSUvWnxkDG0WTyH6LH3gEHo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JYm7jurALzrUfAKstswiqh1pLs5LnN1GJlMQUj/+5ivpetibbeRv5HyF5IoTFp8On
-	 O8KcWU6D2YNimBOghPS+r5EEMwR3rP7XayRuCjEdyMxhfQ2vv/LBCNpXhAWray2IVo
-	 eW0vVe8hPPm/3rqgUaZW9Hne7uQKVlFt7gxkiVRjKSMUFK2lrUWPljgOs7U99usu1h
-	 k/7r/lC70yYhCuorgW0Sg8ShMFJ+HH8TE3DLoec9CvnfxQad51TxA8LoBaDycdOIbQ
-	 OXueAoYUcs1AgurkpbbhRGQN4IKsmebwtGxEH8dxJUEmMGhWK1cAZ5eCKOdKECO4Xd
-	 9Hn2EhvTidNTg==
+	b=DqU0Me33Z85MWShq0P5AAeW5/9VMj7XluRXZJLis8vDGxR2yy66JHHFx99lP1utkF
+	 pg+jt3TpdPE0rGc/c4GLtEYVw9+8/3xz4fc9wHtOwOA7OrPfBUH3O0vguPQ/5W86oo
+	 ab1MnFId6jxUNH8doc3Oky68YM8+75iljzMoa4QQ7b0EN8AL+rhhETqPAvaMBHlbjv
+	 gsVHkQtx7tldhhOIp1Io3dyuf5+ws3anTzYyax7cILPctcLFIh6ymjOss8US3u5XrS
+	 Uzo1DgziFU5O3IW8wzpuGDhCEwt5lDrCKzj4tZxbD/nBNu757zsaZENC0vFyO1JncG
+	 2gouKZHKOdmBQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 716C238111D4;
-	Tue,  8 Apr 2025 20:08:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCED38111D4;
+	Tue,  8 Apr 2025 20:08:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,45 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/4] rps: misc changes
+Subject: Re: [PATCH v1 net-next] net: ena: Support persistent per-NAPI config.
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174414291729.2113367.8617608333010956990.git-patchwork-notify@kernel.org>
-Date: Tue, 08 Apr 2025 20:08:37 +0000
-References: <20250407163602.170356-1-edumazet@google.com>
-In-Reply-To: <20250407163602.170356-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- willemb@google.com, netdev@vger.kernel.org, eric.dumazet@gmail.com
+ <174414291850.2113367.11961686627141164174.git-patchwork-notify@kernel.org>
+Date: Tue, 08 Apr 2025 20:08:38 +0000
+References: <20250407164802.25184-1-kuniyu@amazon.com>
+In-Reply-To: <20250407164802.25184-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: shayagr@amazon.com, akiyano@amazon.com, darinzon@amazon.com,
+ saeedb@amazon.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, jdamato@fastly.com,
+ kuni1840@gmail.com, netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  7 Apr 2025 16:35:58 +0000 you wrote:
-> Minor changes in rps:
+On Mon, 7 Apr 2025 09:47:59 -0700 you wrote:
+> Let's pass the queue index to netif_napi_add_config() to preserve
+> per-NAPI config.
 > 
-> skb_flow_limit() is probably unused these days,
-> and data-races are quite theoretical.
+> Test:
 > 
-> Eric Dumazet (4):
->   net: rps: change skb_flow_limit() hash function
->   net: rps: annotate data-races around (struct sd_flow_limit)->count
->   net: add data-race annotations in softnet_seq_show()
->   net: rps: remove kfree_rcu_mightsleep() use
+> Set 100 to defer-hard-irqs (default is 0) and check the value after
+> link down & up.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/4] net: rps: change skb_flow_limit() hash function
-    https://git.kernel.org/netdev/net-next/c/c3025e94daa9
-  - [net-next,2/4] net: rps: annotate data-races around (struct sd_flow_limit)->count
-    https://git.kernel.org/netdev/net-next/c/7b6f0a852da3
-  - [net-next,3/4] net: add data-race annotations in softnet_seq_show()
-    https://git.kernel.org/netdev/net-next/c/22d046a778e4
-  - [net-next,4/4] net: rps: remove kfree_rcu_mightsleep() use
-    https://git.kernel.org/netdev/net-next/c/0a7de4a8f898
+  - [v1,net-next] net: ena: Support persistent per-NAPI config.
+    https://git.kernel.org/netdev/net-next/c/0f681b0ecd19
 
 You are awesome, thank you!
 -- 
