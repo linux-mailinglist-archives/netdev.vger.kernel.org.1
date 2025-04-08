@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-180143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56EB3A7FBA6
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 12:24:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A20C6A7FBA0
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 12:23:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 597123B81DA
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 10:18:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DC7116A15D
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 10:19:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76838267F50;
-	Tue,  8 Apr 2025 10:14:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 584732690F9;
+	Tue,  8 Apr 2025 10:15:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out28-75.mail.aliyun.com (out28-75.mail.aliyun.com [115.124.28.75])
+Received: from out198-19.us.a.mail.aliyun.com (out198-19.us.a.mail.aliyun.com [47.90.198.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB5C21CC47;
-	Tue,  8 Apr 2025 10:14:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.75
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132612206A2;
+	Tue,  8 Apr 2025 10:15:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=47.90.198.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744107299; cv=none; b=UKEuj786yTJSGP8Hnovv0hkSu0qQy8xNl++JxpPQFzy6eiNp4sOTW//ooH7nYiU/vaJRsX/fufu/IEBbJ3v1qfYZ0bdDzi0XBK4ZycYnE6JbHzvW1vjfb0LPl/cOE8w0AutYiDg3siRxOcMfWD+TkPM81UtfjOJ5GcXLVTtRmWU=
+	t=1744107315; cv=none; b=fSKtJAgJWRLADu/r2McmK624HAMkAaDDzMyp98Ghfyy5knVxlk3spai8/127qsganiRDQsC5opZFbuuaVy+huoeJNfM9SxtuBp95aQhmltqNjbcr5k5IBiFbFhRWm+0p+Ad+CYf0MiG2pwLCqGlpYtUKXVzecgwhY6iCOOCJkrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744107299; c=relaxed/simple;
-	bh=P7T4ZS6gVIt4G/2/Gq0ooJo/xZsFVEteiW7ps3Pm91Y=;
+	s=arc-20240116; t=1744107315; c=relaxed/simple;
+	bh=JOc5cF/LE5O0N/L4ofDr9oKgMYF6k98K+qRFZh0jV88=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tSPOQso88CKsH0pEzmt8fTj/2h95j90nmAVRch9qfkpHuAjLdiuXzkrV1Xy2hSzsP0dw7lotcBZkuxk60Tfflf5Pr1g/YwvRUl+GQzFnPIoLmPmbM93sK/Xj1gz1+AAQDAOiolmm2DDud6jCTFJ82R6UT6KAc0mK3i3hCBaZgGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=115.124.28.75
+	 MIME-Version; b=T6mYhzpZ+trn770DHmmsTdk0nQ5UOtycVlfdf0VcO+fTVazeRDSphok2TOHPvYxSxvCjJBns0WfbaK3dtmz/fXgCgflMiAnqV25GZFp4kDw5zFAxcv11gOhW6PSQp7Jno3f1DgHvSo8EE2t3ofqxNkcXKa+aQpXFkVyqtX+UulE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=47.90.198.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=motor-comm.com
-Received: from sun-VirtualBox..(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.cGww7Ru_1744104537 cluster:ay29)
+Received: from sun-VirtualBox..(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.cGww7TQ_1744104538 cluster:ay29)
           by smtp.aliyun-inc.com;
-          Tue, 08 Apr 2025 17:28:58 +0800
+          Tue, 08 Apr 2025 17:28:59 +0800
 From: Frank Sae <Frank.Sae@motor-comm.com>
 To: Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
@@ -54,9 +54,9 @@ Cc: Masahiro Yamada <masahiroy@kernel.org>,
 	xiaogang.fan@motor-comm.com,
 	fei.zhang@motor-comm.com,
 	hua.sun@motor-comm.com
-Subject: [PATCH net-next v4 09/14] yt6801: Implement the poll functions
-Date: Tue, 08 Apr 2025 18:14:52 +0800
-Message-Id: <20250408092835.3952-10-Frank.Sae@motor-comm.com>
+Subject: [PATCH net-next v4 10/14] yt6801: Implement .ndo_start_xmit function
+Date: Tue, 08 Apr 2025 18:14:57 +0800
+Message-Id: <20250408092835.3952-11-Frank.Sae@motor-comm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250408092835.3952-1-Frank.Sae@motor-comm.com>
 References: <20250408092835.3952-1-Frank.Sae@motor-comm.com>
@@ -68,901 +68,415 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement the fxgmac_request_irqs to request legacy or msix irqs, msix
-  irqs.
-Implement the fxgmac_create_skb to  create skb for rx.
-Implement the fxgmac_isr function to handle legacy irq.
-Implement the fxgmac_dma_isr function to handle tx and rx irq.
-Implement the fxgmac_all_poll for legacy irq.
-Implement the fxgmac_one_poll_rx and fxgmac_one_poll_tx for msix irq.
-Implement the fxgmac_tx_poll and fxgmac_rx_poll to handle tx and rx.
+Implement .ndo_start_xmit function to prepare preliminary packet info for
+ TX, prepare tso and vlan, then map tx skb, at last it call dev_xmit
+ function to send data.
 
 Signed-off-by: Frank Sae <Frank.Sae@motor-comm.com>
 ---
- .../ethernet/motorcomm/yt6801/yt6801_desc.c   | 296 +++++++++++++
- .../ethernet/motorcomm/yt6801/yt6801_desc.h   |  14 +
- .../ethernet/motorcomm/yt6801/yt6801_main.c   | 398 ++++++++++++++++++
- .../ethernet/motorcomm/yt6801/yt6801_type.h   |  94 +++++
- 4 files changed, 802 insertions(+)
+ .../ethernet/motorcomm/yt6801/yt6801_main.c   | 366 ++++++++++++++++++
+ 1 file changed, 366 insertions(+)
 
-diff --git a/drivers/net/ethernet/motorcomm/yt6801/yt6801_desc.c b/drivers/net/ethernet/motorcomm/yt6801/yt6801_desc.c
-index 0891c4fef..39394f8a9 100644
---- a/drivers/net/ethernet/motorcomm/yt6801/yt6801_desc.c
-+++ b/drivers/net/ethernet/motorcomm/yt6801/yt6801_desc.c
-@@ -267,3 +267,299 @@ int fxgmac_channels_rings_alloc(struct fxgmac_pdata *priv)
- 	fxgmac_channels_rings_free(priv);
- 	return ret;
- }
-+
-+static void fxgmac_set_buffer_data(struct fxgmac_buffer_data *bd,
-+				   struct fxgmac_page_alloc *pa,
-+				   unsigned int len)
-+{
-+	get_page(pa->pages);
-+	bd->pa = *pa;
-+
-+	bd->dma_base = pa->pages_dma;
-+	bd->dma_off = pa->pages_offset;
-+	bd->dma_len = len;
-+
-+	pa->pages_offset += len;
-+	if ((pa->pages_offset + len) > pa->pages_len) {
-+		/* This data descriptor is responsible for unmapping page(s) */
-+		bd->pa_unmap = *pa;
-+
-+		/* Get a new allocation next time */
-+		pa->pages = NULL;
-+		pa->pages_len = 0;
-+		pa->pages_offset = 0;
-+		pa->pages_dma = 0;
-+	}
-+}
-+
-+static int fxgmac_alloc_pages(struct fxgmac_pdata *priv,
-+			      struct fxgmac_page_alloc *pa, gfp_t gfp,
-+			      int order)
-+{
-+	struct page *pages = NULL;
-+	dma_addr_t pages_dma;
-+
-+	/* Try to obtain pages, decreasing order if necessary */
-+	gfp |= __GFP_COMP | __GFP_NOWARN;
-+	while (order >= 0) {
-+		pages = alloc_pages(gfp, order);
-+		if (pages)
-+			break;
-+
-+		order--;
-+	}
-+
-+	if (!pages)
-+		return -ENOMEM;
-+
-+	/* Map the pages */
-+	pages_dma = dma_map_page(priv->dev, pages, 0, PAGE_SIZE << order,
-+				 DMA_FROM_DEVICE);
-+	if (dma_mapping_error(priv->dev, pages_dma)) {
-+		put_page(pages);
-+		return -ENOMEM;
-+	}
-+
-+	pa->pages = pages;
-+	pa->pages_len = PAGE_SIZE << order;
-+	pa->pages_offset = 0;
-+	pa->pages_dma = pages_dma;
-+
-+	return 0;
-+}
-+
-+#define FXGMAC_SKB_ALLOC_SIZE 512
-+
-+int fxgmac_rx_buffe_map(struct fxgmac_pdata *priv, struct fxgmac_ring *ring,
-+			struct fxgmac_desc_data *desc_data)
-+{
-+	int ret;
-+
-+	if (!ring->rx_hdr_pa.pages) {
-+		ret = fxgmac_alloc_pages(priv, &ring->rx_hdr_pa, GFP_ATOMIC, 0);
-+		if (ret)
-+			return ret;
-+	}
-+	/* Set up the header page info */
-+	fxgmac_set_buffer_data(&desc_data->rx.hdr, &ring->rx_hdr_pa,
-+			       priv->rx_buf_size);
-+
-+	return 0;
-+}
-+
-+void fxgmac_desc_tx_reset(struct fxgmac_desc_data *desc_data)
-+{
-+	struct fxgmac_dma_desc *dma_desc = desc_data->dma_desc;
-+
-+	/* Reset the Tx descriptor
-+	 * Set buffer 1 (lo) address to zero
-+	 * Set buffer 1 (hi) address to zero
-+	 * Reset all other control bits (IC, TTSE, B2L & B1L)
-+	 * Reset all other control bits (OWN, CTXT, FD, LD, CPC, CIC, etc)
-+	 */
-+	dma_desc->desc0 = 0;
-+	dma_desc->desc1 = 0;
-+	dma_desc->desc2 = 0;
-+	dma_desc->desc3 = 0;
-+
-+	/* Make sure ownership is written to the descriptor */
-+	dma_wmb();
-+}
-+
-+void fxgmac_desc_rx_reset(struct fxgmac_desc_data *desc_data)
-+{
-+	struct fxgmac_dma_desc *dma_desc = desc_data->dma_desc;
-+	dma_addr_t hdr_dma;
-+
-+	/* Reset the Rx descriptor
-+	 * Set buffer 1 (lo) address to header dma address (lo)
-+	 * Set buffer 1 (hi) address to header dma address (hi)
-+	 * set control bits OWN and INTE
-+	 */
-+	hdr_dma = desc_data->rx.hdr.dma_base + desc_data->rx.hdr.dma_off;
-+	dma_desc->desc0 = cpu_to_le32(lower_32_bits(hdr_dma));
-+	dma_desc->desc1 = cpu_to_le32(upper_32_bits(hdr_dma));
-+	dma_desc->desc2 = 0;
-+	dma_desc->desc3 = 0;
-+	fxgmac_desc_wr_bits(&dma_desc->desc3, RX_DESC3_INTE, 1);
-+	fxgmac_desc_wr_bits(&dma_desc->desc3, RX_DESC3_BUF2V, 0);
-+	fxgmac_desc_wr_bits(&dma_desc->desc3, RX_DESC3_BUF1V, 1);
-+
-+	/* Since the Rx DMA engine is likely running, make sure everything
-+	 * is written to the descriptor(s) before setting the OWN bit
-+	 * for the descriptor
-+	 */
-+	dma_wmb();
-+
-+	fxgmac_desc_wr_bits(&dma_desc->desc3, RX_DESC3_OWN, 1);
-+
-+	/* Make sure ownership is written to the descriptor */
-+	dma_wmb();
-+}
-+
-+int fxgmac_tx_skb_map(struct fxgmac_channel *channel, struct sk_buff *skb)
-+{
-+	struct fxgmac_pdata *priv = channel->priv;
-+	struct fxgmac_ring *ring = channel->tx_ring;
-+	unsigned int start_index, cur_index;
-+	struct fxgmac_desc_data *desc_data;
-+	unsigned int offset, datalen, len;
-+	struct fxgmac_pkt_info *pkt_info;
-+	unsigned int tso, vlan;
-+	dma_addr_t skb_dma;
-+	skb_frag_t *frag;
-+
-+	offset = 0;
-+	start_index = ring->cur;
-+	cur_index = ring->cur;
-+	pkt_info = &ring->pkt_info;
-+	pkt_info->desc_count = 0;
-+	pkt_info->length = 0;
-+
-+	tso = FIELD_GET(ATTR_TX_TSO_ENABLE, pkt_info->attr);
-+	vlan = FIELD_GET(ATTR_TX_VLAN_CTAG, pkt_info->attr);
-+
-+	/* Save space for a context descriptor if needed */
-+	if ((tso && pkt_info->mss != ring->tx.cur_mss) ||
-+	    (vlan && pkt_info->vlan_ctag != ring->tx.cur_vlan_ctag))
-+		cur_index = FXGMAC_GET_ENTRY(cur_index, ring->dma_desc_count);
-+
-+	desc_data = FXGMAC_GET_DESC_DATA(ring, cur_index);
-+
-+	if (tso) {
-+		/* Map the TSO header */
-+		skb_dma = dma_map_single(priv->dev, skb->data,
-+					 pkt_info->header_len, DMA_TO_DEVICE);
-+		if (dma_mapping_error(priv->dev, skb_dma)) {
-+			dev_err(priv->dev, "dma map single failed\n");
-+			goto err_out;
-+		}
-+		desc_data->skb_dma = skb_dma;
-+		desc_data->skb_dma_len = pkt_info->header_len;
-+
-+		offset = pkt_info->header_len;
-+		pkt_info->length += pkt_info->header_len;
-+
-+		cur_index = FXGMAC_GET_ENTRY(cur_index, ring->dma_desc_count);
-+		desc_data = FXGMAC_GET_DESC_DATA(ring, cur_index);
-+	}
-+
-+	/* Map the (remainder of the) packet */
-+	for (datalen = skb_headlen(skb) - offset; datalen;) {
-+		len = min_t(unsigned int, datalen, FXGMAC_TX_MAX_BUF_SIZE);
-+		skb_dma = dma_map_single(priv->dev, skb->data + offset, len,
-+					 DMA_TO_DEVICE);
-+		if (dma_mapping_error(priv->dev, skb_dma)) {
-+			dev_err(priv->dev, "dma map single failed\n");
-+			goto err_out;
-+		}
-+		desc_data->skb_dma = skb_dma;
-+		desc_data->skb_dma_len = len;
-+
-+		datalen -= len;
-+		offset += len;
-+		pkt_info->length += len;
-+
-+		cur_index = FXGMAC_GET_ENTRY(cur_index, ring->dma_desc_count);
-+		desc_data = FXGMAC_GET_DESC_DATA(ring, cur_index);
-+	}
-+
-+	for (u32 i = 0; i < skb_shinfo(skb)->nr_frags; i++) {
-+		frag = &skb_shinfo(skb)->frags[i];
-+		offset = 0;
-+
-+		for (datalen = skb_frag_size(frag); datalen;) {
-+			len = min_t(unsigned int, datalen,
-+				    FXGMAC_TX_MAX_BUF_SIZE);
-+			skb_dma = skb_frag_dma_map(priv->dev, frag, offset, len,
-+						   DMA_TO_DEVICE);
-+			if (dma_mapping_error(priv->dev, skb_dma)) {
-+				dev_err(priv->dev, "skb frag dma map failed\n");
-+				goto err_out;
-+			}
-+			desc_data->skb_dma = skb_dma;
-+			desc_data->skb_dma_len = len;
-+			desc_data->mapped_as_page = 1;
-+
-+			datalen -= len;
-+			offset += len;
-+			pkt_info->length += len;
-+
-+			cur_index = FXGMAC_GET_ENTRY(cur_index,
-+						     ring->dma_desc_count);
-+			desc_data = FXGMAC_GET_DESC_DATA(ring, cur_index);
-+		}
-+	}
-+
-+	/* Save the skb address in the last entry. We always have some data
-+	 * that has been mapped so desc_data is always advanced past the last
-+	 * piece of mapped data - use the entry pointed to by cur_index - 1.
-+	 */
-+	desc_data = FXGMAC_GET_DESC_DATA(ring, (cur_index - 1) &
-+					 (ring->dma_desc_count - 1));
-+	desc_data->skb = skb;
-+
-+	/* Save the number of descriptor entries used */
-+	if (start_index <= cur_index)
-+		pkt_info->desc_count = cur_index - start_index;
-+	else
-+		pkt_info->desc_count =
-+			ring->dma_desc_count - start_index + cur_index;
-+
-+	return pkt_info->desc_count;
-+
-+err_out:
-+	while (start_index < cur_index) {
-+		desc_data = FXGMAC_GET_DESC_DATA(ring, start_index);
-+		start_index =
-+			FXGMAC_GET_ENTRY(start_index, ring->dma_desc_count);
-+		fxgmac_desc_data_unmap(priv, desc_data);
-+	}
-+
-+	return 0;
-+}
-+
-+void fxgmac_dump_rx_desc(struct fxgmac_pdata *priv, struct fxgmac_ring *ring,
-+			 unsigned int idx)
-+{
-+	struct fxgmac_desc_data *desc_data;
-+	struct fxgmac_dma_desc *dma_desc;
-+
-+	desc_data = FXGMAC_GET_DESC_DATA(ring, idx);
-+	dma_desc = desc_data->dma_desc;
-+	dev_dbg(priv->dev, "RX: dma_desc=%p, dma_desc_addr=%pad, RX_DESC[%d RX BY DEVICE] = %08x:%08x:%08x:%08x\n\n",
-+		dma_desc, &desc_data->dma_desc_addr, idx,
-+		le32_to_cpu(dma_desc->desc0), le32_to_cpu(dma_desc->desc1),
-+		le32_to_cpu(dma_desc->desc2), le32_to_cpu(dma_desc->desc3));
-+}
-+
-+void fxgmac_dump_tx_desc(struct fxgmac_pdata *priv, struct fxgmac_ring *ring,
-+			 unsigned int idx, unsigned int count,
-+			 unsigned int flag)
-+{
-+	struct fxgmac_desc_data *desc_data;
-+
-+	while (count--) {
-+		desc_data = FXGMAC_GET_DESC_DATA(ring, idx);
-+		dev_dbg(priv->dev, "TX: dma_desc=%p, dma_desc_addr=%pad, TX_DESC[%d %s] = %08x:%08x:%08x:%08x\n",
-+			desc_data->dma_desc, &desc_data->dma_desc_addr, idx,
-+			(flag == 1) ? "QUEUED FOR TX" : "TX BY DEVICE",
-+			le32_to_cpu(desc_data->dma_desc->desc0),
-+			le32_to_cpu(desc_data->dma_desc->desc1),
-+			le32_to_cpu(desc_data->dma_desc->desc2),
-+			le32_to_cpu(desc_data->dma_desc->desc3));
-+
-+		idx++;
-+	}
-+}
-+
-+int fxgmac_is_tx_complete(struct fxgmac_dma_desc *dma_desc)
-+{
-+	return !fxgmac_desc_rd_bits(dma_desc->desc3, TX_DESC3_OWN);
-+}
-+
-+int fxgmac_is_last_desc(struct fxgmac_dma_desc *dma_desc)
-+{
-+	/* Rx and Tx share LD bit, so check TDES3.LD bit */
-+	return fxgmac_desc_rd_bits(dma_desc->desc3, TX_DESC3_LD);
-+}
-diff --git a/drivers/net/ethernet/motorcomm/yt6801/yt6801_desc.h b/drivers/net/ethernet/motorcomm/yt6801/yt6801_desc.h
-index dfe783004..b238f20be 100644
---- a/drivers/net/ethernet/motorcomm/yt6801/yt6801_desc.h
-+++ b/drivers/net/ethernet/motorcomm/yt6801/yt6801_desc.h
-@@ -13,9 +13,23 @@
- #define FXGMAC_GET_DESC_DATA(ring, idx)	((ring)->desc_data_head + (idx))
- #define FXGMAC_GET_ENTRY(x, size)	(((x) + 1) & ((size) - 1))
- 
-+void fxgmac_desc_tx_reset(struct fxgmac_desc_data *desc_data);
-+void fxgmac_desc_rx_reset(struct fxgmac_desc_data *desc_data);
- void fxgmac_desc_data_unmap(struct fxgmac_pdata *priv,
- 			    struct fxgmac_desc_data *desc_data);
- 
- int fxgmac_channels_rings_alloc(struct fxgmac_pdata *priv);
- void fxgmac_channels_rings_free(struct fxgmac_pdata *priv);
-+int fxgmac_tx_skb_map(struct fxgmac_channel *channel, struct sk_buff *skb);
-+int fxgmac_rx_buffe_map(struct fxgmac_pdata *priv, struct fxgmac_ring *ring,
-+			struct fxgmac_desc_data *desc_data);
-+void fxgmac_dump_tx_desc(struct fxgmac_pdata *priv, struct fxgmac_ring *ring,
-+			 unsigned int idx, unsigned int count,
-+			 unsigned int flag);
-+void fxgmac_dump_rx_desc(struct fxgmac_pdata *priv, struct fxgmac_ring *ring,
-+			 unsigned int idx);
-+
-+int fxgmac_is_tx_complete(struct fxgmac_dma_desc *dma_desc);
-+int fxgmac_is_last_desc(struct fxgmac_dma_desc *dma_desc);
-+
- #endif /* YT6801_DESC_H */
 diff --git a/drivers/net/ethernet/motorcomm/yt6801/yt6801_main.c b/drivers/net/ethernet/motorcomm/yt6801/yt6801_main.c
-index 5922a2449..50c3a1364 100644
+index 50c3a1364..e1c4153cf 100644
 --- a/drivers/net/ethernet/motorcomm/yt6801/yt6801_main.c
 +++ b/drivers/net/ethernet/motorcomm/yt6801/yt6801_main.c
-@@ -110,17 +110,72 @@ static int fxgmac_mdio_register(struct fxgmac_pdata *priv)
+@@ -110,6 +110,23 @@ static int fxgmac_mdio_register(struct fxgmac_pdata *priv)
  	return 0;
  }
  
-+static unsigned int fxgmac_desc_tx_avail(struct fxgmac_ring *ring)
++static void fxgmac_tx_start_xmit(struct fxgmac_channel *channel,
++				 struct fxgmac_ring *ring)
 +{
-+	if (ring->dirty > ring->cur)
-+		return ring->dirty - ring->cur;
-+	else
-+		return ring->dma_desc_count - ring->cur + ring->dirty;
++	struct fxgmac_desc_data *desc_data;
++
++	wmb();  /* Make sure everything is written before the register write */
++
++	/* Issue a poll command to Tx DMA by writing address
++	 * of next immediate free descriptor
++	 */
++	desc_data = FXGMAC_GET_DESC_DATA(ring, ring->cur);
++	fxgmac_dma_io_wr(channel, DMA_CH_TDTR_LO,
++			 lower_32_bits(desc_data->dma_desc_addr));
++
++	ring->tx.xmit_more = 0;
++}
++
+ static unsigned int fxgmac_desc_tx_avail(struct fxgmac_ring *ring)
+ {
+ 	if (ring->dirty > ring->cur)
+@@ -118,6 +135,29 @@ static unsigned int fxgmac_desc_tx_avail(struct fxgmac_ring *ring)
+ 		return ring->dma_desc_count - ring->cur + ring->dirty;
+ }
+ 
++static netdev_tx_t fxgmac_maybe_stop_tx_queue(struct fxgmac_channel *channel,
++					      struct fxgmac_ring *ring,
++					      unsigned int count)
++{
++	struct fxgmac_pdata *priv = channel->priv;
++
++	if (count > fxgmac_desc_tx_avail(ring)) {
++		netdev_err(priv->ndev, "Tx queue stopped, not enough descriptors available\n");
++		netif_stop_subqueue(priv->ndev, channel->queue_index);
++		ring->tx.queue_stopped = 1;
++
++		/* If we haven't notified the hardware because of xmit_more
++		 * support, tell it now
++		 */
++		if (ring->tx.xmit_more)
++			fxgmac_tx_start_xmit(channel, ring);
++
++		return NETDEV_TX_BUSY;
++	}
++
++	return NETDEV_TX_OK;
 +}
 +
  static void fxgmac_enable_msix_one_irq(struct fxgmac_pdata *priv, u32 int_id)
  {
  	fxgmac_io_wr(priv, MSIX_TBL_MASK + int_id * 16, 0);
- }
- 
-+static void fxgmac_disable_msix_one_irq(struct fxgmac_pdata *priv, u32 intid)
-+{
-+	fxgmac_io_wr(priv, MSIX_TBL_MASK + intid * 16, 1);
-+}
-+
- static void fxgmac_disable_mgm_irq(struct fxgmac_pdata *priv)
- {
- 	fxgmac_io_wr_bits(priv, MGMT_INT_CTRL0, MGMT_INT_CTRL0_INT_MASK,
- 			  MGMT_INT_CTRL0_INT_MASK_MASK);
- }
- 
-+static irqreturn_t fxgmac_isr(int irq, void *data)
-+{
-+	struct fxgmac_pdata *priv = data;
-+	u32 val;
-+
-+	val = fxgmac_io_rd(priv, MGMT_INT_CTRL0);
-+	if (!(val & MGMT_INT_CTRL0_INT_STATUS_RXTX))
-+		return IRQ_NONE;
-+
-+	/* Restart the device on a Fatal Bus Error */
-+	for (u32 i = 0; i < priv->channel_count; i++) {
-+		val = fxgmac_dma_io_rd(priv->channel_head + i, DMA_CH_SR);
-+		if (FIELD_GET(DMA_CH_SR_FBE, val))
-+			schedule_work(&priv->restart_work);
-+		 /* Clear all the interrupts which are set */
-+		fxgmac_dma_io_wr(priv->channel_head + i, DMA_CH_SR, val);
-+	}
-+
-+	fxgmac_disable_mgm_irq(priv);
-+	napi_schedule_irqoff(&priv->napi); /* Turn on polling */
-+	return IRQ_HANDLED;
-+}
-+
-+static irqreturn_t fxgmac_dma_isr(int irq, void *data)
-+{
-+	struct fxgmac_channel *channel = data;
-+
-+	if (irq == channel->dma_irq_tx) {
-+		fxgmac_disable_msix_one_irq(channel->priv, MSI_ID_TXQ0);
-+		/* Clear Tx signal */
-+		fxgmac_dma_io_wr(channel, DMA_CH_SR, DMA_CH_SR_TI);
-+		napi_schedule_irqoff(&channel->napi_tx);
-+		return IRQ_HANDLED;
-+	}
-+
-+	fxgmac_disable_msix_one_irq(channel->priv, channel->queue_index);
-+	/* Clear Rx signal */
-+	fxgmac_dma_io_wr(channel, DMA_CH_SR, DMA_CH_SR_RI);
-+	napi_schedule_irqoff(&channel->napi_rx);
-+	return IRQ_HANDLED;
-+}
-+
- static void napi_disable_del(struct fxgmac_pdata *priv, struct napi_struct *n,
- 			     u32 flag)
- {
-@@ -1875,6 +1930,30 @@ static int fxgmac_drv_probe(struct device *dev, struct fxgmac_resources *res)
+@@ -303,6 +343,7 @@ static int fxgmac_request_irqs(struct fxgmac_pdata *priv)
+ 	fxgmac_free_irqs(priv);
  	return ret;
  }
++
+ static void fxgmac_free_tx_data(struct fxgmac_pdata *priv)
+ {
+ 	struct fxgmac_channel *channel = priv->channel_head;
+@@ -1954,8 +1995,333 @@ static void fxgmac_dbg_pkt(struct fxgmac_pdata *priv, struct sk_buff *skb,
+ 	dev_dbg(priv->dev, "\n************** SKB dump ****************\n");
+ }
  
-+static void fxgmac_dbg_pkt(struct fxgmac_pdata *priv, struct sk_buff *skb,
-+			   bool tx_rx)
++static void fxgmac_dev_xmit(struct fxgmac_channel *channel)
 +{
-+	struct ethhdr *eth = (struct ethhdr *)skb->data;
-+	unsigned char buffer[128];
++	struct fxgmac_pdata *priv = channel->priv;
++	struct fxgmac_ring *ring = channel->tx_ring;
++	unsigned int tso_context, vlan_context;
++	struct fxgmac_desc_data *desc_data;
++	struct fxgmac_dma_desc *dma_desc;
++	struct fxgmac_pkt_info *pkt_info;
++	unsigned int csum, tso, vlan;
++	int i, start_index = ring->cur;
++	int cur_index = ring->cur;
 +
-+	dev_dbg(priv->dev, "\n************** SKB dump ****************\n");
-+	dev_dbg(priv->dev, "%s, packet of %d bytes\n", (tx_rx ? "TX" : "RX"),
-+		skb->len);
-+	dev_dbg(priv->dev, "Dst MAC addr: %pM\n", eth->h_dest);
-+	dev_dbg(priv->dev, "Src MAC addr: %pM\n", eth->h_source);
-+	dev_dbg(priv->dev, "Protocol: %#06x\n", ntohs(eth->h_proto));
++	pkt_info = &ring->pkt_info;
++	csum =  FIELD_GET(ATTR_TX_CSUM_ENABLE, pkt_info->attr);
++	tso = FIELD_GET(ATTR_TX_TSO_ENABLE, pkt_info->attr);
++	vlan = FIELD_GET(ATTR_TX_VLAN_CTAG, pkt_info->attr);
 +
-+	for (u32 i = 0; i < skb->len; i += 32) {
-+		unsigned int len = min(skb->len - i, 32U);
++	if (tso && pkt_info->mss != ring->tx.cur_mss)
++		tso_context = 1;
++	else
++		tso_context = 0;
 +
-+		hex_dump_to_buffer(&skb->data[i], len, 32, 1, buffer,
-+				   sizeof(buffer), false);
-+		dev_dbg(priv->dev, "  %#06x: %s\n", i, buffer);
++	if (vlan && pkt_info->vlan_ctag != ring->tx.cur_vlan_ctag)
++		vlan_context = 1;
++	else
++		vlan_context = 0;
++
++	desc_data = FXGMAC_GET_DESC_DATA(ring, cur_index);
++	dma_desc = desc_data->dma_desc;
++
++	/* Create a context descriptor if this is a TSO pkt_info */
++	if (tso_context) {
++		/* Set the MSS size */
++		fxgmac_desc_wr_bits(&dma_desc->desc2, TX_CONTEXT_DESC2_MSS,
++				    pkt_info->mss);
++
++		/* Mark it as a CONTEXT descriptor */
++		fxgmac_desc_wr_bits(&dma_desc->desc3, TX_CONTEXT_DESC3_CTXT, 1);
++
++		/* Indicate this descriptor contains the MSS */
++		fxgmac_desc_wr_bits(&dma_desc->desc3, TX_CONTEXT_DESC3_TCMSSV,
++				    1);
++
++		ring->tx.cur_mss = pkt_info->mss;
 +	}
 +
-+	dev_dbg(priv->dev, "\n************** SKB dump ****************\n");
++	if (vlan_context) {
++		/* Mark it as a CONTEXT descriptor */
++		fxgmac_desc_wr_bits(&dma_desc->desc3, TX_CONTEXT_DESC3_CTXT, 1);
++
++		/* Set the VLAN tag */
++		fxgmac_desc_wr_bits(&dma_desc->desc3, TX_CONTEXT_DESC3_VT,
++				    pkt_info->vlan_ctag);
++
++		/* Indicate this descriptor contains the VLAN tag */
++		fxgmac_desc_wr_bits(&dma_desc->desc3, TX_CONTEXT_DESC3_VLTV, 1);
++
++		ring->tx.cur_vlan_ctag = pkt_info->vlan_ctag;
++	}
++	if (tso_context || vlan_context) {
++		cur_index = FXGMAC_GET_ENTRY(cur_index, ring->dma_desc_count);
++		desc_data = FXGMAC_GET_DESC_DATA(ring, cur_index);
++		dma_desc = desc_data->dma_desc;
++	}
++
++	/* Update buffer address (for TSO this is the header) */
++	dma_desc->desc0 = cpu_to_le32(lower_32_bits(desc_data->skb_dma));
++	dma_desc->desc1 = cpu_to_le32(upper_32_bits(desc_data->skb_dma));
++
++	/* Update the buffer length */
++	fxgmac_desc_wr_bits(&dma_desc->desc2, TX_DESC2_HL_B1L,
++			    desc_data->skb_dma_len);
++
++	/* VLAN tag insertion check */
++	if (vlan)
++		fxgmac_desc_wr_bits(&dma_desc->desc2, TX_DESC2_VTIR, 2);
++
++	/* Timestamp enablement check */
++	if (FIELD_GET(ATTR_TX_PTP, pkt_info->attr))
++		fxgmac_desc_wr_bits(&dma_desc->desc2, TX_DESC2_TTSE, 1);
++
++	/* Mark it as First Descriptor */
++	fxgmac_desc_wr_bits(&dma_desc->desc3, TX_DESC3_FD, 1);
++
++	/* Mark it as a NORMAL descriptor */
++	fxgmac_desc_wr_bits(&dma_desc->desc3, TX_DESC3_CTXT, 0);
++
++	/* Set OWN bit if not the first descriptor */
++	if (cur_index != start_index)
++		fxgmac_desc_wr_bits(&dma_desc->desc3, TX_DESC3_OWN, 1);
++
++	if (tso) {
++		/* Enable TSO */
++		fxgmac_desc_wr_bits(&dma_desc->desc3, TX_DESC3_TSE, 1);
++		fxgmac_desc_wr_bits(&dma_desc->desc3, TX_DESC3_TCPPL,
++				    pkt_info->tcp_payload_len);
++		fxgmac_desc_wr_bits(&dma_desc->desc3, TX_DESC3_TCPHDRLEN,
++				    pkt_info->tcp_header_len / 4);
++	} else {
++		/* Enable CRC and Pad Insertion */
++		fxgmac_desc_wr_bits(&dma_desc->desc3, TX_DESC3_CPC, 0);
++
++		/* Enable HW CSUM */
++		if (csum)
++			fxgmac_desc_wr_bits(&dma_desc->desc3, TX_DESC3_CIC,
++					    0x3);
++
++		/* Set the total length to be transmitted */
++		fxgmac_desc_wr_bits(&dma_desc->desc3, TX_DESC3_FL,
++				    pkt_info->length);
++	}
++
++	if (start_index <= cur_index)
++		i = cur_index - start_index + 1;
++	else
++		i = ring->dma_desc_count - start_index + cur_index;
++
++	for (; i < pkt_info->desc_count; i++) {
++		cur_index = FXGMAC_GET_ENTRY(cur_index, ring->dma_desc_count);
++		desc_data = FXGMAC_GET_DESC_DATA(ring, cur_index);
++		dma_desc = desc_data->dma_desc;
++
++		/* Update buffer address */
++		dma_desc->desc0 =
++			cpu_to_le32(lower_32_bits(desc_data->skb_dma));
++		dma_desc->desc1 =
++			cpu_to_le32(upper_32_bits(desc_data->skb_dma));
++
++		/* Update the buffer length */
++		fxgmac_desc_wr_bits(&dma_desc->desc2, TX_DESC2_HL_B1L,
++				    desc_data->skb_dma_len);
++
++		/* Set OWN bit */
++		fxgmac_desc_wr_bits(&dma_desc->desc3, TX_DESC3_OWN, 1);
++
++		/* Mark it as NORMAL descriptor */
++		fxgmac_desc_wr_bits(&dma_desc->desc3, TX_DESC3_CTXT, 0);
++
++		/* Enable HW CSUM */
++		if (csum)
++			fxgmac_desc_wr_bits(&dma_desc->desc3, TX_DESC3_CIC,
++					    0x3);
++	}
++
++	/* Set LAST bit for the last descriptor */
++	fxgmac_desc_wr_bits(&dma_desc->desc3, TX_DESC3_LD, 1);
++
++	fxgmac_desc_wr_bits(&dma_desc->desc2, TX_DESC2_IC, 1);
++
++	/* Save the Tx info to report back during cleanup */
++	desc_data->tx.packets = pkt_info->tx_packets;
++	desc_data->tx.bytes = pkt_info->tx_bytes;
++
++	/* In case the Tx DMA engine is running, make sure everything
++	 * is written to the descriptor(s) before setting the OWN bit
++	 * for the first descriptor
++	 */
++	dma_wmb();
++
++	/* Set OWN bit for the first descriptor */
++	desc_data = FXGMAC_GET_DESC_DATA(ring, start_index);
++	dma_desc = desc_data->dma_desc;
++	fxgmac_desc_wr_bits(&dma_desc->desc3, TX_DESC3_OWN, 1);
++
++	if (netif_msg_tx_queued(priv))
++		fxgmac_dump_tx_desc(priv, ring, start_index,
++				    pkt_info->desc_count, 1);
++
++	smp_wmb();  /* Make sure ownership is written to the descriptor */
++
++	ring->cur = FXGMAC_GET_ENTRY(cur_index, ring->dma_desc_count);
++	fxgmac_tx_start_xmit(channel, ring);
++}
++
++static void fxgmac_prep_vlan(struct sk_buff *skb,
++			     struct fxgmac_pkt_info *pkt_info)
++{
++	if (skb_vlan_tag_present(skb))
++		pkt_info->vlan_ctag = skb_vlan_tag_get(skb);
++}
++
++static int fxgmac_prep_tso(struct fxgmac_pdata *priv, struct sk_buff *skb,
++			   struct fxgmac_pkt_info *pkt_info)
++{
++	int ret;
++
++	if (!FIELD_GET(ATTR_TX_TSO_ENABLE, pkt_info->attr))
++		return 0;
++
++	ret = skb_cow_head(skb, 0);
++	if (ret)
++		return ret;
++
++	pkt_info->header_len = skb_transport_offset(skb) + tcp_hdrlen(skb);
++	pkt_info->tcp_header_len = tcp_hdrlen(skb);
++	pkt_info->tcp_payload_len = skb->len - pkt_info->header_len;
++	pkt_info->mss = skb_shinfo(skb)->gso_size;
++
++	/* Update the number of packets that will ultimately be transmitted
++	 * along with the extra bytes for each extra packet
++	 */
++	pkt_info->tx_packets = skb_shinfo(skb)->gso_segs;
++	pkt_info->tx_bytes += (pkt_info->tx_packets - 1) * pkt_info->header_len;
++
++	return 0;
++}
++
++static int fxgmac_is_tso(struct sk_buff *skb)
++{
++	if (skb->ip_summed != CHECKSUM_PARTIAL)
++		return 0;
++
++	if (!skb_is_gso(skb))
++		return 0;
++
++	return 1;
++}
++
++static void fxgmac_prep_tx_pkt(struct fxgmac_pdata *priv,
++			       struct fxgmac_ring *ring, struct sk_buff *skb,
++			       struct fxgmac_pkt_info *pkt_info)
++{
++	u32 len, context_desc = 0;
++
++	pkt_info->skb = skb;
++	pkt_info->desc_count = 0;
++	pkt_info->tx_packets = 1;
++	pkt_info->tx_bytes = skb->len;
++
++	if (fxgmac_is_tso(skb)) {
++		/* TSO requires an extra descriptor if mss is different */
++		if (skb_shinfo(skb)->gso_size != ring->tx.cur_mss) {
++			context_desc = 1;
++			pkt_info->desc_count++;
++		}
++
++		/* TSO requires an extra descriptor for TSO header */
++		pkt_info->desc_count++;
++		pkt_info->attr |= (ATTR_TX_TSO_ENABLE | ATTR_TX_CSUM_ENABLE);
++	} else if (skb->ip_summed == CHECKSUM_PARTIAL) {
++		pkt_info->attr |= ATTR_TX_CSUM_ENABLE;
++	}
++
++	if (skb_vlan_tag_present(skb)) {
++		/* VLAN requires an extra descriptor if tag is different */
++		if (skb_vlan_tag_get(skb) != ring->tx.cur_vlan_ctag)
++			/* We can share with the TSO context descriptor */
++			if (!context_desc)
++				pkt_info->desc_count++;
++
++		pkt_info->attr |= ATTR_TX_VLAN_CTAG;
++	}
++
++	for (len = skb_headlen(skb); len;) {
++		pkt_info->desc_count++;
++		len -= min_t(unsigned int, len, FXGMAC_TX_MAX_BUF_SIZE);
++	}
++
++	for (u32 i = 0; i < skb_shinfo(skb)->nr_frags; i++)
++		for (len = skb_frag_size(&skb_shinfo(skb)->frags[i]); len;) {
++			pkt_info->desc_count++;
++			len -= min_t(unsigned int, len, FXGMAC_TX_MAX_BUF_SIZE);
++		}
++}
++
++static netdev_tx_t fxgmac_xmit(struct sk_buff *skb, struct net_device *ndev)
++{
++	struct fxgmac_pdata *priv = netdev_priv(ndev);
++	struct fxgmac_pkt_info *tx_pkt_info;
++	struct fxgmac_channel *channel;
++	struct netdev_queue *txq;
++	struct fxgmac_ring *ring;
++	int ret;
++
++	channel = priv->channel_head + skb->queue_mapping;
++	txq = netdev_get_tx_queue(ndev, channel->queue_index);
++	ring = channel->tx_ring;
++	tx_pkt_info = &ring->pkt_info;
++
++	if (skb->len == 0) {
++		netdev_err(priv->ndev, "empty skb received from stack\n");
++		dev_kfree_skb_any(skb);
++		return NETDEV_TX_OK;
++	}
++
++	/* Prepare preliminary packet info for TX */
++	memset(tx_pkt_info, 0, sizeof(*tx_pkt_info));
++	fxgmac_prep_tx_pkt(priv, ring, skb, tx_pkt_info);
++
++	/* Check that there are enough descriptors available */
++	ret = fxgmac_maybe_stop_tx_queue(channel, ring,
++					 tx_pkt_info->desc_count);
++	if (ret == NETDEV_TX_BUSY)
++		return ret;
++
++	ret = fxgmac_prep_tso(priv, skb, tx_pkt_info);
++	if (ret < 0) {
++		netdev_err(priv->ndev, "processing TSO packet failed\n");
++		dev_kfree_skb_any(skb);
++		return NETDEV_TX_OK;
++	}
++	fxgmac_prep_vlan(skb, tx_pkt_info);
++
++	if (!fxgmac_tx_skb_map(channel, skb)) {
++		dev_kfree_skb_any(skb);
++		netdev_err(priv->ndev, "xmit, map tx skb failed\n");
++		return NETDEV_TX_OK;
++	}
++
++	/* Report on the actual number of bytes (to be) sent */
++	netdev_tx_sent_queue(txq, tx_pkt_info->tx_bytes);
++
++	/* Configure required descriptor fields for transmission */
++	fxgmac_dev_xmit(channel);
++
++	if (netif_msg_pktdata(priv))
++		fxgmac_dbg_pkt(priv, skb, true);
++
++	/* Stop the queue in advance if there may not be enough descriptors */
++	fxgmac_maybe_stop_tx_queue(channel, ring, FXGMAC_TX_MAX_DESC_NR);
++
++	return NETDEV_TX_OK;
 +}
 +
  static const struct net_device_ops fxgmac_netdev_ops = {
  	.ndo_open		= fxgmac_open,
- };
-@@ -1884,6 +1963,325 @@ const struct net_device_ops *fxgmac_get_netdev_ops(void)
- 	return &fxgmac_netdev_ops;
- }
- 
-+static void fxgmac_rx_refresh(struct fxgmac_channel *channel)
-+{
-+	struct fxgmac_ring *ring = channel->rx_ring;
-+	struct fxgmac_pdata *priv = channel->priv;
-+	struct fxgmac_desc_data *desc_data;
-+
-+	while (ring->dirty != ring->cur) {
-+		desc_data = FXGMAC_GET_DESC_DATA(ring, ring->dirty);
-+
-+		/* Reset desc_data values */
-+		fxgmac_desc_data_unmap(priv, desc_data);
-+
-+		if (fxgmac_rx_buffe_map(priv, ring, desc_data))
-+			break;
-+
-+		fxgmac_desc_rx_reset(desc_data);
-+		ring->dirty =
-+			FXGMAC_GET_ENTRY(ring->dirty, ring->dma_desc_count);
-+	}
-+
-+	/* Make sure everything is written before the register write */
-+	wmb();
-+
-+	/* Update the Rx Tail Pointer Register with address of
-+	 * the last cleaned entry
-+	 */
-+	desc_data = FXGMAC_GET_DESC_DATA(ring, (ring->dirty - 1) &
-+					 (ring->dma_desc_count - 1));
-+	fxgmac_dma_io_wr(channel, DMA_CH_RDTR_LO,
-+			 lower_32_bits(desc_data->dma_desc_addr));
-+}
-+
-+static struct sk_buff *fxgmac_create_skb(struct fxgmac_pdata *priv,
-+					 struct napi_struct *napi,
-+					 struct fxgmac_desc_data *desc_data,
-+					 unsigned int len)
-+{
-+	unsigned int copy_len;
-+	struct sk_buff *skb;
-+	u8 *packet;
-+
-+	skb = napi_alloc_skb(napi, desc_data->rx.hdr.dma_len);
-+	if (!skb)
-+		return NULL;
-+
-+	/* Start with the header buffer which may contain just the header
-+	 * or the header plus data
-+	 */
-+	dma_sync_single_range_for_cpu(priv->dev, desc_data->rx.hdr.dma_base,
-+				      desc_data->rx.hdr.dma_off,
-+				      desc_data->rx.hdr.dma_len,
-+				      DMA_FROM_DEVICE);
-+
-+	packet = page_address(desc_data->rx.hdr.pa.pages) +
-+		 desc_data->rx.hdr.pa.pages_offset;
-+	copy_len = min(desc_data->rx.hdr.dma_len, len);
-+	skb_copy_to_linear_data(skb, packet, copy_len);
-+	skb_put(skb, copy_len);
-+
-+	return skb;
-+}
-+
-+static int fxgmac_tx_poll(struct fxgmac_channel *channel)
-+{
-+	struct fxgmac_pdata *priv = channel->priv;
-+	unsigned int cur, tx_packets = 0, tx_bytes = 0;
-+	struct fxgmac_ring *ring = channel->tx_ring;
-+	struct net_device *ndev = priv->ndev;
-+	struct fxgmac_desc_data *desc_data;
-+	struct fxgmac_dma_desc *dma_desc;
-+	struct netdev_queue *txq;
-+	int processed = 0;
-+
-+	/* Nothing to do if there isn't a Tx ring for this channel */
-+	if (!ring)
-+		return 0;
-+
-+	if (ring->cur != ring->dirty && (netif_msg_tx_done(priv)))
-+		netdev_dbg(priv->ndev, "%s, ring_cur=%d,ring_dirty=%d,qIdx=%d\n",
-+			   __func__, ring->cur, ring->dirty,
-+			   channel->queue_index);
-+
-+	cur = ring->cur;
-+
-+	/* Be sure we get ring->cur before accessing descriptor data */
-+	smp_rmb();
-+
-+	txq = netdev_get_tx_queue(ndev, channel->queue_index);
-+	while (ring->dirty != cur) {
-+		desc_data = FXGMAC_GET_DESC_DATA(ring, ring->dirty);
-+		dma_desc = desc_data->dma_desc;
-+
-+		if (!fxgmac_is_tx_complete(dma_desc))
-+			break;
-+
-+		/* Make sure descriptor fields are read after reading
-+		 * the OWN bit
-+		 */
-+		dma_rmb();
-+
-+		if (netif_msg_tx_done(priv))
-+			fxgmac_dump_tx_desc(priv, ring, ring->dirty, 1, 0);
-+
-+		if (fxgmac_is_last_desc(dma_desc)) {
-+			tx_packets += desc_data->tx.packets;
-+			tx_bytes += desc_data->tx.bytes;
-+		}
-+
-+		/* Free the SKB and reset the descriptor for re-use */
-+		fxgmac_desc_data_unmap(priv, desc_data);
-+		fxgmac_desc_tx_reset(desc_data);
-+
-+		processed++;
-+		ring->dirty =
-+			FXGMAC_GET_ENTRY(ring->dirty, ring->dma_desc_count);
-+	}
-+
-+	if (!processed)
-+		return 0;
-+
-+	netdev_tx_completed_queue(txq, tx_packets, tx_bytes);
-+
-+	/* Make sure ownership is written to the descriptor */
-+	smp_wmb();
-+	if (ring->tx.queue_stopped == 1 &&
-+	    (fxgmac_desc_tx_avail(ring) > FXGMAC_TX_DESC_MIN_FREE)) {
-+		ring->tx.queue_stopped = 0;
-+		netif_tx_wake_queue(txq);
-+	}
-+
-+	return processed;
-+}
-+
-+static int fxgmac_one_poll_tx(struct napi_struct *napi, int budget)
-+{
-+	struct fxgmac_channel *channel =
-+		container_of(napi, struct fxgmac_channel, napi_tx);
-+	struct fxgmac_pdata *priv = channel->priv;
-+	int ret;
-+
-+	ret = fxgmac_tx_poll(channel);
-+	if (napi_complete_done(napi, 0))
-+		fxgmac_enable_msix_one_irq(priv, MSI_ID_TXQ0);
-+
-+	return ret;
-+}
-+
-+static unsigned int fxgmac_desc_rx_dirty(struct fxgmac_ring *ring)
-+{
-+	unsigned int dirty;
-+
-+	if (ring->dirty <= ring->cur)
-+		dirty = ring->cur - ring->dirty;
-+	else
-+		dirty = ring->dma_desc_count - ring->dirty + ring->cur;
-+
-+	return dirty;
-+}
-+
-+static int fxgmac_rx_poll(struct fxgmac_channel *channel, int budget)
-+{
-+	struct fxgmac_pdata *priv = channel->priv;
-+	struct fxgmac_ring *ring = channel->rx_ring;
-+	struct net_device *ndev = priv->ndev;
-+	u32 context_next, context, incomplete;
-+	struct fxgmac_desc_data *desc_data;
-+	struct fxgmac_pkt_info *pkt_info;
-+	struct napi_struct *napi;
-+	u32 len, max_len;
-+	int packet_count = 0;
-+
-+	struct sk_buff *skb;
-+
-+	/* Nothing to do if there isn't a Rx ring for this channel */
-+	if (!ring)
-+		return 0;
-+
-+	napi = (priv->per_channel_irq) ? &channel->napi_rx : &priv->napi;
-+	pkt_info = &ring->pkt_info;
-+
-+	while (packet_count < budget) {
-+		memset(pkt_info, 0, sizeof(*pkt_info));
-+		skb = NULL;
-+		len = 0;
-+
-+read_again:
-+		desc_data = FXGMAC_GET_DESC_DATA(ring, ring->cur);
-+
-+		if (fxgmac_desc_rx_dirty(ring) > FXGMAC_RX_DESC_MAX_DIRTY)
-+			fxgmac_rx_refresh(channel);
-+
-+		if (fxgmac_dev_read(channel))
-+			break;
-+
-+		ring->cur = FXGMAC_GET_ENTRY(ring->cur, ring->dma_desc_count);
-+		incomplete =  FIELD_GET(ATTR_RX_INCOMPLETE, pkt_info->attr);
-+		context_next = FIELD_GET(ATTR_RX_CONTEXT_NEXT, pkt_info->attr);
-+		context = FIELD_GET(ATTR_RX_CONTEXT, pkt_info->attr);
-+
-+		if (incomplete || context_next)
-+			goto read_again;
-+
-+		if (pkt_info->errors) {
-+			dev_kfree_skb(skb);
-+			priv->ndev->stats.rx_dropped++;
-+			netdev_err(priv->ndev, "Received packet failed\n");
-+			goto next_packet;
-+		}
-+
-+		if (!context) {
-+			len = desc_data->rx.len;
-+			if (len == 0) {
-+				if (net_ratelimit())
-+					netdev_err(priv->ndev, "A packet of length 0 was received\n");
-+				priv->ndev->stats.rx_length_errors++;
-+				priv->ndev->stats.rx_dropped++;
-+				goto next_packet;
-+			}
-+
-+			if (len && !skb) {
-+				skb = fxgmac_create_skb(priv, napi, desc_data,
-+							len);
-+				if (unlikely(!skb)) {
-+					if (net_ratelimit())
-+						netdev_err(priv->ndev, "create skb failed\n");
-+					priv->ndev->stats.rx_dropped++;
-+					goto next_packet;
-+				}
-+			}
-+			max_len = ndev->mtu + ETH_HLEN;
-+			if (!(ndev->features & NETIF_F_HW_VLAN_CTAG_RX) &&
-+			    skb->protocol == htons(ETH_P_8021Q))
-+				max_len += VLAN_HLEN;
-+
-+			if (len > max_len) {
-+				if (net_ratelimit())
-+					netdev_err(priv->ndev, "len %d larger than max size %d\n",
-+						   len, max_len);
-+				priv->ndev->stats.rx_length_errors++;
-+				priv->ndev->stats.rx_dropped++;
-+				dev_kfree_skb(skb);
-+				goto next_packet;
-+			}
-+		}
-+
-+		if (!skb) {
-+			priv->ndev->stats.rx_dropped++;
-+			goto next_packet;
-+		}
-+
-+		if (netif_msg_pktdata(priv))
-+			fxgmac_dbg_pkt(priv, skb, false);
-+
-+		skb_checksum_none_assert(skb);
-+		if (ndev->features & NETIF_F_RXCSUM)
-+			skb->ip_summed = CHECKSUM_UNNECESSARY;
-+
-+		if (FIELD_GET(ATTR_RX_VLAN_CTAG, pkt_info->attr))
-+			__vlan_hwaccel_put_tag(skb, htons(ETH_P_8021Q),
-+					       pkt_info->vlan_ctag);
-+
-+		if (FIELD_GET(ATTR_RX_RSS_HASH, pkt_info->attr))
-+			skb_set_hash(skb, pkt_info->rss_hash,
-+				     pkt_info->rss_hash_type);
-+
-+		skb->dev = ndev;
-+		skb->protocol = eth_type_trans(skb, ndev);
-+		skb_record_rx_queue(skb, channel->queue_index);
-+		napi_gro_receive(napi, skb);
-+
-+next_packet:
-+		packet_count++;
-+		priv->ndev->stats.rx_packets++;
-+		priv->ndev->stats.rx_bytes += len;
-+	}
-+
-+	return packet_count;
-+}
-+
-+static int fxgmac_one_poll_rx(struct napi_struct *napi, int budget)
-+{
-+	struct fxgmac_channel *channel =
-+		container_of(napi, struct fxgmac_channel, napi_rx);
-+	int processed = fxgmac_rx_poll(channel, budget);
-+
-+	if (processed < budget && (napi_complete_done(napi, processed)))
-+		fxgmac_enable_msix_one_irq(channel->priv, channel->queue_index);
-+
-+	return processed;
-+}
-+
-+static int fxgmac_all_poll(struct napi_struct *napi, int budget)
-+{
-+	struct fxgmac_channel *channel;
-+	struct fxgmac_pdata *priv;
-+	int processed = 0;
-+
-+	priv = container_of(napi, struct fxgmac_pdata, napi);
-+	do {
-+		channel = priv->channel_head;
-+		/* Only support 1 tx channel, poll ch 0. */
-+		fxgmac_tx_poll(priv->channel_head + 0);
-+		for (u32 i = 0; i < priv->channel_count; i++, channel++)
-+			processed += fxgmac_rx_poll(channel, budget);
-+	} while (false);
-+
-+	/* If we processed everything, we are done */
-+	if (processed < budget) {
-+		/* Turn off polling */
-+		if (napi_complete_done(napi, processed))
-+			fxgmac_enable_mgm_irq(priv);
-+	}
-+
-+	if ((processed) && (netif_msg_rx_status(priv)))
-+		netdev_dbg(priv->ndev, "%s,received:%d\n", __func__, processed);
-+
-+	return processed;
-+}
-+
- static void napi_add_enable(struct fxgmac_pdata *priv, struct napi_struct *napi,
- 			    int (*poll)(struct napi_struct *, int),
- 			    u32 flag)
-diff --git a/drivers/net/ethernet/motorcomm/yt6801/yt6801_type.h b/drivers/net/ethernet/motorcomm/yt6801/yt6801_type.h
-index 4702ed1dc..f0a6f8eff 100644
---- a/drivers/net/ethernet/motorcomm/yt6801/yt6801_type.h
-+++ b/drivers/net/ethernet/motorcomm/yt6801/yt6801_type.h
-@@ -498,6 +498,63 @@
- #define DMA_CH_SR_RPS			BIT(8)
- #define DMA_CH_SR_FBE			BIT(12)
- 
-+/* Receive Normal Descriptor (Read Format) */
-+#define RX_DESC0_OVT	GENMASK(15, 0)	/* Outer VLAN Tag */
-+
-+#define RX_DESC2_HL	GENMASK(9, 0)	/* L3/L4 Header Length */
-+
-+#define RX_DESC3_PL	GENMASK(14, 0)	/* Packet Length */
-+#define RX_DESC3_ES	BIT(15)		/* Error Summary */
-+#define RX_DESC3_ETLT	GENMASK(18, 16)	/* Length/Type Field */
-+#define RX_DESC3_BUF1V	BIT(24)		/* Receive Status RDES1 Valid */
-+#define RX_DESC3_BUF2V	BIT(25)		/* Receive Status RDES2 Valid */
-+#define RX_DESC3_LD	BIT(28)		/* Last Descriptor */
-+#define RX_DESC3_FD	BIT(29)		/* First Descriptor */
-+#define RX_DESC3_INTE	BIT(30)
-+#define RX_DESC3_OWN	BIT(31)		/* Own Bit */
-+
-+/* Transmit Normal Descriptor (Read Format) */
-+#define TX_DESC2_HL_B1L	GENMASK(13, 0)	/* Header Length or Buffer 1 Length */
-+#define TX_DESC2_VTIR	GENMASK(15, 14)	/* VLAN Tag Insertion/Replacement */
-+#define TX_DESC2_TTSE		BIT(30)		/* Transmit Timestamp Enable */
-+#define TX_DESC2_IC		BIT(31)		/* Interrupt on Completion. */
-+#define TX_DESC3_TCPPL		GENMASK(17, 0)	/* TCP Packet Length.*/
-+#define TX_DESC3_FL		GENMASK(14, 0)	/* Frame Length */
-+#define TX_DESC3_CIC		GENMASK(17, 16)	/* Checksum Insertion Control */
-+#define TX_DESC3_TSE		BIT(18)		/* TCP Segmentation Enable */
-+#define TX_DESC3_TCPHDRLEN	GENMASK(22, 19)	/* TCP/UDP Header Length. */
-+#define TX_DESC3_CPC		GENMASK(27, 26)	/* CRC Pad Control */
-+#define TX_DESC3_LD		BIT(28)		/* Last Descriptor */
-+#define TX_DESC3_FD		BIT(29)		/* First Descriptor */
-+#define TX_DESC3_CTXT		BIT(30)		/* Context Type */
-+#define TX_DESC3_OWN		BIT(31)		/* Own Bit */
-+
-+/* Transmit Context Descriptor */
-+#define TX_CONTEXT_DESC2_MSS	GENMASK(13, 0)	/* Maximum Segment Size */
-+#define TX_CONTEXT_DESC2_IVLTV	GENMASK(31, 16)	/* Inner VLAN Tag. */
-+
-+#define TX_CONTEXT_DESC3_VT	GENMASK(15, 0)	/* VLAN Tag */
-+#define TX_CONTEXT_DESC3_VLTV	BIT(16)		/* Inner VLAN Tag Valid */
-+#define TX_CONTEXT_DESC3_IVLTV	BIT(17)		/* Inner VLAN TAG valid. */
-+/* Inner VLAN Tag Insert/Replace */
-+#define TX_CONTEXT_DESC3_IVTIR	GENMASK(19, 18)
-+#define TX_CONTEXT_DESC3_TCMSSV	BIT(26)	/* Timestamp correct or MSS Valid */
-+#define TX_CONTEXT_DESC3_CTXT	BIT(30)	/* Context Type */
-+
-+/* Receive Normal Descriptor (Write-Back Format) */
-+#define RX_DESC0_WB_OVT		GENMASK(15, 0)	/* Outer VLAN Tag. */
-+#define RX_DESC0_WB_IVT		GENMASK(31, 16)	/* Inner VLAN Tag. */
-+
-+#define RX_DESC1_WB_PT		GENMASK(2, 0)	/* Payload Type */
-+#define RX_DESC1_WB_IPHE	BIT(3)		/* IP Header Error. */
-+#define RX_DESC1_WB_IPV4	BIT(4)		/* IPV4 Header Present */
-+#define RX_DESC1_WB_IPV6	BIT(5)		/* IPV6 Header Present. */
-+#define RX_DESC1_WB_IPCE	BIT(7)		/* IP Payload Error. */
-+
-+#define RX_DESC2_WB_RAPARSER	GENMASK(13, 11)	/* Parse error */
-+#define RX_DESC2_WB_DAF		BIT(17)		/* DA Filter Fail */
-+#define RX_DESC2_WB_HF		BIT(18)		/* Hash Filter Status. */
-+
- struct fxgmac_ring_buf {
- 	struct sk_buff *skb;
- 	dma_addr_t skb_dma;
-@@ -542,6 +599,43 @@ struct fxgmac_rx_desc_data {
- 	unsigned short len;		/* Length of received packet */
++	.ndo_start_xmit		= fxgmac_xmit,
  };
  
-+struct fxgmac_pkt_info {
-+	struct sk_buff *skb;
-+#define ATTR_TX_CSUM_ENABLE		BIT(0)
-+#define ATTR_TX_TSO_ENABLE		BIT(1)
-+#define ATTR_TX_VLAN_CTAG		BIT(2)
-+#define ATTR_TX_PTP			BIT(3)
-+
-+#define ATTR_RX_CSUM_DONE		BIT(0)
-+#define ATTR_RX_VLAN_CTAG		BIT(1)
-+#define ATTR_RX_INCOMPLETE		BIT(2)
-+#define ATTR_RX_CONTEXT_NEXT		BIT(3)
-+#define ATTR_RX_CONTEXT			BIT(4)
-+#define ATTR_RX_RX_TSTAMP		BIT(5)
-+#define ATTR_RX_RSS_HASH		BIT(6)
-+	unsigned int attr;
-+
-+#define ERRORS_RX_LENGTH		BIT(0)
-+#define ERRORS_RX_OVERRUN		BIT(1)
-+#define ERRORS_RX_CRC			BIT(2)
-+#define ERRORS_RX_FRAME			BIT(3)
-+	unsigned int errors;
-+	unsigned int desc_count; /* descriptors needed for this packet */
-+	unsigned int length;
-+	unsigned int tx_packets;
-+	unsigned int tx_bytes;
-+
-+	unsigned int header_len;
-+	unsigned int tcp_header_len;
-+	unsigned int tcp_payload_len;
-+	unsigned short mss;
-+	unsigned short vlan_ctag;
-+
-+	u64 rx_tstamp;
-+	u32 rss_hash;
-+	enum pkt_hash_types rss_hash_type;
-+};
-+
- struct fxgmac_desc_data {
- 	struct fxgmac_dma_desc *dma_desc;  /* Virtual address of descriptor */
- 	dma_addr_t dma_desc_addr;          /* DMA address of descriptor */
+ const struct net_device_ops *fxgmac_get_netdev_ops(void)
 -- 
 2.34.1
 
