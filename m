@@ -1,124 +1,160 @@
-Return-Path: <netdev+bounces-180376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7728EA81250
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 18:30:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DB7AA8131D
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 18:59:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9D82164537
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 16:26:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93C0F1BA186E
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 16:58:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB7F122D791;
-	Tue,  8 Apr 2025 16:26:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04AD5234988;
+	Tue,  8 Apr 2025 16:58:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eYSPj+Ke"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="TDG/w3Uw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from sonic309-27.consmr.mail.ne1.yahoo.com (sonic309-27.consmr.mail.ne1.yahoo.com [66.163.184.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0D4A226D0F
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 16:25:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 315A81BC09A
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 16:58:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.184.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744129560; cv=none; b=C1Je9Tsk0L2KeVwuGSeapKjzVtegE5qOi6Cp5SBAEDVJNvmHzarxCFMGvQG0QaRbyuarbZx4KtjZgdZgqm+ZRJfNXWmIOIcuncK2XrC/QlpFe1BaJ1McyuRbVAwClJwJbf+oRpvTvPnk6PXbe+NulHsed8SsCM5E0rVOlBq9yO8=
+	t=1744131515; cv=none; b=t1zwObggP8WKNMTQcEgdoZ+4Pij8pJ6dp0buEZMTRx0ebSPidPcq48OuS7Kt8cOqUTdb/5czKTPfb9VI+MrSSnnrSDq/iNQbJiLYJzUrbUOsEtj7QjpUyhaMhMTl1/JkC3lhxm8E+d12VEcFMu57kGpD/k9htTISSDN+OE8Ns3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744129560; c=relaxed/simple;
-	bh=ljFPIOq3znfMAq1hPUQc5glriASqAaiOXMDYR6i6u48=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=JS45sbOLycaR9pKN+mPgEWe+ObVnPzZd+aFh5tc8Hjxgdyme6JifDswOdTkQkgDi5UNDdbz1Y3zbQPnkqtVpkgObSLaBkWq7xOoswUd8/KC4j+w2DXyDTPhSyOpPb7Oafzp59BPwPRq8USIpU7GSLzkFNGdsgbpkbT/ZsNGGXg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=eYSPj+Ke; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43cee550af2so5639295e9.1
-        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 09:25:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1744129557; x=1744734357; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RFphVcqK3mFE7z2xyqgIGdTaijWdMSkT/C4V2pISyXU=;
-        b=eYSPj+Kes8bLRHabUmJ0gn2WrliHC1zORE4e26cCsDtm65ZJ55AZGmUewn8sgUH7LJ
-         /gBOs+RBRBeAvS94Yz1NP7RxSJYeu7w6949M0x/uRuYiPUDnis09fpaCARnFQV8eu96Z
-         VG2MsepuGlcGlmPCcJEighzg2Z/lXYUikFTz0ttfl8VdAAgx4m69tOBjey5fctaUSjqu
-         GvkUBldDd/WQKmOVPIaaSjkLPTw14xeuWnELcfBSCWwYHngXu/d/4LLVZokszjWZcBNV
-         X5onQIadAY2tFoWXuh/+8Wg+j9ToOkORTWCRptreCb28gSe3XpzlruKVVwF8NAPZcBIN
-         cvsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744129557; x=1744734357;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RFphVcqK3mFE7z2xyqgIGdTaijWdMSkT/C4V2pISyXU=;
-        b=dZneJuUAHiAJOGqnerhbEpZYdRYwB7z14s98k6VYRoMR+3gQfLPusmShWqGSabzF8g
-         8kpKa1qZIpnofMC4NQpdp4lFW+Go1qGS1sjsi+aywEwhcxMwAqvgTrE1BfKvhd25mKC5
-         0VbLcOd1fovAhjkWHZwodRc1H+FDG20CcnlehgbmD1zZ7rOpvBq88apDHPbP6/2Bud/j
-         cjX8li+PHdLCrUpwqW8p+XUIa/+Fdhgp89biuRy/KLfZBClfhuWLM4LRoEW0Z89s5hb6
-         Wbnif0ewocEDKjPRAFxM/XGAxbXTX6e3nATiBY8xsKL47U1ESwI1X54cOb1XoOolsyPE
-         5amw==
-X-Forwarded-Encrypted: i=1; AJvYcCVg38RyCPnvTlhqwobucYGEDMOHIJlRhDClyLzfawl6rPjzg1yjNg8c8Jn39VdRQHg7s7GcKJE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3H0iceaUn9m0LliVEc0sbbq+BR0j5uh6F5rNYcuDuDmb6U3GL
-	JtPbUury5IJ1T3JVTNrbojxmH9T3kq8FHMEUCEJCVVKMb5+KxvcVHVMlCFzjo60=
-X-Gm-Gg: ASbGncviVFspHOcxjeChVte7ogI3Cjqp6f0Aa7QiV1WtvJKQJakMD0S+y7hFGTreTKM
-	kE69vlP+bAI8Tsp06n3OrPyyMKbVk2WM13Xrz/0Q1V1Lage9tyrju79HdcXB1pw/VAxpGLwXDEg
-	oaHOJDyYBVS67m44cuIDimOC3BbV0Upsatr1T5IlFGE2hUl4IRagUbgRCGNUoVKKEzo0m3X2cy2
-	cq0i2HK6Z4obRL68etYNPlScXC7IZjQyEvBPkVUgKAiJpTtp0CeHKNnjC1j858wjSG0CsYyBaKw
-	T8PQRQOqy7Gqklu+M8Fr/niNWPY4M7G+e1DIZ18VQJ66z4OOAQfadYN17sKH6LctKvn76XJfaw=
-	=
-X-Google-Smtp-Source: AGHT+IHcjPw7vTVflIx/On2eYRJY4Tq9MrtcT3MQ3yA+ESz6rLfbUvrWYzlL9vvcgtQLsbxNYvAtHw==
-X-Received: by 2002:a05:600c:848d:b0:439:a3df:66f3 with SMTP id 5b1f17b1804b1-43ecfa18ba7mr56191265e9.6.1744129557114;
-        Tue, 08 Apr 2025 09:25:57 -0700 (PDT)
-Received: from [192.168.1.26] ([178.197.198.86])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43ec34a7615sm164763125e9.9.2025.04.08.09.25.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Apr 2025 09:25:56 -0700 (PDT)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To: krzk+dt@kernel.org, linux-fsd@tesla.com, robh@kernel.org, 
- conor+dt@kernel.org, richardcochran@gmail.com, alim.akhtar@samsung.com, 
- Swathi K S <swathi.ks@samsung.com>
-Cc: jayati.sahu@samsung.com, linux-arm-kernel@lists.infradead.org, 
- linux-samsung-soc@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- pankaj.dubey@samsung.com, ravi.patel@samsung.com, gost.dev@samsung.com
-In-Reply-To: <20250307044904.59077-1-swathi.ks@samsung.com>
-References: <CGME20250307045516epcas5p3b4006a5e2005beda04170179dc92ad16@epcas5p3.samsung.com>
- <20250307044904.59077-1-swathi.ks@samsung.com>
-Subject: Re: [PATCH v8 0/2] arm64: dts: fsd: Add Ethernet support for FSD
- SoC
-Message-Id: <174412955552.86459.1583748766350981659.b4-ty@linaro.org>
-Date: Tue, 08 Apr 2025 18:25:55 +0200
+	s=arc-20240116; t=1744131515; c=relaxed/simple;
+	bh=e3En4V92v80XJLKjWfPt/hAlZ4Q6SPESKtwDek/YWm8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gZKwSs2bq0DHzQUDBJXRo7dcu8W6vyOJbU1S/F2C442wwS3K6t0Hapj1FrQcICkLW+59kkEEYh6euzFLhi9yBCxO5qjoXWg2Y/3h1BeyUPsJOtcQzZmFcbgnp2FsYnQFM4UNTvg5nl5ZEirbmVg4Ma0etnWmJNIuEcQhz6nW0ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=TDG/w3Uw; arc=none smtp.client-ip=66.163.184.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1744131513; bh=e3En4V92v80XJLKjWfPt/hAlZ4Q6SPESKtwDek/YWm8=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=TDG/w3UwUkzCeUjjCeIHyfAIlfXI85LA6M2Z6c36HPhDCEwjUT2fpkBoE7aJLFzMYURVN0SPnAAUV7TrEC3nNfsvyogVcObimp/E3vPCD25/WxdgUW9n6KrWHMrPNt4moVt6iMJkRcwu4YPt0xscLaF38/W4DBbtJlTLZIBRqhcyoDE729O3wKzc5sw10LC2ybbCpsQAMN8PcOkpPUeAeyMh0H8LidqXy/4g8ASJ65yI0M49A504p1OqLQMgDhR5mtyLhdYhGjdSs+qrmQ4/7ju8EyoWb3qRMvCzYWZ4wptm5MuLRMKIC7Mco/zQ8SLNXCTtB2IzvWt/zouMNF/KTg==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1744131513; bh=IeP/HCL7NYOJYU3bB6h85tHffJZc1UK1pbNY+bDns3R=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=bbP1014F3krVwWcDi9KylZYoxG4DJg1FJbaKpN1truYoO6cLQ3xdBIFKP5YwYT9gEH+IL111xzNA/LAIbhA6b3J3Bn/wVuhtnXHGSNW05bZ6CKcGReHfE3SfeZRtWDy/x6d+qCMPFKMPA5SjWJ5QEXG1tgILSqjr13tJvMYltXtcIts741Kp+avEMzgErjOwf9T6/Ipmaib8T98rUpu6PwbmwsD8X+VbGdaHFlAHuddvhka/aaYtTo1SXtsN9P0Ze+x2iO5CGP0t/wWaCMs0jXjr5oys6RS5b9JaGqhzQWO7YwI+beTEt+b1wutnhOXF3iGBaBQ4lG3pYkez8lhfKg==
+X-YMail-OSG: ixmY0nEVM1kgvi8x1IuO13414Urb6wsNy8bLgywNWmYUHZUoz_muP3LWtR9bRu4
+ NwgJ8Wfqm9.xTjpFXHXcoRs02JoGKuUT9tyZSawB8zc64cXDSeAHvpyQNdU4Vd3bfTIy7yPjtbR_
+ TFkeLlqtBY5emk5mDcJom3ClGj7hJGN846MdmrE3v.Q_oTMZ7CU51B1mcXChASJ9SitlCY7OszjC
+ MZFh395IRGOhAwZ8zAmmSOhh6KifA1qbU3faww27U7_9qeBDKTv4GQ_v8.Ry94SgT9nD1VlvT0mc
+ nc.hyb51SxwVAyqgwn2z1AacPQd4O02n.QBTpJ0Qmz.B6jyzgQYFL9J0V.Zgqns0sG0WlB33avY9
+ vq6mwM14mUvnITZ6TKZhnnG263UT3tOJT_Np6tSVkKfO7fXp_HsnRmPDpvv7LlUxXXxUDw4b_ZCp
+ nUl9gQKXf0CammYmBbDdbfKsSQK.7_PGZDbNcAa06QwrpbFs8FCIBnYdwjf3ksJiaC46XRZX70ME
+ Qlwe2.GIPz.uiEaJf5g2ImXU7bzlVwAFK_nE2dR4SvcTBUdeH4MUfhJe5UXKADip7oOshj49s5Hn
+ 4x7LF.fkveqWzsnWPAKN2fWOvu4do0FaAGCXx4ezye3n4YWRgqWNhpkVHlkqKuYuHvUKoTLGp4qR
+ CbZ5VUNI0aLpm2mHh8CWRdBddOEr1yDaURIdWqTOB12LHNJZRO89TzMK4AOIDU6.UJ4jPQWCsZb.
+ 86aTNSc17U_cDX_t0jzoDDHpCNlGjQfN8rLOAW3m3wAZ7PwFTi.3X.7WaagWE487T.G45yOM1sPK
+ XsEBfvNTP5CN149oiGNka6RH72pq8_ZnRhzhvwAsNLTLsAtSHj1Ih9vdtNbVomPxEVA4Zx86vk6x
+ 7DGhbUpFdXuqVENlqoL.LUBmNdC6xKqb5rSi3yLO9NRhJYpZV7P2BB_A1T0_0rOLsT7egrtvzTcK
+ p2Ga5f4b48aEK.1NaAw2C_l2IKPb1WA864c65Em_OrbW1UNEGl6tDBsBBUJxapd5InXn5axhYNLH
+ crkPImYfUBwckFaFc2eJxIvwCPveoE8f_XYIpmrkeWfAhE0aYwZbNy6vcl98BmG3YTBHNVMUJHES
+ wY.T6amt8MnG5PnhtlZQnc49jg69eor6VVjyQNx2DHlC8Wky_K6DyIMk14D5CjTWcJBQO6_A9MiA
+ rdJ3kyi4E1qYKlfAsNb9R46lazbTtD0HmvXh_eZYF3gcFeCtH3TwpHJdKSgT9NJ.HpbK1KtsoD2W
+ CIyLBMuj3vfTeqMjBuWkBIAui_5daXVfJgbxcNrylvmkNKwn13lV35QA5UT9u75xz2kI3g68gNF2
+ YiZAuLCDvKs1tkAgmIwCcNwjrFowuAA_eCukFN1ZP7cQjszIApzg6SzLenIT4hN_FZYT_WWdY6uR
+ BlYdpqiD3uDq6aLMMweHLmDptSlISYY4ijkLQ1YPG0qF54ID2vVKARPHAqaAihkmpDsFDgfFeA1p
+ dSYM_XsGxxKUJl1DtKr53k5Vl7d9_pWKKwY54Fug3xG8rfvcMGiSdEgZvZ2nF40x0ygiLTZDhE7I
+ j2rlzB8ZGjbzb84b6rkrT.gbc0lG380jhzBK.gw2vJB6_I2txzNpXr5G25dUsZmiC1dcfYUTs8aQ
+ 0c66Dav7ftijW0U87V1ojl3ER3N2iwfjDrOkptfZ3NcwuLCKfXdaD980FY57ijdW6wPf8onfFhID
+ j0Q5E0GrKHfXCQA9xjDAQdASioXYGLEx.qtBfdcb4YCGi5w040_Kr.e1SSqaBmvALQl4w.RSjYof
+ tBW78hZz1ZkipepeivDzyqpROtOngK6_06XFGEFm2U1O1gDLIgc5E_9G7O.84a4sGhaZ7gr2._Fm
+ f6cDhnZetbowiYcAe3gWyOTQTrY1WryDI4ljFhwoa11BtKwu2fXpGQ0A6DdohUvtZhAEwp2qC.Ty
+ rgdHOTS1ZK0Acnlba1MUCOw_VuONtxfe7dJpBqJbXw2Byd7XiIWXUf0kpMTsBes_kDQvR6X1VxVI
+ YhnuPcxYigHcQ0QqKBSp4MNkNtDFGVINnio6uHr2gvUN4i3a58L9Ixi9lTWe.Smhx_peoanb7HEl
+ 1zp_EncgPtReNkJDxS1UioAZHV8FKfw8bxkAhNMiThvv702jmM5Y1bSWviSq.o9pq.YMmdhufmet
+ NJC0t_CSwEW5Yq2k79tgugHUoBAc69SYHCJbm6sKiT.Fxq6MWYzxdFTj4XGTAoo0kTskxacuwXYi
+ Mxs0Lbu5R9iEpjdiZ4dD.0JYTA0OmIM.3zwDfmk0Sv4yO5Jb5ilDRdeVaxGZCkKk1lJqJKoJM
+X-Sonic-MF: <casey@schaufler-ca.com>
+X-Sonic-ID: 11940aed-117c-4b6c-871a-02bc0bae110a
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic309.consmr.mail.ne1.yahoo.com with HTTP; Tue, 8 Apr 2025 16:58:33 +0000
+Received: by hermes--production-gq1-6f8bfcd964-fl6ms (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID b13ff0137a9481d56fe33a5f709f2762;
+          Tue, 08 Apr 2025 16:28:07 +0000 (UTC)
+Message-ID: <2a13a228-01fb-442f-924a-702342618b2e@schaufler-ca.com>
+Date: Tue, 8 Apr 2025 09:28:05 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.14.2
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 net-next 2/4] net: Retire DCCP.
+To: =?UTF-8?Q?Christian_G=C3=B6ttsche?= <cgzones@googlemail.com>,
+ Paul Moore <paul@paul-moore.com>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, selinux@vger.kernel.org,
+ linux-security-module@vger.kernel.org, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,
+ Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, James Morris <jmorris@namei.org>,
+ "Serge E. Hallyn" <serge@hallyn.com>, Kuniyuki Iwashima
+ <kuni1840@gmail.com>, netdev@vger.kernel.org,
+ Casey Schaufler <casey@schaufler-ca.com>
+References: <20250407231823.95927-1-kuniyu@amazon.com>
+ <20250407231823.95927-3-kuniyu@amazon.com>
+ <CAHC9VhQCS-TfSL4cMfBu2GszHS8DVE05Z6FH-zPXV=EiH4ZHdg@mail.gmail.com>
+ <cd8c8f91-336d-4dd2-b997-4f7581202e64@googlemail.com>
+Content-Language: en-US
+From: Casey Schaufler <casey@schaufler-ca.com>
+In-Reply-To: <cd8c8f91-336d-4dd2-b997-4f7581202e64@googlemail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Mailer: WebService/1.1.23590 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 
+On 4/7/2025 10:22 PM, Christian Göttsche wrote:
+> Apr 8, 2025 03:35:15 Paul Moore <paul@paul-moore.com>:
+>
+>> On Mon, Apr 7, 2025 at 7:19 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+>>> DCCP was orphaned in 2021 by commit 054c4610bd05 ("MAINTAINERS: dccp:
+>>> move Gerrit Renker to CREDITS"), which noted that the last maintainer
+>>> had been inactive for five years.
+>>>
+>>> In recent years, it has become a playground for syzbot, and most changes
+>>> to DCCP have been odd bug fixes triggered by syzbot.  Apart from that,
+>>> the only changes have been driven by treewide or networking API updates
+>>> or adjustments related to TCP.
+>>>
+>>> Thus, in 2023, we announced we would remove DCCP in 2025 via commit
+>>> b144fcaf46d4 ("dccp: Print deprecation notice.").
+>>>
+>>> Since then, only one individual has contacted the netdev mailing list. [0]
+>>>
+>>> There is ongoing research for Multipath DCCP.  The repository is hosted
+>>> on GitHub [1], and development is not taking place through the upstream
+>>> community.  While the repository is published under the GPLv2 license,
+>>> the scheduling part remains proprietary, with a LICENSE file [2] stating:
+>>>
+>>>   "This is not Open Source software."
+>>>
+>>> The researcher mentioned a plan to address the licensing issue, upstream
+>>> the patches, and step up as a maintainer, but there has been no further
+>>> communication since then.
+>>>
+>>> Maintaining DCCP for a decade without any real users has become a burden.
+>>>
+>>> Therefore, it's time to remove it.
+>>>
+>>> Removing DCCP will also provide significant benefits to TCP.  It allows
+>>> us to freely reorganize the layout of struct inet_connection_sock, which
+>>> is currently shared with DCCP, and optimize it to reduce the number of
+>>> cachelines accessed in the TCP fast path.
+>>>
+>>> Note that we leave uAPI headers alone for userspace programs.
+>>>
+>>> Link: https://lore.kernel.org/netdev/20230710182253.81446-1-kuniyu@amazon.com/T/#u #[0]
+>>> Link: https://github.com/telekom/mp-dccp #[1]
+>>> Link: https://github.com/telekom/mp-dccp/blob/mpdccp_v03_k5.10/net/dccp/non_gpl_scheduler/LICENSE #[2]
+>>> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+>> Adding the LSM and SELinux lists for obvious reasons, as well as Casey
+>> directly since he maintains Smack and I don't see him on the To/CC
+>> line.
 
-On Fri, 07 Mar 2025 10:19:02 +0530, Swathi K S wrote:
-> FSD platform has two instances of EQoS IP, one is in FSYS0 block and
-> another one is in PERIC block. This patch series add required DT file
-> modifications for the same.
-> 
-> Changes since v1:
-> 1. Addressed the format related corrections.
-> 2. Addressed the MAC address correction.
-> 
-> [...]
+It's annoying that I found out about this indirectly. No biscuit.
 
-Applied, thanks!
+Nonetheless, for the Smack bits:
 
-[1/2] arm64: dts: fsd: Add Ethernet support for FSYS0 Block of FSD SoC
-      https://git.kernel.org/krzk/linux/c/1d62af229b18bff2430ea5dde0e129d43515e12c
-[2/2] arm64: dts: fsd: Add Ethernet support for PERIC Block of FSD SoC
-      https://git.kernel.org/krzk/linux/c/ebeab0be707ddcffd2b7f6ff4f9bd8e0c1c49fdd
-
-Best regards,
--- 
-Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Acked-by: Casey Schaufler <casey@schaufler-ca.com>
 
 
