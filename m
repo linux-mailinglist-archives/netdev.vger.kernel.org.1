@@ -1,212 +1,468 @@
-Return-Path: <netdev+bounces-180324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D917EA80F69
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 17:12:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A95FA80D41
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 16:06:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29C7F426D27
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 15:07:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 373E04A559A
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 14:03:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A6F6225779;
-	Tue,  8 Apr 2025 15:07:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10D801D7989;
+	Tue,  8 Apr 2025 14:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=liebherr.com header.i=@liebherr.com header.b="BdvQKJoJ"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="OJiTWOCw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00701402.pphosted.com (mx07-00701402.pphosted.com [66.159.233.223])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2062.outbound.protection.outlook.com [40.107.94.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07828221DB0;
-	Tue,  8 Apr 2025 15:07:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=66.159.233.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 044481C863C;
+	Tue,  8 Apr 2025 14:02:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.62
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744124860; cv=fail; b=hxIgRjnMph2NqvTZipBGXMpL3zaLvWqEVoChvbM7O9wZnkHunwluZsisP5G6wMUMdoA1KKtHrXhLsCMTGUTtbg3MI/zqu3eeZOfJ5OZLx+1Mqi+zQHjRwjQF6y9tCAxo8K9MBgdCrBSgeNVzQpDQPJWj2l9xQKj1JA67jzIHM8g=
+	t=1744120956; cv=fail; b=mG9stSP9yBxSwxhbyyCZ7AZkZY7oUlTXAoKC8EUhKslnTPPjGlnkC3h2iw2WTq/KitYmEWg/zixKfh0eTGhYpkim4yhTEHbRj0COG/sRA1g0sx2cTX3xfIP29vBfjkNuF7yksVH62a8+bKgFg4S4mdG2u0RKDbilc2SrbD9Sgdc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744124860; c=relaxed/simple;
-	bh=sfEBUlY86JF9mQRt0M81iMqVAXdHMfXStCjm37SkNso=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=YE1x73mxrMOwdVXCdHLc2qEBKWxiBJjR3YPEkQkA0icFuPPYVucp9NwSZpDYAc3ZklJ/YyDrIHyu9XsaFi4vuDkDdqc1761MSPCpTWn0Xm3A7HrSB7ZtxUWDvWJMQ0WHhC/qK+viw/qs8S0iGzqrHyvL3giAnQN5BfzOnej/Paw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=liebherr.com; spf=pass smtp.mailfrom=liebherr.com; dkim=pass (1024-bit key) header.d=liebherr.com header.i=@liebherr.com header.b=BdvQKJoJ; arc=fail smtp.client-ip=66.159.233.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=liebherr.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=liebherr.com
-Received: from pps.filterd (m0408740.ppops.net [127.0.0.1])
-	by mx07-00701402.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53851dPq021852;
-	Tue, 8 Apr 2025 15:01:27 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=liebherr.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=key1; bh=0XFgY
-	/6we8ATOVhFTkBVvTnO0daERQHKDuW4I3lBqbk=; b=BdvQKJoJv5j8aE3h7oHyI
-	e/d3WjLVjyM/qh2eKKQMY4kgxFjo86FAOlli2N2hSMZJWa9Hr1ui/U/Gshe4+Zz3
-	fMAXK0PhOOy0+JKL03cdFtcsMFCZFznavN7QTR/KTz2fWdoVE56tLJ2S7gQFE6oq
-	rpiBG/U8wGo8GvR1VDNP5c=
+	s=arc-20240116; t=1744120956; c=relaxed/simple;
+	bh=xHhlC068bjEaQ0eCoJR3KSlzC3Uo4PamLm6llla8/bA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tf8JFtL0PO8YfNw0AkgfzHNmjldzmPuHn0Nu22QsvcgiQPXv2UphzouQ1NO0r+V4duI2GGRzktrdQ6BcKxxhsokDNm6USNkGPMCUECN0Q4HdgzTlyNlU42ZUJD16GMsVxJHSF+PAtbsAusMRlaIiuaANUL6WP4rpogejAPT1Eoo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=OJiTWOCw; arc=fail smtp.client-ip=40.107.94.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=KyiVrtvDGiIl/gn07hgnMvAW4WyTr0kNbp7A/0XHhw579CXdL2nZGAdeyUPH9tSpWbDQ39WTa2TUV8U45zjoTXiMfSyUVyPJEiSAc7NqNqRKXqxlMbJxn86NoFczhcodn40Gl8f4jyjLFfPo9TWbHcHB4kddOsH2yV1hZGY49+xAi1sBe2Ei5btfX5ivLUaGiO4naLFOMlwOxYiwYA1v4R3C5WduNQDg4hO+gbfc+c7wurLSVjILrGtgz/q/F7VaqjnNZHJJhZH1VMvOX3EuybUrCmZEPpdmt0mwzGSGNaEckJxLaeq3SgHW7IpTvKA+6Sh2/YCTaBiyQh47a9ZFfQ==
+ b=On6fUiDEcBSNublzST+yoysQoQhatHEDjz8mAFLbggiHdRbXdGW/6/Quq/8VZyP/GIz8m5CPh1cb19o/5KVjMiznRAAU5F9L6lE9cQjOYGaxXyIQIli/WIPV+YJ4EKaXA3txHuWPurn18lb1O92P+QmI+qmOBz75dY+fdOqT56iD3sUba6irf2fqPBHtR3hhhWjWIO76PJnah/2G7q9xnqdO8BpeQ0VpiX74JK9Wsd07J09xIWHApCBmmGe76ZoadT/uqYi/vwaa875ha/15FAvTNITohNj5YWRD44AeyV/cUOYopImPe+OJFk5AoBVdYhd65YA17PO734XYRWqTgA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0XFgY/6we8ATOVhFTkBVvTnO0daERQHKDuW4I3lBqbk=;
- b=prUG1kJwbvjbLpPL+qLulmxBPSphbZ/6kjt3f4oAmK74zN1xDrAM4JlT1HDgBD5wFXcikRTRNTm/l8iKb9F0+QW1h8P6LHjFnGHk47Y0TKIoZX/cAOMzgw1Z3wGSW0Qna2326NZMhNr1dA+vTA+PLuyorh6OTUKaFMxiuQF011CiAxixg8v6n5pDlY0iOgS1y2bdvMoxLLZPRlgXG0XLwVLqwXyGFIQtJEeb4qkQW1ryopd1XqLz5ifwaTcFmobsPxAZCWbdXgclhEXakEWzOOfrm7gCvA/xlhEWtjON3PaYopsg6YWMJuqlrKiMz9UP7qKGCykNfEa97WANkBOysg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=liebherr.com; dmarc=pass action=none header.from=liebherr.com;
- dkim=pass header.d=liebherr.com; arc=none
-From: "Fedrau Dimitri (LED)" <Dimitri.Fedrau@liebherr.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Heiner Kallweit <hkallweit1@gmail.com>,
-        Russell King
-	<linux@armlinux.org.uk>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Florian Fainelli
-	<f.fainelli@gmail.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Dimitri Fedrau
-	<dima.fedrau@gmail.com>
-Subject: AW: [PATCH net-next v2 3/3] net: phy: dp83822: Add support for
- changing the MAC termination
-Thread-Topic: [PATCH net-next v2 3/3] net: phy: dp83822: Add support for
- changing the MAC termination
-Thread-Index: AQHbqFo9IjrBTn5E3kmWTGlaedQyF7OZt/mAgAADDKA=
-Date: Tue, 8 Apr 2025 13:01:17 +0000
-Message-ID:
- <DB8P192MB0838E18B78149B3EC1E0F168F3B52@DB8P192MB0838.EURP192.PROD.OUTLOOK.COM>
-References: <20250408-dp83822-mac-impedance-v2-0-fefeba4a9804@liebherr.com>
- <20250408-dp83822-mac-impedance-v2-3-fefeba4a9804@liebherr.com>
- <7dbf8923-ac78-47b8-8b9c-8f511a40dfa3@lunn.ch>
-In-Reply-To: <7dbf8923-ac78-47b8-8b9c-8f511a40dfa3@lunn.ch>
-Accept-Language: de-DE, en-US
-Content-Language: de-DE
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DB8P192MB0838:EE_|AS8P192MB2209:EE_
-x-ms-office365-filtering-correlation-id: de4eb448-f883-433f-31ba-08dd769d735b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700018;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?JHm9EjMTpgya9JeJvTgyv7duaCXnvV9x+xUkZsG25TI1WtMBNLkScTFQdD?=
- =?iso-8859-1?Q?OGsm1xEIwXvQBht9PuBg9aZHijHt85QcjXlLam++GCnqBXfGCgFLdl9PT5?=
- =?iso-8859-1?Q?WyJDlSTbX5lwKjzfCA4oeoxtPwMqPbEQHH2+8286yzyM1bEaMFtT0Moljv?=
- =?iso-8859-1?Q?RgmDeqIORXTUmH6WcIYCDjHSu0aX/9003a8bLKiQkqGNP0Yw9umZ/0krlI?=
- =?iso-8859-1?Q?7hStkm7bdef9aW97+zSVZ4IdkNOisgmqdHLR863n1mjI9WY73GVp639jMq?=
- =?iso-8859-1?Q?UxupClN/2rZfdRVR1taJyMIi2QvO1JsN0wWj1On1E3fc6xR9C804T2PX0H?=
- =?iso-8859-1?Q?O91Js99IXbier08DDked0WSMk2RIaT898NdLjVYdVL9sf79HsswBzoycZ9?=
- =?iso-8859-1?Q?Bzg3PS1hK6ozDYJaoDE0BYdtd8W3ofi0+CWsrTDTTm5Qdh4yPPkLxTOIlX?=
- =?iso-8859-1?Q?7wdDxS+XG/8b1Uz5Fs3vCkMExMaqdiTQSsn0ZSZIrCpDuVhn3rayRCai1b?=
- =?iso-8859-1?Q?b/mmE4OEuVk05dMVNy9X7kALQ72m5NBSVkOB0uBYXBE+40HJtYKD6MrPUy?=
- =?iso-8859-1?Q?6ox89ZoLBfqQKEL6y2xYgxWf+diqfWRJBjzMcIeI/jv4Iq1M0yWXTHq93c?=
- =?iso-8859-1?Q?R/hWHIuYi/jS9jZ5aIzbbRErPVsRMxgYDkKj5/3l2OvieC6ZCKl5WWijGB?=
- =?iso-8859-1?Q?IQW2brn9/g9akzY37PkDWc8IdtL92Nqx8auLRIV2gZDjAf1psoPAi1Jx8J?=
- =?iso-8859-1?Q?tRK7J8gM3MOnebb3aoKB+Sy6plGQj7C05Nq8SVymHX+K9GYnVlsiQZAYUC?=
- =?iso-8859-1?Q?DUJOnPWN06J9DIfW9+gAQd4SZCQ1dn17miE9cOuUxlzeY5nEgNA0qg/ix/?=
- =?iso-8859-1?Q?TqSCULyPQiZ7PZi4PGbt460kU0q43DVn6Ahjag2ggLLunlWfxOSpsIJ0UW?=
- =?iso-8859-1?Q?/X6oxha8D8MYV7LjMfYWNDnMh30esz19nalgc9iSQUjvCxza35ExD3MZBo?=
- =?iso-8859-1?Q?QRd05xtccd5rep3PHfhSxD3J4Ae9uqfg2Cb/zMLze560+nVgTBlb47fHJc?=
- =?iso-8859-1?Q?8YnL7g57JX3u2kvENZ6BXruqUT6lNEAnOZzuTVH07/4jEbXzYg9/ZSjXKM?=
- =?iso-8859-1?Q?6WuYaC8mRv3yiNqarg52Mav99UG2wl4+q412Il3LqY36st7u3q7/931bbl?=
- =?iso-8859-1?Q?bhFte92JuIEITeBVYl6pP+fhJSYHXHQyOsFCgUKeUIiLmA+IeVTlTde8c2?=
- =?iso-8859-1?Q?M+C1qZsclB5lrTulg53PugYTukn9z7NXiqXWurAgSN33pW4Rp6+pzmMu3c?=
- =?iso-8859-1?Q?+5TuRkuFcYKMxGJ7cK7NFvUsaLnoCpHxw9NN7Gi1RxyIqA0iFjIEtHYB1t?=
- =?iso-8859-1?Q?NZgQNlYEsHdaLPjcUGuWdIVjKZHW0vVoVbiOZH/bDt4IajYUqMueTGlxvW?=
- =?iso-8859-1?Q?MnM0ETgKQebsC81lD9L/OeH4mlqMzt6XIYBa/gL9hQRctEZ9jdhUYS8AJc?=
- =?iso-8859-1?Q?UouB82GO9bMg43A9oifM8A?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB8P192MB0838.EURP192.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?yiKRZxDr9M3ahJAHaxZILHEHrXixuNEyd35B1DIN+ApKf4mbxU06goPGGD?=
- =?iso-8859-1?Q?qgph34nxDCrBhjuo2zOqapBEqepjraeBlvShv7iGMh+G4g2tgYDo7MIWXq?=
- =?iso-8859-1?Q?sOufuSKymap/Oxa9Xswk0zCjVY8ixa9qKTa7lMoQZreIK7OzcLYce0CF/a?=
- =?iso-8859-1?Q?mr+AN+IoTdq2xB66r5uLiYvD4PvPBQXHGZiG4SQAVH+x7Vqk+rdxjKPd/o?=
- =?iso-8859-1?Q?XMNvXhBriwu5RzGncXT89hxO0UXzNqIDhSR+f/BOc31wU/MeGWGZJqefaN?=
- =?iso-8859-1?Q?TR6i1HAt6INU9DCHplqlEXFi54IU+8DAyPaXWhKEC4RL5dNcP+AqBAHRx7?=
- =?iso-8859-1?Q?lbyyHl4JAAENi2hTg1vyRUtotyILlmXxtqTFzukbpDcrpHlOY7Y92206vd?=
- =?iso-8859-1?Q?qAww4M6vrMVlfsWJt9QRM3lpVuj/4U57mTPtpy++qx4wiZw27QWA4rubFE?=
- =?iso-8859-1?Q?c1X3woARuogJMBYTbqQYsSvvAxWJMliokKqwBfKhJJJLlGiG7wfognsea2?=
- =?iso-8859-1?Q?IdsecKbmRoGnAFSA68hMrzQpetoM9RapUbCWkWub6AhY06u74zYQ79StXQ?=
- =?iso-8859-1?Q?PBYBbwgCSss1r5Pb9bYxlckWvvozMDlcceZrE/xvt9pr+tQSzrBepvBrBR?=
- =?iso-8859-1?Q?qHKSGSd0v8dmy1hPm2AuOR0LIPX/H1h+2YGf17DcVDhnJz/9WO6383MA/R?=
- =?iso-8859-1?Q?727o2djZwriBZaKzn7bYUsyi87AsK2tPyJvejYZkzEMCOqgT2zJ/9AkXP6?=
- =?iso-8859-1?Q?0bF/Oq6IytudofqfpK3x3cBzxpm1WL2h7I7hBEWct2O0ggugeC3F24mwcs?=
- =?iso-8859-1?Q?beC5Io5UPG8fBFlFmhy7fMUNk+h/mNQMzP+h3IYQR5Ej0FdUEWEWT/8TR7?=
- =?iso-8859-1?Q?1Hv5inRcAEJJ5XmQYDytVNg0mEmUrhiUSmddyqsuoC5g8nY2fDwokyrbpc?=
- =?iso-8859-1?Q?A+78pMGt8HjKo2ILm+KDZ1BEIqKH8PScoN3efe8Q5mmISaGTB+4c+GCJMK?=
- =?iso-8859-1?Q?nqK7rLoeoTjQv8Oj0hYm+KWcK8+ClkW5toEEFmlWvFvv/ctaPrGo49br9v?=
- =?iso-8859-1?Q?SEsO5QJouAEql2CAw8CZyrgbwWbxcul2j6xPwwcpIxNF78VkXW0/VTR2Nk?=
- =?iso-8859-1?Q?5De/8tKtYLHM79PqJsPMhtE6qXCnMcNeviYObPQsbTnrXu6lIX3xufmRnt?=
- =?iso-8859-1?Q?9gR+hD2zBkFHCzBQp/WqbAFFAGkgTBm0wC2Zl6ifzTyRPrXUJPA4/7sHsV?=
- =?iso-8859-1?Q?HVCz2JEMtWTOKZ9mAMAMSzW169IjYQrd5qE1OxcIcbWDcjbI5HwfEGwOKz?=
- =?iso-8859-1?Q?muEjDCg68TTO0ULG8gKDBm3ra41aWK9t1SYE8+IcnkOppBHO3iQD1OIRoR?=
- =?iso-8859-1?Q?wKlBUtOEA68ICG6m4rbQyMDUAlYttsePIxSYnh/owInU7HYAUSaF4OnT3C?=
- =?iso-8859-1?Q?mdOfvP5SMvej8HkRLboxWAx5FnQKBEj0a4z184Dcfsr7HaF6lOWEmK+saP?=
- =?iso-8859-1?Q?IGsKs5on2yh1IbJTwdN/gRJFGSCCDlI5Q/3/AH1AfQSUpZgN/dU8O013cp?=
- =?iso-8859-1?Q?sVNC2gviUIJg+v6YhG59miDQz0gcZ/2xxvXm1SFT59hcKPcOQKG+0F3f9L?=
- =?iso-8859-1?Q?LNoPoQdHvIMF4XNb3HvfcGmE1pPykf8+065OyAeEn8knPI+BPYTQkhug?=
- =?iso-8859-1?Q?=3D=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ bh=arpfpvHe0lPUthAjXpg0Br66FKRAmWT5oVWZZm4Xau4=;
+ b=uZkWg14Sv61foTb3nNBD2RYzv7IOKDKHEEyE325YSlqoIXeJt2X4u2xn17txoHeo+apaZBSWdBizXsJAM0rteIk2x33Tb779iXpTmMfrPrJAdv4Mfbs34Klns0H0Iz1CMDzwdOwpXmgRoqmBcKqGbAzTtjCf8+eGnoo6FZdqRBaJFcXV8Rk0lehxLzEqahwB0nPxHen3Yq2OgqDqCr07HRGE0cer8KcaDiO0SRTf9IDJQinSkmWmXIM+d4vp4cp8icF9ZarBfIf8/+1dGAL9Te3z8PW3tp+3gSzyTdTIrTw/BvGHjcQdtns2xXfw+e5DddW3dn9pU1Z+VJ7HK192gg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=arpfpvHe0lPUthAjXpg0Br66FKRAmWT5oVWZZm4Xau4=;
+ b=OJiTWOCwtWPqobUVtZOu93kNE5JqTP9PBYasO/dx9pSIBb5MtBx10oYDCNd4D5D18FYmA5qc/HYhZswseF6cpI9jyRSt8ixLkdfSezoMSW1nUx+Fh4O4WmNc0c3ArADMdawLjO0v0JSzk9NktKcRB4D8sS2Powc/Ath1CxTcAQWKJG5dWbxr2F8ECITvC+if5G2mGdqVg5I7cE+u9/pEIxmn9AoF0QLPOx2ibeLyx4Sdp2qbVDQ6YkoU7jMWYKARD+w+d95YBdFDquW0EHL5CEFdv3ZUqCCG9HU2ezRexwTgeFmKnd8AScojf2GKmxxxjbhAfatjqugq4cCiN7TZeA==
+Received: from BN7PR06CA0057.namprd06.prod.outlook.com (2603:10b6:408:34::34)
+ by SN7PR12MB7418.namprd12.prod.outlook.com (2603:10b6:806:2a5::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.31; Tue, 8 Apr
+ 2025 14:02:24 +0000
+Received: from BN1PEPF00004680.namprd03.prod.outlook.com
+ (2603:10b6:408:34:cafe::a2) by BN7PR06CA0057.outlook.office365.com
+ (2603:10b6:408:34::34) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8632.19 via Frontend Transport; Tue,
+ 8 Apr 2025 14:02:24 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BN1PEPF00004680.mail.protection.outlook.com (10.167.243.85) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8606.22 via Frontend Transport; Tue, 8 Apr 2025 14:02:23 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 8 Apr 2025
+ 07:02:04 -0700
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 8 Apr
+ 2025 07:02:04 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.9)
+ with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Tue, 8 Apr
+ 2025 07:01:59 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>
+CC: Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, "Saeed
+ Mahameed" <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq
+ Toukan <tariqt@nvidia.com>, <netdev@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Moshe Shemesh
+	<moshe@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Vlad Dogaru
+	<vdogaru@nvidia.com>, Yevgeny Kliteynik <kliteyn@nvidia.com>
+Subject: [PATCH net-next 01/12] net/mlx5: HWS, Fix matcher action template attach
+Date: Tue, 8 Apr 2025 17:00:45 +0300
+Message-ID: <1744120856-341328-2-git-send-email-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.8.0
+In-Reply-To: <1744120856-341328-1-git-send-email-tariqt@nvidia.com>
+References: <1744120856-341328-1-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	apMmuZNksdIPje5EvawRa4S+XLZi4Glu8vpDV1Qxe7nTdcwINXoGcGT27y/5lISzMFteFiL+ebQGt4vCewV8iycWJo0Y01FH7V6uxC29EHVxkfO2GH/Mblwy/kBodPTxCTkAFBgwY0Cs4Qv/v9ahBXpPKIhBDThh0FRovijV4p358FWkOQ+j15MoNNEXN+wJuNfpmkzc6u44JSLBL9DNHCuqZFUQtTdj0KV+lsPY726QFkHeUNiuS6bwLwzFnTvIwSMdvJo+fr8Ix6zAdbbXphbpeahsjdco5bObq70BHg8SQTobnKeQB8brZYAui68subA575ARpJJUU2FOl8wG90MJ4BBe6AoYyxnl/9vZ+U+KbZTK0YBzyGdZ8jJR0jd6vSo/R4qedvYeL8EosaZDb0J4R1OVxmOzZ2ArrLKVQYTkeuEKgqIfImwy+ICktjE3Un9crwELakdvYRGFWTEfZNlYupVUCs3iY3fJOmssxfzCGymVrI8+Jnch6IduKz2Yig/6WLtY8k+UXr3LKHeo++RYzKkcX37zMgF90YVMOW0U1taht0AGmO+VMkmiozDAIOxPo/kSa+CR6zzcbXI5CPuWVsKpyT3l7akK7CAr8O946qXnXAq7HQ4eY0RzGyRYyi7SXsmYzoLHXtxFSAniQw==
-X-OriginatorOrg: liebherr.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DB8P192MB0838.EURP192.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: de4eb448-f883-433f-31ba-08dd769d735b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Apr 2025 13:01:17.3647
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN1PEPF00004680:EE_|SN7PR12MB7418:EE_
+X-MS-Office365-Filtering-Correlation-Id: a99ec006-527d-4927-3f4d-08dd76a5fcc2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?d2f0gzh7NLUNFFykTNn5K6cIW4QMYuzk3/yKl7BsONRNLzezil2vGWz5mcO0?=
+ =?us-ascii?Q?Yo6MuUqT9BIwfbgxvloj3j+yrjYmEoRq/vmUDoyW9FewMLGqi3Q+e611TUqU?=
+ =?us-ascii?Q?Q/+JVZLkgbGY29cWJZvUIcux79sbccCGLnCt4NiY134oT7JVndxufoBqPhXM?=
+ =?us-ascii?Q?HOUBtVJBjsVw5rejIYYotBpcPXaoMW2EbptSwf7BJpvF3s4QUEavRrWx4rYw?=
+ =?us-ascii?Q?9TyRqMk6OnJz/2emks+ifP02cpgW3VAX0Mr9jpgqlISRuDqO80Xkm2JGP4dZ?=
+ =?us-ascii?Q?pPZkH4fIEydycwjz0nfjwjDeuPR3VG3c3Yb3EHNucEKcul8pbzg4hD9okSth?=
+ =?us-ascii?Q?srCzDt1jjAKomCQ4b1EH6qK2QhbmP+sglvAXz7dln2GR28KEv14cTZnGZtUS?=
+ =?us-ascii?Q?X6qjmCynuXOqdx/bbKYr7igombP2KoJ8aciGafJMcBbu1hDVKW6FYAUjVK3E?=
+ =?us-ascii?Q?B7MqeHWNpiTd9vkkSNjtA+pb15P59XKHUGEnn+DixWmNHLxkaNOlsS/uBRKt?=
+ =?us-ascii?Q?sHvsV6535ft92lq+BBlRr31Q2NCDfVxqUWkX5ta3Jf5dtEY4ID1EHLN5MrvA?=
+ =?us-ascii?Q?pCpG9hQYTvhR7JDCTehbGdhKlmMe4wkevgZlqSxJ9Cgvw0MJj83hxWQS4cnt?=
+ =?us-ascii?Q?mer//BrC8zSdekNguRRHa2vXu9o94t6Rvoe/7Kk+pz1rqTF64IHp5YhnGLvr?=
+ =?us-ascii?Q?sis0QOM1BYaQgqHkGwSZ8WlDTM9p7+KwtBhTWCU0h2RJrS0W6UrxnfRAqvo8?=
+ =?us-ascii?Q?IQWjiIJoL7fxaBren8R7OiTo6fqgxtt1gf/hD61k5hW7L096rwAknDjgQ69J?=
+ =?us-ascii?Q?G2paT/hYH9PWpG6Okr6GlJL1JywlVNk4nleVw1ZoYnwleNMtceGV54dwNJ1d?=
+ =?us-ascii?Q?jEfZJAkqcuR00qVO9cd3vOdEsSLItn5tjAtRn2HwtnUwsb6ZXoWHyUMwzCTm?=
+ =?us-ascii?Q?iyB1ahGQ9W1sM+/zJZwm0YSUTLZ8WmF6QxbOMJU3kwDye11JUaNz0Z3AiDh4?=
+ =?us-ascii?Q?EQKnwLJU3EW9yDGRPb/2AeFDQIbW2TwSGUuynqRqwPKzTH9TwJxVD0Ya4+1/?=
+ =?us-ascii?Q?FhMRUZhBzGfW0s5UYNWf8Q91le7ditTk4J1wUBqizChBZ0aMioyjbPkdtFMk?=
+ =?us-ascii?Q?ioEf86ay82/iX79t9+hjogwk8a1Dt2RNO5yX2nnbS2BLURJ0iu+Evf8252lO?=
+ =?us-ascii?Q?RTIyY1bLCpxo8+TSxUgoPdSa5xzcSaaN2+o+Oc+LJHbe1sSj0uTxowcZoy/N?=
+ =?us-ascii?Q?rB3DEFJj8MoFdFihLf4l4Mnk9/BrHYgg58cuq2hx7WbEdSyVkRJkt9nxFBmG?=
+ =?us-ascii?Q?OwlRTEwfjdjr8LzcSjaqGQNJAxTNToUL0WEOdlqkZyKIsqdAQXT4XuqWbT03?=
+ =?us-ascii?Q?AbRsHG7Wq7F56xhOKmLhFkGSk0SdNDFfV/jFotbMCZulLP0YMyBlHm9g888G?=
+ =?us-ascii?Q?wstoePnY3oqVhGsN27WIRw9zIQ32E//zgFo9p/szSxsrCd79RKueqJNVQd23?=
+ =?us-ascii?Q?072+s3Oi6C9phRQ=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2025 14:02:23.6873
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3336d6b0-b132-47ee-a49b-3ab470a5336e
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: CG7K5ZRA/V/vQXpjsYISWB/D7R9P7hpEUUtmWJKfAVLgCNifs2362YURL8b8fcYN6lppaiyO/FTkL8ZfZyh1mi/xuZk4A0ptNzPwmd8QfD0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8P192MB2209
-X-Authority-Analysis: v=2.4 cv=RsjFLDmK c=1 sm=1 tr=0 ts=67f51e27 cx=c_pps a=ow5/roAxt+uy2znxgqYcZQ==:117 a=lCpzRmAYbLLaTzLvsPZ7Mbvzbb8=:19 a=wKuvFiaSGQ0qltdbU6+NXLB8nM8=:19 a=Ol13hO9ccFRV9qXi2t6ftBPywas=:19 a=xqWC_Br6kY4A:10 a=8nJEP1OIZ-IA:10
- a=XR8D0OoHHMoA:10 a=k-H-GU2PAAAA:8 a=pGLkceISAAAA:8 a=PHq6YzTAAAAA:8 a=J1Y8HTJGAAAA:8 a=1XWaLZrsAAAA:8 a=VwQbUJbxAAAA:8 a=20KFwNOVAAAA:8 a=dNtzZPA4tSo3ZyHCessA:9 a=wPNLvfGTeEIA:10 a=OlpMY7MLeOwsGCYq90Np:22 a=ZKzU8r6zoKMcqsNulkmm:22
- a=y1Q9-5lHfBjTkpIzbSAN:22
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
- malwarescore=0 impostorscore=0 clxscore=1015 bulkscore=0 mlxlogscore=999
- lowpriorityscore=0 spamscore=0 phishscore=0 priorityscore=1501
- suspectscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.21.0-2502280000
- definitions=main-2504080092
+X-MS-Exchange-CrossTenant-Network-Message-Id: a99ec006-527d-4927-3f4d-08dd76a5fcc2
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN1PEPF00004680.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7418
 
------Urspr=FCngliche Nachricht-----
-Von: Andrew Lunn <andrew@lunn.ch>=20
-Gesendet: Dienstag, 8. April 2025 14:47
-An: Fedrau Dimitri (LED) <dimitri.fedrau@liebherr.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>; Russell King <linux@armlinux.or=
-g.uk>; David S. Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google=
-.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; R=
-ob Herring <robh@kernel.org>; Krzysztof Kozlowski <krzk+dt@kernel.org>; Con=
-or Dooley <conor+dt@kernel.org>; Florian Fainelli <f.fainelli@gmail.com>; n=
-etdev@vger.kernel.org; devicetree@vger.kernel.org; linux-kernel@vger.kernel=
-.org; Dimitri Fedrau <dima.fedrau@gmail.com>
-Betreff: Re: [PATCH net-next v2 3/3] net: phy: dp83822: Add support for cha=
-nging the MAC termination
+From: Vlad Dogaru <vdogaru@nvidia.com>
 
-> > +static const u32 mac_termination[] =3D {
-> > +	99, 91, 84, 78, 73, 69, 65, 61, 58, 55, 53, 50, 48, 46, 44, 43,
->=20
-> Please add this list to the binding.
+The procedure of attaching an action template to an existing matcher had
+a few issues:
 
-Add this list to "ti,dp83822.yaml" ?
+1. Attaching accidentally overran the `at` array in bwc_matcher, which
+   would result in memory corruption. This bug wasn't triggered, but it
+   is possible to trigger it by attaching action templates beyond the
+   initial buffer size of 8. Fix this by converting to a dynamically
+   sized buffer and reallocating if needed.
 
-Best regards,
-Dimitri Fedrau
+2. Similarly, the `at` array inside the native matcher was never
+   reallocated. Fix this the same as above.
+
+3. The bwc layer treated any error in action template attach as a signal
+   that the matcher should be rehashed to account for a larger number of
+   action STEs. In reality, there are other unrelated errors that can
+   arise and they should be propagated upstack. Fix this by adding a
+   `need_rehash` output parameter that's orthogonal to error codes.
+
+Fixes: 2111bb970c78 ("net/mlx5: HWS, added backward-compatible API handling")
+Signed-off-by: Vlad Dogaru <vdogaru@nvidia.com>
+Reviewed-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Reviewed-by: Mark Bloch <mbloch@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+---
+ .../mellanox/mlx5/core/steering/hws/bwc.c     | 55 ++++++++++++++++---
+ .../mellanox/mlx5/core/steering/hws/bwc.h     |  9 ++-
+ .../mellanox/mlx5/core/steering/hws/matcher.c | 48 +++++++++++++---
+ .../mellanox/mlx5/core/steering/hws/matcher.h |  4 ++
+ .../mellanox/mlx5/core/steering/hws/mlx5hws.h |  5 +-
+ 5 files changed, 97 insertions(+), 24 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c
+index 19dce1ba512d..32de8bfc7644 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.c
+@@ -90,13 +90,19 @@ int mlx5hws_bwc_matcher_create_simple(struct mlx5hws_bwc_matcher *bwc_matcher,
+ 	bwc_matcher->priority = priority;
+ 	bwc_matcher->size_log = MLX5HWS_BWC_MATCHER_INIT_SIZE_LOG;
+ 
++	bwc_matcher->size_of_at_array = MLX5HWS_BWC_MATCHER_ATTACH_AT_NUM;
++	bwc_matcher->at = kcalloc(bwc_matcher->size_of_at_array,
++				  sizeof(*bwc_matcher->at), GFP_KERNEL);
++	if (!bwc_matcher->at)
++		goto free_bwc_matcher_rules;
++
+ 	/* create dummy action template */
+ 	bwc_matcher->at[0] =
+ 		mlx5hws_action_template_create(action_types ?
+ 					       action_types : init_action_types);
+ 	if (!bwc_matcher->at[0]) {
+ 		mlx5hws_err(table->ctx, "BWC matcher: failed creating action template\n");
+-		goto free_bwc_matcher_rules;
++		goto free_bwc_matcher_at_array;
+ 	}
+ 
+ 	bwc_matcher->num_of_at = 1;
+@@ -126,6 +132,8 @@ int mlx5hws_bwc_matcher_create_simple(struct mlx5hws_bwc_matcher *bwc_matcher,
+ 	mlx5hws_match_template_destroy(bwc_matcher->mt);
+ free_at:
+ 	mlx5hws_action_template_destroy(bwc_matcher->at[0]);
++free_bwc_matcher_at_array:
++	kfree(bwc_matcher->at);
+ free_bwc_matcher_rules:
+ 	kfree(bwc_matcher->rules);
+ err:
+@@ -192,6 +200,7 @@ int mlx5hws_bwc_matcher_destroy_simple(struct mlx5hws_bwc_matcher *bwc_matcher)
+ 
+ 	for (i = 0; i < bwc_matcher->num_of_at; i++)
+ 		mlx5hws_action_template_destroy(bwc_matcher->at[i]);
++	kfree(bwc_matcher->at);
+ 
+ 	mlx5hws_match_template_destroy(bwc_matcher->mt);
+ 	kfree(bwc_matcher->rules);
+@@ -520,6 +529,23 @@ hws_bwc_matcher_extend_at(struct mlx5hws_bwc_matcher *bwc_matcher,
+ 			  struct mlx5hws_rule_action rule_actions[])
+ {
+ 	enum mlx5hws_action_type action_types[MLX5HWS_BWC_MAX_ACTS];
++	void *p;
++
++	if (unlikely(bwc_matcher->num_of_at >= bwc_matcher->size_of_at_array)) {
++		if (bwc_matcher->size_of_at_array >= MLX5HWS_MATCHER_MAX_AT)
++			return -ENOMEM;
++		bwc_matcher->size_of_at_array *= 2;
++		p = krealloc(bwc_matcher->at,
++			     bwc_matcher->size_of_at_array *
++				     sizeof(*bwc_matcher->at),
++			     __GFP_ZERO | GFP_KERNEL);
++		if (!p) {
++			bwc_matcher->size_of_at_array /= 2;
++			return -ENOMEM;
++		}
++
++		bwc_matcher->at = p;
++	}
+ 
+ 	hws_bwc_rule_actions_to_action_types(rule_actions, action_types);
+ 
+@@ -777,6 +803,7 @@ int mlx5hws_bwc_rule_create_simple(struct mlx5hws_bwc_rule *bwc_rule,
+ 	struct mlx5hws_rule_attr rule_attr;
+ 	struct mutex *queue_lock; /* Protect the queue */
+ 	u32 num_of_rules;
++	bool need_rehash;
+ 	int ret = 0;
+ 	int at_idx;
+ 
+@@ -803,10 +830,14 @@ int mlx5hws_bwc_rule_create_simple(struct mlx5hws_bwc_rule *bwc_rule,
+ 		at_idx = bwc_matcher->num_of_at - 1;
+ 
+ 		ret = mlx5hws_matcher_attach_at(bwc_matcher->matcher,
+-						bwc_matcher->at[at_idx]);
++						bwc_matcher->at[at_idx],
++						&need_rehash);
+ 		if (unlikely(ret)) {
+-			/* Action template attach failed, possibly due to
+-			 * requiring more action STEs.
++			hws_bwc_unlock_all_queues(ctx);
++			return ret;
++		}
++		if (unlikely(need_rehash)) {
++			/* The new action template requires more action STEs.
+ 			 * Need to attempt creating new matcher with all
+ 			 * the action templates, including the new one.
+ 			 */
+@@ -942,6 +973,7 @@ hws_bwc_rule_action_update(struct mlx5hws_bwc_rule *bwc_rule,
+ 	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
+ 	struct mlx5hws_rule_attr rule_attr;
+ 	struct mutex *queue_lock; /* Protect the queue */
++	bool need_rehash;
+ 	int at_idx, ret;
+ 	u16 idx;
+ 
+@@ -973,12 +1005,17 @@ hws_bwc_rule_action_update(struct mlx5hws_bwc_rule *bwc_rule,
+ 			at_idx = bwc_matcher->num_of_at - 1;
+ 
+ 			ret = mlx5hws_matcher_attach_at(bwc_matcher->matcher,
+-							bwc_matcher->at[at_idx]);
++							bwc_matcher->at[at_idx],
++							&need_rehash);
+ 			if (unlikely(ret)) {
+-				/* Action template attach failed, possibly due to
+-				 * requiring more action STEs.
+-				 * Need to attempt creating new matcher with all
+-				 * the action templates, including the new one.
++				hws_bwc_unlock_all_queues(ctx);
++				return ret;
++			}
++			if (unlikely(need_rehash)) {
++				/* The new action template requires more action
++				 * STEs. Need to attempt creating new matcher
++				 * with all the action templates, including the
++				 * new one.
+ 				 */
+ 				ret = hws_bwc_matcher_rehash_at(bwc_matcher);
+ 				if (unlikely(ret)) {
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.h
+index 47f7ed141553..bb0cf4b922ce 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/bwc.h
+@@ -10,9 +10,7 @@
+ #define MLX5HWS_BWC_MATCHER_REHASH_BURST_TH 32
+ 
+ /* Max number of AT attach operations for the same matcher.
+- * When the limit is reached, next attempt to attach new AT
+- * will result in creation of a new matcher and moving all
+- * the rules to this matcher.
++ * When the limit is reached, a larger buffer is allocated for the ATs.
+  */
+ #define MLX5HWS_BWC_MATCHER_ATTACH_AT_NUM 8
+ 
+@@ -23,10 +21,11 @@
+ struct mlx5hws_bwc_matcher {
+ 	struct mlx5hws_matcher *matcher;
+ 	struct mlx5hws_match_template *mt;
+-	struct mlx5hws_action_template *at[MLX5HWS_BWC_MATCHER_ATTACH_AT_NUM];
+-	u32 priority;
++	struct mlx5hws_action_template **at;
+ 	u8 num_of_at;
++	u8 size_of_at_array;
+ 	u8 size_log;
++	u32 priority;
+ 	atomic_t num_of_rules;
+ 	struct list_head *rules;
+ };
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/matcher.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/matcher.c
+index b61864b32053..37a4497048a6 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/matcher.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/matcher.c
+@@ -905,18 +905,48 @@ static int hws_matcher_uninit(struct mlx5hws_matcher *matcher)
+ 	return 0;
+ }
+ 
++static int hws_matcher_grow_at_array(struct mlx5hws_matcher *matcher)
++{
++	void *p;
++
++	if (matcher->size_of_at_array >= MLX5HWS_MATCHER_MAX_AT)
++		return -ENOMEM;
++
++	matcher->size_of_at_array *= 2;
++	p = krealloc(matcher->at,
++		     matcher->size_of_at_array * sizeof(*matcher->at),
++		     __GFP_ZERO | GFP_KERNEL);
++	if (!p) {
++		matcher->size_of_at_array /= 2;
++		return -ENOMEM;
++	}
++
++	matcher->at = p;
++
++	return 0;
++}
++
+ int mlx5hws_matcher_attach_at(struct mlx5hws_matcher *matcher,
+-			      struct mlx5hws_action_template *at)
++			      struct mlx5hws_action_template *at,
++			      bool *need_rehash)
+ {
+ 	bool is_jumbo = mlx5hws_matcher_mt_is_jumbo(matcher->mt);
+ 	struct mlx5hws_context *ctx = matcher->tbl->ctx;
+ 	u32 required_stes;
+ 	int ret;
+ 
+-	if (!matcher->attr.max_num_of_at_attach) {
+-		mlx5hws_dbg(ctx, "Num of current at (%d) exceed allowed value\n",
+-			    matcher->num_of_at);
+-		return -EOPNOTSUPP;
++	*need_rehash = false;
++
++	if (unlikely(matcher->num_of_at >= matcher->size_of_at_array)) {
++		ret = hws_matcher_grow_at_array(matcher);
++		if (ret)
++			return ret;
++
++		if (matcher->col_matcher) {
++			ret = hws_matcher_grow_at_array(matcher->col_matcher);
++			if (ret)
++				return ret;
++		}
+ 	}
+ 
+ 	ret = hws_matcher_check_and_process_at(matcher, at);
+@@ -927,12 +957,11 @@ int mlx5hws_matcher_attach_at(struct mlx5hws_matcher *matcher,
+ 	if (matcher->action_ste.max_stes < required_stes) {
+ 		mlx5hws_dbg(ctx, "Required STEs [%d] exceeds initial action template STE [%d]\n",
+ 			    required_stes, matcher->action_ste.max_stes);
+-		return -ENOMEM;
++		*need_rehash = true;
+ 	}
+ 
+ 	matcher->at[matcher->num_of_at] = *at;
+ 	matcher->num_of_at += 1;
+-	matcher->attr.max_num_of_at_attach -= 1;
+ 
+ 	if (matcher->col_matcher)
+ 		matcher->col_matcher->num_of_at = matcher->num_of_at;
+@@ -960,8 +989,9 @@ hws_matcher_set_templates(struct mlx5hws_matcher *matcher,
+ 	if (!matcher->mt)
+ 		return -ENOMEM;
+ 
+-	matcher->at = kvcalloc(num_of_at + matcher->attr.max_num_of_at_attach,
+-			       sizeof(*matcher->at),
++	matcher->size_of_at_array =
++		num_of_at + matcher->attr.max_num_of_at_attach;
++	matcher->at = kvcalloc(matcher->size_of_at_array, sizeof(*matcher->at),
+ 			       GFP_KERNEL);
+ 	if (!matcher->at) {
+ 		mlx5hws_err(ctx, "Failed to allocate action template array\n");
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/matcher.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/matcher.h
+index 020de70270c5..20b32012c418 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/matcher.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/matcher.h
+@@ -23,6 +23,9 @@
+  */
+ #define MLX5HWS_MATCHER_ACTION_RTC_UPDATE_MULT 1
+ 
++/* Maximum number of action templates that can be attached to a matcher. */
++#define MLX5HWS_MATCHER_MAX_AT 128
++
+ enum mlx5hws_matcher_offset {
+ 	MLX5HWS_MATCHER_OFFSET_TAG_DW1 = 12,
+ 	MLX5HWS_MATCHER_OFFSET_TAG_DW0 = 13,
+@@ -72,6 +75,7 @@ struct mlx5hws_matcher {
+ 	struct mlx5hws_match_template *mt;
+ 	struct mlx5hws_action_template *at;
+ 	u8 num_of_at;
++	u8 size_of_at_array;
+ 	u8 num_of_mt;
+ 	/* enum mlx5hws_matcher_flags */
+ 	u8 flags;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws.h
+index 5121951f2778..8ed8a715a2eb 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws.h
+@@ -399,11 +399,14 @@ int mlx5hws_matcher_destroy(struct mlx5hws_matcher *matcher);
+  *
+  * @matcher: Matcher to attach the action template to.
+  * @at: Action template to be attached to the matcher.
++ * @need_rehash: Output parameter that tells callers if the matcher needs to be
++ * rehashed.
+  *
+  * Return: Zero on success, non-zero otherwise.
+  */
+ int mlx5hws_matcher_attach_at(struct mlx5hws_matcher *matcher,
+-			      struct mlx5hws_action_template *at);
++			      struct mlx5hws_action_template *at,
++			      bool *need_rehash);
+ 
+ /**
+  * mlx5hws_matcher_resize_set_target - Link two matchers and enable moving rules.
+-- 
+2.31.1
+
 
