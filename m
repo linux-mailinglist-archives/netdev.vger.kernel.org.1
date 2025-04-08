@@ -1,81 +1,101 @@
-Return-Path: <netdev+bounces-180380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A7DEA81297
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 18:41:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F5BBA812B3
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 18:45:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A25B47A565E
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 16:39:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 458AE3B78E0
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 16:40:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07F5E22DF8E;
-	Tue,  8 Apr 2025 16:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CB3C22F3BD;
+	Tue,  8 Apr 2025 16:40:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UTeaimiG"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="OtVOLTit";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="f3vPUZfS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D663922D4E3
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 16:40:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D03E22F17B;
+	Tue,  8 Apr 2025 16:40:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744130443; cv=none; b=blTYE5SSloh11gaQiFYMk+0Vr2PEIsR8wJ+KoYlbKmPS9ghzdpIeeAoxU55Q1IwBWQqpz1jzfsDrtvnlb2H0jeEoV8aiWAqog8oJL6YCCtVsPi4V+EpEELoJV9WnolHWYub/IKev0JjG9UlbNdxATWzPoroRVVREjdHlIyCh0aI=
+	t=1744130447; cv=none; b=TsKn67kDpLkZzcSSS0IhN3LyaxGPS2M7UnDecMkF/EIKmM4oCol3lv22g6BcF8VdrvIBZUD93dQwFJF/I0fipe2924b4j+b2RwpGb7F8RQRretGfCDJ0Z9umowx1QY4Nj+KJjHxzs/8zXcOFLI4O+vb05TO6y4DqXSz7Sml2eTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744130443; c=relaxed/simple;
-	bh=ifkmDg9EAW9rlTsITEIFc9RI+MtlN1jgiRqQYpanbY4=;
+	s=arc-20240116; t=1744130447; c=relaxed/simple;
+	bh=I8vlLpjHcKixlNnee9qQYRSKIq0vzo3OM9ZYXwQvMo4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IIrt3yeSQ9nh8Yzb7nzblgJQ/Ovc5PcTSShnkG7Kre63I/qyfuO3kWxUcQpRFUgLYV7EJbTb3sjyoxFjK2oGN3x7bGzeZbJc6gcqXXOEXo9nuZe7G7SiCRJZab8b4B3T5qNlQXOtZlPqdW938F9BejxDShfWakouytDqz1HCh54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UTeaimiG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBB33C4CEE5;
-	Tue,  8 Apr 2025 16:40:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744130443;
-	bh=ifkmDg9EAW9rlTsITEIFc9RI+MtlN1jgiRqQYpanbY4=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=o7VthtTJTTrmxq6xV4Hkt3RqY/L926g3SfWbPlC4S5/L6QEtv/ctVpQzDDweLhfAI5cW6Jevsh4zJDwi76iu8zXxydHlCWplYAWAXB5H9Tlf7wzkyOtydPO9b9xiUT9LR8NRR6Sm5Jq8urwv0rPy3ZWElQdvveCpMA3FohFqLOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=OtVOLTit; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=f3vPUZfS; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id 1DCF9603AC; Tue,  8 Apr 2025 18:40:43 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1744130443;
+	bh=E6bo8R1g3j8fQftb7Htfmeaods5Ry60+30dXgh8MLco=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UTeaimiGrj+jjOS8dAQlAfIoFZnQZAjPA0fRh3jfr/vGJDeNeApEF31mJhYAMzQqL
-	 exAmcHT1H+1grsjrGjkaspVMB84hFN68wH6PqjeKAAiuy1RB/Pe2x/o+ypgJoVy4ZX
-	 9xGLZLgPqm3JW1w+bAz3ea41NxJ+SVivjKbXo/fpyhbFCaQv+V6n6zK/qt6pMUq99f
-	 Vi1K8uCzztamv3XGrvKyCeJr1EpH5vt+x68/cgsZV1PZ8Bi5bnjPYK7PJKvRpAZXLd
-	 q+YmViQJgdT4vGoISHlqRpcbuToGdZIGYFkSzfANYbfFO8vrSBE0Vls8s40pKNXesr
-	 wFo21S51/KYeg==
-Date: Tue, 8 Apr 2025 17:40:38 +0100
-From: Simon Horman <horms@kernel.org>
-To: Mohsin Bashir <mohsin.bashr@gmail.com>
-Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, suhui@nfschina.com, sanman.p211993@gmail.com,
-	vadim.fedorenko@linux.dev, kalesh-anakkur.purayil@broadcom.com,
-	kernel-team@meta.com
-Subject: Re: [PATCH net-next 1/5] eth: fbnic: add locking support for hw stats
-Message-ID: <20250408164038.GA395307@horms.kernel.org>
-References: <20250407172151.3802893-1-mohsin.bashr@gmail.com>
- <20250407172151.3802893-2-mohsin.bashr@gmail.com>
+	b=OtVOLTitbFsUsj+Jb6w311ZFSg4dSorcyC/B4PfNtVDaeBTKAgo74Y32f1YreLuLn
+	 kpFAB4iojvweLVzutiT7lWGNKLDajPjqfKd0+eGrdZaUrekJln3PbasvBkX3QLEyQm
+	 npjtIHmTmjWxZDpIi65FdNh9LAjsb5kt9ZDcdWlJ827FomloFLJOEbX8M6QaRY6ZDn
+	 DFekOoOFM7A7oj7cx0dudMD4yicoj+w4IGjK91vkT8Gq9sukLaDTaVQzBBzZ0zhKTf
+	 GvNlVFp5aQTknSKU7gZvWMXKePjGkU6pKU/jZMFpWYnIFvNnxIkyzm5RIywsq/F05D
+	 4dX57KpsfADQQ==
+X-Spam-Level: 
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 96862603AC;
+	Tue,  8 Apr 2025 18:40:40 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1744130440;
+	bh=E6bo8R1g3j8fQftb7Htfmeaods5Ry60+30dXgh8MLco=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=f3vPUZfSQv+MMCu/Ce5THBljmzldxHs9c1xRZyAQVWIl2hG9Mq3Jv1uY+ZNPrVyQX
+	 LVhJsAz/pFMfqitWf5QIFKfMvUGZWfUxcD30shPH/i0/a+tMYKp1KyCy3RSbIHI4xt
+	 dI55GfI1NUF1+eDJHbmhBy+3aI5jv5QmPyqRjHtVPPlo8P4Y3bA2bEPF0n6NyXbK6F
+	 qaAJOonklSXM9Yzgyz266k9rhHQE1jUumme/DXggXFtTdJflTi0YpjO5+CEYkZTpbX
+	 +mt3r4QqnpkNp84lUxuo09LK5PWfmEVeA0g3Q5jEYcj/puWCEz6/E0NOLmhv4V/dsX
+	 Nigc4gJ9h5U2w==
+Date: Tue, 8 Apr 2025 18:40:38 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: Eric Woudstra <ericwouds@gmail.com>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+	bridge@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH v11 nf-next 1/2] netfilter: bridge: Add conntrack double
+ vlan and pppoe
+Message-ID: <Z_VRhgHY4KEgbg92@calendula>
+References: <20250408142619.95619-1-ericwouds@gmail.com>
+ <20250408142619.95619-2-ericwouds@gmail.com>
+ <20250408163931.GA11581@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250407172151.3802893-2-mohsin.bashr@gmail.com>
+In-Reply-To: <20250408163931.GA11581@breakpoint.cc>
 
-On Mon, Apr 07, 2025 at 10:21:47AM -0700, Mohsin Bashir wrote:
-> This patch adds lock protection for the hardware statistics for fbnic.
-> The hardware statistics access via ndo_get_stats64 is not protected by
-> the rtnl_lock(). Since these stats can be accessed from different places
-> in the code such as service task, ethtool, Q-API, and net_device_ops, a
-> lock-less approach can lead to races.
+On Tue, Apr 08, 2025 at 06:39:31PM +0200, Florian Westphal wrote:
+> Eric Woudstra <ericwouds@gmail.com> wrote:
+> > This adds the capability to conntrack 802.1ad, QinQ, PPPoE and PPPoE-in-Q
+> > packets that are passing a bridge.
 > 
-> Note that this patch is not a fix rather, just a prep for the subsequent
-> changes in this series.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+> Conntrack is l2 agnostic, so this either requires distinct
+> ip addresses in the vlans/pppoe tunneled traffic or users
+> need to configure connection tracking zones manually to
+> ensure there are no collisions or traffic merges (i.e.,
+> packet x from PPPoE won't be merged with frag from a vlan).
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
+There are conntrack zones.
 
