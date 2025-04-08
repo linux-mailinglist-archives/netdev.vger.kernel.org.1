@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-180445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0A46A8153E
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 20:58:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 627ADA81548
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 21:03:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 996F74A4A98
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 18:58:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48DF94A81EA
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 19:03:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA97723E358;
-	Tue,  8 Apr 2025 18:58:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 760CB225A40;
+	Tue,  8 Apr 2025 19:03:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xVK+ncVX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QgzbA7j2"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 305F41DA60F
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 18:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F2A51E8348;
+	Tue,  8 Apr 2025 19:03:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744138706; cv=none; b=eh5hlsOYxNIxFR/QwGO+xSnS+3/5chN1N9bQwQzg8vtBGHxAmj2/beqLjtNulJsfL3rihHhMDHqkyR4faudToi7vV+QjXlXSGxVo/tdcTOzcrb9aF1te6GtX9To7LeBNw1FjjxTzhgdTgVdG3VmwkVzJmmDnLp1RuBkY6yjn3vs=
+	t=1744139000; cv=none; b=daCmE0sVdDX+eQmS6fsTLgTrP4Ip9q6WVVWpZlMuciXDDjhBpoXO1anZIdrkORTyhkX8stt6uM8nmzzc/jUGoq8tu81euHCyoxjyRhRVo7IG66jHWoacJ5MkEHei3aJlZa9J2Vcxb2J3zZ4sKe2a0yxOHsPAfxSBS+fXl7V+YIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744138706; c=relaxed/simple;
-	bh=rNe4ynFqGQU/T8c0VCnXAfOMZsl2s6uQwqORsmiruCY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FtJb/HrppKv1uVCf7uZ0ILHYGFKssrPpZlJhX6rohdoO1rMT4NipAkUnSSvj39mRJQoGRVZvp40DCSOrggxRE8BSR+Zs4yBxcI+IZQ9SYsA4XNdx52Ovi5kk+VEEhng2QNTXHFPineQaOHgfxeJ6RPxPd66AatFOUf6s/qMxLNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xVK+ncVX; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=L6ofuAtc7jkiEuSMNWEw5n9/rP+htmQbYTekNSwGVi8=; b=xVK+ncVXKeJCmefB4rPZck/cSm
-	CXrBTn3k8K77hBbH4X/Rj+n+ntnZ3htDymrzcsCiuXRQveYSdz6uxi7r8lit/b/atttbS23+SEhGA
-	QekG2m4mAOy0GlNlgQzwEnNs4yez634VlXU1GUn7NRYN3pp/KlqwS4bAFEYrVESNQj6A=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u2E9J-008RJh-SC; Tue, 08 Apr 2025 20:58:17 +0200
-Date: Tue, 8 Apr 2025 20:58:17 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jon Hunter <jonathanh@nvidia.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Thierry Reding <treding@nvidia.com>
-Subject: Re: [PATCH net-next 5/5] net: stmmac: remove GMAC_1US_TIC_COUNTER
- definition
-Message-ID: <a244ef6b-da5f-4727-8277-9b0f9b800029@lunn.ch>
-References: <Z_QgOTC1hOSkIdur@shell.armlinux.org.uk>
- <E1u1rgd-0013h1-Fz@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1744139000; c=relaxed/simple;
+	bh=EARKT6yocmAnZReK9tqnX7V8Nt3uW8Qi9d8HfF7ZBIc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IxyggzWqJ83UIZVSncoBpOGjQyZ/Ab8ASl3yzwuToa/UB0QPBJcp3Vs9Di0AB3vse05DX0MIyfXLdCJBt7DJr+6kioPQrqj8QvcyUcDY3UK0O0eps9OfWA4s3pIOTRnFEqaYJ7yG+HCO89H4dN7YQPeNe56144jMq8LxZ4Qx3U0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QgzbA7j2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25DEAC4CEE5;
+	Tue,  8 Apr 2025 19:03:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744138999;
+	bh=EARKT6yocmAnZReK9tqnX7V8Nt3uW8Qi9d8HfF7ZBIc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QgzbA7j2lLvOFPCnvGx0gUDpMilm+wUBS+wydoweKRrbUNyJND9JIA2BnY8WbOP4Q
+	 gCschZ3zZWrxxq92rKWwHsb6Au5m28T1hvK1J+7YUPAem5ChwnK00OhB/2ARcpEYGY
+	 5jBejeZJDT3hHEjrOz2R1qrlQLztAIqvhNv9U1wgRTN/KFJwXewLP595EXnXQZRikx
+	 J9HNQu8gU82pzmzhEYIYf31wgv1BlKZQwzPxLhykp+1uwo0b991bQtU8C8irCcfRlu
+	 46EM5E76hGYjp+y2kZfV338kCYp9DxwiKZmpRIM8JdEdwWe8bmNDi3UwuDP4SzSqQ5
+	 7VioB9FTcWMDg==
+Date: Tue, 8 Apr 2025 12:03:18 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ paulmck@kernel.org, joel@joelfernandes.org, steven.price@arm.com,
+ akpm@linux-foundation.org, anshuman.khandual@arm.com,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next] configs/debug: run and debug PREEMPT
+Message-ID: <20250408120318.65125876@kernel.org>
+In-Reply-To: <df253016-81df-4cc9-8a8c-f92fd1cb8aea@kernel.org>
+References: <20250402172305.1775226-1-sdf@fomichev.me>
+	<df253016-81df-4cc9-8a8c-f92fd1cb8aea@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1u1rgd-0013h1-Fz@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 07, 2025 at 07:59:11PM +0100, Russell King (Oracle) wrote:
-> GMAC_1US_TIC_COUNTER is now no longer used, so remove the definition.
-> This was duplicated by GMAC4_MAC_ONEUS_TIC_COUNTER further down in the
-> same file.
+On Tue, 8 Apr 2025 20:18:26 +0200 Matthieu Baerts wrote:
+> On 02/04/2025 19:23, Stanislav Fomichev wrote:
+> > Recent change [0] resulted in a "BUG: using __this_cpu_read() in
+> > preemptible" splat [1]. PREEMPT kernels have additional requirements
+> > on what can and can not run with/without preemption enabled.
+> > Expose those constrains in the debug kernels.  
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Good idea to suggest this to find more bugs!
+> 
+> I did some quick tests on my side with our CI, and the MPTCP selftests
+> seem to take a bit more time, but without impacting the results.
+> Hopefully, there will be no impact in slower/busy environments :)
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+What kind of slow down do you see? I think we get up to 50% more time
+spent in the longer tests. Not sure how bad is too bad.. I'm leaning
+towards applying this to net-next and we can see if people running
+on linux-next complain?
 
-    Andrew
+Let me CC kselftests, patch in question:
+https://lore.kernel.org/all/20250402172305.1775226-1-sdf@fomichev.me/
 
