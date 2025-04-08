@@ -1,197 +1,219 @@
-Return-Path: <netdev+bounces-180357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A553EA810CE
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 17:56:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 510C9A810CD
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 17:55:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 463378C260F
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 15:48:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E85C34475E3
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 15:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6007522A7F0;
-	Tue,  8 Apr 2025 15:47:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AEB422A7F3;
+	Tue,  8 Apr 2025 15:49:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IrHdCO6d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Of749uDu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E16288CC;
-	Tue,  8 Apr 2025 15:47:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412EAEEB3;
+	Tue,  8 Apr 2025 15:49:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744127275; cv=none; b=P8Y/cCfAbLL24oNgfQWSbFMAP9XPLcuw8nqaBrM5T/yUh3io38JytXtwxYJq0w7slBiqAxYoJSHJ6GMgGn8urU2srU/PnAFaRwrj5UESehj1x2oqdLtgbo/09CLzSOhASGtZ2Mjk0p9/dr39QQaenL9TuzT2WjfxPEfmpBDN0ec=
+	t=1744127380; cv=none; b=Zx5oahLKuLWzjx4sScnO0IgpPnuyuOf/G8XafvyYKbb2NHWT2OS4gz5G11ZiOUY7bvTD53J3c4Flxqxh8IEQ4dzkD306MFjnrmF3Yii/z3NbXWatUUlOt31aMh8SVAyRQmA5v+O0LI7zNwdatp/wnFaPStCLoZnr8LCVWmZPSEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744127275; c=relaxed/simple;
-	bh=9pXd1fjsd/UkXlXloKHgwO8078MP0tBnXdk5SpFcPao=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qor+QGXseoJM4zrh+lfpJYCyzcOOKVnBbM4rfg8wTLoqhFN6oZrOUTaGjQIVb4cqJ7efoSjvBlohpG9ZKQ/LY6IuaklEsKNU8csbPQwVbpjih3j7PPjIY5FcBamOkDkXbraxPvBrlXi1QzCFl+C1xFY4cYUEvKUHDyyJ9EfAG8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IrHdCO6d; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-39c1ef4acf2so3499334f8f.0;
-        Tue, 08 Apr 2025 08:47:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744127272; x=1744732072; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OF2R80/I/m+psYaKl8m4E9ok2YDgHfmbWkmqjc0ZhBU=;
-        b=IrHdCO6dsJuXbQ+9T1LAEPB66iq+K4g8DxCzSc53yrTRdRvVQJi+BFBMYYBxX1mTcs
-         9O4EpCVrhn/VWsc0/6bKd+nYUEfdVIE9GKZpWH4sSDJ5HXNzxLrvjWe9mkoYsUWRxZNL
-         aHF7slWl94kvDFLnWzOYbhTmr1JlwD8rKy+dcogmMbP0iIEqfYTIW3Rt+HlSg4UH0Dop
-         m9qhu1NbcJ7KGRi5mGfV3r/xt1GaxYfM5OW16ptj4h+OcpJH8MBM+gcCYKWQYjmUie0i
-         HG3tJwvKqRgpPD25qTtm1pe34hkuZGL5WFGgSUQalyTjc2siHQ+6ySC70xw8e026TvBz
-         7CqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744127272; x=1744732072;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OF2R80/I/m+psYaKl8m4E9ok2YDgHfmbWkmqjc0ZhBU=;
-        b=Eb8KdbtRMtf4h/c+FbmQr5XbITCvdOLN7v/ELqowg6sHn0QrInuHkZ2b+LLAGSI7Nc
-         uTTYIK+ruNUkmgzA13nHkv9I3j34808X5QHNtWdAI2dBW+p6SFBFtDJehJ//vVZXHlgJ
-         0H8o/NR28/f3XWc5cRPYk65jiJXmtZE6g8gJMEF/a+CgK0aUD6iLCUVXqXjiGYo+ePtK
-         Mp8zSoT8foKZeoEwxl0Vojxpi9TmUDoEyNedhGHjqlZ2tede62YkJZY/uLfdfXKy3njT
-         u3eCRs19YfnRd3g76RdR8roYMVobA91dOFGGDfORe8AT45m3wMFLoqUozJrwfRAslEHo
-         WIAw==
-X-Forwarded-Encrypted: i=1; AJvYcCXvcwU0pAsDhfyv5AQkujMSoNnbhISXDcW55ga6ygJd7EFvRDRod4D1eoDT8DYnmtACeceFvDQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxySqBXutycfoe1bimX4r45e/lrFoqcgK3HAiTguL6VJojlsaRE
-	9To8aAz+fIrRgGyp0beBBfm5z+0h4/tfvz/ytCnzMZUaI3UcPomU+GDIgA==
-X-Gm-Gg: ASbGncswmvI0cpM0PxkAjWNewE57g62jsAvILWUR0hf/tcv+tzBEuO685PquFftL2zi
-	0cLaiaOk046/B+WZhQ0iURwtRD/Zz7CGzVnvX2J7qajhmZoLdZ1z5XZYkEw9WKM/aTW9DzC/mKq
-	VEkXgQby2mlGx7fctLdgdQn9YfZPInQkY79YvN542S923/fLjFlBsRgawrj07I/UQ60OF3a5uPC
-	6JLMTqvhhM8U0PvHQWpvsyo7SvZy4mxrGVp+FwP1XZiu8Zgvn1z5VZ7i95NZhrHl2DtL/xxBrEK
-	pmwHlDxzF8IKYXFLMJz0HiOppMB7aY17IZVEDRkO6UFxkJo=
-X-Google-Smtp-Source: AGHT+IHHKKolUgiYT3qqV6HCjxg/O5o7+cUUHQwntnVd+b0iAtxfpJm9hR+s2B9Kdo9ACQp5mD6+kg==
-X-Received: by 2002:a05:6000:1849:b0:391:ba6:c066 with SMTP id ffacd0b85a97d-39d0de3e88dmr14995337f8f.35.1744127271425;
-        Tue, 08 Apr 2025 08:47:51 -0700 (PDT)
-Received: from [10.0.0.4] ([37.165.172.123])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c301b760bsm15366907f8f.55.2025.04.08.08.47.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Apr 2025 08:47:51 -0700 (PDT)
-Message-ID: <1ad134d3-4173-4d43-b2ad-0b2c5165bbc1@gmail.com>
-Date: Tue, 8 Apr 2025 17:47:49 +0200
+	s=arc-20240116; t=1744127380; c=relaxed/simple;
+	bh=xSrK7LAUSSUCi4ZzH6O6Ty3z7EDtkJ5DhOg5gEePWLE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tq1Gd61vRoDnzJAynLuTXZ5xNIGY1AAOXuPUJ6KzsIoKPo3/noIpwWCJp0q52Jep7xsDJmLNjbjXStz7wsncwTzDa7FQ6NC2rRO2G3r6RvcpXQIWUasir93xbCEyiBikOVW5uwuOhDYb9p05F+s8NrnA1amB6P6bwdVGRvH/B8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Of749uDu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF94CC4CEE5;
+	Tue,  8 Apr 2025 15:49:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744127379;
+	bh=xSrK7LAUSSUCi4ZzH6O6Ty3z7EDtkJ5DhOg5gEePWLE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Of749uDuTgz7/WgXpLcGSOGpAPy4TPUi/Z0rrk3K+bntaoiSBHvd9I4dNHqkpmyS3
+	 Vf55OSR20730/zkiAfflhyHamswWsCCDRaC66oF2N0tEvNw2mMHB+5NWvXV60lKtGi
+	 Dj3LDrKpeBPGl9C/BraLMv0R3bXlwqmNXUhhXHqyynQ2E2LvlZ7l30OUYKRh7w7ORt
+	 Vw4NPl7+LDuhZBewQeOPC3+IL1mfuZsgiDSyhXb77zgRz2clfcvmv5jqwFHiBf8DEq
+	 3TUyegXPg2J+YZwdS3eKPtjytOsJ2B+dfmA1oACgzpmA98a1VteK1lfLbgcpcsCiQj
+	 76S9xtadpKA8A==
+Date: Tue, 8 Apr 2025 16:49:34 +0100
+From: Simon Horman <horms@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Russell King <rmk+kernel@armlinux.org.uk>
+Subject: Re: [PATCH net-next v2 2/2] net: phy: Add Marvell PHY PTP support
+Message-ID: <20250408154934.GZ395307@horms.kernel.org>
+References: <20250407-feature_marvell_ptp-v2-0-a297d3214846@bootlin.com>
+ <20250407-feature_marvell_ptp-v2-2-a297d3214846@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next V2 2/2] net: sched: generalize check for no-op
- qdisc
-To: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>, edumazet@google.com
-Cc: bpf@vger.kernel.org, tom@herbertland.com,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
- dsahern@kernel.org, makita.toshiaki@lab.ntt.co.jp, kernel-team@cloudflare.com
-References: <174412623473.3702169.4235683143719614624.stgit@firesoul>
- <174412628464.3702169.81132659219041209.stgit@firesoul>
-Content-Language: en-US
-From: Eric Dumazet <eric.dumazet@gmail.com>
-In-Reply-To: <174412628464.3702169.81132659219041209.stgit@firesoul>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250407-feature_marvell_ptp-v2-2-a297d3214846@bootlin.com>
 
+On Mon, Apr 07, 2025 at 04:03:01PM +0200, Kory Maincent wrote:
+> From: Russell King <rmk+kernel@armlinux.org.uk>
+> 
+> From: Russell King <rmk+kernel@armlinux.org.uk>
+> 
+> Add PTP basic support for Marvell 88E151x PHYs. These PHYs support
+> timestamping the egress and ingress of packets, but does not support
+> any packet modification.
+> 
+> The PHYs support hardware pins for providing an external clock for the
+> TAI counter, and a separate pin that can be used for event capture or
+> generation of a trigger (either a pulse or periodic).  This code does
+> not support either of these modes.
+> 
+> The driver takes inspiration from the Marvell 88E6xxx DSA and DP83640
+> drivers.  The hardware is very similar to the implementation found in
+> the 88E6xxx DSA driver, but the access methods are very different,
+> although it may be possible to create a library that both can use
+> along with accessor functions.
+> 
+> Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+> 
+> Add support for interruption.
+> Fix L2 PTP encapsulation frame detection.
+> Fix first PTP timestamp being dropped.
+> Fix Kconfig to depends on MARVELL_PHY.
+> Update comments to use kdoc.
+> 
+> Co-developed-by: Kory Maincent <kory.maincent@bootlin.com>
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 
-On 4/8/25 5:31 PM, Jesper Dangaard Brouer wrote:
-> Several drivers (e.g., veth, vrf) contain open-coded checks to determine
-> whether a TX queue has a real qdisc attached - typically by testing if
-> qdisc->enqueue is non-NULL.
->
-> These checks are functionally equivalent to comparing the queue's qdisc
-> pointer against &noop_qdisc (qdisc named "noqueue"). This equivalence
-> stems from noqueue_init(), which explicitly clears the enqueue pointer
-> for the "noqueue" qdisc. As a result, __dev_queue_xmit() treats the qdisc
-> as a no-op only when enqueue == NULL.
->
-> This patch introduces a common helper, qdisc_txq_is_noop() to standardize
-> this check. The helper is added in sch_generic.h and replaces open-coded
-> logic in both the veth and vrf drivers.
->
-> This is a non-functional change.
->
-> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+Hi Kory,
+
+Some minor feedback from my side.
+
 > ---
->   drivers/net/veth.c        |   14 +-------------
->   drivers/net/vrf.c         |    3 +--
->   include/net/sch_generic.h |    7 ++++++-
->   3 files changed, 8 insertions(+), 16 deletions(-)
->
-> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-> index f29a0db2ba36..83c7758534da 100644
-> --- a/drivers/net/veth.c
-> +++ b/drivers/net/veth.c
-> @@ -341,18 +341,6 @@ static bool veth_skb_is_eligible_for_gro(const struct net_device *dev,
->   		 rcv->features & (NETIF_F_GRO_FRAGLIST | NETIF_F_GRO_UDP_FWD));
->   }
->   
-> -/* Does specific txq have a real qdisc attached? - see noqueue_init() */
-> -static inline bool txq_has_qdisc(struct netdev_queue *txq)
-> -{
-> -	struct Qdisc *q;
-> -
-> -	q = rcu_dereference(txq->qdisc);
-> -	if (q->enqueue)
-> -		return true;
-> -	else
-> -		return false;
-> -}
-> -
->   static netdev_tx_t veth_xmit(struct sk_buff *skb, struct net_device *dev)
->   {
->   	struct veth_priv *rcv_priv, *priv = netdev_priv(dev);
-> @@ -399,7 +387,7 @@ static netdev_tx_t veth_xmit(struct sk_buff *skb, struct net_device *dev)
->   		 */
->   		txq = netdev_get_tx_queue(dev, rxq);
->   
-> -		if (!txq_has_qdisc(txq)) {
-> +		if (qdisc_txq_is_noop(txq)) {
->   			dev_kfree_skb_any(skb);
->   			goto drop;
->   		}
-> diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
-> index 7168b33adadb..d4fe36c55f29 100644
-> --- a/drivers/net/vrf.c
-> +++ b/drivers/net/vrf.c
-> @@ -349,9 +349,8 @@ static bool qdisc_tx_is_default(const struct net_device *dev)
->   		return false;
->   
->   	txq = netdev_get_tx_queue(dev, 0);
-> -	qdisc = rcu_access_pointer(txq->qdisc);
->   
-> -	return !qdisc->enqueue;
-> +	return qdisc_txq_is_noop(txq);
->   }
->   
->   /* Local traffic destined to local address. Reinsert the packet to rx
-> diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-> index d48c657191cd..eb90d5103371 100644
-> --- a/include/net/sch_generic.h
-> +++ b/include/net/sch_generic.h
-> @@ -803,6 +803,11 @@ static inline bool qdisc_tx_changing(const struct net_device *dev)
->   	return false;
->   }
->   
-> +static inline bool qdisc_txq_is_noop(const struct netdev_queue *txq)
+> 
+> Russell I don't know which email I should use, so I keep your old SOB.
+
+Russell's SOB seems to be missing.
+
+...
+
+> diff --git a/drivers/net/phy/marvell/marvell_tai.c b/drivers/net/phy/marvell/marvell_tai.c
+
+...
+
+> +/* Read the global time registers using the readplus command */
+> +static u64 marvell_tai_clock_read(const struct cyclecounter *cc)
 > +{
-> +	return (rcu_access_pointer(txq->qdisc) == &noop_qdisc);
+> +	struct marvell_tai *tai = cc_to_tai(cc);
+> +	struct phy_device *phydev = tai->phydev;
+> +	int err, oldpage, lo, hi;
+> +
+> +	oldpage = phy_select_page(phydev, MARVELL_PAGE_PTP_GLOBAL);
+> +	if (oldpage >= 0) {
+> +		/* 88e151x says to write 0x8e0e */
+> +		ptp_read_system_prets(tai->sts);
+> +		err = __phy_write(phydev, PTPG_READPLUS_COMMAND, 0x8e0e);
+> +		ptp_read_system_postts(tai->sts);
+> +		lo = __phy_read(phydev, PTPG_READPLUS_DATA);
+> +		hi = __phy_read(phydev, PTPG_READPLUS_DATA);
+> +	}
 
+If the condition above is not met then err, lo, and hi may be used
+uninitialised below.
 
-return (expression);
+Flagged by W=1 builds with clang 20.1.2, and Smatch.
 
-->
+> +	err = phy_restore_page(phydev, oldpage, err);
+> +
+> +	if (err || lo < 0 || hi < 0)
+> +		return 0;
+> +
+> +	return lo | hi << 16;
+> +}
 
-return expression;
+...
 
+> +int marvell_tai_get(struct marvell_tai **taip, struct phy_device *phydev)
+> +{
+> +	struct marvell_tai *tai;
+> +	unsigned long overflow_ms;
+> +	int err;
+> +
+> +	err = marvell_tai_global_config(phydev);
+> +	if (err < 0)
+> +		return err;
+> +
+> +	tai = kzalloc(sizeof(*tai), GFP_KERNEL);
+> +	if (!tai)
+> +		return -ENOMEM;
+> +
+> +	mutex_init(&tai->mutex);
+> +
+> +	tai->phydev = phydev;
+> +
+> +	/* This assumes a 125MHz clock */
+> +	tai->cc_mult = 8 << 28;
+> +	tai->cc_mult_num = 1 << 9;
+> +	tai->cc_mult_den = 15625U;
+> +
+> +	tai->cyclecounter.read = marvell_tai_clock_read;
+> +	tai->cyclecounter.mask = CYCLECOUNTER_MASK(32);
+> +	tai->cyclecounter.mult = tai->cc_mult;
+> +	tai->cyclecounter.shift = 28;
+> +
+> +	overflow_ms = (1ULL << 32 * tai->cc_mult * 1000) >>
+> +			tai->cyclecounter.shift;
+> +	tai->half_overflow_period = msecs_to_jiffies(overflow_ms / 2);
+> +
+> +	timecounter_init(&tai->timecounter, &tai->cyclecounter,
+> +			 ktime_to_ns(ktime_get_real()));
+> +
+> +	tai->caps.owner = THIS_MODULE;
+> +	snprintf(tai->caps.name, sizeof(tai->caps.name), "Marvell PHY");
+> +	/* max_adj of 1000000 is what MV88E6xxx DSA uses */
+> +	tai->caps.max_adj = 1000000;
+> +	tai->caps.adjfine = marvell_tai_adjfine;
+> +	tai->caps.adjtime = marvell_tai_adjtime;
+> +	tai->caps.gettimex64 = marvell_tai_gettimex64;
+> +	tai->caps.settime64 = marvell_tai_settime64;
+> +	tai->caps.do_aux_work = marvell_tai_aux_work;
+> +
+> +	tai->ptp_clock = ptp_clock_register(&tai->caps, &phydev->mdio.dev);
+> +	if (IS_ERR(tai->ptp_clock)) {
+> +		kfree(tai);
 
-return rcu_access_pointer(txq->qdisc) == &noop_qdisc;
+tai is freed on the line above, but dereferenced on the line below.
 
-I also feel this patch should come first in the series ?
+Flagged by Smatch.
 
+> +		return PTR_ERR(tai->ptp_clock);
+> +	}
+> +
+> +	ptp_schedule_worker(tai->ptp_clock, tai->half_overflow_period);
+> +
+> +	spin_lock(&tai_list_lock);
+> +	list_add_tail(&tai->tai_node, &tai_list);
+> +	spin_unlock(&tai_list_lock);
+> +
+> +	*taip = tai;
+> +
+> +	return 0;
+> +}
 
+...
 
