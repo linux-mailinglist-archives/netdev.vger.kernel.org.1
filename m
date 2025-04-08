@@ -1,101 +1,261 @@
-Return-Path: <netdev+bounces-180119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 864D4A7FA67
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 11:54:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB72DA7FA53
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 11:53:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9779A1883D51
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 09:51:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E1E267AADDE
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 09:51:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5DC3265627;
-	Tue,  8 Apr 2025 09:51:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADBD9266EF5;
+	Tue,  8 Apr 2025 09:52:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="TLNIO8NI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ax8sJgd+"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D943525FA28;
-	Tue,  8 Apr 2025 09:51:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C9D266594;
+	Tue,  8 Apr 2025 09:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744105884; cv=none; b=RsVPzsmAccuBLw9ce3geFX/o1mEC2ibv9wyxYcJXecvOjpC5A+76zMOgvF0uQ0YhWAjO4mNAwAubSdo74YB8jARE8xDjEQEBJfvBMBxOPOXdXfm7haTGy4gD98Y6y+A/XstPqZhbs6d3TxxW0mSFCdb9zqUNvAepwdA9WWjk91g=
+	t=1744105938; cv=none; b=N9Wqi+SyByJA1xHCxeuSFz8eX//dIIiTI5pZ/A27xLsLyJwy8Ane7GvQnYa8m3xUcjoJ5hwZUGEbI9cwg6r2gZ0yoHw9Ohh6drEMrmWi0G070hkOEEVO9KQncU7cwa4WlsWRh4Jos41C6B8XDraccwJ9cYNKzaptFLtXwKAwFis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744105884; c=relaxed/simple;
-	bh=MdhhuR8u+f2L8BEApKaP9yJB+uq9wXeBIyQyuHw/GDM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ERo4akuItUS2eTd4LtnNzod9P8xMIRdqkh44/IUlzypdzmJ/3SQEfCL8O7SK3J6GKnikLGgYp39HcZKeTcd/Mq4r3CcT/BY4gt4E00UUs1YiY9VpmXCVmz2PNYrZ8QHDZrbQ+YeR9lYzsukWMlTMhwwj+ZZx0prG+8KQ5mN8aY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=TLNIO8NI; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ESiiW9LM+nOg1COvw8+IqrZlBUEJUPwPm3jfljatJPA=; b=TLNIO8NI/VPs2Uj48PZi4GSgXw
-	Af5qcZ9XMj/7wycoyyV+/OwM8V3e9RJEn0VmfAtyUsoD3oMCftyWSMt7rtzPVkn/iyM8lzxtzj5E3
-	myfwNRDcs2IKx/+G//t2x4LNRtiRy5NCZqbHk8KKBxYnvrGiMWm77SCD3WD8+sA+QYv+6YaDYxVsT
-	QnQ8ELbI970wp+9VdvQOa9uBFTA32nyggWOvXZNa/WaYymijdPD2ot5SvrvvU6Go2wepyQCBFtqQD
-	62+fx0KkCV/I3V7F9cROj5o53HIYA/IXkh8iVatWp1WCvHctV02C36gYR7CUYDB9K9mgrbVwx2n35
-	UxEy0IZA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54152)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u25bp-00075n-1P;
-	Tue, 08 Apr 2025 10:51:09 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u25bn-0001KC-1T;
-	Tue, 08 Apr 2025 10:51:07 +0100
-Date: Tue, 8 Apr 2025 10:51:07 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: dimitri.fedrau@liebherr.com
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	s=arc-20240116; t=1744105938; c=relaxed/simple;
+	bh=fL6SMWKFNH/epD5gVrIManfsydu6j65zMzUHhIgMOZ0=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ayNWqAjuD9vJ3UBSNdJVW9tnS4HbGjuqIqht4qGnLYRK4dxm86YE+QsELkK61rhESPOjM7CPN869nd0f9SEnvDdVfVvz7URyq/ca/NNKHRnm/WLYOPMtB+wvHORQbPWZOaBh6tfb2jmNqmdUN5NeFrTn6AInEAFAHqREL9oZG7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ax8sJgd+; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-39bf44be22fso3555928f8f.0;
+        Tue, 08 Apr 2025 02:52:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744105933; x=1744710733; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=B9jOtwj6zr/UlgyzehUvwRXcqVoFIXeaFAL8YGh83i0=;
+        b=Ax8sJgd+jg1fcXCAEjMgmhAOSf9vooh3WLrJYB44tWxmmikJWzpTYWxXteQlLS7uix
+         JZlN0knRGEYDS/DLaKxvBvSEQ+Mvi/FF5p/CRmnNl51mMg+M9RFCiifrfuQeguH9Bk7V
+         gPdeB3kaggk5c7aDfXT/Wivw68TsKrCrOSBKSTJ42ultu0EUoIqMqDFliSAGS8qj64Be
+         gUczEW84lmWkZ8oIMfTKp1fXg3FI6V/UCIuXEcGsTYhS9ey32fiK/2bH24iBHk08co+l
+         8q+xa1c01QAUQM6oxZW5iCI399lbhcBvGWSsd3edaUexwPVABGXv8MDW/hUcofgmfBi4
+         xuAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744105933; x=1744710733;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=B9jOtwj6zr/UlgyzehUvwRXcqVoFIXeaFAL8YGh83i0=;
+        b=lp51QhS6esv8bBtefoFFNv/052C+b4m/EDfgWAQfFomI+DNC0EfamQyxBgQOtACVQO
+         XCE5mQGp+bUL0gjsqdH4y4ODaLg/gociaLn3iSlcQce2eDvCnlVylycr/lyGygYLUl/u
+         OY9oE05jxjbNm3FzQbV9YvzVfRBc9FGmJJ2IFP1Brd3ZuER7fhgWyfpx1CGH0C64C0kP
+         sj3r27+Oal955fXGLZXp+E3r4EowCY2PHhTR95PQbxhWePG0FuztPV9oezUDsvWqDBcL
+         qwZoiaioqVpQ6niXJ3d4ungkbk7ruglePcXZsvThs80rrKDdTgUfkvwT5Wkw6Ia9VWRD
+         +mOw==
+X-Forwarded-Encrypted: i=1; AJvYcCUCQCOSC/v2oSJ9CkeM9/5oD8Qr6Q+Xyu8Hi4VLa8RcSuyZJd0TgIKQqs5L8/9GxDUABTsDeLt7Y3po4rS5@vger.kernel.org, AJvYcCWSIGNubikUw+WCtbxHbTAD0HQ4wlN9FSAkbCF+wY06qmSg/jJnYGOKF/+fLjpmn8q0fxi2WrMc@vger.kernel.org, AJvYcCX7howbVhvTahOH9kia5c+dREj6YXCpMF/jTOtDII+fcO3wvfH1AcDr4ngRu/kUBI3tEZMzWB4mlQ5i@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzulo5pZKuk9q0OQ5pLGQyqBToFFhvy/Fy2cErruMl4WsdxgKFT
+	CLZDGlKv5W6fjjlGu5xqD4PpEk1Q6HenY6nFRlwDuY1qfzGOOWr1
+X-Gm-Gg: ASbGncteTvEvaAXSyBcMIKv/ne/TvWFmuVtJplB7HH0kHbiERnK1g9uwNG508f6l2PC
+	+v8hH8tM08uA23eF+ObD5MDin1jZxFxb5R0b0inFbqkIj+nT/PFC11GBLpUTtSpmu+SsfznWNmB
+	DOObH4x/31cnAeZkp6AJPMblc83O25bxgVSDEYeoO2FrLCjV8+9VlWzWLtKamqPd5ilopHTK60d
+	lMNleapwBYq4RwXd8qmpdPeTpxNuEvX10B7v7zNv/10bQXlugQzwJUlu4KuU/hJ0TN7wYrUleLg
+	Xtd0YcTY6yt3D+sHJ6+p93Aw5Y2cXwX2E+jpsVOjtEp8BoLsEjLjfTOiU8m2BnAnu8OIOmfXJOo
+	vB8Rdl08uOVFFfQ==
+X-Google-Smtp-Source: AGHT+IFwQXlkEkiv59tTOoBNbBWxAd5ev/Yt4wKxTnHPQXrrp31uVElCwlox+riOCqLgnYPJvB/0CA==
+X-Received: by 2002:a05:6000:1862:b0:39c:12ce:1054 with SMTP id ffacd0b85a97d-39d6fc00e59mr9843048f8f.8.1744105932837;
+        Tue, 08 Apr 2025 02:52:12 -0700 (PDT)
+Received: from localhost.localdomain (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-39c3020dacfsm14493310f8f.72.2025.04.08.02.52.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Apr 2025 02:52:12 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>,
+	Lee Jones <lee@kernel.org>,
 	Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Dimitri Fedrau <dima.fedrau@gmail.com>
-Subject: Re: [PATCH net-next v2 2/3] net: phy: Add helper for getting MAC
- termination resistance
-Message-ID: <Z_Txi9sdQh2BF0bk@shell.armlinux.org.uk>
-References: <20250408-dp83822-mac-impedance-v2-0-fefeba4a9804@liebherr.com>
- <20250408-dp83822-mac-impedance-v2-2-fefeba4a9804@liebherr.com>
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	"Chester A. Unal" <chester.a.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Simon Horman <horms@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	upstream@airoha.com
+Subject: [net-next PATCH v14 01/16] dt-bindings: nvmem: Document support for Airoha AN8855 Switch EFUSE
+Date: Tue,  8 Apr 2025 11:51:08 +0200
+Message-ID: <20250408095139.51659-2-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250408095139.51659-1-ansuelsmth@gmail.com>
+References: <20250408095139.51659-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250408-dp83822-mac-impedance-v2-2-fefeba4a9804@liebherr.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 08, 2025 at 09:45:33AM +0200, Dimitri Fedrau via B4 Relay wrote:
-> From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-> 
-> Add helper which returns the MAC termination resistance value. Modifying
-> the resistance to an appropriate value can reduce signal reflections and
-> therefore improve signal quality.
-> 
-> Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Document support for Airoha AN8855 Switch EFUSE used to calibrate
+internal PHYs and store additional configuration info.
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+---
+ .../bindings/nvmem/airoha,an8855-efuse.yaml   | 123 ++++++++++++++++++
+ 1 file changed, 123 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/nvmem/airoha,an8855-efuse.yaml
 
-Thanks!
-
+diff --git a/Documentation/devicetree/bindings/nvmem/airoha,an8855-efuse.yaml b/Documentation/devicetree/bindings/nvmem/airoha,an8855-efuse.yaml
+new file mode 100644
+index 000000000000..9802d9ea2176
+--- /dev/null
++++ b/Documentation/devicetree/bindings/nvmem/airoha,an8855-efuse.yaml
+@@ -0,0 +1,123 @@
++# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/nvmem/airoha,an8855-efuse.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Airoha AN8855 Switch EFUSE
++
++maintainers:
++  - Christian Marangi <ansuelsmth@gmail.com>
++
++description:
++  Airoha AN8855 EFUSE used to calibrate internal PHYs and store additional
++  configuration info.
++
++$ref: nvmem.yaml#
++
++properties:
++  compatible:
++    const: airoha,an8855-efuse
++
++  '#nvmem-cell-cells':
++    const: 0
++
++required:
++  - compatible
++  - '#nvmem-cell-cells'
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    efuse {
++        compatible = "airoha,an8855-efuse";
++
++        #nvmem-cell-cells = <0>;
++
++        nvmem-layout {
++            compatible = "fixed-layout";
++            #address-cells = <1>;
++            #size-cells = <1>;
++
++            shift_sel_port0_tx_a: shift-sel-port0-tx-a@c {
++               reg = <0xc 0x4>;
++            };
++
++            shift_sel_port0_tx_b: shift-sel-port0-tx-b@10 {
++                reg = <0x10 0x4>;
++            };
++
++            shift_sel_port0_tx_c: shift-sel-port0-tx-c@14 {
++                reg = <0x14 0x4>;
++            };
++
++            shift_sel_port0_tx_d: shift-sel-port0-tx-d@18 {
++               reg = <0x18 0x4>;
++            };
++
++            shift_sel_port1_tx_a: shift-sel-port1-tx-a@1c {
++               reg = <0x1c 0x4>;
++            };
++
++            shift_sel_port1_tx_b: shift-sel-port1-tx-b@20 {
++               reg = <0x20 0x4>;
++            };
++
++            shift_sel_port1_tx_c: shift-sel-port1-tx-c@24 {
++               reg = <0x24 0x4>;
++            };
++
++            shift_sel_port1_tx_d: shift-sel-port1-tx-d@28 {
++               reg = <0x28 0x4>;
++            };
++
++            shift_sel_port2_tx_a: shift-sel-port2-tx-a@2c {
++                reg = <0x2c 0x4>;
++            };
++
++            shift_sel_port2_tx_b: shift-sel-port2-tx-b@30 {
++                reg = <0x30 0x4>;
++            };
++
++            shift_sel_port2_tx_c: shift-sel-port2-tx-c@34 {
++                reg = <0x34 0x4>;
++            };
++
++            shift_sel_port2_tx_d: shift-sel-port2-tx-d@38 {
++                reg = <0x38 0x4>;
++            };
++
++            shift_sel_port3_tx_a: shift-sel-port3-tx-a@4c {
++                reg = <0x4c 0x4>;
++            };
++
++            shift_sel_port3_tx_b: shift-sel-port3-tx-b@50 {
++                reg = <0x50 0x4>;
++            };
++
++            shift_sel_port3_tx_c: shift-sel-port3-tx-c@54 {
++               reg = <0x54 0x4>;
++            };
++
++            shift_sel_port3_tx_d: shift-sel-port3-tx-d@58 {
++               reg = <0x58 0x4>;
++            };
++
++            shift_sel_port4_tx_a: shift-sel-port4-tx-a@5c {
++                reg = <0x5c 0x4>;
++            };
++
++            shift_sel_port4_tx_b: shift-sel-port4-tx-b@60 {
++                reg = <0x60 0x4>;
++            };
++
++            shift_sel_port4_tx_c: shift-sel-port4-tx-c@64 {
++                reg = <0x64 0x4>;
++            };
++
++            shift_sel_port4_tx_d: shift-sel-port4-tx-d@68 {
++                reg = <0x68 0x4>;
++            };
++        };
++    };
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.48.1
+
 
