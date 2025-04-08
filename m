@@ -1,111 +1,103 @@
-Return-Path: <netdev+bounces-180339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A3F4A8104E
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 17:40:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36A69A81038
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 17:38:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C7078822DE
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 15:32:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9723E1707B5
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 15:32:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E9622B8DB;
-	Tue,  8 Apr 2025 15:31:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D8FC22F381;
+	Tue,  8 Apr 2025 15:31:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xHjiYEdg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fH+P75IH"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27EC11A8407;
-	Tue,  8 Apr 2025 15:31:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 351EC229B23;
+	Tue,  8 Apr 2025 15:31:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744126269; cv=none; b=B48K3JxE5ZAvA8Z9d6igBTrFdgyYa74v+85XnNSpwzAGens4b2sHW05TlMq8d1IoOLODPSnn58WxexXRQs6Q+gflxtNVsje3D92A7INfqKkuag2GZBKyTw94CLVWb5O1LWCaX41GiRvCAwnOVLj5iKmopfSma1E4ghAl0KYNzXg=
+	t=1744126278; cv=none; b=QhZA3vviRvBNZtiflshTfne65qID8gKcWfaJB4TzHMxoiOOjGfHCzSMqDQ0ghWPJkNPfruyo6RBiX3B7+uEanp9tjTq8Jk9MFNE2ZT9AwE8KkP58hIPXDBFPbr91TuTAu56fXjqaTIt0FFstxzbdJIijrZCadUZ+SYNe10MB6uw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744126269; c=relaxed/simple;
-	bh=0YFuHjXItMALCF9I61SplNMuKtnWRp5UV2h38diSEak=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LuxTuH7WqCJ4CX9Vz+hoAby8IsV+BnXYkJ6J9ftCepnsFeonNCe+Rs2Pv6a8Qe0icOC2wtbR5ZGmJZ4lKoIjwVDBX5bvTClpyldhtEqmodwyy7ggEDWeD0LOzsdSl4zheXAo0H5bZgodrF5/rKTxMoa3VhQP/a9V8RIyK3WsaKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xHjiYEdg; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <08c0e1eb-2de6-45bf-95a4-e817008209ab@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744126252;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8BoOWeNe+pe93MVOTNw72S8eDhTJzWNGVCLyplYdrjU=;
-	b=xHjiYEdgV7tMnhbjUS9rxzHVYtisqRgofwAbFgKBjHeCW/w+sALVnUMiySoFUarrOrSbJp
-	Ecqv/CNdAQM8aUz/+aPqTRou80iDO+z9ZzmUuIVt85PyF9sLMmnGUY26Em+RgqaMhsISwv
-	mClV4f4j7VSPhAIpytBuD78aAgb4MhI=
-Date: Tue, 8 Apr 2025 11:30:43 -0400
+	s=arc-20240116; t=1744126278; c=relaxed/simple;
+	bh=gIc64Fn/mEKKOPm/r9X07rUsmYpa1Dp6dSB8roKpclw=;
+	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=H86SrbEEwYUZC6tYg5GZkBLIfyzccGfGELQ1/K2nhvqn1dnEbHbj4TP98vuUSD65M05z1KhddhlbDKYPL9wJ7eChBtNFqMTXqqzPqvMj1UOWIim9NC4xDDycfIp6LIAaR20HQXBWC6IlksIhzgJGztbLoXaDWaE2i5N9OpvknOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fH+P75IH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74071C4CEE5;
+	Tue,  8 Apr 2025 15:31:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744126277;
+	bh=gIc64Fn/mEKKOPm/r9X07rUsmYpa1Dp6dSB8roKpclw=;
+	h=Subject:From:To:Cc:Date:From;
+	b=fH+P75IHuJLHANPIxPmxWT24w/v8ef8HgiPKOUXKSh4pkoC/SFsfE4MfSvcjV3XLB
+	 nPMCk5waTUcgzpjjkG0e6+9SuYAzcUEaTCg8emRLWFm+TAgypfKXR5VtCutiTXLyuB
+	 AbHZpic7N2MgaHOuqVe3wfLhYXYNSQ88pIxOvF6YEKxaUE2b5oCJMzFSIU19uDeMYy
+	 71oWgnbAw7erdkJ1fju7o7KEgikD5DJztp+39IXHq7KFF/M3y4eI3GmO356pShIize
+	 tsSFr2+xEMETbFSCt1ZJgN5WgTl63gXSv/eXtFI6mJHwduHk2T1RC+gVl13AV5nUAw
+	 2Z9jGZpOzTJvQ==
+Subject: [PATCH net-next V2 0/2] veth: qdisc backpressure and qdisc check
+ refactor
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+To: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
+ tom@herbertland.com, Eric Dumazet <eric.dumazet@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+ dsahern@kernel.org, makita.toshiaki@lab.ntt.co.jp, kernel-team@cloudflare.com
+Date: Tue, 08 Apr 2025 17:31:13 +0200
+Message-ID: <174412623473.3702169.4235683143719614624.stgit@firesoul>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [net-next PATCH v2 00/14] Add PCS core support
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
- upstream@airoha.com, Christian Marangi <ansuelsmth@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Kory Maincent <kory.maincent@bootlin.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Clark Wang <xiaoning.wang@nxp.com>,
- Claudiu Beznea <claudiu.beznea@microchip.com>,
- Claudiu Manoil <claudiu.manoil@nxp.com>, Conor Dooley <conor+dt@kernel.org>,
- Ioana Ciornei <ioana.ciornei@nxp.com>, Jonathan Corbet <corbet@lwn.net>,
- Joyce Ooi <joyce.ooi@intel.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Madalin Bucur <madalin.bucur@nxp.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Michal Simek <michal.simek@amd.com>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
- Rob Herring <robh+dt@kernel.org>, Rob Herring <robh@kernel.org>,
- Robert Hancock <robert.hancock@calian.com>,
- Saravana Kannan <saravanak@google.com>, UNGLinuxDriver@microchip.com,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>,
- devicetree@vger.kernel.org, imx@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com
-References: <20250407231746.2316518-1-sean.anderson@linux.dev>
- <20250408075047.69d031a9@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <20250408075047.69d031a9@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 
-On 4/8/25 10:50, Jakub Kicinski wrote:
-> On Mon,  7 Apr 2025 19:17:31 -0400 Sean Anderson wrote:
->> This series depends on [1,2], and they have been included at the
->> beginning so CI will run. However, I expect them to be reviewed/applied
->> outside the net-next tree.
-> 
-> These appear to break the build:
-> 
-> drivers/acpi/property.c:1669:39: error: initialization of ‘int (*)(const struct fwnode_handle *, const char *, const char *, int,  unsigned int,  struct fwnode_reference_args *)’ from incompatible pointer type ‘int (*)(const struct fwnode_handle *, const char *, const char *, unsigned int,  unsigned int,  struct fwnode_reference_args *)’ [-Wincompatible-pointer-types]
->  1669 |                 .get_reference_args = acpi_fwnode_get_reference_args,   \
-> 
-> Could you post as RFC until we can actually merge this? I'm worried 
-> some sleep deprived maintainer may miss the note in the cover letter
-> and just apply it all to net-next..
+This series addresses TX drops observed in production when using veth
+devices with threaded NAPI, and refactors a common qdisc check into a
+shared helper.
 
-I would really like to keep RFC off the titles since some reviewers don't
-pay attention to RFC series.
+In threaded NAPI mode, packet drops can occur when the ptr_ring backing
+the veth peer fills up. This is typically due to a combination of
+scheduling delays and the consumer (NAPI thread) being slower than the
+producer. When the ring overflows, packets are dropped in veth_xmit().
 
-Would [DO NOT MERGE] in the subject be OK?
+Patch 1 introduces a backpressure mechanism: when the ring is full, the
+driver returns NETDEV_TX_BUSY, signaling the qdisc layer to requeue the
+packet. This allows Active Queue Management (AQM) - such as fq or sfq -
+to spread traffic more fairly across flows and reduce damage from
+elephant flows.
 
---Sean
+To minimize invasiveness, this backpressure behavior is only enabled when
+a qdisc is attached. If no qdisc is present, the driver retains its
+original behavior (dropping packets on a full ring), avoiding behavior
+changes for configurations without a qdisc.
+
+Detecting the presence of a "real" qdisc relies on a check that is
+already duplicated across multiple drivers (e.g., veth, vrf). Patch-2
+consolidates this logic into a new helper, qdisc_txq_is_noop(), to avoid
+duplication and clarify intent.
+
+---
+
+Jesper Dangaard Brouer (2):
+      veth: apply qdisc backpressure on full ptr_ring to reduce TX drops
+      net: sched: generalize check for no-op qdisc
+
+
+ drivers/net/veth.c        | 49 ++++++++++++++++++++++++++++++++-------
+ drivers/net/vrf.c         |  3 +--
+ include/net/sch_generic.h |  7 +++++-
+ 3 files changed, 48 insertions(+), 11 deletions(-)
+
+--
+
 
