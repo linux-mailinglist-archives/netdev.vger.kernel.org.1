@@ -1,86 +1,75 @@
-Return-Path: <netdev+bounces-180423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04424A8147E
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 20:23:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87A6EA8147A
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 20:22:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1FAD1BA54B1
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 18:22:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA398885AA1
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 18:22:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 307D524501F;
-	Tue,  8 Apr 2025 18:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56D6323E333;
+	Tue,  8 Apr 2025 18:21:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="OpK2DfAk"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bzy5346g"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2082.outbound.protection.outlook.com [40.107.93.82])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BBBE245027;
-	Tue,  8 Apr 2025 18:20:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.82
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744136460; cv=fail; b=YZNM8BGS0CZKWUrdo/sPfqMOf9YmFyMynN2KVmSdmP8VcJXWTQMwJS4gmYo5eMnux5kupB8BMNvCLov2E69ERQfjQh6U6k5cvuXHSISHu9538iQNwac0aw4YEh7znwrDRHAX//1065F+uOnkeW9YNRCfXCBbjPg68YxjiSvly4s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744136460; c=relaxed/simple;
-	bh=27VtPvNCkeQDrNlDen5FFYM3PGXz6V+n5WZfnqUWnk8=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 546A522D4E3;
+	Tue,  8 Apr 2025 18:21:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744136497; cv=none; b=bRD+TLmP6MFC4N6PSMPAOdqYRIf0py7jOuq92tQKc0n3+OnGx3kcilmrBseBPYWyQrniPUKGkQdMy9APE3CLj3xqp5WOBK40HUg/tyhXJhqkseqvURD8gr1Q4PWcBOCuwd/pJ4gKO5PYGrN93zCE9MY0l+WQZUJ3oBmCpjCPBe8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744136497; c=relaxed/simple;
+	bh=w/wtZwp4S+W1MVCbnnYE1DIpmI5YnNFyH4JdLkLeeH4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kp4Wg4eOn7pK8xAiDRVF9CAOe8MRxEna8Ag0KvR4f5K+K5V9uWjSVzZRfWA4TE0CBHxs6XVIWIPVfhEgYTnq62zGLo/tOzKSqQJQ9Pk01U+jv329q6vDLne+KU8gpIRiKdMBC33vMWIcdt8RUrAGlVeUD5Rx96e3ubCJpiU7EvQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=OpK2DfAk; arc=fail smtp.client-ip=40.107.93.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sW89WDe+s8zcYNsk2bL13jIWMHoYuAYIrCLhkoTUZ4fb2qpYW+R9ZPYHMyvUTCzuW/eDalCosh740U+fZX9z229KQ7FRI5lxX6HKr+rwXRAPDRYQ+BukN77M8Cy5TlwNeLr5K0fbsdi6HEHRhx11Pt5mk4LhB2k6A8clIth6X379D45eU1KXzNbvQeu9UZpQYzRq97BoqSoE/R84ocdXebJua9B022OHw92CMvADsQInFePdbY29ksa6ujUKjCGpc2qJadT55fUvtSWC/IhKzCgw3wx4T0KZMJRV/tZN60FdGG/cA6mSFcSP3Xtw+qSJCbosEt3kQqCpcx30B3diBw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+Q57uMkc6U049FD9XLMsJV6LbX/l61H9NLmHLU96VmU=;
- b=B27GAxGBbYHhsaKtEYa1kJLdVsGkwAFOijNGATu2qgx+8TsK7tQ9thqUNUSvJHpGYBLEyPPjhuB0KIBsDHgYzTCpmcZtRhPyskVfOoSxmXl3fMxu+pZC3n62KQ9JnisxEw/Ba6mhABWmjpnBSQfBpWGQ796XGJRKvBekhrffaLp0iEwxdKB3eugICiKFlQ4Z8buzAWb22tfZFL+FtN4gtFTaloocEDst9E4KzsOk4tOq5nPNO3OuyE+teNJ7g6EwTSjxWAPgktJgMg8SiDZaJaspOb5omDLQcFtc/woUm/d7ntKuJEQc2DpIE9KS6HS+0rG2a2/BOVSLYIMIT1a7Sg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+Q57uMkc6U049FD9XLMsJV6LbX/l61H9NLmHLU96VmU=;
- b=OpK2DfAkR4+PWzOc0XIOdvubwvq3LasGJ9wCWql0H9MumSEERYXJLnzOxJQk3B/Vy3UVk30+FagLB6fucTRa+wr+2ffIJl4By+SOFltA8QQEkm1YWggMayBZjwtepr8Ofe7YXDRcXKQLzS+/nVUndRjXlu2XOyKr7aqXWNey0WE=
-Received: from MW4PR04CA0304.namprd04.prod.outlook.com (2603:10b6:303:82::9)
- by SJ1PR12MB6220.namprd12.prod.outlook.com (2603:10b6:a03:455::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.35; Tue, 8 Apr
- 2025 18:20:54 +0000
-Received: from MWH0EPF000989EC.namprd02.prod.outlook.com
- (2603:10b6:303:82:cafe::bb) by MW4PR04CA0304.outlook.office365.com
- (2603:10b6:303:82::9) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8606.36 via Frontend Transport; Tue,
- 8 Apr 2025 18:20:54 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- MWH0EPF000989EC.mail.protection.outlook.com (10.167.241.139) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8606.22 via Frontend Transport; Tue, 8 Apr 2025 18:20:53 +0000
-Received: from airavat.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 8 Apr
- 2025 13:20:49 -0500
-From: Raju Rangoju <Raju.Rangoju@amd.com>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<Shyam-sundar.S-k@amd.com>, Raju Rangoju <Raju.Rangoju@amd.com>
-Subject: [PATCH net-next 5/5] amd-xgbe: add support for new pci device id 0x1641
-Date: Tue, 8 Apr 2025 23:50:01 +0530
-Message-ID: <20250408182001.4072954-6-Raju.Rangoju@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250408182001.4072954-1-Raju.Rangoju@amd.com>
-References: <20250408182001.4072954-1-Raju.Rangoju@amd.com>
+	 MIME-Version:Content-Type; b=p1Rj5Za2eBj5k9KSMfJiGHKfaf8TRkKv5Nly/s9R3BGdML5RcZz4HP96te+E+MqWMAplOGs4X0KkZoS3KMUjPZFT4sNhoyFV7lVrEdeXo73YlrgWoNBAhU1CUVBzgqQxudJZMx1YkMwthKOv4PaR7J+RNfGIEY5g8nrBKyw+zRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=bzy5346g; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744136496; x=1775672496;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=OEXDD2pAHOlDSkU4MwJdAg7iSPu5cX3tXDgUUdSq4cc=;
+  b=bzy5346gCm2AZlQJjWfYMUEo1Wzc8tSNzTCdNe/tzGbsLvro8faLlh4l
+   pSLp17RncebiuZFgC6HlDvvhkCoL7l4G24XYX49ootbfpMgFABqUM9d3B
+   Ej9HGwDan1QjcbD/n8mdqEZrz22CJjo174ZtpNhr62UhKol4/DQonPjiN
+   g=;
+X-IronPort-AV: E=Sophos;i="6.15,198,1739836800"; 
+   d="scan'208";a="487699298"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2025 18:21:30 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:12463]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.132:2525] with esmtp (Farcaster)
+ id b5d6e786-97b8-4ca7-acd1-d064dc9b4553; Tue, 8 Apr 2025 18:21:29 +0000 (UTC)
+X-Farcaster-Flow-ID: b5d6e786-97b8-4ca7-acd1-d064dc9b4553
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 8 Apr 2025 18:21:27 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.100.5) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 8 Apr 2025 18:21:24 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <zijun_hu@icloud.com>
+CC: <dada1@cosmosbay.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <quic_zijuhu@quicinc.com>, <willemb@google.com>,
+	<xemul@openvz.org>
+Subject: Re: [PATCH net-next] sock: Correct error checking condition for assign|release_proto_idx()
+Date: Tue, 8 Apr 2025 11:21:14 -0700
+Message-ID: <20250408182116.45882-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250408-fix_net-v1-1-375271a79c11@quicinc.com>
+References: <20250408-fix_net-v1-1-375271a79c11@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,101 +78,88 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000989EC:EE_|SJ1PR12MB6220:EE_
-X-MS-Office365-Filtering-Correlation-Id: 00162291-50d3-4cdd-546f-08dd76ca194a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?QhBlj8RJWdb4m8ospuWSsnwu3AdiLnAH1uVy9qSzvW+qmhWKkwlg+u3VXVDo?=
- =?us-ascii?Q?Ei0H8FSEVSP0n8qZpCr0qtaJByPSOIwlk25Emosm4xPyJNeCRf8v1LL0ZWWs?=
- =?us-ascii?Q?q8J55eNYtyuF2FBhsc396dnqXj8zTEmuELGD/2uP/DUysubrjPlqc2K15l3f?=
- =?us-ascii?Q?+1hfZvdgpEkbMUQarA1AG/UGo14JMgnvuTAYyGgS3Tqw64wv3TgMaqeX/UFr?=
- =?us-ascii?Q?1hYSV+thH8uFc0PtXSaf53JIGH3dtGMfYAP6bs1XJWMq5TJ091mOH+NyXfzU?=
- =?us-ascii?Q?LVaeKd9zV4pnUQw+Vz0Xf7ARpDFqLwobDhiI7lcNCM26HQw+TIRFliiwVdMc?=
- =?us-ascii?Q?Khd5w6qC8Ox1Zg8FKjtNMctYVvkeSmHKYs7/vhrHVTArtSGC8DQq3szoHKjP?=
- =?us-ascii?Q?nXCkxpvkjf777eVwflfmb01CNHv1uC1aE5vvDxdA+C1xHam8HwLbl0tmtVOU?=
- =?us-ascii?Q?d6ZQ6VpoCC+HrSZ6hO1DmsL+HfE8ELX8CwPtuMJX6TBcMA0X+q+YENmtG6Nb?=
- =?us-ascii?Q?a8Ko2PSgk8t2VIVABysxxmqK8Lq9I2RmKwX1/Qw9UMh1KEVjlpTHD0ecK2Q6?=
- =?us-ascii?Q?nX6mmKASv5ud1+xqUsOdhyQLJdmLuwSzo65dGd3UWK6iR+ZltxE3V8RDUNmR?=
- =?us-ascii?Q?79d8oaNcWQyoxAGvo8eSlpVSfj2nb/G7Mwrb93eUI+1U1gESBQTnla0XxjFy?=
- =?us-ascii?Q?G1u9UforfP7I0WO5WZM7U54uU8odAV/LR63v+u1XP+6RHZB7P7WKVVGfkqZ3?=
- =?us-ascii?Q?o6tckvyieKZRxWjKVgEYB/0uFe3MD+n6dfLC0ZW04rVvVDwA0gvt4FyrLF9p?=
- =?us-ascii?Q?vUapAtTauoEsSlduzkZ8Ycl97KGRNGVM+17Xx4FG+C3n9wgoKJ6+HSNeeBz8?=
- =?us-ascii?Q?U4VKb9RotX5YHnMvjahhjvF3KhGqWxqhM12YsztIxHIM6EDdJDQuWPqMU57z?=
- =?us-ascii?Q?mcniHHAavNFjTl3VTC+SLIST4TZB0ZsPYszXfio2R08vz5waAYiTRU2KDn+c?=
- =?us-ascii?Q?ntjiWU4Zl4w5b1S+tLkSuoRvl/6u6PALrdLZAilCqORN7U5Dr3ZHTzU3NQRy?=
- =?us-ascii?Q?rJT5eRHyym7I14vD/RbyEWbcCI58miwsj7ymfbUBtZll9n7YgiQbchAYhEZ1?=
- =?us-ascii?Q?7UUW5bwtU/T028cKAsh1uCvUy87abdq9wdNrJAhnqmkLRfkjpEweg3h5UC5L?=
- =?us-ascii?Q?XM46R2F19D1Ne9R7zGc6WvVK4EFiFusBMGlffz8LsozWVWJD64J6cczwFYiM?=
- =?us-ascii?Q?2UddidwGL6d443mymHgJSF5oPvkTju3ExBmB+c/3e3bzA0lmOTJFB7ERe4pI?=
- =?us-ascii?Q?2OZO0ycf78L8fcGdQubyq/o+YCKjwOuVK+cTPYl7DboiAkKtnDQARrK56z6F?=
- =?us-ascii?Q?K/zPY0zRSNIVfRrQRWHSniVma0j3HwVcI/wkIDjIP+3wnwUePE5bpRFREUjR?=
- =?us-ascii?Q?eRh0Q4lUKsBnIifGybq67QOf2Na3Qgxb7RhyN/iT3vOQzg/ZNJWKsQ=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2025 18:20:53.4845
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 00162291-50d3-4cdd-546f-08dd76ca194a
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000989EC.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6220
+X-ClientProxiedBy: EX19D032UWA002.ant.amazon.com (10.13.139.81) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Add support for new pci device id 0x1641 to register
-Crater device with PCIe.
+From: Zijun Hu <zijun_hu@icloud.com>
+Date: Tue, 08 Apr 2025 21:42:34 +0800
+> From: Zijun Hu <quic_zijuhu@quicinc.com>
+> 
+> assign|release_proto_idx() wrongly check find_first_zero_bit() failure
+> by condition '(prot->inuse_idx == PROTO_INUSE_NR - 1)' obviously.
+> 
+> Fix by correcting the condition to '(prot->inuse_idx == PROTO_INUSE_NR)'
+> Also check @->inuse_idx before accessing @->val[] to avoid OOB.
+> 
+> Fixes: 13ff3d6fa4e6 ("[SOCK]: Enumerate struct proto-s to facilitate percpu inuse accounting (v2).")
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> ---
+>  include/net/sock.h | 5 ++++-
+>  net/core/sock.c    | 7 +++++--
+>  2 files changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index 8daf1b3b12c607d81920682139b53fee935c9bb5..9ece93a3dd044997276b0fa37dddc7b5bbdacc43 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -1421,7 +1421,10 @@ struct prot_inuse {
+>  static inline void sock_prot_inuse_add(const struct net *net,
+>  				       const struct proto *prot, int val)
+>  {
+> -	this_cpu_add(net->core.prot_inuse->val[prot->inuse_idx], val);
+> +	unsigned int idx = prot->inuse_idx;
+> +
+> +	if (likely(idx < PROTO_INUSE_NR))
+> +		this_cpu_add(net->core.prot_inuse->val[idx], val);
 
-Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
----
- drivers/net/ethernet/amd/xgbe/xgbe-pci.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+How does the else case happen ?
 
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-pci.c b/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
-index d692f99aa231..c6662dc1a25d 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-pci.c
-@@ -387,6 +387,22 @@ static int __maybe_unused xgbe_pci_resume(struct device *dev)
- 	return ret;
- }
- 
-+static struct xgbe_version_data xgbe_v3 = {
-+	.init_function_ptrs_phy_impl	= xgbe_init_function_ptrs_phy_v2,
-+	.xpcs_access			= XGBE_XPCS_ACCESS_V3,
-+	.mmc_64bit			= 1,
-+	.tx_max_fifo_size		= 65536,
-+	.rx_max_fifo_size		= 65536,
-+	.tx_tstamp_workaround		= 1,
-+	.ecc_support			= 1,
-+	.i2c_support			= 1,
-+	.irq_reissue_support		= 1,
-+	.tx_desc_prefetch		= 5,
-+	.rx_desc_prefetch		= 5,
-+	.an_cdr_workaround		= 0,
-+	.enable_rrc			= 0,
-+};
-+
- static struct xgbe_version_data xgbe_v2a = {
- 	.init_function_ptrs_phy_impl	= xgbe_init_function_ptrs_phy_v2,
- 	.xpcs_access			= XGBE_XPCS_ACCESS_V2,
-@@ -424,6 +440,8 @@ static const struct pci_device_id xgbe_pci_table[] = {
- 	  .driver_data = (kernel_ulong_t)&xgbe_v2a },
- 	{ PCI_VDEVICE(AMD, 0x1459),
- 	  .driver_data = (kernel_ulong_t)&xgbe_v2b },
-+	{ PCI_VDEVICE(AMD, 0x1641),
-+	  .driver_data = (kernel_ulong_t)&xgbe_v3 },
- 	/* Last entry must be zero */
- 	{ 0, }
- };
--- 
-2.34.1
 
+>  }
+>  
+>  static inline void sock_inuse_add(const struct net *net, int val)
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 323892066def8ba517ff59f98f2e4ab47edd4e63..92f4618c576a3120bcc8e9d03d36738b77447360 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -3948,6 +3948,9 @@ int sock_prot_inuse_get(struct net *net, struct proto *prot)
+>  	int cpu, idx = prot->inuse_idx;
+>  	int res = 0;
+>  
+> +	if (unlikely(idx >= PROTO_INUSE_NR))
+
+Same here.
+
+
+> +		return 0;
+> +
+>  	for_each_possible_cpu(cpu)
+>  		res += per_cpu_ptr(net->core.prot_inuse, cpu)->val[idx];
+>  
+> @@ -3999,7 +4002,7 @@ static int assign_proto_idx(struct proto *prot)
+>  {
+>  	prot->inuse_idx = find_first_zero_bit(proto_inuse_idx, PROTO_INUSE_NR);
+>  
+> -	if (unlikely(prot->inuse_idx == PROTO_INUSE_NR - 1)) {
+> +	if (unlikely(prot->inuse_idx == PROTO_INUSE_NR)) {
+>  		pr_err("PROTO_INUSE_NR exhausted\n");
+>  		return -ENOSPC;
+>  	}
+> @@ -4010,7 +4013,7 @@ static int assign_proto_idx(struct proto *prot)
+>  
+>  static void release_proto_idx(struct proto *prot)
+>  {
+> -	if (prot->inuse_idx != PROTO_INUSE_NR - 1)
+> +	if (prot->inuse_idx != PROTO_INUSE_NR)
+>  		clear_bit(prot->inuse_idx, proto_inuse_idx);
+>  }
+>  #else
+> 
+> ---
+> base-commit: 34a07c5b257453b5fcadc2408719c7b075844014
+> change-id: 20250405-fix_net-3e8364d302ff
+> 
+> Best regards,
+> -- 
+> Zijun Hu <quic_zijuhu@quicinc.com>
 
