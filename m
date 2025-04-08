@@ -1,183 +1,147 @@
-Return-Path: <netdev+bounces-180065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 912E3A7F69E
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 09:42:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B12BAA7F6AF
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 09:44:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BF8187A9E20
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 07:38:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4547318900C5
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 07:43:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AD51263C7D;
-	Tue,  8 Apr 2025 07:37:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="TQBC4zLX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F850264620;
+	Tue,  8 Apr 2025 07:41:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4029A263C76
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 07:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B506B26461D
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 07:41:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744097845; cv=none; b=H9I9I3Cd4LMxtp5qRQCeRrvtUHXL2o/724zxqVLL/JE8Wwkb3ZW5CHWUMFjJmTvVoRfKw7ddqoDEnCsifayQe4aRsYz/NjpPFFcULE01+i/+RbA6mjEMP8q9DyTYKJJu69yXNBsaJpoErKyuZkZUgvWA3QE/n5Cw4c0wAX/0u/c=
+	t=1744098088; cv=none; b=udPLtNjExqS4USPY4puxyG8XF+NJkq2ZLEZI4+U3x8p7z9ESz509WcLGUKy43oQ+jaSxSqQz2RMGFs8evmVngGRETparl/5DlHyi8Gx9a2/ibvJFwd3e3xo6V2MemcM5qahCNJdIQKFYxgT6J9ZuGfQF/FiEbtata/cKmBkBa3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744097845; c=relaxed/simple;
-	bh=lhptucuRa84eI+sVBc0K01zYfX2ZL/c4XOsEebGLJBg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nIqaxuD1lytAfITiqJ/oFgKcQ9RHifB7exAesT5o2lg+cYni7qxqwcqncr/SWJxdz40kwvDkquevdWsXiYIAv/OG37dGX+1TYMhGWep8uHKw6SStM0k4chta180YfYbJW1aH5u8lOQ/JxSc1WvKeyCeKLLddGbk/2AQydYoaGBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=TQBC4zLX; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43d0359b1fcso32771935e9.0
-        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 00:37:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1744097841; x=1744702641; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=iGBnll+v1vTfK1JeEQuKDVXKtlWhbohIMfsqmj0adgQ=;
-        b=TQBC4zLXNxuR8lh2bhBSO1bDi0Jf6z+dNNzIYsdu5ewbhvYfnxqJOXIoRMAY9OtxWl
-         J8KUu+qvNQ5o8293sEcRc5Y6V/WZykz3gY1BiZtPAl/rIptd+IXs/aqUIpvcYGhmjJMp
-         9bo1Dbgs1BKQm+BVbJ/ENTF0rCagnDuSMqjcJVAfoL6StmvF0uwAck9/ilE/QWfmMN88
-         GZ65uIweoRwTu0gWbPsobf9tHIKjmkKxUfMbfX6fEWo0ayMwlwcB40/WuUZvBWE+sdRL
-         QNpi7dECB5cCUl6ipl94WQdudjxhVRzqUnwSel3sSUSvxXxaE0Bn9M84T6iPwDhmw8Qs
-         xgjg==
+	s=arc-20240116; t=1744098088; c=relaxed/simple;
+	bh=c7DCdLXbOqDr50W9/qA7Md2fmFxz0hPGsDzruBo5d3U=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Awh9bam9rkgD2u62ozElskXD0txOO2EsS3UJHIByiWKpND/pY/pP3ZLFpRjnsxg+SOIrU5tFAIy62UY3WSsWXtPSV97Tom2a+fIYWXfYW42jcfHTMOsZOZKOghJGb2lnnT3MQ/ni3ejOfshWNskZBnrBz3P5HD7GoNQxl4qSX5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3d44ba1c2b5so57446305ab.2
+        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 00:41:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744097841; x=1744702641;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iGBnll+v1vTfK1JeEQuKDVXKtlWhbohIMfsqmj0adgQ=;
-        b=jLDkBxja0HyG6y85P63C56hBIQNXR6xYOznYg6ECvDkyZm5jb0FJpO/S1bgSJ2dOl3
-         2qHJ044iCOr6+lz/eawvpXZxCNesb1ifZzME9+6vIt4PmN9dHrLCMBzf5dZMjv+F5hgB
-         ACm8nsObM9geuN5FEtq9MAXGU1robbesBZ+2WTmgqgqciQ4aCR+R5fTC3np33FdNEo+x
-         sXDLoTq3yXzLqXZjBZQrkCNt9no0l7rYKd7ErSn0CbYdShTOvRx3U73HNpjHs2cTH4gF
-         N72WQu77AqVNUD0B5QHmpXC9XMBfExDsOb9tuEGjrojJj7vG5Ue/3qLV77CayQUgIBey
-         VQ7w==
-X-Forwarded-Encrypted: i=1; AJvYcCXLJVOzwvpSozIv6Wdzsxdy++EQFBla781P1i0QUsxsAktoMulbghWZfl4x3I1Cv+Bj6w2+5mM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRTgeijyXLN9Zlp2VbHmR2G66tm94VRVOmc3qbaoNJEF/kgPaF
-	6R6eh8OIztGvFzOnfTojWgXqk008kQDv8oq/xm2CAGrE2/e8jXoKpR7FTjhknupNXiFDmr9228P
-	073QcYqXpC6WKBx2zrmNTlthOMpEZO3u0fUuod7ZqeL4QG+Y=
-X-Gm-Gg: ASbGncvqUtMfkO/O0Mv1qSlQGTYshgV2+r5yoFHoPiykQmSEcHHzcpcLM2SMHtG9wK8
-	Z9+djbiAR/qr9rF6GNVxbxzp5KprC6KMOG6Hz20XEp0yd6FuHUnZMhDjokdp2a1lfrRo3unLd3y
-	QGMHoyL2e7PZGHgud8KCKATFblTrnMc/j77R+zC4UTrLaeAgUQdbo9/GhVcw8KHulfoEnRKpG2T
-	+gHZaJKgCjIqSFjAQiSr1e2cDgQ4GvLveNcASnT3Pjew5BKV6cccxMQe5BCZL30CpAW+U/xQe24
-	Ej1vAD7lRYXdDPZCs7EKHnZmZgDJHIz2FFRkSOh8RtND8ozWwbMgF/0UT6L1p7UgnD0WXrRX7CI
-	MMR8oeX8NBN0d6h+Xnw==
-X-Google-Smtp-Source: AGHT+IGBqtrapcUaVmWiPRDGX6VqcVgn8kTldkv63YvvLmqr+RnHjXnpoT5Zwsb4dDsTzOI1Dng3wg==
-X-Received: by 2002:a05:600c:450a:b0:43b:c592:7e16 with SMTP id 5b1f17b1804b1-43f0e545250mr15453105e9.3.1744097841479;
-        Tue, 08 Apr 2025 00:37:21 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:65bc:b4a6:4ce5:2ced? ([2001:67c:2fbc:1:65bc:b4a6:4ce5:2ced])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c301a76cesm14125273f8f.37.2025.04.08.00.37.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Apr 2025 00:37:21 -0700 (PDT)
-Message-ID: <cc2c26d3-c276-4f6a-a05c-e947798d6345@openvpn.net>
-Date: Tue, 8 Apr 2025 09:37:19 +0200
+        d=1e100.net; s=20230601; t=1744098086; x=1744702886;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=D9nvmIGS/pjAS2D5FId0VkYzyKtpxKn9WhfgUHy7ueM=;
+        b=DihE8KlD15aptsMkxvgksvss5rUQQL03mn///aLoiJHlBEOuNpWZfToOFtKWN1lhvn
+         LjTvKl1G3czFNWYwYDK3/R//sh3+dF2oV2pKV3IRiYC4YWG6BPIBStX3+lQUhq4ZgnSt
+         36EqVc+AXu4uvkU74lZvjtOWRijRebf5FcTy05XWEyKL0vpi6LV7N2rSWz63iaETikps
+         P9i0gdGebKLcahgwk/qT4mzS/aOzxyoECwf+tNOHEb86xuzeNYaB0i+rTZO+7GT3E7Ds
+         i7UX/NAUELTMP5ujcO+x+F07Emvuy2bpL1zfJO064PrzUdH8jX3T/UCmO91pIgoULIrm
+         dY6A==
+X-Forwarded-Encrypted: i=1; AJvYcCX2qyhELp4zxC7Zy3FHWPbT+urAziS+Q26eBzwJb+H3yBqI30BVe7KCr8x41gzZE0NxcXRHzvU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAizvk/BWEOrKDQ/4loCjxqJCo+zHRYfaFSnUdyABBfVswesl8
+	sBNi48jieJQ0+b1+zC6WTkve8rL1fUjZ8nlw4iYPI9UHW2RCQqkHoAmWAFlQ0jxGiR2RrrnKiWp
+	CRmXPN/4nuI3Wl8HEgiN75H6MvD7CjN5ar8DIfzf7NM6dE8SrmyVI+7g=
+X-Google-Smtp-Source: AGHT+IFZ2eHvFY/2Wu1GWjf1i7Xo7TQNwvjqzZ1pDdaqmGpIuMTl8L+5R8VHp4cPz1mlzRR1Q3tpXamKc3qegXbFgf9LLqtrtjyb
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v25 00/23] Introducing OpenVPN Data Channel
- Offload
-To: Jiri Slaby <jirislaby@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- ryazanov.s.a@gmail.com, sd@queasysnail.net, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Xiao Liang <shaw.leon@gmail.com>,
- Donald Hunter <donald.hunter@gmail.com>, steffen.klassert@secunet.com,
- antony.antony@secunet.com, willemdebruijn.kernel@gmail.com,
- netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>, Shuah Khan <skhan@linuxfoundation.org>
-References: <20250407-b4-ovpn-v25-0-a04eae86e016@openvpn.net>
- <bff01a88-1e5d-4855-b7d9-1b1ac4bed650@kernel.org>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- xsFNBFN3k+ABEADEvXdJZVUfqxGOKByfkExNpKzFzAwHYjhOb3MTlzSLlVKLRIHxe/Etj13I
- X6tcViNYiIiJxmeHAH7FUj/yAISW56lynAEt7OdkGpZf3HGXRQz1Xi0PWuUINa4QW+ipaKmv
- voR4b1wZQ9cZ787KLmu10VF1duHW/IewDx9GUQIzChqQVI3lSHRCo90Z/NQ75ZL/rbR3UHB+
- EWLIh8Lz1cdE47VaVyX6f0yr3Itx0ZuyIWPrctlHwV5bUdA4JnyY3QvJh4yJPYh9I69HZWsj
- qplU2WxEfM6+OlaM9iKOUhVxjpkFXheD57EGdVkuG0YhizVF4p9MKGB42D70pfS3EiYdTaKf
- WzbiFUunOHLJ4hyAi75d4ugxU02DsUjw/0t0kfHtj2V0x1169Hp/NTW1jkqgPWtIsjn+dkde
- dG9mXk5QrvbpihgpcmNbtloSdkRZ02lsxkUzpG8U64X8WK6LuRz7BZ7p5t/WzaR/hCdOiQCG
- RNup2UTNDrZpWxpwadXMnJsyJcVX4BAKaWGsm5IQyXXBUdguHVa7To/JIBlhjlKackKWoBnI
- Ojl8VQhVLcD551iJ61w4aQH6bHxdTjz65MT2OrW/mFZbtIwWSeif6axrYpVCyERIDEKrX5AV
- rOmGEaUGsCd16FueoaM2Hf96BH3SI3/q2w+g058RedLOZVZtyQARAQABzSdBbnRvbmlvIFF1
- YXJ0dWxsaSA8YW50b25pb0BvcGVudnBuLm5ldD7Cwa0EEwEIAFcCGwMFCwkIBwMFFQoJCAsF
- FgIDAQACHgECF4AFCRWQ2TIWIQTKvaEoIBfCZyGYhcdI8My2j1nRTAUCYRUquBgYaGtwczov
- L2tleXMub3BlbnBncC5vcmcACgkQSPDMto9Z0UzmcxAAjzLeD47We0R4A/14oDKlZxXO0mKL
- fCzaWFsdhQCDhZkgxoHkYRektK2cEOh4Vd+CnfDcPs/iZ1i2+Zl+va79s4fcUhRReuwi7VCg
- 7nHiYSNC7qZo84Wzjz3RoGYyJ6MKLRn3zqAxUtFECoS074/JX1sLG0Z3hi19MBmJ/teM84GY
- IbSvRwZu+VkJgIvZonFZjbwF7XyoSIiEJWQC+AKvwtEBNoVOMuH0tZsgqcgMqGs6lLn66RK4
- tMV1aNeX6R+dGSiu11i+9pm7sw8tAmsfu3kQpyk4SB3AJ0jtXrQRESFa1+iemJtt+RaSE5LK
- 5sGLAO+oN+DlE0mRNDQowS6q/GBhPCjjbTMcMfRoWPCpHZZfKpv5iefXnZ/xVj7ugYdV2T7z
- r6VL2BRPNvvkgbLZgIlkWyfxRnGh683h4vTqRqTb1wka5pmyBNAv7vCgqrwfvaV1m7J9O4B5
- PuRjYRelmCygQBTXFeJAVJvuh2efFknMh41R01PP2ulXAQuVYEztq3t3Ycw6+HeqjbeqTF8C
- DboqYeIM18HgkOqRrn3VuwnKFNdzyBmgYh/zZx/dJ3yWQi/kfhR6TawAwz6GdbQGiu5fsx5t
- u14WBxmzNf9tXK7hnXcI24Z1z6e5jG6U2Swtmi8sGSh6fqV4dBKmhobEoS7Xl496JN2NKuaX
- jeWsF2rOwE0EZmhJFwEIAOAWiIj1EYkbikxXSSP3AazkI+Y/ICzdFDmiXXrYnf/mYEzORB0K
- vqNRQOdLyjbLKPQwSjYEt1uqwKaD1LRLbA7FpktAShDK4yIljkxhvDI8semfQ5WE/1Jj/I/Q
- U+4VXhkd6UvvpyQt/LiWvyAfvExPEvhiMnsg2zkQbBQ/M4Ns7ck0zQ4BTAVzW/GqoT2z03mg
- p1FhxkfzHMKPQ6ImEpuY5cZTQwrBUgWif6HzCtQJL7Ipa2fFnDaIHQeiJG0RXl/g9x3YlwWG
- sxOFrpWWsh6GI0Mo2W2nkinEIts48+wNDBCMcMlOaMYpyAI7fT5ziDuG2CBA060ZT7qqdl6b
- aXUAEQEAAcLBfAQYAQgAJhYhBMq9oSggF8JnIZiFx0jwzLaPWdFMBQJmaEkXAhsMBQkB4TOA
- AAoJEEjwzLaPWdFMbRUP/0t5FrjF8KY6uCU4Tx029NYKDN9zJr0CVwSGsNfC8WWonKs66QE1
- pd6xBVoBzu5InFRWa2ed6d6vBw2BaJHC0aMg3iwwBbEgPn4Jx89QfczFMJvFm+MNc2DLDrqN
- zaQSqBzQ5SvUjxh8lQ+iqAhi0MPv4e2YbXD0ROyO+ITRgQVZBVXoPm4IJGYWgmVmxP34oUQh
- BM7ipfCVbcOFU5OPhd9/jn1BCHzir+/i0fY2Z/aexMYHwXUMha/itvsBHGcIEYKk7PL9FEfs
- wlbq+vWoCtUTUc0AjDgB76AcUVxxJtxxpyvES9aFxWD7Qc+dnGJnfxVJI0zbN2b37fX138Bf
- 27NuKpokv0sBnNEtsD7TY4gBz4QhvRNSBli0E5bGUbkM31rh4Iz21Qk0cCwR9D/vwQVsgPvG
- ioRqhvFWtLsEt/xKolOmUWA/jP0p8wnQ+3jY6a/DJ+o5LnVFzFqbK3fSojKbfr3bY33iZTSj
- DX9A4BcohRyqhnpNYyHL36gaOnNnOc+uXFCdoQkI531hXjzIsVs2OlfRufuDrWwAv+em2uOT
- BnRX9nFx9kPSO42TkFK55Dr5EDeBO3v33recscuB8VVN5xvh0GV57Qre+9sJrEq7Es9W609a
- +M0yRJWJEjFnMa/jsGZ+QyLD5QTL6SGuZ9gKI3W1SfFZOzV7hHsxPTZ6
-Organization: OpenVPN Inc.
-In-Reply-To: <bff01a88-1e5d-4855-b7d9-1b1ac4bed650@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:2602:b0:3d3:fa0a:7242 with SMTP id
+ e9e14a558f8ab-3d6e53473acmr150443345ab.9.1744098085699; Tue, 08 Apr 2025
+ 00:41:25 -0700 (PDT)
+Date: Tue, 08 Apr 2025 00:41:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67f4d325.050a0220.396535.0558.GAE@google.com>
+Subject: [syzbot] [net?] WARNING in __linkwatch_sync_dev
+From: syzbot <syzbot+48c14f61594bdfadb086@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+Hello,
 
-On 08/04/2025 08:34, Jiri Slaby wrote:
->> Given:
->  > +#define OVPN_FAMILY_NAME    "ovpn"
-> and
->  > ctx->ovpn_dco_id = genl_ctrl_resolve(ctx->nl_sock, OVPN_FAMILY_NAME);
-> 
-> Is there also an openvpn branch understanding the new (in-kernel) 
-> naming? I.e. something like s/ovpn-dco-v2/ovpn/?
-> 
-> As with 2.6.10, I see:
-> $ grep -iE 'offl|dco' log
-> 2025-04-08 08:24:59 us=718854 Note: Kernel support for ovpn-dco missing, 
-> disabling data channel offload.
-> 2025-04-08 08:24:59 us=719060 OpenVPN 2.6.10 x86_64-suse-linux-gnu [SSL 
-> (OpenSSL)] [LZO] [LZ4] [EPOLL] [PKCS11] [MH/PKTINFO] [AEAD] [DCO]
-> 2025-04-08 08:24:59 us=719110 DCO version: N/A
+syzbot found the following issue on:
 
-2.6.x and master do not "speak" the new "ovpn" family, because the new 
-uAPI wasn't considered stable yet (due to ongoing reviews).
+HEAD commit:    7702d0130dc0 Add linux-next specific files for 20250408
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=15fe8070580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=91edf513888f57d7
+dashboard link: https://syzkaller.appspot.com/bug?extid=48c14f61594bdfadb086
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-We have a WIP branch which you can use for test:
+Unfortunately, I don't have any reproducer for this issue yet.
 
-https://github.com/mandelbitdev/openvpn/tree/gianmarco/179-ovpn-support
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/0603dd3556b9/disk-7702d013.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/d384baaee881/vmlinux-7702d013.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/1ac172735b6c/bzImage-7702d013.xz
 
-Please do not try to measure performance at this time as we have various 
-improvements that we are working on, but we wanted to wait for the first 
-version of ovpn to be merged first.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+48c14f61594bdfadb086@syzkaller.appspotmail.com
 
-Regards,
+------------[ cut here ]------------
+RTNL: assertion failed at ./include/net/netdev_lock.h (56)
+WARNING: CPU: 1 PID: 2971 at ./include/net/netdev_lock.h:56 netdev_ops_assert_locked include/net/netdev_lock.h:56 [inline]
+WARNING: CPU: 1 PID: 2971 at ./include/net/netdev_lock.h:56 __linkwatch_sync_dev+0x30d/0x360 net/core/link_watch.c:279
+Modules linked in:
+CPU: 1 UID: 0 PID: 2971 Comm: kworker/u8:8 Not tainted 6.15.0-rc1-next-20250408-syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
+Workqueue: bond0 bond_mii_monitor
+RIP: 0010:netdev_ops_assert_locked include/net/netdev_lock.h:56 [inline]
+RIP: 0010:__linkwatch_sync_dev+0x30d/0x360 net/core/link_watch.c:279
+Code: 7c fe ff ff e8 f4 63 cc f7 c6 05 83 28 53 06 01 90 48 c7 c7 60 5c 51 8d 48 c7 c6 8a 9b 67 8e ba 38 00 00 00 e8 04 6b 8b f7 90 <0f> 0b 90 90 e9 4d fe ff ff 89 d9 80 e1 07 38 c1 0f 8c 19 fd ff ff
+RSP: 0018:ffffc9000b767710 EFLAGS: 00010246
+RAX: bb6ea754fa006300 RBX: 0000000000000000 RCX: ffff888030979e00
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: 0000000000000000 R08: ffffffff81824ed2 R09: 1ffffffff20c01c6
+R10: dffffc0000000000 R11: fffffbfff20c01c7 R12: 0000000000000000
+R13: dffffc0000000000 R14: ffff88805d768008 R15: ffff88805d768000
+FS:  0000000000000000(0000) GS:ffff888125089000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f85e8c4df98 CR3: 000000006a050000 CR4: 00000000003526f0
+DR0: 0000000000000099 DR1: 0000000000000000 DR2: 000000000000000b
+DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ ethtool_op_get_link+0x15/0x60 net/ethtool/ioctl.c:63
+ bond_check_dev_link+0x1fb/0x4b0 drivers/net/bonding/bond_main.c:864
+ bond_miimon_inspect drivers/net/bonding/bond_main.c:2734 [inline]
+ bond_mii_monitor+0x49d/0x3170 drivers/net/bonding/bond_main.c:2956
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xac3/0x18e0 kernel/workqueue.c:3319
+ worker_thread+0x870/0xd50 kernel/workqueue.c:3400
+ kthread+0x7b7/0x940 kernel/kthread.c:464
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
+ </TASK>
 
--- 
-Antonio Quartulli
-OpenVPN Inc.
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
