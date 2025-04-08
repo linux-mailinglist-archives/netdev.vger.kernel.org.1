@@ -1,201 +1,225 @@
-Return-Path: <netdev+bounces-180079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFCF4A7F76B
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 10:13:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB052A7F786
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 10:16:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AEB8E7A79E9
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 08:12:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B1F13AA152
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 08:15:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB86263F39;
-	Tue,  8 Apr 2025 08:12:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3784B22068F;
+	Tue,  8 Apr 2025 08:15:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="MArZ9EuW"
+	dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b="Hq6EdUkJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH5PR02CU005.outbound.protection.outlook.com (mail-northcentralusazon11012054.outbound.protection.outlook.com [40.107.200.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99755224251
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 08:12:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744099960; cv=none; b=VNRBO8loqcqwHxHIg/miKGKaiXkZNnFKiJ20pm+mBEgK09JaMJ4vNreSEbajZOsG2y/RhdxxxTAGkB1Bt94Jy1HzGFGMN8Jpmfcm+TDHpKG2XNF3bkWAJQUY5E0BjvNNK5krjJf5BZW2H1ZF42z1nnbq12+/HfUM0EmoADLJG0o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744099960; c=relaxed/simple;
-	bh=61xtwFIb5wptqbNmXz3zvzG3JN9+GREgW8jot8W/KRQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sWoeoAggEuc8jZBWs9pcfVJD86IJnoCL/3eGihnhhsy/euwwVAbLKuvnk17qMQBDSRhIJWy1uBh82KmB7Fn/eR00jtgXg1Bel/CGbPeMaxHuLLQ36f2rvnqOj+rPnxZZmJSw7ZpAzUy2s5rh3NiFjalQGbuF3EsYfOiYmAsZd4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=MArZ9EuW; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-6fee50bfea5so43316517b3.1
-        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 01:12:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1744099956; x=1744704756; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dr8oyZQMPFVJkSi7/HiJ1yWQXUgwYWLqcCGtSaSYV9g=;
-        b=MArZ9EuWfKmaX/y9pwTRIt+EzwDeltm8IcSjhSNlR5iVepvfRMyMCrA0gTNXgti6U2
-         ln47I3HQAh7pZ0zS634j1s+BDEr30rRIuxmUD6uLxZFTSMcn90Mk5MoKghT5umunmUu2
-         yQYlFYD17O5nE8323wyZF/bbbe+ElqbuX7yIZLrEY7301R59aE5Hpo/wdcNcYA2j6QIW
-         bkpQt6azEhVBiGyHt6yGkZAeRhaUaoHD8HsTMiYeFDY36P8hGmJa2D7Weg6s9o6PYvDW
-         Q8Hx4y9I2ry6gcer+33fBoJJ3E4oN1Za5izG/oUiVhAWn5YOprvFJM2XZ+Q5EH0dfYXU
-         pcrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744099956; x=1744704756;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dr8oyZQMPFVJkSi7/HiJ1yWQXUgwYWLqcCGtSaSYV9g=;
-        b=wmgh7UGVWUYDhkXSaZ2ffoGenzGPqZ3je1mfcpvbUQElC1tVdWBBb4U+lWjps4oL82
-         U5QrGq9TwGL5olYXxXGvG3b9VzoWUKxaWzYGoVdHdhxp9ZGyL+ZknKNkhDpAvMwgWWk1
-         o+l19dzNRQ9GMbV2RTNJzBL54pV+nvqPz2h4do8IJ+jil0wTJ8bPWIucBAaiQaEaeieJ
-         wfus/8ypAh6VBZZVl4Hl+NEcmtyXzhgxPbj17+r4iPiVPtGdngVisL0ygjsbUZmQ4WzD
-         OoPldJjG66ypNqMTpBaWJw8zTs1uVRQfsLA/OaEfAg1GQDITUpHkcobG6pSU/im4dn5o
-         ASBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWn3rtjk8xzicxbFVaPwiQKVmSVp3d5dkCsRBR0UC5+i3ZGmJxj+FyZCmWZJjufAD/NY7Ret3c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrGEliPIN0aDkSAgsDQHeu3ZAAJxhq3PbuVAtXY6zfFdx4S3Bh
-	1IknrF2GZyoHCTa4Z39OXznJ9hMbbsd16mTOOp+lLT6OW6PrstrBVybwo5isfVQAUTxSvR8ZgKu
-	vq58S8k9qNcEmIr+RNgiVZxuQFZCiipmE/bQ+
-X-Gm-Gg: ASbGncuxcBAzntUyBPnlWlOKJJMGDp7RzOo+9vccvQglqLKLM9VrmBFtY+koV9QZyq4
-	rln7mw3siGeM3g+EKp5nS3Jmdgu+JTdVmx9mnQzrN4lEjWTFnLNZpcBxIP3AWgOjb1oAqbc3SIo
-	ZqUPBO6z9lgoy+i4MPqLrqFiy4Kw==
-X-Google-Smtp-Source: AGHT+IELMpKtZhcecUs8JWexH/Kqjt1EKVHKIyu9bGTk/DheARK6jQXpug7N9exoBuWvQU0b09RaeXutHWJnMX1ZMC8=
-X-Received: by 2002:a05:690c:6106:b0:700:b007:a33e with SMTP id
- 00721157ae682-703e154f99emr272898897b3.16.1744099956540; Tue, 08 Apr 2025
- 01:12:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DAE817F4EC;
+	Tue,  8 Apr 2025 08:15:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.200.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744100150; cv=fail; b=sRhax9JR8qxuyB9dZJBArUfGYOvwAnnT7snR1NhCxas7Kb/5N+LIACeWNQIc5k9iywE6veneHibbNrVHd/g4Nz3rYRWUJa72stFS8qFHvMMT0f+jZPNt23cW/pgPYi8j7y2FSs73RZYw7H2fGnoZnWa3rFIONqcYIa2hoQvHndQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744100150; c=relaxed/simple;
+	bh=x7F3U/tDfL/pJ03Vc59F5udBeeLh4oIjKbsnyLiWXkY=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=jTz/pvRkwZTCLn/GZSKbufxiXFTyVOmQTVLA8dICRzvo0lcDDFoBpgXyUm2K5J1f8L/3XmLcLvpcGvk3GqQ9PjeokUb7tbhCtQAophP4db8LDggHHcvTWooBwpB5kWgcViD4Km43NIWvV+guSBqa3eiLDzKmWQv35WBJQjzRxjM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=Hq6EdUkJ; arc=fail smtp.client-ip=40.107.200.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altera.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZgfBKTR2OLdLmldEVVwqtHhrcFy4lhfcOCZWmBk8OT07hNXO8wTRiorFk8ItVaCCkA1oAiK4V8yb+KLRUZjJSUQg6HiR5ecJrXQw+0e3Aj+5iMAqI+CkMSedXbHMCqG09r7Cu70vWubsOlBbvB+hBzMKQ2xGNu6JAeU4z//KrYPzo/5cyjXKXg36ZEWJJwBRxx7rIF4qYlwRJPWp91nJ06xBtxexWWmU2pCm8xOrh24yCmKk167iFbWlUhSi9oru9pA+hC57fl3bPsuB60g78M+nSQ3kpn0KXKQh354il3Sk39gHnkDKEIgB8hbQcj3sHkEXA51hxBXiOdIvhH7/cQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=E92S1WHW4r6OdR+i4/cG2c76Z6KERhbm5lHrsIG6NoU=;
+ b=NAcE1BNt3UztFvXTmai8gRvYF7rTpfCLEKtcsz4oY8kMgvz4wddi4Ttc+DwkvQ/z3GfPaxcXFdeHnx0AoFq+82ikhWqm93JlwVfbCfdXUK0dS5Irdjg1T0X9G1lNTp27VsuZsJojHHW0VzICn6JB0NmgkaTsUXXyWaJmIUO9QO3j4IGEOfhwpKYm9qFmrN16JgPgZzYJQ8xjfaJNCTABc7zelR2TN9uSXNNMPnWmKU6ftdWa4/Nf//TqSVpsOVJU68L+dpzSAK9StmNSaJ8xL8uik+qizyZqdTFp9Rjj4QGKxsYVJ5kK0pwKtWovNPM33hJQaCWrpcFxUX3AScBofQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
+ dkim=pass header.d=altera.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=E92S1WHW4r6OdR+i4/cG2c76Z6KERhbm5lHrsIG6NoU=;
+ b=Hq6EdUkJzFiAHIInATGRoP5uXA82zgzrnJZ4xkJlXVyiGHyU6EMoDTsN//+FwozW+dhoFc3HoNsMOgffkjE4ou9YgOhY63S5sNAktWpI0VkBQrb3tM/alrI+tTSLlqHWld8Lnleb6QIdQbD1hDz9nKmXFU3TF6UMUtBbYjMAify1nuCwi4JXCxU5pcmn8v751mHaeBOLbDmwnYg54Y0rRXktPhPFMQCmgHsLLpC8yQ3fgPE0H5H/6GecnAlb1OPHlX9QfxLKVIHTUrwQ3x36xscA3CnAOG9kytnbaYP+LF7Tr3SSrJVBrsyW8cft8XJpTrhCIoNEAdoiSDjG0dea1w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=altera.com;
+Received: from BN8PR03MB5073.namprd03.prod.outlook.com (2603:10b6:408:dc::21)
+ by CO1PR03MB5666.namprd03.prod.outlook.com (2603:10b6:303:9c::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.29; Tue, 8 Apr
+ 2025 08:15:42 +0000
+Received: from BN8PR03MB5073.namprd03.prod.outlook.com
+ ([fe80::7483:7886:9e3d:f62a]) by BN8PR03MB5073.namprd03.prod.outlook.com
+ ([fe80::7483:7886:9e3d:f62a%3]) with mapi id 15.20.8606.033; Tue, 8 Apr 2025
+ 08:15:42 +0000
+From: Boon Khai Ng <boon.khai.ng@altera.com>
+To: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Matthew Gerlach <matthew.gerlach@altera.com>,
+	Tien Sung Ang <tien.sung.ang@altera.com>,
+	Mun Yew Tham <mun.yew.tham@altera.com>,
+	G Thomas Rohan <rohan.g.thomas@altera.com>,
+	Boon Khai Ng <boon.khai.ng@altera.com>
+Subject: [PATCH net-next v3 0/2] Refactoring designware VLAN code. 
+Date: Tue,  8 Apr 2025 16:13:52 +0800
+Message-Id: <20250408081354.25881-1-boon.khai.ng@altera.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: BYAPR07CA0089.namprd07.prod.outlook.com
+ (2603:10b6:a03:12b::30) To BN8PR03MB5073.namprd03.prod.outlook.com
+ (2603:10b6:408:dc::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250407231823.95927-1-kuniyu@amazon.com> <20250407231823.95927-3-kuniyu@amazon.com>
- <CAHC9VhQCS-TfSL4cMfBu2GszHS8DVE05Z6FH-zPXV=EiH4ZHdg@mail.gmail.com> <cd8c8f91-336d-4dd2-b997-4f7581202e64@googlemail.com>
-In-Reply-To: <cd8c8f91-336d-4dd2-b997-4f7581202e64@googlemail.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Tue, 8 Apr 2025 04:12:25 -0400
-X-Gm-Features: ATxdqUEOtPZ9bXkkZInYIGVexxRT64LXSEfkUWmNZGLrCXqEODt-AG9ggi-X7zs
-Message-ID: <CAHC9VhQeq6RjukUUnoyoCopEOfR5VJ85yPZ1CUfTAA7LeiWJTA@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 2/4] net: Retire DCCP.
-To: =?UTF-8?Q?Christian_G=C3=B6ttsche?= <cgzones@googlemail.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, selinux@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, 
-	Casey Schaufler <casey@schaufler-ca.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
-	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8PR03MB5073:EE_|CO1PR03MB5666:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1d046386-abe8-4889-c3eb-08dd76758de7
+X-MS-Exchange-AtpMessageProperties: SA
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?fvevObgTgs9PEl2IcMo8LJmtEQhsgsjmCzmpcT/WrHSwWSZMcRsxnsrm5q7T?=
+ =?us-ascii?Q?ff1JCC4tnZCR0xCZWjUIbGOOHJ8lcMCcGjOgzk/RKoLHKnf21n3Suytgnq/F?=
+ =?us-ascii?Q?E9TQQNU2gPfu1enn+yC7cz//hkwQS0Guemcl2Z1lwNQVTiM7YNL1NrXoKjBZ?=
+ =?us-ascii?Q?44SzUrfxdv5Vid122wddztF9JeHcbqmUEt/cIyjutqsNsrPk2rNnkB/jhSzp?=
+ =?us-ascii?Q?rFGQ9W9STz3E/vituBhMxe38PHpFBq/Ud518AMWJpsE+UxAeNCG63IcP+yRx?=
+ =?us-ascii?Q?Og2XbbV00QOWuDPuPqUFCDoZy39hFc/opDqj3FGvV6Bu3gXo6PF/wCAlHqqj?=
+ =?us-ascii?Q?0SNyX9DFcxNK7HBq5yu4SeIxjPvWGcTq7i2hktcvF/mgf3WooBEQ6UYdk2Rn?=
+ =?us-ascii?Q?6rgqltYtNhYFHFmsGApS/yyu1Q0T4R0QTblLfB/qF1q2AAGwTsDJiaYXjefj?=
+ =?us-ascii?Q?IM90SD4I0WRQtz5rCjf4iyJkk48sCg/+LcPIZELYm046uRAkg0ezaz9SR1Fv?=
+ =?us-ascii?Q?OjgJxM9bVUcdyM1vkeFEdpDBjWtxV9VbhDXswDZoRlT/Qnd0wK0G1NFQGpKv?=
+ =?us-ascii?Q?VPf4OUjSZNpGECjcNVTdgw9333uGNR4DHRvBJun7asX5KcmTNVLlKBy/vmNs?=
+ =?us-ascii?Q?WFrVirJRr9lIDHR58lpYfjn1jrv8bRb+9OQcCaKm3grqXnKE5F8HedbFecIt?=
+ =?us-ascii?Q?mcOBF3KYUtP2hs7TYokCzUn0hvj3PLBzE9fYvdM8/XvDztqDp7QZhY4goaOr?=
+ =?us-ascii?Q?BWk1UmPp7l3T62MkFSgl7fhR/17Mt+im2a8tWy2kOBN4tUIVueTQkjUdx3at?=
+ =?us-ascii?Q?6Qa54N4JEn9Z5EYoCtiiwImXzJ6+4mZ8Y7cet2bsAj3er4SEle9S9mCiOxtY?=
+ =?us-ascii?Q?JXSt+2OK67IjGHDHrgE7KDRm64dnzsw2hnacAKCRsCi1mCLCM5pK9tNRKBDl?=
+ =?us-ascii?Q?1jCfCWXiXne7GAZhd7s9FnOAHGtZVj1VIEyxCsYIg0uyMHzTyifEM5lQC9YT?=
+ =?us-ascii?Q?CfSMcixgKjkzPgTGovWkA3IIr3LbmAMUjx1KyATwRZwzEool7Wi2WeFKYwVY?=
+ =?us-ascii?Q?Em1gDFMrHpYeRK/fAwLR8cl4eZy7/84V+SJEKxeArOLkXwhj1AX0LKXR+Q6Q?=
+ =?us-ascii?Q?Ou8kiFx1NeBa0IF0y+XW2mTjnxN8ewyQ0Wp4enLXecw9J1wrWBC6f9IPEh+Y?=
+ =?us-ascii?Q?08QPXtMPjRDLaQpISV0t3CbbeFVb+BXVtayAfWbghc4oohjTTL4xTguqa5sm?=
+ =?us-ascii?Q?kVWJsrZzYJ5qi37CJ49KmBwznUpIRC4PmTuzydH151grhlHQqpTl63sWxq8j?=
+ =?us-ascii?Q?8G6fmnr6tnvDjNn/E0Fje0xQdQBv36yfp0H4Eg9xk0kH2g=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN8PR03MB5073.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?fQBuoqeO9HS6KJtMeyx3FbFrBskjo7t5pQYM2GUJcrHs0K71E3KxZnWUBJ/k?=
+ =?us-ascii?Q?LsrEQfNic0TYMXx+T6Tz5lMof/kUYPQsD7N5oeLql7O7pba/1hbAXCXqajQm?=
+ =?us-ascii?Q?xCPMLRyB0fxv1UxdzdOY1z++fjJhcMmmV2bE/dw9RMxNPyw0Og35hxax+lye?=
+ =?us-ascii?Q?tRvRwZIlGMR2dWYa4j7epwB7mDOV7lGz/hrndJeUA8fVbVziVHzW5hUsbFf7?=
+ =?us-ascii?Q?lC0IS5LK3Ey0BJhDUDte+9kskeiGy0RhSMMkHREC5ZP1odfUh74LfFq0YtI2?=
+ =?us-ascii?Q?X8FsD9XnQfnqaFlEgB8zHPYLMtnSKjEI4N8WOEiXvxd35OgKYrvUPHopU4sr?=
+ =?us-ascii?Q?oDMjQhlVIVQKyR1P2gmE4OLORRvyt/NXCWOveOgqQ5Q+cgOgXGp+SAF1PSn1?=
+ =?us-ascii?Q?DjkBBW2jvRZncDvJzBRvsBqv0GLsz4GB63h1fLZpZZ9j2FWEAGIuD+fiRsDb?=
+ =?us-ascii?Q?iK6tSq0y7gxfSWCGNDJHjb9UL9asdYQgJIUPrBzMiQKEaESmYI0LXMeRk65q?=
+ =?us-ascii?Q?qm6SQJi0AlNpjeMxL4otv9oTHMG9MAH89wR22E4cmgxH0a6kfiHYnmtoNTrJ?=
+ =?us-ascii?Q?CJ17l6LerIh/yNAA5LkFiqW55cGNLjt2HtBWM7ZA5WkpjRx5jm5aRu6iqpY2?=
+ =?us-ascii?Q?UYh+brPjsXYbTwUrhw1raZqMutJE5c+LcaWka5bjHigJ+NOrb0TD1c8hNl15?=
+ =?us-ascii?Q?Gu2Y08QmBfw7ZAapbqGABru2S7jy9oqZVrc5Xfa7Thq1GFViduB3qF7QRJ3v?=
+ =?us-ascii?Q?k/StI4K0SnKNCwjSX+cqRUKItQRPe7CilUlxmJ2Hd4P4uSb4WBRDkh98gfJE?=
+ =?us-ascii?Q?SS+OJ8PD4C56I9G8LJidgnIKHXDB+7+fbxBem2vxaZPqcOLFTAPngRTsQor2?=
+ =?us-ascii?Q?i718F6JOWNq7n5Xl0+U6xzFxmxZFHvUYUJqY83MsInvOfdtPDHbMFDuvdPum?=
+ =?us-ascii?Q?2pmIRQf4CqMD25LFmkF7pE0HxoWawBLehIkkQUz8DoIbJKDP1gkV5xcp/xUe?=
+ =?us-ascii?Q?6ciLODITtG73XPd4nQ5QuGRfz73zxRT8kPTJIKJqDsTkWeSQz+ZcGxrhGD+H?=
+ =?us-ascii?Q?Y5zFTGNgeXc2do0ozNZGKds4k6dCHQLfEf1m0TGJG2/vkIUwkhl26ecaVVS/?=
+ =?us-ascii?Q?HGkRzAnY2MLkvoDxOzKd32N5firp/XLGmwTzTKEAenzXx9BdnR3B+BkIQktZ?=
+ =?us-ascii?Q?DZ3SVeBRvJXc2mPYETwoWLN6CNRxWfZpDhg64qgHy33uPwd5bxZPkFifWEYw?=
+ =?us-ascii?Q?KO+RGKr12xeRZyx6gyOUq8HFqOMCprSiHbWeZLNrVznV1IJ/S3HSWSckH8/U?=
+ =?us-ascii?Q?yGtpXJ5RR8AyvRcmkk7twe4+y2JZEBedhrov0sgWmmY9RYY9QPC4gTnP3tce?=
+ =?us-ascii?Q?5JeWWzwIJ0bCkvuAWV9F+BI8mbo9rP7vilCjxdZkJ6IM4LJnstqrI1qVJ23t?=
+ =?us-ascii?Q?cdYknAQhyUgZaZCiZryMGwc0SZBWedggsjRAbaCYCzLgCDHGuTwjLl3RZHkl?=
+ =?us-ascii?Q?ceJRHn7nWnuZDNih2CK6mPT4rjixTb2vEzIE8tB84y0mgucYNcAVmelMFYnv?=
+ =?us-ascii?Q?A9v2eR/ZOl+tsz4ZJWWvJ+dGf9wJIXZINpDkk2hqYA1toN6WfK9NUStzghue?=
+ =?us-ascii?Q?tg=3D=3D?=
+X-OriginatorOrg: altera.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1d046386-abe8-4889-c3eb-08dd76758de7
+X-MS-Exchange-CrossTenant-AuthSource: BN8PR03MB5073.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Apr 2025 08:15:42.4664
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fbd72e03-d4a5-4110-adce-614d51f2077a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Zpb17DGc74kzrsG452BMriDy9+vcktx69RT3ftj1nLm+/m2WOALzwlQGjAup1gE5DPXJWMMi3k2VPIc5Xz8w9Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR03MB5666
 
-On Tue, Apr 8, 2025 at 1:22=E2=80=AFAM Christian G=C3=B6ttsche
-<cgzones@googlemail.com> wrote:
-> Apr 8, 2025 03:35:15 Paul Moore <paul@paul-moore.com>:
-> > On Mon, Apr 7, 2025 at 7:19=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon=
-.com> wrote:
-> >>
-> >> DCCP was orphaned in 2021 by commit 054c4610bd05 ("MAINTAINERS: dccp:
-> >> move Gerrit Renker to CREDITS"), which noted that the last maintainer
-> >> had been inactive for five years.
-> >>
-> >> In recent years, it has become a playground for syzbot, and most chang=
-es
-> >> to DCCP have been odd bug fixes triggered by syzbot.  Apart from that,
-> >> the only changes have been driven by treewide or networking API update=
-s
-> >> or adjustments related to TCP.
-> >>
-> >> Thus, in 2023, we announced we would remove DCCP in 2025 via commit
-> >> b144fcaf46d4 ("dccp: Print deprecation notice.").
-> >>
-> >> Since then, only one individual has contacted the netdev mailing list.=
- [0]
-> >>
-> >> There is ongoing research for Multipath DCCP.  The repository is hoste=
-d
-> >> on GitHub [1], and development is not taking place through the upstrea=
-m
-> >> community.  While the repository is published under the GPLv2 license,
-> >> the scheduling part remains proprietary, with a LICENSE file [2] stati=
-ng:
-> >>
-> >>   "This is not Open Source software."
-> >>
-> >> The researcher mentioned a plan to address the licensing issue, upstre=
-am
-> >> the patches, and step up as a maintainer, but there has been no furthe=
-r
-> >> communication since then.
-> >>
-> >> Maintaining DCCP for a decade without any real users has become a burd=
-en.
-> >>
-> >> Therefore, it's time to remove it.
-> >>
-> >> Removing DCCP will also provide significant benefits to TCP.  It allow=
-s
-> >> us to freely reorganize the layout of struct inet_connection_sock, whi=
-ch
-> >> is currently shared with DCCP, and optimize it to reduce the number of
-> >> cachelines accessed in the TCP fast path.
-> >>
-> >> Note that we leave uAPI headers alone for userspace programs.
-> >>
-> >> Link: https://lore.kernel.org/netdev/20230710182253.81446-1-kuniyu@ama=
-zon.com/T/#u #[0]
-> >> Link: https://github.com/telekom/mp-dccp #[1]
-> >> Link: https://github.com/telekom/mp-dccp/blob/mpdccp_v03_k5.10/net/dcc=
-p/non_gpl_scheduler/LICENSE #[2]
-> >> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> >
-> > Adding the LSM and SELinux lists for obvious reasons, as well as Casey
-> > directly since he maintains Smack and I don't see him on the To/CC
-> > line.
-> >
-> > For those that weren't on the original posting, the lore link is below:
-> > https://lore.kernel.org/all/20250407231823.95927-1-kuniyu@amazon.com
-> >
-> >> diff --git a/security/selinux/include/classmap.h b/security/selinux/in=
-clude/classmap.h
-> >> index 04a9b480885e..5665aa5e7853 100644
-> >> --- a/security/selinux/include/classmap.h
-> >> +++ b/security/selinux/include/classmap.h
-> >> @@ -127,8 +127,6 @@ const struct security_class_mapping secclass_map[]=
- =3D {
-> >>         { "key",
-> >>           { "view", "read", "write", "search", "link", "setattr", "cre=
-ate",
-> >>             NULL } },
-> >> -       { "dccp_socket",
-> >> -         { COMMON_SOCK_PERMS, "node_bind", "name_connect", NULL } },
-> >>         { "memprotect", { "mmap_zero", NULL } },
-> >>         { "peer", { "recv", NULL } },
-> >>         { "capability2", { COMMON_CAP2_PERMS, NULL } },
-> >
-> > A quick question for the rest of the SELinux folks: the DCCP code is
-> > going away, so we won't be performing any of the access checks listed
-> > above, and there will be no way to get a "dccp_socket" object, but do
-> > we want to preserve the class/perms simply to quiet the warning when
-> > loading existing policies?
->
-> Isn't the kernel just warning about missing clssses/permissions? If polic=
-ies still define dccp_socket I think the kernel treats it as user space cla=
-ss, like dbus.
+Refactoring designware VLAN code and introducing support for
+hardware-accelerated VLAN stripping for dwxgmac2 IP,
+the current patch set consists of two key changes:
 
-Ah yes, my apologies, I mixed up the "... not defined in policy"
-warning in my mind.  Thanks for setting me straight :)
+1) Refactoring VLAN Functions:
+The first change involves moving common VLAN-related functions
+of the DesignWare Ethernet MAC into a dedicated file, stmmac_vlan.c.
+This refactoring aims to improve code organization and maintainability
+by centralizing VLAN handling logic.
 
-Anyway, this looks fine to me.
+2) Enabling VLAN for 10G Ethernet MAC IP:
+The second change enables VLAN support specifically
+for the 10G Ethernet MAC IP. This enhancement leverages
+the hardware capabilities of the to perform VLAN stripping,
 
-Acked-by: Paul Moore <paul@paul-moore.com> (LSM and SELinux)
+Changes from previous submmited patches.
+v2:
+The hardware VLAN enablement switch was detached from the
+device tree source (DTS). Instead, the hardware VLAN enablement
+is now dynamically determined in stmmac_main.c based on the
+currently running IP.
+Link: https://lore.kernel.org/lkml/BL3PR11MB5748AC693D9D61FB56DB7313C1F32
+@BL3PR11MB5748.namprd11.prod.outlook.com/
 
---=20
-paul-moore.com
+v1:
+The initial submission introduced hardware VLAN support for the
+10G Ethernet MAC IP.
+Link: https://lore.kernel.org/netdev/DM8PR11MB5751E5388AEFCFB80BCB483FC13FA
+@DM8PR11MB5751.namprd11.prod.outlook.com/
+
+Boon Khai Ng (2):
+  net: stmmac: Refactor VLAN implementation
+  net: stmmac: dwxgmac2: Add support for HW-accelerated VLAN stripping
+
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   2 +-
+ drivers/net/ethernet/stmicro/stmmac/common.h  |   1 +
+ drivers/net/ethernet/stmicro/stmmac/dwmac4.h  |  40 ---
+ .../net/ethernet/stmicro/stmmac/dwmac4_core.c | 295 +-----------------
+ .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  25 +-
+ .../ethernet/stmicro/stmmac/dwxgmac2_core.c   |  89 +-----
+ .../ethernet/stmicro/stmmac/dwxgmac2_descs.c  |  18 ++
+ drivers/net/ethernet/stmicro/stmmac/hwif.c    |   8 +
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    |  61 ++--
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |   2 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_vlan.c | 294 +++++++++++++++++
+ .../net/ethernet/stmicro/stmmac/stmmac_vlan.h |  63 ++++
+ 12 files changed, 434 insertions(+), 464 deletions(-)
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.c
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.h
+
+-- 
+2.25.1
+
 
