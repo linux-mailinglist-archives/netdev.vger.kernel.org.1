@@ -1,173 +1,150 @@
-Return-Path: <netdev+bounces-180474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4693DA816B3
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 22:17:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B99D9A816D9
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 22:28:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A00593B8D7B
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 20:16:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B85C3AC4CD
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 20:27:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F21253B75;
-	Tue,  8 Apr 2025 20:16:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD0062528E9;
+	Tue,  8 Apr 2025 20:27:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bTdQvuDK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bJzz7Sro"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340E224DFFB
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 20:16:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35247244195
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 20:27:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744143395; cv=none; b=ekdNfXh38o2CXmY8LaNSLqQDhjMIOuXBt3RZUCuE+/gXwUX62oDsl9/sHsjl8PFWXKflnitEPszKyb9sFCcOCKsJemblhDJMnp+BYgzIYgR04yO0ko+1JaGemapU1uLpxnDQai4DNaBZsjErW2TCH8VOGZSXXsbNnosWumrQqPw=
+	t=1744144069; cv=none; b=YGE0OkxyDsPX/Y8lUk4I83BqGN5W5SKAlDNpQVL0SP6rI7w+a0jdZ2+Ums7VsdVLzsa7SmJPM8rIHfccCKjO8jbhWLgndSU1SLXAN2GN6rkehjR4NZOkynXbPGmmhkttSpo1zId88GxB84Q2pT/LJlMKz6e1HG9SnR8ipLB9mTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744143395; c=relaxed/simple;
-	bh=+Otf9WjrrPKgfg6yGiXwo0l1zq0oKhjye6gLTZS6yvE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mouDJs6TsFQpv2BXgExs2CKwzLXyiAeqQuu3qnDASxMudFJ8BqPcSWfwqr3ZGBVdwNR7yh3T7MRUPDWGXsU48qe84/wk0ql7EBhzODFtSA3kXMOEjo3fFsmgBHq17O4wC578zfSm/y2ysi4A9inOAJH4yjehTv3hIoNCI9nLfM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bTdQvuDK; arc=none smtp.client-ip=209.85.215.169
+	s=arc-20240116; t=1744144069; c=relaxed/simple;
+	bh=qZgABreuvQIsetdsWRpO+ez5x3ZbCGHktQxtFzLbKzM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=BxBGIHcvKq+svkMWL/vaTlYGAj1AFGfad7CweeZTRgvSVtO8Ad+JogApEU5/Df34Bvhhh10Bip8HitDbXk5MF0FWx7K11eOCnOvYn81TjwpqaGKiEB+cn6qxhnu1iXUAhGZoqK1vneMBfA0Fji3jdaSV6yhTGN2Ttm7DsytMQYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bJzz7Sro; arc=none smtp.client-ip=209.85.219.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-af59c920d32so4281808a12.0
-        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 13:16:32 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-6e91a184588so177275816d6.2
+        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 13:27:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744143392; x=1744748192; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mehwUiVlz7/z5KHfhV+Q1AQQejmAf7B/NmHE2o7479g=;
-        b=bTdQvuDKzEOTNigjdl43O4VVLPxHsZROSIYkYX8YcyxI7yDFoYxoomuluH8SOotlGr
-         UARyog2wi1y0/eVfQTQ09vGGrrQgo2ysmQly4rrbZrHUkiNqi2UX+9E1S2YtahotA8Fp
-         q+HM+ONx3X8hyTi5MQhCU+KvNEjkEZeZHPmew7uIqfJteN7GKRl1HTB/9eBog0nuTjc0
-         OCjUMRF69hplpUI68bCKqPXa0K4qI52lBg8IXAYndUBb0wTrr6M+nd1mcLPcmAbrnhz/
-         Ugs+GOn0r0392mVd/AESzaGXmU0yODtNc4fY5OESdKZBGnSV9dFRYmXy8ZTeYM2OhxSd
-         MtbA==
+        d=google.com; s=20230601; t=1744144067; x=1744748867; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ObztBV5Yi4ZXehN6mjOmpxvnHijoXGi0BfPBHgq47Q0=;
+        b=bJzz7Sro7Gmd24ZSQDEOGFoeOhCLKMewEod9niOz5JUfqEWqGbVAqTKl70AyBaivMx
+         nVLl+8rs6ZCLeUnSU2j0rnAMr+CFus0P4K53FYmG8gBqEhi7oscxurSKN43CYaaPeIuV
+         RpfxYdqrNG8dF5Ob5xKHLAqAmgOiMTkauDrR675/uG4ZgAv9aI39XvlWlvc+0PF6RbCs
+         qz9DP+dE0tbVSWqU8RusbSi/CLuy82bMkJCGn2bpg7vXX8MGQNODWKdF8JWIEe3Aduf/
+         oV+NSzJpRl6xes3tij7zlQrTEZjgrsLKWVqdbuO5+yua6S4cq/Mumk5G2uauagdNGUEb
+         G+YQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744143392; x=1744748192;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mehwUiVlz7/z5KHfhV+Q1AQQejmAf7B/NmHE2o7479g=;
-        b=uVYL10GPV70Ne/L9Xl8QOMPeIhOiziJJgXfq4ZvFVUJMNdpjrttFgHTBGIXs9TGFwG
-         HJOLPXwPVODAlLJrnrXqhlefWsG77em4crtlO/yYqOH16ZzPu88vtGV7TA8r1QoL4J03
-         KCsao5Nu5mN15vofD7wU3saXqNPOQnOWBVv/XCDpX/YcFi63zvAOs8Yl9HsUGG/aW9Th
-         yyJit0n3D0zpuM/JVwhYJcG2h6Jqt8Ve8gOfxRPrOx4PSgreqK5N26ekjYty6+8c8DdX
-         8LJVCx+cbxDcJjCH8gm7kByAmeCbcbBg5HH1v+0ncGtpDnv5ljV6sMCofB7HvEwLKthk
-         IviQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWZOVyyGUD3jQfcZyRYXerpHec9ZRLC2L2GgJ5SbXR6Koxnx9OXhlYFvbS+oi0IRGSbs17nuRg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxwr2DnELjreYobHivA7NqIzA4n490URngFtFv4tCjNTf1hQpk+
-	ioc1da4CHBL8lSw/eb1vJHvmuP4bjXiRhHBOmErSVUsXah9rxhUApXJm39TKbmnWw5b4qf0skeA
-	XCsUPPvjUKbokBdgfibGyZeX2YkGp7ai2l4X3
-X-Gm-Gg: ASbGncuzc5nNtVMhUpy421GnpPn2B9ucIvUHMFaT3xihWnpMsgB8v4OWNQU5QFUgnXX
-	MZwUoPEH1DZ/1BCWb9VCkOuEGH9PKnJDeV82iuxliqV+tJ0QMJP22Ae6Dx2sBe3P/nwiLmypm6C
-	cgkc8NzL7JDGJTJ6xPgIn9zP36YEDtVS/psiAUWDQniDFOEOiuTb9i81H07u3bzUj0NHxMnA==
-X-Google-Smtp-Source: AGHT+IGtGWb6eUUkWxY8GmMQBNcnqZvHvFajRSqQv+lShjf9d+63mfLe+tk4nhM5dqhBVZdhJLi8weQ9qbY2tJuGVlA=
-X-Received: by 2002:a17:90b:2590:b0:2f2:ab09:c256 with SMTP id
- 98e67ed59e1d1-306dbc3aeecmr798843a91.33.1744143392218; Tue, 08 Apr 2025
- 13:16:32 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1744144067; x=1744748867;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ObztBV5Yi4ZXehN6mjOmpxvnHijoXGi0BfPBHgq47Q0=;
+        b=q9Sr608Xsh4HTthjD57aDj+8NLk1Y/3a/+wOgX71CXFGph0VZZiFtPEv5Nu3AQu0ul
+         ogdmo9znH3XFaU76Ot+eA81OlpYoHvFn7qMsfELXHVUHQzR3xNCBun8vgD66KRSHZfNI
+         Vv+v2hyE8IRIeeQn3uwRTkdwfgc2lXGQUWU/EJDt5ThDusjUVKNj+i0bAw165Uxz8s4R
+         6UFSXE+l4Y3eb7ZczDIv04jO/O9zJ94LV2MOIhZ3vK5lVTxZSoHg5aUa4hjrt7acL7Fy
+         Sj2SzktcTInq5wcRfrVC7a/y176Ea2MYIwxwknmdmpvBHPAibstin2Cfp2v1BbKBr8oo
+         hb1A==
+X-Forwarded-Encrypted: i=1; AJvYcCX7hdaGXrqpA6dgVgtadF7XXFGoEl4HmoF4RJmzfgf7LMWnyhXSobkZxflJjKouUZGncufKvVw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgJJ83AQkrqv0vJVg4peMy4ADo2ugr25onChova8WSNcm/d5n1
+	Fvkp3jBB4cZn5+b6/aWrrX2UmKEdDCvXDLDF5kfiHUh4UX5AQTWJf8K7PrW/UQjM2PGFHb8uNMk
+	EDPT6rnd6/w==
+X-Google-Smtp-Source: AGHT+IHw4CoGHECamELU4fnKeNJCcL80CjewmcweZC6MAX617W6Ee02DSvXqO1JQt/xmct+mFuH0rKMPa+B59A==
+X-Received: from qvb1.prod.google.com ([2002:a05:6214:6001:b0:6eb:2b16:6854])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6214:1c81:b0:6e8:9021:9090 with SMTP id 6a1803df08f44-6f0dbc11248mr8324856d6.26.1744144067053;
+ Tue, 08 Apr 2025 13:27:47 -0700 (PDT)
+Date: Tue,  8 Apr 2025 20:27:42 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <Z_PfCosPB7GS4DJl@mini-arch> <20250407161308.19286-1-kuniyu@amazon.com>
- <CANp29Y5RjJD3FK8zciRL92f0+tXEaZ=DbzSF3JrnVRGyDmag2A@mail.gmail.com>
- <CACT4Y+acJ-D6TiynzWef4vAwTNhCNAgey=RmfZHEXDJVrPxDCg@mail.gmail.com> <CANn89iK=SrbwSN20nKY5y71huhsabLEdX=OGsdqwMPZOmNW8Gw@mail.gmail.com>
-In-Reply-To: <CANn89iK=SrbwSN20nKY5y71huhsabLEdX=OGsdqwMPZOmNW8Gw@mail.gmail.com>
-From: Aleksandr Nogikh <nogikh@google.com>
-Date: Tue, 8 Apr 2025 22:16:19 +0200
-X-Gm-Features: ATxdqUHZ4TqwrSVVIkJror92e58_nqzO6Pz7ZoMxbuIXg9lHE1m-GgA4mZ4g9FM
-Message-ID: <CANp29Y5cTga9UrkySy6GiOco+nOHuDnFOWSb5PF-P0i6hU+hnA@mail.gmail.com>
-Subject: Re: [syzbot] [net?] WARNING: bad unlock balance in do_setlink
-To: Eric Dumazet <edumazet@google.com>
-Cc: Dmitry Vyukov <dvyukov@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, stfomichev@gmail.com, 
-	andrew@lunn.ch, davem@davemloft.net, horms@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	sdf@fomichev.me, syzbot+45016fe295243a7882d3@syzkaller.appspotmail.com, 
-	syzkaller-bugs@googlegroups.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.49.0.504.g3bcea36a83-goog
+Message-ID: <20250408202742.2145516-1-edumazet@google.com>
+Subject: [PATCH net-next] net: remove cpu stall in txq_trans_update()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 8, 2025 at 1:33=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> On Tue, Apr 8, 2025 at 12:44=E2=80=AFPM Dmitry Vyukov <dvyukov@google.com=
-> wrote:
-> >
-> > On Tue, 8 Apr 2025 at 10:11, Aleksandr Nogikh <nogikh@google.com> wrote=
-:
-> > >
-> > > On Mon, Apr 7, 2025 at 6:13=E2=80=AFPM 'Kuniyuki Iwashima' via syzkal=
-ler-bugs
-> > > <syzkaller-bugs@googlegroups.com> wrote:
-> > > >
-> > > > From: Stanislav Fomichev <stfomichev@gmail.com>
-> > > > Date: Mon, 7 Apr 2025 07:19:54 -0700
-> > > > > On 04/07, syzbot wrote:
-> > > > > > Hello,
-> > > > > >
-> > > > > > syzbot has tested the proposed patch but the reproducer is stil=
-l triggering an issue:
-> > > > > > unregister_netdevice: waiting for DEV to become free
-> > > > > >
-> > > > > > unregister_netdevice: waiting for batadv0 to become free. Usage=
- count =3D 3
-> > > > >
-> > > > > So it does fix the lock unbalance issue, but now there is a hang?
-> > > >
-> > > > I think this is an orthogonal issue.
-> > > >
-> > > > I saw this in another report as well.
-> > > > https://lore.kernel.org/netdev/67f208ea.050a0220.0a13.025b.GAE@goog=
-le.com/
-> > > >
-> > > > syzbot may want to find a better way to filter this kind of noise.
-> > > >
-> > >
-> > > Syzbot treats this message as a problem worthy of reporting since a
-> > > long time (Cc'd Dmitry who may remember the context):
-> > > https://github.com/google/syzkaller/commit/7a67784ca8bdc3b26cce2f0ec9=
-a40d2dd9ec9396
-> > >
-> > > Since v6.15-rc1, we do observe it happen at least 10x more often than
-> > > before, both during fuzzing and while processing #syz test commands:
-> > > https://syzkaller.appspot.com/bug?extid=3D881d65229ca4f9ae8c84
-> >
-> > IIUC this error means a leaked reference count on a device, and the
-> > device and everything it references leaked forever + a kernel thread
-> > looping forever. This does not look like noise.
-> >
-> > Eric, should know more. Eric fixed a bunch of these bugs and added a
-> > ref count tracker to devices to provide better diagnostics. For some
-> > reason I don't see the reftracker output in the console output, but
-> > CONFIG_NET_DEV_REFCNT_TRACKER=3Dy is enabled in the config.
->
-> I think that Kuniyuki patch was fixing the original syzbot report.
->
-> After fixing this trivial bug, another bug showed up,
-> and this second bug triggered "syzbot may want to find a better way to
-> filter this kind of noise." comment.
+txq_trans_update() currently uses txq->xmit_lock_owner
+to conditionally update txq->trans_start.
 
-FWIW I've just bisected the recent spike in "unregister_netdevice:
-waiting for batadv0 to become free" and git bisect pointed to:
+For regular devices, txq->xmit_lock_owner is updated
+from HARD_TX_LOCK() and HARD_TX_UNLOCK(), and this apparently
+causes cpu stalls.
 
-00b35530811f2aa3d7ceec2dbada80861c7632a8
-Author: Eric Dumazet <edumazet@google.com>
-Date:   Thu Feb 6 14:04:22 2025 +0000
+Using dev->lltx, which sits in a read-mostly cache-line,
+and already used in HARD_TX_LOCK() and HARD_TX_UNLOCK()
+helps cpu prediction.
 
-    batman-adv: adopt netdev_hold() / netdev_put()
+On an AMD EPYC 7B12 dual socket server, tcp_rr with 128 threads
+and 30,000 flows gets a 5 % increase in throughput.
 
-    Add a device tracker to struct batadv_hard_iface to help
-    debugging of network device refcount imbalances.
+As explained in commit 95ecba62e2fd ("net: fix races in
+netdev_tx_sent_queue()/dev_watchdog()") I am planning
+to no longer update txq->trans_start in the fast path
+in a followup patch.
 
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c | 2 +-
+ include/linux/netdevice.h                | 7 ++++---
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-Eric, could you please have a look?
+diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index c9fd34787c9986946c06e3d8d9de693c4438ab6a..e78de79a5d78c2e673809841e5c6d2dc35c754a1 100644
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@ -427,7 +427,7 @@ static void am65_cpsw_nuss_ndo_host_tx_timeout(struct net_device *ndev,
+ 
+ 	if (netif_tx_queue_stopped(netif_txq)) {
+ 		/* try recover if stopped by us */
+-		txq_trans_update(netif_txq);
++		txq_trans_update(ndev, netif_txq);
+ 		netif_tx_wake_queue(netif_txq);
+ 	}
+ }
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index cf3b6445817bb9d3a142da10549ade1c49659313..0b703f0aa2043e537b7f74a4532f89f1f2890b08 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -4688,9 +4688,10 @@ static inline void __netif_tx_unlock_bh(struct netdev_queue *txq)
+ /*
+  * txq->trans_start can be read locklessly from dev_watchdog()
+  */
+-static inline void txq_trans_update(struct netdev_queue *txq)
++static inline void txq_trans_update(const struct net_device *dev,
++				    struct netdev_queue *txq)
+ {
+-	if (txq->xmit_lock_owner != -1)
++	if (!dev->lltx)
+ 		WRITE_ONCE(txq->trans_start, jiffies);
+ }
+ 
+@@ -5209,7 +5210,7 @@ static inline netdev_tx_t netdev_start_xmit(struct sk_buff *skb, struct net_devi
+ 
+ 	rc = __netdev_start_xmit(ops, skb, dev, more);
+ 	if (rc == NETDEV_TX_OK)
+-		txq_trans_update(txq);
++		txq_trans_update(dev, txq);
+ 
+ 	return rc;
+ }
+-- 
+2.49.0.504.g3bcea36a83-goog
 
->
->
-> -ETOOMANYBUGS.
 
