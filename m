@@ -1,154 +1,253 @@
-Return-Path: <netdev+bounces-180250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ED3CA80CD0
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 15:49:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71CD9A80D10
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 15:57:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92A34443818
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 13:43:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C557C188D503
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 13:53:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95722189913;
-	Tue,  8 Apr 2025 13:43:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7991512C499;
+	Tue,  8 Apr 2025 13:53:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="NuZ/nKj6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UAKNwVwg"
 X-Original-To: netdev@vger.kernel.org
-Received: from pv50p00im-ztdg10011901.me.com (pv50p00im-ztdg10011901.me.com [17.58.6.50])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3310117A2EB
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 13:43:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C09B417E00E
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 13:53:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744119795; cv=none; b=eDVKsEEeZVdxkxysHpL3fJ5DT7kFa1L9czXx2UEv+dS89um0Rci7HhtYsi/vcBK+nLuK3cj00DBV2a3rq6Yv5FHTTLeEgb4RF3PQAHFI4soOLCY838U75Abp3A/4+4itL4wKvVPr0OMSD8NxwUznxoNr7lG4KpJ9RtLiyUJTkYs=
+	t=1744120423; cv=none; b=hpn0xxg3rKSN/IBItSZR/cu0vGtVXbBLPAC8ztIQ0BuGQlctlohdE7ggH87Z2paitYKXwpBjX98v/zJlGgdXlpkTxe8QN+S3mZuLpv9lNViP6DtVqKPOpYhRMCX3mu/Gx5rw75BUvcqv6d/EwTne+2ivTAumOjuqdmaTjGE6G2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744119795; c=relaxed/simple;
-	bh=0oqFzUOBPKKix/1j0ccQIbPAQksuNWmVXOUfqjkEL2E=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=WnfcxFtfgP44NXmTQAx/KCticRGLr8A2cPRMpPm6n81o16qJRqMiKcrfhRGPRBggwdpAfD6UU8V4ZvbDget/fVSBeT4RBjFZ9NOSFK07Nv7W7KjJbXuDuqWS+QXOzsUytCUclHPkN5FLYArnJzz8sTpDmo3PYRMY5mWduVNOnJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=NuZ/nKj6; arc=none smtp.client-ip=17.58.6.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; bh=KAvqNbZUARSQP7AzfZVwLgfRlsqyVvzAxLJDPsnC2Po=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:x-icloud-hme;
-	b=NuZ/nKj66k1VnNWfy5cjzJva75QohhM9B18hLWowCBLLMj5G4tNZLJOs1sU6x9+dH
-	 D1hwFtrc1ghGXNzF1hm85e1O5saV1JFR7Qf5w849NAfcGU9DYu0SXNNjI7nuYMye07
-	 Ie/YVZpHSLZSA86joSkqAIVxQFOSIbV7AD1hLNo9H/HGJhj3LPVBsNtSASn9vCcE9M
-	 Mk/ny+fgY0BKeNSZ/6ZMyOdtU6bTjjLFXKXyKNuXC/1tT9PLCLHLty90e1GMfPErKv
-	 fsAY2PJQr2B/LkBMrLqgG7EExD2T0Ank8MqseM2LbMTIIOK8Kyxd7lP66mFTXl/1HU
-	 ygE7bw4xC6N2g==
-Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-ztdg10011901.me.com (Postfix) with ESMTPSA id CAA2D3A0165;
-	Tue,  8 Apr 2025 13:43:07 +0000 (UTC)
-From: Zijun Hu <zijun_hu@icloud.com>
-Date: Tue, 08 Apr 2025 21:42:34 +0800
-Subject: [PATCH net-next] sock: Correct error checking condition for
- assign|release_proto_idx()
+	s=arc-20240116; t=1744120423; c=relaxed/simple;
+	bh=9kJQEmwg7BwiR45UOUurChqkBrRv10mRNt4JqfqNZyI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DnA5f/WsRiA9HFCa2Zi4x5Ce4a05OwjpN43dWjl13GFTI2mSgmm6uFbmwd8Nbfx4qND2nS+mSNvTEmrTlF+sEocQtIUYHKznri3opPtT/OBFkmg03JGFFzGrj59pobOckpvEVwN1/rCxXK2gMzv8qMyG2ohOhvzxzn2KApwD6Ww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UAKNwVwg; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744120422; x=1775656422;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=9kJQEmwg7BwiR45UOUurChqkBrRv10mRNt4JqfqNZyI=;
+  b=UAKNwVwgWEzoetzJ55krm3llIpSkBTRcC8mOXcCQdJDABZj0RSEBWSWX
+   26GenPJpo2MLca+eLKq+oG/ceoZQRhDz2kvXjUs9+MmOwt3RVwLupxxwM
+   tY2JbgmP6p6D05VZeJp1cwXm33QZhaI7Yk1gTlYyFRWqVkOvrHs7bel8m
+   cO0iAS6JNLlOzqMghBdTVqgq0iq8Aj1PFSv21YiM5m2gac9Yap2edyjsq
+   IF/fLw+UHmtbnS05Eg+KhOs5o2MzKzyv4oGy47Z7lvbIANesHb9l33aq2
+   wHaQ8ulhbjIi/a/lNZj4sY7wY9XlCzWm4bbr8NRtMclZFP27MGfexbLvT
+   w==;
+X-CSE-ConnectionGUID: pQhDW1Z+T6Syf1tBoSbjXQ==
+X-CSE-MsgGUID: v0aE7raRQs+NKeB8sHvW2g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11397"; a="45688322"
+X-IronPort-AV: E=Sophos;i="6.15,198,1739865600"; 
+   d="scan'208";a="45688322"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2025 06:53:41 -0700
+X-CSE-ConnectionGUID: ljPQh8IHTx6RKzXEqSY2HQ==
+X-CSE-MsgGUID: TVwXtcvzRaeSMZGj47v8TA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,198,1739865600"; 
+   d="scan'208";a="128796695"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa007.jf.intel.com with ESMTP; 08 Apr 2025 06:53:37 -0700
+Received: from vecna.igk.intel.com (vecna.igk.intel.com [10.123.220.17])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 958BA3432C;
+	Tue,  8 Apr 2025 14:53:35 +0100 (IST)
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: netdev@vger.kernel.org,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Karol Kolacinski <karol.kolacinski@intel.com>,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
+	Michal Kubiak <michal.kubiak@intel.com>
+Subject: [PATCH iwl-net v3] ice: use DSN instead of PCI BDF for ice_adapter index
+Date: Tue,  8 Apr 2025 15:46:55 +0200
+Message-Id: <20250408134655.4287-1-przemyslaw.kitszel@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250408-fix_net-v1-1-375271a79c11@quicinc.com>
-X-B4-Tracking: v=1; b=H4sIAMkn9WcC/x2MWwqAIBAAryL7nWA+IrpKRESutT8WKiGId8/6H
- GaYAhEDYYSJFQj4UKTLN+g7Bvu5+QM52cYghTRCC8Md5dVj4gpHNWirhHQOWn0HbOo/zfAFHnO
- CpdYXHEI09mMAAAA=
-X-Change-ID: 20250405-fix_net-3e8364d302ff
-To: Eric Dumazet <edumazet@google.com>, 
- Kuniyuki Iwashima <kuniyu@amazon.com>, Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemb@google.com>, 
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
- Simon Horman <horms@kernel.org>, Pavel Emelyanov <xemul@openvz.org>
-Cc: Zijun Hu <zijun_hu@icloud.com>, Eric Dumazet <dada1@cosmosbay.com>, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Zijun Hu <quic_zijuhu@quicinc.com>
-X-Mailer: b4 0.14.2
-X-Proofpoint-GUID: oIss7fQIRjTA0gW9VpyqYZaKxVA9fHnV
-X-Proofpoint-ORIG-GUID: oIss7fQIRjTA0gW9VpyqYZaKxVA9fHnV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-08_05,2025-04-08_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- clxscore=1011 spamscore=0 suspectscore=0 malwarescore=0 bulkscore=0
- mlxscore=0 phishscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.22.0-2503100000 definitions=main-2504080097
-X-Apple-Remote-Links: v=1;h=KCk=;charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-From: Zijun Hu <quic_zijuhu@quicinc.com>
+Use Device Serial Number instead of PCI bus/device/function for
+index of struct ice_adapter.
+Functions on the same physical device should point to the very same
+ice_adapter instance.
 
-assign|release_proto_idx() wrongly check find_first_zero_bit() failure
-by condition '(prot->inuse_idx == PROTO_INUSE_NR - 1)' obviously.
+This is not only simplification, but also fixes things up when PF
+is passed to VM (and thus has a random BDF).
 
-Fix by correcting the condition to '(prot->inuse_idx == PROTO_INUSE_NR)'
-Also check @->inuse_idx before accessing @->val[] to avoid OOB.
-
-Fixes: 13ff3d6fa4e6 ("[SOCK]: Enumerate struct proto-s to facilitate percpu inuse accounting (v2).")
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+Suggested-by: Jacob Keller <jacob.e.keller@intel.com>
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Suggested-by: Jiri Pirko <jiri@resnulli.us>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
- include/net/sock.h | 5 ++++-
- net/core/sock.c    | 7 +++++--
- 2 files changed, 9 insertions(+), 3 deletions(-)
+CC: Karol Kolacinski <karol.kolacinski@intel.com>
+CC: Grzegorz Nitka <grzegorz.nitka@intel.com>
+CC: Michal Schmidt <mschmidt@redhat.com>
+CC: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+CC: Michal Kubiak <michal.kubiak@intel.com>
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 8daf1b3b12c607d81920682139b53fee935c9bb5..9ece93a3dd044997276b0fa37dddc7b5bbdacc43 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -1421,7 +1421,10 @@ struct prot_inuse {
- static inline void sock_prot_inuse_add(const struct net *net,
- 				       const struct proto *prot, int val)
+v3:
+ - Add fixes tag (Michal K)
+ - add missing braces (lkp bot), turns out it's hard to purge C++ from your mind
+ - (no changes in the collision handling on 32bit systems)
+
+v2:
+https://lore.kernel.org/intel-wired-lan/20250407112005.85468-1-przemyslaw.kitszel@intel.com/
+ - target to -net (Jiri)
+ - mix both halves of u64 DSN on 32bit systems (Jiri)
+ - (no changes in terms of fallbacks for pre-prod HW)
+ - warn when there is DSN collision after reducing to 32bit
+
+v1:
+https://lore.kernel.org/netdev/20250306211159.3697-2-przemyslaw.kitszel@intel.com
+---
+ drivers/net/ethernet/intel/ice/ice_adapter.h |  6 ++-
+ drivers/net/ethernet/intel/ice/ice_adapter.c | 43 ++++++++------------
+ 2 files changed, 20 insertions(+), 29 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.h b/drivers/net/ethernet/intel/ice/ice_adapter.h
+index e233225848b3..ac15c0d2bc1a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adapter.h
++++ b/drivers/net/ethernet/intel/ice/ice_adapter.h
+@@ -32,17 +32,19 @@ struct ice_port_list {
+  * @refcount: Reference count. struct ice_pf objects hold the references.
+  * @ctrl_pf: Control PF of the adapter
+  * @ports: Ports list
++ * @device_serial_number: DSN cached for collision detection on 32bit systems
+  */
+ struct ice_adapter {
+ 	refcount_t refcount;
+ 	/* For access to the GLTSYN_TIME register */
+ 	spinlock_t ptp_gltsyn_time_lock;
+ 
+ 	struct ice_pf *ctrl_pf;
+ 	struct ice_port_list ports;
++	u64 device_serial_number;
+ };
+ 
+-struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev);
+-void ice_adapter_put(const struct pci_dev *pdev);
++struct ice_adapter *ice_adapter_get(struct pci_dev *pdev);
++void ice_adapter_put(struct pci_dev *pdev);
+ 
+ #endif /* _ICE_ADAPTER_H */
+diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/ethernet/intel/ice/ice_adapter.c
+index 01a08cfd0090..95a1ba04e610 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adapter.c
++++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
+@@ -1,7 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ // SPDX-FileCopyrightText: Copyright Red Hat
+ 
+-#include <linux/bitfield.h>
+ #include <linux/cleanup.h>
+ #include <linux/mutex.h>
+ #include <linux/pci.h>
+@@ -14,29 +13,13 @@
+ static DEFINE_XARRAY(ice_adapters);
+ static DEFINE_MUTEX(ice_adapters_mutex);
+ 
+-/* PCI bus number is 8 bits. Slot is 5 bits. Domain can have the rest. */
+-#define INDEX_FIELD_DOMAIN GENMASK(BITS_PER_LONG - 1, 13)
+-#define INDEX_FIELD_DEV    GENMASK(31, 16)
+-#define INDEX_FIELD_BUS    GENMASK(12, 5)
+-#define INDEX_FIELD_SLOT   GENMASK(4, 0)
+-
+-static unsigned long ice_adapter_index(const struct pci_dev *pdev)
++static unsigned long ice_adapter_index(u64 dsn)
  {
--	this_cpu_add(net->core.prot_inuse->val[prot->inuse_idx], val);
-+	unsigned int idx = prot->inuse_idx;
-+
-+	if (likely(idx < PROTO_INUSE_NR))
-+		this_cpu_add(net->core.prot_inuse->val[idx], val);
+-	unsigned int domain = pci_domain_nr(pdev->bus);
+-
+-	WARN_ON(domain > FIELD_MAX(INDEX_FIELD_DOMAIN));
+-
+-	switch (pdev->device) {
+-	case ICE_DEV_ID_E825C_BACKPLANE:
+-	case ICE_DEV_ID_E825C_QSFP:
+-	case ICE_DEV_ID_E825C_SFP:
+-	case ICE_DEV_ID_E825C_SGMII:
+-		return FIELD_PREP(INDEX_FIELD_DEV, pdev->device);
+-	default:
+-		return FIELD_PREP(INDEX_FIELD_DOMAIN, domain) |
+-		       FIELD_PREP(INDEX_FIELD_BUS,    pdev->bus->number) |
+-		       FIELD_PREP(INDEX_FIELD_SLOT,   PCI_SLOT(pdev->devfn));
+-	}
++#if BITS_PER_LONG == 64
++	return dsn;
++#else
++	return (u32)dsn ^ (u32)(dsn >> 32);
++#endif
  }
  
- static inline void sock_inuse_add(const struct net *net, int val)
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 323892066def8ba517ff59f98f2e4ab47edd4e63..92f4618c576a3120bcc8e9d03d36738b77447360 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -3948,6 +3948,9 @@ int sock_prot_inuse_get(struct net *net, struct proto *prot)
- 	int cpu, idx = prot->inuse_idx;
- 	int res = 0;
- 
-+	if (unlikely(idx >= PROTO_INUSE_NR))
-+		return 0;
-+
- 	for_each_possible_cpu(cpu)
- 		res += per_cpu_ptr(net->core.prot_inuse, cpu)->val[idx];
- 
-@@ -3999,7 +4002,7 @@ static int assign_proto_idx(struct proto *prot)
+ static struct ice_adapter *ice_adapter_new(void)
+@@ -77,25 +60,29 @@ static void ice_adapter_free(struct ice_adapter *adapter)
+  * Return:  Pointer to ice_adapter on success.
+  *          ERR_PTR() on error. -ENOMEM is the only possible error.
+  */
+-struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev)
++struct ice_adapter *ice_adapter_get(struct pci_dev *pdev)
  {
- 	prot->inuse_idx = find_first_zero_bit(proto_inuse_idx, PROTO_INUSE_NR);
+-	unsigned long index = ice_adapter_index(pdev);
++	u64 dsn = pci_get_dsn(pdev);
+ 	struct ice_adapter *adapter;
++	unsigned long index;
+ 	int err;
  
--	if (unlikely(prot->inuse_idx == PROTO_INUSE_NR - 1)) {
-+	if (unlikely(prot->inuse_idx == PROTO_INUSE_NR)) {
- 		pr_err("PROTO_INUSE_NR exhausted\n");
- 		return -ENOSPC;
++	index = ice_adapter_index(dsn);
+ 	scoped_guard(mutex, &ice_adapters_mutex) {
+ 		err = xa_insert(&ice_adapters, index, NULL, GFP_KERNEL);
+ 		if (err == -EBUSY) {
+ 			adapter = xa_load(&ice_adapters, index);
+ 			refcount_inc(&adapter->refcount);
++			WARN_ON_ONCE(adapter->device_serial_number != dsn);
+ 			return adapter;
+ 		}
+ 		if (err)
+ 			return ERR_PTR(err);
+ 
+ 		adapter = ice_adapter_new();
+ 		if (!adapter)
+ 			return ERR_PTR(-ENOMEM);
++		adapter->device_serial_number = dsn;
+ 		xa_store(&ice_adapters, index, adapter, GFP_KERNEL);
  	}
-@@ -4010,7 +4013,7 @@ static int assign_proto_idx(struct proto *prot)
- 
- static void release_proto_idx(struct proto *prot)
+ 	return adapter;
+@@ -110,11 +97,13 @@ struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev)
+  *
+  * Context: Process, may sleep.
+  */
+-void ice_adapter_put(const struct pci_dev *pdev)
++void ice_adapter_put(struct pci_dev *pdev)
  {
--	if (prot->inuse_idx != PROTO_INUSE_NR - 1)
-+	if (prot->inuse_idx != PROTO_INUSE_NR)
- 		clear_bit(prot->inuse_idx, proto_inuse_idx);
- }
- #else
-
----
-base-commit: 34a07c5b257453b5fcadc2408719c7b075844014
-change-id: 20250405-fix_net-3e8364d302ff
-
-Best regards,
+-	unsigned long index = ice_adapter_index(pdev);
++	u64 dsn = pci_get_dsn(pdev);
+ 	struct ice_adapter *adapter;
++	unsigned long index;
+ 
++	index = ice_adapter_index(dsn);
+ 	scoped_guard(mutex, &ice_adapters_mutex) {
+ 		adapter = xa_load(&ice_adapters, index);
+ 		if (WARN_ON(!adapter))
 -- 
-Zijun Hu <quic_zijuhu@quicinc.com>
+2.39.3
 
 
