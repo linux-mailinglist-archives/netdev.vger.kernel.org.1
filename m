@@ -1,75 +1,77 @@
-Return-Path: <netdev+bounces-180512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2117AA8195D
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 01:31:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 862FBA8195E
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 01:31:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C2497B2BDE
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 23:30:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07FED3B1EAC
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 23:31:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CFCD218ABD;
-	Tue,  8 Apr 2025 23:31:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C9582566F9;
+	Tue,  8 Apr 2025 23:31:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mCjNzuJJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JwOIq5zi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 523B315A8
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 23:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99962561B9
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 23:31:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744155081; cv=none; b=QK5+uMlMLYbZaYsL/YGC0RgDGbGqAQVMfu6Xs1tMc1rc+lRQjG4cfKrYN3Ho6Ji2teN2bPJr4MfdklFKuUed9tCHod7mc/F8+lDGYJtp0m+Rc4CCu4II9m1+Wv4tDp7Dt0ahkMgefmoKGCaINvVT+Z2kb03wrHKuEPwXNcJn8Ok=
+	t=1744155083; cv=none; b=bLElIUp8tUqEgOYMJV8NswlNWcbZNekxc8BU+TN1aZlecc6fotdjC3gLQo+rAjEfnNWNEKN7dyOks3gcEbDl+IQEk/iJAyZg29xSABSqrjsgL3vxCQQnWNd9wViCjBGek2ArUQMsDV6PNAPL8B67MQg7XeKYiBLK/SHBZuELZlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744155081; c=relaxed/simple;
-	bh=YCRBAgEr1OqSNF3/6zbuUwRQ8zW8L6qOLVlwShyVooA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JiX8AS7u6t0dgiIq5zYCzd1p9B8W/jCLOF8FTC45eHhLMML1k2TrCfrYEQ6oLhdiK00S0GWJGkIeoDdPsILelgfq/Nmtxurqd+mUesIW58D43xbzDegIpCmMA/FMvkIGkOxJRuqGWqIWbCattQdLc5SD/ofDhZTqJo0D5bj6AWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mCjNzuJJ; arc=none smtp.client-ip=209.85.128.54
+	s=arc-20240116; t=1744155083; c=relaxed/simple;
+	bh=i2FEvLHXwmiztanEvIz1Nz7I4fbAuHkpg5qR/KqL1so=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=X7iBObYAR5qkuhN90dpkpgvQnYg4uk6hK9JgaVo9aQ2bYLJ5yo7bLYoA/q1sriblWm0IIYtP3XksKInJX5PGHBCyyLf89rXCNmZd6TX0+F0iZ8FZYeJh6EB1oX8yml0y3IJ8/8qg5DzyYEtuaB8lfTQUSe+Azbc30pDZLh9MMr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JwOIq5zi; arc=none smtp.client-ip=209.85.221.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43690d4605dso41918905e9.0
-        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 16:31:18 -0700 (PDT)
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-39c31e4c3e5so3777071f8f.0
+        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 16:31:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744155077; x=1744759877; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ows4oTqmiN2OktRiuaSZg2zuOzJP+kImnUZLyOPmAp8=;
-        b=mCjNzuJJ2u+JdY9uQmN3+h0R0++0s3lYEuOTXhczRtULsWUY9g7weCxeOZd9cjocUM
-         lMZgih00RvPLQLcsucAAI3/2FPx9kBa+148G6ay3Lb70rXrMxfkK2BGW7ru2/de8rGKg
-         ImkanDe3vlnRSChAPNw4UpeyuRa8PDRNWRUIiufpFtfy30L+WJalIIN9EN1BooUYmSjw
-         3L63YIV4/klVHyOg5L0W/0LSQ9cv7HLf6DPnNxcSQaaGkRORRONcy/5gzhmDYHGCouZr
-         i2uZxg1QhbuNSqZ7oI4JFkDeqw7QCRDssdqS0vcn5P6MpQE3wzZvU/x54DasJ/ml95G7
-         +tpQ==
+        d=gmail.com; s=20230601; t=1744155080; x=1744759880; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ofhUCdpu9Ci28c3zBFO/slGFSkGPE9Lw2VA1zPlri+4=;
+        b=JwOIq5zi4NGabQo2psLHa9+pTy5iS+vS6RtS4nw21tG139WfLpL5u/2tKp7ScUE67j
+         9t/bEJiojE8mMiLfNtAC7h0DIXLnBqDY0tYd79U43oN7VNaTUrlTvIi4CH2mC5gZ3rFm
+         ThuJhwCSzaHmr7j/Y76RJe/QYrwW6ucHKGtkfxGtHFdnvkceoAPTz8xazIAo8hgRmvlK
+         YXW92iQBaqNdJCUw8/nonDx5rCFEdtarDcE8eCy4OX/G5a4CzGFV+U+QwO6L936fmz1P
+         9NFSecbsoyI7HWZhVPcF4h95fZSkZ1pgFRGCk7tcAmps/hGI3/5y3xziYGUSXx2nROjv
+         yh1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744155077; x=1744759877;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ows4oTqmiN2OktRiuaSZg2zuOzJP+kImnUZLyOPmAp8=;
-        b=DtDmjL9LgY8qeMMelc8t9v/MnrSfv3ksFmPNfdhhjHzqZzHj31cbWlhh/wvaSWBLqY
-         aJgqe8Prxo4PG9WQvGVRX1areVToVwL/8fGYq3XG5oacQqJU81Ub1BNinjfCPoplHqky
-         DGbPF6R/BHeQnIFaq+GqwpI3+zRfyxhaVKTafFwNLUiOZ3b+PGZivt2eqcT3kUnixVIh
-         iUv3rtaplF9Q6sBtHCxLxlvLamAEcgFUMywgkyh091EI4Pw9q2pNzNyVl6qbrJ5Zf3rG
-         DF+Ou3Q6Ptw3pnQxp+bzT4bkYMN0UIvptXfe9/D1j+IpdcyAyk0qc7/OShZquyR7IGB+
-         rQGg==
-X-Forwarded-Encrypted: i=1; AJvYcCWy7JJq1QdYr2kT57GnncEzYc5peq59wg6vStwMi0ZFlAxX7zNEkX9bw8capntZdnaybV+Jf9Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxricipOHB4p6XSNK5qPSGIwOk0oAnzM5QIWAPpGnJ9tO48i62N
-	+eGGGZo6ODns0C19ZpeRWJgkBhH7iMTVaku6/tsasMnQ4CVlVNsR
-X-Gm-Gg: ASbGncsWFML6bG8KV6Rn5SCIGK02XCDTRIC7gUs3kg66PXCsydB1eNFUqktcCVvPY9G
-	2QAdAw2DwgIKcNOqg1N+9vmvr9+n6pFWivn+b1+RJFDaCMTLkqVRqfujrMLc1pbo/CHiEHAPXGO
-	93tXj6j3r40sTjg1tcFZ6dD/48Z3KaPGd/GqCM+jL4ApCzK9imDkNnRcS6xweaAOiBuaKhWPpgF
-	e3X7Bn0rg+jMMrqF+aCd3OsGE9U3EWesyoX6Cf9cWK8gS1kySlU2ZcnottBwr2MkBc9fvKXP0XI
-	siSgGgcKd/bIy5BtiPyeqdBhVCHiboot0m3KYBzKAI+izNC8y5XW892Px6PP0NwgMgdlPA==
-X-Google-Smtp-Source: AGHT+IHky4RZECkzCa51MFyrpIp89rq4mX1V/aGu5m3X9ghmiTgQd/lhFzqE5IrVQpoVB/VHmSEj7Q==
-X-Received: by 2002:a05:600c:4443:b0:43d:2230:303b with SMTP id 5b1f17b1804b1-43f1ff3b39fmr3168495e9.20.1744155077423;
-        Tue, 08 Apr 2025 16:31:17 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1744155080; x=1744759880;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ofhUCdpu9Ci28c3zBFO/slGFSkGPE9Lw2VA1zPlri+4=;
+        b=DvsHPSn4dxQICuFEHUNjgzhj+J+PUzVJfDI5GatCRVqX7DbxV9SYkzrcP2EhVALBNb
+         3Ug+6XHVujBAKmfhjj1wzNa8zivPRgBdEXJ1cgPhSRQwcK5zs1ZDBKDUaPLGff43N3uh
+         o2jXp2mqjxzHV5J01zfausS4MVv8NbO5v1X3soA3N/UL1FFmxu8ZTxf/KxmYL2bVND2F
+         /Dwr98eziSxcxKOHqwTgMmwpOGUaQmNqBcCTKL2zKa+8TPr3PMpUsIXB4om5euotJQSK
+         q09zKS6nc5g6kkrZjZgfpDei3sT5bTrzygOlP5tjxhXoVKXUc948URpZ7Y+m0wm7PvE/
+         R9+g==
+X-Forwarded-Encrypted: i=1; AJvYcCVg/nCQCqA3oxMyTeZ4iIfBZXTuBRAy9majzjPar0I/F8aVKmGI08rjsIXXSAoGU3tVaEZLU3Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwraMyu84FSHVjXxDndNDepWNTZz5jI8iJT5o83p4Aazp/sDckX
+	XA6+wZ8LPm2pLhHc0Gh2XGqaLYS9ztgJQF9D2oR/N27CvRUecDPV
+X-Gm-Gg: ASbGncujSVqWY45cEf2czN6eJIxgM1iR0E99t02v0F5yWfyTQm7Akp2c5TEHydsfu71
+	o8v+pSusIBUs1Bld57lG7JVNgFe54YwhyXys2Ahbs1hlI/NQ7LJjqrjVxd6PKNRsnEog/rEBOxM
+	M9OBsDpkkqOqvChpuxh6fnCS7w8eoVmKnhHrvgnnQ/7MZMXkbj977sGkBch+HOtwmIWm8mabVmy
+	RfphsgKB9umwaoxvwDvrED1JRQ+NtNKWhdQaHCRLFLRQVy2j26y1o/EJ/LTVrBKFt+mdFYMM0hx
+	narnlS/hApoDn/cZD+LtttZns5sz0sfjAeEVv+V7lje/63r7GsqvHQxX+dk=
+X-Google-Smtp-Source: AGHT+IGwU9gfub8I5n8wEVKElfXxZDa6HkqlYms6bOPEUB2gd+Z3hPB3mUujaH56GwpZLOhwXVL5PQ==
+X-Received: by 2002:a05:6000:4308:b0:39d:6f2b:e74d with SMTP id ffacd0b85a97d-39d88564b64mr296692f8f.39.1744155079826;
+        Tue, 08 Apr 2025 16:31:19 -0700 (PDT)
 Received: from localhost.localdomain ([212.50.121.5])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39d75ac6d66sm9934565f8f.14.2025.04.08.16.31.13
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39d75ac6d66sm9934565f8f.14.2025.04.08.16.31.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Apr 2025 16:31:16 -0700 (PDT)
+        Tue, 08 Apr 2025 16:31:18 -0700 (PDT)
 From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
 To: Loic Poulain <loic.poulain@oss.qualcomm.com>,
 	Johannes Berg <johannes@sipsolutions.net>
@@ -78,16 +80,13 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	Slark Xiao <slark_xiao@163.com>,
-	Muhammad Nuzaihan <zaihan@unrealasia.net>,
-	Qiang Yu <quic_qianyu@quicinc.com>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Johan Hovold <johan@kernel.org>
-Subject: [RFC PATCH 0/6] net: wwan: add NMEA port type support
-Date: Wed,  9 Apr 2025 02:31:12 +0300
-Message-ID: <20250408233118.21452-1-ryazanov.s.a@gmail.com>
+	netdev@vger.kernel.org
+Subject: [RFC PATCH 1/6] net: wwan: core: remove unused port_id field
+Date: Wed,  9 Apr 2025 02:31:13 +0300
+Message-ID: <20250408233118.21452-2-ryazanov.s.a@gmail.com>
 X-Mailer: git-send-email 2.45.3
+In-Reply-To: <20250408233118.21452-1-ryazanov.s.a@gmail.com>
+References: <20250408233118.21452-1-ryazanov.s.a@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,51 +95,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The series introduces a long discussed NMEA port type support for the
-WWAN subsystem. There are two goals. From the WWAN driver perspective,
-NMEA exported as any other port type (e.g. AT, MBIM, QMI, etc.). From
-user space software perspective, the exported chardev belongs to the
-GNSS class what makes it easy to distinguish desired port and the WWAN
-device common to both NMEA and control (AT, MBIM, etc.) ports makes it
-easy to locate a control port for the GNSS receiver activation.
+It was used initially for a port id allocation, then removed, and then
+accidently introduced again, but it is still unused. Drop it again to
+keep code clean.
 
-Done by exporting the NMEA port via the GNSS subsystem with the WWAN
-core acting as proxy between the WWAN modem driver and the GNSS
-subsystem.
+Signed-off-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+---
+ drivers/net/wwan/wwan_core.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-The series starts from a cleanup patch. Then two patches prepares the
-WWAN core for the proxy style operation. Followed by a patch introding a
-new WWNA port type, integration with the GNSS subsystem and demux. The
-series ends with a couple of patches that introduce emulated EMEA port
-to the WWAN HW simulator.
-
-The series is the product of the discussion with Loic about the pros and
-cons of possible models and implementation. Also Muhammad and Slark did
-a great job defining the problem, sharing the code and pushing me to
-finish the implementation. Many thanks.
-
-Comments are welcomed.
-
-CC: Slark Xiao <slark_xiao@163.com>
-CC: Muhammad Nuzaihan <zaihan@unrealasia.net>
-CC: Qiang Yu <quic_qianyu@quicinc.com>
-CC: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-CC: Johan Hovold <johan@kernel.org>
-
-Sergey Ryazanov (6):
-  net: wwan: core: remove unused port_id field
-  net: wwan: core: split port creation and registration
-  net: wwan: core: split port unregister and stop
-  net: wwan: add NMEA port support
-  net: wwan: hwsim: refactor to support more port types
-  net: wwan: hwsim: support NMEA port emulation
-
- drivers/net/wwan/Kconfig      |   1 +
- drivers/net/wwan/wwan_core.c  | 260 ++++++++++++++++++++++++++++------
- drivers/net/wwan/wwan_hwsim.c | 201 +++++++++++++++++++++-----
- include/linux/wwan.h          |   2 +
- 4 files changed, 389 insertions(+), 75 deletions(-)
-
+diff --git a/drivers/net/wwan/wwan_core.c b/drivers/net/wwan/wwan_core.c
+index 63a47d420bc5..ade8bbffc93e 100644
+--- a/drivers/net/wwan/wwan_core.c
++++ b/drivers/net/wwan/wwan_core.c
+@@ -43,7 +43,6 @@ static struct dentry *wwan_debugfs_dir;
+  *
+  * @id: WWAN device unique ID.
+  * @dev: Underlying device.
+- * @port_id: Current available port ID to pick.
+  * @ops: wwan device ops
+  * @ops_ctxt: context to pass to ops
+  * @debugfs_dir:  WWAN device debugfs dir
+@@ -51,7 +50,6 @@ static struct dentry *wwan_debugfs_dir;
+ struct wwan_device {
+ 	unsigned int id;
+ 	struct device dev;
+-	atomic_t port_id;
+ 	const struct wwan_ops *ops;
+ 	void *ops_ctxt;
+ #ifdef CONFIG_WWAN_DEBUGFS
 -- 
 2.45.3
 
