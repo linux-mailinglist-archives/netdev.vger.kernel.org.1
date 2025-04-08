@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-180514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF820A81963
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 01:32:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DE20A81960
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 01:31:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACC13189D312
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 23:31:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D95F444263
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 23:31:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 283F82566F4;
-	Tue,  8 Apr 2025 23:31:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A7E2561D9;
+	Tue,  8 Apr 2025 23:31:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OJmOusFa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="So1cHblZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37D72256C65
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 23:31:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86986256C7A
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 23:31:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744155086; cv=none; b=qGzIOVuLnfw270H6J7M1gw4de0oE/qTLZAFvV48UpsqmLV+r1CaQ67FfQIS2lLEOfMy4HHYtC+KziIqp+WRL/2lsfV8VgEBm1jPWBR21+08LKCaq5Aws+WIwoeEs7KMKM9YiJpGAWb2D19dOIk8/Z+66MvmxmCX64wutRQBfKNg=
+	t=1744155088; cv=none; b=KKCK4vHRjpQkZwRB4BQS0KHcxssKyRHGwAEqjbQ3gA19lCENw0aKBJzEUzvHIwvy+E4+QhYTHJuX4MQQggb0UaQelGlD/pD3VmughtTsBoByVyXf9BKOEferlxa4lM6EV2f8PvKqGdB/38kyz+g7teaP5XS3hZi+6jY1d/Hz7iE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744155086; c=relaxed/simple;
-	bh=tYXYPGTsmkGwSHtcnMtnv5No4VmlcuJYo7+tIi/dzJQ=;
+	s=arc-20240116; t=1744155088; c=relaxed/simple;
+	bh=JyUlpVWGTepUIICsKwWPYiXibApeR5e+NDhtYRPQGW0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JR3Otc5BZP/FRLqIu1jap2ZKp1Ouj8p78INEGCliPTCiyv8nZ/jEiQmyNBWxSK6+DfCE7CbWuBawnrX6wIRpk0T9wSPj37RmwmJ2l7AtyDBfXQ57ruYME0PplZ7s/67rakl4txZx8qg5U4jFPyo7XDnbM8AsdReuzzZOLmcVxDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OJmOusFa; arc=none smtp.client-ip=209.85.128.53
+	 MIME-Version; b=ItjrL9BijSoHBXB+EMewcrJpcQlVCZCbUOEno35kd60nd3bhsxpQEQ3WnBtoI3SUXuYBaoinH1EkDhS8ZeBdljGktPZo4PiYgoEfrzkxbwdgIcrLL7mPpMv0DdYmpHfNR5ZKshFTm4iIKXjfkIPOXXP3OnLMldIbXuF+bwOp4Co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=So1cHblZ; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43cf3192f3bso60155505e9.1
-        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 16:31:23 -0700 (PDT)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-43cfb6e9031so55559205e9.0
+        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 16:31:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744155082; x=1744759882; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1744155085; x=1744759885; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gmwXSv7RlVya0U10vKAedkVLI4QTTx9fhGxm6P2/Du8=;
-        b=OJmOusFaoXdPz2dt7bgSw4h/322AWPILAlyKqPV0JapnZkVVIz+2YpM7qLSstgas9K
-         LsdYvPBvgrRc+kBT5RTOpGBFB9wstLBoOdJ8V29dgPPNRRSgolNKoJszo974zxw+Oi03
-         Zu24r4P7RGmx5Crw2vj3FJJ3c/F26MeERo1rA6YsdQpwo9RvN/C6V296AGCfb4QSvfy5
-         E4pjo2GEOiPheTHu5nkvEpjcckWmp8Pyiy5ZPsAKlVOSHnn74fmO50CIwm+z2oIrXH7r
-         oUMI788qXPRKHTyBu8ReJmtSuDnNiTcDkD9SfAJwMwVYb7c1NuLQ4iRuigEGIONokBYV
-         VJVg==
+        bh=OisFLgh5vEU5DklT0qSuWyMPHuNzsGmCGO5Vq6L6MWU=;
+        b=So1cHblZSxZEhBwIpAAaA2UbYbXg7xvrYRjEiQ3RNg0HF+wb42CIA8BmIKXZpF9FjT
+         AxaLWUQ5JAAj48/MsHFrvctW8myPcsnzwF/B/mN4Uq14SR/d/2ifym+QxuE2Ey6NexFJ
+         pubcRXKeAcThfcbC92ETbU3MHCVnh68w4EDFXX3cGN33stGM6uJFroeRbNphvuYdv8+g
+         fqGLdSqUCFMKyFla7mMqQNkDBVTP6Caqnd9KA1QKNKfOuNvM9dQYirfns+8fMOrU3xJ5
+         BAuhmT6M7n45T3bzbBSl8epXGEgoYBSn+wzo8WYQqN7TSniGN2eygw744BSGBwBUJpsy
+         1kAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744155082; x=1744759882;
+        d=1e100.net; s=20230601; t=1744155085; x=1744759885;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=gmwXSv7RlVya0U10vKAedkVLI4QTTx9fhGxm6P2/Du8=;
-        b=lzOeOZoQXEVZdwJmgIRp00lHXOaAzThiOigpPDgQAjPZGTBA9ZqoFxgE0UB4b60Lqw
-         Xqt3OJJoP/4he3AdpMsCf/fYoNzqlZ3657MGvpxLYLHD4/g4M1Yi4k4dKd7b1AXUa5sw
-         ca+fKhdoWiTCv9i0kXfO7OhCfvnH79fwcPNBnOp3+ryxBRd+yjI7F8AqwwRQfeO7tbA9
-         UI/9AJJTBBQV+mn81vRRMTdRplpJRaNoKRr6mAZS/bUd1kp5yOHZgr0k6ZNcYA/bTML2
-         bPgTkIOaenIkd4I9b6VCvujEKTPHewPUGqAo8Vaz9bW7LLwlOdo87krZ53EhHyPOmaAP
-         OJ2w==
-X-Forwarded-Encrypted: i=1; AJvYcCXmnzzFab+YxBOVSwb630lPMxYOqjsl49GjPxg36FeSxsD4FzjEoNTOyXaLOMyLg6pYtVQYc0o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSYcEDwl49p9u3nIM0OSiN34idndDPuc41eHPLxGm79LtHXZ2y
-	QWWt5Hj+lXiHPhYs2FZJiztrhkVDzsIkcj7hzNX+YnZlFBpr/yCU
-X-Gm-Gg: ASbGnctw87VtcYzV4fYI5y12zJ86xFbMxuhwN0DmN7c4gkBCMeDJRmJEUCjuzM2fRtx
-	mp80YGlm6SpazW26q1aYDmxZOIYScg9gEVPeHcIzXK8247YUNkzOR3kF5ivPg5Ro5coMnrgZzBS
-	JtdcjPlgvYBfzbKYWTsJnp3lj9lXT/+2xIwiPOYuOWQgK98dRJRrjiFFqCJ2znrw+PYGW4bC3q2
-	Q3m3AJrTq6BaAJoPNGzsSoaqWbPY9N1GOSbgZc4/tvB3fHDw34x5n+Wwf2HtbS89gVPjrNAGh1p
-	j61Yf9jZNFfgRHpvp+6eQ3sV4wMq8wC7bwXMyuK2mljQoOMsfhMvdWG7OUU=
-X-Google-Smtp-Source: AGHT+IHulfDIQAKiUM9iXBaNQUKY7ldZ5+qJ9kmWpbzjKoZLipqSKoprJl042TWRJB+z9yuFxyRXfA==
-X-Received: by 2002:a05:600c:4713:b0:43c:f895:cb4e with SMTP id 5b1f17b1804b1-43f1ecad5e6mr8646635e9.17.1744155082250;
-        Tue, 08 Apr 2025 16:31:22 -0700 (PDT)
+        bh=OisFLgh5vEU5DklT0qSuWyMPHuNzsGmCGO5Vq6L6MWU=;
+        b=dqXFDT1+JwH4raBa5/MzXE05MKPfY+dTqMc+NelUx+TEINh6HYr+zigg4ePTiHECGo
+         AwLlqoC1xOwn/Tj+bImziugFVsVW9HwZPT+ZCqlZ5gZZ1e0ZA1Jmx13uD871rfoUpWJK
+         EbmOB2QS9zFAp/VKyW8BX1Foazph/quE5fYZ4JqVSDPIgqsaC0Zws6nyk8WenceboWsF
+         eKKkZRjVRkukpR6ERbuXoYjyTfggfHYFzih3/0yH8BlKlF+Keo4SyaWAtkGyMK2JcfsF
+         laAyYTUEAEiAxFo40lKX9XZDsrH4pDyYYtpMVRIzoSqk5l9afmOTRMEgdqOhuo6MfYbb
+         Brmg==
+X-Forwarded-Encrypted: i=1; AJvYcCUTRGcKpCv4qnsLfgdMeSk40L8d154yccODC33jk1sevHVGqDi6awtBCgvgU5SE8OHlcpBl+5Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy89vFn+ziNQAzYzx/EDZza1W5J+nz5DfmDXyz6Wt7gOGyoAqCf
+	9AKDMVTIFqD8F2zLAgffl5hFm5yDDg52EiI7QuEiBrNmZychl7f7
+X-Gm-Gg: ASbGncuY+UIl/9Nav/nMGiVR9X3Wlgpe08FtwMVpQ1gAI1VVGaCG76aeLkM4TTWPtxs
+	39y6eweZV9uRZoFfVJz/Bf3DoJ7843umA/lM9OSC35Cgaz2BeVJWL8J98LdwqtjOHaLWodkfM3G
+	wlNnU18FEgIyFzTXhlL5/sbIb50Dj85cScqzTMaA+HdbbZjLEiKIzf6heXnIEDv9fenbe4AdvVz
+	NMto3SY02V9pztZDmME7oWuR9mpzvv5K4yqzqBiIdUCADLdAfk4jSD3yXs9kzSH4yIb0c8FeGd1
+	hgfLL2/zb3M3OxTSh7lkH914ELYvxOG8git/HoOfyHuUubp1oEiV65vhO77Xd7JxvZAEhQ==
+X-Google-Smtp-Source: AGHT+IGkNr3o+H0JUe4kjJO7vD1t1UqoLNzYYAlCHg8UBxMtFumsUL63vKdi3EcE+Oz8JBFKZ+8CbQ==
+X-Received: by 2002:a05:600c:19ca:b0:43c:fd72:f039 with SMTP id 5b1f17b1804b1-43f1fe16c95mr2714125e9.11.1744155084653;
+        Tue, 08 Apr 2025 16:31:24 -0700 (PDT)
 Received: from localhost.localdomain ([212.50.121.5])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39d75ac6d66sm9934565f8f.14.2025.04.08.16.31.20
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39d75ac6d66sm9934565f8f.14.2025.04.08.16.31.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Apr 2025 16:31:20 -0700 (PDT)
+        Tue, 08 Apr 2025 16:31:24 -0700 (PDT)
 From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
 To: Loic Poulain <loic.poulain@oss.qualcomm.com>,
 	Johannes Berg <johannes@sipsolutions.net>
@@ -81,9 +81,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org
-Subject: [RFC PATCH 2/6] net: wwan: core: split port creation and registration
-Date: Wed,  9 Apr 2025 02:31:14 +0300
-Message-ID: <20250408233118.21452-3-ryazanov.s.a@gmail.com>
+Subject: [RFC PATCH 3/6] net: wwan: core: split port unregister and stop
+Date: Wed,  9 Apr 2025 02:31:15 +0300
+Message-ID: <20250408233118.21452-4-ryazanov.s.a@gmail.com>
 X-Mailer: git-send-email 2.45.3
 In-Reply-To: <20250408233118.21452-1-ryazanov.s.a@gmail.com>
 References: <20250408233118.21452-1-ryazanov.s.a@gmail.com>
@@ -97,156 +97,62 @@ Content-Transfer-Encoding: 8bit
 
 Upcoming GNSS (NMEA) port type support requires exporting it via the
 GNSS subsystem. On another hand, we still need to do basic WWAN core
-work: find or allocate the WWAN device, make it the port parent, etc. To
-reuse as much code as possible, split the port creation function into
-the registration of a regular WWAN port device, and basic port struct
-initialization.
+work: call the port stop operation, purge queues, release the parent
+WWAN device, etc. To reuse as much code as possible, split the port
+unregistering function into the deregistration of a regular WWAN port
+device, and the common port tearing down code.
 
 Signed-off-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
 ---
- drivers/net/wwan/wwan_core.c | 86 ++++++++++++++++++++++--------------
- 1 file changed, 53 insertions(+), 33 deletions(-)
+ drivers/net/wwan/wwan_core.c | 21 ++++++++++++++++-----
+ 1 file changed, 16 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/net/wwan/wwan_core.c b/drivers/net/wwan/wwan_core.c
-index ade8bbffc93e..045246d7cd50 100644
+index 045246d7cd50..439a57bc2b9c 100644
 --- a/drivers/net/wwan/wwan_core.c
 +++ b/drivers/net/wwan/wwan_core.c
-@@ -357,16 +357,19 @@ static struct attribute *wwan_port_attrs[] = {
- };
- ATTRIBUTE_GROUPS(wwan_port);
- 
--static void wwan_port_destroy(struct device *dev)
-+static void __wwan_port_destroy(struct wwan_port *port)
- {
--	struct wwan_port *port = to_wwan_port(dev);
--
--	ida_free(&minors, MINOR(port->dev.devt));
- 	mutex_destroy(&port->data_lock);
- 	mutex_destroy(&port->ops_lock);
- 	kfree(port);
+@@ -486,6 +486,18 @@ static int wwan_port_register_wwan(struct wwan_port *port)
+ 	return 0;
  }
  
-+static void wwan_port_destroy(struct device *dev)
-+{
-+	ida_free(&minors, MINOR(dev->devt));
-+	__wwan_port_destroy(to_wwan_port(dev));
-+}
-+
- static const struct device_type wwan_port_dev_type = {
- 	.name = "wwan_port",
- 	.release = wwan_port_destroy,
-@@ -440,6 +443,49 @@ static int __wwan_port_dev_assign_name(struct wwan_port *port, const char *fmt)
- 	return dev_set_name(&port->dev, "%s", buf);
- }
- 
-+/* Register a regular WWAN port device (e.g. AT, MBIM, etc.)
-+ *
-+ * NB: in case of error function frees the port memory.
-+ */
-+static int wwan_port_register_wwan(struct wwan_port *port)
++/* Unregister regular WWAN port (e.g. AT, MBIM, etc) */
++static void wwan_port_unregister_wwan(struct wwan_port *port)
 +{
 +	struct wwan_device *wwandev = to_wwan_dev(port->dev.parent);
-+	char namefmt[0x20];
-+	int minor, err;
 +
-+	/* A port is exposed as character device, get a minor */
-+	minor = ida_alloc_range(&minors, 0, WWAN_MAX_MINORS - 1, GFP_KERNEL);
-+	if (minor < 0) {
-+		__wwan_port_destroy(port);
-+		return minor;
-+	}
++	dev_set_drvdata(&port->dev, NULL);
 +
-+	port->dev.class = &wwan_class;
-+	port->dev.type = &wwan_port_dev_type;
-+	port->dev.devt = MKDEV(wwan_major, minor);
++	dev_info(&wwandev->dev, "port %s disconnected\n", dev_name(&port->dev));
 +
-+	/* allocate unique name based on wwan device id, port type and number */
-+	snprintf(namefmt, sizeof(namefmt), "wwan%u%s%%d", wwandev->id,
-+		 wwan_port_types[port->type].devsuf);
-+
-+	/* Serialize ports registration */
-+	mutex_lock(&wwan_register_lock);
-+
-+	__wwan_port_dev_assign_name(port, namefmt);
-+	err = device_register(&port->dev);
-+
-+	mutex_unlock(&wwan_register_lock);
-+
-+	if (err) {
-+		put_device(&port->dev);
-+		return err;
-+	}
-+
-+	dev_info(&wwandev->dev, "port %s attached\n", dev_name(&port->dev));
-+
-+	return 0;
++	device_unregister(&port->dev);
 +}
 +
  struct wwan_port *wwan_create_port(struct device *parent,
  				   enum wwan_port_type type,
  				   const struct wwan_port_ops *ops,
-@@ -448,8 +494,7 @@ struct wwan_port *wwan_create_port(struct device *parent,
- {
- 	struct wwan_device *wwandev;
- 	struct wwan_port *port;
--	char namefmt[0x20];
--	int minor, err;
-+	int err;
+@@ -542,18 +554,17 @@ void wwan_remove_port(struct wwan_port *port)
+ 	struct wwan_device *wwandev = to_wwan_dev(port->dev.parent);
  
- 	if (type > WWAN_PORT_MAX || !ops)
- 		return ERR_PTR(-EINVAL);
-@@ -461,17 +506,9 @@ struct wwan_port *wwan_create_port(struct device *parent,
- 	if (IS_ERR(wwandev))
- 		return ERR_CAST(wwandev);
+ 	mutex_lock(&port->ops_lock);
+-	if (port->start_count)
++	if (port->start_count) {
+ 		port->ops->stop(port);
++		port->start_count = 0;
++	}
+ 	port->ops = NULL; /* Prevent any new port operations (e.g. from fops) */
+ 	mutex_unlock(&port->ops_lock);
  
--	/* A port is exposed as character device, get a minor */
--	minor = ida_alloc_range(&minors, 0, WWAN_MAX_MINORS - 1, GFP_KERNEL);
--	if (minor < 0) {
--		err = minor;
--		goto error_wwandev_remove;
--	}
+ 	wake_up_interruptible(&port->waitqueue);
 -
- 	port = kzalloc(sizeof(*port), GFP_KERNEL);
- 	if (!port) {
- 		err = -ENOMEM;
--		ida_free(&minors, minor);
- 		goto error_wwandev_remove;
- 	}
+ 	skb_queue_purge(&port->rxq);
+-	dev_set_drvdata(&port->dev, NULL);
  
-@@ -485,31 +522,14 @@ struct wwan_port *wwan_create_port(struct device *parent,
- 	mutex_init(&port->data_lock);
+-	dev_info(&wwandev->dev, "port %s disconnected\n", dev_name(&port->dev));
+-	device_unregister(&port->dev);
++	wwan_port_unregister_wwan(port);
  
- 	port->dev.parent = &wwandev->dev;
--	port->dev.class = &wwan_class;
--	port->dev.type = &wwan_port_dev_type;
--	port->dev.devt = MKDEV(wwan_major, minor);
- 	dev_set_drvdata(&port->dev, drvdata);
- 
--	/* allocate unique name based on wwan device id, port type and number */
--	snprintf(namefmt, sizeof(namefmt), "wwan%u%s%%d", wwandev->id,
--		 wwan_port_types[port->type].devsuf);
--
--	/* Serialize ports registration */
--	mutex_lock(&wwan_register_lock);
--
--	__wwan_port_dev_assign_name(port, namefmt);
--	err = device_register(&port->dev);
--
--	mutex_unlock(&wwan_register_lock);
--
-+	err = wwan_port_register_wwan(port);
- 	if (err)
--		goto error_put_device;
-+		goto error_wwandev_remove;
- 
--	dev_info(&wwandev->dev, "port %s attached\n", dev_name(&port->dev));
- 	return port;
- 
--error_put_device:
--	put_device(&port->dev);
- error_wwandev_remove:
+ 	/* Release related wwan device */
  	wwan_remove_dev(wwandev);
- 
 -- 
 2.45.3
 
