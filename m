@@ -1,202 +1,144 @@
-Return-Path: <netdev+bounces-180196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3066AA8040D
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 14:05:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93E87A804C8
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 14:12:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2552F1B61063
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 12:00:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A0DB1895693
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 12:06:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B843269899;
-	Tue,  8 Apr 2025 11:59:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 825C526982F;
+	Tue,  8 Apr 2025 12:04:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="nLfZEsyz";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="URE34VJW"
 X-Original-To: netdev@vger.kernel.org
-Received: from ni.piap.pl (ni.piap.pl [195.187.100.5])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 028FCA94A;
-	Tue,  8 Apr 2025 11:59:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.187.100.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F011AAA0F
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 12:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744113586; cv=none; b=P890LR9UQ3KH1xrqM5lBeKZviw4eNz6uKScc8pk2H8IYq32cZ70bzpad8YxLssGLzDhYbWkJFX9nyMe+1SqEWCfkZ4jMHm6wxy6OnmwV2qVjHdZKG0U2TU4a5C62FvmWxzS9upwMW7O31G36jTEom5r4pyMUk+AtVMrwk/SQ+KI=
+	t=1744113868; cv=none; b=GIvQ2fSmfttNcqzXnoU2kIIE8dsasha/fIQzHK+NSxC3oo2cN2GrNjA1bEbYrLIOIxqG44ZanVWf8EUnOEmjK0hrrokwMMdwk6pYKxxFFrd+SI1Oxk8/BjRJ8J3mfU4c0dkGGeysSEyDLP4fcS3Q45jz7MuO3mxWSrEp2ZnBBII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744113586; c=relaxed/simple;
-	bh=H+sEWRoi0KMWTJdhw9CdKZg4wP0qGCG0W3QopnKON+U=;
+	s=arc-20240116; t=1744113868; c=relaxed/simple;
+	bh=VJ2KHIqduJVeD2yn5RmypYFPNq7nH2d/R/Js1HXgqrk=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=PACFX++k+GCNHpRcQt39GezqrACQel2Qt6nvtVPtTr9r5uPF8KcIKX7qfg8se8hG+c0/QmyxzAQlGlhHwh9K7FPTaEvfxOdoEA6rSVToV7SkmrVu7ElUy5MJ2MtzDQ1vljNmRWyAh9MjzNWnrrkG2ED+PMlZJXpSu0OcmHOi12s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=piap.pl; spf=pass smtp.mailfrom=piap.pl; arc=none smtp.client-ip=195.187.100.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=piap.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=piap.pl
-Received: from t19.piap.pl (OSB1819.piap.pl [10.0.9.19])
-	by ni.piap.pl (Postfix) with ESMTPS id 89C76C408283;
-	Tue,  8 Apr 2025 13:59:41 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 ni.piap.pl 89C76C408283
-From: =?utf-8?Q?Krzysztof_Ha=C5=82asa?= <khalasa@piap.pl>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: netdev <netdev@vger.kernel.org>,  Oliver Neukum <oneukum@suse.com>,
-  Andrew Lunn <andrew+netdev@lunn.ch>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
-  <linux-usb@vger.kernel.org>,  <linux-kernel@vger.kernel.org>,  Jose
- Ignacio Tornos Martinez <jtornosm@redhat.com>,  Ming Lei
- <ming.lei@redhat.com>
-Subject: [PATCH v2] usbnet: asix AX88772: leave the carrier control to phylink
-In-Reply-To: <m3tt6ydfzu.fsf@t19.piap.pl> ("Krzysztof =?utf-8?Q?Ha=C5=82as?=
- =?utf-8?Q?a=22's?= message of
-	"Tue, 08 Apr 2025 13:55:49 +0200")
-References: <m35xjgdvih.fsf@t19.piap.pl> <Z_PVOWDMzmLObRM6@pengutronix.de>
-	<m3tt6ydfzu.fsf@t19.piap.pl>
-Sender: khalasa@piap.pl
-Date: Tue, 08 Apr 2025 13:59:41 +0200
-Message-ID: <m3plhmdfte.fsf_-_@t19.piap.pl>
+	 MIME-Version:Content-Type; b=iCKT1nYkxoowjL7fbBYDuRfJdOUCkDa1TOILsCYDSp7iMpTbBV4H25uQBsV9jhAJjIsV74BoNk4zqJITbv2CwFI8ABhCHltJC7hQDBZqCNXi+z10YeriDG5FE845JBzx9Oea6+s9PtVe5xcZVzZkn12OZZbxNdXwieOvwTJrnH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=nLfZEsyz; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=URE34VJW; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1744113863;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DUIhkfxLW/XlWJKlZW3tDkzpsaxUijtWfsWVavFzJgw=;
+	b=nLfZEsyzOb7FAC+IqSA4Wr0ondG7gmYFnOdVjb7JQpjiL2O4Tc6ANK/vKP6KDHQ3rFyR/Y
+	p8tsA4pWgz7OlUM7kgfeCV7Q908QiV3XOf5oy9vLv7nmEbfRn59eUdWiwxXizoj6iJMyvu
+	2WUhcxtZmfBeVczk/t5SmsmIkcqBWrSf+MchOE29b38d3DY/rcqqz09AF28naqG+L4OMGB
+	i1JABEXvLZtwiD1Io5z0mBvEPg2+9fz1OlZS/bu6+j4QyEG7AFntUFrC/r0bpzwB7V9CDV
+	RBVFDB5BrF8L+yovCQwcdUu6Ru4qSt6nzzlhOgtp0SlwfjBx1oqrch71nb96+A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1744113863;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DUIhkfxLW/XlWJKlZW3tDkzpsaxUijtWfsWVavFzJgw=;
+	b=URE34VJWFHwTsxTG+5n7ywKdsXUjc1UCcHYYmQqbHICpTZZWbl0SrxNZjQyWvxgKPCyZJm
+	qTks3sMk2aL1R3BQ==
+To: Simon Horman <horms@kernel.org>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Faizal Rahim
+ <faizal.abdul.rahim@linux.intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-next v4 1/2] igc: Limit netdev_tc calls to MQPRIO
+In-Reply-To: <20250407124741.GJ395307@horms.kernel.org>
+References: <20250321-igc_mqprio_tx_mode-v4-0-4571abb6714e@linutronix.de>
+ <20250321-igc_mqprio_tx_mode-v4-1-4571abb6714e@linutronix.de>
+ <20250407124741.GJ395307@horms.kernel.org>
+Date: Tue, 08 Apr 2025 14:04:21 +0200
+Message-ID: <87mscqsvui.fsf@jax.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
+
+--=-=-=
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 
-ASIX AX88772B based USB 10/100 Ethernet adapter doesn't come
-up ("carrier off"), despite the built-in 100BASE-FX PHY positive link
-indication. The internal PHY is configured (using EEPROM) in fixed
-100 Mbps full duplex mode.
+On Mon Apr 07 2025, Simon Horman wrote:
+> On Fri, Mar 21, 2025 at 02:52:38PM +0100, Kurt Kanzenbach wrote:
+>> Limit netdev_tc calls to MQPRIO. Currently these calls are made in
+>> igc_tsn_enable_offload() and igc_tsn_disable_offload() which are used by
+>> TAPRIO and ETF as well. However, these are only required for MQPRIO.
+>>=20
+>> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+>
+> Hi Kurt,
+>
+> Thanks for the update. And I apologise that I now have question.
+>
+> I see that:
+>
+> * This patch moves logic from igc_tsn_disable_offload()
+>   and igc_tsn_enable_offload() to igc_tsn_enable_mqprio().
+>
+> * That both igc_tsn_disable_offload() and igc_tsn_enable_offload()
+>   are only called from igc_tsn_reset().
+>
+> * And that based on the description, this looks good for the case
+>   where igc_tsn_reset() is called from igc_tsn_offload_apply().
+>   This is because igc_tsn_offload_apply() is called from
+>   igc_tsn_enable_mqprio().
+>
+> All good so far.
+>
+> But my question is about the case where igc_tsn_reset() is called from
+> igc_reset(). Does the logic previously present in igc_tsn_enable_offload()
+> and igc_tsn_disable_offload() need to run in that case?
 
-The primary problem appears to be using carrier_netif_{on,off}() while,
-at the same time, delegating carrier management to phylink. Use only the
-latter and remove "manual control" in the asix driver.
+This patch moves the netdev_tc calls only. These do not have to run in
+this case. The hardware configuration is still applied in
+igc_tsn_enable_offload() and igc_tsn_disable_offload().
 
-I don't have any other AX88772 board here, but the problem doesn't seem
-specific to a particular board or settings - it's probably
-timing-dependent.
+Thanks,
+Kurt
 
-Remove unused asix_adjust_link() as well.
+> And, if so, how is that handled?
 
-Signed-off-by: Krzysztof Ha=C5=82asa <khalasa@piap.pl>
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
---- a/drivers/net/usb/asix.h
-+++ b/drivers/net/usb/asix.h
-@@ -224,7 +224,6 @@ int asix_write_rx_ctl(struct usbnet *dev, u16 mode, int=
- in_pm);
-=20
- u16 asix_read_medium_status(struct usbnet *dev, int in_pm);
- int asix_write_medium_mode(struct usbnet *dev, u16 mode, int in_pm);
--void asix_adjust_link(struct net_device *netdev);
-=20
- int asix_write_gpio(struct usbnet *dev, u16 value, int sleep, int in_pm);
-=20
---- a/drivers/net/usb/asix_common.c
-+++ b/drivers/net/usb/asix_common.c
-@@ -414,28 +414,6 @@ int asix_write_medium_mode(struct usbnet *dev, u16 mod=
-e, int in_pm)
- 	return ret;
- }
-=20
--/* set MAC link settings according to information from phylib */
--void asix_adjust_link(struct net_device *netdev)
--{
--	struct phy_device *phydev =3D netdev->phydev;
--	struct usbnet *dev =3D netdev_priv(netdev);
--	u16 mode =3D 0;
--
--	if (phydev->link) {
--		mode =3D AX88772_MEDIUM_DEFAULT;
--
--		if (phydev->duplex =3D=3D DUPLEX_HALF)
--			mode &=3D ~AX_MEDIUM_FD;
--
--		if (phydev->speed !=3D SPEED_100)
--			mode &=3D ~AX_MEDIUM_PS;
--	}
--
--	asix_write_medium_mode(dev, mode, 0);
--	phy_print_status(phydev);
--	usbnet_link_change(dev, phydev->link, 0);
--}
--
- int asix_write_gpio(struct usbnet *dev, u16 value, int sleep, int in_pm)
- {
- 	int ret;
---- a/drivers/net/usb/asix_devices.c
-+++ b/drivers/net/usb/asix_devices.c
-@@ -752,7 +736,6 @@ static void ax88772_mac_link_down(struct phylink_config=
- *config,
- 	struct usbnet *dev =3D netdev_priv(to_net_dev(config->dev));
-=20
- 	asix_write_medium_mode(dev, 0, 0);
--	usbnet_link_change(dev, false, false);
- }
-=20
- static void ax88772_mac_link_up(struct phylink_config *config,
-@@ -783,7 +766,6 @@ static void ax88772_mac_link_up(struct phylink_config *=
-config,
- 		m |=3D AX_MEDIUM_RFC;
-=20
- 	asix_write_medium_mode(dev, m, 0);
--	usbnet_link_change(dev, true, false);
- }
-=20
- static const struct phylink_mac_ops ax88772_phylink_mac_ops =3D {
-@@ -1350,10 +1328,9 @@ static const struct driver_info ax88772_info =3D {
- 	.description =3D "ASIX AX88772 USB 2.0 Ethernet",
- 	.bind =3D ax88772_bind,
- 	.unbind =3D ax88772_unbind,
--	.status =3D asix_status,
- 	.reset =3D ax88772_reset,
- 	.stop =3D ax88772_stop,
--	.flags =3D FLAG_ETHER | FLAG_FRAMING_AX | FLAG_LINK_INTR | FLAG_MULTI_PAC=
-KET,
-+	.flags =3D FLAG_ETHER | FLAG_FRAMING_AX | FLAG_MULTI_PACKET,
- 	.rx_fixup =3D asix_rx_fixup_common,
- 	.tx_fixup =3D asix_tx_fixup,
- };
-@@ -1362,11 +1339,9 @@ static const struct driver_info ax88772b_info =3D {
- 	.description =3D "ASIX AX88772B USB 2.0 Ethernet",
- 	.bind =3D ax88772_bind,
- 	.unbind =3D ax88772_unbind,
--	.status =3D asix_status,
- 	.reset =3D ax88772_reset,
- 	.stop =3D ax88772_stop,
--	.flags =3D FLAG_ETHER | FLAG_FRAMING_AX | FLAG_LINK_INTR |
--	         FLAG_MULTI_PACKET,
-+	.flags =3D FLAG_ETHER | FLAG_FRAMING_AX | FLAG_MULTI_PACKET,
- 	.rx_fixup =3D asix_rx_fixup_common,
- 	.tx_fixup =3D asix_tx_fixup,
- 	.data =3D FLAG_EEPROM_MAC,
-@@ -1376,11 +1351,9 @@ static const struct driver_info lxausb_t1l_info =3D {
- 	.description =3D "Linux Automation GmbH USB 10Base-T1L",
- 	.bind =3D ax88772_bind,
- 	.unbind =3D ax88772_unbind,
--	.status =3D asix_status,
- 	.reset =3D ax88772_reset,
- 	.stop =3D ax88772_stop,
--	.flags =3D FLAG_ETHER | FLAG_FRAMING_AX | FLAG_LINK_INTR |
--		 FLAG_MULTI_PACKET,
-+	.flags =3D FLAG_ETHER | FLAG_FRAMING_AX | FLAG_MULTI_PACKET,
- 	.rx_fixup =3D asix_rx_fixup_common,
- 	.tx_fixup =3D asix_tx_fixup,
- 	.data =3D FLAG_EEPROM_MAC,
-@@ -1412,10 +1383,8 @@ static const struct driver_info hg20f9_info =3D {
- 	.description =3D "HG20F9 USB 2.0 Ethernet",
- 	.bind =3D ax88772_bind,
- 	.unbind =3D ax88772_unbind,
--	.status =3D asix_status,
- 	.reset =3D ax88772_reset,
--	.flags =3D FLAG_ETHER | FLAG_FRAMING_AX | FLAG_LINK_INTR |
--	         FLAG_MULTI_PACKET,
-+	.flags =3D FLAG_ETHER | FLAG_FRAMING_AX | FLAG_MULTI_PACKET,
- 	.rx_fixup =3D asix_rx_fixup_common,
- 	.tx_fixup =3D asix_tx_fixup,
- 	.data =3D FLAG_EEPROM_MAC,
+-----BEGIN PGP SIGNATURE-----
 
---=20
-Krzysztof "Chris" Ha=C5=82asa
-
-Sie=C4=87 Badawcza =C5=81ukasiewicz
-Przemys=C5=82owy Instytut Automatyki i Pomiar=C3=B3w PIAP
-Al. Jerozolimskie 202, 02-486 Warszawa
-
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmf1EMUTHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgn55EAClsf1y2fAQh+R9zer0mAjHGDqIJB/I
+yByUgRD3zZ4pqHAF5SCwhc46V5PNautDo0OD8YhXrsDFXloNu8TXo15NzzckxFQh
+gB8M/oNhdVOWlvfTkDRCe/6GJRvsQa+aQZwQGLW38bLzU1+4KX770p/xHJqHj1B8
+o//TTsUJuS6UrPj2Y3yR1dNt9fPMEpeAJZyiXekX9bNyvA4gbsu5MLm+/dd8uhKX
+1w+L2nnAX6r5i4E+MfpiQnfyovxZWQPepqeCpQPGfsBQuI9XDquSe2qb/hnYmth5
+tWzWnKgSumcp+OumNEv5Fe8VSrsazy1TM8FcBMX+RTNO3JZXDRi6ZO8WjZ/kOT5c
+Nl9FOWFYmd8EQPjAT8JPPYmopbRCy/P4WrEueMhehKblq89pJYLJs1WwNRlfGe5z
+WJA/lj5e4RtVVqhxgPB6ohn9z3dl7PMomKYUrIOEq8hMjyraI5xaZJLZ82nJ5TXv
+0JnEHiuEJqvU8w1eg/IsJdhsxPOx1OwjYx5pUwSopW8Iy+aLtqEt/pSJfFcoqnHF
+b7KRkG/aHjTEJsSWDSPJj+GaFZt+LQYPDairp1kaJqpKCt1F7G3VqrjRN9q5xnmc
+hOnZGt9Ly6ytXqRURhuS11HR0gAyYXuh9Dv7xig6zBG0tWaoO5A4PiUs57huZf23
+w4X2PdPIA/kWlg==
+=miv5
+-----END PGP SIGNATURE-----
+--=-=-=--
 
