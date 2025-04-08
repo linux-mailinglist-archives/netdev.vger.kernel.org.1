@@ -1,273 +1,102 @@
-Return-Path: <netdev+bounces-180153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A82B6A7FC23
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 12:34:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EB38A7FC2C
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 12:35:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6D1116D4D2
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 10:31:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 874C14416F2
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 10:32:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E3F926A0AD;
-	Tue,  8 Apr 2025 10:28:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC50F268FD0;
+	Tue,  8 Apr 2025 10:30:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b="C1BR6YR+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mUZpaISE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00E6626A0A6
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 10:28:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20302267F70;
+	Tue,  8 Apr 2025 10:30:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744108084; cv=none; b=DLXPWAbIHNvAPFCj4s0OvYkwKK73uXktjBAjggepAlenQ6o6dj6D4zmgtPk4JvunuLJvivg4NAM7suO8+UdZJ38vPJFAtkkcvT6dPeksaDgeVrMTvOFZPPEXWO3RNAGMoFIp57zCPm9X/1qrddOYklf2/aXiFMs//GygdTNcig0=
+	t=1744108244; cv=none; b=eflYHZ44NbDdKRSqsP5r3SdhGSKTOGYjxAP18X6VIfXDqF9zz70cf+WxkRTns8BC6R7QD/ytSE0BGtUZyRonHojDOvIJ0pGesGirWlPFVliPSnqhJ43bZ2LtjimhM9drkyNdUy/0KXCa9/hgHnOdjEsV+0on05B/x1iaAnSv600=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744108084; c=relaxed/simple;
-	bh=WrI0lX7+J5s+4CwxTeHTL2V9dJJ7Iqdsj3G+bwSv8Qg=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=C4YqBUTz56OYyW+i2iJyzq8aRBoqgsHKaFg837kkqLBq0TZ5jMekNRLlrrcgDF8zzv64YMkLKnKAWFuHhaHOGtHoF3lPFWOIrXItexCfci5bSnNxVdTJbvx385bTXjPE087or/1/QTupmjvMoEZd4DEkvXkIG+PtOhlG44aIk4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com; spf=pass smtp.mailfrom=fairphone.com; dkim=pass (2048-bit key) header.d=fairphone.com header.i=@fairphone.com header.b=C1BR6YR+; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fairphone.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fairphone.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-abbb12bea54so37935366b.0
-        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 03:28:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fairphone.com; s=fair; t=1744108080; x=1744712880; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Pv5rrjrhBcfKnYh0Q7OEJ/yH0eQFOKYhTNlnDBdY1gs=;
-        b=C1BR6YR+nGpAodc2Emag1kg/19o1IQUzGynXJh+FLgOOva8XwJVMOwSaI6FqEvr9gW
-         rfigQNGiU73BOQFNwdI8Z75ud0A2FSqcDi9x+S8hgwrgEJyiagxXgpRz05KyJHBeyXYE
-         LAQ+WDoZBJa052TPGot/7bruib3RqLQMMecrYBCeJCLTdAigo3ab15y0XlR3VimY6kyT
-         6crfKu/MLqFeFaCMRKU/9GUml5olMXEemHGnCYexkvZhC4dAIfAHdRKo8oXX0vmdsYzs
-         xY5kp8bkF4TaTShQHazuuAzHW5ARM59OAlwG7R4wrpi0acSUeq5e++43DEO8evY2+Sbf
-         pM9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744108080; x=1744712880;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Pv5rrjrhBcfKnYh0Q7OEJ/yH0eQFOKYhTNlnDBdY1gs=;
-        b=Mqj6yfcQULwLfVpEF87kKNklZe5t+3fyp5omhry0S2gkb+Z5JL0kj2gPv0TtEKBXdy
-         LHbF8/dJCdDVrWNqE5mfHpTLVKUQqmBDwZhTxYplKZChKoAVhrxi0mGrSkth2JXv+2xt
-         WxZ/rD8Ry9QSf+mnuNqLYHV767gZ66Nuj040qoXP/QOslerPmMMxVtBbloUk7aMRddQ6
-         pGj0ztUqXIy39jIjGbAsVSuvPQnOut/fSMDt9AcDkyfQCFhFQB8gq7lwvlenZjXtLAEJ
-         c6buQNYVMRg/rbsROR0EX4aE6ddR2WKXEelfl/8Qsy227btER/813hCO5sQaQggkeM6w
-         KXBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXXhkJnbUskoWSjWIyh+sFycGeCwOQLv/oBT+Byd8yCmj9Xz8VDCum9mQFqAkhKpF5g0FSchmo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhTEZi/R5mdWJ1+k0v+46/hoOjqEmVu0cNyyXISrPWmFZT5Olj
-	9BsM0dqPpHIxH4MNafPwcgT1F3YEeWvnNTyqL2p9dOjADLMExj7FrLlJiYCzgn4=
-X-Gm-Gg: ASbGncvMAFubn61VMqnVlcJ88F2pxr5DEWPhX5q7nzqEsai30gH4/5OQHtrHp2Klx+H
-	LOByY5Qj6hIWG89Mhr1aBzqrfbXZrM+a9jizJWUoRg6ZyDD16testV7DXQhxEt588aqkb58AKUh
-	N2IFecDtppsZbNeOWO6YlN0Rd90xFQZGcfYJg0pZwFEz/HcBG4EtRAdl4xe42IWtfwdefuvMdY+
-	6cJPDyHCLiGHUGNKqukA+9CfcNa8cLQ/CMJ2DZ9cvFnnJnvn9ImLVrLRD37obgkIPJNaBEq6Yfg
-	o/WaWFdCwtt5sJauvdbhsqB+stralSV4Uf5RR5dYKZ65uAsYXmuCImRbaTFFrYCx0MLPHMq1w/X
-	osCobirjuS53Wkg==
-X-Google-Smtp-Source: AGHT+IESBdUuaEBUx9lGQ+c+tpA4+Swqaw0w+9TY0oUjOWcmr9SgDm/idOrRiIt3O3EZmRZOQ/hskA==
-X-Received: by 2002:a17:906:2b05:b0:ac8:1798:a796 with SMTP id a640c23a62f3a-ac81798a8fdmr245365866b.54.1744108080129;
-        Tue, 08 Apr 2025 03:28:00 -0700 (PDT)
-Received: from localhost (144-178-202-138.static.ef-service.nl. [144.178.202.138])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac7bfe67e17sm896532566b.34.2025.04.08.03.27.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Apr 2025 03:27:59 -0700 (PDT)
+	s=arc-20240116; t=1744108244; c=relaxed/simple;
+	bh=P6q7ocM2fZ/JCZfHXicwSxGd25qScXXfymOe1Sn5MXI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GG3Zs3edl8Z3x1ptR6XvjA7YpNC8cGvVPBD54CSn5k5UUm2E89el1vhb6bsAxkmj8jew/Z+c4NTttWxsEw6wDKsdEz7NBIeSUytJCW6xYdkAtjZAeC1b0qXMueW+lMfKlJFcwb5JZyT0n9XNguNOrzVeLZcFcqmftx3KHKlpp5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mUZpaISE; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=aPK8UeRUdmmCTq0T/PPSZ9uFgrIh4Dpxqt0k3+h/cv8=; b=mUZpaISEpFvcYPJ+/0U5A7pk/T
+	u14ZK/VEpYGBy5UZ+sRus7i+I/C8uQ+nIVlS5qoRNmcKvta2OYRd44tAg42Ftb9c6MH0SKg1Ed3wK
+	fFpvoKGwqn2Od2duEMsfwKEEc7sHgNZPORuBbVJm85McUZ6DeuoPV4B6dVx51UwnheAQRnCbqLh0y
+	ZGQ1yNgZM7UdQH7MY6Y9Q8DlUZkde7j+1Ni6RYkJgLunNjrJ9/v4uvGAuyMWErwBpLEq5NjuAu7PX
+	4TIYM+c1sVbbd0cYbx4k9KdkJyZR2pGgu6Rkd+z1twmYCbfOtt7bv1Z1QoBBoKk2cA6w+c1E55gbr
+	R4KvywQA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53706)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u26Du-0007CZ-0P;
+	Tue, 08 Apr 2025 11:30:30 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u26Dm-0001Lq-1p;
+	Tue, 08 Apr 2025 11:30:22 +0100
+Date: Tue, 8 Apr 2025 11:30:22 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Frank Sae <Frank.Sae@motor-comm.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Parthiban.Veerasooran@microchip.com, linux-kernel@vger.kernel.org,
+	"andrew+netdev @ lunn . ch" <andrew+netdev@lunn.ch>, lee@trager.us,
+	horms@kernel.org, linux-doc@vger.kernel.org, corbet@lwn.net,
+	geert+renesas@glider.be, xiaogang.fan@motor-comm.com,
+	fei.zhang@motor-comm.com, hua.sun@motor-comm.com
+Subject: Re: [PATCH net-next v4 00/14] yt6801: Add Motorcomm yt6801 PCIe
+ driver
+Message-ID: <Z_T6vv013jraCzSD@shell.armlinux.org.uk>
+References: <20250408092835.3952-1-Frank.Sae@motor-comm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 08 Apr 2025 12:27:58 +0200
-Message-Id: <D916PQ9VLGEB.Q61B70OVQ9JZ@fairphone.com>
-Cc: "Yassine Oudjana" <yassine.oudjana@gmail.com>,
- <linux-kernel@vger.kernel.org>, <linux-iio@vger.kernel.org>,
- <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-kbuild@vger.kernel.org>
-Subject: Re: [PATCH 0/3] QRTR bus and Qualcomm Sensor Manager IIO drivers
-From: "Luca Weiss" <luca.weiss@fairphone.com>
-To: "Yassine Oudjana" <y.oudjana@protonmail.com>, "Jonathan Cameron"
- <jic23@kernel.org>, "Lars-Peter Clausen" <lars@metafoo.de>, "Bjorn
- Andersson" <andersson@kernel.org>, "Konrad Dybcio"
- <konradybcio@kernel.org>, "Manivannan Sadhasivam"
- <manivannan.sadhasivam@linaro.org>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Simon
- Horman" <horms@kernel.org>, "Masahiro Yamada" <masahiroy@kernel.org>,
- "Nathan Chancellor" <nathan@kernel.org>, "Nicolas Schier"
- <nicolas.schier@linux.dev>, "Alexander Sverdlin"
- <alexander.sverdlin@gmail.com>, "Sean Nyekjaer" <sean@geanix.com>, "Javier
- Carrasco" <javier.carrasco.cruz@gmail.com>, "Matti Vaittinen"
- <mazziesaccount@gmail.com>, "Antoniu Miclaus" <antoniu.miclaus@analog.com>,
- "Ramona Gradinariu" <ramona.gradinariu@analog.com>, "Yo-Jung (Leo) Lin"
- <0xff07@gmail.com>, "Andy Shevchenko" <andriy.shevchenko@linux.intel.com>,
- "Neil Armstrong" <neil.armstrong@linaro.org>,
- =?utf-8?q?Barnab=C3=A1s_Cz=C3=A9m=C3=A1n?=
- <barnabas.czeman@mainlining.org>, "Danila Tikhonov" <danila@jiaxyga.com>,
- "Antoni Pokusinski" <apokusinski01@gmail.com>, "Vasileios Amoiridis"
- <vassilisamir@gmail.com>, "Petar Stoykov" <pd.pstoykov@gmail.com>,
- "shuaijie wang" <wangshuaijie@awinic.com>, "Yasin Lee"
- <yasin.lee.x@gmail.com>, "Borislav Petkov (AMD)" <bp@alien8.de>, "Dave
- Hansen" <dave.hansen@linux.intel.com>, "Tony Luck" <tony.luck@intel.com>,
- "Pawan Gupta" <pawan.kumar.gupta@linux.intel.com>, "Ingo Molnar"
- <mingo@kernel.org>
-X-Mailer: aerc 0.20.1-0-g2ecb8770224a
-References: <20250406140706.812425-1-y.oudjana@protonmail.com>
-In-Reply-To: <20250406140706.812425-1-y.oudjana@protonmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250408092835.3952-1-Frank.Sae@motor-comm.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hi Yassine,
+On Tue, Apr 08, 2025 at 05:28:21PM +0800, Frank Sae wrote:
+> This series includes adding Motorcomm YT6801 Gigabit ethernet driver
+>  and adding yt6801 ethernet driver entry in MAINTAINERS file.
+> YT6801 integrates a YT8531S phy.
 
-On Sun Apr 6, 2025 at 4:07 PM CEST, Yassine Oudjana wrote:
-> Sensor Manager is a QMI service available on several Qualcomm SoCs which
-> exposes available sensors and allows for getting data from them. This
-> service is provided by either:
->
-> - SSC (Snapdragon Sensor Core): Also known as SLPI (Sensor Low Power
->   Island). Has its own set of pins and peripherals to which sensors are
->   connected. These peripherals are generally inaccessible from the AP,
->   meaning sensors need to be operated exclusively through SSC. The only
->   known SoCs in this category are MSM8996 and MSM8998 (and their
->   derivatives).
-> - ADSP (Audio DSP): Shares pins and peripherals with the AP. At least on
->   some devices, these pins could be configured as GPIOs which allows the =
-AP
->   to access sensors by bit-banging their interfaces. Some SoCs in this
->   category are SDM630/660, MSM8953, MSM8974 and MSM8226.
->
-> Before Sensor Manager becomes accessible, another service known as Sensor
-> Registry needs to be provided by the AP. The remote processor that provid=
-es
-> Sensor Manager will then request data from it, and once that process is
-> done, will expose several services including Sensor Manager.
->
-> This series adds kernel drivers for the Sensor Manager service, exposing
-> sensors accessible through it as IIO devices. To facilitate probing of th=
-e
-> Sensor Manager core driver, QRTR is turned into a bus, with services bein=
-g
-> exposed as devices. Once the Sensor Manager service becomes available, th=
-e
-> kernel attaches its device to the driver added in this series. This allow=
-s
-> for dynamic probing of Sensor Manager without the need for static DT
-> bindings, which would also not be ideal because they would be describing
-> software rather than hardware. Sensor Manager is given as a working examp=
-le
-> of the QRTR bus. Kernel drivers for other services may also be able
-> to benefit from this change.
->
-> As previously mentioned, a Sensor Registry server must run on the AP to
-> provide the remote processor (either SLPI or ADSP) with necessary data.
-> A userspace implementation of this server is made[1]. The server can be
-> supplied with the necessary data in the form of a plain-text configuratio=
-n
-> file that can be pulled from the Android vendor partition (sample[2]), or
-> generated from a binary file that can be pulled from the persist partitio=
-n.
-> A more recently developed kernel implementation of the Sensor Registry
-> server[3] can also be used. This last implementation only supports readin=
-g
-> data from the binary file pulled from persist. Sensor Registry remains ou=
-t
-> of the scope of this patch series, as the Sensor Registry server and Sens=
-or
-> Manager client (this series) are fully independent components.
->
-> Due to the total lack of documentation on Sensor Manager, this driver was
-> almost entirely the result of a process of capturing transactions between
-> SSC and the proprietary Android daemons with several methods and manually
-> decoding and interpreting them, sometimes by comparing with values acquir=
-ed
-> from Android APIs. A blog post[4] describes part of this process more
-> detail. A little piece of downstream Android open-source code[5] was also
-> used as reference during later stages of development. All of this, as wel=
-l
-> as a lack of time on my side for the last couple of years, meant that thi=
-s
-> driver had to go through a slow and intermittent development process for
-> more than 3 years before reaching its current state.
->
-> Currently supported sensor types include accelerometers, gyroscopes,
-> magentometers, proximity and pressure sensors. Other types (namely
-> light and temperature sensors) are close to being implemented.
->
-> Some testing instructions may also be found here[6].
+What is different between this and the Designware GMAC4 core supported
+by drivers/net/ethernet/stmicro/stmmac/ ?
 
-It's awesome to see this work being sent! I remember trying this quite a
-while ago, so I definitely need to pick this up again and try it out!
+Looking at the register layout, it looks very similar. The layout of the
+MAC control register looks similar. The RX queue and PMT registers are
+at the same relative offset. The MDIO registers as well.
 
-I can try on msm8226, msm8974 and msm8953 so lots of platforms which
-will gain sensor support thanks to you!
+Can you re-use the stmmac driver?
 
-Regards
-Luca
-
->
-> [1] https://gitlab.com/msm8996-mainline/sns-reg
-> [2] https://github.com/nian0114/android_vendor_xiaomi_scorpio/blob/mkn-mr=
-1/proprietary/etc/sensors/sensor_def_qcomdev.conf
-> [3] https://github.com/sdm660-mainline/linux/pull/57
-> [4] https://emainline.gitlab.io/2022/04/08/Unlocking_SSC_P2.html
-> [5] https://android.googlesource.com/platform/system/chre/+/android-8.0.0=
-_r2/platform/slpi
-> [6] https://gitlab.postmarketos.org/postmarketOS/pmaports/-/merge_request=
-s/4118
->
-> Yassine Oudjana (3):
->   net: qrtr: Turn QRTR into a bus
->   net: qrtr: Define macro to convert QMI version and instance to QRTR
->     instance
->   iio: Add Qualcomm Sensor Manager drivers
->
->  MAINTAINERS                                 |  18 +
->  drivers/iio/accel/Kconfig                   |  10 +
->  drivers/iio/accel/Makefile                  |   2 +
->  drivers/iio/accel/qcom_smgr_accel.c         | 138 ++++
->  drivers/iio/common/Kconfig                  |   1 +
->  drivers/iio/common/Makefile                 |   1 +
->  drivers/iio/common/qcom_smgr/Kconfig        |  16 +
->  drivers/iio/common/qcom_smgr/Makefile       |   8 +
->  drivers/iio/common/qcom_smgr/qcom_smgr.c    | 589 ++++++++++++++++
->  drivers/iio/common/qcom_smgr/qmi/Makefile   |   3 +
->  drivers/iio/common/qcom_smgr/qmi/sns_smgr.c | 711 ++++++++++++++++++++
->  drivers/iio/common/qcom_smgr/qmi/sns_smgr.h | 163 +++++
->  drivers/iio/gyro/Kconfig                    |  10 +
->  drivers/iio/gyro/Makefile                   |   2 +
->  drivers/iio/gyro/qcom_smgr_gyro.c           | 138 ++++
->  drivers/iio/magnetometer/Kconfig            |   9 +
->  drivers/iio/magnetometer/Makefile           |   2 +
->  drivers/iio/magnetometer/qcom_smgr_mag.c    | 138 ++++
->  drivers/iio/pressure/Kconfig                |  10 +
->  drivers/iio/pressure/Makefile               |   1 +
->  drivers/iio/pressure/qcom_smgr_pressure.c   | 106 +++
->  drivers/iio/proximity/Kconfig               |  10 +
->  drivers/iio/proximity/Makefile              |   1 +
->  drivers/iio/proximity/qcom_smgr_prox.c      | 106 +++
->  drivers/soc/qcom/qmi_interface.c            |   5 +-
->  include/linux/iio/common/qcom_smgr.h        |  64 ++
->  include/linux/mod_devicetable.h             |   9 +
->  include/linux/soc/qcom/qrtr.h               |  36 +
->  net/qrtr/af_qrtr.c                          |  23 +-
->  net/qrtr/qrtr.h                             |   3 +
->  net/qrtr/smd.c                              | 250 ++++++-
->  scripts/mod/devicetable-offsets.c           |   4 +
->  scripts/mod/file2alias.c                    |  10 +
->  33 files changed, 2573 insertions(+), 24 deletions(-)
->  create mode 100644 drivers/iio/accel/qcom_smgr_accel.c
->  create mode 100644 drivers/iio/common/qcom_smgr/Kconfig
->  create mode 100644 drivers/iio/common/qcom_smgr/Makefile
->  create mode 100644 drivers/iio/common/qcom_smgr/qcom_smgr.c
->  create mode 100644 drivers/iio/common/qcom_smgr/qmi/Makefile
->  create mode 100644 drivers/iio/common/qcom_smgr/qmi/sns_smgr.c
->  create mode 100644 drivers/iio/common/qcom_smgr/qmi/sns_smgr.h
->  create mode 100644 drivers/iio/gyro/qcom_smgr_gyro.c
->  create mode 100644 drivers/iio/magnetometer/qcom_smgr_mag.c
->  create mode 100644 drivers/iio/pressure/qcom_smgr_pressure.c
->  create mode 100644 drivers/iio/proximity/qcom_smgr_prox.c
->  create mode 100644 include/linux/iio/common/qcom_smgr.h
->  create mode 100644 include/linux/soc/qcom/qrtr.h
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
