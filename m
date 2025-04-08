@@ -1,117 +1,135 @@
-Return-Path: <netdev+bounces-180506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3BFFA81944
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 01:23:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0F0CA81945
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 01:23:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D6B74A01A2
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 23:23:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BD1E8A39D1
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 23:23:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42BDA254B02;
-	Tue,  8 Apr 2025 23:23:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 476E6255233;
+	Tue,  8 Apr 2025 23:23:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gyst2M4A"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JL9OLAUu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7102505A6
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 23:23:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA71B25291E;
+	Tue,  8 Apr 2025 23:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744154599; cv=none; b=PZ0uUJyOT+arz1NJ67+busswppcwcY1OB6KaXsFhvb/UAyzB40f+LhmxD0qAfH7qiMFVFwkEaGq1GVTqzS5mPnfxMju+n+R2xQMpN3GG8CWq6PdavjnQ4Okdge+T7zWZclXFQOzANVYpCb92oy5FPhTlTYvBb8WkuT7HJVyisZI=
+	t=1744154628; cv=none; b=YErEj9DxtPvnNzfcRp0VW/03CxRpXA8rqGVf/STMg74qwAtsXgmWLabgPBYH5Niepo6AeK/peHcZl6O5hmIXrqZAEIoCSdPXcnyHoCI3PkX5mLIPvtxyAvtiy8k/BrT6+9eL+OymcpvruwlorPGVES3ib6h1RCZuXma/E3Jd2eY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744154599; c=relaxed/simple;
-	bh=AmfA72V8Vw03Zdmlew9o49WWKH6ePWrUbPUuTBpunUg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YXc8lQMuzMXnf5jGQIzEGWjFOS1HKdEPA6clIpIT0axwBt//iXvcDzs4+q/mfDfKHcS9kcJpLv/eOiJNaX34wOvSOYLiuLiwQrHaVtM2g1yAHQCZNydyA2/C++WhyjHvHv16vzu8Uma2uUmL0tCoQdGd3QgeU33vuU1t2IhDurc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gyst2M4A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BF9EC4CEE5;
-	Tue,  8 Apr 2025 23:23:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744154598;
-	bh=AmfA72V8Vw03Zdmlew9o49WWKH6ePWrUbPUuTBpunUg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Gyst2M4AwzOVJegnnBiZF/Y4KoVPdq/VYsKbwqL86ee5PVcx4wKdLzFdI8Xubhj4M
-	 /hE9Df/AwToq/vAlPZEv51QWFGmX54H9fqngPx7FvDLnhX/JDhX/6woTd0YewpdWKx
-	 pRBRJKsGEZM3wVceaOOrZsBCvgRkmN8lZo00LIzMOfSYEZxwHitMW0lmezxbc5Dni2
-	 l8DVyaIofT8c4VJIEte3GCxWetobkSW1OGZDQF1BuS4agwenOdeWVOmz23SgWYiWEu
-	 CU0g+j3/CCsMT0+f3yVCt3WBg6+EUCmseAaKiY/2ndGxRDn+7fmoNyOeoqYrxnGgNf
-	 HbyiemZYbbDsw==
-Date: Wed, 9 Apr 2025 01:23:15 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Michal Kubiak <michal.kubiak@intel.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 2/3] net: airoha: Add
- airoha_ppe_foe_flow_remove_entry_locked()
-Message-ID: <Z_Wv458ebLOBlvHp@lore-desk>
-References: <20250407-airoha-flowtable-l2b-v1-0-18777778e568@kernel.org>
- <20250407-airoha-flowtable-l2b-v1-2-18777778e568@kernel.org>
- <Z/WDPBMIPSCkbg9e@localhost.localdomain>
+	s=arc-20240116; t=1744154628; c=relaxed/simple;
+	bh=H0XMTlNnGNJTLmiGDH4a+wLj1hWrBoxh71FQw71GxLE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lcQ5cCzA1qkPDFBHjVUoqqq1v0RzSfJxOiWlq/6RbahlUUCV1BidEZ/TQa74vxIDLEGaohVEQ7sw/lNXHlhym6lGBqwOJBmmLMzae0EBXHVVKhNOFf/PvqJF3dSgsoWs1hhHSvoOlnSZVD8gjrxonAIjFz52FvzMvaNjO5qZsus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JL9OLAUu; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-af51e820336so5783922a12.1;
+        Tue, 08 Apr 2025 16:23:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744154626; x=1744759426; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fJsDFlUL6Zd7eUl9Dh4knyb3AG+zCCjQeQsb2X2t9Bk=;
+        b=JL9OLAUuTF3/AUD7ShxQJEEPxxONZ1/oSAOYvQIJQ3awGHRhtRWEnopgrBIMe3U7S+
+         fucwj/K+R910KPOLJcep7FKdNCaqyNk5c78l/Bn8gUMfoaiiNnduaGiJR5vTqoyF6BoD
+         wNsG2YfOgnYwaWwKG2uPBtrvcuKvuS5XgwhrW/nc4jkgOK5MykNVYgkuqKDWgYZG5BC7
+         t/XrgX3ZSSRw5oVSJrRXiDgr3UnutXInC5nJUxJrEtlFW19c4W1FIv4pbLiyjpLYZwjq
+         q53v5hyN+EeX5LiaIsMf8cFDd4insBfB19RdfTaVZBZtQYlwV4BIruQV76Kl9KsesEVu
+         G0Vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744154626; x=1744759426;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fJsDFlUL6Zd7eUl9Dh4knyb3AG+zCCjQeQsb2X2t9Bk=;
+        b=LgKhl6qMjbVnvBYOSmz5jl2aRDPPeD3ocq8R6pAmfnsl+VY8kVnG/OWFvMM1e/+SB6
+         3GjkC8p1jEpi+ZQ7v3a3/0GKq/M9y4jp8TVDDp+WJyTZKkPztvrtiyGSUN47bZEIO9fI
+         eVOv15CUEuv0x/UDxP6uilxWnl8SK5bpnRcDkCWvQilHdUyXqerT2nKMifTv/4pfUG4r
+         0ImBDgF3QPgW+srxpXvpIoQ5yIulaHYKpEAiLQkYlUDVwEjhQR04/qGOnaFaMshOzkO5
+         pV6/o2WYJyxB+HlmZ4U7BoN61Gd0MuDw1hA30ydLzZf1dAYQy517R12DmGF4NU5AFUeB
+         efsg==
+X-Forwarded-Encrypted: i=1; AJvYcCVBhnVQlJkCAfcUH40xKGNigJGLCAMwC5P7MbvPgx+x3ND6sYW//eCBSI3u2JEseRm7irn6Ky6Q@vger.kernel.org, AJvYcCWeTXMV7xbG42AQ/zsgcvq6Yw/xTlyzhEJfBxdGSjWBRPYMInv1xtT8H59Ff5pI1DKmksUbECZYNm3YEyo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yym7ytM1aze6DkbsIoZmvlQBAJGRAKM9qg6CCNrLqclQa1Ty2w6
+	CtBqQ+0qZxIwXblHedgLjJpZY4O2Jg6CGQ7oUEkvgIiJPR5yhBQ1DgmfMJTdZaGu
+X-Gm-Gg: ASbGncshg+OK9iDn9qrDPy+hXNs2lvQ/Q2ho+/XnXm+EmmfzhpcB1GLC2SF0u189cg7
+	ZQQ3LBdNgDmNR+modQlwI1VMPOiYMWOEn32a0SwlQOxPzqhMR4y+p6A2sac08CsIC0B/ExBzBn7
+	/uNsr4tqXaTjikqMg0GQdvaRaCov20Tob8p6jPQ2Exyh1pAKcSxHfWDaD8CgVu2LlFcmOjiZD6G
+	6mIMA2Ji3HDHhmULA7YKSYrDORFXE9lx9BNRQYlxSNkLlKAIAifL1GXHkZ0TRix7HenTDWditTa
+	k0K64M3TFumKe4EDiMwiKu3BsR4FG9GfyKdm4DD1bRbXnTOd6QWeKVKIGaZRp5e1aym4+mH4HbG
+	kJmjYeed/MbrRAHZM82KR
+X-Google-Smtp-Source: AGHT+IFFouWJcmS4FsC+uzQYbefLVU/J64864RiYNcgtYEjIQGYjhLjftfFGyU9f6PSM9PUWQtkJ9g==
+X-Received: by 2002:a17:903:1447:b0:223:501c:7581 with SMTP id d9443c01a7336-22ac29a6710mr13568425ad.16.1744154625913;
+        Tue, 08 Apr 2025 16:23:45 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:115c:1:f94c:8e92:7ff5:32bf? ([2620:10d:c090:500::4:98ff])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-229785c01b7sm106231095ad.96.2025.04.08.16.23.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Apr 2025 16:23:45 -0700 (PDT)
+Message-ID: <93ac7481-43c0-4207-8965-2d793c90263c@gmail.com>
+Date: Tue, 8 Apr 2025 16:23:43 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="fHlcF3L1BnZPAha3"
-Content-Disposition: inline
-In-Reply-To: <Z/WDPBMIPSCkbg9e@localhost.localdomain>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/2] GCPS Spec Compliance Patch Set
+To: Paul Fertser <fercerpav@gmail.com>
+Cc: Sam Mendoza-Jonas <sam@mendozajonas.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, npeacock@meta.com,
+ akozlov@meta.com
+References: <cover.1744048182.git.kalavakunta.hari.prasad@gmail.com>
+ <ee5feee4-e74a-4dc6-ad8e-42cf9c81cb3c@mendozajonas.com>
+ <b1abcf84-e187-468f-a05e-e634e825210c@gmail.com>
+ <Z/VqQVGI6oP5oEzB@home.paul.comp>
+ <1d570fb8-1da0-4aa6-99f5-052adf559091@gmail.com>
+ <Z/V2pCKe8N6Uxa0O@home.paul.comp>
+ <b1d373d7-77e5-4341-a685-07a617935db5@gmail.com>
+ <Z/WkmPcCJ0e2go97@home.paul.comp>
+Content-Language: en-US
+From: Hari Kalavakunta <kalavakunta.hari.prasad@gmail.com>
+In-Reply-To: <Z/WkmPcCJ0e2go97@home.paul.comp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 4/8/2025 3:35 PM, Paul Fertser wrote:
+> On Tue, Apr 08, 2025 at 03:02:14PM -0700, Hari Kalavakunta wrote:
+>> On 4/8/2025 12:19 PM, Paul Fertser wrote:
+>>
+>>> In other words, you're testing your code only with simulated data so
+>>> there's no way to guarantee it's going to work on any real life
+>>> hardware (as we know hardware doesn't always exactly match the specs)?
+>>> That's unsettling. Please do mention it in the commit log, it's an
+>>> essential point. Better yet, consider going a bit off-centre after the
+>>> regular verification and do a control run on real hardware.
+>>>
+>>> After all, that's what the code is for so if it all possible it's
+>>> better to know if it does the actual job before merging (to avoid
+>>> noise from follow-up patches like yours which fix something that never
+>>> worked because it was never tested).
+>>
+>> I would like to request a week's time to integrate a real hardware
+>> interface, which will enable me to test and demonstrate end-to-end results.
+>> This will also allow me to identify and address any additional issues that
+>> may arise during the testing process. Thank you for the feedback.
+> 
+> Thank you for doing the right thing! Looking forward to your updated
+> patch (please do not forget to consider __be64 for the fields).
 
---fHlcF3L1BnZPAha3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-> On Mon, Apr 07, 2025 at 04:18:31PM +0200, Lorenzo Bianconi wrote:
-> > Introduce airoha_ppe_foe_flow_remove_entry_locked utility routine
-> > in order to run airoha_ppe_foe_flow_remove_entry holding ppe_lock.
-> > This is a preliminary patch to L2 offloading support to airoha_eth
-> > driver.
-> >=20
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
->=20
-> Could you please explain the reason of introducing the *_remove_entry_loc=
-ked
-> function if "airoha_ppe_foe_flow_remove_entry()" is still never called ou=
-t of
-> "airoha_ppe_foe_flow_remove_entry_locked()" context (at least in this
-> series)?
-> I would expect that it can be useful if you have an use case when you want
-> to call "airoha_ppe_foe_flow_remove_entry()" from another function that
-> has already taken the lock, but I haven't found such a context.
-
-ack, you are right. I guess we can drop
-airoha_ppe_foe_flow_remove_entry_locked(). I will fix it in v2.
-
-Regards,
-Lorenzo
-
->=20
-> Thanks,
-> Michal
->=20
-
---fHlcF3L1BnZPAha3
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ/Wv4wAKCRA6cBh0uS2t
-rD6jAP0VCuU67+0Hmp6FoJCYXcDJXP2tbLCdbL7J9QZsGtWOVAD+LNXbCESniFgd
-w97KzvP3u3bXDzN6nfqYBcqzw9afugY=
-=Tg6q
------END PGP SIGNATURE-----
-
---fHlcF3L1BnZPAha3--
+I had not previously considered using __be64 for the struct 
+ncsi_rsp_gcps_pkt, as it is an interface structure. I would like to seek 
+your input on whether it is a good idea to use __be64 for interface 
+messages. In my experience, I haven't come across implementations that 
+utilize __be64. I am unsure about the portability of this approach, 
+particularly with regards to the Management Controller (MC).
 
