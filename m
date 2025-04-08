@@ -1,127 +1,183 @@
-Return-Path: <netdev+bounces-180066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B19F9A7F6FA
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 09:47:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 912E3A7F69E
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 09:42:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CBB73BEBE6
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 07:43:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BF8187A9E20
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 07:38:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A13A2641CD;
-	Tue,  8 Apr 2025 07:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AD51263C7D;
+	Tue,  8 Apr 2025 07:37:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="BKLZSlXi"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="TQBC4zLX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B02C02620CD;
-	Tue,  8 Apr 2025 07:40:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4029A263C76
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 07:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744098069; cv=none; b=OhVvMH7H8qt6I8sGUkc5gAlfPqA55q0t2m13GwJaGFQJkLkYryyL+d3vpUZyQKZUvklecopDwXYC00+ExnCjoSdIzDYZinpFLkxb0903r980y7fvQm5bZz7pyl8KhrYM3r2b0QD6R155uuQcrWftfi6cOSWbn7F04vEkt/B9oog=
+	t=1744097845; cv=none; b=H9I9I3Cd4LMxtp5qRQCeRrvtUHXL2o/724zxqVLL/JE8Wwkb3ZW5CHWUMFjJmTvVoRfKw7ddqoDEnCsifayQe4aRsYz/NjpPFFcULE01+i/+RbA6mjEMP8q9DyTYKJJu69yXNBsaJpoErKyuZkZUgvWA3QE/n5Cw4c0wAX/0u/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744098069; c=relaxed/simple;
-	bh=VmrdJVDpTY1Y3BF9QzGsEsk2pkeTQKYXt41LsIyEfyM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nU6dQWWxVXG6nBWU1sBK4QBJrSJ73ZEEvkS67otGiJdmOq8qi5sFixBFVxep7WjnqZUV9bvRUoXhbZAxEU5lmRiomXwrJfFpXwoMUvc77bVOEQDDTwwX8kfc2QpFvv6UZpFSqmwfgI+M0Zj0gTWJrjihqL6MtExQcauJcH8JzYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=BKLZSlXi; arc=none smtp.client-ip=54.207.22.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1744098047;
-	bh=CwKUleQf27cGcf66047RnWHjOqMcyIi/LBBDO1qSzAM=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=BKLZSlXiwOS0ObJ8zdUczG1rUS1ZL2dEPFY1urmf19WwO2hi1pyfZKZz17LsAyV9B
-	 f/u/M4HoLlv9WY6YV8EssNEPQyRxdGH2d2AF+mcduMmLOKtqs3HNv0BLLAFSpzjh/w
-	 8oDqoRKsctdG9NWWKeWP9IoFCTPlXglH4CIVhfN4=
-X-QQ-mid: bizesmtpsz4t1744098041tb64312
-X-QQ-Originating-IP: YLpLnDErj1dtfcCfWuO3BojoYWQCqOM0zq8eEbVCJxE=
-Received: from localhost.localdomain ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 08 Apr 2025 15:40:39 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 8994852775391133971
-EX-QQ-RecipientCnt: 14
-From: Chen Linxuan <chenlinxuan@uniontech.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	Chen Linxuan <chenlinxuan@uniontech.com>,
-	netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 nf-next] docs: tproxy: fix formatting for nft code block
-Date: Tue,  8 Apr 2025 15:35:50 +0800
-Message-ID: <E25F951CDC9F22B2+20250408073550.3319892-2-chenlinxuan@uniontech.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1744097845; c=relaxed/simple;
+	bh=lhptucuRa84eI+sVBc0K01zYfX2ZL/c4XOsEebGLJBg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nIqaxuD1lytAfITiqJ/oFgKcQ9RHifB7exAesT5o2lg+cYni7qxqwcqncr/SWJxdz40kwvDkquevdWsXiYIAv/OG37dGX+1TYMhGWep8uHKw6SStM0k4chta180YfYbJW1aH5u8lOQ/JxSc1WvKeyCeKLLddGbk/2AQydYoaGBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=TQBC4zLX; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43d0359b1fcso32771935e9.0
+        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 00:37:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1744097841; x=1744702641; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=iGBnll+v1vTfK1JeEQuKDVXKtlWhbohIMfsqmj0adgQ=;
+        b=TQBC4zLXNxuR8lh2bhBSO1bDi0Jf6z+dNNzIYsdu5ewbhvYfnxqJOXIoRMAY9OtxWl
+         J8KUu+qvNQ5o8293sEcRc5Y6V/WZykz3gY1BiZtPAl/rIptd+IXs/aqUIpvcYGhmjJMp
+         9bo1Dbgs1BKQm+BVbJ/ENTF0rCagnDuSMqjcJVAfoL6StmvF0uwAck9/ilE/QWfmMN88
+         GZ65uIweoRwTu0gWbPsobf9tHIKjmkKxUfMbfX6fEWo0ayMwlwcB40/WuUZvBWE+sdRL
+         QNpi7dECB5cCUl6ipl94WQdudjxhVRzqUnwSel3sSUSvxXxaE0Bn9M84T6iPwDhmw8Qs
+         xgjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744097841; x=1744702641;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iGBnll+v1vTfK1JeEQuKDVXKtlWhbohIMfsqmj0adgQ=;
+        b=jLDkBxja0HyG6y85P63C56hBIQNXR6xYOznYg6ECvDkyZm5jb0FJpO/S1bgSJ2dOl3
+         2qHJ044iCOr6+lz/eawvpXZxCNesb1ifZzME9+6vIt4PmN9dHrLCMBzf5dZMjv+F5hgB
+         ACm8nsObM9geuN5FEtq9MAXGU1robbesBZ+2WTmgqgqciQ4aCR+R5fTC3np33FdNEo+x
+         sXDLoTq3yXzLqXZjBZQrkCNt9no0l7rYKd7ErSn0CbYdShTOvRx3U73HNpjHs2cTH4gF
+         N72WQu77AqVNUD0B5QHmpXC9XMBfExDsOb9tuEGjrojJj7vG5Ue/3qLV77CayQUgIBey
+         VQ7w==
+X-Forwarded-Encrypted: i=1; AJvYcCXLJVOzwvpSozIv6Wdzsxdy++EQFBla781P1i0QUsxsAktoMulbghWZfl4x3I1Cv+Bj6w2+5mM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRTgeijyXLN9Zlp2VbHmR2G66tm94VRVOmc3qbaoNJEF/kgPaF
+	6R6eh8OIztGvFzOnfTojWgXqk008kQDv8oq/xm2CAGrE2/e8jXoKpR7FTjhknupNXiFDmr9228P
+	073QcYqXpC6WKBx2zrmNTlthOMpEZO3u0fUuod7ZqeL4QG+Y=
+X-Gm-Gg: ASbGncvqUtMfkO/O0Mv1qSlQGTYshgV2+r5yoFHoPiykQmSEcHHzcpcLM2SMHtG9wK8
+	Z9+djbiAR/qr9rF6GNVxbxzp5KprC6KMOG6Hz20XEp0yd6FuHUnZMhDjokdp2a1lfrRo3unLd3y
+	QGMHoyL2e7PZGHgud8KCKATFblTrnMc/j77R+zC4UTrLaeAgUQdbo9/GhVcw8KHulfoEnRKpG2T
+	+gHZaJKgCjIqSFjAQiSr1e2cDgQ4GvLveNcASnT3Pjew5BKV6cccxMQe5BCZL30CpAW+U/xQe24
+	Ej1vAD7lRYXdDPZCs7EKHnZmZgDJHIz2FFRkSOh8RtND8ozWwbMgF/0UT6L1p7UgnD0WXrRX7CI
+	MMR8oeX8NBN0d6h+Xnw==
+X-Google-Smtp-Source: AGHT+IGBqtrapcUaVmWiPRDGX6VqcVgn8kTldkv63YvvLmqr+RnHjXnpoT5Zwsb4dDsTzOI1Dng3wg==
+X-Received: by 2002:a05:600c:450a:b0:43b:c592:7e16 with SMTP id 5b1f17b1804b1-43f0e545250mr15453105e9.3.1744097841479;
+        Tue, 08 Apr 2025 00:37:21 -0700 (PDT)
+Received: from ?IPV6:2001:67c:2fbc:1:65bc:b4a6:4ce5:2ced? ([2001:67c:2fbc:1:65bc:b4a6:4ce5:2ced])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c301a76cesm14125273f8f.37.2025.04.08.00.37.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Apr 2025 00:37:21 -0700 (PDT)
+Message-ID: <cc2c26d3-c276-4f6a-a05c-e947798d6345@openvpn.net>
+Date: Tue, 8 Apr 2025 09:37:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v25 00/23] Introducing OpenVPN Data Channel
+ Offload
+To: Jiri Slaby <jirislaby@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ ryazanov.s.a@gmail.com, sd@queasysnail.net, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Xiao Liang <shaw.leon@gmail.com>,
+ Donald Hunter <donald.hunter@gmail.com>, steffen.klassert@secunet.com,
+ antony.antony@secunet.com, willemdebruijn.kernel@gmail.com,
+ netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Shuah Khan <skhan@linuxfoundation.org>
+References: <20250407-b4-ovpn-v25-0-a04eae86e016@openvpn.net>
+ <bff01a88-1e5d-4855-b7d9-1b1ac4bed650@kernel.org>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <bff01a88-1e5d-4855-b7d9-1b1ac4bed650@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz5a-1
-X-QQ-XMAILINFO: MMREUZv4wJ7/uOrne6X5SSbeT+Yka9zVShie8oIcWhB2JdLJ5WW4MiZr
-	EcNaNn5OQy4bG0OswoJSKhKIxzRSTx8Ji7+YbJzGszsZ8swRuLITYCvaV75cop7PcdiT53B
-	Tv7gyq+M57NR8SB4wgCAM9Za1FVwoE7GLC2D0d7uJ5/eASbI4KET6cJJwKrNoBONKOPt6ZK
-	zhgULO6RkpBxK639RfIcrXaO5fmMxhpCoTi11CT8ViQimX2togtb6AC4vPfm5lsDzJ2wi54
-	Xk8ruXvnMBGOZzFyMTewDewcl4hSax4NknF/qpnG879YSKMRYWopOklFOisHVy+IDv3kfyc
-	E5FP+wSmH7Mh8Yv3mCk4id7pYXqxnFtE0ICnSUgPJBbPVpSodbLh5+DWNKtdQ6TILvQLkby
-	kVxVC1glPfD0e4hLg1A/1F37cqJZJxtKJR/X3UiC8SQCwJ6ObNth0QFb5MF+04L9GxMp28i
-	YN/+VoGG0SwWME66wZWCXhtYVYvMiTLTjbNhVPwaQa6MDjt2sL8jIKVPS8cJe8pnugeVdwn
-	f3vaUEbY8GHZwM4SE8loBmWQeZQAPGRAQNiannu2ZUsw5bNHtOWjrE0GMbnuLL6bGJ9KBbM
-	4MH1SqsuSL/aR/LlDtSWShsx1UyNy3kEiQu3cK3LXzPKw+iuipmLOgAB5LbkGFXa78aMa08
-	XcZR8u+ljZtIKTsbyeaMZW3RgG73Gf8TqBiOKW1CI02vsvznzkiiZ8K0CJ4CkuXapzUyzqs
-	U/CHkHFGQkyocjPZYxkajOOuOqs5NfWIyg8hSALnrQ+jk+wviR46TfyiGyn3NzOc/be4v2T
-	bpGsWOh6JyvHKz2flezWYgXJb09DfHzt1aBj7F8gdtaNjetsLUsxUKKku3/JO78xazNwsXK
-	o9cJriTCtnByBjDEIf54djXIGwmsKc4l8lC9GevAYyN9l9CAG9UXQzY/og/IBFV7FM+H76L
-	vxK9Dvm1Xl55Uj/pE1lX3+QYIOJcuIiVwZ7+o4MtD7qmun35OMrdZaGam
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-X-QQ-RECHKSPAM: 0
 
-The nft command snippet for redirecting traffic isn't formatted
-in a literal code block like the rest of snippets.
-Fix the formatting inconsistency.
+Hi,
 
-Signed-off-by: Chen Linxuan <chenlinxuan@uniontech.com>
----
-v2:
-  - Update commit message according to suggestion from Bagas
-v1: https://lore.kernel.org/all/CFD0AAF9D7040B1E+20250407031727.1615941-1-chenlinxuan@uniontech.com/
----
- Documentation/networking/tproxy.rst | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On 08/04/2025 08:34, Jiri Slaby wrote:
+>> Given:
+>  > +#define OVPN_FAMILY_NAME    "ovpn"
+> and
+>  > ctx->ovpn_dco_id = genl_ctrl_resolve(ctx->nl_sock, OVPN_FAMILY_NAME);
+> 
+> Is there also an openvpn branch understanding the new (in-kernel) 
+> naming? I.e. something like s/ovpn-dco-v2/ovpn/?
+> 
+> As with 2.6.10, I see:
+> $ grep -iE 'offl|dco' log
+> 2025-04-08 08:24:59 us=718854 Note: Kernel support for ovpn-dco missing, 
+> disabling data channel offload.
+> 2025-04-08 08:24:59 us=719060 OpenVPN 2.6.10 x86_64-suse-linux-gnu [SSL 
+> (OpenSSL)] [LZO] [LZ4] [EPOLL] [PKCS11] [MH/PKTINFO] [AEAD] [DCO]
+> 2025-04-08 08:24:59 us=719110 DCO version: N/A
 
-diff --git a/Documentation/networking/tproxy.rst b/Documentation/networking/tproxy.rst
-index 7f7c1ff6f159..75e4990cc3db 100644
---- a/Documentation/networking/tproxy.rst
-+++ b/Documentation/networking/tproxy.rst
-@@ -69,9 +69,9 @@ add rules like this to the iptables ruleset above::
-     # iptables -t mangle -A PREROUTING -p tcp --dport 80 -j TPROXY \
-       --tproxy-mark 0x1/0x1 --on-port 50080
- 
--Or the following rule to nft:
-+Or the following rule to nft::
- 
--# nft add rule filter divert tcp dport 80 tproxy to :50080 meta mark set 1 accept
-+    # nft add rule filter divert tcp dport 80 tproxy to :50080 meta mark set 1 accept
- 
- Note that for this to work you'll have to modify the proxy to enable (SOL_IP,
- IP_TRANSPARENT) for the listening socket.
+2.6.x and master do not "speak" the new "ovpn" family, because the new 
+uAPI wasn't considered stable yet (due to ongoing reviews).
+
+We have a WIP branch which you can use for test:
+
+https://github.com/mandelbitdev/openvpn/tree/gianmarco/179-ovpn-support
+
+Please do not try to measure performance at this time as we have various 
+improvements that we are working on, but we wanted to wait for the first 
+version of ovpn to be merged first.
+
+Regards,
+
 -- 
-2.48.1
+Antonio Quartulli
+OpenVPN Inc.
 
 
