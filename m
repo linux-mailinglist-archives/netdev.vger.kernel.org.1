@@ -1,89 +1,117 @@
-Return-Path: <netdev+bounces-180505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86B25A8193D
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 01:21:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3BFFA81944
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 01:23:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8F8F8A0250
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 23:20:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D6B74A01A2
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 23:23:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD98E255233;
-	Tue,  8 Apr 2025 23:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42BDA254B02;
+	Tue,  8 Apr 2025 23:23:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ax8+5rrI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gyst2M4A"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83EE123FC4B;
-	Tue,  8 Apr 2025 23:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E7102505A6
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 23:23:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744154460; cv=none; b=bVWR7NUDDkDas0QLPIFO2u4k8WfaEYCjnzRDc+tp/zu2aQ+l0xp2XPvh5Fi1QsDA/S74RKpdOmgiyIElr0rCwnGuhs+L5eFfvbu1rBdkLx1uKJLAd+ySU6Sh+9y76v6uCJmXBJytvrfmHB7wezEc7VsGtvg+Lq5GaVZcOF4Qzsg=
+	t=1744154599; cv=none; b=PZ0uUJyOT+arz1NJ67+busswppcwcY1OB6KaXsFhvb/UAyzB40f+LhmxD0qAfH7qiMFVFwkEaGq1GVTqzS5mPnfxMju+n+R2xQMpN3GG8CWq6PdavjnQ4Okdge+T7zWZclXFQOzANVYpCb92oy5FPhTlTYvBb8WkuT7HJVyisZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744154460; c=relaxed/simple;
-	bh=vWGLK4hJ97VHXRESfYlQmWSZONEI9Yy7VflJj/ld8go=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tDs/Kg6KLggCo2w2x4cQBusqQePfxY/c1MnuLNLlBm1BoZn9/Xw6Y7bMUrBvlZePwCrrA46WRKamWboSs35jqDYVTi5FQ2z3B/mYEIHaRPzy4KwEVmWMtwuzVKvLVvNbqEr0qSQdXeuIPZd/o9Xm7dSx0BdAhaeCGHirDV45bDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ax8+5rrI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC7E1C4CEE5;
-	Tue,  8 Apr 2025 23:20:58 +0000 (UTC)
+	s=arc-20240116; t=1744154599; c=relaxed/simple;
+	bh=AmfA72V8Vw03Zdmlew9o49WWKH6ePWrUbPUuTBpunUg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YXc8lQMuzMXnf5jGQIzEGWjFOS1HKdEPA6clIpIT0axwBt//iXvcDzs4+q/mfDfKHcS9kcJpLv/eOiJNaX34wOvSOYLiuLiwQrHaVtM2g1yAHQCZNydyA2/C++WhyjHvHv16vzu8Uma2uUmL0tCoQdGd3QgeU33vuU1t2IhDurc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gyst2M4A; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BF9EC4CEE5;
+	Tue,  8 Apr 2025 23:23:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744154460;
-	bh=vWGLK4hJ97VHXRESfYlQmWSZONEI9Yy7VflJj/ld8go=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ax8+5rrIuTA3+fEgyYs8DnFMpJrqLoJBjDLz+FlGqCTw4lV6sCTPQ30B5pSEaDqnn
-	 vYgscZOvgv2UHmLiB1NIhktAsVOBJl08iwwXiwVx2nTKYsmdcAbuUMYcsQeK5WQSAz
-	 +B7Lb5NzciL7izP57sYzwbZA6mjDVc4jEZaVa7sjjhxvi1YzMp/F+QmN87wne2+Al1
-	 OrF2S7RI0r6XtDcfTkopRBQG3J/9Z8kG9m9rUaQ23pv0bSspFDdoWX2TVmfVbXNi44
-	 WAZF4sr8DCz80/pwEuTSC9PwrBtPlef1Gfx5GtCrxrxM1qr5UrYKypRpIPRNDCzNxr
-	 /QuiJHgtjb2ag==
-Date: Tue, 8 Apr 2025 16:20:58 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: <netdev@vger.kernel.org>, Hangbin Liu <liuhangbin@gmail.com>, Jay
- Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S
- . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Nikolay Aleksandrov <razor@blackwall.org>, Simon
- Horman <horms@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan
- <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>, Steffen Klassert
- <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- Ayush Sawal <ayush.sawal@chelsio.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, "Przemek Kitszel"
- <przemyslaw.kitszel@intel.com>, Sunil Goutham <sgoutham@marvell.com>,
- Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep
- <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, Bharat Bhushan
- <bbhushan2@marvell.com>, Louis Peens <louis.peens@corigine.com>, "Leon
- Romanovsky" <leonro@nvidia.com>, <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH net-next 4/6] xfrm: Add explicit dev to
- .xdo_dev_state_{add,delete,free}
-Message-ID: <20250408162058.36a44055@kernel.org>
-In-Reply-To: <20250407133542.2668491-5-cratiu@nvidia.com>
-References: <20250407133542.2668491-1-cratiu@nvidia.com>
-	<20250407133542.2668491-5-cratiu@nvidia.com>
+	s=k20201202; t=1744154598;
+	bh=AmfA72V8Vw03Zdmlew9o49WWKH6ePWrUbPUuTBpunUg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Gyst2M4AwzOVJegnnBiZF/Y4KoVPdq/VYsKbwqL86ee5PVcx4wKdLzFdI8Xubhj4M
+	 /hE9Df/AwToq/vAlPZEv51QWFGmX54H9fqngPx7FvDLnhX/JDhX/6woTd0YewpdWKx
+	 pRBRJKsGEZM3wVceaOOrZsBCvgRkmN8lZo00LIzMOfSYEZxwHitMW0lmezxbc5Dni2
+	 l8DVyaIofT8c4VJIEte3GCxWetobkSW1OGZDQF1BuS4agwenOdeWVOmz23SgWYiWEu
+	 CU0g+j3/CCsMT0+f3yVCt3WBg6+EUCmseAaKiY/2ndGxRDn+7fmoNyOeoqYrxnGgNf
+	 HbyiemZYbbDsw==
+Date: Wed, 9 Apr 2025 01:23:15 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Michal Kubiak <michal.kubiak@intel.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 2/3] net: airoha: Add
+ airoha_ppe_foe_flow_remove_entry_locked()
+Message-ID: <Z_Wv458ebLOBlvHp@lore-desk>
+References: <20250407-airoha-flowtable-l2b-v1-0-18777778e568@kernel.org>
+ <20250407-airoha-flowtable-l2b-v1-2-18777778e568@kernel.org>
+ <Z/WDPBMIPSCkbg9e@localhost.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="fHlcF3L1BnZPAha3"
+Content-Disposition: inline
+In-Reply-To: <Z/WDPBMIPSCkbg9e@localhost.localdomain>
 
-On Mon, 7 Apr 2025 16:35:40 +0300 Cosmin Ratiu wrote:
-> @@ -424,10 +424,10 @@ static struct xfrm_state *ixgbe_ipsec_find_rx_state(struct ixgbe_ipsec *ipsec,
->   * This copies the protocol keys and salt to our own data tables.  The
->   * 82599 family only supports the one algorithm.
->   **/
-> -static int ixgbe_ipsec_parse_proto_keys(struct xfrm_state *xs,
-> +static int ixgbe_ipsec_parse_proto_keys(struct net_device *dev,
-> +					struct xfrm_state *xs,
->  					u32 *mykey, u32 *mysalt)
 
-nit: you missed a few kdoc changes in this patch
--- 
-pw-bot: cr
+--fHlcF3L1BnZPAha3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+> On Mon, Apr 07, 2025 at 04:18:31PM +0200, Lorenzo Bianconi wrote:
+> > Introduce airoha_ppe_foe_flow_remove_entry_locked utility routine
+> > in order to run airoha_ppe_foe_flow_remove_entry holding ppe_lock.
+> > This is a preliminary patch to L2 offloading support to airoha_eth
+> > driver.
+> >=20
+> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+>=20
+> Could you please explain the reason of introducing the *_remove_entry_loc=
+ked
+> function if "airoha_ppe_foe_flow_remove_entry()" is still never called ou=
+t of
+> "airoha_ppe_foe_flow_remove_entry_locked()" context (at least in this
+> series)?
+> I would expect that it can be useful if you have an use case when you want
+> to call "airoha_ppe_foe_flow_remove_entry()" from another function that
+> has already taken the lock, but I haven't found such a context.
+
+ack, you are right. I guess we can drop
+airoha_ppe_foe_flow_remove_entry_locked(). I will fix it in v2.
+
+Regards,
+Lorenzo
+
+>=20
+> Thanks,
+> Michal
+>=20
+
+--fHlcF3L1BnZPAha3
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ/Wv4wAKCRA6cBh0uS2t
+rD6jAP0VCuU67+0Hmp6FoJCYXcDJXP2tbLCdbL7J9QZsGtWOVAD+LNXbCESniFgd
+w97KzvP3u3bXDzN6nfqYBcqzw9afugY=
+=Tg6q
+-----END PGP SIGNATURE-----
+
+--fHlcF3L1BnZPAha3--
 
