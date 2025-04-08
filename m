@@ -1,113 +1,136 @@
-Return-Path: <netdev+bounces-180393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 158C2A8132E
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 19:02:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 980B3A8132D
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 19:02:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFFFF4E4965
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 17:01:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0CD4B7B63DE
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 17:00:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B4A232378;
-	Tue,  8 Apr 2025 17:01:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BjuyYhAb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51C8E23C8C1;
+	Tue,  8 Apr 2025 17:01:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFFB523A98D;
-	Tue,  8 Apr 2025 17:01:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78B34238D39;
+	Tue,  8 Apr 2025 17:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744131671; cv=none; b=T00Ux2DYP7H9ufGgrJWKM0xJbWtSLaIHHZUBnpbfY26IpbgJo5dPthgzkTBpZJjGd3CfTnVqVeoVkIHL9Vgi472pOQGw9T/vGY2NBXp0L4bblZeMw0xY9x7/+1o6PPkvuvdIRknIE7Q7CDmXYO0qx7bpnq9ER51AZxe171eCubQ=
+	t=1744131672; cv=none; b=bJ/5vWMPGVhAwimNcsz56OagY4UhXKYzJX0aeircBJC3SH5sbymR7+eGbAgu3FmkFxF+vlcxDLixtRhDMFa3DjTUQz/qlAKgJg54W5wV3RGkX6sgBjH3NYixgpTjZYGOrCu16I/0ZddZoiIB8Gc2ml/34URR7B5A/8tlZd4jIro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744131671; c=relaxed/simple;
-	bh=N6kP2++cC4tYB/jmzigw2pfWwl2+6CJWNdXFfBt87EY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=L4cuD20KHXcQ/t+Akx5RkzKSTg4P42VLcJclo8D4slx62BoJqvKkkLoQoVHv4oJe4djgftbJMqJexi37QTPFCmp1U1yjmaOBVAZQO/IPhavWqilGznTIppo96dnvH18ey4S6LJcjzPnJtg5PmKGs9Uegv3EER1e2iZbpl+Sq6H0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BjuyYhAb; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1744131672; c=relaxed/simple;
+	bh=WgAC3NdMaIecTLeADsVuS5ebef9u2457qsKF7XllYzo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rGRE0e9PXwzXWZaTjKlapYBxHZnztppEpdYmIWIxXyIy26hUtyX9EvlmOhzE+4U37GCk3QZ0KZiQABP4dAD0TmfM0Pc/LENUQeHwh8XguJ5n+P3ARfTHm3VD5HK13IcrDCltLzR4fOtP9HENz/N045ythtQVEOz+NL1jEqyhESs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-301302a328bso6261069a91.2;
-        Tue, 08 Apr 2025 10:01:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744131669; x=1744736469; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=DWc9jP7frlP15MsVrsg1eAcE6YUj4TFtJPNbl9lMOFI=;
-        b=BjuyYhAbQyfldKgmPTJWNKsYaw1Hj6Pi2O7hK1kZX6elQ8H8DBtObYZDHcEzvl6qLT
-         GWnXGftE2d3LjMqkjkk+hFt63HQgXOM2UeF9Qgof0m7kXrHuflV/yXZ+CEYS9RamXtyh
-         syVAKTG3H+f6Qc5WhEeWuUz4XKDrqcJ7y1khwIQf4CQE10UAvbgFCvzO66i692Vc1Brg
-         iTreD1p8XB4+eIc5VhFOFakrQhMWLHjKmPyBfG4keSHfJr4kcoJwe8mETCJhdH+7ZH99
-         is1ZjdoriGGNgFJC8KQLQ+9qltYywcAv4kxg+3JLxF1w1hpn8em5LiP2ehAoHoALsCZf
-         gXJw==
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ac2bb7ca40bso669746766b.3;
+        Tue, 08 Apr 2025 10:01:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1744131669; x=1744736469;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DWc9jP7frlP15MsVrsg1eAcE6YUj4TFtJPNbl9lMOFI=;
-        b=H8iEFtgI6m31o6MihmiWvZNSXXy9KUaJ4IX4I3FJAQpd0/ZHDkMMn03flKx5PXNYY9
-         nXQDiEgYEApMJmQvSoo0yfulE2mKYFTG0faDVRz4boRhAsgQACXxzT1ocoCpt7DDllIl
-         I4bVMHHSDHGSv2WDHak6zT+r124lzuESMBNpvNKEHTH8SO59XIyCbAc++hxScxWnkLgD
-         3ygSVVYI+kP6FxcrIcKk5WRbl2j/4rd/bXt+F4iyw7ANr3GG+dNGvmtMX/A72gHO0+QC
-         j2OepgAemVwgC+hyXDDXvAVKsw25Ih5M5Va+iAfZydb6rH+02UiHljlVcPXAMEWwS3L7
-         mksQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUuvjhsp3N0h91eciyBSKvh3qosvcnUQZPSG1VKb1ErbgaNvrjaqxqjesNCkQ7whgb8YV4xdoQEEeJqs2M=@vger.kernel.org, AJvYcCXAGoQLUu+VVJT6cZ31w8dAvF0/+6q51/5XkK+/VSxwPQ2//Wt4Qnxk+SF/ap6fcYLivgVFuw6O@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxOb6QdKZpeBwA3Qok/zlYRHPUJrs0aijY0AhJsclCpe4sYXHx
-	fLoNWy2O7w9JRlnoyJ8a7CK2zLqhVF1Vwn6QDmiu30T1neX5sDHlMlXIr5JK9z/6
-X-Gm-Gg: ASbGnctNYs+y7+h9htq2NmV05yCOlJoDO6fokYvmsTDiUgU/5BRD2EdmuFDd6FEbl/h
-	oVHlIWjWvt8VGAzuHHwXcTAF1aMCwVDr0P6KxGhVPSsh6dLwKQri8V/NXfm8ae29mR8x6nZ3CR7
-	KEX9rISvG5vKt8NXQ5KN4qEsI96M+xHu6JYwN0d3BKh6vasNUVNgnKkrHLlT8zIXt92K/UwTspA
-	hnLgU+1ugPbHZoyHfVKlTR1Qvj5WD5WWr1bjo06ZKV8QX2ZpWzLa8Nl4Vo2bknq6uGKM+rSVKkr
-	Ip5QayPxmAU/Hr3ABYRzkZO++VXa/IdkmoPilOfcnTs1QhvnGTf346CXx5aL0X9/rCFjxPIj7Pk
-	gI9hxoMIRQNmpDlqmZUC+
-X-Google-Smtp-Source: AGHT+IG18mb409Cnnfo0FgJPQtpkR3IOWmGFxLJQRKYZN3B9w5fVN9mvVZ8KR0T8Mgq30KwBagp/FQ==
-X-Received: by 2002:a17:90b:1347:b0:2ff:5016:7fd2 with SMTP id 98e67ed59e1d1-306a626a0a1mr24782562a91.24.1744131667576;
-        Tue, 08 Apr 2025 10:01:07 -0700 (PDT)
-Received: from ?IPV6:2a03:83e0:115c:1:ed73:89b2:721a:76ad? ([2620:10d:c090:500::5:7de6])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-306d3738b90sm1980962a91.1.2025.04.08.10.01.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Apr 2025 10:01:07 -0700 (PDT)
-Message-ID: <b1abcf84-e187-468f-a05e-e634e825210c@gmail.com>
-Date: Tue, 8 Apr 2025 10:01:03 -0700
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3loSWOdm7A/muGSbHbp/mlDMJUWeJ6VlPIjx21/XSgA=;
+        b=wN8Uuyi3uJJYrwBRQMY7FzUmt+mlZ/O+WW/ImORBiEMzR2JHBVYgU76hkzNxTKHlwp
+         V4g/7ZHEu4vXfFTijdIu3CpBvfxkKohWWn+9V4opxJeRXkjioypSWV1c+xp9RXgWSqxv
+         bGcE/6j7BofLiTR4pKWR4zZY/rjS1n6mv5TT1QFZ7lFmpugUJ8QpFbOiDg6YAOIBrfRU
+         +R6If5SON+DktRlmnpi0/IcsHA+Mt9HMbdcwGuPW/5KiTNnnrS1Tr8Ktzk/Skca3C7Re
+         Ovo/ynBMeYoJ5gjYmvoiaBOQhWm02U7P7Z2l51fuLTrQ5m8YgheUp72FtjkgwsL845jN
+         g8dw==
+X-Forwarded-Encrypted: i=1; AJvYcCUEdm9Tw2fSkrlwWFHeS6WJdjUUMHefUrLacc046hptJNpqtZ6wBpiq8MZ5eXf8U61WR4TemZ/of6enVlc=@vger.kernel.org, AJvYcCVd+b8s++npqtLBILgPdED8j2AQblxBCLB77cMQrrW4ycBybI1ZIGfmrvo2kPyXPcIYdrh73RYBkxM9GLR7YjjaMjJh@vger.kernel.org, AJvYcCVnRId1BGXgUOIQgSoQKPseJJ9bXUM9+h0lPthmrEb1YM3tLaH3ugpW7htIOlDTeroRQglfixEY@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywv4jcUl0ybxcrQqJjXm6xu+SnyFKN2plCzvtvHP7rFf7ccbzeR
+	yj5JD3RHbwnef4ovE8925j5WKxMsGBLmLW7eTtXOsk3619iZdIIF
+X-Gm-Gg: ASbGnct/6OI+Q7KurWr7GlYnVOsY6IWjYjhVhTflPxBscQsJavsB5uNKIYJ0Tj0qYLL
+	8itjz9OxSf3EMJe406uay3mpNwGiD5mkV51yaKBQlviOt3VoMLQIY0XikJVa+tn0Zc4u4uIljjm
+	HcPE+tVjDtQXay2sOCk8mIanphh4PF2L5hd0gn7zHZ6wkfn7XtVEpu2ILg1q/EV+coAPdOrq8PU
+	ih+J5WYXNWj5p49T2XgCc3WqvnDKVycL9G4seQhGxr6MZdjhTAcGAEqHQ21cevMT4JBH9mDC0Ry
+	KKGRIvv5bbub64FOv3oI7Tny/cmYx1Om
+X-Google-Smtp-Source: AGHT+IHDbgqPfbcqHmYeawiEypB+7MDmdtDPRJCMoLpHc5sdwdwL6CJJJT6ib6Kw/XcApllac97xtw==
+X-Received: by 2002:a17:907:9801:b0:ac7:33d0:dbe with SMTP id a640c23a62f3a-ac7d18cb7f9mr1744076266b.33.1744131668369;
+        Tue, 08 Apr 2025 10:01:08 -0700 (PDT)
+Received: from gmail.com ([2a03:2880:30ff::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac7c01c10dcsm940755466b.180.2025.04.08.10.01.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Apr 2025 10:01:08 -0700 (PDT)
+Date: Tue, 8 Apr 2025 10:01:05 -0700
+From: Breno Leitao <leitao@debian.org>
+To: David Ahern <dsahern@kernel.org>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, davem@davemloft.net,
+	edumazet@google.com, horms@kernel.org, kernel-team@meta.com,
+	kuba@kernel.org, linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, mathieu.desnoyers@efficios.com,
+	mhiramat@kernel.org, ncardwell@google.com, netdev@vger.kernel.org,
+	pabeni@redhat.com, rostedt@goodmis.org, song@kernel.org,
+	yonghong.song@linux.dev
+Subject: Re: [PATCH net-next v2 2/2] trace: tcp: Add tracepoint for
+ tcp_sendmsg_locked()
+Message-ID: <Z/VWUVk+mHXTENms@gmail.com>
+References: <20250407-tcpsendmsg-v2-2-9f0ea843ef99@debian.org>
+ <20250408010143.11193-1-kuniyu@amazon.com>
+ <Z/UyZNiYUq9qrZds@gmail.com>
+ <b85ddaa3-6115-466c-8fc9-84b58d55e4b4@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/2] GCPS Spec Compliance Patch Set
-To: Sam Mendoza-Jonas <sam@mendozajonas.com>, fercerpav@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: npeacock@meta.com, akozlov@meta.com
-References: <cover.1744048182.git.kalavakunta.hari.prasad@gmail.com>
- <ee5feee4-e74a-4dc6-ad8e-42cf9c81cb3c@mendozajonas.com>
-Content-Language: en-US
-From: Hari Kalavakunta <kalavakunta.hari.prasad@gmail.com>
-In-Reply-To: <ee5feee4-e74a-4dc6-ad8e-42cf9c81cb3c@mendozajonas.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b85ddaa3-6115-466c-8fc9-84b58d55e4b4@kernel.org>
 
-On 4/7/2025 2:44 PM, Sam Mendoza-Jonas wrote:
-> On 8/04/2025 4:19 am, kalavakunta.hari.prasad@gmail.com wrote:
+On Tue, Apr 08, 2025 at 09:16:51AM -0600, David Ahern wrote:
+> On 4/8/25 8:27 AM, Breno Leitao wrote:
+> > 
+> > 	SEC("tracepoint/tcp/tcp_sendmsg_locked")
+> 
+> Try `raw_tracepoint/tcp/tcp_sendmsg_locked`.
+> 
+> This is the form I use for my tracepoint based packet capture (not tied
+> to this tracepoint, but traces inside our driver) and it works fine.
 
-> 
-> Looking at e.g. DSP0222 1.2.0a, you're right about the field widths, but 
-> it's not particularly explicit about whether the full 64 bits is used. 
-> I'd assume so, but do you see the upper bits of e.g. the packet counters 
-> return expected data? Otherwise looks good.
-> 
-It is possible that these statistics have not been previously explored 
-or utilized, which may explain why they went unnoticed. As you pointed 
-out, the checksum offset within the struct is not currently being 
-checked, and similarly, the returned packet sizes are also not being 
-verified.
+Thanks. I was not able to get this crashing as well. In fact, the
+following program fails to be loaded:
+
+	SEC("raw_tracepoint/tcp/tcp_sendmsg_locked")
+	int bpf_tcp_sendmsg_locked(struct bpf_raw_tracepoint_args *ctx)
+	{
+		void *skb_addr = (void *) ctx->args[0];
+
+		bpf_printk("deref %d\n", *(int *) skb_addr);
+
+		return 0;
+	}
+
+libbpf refuses to load it, and drumps:
+
+	libbpf: prog 'bpf_tcp_sendmsg_locked': BPF program load failed: Permission denied
+	libbpf: prog 'bpf_tcp_sendmsg_locked': -- BEGIN PROG LOAD LOG --
+	0: R1=ctx() R10=fp0
+	; void *skb_addr = (void *) ctx->args[0]; @ tcp_sendmsg_locked_bpf.c:18
+	0: (79) r1 = *(u64 *)(r1 +0)          ; R1_w=scalar()
+	; bpf_printk("deref %d\n", *(int *) skb_addr); @ tcp_sendmsg_locked_bpf.c:20
+	1: (61) r3 = *(u32 *)(r1 +0)
+	R1 invalid mem access 'scalar'
+	processed 2 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
+	-- END PROG LOAD LOG --
+	libbpf: prog 'bpf_tcp_sendmsg_locked': failed to load: -13
+	libbpf: failed to load object 'tcp_sendmsg_locked_bpf.o'
+	Failed to load BPF object: -13
+
+> As suggested, you might need to update raw_tp_null_args
+
+Thanks for confirming it. I will update raw_tp_null_args, assuming that
+the problem exists but I am failing to reproduce it.
+
+I will send an updated version soon.
+
+Thanks
+--breno
 
