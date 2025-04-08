@@ -1,206 +1,106 @@
-Return-Path: <netdev+bounces-180285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2241A80E25
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 16:34:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC755A80E3D
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 16:35:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3D88886AD3
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 14:28:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E23F48A04B8
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 14:29:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83449224B14;
-	Tue,  8 Apr 2025 14:27:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A359E22ACFA;
+	Tue,  8 Apr 2025 14:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ELIugcKy"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="OFSxVztI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE59A2222B9;
-	Tue,  8 Apr 2025 14:27:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2805C22AE45;
+	Tue,  8 Apr 2025 14:27:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744122456; cv=none; b=M/w5N+dOAY0pAFd+/Aar9R7sewFilm9rlUD6IBhiKLxEiIGk//XUgQTYHXB7e+vGICuT81IjTW27Fpkh1+4LL9u5LZc5hT4x24QwDjF7hCbARf7HmeKTIQXYACT7WuqZC9w7xRPUnSri+tdbNNz1K9gbp6+L8uPlpbT6HVi8K/c=
+	t=1744122481; cv=none; b=QSV/9nOgeLcBAfPchtxAUWczDznnkIlKUsbQFc8V25DLqmNShzkCg48qqlOjuTqcFMaO6PRNIjJm2+RWl2T0TV29R6T3GRkn42RXbQX97FABnp9DGFOIRi6502SI+ZjRSsBLM8NNoxaQOFNj6m0WePct/J5ignUrR3TelB9Ayb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744122456; c=relaxed/simple;
-	bh=gaG/8CllEsuEYVXuPZk1cX0GaP1RIWirH2m+Ef/oQJY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=daU0boN5RoVXxfz2/zcHiAdH/oaiKOhBa0WwdIUw7r029R6jr0bX59v1WiwaGvJgxW9ME8+dI+6U+Ic71FW4IxbWyDzIyFhInWwKHku2aLxK9omEt9+o3gq37PngdscADsaL+9hX09IEEwke2GT30Iy+oJx8TsYHLnx9KUg4VZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ELIugcKy; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ac3b12e8518so1038910666b.0;
-        Tue, 08 Apr 2025 07:27:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744122453; x=1744727253; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pSHGxvoqIBIbqZcTKF/gVVMx0ajorY2bbUPhZUg2YJ0=;
-        b=ELIugcKygubmCdQF330xaBOSEOBoCtTXiiwCEvubLIwJHoOwTSxvJ1ZvGhePJuoAa3
-         +jly5VTHzvAjSVxFj7iAyutvZAsPoVmo+OskPLywO8mMJtKMxv/a4IYIf0EiBGBV7al6
-         5LZF0YWuYrqIzbnuh+WrwJ7VBJ6WtG9xlu1eP3J7kQLuU0Oex888Bi37Kda1srLp9cSX
-         9mraM7OQd0PNJ9UQKQ6xlP2bP8gT5UZnxFw8eIaX8HEyUyrSQvjNzMM4/svykwlYdipI
-         te/XMg2i/Koy+s0Vyo8jaOuLWDXpPEIgRupsGPF+ZL+K3Rdf+4nEAxhJKRWDom8B1Sb6
-         FMHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744122453; x=1744727253;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pSHGxvoqIBIbqZcTKF/gVVMx0ajorY2bbUPhZUg2YJ0=;
-        b=Vb3cyaBWb9mLT6DSnWEd0MCIyKPW2rFTy7Ng960sFxvtjVxm2OZ2hQrRKIfGWLpfT2
-         +ynkhdxx4dEfsffUO4vcUEz8/49KeUeVbjYdB9ezi/07PkwjzZokYvldXLCHVinxhudD
-         Aq36V0mMLw+pArAV3rn1zalEv5wo2809m9erNbq5vi/Wmdqo/I/ucualjwEMeRQnECzj
-         IMbciEa1KDcqI8wFyfX+P3YYiE2VEg/JYUJZhshFkGuA5i2xHpqDkBTfZrkN89A21d3p
-         OFbkoQ5YWr3BzGJmu8+lO5X0OphO3cvqoJNTO4nYDd8QH6D7odMWqJvgVEKHrs4xzmvr
-         du2A==
-X-Forwarded-Encrypted: i=1; AJvYcCU9DayKqi+xjv6rUfVFdgzb0zsD17OM6sbFYxZDIXqojpsBrOKdIjL9EE/0OmSPHZ1L4QfbkMD4vWLYVvl4x0Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3EYGmmWVIEW+GFm8MfbQvtrgGrL1BqpUnrPuizQ5AkjK10iyU
-	n+YrP6WDOfREXfjwN7PobTlQmPCmX5RU2LqxLCCfZF42jEpyj+Jz
-X-Gm-Gg: ASbGnctrCvrlviAMKe8Bb2EGwLcYXMascNCifvyhOH+A8BG8mAOUVG7IMRtfbpCkgfM
-	6/EY918QWFUtnSnjSJl4ZxejTN8E4GpSc95qs75H/ClK8OCYWeYo0jUpgH2M4qwBkUENbl9vbpS
-	GA9UHEtWcdQjnZDEsFFGv9RmaDkcw+dGRbeedXKZh/NNBBzU2kEe1MxU4hFCgYSswN6tCVnb8Vq
-	K1HQEByfdITmLvb02FX687QNT3Vzu5g2ziTutlt22sJeAwMx//tIzFHvivuvyOfF6qxnbNVsPpi
-	i+3RsPEwXDy7u3dn3qXQa1JpDMNI8Amt6D7RxkbiQAANCzoPDPjJ+k1KmnPGKvgOApEfuomiSJh
-	UxvOT7RhdzEguqqFA/XomcCEgvK4sow6L7w7SCyDuCAEF0qjXPHCn3+x8R57QbqY=
-X-Google-Smtp-Source: AGHT+IH3URBmXzvm7rmuiifGg0nI6GTLC2yk/NwC/7RSNf7U9qMp8Uua9d/HOCEY/8nWokG6ODloBA==
-X-Received: by 2002:a17:907:7291:b0:ac2:a4ec:46c2 with SMTP id a640c23a62f3a-ac7d1b9c1demr1497465466b.49.1744122452769;
-        Tue, 08 Apr 2025 07:27:32 -0700 (PDT)
-Received: from localhost.localdomain (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac7bfe9be67sm910393266b.46.2025.04.08.07.27.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Apr 2025 07:27:32 -0700 (PDT)
-From: Eric Woudstra <ericwouds@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1744122481; c=relaxed/simple;
+	bh=oBvPXTDoawXXTh1nSPqX82Qcczec9zWjDK26sxmbimg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HMtN2+DEh1uOG1BtUzRG+hUEvA1agOcUTcqa0+cYosQzesxJJqCF2SJEOCg75iPDQwY9a416hCW7DGaeErIBoFB91udOiB7zfa/Glhn/PfjGOcV/fXvxUJQLAATmlvqBsY14sse/LSqEJmacUD3m2813BWyxCWzJKUT0r1vXxP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=OFSxVztI; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=AMa6u84bfpisRdGUTui7ZAbRD3OzT3HWV8+rzJ/A6mQ=; b=OFSxVztIM2I0QtONqn2shMWwB7
+	oDpN5BuFtbvpECYu7FQdHPgKaUA7FlTYiiIyEhfbWdNyg2w0/PzRz0LeadbBjU8LW2SpJQ3qTECdL
+	xG7Udlot7lnceivkfXJcOgvak/pfmTAhN1kgcsBkvkMtlejoMc6QrRCFttXrkRuEtCkag7Qz9CwAI
+	NTUuQCDWIHAgjFqyegNHEwF62fvlmLfhNJdB9y8IIU44FVZo29iwbd6wetU+426tkuhLBS3rjexyc
+	ffjtMGHoKvGOqsHWg39l58oSwSpDWH9Wq8J0oGqJpUM+P5UeXXzhc4PW9VfuYiFWpOpNbXjaemXvK
+	lrqRFXJg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33128)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u29va-0007ZZ-0Z;
+	Tue, 08 Apr 2025 15:27:50 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u29vX-0001Ux-0N;
+	Tue, 08 Apr 2025 15:27:47 +0100
+Date: Tue, 8 Apr 2025 15:27:46 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Joe Damato <jdamato@fastly.com>
+Cc: Michael Klein <michael@fossekall.de>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Ivan Vecera <ivecera@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: netdev@vger.kernel.org,
-	bridge@lists.linux.dev,
-	netfilter-devel@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	Eric Woudstra <ericwouds@gmail.com>
-Subject: [PATCH v11 nf-next 3/3] bridge: Introduce DEV_PATH_BR_VLAN_KEEP_HW
-Date: Tue,  8 Apr 2025 16:27:16 +0200
-Message-ID: <20250408142716.95855-4-ericwouds@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250408142716.95855-1-ericwouds@gmail.com>
-References: <20250408142716.95855-1-ericwouds@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RESEND net-next v5 1/4] net: phy: realtek: Group RTL82* macro
+ definitions
+Message-ID: <Z_UyYgkLAvbU0ufp@shell.armlinux.org.uk>
+References: <20250407182155.14925-1-michael@fossekall.de>
+ <20250407182155.14925-2-michael@fossekall.de>
+ <Z_SPgqil9HFyU7Y6@LQ3V64L9R2>
+ <96fcff68-6a96-49fe-b771-629d3bef03ea@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <96fcff68-6a96-49fe-b771-629d3bef03ea@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Following the path through a bridge, there are 2 situations where the
-action is to keep:
+On Tue, Apr 08, 2025 at 02:17:19PM +0200, Andrew Lunn wrote:
+> This i don't follow, you normally keep register bits next to the
+> register. This is particularly important when the register bits don't
+> have the register name embedded within it.
 
-1. Packets have the encap, and keep the tag at ingress and keep it at
-   egress. It is typical in the forward path, when a vlan-device and
-   bridge are combined.
+Agreed - the worst thing is when one reads driver code, where the
+registers offsets are all defined one after each other, and the
+individual register bits are defined elsewhere and without prefixes
+that identify which register they pertain to or comments that identify
+that.
 
-2. Packets do not have the encap, are tagged at ingress and untagged
-   at egress. Can be found when only a bridge is in the forward path.
-   It is also possible in the bridged path.
+So yes, please keep register bits and bitfield definitions next to
+the register offset definition they pertain to, it's way nicer to
+read that way.
 
-For switchdev userports that support SWITCHDEV_OBJ_ID_PORT_VLAN in
-sitaution 2, it is necessary to introduce DEV_PATH_BR_VLAN_KEEP_HW.
-The typical situation 1 is unchanged: DEV_PATH_BR_VLAN_KEEP.
+Also, having register offset definitions sorted by offset means when
+reading documentation, locating the definitions actually used is much
+easier. Using the same value (hex or decimal) as the documentation
+also aids this.
 
-DEV_PATH_BR_VLAN_KEEP_HW is similar to DEV_PATH_BR_VLAN_TAG, with the
-correcponding bit in ingress_vlans set.
-
-Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
----
- include/linux/netdevice.h        |  1 +
- net/bridge/br_device.c           |  1 +
- net/bridge/br_vlan.c             | 18 +++++++++++-------
- net/netfilter/nft_flow_offload.c |  3 +++
- 4 files changed, 16 insertions(+), 7 deletions(-)
-
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index cf3b6445817b..4e8eaae8c441 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -887,6 +887,7 @@ struct net_device_path {
- 				DEV_PATH_BR_VLAN_TAG,
- 				DEV_PATH_BR_VLAN_UNTAG,
- 				DEV_PATH_BR_VLAN_UNTAG_HW,
-+				DEV_PATH_BR_VLAN_KEEP_HW,
- 			}		vlan_mode;
- 			u16		vlan_id;
- 			__be16		vlan_proto;
-diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
-index a818fdc22da9..80b75c2e229b 100644
---- a/net/bridge/br_device.c
-+++ b/net/bridge/br_device.c
-@@ -423,6 +423,7 @@ static int br_fill_forward_path(struct net_device_path_ctx *ctx,
- 	case DEV_PATH_BR_VLAN_UNTAG:
- 		ctx->num_vlans--;
- 		break;
-+	case DEV_PATH_BR_VLAN_KEEP_HW:
- 	case DEV_PATH_BR_VLAN_KEEP:
- 		break;
- 	}
-diff --git a/net/bridge/br_vlan.c b/net/bridge/br_vlan.c
-index 6bfc7da10865..0f714df92118 100644
---- a/net/bridge/br_vlan.c
-+++ b/net/bridge/br_vlan.c
-@@ -1490,13 +1490,17 @@ int br_vlan_fill_forward_path_mode(struct net_bridge *br,
- 	if (!(v->flags & BRIDGE_VLAN_INFO_UNTAGGED))
- 		return 0;
- 
--	if (path->bridge.vlan_mode == DEV_PATH_BR_VLAN_TAG)
--		path->bridge.vlan_mode = DEV_PATH_BR_VLAN_KEEP;
--	else if (v->priv_flags & BR_VLFLAG_TAGGING_BY_SWITCHDEV)
--		path->bridge.vlan_mode = DEV_PATH_BR_VLAN_UNTAG_HW;
--	else
--		path->bridge.vlan_mode = DEV_PATH_BR_VLAN_UNTAG;
--
-+	if (path->bridge.vlan_mode == DEV_PATH_BR_VLAN_TAG) {
-+		if (v->priv_flags & BR_VLFLAG_TAGGING_BY_SWITCHDEV)
-+			path->bridge.vlan_mode = DEV_PATH_BR_VLAN_KEEP_HW;
-+		else
-+			path->bridge.vlan_mode = DEV_PATH_BR_VLAN_KEEP;
-+	} else {
-+		if (v->priv_flags & BR_VLFLAG_TAGGING_BY_SWITCHDEV)
-+			path->bridge.vlan_mode = DEV_PATH_BR_VLAN_UNTAG_HW;
-+		else
-+			path->bridge.vlan_mode = DEV_PATH_BR_VLAN_UNTAG;
-+	}
- 	return 0;
- }
- 
-diff --git a/net/netfilter/nft_flow_offload.c b/net/netfilter/nft_flow_offload.c
-index d84e677384da..fdf927a8252d 100644
---- a/net/netfilter/nft_flow_offload.c
-+++ b/net/netfilter/nft_flow_offload.c
-@@ -145,6 +145,9 @@ static void nft_dev_path_info(const struct net_device_path_stack *stack,
- 			case DEV_PATH_BR_VLAN_UNTAG_HW:
- 				info->ingress_vlans |= BIT(info->num_encaps - 1);
- 				break;
-+			case DEV_PATH_BR_VLAN_KEEP_HW:
-+				info->ingress_vlans |= BIT(info->num_encaps);
-+				fallthrough;
- 			case DEV_PATH_BR_VLAN_TAG:
- 				info->encap[info->num_encaps].id = path->bridge.vlan_id;
- 				info->encap[info->num_encaps].proto = path->bridge.vlan_proto;
 -- 
-2.47.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
