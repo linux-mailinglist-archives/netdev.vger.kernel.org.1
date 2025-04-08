@@ -1,187 +1,156 @@
-Return-Path: <netdev+bounces-180038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B1FFA7F2D9
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 04:56:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A6F5A7F30C
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 05:09:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CAAD188CD87
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 02:56:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 359F518930D8
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 03:09:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5131DE2A1;
-	Tue,  8 Apr 2025 02:56:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C231D3FB1B;
+	Tue,  8 Apr 2025 03:09:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="MFSBWKSS"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="ZqsvqY7H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E64C1C6B4
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 02:56:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D241A1AA7BA
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 03:09:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744080980; cv=none; b=UAgXScKaLqp8xT8TSAolJ3CKEW9tI18bsmY2kUFYBQi+DILPaLfVws9YKLHqM4x+i3Su6GRDabPryqv+Dr2ZDoVO34nme4NT+YV3AjJozODYXe+JQrsCxtUibXfbVj8PFcIFenaPex1HOwhfrWzLsRhFt3HMsC6vmu9YL/iUTac=
+	t=1744081755; cv=none; b=DU0yubUbybH32V8p1rvXkVN2b/q+V/MCF5uU/QY1yvspxC4N/6uvehnmAuYVrYCQNh+k98DkwaSf/epyHGakfhFO/SYFMm8hvFcv8Q7tyA5XO2wFLOhbhGVu0r3uKWnW/30X4jgNmJLsaKeMMiXPzJkK2HdAv5ipwJuY9cBHKeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744080980; c=relaxed/simple;
-	bh=IRQX6FnE5MUIklYEtMa+zEA/SgwB8IzLIYokjzXBmWs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OC1Q+WAJSxyOgObj1OLqH0w2qhtarSZEz6YA7hvqEXhOkRuC9yMOUGnquXgUXmPhAwit5CgvJ3tcTfWYtCTmbn/a5+QnuW6Gt1qLntmCgbArxnwnYQosOQ0CgfIVkB/zuBMKkalQhN9gbV6baAj6V0ODldZnqrtfANYxjEh1Ufk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=MFSBWKSS; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-72d3b48d2ffso5295523b3a.2
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 19:56:18 -0700 (PDT)
+	s=arc-20240116; t=1744081755; c=relaxed/simple;
+	bh=9bXBAqjwsMH7aUBaipURQXJeh98g4OYHsd+AsP53j/A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kN4cOYB0UKNNjYPv+PQ3IOKmd8QHEVtfOZT3lqTYwXqtnn5R4gYclUkVWUvFwpPGhaxVAVECc8kEwD2LmUm+P2gwpapu/LiFA8PqM+mwP1dzXPyssv5bH4dFZhbzOqWaNvZbr4rK5RHXJt6qbGdnERhY7YSGQXWSVjf0vlR/p1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=ZqsvqY7H; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7398d65476eso3921553b3a.1
+        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 20:09:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1744080978; x=1744685778; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zo7thYEk15AQtYFUXhpvpFSCu3cxGHzMkjACCgnp/lU=;
-        b=MFSBWKSSsfV87CHo/MWx7mq8gnBdbrueuLc8dzjxH8TOE/sexfLwNG7gCOrlP9nvHC
-         mcfHO0jCvNM3/qOvlXGpMRyejFESN+gClWW2laSF3m9ALKYrqZOaHzIvAqt9i22y9LVH
-         yjgQlrvPGfmgmpsd0eV5XzqbKRXL5gJ5vqlew=
+        d=bytedance.com; s=google; t=1744081753; x=1744686553; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sPuw2Ymw6aEL6CjIynPBldeAGkGLHtU6wbCawr07JKA=;
+        b=ZqsvqY7HC4fmkSX78/ef4WpQ3vQ4sg63ljJB3Uns60qwKxL1vSwCy4ZQ198CHUw1IW
+         foVqCnqA8ZYL6w1RymGCEvECGt3CPQgZofwgQCS195DSyvJUzmD0pgIDLcQVK2Yn3Eo8
+         uefs1d4lqnG/YI3KqZ7Mb1G7oypi2rQ7BDgNlp12Z6PPCnurJ02z0hC+S5wjKs0Ldfk4
+         r2tcuM+ezjRHjCeGY6BGN6S5Ka2M9ZiT1Dgd3IOTVrzjCI/HxXzxSPgWiuHz/N9n616j
+         AWWCl+00hFBEj1/gmS2sr9iybrtR815AQIIo/9KgvinLM0BV6BjU6LsaFdBVJ2OR6VwJ
+         70zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744080978; x=1744685778;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1744081753; x=1744686553;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zo7thYEk15AQtYFUXhpvpFSCu3cxGHzMkjACCgnp/lU=;
-        b=k6bm3J0XyXn2wRDE7v4JpwNzzoxxQsZAbB9ph2R2hGZ4Qm597OwV+wUqCg9/OPp3LO
-         +IAR6JtCTwi0VO4zh7uQj+VkSkzEYfEAnYtnIZcftX2b7G3lXjM2RRMcFanbtNv07kTI
-         mp0a5tbqdt82cmBEFtISvb0C8TsA1F2siqfO4WkpncKtTUn3mTp37TFscPfjSfLOSAnq
-         kTQlxbyUi+AV9rhdCr+7IKfLiavH/8SSXpkrqzZ7Zkhla1H0nf4+Y9CwH8Ti3ELQm9m1
-         NCYYemd5s1csovEry9PM5aneHPi0ILsyvuhkWJjI7sdIsu+QAxENdUvbF4dSNB2DdY8L
-         Hdfg==
-X-Forwarded-Encrypted: i=1; AJvYcCWzBBc3RAGMsw8tpxFlnr9cdPgO3ONxPYk4kuRXbqebY0zokuJklj83XwbLASTe75Ttxag2u7A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmnFOuGPI7vXVEB4mHIcz9dqdaxLUW3EvftY46FhflFGNvekXv
-	PFFHOZk0K8BQS8CbvtUJzsTh0xDecnhKLwfNeQu0ybS9v23dLQwc5zfHyOabsUk=
-X-Gm-Gg: ASbGncutBkQwlfUhhfX/eSPCN+nkUSxaCHtXDE17BtoaIDFJWXZVopmcaF5jIXacu5M
-	mKXXZTytyDryRenOXqw7B/qnBpEo7o1ucPtxaMXKGAcD7LQi7kNz8G9G7vAVIpyPyQN/HqxrTTm
-	BgGS6t561AjCbXXBYKZmvdh43Bwu5Ai64ivQ2HjazpDgRpptYekxBgvcdjxkkt9kLIEh+b3cm3r
-	/YYgDou1B9SjEd2p/c9NtLi611+SfpJVrgokbCZxj4cV98VA7NpvXo8ytbnL3PZ3YlxNyKkQc7b
-	UTR/T8O+iYYH9j6CpIweyFr+rV16KA9VfsDRVVDsnBAaZw2rimwT/6qKHZgLEVgKr3vjnOmy1Ri
-	SzjadYoz7A40zwyvDPnkP0w==
-X-Google-Smtp-Source: AGHT+IF39pNN6cU68fx9ODvUvpTInT6A2EN2f9pvyQLUfRl60UGSNF352rkRljHG/9VD401YHWnMqg==
-X-Received: by 2002:a05:6a21:6e01:b0:1f5:889c:3ccc with SMTP id adf61e73a8af0-2010461ce81mr24283036637.14.1744080977704;
-        Mon, 07 Apr 2025 19:56:17 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-af9bc323877sm7964377a12.29.2025.04.07.19.56.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 19:56:17 -0700 (PDT)
-Date: Mon, 7 Apr 2025 19:56:14 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Michael Klein <michael@fossekall.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RESEND net-next v5 2/4] net: phy: realtek: Clean up RTL8211E
- ExtPage access
-Message-ID: <Z_SQTi-uKk4wqRcL@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Michael Klein <michael@fossekall.de>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250407182155.14925-1-michael@fossekall.de>
- <20250407182155.14925-3-michael@fossekall.de>
+        bh=sPuw2Ymw6aEL6CjIynPBldeAGkGLHtU6wbCawr07JKA=;
+        b=BpndOBq27Pu5sr4y/uSWKvtgWJsmTmWG7NP3x+0iDVd+FBA7o5T7GL92ldklOPQ0fe
+         8xHCXAhRvkRX46VSCRzSI6HXNpFlQDP2u9CU8D0Tx9c/KWcZCc3wvy/JNOA008mF5Jqk
+         xcnzLpe3wKBFnYKd/on44gYxfbziboVZ2Z3FDQS8cE3AW7XBWn/N1OOYEbr3TKEOsAQC
+         YQezytlIIzzv1NISVIUEU9cIC83j7udaTOXDnIcMrZ8seoCLDTOcLY3cesR71NbPB4N0
+         +ImZAuO0Jj5L9yigPNyh7CZUgVFSg64azu9IuwLqox3fLbFdgXik4x+bx7Lw7CF7utY0
+         2G/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXSEeRclkhHPR8kL2TQJe+UBjh+T7muzQHt7DTiAfPiu8cBHDrQsWgW20DrEWX1LcBuHGw6qF8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyoyIJczcsie4mnZuE8+nMAErLcfzLZbdh19tzxEJ1ffN+VuIV0
+	XOxRPXdPTp70zXom/zS5kprgm5kgYC93y4f8z6iXmFc/9MbeECHgeQ4ex5eni88=
+X-Gm-Gg: ASbGncvLC/EvXHt71zFNxfmQzrFTGEx6fhJ3QGdKMwrlkB8KGA1dwwWgnsA8KItZyuK
+	7pXrgY9p8Z1q8Jum1Kn6W97kCuqFYOXJ5Il4LEz62z90ZsdItUaR9lnwC67OzSh2qtsLp3G+43I
+	XwOxH66fWmkEFuKwVf53XKGiLKdReOSPXdmXE4WNatPxAZ5l/DMS0qI8BqurrlxiGaJtv28as+4
+	1asi3oPySRgGr/DdIG16rR1E6B/OWxgqGiHX9UGhYwxuTqHUV0UJZND2Cn5A142Wtwp+9tv+wvU
+	VR/o8bzVLcETWrVE/D17H2pO4+2KjhAC04+/kH58DWd7CY6jD2k=
+X-Google-Smtp-Source: AGHT+IEwH96uV5EtxaP2ImURK29zECcTWq13GuIUlA74sMLhltZ9xgPDSZDjYcQ7xrW9wkCK0hHxtA==
+X-Received: by 2002:aa7:875a:0:b0:736:b3cb:5db with SMTP id d2e1a72fcca58-73b9d4019ddmr2344723b3a.11.1744081752836;
+        Mon, 07 Apr 2025 20:09:12 -0700 (PDT)
+Received: from [10.3.43.196] ([61.213.176.11])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-739d97d1881sm9372280b3a.3.2025.04.07.20.09.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Apr 2025 20:09:12 -0700 (PDT)
+Message-ID: <0de20ab7-9f1c-4a13-a8d2-295f94161c4e@bytedance.com>
+Date: Tue, 8 Apr 2025 11:09:07 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250407182155.14925-3-michael@fossekall.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: Re: [PATCH] selftests: mptcp: add comment for getaddrinfo
+To: Geliang Tang <geliang@kernel.org>, linux-kernel@vger.kernel.org,
+ mptcp@lists.linux.dev, linux-kselftest@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: matttbe@kernel.org, martineau@kernel.org, viktor.soderqvist@est.tech,
+ zhenwei pi <zhenwei.pi@linux.dev>
+References: <20250407085122.1203489-1-pizhenwei@bytedance.com>
+ <ae367fb7158e2f1c284a4acaea86f96a7a95b0c4.camel@kernel.org>
+Content-Language: en-US
+From: zhenwei pi <pizhenwei@bytedance.com>
+In-Reply-To: <ae367fb7158e2f1c284a4acaea86f96a7a95b0c4.camel@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Apr 07, 2025 at 08:21:41PM +0200, Michael Klein wrote:
-> - Factor out RTL8211E extension page access code to
->   rtl8211e_modify_ext_page() and clean up rtl8211e_config_init()
-> 
-> Signed-off-by: Michael Klein <michael@fossekall.de>
-> ---
->  drivers/net/phy/realtek/realtek_main.c | 38 +++++++++++++++-----------
->  1 file changed, 22 insertions(+), 16 deletions(-)
-> 
-> diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-> index b27c0f995e56..e60c18551a4e 100644
-> --- a/drivers/net/phy/realtek/realtek_main.c
-> +++ b/drivers/net/phy/realtek/realtek_main.c
-> @@ -37,9 +37,11 @@
->  
->  #define RTL821x_INSR				0x13
->  
-> -#define RTL821x_EXT_PAGE_SELECT			0x1e
->  #define RTL821x_PAGE_SELECT			0x1f
->  
-> +#define RTL8211E_EXT_PAGE_SELECT		0x1e
-> +#define RTL8211E_SET_EXT_PAGE			0x07
-> +
->  #define RTL8211E_CTRL_DELAY			BIT(13)
->  #define RTL8211E_TX_DELAY			BIT(12)
->  #define RTL8211E_RX_DELAY			BIT(11)
-> @@ -135,6 +137,21 @@ static int rtl821x_write_page(struct phy_device *phydev, int page)
->  	return __phy_write(phydev, RTL821x_PAGE_SELECT, page);
->  }
->  
-> +static int rtl8211e_modify_ext_page(struct phy_device *phydev, u16 ext_page,
-> +				    u32 regnum, u16 mask, u16 set)
-> +{
-> +	int oldpage, ret = 0;
-> +
-> +	oldpage = phy_select_page(phydev, RTL8211E_SET_EXT_PAGE);
-> +	if (oldpage >= 0) {
-> +		ret = __phy_write(phydev, RTL8211E_EXT_PAGE_SELECT, ext_page);
-> +		if (ret == 0)
-> +			ret = __phy_modify(phydev, regnum, mask, set);
-> +	}
-> +
-> +	return phy_restore_page(phydev, oldpage, ret);
-> +}
-> +
->  static int rtl821x_probe(struct phy_device *phydev)
->  {
->  	struct device *dev = &phydev->mdio.dev;
-> @@ -607,7 +624,9 @@ static int rtl8211f_led_hw_control_set(struct phy_device *phydev, u8 index,
->  
->  static int rtl8211e_config_init(struct phy_device *phydev)
->  {
-> -	int ret = 0, oldpage;
-> +	const u16 delay_mask = RTL8211E_CTRL_DELAY |
-> +			       RTL8211E_TX_DELAY |
-> +			       RTL8211E_RX_DELAY;
->  	u16 val;
->  
->  	/* enable TX/RX delay for rgmii-* modes, and disable them for rgmii. */
-> @@ -637,20 +656,7 @@ static int rtl8211e_config_init(struct phy_device *phydev)
->  	 * 12 = RX Delay, 11 = TX Delay
->  	 * 10:0 = Test && debug settings reserved by realtek
->  	 */
-> -	oldpage = phy_select_page(phydev, 0x7);
-> -	if (oldpage < 0)
-> -		goto err_restore_page;
-> -
-> -	ret = __phy_write(phydev, RTL821x_EXT_PAGE_SELECT, 0xa4);
-> -	if (ret)
-> -		goto err_restore_page;
-> -
-> -	ret = __phy_modify(phydev, 0x1c, RTL8211E_CTRL_DELAY
-> -			   | RTL8211E_TX_DELAY | RTL8211E_RX_DELAY,
-> -			   val);
-> -
-> -err_restore_page:
-> -	return phy_restore_page(phydev, oldpage, ret);
-> +	return rtl8211e_modify_ext_page(phydev, 0xa4, 0x1c, delay_mask, val);
->  }
 
-Seems good to add RTL8211E_SET_EXT_PAGE to remove a constant from
-the code. Any reason to avoid adding constants for 0xa4 and 0x1c ?
+
+On 4/8/25 09:43, Geliang Tang wrote:
+> Hi zhenwei,
+> 
+> On Mon, 2025-04-07 at 16:51 +0800, zhenwei pi wrote:
+>> mptcp_connect.c is a startup tutorial of MPTCP programming, however
+>> there is a lack of ai_protocol(IPPROTO_MPTCP) usage. Add comment for
+>> getaddrinfo MPTCP support.
+>>
+>> Signed-off-by: zhenwei pi <zhenwei.pi@linux.dev>
+>> Signed-off-by: zhenwei pi <pizhenwei@bytedance.com>
+>> ---
+>>   tools/testing/selftests/net/mptcp/mptcp_connect.c | 12 ++++++++++++
+>>   1 file changed, 12 insertions(+)
+>>
+>> diff --git a/tools/testing/selftests/net/mptcp/mptcp_connect.c
+>> b/tools/testing/selftests/net/mptcp/mptcp_connect.c
+>> index c83a8b47bbdf..6b9031273964 100644
+>> --- a/tools/testing/selftests/net/mptcp/mptcp_connect.c
+>> +++ b/tools/testing/selftests/net/mptcp/mptcp_connect.c
+>> @@ -179,6 +179,18 @@ static void xgetnameinfo(const struct sockaddr
+>> *addr, socklen_t addrlen,
+>>   	}
+>>   }
+>>   
+>> +/* There is a lack of MPTCP support from glibc, these code leads
+>> error:
+>> + *	struct addrinfo hints = {
+>> + *		.ai_protocol = IPPROTO_MPTCP,
+>> + *		...
+>> + *	};
+>> + *	err = getaddrinfo(node, service, &hints, res);
+>> + *	...
+>> + * So using IPPROTO_TCP to resolve, and use TCP/MPTCP to create
+>> socket.
+>> + *
+>> + * glibc starts to support MPTCP since v2.42.
+>> + * Link:
+>> https://sourceware.org/git/?p=glibc.git;a=commit;h=a8e9022e0f82
+> 
+> Thanks for adding getaddrinfo mptcp support to glibc. I think we should
+> not only add a comment for getaddrinfo mptcp here, but also add an
+> example of using it in mptcp_connect.c. I will work with you to
+> implement this example in v2.
+> 
+> Thanks,
+> -Geliang
+> 
+
+Good idea, thank you Geliang!
+
+>> + */
+>>   static void xgetaddrinfo(const char *node, const char *service,
+>>   			 const struct addrinfo *hints,
+>>   			 struct addrinfo **res)
+> 
+
 
