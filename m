@@ -1,223 +1,126 @@
-Return-Path: <netdev+bounces-180095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9293EA7F911
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 11:14:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 260CBA7F92B
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 11:16:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F40816FA20
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 09:13:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A00E3B3BEE
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 09:16:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5724B264A85;
-	Tue,  8 Apr 2025 09:13:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E40D21ADC3;
+	Tue,  8 Apr 2025 09:16:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mr6Ho6Oq"
+	dkim=pass (2048-bit key) header.d=outer-limits.org header.i=@outer-limits.org header.b="YKdHt5h5";
+	dkim=permerror (0-bit key) header.d=outer-limits.org header.i=@outer-limits.org header.b="JbWIdq+j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71DBD21ADC4;
-	Tue,  8 Apr 2025 09:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744103618; cv=none; b=ei6zsPOnc9rIWLtMHlidTMzbeSk8G7+EetbwgpPOcO48kHnXq/qCZ5OV35FK3SJn6bLIBcuT+K87KWaosUdMEJdAMbkAgcZUbSKlG3FbYyJDmjZtAxEETdbP2x3G+bCJxpZvZQYSXLAoYbsl7Zvm6CFQJGDUc8JayEbIZ51Jg0s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744103618; c=relaxed/simple;
-	bh=lX374fK7hl8i0okOxSeURBAL+h/slCG4NEZH1QURphg=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SQifCV0MZ9A53Sgy50ZarN6zh954JTO0Yb44U9HvHHXL9dG/tNNNmATkG3v4YgfWyG92WkT9nYE7YyQM+RDt49495oNEsZRsf+QyGM1hCZYbkok4STtl8MXQCQ/O2fiVHC1kTqjJ2tSPSRzrKOk24a05zSXTK9bg9myD1TLEhpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mr6Ho6Oq; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3913b539aabso3082577f8f.2;
-        Tue, 08 Apr 2025 02:13:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744103615; x=1744708415; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=HU3jlfHL29/51vRr+ClhtWxfhwAXBGkQarZA/yxGO2g=;
-        b=mr6Ho6Oqs9HEtEHWngAfA6l8rUC5KVjd7alUG+aMC9r3CDjPV1esuFHbDnY6zSllvq
-         yVBwnNaV0LFwqWR8cKFGAXxlRm6CKowYV+DCKph5AFqD+m63pcMgjDOdYiN8PLKjCU08
-         UP9siElT+3BD6J+zv0LugXZT0YLBgm/gLsnFcej3WjVfXbV/Ih73YweVk7rqiFDBWKRN
-         FlvBa8y02gWa8MGQoUFf7JmgQXTbpgsANSL1OzFrruGcAaBlbqRca+XoGWoxH2BZJlUe
-         sFExaAjwijUcP6p2GqeT8rOVAxSTKO+zmP5Hegn5DdC9yQDw+Fr1p9Kn86/iYlapKJZd
-         cUkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744103615; x=1744708415;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HU3jlfHL29/51vRr+ClhtWxfhwAXBGkQarZA/yxGO2g=;
-        b=YbB4VwWiexxwoQybo4GWAIcg4VxEqjFKSG2TMOgP4iiiZlOjKbMLclDrsWljVhi7iO
-         3tL3z3v+tA4XQ4+JBkGtN1WaGI53frQmgTrfwhmHAaYVbHvadbFbE9vQgkRAJoBE9vd4
-         /n8x2M1ajF5fv6tdlTQKw8AeIrNNst8vMo2m93dGcHSsqZC5HwQyNpK8U0h9vm6ykS5p
-         2DWZ+iZKA02Jm6C2sqDbiazn0/DkqhQ1EkZyddDNkAzeR8Z6WMG/mvSb/+mS4xUpim4L
-         7RwleerV9lOTeD7NpB6TxyO0PHCd3ullCmh495xE1jBWW1ubfVkxKOGmveGe2ECy2AI4
-         /rnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUG75vxQ6Pw4BkNw/MGYeQOOn6yAemZLYE3hCBiJRG2ksrArG3u08GP+Kg5x4v7pfVl3gxYgM8fL59j@vger.kernel.org, AJvYcCXk43BLS65v/6AuuLxrb5Wuuj4VCjWDOj6MRmtkBEF7feAa3hCxndc1nfeGvU5Z2fkMk5+ch4Sc@vger.kernel.org, AJvYcCXyfBSz2QhhMS8IIqpzwSKoi9pbNHwQ7USp3UiNeaFudhd46jsZqCQAIsZ7V+mhKGEMKBjQbZsABLzGF7YU@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyia38hePRBfzh1jchxKL3/4NZ4s46duKqNseyD0wxQLLELaEQL
-	thn8z5zV7XSilnBv3EBGm+ywLnBCcyaZBF7//xiNgB6/AQNzDYqK
-X-Gm-Gg: ASbGncsPAf2xGd9ZK6QgFJ7vESr1i+smBWpkxeZuOZS6BZwPxgD6OwEi8Gkm6xF2Vfk
-	g4/frkrZwio/wOFzBSp+QAXSJjR8JFAk8vVs6LTu0V4FGj09z68q3rrca99i7NLxJy1m6TC7P8d
-	ARns+ZFfxJfrNlxNF7neDqBjFSl9fKupMgftYyhxDYMc5IejxcX36AoyaX9J4HmJqqW2Whdm6Z5
-	ZNRo2jGwf4IspZKxW3BjQGw6i6sS9AcM5JNbT35oqcR/Zo5VSkkWUzxfCLbr2meG/3umsB3rg2S
-	X/ls/VxwmAncVIOeo9bTR8dgd3e3/Jt7BQgXg2Ty9hBtZ/QjJWAI1YtUnmStFhqmS5mbWFyINTq
-	9
-X-Google-Smtp-Source: AGHT+IFmpUD3WDEfYZdyJZMlUcmM3Uz/pG9KD9AKQWX9zm9kiZbZimr4FaqPmFNyWRNVcwv9d/OHeA==
-X-Received: by 2002:a5d:64ce:0:b0:39c:1257:c7a2 with SMTP id ffacd0b85a97d-39cba93d0aemr12569839f8f.58.1744103614388;
-        Tue, 08 Apr 2025 02:13:34 -0700 (PDT)
-Received: from Ansuel-XPS. (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39c301b72d5sm14132111f8f.47.2025.04.08.02.13.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Apr 2025 02:13:33 -0700 (PDT)
-Message-ID: <67f4e8bd.df0a0220.369157.fb3d@mx.google.com>
-X-Google-Original-Message-ID: <Z_ToufQVD2WfPA5t@Ansuel-XPS.>
-Date: Tue, 8 Apr 2025 11:13:29 +0200
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9161264A77;
+	Tue,  8 Apr 2025 09:16:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744103768; cv=pass; b=kP2CgEKLRkbDX/yu8bfk9Fe0vwg2lvnaWWACE1cd9XSM50QKqn/l03jTiF8YF7qJKyAIE765knYromBcXnlopaBdTuY2/lqMLR/jUbK6a2ZQcl0CO1BtSjsMYfMSVoUqnSYTiisoFf9Kmci8hIkbfCBG4g6qyNQrPCTAmbjATUY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744103768; c=relaxed/simple;
+	bh=j06atkAE5GaJghbZbm7QfVldihTFSd3UlHN8BHnQW38=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=WphHL1CGpaMFEyzF7uJI2m3CPfSEkcMv7F88+aVVP53TXY5lGRiXldokRI8K2cfFxEQzjXpZ3pfr0hQaU3yqK3UP4d0siIzCe22n8HwzEc/mjLTBhdBqrwqO0yZMbWFxkq4EL/gqUnujaM8S0klkTF/ti5UCPlHEsAxSBZCLl2Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=outer-limits.org; spf=none smtp.mailfrom=outer-limits.org; dkim=pass (2048-bit key) header.d=outer-limits.org header.i=@outer-limits.org header.b=YKdHt5h5; dkim=permerror (0-bit key) header.d=outer-limits.org header.i=@outer-limits.org header.b=JbWIdq+j; arc=pass smtp.client-ip=85.215.255.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=outer-limits.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=outer-limits.org
+ARC-Seal: i=1; a=rsa-sha256; t=1744103756; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=Lnj/+Ab+BInSFoJPRhY8Ez4a8zIb2BsVZj0QOZzYZO4aGE+W+MWvcsaJNIFDn9DJ1R
+    d0SKg5NrMu3qW1hzBq2JltkhgeH2FrdRr2/aBGFPBkJlcXeShFnSi3fUa8gUTcE4qO6w
+    izhEFXSJ/rf+hrAaKY0lkrjRLberkAPU+vSUfrhhUQVOdhVuQGLuQ0cWh1Cf0A51kHhm
+    3ullM0pmWbYcnvIjSBqlihwGhpUOaCiJIQ3xW9lIe/0bEa0hbPeZ6FLsL9G6XhF9sXgC
+    KwFmqTCLogsfBDkfqE+vsCQpz/aFEIdc+VJ1YIGoIYJ0FIxi7Ij8rzIh13AKmcda4LUI
+    PITg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1744103756;
+    s=strato-dkim-0002; d=strato.com;
+    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=JH7bAes1a5f2oruGiUBDVJZHj7HNc2J4ERrWSVZgLYw=;
+    b=ox7qEDu9c+9pGu9ZFd9UA5D7mA/tDOb6yleh5Yb59PksyDFBKVEXZ4aMm4dTGuGtPW
+    /Bhh9hEB9Me2CSzYFYL3yko6p6IBtRXRed3+Vm6hqGtLwpIkbh/XXRSMHfARiE4uJhuj
+    KpijiiYIMwm7Orh7RZIP2k8t18M/ZAJColUgibootAOGrou6DSHY6LkqX7wm2XaUFyvJ
+    d+H5iDBYwUXLqIUo6ddWezW5i3Lg3gKZ4lg6drhVtFLRejThy5///rHxApmwY4LLNP8i
+    5lVqTIxeBZJ457HxEFmMnFXwhWQrLa7sYwN/WljdpNmkK5aAiTP5k+nkov9zB51lSbtz
+    gAWQ==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1744103756;
+    s=strato-dkim-0002; d=outer-limits.org;
+    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=JH7bAes1a5f2oruGiUBDVJZHj7HNc2J4ERrWSVZgLYw=;
+    b=YKdHt5h5KEWl9jZf78YV6NH1uPcqvkWqZcz5G2L2C4wdPzTBBvvNby1eZk58nEQJfX
+    r++2aLRB2+S/1QY9drnS9+BPuGDJRD/tIbjHmf7GXefHLc1yvDTAdEKdwO5R7ppb9Pdw
+    9njCFRYO/0+DYO7lSpN+JoDpJjbto+Vfr/mNgBxKvd7CeYehhNtsMx2M6Olhq9JXyqih
+    GndiRc2x6EcjhcJ8CblvNAlS44vluUTDLuXt0Gm/O5DS2nyCpy8gd9EdLtY6/erE6tRy
+    zkuuyXacc1aZUbwiRmAhgN2Xp5kXSPwMAjBd/N0p//UfqOwHptRPpChFxvyRDcZprciN
+    otXg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1744103756;
+    s=strato-dkim-0003; d=outer-limits.org;
+    h=Message-Id:Date:Subject:Cc:To:From:Cc:Date:From:Subject:Sender;
+    bh=JH7bAes1a5f2oruGiUBDVJZHj7HNc2J4ERrWSVZgLYw=;
+    b=JbWIdq+ju8+whTyI81mm2OrXkaFXB3HKVsyuzhzMeQzOLqPJAjPbVG+NzZzuNLKe+W
+    yxJu69g/XSw45vLLPEDA==
+X-RZG-AUTH: ":JnkIfEGmW/AMJS6HttH4FbRVwc4dHlPLCp4e/IoHo8zEMMHAgwTfqBEHcVJSv9P5mRTGd2ImeA=="
+Received: from ws2104.lan.kalrayinc.com
+    by smtp.strato.de (RZmta 51.3.0 AUTH)
+    with ESMTPSA id J2b1101389FtX7t
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Tue, 8 Apr 2025 11:15:55 +0200 (CEST)
+From: Julian Vetter <julian@outer-limits.org>
+To: Arnd Bergmann <arnd@arndb.de>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH v13 13/14] net: dsa: Add Airoha AN8855 5-Port
- Gigabit DSA Switch driver
-References: <20250315154407.26304-1-ansuelsmth@gmail.com>
- <20250315154407.26304-14-ansuelsmth@gmail.com>
- <20250318151540.4rmw6jj5hh2rp4b4@skbuf>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Julian Vetter <julian@outer-limits.org>
+Subject: [PATCH] net: remove __get_unaligned_cpu32 from macvlan driver
+Date: Tue,  8 Apr 2025 11:15:48 +0200
+Message-Id: <20250408091548.2263911-1-julian@outer-limits.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250318151540.4rmw6jj5hh2rp4b4@skbuf>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Mar 18, 2025 at 05:15:40PM +0200, Vladimir Oltean wrote:
-> On Sat, Mar 15, 2025 at 04:43:53PM +0100, Christian Marangi wrote:
-> > +/* Similar to MT7530 also trap link local frame and special frame to CPU */
-> > +static int an8855_trap_special_frames(struct an8855_priv *priv)
-> > +{
-> > +	int ret;
-> > +
-> > +	/* Trap BPDUs to the CPU port(s) and egress them
-> > +	 * VLAN-untagged.
-> > +	 */
-> > +	ret = regmap_update_bits(priv->regmap, AN8855_BPC,
-> > +				 AN8855_BPDU_BPDU_FR | AN8855_BPDU_EG_TAG |
-> > +				 AN8855_BPDU_PORT_FW,
-> > +				 AN8855_BPDU_BPDU_FR |
-> > +				 FIELD_PREP(AN8855_BPDU_EG_TAG, AN8855_VLAN_EG_UNTAGGED) |
-> > +				 FIELD_PREP(AN8855_BPDU_PORT_FW, AN8855_BPDU_CPU_ONLY));
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	/* Trap 802.1X PAE frames to the CPU port(s) and egress them
-> > +	 * VLAN-untagged.
-> > +	 */
-> > +	ret = regmap_update_bits(priv->regmap, AN8855_PAC,
-> > +				 AN8855_PAE_BPDU_FR | AN8855_PAE_EG_TAG |
-> > +				 AN8855_PAE_PORT_FW,
-> > +				 AN8855_PAE_BPDU_FR |
-> > +				 FIELD_PREP(AN8855_PAE_EG_TAG, AN8855_VLAN_EG_UNTAGGED) |
-> > +				 FIELD_PREP(AN8855_PAE_PORT_FW, AN8855_BPDU_CPU_ONLY));
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	/* Trap frames with :01 MAC DAs to the CPU port(s) and egress
-> > +	 * them VLAN-untagged.
-> > +	 */
-> > +	ret = regmap_update_bits(priv->regmap, AN8855_RGAC1,
-> > +				 AN8855_R01_BPDU_FR | AN8855_R01_EG_TAG |
-> > +				 AN8855_R01_PORT_FW,
-> > +				 AN8855_R01_BPDU_FR |
-> > +				 FIELD_PREP(AN8855_R01_EG_TAG, AN8855_VLAN_EG_UNTAGGED) |
-> > +				 FIELD_PREP(AN8855_R01_PORT_FW, AN8855_BPDU_CPU_ONLY));
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	/* Trap frames with :02 MAC DAs to the CPU port(s) and egress
-> > +	 * them VLAN-untagged.
-> > +	 */
-> > +	ret = regmap_update_bits(priv->regmap, AN8855_RGAC1,
-> > +				 AN8855_R02_BPDU_FR | AN8855_R02_EG_TAG |
-> > +				 AN8855_R02_PORT_FW,
-> > +				 AN8855_R02_BPDU_FR |
-> > +				 FIELD_PREP(AN8855_R02_EG_TAG, AN8855_VLAN_EG_UNTAGGED) |
-> > +				 FIELD_PREP(AN8855_R02_PORT_FW, AN8855_BPDU_CPU_ONLY));
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	/* Trap frames with :03 MAC DAs to the CPU port(s) and egress
-> > +	 * them VLAN-untagged.
-> > +	 */
-> > +	ret = regmap_update_bits(priv->regmap, AN8855_RGAC1,
-> > +				 AN8855_R03_BPDU_FR | AN8855_R03_EG_TAG |
-> > +				 AN8855_R03_PORT_FW,
-> > +				 AN8855_R03_BPDU_FR |
-> > +				 FIELD_PREP(AN8855_R03_EG_TAG, AN8855_VLAN_EG_UNTAGGED) |
-> > +				 FIELD_PREP(AN8855_R03_PORT_FW, AN8855_BPDU_CPU_ONLY));
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	/* Trap frames with :0E MAC DAs to the CPU port(s) and egress
-> > +	 * them VLAN-untagged.
-> > +	 */
-> > +	return regmap_update_bits(priv->regmap, AN8855_RGAC1,
-> > +				  AN8855_R0E_BPDU_FR | AN8855_R0E_EG_TAG |
-> > +				  AN8855_R0E_PORT_FW,
-> > +				  AN8855_R0E_BPDU_FR |
-> > +				  FIELD_PREP(AN8855_R0E_EG_TAG, AN8855_VLAN_EG_UNTAGGED) |
-> > +				  FIELD_PREP(AN8855_R0E_PORT_FW, AN8855_BPDU_CPU_ONLY));
-> > +}
-> 
-> Is there a way in which you could group the registers a bit more?
-> The function occupies 2 screens :-/
->
+The __get_unaligned_cpu32 function is deprecated. So, replace it with
+the more generic get_unaligned and just cast the input parameter.
 
-I will use local variable and pack it.
+Signed-off-by: Julian Vetter <julian@outer-limits.org>
+---
+ drivers/net/macvlan.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> There are 4 read-modify-write operations in succession to the RGAC1
-> register. Maybe you can converge them into a single regmap_update_bits()
-> call.
-> 
-> Also, for packets which reach the CPU via a trap, we shouldn't set
-> skb->offload_fwd_mark = 1. In other words, if the bridge layer wants to
-> forward them in software (including to other an8855 ports), let it do so.
-> The common example given in commit 515853ccecc6 ("bridge: allow
-> forwarding some link local frames") is 802.1X PAE (01-80-C2-00-00-03).
-> 
-> I notice mtk_tag_rcv() calls dsa_default_offload_fwd_mark() with no
-> pre-condition. Do you know whether there exists any bit in the RX tag
-> which signifies whether the packet was received because of a trap
-> (or if it was autonomously forwarded by the switch to the other bridge
-> ports as well)? The offload_fwd_mark bit should be set based on
-> something like that.
-
-
-I did some simulation checking the full tag and also yesterday Airoha
-confirmed that those register doesn't affect the CPU tag.
-
-There is an entry in the TAG that signal some kind of packet but it
-doesn't react. From what I can see it only comunicate when fdb or other
-really special thing.
-
+diff --git a/drivers/net/macvlan.c b/drivers/net/macvlan.c
+index d0dfa6bca6cc..7045b1d58754 100644
+--- a/drivers/net/macvlan.c
++++ b/drivers/net/macvlan.c
+@@ -254,7 +254,7 @@ static u32 macvlan_hash_mix(const struct macvlan_dev *vlan)
+ static unsigned int mc_hash(const struct macvlan_dev *vlan,
+ 			    const unsigned char *addr)
+ {
+-	u32 val = __get_unaligned_cpu32(addr + 2);
++	u32 val = get_unaligned((u32 *)(addr + 2));
+ 
+ 	val ^= macvlan_hash_mix(vlan);
+ 	return hash_32(val, MACVLAN_MC_FILTER_BITS);
 -- 
-	Ansuel
+2.34.1
+
 
