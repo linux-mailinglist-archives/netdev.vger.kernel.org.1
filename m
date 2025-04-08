@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-180399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 229E8A81349
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 19:12:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EC65A81351
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 19:15:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DA951BA6D31
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 17:13:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F26ED1BA6D51
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 17:15:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05EEF2356C2;
-	Tue,  8 Apr 2025 17:12:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="JG3m4znX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7811222FF4D;
+	Tue,  8 Apr 2025 17:14:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0875223024C;
-	Tue,  8 Apr 2025 17:12:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B14B191F79;
+	Tue,  8 Apr 2025 17:14:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744132372; cv=none; b=YJu8OccKPFGAMMn+J5VmxTVioEX5M58SMEPNohlu3qd0PTnmHDBn08S2Ep1znB1GphZouEBW0ebJxuy6w5OsqyVUuO+vQhy00CSgx/4z4q4tTSN1Cd+UcuB8IDSk8oKs1L3ngzcxM9DzVWkBzi1Jc+UEZ5kc0TOzPYRdU5GDtWI=
+	t=1744132497; cv=none; b=KbnoOceYT49FkgKqIIfuMcNMcNda+sZ7YcCZDwVtO/oddFXJVAsweD8HD71OUqrEI2nCNHrU8UYzwxQ/O3PRt+yZYRO9viqB7R5Tts3kjhtuCs2KokGuphtScbIDipEvBdcouAmEN1ZVPC/zgFdV+d3Unc45xTsM9QGQ745Nkn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744132372; c=relaxed/simple;
-	bh=Pj34+P8socyPgDvsKTOjkxt1ShfPBwPzx2cS+bfx3+8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=spciSKqeLq7nJ0FC0P2hnuvwLkfcTRlsy33yQrB7+7pLQlKPMMrQSnEeSW3WKwkjCj+PeLVtaG6uCAKQewRmN1phfkQ1pSUKmJTbn6AHQoO+UtJj5jqLnjt55YYyHlHZ2jvvE0Ie5CDrP2krUiFsHI8gNIMFjUUpPG6i649G4rI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=JG3m4znX; arc=none smtp.client-ip=52.95.49.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1744132372; x=1775668372;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=KiccT77guSl05qwq/f8E1x1Iwhvgdns3YBbXrIazhCo=;
-  b=JG3m4znXJR1B+uHXHOaXqgN2TtbUD2mGflo29pSaSmCARhyqY/o1ct2o
-   /Zb/eKaQ7TGbfi8BjKmpKMubfU0/vtPRH6yR3qLio/EDucwAgWM2Jh6Cy
-   Pca6g20R1p6DN7xfCpt4ksRz4WJVb6ziE6K+ypsJQigynLdMyguWU8MUO
-   s=;
-X-IronPort-AV: E=Sophos;i="6.15,198,1739836800"; 
-   d="scan'208";a="487678219"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2025 17:12:48 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:13538]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.47.159:2525] with esmtp (Farcaster)
- id c75f37ee-019c-4161-b594-54f7ed1f0739; Tue, 8 Apr 2025 17:12:47 +0000 (UTC)
-X-Farcaster-Flow-ID: c75f37ee-019c-4161-b594-54f7ed1f0739
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 8 Apr 2025 17:12:45 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.100.5) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 8 Apr 2025 17:12:40 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <leitao@debian.org>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<horms@kernel.org>, <kernel-team@meta.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
-	<linux-trace-kernel@vger.kernel.org>, <mathieu.desnoyers@efficios.com>,
-	<mhiramat@kernel.org>, <ncardwell@google.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <rostedt@goodmis.org>, <song@kernel.org>,
-	<yonghong.song@linux.dev>
-Subject: Re: [PATCH net-next v2 2/2] trace: tcp: Add tracepoint for tcp_sendmsg_locked()
-Date: Tue, 8 Apr 2025 10:12:14 -0700
-Message-ID: <20250408171231.35951-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <Z/VWUVk+mHXTENms@gmail.com>
-References: <Z/VWUVk+mHXTENms@gmail.com>
+	s=arc-20240116; t=1744132497; c=relaxed/simple;
+	bh=jcyK2mN7KL6A10vMwCASXq/OxRL74veeQ/dmNNMAYtQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oMNxVKlg3ZLOv3weqJRYc1QtnauhPvtSyIqZ6asoDUXjCEIuLFoVbNoPwtKRAnmPSeZp4tDuYblTLh0RA9z1PhGp6J35eseBBULvgfND4RkoDjJLYyER+kQoVo/qd10MmQ8PXoBdeUWHE0ZKCs4AHUKE27d0LjXK2oa+1vSrKpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-22580c9ee0aso64127225ad.2;
+        Tue, 08 Apr 2025 10:14:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744132494; x=1744737294;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AW5WeJLIZtIq8T9byhQyeBBnS+bdUWcEU8FgEy7dvi0=;
+        b=OtI1nQ9d+LCoRF4rt3RgkRzxg3KoZoXRSic/Xu87nDPJOsJjyUkcuxvReML/JXh90Y
+         /AXi+94MAxt1/hwlv5XNBdq1oEki4asmc6dbIGryWF+6athU4qiWeubuIcbanplnpku8
+         JsudhSNW5zZ3MkGmuRII5EE5T2zx+BjukDfDv/FrmHQVyThoKL+vAdUBmolDtsxm26ar
+         SOwMlvq6Be7ZV7ygspv8+cZjzb7jEMFvGaKxqPEQABE5AsSZiaCtDAADBbzrcSVxk6U+
+         jrcn6omA4kGQknv53keeSsG/0OY8TrbuYXvhcefTjQwAJ70xanZLG47X68alo1RBqZ5c
+         gLeA==
+X-Forwarded-Encrypted: i=1; AJvYcCXuidifYiYOc7sxoWJ8cfTgNvOKjQl2m0ZbRx3bZ5axkTxqQMa3Q7A5gUoa6K+CLk0TAr2LAnEgLo6pQC8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhiAZeDCGZhTCw3LesQeylGkPj5+im4kRF6hw4LaKOBFGoPq86
+	aJmEQNJkJ/dNd7AsVH8xpsczabQwCNLSDYJS4CjIRaPUmqnlVHvaqbn6
+X-Gm-Gg: ASbGncv/BZP2QwJep04bWlwWO+WkSRtQ5bjhR+y7+gf2jv+4MJqe1IftxGFcnnU7CP3
+	syJLLgRrGY9d0JwVRTutU05gkTzaOLZ8gDoVVUW58oYJpT6K29bMZ83RIZS6lnHK8NqGiUMwA4P
+	ad09s05ijEVUELZI8b+BPjfu1yAyl/dk3R8BwuX9iGkQwWHcEGgeGNY74wS5svfjndBUutzW4tu
+	f2KoulGxloezS45scpSzWbCv++0xNLkSpjziuyO9FhtHbb2pdA12v3KHN+ju3bygMhy0EAI7uKE
+	RMARcqzDGVOs2kVAkLCOCWQ4WKbGRrX2507qkRzoqY9b
+X-Google-Smtp-Source: AGHT+IE6rpUteQ6/c4exxF09OpehWY2Hv9kpbP0+sLAH3pLaunBDR4/hyikJ8JyzkiV/Sq847v+J1A==
+X-Received: by 2002:a17:902:cf07:b0:223:f9a4:3f99 with SMTP id d9443c01a7336-22ac29c19f4mr449465ad.29.1744132493955;
+        Tue, 08 Apr 2025 10:14:53 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-2297866e161sm102717155ad.171.2025.04.08.10.14.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Apr 2025 10:14:53 -0700 (PDT)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jv@jvosburgh.net,
+	andrew+netdev@lunn.ch,
+	sdf@fomichev.me,
+	linux-kernel@vger.kernel.org,
+	syzbot+48c14f61594bdfadb086@syzkaller.appspotmail.com
+Subject: [PATCH net] bonding: hold ops lock around get_link
+Date: Tue,  8 Apr 2025 10:14:51 -0700
+Message-ID: <20250408171451.2278366-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,65 +79,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D033UWA004.ant.amazon.com (10.13.139.85) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Breno Leitao <leitao@debian.org>
-Date: Tue, 8 Apr 2025 10:01:05 -0700
-> On Tue, Apr 08, 2025 at 09:16:51AM -0600, David Ahern wrote:
-> > On 4/8/25 8:27 AM, Breno Leitao wrote:
-> > > 
-> > > 	SEC("tracepoint/tcp/tcp_sendmsg_locked")
-> > 
-> > Try `raw_tracepoint/tcp/tcp_sendmsg_locked`.
-> > 
-> > This is the form I use for my tracepoint based packet capture (not tied
-> > to this tracepoint, but traces inside our driver) and it works fine.
-> 
-> Thanks. I was not able to get this crashing as well. In fact, the
-> following program fails to be loaded:
-> 
-> 	SEC("raw_tracepoint/tcp/tcp_sendmsg_locked")
+syzbot reports a case of ethtool_ops->get_link being called without
+ops lock:
 
-Try SEC("tp_btf/tcp_sendmsg_locked") and access the raw argument
-(struct sk_buff *skb) instead of bpf_raw_tracepoint_args.
+ ethtool_op_get_link+0x15/0x60 net/ethtool/ioctl.c:63
+ bond_check_dev_link+0x1fb/0x4b0 drivers/net/bonding/bond_main.c:864
+ bond_miimon_inspect drivers/net/bonding/bond_main.c:2734 [inline]
+ bond_mii_monitor+0x49d/0x3170 drivers/net/bonding/bond_main.c:2956
+ process_one_work kernel/workqueue.c:3238 [inline]
+ process_scheduled_works+0xac3/0x18e0 kernel/workqueue.c:3319
+ worker_thread+0x870/0xd50 kernel/workqueue.c:3400
+ kthread+0x7b7/0x940 kernel/kthread.c:464
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
 
-The original report used it and I was able to reproduce it
-at that time.
+Commit 04efcee6ef8d ("net: hold instance lock during NETDEV_CHANGE")
+changed to lockless __linkwatch_sync_dev in ethtool_op_get_link.
+All paths except bonding are coming via locked ioctl. Add necessary
+locking to bonding.
 
-https://lore.kernel.org/netdev/Z50zebTRzI962e6X@debian.debian/
+Reported-by: syzbot+48c14f61594bdfadb086@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=48c14f61594bdfadb086
+Fixes: 04efcee6ef8d ("net: hold instance lock during NETDEV_CHANGE")
+Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+---
+ drivers/net/bonding/bond_main.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 950d8e4d86f8..d1ec5ec6f7e5 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -850,8 +850,9 @@ static int bond_check_dev_link(struct bonding *bond,
+ 			       struct net_device *slave_dev, int reporting)
+ {
+ 	const struct net_device_ops *slave_ops = slave_dev->netdev_ops;
+-	struct ifreq ifr;
+ 	struct mii_ioctl_data *mii;
++	struct ifreq ifr;
++	int ret;
+ 
+ 	if (!reporting && !netif_running(slave_dev))
+ 		return 0;
+@@ -860,9 +861,14 @@ static int bond_check_dev_link(struct bonding *bond,
+ 		return netif_carrier_ok(slave_dev) ? BMSR_LSTATUS : 0;
+ 
+ 	/* Try to get link status using Ethtool first. */
+-	if (slave_dev->ethtool_ops->get_link)
+-		return slave_dev->ethtool_ops->get_link(slave_dev) ?
++	if (slave_dev->ethtool_ops->get_link) {
++		netdev_lock_ops(slave_dev);
++		ret = slave_dev->ethtool_ops->get_link(slave_dev) ?
+ 			BMSR_LSTATUS : 0;
++		netdev_unlock_ops(slave_dev);
++
++		return ret;
++	}
+ 
+ 	/* Ethtool can't be used, fallback to MII ioctls. */
+ 	if (slave_ops->ndo_eth_ioctl) {
+-- 
+2.49.0
 
-> 	int bpf_tcp_sendmsg_locked(struct bpf_raw_tracepoint_args *ctx)
-> 	{
-> 		void *skb_addr = (void *) ctx->args[0];
-> 
-> 		bpf_printk("deref %d\n", *(int *) skb_addr);
-> 
-> 		return 0;
-> 	}
-> 
-> libbpf refuses to load it, and drumps:
-> 
-> 	libbpf: prog 'bpf_tcp_sendmsg_locked': BPF program load failed: Permission denied
-> 	libbpf: prog 'bpf_tcp_sendmsg_locked': -- BEGIN PROG LOAD LOG --
-> 	0: R1=ctx() R10=fp0
-> 	; void *skb_addr = (void *) ctx->args[0]; @ tcp_sendmsg_locked_bpf.c:18
-> 	0: (79) r1 = *(u64 *)(r1 +0)          ; R1_w=scalar()
-> 	; bpf_printk("deref %d\n", *(int *) skb_addr); @ tcp_sendmsg_locked_bpf.c:20
-> 	1: (61) r3 = *(u32 *)(r1 +0)
-> 	R1 invalid mem access 'scalar'
-> 	processed 2 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
-> 	-- END PROG LOAD LOG --
-> 	libbpf: prog 'bpf_tcp_sendmsg_locked': failed to load: -13
-> 	libbpf: failed to load object 'tcp_sendmsg_locked_bpf.o'
-> 	Failed to load BPF object: -13
-> 
-> > As suggested, you might need to update raw_tp_null_args
-> 
-> Thanks for confirming it. I will update raw_tp_null_args, assuming that
-> the problem exists but I am failing to reproduce it.
-> 
-> I will send an updated version soon.
 
