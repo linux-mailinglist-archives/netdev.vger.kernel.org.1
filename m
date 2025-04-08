@@ -1,165 +1,160 @@
-Return-Path: <netdev+bounces-180424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87A6EA8147A
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 20:22:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F6E7A8147D
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 20:23:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA398885AA1
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 18:22:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D7B188627C
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 18:22:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56D6323E333;
-	Tue,  8 Apr 2025 18:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEEA823E35C;
+	Tue,  8 Apr 2025 18:22:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bzy5346g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c9i/LVkB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 546A522D4E3;
-	Tue,  8 Apr 2025 18:21:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A608823E34D;
+	Tue,  8 Apr 2025 18:22:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744136497; cv=none; b=bRD+TLmP6MFC4N6PSMPAOdqYRIf0py7jOuq92tQKc0n3+OnGx3kcilmrBseBPYWyQrniPUKGkQdMy9APE3CLj3xqp5WOBK40HUg/tyhXJhqkseqvURD8gr1Q4PWcBOCuwd/pJ4gKO5PYGrN93zCE9MY0l+WQZUJ3oBmCpjCPBe8=
+	t=1744136528; cv=none; b=ahz1Sb8tjXKKmzrKCBuDODm1VS3yW/10yzOhG7aQ0Gnalnq447CDfoqvfYUpY/0jqkzuLuMOzEpxMWwaylNvqiTIEFikdma4stT5WgfIoQomCNCIxBIl2cz5Wrp0Z5rHi4cVhv2AjFcgko6uq3RA+YUm2vPwo9um2TGz9pBgV2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744136497; c=relaxed/simple;
-	bh=w/wtZwp4S+W1MVCbnnYE1DIpmI5YnNFyH4JdLkLeeH4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p1Rj5Za2eBj5k9KSMfJiGHKfaf8TRkKv5Nly/s9R3BGdML5RcZz4HP96te+E+MqWMAplOGs4X0KkZoS3KMUjPZFT4sNhoyFV7lVrEdeXo73YlrgWoNBAhU1CUVBzgqQxudJZMx1YkMwthKOv4PaR7J+RNfGIEY5g8nrBKyw+zRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=bzy5346g; arc=none smtp.client-ip=52.95.49.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1744136496; x=1775672496;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=OEXDD2pAHOlDSkU4MwJdAg7iSPu5cX3tXDgUUdSq4cc=;
-  b=bzy5346gCm2AZlQJjWfYMUEo1Wzc8tSNzTCdNe/tzGbsLvro8faLlh4l
-   pSLp17RncebiuZFgC6HlDvvhkCoL7l4G24XYX49ootbfpMgFABqUM9d3B
-   Ej9HGwDan1QjcbD/n8mdqEZrz22CJjo174ZtpNhr62UhKol4/DQonPjiN
-   g=;
-X-IronPort-AV: E=Sophos;i="6.15,198,1739836800"; 
-   d="scan'208";a="487699298"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2025 18:21:30 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:12463]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.132:2525] with esmtp (Farcaster)
- id b5d6e786-97b8-4ca7-acd1-d064dc9b4553; Tue, 8 Apr 2025 18:21:29 +0000 (UTC)
-X-Farcaster-Flow-ID: b5d6e786-97b8-4ca7-acd1-d064dc9b4553
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 8 Apr 2025 18:21:27 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.100.5) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 8 Apr 2025 18:21:24 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <zijun_hu@icloud.com>
-CC: <dada1@cosmosbay.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <quic_zijuhu@quicinc.com>, <willemb@google.com>,
-	<xemul@openvz.org>
-Subject: Re: [PATCH net-next] sock: Correct error checking condition for assign|release_proto_idx()
-Date: Tue, 8 Apr 2025 11:21:14 -0700
-Message-ID: <20250408182116.45882-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250408-fix_net-v1-1-375271a79c11@quicinc.com>
-References: <20250408-fix_net-v1-1-375271a79c11@quicinc.com>
+	s=arc-20240116; t=1744136528; c=relaxed/simple;
+	bh=eafZhOICJ+cb3LT7pXsw6UGWPAlqO78ao+HmwjWd90Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tTklcczSLvnVgQEO34H8Eyme8pM+dqqQFaJPmsfflGyekz2g/TlPT3zUxSRAF2FWhIW9FPy27805rT85+taYDVQOqy9APZ/AqJDSMVTZyynVhfW3v9AuQGRwAdTPerL2TD6yvRw7KJTEbwjPCTnly9CM/e3Qq4Z2eaI60nTX7B4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c9i/LVkB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C0E7C4CEE5;
+	Tue,  8 Apr 2025 18:22:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744136528;
+	bh=eafZhOICJ+cb3LT7pXsw6UGWPAlqO78ao+HmwjWd90Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=c9i/LVkBf6jcyfpfF8IVa5VHgrOvgQJScpcymB3yyefit9ZzSOwJzDGjuX7GiizhW
+	 vRs/Ii4xsMvttvOAXRC061cVo+kcLCoJVEcKxpJjWu4yprAI0CaNifaYhj54ba3DUa
+	 7rXmlEe3a1GkTpoyaOnUvCwVcCEqib5YZiH6LYg7CHVg4KiUCsUMIPAwfkTDm2p+Yn
+	 1CiQN2nD9bsduyfKq+1MGXAHy59IXz2xu2T7I1L9IF9hVilS2wlMQova/1aY/SFGIj
+	 h6o5IKEinpVlC8ob9iUw+FQs7ZsMKkRDFUeJ0VH5VbJ5x/+CU55UG4x2n7icn69uBK
+	 kxn1c6E3ttheA==
+Date: Tue, 8 Apr 2025 19:22:03 +0100
+From: Simon Horman <horms@kernel.org>
+To: Baris Can Goral <goralbaris@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	allison.henderson@oracle.com, skhan@linuxfoundation.org,
+	linux-rdma@vger.kernel.org
+Subject: Re: [PATCH] net: rds transform strncpy to strscpy
+Message-ID: <20250408182203.GH395307@horms.kernel.org>
+References: <20250407183052.8763-1-goralbaris@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D032UWA002.ant.amazon.com (10.13.139.81) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250407183052.8763-1-goralbaris@gmail.com>
 
-From: Zijun Hu <zijun_hu@icloud.com>
-Date: Tue, 08 Apr 2025 21:42:34 +0800
-> From: Zijun Hu <quic_zijuhu@quicinc.com>
-> 
-> assign|release_proto_idx() wrongly check find_first_zero_bit() failure
-> by condition '(prot->inuse_idx == PROTO_INUSE_NR - 1)' obviously.
-> 
-> Fix by correcting the condition to '(prot->inuse_idx == PROTO_INUSE_NR)'
-> Also check @->inuse_idx before accessing @->val[] to avoid OOB.
-> 
-> Fixes: 13ff3d6fa4e6 ("[SOCK]: Enumerate struct proto-s to facilitate percpu inuse accounting (v2).")
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
++ linux-rdma@vger.kernel.org
+
+Hi Baris,
+
+On Mon, Apr 07, 2025 at 09:30:53PM +0300, Baris Can Goral wrote:
+> Hi,
+
+It's nice to be friendly, but I don't think a salutation
+belongs in a commit message. (Please remove the line above.)
+
+> The strncpy() function is actively dangerous to use since it may not
+> NULL-terminate the destination string,resulting in potential memory
+
+Space after the comma (,) please.
+
+> content exposures, unbounded reads, or crashes.
+
+I think there should be a blank like before the Link tag.
+
+> Link:https://github.com/KSPP/linux/issues/90
+
+But not between it and other tags.
+
+Also, there should be a space after "Link:"
+
+Link: https://github.com/KSPP/linux/issues/90
+> Signed-off-by: Baris Can Goral <goralbaris@gmail.com>
 > ---
->  include/net/sock.h | 5 ++++-
->  net/core/sock.c    | 7 +++++--
->  2 files changed, 9 insertions(+), 3 deletions(-)
+>  net/rds/connection.c | 4 ++--
+>  net/rds/stats.c      | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/include/net/sock.h b/include/net/sock.h
-> index 8daf1b3b12c607d81920682139b53fee935c9bb5..9ece93a3dd044997276b0fa37dddc7b5bbdacc43 100644
-> --- a/include/net/sock.h
-> +++ b/include/net/sock.h
-> @@ -1421,7 +1421,10 @@ struct prot_inuse {
->  static inline void sock_prot_inuse_add(const struct net *net,
->  				       const struct proto *prot, int val)
->  {
-> -	this_cpu_add(net->core.prot_inuse->val[prot->inuse_idx], val);
-> +	unsigned int idx = prot->inuse_idx;
-> +
-> +	if (likely(idx < PROTO_INUSE_NR))
-> +		this_cpu_add(net->core.prot_inuse->val[idx], val);
+> diff --git a/net/rds/connection.c b/net/rds/connection.c
+> index c749c5525b40..fb2f14a1279a 100644
+> --- a/net/rds/connection.c
+> +++ b/net/rds/connection.c
+> @@ -749,7 +749,7 @@ static int rds_conn_info_visitor(struct rds_conn_path *cp, void *buffer)
+>  	cinfo->laddr = conn->c_laddr.s6_addr32[3];
+>  	cinfo->faddr = conn->c_faddr.s6_addr32[3];
+>  	cinfo->tos = conn->c_tos;
+> -	strncpy(cinfo->transport, conn->c_trans->t_name,
+> +	strscpy(cinfo->transport, conn->c_trans->t_name,
+>  		sizeof(cinfo->transport));
 
-How does the else case happen ?
+I agree that strscpy() is appropriate as we want null termination
+but not padding.
 
+Because the destination, cinfo->transport, is an array I believe
+we can omit passing the size argument to strscpy, like this:
 
->  }
+	strscpy(cinfo->transport, conn->c_trans->t_name);
+
+Link: https://docs.kernel.org/core-api/kernel-api.html#c.strscpy
+
+>  	cinfo->flags = 0;
 >  
->  static inline void sock_inuse_add(const struct net *net, int val)
-> diff --git a/net/core/sock.c b/net/core/sock.c
-> index 323892066def8ba517ff59f98f2e4ab47edd4e63..92f4618c576a3120bcc8e9d03d36738b77447360 100644
-> --- a/net/core/sock.c
-> +++ b/net/core/sock.c
-> @@ -3948,6 +3948,9 @@ int sock_prot_inuse_get(struct net *net, struct proto *prot)
->  	int cpu, idx = prot->inuse_idx;
->  	int res = 0;
->  
-> +	if (unlikely(idx >= PROTO_INUSE_NR))
+> @@ -775,7 +775,7 @@ static int rds6_conn_info_visitor(struct rds_conn_path *cp, void *buffer)
+>  	cinfo6->next_rx_seq = cp->cp_next_rx_seq;
+>  	cinfo6->laddr = conn->c_laddr;
+>  	cinfo6->faddr = conn->c_faddr;
+> -	strncpy(cinfo6->transport, conn->c_trans->t_name,
+> +	strscpy(cinfo6->transport, conn->c_trans->t_name,
+>  		sizeof(cinfo6->transport));
+>  	cinfo6->flags = 0;
 
-Same here.
+Ditto.
 
+>  
+> diff --git a/net/rds/stats.c b/net/rds/stats.c
+> index 9e87da43c004..63c34dbdf97f 100644
+> --- a/net/rds/stats.c
+> +++ b/net/rds/stats.c
+> @@ -89,7 +89,7 @@ void rds_stats_info_copy(struct rds_info_iterator *iter,
+>  
+>  	for (i = 0; i < nr; i++) {
+>  		BUG_ON(strlen(names[i]) >= sizeof(ctr.name));
+> -		strncpy(ctr.name, names[i], sizeof(ctr.name) - 1);
+> +		strscpy(ctr.name, names[i], sizeof(ctr.name) - 1);
+>  		ctr.name[sizeof(ctr.name) - 1] = '\0';
+>  		ctr.value = values[i];
 
-> +		return 0;
-> +
->  	for_each_possible_cpu(cpu)
->  		res += per_cpu_ptr(net->core.prot_inuse, cpu)->val[idx];
->  
-> @@ -3999,7 +4002,7 @@ static int assign_proto_idx(struct proto *prot)
->  {
->  	prot->inuse_idx = find_first_zero_bit(proto_inuse_idx, PROTO_INUSE_NR);
->  
-> -	if (unlikely(prot->inuse_idx == PROTO_INUSE_NR - 1)) {
-> +	if (unlikely(prot->inuse_idx == PROTO_INUSE_NR)) {
->  		pr_err("PROTO_INUSE_NR exhausted\n");
->  		return -ENOSPC;
->  	}
-> @@ -4010,7 +4013,7 @@ static int assign_proto_idx(struct proto *prot)
->  
->  static void release_proto_idx(struct proto *prot)
->  {
-> -	if (prot->inuse_idx != PROTO_INUSE_NR - 1)
-> +	if (prot->inuse_idx != PROTO_INUSE_NR)
->  		clear_bit(prot->inuse_idx, proto_inuse_idx);
->  }
->  #else
-> 
-> ---
-> base-commit: 34a07c5b257453b5fcadc2408719c7b075844014
-> change-id: 20250405-fix_net-3e8364d302ff
-> 
-> Best regards,
-> -- 
-> Zijun Hu <quic_zijuhu@quicinc.com>
+This issue appears to have been addressed by
+commit c451715d78e3 ("net/rds: Replace deprecated strncpy() with strscpy_pad()")
+
+As a Networking patch please make sure it is based on the net-next tree and
+targeted at that tree like this:
+
+  Subject: [PATCH net-next v2] ...
+
+Or the net tree if it is a big fix, which this patch isn't.
+
+Please consider posting a v2 patch to address the above.
+And please consider CCing linux-rdma@vger.kernel.org on v2.
+
+-- 
+pw-bot: changes-requested
 
