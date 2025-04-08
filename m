@@ -1,91 +1,91 @@
-Return-Path: <netdev+bounces-180030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAAE4A7F2AD
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 04:31:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94A57A7F2B8
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 04:34:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93B5B16F3D3
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 02:31:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E2C37A629D
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 02:33:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E07B2262A6;
-	Tue,  8 Apr 2025 02:31:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E384E2356AE;
+	Tue,  8 Apr 2025 02:34:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="SXCF9r1m"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="lK2e8Tx5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DA9BDDD3
-	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 02:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453011A7045
+	for <netdev@vger.kernel.org>; Tue,  8 Apr 2025 02:34:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744079480; cv=none; b=AJhsF34EoLCS7dFI0FVCthQO2Z8Rbo7gRCxTgvyjpORBaLC2VSmaL9n/SSiMTgu2ILmU5+21C3WJUwFbSdQ8NB3qfzzrFCqlfoOp2du18ZrKihloA39v1tRRVc46fSbCF8wd0BbER2aYtYxUiI9hoobZdZoHO6QHtzEumhVUiqM=
+	t=1744079679; cv=none; b=Ud4PrpK1BFIhnNyImTVxMx7wt0LCUY9y8CEZ1LOEnXhKLke14ylsDxfoebp05x4m7AyMHoiIwHZleh9fOzneYxoydvsii0AmAbQS2wamOs7OGRBBsYerF+yKkh2Zu7EG0jMnNJhNjg9VEiv9icmihT+w2mirl0H6aizozI+D2WQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744079480; c=relaxed/simple;
-	bh=jsmJQwy0Z1C1LBAwO/FD1pvbESA9uRz+FYmlFLMqtXI=;
+	s=arc-20240116; t=1744079679; c=relaxed/simple;
+	bh=n1EBPwm6oHt/kqJqj89iNLfrch0xyCl6t5b7nlGhkWM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b1G8FrjgxJIjyxNFYi8cBvQG9+dIEJbjb9EZAyac2lMzcGPgwxpHtMAg3u/0KJ5+m5K8+0xVdVeCN0gQ98LLYAS7wM+tHItkO+unKyJb91mYnepAGrfi6jkqndCBM+oFtsoXJMhhRTuZ/RmkYhLdubhFNI2kfgXVynGcFvaAi+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=SXCF9r1m; arc=none smtp.client-ip=209.85.215.171
+	 Content-Type:Content-Disposition:In-Reply-To; b=qfHJGitfIZBYhEH/K9g/tKulTdYPCma8vm7AuqI80N5Pz2fHakuPLbF/z/3E5/m+rlLcTOP6rphJeOoVdSimdZtWkWRfK738jS1R+jXCXWw7HP4o1gWQI2WmXRn4qGnmDoVEFf1JsLuvdRxXWRW+w9lYwF3dvRQPVT+4vZIHxw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=lK2e8Tx5; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-af51e820336so4712899a12.1
-        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 19:31:19 -0700 (PDT)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-225df540edcso60110865ad.0
+        for <netdev@vger.kernel.org>; Mon, 07 Apr 2025 19:34:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1744079478; x=1744684278; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1744079677; x=1744684477; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Qa1TnvGYMauUMWyZcz7/o2Egu7BWLDt3zJ0t+wJXCTM=;
-        b=SXCF9r1m3R7ShEEjFArR27QZKjhrjlH5qB7MeRIkTEbq4luUW//cScxBVp883mCpUk
-         h8HC4v2qOfdLf0+RGKu/+C4mnErU8rsdyeMO4UHpxj/MBzTDsU6kNbOGCS763gG0v+dV
-         54BXEZ+9sJJEP+i1eBzfHXVvoNmuZnaOziTvo=
+        bh=MnXZkpRT7mxbnF2z/cf8ODUkvmDtEsPtOUc9IhkrOng=;
+        b=lK2e8Tx5Hi9UgK0+aeC2qEgAYeR8Krr/vCB2NFPzG1pjh4rfOtepIPMAtK54LbGy7L
+         kkswAtB8myjy0WDO6BSew24bFDFkwJxcreJIbQIuMvoflhPRw/66VY1BG3s5Wht8X8W6
+         mAZSo+VNRBgxkc19C17k258fRZimO52ANRwC0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744079478; x=1744684278;
+        d=1e100.net; s=20230601; t=1744079677; x=1744684477;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qa1TnvGYMauUMWyZcz7/o2Egu7BWLDt3zJ0t+wJXCTM=;
-        b=oKg2DMajm5+TCKPTLqpC/GyyhLQ+Q+qiHKRJMXVo/ck7Yj/s7mc6r+kFgDroHSO4ae
-         5owMMlREU8j90NKnOSJgRDmlYoBI1MogO2sw550bgVPGX1LEMD7ZhRtlyt2E1rMb3qYN
-         qShTlV8zjBQA5hbGw8aJwr2UidTyx6AhteRLVrrIbVxy9S9z0RNV0H6ckpxRzEtA/klb
-         osWGoR+OLUMyW9qXJw5vY5/6VqBWHmV94JfL9wTwtuSovRAkKQ0PcLzGpQFeA6aiIIR2
-         ZZ9H1KNBM4z99pOj9rW+lj2FmlLzcjUpyW0gc/7RBwAIP7dUPPYoaYZkzfW5VUSNk71S
-         mwHw==
-X-Forwarded-Encrypted: i=1; AJvYcCUVBb+gTOK/ZDlGtnUeAItTG8iFX6FU4GsUGDrRigfdKO2mmAC1sYOoJ7vjzU4dziQwv5RA2bM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJKjc+UDLCIxrYpfODrc4KHjr5/ec+yRlZBrFvldy7HUJZExST
-	MsFWcN6k6M0lqgnX6k8X59jAIvix+ml7iayDD7ZNAZm278G58R9/iW1ld/ValP4=
-X-Gm-Gg: ASbGncug7I3zPwFFk9MD2KKUbpDD1PI2GFMg7eBZXAsZLeYhoAuSMeUWb1vOHy9gv2E
-	oN1Us+4uAcxePvE7w40z4u2t4uMg4PbU5DZxdns27mBCuq2v7Vj3tCsEKaVVysk8M0vSZWL5XxY
-	/ZrHLmoAL15mkhFGp1wSwi0VsED3gpcSciFF+d8PBViR2IZiYQrjEmgk6u4+LVkTA+KUO1YwMPc
-	odSnK5CoaW1aWRTI5sV7aAzWprwesq1YDfTBbLCe77HJtEoj4zHDIk4An9jlWx+3Fy6Btdprld4
-	T0SDwHVow6mtcl0MFVJOk55MbDlFLOleHtP5T7JhzutCdyfblCdt5S5qS4SYtJ57Ps0Z8HgEFe6
-	w6+B8heaWBSI7WTP1c56p3w==
-X-Google-Smtp-Source: AGHT+IEvpMlryK5DgzXlx0enILMXFGvA3Yfw0DlR5M2iKfMsTPXz70uGgd23bNNQ6iY/yyzyr+5baA==
-X-Received: by 2002:a17:903:1aac:b0:224:10a2:cad5 with SMTP id d9443c01a7336-22a954f9e54mr180018785ad.10.1744079478598;
-        Mon, 07 Apr 2025 19:31:18 -0700 (PDT)
+        bh=MnXZkpRT7mxbnF2z/cf8ODUkvmDtEsPtOUc9IhkrOng=;
+        b=i9xTU4Qkns61SHdkTIMjL3ngz+Abhyw0gDb7H4DwIUUNlEdvcvOZ2zrF3xvJrZ3cT8
+         k7Ttf0JIwSlDv61oojdMwdHTcrvElUP67ord+sU0b8VMEu08SBKUIgYrTioDHvS6ejEc
+         DnuqSKOydClQPrYdIfCNJgjhLTOPl6gm9OMDiqN6+mbpN8Q7N1Fwip4WwPFNCrp0hbAz
+         EP5pKgV/nro0ETVKU4kjre+tf0nWoOQp9QhUfCIs61KnCunp2DPbFUJTbbdJhKFcO4KM
+         j3x3we5pdLbXZdQlxd/Qs72iLh3TZvEx9emq2OApMA97jYjzbufLpbH7KazyYFouf5p+
+         P26Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWMnqzq9lzDachTrigzrGPtw+ksMpQ0ImkKGh9q3JOxW2kee9Vol3ehFolpQ7HTZv0ZOYJwqm8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwzkZRLvxfTGq7xFNiKKLxtenZ4BgSc5B7PeY5e2F0DH4XtXxH/
+	MMjEZBQVR7Egw9oeeG5JBVZxBT0mJs3GHYXwkn9v6wHnEmU6qMFnwGr64lSuxUA=
+X-Gm-Gg: ASbGnct6duyud9NPznTsIw4J9CtRcyV4GqOMIuq9nkpK2hPYGigLM+xNKFi8hMzzyY5
+	f3CuddCLK+WXPIc+QLvb6NEOdZthGgxI2LIXy1kPlksXQqiKyC5q5T6ePSX+puB+qzUUn0Totps
+	TyZMWIyKulbRqA7t3ddbQc7hp1JXPSExZGSY8YZ6Xa9BdVZBT50pfTkdLESRUZuxyxZdDpO8Grn
+	gTb41EQlt6v274mw3YJzuU76cldAE9vJgQkwKg1Ay49g3ikzLqiCg7cRF60wt4wE6LeTl1ta8gt
+	8Gm7SoCMdcHurnJoZ/T52/37ZQQ2lB7JpoJ1VMqBQ6n7QhXmCQoMJx5PVsfnKhmMIhnRkpoJSRU
+	jH3auTUSE33x7Op+3i6jDrQ==
+X-Google-Smtp-Source: AGHT+IEtOEfCePoutvJnvI8ake1HKWSU8mdy8FYB0DzEdAp7teWvV3c+lsnACnLFrUOMvQx3YB2NJQ==
+X-Received: by 2002:a17:902:ebc6:b0:21f:5063:d3ca with SMTP id d9443c01a7336-22ab5e9420cmr23886225ad.16.1744079677453;
+        Mon, 07 Apr 2025 19:34:37 -0700 (PDT)
 Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2297865dfb4sm88235185ad.152.2025.04.07.19.31.17
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-739d97d2f4dsm9280465b3a.28.2025.04.07.19.34.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Apr 2025 19:31:18 -0700 (PDT)
-Date: Mon, 7 Apr 2025 19:31:15 -0700
+        Mon, 07 Apr 2025 19:34:37 -0700 (PDT)
+Date: Mon, 7 Apr 2025 19:34:34 -0700
 From: Joe Damato <jdamato@fastly.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
 	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
 	sdf@fomichev.me, hramamurthy@google.com, kuniyu@amazon.com
-Subject: Re: [PATCH net-next 6/8] netdev: depend on netdev->lock for xdp
- features
-Message-ID: <Z_SKcxXnCzQc2riN@LQ3V64L9R2>
+Subject: Re: [PATCH net-next 7/8] docs: netdev: break down the instance
+ locking info per ops struct
+Message-ID: <Z_SLOkj9EGKg_sRn@LQ3V64L9R2>
 Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
 	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
 	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
 	andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me,
 	hramamurthy@google.com, kuniyu@amazon.com
 References: <20250407190117.16528-1-kuba@kernel.org>
- <20250407190117.16528-7-kuba@kernel.org>
+ <20250407190117.16528-8-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,18 +94,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250407190117.16528-7-kuba@kernel.org>
+In-Reply-To: <20250407190117.16528-8-kuba@kernel.org>
 
-On Mon, Apr 07, 2025 at 12:01:15PM -0700, Jakub Kicinski wrote:
-> Writes to XDP features are now protected by netdev->lock.
-> Other things we report are based on ops which don't change
-> once device has been registered. It is safe to stop taking
-> rtnl_lock, and depend on netdev->lock instead.
+On Mon, Apr 07, 2025 at 12:01:16PM -0700, Jakub Kicinski wrote:
+> Explicitly list all the ops structs and what locking they provide.
+> Use "ops locked" as a term for drivers which have ops called under
+> the instance lock.
 > 
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
->  net/core/netdev-genl.c | 26 ++++++++++++--------------
->  1 file changed, 12 insertions(+), 14 deletions(-)
+>  Documentation/networking/netdevices.rst | 54 +++++++++++++++++++------
+>  1 file changed, 42 insertions(+), 12 deletions(-)
+> 
+> diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
+> index d6357472d3f1..0cfff56b436e 100644
+> --- a/Documentation/networking/netdevices.rst
+> +++ b/Documentation/networking/netdevices.rst
+> @@ -314,13 +314,8 @@ struct napi_struct synchronization rules
+
+[...]
+
+> +struct ethtool_ops
+> +------------------
+> +
+> +Similarly to ``ndos`` the instance lock is only held for select drivers.
+> +For "ops locked" drivers all ethtool ops without an exception should
+> +be called under the instance lock.
+
+Extreme nit (which you can ignore): "without an exception" read
+oddly to me. Did you mean "without exception" ?
+
+At any rate:
 
 Reviewed-by: Joe Damato <jdamato@fastly.com>
 
