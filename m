@@ -1,187 +1,145 @@
-Return-Path: <netdev+bounces-180430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D606DA814AB
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 20:33:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8752EA814B1
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 20:34:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56957887426
-	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 18:32:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 283467B0D76
+	for <lists+netdev@lfdr.de>; Tue,  8 Apr 2025 18:32:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E930A241691;
-	Tue,  8 Apr 2025 18:32:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ED1623E350;
+	Tue,  8 Apr 2025 18:33:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U6VEkrmx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2257C23ED72;
-	Tue,  8 Apr 2025 18:32:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9250F23E338;
+	Tue,  8 Apr 2025 18:33:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744137141; cv=none; b=LjuK8mH2HFcwMpzVqEXCV0gJFHHZftmR+ylfBh8QtKN8GKoBjN6++vaVPlcbSH7g9owBsZ4u/5kVBRuOGDIRGwx7wmim4zefh8MRswiboGrjAz9/dcTGGJlwSDQvGin9GKGChycAja45hUrvcenpKIYYpijSNrFu4su5M0Mgz8k=
+	t=1744137227; cv=none; b=KtsS/kkXktFw9YiTK/WueXLXNbiTx8lyCQ/l9a0EJDJysDkzQRpOWGh2MAy1aHg5glPrKcTei/SRc5pa8dhXVdqbHguvqp7RODpzypiEvegubJqKdm4bRaw6J6TyRGmYOR6hgz2AVQHCr5EwddM+2TM4NjIvMip6cOj2bv7oU0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744137141; c=relaxed/simple;
-	bh=rQ8hyR9oiHg2KsZ+lDVGyJ4BSv0od8Sa7HW79HCLVwc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=UUoANgISQKhYD/6kCLNtUH2YelLDOpOF9eiOqUSrbpSvPgoHyhKWT3MyZ6pTDi5hr6a7gOn77Xyk5rqh6iyCnYnaVnX2+Toq52ldd4ISH53xXNJrDJTMCFoNEwWB5lPhgOjZZAlK6qdRrtGMkwNTaVmeI8AibHxGD4uf5+kj/pw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1744137227; c=relaxed/simple;
+	bh=OkpfI8JKKBHKEkXG8a9cTHLMUwDLO39b4MBr8fj0v9A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WidfGhfWT1ONiB+syvNQDIqmFIiuIXpcJF/f2TiiSc1ocROtC0sFO5eAj1elRcB+zmVA+lCP31wgVt81Oz1aLxD5q4unkOVXDhlfbyy7nXo5NTiW8+bDw4/v8ZrM2SS9vWVqmQS20vd6NkwjnLw73pHhckqCkwM/+mY1rv3S9CQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U6VEkrmx; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ac2a089fbbdso1054019566b.1;
-        Tue, 08 Apr 2025 11:32:19 -0700 (PDT)
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-abbb12bea54so138615466b.0;
+        Tue, 08 Apr 2025 11:33:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744137224; x=1744742024; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CbR+SDBjSlCanP57hiVBvuMAbFJp90QL/uZWZc8SqiQ=;
+        b=U6VEkrmxpHB2Bxp1Ri04bOVRM3pjVAyySaurjBDLcb+S6uAfEuALRAeVV+Rqd1MiKG
+         jLjATI7H7Fid60uD8HYu3TRK+ydUTbu2CsIZ+IdANArL9795crujnqGrqmvrS4xxVS2Q
+         uI7RjP6hsYzL9H4DO91NZKgo0MrjdUEpAkxRWP7XoF53jV7t7SrHPKBI0nMFgeaSZFB9
+         XUaNk+M0NUHNQUo9HmI+0zdo8DQyg6ALaCof7pAsU1pumSqb/oLAi2UGI7xurd919cox
+         QeftGRStrROIcQVpS0EC84s6rFmwGoJEP9+HTZdARiRUDYU+cc+ihTCY0qHXjoLl+Jzb
+         9hdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744137138; x=1744741938;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EhY4Z3oAJKd03SrzATbzNjahPXsmuoOiwYMLC9powFE=;
-        b=uWDCWFNkUL2umIk2xs/FUVxJFCrVTKlpBmerCEf2DJ01cLc91JDlgkn+ulfH1MxVII
-         Zo5/35IxM1sbmCCCmbbf3yT27vDJb33HNajal6r0TpZvhxQw+Ivq0wo/ZkQ/OgCbc0KP
-         5Q7kLX+QC1kjdPi/e24meosU+fLIXRLS1RCuUK3ZmFvdvSeiveVlJoDMk29wSCp8Bjb7
-         WKggaKIgbKUFuqSL+WzRvNnSuIF1K7ma3k+usWu6ztdA+WZ6UcJ/4MssHxwmFwftglo7
-         wAFVMtT53a728Sxz5sPcgzeWfWsrEQKpN2p2lj9Osf+SIqCIomjjaU2HuX9TFxw1p/HH
-         1G0A==
-X-Forwarded-Encrypted: i=1; AJvYcCUfuoBFeHsByEHe61irlXs+yKSY2NCVR7kkG7SC9JFWs9uhPMu5huJPGv/aXLTqI9DpGEGyMKfCXnOO3h8=@vger.kernel.org, AJvYcCWNwgzHioHRng/5Omnnkw41wUnRtUPvQEnh/fLSWoF65m/YpRU2mJo3INuT7WVZk9c4MqRyD0Da@vger.kernel.org, AJvYcCX3N8Tidi80/WNtGz7k0fIUzi3DF+MaIJ7d24qrsve5ZpKHoQ24a5s0YBG+hHjN2aSUse4VPbWLao5N20noSXmhgXgA@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHQ6JzTq8+HQ7XhbITjC+is6KCbcvlb4AyzoBxxLd6r8yozklE
-	XBz7t444tAC7aq7281KxBRf4RGl4GCS8l0CYiGf5liwJaSXCupPJp81DnQ==
-X-Gm-Gg: ASbGnctA0Q6QF1R+Bofq2i6qE/4j7OWOfWu+lhQPABIDq7VhZizF9/1C9uj6KrVkHmf
-	swkn2arfs735KELg7X3IJ9g1732lwcaBwhlPKoi0iwZ4QGkoTFrplPfAAgQGq+MZ2JkdrzK5WFq
-	FE4DnV9uKkV38qDdUCGcU5+Ic5BDGVv5l/3A02SdFrp4q2Lt/HUQI6T2AD3MOMEbVl508oI5r4d
-	ZoLY1NvG7D/htxrzwYEWZTEBc/gR/Nie1X5nRb8gUOKaunWhji9YgUJWLNge64B+PZL+lqgItaC
-	p2vtr7X8P/LigyKMknI7aM4ZMz+vFtjaCoSj
-X-Google-Smtp-Source: AGHT+IHrblW6iKvZrDCZZnVsYdIASQfGNg4NSLAsnEK7X08Y/yKOXlfNqlhnRhQefJiJdtPrCRXYeg==
-X-Received: by 2002:a17:907:7f0b:b0:ac7:b8d3:df9c with SMTP id a640c23a62f3a-aca9bfb1039mr10321366b.1.1744137137777;
-        Tue, 08 Apr 2025 11:32:17 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff:73::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac7c01c2ce0sm964609866b.178.2025.04.08.11.32.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Apr 2025 11:32:17 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-Date: Tue, 08 Apr 2025 11:32:02 -0700
-Subject: [PATCH net-next v3 2/2] trace: tcp: Add tracepoint for
- tcp_sendmsg_locked()
+        d=1e100.net; s=20230601; t=1744137224; x=1744742024;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CbR+SDBjSlCanP57hiVBvuMAbFJp90QL/uZWZc8SqiQ=;
+        b=nPONCaaFvSqjeIQUwV8gLUJmZEyNymzrKdIjnfOKALpH0h4c8P+VYkmGoYhn29ZXuu
+         6rQ6YPdIV0duZNp5qkiBfkcPT5JAyrybsKoAThZIdecyyWVQiv7fZP+J/90lsc/uZ+Gn
+         WuhJbyJIaHcAk7jEFlBih3dxgQeVz4M/LGhoaNtLKrCedskfr+aSdb2/GPMp89Nm7L2U
+         34xllljNmAk6ciNpmdoo+aTMM+Epn2Dt8L+oeGr52acDthlkp7UM7/dbUNUdZq4zPeOt
+         ywCO82R8eXjwW9aZN4KDTCz23sYpsJbGY5yoAgFyNsHD39OWnLiAXa/eQj5GLgyi/SWJ
+         fodg==
+X-Forwarded-Encrypted: i=1; AJvYcCWcjbNGY263rLBcAKh23n27yfVDwxtvRnI/kWLHoBq6inuu3TYmT4PoCKHMhdPNkLeLnzxG6hZaYtCsGsQTJ8Y7@vger.kernel.org, AJvYcCWlmyCdIAY3nt2an5Ktbkyfo1m9ZK54E2i2Mq1mPV2lOtX2Rv4E8zlAR3XxOXct0Dhf1YJIgxQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyVA+FpKv6r+UPkFW/Y7AX11ie6XBr8C3J97aMCeTw2CuOB49d
+	17U4a1x5D27Rg8lA2HzJ8waszniS/CTzLf+dsyZ/dNsDdsC7NHQR
+X-Gm-Gg: ASbGncsZzlC/hhZro+MbA36MjGQG5f0/hbWwoUQ5HxLzqz96OVo781Ov8M9KwzO7/40
+	TFXpr0KGzJhxKIRUkfi1SZYy9lEGcFLgAUyl9nL+Fiu0TH+xOQtp9XE5egbKy9sPFuhXYyZ+aVm
+	TYwfEiRZylynQXbFARPqxstF368Nf8HxoiSmXT2Q7NUzqoxlb7/juN1qE+DCF4Z6FLViAZK/Zk7
+	TEhIVKGB98HyoDF2eSfFcXc9GRfcKWmQsMJWMip/HYmhynDwKzhzj6/NqHnzoRE+PVT2Bf73NxS
+	SptK2hs2hwGP8BKwq53ZzMFKIftDElY6I+bj4T2phFvlkPwcTRebOvphfO6kd4yW+864+Od6iLw
+	1nSTTBTKDhN7K6JsG42ti1NRty7DodIrqriV8CLtTO85dUw5BcS4C/RIWq8YGqrBn/Wpm+Mdb+D
+	F8F3ZQGx/4VL9JTxLL8D4=
+X-Google-Smtp-Source: AGHT+IHAAt6vPbKGMz1eXRWFE/FZ9F4uiX2LpnIYwTZUS8jCgcDQIcbdzzrkb6ANj1v8EAbdA8C1Tw==
+X-Received: by 2002:a17:907:d93:b0:abf:4c82:22b1 with SMTP id a640c23a62f3a-aca9b695a43mr20164966b.32.1744137223553;
+        Tue, 08 Apr 2025 11:33:43 -0700 (PDT)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ac7c013fda7sm954327466b.117.2025.04.08.11.33.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Apr 2025 11:33:43 -0700 (PDT)
+Message-ID: <fc34e774-e264-492c-9ecb-20eaf7bd87e8@gmail.com>
+Date: Tue, 8 Apr 2025 20:33:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v11 nf-next 1/2] netfilter: bridge: Add conntrack double
+ vlan and pppoe
+To: Florian Westphal <fw@strlen.de>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>,
+ Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+ bridge@lists.linux.dev, netdev@vger.kernel.org
+References: <20250408142619.95619-1-ericwouds@gmail.com>
+ <20250408142619.95619-2-ericwouds@gmail.com>
+ <20250408163931.GA11581@breakpoint.cc>
+From: Eric Woudstra <ericwouds@gmail.com>
+Content-Language: en-US
+In-Reply-To: <20250408163931.GA11581@breakpoint.cc>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250408-tcpsendmsg-v3-2-208b87064c28@debian.org>
-References: <20250408-tcpsendmsg-v3-0-208b87064c28@debian.org>
-In-Reply-To: <20250408-tcpsendmsg-v3-0-208b87064c28@debian.org>
-To: David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
- Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
- Steven Rostedt <rostedt@goodmis.org>, 
- Masami Hiramatsu <mhiramat@kernel.org>, 
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-trace-kernel@vger.kernel.org, Breno Leitao <leitao@debian.org>, 
- kernel-team@meta.com
-X-Mailer: b4 0.15-dev-42535
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2727; i=leitao@debian.org;
- h=from:subject:message-id; bh=rQ8hyR9oiHg2KsZ+lDVGyJ4BSv0od8Sa7HW79HCLVwc=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBn9WutKMiFYZp21UHtkEtORTCNKpJYNNjokz0CC
- /DzeChP98OJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ/VrrQAKCRA1o5Of/Hh3
- bZgND/99YiH/dd+FiIPywZsKOzA3EDGLQCw5AjD8k5DllLCIZcdQVnPV3LKL2paa2RScNtSe977
- 0fN2CbyPteQhQ2UrO6Fu0aLIs2TXSutLumQj9h3sZBLCKmoZ280oeeGczwL/Hl99Jycy4Fxh8fS
- WZtFnVj+lO/Y8ZZrlmVqbA9aQG7wDk1BelsQXgKwoaYZ9t6efYvfzGRmEJUGD8axm0vAQqTI7kz
- zYFjzaR40LsHLDKncuynhgW1TNbvzJc2pKZ8h89dlgfpLBYcdFAeVFF2Vr+Dhvo7nmJW9DYWSqP
- J8T66A3kjny11xZcBHLqU2M1AT1brf9o7vNkVVBCkhgB41aWOqFsORU0EKPiU+Ie3ULIXk+qhd8
- 7tYI+AZ/wYlPJP0zCTmM43qWffjK/q+GRsnJXpVqlXJnMpMrzCI9mqi4BGe3PLKIhOfiTFP+YsQ
- sTacz+/FnhQyc1CjYzpr4/udXCRplhajAHwzac7DEW3DkJ2BV3VkrruntA+tAl+dXkz8h9bJ9pX
- 7MkNT7V7ZQPTa1Z+0IF958H2Xe3ZIaCDrWmCv+mU5aorGWxRJ1FpGZZ9qbERJkUyjOLa0WX9l/+
- yDUFa4BDWhkZiNKMMpvTWoWqVXr9leWNO5qVepIrVo4tK3VjPzAsbpwhF3he0KWXFqxlQdizAXp
- 5GIzx5PscHRZLHg==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Add a tracepoint to monitor TCP send operations, enabling detailed
-visibility into TCP message transmission.
 
-Create a new tracepoint within the tcp_sendmsg_locked function,
-capturing traditional fields along with size_goal, which indicates the
-optimal data size for a single TCP segment. Additionally, a reference to
-the struct sock sk is passed, allowing direct access for BPF programs.
-The implementation is largely based on David's patch[1] and suggestions.
 
-Link: https://lore.kernel.org/all/70168c8f-bf52-4279-b4c4-be64527aa1ac@kernel.org/ [1]
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- include/trace/events/tcp.h | 24 ++++++++++++++++++++++++
- kernel/bpf/btf.c           |  1 +
- net/ipv4/tcp.c             |  2 ++
- 3 files changed, 27 insertions(+)
+On 4/8/25 6:39 PM, Florian Westphal wrote:
+> Eric Woudstra <ericwouds@gmail.com> wrote:
+>> This adds the capability to conntrack 802.1ad, QinQ, PPPoE and PPPoE-in-Q
+>> packets that are passing a bridge.
+> 
+> Conntrack is l2 agnostic, so this either requires distinct
+> ip addresses in the vlans/pppoe tunneled traffic or users
+> need to configure connection tracking zones manually to
+> ensure there are no collisions or traffic merges (i.e.,
+> packet x from PPPoE won't be merged with frag from a vlan).
+> 
+> Actually reading  nf_ct_br_defrag4/6 it seems existing
+> code already has this bug :/
+> 
+> I currently don't see a fix for this problem.
+> Can't add L2 addresses to conntrack since those aren't
+> unique accross vlans/tunnels and they can change anyway
+> even mid-stream, we can't add ifindexes into the mix
+> as we'd miss all reply traffic, can't use the vlan tag
+> since it can be vlan-in-vlan etc.
+> 
+> So likely, we have to live with this.
+> 
+> Maybe refuse to track (i.e. ACCEPT) vlan/8021ad qinq, etc.
+> traffic if the skb has no template with a zone attached to it?
+> 
+> This would at least push 'address collisions' into the
+> 'incorrect ruleset configuration' domain.
 
-diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-index 1a40c41ff8c30..75d3d53a3832c 100644
---- a/include/trace/events/tcp.h
-+++ b/include/trace/events/tcp.h
-@@ -259,6 +259,30 @@ TRACE_EVENT(tcp_retransmit_synack,
- 		  __entry->saddr_v6, __entry->daddr_v6)
- );
- 
-+TRACE_EVENT(tcp_sendmsg_locked,
-+	TP_PROTO(const struct sock *sk, const struct msghdr *msg,
-+		 const struct sk_buff *skb, int size_goal),
-+
-+	TP_ARGS(sk, msg, skb, size_goal),
-+
-+	TP_STRUCT__entry(
-+		__field(const void *, skb_addr)
-+		__field(int, skb_len)
-+		__field(int, msg_left)
-+		__field(int, size_goal)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->skb_addr = skb;
-+		__entry->skb_len = skb ? skb->len : 0;
-+		__entry->msg_left = msg_data_left(msg);
-+		__entry->size_goal = size_goal;
-+	),
-+
-+	TP_printk("skb_addr %p skb_len %d msg_left %d size_goal %d",
-+		  __entry->skb_addr, __entry->skb_len, __entry->msg_left,
-+		  __entry->size_goal));
-+
- DECLARE_TRACE(tcp_cwnd_reduction_tp,
- 	TP_PROTO(const struct sock *sk, int newly_acked_sacked,
- 		 int newly_lost, int flag),
-diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
-index eacb701bc2be2..475a1317ad275 100644
---- a/kernel/bpf/btf.c
-+++ b/kernel/bpf/btf.c
-@@ -6518,6 +6518,7 @@ static const struct bpf_raw_tp_null_args raw_tp_null_args[] = {
- 	{ "xprt_put_cong", 0x10 },
- 	/* tcp */
- 	{ "tcp_send_reset", 0x11 },
-+	{ "tcp_sendmsg_locked", 0x100 },
- 	/* tegra_apb_dma */
- 	{ "tegra_dma_tx_status", 0x100 },
- 	/* timer_migration */
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index ea8de00f669d0..270ce2c8c2d54 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -1160,6 +1160,8 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
- 		if (skb)
- 			copy = size_goal - skb->len;
- 
-+		trace_tcp_sendmsg_locked(sk, msg, skb, size_goal);
-+
- 		if (copy <= 0 || !tcp_skb_can_collapse_to(skb)) {
- 			bool first_skb;
- 
+Thanks for the input. I will look in to it and see if I can also add it
+to the test script.
 
--- 
-2.47.1
+The thing is, single vlan (802.1Q) can be conntracked without setting up
+a zone. I've only added Q-in-Q, AD and PPPoE-in-Q. Since single Q (L2)
+can be conntracked, I thought the same will apply to other L2 tags.
+
+So would single Q also need this restriction added in your opinion?
 
 
