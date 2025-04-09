@@ -1,226 +1,194 @@
-Return-Path: <netdev+bounces-180570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 547A1A81B62
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 05:13:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 066CAA81B6F
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 05:27:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 883CC425A76
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 03:12:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A2EE882B0C
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 03:26:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1426B192584;
-	Wed,  9 Apr 2025 03:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E00B16F858;
+	Wed,  9 Apr 2025 03:27:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b="oGHch4f+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l/B9LyYZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2040.outbound.protection.outlook.com [40.107.220.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD13208A7;
-	Wed,  9 Apr 2025 03:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744168380; cv=fail; b=gh9EZENYsObQ9p6QYS4ToVfTt9cHO1mIaJpckaaZcz6OiANpDMKlDhzd5a/r2rESEQnX7lQGh3SYNnxnp+oNO4u7/sUGDYR91cMbaX9VZQjK56H4ibDDRJxr5dePfA3FlZdwJbwuAPCLqjQ+9j77S7dWk++LQBsAV8T2x1WjELg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744168380; c=relaxed/simple;
-	bh=NHBuSr1F6gmrN3qnB+lZ3+wNQYsmTT6NqyXwECPnzPU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Q7u42XatMlB0NENHxMEK40agHLySsRxfXDuHDPDXWMUNG/uvBkqdqYlrObgYpP7Bmjo2+rW2WvatRLJPO/qz15JGMUjKMmlcOPjb5FaomKAb5m3yYg/sH4joM97fWjfv9NpjvKwOVHpfkQ+bTaYKXca2pfYYG7gMP2Rmsd+80UM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com; spf=pass smtp.mailfrom=altera.com; dkim=pass (2048-bit key) header.d=altera.com header.i=@altera.com header.b=oGHch4f+; arc=fail smtp.client-ip=40.107.220.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=altera.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altera.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Q9REq2548rBjD0wpsZ9WxcgsWujGTpG9yVEBeNKcD2++z3XAayrwmr8sPcHnr9Q8jxb0O/4kwR3YztNeTcRGw+6+CPl+VPGVt1yrkh7iwgTtopTvV9CBUH2yCC57K01Jx5M6pmtyoGhhAahJAAgrXkQroImVeb9UyIk8oZKzmS8NaAb3raa6NtcSzYJDCykagh+uI6GXCxIMjggsJDTjM9Z2BKkNnu17HSg7wnuTXGvV6pYyRoxT/IT2gN27h+oSaaJXBEZxlYYbYl1/haGZjKuz2232ythYZyoyTFcrCaWuyEE20gCAK8rHAmx97Eh/T5D5bmcH38HLUC6sZffwLw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=atwN7loEq4It1UfikccBrN4ZnO5Uwq9RB04UmheZOFU=;
- b=fa7Eu5DunhOrQCEECWL8bV+TIdBhcDtBDFb3RYAq+XrcGLCxLaKHLFYcrV2M8FkPVOgXetLaEgLrvw2hyd4qyJU5Zy7pGwJSpYnrkTZsxO8DBE/kwM4MHPBN98o3DIIRV8HH5IGjUDbXWewu9GGxz9R/IHQDjU2jBlpI0eaxDV1+0Tbhd76v8Q7gAVxJ+wE2zpwODdxvcTlDf9cbQtBZcrk/jtdzLPIZRkb5PYXAH7eV1ukLHVXtZbMFQVqrPY+vYInfyxNozVZrtjmt549f0VpgU/N7BrvzXYa0JdOVrxzrt9nSvUwi29PuQzo/Cuyu1CSekfvDS/U9OAGQrnLB6A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=altera.com; dmarc=pass action=none header.from=altera.com;
- dkim=pass header.d=altera.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=altera.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=atwN7loEq4It1UfikccBrN4ZnO5Uwq9RB04UmheZOFU=;
- b=oGHch4f+LhEhUZJ7BT69DljQojO76U6r+4geJkmH5n5x/0zGj9M4hMpPP1UqDu9irv7jBuH6/f61TuT0zBdKZ5gCWhe4z6upt0g6FQ3L6uw+ita7Jhr9yD4Xi6OzLwtwv6D2jao80gc3tICneWmApGdYx1dDQjZWLhDsqiLfEyI8UZO53zHYr922LLEq8X1yJATQHmLtXpJaIeBS0gAxCSUGsisknkY2dIQdAzDvqy69/SKlMs1IvXBOGejlQhS+5yfnh42Px/7ynhb8dNeItyZZ91LG//XL1O8JIey1yZkxFJeLZf5/ummQ3RT+w5rhFfpvxmBhccNnHE/dFnSwdQ==
-Received: from BN8PR03MB5073.namprd03.prod.outlook.com (2603:10b6:408:dc::21)
- by BY5PR03MB5361.namprd03.prod.outlook.com (2603:10b6:a03:21a::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.34; Wed, 9 Apr
- 2025 03:12:53 +0000
-Received: from BN8PR03MB5073.namprd03.prod.outlook.com
- ([fe80::7483:7886:9e3d:f62a]) by BN8PR03MB5073.namprd03.prod.outlook.com
- ([fe80::7483:7886:9e3d:f62a%3]) with mapi id 15.20.8606.033; Wed, 9 Apr 2025
- 03:12:53 +0000
-From: "Ng, Boon Khai" <boon.khai.ng@altera.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Russell King <linux@armlinux.org.uk>, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer
-	<hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, "Gerlach,
- Matthew" <matthew.gerlach@altera.com>, "Ang, Tien Sung"
-	<tien.sung.ang@altera.com>, "Tham, Mun Yew" <mun.yew.tham@altera.com>, "G
- Thomas, Rohan" <rohan.g.thomas@altera.com>
-Subject: RE: [PATCH net-next v3 2/2] net: stmmac: dwxgmac2: Add support for
- HW-accelerated VLAN stripping
-Thread-Topic: [PATCH net-next v3 2/2] net: stmmac: dwxgmac2: Add support for
- HW-accelerated VLAN stripping
-Thread-Index: AQHbqF58Bphr398kgkyddiIUmDLZn7OaIpwAgAB6UlA=
-Date: Wed, 9 Apr 2025 03:12:53 +0000
-Message-ID:
- <BN8PR03MB5073B710F5040EAC06595AE2B4B42@BN8PR03MB5073.namprd03.prod.outlook.com>
-References: <20250408081354.25881-1-boon.khai.ng@altera.com>
- <20250408081354.25881-3-boon.khai.ng@altera.com>
- <c65bfe99-a6e1-4485-90ee-aee0b8e0984d@lunn.ch>
-In-Reply-To: <c65bfe99-a6e1-4485-90ee-aee0b8e0984d@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=altera.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN8PR03MB5073:EE_|BY5PR03MB5361:EE_
-x-ms-office365-filtering-correlation-id: 0153451b-dabb-4b3b-032a-08dd77146b1b
-x-ms-exchange-atpmessageproperties: SA
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|1800799024|376014|10070799003|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?GEAAcA5wW5QMENhpzfuCPDbMwiG+2KmqGgXrYTUltyt3ObDB4CDBg9qHLDmH?=
- =?us-ascii?Q?VdTeTWEkT8jvBg7WvLmVMzqZLUU495TSYTS/eYlmi3LesP5GesDBp9a9/obL?=
- =?us-ascii?Q?d4/9pxXzBtMbm5saZ55PLYpkiQj6rbzHHi+8duNIqBPKmk8N5CZsDkkkwQ3e?=
- =?us-ascii?Q?jbWuXJiv3tbzErUhm0grFeWHMkvzha9CVYlmtHK/McZGqbQJYy428Sy3jCo2?=
- =?us-ascii?Q?I5FU4aeMWxkhdBNr7KxWi4pwwTf9HiHE/918yRdmSioQvyGIDEBQX0LmDQET?=
- =?us-ascii?Q?E327+1A2YD6G2kUNHFANhuAObg2ACAe6lu+1wevLfK9ys5zZOL41chYW+YJa?=
- =?us-ascii?Q?hYTGUTE1IU0vyyqIe4U50uFtBic6P2oMyTasXFFLlE+qIqISAn6chUJQQjiA?=
- =?us-ascii?Q?JScoLql5oWtcrSp7+v6PN2TnnT0GlA1JnSaRcWDX4xyEXguyUIxwGqcpA8fh?=
- =?us-ascii?Q?ub9KpGItivnp+Eu4BFc9dJ7mNrhJ+U2d0grOitaSvkHN76KZnf3mN5zA7RlX?=
- =?us-ascii?Q?kgd1L6h4nIXY7XCnd4iSGgnYW/y3aoHcW6U5sFFrsVByncR15iCpoO5oqZ3T?=
- =?us-ascii?Q?K4aXaqL4LHs6ZtKJhlYtabXrZH6jM2pWxd/s9S8X8cgi0ZA7ofv3JEeB7rCT?=
- =?us-ascii?Q?PT+mSmgkcMezBKZkUhScma5GvPwYxWQ3kCGMJHHNszPMb6DEpxEvQEgSnRiQ?=
- =?us-ascii?Q?82xxoZKutTBn8Bv4qCOLBDUm3VtXwyy862zFK/q69Up0PXSlfCq0A5BhpVT6?=
- =?us-ascii?Q?DRPADIxHbgVMfexPq1E07CmfS1uc5NjOZIrs5nZ9gvTkMsfYtqDUBC19/X1w?=
- =?us-ascii?Q?xef6jFhQ+OJdbl0RL+asCsWBC0y/MYVJqYQIYkv0AfZHbORUjRI+vUqARMSq?=
- =?us-ascii?Q?kGmjk3ddsCNfqc7+5rbNozX8vj7XykqUFMP2T0u8UI5tahDhofBEkL5qCSSV?=
- =?us-ascii?Q?jazV7TUg4DIYoA0ygS7ndy8VBi/GYr7+Vg5jYMZfCypjgnaP1ZHsTC8emPQy?=
- =?us-ascii?Q?lLpPwgd9n1RAaMX0f7kbtUDObSOcz+Ae32fJCkttLqus130t9S7ovk1bb+tr?=
- =?us-ascii?Q?kscEEolfn/DnO5GF9xwS64QgGbeoYVYSLXIs480c8/mBTUGN720Ooi3JIwqQ?=
- =?us-ascii?Q?vGLTUCygwowFZVJbr4EKo+OVnHw0KwQ76u2JXzkYTdlbV0Zc3TfrdiVrUw60?=
- =?us-ascii?Q?LRcA0Kh7jhvTA85v2+V7oT+oAqo76PmyWrP7Ibe6P43791IwYCa9JeXs+5fb?=
- =?us-ascii?Q?kODlAyg053NNxH0F71FSZ5GiN8YcEZQe+C/HIQQH6U08JApzuIVSlxwG2dTY?=
- =?us-ascii?Q?BKDNkgLU7VTb93vHSQ7KRsr6TB9tnZCajs+n0yWnB3j/eNbRg3jCHp/NGEIv?=
- =?us-ascii?Q?e8iDJFj/bo6V0fKXIOd1OjIBzNF6PYdw84iPD/71S0MZSdVXz9Xdx0gHWAJZ?=
- =?us-ascii?Q?4tOcSTInmZ9fFzp8gI4XoywVmkuFl86H?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN8PR03MB5073.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(10070799003)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?mwdY8jvxFqnqAx+pIvd/oVDYwk4j0567VAkjPrJk+cmU47gMXFYAkn13ERdK?=
- =?us-ascii?Q?nXat8CaEhO70Rwrp36PTUePO4MEI+lEF8/64U8fYawYs/4k3jUukeFFPQvZN?=
- =?us-ascii?Q?zPa7N6mJ2wv0NF1ltnM4XbqEGT4wahvLoxCrTn+kg5EcbWRLFQeLzFQKt7xZ?=
- =?us-ascii?Q?tnwahPlsEEo4CVgPWEGRXQU65THNH4vVtJVVfa/jYybm0Ek3hqJ4v8WgwrXz?=
- =?us-ascii?Q?YbI2dCgtYmNhwY1h/DF8R1C5eN3lNGLb091XfY8+u7Bceu+aoStfhIWV5oOt?=
- =?us-ascii?Q?qDS9001tVynfWyNBpe3ICbhxzpsVphlCwuxA709uWRVEQElMI+T+S4cEd6XS?=
- =?us-ascii?Q?uA7s2pUY0rlInabnbcRr6T5Ns0D5I1kK4i+BpzXx6TGRZJzdZ5ZcvwZ2AXB2?=
- =?us-ascii?Q?WNK3MK9IL+NsU/6W8ZjloD5/BlHOsuFd9OBSP6G1bK3h0mw6XPTeL68TvTsn?=
- =?us-ascii?Q?aijSZZ51QzfeQfqBbkJZKHIE52WZ6HhKYReaeLewGO9jjtDS81fMlZVSgCLw?=
- =?us-ascii?Q?kUc+u2BaguZ3MdGw0m3MMHgJrP30eFOSdtqWcUuhICEICYMxa+T1okGA8EYr?=
- =?us-ascii?Q?OyToouBjy8b+91hR0ZWM7ZnFWRmzrJwaPfCnDPt7y9UTSx5RA5UssZGxeMpv?=
- =?us-ascii?Q?BXuNysuWMT0+HcXxXpk8rbHpku5tu8FXe4Clexy+z96IFrtJTneX/UgVif2x?=
- =?us-ascii?Q?p5+pY+m93Mr6eB4DVvDmrvbRsG94f7OpFEQzry9fhqm6xnK9OedcOvs6z2Yd?=
- =?us-ascii?Q?2hf7Sns9+WppyPOsbv8f0eWfY4qAoRcQjiPsbg3njZ+tqAhL/KLe4cp1yFIC?=
- =?us-ascii?Q?snvzL960yck6Q7iYUDrX+DgfQTgblSnlNMDRRPu12w9GLoHpiAvLbYPv2N/C?=
- =?us-ascii?Q?c6x6Y34AF9pRF5NbTUGkPARpgFC/iNbdwIdpHC6m4APP796bwgL+vhqCAq7O?=
- =?us-ascii?Q?RLmDTo0U7pJ2TvEzfLO6ZB9uQE2qS4nj4IGirsjtZgytN/1x9V72yGjv2P8s?=
- =?us-ascii?Q?SJo8VLiPPNXKiDYWt5e4aCuL7VZOU8LXIgSmjXnvg/wZ+4Qe/pWv9829PHK+?=
- =?us-ascii?Q?376NTgaz97o6fWSN43NgHFIze7HMKBZnpuuWVZ0TWdXGr4e3z1itY1xX2uZg?=
- =?us-ascii?Q?NaXYJobsVkTd/G9bp/DkYOFTGQ56UGyyrdnZM8VUmWLxca/NO4d7eMvy5gcS?=
- =?us-ascii?Q?UfGqdqzBc1NtO/Wf8YMiQcJa4AkFh097GavVZpOMfPc9ivmK3o0cjRZ/E+RH?=
- =?us-ascii?Q?QUgO1RBZqYYqatSFz4jiKjBlpT8f1j62opRreG28a3gd6J7CxPZGK2dlnHk+?=
- =?us-ascii?Q?Cq9Gq5l+II4VZ3pJ+Mmkzh2Wib1h90ubSrnpMnyw2jZ9tq2d6lAZjJpJwMsy?=
- =?us-ascii?Q?MVGhMEiJLGmRxrhgJrG3jMCF57JkE0VBQi0uHFcEdvPsicn6LMsbv8WJf3vj?=
- =?us-ascii?Q?wIC2zdkiX5Mj7mxNN8wJ6HC74iw8H3xINKlhrRg6M/OdFLQuz9wWQoL+PmIL?=
- =?us-ascii?Q?sErbUksQ6V6qVKgmWXE3eh5ubF44G1c7e4t4Ow71SbdTvwyMZpgg/V8vELJo?=
- =?us-ascii?Q?K2gjwA7FueuDmWAhQUdOrWYGeABbrAX+rnR+7HHM3wvkWdOdprr10/ViaH3c?=
- =?us-ascii?Q?tJ04ik5fP3TWGu/Ht9LImn353acVrI02OUYSvF7+rNYv?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8191829A2;
+	Wed,  9 Apr 2025 03:27:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744169231; cv=none; b=m8hligKEENJq7pbQYkaNwor8ZTOxZdY8ddTuO76R/YwO5EusZU5g/qDxvGGDHC5aUVY1bcOtxMFho5iwF0Rxu9wFcTo0zXrNKZy9ihGsAMdVPuoVLvozGbxOXyEI3XMmxQYJEiETRef8L47RJyErmtistbkUq5rTCHGdTIIF9H8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744169231; c=relaxed/simple;
+	bh=D6EvTL4iYuuHIjtGTY4AYogyqtGWNblNDT64LnMhFrE=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=p1oCx08Sd8gWB5wyWUraCEe4j2Zxv2GkvPiscLunCeGvZluBHvgqOjxydlUX+BxG0jI2o9AdYe6AVwPfV2N0/PBHXynGQyBXgcoirM2PueKefUfTncXmV4kypKOniatJ2ckVDqIbcfVug1UPjikk/uvQ3ljxIEP3cGAJI7u+B9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l/B9LyYZ; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7359aca7ef2so8914583b3a.2;
+        Tue, 08 Apr 2025 20:27:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744169229; x=1744774029; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=a4jAE1elJcepr1tdiADTCAGlm7zbKPiv/FbJVtT5R04=;
+        b=l/B9LyYZybwpSd2FUh5V/YCWwOI2WPV7JTAaYbKRl4whDLoIQEvnQ8FoUYpSToSpVR
+         7hnRip1znXetKdM3P0BmWx8xTFfwRh1yVZ5mfX700msuA0HB7ZMG2EkHLhukXLKy4czS
+         9VCPrwoei2e/QpRhJXTlpmcczU9GILlOGH1QujF2QOS8gsont6Y3bwT51+P0eaKj1TrX
+         O1BDXBWGCQlQrtOuoVf9r7Gq69ZviW+gidesCT80GbYXCxLRqz2WrGRfoKdUYJzn1pFA
+         P1kr1QHP1Rt/OaCyVN3VXLOst2SiR3CI2zmSLAlLrI7cqZYk/HaVRxcFLuNU4L/ritbA
+         RToA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744169229; x=1744774029;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=a4jAE1elJcepr1tdiADTCAGlm7zbKPiv/FbJVtT5R04=;
+        b=ugPEAxeteTWYPjUm8Mo1H8GRC9rDar4tVZCSlK/aBBXMZ2BD3MPsBQVN5CUgp3ZopA
+         ggsXzBR5eZed1mfveKdff4UwTtE/P9/HcE4PIbbc/Aj0UK3/xGCJuIZ0Y4mvYFnDanen
+         fT6HNsXvy1mgDvFfB94NzD3S4g8KUritfQ2xHoCGjYv8WJqD3HLDIcTlKJNhNk8vbdaO
+         A7K2DYDxhhPTjyX60cnQ+zAppRl+QAZ2HC0tE74sl+RORYc3IA58T9F5I6id6L5eb6JR
+         xpnMobwr9OXmWhVaYWuKQ7zSu76Vgnui5aLzj4ry5oeOQVVLLZakWry50Gy9GIlB+HyG
+         9bQw==
+X-Forwarded-Encrypted: i=1; AJvYcCVDl+9u2LwV7p2kSbhA6ZlTg7jhRcDlUJxuy2z5wnm4dKlpcycZF6oNJ/TLdcc/kY4IwXin6xo3@vger.kernel.org, AJvYcCWUjfr/CXhMh/GeiRJPx5s2i379XhwRSwqPAV+YYA3J5FZxVQyqpxTEfKRnnI1NCwCw/0SKYwqR45BZDWM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFfyJia8ttb/J799eBKOH6hFXY7nn6/DoViQ9cC/K9iTIM+bXS
+	NBQneGUaeeejrBT617d0F5Mu47XqD46YH2iRCk/GLWna+G9H9go=
+X-Gm-Gg: ASbGncslBxVQYM6BXZNdGlQimk7lx5LAHjqIqB+Cfy3/Y/mkHbGvpX9lsk3TXB+gnIX
+	VN05AyS97llyhvXWEI3HtL2pXPjIZcLf9tnxpw03IxJ20B84v+ImF0ReyJzU5pSsv2sJIa6Azne
+	v0F4FiZL2nOeGVWrP1YbGCnc8Y8sfRBft4y8YR0+pZ/ah8wdEpAfbpQ+s2oXgNi9CxtbGJidbJc
+	2gVGvycxJ4SCz00kaiggJDZk9xm4EL72rqc10HVs4bP63foGtHQjmSh908mIFaB+TnE9wCIfJzK
+	C/Ju4rQiSQOuIWxZ6sYi8B0gqeXgYEbDCZzhMoz0L5jj9dDni+mpwtyg3Tyyw0oauSwd+pjrK5i
+	hqKl7RMDQJL26XOuagbsv
+X-Google-Smtp-Source: AGHT+IFluP2lajffl9SoWcBd2FkHmaeG3wkjggTtla8rF5wyu2rM+lF5RAbLROcd8TQorKRJsHANww==
+X-Received: by 2002:a05:6a21:99a6:b0:1f5:8b9b:ab6a with SMTP id adf61e73a8af0-201591956c0mr1731310637.18.1744169228551;
+        Tue, 08 Apr 2025 20:27:08 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:115c:1:f94c:8e92:7ff5:32bf? ([2620:10d:c090:500::4:98ff])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b02a11d2c1dsm192043a12.38.2025.04.08.20.27.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Apr 2025 20:27:08 -0700 (PDT)
+Message-ID: <6d2abc68-ad40-4cfb-b6aa-bd724023f998@gmail.com>
+Date: Tue, 8 Apr 2025 20:27:06 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: altera.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN8PR03MB5073.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0153451b-dabb-4b3b-032a-08dd77146b1b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Apr 2025 03:12:53.6254
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: fbd72e03-d4a5-4110-adce-614d51f2077a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ln7jECEIW7AJSbQm312gwPMYc/O4Sd3HmNnSSbQt7B/kFI87BTqFrmKHf42mRc+luACVqw/hoq4XaQ3Rf0zEcA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR03MB5361
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/2] GCPS Spec Compliance Patch Set
+From: Hari Kalavakunta <kalavakunta.hari.prasad@gmail.com>
+To: Paul Fertser <fercerpav@gmail.com>
+Cc: Sam Mendoza-Jonas <sam@mendozajonas.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, npeacock@meta.com,
+ akozlov@meta.com
+References: <cover.1744048182.git.kalavakunta.hari.prasad@gmail.com>
+ <ee5feee4-e74a-4dc6-ad8e-42cf9c81cb3c@mendozajonas.com>
+ <b1abcf84-e187-468f-a05e-e634e825210c@gmail.com>
+ <Z/VqQVGI6oP5oEzB@home.paul.comp>
+ <1d570fb8-1da0-4aa6-99f5-052adf559091@gmail.com>
+ <Z/V2pCKe8N6Uxa0O@home.paul.comp>
+ <b1d373d7-77e5-4341-a685-07a617935db5@gmail.com>
+ <Z/WkmPcCJ0e2go97@home.paul.comp>
+ <93ac7481-43c0-4207-8965-2d793c90263c@gmail.com>
+Content-Language: en-US
+In-Reply-To: <93ac7481-43c0-4207-8965-2d793c90263c@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> This appears to be identical to dwmac4_wrback_get_rx_vlan_tci() ?
->=20
-> Can it be moved into the shared code, or am i missing something?
->=20
->         Andrew
+On 4/8/2025 4:23 PM, Hari Kalavakunta wrote:
+> On 4/8/2025 3:35 PM, Paul Fertser wrote:
+>> On Tue, Apr 08, 2025 at 03:02:14PM -0700, Hari Kalavakunta wrote:
+>>> On 4/8/2025 12:19 PM, Paul Fertser wrote:
+>>>
+>>>> In other words, you're testing your code only with simulated data so
+>>>> there's no way to guarantee it's going to work on any real life
+>>>> hardware (as we know hardware doesn't always exactly match the specs)?
+>>>> That's unsettling. Please do mention it in the commit log, it's an
+>>>> essential point. Better yet, consider going a bit off-centre after the
+>>>> regular verification and do a control run on real hardware.
+>>>>
+>>>> After all, that's what the code is for so if it all possible it's
+>>>> better to know if it does the actual job before merging (to avoid
+>>>> noise from follow-up patches like yours which fix something that never
+>>>> worked because it was never tested).
+>>>
+>>> I would like to request a week's time to integrate a real hardware
+>>> interface, which will enable me to test and demonstrate end-to-end 
+>>> results.
+>>> This will also allow me to identify and address any additional issues 
+>>> that
+>>> may arise during the testing process. Thank you for the feedback.
+>>
+>> Thank you for doing the right thing! Looking forward to your updated
+>> patch (please do not forget to consider __be64 for the fields).
+> 
+> I had not previously considered using __be64 for the struct 
+> ncsi_rsp_gcps_pkt, as it is an interface structure. I would like to seek 
+> your input on whether it is a good idea to use __be64 for interface 
+> messages. In my experience, I haven't come across implementations that 
+> utilize __be64. I am unsure about the portability of this approach, 
+> particularly with regards to the Management Controller (MC).
 
-Hi Andrew thanks for the quick response.
+Here are the results from a real hardware test, which validates the patch.
 
-For the dwmac4 IP it has the following format at the=20
-Receive Normal Descriptor 0 (RDES0)
 
-           31                                                              =
-                                  0
-              ------------------------------------- -----------------------=
-------------
-RDES0 |   Inner VLAN TAG [31:16]   | Outer VLAN TAG [31:16   |
-              ------------------------------------- -----------------------=
-------------
+a. Initiate GCPS command to the NIC-2
+root@bmc:~# ./ncsi-cmd -i 3 -p 0 -c 0 raw 0x18
+<7> Command: type 0x18, payload 0 bytes:
+<7> Send Command, CHANNEL : 0x0 , PACKAGE : 0x0, INTERFACE: 0x008cd598
+<7> Response 228 bytes: 00 01 00 3b 98 00 00 cc 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 2b e5 fc e0 c0 00 00 00 00 
+65 70 d5 54 00 00 00 00 09 50 66 56 00 00 00 00 03 08 a8 79 00 00 00 00 
+00 3d 5c 44 00 00 00 00 00 79 38 23 00 00 00 00 00 02 fe 06 00 00 00 00 
+00 00 02 be 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 00 00 00 b8 21 5f 03 8f da af 00 d8 6d 36 
+00 73 a3 e7 00 17 20 70 00 00 00 00 00 00 d8 8a 00 00 0e 9c 00 56 4f 83 
+00 10 17 e2 00 01 5b 76 00 13 6e a3 00 00 f8 cd 00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 2c 20 55 f5
 
-While for dwxgmac2 IP it has the following format at the RDES0
-Depending on the Tunneled Frame bit (TNP)
+b. tcpdump capture of the GCPS
+GCPS Command Capture:
+         0x0000:  0001 003b 1800 0000 0000 0000 0000 0000
+         0x0010:  ffff e7c4 0000 0000 0000 0000 0000 0000
+         0x0020:  0000 0000 0000 0000 0000 0000 0000
 
-For Non-Tunneled Frame (TNP=3D0)
-           31                                                              =
-                                  0
-              ------------------------------------- -----------------------=
-------------
-RDES0 |   Inner VLAN TAG [31:16 ]  | Outer VLAN TAG [31:16]   |
-              ------------------------------------- -----------------------=
-------------
+GCPS Response
+         0x0000:  0001 003b 9800 00cc 0000 0000 0000 0000
+         0x0010:  0000 0000 0000 0000 0000 0000 0000 002b
+         0x0020:  e5fc e0c0 0000 0000 6570 d554 0000 0000
+         0x0030:  0950 6656 0000 0000 0308 a879 0000 0000
+         0x0040:  003d 5c44 0000 0000 0079 3823 0000 0000
+         0x0050:  0002 fe06 0000 0000 0000 02be 0000 0000
+         0x0060:  0000 0000 0000 0000 0000 0000 0000 0000
+         0x0070:  0000 0000 0000 0000 0000 0000 0000 0000
+         0x0080:  0000 0000 0000 0000 0000 0000 0000 0000
+         0x0090:  0000 0000 00b8 215f 038f daaf 00d8 6d36
+         0x00a0:  0073 a3e7 0017 2070 0000 0000 0000 d88a
+         0x00b0:  0000 0e9c 0056 4f83 0010 17e2 0001 5b76
+         0x00c0:  0013 6ea3 0000 f8cd 0000 0000 0000 0000
+         0x00d0:  0000 0000 0000 0000 0000 0000 0000 0000
+         0x00e0:  2c20 55f5
 
-For Tunneled Frame (TNP=3D1)
-           31                                        8 7                   =
-       3 2                  0
-              -------------------------------- ----------------------- ----=
-------------
-RDES0 |   VNID/VSID                    |    Reserved         | OL2L3       =
-  |
-              -------------------------------- ----------------------- ----=
-------------
+c. dmesg log (Debug purpose only) to demonstrate correct value read.
+[ 1350.369741] ncsi_rsp_handler_gcps ENTRY
+[ 1350.369768] ncs->hnc_rx_bytes = 188542148800 (0x2be5fce0c0)
 
-While the logic for handling Tunneled Frame and Non-Tunneled
-Frame is not yet implemented in the=20
-dwxgmac2_wrback_get_rx_vlan_tci() function, I believe it is
-prudent to maintain separate functions within their respective
-descriptor driver files, (dwxgmac2_descs.c and dwmac4_descs.c)
+
+Let us examine the "Total Bytes Received" statistic. Specifically, we'll 
+look at offset 28..35 (0x1c..0x24), bytes read - '0000 002b e5fc e0c0'. 
+NCSI now correctly collects this value into it's internal structure.
+
+
+I just noticed a warning regarding line length in the patch submission, 
+I will address this issue in version 2 of the patch. Let me know if we 
+need additional information.
 
