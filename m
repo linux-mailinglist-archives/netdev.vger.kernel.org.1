@@ -1,143 +1,135 @@
-Return-Path: <netdev+bounces-180829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF534A829F8
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 17:21:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D45E9A82A09
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 17:22:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3EBE462373
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 15:14:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9DD61BC6958
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 15:16:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A8FA262804;
-	Wed,  9 Apr 2025 15:14:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04E32676E3;
+	Wed,  9 Apr 2025 15:15:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VzeOMvip"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="PdIFwprw"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503C617C224;
-	Wed,  9 Apr 2025 15:14:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06022676DC;
+	Wed,  9 Apr 2025 15:15:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744211675; cv=none; b=H59z7R4ZkzNGYrGdw8ZpI3AQb2qVqsIOlS6MkJ/LjKFULAb1va0Ctjo1PZ+8M3YLOXj/xs5QZVGbS2ZMzOJ2OBKKgncRzNSLqYO4OuzRRW2ZNDQK/Powab4exedgA+jReO++NzzCWdCUvUTsujWcSHvnW+vtywefDD5xpAQDqos=
+	t=1744211743; cv=none; b=itlgSQCP3FsDgFbqI5qhX9CG9h6xLbcOgm83V8AvhJ3xYoQqjslbsDGDg/1hbHnu+9XYn8OzvfqPFGAd3IYB2HAToJjKAz6bnGtvPSZiHjfmIlruSSfRFSAnSgIoT8L8U041nxX+VlPkRdRikE8yZLdG0PLfu5IdQdc/RXEpcr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744211675; c=relaxed/simple;
-	bh=4pv6xbJxx0FGOS5p+DoZTJASD5VN3ptTlbrUPvCbD0w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZgpdPTzd98xLmVwEnpK+aeQCEvvpetTU9Y7XFTekFLIhhPMl0At1iBP7jrKmA2g3M/cRV9kYmxNwtT2oKS0hT2QHKrXzaBZqMUvJNcmpEafqmwMFO30Fc3I95Xmf+M0lXRbWPj2sXPmRvtKApM9EX87nv0fzblOZrBbE+oDM7Io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=VzeOMvip; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 73EBF433E8;
-	Wed,  9 Apr 2025 15:14:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1744211671;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+SFhdSIbhQQFQ25tC/H1tGZS1MIYQhE75YEayy/jgE8=;
-	b=VzeOMvipLpW8qfpw6FnWEdsmt3E8apRA+vaip6pEQNq4YJyjnbrwm7pSGscBJhI9zlLG5T
-	/AUaSu0xGngOYq1dxx5l8bZ7O/cJ+Fk5zQ3o/XgFty3Q+iAAkvO3mYg5ynx+kAOEnw+/eA
-	6zx8ECZS+nqI2VMdZVvlwoTZpCRD2+VU+tTDTIjtx3d7uy5X6YtMemjg3S+PlYOr2PHMi0
-	0kDKcU3VdEVJ/o600tXjO1mmpsSD887PII34Id8I2dit/iL1e9bFBRx6zw5OngWCxcBLRm
-	DUCCqBH/6MwZbzjAYKSKRjOCxBmk/a9dnPV6cvi+cKyF/CQVXEhspiEkQZOgqA==
-Date: Wed, 9 Apr 2025 17:14:29 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Marek =?UTF-8?B?QmVo?=
- =?UTF-8?B?w7pu?= <kabel@kernel.org>, Richard Cochran
- <richardcochran@gmail.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH net-next v2 0/2] Add Marvell PHY PTP support
-Message-ID: <20250409171429.3e9ced7d@kmaincent-XPS-13-7390>
-In-Reply-To: <20250409171055.43e51012@fedora.home>
-References: <20250407-feature_marvell_ptp-v2-0-a297d3214846@bootlin.com>
-	<Z_P3FKEhv1s0y4d7@shell.armlinux.org.uk>
-	<20250407182028.75531758@kmaincent-XPS-13-7390>
-	<Z_P-K7mEEH6ProlC@shell.armlinux.org.uk>
-	<20250407183914.4ec135c8@kmaincent-XPS-13-7390>
-	<Z_WJO9g5Al1Yr_LX@shell.armlinux.org.uk>
-	<20250409103130.43ab4179@kmaincent-XPS-13-7390>
-	<Z_Yxb6-qclDSWk01@shell.armlinux.org.uk>
-	<20250409104637.37301e01@kmaincent-XPS-13-7390>
-	<Z_Y-ENUiX_nrR7VY@shell.armlinux.org.uk>
-	<20250409142309.45cdd62f@kmaincent-XPS-13-7390>
-	<20250409144654.67fae016@fedora.home>
-	<20250409164920.5fbc3fd1@kmaincent-XPS-13-7390>
-	<20250409171055.43e51012@fedora.home>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1744211743; c=relaxed/simple;
+	bh=Opub4nPFKe0dGEqqnAdG56suvfimC2NloMu5LJWvNkg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=srvzejb1Sa71TQp8+Y7nwYF7PWkeqPtnvAs/Xw5fw2s4nCsQxPS0fF8Q9LUgaiIzV6VBv5TSDPbRBCJHJvdEZrySmBeQNyQq2ShFfaValHW5kRVB0Y20erFI0/oFhMjAn8jeU+yybvr7oqjRKAtkIzzLxWF6lrzn9jLK1GD07zU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=PdIFwprw; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5399wevp001338;
+	Wed, 9 Apr 2025 08:15:19 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=eoPBda+7E2pDFQFTGwL019q
+	+LmJJfjxwNswlPkwFweM=; b=PdIFwprwyNoe/wKhEWV2EIKOYxk3IjUR059+8K6
+	rFSGM7AgNQ3PrshfjEhsH10tNJabyYkoGGV7Y/wwNN4p/8TkxJPPF8ng/bbgloZe
+	UKpiF6WDAjhhqfXTGI8QcfIaTSsQMMvFud3GgifTrqDo1rGw+AdqRpr+vuP5qi45
+	+NOH5cUBOvKRE/SZ78hDn6mUUOe2npZKt6GnA413zx3UQE5rV6ivY2E2I+GPSutn
+	u3/z5BKkn2ppcGgMk3MffjVSnvM1m6qNQ8DoY2ZzhFssiqXZZ61ZbeOJPFE61zay
+	NuSnETQ8MRRJKbM1lzOwM/OYXfv8WzCSuQfyFNS6eJYiHoQ==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 45unnb084j-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 09 Apr 2025 08:15:18 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Wed, 9 Apr 2025 08:15:17 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Wed, 9 Apr 2025 08:15:17 -0700
+Received: from sburla-PowerEdge-T630.sclab.marvell.com (unknown [10.106.27.217])
+	by maili.marvell.com (Postfix) with ESMTP id 7F5753F7069;
+	Wed,  9 Apr 2025 08:15:17 -0700 (PDT)
+From: Sathesh B Edara <sedara@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <hgani@marvell.com>, <vimleshk@marvell.com>,
+        Veerasenareddy Burru
+	<vburru@marvell.com>,
+        Sathesh Edara <sedara@marvell.com>,
+        Shinas Rasheed
+	<srasheed@marvell.com>,
+        Satananda Burla <sburla@marvell.com>,
+        Andrew Lunn
+	<andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Eric
+ Dumazet" <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+Subject: [PATCH net v1] octeon_ep_vf: Resolve netdevice usage count issue
+Date: Wed, 9 Apr 2025 08:15:09 -0700
+Message-ID: <20250409151509.31764-1-sedara@marvell.com>
+X-Mailer: git-send-email 2.36.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtdeifeegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudehpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmp
- dhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: nh0IFZLiqJXd6Yl3FNMD1RA8PP21G0TU
+X-Authority-Analysis: v=2.4 cv=E57Npbdl c=1 sm=1 tr=0 ts=67f68f06 cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=XR8D0OoHHMoA:10 a=M5GUcnROAAAA:8 a=21s9sNkdZRs4KDQlc5MA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: nh0IFZLiqJXd6Yl3FNMD1RA8PP21G0TU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-09_05,2025-04-08_04,2024-11-22_01
 
-On Wed, 9 Apr 2025 17:10:55 +0200
-Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+Address the netdevice usage count problem in the following scenarios:
+- When the interface is down
+- During transmit queue timeouts
+Additionally, ensure all queues are stopped when the interface is down.
 
-> On Wed, 9 Apr 2025 16:49:20 +0200
-> Kory Maincent <kory.maincent@bootlin.com> wrote:
->=20
-> > On Wed, 9 Apr 2025 14:46:54 +0200
-> > Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
-> >  =20
-> > > On Wed, 9 Apr 2025 14:23:09 +0200
-> > > Kory Maincent <kory.maincent@bootlin.com> wrote:
+Signed-off-by: Sathesh B Edara <sedara@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-> > > How about an enum instead of a string indicating the device type, and=
- if
-> > > PHY, the phy_index ? (phy ID has another meaning :) )   =20
-> >=20
-> > This will raise the same question I faced during the ptp series mainline
-> > process. In Linux, the PTP is managed through netdev or phylib API.
-> > In case of a NIC all is managed through netdev. So if a NIC has a PTP at
-> > the PHY layer how should we report that? As MAC PTP because it goes tho=
-ught
-> > netdev, as PHY PTP but without phyindex? =20
->=20
-> Are you referring to the case where the PHY is transparently handled by
-> the MAC driver (i.e. controlled through a firmware of some sort) ?
+diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
+index 18c922dd5fc6..f16b5930d414 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
++++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
+@@ -526,6 +526,7 @@ static int octep_vf_stop(struct net_device *netdev)
+ 	netdev_info(netdev, "Stopping the device ...\n");
+ 
+ 	/* Stop Tx from stack */
++	netif_tx_stop_all_queues(netdev);
+ 	netif_carrier_off(netdev);
+ 	netif_tx_disable(netdev);
+ 
+@@ -819,7 +820,6 @@ static void octep_vf_tx_timeout_task(struct work_struct *work)
+ 		octep_vf_open(netdev);
+ 	}
+ 	rtnl_unlock();
+-	netdev_put(netdev, NULL);
+ }
+ 
+ /**
+@@ -834,7 +834,6 @@ static void octep_vf_tx_timeout(struct net_device *netdev, unsigned int txqueue)
+ {
+ 	struct octep_vf_device *oct = netdev_priv(netdev);
+ 
+-	netdev_hold(netdev, NULL, GFP_ATOMIC);
+ 	schedule_work(&oct->tx_timeout_task);
+ }
+ 
+-- 
+2.36.0
 
-Yes I was.
-=20
-> In such case, how do you even know that timestamping is done in a PHY,
-> as the kernel doesn't know the PHY even exists ? The
-> HWTSTAMP_SOURCE_XXX enum either says it's from PHYLIB or NETDEV. As
-> PHYs handled by firmwares don't go through phylib, I'd say reporting
-> "PHY with no index" won't be accurate.
->=20
-> In such case I'd probably expect the NIC driver to register several
-> hwtstamp_provider with different qualifiers
->=20
-> > That's why maybe using netlink string could assure we won't have UAPI
-> > breakage in the future due to weird cases.
-> > What do you think? =20
->=20
-> Well I'd say this is the same for enums, nothing prevents you from
-> adding more values to your enum ?
-
-Thanks! I am ok with that.
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
 
