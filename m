@@ -1,97 +1,126 @@
-Return-Path: <netdev+bounces-180721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DAE6A82416
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 14:00:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A18ABA8242E
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 14:05:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E1BD1B66FA9
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 12:00:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 125B47B212B
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 12:04:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECBCC25E463;
-	Wed,  9 Apr 2025 11:59:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F6C925EFBC;
+	Wed,  9 Apr 2025 12:04:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mQGK+l/y"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Do2eW7o2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87B125DCE9
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 11:59:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFF325EF8F;
+	Wed,  9 Apr 2025 12:04:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744199998; cv=none; b=dGBn1P7dFjWA7rPGUQdooiP70YNHB1n7P9imdLagaygpJcSZKDMn8GWWcOeMnruVdVjoTH7GdqZ1hwbVdO81MNG9KT3zL/CxEO0H8RTIJknoIipA/nteRBlJ4vNSP/Mhpb5hOYtk10CKeWTh0D7/v28gv0VqS7fOBE79cp7mOck=
+	t=1744200287; cv=none; b=ehEN9NpTHp9ywOrwKNPblE3Y6eRDdJ3/mYn8wIzBJvh4On0gIDv9E9/sMdobS9uZofaQk4v2BzKz4jlU63cdINIyX9e6nD0BZE0R17znrbCrYFax/xoceJ61mYW9WMddgsJ0dC/N5WNPPlksd37c71Jn2a9uGaZf8uN9DIQvkNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744199998; c=relaxed/simple;
-	bh=UeVaUpGckLqe3u4NPYNDHrmcLio1DL+K4Gg3hUTZ2M4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PE0qXXqCubwnDMzFY3jSOatgEUKA5NSOvG3rBzRn7FSkLtSL9Bg8YOe2fV+RB1OQOeWxROOWPQ/tJrDBb17+UV6CI6njAGhULKhxU//lJysW/dvTacGW7xbT0OZqU8EAngeTieOlhc2d4Ux3FECZ+rw39KGn7tTs8wlj59tkdZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mQGK+l/y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41386C4CEE3;
-	Wed,  9 Apr 2025 11:59:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744199998;
-	bh=UeVaUpGckLqe3u4NPYNDHrmcLio1DL+K4Gg3hUTZ2M4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mQGK+l/ym3thsVasbrehMvUkBRRpnpl7SgRYewIpj/E214YV8AfgYpK8/o1vUUrzj
-	 F0hzdBU1iUVEJAWPDPbEaQjl2bbCF/RgZMUndv0pzfvW5XTLXRxMq+UJCkVeDunpFT
-	 ae1EA1/a5Q014r/ktymD+U+AisPzwWwg95Q+PXdws9M/6SbsAoB+Dc07bI35XhthxP
-	 TdeBAe4KnQtSELAAnSVz3CC/D4oEipIgwtpY8EYcls8YWgxOicHNpAsu8OQSnym13W
-	 5sbzbb5RN6r2FFcgmSTNVEpVJeP85zvWlMCPYTiHyAee4vibYu5AYT2pbTkP0vFoSq
-	 0WJ94FUzphusQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id DF1EC380CEF0;
-	Wed,  9 Apr 2025 12:00:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1744200287; c=relaxed/simple;
+	bh=3eISLvMZBxP/ooZQeBCga7d69iQG8hNqCRD4i6rUm48=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qA2gF5P1H+FUj5Bc0MlR//dDK+GNmOr9dz25pLs7Qct4XVEmyzZZWAs8L7omBAa4SUVZ3Uv7v//nP+n45aD88jde1fwxJe0y1Dx1Q2vm9dpdLgeHJyXr46z6pnDjp46ViQ2oF6IIPgwfLOR4LHI5PpSQ8YnnjxHC9JWiUUxT0os=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Do2eW7o2; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=OAVZ/6PMd5CIYGP1LffsV13Ct6MPa7aS43NNYUi9Muc=; b=Do2eW7o21PD63tUeD1m2JPMF3Y
+	GA5PJ2TY9XpQdy9chWaHuYljs1HgVw6p5M9TaxjWcsYXPcY68Nmh+BBlqBEFfjV182S1AM0QCVxcE
+	Mg97XRoHA317XEdNLGpJRIrwHtQCfQNRRgkRtx6Y8UULja95mNyri9hyyr5XhP3K1DcA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u2UAX-008X2W-Vg; Wed, 09 Apr 2025 14:04:37 +0200
+Date: Wed, 9 Apr 2025 14:04:37 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Ng, Boon Khai" <boon.khai.ng@altera.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	"Gerlach, Matthew" <matthew.gerlach@altera.com>,
+	"Ang, Tien Sung" <tien.sung.ang@altera.com>,
+	"Tham, Mun Yew" <mun.yew.tham@altera.com>,
+	"G Thomas, Rohan" <rohan.g.thomas@altera.com>
+Subject: Re: [PATCH net-next v3 2/2] net: stmmac: dwxgmac2: Add support for
+ HW-accelerated VLAN stripping
+Message-ID: <3eb3bb21-eee9-44b6-b680-4c629df29d34@lunn.ch>
+References: <20250408081354.25881-1-boon.khai.ng@altera.com>
+ <20250408081354.25881-3-boon.khai.ng@altera.com>
+ <c65bfe99-a6e1-4485-90ee-aee0b8e0984d@lunn.ch>
+ <BN8PR03MB5073B710F5040EAC06595AE2B4B42@BN8PR03MB5073.namprd03.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3 0/3] net_sched: sch_sfq: reject a derived limit of 1
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174420003545.2791114.5721266695877616211.git-patchwork-notify@kernel.org>
-Date: Wed, 09 Apr 2025 12:00:35 +0000
-References: <20250407202409.4036738-1-tavip@google.com>
-In-Reply-To: <20250407202409.4036738-1-tavip@google.com>
-To: Octavian Purdila <tavip@google.com>
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, shuah@kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN8PR03MB5073B710F5040EAC06595AE2B4B42@BN8PR03MB5073.namprd03.prod.outlook.com>
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Mon,  7 Apr 2025 13:24:06 -0700 you wrote:
-> Because sfq parameters can influence each other there can be
-> situations where although the user sets a limit of 2 it can be lowered
-> to 1:
+On Wed, Apr 09, 2025 at 03:12:53AM +0000, Ng, Boon Khai wrote:
+> > This appears to be identical to dwmac4_wrback_get_rx_vlan_tci() ?
+> > 
+> > Can it be moved into the shared code, or am i missing something?
+> > 
+> >         Andrew
 > 
-> $ tc qdisc add dev dummy0 handle 1: root sfq limit 2 flows 1 depth 1
-> $ tc qdisc show dev dummy0
-> qdisc sfq 1: dev dummy0 root refcnt 2 limit 1p quantum 1514b depth 1 divisor 1024
+> Hi Andrew thanks for the quick response.
 > 
-> [...]
+> For the dwmac4 IP it has the following format at the 
+> Receive Normal Descriptor 0 (RDES0)
+> 
+>            31                                                                                                0
+>               ------------------------------------- -----------------------------------
+> RDES0 |   Inner VLAN TAG [31:16]   | Outer VLAN TAG [31:16   |
+>               ------------------------------------- -----------------------------------
+> 
+> While for dwxgmac2 IP it has the following format at the RDES0
+> Depending on the Tunneled Frame bit (TNP)
+> 
+> For Non-Tunneled Frame (TNP=0)
+>            31                                                                                                0
+>               ------------------------------------- -----------------------------------
+> RDES0 |   Inner VLAN TAG [31:16 ]  | Outer VLAN TAG [31:16]   |
+>               ------------------------------------- -----------------------------------
+> 
+> For Tunneled Frame (TNP=1)
+>            31                                        8 7                          3 2                  0
+>               -------------------------------- ----------------------- ----------------
+> RDES0 |   VNID/VSID                    |    Reserved         | OL2L3         |
+>               -------------------------------- ----------------------- ----------------
+> 
+> While the logic for handling Tunneled Frame and Non-Tunneled
+> Frame is not yet implemented in the 
+> dwxgmac2_wrback_get_rx_vlan_tci() function, I believe it is
+> prudent to maintain separate functions within their respective
+> descriptor driver files, (dwxgmac2_descs.c and dwmac4_descs.c)
 
-Here is the summary with links:
-  - [net,v3,1/3] net_sched: sch_sfq: use a temporary work area for validating configuration
-    https://git.kernel.org/netdev/net/c/8c0cea59d40c
-  - [net,v3,2/3] net_sched: sch_sfq: move the limit validation
-    https://git.kernel.org/netdev/net/c/b3bf8f63e617
-  - [net,v3,3/3] selftests/tc-testing: sfq: check that a derived limit of 1 is rejected
-    https://git.kernel.org/netdev/net/c/26e705184e7a
+Please add a comment, or describe this in the commit message.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+	Andrew
 
