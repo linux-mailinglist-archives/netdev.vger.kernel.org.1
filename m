@@ -1,64 +1,79 @@
-Return-Path: <netdev+bounces-180607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3E9BA81D4C
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 08:42:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5299FA81D51
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 08:44:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 193F03B7934
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 06:42:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22DBA189A42B
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 06:44:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74CC21DF748;
-	Wed,  9 Apr 2025 06:42:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C71571DF27D;
+	Wed,  9 Apr 2025 06:44:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pc0gd56f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UCjoTyZ7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03601D63E8
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 06:42:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522311DE4E7;
+	Wed,  9 Apr 2025 06:44:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744180939; cv=none; b=IrN3bESn5i6Q8/1Bbz1UD3kyQAA7GjWfIAtthKVrHQx4FAC+cn1QOaJXM66X0qUd9AhyEp9dkH/DQNccWC4IcImzUfBHSdvLbqD0dZND/0lQ/wrYIzgJ3G8+82/X3McSqeTVlwAJyByk18XpdBUTUGRAvsbaH+5yygm91HwTFrg=
+	t=1744181057; cv=none; b=aEEsOKqMmXeNY/1Jmh3e/3hHnTtVLB039as1yfC44YAY43J+iO8zZs6Bfoudhr1U0O8+y+sDkyhG+80T7okOQci/ePJtJQLoetPXuaok4h9jRPOIa2TBGhX17UvpoiPVELyhnS3/uEPlXIBiC5ouH8/O0yBqRo5RQUHOxblyWYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744180939; c=relaxed/simple;
-	bh=xQKw0XbFmKGsN+GZ6nIb5nWvMnctlKZfRwk3pF7YWzI=;
+	s=arc-20240116; t=1744181057; c=relaxed/simple;
+	bh=EA2abmK970vc5VUSwknSZAbpfozmiJ2WLu2yC0Rm9Q8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C/9eilkHkvdtVhePQk0Jebo0vKfk1TNmBz/5jIjA/0DN/h6zvFerZV0qgEkvCc+dANGE/FLdMZfjnXRXzRhqN23QwDq/9i3rCy5P4UXEE/FP0g2b1T3Fl03NDq4ZJR8XxHfdG3XlOMFGHk5eS/H9UCv5lBJlKhW7tTgIOoPUf98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pc0gd56f; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744180936;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bXOvHf+rQnYe15TmhKJ+zlI21FPd5oLP8we8fpA0shw=;
-	b=Pc0gd56fsidLO3Yjk8zJutwZq2fdjX+5+BxhjFiDsKhH823/pHNFpgf/OPd14xZXoZ6aJK
-	XybIPQ7a8m+8Tv26OwxuZZJwWZRT/WsHMTF7gZ8DJf1+LoiXl0eEXIQo2DpKjA5heYHhzQ
-	lpe8GWrNKZ5qo+sJ1xo6WwsVhqIjnE0=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-34-m7d0HUV2M7GLY8AnyzUsXg-1; Wed,
- 09 Apr 2025 02:42:14 -0400
-X-MC-Unique: m7d0HUV2M7GLY8AnyzUsXg-1
-X-Mimecast-MFC-AGG-ID: m7d0HUV2M7GLY8AnyzUsXg_1744180932
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C574319560BC;
-	Wed,  9 Apr 2025 06:42:11 +0000 (UTC)
-Received: from [10.44.32.72] (unknown [10.44.32.72])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CB74D3001D0E;
-	Wed,  9 Apr 2025 06:42:07 +0000 (UTC)
-Message-ID: <466681f4-22c2-4eae-aa98-ee923c148907@redhat.com>
-Date: Wed, 9 Apr 2025 08:42:06 +0200
+	 In-Reply-To:Content-Type; b=G+iBxptMY39zla1sf2g0IDBWeQgpOFpQu2ZPZp07f7t30NzaZav4WfRL88zk5nIBod8Qrlh6nFtBq/K69rJcsriI7S1C0oAW67SPLKqz/lZT8Oi+C7hGzj/BhylPjUdJ8DixsP9Ry6DI77CuT8XzFprg1JRKTkwxgIoAe9bqrM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UCjoTyZ7; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-306bf444ba2so2921946a91.1;
+        Tue, 08 Apr 2025 23:44:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744181055; x=1744785855; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zFnPHqAViJTArLLnMbNb1yqvVoshG4R2mnj5u2i0toE=;
+        b=UCjoTyZ7n8tvGR7OjR7tS9Ro8L6DZwRuJrPXMXc0xYRDuSBjkVrXWTFGds+H1WQgfk
+         Cw8H8bFkttNmiWr0SkDD4d0ub/uTIlEey5XyoJlu5OeKZmfVmXl5qwo2rsavYFKLg3yQ
+         UCFG7H0G13HgI95y2pp0HayFIU3KMNkU58fypUztZHcanuF14xDNsvgT+kodRqefKlDd
+         m1CFbvPnOqpieeNvWkDFeUraia1KI1JU9YLB++Gji1oXn/3WGhoXFJGCUtDcQrvFNeAC
+         b9boKIxtjNKpTZv2GJGSOFprw3lPe8+4pqSghfe12fvjbYM4NItRj7d9j83Tkuf9zjTa
+         TlFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744181055; x=1744785855;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zFnPHqAViJTArLLnMbNb1yqvVoshG4R2mnj5u2i0toE=;
+        b=OQ2enlJ411P2VUcc1F9WQlnCjPh0rvXYq5os0OAujFdDezIhkZQGzNh0VjoWA5MWmc
+         DrOLzJOqIemG+2jMYf7Was/W/S0fSAepk3txAPPkNMIOv25HZlrV9UIKCmw/6IIf3Kti
+         HXGm/LOi23iEiktDscbdWlgd1aS2KVjBVOQbCFuuDNvf9CgusCKsTwiY+VfVgtG6bJir
+         AFn1RcRmGicYQWhzemyFnpHWI/h80TTfJtSexteLvBiotFYtlJeupNFw4jyX6LeW3qKS
+         RxML25+hUH585ZH2GjSFUZvkYyMc0Hw6NkPPY131JcrVbgsQR7TGg87aYi9SCKGQway2
+         /VZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUEexOdK9qCPYZhGyULaaX5xXql0mPZ1WT38S6QbreWmoSaGMMZqqRLhlh06TtdN8OdjBnRtMCh@vger.kernel.org, AJvYcCUuKXJsKYqwjQErzh/Wxfc9cS4OKEPyBKaXclXWqK1usyGbMki0wMieocSTAZd1xoMVa8o=@vger.kernel.org, AJvYcCWxPsPKgl8iqnUFTxILAMzUBFIJuFKf7xKXa/hBSMrrnckZt/IgQy4ndfvh7o8wNUGUrIsZGzCCXNUrDfaf@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVs00Dro6bD73Lzk4Oakg95dvYnwgg/sLaTQLisIEBwPjNf5jK
+	ozKTnLpdB1DqV6+yqt0Bw/6aBgg4DffkUsl90/gNCWvnk79l6Cek
+X-Gm-Gg: ASbGncssGAHIzNeIQWr6+2uIo3cJHX7KoICN+ZEiVL8K/7jw3fwJQ6XoLFmP2VN2vXj
+	ypaglAht/e6lNVkYHvGq8jSUQfrfIaeJTDCAzA6HTpJToQrNGbk7xJW9443DCfSZcOKkv1CuGxc
+	W7xiR4yiMe6pqMeOaTIMkgwWvqRfTYCu1WUUo2QAGhomNLBisOf9Uqn72V1HIpIIZE2oFG0fe+/
+	Tyzl9dnDCH1Ruabapkp1d1cKXY8OowF9f5CxTxTTGRvzy9NNPccOKuiuE1DgL0G/PdNUYtj21Pj
+	2JaI5K47dfrf3vRHKa4dAtuKVuwHDT+zoKO6GRlrqbd1ifp0yQ==
+X-Google-Smtp-Source: AGHT+IFEFBrVdU4Z60J6u9c77Kly+wSwU0+rEdmF+faACzLEkBXEARmQGsGuz7F6mtlkCJR4WkAuvA==
+X-Received: by 2002:a17:90a:d00b:b0:2fe:9783:afd3 with SMTP id 98e67ed59e1d1-306dbb8e8a5mr2762085a91.2.1744181055366;
+        Tue, 08 Apr 2025 23:44:15 -0700 (PDT)
+Received: from [192.168.0.118] ([14.169.40.45])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22ac7b8c617sm4321055ad.67.2025.04.08.23.44.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Apr 2025 23:44:14 -0700 (PDT)
+Message-ID: <4195db62-db43-4d61-88c3-7a7fbb164726@gmail.com>
+Date: Wed, 9 Apr 2025 13:44:07 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,42 +81,63 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 03/28] mfd: zl3073x: Add register access helpers
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
- Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
- Andy Shevchenko <andy@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <20250407172836.1009461-1-ivecera@redhat.com>
- <20250407172836.1009461-4-ivecera@redhat.com>
- <bd028787-4695-4d7b-9000-c725a9ae4106@lunn.ch>
+Subject: Re: [PATCH] virtio-net: disable delayed refill when pausing rx
+To: Jason Wang <jasowang@redhat.com>
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ virtualization@lists.linux.dev
+References: <20250404093903.37416-1-minhquangbui99@gmail.com>
+ <1743987836.9938157-1-xuanzhuo@linux.alibaba.com>
+ <30419bd6-13b1-4426-9f93-b38b66ef7c3a@gmail.com>
+ <CACGkMEs7O7D5sztwJVn45c+1pap20Oi5f=02Sy_qxFjbeHuYiQ@mail.gmail.com>
 Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <bd028787-4695-4d7b-9000-c725a9ae4106@lunn.ch>
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+In-Reply-To: <CACGkMEs7O7D5sztwJVn45c+1pap20Oi5f=02Sy_qxFjbeHuYiQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Transfer-Encoding: 8bit
 
-On 07. 04. 25 11:03 odp., Andrew Lunn wrote:
-> On Mon, Apr 07, 2025 at 07:28:30PM +0200, Ivan Vecera wrote:
->> Add helpers zl3073x_{read,write}_reg() to access device registers.
->> These functions have to be called with device lock that can be taken
->> by zl3073x_{lock,unlock}() or a caller can use defined guard.
-> 
-> regmap has locking. It would be good to explain in detail why regmap
-> locking is not sufficient.
-> 
-> 	Andrew
-> 
-Yes, it is not sufficient. I will describe this in v2 commit description.
+On 4/8/25 14:34, Jason Wang wrote:
+> On Mon, Apr 7, 2025 at 10:27 AM Bui Quang Minh <minhquangbui99@gmail.com> wrote:
+>> On 4/7/25 08:03, Xuan Zhuo wrote:
+>>> On Fri,  4 Apr 2025 16:39:03 +0700, Bui Quang Minh <minhquangbui99@gmail.com> wrote:
+>>>> When pausing rx (e.g. set up xdp, xsk pool, rx resize), we call
+>>>> napi_disable() on the receive queue's napi. In delayed refill_work, it
+>>>> also calls napi_disable() on the receive queue's napi. This can leads to
+>>>> deadlock when napi_disable() is called on an already disabled napi. This
+>>>> scenario can be reproducible by binding a XDP socket to virtio-net
+>>>> interface without setting up the fill ring. As a result, try_fill_recv
+>>>> will fail until the fill ring is set up and refill_work is scheduled.
+>>> So, what is the problem? The refill_work is waiting? As I know, that thread
+>>> will sleep some time, so the cpu can do other work.
+>> When napi_disable is called on an already disabled napi, it will sleep
+>> in napi_disable_locked while still holding the netdev_lock. As a result,
+>> later napi_enable gets stuck too as it cannot acquire the netdev_lock.
+>> This leads to refill_work and the pause-then-resume tx are stuck altogether.
+> This needs to be added to the chagelog. And it looks like this is a fix for
+>
+> commit 413f0271f3966e0c73d4937963f19335af19e628
+> Author: Jakub Kicinski <kuba@kernel.org>
+> Date:   Tue Jan 14 19:53:14 2025 -0800
+>
+>      net: protect NAPI enablement with netdev_lock()
+>
+> ?
+
+I'm not aware of this, will update the fix tags in the next patch.
+
+> I wonder if it's simpler to just hold the netdev lock in resize or xsk
+> binding instead of this.
+
+That looks cleaner, let me try that approach.
 
 Thanks,
-Ivan
-
+Quang Minh
 
