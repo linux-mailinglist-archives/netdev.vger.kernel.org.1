@@ -1,146 +1,174 @@
-Return-Path: <netdev+bounces-180576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE2ACA81BAF
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 05:46:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2F28A81BB0
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 05:48:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50D043A65FA
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 03:46:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 343A87A720B
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 03:47:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F26A7082A;
-	Wed,  9 Apr 2025 03:46:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D21713BC3F;
+	Wed,  9 Apr 2025 03:48:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="uQRCMYhN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y3ZxwuZr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BE1C442C
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 03:46:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CE7B6F073
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 03:48:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744170412; cv=none; b=YjyL1bqohtfrDwu5zdKtNr9YgaJWnw1pHS0YZIY0e9nB/LlXnJB10krQ0tPTvTYcZzNVphZ3unOe2h3Feo9weD3FFIfxGIEIIOBOn0TB6omDrPu6cCdg8oRwEBiUhDhgUXwq+RATFxC2IbugapwkB9zCLsXwpvOxeiLryM4is1o=
+	t=1744170506; cv=none; b=h3l6K68G5T37dMlXmKrarnSkZJrPDhTIjrFIwPntjoeHAh5JDyyVnZ+kd/WPXe0bMVuqkj1W2xHxnEeCT1ISPmxYkX3V2MdLcaJTIkfQ+ZB4PdEPwsAPICuSScCyG78Ykpcyp2wDA4jPMLgIo1I0cpsPDMEanwA8stSvHQBk450=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744170412; c=relaxed/simple;
-	bh=c38k5NxC5UTvrWESclciIp/0Wma2BRjeEb0TWCoh9Ps=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eG+mIsPKp7oCyAja2bGzrGF+reMU0fyWHR98SJ9eqAm8gYupb0K7QJGwvkk20VvJZeWq/CloZCKPzeIVEw6d8yP1iTL1X0elKZ18KOWHzcuykFdBI02Fw2m/tqcT0riqBzO+LBTJhCmurfjP5RqtMSd0c7w/T1YhT2VsF8PmdP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=uQRCMYhN; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-af523f4511fso4994922a12.0
-        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 20:46:50 -0700 (PDT)
+	s=arc-20240116; t=1744170506; c=relaxed/simple;
+	bh=jm23jbproO302nvscE4k26m7PcSXsSKnvx/92fuN9sw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JxB5lQpQi9E74cn14jwLpqcpjzhY1nJD0ZSuqO5WZCaz5NSSSAU08MgN6yEhzjRE45qTKa+cC8YJ6O/rdJWcXP+niYZYSC8YVYnS5/jl4X7kxf9WuE1GKDbo/zCxJVokZbvj1Ka/gx7VqUuBNEPfQ+yX9qUd96iN4gFHGXz92Jk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y3ZxwuZr; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5e8be1bdb7bso10187524a12.0
+        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 20:48:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1744170410; x=1744775210; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=py3mENGKXJzMS1z0Ezu0V0tIhaLvQv6W38y8yd1FgSY=;
-        b=uQRCMYhNzliybHs0bFAn/4VDQne1Eov/xeJvhMrXypCwWEhylodemuxBcEixzTNK0M
-         p9P+XmEQCirTi5NiwBUN9twF3vKB79vFOwKwlGudiJ70frG29rp+7VAr8rrjVJTmidvS
-         EY3038/yklorol5CQCqwbkwfC0yV+6zeLA4U2QVf/ZX2l35/nDBW+UEkR3YG2UE9MOe3
-         pa3fkK3T1yShjcP01A9I6NtRAJriPuoQJ0pisFjoYrDU98BwgDU6YoqHZHm6J0k9joeY
-         h5i8XOVHPCqGEYPWw7hPViyVv0U2L+KpPb2/FpiCscMsN9b5kuimHbJgWc9Njee7ScZV
-         1Vtg==
+        d=gmail.com; s=20230601; t=1744170502; x=1744775302; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=plqOV+CBhLr8hn2ShOMF5leTcV4+inLNdgzQe1MuDbc=;
+        b=Y3ZxwuZrP30TFCh4RHnJQngCcnJoy+8hejUtNqQFjKJpmO8MENjcCcSW4CcD2OO2m4
+         iU/2OMGzEmXy0UY3qNnZv6ICMWYrlUdVJNt9mhE3rYzIadSkigcWcMYn67xk5hDBdyJg
+         7i+rTsMlR9+/3nKcn8E+Y+OFJKqC0nA1P2DnwMKhWAfoxQkhibbsyTKjA6+mYRWGLXif
+         VZh6930qjZLExzteK+uC4X6c8kIzlhLHp0Y24+s0TZNnT2ScoDC05qQpaFpAAa56Nb+G
+         AoCvJyMCKFbi9znRjIMWV2ujjxsV2oy7xa2hwlbXjFuOM4qHmpXs+4EarK6qR5Qi+iFc
+         n88g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744170410; x=1744775210;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=py3mENGKXJzMS1z0Ezu0V0tIhaLvQv6W38y8yd1FgSY=;
-        b=k4Cpkz61IsjIZ8aV2FiCsZazuvtmOjAJdte1NmZTZdHmKPOlFKt1zb+x5c8FyhJqcU
-         b+GGvZJJ38SgOFeX6yuFNF6kUhHTnt6tQcecfTy7AyN03JzdxX291JCuDInUnWGu4TYb
-         jBzob+mDvFDS+esmdLXPbRAuQMFiiT0AK9BSnb9FSQ0sf0l3FFhmH0E7BwLOd/pRxI8d
-         VIkqm7hieeTOfLgcJO87yN0N9uIyNlADplitMfkM9F2vHOyhLbxwoOiCMKb/oCuWZzcE
-         HqVoEwRB7qAC026niuxpR9W9+c/ggR7V4HyltmMdMWzbXEbM65xX3dPd+8Dx5fDuPxau
-         EYqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVWWjNXJ3WrydoqrpmxPw+C/MiKqRxC+sZY4KPmwAKEUR3+lpt8JIP7xKKNCUDCKEFYI8zEODU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvP09HY0TauSrpqAJ2+MmUvtrx4NFMwsBwT4KzNXzH8JSxy6Y/
-	nUFxiUJ/BUiOaaTWmM6565z8ZbfPYoLyixfGTZCaJcmEz/4dM95vIhn4bRgoVlI=
-X-Gm-Gg: ASbGnct9876hhKrvrAkXhAa+D6TLF6CV7uSIe4Ktoc8EwBv8WqutCjiSPSuMDmRQ8md
-	+i4r0OGNdGThryAPO0ug0dUm1dKwe9pW2vRZGuKVDWfj1HP/+gI1ZD0K+CZ0KM1OplNyUSoMYDA
-	DzCAT4Tq+WEyYSjHbWBT0mtNriNNWRC8jSHzUMdS4jYBQ5RIZj2YLeeQjGoSL/rO5Oaac/OLvvD
-	Zv3PlAZSOL9Eriv+fT08EhF2BcTzUS0Ta+k0a5uliiGyMfnwM/V9Cf9h/vkV1V2Bvg2ZLdqBRKr
-	LG5f6RAyg5Y9EuJLLtZ8Qo5htgThdYtRq/Mkaa0vg20tM8uwzpg=
-X-Google-Smtp-Source: AGHT+IE/VCko3c/0Pi9VEv7XOV/shf3GrZe3RmbTpVPt9s39kr91Xiw3J/4eier15E7yTl+vv+624Q==
-X-Received: by 2002:a17:90b:582f:b0:2fc:b40:339a with SMTP id 98e67ed59e1d1-306dbb90e5emr2526295a91.10.1744170410325;
-        Tue, 08 Apr 2025 20:46:50 -0700 (PDT)
-Received: from [192.168.1.12] ([97.126.136.10])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-306df2fae34sm254138a91.39.2025.04.08.20.46.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Apr 2025 20:46:50 -0700 (PDT)
-Message-ID: <7c7dd9fa-40ab-4a3b-83e9-4dc338d02e60@davidwei.uk>
-Date: Tue, 8 Apr 2025 20:46:49 -0700
+        d=1e100.net; s=20230601; t=1744170502; x=1744775302;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=plqOV+CBhLr8hn2ShOMF5leTcV4+inLNdgzQe1MuDbc=;
+        b=W4qRawP6/tkwuPQ/vXZMqmCjIUEwL8uMUKQWg01ml5R2GC7AXrWnWAV6jc/IkT3r20
+         fbaQu3EC65t6I39XlQD7oMgzFrtH78Y8+z7AgWeJ/TiGXe5i6uvLCjF866o/GsCabV6E
+         EvRLwCoUobRTP4ZSCFLKs5gVB4IKNLnO6s8H4BvIQo/BBwRSkRLHxGxtWahRI88mOgNK
+         CpW6XnAI+sWHOKZucIJWOcXiJ/gCJtjR1TDPl9oQ+r5nW7SSLOpgT9slXfPAt9XDHW3H
+         Tf+r2LynhKbcLBZZY/YRlruEw7MMNSnQiX0/u1UJobWZQb6T+m60nCeXwz7e7HXtgRWN
+         /Bnw==
+X-Forwarded-Encrypted: i=1; AJvYcCURb9fpq9JqeUbJzkLpO1o6MiPWao9+i7B+6OCVHSDkR6w4HztjbrxJ7TC3KibQJY01SgERmgU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+tTQMzhqD+ObjkVCFQKUGtAQCQ/frId1cngBU+ZKql5qpIaCu
+	NIJJWOetTN7wmIyvWw7v1IAEkoGabbyOYjVBy0wnJy2YHo+ESn/PAn64en1B5PIshMxGy1heZMt
+	M923DhjKn9NSB3s33L+m9Tn2cVkQ=
+X-Gm-Gg: ASbGncsbM1apz0Un69eDz9jMvyNxRp409tA496qM5PgQCAQfFp4r4iqtbF7OAgRmb72
+	pcMVVSgIfYTLRSiOJsjohJiW3xEqT50bHOlMh6THc1vN/gWG9D0BvJ4aPnAWxjVuMH8pt9xXkrr
+	3DND14HFEEHYl/LuPhfgvvF8uk
+X-Google-Smtp-Source: AGHT+IGLslssggqPSAPwBaEZvHjSNFE7yjcvWezA6Qhi/hGAEm6SAGFD/lknkH2uREmycfpDun9wl6CCBbPwjNQfy2A=
+X-Received: by 2002:a05:6402:26c7:b0:5e5:edf8:88f2 with SMTP id
+ 4fb4d7f45d1cf-5f2f7740579mr1064458a12.23.1744170502104; Tue, 08 Apr 2025
+ 20:48:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+References: <20250408043545.2179381-1-ap420073@gmail.com> <CADYv5ecv3iz=B_Lve-0oK273a79Qqa=Eh08kbfhBHLFXDgotSw@mail.gmail.com>
+In-Reply-To: <CADYv5ecv3iz=B_Lve-0oK273a79Qqa=Eh08kbfhBHLFXDgotSw@mail.gmail.com>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Wed, 9 Apr 2025 12:48:10 +0900
+X-Gm-Features: ATxdqUH0Cm1ntZmDdsvweFFzJQhgK4gg7RjCvn33K9uI4pv9zNkPDhZL5vMAzko
+Message-ID: <CAMArcTU7iv1McsFM24yaK5TxaiOqsayizOBr__82VKqD0w=fHw@mail.gmail.com>
 Subject: Re: [PATCH net-next] eth: bnxt: add support rx side device memory TCP
-Content-Language: en-GB
-To: Taehee Yoo <ap420073@gmail.com>, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, andrew+netdev@lunn.ch,
- horms@kernel.org, michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
- hawk@kernel.org, ilias.apalodimas@linaro.org, netdev@vger.kernel.org
-Cc: kuniyu@amazon.com, sdf@fomichev.me, ahmed.zaki@intel.com,
- aleksander.lobakin@intel.com
-References: <20250408043545.2179381-1-ap420073@gmail.com>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20250408043545.2179381-1-ap420073@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To: Hongguang Gao <hongguang.gao@broadcom.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	michael.chan@broadcom.com, pavan.chebbi@broadcom.com, hawk@kernel.org, 
+	ilias.apalodimas@linaro.org, netdev@vger.kernel.org, dw@davidwei.uk, 
+	kuniyu@amazon.com, sdf@fomichev.me, ahmed.zaki@intel.com, 
+	aleksander.lobakin@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2025-04-07 21:35, Taehee Yoo wrote:
-> Currently, bnxt_en driver satisfies the requirements of the Device
-> memory TCP, which is HDS.
-> So, it implements rx-side Device memory TCP for bnxt_en driver.
-> It requires only converting the page API to netmem API.
-> `struct page` of agg rings are changed to `netmem_ref netmem` and
-> corresponding functions are changed to a variant of netmem API.
-> 
-> It also passes PP_FLAG_ALLOW_UNREADABLE_NETMEM flag to a parameter of
-> page_pool.
-> The netmem will be activated only when a user requests devmem TCP.
-> 
-> When netmem is activated, received data is unreadable and netmem is
-> disabled, received data is readable.
-> But drivers don't need to handle both cases because netmem core API will
-> handle it properly.
-> So, using proper netmem API is enough for drivers.
-> 
-> Device memory TCP can be tested with
-> tools/testing/selftests/drivers/net/hw/ncdevmem.
-> This is tested with BCM57504-N425G and firmware version 232.0.155.8/pkg
-> 232.1.132.8.
-> 
-> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> ---
-> 
-> RFC -> PATCH v1:
->  - Drop ring buffer descriptor refactoring patch.
->  - Do not convert to netmem API for normal ring(non-agg ring).
->  - Remove changes of napi_{enable | disable}() to
->    napi_{enable | disable}_locked().
->  - Relocate a need_head_pool in struct bnxt_rx_ring_info due to
->    an alignment hole.
->  - Remove *offset parameter of __bnxt_alloc_rx_netmem().
->    *offset is always set to 0 in this function. it's unnecessary.
->  - Get skb_shared_info outside of loop in __bnxt_rx_agg_netmems().
->  - Drop Tested-by tag due to changes of this patch.
-> 
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 201 +++++++++++++---------
->  drivers/net/ethernet/broadcom/bnxt/bnxt.h |   3 +-
->  include/linux/netdevice.h                 |   1 +
->  include/net/page_pool/helpers.h           |   6 +
->  net/core/dev.c                            |   6 +
->  5 files changed, 137 insertions(+), 80 deletions(-)
+On Wed, Apr 9, 2025 at 9:35=E2=80=AFAM Hongguang Gao <hongguang.gao@broadco=
+m.com> wrote:
+>
 
-Tested to work with io_uring zero copy receive.
+Hi Hongguang,
+Thanks a lot for your review!
 
-Tested-by: David Wei <dw@davidwei.uk>
+> On Mon, Apr 7, 2025 at 9:36=E2=80=AFPM Taehee Yoo <ap420073@gmail.com> wr=
+ote:
+> >
+> > Currently, bnxt_en driver satisfies the requirements of the Device
+> > memory TCP, which is HDS.
+> > So, it implements rx-side Device memory TCP for bnxt_en driver.
+> > It requires only converting the page API to netmem API.
+> > `struct page` of agg rings are changed to `netmem_ref netmem` and
+> > corresponding functions are changed to a variant of netmem API.
+> >
+> > It also passes PP_FLAG_ALLOW_UNREADABLE_NETMEM flag to a parameter of
+> > page_pool.
+> > The netmem will be activated only when a user requests devmem TCP.
+> >
+> > When netmem is activated, received data is unreadable and netmem is
+> > disabled, received data is readable.
+> > But drivers don't need to handle both cases because netmem core API wil=
+l
+> > handle it properly.
+> > So, using proper netmem API is enough for drivers.
+> >
+> > Device memory TCP can be tested with
+> > tools/testing/selftests/drivers/net/hw/ncdevmem.
+> > This is tested with BCM57504-N425G and firmware version 232.0.155.8/pkg
+> > 232.1.132.8.
+> >
+> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+>
+> Hi Taehee,
+> Thanks for submitting the patch. Overall it looks good to me.  Please see
+> 2 minor comments below.
+>
+> I'm also in progress to test this patch, not finished yet.
+>
+>
+> > @@ -3777,15 +3811,20 @@ static int bnxt_alloc_rx_page_pool(struct bnxt =
+*bp,
+> >         pp.dev =3D &bp->pdev->dev;
+> >         pp.dma_dir =3D bp->rx_dir;
+> >         pp.max_len =3D PAGE_SIZE;
+> > -       pp.flags =3D PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
+> > +       pp.flags =3D PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV |
+> > +                  PP_FLAG_ALLOW_UNREADABLE_NETMEM;
+> > +       pp.queue_idx =3D rxr->bnapi->index;
+> > +       pp.order =3D 0;
+>
+> Nit, set pp.order to 0 is not needed. The whole struct was initialized
+> to 0 already.
+
+Okay, I will remove it in v2.
+
+>
+>
+> > @@ -15766,7 +15808,7 @@ static int bnxt_queue_mem_alloc(struct net_devi=
+ce *dev, void *qmem, int idx)
+> >         xdp_rxq_info_unreg(&clone->xdp_rxq);
+> >  err_page_pool_destroy:
+> >         page_pool_destroy(clone->page_pool);
+> > -       if (bnxt_separate_head_pool())
+> > +       if (bnxt_separate_head_pool(rxr))
+>
+> Should be:
+>         if (bnxt_separate_head_pool(clone))
+
+Thanks for this. You're right.
+I will fix it in v2.
+
+Thanks a lot!
+Taehee Yoo
+
+>
+> Thanks,
+> -Hongguang
 
