@@ -1,266 +1,218 @@
-Return-Path: <netdev+bounces-180932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 846EEA8318F
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 22:05:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AD7D5A83196
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 22:06:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0607B1883EA6
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 20:02:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E2D3189E184
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 20:04:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20174202C44;
-	Wed,  9 Apr 2025 20:01:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 638FA2116F6;
+	Wed,  9 Apr 2025 20:04:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gonB0jQI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BROwbz0n"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BC57143748
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 20:01:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744228913; cv=none; b=LnSiIfMAFS1s6/EqEDsA2LBE6OR/PNgBYzJr4qxSPrYXY6qng99xKgjMFhwH280whDBpPnvEySDi83TFbrDIzZ8ycrvKoeGtEhTTATuAQ2/IoDFmRVgQt8CfqpcsoSFJuabyJBtyQeIKbpgC86SIiFQQPapiq4u37MtS+iXHogc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744228913; c=relaxed/simple;
-	bh=yaL/ywHwuPQsVvtg6ZRMYk5T0/zBOQglL+9mB6Mwr7U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Phpu5ocZQInmHpZO5asT59aGyt7EUMveiKmzciZWZcHUdude7+V4XDMaRoTCFGjrqd5x1T5DXzvSM5iLw8wt7j2e9SKif/svKQzeb/Lp9NWnwDqQ4qnESo5+M9uQWmopVuyK9m3qz8Gfx/i4k2IZDBcs5DXn2zDp1aK+NV6v3jk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gonB0jQI; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744228910;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=mIgAyrF2k7dRorD29uzq+ilAyM64Yue0WDj/eSINd/U=;
-	b=gonB0jQI8+j2zcUpKsji6cyBj/0golNfYmpKLP8TYLVXkUueCWIQWlrImclBYF5/gFpgJg
-	+vD6cyQChwcB4HApRyXbgmm9oMyINLOk4lm3a8m3Z0WS+p7nuUoxccCl4UgBNvuMdrZVHj
-	VYAVSL8LeumZqKl3KynWXr0P+iO8o50=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-407-1_OoWwkcN7iOJcyjRbD9WA-1; Wed,
- 09 Apr 2025 16:01:46 -0400
-X-MC-Unique: 1_OoWwkcN7iOJcyjRbD9WA-1
-X-Mimecast-MFC-AGG-ID: 1_OoWwkcN7iOJcyjRbD9WA_1744228904
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EE82D187BE0A;
-	Wed,  9 Apr 2025 20:01:29 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.32.195])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0FBD8180B486;
-	Wed,  9 Apr 2025 20:01:24 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	David Ahern <dsahern@kernel.org>,
-	Eyal Birger <eyal.birger@gmail.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Antony Antony <antony.antony@secunet.com>
-Subject: [PATCH net-next] udp: properly deal with xfrm encap and ADDRFORM
-Date: Wed,  9 Apr 2025 22:00:56 +0200
-Message-ID: <92bcdb6899145a9a387c8fa9e3ca656642a43634.1744228733.git.pabeni@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F42211479;
+	Wed,  9 Apr 2025 20:04:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744229074; cv=fail; b=p6D8+nueCpVSTxdD7fbZcl/VphUXKamss83ii29+6Xd07Yk8epeoKWSkp/bY/2Sei2Feq63LeFf+t3F6c6Rfa04oCisGm8YBmJGPc+oHaZxZlGjtdOt7+MYJ6iV/APo4ZGSmc+rW7CFdedD+57PSfSRZOSnQmX+CtRwRs4/FAwc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744229074; c=relaxed/simple;
+	bh=hBWBJJAMRrhGFIHgyrymH55mo+SWE4v1AQrPiCGB5sc=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=X1SIJy+xu0k02niyBkrN5EmAuveUicPD9jxTnlRP9+fJ60Mkct3CMqSeSGAFA/n0LRr1qI5oY3gHLYHxcyKPSYn70PQDJkUzXCMqKhyI9zrE6O4wDq6S5apHnL/nUVFRC3aWdhAq3WA7/4XINJag7tHPZ1nJyVgAcQuZbtln/Ds=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BROwbz0n; arc=fail smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744229073; x=1775765073;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=hBWBJJAMRrhGFIHgyrymH55mo+SWE4v1AQrPiCGB5sc=;
+  b=BROwbz0nUoptFPbjua0uiwt2tFlQcwLALCsy6+TzpFtguhQ4E1cRVfGi
+   TqDHCaTj3YRVH5HQM4AxBTKGa2FEmoALErGx2o0CqloFoI2z0llGiF973
+   MIYhrkvIZvA8koe34RneEIkBRBAFeuTGUsV8YN9Mu8701uU6fY9qFUAhP
+   Xq9LyDdZUCjZUhXV+WIGai7hWh447jye6/ReJN+6lSZaeAKwS0l6rJep/
+   /mGZ3GGUuKpSOqG1l1di7ZeX4VsbfOt3AeVlju9TfhKh//hk4wgCkz/jE
+   6Y/urg7+RueHsYA6VzaGmN9aFJo9L8IVdLLUILIhTeuUzJSdg8MwtEZ+R
+   g==;
+X-CSE-ConnectionGUID: cY4wkxmfTreqa943gmsXTg==
+X-CSE-MsgGUID: 0yhv+qW3Tm63Tc76xrlN6g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11399"; a="49523376"
+X-IronPort-AV: E=Sophos;i="6.15,201,1739865600"; 
+   d="scan'208";a="49523376"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 13:04:32 -0700
+X-CSE-ConnectionGUID: xC18FLFdQm+2kmlf5UghVA==
+X-CSE-MsgGUID: s29r0Ug4TVubs2f5Ni2GIQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,201,1739865600"; 
+   d="scan'208";a="132823437"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 13:04:30 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Wed, 9 Apr 2025 13:04:30 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Wed, 9 Apr 2025 13:04:30 -0700
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.172)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 9 Apr 2025 13:04:30 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MOgjtC1j7QFevI8/8/+/vdY3N8OlZ9Y5kL+G6p9ycrQkuWdZgLAm+1bEZetiB9skxb4immoKUNoY7re1aR1GAGbE61Pas1PlPQde0uN/Qs5EgHtMxyBiKaZoWLwCzUuxkzdPCD4VMrTV96gV/+Aafmr85w+5sGCmv2TQAmmrPVrEJXnup+kfQvhgTihHcCa5o2mKMYfXMjrBFAvsegqa51sOJqzaDhc2/LKMiWKEihABrqEbTppBBFzeeAMwo/my1lxEiNWM/TMHcEgIuSFm7x8fPwVs6AkdU/zrJV7uGjuNmHn6kuYmruP1SypTHjeM4jqBecjLz9owozAOlxJ9iQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JptZK7/f3Kn8ihtQWWKGVPR5GcSj9m5KsqJviiYT2ac=;
+ b=RYRs652QNTX3AGEg/oM856n5I9FRwKZQtRpTLXoJh+jsZDR5mzT5CA4tgbr8u+OckF3rqLCDh/Moo4cFzvBXxELneT4Qi4EIikndBXTLQLdbOm61G+CnpTYD4/DCjxkObxNVPVS1qboo0LD4poG9rnXrBrVBKkMMWrKGi30GbwWdfZfGUDmuOWu6n+YMWBYnobtDiLrgv5VpOmZ+2sdIucQYHcMYbosyrTjJWR2EsLPyNdgxsZk2TCwk2iqBLqJy0OAkleEQkhjcMcIrKJWzIaZbgrCS8x0sO1kJOqeG/i5VVOwoLX5Ewm3FW6nhYNCpN1eYMT4s2ZjUywww2LzRuA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8665.namprd11.prod.outlook.com (2603:10b6:8:1b8::6) by
+ CO1PR11MB5155.namprd11.prod.outlook.com (2603:10b6:303:91::11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8632.22; Wed, 9 Apr 2025 20:04:27 +0000
+Received: from DS0PR11MB8665.namprd11.prod.outlook.com
+ ([fe80::8e7e:4f8:f7e4:3955]) by DS0PR11MB8665.namprd11.prod.outlook.com
+ ([fe80::8e7e:4f8:f7e4:3955%5]) with mapi id 15.20.8632.021; Wed, 9 Apr 2025
+ 20:04:27 +0000
+Date: Wed, 9 Apr 2025 22:04:13 +0200
+From: Michal Kubiak <michal.kubiak@intel.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+CC: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
+	<leonro@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
+	<leon@kernel.org>, <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Moshe Shemesh <moshe@nvidia.com>, Mark Bloch
+	<mbloch@nvidia.com>, Vlad Dogaru <vdogaru@nvidia.com>, Yevgeny Kliteynik
+	<kliteyn@nvidia.com>
+Subject: Re: [PATCH net-next 03/12] net/mlx5: HWS, Make pool single resource
+Message-ID: <Z/bSvTuAD5P8iHxQ@localhost.localdomain>
+References: <1744120856-341328-1-git-send-email-tariqt@nvidia.com>
+ <1744120856-341328-4-git-send-email-tariqt@nvidia.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1744120856-341328-4-git-send-email-tariqt@nvidia.com>
+X-ClientProxiedBy: MI2P293CA0015.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:45::9) To DS0PR11MB8665.namprd11.prod.outlook.com
+ (2603:10b6:8:1b8::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8665:EE_|CO1PR11MB5155:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6602ab6c-8bc5-4cc6-8f11-08dd77a1bb69
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7416014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?otrKghqkTzNIXC1KTn8NpIdifg+1F3Q4QjFo0sS3dWGFTilYJgajwuQAJrSm?=
+ =?us-ascii?Q?yYMvVc9tAyj63Z8OIigLGhmLBulHjcwIQF5BZhWY7V31ICbuZbGSby7fU6GR?=
+ =?us-ascii?Q?0OnbSzYgJt7rb8S8m4NB5pLr58+M/dtW5Ee6KQk0BrRe9NImxMvAUdYgbAUm?=
+ =?us-ascii?Q?zqtuZr+kHi+Xa7g4nPnOSTed2n0tH1AEtkbiQ/R5pRHe1izzrWwxqsbY9l3F?=
+ =?us-ascii?Q?0ek4rMNZ5sZJywyS68wqAUMSKDzloQ6aVyI+1Ks6vuD9EfS3Qdmh7P2k8yau?=
+ =?us-ascii?Q?ozQGVbcCa7AD8+6DLMDIypNeJve60g7Z/CUZuMrUZfSAPXc/6AnDycThHP+B?=
+ =?us-ascii?Q?pihYkQR6dmyuYDpuyeNmCfHMY18CKR4B2JRwB0rdr6t+P24kA81h23SpDI4q?=
+ =?us-ascii?Q?o5CPMfm5+QappCdirhbYGSUhlbltw6HTanxw129y0RPQyP7jJ0Sf8Y742xMG?=
+ =?us-ascii?Q?G3SqlR25fkpDrXRED8h8i/tIRKPRMRLwyVG3dkLNjE0rS0fpAhsRZO/e7DUt?=
+ =?us-ascii?Q?rPOCmiEx0lZcqSPQk+AkKpiv54YXyywqvvpsKSb9TuOspaSroisO8v/4dUUW?=
+ =?us-ascii?Q?jxqcBJtvGkLaC8SlwMs6eEY5wWlZAr7t2ky91eqiOSlMo2bNocBURQohMagf?=
+ =?us-ascii?Q?pgsswV0GLJJzFGBbf+FyeC5foW2f1tSwmP0ZLxD1zbsupTlQMLuFGffRGjte?=
+ =?us-ascii?Q?NF+YgKdx9kHBffXknxp5Wcn43SlL6dJ5n0MxDhJciDmfpc3KaY0UMz0UDQNp?=
+ =?us-ascii?Q?raIdCxQcJRQAhFj1qYxqaBe2/fBnxoeVmcwDRsQ4e/3Eb6+24kv8CTd3QKt2?=
+ =?us-ascii?Q?QeCDZ2xlcIpmQy5I4c7VBnlKa7eGDXYqeZVOa0BNB/aebtasgeY2DMuFGOe5?=
+ =?us-ascii?Q?Z+U3ascqecwd5B8hMeYIDV4eqf1/CxY0rTQD0sVeizuAeTgkanbSqc52XKX7?=
+ =?us-ascii?Q?XcoFBVrnf9+C9exuRJB9D+UNZEBuFE5lLEo8wcgvaCFMOmpR6Mpfev6Q/4Aa?=
+ =?us-ascii?Q?39C8fEURJoMsb5j0wxqspWpVPksRziUKhbDbhDwxOGl0QMQXS9FMbzoDFcw/?=
+ =?us-ascii?Q?/cHZP0JsAJZiI0GLvq2AtYGdcQhaaSJ2PzBSNtJcgiByr0FCGhlNyNdCdTiB?=
+ =?us-ascii?Q?KRV2L1g/Uy1VH/i6/C3Ty1SkoZMvAzM2IyG1pShORH6+T+RNLxnUtv5f4Nug?=
+ =?us-ascii?Q?KksAuKsGTWu6fMorioxLyoNiSIf/mtKt4KVH/bT1w4qqUtG94J46Mc2EbUbj?=
+ =?us-ascii?Q?6HPTFKd/cs4TMoVoUMAbnGVHwEZkrtmSbbHqpqE/tjlmDhrii26J4bm80OY8?=
+ =?us-ascii?Q?a6CcqnLVL9UI9RrrByHeWUVxuu7jQyX4qpL8cXcOt+JM+euUwzOHQOpa7N2t?=
+ =?us-ascii?Q?40ilKfda091l0shyXpxy4WAjP9m8?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8665.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?LJkldddhQzhPd3IffVvaew14/I9F6rtC+hvCuThr67Ymc4v0yqyOhQbzv51s?=
+ =?us-ascii?Q?xconSmX/NORSmSWh5BDtXn4Xqq8uDxxz2fIqibRtaxk9b6rEefVhU/etswmH?=
+ =?us-ascii?Q?fjtsQwah81kkCWqZY+KRStfzh6+vxtJxqe18S76kcQJmBUiPDPvDGAzm5njX?=
+ =?us-ascii?Q?UXi2dPmAMs/MEEZvhB3fXgDfJ1Zzc5HfSJ+oMfY70IK9jGNdo1rbU3HQvAqG?=
+ =?us-ascii?Q?uws9rrQfLv9QJSjbmOOw4ENPLs4ToDH+XjTlyfURhLW2X5aOvPm5EZyTzBKW?=
+ =?us-ascii?Q?Nmtm1I6+ZXthdtXQi7jpNiRV0zin3F/ALH6l6XBs7MfPwn+axrm6GSgq/zFb?=
+ =?us-ascii?Q?ifEtWFF/8QJdnjCH2gDVE8Pcu2CCOoAFqTsC1ch6JzSiotZElzmbscojalkR?=
+ =?us-ascii?Q?zJYWcXaKQQtIseNNO4oZzxHPQl6374tf6/jEQYaOFPs+vgh1BBcd3O3AHlOD?=
+ =?us-ascii?Q?8sdFn8q9Y8bl6YJ7OHUdqFQ+hLclYZKp56V9gRA6h/hJOPk9eI7BqC5MoJEf?=
+ =?us-ascii?Q?V10/HxmOb7nwhbfTsqirYbtn3sp15dgjR7CAJflkjPQwd1ESQ9fVGFJ2bs1t?=
+ =?us-ascii?Q?JJEGxwm6E8RzbOabnA2kRv9R/X8QpAHP4DTFlU7LF7nOcoLhfgTCei3o4liW?=
+ =?us-ascii?Q?vOfzrH+B7n7hiZzpNdL4DuxTn88cKFrDGwvVvk2oGtTx4LJYn7PtO+1w2HJ5?=
+ =?us-ascii?Q?/4KZd1jgiWQzuyKFhwQZahpjmDiE3xcgh13KElZpkoNHJvif2g+jroiLENh4?=
+ =?us-ascii?Q?xY2JBBp/VZjSs6gvPVb8266/WE8ZhPbQ9VjPYnMZ4KzlKRl83HSF6kH8dKwi?=
+ =?us-ascii?Q?jA48mP7FaMTUQjBTGkktyDG+igAGl+aiGOHJ/BNf/MdOSrqFOWOLGTx8rFRE?=
+ =?us-ascii?Q?J15TJMtXoViY4e+2kP+8wM0fdSlqETe8po4cqkOfHF2HeM+7O9nSuxpuMCtj?=
+ =?us-ascii?Q?U5HM6yENj40X8fvrNTWTcQ8zNDpKFsVGdeiusOWYNVG/aoFZ+ujHgN2qij7M?=
+ =?us-ascii?Q?TAFjeT830soy+KXgTZ4WazgLIngTzk1Ugr+DnbjIRpOjKEg0GjN83wM1twaM?=
+ =?us-ascii?Q?xSRMnEVHqjbbyPiV8pku8zhv10/Fu64HbHKK2UBynnXGDrTUc5PR3p0GSb6O?=
+ =?us-ascii?Q?4pV5VVGiIjiL//bXQK6COdLk5c9PVQBPeJficKin+YRMri5XhWFXPhgYreTl?=
+ =?us-ascii?Q?BvAFFqx+xPNq/+TodZHnMhU9Qasyuh0lr9108/SpFBJMe6tSuo8wFw0oyNpp?=
+ =?us-ascii?Q?QYJ/1PRQmIjv9UIE8/FJv4cYB1ZGdJIKCDnymD/drupNve1/qRXOASMwg+lL?=
+ =?us-ascii?Q?i84jnzQ2FIiMWiPnTC2BVzyXVgoykdJgAYDONbnxyOYSsapUGdd3GaKNNGXl?=
+ =?us-ascii?Q?zWDSEKVHmX48v35exAq9PTltfDbHlCYmZs3UgvV7hwPMKtY2FzYLVKTxKTCn?=
+ =?us-ascii?Q?AEzNjOqqkzRVEdXS2UFUlCW9Yp5mOyqLFDK8PU+gGRvbDj5oMkXCI2OV6yrU?=
+ =?us-ascii?Q?0fR/g99CgzR1JQnoNnCy/o6KYn9b5PzOq+DM9yXdgiHdF3vpPmNfxomBYIwC?=
+ =?us-ascii?Q?wsfSHqNmuUqLunf5KpjPBibri32xyr8GE80SICzEcLIFw3Q6xqhhTvhrhoFd?=
+ =?us-ascii?Q?PQ=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6602ab6c-8bc5-4cc6-8f11-08dd77a1bb69
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8665.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2025 20:04:27.7259
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SlvDllh7kA20kPF2VvX7VCZ+1Oj3yyIAGWMMCAiJ0rKZ4voFCtNbOyta0WvzTgYx9r9gRY5SrwOaidT4C4hsTg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5155
+X-OriginatorOrg: intel.com
 
-UDP GRO accounting assumes that the GRO receive callback is always
-set when the UDP tunnel is enabled, but syzkaller proved otherwise,
-leading tot the following splat:
+On Tue, Apr 08, 2025 at 05:00:47PM +0300, Tariq Toukan wrote:
+> From: Vlad Dogaru <vdogaru@nvidia.com>
+> 
+> The pool implementation claimed to support multiple resources, but this
+> does not really make sense in context. Callers always allocate a single
+> STC or STE chunk of exactly the size provided.
+> 
+> The code that handled multiple resources was unused (and likely buggy)
+> due to the combination of flags passed by callers.
+> 
+> Simplify the pool by having it handle a single resource. As a result of
+> this simplification, chunks no longer contain a resource offset (there
+> is now only one resource per pool), and the get_base_id functions no
+> longer take a chunk parameter.
+> 
+> Signed-off-by: Vlad Dogaru <vdogaru@nvidia.com>
+> Reviewed-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+> Reviewed-by: Mark Bloch <mbloch@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-WARNING: CPU: 0 PID: 5837 at net/ipv4/udp_offload.c:123 udp_tunnel_update_gro_rcv+0x28d/0x4c0 net/ipv4/udp_offload.c:123
-Modules linked in:
-CPU: 0 UID: 0 PID: 5837 Comm: syz-executor850 Not tainted 6.14.0-syzkaller-13320-g420aabef3ab5 #0 PREEMPT(full)
-Hardware name: Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-RIP: 0010:udp_tunnel_update_gro_rcv+0x28d/0x4c0 net/ipv4/udp_offload.c:123
-Code: 00 00 e8 c6 5a 2f f7 48 c1 e5 04 48 8d b5 20 53 c7 9a ba 10
-      00 00 00 4c 89 ff e8 ce 87 99 f7 e9 ce 00 00 00 e8 a4 5a 2f
-      f7 90 <0f> 0b 90 e9 de fd ff ff bf 01 00 00 00 89 ee e8 cf
-      5e 2f f7 85 ed
-RSP: 0018:ffffc90003effa88 EFLAGS: 00010293
-RAX: ffffffff8a93fc9c RBX: 0000000000000000 RCX: ffff8880306f9e00
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: ffffffff8a93fabe R09: 1ffffffff20bfb2e
-R10: dffffc0000000000 R11: fffffbfff20bfb2f R12: ffff88814ef21738
-R13: dffffc0000000000 R14: ffff88814ef21778 R15: 1ffff11029de42ef
-FS:  0000000000000000(0000) GS:ffff888124f96000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f04eec760d0 CR3: 000000000eb38000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- udp_tunnel_cleanup_gro include/net/udp_tunnel.h:205 [inline]
- udpv6_destroy_sock+0x212/0x270 net/ipv6/udp.c:1829
- sk_common_release+0x71/0x2e0 net/core/sock.c:3896
- inet_release+0x17d/0x200 net/ipv4/af_inet.c:435
- __sock_release net/socket.c:647 [inline]
- sock_close+0xbc/0x240 net/socket.c:1391
- __fput+0x3e9/0x9f0 fs/file_table.c:465
- task_work_run+0x251/0x310 kernel/task_work.c:227
- exit_task_work include/linux/task_work.h:40 [inline]
- do_exit+0xa11/0x27f0 kernel/exit.c:953
- do_group_exit+0x207/0x2c0 kernel/exit.c:1102
- __do_sys_exit_group kernel/exit.c:1113 [inline]
- __se_sys_exit_group kernel/exit.c:1111 [inline]
- __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1111
- x64_sys_call+0x26c3/0x26d0 arch/x86/include/generated/asm/syscalls_64.h:232
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f04eebfac79
-Code: Unable to access opcode bytes at 0x7f04eebfac4f.
-RSP: 002b:00007fffdcaa34a8 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f04eebfac79
-RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000000
-RBP: 00007f04eec75270 R08: ffffffffffffffb8 R09: 00007fffdcaa36c8
-R10: 0000200000000000 R11: 0000000000000246 R12: 00007f04eec75270
-R13: 0000000000000000 R14: 00007f04eec75cc0 R15: 00007f04eebcca70
+Nice code simplification!
 
-Address the issue moving the accounting hook into
-setup_udp_tunnel_sock() and set_xfrm_gro_udp_encap_rcv(), where
-the GRO callback is actually set.
-
-set_xfrm_gro_udp_encap_rcv() is prone to races with IPV6_ADDRFORM,
-run the relevant setsockopt under the socket lock to ensure using
-consistent values of sk_family and up->encap_type.
-
-Refactor the GRO callback selection code, to make it clear that
-the function pointer is always initialized.
-
-Reported-by: syzbot+8c469a2260132cd095c1@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=8c469a2260132cd095c1
-Fixes: 172bf009c18d ("xfrm: Support GRO for IPv4 ESP in UDP encapsulation")
-Fixes: 5d7f5b2f6b935 ("udp_tunnel: use static call for GRO hooks when possible")
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
-Technically this addresses 2 separate issues: the ADDRFORM race
-already exists on net, but is very unlikely to cause any problem
-in practice.
-
-Since the gro accounting fix depends on it, fix both with a
-single net-next patch, to avoid cross-trees dependencies and redice
-the syzbot noise.
----
- include/net/udp_tunnel.h   |  1 -
- net/ipv4/udp.c             | 31 ++++++++++++++++++++++++++-----
- net/ipv4/udp_tunnel_core.c |  2 ++
- 3 files changed, 28 insertions(+), 6 deletions(-)
-
-diff --git a/include/net/udp_tunnel.h b/include/net/udp_tunnel.h
-index 288f06f23a804..2df3b8344eb52 100644
---- a/include/net/udp_tunnel.h
-+++ b/include/net/udp_tunnel.h
-@@ -215,7 +215,6 @@ static inline void udp_tunnel_encap_enable(struct sock *sk)
- 	if (READ_ONCE(sk->sk_family) == PF_INET6)
- 		ipv6_stub->udpv6_encap_enable();
- #endif
--	udp_tunnel_update_gro_rcv(sk, true);
- 	udp_encap_enable();
- }
- 
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 8867fe687888c..f9f5b92cf4b61 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -2904,15 +2904,33 @@ void udp_destroy_sock(struct sock *sk)
- 	}
- }
- 
-+typedef struct sk_buff *(*udp_gro_receive_t)(struct sock *sk,
-+					     struct list_head *head,
-+					     struct sk_buff *skb);
-+
- static void set_xfrm_gro_udp_encap_rcv(__u16 encap_type, unsigned short family,
- 				       struct sock *sk)
- {
- #ifdef CONFIG_XFRM
-+	udp_gro_receive_t new_gro_receive;
-+
- 	if (udp_test_bit(GRO_ENABLED, sk) && encap_type == UDP_ENCAP_ESPINUDP) {
--		if (family == AF_INET)
--			WRITE_ONCE(udp_sk(sk)->gro_receive, xfrm4_gro_udp_encap_rcv);
--		else if (IS_ENABLED(CONFIG_IPV6) && family == AF_INET6)
--			WRITE_ONCE(udp_sk(sk)->gro_receive, ipv6_stub->xfrm6_gro_udp_encap_rcv);
-+		if (IS_ENABLED(CONFIG_IPV6) && family == AF_INET6)
-+			new_gro_receive = ipv6_stub->xfrm6_gro_udp_encap_rcv;
-+		else
-+			new_gro_receive = xfrm4_gro_udp_encap_rcv;
-+
-+		if (udp_sk(sk)->gro_receive != new_gro_receive) {
-+			/*
-+			 * With IPV6_ADDRFORM the gro callback could change
-+			 * after being set, unregister the old one, if valid.
-+			 */
-+			if (udp_sk(sk)->gro_receive)
-+				udp_tunnel_update_gro_rcv(sk, false);
-+
-+			WRITE_ONCE(udp_sk(sk)->gro_receive, new_gro_receive);
-+			udp_tunnel_update_gro_rcv(sk, true);
-+		}
- 	}
- #endif
- }
-@@ -2962,6 +2980,7 @@ int udp_lib_setsockopt(struct sock *sk, int level, int optname,
- 		break;
- 
- 	case UDP_ENCAP:
-+		sockopt_lock_sock(sk);
- 		switch (val) {
- 		case 0:
- #ifdef CONFIG_XFRM
-@@ -2985,6 +3004,7 @@ int udp_lib_setsockopt(struct sock *sk, int level, int optname,
- 			err = -ENOPROTOOPT;
- 			break;
- 		}
-+		sockopt_release_sock(sk);
- 		break;
- 
- 	case UDP_NO_CHECK6_TX:
-@@ -3002,13 +3022,14 @@ int udp_lib_setsockopt(struct sock *sk, int level, int optname,
- 		break;
- 
- 	case UDP_GRO:
--
-+		sockopt_lock_sock(sk);
- 		/* when enabling GRO, accept the related GSO packet type */
- 		if (valbool)
- 			udp_tunnel_encap_enable(sk);
- 		udp_assign_bit(GRO_ENABLED, sk, valbool);
- 		udp_assign_bit(ACCEPT_L4, sk, valbool);
- 		set_xfrm_gro_udp_encap_rcv(up->encap_type, sk->sk_family, sk);
-+		sockopt_release_sock(sk);
- 		break;
- 
- 	/*
-diff --git a/net/ipv4/udp_tunnel_core.c b/net/ipv4/udp_tunnel_core.c
-index 3d1214e6df0ea..2326548997d3f 100644
---- a/net/ipv4/udp_tunnel_core.c
-+++ b/net/ipv4/udp_tunnel_core.c
-@@ -90,6 +90,8 @@ void setup_udp_tunnel_sock(struct net *net, struct socket *sock,
- 
- 	udp_tunnel_encap_enable(sk);
- 
-+	udp_tunnel_update_gro_rcv(sk, true);
-+
- 	if (!sk->sk_dport && !sk->sk_bound_dev_if && sk_saddr_any(sk) &&
- 	    sk->sk_kern_sock)
- 		udp_tunnel_update_gro_lookup(net, sk, true);
--- 
-2.49.0
+Thanks,
+Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
 
 
