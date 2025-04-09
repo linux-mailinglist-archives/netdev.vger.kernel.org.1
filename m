@@ -1,64 +1,60 @@
-Return-Path: <netdev+bounces-180658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EC43A820C8
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 11:14:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BB5EA820DA
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 11:17:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5DF58A1B37
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 09:14:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7A687A4D2C
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 09:16:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03A7C25D546;
-	Wed,  9 Apr 2025 09:14:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D08D51DF749;
+	Wed,  9 Apr 2025 09:17:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="lG/4VHfL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iGMIQvFw"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C068B1DE3A5;
-	Wed,  9 Apr 2025 09:14:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53611DE3A5;
+	Wed,  9 Apr 2025 09:17:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744190064; cv=none; b=a2NJ5KjFad1/thtOq4THT2QeigdJUK7n0POYZWfm3lzPn8NJ01jVWpefFg28jvfI0LZHr/Xgm3Q2gvI5ZVF7jEEk5zFVaZp37kkuBZRsvZWkzfj/YIq/1oHyGswHc8/nRe7aFzRsQ/jbcqa/Is+iEAViAO1mlle7Tb0Gpv9Evzg=
+	t=1744190269; cv=none; b=oHX50oYO8M4PIxpqgUMM1y+0tLKtZQRElbX2hGGD422Ch4MsbEZJ73VmtvQi4Oi/ZZ2BtrnmAajAwSIDCqBVtOfJEea4LZZKiumQNnJi/OGtoClSDd4TjnC35MNMxfUHmXKYo2tguAlSmhMaO78yLqeLAdicfm/k/eyIntskkmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744190064; c=relaxed/simple;
-	bh=pidPjAxOQUC9n6C32lfwewePZ3cS4lFV9cAEdT1v+4U=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YrSHEgzgExUfyMP5VgtBrHcBL+RxVo46XrJxpwltCwVhSh/D6snE95otbUcm8FSHzTgKTHvfHGFFqX5/CY45oyHm8NL4jzTaUakhMjxcfsccgzLTCD57EPdJ6z0N3Am/OkNoGanJm4b3dGhdD2wnKK6lBDQ5EP+ua4bkJBYbT60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=lG/4VHfL; arc=none smtp.client-ip=117.135.210.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=pidPj
-	AxOQUC9n6C32lfwewePZ3cS4lFV9cAEdT1v+4U=; b=lG/4VHfLm/ZuH9BG9qDIM
-	EcfSx2PPtF0SrMRZLuUbPDrjPSgxIsti0Szju+Uu4P5ln0WElCBX7CA7nUMrA+eG
-	hVA7c8j4XVANu6TvuXctOTtFvvO6rmtiytTUXXelrD6VSAfT5jYfHPOy6HO5Yt/F
-	bu5tiyQYiv5ixt729oFqxM=
-Received: from localhost.localdomain (unknown [])
-	by gzsmtp1 (Coremail) with SMTP id PCgvCgCXX+owOvZnHjkdAQ--.48217S4;
-	Wed, 09 Apr 2025 17:13:23 +0800 (CST)
-From: lvxiafei <xiafei_xupt@163.com>
-To: fw@strlen.de
-Cc: coreteam@netfilter.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	kadlec@netfilter.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvxiafei@sensetime.com,
-	netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	pabeni@redhat.com,
-	pablo@netfilter.org,
-	xiafei_xupt@163.com
-Subject: Re: [PATCH V3] netfilter: netns nf_conntrack: per-netns net.netfilter.nf_conntrack_max sysctl
-Date: Wed,  9 Apr 2025 17:13:19 +0800
-Message-Id: <20250409091319.17856-1-xiafei_xupt@163.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20250409072028.GA14003@breakpoint.cc>
-References: <20250409072028.GA14003@breakpoint.cc>
+	s=arc-20240116; t=1744190269; c=relaxed/simple;
+	bh=hqEQ77fSXiZu3N5SWCg2WjfSPbGTcCLVEwpTTrz/2xg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=nM7Fa8BAWenyqhub1rb6te0v0l9UwiXBCJObX/soPADK30AMmLeeT53xY+Tbp8ahmrfV8vWtBScqJ/vugFDmhnBjD4cObYeA+oKBVEdIGl977f5HQSBkzrD1y6ZCNquWk9WIVtkVz7fuRXJ/udaq785y0XZr7zphXACah4DQe9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iGMIQvFw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90096C4CEE3;
+	Wed,  9 Apr 2025 09:17:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744190269;
+	bh=hqEQ77fSXiZu3N5SWCg2WjfSPbGTcCLVEwpTTrz/2xg=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=iGMIQvFwdJCtmyVMtv1xeIy2DraOwP6Ba/h6zAEN+wsvrAiubvTkQOtfy9s6ipwDk
+	 /mC3296UDFwck7Fh+lRo+EvGvnmmX5znY6NWR1ORehE9yuEqwhe86vEHzf1HkLYNm7
+	 rAwhHVN5J5IByZFNVCTNz+MUyLgTnRiD77NVtkhZuq9SDpwEeAcooYDaAl3e9VEI+k
+	 EHbka3139/bdYlI/mB38AFgsDPkhfHdEFD2znKL+qGxMoNgUR1YvmAGdh8Ba8qbkZQ
+	 iLX8iQrdhRjgZT1f7VA/eaclHqrTx2nTNCxoIF3+xjWJOb7e3teMU/ZaQouTXNky4h
+	 7OSTDC2m7te3Q==
+Message-ID: <1cc54fa0f517f387563263bb90ef1628244778df.camel@kernel.org>
+Subject: Re: [PATCH bpf-next] bpf: Allow error injection for
+ update_socket_protocol
+From: Geliang Tang <geliang@kernel.org>
+To: Yonghong Song <yonghong.song@linux.dev>, Gang Yan
+ <gang_yan@foxmail.com>,  Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, mptcp@lists.linux.dev
+Date: Wed, 09 Apr 2025 17:17:43 +0800
+In-Reply-To: <dee07a8c-aed2-4125-a4f0-1bd76ca1e4ac@linux.dev>
+References: <tmcxv429u9-tmgrokbfbm@nsmail7.0.0--kylin--1>
+	 <tencent_EB51CDCA4E189E271032DFEC7E042B752008@qq.com>
+	 <dee07a8c-aed2-4125-a4f0-1bd76ca1e4ac@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,19 +62,84 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PCgvCgCXX+owOvZnHjkdAQ--.48217S4
-X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjTRROJ5UUUUU
-X-CM-SenderInfo: x0ldwvplb031rw6rljoofrz/1tbiEBMqU2f2NYWJnwAAsN
 
-Florian Westphal <fw@strlen.de> wrote:
-> Whats the function of nf_conntrack_max?
-> After this change its always 0?
+Hi Yonghong,
 
-nf_conntrack_max is a global (ancestor) limit, by default
-nf_conntrack_max = max_factor * nf_conntrack_htable_size.
+On Sun, 2024-08-25 at 21:05 -0700, Yonghong Song wrote:
+> 
+> On 8/25/24 8:29 PM, Gang Yan wrote:
+> > Hi Alexei:
+> > It's my honor to recieve your reply. The response to your concerns
+> > is attached below
+> > for your review.
+> > On Mon, Aug 26, 2024 at 10:57:12AM +0800, Gang Yan wrote:
+> > > On Thu, Aug 22, 2024 at 8:33 AM Jakub Kicinski wrote:
+> > > > On Thu, 22 Aug 2024 14:08:57 +0800 Gang Yan wrote:
+> > > > > diff --git a/net/socket.c b/net/socket.c
+> > > > > index fcbdd5bc47ac..63ce1caf75eb 100644
+> > > > > --- a/net/socket.c
+> > > > > +++ b/net/socket.c
+> > > > > @@ -1695,6 +1695,7 @@ __weak noinline int
+> > > > > update_socket_protocol(int family, int type, int protocol)
+> > > > > {
+> > > > > return protocol;
+> > > > > }
+> > > > > +ALLOW_ERROR_INJECTION(update_socket_protocol, ERRNO);
+> > > > IDK if this falls under BPF or directly net, but could you
+> > > > explain
+> > > > what test will use this? I'd prefer not to add test hooks into
+> > > > the
+> > > > kernel unless they are exercised by in-tree tests.
+> > > This looks unnecessary.
+> > > update_socket_protocol is already registered as fmodret.
+> > > There is even selftest that excises this feature:
+> > > tools/testing/selftests/bpf/progs/mptcpify.c
+> > > 
+> > > It doesn't need to be part of the error-inject.
+> > The 'update_socket_protocol' is a BPF interface designed primarily
+> > to
+> > fix the socket protocol from TCP protocol to MPTCP protocol without
+> > requiring modifications to user-space application codes. However,
+> > when attempting to achieve this using the BCC tool in user-space,
+> > the BCC tool doesn't support 'fmod_ret'. Therefore, this patch aims
+> > to
+> > further expand capabilities, enabling the 'kprobe' method can
+> > overriding
+> > the update_socket_protocol interface.
+> 
+> Gang Yan, could you explore to add fmod_ret support in bcc? It should
+> be
+> similar to kfunc/kretfunc support. I am happy to review your patches.
 
-init_net.ct.sysctl_max is a parameter for each netns, and
-setting it will not affect the value of nf_conntrack_max.
+It took us some time to add this support in bcc, and we have recently
+completed it in [1]. We would be grateful if you could help review
+these patches.
+
+Thanks,
+-Geliang
+
+[1]
+https://github.com/iovisor/bcc/pull/5274
+
+> 
+> Thanks,
+> Yonghong
+> 
+> > 
+> > As a Python developer, the BCC tool is a commonly utilized
+> > instrument for
+> > interacting with the kernel. If the kernel could permit the use of
+> > an
+> > error-inject method to modify the `update_socket_protocol`, it
+> > would significantly
+> > benefit the subsequent promotion and development of MPTCP
+> > applications.
+> > Thank you for considering this enhancement.
+> > 
+> > Best wishes!
+> > Gang Yan
+> > 
+> > 
+> 
 
 
