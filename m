@@ -1,50 +1,62 @@
-Return-Path: <netdev+bounces-180660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72383A820E9
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 11:20:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 706E2A820F0
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 11:24:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 215494A1986
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 09:19:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53D741BA2C49
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 09:24:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E529E25D20A;
-	Wed,  9 Apr 2025 09:18:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D20B25C703;
+	Wed,  9 Apr 2025 09:24:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I5IgcAlR"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36611DE3AA;
-	Wed,  9 Apr 2025 09:18:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED36825A64E
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 09:24:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744190317; cv=none; b=XeqEcgfUd7TmDXnCeSOEKOl1sOudVADq4PBAcTyKMJ/+NwebjZhLLob5MiB98qfwBkJPX9KN6UQ0qShMN/NPFedmYFSJG6tbMNrvZ2yaWH29S+kVz6bpiz+WND4v/yOVCvx/qlrOsLRiylJFpLxU3LUxiJ1iVQ8ytCj6b+3vhDI=
+	t=1744190661; cv=none; b=KvZTTNnsCtdi7V3Fs3G+TvFqhIEE0IMEjRX+r71ZeWlBZvaPZPgR8RnsPxJrhvnkw7u1LhUztIbtStzJlkjLqEWHMH0tb9Z4Ty+Lb9meiv/H3OpxnZmlHu386FkeB+2Xl676yA5+yoCcKZwNxGXu6+sxzZttbbdCQnO/DiNm9mU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744190317; c=relaxed/simple;
-	bh=SvN3Gcf50djMUpmY0B1/0uK5pLnCZSO+X3P+SrDIIZ8=;
+	s=arc-20240116; t=1744190661; c=relaxed/simple;
+	bh=DwGnLL6yRkvpHKgsWq2KLkFsuAMpxTUYys1PXFd8l/k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UXs28hxFtEpV5IoLWvP1OlH7PVxRxgxEY0BAlSsQRkyxASSQvrmHNdzvVYwH4Vsn4wgBLhCF2vEMSdpGVLgz3hMBnurR9Fdm5FQTjK2Ii5Sr7hjHaEgZw/eEmeBhFQrPGCaZPSXfky8mW3jxvb6jom9G75FlK6A/8HjAzSDVG4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1u2RZd-0004ns-Qe; Wed, 09 Apr 2025 11:18:21 +0200
-Date: Wed, 9 Apr 2025 11:18:21 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Huajian Yang <huajianyang@asrmicro.com>
-Cc: pablo@netfilter.org, kadlec@netfilter.org, razor@blackwall.org,
-	idosch@nvidia.com, davem@davemloft.net, dsahern@kernel.org,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, bridge@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: Expand headroom to send fragmented packets in
- bridge fragment forward
-Message-ID: <20250409091821.GA17911@breakpoint.cc>
-References: <20250409073336.31996-1-huajianyang@asrmicro.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LfUsbOtrsG+nE0c6mKqbdBs3cWMXpxmj5k8BH7NIUtdOpg0sJNe0ihtZ6WK/lolnuNSNC+uTWva8My4tDkjzm5Dll0R+NgXSEw3lKyU9B7bUCbTV6hsRXaSHRuxNjo2J4a/WCNKt0CbQx2XoOI28VxaD5hvJMzfkMlhpRGMZg9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I5IgcAlR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F195BC4CEE3;
+	Wed,  9 Apr 2025 09:24:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744190660;
+	bh=DwGnLL6yRkvpHKgsWq2KLkFsuAMpxTUYys1PXFd8l/k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=I5IgcAlRk1EgDie6uaxayYtmeWyKVS9fIZR/1/0nWhopGT1klDsqsAR7EEvpioDBA
+	 fT+AelYZcJx98j9ircBrA/HFfrqqKxbfjSa6MQrT5xWwUW8xPgSSMzDlert4absJ6f
+	 bN0q1tjepncf6SDptO1blqFqaz/am//rlMjDmRAeUp/jdX/eN4wmAAvTDvgkNHDN+x
+	 Hr06pPWxCq93goCnSt6PUrlzRR3E2sHbGERKzE+hRoSqOzeWpPubGNxQuyfeVRghR+
+	 HKyRoY10GR+tr2P6I3RsaFu6Nnz2Hc+vRvi4fdIdM6Yo0Gw7CvaddfZs/7/qYPcVXK
+	 RSmto31DVfR+Q==
+Date: Wed, 9 Apr 2025 10:24:15 +0100
+From: Simon Horman <horms@kernel.org>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] net: stmmac: stm32: simplify clock handling
+Message-ID: <20250409092415.GI395307@horms.kernel.org>
+References: <E1u1rwV-0013jc-Ez@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,59 +65,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250409073336.31996-1-huajianyang@asrmicro.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <E1u1rwV-0013jc-Ez@rmk-PC.armlinux.org.uk>
 
-Huajian Yang <huajianyang@asrmicro.com> wrote:
-> The config NF_CONNTRACK_BRIDGE will change the way fragments are processed.
-> Bridge does not know that it is a fragmented packet and forwards it
-> directly, after NF_CONNTRACK_BRIDGE is enabled, function nf_br_ip_fragment
-> will check and fraglist this packet.
+On Mon, Apr 07, 2025 at 08:15:35PM +0100, Russell King (Oracle) wrote:
+> Some stm32 implementations need the receive clock running in suspend,
+> as indicated by dwmac->ops->clk_rx_enable_in_suspend. The existing
+> code achieved this in a rather complex way, by passing a flag around.
 > 
-> Some network devices that would not able to ping large packet under bridge,
-> but large packet ping is successful if not enable NF_CONNTRACK_BRIDGE.
+> However, the clk API prepare/enables are counted - which means that a
+> clock won't be stopped as long as there are more prepare and enables
+> than disables and unprepares, just like a reference count.
+> 
+> Therefore, we can simplify this logic by calling clk_prepare_enable()
+> an additional time in the probe function if this flag is set, and then
+> balancing that at remove time.
+> 
+> With this, we can avoid passing a "are we suspending" and "are we
+> resuming" flag to various functions in the driver.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+> This patch has been only build tested, so I would be grateful if
+> someone with the hardware could run-test this change please.
 
-Can you add a new test to tools/testing/selftests/net/netfilter/ that
-demonstrates this problem?
+Yes, agreed that would be nice.
+But this is a very nice cleanup.
 
-> In function nf_br_ip_fragment, checking the headroom before sending is
-> undoubted, but it is unreasonable to directly drop skb with insufficient
-> headroom.
-
-Are we talking about
-if (first_len - hlen > mtu
-  or
-skb_headroom(skb) < ll_rs)
-
-?
-
->  
->  		if (first_len - hlen > mtu ||
->  		    skb_headroom(skb) < ll_rs)
-> -			goto blackhole;
-> +			goto expand_headroom;
-
-I guess this should be
-
-if (first_len - hlen > mtu)
-	goto blackhole;
-if (skb_headroom(skb) < ll_rs)
-	goto expand_headroom;
-
-... but I'm not sure what the actual problem is.
-
-> +expand_headroom:
-> +	struct sk_buff *expand_skb;
-> +
-> +	expand_skb = skb_copy_expand(skb, ll_rs, skb_tailroom(skb), GFP_ATOMIC);
-> +	if (unlikely(!expand_skb))
-> +		goto blackhole;
-
-Why does this need to make a full skb copy?
-Should that be using skb_expand_head()?
-
->  slow_path:
-
-Actually, can't you just (re)use the slowpath for the skb_headroom < ll_rs
-case instead of adding headroom expansion?
+Reviewed-by: Simon Horman <horms@kernel.org>
 
