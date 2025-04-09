@@ -1,139 +1,206 @@
-Return-Path: <netdev+bounces-180602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DBD9A81D16
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 08:31:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 435EDA81D17
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 08:31:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D57F9463727
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 06:30:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC2A24A79CB
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 06:31:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 676AC1DD877;
-	Wed,  9 Apr 2025 06:29:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 359851DC997;
+	Wed,  9 Apr 2025 06:31:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XM4VntXF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UhWb3kCB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 966DC1DD9AD
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 06:29:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B881DC745
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 06:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744180195; cv=none; b=PFya4en+zMigKHz/eFEHYqKB3oz6Z7FXNHNw3tOoM+KntmExQNxmMiSF5O3I+DBRGQBlQmlrzPQk5phWrgY//BpMqPhYIHUAsHF+9qPpwIBxI69ZYZYRjzhXgXlodM/rjbU+gzCzZYP1mhJs9u2V/28YlxqPP6hzqUW1DFKUN50=
+	t=1744180275; cv=none; b=OmnMz6DW/yr5PDqJk2bWp1C+eNH1JaXUoDsV+IShgZkgke1h6OqCHIONVSSWH0/UaGEd83e46dXt3qa9U4vHHDHuWUuPIeCRfZVXUkshVzky/mkNzADCpR/74KCE71AN4letxuEbALWZPE3bVpwQXfpaShfHASXIg5DDgdoJUAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744180195; c=relaxed/simple;
-	bh=D9h/SvR+OD8whX99uCWdOOZoeOyHH8WRSCSyoddVY80=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BecMRHk/D8OkWKCHK/zHZvZNQIw05diNJ29/YMClXojurtgk2Lg44bScXCIL9QJxKciAKIiafUJQ6ZlM7WhikBTM0us9EkghRLXG+wMFGGFgEJYXTDNLU2icA2T7dCz5qH8ff7Q95JoB16NpAUCBvORbHN0o9Rte/uLK/ka19wQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XM4VntXF; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744180194; x=1775716194;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=D9h/SvR+OD8whX99uCWdOOZoeOyHH8WRSCSyoddVY80=;
-  b=XM4VntXFVtDdyEzM6f1lTn9Q1LxIW6r63iuFF3VtHatOhlcFGhGVmN53
-   ARkwkuE9+fl59BQa2q7nZtXYnYGR4xMOfst8G4h+PXbdzbZQacub7vaE1
-   Dqgajb/2QsCt4SoXHTuTci0WrV42DANgFeL2wC4MKs+GJvxC+lprpBv9E
-   EsrFVlK+cv5vEiMRDYyZ34KDkAUtilfQmhMFT+kotOIJuGl1IGXE01unJ
-   8zSpNuUuCAoNdwKBWTkenx2NlIJU04xE9eo3jxS4ZolUMhEbTqLWLjx0b
-   YWKRT6b5E4nxYD/nsgMQFSkRCmnDCq7sL5dD0VA+jN6yEkLeIg1E754qj
-   g==;
-X-CSE-ConnectionGUID: EI+pX0MXTFiDOHGEXFnn7Q==
-X-CSE-MsgGUID: iFQ2bKDfRs63gjZBbFkKKQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11397"; a="68117915"
-X-IronPort-AV: E=Sophos;i="6.15,199,1739865600"; 
-   d="scan'208";a="68117915"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2025 23:29:50 -0700
-X-CSE-ConnectionGUID: bgnxuz6AQtW5CquzZ9AqkQ==
-X-CSE-MsgGUID: RpklP67JTsCw0bERkkquHg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,199,1739865600"; 
-   d="scan'208";a="159478568"
-Received: from gk3153-dr2-r750-36946.igk.intel.com ([10.102.20.192])
-  by orviesa002.jf.intel.com with ESMTP; 08 Apr 2025 23:29:48 -0700
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-Subject: [PATCH iwl-next v1] idpf: remove unreachable code from setting mailbox
-Date: Wed,  9 Apr 2025 08:29:45 +0200
-Message-ID: <20250409062945.1764245-1-michal.swiatkowski@linux.intel.com>
-X-Mailer: git-send-email 2.42.0
+	s=arc-20240116; t=1744180275; c=relaxed/simple;
+	bh=c2PprSJYcvSOOVD7CPC11hdDQnxIfNPG8Zd5bRYVz0w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qIU6fTmHR48B+37KEcoSxcj9mOQkMGIiXmg3bV7DQXISZdgr3xD6XPxqHSdhBRkmhrBTq5HYQ3SKLRTPRkFuS2QNuPwkMkSSl5R2cYZrZQ0/nL4Zrz8m0RZzim0QCDNFmj/ekEGZqPAKGdmi8uLzQyMIjCYOA0KmR7bAZzz5y/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UhWb3kCB; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744180272;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pxsCkg7T9hdK7RNaWY5esSIdR5AuOm6Jdp3figUFvGs=;
+	b=UhWb3kCBoTrTyrW2Xv88miMQPu5pfwZ+uBNXgT3aOEyh72qC5XdbW/DDj2iKBBVDniA1SP
+	MeCJZ2P0zs780e8oTPvlkJWpQkZGmBbuOkWTYxZL8WuQINY772eXwklKjdUuYyKxb+U3vU
+	NiYwnI/kawRixh3OvGBq2tDDSxvMxPA=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-17-RdlbYl45Mk6sCPkLfLCfvA-1; Wed,
+ 09 Apr 2025 02:31:09 -0400
+X-MC-Unique: RdlbYl45Mk6sCPkLfLCfvA-1
+X-Mimecast-MFC-AGG-ID: RdlbYl45Mk6sCPkLfLCfvA_1744180267
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6896A180035E;
+	Wed,  9 Apr 2025 06:31:06 +0000 (UTC)
+Received: from [10.44.32.72] (unknown [10.44.32.72])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DCB171955DCE;
+	Wed,  9 Apr 2025 06:31:01 +0000 (UTC)
+Message-ID: <333a12a8-157b-47f1-9602-e68e7d52b4c2@redhat.com>
+Date: Wed, 9 Apr 2025 08:31:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 01/28] mfd: Add Microchip ZL3073x support
+To: Krzysztof Kozlowski <krzk@kernel.org>, netdev@vger.kernel.org
+Cc: Michal Schmidt <mschmidt@redhat.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
+ Andy Shevchenko <andy@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <20250407172836.1009461-1-ivecera@redhat.com>
+ <20250407172836.1009461-2-ivecera@redhat.com>
+ <9b38d033-72aa-4fb0-b1ee-41bbe3884040@kernel.org>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <9b38d033-72aa-4fb0-b1ee-41bbe3884040@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Remove code that isn't reached. There is no need to check for
-adapter->req_vec_chunks, because if it isn't set idpf_set_mb_vec_id()
-won't be called.
 
-Only one path when idpf_set_mb_vec_id() is called:
-idpf_intr_req()
- -> idpf_send_alloc_vectors_msg() -> adapter->req_vec_chunk is allocated
- here, otherwise an error is returned and idpf_intr_req() exits with an
- error.
 
-The idpf_set_mb_vec_id() becomes one-linear and it is called only once.
-Remove it and set mailbox vector index directly.
+On 07. 04. 25 7:53 odp., Krzysztof Kozlowski wrote:
+> On 07/04/2025 19:28, Ivan Vecera wrote:
+>> This adds base MFD driver for Microchip Azurite ZL3073x chip family.
+> 
+> Please do not use "This commit/patch/change", but imperative mood. See
+> longer explanation here:
+> https://elixir.bootlin.com/linux/v5.17.1/source/Documentation/process/submitting-patches.rst#L95
 
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
-Reviewed-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_lib.c | 18 +-----------------
- 1 file changed, 1 insertion(+), 17 deletions(-)
+Will fix in v2.
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index 730a9c7a59f2..4c18c5fceb97 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -143,22 +143,6 @@ static int idpf_mb_intr_req_irq(struct idpf_adapter *adapter)
- 	return 0;
- }
- 
--/**
-- * idpf_set_mb_vec_id - Set vector index for mailbox
-- * @adapter: adapter structure to access the vector chunks
-- *
-- * The first vector id in the requested vector chunks from the CP is for
-- * the mailbox
-- */
--static void idpf_set_mb_vec_id(struct idpf_adapter *adapter)
--{
--	if (adapter->req_vec_chunks)
--		adapter->mb_vector.v_idx =
--			le16_to_cpu(adapter->caps.mailbox_vector_id);
--	else
--		adapter->mb_vector.v_idx = 0;
--}
--
- /**
-  * idpf_mb_intr_init - Initialize the mailbox interrupt
-  * @adapter: adapter structure to store the mailbox vector
-@@ -349,7 +333,7 @@ int idpf_intr_req(struct idpf_adapter *adapter)
- 		goto free_irq;
- 	}
- 
--	idpf_set_mb_vec_id(adapter);
-+	adapter->mb_vector.v_idx = le16_to_cpu(adapter->caps.mailbox_vector_id);
- 
- 	vecids = kcalloc(total_vecs, sizeof(u16), GFP_KERNEL);
- 	if (!vecids) {
--- 
-2.42.0
+>> These chips provide DPLL and PHC (PTP) functionality and they can
+>> be connected over I2C or SPI bus.
+>>
+> 
+> ...
+> 
+>> +/**
+>> + * zl3073x_get_regmap_config - return pointer to regmap config
+>> + *
+>> + * Returns pointer to regmap config
+>> + */
+>> +const struct regmap_config *zl3073x_get_regmap_config(void)
+>> +{
+>> +	return &zl3073x_regmap_config;
+>> +}
+>> +EXPORT_SYMBOL_NS_GPL(zl3073x_get_regmap_config, "ZL3073X");
+>> +
+>> +struct zl3073x_dev *zl3073x_dev_alloc(struct device *dev)
+>> +{
+>> +	struct zl3073x_dev *zldev;
+>> +
+>> +	return devm_kzalloc(dev, sizeof(*zldev), GFP_KERNEL);
+>> +}
+>> +EXPORT_SYMBOL_NS_GPL(zl3073x_dev_alloc, "ZL3073X");
+>> +
+>> +int zl3073x_dev_init(struct zl3073x_dev *zldev)
+>> +{
+>> +	devm_mutex_init(zldev->dev, &zldev->lock);
+>> +
+>> +	return 0;
+>> +}
+>> +EXPORT_SYMBOL_NS_GPL(zl3073x_dev_init, "ZL3073X");
+>> +
+>> +void zl3073x_dev_exit(struct zl3073x_dev *zldev)
+>> +{
+>> +}
+>> +EXPORT_SYMBOL_NS_GPL(zl3073x_dev_exit, "ZL3073X");
+> 
+> Why do you add empty exports?
+
+It is filled in the later commits but yeah I will include the function 
+once it will be necessary.
+
+>> diff --git a/drivers/mfd/zl3073x-spi.c b/drivers/mfd/zl3073x-spi.c
+>> new file mode 100644
+>> index 0000000000000..a6b9a366a7585
+>> --- /dev/null
+>> +++ b/drivers/mfd/zl3073x-spi.c
+>> @@ -0,0 +1,71 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +
+>> +#include <linux/kernel.h>
+>> +#include <linux/module.h>
+>> +#include <linux/of.h>
+>> +#include <linux/spi/spi.h>
+>> +#include "zl3073x.h"
+>> +
+>> +static const struct spi_device_id zl3073x_spi_id[] = {
+>> +	{ "zl3073x-spi", },
+>> +	{ /* sentinel */ },
+>> +};
+>> +MODULE_DEVICE_TABLE(spi, zl3073x_spi_id);
+>> +
+>> +static const struct of_device_id zl3073x_spi_of_match[] = {
+>> +	{ .compatible = "microchip,zl3073x-spi" },
+> 
+> 
+> You need bindings. If they are somewhere in this patchset then you need
+> correct order so before users (see DT submitting patches).
+
+Yes, there are. I will reorder the patches in v2 and also split the 
+whole series into several ones.
+
+>> +static void zl3073x_spi_remove(struct spi_device *spidev)
+>> +{
+>> +	struct zl3073x_dev *zldev;
+>> +
+>> +	zldev = spi_get_drvdata(spidev);
+>> +	zl3073x_dev_exit(zldev);
+>> +}
+>> +
+>> +static struct spi_driver zl3073x_spi_driver = {
+>> +	.driver = {
+>> +		.name = "zl3073x-spi",
+>> +		.of_match_table = of_match_ptr(zl3073x_spi_of_match),
+> 
+> Drop of_match_ptr, you have warnings here.
+
+Ack, will avoid.
+
+>> +	},
+>> +	.probe = zl3073x_spi_probe,
+>> +	.remove = zl3073x_spi_remove,
+>> +	.id_table = zl3073x_spi_id,
+>> +};
+>> +
+> 
+> 
+> 
+> Best regards,
+> Krzysztof
+> 
 
 
