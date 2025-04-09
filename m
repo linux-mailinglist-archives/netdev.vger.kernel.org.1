@@ -1,77 +1,87 @@
-Return-Path: <netdev+bounces-180722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A18ABA8242E
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 14:05:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7751A8243A
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 14:06:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 125B47B212B
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 12:04:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B25F18887E3
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 12:06:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F6C925EFBC;
-	Wed,  9 Apr 2025 12:04:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE51725E465;
+	Wed,  9 Apr 2025 12:06:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Do2eW7o2"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="kQ3VdiaC"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from fout-a5-smtp.messagingengine.com (fout-a5-smtp.messagingengine.com [103.168.172.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFF325EF8F;
-	Wed,  9 Apr 2025 12:04:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D29725DAF1
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 12:06:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744200287; cv=none; b=ehEN9NpTHp9ywOrwKNPblE3Y6eRDdJ3/mYn8wIzBJvh4On0gIDv9E9/sMdobS9uZofaQk4v2BzKz4jlU63cdINIyX9e6nD0BZE0R17znrbCrYFax/xoceJ61mYW9WMddgsJ0dC/N5WNPPlksd37c71Jn2a9uGaZf8uN9DIQvkNs=
+	t=1744200391; cv=none; b=iBkrNDTLlyhkazCyRNQ3/8X2FSpsIwp++GG7RUsIKISnvWF7f4W1uza2tUHNeGytP/+TCrsxOexR2U5oEjEULHyFkGXv/m+U3n2UIxSKGI86ud/5QTE+lMs91LrgzxIXYp9uue7aay7N1DpqPAmTQQf6IJ+B+bVtv6Jzfb+tQ9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744200287; c=relaxed/simple;
-	bh=3eISLvMZBxP/ooZQeBCga7d69iQG8hNqCRD4i6rUm48=;
+	s=arc-20240116; t=1744200391; c=relaxed/simple;
+	bh=o9KXGK3PvYc3GeFSutCjFzzOu06dct2QMCXeJ5li4IY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qA2gF5P1H+FUj5Bc0MlR//dDK+GNmOr9dz25pLs7Qct4XVEmyzZZWAs8L7omBAa4SUVZ3Uv7v//nP+n45aD88jde1fwxJe0y1Dx1Q2vm9dpdLgeHJyXr46z6pnDjp46ViQ2oF6IIPgwfLOR4LHI5PpSQ8YnnjxHC9JWiUUxT0os=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Do2eW7o2; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=OAVZ/6PMd5CIYGP1LffsV13Ct6MPa7aS43NNYUi9Muc=; b=Do2eW7o21PD63tUeD1m2JPMF3Y
-	GA5PJ2TY9XpQdy9chWaHuYljs1HgVw6p5M9TaxjWcsYXPcY68Nmh+BBlqBEFfjV182S1AM0QCVxcE
-	Mg97XRoHA317XEdNLGpJRIrwHtQCfQNRRgkRtx6Y8UULja95mNyri9hyyr5XhP3K1DcA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u2UAX-008X2W-Vg; Wed, 09 Apr 2025 14:04:37 +0200
-Date: Wed, 9 Apr 2025 14:04:37 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Ng, Boon Khai" <boon.khai.ng@altera.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	"Gerlach, Matthew" <matthew.gerlach@altera.com>,
-	"Ang, Tien Sung" <tien.sung.ang@altera.com>,
-	"Tham, Mun Yew" <mun.yew.tham@altera.com>,
-	"G Thomas, Rohan" <rohan.g.thomas@altera.com>
-Subject: Re: [PATCH net-next v3 2/2] net: stmmac: dwxgmac2: Add support for
- HW-accelerated VLAN stripping
-Message-ID: <3eb3bb21-eee9-44b6-b680-4c629df29d34@lunn.ch>
-References: <20250408081354.25881-1-boon.khai.ng@altera.com>
- <20250408081354.25881-3-boon.khai.ng@altera.com>
- <c65bfe99-a6e1-4485-90ee-aee0b8e0984d@lunn.ch>
- <BN8PR03MB5073B710F5040EAC06595AE2B4B42@BN8PR03MB5073.namprd03.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ig4pNp+lpBs17oqBs56FPPgkoGAwTyQpC74ffRBoxZSNPNy8GqseBEJXzHBsnY92GOln+zTcWsmWqVAg7oYZJWY22IV5IcSCkvqgshxN2K2iX16FBGS15pyekstX8TPIk2fZ3G0WOuwzWsRHPePRH6HF934/eH3Zqcqrop2iKqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=kQ3VdiaC; arc=none smtp.client-ip=103.168.172.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
+	by mailfout.phl.internal (Postfix) with ESMTP id 8E89D1380163;
+	Wed,  9 Apr 2025 08:06:28 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-09.internal (MEProxy); Wed, 09 Apr 2025 08:06:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1744200388; x=1744286788; bh=s/+XScN+DX/hI6ZdffBa6gflMtgoXQ6VeTH
+	cwMIEqqk=; b=kQ3VdiaCcWaSzeMTAmaAXP+IzHhY4VC7rdP1UtrXwe5zZ4Gk4PC
+	aAmyMVrrn0U7U9wUKVhsL8VKBT9e71SAhBzS3UOW5TxzQT0iNUsiwHM3kstErAUB
+	QiYKIquOt+r2mh1yf4IoYv5TsX0021Ge84f0lGftF6hMYmsv6bmTsPeXCZwGA3B1
+	mC+NVOErppxChvlI1fog2NyY7zov9k0xQ/hqMqY8Ic7hK8i1Og2zLLt4maWkKD25
+	zp6sfrysIKJ5oMKnKy/sLMeTOcYyNKRsp0cQu22fHoAAUNMQt7qIDDaPbsYmgbXS
+	WLkAdUW4UKnMX5qQX89K2oM2kI12ZfmKmAQ==
+X-ME-Sender: <xms:w2L2Zz9p9K_CFb4UmG-rCRInMZ87KjqXs1XsKdx_KYEuWbnfH5ewWA>
+    <xme:w2L2Z_uFqXFK6p5-UvfGuFQX613mnQG7JesCQQmaqslXc-acfbPEemriikN07Gz7a
+    2NsppgNFxr_jHc>
+X-ME-Received: <xmr:w2L2ZxDmUdiXg8tnZF0E7yB702SF5BuD7p0kHv7zFqptYGYVnX0SjLYD2pMp>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtdehleehucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
+    vdenucfhrhhomhepkfguohcuufgthhhimhhmvghluceoihguohhstghhsehiughoshgthh
+    drohhrgheqnecuggftrfgrthhtvghrnhepvddufeevkeehueegfedtvdevfefgudeifedu
+    ieefgfelkeehgeelgeejjeeggefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
+    hmpehmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrghdpnhgspghrtghp
+    thhtohepgedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepmhgrrhhthihnrgdrsh
+    iirghprghrqdhmuhgulhgrfieslhhinhhugidrihhnthgvlhdrtghomhdprhgtphhtthho
+    pehinhhtvghlqdifihhrvgguqdhlrghnsehlihhsthhsrdhoshhuohhslhdrohhrghdprh
+    gtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthho
+    pehmihgthhgrlhdrkhhusghirghksehinhhtvghlrdgtohhm
+X-ME-Proxy: <xmx:w2L2Z_fANOu9qd9HL46WJ86i3MLZ2FK-Uqdl9XzwMYiEyQwBHiGecw>
+    <xmx:w2L2Z4PXy9yhE-L9K4px5nzk7jWw_NeZPyuAOeJZ27ab5u2TMfN-Bg>
+    <xmx:w2L2ZxkRFe47LzyavREWgo7025jId4KxjNIZQJSahK9SKOFLtrvxxQ>
+    <xmx:w2L2ZytP_i_22DYY1Z4UMujCE1PyNiKhQagX1qBEV2w6BIkQ8TFndg>
+    <xmx:xGL2Z8aw1HFviLpTJWr6BRM3ZixbN-RZ14AYqtUgIhIVq-WGzSlDoyeV>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 9 Apr 2025 08:06:26 -0400 (EDT)
+Date: Wed, 9 Apr 2025 15:06:24 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Michal Kubiak <michal.kubiak@intel.com>
+Subject: Re: [PATCH iwl-next 1/2] ice: add link_down_events statistic
+Message-ID: <Z_ZiwNUJy7xGeT8m@shredder>
+References: <20250409113622.161379-2-martyna.szapar-mudlaw@linux.intel.com>
+ <20250409113622.161379-4-martyna.szapar-mudlaw@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,47 +90,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BN8PR03MB5073B710F5040EAC06595AE2B4B42@BN8PR03MB5073.namprd03.prod.outlook.com>
+In-Reply-To: <20250409113622.161379-4-martyna.szapar-mudlaw@linux.intel.com>
 
-On Wed, Apr 09, 2025 at 03:12:53AM +0000, Ng, Boon Khai wrote:
-> > This appears to be identical to dwmac4_wrback_get_rx_vlan_tci() ?
-> > 
-> > Can it be moved into the shared code, or am i missing something?
-> > 
-> >         Andrew
+On Wed, Apr 09, 2025 at 01:36:23PM +0200, Martyna Szapar-Mudlaw wrote:
+> Introduce a new ethtool statistic to ice driver, `link_down_events`,
+> to track the number of times the link transitions from up to down.
+> This counter can help diagnose issues related to link stability,
+> such as port flapping or unexpected link drops.
 > 
-> Hi Andrew thanks for the quick response.
-> 
-> For the dwmac4 IP it has the following format at the 
-> Receive Normal Descriptor 0 (RDES0)
-> 
->            31                                                                                                0
->               ------------------------------------- -----------------------------------
-> RDES0 |   Inner VLAN TAG [31:16]   | Outer VLAN TAG [31:16   |
->               ------------------------------------- -----------------------------------
-> 
-> While for dwxgmac2 IP it has the following format at the RDES0
-> Depending on the Tunneled Frame bit (TNP)
-> 
-> For Non-Tunneled Frame (TNP=0)
->            31                                                                                                0
->               ------------------------------------- -----------------------------------
-> RDES0 |   Inner VLAN TAG [31:16 ]  | Outer VLAN TAG [31:16]   |
->               ------------------------------------- -----------------------------------
-> 
-> For Tunneled Frame (TNP=1)
->            31                                        8 7                          3 2                  0
->               -------------------------------- ----------------------- ----------------
-> RDES0 |   VNID/VSID                    |    Reserved         | OL2L3         |
->               -------------------------------- ----------------------- ----------------
-> 
-> While the logic for handling Tunneled Frame and Non-Tunneled
-> Frame is not yet implemented in the 
-> dwxgmac2_wrback_get_rx_vlan_tci() function, I believe it is
-> prudent to maintain separate functions within their respective
-> descriptor driver files, (dwxgmac2_descs.c and dwmac4_descs.c)
+> The counter increments when a link-down event occurs and is exposed
+> via ethtool stats as `link_down_events.nic`.
 
-Please add a comment, or describe this in the commit message.
+Are you aware of commit 9a0f830f8026 ("ethtool: linkstate: add a
+statistic for PHY down events")?
 
-	Andrew
+Better to report this via the generic counter than a driver-specific
+one.
 
