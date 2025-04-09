@@ -1,113 +1,113 @@
-Return-Path: <netdev+bounces-180615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E11D5A81DFE
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 09:11:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2374DA81E0A
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 09:15:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 69C547A5B86
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 07:10:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2395E3B21F3
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 07:13:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F4382561B6;
-	Wed,  9 Apr 2025 07:11:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DC3F25524A;
+	Wed,  9 Apr 2025 07:14:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ekCQmfKE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1CCF254868
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 07:11:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9848253B42
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 07:14:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744182692; cv=none; b=vGmlYYzNti3vrvUeRAu2pv8RPOoH6VuIQoD1WV7d000/ZkMJla5NcBNMnfSXOsPSLrtwvQDw7Ua7WbfM4ZzHAhS9s7sS2ADa2IioIReSeYRnfMdTtpIP8fBkVqnRAZ3cr/907CJgkGVLWSS6krS3Y/xszSnU/jHfqXmF35LsH6Y=
+	t=1744182847; cv=none; b=QjH6uVUAWNT4FVgzCXOmdUOEN9k5xc5T+dXZB2RXsvAqeIzDSwZPZjWgoBnrTAdaaWVvMsR8Dj7SARfL1Xt3wx6G8kHdTf5TZ6BZeCmyp8Hm3VPn0GtNzyycmQVQ1alCb2k+z5pfX3wNd3P+ZVEC17yjk+6BZdFutdo4a1glByc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744182692; c=relaxed/simple;
-	bh=cF+GdEvDlvR+eW3APXrac70u2/BsJEQ0xy1cLwTP1Vw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=GU+rUMEgeqCo4eZNS0CvzPdMTWsxkfrvuAqfI3hqhb2GwMy7Q+On+uzQ8ws+Otu0NDuW2hhHpDr0I8OXTHypqcV0xkbmp3yAFXw4WVrtGP7NHPE5VUdRWgffN04doBtilvFcI/ZjhGaLPgxlVN8sG/HHOjUqLFYb5Kmpd3XTaNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3d5b3819ff6so68548345ab.2
-        for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 00:11:30 -0700 (PDT)
+	s=arc-20240116; t=1744182847; c=relaxed/simple;
+	bh=o4u22On0K74aCLxCe4KHlANGFU1KZOeJn9PZNDHqBII=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MVc43Jg1dA0uCgcLvXYYhnZMb1YgWsZgVNdhWan3CEi0FBN1pog8gA8qoXGDHg7spfN5PT7ABoUyYqfqBu1rjyo9VUxWioo7XBbBc7YA89l3sGEWAmm8AgEQFHadEbIuyLfdAe7kV+xIZq03oBgTWt+9JYcBKXKWS+wVB/HnejE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ekCQmfKE; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-47691d82bfbso126133971cf.0
+        for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 00:14:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1744182845; x=1744787645; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o4u22On0K74aCLxCe4KHlANGFU1KZOeJn9PZNDHqBII=;
+        b=ekCQmfKEB0bLWZzXtd7R2oH2sSK14iQ2pma12G0EcIvhTlGB5SzYD+FgtuHYRw2Ziv
+         omL2HXb+4fJjfL/p/Xo6SNAkjcTaoFkU1s6RAPZ+TM0i75czBtd9YFBdwfmbDCGnS9R6
+         N/uMZVezf3JMPZb38v+Zbn5iTlPumqS+2SSWkdwnYavt6JFgEUiv+wc9xB+eJEZypHh9
+         gMjWJpEyz556pzyVvs43uDl82DSSbFZ7XDTR3exeKDf0t5BFnsw1LMoZo/e1RdvRzZ9r
+         OXkD0+UHehK8C0/iex+frri3vn2aEBBt3adjC5LInhzD4JrYmcCKSJU4HS2lwnw66Ows
+         jbaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744182690; x=1744787490;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1Tv15xLHz25nQS5v1zxfS61nspX79os8te6jVU76pyw=;
-        b=AGbAuTw/479Fl/Io1FWPIaGpOB4Dj3Cu3iuhrif9eI4YanpJAPRQf+D6JiArLULGDj
-         TOLz9DANd/TWwfaAFXJuAZedcYco7JFsUE3jiY1gK1gEQspqynI6zcckoTjvBpm1zVwo
-         3MfzwuPLg8tfkrG7NcuXlKvZMOBWxflRZ1kbN2MKkHnU6t4cL7kbYaOjS/KdvYG26OeJ
-         JPUvbKcx9MkeVlsBoEU8t9yKe+Oq18FIDW0yUbPCSBa4JGXQFnB8oX4wuCxahJ/nYeUM
-         OpZzi8kQokW2XxnE7tBKPB4mcL2vFCdP9+Jwjp/VXQ7UCIeY0ZSh1FbZHho4jWrbkBXi
-         NBrg==
-X-Forwarded-Encrypted: i=1; AJvYcCUaBwEFLN5pL3bjl/pLLnxDCqI5Q0PNbjSldtfTr37JI8OhEsEcqhl63qMLMbR7/jAwZesfs8E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3VpnM39Ct8/gOo4f5+7WYPYXiyiNVaZpWC08GE1zWe/J8xq09
-	Xxq2yy7oRBZfb5z4KVZO3ZQxp5gvc5AiUzHfok5dfoyqzH5l5jkUDhQ9HQfE1FOQ3/sWfmke19f
-	rgg5jTLDisB+gCZ6TjfiKoTsuzEhEKeJRaXiJLkK4XAd4TuUxLtjIwb0=
-X-Google-Smtp-Source: AGHT+IHmXVwqL/pqEnn67T+QPxOK+1jA2rVILDgEpbxTfhiAnq+J8M0EkvZG/u/D1lTKMTTWHqVkz7Rw9j496haRgDGYBVxFZpes
+        d=1e100.net; s=20230601; t=1744182845; x=1744787645;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=o4u22On0K74aCLxCe4KHlANGFU1KZOeJn9PZNDHqBII=;
+        b=E7TKNQQ5lFJHkR6wsirWXcSlD91kqSvxfKdMkPfObDyit7oVgDWhh+wtJfyEi3RQJZ
+         1TCToFidwlWoor04eaOozUJID9zmIK0+7j1Z9VjRWWHJZLdvZ0aFA8QbDipj2xSQy1kx
+         ytKjzJtozu67PYFSqvGULquozY+OpEkwrfhixzzxpqZPlVCef/5monyu6xkGcg+r2xrB
+         Qr81Gkzd2U9BFac+6Lt+CdaAMN0rUe08S6mSmCTHiifHD8az1S0I7lkyzHCISq2QX7Ex
+         HMVX391vcKkcY67ohGZR+fVhIGvXbsKqGHvRp+nBe8fMkG+URkutPZEJrQIzieXCZlGJ
+         bheg==
+X-Forwarded-Encrypted: i=1; AJvYcCUhZQnIrIAq9sCGf9OVlhQYnIekGGL9Tv1O1zYcV+oIgXeuc/VNOaSLP0BtAFWdHGBmdo+l3ys=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyqDEyVGl4ji9XwU4M3xspm/GDEWPWC3yiCRwOIl3ITi8l6Iub5
+	hEbOETBI4XRCRC/XARstNThIqcdW/V9uoo5VNXXFOQSs4vYb4v5K7k22qDbubAnACuMWO1anxS6
+	DEYTvYDuqsQ7ZQiYEljNvKkhMtJ0mZhT2wqKb
+X-Gm-Gg: ASbGncs2mhU85/Jf3WdQgzx4XovgfQw7hdp2eGIEJRzOYO1v9uSjWOeduXC9xWY7Bp8
+	X9oc4FuLhncO0ndvZ3OUX0Dld25yUashfVQ8kosV4Py64XN1avsgMzFGiMzMoCK/UjND8jpkHsu
+	dvf2rc/mhMddpKjzPGzGztCg==
+X-Google-Smtp-Source: AGHT+IEPf+bMOSyPAyRRT5FnYt/dQDrDJkP7fgIqSBGifSkvX0GxrGH6i7XdUzqfrW17ujqWAY4wjqbjwcnaYpM00XA=
+X-Received: by 2002:a05:622a:1209:b0:475:ce:3c59 with SMTP id
+ d75a77b69052e-479600c94ffmr21204371cf.30.1744182844448; Wed, 09 Apr 2025
+ 00:14:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1607:b0:3d6:d01e:7314 with SMTP id
- e9e14a558f8ab-3d77c2adf5amr14375755ab.16.1744182689853; Wed, 09 Apr 2025
- 00:11:29 -0700 (PDT)
-Date: Wed, 09 Apr 2025 00:11:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67f61da1.050a0220.258fea.0018.GAE@google.com>
-Subject: [syzbot] Monthly net report (Apr 2025)
-From: syzbot <syzbot+list74a39cccbcbfcf70c2a9@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
+References: <20250408-tcpsendmsg-v3-0-208b87064c28@debian.org> <20250408-tcpsendmsg-v3-2-208b87064c28@debian.org>
+In-Reply-To: <20250408-tcpsendmsg-v3-2-208b87064c28@debian.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 9 Apr 2025 09:13:53 +0200
+X-Gm-Features: ATxdqUExgIlhI5h9g1kuJu6S49AR43PpGh5RclwAbpAXHtSKJ9IcrrdS9kYyTqQ
+Message-ID: <CANn89iKr2kfCakou8id62C5ic95HF5RCps9a2cUv5FL3yjAGdg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/2] trace: tcp: Add tracepoint for tcp_sendmsg_locked()
+To: Breno Leitao <leitao@debian.org>
+Cc: David Ahern <dsahern@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	kernel-team@meta.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello net maintainers/developers,
+On Tue, Apr 8, 2025 at 8:32=E2=80=AFPM Breno Leitao <leitao@debian.org> wro=
+te:
+>
+> Add a tracepoint to monitor TCP send operations, enabling detailed
+> visibility into TCP message transmission.
+>
+> Create a new tracepoint within the tcp_sendmsg_locked function,
+> capturing traditional fields along with size_goal, which indicates the
+> optimal data size for a single TCP segment. Additionally, a reference to
+> the struct sock sk is passed, allowing direct access for BPF programs.
+> The implementation is largely based on David's patch[1] and suggestions.
+>
+> Link: https://lore.kernel.org/all/70168c8f-bf52-4279-b4c4-be64527aa1ac@ke=
+rnel.org/ [1]
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-This is a 31-day syzbot report for the net subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/net
-
-During the period, 10 new issues were detected and 3 were fixed.
-In total, 133 issues are still open and 1592 have already been fixed.
-
-Some of the still happening issues:
-
-Ref  Crashes Repro Title
-<1>  315729  Yes   possible deadlock in team_del_slave (3)
-                   https://syzkaller.appspot.com/bug?extid=705c61d60b091ef42c04
-<2>  26386   Yes   possible deadlock in smc_switch_to_fallback (2)
-                   https://syzkaller.appspot.com/bug?extid=bef85a6996d1737c1a2f
-<3>  12279   Yes   possible deadlock in do_ip_setsockopt (4)
-                   https://syzkaller.appspot.com/bug?extid=e4c27043b9315839452d
-<4>  7795    Yes   WARNING: suspicious RCU usage in dev_deactivate_queue
-                   https://syzkaller.appspot.com/bug?extid=ca9ad1d31885c81155b6
-<5>  6881    Yes   KMSAN: uninit-value in eth_type_trans (2)
-                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
-<6>  6366    Yes   KASAN: slab-use-after-free Read in __ethtool_get_link_ksettings
-                   https://syzkaller.appspot.com/bug?extid=5fe14f2ff4ccbace9a26
-<7>  6309    Yes   WARNING in inet_sock_destruct (4)
-                   https://syzkaller.appspot.com/bug?extid=de6565462ab540f50e47
-<8>  3673    Yes   possible deadlock in do_ipv6_setsockopt (4)
-                   https://syzkaller.appspot.com/bug?extid=3433b5cb8b2b70933f8d
-<9>  3315    Yes   possible deadlock in sockopt_lock_sock
-                   https://syzkaller.appspot.com/bug?extid=819a360379cf16b5f0d3
-<10> 3195    Yes   INFO: task hung in linkwatch_event (4)
-                   https://syzkaller.appspot.com/bug?extid=2ba2d70f288cf61174e4
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
