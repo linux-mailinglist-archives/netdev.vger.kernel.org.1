@@ -1,179 +1,179 @@
-Return-Path: <netdev+bounces-180649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D97DA8202F
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 10:36:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A731A8203A
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 10:38:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 516983AD37F
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 08:36:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 335974C18D4
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 08:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF0025C706;
-	Wed,  9 Apr 2025 08:36:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B4322D4D4;
+	Wed,  9 Apr 2025 08:38:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="JxOHfEpA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NSfCJDAX"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F98F22D4D4;
-	Wed,  9 Apr 2025 08:36:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5692AE89
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 08:38:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744187771; cv=none; b=Akkfs69WJHnJONS/AEiFXDvW4lqK1w0IpTcPW8aNhorq6L16EWsRNhlLvL7xeljhYayNiweqUJnDVxMOyGWvjll2CsYbhKQ6IDxXJznpOk6HHEdeDmwpJjZ3cGy/j6si2tm19kvk1Vdodu74mMTU15vPaI/49zomqFDHB0uqVDM=
+	t=1744187908; cv=none; b=hKxA0WfvPmSPYBRYvK0O0CE2mEiakeuHKapTBoczcxJJfdk5GoWGurFFODTKsFBSKXnVnRvdGbz1YI9eIozXPcjkN9xhxeHqexqQKBTqHph91nv0dsVASuHf2ByYBgcnUK5LaBxNIZG3B6qxZdxvjS0WV4MD/PevkGHtcXHSqEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744187771; c=relaxed/simple;
-	bh=ndma1L/vxUMfXkDwaQPrl7wCz2eHmQ0e3LdcIJkDHd0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q9Oq7AIbJ2r027kHSv4GO4YzaTf1iqRr5ijeIfRsIqd61di3FuXoySFe2SwkYgrDTVdi5sWfzMTaH0JOs48F/IbzIXwvyNwQX20jud1tQZNuVljstw2mAi5VMnnCtmWUIXm4d6fDgG9l6r9TB0QQa9Cnin3RZiShMAhHQofURCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=JxOHfEpA; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Q3ecYacwG4Aorvd7wfw9EgBZG2LtEkkY7JvpnDXhS48=; b=JxOHfEpADDwTcatS2ifIslfKRW
-	7sPd0FGyUmBnOsdVtrf88xQQYyNdqrJwverEDU/kZrjwttigjkfiWrUqsqoS5Eim3L9KT7L7adelx
-	CbLsaCDvLtsUUOzw2Pm0XuUrmtm8MCN/ia2POGL5WFxwkYgh4fLaPS8o5tn7Mnm062w5bA1QUj6x8
-	a9yejTFS3Rfk7W+EB55xuo2GzIROnZdn86J18+M7YSb1P3q6RBoWFV0avEkPf8txze37hcOBl/ZER
-	8U0xxf6857IFe+FbIjTGwqUYmrMPMw94U6bYSLpeRCkvkv/olb9aOBwOTFdx5dh4IPQDNrPAYie7T
-	716a9zzQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47374)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u2Quf-0000GO-1d;
-	Wed, 09 Apr 2025 09:36:01 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u2Qud-0002Pp-0k;
-	Wed, 09 Apr 2025 09:35:59 +0100
-Date: Wed, 9 Apr 2025 09:35:59 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH net-next v2 0/2] Add Marvell PHY PTP support
-Message-ID: <Z_Yxb6-qclDSWk01@shell.armlinux.org.uk>
-References: <20250407-feature_marvell_ptp-v2-0-a297d3214846@bootlin.com>
- <Z_P3FKEhv1s0y4d7@shell.armlinux.org.uk>
- <20250407182028.75531758@kmaincent-XPS-13-7390>
- <Z_P-K7mEEH6ProlC@shell.armlinux.org.uk>
- <20250407183914.4ec135c8@kmaincent-XPS-13-7390>
- <Z_WJO9g5Al1Yr_LX@shell.armlinux.org.uk>
- <20250409103130.43ab4179@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1744187908; c=relaxed/simple;
+	bh=61PW9y7PDNWOcIblSehzngap5jGtPaiZoqUtTkIf7Q4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hHN3khf9oZhP36XbFy1qo5MO37TwnSYgQiYUsbhmMGGjfCGAmyX1lDTzixGZRJARmIPTc4Vj6NsEUryScarGNQvq1ztcLcrgKwFHWdIoia6E9ygGErkseJ96Xyq2dEWc+s+qc12jiGqSgJAzPvpTirxppbh/yRlRyOE37Zhflio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NSfCJDAX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744187905;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Db2JSRrytLkXPNCk2u9oY2iCWyl++39LNyoKOlHjxS4=;
+	b=NSfCJDAXC34jrFptPGDjx0rTF0OMzG5QLUJf6xgealGWuI4d3jd+px3MoaSAS8ZOFABoOH
+	bMxw/efRCmI7NrHxZRolHq3bkfFCZVrLEDdeiypBa/GRag7BHbMBDR4I58pm3YqJWIds39
+	4F2alWgFNnA6e2qyMKSgANV6QvYWRGk=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-549-mId4LvS-MOSWkKA2uOHcWQ-1; Wed, 09 Apr 2025 04:38:24 -0400
+X-MC-Unique: mId4LvS-MOSWkKA2uOHcWQ-1
+X-Mimecast-MFC-AGG-ID: mId4LvS-MOSWkKA2uOHcWQ_1744187903
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-ac3dca41591so620175266b.1
+        for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 01:38:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744187903; x=1744792703;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Db2JSRrytLkXPNCk2u9oY2iCWyl++39LNyoKOlHjxS4=;
+        b=XbGUrdSTBSGzUwCz/6Hz4me/oycpSJ9fhG0x85bG+sMIfZMwNPOIJEcuRR8aFAwuou
+         TP7Gi2hOUKcOQ3l+r/6NtFwUS9lFPgkjfySnDIMCP18p5CkLkHvCku7C9TTLCvytRg3K
+         Xfcz0ZVHrPARYlHVMaCEoN8vpgmk8EhHm+iKlPnvc3dtItRSZoa7foGXSbPtJZx/clgO
+         9t/ooxEG4OntpuNsb+SMRVYiZSNk2lSK8E2lw3OEmEZ+imIqK3K6h2ap4/3t68i9NCbu
+         +GMBpfGIeou4K1HQ4VRb+8ddslG9NzaEEU9V75LrY316WlnEDYxRRWKXqCqUO2LUHTKD
+         kiAA==
+X-Forwarded-Encrypted: i=1; AJvYcCVWdIf+ZWTiXujeZPUWQUZTEdjjaskHQ7awgmD2hMosYXrAPvrXuupgwTx+RQ9qIsUTeSuuerI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTMcWgrAT4j9bgDUBTeaX1EB1f4e9F8p5Fj+Ke2+me2q7+6smU
+	wudLF8ftZz0AGDb73OJMnh7RmQkuGM5jK5zQss598rlxKbyFKGa2Kp9F04LKe/Y4DHdzmSac+Sq
+	JlHQRRqW+VmCdzcuyrO0QxaqTfNPqorr2fg/Ou6Fh/z/l5MJICAILrOzvhHC6+sYy8Wt+XaKzvb
+	VXbIe6nFIDrV5MaHQAGg+H+i+biNz3
+X-Gm-Gg: ASbGncudCOQp/Hlw6XzJ9LI7g2VMCQsQMRch3RVFya2KqlR/SMtuDzalox++mhG7TXz
+	b9nyyGeeZyiqSGxO8ZgiPeSrqtFyGudtlv2fxWiU5w9gGPw9AIOcSOgLKuXP7NKIGp+5Zmw==
+X-Received: by 2002:a17:907:d22:b0:ac7:e5c7:d235 with SMTP id a640c23a62f3a-aca9d5f2efbmr173776766b.17.1744187902787;
+        Wed, 09 Apr 2025 01:38:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFfsT/n2l3DnTQQWDgOLT9XB9DPUTgcUViU2G8XrGBhEdFOH5XIrY6JzqMwM3FJqCj1qI/dn6iOuo9AsFhQy0g=
+X-Received: by 2002:a17:907:d22:b0:ac7:e5c7:d235 with SMTP id
+ a640c23a62f3a-aca9d5f2efbmr173774366b.17.1744187902343; Wed, 09 Apr 2025
+ 01:38:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250409103130.43ab4179@kmaincent-XPS-13-7390>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20250328100359.1306072-1-lulu@redhat.com> <20250328100359.1306072-9-lulu@redhat.com>
+ <20250408075426-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20250408075426-mutt-send-email-mst@kernel.org>
+From: Cindy Lu <lulu@redhat.com>
+Date: Wed, 9 Apr 2025 16:37:44 +0800
+X-Gm-Features: ATxdqUHSwziP5tEY_Ach5syGN9Prz3P9ZHSrioqnJKFuE86H3ZVl_NFlZH6Hdgk
+Message-ID: <CACLfguXTYy2BfmB3wLnVdANu6jvxjP4G8a3h2XHO-iw5RE1CnA@mail.gmail.com>
+Subject: Re: [PATCH v8 8/8] vhost: Add a KConfig knob to enable IOCTL VHOST_FORK_FROM_OWNER
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: jasowang@redhat.com, michael.christie@oracle.com, sgarzare@redhat.com, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 09, 2025 at 10:31:30AM +0200, Kory Maincent wrote:
-> On Tue, 8 Apr 2025 21:38:19 +0100
-> "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
-> 
-> > On Mon, Apr 07, 2025 at 06:39:14PM +0200, Kory Maincent wrote:
-> > > On Mon, 7 Apr 2025 17:32:43 +0100
-> > > "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
-> > > > I'm preferring to my emails in connection with:
-> > > > 
-> > > > https://lore.kernel.org/r/ZzTMhGDoi3WcY6MR@shell.armlinux.org.uk
-> > > > 
-> > > > when I tested your work last time, it seemed that what was merged hadn't
-> > > > even been tested. In the last email, you said you'd look into it, but I
-> > > > didn't hear anything further. Have the problems I reported been
-> > > > addressed?  
-> > > 
-> > > It wasn't merged it was 19th version and it worked and was tested, but not
-> > > with the best development design. I have replied to you that I will do some
-> > > change in v20 to address this.
-> > > https://lore.kernel.org/all/20241113171443.697ac278@kmaincent-XPS-13-7390/
-> > > 
-> > > It gets finally merged in v21.  
-> > 
-> > Okay, so I'm pleased to report that this now works on the Macchiatobin:
-> > 
-> > where phc 2 is the mvpp2 clock, and phc 0 is the PHY.
-> 
-> Great, thank you for the testing!
-> 
-> > 
-> > # ethtool -T eth2
-> > Time stamping parameters for eth2:
-> > Capabilities:
-> >         hardware-transmit
-> >         software-transmit
-> >         hardware-receive
-> >         software-receive
-> >         software-system-clock
-> >         hardware-raw-clock
-> > PTP Hardware Clock: 2
-> > Hardware Transmit Timestamp Modes:
-> >         off
-> >         on
-> >         onestep-sync
-> >         onestep-p2p
-> > Hardware Receive Filter Modes:
-> >         none
-> >         all
-> > 
-> > So I guess that means that by default it's using PHC 2, and thus using
-> > the MVPP2 PTP implementation - which is good, it means that when we add
-> > Marvell PHY support, this won't switch to the PHY implementation.
-> 
-> Yes.
-> 
-> > 
-> > Now, testing ethtool:
-> > 
-> > $ ./ethtool --get-hwtimestamp-cfg eth2
-> > netlink error: Operation not supported
-> > 
-> > Using ynl:
-> > 
-> > # ./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema --dump
-> > tsconfig-get --json '{"header":{"dev-name":"eth2"}}' []
-> > 
-> > So, It's better, something still isn't correct as there's no
-> > configuration. Maybe mvpp2 needs updating first? If that's the case,
-> > then we're not yet in a position to merge PHY PTP support.
-> 
-> Indeed mvpp2 has not been update to support the ndo_hwtstamp_get/set NDOs.
-> Vlad had made some work to update all net drivers to these NDOs but he never
-> send it mainline:
-> https://github.com/vladimiroltean/linux/commits/ndo-hwtstamp-v9
-> 
-> I have already try to ping him on this but without success.
-> Vlad any idea on when you could send your series upstream?
+On Tue, Apr 8, 2025 at 7:56=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com> =
+wrote:
+>
+> On Fri, Mar 28, 2025 at 06:02:52PM +0800, Cindy Lu wrote:
+> > Introduce a new config knob `CONFIG_VHOST_ENABLE_FORK_OWNER_IOCTL`,
+> > to control the availability of the `VHOST_FORK_FROM_OWNER` ioctl.
+> > When CONFIG_VHOST_ENABLE_FORK_OWNER_IOCTL is set to n, the ioctl
+> > is disabled, and any attempt to use it will result in failure.
+> >
+> > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > ---
+> >  drivers/vhost/Kconfig | 15 +++++++++++++++
+> >  drivers/vhost/vhost.c |  3 +++
+> >  2 files changed, 18 insertions(+)
+> >
+> > diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
+> > index b455d9ab6f3d..e5b9dcbf31b6 100644
+> > --- a/drivers/vhost/Kconfig
+> > +++ b/drivers/vhost/Kconfig
+> > @@ -95,3 +95,18 @@ config VHOST_CROSS_ENDIAN_LEGACY
+> >         If unsure, say "N".
+> >
+> >  endif
+> > +
+> > +config VHOST_ENABLE_FORK_OWNER_IOCTL
+> > +     bool "Enable IOCTL VHOST_FORK_FROM_OWNER"
+> > +     default n
+> > +     help
+> > +       This option enables the IOCTL VHOST_FORK_FROM_OWNER, which allo=
+ws
+> > +       userspace applications to modify the thread mode for vhost devi=
+ces.
+>
+> ok
+>
+> > +          By default, `CONFIG_VHOST_ENABLE_FORK_OWNER_IOCTL` is set to=
+ `n`,
+> > +          meaning the ioctl is disabled and any operation using this i=
+octl
+> > +          will fail.
+> > +          When the configuration is enabled (y), the ioctl becomes
+> > +          available, allowing users to set the mode if needed.
+>
+> no need to be so verbose - the disabled beavious belongs in commit log
+> not here.
+>
+> Also either ioctl or IOCTL but not both.
+>
+sure, will change this
+Thanks
+cindy
+> > +
+> > +       If unsure, say "N".
+> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > index fb0c7fb43f78..568e43cb54a9 100644
+> > --- a/drivers/vhost/vhost.c
+> > +++ b/drivers/vhost/vhost.c
+> > @@ -2294,6 +2294,8 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigne=
+d int ioctl, void __user *argp)
+> >               r =3D vhost_dev_set_owner(d);
+> >               goto done;
+> >       }
+> > +
+> > +#ifdef CONFIG_VHOST_ENABLE_FORK_OWNER_IOCTL
+> >       if (ioctl =3D=3D VHOST_FORK_FROM_OWNER) {
+> >               u8 inherit_owner;
+> >               /*inherit_owner can only be modified before owner is set*=
+/
+> > @@ -2313,6 +2315,7 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigne=
+d int ioctl, void __user *argp)
+> >               r =3D 0;
+> >               goto done;
+> >       }
+> > +#endif
+> >       /* You must be the owner to do anything else */
+> >       r =3D vhost_dev_check_owner(d);
+> >       if (r)
+> > --
+> > 2.45.0
+>
 
-Right, and that means that the kernel is not yet ready to support
-Marvell PHY PTP, because all the pre-requisits to avoid breaking
-mvpp2 have not yet been merged.
-
-So that's a NAK on this series from me.
-
-I'd have thought this would be obvious given my well known stance
-on why I haven't merged Marvell PHY PTP support before.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
