@@ -1,143 +1,121 @@
-Return-Path: <netdev+bounces-180608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5299FA81D51
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 08:44:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 798C9A81D5F
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 08:45:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22DBA189A42B
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 06:44:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EEB68A07A2
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 06:44:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C71571DF27D;
-	Wed,  9 Apr 2025 06:44:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD301DF25D;
+	Wed,  9 Apr 2025 06:44:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UCjoTyZ7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FHRhJMKx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522311DE4E7;
-	Wed,  9 Apr 2025 06:44:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 547581B81DC;
+	Wed,  9 Apr 2025 06:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744181057; cv=none; b=aEEsOKqMmXeNY/1Jmh3e/3hHnTtVLB039as1yfC44YAY43J+iO8zZs6Bfoudhr1U0O8+y+sDkyhG+80T7okOQci/ePJtJQLoetPXuaok4h9jRPOIa2TBGhX17UvpoiPVELyhnS3/uEPlXIBiC5ouH8/O0yBqRo5RQUHOxblyWYQ=
+	t=1744181080; cv=none; b=grctfgFoVHdas3BdD6OP98+LsPYRoClow7zXbqiEuziUg8R8t/Yhi/C30d0L0XMOnFNdp9FtAHbNMWqK+o7PcqXPEcRDMbRRvoSMCTCHie0Got/pj8qyZRTDtb7VdjsMZXt9TTC1XUq1NRA6+9bV0SlQ8dMro7a+odCu5+E69ac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744181057; c=relaxed/simple;
-	bh=EA2abmK970vc5VUSwknSZAbpfozmiJ2WLu2yC0Rm9Q8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G+iBxptMY39zla1sf2g0IDBWeQgpOFpQu2ZPZp07f7t30NzaZav4WfRL88zk5nIBod8Qrlh6nFtBq/K69rJcsriI7S1C0oAW67SPLKqz/lZT8Oi+C7hGzj/BhylPjUdJ8DixsP9Ry6DI77CuT8XzFprg1JRKTkwxgIoAe9bqrM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UCjoTyZ7; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-306bf444ba2so2921946a91.1;
-        Tue, 08 Apr 2025 23:44:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744181055; x=1744785855; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zFnPHqAViJTArLLnMbNb1yqvVoshG4R2mnj5u2i0toE=;
-        b=UCjoTyZ7n8tvGR7OjR7tS9Ro8L6DZwRuJrPXMXc0xYRDuSBjkVrXWTFGds+H1WQgfk
-         Cw8H8bFkttNmiWr0SkDD4d0ub/uTIlEey5XyoJlu5OeKZmfVmXl5qwo2rsavYFKLg3yQ
-         UCFG7H0G13HgI95y2pp0HayFIU3KMNkU58fypUztZHcanuF14xDNsvgT+kodRqefKlDd
-         m1CFbvPnOqpieeNvWkDFeUraia1KI1JU9YLB++Gji1oXn/3WGhoXFJGCUtDcQrvFNeAC
-         b9boKIxtjNKpTZv2GJGSOFprw3lPe8+4pqSghfe12fvjbYM4NItRj7d9j83Tkuf9zjTa
-         TlFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744181055; x=1744785855;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zFnPHqAViJTArLLnMbNb1yqvVoshG4R2mnj5u2i0toE=;
-        b=OQ2enlJ411P2VUcc1F9WQlnCjPh0rvXYq5os0OAujFdDezIhkZQGzNh0VjoWA5MWmc
-         DrOLzJOqIemG+2jMYf7Was/W/S0fSAepk3txAPPkNMIOv25HZlrV9UIKCmw/6IIf3Kti
-         HXGm/LOi23iEiktDscbdWlgd1aS2KVjBVOQbCFuuDNvf9CgusCKsTwiY+VfVgtG6bJir
-         AFn1RcRmGicYQWhzemyFnpHWI/h80TTfJtSexteLvBiotFYtlJeupNFw4jyX6LeW3qKS
-         RxML25+hUH585ZH2GjSFUZvkYyMc0Hw6NkPPY131JcrVbgsQR7TGg87aYi9SCKGQway2
-         /VZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUEexOdK9qCPYZhGyULaaX5xXql0mPZ1WT38S6QbreWmoSaGMMZqqRLhlh06TtdN8OdjBnRtMCh@vger.kernel.org, AJvYcCUuKXJsKYqwjQErzh/Wxfc9cS4OKEPyBKaXclXWqK1usyGbMki0wMieocSTAZd1xoMVa8o=@vger.kernel.org, AJvYcCWxPsPKgl8iqnUFTxILAMzUBFIJuFKf7xKXa/hBSMrrnckZt/IgQy4ndfvh7o8wNUGUrIsZGzCCXNUrDfaf@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVs00Dro6bD73Lzk4Oakg95dvYnwgg/sLaTQLisIEBwPjNf5jK
-	ozKTnLpdB1DqV6+yqt0Bw/6aBgg4DffkUsl90/gNCWvnk79l6Cek
-X-Gm-Gg: ASbGncssGAHIzNeIQWr6+2uIo3cJHX7KoICN+ZEiVL8K/7jw3fwJQ6XoLFmP2VN2vXj
-	ypaglAht/e6lNVkYHvGq8jSUQfrfIaeJTDCAzA6HTpJToQrNGbk7xJW9443DCfSZcOKkv1CuGxc
-	W7xiR4yiMe6pqMeOaTIMkgwWvqRfTYCu1WUUo2QAGhomNLBisOf9Uqn72V1HIpIIZE2oFG0fe+/
-	Tyzl9dnDCH1Ruabapkp1d1cKXY8OowF9f5CxTxTTGRvzy9NNPccOKuiuE1DgL0G/PdNUYtj21Pj
-	2JaI5K47dfrf3vRHKa4dAtuKVuwHDT+zoKO6GRlrqbd1ifp0yQ==
-X-Google-Smtp-Source: AGHT+IFEFBrVdU4Z60J6u9c77Kly+wSwU0+rEdmF+faACzLEkBXEARmQGsGuz7F6mtlkCJR4WkAuvA==
-X-Received: by 2002:a17:90a:d00b:b0:2fe:9783:afd3 with SMTP id 98e67ed59e1d1-306dbb8e8a5mr2762085a91.2.1744181055366;
-        Tue, 08 Apr 2025 23:44:15 -0700 (PDT)
-Received: from [192.168.0.118] ([14.169.40.45])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22ac7b8c617sm4321055ad.67.2025.04.08.23.44.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Apr 2025 23:44:14 -0700 (PDT)
-Message-ID: <4195db62-db43-4d61-88c3-7a7fbb164726@gmail.com>
-Date: Wed, 9 Apr 2025 13:44:07 +0700
+	s=arc-20240116; t=1744181080; c=relaxed/simple;
+	bh=ALBnrSfHV8g4GMuPHWFFLTfPQLBL6JiGSf0XrqgvB2w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QfSXjDLyH7ga69BqDB9EoNndzi+4VCSeedmVT9WulagWIRuaMz4SiUeG+LhjndsWv5AFoyy7tU0OVLof2Z1BCcXAxchqQOv6x0/bnSzMt83AibBEc/TYW7QoavPRQ1L44qHj8ew+1MQLWxWQut4WQoUsl7iRyaGRl5mKGpR8M6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FHRhJMKx; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744181078; x=1775717078;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ALBnrSfHV8g4GMuPHWFFLTfPQLBL6JiGSf0XrqgvB2w=;
+  b=FHRhJMKxJc1ablkHMeGxiAnVmhFs5e5C60EX5t6jEDrNngF62wCBDqJm
+   pa5bixfNHZyD+g+JB09d+3WGqExdayQs2oW7lttxoCeqwIec/6tezANfO
+   d6nunvQbnk8aOJpnreKXYsRE1u1DIXg60yThWcS7vrHvRQMQlQBoubZbi
+   BtjuyYJr/2lDimEW/PcGub2zIHRhEQnWlGc18paVbOQrRtVzL3B0CcG5Z
+   Dsh60NRgV+a14VJT5pd+dxOhylH7TMsaHkDL0nDsfw5z0gP9iLFI7v3ra
+   pqVy8IFGreHyiEfV8D7sRxe63E5nOoBvPXJol7JX81CQnDSM+tGYY2qJG
+   g==;
+X-CSE-ConnectionGUID: yO+mWpBWSZOh9bmZeHmr7A==
+X-CSE-MsgGUID: cpcK/FvcSQuDrSuBMHhLNQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11397"; a="44782354"
+X-IronPort-AV: E=Sophos;i="6.15,200,1739865600"; 
+   d="scan'208";a="44782354"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2025 23:44:37 -0700
+X-CSE-ConnectionGUID: b/FVb1UPT6qv4CdqTE5qLA==
+X-CSE-MsgGUID: ZiQndo1+TFuqri8K0Hg3cA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,200,1739865600"; 
+   d="scan'208";a="165726005"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2025 23:44:35 -0700
+Date: Wed, 9 Apr 2025 08:44:19 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Abdun Nihaal <abdun.nihaal@gmail.com>
+Cc: shannon.nelson@amd.com, brett.creeley@amd.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] pds_core: fix memory leak in
+ pdsc_debugfs_add_qcq()
+Message-ID: <Z/YXQ7N2lCQxCn0L@mev-dev.igk.intel.com>
+References: <20250409054450.48606-1-abdun.nihaal@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] virtio-net: disable delayed refill when pausing rx
-To: Jason Wang <jasowang@redhat.com>
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- virtualization@lists.linux.dev
-References: <20250404093903.37416-1-minhquangbui99@gmail.com>
- <1743987836.9938157-1-xuanzhuo@linux.alibaba.com>
- <30419bd6-13b1-4426-9f93-b38b66ef7c3a@gmail.com>
- <CACGkMEs7O7D5sztwJVn45c+1pap20Oi5f=02Sy_qxFjbeHuYiQ@mail.gmail.com>
-Content-Language: en-US
-From: Bui Quang Minh <minhquangbui99@gmail.com>
-In-Reply-To: <CACGkMEs7O7D5sztwJVn45c+1pap20Oi5f=02Sy_qxFjbeHuYiQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250409054450.48606-1-abdun.nihaal@gmail.com>
 
-On 4/8/25 14:34, Jason Wang wrote:
-> On Mon, Apr 7, 2025 at 10:27 AM Bui Quang Minh <minhquangbui99@gmail.com> wrote:
->> On 4/7/25 08:03, Xuan Zhuo wrote:
->>> On Fri,  4 Apr 2025 16:39:03 +0700, Bui Quang Minh <minhquangbui99@gmail.com> wrote:
->>>> When pausing rx (e.g. set up xdp, xsk pool, rx resize), we call
->>>> napi_disable() on the receive queue's napi. In delayed refill_work, it
->>>> also calls napi_disable() on the receive queue's napi. This can leads to
->>>> deadlock when napi_disable() is called on an already disabled napi. This
->>>> scenario can be reproducible by binding a XDP socket to virtio-net
->>>> interface without setting up the fill ring. As a result, try_fill_recv
->>>> will fail until the fill ring is set up and refill_work is scheduled.
->>> So, what is the problem? The refill_work is waiting? As I know, that thread
->>> will sleep some time, so the cpu can do other work.
->> When napi_disable is called on an already disabled napi, it will sleep
->> in napi_disable_locked while still holding the netdev_lock. As a result,
->> later napi_enable gets stuck too as it cannot acquire the netdev_lock.
->> This leads to refill_work and the pause-then-resume tx are stuck altogether.
-> This needs to be added to the chagelog. And it looks like this is a fix for
->
-> commit 413f0271f3966e0c73d4937963f19335af19e628
-> Author: Jakub Kicinski <kuba@kernel.org>
-> Date:   Tue Jan 14 19:53:14 2025 -0800
->
->      net: protect NAPI enablement with netdev_lock()
->
-> ?
+On Wed, Apr 09, 2025 at 11:14:48AM +0530, Abdun Nihaal wrote:
+> The memory allocated for intr_ctrl_regset, which is passed to
+> debugfs_create_regset32() may not be cleaned up when the driver is
+> removed. Fix that by using device managed allocation for it.
+> 
+> Fixes: 45d76f492938 ("pds_core: set up device and adminq")
+> Signed-off-by: Abdun Nihaal <abdun.nihaal@gmail.com>
+> ---
+>  drivers/net/ethernet/amd/pds_core/debugfs.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/amd/pds_core/debugfs.c b/drivers/net/ethernet/amd/pds_core/debugfs.c
+> index ac37a4e738ae..04c5e3abd8d7 100644
+> --- a/drivers/net/ethernet/amd/pds_core/debugfs.c
+> +++ b/drivers/net/ethernet/amd/pds_core/debugfs.c
+> @@ -154,8 +154,9 @@ void pdsc_debugfs_add_qcq(struct pdsc *pdsc, struct pdsc_qcq *qcq)
+>  		debugfs_create_u32("index", 0400, intr_dentry, &intr->index);
+>  		debugfs_create_u32("vector", 0400, intr_dentry, &intr->vector);
+>  
+> -		intr_ctrl_regset = kzalloc(sizeof(*intr_ctrl_regset),
+> -					   GFP_KERNEL);
+> +		intr_ctrl_regset = devm_kzalloc(pdsc->dev,
+> +						sizeof(*intr_ctrl_regset),
+> +						GFP_KERNEL);
+>  		if (!intr_ctrl_regset)
+>  			return;
+>  		intr_ctrl_regset->regs = intr_ctrl_regs;
 
-I'm not aware of this, will update the fix tags in the next patch.
+In ionic driver it is also devm_ version, thanks for catching that.
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-> I wonder if it's simpler to just hold the netdev lock in resize or xsk
-> binding instead of this.
-
-That looks cleaner, let me try that approach.
+For future submission remember to set correct target (net instead of
+net-next as it is a fix)
 
 Thanks,
-Quang Minh
+Michal
+
+> -- 
+> 2.47.2
 
