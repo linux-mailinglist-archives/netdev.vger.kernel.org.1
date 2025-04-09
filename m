@@ -1,221 +1,287 @@
-Return-Path: <netdev+bounces-180717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68E06A823E3
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 13:46:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EF92A82400
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 13:51:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51EB219E16A5
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 11:46:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A30B3BE398
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 11:51:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8179825F79D;
-	Wed,  9 Apr 2025 11:44:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F11B25A62C;
+	Wed,  9 Apr 2025 11:51:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cMDUaLSU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XCxKfc2c"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49AB225F79B;
-	Wed,  9 Apr 2025 11:44:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744199088; cv=none; b=VJm/RuJ2K990rVGuy35xqyfa3mNwmQ57QOEC9r8lBnetj/dTU3IwWb1MG1znDFky/+91PrErFv4lU3B6lO1gWl3+degYXUvtxSN6zGfXGGhJ6J1VVIl0udp4kI3HTbsmvVKLYtPhgZgkv8RpsTVXoCchStGyWmKAhaMOFbOpiRQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744199088; c=relaxed/simple;
-	bh=iY5EsMn0jbpG1tVs5WE3pjqlXKU5g3mGBlcrgN1cXYc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K94MPIYmJocz308pkAjQ+vvSaor1mNGGK05TSMaKvvc8zwPkdJwlZuRKmx1IYP9HZrcAugLQeIGakhKepoYaV0oTqSdgsXia7u3/HNd3VOXCIBd74RSwNiDs4tnsRN2ZXQmjeL86jfvtZRzna5AyNXzKMhexAGsPfg60ShsxpUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cMDUaLSU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16AE4C4CEE3;
-	Wed,  9 Apr 2025 11:44:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744199087;
-	bh=iY5EsMn0jbpG1tVs5WE3pjqlXKU5g3mGBlcrgN1cXYc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cMDUaLSUyLPCKE3KdacRrB7QnxUH+0jk0pESqIXiQKEsxLcCF2xAFWQX2RIyd5YQ8
-	 KNKqKDS90oZxLNTs2h2Ik2FADoZpLfLW3YrJgNlAYlWiaoUo6ZOqF5G1ODNxdwlQR9
-	 SPs66F1TVr1Hmy8KdzvyXEadbrW/q+Eh3p1Cq32uzgIXvgzoSUJQWvrwSm2/YzsUrA
-	 PQ5+hnvTIzwni/cgbOF+Fv50dLYr1HopFBixZys1xGedu9I0AiYRZnaJ4LwvaE3hsz
-	 EYJqadhzq6P4aGkC/qsgx9jVIqKZuxkiZ+64uOVB1KbJ7M/eDsrKYDuu5gPm+iq8Ft
-	 +JKuPV/3N/9cg==
-Date: Wed, 9 Apr 2025 19:44:25 +0800
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Jani Nikula <jani.nikula@linux.intel.com>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, linux-kernel@vger.kernel.org, "Gustavo A. R. Silva"
- <gustavoars@kernel.org>, Kees Cook <kees@kernel.org>, Russell King
- <linux@armlinux.org.uk>, linux-hardening@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH v3 00/33] Implement kernel-doc in Python
-Message-ID: <20250409194425.496d092d@sal.lan>
-In-Reply-To: <87r021wsgp.fsf@intel.com>
-References: <cover.1744106241.git.mchehab+huawei@kernel.org>
-	<87r021wsgp.fsf@intel.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7ECD25523F
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 11:51:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744199474; cv=fail; b=flrN/iFJm7JooTPMQDO8UPNFTtm6/M6SGHX0lWTXqBkgclYmBLOp8Zsf5yNTDoFcH4pEk/56YsSMzBOzSJ9sHjEPk1nefXTsnf0pPuHWY2efhxntcnY2fnCk3By7cJiLzgJgtcAVt4MGPydJqZcR7hIEmDdv+aPgF676StT/1ss=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744199474; c=relaxed/simple;
+	bh=syWV+qerWg9ub6WEab4Xi9s6olo3YcNtmNDSImMxFZY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=J11mw4gys/ZSrG6QXj1JJVlNqOsXYO7P29+lBtqq9c12A4IHRQkyfATwZkjZdLLJfrt18E0/WyqrYxMzN30NHwQsIo6o+kEbWC3DEjQupJswYFAVuSjf8CE5TRXcIOHpW2B5P2fMfaZgxOMnv6BQEin00Au3fB5OupsToXE3ASU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XCxKfc2c; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744199472; x=1775735472;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=syWV+qerWg9ub6WEab4Xi9s6olo3YcNtmNDSImMxFZY=;
+  b=XCxKfc2cAylwigpejwQAZWN6X1yqCEt8IbsaVUGSu8Z0qbuCZeXeZdy+
+   YDEJq2/zFPleJh6KQu0GuQbX9QmaKocJGPKK2ExhHGpMKuL+QYTV53Hc9
+   BfAvNt4OIgbGqbq+wEYOowMtrwmstzoVn/Ep/KcF/RwTtKj9S2TXs/zIE
+   yOC72pCF/Wy9mPWhMnx2JC3YQ+VviT9GvuOp3x3YD0XJr2dSCTfOJ7PHK
+   7XZXzM5isK3j1iiBuZhHZlr829Wvufx5VUdG7T9uONTczU/LyKf1dutFV
+   aQsPG6FSvEdsoKIyQ45zEDpYx8GahKQIeZJXcbHVnerNiOa2u0T1s9KTK
+   w==;
+X-CSE-ConnectionGUID: n8tKmVUZQ1qIdcrJSAF6Pw==
+X-CSE-MsgGUID: kY20KogVS/2Jb/YBZMFgPA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11397"; a="45561431"
+X-IronPort-AV: E=Sophos;i="6.15,200,1739865600"; 
+   d="scan'208";a="45561431"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 04:51:11 -0700
+X-CSE-ConnectionGUID: dL8OYYbHTCek5sspYscf1Q==
+X-CSE-MsgGUID: SGMcC7ilSsGUrkIic3yxeA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,200,1739865600"; 
+   d="scan'208";a="128427422"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 04:51:11 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Wed, 9 Apr 2025 04:51:10 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Wed, 9 Apr 2025 04:51:10 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.45) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 9 Apr 2025 04:51:10 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=o8LEFFZM8Ccipppq3QtJS6sq7WVCsyGCf+82PZ2nO7eCNZRaxrsxh+e0XNyER1AB+XmcOT0SC1pS8F6xpx8TZdHEWaaHCXwWXOuAy1O3NP2ODTqYQWm8XH4FwnF8k7/oHLFez/Iqn5NEMxnm42RXcCy+55g8ZQ+3/H5mraWhCa4eIuu636BmY6/d0y7ZomqtxVdT/xnoHg5gUsnXP85wdyi4plOLJXTfRH2fbMvzTI1DzjKAcOpzUUNtgJIffVxqYDPoYJqTw+YwTR5MNcK7SjSBgkF1XourM3PO3YEwUWw42IWoJzWzt3Ue2LRKAmddQ4igY0j4MBteiCSE0q44Lg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=syWV+qerWg9ub6WEab4Xi9s6olo3YcNtmNDSImMxFZY=;
+ b=Lm6J5S/p9SfAROozC69Ewxy2F0PwOLw7cYfetH7BeY9nSkVOU1lg+L8IZDCsZsWbd0exluE5+0nZyMu3rXehybZYw4AdChzjQYI8eGEouHgPrjtH3v3m89AmXb2w05UbdzAYCBOoUd7cvwJPVj31wYFbfAeCB+e9ntUaaAF6Vq7V/JfmaNS3q257oZ6j8x07wATe2R1h9crgrnrkRcwidPGOONXnAfke6LMWV9c5wnoDkwqg27UsGEJuY5QmBVxTciTDo14yuUQJDRWaI9O6CF6t8spKDRh7GTgfvdPX72TzW2rmeOP55p22ne2I752y63APSv8BJ2wzwzHjDcFQPw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MW4PR11MB5889.namprd11.prod.outlook.com (2603:10b6:303:168::10)
+ by PH7PR11MB6056.namprd11.prod.outlook.com (2603:10b6:510:1d4::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.29; Wed, 9 Apr
+ 2025 11:51:06 +0000
+Received: from MW4PR11MB5889.namprd11.prod.outlook.com
+ ([fe80::89d6:5ccc:1dcc:3073]) by MW4PR11MB5889.namprd11.prod.outlook.com
+ ([fe80::89d6:5ccc:1dcc:3073%3]) with mapi id 15.20.8632.017; Wed, 9 Apr 2025
+ 11:51:06 +0000
+From: "Olech, Milena" <milena.olech@intel.com>
+To: "Keller, Jacob E" <jacob.e.keller@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Lobakin, Aleksander"
+	<aleksander.lobakin@intel.com>, Willem de Bruijn <willemb@google.com>, "Mina
+ Almasry" <almasrymina@google.com>, "Salin, Samuel" <samuel.salin@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH v10 iwl-next 03/11] virtchnl: add PTP
+ virtchnl definitions
+Thread-Topic: [Intel-wired-lan] [PATCH v10 iwl-next 03/11] virtchnl: add PTP
+ virtchnl definitions
+Thread-Index: AQHbqHKLDZhvMZzjoEqp31HJrhXBtrOaROAAgADyVmA=
+Date: Wed, 9 Apr 2025 11:51:06 +0000
+Message-ID: <MW4PR11MB5889CBA3909D6C877DA20CF48EB42@MW4PR11MB5889.namprd11.prod.outlook.com>
+References: <20250408103240.30287-2-milena.olech@intel.com>
+ <20250408103240.30287-9-milena.olech@intel.com>
+ <754e6414-cbee-4216-9fe9-36c468d01244@intel.com>
+In-Reply-To: <754e6414-cbee-4216-9fe9-36c468d01244@intel.com>
+Accept-Language: en-US, pl-PL
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW4PR11MB5889:EE_|PH7PR11MB6056:EE_
+x-ms-office365-filtering-correlation-id: 94986bc2-2df2-44e9-5a58-08dd775ccfe7
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
+x-microsoft-antispam-message-info: =?utf-8?B?Y29MaHBJbUlRUWJrVkpmZk1GUmJsWmQvVWlUdEkwTTdlcjhJbHBuUkh1cFN4?=
+ =?utf-8?B?QTY3NVNlSE5wQlJaSTJwdjRZRTlJUjJRZ3F0K2dLeEZndURXcklpTDF0UDRP?=
+ =?utf-8?B?S1RGL0lTV1E3d0JPVFRQMVA2cDhtbllET0dzdHRlR1lTMVNSRzk0TXlQTkFR?=
+ =?utf-8?B?VDhLOFNFWUNnOXUwSnl5aDdJeU4wd2ZFSmZ4aTl1aDl6Q2tKMVhzQ3NBWjZ1?=
+ =?utf-8?B?Q0ZLWXpjcTJmbXltZ0J3bi9WYTVtaE8xZ3pJWFlvRTU5UjNSR1lMcVVHbUFv?=
+ =?utf-8?B?disxZVNudWZtVG9wRy83NWtLWEdZdjd0R2dPOG1xSURkcEJOWWFqMGhEUlYz?=
+ =?utf-8?B?NGpWSUQvZTJMWG9aR3piNGRsQU9rUmJ2SlFRNEZFNW9POFV0WVN6NUJNaDJD?=
+ =?utf-8?B?ZlNmU1FiU1R6a0p6MG93OE9sdVptL203VXZlMVhSZC83NWRnVzkrcVJLRncx?=
+ =?utf-8?B?bmg2RU1kUlozaEtOYTVpSXlXWVVJN2xjcHFyYTZvaCtSTjd4eVkyd0JmQTI1?=
+ =?utf-8?B?WDdHa01kMjg2VlhLWFNNVmNWbENzWTZnNWdjekFDaEpJdXMwREdraGd4Q05J?=
+ =?utf-8?B?Zm8vc2xLbTRyQUFZNkhiYkdndEJSUTFkVS9LRU9IbDVENE93VnVyV3krcXFl?=
+ =?utf-8?B?aDZiU3dkcTFvMHZ6MitCMDBEcXEyMTFCbnpQellTU1ljMVQ0R1dnWkJ6akc0?=
+ =?utf-8?B?b3k4b2NFMFMvZ05vNGlLb3pLeHkvamtoL05RSFd3ZU4reDQxek54OGQrdi8z?=
+ =?utf-8?B?UjRLMzlnblVYUXpITVNXT0I5NW5ZeWZHMzF0ckl2NDJmUGVNdkxKMHpHOThj?=
+ =?utf-8?B?aEhKUVRNL29WYjhZWWpwZjlPdXhNMCtmTXJzUG9lQXF0aitVUmI4WGkvaXhI?=
+ =?utf-8?B?aVdSTlE3b3ZadUpQRlVZTHphQWwzTysyUi8xVWtmbytLYzhpMkQ2eStHOFBq?=
+ =?utf-8?B?SGhCZjF0eVFoMlVYK2Y2VjZNSUdvdWdWSXpPYXl3TlVQRlE5a0FPeDgveXdF?=
+ =?utf-8?B?dmJPVEVlWXFmcTlNZXYxSGUxd0VNTzI4WEdra2NXZ21RcFRFamJpbjU0WHY4?=
+ =?utf-8?B?RlErbDBNVFhuZnpuc3VucStxblVKcytGdjlpZUt2d3E2SXh5R3dFY2xPRUUr?=
+ =?utf-8?B?TStqbFk2U2IxRjZrTFg1a1hQdGlXM1dtQ0xGdDJHUlI4M1c4MWhXWHc2MnhX?=
+ =?utf-8?B?KzlWM0J4MmQrZ2JMUnl2Smt0Q3VzVTRNWUtteVNEdGQ5VWxIcTFtMVVmemhI?=
+ =?utf-8?B?amdWMmtZV3N4YXNmT3ZuaEJsa1FsbHkvaTRHU3lQd3hneGdJNjhUUkZVektm?=
+ =?utf-8?B?dS9uMjMrYlNOcXVBRkZYT2V6Z2lyb0NYbU1uVkNGRm5oU0lmRVpJWHBqekh5?=
+ =?utf-8?B?aXByMEt2aEhMb2pmYUs5OFl3QjV0T0xsMUFSY1FwRFdhMmZzZDNCU3UvU3dG?=
+ =?utf-8?B?NTdvenA0ZFU3YUUrNVJVTEZrUjJ4V0I5TGVKUDNkcnV6OXlQT3ZoVkJkdFNq?=
+ =?utf-8?B?dmNTYXBma2RDdTd2SFVYb3RGNEhRVGo3REMwN01VQndwemJiT2pmTmpaNUtM?=
+ =?utf-8?B?UUNOUmFTaWZFNVk0Ky9SZGtQaWo5aDRsM3MrS05Hek13M2pXVHNGRWhqMW9m?=
+ =?utf-8?B?SmlPaThhLzJWMXhXN29DN3liWm51V0xacHo1aXNySlh4SDVvWnNCRm9OUnZK?=
+ =?utf-8?B?YXhlMzhuMXhSK3hmL0oxbitEYjI3NlZEc3A2M0RvbWF2SnRkZkFhZkp5TXJm?=
+ =?utf-8?B?ZlFBV1Z0VWw4VUtzS01lRlFIQ1dyOVl0clZQTVlqd1RIc3NVbnE2SjMyMXBq?=
+ =?utf-8?B?c2plZFU3bGpxbW5yMFZWRjNaL29na2FmOTdJSWxVVlBQbzloejg2WGsycGdy?=
+ =?utf-8?B?RE5YV1ltMko3dzlsZjMvdDEvWVUwM3ZKakVDeURFMGpOK2E2Y1ZZQWZwVFV0?=
+ =?utf-8?B?UUZOQUZmUEdxZTlqVWtwMmJDVGdFNkF4ekxIRFJmMFQyTEE0b0dqYlJmQVVV?=
+ =?utf-8?Q?Q4pbek7YblmGXwhwiXZGvphl8y4YqM=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5889.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?TzcxY3NOdXUrQnlEdVVhWnlWUEJXaDV3REdva1dNMjlJZ09SdFo4czRiSVp0?=
+ =?utf-8?B?SzRreEcxdVhYbXRpNjUvZ3N6ZHI2b0xBTWNNSmJNTHprTGp2RTF4ZDdva3Vu?=
+ =?utf-8?B?Y25VYjRYK3I3ZTd1b3grRWZqRmxaaGpXbkd4dS9DbkJubW1uLzJya29tamNK?=
+ =?utf-8?B?M1FWRGV2M0FhbENTT21GWlRSVWk2ajh3c2VBb2VwOFg1cXJGaWJjUGlEU2Yy?=
+ =?utf-8?B?TFhZYlc1bTJMaWJVVXBMZGlGMlViZS9lMU1uamZ6Y3hyQnFsbDFxOUo0dzhC?=
+ =?utf-8?B?bC9KYUpaZFJMbmVYdzJQNjFFcWdYSTdUR1ExdVEwakg5c0Rtb0lEdi8vcXht?=
+ =?utf-8?B?MEZUZ3NPQzhaalRGWWkyWmQ4RTI1bUJxOUxIZ21jUHFOaUtUenUyT04xVzZD?=
+ =?utf-8?B?K1hxNnBRM2drRkFkaVowV2dlOGdjWWF1SEF2YkV5UitNZTVCZC9aSUc1Y0lW?=
+ =?utf-8?B?S1diSEJwenFuTnNpbXk0U0JnY3lDN2VOcm5TZ1AzcTN3Y1d1M2d0elNFcWVT?=
+ =?utf-8?B?SVlzMEg2SHVrY21URVZ0SThYUW42MlE0TzJ0akxxMXZPb1QrSWh3aHR4U1Ja?=
+ =?utf-8?B?MytxQWlobG9YVmZQTXF1cU9jQTY5aVNDYzFnZHhuTVlvQkVPa21EcnhNcVcy?=
+ =?utf-8?B?VU5XWkx2bytERzJyWk5qY3crT05xUVlncnJsTjZKM2NaWDg3b1NmTHErLzV0?=
+ =?utf-8?B?TlorRkE1bkJXZkw4eFg1dk5EVEY1Qm9PZnhqa09MWmhGckw0UFVwVWZmb0x4?=
+ =?utf-8?B?OW9oV2VHKy9NZzVSaVpYWGYyV0J2UkZHanJBWEZEcExjQXY3bnRzenYrY3dJ?=
+ =?utf-8?B?U3A3eFlkb2x3U01JY3E1a0QrWDY5L3Q5MWJ1VDNvNDBxU0J5YUF0TjkwMnBr?=
+ =?utf-8?B?M0hBT2xnbmJxNmxNRjBWNVlYbU1FMHlML09qWFd1VFA4QU91VEhEZ0E1T3da?=
+ =?utf-8?B?TDVNelNPcE9hZFIvcyt2aENHaG5QbGtOcVdGcDJya3FGdTFJelhPKzNucXFL?=
+ =?utf-8?B?Rk9SaGJpTHRYbkdxKzFrdGFmc0s1cmU1ZWZUM0NRenNHMXhKKzJFZHI4QW5t?=
+ =?utf-8?B?aFdSU1dUYmRmdnN1TWVJOEFCcWxSdXNmb1JDVm1FNmpOMFRtd3I4STY1RWp4?=
+ =?utf-8?B?V0RxU0lucHhDVXRwNEh6TG5XRHJXUWlWT3Y4QUhMajQ1QjV1Y2grY0hkT0lG?=
+ =?utf-8?B?Z0JnQzBIcmd0TEdpdDJJRkprMU9QSDJoN0t1RVVwOE5MNUhucGE0QlNpUXpm?=
+ =?utf-8?B?bmNiYVNmRkNxYnk1bUw2S2F5NkU4SFVHMDZOZHVCY3FIYmZjQ1BJNjdaSFpY?=
+ =?utf-8?B?cXpYTlh6SDhiYXQ2TVdQQTNtTllsVG9SbUZ0bjV2SkJxMXc0SVNuRXhFdTNa?=
+ =?utf-8?B?cUh3SDYxTFFSNGRKM05hNjZsa2xndEg0cFBOQkQxbzU1WEw5S3dOWUpUTFh6?=
+ =?utf-8?B?RGtpaVk0WVZMS3N3MVM0Z3M3ZWZxTk82MWxHZWk5Vk84ZmVHRjFzYitwbnIr?=
+ =?utf-8?B?OFNLbmwzQ25tZHRzcjBjdnBnUmFJWUlxcUxQQ1FIQWtVQm9ySmRQZW9PdlVo?=
+ =?utf-8?B?aHU2NnZCWGdSOC8rdDRKM1VFZ3hBN3FzWFZOZ0prb3NPSEd1VEJvekkvNE12?=
+ =?utf-8?B?TDZiWDZSbWQrZUhwdXR1VVYxN09TMHdTNm03MlhrZGJTZnhncnp1VThVdTRo?=
+ =?utf-8?B?OWI1R0pEMmFiVGhKU1FwTldnNFlNQjVZSk9QZHV6UWdqVytIejFOSE81S01O?=
+ =?utf-8?B?Z0ZNMlFRWTJCQTFrbzlTWDcvRHVCL3htWXhrdFB4WXRNZlRoengydC9PY3NT?=
+ =?utf-8?B?Rkp3akRmdWUvaFNZMnJCQWI4MGROWHBLTzVVSjgwQkRYV1BxRmJ3T3NhN1ZI?=
+ =?utf-8?B?WnFpZHdibW04RVgrTUxnUkMxN01vaWNzY1VKdVhSK2k4SkkvRno5cTY5cmNJ?=
+ =?utf-8?B?Q1FkaG5aUEROTVZGcmpydmFkdTdPTGkybS82M29KRW9pejRPVzhXMTEyRUpN?=
+ =?utf-8?B?czhROVhMWm9IRTNMNUFkR1VpTldFSmRTa3llSUo4WXF1MU1yV1dUbGZkYUov?=
+ =?utf-8?B?WkI4dlk5YXNSUmVpbkJ2ZWdBU21JUnZzNnIvTkdWdkNqc3Vsb2dQanRZbnBG?=
+ =?utf-8?Q?nA2LMl/f6eQkoG5EptyoyHBNL?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5889.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 94986bc2-2df2-44e9-5a58-08dd775ccfe7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Apr 2025 11:51:06.4979
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: LoCUNTK9cDIyy6lj+w2zJTN7ViHuMi1p7ETJxh1XbDwWARnxUMr9bHHerxyjAUmOvCFWVVBtq/7EHYxaumK2YQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6056
+X-OriginatorOrg: intel.com
 
-Em Wed, 09 Apr 2025 13:16:06 +0300
-Jani Nikula <jani.nikula@linux.intel.com> escreveu:
-
-> On Tue, 08 Apr 2025, Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
-> > Hi Jon,
-> >
-> > This changeset contains the kernel-doc.py script to replace the verable
-> > kernel-doc originally written in Perl. It replaces the first version and the
-> > second series I sent on the top of it.  
-> 
-> Yay! Thanks for doing this. I believe this will make contributing to
-> kernel-doc more accessible in the long run.
-> 
-> > I tried to stay as close as possible of the original Perl implementation
-> > on the first patch introducing kernel-doc.py, as it helps to double check
-> > if each function was  properly translated to Python.  This have been 
-> > helpful debugging troubles that happened during the conversion.
-> >
-> > I worked hard to make it bug-compatible with the original one. Still, its
-> > output has a couple of differences from the original one:
-> >
-> > - The tab expansion works better with the Python script. With that, some
-> >   outputs that contain tabs at kernel-doc markups are now different;
-> >
-> > - The new script  works better stripping blank lines. So, there are a couple
-> >   of empty new lines that are now stripped with this version;
-> >
-> > - There is a buggy logic at kernel-doc to strip empty description and
-> >   return sections. I was not able to replicate the exact behavior. So, I ended
-> >   adding an extra logic to strip empty sections with a different algorithm.
-> >
-> > Yet, on my tests, the results are compatible with the venerable script
-> > output for all .. kernel-doc tags found in Documentation/. I double-checked
-> > this by adding support to output the kernel-doc commands when V=1, and
-> > then I ran a diff between kernel-doc.pl and kernel-doc.py for the same
-> > command lines.
-> >
-> > The only patch that doesn't belong to this series is a patch dropping
-> > kernel-doc.pl. I opted to keep it for now, as it can help to better
-> > test the new tools.
-> >
-> > With such changes, if one wants to build docs with the old script,
-> > all it is needed is to use KERNELDOC parameter, e.g.:
-> >
-> > 	$ make KERNELDOC=scripts/kernel-doc.pl htmldocs  
-> 
-> I guess that's good for double checking that the python version
-> reproduces the output of the old version, warts and all. And it could be
-> used standalone for comparing the output for .[ch] files directly
-> instead of going through Sphinx.
-> 
-> But once we're reasonably sure the new one works fine, I think the
-> natural follow-up will be to import the kernel-doc python module from
-> the kernel-doc Sphinx extension instead of running it with
-> subprocess.Popen(). It'll bypass an absolutely insane amount of forks,
-> python interpreter launches and module imports.
-> 
-> It'll also open the door for passing the results in python native
-> structures instead of text, also making it possible to cache parse
-> results instead of parsing the source files for every kernel-doc
-> directive in rst.
-
-Yes, this is on my plan. I have already a patch series for that,
-but it still requires some care to ensure that the results will be
-identical.
-
-> Another idea regarding code organization, again for future. Maybe we
-> should have a scripts/python/ directory structure, so we can point
-> python path there, and be able to import stuff from there? And
-> reasonably share code between modules. And have linters handle it
-> recursively, etc, etc.
-
-Sounds like a plan. I did some code reorg already, but surely there
-are spaces for improvements. 
-
-> Anyway, I applaud the work, and I regret that I don't have time to
-> review it in detail. Regardless, I think the matching output is the most
-> important part.
-
-I did several tests here to check the output, making it similar to the
-output from the Perl version.
-
-> 
-> 
-> BR,
-> Jani.
-> 
-> > ---
-> >
-> > v3:
-> > - rebased on the top of v6.15-rc1;
-> > - Removed patches that weren't touching kernel-doc and its Sphinx extension;
-> > - The "Re" class was renamed to "KernRe"
-> > - It contains one patch from Sean with an additional hunk for the
-> >   python version.
-> >
-> > Mauro Carvalho Chehab (32):
-> >   scripts/kernel-doc: rename it to scripts/kernel-doc.pl
-> >   scripts/kernel-doc: add a symlink to the Perl version of kernel-doc
-> >   scripts/kernel-doc.py: add a Python parser
-> >   scripts/kernel-doc.py: output warnings the same way as kerneldoc
-> >   scripts/kernel-doc.py: better handle empty sections
-> >   scripts/kernel-doc.py: properly handle struct_group macros
-> >   scripts/kernel-doc.py: move regex methods to a separate file
-> >   scripts/kernel-doc.py: move KernelDoc class to a separate file
-> >   scripts/kernel-doc.py: move KernelFiles class to a separate file
-> >   scripts/kernel-doc.py: move output classes to a separate file
-> >   scripts/kernel-doc.py: convert message output to an interactor
-> >   scripts/kernel-doc.py: move file lists to the parser function
-> >   scripts/kernel-doc.py: implement support for -no-doc-sections
-> >   scripts/kernel-doc.py: fix line number output
-> >   scripts/kernel-doc.py: fix handling of doc output check
-> >   scripts/kernel-doc.py: properly handle out_section for ReST
-> >   scripts/kernel-doc.py: postpone warnings to the output plugin
-> >   docs: add a .pylintrc file with sys path for docs scripts
-> >   docs: sphinx: kerneldoc: verbose kernel-doc command if V=1
-> >   docs: sphinx: kerneldoc: ignore "\" characters from options
-> >   docs: sphinx: kerneldoc: use kernel-doc.py script
-> >   scripts/kernel-doc.py: Set an output format for --none
-> >   scripts/kernel-doc.py: adjust some coding style issues
-> >   scripts/lib/kdoc/kdoc_parser.py: fix Python compat with < v3.13
-> >   scripts/kernel-doc.py: move modulename to man class
-> >   scripts/kernel-doc.py: properly handle KBUILD_BUILD_TIMESTAMP
-> >   scripts/lib/kdoc/kdoc_parser.py: remove a python 3.9 dependency
-> >   scripts/kernel-doc.py: Properly handle Werror and exit codes
-> >   scripts/kernel-doc: switch to use kernel-doc.py
-> >   scripts/lib/kdoc/kdoc_files.py: allow filtering output per fname
-> >   scripts/kernel_doc.py: better handle exported symbols
-> >   scripts/kernel-doc.py: Rename the kernel doc Re class to KernRe
-> >
-> > Sean Anderson (1):
-> >   scripts: kernel-doc: fix parsing function-like typedefs (again)
-> >
-> >  .pylintrc                         |    2 +
-> >  Documentation/Makefile            |    2 +-
-> >  Documentation/conf.py             |    2 +-
-> >  Documentation/sphinx/kerneldoc.py |   46 +
-> >  scripts/kernel-doc                | 2440 +----------------------------
-> >  scripts/kernel-doc.pl             | 2439 ++++++++++++++++++++++++++++
-> >  scripts/kernel-doc.py             |  315 ++++
-> >  scripts/lib/kdoc/kdoc_files.py    |  282 ++++
-> >  scripts/lib/kdoc/kdoc_output.py   |  793 ++++++++++
-> >  scripts/lib/kdoc/kdoc_parser.py   | 1715 ++++++++++++++++++++
-> >  scripts/lib/kdoc/kdoc_re.py       |  273 ++++
-> >  11 files changed, 5868 insertions(+), 2441 deletions(-)
-> >  create mode 100644 .pylintrc
-> >  mode change 100755 => 120000 scripts/kernel-doc
-> >  create mode 100755 scripts/kernel-doc.pl
-> >  create mode 100755 scripts/kernel-doc.py
-> >  create mode 100644 scripts/lib/kdoc/kdoc_files.py
-> >  create mode 100755 scripts/lib/kdoc/kdoc_output.py
-> >  create mode 100755 scripts/lib/kdoc/kdoc_parser.py
-> >  create mode 100755 scripts/lib/kdoc/kdoc_re.py  
-> 
+T24gNC84LzIwMjUgMTE6MTIgUE0sIEphY29iIEtlbGxlciB3cm90ZToNCg0KPk9uIDQvOC8yMDI1
+IDM6MzAgQU0sIE1pbGVuYSBPbGVjaCB3cm90ZToNCj4+IFBUUCBjYXBhYmlsaXRpZXMgYXJlIG5l
+Z290aWF0ZWQgdXNpbmcgdmlydGNobmwgY29tbWFuZHMuIFRoZXJlIGFyZSB0d28NCj4+IGF2YWls
+YWJsZSBtb2RlcyBvZiB0aGUgUFRQIHN1cHBvcnQ6IGRpcmVjdCBhbmQgbWFpbGJveC4gV2hlbiB0
+aGUgZGlyZWN0DQo+PiBhY2Nlc3MgdG8gUFRQIHJlc291cmNlcyBpcyBuZWdvdGlhdGVkLCB2aXJ0
+Y2hubCBtZXNzYWdlcyByZXR1cm5zIGEgc2V0DQo+PiBvZiByZWdpc3RlcnMgdGhhdCBhbGxvdyBy
+ZWFkL3dyaXRlIGRpcmVjdGx5LiBXaGVuIHRoZSBtYWlsYm94IGFjY2VzcyB0bw0KPj4gUFRQIHJl
+c291cmNlcyBpcyBuZWdvdGlhdGVkLCB2aXJ0Y2hubCBtZXNzYWdlcyBhcmUgdXNlZCB0byBhY2Nl
+c3MNCj4+IFBUUCBjbG9jayBhbmQgdG8gcmVhZCB0aGUgdGltZXN0YW1wIHZhbHVlcy4NCj4+IA0K
+Pj4gVmlydGNobmwgQVBJIGNvdmVycyBib3RoIG1vZGVzIGFuZCBleHBvc2VzIGEgc2V0IG9mIFBU
+UCBjYXBhYmlsaXRpZXMuDQo+PiANCj4+IFVzaW5nIHZpcnRjaG5sIEFQSSwgdGhlIGRyaXZlciBy
+ZWNvZ25pemVzIGFsc28gSFcgYWJpbGl0aWVzIC0gbWF4aW11bQ0KPj4gYWRqdXN0bWVudCBvZiB0
+aGUgY2xvY2sgYW5kIHRoZSBiYXNpYyBpbmNyZW1lbnQgdmFsdWUuDQo+PiANCj4+IEFkZGl0aW9u
+YWxseSwgQVBJIGFsbG93cyB0byBjb25maWd1cmUgdGhlIHNlY29uZGFyeSBtYWlsYm94LCBkZWRp
+Y2F0ZWQNCj4+IGV4Y2x1c2l2ZWx5IGZvciBQVFAgcHVycG9zZXMuDQo+PiANCj4+IFJldmlld2Vk
+LWJ5OiBBbGV4YW5kZXIgTG9iYWtpbiA8YWxla3NhbmRlci5sb2Jha2luQGludGVsLmNvbT4NCj4+
+IFJldmlld2VkLWJ5OiBXaWxsZW0gZGUgQnJ1aWpuIDx3aWxsZW1iQGdvb2dsZS5jb20+DQo+PiBT
+aWduZWQtb2ZmLWJ5OiBNaWxlbmEgT2xlY2ggPG1pbGVuYS5vbGVjaEBpbnRlbC5jb20+DQo+PiBU
+ZXN0ZWQtYnk6IE1pbmEgQWxtYXNyeSA8YWxtYXNyeW1pbmFAZ29vZ2xlLmNvbT4NCj4+IFRlc3Rl
+ZC1ieTogU2FtdWVsIFNhbGluIDxTYW11ZWwuc2FsaW5AaW50ZWwuY29tPg0KPg0KPg0KPkNvdXBs
+ZSBvZiBjb21tZW50cywgYnV0IG5vIHJlYWwgb2JqZWN0aW9uLiBJIHRoaW5rIHRoZSBkZWNpc2lv
+bnMgaGVyZQ0KPmFyZSBhY2NlcHRhYmxlIHRyYWRlIG9mZnMuDQo+DQo+UmV2aWV3ZWQtYnk6IEph
+Y29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPg0KPg0KPj4gKy8qKg0KPj4gKyAq
+IHN0cnVjdCB2aXJ0Y2hubDJfcHRwX2dldF9jcm9zc190aW1lOiBBc3NvY2lhdGVkIHdpdGggbWVz
+c2FnZQ0KPj4gKyAqCQkJCQlWSVJUQ0hOTDJfT1BfUFRQX0dFVF9DUk9TU19USU1FLg0KPj4gKyAq
+IEBzeXNfdGltZV9uczogU3lzdGVtIGNvdW50ZXIgdmFsdWUgZXhwcmVzc2VkIGluIG5hbm9zZWNv
+bmRzLCByZWFkDQo+PiArICoJCSBzeW5jaHJvbm91c2x5IHdpdGggZGV2aWNlIHRpbWUNCj4+ICsg
+KiBAZGV2X3RpbWVfbnM6IERldmljZSBjbG9jayB0aW1lIHZhbHVlIGV4cHJlc3NlZCBpbiBuYW5v
+c2Vjb25kcw0KPj4gKyAqDQo+PiArICogUEYvVkYgc2VuZHMgdGhpcyBtZXNzYWdlIHRvIHJlY2Vp
+dmUgdGhlIGNyb3NzIHRpbWUuDQo+PiArICovDQo+PiArc3RydWN0IHZpcnRjaG5sMl9wdHBfZ2V0
+X2Nyb3NzX3RpbWUgew0KPj4gKwlfX2xlNjQgc3lzX3RpbWVfbnM7DQo+PiArCV9fbGU2NCBkZXZf
+dGltZV9uczsNCj4+ICt9Ow0KPg0KPlRoZXNlIGFyZSBpbiBuYW5vIHNlY29uZHMsIGFuZCB0aGVy
+ZSdzIG5vIHJvb20gbGVmdCBmb3IgZXh0ZW5zaW9uIGluIHRoZQ0KPnN0cnVjdHVyZS4uIEhvd2V2
+ZXIsIDY0Yml0cyBvZiBuYW5vc2Vjb25kcyBpcyA1ODQgeWVhcnMgZ2l2ZSBvciB0YWtlLg0KPkV2
+ZW4gaWYgd2Ugc3RhcnQgZnJvbSB0aGUgVW5peCBlcG9jaCB0aGF0cyBhIHByZXR0eSBsb25nIHdh
+eSBpbiB0aGUNCj5mdXR1cmUuIEFkZGl0aW9uYWxseSwgaXQgaXMgbGlrZWx5IHRoYXQgc29tZSBz
+b3J0IG9mIHNvZnR3YXJlLWJhc2VkDQo+cm9sbG92ZXIgY291bGQgYmUgdXNlZCBzaW5jZSB0aGUg
+cm9sbC1vdmVyIHBlcmlvZCB3b3VsZCBiZSBodW5kcmVkcyBvZg0KPnllYXJzLiBPay4gSSBkb24n
+dCB0aGluayB3ZSBuZWVkIHRvIHdhc3RlIGFkZGl0aW9uYWwgc3BhY2UgZm9yIGV4dGVuc2lvbg0K
+PmhlcmUuIFRoaXMgYWxzbyBhcHBsaWVzIHRvIHRoZSBvdGhlciBfX2xlNjQgZmllbGRzIHdpdGgg
+bmFub3NlY29uZCB0aW1lLg0KDQpSaWdodCwgSSd2ZSBhbHNvIGNvbnNpZGVyZWQgaXQgZHVyaW5n
+IGNyZWF0aW5nIHZpcnRjaG5sIEFQSSwgYnV0IGF0IHRoZQ0KZW5kIG9mIHRoZSBkYXkgSSBhZ3Jl
+ZSB0aGF0IHdlIGRvbid0IG5lZWQgdG8gd2FzdGUgc3BhY2UgZm9yIGV4dGVuc2lvbnMuDQoNCj4N
+Cj4+ICtWSVJUQ0hOTDJfQ0hFQ0tfU1RSVUNUX0xFTigxNiwgdmlydGNobmwyX3B0cF9nZXRfY3Jv
+c3NfdGltZSk7DQo+PiArDQo+PiArLyoqDQo+PiArICogc3RydWN0IHZpcnRjaG5sMl9wdHBfc2V0
+X2Rldl9jbGtfdGltZTogQXNzb2NpYXRlZCB3aXRoIG1lc3NhZ2UNCj4+ICsgKgkJCQkJICBWSVJU
+Q0hOTDJfT1BfUFRQX1NFVF9ERVZfQ0xLX1RJTUUuDQo+PiArICogQGRldl90aW1lX25zOiBEZXZp
+Y2UgdGltZSB2YWx1ZSBleHByZXNzZWQgaW4gbmFub3NlY29uZHMgdG8gc2V0DQo+PiArICoNCj4+
+ICsgKiBQRi9WRiBzZW5kcyB0aGlzIG1lc3NhZ2UgdG8gc2V0IHRoZSB0aW1lIG9mIHRoZSBtYWlu
+IHRpbWVyLg0KPj4gKyAqLw0KPj4gK3N0cnVjdCB2aXJ0Y2hubDJfcHRwX3NldF9kZXZfY2xrX3Rp
+bWUgew0KPj4gKwlfX2xlNjQgZGV2X3RpbWVfbnM7DQo+PiArfTsNCj4+ICtWSVJUQ0hOTDJfQ0hF
+Q0tfU1RSVUNUX0xFTig4LCB2aXJ0Y2hubDJfcHRwX3NldF9kZXZfY2xrX3RpbWUpOw0KPj4gKw0K
+Pj4gKy8qKg0KPj4gKyAqIHN0cnVjdCB2aXJ0Y2hubDJfcHRwX2Fkal9kZXZfY2xrX2ZpbmU6IEFz
+c29jaWF0ZWQgd2l0aCBtZXNzYWdlDQo+PiArICoJCQkJCSAgVklSVENITkwyX09QX1BUUF9BREpf
+REVWX0NMS19GSU5FLg0KPj4gKyAqIEBpbmN2YWw6IFNvdXJjZSB0aW1lciBpbmNyZW1lbnQgdmFs
+dWUgcGVyIGNsb2NrIGN5Y2xlDQo+PiArICoNCj4+ICsgKiBQRi9WRiBzZW5kcyB0aGlzIG1lc3Nh
+Z2UgdG8gYWRqdXN0IHRoZSBmcmVxdWVuY3kgb2YgdGhlIG1haW4gdGltZXIgYnkgdGhlDQo+PiAr
+ICogaW5kaWNhdGVkIHNjYWxlZCBwcG0uDQo+PiArICovDQo+DQo+RG8gd2Ugd2FudCB0byBlbmNv
+ZGUgc2NhbGVkX3BwbSBoZXJlIGluIHRoZSB2aXJ0Y2hubCBpbnRlcmZhY2U/IEkNCj5zdXBwb3Nl
+IGl0cyBub3QgdGhhdCBiaWcgYSBkZWFsIGJ1dCBpdCBpcyBraW5kIG9mIGFuIGltcGxlbWVudGF0
+aW9uDQo+cXVpcmsgb2YgdGhlIExpbnV4IEFQSXMuIFdlIGNvdWxkIHVzZSBwYXJ0cyBwZXIgdHJp
+bGxpb24gb3Igc29tZXRoaW5nDQo+c2ltaWxhci4uDQo+DQo+SSBzdXBwb3NlIHRoZXJlIGlzIGxp
+dHRsZSB2YWx1ZSBpbiB0cmFuc2xhdGluZyBmcm9tIHNjYWxlZF9wcG0gdG8gc29tZQ0KPm90aGVy
+IGZvcm1hdCwgZHVlIHRvIGFjY3VtdWxhdGVkIGVycm9yLCBhbmQgc2NhbGVkX3BwbSBpcyBoaWdo
+ZXINCj5wcmVjaXNpb24gdGhhbiBwcGIuIE9rLg0KDQpJJ20gbm90IHN1cmUgSSBmdWxseSB1bmRl
+cnN0YW5kIHlvdXIgY29uY2VybiwgYnV0IHlvdSB0aGluayB0aGF0IHdlDQpjb3VsZCB1c2UgYW5v
+dGhlciBuYW1pbmcgY29udmVudGlvbiwgb3IgcHJvdmlkZSB0byBjb250cm9sIHBsYW5lIHJhdw0K
+c2NhbGVkIHBwbSB2YWx1ZT8NCg0KUGxlYXNlIG5vdGljZSB0aGF0IGluIGN1cnJlbnQgc2hhcGUs
+IHdlIG5lZ290aWF0ZSBhbHNvIGJhc2ljIGluY3JlbWVudA0KdmFsdWUgaW4gUFRQIGNhcGFiaWxp
+dGllcywgdG8gYWRqdXN0IHNjYWxlZCBwcG0gLSBhcyBpdCBpcyBkb25lIGluIGFueQ0Kb3RoZXIg
+cHJvZHVjdCAtIGFuZCB0aGVuIHRoZSBkaWZmIGlzIHNlbnQgdGhyb3VnaCB2aXJ0Y2hubCBtZXNz
+YWdlLg0KDQpUaGFua3MsDQpNaWxlbmENCg==
 
