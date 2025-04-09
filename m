@@ -1,244 +1,268 @@
-Return-Path: <netdev+bounces-180832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D936BA82A18
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 17:24:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97709A82A3B
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 17:27:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D21019E2DDB
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 15:18:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD16317AF48
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 15:21:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B00D626770E;
-	Wed,  9 Apr 2025 15:18:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 950C4266B61;
+	Wed,  9 Apr 2025 15:21:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="goPfuNZ+"
 X-Original-To: netdev@vger.kernel.org
-Received: from dediextern.your-server.de (dediextern.your-server.de [85.10.215.232])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F5DA1DFFD;
-	Wed,  9 Apr 2025 15:17:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.215.232
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744211881; cv=none; b=TWJ3Wk4eGuQnvlGqVqg+JfHSVKodJUGMB5lsZW48jGw9NLLjuollejdWzkKshuDRNGE6tLmCVjv+mqSjDxAp/GxHkmlGnaDp9H9rxBZEH56Mr6wtWlgm3qEIMW48wwl7Sd/JvwpGl4EXMqmwlcYvlaDYitmFrgwpxZ5zb1IOPJU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744211881; c=relaxed/simple;
-	bh=fz9JUrz7Jcqv5zV5815euWKNMRBXwDy2+iRh8qVXsls=;
-	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=YLYj3K9xvK+iiL7h3JYBwKzWPes7wEKXoKwTBX6xaDKDbEUvfdo4gVg/aWbG/K1eCFO9ZQ/KAQH9GhC2rjGSbXdHGUPWH1H7hF4iebAV5UPugYI9tTrC1YDqvo2OaCNu6LAxFx0V8BTFkZFfLuMXzGqOIXQuYK7ls8/wpm8+Uh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de; spf=pass smtp.mailfrom=hetzner-cloud.de; arc=none smtp.client-ip=85.10.215.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hetzner-cloud.de
-Received: from sslproxy01.your-server.de ([78.46.139.224])
-	by dediextern.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
-	id 1u2XBX-000Dxr-88; Wed, 09 Apr 2025 17:17:51 +0200
-Received: from [2a0d:3344:1523:1f10:f118:b2d4:edbb:54af]
-	by sslproxy01.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
-	id 1u2XBW-000HjF-34;
-	Wed, 09 Apr 2025 17:17:50 +0200
-Message-ID: <d33f0ab4-4dc4-49cd-bbd0-055f58dd6758@hetzner-cloud.de>
-Date: Wed, 9 Apr 2025 17:17:49 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1607C69D2B;
+	Wed,  9 Apr 2025 15:21:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744212092; cv=fail; b=cnd4YBbRzo4YkwlZMiYZHz3+G3cUAl6Kjpp4jvNjdXUBq6zaqYFVMrh9jh/l/6vpBM0PMRNaIrGxGZ5YEYiOTBc6+LGqu2oR00/R1TlEPtPN7GvoJObmfeurPRsD86ZwshdPPE+OmP8E3RNUzNY8xjuEzPlWPZT11CFAQVAcUMk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744212092; c=relaxed/simple;
+	bh=yk6xPr0blV5rRC2jaflogeLiKYtwlkZslHsiqKpcEWY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=tzb68jebjEUzcpqocowLg/E0Qc0FI4ikIItuw1LQjyxY9OPiFeTe6MmEZ6b/YDtVvDQsTCSeq3eyru77/9bzI4j1DiAEdT2d+O0aNUKyxJsAhzTYgw/8UbsSoSUpafmohWLenPRzvQhhnlE+Ol0b8wb7djqdZVgblnNowt6PQpQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=goPfuNZ+; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744212090; x=1775748090;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=yk6xPr0blV5rRC2jaflogeLiKYtwlkZslHsiqKpcEWY=;
+  b=goPfuNZ+EBwJVrWTNLYnShKTPiaY5bw+AIKpenQQTvZG2SgKfm1kXz+T
+   CZa2arFEzcNbzus3Nq8a+cYEIijV7xB+TAmqeOSnVkTrSbm+yvBwhkjar
+   gcdYrfNjj9MpIa/akzns0k/JeIFs5LF/HE3nme23ggmy+Qrc8VsIT90Fj
+   i387HfHL/C1AykLIUOOuVug48Wuf2MqSDsVVicKXkGhX8Vaf8g8wQIQgU
+   jbzhQMINkyw2B2iokhzfQJ19hI96k4nU20v1wamBWc73qwGRwq7AtL9sW
+   KcijGAPKPBjvUoZ64xa9RNxVNX3PgJao0UeYpeQy9JwGODwHwPvECyAtF
+   w==;
+X-CSE-ConnectionGUID: 6CGngITKT3i3VFjriNU7ww==
+X-CSE-MsgGUID: rl0hGQrQQ52H5DJzi8rgbg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11399"; a="57068694"
+X-IronPort-AV: E=Sophos;i="6.15,200,1739865600"; 
+   d="scan'208";a="57068694"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 08:21:29 -0700
+X-CSE-ConnectionGUID: cVyuf7mpSZOolVJTyVrhuw==
+X-CSE-MsgGUID: 6Ks4dVeCRq27d0ja/dxwbQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,200,1739865600"; 
+   d="scan'208";a="133831349"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 08:21:29 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Wed, 9 Apr 2025 08:21:28 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Wed, 9 Apr 2025 08:21:28 -0700
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.44) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 9 Apr 2025 08:21:28 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jC/R0S/yaJ/tK/MPWMNy4PG124hK+vVDuTfKat5y1vH4VZMGBZ3BPOm56D1DXF2jioIvwuO3lYaGlmyDl/hCzH9crkxOKS01oJ+87r9leaoeu4FXsB1Hc3hemQMOgdWP+MGDO3Lud/i0wxsXt49f0I0z9KOuJg6O1pibGEIwadao15D79A1Unel+s5Gneu3GOjW5Vrt+yGUnNmxzwT9QbBjEqHGOcrL/L1s0tfe0ms+SgMk9FQ/ezgBrZy78j3iesiRhzP1hOP3dw82ybx6Oh/CXtTYyCC6qV/RagfnvISEBP9H9I+4vkayaVChAAJYQmFeh1gqDe7yxdolu6JaSEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fBtS+spGBDEsnI00/P1Kwg3dNxdO9ZMW4MzjfE4CWWE=;
+ b=HeX8rrToHh/uSgXtYMb+bFNvn9LqulTIU15eeGsIIHMW54vSUFlxfBUI0KdLSCD8wGOOPKZ6+DW7dy0lv5Dgi5d+iol4HWjNsbA3bH0tqvjtnxKvItUhg6CyjWmsOoYiVjwFbzvzi0/DIS9AgueGfoXyakApFJI0zh/yGCi4aLM147C/pRfpppwhx9qqDlyuGDCM3UuhimuaCkNk0OZ9wiMjIko4ovXg0BicLBNBIStx7oMcjT2xqZpm+wEv/A2rEbZfUoUdwxrHzJuXOEJP5z5JENEZU9JepDCpLAV38sym+Fg+1CzuckcZPqMToqBwLgi5YDbwCf8ydgv0WmqXEg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8665.namprd11.prod.outlook.com (2603:10b6:8:1b8::6) by
+ SJ0PR11MB5119.namprd11.prod.outlook.com (2603:10b6:a03:2d6::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.34; Wed, 9 Apr
+ 2025 15:21:24 +0000
+Received: from DS0PR11MB8665.namprd11.prod.outlook.com
+ ([fe80::8e7e:4f8:f7e4:3955]) by DS0PR11MB8665.namprd11.prod.outlook.com
+ ([fe80::8e7e:4f8:f7e4:3955%5]) with mapi id 15.20.8632.021; Wed, 9 Apr 2025
+ 15:21:23 +0000
+Date: Wed, 9 Apr 2025 17:21:11 +0200
+From: Michal Kubiak <michal.kubiak@intel.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+CC: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
+	<leonro@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
+	<leon@kernel.org>, <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Moshe Shemesh <moshe@nvidia.com>, Mark Bloch
+	<mbloch@nvidia.com>, Vlad Dogaru <vdogaru@nvidia.com>, Yevgeny Kliteynik
+	<kliteyn@nvidia.com>
+Subject: Re: [PATCH net-next 01/12] net/mlx5: HWS, Fix matcher action
+ template attach
+Message-ID: <Z/aQZzRYWkSLV1r/@localhost.localdomain>
+References: <1744120856-341328-1-git-send-email-tariqt@nvidia.com>
+ <1744120856-341328-2-git-send-email-tariqt@nvidia.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1744120856-341328-2-git-send-email-tariqt@nvidia.com>
+X-ClientProxiedBy: MI1P293CA0005.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:2::12) To DS0PR11MB8665.namprd11.prod.outlook.com
+ (2603:10b6:8:1b8::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
-Autocrypt: addr=marcus.wichelmann@hetzner-cloud.de; keydata=
- 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
- wySmewx3h/yfMh0aFxHhvLPxrO2IEQ==
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, Jay Vosburgh
- <jv@jvosburgh.net>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org, sdn@hetzner-cloud.de
-Subject: [BUG] ixgbe: Detected Tx Unit Hang (XDP)
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: marcus.wichelmann@hetzner-cloud.de
-X-Virus-Scanned: Clear (ClamAV 1.0.7/27603/Wed Apr  9 10:44:35 2025)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8665:EE_|SJ0PR11MB5119:EE_
+X-MS-Office365-Filtering-Correlation-Id: fead1f06-f708-4a60-759e-08dd777a300e
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?xlxISPKlEZFNlzlhFp+6cJuRkpSE2nS0sVHgR/e1wAHzqUmJhkpbFUyvNFxm?=
+ =?us-ascii?Q?6TY9Xrkb0nLTvQTSkPJFxpkqRjBNU+8TVGTSUDso+3lK9FFJKaF/3HHeYQ38?=
+ =?us-ascii?Q?RSRVn47DmbdQoOiEmffezy+ih17Kr4UgOG/VffsIctQIFxWhe3mELwuPQfIP?=
+ =?us-ascii?Q?e0mBwaAIhXNEy2zztf5zQaLlPf5iq4P9WucJH4CXpUnoaTl6cfwKxwXeLV35?=
+ =?us-ascii?Q?7ZZVZq6a8TDnRSKaIoBSckrAAvqGAI83d0HvtZM0ImP8NNTv3jObGvefb7GJ?=
+ =?us-ascii?Q?rb8UgfE1zcxm1wPRLvocd9Va/nLDD+9gyRmmnbRcEcULQFMUrgMXyAgpEjdF?=
+ =?us-ascii?Q?nQTcxDCrT64e5miXNVSZRSgZ0XXC0NFKUKxHctcLq67y2eXiBGgvU0resmhK?=
+ =?us-ascii?Q?4pn9SaXxWQhDZD6PfXkhxZi2xmqMDbrnS6UvJW/9vPVC39lr3JvMVWOxOzg0?=
+ =?us-ascii?Q?RKrz8vHQqed0Nl3KdlFM7UbB51AFTh8EaYLWLBCYw9oev7FaFnpoPe3+GmcX?=
+ =?us-ascii?Q?gvpJQqfyR2OUWUnA9HiPdjo/CHBMKLNNQO2GUtoSqNKBDcF/kQYQCVwzl9zz?=
+ =?us-ascii?Q?nr8Zu21OHsraikj66hrRVmWGLJz9w/IMB2YiRyqrJa6+7VImzHB48Ce4nV7H?=
+ =?us-ascii?Q?ZJ+mt+CyyIU86uQyIwYOFwb8qIYNUVzTD3ROjaD+HkhrAYFvF4srxzPhb0TF?=
+ =?us-ascii?Q?x7F660SNLzh3iP/WerUvoX71zHUi4UhPXDSqs3jpwBkxEJpMOM4DLBUXzq7A?=
+ =?us-ascii?Q?gvWP5zSdzNJ/ACcqTccS0CEOAodZCCdeuJpr0WpwYOqI2JAN4LAdX5zM2l62?=
+ =?us-ascii?Q?4StA4qcMf6odWY+Ay/9uIRDZH4QvvQQOCz/qEXS4Vb1tO+MPWSF8DGLEq/Wy?=
+ =?us-ascii?Q?koblhz83Hd1NMK7b6k8yObVKKtSEPvA/WE/ru8nkSNWaSKHZIRKQOZtBQo1B?=
+ =?us-ascii?Q?U1H93pC67TlzOz26NbDNXdq+4el7U5fBHkjRNabY3CmDWFP3TuaRgbBsIjB7?=
+ =?us-ascii?Q?nkqHAVOJCWpWvgqd78SFKU+e6MrtQr1LXxZ2p/UIJnk3an3MP4KD1WBqtuGV?=
+ =?us-ascii?Q?hdzjtbtQYDe3qjoIMU6+ya4AwPZeJ6/Tobj2BLfitElLBwmmavpBeYUhnhHi?=
+ =?us-ascii?Q?wziyuBzlgqZIrnXpVyUImpkBX6YuwSGdCHpqOGJlYKFXXBLrfVpJoGrQRJV8?=
+ =?us-ascii?Q?NzFLFjTRTy61W1ASbpnMyOzZIL7jVff2VObgiuSMcAr3nTGCW9PTowIy+1Du?=
+ =?us-ascii?Q?t+kq5CRID9R68LDSBH9JW+n7f5Ln/HzqWGuAg1An3Zb9up4iLkAwFb/bI6uq?=
+ =?us-ascii?Q?xSHleAWoj+2Ed/vdsDZ+snkdSlSFcygViznVzQZXHiIiZu4RzbrC+HCIei2t?=
+ =?us-ascii?Q?lmkWAljfVfg3OMhmVv6TARadwqlW?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8665.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?8JK7Ft+hJ0a+jRbZ+/8Et8fm0RmXcCD/rlFTqPsYq225Gz9kxI6s3IahUnqG?=
+ =?us-ascii?Q?ZnJpPZm3s93+Xc3Zxk4FWdnZL2BX+rHUrdOXOhawtXAVTY8gbxlbWyYDgPzi?=
+ =?us-ascii?Q?cxxZOVMR5NdFEoHzzl8R1QtaNDbSi2lS0l8BpeotO9xxu1DXA1b7KWrAjNhD?=
+ =?us-ascii?Q?8SE2tAynOX9Rag+EvBqf4GyxhKANpvlXgH1J8cR/KremqFpsX5ZXLmeDYQKz?=
+ =?us-ascii?Q?bXJXsV/S/niLHOkjqZIlCJ8kA240Bgfl0hZOu4dDv/ity6ic7l0VhXo/J/aX?=
+ =?us-ascii?Q?peLyIig4fGx3gMJOzsq2MHyUyoPOkiaG+ZDP9U1oU4X06XjvKTe/cV1icO07?=
+ =?us-ascii?Q?RH3BA0Alc0rSD4OeQghdK0apmh23P8dyiZrk6ZkdDl0JDWS8bkuCJrZmWaG4?=
+ =?us-ascii?Q?E4W49YGWJm4/Q+h/NhhfwsWrURn3n9AIqwvlnzhKDWXHoHfvj2zfYIhDeW4f?=
+ =?us-ascii?Q?XxN1i+HpsjQ7WZft7IgqHZkE68x+N8PTpL/8Ktr5KzkJbFSkt/hNlAUzJE/c?=
+ =?us-ascii?Q?Z9Ff/PcTCsENXVu0hCb2uNlnjjMOD8td6rjfmEpEaEwJN4fi3JTgQpIVlNCr?=
+ =?us-ascii?Q?N+q84iPM76sHejJE5DU2FyTgxMsnDIwn5vZ1ZGWsB78Oo3bqVd9S2sJ9Ufpc?=
+ =?us-ascii?Q?Ze/2CMpIJBW3Yb+IHtvZTWoPdwZep5idTc8rGPQmENeuKN5zOgU/XC/pangZ?=
+ =?us-ascii?Q?dE1e4atzE+r06ToBlPvzDL0HZNC2jBrQofgWhnErM4ZW0upNjS09/7yt5JqN?=
+ =?us-ascii?Q?qMBaC4iTgwpY64QaFcPh1eadL8a9k1s4g889bMfULk5nArpzP7WwIyIZKqGi?=
+ =?us-ascii?Q?1uwA4ownrRv36JgrGUYw9Q30TFlUrAd2rQfmZ+ICgGk2Cb7MAt0YNN15YRYz?=
+ =?us-ascii?Q?KkJtZGzCaknfWuGTsf/iqHp0PkOoRcpbbpYUPhsj/4P1ahGTLtFpfJv6SK+W?=
+ =?us-ascii?Q?pxLPXUXgYQdyqisSaBVOfbsMwGUcPny2vbzu/ojo7ucZJkLspGswf5SgZd45?=
+ =?us-ascii?Q?KYa4kl38ZzY0XymqztpFyTFAVAsAbTsmbw39a08ve7sGkZUzuolyqi0gH7T/?=
+ =?us-ascii?Q?0K+mKfcuBPjJScIUFGlfzTqQhgTyRJcryDEEAoYSEptEzltaBk1XbfMCuDYb?=
+ =?us-ascii?Q?4QIP6ZY+xcsXYMZX1tgQsPoE1HGupLsGSJJG2S1TaNps5mfi1Dx2NR9GCbBa?=
+ =?us-ascii?Q?1VOgPmXeo4ekUxpUleDLzTOn3q31f8Xzf/7F8MWHUHMNhcpeSpv0iL6tPdMy?=
+ =?us-ascii?Q?vjKziYZtg4O2SvmxZ+cgvOYIzX2lXyMy5vscM5muD6ncSAI1CA8CjazTI2WY?=
+ =?us-ascii?Q?9vqbbpE6PMJFLC1b+8tIBN5lI4+solbQEZDPGD+DvHXUHQHrTCxx55r3fqca?=
+ =?us-ascii?Q?qbMDtbn5Fu8B5rkQcl5id8MAAx2u//dGKUvsgIlEffar2s3x3Lf0LHJne9i2?=
+ =?us-ascii?Q?TnA3qFnqIqCogXB11zNyX+ozfaLTFyioaEvQ/4uzuobnpvTaIDmN4Ao3eig2?=
+ =?us-ascii?Q?fKHZEjsC3wYQZrEjQzCJoqZeoOxgDxf6OxYwRDL9AoT4NdIkklMrzjF5hNLx?=
+ =?us-ascii?Q?B+bm3JQawdIKAAAKqdizRzSatjh37BPxvcQNPvW2IrfXJztjG2sBUQRISP2k?=
+ =?us-ascii?Q?fA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: fead1f06-f708-4a60-759e-08dd777a300e
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8665.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2025 15:21:23.4044
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: eDnDsb0BKNuUMvPYC9LGNPlKBT7l0xGCEvYwEgjlaCebJqXSBaohT1KUI0ePWMh/Cwyx0ieqUp+gyYCeedl2oA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5119
+X-OriginatorOrg: intel.com
 
-Hi,
+On Tue, Apr 08, 2025 at 05:00:45PM +0300, Tariq Toukan wrote:
+> From: Vlad Dogaru <vdogaru@nvidia.com>
+> 
+> The procedure of attaching an action template to an existing matcher had
+> a few issues:
+> 
+> 1. Attaching accidentally overran the `at` array in bwc_matcher, which
+>    would result in memory corruption. This bug wasn't triggered, but it
+>    is possible to trigger it by attaching action templates beyond the
+>    initial buffer size of 8. Fix this by converting to a dynamically
+>    sized buffer and reallocating if needed.
+> 
+> 2. Similarly, the `at` array inside the native matcher was never
+>    reallocated. Fix this the same as above.
+> 
+> 3. The bwc layer treated any error in action template attach as a signal
+>    that the matcher should be rehashed to account for a larger number of
+>    action STEs. In reality, there are other unrelated errors that can
+>    arise and they should be propagated upstack. Fix this by adding a
+>    `need_rehash` output parameter that's orthogonal to error codes.
+> 
+> Fixes: 2111bb970c78 ("net/mlx5: HWS, added backward-compatible API handling")
+> Signed-off-by: Vlad Dogaru <vdogaru@nvidia.com>
+> Reviewed-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+> Reviewed-by: Mark Bloch <mbloch@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-in a setup where I use native XDP to redirect packets to a bonding interface
-that's backed by two ixgbe slaves, I noticed that the ixgbe driver constantly
-resets the NIC with the following kernel output:
+In general the patch looks OK to me.
+Just one request for clarification inline.
 
-  ixgbe 0000:01:00.1 ixgbe-x520-2: Detected Tx Unit Hang (XDP)
-    Tx Queue             <4>
-    TDH, TDT             <17e>, <17e>
-    next_to_use          <181>
-    next_to_clean        <17e>
-  tx_buffer_info[next_to_clean]
-    time_stamp           <0>
-    jiffies              <10025c380>
-  ixgbe 0000:01:00.1 ixgbe-x520-2: tx hang 19 detected on queue 4, resetting adapter
-  ixgbe 0000:01:00.1 ixgbe-x520-2: initiating reset due to tx timeout
-  ixgbe 0000:01:00.1 ixgbe-x520-2: Reset adapter
+Thanks,
+Michal
 
-This only occurs in combination with a bonding interface and XDP, so I don't
-know if this is an issue with ixgbe or the bonding driver.
-I first discovered this with Linux 6.8.0-57, but kernel 6.14.0 and 6.15.0-rc1
-show the same issue.
+> ---
+>  .../mellanox/mlx5/core/steering/hws/bwc.c     | 55 ++++++++++++++++---
+>  .../mellanox/mlx5/core/steering/hws/bwc.h     |  9 ++-
+>  .../mellanox/mlx5/core/steering/hws/matcher.c | 48 +++++++++++++---
+>  .../mellanox/mlx5/core/steering/hws/matcher.h |  4 ++
+>  .../mellanox/mlx5/core/steering/hws/mlx5hws.h |  5 +-
+>  5 files changed, 97 insertions(+), 24 deletions(-)
+> 
 
+[...]
 
-I managed to reproduce this bug in a lab environment. Here are some details
-about my setup and the steps to reproduce the bug:
+> @@ -520,6 +529,23 @@ hws_bwc_matcher_extend_at(struct mlx5hws_bwc_matcher *bwc_matcher,
+>  			  struct mlx5hws_rule_action rule_actions[])
+>  {
+>  	enum mlx5hws_action_type action_types[MLX5HWS_BWC_MAX_ACTS];
+> +	void *p;
+> +
+> +	if (unlikely(bwc_matcher->num_of_at >= bwc_matcher->size_of_at_array)) {
+> +		if (bwc_matcher->size_of_at_array >= MLX5HWS_MATCHER_MAX_AT)
+> +			return -ENOMEM;
+> +		bwc_matcher->size_of_at_array *= 2;
 
-NIC: Intel Corporation 82599ES 10-Gigabit SFI/SFP+ Network Connection (rev 01)
+Is it possible that `num_of_at` is even greater than twice `size_of_array`?
+If so, shouldn't you calculate how many multiplications by 2 you need to
+do?
 
-CPU: Ampere(R) Altra(R) Processor Q80-30 CPU @ 3.0GHz
-     Also reproduced on:
-     - Intel(R) Xeon(R) Gold 5218 CPU @ 2.30GHz
-     - Intel(R) Xeon(R) CPU E5-2620 v4 @ 2.10GHz
-
-Kernel: 6.15.0-rc1 (built from mainline)
-
-  # ethtool -i ixgbe-x520-1
-  driver: ixgbe
-  version: 6.15.0-rc1
-  firmware-version: 0x00012b2c, 1.3429.0
-  expansion-rom-version: 
-  bus-info: 0000:01:00.0
-  supports-statistics: yes
-  supports-test: yes
-  supports-eeprom-access: yes
-  supports-register-dump: yes
-  supports-priv-flags: yes
-
-The two ports of the NIC (named "ixgbe-x520-1" and "ixgbe-x520-2") are directly
-connected with each other using a DAC cable. Both ports are configured to be
-slaves of a bonding with mode balance-rr.
-Neither the direct connection of  both ports nor the round-robin bonding mode
-are a requirement to reproduce the issue. This setup just allows it to be easier
-reproduced in an isolated environment. The issue is also visible with a regular
-802.3ad link aggregation with a switch on the other side.
-
-  # modprobe bonding
-  # ip link set dev ixgbe-x520-1 down
-  # ip link set dev ixgbe-x520-2 down
-  # ip link add bond0 type bond mode balance-rr
-  # ip link set dev ixgbe-x520-1 master bond0
-  # ip link set dev ixgbe-x520-2 master bond0
-  # ip link set dev ixgbe-x520-1 up
-  # ip link set dev ixgbe-x520-2 up
-  # ip link set dev bond0 up
-        
-  # cat /proc/net/bonding/bond0
-  Ethernet Channel Bonding Driver: v6.15.0-rc1
-
-  Bonding Mode: load balancing (round-robin)
-  MII Status: up
-  MII Polling Interval (ms): 0
-  Up Delay (ms): 0
-  Down Delay (ms): 0
-  Peer Notification Delay (ms): 0
-
-  Slave Interface: ixgbe-x520-1
-  MII Status: up
-  Speed: 10000 Mbps
-  Duplex: full
-  Link Failure Count: 0
-  Permanent HW addr: 6c:b3:11:08:5c:3c
-  Slave queue ID: 0
-
-  Slave Interface: ixgbe-x520-2
-  MII Status: up
-  Speed: 10000 Mbps
-  Duplex: full
-  Link Failure Count: 0
-  Permanent HW addr: 6c:b3:11:08:5c:3e
-  Slave queue ID: 0
-
-  # ethtool -l ixgbe-x520-1
-  Channel parameters for ixgbe-x520-1:
-  Pre-set maximums:
-  RX:             n/a
-  TX:             n/a
-  Other:          1
-  Combined:       63
-  Current hardware settings:
-  RX:             n/a
-  TX:             n/a
-  Other:          1
-  Combined:       63
-  (same for ixgbe-x520-2)
-
-In the following the xdp-tools from https://github.com/xdp-project/xdp-tools/
-are used.
-
-Enable XDP on the bonding and make sure all received packets will be dropped:
-  # xdp-tools/xdp-bench/xdp-bench drop -e -i 1 bond0
-
-Redirect a batch of packets to the bonding interface:
-  # xdp-tools/xdp-trafficgen/xdp-trafficgen udp --dst-mac <mac of bond0>
-    --src-port 5000 --dst-port 6000 --threads 16 --num-packets 1000000 bond0
-
-Shortly after that (3-4 seconds), one or more "Detected Tx Unit Hang" errors
-(see above) will show up in the kernel log.
-
-The high number of packets and thread count (--threads 16) is not required to
-trigger the issue but greatly improves the probability.
-
-
-Do you have any ideas what may be causing this issue or what I can do to
-diagnose this further?
-
-Please let me know when I should provide any more information.
-
-
-Thanks!
-Marcus
+> +		p = krealloc(bwc_matcher->at,
+> +			     bwc_matcher->size_of_at_array *
+> +				     sizeof(*bwc_matcher->at),
+> +			     __GFP_ZERO | GFP_KERNEL);
+> +		if (!p) {
+> +			bwc_matcher->size_of_at_array /= 2;
+> +			return -ENOMEM;
+> +		}
+> +
+> +		bwc_matcher->at = p;
+> +	}
+>  
+>  	hws_bwc_rule_actions_to_action_types(rule_actions, action_types);
+>  
 
