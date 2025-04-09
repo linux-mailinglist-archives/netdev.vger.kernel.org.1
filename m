@@ -1,62 +1,60 @@
-Return-Path: <netdev+bounces-180770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26733A826AA
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 15:49:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 739DDA826C5
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 15:54:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19EB31BA28F7
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 13:50:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 375BF19E5225
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 13:52:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DCD7248888;
-	Wed,  9 Apr 2025 13:49:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 129F5264A9C;
+	Wed,  9 Apr 2025 13:52:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cVSQyr4B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rs4mV/lE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD95172767;
-	Wed,  9 Apr 2025 13:49:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0E6E264A85
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 13:52:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744206592; cv=none; b=W0LERsmoTTw1d5HcQ2lI3ZmA9rmzYrk6WX7BIIxwQEA61+hSzxVRlSvlszhmGQVQsAJYGpU4P+TiLleMth5M4veWpLoS5lw5HN3HvetAOQAmvzU3uX5vd4MA/VYZt0sm5TlPd/G+Pua/0kqM3s/IC5ZEguTfshjEIwLFZ+KwoRQ=
+	t=1744206758; cv=none; b=h/nG32QRqqcgCEtDTBaNcldHe6HCPYa8OtQRx5SE5lLkuqWgBIVjIgSqI7MVLgLr0uG6lSC34Jzh2BSm7NDXu6NUb6O6K6wbIGG4udFoqtKF4pCSE/ddHgEuH7Atuj79dSu3FEkjaUZ+j5joEsR2VS3zZogZPxop8i5c27TTry0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744206592; c=relaxed/simple;
-	bh=OYf0UFBbqCo6CLjwr/J0wXSIXXNTgsDA387uekNdmbM=;
+	s=arc-20240116; t=1744206758; c=relaxed/simple;
+	bh=FhwEdM65NQi4HIHvUoFIUqD0MC/HRJGQgoVlHaelsXo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QmT/2/CeGgyOk69sxdJ1qajyjbkVI5VhMG5xrZuKZm+5NuojkMz7nHN+0c2zOOAVboSwUkTgwvrV/NlrR0v71XbSKUdgmNjzKtTK2dZHggahUq5oyoVwM90YVkRJpXZFNJFmoEb5liwBZVGC6xxduoRfKfFBLCRG6Hs48iWMsl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cVSQyr4B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1401C4CEE2;
-	Wed,  9 Apr 2025 13:49:50 +0000 (UTC)
+	 MIME-Version:Content-Type; b=f7juLR0enM8BS9szOhsG28aqmP9VogaH+z9I1ZjGzU9MmbTKF85XrSqVVGaOTVB3C9SemORfSLL18E7yG+Ouyt0Kr2Mp9HXOPi4vUsu4e6WgcevAFwAgWAWYVc5/AFmqL2CeE63cKEnE31DoTevIuHQFRyqdBdlVPqP0DF6xNA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rs4mV/lE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 522EFC4CEE2;
+	Wed,  9 Apr 2025 13:52:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744206591;
-	bh=OYf0UFBbqCo6CLjwr/J0wXSIXXNTgsDA387uekNdmbM=;
+	s=k20201202; t=1744206757;
+	bh=FhwEdM65NQi4HIHvUoFIUqD0MC/HRJGQgoVlHaelsXo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cVSQyr4BdDbHE8rV74/CAaqbtv7GyM+/pVrJwUzI4IqJzZAF66B+gmUBYt8a3/RQM
-	 IiHpKUggEXL90TVqWcy9UBD9aSESTsdZ97ir4BhqBMa7fk3Tb18I4mVpNW1yx3bLLn
-	 HycTOI76+iw64G6yLcP3yjt7JiWUMftkKEw2UQhzG8dzMepKVIi+vTIarqnmeNCgpI
-	 JgxTG86DF/s3Nt1vxrAZKJ1ni2Kxk659yUbpBCCbJLBicWnSVNWjxIMhMA6H0uzrB6
-	 ZLvcaPo+Au4Z9pPM//ub6dnTbFrBB4FCOcIVzkM7CN2ZS8aQh+FSrRgqX10ca86KwZ
-	 xMpsL0zjQ17cQ==
-Date: Wed, 9 Apr 2025 06:49:49 -0700
+	b=Rs4mV/lE+o/KRQY3EzAiSwA4d4cxxeKDRPqZQRxUxwky+QV5QULQGcwvqu98oJ/ow
+	 BhOhhmt3yl1+CWtQXq6p91g0iTG3lSXVA8Kc53qxA8ikAh4zKaRHKRLUzT6JizoEOI
+	 M8l7I4XRJcdaTGGEv5yaEoZ/k4w9bfz6FY384lA2gNy5TgSNeEox+I9Vlj/EeAYMz/
+	 +T3YPfxxDIiBjT2lU2t5GQ/J03wNVMUPDAXAtrf72FxjIiKLBt9Orbrha0ztmWO6At
+	 Z9jEe14hJF9P6h2waoed+9rGIMlehn55HOp1jl6Nw41WE2slxsbT12isVeLveUU9tO
+	 Y4+mra4WJlbhw==
+Date: Wed, 9 Apr 2025 06:52:36 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, David Ahern <dsahern@kernel.org>, "Neal Cardwell"
- <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>, "Pablo Neira
- Ayuso" <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, Paul
- Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, "Serge E.
- Hallyn" <serge@hallyn.com>, Casey Schaufler <casey@schaufler-ca.com>,
- Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>,
- <selinux@vger.kernel.org>, <linux-security-module@vger.kernel.org>
-Subject: Re: [PATCH v2 net-next 0/4] net: Retire DCCP socket.
-Message-ID: <20250409064949.6c992d15@kernel.org>
-In-Reply-To: <20250409003014.19697-1-kuniyu@amazon.com>
-References: <20250409003014.19697-1-kuniyu@amazon.com>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ jacob.e.keller@intel.com, yuyanghuang@google.com, sdf@fomichev.me,
+ gnault@redhat.com, nicolas.dichtel@6wind.com, petrm@nvidia.com
+Subject: Re: [PATCH net-next 10/13] tools: ynl-gen: consider dump ops
+ without a do "type-consistent"
+Message-ID: <20250409065236.4f6426cc@kernel.org>
+In-Reply-To: <m27c3t33yu.fsf@gmail.com>
+References: <20250409000400.492371-1-kuba@kernel.org>
+	<20250409000400.492371-11-kuba@kernel.org>
+	<m27c3t33yu.fsf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,22 +64,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 8 Apr 2025 17:29:07 -0700 Kuniyuki Iwashima wrote:
-> As announced by commit b144fcaf46d4 ("dccp: Print deprecation
-> notice."), it's time to remove DCCP socket.
+On Wed, 09 Apr 2025 13:38:01 +0100 Donald Hunter wrote:
+> >          # 'do' and 'dump' response parsing is identical
+> >          self.type_consistent = True
+> > +        self.type_onside = False  
 > 
-> The patch 2 removes net/dccp, LSM code, doc, and etc, leaving
-> DCCP netfilter modules.
-> 
-> The patch 3 unexports shared functions for DCCP, and the patch 4
-> renames tcp_or_dccp_get_hashinfo() to tcp_get_hashinfo().
-> 
-> We can do more cleanup; for example, remove IPPROTO_TCP checks in
-> __inet6?_check_established(), remove __module_get() for twsk,
-> remove timewait_sock_ops.twsk_destructor(), etc, but it will be
-> more of TCP stuff, so I'll defer to a later series.
+> I'm not understanding what type_onside is meant to mean.
 
-So it builds now but appears to break 1/3rd of the selftests :)
+Damn, I have fallen into the IDE auto-completion trap.
+It was supposed to say "oneside".
+Not that the solution is super clean either way :(
 -- 
 pw-bot: cr
 
