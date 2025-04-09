@@ -1,143 +1,94 @@
-Return-Path: <netdev+bounces-180566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30F27A81B0C
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 04:33:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FD71A81B29
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 04:40:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF37C3B4C1A
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 02:32:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BF874A7F95
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 02:40:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BE1F19CC20;
-	Wed,  9 Apr 2025 02:32:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7BBD5D477;
+	Wed,  9 Apr 2025 02:40:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P6qgTGza"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t5pmx8vs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8472F29D0E;
-	Wed,  9 Apr 2025 02:32:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B39224C81
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 02:40:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744165962; cv=none; b=Dvab4xnqeOLxBtlJdGVwBWp5A2FlnyMiXWd2ONSvZrvb/nD0knEvEn6Rf/gvRYca/RWQbBiRxQ0kFmwTyzQUTsjwSdYvzKvzRnoKpEYftqjTH0Cm9RQZojgW2+SsqaWx040tdUHI19Kp3wR1QQ7XIYCRF3SbV7BCndnCqdaDol0=
+	t=1744166411; cv=none; b=stuAjYT0fUnCMZMR7hqAGX2EmvjwSsYPzkpKztYOLMKN2dWWl9z4ZRDL+0EnBp1F3zMhD2KIstgHbQwBcXZ6xYDVGRq1bmcMOKGQ48D7exF8YHSlqv4aG6OUddeOL9CAIeMcNaE2gaKCrRq4aSzfr1Axo8xLv0vspQW7GW8zYCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744165962; c=relaxed/simple;
-	bh=vnaDNkCLPpmH76yQp56KQf7WqL8mrYB+8sRUh34dcGc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fI5WYNHXTVJzqVe10LJinmQ2gREX5zi5uzxTVkBwBXtK8Ar6lyQ5H9B0S8f499QRtOiAGiJmae5/gM6DR0RICrGa66MF3mmlf2NmCu7q2ak47ZdT41L0uQNvOzmVFonRXlxEXezfCvdhWVPr7bs9LGWKoqwqmdVSh2ckxV8ywS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P6qgTGza; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744165960; x=1775701960;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=vnaDNkCLPpmH76yQp56KQf7WqL8mrYB+8sRUh34dcGc=;
-  b=P6qgTGzaq1oFnypmWHPMeDDkPCphjrDRqSnBygJic0NXVwZiFiTlMVIP
-   OYSr5l+Ak81jM90K9L6KQoZ7j7FL9U988ifUynMJaIphqKz0oKpuxaROz
-   nPdXs2P0im5KMjqiLqpPhpkmrR+nabXS4gpZMjXKevq8zErGV02cvgDak
-   8uu4bjs3rQuqPZ0/iCbrBsV2OvXlIPB+G+e3pHMwOdEEUOcPL4I3OYla5
-   K1MhfH00k0xhydT6K7rx8ESzZEDdtZm93gXrPP9c2UPtiZIuAMRCeddnE
-   fe+5RzQqOTqwXZ4uDqCnjkW31GNP4w8YuXZf7FegC4ZhOTSthIJdRzrWL
-   w==;
-X-CSE-ConnectionGUID: c1jEaNKlSgekA1mR5WPwkw==
-X-CSE-MsgGUID: 7xa7UVUrQBWVizrYkZk1kg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11397"; a="49465359"
-X-IronPort-AV: E=Sophos;i="6.15,199,1739865600"; 
-   d="scan'208";a="49465359"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2025 19:32:37 -0700
-X-CSE-ConnectionGUID: thhpgLzqTnyYqgpIXkTxAQ==
-X-CSE-MsgGUID: 9HlMwltuT7uIdLoQ6jkFpA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,199,1739865600"; 
-   d="scan'208";a="151634018"
-Received: from lkp-server01.sh.intel.com (HELO b207828170a5) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 08 Apr 2025 19:32:33 -0700
-Received: from kbuild by b207828170a5 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1u2LEt-0008CT-07;
-	Wed, 09 Apr 2025 02:32:31 +0000
-Date: Wed, 9 Apr 2025 10:32:03 +0800
-From: kernel test robot <lkp@intel.com>
-To: Sean Anderson <sean.anderson@linux.dev>, netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>
-Cc: oe-kbuild-all@lists.linux.dev, Heiner Kallweit <hkallweit1@gmail.com>,
-	upstream@airoha.com, Kory Maincent <kory.maincent@bootlin.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	linux-kernel@vger.kernel.org, Michal Simek <monstr@monstr.eu>,
-	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	Robert Hancock <robert.hancock@calian.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Sean Anderson <sean.anderson@linux.dev>
-Subject: Re: [net-next PATCH v2 11/14] net: axienet: Convert to use PCS
- subsystem
-Message-ID: <202504091007.RSwPrfcI-lkp@intel.com>
-References: <20250407232058.2317056-1-sean.anderson@linux.dev>
+	s=arc-20240116; t=1744166411; c=relaxed/simple;
+	bh=hPHKw8GBy0hFTIUJjRpQOQFzpwL7UJjthBUqcbXdt+0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=TQSNAyUo63dALUDiE+A2JXhTJ/oe8GiFWms90n9IXdp2kOEZ9A5XDJ4h64OCGunIbmouX1/e1l75rmfnulpcHbxjt7Lva3qNCewkBPyNNKWt7D+K7kw5tDtH4HTC7hpdQq9gGs+MV4bOHWriNMIrnMWIv3g5QdH/QjCAaum4//Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t5pmx8vs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EAAEC4CEE5;
+	Wed,  9 Apr 2025 02:40:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744166409;
+	bh=hPHKw8GBy0hFTIUJjRpQOQFzpwL7UJjthBUqcbXdt+0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=t5pmx8vsjRnHIbBmcVLjG/8kw2kkRMRsl/5V5dezgPfbb5r0D+zEAZedA/YuYe6Np
+	 5JYC/fwa/kDl9TM66E9h/19MdElnoiHjfQpL23tOv08MALWai9JHTG3vgKKcBi48OY
+	 B3JpI7h7tlPexLvnIvYZz92w44ln1bQVkAI2LfJ74w3I/tltE7LmtmU1QCro1XOwNh
+	 3M4DiWSN42H/w4fsJXINsIT0iOMHfP/Tvyb2CiMpERC1yhusrTjVMfSaWtqHguoKuT
+	 4zyeqFAkl6WWoAlrrtVRkcEYjJC93a3Foxw3rfNqTwVHZ1NQgt2PWK0PzadgIwN40e
+	 jCKXOgEqeX1Hg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AFBCA38111D4;
+	Wed,  9 Apr 2025 02:40:47 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250407232058.2317056-1-sean.anderson@linux.dev>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v5 0/2] udp_tunnel: GRO optimizations
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174416644627.2289933.4526280567617505719.git-patchwork-notify@kernel.org>
+Date: Wed, 09 Apr 2025 02:40:46 +0000
+References: <cover.1744040675.git.pabeni@redhat.com>
+In-Reply-To: <cover.1744040675.git.pabeni@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, willemdebruijn.kernel@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, horms@kernel.org,
+ dsahern@kernel.org
 
-Hi Sean,
+Hello:
 
-kernel test robot noticed the following build warnings:
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-[auto build test WARNING on net-next/main]
+On Mon,  7 Apr 2025 17:45:40 +0200 you wrote:
+> The UDP tunnel GRO stage is source of measurable overhead for workload
+> based on UDP-encapsulated traffic: each incoming packets requires a full
+> UDP socket lookup and an indirect call.
+> 
+> In the most common setups a single UDP tunnel device is used. In such
+> case we can optimize both the lookup and the indirect call.
+> 
+> [...]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Sean-Anderson/dt-bindings-net-Add-Xilinx-PCS/20250408-072650
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250407232058.2317056-1-sean.anderson%40linux.dev
-patch subject: [net-next PATCH v2 11/14] net: axienet: Convert to use PCS subsystem
-config: arm-randconfig-001-20250409 (https://download.01.org/0day-ci/archive/20250409/202504091007.RSwPrfcI-lkp@intel.com/config)
-compiler: arm-linux-gnueabi-gcc (GCC) 7.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250409/202504091007.RSwPrfcI-lkp@intel.com/reproduce)
+Here is the summary with links:
+  - [net-next,v5,1/2] udp_tunnel: create a fastpath GRO lookup.
+    https://git.kernel.org/netdev/net-next/c/a36283e2b683
+  - [net-next,v5,2/2] udp_tunnel: use static call for GRO hooks when possible
+    https://git.kernel.org/netdev/net-next/c/5d7f5b2f6b93
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202504091007.RSwPrfcI-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from drivers/net/ethernet/xilinx/xilinx_axienet_main.c:38:0:
-   include/linux/pcs.h: In function 'pcs_get':
->> include/linux/pcs.h:165:9: warning: return makes pointer from integer without a cast [-Wint-conversion]
-     return -EOPNOTSUPP;
-            ^
-   include/linux/pcs.h: In function 'pcs_get_by_fwnode':
-   include/linux/pcs.h:178:9: warning: return makes pointer from integer without a cast [-Wint-conversion]
-     return -EOPNOTSUPP;
-            ^
-   include/linux/pcs.h: In function 'pcs_get_by_dev':
-   include/linux/pcs.h:191:9: warning: return makes pointer from integer without a cast [-Wint-conversion]
-     return -EOPNOTSUPP;
-            ^
-
-
-vim +165 include/linux/pcs.h
-
-b7da98b4ee6f2f Sean Anderson 2025-04-07  162  
-b7da98b4ee6f2f Sean Anderson 2025-04-07  163  static inline struct phylink_pcs *pcs_get(struct device *dev, const char *id)
-b7da98b4ee6f2f Sean Anderson 2025-04-07  164  {
-b7da98b4ee6f2f Sean Anderson 2025-04-07 @165  	return -EOPNOTSUPP;
-b7da98b4ee6f2f Sean Anderson 2025-04-07  166  }
-b7da98b4ee6f2f Sean Anderson 2025-04-07  167  
-
+You are awesome, thank you!
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
