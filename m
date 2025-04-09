@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-180800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D984BA828A2
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 16:49:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 86AAFA828A3
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 16:50:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD13717236D
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 14:45:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77ACC177622
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 14:45:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9D4C268C7D;
-	Wed,  9 Apr 2025 14:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D77D268C61;
+	Wed,  9 Apr 2025 14:43:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DddGgENY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z48XenTm"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C55268C40
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 14:43:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F92268690
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 14:43:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744209805; cv=none; b=dtPukUCeFCOcf5daKfWUSVSxvmYvXTIqMoJx1hkexzbAHaNExLPcKG/0hmGgX5qmC8Poe66smwBw2PEQu5EZfR+GrxeF8OgFFlvZBXX5JLTAVsKUOmvOMLMtSI9G/HPq85IwZElm2AMXtMSqifTLuUIDrnnj1zDboBuej0hx1mk=
+	t=1744209810; cv=none; b=Hv1AKwvGwPo9sW+B77IdEQhko7y86XU3uPM4iYd+3ctRO4p1f9FtoZVF+tt1znK4FHjMR2po1HiRWxePsRkVQbOunpg2ehsh5szPlZV3q/elFf++264Gd0pKQ6HfqJMIURYIBykVRSDKujr9A2eGzugQP/MGEOCsLTL2ovEXojU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744209805; c=relaxed/simple;
-	bh=cyVWJiESR6+ddF3hk2p72+BYjghIjU6b3CLJ4+lQg0c=;
+	s=arc-20240116; t=1744209810; c=relaxed/simple;
+	bh=kQ9GHfesH0VP3UbX5nxEs6wOWpoqClYTSG7LdtlBlS8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Mu1XD9HDWDNULKbqRGorqfDn769bebeEm4zMmCs/65xXX7hLS0XU/J7WoT5o6vY+2DKalg1OZYpDD992yq9u3qjAz0aNen8k8DBsRfulsJjqELOn8GQghyoXWnHa+T+vi0GRLOMD+VjXnoiVRI4t94njrsZ6xa+SGBPSKeOrAXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DddGgENY; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=VI1jtvPyGfJaLIho8ZQCCZ4LXsh5q9kjvG3arCrqv71skK5F4sBawSHNgXIP7IXr6giJhO3d+Sz750iWQ0Vd2X02VZRhinJcijdzgaZDuWJ/zq2lWpMpzmBpcqVLUXbKHElDjleljMOyFkBiGimEotDWcWgRqsJeh8Itp0GsIdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z48XenTm; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744209802;
+	s=mimecast20190719; t=1744209806;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=aPfUA5BWs8R/De+l5pzd9CJqVt44oZhdUA/jGokvVSs=;
-	b=DddGgENYIF7Hk5ZXo0LDU5IwdBRSVdAHI6ceuzmYXWCZEvyzrXvhNWoXKPYku7PwweVSKm
-	xzuG+5wMK8y3OtQjDK5bOg4jbPWp0iflVnKQUv6O4XMzJ/HCnlmvwEknbCnXNZ8waL7LmL
-	F+DgKx85oTw97NthANF1qNY7Fxol5A4=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+	bh=wcivbUEWC4kBHEWoC8mH97RWcHUUu64DZ8iwYH5064E=;
+	b=Z48XenTmHc9u9ITCaKATPnMP2l0gQF0oEw8QgqtnlfkGlyd3j9pey9cRqGOAXF6Ux6urvL
+	SAOUf0vI5nS03umD/SWfnBcZBnPg5L2lTmDiGRguTBPpJ/6Dbs8rKdZZKgvB0z5W/hkxVn
+	TUyxMX+AVVA9T7AQl4KlT/O6jFVf4tY=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-221-K9GxGEO2NAudOrSY5XnXcw-1; Wed,
- 09 Apr 2025 10:43:18 -0400
-X-MC-Unique: K9GxGEO2NAudOrSY5XnXcw-1
-X-Mimecast-MFC-AGG-ID: K9GxGEO2NAudOrSY5XnXcw_1744209796
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-695-B_um9ZZTMveArSVeNO6W7A-1; Wed,
+ 09 Apr 2025 10:43:23 -0400
+X-MC-Unique: B_um9ZZTMveArSVeNO6W7A-1
+X-Mimecast-MFC-AGG-ID: B_um9ZZTMveArSVeNO6W7A_1744209801
 Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8CFC419560B8;
-	Wed,  9 Apr 2025 14:43:16 +0000 (UTC)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8CDBA18007E1;
+	Wed,  9 Apr 2025 14:43:21 +0000 (UTC)
 Received: from p16v.luc.cera.cz (unknown [10.44.32.72])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6606918009BC;
-	Wed,  9 Apr 2025 14:43:12 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F3BFD18009BC;
+	Wed,  9 Apr 2025 14:43:16 +0000 (UTC)
 From: Ivan Vecera <ivecera@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
@@ -74,9 +74,9 @@ Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-hardening@vger.kernel.org
-Subject: [PATCH v2 04/14] mfd: zl3073x: Register itself as devlink device
-Date: Wed,  9 Apr 2025 16:42:40 +0200
-Message-ID: <20250409144250.206590-5-ivecera@redhat.com>
+Subject: [PATCH v2 05/14] mfd: zl3073x: Add register access helpers
+Date: Wed,  9 Apr 2025 16:42:41 +0200
+Message-ID: <20250409144250.206590-6-ivecera@redhat.com>
 In-Reply-To: <20250409144250.206590-1-ivecera@redhat.com>
 References: <20250409144250.206590-1-ivecera@redhat.com>
 Precedence: bulk
@@ -88,112 +88,191 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Use devlink_alloc() to alloc zl3073x_dev structure and register
-the device as a devlink device. Follow-up patches add support for
-devlink device info reporting and devlink flash interface will
-be later used for flashing firmware and configuration.
+Add helpers zl3073x_{read,write}_reg() to access device registers.
+These functions have to be called with device lock that can be taken
+by zl3073x_{lock,unlock}() or a caller can use defined guard.
+
+Locking mechanism of regmap is not sufficient because sometimes is
+necessary to perform several register operations at once. This is
+especially a case of register mailboxes (more details in patch 7 & 8).
+Disable regmap locking mechanism and use this device lock instead.
 
 Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 ---
 v1->v2:
-- dependency on NET moved to MFD_ZL3073X_CORE in Kconfig
-- devlink register managed way
+* disabled regmap locking
 ---
- drivers/mfd/Kconfig        |  2 ++
- drivers/mfd/zl3073x-core.c | 35 +++++++++++++++++++++++++++++++++--
- 2 files changed, 35 insertions(+), 2 deletions(-)
+ drivers/mfd/zl3073x-core.c  | 90 +++++++++++++++++++++++++++++++++++++
+ include/linux/mfd/zl3073x.h | 33 ++++++++++++++
+ 2 files changed, 123 insertions(+)
 
-diff --git a/drivers/mfd/Kconfig b/drivers/mfd/Kconfig
-index 30b36e3ee8f7f..3c54b9e2b8003 100644
---- a/drivers/mfd/Kconfig
-+++ b/drivers/mfd/Kconfig
-@@ -2424,6 +2424,8 @@ config MFD_UPBOARD_FPGA
- 
- config MFD_ZL3073X_CORE
- 	tristate
-+	depends on NET
-+	select NET_DEVLINK
- 	select MFD_CORE
- 
- config MFD_ZL3073X_I2C
 diff --git a/drivers/mfd/zl3073x-core.c b/drivers/mfd/zl3073x-core.c
-index ccb6987d04a20..116c6dd9eebc7 100644
+index 116c6dd9eebc7..f0d85f77a7a76 100644
 --- a/drivers/mfd/zl3073x-core.c
 +++ b/drivers/mfd/zl3073x-core.c
-@@ -8,6 +8,7 @@
+@@ -5,9 +5,11 @@
+ #include <linux/dev_printk.h>
+ #include <linux/device.h>
+ #include <linux/export.h>
++#include <linux/lockdep.h>
  #include <linux/mfd/zl3073x.h>
  #include <linux/module.h>
  #include <linux/regmap.h>
-+#include <net/devlink.h>
++#include <linux/unaligned.h>
+ #include <net/devlink.h>
  #include "zl3073x.h"
  
- /*
-@@ -58,6 +59,14 @@ const struct regmap_config *zl3073x_get_regmap_config(void)
+@@ -46,6 +48,7 @@ const struct regmap_config zl3073x_regmap_config = {
+ 	.max_register		= ZL3073x_NUM_PAGES * ZL3073x_PAGE_SIZE,
+ 	.ranges			= zl3073x_regmap_ranges,
+ 	.num_ranges		= ARRAY_SIZE(zl3073x_regmap_ranges),
++	.disable_locking	= true,
+ };
+ 
+ /**
+@@ -59,6 +62,93 @@ const struct regmap_config *zl3073x_get_regmap_config(void)
  }
  EXPORT_SYMBOL_NS_GPL(zl3073x_get_regmap_config, "ZL3073X");
  
-+static const struct devlink_ops zl3073x_devlink_ops = {
-+};
-+
-+static void zl3073x_devlink_free(void *ptr)
++/**
++ * zl3073x_read_reg - Read value from device register
++ * @zldev: pointer to zl3073x device
++ * @reg: register to be read
++ * @len: number of bytes to read
++ * @value: pointer to place to store value read from the register
++ *
++ * Caller has to hold the device lock that can be obtained
++ * by zl3073x_lock().
++ *
++ * Return: 0 on success or <0 on error
++ */
++int zl3073x_read_reg(struct zl3073x_dev *zldev, unsigned int reg,
++		     unsigned int len, void *value)
 +{
-+	devlink_free(ptr);
-+}
++	u8 buf[6];
++	int rc;
 +
- /**
-  * zl3073x_devm_alloc - allocates zl3073x device structure
-  * @dev: pointer to device structure
-@@ -68,12 +77,25 @@ EXPORT_SYMBOL_NS_GPL(zl3073x_get_regmap_config, "ZL3073X");
-  */
- struct zl3073x_dev *zl3073x_devm_alloc(struct device *dev)
- {
--	struct zl3073x_dev *zldev;
-+	struct devlink *devlink;
++	lockdep_assert_held(&zldev->lock);
 +
-+	devlink = devlink_alloc(&zl3073x_devlink_ops,
-+				sizeof(struct zl3073x_dev), dev);
-+	if (!devlink)
-+		return NULL;
-+
-+	if (devm_add_action_or_reset(dev, zl3073x_devlink_free, devlink))
-+		return NULL;
- 
--	return devm_kzalloc(dev, sizeof(*zldev), GFP_KERNEL);
-+	return devlink_priv(devlink);
- }
- EXPORT_SYMBOL_NS_GPL(zl3073x_devm_alloc, "ZL3073X");
- 
-+static void zl3073x_devlink_unregister(void *ptr)
-+{
-+	devlink_unregister(ptr);
-+}
-+
- /**
-  * zl3073x_dev_init - initialize zl3073x device
-  * @zldev: pointer to zl3073x device
-@@ -84,6 +106,7 @@ EXPORT_SYMBOL_NS_GPL(zl3073x_devm_alloc, "ZL3073X");
-  */
- int zl3073x_dev_init(struct zl3073x_dev *zldev)
- {
-+	struct devlink *devlink;
- 	int rc;
- 
- 	rc = devm_mutex_init(zldev->dev, &zldev->lock);
-@@ -92,6 +115,14 @@ int zl3073x_dev_init(struct zl3073x_dev *zldev)
- 		return rc;
- 	}
- 
-+	devlink = priv_to_devlink(zldev);
-+	devlink_register(devlink);
-+
-+	rc = devm_add_action_or_reset(zldev->dev, zl3073x_devlink_unregister,
-+				      devlink);
++	rc = regmap_bulk_read(zldev->regmap, reg, buf, len);
 +	if (rc)
 +		return rc;
 +
- 	return 0;
- }
- EXPORT_SYMBOL_NS_GPL(zl3073x_dev_init, "ZL3073X");
++	switch (len) {
++	case 1:
++		*(u8 *)value = buf[0];
++		break;
++	case 2:
++		*(u16 *)value = get_unaligned_be16(buf);
++		break;
++	case 4:
++		*(u32 *)value = get_unaligned_be32(buf);
++		break;
++	case 6:
++		*(u64 *)value = get_unaligned_be48(buf);
++		break;
++	default:
++		WARN(true, "Unsupported register size: %u\n", len);
++		break;
++	}
++
++	return rc;
++}
++EXPORT_SYMBOL_GPL(zl3073x_read_reg);
++
++/**
++ * zl3073x_write_reg - Write value to device register
++ * @zldev: pointer to zl3073x device
++ * @reg: register to be written
++ * @len: number of bytes to write
++ * @value: pointer to value to write to the register
++ *
++ * Caller has to hold the device lock that can be obtained
++ * by zl3073x_lock().
++ *
++ * Return: 0 on success, <0 on error
++ */
++int zl3073x_write_reg(struct zl3073x_dev *zldev, unsigned int reg,
++		      unsigned int len, const void *value)
++{
++	u8 buf[6];
++
++	lockdep_assert_held(&zldev->lock);
++
++	switch (len) {
++	case 1:
++		buf[0] = *(u8 *)value;
++		break;
++	case 2:
++		put_unaligned_be16(*(u16 *)value, buf);
++		break;
++	case 4:
++		put_unaligned_be32(*(u32 *)value, buf);
++		break;
++	case 6:
++		put_unaligned_be48(*(u64 *)value, buf);
++		break;
++	default:
++		WARN(true, "Unsupported register size: %u\n", len);
++		break;
++	}
++
++	return regmap_bulk_write(zldev->regmap, reg, buf, len);
++}
++EXPORT_SYMBOL_GPL(zl3073x_write_reg);
++
+ static const struct devlink_ops zl3073x_devlink_ops = {
+ };
+ 
+diff --git a/include/linux/mfd/zl3073x.h b/include/linux/mfd/zl3073x.h
+index f3f33ef8bfa18..00dcc73aeeb34 100644
+--- a/include/linux/mfd/zl3073x.h
++++ b/include/linux/mfd/zl3073x.h
+@@ -3,6 +3,7 @@
+ #ifndef __LINUX_MFD_ZL3073X_H
+ #define __LINUX_MFD_ZL3073X_H
+ 
++#include <linux/cleanup.h>
+ #include <linux/mutex.h>
+ 
+ struct device;
+@@ -20,4 +21,36 @@ struct zl3073x_dev {
+ 	struct mutex		lock;
+ };
+ 
++/**
++ * zl3073x_lock - Lock the device
++ * @zldev: device structure pointer
++ *
++ * Caller has to take this lock when it needs to access device registers.
++ */
++static inline void zl3073x_lock(struct zl3073x_dev *zldev)
++{
++	mutex_lock(&zldev->lock);
++}
++
++/**
++ * zl3073x_unlock - Unlock the device
++ * @zldev: device structure pointer
++ *
++ * Caller unlocks the device when it does not need to access device
++ * registers anymore.
++ */
++static inline void zl3073x_unlock(struct zl3073x_dev *zldev)
++{
++	mutex_unlock(&zldev->lock);
++}
++
++DEFINE_GUARD(zl3073x, struct zl3073x_dev *, zl3073x_lock(_T),
++	     zl3073x_unlock(_T));
++
++int zl3073x_read_reg(struct zl3073x_dev *zldev, unsigned int reg,
++		     unsigned int len, void *value);
++
++int zl3073x_write_reg(struct zl3073x_dev *zldev, unsigned int reg,
++		      unsigned int len, const void *value);
++
+ #endif /* __LINUX_MFD_ZL3073X_H */
 -- 
 2.48.1
 
