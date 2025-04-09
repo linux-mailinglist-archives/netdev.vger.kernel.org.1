@@ -1,78 +1,96 @@
-Return-Path: <netdev+bounces-180818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7CC1A82939
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 17:03:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F7FBA829A0
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 17:12:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A0B69A231D
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 14:54:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73A389A0947
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 14:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5646526773F;
-	Wed,  9 Apr 2025 14:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5AC7278154;
+	Wed,  9 Apr 2025 14:51:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ATAPiJmn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MbDbNWX6"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9CE4264633;
-	Wed,  9 Apr 2025 14:49:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2348527781B
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 14:51:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744210173; cv=none; b=VXSLDfkb35gX16zvG4+Gx3M8A9xOUMVHp2VVpevgdBeQy+YUMH8Z3wPPCvjDv94xMVEVIzSaxR98TIJT4MrNf3N8HHvjl+Y8phYI1fbRZ/jndKmEX0PUaTxLGp7piSzAbQIpiRN1v7mOCRbzemvQERAvG7IddINwdPa1XpVAbEw=
+	t=1744210298; cv=none; b=j9tQ/vS1vTUnWhBuDVGmVwnN4ufsmRFzDBw0kGpX3qcIbsk7rsSCRxceeIqc8SGMeSjFlsQIb9DFx85NOFDCasi530a9P6I+slvnPcwTjXSVmKtC0m1Iayvr8hkU4EUM8K6sBvjHJ8sjhqdEpoBkRcUu07bzDKcCGmYo9Xn9f0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744210173; c=relaxed/simple;
-	bh=07QypnSemJ6N4KpkR5GbszKUU6eGU0VWeKKzV9WAYkg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dVuzzg7rzJ8jvHZ4RYd/HwL8x2ylHttALmH4EyuMzdqYEOZn1pmGck/ohrP6peef3UJ3RxRrvRp2fDK+tKMOd63udXKDWy5XpHajdGyM1BrVPnW4U46sGWfnYOL1FgDi4VsxrgQQ+NIAySgfdzT9a+b+1VlLs7TWR1CYA0oI2Q4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ATAPiJmn; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id E239E441AE;
-	Wed,  9 Apr 2025 14:49:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1744210162;
+	s=arc-20240116; t=1744210298; c=relaxed/simple;
+	bh=4DUob6+eMdIz5RoHjq05jW8GZiksk7IQ/Wo8KKlT220=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kNaQ05gjuaBfgVwwo4e1l9R+orrMWJhP+8kjLHBloTgy0XFJVshu1fiHfV6ZYxrSu56qrcEPpPQG2ZBQ8jOBk0F8F3F/9VJFapBSWYs7u6V6+xj0cYB4IsFn9TmAItikve1owp/JEvkYjs15zS0P0cp6Ta+AdR/sjFPqFwFcPEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MbDbNWX6; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744210294;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gsP1KTv2XYPfGaf4M7Q7suclDVzNu6V2bzVq2CpRjnQ=;
-	b=ATAPiJmn3ezHE9H5bkksUbLkZzerTfqYRTtXDvk81wyHnoc8tNfPf1liuoh5Kk2mhuYbws
-	M9iOSaQzhqlDZ7dc2vjsv73jJul6MRBwp3XQhN4pU1T0HcxhvUuh7LD95PkRH4bH4EHE3E
-	TJWPZuX0g0Qu66sWRXzaG2yG3Zgmcei+sqL2r7WqP39CbboXO2HdRw9/xgGNqZGvDJ7jOn
-	qavWCztoh2eT5gxjNEeNJ87m3RRvEDiDjQLyrLC8zZJjWutue5NxUM2txr7rmVhK7GWnUQ
-	ZIuDtVDwM3mv1ucTZtqgZqZyiw1BOkMkOfmn0K+XvDj7Egw/Uy2ecAS8z9duxQ==
-Date: Wed, 9 Apr 2025 16:49:20 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Marek =?UTF-8?B?QmVo?=
- =?UTF-8?B?w7pu?= <kabel@kernel.org>, Richard Cochran
- <richardcochran@gmail.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH net-next v2 0/2] Add Marvell PHY PTP support
-Message-ID: <20250409164920.5fbc3fd1@kmaincent-XPS-13-7390>
-In-Reply-To: <20250409144654.67fae016@fedora.home>
-References: <20250407-feature_marvell_ptp-v2-0-a297d3214846@bootlin.com>
-	<Z_P3FKEhv1s0y4d7@shell.armlinux.org.uk>
-	<20250407182028.75531758@kmaincent-XPS-13-7390>
-	<Z_P-K7mEEH6ProlC@shell.armlinux.org.uk>
-	<20250407183914.4ec135c8@kmaincent-XPS-13-7390>
-	<Z_WJO9g5Al1Yr_LX@shell.armlinux.org.uk>
-	<20250409103130.43ab4179@kmaincent-XPS-13-7390>
-	<Z_Yxb6-qclDSWk01@shell.armlinux.org.uk>
-	<20250409104637.37301e01@kmaincent-XPS-13-7390>
-	<Z_Y-ENUiX_nrR7VY@shell.armlinux.org.uk>
-	<20250409142309.45cdd62f@kmaincent-XPS-13-7390>
-	<20250409144654.67fae016@fedora.home>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=WBh/oxXtw+maKeUB3gFYpOwHzm3sbyiLyYnxbG7BaBM=;
+	b=MbDbNWX6/p8oo76LjHxXMDBXIz2MDL+8WpCWatrfoinomvDLUhwi5Cfqb6+cRflSTD3MYo
+	c12ZbTQIYxZ6WT2nkyYRcNclz9aimGIeH2R0Wp54ks9BeW6xZDWpGqzHAvpN1tZMknLKr5
+	M77HZY7uZjdNt3C/RYuLWwH7wNQ2dlo=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-361-ERFNx0UfMOa83i5dvDabzQ-1; Wed, 09 Apr 2025 10:51:32 -0400
+X-MC-Unique: ERFNx0UfMOa83i5dvDabzQ-1
+X-Mimecast-MFC-AGG-ID: ERFNx0UfMOa83i5dvDabzQ_1744210290
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-ac6ce5fe9bfso149046666b.1
+        for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 07:51:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744210289; x=1744815089;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WBh/oxXtw+maKeUB3gFYpOwHzm3sbyiLyYnxbG7BaBM=;
+        b=liBtZwToxua8aGuvNUHVgP3WYu0aleNKQ1vNGg+t5y+gwM0wLz3rcO7kXaBRI+m2eS
+         zg/gV1hdCfd52ifbK4JLTDPfwWW+XI2dH1WVo2ef/SedqdVcuf4wxtqKEUTL7mMnCeIB
+         U2ZgGI+kURBzoQ2LFvWO1wAjKEiE+QuhNDERFL3SPpKowBNkXlU+9pPARaj9ZRkz1YM7
+         nHiSXE8K+z/Hv0lXPhHg1PzsmGOkXMdMal6MHzf0fK8rrPfM3NP7HVQQIDhXvXchJZF6
+         bQf9eJK/u3f99yH01vFxpacoLKi/ZO1tzIDnmRcvr1N3A0YzY+Q3ht3HtpRRfdWXPd0p
+         TBzA==
+X-Forwarded-Encrypted: i=1; AJvYcCUrmqzNPI8yh241VCT5ZvTfRQVd59eNG19gJE2Xh95VL4EqL8d5se9Nz8lEZrIRpOKCSwXSUjI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNcFrzndUZMRcRopgetafTaCBXmUa4iDOZQUZt6XHFZJe02Xtx
+	Vk/nuxbDfyOrFSDsWFmUrx6aHHWhE8iDryMRst9AQjruGgvgv1TgElbSeVnmVQhruW0E9LzYlRN
+	ALFsESwfGOoG13halr1MMyIY2d8ohhB2T2//glsJ1k0ALIC0y6V+Mew==
+X-Gm-Gg: ASbGncv5Q5goNlPuU3yTd9wl177FSNaHWbcq2hO1mtxostiNO1eBYuW8yIwrqMQhLZr
+	dauwTOeJ/+WKY2PTvB6rHA+r4jsxGZ3N/OcX97zttipHvV6+E7p15pQKJv4/z1KjzP8EKBPj4dF
+	AERQGf8Y7BF2YY8fP6jPJwh4RyLUJB5JABvCAKDsGXjv7D3wERZLFeEslkl7ZinTAI0NYQ0Q8dD
+	YIaLHsfphA+CHCvhDB8uaBOTMiyrT/rbDzmrwd/1WcwuQarPaz3IYzlDLqY2BfxFv0KrUg3VAiP
+	tX0nlr+SyfNvKN83hAEcMMSRLswFp4o3Aw2L
+X-Received: by 2002:a17:907:706:b0:ac7:95b0:d0fb with SMTP id a640c23a62f3a-aca9b6bc5f3mr342548066b.34.1744210289581;
+        Wed, 09 Apr 2025 07:51:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFy9g+DIrOAE96RAAhVeZY/4RHlv/rCrPjYfagAafONsEIrunVZvC7JorsmpzIoJdHOpPNMcw==
+X-Received: by 2002:a17:907:706:b0:ac7:95b0:d0fb with SMTP id a640c23a62f3a-aca9b6bc5f3mr342545466b.34.1744210289199;
+        Wed, 09 Apr 2025 07:51:29 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acaa1be9632sm112413866b.66.2025.04.09.07.51.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Apr 2025 07:51:28 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 6C98F19920EC; Wed, 09 Apr 2025 16:51:27 +0200 (CEST)
+From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org
+Subject: [PATCH net] selftests/tc-testing: Add test for echo of big TC filters
+Date: Wed,  9 Apr 2025 16:51:22 +0200
+Message-ID: <20250409145123.163446-1-toke@redhat.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,69 +98,51 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtdeivdekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudehpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmp
- dhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 8bit
 
-On Wed, 9 Apr 2025 14:46:54 +0200
-Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+Add a selftest that checks whether the kernel can successfully echo a
+big tc filter, to test the fix introduced in commit:
 
-> On Wed, 9 Apr 2025 14:23:09 +0200
-> Kory Maincent <kory.maincent@bootlin.com> wrote:
->=20
-> > On Wed, 9 Apr 2025 10:29:52 +0100
-> > "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
-> >  =20
-> > > On Wed, Apr 09, 2025 at 10:46:37AM +0200, Kory Maincent wrote:   =20
->  [...] =20
-> >  =20
->  [...] =20
->  [...] =20
-> > >=20
-> > > How do I know that from the output? Nothing in the output appears to
-> > > tells me which PTP implementation will be used.
-> > >=20
-> > > Maybe you have some understanding that makes this obvious that I don't
-> > > have.   =20
-> >=20
-> > You are right there is no report of the PTP source device info in ethto=
-ol.
-> > With all the design change of the PTP series this has not made through =
-my
-> > brain that we lost this information along the way.
-> >=20
-> > You can still know the source like that but that's not the best.
-> > # ls -l /sys/class/ptp
-> >=20
-> > It will be easy to add the source name support in netlink but which nam=
-es
-> > are better report to the user?
-> > - dev_name of the netdev->dev and phydev->mdio.dev?
-> >   Maybe not the best naming for the phy PTP source
-> >   (ff0d0000.ethernet-ffffffff:01)
-> > - "PHY" + the PHY ID and "MAC" string? =20
->=20
-> How about an enum instead of a string indicating the device type, and if
-> PHY, the phy_index ? (phy ID has another meaning :) )
+369609fc6272 ("tc: Ensure we have enough buffer space when sending filter netlink notifications")
 
-This will raise the same question I faced during the ptp series mainline
-process. In Linux, the PTP is managed through netdev or phylib API.
-In case of a NIC all is managed through netdev. So if a NIC has a PTP at th=
-e PHY
-layer how should we report that? As MAC PTP because it goes thought netdev,=
- as
-PHY PTP but without phyindex?
-That's why maybe using netlink string could assure we won't have UAPI break=
-age
-in the future due to weird cases.
-What do you think?
-=20
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+---
+ .../tc-testing/tc-tests/filters/u32.json      | 22 +++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json b/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
+index b2ca9d4e991b..67117f86fef0 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
+@@ -353,5 +353,27 @@
+         "teardown": [
+             "$TC qdisc del dev $DEV1 parent root drr"
+         ]
++    },
++    {
++        "id": "33f4",
++        "name": "Check echo of big filter command",
++        "category": [
++            "filter",
++            "u32"
++        ],
++        "plugins": {
++            "requires": "nsPlugin"
++        },
++        "setup": [
++            "$TC qdisc add dev $DEV1 parent root handle 10: fq_codel"
++        ],
++        "cmdUnderTest": "bash -c '$TC -echo filter add dev $DEV1 parent 10: u32 match u32 0 0 $(for i in $(seq 32); do echo action pedit munge ip dport set 22; done) | grep \"added filter\"'",
++        "verifyCmd": "",
++        "expExitCode": "0",
++        "matchCount": "0",
++        "matchPattern": "",
++        "teardown": [
++            "$TC qdisc del dev $DEV1 parent root fq_codel"
++        ]
+     }
+ ]
+-- 
+2.49.0
+
 
