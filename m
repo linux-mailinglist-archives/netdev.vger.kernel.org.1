@@ -1,98 +1,247 @@
-Return-Path: <netdev+bounces-180535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4871CA819C2
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 02:11:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38F6CA819D5
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 02:30:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 321144A1A1B
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 00:11:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E680419034E0
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 00:31:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87EB64A28;
-	Wed,  9 Apr 2025 00:11:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB8FCA5E;
+	Wed,  9 Apr 2025 00:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="aQY+QTqo"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="cfsSPrz7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F30442C
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 00:11:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1301FBE4E;
+	Wed,  9 Apr 2025 00:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744157494; cv=none; b=Af6BwKkRmIsWmOW7B3q5cgPjQgRIrFZMG+TVanbNpucja4pWpRshMZHVRXqwI2fUzMdCusOLBSLx4YIXHDMVrK6gmrQ4M/JxVReEEK93zBb+uC5d1dQy2vctwjmPY0UCEG3jNCe08klSEwinfIEHa1iG0+Qvr2EXpWHiMfatb2M=
+	t=1744158647; cv=none; b=gC0qge3JgJMCkbcneGg7krP18MDRzPtqb4/8XY31y1LVAJz+K3IVvJCfONQzCEfqX93byqbIo1k8BCXfGoHeHs6jEtz9WGlf7Z/6P11wyAo/m7Yz9exHzryZkEC97j+3Egt5Mx9wtWS+JIotfz4bup2jcJiZ+NuFidFJfotaWi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744157494; c=relaxed/simple;
-	bh=IGrIh0oj6QcgaAVxI1Jr5iHoY3WwQRLUyJGmpJyReHg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=i5F/ZOebp8JP+joojK0ruiYqd4gh+M1magiiMROIFci0W7WaecIyYL5FlpYuHvCSXE197Gs2BqY2S6K1R1ICi81TCfDoiGqXhsbdwmReJD/UyA7K8E0jbpKLjcmRYNP3nHTqHScCP5AUwXj5n5Nti4a5J4VHfpQ7l4Bk9r/mpmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=aQY+QTqo; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7c53c6c28c4so97113785a.2
-        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 17:11:32 -0700 (PDT)
+	s=arc-20240116; t=1744158647; c=relaxed/simple;
+	bh=Kkr41MKLfUV3nlYB7QaLWfvVfh+vxT9CsFdYykmr1R0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=chmfjVraMlFy/1t13kKPYsYdti/7dqdXTyaViohXx9fOpu302GFdETIiGC31t07uW2VksVnahJp5KfjrjhiCqax7rj1g1HdPWDJglahTRLG84vVSS9fnsSPQq5Zam9y1FkmqnfkagZYicJyeO4MsGStCJTVEfFeIEUpJV+/W5WA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=cfsSPrz7; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1744157491; x=1744762291; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=IGrIh0oj6QcgaAVxI1Jr5iHoY3WwQRLUyJGmpJyReHg=;
-        b=aQY+QTqoYuFI/nNDUwHoSR7Hh/3zQAjxNbuBOsZzexzqk6GRhLr1dj6gStc8JIe4ys
-         GejfeEaG8FcbMGU+fMB7oyUjbox8A4dpBJCSDahgLxBO4RrKSPYx/iB0NQ6eiTuNO8T3
-         zx1Us+SX5+3WwAzlCZrFX1YF3SjYjN2bz/g/Ylj2RtwujFgrcbWOxSf2mNrTd8pPsyhb
-         2F0G4SUkzuiJQDPvHLFOcn6zoOIyndwvKAAG+Cwg+NaSUL1vA4s/6Cbiu+3uaTAcgosl
-         dt+4hvAwzTgzf+wWjO37+t8R4arMiZjtewxZjzUQfaIOkjhyhWx9/krBqIo4IhZykauh
-         RWMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744157491; x=1744762291;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IGrIh0oj6QcgaAVxI1Jr5iHoY3WwQRLUyJGmpJyReHg=;
-        b=o4dEt2jUDgIki8CAISP9QjhVFWMBWiPEdcmP4uT+swAjPyK4Dt0/5+6LTKtRgVyO4i
-         +Xke5TM1neLnfa79X4wxO+QJRV/cdo0neOfhBLmfmZnu5Jo4OpUpbM2YQKPI9bh0ZRpZ
-         nPaLtzM+C7l+Uadmdtzne7akAZpjgpDL4hIjBddHl1AAJ7+aX8Fr5JB0a2udAHqDuE0w
-         jWaYw395F4G7O9Q3zS9Z29NcnbuupA3vlYVCEQrX6rixUUcnXX/Nq/bkl5hYQmVndU+e
-         e4iY41MFvjGCJr4MKf8OUCBMJLLovCLo6E3OwgDtMjgjbTB6Zb/At7ZliawV8ue2RWvo
-         5ZXA==
-X-Forwarded-Encrypted: i=1; AJvYcCXTfMxZkp+8YnBBbrE//HP6K7tOJW1RPt18yWrUJySlrT97QpPry4upTZS1dlGbt19LBaUPvZY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvEFKJMRgG9soRQynmW6/JDlrj8TG1R9tDIG7Gf4PtXfpPlNQy
-	nMwZLSRF38ZuBSG6z5mY72TeNtvu8S/IM/X6JC+MmffZBceCZ2fCLXU0ZtWV03p4RMWqqhUWJvh
-	UTwcIv2h2fdNct7xZaVUpoFnzRmeFOT87OKXaYWqS3qTKO/eROV8YKQ==
-X-Gm-Gg: ASbGncvFqF+ILTKFFffZKmYWMMUzfCfoiJsE92fU8RBCgxZRF7Y5uOCgn/80o334pLk
-	i59maJJoOchTJFKc3mEESBW9t2zNLz97v3CbrJVkd2KZhw5H8+rfGJldiHN9qIfu4wOZAhha4Is
-	RBvEjNX/C5uuYtpS7TcqZMVLnExxAhUs3+HpVCIFJ9qThLyx8I191+nHiKGEk=
-X-Google-Smtp-Source: AGHT+IHyd/e0WwHsSsXmA/rIS5elMkh/5M5LD6diadoxtBUswF4A2g96igG0yc9/p3nRuCk0cfAxrY7asTUIYoMcfqQ=
-X-Received: by 2002:ad4:5c8d:0:b0:6e8:af1b:e70e with SMTP id
- 6a1803df08f44-6f0dbc7d4admr6977786d6.8.1744157491661; Tue, 08 Apr 2025
- 17:11:31 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744158646; x=1775694646;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=MPbizvZgv6pYIN320m0zxORHuUWeMTbiHbel6cpEpeQ=;
+  b=cfsSPrz7LBpMwy6rqDEZOz52K3iuJPv7QJ0019m3v4ny4RobpzJNV6G/
+   /SunwJLDPl+mZAiRzvrZnpzahvXP6FLyqEDXVy/VD7fDRM6KT2CSUfWjm
+   TaMPfuZUjQWvwiYk1XzsyDVLwz5mYYsNKKJOP7bpd3vCvVmnCmXJV/w7Y
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.15,199,1739836800"; 
+   d="scan'208";a="814495354"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 00:30:39 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:37776]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.21.195:2525] with esmtp (Farcaster)
+ id 7de501ce-3ae9-4104-a5af-6c298916525d; Wed, 9 Apr 2025 00:30:38 +0000 (UTC)
+X-Farcaster-Flow-ID: 7de501ce-3ae9-4104-a5af-6c298916525d
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 9 Apr 2025 00:30:38 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.100.5) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 9 Apr 2025 00:30:33 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, "Neal
+ Cardwell" <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,
+	"Pablo Neira Ayuso" <pablo@netfilter.org>, Jozsef Kadlecsik
+	<kadlec@netfilter.org>, Paul Moore <paul@paul-moore.com>, James Morris
+	<jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, Casey Schaufler
+	<casey@schaufler-ca.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki
+ Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>,
+	<selinux@vger.kernel.org>, <linux-security-module@vger.kernel.org>
+Subject: [PATCH v2 net-next 0/4] net: Retire DCCP socket.
+Date: Tue, 8 Apr 2025 17:29:07 -0700
+Message-ID: <20250409003014.19697-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CABi4-ogLNdQw=gLTRZ4aJ8qiQWiovHaO19sx5uz29Es6du8GKg@mail.gmail.com>
- <20250408001649.5560-1-kuniyu@amazon.com> <CABi4-ogUtMrH8-NVB6W8Xg_F_KDLq=yy-yu-tKr2udXE2Mu1Lg@mail.gmail.com>
- <da0e43ef-4861-4541-951d-8d576fbaa069@linux.dev>
-In-Reply-To: <da0e43ef-4861-4541-951d-8d576fbaa069@linux.dev>
-From: Jordan Rife <jordan@jrife.io>
-Date: Tue, 8 Apr 2025 17:11:21 -0700
-X-Gm-Features: ATxdqUFIpcH5ylsr6kaKrr69hnZZXAQx6Ib_kzSVOyDlVM8d3bq7Yg4L5qQzZfs
-Message-ID: <CABi4-ohyFtRAGfwjg9dGcdDTpgR6guyciijzr32YFbA0xsau2A@mail.gmail.com>
-Subject: Re: [RFC PATCH bpf-next 2/3] bpf: udp: Avoid socket skips and repeats
- during iteration
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, aditi.ghag@isovalent.com, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, netdev@vger.kernel.org, willemdebruijn.kernel@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D037UWB003.ant.amazon.com (10.13.138.115) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-> Agree that this is better.
-> The stop() may need to take care of the start()/next() may fail. Take a look at
-> the bpf_seq_read() in bpf_iter.c. Please check.
+As announced by commit b144fcaf46d4 ("dccp: Print deprecation
+notice."), it's time to remove DCCP socket.
 
-Thanks, I will take a look.
+The patch 2 removes net/dccp, LSM code, doc, and etc, leaving
+DCCP netfilter modules.
 
--Jordan
+The patch 3 unexports shared functions for DCCP, and the patch 4
+renames tcp_or_dccp_get_hashinfo() to tcp_get_hashinfo().
+
+We can do more cleanup; for example, remove IPPROTO_TCP checks in
+__inet6?_check_established(), remove __module_get() for twsk,
+remove timewait_sock_ops.twsk_destructor(), etc, but it will be
+more of TCP stuff, so I'll defer to a later series.
+
+
+Changes:
+  v2:
+    * Patch 2
+      * Drop netfilter changes
+    * Patch 3
+      * Leave inet_twsk_put() as is
+
+  v1: https://lore.kernel.org/netdev/20250407231823.95927-1-kuniyu@amazon.com/
+
+
+Kuniyuki Iwashima (4):
+  selftest: net: Remove DCCP bits.
+  net: Retire DCCP socket.
+  net: Unexport shared functions for DCCP.
+  tcp: Rename tcp_or_dccp_get_hashinfo().
+
+ Documentation/admin-guide/bug-hunting.rst     |    2 +-
+ Documentation/networking/dccp.rst             |  219 ---
+ Documentation/networking/index.rst            |    1 -
+ Documentation/networking/ip-sysctl.rst        |    4 +-
+ .../zh_CN/admin-guide/bug-hunting.rst         |    2 +-
+ .../zh_TW/admin-guide/bug-hunting.rst         |    2 +-
+ MAINTAINERS                                   |    9 -
+ arch/m68k/configs/amiga_defconfig             |    2 -
+ arch/m68k/configs/apollo_defconfig            |    2 -
+ arch/m68k/configs/atari_defconfig             |    2 -
+ arch/m68k/configs/bvme6000_defconfig          |    2 -
+ arch/m68k/configs/hp300_defconfig             |    2 -
+ arch/m68k/configs/mac_defconfig               |    2 -
+ arch/m68k/configs/multi_defconfig             |    2 -
+ arch/m68k/configs/mvme147_defconfig           |    2 -
+ arch/m68k/configs/mvme16x_defconfig           |    2 -
+ arch/m68k/configs/q40_defconfig               |    2 -
+ arch/m68k/configs/sun3_defconfig              |    2 -
+ arch/m68k/configs/sun3x_defconfig             |    2 -
+ arch/mips/configs/bigsur_defconfig            |    1 -
+ arch/mips/configs/gpr_defconfig               |    1 -
+ arch/mips/configs/mtx1_defconfig              |    1 -
+ arch/powerpc/configs/pmac32_defconfig         |    1 -
+ arch/powerpc/configs/ppc6xx_defconfig         |    1 -
+ include/linux/dccp.h                          |  289 ---
+ include/linux/tfrc.h                          |   51 -
+ include/net/inet_hashtables.h                 |    7 +-
+ include/net/rstreason.h                       |    2 +-
+ include/net/secure_seq.h                      |    4 -
+ include/net/sock.h                            |    1 -
+ include/trace/events/sock.h                   |    1 -
+ include/trace/events/sunrpc.h                 |    2 -
+ net/Kconfig                                   |    1 -
+ net/Makefile                                  |    1 -
+ net/core/secure_seq.c                         |   42 -
+ net/core/sock.c                               |   24 +-
+ net/core/sock_diag.c                          |    2 -
+ net/dccp/Kconfig                              |   46 -
+ net/dccp/Makefile                             |   30 -
+ net/dccp/ackvec.c                             |  403 -----
+ net/dccp/ackvec.h                             |  136 --
+ net/dccp/ccid.c                               |  219 ---
+ net/dccp/ccid.h                               |  262 ---
+ net/dccp/ccids/Kconfig                        |   55 -
+ net/dccp/ccids/ccid2.c                        |  794 ---------
+ net/dccp/ccids/ccid2.h                        |  121 --
+ net/dccp/ccids/ccid3.c                        |  866 ---------
+ net/dccp/ccids/ccid3.h                        |  148 --
+ net/dccp/ccids/lib/loss_interval.c            |  184 --
+ net/dccp/ccids/lib/loss_interval.h            |   69 -
+ net/dccp/ccids/lib/packet_history.c           |  439 -----
+ net/dccp/ccids/lib/packet_history.h           |  142 --
+ net/dccp/ccids/lib/tfrc.c                     |   46 -
+ net/dccp/ccids/lib/tfrc.h                     |   73 -
+ net/dccp/ccids/lib/tfrc_equation.c            |  702 --------
+ net/dccp/dccp.h                               |  483 -----
+ net/dccp/diag.c                               |   85 -
+ net/dccp/feat.c                               | 1581 -----------------
+ net/dccp/feat.h                               |  133 --
+ net/dccp/input.c                              |  739 --------
+ net/dccp/ipv4.c                               | 1101 ------------
+ net/dccp/ipv6.c                               | 1174 ------------
+ net/dccp/ipv6.h                               |   27 -
+ net/dccp/minisocks.c                          |  266 ---
+ net/dccp/options.c                            |  609 -------
+ net/dccp/output.c                             |  708 --------
+ net/dccp/proto.c                              | 1293 --------------
+ net/dccp/qpolicy.c                            |  136 --
+ net/dccp/sysctl.c                             |  107 --
+ net/dccp/timer.c                              |  272 ---
+ net/dccp/trace.h                              |   82 -
+ net/ipv4/Kconfig                              |    2 +-
+ net/ipv4/af_inet.c                            |    5 +-
+ net/ipv4/inet_connection_sock.c               |   23 +-
+ net/ipv4/inet_diag.c                          |    2 -
+ net/ipv4/inet_hashtables.c                    |   30 +-
+ net/ipv4/inet_timewait_sock.c                 |    4 -
+ net/ipv6/af_inet6.c                           |    1 -
+ net/ipv6/inet6_connection_sock.c              |    2 -
+ net/ipv6/ip6_output.c                         |    2 +-
+ samples/bpf/sockex2_kern.c                    |    1 -
+ scripts/checkpatch.pl                         |    2 +-
+ security/lsm_audit.c                          |   19 -
+ security/selinux/hooks.c                      |   41 +-
+ security/selinux/include/classmap.h           |    2 -
+ security/selinux/nlmsgtab.c                   |    1 -
+ security/smack/smack_lsm.c                    |    9 +-
+ tools/testing/selftests/net/config            |    1 -
+ .../selftests/net/reuseport_addr_any.c        |   36 +-
+ 89 files changed, 41 insertions(+), 14368 deletions(-)
+ delete mode 100644 Documentation/networking/dccp.rst
+ delete mode 100644 include/linux/tfrc.h
+ delete mode 100644 net/dccp/Kconfig
+ delete mode 100644 net/dccp/Makefile
+ delete mode 100644 net/dccp/ackvec.c
+ delete mode 100644 net/dccp/ackvec.h
+ delete mode 100644 net/dccp/ccid.c
+ delete mode 100644 net/dccp/ccid.h
+ delete mode 100644 net/dccp/ccids/Kconfig
+ delete mode 100644 net/dccp/ccids/ccid2.c
+ delete mode 100644 net/dccp/ccids/ccid2.h
+ delete mode 100644 net/dccp/ccids/ccid3.c
+ delete mode 100644 net/dccp/ccids/ccid3.h
+ delete mode 100644 net/dccp/ccids/lib/loss_interval.c
+ delete mode 100644 net/dccp/ccids/lib/loss_interval.h
+ delete mode 100644 net/dccp/ccids/lib/packet_history.c
+ delete mode 100644 net/dccp/ccids/lib/packet_history.h
+ delete mode 100644 net/dccp/ccids/lib/tfrc.c
+ delete mode 100644 net/dccp/ccids/lib/tfrc.h
+ delete mode 100644 net/dccp/ccids/lib/tfrc_equation.c
+ delete mode 100644 net/dccp/dccp.h
+ delete mode 100644 net/dccp/diag.c
+ delete mode 100644 net/dccp/feat.c
+ delete mode 100644 net/dccp/feat.h
+ delete mode 100644 net/dccp/input.c
+ delete mode 100644 net/dccp/ipv4.c
+ delete mode 100644 net/dccp/ipv6.c
+ delete mode 100644 net/dccp/ipv6.h
+ delete mode 100644 net/dccp/minisocks.c
+ delete mode 100644 net/dccp/options.c
+ delete mode 100644 net/dccp/output.c
+ delete mode 100644 net/dccp/proto.c
+ delete mode 100644 net/dccp/qpolicy.c
+ delete mode 100644 net/dccp/sysctl.c
+ delete mode 100644 net/dccp/timer.c
+ delete mode 100644 net/dccp/trace.h
+
+-- 
+2.49.0
+
 
