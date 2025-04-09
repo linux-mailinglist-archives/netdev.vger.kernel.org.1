@@ -1,109 +1,96 @@
-Return-Path: <netdev+bounces-180958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3C1DA833F6
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 00:08:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAC96A833EA
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 00:06:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB19E189A29F
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 22:07:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1CCDA7A99CF
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 22:05:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9957A219A86;
-	Wed,  9 Apr 2025 22:07:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F30E214201;
+	Wed,  9 Apr 2025 22:06:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="asCopqs3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N8LhXGVo"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF48E1E5713;
-	Wed,  9 Apr 2025 22:06:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28B621E5713
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 22:06:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744236420; cv=none; b=rKM1E6jCB2nX0xUqOoyP2JFWjvAPiFifbovOqGiqo5SHjSopJWHAx1knMrNtbmV6f05WKlEOO/lhqQesgfL9Qh0IX356p77N1KpYgNt7F04wGT2wWxzaU6sBodOKSbrpEyjMERCtvdxiNNJDnpJ2u+6gvq8nuDR2mrVW4zUImzM=
+	t=1744236402; cv=none; b=LYlqVrQwGgh7l3mnL6FgNZan1IPXgHXj7ks2bFeVq/1kIsgCVwawdp3tDtlDhh/VBQxR8p0wA8NmKOKgAgUti0303oRCGsy/+XvRachhQMWfRjdyUnqBcRMqRrqpi4O+msszbI/2YwNDHPRsU2NSw7NOF1lkRBnCLilv/Nt4Ntw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744236420; c=relaxed/simple;
-	bh=LqPIp6+OYr6Lu05eZr+DtxFsHBUkh7pN3E33NAMprsU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=e0nvIUAfJqx28fjf8CHbZqN9riDgTHQ9xLE/Iw8Qxwc4utA97pdH4bhG89xSU3nicgC0uzUM+wJTppmbIshTMxM4ViFAO0o1bNyloVVPahoLg8lbeh+HsLnZ+pV+W8DBD0UadpKse9E8Tag79mLuZNRJTnUzJ3NGMWlgd9FJduM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=asCopqs3; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=MXaJb6rqjO6k6hC8GGRd9Nz5/YI2plyuUrbJ5reUjDs=;
-	t=1744236419; x=1745446019; b=asCopqs3XyqFrtO3t8wVBRwG3MlLTFRVdgVfSnVL4Iz61u6
-	vXhM1KbVeFuXEPTY5sMCGxuwXol6WzA0rAzYRuxR6RpD0VhQuPqSgn43Tf/lqvOOMhmwRtcYtsfyB
-	aahgpjeCxTcP/eKvl3kq8bgDLvMl146mioXEJGCK7hmgiIWgwOhN0fMQtwbCjRnSkAHVoKdqXkJyr
-	nS5kVmxAmOBXsVkTCG4vaEk8C3IjMrAVOL+C2Dptw6SjsZE19btV3KOinaLqydwanvSphjYuYIBf+
-	xr4VjceodEemzupHcJCEfQq2Hy/JwdUI4fF97rjjtMAy68TxEpvBwk/H9JrBbeFQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.1)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1u2dYb-00000005Jap-0lrk;
-	Thu, 10 Apr 2025 00:06:05 +0200
-Message-ID: <740c7de894d39249665c6333aa3175762cfb13c6.camel@sipsolutions.net>
-Subject: Re: [PATCH v4 03/13] media: pci: cx18-av-vbi: Replace open-coded
- parity calculation with parity_odd()
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Arend van Spriel <arend.vanspriel@broadcom.com>, Kuan-Wei Chiu	
- <visitorckw@gmail.com>, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- 	dave.hansen@linux.intel.com, x86@kernel.org, jk@ozlabs.org,
- joel@jms.id.au, 	eajames@linux.ibm.com, andrzej.hajda@intel.com,
- neil.armstrong@linaro.org, 	rfoss@kernel.org,
- maarten.lankhorst@linux.intel.com, mripard@kernel.org, 
-	tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
- dmitry.torokhov@gmail.com, 	mchehab@kernel.org, awalls@md.metrocast.net,
- hverkuil@xs4all.nl, 	miquel.raynal@bootlin.com, richard@nod.at,
- vigneshr@ti.com, 	louis.peens@corigine.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, 	edumazet@google.com, pabeni@redhat.com,
- parthiban.veerasooran@microchip.com, 	gregkh@linuxfoundation.org,
- jirislaby@kernel.org, yury.norov@gmail.com, 	akpm@linux-foundation.org,
- jdelvare@suse.com, linux@roeck-us.net, 	alexandre.belloni@bootlin.com,
- pgaj@cadence.com
-Cc: hpa@zytor.com, alistair@popple.id.au, linux@rasmusvillemoes.dk, 
-	Laurent.pinchart@ideasonboard.com, jonas@kwiboo.se,
- jernej.skrabec@gmail.com, 	kuba@kernel.org, linux-kernel@vger.kernel.org,
- linux-fsi@lists.ozlabs.org, 	dri-devel@lists.freedesktop.org,
- linux-input@vger.kernel.org, 	linux-media@vger.kernel.org,
- linux-mtd@lists.infradead.org, 	oss-drivers@corigine.com,
- netdev@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com, 
-	linux-serial@vger.kernel.org, bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw, 
-	Frank.Li@nxp.com, linux-hwmon@vger.kernel.org,
- linux-i3c@lists.infradead.org, 	david.laight.linux@gmail.com,
- andrew.cooper3@citrix.com, Yu-Chun Lin	 <eleanor15x@gmail.com>
-Date: Thu, 10 Apr 2025 00:06:03 +0200
-In-Reply-To: <25b7888d-f704-493b-a2d7-c5e8fff9cfb4@broadcom.com>
-References: <20250409154356.423512-1-visitorckw@gmail.com>
-	 <20250409154356.423512-4-visitorckw@gmail.com>
-	 <25b7888d-f704-493b-a2d7-c5e8fff9cfb4@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+	s=arc-20240116; t=1744236402; c=relaxed/simple;
+	bh=tjTLNSTCp3maD979cYWZBH6QdBvoEM2OgvE3a03Ox28=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DfLMwsFWlGzpYFrlbcMmeYwXn9SgwNBXkekGeO3ZxkYPilvsYv6UBxWPDOyXCishLPZsNI+wnzVrijsJLEZ1+JTfZQMbTx8QVq5pv58JWl1xfuvISQ2N2a1kNe/fmjNogdiAIDBemnvz/EDv2PkoAbYe/jfnveQ7N0/ceqew7DU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N8LhXGVo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47EA9C4CEE2;
+	Wed,  9 Apr 2025 22:06:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744236400;
+	bh=tjTLNSTCp3maD979cYWZBH6QdBvoEM2OgvE3a03Ox28=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=N8LhXGVoOb8Ymbmdlx7nKtgLri7C0nxl8H88oowbjUNHP4YNcmQjTJ4tlLpev0HUx
+	 reDjj6WLh8px+dr169jGVzLFmNtjFrQsB1zxIhj/KsQ4V+F0ZpenfcAhUc5dnVSRSa
+	 ozyeAwjWOu54LrtpP4GFyVJ1sK2+wKWvr7TUtKi0UCPA8IHqVrj4/2PXpVTaUYbPZ/
+	 Gd+YN3hdNoWhKIJEqaqmY1ptaO9kj1OL7+QrvxqUOkHcv12Fp5QAlymiil7Ipi9+y3
+	 vmZYE/GNdCcr9+Osqe4VDbeG9cpZwl5JsvioUBlRSbi4JA/HO40ifhOAW2CbgRSTGJ
+	 RdvOROSKhRv8g==
+Date: Wed, 9 Apr 2025 15:06:39 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Carolina Jubran <cjubran@nvidia.com>
+Cc: Cosmin Ratiu <cratiu@nvidia.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "horms@kernel.org" <horms@kernel.org>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+ <davem@davemloft.net>, Tariq Toukan <tariqt@nvidia.com>, Gal Pressman
+ <gal@nvidia.com>, "jiri@resnulli.us" <jiri@resnulli.us>,
+ "edumazet@google.com" <edumazet@google.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, "pabeni@redhat.com" <pabeni@redhat.com>
+Subject: Re: net-shapers plan
+Message-ID: <20250409150639.30a4c041@kernel.org>
+In-Reply-To: <1fc5aaa2-1c3d-48cc-99a8-523ed82b4cf9@nvidia.com>
+References: <d9831d0c940a7b77419abe7c7330e822bbfd1cfb.camel@nvidia.com>
+	<20250328051350.5055efe9@kernel.org>
+	<a3e8c008-384f-413e-bfa0-6e4568770213@nvidia.com>
+	<20250401075045.1fa012f5@kernel.org>
+	<1fc5aaa2-1c3d-48cc-99a8-523ed82b4cf9@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2025-04-09 at 20:43 +0200, Arend van Spriel wrote:
+On Tue, 8 Apr 2025 17:43:19 +0300 Carolina Jubran wrote:
+> >> I don't believe there's a specific real-world scenario. It's really
+> >> about maximizing flexibility. Essentially, if a user sets things up in=
+ a
+> >> less-than-optimal way, the hardware can ensure that traffic is
+> >> classified and managed properly. =20
+> >=20
+> > I see. If you could turn it off and leave it out, at least until clear
+> > user appears that'd be great. Reclassifying packets on Tx slightly goes
+> > against the netdev recommendation to limit any packet parsing and
+> > interpretation on Tx. =20
 >=20
-> This is orthogonal to the change to parity_odd() though. More specific=
-=20
-> to the new parity_odd() you can now do following as parity_odd()=20
-> argument is u64:
->=20
-> 		err =3D !parity_odd(*(u16 *)p);
->=20
+> The hardware enforces a match between the packet=E2=80=99s priority and t=
+he=20
+> scheduling queue=E2=80=99s configured priority. If they match, the packet=
+ is=20
+> transmitted without further processing. If not, the hardware moves the=20
+> Tx queue to the right scheduling queue to ensure proper traffic class=20
+> separation.
+> This check is always active and cannot currently be disabled. Even when
+> the queue is configured with the correct priority, the hardware still=20
+> verifies the match before sending.
 
-Can it though? Need to be careful with alignment with that, I'd think.
-
-johannes
+It needs to work as intended :( so you probably need to enforce
+the correct mapping in the FW or the driver.
 
