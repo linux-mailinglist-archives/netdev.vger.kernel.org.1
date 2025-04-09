@@ -1,298 +1,171 @@
-Return-Path: <netdev+bounces-180691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180692-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3D8BA82220
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 12:31:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5ACABA82242
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 12:34:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 573808A1F38
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 10:30:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D75D3B20CE
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 10:33:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB6A13B59B;
-	Wed,  9 Apr 2025 10:30:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23E4725522B;
+	Wed,  9 Apr 2025 10:33:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="URr6BBK3"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="C6zosi2H"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA88425D8E3
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 10:29:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4636C1DA60F
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 10:33:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744194602; cv=none; b=gvIjLnsq6A46ezE7yM9tu+BTqnFQXfTtZtMQV+ZUVlacrdP0/DbAeAhYJqdrXAb3OO81dfpYmclzF7b08ZQVQYYKptfkH190/kcX/APrbzvi5F+uxc3epw7vD3MDSHfxbPLPodiRcc8iD1PvlUgCNlUQUHpfiLc5oHJy2Hy/Jhc=
+	t=1744194804; cv=none; b=AhwZLdQPK7mJeWSfqsRT79FtxNgUrhtM8Z8fN9CFI+iJpJzINOOxT2A9S9OJRLXgxKNitwd9b41wX9Q8kTlikKHKYTNT5M+f+s95oEmW1yHcLqlUNVoTYp4IBiIz5Apv3en91mZHFIoQObulrC3Lr+CN7uXem9kPe/Y0kxesjrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744194602; c=relaxed/simple;
-	bh=WQk83JuPuQX2fSNl/OKOGc35+sSgfnC9FLi+eV/1Z4A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mDk13b+E4ru+0X8/LUNjXKPj3fJN13Dp7f39k5XxYBRYkof9uP/KmqyP1soJ8fV9VKLGKVqf9BlwnIoO8hXfV0DtO1S/nCm/ln2t3yzNBAQooTBJhADb6+yIXLsin/NWU9dFYIzggRIh+baw+i9HEonvFDyM8B9d23fOvd5bfT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=URr6BBK3; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744194596;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=tVjoel3accGTvriYfDQCUCAxB4fdnEejpHrDGJrVaco=;
-	b=URr6BBK36GF8FRT9ASyYKMCuY2UJLHSxLZu4gdJzyjDDmhSvKVSruxFiPU64s3ACJIP+vr
-	A8QaJ+YG9O447840kX6fdKi+j8V7tSZKg+qx2hkfTC6YOKa8IRz4jZnU0ePs117q9KWUfd
-	26m7vdffmeNppHNYwAbukuQ1kg+Nf8s=
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: bpf@vger.kernel.org
-Cc: mrpre@163.com,
-	Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org
-Subject: [PATCH bpf-next v1] bpf, sockmap: Introduce tracing capability for sockmap
-Date: Wed,  9 Apr 2025 18:29:33 +0800
-Message-ID: <20250409102937.15632-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1744194804; c=relaxed/simple;
+	bh=zqBa8qyfz3XqnbkLny2u5Hws//r6LChLxkecT5EOKeY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qnAwT4ISJUsgEqXUJeXXRCSsKNbR1RZx/hebFO4loqSrzVqx+0xf33j9hSU/ZVtXXTmj0trgShd3jk7savevp8xjnOqVwreKww2XbOGeQqL/f7/yf6ooEIvC83N2Y7giYWMoe+UTtL06fEdxDBykWxZwGnCskJGgVoyZpk+s3JM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=C6zosi2H; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43cf257158fso46190585e9.2
+        for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 03:33:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1744194800; x=1744799600; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mBi4VOwBcb3oMnTsthtGachLyy7QtgkSFGvt4FX19+w=;
+        b=C6zosi2HBQET3r55vuiOTKKvpdAQhr9ONzRPJuUWSuYAMdLTyMIgN00pwf42fhZ/g5
+         Hy68EhQpmSdeH4RkQn6SPSW2mL+OhiR0bSGuVx0gS4hpFWdI8eRgaUA35vr4gjzoxJYu
+         aheuHv4MV7rrEgO+P63VW01a9wjKX30SSKmMEwd5lYvaTcBIQvfvrH4zuLfSA0w2s92V
+         StuxvAvbsTJ6MARcuLFu1cEqWs+S/2HHOGBcKb2/Gyh7Sk/2i+WIbabZf+sAUXp3yD/A
+         EvrDplH7QpbqGgDcYEkoma0gov+IFFx+Y/yZ01p9SxxBXR2ZF2IaomBLHklLC1cRjMYC
+         rBPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744194800; x=1744799600;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mBi4VOwBcb3oMnTsthtGachLyy7QtgkSFGvt4FX19+w=;
+        b=YwJRC6Bx+9eMAYZ8Fp8t+YiIaAw0WHMAC/gUtgsNuttBJGzOIdxJCrqF28wNJrlRBH
+         4StsXytyEbcL3x1sVuIXqeg6lXyzUTi4M/seoaFYOuXOFTrXh0ejykU5qSmHObmDGfs9
+         5aOL3eSGhavk7A4p1mVZx9KikhBLco5pOHJB4ova3eH3IqdKvjq11rye/KTpE1xhDTPk
+         lUZNx2rqKyISpQAYACWjPQ5NEgc5L0ilPn1IHnLiPIcsAwcDVttcV/p5DWVCr164QA81
+         1XEi2pc6pExibh777kxEfEPIzTSLjSSN1rNV8pEKAPFLoaUoHl+CzRtrlZd6SoXl5+K+
+         uehg==
+X-Forwarded-Encrypted: i=1; AJvYcCUko3lkvSoKctvm3cyMnUHiDhfnq62M+BfRu6uZFISup93iHobtzF9ga+ng09RSvdTI0mdZqAc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7v6nW/AHrcIFwkb7wWZldLJPRrNhpcvo/6w+I8IYJG9hpVsB5
+	sTVL3Kr2lBM4oy2H0r+CaRwQel+xHkf4ziq6pAzWdDc8I1A3mRJoxiXXPBGlXKY=
+X-Gm-Gg: ASbGnctFU3vhUAsleTNsUnk5eZocN3KCYGaRevsPI6GlR98nic/CNW+MJ7ngSQqOaAn
+	7vDTHRNW8851y5ZIckUtRvDlXdL+7SzneOxD8+UzmO9N2DuGT7lW3QKGT+H3/kh9wZyEJU7gV0j
+	7mW3WcB2qwCtwXV0oG+9Ban0nmMOKcD8kcDS80oqO1aTaAgsX5xZRIxZ6+gKb0kEOh8wDdRbuxM
+	noiToxEieB21R9D+TiWGoetY5UteEItDoh39Sxx2RWcU5uDCmxtif2rhX6IankzPXFy/TVbW5WX
+	kww+KKDQOGa9r4oO//eQxzQo2WNMFJhSM8WQpvaqdVDMHgGwTYEK5zrb0e7ybb9fik0S6PUpfBH
+	AEanSLGU=
+X-Google-Smtp-Source: AGHT+IF+VmnSjKoz4qUXSItqfvLwHlUV3cZ/MgW2aun1vPnXhsC5dMMx7i0pxZQLraz/SZM47liIVw==
+X-Received: by 2002:a05:600c:2d48:b0:43c:f332:703a with SMTP id 5b1f17b1804b1-43f21ad389fmr11637865e9.31.1744194800136;
+        Wed, 09 Apr 2025 03:33:20 -0700 (PDT)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f2338dc13sm12257075e9.3.2025.04.09.03.33.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Apr 2025 03:33:19 -0700 (PDT)
+Message-ID: <7d88da06-e943-4d78-a483-66d7ce151f00@blackwall.org>
+Date: Wed, 9 Apr 2025 13:33:18 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] net: bridge: Prevent unicast ARP/NS packets
+ from being suppressed by bridge
+To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org
+Cc: Ido Schimmel <idosch@nvidia.com>, bridge@lists.linux.dev,
+ mlxsw@nvidia.com, Denis Yulevych <denisyu@nvidia.com>,
+ Amit Cohen <amcohen@nvidia.com>
+References: <cover.1744123493.git.petrm@nvidia.com>
+ <6bf745a149ddfe5e6be8da684a63aa574a326f8d.1744123493.git.petrm@nvidia.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <6bf745a149ddfe5e6be8da684a63aa574a326f8d.1744123493.git.petrm@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Sockmap has the same high-performance forwarding capability as XDP, but
-operates at Layer 7.
+On 4/8/25 18:40, Petr Machata wrote:
+> From: Amit Cohen <amcohen@nvidia.com>
+> 
+> When Proxy ARP or ARP/ND suppression are enabled, ARP/NS packets can be
+> handled by bridge in br_do_proxy_suppress_arp()/br_do_suppress_nd().
+> For broadcast packets, they are replied by bridge, but later they are not
+> flooded. Currently, unicast packets are replied by bridge when suppression
+> is enabled, and they are also forwarded, which results two replicas of
+> ARP reply/NA - one from the bridge and second from the target.
+> 
+> RFC 1122 describes use case for unicat ARP packets - "unicast poll" -
+> actively poll the remote host by periodically sending a point-to-point ARP
+> request to it, and delete the entry if no ARP reply is received from N
+> successive polls.
+> 
+> The purpose of ARP/ND suppression is to reduce flooding in the broadcast
+> domain. If a host is sending a unicast ARP/NS, then it means it already
+> knows the address and the switches probably know it as well and there
+> will not be any flooding.
+> 
+> In addition, the use case of unicast ARP/NS is to poll a specific host,
+> so it does not make sense to have the switch answer on behalf of the host.
+> 
+> According to RFC 9161:
+> "A PE SHOULD reply to broadcast/multicast address resolution messages,
+> i.e., ARP Requests, ARP probes, NS messages, as well as DAD NS messages.
+> An ARP probe is an ARP Request constructed with an all-zero sender IP
+> address that may be used by hosts for IPv4 Address Conflict Detection as
+> specified in [RFC5227]. A PE SHOULD NOT reply to unicast address resolution
+> requests (for instance, NUD NS messages)."
+> 
+> Forward such requests and prevent the bridge from replying to them.
+> 
+> Reported-by: Denis Yulevych <denisyu@nvidia.com>
+> Signed-off-by: Amit Cohen <amcohen@nvidia.com>
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+> Signed-off-by: Petr Machata <petrm@nvidia.com>
+> ---
+>  net/bridge/br_arp_nd_proxy.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/net/bridge/br_arp_nd_proxy.c b/net/bridge/br_arp_nd_proxy.c
+> index 115a23054a58..1e2b51769eec 100644
+> --- a/net/bridge/br_arp_nd_proxy.c
+> +++ b/net/bridge/br_arp_nd_proxy.c
+> @@ -160,6 +160,9 @@ void br_do_proxy_suppress_arp(struct sk_buff *skb, struct net_bridge *br,
+>  	if (br_opt_get(br, BROPT_NEIGH_SUPPRESS_ENABLED)) {
+>  		if (br_is_neigh_suppress_enabled(p, vid))
+>  			return;
+> +		if (is_unicast_ether_addr(eth_hdr(skb)->h_dest) &&
+> +		    parp->ar_op == htons(ARPOP_REQUEST))
+> +			return;
+>  		if (parp->ar_op != htons(ARPOP_RREQUEST) &&
+>  		    parp->ar_op != htons(ARPOP_RREPLY) &&
+>  		    (ipv4_is_zeronet(sip) || sip == tip)) {
+> @@ -410,6 +413,10 @@ void br_do_suppress_nd(struct sk_buff *skb, struct net_bridge *br,
+>  	if (br_is_neigh_suppress_enabled(p, vid))
+>  		return;
+>  
+> +	if (is_unicast_ether_addr(eth_hdr(skb)->h_dest) &&
+> +	    msg->icmph.icmp6_type == NDISC_NEIGHBOUR_SOLICITATION)
+> +		return;
+> +
+>  	if (msg->icmph.icmp6_type == NDISC_NEIGHBOUR_ADVERTISEMENT &&
+>  	    !msg->icmph.icmp6_solicited) {
+>  		/* prevent flooding to neigh suppress ports */
 
-Introduce tracing capability for sockmap, similar to XDP, to trace the
-execution results of BPF programs without modifying the programs
-themselves, similar to the existing trace_xdp_redirect{_map}.
-
-It is crucial for debugging BPF programs, especially in production
-environments.
-
-Additionally, a header file was added to bpf_trace.h to automatically
-generate tracepoints.
-
-Test results:
-$ echo "1" > /sys/kernel/tracing/events/sockmap/enable
-
-skb:
-sockmap_redirect: sk=00000000d3266a8d, type=skb, family=2, protocol=6, \
-prog_id=73, length=256, action=PASS
-
-msg:
-sockmap_redirect: sk=00000000528c7614, type=msg, family=2, protocol=6, \
-prog_id=185, length=5, action=REDIRECT
-
-tls:
-sockmap_redirect: sk=00000000d04d2224, type=skb, family=2, protocol=6, \
-prog_id=143, length=35, action=PASS
-
-strparser:
-sockmap_skb_strp_parse: sk=00000000ecab0b30, family=2, protocol=6, \
-prog_id=170, size=5
-
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
----
- MAINTAINERS                    |  1 +
- include/linux/bpf_trace.h      |  2 +-
- include/trace/events/sockmap.h | 89 ++++++++++++++++++++++++++++++++++
- net/core/skmsg.c               |  6 +++
- 4 files changed, 97 insertions(+), 1 deletion(-)
- create mode 100644 include/trace/events/sockmap.h
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a7a1d121a83e..578e16d86853 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -4420,6 +4420,7 @@ L:	netdev@vger.kernel.org
- L:	bpf@vger.kernel.org
- S:	Maintained
- F:	include/linux/skmsg.h
-+F:	include/trace/events/sockmap.h
- F:	net/core/skmsg.c
- F:	net/core/sock_map.c
- F:	net/ipv4/tcp_bpf.c
-diff --git a/include/linux/bpf_trace.h b/include/linux/bpf_trace.h
-index ddf896abcfb6..896346fb2b46 100644
---- a/include/linux/bpf_trace.h
-+++ b/include/linux/bpf_trace.h
-@@ -3,5 +3,5 @@
- #define __LINUX_BPF_TRACE_H__
- 
- #include <trace/events/xdp.h>
--
-+#include <trace/events/sockmap.h>
- #endif /* __LINUX_BPF_TRACE_H__ */
-diff --git a/include/trace/events/sockmap.h b/include/trace/events/sockmap.h
-new file mode 100644
-index 000000000000..2a69b011e88f
---- /dev/null
-+++ b/include/trace/events/sockmap.h
-@@ -0,0 +1,89 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM sockmap
-+
-+#if !defined(_TRACE_SOCKMAP_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define _TRACE_SOCKMAP_H
-+
-+#include <linux/filter.h>
-+#include <linux/tracepoint.h>
-+#include <linux/bpf.h>
-+#include <linux/skmsg.h>
-+
-+TRACE_DEFINE_ENUM(__SK_DROP);
-+TRACE_DEFINE_ENUM(__SK_PASS);
-+TRACE_DEFINE_ENUM(__SK_REDIRECT);
-+TRACE_DEFINE_ENUM(__SK_NONE);
-+
-+#define show_act(x) \
-+	__print_symbolic(x, \
-+		{ __SK_DROP,		"DROP" }, \
-+		{ __SK_PASS,		"PASS" }, \
-+		{ __SK_REDIRECT,	"REDIRECT" }, \
-+		{ __SK_NONE,		"NONE" })
-+
-+#define trace_sockmap_skmsg_redirect(sk, prog, msg, act)	\
-+	trace_sockmap_redirect((sk), "msg", (prog), (msg)->sg.size, (act))
-+
-+#define trace_sockmap_skb_redirect(sk, prog, skb, act)		\
-+	trace_sockmap_redirect((sk), "skb", (prog), (skb)->len, (act))
-+
-+TRACE_EVENT(sockmap_redirect,
-+	    TP_PROTO(const struct sock *sk, const char *type,
-+		     const struct bpf_prog *prog, int length, int act),
-+	    TP_ARGS(sk, type, prog, length, act),
-+
-+	TP_STRUCT__entry(
-+		__field(const void *, sk)
-+		__field(const char *, type)
-+		__field(__u16, family)
-+		__field(__u16, protocol)
-+		__field(int, prog_id)
-+		__field(int, length)
-+		__field(int, act)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->sk		= sk;
-+		__entry->type		= type;
-+		__entry->family		= sk->sk_family;
-+		__entry->protocol	= sk->sk_protocol;
-+		__entry->prog_id	= prog->aux->id;
-+		__entry->length		= length;
-+		__entry->act		= act;
-+	),
-+
-+	TP_printk("sk=%p, type=%s, family=%d, protocol=%d, prog_id=%d, length=%d, action=%s",
-+		  __entry->sk, __entry->type, __entry->family, __entry->protocol,
-+		  __entry->prog_id, __entry->length,
-+		  show_act(__entry->act))
-+);
-+
-+TRACE_EVENT(sockmap_skb_strp_parse,
-+	    TP_PROTO(const struct sock *sk, const struct bpf_prog *prog,
-+		     int size),
-+	    TP_ARGS(sk, prog, size),
-+
-+	TP_STRUCT__entry(
-+		__field(const void *, sk)
-+		__field(__u16, family)
-+		__field(__u16, protocol)
-+		__field(int, prog_id)
-+		__field(int, size)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->sk		= sk;
-+		__entry->family		= sk->sk_family;
-+		__entry->protocol	= sk->sk_protocol;
-+		__entry->prog_id	= prog->aux->id;
-+		__entry->size		= size;
-+	),
-+
-+	TP_printk("sk=%p, family=%d, protocol=%d, prog_id=%d, size=%d",
-+		  __entry->sk, __entry->family, __entry->protocol,
-+		  __entry->prog_id, __entry->size)
-+);
-+#endif /* _TRACE_SOCKMAP_H */
-+
-+#include <trace/define_trace.h>
-diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index 0ddc4c718833..9fb948f3b1eb 100644
---- a/net/core/skmsg.c
-+++ b/net/core/skmsg.c
-@@ -9,6 +9,7 @@
- #include <net/tcp.h>
- #include <net/tls.h>
- #include <trace/events/sock.h>
-+#include <trace/events/sockmap.h>
- 
- static bool sk_msg_try_coalesce_ok(struct sk_msg *msg, int elem_first_coalesce)
- {
-@@ -904,6 +905,7 @@ int sk_psock_msg_verdict(struct sock *sk, struct sk_psock *psock,
- 		sock_hold(psock->sk_redir);
- 	}
- out:
-+	trace_sockmap_skmsg_redirect(sk, prog, msg, ret);
- 	rcu_read_unlock();
- 	return ret;
- }
-@@ -975,6 +977,7 @@ int sk_psock_tls_strp_read(struct sk_psock *psock, struct sk_buff *skb)
- 		ret = bpf_prog_run_pin_on_cpu(prog, skb);
- 		ret = sk_psock_map_verd(ret, skb_bpf_redirect_fetch(skb));
- 		skb->sk = NULL;
-+		trace_sockmap_skb_redirect(psock->sk, prog, skb, ret);
- 	}
- 	sk_psock_tls_verdict_apply(skb, psock, ret);
- 	rcu_read_unlock();
-@@ -1084,6 +1087,7 @@ static void sk_psock_strp_read(struct strparser *strp, struct sk_buff *skb)
- 		skb_bpf_set_strparser(skb);
- 		ret = sk_psock_map_verd(ret, skb_bpf_redirect_fetch(skb));
- 		skb->sk = NULL;
-+		trace_sockmap_skb_redirect(sk, prog, skb, ret);
- 	}
- 	sk_psock_verdict_apply(psock, skb, ret);
- out:
-@@ -1107,6 +1111,7 @@ static int sk_psock_strp_parse(struct strparser *strp, struct sk_buff *skb)
- 		skb->sk = psock->sk;
- 		ret = bpf_prog_run_pin_on_cpu(prog, skb);
- 		skb->sk = NULL;
-+		trace_sockmap_skb_strp_parse(psock->sk, prog, ret);
- 	}
- 	rcu_read_unlock();
- 	return ret;
-@@ -1211,6 +1216,7 @@ static int sk_psock_verdict_recv(struct sock *sk, struct sk_buff *skb)
- 		skb_bpf_redirect_clear(skb);
- 		ret = bpf_prog_run_pin_on_cpu(prog, skb);
- 		ret = sk_psock_map_verd(ret, skb_bpf_redirect_fetch(skb));
-+		trace_sockmap_skb_redirect(psock->sk, prog, skb, ret);
- 	}
- 	ret = sk_psock_verdict_apply(psock, skb, ret);
- 	if (ret < 0)
--- 
-2.47.1
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
 
 
