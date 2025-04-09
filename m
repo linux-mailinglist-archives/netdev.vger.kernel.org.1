@@ -1,134 +1,141 @@
-Return-Path: <netdev+bounces-180724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAE36A82463
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 14:10:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ADFBA8247A
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 14:14:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB58E1BA18A7
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 12:10:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F3824E2550
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 12:11:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25ED725F780;
-	Wed,  9 Apr 2025 12:09:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64BC325E831;
+	Wed,  9 Apr 2025 12:11:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="aGIjfjn3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E1CD25E476
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 12:09:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B005125E478;
+	Wed,  9 Apr 2025 12:11:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744200554; cv=none; b=lIldOwvFUvrRZpk4bBFyNGI9kbRIFhiquAKVFlS9J457NL0UVU2heUzY6Rf+kdcQ7oG4ZelAjVGJTc8Br0BVClykc4vXHmxg1C60r9zjnqdt4UVkzf83xQpT1qh3Da+ndp+TZ6pSyIcfogqSyqu/zsIY4iDCKg87W3GeYq4nUPE=
+	t=1744200689; cv=none; b=nri36556H9k+wmSAoJuh9X8wJRsLZ6Z4u3QWmw1NehRpsTQhKY6denwyEVwH9rkp0mW9YYZIGklOqii3dftPO8fvepNwgcG59abV5PVCvO9rT0xRBQafq80OHmRsPYuEtLZvTvqTbXaOQNqxBonB2ackbU24ZI4e1sXwy1QOLT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744200554; c=relaxed/simple;
-	bh=ugJn329Q4SAyP1D2vejqkWdr9MT1ubLwE1DlABoJEwI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lJ64+Gcegi12Im6iDnihTReoibE1wdEPm4QCGhugZ5rH0y5Eh4fEAm1LDSqfEWciijo4m3MwnKqacFadF7dcLTG7RZNTrozTT7694Vvwy929xRGbY2LfhERkk9dmUirbC5AadSq0da5quqQgn8KOsP6cEJ6N1mq+PrfwEqjXBWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.43] (g43.guest.molgen.mpg.de [141.14.220.43])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 8208C61E64799;
-	Wed, 09 Apr 2025 14:08:26 +0200 (CEST)
-Message-ID: <55ae83fc-8333-4a04-9320-053af1fd6f46@molgen.mpg.de>
-Date: Wed, 9 Apr 2025 14:08:26 +0200
+	s=arc-20240116; t=1744200689; c=relaxed/simple;
+	bh=KLkilOFKphTG8GxrVVGT0sc7EkGHKSwqaU/iaMs8KFE=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sdMBzSZWllw1md0yJ7KErK2RwpI5TRwLxJc/+2FX5l2C+cgj/ELiZWNYN981o04U0yv/IUPWNU5mQLQdwRSkHNCcdBaXIlScI+mtTIMCZg295u8gg5PQt3dncDw2uEnqMcqsN7EPW1ZHu3EZJhGViZpWidPouJr4B37axbY9rD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=aGIjfjn3; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:To:From:Date:From:Sender:Reply-To:Subject:Date:
+	Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=SwQ+6WD97tage8nC5az+Ng5lCMDKmy/g4EcXjscUpEE=; b=aGIjfjn3R6ScS9Q5FdZiUvq6Wf
+	Ur7mm5wUpuUgaJ06zoiCZLOGQnr/NcIAL1nrk+XU+n6t464bkXcNeCesT8foGREwviTVk+t5pzZaB
+	P3gMdQgNFfSlOOOYtfUUDOEmChaGOB2v3HQLOs0i1TIjijdehy32n91vN5Xpnm5DiLrs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u2UGv-008X8R-4I; Wed, 09 Apr 2025 14:11:13 +0200
+Date: Wed, 9 Apr 2025 14:11:13 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	linux-renesas-soc@vger.kernel.org,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [RFC PATCH net-next] net: phy: marvell: support DT
+ configurations with only two LEDs
+Message-ID: <0fe35fe3-b63c-478b-9674-a2522f582167@lunn.ch>
+References: <20250408063136.5463-2-wsa+renesas@sang-engineering.com>
+ <7f706127-aa48-4385-a7b8-f016e0ba52b7@lunn.ch>
+ <Z_YZ3NiXb15wgDuY@shikoro>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next 1/2] ice: add link_down_events
- statistic
-To: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- Michal Kubiak <michal.kubiak@intel.com>
-References: <20250409113622.161379-2-martyna.szapar-mudlaw@linux.intel.com>
- <20250409113622.161379-4-martyna.szapar-mudlaw@linux.intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250409113622.161379-4-martyna.szapar-mudlaw@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z_YZ3NiXb15wgDuY@shikoro>
 
-Dear Martyna,
-
-
-Thank you for your patch.
-
-Am 09.04.25 um 13:36 schrieb Martyna Szapar-Mudlaw:
-> Introduce a new ethtool statistic to ice driver, `link_down_events`,
-> to track the number of times the link transitions from up to down.
-> This counter can help diagnose issues related to link stability,
-> such as port flapping or unexpected link drops.
+On Wed, Apr 09, 2025 at 08:55:24AM +0200, Wolfram Sang wrote:
+> Hi Andrew,
 > 
-> The counter increments when a link-down event occurs and is exposed
-> via ethtool stats as `link_down_events.nic`.
-
-It’d be great if you pasted an example output.
-
-> Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
-> Signed-off-by: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
-> ---
->   drivers/net/ethernet/intel/ice/ice.h         | 1 +
->   drivers/net/ethernet/intel/ice/ice_ethtool.c | 1 +
->   drivers/net/ethernet/intel/ice/ice_main.c    | 3 +++
->   3 files changed, 5 insertions(+)
+> > Please make use of the LED binding:
+> > 
+> > &mdio {
+> >         pinctrl-0 = <&mdio_pins>;
+> >         pinctrl-names = "default";
+> >         phy0: ethernet-phy@0 {
+> >                 reg = <0>;
+> >                 leds {
+> >                         #address-cells = <1>;
+> >                         #size-cells = <0>;
+> > 
+> >                         led@0 {
+> >                                 reg = <0>;
+> >                                 color = <LED_COLOR_ID_WHITE>;
+> >                                 function = LED_FUNCTION_WAN;
+> >                                 default-state = "keep";
+> >                         };
+> >                 };
+> >         };
+> > 
+> > Just list the two LEDs you have connected.
 > 
-> diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-> index 7200d6042590..6304104d1900 100644
-> --- a/drivers/net/ethernet/intel/ice/ice.h
-> +++ b/drivers/net/ethernet/intel/ice/ice.h
-> @@ -621,6 +621,7 @@ struct ice_pf {
->   	u16 globr_count;	/* Global reset count */
->   	u16 empr_count;		/* EMP reset count */
->   	u16 pfr_count;		/* PF reset count */
-> +	u32 link_down_events;
-
-Why not u16?
-
->   
->   	u8 wol_ena : 1;		/* software state of WoL */
->   	u32 wakeup_reason;	/* last wakeup reason */
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> index b0805704834d..7bad0113aa88 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> @@ -137,6 +137,7 @@ static const struct ice_stats ice_gstrings_pf_stats[] = {
->   	ICE_PF_STAT("mac_remote_faults.nic", stats.mac_remote_faults),
->   	ICE_PF_STAT("fdir_sb_match.nic", stats.fd_sb_match),
->   	ICE_PF_STAT("fdir_sb_status.nic", stats.fd_sb_status),
-> +	ICE_PF_STAT("link_down_events.nic", link_down_events),
->   	ICE_PF_STAT("tx_hwtstamp_skipped", ptp.tx_hwtstamp_skipped),
->   	ICE_PF_STAT("tx_hwtstamp_timeouts", ptp.tx_hwtstamp_timeouts),
->   	ICE_PF_STAT("tx_hwtstamp_flushed", ptp.tx_hwtstamp_flushed),
-> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-> index a03e1819e6d5..d68dd2a3f4a6 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_main.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
-> @@ -1144,6 +1144,9 @@ ice_link_event(struct ice_pf *pf, struct ice_port_info *pi, bool link_up,
->   	if (link_up == old_link && link_speed == old_link_speed)
->   		return 0;
->   
-> +	if (!link_up && old_link)
-> +		pf->link_down_events++;
-> +
->   	ice_ptp_link_change(pf, link_up);
->   
->   	if (ice_is_dcb_active(pf)) {
-
-The diff looks good.
+> Been there, didn't work. This is what I had:
+> 
+> 	mdio {
+> 		#address-cells = <1>;
+> 		#size-cells = <0>;
+> 		compatible = "snps,dwmac-mdio";
+> 
+> 		phy_mii0: ethernet-phy@8 {
+> 			reg = <8>;
+> 			leds {
+> 				#address-cells = <1>;
+> 				#size-cells = <0>;
+> 				led@0 {
+> 					reg = <0>;
+> 					color = <LED_COLOR_ID_GREEN>;
+> 					function = LED_FUNCTION_LAN;
+> 					default-state = "keep";
+> 				};
+> 
+> 				led@1 {
+> 					reg = <1>;
+> 					color = <LED_COLOR_ID_AMBER>;
+> 					function = LED_FUNCTION_ACTIVITY;
+> 					default-state = "keep";
+> 				};
+> 			};
+> 		};
+> 	};
+> 
+> I played around with LED_FUNCTION_* values.
 
 
-Kind regards,
+Function is just to do with naming. What you want is to add
 
-Paul
+linux,default-trigger = "netdev";
 
+and ensure you have drivers/leds/trigger/ledtrig-netdev.c in your
+kernel.
+
+You should then find that you gain an LED directory per LED in sysfs,
+trigger has [netdev] and there are additional files you can use to
+configure when the LED lights/blinks for different link speeds, RX and
+TX etc.
+
+	Andrew
 
