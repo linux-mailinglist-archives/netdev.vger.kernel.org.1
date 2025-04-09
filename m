@@ -1,179 +1,122 @@
-Return-Path: <netdev+bounces-180845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB41FA82B26
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 17:51:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1E9DA82B52
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 17:54:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD7D29A1B49
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 15:44:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B0C57B5138
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 15:53:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03F32267F4C;
-	Wed,  9 Apr 2025 15:44:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 556FD26E14E;
+	Wed,  9 Apr 2025 15:48:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=universe-factory.net header.i=@universe-factory.net header.b="Aafp1mcA"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="PphQyRZr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.universe-factory.net (osgiliath.universe-factory.net [141.95.161.142])
+Received: from mout.web.de (mout.web.de [212.227.15.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BC3525DCE2;
-	Wed,  9 Apr 2025 15:44:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.95.161.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89D226B96C;
+	Wed,  9 Apr 2025 15:48:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744213450; cv=none; b=r9NrrpUJ20NdK1i7s5aAK4UeoqgpSS4aHjMhz+Ng345u5lDgW2lJdCdt5eiep77hNxLmCHcgDNCBdP4GRLYyul6xiT+ExjDIikaY3xM1GS8pHOKi6Rh/b0xL4570lVDoPfxUiQ+BYGK08wrvxO/mVa0rfL5tF9Wp04keyQVahpA=
+	t=1744213701; cv=none; b=q84Zk1EG6wD4o9oXXqlNYadOfQ4yaC52tKk94Meuv/EUpu9GZscDBYwKrICDlqPY+Oa14mhnBzYQcnmF7rTOPqjnI8CjQ4H//q789kHErFE28c5+G0JTgWAIYb1mPmfKr4Pbx7KbrkMDaAMWleTIHlmbR0nBM4JIGl6O9O2Z9Tc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744213450; c=relaxed/simple;
-	bh=ByunKrilyL48d/c5MjnZJh9souP+RihV9Ah6M47bueA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Jr9UutlP/6qmfsIEGvF5S2yGmAyO+rfAvS2+MzQHvm/pZBzcziDU/dv1Js87L9xu0PlBurwfS0wRlH2kJRrPlLOOO0HRwwkm6SzDTF7deC18B+KJvrhwoqQBK4LAz4Uzt3L8vHszCs0pIuCFqRC8P3Kbu6KJIlreGuCMPpHxLsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=universe-factory.net; spf=pass smtp.mailfrom=universe-factory.net; dkim=pass (2048-bit key) header.d=universe-factory.net header.i=@universe-factory.net header.b=Aafp1mcA; arc=none smtp.client-ip=141.95.161.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=universe-factory.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=universe-factory.net
-Message-ID: <3615fa6f-a837-4b4d-a987-52245710d84e@universe-factory.net>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=universe-factory.net;
-	s=dkim; t=1744213443;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=ByunKrilyL48d/c5MjnZJh9souP+RihV9Ah6M47bueA=;
-	b=Aafp1mcAiZH8DXqq0kdvvMDJv8NFT22AjB8NsPBEnvZADRi2tSeY4Enyq2XH9UJyrQLknZ
-	2kf2xqN1Flc9CKMmrI6Yh2sl5aUGLb+uQDHLsBrsBkLflX+6fk1bayRUjV++iEK14OVkVK
-	nwrLpa5DFraGh3nafaK/k+3QpQttUQkboHxm0Agt9x+i7WZ7JJ1abptJnIzMk+v5Gh5ydI
-	EzdrKKwIElEwsqu5TXbRTsArPxydkKbAMQgZ8wIq/F094d0mBFlgciSg0WBz8KvKEhfhxd
-	eRatMIdeFfsQgZqQC3aKxotH8tgUdbK9lRySvz6dT1GcST9KmRhNF2lOwfIhUA==
-Authentication-Results: mail.universe-factory.net;
-	auth=pass smtp.mailfrom=mschiffer@universe-factory.net
-Date: Wed, 9 Apr 2025 17:44:02 +0200
+	s=arc-20240116; t=1744213701; c=relaxed/simple;
+	bh=j0V1wck0xZxzCc/1mxSTxnQIbGt4ju3zFjXLX5tgr00=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=F5DmYSJGAqKa1AbyBSL1nxJItVy94nB0WGZ9ZMXNtxBxDJIBmO2SFRigLEb+I+F4M575WYxGuq153SjhCMzuwXLoy7aTUOfK27x/8fhjT+0T/8cw6DCo7Nisa8pBJ5CkfcrxWYuWh9GfXIU1FMttsB3aRlizMOWTA96UHhbOCZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=PphQyRZr; arc=none smtp.client-ip=212.227.15.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1744213668; x=1744818468; i=markus.elfring@web.de;
+	bh=ib4IhZGD0jDk7BbJKX7gsQ/I7ag9tHI6LBdrJijgTZw=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=PphQyRZrLM0QJHWznf39jSzf6Rilc4KAvbHUs7zYJgtsz5wJaR4X50gETr2jWLNe
+	 j7GdHkUeGfHCSakW7TV/H4TkA0R5SJohjqZC60EoEgOgDNbxnk7m5hN7WKnXiW6dL
+	 K6DhDKIHDknR1yRa0GkkFvdCJnHIdGduwKqqpfsfIkufHjhcBRRVnaDPxCVyKXuci
+	 wf+4ypFqU/1T+MalFV7rFE/eMRHTAsZhUIElfQLcOypEpSfWyC4+TxuFyMtFDsiLF
+	 ta7H6N/nNqjbiOzrcnB03HG+VjkPRTsx/1XjohTlTM+w2HhS5I20nki94yW2ONfKd
+	 D8Z1wZ+l+/y0QGvUOw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.29] ([94.31.70.27]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1Myezp-1t8dib0fHR-015vDX; Wed, 09
+ Apr 2025 17:47:48 +0200
+Message-ID: <5cb34dde-fb40-4654-806f-50e0c2ee3579@web.de>
+Date: Wed, 9 Apr 2025 17:47:46 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next] net: batman-adv: constify and move broadcast
- addr definition
-Content-Language: en-US-large
-To: Sven Eckelmann <sven@narfation.org>,
- Marek Lindner <marek.lindner@mailbox.org>,
- Simon Wunderlich <sw@simonwunderlich.de>,
- Antonio Quartulli <antonio@mandelbit.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- b.a.t.m.a.n@lists.open-mesh.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <c5f3e04813ff92aca8dddc7e1966fe45fca63e56.1744127239.git.mschiffer@universe-factory.net>
- <2789676.Lt9SDvczpP@ripper>
-From: Matthias Schiffer <mschiffer@universe-factory.net>
-Autocrypt: addr=mschiffer@universe-factory.net; keydata=
- xsFNBFLNIUUBEADtyPGKZY/BVjqAp68oV5xpY557+KDgXN4jDrdtANDDMjIDakbXAD1A1zqX
- LUREvXMsKA/vacGF2I4/0kwsQhNeOzhGPsBa8y785WFQjxq4LsBJpC4QfDvcheIl4BeKoHzf
- UYDp4hgPBrKcaRRoBODMwp1FZmJxhRVtiQ2m6piemksF1Wpx+6wZlcw4YhQdEnw7QZByYYgA
- Bv7ZoxSQZzyeR/Py0G5/zg9ABLcTF56UWq+ZkiLEMg/5K5hzUKLYC4h/xNV58mNHBho0k/D4
- jPmCjXy7bouDzKZjnu+CIsMoW9RjGH393GNCc+F3Xuo35g3L4lZ89AdNhZ0zeMLJCTx5uYOQ
- N5YZP2eHW2PlVZpwtDOR0zWoy1c0q6DniYtn0HGStVLuP+MQxuRe2RloJE7fDRfz7/OfOU6m
- BVkRyMCCPwWYXyEs2y8m4akXDvBCPTNMMEPRIy3qcAN4HnOrmnc24qfQzYp9ajFt1YrXMqQy
- SQgcTzuVYkYVnEMFBhN6P2EKoKU+6Mee01UFb7Ww8atiqG3U0oxsXbOIVLrrno6JONdYeAvy
- YuZbAxJivU3/RkGLSygZV53EUCfyoNldDuUL7Gujtn/R2/CsBPM+RH8oOVuh3od2Frf0PP8p
- 9yYoa2RD7PfX4WXdNfYv0OWgFgpz0leup9xhoUNE9RknpbLlUwARAQABzTJNYXR0aGlhcyBT
- Y2hpZmZlciA8bXNjaGlmZmVyQHVuaXZlcnNlLWZhY3RvcnkubmV0PsLBlwQTAQoAQQIbAwUL
- CQgHAwUVCgkICwUWAwIBAAIeAQIXgAIZARYhBGZk572mtmmIHsUudRbvP2TLIB2cBQJk6wEu
- BQkV4EbpAAoJEBbvP2TLIB2cjTQQAOE1NZ9T2CCWLPwENeAgWCi+mTrwzz2iZFYm9kZYe13f
- ZmeGad30u6B57RW24w3hp6uFY764XTHo8J0pLveYSg9zxgrMZp1elWp4Pnmyw7tosJuxmb7V
- cE4zeW74TZmP653Li12OZGVZ863VDpDN5cTTdm/t1pOp0cnZlLHo3OtGemxdOFd0MSauYAqF
- htvM3TbWdnGonnMblKX8cSRwW5FUzOwJ+KuF7KsYxQCAEQkWwd1gmevPISpXpvIDicyPgK5w
- ToS3MKayMKf0iFIFCzRwLZAzVhVY987yPaUPwyY6pzozNYla4OTLnXQaXQlLeiP9EgMF2UXT
- kI345ZnCcyG66uY3eZv1taRWt+IfguPQo8eVdAZDWVh9LZ3nCw/gobfKFr+tk0c1bqCm0N3m
- pBWB+d+EmBVaW4YkZWGxgt0nje76791qI5s5xtr+IqaxBUmA1W6SIvz4kfzsvt6xeM6rgrrY
- M9R9mF2Vrc84cHbIRt69ScmvSo5da7Cpi/evQtG9rdSPb3ycCfFptxfaTnxrxSQw1i7Uw+O1
- OmsETE/ThAFRuqO5wp4Pf0D788bdWP/Pc5/n9nARmJ9xOV46UHiLV4KmMBVY+VE8TJbZoqc/
- EpLnpknTpNOteJ5+DVYQ/ZV+mWv56nwOpJS+5CV/g1GEGzRf6ZVZMDYl9lC4NcnWzsFNBFLN
- IUUBEADCFlCWLGQmnKkb1DvWbyIPcTuy7ml07G5VhCcRKrYD9GAasvGwb1FafSHxZ1k0JeWx
- FOT02TEMmjVUqals2rINUfu3YXaALq8R0aQ/TjZ8X+jI6Q6HsHwOdFTBL4zD4pKs43iRWd+g
- x8xYBb8aUBY+KiRKP70XCzQMdrEG1x6FABbUX9651hN20Qt/GKNixHVy3vaD3PzteH/jugqf
- tNu98XQ2h4BJBG4gZ0gwjpexu/LjP2t0IOULSsFSf6S8Nat6bPgMW3CrEdTOGklAP9sqjbby
- i8GAbsxZhjx7YDkl1MpFGxlC2g0kFC0MMLue9pSsT5nwDl230IxZgkS7joLSfmjTWj1tyEry
- kiWV7ta3rx27NtXYnHtGrHy+yubTsBygt2uZbL9l2OR4zsc9+hLftF6Up/2D09nFzmLKKcd5
- 1bDrb+SMsWull0DjAv73IRF9zrHPJoaVesaTzUGfXlXGxsOqpQ9U2NjUUJg3B/9ijKGM3z9E
- 6PF/0Xmc5gG3C4XzT0xJVfsKZcZoWuPl++QQA7nHJMbexyruKOMqzS273vAKnTzvOD0chIvU
- 0DZ/FfJBqNdRfv3cUwgQwsBU6BGsGCnM0ofFMg7m0xnCAQeXe9hxAoH1vgGjX0M5U5sJarJA
- +E6o5Kmqtyo0g5R0NBiAxJnhUB0eHJPAElFrR7u1zQARAQABwsF8BBgBCgAmAhsMFiEEZmTn
- vaa2aYgexS51Fu8/ZMsgHZwFAmTrAV8FCRXgRxoACgkQFu8/ZMsgHZwE0A/+PCYHd4kl/oPK
- Kqv9qe89fEz4s8BSVmX+Aq/u52Fl373rcVWpGjokzYDr7jhUHMLEYJcAdmv5AXIbee6az6ip
- OgshW3/rVRRXTgh+DkQMyQZPTHDbB7o9JLcXQ1ehZeEzI8u+HxvWE+Anoquz8Ufsd/3RttgQ
- 6HPHSiIogzDizVGxUEPhxFvcH/KlSTTtcmS126Kng2AWs5StE7BW53/cukTLfBR0IGBH1Uwv
- NqDMomXBOifAkv29LFf6qJJkgKA56eiMtUgVjYMgDm9KFOIwDV7J0tNHLqIc0zZEJF+BtxZM
- 8tAhPi930wDK4Lcx3TkSNa5/yhmSSnOtLL+YU7R/Gqx24gEeZ0ceMW6A4I6qVrgd3X8pKSYr
- DzqfF/m+ODQeCiSUKtqUa1Kyx736txQ8/Y1DvfXqglIIcF2yiLYpxdHNrNsIC6Me0lEWrFel
- C/dkbUrddrlCOReulvhn1Qve+zh7UC9gLeN6ZkneRgTb6G9NZQhkssXV7ZKXGzn26tzwAgSy
- Ezh+M8kMylL84WE2TkQKo59oqMV7scWcrcY801Lhurb636ZJ/ebMd4bn+eAzwURaeqzScZ2b
- hg1eFj1e0ZkaSVyAu9gBCzuRUnbZ4TiC8/mFfg7HxTnbOSPYI6TrNPFzuzf1NDPLXRXV+rcY
- cQqe8eRmcdNdqWSiJQ8VLoI=
-In-Reply-To: <2789676.Lt9SDvczpP@ripper>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------60iJOc5p1wrpyh3HgNkqvD71"
-X-Spamd-Bar: ----
+User-Agent: Mozilla Thunderbird
+To: Abdun Nihaal <abdun.nihaal@gmail.com>, netdev@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Potnuri Bharat Teja <bharat@chelsio.com>,
+ Rahul Lakkireddy <rahul.lakkireddy@chelsio.com>,
+ Vishal Kulkarni <vishal@chelsio.com>
+References: <20250409054323.48557-1-abdun.nihaal@gmail.com>
+Subject: Re: [PATCH net-next] cxgb4: fix memory leak in
+ cxgb4_init_ethtool_filters() error path
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20250409054323.48557-1-abdun.nihaal@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:1xqDJl4bH+XFPfuPRah1CtMfk+/ByhWXB5sJOzItbSfnuvd0Pzv
+ UNaF+GjwpBNyJftGdjrggJKgW1f/10Hja17KXE2HA2Lp3jHjIZbb+v3cDo5r9g9W4ibgxz8
+ PSBbvthRJzf3UMZvlVEJp8K7FOKjqESI2tPOcZ+56N85w8H5x/VMrSFpcmRhBLf3FdpLj3R
+ wmh/lVNrkM3kjwM0l805w==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:D+BS8iXSyUI=;xhZPwpxhixT66Q2KZJQn0Iv+V81
+ 4HIoqNLoSbdWHkOFD9s6QQMRH9UGDl12ZPx/xGSFQmZXClVYM6S0x3wVjFqdY8aMNy4yYjszA
+ pYO+aEJxeMECjkKTV2Aihtqnj+mQqDIVFByYZIMNjyz1QBcn1d5V+uSEt3seE8paeQlBJi9ET
+ VNZ6QRQSQ5wagBH+uT0PVaObSB+uKIts1T2dRNODeUmWXyi46Y+ptLo3SHbbuwE3+qY31aJtD
+ KeoE99Nt8X26vQLsRXzWR4P7+MVKMQUzW210u3rGQ7idtRemZ/J+BboQKkWQhsCHnzGZFooU3
+ VEQaAV5XUC2h5gcFUDW6YUi8rvhIdqhgFGyALM59/R/hrkBWC33UtBzPPl9g5zu6YUUL0YD53
+ ysWuSgRRMp4xdMfG8nS+JnXWJK3w/TSc9XUzA8VeF7LJrellyo1tfTsV5I6CXNSj8So8S1lpG
+ 2Gy7BM3eh34L7ew52vLypD6GaFdEAoNZRIhFvoLJxR/Zf+Or1X9NtpbXzqeuEVLvH+Qs5zZnC
+ Yi74BRrF4+Rbncl+/o90IjTz7rguekR4BQ8ixFZa96UhikvoMRfcVkB2iJqvzthb+DWqrDx7K
+ eWwo6LVLmQkskQP27wLfOtmY90znR4LUx9pEfLnOOCGZx8iemkWDbOBi/qzhm1+itoZohVOg6
+ TbQXY5eWOjChW/CHrf+vmLhKgIPR4Bs4UqxT5CMqQZvnfPuC01WRl5ZTJMupGJQF2RlQUknLP
+ VGX68hn87jCFGSg7gQYnRKL2LHR3fUuOIc7biIwp2xPdvmbEHITIEaXK4eP3J+FEaCxkvk2KO
+ BNha2Pta5ddpotcGKL77Q9TeiukmbyV2gn63w+C8UTNeXIxGgajB5Ej0DmatBaUAxyFxOc9lW
+ QYyRwNTDLP1XaGvDGoPtGxzFHp9XIghvTZaYXOBkpGwL2l9ryh+q17+UrEkT8OLqU4v+ttn3I
+ YFtwfCez0m9VjIrYvxrZAZ1Xaa7rOGiL0WbH5RODy4D22LGTLTQ3hO7k0JX/5ypq4oJ3B170v
+ TrW58OPPYsC7TTbNIfJeJeVx3iHGHp4U89ZVsQq5uUDtG1GGFS2L7tZV741ed/ii+x/89ezT9
+ 3uSFlNnCiMwiGubK7ahO/B4QiQorRu1JUJCoa9ErzUOF8LqjjY+/yS6uk/Zp4wi6h51JggqYm
+ TentKtqRpzsSai/qogjV+pd9eecj6Pw9RC/OTpm9kRxqZBmGD32C4erKgWUPEK99+2d0cLJnF
+ FwC13RJPWGFZaDubV1GlRUg4X6UVXvSVKDzS+4MFeDBvmk14J4nANrj8btECCCLCapUSMpwff
+ i9OflMJfzzCKNxYD1+JECjzr4zryJocuEYYBJyJIrb77ZkRrQpgOzJYDUROYz61ZLXoy1bjUI
+ dBHnC3DyzjVz1wEua3M/B4/jqWXHnamt22eg/vGzbyXdPh203CFqn6tRjR+UINPfYaW6tI1bs
+ vscc9ckHHk6vWLM3BKOAq6jEXUSmgQWSF8xfZNhTrJqmYgWfQazJpRPs7Z2P9jkgOiKacDS0A
+ JeDzrdVzL89lxj32ucA=
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------60iJOc5p1wrpyh3HgNkqvD71
-Content-Type: multipart/mixed; boundary="------------so68tEQeyh9weA1bi63OW1xD";
- protected-headers="v1"
-From: Matthias Schiffer <mschiffer@universe-factory.net>
-To: Sven Eckelmann <sven@narfation.org>,
- Marek Lindner <marek.lindner@mailbox.org>,
- Simon Wunderlich <sw@simonwunderlich.de>,
- Antonio Quartulli <antonio@mandelbit.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- b.a.t.m.a.n@lists.open-mesh.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Message-ID: <3615fa6f-a837-4b4d-a987-52245710d84e@universe-factory.net>
-Subject: Re: [PATCH net-next] net: batman-adv: constify and move broadcast
- addr definition
-References: <c5f3e04813ff92aca8dddc7e1966fe45fca63e56.1744127239.git.mschiffer@universe-factory.net>
- <2789676.Lt9SDvczpP@ripper>
-In-Reply-To: <2789676.Lt9SDvczpP@ripper>
+=E2=80=A6
+> +++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_ethtool.c
+> @@ -2270,6 +2270,7 @@ int cxgb4_init_ethtool_filters(struct adapter *ada=
+p)
+>  		eth_filter->port[i].bmap =3D bitmap_zalloc(nentries, GFP_KERNEL);
+>  		if (!eth_filter->port[i].bmap) {
+>  			ret =3D -ENOMEM;
+> +			kvfree(eth_filter->port[i].loc_array);
+>  			goto free_eth_finfo;
+>  		}
+>  	}
 
---------------so68tEQeyh9weA1bi63OW1xD
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+How do you think about to move the shown error code assignment behind the =
+mentioned label
+(so that another bit of duplicate source code could be avoided)?
 
-T24gMDkvMDQvMjAyNSAxMDoxMCwgU3ZlbiBFY2tlbG1hbm4gd3JvdGU6DQo+IE9uIFR1ZXNk
-YXksIDggQXByaWwgMjAyNSAxNzo1MzozNiBDRVNUIE1hdHRoaWFzIFNjaGlmZmVyIHdyb3Rl
-Og0KPj4gKyAgICAgICBjb25zdCB1OCBicm9hZGNhc3RfYWRkcltdID0gezB4ZmYsIDB4ZmYs
-IDB4ZmYsIDB4ZmYsIDB4ZmYsIDB4ZmZ9Ow0KPiANCj4gU2hvdWxkIG1vc3QgbGlrZWx5IGJl
-ICJzdGF0aWMgY29uc3QgdTggLi4uIg0KPiANCj4gKGNoZWNrcGF0Y2ggU1RBVElDX0NPTlNU
-X0NIQVJfQVJSQVkpDQo+IA0KPiBLaW5kIHJlZ2FyZHMsDQo+IAlTdmVuDQoNClRoYW5rcywg
-d2lsbCBzZW5kIGEgdjIuIFRoZSBjaGVja3BhdGNoIGNoZWNrIG9ubHkgbG9va3MgZm9yIHN0
-cmluZ3MsIG5vdCANCmFycmF5cyBkZWZpbmVkIHdpdGggeyB9LCBzbyBpdCBkaWRuJ3QgdHJp
-Z2dlciBmb3IgbWUuDQoNCkJlc3QsDQpNYXR0aGlhcw0K
-
---------------so68tEQeyh9weA1bi63OW1xD--
-
---------------60iJOc5p1wrpyh3HgNkqvD71
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wsF5BAABCAAjFiEEZmTnvaa2aYgexS51Fu8/ZMsgHZwFAmf2lcIFAwAAAAAACgkQFu8/ZMsgHZxu
-fRAA02x0QMxxvLVurZGGbh1sjKGPgMeRcQwSoO6e516iXhjjlhali0f3Z+xVxSpPw9Hjg4OX/vs3
-tupMNvLjFTizfw11jyTjQirrID8J813n1yRc+hJEayjEvhbrv5+nUGDUANiasAoASuikE7ah34jY
-WIOrt4qD38EHEvbwRVFz0YUZqfGFDrJ/l3t+/wm24VFVFMHXLVLVcn8qJmfoCdAKmKP2Qh1HMqVG
-OLNwiwMo5CBUYx0yhN/RzdU5F0660Q+CUT2ws1GN/MejfcqLUvwl4ol3RpM3heewLhPU2ArRJy+2
-QBaN+mVZJK4LL3P+wtgeL+0FUxiJelIfDFaLrBg0fcuUnfgenkKPcwaHc4lzBqNPcdJJ20sCP4Go
-In0Vz4WpgtV4HIAz4659tqxo3YkDrHSMiyE2p903AoTxTUn8hT+TpK8VacfaOjqcyMUKtkXHwSze
-FGS09DJlQMiYCxbIRUzKNM6MkvCbBQaB5CuG+sJX5RDl6rDsZTXMX/PjvmTzKPPvwDMEln9QO+xz
-l9bhOGi3FBQ3/OsXOwuCyenPtwRGfh/ZLkAwOIB9LPEmqq0HXO5EgcuuAomHfuiFw1Kd9gov6wcN
-L7Phl4l0HrHLKGcIXQtZkfdqnbNJ1MTeVBBjkaiq1UqLQXbEJL6q1nll8QrFNVXcRXkAnw+U7GQa
-IV8=
-=xF61
------END PGP SIGNATURE-----
-
---------------60iJOc5p1wrpyh3HgNkqvD71--
+Regards,
+Markus
 
