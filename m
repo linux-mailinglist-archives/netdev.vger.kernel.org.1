@@ -1,148 +1,204 @@
-Return-Path: <netdev+bounces-180819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F7FBA829A0
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 17:12:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20A78A82947
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 17:05:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73A389A0947
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 14:58:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D2A57B5AFA
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 14:58:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5AC7278154;
-	Wed,  9 Apr 2025 14:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED78D26B2A3;
+	Wed,  9 Apr 2025 14:54:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MbDbNWX6"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="SmByAWa+"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2348527781B
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 14:51:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE2926B098
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 14:54:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744210298; cv=none; b=j9tQ/vS1vTUnWhBuDVGmVwnN4ufsmRFzDBw0kGpX3qcIbsk7rsSCRxceeIqc8SGMeSjFlsQIb9DFx85NOFDCasi530a9P6I+slvnPcwTjXSVmKtC0m1Iayvr8hkU4EUM8K6sBvjHJ8sjhqdEpoBkRcUu07bzDKcCGmYo9Xn9f0U=
+	t=1744210455; cv=none; b=Sx4IllKoFvvA8wp/dTo1RrYXJPNp8a4XHU8zk11uJtGRIMJ4FaopF/YqMGQrXyl95Q+EgdRRDRuTZy49WiRio7Vn9LXB+/QOFfoPwzvSH4iXN8zT0yyLmXq+Qr/s4CKo2Pku9xwh00hKpoZwais/G4Gu6ghei3q+M++NRtnmA+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744210298; c=relaxed/simple;
-	bh=4DUob6+eMdIz5RoHjq05jW8GZiksk7IQ/Wo8KKlT220=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kNaQ05gjuaBfgVwwo4e1l9R+orrMWJhP+8kjLHBloTgy0XFJVshu1fiHfV6ZYxrSu56qrcEPpPQG2ZBQ8jOBk0F8F3F/9VJFapBSWYs7u6V6+xj0cYB4IsFn9TmAItikve1owp/JEvkYjs15zS0P0cp6Ta+AdR/sjFPqFwFcPEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MbDbNWX6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744210294;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=WBh/oxXtw+maKeUB3gFYpOwHzm3sbyiLyYnxbG7BaBM=;
-	b=MbDbNWX6/p8oo76LjHxXMDBXIz2MDL+8WpCWatrfoinomvDLUhwi5Cfqb6+cRflSTD3MYo
-	c12ZbTQIYxZ6WT2nkyYRcNclz9aimGIeH2R0Wp54ks9BeW6xZDWpGqzHAvpN1tZMknLKr5
-	M77HZY7uZjdNt3C/RYuLWwH7wNQ2dlo=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-361-ERFNx0UfMOa83i5dvDabzQ-1; Wed, 09 Apr 2025 10:51:32 -0400
-X-MC-Unique: ERFNx0UfMOa83i5dvDabzQ-1
-X-Mimecast-MFC-AGG-ID: ERFNx0UfMOa83i5dvDabzQ_1744210290
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-ac6ce5fe9bfso149046666b.1
-        for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 07:51:32 -0700 (PDT)
+	s=arc-20240116; t=1744210455; c=relaxed/simple;
+	bh=6g0TfWDuvigbnJLDqJYb2R4PL8SRBJ82ihr5x2bmHek=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fTt5kviow5mWBu9r73QxJiDnuMQxFlY1SqF/4ArRQTgbDhC1nloz+5TsLZVfqKG3SFPu42nAKrSaM7gT4F6LJQU2jmutHycD3Djv1FmqOY2u6lTdtw3i5PNnQFjhXPAQNhrV2pjRCk1drRZAMdcwr/KXHruTaWd2l9q+Hp5Aoow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=SmByAWa+; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5398d52d029098
+	for <netdev@vger.kernel.org>; Wed, 9 Apr 2025 14:54:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	2e+zhortkq1PPVBPRYcJak6GvfMLkq1x12up5ZcdsG0=; b=SmByAWa+1AfXtVKW
+	kW7NxtxG4xNKWwjKtwsoXDRknfKrd0cOocRlx/ZRWIKIALZyUZO6ev74eZtaEz8J
+	xHSw3qj7m0wyc2QaL/KMHZaTzMiFg321kMfnnwqPqJ1IGG51YE58+cc1wNmdTfGR
+	3ZBCbW/h9f00z2qK+UwPzT1U+8vG0Rf2WiVQkTuv3IoCenouGJOdl9V5rAX5MvlP
+	H/f99YsjRpjz6r971m7juzNyEPQ23qICulBfVU/MiiR/gvvzT+CgrOSrySFjEJWy
+	bNHaAzU8A1uKsKhT8Q18IiX3YOzn8gHx5Jh6SZbXnNjJiMv6CesYI4A+qjc60OZD
+	MfNUUA==
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 45twpmbmsn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 14:54:13 +0000 (GMT)
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7c53d5f85c9so162291985a.1
+        for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 07:54:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744210289; x=1744815089;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WBh/oxXtw+maKeUB3gFYpOwHzm3sbyiLyYnxbG7BaBM=;
-        b=liBtZwToxua8aGuvNUHVgP3WYu0aleNKQ1vNGg+t5y+gwM0wLz3rcO7kXaBRI+m2eS
-         zg/gV1hdCfd52ifbK4JLTDPfwWW+XI2dH1WVo2ef/SedqdVcuf4wxtqKEUTL7mMnCeIB
-         U2ZgGI+kURBzoQ2LFvWO1wAjKEiE+QuhNDERFL3SPpKowBNkXlU+9pPARaj9ZRkz1YM7
-         nHiSXE8K+z/Hv0lXPhHg1PzsmGOkXMdMal6MHzf0fK8rrPfM3NP7HVQQIDhXvXchJZF6
-         bQf9eJK/u3f99yH01vFxpacoLKi/ZO1tzIDnmRcvr1N3A0YzY+Q3ht3HtpRRfdWXPd0p
-         TBzA==
-X-Forwarded-Encrypted: i=1; AJvYcCUrmqzNPI8yh241VCT5ZvTfRQVd59eNG19gJE2Xh95VL4EqL8d5se9Nz8lEZrIRpOKCSwXSUjI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNcFrzndUZMRcRopgetafTaCBXmUa4iDOZQUZt6XHFZJe02Xtx
-	Vk/nuxbDfyOrFSDsWFmUrx6aHHWhE8iDryMRst9AQjruGgvgv1TgElbSeVnmVQhruW0E9LzYlRN
-	ALFsESwfGOoG13halr1MMyIY2d8ohhB2T2//glsJ1k0ALIC0y6V+Mew==
-X-Gm-Gg: ASbGncv5Q5goNlPuU3yTd9wl177FSNaHWbcq2hO1mtxostiNO1eBYuW8yIwrqMQhLZr
-	dauwTOeJ/+WKY2PTvB6rHA+r4jsxGZ3N/OcX97zttipHvV6+E7p15pQKJv4/z1KjzP8EKBPj4dF
-	AERQGf8Y7BF2YY8fP6jPJwh4RyLUJB5JABvCAKDsGXjv7D3wERZLFeEslkl7ZinTAI0NYQ0Q8dD
-	YIaLHsfphA+CHCvhDB8uaBOTMiyrT/rbDzmrwd/1WcwuQarPaz3IYzlDLqY2BfxFv0KrUg3VAiP
-	tX0nlr+SyfNvKN83hAEcMMSRLswFp4o3Aw2L
-X-Received: by 2002:a17:907:706:b0:ac7:95b0:d0fb with SMTP id a640c23a62f3a-aca9b6bc5f3mr342548066b.34.1744210289581;
-        Wed, 09 Apr 2025 07:51:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFy9g+DIrOAE96RAAhVeZY/4RHlv/rCrPjYfagAafONsEIrunVZvC7JorsmpzIoJdHOpPNMcw==
-X-Received: by 2002:a17:907:706:b0:ac7:95b0:d0fb with SMTP id a640c23a62f3a-aca9b6bc5f3mr342545466b.34.1744210289199;
-        Wed, 09 Apr 2025 07:51:29 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acaa1be9632sm112413866b.66.2025.04.09.07.51.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Apr 2025 07:51:28 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 6C98F19920EC; Wed, 09 Apr 2025 16:51:27 +0200 (CEST)
-From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org
-Subject: [PATCH net] selftests/tc-testing: Add test for echo of big TC filters
-Date: Wed,  9 Apr 2025 16:51:22 +0200
-Message-ID: <20250409145123.163446-1-toke@redhat.com>
-X-Mailer: git-send-email 2.49.0
+        d=1e100.net; s=20230601; t=1744210452; x=1744815252;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2e+zhortkq1PPVBPRYcJak6GvfMLkq1x12up5ZcdsG0=;
+        b=NDdlrrvFsfJWK3ux34gu06fV2N3SF+felUtg6k5JraX6nAUze39FeqZ+XUbH9elYTm
+         G6pMViYCigXvWiY+SPntKpnCCh0V199P6lQMTbTlV/dFVZzf85O5+myicAugF0gIbBsB
+         ZxXPQwGZyhRdNdQ7V0UFjtnsNogylg57eyBn0MyaPMtrQTQOHoiNoEgsoOes6Rpow9dZ
+         oqARQOoq3BgLGgRBy6H4BiokZIvronzmtdbjDs104S/AqDa37rl8NR0xfN7FIfrJ68cs
+         KEjiYN5gKSKC2alK1ufSekrjyJ95d85tReIfND+KAO40hHydwELbXTx7wQxKIIEc25Fk
+         H5OA==
+X-Forwarded-Encrypted: i=1; AJvYcCXMts/p4dbYhOaFnEkwm9o+86uX3m/tRpFZXCOQrhrR7jUKGbL6GaWVzCd4wB8YSAIrOpzBqPc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6fYsLtqOjOLbhBFjNWzRe5ls7eOizOZ4HpMKV2d48TjipN/A8
+	2ubhxPBptctnlxfMOdFRXW1cGyVrhICk4Wp0gjIobLjCiigN/BQSUkxJ+jiU7aKpSVKfqxepdDP
+	gJXssui2I1sXxkXzkK5UD9Jah8D5aoN1DrvMu6Q+ZTSEIUiDi+oSB6uU=
+X-Gm-Gg: ASbGnctct3ojbmxI+uI3bVECWwJWh8rGjlOUiUIWxbnHwe0g8g6mwUanQvaC6ztk6WM
+	Uz+4r/VLj2m+oNhk65WXHAtd1/GC0iGIiqah+lupiC0cQPBVlIYj/0Yy3Zelwgel04l18VoHcaQ
+	TmooofAAvyMsA+tOEX80VNNtDBUmhx+2sJseqiAuTvef5s2c//bqCcriYlqwpirEBddztjSt62q
+	dQcleuJeLBvWOVApHhVeAKh+zjYXJlvSsiFrgdlrqRfCNPxqUvmxk8RPXMkTNDup4Rk/QmgiWjz
+	ZRBPYixRnBx7jj84lG8BgoRjHa2V+MhsrtDQtW6S2z6a/QUvi+mYCp2G6Va7xRZR6A==
+X-Received: by 2002:a05:620a:d8d:b0:7c3:c814:591d with SMTP id af79cd13be357-7c79cbcad39mr181547985a.1.1744210451955;
+        Wed, 09 Apr 2025 07:54:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEkhEFX9jW2lxjwZtZRt5wSID+lKfDUWjDhK7POIeIFuD1YPW0A5mtnATcnc6+c78jlhAPyDg==
+X-Received: by 2002:a05:620a:d8d:b0:7c3:c814:591d with SMTP id af79cd13be357-7c79cbcad39mr181545185a.1.1744210451558;
+        Wed, 09 Apr 2025 07:54:11 -0700 (PDT)
+Received: from [192.168.65.90] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acaa1cb4142sm108209666b.101.2025.04.09.07.54.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Apr 2025 07:54:10 -0700 (PDT)
+Message-ID: <fb61323b-aabd-4661-a202-02da7da557ea@oss.qualcomm.com>
+Date: Wed, 9 Apr 2025 16:54:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/3] net: qrtr: Define macro to convert QMI version and
+ instance to QRTR instance
+To: Yassine Oudjana <y.oudjana@protonmail.com>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Lars-Peter Clausen <lars@metafoo.de>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nicolas Schier <nicolas.schier@linux.dev>,
+        Alexander Sverdlin <alexander.sverdlin@gmail.com>,
+        Sean Nyekjaer <sean@geanix.com>,
+        Javier Carrasco <javier.carrasco.cruz@gmail.com>,
+        Matti Vaittinen <mazziesaccount@gmail.com>,
+        Antoniu Miclaus <antoniu.miclaus@analog.com>,
+        Ramona Gradinariu <ramona.gradinariu@analog.com>,
+        "Yo-Jung (Leo) Lin" <0xff07@gmail.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Neil Armstrong <neil.armstrong@linaro.org>,
+        =?UTF-8?B?QmFybmFiw6FzIEN6w6ltw6Fu?= <barnabas.czeman@mainlining.org>,
+        Danila Tikhonov <danila@jiaxyga.com>,
+        Antoni Pokusinski <apokusinski01@gmail.com>,
+        Vasileios Amoiridis <vassilisamir@gmail.com>,
+        Petar Stoykov <pd.pstoykov@gmail.com>,
+        shuaijie wang <wangshuaijie@awinic.com>,
+        Yasin Lee <yasin.lee.x@gmail.com>,
+        "Borislav Petkov (AMD)" <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Ingo Molnar <mingo@kernel.org>
+Cc: Yassine Oudjana <yassine.oudjana@gmail.com>, linux-kernel@vger.kernel.org,
+        linux-iio@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kbuild@vger.kernel.org
+References: <20250406140706.812425-1-y.oudjana@protonmail.com>
+ <20250406140706.812425-3-y.oudjana@protonmail.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20250406140706.812425-3-y.oudjana@protonmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: QLVsXXplpn9x9hW-XbnoqlwJ2sGvB6iD
+X-Proofpoint-ORIG-GUID: QLVsXXplpn9x9hW-XbnoqlwJ2sGvB6iD
+X-Authority-Analysis: v=2.4 cv=MpRS63ae c=1 sm=1 tr=0 ts=67f68a15 cx=c_pps a=qKBjSQ1v91RyAK45QCPf5w==:117 a=FpWmc02/iXfjRdCD7H54yg==:17 a=IkcTkHD0fZMA:10 a=XR8D0OoHHMoA:10 a=sfOm8-O8AAAA:8 a=PIWKGJPQcB-H7wabpAUA:9 a=QEXdDO2ut3YA:10
+ a=NFOGd7dJGGMPyQGDc5-O:22 a=TvTJqdcANYtsRzA46cdi:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-09_05,2025-04-08_04,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=999 clxscore=1015 priorityscore=1501 impostorscore=0
+ spamscore=0 bulkscore=0 suspectscore=0 malwarescore=0 adultscore=0
+ phishscore=0 mlxscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
+ definitions=main-2504090093
 
-Add a selftest that checks whether the kernel can successfully echo a
-big tc filter, to test the fix introduced in commit:
+On 4/6/25 4:07 PM, Yassine Oudjana wrote:
+> Move QRTR instance conversion from qmi_interface into a new macro in order
+> to reuse it in QRTR device ID tables.
+> 
+> Signed-off-by: Yassine Oudjana <y.oudjana@protonmail.com>
+> ---
+>  drivers/soc/qcom/qmi_interface.c | 5 +++--
+>  include/linux/soc/qcom/qrtr.h    | 2 ++
+>  2 files changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/soc/qcom/qmi_interface.c b/drivers/soc/qcom/qmi_interface.c
+> index bc6d6379d8b1..cb57b7e1f252 100644
+> --- a/drivers/soc/qcom/qmi_interface.c
+> +++ b/drivers/soc/qcom/qmi_interface.c
+> @@ -14,6 +14,7 @@
+>  #include <linux/workqueue.h>
+>  #include <trace/events/sock.h>
+>  #include <linux/soc/qcom/qmi.h>
+> +#include <linux/soc/qcom/qrtr.h>
+>  
+>  static struct socket *qmi_sock_create(struct qmi_handle *qmi,
+>  				      struct sockaddr_qrtr *sq);
+> @@ -173,7 +174,7 @@ static void qmi_send_new_lookup(struct qmi_handle *qmi, struct qmi_service *svc)
+>  	memset(&pkt, 0, sizeof(pkt));
+>  	pkt.cmd = cpu_to_le32(QRTR_TYPE_NEW_LOOKUP);
+>  	pkt.server.service = cpu_to_le32(svc->service);
+> -	pkt.server.instance = cpu_to_le32(svc->version | svc->instance << 8);
+> +	pkt.server.instance = cpu_to_le32(QRTR_INSTANCE(svc->version, svc->instance));
+>  
+>  	sq.sq_family = qmi->sq.sq_family;
+>  	sq.sq_node = qmi->sq.sq_node;
+> @@ -236,7 +237,7 @@ static void qmi_send_new_server(struct qmi_handle *qmi, struct qmi_service *svc)
+>  	memset(&pkt, 0, sizeof(pkt));
+>  	pkt.cmd = cpu_to_le32(QRTR_TYPE_NEW_SERVER);
+>  	pkt.server.service = cpu_to_le32(svc->service);
+> -	pkt.server.instance = cpu_to_le32(svc->version | svc->instance << 8);
+> +	pkt.server.instance = cpu_to_le32(QRTR_INSTANCE(svc->version, svc->instance));
+>  	pkt.server.node = cpu_to_le32(qmi->sq.sq_node);
+>  	pkt.server.port = cpu_to_le32(qmi->sq.sq_port);
+>  
+> diff --git a/include/linux/soc/qcom/qrtr.h b/include/linux/soc/qcom/qrtr.h
+> index 4d7f25c64c56..10c89a35cbb9 100644
+> --- a/include/linux/soc/qcom/qrtr.h
+> +++ b/include/linux/soc/qcom/qrtr.h
+> @@ -13,6 +13,8 @@ struct qrtr_device {
+>  
+>  #define to_qrtr_device(d) container_of(d, struct qrtr_device, dev)
+>  
+> +#define QRTR_INSTANCE(qmi_version, qmi_instance) (qmi_version | qmi_instance << 8)
 
-369609fc6272 ("tc: Ensure we have enough buffer space when sending filter netlink notifications")
+Please use FIELD_PREP + GENMASK to avoid potential overflows
 
-Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
----
- .../tc-testing/tc-tests/filters/u32.json      | 22 +++++++++++++++++++
- 1 file changed, 22 insertions(+)
-
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json b/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
-index b2ca9d4e991b..67117f86fef0 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
-@@ -353,5 +353,27 @@
-         "teardown": [
-             "$TC qdisc del dev $DEV1 parent root drr"
-         ]
-+    },
-+    {
-+        "id": "33f4",
-+        "name": "Check echo of big filter command",
-+        "category": [
-+            "filter",
-+            "u32"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DEV1 parent root handle 10: fq_codel"
-+        ],
-+        "cmdUnderTest": "bash -c '$TC -echo filter add dev $DEV1 parent 10: u32 match u32 0 0 $(for i in $(seq 32); do echo action pedit munge ip dport set 22; done) | grep \"added filter\"'",
-+        "verifyCmd": "",
-+        "expExitCode": "0",
-+        "matchCount": "0",
-+        "matchPattern": "",
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 parent root fq_codel"
-+        ]
-     }
- ]
--- 
-2.49.0
-
+Konrad
 
