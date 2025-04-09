@@ -1,495 +1,256 @@
-Return-Path: <netdev+bounces-180645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EAF8A82011
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 10:32:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF615A8201D
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 10:33:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E11DB4A66AC
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 08:30:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 428431BA0DF8
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 08:32:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E55D225E457;
-	Wed,  9 Apr 2025 08:28:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AE7125D1E7;
+	Wed,  9 Apr 2025 08:31:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V+g9dQu3"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="ChIjYHvu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E8925E44D;
-	Wed,  9 Apr 2025 08:28:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CF7B25C717
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 08:31:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744187318; cv=none; b=KggyzRSn8Wtg7t7sliYo/VrBBIeYCafsnp4y2xxk4b+Es5kA20dig0C0M6Zq04LMNiNAEVe0r/gfyRaIS+AnayTlDaQJbHDr48433RkGpGDiR2ULVqfmUdLl6qOuTrklTSbPbjMC7aTHTO6RSy33opSM1YOU/Z7jYeH5cu5UN84=
+	t=1744187510; cv=none; b=cJQKIXxH7Fsx+3/RctmVoW8Ix6uDWslA+F7cmSbcfWalfSvu4eZMLoSsYONtTFBd3waqvx/1YkKM+TOoM5+VERIu4mDgVi7Ie+9qQjDsSNBZ+lKJ/EGQpclJBXMjVem9UTm4O826rgQo/Wl+h0R8Oxlu0AOkvZw/MqeXKOVdQQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744187318; c=relaxed/simple;
-	bh=RAuWVJlpPi7M3nf6Gx2Y7sgyy51HoQxUVXJ7krbJr8A=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Nur6InFiZyAZyp4KplwaZPdMi+Pzg3P5GBDguhbBNoPfMMRTOEURnDcygMe6TaD+jiVWiG469Y63DwgBo9ytFfDb7doMDrzDPH84HFrhOkag/TqN0jpewYnuQPyoqgzK2L6alHglxpzdzGc5sxd7byCgBpYfcCtTemACpO58JD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V+g9dQu3; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7390d21bb1cso6280028b3a.2;
-        Wed, 09 Apr 2025 01:28:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744187316; x=1744792116; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GLRPaGKplD8oYOPGjWmbdAprG6q5TQE2NqumKVm0Mi4=;
-        b=V+g9dQu3I8ONbYUAIU+Brne4TuNULMrfsKHFcJdKcFnolHd70K/TaijvxaVIffP4t1
-         r7CJyBG36wGwMEgYBy1ZPVU+KPXvX1Jhz2fBrWeZJKUg7oG55PLVD/eAnIT4OHTg/jQj
-         sVqf4sANmFFl9QDY+60kjJPFb26a+yp6PHml3XcWJSgognaqzOmBRqsomQJK4TFykrGY
-         CvO7Morvh0bHtx5LAKzfTkxk6UGrs/T2xDH30p13eL90Qkk0LnEHAqEq8qahVdbACHn3
-         9hLfljO4RiJHVMo+x1ThdvWFo4H6mUMI1l4qMWPcfBm08WaMSwxV5RwLZX6w/xDkmqaC
-         TMIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744187316; x=1744792116;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GLRPaGKplD8oYOPGjWmbdAprG6q5TQE2NqumKVm0Mi4=;
-        b=A0+Rb7Y3XAZQGeGmBo5IJxVgIyEBOCl/oORbCrg3a3dEawunJmtRVwo7sQxQ0+/Aid
-         I2Xz3BLqq1JKsjWumuPTk1t3W+FsNfQUBKP9n3FrMzcw/6nNLPjxdNUBgAiYzwci69DU
-         +riGAhQJ7Lcwuyy9m7ewa+rxI0AldptKzAzFDV0MyaaJZruECoqYifvGW7xgMwLbrHcT
-         S7fDuoIWhctEnsUuVr9paweBctN4jsQy33R4oK1enXH3/0pqvWOQil47jUYjjteM9GSj
-         cg3zDghLn79DNlMlEIwhGK15YY9hAVscp7EJy/Av7lTCjiVajvwVsJaJkoiCkA7eRVL6
-         XfYg==
-X-Forwarded-Encrypted: i=1; AJvYcCUkDyE+LFSs1HCKqp+uF6fVjVxQhTkjTMIwZevxVr66cUGPnfHaf4Y0WoBLnek0ppkm3h8asxx5h7k=@vger.kernel.org, AJvYcCUnBZw6QCwDDtRMy7pXa9me5+yGACGQw4Q3jSIvFgEByRsTAlV1jBdCNsTtHnt2ljGD+qmCw78j+4Z7@vger.kernel.org, AJvYcCVcA1zsEBreAG2nGUYQ2QAj+XqFvdwiwqvRijNHAxKjxZmRDMVxN+EPyp9TcMMEDaMcEvaiItdldhc4n40=@vger.kernel.org, AJvYcCVhDUA9jiMc/PwXnSc0GnIDFg3f64/nD4ov+oQLi2g2hcY4zHDKVwQXmUr1PA8mpHP0WjKzF5wYk2+azTp+xoM=@vger.kernel.org, AJvYcCW1fbjXHNs2GQk1wL1NWjV2MUm/B5GMu99I/Ud/+j5PlcMjzMNND/m8Lgu5Kd0YKEIA9/3W8kMf/7Ya@vger.kernel.org, AJvYcCW3jeE57+ho1dN3BWZVO/TMtxiyO7aEO8w5QoJtwVQgujKOjcNZghMsKfd8G8ySCp7rB5RKPRav@vger.kernel.org, AJvYcCXiN9Wz//GMCaFPERFGMybwW1EssMfWaxVlsI1WCgbudXpx4fNCEd4dFAW1gjlKwzule0sr2kLNeDlHSQ==@vger.kernel.org, AJvYcCXyAhl5ySRQosirHugVtEhR+2v42+xUYyk6ITJVVF2+V6KobNjs6onwqhKxKg5LhRKezNzfj/qwJ7Bi@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzsMq/RQymBgGaeo5vpQtv/xCi6EKfVp+s8RcjLs4EpKsscqx8
-	WjvNCTGRtUsFFjAamj++LgN79oOx9oY6BhpFUxz1LzjdHdlzZ3qd
-X-Gm-Gg: ASbGnctudfs97t7+F1Is6RK+ImYrIs2+W0F0zdeNt4pgIttUThnOCF+Ce2R+lHS4+qa
-	XfyH3jBOKQwM2HkrkC3KleWQo+tXiD60ANSqTkUNjRM8iBIs8uSPTBX9OzZBstkuItLPja55KEj
-	6c2jWrF6p/0EpQOCyqrvri8YfN9MJPPfMHoMduTr2h1vVfaIt79J9d6b8F+Ithug78f8vKXkKDk
-	1Psy8aZQLBCvGSCsMG6pmoDQaStiDf9Ged+g5zLbuLacvkOwgHZFY0DvoZHJ7e3iGYFxRyf31Ix
-	oxNRU3htXz5YBIegiNXTkl2v+66Kmu4MvulGoQadEiZzqRjoSe5Rv+7YQdQRir1X/NykYKTmeDm
-	wr5s=
-X-Google-Smtp-Source: AGHT+IGNnTzL24kdGFR/kkNnJL7VtTc0aIEqz0aHaBaOQno6bBJXxchhxM+uxjiRgApPAfsCqradiw==
-X-Received: by 2002:a05:6a00:2e0f:b0:736:6ecd:8e32 with SMTP id d2e1a72fcca58-73bae551295mr2622809b3a.21.1744187316047;
-        Wed, 09 Apr 2025 01:28:36 -0700 (PDT)
-Received: from hcdev-d520mt2.. (60-250-196-139.hinet-ip.hinet.net. [60.250.196.139])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73bb1d46509sm740772b3a.57.2025.04.09.01.28.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Apr 2025 01:28:35 -0700 (PDT)
-From: a0282524688@gmail.com
-X-Google-Original-From: tmyu0@nuvoton.com
-To: lee@kernel.org,
-	linus.walleij@linaro.org,
-	brgl@bgdev.pl,
-	andi.shyti@kernel.org,
-	mkl@pengutronix.de,
-	mailhol.vincent@wanadoo.fr,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	wim@linux-watchdog.org,
-	linux@roeck-us.net,
-	jdelvare@suse.com,
-	alexandre.belloni@bootlin.com
-Cc: linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	linux-i2c@vger.kernel.org,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-watchdog@vger.kernel.org,
-	linux-hwmon@vger.kernel.org,
-	linux-rtc@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	Ming Yu <tmyu0@nuvoton.com>
-Subject: [PATCH v9 7/7] rtc: Add Nuvoton NCT6694 RTC support
-Date: Wed,  9 Apr 2025 16:27:52 +0800
-Message-Id: <20250409082752.3697532-8-tmyu0@nuvoton.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250409082752.3697532-1-tmyu0@nuvoton.com>
-References: <20250409082752.3697532-1-tmyu0@nuvoton.com>
+	s=arc-20240116; t=1744187510; c=relaxed/simple;
+	bh=gHcBGLvzRmMkrLjkwveEbOAmV71CO0SVIfPIyrWUg58=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:Content-Type:
+	 MIME-Version:Message-ID; b=X4o6CLNIvOEQ3by4IwqBkMJcCXqq4Dacq7OtvbuZoJnUk9dOyejW3H/bPCM2ykvVWExKsVVAcR9An+SiAPIGqCaq3iXRSICxk1evVW9d1AzM4S12MdlgDNduWv5NLki0CiVp1ddzeKA/u0lAjMsspddx2HPcboE01i96/eEV+6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=fail (1024-bit key) header.d=163.com header.i=@163.com header.b=ChIjYHvu reason="signature verification failed"; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:Subject:Content-Type:MIME-Version:
+	Message-ID; bh=AzbWT3cVsCGEo2pzC3XiR2KsM9Ip6v8UQjU0g1vzuhQ=; b=C
+	hIjYHvuZhIcvFMBDk+D80EseFqO1iKgj+2rAuANApFDgcUQpsdeevMaynVwQeb0Q
+	2LclltEqN9MSSwJfl2otg17hN8c9JiBkOrUu869J+m2i64IM3dKTK1U21i2iPUGP
+	70ZQjazYjqF0uAZiHz8fI1vWSEHBVxdkxvsPlM2dzY=
+Received: from slark_xiao$163.com ( [2408:8459:3c40:abe:58b8:cf4:b0f1:6c5d]
+ ) by ajax-webmail-wmsvr-40-141 (Coremail) ; Wed, 9 Apr 2025 16:30:58 +0800
+ (CST)
+Date: Wed, 9 Apr 2025 16:30:58 +0800 (CST)
+From: "Slark Xiao" <slark_xiao@163.com>
+To: "Sergey Ryazanov" <ryazanov.s.a@gmail.com>
+Cc: "Loic Poulain" <loic.poulain@oss.qualcomm.com>,
+	"Johannes Berg" <johannes@sipsolutions.net>,
+	"Andrew Lunn" <andrew+netdev@lunn.ch>,
+	"Eric Dumazet" <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	"Jakub Kicinski" <kuba@kernel.org>,
+	"Paolo Abeni" <pabeni@redhat.com>, netdev@vger.kernel.org,
+	"Muhammad Nuzaihan" <zaihan@unrealasia.net>,
+	"Qiang Yu" <quic_qianyu@quicinc.com>,
+	"Manivannan Sadhasivam" <manivannan.sadhasivam@linaro.org>,
+	"Johan Hovold" <johan@kernel.org>
+Subject: Re:Re:[RFC PATCH 4/6] net: wwan: add NMEA port support
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20240801(9da12a7b)
+ Copyright (c) 2002-2025 www.mailtech.cn 163com
+In-Reply-To: <2fb6c2fd.451c.19618afb36b.Coremail.slark_xiao@163.com>
+References: <20250408233118.21452-1-ryazanov.s.a@gmail.com>
+ <20250408233118.21452-5-ryazanov.s.a@gmail.com>
+ <2fb6c2fd.451c.19618afb36b.Coremail.slark_xiao@163.com>
+X-NTES-SC: AL_Qu2fBv2TuEwu7imYY+kfmkkXg+c4XsW5vfwu1IVRPJp+jCrryBEKQ3tME2Ln4t+ODx6DkReYSChi1cR8V7Z8UJIZDT/T2mopK/59Xo0Tu8cGBA==
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=GBK
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Message-ID: <16135e8d.86f9.19619ac8560.Coremail.slark_xiao@163.com>
+X-Coremail-Locale: zh_CN
+X-CM-TRANSID:jSgvCgDnbxRCMPZnfOySAA--.26509W
+X-CM-SenderInfo: xvod2y5b0lt0i6rwjhhfrp/1tbiMBEqZGf2J8nZVQACse
+X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
 
-From: Ming Yu <tmyu0@nuvoton.com>
-
-This driver supports RTC functionality for NCT6694 MFD device
-based on USB interface.
-
-Acked-by: Alexandre Belloni <alexandre.belloni@bootlin.com>
-Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
----
- MAINTAINERS               |   1 +
- drivers/rtc/Kconfig       |  10 ++
- drivers/rtc/Makefile      |   1 +
- drivers/rtc/rtc-nct6694.c | 309 ++++++++++++++++++++++++++++++++++++++
- 4 files changed, 321 insertions(+)
- create mode 100644 drivers/rtc/rtc-nct6694.c
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ee0cc1b55c83..b68a6ea3ca2c 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17310,6 +17310,7 @@ F:	drivers/hwmon/nct6694-hwmon.c
- F:	drivers/i2c/busses/i2c-nct6694.c
- F:	drivers/mfd/nct6694.c
- F:	drivers/net/can/usb/nct6694_canfd.c
-+F:	drivers/rtc/rtc-nct6694.c
- F:	drivers/watchdog/nct6694_wdt.c
- F:	include/linux/mfd/nct6694.h
- 
-diff --git a/drivers/rtc/Kconfig b/drivers/rtc/Kconfig
-index 838bdc138ffe..d8662b5d1e47 100644
---- a/drivers/rtc/Kconfig
-+++ b/drivers/rtc/Kconfig
-@@ -416,6 +416,16 @@ config RTC_DRV_NCT3018Y
- 	   This driver can also be built as a module, if so, the module will be
- 	   called "rtc-nct3018y".
- 
-+config RTC_DRV_NCT6694
-+	tristate "Nuvoton NCT6694 RTC support"
-+	depends on MFD_NCT6694
-+	help
-+	  If you say yes to this option, support will be included for Nuvoton
-+	  NCT6694, a USB device to RTC.
-+
-+	  This driver can also be built as a module. If so, the module will
-+	  be called rtc-nct6694.
-+
- config RTC_DRV_RK808
- 	tristate "Rockchip RK805/RK808/RK809/RK817/RK818 RTC"
- 	depends on MFD_RK8XX
-diff --git a/drivers/rtc/Makefile b/drivers/rtc/Makefile
-index 31473b3276d9..da091d66e2d7 100644
---- a/drivers/rtc/Makefile
-+++ b/drivers/rtc/Makefile
-@@ -118,6 +118,7 @@ obj-$(CONFIG_RTC_DRV_MXC)	+= rtc-mxc.o
- obj-$(CONFIG_RTC_DRV_MXC_V2)	+= rtc-mxc_v2.o
- obj-$(CONFIG_RTC_DRV_GAMECUBE)	+= rtc-gamecube.o
- obj-$(CONFIG_RTC_DRV_NCT3018Y)	+= rtc-nct3018y.o
-+obj-$(CONFIG_RTC_DRV_NCT6694)	+= rtc-nct6694.o
- obj-$(CONFIG_RTC_DRV_NTXEC)	+= rtc-ntxec.o
- obj-$(CONFIG_RTC_DRV_OMAP)	+= rtc-omap.o
- obj-$(CONFIG_RTC_DRV_OPAL)	+= rtc-opal.o
-diff --git a/drivers/rtc/rtc-nct6694.c b/drivers/rtc/rtc-nct6694.c
-new file mode 100644
-index 000000000000..b7ae229d6a31
---- /dev/null
-+++ b/drivers/rtc/rtc-nct6694.c
-@@ -0,0 +1,309 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Nuvoton NCT6694 RTC driver based on USB interface.
-+ *
-+ * Copyright (C) 2024 Nuvoton Technology Corp.
-+ */
-+
-+#include <linux/bcd.h>
-+#include <linux/irqdomain.h>
-+#include <linux/kernel.h>
-+#include <linux/mfd/core.h>
-+#include <linux/mfd/nct6694.h>
-+#include <linux/module.h>
-+#include <linux/platform_device.h>
-+#include <linux/rtc.h>
-+#include <linux/slab.h>
-+
-+/*
-+ * USB command module type for NCT6694 RTC controller.
-+ * This defines the module type used for communication with the NCT6694
-+ * RTC controller over the USB interface.
-+ */
-+#define NCT6694_RTC_MOD		0x08
-+
-+/* Command 00h - RTC Time */
-+#define NCT6694_RTC_TIME	0x0000
-+#define NCT6694_RTC_TIME_SEL	0x00
-+
-+/* Command 01h - RTC Alarm */
-+#define NCT6694_RTC_ALARM	0x01
-+#define NCT6694_RTC_ALARM_SEL	0x00
-+
-+/* Command 02h - RTC Status */
-+#define NCT6694_RTC_STATUS	0x02
-+#define NCT6694_RTC_STATUS_SEL	0x00
-+
-+#define NCT6694_RTC_IRQ_INT_EN	BIT(0)	/* Transmit a USB INT-in when RTC alarm */
-+#define NCT6694_RTC_IRQ_GPO_EN	BIT(5)	/* Trigger a GPO Low Pulse when RTC alarm */
-+
-+#define NCT6694_RTC_IRQ_EN	(NCT6694_RTC_IRQ_INT_EN | NCT6694_RTC_IRQ_GPO_EN)
-+#define NCT6694_RTC_IRQ_STS	BIT(0)	/* Write 1 clear IRQ status */
-+
-+struct __packed nct6694_rtc_time {
-+	u8 sec;
-+	u8 min;
-+	u8 hour;
-+	u8 week;
-+	u8 day;
-+	u8 month;
-+	u8 year;
-+};
-+
-+struct __packed nct6694_rtc_alarm {
-+	u8 sec;
-+	u8 min;
-+	u8 hour;
-+	u8 alarm_en;
-+	u8 alarm_pend;
-+};
-+
-+struct __packed nct6694_rtc_status {
-+	u8 irq_en;
-+	u8 irq_pend;
-+};
-+
-+union __packed nct6694_rtc_msg {
-+	struct nct6694_rtc_time time;
-+	struct nct6694_rtc_alarm alarm;
-+	struct nct6694_rtc_status sts;
-+};
-+
-+struct nct6694_rtc_data {
-+	struct nct6694 *nct6694;
-+	struct rtc_device *rtc;
-+	union nct6694_rtc_msg *msg;
-+	int irq;
-+};
-+
-+static int nct6694_rtc_read_time(struct device *dev, struct rtc_time *tm)
-+{
-+	struct nct6694_rtc_data *data = dev_get_drvdata(dev);
-+	struct nct6694_rtc_time *time = &data->msg->time;
-+	static const struct nct6694_cmd_header cmd_hd = {
-+		.mod = NCT6694_RTC_MOD,
-+		.cmd = NCT6694_RTC_TIME,
-+		.sel = NCT6694_RTC_TIME_SEL,
-+		.len = cpu_to_le16(sizeof(*time))
-+	};
-+	int ret;
-+
-+	ret = nct6694_read_msg(data->nct6694, &cmd_hd, time);
-+	if (ret)
-+		return ret;
-+
-+	tm->tm_sec = bcd2bin(time->sec);		/* tm_sec expect 0 ~ 59 */
-+	tm->tm_min = bcd2bin(time->min);		/* tm_min expect 0 ~ 59 */
-+	tm->tm_hour = bcd2bin(time->hour);		/* tm_hour expect 0 ~ 23 */
-+	tm->tm_wday = bcd2bin(time->week) - 1;		/* tm_wday expect 0 ~ 6 */
-+	tm->tm_mday = bcd2bin(time->day);		/* tm_mday expect 1 ~ 31 */
-+	tm->tm_mon = bcd2bin(time->month) - 1;		/* tm_month expect 0 ~ 11 */
-+	tm->tm_year = bcd2bin(time->year) + 100;	/* tm_year expect since 1900 */
-+
-+	return ret;
-+}
-+
-+static int nct6694_rtc_set_time(struct device *dev, struct rtc_time *tm)
-+{
-+	struct nct6694_rtc_data *data = dev_get_drvdata(dev);
-+	struct nct6694_rtc_time *time = &data->msg->time;
-+	static const struct nct6694_cmd_header cmd_hd = {
-+		.mod = NCT6694_RTC_MOD,
-+		.cmd = NCT6694_RTC_TIME,
-+		.sel = NCT6694_RTC_TIME_SEL,
-+		.len = cpu_to_le16(sizeof(*time))
-+	};
-+
-+	time->sec = bin2bcd(tm->tm_sec);
-+	time->min = bin2bcd(tm->tm_min);
-+	time->hour = bin2bcd(tm->tm_hour);
-+	time->week = bin2bcd(tm->tm_wday + 1);
-+	time->day = bin2bcd(tm->tm_mday);
-+	time->month = bin2bcd(tm->tm_mon + 1);
-+	time->year = bin2bcd(tm->tm_year - 100);
-+
-+	return nct6694_write_msg(data->nct6694, &cmd_hd, time);
-+}
-+
-+static int nct6694_rtc_read_alarm(struct device *dev, struct rtc_wkalrm *alrm)
-+{
-+	struct nct6694_rtc_data *data = dev_get_drvdata(dev);
-+	struct nct6694_rtc_alarm *alarm = &data->msg->alarm;
-+	static const struct nct6694_cmd_header cmd_hd = {
-+		.mod = NCT6694_RTC_MOD,
-+		.cmd = NCT6694_RTC_ALARM,
-+		.sel = NCT6694_RTC_ALARM_SEL,
-+		.len = cpu_to_le16(sizeof(*alarm))
-+	};
-+	int ret;
-+
-+	ret = nct6694_read_msg(data->nct6694, &cmd_hd, alarm);
-+	if (ret)
-+		return ret;
-+
-+	alrm->time.tm_sec = bcd2bin(alarm->sec);
-+	alrm->time.tm_min = bcd2bin(alarm->min);
-+	alrm->time.tm_hour = bcd2bin(alarm->hour);
-+	alrm->enabled = alarm->alarm_en;
-+	alrm->pending = alarm->alarm_pend;
-+
-+	return ret;
-+}
-+
-+static int nct6694_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alrm)
-+{
-+	struct nct6694_rtc_data *data = dev_get_drvdata(dev);
-+	struct nct6694_rtc_alarm *alarm = &data->msg->alarm;
-+	static const struct nct6694_cmd_header cmd_hd = {
-+		.mod = NCT6694_RTC_MOD,
-+		.cmd = NCT6694_RTC_ALARM,
-+		.sel = NCT6694_RTC_ALARM_SEL,
-+		.len = cpu_to_le16(sizeof(*alarm))
-+	};
-+
-+	alarm->sec = bin2bcd(alrm->time.tm_sec);
-+	alarm->min = bin2bcd(alrm->time.tm_min);
-+	alarm->hour = bin2bcd(alrm->time.tm_hour);
-+	alarm->alarm_en = alrm->enabled ? NCT6694_RTC_IRQ_EN : 0;
-+	alarm->alarm_pend = 0;
-+
-+	return nct6694_write_msg(data->nct6694, &cmd_hd, alarm);
-+}
-+
-+static int nct6694_rtc_alarm_irq_enable(struct device *dev, unsigned int enabled)
-+{
-+	struct nct6694_rtc_data *data = dev_get_drvdata(dev);
-+	struct nct6694_rtc_status *sts = &data->msg->sts;
-+	static const struct nct6694_cmd_header cmd_hd = {
-+		.mod = NCT6694_RTC_MOD,
-+		.cmd = NCT6694_RTC_STATUS,
-+		.sel = NCT6694_RTC_STATUS_SEL,
-+		.len = cpu_to_le16(sizeof(*sts))
-+	};
-+
-+	if (enabled)
-+		sts->irq_en |= NCT6694_RTC_IRQ_EN;
-+	else
-+		sts->irq_en &= ~NCT6694_RTC_IRQ_EN;
-+
-+	sts->irq_pend = 0;
-+
-+	return nct6694_write_msg(data->nct6694, &cmd_hd, sts);
-+}
-+
-+static const struct rtc_class_ops nct6694_rtc_ops = {
-+	.read_time = nct6694_rtc_read_time,
-+	.set_time = nct6694_rtc_set_time,
-+	.read_alarm = nct6694_rtc_read_alarm,
-+	.set_alarm = nct6694_rtc_set_alarm,
-+	.alarm_irq_enable = nct6694_rtc_alarm_irq_enable,
-+};
-+
-+static irqreturn_t nct6694_irq(int irq, void *dev_id)
-+{
-+	struct nct6694_rtc_data *data = dev_id;
-+	struct nct6694_rtc_status *sts = &data->msg->sts;
-+	static const struct nct6694_cmd_header cmd_hd = {
-+		.mod = NCT6694_RTC_MOD,
-+		.cmd = NCT6694_RTC_STATUS,
-+		.sel = NCT6694_RTC_STATUS_SEL,
-+		.len = cpu_to_le16(sizeof(*sts))
-+	};
-+	int ret;
-+
-+	rtc_lock(data->rtc);
-+
-+	sts->irq_en = NCT6694_RTC_IRQ_EN;
-+	sts->irq_pend = NCT6694_RTC_IRQ_STS;
-+	ret = nct6694_write_msg(data->nct6694, &cmd_hd, sts);
-+	if (ret) {
-+		rtc_unlock(data->rtc);
-+		return IRQ_NONE;
-+	}
-+
-+	rtc_update_irq(data->rtc, 1, RTC_IRQF | RTC_AF);
-+
-+	rtc_unlock(data->rtc);
-+
-+	return IRQ_HANDLED;
-+}
-+
-+static int nct6694_rtc_probe(struct platform_device *pdev)
-+{
-+	struct nct6694_rtc_data *data;
-+	struct nct6694 *nct6694 = dev_get_drvdata(pdev->dev.parent);
-+	int ret, irq;
-+
-+	irq = irq_create_mapping(nct6694->domain, NCT6694_IRQ_RTC);
-+	if (!irq)
-+		return -EINVAL;
-+
-+	data = devm_kzalloc(&pdev->dev, sizeof(*data), GFP_KERNEL);
-+	if (!data) {
-+		ret = -ENOMEM;
-+		goto dispose_irq;
-+	}
-+
-+	data->msg = devm_kzalloc(&pdev->dev, sizeof(union nct6694_rtc_msg),
-+				 GFP_KERNEL);
-+	if (!data->msg) {
-+		ret = -ENOMEM;
-+		goto dispose_irq;
-+	}
-+
-+	data->rtc = devm_rtc_allocate_device(&pdev->dev);
-+	if (IS_ERR(data->rtc)) {
-+		ret = PTR_ERR(data->rtc);
-+		goto dispose_irq;
-+	}
-+
-+	data->irq = irq;
-+	data->nct6694 = nct6694;
-+	data->rtc->ops = &nct6694_rtc_ops;
-+	data->rtc->range_min = RTC_TIMESTAMP_BEGIN_2000;
-+	data->rtc->range_max = RTC_TIMESTAMP_END_2099;
-+
-+	platform_set_drvdata(pdev, data);
-+
-+	ret = devm_request_threaded_irq(&pdev->dev, irq, NULL,
-+					nct6694_irq, IRQF_ONESHOT,
-+					"rtc-nct6694", data);
-+	if (ret < 0) {
-+		dev_err_probe(&pdev->dev, ret, "Failed to request irq\n");
-+		goto dispose_irq;
-+	}
-+
-+	ret = devm_rtc_register_device(data->rtc);
-+	if (ret)
-+		goto dispose_irq;
-+
-+	device_init_wakeup(&pdev->dev, true);
-+	return 0;
-+
-+dispose_irq:
-+	irq_dispose_mapping(irq);
-+	return ret;
-+}
-+
-+static void nct6694_rtc_remove(struct platform_device *pdev)
-+{
-+	struct nct6694_rtc_data *data = platform_get_drvdata(pdev);
-+
-+	devm_free_irq(&pdev->dev, data->irq, data);
-+	irq_dispose_mapping(data->irq);
-+}
-+
-+static struct platform_driver nct6694_rtc_driver = {
-+	.driver = {
-+		.name	= "nct6694-rtc",
-+	},
-+	.probe		= nct6694_rtc_probe,
-+	.remove		= nct6694_rtc_remove,
-+};
-+
-+module_platform_driver(nct6694_rtc_driver);
-+
-+MODULE_DESCRIPTION("USB-RTC driver for NCT6694");
-+MODULE_AUTHOR("Ming Yu <tmyu0@nuvoton.com>");
-+MODULE_LICENSE("GPL");
-+MODULE_ALIAS("platform:nct6694-rtc");
--- 
-2.34.1
-
+CkhpIFNlcmdleSwKRGV2aWNlIHBvcnQgL2Rldi9nbnNzMCBpcyBlbnVtZXJhdGVkIC4gRG9lcyBp
+dCBiZSBleHBlY3RlZD8KSSBjYW4gZ2V0IHRoZSBOTUVBIGRhdGEgZnJvbSB0aGlzIHBvcnQgYnkg
+Y2F0IG9yIG1pbmljb20gY29tbWFuZC4KQnV0IHRoZSBncHNkLnNlcnZpY2UgYWxzbyBjYW4gbm90
+IGJlIGluaXRpYWxpemVkIG5vcm1hbGx5LiBJdCByZXBvcnRzOgoKVHJpZ2dlcmVkQnk6IKHxIGdw
+c2Quc29ja2V0CiAgICBQcm9jZXNzOiAzODI0IEV4ZWNTdGFydFByZT0vYmluL3N0dHkgc3BlZWQg
+MTE1MjAwIC1GICRERVZJQ0VTIChjb2RlPWV4aXRlZCwgc3RhdHVzPTEvRkFJTFVSRSkKICAgICAg
+ICBDUFU6IDdtcwoKNNTCIDA5IDE2OjA0OjE2IGpiZCBzeXN0ZW1kWzFdOiBTdGFydGluZyBHUFMg
+KEdsb2JhbCBQb3NpdGlvbmluZyBTeXN0ZW0pIERhZW1vbi4uLgo01MIgMDkgMTY6MDQ6MTcgamJk
+IHN0dHlbMzgyNF06IC9iaW4vc3R0eTogL2Rldi9nbnNzMDogSW5hcHByb3ByaWF0ZSBpb2N0bCBm
+b3IgZGV2aWNlCjTUwiAwOSAxNjowNDoxNyBqYmQgc3lzdGVtZFsxXTogZ3BzZC5zZXJ2aWNlOiBD
+b250cm9sIHByb2Nlc3MgZXhpdGVkLCBjb2RlPWV4aXRlZCwgc3RhdHVzPTEvRkFJTFVSRQo01MIg
+MDkgMTY6MDQ6MTcgamJkIHN5c3RlbWRbMV06IGdwc2Quc2VydmljZTogRmFpbGVkIHdpdGggcmVz
+dWx0ICdleGl0LWNvZGUnLgo01MIgMDkgMTY6MDQ6MTcgamJkIHN5c3RlbWRbMV06IEZhaWxlZCB0
+byBzdGFydCBHUFMgKEdsb2JhbCBQb3NpdGlvbmluZyBTeXN0ZW0pIERhZW1vbi4KClNlZW1zIGl0
+J3Mgbm90IGEgc2VyaWFsIHBvcnQuCkFueSBhZHZpY2U/CgpUaGFua3MKCkF0IDIwMjUtMDQtMDkg
+MTE6NTQ6NTAsICJTbGFyayBYaWFvIiA8c2xhcmtfeGlhb0AxNjMuY29tPiB3cm90ZToKPgo+SGkg
+U2VyZ2V5LAo+SSBzYXcgeW91IGFkZCBXV0FOX1BPUlRfTk1FQSBoZXJlLiBBbmQgSSBoYXZlIGEg
+Y29uY2Vybiwgc2hhbGwgd2UKPmFkZCBpdCBpbnRvIG1oaV93d2FuX2N0cmwuYyBmb3IgbWFwcGlu
+ZyAiTk1FQSIgY2hhbm5lbCBpbiAKPm1oaV93d2FuX2N0cmxfbWF0Y2hfdGFibGUgc2luY2UgcHJl
+dmlvdXMgUURVMTAwIGRldmljZSBoYXMgYWRkZWQKPk5NRUEgY2hhbm5lbChTbyBvbmx5ICJOTUVB
+IiBjaGFubmVsIGlzIHZhbGlkIGluIHBjaV9nZW5lcmljLmMsIGJ1dCBub3QKPiJHTlNTIiBpbiBm
+dXR1cmUpLgo+Cj5JIGFtIHRlc3RpbmcgeW91ciBwYXRjaCBub3cuIFdpbGwgdXBkYXRlIGxhdGVy
+Lgo+VGhhbmtzCj4KPkF0IDIwMjUtMDQtMDkgMDc6MzE6MTYsICJTZXJnZXkgUnlhemFub3YiIDxy
+eWF6YW5vdi5zLmFAZ21haWwuY29tPiB3cm90ZToKPj5NYW55IFdXQU4gbW9kZW1zIGNvbWUgd2l0
+aCBlbWJlZGRlZCBHTlNTIHJlY2VpdmVyIGluc2lkZSBhbmQgaGF2ZSBhCj4+ZGVkaWNhdGVkIHBv
+cnQgdG8gb3V0cHV0IGdlb3Bvc2l0aW9uaW5nIGRhdGEuIE9uIHRoZSBvbmUgaGFuZCwgdGhlCj4+
+R05TUyByZWNlaXZlciBoYXMgbGl0dGxlIGluIGNvbW1vbiB3aXRoIFdXQU4gbW9kZW0gYW5kIGp1
+c3Qgc2hhcmVzIGEKPj5ob3N0IGludGVyZmFjZSBhbmQgc2hvdWxkIGJlIGV4cG9ydGVkIHVzaW5n
+IHRoZSBHTlNTIHN1YnN5c3RlbS4gT24gdGhlCj4+b3RoZXIgaGFuZCwgR05TUyByZWNlaXZlciBp
+cyBub3QgYXV0b21hdGljYWxseSBhY3RpdmF0ZWQgYW5kIG5lZWRzIGEKPj5nZW5lcmljIFdXQU4g
+Y29udHJvbCBwb3J0IChBVCwgTUJJTSwgZXRjLikgdG8gYmUgdHVybmVkIG9uLiBBbmQgYSB1c2Vy
+Cj4+c3BhY2Ugc29mdHdhcmUgbmVlZHMgZXh0cmEgaW5mb3JtYXRpb24gdG8gZmluZCB0aGUgY29u
+dHJvbCBwb3J0Lgo+Pgo+PkludHJvZHVjZSB0aGUgbmV3IHR5cGUgb2YgV1dBTiBwb3J0IC0gTk1F
+QS4gV2hlbiBkcml2ZXIgYXNrcyB0byByZWdpc3Rlcgo+PmEgTk1FQSBwb3J0LCB0aGUgY29yZSBh
+bGxvY2F0ZXMgY29tbW9uIHBhcmVudCBXV0FOIGRldmljZSBhcyB1c3VhbCwgYnV0Cj4+ZXhwb3J0
+cyB0aGUgTk1FQSBwb3J0IHZpYSB0aGUgR05TUyBzdWJzeXN0ZW0gYW5kIGFjdHMgYXMgYSBwcm94
+eSBiZXR3ZWVuCj4+dGhlIGRldmljZSBkcml2ZXIgYW5kIHRoZSBHTlNTIHN1YnN5c3RlbS4KPj4K
+Pj5Gcm9tIHRoZSBXV0FOIGRldmljZSBkcml2ZXIgcGVyc3BlY3RpdmUsIGEgTk1FQSBwb3J0IGlz
+IHJlZ2lzdGVyZWQgYXMgYQo+PnJlZ3VsYXIgV1dBTiBwb3J0IHdpdGhvdXQgYW55IGRpZmZlcmVu
+Y2UuIEFuZCB0aGUgZHJpdmVyIGludGVyYWN0cyBvbmx5Cj4+d2l0aCB0aGUgV1dBTiBjb3JlLiBG
+cm9tIHRoZSB1c2VyIHNwYWNlIHBlcnNwZWN0aXZlLCB0aGUgTk1FQSBwb3J0IGlzIGEKPj5HTlNT
+IGRldmljZSB3aGljaCBwYXJlbnQgY2FuIGJlIHVzZWQgdG8gZW51bWVyYXRlIGFuZCBzZWxlY3Qg
+dGhlIHByb3Blcgo+PmNvbnRyb2wgcG9ydCBmb3IgdGhlIEdOU1MgcmVjZWl2ZXIgbWFuYWdlbWVu
+dC4KPj4KPj5DQzogU2xhcmsgWGlhbyA8c2xhcmtfeGlhb0AxNjMuY29tPgo+PkNDOiBNdWhhbW1h
+ZCBOdXphaWhhbiA8emFpaGFuQHVucmVhbGFzaWEubmV0Pgo+PkNDOiBRaWFuZyBZdSA8cXVpY19x
+aWFueXVAcXVpY2luYy5jb20+Cj4+Q0M6IE1hbml2YW5uYW4gU2FkaGFzaXZhbSA8bWFuaXZhbm5h
+bi5zYWRoYXNpdmFtQGxpbmFyby5vcmc+Cj4+Q0M6IEpvaGFuIEhvdm9sZCA8am9oYW5Aa2VybmVs
+Lm9yZz4KPj5TdWdnZXN0ZWQtYnk6IExvaWMgUG91bGFpbiA8bG9pYy5wb3VsYWluQG9zcy5xdWFs
+Y29tbS5jb20+Cj4+U2lnbmVkLW9mZi1ieTogU2VyZ2V5IFJ5YXphbm92IDxyeWF6YW5vdi5zLmFA
+Z21haWwuY29tPgo+Pi0tLQo+PiBkcml2ZXJzL25ldC93d2FuL0tjb25maWcgICAgIHwgICAxICsK
+Pj4gZHJpdmVycy9uZXQvd3dhbi93d2FuX2NvcmUuYyB8IDE1NyArKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrLQo+PiBpbmNsdWRlL2xpbnV4L3d3YW4uaCAgICAgICAgIHwgICAyICsK
+Pj4gMyBmaWxlcyBjaGFuZ2VkLCAxNTYgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkKPj4K
+Pj5kaWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQvd3dhbi9LY29uZmlnIGIvZHJpdmVycy9uZXQvd3dh
+bi9LY29uZmlnCj4+aW5kZXggNDEwYjAyNDUxMTRlLi44OGRmNTVkNzhkOTAgMTAwNjQ0Cj4+LS0t
+IGEvZHJpdmVycy9uZXQvd3dhbi9LY29uZmlnCj4+KysrIGIvZHJpdmVycy9uZXQvd3dhbi9LY29u
+ZmlnCj4+QEAgLTcsNiArNyw3IEBAIG1lbnUgIldpcmVsZXNzIFdBTiIKPj4gCj4+IGNvbmZpZyBX
+V0FOCj4+IAl0cmlzdGF0ZSAiV1dBTiBEcml2ZXIgQ29yZSIKPj4rCWRlcGVuZHMgb24gR05TUyB8
+fCBHTlNTID0gbgo+PiAJaGVscAo+PiAJICBTYXkgWSBoZXJlIGlmIHlvdSB3YW50IHRvIHVzZSB0
+aGUgV1dBTiBkcml2ZXIgY29yZS4gVGhpcyBkcml2ZXIKPj4gCSAgcHJvdmlkZXMgYSBjb21tb24g
+ZnJhbWV3b3JrIGZvciBXV0FOIGRyaXZlcnMuCj4+ZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L3d3
+YW4vd3dhbl9jb3JlLmMgYi9kcml2ZXJzL25ldC93d2FuL3d3YW5fY29yZS5jCj4+aW5kZXggNDM5
+YTU3YmMyYjljLi5hMzBmMGM4OWFhODIgMTAwNjQ0Cj4+LS0tIGEvZHJpdmVycy9uZXQvd3dhbi93
+d2FuX2NvcmUuYwo+PisrKyBiL2RyaXZlcnMvbmV0L3d3YW4vd3dhbl9jb3JlLmMKPj5AQCAtMTYs
+NiArMTYsNyBAQAo+PiAjaW5jbHVkZSA8bGludXgvdHlwZXMuaD4KPj4gI2luY2x1ZGUgPGxpbnV4
+L3VhY2Nlc3MuaD4KPj4gI2luY2x1ZGUgPGxpbnV4L3Rlcm1pb3MuaD4KPj4rI2luY2x1ZGUgPGxp
+bnV4L2duc3MuaD4KPj4gI2luY2x1ZGUgPGxpbnV4L3d3YW4uaD4KPj4gI2luY2x1ZGUgPG5ldC9y
+dG5ldGxpbmsuaD4KPj4gI2luY2x1ZGUgPHVhcGkvbGludXgvd3dhbi5oPgo+PkBAIC04OSw5ICs5
+MCwxNiBAQCBzdHJ1Y3Qgd3dhbl9wb3J0IHsKPj4gCQkJc3RydWN0IGt0ZXJtaW9zIHRlcm1pb3M7
+Cj4+IAkJCWludCBtZG1iaXRzOwo+PiAJCX0gYXRfZGF0YTsKPj4rCQlzdHJ1Y3QgZ25zc19kZXZp
+Y2UgKmduc3M7Cj4+IAl9Owo+PiB9Owo+PiAKPj4rc3RhdGljIGludCB3d2FuX3BvcnRfb3Bfc3Rh
+cnQoc3RydWN0IHd3YW5fcG9ydCAqcG9ydCk7Cj4+K3N0YXRpYyB2b2lkIHd3YW5fcG9ydF9vcF9z
+dG9wKHN0cnVjdCB3d2FuX3BvcnQgKnBvcnQpOwo+PitzdGF0aWMgaW50IHd3YW5fcG9ydF9vcF90
+eChzdHJ1Y3Qgd3dhbl9wb3J0ICpwb3J0LCBzdHJ1Y3Qgc2tfYnVmZiAqc2tiLAo+PisJCQkgICBi
+b29sIG5vbmJsb2NrKTsKPj4rc3RhdGljIGludCB3d2FuX3dhaXRfdHgoc3RydWN0IHd3YW5fcG9y
+dCAqcG9ydCwgYm9vbCBub25ibG9jayk7Cj4+Kwo+PiBzdGF0aWMgc3NpemVfdCBpbmRleF9zaG93
+KHN0cnVjdCBkZXZpY2UgKmRldiwgc3RydWN0IGRldmljZV9hdHRyaWJ1dGUgKmF0dHIsIGNoYXIg
+KmJ1ZikKPj4gewo+PiAJc3RydWN0IHd3YW5fZGV2aWNlICp3d2FuID0gdG9fd3dhbl9kZXYoZGV2
+KTsKPj5AQCAtMzQwLDYgKzM0OCw3IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3Qgewo+PiAJCS5uYW1l
+ID0gIk1JUEMiLAo+PiAJCS5kZXZzdWYgPSAibWlwYyIsCj4+IAl9LAo+PisJLyogV1dBTl9QT1JU
+X05NRUEgaXMgZXhwb3J0ZWQgdmlhIHRoZSBHTlNTIHN1YnN5c3RlbSAqLwo+PiB9Owo+PiAKPj4g
+c3RhdGljIHNzaXplX3QgdHlwZV9zaG93KHN0cnVjdCBkZXZpY2UgKmRldiwgc3RydWN0IGRldmlj
+ZV9hdHRyaWJ1dGUgKmF0dHIsCj4+QEAgLTQ5OCw2ICs1MDcsMTMyIEBAIHN0YXRpYyB2b2lkIHd3
+YW5fcG9ydF91bnJlZ2lzdGVyX3d3YW4oc3RydWN0IHd3YW5fcG9ydCAqcG9ydCkKPj4gCWRldmlj
+ZV91bnJlZ2lzdGVyKCZwb3J0LT5kZXYpOwo+PiB9Cj4+IAo+PisjaWYgSVNfRU5BQkxFRChDT05G
+SUdfR05TUykKPj4rc3RhdGljIGludCB3d2FuX2duc3Nfb3BlbihzdHJ1Y3QgZ25zc19kZXZpY2Ug
+KmdkZXYpCj4+K3sKPj4rCXJldHVybiB3d2FuX3BvcnRfb3Bfc3RhcnQoZ25zc19nZXRfZHJ2ZGF0
+YShnZGV2KSk7Cj4+K30KPj4rCj4+K3N0YXRpYyB2b2lkIHd3YW5fZ25zc19jbG9zZShzdHJ1Y3Qg
+Z25zc19kZXZpY2UgKmdkZXYpCj4+K3sKPj4rCXd3YW5fcG9ydF9vcF9zdG9wKGduc3NfZ2V0X2Ry
+dmRhdGEoZ2RldikpOwo+Pit9Cj4+Kwo+PitzdGF0aWMgaW50IHd3YW5fZ25zc193cml0ZShzdHJ1
+Y3QgZ25zc19kZXZpY2UgKmdkZXYsIGNvbnN0IHVuc2lnbmVkIGNoYXIgKmJ1ZiwKPj4rCQkJICAg
+c2l6ZV90IGNvdW50KQo+Pit7Cj4+KwlzdHJ1Y3Qgd3dhbl9wb3J0ICpwb3J0ID0gZ25zc19nZXRf
+ZHJ2ZGF0YShnZGV2KTsKPj4rCXN0cnVjdCBza19idWZmICpza2IsICpoZWFkID0gTlVMTCwgKnRh
+aWwgPSBOVUxMOwo+PisJc2l6ZV90IGZyYWdfbGVuLCByZW1haW4gPSBjb3VudDsKPj4rCWludCBy
+ZXQ7Cj4+Kwo+PisJcmV0ID0gd3dhbl93YWl0X3R4KHBvcnQsIGZhbHNlKTsKPj4rCWlmIChyZXQp
+Cj4+KwkJcmV0dXJuIHJldDsKPj4rCj4+KwlkbyB7Cj4+KwkJZnJhZ19sZW4gPSBtaW4ocmVtYWlu
+LCBwb3J0LT5mcmFnX2xlbik7Cj4+KwkJc2tiID0gYWxsb2Nfc2tiKGZyYWdfbGVuICsgcG9ydC0+
+aGVhZHJvb21fbGVuLCBHRlBfS0VSTkVMKTsKPj4rCQlpZiAoIXNrYikgewo+PisJCQlyZXQgPSAt
+RU5PTUVNOwo+PisJCQlnb3RvIGZyZWVza2I7Cj4+KwkJfQo+PisJCXNrYl9yZXNlcnZlKHNrYiwg
+cG9ydC0+aGVhZHJvb21fbGVuKTsKPj4rCQltZW1jcHkoc2tiX3B1dChza2IsIGZyYWdfbGVuKSwg
+YnVmICsgY291bnQgLSByZW1haW4sIGZyYWdfbGVuKTsKPj4rCj4+KwkJaWYgKCFoZWFkKSB7Cj4+
+KwkJCWhlYWQgPSBza2I7Cj4+KwkJfSBlbHNlIHsKPj4rCQkJaWYgKCF0YWlsKQo+PisJCQkJc2ti
+X3NoaW5mbyhoZWFkKS0+ZnJhZ19saXN0ID0gc2tiOwo+PisJCQllbHNlCj4+KwkJCQl0YWlsLT5u
+ZXh0ID0gc2tiOwo+PisKPj4rCQkJdGFpbCA9IHNrYjsKPj4rCQkJaGVhZC0+ZGF0YV9sZW4gKz0g
+c2tiLT5sZW47Cj4+KwkJCWhlYWQtPmxlbiArPSBza2ItPmxlbjsKPj4rCQkJaGVhZC0+dHJ1ZXNp
+emUgKz0gc2tiLT50cnVlc2l6ZTsKPj4rCQl9Cj4+Kwl9IHdoaWxlIChyZW1haW4gLT0gZnJhZ19s
+ZW4pOwo+PisKPj4rCXJldCA9IHd3YW5fcG9ydF9vcF90eChwb3J0LCBoZWFkLCBmYWxzZSk7Cj4+
+KwlpZiAoIXJldCkKPj4rCQlyZXR1cm4gY291bnQ7Cj4+Kwo+PitmcmVlc2tiOgo+PisJa2ZyZWVf
+c2tiKGhlYWQpOwo+PisJcmV0dXJuIHJldDsKPj4rfQo+PisKPj4rc3RhdGljIHN0cnVjdCBnbnNz
+X29wZXJhdGlvbnMgd3dhbl9nbnNzX29wcyA9IHsKPj4rCS5vcGVuID0gd3dhbl9nbnNzX29wZW4s
+Cj4+KwkuY2xvc2UgPSB3d2FuX2duc3NfY2xvc2UsCj4+Kwkud3JpdGVfcmF3ID0gd3dhbl9nbnNz
+X3dyaXRlLAo+Pit9Owo+PisKPj4rc3RhdGljIGludCB3d2FuX3BvcnRfcmVnaXN0ZXJfZ25zcyhz
+dHJ1Y3Qgd3dhbl9wb3J0ICpwb3J0KQo+Pit7Cj4+KwlzdHJ1Y3Qgd3dhbl9kZXZpY2UgKnd3YW5k
+ZXYgPSB0b193d2FuX2Rldihwb3J0LT5kZXYucGFyZW50KTsKPj4rCXN0cnVjdCBnbnNzX2Rldmlj
+ZSAqZ2RldjsKPj4rCWludCBlcnI7Cj4+Kwo+PisJZ2RldiA9IGduc3NfYWxsb2NhdGVfZGV2aWNl
+KCZ3d2FuZGV2LT5kZXYpOwo+PisJaWYgKCFnZGV2KSB7Cj4+KwkJZXJyID0gLUVOT01FTTsKPj4r
+CQlnb3RvIGVycm9yX2Rlc3Ryb3lfcG9ydDsKPj4rCX0KPj4rCj4+KwkvKiBOQjogZm9yIG5vdyB3
+ZSBzdXBwb3J0IG9ubHkgTk1FQSBXV0FOIHBvcnQgdHlwZSwgc28gaGFyZGNvZGUKPj4rCSAqIHRo
+ZSBHTlNTIHBvcnQgdHlwZS4gSWYgbW9yZSBHTlNTIFdXQU4gcG9ydCB0eXBlcyB3aWxsIGJlIGFk
+ZGVkLAo+PisJICogdGhlbiB3ZSBzaG91bGQgZHluYW1pY2FsbHkgbWFwdCBXV0FOIHBvcnQgdHlw
+ZSB0byBHTlNTIHR5cGUuCj4+KwkgKi8KPj4rCWdkZXYtPnR5cGUgPSBHTlNTX1RZUEVfTk1FQTsK
+Pj4rCWdkZXYtPm9wcyA9ICZ3d2FuX2duc3Nfb3BzOwo+PisJZ25zc19zZXRfZHJ2ZGF0YShnZGV2
+LCBwb3J0KTsKPj4rCj4+Kwlwb3J0LT5nbnNzID0gZ2RldjsKPj4rCj4+KwllcnIgPSBnbnNzX3Jl
+Z2lzdGVyX2RldmljZShnZGV2KTsKPj4rCWlmIChlcnIpIHsKPj4rCQlnbnNzX3B1dF9kZXZpY2Uo
+Z2Rldik7Cj4+KwkJZ290byBlcnJvcl9kZXN0cm95X3BvcnQ7Cj4+Kwl9Cj4+Kwo+PisJZGV2X2lu
+Zm8oJnd3YW5kZXYtPmRldiwgInBvcnQgJXMgYXR0YWNoZWRcbiIsIGRldl9uYW1lKCZnZGV2LT5k
+ZXYpKTsKPj4rCj4+KwlyZXR1cm4gMDsKPj4rCj4+K2Vycm9yX2Rlc3Ryb3lfcG9ydDoKPj4rCV9f
+d3dhbl9wb3J0X2Rlc3Ryb3kocG9ydCk7Cj4+Kwo+PisJcmV0dXJuIGVycjsKPj4rfQo+PisKPj4r
+c3RhdGljIHZvaWQgd3dhbl9wb3J0X3VucmVnaXN0ZXJfZ25zcyhzdHJ1Y3Qgd3dhbl9wb3J0ICpw
+b3J0KQo+Pit7Cj4+KwlzdHJ1Y3Qgd3dhbl9kZXZpY2UgKnd3YW5kZXYgPSB0b193d2FuX2Rldihw
+b3J0LT5kZXYucGFyZW50KTsKPj4rCXN0cnVjdCBnbnNzX2RldmljZSAqZ2RldiA9IHBvcnQtPmdu
+c3M7Cj4+Kwo+PisJZGV2X2luZm8oJnd3YW5kZXYtPmRldiwgInBvcnQgJXMgZGlzY29ubmVjdGVk
+XG4iLCBkZXZfbmFtZSgmZ2Rldi0+ZGV2KSk7Cj4+Kwo+PisJZ25zc19kZXJlZ2lzdGVyX2Rldmlj
+ZShnZGV2KTsKPj4rCWduc3NfcHV0X2RldmljZShnZGV2KTsKPj4rCj4+KwlfX3d3YW5fcG9ydF9k
+ZXN0cm95KHBvcnQpOwo+Pit9Cj4+KyNlbHNlCj4+K3N0YXRpYyBpbmxpbmUgaW50IHd3YW5fcG9y
+dF9yZWdpc3Rlcl9nbnNzKHN0cnVjdCB3d2FuX3BvcnQgKnBvcnQpCj4+K3sKPj4rCV9fd3dhbl9w
+b3J0X2Rlc3Ryb3kocG9ydCk7Cj4+KwlyZXR1cm4gLUVPUE5PVFNVUFA7Cj4+K30KPj4rCj4+K3N0
+YXRpYyBpbmxpbmUgdm9pZCB3d2FuX3BvcnRfdW5yZWdpc3Rlcl9nbnNzKHN0cnVjdCB3d2FuX3Bv
+cnQgKnBvcnQpCj4+K3sKPj4rCVdBUk5fT04oMSk7CS8qIFRoaXMgaGFuZGxlciBjYW5ub3QgYmUg
+Y2FsbGVkICovCj4+K30KPj4rI2VuZGlmCj4+Kwo+PiBzdHJ1Y3Qgd3dhbl9wb3J0ICp3d2FuX2Ny
+ZWF0ZV9wb3J0KHN0cnVjdCBkZXZpY2UgKnBhcmVudCwKPj4gCQkJCSAgIGVudW0gd3dhbl9wb3J0
+X3R5cGUgdHlwZSwKPj4gCQkJCSAgIGNvbnN0IHN0cnVjdCB3d2FuX3BvcnRfb3BzICpvcHMsCj4+
+QEAgLTUzNiw3ICs2NzEsMTEgQEAgc3RydWN0IHd3YW5fcG9ydCAqd3dhbl9jcmVhdGVfcG9ydChz
+dHJ1Y3QgZGV2aWNlICpwYXJlbnQsCj4+IAlwb3J0LT5kZXYucGFyZW50ID0gJnd3YW5kZXYtPmRl
+djsKPj4gCWRldl9zZXRfZHJ2ZGF0YSgmcG9ydC0+ZGV2LCBkcnZkYXRhKTsKPj4gCj4+LQllcnIg
+PSB3d2FuX3BvcnRfcmVnaXN0ZXJfd3dhbihwb3J0KTsKPj4rCWlmIChwb3J0LT50eXBlID09IFdX
+QU5fUE9SVF9OTUVBKQo+PisJCWVyciA9IHd3YW5fcG9ydF9yZWdpc3Rlcl9nbnNzKHBvcnQpOwo+
+PisJZWxzZQo+PisJCWVyciA9IHd3YW5fcG9ydF9yZWdpc3Rlcl93d2FuKHBvcnQpOwo+PisKPj4g
+CWlmIChlcnIpCj4+IAkJZ290byBlcnJvcl93d2FuZGV2X3JlbW92ZTsKPj4gCj4+QEAgLTU2NCw3
+ICs3MDMsMTAgQEAgdm9pZCB3d2FuX3JlbW92ZV9wb3J0KHN0cnVjdCB3d2FuX3BvcnQgKnBvcnQp
+Cj4+IAl3YWtlX3VwX2ludGVycnVwdGlibGUoJnBvcnQtPndhaXRxdWV1ZSk7Cj4+IAlza2JfcXVl
+dWVfcHVyZ2UoJnBvcnQtPnJ4cSk7Cj4+IAo+Pi0Jd3dhbl9wb3J0X3VucmVnaXN0ZXJfd3dhbihw
+b3J0KTsKPj4rCWlmIChwb3J0LT50eXBlID09IFdXQU5fUE9SVF9OTUVBKQo+PisJCXd3YW5fcG9y
+dF91bnJlZ2lzdGVyX2duc3MocG9ydCk7Cj4+KwllbHNlCj4+KwkJd3dhbl9wb3J0X3VucmVnaXN0
+ZXJfd3dhbihwb3J0KTsKPj4gCj4+IAkvKiBSZWxlYXNlIHJlbGF0ZWQgd3dhbiBkZXZpY2UgKi8K
+Pj4gCXd3YW5fcmVtb3ZlX2Rldih3d2FuZGV2KTsKPj5AQCAtNTczLDggKzcxNSwxNSBAQCBFWFBP
+UlRfU1lNQk9MX0dQTCh3d2FuX3JlbW92ZV9wb3J0KTsKPj4gCj4+IHZvaWQgd3dhbl9wb3J0X3J4
+KHN0cnVjdCB3d2FuX3BvcnQgKnBvcnQsIHN0cnVjdCBza19idWZmICpza2IpCj4+IHsKPj4tCXNr
+Yl9xdWV1ZV90YWlsKCZwb3J0LT5yeHEsIHNrYik7Cj4+LQl3YWtlX3VwX2ludGVycnVwdGlibGUo
+JnBvcnQtPndhaXRxdWV1ZSk7Cj4+KwlpZiAocG9ydC0+dHlwZSA9PSBXV0FOX1BPUlRfTk1FQSkg
+ewo+PisjaWYgSVNfRU5BQkxFRChDT05GSUdfR05TUykKPj4rCQlnbnNzX2luc2VydF9yYXcocG9y
+dC0+Z25zcywgc2tiLT5kYXRhLCBza2ItPmxlbik7Cj4+KyNlbmRpZgo+PisJCWNvbnN1bWVfc2ti
+KHNrYik7Cj4+Kwl9IGVsc2Ugewo+PisJCXNrYl9xdWV1ZV90YWlsKCZwb3J0LT5yeHEsIHNrYik7
+Cj4+KwkJd2FrZV91cF9pbnRlcnJ1cHRpYmxlKCZwb3J0LT53YWl0cXVldWUpOwo+PisJfQo+PiB9
+Cj4+IEVYUE9SVF9TWU1CT0xfR1BMKHd3YW5fcG9ydF9yeCk7Cj4+IAo+PmRpZmYgLS1naXQgYS9p
+bmNsdWRlL2xpbnV4L3d3YW4uaCBiL2luY2x1ZGUvbGludXgvd3dhbi5oCj4+aW5kZXggYTRkNmNj
+MGM5ZjY4Li4xZTBlMmNiNTM1NzkgMTAwNjQ0Cj4+LS0tIGEvaW5jbHVkZS9saW51eC93d2FuLmgK
+Pj4rKysgYi9pbmNsdWRlL2xpbnV4L3d3YW4uaAo+PkBAIC0xOSw2ICsxOSw3IEBACj4+ICAqIEBX
+V0FOX1BPUlRfRkFTVEJPT1Q6IEZhc3Rib290IHByb3RvY29sIGNvbnRyb2wKPj4gICogQFdXQU5f
+UE9SVF9BREI6IEFEQiBwcm90b2NvbCBjb250cm9sCj4+ICAqIEBXV0FOX1BPUlRfTUlQQzogTVRL
+IE1JUEMgZGlhZ25vc3RpYyBpbnRlcmZhY2UKPj4rICogQFdXQU5fUE9SVF9OTUVBOiBlbWJlZGRl
+ZCBHTlNTIHJlY2VpdmVyIHdpdGggTk1FQSBvdXRwdXQKPj4gICoKPj4gICogQFdXQU5fUE9SVF9N
+QVg6IEhpZ2hlc3Qgc3VwcG9ydGVkIHBvcnQgdHlwZXMKPj4gICogQFdXQU5fUE9SVF9VTktOT1dO
+OiBTcGVjaWFsIHZhbHVlIHRvIGluZGljYXRlIGFuIHVua25vd24gcG9ydCB0eXBlCj4+QEAgLTM0
+LDYgKzM1LDcgQEAgZW51bSB3d2FuX3BvcnRfdHlwZSB7Cj4+IAlXV0FOX1BPUlRfRkFTVEJPT1Qs
+Cj4+IAlXV0FOX1BPUlRfQURCLAo+PiAJV1dBTl9QT1JUX01JUEMsCj4+KwlXV0FOX1BPUlRfTk1F
+QSwKPj4gCj4+IAkvKiBBZGQgbmV3IHBvcnQgdHlwZXMgYWJvdmUgdGhpcyBsaW5lICovCj4+IAo+
+Pi0tIAo+PjIuNDUuMwo=
 
