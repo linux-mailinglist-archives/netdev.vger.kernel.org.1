@@ -1,73 +1,83 @@
-Return-Path: <netdev+bounces-180935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D4E9A831CE
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 22:21:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 812FAA832DB
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 22:57:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85D8E17E548
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 20:20:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9FE08A0760
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 20:56:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6575620298E;
-	Wed,  9 Apr 2025 20:20:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44F7A202C39;
+	Wed,  9 Apr 2025 20:57:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="DQFNj3bj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BBjR5w/Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F6D1DE884;
-	Wed,  9 Apr 2025 20:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7186B1E520F
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 20:57:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744230048; cv=none; b=hWa7T35xKrA1BfK0dicfYGmbyllMARv523NzB+c5NNpQCm3DPaBmzoNCYDZJeaGTR7l20U5WSBQLHEksjCo+aeUFb+QhpB/BtdmLR3cHsJuH+2szxhZa0Wy66FF4/3ChbR6d9P9YZnjjxT2G8+008X9in+CsptXUCltpnVb8y+A=
+	t=1744232232; cv=none; b=DGCR7OVn6kDQ9pQUYD8hxdLwn7asEbq6RMjHrwWaYgKj6eaYv+QyS+0AlQVVFpq7/mhPt/7rm8jGKXz3xTYMYR0MjM5pj8A4urVxEP4eMrKQ0sUvMQpH90oJVC1kuUCgAX79yopSKxqKQv3k/67aix+K+r0Ucu4fFQHn3veopeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744230048; c=relaxed/simple;
-	bh=1WrEWfpFHEmFTxy1AVRfKmrCHZ+R+S8KOv66hp8ygFk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qaNmtwM1TRg9NyypphN3ATXwMS2sNXT2btxwEqmL5nXgrHTzRko/+po8n5PXtJozZq/ndxF4YlOhJUeUn1AgtlUQnGG6hfUO0afhsJF0wnXiW/9KASHz0iQpZDsy0oFe257gWIxhGyTZn08YIal0uiS48d7gFe1CKC8gLUHONiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=DQFNj3bj; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1744230044; x=1775766044;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=BFKlNYVEHNJdeCxI8d7yxB4qk1YN6ZpSI2mPtyL+/tk=;
-  b=DQFNj3bjP9XFoC18ZRzauNe4f3Js7loUt3djd9rXbN/1wM4DfyDoTvdv
-   ybutBoQY2MrNBhubGzbvdfK/g7gZ60eKdgThm0+1CcfLEu18VDxciA7/6
-   Eh/PyrAfEAK+22eNEAQR3FuYmNhsAZDpEDMiyienz/3aw3+R5gZFoF1+9
-   I=;
-X-IronPort-AV: E=Sophos;i="6.15,201,1739836800"; 
-   d="scan'208";a="510240796"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 20:20:36 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:21857]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.62.147:2525] with esmtp (Farcaster)
- id 8d194daa-eab1-490c-b425-30f481a950b4; Wed, 9 Apr 2025 20:20:35 +0000 (UTC)
-X-Farcaster-Flow-ID: 8d194daa-eab1-490c-b425-30f481a950b4
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 9 Apr 2025 20:20:34 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.187.170.41) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Wed, 9 Apr 2025 20:20:32 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <mhal@rbox.co>
-CC: <bpf@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH net-next] af_unix: Remove unix_unhash()
-Date: Wed, 9 Apr 2025 13:20:15 -0700
-Message-ID: <20250409202018.54638-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250409-cleanup-drop-unix-unhash-v1-1-1659e5b8ee84@rbox.co>
-References: <20250409-cleanup-drop-unix-unhash-v1-1-1659e5b8ee84@rbox.co>
+	s=arc-20240116; t=1744232232; c=relaxed/simple;
+	bh=NCFwEvRWd8RhKMXrRod3jP44gTOZyUL6jE+zGFld6X8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QGPKia74pzMO5I5d8hjEIEwins+1m5BydQtQGZpy7FE8GSNSPgpsSz0stVq30Vo685OwGTkwepBt+eTERBAUtywst8ZWzE7IFkW7pwMVycYtGA9jq2lHnCGzEtNgUo+ALuSrfKVU5+ddf4uhkIeY8PEbqAYlVipCn7SCgzatY4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BBjR5w/Q; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744232230; x=1775768230;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=NCFwEvRWd8RhKMXrRod3jP44gTOZyUL6jE+zGFld6X8=;
+  b=BBjR5w/QhYx8jA7SsMkxBkUJXlsI+dXAERthWaqYWG69zxsjCNSJzdOO
+   oVzBJXLF+IWRjK+n3WnTB1fsal3W4JWJHFi+/Lq51nzjd0qEjsF6PEEqb
+   WnkoesOWPZBUl6CVvylyanT104Bo9U6cuwGffguKHM29nVdBnISC5T/LJ
+   KYQAx8yzindf88VG/BOhU/NFd/sXB3ONXvXm+xeyEwkWvHUjLN6To8IRr
+   5zj9mPzT9h1QK8mNWSB0GjXNed6A91KNyOzx4SdtH5/W4WpwlgfpPRVhw
+   3ZcL30NbmlOmK2Fu5v/f0x7wK9c/GCszja/ddl5jxiybUFHEaIPgMH4Dg
+   Q==;
+X-CSE-ConnectionGUID: DBoJHhasQzKED27FApDq5Q==
+X-CSE-MsgGUID: i9QjxlDnSPO0V9WwonQa5w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11399"; a="56711253"
+X-IronPort-AV: E=Sophos;i="6.15,201,1739865600"; 
+   d="scan'208";a="56711253"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 13:57:09 -0700
+X-CSE-ConnectionGUID: Hp/p/5MMQO+ob42GLY1nSA==
+X-CSE-MsgGUID: bQWsjAM4RsGC7eEeEMIf6g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,201,1739865600"; 
+   d="scan'208";a="133422964"
+Received: from kcaccard-desk.amr.corp.intel.com (HELO azaki-desk1.intel.com) ([10.125.111.223])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 13:57:03 -0700
+From: Ahmed Zaki <ahmed.zaki@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	ahmed.zaki@intel.com,
+	sridhar.samudrala@intel.com,
+	aleksandr.loktionov@intel.com,
+	aleksander.lobakin@intel.com,
+	dinesh.kumar@intel.com,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	almasrymina@google.com,
+	willemb@google.com
+Subject: [PATCH iwl-next v3 0/3] idpf: add flow steering support 
+Date: Wed,  9 Apr 2025 14:56:52 -0600
+Message-ID: <20250409205655.1039865-1-ahmed.zaki@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,26 +85,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWB003.ant.amazon.com (10.13.138.8) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Michal Luczaj <mhal@rbox.co>
-Date: Wed, 09 Apr 2025 14:50:58 +0200
-> Dummy unix_unhash() was introduced for sockmap in commit 94531cfcbe79
-> ("af_unix: Add unix_stream_proto for sockmap"), but there's no need to
-> implement it anymore.
-> 
-> ->unhash() is only called conditionally: in unix_shutdown() since commit
-> d359902d5c35 ("af_unix: Fix NULL pointer bug in unix_shutdown"), and in BPF
-> proto's sock_map_unhash() since commit 5b4a79ba65a1 ("bpf, sockmap: Don't
-> let sock_map_{close,destroy,unhash} call itself").
-> 
-> Remove it.
-> 
-> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+Add basic flow steering. For now, we support IPv4 and TCP/UDP only.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Patch 1 renames "enum virtchnl2_cap_rss" to a more generic "enum 
+virtchnl2_flow_types" that can be used with RSS and flow steering.
 
+Patch 2 adds the required flow steering virtchnl2 OP codes and patch 3
+adds the required flow steering ethtool ntuple ops to the idpf driver.
+---
+v3: - Fix sparse errors in patch 3 (Tony).
+
+v2: - https://lore.kernel.org/netdev/20250407191017.944214-1-ahmed.zaki@intel.com/
+    - Rename "enum virtchnl2_cap_rss" to virtchnl2_flow_types in
+      a separate patch (Patch 1).
+    - Change comments of freed BIT(6, 13) in patch 2 (Tony).
+    - Remove extra lines before VIRTCHNL2_CHECK_STRUCT_LEN (this makes
+      checkpatch complaints, but Tony believes this is preferred.
+    - Expand commit of patch 3 (Sridhar).
+    - Fix lkp build error (patch 3).
+    - Move 'include "idpf_virtchnl.h"' from idpf.h to idpf_ethtool.c
+      (patch 3) (Olek).
+    - Expand the cover letter text (Olek).
+    - Fix kdocs warnings.
+
+v1:
+    - https://lore.kernel.org/netdev/20250324134939.253647-1-ahmed.zaki@intel.com/
+
+Ahmed Zaki (2):
+  virtchnl2: rename enum virtchnl2_cap_rss
+  idpf: add flow steering support
+
+Sudheer Mogilappagari (1):
+  virtchnl2: add flow steering support
+
+ drivers/net/ethernet/intel/idpf/idpf.h        |  33 +-
+ .../net/ethernet/intel/idpf/idpf_ethtool.c    | 298 +++++++++++++++++-
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    |   5 +
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 120 ++++++-
+ .../net/ethernet/intel/idpf/idpf_virtchnl.h   |   6 +
+ drivers/net/ethernet/intel/idpf/virtchnl2.h   | 249 +++++++++++++--
+ 6 files changed, 665 insertions(+), 46 deletions(-)
+
+-- 
+2.43.0
 
 
