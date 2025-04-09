@@ -1,199 +1,154 @@
-Return-Path: <netdev+bounces-180922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB586A82F28
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 20:44:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A60D7A82F94
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 20:56:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91FF21896467
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 18:43:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D71364662E3
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 18:55:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE47C278177;
-	Wed,  9 Apr 2025 18:43:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA58127703E;
+	Wed,  9 Apr 2025 18:54:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DDNVpVlq"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ariTeyU2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C1022777EA
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 18:43:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4E9269B1E;
+	Wed,  9 Apr 2025 18:54:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744224211; cv=none; b=TPYBDvYMvz6FgrSUPBpZuzz+F/nTC7W+JRoJeuofFlqG3S+lYs7aMbD1fJL2UI38RxglcV2xnUcgTRDhqmsvQKXleBQOuHfnp7mCfcry6+dtTl5ptMIFzwy71cNyT92TCjJpnliUOjf9mDKK84654K4iCoCS5QioAWOgQX2EGo4=
+	t=1744224858; cv=none; b=V508WW7oWhpLbdmJUkZd7NV+a4jujoM9XvBI2UqM2WvxxZUCA0zzdRiFaGeM4cA2J9XLLa6oSBPBgwpad9tk0TIzHYPUA4cyHcyQ8QyjZwRpUhfIoLiB469R+pZ1R3RxGuiK1y4bl1tMz2oBz+S0EF5YKsJWWBRJh4tjqxRF9Qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744224211; c=relaxed/simple;
-	bh=39vz9Jz4SIUGg6Pb+C8ys6F0B1ja7AbNj2X6gnj3wFU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HExTjPStC7xG79Y7HlwAcQ1rXn9/vWZqVmyBwHjVSXmgr4ZrRwIrJvtmGf7ncDN0r6617TZC1qlVHx/ZUx9ZI1fLL/Wtz7V4hCOLLZyjIXmfrtL7NKjadIRl45M5CThGV85FIa2rF3pPmXk7fwYBhZe4sRtbNnhD16YwhRXuXro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=DDNVpVlq; arc=none smtp.client-ip=209.85.210.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-727388e8f6cso19887a34.0
-        for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 11:43:28 -0700 (PDT)
+	s=arc-20240116; t=1744224858; c=relaxed/simple;
+	bh=j75jUcknLX0EvayT68ZtfbolzuFLvZfJ3QkiyLlvBW4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IELTW2mYiVuAILW1rYCX2R4s58csu0t46qyM+IT3+qWx+Ek7Abp94SoMQlqJjjl61wrvRnjswvlY00Cvg/E7WS+CdvH4BYZRCXzSnV6YOPuDtf09mNEdYlh1eJ2lc1pLc5xCOmYMvRXOz0EodkQA6QCtX/ZJkG+AztE20RV1hlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ariTeyU2; arc=none smtp.client-ip=207.171.188.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1744224208; x=1744829008; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=yUFP4lEaxI/UXTQ8hF09KRKSpAvq6LdwMQOtlQ6n0zQ=;
-        b=DDNVpVlqYMNnXaIbuqd/VFeygNyScS2JLzUmcXTGkOd1UZKmt3v5Mc/iPwZ4n3D27v
-         A8E9G6z9qvRLykKpUhRUEmNCHfSp+h3ppTLcGRV01qnwVWJDBFP4owZhMGLZBvwDuAgR
-         vkASSjCS5mglXr6Qm51jCAo0VbSJQ2ylml6kI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744224208; x=1744829008;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yUFP4lEaxI/UXTQ8hF09KRKSpAvq6LdwMQOtlQ6n0zQ=;
-        b=ok2QJFo0MwkaS1/FYoiNFJgboEZ2ZGQ7MuVN5cjdi1wMYu/CVwklom18HC84AzIjRy
-         k+Qas0nPouO1CWSffZBruqMHIhKfZC384ZPso0Ow48aJf/IV/94JNCUAiJOUExwtd6XZ
-         Dm5P9tqkWQSrmUvqAVR6PMJ/pF0Dqt4xu93IFr25tPSAYU6dS5Auqg5Pw++GiIvi8DVm
-         6xhmecYlDzInuTNJM/1/5W/t5h2bI3DFf33/Qu7YU9dDC4/8+8r6WgI30oYkJjVskJe5
-         1Xo5dPB+L1f/oJwTqFpPLjLYB64o1C+B+/cULio/9PPaFBv8TjLUjCMxHup0rpJ5TGi+
-         LgnA==
-X-Forwarded-Encrypted: i=1; AJvYcCUEXIUfVxBbyjnLiXcHuRFn7IWp3hjBJJI5ZpvNogljtQiFLnX+Em2zgV3I8tfo5uCE87W/DDg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywt/YE02Hw7fSmQeAV6SwPtHNCYujcjl+jPOraaJOIYfQ+V377t
-	KMjTr63ax6rBR1603DGrAIj+YGmctcTdmMF40YfBR34C8oijhX9zMh1Ld3dGrw==
-X-Gm-Gg: ASbGncvU2kVLLtPVIXxMSAf/ZXcayysPzJ0WjAY+OAzAusdKVHR612IDb0Ex23FSqeB
-	8zq14avIvYbeRKN1GrP86oeZ69stJkO1qGr4F2rOfL/rDwyPrJH5UUEPcWyPXNrAjkX2Xo7PgtC
-	J4Vc35rNLU6Dw2ZbShBteE+X2p1ip3NlAcnTJKEElbCzC7vLGbpL6YpljtZPSyXqa1cSE/96QUp
-	7XYQeXq5EB2Cfnp48Ilscg5A5q153X/CrHjxiNlR6gpU9iNTIk8nyyojneyArdl7xtdeF1mTQRU
-	TjgDzo6dWN3LpblXD/J7TzvZHIwSSMey/ebJ3iwJAn63gIAT0UID1eGSrIvqPC705ty7QPlJVo1
-	eZ0oTiNFl7s1ldtfH
-X-Google-Smtp-Source: AGHT+IF+btWX9Vo26E5xa94gpnRIcQR2MzTl8AHguTxH8TEW16aEw9TQysoZkDfa3NYurrnfcDnCXQ==
-X-Received: by 2002:a05:6830:6019:b0:72b:87bd:ad47 with SMTP id 46e09a7af769-72e7baae198mr27677a34.3.1744224208126;
-        Wed, 09 Apr 2025 11:43:28 -0700 (PDT)
-Received: from [192.168.178.137] (f215227.upc-f.chello.nl. [80.56.215.227])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2d096cd3764sm325488fac.31.2025.04.09.11.43.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Apr 2025 11:43:27 -0700 (PDT)
-Message-ID: <25b7888d-f704-493b-a2d7-c5e8fff9cfb4@broadcom.com>
-Date: Wed, 9 Apr 2025 20:43:09 +0200
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744224857; x=1775760857;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=4Y+ZGykNcdvfvWdA+3QWI9sfVzx1jMsXgVbSk8G1+84=;
+  b=ariTeyU25iI/1vG7mNz+BP0it08Tejs6LiBMFfxdVhCka2htodchJF52
+   txrW6lL/7kbKP48Rcue0cQfCq9MNleOVOSuqlfwaFLO+tOWQz8qRQb3Ny
+   I0tXWpnePTQuIKFqbtQkraio7GRnqjEN3ym6j7MC5qQuSaT8a8dKkvdTL
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.15,201,1739836800"; 
+   d="scan'208";a="9030907"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 18:54:09 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:27356]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.132:2525] with esmtp (Farcaster)
+ id 0e6f7f6b-bdc1-448f-89f4-2d1d29037238; Wed, 9 Apr 2025 18:54:08 +0000 (UTC)
+X-Farcaster-Flow-ID: 0e6f7f6b-bdc1-448f-89f4-2d1d29037238
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 9 Apr 2025 18:54:08 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.170.41) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Wed, 9 Apr 2025 18:54:04 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kuba@kernel.org>
+CC: <casey@schaufler-ca.com>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <horms@kernel.org>, <jmorris@namei.org>,
+	<kadlec@netfilter.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
+	<linux-security-module@vger.kernel.org>, <ncardwell@google.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <pablo@netfilter.org>,
+	<paul@paul-moore.com>, <selinux@vger.kernel.org>, <serge@hallyn.com>,
+	<willemb@google.com>
+Subject: Re: [PATCH v2 net-next 0/4] net: Retire DCCP socket.
+Date: Wed, 9 Apr 2025 11:53:41 -0700
+Message-ID: <20250409185356.37457-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250409064949.6c992d15@kernel.org>
+References: <20250409064949.6c992d15@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 03/13] media: pci: cx18-av-vbi: Replace open-coded
- parity calculation with parity_odd()
-To: Kuan-Wei Chiu <visitorckw@gmail.com>, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
- jk@ozlabs.org, joel@jms.id.au, eajames@linux.ibm.com,
- andrzej.hajda@intel.com, neil.armstrong@linaro.org, rfoss@kernel.org,
- maarten.lankhorst@linux.intel.com, mripard@kernel.org, tzimmermann@suse.de,
- airlied@gmail.com, simona@ffwll.ch, dmitry.torokhov@gmail.com,
- mchehab@kernel.org, awalls@md.metrocast.net, hverkuil@xs4all.nl,
- miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
- louis.peens@corigine.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, parthiban.veerasooran@microchip.com,
- johannes@sipsolutions.net, gregkh@linuxfoundation.org, jirislaby@kernel.org,
- yury.norov@gmail.com, akpm@linux-foundation.org, jdelvare@suse.com,
- linux@roeck-us.net, alexandre.belloni@bootlin.com, pgaj@cadence.com
-Cc: hpa@zytor.com, alistair@popple.id.au, linux@rasmusvillemoes.dk,
- Laurent.pinchart@ideasonboard.com, jonas@kwiboo.se,
- jernej.skrabec@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
- linux-fsi@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
- linux-input@vger.kernel.org, linux-media@vger.kernel.org,
- linux-mtd@lists.infradead.org, oss-drivers@corigine.com,
- netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
- brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
- linux-serial@vger.kernel.org, bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw,
- Frank.Li@nxp.com, linux-hwmon@vger.kernel.org,
- linux-i3c@lists.infradead.org, david.laight.linux@gmail.com,
- andrew.cooper3@citrix.com, Yu-Chun Lin <eleanor15x@gmail.com>
-References: <20250409154356.423512-1-visitorckw@gmail.com>
- <20250409154356.423512-4-visitorckw@gmail.com>
-Content-Language: en-US
-From: Arend van Spriel <arend.vanspriel@broadcom.com>
-Autocrypt: addr=arend.vanspriel@broadcom.com; keydata=
- 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
-In-Reply-To: <20250409154356.423512-4-visitorckw@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D032UWA003.ant.amazon.com (10.13.139.37) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 4/9/2025 5:43 PM, Kuan-Wei Chiu wrote:
-> Refactor parity calculations to use the standard parity_odd() helper.
-> This change eliminates redundant implementations.
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Wed, 9 Apr 2025 06:49:49 -0700
+> On Tue, 8 Apr 2025 17:29:07 -0700 Kuniyuki Iwashima wrote:
+> > As announced by commit b144fcaf46d4 ("dccp: Print deprecation
+> > notice."), it's time to remove DCCP socket.
+> > 
+> > The patch 2 removes net/dccp, LSM code, doc, and etc, leaving
+> > DCCP netfilter modules.
+> > 
+> > The patch 3 unexports shared functions for DCCP, and the patch 4
+> > renames tcp_or_dccp_get_hashinfo() to tcp_get_hashinfo().
+> > 
+> > We can do more cleanup; for example, remove IPPROTO_TCP checks in
+> > __inet6?_check_established(), remove __module_get() for twsk,
+> > remove timewait_sock_ops.twsk_destructor(), etc, but it will be
+> > more of TCP stuff, so I'll defer to a later series.
 > 
-> Co-developed-by: Yu-Chun Lin <eleanor15x@gmail.com>
-> Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
-> Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail.com>
-> ---
->   drivers/media/pci/cx18/cx18-av-vbi.c | 12 ++----------
->   1 file changed, 2 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/media/pci/cx18/cx18-av-vbi.c b/drivers/media/pci/cx18/cx18-av-vbi.c
-> index 65281d40c681..15b515b95956 100644
-> --- a/drivers/media/pci/cx18/cx18-av-vbi.c
-> +++ b/drivers/media/pci/cx18/cx18-av-vbi.c
+> So it builds now but appears to break 1/3rd of the selftests :)
 
-[...]
+Ahh sorry, I made a mistake while inlining sk_clone_lock()...
 
-> @@ -278,7 +270,7 @@ int cx18_av_decode_vbi_line(struct v4l2_subdev *sd,
->   		break;
->   	case 6:
->   		sdid = V4L2_SLICED_CAPTION_525;
-> -		err = !odd_parity(p[0]) || !odd_parity(p[1]);
-> +		err = !parity_odd(p[0]) || !parity_odd(p[1]);
+Will squash diff below in v3.
 
-No need to call parity_odd() twice here. Instead you could do:
+Thanks!
 
-		err = !parity_odd(p[0] ^ p[1]);
 
-This is orthogonal to the change to parity_odd() though. More specific 
-to the new parity_odd() you can now do following as parity_odd() 
-argument is u64:
-
-		err = !parity_odd(*(u16 *)p);
-
-Regards,
-Arend
-
+---8<---
+$ git diff --cached | cat
+diff --git a/net/core/sock.c b/net/core/sock.c
+index e76b2bcec33d..e053ab6380f5 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -2490,13 +2490,13 @@ struct sock *sk_clone_lock(const struct sock *sk, const gfp_t priority)
+ 		if (!is_charged)
+ 			RCU_INIT_POINTER(newsk->sk_filter, NULL);
+ 
+-		goto out;
++		goto free;
+ 	}
+ 
+ 	RCU_INIT_POINTER(newsk->sk_reuseport_cb, NULL);
+ 
+ 	if (bpf_sk_storage_clone(sk, newsk))
+-		goto out;
++		goto free;
+ 
+ 	/* Clear sk_user_data if parent had the pointer tagged
+ 	 * as not suitable for copying when cloning.
+@@ -2525,12 +2525,16 @@ struct sock *sk_clone_lock(const struct sock *sk, const gfp_t priority)
+ 	if (sock_needs_netstamp(sk) && newsk->sk_flags & SK_FLAGS_TIMESTAMP)
+ 		net_enable_timestamp();
+ out:
++	return newsk;
++free:
+ 	/* It is still raw copy of parent, so invalidate
+-	 * destructor and make plain sk_free() */
++	 * destructor and make plain sk_free()
++	 */
+ 	newsk->sk_destruct = NULL;
+ 	bh_unlock_sock(newsk);
+ 	sk_free(newsk);
+-	return NULL;
++	newsk = NULL;
++	goto out;
+ }
+ EXPORT_SYMBOL_GPL(sk_clone_lock);
+ 
+---8<---
 
