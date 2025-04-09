@@ -1,204 +1,175 @@
-Return-Path: <netdev+bounces-180820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20A78A82947
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 17:05:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7467A82979
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 17:09:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D2A57B5AFA
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 14:58:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6405F9A15C5
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 15:00:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED78D26B2A3;
-	Wed,  9 Apr 2025 14:54:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550D418A6A5;
+	Wed,  9 Apr 2025 14:55:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="SmByAWa+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O8GmzoLk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE2926B098
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 14:54:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4EE2262801
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 14:55:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744210455; cv=none; b=Sx4IllKoFvvA8wp/dTo1RrYXJPNp8a4XHU8zk11uJtGRIMJ4FaopF/YqMGQrXyl95Q+EgdRRDRuTZy49WiRio7Vn9LXB+/QOFfoPwzvSH4iXN8zT0yyLmXq+Qr/s4CKo2Pku9xwh00hKpoZwais/G4Gu6ghei3q+M++NRtnmA+M=
+	t=1744210535; cv=none; b=EvKmQ5OhS2UTZqH0ZsvVadgOwBOxRSrP07jVFLNJb3XFEjKJ1QT2OhSxfhARFvKsJ68rLs1WjcjgX0N2UkDRAdlvDCYkE1PwKC9POMBCoPcz2DCfDiUG6QLnYOKmV81wzFDD0p4hnun7P+/6cgYw8q8iuSJM1R9dnjGCNtdIWBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744210455; c=relaxed/simple;
-	bh=6g0TfWDuvigbnJLDqJYb2R4PL8SRBJ82ihr5x2bmHek=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fTt5kviow5mWBu9r73QxJiDnuMQxFlY1SqF/4ArRQTgbDhC1nloz+5TsLZVfqKG3SFPu42nAKrSaM7gT4F6LJQU2jmutHycD3Djv1FmqOY2u6lTdtw3i5PNnQFjhXPAQNhrV2pjRCk1drRZAMdcwr/KXHruTaWd2l9q+Hp5Aoow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=SmByAWa+; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5398d52d029098
-	for <netdev@vger.kernel.org>; Wed, 9 Apr 2025 14:54:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	2e+zhortkq1PPVBPRYcJak6GvfMLkq1x12up5ZcdsG0=; b=SmByAWa+1AfXtVKW
-	kW7NxtxG4xNKWwjKtwsoXDRknfKrd0cOocRlx/ZRWIKIALZyUZO6ev74eZtaEz8J
-	xHSw3qj7m0wyc2QaL/KMHZaTzMiFg321kMfnnwqPqJ1IGG51YE58+cc1wNmdTfGR
-	3ZBCbW/h9f00z2qK+UwPzT1U+8vG0Rf2WiVQkTuv3IoCenouGJOdl9V5rAX5MvlP
-	H/f99YsjRpjz6r971m7juzNyEPQ23qICulBfVU/MiiR/gvvzT+CgrOSrySFjEJWy
-	bNHaAzU8A1uKsKhT8Q18IiX3YOzn8gHx5Jh6SZbXnNjJiMv6CesYI4A+qjc60OZD
-	MfNUUA==
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 45twpmbmsn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 14:54:13 +0000 (GMT)
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7c53d5f85c9so162291985a.1
-        for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 07:54:13 -0700 (PDT)
+	s=arc-20240116; t=1744210535; c=relaxed/simple;
+	bh=Le42i0f9ri0OTkgnI+o5y8rBvy/0/K5o9eeKOO0dHFA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sUnhiAVBIlfQsOTG/BpDTUcX4EaCrytpy6pIWoRfNnCVGDirIL+OuyBZkszGFv37cZYnVL5UfniE+Ygn2scfQ+pegPpmBFOy9OSJWSGMhVeoMpYyRYKY9V9bPLNDAZDTLPAUwbiOE6i1Ba8+p1oAM4/PjH6Kkkoz1aUxUgh1uFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O8GmzoLk; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744210532;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=m76p578lQmATrS7N9RNgIuSei90CjOqaYzI8tK7znzQ=;
+	b=O8GmzoLkEaKpd0jglPQaJY3xFjNXpE3OjctlIBhIskYwv56AZf9BF3nEUxZe1Z0EMUCwHD
+	8SEfq3WTDh1g8wDGdSQupNJUeEX5fux5Z7Et0AJS+nxCrmP56DNPCe9altlXnpChapgATw
+	4eVe3qOtnlGwKQ2j3yURsRzy67kc8Yk=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-441-AMd2vXNuNG210DKBgChdPQ-1; Wed, 09 Apr 2025 10:55:31 -0400
+X-MC-Unique: AMd2vXNuNG210DKBgChdPQ-1
+X-Mimecast-MFC-AGG-ID: AMd2vXNuNG210DKBgChdPQ_1744210530
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-ac293748694so158742166b.0
+        for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 07:55:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744210452; x=1744815252;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2e+zhortkq1PPVBPRYcJak6GvfMLkq1x12up5ZcdsG0=;
-        b=NDdlrrvFsfJWK3ux34gu06fV2N3SF+felUtg6k5JraX6nAUze39FeqZ+XUbH9elYTm
-         G6pMViYCigXvWiY+SPntKpnCCh0V199P6lQMTbTlV/dFVZzf85O5+myicAugF0gIbBsB
-         ZxXPQwGZyhRdNdQ7V0UFjtnsNogylg57eyBn0MyaPMtrQTQOHoiNoEgsoOes6Rpow9dZ
-         oqARQOoq3BgLGgRBy6H4BiokZIvronzmtdbjDs104S/AqDa37rl8NR0xfN7FIfrJ68cs
-         KEjiYN5gKSKC2alK1ufSekrjyJ95d85tReIfND+KAO40hHydwELbXTx7wQxKIIEc25Fk
-         H5OA==
-X-Forwarded-Encrypted: i=1; AJvYcCXMts/p4dbYhOaFnEkwm9o+86uX3m/tRpFZXCOQrhrR7jUKGbL6GaWVzCd4wB8YSAIrOpzBqPc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6fYsLtqOjOLbhBFjNWzRe5ls7eOizOZ4HpMKV2d48TjipN/A8
-	2ubhxPBptctnlxfMOdFRXW1cGyVrhICk4Wp0gjIobLjCiigN/BQSUkxJ+jiU7aKpSVKfqxepdDP
-	gJXssui2I1sXxkXzkK5UD9Jah8D5aoN1DrvMu6Q+ZTSEIUiDi+oSB6uU=
-X-Gm-Gg: ASbGnctct3ojbmxI+uI3bVECWwJWh8rGjlOUiUIWxbnHwe0g8g6mwUanQvaC6ztk6WM
-	Uz+4r/VLj2m+oNhk65WXHAtd1/GC0iGIiqah+lupiC0cQPBVlIYj/0Yy3Zelwgel04l18VoHcaQ
-	TmooofAAvyMsA+tOEX80VNNtDBUmhx+2sJseqiAuTvef5s2c//bqCcriYlqwpirEBddztjSt62q
-	dQcleuJeLBvWOVApHhVeAKh+zjYXJlvSsiFrgdlrqRfCNPxqUvmxk8RPXMkTNDup4Rk/QmgiWjz
-	ZRBPYixRnBx7jj84lG8BgoRjHa2V+MhsrtDQtW6S2z6a/QUvi+mYCp2G6Va7xRZR6A==
-X-Received: by 2002:a05:620a:d8d:b0:7c3:c814:591d with SMTP id af79cd13be357-7c79cbcad39mr181547985a.1.1744210451955;
-        Wed, 09 Apr 2025 07:54:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEkhEFX9jW2lxjwZtZRt5wSID+lKfDUWjDhK7POIeIFuD1YPW0A5mtnATcnc6+c78jlhAPyDg==
-X-Received: by 2002:a05:620a:d8d:b0:7c3:c814:591d with SMTP id af79cd13be357-7c79cbcad39mr181545185a.1.1744210451558;
-        Wed, 09 Apr 2025 07:54:11 -0700 (PDT)
-Received: from [192.168.65.90] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acaa1cb4142sm108209666b.101.2025.04.09.07.54.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Apr 2025 07:54:10 -0700 (PDT)
-Message-ID: <fb61323b-aabd-4661-a202-02da7da557ea@oss.qualcomm.com>
-Date: Wed, 9 Apr 2025 16:54:05 +0200
+        d=1e100.net; s=20230601; t=1744210530; x=1744815330;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=m76p578lQmATrS7N9RNgIuSei90CjOqaYzI8tK7znzQ=;
+        b=wHsV70oysK4H25uPHCl0iAMwU9j5SwsfvBjBTs2UWmhPaBqQpKSBY4hGGOLVdEkqSL
+         1Oj9zqc87uFFCZ1IikPdCVP4vINt8Ay5xWcd/8lUahBdWShh1OXzPI5vI0tNKV7ITQ6G
+         MRS6fBye/hFtSs3qkHzxkitbsSrFQvptNBvkI+YJOFRdp69OLJngestgLA92DckLDEgG
+         eVZt7FGcPdTVj+RiBvbs5obPSqjbWKrQGJuBNOwNVsVyFk72VDnbIxtkt0uU96PXUJYg
+         nq9rq5h9otbl02Hw7W47MjaUGO5DyX9s/dhumssYNms9fgfQu8kMUHnWWguXJXVdO5X8
+         ogVw==
+X-Forwarded-Encrypted: i=1; AJvYcCWrkT3qoycTzNmMBATjZVUCRjyCMPYuiUyY/zw3FyUCxJnYoU4sr3K7giCLeK3LSfoZ5nImAU8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyg4hN+3nxHi0I5Wfwqnv0ZwhQnTQZ87ugABkQzZRDYsfOFaLuL
+	AFLy4Yeytsr+mPI7H82U/p8Oge3Cq9Q5gr2TRKo5pUwOezVU9AzRSlTQt08DH0itvs+feKsFNnQ
+	DppCFj0TXfG35pxggPz/pHNyTc6BFsJ8SeszX0uTBcySlv6NpC3Umng==
+X-Gm-Gg: ASbGnctOYJjA1dXjt5dR/Cnw1HJ9uS0xA4tF8FLLbJ+SKfgz06QdX3UB+cjNeDEoAMA
+	2P1BMPhVl8+9aVCPhfH6yrMtR6v9q7aMw9xhLKv9UF/03/TNgN/8vC2ia7EEqwYf8WaxHzgSyq1
+	MXbKRaFcb9Ya08PJWX5qNL2YxNv9ZkSNIaM/rNfISdrIhMXh0DgZLHFDP7MvVnwCa9/+CVYkPbd
+	D6sclkeIIXejUqoEMQxr1ehn8adkY3jiuMAGM/SLnGLq7aeEy9DF49KUtC7Un/hPQlU507kCcXO
+	Bd0xm6mV
+X-Received: by 2002:a17:907:2d20:b0:ac7:7f14:f31b with SMTP id a640c23a62f3a-aca9b64d7a3mr300943966b.3.1744210529878;
+        Wed, 09 Apr 2025 07:55:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE/zURxGPfd0Yl1XD9idcXRTI7MKb7xPhWFNGbImVZpZ3AvB5dKEKj0WPEKQNwn4qLT4WaLuA==
+X-Received: by 2002:a17:907:2d20:b0:ac7:7f14:f31b with SMTP id a640c23a62f3a-aca9b64d7a3mr300941966b.3.1744210529414;
+        Wed, 09 Apr 2025 07:55:29 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acaa1cb422asm107541766b.115.2025.04.09.07.55.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Apr 2025 07:55:28 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id B6E0819920EE; Wed, 09 Apr 2025 16:55:27 +0200 (CEST)
+From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>
+Cc: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next] tc: Return an error if filters try to attach too many actions
+Date: Wed,  9 Apr 2025 16:55:23 +0200
+Message-ID: <20250409145523.164506-1-toke@redhat.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] net: qrtr: Define macro to convert QMI version and
- instance to QRTR instance
-To: Yassine Oudjana <y.oudjana@protonmail.com>,
-        Jonathan Cameron <jic23@kernel.org>,
-        Lars-Peter Clausen <lars@metafoo.de>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nicolas Schier <nicolas.schier@linux.dev>,
-        Alexander Sverdlin <alexander.sverdlin@gmail.com>,
-        Sean Nyekjaer <sean@geanix.com>,
-        Javier Carrasco <javier.carrasco.cruz@gmail.com>,
-        Matti Vaittinen <mazziesaccount@gmail.com>,
-        Antoniu Miclaus <antoniu.miclaus@analog.com>,
-        Ramona Gradinariu <ramona.gradinariu@analog.com>,
-        "Yo-Jung (Leo) Lin" <0xff07@gmail.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Neil Armstrong <neil.armstrong@linaro.org>,
-        =?UTF-8?B?QmFybmFiw6FzIEN6w6ltw6Fu?= <barnabas.czeman@mainlining.org>,
-        Danila Tikhonov <danila@jiaxyga.com>,
-        Antoni Pokusinski <apokusinski01@gmail.com>,
-        Vasileios Amoiridis <vassilisamir@gmail.com>,
-        Petar Stoykov <pd.pstoykov@gmail.com>,
-        shuaijie wang <wangshuaijie@awinic.com>,
-        Yasin Lee <yasin.lee.x@gmail.com>,
-        "Borislav Petkov (AMD)" <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Ingo Molnar <mingo@kernel.org>
-Cc: Yassine Oudjana <yassine.oudjana@gmail.com>, linux-kernel@vger.kernel.org,
-        linux-iio@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kbuild@vger.kernel.org
-References: <20250406140706.812425-1-y.oudjana@protonmail.com>
- <20250406140706.812425-3-y.oudjana@protonmail.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20250406140706.812425-3-y.oudjana@protonmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: QLVsXXplpn9x9hW-XbnoqlwJ2sGvB6iD
-X-Proofpoint-ORIG-GUID: QLVsXXplpn9x9hW-XbnoqlwJ2sGvB6iD
-X-Authority-Analysis: v=2.4 cv=MpRS63ae c=1 sm=1 tr=0 ts=67f68a15 cx=c_pps a=qKBjSQ1v91RyAK45QCPf5w==:117 a=FpWmc02/iXfjRdCD7H54yg==:17 a=IkcTkHD0fZMA:10 a=XR8D0OoHHMoA:10 a=sfOm8-O8AAAA:8 a=PIWKGJPQcB-H7wabpAUA:9 a=QEXdDO2ut3YA:10
- a=NFOGd7dJGGMPyQGDc5-O:22 a=TvTJqdcANYtsRzA46cdi:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-09_05,2025-04-08_04,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- mlxlogscore=999 clxscore=1015 priorityscore=1501 impostorscore=0
- spamscore=0 bulkscore=0 suspectscore=0 malwarescore=0 adultscore=0
- phishscore=0 mlxscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
- definitions=main-2504090093
+Content-Transfer-Encoding: 8bit
 
-On 4/6/25 4:07 PM, Yassine Oudjana wrote:
-> Move QRTR instance conversion from qmi_interface into a new macro in order
-> to reuse it in QRTR device ID tables.
-> 
-> Signed-off-by: Yassine Oudjana <y.oudjana@protonmail.com>
-> ---
->  drivers/soc/qcom/qmi_interface.c | 5 +++--
->  include/linux/soc/qcom/qrtr.h    | 2 ++
->  2 files changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/soc/qcom/qmi_interface.c b/drivers/soc/qcom/qmi_interface.c
-> index bc6d6379d8b1..cb57b7e1f252 100644
-> --- a/drivers/soc/qcom/qmi_interface.c
-> +++ b/drivers/soc/qcom/qmi_interface.c
-> @@ -14,6 +14,7 @@
->  #include <linux/workqueue.h>
->  #include <trace/events/sock.h>
->  #include <linux/soc/qcom/qmi.h>
-> +#include <linux/soc/qcom/qrtr.h>
->  
->  static struct socket *qmi_sock_create(struct qmi_handle *qmi,
->  				      struct sockaddr_qrtr *sq);
-> @@ -173,7 +174,7 @@ static void qmi_send_new_lookup(struct qmi_handle *qmi, struct qmi_service *svc)
->  	memset(&pkt, 0, sizeof(pkt));
->  	pkt.cmd = cpu_to_le32(QRTR_TYPE_NEW_LOOKUP);
->  	pkt.server.service = cpu_to_le32(svc->service);
-> -	pkt.server.instance = cpu_to_le32(svc->version | svc->instance << 8);
-> +	pkt.server.instance = cpu_to_le32(QRTR_INSTANCE(svc->version, svc->instance));
->  
->  	sq.sq_family = qmi->sq.sq_family;
->  	sq.sq_node = qmi->sq.sq_node;
-> @@ -236,7 +237,7 @@ static void qmi_send_new_server(struct qmi_handle *qmi, struct qmi_service *svc)
->  	memset(&pkt, 0, sizeof(pkt));
->  	pkt.cmd = cpu_to_le32(QRTR_TYPE_NEW_SERVER);
->  	pkt.server.service = cpu_to_le32(svc->service);
-> -	pkt.server.instance = cpu_to_le32(svc->version | svc->instance << 8);
-> +	pkt.server.instance = cpu_to_le32(QRTR_INSTANCE(svc->version, svc->instance));
->  	pkt.server.node = cpu_to_le32(qmi->sq.sq_node);
->  	pkt.server.port = cpu_to_le32(qmi->sq.sq_port);
->  
-> diff --git a/include/linux/soc/qcom/qrtr.h b/include/linux/soc/qcom/qrtr.h
-> index 4d7f25c64c56..10c89a35cbb9 100644
-> --- a/include/linux/soc/qcom/qrtr.h
-> +++ b/include/linux/soc/qcom/qrtr.h
-> @@ -13,6 +13,8 @@ struct qrtr_device {
->  
->  #define to_qrtr_device(d) container_of(d, struct qrtr_device, dev)
->  
-> +#define QRTR_INSTANCE(qmi_version, qmi_instance) (qmi_version | qmi_instance << 8)
+While developing the fix for the buffer sizing issue in [0], I noticed
+that the kernel will happily accept a long list of actions for a filter,
+and then just silently truncate that list down to a maximum of 32
+actions.
 
-Please use FIELD_PREP + GENMASK to avoid potential overflows
+That seems less than ideal, so this patch changes the action parsing to
+return an error message and refuse to create the filter in this case.
+This results in an error like:
 
-Konrad
+ # ip link add type veth
+ # tc qdisc replace dev veth0 root handle 1: fq_codel
+ # tc -echo filter add dev veth0 parent 1: u32 match u32 0 0 $(for i in $(seq 33); do echo action pedit munge ip dport set 22; done)
+Error: Only 32 actions supported per filter.
+We have an error talking to the kernel
+
+Instead of just creating a filter with 32 actions and dropping the last
+one.
+
+This is obviously a change in UAPI. But seeing as creating more than 32
+filters has never actually *worked*, it seems that returning an explicit
+error is better, and any use cases that get broken by this were already
+broken just in more subtle ways.
+
+[0] https://lore.kernel.org/r/20250407105542.16601-1-toke@redhat.com
+
+Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+---
+ net/sched/act_api.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/net/sched/act_api.c b/net/sched/act_api.c
+index 839790043256..057e20cef375 100644
+--- a/net/sched/act_api.c
++++ b/net/sched/act_api.c
+@@ -1461,17 +1461,29 @@ int tcf_action_init(struct net *net, struct tcf_proto *tp, struct nlattr *nla,
+ 		    struct netlink_ext_ack *extack)
+ {
+ 	struct tc_action_ops *ops[TCA_ACT_MAX_PRIO] = {};
+-	struct nlattr *tb[TCA_ACT_MAX_PRIO + 1];
++	struct nlattr *tb[TCA_ACT_MAX_PRIO + 2];
+ 	struct tc_action *act;
+ 	size_t sz = 0;
+ 	int err;
+ 	int i;
+ 
+-	err = nla_parse_nested_deprecated(tb, TCA_ACT_MAX_PRIO, nla, NULL,
++	err = nla_parse_nested_deprecated(tb, TCA_ACT_MAX_PRIO + 1, nla, NULL,
+ 					  extack);
+ 	if (err < 0)
+ 		return err;
+ 
++	/* The nested attributes are parsed as types, but they are really an
++	 * array of actions. So we parse one more than we can handle, and return
++	 * an error if the last one is set (as that indicates that the request
++	 * contained more than the maximum number of actions).
++	 */
++	if (tb[TCA_ACT_MAX_PRIO + 1]) {
++		NL_SET_ERR_MSG_FMT(extack,
++				   "Only %d actions supported per filter",
++				   TCA_ACT_MAX_PRIO);
++		return -EINVAL;
++	}
++
+ 	for (i = 1; i <= TCA_ACT_MAX_PRIO && tb[i]; i++) {
+ 		struct tc_action_ops *a_o;
+ 
+-- 
+2.49.0
+
 
