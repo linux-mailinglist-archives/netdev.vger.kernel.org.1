@@ -1,179 +1,102 @@
-Return-Path: <netdev+bounces-180766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD594A82650
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 15:31:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 631C1A82659
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 15:35:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5EE117DA9F
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 13:29:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51BCF1B88925
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 13:35:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C23D125DD0F;
-	Wed,  9 Apr 2025 13:29:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 597E525484B;
+	Wed,  9 Apr 2025 13:35:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JaW8AaeG"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="G0W4MyNw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B0052561CC;
-	Wed,  9 Apr 2025 13:29:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72498433C4;
+	Wed,  9 Apr 2025 13:35:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744205342; cv=none; b=hw8NGdObODfSsODDSQiM3Rsb5RGpbOxtKbM6UrPG/1DbDqhISJhFUrNxeWcizIZWRO9FmsBePEifRvHfYXyanb3Edehme5TGPhKSE1HWBzoBa/glNZRroSpPIj2S1SNfttJpEhc3++zIJGM2qUGJjj/PZqW3JfiV/l3r7LMnKm4=
+	t=1744205734; cv=none; b=RVIOlH16qSW+ge9q1gj9eUc5rC7lo3rDUH6nUnfqOsthWW+cVj2qKrKmlAAKD7NbrszKJnbwyNhODeU9Kdm/67DuQIrfhAp+3+1XX7AqCE06+ImlEDZtLO/rPZMX2aBfhv8FRr6rS0J+t043DY7wMHWqJNz+EKEjz1mL6J5e3qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744205342; c=relaxed/simple;
-	bh=Km9/FVRC6jO0f5L6lMq0Nqd/ym5VEVLjWSFCAHLpB/Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sUAdlBOwHkdNL4pzUV7Ld4A7TvqGJRQP7sMiCjXMNNszYmXGOD39J2jQWAaWqHdjBNWSzyYS5tjiGnmSRFRt2tpCYwlG8jPH5ZLeYpmZEnEPwxVKI/dz9CtueqIw0u/FjiMgiTHwyYe33ldF5tTbBPs27Kae498XMrKcg+t32Ag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JaW8AaeG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADBC2C4CEE3;
-	Wed,  9 Apr 2025 13:28:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744205342;
-	bh=Km9/FVRC6jO0f5L6lMq0Nqd/ym5VEVLjWSFCAHLpB/Q=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=JaW8AaeGbE+zWk56+4oZKbLWDEWr5CDoMzsezn52H5jB1+ZmyvcmVxlX7AaUpoRzD
-	 9H49ajkehX5m44qaEY9zQA2csv4ElqHv9DXhIvnBSWTclMAbJVci6hYD5xC5bm/ucH
-	 ss6zHFcLZe/eBFir+Moq0F87UgCwRRAqy78tW165dK3Cr7tYZBlOd5z/CQA2MkvMPo
-	 7GgfSU38I8tt66CWw9M0p+50F4Zqb/pTsMSSE89GOhGzkIaz6Nt7Lj3CV0b/4zb/T1
-	 /9y8txxqMmzKMi1IpWjD+bsCziskEXiYSDnvXtXuZ2RNGov53zt5MRlqfZ/ulSCw58
-	 p/oKcvHYry7JQ==
-Message-ID: <e40c4f92-cc4f-49d2-9d7f-e2d88aeba873@kernel.org>
-Date: Wed, 9 Apr 2025 15:28:55 +0200
+	s=arc-20240116; t=1744205734; c=relaxed/simple;
+	bh=Cr1i7QuEckUmeD+MKDGZjYqbAOuv4cMLcJYoRcPCq44=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ieCKWEyT/RIF24kCkI5wBVhyaKgyRvm5c4vYq3VM9Wn7zaltmYxpcgA6id2bXT9q+nOW2oPeUPzOavd2aOzLZZG3TXl1W+XKJ25LyFDM4MBV1TdCmuXlytHpmALfWMgeULusXr1kR5VmJrq1y3JQGna3oxHlYR0OOimFxkd2K+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=G0W4MyNw; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=RwIdYiiW5ktOZ+Nc8/rs0JZc6lh8LeCykoSCmOQ2Nog=; b=G0W4MyNwxaD/LuM37kAc8j7r/p
+	ZC7hWOqY5d3s8YVdHMOTzQTfouyv5HVHB6bIm1PcoYVFnGfc2VSJ4rg1dRfjsZzVXZ5d2tiiORHx0
+	S1f7aYN5pxnKF40ctg5Z6QPEwXppaatAVTDL4B1mbf6COfabaHVx1Nn2tKhnxrxcs84tgF9ReXbm9
+	6eZH8pT2hhRmHQQP4n0Jow0wETS29VkHCVM9NZCFteP+z7vHT/msNKKEoJOQayVapkgYPRlVJEXd/
+	Ok/ZdnemX31jvsl4U7Qnw38FNFryOs0tpMxxShFOzq0xYB0nEi3kOIflbVx4jAbGLm3TIFabK3b8B
+	bgKYPSkw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50930)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u2VaL-0000Z8-0i;
+	Wed, 09 Apr 2025 14:35:21 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u2VaI-0002be-06;
+	Wed, 09 Apr 2025 14:35:18 +0100
+Date: Wed, 9 Apr 2025 14:35:17 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 2/2] net: phy: Add Marvell PHY PTP support
+Message-ID: <Z_Z3lchknUpZS1UP@shell.armlinux.org.uk>
+References: <20250407-feature_marvell_ptp-v2-0-a297d3214846@bootlin.com>
+ <20250407-feature_marvell_ptp-v2-2-a297d3214846@bootlin.com>
+ <20250408154934.GZ395307@horms.kernel.org>
+ <Z_VdlGVJjdtQuIW0@shell.armlinux.org.uk>
+ <20250409101808.43d5a17d@kmaincent-XPS-13-7390>
+ <Z_YwxYZc7IHkTx_C@shell.armlinux.org.uk>
+ <20250409104858.2758e68e@kmaincent-XPS-13-7390>
+ <Z_ZlDLzvu_Y2JWM8@shell.armlinux.org.uk>
+ <20250409143820.51078d31@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next V2 2/2] net: sched: generalize check for no-op
- qdisc
-To: Eric Dumazet <eric.dumazet@gmail.com>, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>, edumazet@google.com
-Cc: bpf@vger.kernel.org, tom@herbertland.com,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
- dsahern@kernel.org, makita.toshiaki@lab.ntt.co.jp, kernel-team@cloudflare.com
-References: <174412623473.3702169.4235683143719614624.stgit@firesoul>
- <174412628464.3702169.81132659219041209.stgit@firesoul>
- <1ad134d3-4173-4d43-b2ad-0b2c5165bbc1@gmail.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <1ad134d3-4173-4d43-b2ad-0b2c5165bbc1@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250409143820.51078d31@kmaincent-XPS-13-7390>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+On Wed, Apr 09, 2025 at 02:38:20PM +0200, Kory Maincent wrote:
+> Ok, thanks for the tests and these information.
+> Did you run ptp4l with this patch applied and did you switch to Marvell PHY PTP
+> source?
 
+This was using mvpp2, but I have my original patch as part of my kernel
+rather than your patch.
 
-On 08/04/2025 17.47, Eric Dumazet wrote:
-> 
-> On 4/8/25 5:31 PM, Jesper Dangaard Brouer wrote:
->> Several drivers (e.g., veth, vrf) contain open-coded checks to determine
->> whether a TX queue has a real qdisc attached - typically by testing if
->> qdisc->enqueue is non-NULL.
->>
->> These checks are functionally equivalent to comparing the queue's qdisc
->> pointer against &noop_qdisc (qdisc named "noqueue"). This equivalence
->> stems from noqueue_init(), which explicitly clears the enqueue pointer
->> for the "noqueue" qdisc. As a result, __dev_queue_xmit() treats the qdisc
->> as a no-op only when enqueue == NULL.
->>
->> This patch introduces a common helper, qdisc_txq_is_noop() to standardize
->> this check. The helper is added in sch_generic.h and replaces open-coded
->> logic in both the veth and vrf drivers.
->>
->> This is a non-functional change.
->>
->> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
->> ---
->>   drivers/net/veth.c        |   14 +-------------
->>   drivers/net/vrf.c         |    3 +--
->>   include/net/sch_generic.h |    7 ++++++-
->>   3 files changed, 8 insertions(+), 16 deletions(-)
->>
->> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
->> index f29a0db2ba36..83c7758534da 100644
->> --- a/drivers/net/veth.c
->> +++ b/drivers/net/veth.c
->> @@ -341,18 +341,6 @@ static bool veth_skb_is_eligible_for_gro(const 
->> struct net_device *dev,
->>            rcv->features & (NETIF_F_GRO_FRAGLIST | NETIF_F_GRO_UDP_FWD));
->>   }
->> -/* Does specific txq have a real qdisc attached? - see noqueue_init() */
->> -static inline bool txq_has_qdisc(struct netdev_queue *txq)
->> -{
->> -    struct Qdisc *q;
->> -
->> -    q = rcu_dereference(txq->qdisc);
->> -    if (q->enqueue)
->> -        return true;
->> -    else
->> -        return false;
->> -}
->> -
->>   static netdev_tx_t veth_xmit(struct sk_buff *skb, struct net_device 
->> *dev)
->>   {
->>       struct veth_priv *rcv_priv, *priv = netdev_priv(dev);
->> @@ -399,7 +387,7 @@ static netdev_tx_t veth_xmit(struct sk_buff *skb, 
->> struct net_device *dev)
->>            */
->>           txq = netdev_get_tx_queue(dev, rxq);
->> -        if (!txq_has_qdisc(txq)) {
->> +        if (qdisc_txq_is_noop(txq)) {
->>               dev_kfree_skb_any(skb);
->>               goto drop;
->>           }
->> diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
->> index 7168b33adadb..d4fe36c55f29 100644
->> --- a/drivers/net/vrf.c
->> +++ b/drivers/net/vrf.c
->> @@ -349,9 +349,8 @@ static bool qdisc_tx_is_default(const struct 
->> net_device *dev)
->>           return false;
->>       txq = netdev_get_tx_queue(dev, 0);
->> -    qdisc = rcu_access_pointer(txq->qdisc);
->> -    return !qdisc->enqueue;
->> +    return qdisc_txq_is_noop(txq);
->>   }
->>   /* Local traffic destined to local address. Reinsert the packet to rx
->> diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
->> index d48c657191cd..eb90d5103371 100644
->> --- a/include/net/sch_generic.h
->> +++ b/include/net/sch_generic.h
->> @@ -803,6 +803,11 @@ static inline bool qdisc_tx_changing(const struct 
->> net_device *dev)
->>       return false;
->>   }
->> +static inline bool qdisc_txq_is_noop(const struct netdev_queue *txq)
->> +{
->> +    return (rcu_access_pointer(txq->qdisc) == &noop_qdisc);
-> 
-> 
-> return (expression);
-> 
-> ->
-> 
-> return expression;
-> 
-> 
-> return rcu_access_pointer(txq->qdisc) == &noop_qdisc;
-
-Will fix in next iteration.
-
-> I also feel this patch should come first in the series ?
-> 
-
-To me it looks/feels wrong doing this before there are two users.
-With only the vrf driver, the changed looked unnecessary.
-The diff stats looks/feels wrong, when it's patch-1.
-
-As I have to respin anyhow, I will let you decide.
-Please let me know, if you prefer this to be patch-1 ?
-
---Jesper
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
