@@ -1,145 +1,111 @@
-Return-Path: <netdev+bounces-180659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BB5EA820DA
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 11:17:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72383A820E9
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 11:20:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7A687A4D2C
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 09:16:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 215494A1986
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 09:19:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D08D51DF749;
-	Wed,  9 Apr 2025 09:17:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iGMIQvFw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E529E25D20A;
+	Wed,  9 Apr 2025 09:18:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53611DE3A5;
-	Wed,  9 Apr 2025 09:17:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36611DE3AA;
+	Wed,  9 Apr 2025 09:18:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744190269; cv=none; b=oHX50oYO8M4PIxpqgUMM1y+0tLKtZQRElbX2hGGD422Ch4MsbEZJ73VmtvQi4Oi/ZZ2BtrnmAajAwSIDCqBVtOfJEea4LZZKiumQNnJi/OGtoClSDd4TjnC35MNMxfUHmXKYo2tguAlSmhMaO78yLqeLAdicfm/k/eyIntskkmg=
+	t=1744190317; cv=none; b=XeqEcgfUd7TmDXnCeSOEKOl1sOudVADq4PBAcTyKMJ/+NwebjZhLLob5MiB98qfwBkJPX9KN6UQ0qShMN/NPFedmYFSJG6tbMNrvZ2yaWH29S+kVz6bpiz+WND4v/yOVCvx/qlrOsLRiylJFpLxU3LUxiJ1iVQ8ytCj6b+3vhDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744190269; c=relaxed/simple;
-	bh=hqEQ77fSXiZu3N5SWCg2WjfSPbGTcCLVEwpTTrz/2xg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nM7Fa8BAWenyqhub1rb6te0v0l9UwiXBCJObX/soPADK30AMmLeeT53xY+Tbp8ahmrfV8vWtBScqJ/vugFDmhnBjD4cObYeA+oKBVEdIGl977f5HQSBkzrD1y6ZCNquWk9WIVtkVz7fuRXJ/udaq785y0XZr7zphXACah4DQe9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iGMIQvFw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90096C4CEE3;
-	Wed,  9 Apr 2025 09:17:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744190269;
-	bh=hqEQ77fSXiZu3N5SWCg2WjfSPbGTcCLVEwpTTrz/2xg=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=iGMIQvFwdJCtmyVMtv1xeIy2DraOwP6Ba/h6zAEN+wsvrAiubvTkQOtfy9s6ipwDk
-	 /mC3296UDFwck7Fh+lRo+EvGvnmmX5znY6NWR1ORehE9yuEqwhe86vEHzf1HkLYNm7
-	 rAwhHVN5J5IByZFNVCTNz+MUyLgTnRiD77NVtkhZuq9SDpwEeAcooYDaAl3e9VEI+k
-	 EHbka3139/bdYlI/mB38AFgsDPkhfHdEFD2znKL+qGxMoNgUR1YvmAGdh8Ba8qbkZQ
-	 iLX8iQrdhRjgZT1f7VA/eaclHqrTx2nTNCxoIF3+xjWJOb7e3teMU/ZaQouTXNky4h
-	 7OSTDC2m7te3Q==
-Message-ID: <1cc54fa0f517f387563263bb90ef1628244778df.camel@kernel.org>
-Subject: Re: [PATCH bpf-next] bpf: Allow error injection for
- update_socket_protocol
-From: Geliang Tang <geliang@kernel.org>
-To: Yonghong Song <yonghong.song@linux.dev>, Gang Yan
- <gang_yan@foxmail.com>,  Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, mptcp@lists.linux.dev
-Date: Wed, 09 Apr 2025 17:17:43 +0800
-In-Reply-To: <dee07a8c-aed2-4125-a4f0-1bd76ca1e4ac@linux.dev>
-References: <tmcxv429u9-tmgrokbfbm@nsmail7.0.0--kylin--1>
-	 <tencent_EB51CDCA4E189E271032DFEC7E042B752008@qq.com>
-	 <dee07a8c-aed2-4125-a4f0-1bd76ca1e4ac@linux.dev>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.52.3-0ubuntu1 
+	s=arc-20240116; t=1744190317; c=relaxed/simple;
+	bh=SvN3Gcf50djMUpmY0B1/0uK5pLnCZSO+X3P+SrDIIZ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UXs28hxFtEpV5IoLWvP1OlH7PVxRxgxEY0BAlSsQRkyxASSQvrmHNdzvVYwH4Vsn4wgBLhCF2vEMSdpGVLgz3hMBnurR9Fdm5FQTjK2Ii5Sr7hjHaEgZw/eEmeBhFQrPGCaZPSXfky8mW3jxvb6jom9G75FlK6A/8HjAzSDVG4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1u2RZd-0004ns-Qe; Wed, 09 Apr 2025 11:18:21 +0200
+Date: Wed, 9 Apr 2025 11:18:21 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Huajian Yang <huajianyang@asrmicro.com>
+Cc: pablo@netfilter.org, kadlec@netfilter.org, razor@blackwall.org,
+	idosch@nvidia.com, davem@davemloft.net, dsahern@kernel.org,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, bridge@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: Expand headroom to send fragmented packets in
+ bridge fragment forward
+Message-ID: <20250409091821.GA17911@breakpoint.cc>
+References: <20250409073336.31996-1-huajianyang@asrmicro.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250409073336.31996-1-huajianyang@asrmicro.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Hi Yonghong,
-
-On Sun, 2024-08-25 at 21:05 -0700, Yonghong Song wrote:
+Huajian Yang <huajianyang@asrmicro.com> wrote:
+> The config NF_CONNTRACK_BRIDGE will change the way fragments are processed.
+> Bridge does not know that it is a fragmented packet and forwards it
+> directly, after NF_CONNTRACK_BRIDGE is enabled, function nf_br_ip_fragment
+> will check and fraglist this packet.
 > 
-> On 8/25/24 8:29 PM, Gang Yan wrote:
-> > Hi Alexei:
-> > It's my honor to recieve your reply. The response to your concerns
-> > is attached below
-> > for your review.
-> > On Mon, Aug 26, 2024 at 10:57:12AM +0800, Gang Yan wrote:
-> > > On Thu, Aug 22, 2024 at 8:33 AM Jakub Kicinski wrote:
-> > > > On Thu, 22 Aug 2024 14:08:57 +0800 Gang Yan wrote:
-> > > > > diff --git a/net/socket.c b/net/socket.c
-> > > > > index fcbdd5bc47ac..63ce1caf75eb 100644
-> > > > > --- a/net/socket.c
-> > > > > +++ b/net/socket.c
-> > > > > @@ -1695,6 +1695,7 @@ __weak noinline int
-> > > > > update_socket_protocol(int family, int type, int protocol)
-> > > > > {
-> > > > > return protocol;
-> > > > > }
-> > > > > +ALLOW_ERROR_INJECTION(update_socket_protocol, ERRNO);
-> > > > IDK if this falls under BPF or directly net, but could you
-> > > > explain
-> > > > what test will use this? I'd prefer not to add test hooks into
-> > > > the
-> > > > kernel unless they are exercised by in-tree tests.
-> > > This looks unnecessary.
-> > > update_socket_protocol is already registered as fmodret.
-> > > There is even selftest that excises this feature:
-> > > tools/testing/selftests/bpf/progs/mptcpify.c
-> > > 
-> > > It doesn't need to be part of the error-inject.
-> > The 'update_socket_protocol' is a BPF interface designed primarily
-> > to
-> > fix the socket protocol from TCP protocol to MPTCP protocol without
-> > requiring modifications to user-space application codes. However,
-> > when attempting to achieve this using the BCC tool in user-space,
-> > the BCC tool doesn't support 'fmod_ret'. Therefore, this patch aims
-> > to
-> > further expand capabilities, enabling the 'kprobe' method can
-> > overriding
-> > the update_socket_protocol interface.
-> 
-> Gang Yan, could you explore to add fmod_ret support in bcc? It should
-> be
-> similar to kfunc/kretfunc support. I am happy to review your patches.
+> Some network devices that would not able to ping large packet under bridge,
+> but large packet ping is successful if not enable NF_CONNTRACK_BRIDGE.
 
-It took us some time to add this support in bcc, and we have recently
-completed it in [1]. We would be grateful if you could help review
-these patches.
+Can you add a new test to tools/testing/selftests/net/netfilter/ that
+demonstrates this problem?
 
-Thanks,
--Geliang
+> In function nf_br_ip_fragment, checking the headroom before sending is
+> undoubted, but it is unreasonable to directly drop skb with insufficient
+> headroom.
 
-[1]
-https://github.com/iovisor/bcc/pull/5274
+Are we talking about
+if (first_len - hlen > mtu
+  or
+skb_headroom(skb) < ll_rs)
 
-> 
-> Thanks,
-> Yonghong
-> 
-> > 
-> > As a Python developer, the BCC tool is a commonly utilized
-> > instrument for
-> > interacting with the kernel. If the kernel could permit the use of
-> > an
-> > error-inject method to modify the `update_socket_protocol`, it
-> > would significantly
-> > benefit the subsequent promotion and development of MPTCP
-> > applications.
-> > Thank you for considering this enhancement.
-> > 
-> > Best wishes!
-> > Gang Yan
-> > 
-> > 
-> 
+?
 
+>  
+>  		if (first_len - hlen > mtu ||
+>  		    skb_headroom(skb) < ll_rs)
+> -			goto blackhole;
+> +			goto expand_headroom;
+
+I guess this should be
+
+if (first_len - hlen > mtu)
+	goto blackhole;
+if (skb_headroom(skb) < ll_rs)
+	goto expand_headroom;
+
+... but I'm not sure what the actual problem is.
+
+> +expand_headroom:
+> +	struct sk_buff *expand_skb;
+> +
+> +	expand_skb = skb_copy_expand(skb, ll_rs, skb_tailroom(skb), GFP_ATOMIC);
+> +	if (unlikely(!expand_skb))
+> +		goto blackhole;
+
+Why does this need to make a full skb copy?
+Should that be using skb_expand_head()?
+
+>  slow_path:
+
+Actually, can't you just (re)use the slowpath for the skb_headroom < ll_rs
+case instead of adding headroom expansion?
 
