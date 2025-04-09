@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-180890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92DD2A82D36
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 19:07:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E158A82D38
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 19:07:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4E611B64F44
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 17:06:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9ECB188078C
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 17:07:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38CDA270EA6;
-	Wed,  9 Apr 2025 17:06:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE618270EA6;
+	Wed,  9 Apr 2025 17:07:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QgQO0Ynr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a57XR0c4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FBCC1BF33F;
-	Wed,  9 Apr 2025 17:06:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5ED31C2324;
+	Wed,  9 Apr 2025 17:07:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744218396; cv=none; b=rSGWATXOkqBjUnEEMz49kZtxpyo3uwyfipH5IAmAqOL9jrAjpQ9JSnGL71F6/W7/c9/S3u7Wwy+atoENPyXCSCkSjMvgGNmqG1tvBba9XPufrdI9J9Dw+FnWOol28vNZyUglqL/5c7QMAXb5rZ6xmvqT7dCIcK8FcBODqWKWSl0=
+	t=1744218470; cv=none; b=mPcOTSYwyFA5gQ5R9UUF/z2QM9AM66WZGAFDh1awhK1MQRFb14F2CXVHdW2gPhFNc3I4TMc+o64MTdz9AqXR8SSk7lubDgLe4dh6zA7bvlzgGJsR5sPUSZu89EaHCu3FNEv6snBYUdbwvSQnxddDi82O0YpHGQHw53PhGVmwxbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744218396; c=relaxed/simple;
-	bh=NXMhv+VVEYftOJ76w+3cGn9WxGbJC5rBcev8hsK3ALU=;
+	s=arc-20240116; t=1744218470; c=relaxed/simple;
+	bh=PcqRDQbAzwE809Lz8qtd+AbOW+ahMuiblP3wSIQB8Ss=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rbZ4ad/ukPDACzzznQUgLxr/QNSs+U7moiWXLwuG5rzbOKANKy+NoJKLT+HliZ5sZ3ykGumvvflJTXPPTJqq1VZQwJKeAgdcRm9mI7qhOeB8DP3ZD9PPt0KtV49NnZJf5rrzgSu8oZQ9r2UskRcLBHq+C9VbYY/sD1R0QDPOjsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QgQO0Ynr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 892EAC4CEE7;
-	Wed,  9 Apr 2025 17:06:32 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=LlA9f9umQPvMTOTrCoyiFaq8ebOI/dx9U75BhjigqU6WJJfydkCtdT89ep3AdRnF2NH8+mxEOwejeXqFgItiOi4sbb/co2UY1GtWLAYmXkHY3qMVez9Ln6JlxVaPlQsPnYIAQ87VZY45Ag0125jJgEYMqoP6BPtwlH1WlrBd0z0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a57XR0c4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E47FC4CEE2;
+	Wed,  9 Apr 2025 17:07:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744218394;
-	bh=NXMhv+VVEYftOJ76w+3cGn9WxGbJC5rBcev8hsK3ALU=;
+	s=k20201202; t=1744218470;
+	bh=PcqRDQbAzwE809Lz8qtd+AbOW+ahMuiblP3wSIQB8Ss=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QgQO0Ynrk2uUEmlNq+Oi1/C7HRieeFw3w9+aS/s4l33j4tms9FJvvPkBB3T/ujI3z
-	 z0U7AZizS8xJn48yWCBYNTe6vIxF7Z+u8PJp1uMSV/VzpOY0nh5ArdIQh2ax9sbQHZ
-	 fubgOR5Hgquhklwgia9vul9RokP4bSOl12u3+2oUXPwQwf5qsECz52Cz6U2zitkZhv
-	 HLKJVQwZ1osfP6tYvN53tlkxHc6HajT0p1WA9HPcl7hLv9uUUe4n2FvX4iB9BV3Ib+
-	 0WB0gq2XZrDD11PSMp3D/loz3qp4nGds46tOMggQPg1gi7Vsc0H+/Me7FUPD92W0qA
-	 jqEGTaZzDa3PQ==
-Date: Wed, 9 Apr 2025 18:06:30 +0100
+	b=a57XR0c43AffaWmAz1Ed7S/TRdn57sZL7pBF3H7tCtXQAUM2KXRXXq6ioEJRw5WVw
+	 rpZDto+ddqJoC6HYDwcWVYHBOy79rwxs7Lo+qeu7/U+OUyZFeO/IjzNAUZCsvGTmAi
+	 fQ8PBep3dK71lPOvym3o3tj3kDYtLE5xU0IByVZsRh1vq8rNBs3LpGVhh5ps/OZbbl
+	 941G4LCV9sfUzJoOwzupdnuEjfbug7GmjcD2iKk4+DfvcHLJiIuFPOWxPGeFnusMNz
+	 TN8SRDnQsLHWL5SCoiYntMb46wkdnnmGnUv8WiEY4vj/FCiMYFYXbzrvQUrH8YgQTN
+	 HOLsk9c8VGjag==
+Date: Wed, 9 Apr 2025 18:07:45 +0100
 From: Simon Horman <horms@kernel.org>
 To: Shannon Nelson <shannon.nelson@amd.com>
 Cc: andrew+netdev@lunn.ch, brett.creeley@amd.com, davem@davemloft.net,
 	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
 	michal.swiatkowski@linux.intel.com, linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: Re: [PATCH net 6/6] pds_core: make wait_context part of q_info
-Message-ID: <20250409170630.GN395307@horms.kernel.org>
+Subject: Re: [PATCH net 4/6] pds_core: Remove unnecessary check in
+ pds_client_adminq_cmd()
+Message-ID: <20250409170745.GO395307@horms.kernel.org>
 References: <20250407225113.51850-1-shannon.nelson@amd.com>
- <20250407225113.51850-7-shannon.nelson@amd.com>
+ <20250407225113.51850-5-shannon.nelson@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,25 +61,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250407225113.51850-7-shannon.nelson@amd.com>
+In-Reply-To: <20250407225113.51850-5-shannon.nelson@amd.com>
 
-On Mon, Apr 07, 2025 at 03:51:13PM -0700, Shannon Nelson wrote:
-> Make the wait_context a full part of the q_info struct rather
-> than a stack variable that goes away after pdsc_adminq_post()
-> is done so that the context is still available after the wait
-> loop has given up.
+On Mon, Apr 07, 2025 at 03:51:11PM -0700, Shannon Nelson wrote:
+> From: Brett Creeley <brett.creeley@amd.com>
 > 
-> There was a case where a slow development firmware caused
-> the adminq request to time out, but then later the FW finally
-> finished the request and sent the interrupt.  The handler tried
-> to complete_all() the completion context that had been created
-> on the stack in pdsc_adminq_post() but no longer existed.
-> This caused bad pointer usage, kernel crashes, and much wailing
-> and gnashing of teeth.
+> When the pds_core driver was first created there were some race
+> conditions around using the adminq, especially for client drivers.
+> To reduce the possibility of a race condition there's a check
+> against pf->state in pds_client_adminq_cmd(). This is problematic
+> for a couple of reasons:
 > 
-> Fixes: 01ba61b55b20 ("pds_core: Add adminq processing and commands")
+> 1. The PDSC_S_INITING_DRIVER bit is set during probe, but not
+>    cleared until after everything in probe is complete, which
+>    includes creating the auxiliary devices. For pds_fwctl this
+>    means it can't make any adminq commands until after pds_core's
+>    probe is complete even though the adminq is fully up by the
+>    time pds_fwctl's auxiliary device is created.
+> 
+> 2. The race conditions around using the adminq have been fixed
+>    and this path is already protected against client drivers
+>    calling pds_client_adminq_cmd() if the adminq isn't ready,
+>    i.e. see pdsc_adminq_post() -> pdsc_adminq_inc_if_up().
+> 
+> Fix this by removing the pf->state check in pds_client_adminq_cmd()
+> because invalid accesses to pds_core's adminq is already handled by
+> pdsc_adminq_post()->pdsc_adminq_inc_if_up().
+> 
+> Fixes: 10659034c622 ("pds_core: add the aux client API")
+
+I'm assuming that backporting this patch that far only
+makes sense if other fixes have been backported too.
+And that their fixes tags should enable that happening.
+
+If so, this seems fine to me.
+
+> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
 > Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
-
 
