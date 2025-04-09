@@ -1,106 +1,111 @@
-Return-Path: <netdev+bounces-180870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D3A7A82C10
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 18:15:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFC38A82C25
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 18:18:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 337473AF7C1
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 16:09:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FB26165B43
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 16:11:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FF4B1FF5F7;
-	Wed,  9 Apr 2025 16:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6363025A65C;
+	Wed,  9 Apr 2025 16:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="34Efn0TO";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="CyNS8dpT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC7F6259C;
-	Wed,  9 Apr 2025 16:10:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F1D25291E;
+	Wed,  9 Apr 2025 16:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744215009; cv=none; b=A8bE4CkGHanAEOQa0ner9sfOcXUYefars1YL0HQYmcjFhZYUwUhS1NAMNJgO3WIkLDxYW0WRdZ65pRbdF9Mjbq0KcrGqyodg4Qhb0DEePkDzS7uEFZllSkqyay0p9XcubinhcT9m7Y0wuZjgsja7mJxZ9Y89aDuzvOKI8WcXJxw=
+	t=1744215105; cv=none; b=fahv+VshPw/vA12MTqPryxMLlkUdaBIu25l1gmh0yol1a8mkQSCnnKoGpDDVMrFl/jsAKU6F+tnPcWoVW5ksyX5QZp3lNfGziChBnVOoadRNaCIa3igjTKStLU70AJiTWchSIxr8NqPwyE2srrgsiR8Wlhw1sUbHE/MNU9c/c+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744215009; c=relaxed/simple;
-	bh=KoaylkJAFwie8qe4eWrllGQZ9xFpIomToI9+3Wyddbw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dfhfu6CNIaPeUkxmNsKsf2rg/1HYkR68YC0r3JocLLu7l8QBetIj/bPJD/sJm00JaOOxGIK/Zsi+SwHjMMFSqJh3QJFobXTXiNZGqNuHUsCh1deAYSTmNaNr3gkehuzOmQOn8DIj9mqvmgev/rDMLTh1N7huKz7m3CHp1jcIb24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89F06C4CEE2;
-	Wed,  9 Apr 2025 16:10:05 +0000 (UTC)
-Date: Wed, 9 Apr 2025 12:11:25 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: bpf@vger.kernel.org, mrpre@163.com, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
- <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, Martin
- KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP
- Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Jakub Sitnicki
- <jakub@cloudflare.com>, Masami Hiramatsu <mhiramat@kernel.org>, Mathieu
- Desnoyers <mathieu.desnoyers@efficios.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next v1] bpf, sockmap: Introduce tracing capability
- for sockmap
-Message-ID: <20250409121125.48510acb@gandalf.local.home>
-In-Reply-To: <20250409102937.15632-1-jiayuan.chen@linux.dev>
-References: <20250409102937.15632-1-jiayuan.chen@linux.dev>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1744215105; c=relaxed/simple;
+	bh=MiVTnIC2+bhkCArxVKD+yTeDnBjDmgCvDWMFOgjJO1A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OmtKs+UjZlRFTrK8jzVsJAFlxeehIhGueiImEiMvX4O00z1lNRKc8kJdps4LZbN8kKBH4Y92XZMvTyjvZCnP+W6YQrhsJNmvhrzFrQ+XF1nP9cl3dOiVGGJTLe2vCf8VYefhVO7ryuLB9ajLgREx6m/O4JefnoHnM0MvB14piIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=34Efn0TO; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=CyNS8dpT; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Wed, 9 Apr 2025 18:11:40 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1744215101;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PRDAYueeSE0rSRTm2UWZBPmD2llhpcLxL39y2Ha55CE=;
+	b=34Efn0TOiPIGqiDvKTuju+dmf90AToL2+L/rPaBW5OdYR82W8Pxc4X5fQo2OV7HSHEOiYU
+	XC7Z1mGKZSb5JE//ra59l7PxW6rix3upYXJevKeJV7S3Pdg9ex9yz5SJChS1we95xwXAQ6
+	wn5/mfwcGYQG+ffg8JC4/Uex5PQldTCwvdSdg28RuyjZSy6jfaAIa/+oYqIoXE5/CC4Tr5
+	vSDyg4rMve6i12+vG2hnZ98JKatkJjFTjapn3kkn1DDpcMG/mTo6YEhJtDIPE0hn6uW8Jl
+	8TKWqi6E1q/DlVwUM5ccLpdNl974/5nfp6LmbSFv/2xyHqyeS0coAJu12KiqVQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1744215101;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PRDAYueeSE0rSRTm2UWZBPmD2llhpcLxL39y2Ha55CE=;
+	b=CyNS8dpTxI1HQ2vbNigmPmlICkRnSfugxNo8TPwhetWF+bxvStqQKoBKw3xs4PhcposbjI
+	IYudupa/rX3v0lBQ==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: linux-rdma@vger.kernel.org, linux-rt-devel@lists.linux.dev,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Joe Damato <jdamato@fastly.com>, Leon Romanovsky <leon@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH net-next v3 3/4] page_pool: Convert
+ page_pool_recycle_stats to u64_stats_t.
+Message-ID: <20250409161140.-k4iGuQe@linutronix.de>
+References: <20250408105922.1135150-1-bigeasy@linutronix.de>
+ <20250408105922.1135150-4-bigeasy@linutronix.de>
+ <988c920b-56b8-43f6-a42c-54e3ea6dc261@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <988c920b-56b8-43f6-a42c-54e3ea6dc261@huawei.com>
 
-On Wed,  9 Apr 2025 18:29:33 +0800
-Jiayuan Chen <jiayuan.chen@linux.dev> wrote:
+On 2025-04-08 20:13:09 [+0800], Yunsheng Lin wrote:
+> > index 9d958128a57cb..5215fd51a334a 100644
+> > --- a/Documentation/networking/page_pool.rst
+> > +++ b/Documentation/networking/page_pool.rst
+> > @@ -181,11 +181,11 @@ Stats
+> >  
+> >  	#ifdef CONFIG_PAGE_POOL_STATS
+> >  	/* retrieve stats */
+> > -	struct page_pool_stats stats = { 0 };
+> > +	struct page_pool_stats stats = { };
+> >  	if (page_pool_get_stats(page_pool, &stats)) {
+> >  		/* perhaps the driver reports statistics with ethool */
+> > -		ethtool_print_allocation_stats(&stats.alloc_stats);
+> > -		ethtool_print_recycle_stats(&stats.recycle_stats);
+> > +		ethtool_print_allocation_stats(u64_stats_read(&stats.alloc_stats));
+> > +		ethtool_print_recycle_stats(u64_stats_read(&stats.recycle_stats));
+> 
+> The above seems like an unnecessary change? as stats.alloc_stats and
 
-> +#define trace_sockmap_skmsg_redirect(sk, prog, msg, act)	\
-> +	trace_sockmap_redirect((sk), "msg", (prog), (msg)->sg.size, (act))
-> +
-> +#define trace_sockmap_skb_redirect(sk, prog, skb, act)		\
-> +	trace_sockmap_redirect((sk), "skb", (prog), (skb)->len, (act))
-> +
-> +TRACE_EVENT(sockmap_redirect,
-> +	    TP_PROTO(const struct sock *sk, const char *type,
-> +		     const struct bpf_prog *prog, int length, int act),
-> +	    TP_ARGS(sk, type, prog, length, act),
-> +
-> +	TP_STRUCT__entry(
-> +		__field(const void *, sk)
-> +		__field(const char *, type)
+Right. The ethtool_print_.*() don't exist either. Let me remove that.
 
-On 64bit, const char * is 8 bytes, and you are pointing it to a string of
-size 4 bytes (3 chars and '\0'). Why not just make it a constant string, or
-better yet, an enum?
+> stats.recycle_stats are not really 'u64_stats_t' type.
+> 
+> Otherwise, LGTM.
+> Reviewed-by: Yunsheng Lin <linyunsheng@huawei.com>
 
--- Steve
-
-
-> +		__field(__u16, family)
-> +		__field(__u16, protocol)
-> +		__field(int, prog_id)
-> +		__field(int, length)
-> +		__field(int, act)
-> +	),
-> +
-> +	TP_fast_assign(
-> +		__entry->sk		= sk;
-> +		__entry->type		= type;
-> +		__entry->family		= sk->sk_family;
-> +		__entry->protocol	= sk->sk_protocol;
-> +		__entry->prog_id	= prog->aux->id;
-> +		__entry->length		= length;
-> +		__entry->act		= act;
-> +	),
-> +
+Sebastian
 
