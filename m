@@ -1,231 +1,112 @@
-Return-Path: <netdev+bounces-180759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7BFDA82565
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 14:55:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79FD2A82557
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 14:53:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6FB43B96BD
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 12:52:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C20E4C5BE1
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 12:52:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 606A1265627;
-	Wed,  9 Apr 2025 12:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2252C264F8F;
+	Wed,  9 Apr 2025 12:51:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="bijmABSU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cGI45NR1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06348263C78
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 12:52:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64DF3265613
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 12:51:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744203143; cv=none; b=Wc6FN7sZ0O8iD4m1cqGQgDVf145ffCdNJSvCuCKDDzNrzQRwH4yk5Z/7mtPCOE956/v1czj0EnGd3R8eZBqDyZ4U+CG8KiHqzayojG+Q6ldscb7GqiOkycK1BSvRz4bmcr/BBB8mP0atAFYtB+U1vpADQiDig6UygjoJM2lOxqM=
+	t=1744203086; cv=none; b=aJg7jXeOYhbw6Q9vG7WcFBbdUg1z9paJ4PHd6hG7hwkiAREvICjXhHaP4uW3Oe+/NA4oFMZIrBm/+1hnTRG4yt/XLyrRq1z6ykqgQ1EwvTFQH07qkxfzdGb3ZiRBrL9RSisD06p8V46CJm6kl6fUacCIqysiOi1yPh8mZywZOmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744203143; c=relaxed/simple;
-	bh=VRVdHQosnpdghOkblzY+Q6O7G0A0ldhMteIRbIkzuHY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type:
-	 References; b=LoiMhBUyMNIULzo4iyzbE0uB4oxO9h1cG3R6HM+NMhShgb6sG2Wnq7+qIMW7DOmyK2V5HCjMKwmYQvNmF48jV4cxYJ+tuNH41yqHGGPcZfYtcbNxXSkA/v8sfKzH1ltTmeE2Dpc8aX77ZzGXXaKyeEFkbRrIsaG17qpEReojvt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=partner.samsung.com; spf=pass smtp.mailfrom=partner.samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=bijmABSU; arc=none smtp.client-ip=210.118.77.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=partner.samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=partner.samsung.com
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20250409125216euoutp02eea09b511faec6adf44bc306aed1e8ef~0p4MLFJ9X2353723537euoutp02W
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 12:52:16 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20250409125216euoutp02eea09b511faec6adf44bc306aed1e8ef~0p4MLFJ9X2353723537euoutp02W
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1744203137;
-	bh=d4Y7SWFI4qVzd8NlSNxlD8Ff/ZD2SwDfY5q3CblmY7g=;
-	h=From:To:Cc:Subject:Date:References:From;
-	b=bijmABSUltROHCz0+LgBRXSBu6ooK+6V9Mfi0Y6T6YQg2ukPCjjX3JI+/JQcW9o5/
-	 ttLfd8MJEtizuMnzT3rjazezu4zvbzHGmp1AIVPMGEgk0+X+0KBjB2BKes7D6/Frhx
-	 lXL6lonKnJJa+ir9cqnqXff3BBN9+bYyATM2XtH0=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20250409125216eucas1p1453b5f9e90636a05728dcc6173dc4531~0p4L8PL5M1939619396eucas1p1i;
-	Wed,  9 Apr 2025 12:52:16 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-	eusmges3new.samsung.com (EUCPMTA) with SMTP id FB.22.20397.08D66F76; Wed,  9
-	Apr 2025 13:52:16 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20250409125216eucas1p150b189cd13807197a233718302103a02~0p4Leaiy90659606596eucas1p1V;
-	Wed,  9 Apr 2025 12:52:16 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20250409125216eusmtrp11e8b63b62e7462829208962a12713787~0p4LdzomC0724607246eusmtrp1j;
-	Wed,  9 Apr 2025 12:52:16 +0000 (GMT)
-X-AuditID: cbfec7f5-e59c770000004fad-53-67f66d8050f5
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-	eusmgms2.samsung.com (EUCPMTA) with SMTP id ED.1D.19654.08D66F76; Wed,  9
-	Apr 2025 13:52:16 +0100 (BST)
-Received: from localhost.localdomain (unknown [106.210.135.126]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20250409125215eusmtip26ea0b30a2e1e7930bd611bbc1d4e540d~0p4LCrRvT2770527705eusmtip2u;
-	Wed,  9 Apr 2025 12:52:15 +0000 (GMT)
-From: "e.kubanski" <e.kubanski@partner.samsung.com>
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc: bjorn@kernel.org, magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, "e.kubanski"
-	<e.kubanski@partner.samsung.com>
-Subject: [PATCH] xsk: Fix race condition in AF_XDP generic RX path
-Date: Wed,  9 Apr 2025 14:49:50 +0200
-Message-Id: <20250409124950.58819-1-e.kubanski@partner.samsung.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1744203086; c=relaxed/simple;
+	bh=lt8foCrNENTzlLGwzw3Ao8LQrCe9mCrRdH07Skz0aQ0=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=J/P5TEH0xi8ZiCY1sPfmhAua3BAzVN/Tg6n1mSP2cIy8UjblsyJtgNoSToUAH2TLwvUJ8iLNaObNYzCfjr0F7MKMT4r41TrXswCZid2+HcuMA/w5HPw1j2r80n2f0nvVAGtWJaC3be78P5Sxfgsug5+ZBlZSEtvIcazU8pWuATU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cGI45NR1; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43edb40f357so39512185e9.0
+        for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 05:51:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744203083; x=1744807883; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9CuCBbmIrf30BOOKbrBsC5yCKhZWgZPYBMaGL3IajWg=;
+        b=cGI45NR18K/6ZVWlcpdwX4Oc70k9ATMOXrQR03dQ5iJQgT7bI2B5O8mlvvycv3Kn5N
+         nyo1X0VTqn83G6c2QPdiy666hfCt2CJ0I5Uou4mq7ewmj7WL2K+8C6gCCideRK6yK1mx
+         spPkdWKjBOb3Iwphi9MazJzukTIv+/WXqoE+I56fM2ruIh6In90K9eZtRXXSDF8pcnJR
+         P2ekn0qlsSdx9tMKJyHff38HNupyTIhKXcFxiBBZZYcVp7/DZ2sWB4AkmXQE27gIXh7l
+         hZWVDgo5MVFbnFbRVztUTMP6qu6wmqvkA1TBhlbEG+/egZNorW9d3Mgq2gvIxcXjOUZ7
+         l3Gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744203083; x=1744807883;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9CuCBbmIrf30BOOKbrBsC5yCKhZWgZPYBMaGL3IajWg=;
+        b=THeYYkHoSmtXRadzeNwJiGGrCGuUO22kOyh4e9m8PuIa8c+47CUGvG2ySGGhLQJKXr
+         I8UFANTLjMOWTQoJ7MyJdF9dKkDmAYIaSeVymihEdfXhehI4/HMdTrp67a0hMEp5xiVu
+         7N/FzpSYIrUXnF0tWLuBvr54caUJFm1VvJv85VsGmFcEAwsrlW2WOa423sRzR7qLA+Ek
+         8IAUg8mtcEriKiwjLEJzl0I7C017V+9eYvbd2JSw4rOPrO+4uH+q5UUFRBRgNRSGcREI
+         qD+cEC4CjHJdBmsp0NWD4xo+iyxCJ8AyMiDPzqXmus1wYvLJFPX7vH3Zwe/FoCiJUidp
+         hfrA==
+X-Forwarded-Encrypted: i=1; AJvYcCU1gJihtPWTS54wwvKwVdY+5bFLNCdoWwPYGFrOnBsjr4cub18863Gtvz9m6CsxNQtrIab0M68=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8hazSuM1l9of505HWpaTAzDsczOZyPsnuRoKOsyksS9oUN3GL
+	fqVtWyokrIwNPSyNaU8k7rEXJjdADLjVxO7M8voQXSjDfU0fl5Kc
+X-Gm-Gg: ASbGnctnSQ022sSxeeqjsambQZc2GiT6xnkRmZzQFRz1wInsKojHvohubGf65OQ+5tO
+	091yPOcn/I3w22ORxLDUP2+uxPVXbhwT4mFnWQrog/WzbNF6pn/WrbhmQGDfKm86ugt2UWQJqu3
+	V+TKAsE//zFYd+po1ZgRg5a3swwMD66kmxwrE3t7XEaFBDuF4G5IevWAhpISx/4scaLgcuFfLWJ
+	Q6h6ucG4U0Xa8cKSvyP2Vd4svU4m5oaDj2XbVDg43F049X08hE8uhnqvQ8xceliOMbACdCS23Zl
+	4f5F/C+8j4qynZ3ghj+iYFTJv9WIXUpJHz+bEIczb0k+JHY3XAXVtQ==
+X-Google-Smtp-Source: AGHT+IFbt5IXLUulkQzj1Zy5O+hlqjZ5ZrsxRmwbeSjb6aPoz6U0fX0wbM0NLv2YiHN8LVkYQUXGVg==
+X-Received: by 2002:a05:600c:3d9b:b0:43d:5ec:b2f4 with SMTP id 5b1f17b1804b1-43f1eca7d70mr29282095e9.10.1744203082713;
+        Wed, 09 Apr 2025 05:51:22 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:2c7c:6d5e:c9f5:9db1])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f2075fc8esm19045415e9.30.2025.04.09.05.51.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Apr 2025 05:51:22 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
+  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
+  jacob.e.keller@intel.com,  yuyanghuang@google.com,  sdf@fomichev.me,
+  gnault@redhat.com,  nicolas.dichtel@6wind.com,  petrm@nvidia.com
+Subject: Re: [PATCH net-next 12/13] tools: ynl: generate code for rt-addr
+ and add a sample
+In-Reply-To: <20250409000400.492371-13-kuba@kernel.org> (Jakub Kicinski's
+	message of "Tue, 8 Apr 2025 17:03:59 -0700")
+Date: Wed, 09 Apr 2025 13:50:29 +0100
+Message-ID: <m2tt6x1otm.fsf@gmail.com>
+References: <20250409000400.492371-1-kuba@kernel.org>
+	<20250409000400.492371-13-kuba@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprIKsWRmVeSWpSXmKPExsWy7djP87oNud/SDa60qVpsfb+KxeLB7KXM
-	FrvWzWS2uLxrDpvFzePPWSxWHDrBbnFsgZgDu8fOWXfZPRbvecnksWlVJ5vHwXd7mDw+b5IL
-	YI3isklJzcksSy3St0vgypj07AZbwWPpip7dF9gaGL+LdTFyckgImEh0Pf3E3MXIxSEksIJR
-	Yv2j74wQzhdGiUsLPzOCVAkJfGaU2LSXB6Zj/8XFrBBFyxklTm78BdX+lVHiwLPbLCBVbALG
-	Ek3f94PZIgIWEpsWfQPrYBaYxSixZM8usISwgJPEwpV/2EFsFgFVib8n74LZvALOEgdvLWCE
-	WCcvsf/gWWaIuKDEyZlPwHqZgeLNW2eDbZYQmMsh8XnSFTaIBheJ/imbWCBsYYlXx7ewQ9gy
-	Eqcn97BANDQzSsya2ckO4fQwSqy5egVoHQeQYy2x9qQtiMksoCmxfpc+RK+jxNFZD9khKvgk
-	brwVhLiBT2LStunMEGFeiY42IYhqHYkbF59DbZWS+D5zM9Q1HhJbT+5gg4RorERn1wKWCYwK
-	s5B8NgvJZ7MQbljAyLyKUTy1tDg3PbXYOC+1XK84Mbe4NC9dLzk/dxMjMNWc/nf86w7GFa8+
-	6h1iZOJgPMQowcGsJML7duKXdCHelMTKqtSi/Pii0pzU4kOM0hwsSuK8i/a3pgsJpCeWpGan
-	phakFsFkmTg4pRqYhLQ4FqZMSeS9Piv8QuexfZvKNWOWaLMdzk1tCbdds+7VYcv/8wKqfjoq
-	fTaV4nKwOvPStul020T+q8ahP5IMt+vf3DVxUcF7Nc7KDYY3tR32WK5aFqp+/mhTkpVlxP7u
-	c/0KZ76yRWVNqj584MAtH5kl34JzT23ZfdPjW59btPb2k++byg60Z0tN1crxMFynWlE/Z84j
-	yZYlO+vuqJ1n4XQ5L3z42E0m5syXOquyJ61V5axPvZN5t1zl4spCDo+gnYXXMjsCPf80mKRl
-	eKSZr+8vNq98tHBOzOEMx91ng/Z736lgcOL8LPRI3K3Hfr5rS6h2uNq5335pnbx38nZ97UsN
-	N3z57XF1sGr9mZNKLMUZiYZazEXFiQBV1rXYpAMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrBLMWRmVeSWpSXmKPExsVy+t/xe7oNud/SDaZ8ZbHY+n4Vi8WD2UuZ
-	LXatm8lscXnXHDaLm8efs1isOHSC3eLYAjEHdo+ds+6yeyze85LJY9OqTjaPg+/2MHl83iQX
-	wBqlZ1OUX1qSqpCRX1xiqxRtaGGkZ2hpoWdkYqlnaGwea2VkqqRvZ5OSmpNZllqkb5eglzHp
-	2Q22gsfSFT27L7A1MH4X62Lk5JAQMJHYf3ExaxcjF4eQwFJGiV9fZzFCJKQk/qz7wwxhC0v8
-	udbFBlH0mVHi+5QudpAEm4CxRNP3/SwgtoiAlcSD2/+YQYqYBeYxSszZtZ4VJCEs4CSxcOUf
-	sAYWAVWJvyfvgtm8As4SB28tgNomL7H/4FlmiLigxMmZT8CGMgPFm7fOZp7AyDcLSWoWktQC
-	RqZVjCKppcW56bnFRnrFibnFpXnpesn5uZsYgUG+7djPLTsYV776qHeIkYmD8RCjBAezkgjv
-	24lf0oV4UxIrq1KL8uOLSnNSiw8xmgLdN5FZSjQ5HxhneSXxhmYGpoYmZpYGppZmxkrivGxX
-	zqcJCaQnlqRmp6YWpBbB9DFxcEo1MHFV926sZDTeJxUsrPHggY3Ckr3qvSFrs9J3ni6XvVpc
-	6Z1Qmhw5MXFx78/0k+v3nRSouyJ7U/Kj1pNpUl9KasRM1PhNju2ZeuqTRO8q60mH59V2H2d5
-	lcH1p3DNyx/z8ufXl57LTwcC7/9pFRLLJxq0m3xkYFkpufbfZ5+/pR9K29LKrk5LvrShTYfx
-	Oe+KbbNn3uA8sr3CTKUq7stRc8u7Oqdtr83J1WG9WDG9yp1N4HSeGb+iSO7HKntR2+fKl8JZ
-	754UiLeLDLVZHGiW5Px19+xLOxls97FtmSNo+OxzpMd2lke8O77eDF5fJR/s3BXioF79e1ed
-	67H2jrU/UvMrlnesrxZ/pVO700uJpTgj0VCLuag4EQBCJHS2+wIAAA==
-X-CMS-MailID: 20250409125216eucas1p150b189cd13807197a233718302103a02
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20250409125216eucas1p150b189cd13807197a233718302103a02
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20250409125216eucas1p150b189cd13807197a233718302103a02
-References: <CGME20250409125216eucas1p150b189cd13807197a233718302103a02@eucas1p1.samsung.com>
+Content-Type: text/plain
 
-rx_lock moved from xsk_socket to xsk_buff_pool.
-Previous synchronization didn't take care of
-shared umem mode in generic RX path where sockets
-share the same xsk_buff_pool.
+Jakub Kicinski <kuba@kernel.org> writes:
 
-RX queue is exclusive to xsk_socket, while FILL
-queue can be shared between multiple sockets.
-This could result in race condition where two
-CPU cores access RX path of two different sockets
-sharing the same umem.
+> YNL C can now generate code for simple classic netlink families.
+> Include rt-addr in the Makefile for generation and add a sample.
+>
+>   $ ./tools/net/ynl/samples/rt-addr
+>               lo: 127.0.0.1
+>        wlp0s20f3: 192.168.1.101
+>               lo: ::
+>        wlp0s20f3: fe80::6385:be6:746e:8116
+>             vpn0: fe80::3597:d353:b5a7:66dd
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Now both queues are protected by acquiring spinlock
-in shared xsk_buff_pool.
-
-Lock contention may be minimized in the future by some
-per-thread FQ buffering.
-
-It's safe and necessary to move spin_lock_bh(rx_lock)
-after xsk_rcv_check():
-* xs->pool and spinlock_init is synchronized by
-  xsk_bind() -> xsk_is_bound() memory barriers.
-* xsk_rcv_check() may return true at the moment
-  of xsk_release() or xsk_unbind_dev(),
-  however this will not cause any data races or
-  race conditions. xsk_unbind_dev() removes xdp
-  socket from all maps and waits for completion
-  of all outstanding rx operations. Packets in
-  RX path will either complete safely or drop.
-
-Signed-off-by: Eryk Kubanski <e.kubanski@partner.samsung.com>
----
- include/net/xdp_sock.h      | 3 ---
- include/net/xsk_buff_pool.h | 2 ++
- net/xdp/xsk.c               | 6 +++---
- net/xdp/xsk_buff_pool.c     | 1 +
- 4 files changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
-index bfe625b55d55..df3f5f07bc7c 100644
---- a/include/net/xdp_sock.h
-+++ b/include/net/xdp_sock.h
-@@ -71,9 +71,6 @@ struct xdp_sock {
- 	 */
- 	u32 tx_budget_spent;
- 
--	/* Protects generic receive. */
--	spinlock_t rx_lock;
--
- 	/* Statistics */
- 	u64 rx_dropped;
- 	u64 rx_queue_full;
-diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
-index 50779406bc2d..7f0a75d6563d 100644
---- a/include/net/xsk_buff_pool.h
-+++ b/include/net/xsk_buff_pool.h
-@@ -53,6 +53,8 @@ struct xsk_buff_pool {
- 	refcount_t users;
- 	struct xdp_umem *umem;
- 	struct work_struct work;
-+	/* Protects generic receive in shared and non-shared umem mode. */
-+	spinlock_t rx_lock;
- 	struct list_head free_list;
- 	struct list_head xskb_list;
- 	u32 heads_cnt;
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index 89d2bef96469..e2a75f3be237 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -337,13 +337,14 @@ int xsk_generic_rcv(struct xdp_sock *xs, struct xdp_buff *xdp)
- 	u32 len = xdp_get_buff_len(xdp);
- 	int err;
- 
--	spin_lock_bh(&xs->rx_lock);
- 	err = xsk_rcv_check(xs, xdp, len);
- 	if (!err) {
-+		spin_lock_bh(&xs->pool->rx_lock);
- 		err = __xsk_rcv(xs, xdp, len);
- 		xsk_flush(xs);
-+		spin_unlock_bh(&xs->pool->rx_lock);
- 	}
--	spin_unlock_bh(&xs->rx_lock);
-+
- 	return err;
- }
- 
-@@ -1724,7 +1725,6 @@ static int xsk_create(struct net *net, struct socket *sock, int protocol,
- 	xs = xdp_sk(sk);
- 	xs->state = XSK_READY;
- 	mutex_init(&xs->mutex);
--	spin_lock_init(&xs->rx_lock);
- 
- 	INIT_LIST_HEAD(&xs->map_list);
- 	spin_lock_init(&xs->map_list_lock);
-diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
-index 1f7975b49657..3a5f16f53178 100644
---- a/net/xdp/xsk_buff_pool.c
-+++ b/net/xdp/xsk_buff_pool.c
-@@ -87,6 +87,7 @@ struct xsk_buff_pool *xp_create_and_assign_umem(struct xdp_sock *xs,
- 	pool->addrs = umem->addrs;
- 	pool->tx_metadata_len = umem->tx_metadata_len;
- 	pool->tx_sw_csum = umem->flags & XDP_UMEM_TX_SW_CSUM;
-+	spin_lock_init(&pool->rx_lock);
- 	INIT_LIST_HEAD(&pool->free_list);
- 	INIT_LIST_HEAD(&pool->xskb_list);
- 	INIT_LIST_HEAD(&pool->xsk_tx_list);
--- 
-2.34.1
-
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
