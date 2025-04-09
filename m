@@ -1,126 +1,140 @@
-Return-Path: <netdev+bounces-180604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23534A81D3B
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 08:41:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 781E2A81D44
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 08:41:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99C0C464920
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 06:41:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B73697B6C0D
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 06:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 209491E1E06;
-	Wed,  9 Apr 2025 06:40:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF2D1D63E8;
+	Wed,  9 Apr 2025 06:41:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cRTNueH0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZRwgFJ18"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED3A1DF26F
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 06:40:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C1C31990CD
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 06:41:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744180839; cv=none; b=lKD8E9og91UvTHtAuR0C0jcnmyVt5drX1cx9ne6NqPzTes+Ubmklkm1jYt4gJp8jYb38nsYwwJf3GZVSVEqZTGpdYvmC0flZ4jKryyLPBgpJvM/cXblSFGSRwiNBrt9bv3S+OPkx1fSy+cRPq4U2G1hpUKEyuLCctz3wzwK6jbQ=
+	t=1744180890; cv=none; b=PnySiod3fIHd7d1d1j7B/4RmCzw3W+9qo530m6BMAI2Xcr9O3gZ8THzZRtpI7lfb/gsfSXlr5X4BPjGm2YQjaotX6H5uAw5Ilf4o3ycAqKAby7pRpp1oxYkJ3OVRFgiOxoj0Inv3vxf/TV01AR8JW/N+8871QQ7YGgKCtp4i8Oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744180839; c=relaxed/simple;
-	bh=7o6a2nvVwLYHeX/c8zhJrI+adrIx2FSoCS5LnDERMWE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eVll/+9xnd5erwcBysqNL7DSHPKHTAAsNEBvCgx6w4vVJmdkNxuw04CuDNxv5MO28x6DGEYfELPxr/O8ghy6hdMMpiEfRO8dDgAbO40yZL4ahrxO3CYAppJsYWPSUrR4BWyNy28wtTzYOmyykf5J2s+cGwMk8V0mGfopvoroV/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=cRTNueH0; arc=none smtp.client-ip=103.168.172.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 11D751140192;
-	Wed,  9 Apr 2025 02:40:36 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Wed, 09 Apr 2025 02:40:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1744180836; x=
-	1744267236; bh=BcwP9avawRhonmUticFT0MAEd9a2Df0v1P5/5LGiiZM=; b=c
-	RTNueH0IIMwHk5ZWS3iQqiWHI4yQmVKZ4se9XthdxlD/m9oExf+w6/QAIh4mp1KA
-	mALw5j+BbJ2P16SiQMF7gicYpaVN+yjbjrSaL9xMRMYcOutrtnLtGqmyC6O1diQk
-	HqN5rrO+9VIjxOsjBiaTm+pDdaahU/Fjc9hTavqPKLMW/y9Yh1GtaYRgEnSxbBxu
-	rzeImKV/jNqShgwat24210y6Fs/LH8KL+4oPjQ1Qu+GHcFKQI1yTfwce6CPxVlkR
-	DoVzM/NPj5ETX2E+y2kTJxdijgpv1d8JRsfAAWzdiTpGXUXvzaNrJOLKy9mE9UBi
-	PXAspbrFnqbwIAVWpJvOA==
-X-ME-Sender: <xms:Yxb2Z8fzdfF-hOmcFTJtfygwTm3iYyAeOAhQkdRO4G0yBbJ0mAI1uQ>
-    <xme:Yxb2Z-Oxp13VyChDHNE-WUytPEYEf2AKo1dX-l-ZbU1MBkU2Mrq0xNmGAQ8wfMH2X
-    MlVzgKyCG05EOw>
-X-ME-Received: <xmr:Yxb2Z9gH3Vi4f02DNUd3QY1szst7s10IGIQ9bZMQsZWQWJKU57zfH7VsJWB8>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtdehvdelucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddt
-    tdejnecuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstg
-    hhrdhorhhgqeenucggtffrrghtthgvrhhnpeekgefggefhuedvgeettdegvdeuvdfhudej
-    vddvjeetledvuedtheehleelhffhudenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprhgt
-    phhtthhopeduvddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepmhhitghhrggvlh
-    drtghhrghnsegsrhhorggutghomhdrtghomhdprhgtphhtthhopegurghmohguhhgrrhgr
-    mhdrrghmmhgvphgrlhhlihessghrohgruggtohhmrdgtohhmpdhrtghpthhtohepuggrvh
-    gvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghr
-    rdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
-    gtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehp
-    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnh
-    drtghhpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:Yxb2Zx_TKzubvdOve1nwM-gseuR7OYepl7cYZi9da7WMcP6JoZXAtg>
-    <xmx:Yxb2Z4uCLlBLLrPL1bLiZv_nuxMeAJoNf1fuzJNskqzjyTtDfajFRQ>
-    <xmx:Yxb2Z4ETIVArdXPVd1PPM5YkCDBQ93YilssOXhkaUpaFolbSP1OqnA>
-    <xmx:Yxb2Z3PFJCGq7nQonZ38o1ci_KiqafccyLdAViwKeY-VaCoC_b2HSQ>
-    <xmx:ZBb2Z4bJvk-Avj4yGDO-rquUYpLM4OetIFavlQiYFG3DXZ6M6sfZbRjO>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 9 Apr 2025 02:40:35 -0400 (EDT)
-Date: Wed, 9 Apr 2025 09:40:32 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>,
-	davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch,
-	horms@kernel.org, danieller@nvidia.com,
-	andrew.gospodarek@broadcom.com, petrm@nvidia.com
-Subject: Re: [PATCH net 2/2] ethtool: cmis: use u16 for calculated
- read_write_len_ext
-Message-ID: <Z_YWYKfUATz19geO@shredder>
-References: <20250402183123.321036-1-michael.chan@broadcom.com>
- <20250402183123.321036-3-michael.chan@broadcom.com>
- <Z-6jN7aA8ZnYRH6j@shredder>
- <Z_P8EZ4YPISzAbPw@shredder>
- <CACKFLik=7nTXHGUiTQH=aAsY=3sxd39ouZLEYkN2hj8rRHetsw@mail.gmail.com>
+	s=arc-20240116; t=1744180890; c=relaxed/simple;
+	bh=aKS8gBsiMJ6oTJz/0emeMCjhJxmfoOa2NfawNsW2npA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LfQBG/hZrRq/Cb2URSMzNWXoHZ3ws8rddKdBreRwR+pwXBbKLXHrfMhWhTVRXpArP2EB2w48GBTkSiOEJ2/HG4IeoB+BUEOxgNb8AEhjbqL4OYLMpzCFkWABwTOOY4otqOT/b2Fs7xgpzuwhu7r/3d6obbVmf1BycFQ1M4x0mGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZRwgFJ18; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744180888;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pG3lLWeJjhseMh1HmN6IvSUlLvJdHWorVSiUARqGbMo=;
+	b=ZRwgFJ187QB8C9/ixy8XxGMl06Zwk7xisAXHRpyOuYRsrSFYcnKtdQ6KsZMvqk8e9wdOpK
+	FAe2QFjLt2hbzl4DzP638Mr8ADJ3LgXyzAZBPZG8TWRH+3WpbP5/mc4ZrgIIkVLam1gUI6
+	AqaTm5aZHjJus0GMdhBS6HWIQGXUqs8=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-154-_eeiUJRPOiiN7XgFVmJ9dw-1; Wed,
+ 09 Apr 2025 02:41:26 -0400
+X-MC-Unique: _eeiUJRPOiiN7XgFVmJ9dw-1
+X-Mimecast-MFC-AGG-ID: _eeiUJRPOiiN7XgFVmJ9dw_1744180884
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 60DD819560A1;
+	Wed,  9 Apr 2025 06:41:24 +0000 (UTC)
+Received: from [10.44.32.72] (unknown [10.44.32.72])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E4BCC19560AD;
+	Wed,  9 Apr 2025 06:41:19 +0000 (UTC)
+Message-ID: <62c616f8-bd96-497a-b0e5-fe726d1f22bd@redhat.com>
+Date: Wed, 9 Apr 2025 08:41:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACKFLik=7nTXHGUiTQH=aAsY=3sxd39ouZLEYkN2hj8rRHetsw@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 02/28] mfd: zl3073x: Register itself as devlink device
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
+ Andy Shevchenko <andy@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <20250407172836.1009461-1-ivecera@redhat.com>
+ <20250407172836.1009461-3-ivecera@redhat.com>
+ <262753b0-817a-436c-bfcc-62c375e4bbf6@lunn.ch>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <262753b0-817a-436c-bfcc-62c375e4bbf6@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Tue, Apr 08, 2025 at 11:25:44AM -0700, Michael Chan wrote:
-> On Mon, Apr 7, 2025 at 9:23 AM Ido Schimmel <idosch@idosch.org> wrote:
-> >
-> > To be clear, this is what I'm suggesting [1] and it doesn't involve
-> > setting args->req.epl_len to zero, so I'm not sure what was tested.
-> >
-> > Basically, setting maximum length of read or write to 128 bytes as the
-> > kernel does not currently support auto paging (even if the transceiver
-> > module does) and will not try to perform cross-page reads or writes.
+On 07. 04. 25 10:57 odp., Andrew Lunn wrote:
+> On Mon, Apr 07, 2025 at 07:28:29PM +0200, Ivan Vecera wrote:
+>> Use devlink_alloc() to alloc zl3073x_dev structure and register
+>> the device as a devlink device. Follow-up patches add support for
+>> devlink device info reporting and devlink flash interface will
+>> be later used for flashing firmware and configuration.
+>>
+>> Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
+>> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+>> ---
+>>   drivers/mfd/Kconfig        |  3 +++
+>>   drivers/mfd/zl3073x-core.c | 27 +++++++++++++++++++++++++--
+>>   2 files changed, 28 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/mfd/Kconfig b/drivers/mfd/Kconfig
+>> index 30b36e3ee8f7f..a838d5dca4579 100644
+>> --- a/drivers/mfd/Kconfig
+>> +++ b/drivers/mfd/Kconfig
+>> @@ -2424,11 +2424,13 @@ config MFD_UPBOARD_FPGA
+>>   
+>>   config MFD_ZL3073X_CORE
+>>   	tristate
+>> +	select NET_DEVLINK
+>>   	select MFD_CORE
+>>   
+>>   config MFD_ZL3073X_I2C
+>>   	tristate "Microchip Azurite DPLL/PTP/SyncE with I2C"
+>>   	depends on I2C
+>> +	depends on NET
+>>   	select MFD_ZL3073X_CORE
+>>   	select REGMAP_I2C
+>>   	help
+>> @@ -2441,6 +2443,7 @@ config MFD_ZL3073X_I2C
+>>   
+>>   config MFD_ZL3073X_SPI
+>>   	tristate "Microchip Azurite DPLL/PTP/SyncE with SPI"
+>> +	depends on NET
 > 
-> Ido, do you want to post your patch formally?  Damodharam has tested
-> it and he is providing his:
+> It seems odd that the SPI and I2C drivers need net? It is the core
+> which is doing devlink stuff.
 > 
-> Tested-by: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
-> 
-> I'll drop this patch and repost patch #1 only.  Thanks.
+> 	Andrew
 
-OK, as you wish. I figured you would just incorporate the change into
-v2, but I can post the patch myself.
+Will move this under MFD_ZL3073X_CORE.
+
+Thank you.
+
+I.
+
 
