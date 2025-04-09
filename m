@@ -1,109 +1,147 @@
-Return-Path: <netdev+bounces-180621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11118A81E50
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 09:31:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37C19A81E59
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 09:32:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64490880F97
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 07:30:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 986F47A5D26
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 07:31:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 779AA193062;
-	Wed,  9 Apr 2025 07:30:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA9325A2C5;
+	Wed,  9 Apr 2025 07:32:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="Kl6fa6l+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F53d+bI9"
 X-Original-To: netdev@vger.kernel.org
-Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6145A125B9
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 07:30:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E3C61DB122
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 07:32:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744183859; cv=none; b=tOZQ3t0YkxX4ZLIbT/wzPLHz53VDa6n6bxwRYS2vrL4iYxrUumdznbBlJOkj0nIud9mhpST5+czMFpKmG2K5ZEhHA/aivi0xf9Vjo9xaYM2zAjUP/1RXorU0iEdX22S0j7sFkKHlH22a0PxfKVuegbHBUJaXGGVBq0bjJvThFtA=
+	t=1744183933; cv=none; b=gnzd9Qkn75pLiOYS4jUi4pns7xS6yFvuI2zUJUn38GYYgf6RQ44URhm/RlH7IfQZpAv+ZN5L+q2tFZT6cc+fJRytAN1REnbqL7v060DT4XrFwBhU7yLDHKbOq0xtXwJRP7FAj8ljkmVKZkuscFykdIAxbU0O8yNSKmIIpI3UU7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744183859; c=relaxed/simple;
-	bh=U7zZD/TujA1vbjQKOFH3wi0oc8Il7ccNrDO+VIMQ1+E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k0RbvBv+CT441tpo+xhmXfr2Yiqykft96aPCc3/gh5pC3esbRYpCFhnd7N/kv0Lx5zoe334OFNOsMFakqxElpMB7i1NWrhdvlp9YptpMIULUBzhiuGf8CdNSuRcYK7y8unTsVw6mIWLNQ79XrM6n46SacLZeNO1YnP04MOsevvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=Kl6fa6l+; arc=none smtp.client-ip=213.160.73.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
-	s=20121; t=1744183855;
+	s=arc-20240116; t=1744183933; c=relaxed/simple;
+	bh=sghke2wTh/FVNvg8pfbLJx6eA1Do09KTsI4oj5JZIzs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tIOKGtrC5tDxS8wJOQXVsMOZaiQMOpDVOP1aIs8aByKlv+nqTetINTGg9TEbuk22U/cCnltg81NAtgjNJ170hkRfCIc4czVGAji1aIudtx3vFpg9Qk/KoLOPmoezVaOWDihy8yOCxdB4zPrNX0TUwvTjKPsI8v8XV3h8swTuj5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F53d+bI9; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744183930;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7a4dAjNQusOdsThgxDSIy+4F08KxjxwHQblu5OrF+WM=;
-	b=Kl6fa6l+IH9jAyJF5uUXtuCgQb+fpKa8ukujuYQdkowfe3i3O7f1xkfY7cC6f8uAnCC7xt
-	mqTkWnq5pMmb9molkDK+FjpMYgb2RgPmfsaY7I4YEO2gUrGlmA9CWiDJ3Brjoo9+lu4BC3
-	9H77dirlfU6J/NlJhkQuu/gf5+20OiI=
-From: Sven Eckelmann <sven@narfation.org>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Subject: Re: batman-adv: Fix double-hold of meshif when getting enabled
-Date: Wed, 09 Apr 2025 09:30:52 +0200
-Message-ID: <6178198.MhkbZ0Pkbq@ripper>
-In-Reply-To: <20250409073000.556263-1-sven@narfation.org>
-References: <20250409073000.556263-1-sven@narfation.org>
+	bh=15XMg9uMFcGvaxDTX0fVMBlGv3B/qZKa6F1fNknaxhY=;
+	b=F53d+bI9nF7LTOo/1Ve8uGh8FToCxHeIa5AnGVKAAQzxnTsvQGTOexM7uOloZ5gehake4y
+	Y4SYcbGAiOSRy06b8lls1GcSqfouBzStunu4XUWe4XagOT3gJUF6svoBp/uDPVXG7V2cL7
+	INgfH4XsiHnmrr35UOgr5NuppFtohjo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-9-qWADGFpzOrCRW4Y_A2fa1Q-1; Wed, 09 Apr 2025 03:32:08 -0400
+X-MC-Unique: qWADGFpzOrCRW4Y_A2fa1Q-1
+X-Mimecast-MFC-AGG-ID: qWADGFpzOrCRW4Y_A2fa1Q_1744183927
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3912539665cso215123f8f.1
+        for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 00:32:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744183927; x=1744788727;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=15XMg9uMFcGvaxDTX0fVMBlGv3B/qZKa6F1fNknaxhY=;
+        b=gxH0CsYcjEqZPyBuIKtlokfj318vgNFW0cS65ofXvD9YN07R2Lb7CHSXm6MScb2fz3
+         t2jFMuxpA8QvYr1UvP9292TtAQ1a6KWTWvmQ2rQX5u2ep6BPY8TjB3DjBnWLM1mweznr
+         TUtDh4bRTNxGu01DY/iPC6fdkG4Uwhfy9QfVdldFTmvW/Innbya1t8yIBCdh/03kL1o3
+         UdAR2k9SfxV/ZCAoVYJM4FTmW0DZMlXDwBxPC3jo3DU1UujVUrW5JSLJK/F602zpt3/U
+         4avykvM6Mmr9GKJo4vHD4z97QVBEK9K2sQOSJjz5Y0uMVUtAAjg0VfinRo4ItwyHA1mD
+         rBJA==
+X-Forwarded-Encrypted: i=1; AJvYcCVPIiEZP5OTE7DC04xfH3UsLiRqF9OHLpp2EeQANa83qmivdTTrFpc/q84/fyhunhvChUbi9EE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywkh874iqEagvrzOVX/zEAv6Vs9q7+RnSqhBF5FuBgNh0xEmw7Z
+	xGeTRsV5nQy6gOGcAIfho0dicB/5QU+8ISQkNUu8X4AzYsvfpf1mgUp9XPRroB4O30lDB+6wxoZ
+	LQhgMYIeTn4BfAdvzpP0dwCCzLyYYXIodSPkWCRTqCfwGyahO5HbLdQ==
+X-Gm-Gg: ASbGncupRR8e3XiVEp4j3I9ygYtuFTAAClrh98TI1bDye5GYwZpocsRaZ67XmjNvAVS
+	HXOoGLJ7FlkA6EUq25SEm10YRup3IWfrhsx7DuiP+uV6yWB3muesvJYDJ7Z2+oMrPP2OWy3amAj
+	ckO7rodw+NURhQYHItbf5kkuighsMd/t5eOUisM6credZQ7rAV+spIK/CWNfaWqvnGL5cSWsIUO
+	Iq5I4wie/g52QQ1z8F5jpiRGJtlq0suIwstElfUmJg6BPFiLpz+X84yf2Jmmp7XOLJP9eG6k/lR
+	ScEpwSV47VxbsKYdw+vnFZVe8DwolaSHvfRAhA4=
+X-Received: by 2002:a05:6000:2283:b0:38f:4ffd:c757 with SMTP id ffacd0b85a97d-39d87e84b3fmr1340029f8f.2.1744183927443;
+        Wed, 09 Apr 2025 00:32:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF1PMwJ44PM7LbjW9qlmaMxkzVnUu1AIQlY9GTRrZoeakrYO1vlywPRAbPevQQr2y1XKuYxkw==
+X-Received: by 2002:a05:6000:2283:b0:38f:4ffd:c757 with SMTP id ffacd0b85a97d-39d87e84b3fmr1340006f8f.2.1744183927137;
+        Wed, 09 Apr 2025 00:32:07 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-84-24.dyn.eolo.it. [146.241.84.24])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39d892761fesm824803f8f.0.2025.04.09.00.32.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Apr 2025 00:32:06 -0700 (PDT)
+Message-ID: <103301d3-4c38-428d-aa31-501654064183@redhat.com>
+Date: Wed, 9 Apr 2025 09:32:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart1961712.VLH7GnMWUR";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/5] eth: fbnic: add coverage for hw queue stats
+To: Mohsin Bashir <mohsin.bashr@gmail.com>, netdev@vger.kernel.org
+Cc: alexanderduyck@fb.com, kuba@kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, suhui@nfschina.com,
+ sanman.p211993@gmail.com, vadim.fedorenko@linux.dev, horms@kernel.org,
+ kalesh-anakkur.purayil@broadcom.com, kernel-team@meta.com
+References: <20250407172151.3802893-1-mohsin.bashr@gmail.com>
+ <20250407172151.3802893-3-mohsin.bashr@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250407172151.3802893-3-mohsin.bashr@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
---nextPart1961712.VLH7GnMWUR
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"; protected-headers="v1"
-From: Sven Eckelmann <sven@narfation.org>
-To: netdev@vger.kernel.org
-Date: Wed, 09 Apr 2025 09:30:52 +0200
-Message-ID: <6178198.MhkbZ0Pkbq@ripper>
-In-Reply-To: <20250409073000.556263-1-sven@narfation.org>
-References: <20250409073000.556263-1-sven@narfation.org>
-MIME-Version: 1.0
-
-On Wednesday, 9 April 2025 09:30:00 CEST Sven Eckelmann wrote:
-> Fixes: 00b35530811f ("batman-adv: adopt netdev_hold() / netdev_put()")
-> Signed-off-by: Sven Eckelmann <sven@narfation.org>
-> 
-> diff --git a/net/batman-adv/hard-interface.c b/net/batman-adv/hard-interface.c
-> index f145f96626531053bbf8f58a31f28f625a9d80f9..7cd4bdcee43935b9e5fb7d1696430909b7af67b4 100644
-> --- a/net/batman-adv/hard-interface.c
-> +++ b/net/batman-adv/hard-interface.c
-> @@ -725,7 +725,6 @@ int batadv_hardif_enable_interface(struct batadv_hard_iface *hard_iface,
+On 4/7/25 7:21 PM, Mohsin Bashir wrote:
+> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+> index 79a01fdd1dd1..e21a315ba694 100644
+> --- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+> @@ -403,11 +403,15 @@ static int fbnic_hwtstamp_set(struct net_device *netdev,
+>  static void fbnic_get_stats64(struct net_device *dev,
+>  			      struct rtnl_link_stats64 *stats64)
+>  {
+> +	u64 rx_bytes, rx_packets, rx_dropped = 0, rx_errors = 0;
+>  	u64 tx_bytes, tx_packets, tx_dropped = 0;
+> -	u64 rx_bytes, rx_packets, rx_dropped = 0;
+>  	struct fbnic_net *fbn = netdev_priv(dev);
+> +	struct fbnic_dev *fbd = fbn->fbd;
+>  	struct fbnic_queue_stats *stats;
+>  	unsigned int start, i;
+> +	u64 rx_over = 0;
+> +
+> +	fbnic_get_hw_stats(fbd);
 >  
->  	kref_get(&hard_iface->refcount);
+>  	stats = &fbn->tx_stats;
 >  
-> -	dev_hold(mesh_iface);
->  	netdev_hold(mesh_iface, &hard_iface->meshif_dev_tracker, GFP_ATOMIC);
->  	hard_iface->mesh_iface = mesh_iface;
->  	bat_priv = netdev_priv(hard_iface->mesh_iface);
-> 
+> @@ -444,9 +448,20 @@ static void fbnic_get_stats64(struct net_device *dev,
+>  	rx_packets = stats->packets;
+>  	rx_dropped = stats->dropped;
+>  
+> +	for (i = 0; i < fbd->max_num_queues; i++) {
+> +		/* Report packets dropped due to CQ/BDQ being full/empty */
+> +		rx_over += fbd->hw_stats.hw_q[i].rde_pkt_cq_drop.value;
+> +		rx_over += fbd->hw_stats.hw_q[i].rde_pkt_bdq_drop.value;
 
-Sorry, from wrong folder
---nextPart1961712.VLH7GnMWUR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
+I'm possibly missing something, but AFAICS the above statements can be
+executed without any lock held. Another thread can concurrently call
+fbnic_get_hw_stats() leading to an inconsistent snapshot.
 
------BEGIN PGP SIGNATURE-----
+Should fbnic_get_hw_stats() store the values in a local(ly allocated)
+struct?
 
-iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCZ/YiLAAKCRBND3cr0xT1
-y/u1AQDvWc+3llxL1qDqtrnLD4jc5XvmWsi2gS8qWZjs66UEhAD/fJj59QbZ6hqU
-Xpm+c6rx8N6WbXRz+zjy5GkUf3WORA8=
-=cyyR
------END PGP SIGNATURE-----
+Cheers,
 
---nextPart1961712.VLH7GnMWUR--
-
-
+Paolo
 
 
