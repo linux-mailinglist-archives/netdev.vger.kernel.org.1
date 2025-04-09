@@ -1,235 +1,389 @@
-Return-Path: <netdev+bounces-180762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A8B8A8258C
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 15:02:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 698A7A8259C
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 15:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 757C11B63C58
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 13:02:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A6C14A3729
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 13:10:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B2362397B9;
-	Wed,  9 Apr 2025 13:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D1C226159A;
+	Wed,  9 Apr 2025 13:10:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mWA8Ezeu"
+	dkim=pass (2048-bit key) header.d=hazent-com.20230601.gappssmtp.com header.i=@hazent-com.20230601.gappssmtp.com header.b="HeQePJiY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926B725634
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 13:01:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744203719; cv=fail; b=gjFOruFO+0vLE2MB1kS8Ml1+xyA/B3RmRne1MOmxO/vyknQs481nBRbfd8u4YyEJfARrICoJASkOcu7bPr8JyDiTdh9GbQezdIbN3er5S+eH+nTvit8wvNu7SYL8KB9C6tS4wqanFvckZW0+L1rBu8djo6qn0ONMEK9jMr1DCLo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744203719; c=relaxed/simple;
-	bh=a3EObzrmSxXkdiYX6fSFsStSTFxSpSjEomyrsspU0ys=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=TAdkNJQAx9KRqmdF9pwEYR0uO734KCSp4F9kki03FBynKdxDE39QNdDUFwSK4aM8TArFdCffiVj9zkzmJ4yn+wT2+bFaeYrexpzR4vdR5m5NSq1fxURQFJGJ7v9mMuTnfP6r78yTLJ1otNIhRjSQJX0sktm3grgc9toq1zYXkzA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mWA8Ezeu; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744203718; x=1775739718;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=a3EObzrmSxXkdiYX6fSFsStSTFxSpSjEomyrsspU0ys=;
-  b=mWA8EzeuKgawuuxiqC2pCR7Iwkm1mHNtStaEjKgi9hElbQKjHCcJlZTW
-   Gt1EWpm6PEqNpm0Dlwxn5nOoyVRRsKNPdI4GfU4LVDkPiB0fjkV6tUw/D
-   42zN+ts3IsPYPo8MEg9S3WHdPTwox3UcbIvcIlm4/Qv3t51l7m8PNVMhR
-   6chogaq9Ii3qoXQar3DvDTFdgo5dEvoCJsyWym8bEsh6sfPfC5m4ZqIO7
-   5ZrVLCm5MQHt4NCvpD6Vb3CyAO1i5q8ljsOZG+EDZSdBUuEG46sGuJckZ
-   YOtaoqwaV7QGDURFdA/KBiy08oLuesryMkNPTOLRY9Ajr46mRgTR+dY+Z
-   Q==;
-X-CSE-ConnectionGUID: VJHMGvx4RsqP0kEinwPcUQ==
-X-CSE-MsgGUID: QrueROAwRS6cH8IQMz+stg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11397"; a="55856680"
-X-IronPort-AV: E=Sophos;i="6.15,200,1739865600"; 
-   d="scan'208";a="55856680"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 06:01:57 -0700
-X-CSE-ConnectionGUID: j4kh5X9GRkejZmTcpT+b9Q==
-X-CSE-MsgGUID: 8rrwQuWfSv60VFFysgYiLQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,200,1739865600"; 
-   d="scan'208";a="129540508"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 06:01:57 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Wed, 9 Apr 2025 06:01:56 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Wed, 9 Apr 2025 06:01:56 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.173)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 9 Apr 2025 06:01:54 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ogUFrf4RA2oY99AMPumtykFh4yqfwx8C7N33n0u/VcWN6yqn/BJz7tNs6JhQVikU4ep5/iA55eLhgjUqSKNZOS1RGL7nHOWRC8T2blS59vbLCWnj8Pvly+9vI5+S/ZxRYAzgVhpIouBYIvqq/LJRPLEzypPVUs1VDP83N0IYV//hTXwfF6ybzDuOKVgOnXm6a6vv/ixWuVGHRoybX0eRlmFiOnTuBDBbqdRMR9FZANG/ATtleGzCn8oHBdtOBovnNp8vyPrS+sNvli/AU4BAJT166cm6tdyICAWUxcHXcGLC3YLTdgEzKb6sQwV12vKD6O0EJo9NgJEulQoRmmmJRQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6iJBhs1X8VX58v90etcm1ujrRdWudPaXA7gY7PWDKac=;
- b=pr5071kUINHeKEt2SuBhgTc4j9vvLSoCqa7BvpIz2kqh8qO+kw2gff2rhEcAA88RaMtLSCFJL9PGDzgOP9nZ+gwCm/GjUcEceSJpFARrTud6L8/i4RzuH2kPGJYoLWwj2UZqQv2SNr0TMZf9He9O93DIOZaK71NcwHH0EhdOmt/Y6jECD1q46XEIxvllNRSHMDpVdWkbXySEVuj9pTSu3p7uTvgKUBpFKUjBL5boSKkKbhEKKPyVRwkpp8oScrREdl7IX2EcegjX82iIxTpN3X5V4SPxcO7oXdpij7iJxlu1Re1b3tRLF3lBSBJJufUZO3FfHcte11MTd8UZIhVyDg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MW4PR11MB5889.namprd11.prod.outlook.com (2603:10b6:303:168::10)
- by CY8PR11MB7108.namprd11.prod.outlook.com (2603:10b6:930:50::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.34; Wed, 9 Apr
- 2025 13:01:21 +0000
-Received: from MW4PR11MB5889.namprd11.prod.outlook.com
- ([fe80::89d6:5ccc:1dcc:3073]) by MW4PR11MB5889.namprd11.prod.outlook.com
- ([fe80::89d6:5ccc:1dcc:3073%3]) with mapi id 15.20.8632.017; Wed, 9 Apr 2025
- 13:01:21 +0000
-From: "Olech, Milena" <milena.olech@intel.com>
-To: "Keller, Jacob E" <jacob.e.keller@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Lobakin, Aleksander"
-	<aleksander.lobakin@intel.com>, Willem de Bruijn <willemb@google.com>,
-	"Salin, Samuel" <samuel.salin@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH v10 iwl-next 06/11] idpf: add mailbox
- access to read PTP clock time
-Thread-Topic: [Intel-wired-lan] [PATCH v10 iwl-next 06/11] idpf: add mailbox
- access to read PTP clock time
-Thread-Index: AQHbqHM+oVY7wl6vTkKRI0vBuajUsbOaRjeAgAEHpMA=
-Date: Wed, 9 Apr 2025 13:01:21 +0000
-Message-ID: <MW4PR11MB58896B0420FE0EDCBBAA67D08EB42@MW4PR11MB5889.namprd11.prod.outlook.com>
-References: <20250408103240.30287-2-milena.olech@intel.com>
- <20250408103240.30287-15-milena.olech@intel.com>
- <8e97d23b-f848-4649-ab1b-51e310757ad8@intel.com>
-In-Reply-To: <8e97d23b-f848-4649-ab1b-51e310757ad8@intel.com>
-Accept-Language: en-US, pl-PL
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW4PR11MB5889:EE_|CY8PR11MB7108:EE_
-x-ms-office365-filtering-correlation-id: 0e4d1fa5-b7ba-4bce-c887-08dd77669ffc
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?4gJx9Gm+hAufrpQBfpAhFPeKZY/5QHQoQkc9RyHZSP0SfYPMHOTTdNTkwobr?=
- =?us-ascii?Q?1Cjvf6dMdHP8n70sSXwfT9qLb44syvG5OGLPgorx4+O8PSJNoJD99jcMLInG?=
- =?us-ascii?Q?EqcFAf3nUXg2AuZVE0jcbfStBzeqceRmuEogLBBthppTjQp6aZSa8I1m5dA9?=
- =?us-ascii?Q?UUb/Kyx79Ar2lwfjlj+I+3K0ozMCG84gVaQhdRHv8MniEcSzBLPeYpipmynr?=
- =?us-ascii?Q?pnOlFLoj8n+eXsjWEbq9xXlrZRxZi/5GbZ4En/spf1nndH4BM2kmODKJuB1f?=
- =?us-ascii?Q?rpAjy+khNscBV3O6MKe9XDoJLXQno1Ixh7b4JV2QIHOlIFTjvRiRDl4F3d9/?=
- =?us-ascii?Q?iOGt1whYWDBNyQ5TPqbFT5TduEvzNlBJOCPhuH95gPKoTbRex9sdsdgOBAMU?=
- =?us-ascii?Q?siX/YB9ppsP6sfSJBmgMGtGLrX2EbpQ93ZINtIeOspg9ImJ0yjauvUuhrHLr?=
- =?us-ascii?Q?cY0Rqrf5Fgdx6sgsLHyQ/nZjGHuvuoZNP3CBct9EgUfLRwLITUYkK4DEpc0/?=
- =?us-ascii?Q?4Zy5CHdfY3cJyybeL12ZG/3T/oBAt5I6c5C1StBAkyDB1FPBnSQZCakRix5y?=
- =?us-ascii?Q?pImSf79FQDmXasaZv15wcxMBbzyalHeOdrPj2JU6XGnn8O822xVi/8RwObRf?=
- =?us-ascii?Q?XLbtBPr21IqDjTj3yDF9GubnfCo7ldBC5G5n5q3eEg6R8hlxiI9+YzYxWBn2?=
- =?us-ascii?Q?Gma3Wpzoe7/p4w2ENmRITfn7o3sY1sfyNW8NRqsA3lQJz9ihPM3HNggtDdrh?=
- =?us-ascii?Q?M+TP2f2jhI8jxVSgNk5ToJtl3PbLKLofMde8YrgJaeE38T3hKR7eRg8sHlCn?=
- =?us-ascii?Q?deTC/G/U9uyTaTq7S4ir9Xf0DUIc7TOwhcZwpPz9N+A9n81nAGQhhJBc3Hql?=
- =?us-ascii?Q?ktxNH+8Kcng9Z/NtoyRZKE4zWIdaF6PvnC7ovSAfEGQE6TY7KJVJIJ4wEKYV?=
- =?us-ascii?Q?XW2lzQK6lzFiB6f1SjFc5W4Lz/iwitRqqm1ATnAoWfZy1vkU2Tf5VFahBGxc?=
- =?us-ascii?Q?aTsB9FU6f6/F1uTOmw3+7ZMRQ6sRYt56E0trYvzqnfTguQvdqbrCaWBgGG7u?=
- =?us-ascii?Q?TgSf66Tbd4M3t+cfgtPWaJCvijSVcaXByzMI8lsK3dfs6k2S03iemCfeOBTw?=
- =?us-ascii?Q?MiUuYRBTLVYy8bIH49fl5IUO2UGoD10H9nS1BxIINaivf49rb99TOBa/+u0v?=
- =?us-ascii?Q?u9iEWj8YaIjVypbGPzFA0rl+Mvp4ksqjZIDoc8y5QZweKL3yPsm+k79XjwZ+?=
- =?us-ascii?Q?orTiOSqUkPR8rS4cQfpW2GpBlaYpw+ncl0MITdcl+573wnFnxwbw/1jQSCqQ?=
- =?us-ascii?Q?S/Hi8M92HsxVCm1XcAblm6wzAXTOnfAPkVziMUDSlM6BnjQXfzEnFxLlcEB+?=
- =?us-ascii?Q?MU9cwNDG4AKTNYmnphdhC/hbkIft9Q/vRx+GPU3RMYQqj04nlo2ywgvM95O/?=
- =?us-ascii?Q?jZy52TWmGApaRS0t6dQQlGRSDJ0ml1Vn?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5889.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?zV8XFISKbd1PIokkskZB/r0tgxSRirmhCft6+5CCgNPd1e9dCGQg7VYArJuz?=
- =?us-ascii?Q?S3Q5x0vGO0k18D5BApONg6AzGsOcB5nwskKgo4oTg4scr6OdW79KNOGqC5/0?=
- =?us-ascii?Q?vrWl0YPd4SzXSvuPrN2AirdtCHzsFCDaPBdq03y2F5Z68CDGwEe22eM1Tdbx?=
- =?us-ascii?Q?bqvTsPS48dbm6ilfm+BHSh5RIcsX3RSFcz/wMVrDRA67qWKJAsSpbG74ZjHH?=
- =?us-ascii?Q?JqtLa7v5NU6Hj11NR+xHaHYU6mDzLgHoPf7n5Vz4yGJwQ7xnwgxzw26UN4L8?=
- =?us-ascii?Q?/adzdWHc7dmWmbaP7TP3sKBWnp0gnfc/nMRJr/B3K9B+1nyR5x454bImVO5f?=
- =?us-ascii?Q?jHwhST21gxYhgiU8fT1z7BHecnoZJvJJz1XR/vS4xU9xvvA6YhpZJz/8jxiS?=
- =?us-ascii?Q?vVRocA/bCMcMWQcGYC4/BAO8ITodQcHEkPSCDihksb23RS0he9Ur5OhaQpuh?=
- =?us-ascii?Q?/rLZtTSd+umXD+8TncyvbYaXlQooW09xzAm0qLPda1Ru41y1Ho3a/l6T0Iql?=
- =?us-ascii?Q?xRPWYSJFDK7J87MycFpIQLX6ebRiaxM2g2eCY7CLtsvkBZGcEoqt739jMj/r?=
- =?us-ascii?Q?TyQ41c7lmDRnkJ5CqqHhv7IFARvY9HRxX0rZCnjv6Dl7G85f2JG5ToEZAHUv?=
- =?us-ascii?Q?PkH+9y8dajg9VVqxSKTPMGdb37nbIZw5I4xwXqYOrnMp/nUPA4as3eZI/IfT?=
- =?us-ascii?Q?JVjVBvRoHRpfO1qx9oQjni737DnOaJi1xcEkGdyCqOyEZ/jo/ZItgBdUclQy?=
- =?us-ascii?Q?Fyt5OTM2HBhacwyidE4qS0TarwR6W29ufBDqU9yM1rBi2PBTvnmPhtW/MJsA?=
- =?us-ascii?Q?NXyLc7CvmrsOvzn6ZDxzC6yMZOkGK7fEnb3E+Q61YEvlirjV9TKwRrNlXyAE?=
- =?us-ascii?Q?Ngqe/4mqnbiRdbrle/GNwZgddPgeRPnD/1CR1vdo5LpDU5buy9eQMXYykIAe?=
- =?us-ascii?Q?06mv+Ifa0jw5uyBaSZ6lUy75nBMz/ZXceV7q9nU6NOhD3HpyzYbyVWs3jc6+?=
- =?us-ascii?Q?V+eaBC2m4hY2o5gYWLoTY0p4FO6ybUtIcQdIWIsxQ7pcwGWXChtyg8ApwJzh?=
- =?us-ascii?Q?Zn0cnAyc9HOaMEQwCQa80ixOg3C3KA2Rky8lKr19Sgk6N8jrhT8HDbEdXIM+?=
- =?us-ascii?Q?+fzez+t/5JYteOcp2OM+QKtSaJ2IfExSJpmm5BzOSz0NtBTSle2FnzqJSN5/?=
- =?us-ascii?Q?eesakHFQCofR1RlCzx9N4eH89XqzSK0elfBunC/jeAO7I4DCk8uT0oTimrVA?=
- =?us-ascii?Q?/jEEedMsa4h3nE2CBP5V4IT+9/Zb1+FXZFR8yT8ZJv6a2g98222aaQx/Zwwr?=
- =?us-ascii?Q?DTMQo/KDFuJGjMnwsuoQ2enkQH1WwFOqVAduL3Nrxa7GYp9nj5tKvGe9iQ1t?=
- =?us-ascii?Q?RcL73ZABc/OzzmeitPGULWYFuZF72JJJ4TimLygG694HfpLJ0X13O2AtESi+?=
- =?us-ascii?Q?XRCtTR0VYgIMCHbspTX+w651QaP7H6/LD2zoP9/9A3r3pYriUL1W/pjGbgSP?=
- =?us-ascii?Q?WJsyqBUKyXNBsOA9/AkODH4K+7qGebhtIg6cV9AtPeVSXSkFQa6SVG6Bxkz3?=
- =?us-ascii?Q?ZOI/Ed99JnjhYrYSJnWQn/7pd52SYfp8Qww2bqfK?=
-Content-Type: text/plain; charset="us-ascii"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 683B629A0
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 13:10:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744204203; cv=none; b=oW5hilFZPHDHfDWQMTfcO1HjXueKYBemmRhqX94dHxWs0FC01tKBL+yChE/R6zvOwzit+D3EfcgMWQglHGnVdbbsQD3sIFuWhvCKTNhmwQopGaZLIIjKkvg5laPUi8etFKwagN6VcQ136z3LX3lASh+ymGhuU7ymrYYSUiP6efY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744204203; c=relaxed/simple;
+	bh=0QsZXp1kwnYMT0ririRLCSH8gnC7cPSbbcK+C5vJ4rU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=CbGQtv2grNWML5Va259tdkaFWD4EHhSrbbU1u9kT5AbE87S7CKCgKGM4t2EqIxhb+mD+HnT7JP3vDLfjiOMfRICMFcVZAeMhznSe9pKxV/WNaDzjNzCnHkt2fKifQxluXM+QgFVaO5zwvoZ4B81VIlLFf9O6KnqCF2Qf9coAjMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hazent.com; spf=pass smtp.mailfrom=hazent.com; dkim=pass (2048-bit key) header.d=hazent-com.20230601.gappssmtp.com header.i=@hazent-com.20230601.gappssmtp.com header.b=HeQePJiY; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hazent.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hazent.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ac2bb7ca40bso833847666b.3
+        for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 06:10:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=hazent-com.20230601.gappssmtp.com; s=20230601; t=1744204198; x=1744808998; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=x+KfK/XzOXfwWuXD/PpqYGuODz7cec1/ltmqrDc8nps=;
+        b=HeQePJiYF6pW9+Wc1GweKP1IXhjzdmCju9B0PCRxZidhx/Lb44NZUfWsG0qyvhvd41
+         V9724MKGGpp5T/rpQIoPYWlVR/UDVT+Zh3xsvWXY+i8s22ZgQNZtkSB078FPZs60Yw3H
+         edoeUUCqpZmDr80gESAB+/pqaVMP/ENju6CsA8sy6mldVlpnqLMmtKGw04N6ZWgA1qJB
+         BuntnIFOetR22HPbGWxeCKWvD8Ku31IpmnNz9s4OHm92cmOdus7mxncAyFuXkkBQfBlV
+         7EKl5b+D8UB6C45hb9pulkZUMBS6OoJWTB90hu0xe0mqarglCrC3kd4DTouqbR6UcZMD
+         lxjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744204198; x=1744808998;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=x+KfK/XzOXfwWuXD/PpqYGuODz7cec1/ltmqrDc8nps=;
+        b=p/lFCYmK+AMMz1uHL2ZSXoxuiI+nqvCWZCGDsjj7daYzvZ8YqOJXAwAcIuM9lPpFrn
+         oabfdt4HCHYfMS5SkycXV9H1M/qDt6FZ44H9zuHuRhDYaUA6i6ooBnbhscDaCw2cRDEm
+         p+5UiBZlR45bKS0lPFWChyVuM50p6NEAUloRgeRt190kkO5OPbOfVEXEGlqn3MppxZpT
+         rvHM0O0HeZQvQnHupaffPA/J93uY15ZovsP4k/zSqZFTiGoiVUdWFGwgYDHXMZZj7EjA
+         DeDJh6hE3NF8rWcHXH/VlMtC7RBnh4HwkfadzCf1MBTNOw3vfA89cL3bXTSbs2/i7dkd
+         hpOw==
+X-Gm-Message-State: AOJu0Ywjir0tA5su5yjv8SZ+IpcoLcelP02fvzIxH7KgGf9RtdjtFXSW
+	6DEnfTR2dqoczY/1Wm0ZmUvKpIbBuM89gkZ85ELKgIMhlBrqrwaHjQbkR/siUg==
+X-Gm-Gg: ASbGncvXDORNc35G+X0EqUut1folIvRDGR5PB+dgbWYRJIqRVhqgkDGfhAi5NGjYN7G
+	eEx/ZEAz1a3EhoAzq7VvDqKt1oL/Q1C0eLnP5DbZkcTvmwFYvXCQVVfXcEIxGhod3hYmnqnfowe
+	qjYpxd8EIVFdF92WSIJSZ9c6rArm3K4UwwmpYoSRr5dFfBASOHnw+t2gHq6ZhnPZIvU2xQiaXlK
+	EmziS+B/D2ywhlWMJ4iq3R7Chbk+gepX57U+JKzrmQefgw4hI0mB/9Mv+tXzJO0VS3PPiu3yRXc
+	q9m037QhOP3t1t7Xcz9UYoZhTyljVLtaAoMkqAaFIaRC+NuQ
+X-Google-Smtp-Source: AGHT+IEJO0WjdgXOjXJqZPftUFQkpS6u3BM4TNcGdroUlKAuuGmTMKinuIf0AidjcQlLK1aelrsOqw==
+X-Received: by 2002:a17:906:248a:b0:aca:abff:b427 with SMTP id a640c23a62f3a-acaabffc0edmr19595266b.52.1744204198022;
+        Wed, 09 Apr 2025 06:09:58 -0700 (PDT)
+Received: from [192.168.2.3] ([109.227.147.74])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acaa1ce7322sm92151066b.164.2025.04.09.06.09.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Apr 2025 06:09:57 -0700 (PDT)
+Message-ID: <573ae845a793527ddb410eee4f6f5f0111912ca6.camel@hazent.com>
+Subject: Re: Issue with AMD Xilinx AXI Ethernet (xilinx_axienet) on
+ MicroBlaze: Packets only received after some buffer is full
+From: =?ISO-8859-1?Q?=C1lvaro?= "G. M." <alvaro.gamez@hazent.com>
+To: "Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>, Jakub Kicinski
+	 <kuba@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Katakam, Harini"
+	 <harini.katakam@amd.com>, "Gupta, Suraj" <Suraj.Gupta2@amd.com>
+Date: Wed, 09 Apr 2025 15:09:56 +0200
+In-Reply-To: <MN0PR12MB59539CF99653EC1F937591AAB7B42@MN0PR12MB5953.namprd12.prod.outlook.com>
+References: <9a6e59fcc08cb1ada36aa01de6987ad9f6aaeaa4.camel@hazent.com>
+			 <20250402100039.4cae8073@kernel.org>
+		 <80e2a74d4fcfcc9b3423df13c68b1525a8c41f7f.camel@hazent.com>
+		 <MN0PR12MB59537EB05F07459513A2301EB7AE2@MN0PR12MB5953.namprd12.prod.outlook.com>
+	 <ce56ed7345d2077a7647687f90cf42da57bf90c7.camel@hazent.com>
+	 <MN0PR12MB59539CF99653EC1F937591AAB7B42@MN0PR12MB5953.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.56.0-1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5889.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0e4d1fa5-b7ba-4bce-c887-08dd77669ffc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Apr 2025 13:01:21.0371
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: FeUu5s/GQtO4FDIJEsz46aw2+sAAmhLM6uhCa1OAdMsGsUbiXx+Jc1FOgZtFeptehfQl5+0Sz4pe4zMpK3lMOg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7108
-X-OriginatorOrg: intel.com
 
-On 4/8/2025 11:17 PM, Jacob Keller wrote:
+On Wed, 2025-04-09 at 11:14 +0000, Pandey, Radhey Shyam wrote:
+> [AMD Official Use Only - AMD Internal Distribution Only]
+>=20
+> > -----Original Message-----
+> > From: =C3=81lvaro G. M. <alvaro.gamez@hazent.com>
+> > Sent: Wednesday, April 9, 2025 4:31 PM
+> > To: Pandey, Radhey Shyam <radhey.shyam.pandey@amd.com>; Jakub Kicinski
+> > <kuba@kernel.org>
+> > Cc: netdev@vger.kernel.org; Katakam, Harini <harini.katakam@amd.com>; G=
+upta,
+> > Suraj <Suraj.Gupta2@amd.com>
+> > Subject: Re: Issue with AMD Xilinx AXI Ethernet (xilinx_axienet) on Mic=
+roBlaze:
+> > Packets only received after some buffer is full
+> >=20
+> > On Thu, 2025-04-03 at 05:54 +0000, Pandey, Radhey Shyam wrote:
+> > > [...]
+> > >  + Going through the details and will get back to you . Just to
+> > > confirm there is no vivado design update ? and we are only updating l=
+inux kernel to
+> > latest?
+> > >=20
+> >=20
+> > Hi again,
+> >=20
+> > I've reconsidered the upgrading approach and I've first upgraded buildr=
+oot and kept
+> > the same kernel version (4.4.43). This has the effect of upgrading gcc =
+from version
+> > 10 to version 13.
+> >=20
+> > With buildroot's compiled gcc-13 and keeping this same old kernel, the =
+effect is that
+> > the system drops ARP requests. Compiling with older gcc-10, ARP request=
+s are
+>=20
+> When the system drops ARP packet - Is it drop by MAC hw or by software la=
+yer.
+> Reading MAC stats and DMA descriptors help us know if it reaches software
+> layer or not ?
 
->On 4/8/2025 3:30 AM, Milena Olech wrote:
->> +static int idpf_ptp_read_src_clk_reg_mailbox(struct idpf_adapter *adapt=
-er,
->> +					     struct ptp_system_timestamp *sts,
->> +					     u64 *src_clk)
->> +{
->> +	struct idpf_ptp_dev_timers clk_time;
->> +	int err;
->> +
->> +	/* Read the system timestamp pre PHC read */
->> +	ptp_read_system_prets(sts);
->> +
->> +	err =3D idpf_ptp_get_dev_clk_time(adapter, &clk_time);
->> +	if (err)
->> +		return err;
->> +
->> +	/* Read the system timestamp post PHC read */
->> +	ptp_read_system_postts(sts);
->> +
->> +	*src_clk =3D clk_time.dev_clk_time_ns;
->> +
->> +	return 0;
->> +}
->Not an objection, since its obvious using the direct register access is
->preferable when it is available. This will result in a fair amount of
->jitter since mailbox timing is unlikely to be consistent. We also cannot
->have sts be filled in somehow by the host because it might not be
->operating on the same system clock.
->
+I'm not sure, who is the open dropping packets, I can only check with
+ethtool -S eth0 and this is its output after a few dozens of arpings:
 
-You're 100% right, reading the time of the clock through mailbox is not
-efficient. But as you mentioned, direct register access is definitely
-preferable.
+# ifconfig eth0
+eth0      Link encap:Ethernet  HWaddr 06:00:0A:BC:8C:01 =20
+          inet addr:10.188.140.1  Bcast:10.188.143.255  Mask:255.255.248.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:164 errors:0 dropped:99 overruns:0 frame:0
+          TX packets:22 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000=20
+          RX bytes:11236 (10.9 KiB)  TX bytes:1844 (1.8 KiB)
 
-Thanks,
-Milena
+# ethtool -S eth0
+NIC statistics:
+     Received bytes: 13950
+     Transmitted bytes: 2016
+     RX Good VLAN Tagged Frames: 0
+     TX Good VLAN Tagged Frames: 0
+     TX Good PFC Frames: 0
+     RX Good PFC Frames: 0
+     User Defined Counter 0: 0
+     User Defined Counter 1: 0
+     User Defined Counter 2: 0
+
+# ethtool -g eth0
+Ring parameters for eth0:
+Pre-set maximums:
+RX:		4096
+RX Mini:	0
+RX Jumbo:	0
+TX:		4096
+Current hardware settings:
+RX:		1024
+RX Mini:	0
+RX Jumbo:	0
+TX:		128
+
+# ethtool -d eth0
+Offset		Values
+------		------
+0x0000:		00 00 00 00 00 00 00 00 00 00 00 00 e4 01 00 00=20
+0x0010:		00 00 00 00 18 00 00 00 00 00 00 00 00 00 00 00=20
+0x0020:		00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00=20
+0x0030:		00 00 00 00 ff ff ff ff ff ff 00 18 00 00 00 18=20
+0x0040:		00 00 00 00 00 00 00 40 d0 07 00 00 50 00 00 00=20
+0x0050:		80 80 00 01 00 00 00 00 00 21 01 00 00 00 00 00=20
+0x0060:		00 00 00 00 00 00 00 00 00 00 00 00 06 00 0a bc=20
+0x0070:		8c 01 00 00 03 00 00 00 00 00 00 00 00 00 00 00=20
+0x0080:		03 70 18 21 0a 00 18 00 40 25 b3 80 40 25 b3 80=20
+0x0090:		03 50 01 00 08 00 01 00 40 38 12 81 00 38 12 81=20
+
+
+
+Running tcpdump makes it so that ifconfig dropped value doesn't increment a=
+nd shows
+me ARP requests (although it won't reply to them), but just setting the int=
+erface as promisc do not.
+
+If you can give me any indications on how to gather more data about DMA des=
+criptors
+I'll try my best.
+
+This is using internal's emaclite dma, because when using dmaengine there's=
+ no dropping
+of packets, but a big buffering, and kernel 6.13.8, because in series ~5.11=
+ which I'm
+also working with, axienet didn't have support for reading statistics from =
+the core.
+
+I assume the old dma code inside axienet is to be deprecated, and I would b=
+e
+pretty glad to use dmaengine, but that has the buffering problem. So if you
+want to focus efforts on solving that issue I'm completely open to whatever
+you all deem more appropriate.
+
+I can even add some ILA to the Vivado design and inspect whatever you
+think could be useful
+
+Thanks
+
+>=20
+> > replied to. Keeping old buildroot version but asking it to use gcc-11 w=
+ill cause the
+> > same issue with kernel 4.4.43, so something must have happened in betwe=
+en those
+> > gcc versions.
+> >=20
+> > So this does not look like an axienet driver problem, which I first tho=
+ught it was,
+> > because who would blame the compiler in first instance?
+> >=20
+> > But then things started to get even stranger.
+> >=20
+> > What I did next, was slowly upgrading buildroot and using the kernel ve=
+rsion that
+> > buildroot considered "latest" at the point it was released. I reached a=
+ point in which
+> > the ARP requests were being dropped again. This happened on buildroot 2=
+021.11,
+> > which still used gcc-10 as the default and kernel version 5.15.6. So so=
+me gcc bug
+> > that is getting triggered on gcc-11 in kernel 4.4.43 is also triggered =
+on gcc-10 by
+> > kernel 5.15.6.
+> >=20
+> > Using gcc-10, I bisected the kernel and found that this commit was trig=
+gering
+> > whatever it is that is happening, around 5.11-rc2:
+> >=20
+> > commit 324cefaf1c723625e93f703d6e6d78e28996b315 (HEAD)
+> > Author: Menglong Dong <dong.menglong@zte.com.cn>
+> > Date:   Mon Jan 11 02:42:21 2021 -0800
+> >=20
+> >     net: core: use eth_type_vlan in __netif_receive_skb_core
+> >=20
+> >     Replace the check for ETH_P_8021Q and ETH_P_8021AD in
+> >     __netif_receive_skb_core with eth_type_vlan.
+> >=20
+> >     Signed-off-by: Menglong Dong <dong.menglong@zte.com.cn>
+> >     Link: https://lore.kernel.org/r/20210111104221.3451-1-
+> > dong.menglong@zte.com.cn
+> >     Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> >=20
+> >=20
+> > I've been staring at the diff for hours because I can't understand what=
+ can be wrong
+> > about this:
+> >=20
+> > diff --git a/net/core/dev.c b/net/core/dev.c index e4d77c8abe76..267c4a=
+8daa55
+> > 100644
+> > --- a/net/core/dev.c
+> > +++ b/net/core/dev.c
+> > @@ -5151,8 +5151,7 @@ static int __netif_receive_skb_core(struct sk_buf=
+f **pskb,
+> > bool pfmemalloc,
+> >         skb_reset_mac_len(skb);
+> >     }
+> >=20
+> > -   if (skb->protocol =3D=3D cpu_to_be16(ETH_P_8021Q) ||
+> > -       skb->protocol =3D=3D cpu_to_be16(ETH_P_8021AD)) {
+> > +   if (eth_type_vlan(skb->protocol)) {
+> >         skb =3D skb_vlan_untag(skb);
+> >         if (unlikely(!skb))
+> >             goto out;
+> > @@ -5236,8 +5235,7 @@ static int __netif_receive_skb_core(struct sk_buf=
+f **pskb,
+> > bool pfmemalloc,
+> >              * find vlan device.
+> >              */
+> >             skb->pkt_type =3D PACKET_OTHERHOST;
+> > -       } else if (skb->protocol =3D=3D cpu_to_be16(ETH_P_8021Q) ||
+> > -              skb->protocol =3D=3D cpu_to_be16(ETH_P_8021AD)) {
+> > +       } else if (eth_type_vlan(skb->protocol)) {
+> >             /* Outer header is 802.1P with vlan 0, inner header is
+> >              * 802.1Q or 802.1AD and vlan_do_receive() above could
+> >              * not find vlan dev for vlan id 0.
+> >=20
+> >=20
+> >=20
+> > Given that eth_type_vlan is simply this:
+> >=20
+> > static inline bool eth_type_vlan(__be16 ethertype) {
+> >         switch (ethertype) {
+> >         case htons(ETH_P_8021Q):
+> >         case htons(ETH_P_8021AD):
+> >                 return true;
+> >         default:
+> >                 return false;
+> >         }
+> > }
+> >=20
+> > I've added a small printk to see these values right before the first ti=
+me they are
+> > checked:
+> >=20
+> > printk(KERN_ALERT  "skb->protocol =3D %d, ETH_P_8021Q=3D%d
+> > ETH_P_8021AD=3D%d, eth_type_vlan(skb->protocol) =3D %d",
+> >        skb->protocol, cpu_to_be16(ETH_P_8021Q), cpu_to_be16(ETH_P_8021A=
+D),
+> > eth_type_vlan(skb->protocol));
+> >=20
+> > And each ARP ping delivers a packet reported as:
+> > skb->protocol =3D 1544, ETH_P_8021Q=3D129 ETH_P_8021AD=3D43144,
+> > skb->eth_type_vlan(skb->protocol) =3D 0
+> >=20
+> > To add insult to injury, adding this printk line solves the ARP deafnes=
+s, so no matter
+> > whether I use eth_type_vlan function or manual comparison, now ARP pack=
+ets
+> > aren't dropped.
+> >=20
+> > Removing this printk and adding one inside the if-clause that should no=
+t be
+> > happening, shows nothing, so neither I can directly inspect the packets=
+ or return
+> > value of the wrong working code, nor can I indirectly proof that the wr=
+ong branch of
+> > the if is being taken. This reinforces the idea of a compiler bug, but =
+I very well could
+> > be wrong.
+> >=20
+> > Adding this printk:
+> > diff --git i/net/core/dev.c w/net/core/dev.c index 267c4a8daa55..a3ae3b=
+cb3a21
+> > 100644
+> > --- i/net/core/dev.c
+> > +++ w/net/core/dev.c
+> > @@ -5257,6 +5257,8 @@ static int __netif_receive_skb_core(struct sk_buf=
+f **pskb,
+> > bool pfmemalloc,
+> >                  * check again for vlan id to set OTHERHOST.
+> >                  */
+> >                 goto check_vlan_id;
+> > +       } else {
+> > +           printk(KERN_ALERT "(1) skb->protocol is not type vlan\n");
+> >         }
+> >         /* Note: we might in the future use prio bits
+> >          * and set skb->priority like in vlan_do_receive()
+> >=20
+> > is even weirder because the same effect: the message does not appear bu=
+t ARP
+> > requests are answered back. If I remove this printk, ARP requests are d=
+ropped.
+> >=20
+> > I've generated assembly output and this is the difference between havin=
+g that extra
+> > else with the printk and not having it.
+> >=20
+> > It doesn't even make much any sense that code would even reach this reg=
+ion of
+> > code because there's no vlan involved in at all here.
+> >=20
+> > And so here I am again, staring at all this without knowing how to proc=
+eed.
+> >=20
+> > I guess I will be trying different and more modern versions of gcc, eve=
+n some
+> > precompiled toolchains and see what else may be going on.
+> >=20
+> > If anyone has any hindsight as to what is causing this or how to solve =
+it, it'd be great
+> > if you could share it.
+> >=20
+> > Thanks!
+> >=20
+> > --
+> > =C3=81lvaro G. M.
 
