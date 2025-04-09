@@ -1,213 +1,98 @@
-Return-Path: <netdev+bounces-180533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05E22A8199E
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 02:05:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4871CA819C2
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 02:11:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF6127B480E
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 00:04:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 321144A1A1B
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 00:11:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B53881732;
-	Wed,  9 Apr 2025 00:04:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87EB64A28;
+	Wed,  9 Apr 2025 00:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b5oGfP1Z"
+	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="aQY+QTqo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 177A07D07D
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 00:04:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F30442C
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 00:11:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744157072; cv=none; b=dPqoe+Ku68ZthN+QAxyen6qHXXyLViGsXmbpnjVk0zLQCP9kaQWlq5kEvK38arv5YX2MB9Qs3ki2aOTGZCNxdPozDXC9Wyd20b0NcPQzcVxUBYrMMdtE2vo38vGOukLQaz0v7vSZb7wKGYSYRSiwd5tgOedyR9RoRO/4kBug4cw=
+	t=1744157494; cv=none; b=Af6BwKkRmIsWmOW7B3q5cgPjQgRIrFZMG+TVanbNpucja4pWpRshMZHVRXqwI2fUzMdCusOLBSLx4YIXHDMVrK6gmrQ4M/JxVReEEK93zBb+uC5d1dQy2vctwjmPY0UCEG3jNCe08klSEwinfIEHa1iG0+Qvr2EXpWHiMfatb2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744157072; c=relaxed/simple;
-	bh=LT5cBqZZGmg/Lie2cBLWEuIIWRsf57T0Vjd0+4sQd+I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c/zMGdbzLv5Qf/djR3RrhrhsmZbpaSOeOQE8MTxSMV7jruZqgjJRq4AmKP4eV8BKe6kipJqJGBlFFb5nz72j29Bn17e5iL8MYIZg2mCOBdDjJodtflRzRmmAzT5WumvsAH7+xCHIgNivEzbWwlB8pegRfrJ2QXRNNB+Pxg2ZppQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b5oGfP1Z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50A48C4CEE9;
-	Wed,  9 Apr 2025 00:04:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744157072;
-	bh=LT5cBqZZGmg/Lie2cBLWEuIIWRsf57T0Vjd0+4sQd+I=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=b5oGfP1ZNRiOpTUhhdBbvXsy15q9nwFJSZ0VEGTQkUTLCPa+kigt0/EIEOWQaHi7u
-	 RezwtEJueNVstQuJU+wWhYyD6SaA+lIyOMxO1i9aaimpesNLO8WiLWJQzNtJp4WFhH
-	 vaNuu3v/IYtWVIAgJRyDgG5EZxstkpQctEOdYIubqxq9RaNZCz7342TIvyozQb9cxo
-	 hr/csVq0P5Ev9nHoivGFnD9gGl4Sv7LAHxppgEFbMkHV2RBP9sfRYDPq4GgObA4rY3
-	 3Dy/qwqdPICgICO/9MBF8iBKsY9lkcJ0qq2GE8uEzBH31EOWc6YKuoMccr2Og/f88C
-	 7t8Bmte/0DUSw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	donald.hunter@gmail.com,
-	jacob.e.keller@intel.com,
-	yuyanghuang@google.com,
-	sdf@fomichev.me,
-	gnault@redhat.com,
-	nicolas.dichtel@6wind.com,
-	petrm@nvidia.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 13/13] tools: ynl: generate code for rt-route and add a sample
-Date: Tue,  8 Apr 2025 17:04:00 -0700
-Message-ID: <20250409000400.492371-14-kuba@kernel.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250409000400.492371-1-kuba@kernel.org>
-References: <20250409000400.492371-1-kuba@kernel.org>
+	s=arc-20240116; t=1744157494; c=relaxed/simple;
+	bh=IGrIh0oj6QcgaAVxI1Jr5iHoY3WwQRLUyJGmpJyReHg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=i5F/ZOebp8JP+joojK0ruiYqd4gh+M1magiiMROIFci0W7WaecIyYL5FlpYuHvCSXE197Gs2BqY2S6K1R1ICi81TCfDoiGqXhsbdwmReJD/UyA7K8E0jbpKLjcmRYNP3nHTqHScCP5AUwXj5n5Nti4a5J4VHfpQ7l4Bk9r/mpmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=aQY+QTqo; arc=none smtp.client-ip=209.85.222.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7c53c6c28c4so97113785a.2
+        for <netdev@vger.kernel.org>; Tue, 08 Apr 2025 17:11:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1744157491; x=1744762291; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=IGrIh0oj6QcgaAVxI1Jr5iHoY3WwQRLUyJGmpJyReHg=;
+        b=aQY+QTqoYuFI/nNDUwHoSR7Hh/3zQAjxNbuBOsZzexzqk6GRhLr1dj6gStc8JIe4ys
+         GejfeEaG8FcbMGU+fMB7oyUjbox8A4dpBJCSDahgLxBO4RrKSPYx/iB0NQ6eiTuNO8T3
+         zx1Us+SX5+3WwAzlCZrFX1YF3SjYjN2bz/g/Ylj2RtwujFgrcbWOxSf2mNrTd8pPsyhb
+         2F0G4SUkzuiJQDPvHLFOcn6zoOIyndwvKAAG+Cwg+NaSUL1vA4s/6Cbiu+3uaTAcgosl
+         dt+4hvAwzTgzf+wWjO37+t8R4arMiZjtewxZjzUQfaIOkjhyhWx9/krBqIo4IhZykauh
+         RWMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744157491; x=1744762291;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IGrIh0oj6QcgaAVxI1Jr5iHoY3WwQRLUyJGmpJyReHg=;
+        b=o4dEt2jUDgIki8CAISP9QjhVFWMBWiPEdcmP4uT+swAjPyK4Dt0/5+6LTKtRgVyO4i
+         +Xke5TM1neLnfa79X4wxO+QJRV/cdo0neOfhBLmfmZnu5Jo4OpUpbM2YQKPI9bh0ZRpZ
+         nPaLtzM+C7l+Uadmdtzne7akAZpjgpDL4hIjBddHl1AAJ7+aX8Fr5JB0a2udAHqDuE0w
+         jWaYw395F4G7O9Q3zS9Z29NcnbuupA3vlYVCEQrX6rixUUcnXX/Nq/bkl5hYQmVndU+e
+         e4iY41MFvjGCJr4MKf8OUCBMJLLovCLo6E3OwgDtMjgjbTB6Zb/At7ZliawV8ue2RWvo
+         5ZXA==
+X-Forwarded-Encrypted: i=1; AJvYcCXTfMxZkp+8YnBBbrE//HP6K7tOJW1RPt18yWrUJySlrT97QpPry4upTZS1dlGbt19LBaUPvZY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvEFKJMRgG9soRQynmW6/JDlrj8TG1R9tDIG7Gf4PtXfpPlNQy
+	nMwZLSRF38ZuBSG6z5mY72TeNtvu8S/IM/X6JC+MmffZBceCZ2fCLXU0ZtWV03p4RMWqqhUWJvh
+	UTwcIv2h2fdNct7xZaVUpoFnzRmeFOT87OKXaYWqS3qTKO/eROV8YKQ==
+X-Gm-Gg: ASbGncvFqF+ILTKFFffZKmYWMMUzfCfoiJsE92fU8RBCgxZRF7Y5uOCgn/80o334pLk
+	i59maJJoOchTJFKc3mEESBW9t2zNLz97v3CbrJVkd2KZhw5H8+rfGJldiHN9qIfu4wOZAhha4Is
+	RBvEjNX/C5uuYtpS7TcqZMVLnExxAhUs3+HpVCIFJ9qThLyx8I191+nHiKGEk=
+X-Google-Smtp-Source: AGHT+IHyd/e0WwHsSsXmA/rIS5elMkh/5M5LD6diadoxtBUswF4A2g96igG0yc9/p3nRuCk0cfAxrY7asTUIYoMcfqQ=
+X-Received: by 2002:ad4:5c8d:0:b0:6e8:af1b:e70e with SMTP id
+ 6a1803df08f44-6f0dbc7d4admr6977786d6.8.1744157491661; Tue, 08 Apr 2025
+ 17:11:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CABi4-ogLNdQw=gLTRZ4aJ8qiQWiovHaO19sx5uz29Es6du8GKg@mail.gmail.com>
+ <20250408001649.5560-1-kuniyu@amazon.com> <CABi4-ogUtMrH8-NVB6W8Xg_F_KDLq=yy-yu-tKr2udXE2Mu1Lg@mail.gmail.com>
+ <da0e43ef-4861-4541-951d-8d576fbaa069@linux.dev>
+In-Reply-To: <da0e43ef-4861-4541-951d-8d576fbaa069@linux.dev>
+From: Jordan Rife <jordan@jrife.io>
+Date: Tue, 8 Apr 2025 17:11:21 -0700
+X-Gm-Features: ATxdqUFIpcH5ylsr6kaKrr69hnZZXAQx6Ib_kzSVOyDlVM8d3bq7Yg4L5qQzZfs
+Message-ID: <CABi4-ohyFtRAGfwjg9dGcdDTpgR6guyciijzr32YFbA0xsau2A@mail.gmail.com>
+Subject: Re: [RFC PATCH bpf-next 2/3] bpf: udp: Avoid socket skips and repeats
+ during iteration
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, aditi.ghag@isovalent.com, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, netdev@vger.kernel.org, willemdebruijn.kernel@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-YNL C can now generate code for simple classic netlink families.
-Include rt-route in the Makefile for generation and add a sample.
+> Agree that this is better.
+> The stop() may need to take care of the start()/next() may fail. Take a look at
+> the bpf_seq_read() in bpf_iter.c. Please check.
 
-    $ ./tools/net/ynl/samples/rt-route
-    oif: wlp0s20f3        gateway: 192.168.1.1
-    oif: wlp0s20f3        dst: 192.168.1.0/24
-    oif: vpn0             dst: fe80::/64
-    oif: wlp0s20f3        dst: fe80::/64
-    oif: wlp0s20f3        gateway: fe80::200:5eff:fe00:201
+Thanks, I will take a look.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- tools/net/ynl/Makefile.deps      |  1 +
- tools/net/ynl/generated/Makefile |  2 +-
- tools/net/ynl/samples/rt-route.c | 80 ++++++++++++++++++++++++++++++++
- tools/net/ynl/samples/.gitignore |  1 +
- 4 files changed, 83 insertions(+), 1 deletion(-)
- create mode 100644 tools/net/ynl/samples/rt-route.c
-
-diff --git a/tools/net/ynl/Makefile.deps b/tools/net/ynl/Makefile.deps
-index e55d94211df6..385783489f84 100644
---- a/tools/net/ynl/Makefile.deps
-+++ b/tools/net/ynl/Makefile.deps
-@@ -30,4 +30,5 @@ CFLAGS_ovs_datapath:=$(call get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h)
- CFLAGS_ovs_flow:=$(call get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h)
- CFLAGS_ovs_vport:=$(call get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h)
- CFLAGS_rt-addr:=$(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h)
-+CFLAGS_rt-route:=$(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h)
- CFLAGS_tcp_metrics:=$(call get_hdr_inc,_LINUX_TCP_METRICS_H,tcp_metrics.h)
-diff --git a/tools/net/ynl/generated/Makefile b/tools/net/ynl/generated/Makefile
-index 67ce3b8988ef..6603ad8d4ce1 100644
---- a/tools/net/ynl/generated/Makefile
-+++ b/tools/net/ynl/generated/Makefile
-@@ -25,7 +25,7 @@ SPECS_DIR:=../../../../Documentation/netlink/specs
- GENS_PATHS=$(shell grep -nrI --files-without-match \
- 		'protocol: netlink' \
- 		$(SPECS_DIR))
--GENS=$(patsubst $(SPECS_DIR)/%.yaml,%,${GENS_PATHS}) rt-addr
-+GENS=$(patsubst $(SPECS_DIR)/%.yaml,%,${GENS_PATHS}) rt-addr rt-route
- SRCS=$(patsubst %,%-user.c,${GENS})
- HDRS=$(patsubst %,%-user.h,${GENS})
- OBJS=$(patsubst %,%-user.o,${GENS})
-diff --git a/tools/net/ynl/samples/rt-route.c b/tools/net/ynl/samples/rt-route.c
-new file mode 100644
-index 000000000000..9d9c868f8873
---- /dev/null
-+++ b/tools/net/ynl/samples/rt-route.c
-@@ -0,0 +1,80 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <stdio.h>
-+#include <string.h>
-+
-+#include <ynl.h>
-+
-+#include <arpa/inet.h>
-+#include <net/if.h>
-+
-+#include "rt-route-user.h"
-+
-+static void rt_route_print(struct rt_route_getroute_rsp *r)
-+{
-+	char ifname[IF_NAMESIZE];
-+	char route_str[64];
-+	const char *route;
-+	const char *name;
-+
-+	/* Ignore local */
-+	if (r->_hdr.rtm_table == RT_TABLE_LOCAL)
-+		return;
-+
-+	if (r->_present.oif) {
-+		name = if_indextoname(r->oif, ifname);
-+		if (name)
-+			printf("oif: %-16s ", name);
-+	}
-+
-+	if (r->_present.dst_len) {
-+		route = inet_ntop(r->_hdr.rtm_family, r->dst,
-+				  route_str, sizeof(route_str));
-+		printf("dst: %s/%d", route, r->_hdr.rtm_dst_len);
-+	}
-+
-+	if (r->_present.gateway_len) {
-+		route = inet_ntop(r->_hdr.rtm_family, r->gateway,
-+				  route_str, sizeof(route_str));
-+		printf("gateway: %s ", route);
-+	}
-+
-+	printf("\n");
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	struct rt_route_getroute_req_dump *req;
-+	struct rt_route_getroute_list *rsp;
-+	struct ynl_error yerr;
-+	struct ynl_sock *ys;
-+
-+	ys = ynl_sock_create(&ynl_rt_route_family, &yerr);
-+	if (!ys) {
-+		fprintf(stderr, "YNL: %s\n", yerr.msg);
-+		return 1;
-+	}
-+
-+	req = rt_route_getroute_req_dump_alloc();
-+	if (!req)
-+		goto err_destroy;
-+
-+	rsp = rt_route_getroute_dump(ys, req);
-+	rt_route_getroute_req_dump_free(req);
-+	if (!rsp)
-+		goto err_close;
-+
-+	if (ynl_dump_empty(rsp))
-+		fprintf(stderr, "Error: no routeesses reported\n");
-+	ynl_dump_foreach(rsp, route)
-+		rt_route_print(route);
-+	rt_route_getroute_list_free(rsp);
-+
-+	ynl_sock_destroy(ys);
-+	return 0;
-+
-+err_close:
-+	fprintf(stderr, "YNL: %s\n", ys->err.msg);
-+err_destroy:
-+	ynl_sock_destroy(ys);
-+	return 2;
-+}
-diff --git a/tools/net/ynl/samples/.gitignore b/tools/net/ynl/samples/.gitignore
-index 2bc8721d6144..7f9781cf532f 100644
---- a/tools/net/ynl/samples/.gitignore
-+++ b/tools/net/ynl/samples/.gitignore
-@@ -4,3 +4,4 @@ netdev
- ovs
- page-pool
- rt-addr
-+rt-route
--- 
-2.49.0
-
+-Jordan
 
