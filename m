@@ -1,99 +1,94 @@
-Return-Path: <netdev+bounces-180873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF091A82C43
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 18:24:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1790A82C58
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 18:28:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25F6F3BD88E
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 16:16:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DAD8188F386
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 16:25:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57808265CD1;
-	Wed,  9 Apr 2025 16:16:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B9B26B2C8;
+	Wed,  9 Apr 2025 16:25:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="OdbbvZs0";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="5JPBKXOx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IjAFBKkb"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5033925EF89
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 16:16:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B470226ACB;
+	Wed,  9 Apr 2025 16:25:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744215365; cv=none; b=KAt3JB+KnAdhJU1JyxhGWSkUeUO5V0jWHJAdZnIUr+XnfqplREgGf96DwGK5iWAALE79Tc6hbAYBjOSeuMZzeatDH2ljvyOymcDQo6REjAkBnrclRa9ojx6XNeYCYX235sQQGdiXaCFmClxK2k437VI3rpS9cIlmA2xW16Adbsw=
+	t=1744215932; cv=none; b=XYnoFUKKKlx7nCpPFbB7D8mZkRR7bqdRs38uPJ+cQXp+xBJk/Oxl56wrRBwuOpJOHi6AztWl9GKoug/bLRS9MtYaZrGgkmguqpkpJizawXGsnMWIPINLdjKyzA6LbJS2snAdgiOgZFSRgfXV/vy3mKQPuc9vhlttSmOHkrkmZhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744215365; c=relaxed/simple;
-	bh=VIi+YlCkI3z0HYCkxQs89wwgYPN5hVjIw7Cma631Hfk=;
+	s=arc-20240116; t=1744215932; c=relaxed/simple;
+	bh=Or8ZyypeIwZJpxaC5/YAmhtdOzEWbnUvN1Hsw/pxgzw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZTBIj/TDP+G6S0l1Ke33/BXJT47xdaBVsJDxjkoI2vAS9JDmKeE4fzfw0EaeZZZN06ET8c300OpWKP26PaRsOFqk6uiVW0mzOdjBi+v7urQN45NXCRA+dKXVG5ILm8IPQfs+I1jJI+VWbRPYj8Z9+CKltrPmjf+COogOb+zooko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=OdbbvZs0; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=5JPBKXOx; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Wed, 9 Apr 2025 18:15:58 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1744215360;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KhF/SyB8TS1klwHHCHleCoeFO5TPQWip+5TUuN+HrdQ=;
-	b=OdbbvZs0YIUJjQS5VTzyHwpQau13G4ty2UZc3s8cuTuljxAvu289uEEIrsuO453BRWyWp0
-	jPBU42Rgk9G1FUJHNieRfDajsmCdX2EKPa0IGH7QDqX+AaYOk5be0GteuR0Icgswxbtamr
-	5Bq8SAOsdy+7x+1GMViVgkPo7B+CDjvm6Lh41reGSr45g70sFn3i+L0pmztpa6kyU9ODVj
-	bUw8Zpf3DbbsTS0FdZCn4a+DP/AdhE13TFBuLG/fw9fzSVc5AXQc5KOc1D0e/J6LLRK9St
-	oHQDlt0jODBqB9I7xPwrZux1BwLJIvzYu5O0X8FMsiKmT3zW3vK91iOqyrjNig==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1744215360;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KhF/SyB8TS1klwHHCHleCoeFO5TPQWip+5TUuN+HrdQ=;
-	b=5JPBKXOx+9DSnPddkoUmUONMPqkHALuOSZsMdsC2KsiWPHCFamzrG21gTqPF4epyYyC1JA
-	J50seKSNo+01D0DA==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-rt-devel@lists.linux.dev, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=rJtPE8gpng+q00aV6Zsny5ewMnezbG92dHNywnbhIxE+zTFs3GYPElzC0rqckPoVSt1uUPFjNxMv2hOSMb0NHPbrIapngcLj2BtyZCLHAd9hKHe0p+ZuyFIs30EfDKu1O8pEj975IBTQEFwbqFFpx1K4dUdfGS1pAYtUoXVIwpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IjAFBKkb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C16CC4CEE2;
+	Wed,  9 Apr 2025 16:25:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744215932;
+	bh=Or8ZyypeIwZJpxaC5/YAmhtdOzEWbnUvN1Hsw/pxgzw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IjAFBKkbF6K0ZsrxQKGk6i10sxR6und2qMP+jB4em4QzK2W/iwyFpPxO64JKUTypT
+	 eu05VKyUzSf5HCVsvFSs/pcVK0u6L+pamnYVCCN6Hb6usWEjI5HO+OoPQkVERbyTLM
+	 LbTp51cPW8vP22NyyeHOr0yojQ5vBaOkRRRZZnwV/PtTU/Gbn2/ZO3NGnyv12viOBo
+	 ab1lTSERL8q42o23kT6XZhOtHorZxAvPqfG+UMNfSUheZEyAWUSUS7EMowoVQ0+xMZ
+	 TjAn3nXLQO0hq3hGAMh61V9BNOowEPLP9jwA2EkajH4q+frYGbne0pBsBbV/LWxSHo
+	 i2NwjluKNf4Bw==
+Date: Wed, 9 Apr 2025 09:25:29 -0700
+From: Kees Cook <kees@kernel.org>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Michal Ostrowski <mostrows@earthlink.net>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Joe Damato <jdamato@fastly.com>, Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>, Simon Horman <horms@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Yunsheng Lin <linyunsheng@huawei.com>
-Subject: Re: [PATCH net-next v3 0/4] page_pool: Convert stats to u64_stats_t.
-Message-ID: <20250409161558.8a8WSoml@linutronix.de>
-References: <20250408105922.1135150-1-bigeasy@linutronix.de>
- <20250408185636.4adc61fb@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Simon Horman <horms@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v11 nf-next 1/2] net: pppoe: avoid zero-length arrays in
+ struct pppoe_hdr
+Message-ID: <202504090925.2FB4D65@keescook>
+References: <20250408142425.95437-1-ericwouds@gmail.com>
+ <20250408142425.95437-2-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250408185636.4adc61fb@kernel.org>
+In-Reply-To: <20250408142425.95437-2-ericwouds@gmail.com>
 
-On 2025-04-08 18:56:36 [-0700], Jakub Kicinski wrote:
-> On Tue,  8 Apr 2025 12:59:17 +0200 Sebastian Andrzej Siewior wrote:
-> > I don't know if it is ensured that only *one* update can happen because
-> > the stats are per-CPU and per NAPI device. But there will be now a
-> > warning on 32bit if this is really attempted in preemptible context.
+On Tue, Apr 08, 2025 at 04:24:24PM +0200, Eric Woudstra wrote:
+> Jakub Kicinski suggested following patch:
 > 
-> I think recycling may happen in preemptible context, and from BH.
-> Have you tried to test?
+> W=1 C=1 GCC build gives us:
+> 
+> net/bridge/netfilter/nf_conntrack_bridge.c: note: in included file (through
+> ../include/linux/if_pppox.h, ../include/uapi/linux/netfilter_bridge.h,
+> ../include/linux/netfilter_bridge.h): include/uapi/linux/if_pppox.h:
+> 153:29: warning: array of flexible structures
+> 
+> It doesn't like that hdr has a zero-length array which overlaps proto.
+> The kernel code doesn't currently need those arrays.
+> 
+> PPPoE connection is functional after applying this patch.
+> 
+> Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
 
-Let me try to find something for testing. My mlx box has no ethernet
-cable plugged.
-Yunsheng mentioned also something that there might be more than one
-writer this might ask for different approach.
+Reviewed-by: Kees Cook <kees@kernel.org>
 
-> The net.core.skb_defer_max sysctl may mask it for TCP traffic.
-
-Sebastian
+-- 
+Kees Cook
 
