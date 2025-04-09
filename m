@@ -1,169 +1,174 @@
-Return-Path: <netdev+bounces-180610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C459A81D5C
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 08:45:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 577D0A81D86
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 08:55:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8793817EC5E
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 06:45:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FD8B8811CF
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 06:55:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1175D1DF984;
-	Wed,  9 Apr 2025 06:45:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E724212D67;
+	Wed,  9 Apr 2025 06:55:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FJqxQ0tl"
+	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="BMqIzemn"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE941E00B4
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 06:45:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E50213235
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 06:55:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744181102; cv=none; b=VvZvp8cPueHJgINnJQbz5H4XjsscB45Nd8B4Q9xVSLhTpeDi1vIu79yutILxHrXn4Y1UFMKhqWwAmQOsVdkEmdyYa/CDFLJ+8ZadCGYCRykbgBX7WfcG9S/OjpDfQNAlccK26bwee5vRi0D9h0u8aP/DEV2w/T81qds3e+IWhE0=
+	t=1744181739; cv=none; b=W6Rrtg3Cmg96+/FqFbk4x9MQDj1pGhmdhh1rVtIMfwMhd82cRwRfpRleh0RtPDj1d1l8CElmoRKjagc9hFHtRFWPimchgpSOO7VFqcR5YzmzBOKwELC/CPKl9nCVkBkN3wA5w47yWx4Pahoybt57om7TBKphPDdheugSRMZflQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744181102; c=relaxed/simple;
-	bh=Lk/nerQuXwCVaG1hZ0KR4U4tdyw6/FXCBoB6hXRgscQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=APxHwua64SD4bR+HzWES8qx2NlWBspfTgZkKzRM7G0fymQf+F7wa/W/tuoXMFDRkXg9HUDP2XYUnzRNlVLU883597Hshd8stUstpvH50pJLokpUMQYSts6V7TG+GE6DfMcamNpYMYLUxNmB/NuSqHTjPwJSiKuq0/x/YI9itv2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FJqxQ0tl; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744181099;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Xyyyv7/mfJ9H0zBbyj9vD5vCWrDye2V05E9brkG1H0g=;
-	b=FJqxQ0tlb2yCd5CtizmWFzTbySj2YFqlDidAPfbCc0/84s9Nj4nR7YYtPvyi+RiSeKWRCz
-	HBmw1iXprfGYfqFkC+dKQsEnFq9zARGPrcUDVPyLez7eiWzKV4UlvFC60I6+SDWCszFmgb
-	LYgezhQiY4uiyIw4XT4j+8d9yQbT5a8=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-675-m6XxHO3uPn6SB5zNQuCBSg-1; Wed,
- 09 Apr 2025 02:44:55 -0400
-X-MC-Unique: m6XxHO3uPn6SB5zNQuCBSg-1
-X-Mimecast-MFC-AGG-ID: m6XxHO3uPn6SB5zNQuCBSg_1744181093
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CA7321955DCD;
-	Wed,  9 Apr 2025 06:44:52 +0000 (UTC)
-Received: from [10.44.32.72] (unknown [10.44.32.72])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 521C43001D0E;
-	Wed,  9 Apr 2025 06:44:47 +0000 (UTC)
-Message-ID: <22b9f197-2f98-43c7-9cc9-c748e80078b0@redhat.com>
-Date: Wed, 9 Apr 2025 08:44:46 +0200
+	s=arc-20240116; t=1744181739; c=relaxed/simple;
+	bh=DtoGMl4+W8r1g/lGfoCOHOQvWKdWBn2e+uY7/BpjuRM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YSO17XLrgQqImANZZ5P1VKyOQS7XzEcIuv6SxQ7g+v3njEjPNNNGcdiZspBGEo9FzjV+0+b+L4eCCJH+G5JW2qTtfiZqpeBxNqvFN3fcPhpbn3fD7yg30K2d/pGPaqzuCM2b60UlICiju0QmnAXioPXEeAM2FZHRWqpmtZWS03s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=BMqIzemn; arc=none smtp.client-ip=194.117.254.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	sang-engineering.com; h=date:from:to:cc:subject:message-id
+	:references:mime-version:content-type:in-reply-to; s=k1; bh=OwVf
+	WRLhh8nlfli2ZxrlP2wEOtA908Se5+ygDD6PL58=; b=BMqIzemnmz33jgpBPWPf
+	CnBIeUoYwWhmyfM0Gum55c+/nbjcgYr/WMt2qVCyNvDpYSiKpVo4X7yCtsbWnExi
+	vktzBVfYKNzv3roRpNmnW4sq+yUFLWX/RISFAefLaZaZ0VlJJSuE8+/JxuuLJ0wV
+	MBtqUm8VqrTStVwQsyU4GOnz0jhhjhkNqWIo9WFN9eCHQjkRjAlL1XHIixDoGQrs
+	TiFYBGPVLhGOFL8ZagGFw65bjB+vp+7niIoaoFzatA4LBEDEqUe9mjLU7zFBh41+
+	66BFl4sJeX3tX3pQ/l/xkaGxYBqIrAgJFfaQxvm+FUivOysv/1wP42u0hO9w6VB3
+	Fg==
+Received: (qmail 321901 invoked from network); 9 Apr 2025 08:55:25 +0200
+Received: by mail.zeus03.de with UTF8SMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 9 Apr 2025 08:55:25 +0200
+X-UD-Smtp-Session: l3s3148p1@U2Qm9FIyttogAwDPXyfYALbiJ46yNPq3
+Date: Wed, 9 Apr 2025 08:55:24 +0200
+From: Wolfram Sang <wsa+renesas@sang-engineering.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: linux-renesas-soc@vger.kernel.org,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [RFC PATCH net-next] net: phy: marvell: support DT
+ configurations with only two LEDs
+Message-ID: <Z_YZ3NiXb15wgDuY@shikoro>
+Mail-Followup-To: Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	Andrew Lunn <andrew@lunn.ch>, linux-renesas-soc@vger.kernel.org,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+References: <20250408063136.5463-2-wsa+renesas@sang-engineering.com>
+ <7f706127-aa48-4385-a7b8-f016e0ba52b7@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 05/28] mfd: zl3073x: Add components versions register defs
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
- Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
- Andy Shevchenko <andy@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <20250407172836.1009461-1-ivecera@redhat.com>
- <20250407172836.1009461-6-ivecera@redhat.com>
- <a5d2e1eb-7b98-4909-9505-ec93fe0c3aac@lunn.ch>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <a5d2e1eb-7b98-4909-9505-ec93fe0c3aac@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="QXDi9iYu4cGtvusf"
+Content-Disposition: inline
+In-Reply-To: <7f706127-aa48-4385-a7b8-f016e0ba52b7@lunn.ch>
 
-On 07. 04. 25 11:09 odp., Andrew Lunn wrote:
-> On Mon, Apr 07, 2025 at 07:28:32PM +0200, Ivan Vecera wrote:
->> Add register definitions for components versions and report them
->> during probe.
->>
->> Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
->> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
->> ---
->>   drivers/mfd/zl3073x-core.c | 35 +++++++++++++++++++++++++++++++++++
->>   1 file changed, 35 insertions(+)
->>
->> diff --git a/drivers/mfd/zl3073x-core.c b/drivers/mfd/zl3073x-core.c
->> index 39d4c8608a740..b3091b00cffa8 100644
->> --- a/drivers/mfd/zl3073x-core.c
->> +++ b/drivers/mfd/zl3073x-core.c
->> @@ -1,10 +1,19 @@
->>   // SPDX-License-Identifier: GPL-2.0-only
->>   
->> +#include <linux/bitfield.h>
->>   #include <linux/module.h>
->>   #include <linux/unaligned.h>
->>   #include <net/devlink.h>
->>   #include "zl3073x.h"
->>   
->> +/*
->> + * Register Map Page 0, General
->> + */
->> +ZL3073X_REG16_DEF(id,			0x0001);
->> +ZL3073X_REG16_DEF(revision,		0x0003);
->> +ZL3073X_REG16_DEF(fw_ver,		0x0005);
->> +ZL3073X_REG32_DEF(custom_config_ver,	0x0007);
->> +
->>   /*
->>    * Regmap ranges
->>    */
->> @@ -159,10 +168,36 @@ EXPORT_SYMBOL_NS_GPL(zl3073x_dev_alloc, "ZL3073X");
->>   
->>   int zl3073x_dev_init(struct zl3073x_dev *zldev)
->>   {
->> +	u16 id, revision, fw_ver;
->>   	struct devlink *devlink;
->> +	u32 cfg_ver;
->> +	int rc;
->>   
->>   	devm_mutex_init(zldev->dev, &zldev->lock);
->>   
->> +	scoped_guard(zl3073x, zldev) {
-> 
-> Why the scoped_guard? The locking scheme you have seems very opaque.
 
-We are read the HW registers in this block and the access is protected 
-by this device lock. Regmap locking will be disabled in v2 as this is 
-not sufficient.
+--QXDi9iYu4cGtvusf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->> +		rc = zl3073x_read_id(zldev, &id);
->> +		if (rc)
->> +			return rc;
->> +		rc = zl3073x_read_revision(zldev, &revision);
->> +		if (rc)
->> +			return rc;
->> +		rc = zl3073x_read_fw_ver(zldev, &fw_ver);
->> +		if (rc)
->> +			return rc;
->> +		rc = zl3073x_read_custom_config_ver(zldev, &cfg_ver);
->> +		if (rc)
->> +			return rc;
-> 
-> Could a parallel operation change the ID? Upgrade the firmware
-> version?
-> 
-> 	Andrew
+Hi Andrew,
 
-No, but register access functions require the device lock to be held. 
-See above.
+> Please make use of the LED binding:
+>=20
+> &mdio {
+>         pinctrl-0 =3D <&mdio_pins>;
+>         pinctrl-names =3D "default";
+>         phy0: ethernet-phy@0 {
+>                 reg =3D <0>;
+>                 leds {
+>                         #address-cells =3D <1>;
+>                         #size-cells =3D <0>;
+>=20
+>                         led@0 {
+>                                 reg =3D <0>;
+>                                 color =3D <LED_COLOR_ID_WHITE>;
+>                                 function =3D LED_FUNCTION_WAN;
+>                                 default-state =3D "keep";
+>                         };
+>                 };
+>         };
+>=20
+> Just list the two LEDs you have connected.
 
-Thanks,
-Ivan
+Been there, didn't work. This is what I had:
 
+	mdio {
+		#address-cells =3D <1>;
+		#size-cells =3D <0>;
+		compatible =3D "snps,dwmac-mdio";
+
+		phy_mii0: ethernet-phy@8 {
+			reg =3D <8>;
+			leds {
+				#address-cells =3D <1>;
+				#size-cells =3D <0>;
+				led@0 {
+					reg =3D <0>;
+					color =3D <LED_COLOR_ID_GREEN>;
+					function =3D LED_FUNCTION_LAN;
+					default-state =3D "keep";
+				};
+
+				led@1 {
+					reg =3D <1>;
+					color =3D <LED_COLOR_ID_AMBER>;
+					function =3D LED_FUNCTION_ACTIVITY;
+					default-state =3D "keep";
+				};
+			};
+		};
+	};
+
+I played around with LED_FUNCTION_* values. I looked at other
+devicetrees but I only could find one-LED setups. I tried going to one
+LED, too, with LED_COLOR_ID_MULTI. No success. Then, I looked at the
+driver code and did not see a path that would enable
+'MII_88E1510_PHY_LED0_LINK_LED1_ACTIVE' via any DT configuration. Thus,
+the above patch. If you have any further pointers how to do this
+properly, I'd love to hear about them.
+
+Thank you,
+
+   Wolfram
+
+
+--QXDi9iYu4cGtvusf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmf2GdkACgkQFA3kzBSg
+KbYuFQ//TwBaCjWOfynwFvWmaRHAHIdYwC2R09TxsTqDOFI66VfWfBOgr+3SPoQR
+9cMGq/w+hVi7QxpYflPwka7Jk4GqBFZi35ToCANCGQRCsulFc3zKhmy0QguXJtBN
+y34Y+P0DK3bG+DR4tl3wqUe4RJ4gJV08sXWeUJ0wF9guXuUWHOmykjtYOeSBPXId
+GBSqGPEZj0Zb7XlfWP/0elSkoOlcYBtuQao0ASdjLF+FpNFH1qqaYRvgz5tLm2TN
+hSaOzCzlouhU+/uNVLgJckP7Isemv3bF2C44le+/Ei6JbzJvp1JCF///dmHHPLdY
+HNnp3PaLj3bpfXCjMrB6kT3SegX0Pyvvop0LwVV6C+NjUOE7ozTWWK8AlAIiH83B
+nPvzLyw8yP1EqKtJOeZwbt4CHehwfCNPP76eMhDTTCpWk7LqNXBjQ9B01K7nE/rZ
+3RYmt23bvSp6yyeJ1MmzVawO2yJ8EAdajgN1PuHXGUlXTCj32vdIRCdEdv86payS
+z74JaVH7b2bD2oGtlygDeul0MoBH2SzOZfGQFnr7FbWqDOVSmPgwJ5wPW4vyqZUK
+B5PlVL25D3PMnwODiHeVAH8qFWRXc32k9QylmTRM7YMBizNKDmNSeRi/ziQSMP4C
+7bBkkox9ipCUPc/yu8naLsTbLQZ4UUoCtofLmvn4aT2CN5UDb84=
+=qIkr
+-----END PGP SIGNATURE-----
+
+--QXDi9iYu4cGtvusf--
 
