@@ -1,146 +1,102 @@
-Return-Path: <netdev+bounces-180711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAE47A823A3
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 13:34:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E21CA823A8
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 13:36:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60C32179DEF
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 11:33:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6ED4B443FCA
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 11:36:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F4F725D212;
-	Wed,  9 Apr 2025 11:33:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 829ED2566D9;
+	Wed,  9 Apr 2025 11:36:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="t1frAIOv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CVYTo+8N"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F4C62C190;
-	Wed,  9 Apr 2025 11:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF97825E448
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 11:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744198425; cv=none; b=saZxi1vxkKODyNVwXUqxu9gRrRq4sIWIMJTbh4miWs4gC0u+QMSwbq6eULh9Rne1NQmHNwfSFdC9xz2Ov+u6lEabaBmW5z9hU7gbba5+xmd4djO9LqcruWAf1YI+2Hgja2aekSbYoZnBB6TOsJefdqrdoPnLbM6QIm1hb0DUBu4=
+	t=1744198597; cv=none; b=KA01SCpxx9kaYWv5HWEsDp9X8QGXEyID58YFJMA4iJD4v32rXLVa5JWihbqznK49V9vPvGQF2Pf2yRXsoWOXiGoz/1qCikUOmrQHoCT+TzMpncG9wrtuTQQHig0K0xge/Qxqvaf3NTa/Enu7FEFRiq/fA5OE5xH0vR1kB4E0ITo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744198425; c=relaxed/simple;
-	bh=87KYMpQkh72ZcDC2kM01aENUZegjbSBq2CAQth4tsjA=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=FghJlvrhVb4Eps1S2TA/7VHcm+nyFWSCzkbgzaU49MhuePm5K5KBIPyF10rW8Y0TZaNV2gcScOWVm2wi4iQJ0CB3ObqSzuGvX9fubmNr1NIE2AuaiQwQPIxglrk1ceFVqICJGdcwJqUjC75EFAW5E5NrBTTxYueVecxwMTc3GBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=t1frAIOv; arc=none smtp.client-ip=162.240.238.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
-	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=NzZsOt1cKau/PD5x2aFRuLHCT/wldjQtNk8/+LhsvTM=; b=t1frAIOvKlfnlN54/NH0r4j3kL
-	g8rpv0hG0SRt5/c0mJaRG+tBKhaYt612ygqrqbtYYoiDrUNTXEWY5rIje+9htCHxxiRNDe25nnSQ4
-	qlm5ePCmNRdlbSG3fVw8tw1ehkz1DgyHz4MVPm4iIXlEBv/lPLdZp+jSGu8Ubcn6juGg9+kaiAhgp
-	NqnRP4sFTb0XHtbEgjBQnAybyjWsci50AQRBMlBTwcoojCxJCzowdSlCqBGVrHDEQeWaaxtoWlMJB
-	PJ8fzkKJh2ifTTHYJmu/MP80nbRLd9wyZv0aAGcVpSYrpNqfaOdEDDAMMU/n1LmXlqlDZDszyz3xV
-	JuORocfQ==;
-Received: from [122.175.9.182] (port=62615 helo=zimbra.couthit.local)
-	by server.wki.vra.mybluehostin.me with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.1)
-	(envelope-from <parvathi@couthit.com>)
-	id 1u2TgY-000000000Uh-4B1D;
-	Wed, 09 Apr 2025 17:03:38 +0530
-Received: from zimbra.couthit.local (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTPS id AD0DC1782035;
-	Wed,  9 Apr 2025 17:03:31 +0530 (IST)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id 8ADBD178245B;
-	Wed,  9 Apr 2025 17:03:31 +0530 (IST)
-Received: from zimbra.couthit.local ([127.0.0.1])
-	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id PiRs0122yNG1; Wed,  9 Apr 2025 17:03:31 +0530 (IST)
-Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
-	by zimbra.couthit.local (Postfix) with ESMTP id 2FC4B1782035;
-	Wed,  9 Apr 2025 17:03:31 +0530 (IST)
-Date: Wed, 9 Apr 2025 17:03:30 +0530 (IST)
-From: Parvathi Pudi <parvathi@couthit.com>
-To: jacob e keller <jacob.e.keller@intel.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, parvathi <parvathi@couthit.com>, 
-	danishanwar <danishanwar@ti.com>, rogerq <rogerq@kernel.org>, 
-	andrew+netdev <andrew+netdev@lunn.ch>, davem <davem@davemloft.net>, 
-	edumazet <edumazet@google.com>, kuba <kuba@kernel.org>, 
-	pabeni <pabeni@redhat.com>, robh <robh@kernel.org>, 
-	krzk+dt <krzk+dt@kernel.org>, conor+dt <conor+dt@kernel.org>, 
-	nm <nm@ti.com>, ssantosh <ssantosh@kernel.org>, tony@atomide.com, 
-	richardcochran <richardcochran@gmail.com>, glaroque@baylibre.com, 
-	schnelle <schnelle@linux.ibm.com>, 
-	m-karicheri2 <m-karicheri2@ti.com>, rdunlap@infradead.org, 
-	diogo ivo <diogo.ivo@siemens.com>, basharath <basharath@couthit.com>, 
-	horms <horms@kernel.org>, m-malladi <m-malladi@ti.com>, 
-	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
-	afd <afd@ti.com>, s-anna <s-anna@ti.com>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
-	netdev <netdev@vger.kernel.org>, 
-	devicetree <devicetree@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	linux-omap@vger.kernel.org, pratheesh <pratheesh@ti.com>, 
-	Prajith Jayarajan <prajith@ti.com>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
-	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
-	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
-	mohan <mohan@couthit.com>
-Message-ID: <190529030.1024806.1744198410980.JavaMail.zimbra@couthit.local>
-In-Reply-To: <CO1PR11MB5089CB4D35150C286EE81387D6AA2@CO1PR11MB5089.namprd11.prod.outlook.com>
-References: <20250407102528.1048589-1-parvathi@couthit.com> <20250407113714.1050076-6-parvathi@couthit.com> <64a3cd3b-feee-4414-8569-01642b127ac8@lunn.ch> <CO1PR11MB5089CB4D35150C286EE81387D6AA2@CO1PR11MB5089.namprd11.prod.outlook.com>
-Subject: Re: [PATCH net-next v4 05/11] net: ti: prueth: Adds ethtool support
- for ICSSM PRUETH Driver
+	s=arc-20240116; t=1744198597; c=relaxed/simple;
+	bh=eiqoUi6FvN65bOZqURNCLAncfpVXuS7lmO9PkclFt3A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iIF8Cx+4Fjd00dTgQAVl7NRWcivjNLPhZ5AeoOqMe953uYjX9rW6GdcHw/2jRAE9iL7jp1XEQsnyYzZU+tMi5XM2zKllSGXfAmrmIBoB3QVvHnOmIZE/EyUNBzO4DN3Wx2hRisS0SLlVdzbHjS2Ry6CkUm7G7aTWSJRUWujdS60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CVYTo+8N; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744198596; x=1775734596;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=eiqoUi6FvN65bOZqURNCLAncfpVXuS7lmO9PkclFt3A=;
+  b=CVYTo+8NlUU52x2QOEu9M4MGiYO0RaabulvfCcMj1sSRkfR9jVHwilL7
+   QUd1LFJ56x4ADTOJ9a34w9Z43e9V/j/IwvUCv2mTZKF8lbCEjnvukL+ra
+   Im2T65Fydb/lUjGgREqDje+omHg73TxynR4ZCudphrX+8KTPsFq2YQ4S4
+   81MMWd/w0oru4yf1GyJytnKcjn4nT9QFNHkLNkLMHyXuNX1ACecRVyCyi
+   V0Ag0rduGt2NjEzSQ1+NtUE6MhvtHEYSw8TT5wQm00fRATdMg5owb8soG
+   eBTpsfm+iiJOLhUtXxCmo3AWS/iv32XpodM7R3CQXLjD/hSCd0d6pUKyE
+   Q==;
+X-CSE-ConnectionGUID: vCJPAMm/RemaesLSjSUAiQ==
+X-CSE-MsgGUID: nZoDn9bhQviRHN4ly0LiSw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11397"; a="45799642"
+X-IronPort-AV: E=Sophos;i="6.15,200,1739865600"; 
+   d="scan'208";a="45799642"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 04:36:36 -0700
+X-CSE-ConnectionGUID: 5C6ty4mcQZ6nqglthWqhMw==
+X-CSE-MsgGUID: uWGRG6pQT2e0da+eN+n0wA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,200,1739865600"; 
+   d="scan'208";a="159536640"
+Received: from enterprise.igk.intel.com ([10.102.20.175])
+  by fmviesa001.fm.intel.com with ESMTP; 09 Apr 2025 04:36:34 -0700
+From: Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Martyna Szapar-Mudlaw <martyna.szapar-mudlaw@linux.intel.com>
+Subject: [PATCH iwl-next 0/2] Add link_down_events ethtool stat to ixgbe and ice 
+Date: Wed,  9 Apr 2025 13:36:21 +0200
+Message-ID: <20250409113622.161379-2-martyna.szapar-mudlaw@linux.intel.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - FF113 (Linux)/8.8.15_GA_3968)
-Thread-Topic: prueth: Adds ethtool support for ICSSM PRUETH Driver
-Thread-Index: AQHbp7GUMpxoQbaZ60qmLD3ok6PwS7OYpSWAgAAYWhDYFQ2Lzg==
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: smtp@couthit.com
-X-Authenticated-Sender: server.wki.vra.mybluehostin.me: smtp@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+Content-Transfer-Encoding: 8bit
 
-Hi,
-
->> > +#define PRUETH_MODULE_VERSION "0.2"
->> 
->> > +static void icssm_emac_get_drvinfo(struct net_device *ndev,
->> > +				   struct ethtool_drvinfo *info)
->> > +{
->> > +	strscpy(info->driver, PRUETH_MODULE_DESCRIPTION, sizeof(info-
->> >driver));
->> > +	strscpy(info->version, PRUETH_MODULE_VERSION, sizeof(info->version));
->> 
->> Driver version numbers are pointless, they never change, but the
->> kernel is changing all the time. Leave version blank, and the core
->> will fill in the kernel version, which is useful.
->> 
->>      Andrew
-> 
-> It is also a long standing policy that in-tree drivers should not have versions
-> separate from the kernel version.
-> 
-
-Ok. We will leave the version field blank as suggested by Andrew and cleanup version
-will be resubmitted shortly.
+This series introduces a new ethtool statistic, link_down_events,
+to both the ixgbe and ice drivers. The purpose of this counter is
+to track the number of times the network link transitions from up to
+down.
+This statistic can help diagnose issues related to link stability,
+such as port flapping or unexpected link drops. It is exposed via
+ethtool.
+Patch 1 adds this functionality to the ice driver, while patch 2 adds
+the same support to the ixge driver.
 
 
-Thanks and Regards,
-Parvathi.
+Martyna Szapar-Mudlaw (2):
+  ice: add link_down_events statistic
+  ixgbe: add link_down_events statistic
+
+ drivers/net/ethernet/intel/ice/ice.h             | 1 +
+ drivers/net/ethernet/intel/ice/ice_ethtool.c     | 1 +
+ drivers/net/ethernet/intel/ice/ice_main.c        | 3 +++
+ drivers/net/ethernet/intel/ixgbe/ixgbe.h         | 1 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c | 1 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c    | 2 ++
+ 6 files changed, 9 insertions(+)
+
+-- 
+2.47.0
 
 
