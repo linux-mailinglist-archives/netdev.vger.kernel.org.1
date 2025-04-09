@@ -1,125 +1,131 @@
-Return-Path: <netdev+bounces-180841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8671A82AC7
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 17:42:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD561A82AF3
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 17:46:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F6E68A276E
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 15:34:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EDFD9A2BB7
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 15:37:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D20A267395;
-	Wed,  9 Apr 2025 15:34:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D094267AED;
+	Wed,  9 Apr 2025 15:37:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="j9uL2eh2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bHxzewsZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5795265626;
-	Wed,  9 Apr 2025 15:34:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5DD82676F4;
+	Wed,  9 Apr 2025 15:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744212899; cv=none; b=p+fDQn4caJ+D1sr/wUhWbED+aXRqxI7C5LnAOv8jbVEVRU9x5z2Kw9sgpZlceoYV/+gngE+dgYu4KHLUAcai+PXjkEWsjxzEp0+0Wr5axwIZZhyk+VPVfKiwstNx5X8qQq94tC4aY+7EwqIdQZmFp9PYJ6exgvzqiEAwomsSu/Y=
+	t=1744213044; cv=none; b=kK/57zkBGOJMrahxQZM9uBzD9IN40MScEJKqI1UQBSrpKqxEswXW1Hg62BmY+eI+G9niu7HGBsc0gKuS4znTyXe2HvOT2htha5OuaqzOxG8AaXADt+2D08qndILZ8BlBeLbD90gBQGIem3V0wCR0pmTY32W5CniejDav6IJxb5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744212899; c=relaxed/simple;
-	bh=2F9ePwMOxedJqYbn7dmyp4HRv06kb5YhvYQjEyOtXTU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rrXU8jmxp1YHFtcfmkilzBDPe/z3bCBQP93g/TaJCwG2beOTr89SRy71141mCS/gRbPpy63eaooaJB77ZoDTyQPZ1HnyUCmxEMGs0D2AfYG448/g7eibO7TkEIFVetuRyyRmY5KJ/x/+IVuvD1zqlCPBJemjz332eqoN/G//d+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=j9uL2eh2; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=7+t1ge5BiFrWMuX3el6edD85lJu9VSjsiGni54gW/Hw=; b=j9uL2eh2kAvrnoa8WvjGKPX4Aq
-	smp8i/JKeRZJsGJvIxVHP60lQYjYV1f0T6Zqj77+x4Tm14zLFFZ66Z9FCDztWevX9SPCR9YXQHm6/
-	mXX7r4TjW9DsOIfNl2+b4jJPScglD1CRH43pYHPmIicyuIJLr8t4DtVKfy7+STaNjyMRBV0i8pUA9
-	nUMyXLGm+n23kFpFRI1kHvsk10ZW4OQCPRhur54+q7CsnLTBHOne3/hFKiFMj8XHIyGH7W/+I3GNw
-	TgmdS1HZUXxDl2QQ+wtwzPKEk+RjPcq4axQU37Ybc9O8Pgux+bx8bmeWfrMdy4Zo8+aGrm1uDX63C
-	lJj1ABcg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37870)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u2XRo-0000jA-1R;
-	Wed, 09 Apr 2025 16:34:40 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u2XRk-0002g8-2k;
-	Wed, 09 Apr 2025 16:34:36 +0100
-Date: Wed, 9 Apr 2025 16:34:36 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/2] net: phy: Add Marvell PHY PTP support
-Message-ID: <Z_aTjBrUw79skcAg@shell.armlinux.org.uk>
-References: <20250407-feature_marvell_ptp-v2-0-a297d3214846@bootlin.com>
- <20250407-feature_marvell_ptp-v2-2-a297d3214846@bootlin.com>
+	s=arc-20240116; t=1744213044; c=relaxed/simple;
+	bh=9LU8tmwWdSBnl+obLv/zcMHGhBuo3aeveod/ATqqHcA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sEjpXCZDT75dxgmqET/17xh5LAG0N6sT+M7gHTG6OcpxmpXyYrDJrYH4aMRoSBUfDhqZ7HH2DLt9P8Cv1bS77fCPXKxORip5PnpgkbK9VUz5aVwuM4B8sLQTCzmNz4KC1PRKvYr5qpmMNpuYrjBIldE9nF/lSE6uhi3xPEfKHeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bHxzewsZ; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3913d129c1aso695203f8f.0;
+        Wed, 09 Apr 2025 08:37:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744213041; x=1744817841; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Zfn4+CqLwyCJAyaZhIUy7/PFfj8wg7XnNrVnmZ0+y30=;
+        b=bHxzewsZbcR8dHCWcCamLwJv++7lGwqEY67shttdB0TaUO949Dg7rPDD4Z/TbQNKs2
+         a7TIN2Zv05Uv22Kfg3PsJo+miQep7aEXzkO9oOwngP9lTTZjlZrr6+XVUjBLfPVJ4k1E
+         XJomAtl6oeCwE0jTr5GPIdYE9BMwiFwwM0pQ8X94y2zIFOx5QadfnSDYKDkyDiTfPAoV
+         GHcAtZeM7jXwZ1Q3fpFXgbRvAJ+Mzt9zVuBRKItpf2Ou7WDpSvK95AUWyzIUsub3enxI
+         V2VBg36X+GlXJCFb8GYyQYQv0s8wIXKmCEaUtquL8jeoO1srHjdYrllswNnTQFLFJypF
+         +edA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744213041; x=1744817841;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Zfn4+CqLwyCJAyaZhIUy7/PFfj8wg7XnNrVnmZ0+y30=;
+        b=N+utn46XJZEOf9RhxNpzUVXLOLS3s/PIq2Yei+zcHEYnKwA17LEpe8/lGDVDd2l3Mw
+         cv0LR7fBYJ+b/x+ws2MfffckLNzgnADM82j2+6i3ekfUXUdNuRxhWl/FZ1UauTliHilq
+         1c6QndonISS00+EsE8uS2iuSvIbdoSW0GSEeyH6TA171WPh3HxNe3+KyH9fzzqPpaDr9
+         Ef3LcUXYzpr7qtot4x2NL2Bi7rD65eGIySqQLaixCRb5dQBTo6CqjpXvelnnqjQ7mDKM
+         GZPv/zVTTIUdxDpGSsuAH6fN7oGqxkIg27HRX0dNC2d572n2Dw1pcB0iIP4DfHwu6uck
+         leJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVjplV6CLiQlVeI2pym4sO2Kkif/RySh6w1Gsuu8N8vSjxi5AyqPmIE1+4TtaiST0geOO2TPHIm@vger.kernel.org, AJvYcCWRn2mYg9Xmq2WfPtrSyR71K/hXvfTNI8rdRKTQAgoDdYXUq9fn1Sj+X96wEG9MG+PrZB0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyQCl+FM0LbEUnfIynW7sdo+1l0KH02aWshxiEMy78h38wx6tD
+	tibW8DbcQsvkwL/FsL4ZfcQIziK4KeXdKrcreVQMIEPTXLShMRxyMtmdumFZujC9hbm+zrhMfnE
+	QH0pkU7XiDe9530RmfZmj9vss8pM=
+X-Gm-Gg: ASbGncsjALdIdq9dl0OQSm5zSAh7OzKQn3RECjofWnbutH9OZVizCF6SeW0XqFIcdID
+	dMhFaerY+OkcyTutw5iW8rSUvJL1h04qisUpEIz0jmPF4Sce/WCLnXURnB3rp3U6pK3Rz5dyuwd
+	raTjuglFwWGg6hHCgxIy774r40u+j993ExEreAyA==
+X-Google-Smtp-Source: AGHT+IGqTVHZdF0Gnl5ox7AneBTijUDOiLO0yxLHMb109MwajX6MZM3vRl0qW4Z4nNz11FZzh4KO6eEQNmkSlrmjibI=
+X-Received: by 2002:a05:6000:1a8c:b0:390:f116:d220 with SMTP id
+ ffacd0b85a97d-39d87fbd0f5mr3045672f8f.17.1744213041130; Wed, 09 Apr 2025
+ 08:37:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250407-feature_marvell_ptp-v2-2-a297d3214846@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20250321005419.684036-1-tushar.vyavahare@intel.com> <Z/VUvPIxGVJ5dRic@boxer>
+In-Reply-To: <Z/VUvPIxGVJ5dRic@boxer>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 9 Apr 2025 08:37:09 -0700
+X-Gm-Features: ATxdqUF95bIHej4EzUAYAviqwjNUt6B8FDA3UuASlSr6ls445vufafsV_mKdxPM
+Message-ID: <CAADnVQKSWymsw4eu7LuHMCiYU=dfq7TCCh3LNA_mg12G+Y1=Ng@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v4 0/2] selftests/xsk: Add tests for XDP tail
+ adjustment in AF_XDP
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: Tushar Vyavahare <tushar.vyavahare@intel.com>, bpf <bpf@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	"Karlsson, Magnus" <magnus.karlsson@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	"Sarkar, Tirthendu" <tirthendu.sarkar@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 07, 2025 at 04:03:01PM +0200, Kory Maincent wrote:
-> From: Russell King <rmk+kernel@armlinux.org.uk>
-> 
-> From: Russell King <rmk+kernel@armlinux.org.uk>
-> 
-> Add PTP basic support for Marvell 88E151x PHYs. These PHYs support
-> timestamping the egress and ingress of packets, but does not support
-> any packet modification.
-> 
-> The PHYs support hardware pins for providing an external clock for the
-> TAI counter, and a separate pin that can be used for event capture or
-> generation of a trigger (either a pulse or periodic).  This code does
-> not support either of these modes.
-> 
-> The driver takes inspiration from the Marvell 88E6xxx DSA and DP83640
-> drivers.  The hardware is very similar to the implementation found in
-> the 88E6xxx DSA driver, but the access methods are very different,
-> although it may be possible to create a library that both can use
-> along with accessor functions.
-> 
-> Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
-> 
-> Add support for interruption.
-> Fix L2 PTP encapsulation frame detection.
-> Fix first PTP timestamp being dropped.
-> Fix Kconfig to depends on MARVELL_PHY.
-> Update comments to use kdoc.
+On Tue, Apr 8, 2025 at 9:55=E2=80=AFAM Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> On Fri, Mar 21, 2025 at 12:54:17AM +0000, Tushar Vyavahare wrote:
+> > This patch series adds tests to validate the XDP tail adjustment
+> > functionality, focusing on its use within the AF_XDP context. The tests
+> > verify dynamic packet size manipulation using the bpf_xdp_adjust_tail()
+> > helper function, covering both single and multi-buffer scenarios.
+> >
+> > v1 -> v2:
+> > 1. Retain and extend stream replacement: Keep `pkt_stream_replace`
+> >    unchanged. Add `pkt_stream_replace_ifobject` for targeted ifobject
+> >    handling.
+> >
+> > 2. Consolidate patches: Merge patches 2 to 6 for tail adjustment tests =
+and
+> >    check.
+> >
+> > v2 -> v3:
+> > 1. Introduce `adjust_value` to replace `count` for clearer communicatio=
+n
+> >    with userspace.
+> >
+> > v3 -> v4:
+> > 1. Remove `testapp_adjust_tail_common()`. [Maciej]
+> >
+> > 2. Add comments and modify code for buffer resizing logic in test cases
+> >    (shrink/grow by specific byte sizes for testing purposes). [Maciej]
+>
+> Hi BPF maintainers,
+>
+> could we merge this patch set as i have acked the patches? Or is there
+> something that stops us? I suppose this might have slipped during the
+> merge window?
 
-Would you mind forwarding me the changes you actually made so I can
-integrate them into the version I have (which is structured quite
-differently from - what I assume - is a much older version of my
-patches please?
-
-The PTP IP is re-used not only in Marvell PHY drivers but also their
-DSA drivers, and having it all in drivers/net/phy/ as this version
-has does not make sense.
-
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Sorry. It got lost. Please resend the set.
 
