@@ -1,62 +1,56 @@
-Return-Path: <netdev+bounces-180559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 202D0A81ABF
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 03:56:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17088A81AC1
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 03:58:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED6C14489DE
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 01:56:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87A247A4553
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 01:57:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A095315A858;
-	Wed,  9 Apr 2025 01:56:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B534614A4CC;
+	Wed,  9 Apr 2025 01:58:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XfoMn3CQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HrV7wyCM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74BDD41C64;
-	Wed,  9 Apr 2025 01:56:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9020270809
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 01:58:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744163798; cv=none; b=EuEhSDeyppOrPUICt0XNwc4+R1lM68veb1o94/+ya+FrGscTEU6tvXJOlH6G/QvTfoxnZHv0jQZEfkuJlQG1xD8PDlNuahLGSYMs7qi8ByRgguq6EoFQ44z2Umdi18+N8waTd/409c0C8bUAESmkf6J2YPJ3wszmsnGuq5aAk1k=
+	t=1744163887; cv=none; b=IZXl5XW8VExoRlYZiv9B+VestFDDUa9AbDMn7ccp5GWObg+qcFSee+Pa8HEs3XI/VLFiNpMkWBhxkvcgtFN8BvowLcgj5HwtQXTPiMAOT7uuk+AbYlI4eFoeXqT7eS51WVROuMLOF3rngARFGkNlnw+g/uY8w49iNnSVcgP+iKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744163798; c=relaxed/simple;
-	bh=wogBXxkmsq3n6cxuOkr4dWeKoE8pceAArRWdt5jRii0=;
+	s=arc-20240116; t=1744163887; c=relaxed/simple;
+	bh=pIVvXkTr2x/0mrRnQyLSePTj5TkVGBJtQGUcLzFvvAQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sUeXHD0KWddxy7DgYWEUw9nNi1LrxmD1vYlJFxhiYqGt41Zegc/259YxQcIVySkQmvlkFOi3WPyP+Jz8d999Z2BUX9bkHa5qq1/4k4jct+v82+wLUUno94PZfVnoo60O4s2FE/OturVxwuneWja9ZJKSifJU25YFBXSmKQvgGac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XfoMn3CQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B08BC4CEE5;
-	Wed,  9 Apr 2025 01:56:37 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ENbavip1Bbs9xexNi1tAo7Cmlam/SIxpu3tHNHk7Zt5uO+s7XIr+WgJrS85d53uUpzSvKTVg00lh0qF3Eg9X5aiSBQaBT6kZhvGXrPozHsijPhKC4hrI2HUqFiQAADocuojgMRwuDJ7wqSaolnNH1dGC9x0Q4Xv/HPiLtuvOs68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HrV7wyCM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94DEDC4CEE5;
+	Wed,  9 Apr 2025 01:58:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744163797;
-	bh=wogBXxkmsq3n6cxuOkr4dWeKoE8pceAArRWdt5jRii0=;
+	s=k20201202; t=1744163887;
+	bh=pIVvXkTr2x/0mrRnQyLSePTj5TkVGBJtQGUcLzFvvAQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XfoMn3CQHTxmeQ1ImWN9K8y9ucQsl21HGJp6PZCeHP81G1p7IUoHpSD4njlk0c1cK
-	 /Fi7GrNqDeiKru3e1CMv5ZlOPhd+hrgJ9emtXKbYM6hUzOv883gUBts+dYwV3kx9tl
-	 U3kUSUR7QOAhvOE2ihXf5/kVkenICTxS2umKVdnHhkCvErvwftYUPh6z06/BVFFzwK
-	 gxsrzdLZ6+RMctQLdEsrWmlnCEUACFyzOgIetfA0dR9rMUDzvcP/BZlEe2sk0LGy8I
-	 0O+gu1Rld63KfX0ORKeicG/BMtMc07TrP23nhZRZg532z0KmWQU6oZZfR22yLeE0Jb
-	 TIMD/VyaWFPVA==
-Date: Tue, 8 Apr 2025 18:56:36 -0700
+	b=HrV7wyCMh2JhiBqai580Z/brOkzz6ZA/1Wj2Vj4JYTx9ClZz8f0AilwXPQo5lnfbV
+	 t9gjuAS6ffGrnu5cd/yekciLPMoAen3nZ6XAAo5zzeM2EX2KH0JrM1zRmdB7hpezZ7
+	 4Llq3jMN1tDzXuF3DNi2FTqDbgVtmiWUpqE/SK6gAOsbQ3T0WqvC/wUJ+PX2RGraPp
+	 uJ/eDXCNJK0AKtyBgHHYOMoVJ52cLiVlg1voaKkTfzLJfsmWCakpHdU17BbN00+cm8
+	 v470S+OVFWQjF6CdTFfARpaaaVWsn5goAOzK1AG7+gbh+OmpHI1JWYmDram+jrEXZw
+	 OWw/LsjvUZGkQ==
+Date: Tue, 8 Apr 2025 18:58:05 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: linux-rt-devel@lists.linux.dev, netdev@vger.kernel.org, "David S.
- Miller" <davem@davemloft.net>, Andrew Lunn <andrew+netdev@lunn.ch>, Eric
- Dumazet <edumazet@google.com>, Ilias Apalodimas
- <ilias.apalodimas@linaro.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Joe Damato <jdamato@fastly.com>, Paolo Abeni <pabeni@redhat.com>, Saeed
- Mahameed <saeedm@nvidia.com>, Simon Horman <horms@kernel.org>, Tariq Toukan
- <tariqt@nvidia.com>, Thomas Gleixner <tglx@linutronix.de>, Yunsheng Lin
- <linyunsheng@huawei.com>
-Subject: Re: [PATCH net-next v3 0/4] page_pool: Convert stats to
- u64_stats_t.
-Message-ID: <20250408185636.4adc61fb@kernel.org>
-In-Reply-To: <20250408105922.1135150-1-bigeasy@linutronix.de>
-References: <20250408105922.1135150-1-bigeasy@linutronix.de>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+ mengyuanlou@net-swift.com
+Subject: Re: [PATCH net] net: txgbe: Update module description
+Message-ID: <20250408185805.2fae770e@kernel.org>
+In-Reply-To: <20250408081958.289773-1-jiawenwu@trustnetic.com>
+References: <20250408081958.289773-1-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,12 +60,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue,  8 Apr 2025 12:59:17 +0200 Sebastian Andrzej Siewior wrote:
-> I don't know if it is ensured that only *one* update can happen because
-> the stats are per-CPU and per NAPI device. But there will be now a
-> warning on 32bit if this is really attempted in preemptible context.
+On Tue,  8 Apr 2025 16:19:58 +0800 Jiawen Wu wrote:
+> Because of the addition of support for 40G/25G devices, update the module
+> description.
 
-I think recycling may happen in preemptible context, and from BH.
-Have you tried to test?
-The net.core.skb_defer_max sysctl may mask it for TCP traffic.
+Not important enough for a fix, please repost for net-next.
+And I think it'd be more typical to sort the speeds from the slowest.
+10/25/40
+-- 
+pw-bot: cr
 
