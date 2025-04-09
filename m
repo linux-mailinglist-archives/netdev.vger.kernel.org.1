@@ -1,112 +1,129 @@
-Return-Path: <netdev+bounces-180757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79FD2A82557
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 14:53:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBF67A82551
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 14:52:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C20E4C5BE1
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 12:52:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49CF17B243A
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 12:51:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2252C264F8F;
-	Wed,  9 Apr 2025 12:51:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 320242641DA;
+	Wed,  9 Apr 2025 12:52:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cGI45NR1"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="bO3gSMGV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64DF3265613
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 12:51:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3FA2627EA;
+	Wed,  9 Apr 2025 12:52:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744203086; cv=none; b=aJg7jXeOYhbw6Q9vG7WcFBbdUg1z9paJ4PHd6hG7hwkiAREvICjXhHaP4uW3Oe+/NA4oFMZIrBm/+1hnTRG4yt/XLyrRq1z6ykqgQ1EwvTFQH07qkxfzdGb3ZiRBrL9RSisD06p8V46CJm6kl6fUacCIqysiOi1yPh8mZywZOmM=
+	t=1744203137; cv=none; b=RtAC1GBlN0VZJhQ5k3BNTHmmDoDt3OW5EBZylK24mXNDtDwKzMwbs2/t4OaAuiFy9zEbSTLter3NXG4Efd3Hvk+OXElkf9OI8M40sxgTqUctFjRQbfTIXRpx+LWMtM0eVcNi0dL0cWmE6YgQbC2VL3ogRu1WRqDQ/qykYKC7BUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744203086; c=relaxed/simple;
-	bh=lt8foCrNENTzlLGwzw3Ao8LQrCe9mCrRdH07Skz0aQ0=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=J/P5TEH0xi8ZiCY1sPfmhAua3BAzVN/Tg6n1mSP2cIy8UjblsyJtgNoSToUAH2TLwvUJ8iLNaObNYzCfjr0F7MKMT4r41TrXswCZid2+HcuMA/w5HPw1j2r80n2f0nvVAGtWJaC3be78P5Sxfgsug5+ZBlZSEtvIcazU8pWuATU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cGI45NR1; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43edb40f357so39512185e9.0
-        for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 05:51:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744203083; x=1744807883; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9CuCBbmIrf30BOOKbrBsC5yCKhZWgZPYBMaGL3IajWg=;
-        b=cGI45NR18K/6ZVWlcpdwX4Oc70k9ATMOXrQR03dQ5iJQgT7bI2B5O8mlvvycv3Kn5N
-         nyo1X0VTqn83G6c2QPdiy666hfCt2CJ0I5Uou4mq7ewmj7WL2K+8C6gCCideRK6yK1mx
-         spPkdWKjBOb3Iwphi9MazJzukTIv+/WXqoE+I56fM2ruIh6In90K9eZtRXXSDF8pcnJR
-         P2ekn0qlsSdx9tMKJyHff38HNupyTIhKXcFxiBBZZYcVp7/DZ2sWB4AkmXQE27gIXh7l
-         hZWVDgo5MVFbnFbRVztUTMP6qu6wmqvkA1TBhlbEG+/egZNorW9d3Mgq2gvIxcXjOUZ7
-         l3Gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744203083; x=1744807883;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9CuCBbmIrf30BOOKbrBsC5yCKhZWgZPYBMaGL3IajWg=;
-        b=THeYYkHoSmtXRadzeNwJiGGrCGuUO22kOyh4e9m8PuIa8c+47CUGvG2ySGGhLQJKXr
-         I8UFANTLjMOWTQoJ7MyJdF9dKkDmAYIaSeVymihEdfXhehI4/HMdTrp67a0hMEp5xiVu
-         7N/FzpSYIrUXnF0tWLuBvr54caUJFm1VvJv85VsGmFcEAwsrlW2WOa423sRzR7qLA+Ek
-         8IAUg8mtcEriKiwjLEJzl0I7C017V+9eYvbd2JSw4rOPrO+4uH+q5UUFRBRgNRSGcREI
-         qD+cEC4CjHJdBmsp0NWD4xo+iyxCJ8AyMiDPzqXmus1wYvLJFPX7vH3Zwe/FoCiJUidp
-         hfrA==
-X-Forwarded-Encrypted: i=1; AJvYcCU1gJihtPWTS54wwvKwVdY+5bFLNCdoWwPYGFrOnBsjr4cub18863Gtvz9m6CsxNQtrIab0M68=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8hazSuM1l9of505HWpaTAzDsczOZyPsnuRoKOsyksS9oUN3GL
-	fqVtWyokrIwNPSyNaU8k7rEXJjdADLjVxO7M8voQXSjDfU0fl5Kc
-X-Gm-Gg: ASbGnctnSQ022sSxeeqjsambQZc2GiT6xnkRmZzQFRz1wInsKojHvohubGf65OQ+5tO
-	091yPOcn/I3w22ORxLDUP2+uxPVXbhwT4mFnWQrog/WzbNF6pn/WrbhmQGDfKm86ugt2UWQJqu3
-	V+TKAsE//zFYd+po1ZgRg5a3swwMD66kmxwrE3t7XEaFBDuF4G5IevWAhpISx/4scaLgcuFfLWJ
-	Q6h6ucG4U0Xa8cKSvyP2Vd4svU4m5oaDj2XbVDg43F049X08hE8uhnqvQ8xceliOMbACdCS23Zl
-	4f5F/C+8j4qynZ3ghj+iYFTJv9WIXUpJHz+bEIczb0k+JHY3XAXVtQ==
-X-Google-Smtp-Source: AGHT+IFbt5IXLUulkQzj1Zy5O+hlqjZ5ZrsxRmwbeSjb6aPoz6U0fX0wbM0NLv2YiHN8LVkYQUXGVg==
-X-Received: by 2002:a05:600c:3d9b:b0:43d:5ec:b2f4 with SMTP id 5b1f17b1804b1-43f1eca7d70mr29282095e9.10.1744203082713;
-        Wed, 09 Apr 2025 05:51:22 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:2c7c:6d5e:c9f5:9db1])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f2075fc8esm19045415e9.30.2025.04.09.05.51.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Apr 2025 05:51:22 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
-  jacob.e.keller@intel.com,  yuyanghuang@google.com,  sdf@fomichev.me,
-  gnault@redhat.com,  nicolas.dichtel@6wind.com,  petrm@nvidia.com
-Subject: Re: [PATCH net-next 12/13] tools: ynl: generate code for rt-addr
- and add a sample
-In-Reply-To: <20250409000400.492371-13-kuba@kernel.org> (Jakub Kicinski's
-	message of "Tue, 8 Apr 2025 17:03:59 -0700")
-Date: Wed, 09 Apr 2025 13:50:29 +0100
-Message-ID: <m2tt6x1otm.fsf@gmail.com>
-References: <20250409000400.492371-1-kuba@kernel.org>
-	<20250409000400.492371-13-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1744203137; c=relaxed/simple;
+	bh=Wga7NfE5EOLKXNPpGWNCl75SXWhKLrcAiVKGdRIqwI8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=S6IymdbBbA8bjiE5/n/WKSqxwf+K4gfbW+fd7oAaCSEdbrWHwA+yV5JScwO+G3BxxmBnLFBqFFaxfK3HNA1bKFR5ox1t5vdE9Vv8r49PkWYI0KzFb3VH820Dvl0VB9qiabVyj6Nmuj51s9LqA7sZUdDzFvdsId19qPACHqWc5Rw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=bO3gSMGV; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1u2UuO-0009cr-7G; Wed, 09 Apr 2025 14:52:00 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Cc:To:Message-Id:Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Subject:Date:From;
+	bh=f8y5kARShR5ZLHXs9fSAYU7oghihWo6U0sGdj42AVuw=; b=bO3gSMGVQs62Kc9g60sAUfmuGj
+	yV5w2IXK7bndM+9Q9OgJCsQbMWEJK55eaWfCdXoPtodwc2+Prh/ud1GqN09+2Qkamzo/h+Ej9w0zk
+	Z9HfRv0DBHzzhENH64a65Ho9pkhWzhR9U4BwKBq1Ni95KLsEXHhf4ISDuLCK7dB+4tczkZ1BKcbjU
+	kSFmpUXTfNqzUHSclNEbrl2dNDyRBEhm7N+pF1P9RZdx0hbi3z5nURjKRSwGC5VFlR8qlelWyni32
+	bhIXGcgT4akapkAg+PubdrNyaWsMzLyyy/SI95MjvGystZpnOlVMVDB0ywiOKycPJQ8opLpFnB1H5
+	k6YwmlZw==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1u2UuD-0003GE-PE; Wed, 09 Apr 2025 14:51:54 +0200
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1u2Uts-0021Ze-Ld; Wed, 09 Apr 2025 14:51:28 +0200
+From: Michal Luczaj <mhal@rbox.co>
+Date: Wed, 09 Apr 2025 14:50:58 +0200
+Subject: [PATCH net-next] af_unix: Remove unix_unhash()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250409-cleanup-drop-unix-unhash-v1-1-1659e5b8ee84@rbox.co>
+X-B4-Tracking: v=1; b=H4sIADFt9mcC/x2MQQqDMBAAvyJ77kKMNtB+RXpIs1uzIGtItATEv
+ xu8DMxh5oDCWbjAuzsg81+KrNqkf3QQoteZUag5WGOfZjQOw8Je94SU14S7Sm2IvkR0diAavoF
+ eo4OWp8w/qfd6AuUNlesGn/O8ACHfB5J0AAAA
+X-Change-ID: 20250406-cleanup-drop-unix-unhash-623dd3bcd946
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ bpf@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
+X-Mailer: b4 0.14.2
 
-Jakub Kicinski <kuba@kernel.org> writes:
+Dummy unix_unhash() was introduced for sockmap in commit 94531cfcbe79
+("af_unix: Add unix_stream_proto for sockmap"), but there's no need to
+implement it anymore.
 
-> YNL C can now generate code for simple classic netlink families.
-> Include rt-addr in the Makefile for generation and add a sample.
->
->   $ ./tools/net/ynl/samples/rt-addr
->               lo: 127.0.0.1
->        wlp0s20f3: 192.168.1.101
->               lo: ::
->        wlp0s20f3: fe80::6385:be6:746e:8116
->             vpn0: fe80::3597:d353:b5a7:66dd
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+->unhash() is only called conditionally: in unix_shutdown() since commit
+d359902d5c35 ("af_unix: Fix NULL pointer bug in unix_shutdown"), and in BPF
+proto's sock_map_unhash() since commit 5b4a79ba65a1 ("bpf, sockmap: Don't
+let sock_map_{close,destroy,unhash} call itself").
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+Remove it.
+
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+ net/unix/af_unix.c | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index f78a2492826f9cc1e302ee6f8ca93c367656670a..2ab20821d6bb244a09e0364e1c649042360e23b1 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -950,13 +950,6 @@ static void unix_close(struct sock *sk, long timeout)
+ 	 */
+ }
+ 
+-static void unix_unhash(struct sock *sk)
+-{
+-	/* Nothing to do here, unix socket does not need a ->unhash().
+-	 * This is merely for sockmap.
+-	 */
+-}
+-
+ static bool unix_bpf_bypass_getsockopt(int level, int optname)
+ {
+ 	if (level == SOL_SOCKET) {
+@@ -987,7 +980,6 @@ struct proto unix_stream_proto = {
+ 	.owner			= THIS_MODULE,
+ 	.obj_size		= sizeof(struct unix_sock),
+ 	.close			= unix_close,
+-	.unhash			= unix_unhash,
+ 	.bpf_bypass_getsockopt	= unix_bpf_bypass_getsockopt,
+ #ifdef CONFIG_BPF_SYSCALL
+ 	.psock_update_sk_prot	= unix_stream_bpf_update_proto,
+
+---
+base-commit: 420aabef3ab5fa743afb4d3d391f03ef0e777ca8
+change-id: 20250406-cleanup-drop-unix-unhash-623dd3bcd946
+
+Best regards,
+-- 
+Michal Luczaj <mhal@rbox.co>
+
 
