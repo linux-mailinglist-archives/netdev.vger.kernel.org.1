@@ -1,137 +1,258 @@
-Return-Path: <netdev+bounces-180844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 425ADA82B46
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 17:54:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04F43A82B68
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 17:56:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF3489A1BAC
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 15:43:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 367C79A54B7
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 15:44:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50145267B92;
-	Wed,  9 Apr 2025 15:43:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6F4C267F6C;
+	Wed,  9 Apr 2025 15:44:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P3grMWA+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C52817A319;
-	Wed,  9 Apr 2025 15:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EADB025D556;
+	Wed,  9 Apr 2025 15:44:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744213406; cv=none; b=rxgMlwb3mpJUmn2rG9GEzwdtrRdk2fLnLAsoSaTKSfvCBMSG8jFRDTvZZeh+9LZaEhhIkFqSHo2nBB4DpWsdT79wZqv6+lVBVVthQY46m1I+b2XQQiT6O08WtjUq0xWBbetH3yJZrbt4o6KpNqfnj2BWwmbRZP8Pr8SI5O5CGL8=
+	t=1744213473; cv=none; b=F+k5zeGWqO6XobqXfGpziRvzdRFr5SmdcNvJUK0AZqbFNxLxzgHJn3gqm3VooKISDLN/pMw+O9RTjgfjUnOeUGn4EWYyKJ367HxoHQNoCga8vNlpIJ7W0qSz5rarxyuqHt8tGe5/R0wMNPKH1wgDOhnOkxorJlEZQUpd4M5YkDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744213406; c=relaxed/simple;
-	bh=y9uebcKW8YvKkKHt4Ltu6yUEyYoT0rCBCLeMKwit3eM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e1LHJc0mICJSmKfo4rRy03rLUeDkSCraxXHHSCDrZ293tWHedFgMcyStL98ZAr1XpVCSX/QPSt/Ov46Qt2PSBOkIQFS/nWoL68SCmfVPGRv7P+FPCEw+2AhhnO0kPr/EqQujgtrHIDDmspd6fKLzXf/VovaxXCGR21W46AqYoGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
-X-CSE-ConnectionGUID: z09WTXwoSD6gInyYwOsg3w==
-X-CSE-MsgGUID: qBZiBJvZShqOzDg+fyM8rg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11399"; a="56330918"
-X-IronPort-AV: E=Sophos;i="6.15,200,1739865600"; 
-   d="scan'208";a="56330918"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 08:43:23 -0700
-X-CSE-ConnectionGUID: jBz6NS4OR62aMwAXaezCtA==
-X-CSE-MsgGUID: Ckj9YI5xSyu3GY5GKOussQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,200,1739865600"; 
-   d="scan'208";a="128540658"
-Received: from smile.fi.intel.com ([10.237.72.58])
-  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 08:43:19 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98.2)
-	(envelope-from <andy@kernel.org>)
-	id 1u2Xa8-0000000AmY0-3UpM;
-	Wed, 09 Apr 2025 18:43:16 +0300
-Date: Wed, 9 Apr 2025 18:43:16 +0300
-From: Andy Shevchenko <andy@kernel.org>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2 03/14] mfd: Add Microchip ZL3073x support
-Message-ID: <Z_aVlIiT07ZDE2Kf@smile.fi.intel.com>
-References: <20250409144250.206590-1-ivecera@redhat.com>
- <20250409144250.206590-4-ivecera@redhat.com>
+	s=arc-20240116; t=1744213473; c=relaxed/simple;
+	bh=Dh2iCy49AlSFY/9nHd6Unte6BCO4NJ7RSIG0FCrmwLQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FeZLPmpmC8D9uUjx5P2+6tguray0g50sPc6/U9WGxEFRh1gcrAGsp0D/LpP2wnad8NRroBpjU3M4xHpfTqDSqF4TxdFJejrS/EerufpEW6R6w4+0M2pAgwbQzXxPmn+HPhmPssooPWzm6iyEdA2LwNBNrU35e0lZh+i0arZT5ak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P3grMWA+; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-af50f56b862so4885734a12.1;
+        Wed, 09 Apr 2025 08:44:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744213471; x=1744818271; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MUUuTxOiF/e6pFbiGJ55Vd+VaZOP/yQaXFZJe/XlPzE=;
+        b=P3grMWA+e1iHD/x8gmr9RZaGKL+y35ts6TeeIjR2IueDnvP00TrdUPrUdzulmMe1xq
+         Q5L6qoBA7p8tXyuUmSoZmbDWbPp2eccSytVL7WRGeIdRW0bE1Ko+uo3Nb9WPC4l3zNlI
+         t17XGTYTHVabMOIbz8E77PKG95PQSXiNVe5Aa2/OvTh+OM0HkUxDiuyIX4bpZ0daU5nw
+         3tHcwqltaImNumjvXoztsSYqsjaCd5toL7ilw3auvhdm6cE8X0pVo7gg4UFU/34lbpvG
+         bJVdk81DGhBCOvRXN7RzyCp//oHgsklZjh0q8Uv3ToDWNT6XaaLgaCOw+cA6RGaTfwfv
+         PWpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744213471; x=1744818271;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MUUuTxOiF/e6pFbiGJ55Vd+VaZOP/yQaXFZJe/XlPzE=;
+        b=ezqe8+pyKUqnc+U7I4MsmixHZ/N62IHgLEqYlseKrBC0Sk7iR6zB45gFt7BgFK5a6i
+         SlSjkiQYIUApV5GBg+BuqzMUZCKqaU98mG9iiaZ9p8uWsLloAYlDdhkbNDYiplBLKDHD
+         4YU2aACzOw2DpLdC5X6+QAeshCPcA5icNfJSCcAmN2YzKBBH7zU/Lq1flvdHgdpr9zaA
+         Tf0AbgyIsORSWgzwMtrOBuciPwmOxYcctVOM6sFC/gIEOm9tbnq0yf4fnaL2J4jGvShm
+         sSaldz6GsCsJT23rA08oLMIJSd1hwijTyLceLyM5ut112rzKP1ZuOtAAS5ElBAx1ZnOk
+         WerA==
+X-Forwarded-Encrypted: i=1; AJvYcCV5Rkn4zKLojuF+En+gCnkt7gnvUEwbig8/nXjd43ZEHWwFSLZk5AQeu/WPOvEd8AF6eM8=@vger.kernel.org, AJvYcCVVQI3aGGedKFxdxgGuSwwcDF7dQuqBIkBH3kz2rqNTfHTCkLxBFMezKczODU1Z2xQXnJ9djtHSP722oNg=@vger.kernel.org, AJvYcCVbWCGtfoH09WTi/NT7ZM0mmr/BjbwywlW1sD8VUuagcR1NoU9vLRta5StAsnO/EQZ9FdnIaQIV@vger.kernel.org, AJvYcCVt+xlNsSzhjRCzuxojTpKGdLWm2pO5n+Obb9nmffh0lIePo6CIuOnEM2H3lfPyPzsWNDEygonAjF06b3RX@vger.kernel.org, AJvYcCW1MpgD++n9SKyqcFIhRlZ4ZxXpP19nXWgGVc4nxw5ytQBjr7s6TlG+2RxtUN2tKa5NCz0kvIDbuFi1T30=@vger.kernel.org, AJvYcCW5KvcnBShGwAdqpTKairRWKZLSUXjGARoyHsF786h8xuxcanLGPzyWY+WibXG795HK3rCz1SGhrTcWxPzKP2c=@vger.kernel.org, AJvYcCX0ebyTyZ5rFwbJOV5zf12p6QcxlRVb2nT5psEFWReaqaVXL/Assea5FL22YLFv5xn6ODy4izCvnl6TqxE=@vger.kernel.org, AJvYcCXb/E3Bfte9scP4x81Ru3Bu953vgtfS3YbKzXsJypAy881Zu39OqareJY1w/8/nc9m4C2xURHmnSFbHOjZj@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8fQ2h9tmGG0TTbeTc9aCQDUC8VTVQBjvJpzjMxIWVN/pkC3tV
+	l0F9gCb7Pf70zeuWWM4ZxEEVxFV4iOzLPthzyKGheK0T/hTbrmuh
+X-Gm-Gg: ASbGnctIjBmpRRcrd3OJMiFcbxMMMyahV5tvXuLqykimg08JBYIbJ6p1BRj/gtEZemT
+	5Z4S8QApXGlW9SoHRuBw50AUK3ycBpb5yFRSm/KKs6i8J1yPxN958EDXbuJtRLIYDc5DJP4h0NB
+	LQFX4mFIXN4CagYZtDuvEtlypC7vXc9/K/zPTbPSPH20Hp0Y7PD6SDbccyYsGRFJSBAJY3vTvPB
+	15zJAyrItCiXfSlVH1C9kzfWeGk+69QMUTVcQuEGEaU9kSVF3CtI86Kn25vcID62xd6AibmkVqj
+	qRKfetp7Dmdzy7zsBJpMOPOkwOw288afsfcGgDFJiSgcM90QSJhlNye6lnS8q4aUiJ8Llpk=
+X-Google-Smtp-Source: AGHT+IGnoEozOknyoC6We3L6wSu5LW5c8+l3K2S+PrKsnw7nWoi0Lt21fMnvhITP0Puz6RwfcrL34g==
+X-Received: by 2002:a17:90a:d884:b0:2f9:cf97:56ac with SMTP id 98e67ed59e1d1-306dd1719cfmr5116718a91.0.1744213470998;
+        Wed, 09 Apr 2025 08:44:30 -0700 (PDT)
+Received: from visitorckw-System-Product-Name.. ([140.113.216.168])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-306dd171991sm1952304a91.37.2025.04.09.08.44.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Apr 2025 08:44:30 -0700 (PDT)
+From: Kuan-Wei Chiu <visitorckw@gmail.com>
+To: tglx@linutronix.de,
+	mingo@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	jk@ozlabs.org,
+	joel@jms.id.au,
+	eajames@linux.ibm.com,
+	andrzej.hajda@intel.com,
+	neil.armstrong@linaro.org,
+	rfoss@kernel.org,
+	maarten.lankhorst@linux.intel.com,
+	mripard@kernel.org,
+	tzimmermann@suse.de,
+	airlied@gmail.com,
+	simona@ffwll.ch,
+	dmitry.torokhov@gmail.com,
+	mchehab@kernel.org,
+	awalls@md.metrocast.net,
+	hverkuil@xs4all.nl,
+	miquel.raynal@bootlin.com,
+	richard@nod.at,
+	vigneshr@ti.com,
+	louis.peens@corigine.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	parthiban.veerasooran@microchip.com,
+	arend.vanspriel@broadcom.com,
+	johannes@sipsolutions.net,
+	gregkh@linuxfoundation.org,
+	jirislaby@kernel.org,
+	yury.norov@gmail.com,
+	akpm@linux-foundation.org,
+	jdelvare@suse.com,
+	linux@roeck-us.net,
+	alexandre.belloni@bootlin.com,
+	pgaj@cadence.com
+Cc: hpa@zytor.com,
+	alistair@popple.id.au,
+	linux@rasmusvillemoes.dk,
+	Laurent.pinchart@ideasonboard.com,
+	jonas@kwiboo.se,
+	jernej.skrabec@gmail.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-fsi@lists.ozlabs.org,
+	dri-devel@lists.freedesktop.org,
+	linux-input@vger.kernel.org,
+	linux-media@vger.kernel.org,
+	linux-mtd@lists.infradead.org,
+	oss-drivers@corigine.com,
+	netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	brcm80211@lists.linux.dev,
+	brcm80211-dev-list.pdl@broadcom.com,
+	linux-serial@vger.kernel.org,
+	bpf@vger.kernel.org,
+	jserv@ccns.ncku.edu.tw,
+	Frank.Li@nxp.com,
+	linux-hwmon@vger.kernel.org,
+	linux-i3c@lists.infradead.org,
+	david.laight.linux@gmail.com,
+	andrew.cooper3@citrix.com,
+	Kuan-Wei Chiu <visitorckw@gmail.com>,
+	Yu-Chun Lin <eleanor15x@gmail.com>
+Subject: [PATCH v4 00/13] Introduce parity_odd() and refactor redundant parity code
+Date: Wed,  9 Apr 2025 23:43:43 +0800
+Message-Id: <20250409154356.423512-1-visitorckw@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250409144250.206590-4-ivecera@redhat.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 09, 2025 at 04:42:39PM +0200, Ivan Vecera wrote:
-> Add base MFD driver for Microchip Azurite ZL3073x chip family.
-> These chips provide DPLL and PHC (PTP) functionality and they can
-> be connected over I2C or SPI bus.
-> 
-> The MFD driver provide basic communication and synchronization
-> over the bus and common functionality that are used by the DPLL
-> driver (later in this series) and by the PTP driver (will be
-> added later).
-> 
-> The chip family is characterized by following properties:
-> * 2 separate DPLL units (channels)
-> * 5 synthesizers
-> * 10 input pins (references)
-> * 10 outputs
-> * 20 output pins (output pin pair shares one output)
-> * Each reference and output can act in differential or single-ended
->   mode (reference or output in differential mode consumes 2 pins)
-> * Each output is connected to one of the synthesizers
-> * Each synthesizer is driven by one of the DPLL unit
+Several parts of the kernel contain open-coded and redundant
+implementations of parity calculation. This patch series introduces
+a unified helper, parity_odd(), to simplify and standardize these
+cases.
 
-...
+The first patch renames parity8() to parity_odd(), changes its argument
+type from u8 to u64 for broader applicability, and updates its return
+type from int to bool to make its usage and return semantics more
+intuitive-returning true for odd parity and false for even parity. It
+also adds __attribute_const__ to enable compiler optimizations.
 
-> +/*
-> + * Regmap ranges
-> + */
-> +#define ZL3073x_PAGE_SIZE	128
-> +#define ZL3073x_NUM_PAGES	16
-> +#define ZL3073x_PAGE_SEL	0x7F
-> +
-> +/*
-> + * Regmap range configuration
-> + *
-> + * The device uses 7-bit addressing and has 16 register pages with
-> + * range 0x00-0x7f. The register 0x7f in each page acts as page
-> + * selector where bits 0-3 contains currently selected page.
-> + */
-> +static const struct regmap_range_cfg zl3073x_regmap_ranges[] = {
-> +	{
-> +		.range_min	= 0,
+While more efficient implementations may exist, further optimization is
+postponed until a use case in performance-critical paths arises.
 
-This still has the same issue, you haven't given a chance to me to reply
-in v1 thread. I'm not going to review this as it's not settled down yet.
-Let's first discuss the questions you have in v1.
+Subsequent patches refactor various kernel components to replace
+open-coded parity logic with the new helper, reducing code duplication
+and improving consistency.
 
-> +		.range_max	= ZL3073x_NUM_PAGES * ZL3073x_PAGE_SIZE,
-> +		.selector_reg	= ZL3073x_PAGE_SEL,
-> +		.selector_mask	= GENMASK(3, 0),
-> +		.selector_shift	= 0,
-> +		.window_start	= 0,
-> +		.window_len	= ZL3073x_PAGE_SIZE,
-> +	},
-> +};
+Co-developed-by: Yu-Chun Lin <eleanor15x@gmail.com>
+Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
+Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail.com>
+---
+
+To H. Peter:
+I understand your preference for a parity8/16/32/64() style interface,
+and I agree that such a design would better accommodate potential
+arch-specific implementations. However, I suspect there are very few,
+if any, users who care about the performance of parity calculations
+enough to warrant such optimizations. So my inclination is to defer any
+arch-specific or optimized implementations until we see parity_odd()
+being used in hot paths.
+
+Changes in v4:
+- Rename parity8() to parity_odd().
+- Change the argument type from u8 to u64.
+- Use a single parity_odd() function.
+
+Changes in v3:
+- Avoid using __builtin_parity.
+- Change return type to bool.
+- Drop parity() macro.
+- Change parityXX() << y to !!parityXX() << y.
+
+Changes in v2:
+- Provide fallback functions for __builtin_parity() when the compiler
+  decides not to inline it
+- Use __builtin_parity() when no architecture-specific implementation
+  is available
+- Optimize for constant folding when val is a compile-time constant
+- Add a generic parity() macro
+- Drop the x86 bootflag conversion patch since it has been merged into
+  the tip tree
+
+v3: https://lore.kernel.org/lkml/20250306162541.2633025-1-visitorckw@gmail.com/
+v1: https://lore.kernel.org/lkml/20250223164217.2139331-1-visitorckw@gmail.com/
+v2: https://lore.kernel.org/lkml/20250301142409.2513835-1-visitorckw@gmail.com/
+
+Kuan-Wei Chiu (13):
+  bitops: Change parity8() to parity_odd() with u64 input and bool
+    return type
+  media: media/test_drivers: Replace open-coded parity calculation with
+    parity_odd()
+  media: pci: cx18-av-vbi: Replace open-coded parity calculation with
+    parity_odd()
+  media: saa7115: Replace open-coded parity calculation with
+    parity_odd()
+  serial: max3100: Replace open-coded parity calculation with
+    parity_odd()
+  lib/bch: Replace open-coded parity calculation with parity_odd()
+  Input: joystick - Replace open-coded parity calculation with
+    parity_odd()
+  net: ethernet: oa_tc6: Replace open-coded parity calculation with
+    parity_odd()
+  wifi: brcm80211: Replace open-coded parity calculation with
+    parity_odd()
+  drm/bridge: dw-hdmi: Replace open-coded parity calculation with
+    parity_odd()
+  mtd: ssfdc: Replace open-coded parity calculation with parity_odd()
+  fsi: i2cr: Replace open-coded parity calculation with parity_odd()
+  nfp: bpf: Replace open-coded parity calculation with parity_odd()
+
+ arch/x86/kernel/bootflag.c                    |  4 +--
+ drivers/fsi/fsi-master-i2cr.c                 | 20 +++------------
+ .../drm/bridge/synopsys/dw-hdmi-ahb-audio.c   |  8 ++----
+ drivers/hwmon/spd5118.c                       |  2 +-
+ drivers/i3c/master/dw-i3c-master.c            |  2 +-
+ drivers/i3c/master/i3c-master-cdns.c          |  2 +-
+ drivers/i3c/master/mipi-i3c-hci/dat_v1.c      |  2 +-
+ drivers/input/joystick/grip_mp.c              | 17 ++-----------
+ drivers/input/joystick/sidewinder.c           | 25 ++++---------------
+ drivers/media/i2c/saa7115.c                   | 12 ++-------
+ drivers/media/pci/cx18/cx18-av-vbi.c          | 12 ++-------
+ .../media/test-drivers/vivid/vivid-vbi-gen.c  |  8 ++----
+ drivers/mtd/ssfdc.c                           | 20 +++------------
+ drivers/net/ethernet/netronome/nfp/nfp_asm.c  |  7 +-----
+ drivers/net/ethernet/oa_tc6.c                 | 19 +++-----------
+ .../broadcom/brcm80211/brcmsmac/dma.c         | 18 ++-----------
+ drivers/tty/serial/max3100.c                  |  3 ++-
+ include/linux/bitops.h                        | 19 ++++++++------
+ lib/bch.c                                     | 14 +----------
+ 19 files changed, 49 insertions(+), 165 deletions(-)
 
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.34.1
 
 
