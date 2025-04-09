@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-180787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF75FA82857
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 16:45:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 621F3A8285B
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 16:45:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 494E3445095
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 14:40:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 065C1464476
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 14:41:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61498269811;
-	Wed,  9 Apr 2025 14:38:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11CD5266567;
+	Wed,  9 Apr 2025 14:39:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VppNnAd2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZDPJ+PyY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 390D82690FF;
-	Wed,  9 Apr 2025 14:38:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBBAA265CC8;
+	Wed,  9 Apr 2025 14:39:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744209517; cv=none; b=JXamGlmCipfNqiB3Utjdx87wBvHqlAyFPX5VlUwPKAbBJh8syD4J+/VvY9edWyGHjW0h/OWLvuarHbj2rxwssEB4dbB7MyhLTjV0jyXbUSb9BFlI35lzOHCJ3/I6X9SKsbx3nD7i+suglYtg1a5KzPVOQDZLv42Cwim701SyIpY=
+	t=1744209584; cv=none; b=hSE3lU7BdDpEKmAguPVIzjr/Bgzeek+5ASK5dk0RkpP9Irt67sVTiMZf4HsIBASKG2rBkk4dx6XFzH2z4V60TmXCDHbVVFdx64CHdGqifdGIvD2ASWV0XXuV6IfTUkCli/+mhbnRdIHtkN5c7g1PJdscxD/rhRh/btq8ja6FQVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744209517; c=relaxed/simple;
-	bh=bZ9LqXFL20jiPKhVHCikZHr3AT6FsxsF+d8oFILNqJk=;
+	s=arc-20240116; t=1744209584; c=relaxed/simple;
+	bh=eavIfudAxkQ0CDQau8Hia0v1E+MVOHyrbHbwzaV3J3s=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pCf4CFy9BS040dajknTNt79RYFfB9vc/IGZLObsjR+v+GID9uIKL/NTETGvnKOUOYC7p16KVDQLU9RlZmRCuqDqWtPFCHcBFftbj9UR5DTLf0q0GtjdwjNzv4EzBY9TEe43JrncjXnxA+ojMzIvllaRzTQQy1tk6XJaI9zlWan8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VppNnAd2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38FF3C4CEE7;
-	Wed,  9 Apr 2025 14:38:36 +0000 (UTC)
+	 MIME-Version:Content-Type; b=owZl2NJQx6xqPhpDZdsH86KRESECK/YWkBcoSWTbToqgW/T1jPh7DSZgZ7Ngj5VSiqC9dsa68PrNVq5f6iKnNvDRQVJGMskOqYBUbdZtaVGbTGOgzXRzCE2NugWoNBxosXnpzIvjvKESqsbvtmBXjIlgIKsacPGs0eLE21cepwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZDPJ+PyY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0AD8C4CEE2;
+	Wed,  9 Apr 2025 14:39:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744209516;
-	bh=bZ9LqXFL20jiPKhVHCikZHr3AT6FsxsF+d8oFILNqJk=;
+	s=k20201202; t=1744209583;
+	bh=eavIfudAxkQ0CDQau8Hia0v1E+MVOHyrbHbwzaV3J3s=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VppNnAd2YISS5KOAan+Dz+7uk/id2F66sciDMXE5//+ld5vvD0IH5Jhjhmmyph8yh
-	 UFHMRrKBtnrhMwKSczQgKpiTvLPlRxeePIfiF8dKtZ5m1NvYewQtSkF6V6BMXJMbSO
-	 Qt6Ht+kiFzebGT9sy+YOkK5QmwWRoWjRkkznuL03j/eFFw/6oVn97lyeNdlXZuPwON
-	 cx6Khz11C11moVxdDI+euyuTEiBMFuMUl9eyWu5FpFWPVmqhNJ6+LkIiNeA1VudRwM
-	 TvXpS5EmPUTsVloDj9DR2d8z4q6xQa/Wrb+9aMYNmbSxNKJxqI7m2iQnY8Ni2u31Yn
-	 xttd+aPjUw+Vw==
-Date: Wed, 9 Apr 2025 07:38:35 -0700
+	b=ZDPJ+PyYJ7v5LlekieDdtXa/9JtPsnS46YRyqKRUgyHqOADYuP6sJ5qK64yRgHq2C
+	 5Q7/sGYoAVToeYqmTUmL4rq8vbp/jr8KuRf3o0TXajXsuxrU6ndC334mA4y0pIIPIi
+	 9w0Wlay9YgL+ciWQrzDZ4MdJq6ke23izETElJ/OHO3IA2Wnr5dILwPWQUuYB84DVY/
+	 r081psyofHgIpm+3RNnhDCNQ2YAWvlCCjvh9bj6vQckNTzq2AuC/vfwoIEUhDYPJmq
+	 4B4+k54kH/q+Opa//PJViA7Jur9L+r2iLKae+vGlt2dZfdKrRtXxjuqrnT2nFeZU3j
+	 5h0rMRYs1cADA==
+Date: Wed, 9 Apr 2025 07:39:42 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
-Cc: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "davem@davemloft.net"
- <davem@davemloft.net>, "pabeni@redhat.com" <pabeni@redhat.com>, "Dumazet,
- Eric" <edumazet@google.com>, "andrew+netdev@lunn.ch"
- <andrew+netdev@lunn.ch>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "jiri@resnulli.us"
- <jiri@resnulli.us>, "horms@kernel.org" <horms@kernel.org>, "corbet@lwn.net"
- <corbet@lwn.net>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "Polchlopek, Mateusz" <mateusz.polchlopek@intel.com>, "R, Bharath"
- <bharath.r@intel.com>, "Mrozowicz, SlawomirX"
- <slawomirx.mrozowicz@intel.com>, "Kwapulinski, Piotr"
- <piotr.kwapulinski@intel.com>
-Subject: Re: [PATCH net-next 10/15] ixgbe: extend .info_get with() stored
- versions
-Message-ID: <20250409073835.5d0e4018@kernel.org>
-In-Reply-To: <DS0PR11MB778531031053B86BC5301CBBF0B42@DS0PR11MB7785.namprd11.prod.outlook.com>
+Cc: "Nelson, Shannon" <shannon.nelson@amd.com>, "Nguyen, Anthony L"
+ <anthony.l.nguyen@intel.com>, "davem@davemloft.net" <davem@davemloft.net>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, "Dumazet, Eric"
+ <edumazet@google.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kitszel, Przemyslaw"
+ <przemyslaw.kitszel@intel.com>, "jiri@resnulli.us" <jiri@resnulli.us>,
+ "horms@kernel.org" <horms@kernel.org>, "corbet@lwn.net" <corbet@lwn.net>,
+ "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, Kalesh AP
+ <kalesh-anakkur.purayil@broadcom.com>, "R, Bharath" <bharath.r@intel.com>
+Subject: Re: [PATCH net-next 01/15] devlink: add value check to
+ devlink_info_version_put()
+Message-ID: <20250409073942.26be7914@kernel.org>
+In-Reply-To: <DS0PR11MB7785945F6C0A9907A4E51AD6F0B42@DS0PR11MB7785.namprd11.prod.outlook.com>
 References: <20250407215122.609521-1-anthony.l.nguyen@intel.com>
-	<20250407215122.609521-11-anthony.l.nguyen@intel.com>
-	<20250408193124.37f37f7c@kernel.org>
-	<DS0PR11MB778531031053B86BC5301CBBF0B42@DS0PR11MB7785.namprd11.prod.outlook.com>
+	<20250407215122.609521-2-anthony.l.nguyen@intel.com>
+	<d9638476-1778-4e34-96ac-448d12877702@amd.com>
+	<DS0PR11MB7785C2BC22AE770A31D7427AF0B52@DS0PR11MB7785.namprd11.prod.outlook.com>
+	<7e5aecb4-cb28-4f55-9970-406ec35a5ae7@amd.com>
+	<DS0PR11MB7785945F6C0A9907A4E51AD6F0B42@DS0PR11MB7785.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,24 +72,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 9 Apr 2025 10:50:34 +0000 Jagielski, Jedrzej wrote:
-> >Just to be crystal clear -- could you share the outputs for dev info:
-> > - before update
-> > - after update, before reboot/reload
-> > - after update, after activation (/reboot/reload)
-> >?  
-> 
-> OK so this looks this way:
+On Wed, 9 Apr 2025 14:14:23 +0000 Jagielski, Jedrzej wrote:
+> No insisting on that but should empty entry be really presented to the user?
+> Especially unintentionally? Actually it's exposing some driver's shortcomings.
+> That means the output was not properly validated so imho there's no point in
+> printing it.
 
-Not terrible, but FWIW my expectation (and how we use it at Meta [1])
-is that stored will always be present. If there is no update pending
-it will simply be equal to running. Otherwise it's unclear whether
-we're missing stored because it's not supported or because there is 
-no pending update.
-
-But I guess it's not a huge deal if for some reason you can't achieve
-this behavior, just make sure to document it in the driver devlink doc.
-
-1:
-https://docs.kernel.org/networking/devlink/devlink-flash.html#firmware-version-management
++1, FWIW, I don't see the point of outputting keys without values.
 
