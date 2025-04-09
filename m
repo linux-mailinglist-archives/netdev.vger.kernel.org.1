@@ -1,125 +1,102 @@
-Return-Path: <netdev+bounces-180667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B5A9A8212C
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 11:42:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FB16A82146
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 11:47:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63B568A5452
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 09:42:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 073D1188C4F2
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 09:47:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70B49253B76;
-	Wed,  9 Apr 2025 09:42:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15A9B2512D6;
+	Wed,  9 Apr 2025 09:47:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rbUfYfs5"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEA7425D214;
-	Wed,  9 Apr 2025 09:42:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E570322DFA2
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 09:47:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744191744; cv=none; b=IkFyPEa6GxoXqS/Agu8+IlagK9mFyy98DoceYa2u2rxfMjhR4whHFTTqWvmibx6iVzNxGoL05QNadV6ESKB0RJzQTnPuCKqEhRaX5jtRrVmLYWUR4elKnENcAJDs0B39OHgnFGZHjEFTzOpDKy+jwTfUxUgi0nQbxeS4OlSslHM=
+	t=1744192058; cv=none; b=kfr3rVm+ZWcg7WiOuKRF9bp4jxtpMjvQK/6sFAAkbce0Wb4w/f4qzX9o51gdEQd66ZVp+CP4WFLQS6LiH0usvK6QWF5g+5jox+O56CMlZOzYTw84Hxlxhgzn84z1OlO4aM7kFqavRabVjhl+78Q9mJ5dyllDx7MlQKg5drC/rlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744191744; c=relaxed/simple;
-	bh=43REFmZRu18CN3j2GspN90f2p0rdAUcbTvNtIutpiKw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N9qtkjTq6iFea9rAAUO0ATB9ftLjp5B9oQ/Q/+CJ8LGCmECPVIWzZ8CerQrYUiHhYkM8J9HUN+oXru1y/hZ/hannRbCPy4Npk9w/7j523vMlmWRrhqO+/LqxY2idY+sgR6KqwNfR7ghV4pzhlp1toxkjNe/P7UF3m61OX+kMRH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1u2Rwc-000527-Qs; Wed, 09 Apr 2025 11:42:06 +0200
-Date: Wed, 9 Apr 2025 11:42:06 +0200
-From: Florian Westphal <fw@strlen.de>
-To: lvxiafei <xiafei_xupt@163.com>
-Cc: fw@strlen.de, coreteam@netfilter.org, davem@davemloft.net,
-	edumazet@google.com, horms@kernel.org, kadlec@netfilter.org,
-	kuba@kernel.org, linux-kernel@vger.kernel.org,
-	lvxiafei@sensetime.com, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, pabeni@redhat.com,
-	pablo@netfilter.org
-Subject: Re: [PATCH V3] netfilter: netns nf_conntrack: per-netns
- net.netfilter.nf_conntrack_max sysctl
-Message-ID: <20250409094206.GB17911@breakpoint.cc>
-References: <20250409072028.GA14003@breakpoint.cc>
- <20250409091319.17856-1-xiafei_xupt@163.com>
+	s=arc-20240116; t=1744192058; c=relaxed/simple;
+	bh=+m0+N46haligEw11nrASxYuR/7DydAeoOe7+i2M73fo=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=FhvVPvsSxhM4gjl/W5hPJiZG/Dk/IISIaOVkc25UTMaVSVsjywM2BqLdrPn0xtUtWk0T5FC1pa3GyUryBS6HZOtbR8ubi+9NMrCSTB7HC4aktqv7N34ClwkyCuADRJd9o/hZUx6eguifGD92rLhOKnf9q/iFYg8Ohg1ak60dhSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rbUfYfs5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18ADBC4CEE3;
+	Wed,  9 Apr 2025 09:47:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744192057;
+	bh=+m0+N46haligEw11nrASxYuR/7DydAeoOe7+i2M73fo=;
+	h=From:Subject:Date:To:Cc:From;
+	b=rbUfYfs5XOo5tkvyZq39tMu8b4hVDMHci6cq/9DXOBwaKcXCKkRskse6SYupSxtEQ
+	 75FRODDHVTWK1FHXjUg1asgP7As971PPBF6wObzRNrQ5BF2Kw846N8HtKpvL3UmWil
+	 zbgYe6lPLEWyNRhuz2PVaWXJlFjSZzn9MFYnJPZM+Dhe3dq5E/+Cvo0feP5Ind+ski
+	 PrqqBftR8k8UJ2GJAyI4nnQls9+jxDIVwNziaT0MKOiwcuaSmt24xE9M5/EmAKlDjQ
+	 d+90Ct/JS+RIUL179++0TBJYmhTRdH8t+KmaMxLw5UfZXIXW8ObK4dgMC1oSh/sMEY
+	 X6L7Kym3CSMvA==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Subject: [PATCH net-next v2 0/2] Add L2 hw acceleration for airoha_eth
+ driver
+Date: Wed, 09 Apr 2025 11:47:13 +0200
+Message-Id: <20250409-airoha-flowtable-l2b-v2-0-4a1e3935ea92@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250409091319.17856-1-xiafei_xupt@163.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIACFC9mcC/22NwQ6CMBBEf4Xs2TVtoUI8+R+GQ5EFNjaUbAlqC
+ P9uwatze5PMmxUiCVOEa7aC0MKRw5jAnDJ4DG7sCblNDEYZq3Kdo2MJg8POh9fsGk/oTYOkGqv
+ awuVGW0jTSajj96G914kHjnOQz/Gy6L39CQtV/hcuGhXqqtxTkb1UtyfJSP4cpId627YvMfYLL
+ rkAAAA=
+X-Change-ID: 20250313-airoha-flowtable-l2b-e0b50d4a3215
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
+ Michal Kubiak <michal.kubiak@intel.com>
+X-Mailer: b4 0.14.2
 
-lvxiafei <xiafei_xupt@163.com> wrote:
-> Florian Westphal <fw@strlen.de> wrote:
-> > Whats the function of nf_conntrack_max?
-> > After this change its always 0?
-> 
-> nf_conntrack_max is a global (ancestor) limit, by default
-> nf_conntrack_max = max_factor * nf_conntrack_htable_size.
+Introduce the capability to offload L2 traffic defining flower rules in
+the PSE/PPE engine available on EN7581 SoC.
+Since the hw always reports L2/L3/L4 flower rules, link all L2 rules
+sharing the same L2 info (with different L3/L4 info) in the L2 subflows
+list of a given L2 PPE entry.
 
-Argh.
+---
+Changes in v2:
+- squash patch 1/3 and 2/3
+- explicitly initialize airoha_flow_table_entry type for
+  FLOW_TYPE_L4 entry
+- get rid of airoha_ppe_foe_flow_remove_entry_locked() and just rely on
+  airoha_ppe_foe_flow_remove_entry()
+- Link to v1: https://lore.kernel.org/r/20250407-airoha-flowtable-l2b-v1-0-18777778e568@kernel.org
 
-net.netfilter.nf_conntrack_max
-is replaced by init_net.nf_conntrack_max in your patch.
+---
+Lorenzo Bianconi (2):
+      net: airoha: Add l2_flows rhashtable
+      net: airoha: Add L2 hw acceleration support
 
-But not net.nf_conntrack_max, so they are now different and not
-related at all anymore except that the latter overrides the former
-even in init_net.
+ drivers/net/ethernet/airoha/airoha_eth.c |   2 +-
+ drivers/net/ethernet/airoha/airoha_eth.h |  22 ++-
+ drivers/net/ethernet/airoha/airoha_ppe.c | 224 ++++++++++++++++++++++++++-----
+ 3 files changed, 212 insertions(+), 36 deletions(-)
+---
+base-commit: 61f96e684edd28ca40555ec49ea1555df31ba619
+change-id: 20250313-airoha-flowtable-l2b-e0b50d4a3215
 
-I'm not sure this is sane.  And it needs an update to
-Documentation/networking/nf_conntrack-sysctl.rst
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
 
-in any case.
-
-Also:
-
--       if (nf_conntrack_max && unlikely(ct_count > nf_conntrack_max)) {
-+       if (net->ct.sysctl_max && unlikely(ct_count > min(nf_conntrack_max, net->ct.sysctl_max))) {
-
-
-... can't be right, this allows a 0 setting in the netns.
-So, setting 0 in non-init-net must be disallowed.
-
-I suggest to remove nf_conntrack_max as a global variable,
-make net.nf_conntrack_max use init_net.nf_conntrack_max too internally,
-so in the init_net both sysctls remain the same.
-
-Then, change __nf_conntrack_alloc() to do:
-
-unsigned int nf_conntrack_max = min(net->ct.sysctl_max, &init_net.ct.sysctl_max);
-
-and leave the if-condition as is, i.e.:
-
-if (nf_conntrack_max && unlikely(ct_count > nf_conntrack_max)) { ...
-
-It means:
-each netns can pick an arbitrary value (but not 0, this ability needs to
-be removed).
-
-When a new conntrack is allocated, then:
-
-If the limit in the init_net is lower than the netns, then
-that limit applies, so it provides upper cap.
-
-If the limit in the init_net is higher, the lower pernet limit
-is applied.
-
-If the init_net has 0 setting, no limit is applied.
-
-This also needs an update to Documentation/networking/nf_conntrack-sysctl.rst
-to explain the restrictions.
-
-Or, alternative, try the other suggestion I made
-(memcg charge at sysctl change time,
- https://lore.kernel.org/netfilter-devel/20250408095854.GB536@breakpoint.cc/).
-
-Or come up with a better proposal.
 
