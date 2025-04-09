@@ -1,177 +1,157 @@
-Return-Path: <netdev+bounces-180693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20C7CA82235
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 12:33:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5425FA82261
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 12:37:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8EE21880759
-	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 10:33:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1CF637B77B9
+	for <lists+netdev@lfdr.de>; Wed,  9 Apr 2025 10:35:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F8A225C6F1;
-	Wed,  9 Apr 2025 10:33:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DC9F25D8F2;
+	Wed,  9 Apr 2025 10:36:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="SO0oIJ9O"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dEynIQql"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CDD52550BC
-	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 10:33:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF28E25522B
+	for <netdev@vger.kernel.org>; Wed,  9 Apr 2025 10:36:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744194822; cv=none; b=CWFqMFyumhIgMjZMOga3SCrJMfSRqf7V3HHEa6cYOWGk9POwKLC0zvLCJUlxJR/QtZGNyGUm3fa/MbghSxvCcpk6iCvr+EcWxV22CSX4uO200tFP1Mk4w8jGdybwnqMy1XHdOVTo8s4pav5F75oPKQCwOY/dQ2kxCrLDoCV447g=
+	t=1744194979; cv=none; b=bLdiZPWRRZLjOZVec8VRYVlCxkhEopICW13VPJDCGDN6Vtl2zmLP77ayN/MEUBQQIorei4kajlmc6oN94MOGIqe1WM88QvpdnUkQ18mtWsxkgDZSGzhaQ1aw16PKtwtUuPrIztaV82B+kU7G6dUCqfiAd0k2aSB69pE6CzuXuaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744194822; c=relaxed/simple;
-	bh=eJiiSL2hEBM31QpdZjTGxkNCHrjWvXRhsnysYFnGW1A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MNYMO9jK/kBONvpHZw2gIwG7lG1TSnsmR2H1BIHmISW0MsTjdEsoOC9wE3zsb1Yd3b3ACNqAtxo+QGujHT2CMarCsT39OQBZQQOnY36ymw2qkc+ArahstBXaftG/1SbKm+w7lQL6fFu/EM+HBaOWN8A7BRFrXHgr7eLb9aS8dgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=SO0oIJ9O; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43d04dc73b7so69485305e9.3
-        for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 03:33:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1744194819; x=1744799619; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iNYfYAHMIpD9FdvT1GsMuzUjrwnA51rOxuoeTYQFk9o=;
-        b=SO0oIJ9OuALE/dMT1Sd2HdGV4lAtohQB4OXAWLT2WS5tRJFdinqkBkw+8ihbV/ZINr
-         RtKW7IcYFRFP0rToDQhq+Jc8EQSnd2cAK4uUOF5618cuMg4RcYTEcuL1WPbijMpy3Kvc
-         60dcwW2hK8NMCgLYXxvzcT2KpEV4960QaUWvNXzbRgRb6kJLcpO59JD5ccUrzqsGq42n
-         aEzfMKVQ6s4rDfvhMSUMXlnopKgxX0gn06S27oV74lZevMJ+wCPOLN1mP45DYoK12osW
-         Ini7/r5v4SuKDDMtAAvppmSiNshV4mDnuIPPE562FCJoq8TQ5dRjY7bFhAx2XKJkQdfp
-         WhNQ==
+	s=arc-20240116; t=1744194979; c=relaxed/simple;
+	bh=i4ww+FDuhBq9K89tHk8yHaDJA0LXhNvp9fAushoG6jQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=efAVh+kLBiFwEu9AIixeG5WHUD/o9oTlf/4wRD6AHYra2P2C9butnMjd2btPPmDdDWtushjmiS9ylByGbLLbdFN+znCGWDv5Kds0UQfOkDtA/iphFLeKuNiXVhR08PX629MQOGte0sJhlLM+EsGDWJVDqg/D2zLiat/WmllLa2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dEynIQql; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744194976;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+5kKiovjW0ZhkYwq0PKT65H3P9L8h+uzV491ftb4psU=;
+	b=dEynIQql6sA9ab6nLmZxi7ERSqLbCiMSlmcODiFU0ZvJ7ZrikmTt1edzIX01Fo8c24G5GB
+	7nGeOVaQMb8hwlMjpzkkWPFLZXB8Al5PNsQ++xjYyeWC1EkED3hfxCPFHSWeo8dYSPA0AC
+	q5nf32BW67JWarMoZtXV87hKJOhqYkQ=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-104-06S_5rkPPvierQeG_DTbgA-1; Wed, 09 Apr 2025 06:36:15 -0400
+X-MC-Unique: 06S_5rkPPvierQeG_DTbgA-1
+X-Mimecast-MFC-AGG-ID: 06S_5rkPPvierQeG_DTbgA_1744194974
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-ac6ef2d1b7dso550528666b.0
+        for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 03:36:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744194819; x=1744799619;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iNYfYAHMIpD9FdvT1GsMuzUjrwnA51rOxuoeTYQFk9o=;
-        b=CZljZeV563Q/rRa1zQoIEgvWW6exvH/9cyoFRByVZA6SyrCp7YBnDiTRgWTzmGXUc0
-         yYnWXJ8ACiddP+XbpjHbulsClGXg4QWVvrh/RKdPEw+KT1QuVoNlXWVbmAZjDjjWCKRO
-         sDh0k0fCk+1NefZ9Uxg5bUrVl4c3KiiJIUkSWOShp2TiLrolQvbdeZjcPVosFDWavzj2
-         o5oxn065JEsgvws6ioTkiNQieQp2gLggYcHq8F5T4zI6kdO/4zLMOa7IKmsPbR12jdCD
-         6UavnRYKQNIi8t63akJb0CmdysTVHUdbCbx/yyYqBWUudMD//De9/rR9gbxY9wPcssZ/
-         C7SQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVT/c9c1idVFVwY9nBlwgOEcpXRp2yhpD3P9tyM8PKvkGLVvKAZqiC0/gMirKtQ5BA9ybzDxGI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1FaU8jhpydElyHVaulA9XZ8YSI3wokWf6fWdLzhHG+6MY/ela
-	tM17nfN3bSjUEnzkTMCfysLHyNqFUc6nq6fJMfDGXWNc6APIJ9eQYsQ3w7txKqc=
-X-Gm-Gg: ASbGncsnhi2NstUNf0ijEOZn/J4eHsCptWcOaF0h3armhfagI1UBYv8D8duFSd8Gl5I
-	AzB71+NzgDDf34ddnwNQemPxXzMkqXVBywCVomRkgRRa7OOUZqc5LLRlvcLwgwBiSyb9MCbfWWZ
-	xKJquv869feOxC2d/x788VLNUHs1C+j9+SX2acvZf6uSCmSpfjnqv+ww27T87oXUfQPkoQERh/j
-	8FBPbpkvv/a+i7Sfhr3t37XSR6cqB3DzbbNEY+iVDIQMvZZWWOYkbvck+fy0bd1t6xVxFBWwc2j
-	KGEl81ohHCN1fEpdbXDICFLBIZXFAzZFM9TF8t9YTKCM0v0bNwVaTCTnD+pipb78uYVo4JCY
-X-Google-Smtp-Source: AGHT+IGOViq/FFxXMmab/4pISxbhFgAUX7J2o72U3BiWbwrZb7f0t75b8fXgPQvEBnKDhmE/5Yxtmg==
-X-Received: by 2002:a05:6000:2508:b0:39c:223f:2770 with SMTP id ffacd0b85a97d-39d87aa7b97mr2230265f8f.15.1744194818617;
-        Wed, 09 Apr 2025 03:33:38 -0700 (PDT)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39d893773absm1263777f8f.31.2025.04.09.03.33.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Apr 2025 03:33:38 -0700 (PDT)
-Message-ID: <4ee836f0-9d28-4e40-bcca-1b4eadd040f3@blackwall.org>
-Date: Wed, 9 Apr 2025 13:33:37 +0300
+        d=1e100.net; s=20230601; t=1744194974; x=1744799774;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+5kKiovjW0ZhkYwq0PKT65H3P9L8h+uzV491ftb4psU=;
+        b=PkdMuMLC3jR4QncUaCbh47dHMqPm/ahZ3lFRcu4Nm7G6zBIfRJuugrjkknFcAbKk6r
+         7ktpo6Pg7x778V/9VSHkswNDhiHArOXnSKn/gjKkMrLcBCFvi2Q9Efsc58ZZO/BDpN9I
+         t1JlQjuvPJPKmdqIhPVPefM1zn0MHPRxDv/HehsaR/ZP0fYxrGWwl7d4lddkdbIgdUOu
+         vW9PblLIv1BfClzcpqDekrpRuL0ugOiBWP1hFqL8C/WmTRbmZOvxM4MMbN8ZjRhl4deg
+         Tl7ZSjfvJt94x6ETMETlrRDruF0OgoyYabyQiXA78P0a1Ukc4H1hR8XYokatNi4TyHpH
+         R7zw==
+X-Forwarded-Encrypted: i=1; AJvYcCXtS6FVbY8xdDcTFRg/8tQIrCFlqU6rKwDnPllhCvmgzjwcXxyqvQGcn2YYNgjCLat9hdaPmbA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9cUcw+2lAq6sdnX0G8c0KrnACqK5PQ/Hoaku/4HgwQxPn87p8
+	cKQnNTeLubAo6ksCRQPUrxFEdyaTWviFGr3VgB7i9dEhtF655Gy+/VrkuhzHCo4edWKKf83MTzF
+	WatC0kJCfJnrlo2nAYDCZo/k9IBkOFV6oAgtS0a892c53CMyzsNlWqw==
+X-Gm-Gg: ASbGncvoJY8h3o9RF6DvZK53rdGVAJdqBkCbuHpavou3YPv6g8N5SN98x30lPFLPMqS
+	ViZhObNDmStziBLINy9zXMEL67o3y2rQRMvzpaoeTIkAlJlGCCHZXDSKWxtv1+LBZ+kglP2w24/
+	HSU25cNIcXd/rSGq1Et3tXgdA1uu8DcTswQazZrxktBFo7yNQlUgs8Ns+htdWkIxd87CPJFPfuk
+	iuubiwGs58SfNslb4/bkQs3/iE5yC/w/hG3HbYHBYP/uyY3Gy69Fh7bkW09rEyjl/AaN6GyEDlv
+	b0Q8zCvS
+X-Received: by 2002:a17:907:7ea6:b0:ac2:dfcf:3e09 with SMTP id a640c23a62f3a-aca9b719b0cmr234858866b.43.1744194974077;
+        Wed, 09 Apr 2025 03:36:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGQCZRAFJMcL3NkxF41e8trgIRpTjzQOtQoBDKD5Ijj+qm+kAuHuUYYu1XdMXJhDmFnpSmJJA==
+X-Received: by 2002:a17:907:7ea6:b0:ac2:dfcf:3e09 with SMTP id a640c23a62f3a-aca9b719b0cmr234857166b.43.1744194973699;
+        Wed, 09 Apr 2025 03:36:13 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acaa1cb43b6sm74653666b.93.2025.04.09.03.36.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Apr 2025 03:36:13 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id DCF4B19920AD; Wed, 09 Apr 2025 12:36:11 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
+ <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Simon
+ Horman <horms@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Mina
+ Almasry <almasrymina@google.com>, Yonglong Liu <liuyonglong@huawei.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>, Pavel Begunkov
+ <asml.silence@gmail.com>, Matthew Wilcox <willy@infradead.org>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-mm@kvack.org
+Subject: Re: [PATCH net-next v8 1/2] page_pool: Move pp_magic check into
+ helper functions
+In-Reply-To: <20250408121352.6a2349a9@kernel.org>
+References: <20250407-page-pool-track-dma-v8-0-da9500d4ba21@redhat.com>
+ <20250407-page-pool-track-dma-v8-1-da9500d4ba21@redhat.com>
+ <20250408121352.6a2349a9@kernel.org>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Wed, 09 Apr 2025 12:36:11 +0200
+Message-ID: <87o6x5vcys.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] selftests: test_bridge_neigh_suppress: Test
- unicast ARP/NS with suppression
-To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org
-Cc: Ido Schimmel <idosch@nvidia.com>, bridge@lists.linux.dev,
- mlxsw@nvidia.com, Amit Cohen <amcohen@nvidia.com>
-References: <cover.1744123493.git.petrm@nvidia.com>
- <dc240b9649b31278295189f412223f320432c5f2.1744123493.git.petrm@nvidia.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <dc240b9649b31278295189f412223f320432c5f2.1744123493.git.petrm@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 4/8/25 18:40, Petr Machata wrote:
-> From: Amit Cohen <amcohen@nvidia.com>
-> 
-> Add test cases to check that unicast ARP/NS packets are replied once, even
-> if ARP/ND suppression is enabled.
-> 
-> Without the previous patch:
-> $ ./test_bridge_neigh_suppress.sh
-> ...
-> Unicast ARP, per-port ARP suppression - VLAN 10
-> -----------------------------------------------
-> TEST: "neigh_suppress" is on                                        [ OK ]
-> TEST: Unicast ARP, suppression on, h1 filter                        [FAIL]
-> TEST: Unicast ARP, suppression on, h2 filter                        [ OK ]
-> 
-> Unicast ARP, per-port ARP suppression - VLAN 20
-> -----------------------------------------------
-> TEST: "neigh_suppress" is on                                        [ OK ]
-> TEST: Unicast ARP, suppression on, h1 filter                        [FAIL]
-> TEST: Unicast ARP, suppression on, h2 filter                        [ OK ]
-> ...
-> Unicast NS, per-port NS suppression - VLAN 10
-> ---------------------------------------------
-> TEST: "neigh_suppress" is on                                        [ OK ]
-> TEST: Unicast NS, suppression on, h1 filter                         [FAIL]
-> TEST: Unicast NS, suppression on, h2 filter                         [ OK ]
-> 
-> Unicast NS, per-port NS suppression - VLAN 20
-> ---------------------------------------------
-> TEST: "neigh_suppress" is on                                        [ OK ]
-> TEST: Unicast NS, suppression on, h1 filter                         [FAIL]
-> TEST: Unicast NS, suppression on, h2 filter                         [ OK ]
-> ...
-> Tests passed: 156
-> Tests failed:   4
-> 
-> With the previous patch:
-> $ ./test_bridge_neigh_suppress.sh
-> ...
-> Unicast ARP, per-port ARP suppression - VLAN 10
-> -----------------------------------------------
-> TEST: "neigh_suppress" is on                                        [ OK ]
-> TEST: Unicast ARP, suppression on, h1 filter                        [ OK ]
-> TEST: Unicast ARP, suppression on, h2 filter                        [ OK ]
-> 
-> Unicast ARP, per-port ARP suppression - VLAN 20
-> -----------------------------------------------
-> TEST: "neigh_suppress" is on                                        [ OK ]
-> TEST: Unicast ARP, suppression on, h1 filter                        [ OK ]
-> TEST: Unicast ARP, suppression on, h2 filter                        [ OK ]
-> ...
-> Unicast NS, per-port NS suppression - VLAN 10
-> ---------------------------------------------
-> TEST: "neigh_suppress" is on                                        [ OK ]
-> TEST: Unicast NS, suppression on, h1 filter                         [ OK ]
-> TEST: Unicast NS, suppression on, h2 filter                         [ OK ]
-> 
-> Unicast NS, per-port NS suppression - VLAN 20
-> ---------------------------------------------
-> TEST: "neigh_suppress" is on                                        [ OK ]
-> TEST: Unicast NS, suppression on, h1 filter                         [ OK ]
-> TEST: Unicast NS, suppression on, h2 filter                         [ OK ]
-> ...
-> Tests passed: 160
-> Tests failed:   0
-> 
-> Signed-off-by: Amit Cohen <amcohen@nvidia.com>
-> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-> Signed-off-by: Petr Machata <petrm@nvidia.com>
-> ---
->  .../net/test_bridge_neigh_suppress.sh         | 125 ++++++++++++++++++
->  1 file changed, 125 insertions(+)
-> 
+Jakub Kicinski <kuba@kernel.org> writes:
 
-Thanks,
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+> On Mon, 07 Apr 2025 18:53:28 +0200 Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> diff --git a/include/linux/mm.h b/include/linux/mm.h
+>> index b7f13f087954bdccfe1e263d39a59bfd1d738ab6..6f9ef1634f75701ae0be146a=
+dd1ea2c11beb6e48 100644
+>> --- a/include/linux/mm.h
+>> +++ b/include/linux/mm.h
+>> @@ -4248,4 +4248,25 @@ int arch_lock_shadow_stack_status(struct task_str=
+uct *t, unsigned long=20
+>
+>> +static inline bool page_pool_page_is_pp(struct page *page)
+>> +{
+>> +	return false;
+>> +}
+>> +#endif
+>> +
+>> +
+>
+> extra empty line here
+>
+>>  #endif /* _LINUX_MM_H */
+>> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types=
+.h
+>> index 36eb57d73abc6cfc601e700ca08be20fb8281055..31e6c5c6724b1cffbf5ad253=
+5b3eaee5dec54d9d 100644
+>> --- a/include/net/page_pool/types.h
+>> +++ b/include/net/page_pool/types.h
+>> @@ -264,6 +264,7 @@ void page_pool_destroy(struct page_pool *pool);
+>>  void page_pool_use_xdp_mem(struct page_pool *pool, void (*disconnect)(v=
+oid *),
+>>  			   const struct xdp_mem_info *mem);
+>>  void page_pool_put_netmem_bulk(netmem_ref *data, u32 count);
+>> +
+>
+> and here
+
+Ugh, got sloppy when moving things around; sorry about that. Will
+respin.
+
+-Toke
 
 
