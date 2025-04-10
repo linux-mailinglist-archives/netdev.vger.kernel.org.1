@@ -1,115 +1,113 @@
-Return-Path: <netdev+bounces-180970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D829CA83513
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 02:18:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38779A8351D
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 02:41:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF0431B6685D
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 00:19:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 044348A4F51
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 00:39:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA85012B63;
-	Thu, 10 Apr 2025 00:18:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A74654D599;
+	Thu, 10 Apr 2025 00:39:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SK+Rr0a6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ebmaNGaP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67986FC0B
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 00:18:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C61381A3
+	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 00:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744244331; cv=none; b=c1vNhxmXdHfIKqWt6qaa8xo5zj7VTV3FORy5PO9tQ0eTrO1p7kztWQg/VnYHWbTRlu8zr//SvNW188aBxCrpd5ygoj5h42V037go540VNs4cLcV2Od0ZNo5Zqq1qS9ZqCEA2+/nKTIGqj564yAJAGffY3RPUmtU8+uuMsBPIvAY=
+	t=1744245597; cv=none; b=u77NdP64RruNTJ4N/0/F3TyiIpwcMdSurLvjIyh7kf7ETnUHU9LOlanijOY3I1UDgGLZiQx9DsJ3hO8ISGi3UZLwpaa5NgK+P7vmM9LqrMdE4uo83QEDmhcq2RF2FxkUertggj0a8yWIwdVJJD5VqSeSODs3BO3OgLbYPzY8AJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744244331; c=relaxed/simple;
-	bh=s+PzXNKbJt3JsUCHJdE6Ao7iwC36IXVrQDl9xsIWwC8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IR/Mizkz23K9yoi/IojXR9PLCvsgqd2KtEWvz2IT8xAUyikF9k9Uw1qXqTwE64wdq+XGkmit9C5UGg6jC37YeWLLK9FSHNO6BkZOhT9bQvcEmQs5SQGXYPMoRaKKJjAHcPfLqp+6vLooibjTTnrdVbVooBbH8EEdxXoNVNimp7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SK+Rr0a6; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-72d3b48d2ffso179992b3a.2
-        for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 17:18:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744244329; x=1744849129; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QFlMF8fqDPm14tTvIOjeWMgKHRPyiqOd/HgbgdEetug=;
-        b=SK+Rr0a6uVatDRszcOKhLVMwWwIR964cstSGL3BVtV8V7yMPxVnYgY2lTgGlUk5Ev7
-         RmxTQIgbwuIoTMkv2ssTtls1NpAJjyIVIzzupHT4jN+R3BDqYk8SQNWjyfVH3FQteNSU
-         fhIpuBRFC1H29L73OcDJ7tbwobG0RQsUOpVmqQwGQUFBXWYHbLMzVhwAo8/QnSm7W9bj
-         2j9nb3a6Q9Et6G6RrEonfkEBbt/OT6Abhf/8qiq1MwJeAK7sGczyofb1HMAWIkV76hxr
-         +SO9T44sy42YqfqHRcEoE+9feLyf5AH4+XtdWJrbURGoLtXoINxMD3lEzJs0mM754X/p
-         YR6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744244329; x=1744849129;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QFlMF8fqDPm14tTvIOjeWMgKHRPyiqOd/HgbgdEetug=;
-        b=vJBEAypgxoh1RslqCniN1+NJOSNiO8BGX1Rn//KYvQRt4AlKln6jZaxYENC+LsHLhU
-         rg7Ue6Wi1HxeyJhuk+AJHLD0Tmbk7thvnbozo758kCz7io82X8FNbdHDGBBuNFYz1zgs
-         OhTBuabwGBavs3xN0ZMFw/WCne1PWIvRARASfbLArHMQtsPTC3FazS4DZeVv1hpUL3b7
-         ih15wF32VN8Fw0l9xzrRgr2q9rhnnKdimezZScyImpKJw2QCBE7p0hTKRWcC1H56BBRr
-         Er4L6uDj+xPOANrjNh74q2Zhzo73gnJ7mWLQoRDSDntGxW2Zjv/BdTEnDdb+stPg1/yy
-         V72Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXZmbPPRD00X74sFDHnR+FCTuPSrRcaoQT2KpV2wYkOxsfcbILLDs+O+S+ZNKQtHcxkzWW/YwU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3bWzgE/GILhaIdkV+vV3N+hA4NFzSn1ksZnOog+GIRumOLrVH
-	Z3epdITwCOTXhoybQaUNCoXIyl37nN4kk9+fpUAwtXe+RDNvO/6/
-X-Gm-Gg: ASbGnctTmY+kadXzmF5CtkNNHXllYUUo24CWP2DeINof0M2oTgBxM3sQnJkbURCMFV6
-	eOeW3lhHm2NMEFiZD/6Kp0oWbS56uB6OAf/cuTkM/gMSShTFrfmDXSSlGGvF9PrXhNMa99VUFgd
-	iQegaUdAENHd9RwEMRtse0rzXA25/Y4b0L7ZqZvtUVfns1Bn4DQg7ZaOP7ZxT19Cs3YqdabD4l9
-	FmdlWOAPIq6dG+9FrqXNttO27bdKSOwupg+qKwzvVWF60ZBWOysmIbnB4CwczBCb67by3ZGE2SG
-	VPJ4Z5rGh3/mgi4kc2uT+It1hKs5yECqJQz9bAoeDl3BKX7zdzK0K5XApadPf/Aeqm/8txQ+Q8D
-	7VbZj10DjGwImgrwuVJAaYmY/DQ==
-X-Google-Smtp-Source: AGHT+IGqGkgSnnHXVOLnekNKJgYyw+qSPoYkEVs0Of9Ar/Qenq7NmuyfFe3J8vkInq/Z17hAesvJyg==
-X-Received: by 2002:a05:6a00:3915:b0:736:34ca:deee with SMTP id d2e1a72fcca58-73bbee5480cmr1003435b3a.7.1744244329395;
-        Wed, 09 Apr 2025 17:18:49 -0700 (PDT)
-Received: from ?IPV6:2a03:83e0:1151:15:102c:2ede:cf31:2f66? ([2620:10d:c090:500::5:fad8])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73bb1e38569sm2061690b3a.93.2025.04.09.17.18.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Apr 2025 17:18:48 -0700 (PDT)
-Message-ID: <0a5fee34-5798-49f5-af3f-c6e56987da62@gmail.com>
-Date: Wed, 9 Apr 2025 17:18:46 -0700
+	s=arc-20240116; t=1744245597; c=relaxed/simple;
+	bh=ZIaPaVr3yCGe2ScrihZRTGX11470A1far/aq1foYG+0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=HWxamzuDdoT7ybs0OHt0PsHQhEldms961PJRuItZlSc//FtMUeVWuvUZ3BD4kFUVdc7X6du/ixD2c6v4D2o0lXJwPMzUEYseGTh0ONTjRYG4V59lxacm85gYbOblSHOmqLsBPBtZ/0uftMrWTJAC9AFBA9inGQlHLPx0TPoWk7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ebmaNGaP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FA2BC4CEE2;
+	Thu, 10 Apr 2025 00:39:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744245597;
+	bh=ZIaPaVr3yCGe2ScrihZRTGX11470A1far/aq1foYG+0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ebmaNGaPFO7FbxHqfwLh/luCP3eV+mUI+WZeF3p2RU8F1ZxaOiSxBolHwXjxcCnLC
+	 7PUFg2H8bAFHv/e4qS3MMAxSCZduWMM1dZu+i7ewIbt3hZ0WN+DfpaE/UbFdkKwp5h
+	 y35otRQHZ9VBMYhpFeFZjxnECvv/F5NgomfTYw8KO47TDYQRtCuz64Na1unlQC8M3h
+	 43LQDEvDBiSdM8P8TxORhQyS0tQnLAuabSqXj3lI7Xr4Q1XDmfeYf95a916memxED9
+	 JnUBJytF096fCEknQYxoAHqm+HIbQb8tE76gqJw434H7y8pSXKuPgsFahraqlZzJsd
+	 Nvqi+qtRn0azA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB00638111E3;
+	Thu, 10 Apr 2025 00:40:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/5] eth: fbnic: add coverage for hw queue stats
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: alexanderduyck@fb.com, kuba@kernel.org, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, suhui@nfschina.com,
- sanman.p211993@gmail.com, vadim.fedorenko@linux.dev, horms@kernel.org,
- kalesh-anakkur.purayil@broadcom.com, kernel-team@meta.com
-References: <20250407172151.3802893-1-mohsin.bashr@gmail.com>
- <20250407172151.3802893-3-mohsin.bashr@gmail.com>
- <103301d3-4c38-428d-aa31-501654064183@redhat.com>
-Content-Language: en-US
-From: Mohsin Bashir <mohsin.bashr@gmail.com>
-In-Reply-To: <103301d3-4c38-428d-aa31-501654064183@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 0/8] net: depend on instance lock for queue
+ related netlink ops
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174424563486.3092405.11629244278236026519.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Apr 2025 00:40:34 +0000
+References: <20250408195956.412733-1-kuba@kernel.org>
+In-Reply-To: <20250408195956.412733-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, sdf@fomichev.me,
+ hramamurthy@google.com, kuniyu@amazon.com, jdamato@fastly.com
 
->>   
->> +	for (i = 0; i < fbd->max_num_queues; i++) {
->> +		/* Report packets dropped due to CQ/BDQ being full/empty */
->> +		rx_over += fbd->hw_stats.hw_q[i].rde_pkt_cq_drop.value;
->> +		rx_over += fbd->hw_stats.hw_q[i].rde_pkt_bdq_drop.value;
-> 
-> I'm possibly missing something, but AFAICS the above statements can be
-> executed without any lock held. Another thread can concurrently call
-> fbnic_get_hw_stats() leading to an inconsistent snapshot.
-> 
-> Should fbnic_get_hw_stats() store the values in a local(ly allocated)
-> struct?
-> 
+Hello:
 
-Thanks for pointing it out. You are right. Let me fix and resubmit.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue,  8 Apr 2025 12:59:47 -0700 you wrote:
+> netdev-genl used to be protected by rtnl_lock. In previous release
+> we already switched the queue management ops (for Rx zero-copy) to
+> the instance lock. This series converts other ops to depend on the
+> instance lock when possible.
+> 
+> Unfortunately queue related state is hard to lock (unlike NAPI)
+> as the process of switching the number of queues usually involves
+> a large reconfiguration of the driver. The reconfig process has
+> historically been under rtnl_lock, but for drivers which opt into
+> ops locking it is also under the instance lock. Leverage that
+> and conditionally take rtnl_lock or instance lock depending
+> on the device capabilities.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v2,1/8] net: avoid potential race between netdev_get_by_index_lock() and netns switch
+    (no matching commit)
+  - [net-next,v2,2/8] net: designate XSK pool pointers in queues as "ops protected"
+    https://git.kernel.org/netdev/net-next/c/606048cbd834
+  - [net-next,v2,3/8] netdev: add "ops compat locking" helpers
+    (no matching commit)
+  - [net-next,v2,4/8] netdev: don't hold rtnl_lock over nl queue info get when possible
+    https://git.kernel.org/netdev/net-next/c/d02e3b388221
+  - [net-next,v2,5/8] xdp: double protect netdev->xdp_flags with netdev->lock
+    (no matching commit)
+  - [net-next,v2,6/8] netdev: depend on netdev->lock for xdp features
+    https://git.kernel.org/netdev/net-next/c/99e44f39a8f7
+  - [net-next,v2,7/8] docs: netdev: break down the instance locking info per ops struct
+    https://git.kernel.org/netdev/net-next/c/87eba404f2e1
+  - [net-next,v2,8/8] netdev: depend on netdev->lock for qstats in ops locked drivers
+    https://git.kernel.org/netdev/net-next/c/ce7b14947484
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
