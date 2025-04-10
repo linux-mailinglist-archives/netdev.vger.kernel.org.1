@@ -1,117 +1,156 @@
-Return-Path: <netdev+bounces-181258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BF02A84339
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:35:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED0F9A84360
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:40:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE59E19E8E99
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:35:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 423524C3893
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:37:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BC3128A40C;
-	Thu, 10 Apr 2025 12:34:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5358328540A;
+	Thu, 10 Apr 2025 12:36:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JYwnzj1z"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wEi6qI4w"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3CCC2853EC;
-	Thu, 10 Apr 2025 12:34:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D379285414;
+	Thu, 10 Apr 2025 12:36:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744288443; cv=none; b=df9IomnWl/Do4s188EUkeCWrIiqmOUCTHfNB9l9gA67FR5LEm67x4RIa9LoB1RHUGeW5/GgmySTxEmR9VKyuNy1koRhFXLP5GQuxTtpD4CV8gOLwwNLWlNGWA48bilxI6Wb1NciEwaDrnhpUqJ7TtRuv+Zrc9L+rTxEYLXFbUMk=
+	t=1744288598; cv=none; b=FxZT1Hly8M6CdcYH4qKtaWveBsMRS5drywXcn6Bi1ag0ZzTX5lJkCR1A5u0Y7Bn+jwbAplcJYwxX3kHAEQ17dDdCkjAatjtuxzQEd+9Kgg8VX5iRx90aisw1tzM7xmVDEmJrGN8RxEMxfvbDTf+0PwV6YcKOLmzrH4swJSo62e0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744288443; c=relaxed/simple;
-	bh=3I121XF2fMBchfmtwI8JGkIY0Sv+AhGwwxBQpzUsKSA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qxk32/BeBFXnJKkGBfRW9qi21eh2F4GyRz2/Me9Js17Nj2LirmEPY0ZOYgIjZnPEF0xuqfXOYomC8t78iiej3120FQFCSoIsSI2OdVyCiSRqP17O5TcWuesoFGViQVg0xQWac9PDj0CuD3soFP1ipAHz0WhDNQ3VGHfZsjzBv4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JYwnzj1z; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D97F14433A;
-	Thu, 10 Apr 2025 12:33:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1744288438;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=836dXAW5BQEuD0IbtlpXEx1xy09kQKLZHvAT71eDZnY=;
-	b=JYwnzj1zI3aDS1cak+ToJdFssF7eO483/rRSeVqeCaEmF7c+l2CP51HP800fW0o2y9Yq3y
-	VwfQvJT3wAV1sjYbBE8TsUvp6sVSNvRvjzXlqRGbYVXVI+Ko7DRs68GSAXcoB5AtcesF3V
-	wCBaVbJLcgpxI8enQaSv12Ijl5HkAQV6Tzbmj9Rb/wvJgONNm9Wch4Bn5NsshEAXbFKaXm
-	OnoOtkcTZW4UOJ8fZd7H/3X7fObtZZwR+cj4D5nmdQ/mxryhnyUhlMDOBR/K7B4tYhKcrc
-	BPkBsLnxO26K0eLf+uVUBn5YweiEZFE8Jm9ULSVDveTkcXr24DU+oLrzZdiy6g==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
+	s=arc-20240116; t=1744288598; c=relaxed/simple;
+	bh=Axve0jiGvbbIsMkn4WSCs6R1ZOyKIjneErr6ing8AQM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UCafNkqpofQehk3LB2N5k06Iar/KnZjNS465N5xmMM9XKLR4wqR9fwooGWnAqu23zRUpagTrjptytnqARri3P2pfsYM7P4XhjL8kAZqgxo/8bl9akPWKpqiWGhZ0nWExXufpWaVMxKvyx8VLLpFOB73WupdsLtB1568nYw4TAbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wEi6qI4w; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=5oq1WjVLXQxQtBKLB02vbt6Nr9HYhm9Q4TxypjuqpOM=; b=wEi6qI4wn7j/qN+3YBFE6U6Wm5
+	aqKQ/4N7St+Nowbxk6Huipm6SpBcEzxCcGTVfhnZMW0zxtzKSUpgit8BsSmDzDdR/JYFugTwZpBhj
+	u2xNHgTYehH5XbkQzRnBPQRnUQ316oMyXcTg7eGSEWDY0Als90166bWyvCpZP3uicWqE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u2r8s-008gA9-Nb; Thu, 10 Apr 2025 14:36:26 +0200
+Date: Thu, 10 Apr 2025 14:36:26 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>
-Subject: [PATCH net-next v5 4/4] net: ethtool: pse-pd: Use per-PHY DUMP operations
-Date: Thu, 10 Apr 2025 14:33:49 +0200
-Message-ID: <20250410123350.174105-5-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250410123350.174105-1-maxime.chevallier@bootlin.com>
-References: <20250410123350.174105-1-maxime.chevallier@bootlin.com>
+	Andrew Morton <akpm@linux-foundation.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] net: add debugfs files for showing netns refcount
+ tracking info
+Message-ID: <1e717326-8551-419e-b185-5cfb20573b4f@lunn.ch>
+References: <20250408-netns-debugfs-v2-0-ca267f51461e@kernel.org>
+ <20250408-netns-debugfs-v2-2-ca267f51461e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtdekledvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepveegtdffleffleevueellefgjeefvedvjefhheegfefgffdvfeetgeevudetffdtnecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvddupdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmr
- giivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250408-netns-debugfs-v2-2-ca267f51461e@kernel.org>
 
-Leverage the per-phy ethnl DUMP helpers in case we have more that one
-PSE PHY on the link.
+On Tue, Apr 08, 2025 at 09:36:38AM -0400, Jeff Layton wrote:
+> CONFIG_NET_NS_REFCNT_TRACKER currently has no convenient way to display
+> its tracking info. Add a new net_ns directory under the debugfs
+> ref_tracker directory. Create a directory in there for every netns, with
+> refcnt and notrefcnt files that show the currently tracked active and
+> passive references.
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- net/ethtool/netlink.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+I think most if not all of this should be moved into the tracker
+sources, there is very little which is netdev specific. 
 
-diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
-index dd4eaa77dd8c..7186c465f429 100644
---- a/net/ethtool/netlink.c
-+++ b/net/ethtool/netlink.c
-@@ -1361,9 +1361,9 @@ static const struct genl_ops ethtool_genl_ops[] = {
- 	{
- 		.cmd	= ETHTOOL_MSG_PSE_GET,
- 		.doit	= ethnl_default_doit,
--		.start	= ethnl_default_start,
--		.dumpit	= ethnl_default_dumpit,
--		.done	= ethnl_default_done,
-+		.start	= ethnl_perphy_start,
-+		.dumpit	= ethnl_perphy_dumpit,
-+		.done	= ethnl_perphy_done,
- 		.policy = ethnl_pse_get_policy,
- 		.maxattr = ARRAY_SIZE(ethnl_pse_get_policy) - 1,
- 	},
--- 
-2.49.0
+> 
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> ---
+>  net/core/net_namespace.c | 151 +++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 151 insertions(+)
+> 
+> diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+> index 4303f2a4926243e2c0ff0c0387383cd8e0658019..7e9dc487f46d656ee4ae3d6d18d35bb2aba2b176 100644
+> --- a/net/core/net_namespace.c
+> +++ b/net/core/net_namespace.c
+> @@ -1512,3 +1512,154 @@ const struct proc_ns_operations netns_operations = {
+>  	.owner		= netns_owner,
+>  };
+>  #endif
+> +
+> +#ifdef CONFIG_DEBUG_FS
+> +#ifdef CONFIG_NET_NS_REFCNT_TRACKER
+> +
+> +#include <linux/debugfs.h>
+> +
+> +static struct dentry *ns_ref_tracker_dir;
+> +static unsigned int ns_debug_net_id;
+> +
+> +struct ns_debug_net {
+> +	struct dentry *netdir;
+> +	struct dentry *refcnt;
+> +	struct dentry *notrefcnt;
+> +};
+> +
+> +#define MAX_NS_DEBUG_BUFSIZE	(32 * PAGE_SIZE)
+> +
+> +static int
+> +ns_debug_tracker_show(struct seq_file *f, void *v)
+> +{
+> +	struct ref_tracker_dir *tracker = f->private;
+> +	int len, bufsize = PAGE_SIZE;
+> +	char *buf;
+> +
+> +	for (;;) {
+> +		buf = kvmalloc(bufsize, GFP_KERNEL);
+> +		if (!buf)
+> +			return -ENOMEM;
+> +
+> +		len = ref_tracker_dir_snprint(tracker, buf, bufsize);
+> +		if (len < bufsize)
+> +			break;
+> +
+> +		kvfree(buf);
+> +		bufsize *= 2;
+> +		if (bufsize > MAX_NS_DEBUG_BUFSIZE)
+> +			return -ENOBUFS;
 
+Maybe consider storing bufsize between calls to dump the tracker? I
+guess you then have about the correct size for most calls, and from
+looking at len, you can decide to downsize it if needed.
+
+> +static int
+> +ns_debug_init_net(struct net *net)
+> +{
+> +	struct ns_debug_net *dnet = net_generic(net, ns_debug_net_id);
+> +	char name[11]; /* 10 decimal digits + NULL term */
+> +	int len;
+> +
+> +	len = snprintf(name, sizeof(name), "%u", net->ns.inum);
+> +	if (len >= sizeof(name))
+> +		return -EOVERFLOW;
+> +
+> +	dnet->netdir = debugfs_create_dir(name, ns_ref_tracker_dir);
+> +	if (IS_ERR(dnet->netdir))
+> +		return PTR_ERR(dnet->netdir);
+
+As i pointed out before, the tracker already has a name. Is that name
+useless? Not specific enough? Rather than having two names, maybe
+change the name to make it useful. Once it has a usable name, you
+should be able to push more code into the core.
+
+       Andrew
 
