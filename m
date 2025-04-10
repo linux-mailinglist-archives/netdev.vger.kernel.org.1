@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-180988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B69BAA835E6
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 03:47:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F097CA835E7
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 03:47:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04EF93B2F0E
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 01:47:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD306464A62
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 01:47:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD533193077;
-	Thu, 10 Apr 2025 01:47:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79DE91C1F13;
+	Thu, 10 Apr 2025 01:47:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JlJucMLO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UevNFDt/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85611494DB
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5419A1B4F0F
 	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 01:47:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744249631; cv=none; b=eHYNcab4HyRWZ3oMQlKTQbkiLpd8hl6oPwpPFqvRrxtav3ebnY5FHVDh4MReVSPjI5ypV0RQB0ht/l4lSAS7GqC+VZK5LDa4NntSoZ66K7QUPN7GF/pYv90zjGcTkXeAVvjHbP+4UxrG4sUo0C4Fy9cAU9Z0dlq97k5bHaNJqo0=
+	t=1744249632; cv=none; b=M22ShC/bG7XVGN0kJ6qto5XL/vUjzlCvxv1cbXtFkn/EAM1oQJOA9g9xk72fNzh1egrovJZxHXiE/7QiVR7MdPhEYPKFQv6gi2WI8ENV5c20+hTmPhqDlS3fZb0GFZzL1E5qHKi3QhOstJBDUbeS9IMTwdGF9TTo+Ebkivbgvo0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744249631; c=relaxed/simple;
-	bh=+HD3W9jEdp9+lfCLfeo8WLJiA7wEXd8+3tAfzLedAh4=;
+	s=arc-20240116; t=1744249632; c=relaxed/simple;
+	bh=isnKNCougcLmJ5pvVmLSxorQwWo1xGQ1wqKfgVLr7Ic=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=meF9VIeJ+G/3aLkXDOS2VdE88cB9y7rk9L5qWhP3QWJLbIS6hfSEPp61C2hwICSxxfRC6CMrTp0xrxS/9e6DuuJg9yGtdavqjfgZYtTJcrx8Q3A4LRrYpXiWh27giKGzxCmiuwuBSRZaEApLbHRbKmGcD4dxz0vnB3NGDgPuf6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JlJucMLO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF5BCC4CEEB;
-	Thu, 10 Apr 2025 01:47:10 +0000 (UTC)
+	 MIME-Version; b=AV/gJvRO6ybLomZdZ0jDRrx5kbEonpbWsqZ2Cjx1d0+NYrMyApB+cAKAgZmp+jJHjmn8D57CXviwhw8UI4B/cKdqbcmE0Qk5bsDdtnCUX6DCe3Pc8oo8FkNxLg6CITM5eu5H0Ogw69r1hh7sPfIdRcDnw2B8Gho/MbeDo8vrfqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UevNFDt/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68615C4CEEA;
+	Thu, 10 Apr 2025 01:47:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1744249631;
-	bh=+HD3W9jEdp9+lfCLfeo8WLJiA7wEXd8+3tAfzLedAh4=;
+	bh=isnKNCougcLmJ5pvVmLSxorQwWo1xGQ1wqKfgVLr7Ic=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JlJucMLO8xKB9rsQrz5WYhMcVMFoSR4zIZX0kbLUoy+p5v3LwvdaAiQkmmy9aLNUi
-	 08NcdvlWZM27NndpczLEu7uqtufHkK4AUSrbVJQx6B/QhThiEtAowdc64ajZr+E8he
-	 0fmJgEMuPHf3Cv4jYUTIt79IkhUdd5Rr9nqVmqeUWKdxnwQiBIxjVMXZ2FgszI9HFQ
-	 0K1OjtOaDU0Nj/5qSOyKnBj2+gLInV/7BH3v0vK4Z6paLPUXr3D+o5AybHh4HQWCy3
-	 26cjpM4A2WTgnDZYUDawa5AU1BayWcQmo5brZdZEGDp8BaPCKPdDDICWvgkK1B06ZX
-	 +67ZIRUsla6gQ==
+	b=UevNFDt/Xk1rwwhAZKoTkJcOUkzMbUoYxi9VdVNcPuhfnfMNfyUZjTLqUJznPDrqE
+	 qQoOWJWj5TFDdZbUzq9HKhqvsV0cIGziByjTRIYGldjwN3dXxO4PXq7CxI6niZoL1C
+	 HEfWc1LtWa6CMjlisMNk4V8mIGp/Y5au8XQf9A4dljOivfyFEpWhUjOLU5VEpQfGpf
+	 6o2VfSNLrifqON+K3NI7JxzW8Lll2MqZ8WRU3OJI+hHzGqWoUzVWXaT199cKyOTa0q
+	 wzH2/hpayuyia1k895oyqyvPlw1JOCL/l4PTdV0xWtbq4uf56Jvhgt11zhN9iqJ4z7
+	 5US8Zv7YdVyOQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -56,9 +56,9 @@ Cc: netdev@vger.kernel.org,
 	nicolas.dichtel@6wind.com,
 	petrm@nvidia.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 01/13] netlink: specs: rename rtnetlink specs in accordance with family name
-Date: Wed,  9 Apr 2025 18:46:46 -0700
-Message-ID: <20250410014658.782120-2-kuba@kernel.org>
+Subject: [PATCH net-next v2 02/13] netlink: specs: rt-route: specify fixed-header at operations level
+Date: Wed,  9 Apr 2025 18:46:47 -0700
+Message-ID: <20250410014658.782120-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250410014658.782120-1-kuba@kernel.org>
 References: <20250410014658.782120-1-kuba@kernel.org>
@@ -70,95 +70,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The rtnetlink family names are set to rt-$name within the YAML
-but the files are called rt_$name. C codegen assumes that the
-generated file name will match the family. The use of dashes
-is in line with our general expectation that name properties
-in the spec use dashes not underscores (even tho, as Donald
-points out most genl families use underscores in the name).
-
-We have 3 un-ideal options to choose from:
-
- - accept the slight inconsistency with old families using _, or
- - accept the slight annoyance with all languages having to do s/-/_/
-   when looking up family ID, or
- - accept the inconsistency with all name properties in new YAML spec
-   being separated with - and just the family name always using _.
-
-Pick option 1 and rename the rtnl spec files.
+The C codegen currently stores the fixed-header as part of family
+info, so it only supports one fixed-header type per spec. Luckily
+all rtm route message have the same fixed header so just move it up
+to the higher level.
 
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-v2: extend commit msg
----
- Documentation/netlink/specs/{rt_addr.yaml => rt-addr.yaml}   | 0
- Documentation/netlink/specs/{rt_link.yaml => rt-link.yaml}   | 0
- Documentation/netlink/specs/{rt_neigh.yaml => rt-neigh.yaml} | 0
- Documentation/netlink/specs/{rt_route.yaml => rt-route.yaml} | 0
- Documentation/netlink/specs/{rt_rule.yaml => rt-rule.yaml}   | 0
- Documentation/userspace-api/netlink/netlink-raw.rst          | 2 +-
- tools/testing/selftests/net/lib/py/ynl.py                    | 4 ++--
- 7 files changed, 3 insertions(+), 3 deletions(-)
- rename Documentation/netlink/specs/{rt_addr.yaml => rt-addr.yaml} (100%)
- rename Documentation/netlink/specs/{rt_link.yaml => rt-link.yaml} (100%)
- rename Documentation/netlink/specs/{rt_neigh.yaml => rt-neigh.yaml} (100%)
- rename Documentation/netlink/specs/{rt_route.yaml => rt-route.yaml} (100%)
- rename Documentation/netlink/specs/{rt_rule.yaml => rt-rule.yaml} (100%)
+ Documentation/netlink/specs/rt-route.yaml | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/Documentation/netlink/specs/rt_addr.yaml b/Documentation/netlink/specs/rt-addr.yaml
-similarity index 100%
-rename from Documentation/netlink/specs/rt_addr.yaml
-rename to Documentation/netlink/specs/rt-addr.yaml
-diff --git a/Documentation/netlink/specs/rt_link.yaml b/Documentation/netlink/specs/rt-link.yaml
-similarity index 100%
-rename from Documentation/netlink/specs/rt_link.yaml
-rename to Documentation/netlink/specs/rt-link.yaml
-diff --git a/Documentation/netlink/specs/rt_neigh.yaml b/Documentation/netlink/specs/rt-neigh.yaml
-similarity index 100%
-rename from Documentation/netlink/specs/rt_neigh.yaml
-rename to Documentation/netlink/specs/rt-neigh.yaml
-diff --git a/Documentation/netlink/specs/rt_route.yaml b/Documentation/netlink/specs/rt-route.yaml
-similarity index 100%
-rename from Documentation/netlink/specs/rt_route.yaml
-rename to Documentation/netlink/specs/rt-route.yaml
-diff --git a/Documentation/netlink/specs/rt_rule.yaml b/Documentation/netlink/specs/rt-rule.yaml
-similarity index 100%
-rename from Documentation/netlink/specs/rt_rule.yaml
-rename to Documentation/netlink/specs/rt-rule.yaml
-diff --git a/Documentation/userspace-api/netlink/netlink-raw.rst b/Documentation/userspace-api/netlink/netlink-raw.rst
-index 1990eea772d0..31fc91020eb3 100644
---- a/Documentation/userspace-api/netlink/netlink-raw.rst
-+++ b/Documentation/userspace-api/netlink/netlink-raw.rst
-@@ -62,7 +62,7 @@ Sub-messages
- ------------
+diff --git a/Documentation/netlink/specs/rt-route.yaml b/Documentation/netlink/specs/rt-route.yaml
+index 292469c7d4b9..6fa3fa24305e 100644
+--- a/Documentation/netlink/specs/rt-route.yaml
++++ b/Documentation/netlink/specs/rt-route.yaml
+@@ -245,12 +245,12 @@ protonum: 0
  
- Several raw netlink families such as
--:doc:`rt_link<../../networking/netlink_spec/rt_link>` and
-+:doc:`rt-link<../../networking/netlink_spec/rt-link>` and
- :doc:`tc<../../networking/netlink_spec/tc>` use attribute nesting as an
- abstraction to carry module specific information.
- 
-diff --git a/tools/testing/selftests/net/lib/py/ynl.py b/tools/testing/selftests/net/lib/py/ynl.py
-index 8986c584cb37..6329ae805abf 100644
---- a/tools/testing/selftests/net/lib/py/ynl.py
-+++ b/tools/testing/selftests/net/lib/py/ynl.py
-@@ -39,12 +39,12 @@ from .ksft import ksft_pr, ktap_result
- 
- class RtnlFamily(YnlFamily):
-     def __init__(self, recv_size=0):
--        super().__init__((SPEC_PATH / Path('rt_link.yaml')).as_posix(),
-+        super().__init__((SPEC_PATH / Path('rt-link.yaml')).as_posix(),
-                          schema='', recv_size=recv_size)
- 
- class RtnlAddrFamily(YnlFamily):
-     def __init__(self, recv_size=0):
--        super().__init__((SPEC_PATH / Path('rt_addr.yaml')).as_posix(),
-+        super().__init__((SPEC_PATH / Path('rt-addr.yaml')).as_posix(),
-                          schema='', recv_size=recv_size)
- 
- class NetdevFamily(YnlFamily):
+ operations:
+   enum-model: directional
++  fixed-header: rtmsg
+   list:
+     -
+       name: getroute
+       doc: Dump route information.
+       attribute-set: route-attrs
+-      fixed-header: rtmsg
+       do:
+         request:
+           value: 26
+@@ -320,7 +320,6 @@ protonum: 0
+       name: newroute
+       doc: Create a new route
+       attribute-set: route-attrs
+-      fixed-header: rtmsg
+       do:
+         request:
+           value: 24
+@@ -329,7 +328,6 @@ protonum: 0
+       name: delroute
+       doc: Delete an existing route
+       attribute-set: route-attrs
+-      fixed-header: rtmsg
+       do:
+         request:
+           value: 25
 -- 
 2.49.0
 
