@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-181087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B920A83A5E
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 09:10:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACAB2A83A72
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 09:13:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C85331B82735
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 07:09:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4C6E8C52F9
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 07:09:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B5D62045B0;
-	Thu, 10 Apr 2025 07:09:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8A90204C14;
+	Thu, 10 Apr 2025 07:09:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VjAQj7TR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CPow/a5P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFFBD204C14
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 07:09:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6643204C3C
+	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 07:09:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744268981; cv=none; b=BV+RjuNSpfqmAq8RPh0Pw/Q+MHxdE0gQ6dgoGAGfpk7DPoG7Q5cNSQqhxoVHRYnwPBGLH0w7i7EEF1vVl3z3gnqJ5Uyr9VDXpXxD6YaYoqrJ4/0wAKI4Mw/E+hhH8OzwgTSBCuAPFUWTy4gzwFYsKv/ZKVP/2N/fNpfYxgT876Q=
+	t=1744268983; cv=none; b=jAl1W9Ut0Olk73olF9yVugssOrOhcwf5iD78BzhyHWeWvWpprwaerUzpXcy7fjRP2FbEir+7mQNhvUoxiWWyxIgamNIQNa6jeaMPthr9IdkGUHdiBYW+fsRQtlyQvrS/YWRW76Xe5XNno+IfJUwpf8JJPcAJLrG8uVhzKdF36/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744268981; c=relaxed/simple;
-	bh=twmxLOniMqpJYiahMn2vTkQH09dQjxfCm2AdhMBW1sU=;
+	s=arc-20240116; t=1744268983; c=relaxed/simple;
+	bh=8vzmveTwXWZn4nZaYw5YL6CNieBIdBrZO1rG66Nexe4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dxjyIhyDPyrtVO9LBeDVm9WU7oTUOjAIhUN57+XsMtxsFNhjvdW/QYhbPOLgI/bMYFaIKf6ff9w3Xu8PC0Jibxygft2fEXVNm2u6vOgbQ5trokkrxsaaiS2NWpvJw7byCWBPaNm2aNdO2JuUnF7p1jApw8DLFfe5eA/2BH7PfG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VjAQj7TR; arc=none smtp.client-ip=209.85.221.43
+	 MIME-Version; b=BlGS+c3a1qEaLS7kHV4GK3TazAPvLBpYnuLbII8dfe0cyHrfOGerELZqO0UR/0wQ4QMA1KQDtLIc5184fd9Oz/XAcx8JEd2zxKIZwdXrFkwdv3CwYn8sKw4Q9l8qONvat3f9iQgU90lQo5MgF0xPAw7uLdSGvvuT2f8rqx6/QPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CPow/a5P; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-39c31e4c3e5so225277f8f.0
-        for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 00:09:38 -0700 (PDT)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-43edecbfb94so5356525e9.1
+        for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 00:09:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744268976; x=1744873776; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1744268979; x=1744873779; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hxMMLXa3xZFAJENCUVmYSmi8zhnkjZvyHs2Cc3FojUA=;
-        b=VjAQj7TRWiHEL6oE3cx7tIHGQomSaz0X2PgWkVzpwUDWKTEnwLRzIApo8acGvSXpRk
-         i3k/AsIJtofqySSMhBawU2rB0hRdQrv/StTSKWOc1a7XW90J+4ijBAW6dEeL/zfAwf8e
-         2KFYYSL2Zok2QPX5BEY5VtCHIaSgpwk03pDvxvSiGkM9KrBE2Qtjr16VsqPJ50cs2kF6
-         de/g7dszmtSPMjDQ/F8jVAGYTc2Rqua8ByW573Y+saRp2AwuBpEzneLIuRh0J0iC/Z7+
-         lm46ub50xbsqtTrJpdZ6yLO8PLQc/Z1oYOAWxxV2yh+8GWqTatYZvUxTtZCU50pZQr6B
-         at+w==
+        bh=m+FdyvwWte9fQ+zlYmpZxgQpsgup+t9GWDZcE3v6yyA=;
+        b=CPow/a5PJzAr4yoA6PaRy0V59Sj9M/ABJ/4AXgIURSXvC46CSTCCUVozOLYuskmtpj
+         XBmyeMwLcbWb8+0M0mzCbupOl7SlvG9i9AAVchZNsYFmORMm1PUA5aKmMT7YcVvbeFIs
+         t0X/eL/Sem0L9EIkzPGYxNVd9UxnrUSI4wIXlHIjW4JAx/zNCKPpyQHVL9QFN5PUdRx5
+         e4okiqFBvCerhNzGWwH209RjWzK2Bj/IE+0/gK5PHbG87cn/Xm7dQBPRSp+YISXCo5zK
+         mX+ZeKCOAcG5WzORamub6X4Q5WMj1qxDV8GQOMN0+TrxgVWuixAAtyqFWpOqq42dCeb7
+         kEYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744268976; x=1744873776;
+        d=1e100.net; s=20230601; t=1744268979; x=1744873779;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hxMMLXa3xZFAJENCUVmYSmi8zhnkjZvyHs2Cc3FojUA=;
-        b=P5JE3axmVXKA3pWZqKf7sjZeVzgoA/Gw+ZgaP158K22ba1WAiiXJ0fc/6/TDvi6Oz1
-         VBnHHoosBOCe+CPuGZDx6mRFabQpNm3L3ktzIjQOl4jfZScdCN5OKpBCOP/nzinaxBrv
-         4eCEaN1fi8QeCeKQnV9uqwHZPRywYj3nmjbxNZ0WGSDz8EIzZD1m/kYc4woWyV4a7omZ
-         oLEk/MuJn64brU4CIJ9EgKVq5bQN1sKhllc/+Ir52de0XMRtOa0pyNbMMx5+oVlxy23b
-         ZacSpU27GUKN5mjAGUqhYbNzT8A+C/hzMJYPN2MxB786pRtwvW4ex5oS1dhGvia4uqTm
-         usBg==
-X-Gm-Message-State: AOJu0Yy6UDLbONUHYQSqpBfCpxtQqzaOOwDvwb3T5qpQ7kvdkmzZ5SI7
-	SorDe3zzedyHdPWGFf/BE7Nzd1GPL4vKIPkQ0S2GC6sEEzMZWaRd5TtmEZOU
-X-Gm-Gg: ASbGncvsPMoeV81/NxGI5K7Z6PfjRnt6tIuqNESVNRre8u4JasJdHp9h2VNgQ8zReRf
-	9fxoWd8grWohDtniL6UGw8X9z0jAuwYwCyTjfFMDAQWZc4xbtgLDJn7vJVc0dtGpKoV+lIXzE+H
-	9LhFNHJB5bjS0qqm/2f54R1p7W/4GQ9b4uMotJJ76HX8JijVXICrxf3BJjN+Soh20/JiYglbuHz
-	rTEWzakwXBsBIopxFO3j0hhlnw5iHRwEyGqjvlHVNQccQqpvz6SC34mozBLNIzVFHB7iZHhaJdJ
-	tbv5YGJqePSztEuKXs0SmXjAdSeafsxw42I=
-X-Google-Smtp-Source: AGHT+IGWo1fdfveid8WFBs862TFUgCyLpAJyuhLA7UEvBCb8GA7cg1NvmRhnkyokGaUSsMZKjdotJQ==
-X-Received: by 2002:a5d:584d:0:b0:39c:1257:c7a2 with SMTP id ffacd0b85a97d-39d8f4fa815mr1089441f8f.58.1744268976210;
-        Thu, 10 Apr 2025 00:09:36 -0700 (PDT)
+        bh=m+FdyvwWte9fQ+zlYmpZxgQpsgup+t9GWDZcE3v6yyA=;
+        b=XbyrMnEIt/xnt4KIFuaCLmBHcIzU/LHVXmJDxW2MCUmfZit6fTlzJ2S5Or7XybubsJ
+         yT33SnGhybyPg1E4KXG5l5RdVTDU0LNW037C54So1L7cdISrdNLTYGlyvnWY7V5Adobk
+         D++tTV/+VMn0buurC55hrg1a2cB05Fx2mOgiQfSlWETBdBiG81obKG7osr4kWemoTUMm
+         AuTIbsl5ulC1X6lu1r83I+OPZKyS1f1zjQXsSebGnTB8YhhrosHdWH6yj87f5UcZgA4O
+         XltFy/PtoQy+Grgrd9ZTrVnvraEqj3YH1FS1kbCc+75y3Q1wMIhvzGq6kGpeMWzE4D66
+         toIw==
+X-Gm-Message-State: AOJu0YyOCqqPuwQkMhDYXx/ZmGV3EO1neQTPzTOyK8SN2huI5uymdQFF
+	mCMODvd/HTtaQxDdlEvjS9npRpZkIVgUmxcMT8vnlgnzh0nMVbJBu5AlHXRo
+X-Gm-Gg: ASbGncuTgSo8VEjRWOekUsMJoUjaXjmRHTlr7dOglL3Vdxxh6CCXafuhbHlA+te8ven
+	a3Qj4O6bjiKC8CBtKrV3fqdc/dsXOkZp7pBUpwQVyhfHtqHKqYGxVDFJbqd/umn8axnTKkkvDy5
+	Wn2Tj4jCM2gsp6N3UGU1CSndVctIH82sUetMkCCZkuitYSudEna/WeZg8a9b3ZVnZxCF2/0ipZx
+	MvKFXmS9u2Ocm4pwbDOvOztQmtk8KMkl9BGY1m0OBUR5Pr3LnvzXW/tppXj5k1uPQjDEp7ZDrll
+	8Q0VFOIDREzP/zt3uU0C8W2hfVY/bd56ITQ=
+X-Google-Smtp-Source: AGHT+IHIcbe00HafuxTiVPPwEiqqMpejOZYmCvn5ftTXFvSQzYxJh7cq6AFUwTa5+M2dd4+RxX1Tsw==
+X-Received: by 2002:a05:600c:a08d:b0:43c:f513:9585 with SMTP id 5b1f17b1804b1-43f2fedc717mr11162305e9.13.1744268978590;
+        Thu, 10 Apr 2025 00:09:38 -0700 (PDT)
 Received: from localhost ([2a03:2880:31ff::])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39d8938a4dasm3813512f8f.48.2025.04.10.00.09.35
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f235a5ec3sm41314255e9.39.2025.04.10.00.09.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Apr 2025 00:09:35 -0700 (PDT)
+        Thu, 10 Apr 2025 00:09:37 -0700 (PDT)
 From: Mohsin Bashir <mohsin.bashr@gmail.com>
 To: netdev@vger.kernel.org
 Cc: alexanderduyck@fb.com,
@@ -89,9 +89,9 @@ Cc: alexanderduyck@fb.com,
 	sanman.p211993@gmail.com,
 	sdf@fomichev.me,
 	vadim.fedorenko@linux.dev
-Subject: [PATCH net-next 3/5 V2] eth: fbnic: add coverage for RXB stats
-Date: Thu, 10 Apr 2025 00:08:57 -0700
-Message-ID: <20250410070859.4160768-4-mohsin.bashr@gmail.com>
+Subject: [PATCH net-next 4/5 V2] eth: fbnic: add support for TMI stats
+Date: Thu, 10 Apr 2025 00:08:58 -0700
+Message-ID: <20250410070859.4160768-5-mohsin.bashr@gmail.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250410070859.4160768-1-mohsin.bashr@gmail.com>
 References: <20250410070859.4160768-1-mohsin.bashr@gmail.com>
@@ -103,543 +103,187 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch provides coverage to the RXB (RX Buffer) stats. RXB stats
-are divided into 3 sections: RXB enqueue, RXB FIFO, and RXB dequeue
+This patch add coverage for TMI stats including PTP stats and drop
 stats.
 
-The RXB enqueue/dequeue stats are indexed from 0-3 and cater for the
-input/output counters whereas, the RXB fifo stats are indexed from 0-7.
+PTP stats include illegal requests, bad timestamp and good timestamps.
+The bad timestamp and illegal request counters are reported under as
+`error` via `ethtool -T` Both these counters are individually being
+reported via `ethtool -S`
 
-The RXB also supports pause frame stats counters which we are leaving
-for a later patch.
+The good timestamp stats are being reported as `pkts` via `ethtool -T`
 
-ethtool -S eth0 | grep rxb
-     rxb_integrity_err0: 0
-     rxb_mac_err0: 0
-     rxb_parser_err0: 0
-     rxb_frm_err0: 0
-     rxb_drbo0_frames: 1433543
-     rxb_drbo0_bytes: 775949081
-     ---
-     ---
-     rxb_intf3_frames: 1195711
-     rxb_intf3_bytes: 739650210
-     rxb_pbuf3_frames: 1195711
-     rxb_pbuf3_bytes: 765948092
+ethtool -S eth0 | grep "ptp"
+     ptp_illegal_req: 0
+     ptp_good_ts: 0
+     ptp_bad_ts: 0
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- .../device_drivers/ethernet/meta/fbnic.rst    |  26 +++
- drivers/net/ethernet/meta/fbnic/fbnic_csr.h   |   8 +
- .../net/ethernet/meta/fbnic/fbnic_ethtool.c   | 110 +++++++++++
- .../net/ethernet/meta/fbnic/fbnic_hw_stats.c  | 171 ++++++++++++++++++
- .../net/ethernet/meta/fbnic/fbnic_hw_stats.h  |  28 +++
- .../net/ethernet/meta/fbnic/fbnic_netdev.c    |  14 +-
- 6 files changed, 356 insertions(+), 1 deletion(-)
+ .../device_drivers/ethernet/meta/fbnic.rst    |  7 ++++
+ drivers/net/ethernet/meta/fbnic/fbnic_csr.h   |  5 +++
+ .../net/ethernet/meta/fbnic/fbnic_ethtool.c   |  5 +++
+ .../net/ethernet/meta/fbnic/fbnic_hw_stats.c  | 34 +++++++++++++++++++
+ .../net/ethernet/meta/fbnic/fbnic_hw_stats.h  |  6 ++++
+ .../net/ethernet/meta/fbnic/fbnic_netdev.c    |  3 ++
+ 6 files changed, 60 insertions(+)
 
 diff --git a/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst b/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
-index bc7f2fef2875..8ba94ae95db9 100644
+index 8ba94ae95db9..02339818cb8d 100644
 --- a/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
 +++ b/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
-@@ -31,6 +31,32 @@ separate entry.
+@@ -31,6 +31,13 @@ separate entry.
  Statistics
  ----------
  
-+RXB (RX Buffer) Enqueue
-+~~~~~~~~~~~~~~~~~~~~~~~
++TX MAC Interface
++~~~~~~~~~~~~~~~~
 +
-+ - ``rxb_integrity_err[i]``: frames enqueued with integrity errors (e.g., multi-bit ECC errors) on RXB input i
-+ - ``rxb_mac_err[i]``: frames enqueued with MAC end-of-frame errors (e.g., bad FCS) on RXB input i
-+ - ``rxb_parser_err[i]``: frames experienced RPC parser errors
-+ - ``rxb_frm_err[i]``: frames experienced signaling errors (e.g., missing end-of-packet/start-of-packet) on RXB input i
-+ - ``rxb_drbo[i]_frames``: frames received at RXB input i
-+ - ``rxb_drbo[i]_bytes``: bytes received at RXB input i
++ - ``ptp_illegal_req``: packets sent to the NIC with PTP request bit set but routed to BMC/FW
++ - ``ptp_good_ts``: packets successfully routed to MAC with PTP request bit set
++ - ``ptp_bad_ts``: packets destined for MAC with PTP request bit set but aborted because of some error (e.g., DMA read error)
 +
-+RXB (RX Buffer) FIFO
-+~~~~~~~~~~~~~~~~~~~~
-+
-+ - ``rxb_fifo[i]_drop``: transitions into the drop state on RXB pool i
-+ - ``rxb_fifo[i]_dropped_frames``: frames dropped on RXB pool i
-+ - ``rxb_fifo[i]_ecn``: transitions into the ECN mark state on RXB pool i
-+ - ``rxb_fifo[i]_level``: current occupancy of RXB pool i
-+
-+RXB (RX Buffer) Dequeue
-+~~~~~~~~~~~~~~~~~~~~~~~
-+
-+   - ``rxb_intf[i]_frames``: frames sent to the output i
-+   - ``rxb_intf[i]_bytes``: bytes sent to the output i
-+   - ``rxb_pbuf[i]_frames``: frames sent to output i from the perspective of internal packet buffer
-+   - ``rxb_pbuf[i]_bytes``: bytes sent to output i from the perspective of internal packet buffer
-+
- RPC (Rx parser)
- ~~~~~~~~~~~~~~~
+ RXB (RX Buffer) Enqueue
+ ~~~~~~~~~~~~~~~~~~~~~~~
  
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-index ff5f68c7e73d..a554e0b2cfff 100644
+index a554e0b2cfff..9426f7f2e611 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-@@ -485,6 +485,14 @@ enum {
- 	FBNIC_RXB_FIFO_INDICES		= 8
- };
+@@ -432,6 +432,11 @@ enum {
+ #define FBNIC_TMI_SOP_PROT_CTRL		0x04400		/* 0x11000 */
+ #define FBNIC_TMI_DROP_CTRL		0x04401		/* 0x11004 */
+ #define FBNIC_TMI_DROP_CTRL_EN			CSR_BIT(0)
++#define FBNIC_TMI_DROP_PKTS		0x04402		/* 0x11008 */
++#define FBNIC_TMI_DROP_BYTE_L		0x04403		/* 0x1100c */
++#define FBNIC_TMI_ILLEGAL_PTP_REQS	0x04409		/* 0x11024 */
++#define FBNIC_TMI_GOOD_PTP_TS		0x0440a		/* 0x11028 */
++#define FBNIC_TMI_BAD_PTP_TS		0x0440b		/* 0x1102c */
+ #define FBNIC_CSR_END_TMI		0x0443f	/* CSR section delimiter */
  
-+enum {
-+	FBNIC_RXB_INTF_NET = 0,
-+	FBNIC_RXB_INTF_RBT = 1,
-+	/* Unused */
-+	/* Unused */
-+	FBNIC_RXB_INTF_INDICES	= 4
-+};
-+
- #define FBNIC_RXB_CT_SIZE(n)		(0x08000 + (n))	/* 0x20000 + 4*n */
- #define FBNIC_RXB_CT_SIZE_CNT			8
- #define FBNIC_RXB_CT_SIZE_HEADER		CSR_GENMASK(5, 0)
+ /* Precision Time Protocol Registers */
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-index 038e969f5ba3..816af96a5d5f 100644
+index 816af96a5d5f..7d421791033e 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-@@ -40,6 +40,47 @@ static const struct fbnic_stat fbnic_gstrings_hw_stats[] = {
+@@ -27,6 +27,11 @@ struct fbnic_stat {
+ 	FBNIC_STAT_FIELDS(fbnic_hw_stats, name, stat)
  
- #define FBNIC_HW_FIXED_STATS_LEN ARRAY_SIZE(fbnic_gstrings_hw_stats)
- 
-+#define FBNIC_RXB_ENQUEUE_STAT(name, stat) \
-+	FBNIC_STAT_FIELDS(fbnic_rxb_enqueue_stats, name, stat)
+ static const struct fbnic_stat fbnic_gstrings_hw_stats[] = {
++	/* TMI */
++	FBNIC_HW_STAT("ptp_illegal_req", tmi.ptp_illegal_req),
++	FBNIC_HW_STAT("ptp_good_ts", tmi.ptp_good_ts),
++	FBNIC_HW_STAT("ptp_bad_ts", tmi.ptp_bad_ts),
 +
-+static const struct fbnic_stat fbnic_gstrings_rxb_enqueue_stats[] = {
-+	FBNIC_RXB_ENQUEUE_STAT("rxb_integrity_err%u", integrity_err),
-+	FBNIC_RXB_ENQUEUE_STAT("rxb_mac_err%u", mac_err),
-+	FBNIC_RXB_ENQUEUE_STAT("rxb_parser_err%u", parser_err),
-+	FBNIC_RXB_ENQUEUE_STAT("rxb_frm_err%u", frm_err),
-+
-+	FBNIC_RXB_ENQUEUE_STAT("rxb_drbo%u_frames", drbo.frames),
-+	FBNIC_RXB_ENQUEUE_STAT("rxb_drbo%u_bytes", drbo.bytes),
-+};
-+
-+#define FBNIC_HW_RXB_ENQUEUE_STATS_LEN \
-+	ARRAY_SIZE(fbnic_gstrings_rxb_enqueue_stats)
-+
-+#define FBNIC_RXB_FIFO_STAT(name, stat) \
-+	FBNIC_STAT_FIELDS(fbnic_rxb_fifo_stats, name, stat)
-+
-+static const struct fbnic_stat fbnic_gstrings_rxb_fifo_stats[] = {
-+	FBNIC_RXB_FIFO_STAT("rxb_fifo%u_drop", trans_drop),
-+	FBNIC_RXB_FIFO_STAT("rxb_fifo%u_dropped_frames", drop.frames),
-+	FBNIC_RXB_FIFO_STAT("rxb_fifo%u_ecn", trans_ecn),
-+	FBNIC_RXB_FIFO_STAT("rxb_fifo%u_level", level),
-+};
-+
-+#define FBNIC_HW_RXB_FIFO_STATS_LEN ARRAY_SIZE(fbnic_gstrings_rxb_fifo_stats)
-+
-+#define FBNIC_RXB_DEQUEUE_STAT(name, stat) \
-+	FBNIC_STAT_FIELDS(fbnic_rxb_dequeue_stats, name, stat)
-+
-+static const struct fbnic_stat fbnic_gstrings_rxb_dequeue_stats[] = {
-+	FBNIC_RXB_DEQUEUE_STAT("rxb_intf%u_frames", intf.frames),
-+	FBNIC_RXB_DEQUEUE_STAT("rxb_intf%u_bytes", intf.bytes),
-+	FBNIC_RXB_DEQUEUE_STAT("rxb_pbuf%u_frames", pbuf.frames),
-+	FBNIC_RXB_DEQUEUE_STAT("rxb_pbuf%u_bytes", pbuf.bytes),
-+};
-+
-+#define FBNIC_HW_RXB_DEQUEUE_STATS_LEN \
-+	ARRAY_SIZE(fbnic_gstrings_rxb_dequeue_stats)
-+
- #define FBNIC_HW_Q_STAT(name, stat) \
- 	FBNIC_STAT_FIELDS(fbnic_hw_q_stats, name, stat.value)
- 
-@@ -52,6 +93,9 @@ static const struct fbnic_stat fbnic_gstrings_hw_q_stats[] = {
- #define FBNIC_HW_Q_STATS_LEN ARRAY_SIZE(fbnic_gstrings_hw_q_stats)
- #define FBNIC_HW_STATS_LEN \
- 	(FBNIC_HW_FIXED_STATS_LEN + \
-+	 FBNIC_HW_RXB_ENQUEUE_STATS_LEN * FBNIC_RXB_ENQUEUE_INDICES + \
-+	 FBNIC_HW_RXB_FIFO_STATS_LEN * FBNIC_RXB_FIFO_INDICES + \
-+	 FBNIC_HW_RXB_DEQUEUE_STATS_LEN * FBNIC_RXB_DEQUEUE_INDICES + \
- 	 FBNIC_HW_Q_STATS_LEN * FBNIC_MAX_QUEUES)
- 
- static void
-@@ -311,6 +355,36 @@ fbnic_set_ringparam(struct net_device *netdev, struct ethtool_ringparam *ring,
- 	return err;
- }
- 
-+static void fbnic_get_rxb_enqueue_strings(u8 **data, unsigned int idx)
-+{
-+	const struct fbnic_stat *stat;
-+	int i;
-+
-+	stat = fbnic_gstrings_rxb_enqueue_stats;
-+	for (i = 0; i < FBNIC_HW_RXB_ENQUEUE_STATS_LEN; i++, stat++)
-+		ethtool_sprintf(data, stat->string, idx);
-+}
-+
-+static void fbnic_get_rxb_fifo_strings(u8 **data, unsigned int idx)
-+{
-+	const struct fbnic_stat *stat;
-+	int i;
-+
-+	stat = fbnic_gstrings_rxb_fifo_stats;
-+	for (i = 0; i < FBNIC_HW_RXB_FIFO_STATS_LEN; i++, stat++)
-+		ethtool_sprintf(data, stat->string, idx);
-+}
-+
-+static void fbnic_get_rxb_dequeue_strings(u8 **data, unsigned int idx)
-+{
-+	const struct fbnic_stat *stat;
-+	int i;
-+
-+	stat = fbnic_gstrings_rxb_dequeue_stats;
-+	for (i = 0; i < FBNIC_HW_RXB_DEQUEUE_STATS_LEN; i++, stat++)
-+		ethtool_sprintf(data, stat->string, idx);
-+}
-+
- static void fbnic_get_strings(struct net_device *dev, u32 sset, u8 *data)
- {
- 	const struct fbnic_stat *stat;
-@@ -321,6 +395,15 @@ static void fbnic_get_strings(struct net_device *dev, u32 sset, u8 *data)
- 		for (i = 0; i < FBNIC_HW_FIXED_STATS_LEN; i++)
- 			ethtool_puts(&data, fbnic_gstrings_hw_stats[i].string);
- 
-+		for (i = 0; i < FBNIC_RXB_ENQUEUE_INDICES; i++)
-+			fbnic_get_rxb_enqueue_strings(&data, i);
-+
-+		for (i = 0; i < FBNIC_RXB_FIFO_INDICES; i++)
-+			fbnic_get_rxb_fifo_strings(&data, i);
-+
-+		for (i = 0; i < FBNIC_RXB_DEQUEUE_INDICES; i++)
-+			fbnic_get_rxb_dequeue_strings(&data, i);
-+
- 		for (idx = 0; idx < FBNIC_MAX_QUEUES; idx++) {
- 			stat = fbnic_gstrings_hw_q_stats;
- 
-@@ -357,6 +440,33 @@ static void fbnic_get_ethtool_stats(struct net_device *dev,
- 	fbnic_report_hw_stats(fbnic_gstrings_hw_stats, &fbd->hw_stats,
- 			      FBNIC_HW_FIXED_STATS_LEN, &data);
- 
-+	for (i = 0; i < FBNIC_RXB_ENQUEUE_INDICES; i++) {
-+		const struct fbnic_rxb_enqueue_stats *enq;
-+
-+		enq = &fbd->hw_stats.rxb.enq[i];
-+		fbnic_report_hw_stats(fbnic_gstrings_rxb_enqueue_stats,
-+				      enq, FBNIC_HW_RXB_ENQUEUE_STATS_LEN,
-+				      &data);
-+	}
-+
-+	for (i = 0; i < FBNIC_RXB_FIFO_INDICES; i++) {
-+		const struct fbnic_rxb_fifo_stats *fifo;
-+
-+		fifo = &fbd->hw_stats.rxb.fifo[i];
-+		fbnic_report_hw_stats(fbnic_gstrings_rxb_fifo_stats,
-+				      fifo, FBNIC_HW_RXB_FIFO_STATS_LEN,
-+				      &data);
-+	}
-+
-+	for (i = 0; i < FBNIC_RXB_DEQUEUE_INDICES; i++) {
-+		const struct fbnic_rxb_dequeue_stats *deq;
-+
-+		deq = &fbd->hw_stats.rxb.deq[i];
-+		fbnic_report_hw_stats(fbnic_gstrings_rxb_dequeue_stats,
-+				      deq, FBNIC_HW_RXB_DEQUEUE_STATS_LEN,
-+				      &data);
-+	}
-+
- 	for (i  = 0; i < FBNIC_MAX_QUEUES; i++) {
- 		const struct fbnic_hw_q_stats *hw_q = &fbd->hw_stats.hw_q[i];
- 
+ 	/* RPC */
+ 	FBNIC_HW_STAT("rpc_unkn_etype", rpc.unkn_etype),
+ 	FBNIC_HW_STAT("rpc_unkn_ext_hdr", rpc.unkn_ext_hdr),
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.c b/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.c
-index c8faedc2ec44..1c5ccaf39727 100644
+index 1c5ccaf39727..80157f389975 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.c
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.c
-@@ -117,6 +117,173 @@ static void fbnic_get_rpc_stats32(struct fbnic_dev *fbd,
- 			   &rpc->ovr_size_err);
+@@ -70,6 +70,37 @@ static void fbnic_hw_stat_rd64(struct fbnic_dev *fbd, u32 reg, s32 offset,
+ 	stat->u.old_reg_value_64 = new_reg_value;
  }
  
-+static void fbnic_reset_rxb_fifo_stats(struct fbnic_dev *fbd, int i,
-+				       struct fbnic_rxb_fifo_stats *fifo)
++static void fbnic_reset_tmi_stats(struct fbnic_dev *fbd,
++				  struct fbnic_tmi_stats *tmi)
 +{
-+	fbnic_hw_stat_rst32(fbd, FBNIC_RXB_DROP_FRMS_STS(i),
-+			    &fifo->drop.frames);
-+	fbnic_hw_stat_rst64(fbd, FBNIC_RXB_DROP_BYTES_STS_L(i), 1,
-+			    &fifo->drop.bytes);
++	fbnic_hw_stat_rst32(fbd, FBNIC_TMI_DROP_PKTS, &tmi->drop.frames);
++	fbnic_hw_stat_rst64(fbd, FBNIC_TMI_DROP_BYTE_L, 1, &tmi->drop.bytes);
 +
-+	fbnic_hw_stat_rst32(fbd, FBNIC_RXB_TRUN_FRMS_STS(i),
-+			    &fifo->trunc.frames);
-+	fbnic_hw_stat_rst64(fbd, FBNIC_RXB_TRUN_BYTES_STS_L(i), 1,
-+			    &fifo->trunc.bytes);
-+
-+	fbnic_hw_stat_rst32(fbd, FBNIC_RXB_TRANS_DROP_STS(i),
-+			    &fifo->trans_drop);
-+	fbnic_hw_stat_rst32(fbd, FBNIC_RXB_TRANS_ECN_STS(i),
-+			    &fifo->trans_ecn);
-+
-+	fifo->level.u.old_reg_value_32 = 0;
++	fbnic_hw_stat_rst32(fbd,
++			    FBNIC_TMI_ILLEGAL_PTP_REQS,
++			    &tmi->ptp_illegal_req);
++	fbnic_hw_stat_rst32(fbd, FBNIC_TMI_GOOD_PTP_TS, &tmi->ptp_good_ts);
++	fbnic_hw_stat_rst32(fbd, FBNIC_TMI_BAD_PTP_TS, &tmi->ptp_bad_ts);
 +}
 +
-+static void fbnic_reset_rxb_enq_stats(struct fbnic_dev *fbd, int i,
-+				      struct fbnic_rxb_enqueue_stats *enq)
++static void fbnic_get_tmi_stats32(struct fbnic_dev *fbd,
++				  struct fbnic_tmi_stats *tmi)
 +{
-+	fbnic_hw_stat_rst32(fbd, FBNIC_RXB_DRBO_FRM_CNT_SRC(i),
-+			    &enq->drbo.frames);
-+	fbnic_hw_stat_rst64(fbd, FBNIC_RXB_DRBO_BYTE_CNT_SRC_L(i), 4,
-+			    &enq->drbo.bytes);
++	fbnic_hw_stat_rd32(fbd, FBNIC_TMI_DROP_PKTS, &tmi->drop.frames);
 +
-+	fbnic_hw_stat_rst32(fbd, FBNIC_RXB_INTEGRITY_ERR(i),
-+			    &enq->integrity_err);
-+	fbnic_hw_stat_rst32(fbd, FBNIC_RXB_MAC_ERR(i),
-+			    &enq->mac_err);
-+	fbnic_hw_stat_rst32(fbd, FBNIC_RXB_PARSER_ERR(i),
-+			    &enq->parser_err);
-+	fbnic_hw_stat_rst32(fbd, FBNIC_RXB_FRM_ERR(i),
-+			    &enq->frm_err);
++	fbnic_hw_stat_rd32(fbd,
++			   FBNIC_TMI_ILLEGAL_PTP_REQS,
++			   &tmi->ptp_illegal_req);
++	fbnic_hw_stat_rd32(fbd, FBNIC_TMI_GOOD_PTP_TS, &tmi->ptp_good_ts);
++	fbnic_hw_stat_rd32(fbd, FBNIC_TMI_BAD_PTP_TS, &tmi->ptp_bad_ts);
 +}
 +
-+static void fbnic_reset_rxb_deq_stats(struct fbnic_dev *fbd, int i,
-+				      struct fbnic_rxb_dequeue_stats *deq)
++static void fbnic_get_tmi_stats(struct fbnic_dev *fbd,
++				struct fbnic_tmi_stats *tmi)
 +{
-+	fbnic_hw_stat_rst32(fbd, FBNIC_RXB_INTF_FRM_CNT_DST(i),
-+			    &deq->intf.frames);
-+	fbnic_hw_stat_rst64(fbd, FBNIC_RXB_INTF_BYTE_CNT_DST_L(i), 4,
-+			    &deq->intf.bytes);
-+
-+	fbnic_hw_stat_rst32(fbd, FBNIC_RXB_PBUF_FRM_CNT_DST(i),
-+			    &deq->pbuf.frames);
-+	fbnic_hw_stat_rst64(fbd, FBNIC_RXB_PBUF_BYTE_CNT_DST_L(i), 4,
-+			    &deq->pbuf.bytes);
++	fbnic_hw_stat_rd64(fbd, FBNIC_TMI_DROP_BYTE_L, 1, &tmi->drop.bytes);
 +}
 +
-+static void fbnic_reset_rxb_stats(struct fbnic_dev *fbd,
-+				  struct fbnic_rxb_stats *rxb)
-+{
-+	int i;
-+
-+	for (i = 0; i < FBNIC_RXB_FIFO_INDICES; i++)
-+		fbnic_reset_rxb_fifo_stats(fbd, i, &rxb->fifo[i]);
-+
-+	for (i = 0; i < FBNIC_RXB_INTF_INDICES; i++) {
-+		fbnic_reset_rxb_enq_stats(fbd, i, &rxb->enq[i]);
-+		fbnic_reset_rxb_deq_stats(fbd, i, &rxb->deq[i]);
-+	}
-+}
-+
-+static void fbnic_get_rxb_fifo_stats32(struct fbnic_dev *fbd, int i,
-+				       struct fbnic_rxb_fifo_stats *fifo)
-+{
-+	fbnic_hw_stat_rd32(fbd, FBNIC_RXB_DROP_FRMS_STS(i),
-+			   &fifo->drop.frames);
-+	fbnic_hw_stat_rd32(fbd, FBNIC_RXB_TRUN_FRMS_STS(i),
-+			   &fifo->trunc.frames);
-+
-+	fbnic_hw_stat_rd32(fbd, FBNIC_RXB_TRANS_DROP_STS(i),
-+			   &fifo->trans_drop);
-+	fbnic_hw_stat_rd32(fbd, FBNIC_RXB_TRANS_ECN_STS(i),
-+			   &fifo->trans_ecn);
-+
-+	fifo->level.value = rd32(fbd, FBNIC_RXB_PBUF_FIFO_LEVEL(i));
-+}
-+
-+static void fbnic_get_rxb_fifo_stats(struct fbnic_dev *fbd, int i,
-+				     struct fbnic_rxb_fifo_stats *fifo)
-+{
-+	fbnic_hw_stat_rd64(fbd, FBNIC_RXB_DROP_BYTES_STS_L(i), 1,
-+			   &fifo->drop.bytes);
-+	fbnic_hw_stat_rd64(fbd, FBNIC_RXB_TRUN_BYTES_STS_L(i), 1,
-+			   &fifo->trunc.bytes);
-+
-+	fbnic_get_rxb_fifo_stats32(fbd, i, fifo);
-+}
-+
-+static void fbnic_get_rxb_enq_stats32(struct fbnic_dev *fbd, int i,
-+				      struct fbnic_rxb_enqueue_stats *enq)
-+{
-+	fbnic_hw_stat_rd32(fbd, FBNIC_RXB_DRBO_FRM_CNT_SRC(i),
-+			   &enq->drbo.frames);
-+
-+	fbnic_hw_stat_rd32(fbd, FBNIC_RXB_INTEGRITY_ERR(i),
-+			   &enq->integrity_err);
-+	fbnic_hw_stat_rd32(fbd, FBNIC_RXB_MAC_ERR(i),
-+			   &enq->mac_err);
-+	fbnic_hw_stat_rd32(fbd, FBNIC_RXB_PARSER_ERR(i),
-+			   &enq->parser_err);
-+	fbnic_hw_stat_rd32(fbd, FBNIC_RXB_FRM_ERR(i),
-+			   &enq->frm_err);
-+}
-+
-+static void fbnic_get_rxb_enq_stats(struct fbnic_dev *fbd, int i,
-+				    struct fbnic_rxb_enqueue_stats *enq)
-+{
-+	fbnic_hw_stat_rd64(fbd, FBNIC_RXB_DRBO_BYTE_CNT_SRC_L(i), 4,
-+			   &enq->drbo.bytes);
-+
-+	fbnic_get_rxb_enq_stats32(fbd, i, enq);
-+}
-+
-+static void fbnic_get_rxb_deq_stats32(struct fbnic_dev *fbd, int i,
-+				      struct fbnic_rxb_dequeue_stats *deq)
-+{
-+	fbnic_hw_stat_rd32(fbd, FBNIC_RXB_INTF_FRM_CNT_DST(i),
-+			   &deq->intf.frames);
-+	fbnic_hw_stat_rd32(fbd, FBNIC_RXB_PBUF_FRM_CNT_DST(i),
-+			   &deq->pbuf.frames);
-+}
-+
-+static void fbnic_get_rxb_deq_stats(struct fbnic_dev *fbd, int i,
-+				    struct fbnic_rxb_dequeue_stats *deq)
-+{
-+	fbnic_hw_stat_rd64(fbd, FBNIC_RXB_INTF_BYTE_CNT_DST_L(i), 4,
-+			   &deq->intf.bytes);
-+	fbnic_hw_stat_rd64(fbd, FBNIC_RXB_PBUF_BYTE_CNT_DST_L(i), 4,
-+			   &deq->pbuf.bytes);
-+
-+	fbnic_get_rxb_deq_stats32(fbd, i, deq);
-+}
-+
-+static void fbnic_get_rxb_stats32(struct fbnic_dev *fbd,
-+				  struct fbnic_rxb_stats *rxb)
-+{
-+	int i;
-+
-+	for (i = 0; i < FBNIC_RXB_FIFO_INDICES; i++)
-+		fbnic_get_rxb_fifo_stats32(fbd, i, &rxb->fifo[i]);
-+
-+	for (i = 0; i < FBNIC_RXB_INTF_INDICES; i++) {
-+		fbnic_get_rxb_enq_stats32(fbd, i, &rxb->enq[i]);
-+		fbnic_get_rxb_deq_stats32(fbd, i, &rxb->deq[i]);
-+	}
-+}
-+
-+static void fbnic_get_rxb_stats(struct fbnic_dev *fbd,
-+				struct fbnic_rxb_stats *rxb)
-+{
-+	int i;
-+
-+	for (i = 0; i < FBNIC_RXB_FIFO_INDICES; i++)
-+		fbnic_get_rxb_fifo_stats(fbd, i, &rxb->fifo[i]);
-+
-+	for (i = 0; i < FBNIC_RXB_INTF_INDICES; i++) {
-+		fbnic_get_rxb_enq_stats(fbd, i, &rxb->enq[i]);
-+		fbnic_get_rxb_deq_stats(fbd, i, &rxb->deq[i]);
-+	}
-+}
-+
- static void fbnic_reset_hw_rxq_stats(struct fbnic_dev *fbd,
- 				     struct fbnic_hw_q_stats *hw_q)
+ static void fbnic_reset_rpc_stats(struct fbnic_dev *fbd,
+ 				  struct fbnic_rpc_stats *rpc)
  {
-@@ -253,6 +420,7 @@ void fbnic_reset_hw_stats(struct fbnic_dev *fbd)
+@@ -419,6 +450,7 @@ static void fbnic_get_pcie_stats_asic64(struct fbnic_dev *fbd,
+ void fbnic_reset_hw_stats(struct fbnic_dev *fbd)
  {
  	spin_lock(&fbd->hw_stats_lock);
++	fbnic_reset_tmi_stats(fbd, &fbd->hw_stats.tmi);
  	fbnic_reset_rpc_stats(fbd, &fbd->hw_stats.rpc);
-+	fbnic_reset_rxb_stats(fbd, &fbd->hw_stats.rxb);
+ 	fbnic_reset_rxb_stats(fbd, &fbd->hw_stats.rxb);
  	fbnic_reset_hw_rxq_stats(fbd, fbd->hw_stats.hw_q);
- 	fbnic_reset_pcie_stats_asic(fbd, &fbd->hw_stats.pcie);
- 	spin_unlock(&fbd->hw_stats_lock);
-@@ -261,6 +429,7 @@ void fbnic_reset_hw_stats(struct fbnic_dev *fbd)
+@@ -428,6 +460,7 @@ void fbnic_reset_hw_stats(struct fbnic_dev *fbd)
+ 
  static void __fbnic_get_hw_stats32(struct fbnic_dev *fbd)
  {
++	fbnic_get_tmi_stats32(fbd, &fbd->hw_stats.tmi);
  	fbnic_get_rpc_stats32(fbd, &fbd->hw_stats.rpc);
-+	fbnic_get_rxb_stats32(fbd, &fbd->hw_stats.rxb);
+ 	fbnic_get_rxb_stats32(fbd, &fbd->hw_stats.rxb);
  	fbnic_get_hw_rxq_stats32(fbd, fbd->hw_stats.hw_q);
- }
- 
-@@ -275,6 +444,8 @@ void fbnic_get_hw_stats(struct fbnic_dev *fbd)
- {
+@@ -445,6 +478,7 @@ void fbnic_get_hw_stats(struct fbnic_dev *fbd)
  	spin_lock(&fbd->hw_stats_lock);
  	__fbnic_get_hw_stats32(fbd);
-+
-+	fbnic_get_rxb_stats(fbd, &fbd->hw_stats.rxb);
+ 
++	fbnic_get_tmi_stats(fbd, &fbd->hw_stats.tmi);
+ 	fbnic_get_rxb_stats(fbd, &fbd->hw_stats.rxb);
  	fbnic_get_pcie_stats_asic64(fbd, &fbd->hw_stats.pcie);
  	spin_unlock(&fbd->hw_stats_lock);
- }
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h b/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h
-index 81efa8dc8381..ec03e6253ba5 100644
+index ec03e6253ba5..abb0957a5ac0 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h
-@@ -17,6 +17,11 @@ struct fbnic_stat_counter {
- 	bool reported;
+@@ -42,6 +42,11 @@ struct fbnic_mac_stats {
+ 	struct fbnic_eth_mac_stats eth_mac;
  };
  
-+struct fbnic_hw_stat {
-+	struct fbnic_stat_counter frames;
-+	struct fbnic_stat_counter bytes;
++struct fbnic_tmi_stats {
++	struct fbnic_hw_stat drop;
++	struct fbnic_stat_counter ptp_illegal_req, ptp_good_ts, ptp_bad_ts;
 +};
 +
- struct fbnic_eth_mac_stats {
- 	struct fbnic_stat_counter FramesTransmittedOK;
- 	struct fbnic_stat_counter FramesReceivedOK;
-@@ -43,6 +48,28 @@ struct fbnic_rpc_stats {
- 	struct fbnic_stat_counter tcp_opt_err, out_of_hdr_err, ovr_size_err;
- };
+ struct fbnic_rpc_stats {
+ 	struct fbnic_stat_counter unkn_etype, unkn_ext_hdr;
+ 	struct fbnic_stat_counter ipv4_frag, ipv6_frag, ipv4_esp, ipv6_esp;
+@@ -88,6 +93,7 @@ struct fbnic_pcie_stats {
  
-+struct fbnic_rxb_enqueue_stats {
-+	struct fbnic_hw_stat drbo;
-+	struct fbnic_stat_counter integrity_err, mac_err;
-+	struct fbnic_stat_counter parser_err, frm_err;
-+};
-+
-+struct fbnic_rxb_fifo_stats {
-+	struct fbnic_hw_stat drop, trunc;
-+	struct fbnic_stat_counter trans_drop, trans_ecn;
-+	struct fbnic_stat_counter level;
-+};
-+
-+struct fbnic_rxb_dequeue_stats {
-+	struct fbnic_hw_stat intf, pbuf;
-+};
-+
-+struct fbnic_rxb_stats {
-+	struct fbnic_rxb_enqueue_stats enq[FBNIC_RXB_ENQUEUE_INDICES];
-+	struct fbnic_rxb_fifo_stats fifo[FBNIC_RXB_FIFO_INDICES];
-+	struct fbnic_rxb_dequeue_stats deq[FBNIC_RXB_DEQUEUE_INDICES];
-+};
-+
- struct fbnic_hw_q_stats {
- 	struct fbnic_stat_counter rde_pkt_err;
- 	struct fbnic_stat_counter rde_pkt_cq_drop;
-@@ -62,6 +89,7 @@ struct fbnic_pcie_stats {
  struct fbnic_hw_stats {
  	struct fbnic_mac_stats mac;
++	struct fbnic_tmi_stats tmi;
  	struct fbnic_rpc_stats rpc;
-+	struct fbnic_rxb_stats rxb;
+ 	struct fbnic_rxb_stats rxb;
  	struct fbnic_hw_q_stats hw_q[FBNIC_MAX_QUEUES];
- 	struct fbnic_pcie_stats pcie;
- };
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-index e19284d4b91d..dff485511301 100644
+index dff485511301..a0f93bd27113 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-@@ -408,8 +408,8 @@ static void fbnic_get_stats64(struct net_device *dev,
- 	struct fbnic_net *fbn = netdev_priv(dev);
- 	struct fbnic_dev *fbd = fbn->fbd;
- 	struct fbnic_queue_stats *stats;
-+	u64 rx_over = 0, rx_missed = 0;
- 	unsigned int start, i;
--	u64 rx_over = 0;
+@@ -423,6 +423,9 @@ static void fbnic_get_stats64(struct net_device *dev,
+ 	stats64->tx_packets = tx_packets;
+ 	stats64->tx_dropped = tx_dropped;
  
- 	fbnic_get_hw_stats(fbd);
- 
-@@ -449,6 +449,17 @@ static void fbnic_get_stats64(struct net_device *dev,
- 	rx_dropped = stats->dropped;
- 
- 	spin_lock(&fbd->hw_stats_lock);
-+	/* Record drops for the host FIFOs.
-+	 * 4: network to Host,	6: BMC to Host
-+	 * Exclude the BMC and MC FIFOs as those stats may contain drops
-+	 * due to unrelated items such as TCAM misses. They are still
-+	 * accessible through the ethtool stats.
-+	 */
-+	i = FBNIC_RXB_FIFO_HOST;
-+	rx_missed += fbd->hw_stats.rxb.fifo[i].drop.frames.value;
-+	i = FBNIC_RXB_FIFO_BMC_TO_HOST;
-+	rx_missed += fbd->hw_stats.rxb.fifo[i].drop.frames.value;
++	/* Record drops from Tx HW Datapath */
++	tx_dropped += fbd->hw_stats.tmi.drop.frames.value;
 +
- 	for (i = 0; i < fbd->max_num_queues; i++) {
- 		/* Report packets dropped due to CQ/BDQ being full/empty */
- 		rx_over += fbd->hw_stats.hw_q[i].rde_pkt_cq_drop.value;
-@@ -464,6 +475,7 @@ static void fbnic_get_stats64(struct net_device *dev,
- 	stats64->rx_dropped = rx_dropped;
- 	stats64->rx_over_errors = rx_over;
- 	stats64->rx_errors = rx_errors;
-+	stats64->rx_missed_errors = rx_missed;
+ 	for (i = 0; i < fbn->num_tx_queues; i++) {
+ 		struct fbnic_ring *txr = fbn->tx[i];
  
- 	for (i = 0; i < fbn->num_rx_queues; i++) {
- 		struct fbnic_ring *rxr = fbn->rx[i];
 -- 
 2.47.1
 
