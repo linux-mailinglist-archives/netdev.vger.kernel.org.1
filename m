@@ -1,151 +1,248 @@
-Return-Path: <netdev+bounces-181202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D769A84108
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:43:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CFA4A8412A
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:48:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D10E4A1C31
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 10:43:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB3F83B5E22
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 10:46:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1CD628135B;
-	Thu, 10 Apr 2025 10:43:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54D48281516;
+	Thu, 10 Apr 2025 10:45:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KDUKvJO9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hVdsQRkQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7BA27E1A1
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 10:43:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744281812; cv=none; b=a1/MhFjOxF6l1hi5Fc40Z8mlN+Ji5BKrLS9FfsX51LH/9cSHdktQhm0recPQL2pgaFq/jdB2LyS12M868mM2cjGHeyMjfvkfx6QHybJBN3uB4ba4pGfJ8fIb/XiESDEShU+JqucwGvANxw0TT7yIQq4XHozYWuduSUrPyDZ6HHQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744281812; c=relaxed/simple;
-	bh=pZ5bB8vFUMnyv3cCOmpIUQLd2O2QWg60MWTovyHf87Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=j3BBpEmqkRwoAyGarFJXBUJZMHZsP34xGsloi1Oc2yqIuBGT6+VOUjAdVl02bOLB6rDwV/bfOvX2Vt0jJhR8q99vA5mZrBEQcMtECTaZcswng5AyYIAUhOu9A2vtVwGcVUnYpCdI5ETYMJotmADBhPC0ESlg5EaRwMvgyRXub+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KDUKvJO9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744281809;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=o8NDC37k3QmU+NUsDCirFAdGiwD0pEhO0xSGio8XM74=;
-	b=KDUKvJO9V2F3pHWxnl9FHQjF2fYU7Uxw9qiTJd6lEdjZ7rfTPGcAJihdN0oYY4JTxFxOTo
-	TfrrUDMuLlo2ZWperFICrvwadPX/eMLNJ7ty6o6UecstoqJwoahwDq4qEhV46kC9RLp6mh
-	VgHHmtECdAalslv5ZfeGX4QMYJnGq0g=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-640-ICzkpHhaMXmBHgyyBJUGHw-1; Thu, 10 Apr 2025 06:43:28 -0400
-X-MC-Unique: ICzkpHhaMXmBHgyyBJUGHw-1
-X-Mimecast-MFC-AGG-ID: ICzkpHhaMXmBHgyyBJUGHw_1744281807
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-ac27d8ac365so52711166b.2
-        for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 03:43:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744281807; x=1744886607;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=o8NDC37k3QmU+NUsDCirFAdGiwD0pEhO0xSGio8XM74=;
-        b=Im1WMZDatocd/nHCKIEwdxn3jo64dtRt+yK5UI0Zw7xdJM5biknSOWmMua8JWdeDkg
-         jibuLYStTX406yo420f6dlJ5kRRhYrhYk860mfFRWnwoY1tXd6lfDQ5PQ7QhaO8VC6yc
-         NMaWmw0XHR4WV7EJ3qIcK1njsPgYUY33rdhrDjs2iXtpinbDPQHlV1CLiP9R8lekK9br
-         Rcyygdd/ftdNiz9jzVhBi+uqXZTmuuRi2RPYRIDIy8S1POpDct71N520Og3wsOwWOIfa
-         AfzhefRFf7aacUzA5Afu1MDzxT7ZhAO3iiBZjF97d/6lQ9PMXhyz6/M/hfNw0lIXwfaw
-         NB4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWF+QI6K/zHFEA8xDpzMouAiG3MWm2dO0ng8lbnt8z7qhHAIgTiq9FGnikvyu+AZj+GcsYxALY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBa4QYMDv6Tyx7NUEQOdGYgJyngbSpWRaAWy0htwi2fM0NCOtY
-	Lvf1XJ8drMXJQrGsBb3DaiAXh1kIWybUVH0EmLDLv8BNJHDUBEDpD8B7Dh5ezMHXKPcead/y0uM
-	SU+KEL+dMwY77228yOi1tBINPCQ0BI2JLizcU5fMAH0kiX4W/FyXKqA==
-X-Gm-Gg: ASbGncukWlrcXveX7XGkqsyBKXdBhV4Crxo9ihhDuDQmiIsw5/VxteXAlsvTa7z2VaG
-	d45oeUO62AtvDnCRpM+foF4SaCHZkDJxJWz39AsCw/tASU1/e9EsyhnZtGTu6METnDD1ZablbCu
-	XSgSF491MMxtHwOCyUJMyHyrCRDrUbMtyHtm+P27AaoUXgKCRkE0IKjT8Dyez5FHABsLm3i38WH
-	JC0dBCnOANR5fDsLMGeGV3hjgpGQEY1y3YnBhQv2rdRO15bcw2f8GROUiBU+MhbqflFLH5BbyJa
-	9sSq/blW
-X-Received: by 2002:a17:907:3e11:b0:ac7:ec6f:a7c with SMTP id a640c23a62f3a-acabd1ddb9amr205751966b.13.1744281807223;
-        Thu, 10 Apr 2025 03:43:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFtZjy9wlPfZmZBnYMu79NO3yotRmZU9d09bLGlKvvf77owRla0L/nGxvLBfyuq+ABs6xAk7w==
-X-Received: by 2002:a17:907:3e11:b0:ac7:ec6f:a7c with SMTP id a640c23a62f3a-acabd1ddb9amr205750266b.13.1744281806835;
-        Thu, 10 Apr 2025 03:43:26 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acaa1bb3df5sm249424366b.26.2025.04.10.03.43.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Apr 2025 03:43:26 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 4D3D11992280; Thu, 10 Apr 2025 12:43:25 +0200 (CEST)
-From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org
-Subject: [PATCH net v2] selftests/tc-testing: Add test for echo of big TC filters
-Date: Thu, 10 Apr 2025 12:43:21 +0200
-Message-ID: <20250410104322.214620-1-toke@redhat.com>
-X-Mailer: git-send-email 2.49.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2606228151E;
+	Thu, 10 Apr 2025 10:45:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744281940; cv=fail; b=eBqJzd4XubIZ/HtlaUtMNn0w+nQ7d6H+DxGDvY2R+YQTQL65nVw7CRkHsM1LPpoe1LCiGaJwMuhIB0iaHwjkA5TElTCpATrGMJyzNKeHiftwjYV0UW07tDsncK2AlT0MfzWBNt9NEbUdArTordr0vKMSbZlYUYPNYb2+jg6h6GI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744281940; c=relaxed/simple;
+	bh=vBwfINGeP4Sd6CNthM6IQPDYPVXyYADB15Z7DFrj4i0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=TQFfkF2HnMCQhwvZTSE5AtvR7T3nQT6mxtYQhhe4ZIaUOmsD+ebUHJoUURxjNhWtUKT0vROeCrZ65jK5780REgNDRVQyrQDF7pZ1w5i6ZvQNc8aq9GJ38ZE6FS5f6nHefUwgW83YO518EGEMSdKSB6iGweF9qdGaMYj0OY7ZlDM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hVdsQRkQ; arc=fail smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744281938; x=1775817938;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=vBwfINGeP4Sd6CNthM6IQPDYPVXyYADB15Z7DFrj4i0=;
+  b=hVdsQRkQU7AYnKIg+2lkJsQYuETi5wpyF0FDqphP6fqBg8IU6jzvwnDY
+   gvDrBOTiT7lSgMFXfltrZiirnZVrsZR9FHmlhbuQa+fLaMKoe4ZC3bKNg
+   vz7wrHqrdyPdVGplDnsIO96zsFuAsfre5l0vskwGQdqWLm5JY2HKpqWaN
+   8YK1bmv0OYEDq5pQryLW4/+9yw/1g4vaJxR2v6nrDSue8z3rhORDRW8Q+
+   zdr/jXCV6tpAvqkJZ/RC0M8d1ccIPuv0ntLFavR9s5Pcwut2SqJkHuWrO
+   1/nQdXrdhjRXtECnJak3dydCBFGRO3uVhhyWlukgr+ATl2LTrh7QiaxM1
+   w==;
+X-CSE-ConnectionGUID: K9CncFujTmSgnM6N+OJOyw==
+X-CSE-MsgGUID: mVlg86UlSWSOG0Dl8wBC6A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11400"; a="56432924"
+X-IronPort-AV: E=Sophos;i="6.15,202,1739865600"; 
+   d="scan'208";a="56432924"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 03:45:37 -0700
+X-CSE-ConnectionGUID: KgC8p68ITlOqkuWcJAzkuA==
+X-CSE-MsgGUID: 74SL5tw4QPS5bizfXjd45Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,202,1739865600"; 
+   d="scan'208";a="133988699"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 03:45:36 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Thu, 10 Apr 2025 03:45:36 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Thu, 10 Apr 2025 03:45:36 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Thu, 10 Apr 2025 03:45:35 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=FQcLqKIusyYqG9O1VzIccovP3iv3J7Cfi6u+R6Z2I1M9u5RU19uUMxWU9Ts9GWlE1JfygFUtgPphe0iu0Q9fA8bPj+HnYBHsOO8t/Jeopn8sNlHf3VyJqRjU1ARiqkQgObUQfMbLroNkU4LBDVgXdzJ9dJjuaq4/IwHnazTPU25wEDPuUsrRA4EVtaf3iPJMvYbGCRHYsYs3uLYQacMgEBSrNGax0S4NtYntNWDjIaUKDR0tIv0PxedY50Ax4WecrgQKag0KAW2YhyHoesXLm+/eY3a1ocjg8RuAzHwwHXDUu3xM9STGI6TsAd+iWProU8p5Q8BBXbK1JFPN/ZZWQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ftGZTZgRKX5vGOyONAzQDFe0SGQsQc1mT6dqlYq+h+k=;
+ b=ja9PneWnRpXdeUWeOP9lkGGoUZFxYbxL9NRgSqxYNXlJs9yVutWZKhkjWdg8anOPvtwyMtrfrwR4RtQCjg2QnkVpCjMhe2KvM33i5lIOy8NdhUbe+b1jTIPG7loLJH+9wNlAlBgPDRumC1u3f9X0zFET2HWDpRC4h3Nce2zav3QwnIj6NbD+k4ZiGBnI6SP++i71eekiGxPGWJthhS9VxWjqAB9DQ5iEqSIc6e37vyvmZMeSpL+vlLGD0xrshlJskjJYOuH+835JYudPhjZxJE12UGKH/E4wPGfuxdTj/lN4S99TR5Z3nVL8RGbL/WwE2T9mZeI0g+DBIArFif6fIg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
+ by SJ5PPF4DC104A0B.namprd11.prod.outlook.com (2603:10b6:a0f:fc02::827) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.32; Thu, 10 Apr
+ 2025 10:44:51 +0000
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::399f:ff7c:adb2:8d29]) by SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::399f:ff7c:adb2:8d29%4]) with mapi id 15.20.8606.029; Thu, 10 Apr 2025
+ 10:44:50 +0000
+Date: Thu, 10 Apr 2025 12:44:33 +0200
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: Leon Romanovsky <leon@kernel.org>
+CC: <intel-wired-lan@lists.osuosl.org>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
+	<corbet@lwn.net>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, Jiri Pirko
+	<jiri@resnulli.us>, Tatyana Nikolova <tatyana.e.nikolova@intel.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>, Alexander Lobakin
+	<aleksander.lobakin@intel.com>, Michael Ellerman <mpe@ellerman.id.au>,
+	"Maciej Fijalkowski" <maciej.fijalkowski@intel.com>, Lee Trager
+	<lee@trager.us>, Madhavan Srinivasan <maddy@linux.ibm.com>, Sridhar Samudrala
+	<sridhar.samudrala@intel.com>, Jacob Keller <jacob.e.keller@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, Mateusz Polchlopek
+	<mateusz.polchlopek@intel.com>, Ahmed Zaki <ahmed.zaki@intel.com>,
+	<netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, "Karlsson, Magnus"
+	<magnus.karlsson@intel.com>, Emil Tantilov <emil.s.tantilov@intel.com>,
+	"Madhu Chittim" <madhu.chittim@intel.com>, Josh Hay <joshua.a.hay@intel.com>,
+	"Milena Olech" <milena.olech@intel.com>, <pavan.kumar.linga@intel.com>,
+	"Singhai, Anjali" <anjali.singhai@intel.com>, Phani R Burra
+	<phani.r.burra@intel.com>
+Subject: Re: [PATCH iwl-next 05/14] libeth: add control queue support
+Message-ID: <Z_ehEXmlEBREQWQM@soc-5CG4396X81.clients.intel.com>
+References: <20250408124816.11584-1-larysa.zaremba@intel.com>
+ <20250408124816.11584-6-larysa.zaremba@intel.com>
+ <20250410082137.GO199604@unreal>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250410082137.GO199604@unreal>
+X-ClientProxiedBy: WA1P291CA0016.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:19::27) To SN7PR11MB7540.namprd11.prod.outlook.com
+ (2603:10b6:806:340::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|SJ5PPF4DC104A0B:EE_
+X-MS-Office365-Filtering-Correlation-Id: 48ca3554-44d7-45fa-b76f-08dd781cb884
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|10070799003|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?/uyW3bYwj5d9GI0lBpdSIpCFucy4Bvv7t4uz44JTr4nAIuC0KZBfh7yLU4QX?=
+ =?us-ascii?Q?mKrIv2gl0rbMyjjkiejM6g33wRF+9FLzr0ZPR1LTEazY6zeG6lmNRzNo6fFP?=
+ =?us-ascii?Q?sJ7wVAZjadKcnlovmeIeGx9t9JUJezLHr097mWesMq5U1cou64Nn/o2sOrIT?=
+ =?us-ascii?Q?Aa71svAuIiZCve057OQSz1sjmtwFASY7O+M6ZmtPdnbalS5uussvsI3EkgWm?=
+ =?us-ascii?Q?sYIlnBPgb3mm4ZQaRikHeWQw666mShKG0AaeAYTRWO9nSbrb0Er7M2Cy4Qdx?=
+ =?us-ascii?Q?CqkXV5R34+O2eaE+/ZrFE3babHDfeQ5pp9WDExCbL8gefRmcCStPjrad9zux?=
+ =?us-ascii?Q?EpKEYvhXP/W5gtmS+4oWj17DnQLzzgfNkpYeYBzPpyqq3PMiyOhJYsxg+tmJ?=
+ =?us-ascii?Q?mdoqtId38fbk+YHEe8UaFNWZndZ2ODbltqQLea9oeUtOxYDwNynZNAYq0fZY?=
+ =?us-ascii?Q?ZYgDt6HFiA3r5pvIyMo6oqHImzg+V5+/aORYotqncYu/MiDgsxeRmaUmw09H?=
+ =?us-ascii?Q?JyZZofXveyZRf5VAEl/wpmRsfzhRTGt3du6GEDVe2wnrCFwlmozL7sE3iSY2?=
+ =?us-ascii?Q?MREoWVB+zg89NSrefoZ6E1SZ8lH6larUtUVofVkPC3sW7vEiIB3RHApTdrRp?=
+ =?us-ascii?Q?YubP+sbUnMkVVUAkmNaH5ZC1/AcOYYXOSBgMyMCustvJKlpdxuNunKTdDC9S?=
+ =?us-ascii?Q?FBjlnzifk/XYecd/VCA8fiLhc9tFIJW58/smf6M974FDKNTWdrgnqPGDpj1T?=
+ =?us-ascii?Q?h33POqtUAGf1i9tKoZpr5q0GIrc3uTepZZihGvzXR4cBIh7kP76ZshyYYEiG?=
+ =?us-ascii?Q?EZyNYLlSkOBvbqgxy++qx61Qwm+a2g9Wl0Z25H8GQA68CtjVcX6QA89NV4mj?=
+ =?us-ascii?Q?jqNXlmGZgh6Tyd1/9GwsvXyzrVj+BVNcUdJp/oZI6Yl0uQxZ1XG/jdqJ9oJo?=
+ =?us-ascii?Q?EBdgxJDfCpRu7Oszay7UEv5VoQFnhvpkgVnKyS9SMlHpA5ELKqur3nk8eRpO?=
+ =?us-ascii?Q?o2B5WchdUfUSzMkBhmnU/q9I5fgI8qQBnQqr6LcuwA+MfSB2U+MF3L6SCJh+?=
+ =?us-ascii?Q?A8N5MlBUMVGx54b8YwvoUpS9kdfaqWbxNgQ5vRh/2hbOxZf9p7CwwxdjSCGO?=
+ =?us-ascii?Q?HK3O/g1HX9hn0hx72pJZAHwkGG58+6dAFbVt/f5FpgwIffxBn9gMhCyp1Ho8?=
+ =?us-ascii?Q?XMPuUhFhr35Xyy5qjZaDkteXQqNGhfhRfeP9DnaAck2QQJObXkBjr4cvy20D?=
+ =?us-ascii?Q?8gzTA/OkQ8TPkTMIfabfH7VovpnDM29ilfrRdcuVtDf7DaxzS7NAIE7QkUeW?=
+ =?us-ascii?Q?/bm90kYH0N3V20igS4f3dSV8ckKuAs6voCamqKBwpZMLndS+7ffpFJApb8Mk?=
+ =?us-ascii?Q?enelNlg0vMaPXnwgoJ5EdR5NtHUk?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(10070799003)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ofh0L2q71kKQTGbHM/cb8fQ743yZAlyVG8rWwJpRY9N06Gf7nZe/+oQOcWkr?=
+ =?us-ascii?Q?ss+ecsbnE+z+qjVhiWX7F6+affD6LU9wT6J2HU2ZenDtUXQILz1z7Il/iN9z?=
+ =?us-ascii?Q?QVU6g7TKxHIw8ByPwksQmywciKzAo6tXVMBZzXpDCYdslFUTzCsGwC5Plg/r?=
+ =?us-ascii?Q?b7Forog+HUwPxjnXw0k+BU5DpJAaJXKtwWPVi8UQMTw7gE5Uecdu8G4Qitqn?=
+ =?us-ascii?Q?aSUyNG5W6NVtfeFejLWclfPGa3fuVtGoITYUdU8+ccJjDkne7DCEwIl2p3cM?=
+ =?us-ascii?Q?L/fcqs9YIf4iiOT/QMowq5kEztw/zP9l6jrm0oVRIK8DGI3LsmX44apSmPPg?=
+ =?us-ascii?Q?adAgoYLYkHDBriJB27ylDaBXHMKUDvTZ6mhF5xoLitqumjhxkxYD8ekoLmTn?=
+ =?us-ascii?Q?ZYWqu6uCpnmeKxkT7ULsddYPqRGWT5YN4mKbD1WTzLWvsIXQxqCXh62kUKyy?=
+ =?us-ascii?Q?fKOEaTxctM4D8F6q+aJNz4ciwg4wA04LHpZIaZ+e1S+9wGhBhJTB4db4DrQK?=
+ =?us-ascii?Q?Rg5+ZV/qqn/x8MIsZB6jBEjDHMhFK1AOOsEkiNTjVRdhvr1nk7tgrP0XQPSr?=
+ =?us-ascii?Q?WlaoqjN3csHX+A7H4eQdemOk8jSo8Y5uhxwP7tqPOk0SSuxsyEoEvjVHU2Tp?=
+ =?us-ascii?Q?WxJc/ymcaLjh+e4uSGza8wpxRK1RfZldCi/QGHeR0E+R0eZq44O3gnGlgxy1?=
+ =?us-ascii?Q?EVKneKl4/s+pJyhef04O6dYX5Adivyz/OUpLgDhA+iD+tNK6u/iI0pj78+Wn?=
+ =?us-ascii?Q?jBL0U15gqfbRF4hYxUiMPi4Nv+0NR/bzkFF17GZO8KtQkgZT72JHPC/xPxst?=
+ =?us-ascii?Q?rrJ4rfSRg7oG9RC73uWb46XQ9H+AiJlY5/uzxYHSjl20a//pUra7t5M9tXNm?=
+ =?us-ascii?Q?3os2XikFiDsaSZhL2inzzysE3u9MIJufGdrh6kDEfAb0fFg+42+SvYNTpit4?=
+ =?us-ascii?Q?EST+nWRkuT1LmT5o7SCy9kDjzxS+Xd8IQ5Ro+Gj1gh86IOfrd0GHunAI7uEm?=
+ =?us-ascii?Q?z5CUFLrkpDB3NDObE5WVzwjtaUboKw2eft0osPgtFyJKn0h7ILI7lPpcRLqe?=
+ =?us-ascii?Q?MupR0534roqQ/1xG2hzIZNsYfjPT0CN9iApgdUbfrgiDPBvwZeuy9+Isi9Js?=
+ =?us-ascii?Q?/CmFl1Lk18+FC903+fMIh9kRnzEhg2L9q8kMYGCc/b7NueFP45AYZEUEvKNe?=
+ =?us-ascii?Q?gOrelKkVo/DwnTLvz9EnO7NW4rauLT5DIDzmqdNAs44U0bKwDPcUOMHeFJND?=
+ =?us-ascii?Q?OE0qTBLappk1KykLmIvWHSoF2T3uWLaS9+43ojJfj5Bu3PYnuoIAipnXZuyc?=
+ =?us-ascii?Q?LVg7evn0Hww+hiKf0dPeEme2nA1fGhLWweOtcjWRvKMQU3YPjDoxdK2QCvvB?=
+ =?us-ascii?Q?WjtsJSbMETeWUK4JDKs/8yI76a/rWSlA6I9+QSbO3jhrLaRrKtEPETdVRPIx?=
+ =?us-ascii?Q?JtwBzvC3pD0s2KbRH4KGAoA6ylcomTH7gYi9gqAGXkaZqpjFCdz6cef6AH43?=
+ =?us-ascii?Q?BGm7BkeE90TQi1Mbh4d0E1SyrJmuVi0nf+04IhJW8aAro6J1KrBVRoP5cGXB?=
+ =?us-ascii?Q?l4USAeoOlgCYQGe2ChQLncQc1DQgp2KyvQTbDl/Bkua65+MTSeiHaecdJNWc?=
+ =?us-ascii?Q?9uVZHuwJVAqcaIjhXMnHduXgmypYk6KNyDbfKQffbbjzogShUlI82SLss6cu?=
+ =?us-ascii?Q?BGtjVQ=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 48ca3554-44d7-45fa-b76f-08dd781cb884
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2025 10:44:50.8946
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8UBj0uhp4h+706zeBrbtIWQWUxem8PIFATdgF4yoMDRUa7XcpKPv46003nNpQF5FJqpC1XZvJgAj6v7K5xPjXlTEWt3feN78RNTdTLs+iBE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF4DC104A0B
+X-OriginatorOrg: intel.com
 
-Add a selftest that checks whether the kernel can successfully echo a
-big tc filter, to test the fix introduced in commit:
+On Thu, Apr 10, 2025 at 11:21:37AM +0300, Leon Romanovsky wrote:
+> On Tue, Apr 08, 2025 at 02:47:51PM +0200, Larysa Zaremba wrote:
+> > From: Phani R Burra <phani.r.burra@intel.com>
+> > 
+> > Libeth will now support control queue setup and configuration APIs.
+> > These are mainly used for mailbox communication between drivers and
+> > control plane.
+> > 
+> > Make use of the page pool support for managing controlq buffers.
+> 
+> <...>
+> 
+> >  libeth-y			:= rx.o
+> >  
+> > +obj-$(CONFIG_LIBETH_CP)		+= libeth_cp.o
+> > +
+> > +libeth_cp-y			:= controlq.o
+> 
+> So why did you create separate module for it?
+> Now you have pci -> libeth -> libeth_cp -> ixd, with the potential races between ixd and libeth, am I right?
+>
 
-369609fc6272 ("tc: Ensure we have enough buffer space when sending filter netlink notifications")
+I am not sure what kind of races do you mean, all libeth modules themselves are 
+stateless and will stay this way [0], all used data is owned by drivers.
 
-Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
----
-v2:
-- Move to infra/actions.json
+As for the module separation, I think there is no harm in keeping it modular. 
+We intend to use basic libeth (libeth_rx) in drivers that for sure have no use 
+for libeth_cp. libeth_pci and libeth_cp separation is more arbitral, as we have 
+no plans for now to use them separately.
 
- .../tc-testing/tc-tests/infra/actions.json    | 22 +++++++++++++++++++
- 1 file changed, 22 insertions(+)
+Module dependencies are as follows:
 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/infra/actions.json b/tools/testing/selftests/tc-testing/tc-tests/infra/actions.json
-index 1ba96c467754..d9fc62ab476c 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/infra/actions.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/infra/actions.json
-@@ -412,5 +412,27 @@
-         "teardown": [
-             "$TC qdisc del dev $DUMMY ingress"
-         ]
-+    },
-+    {
-+        "id": "33f4",
-+        "name": "Check echo of big filter command",
-+        "category": [
-+            "infra",
-+            "u32"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            "$TC qdisc add dev $DUMMY parent root handle 10: fq_codel"
-+        ],
-+        "cmdUnderTest": "bash -c '$TC -echo filter add dev $DUMMY parent 10: u32 match u32 0 0 $(for i in $(seq 32); do echo action pedit munge ip dport set 22; done) | grep \"added filter\"'",
-+        "verifyCmd": "",
-+        "expExitCode": "0",
-+        "matchCount": "0",
-+        "matchPattern": "",
-+        "teardown": [
-+            "$TC qdisc del dev $DUMMY parent root fq_codel"
-+        ]
-     }
- ]
--- 
-2.49.0
+libeth_rx and libeth_pci do not depend on other modules.
+libeth_cp depends on both libeth_rx and libeth_pci.
+idpf directly uses libeth_pci, libeth_rx and libeth_cp.
+ixd directly uses libeth_cp and libeth_pci.
 
+[0] https://lore.kernel.org/netdev/61bfa880-6a88-4eac-bab7-040bf72a11ef@intel.com/
+
+> Thanks
 
