@@ -1,78 +1,54 @@
-Return-Path: <netdev+bounces-181005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CED7A8362F
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 04:06:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 892DAA83642
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 04:14:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EE643AAC35
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 02:06:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1B113B036F
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 02:13:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 297CD1ADC6D;
-	Thu, 10 Apr 2025 02:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60F0C1C700C;
+	Thu, 10 Apr 2025 02:13:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="csFjFbR6"
+	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="oGXzMqPn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED6A46B5
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 02:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FED918A6A9;
+	Thu, 10 Apr 2025 02:13:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744250777; cv=none; b=cMiGO2Yz1BuLkH+iH6mnXBAZ27/OvEXBTO4IXoYZJPxzo/gFIo0F8Rin/tRJ2ySq2R87Y429LQN/HneYoiRyEdnuaN0+Egx6BD5OcPfCg9cGTO2AoMB8FgUNYP7Fvm+7TYNsNEu9qqbmLr0/teMnqU/AychCiPBTpaI4nBMPagE=
+	t=1744251237; cv=none; b=a/pEaPkaba+nukECgiKUCZY32D5OhIy/l1P8ArZyevcKgHeSkDcFWC2yapcaFRWClSzf0sUJyA7df3bo9USZdDUgLmLb7VKC99OxYUW/OtpE3SG1iQau2UtkHOGYKvU9n2CMUODyBcMG+MKMNjDkz5a0RLV/Bm63yS23Uy7JhiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744250777; c=relaxed/simple;
-	bh=00CWvMubTXn8KiaGY9JQiBESkYIbnobhC2OpT6I0kQ4=;
+	s=arc-20240116; t=1744251237; c=relaxed/simple;
+	bh=9u60sO7OOT1oWOmjPwikFu4rY64oDd58zik3I0OmYfo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=k0EM8B0ZCAF1gfiuBjgfSFIbBVXH+MuwIdnbSTaFdw1qu72UpYBVpEAMxPJSz+GHhsUjIAjrTRMZsxXEESJfoTDstU1dAtpMQwwX1tnXtBcfY/DTzuOo/S6Q0tDszPgevfx7/nixSgDOfXNvmfWDTemHEOGEvfL5J6pKpluYvIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=csFjFbR6; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-736b0c68092so202082b3a.0
-        for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 19:06:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1744250774; x=1744855574; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qLfzADnFJZfpkNlgb/x4vFLv1q7ddCAmApIeXYB9u6c=;
-        b=csFjFbR6j4sHjK2cNY6GjXXoXlcIdkbijJtYi9+B2VcpPY/7VtOFWUqCkPxZATo0u7
-         XWt6lMkfdC+Ld/LPfQyQ2v2aUX4NF9KelxNmfY3XgZht+ZcpqhVi+ezdlHFdMMz8LWk5
-         cRUu+DObnI8BVarvF1639pjr+gvuVW66tCJuTsjfHAIeFrynRE3qUE5j3dN2fiIWF4AF
-         EH72dTO/y5i26pq/zpqdVAav2t9QQ5kl+sondZVnsIJb4BdcCRD1h4DaXpMoF8ww4XiS
-         hX0VvfUGuBuyRuJrPPacdDz0+PxBcrYB7iYNP6ZxnACKSJg1svUofghMSq0ai7nAipSG
-         jqQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744250774; x=1744855574;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qLfzADnFJZfpkNlgb/x4vFLv1q7ddCAmApIeXYB9u6c=;
-        b=dSHvrYrwSZUENvdeqY9ulnmeY03ki5Awffsb9y+SrS5nKT7XfBGCkvwf+VTxi9Eyy+
-         viUL1Y9BTbcygCaJLYe5/G526mX1GUU8dwrD94S/sPVhm+0jNUpyCDTj7+eGVsLsT0xj
-         +1rD1jpO+Jz/SMQQcI1uY2UxHpX6ik+sSaIOQ0pB1fh5rjXv4zJf1tiADPKW4ye51zRY
-         /OXUacPsckNgmRd+15ea+Q8tZCFo9ZvlP6VnYAniPupL1Se4V4nvnrCa+Tru6L4NsU5v
-         ILvafQH78ouyz7f8E6tR/So8JHlx/VINoPJURZrZbg7d6FLPMDrOWD/jPc/u7ujOMD4m
-         LSxA==
-X-Gm-Message-State: AOJu0YzXty1eD4FJ5sGp3TOKSfd56AUPZcYhn2gqxfJwIqWzeFauJ7zp
-	PWzThin/1aJy5jZht727WJewNajzJRWw8ZlpFwo/Qb48GPbTyVXwnvsXdh7uyIo=
-X-Gm-Gg: ASbGnctGtaO9/oFiDZVutsZ0A3L+pogclKcyuAx1dSCaPB7RqMl7TRWGglSqXnhsIQ3
-	vvS845QCLELo4Cv4+TGoU6lwkUhkBCSDTd0Uvs/IEi+iETBHwlRhjIfU+EuVteEzXu3sSRSE3lT
-	mAdlFA9iIFMDeS4WaLKhkCt0+YhT2CrjzzYlDqJWo0V9b9UPKmR+RyF7iQWMdF2IdVTAHTj/XmI
-	fx0wyRCGo598otTDg6eoWoSpEj9D4PIg7Yq4e2RdEr/G4/XDx1VQLpVv/ECv68OrK6jAyzsd0kV
-	ym/5ZfRP5IUhObw0lYpoZKrb8Slu2Cg9hxw0T0a3RMztDGh+SR5gZEXPyA==
-X-Google-Smtp-Source: AGHT+IFcsqF2COoB0ZwKxM1t1iUUhTzcjUC1SauyOA0wnqzk2CF8OJWkpbLX3fklPdOTSQtdrL7y8w==
-X-Received: by 2002:a05:6a21:318c:b0:1f5:6e00:14da with SMTP id adf61e73a8af0-201695fb4a7mr2370000637.40.1744250774693;
-        Wed, 09 Apr 2025 19:06:14 -0700 (PDT)
-Received: from [192.168.1.12] ([97.126.136.10])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b02a322114fsm1935978a12.73.2025.04.09.19.06.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Apr 2025 19:06:14 -0700 (PDT)
-Message-ID: <54a8a9fa-9717-435e-9253-40f3a0a7f779@davidwei.uk>
-Date: Wed, 9 Apr 2025 19:06:13 -0700
+	 In-Reply-To:Content-Type; b=jyrx9vcKh3bQBwlFUn5MCd03clO2cOnKXN0/VHVawSfJhx3OrL+vuYxCQixECWJov5lKBt9rI+r8GLFYxoRz9760wpu7sDj1ao+nLg7LgGmSn6bqt7pXWP/0AL3taPtxaXDAeo+2/qUhQxoOHG/dBa4OQKDjm6r/E2KJKIRCd1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=oGXzMqPn; arc=none smtp.client-ip=198.137.202.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+Received: from [IPV6:2601:646:8081:1f94:9d5:a0c2:3619:62ac] ([IPv6:2601:646:8081:1f94:9d5:a0c2:3619:62ac])
+	(authenticated bits=0)
+	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 53A29YJd3849252
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Wed, 9 Apr 2025 19:09:34 -0700
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 53A29YJd3849252
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
+	s=2025032001; t=1744250985;
+	bh=sYPb2HJP4fVpfYUaFUUZ0pgxUHfO2I9/b7H7IqJmj3c=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=oGXzMqPnDihlvH8csOG6X1vYEL5+OkVYip8jhTPp6IM9qVTa+TE2DQN/NL7CCufbI
+	 W70VoP5+eXYAecjlqh+Tn7MRcWyYYPY6ri9KgXYwsAfXP39A5RG5P/1U2MrIrPxIl4
+	 LgNJ7p5qe7PlXd1brGtIHKI9TjgO8NyN/0p80ooXB7kFpxcUb3DSe2qpaXbL6MYH5Y
+	 jkbPJIJLpQn1W597tFm89pO6yOJzSzHl/UbpTIyOav94ZVlYeTk/+v6ZOvSDveTwGk
+	 3WaanUXTgaBtSBGsUrLEl+lM6ukmEGPsrkHUnC15nBvJNz4rVyDO7jHqYWigKmp0ks
+	 M5Uu5VvWQnEFA==
+Message-ID: <e97a83a2-dabd-4dc3-b69a-840ca17d70b5@zytor.com>
+Date: Wed, 9 Apr 2025 19:09:28 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,48 +56,199 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] io_uring/zcrx: enable tcp-data-split in selftest
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>
-References: <20250409163153.2747918-1-dw@davidwei.uk>
- <20250409170622.5085484a@kernel.org>
-Content-Language: en-GB
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20250409170622.5085484a@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH v4 00/13] Introduce parity_odd() and refactor redundant
+ parity code
+To: Yury Norov <yury.norov@gmail.com>, Kuan-Wei Chiu <visitorckw@gmail.com>
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, jk@ozlabs.org,
+        joel@jms.id.au, eajames@linux.ibm.com, andrzej.hajda@intel.com,
+        neil.armstrong@linaro.org, rfoss@kernel.org,
+        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+        tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
+        dmitry.torokhov@gmail.com, mchehab@kernel.org, awalls@md.metrocast.net,
+        hverkuil@xs4all.nl, miquel.raynal@bootlin.com, richard@nod.at,
+        vigneshr@ti.com, louis.peens@corigine.com, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+        parthiban.veerasooran@microchip.com, arend.vanspriel@broadcom.com,
+        johannes@sipsolutions.net, gregkh@linuxfoundation.org,
+        jirislaby@kernel.org, akpm@linux-foundation.org, jdelvare@suse.com,
+        linux@roeck-us.net, alexandre.belloni@bootlin.com, pgaj@cadence.com,
+        alistair@popple.id.au, linux@rasmusvillemoes.dk,
+        Laurent.pinchart@ideasonboard.com, jonas@kwiboo.se,
+        jernej.skrabec@gmail.com, kuba@kernel.org,
+        linux-kernel@vger.kernel.org, linux-fsi@lists.ozlabs.org,
+        dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
+        oss-drivers@corigine.com, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
+        brcm80211-dev-list.pdl@broadcom.com, linux-serial@vger.kernel.org,
+        bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw, Frank.Li@nxp.com,
+        linux-hwmon@vger.kernel.org, linux-i3c@lists.infradead.org,
+        david.laight.linux@gmail.com, andrew.cooper3@citrix.com,
+        Yu-Chun Lin <eleanor15x@gmail.com>
+References: <20250409154356.423512-1-visitorckw@gmail.com>
+ <Z_amQp3gK5Dm8Qz3@yury> <Z/a5Qh/OeLT8JBS4@visitorckw-System-Product-Name>
+ <Z_a9YpE46Xf8581l@yury>
+Content-Language: en-US
+From: "H. Peter Anvin" <hpa@zytor.com>
+In-Reply-To: <Z_a9YpE46Xf8581l@yury>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 2025-04-09 17:06, Jakub Kicinski wrote:
-> On Wed,  9 Apr 2025 09:31:53 -0700 David Wei wrote:
->> For bnxt when the agg ring is used then tcp-data-split is automatically
->> reported to be enabled, but __net_mp_open_rxq() requires tcp-data-split
->> to be explicitly enabled by the user.
+On 4/9/25 11:33, Yury Norov wrote:
+>>>
+>> I don't have a strong preference for the name, but if I had to guess
+>> the return value from the function prototype, I would intuitively
+>> expect an int to return "0 for even and 1 for odd," and a bool to
+>> return "true for even, false for odd." I recall Jiri and Jacob shared
+>> similar thoughts, which is why I felt adding _odd could provide better
+>> clarity.
 > 
->> diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
->> index 9f271ab6ec04..6a0378e06cab 100755
->> --- a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
->> +++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
->> @@ -35,6 +35,7 @@ def test_zcrx(cfg) -> None:
->>      rx_ring = _get_rx_ring_entries(cfg)
->>  
->>      try:
->> +        ethtool(f"-G {cfg.ifname} tcp-data-split on", host=cfg.remote)
+> I think they said they are convinced that parity should return 1 for
+> odd because of folding and __builtin_parity() arguments.
 > 
-> You should really use defer() to register the "undo" actions
-> individually. Something like:
-> 
->          ethtool(f"-G {cfg.ifname} tcp-data-split on", host=cfg.remote)
->          defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}", host=cfg.remote)
->          ethtool(f"-G {cfg.ifname} rx 64", host=cfg.remote)
->          defer(ethtool, f"-G {cfg.ifname} rx {rx_ring}", host=cfg.remote)
->          ethtool(f"-X {cfg.ifname} equal {combined_chans - 1}", host=cfg.remote)
->          defer(ethtool, f"-X {cfg.ifname} default", host=cfg.remote)
->          ...
-> 
-> This patch is fine. But could you follow up and convert the test fully?
 
-I'll send a follow up, one to switch to defer(), then another to call
-tcp-data-split on.
+And for bool, 0 == false, and 1 == true. In fact, the *definitions* for 
+false and true in C (but not C++) is:
+
+<stdbool.h>:
+typedef _Bool bool;
+#define false	0
+#define true	1
+
+If someone wants to make more clear, it would be better to put "typedef 
+bool bit_t" in a common header, but that personally seems ridiculous to me.
+   >>>> type from u8 to u64 for broader applicability, and updates its 
+return
+>>>> type from int to bool to make its usage and return semantics more
+>>>> intuitive-returning true for odd parity and false for even parity. It
+>>>> also adds __attribute_const__ to enable compiler optimizations.
+>>>
+>>> That's correct and nice, but can you support it with a bloat-o-meter's
+>>> before/after and/or asm snippets? I also think it worth to be a separate
+>>> patch, preferably the last patch in the series.
+>>>
+>> I quickly tested it with the x86 defconfig, and it appears that the
+>> generated code doesn't change. I forgot who requested the addition
+>> during the review process, but I initially thought it would either
+>> improve the generated code or leave it unchanged without significantly
+>> increasing the source code size.
+> 
+> That's what I actually expected, but was shy to guess openly. :). It's
+> hard to imagine how compiler may improve code generation in this case...
+> 
+> This attribute is used when there's an asm block, or some non-trivial
+> function call. In this case, the function is self-consistent and makes
+> no calls. And you see, const annotation raises more questions than
+> solves problems. Let's drop it.
+
+Ah yes; one of the quirks about gcc asm is that an asm is implicitly 
+assumed "const" (with no memory operands) or "pure" (with memory 
+operands) unless declared volatile or given an explicit "memory" clobber.
+
+So yes, the compiler can most definitely derive the constness from the 
+form of the function even in the variable case.
+
+I would still like to see __builtin_parity() being used as an 
+architecture opt-in; it can, of course, also be unconditionally used in 
+the constant case.
+
+So in the end one of these two become my preferred implementation, and I 
+really don't think it is very complicated:
+
+#ifndef use_builtin_parity
+#define use_builtin_parity(x) __builtin_constant_p(x)
+#endif
+
+static inline bool parity8(u8 val)
+{
+	if (use_builtin_parity(val))
+		return __builtin_parity(val);
+	val ^= val >> 4;
+	return (0x6996 >> (val & 0xf)) & 1;
+}
+
+static inline bool parity16(u16 val)
+{
+	if (use_builtin_parity(val))
+		return __builtin_parity(val);
+	return parity8(val ^ (val >> 8));
+}
+
+static inline bool parity32(u32 val)
+{
+	if (use_builtin_parity(val))
+		return __builtin_parity(val);
+	return parity16(val ^ (val >> 16));
+}
+
+static inline bool parity64(u64 val)
+{
+	if (use_builtin_parity(val))
+		return __builtin_parityll(val);
+	return parity32(val ^ (val >> 32));
+}
+
+This means that an architecture -- in particular, x86 -- can still ask 
+to use __builtin_parity*() directly. It means that architectures on 
+which __builtin_parity*() produces bad code should either complain to 
+the gcc/clang team and have it fixed, or we can add additional mechanism 
+for them to override the implementation at that time.
+
+The alternative is to stop worrying about overengineering, and just do 
+it once and for all:
+
+#ifndef parity8
+static inline bool parity8(u8 val)
+{
+	val ^= val >> 4;
+	return (0x6996 >> (val & 0xf)) & 1;
+}
+#endif
+
+#ifndef parity16
+static inline bool parity16(u16 val)
+{
+	return parity8(val ^ (val >> 8));
+}
+#endif
+
+#ifndef parity32
+static inline bool parity32(u32 val)
+{
+	return parity16(val ^ (val >> 16));
+}
+#endif
+
+#ifndef parity64
+static inline bool parity64(u64 val)
+{
+	return parity32(val ^ (val >> 32));
+}
+#endif
+
+In either case, instead of packing the cascade into one function, make 
+good use of it.
+
+In the latter case, __builtin_constant_p() isn't necessary as it puts 
+the onus on the architecture to separate out const and non-const cases, 
+if it matters -- which it doesn't if the architecture simply wants to 
+use __builtin_parity:
+
+#define parity8(x)  ((bool) __builtin_parity((u8)(x)))
+#define parity16(x) ((bool) __builtin_parity((u16)(x)))
+#define parity32(x) ((bool) __builtin_parity((u32)(x)))
+#define parity64(x) ((bool) __builtin_parityll((u64)(x)))
+
+As stated before, I don't really see that the parity function itself 
+would be very suitable for a generic helper, but if it were to, then 
+using the "standard" macro construct for it would seem to be the better 
+option.
+
+(And I would be very much in favor of not open-coding the helper 
+everywhere but to macroize it; effectively creating a C++ template 
+equivalent. It is out of scope for this project, though.)
+
+	-hpa
+
 
