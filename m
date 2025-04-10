@@ -1,255 +1,136 @@
-Return-Path: <netdev+bounces-181370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 999C2A84AD9
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 19:22:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02B6EA84AE5
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 19:25:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76FA34C2294
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 17:22:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0DAAC7ABE80
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 17:22:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40CF21F098E;
-	Thu, 10 Apr 2025 17:22:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D790F1F09A5;
+	Thu, 10 Apr 2025 17:24:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P/jCjagg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S0gJmHzb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9655415D5B6;
-	Thu, 10 Apr 2025 17:22:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29A7F1EF363;
+	Thu, 10 Apr 2025 17:23:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744305774; cv=none; b=kMW0engPxsF3X2Z9/UdA5KUYsU41eWhgCSGelCr3rXzL6IRINiJHIAH0dVZXyPTVvxyaKK3vLF523dTOuLF+eEFbtTxhdACZDOtOsg8pzhECFLVMmCMLNgUtEgmW1dK9KUgKKxeMghMZqgzjVWyVX2ECZZWNRGhpiuliRttmPeA=
+	t=1744305840; cv=none; b=u8y2kKvxqKpnxkq4e/9mR1N7OKVSuj7yd768TyKymVz6kktuxQWuuGaJ2OXpvz89EDt1cJm8BDyA0vpw+yCwNkKyMSqfvlZJ+tbipvtGm7Qjva4QjPZzKI82W8GRuHhyAw9Y4KkjRvKuG/34wc5SJBgvG7uKi0YZAeGF8mPKGoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744305774; c=relaxed/simple;
-	bh=pvn7tXjdG6gfIyfzZr5drPvwWX3wRbgXki7C6daaqYA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rlmgWHbFcbjjYIY9/gjda95fY/QLOvh5U5RBp5RAcbLZ3tOIVj/c7/P6sEiZm41/njaP+D2GaavDteJcN9m/mz57D/krbLVEYH48oY4gYNHsnVKemW/u/Vni5whZ/O4WRSoSq5pRY143vsmJqxlGgmdiBlj4qW3/J6s/pIo79T8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P/jCjagg; arc=none smtp.client-ip=209.85.210.177
+	s=arc-20240116; t=1744305840; c=relaxed/simple;
+	bh=ClReNv4tZNKYKHIKcr+3YRA9kSYs6eYQ6ZoMhlVPy0I=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BsknDtMqTQ4DtiHRVS9ljnerAXaIcnTZoWGbEztwm8IAl2oGihb1BxkdzgpG2s5ksZWsMa7WmeesB4QU47/Ttfdrm92t8NAxg5m4kO/ARQ5/UtAMjT422/ZyrzhAp3JzeCIs7fagWuWQJ5ZfALGwfCA5MpGBhn0rEZRESmuQoho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S0gJmHzb; arc=none smtp.client-ip=209.85.221.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-730517040a9so1369979b3a.0;
-        Thu, 10 Apr 2025 10:22:52 -0700 (PDT)
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-39c0dfad22aso569449f8f.2;
+        Thu, 10 Apr 2025 10:23:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744305772; x=1744910572; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IgtDWZl2x1QLYm6C7yhUEwcBItI4P6YMt+GwUmEGLw4=;
-        b=P/jCjaggRe/Nc43tBHB2X0sjWST/ahT7t9/k+LLBH1zGpOsusULmpXrsFAy6rssQF5
-         1OWv1KI25uND/gIZJ28wCafF9h4HogILSy0hh+wwOeahNOxtb6DLrSgJl9dkJWdhLj5r
-         lO9jYi0U3GNvBErpHsCUnT8FFpHLSTHryDQ0iKo6YK7V734mwWlZ+7vmZo3IIw0Y8Air
-         7jvYm3SmgKpnMEs7q5iuWxJGA48b37on89iQzlL5QDcQdITH7fftFVCJFy0R6HJ7qjmB
-         NjFDAVe2AOZGpA0RCh5VZHd76CD5Ce8XVcMvdHY2CiC4Nc//XkSbcBd9jJMJc/SShHBi
-         jh3g==
+        d=gmail.com; s=20230601; t=1744305836; x=1744910636; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=RVEmfdcIK+nAC24P6F8Ud5S0YAAGuFYjRvgCZ39ZrCQ=;
+        b=S0gJmHzbpt4uWdJ5XDWZodPTbEJFbfn4vAjDlsOTNKl/WuUqPCGbaZoYvkHQd6Emef
+         Nof2K+CVxvfrBFL6JTmGKrrxmRsqzLIotk1jAUTPuN6Y++PyykumCTMkRBV+DDjnzMrH
+         GiPotdoonWaPtRsFfEkO2xDHDOBzqz4jMLAMlD1WAv6+usSUmeKuus56WivnEyUJHrrF
+         Y1F+39mLK7vUq15u8qTaclykr4t6lzijCkJe8JCUuB1902ExK/eyh47LCk2RJASC7C3N
+         UkUI3lFd/NgLzbRDgmVGjdq+WG29mu8fRGRh8lx2TzmlljcFn84gqE9XmUgnE3e9FrwQ
+         yotA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744305772; x=1744910572;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IgtDWZl2x1QLYm6C7yhUEwcBItI4P6YMt+GwUmEGLw4=;
-        b=tvLc/Ed6dnMi7PVAIj36guVMacUJdrRe4arrivVqQF8/xFFGkWivCMzQetW6t+sXov
-         iVufa3S2mGKAHRPuJJB6lzwOA0D5GxXmBIHNGNjVykO/5n60Hi/kguBsUQmw2oVPpIS7
-         7ajzRqFiVRVDnLzvgqCD4PK/o2vdGiF5er/0FLB8kwLu+RExP+T0rj8xOaUSRpoxD/gr
-         HBfVnXLYrU8lL6fchVd8YHLR/IBCImh1hycYe497Xm8FwwWLvPwWpzJqtexML2p8iHYw
-         B5I0bU09U8fTTx1uCKLy0q7PIn+lcxTA264vlfMosQKX9v+Bgj2GI55BHcXFF1vZD2sX
-         cqdg==
-X-Forwarded-Encrypted: i=1; AJvYcCVftkzs30gJEFdwF988ywKkdlJTNFZIzHKVFUh5iT7GyIrZc12yS696wdLkp7YzzLBQBcQ42bw85OHAiGE=@vger.kernel.org, AJvYcCVxhvnVMnNR6C9I5Xqrymyxr/uRSBeAoAQdEu8zlTkr3NkwrMpakX0GQXaF7YVX818gk6ngVb9k@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRY88J09tQr1+WpEiD2G/zr+gvoo2MBt7eyEZYablPjKlm0dxX
-	yizx2H+i6EQMW4Q+8LwjtQToR7x0k2dzNFIKAc6A8zx1s+yKJDc=
-X-Gm-Gg: ASbGncvmY8ntLPIj6vWSUvv5AIMSfJECJFDuVGEMsJfPScR8Z/SFEjyHI0zdQKs/MxE
-	mcPBvUNqJgJzgi99v+FpbWocg4X+lbuWeKxapTdygshKaSkgP1OD00/RdWO75+BVsD/785y8AV+
-	FCBFAMU2GFKt1qtdG0YCqaJjA+kXluvNtraMi7PhZVsU1QQcc3V7us7+IBG+lwEYM1oHLo6bYIg
-	/ZFgroP5/xszAEXlaIE6Oh7iYw9/ATRjpgMjqojeij8dn3QztPgjJXlxBeC7vhe7WoaSaXoZ3Wf
-	5kofOkbdEazHOcJm2QxGHmh9qQSZU3HH9t8J6x6U7kY0tJjt7//nwzQ98C+qrDxjFtY+5m4=
-X-Google-Smtp-Source: AGHT+IEqhqDXgHC4MZY+OWZh74zHsmVZF1CJ4511JHb4Xsj7rApNyxMJIZ9asTIyeHBktC25oodk9Q==
-X-Received: by 2002:a05:6a00:39aa:b0:736:3ea8:4805 with SMTP id d2e1a72fcca58-73bbee3f901mr5234719b3a.7.1744305771731;
-        Thu, 10 Apr 2025 10:22:51 -0700 (PDT)
-Received: from L1HF02V04E1.TheFacebook.com ([2620:10d:c090:500::6:aed5])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73bb1e51ed7sm3529815b3a.155.2025.04.10.10.22.49
+        d=1e100.net; s=20230601; t=1744305836; x=1744910636;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RVEmfdcIK+nAC24P6F8Ud5S0YAAGuFYjRvgCZ39ZrCQ=;
+        b=TcB6f46/5hRuZWIzJDeTROsR2SXGOTVG3zeN90sy7SGPEvFLG1ZyHklY7hEhjQHxOX
+         vpDz/Y+CsXNG2x7lDQpUdM2tE3ZmD4w2x1ZZM8JGJKi5ZdmDhzKohMdfFX5zsqyA4IB1
+         uovr8Fx1tb5ETa3jxmKkPn7xAncDDcRw9dyjbVXJVy83+Ehf3XODKlXYxpcICbsWCRVq
+         tRJUvfBB5gBxfe8Dcj1UrrKgRJxmxoCzKJgfR6K1tDCtNJdjiQNq/M5360Cm2QrhFqLN
+         c6itbZhc+uC7Cj2zXUUMAtWMO1aDTjV37tO5DTVKySsFu/BVAov5xld0tP9KoHTNyKX3
+         gjQA==
+X-Forwarded-Encrypted: i=1; AJvYcCU508S7r7LMviC/KniFSNIzAU0rbv1WhPcuvt+G0Zbucmaejr2KHMAeGf1Lihe7WaQpQUoPa8F6A39xT5+9@vger.kernel.org, AJvYcCUVhxMf5BEkPX9FyQGbluINLnPSWgioTU/nZCv0LbCTAKXXvAx2TES9ga77YET/d3f/b0JCAzCw@vger.kernel.org, AJvYcCUsHDLgneAtTeA9fOsCsY9VlW8/s6h4TbczE5UvqAVquU6LNCEAfftCxhdKPvh4nOcn1XINUZZ+4OCp@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyn5T+7n33/7wdGETsWTzwORUmgeL20sSdAnT9UlNqTprBc1fl9
+	NzE7TwNfpciMg+skLvnfrdwxE+tjp+hnecEW3qBOQ3bzNStAeBNu
+X-Gm-Gg: ASbGncsKAdhA+UX/cyfwLXMCv/WWK0vH08SC3jXteNqagf2SH9+16xB3loO7o7nyLeJ
+	fUXUWBEjgjlDdOCHJ2aidrcXxhPes3a1veU/O4cotomzT+0clyUC4DntvWc7ZfL1kLo6m0T+BoB
+	OUA+cF2she86PzeOU84ZNo2I0TZ8PXjM/4XCaIM43bWg15rL8bRjM0EbZihow7prWLup1zw3rpt
+	dhDaGKjJbLLwCvyaNReGU4KDhQ+fp/MPNPaQpmRZtd0FCx9o5UBIqegLQCoYKFnyVL2rzINnElX
+	eOYDDWQDSvvSihG9T49hnBEVsRBLEbFfDzV6H1iQea6qYRox8ts6TFck2S3IdiFjTcLoaZMX6Wc
+	PFO8E3fk=
+X-Google-Smtp-Source: AGHT+IFqhoIbl8rG6Xm1pydrcNvSBmIecSBYlMaEofFIFMZzgUR9B34igWvZcOG2E52kzZjCqGGyAw==
+X-Received: by 2002:a05:6000:2586:b0:391:3aaf:1d5d with SMTP id ffacd0b85a97d-39d8f47497bmr3207232f8f.27.1744305836300;
+        Thu, 10 Apr 2025 10:23:56 -0700 (PDT)
+Received: from Ansuel-XPS. (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39d893f0a75sm5495874f8f.62.2025.04.10.10.23.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Apr 2025 10:22:51 -0700 (PDT)
-From: kalavakunta.hari.prasad@gmail.com
-To: sam@mendozajonas.com,
-	fercerpav@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: npeacock@meta.com,
-	akozlov@meta.com,
-	hkalavakunta@meta.com,
-	Hari Kalavakunta <kalavakunta.hari.prasad@gmail.com>
-Subject: [PATCH net-next v3] net: ncsi: Fix GCPS 64-bit member variables
-Date: Thu, 10 Apr 2025 10:22:47 -0700
-Message-Id: <20250410172247.1932-1-kalavakunta.hari.prasad@gmail.com>
-X-Mailer: git-send-email 2.37.1.windows.1
+        Thu, 10 Apr 2025 10:23:55 -0700 (PDT)
+Message-ID: <67f7feab.df0a0220.40a6f.c911@mx.google.com>
+X-Google-Original-Message-ID: <Z_f-qflwHutRYS6_@Ansuel-XPS.>
+Date: Thu, 10 Apr 2025 19:23:53 +0200
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	"Chester A. Unal" <chester.a.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Simon Horman <horms@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	upstream@airoha.com
+Subject: Re: [net-next PATCH v14 06/16] net: mdio: regmap: prepare support
+ for multiple valid addr
+References: <20250408095139.51659-1-ansuelsmth@gmail.com>
+ <20250408095139.51659-7-ansuelsmth@gmail.com>
+ <6f29a01d-35da-4d51-b309-a1799950a707@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6f29a01d-35da-4d51-b309-a1799950a707@lunn.ch>
 
-From: Hari Kalavakunta <kalavakunta.hari.prasad@gmail.com>
+On Thu, Apr 10, 2025 at 07:18:02PM +0200, Andrew Lunn wrote:
+> On Tue, Apr 08, 2025 at 11:51:13AM +0200, Christian Marangi wrote:
+> > Rework the valid_addr and convert it to a mask in preparation for mdio
+> > regmap to support multiple valid addr in the case the regmap can support
+> > it.
+> 
+> I think it would be good to pull these MDIO regmap patches out into a
+> series of their own. We know there is a user, so i'm happy for us the
+> accept it without that user. But this code needs further discusion,
+> which will be irrelevant for the switch.
+>
 
-Correct Get Controller Packet Statistics (GCPS) 64-bit wide member
-variables, as per DSP0222 v1.0.0 and forward specs. The Driver currently
-collects these stats, but they are yet to be exposed to the user.
-Therefore, no user impact.
+Ok so how you would like to proceed for the remaining patch? Repost as RFC?
 
-Statistics fixes:
-Total Bytes Received (byte range 28..35)
-Total Bytes Transmitted (byte range 36..43)
-Total Unicast Packets Received (byte range 44..51)
-Total Multicast Packets Received (byte range 52..59)
-Total Broadcast Packets Received (byte range 60..67)
-Total Unicast Packets Transmitted (byte range 68..75)
-Total Multicast Packets Transmitted (byte range 76..83)
-Total Broadcast Packets Transmitted (byte range 84..91)
-Valid Bytes Received (byte range 204..11)
+Still waiting feedback for nvmem and mfd so I would love to get feedback
+for them (that are also irrelevant to the switch)
 
-v2:
-- __be64 for all 64 bit GCPS counters
-
-v3:
-- be64_to_cpup() instead of be64_to_cpu()
-
-Signed-off-by: Hari Kalavakunta <kalavakunta.hari.prasad@gmail.com>
----
- net/ncsi/internal.h | 21 ++++++++++-----------
- net/ncsi/ncsi-pkt.h | 23 +++++++++++------------
- net/ncsi/ncsi-rsp.c | 21 ++++++++++-----------
- 3 files changed, 31 insertions(+), 34 deletions(-)
-
-diff --git a/net/ncsi/internal.h b/net/ncsi/internal.h
-index 4e0842df5234..2c260f33b55c 100644
---- a/net/ncsi/internal.h
-+++ b/net/ncsi/internal.h
-@@ -143,16 +143,15 @@ struct ncsi_channel_vlan_filter {
- };
- 
- struct ncsi_channel_stats {
--	u32 hnc_cnt_hi;		/* Counter cleared            */
--	u32 hnc_cnt_lo;		/* Counter cleared            */
--	u32 hnc_rx_bytes;	/* Rx bytes                   */
--	u32 hnc_tx_bytes;	/* Tx bytes                   */
--	u32 hnc_rx_uc_pkts;	/* Rx UC packets              */
--	u32 hnc_rx_mc_pkts;     /* Rx MC packets              */
--	u32 hnc_rx_bc_pkts;	/* Rx BC packets              */
--	u32 hnc_tx_uc_pkts;	/* Tx UC packets              */
--	u32 hnc_tx_mc_pkts;	/* Tx MC packets              */
--	u32 hnc_tx_bc_pkts;	/* Tx BC packets              */
-+	u64 hnc_cnt;		/* Counter cleared            */
-+	u64 hnc_rx_bytes;	/* Rx bytes                   */
-+	u64 hnc_tx_bytes;	/* Tx bytes                   */
-+	u64 hnc_rx_uc_pkts;	/* Rx UC packets              */
-+	u64 hnc_rx_mc_pkts;     /* Rx MC packets              */
-+	u64 hnc_rx_bc_pkts;	/* Rx BC packets              */
-+	u64 hnc_tx_uc_pkts;	/* Tx UC packets              */
-+	u64 hnc_tx_mc_pkts;	/* Tx MC packets              */
-+	u64 hnc_tx_bc_pkts;	/* Tx BC packets              */
- 	u32 hnc_fcs_err;	/* FCS errors                 */
- 	u32 hnc_align_err;	/* Alignment errors           */
- 	u32 hnc_false_carrier;	/* False carrier detection    */
-@@ -181,7 +180,7 @@ struct ncsi_channel_stats {
- 	u32 hnc_tx_1023_frames;	/* Tx 512-1023 bytes frames   */
- 	u32 hnc_tx_1522_frames;	/* Tx 1024-1522 bytes frames  */
- 	u32 hnc_tx_9022_frames;	/* Tx 1523-9022 bytes frames  */
--	u32 hnc_rx_valid_bytes;	/* Rx valid bytes             */
-+	u64 hnc_rx_valid_bytes;	/* Rx valid bytes             */
- 	u32 hnc_rx_runt_pkts;	/* Rx error runt packets      */
- 	u32 hnc_rx_jabber_pkts;	/* Rx error jabber packets    */
- 	u32 ncsi_rx_cmds;	/* Rx NCSI commands           */
-diff --git a/net/ncsi/ncsi-pkt.h b/net/ncsi/ncsi-pkt.h
-index f2f3b5c1b941..24edb2737972 100644
---- a/net/ncsi/ncsi-pkt.h
-+++ b/net/ncsi/ncsi-pkt.h
-@@ -252,16 +252,15 @@ struct ncsi_rsp_gp_pkt {
- /* Get Controller Packet Statistics */
- struct ncsi_rsp_gcps_pkt {
- 	struct ncsi_rsp_pkt_hdr rsp;            /* Response header            */
--	__be32                  cnt_hi;         /* Counter cleared            */
--	__be32                  cnt_lo;         /* Counter cleared            */
--	__be32                  rx_bytes;       /* Rx bytes                   */
--	__be32                  tx_bytes;       /* Tx bytes                   */
--	__be32                  rx_uc_pkts;     /* Rx UC packets              */
--	__be32                  rx_mc_pkts;     /* Rx MC packets              */
--	__be32                  rx_bc_pkts;     /* Rx BC packets              */
--	__be32                  tx_uc_pkts;     /* Tx UC packets              */
--	__be32                  tx_mc_pkts;     /* Tx MC packets              */
--	__be32                  tx_bc_pkts;     /* Tx BC packets              */
-+	__be64                  cnt;            /* Counter cleared            */
-+	__be64                  rx_bytes;       /* Rx bytes                   */
-+	__be64                  tx_bytes;       /* Tx bytes                   */
-+	__be64                  rx_uc_pkts;     /* Rx UC packets              */
-+	__be64                  rx_mc_pkts;     /* Rx MC packets              */
-+	__be64                  rx_bc_pkts;     /* Rx BC packets              */
-+	__be64                  tx_uc_pkts;     /* Tx UC packets              */
-+	__be64                  tx_mc_pkts;     /* Tx MC packets              */
-+	__be64                  tx_bc_pkts;     /* Tx BC packets              */
- 	__be32                  fcs_err;        /* FCS errors                 */
- 	__be32                  align_err;      /* Alignment errors           */
- 	__be32                  false_carrier;  /* False carrier detection    */
-@@ -290,11 +289,11 @@ struct ncsi_rsp_gcps_pkt {
- 	__be32                  tx_1023_frames; /* Tx 512-1023 bytes frames   */
- 	__be32                  tx_1522_frames; /* Tx 1024-1522 bytes frames  */
- 	__be32                  tx_9022_frames; /* Tx 1523-9022 bytes frames  */
--	__be32                  rx_valid_bytes; /* Rx valid bytes             */
-+	__be64                  rx_valid_bytes; /* Rx valid bytes             */
- 	__be32                  rx_runt_pkts;   /* Rx error runt packets      */
- 	__be32                  rx_jabber_pkts; /* Rx error jabber packets    */
- 	__be32                  checksum;       /* Checksum                   */
--};
-+}  __packed __aligned(4);
- 
- /* Get NCSI Statistics */
- struct ncsi_rsp_gns_pkt {
-diff --git a/net/ncsi/ncsi-rsp.c b/net/ncsi/ncsi-rsp.c
-index 4a8ce2949fae..d3f902a1c891 100644
---- a/net/ncsi/ncsi-rsp.c
-+++ b/net/ncsi/ncsi-rsp.c
-@@ -926,16 +926,15 @@ static int ncsi_rsp_handler_gcps(struct ncsi_request *nr)
- 
- 	/* Update HNC's statistics */
- 	ncs = &nc->stats;
--	ncs->hnc_cnt_hi         = ntohl(rsp->cnt_hi);
--	ncs->hnc_cnt_lo         = ntohl(rsp->cnt_lo);
--	ncs->hnc_rx_bytes       = ntohl(rsp->rx_bytes);
--	ncs->hnc_tx_bytes       = ntohl(rsp->tx_bytes);
--	ncs->hnc_rx_uc_pkts     = ntohl(rsp->rx_uc_pkts);
--	ncs->hnc_rx_mc_pkts     = ntohl(rsp->rx_mc_pkts);
--	ncs->hnc_rx_bc_pkts     = ntohl(rsp->rx_bc_pkts);
--	ncs->hnc_tx_uc_pkts     = ntohl(rsp->tx_uc_pkts);
--	ncs->hnc_tx_mc_pkts     = ntohl(rsp->tx_mc_pkts);
--	ncs->hnc_tx_bc_pkts     = ntohl(rsp->tx_bc_pkts);
-+	ncs->hnc_cnt            = be64_to_cpup(&rsp->cnt);
-+	ncs->hnc_rx_bytes       = be64_to_cpup(&rsp->rx_bytes);
-+	ncs->hnc_tx_bytes       = be64_to_cpup(&rsp->tx_bytes);
-+	ncs->hnc_rx_uc_pkts     = be64_to_cpup(&rsp->rx_uc_pkts);
-+	ncs->hnc_rx_mc_pkts     = be64_to_cpup(&rsp->rx_mc_pkts);
-+	ncs->hnc_rx_bc_pkts     = be64_to_cpup(&rsp->rx_bc_pkts);
-+	ncs->hnc_tx_uc_pkts     = be64_to_cpup(&rsp->tx_uc_pkts);
-+	ncs->hnc_tx_mc_pkts     = be64_to_cpup(&rsp->tx_mc_pkts);
-+	ncs->hnc_tx_bc_pkts     = be64_to_cpup(&rsp->tx_bc_pkts);
- 	ncs->hnc_fcs_err        = ntohl(rsp->fcs_err);
- 	ncs->hnc_align_err      = ntohl(rsp->align_err);
- 	ncs->hnc_false_carrier  = ntohl(rsp->false_carrier);
-@@ -964,7 +963,7 @@ static int ncsi_rsp_handler_gcps(struct ncsi_request *nr)
- 	ncs->hnc_tx_1023_frames = ntohl(rsp->tx_1023_frames);
- 	ncs->hnc_tx_1522_frames = ntohl(rsp->tx_1522_frames);
- 	ncs->hnc_tx_9022_frames = ntohl(rsp->tx_9022_frames);
--	ncs->hnc_rx_valid_bytes = ntohl(rsp->rx_valid_bytes);
-+	ncs->hnc_rx_valid_bytes = be64_to_cpup(&rsp->rx_valid_bytes);
- 	ncs->hnc_rx_runt_pkts   = ntohl(rsp->rx_runt_pkts);
- 	ncs->hnc_rx_jabber_pkts = ntohl(rsp->rx_jabber_pkts);
- 
 -- 
-2.47.1
-
+	Ansuel
 
