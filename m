@@ -1,132 +1,135 @@
-Return-Path: <netdev+bounces-181231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01BD1A84248
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 13:59:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF7B7A8425A
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:02:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A09DA00D64
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 11:55:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 685DB19E117A
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:02:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B0CC28CF4D;
-	Thu, 10 Apr 2025 11:53:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04DC8281509;
+	Thu, 10 Apr 2025 12:01:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="dfg+YRcn";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="r8Zp9VEO"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from fout-b2-smtp.messagingengine.com (fout-b2-smtp.messagingengine.com [202.12.124.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 056A8283CB7
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 11:53:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1BE3204F80;
+	Thu, 10 Apr 2025 12:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744286002; cv=none; b=JphLNdFtT3xxwyBBZiPvvT5A9LuHZG5SY88xD6OXZjH+WJTnGgHhtwmSMlqvtA2rtpstWktPIsBn+K1EGhKwFqZ1ly2UmQEV3xca3R86ss9fRCrcDS6M2113QGUTh/4rvn5z2OFkSuJ85fPf3Yat4QF4aoxjXuYFHR9ehQQsBFw=
+	t=1744286517; cv=none; b=RslGfJIw8MKCbfS/NWNY1BCIdIlVHqgu6l6pRDCzHSq01wc0jAb4FOyjmxm7IqPwgG7r0/nI6A+Y21WqhgcvvCf2/sTWYmP22XXj8+sQRzYNtRilQzsMsqesfyR7K/8VkVmp5Q5ulS0KtdEvsxEwVs34qQk0hane+arbY0kh/Bs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744286002; c=relaxed/simple;
-	bh=UXELpa1UU70rhDlnJufWAH05ykovzyZtSXFEGrbnpxQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dYphhGi7EVuCEh6k3TGBHE9in8odK9a8bqDAojKn9BhalxfSts7eZmZenr+4wFgJRSCQNNvz3WaoEESULKPjdjTYXP/zx+pGcUwC4M6mpy3rAAEmVnN7OXdsOA/uG+tkcUZj1OPXcL6jsFSgOyFNajt/UGqIUFTgPuOlZ5jhPs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u2qSz-0002y2-Im; Thu, 10 Apr 2025 13:53:09 +0200
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u2qSu-004GLH-0j;
-	Thu, 10 Apr 2025 13:53:04 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1u2qSu-00AkgW-0E;
-	Thu, 10 Apr 2025 13:53:04 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Thangaraj Samynathan <Thangaraj.S@microchip.com>,
-	Rengarajan Sundararajan <Rengarajan.S@microchip.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	Phil Elwell <phil@raspberrypi.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next v6 12/12] net: usb: lan78xx: remove unused struct members
-Date: Thu, 10 Apr 2025 13:53:02 +0200
-Message-Id: <20250410115302.2562562-13-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250410115302.2562562-1-o.rempel@pengutronix.de>
-References: <20250410115302.2562562-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1744286517; c=relaxed/simple;
+	bh=gl9oaGaRIsYt/WyBdN7UO9fsD1iIFpw+hRE7Ip3gDTM=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=lC32WcmvF6gnoFOm6SyYpfmdJG+efXWksk34eNmb2SqsZzcUZ3AxCWv287z10elZokkeR3nSgjgOdwvdFPO9IRt/Ymq49JYvjxggbu37WeQJT7oiPZNMUZhX1kbHKPvFcyjgYzAw0y2DNA+sAHMjLojTHz6IhD1olHsdkhL1yOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=dfg+YRcn; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=r8Zp9VEO; arc=none smtp.client-ip=202.12.124.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
+	by mailfout.stl.internal (Postfix) with ESMTP id 8903511400E8;
+	Thu, 10 Apr 2025 08:01:53 -0400 (EDT)
+Received: from phl-imap-11 ([10.202.2.101])
+  by phl-compute-05.internal (MEProxy); Thu, 10 Apr 2025 08:01:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1744286513;
+	 x=1744372913; bh=gl9oaGaRIsYt/WyBdN7UO9fsD1iIFpw+hRE7Ip3gDTM=; b=
+	dfg+YRcn27ujd2Kv89PNH28iSsx/7J18F2jg5wmmBRf8pCwvQaPjV1o7P8x/kROs
+	vvkaEZGKh4Yqj/RLXvclFPtu4fPBMK93Enw9GPRzzd22JO5qVvYm0yiIY2OM+VUY
+	LDtnq75Oz7w9eYYD91Bign6GT4zSA/4zm6MROyaMlWAFiKWre29U84VLxU2FSPkE
+	NT8uPtszkU/yY7WEuAAw1X0JSKFJVmEtqK9qOtv7PpM0LtNOCaMPhVbAQg2Wt2kj
+	ehPfW65hcdqzweofIQJwcG/YCyhN2fBlCluT87167OUV386sVeQu/JcMKerWhegc
+	iyUPtZcAywhDc6RVXB7nUg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1744286513; x=
+	1744372913; bh=gl9oaGaRIsYt/WyBdN7UO9fsD1iIFpw+hRE7Ip3gDTM=; b=r
+	8Zp9VEODKfutsmRAEbgUnrmBP3s0vdxVjQ8hpakmL3zjajt6qqTpVw916454vjfD
+	MYCRUzOEQP66c9+jX4v3aRjSpzYdR3Pn2o6ABlec/Jb5b5J0FuSN3zDzgEJncxJG
+	mr3wzL6l/A6SV4p+IF4pP1V3cyE2ZJRzIm2kkXP9GowfJB2Gkb15nmC3EMZTHmhu
+	EvaIZiuyGZoiFUksZ6ewc3NIgmf17tWIdAfOXtj2hf/Yh/2erVvJqYsgVmYyw70p
+	WL9b1Dpt3dH/1I6j59XUt7MntbL0AAiWiX/QrDcuw9gI8Sh+Gq2BMb8rn81QmirA
+	MEVWkzxStZrSeZgYJBRtA==
+X-ME-Sender: <xms:MLP3Z3ZzkHrptGtQOUk4WRvDyC57tPhsZw9eTxDP4-DVo3giJ-5fBg>
+    <xme:MLP3Z2ZJ-wOZhDIeQ-61FKaOu6linY8MUS3ia6cJ4zjA8_UAANbvmqWCqELvg8xO-
+    G4GclEPSZT2KHJX96Y>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtdekkeehucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertder
+    tddtnecuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnug
+    gsrdguvgeqnecuggftrfgrthhtvghrnhephfdthfdvtdefhedukeetgefggffhjeeggeet
+    fefggfevudegudevledvkefhvdeinecuvehluhhsthgvrhfuihiivgepudenucfrrghrrg
+    hmpehmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohep
+    udelpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehlihhnuhigsegrrhhmlhhinh
+    hugidrohhrghdruhhkpdhrtghpthhtoheprghnghgvlhhoghhiohgrtggthhhinhhordgu
+    vghlrhgvghhnohestgholhhlrggsohhrrgdrtghomhdprhgtphhtthhopegurghvvghmse
+    gurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoheprghnshhuvghlshhmthhhsehgmhgr
+    ihhlrdgtohhmpdhrtghpthhtohepughqfhgvgihtsehgmhgrihhlrdgtohhmpdhrtghpth
+    htohephhhkrghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepmhgrthht
+    hhhirghsrdgsghhgsehgmhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtse
+    hgohhoghhlvgdrtghomhdprhgtphhtthhopehrughunhhlrghpsehinhhfrhgruggvrggu
+    rdhorhhg
+X-ME-Proxy: <xmx:MLP3Z588WIt1trNXStRldSHp7GGw67WcEJeidMURVp7sO9bDhwqc0Q>
+    <xmx:MLP3Z9oVgKRh86jQsy2Z2YvyqQrLhGfsSpuomX5U0Ip0M10L_vEhqg>
+    <xmx:MLP3ZyruZoteQa0f9aj6BpwIy6D1WAEC9Mg7V3M4simfzGzh1FZ-wA>
+    <xmx:MLP3ZzTAa1BWV4e7XYPfF-qLN-dK0NxTmJItaIgjsgO8qeTPamDZjw>
+    <xmx:MbP3Z_j0t2xgFRutTCp2TfvmslhP_6FnsCjYr9_pkLwdxVg5p1L3TQFr>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 2B1352220073; Thu, 10 Apr 2025 08:01:52 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-ThreadId: T2340d8c52bdbc82d
+Date: Thu, 10 Apr 2025 14:01:31 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Christian Marangi" <ansuelsmth@gmail.com>
+Cc: "Andrew Lunn" <andrew@lunn.ch>, "Heiner Kallweit" <hkallweit1@gmail.com>,
+ "Russell King" <linux@armlinux.org.uk>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>, "Daniel Golle" <daniel@makrotopia.org>,
+ "Qingfang Deng" <dqfext@gmail.com>,
+ "SkyLake Huang" <SkyLake.Huang@mediatek.com>,
+ "Matthias Brugger" <matthias.bgg@gmail.com>,
+ "AngeloGioacchino Del Regno" <angelogioacchino.delregno@collabora.com>,
+ "Randy Dunlap" <rdunlap@infradead.org>, "Simon Horman" <horms@kernel.org>,
+ Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+Message-Id: <0b5c6443-f50f-47a1-b5f5-900d70b69e06@app.fastmail.com>
+In-Reply-To: <67f7a119.050a0220.b15d0.3df3@mx.google.com>
+References: <20250410100410.348-1-ansuelsmth@gmail.com>
+ <c108aee9-f668-4cd7-b276-d5e0a266eaa4@app.fastmail.com>
+ <67f7a015.df0a0220.287b40.53b2@mx.google.com>
+ <67f7a119.050a0220.b15d0.3df3@mx.google.com>
+Subject: Re: [net-next PATCH v2 1/2] net: phy: mediatek: permit to compile test GE SOC
+ PHY driver
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-Remove unused members from struct lan78xx_net, including:
+On Thu, Apr 10, 2025, at 12:44, Christian Marangi wrote:
+> On Thu, Apr 10, 2025 at 12:40:15PM +0200, Christian Marangi wrote:
+>
+> Also 99% I could be wrong but from what I can see in NVMEM kconfig,
+> NVMEM is not tristate but only bool? So NVMEM=m is not a thing?
 
-    driver_priv
-    suspend_count
-    mdix_ctrl
+Ah, I missed that. In this case your patches are both fine.
 
-These fields are no longer used in the driver and can be safely removed
-as part of a cleanup.
-
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
-changes v6:
-- drop only those fields not already removed in previous patches
-- align patch structure with review feedback from Russell King
----
- drivers/net/usb/lan78xx.c | 4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
-index 053c7a31d65c..8868f4a19760 100644
---- a/drivers/net/usb/lan78xx.c
-+++ b/drivers/net/usb/lan78xx.c
-@@ -414,7 +414,6 @@ struct lan78xx_net {
- 	struct net_device	*net;
- 	struct usb_device	*udev;
- 	struct usb_interface	*intf;
--	void			*driver_priv;
- 
- 	unsigned int		tx_pend_data_len;
- 	size_t			n_tx_urbs;
-@@ -449,15 +448,12 @@ struct lan78xx_net {
- 	unsigned long		flags;
- 
- 	wait_queue_head_t	*wait;
--	unsigned char		suspend_count;
- 
- 	unsigned int		maxpacket;
- 	struct timer_list	stat_monitor;
- 
- 	unsigned long		data[5];
- 
--	u8			mdix_ctrl;
--
- 	u32			chipid;
- 	u32			chiprev;
- 	struct mii_bus		*mdiobus;
--- 
-2.39.5
-
+Acked-by: Arnd Bergmann <arnd@arndb.de>
 
