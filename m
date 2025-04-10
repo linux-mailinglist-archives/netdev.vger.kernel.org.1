@@ -1,117 +1,281 @@
-Return-Path: <netdev+bounces-181059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C80DA837BC
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 06:16:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5DEEA837D2
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 06:26:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3F781704B4
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 04:16:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16E038A427D
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 04:26:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F035A1C173F;
-	Thu, 10 Apr 2025 04:16:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF1F1F2B85;
+	Thu, 10 Apr 2025 04:26:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IeRFFuo/"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="tbpBpfhc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D4B55234;
-	Thu, 10 Apr 2025 04:16:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C67F1F1538;
+	Thu, 10 Apr 2025 04:26:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744258584; cv=none; b=T8XdjMGB6qY3B18k4gVRmATWDDMiU+Nne5oQeM8a1sIAthFE5+ZARCUqrjWMWjJZF3N+nYWBE1mqInFOEoUQuXxSRUntK9/A1vo9deiyNcyiopWHdbEyP9tvIsWUnbnT1xuS+bbZyBK8YoVnsqbMKwnJUIzOeI9s6z/+IqiSjdk=
+	t=1744259179; cv=none; b=IeSTFUGu7GClOoKR3MuLKwxJlpgXL3V8w+bw3awryJ1iOOgwEHbfTcsCJ9R4DwWNOvHXvG7s5ivedvwly9+k3n+KWUyeCKSO6A8srmxbt1x0Nx3OB0lXMZVbLi1k8drhUm+phbxmoarD+siPEcqMqVjZGD0AdM2uOB5NZ50cWjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744258584; c=relaxed/simple;
-	bh=eCqBNdrDzJ3x9QKNmY/h6+yCoYHsWVoQX1qTJ7S7hoc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E2fSlkeCBsZEulLXSI2kS0se8uAmYYCZ2SkN33RmDBREJCZWOwlVPgis2NcUrwGs5vuaQ1nD3AN1bhEEufsDTUneulGttQ/vzW4GYVjykuLdE9IAQgQhQs+Gn5o4LLhfDzoNCnKZ2y6nyJEDch4Hpj6LOtUUsduVye11SIWUhfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IeRFFuo/; arc=none smtp.client-ip=209.85.215.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-af19b9f4c8cso267547a12.2;
-        Wed, 09 Apr 2025 21:16:23 -0700 (PDT)
+	s=arc-20240116; t=1744259179; c=relaxed/simple;
+	bh=i2rsA0GJ5JL9p9YLnj53F8I4XkKH+f57A+JCAXPDoxg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f7KEhziSV0A91lsExP5k/vViGIT9+hNbrph+3x7yrO4h/R0nTDAebJg6sAhTQceZ0p5qk1o70RCzscGguEQfJxkio4WJZDmKaqBjs1vV3lyuYckd+RUm0mcUsDa2+ANi/TM5eg//h0J40TkBWi08Tn3G7L2cjFCgRcSCJ5foWZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=tbpBpfhc; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744258583; x=1744863383; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QlmynTgByf4Kwa5VfoEnK8EdQwb5yKMa+V4z66nhhcU=;
-        b=IeRFFuo/oACl0vlTf3jejZ6ACTStrmU07nbxgMRJ6SBALKGMHFsjM81e4t+WLPKRy7
-         kc7CEIZDRha79zxZSoEbQbKOWlGbkmZIBVCT+HqA9JN3ylN39ME+8gNEvGrWCHvXmhk1
-         D/POxzpOwDqDVtPLiQy12m4o1W3Kgo/YxFmisqwMk8kxnX28jPmrLBN0Hoz0fQkPRwY/
-         O6/e3xmTfAXZEHaXVUyZ1YrHtnD9BO8eO2OdBlzapy6FyshJTxGZy6cncwmeOu7U6rph
-         JbxhbBDqAYorLnM29Lwf2IHGJ5v8Z2IN7W24dQxpOJiu2y8UfnUriXI57++uJ1Ktfv2D
-         WVDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744258583; x=1744863383;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QlmynTgByf4Kwa5VfoEnK8EdQwb5yKMa+V4z66nhhcU=;
-        b=u99vCc5FxISLUE3/hYuvmmHDpcjW3sFZeUPIS4v/UHO2YJ+5NjZAUDEgjJJv6z1GhG
-         qp+7hYVd//RZTupsYWA/JIAY35ogkrQBgiahzwh2VqQUwwmc+xrkFeGYb7QWlcGP3TFs
-         vACvNHMOQUCKA04EZ/VyG8WgDeCYOMsOcnEBr4aod+eBspcpIFYeDveFHL6IpTaFeoGB
-         ylTqa3TTapoP6fTvA1kB1NtC8agb4sywFdSydv7z89BHWHmB6LfukawEdP/WQbrnvqdH
-         8cJVngKy/umc2qbpCrjhccLJPuFcvcM8DjiO3uwOYUH/W0W/jBWWEXclZj1jfh3BFD9C
-         Zs0g==
-X-Forwarded-Encrypted: i=1; AJvYcCXOFxppcM/DrHLIPE7uugc5I62pyLLrFmxHEEK9Q7Nt8ZiYDeyYwk3qEAv4AKBd8mVn9yHD4KC/@vger.kernel.org, AJvYcCXy6DkV8XNQ1skUqhhdoPYAc+nrwNT8PgZJrbCxqY4WUf3m4KK2Ii8eWYu4KOVQQWBKKMHKLW/hJdFbXaw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCA3soDpcRPHlGqgZoErht4+Dq7DdOMjs9RBGh9B8kWo7EUu01
-	WvnheNKiEvDbgK0/HL2KTMRWndbStog5oq2gsf+8v7AJ4AHslA4J
-X-Gm-Gg: ASbGncudvOaOfmbewHOe15BanlGbYCQOxrgDLmnXuhx5a5ySCDl6ZnVjQmsJQFF4uz2
-	uny9pQlU3Lk3utX4PlYrDj4PxoURVjd31HSP8qVe21ctc7sJSjmvMyiGB0IFUv++ok3U9vc9jpD
-	ahGeoTvOtog4TjeohO2Dmp5bzCxL24ek8QABt4Ck32o09I4XonxXlUkBBE6jcXlgc4rG3BUDQ5E
-	VEOlMpvK9F+hd3oWrzLXsg+u9deCRj/vBBW668I3iPXwJViBYpKKvVUXacWm+dN2MRiD8Hrss4K
-	R9ZaYmmnGaPrPnzMnyiEAm42xA1/DhqsyVK9QB5G1D7lS5NgHgJBQM+ts+hB
-X-Google-Smtp-Source: AGHT+IFyjAQxZ/eBlALI7viUkwJoBudRUhuwEX5LYGJwRYb5anXvvc7BgZKTecl5Hqufy14LpTF3Fw==
-X-Received: by 2002:a05:6a20:d70f:b0:1f6:6539:e026 with SMTP id adf61e73a8af0-2016ccc42d7mr1278051637.15.1744258582590;
-        Wed, 09 Apr 2025 21:16:22 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b02a321f082sm2090380a12.68.2025.04.09.21.16.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Apr 2025 21:16:22 -0700 (PDT)
-Date: Wed, 9 Apr 2025 21:16:19 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/2] net: phy: Add Marvell PHY PTP support
-Message-ID: <Z_dGE4ZwjTgLMTju@hoboy.vegasvil.org>
-References: <Z_VdlGVJjdtQuIW0@shell.armlinux.org.uk>
- <20250409101808.43d5a17d@kmaincent-XPS-13-7390>
- <Z_YwxYZc7IHkTx_C@shell.armlinux.org.uk>
- <20250409104858.2758e68e@kmaincent-XPS-13-7390>
- <Z_ZlDLzvu_Y2JWM8@shell.armlinux.org.uk>
- <20250409143820.51078d31@kmaincent-XPS-13-7390>
- <Z_Z3lchknUpZS1UP@shell.armlinux.org.uk>
- <20250409180414.19e535e5@kmaincent-XPS-13-7390>
- <Z_avqyOX2bi44sO9@shell.armlinux.org.uk>
- <Z/b2yKMXNwjqTKy4@shell.armlinux.org.uk>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744259178; x=1775795178;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=jWrgfCuyAlswd5qJJIv7RiCXg6fDzAQOV2joMZ360dQ=;
+  b=tbpBpfhcyP8iLDQQ5pLhtobUroCv317SzMct4RQ7F15yCKIfPMPsLTik
+   9mZF4/pxvWpnQdhPDw4Jfo/kEKMDztIyw+MRt05I1mgKrTK7zqWEAWxYO
+   SnScg/N1vGeBwAZWXAQG/RLl+4Nlpf6dD+KNuIk7YsdcRQwURix7bKVQy
+   4=;
+X-IronPort-AV: E=Sophos;i="6.15,202,1739836800"; 
+   d="scan'208";a="481854576"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 04:26:14 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:55004]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.21.195:2525] with esmtp (Farcaster)
+ id 5eb5ee46-9dd5-4e4c-9964-7a70054ce6e7; Thu, 10 Apr 2025 04:26:13 +0000 (UTC)
+X-Farcaster-Flow-ID: 5eb5ee46-9dd5-4e4c-9964-7a70054ce6e7
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 10 Apr 2025 04:26:12 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.170.41) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 10 Apr 2025 04:26:09 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <jlayton@kernel.org>
+CC: <akpm@linux-foundation.org>, <andrew@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <horms@kernel.org>, <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <kuniyu@amazon.com>
+Subject: Re: [PATCH v2 2/2] net: add debugfs files for showing netns refcount tracking info
+Date: Wed, 9 Apr 2025 21:24:59 -0700
+Message-ID: <20250410042602.27471-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250408-netns-debugfs-v2-2-ca267f51461e@kernel.org>
+References: <20250408-netns-debugfs-v2-2-ca267f51461e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z/b2yKMXNwjqTKy4@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D033UWC003.ant.amazon.com (10.13.139.217) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Wed, Apr 09, 2025 at 11:38:00PM +0100, Russell King (Oracle) wrote:
+From: Jeff Layton <jlayton@kernel.org>
+Date: Tue, 08 Apr 2025 09:36:38 -0400
+> CONFIG_NET_NS_REFCNT_TRACKER currently has no convenient way to display
+> its tracking info. Add a new net_ns directory under the debugfs
+> ref_tracker directory. Create a directory in there for every netns, with
+> refcnt and notrefcnt files that show the currently tracked active and
+> passive references.
+> 
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> ---
+>  net/core/net_namespace.c | 151 +++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 151 insertions(+)
+> 
+> diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+> index 4303f2a4926243e2c0ff0c0387383cd8e0658019..7e9dc487f46d656ee4ae3d6d18d35bb2aba2b176 100644
+> --- a/net/core/net_namespace.c
+> +++ b/net/core/net_namespace.c
+> @@ -1512,3 +1512,154 @@ const struct proc_ns_operations netns_operations = {
+>  	.owner		= netns_owner,
+>  };
+>  #endif
+> +
+> +#ifdef CONFIG_DEBUG_FS
+> +#ifdef CONFIG_NET_NS_REFCNT_TRACKER
+> +
+> +#include <linux/debugfs.h>
+> +
+> +static struct dentry *ns_ref_tracker_dir;
+> +static unsigned int ns_debug_net_id;
+> +
+> +struct ns_debug_net {
+> +	struct dentry *netdir;
+> +	struct dentry *refcnt;
+> +	struct dentry *notrefcnt;
+> +};
+> +
+> +#define MAX_NS_DEBUG_BUFSIZE	(32 * PAGE_SIZE)
+> +
+> +static int
+> +ns_debug_tracker_show(struct seq_file *f, void *v)
 
-> Right, got to the bottom of it at last. I hate linuxptp / ptp4l.
+I think there is no clear rule about where to break, but could you
+remove \n after int so that it will match with other functions in
+this file ?
 
-So don't use it.  Nobody is forcing you.
+Same for other new functions, looks like none of them go over 80 columns.
 
-Thanks,
-Richard
+> +{
+> +	struct ref_tracker_dir *tracker = f->private;
+> +	int len, bufsize = PAGE_SIZE;
+> +	char *buf;
+> +
+> +	for (;;) {
+> +		buf = kvmalloc(bufsize, GFP_KERNEL);
+> +		if (!buf)
+> +			return -ENOMEM;
+> +
+> +		len = ref_tracker_dir_snprint(tracker, buf, bufsize);
+> +		if (len < bufsize)
+> +			break;
+> +
+> +		kvfree(buf);
+> +		bufsize *= 2;
+> +		if (bufsize > MAX_NS_DEBUG_BUFSIZE)
+> +			return -ENOBUFS;
+> +	}
+> +	seq_write(f, buf, len);
+> +	kvfree(buf);
+> +	return 0;
+> +}
+> +
+> +static int
+> +ns_debug_ref_open(struct inode *inode, struct file *filp)
+> +{
+> +	int ret;
+> +	struct net *net = inode->i_private;
+
+nit: Please sort in the reverse xmas order.
+
+https://docs.kernel.org/process/maintainer-netdev.html#local-variable-ordering-reverse-xmas-tree-rcs
+
+> +
+> +	ret = single_open(filp, ns_debug_tracker_show, &net->refcnt_tracker);
+> +	if (!ret)
+> +		net_passive_inc(net);
+> +	return ret;
+> +}
+> +
+> +static int
+> +ns_debug_notref_open(struct inode *inode, struct file *filp)
+> +{
+> +	int ret;
+> +	struct net *net = inode->i_private;
+
+Same here.
+
+
+> +
+> +	ret = single_open(filp, ns_debug_tracker_show, &net->notrefcnt_tracker);
+> +	if (!ret)
+> +		net_passive_inc(net);
+> +	return ret;
+> +}
+> +
+> +static int
+> +ns_debug_ref_release(struct inode *inode, struct file *filp)
+> +{
+> +	struct net *net = inode->i_private;
+> +
+> +	net_passive_dec(net);
+> +	return single_release(inode, filp);
+> +}
+> +
+> +static const struct file_operations ns_debug_ref_fops = {
+> +	.owner		= THIS_MODULE,
+> +	.open		= ns_debug_ref_open,
+> +	.read		= seq_read,
+> +	.llseek		= seq_lseek,
+> +	.release	= ns_debug_ref_release,
+> +};
+> +
+> +static const struct file_operations ns_debug_notref_fops = {
+> +	.owner		= THIS_MODULE,
+> +	.open		= ns_debug_notref_open,
+> +	.read		= seq_read,
+> +	.llseek		= seq_lseek,
+> +	.release	= ns_debug_ref_release,
+> +};
+> +
+> +static int
+> +ns_debug_init_net(struct net *net)
+> +{
+> +	struct ns_debug_net *dnet = net_generic(net, ns_debug_net_id);
+> +	char name[11]; /* 10 decimal digits + NULL term */
+> +	int len;
+> +
+> +	len = snprintf(name, sizeof(name), "%u", net->ns.inum);
+> +	if (len >= sizeof(name))
+> +		return -EOVERFLOW;
+> +
+> +	dnet->netdir = debugfs_create_dir(name, ns_ref_tracker_dir);
+> +	if (IS_ERR(dnet->netdir))
+> +		return PTR_ERR(dnet->netdir);
+> +
+> +	dnet->refcnt = debugfs_create_file("refcnt", S_IFREG | 0400, dnet->netdir,
+> +					   net, &ns_debug_ref_fops);
+> +	if (IS_ERR(dnet->refcnt)) {
+> +		debugfs_remove(dnet->netdir);
+> +		return PTR_ERR(dnet->refcnt);
+> +	}
+> +
+> +	dnet->notrefcnt = debugfs_create_file("notrefcnt", S_IFREG | 0400, dnet->netdir,
+> +					      net, &ns_debug_notref_fops);
+> +	if (IS_ERR(dnet->notrefcnt)) {
+> +		debugfs_remove_recursive(dnet->netdir);
+> +		return PTR_ERR(dnet->notrefcnt);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void
+> +ns_debug_exit_net(struct net *net)
+> +{
+> +	struct ns_debug_net *dnet = net_generic(net, ns_debug_net_id);
+> +
+> +	debugfs_remove_recursive(dnet->netdir);
+> +}
+> +
+> +static struct pernet_operations ns_debug_net_ops = {
+> +	.init = ns_debug_init_net,
+> +	.exit = ns_debug_exit_net,
+> +	.id = &ns_debug_net_id,
+> +	.size = sizeof(struct ns_debug_net),
+> +};
+> +
+> +static int __init ns_debug_init(void)
+> +{
+> +	ns_ref_tracker_dir = debugfs_create_dir("net_ns", ref_tracker_debug_dir);
+> +	if (IS_ERR(ns_ref_tracker_dir))
+> +		return PTR_ERR(ns_ref_tracker_dir);
+> +
+> +	register_pernet_subsys(&ns_debug_net_ops);
+> +	return 0;
+
+register_pernet_subsys() could fail, so
+
+	return register_pernet_subsys(&ns_debug_net_ops);
+
+
+> +}
+> +late_initcall(ns_debug_init);
+> +#endif /* CONFIG_NET_NS_REFCNT_TRACKER */
+> +#endif /* CONFIG_DEBUG_FS */
+> 
+> -- 
+> 2.49.0
+> 
 
