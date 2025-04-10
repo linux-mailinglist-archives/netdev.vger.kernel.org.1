@@ -1,87 +1,70 @@
-Return-Path: <netdev+bounces-181219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54B56A84222
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 13:55:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2D22A8423F
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 13:58:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0E308A1C74
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 11:52:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 993C99E8267
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 11:54:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA397283CB5;
-	Thu, 10 Apr 2025 11:52:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kzIQN42V"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D89662836BA;
+	Thu, 10 Apr 2025 11:53:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11778283C8D;
-	Thu, 10 Apr 2025 11:52:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 022A828540D
+	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 11:53:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744285967; cv=none; b=Y4xrcOI39f9/rOgdLF66OLaAJ/jhlKaBC+8rc/onEnf9lXGN7jqiu2yEYJFfQBOnk2Y48aUZ9zlxNFHuvEzhuTN0eEnLcoUvynvXGImSLoC/ujVvC+/j6k5/FgaqxCXddvHHOHL64BwpL3WwBw/6b9os+TF/KHwi5LFSp561LLM=
+	t=1744286001; cv=none; b=osBRlumtkid3YMTMhKB+rcLOvNl3t2xJES+fhXAI8JNCpmY6mlUhid3GJ3v375sM6bKXzrpFg6QYl3p8/MeJKRPjyStWlyeQHxMvE9jZ/twm+R7ouguiXZEUpw5FREKihvbEfhGQYBa5HgeQAZ/MAgGmGvg4sEhlMVe8K/c/5Bg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744285967; c=relaxed/simple;
-	bh=XFQzoxeqsD9v2JOgNHZGxnrAw6ddmJkdJnpFrk0ivkc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jjKjC+dCocSVqUAzbymmLTmcZulW+dzxlVh4F5sGuYaLDubB9km0w7/my2X8SEJy1eJV0OLcIODIO2yjmCR1t6NuT12ndaZK2gj3HG6jZvyR4xT4XdvzLnJvSxi5Il5lyLFPq9uDO0pmZnebdZzQHdJ/oWnc+zTbbnd+ZFYTmls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kzIQN42V; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744285966; x=1775821966;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=XFQzoxeqsD9v2JOgNHZGxnrAw6ddmJkdJnpFrk0ivkc=;
-  b=kzIQN42VhE/Xi1pJ6obatowS7swlN1klI34zELPWlrQiop9JKhMr938R
-   e5KMlYWGpRpuM0cmy2GX4q9sfKO1Ok1wGJFOu5QAFFblETgBezGGVPqCY
-   hGglyNUhF1JAaHpfimgczG+ZDTwvPjUJwHzXz6Lw+qAWuV9vnByQir6Mk
-   0SzplkFR4dxjpOFN9seqEQweBkCJk2GjHlffWP49ACbufVsJWDAyyHQP0
-   ZVSmDG7NdyuUEq+NACaIRC040LtxOP7FvvCPwJpByxY3LRXW3f+4cJNHx
-   t6xFXwzGlW5hHXe5/LeIycPyBy/3dJCe3QsDj+Zx2ZFCN2COwlzdg82MN
-   w==;
-X-CSE-ConnectionGUID: wDmMDZ9qSjetr6XI3mmoyg==
-X-CSE-MsgGUID: Luch5LP9R3iBu76uXtxXZA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11400"; a="44939952"
-X-IronPort-AV: E=Sophos;i="6.15,202,1739865600"; 
-   d="scan'208";a="44939952"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 04:52:42 -0700
-X-CSE-ConnectionGUID: YHA03Bs4SNi8jD6bPNuJYQ==
-X-CSE-MsgGUID: q617/JOcRmiqox68+dv2oQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,202,1739865600"; 
-   d="scan'208";a="129731691"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa009.fm.intel.com with ESMTP; 10 Apr 2025 04:52:39 -0700
-Received: from mglak.igk.intel.com (mglak.igk.intel.com [10.237.112.146])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id DD87C34312;
-	Thu, 10 Apr 2025 12:52:37 +0100 (IST)
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Emil Tantilov <emil.s.tantilov@intel.com>,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Josh Hay <joshua.a.hay@intel.com>,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1744286001; c=relaxed/simple;
+	bh=HV+uwtlab0erbFyFEmVTUOqbS+plOLLJFi/5t/DtZyY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ef6sctKxcyOBDBwXU6q/nlkiE+I+gZazosqq1EkVlHI5jFrav2hwL6a/qYpXbSe5OX0t9tvTW9s50MD+u6Ied9izas5acUpyY1wSWvD08YFsgeDIRv/gREl/webhsN808+8K/51gqiqu6OPkUaW4cHr0AL0kmksm5JI+r2XuAYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u2qSw-0002xr-Pt; Thu, 10 Apr 2025 13:53:06 +0200
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u2qSt-004GKw-31;
+	Thu, 10 Apr 2025 13:53:03 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u2qSt-00AkeR-2i;
+	Thu, 10 Apr 2025 13:53:03 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Thangaraj Samynathan <Thangaraj.S@microchip.com>,
+	Rengarajan Sundararajan <Rengarajan.S@microchip.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl-net] idpf: protect shutdown from reset
-Date: Thu, 10 Apr 2025 13:52:23 +0200
-Message-ID: <20250410115225.59462-1-larysa.zaremba@intel.com>
-X-Mailer: git-send-email 2.47.0
+	UNGLinuxDriver@microchip.com,
+	Phil Elwell <phil@raspberrypi.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next v6 00/12] Convert LAN78xx to PHYLINK
+Date: Thu, 10 Apr 2025 13:52:50 +0200
+Message-Id: <20250410115302.2562562-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,44 +72,61 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Before the referenced commit, the shutdown just called idpf_remove(),
-this way IDPF_REMOVE_IN_PROG was protecting us from the serv_task
-rescheduling reset. Without this flag set the shutdown process is
-vulnerable to HW reset or any other triggering conditions (such as
-default mailbox being destroyed).
+This patch series refactors the LAN78xx USB Ethernet driver to use the
+PHYLINK framework for MAC and PHY management.
 
-When one of conditions checked in idpf_service_task becomes true,
-vc_event_task can be rescheduled during shutdown, this leads to accessing
-freed memory e.g. idpf_req_rel_vector_indexes() trying to read
-vport->q_vector_idxs. This in turn causes the system to become defunct
-during e.g. systemctl kexec.
+In the process, various improvements were made to structure the code and
+separate concerns such as:
+- Refactoring PHY detection and MAC-side interface setup
+- Consolidating USB and flow control configuration into helpers
+- Dropping legacy EEE and pause handling in favor of PHYLINK equivalents
+- Simplifying the suspend/resume flow with proper phylink_suspend/resume
+- Removing unused fields and outdated workarounds
 
-Considering using IDPF_REMOVE_IN_PROG would lead to more heavy shutdown
-process, instead just cancel the serv_task before cancelling
-adapter->serv_task before cancelling adapter->vc_event_task to ensure that
-reset will not be scheduled while we are doing a shutdown.
+changes v6:
+- Move unrelated logic out of the main PHYLINK conversion patch:
+  - EEE handling, USB config, flow control, LED config, etc., now split
+    into separate commits
+- Remove obsolete members from struct lan78xx_net earlier, in the patch
+  where they're no longer needed
 
-Fixes: 4c9106f4906a ("idpf: fix adapter NULL pointer dereference on reboot")
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_main.c | 1 +
- 1 file changed, 1 insertion(+)
+changes v5:
+- merge ethtool pause configuration patch with PHYlink patch
+- merge some other small cleanup to a single patch
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
-index bec4a02c5373..b35713036a54 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_main.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
-@@ -89,6 +89,7 @@ static void idpf_shutdown(struct pci_dev *pdev)
- {
- 	struct idpf_adapter *adapter = pci_get_drvdata(pdev);
- 
-+	cancel_delayed_work_sync(&adapter->serv_task);
- 	cancel_delayed_work_sync(&adapter->vc_event_task);
- 	idpf_vc_core_deinit(adapter);
- 	idpf_deinit_dflt_mbx(adapter);
--- 
-2.47.0
+changes v4:
+- split "Improve error handling in PHY initialization" patch and move
+  some parts before PHYlink porting to address some of compile warning
+  as early as possible.
+- add cleanup patch to remove unused struct members
+
+Oleksij Rempel (12):
+  net: usb: lan78xx: Improve error handling in PHY initialization
+  net: usb: lan78xx: remove explicit check for missing PHY driver
+  net: usb: lan78xx: refactor PHY init to separate detection and MAC
+    configuration
+  net: usb: lan78xx: move LED DT configuration to helper
+  net: usb: lan78xx: Extract PHY interrupt acknowledgment to helper
+  net: usb: lan78xx: Refactor USB link power configuration into helper
+  net: usb: lan78xx: Extract flow control configuration to helper
+  net: usb: lan78xx: Convert to PHYLINK for improved PHY and MAC
+    management
+  net: usb: lan78xx: Use ethtool_op_get_link to reflect current link
+    status
+  net: usb: lan78xx: port link settings to phylink API
+  net: usb: lan78xx: Integrate EEE support with phylink LPI API
+  net: usb: lan78xx: remove unused struct members
+
+ drivers/net/usb/Kconfig   |    3 +-
+ drivers/net/usb/lan78xx.c | 1114 +++++++++++++++++++++----------------
+ 2 files changed, 646 insertions(+), 471 deletions(-)
+
+--
+2.39.5
 
 
