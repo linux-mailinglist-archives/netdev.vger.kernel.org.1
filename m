@@ -1,69 +1,87 @@
-Return-Path: <netdev+bounces-181302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1C38A8456B
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 15:55:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69CDDA8458E
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 16:01:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AC1C1B84EE2
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 13:55:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2006E3B69D3
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 13:58:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 265312857F1;
-	Thu, 10 Apr 2025 13:55:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00712857E0;
+	Thu, 10 Apr 2025 13:58:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RXj1ixJ4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TKApxj71"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED43526ACB;
-	Thu, 10 Apr 2025 13:55:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3ECE26ACB;
+	Thu, 10 Apr 2025 13:58:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744293312; cv=none; b=RVhKpAqR8uLCFUbJt4JP1YgT/VFgHTKsUG7ipXT19HCC903/a350/O7z1rgPkjN/5xBjvvq3KhcJ10kMP7RopECAYFZHC397hMrxONSisn2P0iPH7ZVQ3w59kDYZMpB7LHIgOO2SNpEEfLg96ENN0MHylcwqqXt9SxCgZpGVku4=
+	t=1744293528; cv=none; b=c9iLW9+ZZe3gFcYyz4iXeuTFFSYkXPdsZBUzPc+dt4bVvHbOrcCnWmGZnKv2MRqHd46kpcqfMsAKVWD2+OLgItflVfMXJxY3SH/9bBdLwoGOAODNOYN7pjbS8GYPxpZsO0IyPuIjZBjYJQ4xCgukpUpbTMLiCO+2SZjGSuXwhD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744293312; c=relaxed/simple;
-	bh=p6SCvTMZTG8S3u0hXcPVYGmdpHI9zrLpcY6+qewRNrc=;
+	s=arc-20240116; t=1744293528; c=relaxed/simple;
+	bh=tc3sjsEyh+ECbexe09u7lpewpQnE1mf7v/fkj4+zOy0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jKQPtaXQmVIHEXhkpFM/cA6g+PfmRzVq5mLnieQ2Zn7xVnZqaIIP7FfNSRtLLyArkSsM6v8TlHCFjDdF7rkgBSIQsCgTQJfuwZOEk7HUo0/WR7+C2s5epZk6RdJiDEI5z/IKg7qLACP6DrZx1ux7hAC+ggot+IiXVUdSGK2l21M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RXj1ixJ4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60B88C4CEDD;
-	Thu, 10 Apr 2025 13:55:09 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=mJyHdYHyWdIL0RMzm/2m/yY+6z5bQOV5+TeVB8pg7Wg69LWpr2Bk/d+FlbR3CEBK/wXbUaQjdn84Xh3fMuY8ESyTOdnnXg+zxIPg/7IHVu9MlxiKDddj7VOizUjZYSCYnc0tCdf84p8Dccw1N7XALiv0hk9vQHaP0S5DHVMxitg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TKApxj71; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 061C7C4CEDD;
+	Thu, 10 Apr 2025 13:58:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744293310;
-	bh=p6SCvTMZTG8S3u0hXcPVYGmdpHI9zrLpcY6+qewRNrc=;
+	s=k20201202; t=1744293528;
+	bh=tc3sjsEyh+ECbexe09u7lpewpQnE1mf7v/fkj4+zOy0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RXj1ixJ4ZhLovviw79iMjdKUdRXCSLBKuSD/Y/oGP8+vJFA9tg+AZh3ot8Pm03tAR
-	 XiZOfzKtQDkSR8oRjnmKKIoMf5GU0RUg/h6/OliDtAnR1glTDexTq9ZtrnhaWBGnUM
-	 7eFldfm9vLY+WjK/So/+Tx4q5UUkVlNnGPNyZuLgAEiR8+hvIJzcY8OiDy+IvCS4TI
-	 3BYcrE1W/mmfEzwS96p1cDQyp8q+kWabBwP899n4gaK6/wMQp3ZDdskLSECQTjsEI8
-	 5NTEzOwHI+0G8VwPpED4MiEOijmi/z70TFIRwol4l2J3LteMyQGrIiiMR9xUkzqpcC
-	 9Z+e6eey+c+XA==
-Date: Thu, 10 Apr 2025 16:55:04 +0300
+	b=TKApxj71kO7MtG3mvtlzsnBLPdsk6DOvpqsDJLj5Zp2cK0YLoAFOsmy157pN4IXf2
+	 BZ428qjsIMaN2cDly63aH7BoR4eqDIQA/J10/KETejdkzXCHVDNaTx5Gtb7YfYUCz5
+	 OMyBZ7xyBzph+iaBZXlVpXZHQkGJDDf71Ct49kMF8E6u4HXJxxIV9ZuICkRQFon32x
+	 AkUQWwvQB9uosvTnIs+rOib20WBt2FSJZe3ilEJpwdMpBF0llh0wCrxoUpS8LACVfM
+	 xFp2XDBhNNWjN+DF5IkSDGRNewTMEgcItf9JkODT7Js4xgeHryVP9R20ppzOgkJ2C6
+	 nw1+mRfubH16g==
+Date: Thu, 10 Apr 2025 16:58:43 +0300
 From: Leon Romanovsky <leon@kernel.org>
-To: Konstantin Taranov <kotaranov@microsoft.com>
-Cc: Konstantin Taranov <kotaranov@linux.microsoft.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	KY Srinivasan <kys@microsoft.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	Dexuan Cui <decui@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>,
-	Long Li <longli@microsoft.com>, "jgg@ziepe.ca" <jgg@ziepe.ca>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [EXTERNAL] Re: [PATCH rdma-next 3/3] RDMA/mana_ib: Add support
- of 4M, 1G, and 2G pages
-Message-ID: <20250410135504.GU199604@unreal>
-References: <1743777955-2316-1-git-send-email-kotaranov@linux.microsoft.com>
- <1743777955-2316-4-git-send-email-kotaranov@linux.microsoft.com>
- <20250409122743.GK199604@unreal>
- <PA1PR83MB0662BB595EEA7FE39B97422EB4B72@PA1PR83MB0662.EURPRD83.prod.outlook.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
+	intel-wired-lan@lists.osuosl.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Tatyana Nikolova <tatyana.e.nikolova@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Lee Trager <lee@trager.us>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Karlsson, Magnus" <magnus.karlsson@intel.com>,
+	Emil Tantilov <emil.s.tantilov@intel.com>,
+	Madhu Chittim <madhu.chittim@intel.com>,
+	Josh Hay <joshua.a.hay@intel.com>,
+	Milena Olech <milena.olech@intel.com>, pavan.kumar.linga@intel.com,
+	"Singhai, Anjali" <anjali.singhai@intel.com>,
+	Phani R Burra <phani.r.burra@intel.com>
+Subject: Re: [PATCH iwl-next 05/14] libeth: add control queue support
+Message-ID: <20250410135843.GV199604@unreal>
+References: <20250408124816.11584-1-larysa.zaremba@intel.com>
+ <20250408124816.11584-6-larysa.zaremba@intel.com>
+ <20250410082137.GO199604@unreal>
+ <Z_ehEXmlEBREQWQM@soc-5CG4396X81.clients.intel.com>
+ <20250410112349.GP199604@unreal>
+ <Z_fAdLJ4quuP2lip@soc-5CG4396X81.clients.intel.com>
+ <20250410132706.GR199604@unreal>
+ <7e3f2eb8-b668-4ac5-8b49-43eebff2b3e0@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,35 +90,90 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <PA1PR83MB0662BB595EEA7FE39B97422EB4B72@PA1PR83MB0662.EURPRD83.prod.outlook.com>
+In-Reply-To: <7e3f2eb8-b668-4ac5-8b49-43eebff2b3e0@intel.com>
 
-On Thu, Apr 10, 2025 at 01:38:39PM +0000, Konstantin Taranov wrote:
-> > 
-> > >  enum gdma_page_type {
-> > >  	GDMA_PAGE_TYPE_4K,
-> > > +	GDMA_PAGE_SIZE_8K,
-> > > +	GDMA_PAGE_SIZE_16K,
-> > > +	GDMA_PAGE_SIZE_32K,
-> > > +	GDMA_PAGE_SIZE_64K,
-> > > +	GDMA_PAGE_SIZE_128K,
-> > > +	GDMA_PAGE_SIZE_256K,
-> > > +	GDMA_PAGE_SIZE_512K,
-> > > +	GDMA_PAGE_SIZE_1M,
-> > > +	GDMA_PAGE_SIZE_2M,
-> > > +	/* Only when
-> > GDMA_DRV_CAP_FLAG_1_GDMA_PAGES_4MB_1GB_2GB is set */
-> > > +	GDMA_PAGE_SIZE_4M,
-> > > +	GDMA_PAGE_SIZE_1G = 18,
-> > > +	GDMA_PAGE_SIZE_2G
-> > 
-> > Where are all these defines used?
+On Thu, Apr 10, 2025 at 03:33:40PM +0200, Alexander Lobakin wrote:
+> From: Leon Romanovsky <leon@kernel.org>
+> Date: Thu, 10 Apr 2025 16:27:06 +0300
 > 
-> There are not used explicitly in this patch, but they can be used in theory.
-
-Yes, please.
-
-> I can remove unused defines in V2.
-> 
+> > On Thu, Apr 10, 2025 at 02:58:28PM +0200, Larysa Zaremba wrote:
+> >> On Thu, Apr 10, 2025 at 02:23:49PM +0300, Leon Romanovsky wrote:
+> >>> On Thu, Apr 10, 2025 at 12:44:33PM +0200, Larysa Zaremba wrote:
+> >>>> On Thu, Apr 10, 2025 at 11:21:37AM +0300, Leon Romanovsky wrote:
+> >>>>> On Tue, Apr 08, 2025 at 02:47:51PM +0200, Larysa Zaremba wrote:
+> >>>>>> From: Phani R Burra <phani.r.burra@intel.com>
+> >>>>>>
+> >>>>>> Libeth will now support control queue setup and configuration APIs.
+> >>>>>> These are mainly used for mailbox communication between drivers and
+> >>>>>> control plane.
+> >>>>>>
+> >>>>>> Make use of the page pool support for managing controlq buffers.
+> >>>>>
+> >>>>> <...>
+> >>>>>
+> >>>>>>  libeth-y			:= rx.o
+> >>>>>>  
+> >>>>>> +obj-$(CONFIG_LIBETH_CP)		+= libeth_cp.o
+> >>>>>> +
+> >>>>>> +libeth_cp-y			:= controlq.o
+> >>>>>
+> >>>>> So why did you create separate module for it?
+> >>>>> Now you have pci -> libeth -> libeth_cp -> ixd, with the potential races between ixd and libeth, am I right?
+> >>>>>
+> >>>>
+> >>>> I am not sure what kind of races do you mean, all libeth modules themselves are 
+> >>>> stateless and will stay this way [0], all used data is owned by drivers.
+> >>>
+> >>> Somehow such separation doesn't truly work. There are multiple syzkaller
+> >>> reports per-cycle where module A tries to access module C, which already
+> >>> doesn't exist because it was proxied through module B.
+> >>
+> >> Are there similar reports for libeth and libie modules when iavf is enabled?
 > > 
-> > Thanks
+> > To get such report, syzkaller should run on physical iavf, it looks like it doesn't.
+> > Did I miss it here?
+> > https://syzkaller.appspot.com/upstream/s/net
+> > 
+> >> It is basically the same hierarchy. (iavf uses both libeth and libie, libie 
+> >> depends on libeth).
+> >>
+> >> I am just trying to understand, is this a regular situation or did I just mess 
+> >> smth up?
+> > 
+> > My review comment was general one. It is almost impossible to review
+> > this newly proposed architecture split for correctness.
+> > 
+> >>
+> >>>
+> >>>>
+> >>>> As for the module separation, I think there is no harm in keeping it modular. 
+> >>>
+> >>> Syzkaller reports disagree with you. 
+> >>>
+> >>
+> >> Could you please share them?
+> > 
+> > It is not an easy question to answer, because all these reports are complaining
+> > about some wrong locking order or NULL-pointer access. You will never know if
+> > it is because of programming or design error.
+> > 
+> > As an approximate example, see commits a27c6f46dcec ("RDMA/bnxt_re: Fix an issue in bnxt_re_async_notifier")
+> > and f0df225d12fc ("RDMA/bnxt_re: Add sanity checks on rdev validity").
+> > At the first glance, they look unrelated to our discussion, however
+> > they can serve as an example or races between deinit/disable paths in
+> > parent module vs. child.
+> 
+> Unrelated. At first, you were talking about module dependencies, now
+> you're talking about struct device etc dependencies, which is a
+> completely different thing.
+> 
+> As already said, libeth is stateless, so the latter one can't happen.
+> The former one is impossible at all. As long as at least 1 child module
+> is loaded, you can't unload the parent. And load/unload is serialized,
+> see module core code.
+
+It is not only module load/unload. It is bind/unbind, devlink operations
+e.t.c, everything that can cause to reload driver in module C.
+
+Thanks
 
