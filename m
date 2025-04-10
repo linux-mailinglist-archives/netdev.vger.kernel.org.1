@@ -1,147 +1,151 @@
-Return-Path: <netdev+bounces-181413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E2AAA84D33
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 21:40:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 475BBA84DA0
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 21:59:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C614447E2B
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 19:40:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A069174CCD
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 19:59:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5B8284B5A;
-	Thu, 10 Apr 2025 19:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30A0428F927;
+	Thu, 10 Apr 2025 19:59:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="1pQ8c14I"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z38pf3p3"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 747581E5206;
-	Thu, 10 Apr 2025 19:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4C61C3BEB;
+	Thu, 10 Apr 2025 19:59:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744314030; cv=none; b=Hw9FBsednrTx/UKvn17vkA9xisu7/IgDUEUI9Hl6R2lACH5w2BDQT+6vAa6VPeqfFw//C9fTsMpy/OJFxFLkDQvCh/366bcONd2rzM5ZtdGyMeZ9zHiO8AwhSodCNEXxXtMkwcpMS/Q+fDntYXOAynAmpgwH0UfujhJzT/PZrwM=
+	t=1744315183; cv=none; b=OkvEBJFC6KF2NmKNeUywPoiKamNMXZRfNZgZjUcIIp/RNu3cOIbUgOlJ8ZLhcJvlXP+zmboYVFznb1rJkxCZ7kv8H/DkvShufSJbN2tJIdXBHWz6JPXPVWzRZqK4NGx9oe5hZiXJMrbB8ck3YrMigltJDoxDd5eHG9Htu2EWvyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744314030; c=relaxed/simple;
-	bh=EqG6bV9uu1+OS9htLQk+Lmb3SAcKfz+RCqu+acDYM0Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tptWjvdvH7NrKMrXjQKFshPJYbBCVE40UuW88YRiAKcJBFSmMxArAIt2GeRPSvl+iipOS0N5MK8AtrOLzGF+aGVFWCpxHUEu2MZRZ1BbEJjxJyAG+2tIDJl/t+yu45Vc4KzQQAnxmbLdq5vebrFArPv940RgLkSfiOoVbQGfaOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=1pQ8c14I; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=hXIB3Hcfuug+kNve3lPpJgg9CdyzHNxaIStHc89+43c=; b=1pQ8c14IaovuGU/AE+akUVZwWN
-	wmeOAhVVxROopAX1/XwGnNjrOaWviJnSS4TrOq+rKuPL0BuDaLXmaZhUoLf81CYtHONLDW70iH8ob
-	selguFVe3QclQWYh0pQc8VSbU2W+N+4gF+/M3AHce+z/dUUuM9ncUjO3aWsSjOHVqr8z3Oy8yx0lq
-	mmloSqSLYjhsaCqz5ZmlddaTU3Ao6NVUcGq9PYniLhfFBromc6tHrz+bljDTAknjKJc6iR6Q7RlIu
-	BqSLtFGcztXk1NZbBBk0ofYjyBZ0XpR5p+WsPeikqCOT9K84+1zHBwSIPQvFayrV0RarygA2toRAY
-	Uio8g5vg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60700)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u2xl2-0002NX-1v;
-	Thu, 10 Apr 2025 20:40:16 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u2xkz-0003qV-0C;
-	Thu, 10 Apr 2025 20:40:13 +0100
-Date: Thu, 10 Apr 2025 20:40:12 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/2] net: phy: Add Marvell PHY PTP support
-Message-ID: <Z/genHfvbvll09XT@shell.armlinux.org.uk>
-References: <Z_ZlDLzvu_Y2JWM8@shell.armlinux.org.uk>
- <20250409143820.51078d31@kmaincent-XPS-13-7390>
- <Z_Z3lchknUpZS1UP@shell.armlinux.org.uk>
- <20250409180414.19e535e5@kmaincent-XPS-13-7390>
- <Z_avqyOX2bi44sO9@shell.armlinux.org.uk>
- <Z/b2yKMXNwjqTKy4@shell.armlinux.org.uk>
- <20250410111754.136a5ad1@kmaincent-XPS-13-7390>
- <Z_fmkuPhqMqWBL2M@shell.armlinux.org.uk>
- <20250410180205.455d8488@kmaincent-XPS-13-7390>
- <Z_gLD8XFlyG32D6L@shell.armlinux.org.uk>
+	s=arc-20240116; t=1744315183; c=relaxed/simple;
+	bh=NW63uHkLkcM39Qc6iSVYuH58ir45xfXAXIeZclP1MP8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FCePYWpPZgSuHwq2yj922O3OTvKyAqTtK1b0FUfL5JIeP3QFjBUdKK2Jc++C57mi5Ilw2JB8bABDuiwTE5ZabFhTpY9q2Vlvca3W+3jYkCBIyV8bNooSkMOHAgj+tC0qvXnthbqeE+Mqu9tJ2sBcWRWb6qlxwPCm65mfV3HL0I4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z38pf3p3; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-54b09cb06b0so1292747e87.1;
+        Thu, 10 Apr 2025 12:59:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744315179; x=1744919979; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vwHmA378W6NLdb94l0kIXEG6dN9f+MTetUXmPGeF77o=;
+        b=Z38pf3p3qkoX0yngrrmC3ZyI5AvuzXBnwGputwF/DgSmAdWufmeNQ/iejfsq4CrKH6
+         3qu3r9eVrpzO20/EWTx94Go9tzFVGeiHVjkUWPlkYbVxqZqxSP3AyLPk85NU9InUyrAV
+         Nv+oWjgdXWBb+7aYfcNnZFmQu4zqxPLn2qHm1nkFo2vikwxVwMNI4SJxfQbrR8XFyhUC
+         +tzt20L9S+mZvlrtPNbbsGc0i1nLdQh6tAG+lqnlA/lERKvvrOXwQPWxlOEA7+SBckkH
+         zNlWV0fonXrJt27yU0FIjgdsD9gvPW4WIKNqMlN+30SXuehg432uZNU7ruVv5vHaGR/F
+         jjaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744315179; x=1744919979;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vwHmA378W6NLdb94l0kIXEG6dN9f+MTetUXmPGeF77o=;
+        b=XnuFlf6rpuPXUs1vkq953TphjhGDXvnzd81DDvhzoDKJrf2IJdtwiYfRpM/bKM4Vou
+         1LkTkEJPrptUbHNJn98ITVxDyxyHRpJsA1wPVTcfzxV0RkCZXrppJNNz99y4zLbMTJR6
+         sY6NkQP3iy1bKFKn/hwErNMgmuv6pYSj+B0A2q41iXfqECXhRWpgPSB7wlfzr2l2no1h
+         Uy8N0rYOTIHHlxed9ZfJr2bnX+ZokURISPV1ARdwKENomOQ7w/m6hN/TiKCkLqk519px
+         tWCI8ns9zJKym7bJ4kWHd2zoF4d8mA/zAEN/xzM5RaO3j2GzGNmQATrZ7li3obLlmSGG
+         6ueA==
+X-Forwarded-Encrypted: i=1; AJvYcCVlXkmTmVh8AawJp9z39NZFQSyfzsXgB9O9Ld0O+z6hOtMysaFsy9cJgX4qe9sAK7bbwWC/HDsT@vger.kernel.org, AJvYcCXjxmIUQdmh8Sxv/ePRyrEgc8CrU8/34y9aY1hOM91ppUtjqDA+5L6RD27UK6ODV2UCh3gUoAqLnEIiPZM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YycGF3KIN+UawGlQ0QU2GZOOeZlUUKW0UfjWZMnfj1FoOT1l6W+
+	8DbMHht2bl8Lcl5hrlfWFfJyygpq+BaKcd0jWJJMpjucr68qpQqUeiQTdnR83Xrb94j4QS6AlkY
+	nnGmCbROHsoJ+cNBlWk2BZimGKyI=
+X-Gm-Gg: ASbGncseuc51C+93dFJ0am4k1o7g9Z84Xx57yiqRXNd2XJWa83qIraaYmfiC+f3Euba
+	7FyxJgYccdRIcK9Yn+Y44iXNi1OSg/V6lWVd1s8T/hAmU+uV/5MI44eSCetGl97SBUWeMlTwNPQ
+	wBhXPCc2dz6qwyzROSBSr88KXQAIluUQJ9w6u3sseYZo5klSscaI8UxDs=
+X-Google-Smtp-Source: AGHT+IGY4oluoFyz6GVB34MFhj5G3ks9xo2ahSRLku9GIJQXukB383ULsfDKfh+ZtOCcwWEADCve3h2EUoyMATCSseg=
+X-Received: by 2002:a05:6512:3ba4:b0:54b:1095:6190 with SMTP id
+ 2adb3069b0e04-54d452d7ec2mr10657e87.49.1744315179118; Thu, 10 Apr 2025
+ 12:59:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z_gLD8XFlyG32D6L@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20250408185759.5088-1-pranav.tyagi03@gmail.com> <1168af15-14dd-4eef-b1d7-c04de4781ea7@amd.com>
+In-Reply-To: <1168af15-14dd-4eef-b1d7-c04de4781ea7@amd.com>
+From: Pranav Tyagi <pranav.tyagi03@gmail.com>
+Date: Fri, 11 Apr 2025 01:29:29 +0530
+X-Gm-Features: ATxdqUGWkHq07QDYT837wHsiO-ekWuaZwFRrPK3PdsygZOVdXNU2Ad9m_XoQj00
+Message-ID: <CAH4c4jKm9ewfL3G7SAGokzGT3VpLaKWQrbrxcLAnb-G8_MUjSA@mail.gmail.com>
+Subject: Re: [PATCH] net: ipconfig: replace strncpy with strscpy_pad
+To: "Nelson, Shannon" <shannon.nelson@amd.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	skhan@linuxfoundation.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kernel-mentees@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 10, 2025 at 07:16:47PM +0100, Russell King (Oracle) wrote:
-> On Thu, Apr 10, 2025 at 06:02:05PM +0200, Kory Maincent wrote:
-> > On Thu, 10 Apr 2025 16:41:06 +0100
-> > "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
-> > 
-> > > On Thu, Apr 10, 2025 at 11:17:54AM +0200, Kory Maincent wrote:
-> > > > On Wed, 9 Apr 2025 23:38:00 +0100
-> > > > "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:  
-> > > > > On Wed, Apr 09, 2025 at 06:34:35PM +0100, Russell King (Oracle) wrote:  
-> > 
-> > > > > 
-> > > > > With that fixed, ptp4l's output looks very similar to that with mvpp2 -
-> > > > > which doesn't inspire much confidence that the ptp stack is operating
-> > > > > properly with the offset and frequency varying all over the place, and
-> > > > > the "delay timeout" messages spamming frequently. I'm also getting
-> > > > > ptp4l going into fault mode - so PHY PTP is proving to be way more
-> > > > > unreliable than mvpp2 PTP. :(  
-> > > > 
-> > > > That's really weird. On my board the Marvell PHY PTP is more reliable than
-> > > > MACB. Even by disabling the interrupt.
-> > > > What is the state of the driver you are using?   
-> > > 
-> > > Right, it seems that some of the problems were using linuxptp v3.0
-> > > rather than v4.4, which seems to work better (in that it doesn't
-> > > seem to time out and drop into fault mode.)
-> > > 
-> > > With v4.4, if I try:
-> > > 
-> > > # ./ptp4l -i eth2 -m -s -2
-> > > ptp4l[322.396]: selected /dev/ptp0 as PTP clock
-> > > ptp4l[322.453]: port 1 (eth2): INITIALIZING to LISTENING on INIT_COMPLETE
-> > > ptp4l[322.454]: port 0 (/var/run/ptp4l): INITIALIZING to LISTENING on
-> > > INIT_COMPLETE ptp4l[322.455]: port 0 (/var/run/ptp4lro): INITIALIZING to
-> > > LISTENING on INIT_COMPLETE ptp4l[328.797]: selected local clock
-> > > 005182.fffe.113302 as best master
-> > > 
-> > > that's all I see. If I drop the -2, then:
-> > 
-> > It seems you are still using your Marvell PHY drivers without my change.
-> > PTP L2 was broken on your first patch and I fixed it.
-> > I have the same result without the -2 which mean ptp4l uses UDP IPV4.
-> 
-> I'm not sure what you're referring to.
+On Wed, Apr 9, 2025 at 3:14=E2=80=AFAM Nelson, Shannon <shannon.nelson@amd.=
+com> wrote:
+>
+> On 4/8/2025 11:57 AM, Pranav Tyagi wrote:
+> >
+> > Replace the deprecated strncpy() function with strscpy_pad() as the
+> > destination buffer is NUL-terminated and requires
+> > trailing NUL-padding
+> >
+> > Signed-off-by: Pranav Tyagi <pranav.tyagi03@gmail.com>
+>
+> There should be a Fixes tag here, and usually we put the 'net' tree
+> indicator inside the tag, like this: [PATCH net]
+>
+>
+> > ---
+> >   net/ipv4/ipconfig.c | 2 +-
+> >   1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/net/ipv4/ipconfig.c b/net/ipv4/ipconfig.c
+> > index c56b6fe6f0d7..7c238d19328f 100644
+> > --- a/net/ipv4/ipconfig.c
+> > +++ b/net/ipv4/ipconfig.c
+> > @@ -1690,7 +1690,7 @@ static int __init ic_proto_name(char *name)
+> >                          *v =3D 0;
+> >                          if (kstrtou8(client_id, 0, dhcp_client_identif=
+ier))
+> >                                  pr_debug("DHCP: Invalid client identif=
+ier type\n");
+> > -                       strncpy(dhcp_client_identifier + 1, v + 1, 251)=
+;
+> > +                       strscpy_pad(dhcp_client_identifier + 1, v + 1, =
+251);
+>
+> The strncpy() action, as well as the memcpy() into
+> dhcp_client_identifier elsewhere, are not padding to the end, so I think
+> this only needs to be null-terminated, not fully padded.  If full
+> padding is needed, please let us know why.
+>
+> sln
+>
+> >                          *v =3D ',';
+> >                  }
+> >                  return 1;
+> > --
+> > 2.49.0
+> >
+> >
+>
 
-Okay, turns out to be nothing to do with any fixes in my code or not
-(even though I still don't know what the claimed brokenness you
-refer to actually was.)
+My initial assumption was on the fact that dhcp_client_identifier
+is directly used in DHCP packet construction
+and may be parsed byte-wise. But on going through the code again
+I see that it does not require to be fully padded.
+Would strscpy() suffice? as it ensures null-termination and
+does not fully pad the buffer.
 
-It turns out to be that ptpdv2 sends PTP packets using IPv4 UDP *or*
-L2, and was using IPv4 UDP. Adding "ptpengine:transport=ethernet" to
-the ptpdv2 configuration allows ptp4l -2 to then work.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Regards
+Pranav Tyagi
 
