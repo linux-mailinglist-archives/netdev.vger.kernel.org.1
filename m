@@ -1,91 +1,147 @@
-Return-Path: <netdev+bounces-181412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1E1BA84CF9
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 21:27:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E2AAA84D33
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 21:40:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 913DC4C455A
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 19:26:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C614447E2B
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 19:40:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0568A28FFCD;
-	Thu, 10 Apr 2025 19:26:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5B8284B5A;
+	Thu, 10 Apr 2025 19:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="u9dgxLfF"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="1pQ8c14I"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5074D70830;
-	Thu, 10 Apr 2025 19:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 747581E5206;
+	Thu, 10 Apr 2025 19:40:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744313163; cv=none; b=euPKyo/nb99jAs1q6KCNLTUp+bYqUhmeE8kgSFwZ5hWWOoC12rL6M5T12zQH93JegLpP8Ked9IgS5Pmqs8Xgux0dYgJflh6q1KPOSUMS/1zDPD08LMKHm7Lt9L/oxrgDvWPcEN6ZkB1J3me6FtOOb2K0T+cfAKMdfjPMJEjbqds=
+	t=1744314030; cv=none; b=Hw9FBsednrTx/UKvn17vkA9xisu7/IgDUEUI9Hl6R2lACH5w2BDQT+6vAa6VPeqfFw//C9fTsMpy/OJFxFLkDQvCh/366bcONd2rzM5ZtdGyMeZ9zHiO8AwhSodCNEXxXtMkwcpMS/Q+fDntYXOAynAmpgwH0UfujhJzT/PZrwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744313163; c=relaxed/simple;
-	bh=k8RFiI/x6UxupfW1UUmtnhPewcoXjLqm7EjG3qPoxxo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aHmKS598PDDz8sY272J02o9lA1NKc9hOJNjWzG31LHqKdXo+uoGk7oSnwTiZoOHiigRW23Yk7Xyo+pFiwIxl/e5S8OCGV7HSQC3FQGmPYWGWznX2eQLolt1cCqU90iFyguc0UV6GsZ9Zuc+WOgAS0drvq9hJeDxN8OlKWCU3kbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=u9dgxLfF; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1744313163; x=1775849163;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=0l1LQFW7fzsNRJ7rHIC6JfuWXS1d6idcutFACZv5Txw=;
-  b=u9dgxLfFqj8A9vhJ0DrNQt2d5iTRAO/rVVaSdDsb4MZGBJJx9JWUGC8r
-   DzRWI/MLs3zwgeTGeqyQJTkPqxwPzuFVGr+Uh8xLL9vSd4d7nhhnzTgp0
-   m7+kaXA/MXJVI3biip1Gd/lbB2ssKWxI0g1IbCou5rkLnmbHXWdJhdc2m
-   A=;
-X-IronPort-AV: E=Sophos;i="6.15,203,1739836800"; 
-   d="scan'208";a="510568203"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 19:25:57 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:43177]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.25.120:2525] with esmtp (Farcaster)
- id c8f9aa91-2435-413f-a495-a915702a0546; Thu, 10 Apr 2025 19:25:56 +0000 (UTC)
-X-Farcaster-Flow-ID: c8f9aa91-2435-413f-a495-a915702a0546
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 10 Apr 2025 19:25:55 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.100.21) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 10 Apr 2025 19:25:53 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <jordan@jrife.io>
-CC: <aditi.ghag@isovalent.com>, <bpf@vger.kernel.org>, <daniel@iogearbox.net>,
-	<kuniyu@amazon.com>, <martin.lau@linux.dev>, <netdev@vger.kernel.org>,
-	<willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH v1 bpf-next 1/5] bpf: udp: Use bpf_udp_iter_batch_item for bpf_udp_iter_state batch items
-Date: Thu, 10 Apr 2025 12:25:40 -0700
-Message-ID: <20250410192543.99383-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250409182237.441532-2-jordan@jrife.io>
-References: <20250409182237.441532-2-jordan@jrife.io>
+	s=arc-20240116; t=1744314030; c=relaxed/simple;
+	bh=EqG6bV9uu1+OS9htLQk+Lmb3SAcKfz+RCqu+acDYM0Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tptWjvdvH7NrKMrXjQKFshPJYbBCVE40UuW88YRiAKcJBFSmMxArAIt2GeRPSvl+iipOS0N5MK8AtrOLzGF+aGVFWCpxHUEu2MZRZ1BbEJjxJyAG+2tIDJl/t+yu45Vc4KzQQAnxmbLdq5vebrFArPv940RgLkSfiOoVbQGfaOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=1pQ8c14I; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=hXIB3Hcfuug+kNve3lPpJgg9CdyzHNxaIStHc89+43c=; b=1pQ8c14IaovuGU/AE+akUVZwWN
+	wmeOAhVVxROopAX1/XwGnNjrOaWviJnSS4TrOq+rKuPL0BuDaLXmaZhUoLf81CYtHONLDW70iH8ob
+	selguFVe3QclQWYh0pQc8VSbU2W+N+4gF+/M3AHce+z/dUUuM9ncUjO3aWsSjOHVqr8z3Oy8yx0lq
+	mmloSqSLYjhsaCqz5ZmlddaTU3Ao6NVUcGq9PYniLhfFBromc6tHrz+bljDTAknjKJc6iR6Q7RlIu
+	BqSLtFGcztXk1NZbBBk0ofYjyBZ0XpR5p+WsPeikqCOT9K84+1zHBwSIPQvFayrV0RarygA2toRAY
+	Uio8g5vg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60700)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u2xl2-0002NX-1v;
+	Thu, 10 Apr 2025 20:40:16 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u2xkz-0003qV-0C;
+	Thu, 10 Apr 2025 20:40:13 +0100
+Date: Thu, 10 Apr 2025 20:40:12 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 2/2] net: phy: Add Marvell PHY PTP support
+Message-ID: <Z/genHfvbvll09XT@shell.armlinux.org.uk>
+References: <Z_ZlDLzvu_Y2JWM8@shell.armlinux.org.uk>
+ <20250409143820.51078d31@kmaincent-XPS-13-7390>
+ <Z_Z3lchknUpZS1UP@shell.armlinux.org.uk>
+ <20250409180414.19e535e5@kmaincent-XPS-13-7390>
+ <Z_avqyOX2bi44sO9@shell.armlinux.org.uk>
+ <Z/b2yKMXNwjqTKy4@shell.armlinux.org.uk>
+ <20250410111754.136a5ad1@kmaincent-XPS-13-7390>
+ <Z_fmkuPhqMqWBL2M@shell.armlinux.org.uk>
+ <20250410180205.455d8488@kmaincent-XPS-13-7390>
+ <Z_gLD8XFlyG32D6L@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWA001.ant.amazon.com (10.13.139.124) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z_gLD8XFlyG32D6L@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Jordan Rife <jordan@jrife.io>
-Date: Wed,  9 Apr 2025 11:22:30 -0700
-> Prepare for the next commit that tracks cookies between iterations by
-> converting struct sock **batch to union bpf_udp_iter_batch_item *batch
-> inside struct bpf_udp_iter_state.
+On Thu, Apr 10, 2025 at 07:16:47PM +0100, Russell King (Oracle) wrote:
+> On Thu, Apr 10, 2025 at 06:02:05PM +0200, Kory Maincent wrote:
+> > On Thu, 10 Apr 2025 16:41:06 +0100
+> > "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+> > 
+> > > On Thu, Apr 10, 2025 at 11:17:54AM +0200, Kory Maincent wrote:
+> > > > On Wed, 9 Apr 2025 23:38:00 +0100
+> > > > "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:  
+> > > > > On Wed, Apr 09, 2025 at 06:34:35PM +0100, Russell King (Oracle) wrote:  
+> > 
+> > > > > 
+> > > > > With that fixed, ptp4l's output looks very similar to that with mvpp2 -
+> > > > > which doesn't inspire much confidence that the ptp stack is operating
+> > > > > properly with the offset and frequency varying all over the place, and
+> > > > > the "delay timeout" messages spamming frequently. I'm also getting
+> > > > > ptp4l going into fault mode - so PHY PTP is proving to be way more
+> > > > > unreliable than mvpp2 PTP. :(  
+> > > > 
+> > > > That's really weird. On my board the Marvell PHY PTP is more reliable than
+> > > > MACB. Even by disabling the interrupt.
+> > > > What is the state of the driver you are using?   
+> > > 
+> > > Right, it seems that some of the problems were using linuxptp v3.0
+> > > rather than v4.4, which seems to work better (in that it doesn't
+> > > seem to time out and drop into fault mode.)
+> > > 
+> > > With v4.4, if I try:
+> > > 
+> > > # ./ptp4l -i eth2 -m -s -2
+> > > ptp4l[322.396]: selected /dev/ptp0 as PTP clock
+> > > ptp4l[322.453]: port 1 (eth2): INITIALIZING to LISTENING on INIT_COMPLETE
+> > > ptp4l[322.454]: port 0 (/var/run/ptp4l): INITIALIZING to LISTENING on
+> > > INIT_COMPLETE ptp4l[322.455]: port 0 (/var/run/ptp4lro): INITIALIZING to
+> > > LISTENING on INIT_COMPLETE ptp4l[328.797]: selected local clock
+> > > 005182.fffe.113302 as best master
+> > > 
+> > > that's all I see. If I drop the -2, then:
+> > 
+> > It seems you are still using your Marvell PHY drivers without my change.
+> > PTP L2 was broken on your first patch and I fixed it.
+> > I have the same result without the -2 which mean ptp4l uses UDP IPV4.
 > 
-> Signed-off-by: Jordan Rife <jordan@jrife.io>
+> I'm not sure what you're referring to.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Okay, turns out to be nothing to do with any fixes in my code or not
+(even though I still don't know what the claimed brokenness you
+refer to actually was.)
+
+It turns out to be that ptpdv2 sends PTP packets using IPv4 UDP *or*
+L2, and was using IPv4 UDP. Adding "ptpengine:transport=ethernet" to
+the ptpdv2 configuration allows ptp4l -2 to then work.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
