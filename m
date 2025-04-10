@@ -1,50 +1,100 @@
-Return-Path: <netdev+bounces-181264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41E57A84383
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:44:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A588EA8437F
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:44:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A6144A4BAD
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:40:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4E64189CB8B
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:41:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 327BC2853FA;
-	Thu, 10 Apr 2025 12:40:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 404A928540E;
+	Thu, 10 Apr 2025 12:41:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UQIW1YN8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="knB0CNbS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f65.google.com (mail-wr1-f65.google.com [209.85.221.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E447284B4B
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 12:40:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7791B28541F;
+	Thu, 10 Apr 2025 12:41:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744288805; cv=none; b=TeF6H52/i9qp7N3cHgfUkx5vRaRyBg1V7zjiBjkmzStKX23y0ANr+gOx7GB7IvNlad+z4kBxxt9R4GoILhEq+1FQNBITvY89bln4u9teB7/ZdPZOxor32kEfk6ITuP4dAUdbP7DNRk/G7gVbgbm1d/GvnJuwqUCRia58v/xakbE=
+	t=1744288889; cv=none; b=Sv36aTVGYPlzHzR0qY2kjAyAFp3CcU3k43bTU8DWrjx8osZy4EMZMBWR/jmwcLZx6t+Mk2sBPASpCrK8/e3XpXvX0NNbYrpcqJXOWqz1GR5RD/KF3azjVQ1FsqAZNWHhX+HMJPJR7kSUx/6pEE8TYpQmDuiUenJHR/34P1WOvMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744288805; c=relaxed/simple;
-	bh=+1/TGOpczVD0Su+kju5DpaZRmGMZI+EkUDlmNF4Kvqk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ThiMGczLqJT9CmwgL+eMhrAPUxbEaJyEJtB72WoE3S6hLaGJYT4KcGazlSPJ31BEifxiDTRSi/0DEyzCorwyr2obsc+BJy13WPVEJI6VMxRH55AYcL8IwldCnsrZrQamrGxYsYpuHRfW8S5qHDWh2vEeKCGZbO0QzqtshOp1oeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UQIW1YN8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78E95C4CEE9;
-	Thu, 10 Apr 2025 12:40:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744288804;
-	bh=+1/TGOpczVD0Su+kju5DpaZRmGMZI+EkUDlmNF4Kvqk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UQIW1YN8U25FrwYI+5Fm3GDg3wFsAXntxwQi4E0EbL9mYDiLkX5Mw7inT5hEuW1u2
-	 S0qSA5aWGaYJxJYGyz0wI0304rCJXgOqU6hpx93mBzLnHF01/jpQgTIpYKz66B1CaV
-	 PeSyYVSXT+MnZluDy7rBkjM/rkg2C5LZZbmcRYiZLGQastl5AULVxWe7J0aB+a0riE
-	 B1OL9GV7p2uLafpElRpMmQExNBiV5PwWkSkEuc3A2nVmJgJi/z7Z9PdbHoDbkhv4R8
-	 bQZZEDBTdMQKkfWavK5c1BcvBltVzmJtSBAgvk1jHFGIvpTvRCp6jK26pihij2UlAF
-	 dq7aDMoTT5dEQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34193380CEF4;
-	Thu, 10 Apr 2025 12:40:43 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1744288889; c=relaxed/simple;
+	bh=FdnbocKbRHhtLFIRneUZ+/1khNFKq2SMICJ8698GBPY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Z6Zey62M722NUZhdV/ctbZEQJs7JQIWTP3f7dP+3PEk3/HMJ3/HPIQ5Xm05r3NDKZgEbL0qxVAMgWJZoiwUOyddU6kEy3EwoCt1BWjZq7QKGg5T+Ue/t35n8B0gW/m6EfXCuwHxEkoVY4tGVqCsXB6LYtpvLoTLcnES3wV2cfOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=knB0CNbS; arc=none smtp.client-ip=209.85.221.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f65.google.com with SMTP id ffacd0b85a97d-39c1ef4ae3aso468723f8f.1;
+        Thu, 10 Apr 2025 05:41:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744288886; x=1744893686; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FdnbocKbRHhtLFIRneUZ+/1khNFKq2SMICJ8698GBPY=;
+        b=knB0CNbSLyrwtTrRfh4BztPMuwF6XuwgMpMDo265lQMxCg6eabs1rMwZ5TwqYxHuek
+         6YeZp70z5Ni2jVxZfEm/HWJkyEzqslEpts2lirzbsLFKWZKcVCvQkiZ3+BGqKxV4oS84
+         Nu4bLpsCCD0xMJ0bsUjzCft+fezPM/cVhkW5KcZ3VlTyYRe3Q1ADAZ3KEUisS3ktMILK
+         C7uIyLELxAuBpwaxAscmXzs1eA4NgjRRhxkUWBI0NFyIQu32/HmZ6iOWuC4AoQr5neTU
+         i3jMZ1QjcyD6IhwZrLt7gGHYRXXHpsk5TjD3oOJC6Sy+TNx5DG5QjPuI+/jXTESpZWAY
+         /pzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744288886; x=1744893686;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FdnbocKbRHhtLFIRneUZ+/1khNFKq2SMICJ8698GBPY=;
+        b=S7lKnlJ9ZnqfBDP4UbKYCh3kWi2dV7FEQE8mvqnqWOaZOO5pKiSoQZ/hlsU21NHn/H
+         ZRFIxbmsUzCXKe7TjB/gM8o1YPdSZXyApRQL9RLLPpio85h+LPuot/ZZC1k23HIxlY0a
+         GJOMhfyQgX+g/9+1XBCKZyzmHFTsjF1VyH5BIINhTHC+UjXucKip+URj34QP5XCZ8iLZ
+         vSW34kRr/dJIWR5/lQhOSbL5V1twT6TL4KCX/bBEeuv8HKmE8xDaqW3h1xwMmTXBHp26
+         3G9+X5yMVnkxGGY3Hxa5k+gvpCn95p9qi2KDex4xjBEwc/EnI+7jCiVQ6K444aa/glzf
+         LFJA==
+X-Forwarded-Encrypted: i=1; AJvYcCUUD5EUHlsMvrOs64NG+NzmDtghDYG+mqQ//V2yz9N/EJM4l+/DgEfxxUh/nW4Cd4RVdM9uqapvMghtxaSU@vger.kernel.org, AJvYcCV0gqJolleYMZy+z3GVtInnlwQ3lLNfnc0O06bOIgfeeyTNrvvAFSsEPg52Wdg5P4uuNxg=@vger.kernel.org, AJvYcCXhBxjLnAe1libcCSjZef+faL9+kisMBB3s3Jp+1eQjXw9PbBzeYW+dHKqbx8ys6X3Ic29N1XVy@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJmKayxqiqHCOp1TWSIH76GvLOmF/sA84qOrNNbSR12fg9ncrA
+	84Qm7ngn+rHj1U5+hsVGevhhPTQxloAW+AgZZM5Ho+5GNfkYzJXK
+X-Gm-Gg: ASbGncuOhnirKfCLm8Z5rMpvFAowwEis8CkqnQdIbt18z7NAt1htxvapEEN/R3I1xy5
+	AhRC1+sn1LHhDFcsmfirePxu5Z6VJOU4iJCjGNXneP73tsGUK/ZKXqi8qKLirfogSXHp4X1Yp/F
+	KIFz06aKCi0EBLat6zFRn6WLyc/HDsTUfgVa84BmAqCh8UYLUFKRckrhiJa2q7BDzbab9fpRGas
+	F82uNeaHfW5pF9tUoilL+/YF4tf9XepLQOJlQ1E7eTzIKOEDdR31qOxawXllXzUlPMl72TaMCbY
+	BkxGzu46rG0AeSZ1lewSb6zzcYbjAm4=
+X-Google-Smtp-Source: AGHT+IHFnixQ5MsGHZOrRj7wBMlCDreKn1YjUX+wo4a9yoUxFxM74gu0LIHOA4oxH0+d9O3PjuEj5w==
+X-Received: by 2002:a05:6000:1ace:b0:38d:fede:54f8 with SMTP id ffacd0b85a97d-39d8f604e74mr2137274f8f.16.1744288885650;
+        Thu, 10 Apr 2025 05:41:25 -0700 (PDT)
+Received: from localhost ([2a03:2880:31ff:43::])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39d893f0cb7sm4722483f8f.75.2025.04.10.05.41.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Apr 2025 05:41:25 -0700 (PDT)
+From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+To: syzbot+252bc5c744d0bba917e1@syzkaller.appspotmail.com
+Cc: andrii@kernel.org,
+	ast@kernel.org,
+	bpf@vger.kernel.org,
+	daniel@iogearbox.net,
+	eddyz87@gmail.com,
+	haoluo@google.com,
+	john.fastabend@gmail.com,
+	jolsa@kernel.org,
+	kpsingh@kernel.org,
+	linux-kernel@vger.kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	song@kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	yonghong.song@linux.dev
+Subject: [syzbot] [bpf?] possible deadlock in queue_stack_map_push_elem
+Date: Thu, 10 Apr 2025 05:41:24 -0700
+Message-ID: <20250410124124.1189471-1-memxor@gmail.com>
+X-Mailer: git-send-email 2.47.1
+In-Reply-To: <000000000000c80abd0616517df9@google.com>
+References: <000000000000c80abd0616517df9@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,48 +102,6 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] ethtool: cmis_cdb: Fix incorrect read / write length
- extension
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174428884203.3651632.2197341307164250382.git-patchwork-notify@kernel.org>
-Date: Thu, 10 Apr 2025 12:40:42 +0000
-References: <20250409112440.365672-1-idosch@nvidia.com>
-In-Reply-To: <20250409112440.365672-1-idosch@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, horms@kernel.org,
- danieller@nvidia.com, petrm@nvidia.com, andrew@lunn.ch,
- damodharam.ammepalli@broadcom.com, michael.chan@broadcom.com,
- andrew.gospodarek@broadcom.com
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Wed, 9 Apr 2025 14:24:40 +0300 you wrote:
-> The 'read_write_len_ext' field in 'struct ethtool_cmis_cdb_cmd_args'
-> stores the maximum number of bytes that can be read from or written to
-> the Local Payload (LPL) page in a single multi-byte access.
-> 
-> Cited commit started overwriting this field with the maximum number of
-> bytes that can be read from or written to the Extended Payload (LPL)
-> pages in a single multi-byte access. Transceiver modules that support
-> auto paging can advertise a number larger than 255 which is problematic
-> as 'read_write_len_ext' is a 'u8', resulting in the number getting
-> truncated and firmware flashing failing [1].
-> 
-> [...]
-
-Here is the summary with links:
-  - [net] ethtool: cmis_cdb: Fix incorrect read / write length extension
-    https://git.kernel.org/netdev/net/c/eaa517b77e63
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+#syz test: https://github.com/kkdwivedi/linux.git res-lock-next
 
