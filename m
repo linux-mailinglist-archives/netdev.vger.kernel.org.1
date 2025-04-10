@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-180995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D766FA835ED
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 03:48:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D84D1A835F5
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 03:49:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB69E19E7446
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 01:47:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65ECC8A293B
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 01:47:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87A361D9A70;
-	Thu, 10 Apr 2025 01:47:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 263C71DD0F2;
+	Thu, 10 Apr 2025 01:47:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nFE/or86"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Igu/nogw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642381D88A6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D5E1DC9B0
 	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 01:47:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744249635; cv=none; b=ZZLCSDz4blmOVy2QBciIWFwemKa3YObinagN8L6v/d1fCS83JT8tDyjC+8JQ/0AMK/8Zc7C8s5HawL4kzYqF/enjkhBzF7tgy0gmKL7E6yhnF95J+5iqAUGRfGeKlmd9PkFU5CvVlwsPxjvCjtCr3BMui6L7/FugB1C1JmgkStA=
+	t=1744249636; cv=none; b=TgkLkdbAQgPeDuSJkOOMFEix0RCdkeOlTRhIxzcVn0aw8HyePk2hltk4+vrZL0+FZ7vi7PKfm389Dcw6A0TUlfxpkp/aepcTHAgYFn5dUGOt3GImSHxKBjZ64pEtT6gr2uD9dZzV1+Zvwq+fl73BQbWmb49u0AgUIc7GHgZE39Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744249635; c=relaxed/simple;
-	bh=R2hc2/Mm4VbD488z4wUPb+sssP4MJRPRpuL7TS21MQ0=;
+	s=arc-20240116; t=1744249636; c=relaxed/simple;
+	bh=19N7IMgAQ20DbAsJ2YZ0IEia+k1fep/RYxtQto5l4Lo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=e5kZpLf3vb0Dp5AI4ZzZhPkyKQK27PhBAzbd9eFxM4PajqXbTfkF68PDs5Zs2I3wAVZhXqhWc1dSYmt5MCgXtElIsP3I++R/OgXvwYGnZiv5KKIxYg4fgqQ7JHv/Ef9OdZ2K5IqpSrAlYVHRSXnn+q5d3I3ENneAPaV5gMGegKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nFE/or86; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF837C4CEEB;
-	Thu, 10 Apr 2025 01:47:14 +0000 (UTC)
+	 MIME-Version; b=CO2LRG/Dh7w1awMq1tXT68dOIegpkHgqiqnBvZ6uY3V+svzyRRDkfrEp1HyBaZFUr4EJej+Tihub5FIeX2RikNfkkk417q78RjBSYeIDyLOY1vnQJaSMtz8+sCZ3AmaVx8Fk9OTjwC5CGaoM6GwaOzbXNtNDwP1WZVW3kaE8HIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Igu/nogw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64DF8C4CEEC;
+	Thu, 10 Apr 2025 01:47:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1744249635;
-	bh=R2hc2/Mm4VbD488z4wUPb+sssP4MJRPRpuL7TS21MQ0=;
+	bh=19N7IMgAQ20DbAsJ2YZ0IEia+k1fep/RYxtQto5l4Lo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nFE/or86BjEjfWBryFD+GOtvNB2SdKNiXFkd1sMBv05c2J/JUTnEWkcAJObC4o8gg
-	 Uzve51gTcLr2UMHDqzWFYeaica4ks52JJtIcDoh4169uFglRIabvGevGjkeX6O/ye6
-	 62/f7JLy8N4Q1WMwlXEQ6XK4xar6v3ZariNs41XLszJL6B1i9KwsYnUQ7u1K42hmWZ
-	 5RFyvKWaK45vwBd0IDoscbCF+f8hLKlfwrRoOpS12Nkm9Yli29dKR5p+mIOY2Vzx7C
-	 PkfbPAr7ar/pxkswjjs42cjW8hmbInfAPXeeAVNjgnwFlOzgnmHIjIXYLW+JeGz5Xz
-	 IfPT7RHc73e6A==
+	b=Igu/nogwL0AYMOuruP3i7jyzxvGKXblQc9cxDz5xXSeRCsaJwo2064buTCYEIbVed
+	 yQniIbWBKOV+3AgC+E6UW4mjvEkYrTKNBQQuy6cNYjmnEmYAvHW0ZcpnuX4dwk5WvO
+	 LYCGaL5TkoL4/o54c7XNXR2CPztBoS9qEXYHXLKohmiradvBFA8XcyfEDnuVf824nT
+	 1i8cocNx0UaRHyLa6/DIjJmkLQBbTTOXbLGl6MprfFVyFGvU4bVZMQZ5E87GGIVE8T
+	 NCmkfHzuxCvIZSW9CCxphshZBHGCHWjLNsF3QjXz6XH8xolX9Yhhsw4o4SKksLj8dW
+	 ETdMZe0tQtiyA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -56,9 +56,9 @@ Cc: netdev@vger.kernel.org,
 	nicolas.dichtel@6wind.com,
 	petrm@nvidia.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 08/13] tools: ynl-gen: don't consider requests with fixed hdr empty
-Date: Wed,  9 Apr 2025 18:46:53 -0700
-Message-ID: <20250410014658.782120-9-kuba@kernel.org>
+Subject: [PATCH net-next v2 09/13] tools: ynl: don't use genlmsghdr in classic netlink
+Date: Wed,  9 Apr 2025 18:46:54 -0700
+Message-ID: <20250410014658.782120-10-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250410014658.782120-1-kuba@kernel.org>
 References: <20250410014658.782120-1-kuba@kernel.org>
@@ -70,51 +70,109 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-C codegen skips generating the structs if request/reply has no attrs.
-In such cases the request op takes no argument and return int
-(rather than response struct). In case of classic netlink a lot of
-information gets passed using the fixed struct, however, so adjust
-the logic to consider a request empty only if it has no attrs _and_
-no fixed struct.
+Make sure the codegen calls the right YNL lib helper to start
+the request based on family type. Classic netlink request must
+not include the genl header.
+
+Conversely don't expect genl headers in the responses.
 
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/net/ynl/pyynl/ynl_gen_c.py | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ tools/net/ynl/lib/ynl-priv.h     |  3 +++
+ tools/net/ynl/lib/ynl.c          |  8 ++++----
+ tools/net/ynl/pyynl/ynl_gen_c.py | 19 +++++++++++++++----
+ 3 files changed, 22 insertions(+), 8 deletions(-)
 
+diff --git a/tools/net/ynl/lib/ynl-priv.h b/tools/net/ynl/lib/ynl-priv.h
+index 3c09a7bbfba5..634eb16548b9 100644
+--- a/tools/net/ynl/lib/ynl-priv.h
++++ b/tools/net/ynl/lib/ynl-priv.h
+@@ -94,6 +94,9 @@ struct ynl_ntf_base_type {
+ 	unsigned char data[] __attribute__((aligned(8)));
+ };
+ 
++struct nlmsghdr *ynl_msg_start_req(struct ynl_sock *ys, __u32 id);
++struct nlmsghdr *ynl_msg_start_dump(struct ynl_sock *ys, __u32 id);
++
+ struct nlmsghdr *
+ ynl_gemsg_start_req(struct ynl_sock *ys, __u32 id, __u8 cmd, __u8 version);
+ struct nlmsghdr *
+diff --git a/tools/net/ynl/lib/ynl.c b/tools/net/ynl/lib/ynl.c
+index b9fda1a99453..70f899a54007 100644
+--- a/tools/net/ynl/lib/ynl.c
++++ b/tools/net/ynl/lib/ynl.c
+@@ -451,14 +451,14 @@ ynl_gemsg_start(struct ynl_sock *ys, __u32 id, __u16 flags,
+ 	return nlh;
+ }
+ 
+-void ynl_msg_start_req(struct ynl_sock *ys, __u32 id)
++struct nlmsghdr *ynl_msg_start_req(struct ynl_sock *ys, __u32 id)
+ {
+-	ynl_msg_start(ys, id, NLM_F_REQUEST | NLM_F_ACK);
++	return ynl_msg_start(ys, id, NLM_F_REQUEST | NLM_F_ACK);
+ }
+ 
+-void ynl_msg_start_dump(struct ynl_sock *ys, __u32 id)
++struct nlmsghdr *ynl_msg_start_dump(struct ynl_sock *ys, __u32 id)
+ {
+-	ynl_msg_start(ys, id, NLM_F_REQUEST | NLM_F_ACK | NLM_F_DUMP);
++	return ynl_msg_start(ys, id, NLM_F_REQUEST | NLM_F_ACK | NLM_F_DUMP);
+ }
+ 
+ struct nlmsghdr *
 diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
-index 9e00aac4801c..04f1ac62cb01 100755
+index 04f1ac62cb01..b0b47a493a86 100755
 --- a/tools/net/ynl/pyynl/ynl_gen_c.py
 +++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-@@ -1247,6 +1247,9 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-         if op_mode == 'event':
-             self.struct['reply'] = Struct(family, self.attr_set, type_list=op['event']['attributes'])
+@@ -1710,7 +1710,10 @@ _C_KW = {
+         ri.cw.p(f'dst->{arg} = {arg};')
  
-+    def type_empty(self, key):
-+        return len(self.struct[key].attr_list) == 0 and self.fixed_hdr is None
-+
+     if ri.fixed_hdr:
+-        ri.cw.p('hdr = ynl_nlmsg_data_offset(nlh, sizeof(struct genlmsghdr));')
++        if ri.family.is_classic():
++            ri.cw.p('hdr = ynl_nlmsg_data(nlh);')
++        else:
++            ri.cw.p('hdr = ynl_nlmsg_data_offset(nlh, sizeof(struct genlmsghdr));')
+         ri.cw.p(f"memcpy(&dst->_hdr, hdr, sizeof({ri.fixed_hdr}));")
+     for anest in sorted(all_multi):
+         aspec = struct[anest]
+@@ -1857,7 +1860,10 @@ _C_KW = {
+     ri.cw.block_start()
+     ri.cw.write_func_lvar(local_vars)
  
- class CodeWriter:
-     def __init__(self, nlib, out_file=None, overwrite=True):
-@@ -2034,7 +2037,7 @@ _C_KW = {
+-    ri.cw.p(f"nlh = ynl_gemsg_start_req(ys, {ri.nl.get_family_id()}, {ri.op.enum_name}, 1);")
++    if ri.family.is_classic():
++        ri.cw.p(f"nlh = ynl_msg_start_req(ys, {ri.op.enum_name});")
++    else:
++        ri.cw.p(f"nlh = ynl_gemsg_start_req(ys, {ri.nl.get_family_id()}, {ri.op.enum_name}, 1);")
  
+     ri.cw.p(f"ys->req_policy = &{ri.struct['request'].render_name}_nest;")
+     if 'reply' in ri.op[ri.op_mode]:
+@@ -1926,7 +1932,10 @@ _C_KW = {
+     else:
+         ri.cw.p(f'yds.rsp_cmd = {ri.op.rsp_value};')
+     ri.cw.nl()
+-    ri.cw.p(f"nlh = ynl_gemsg_start_dump(ys, {ri.nl.get_family_id()}, {ri.op.enum_name}, 1);")
++    if ri.family.is_classic():
++        ri.cw.p(f"nlh = ynl_msg_start_dump(ys, {ri.op.enum_name});")
++    else:
++        ri.cw.p(f"nlh = ynl_gemsg_start_dump(ys, {ri.nl.get_family_id()}, {ri.op.enum_name}, 1);")
  
- def print_req_type_helpers(ri):
--    if len(ri.struct["request"].attr_list) == 0:
-+    if ri.type_empty("request"):
-         return
-     print_alloc_wrapper(ri, "request")
-     print_type_helpers(ri, "request")
-@@ -2057,7 +2060,7 @@ _C_KW = {
- 
- 
- def print_req_type(ri):
--    if len(ri.struct["request"].attr_list) == 0:
-+    if ri.type_empty("request"):
-         return
-     print_type(ri, "request")
- 
+     if ri.fixed_hdr:
+         ri.cw.p("hdr_len = sizeof(req->_hdr);")
+@@ -2736,7 +2745,9 @@ _C_KW = {
+     if family.is_classic():
+         cw.p(f'.is_classic\t= true,')
+         cw.p(f'.classic_id\t= {family.get("protonum")},')
+-    if family.fixed_header:
++    if family.is_classic():
++        cw.p(f'.hdr_len\t= sizeof(struct {c_lower(family.fixed_header)}),')
++    elif family.fixed_header:
+         cw.p(f'.hdr_len\t= sizeof(struct genlmsghdr) + sizeof(struct {c_lower(family.fixed_header)}),')
+     else:
+         cw.p('.hdr_len\t= sizeof(struct genlmsghdr),')
 -- 
 2.49.0
 
