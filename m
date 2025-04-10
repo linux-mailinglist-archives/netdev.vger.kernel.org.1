@@ -1,113 +1,99 @@
-Return-Path: <netdev+bounces-181416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E56F0A84DE2
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 22:08:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EE09A84E08
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 22:22:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4CCD9A3618
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 20:05:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31BE33B4032
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 20:22:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC4432900B5;
-	Thu, 10 Apr 2025 20:06:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC9B420469E;
+	Thu, 10 Apr 2025 20:22:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ma8aQVEs"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Pa6vGg2U"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94FAB2900A6;
-	Thu, 10 Apr 2025 20:06:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6251149C64;
+	Thu, 10 Apr 2025 20:22:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744315564; cv=none; b=fs+lShmII0RSrc9rjR7IohGex5AKO1hqJ0LNhFdKve21pqzYCrENQLVSUEbd5Vnm5pwALeFMwScqvBltD7yYsPSvNm6IHtjDzllYVuEng1m8vUDHi8Vn4iNmswktWtP/JRBoCXPGu71MgS8C8RAr1R/+azjTuWNlWdgJyjSoBU0=
+	t=1744316549; cv=none; b=CG+Q/vU9dDkQc096hptnDhjQmByg8cwCjzmacp/YEMFraJYMzgW3c7Zon3uDb6liggS6UKWdz0tZ4jfvCfqSu1HluY6OGquA3kn//leQQnqHQqhMKMxLW6iDoUBkkCOuzY5to9vNzS9P2l1Q5g+bCQg/7rJ5adNpMYyTFqKkYI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744315564; c=relaxed/simple;
-	bh=BgK7fIJnk4AnRNaBbtmdJBytPMMCJgQxju8Id4E66OM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kSOarWgO0aIDpSibgunXXFjpXP3w9TSBJwVf2hNrBT+sIrdT/MZxGs/DJ4cYiH0eo+J/3WxdeOJHNPkgLmwGdVv0KsuBqS68v8AO1arvz2XTx6FEVdiEQCryw7nPX4DxhjAmA9gziyEV61YwwLFyNEm3zN/nQNbf4KLrzpWSLPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ma8aQVEs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0BFBC4CEE7;
-	Thu, 10 Apr 2025 20:06:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744315564;
-	bh=BgK7fIJnk4AnRNaBbtmdJBytPMMCJgQxju8Id4E66OM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ma8aQVEs4IEn4dHXZRse95AfcBx/oA9NVW+FH2zIAGbj2OYjSSlOJtN5rA1fxpKo5
-	 h/sXdR4lyTnew51sMEi1g7vxgsTq4PBIkNO88s7UCCe+Kve4+2AHJ1dSfg+EbFvWpW
-	 iauGBircvRhoDK9si67OJDLSfGs7K3vhDKPZ0XS0wKPjqymLymy78qxBh9UtsTA90L
-	 /2/K/5XuwQ3nj5jQ3etXoR6i5Ohm/AxID+aZ31srbrRyfR/IfJbsP6K/ZPgFhOIC8T
-	 EiTgY7KdWUlFatImjzK0Uo6235y+VVzrXEm0Ajvk7mFb/4Lbhd9OzI2JKmaFteUNAb
-	 qNA+GuoKKLdGQ==
-Date: Thu, 10 Apr 2025 21:05:59 +0100
-From: Simon Horman <horms@kernel.org>
-To: "Nelson, Shannon" <shannon.nelson@amd.com>
-Cc: Pranav Tyagi <pranav.tyagi03@gmail.com>, davem@davemloft.net,
-	dsahern@kernel.org, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, skhan@linuxfoundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@lists.linux.dev
-Subject: Re: [PATCH] net: ipconfig: replace strncpy with strscpy_pad
-Message-ID: <20250410200559.GW395307@horms.kernel.org>
-References: <20250408185759.5088-1-pranav.tyagi03@gmail.com>
- <1168af15-14dd-4eef-b1d7-c04de4781ea7@amd.com>
+	s=arc-20240116; t=1744316549; c=relaxed/simple;
+	bh=gX8EX80S6a3yeduLhPH2Qe6/s1ZNT5LtkB/JBoIipO8=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iwAf3VwwMwZity/IdtG8ln5u7KXQ7pl7AW+i1jHqf7SaoZD94aR6pOKmqo4svjHvipJAUMif7X1icK5i/2l4VQUR/cfHgJpk6bkd2vtjNDQe7NQqP7BE20VFlEaO3kZUNXaJskd9hRnhPx3Jjw1dAQuDvtAR0mrrsnjfbVsuHY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Pa6vGg2U; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744316548; x=1775852548;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Dmvp2WGCbCiTgKF8lQKzXJKeQhBRReifwMWOGzkGP+A=;
+  b=Pa6vGg2UXRHK0NkSt1gcvRylOA/u7jhB/AtZX4RSVM5pGyWKsfx+a2yh
+   WkXE0adIsJSlHAe2uPinaCVhgjvLvVcZ8W3rNPppxtS686BsKmhzBDW4B
+   jbc8B3aBSMQ2BCkCqgmrOu0hF12oOMspcUCmdZdnDfb8NbCWJKxlNOf0d
+   U=;
+X-IronPort-AV: E=Sophos;i="6.15,203,1739836800"; 
+   d="scan'208";a="186403464"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 20:22:26 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:43626]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.43.57:2525] with esmtp (Farcaster)
+ id e2c535d9-c422-41b0-aa8b-45079d12221d; Thu, 10 Apr 2025 20:22:25 +0000 (UTC)
+X-Farcaster-Flow-ID: e2c535d9-c422-41b0-aa8b-45079d12221d
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 10 Apr 2025 20:22:25 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.106.100.21) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 10 Apr 2025 20:22:22 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <jordan@jrife.io>
+CC: <aditi.ghag@isovalent.com>, <bpf@vger.kernel.org>, <daniel@iogearbox.net>,
+	<kuniyu@amazon.com>, <martin.lau@linux.dev>, <netdev@vger.kernel.org>,
+	<willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH v1 bpf-next 2/5] bpf: udp: Avoid socket skips and repeats during iteration
+Date: Thu, 10 Apr 2025 13:21:07 -0700
+Message-ID: <20250410202214.7061-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250409182237.441532-3-jordan@jrife.io>
+References: <20250409182237.441532-3-jordan@jrife.io>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1168af15-14dd-4eef-b1d7-c04de4781ea7@amd.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D033UWA002.ant.amazon.com (10.13.139.10) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Tue, Apr 08, 2025 at 02:44:42PM -0700, Nelson, Shannon wrote:
-> On 4/8/2025 11:57 AM, Pranav Tyagi wrote:
-> > 
-> > Replace the deprecated strncpy() function with strscpy_pad() as the
-> > destination buffer is NUL-terminated and requires
-> > trailing NUL-padding
-> > 
-> > Signed-off-by: Pranav Tyagi <pranav.tyagi03@gmail.com>
-> 
-> There should be a Fixes tag here, and usually we put the 'net' tree
-> indicator inside the tag, like this: [PATCH net]
+From: Jordan Rife <jordan@jrife.io>
+Date: Wed,  9 Apr 2025 11:22:31 -0700
+> @@ -3839,6 +3876,11 @@ static int bpf_iter_udp_realloc_batch(struct bpf_udp_iter_state *iter,
+>  		return -ENOMEM;
+>  
+>  	bpf_iter_udp_put_batch(iter);
+> +	WARN_ON_ONCE(new_batch_sz < iter->max_sk);
 
-FWIIW, this feels more line net-next material to me:
-I'm not seeing a bug that is being fixed.
+I'd put this before kvmalloc_array() or remove as it's obvious.
 
-> 
-> 
-> > ---
-> >   net/ipv4/ipconfig.c | 2 +-
-> >   1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/net/ipv4/ipconfig.c b/net/ipv4/ipconfig.c
-> > index c56b6fe6f0d7..7c238d19328f 100644
-> > --- a/net/ipv4/ipconfig.c
-> > +++ b/net/ipv4/ipconfig.c
-> > @@ -1690,7 +1690,7 @@ static int __init ic_proto_name(char *name)
-> >                          *v = 0;
-> >                          if (kstrtou8(client_id, 0, dhcp_client_identifier))
-> >                                  pr_debug("DHCP: Invalid client identifier type\n");
-> > -                       strncpy(dhcp_client_identifier + 1, v + 1, 251);
-> > +                       strscpy_pad(dhcp_client_identifier + 1, v + 1, 251);
-> 
-> The strncpy() action, as well as the memcpy() into dhcp_client_identifier
-> elsewhere, are not padding to the end, so I think this only needs to be
-> null-terminated, not fully padded.  If full padding is needed, please let
-> us know why.
-> 
-> sln
-> 
-> >                          *v = ',';
-> >                  }
-> >                  return 1;
-> > --
-> > 2.49.0
-> > 
-> > 
-> 
+
+> +	/* Make sure the new batch has the cookies of the sockets we haven't
+> +	 * visited yet.
+> +	 */
+> +	memcpy(new_batch, iter->batch, iter->end_sk);
+
+The 3rd arg is missing sizeof(*iter->batch) * ?
 
