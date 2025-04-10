@@ -1,80 +1,104 @@
-Return-Path: <netdev+bounces-180972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E3DAA83520
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 02:44:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2E08A83526
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 02:51:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3C6E3BFE31
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 00:44:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F97E1786C3
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 00:51:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C227381A3;
-	Thu, 10 Apr 2025 00:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83C1278F40;
+	Thu, 10 Apr 2025 00:51:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="stqSRG9b"
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="sufCOgTT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pv50p00im-tydg10011801.me.com (pv50p00im-tydg10011801.me.com [17.58.6.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325571BF37;
-	Thu, 10 Apr 2025 00:44:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8192E32C85
+	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 00:50:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744245875; cv=none; b=bdzDv0ZrUKi/e31gL4vkcAoqXk/ar/jN6ZPPSyEjNeusrgiiL8ToiLf8NGizkZomn8lpcjrmNd66uEu43EYKWyFyOBGbsgqCCeYPaX2XhL8IHkgP6oXTO7RVZSfZePWdz3ORb1+avqe123+7zcNmzS3SYUdt0kOhLjNs4hqNvEk=
+	t=1744246261; cv=none; b=I5E2fyCwgXS/KcrPp7VlbJ1rDKswnxCu2+sNrfLApOnAAN17350d5ftPs/XT7MAnNbbNX+gniWDPl90Kp2qeE6vdXyCiD0/JIl16LPuEHxPinycURo4jkcWCs8bBQ5lBmRyct1pslsnOI+GPnxehtrvE5F+Zf9MPmFNj07fFLkM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744245875; c=relaxed/simple;
-	bh=s6Mi5a6ne5nmm3KPRugEAD13xldMWCgW6hxneh5DGWc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u8IzSkoTwaAQBp+szhq/6GNouDzLIJMkY76hHZq+KPZTjG8tpB0vzmCfC0t/5v192TuOt128zYUM3w+ekeOTobl2/PDZMH50N2l+aWn6+egOuztgfAW8RKqFgtjSMqqVBEzShgioAGRMSS8BYqXz36MbI2gPuqVdy2WKTt3FJlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=stqSRG9b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FE10C4CEE2;
-	Thu, 10 Apr 2025 00:44:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744245874;
-	bh=s6Mi5a6ne5nmm3KPRugEAD13xldMWCgW6hxneh5DGWc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=stqSRG9bbHbGLkIr8TTf238dd/RyIegcJpxxrT9g3fDv5Zm0DIJ34/Y/p6gtgLDHb
-	 XylnpzltA00csOsjHmd1JJr3NUHA12ucNvHwwQ1BQEhEScFqx8sNVA0zRP8UNFIU03
-	 rCi3jQO58AHhNKmKkNgIQTIw/FHe0GbcCae2Ekvb4ODBLQBQCZn8UWn6+vzkk+z4qe
-	 fl5YzDeQMS6gDq83uJR7XjZ47dCc9L7saI3K4VvuW52w4e9hP6dtNgTm5UCWXK59ow
-	 FgoLRVKIQTgicuXkTUxxvWHaxMoYzdkx0inKyocPhKLBaJwq350VZvmfZfG/TOApTq
-	 Ux+pPMXMhht9Q==
-Date: Wed, 9 Apr 2025 17:44:33 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, jv@jvosburgh.net, andrew+netdev@lunn.ch,
- linux-kernel@vger.kernel.org,
- syzbot+48c14f61594bdfadb086@syzkaller.appspotmail.com
-Subject: Re: [PATCH net] bonding: hold ops lock around get_link
-Message-ID: <20250409174433.7b3d0f29@kernel.org>
-In-Reply-To: <20250408171451.2278366-1-sdf@fomichev.me>
-References: <20250408171451.2278366-1-sdf@fomichev.me>
+	s=arc-20240116; t=1744246261; c=relaxed/simple;
+	bh=VrjcwHCUg5dCeKPbZz+emw/iuRN3YC2fs/0+F+3D+tk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lldb5k0CAAYCpN3ZcqTSoaI3/rTP7RSsB57Ssq6ZGQR0FIDJCgBLPeR5bacwloft8FEu7V78h2FXtZ0HgVwlrmToU4BvqV+JzfhBzXp6BGp++zN33ihe0PkvtOTtloCTgj/ITcKD4SoIUnk62OMoGjBzumvW6mB0MYh6R+d4txc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=sufCOgTT; arc=none smtp.client-ip=17.58.6.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; bh=BeKHta/udR8KX7M6EhKvHmogccj10B6Md6MMKith8pw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:x-icloud-hme;
+	b=sufCOgTTb5U+iybi2WXhJt1a90UWz/B84WGhd5jF1ovwOZmfoaNzYlkW7nYBEzWA8
+	 dfoU2M+UP0hJPBnqBs5V83/ixVhTyjeeoCS+jvAzD6f2shKksslZnFb3E10GJzhtPi
+	 +iivQbCmuFeQFV9ArILYLhk2kH3m5ohREGW4l6ehqI0qn/GW04wgvDU6R0CrHvmS9C
+	 PJyJbGwlPwdrdZ+DfbqZOpDi6HtSu5X8EwTYnqcvLwlHnzpmDHxiQypaXYJa7n7T4p
+	 jyP9ZRk6w3UJDfXV5IZ03w/T9HaqzJinCc5TpYt3febh3UgCE7iV+Rhcyz0C7SSyAP
+	 PobXqVV6Hv/tg==
+Received: from pv50p00im-tydg10011801.me.com (pv50p00im-tydg10011801.me.com [17.58.6.52])
+	by pv50p00im-tydg10011801.me.com (Postfix) with ESMTPS id 92F368001EE;
+	Thu, 10 Apr 2025 00:50:56 +0000 (UTC)
+Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
+	by pv50p00im-tydg10011801.me.com (Postfix) with ESMTPSA id 4F5E880028C;
+	Thu, 10 Apr 2025 00:50:53 +0000 (UTC)
+Message-ID: <057db64d-04de-45fd-b1e6-ede46fa6923a@icloud.com>
+Date: Thu, 10 Apr 2025 08:50:49 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] sock: Correct error checking condition for
+ assign|release_proto_idx()
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: dada1@cosmosbay.com, davem@davemloft.net, edumazet@google.com,
+ horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, quic_zijuhu@quicinc.com,
+ willemb@google.com, xemul@openvz.org
+References: <20250408-fix_net-v1-1-375271a79c11@quicinc.com>
+ <20250408182116.45882-1-kuniyu@amazon.com>
+Content-Language: en-US
+From: Zijun Hu <zijun_hu@icloud.com>
+In-Reply-To: <20250408182116.45882-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: QW_CSOwNFW1AyOI-XR7XmKTbtl1kobjV
+X-Proofpoint-ORIG-GUID: QW_CSOwNFW1AyOI-XR7XmKTbtl1kobjV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-09_06,2025-04-08_04,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015 spamscore=0
+ suspectscore=0 phishscore=0 adultscore=0 malwarescore=0 bulkscore=0
+ mlxlogscore=999 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2504100004
 
-On Tue,  8 Apr 2025 10:14:51 -0700 Stanislav Fomichev wrote:
-> +		netdev_lock_ops(slave_dev);
-> +		ret = slave_dev->ethtool_ops->get_link(slave_dev) ?
->  			BMSR_LSTATUS : 0;
-> +		netdev_unlock_ops(slave_dev);
-> +
-> +		return ret;
+On 2025/4/9 02:21, Kuniyuki Iwashima wrote:
+>> diff --git a/include/net/sock.h b/include/net/sock.h
+>> index 8daf1b3b12c607d81920682139b53fee935c9bb5..9ece93a3dd044997276b0fa37dddc7b5bbdacc43 100644
+>> --- a/include/net/sock.h
+>> +++ b/include/net/sock.h
+>> @@ -1421,7 +1421,10 @@ struct prot_inuse {
+>>  static inline void sock_prot_inuse_add(const struct net *net,
+>>  				       const struct proto *prot, int val)
+>>  {
+>> -	this_cpu_add(net->core.prot_inuse->val[prot->inuse_idx], val);
+>> +	unsigned int idx = prot->inuse_idx;
+>> +
+>> +	if (likely(idx < PROTO_INUSE_NR))
+>> +		this_cpu_add(net->core.prot_inuse->val[idx], val);
+> How does the else case happen ?
 
-Is it okay to nit pick? Since you have a temp now it's cleaner to move
-the ternary operator later, avoid the line break:
+thank you for code review.
 
-		netdev_lock_ops(slave_dev);
-		ret = slave_dev->ethtool_ops->get_link(slave_dev);
-		netdev_unlock_ops(slave_dev);
+provided that @prot->inuse_idx will never be used if @prot fails to be
+registered.
 
-		return ret ? BMSR_LSTATUS : 0;
+will remove this check in v2.
 
