@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-181011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99A9CA83652
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 04:20:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23048A8365F
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 04:21:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93E1619E877A
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 02:20:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D7C73BB658
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 02:20:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC4611DE8B3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B1DF1DD0F2;
 	Thu, 10 Apr 2025 02:20:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B401C84D7;
-	Thu, 10 Apr 2025 02:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7C721C8639;
+	Thu, 10 Apr 2025 02:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744251604; cv=none; b=aWDGv06kgtWLTpxzQxElaIJ4iGEp0Z+Ll8bSUAzVrQIOlsFtS8tFBVYVFQohCyl+oYNgP8LLR712fhNkjZA7LbHlwXIaKu3bIDuLADL3tzOmR4cYXjMczS7+aOt6sgT/FJgJpCoejpZIYcmNnU0ogmXzxmrNGYuaHlvevx6xJ8E=
+	t=1744251604; cv=none; b=h6BrVLgTVG8DWTFtMzpdd9xn3cAYHrwvnP8ll1MhzhtG8QAB2LlAFpD/ru5UADHf1ftwOsQqysxD0sh+3m3bgPlHiODmDCYsZJu4ctk7bQdeJ+aZFusE1AU8hxtENGWP1bSIufbqrfNWxyKiWCyvMn8/mIQYRSdpIjmRSFCpcN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1744251604; c=relaxed/simple;
-	bh=324/5ZRTH1pnz8Ng5w54D7wF46lELpHyXrxXsfeai4E=;
+	bh=qYbrNhR2CusQb1SmRQb2ywkd4VIoINGw3PjXJTfZL/k=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jQNMuVhbhWxTUou5NB/1J7RUtLvM6RlKILsqumzys7PVYgXX5oixd+0mDIAEXeCGn+V+uPyY6V2uWktKjj5svRAX5CGr3/niZAbk3JMsrybzNGyTKHgTEe+FYZFnLWyQOG7iQxFqbtVWYrEsiiqFzn7eiwRUZ5xwSS4g97l/ATI=
+	 MIME-Version:Content-Type; b=J70kHn6YfN4kvA8iSJUbGbZKVLy9LSXXDlMzuqdkEA0X+i4THzV1vVZ4xaFAxNZOGCtQ2LwWSep2X/tjpJsgviqH50u8ovQ0/W+7gM4BL7Xzi4IIAH1v6s7tlOfrQ9tHW6RlLe5adId32E4LqDY+cW0ReC8blHNQCvUvlbv0f4M=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4ZY3MJ23HXzvWYs;
-	Thu, 10 Apr 2025 10:15:56 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4ZY3RB3wRcz13LT1;
+	Thu, 10 Apr 2025 10:19:18 +0800 (CST)
 Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8CEC5180B51;
-	Thu, 10 Apr 2025 10:19:59 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 46A931402EB;
+	Thu, 10 Apr 2025 10:20:00 +0800 (CST)
 Received: from localhost.localdomain (10.90.30.45) by
  kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 10 Apr 2025 10:19:58 +0800
+ 15.2.1544.11; Thu, 10 Apr 2025 10:19:59 +0800
 From: Jijie Shao <shaojijie@huawei.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
@@ -48,9 +48,9 @@ CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
 	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
 	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH net v3 3/7] net: hibmcge: fix the share of irq statistics among different network ports issue
-Date: Thu, 10 Apr 2025 10:13:23 +0800
-Message-ID: <20250410021327.590362-4-shaojijie@huawei.com>
+Subject: [PATCH net v3 4/7] net: hibmcge: fix wrong mtu log issue
+Date: Thu, 10 Apr 2025 10:13:24 +0800
+Message-ID: <20250410021327.590362-5-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20250410021327.590362-1-shaojijie@huawei.com>
 References: <20250410021327.590362-1-shaojijie@huawei.com>
@@ -65,182 +65,42 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
  kwepemk100013.china.huawei.com (7.202.194.61)
 
-hbg_irqs is a global array which contains irq statistics.
-However, the irq statistics of different network ports
-point to the same global array. As a result, the statistics are incorrect.
+A dbg log is generated when the driver modifies the MTU,
+which is expected to trace the change of the MTU.
 
-This patch allocates a statistics array for each network port
-to prevent the statistics of different network ports
-from affecting each other.
+However, the log is recorded after WRITE_ONCE().
+At this time, netdev->mtu has been changed to the new value.
+As a result, netdev->mtu is the same as new_mtu.
 
-irq statistics are removed from hbg_irq_info. Therefore,
-all data in hbg_irq_info remains unchanged. Therefore,
-the input parameter of some functions is changed to const.
+This patch modifies the log location and records logs before WRITE_ONCE().
 
-Fixes: 4d089035fa19 ("net: hibmcge: Add interrupt supported in this module")
+Fixes: ff4edac6e9bd ("net: hibmcge: Implement some .ndo functions")
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- .../ethernet/hisilicon/hibmcge/hbg_common.h   |  8 ++++---
- .../ethernet/hisilicon/hibmcge/hbg_debugfs.c  |  4 ++--
- .../ethernet/hisilicon/hibmcge/hbg_diagnose.c |  2 +-
- .../net/ethernet/hisilicon/hibmcge/hbg_irq.c  | 24 ++++++++++++-------
- .../net/ethernet/hisilicon/hibmcge/hbg_main.c |  2 +-
- 5 files changed, 24 insertions(+), 16 deletions(-)
+ drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
-index f8cdab62bf85..7725cb0c5c8a 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
-@@ -108,14 +108,16 @@ struct hbg_irq_info {
- 	bool re_enable;
- 	bool need_print;
- 	bool need_reset;
--	u64 count;
- 
--	void (*irq_handle)(struct hbg_priv *priv, struct hbg_irq_info *info);
-+	void (*irq_handle)(struct hbg_priv *priv,
-+			   const struct hbg_irq_info *info);
- };
- 
- struct hbg_vector {
- 	char name[HBG_VECTOR_NUM][32];
--	struct hbg_irq_info *info_array;
-+
-+	u64 *stats_array;
-+	const struct hbg_irq_info *info_array;
- 	u32 info_array_len;
- };
- 
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.c
-index 5e0ba4d5b08d..9c09e4835990 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.c
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_debugfs.c
-@@ -61,7 +61,7 @@ static int hbg_dbg_irq_info(struct seq_file *s, void *unused)
- {
- 	struct net_device *netdev = dev_get_drvdata(s->private);
- 	struct hbg_priv *priv = netdev_priv(netdev);
--	struct hbg_irq_info *info;
-+	const struct hbg_irq_info *info;
- 	u32 i;
- 
- 	for (i = 0; i < priv->vectors.info_array_len; i++) {
-@@ -73,7 +73,7 @@ static int hbg_dbg_irq_info(struct seq_file *s, void *unused)
- 								info->mask)),
- 			   str_true_false(info->need_reset),
- 			   str_true_false(info->need_print),
--			   info->count);
-+			   priv->vectors.stats_array[i]);
- 	}
- 
- 	return 0;
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_diagnose.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_diagnose.c
-index d61c03f34ff0..f23fb5920c3c 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_diagnose.c
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_diagnose.c
-@@ -234,7 +234,7 @@ static u64 hbg_get_irq_stats(struct hbg_vector *vectors, u32 mask)
- 
- 	for (i = 0; i < vectors->info_array_len; i++)
- 		if (vectors->info_array[i].mask == mask)
--			return vectors->info_array[i].count;
-+			return vectors->stats_array[i];
- 
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
-index e79e9ab3e530..8af0bc4cca21 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
-@@ -6,7 +6,7 @@
- #include "hbg_hw.h"
- 
- static void hbg_irq_handle_err(struct hbg_priv *priv,
--			       struct hbg_irq_info *irq_info)
-+			       const struct hbg_irq_info *irq_info)
- {
- 	if (irq_info->need_print)
- 		dev_err(&priv->pdev->dev,
-@@ -17,30 +17,30 @@ static void hbg_irq_handle_err(struct hbg_priv *priv,
- }
- 
- static void hbg_irq_handle_tx(struct hbg_priv *priv,
--			      struct hbg_irq_info *irq_info)
-+			      const struct hbg_irq_info *irq_info)
- {
- 	napi_schedule(&priv->tx_ring.napi);
- }
- 
- static void hbg_irq_handle_rx(struct hbg_priv *priv,
--			      struct hbg_irq_info *irq_info)
-+			      const struct hbg_irq_info *irq_info)
- {
- 	napi_schedule(&priv->rx_ring.napi);
- }
- 
- static void hbg_irq_handle_rx_buf_val(struct hbg_priv *priv,
--				      struct hbg_irq_info *irq_info)
-+				      const struct hbg_irq_info *irq_info)
- {
- 	priv->stats.rx_fifo_less_empty_thrsld_cnt++;
- }
- 
- #define HBG_IRQ_I(name, handle) \
--	{#name, HBG_INT_MSK_##name##_B, false, false, false, 0, handle}
-+	{#name, HBG_INT_MSK_##name##_B, false, false, false, handle}
- #define HBG_ERR_IRQ_I(name, need_print, ndde_reset) \
- 	{#name, HBG_INT_MSK_##name##_B, true, need_print, \
--	ndde_reset, 0, hbg_irq_handle_err}
-+	ndde_reset, hbg_irq_handle_err}
- 
--static struct hbg_irq_info hbg_irqs[] = {
-+static const struct hbg_irq_info hbg_irqs[] = {
- 	HBG_IRQ_I(RX, hbg_irq_handle_rx),
- 	HBG_IRQ_I(TX, hbg_irq_handle_tx),
- 	HBG_ERR_IRQ_I(TX_PKT_CPL, true, true),
-@@ -64,7 +64,7 @@ static struct hbg_irq_info hbg_irqs[] = {
- 
- static irqreturn_t hbg_irq_handle(int irq_num, void *p)
- {
--	struct hbg_irq_info *info;
-+	const struct hbg_irq_info *info;
- 	struct hbg_priv *priv = p;
- 	u32 status;
- 	u32 i;
-@@ -79,7 +79,7 @@ static irqreturn_t hbg_irq_handle(int irq_num, void *p)
- 			hbg_hw_irq_enable(priv, info->mask, false);
- 			hbg_hw_irq_clear(priv, info->mask);
- 
--			info->count++;
-+			priv->vectors.stats_array[i]++;
- 			if (info->irq_handle)
- 				info->irq_handle(priv, info);
- 
-@@ -132,6 +132,12 @@ int hbg_irq_init(struct hbg_priv *priv)
- 					     irq_names_map[i]);
- 	}
- 
-+	vectors->stats_array = devm_kcalloc(&priv->pdev->dev,
-+					    ARRAY_SIZE(hbg_irqs),
-+					    sizeof(u64), GFP_KERNEL);
-+	if (!vectors->stats_array)
-+		return -ENOMEM;
-+
- 	vectors->info_array = hbg_irqs;
- 	vectors->info_array_len = ARRAY_SIZE(hbg_irqs);
- 	return 0;
 diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-index 2ac5454338e4..e5c961ad4b9b 100644
+index e5c961ad4b9b..2e64dc1ab355 100644
 --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
 +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-@@ -21,7 +21,7 @@
+@@ -203,12 +203,12 @@ static int hbg_net_change_mtu(struct net_device *netdev, int new_mtu)
+ 	if (netif_running(netdev))
+ 		return -EBUSY;
  
- static void hbg_all_irq_enable(struct hbg_priv *priv, bool enabled)
- {
--	struct hbg_irq_info *info;
-+	const struct hbg_irq_info *info;
- 	u32 i;
+-	hbg_hw_set_mtu(priv, new_mtu);
+-	WRITE_ONCE(netdev->mtu, new_mtu);
+-
+ 	dev_dbg(&priv->pdev->dev,
+ 		"change mtu from %u to %u\n", netdev->mtu, new_mtu);
  
- 	for (i = 0; i < priv->vectors.info_array_len; i++) {
++	hbg_hw_set_mtu(priv, new_mtu);
++	WRITE_ONCE(netdev->mtu, new_mtu);
++
+ 	return 0;
+ }
+ 
 -- 
 2.33.0
 
