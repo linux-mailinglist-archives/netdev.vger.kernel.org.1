@@ -1,66 +1,69 @@
-Return-Path: <netdev+bounces-181424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9541A84EE3
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 22:59:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97428A84F15
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 23:13:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE4E41B6345C
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 20:59:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D7B5462A90
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 21:13:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E104E290BDE;
-	Thu, 10 Apr 2025 20:59:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FE35290BDB;
+	Thu, 10 Apr 2025 21:12:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N1/YGJY5"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="b71vFG8V"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEA69290BA8;
-	Thu, 10 Apr 2025 20:59:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB697283699;
+	Thu, 10 Apr 2025 21:12:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744318767; cv=none; b=Aldmg8EMXtnzxJYgJLvDP4lRjE3Vw2/SONx6Hq3YkjbQzsgmFEjT/k6SIVzHdLuD2tRkqg9OO2Wkw0Lj1oXeC+xf4GU33mJdb0SSQxUnrxmYKCil9OvBlnwTle7iPt6yNgbJEHbiLRzBixARo74ZKuCJInw3StejzU2WDIJQmtw=
+	t=1744319575; cv=none; b=KGoNBhIEBUQyoe+CazbYgeopzU9ywk9FNn4dPW+BRjGRmqrHDoxaa0CI4NM6wDbnsjz3Cz5eoPAOhEbA7L1baThYaO/6IsdLbABn+5S3CDpsAe0OmMtZpNKAD1e2xJfReqVXNgC6fMfpMxwN+7ursjbEkBrUdWLTtI4gcxSWe5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744318767; c=relaxed/simple;
-	bh=ecHUf2Hpwk+1O+STcd+2A4XQmIHogrxTQ9Qfsd65yEg=;
+	s=arc-20240116; t=1744319575; c=relaxed/simple;
+	bh=T/P1P+E6uonJ66xjSWFrnWdtSTsghWdTneLNPuBwQ/0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oUQlK+fqPzaJuiZViBB7zg0yFGjdzVmv9EL1LIoOnqXrAYHOAbFVpg/FKo+5yOMs3Di0Yt37UN5I3k+TJlTlwxv8GWrVSemXO/KKL8TfJrTA4qZe9mkoUM7D+vJ76YtjHW+SAEcRpXEx1E8YeA7ovmpP9++uLmy2ILpoIqIzNWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N1/YGJY5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0591C4CEDD;
-	Thu, 10 Apr 2025 20:59:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744318767;
-	bh=ecHUf2Hpwk+1O+STcd+2A4XQmIHogrxTQ9Qfsd65yEg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=N1/YGJY5o59GBadahGD1tR89MMuhoDVyWrfwPbWC2WmIFRfkO1I3q7C1ionfou5gQ
-	 qw31+65qNcKO1aO7auRqDAIqq980sBsJrHIQwj3suyRosRcCKeSsfig1FGlb3bQtNA
-	 67pQ9bInybrVNUa/bXoe0K6I/af3uzudSkAbXkKyY2srHwU8uSg7nc/Ta9puCNmxT0
-	 dEJtM///RfVWw0t26NJIHXUpkFKiPp+LzEi/RPs2fMKWx0mz+y/z5QwHqp8VatCP0T
-	 c/c7l7Z/kOzy3HlkDypmFNu4c1WIyHZc9tkX6kmcc+6J1+RPLA35+EclYWjNJR4LLa
-	 uXJoN82QRWu0w==
-Date: Thu, 10 Apr 2025 15:59:25 -0500
-From: Rob Herring <robh@kernel.org>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	Stefan Wahren <wahrenst@gmx.net>
-Subject: Re: [net-next v4 1/5] dt-bindings: net: Add MTIP L2 switch
- description
-Message-ID: <20250410205925.GA1041840-robh@kernel.org>
-References: <20250407145157.3626463-1-lukma@denx.de>
- <20250407145157.3626463-2-lukma@denx.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=IlowKPHlEOQGLL0Yr1xPrNtkh24OdWPgcFDgWZWBtFY/lycqKECqCMq8TbuqYio6BZ/lzTM0qWVqlNc8DkNXojeQWG54jMFJwKaSXcfb57Xyqy++kii4Nf9WM+qdO4lIpuiznmBcE7U0cPIpvPwvi6ftosPFxyuRh4VMSW/UG1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=b71vFG8V; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=rNczozpcMMZxD6eTya8/M09asYvM0i0dZVM4tXgpxfI=; b=b71vFG8VCjoEOC9kmtRiAM4CGT
+	K6kl1UNoulWweks05cqAieZhnfkkcdnD4yFBbpbnd0MBb6iEmajn66P/0Gc78Kc+JwKqukGfJoOB9
+	K32KsGy4iB5xvor3+A4L7xLVRk6UJKBAuuM9MaIHpz6gD5s0cUKqLBpfvfArGlTIbouI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u2zCT-008jJx-3t; Thu, 10 Apr 2025 23:12:41 +0200
+Date: Thu, 10 Apr 2025 23:12:41 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: Prathosh.Satish@microchip.com, conor@kernel.org, krzk@kernel.org,
+	netdev@vger.kernel.org, vadim.fedorenko@linux.dev,
+	arkadiusz.kubalewski@intel.com, jiri@resnulli.us, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, lee@kernel.org,
+	kees@kernel.org, andy@kernel.org, akpm@linux-foundation.org,
+	mschmidt@redhat.com, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2 02/14] dt-bindings: dpll: Add support for Microchip
+ Azurite chip family
+Message-ID: <4e331736-36f2-4796-945f-613279329585@lunn.ch>
+References: <20250409144250.206590-1-ivecera@redhat.com>
+ <20250409144250.206590-3-ivecera@redhat.com>
+ <20250410-skylark-of-silent-symmetry-afdec9@shite>
+ <1a78fc71-fcf6-446e-9ada-c14420f9c5fe@redhat.com>
+ <20250410-puritan-flatbed-00bf339297c0@spud>
+ <6dc1fdac-81cc-4f2c-8d07-8f39b9605e04@redhat.com>
+ <CY5PR11MB6462412A953AF5D93D97DCE5ECB72@CY5PR11MB6462.namprd11.prod.outlook.com>
+ <bd7d005b-c715-4fd9-9b0d-52956d28d272@lunn.ch>
+ <7ab19530-d0d4-4df1-9f75-060c3055585b@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,183 +72,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250407145157.3626463-2-lukma@denx.de>
+In-Reply-To: <7ab19530-d0d4-4df1-9f75-060c3055585b@redhat.com>
 
-On Mon, Apr 07, 2025 at 04:51:53PM +0200, Lukasz Majewski wrote:
-> This patch provides description of the MTIP L2 switch available in some
-> NXP's SOCs - e.g. imx287.
+On Thu, Apr 10, 2025 at 08:33:31PM +0200, Ivan Vecera wrote:
 > 
-> Signed-off-by: Lukasz Majewski <lukma@denx.de>
-> ---
-> Changes for v2:
-> - Rename the file to match exactly the compatible
->   (nxp,imx287-mtip-switch)
 > 
-> Changes for v3:
-> - Remove '-' from const:'nxp,imx287-mtip-switch'
-> - Use '^port@[12]+$' for port patternProperties
-> - Drop status = "okay";
-> - Provide proper indentation for 'example' binding (replace 8
->   spaces with 4 spaces)
-> - Remove smsc,disable-energy-detect; property
-> - Remove interrupt-parent and interrupts properties as not required
-> - Remove #address-cells and #size-cells from required properties check
-> - remove description from reg:
-> - Add $ref: ethernet-switch.yaml#
+> On 10. 04. 25 7:36 odp., Andrew Lunn wrote:
+> > > Prathosh, could you please bring more light on this?
+> > > 
+> > > > Just to clarify, the original driver was written specifically with 2-channel
+> > > > chips in mind (ZL30732) with 10 input and 20 outputs, which led to some confusion of using zl3073x as compatible.
+> > > > However, the final version of the driver will support the entire ZL3073x family
+> > > > ZL30731 to ZL30735 and some subset of ZL30732 like ZL80732 etc
+> > > > ensuring compatibility across all variants.
+> > 
+> > Hi Prathosh
+> > 
+> > Your email quoting is very odd, i nearly missed this reply.
+> > 
+> > Does the device itself have an ID register? If you know you have
+> > something in the range ZL30731 to ZL30735, you can ask the hardware
+> > what it is, and the driver then does not need any additional
+> > information from DT, it can hard code it all based on the ID in the
+> > register?
+> > 
+> > 	Andrew
+> > 
+> Hi Andrew,
+> yes there is ID register that identifies the ID. But what compatible should
+> be used?
 > 
-> Changes for v4:
-> - Use $ref: ethernet-switch.yaml#/$defs/ethernet-ports and remove already
->   referenced properties
-> - Rename file to nxp,imx28-mtip-switch.yaml
-> ---
->  .../bindings/net/nxp,imx28-mtip-switch.yaml   | 126 ++++++++++++++++++
->  1 file changed, 126 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/nxp,imx28-mtip-switch.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/nxp,imx28-mtip-switch.yaml b/Documentation/devicetree/bindings/net/nxp,imx28-mtip-switch.yaml
-> new file mode 100644
-> index 000000000000..1afaf8029725
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/nxp,imx28-mtip-switch.yaml
-> @@ -0,0 +1,126 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/nxp,imx28-mtip-switch.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: NXP SoC Ethernet Switch Controller (L2 MoreThanIP switch)
-> +
-> +maintainers:
-> +  - Lukasz Majewski <lukma@denx.de>
-> +
-> +description:
-> +  The 2-port switch ethernet subsystem provides ethernet packet (L2)
-> +  communication and can be configured as an ethernet switch. It provides the
-> +  reduced media independent interface (RMII), the management data input
-> +  output (MDIO) for physical layer device (PHY) management.
-> +
-> +$ref: ethernet-switch.yaml#/$defs/ethernet-ports
-> +
+> microchip,zl3073x was rejected as wildcard and we should use all
+> compatibles.
 
-> +patternProperties:
-> +  "^(ethernet-)?ports$":
+You have two choices really:
 
-New bindings should only use 'ethernet-ports'.
+1) You list each device with its own compatible, because they are in
+fact not compatible. You need to handle each one different, they have
+different DT properties, etc. If you do that, please validate the ID
+register against the compatible and return -ENODEV if they don't
+match.
 
-> +    type: object
-> +    additionalProperties: true
+2) You say the devices are compatible. So the DT compatible just
+indicates the family, enough information for the driver to go find the
+ID register. This does however require the binding is the same for all
+devices. You cannot have one family member listing 10 inputs in its
+binding, and another family member listing 20.
 
-But what's this for? I thought you had some constrants for phy-mode and 
-phy-handle?
+If you say your devices are incompatible, and list lots of
+compatibles, you can then use constraints in the yaml, based on the
+compatible, to limit each family member to what it supports.
 
-> +
-> +properties:
-> +  compatible:
-> +    const: nxp,imx28-mtip-switch
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  phy-supply:
-> +    description:
-> +      Regulator that powers Ethernet PHYs.
-> +
-> +  clocks:
-> +    items:
-> +      - description: Register accessing clock
-> +      - description: Bus access clock
-> +      - description: Output clock for external device - e.g. PHY source clock
-> +      - description: IEEE1588 timer clock
-> +
-> +  clock-names:
-> +    items:
-> +      - const: ipg
-> +      - const: ahb
-> +      - const: enet_out
-> +      - const: ptp
-> +
-> +  interrupts:
-> +    items:
-> +      - description: Switch interrupt
-> +      - description: ENET0 interrupt
-> +      - description: ENET1 interrupt
-> +
-> +  pinctrl-names: true
-> +
-> +  mdio:
-> +    type: object
-> +    $ref: mdio.yaml#
-> +    unevaluatedProperties: false
-> +    description:
-> +      Specifies the mdio bus in the switch, used as a container for phy nodes.
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - clocks
-> +  - clock-names
-> +  - interrupts
-> +  - mdio
-> +  - ethernet-ports
-> +
-> +additionalProperties: false
+My guess is, you are going to take the first route.
 
-unevaluatedProperties: false
-
-> +
-> +examples:
-> +  - |
-> +    #include<dt-bindings/interrupt-controller/irq.h>
-> +    switch@800f0000 {
-> +        compatible = "nxp,imx28-mtip-switch";
-> +        reg = <0x800f0000 0x20000>;
-> +        pinctrl-names = "default";
-> +        pinctrl-0 = <&mac0_pins_a>, <&mac1_pins_a>;
-> +        phy-supply = <&reg_fec_3v3>;
-> +        interrupts = <100>, <101>, <102>;
-> +        clocks = <&clks 57>, <&clks 57>, <&clks 64>, <&clks 35>;
-> +        clock-names = "ipg", "ahb", "enet_out", "ptp";
-> +
-> +        ethernet-ports {
-> +            #address-cells = <1>;
-> +            #size-cells = <0>;
-> +
-> +            mtip_port1: ethernet-port@1 {
-> +                reg = <1>;
-> +                label = "lan0";
-> +                local-mac-address = [ 00 00 00 00 00 00 ];
-> +                phy-mode = "rmii";
-> +                phy-handle = <&ethphy0>;
-> +            };
-> +
-> +            mtip_port2: ethernet-port@2 {
-> +                reg = <2>;
-> +                label = "lan1";
-> +                local-mac-address = [ 00 00 00 00 00 00 ];
-> +                phy-mode = "rmii";
-> +                phy-handle = <&ethphy1>;
-> +            };
-> +        };
-> +
-> +        mdio_sw: mdio {
-> +            #address-cells = <1>;
-> +            #size-cells = <0>;
-> +
-> +            reset-gpios = <&gpio2 13 0>;
-> +            reset-delay-us = <25000>;
-> +            reset-post-delay-us = <10000>;
-> +
-> +            ethphy0: ethernet-phy@0 {
-> +                reg = <0>;
-> +            };
-> +
-> +            ethphy1: ethernet-phy@1 {
-> +                reg = <1>;
-> +            };
-> +        };
-> +    };
-> -- 
-> 2.39.5
-> 
+	Andrew
 
