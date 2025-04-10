@@ -1,466 +1,227 @@
-Return-Path: <netdev+bounces-181238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51790A8429B
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:11:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8565A842AD
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:12:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1ABA119E7FE9
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:11:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D9CC1767C3
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:12:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12C69283685;
-	Thu, 10 Apr 2025 12:11:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF9F82163B2;
+	Thu, 10 Apr 2025 12:11:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="BjWAk+cv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dyrJA5aq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-4325.protonmail.ch (mail-4325.protonmail.ch [185.70.43.25])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8026F198A2F;
-	Thu, 10 Apr 2025 12:11:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.25
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744287073; cv=none; b=VjU6CNd3o0Xa+tx/YvJ6YbAQWtMCfdiilsmEur0L7jBkNWLTgcEU1rufVO9vv3G4t6kEjp54tE2YtGBsjaK7HN662O9N4IPotl4DbzjTBEzvGC0+RgzFaivXDKL/yMtkh74K88GQIwKJ3HWvKKD2q61tP++Mmi0Ldxf6/Wq+ih4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744287073; c=relaxed/simple;
-	bh=qXXtGPIhLnvmHrJi1iDGlTg3m4+StgJ+rC0LnOqYp+w=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q4pJt136Hq3Lu3yrRKwwiF1Zsp0/g2+UovKou6573Pt5snjFCoU2Yloyu67gNFLTp9olY7K+bTayHFqvwEDsaey2qbmZPXD42x1YgSYtdajNRnqPGWxExj1W12sDbv9HgpxBUOli0zjoWyBBN3GLpmxWmU3t63/iXO37cQu7syk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=BjWAk+cv; arc=none smtp.client-ip=185.70.43.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1744287061; x=1744546261;
-	bh=JsD8W9+QLR1ntZMy9UTTGcBkyMsXm2xr6XK0/nBEimo=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=BjWAk+cvngcpO+4xqh4psfOHXe9AMru/1VccZe6LzPdt7fHYBm0JJcMlLA+Eb0qMA
-	 Kr43NdgdQiD6XyQdOPNdrLOkBQ8QF+5BwYwUYWW5MVdEeg32owvP0Mtwa/YiXMLM4r
-	 JUrmQDmVPYMu/XtxY646/419n4vK3eKnzZR4prckCrnKLs4p7bEBagIgSmedkG2Wfd
-	 CIA9Oid1KE6BNKQqSTFVOO3Ss0gkKiGXhjJtz0807ncGOC+XIC2mO34pZKzrP3674q
-	 OgwknawR1RvG8LlKb2GXW9eRrQZ33ObMC+Kze/q0CgEzUyz6kcTXwnXk53Kh3I3Hwi
-	 P+0Pl/H/rihrQ==
-Date: Thu, 10 Apr 2025 12:10:54 +0000
-To: Jonathan Cameron <jic23@kernel.org>
-From: Yassine Oudjana <y.oudjana@protonmail.com>
-Cc: Lars-Peter Clausen <lars@metafoo.de>, Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, Alexander Sverdlin <alexander.sverdlin@gmail.com>, Sean Nyekjaer <sean@geanix.com>, Javier Carrasco <javier.carrasco.cruz@gmail.com>, Matti Vaittinen <mazziesaccount@gmail.com>, Antoniu Miclaus <antoniu.miclaus@analog.com>, Ramona Gradinariu <ramona.gradinariu@analog.com>, "Yo-Jung (Leo) Lin" <0xff07@gmail.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Neil Armstrong <neil.armstrong@linaro.org>, =?utf-8?Q?Barnab=C3=A1s_Cz=C3=A9m=C3=A1n?= <barnabas.czeman@mainlining.org>, Danila Tikhonov
-	<danila@jiaxyga.com>, Antoni Pokusinski <apokusinski01@gmail.com>, Vasileios Amoiridis <vassilisamir@gmail.com>, Petar Stoykov <pd.pstoykov@gmail.com>, shuaijie wang <wangshuaijie@awinic.com>, Yasin Lee <yasin.lee.x@gmail.com>, "Borislav Petkov (AMD)" <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, Tony Luck <tony.luck@intel.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Ingo Molnar <mingo@kernel.org>, Yassine Oudjana <yassine.oudjana@gmail.com>, linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org, linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH 1/3] net: qrtr: Turn QRTR into a bus
-Message-ID: <02aeebee-0acc-4a03-a7f1-a920a34fb378@protonmail.com>
-In-Reply-To: <20250406170111.7a11437a@jic23-huawei>
-References: <20250406140706.812425-1-y.oudjana@protonmail.com> <20250406140706.812425-2-y.oudjana@protonmail.com> <20250406170111.7a11437a@jic23-huawei>
-Feedback-ID: 6882736:user:proton
-X-Pm-Message-ID: 66173a85f0a66ef4d3a359cd31132b974dc15473
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21D0C2836BE
+	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 12:11:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744287119; cv=fail; b=RO8pW7rQpVZBSgScyFfLUeX+sHuiH1u9deJOnGGiCDO4bv/cdKu1OLIr2tGcPLeigwFvSkFwF6yQajCPLPEDT7lNq2INQ0JmYsK+xOYs5sv+j67WwoQMQBTaJ+xo1IGez+F6x/d3JeS+bONVsMOgfhDwTtdYpMPUuYtsaKdJYTM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744287119; c=relaxed/simple;
+	bh=Nvs4jqX+s1u8Ad4wYt7ml4zmIWff52brK/MtmgRUwtA=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=qlVMIZWJH5gdfvVuFtkDslaKyGGDlsX+LePl9TENaen103bhpsTzfhPoaHJg8XWqtEUeHl0Xt+7LZrax446gElUwf6HyXvevsiND26kjH2UCnwvFAUzKDwVStj3tX46q8o15C6PdO4vyRbMGLac/zhGjwBfuqNYDPGo3z03+Ln4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dyrJA5aq; arc=fail smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744287117; x=1775823117;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Nvs4jqX+s1u8Ad4wYt7ml4zmIWff52brK/MtmgRUwtA=;
+  b=dyrJA5aq1cUrlMQLc1xx27S8S2PmJzJ+YNUvytQ9V01LvoJo126qjRdQ
+   ED7ikTMG/9Xa9y1JUUwAn3BjYBq5ZFv2zDtFQ8oN5zudRrXIRy1dMdxsN
+   5B/6JxMRXm6x0SDjYEKeMljV+UTWkIHwJw/5dXT/m0U3mzmtUWteXh/0P
+   KmiSwv7sLDJJ5yUH4roUITbAJSL+Jk3VTae7OMrj3Beuc1OuK8g0Yvl3c
+   TBdURb6Dx2Cg1+7mBfmIM9taYNfOZFC6oay1Cq6R7t5jmfgxidxcIK6/k
+   plsN8s+WG0mfgQFxX14YiX/TGng5xwFRkfKbKyz4b4jyt7wOEWR7NRor2
+   g==;
+X-CSE-ConnectionGUID: Pcv1V3qVRBy9qlUDSkp7mw==
+X-CSE-MsgGUID: qLcHop+TT9uTkIaRT8Gn2Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11400"; a="45816141"
+X-IronPort-AV: E=Sophos;i="6.15,202,1739865600"; 
+   d="scan'208";a="45816141"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 05:11:56 -0700
+X-CSE-ConnectionGUID: q0plU7maTfG8DjSvv7FhNQ==
+X-CSE-MsgGUID: ZuZ7Tjg/RGCF0/FYia2WRA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,202,1739865600"; 
+   d="scan'208";a="128754017"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 05:11:56 -0700
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Thu, 10 Apr 2025 05:11:55 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Thu, 10 Apr 2025 05:11:55 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Thu, 10 Apr 2025 05:11:55 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lt7ci7OOAOa80SZMThXYhGehx+5FGrMW/6o3h3/RX+2EpGlT9jw1gqQgO/gnKVjR6pqmZeZAeeznDgx2eGPjpjYrDfI2cFskhi5aT10cjd7W7G1ECUM38bnj901Qql9ToKnthoGJUGuplHJWgJV8+HNsufEHWF+zCwSfL9FrJGGYjA8IL8gm9Oxlb//Ao6QwcBYHaulOQ9ZrZeQvIYJ/9w7t9KkWhaU61/gsV0Wn3U+3eX4trCsKoZJRt657sOjGvNYuZfZIs+90ffFpFfj0FKbzgL51p6AAh1toJ89Yg8I+ESD0ea0SThClVj1m5zhOgweUi6+qffR37X0E7t6Vnw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=o5ApKjnyqRxwfiddBbigKO2pGIBbsk03mhS3fRJu3vw=;
+ b=lBApu9Z4M3iZU8f/OqYohrblg3zWKzq+xLvu8qI91LV7b14x/T4afrDzutAn9lOcCPU7fY6jQgws6sgKryjSRYEw/71cYCL6JFaTK/wGpq1uK2EKChG01GUh4n8pJrmbDnq7wXnK2rByZpb6NV25x+lVJ4ALST+1CKwBy6FsflVaQUIELMWw7l47erWPdqoXvR+4kT6au/C/JZaSRAWeT11+HvCW/kKPAIWyku1SkSTL75r/99tlXvgv0qp4j4aDfOH6g4jFm/V5Y5z9UACsrq1Z/V4pHe2l+DOy3MTMXInbeMmlVOiiIxzq1zVdqfpuEOlnn9aepY0dlHQD+RFSlw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CY5PR11MB6307.namprd11.prod.outlook.com (2603:10b6:930:21::20)
+ by IA0PR11MB7863.namprd11.prod.outlook.com (2603:10b6:208:40c::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.21; Thu, 10 Apr
+ 2025 12:11:46 +0000
+Received: from CY5PR11MB6307.namprd11.prod.outlook.com
+ ([fe80::1fa2:d2f9:5904:2a14]) by CY5PR11MB6307.namprd11.prod.outlook.com
+ ([fe80::1fa2:d2f9:5904:2a14%4]) with mapi id 15.20.8632.021; Thu, 10 Apr 2025
+ 12:11:46 +0000
+Message-ID: <deb59318-dc9a-44c9-8a18-3264e95e5297@intel.com>
+Date: Thu, 10 Apr 2025 15:11:41 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v4 4/6] igc: handle the
+ IGC_PTP_ENABLED flag correctly
+To: Jacob Keller <jacob.e.keller@intel.com>, Anthony Nguyen
+	<anthony.l.nguyen@intel.com>
+CC: <david.zage@intel.com>, <vinicius.gomes@intel.com>,
+	<rodrigo.cadore@l-acoustics.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>, Christopher S M Hall
+	<christopher.s.hall@intel.com>, Corinna Vinschen <vinschen@redhat.com>
+References: <20250401-jk-igc-ptm-fixes-v4-v4-0-c0efb82bbf85@intel.com>
+ <20250401-jk-igc-ptm-fixes-v4-v4-4-c0efb82bbf85@intel.com>
+Content-Language: en-US
+From: Mor Bar-Gabay <morx.bar.gabay@intel.com>
+In-Reply-To: <20250401-jk-igc-ptm-fixes-v4-v4-4-c0efb82bbf85@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: TL2P290CA0026.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:3::13) To CY5PR11MB6307.namprd11.prod.outlook.com
+ (2603:10b6:930:21::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR11MB6307:EE_|IA0PR11MB7863:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8efe8bb3-27dc-4b1b-fdf3-08dd7828dd2d
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?K2ZhRUFkTllIeTRiRTFHZkRYOUE1U0xzeDViSFBmSDVGa0NVVFNNTUxwRUda?=
+ =?utf-8?B?dFBXMEZ2djRTaXVYcm13cjJ4Q1kxajdIWHdqeG9vT2tSUjVvKzJiazBCNEhP?=
+ =?utf-8?B?LzBuUTRkbldSWEtPMnpXZkw0TGswK1J3M3JOQXYzVk1hSkM3OHIvWUVDa1RJ?=
+ =?utf-8?B?TXIzWmp4a09VaXpuaXNBMG5WSytwT0lFQUl6a3J4QkZwMThXb2tRcC9GTG8w?=
+ =?utf-8?B?Q1MrNTdFYlREUGhqdzVDWG1hSGxZWXFCUnJNNkxKK214OGJGbkhEN3VYWW5K?=
+ =?utf-8?B?ekNDRVllNkJwRGVjZEV3MzFmdnRZOXZJeGhwcGpYSUF6TFZxUnVxL1RJeFEz?=
+ =?utf-8?B?bU9IcmF3K1kyTDA0eHZuTWJBcE1nNHJ6NkY1R3JrZEJRZXl4NjNvS0JLWFpV?=
+ =?utf-8?B?V1FCNStHVmNxeFJQdHVJL1RzTmtteFZBMi9ySE1LdENoL2tZY1BhNnJ4TVcx?=
+ =?utf-8?B?UWJ2YmY5Y3JaeXdBWStVNzdFS01YbWlKR0l4SHdnK0JocE1yeURDaVh3bzZ6?=
+ =?utf-8?B?OWF3VmJqOEJJSHZaZkYrMXdiSmQxeDc1QVFPcXRKMTZYRXlvNDZEZGNUa0pS?=
+ =?utf-8?B?YWR4cjYxNkN0Z2ZiZHpld1M3K05QU20yQlVJaGVjTmJmbld6d0F4WC9IcGU4?=
+ =?utf-8?B?dmZaZlNWTmJOeHE5eFJJUC96a3htL2x5cjZNR3JhRmk2YTY0WmRjNVNFdWN0?=
+ =?utf-8?B?ZjVBcjlaalBCS2V1Tnl1aXlpODdJc0tMSkJidEZkVDYxWmhvL0MxeTNXSkoy?=
+ =?utf-8?B?c2pIYlJXWGs1MkhveWQ2czV6ek5Rd055L3IxVCtlR05Lalc5bWR3TE0weVJV?=
+ =?utf-8?B?N2UwVHhOVXhBbTQ3RzM2UW1KdzR6TEhBQ2RPeFBjTklPQmxFem4rVkhZcWkr?=
+ =?utf-8?B?NVcxQ2lDanZKNXNwY2xUNUxpVzhjTnp2SE1HR3plbk9scUZ5Y3hrbWRnOEd4?=
+ =?utf-8?B?U05tWXRLOEtBenY1ejQvK1Q4d1ZUSC95N2pXYTdJcjg1Qm5aYUdMcUIzNjRw?=
+ =?utf-8?B?a1o5MUtCK1FoNHVIS0pzOFhLVU01NUZkNSt4MUYvOVQ1TGtCKzFFQ2wzUXVv?=
+ =?utf-8?B?enpFVjZLVzNYemFZazM2WTl0RkVJdXlnbVR0QXpSaFlGL1NWYzBqSVF1WFdL?=
+ =?utf-8?B?Z3czNWh2U2VuSWpOUUhCQnhka0hVekl0NWduVnBlclpTY3FKTzVrdWFsT1Ax?=
+ =?utf-8?B?YVVXd2Jqb0MzL3FQVmFqc1lXYjBlVklNK0E4cTY5djZQOE9yMWtSQWI0UGxY?=
+ =?utf-8?B?cGowd3ZqTXVsTjM1YUJ3Z1U3QytFK1ZiQ0lUOEFWM0xiRTY1cEkwNHBHSVkz?=
+ =?utf-8?B?RGkydC9DN2lJaUswWlV4SnU1WWYzSFR5WE42NSt1Uk1KbFRqSmdsc0hHN1V2?=
+ =?utf-8?B?cFNoc2VxaldyQ1hKTk94S0dabU11Y0JwdVZJOG5sSWliY2RCSEFLa2d6d1o5?=
+ =?utf-8?B?dDJzY205RTRIZ0lYc0IvMUI3V3crSCsrTE02YmR6ZDNFVklZTmNMeHNRS3lz?=
+ =?utf-8?B?S04vMi9GTi90a25JaHcxSlBIOGVhZDRyRFhWK2hJbCs0RElBbDg4d1Y2Y3Zh?=
+ =?utf-8?B?WWQzZVZGdXorNmdoNkZ4UzBGTU1vTzBpbFpxSzNuak1oUUtQOEhNR1hMcnNH?=
+ =?utf-8?B?NmoxeXltamI2WUk0cG1yZkR3RmJLM1BjUmwxQXd0bU5CQjVtVk0zUVBuNmJh?=
+ =?utf-8?B?UDkvdFRxVGNZWXoxWlF2MVRkMDFLTXBvWlVrQ1Rha1hpSWZ3ME8rRVZUU0th?=
+ =?utf-8?B?Mm00bk5XRHJYYnExdlFORjhsNk9VY2ZTbXNWSXJWNUpDOWxZbkdDcUlES1dz?=
+ =?utf-8?B?NTZqM1M4R2RXU1paYUhVVXJrQUttMjlxd0wwNVVCMzcrMDM1NWZkUC82Nkhl?=
+ =?utf-8?Q?wSxINcqoF/5BV?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6307.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eG9NeEJvcGZyOFhDckVXd1B6Qm9JWkowTWNqQmJnQTFocFJTYWNYT2c4b1lz?=
+ =?utf-8?B?T3VZaFdlSy9qa2l3TS94ekhmbFp2L0Z3djBubzJmMzF3VHRZRDNaeXEzS28z?=
+ =?utf-8?B?RkJ3Y0VqTnF0ZjBTOGZlWlpRc05oSU5qOG43VkZGSDJKQklURnpPZ1IxS290?=
+ =?utf-8?B?VHJPUEpiSWRFaFRjS0hRa0hIQnZTendSRmpaTGsvV0llMnBZa3VMK3JRYndC?=
+ =?utf-8?B?SlkvSy9mU2xROU14VStVMmZTV2M0QjlUdmJYWWtQajFSdDZmMzI4b1ljdG4z?=
+ =?utf-8?B?ZDBTYWxBYXJzeVVaWFBrZGNQQk94SmxlOWlGK1ErM1BHcEZ4eTU2VHV5cU9M?=
+ =?utf-8?B?emZnZk8wd0J2NTBiMnRaSnR6Z0x0RVY0S2MxaVhEdm5YUXFyRnNFT01oelIz?=
+ =?utf-8?B?MUhQSk9lRjRFYkJFRHVXeGFRS0xPeTN1WlVmUG9mQ1cyelNnTS9iYk52d21x?=
+ =?utf-8?B?WmJLa0R1RXlnbFVNRDNGalFvMzdsRXZWdGtLMWpDdFhtTnlQMWVkMUo2VXZ3?=
+ =?utf-8?B?U3l0S2xpUlBPRFB6QjJDMTVnWFZ6VFlwR1pydUpjM2RxZHIvVGgrd0wvbGVB?=
+ =?utf-8?B?NEFWdlFWbTc0WW1SRU1KRmNpWjNUbTN3SFl4a1BxdlFlU2lxK0JWbUNlUEFt?=
+ =?utf-8?B?Ri84L052WUdJMnNrRzgvM0dlYjYxbjdQWXIvTitXYVgxNEo5RWtWSHh4NWZR?=
+ =?utf-8?B?eUMwTlFPU2YvdGl0alpSVmdwWElGQ3lMTGhySi9sSDhYTWgzdVI0UURyS1No?=
+ =?utf-8?B?OU1VZlVUY21HdnY3R2djbzExRVJlTGVYMy9wcjFkb0V2aHd4QStDOEd1ai9Z?=
+ =?utf-8?B?WDFqeC9IMm5kV0s1TlpSMkQ1dGJ1WlFLbklMWUs2U0FRWlptYkNuaGF5b0FL?=
+ =?utf-8?B?TzArNVE1ZjkzWU4zWnJkaU16ZEQyV2N3MTVlakI0eCtmWnZZcW5md1Mveldi?=
+ =?utf-8?B?d0dRZ04wMUVsVnRwYUtGa0hhL0dIakRaeVNDVXlTUjNWKzBpblFoYzQ5V0U3?=
+ =?utf-8?B?Z2NKRkRnUUJEV3dCQnFpdEgvc1l4aHFsRG51OUdUNGc0dm4wbTdQL3czTWE3?=
+ =?utf-8?B?K2J0Vm4zSWJTbkMxM2d5OG9HcWFqV2RLQW5qRktFaFJqWk9GRUNIZjJEQUR2?=
+ =?utf-8?B?NnVhbFMrVVpZWUJ5Q3ppMldPOVVNRGs4K3ZNekFyaUtyU1dDc2lTUkNxVkNp?=
+ =?utf-8?B?VmUwY2cyV20zbHdtZ2hXODd6UnZKNHdxVUlOcy9rc2kyNVBJQ1hpejZNMXkw?=
+ =?utf-8?B?TWhRTkpzWWNVVVpxZDE0MHA1L0hDMzA1YVVzVm5JWkoyUURuQUZmNzV5NStn?=
+ =?utf-8?B?MUNHWmhkNGVSMnA1TWhWK3NUZXRsOG84bkJQdDBvaFBDa24zUTZYZE1pWWVs?=
+ =?utf-8?B?UkcySWVhSFhlU3UrT1poUzZveUNtQkFadE1aZDlTb0hpL2FoajNmQVlpYWNV?=
+ =?utf-8?B?dm4xcDduS01zSVJqTDJ5SDBOWVZteU5qSnVwa2tuam81dVNENmp2MjZXN0Vj?=
+ =?utf-8?B?eWJ0bXczRnhUeFFCcitwdHp2QnY2UFlFbGZzQ001R0hGdk16VThaeGJxQ0Ry?=
+ =?utf-8?B?RHhiTEdTWFdwazNrZ1NYQmlYZU0zTWFZVmhjNVgzSUFsbGR5bC9rTlFtYVVW?=
+ =?utf-8?B?QXdqa3ZUK2U3WFozYkZXN3FlVzFlaWUyOVRCSXh1VGdJMFIwUlloY09BWDFt?=
+ =?utf-8?B?Y0NPeU1GTlhvWUdRNDYvTFFrWGoxbkZxMCtUN3VhV05QNUpkVzBhT1ZzeGJ5?=
+ =?utf-8?B?T1RoY091NWYxVHQzcGh3SkdiS1ppUFFuYk1yMnRPR3V6SVRaYW10cjQ3dWNT?=
+ =?utf-8?B?SmIwNnIyL0VNZ2wyWVp4V0c1UWlVYUtONEhMMzVoTlZYSHMwSGpFMSttS21O?=
+ =?utf-8?B?dWpHZzZlRERTUk9ETmwxSXVoak9Bc1NPNkl2YmdJYmxkRVpOcUZDQjBQcVJh?=
+ =?utf-8?B?ckJLeFBjOE9XMzhXMzFIYW94NEd2OUdQcTB3L0ZLWTBqeGhBemxHM0t3TlB2?=
+ =?utf-8?B?akNNVW9yWVM2TnZmZFVjUkF1WUVvaVlkM29PUUhEYUFZWEJmeVVlcE81Y1Ax?=
+ =?utf-8?B?OFhiSlhtS0lEYnMrNkJ3Y21pUWtRNmJxMzVTRGNMaEEwd3dBUjMvMXh2T1kx?=
+ =?utf-8?B?K0FzUEoycDFLYTdzVXRjWk5Hd3lKaFhvb3cwWGloMGJYanJ2b3QxSkFpRDN1?=
+ =?utf-8?B?cFE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8efe8bb3-27dc-4b1b-fdf3-08dd7828dd2d
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6307.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2025 12:11:46.4292
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HgDTgfJWdvEzx4NtpT65hPZZPTKxQ+i8PhR62t72gEH3KfmMy2aUrxUk0MifID5Ka5Y462MxJl9fCcdiC4WoDMwLSdNp8N9JnRsusUYFYxc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7863
+X-OriginatorOrg: intel.com
 
-On 06/04/2025 7:01 pm, Jonathan Cameron wrote:
-> On Sun, 06 Apr 2025 14:07:43 +0000
-> Yassine Oudjana <y.oudjana@protonmail.com> wrote:
->=20
->> Implement a QRTR bus to allow for creating drivers for individual QRTR
->> services. With this in place, devices are dynamically registered for QRT=
-R
->> services as they become available, and drivers for these devices are
->> matched using service and instance IDs.
->>
->> In smd.c, replace all current occurences of qdev with qsdev in order to
->> distinguish between the newly added QRTR device which represents a QRTR
->> service with the existing QRTR SMD device which represents the endpoint
->> through which services are provided.
->>
->> Signed-off-by: Yassine Oudjana <y.oudjana@protonmail.com>
-> Hi Yassine
->=20
-> Just took a quick look through.
->=20
-> It might make more sense to do this with an auxiliary_bus rather
-> than defining a new bus.
->=20
-> I'd also split out the renames as a precursor patch.
->=20
-> Various other comments inline.
->=20
-> Jonathan
->=20
->> diff --git a/net/qrtr/af_qrtr.c b/net/qrtr/af_qrtr.c
->> index 00c51cf693f3..e11682fd7960 100644
->> --- a/net/qrtr/af_qrtr.c
->> +++ b/net/qrtr/af_qrtr.c
->> @@ -435,6 +435,7 @@ static void qrtr_node_assign(struct qrtr_node *node,=
- unsigned int nid)
->>   int qrtr_endpoint_post(struct qrtr_endpoint *ep, const void *data, siz=
-e_t len)
->>   {
->>   =09struct qrtr_node *node =3D ep->node;
->> +=09const struct qrtr_ctrl_pkt *pkt;
->>   =09const struct qrtr_hdr_v1 *v1;
->>   =09const struct qrtr_hdr_v2 *v2;
->>   =09struct qrtr_sock *ipc;
->> @@ -443,6 +444,7 @@ int qrtr_endpoint_post(struct qrtr_endpoint *ep, con=
-st void *data, size_t len)
->>   =09size_t size;
->>   =09unsigned int ver;
->>   =09size_t hdrlen;
->> +=09int ret =3D 0;
->>
->>   =09if (len =3D=3D 0 || len & 3)
->>   =09=09return -EINVAL;
->> @@ -516,12 +518,24 @@ int qrtr_endpoint_post(struct qrtr_endpoint *ep, c=
-onst void *data, size_t len)
->>
->>   =09qrtr_node_assign(node, cb->src_node);
->>
->> +=09pkt =3D data + hdrlen;
->> +
->>   =09if (cb->type =3D=3D QRTR_TYPE_NEW_SERVER) {
->>   =09=09/* Remote node endpoint can bridge other distant nodes */
->> -=09=09const struct qrtr_ctrl_pkt *pkt;
->> -
->> -=09=09pkt =3D data + hdrlen;
->>   =09=09qrtr_node_assign(node, le32_to_cpu(pkt->server.node));
->> +
->> +=09=09/* Create a QRTR device */
->> +=09=09ret =3D ep->add_device(ep, le32_to_cpu(pkt->server.node),
->> +=09=09=09=09=09       le32_to_cpu(pkt->server.port),
->> +=09=09=09=09=09       le32_to_cpu(pkt->server.service),
->> +=09=09=09=09=09       le32_to_cpu(pkt->server.instance));
->> +=09=09if (ret)
->> +=09=09=09goto err;
->> +=09} else if (cb->type =3D=3D QRTR_TYPE_DEL_SERVER) {
->> +=09=09/* Remove QRTR device corresponding to service */
->> +=09=09ret =3D ep->del_device(ep, le32_to_cpu(pkt->server.port));
->> +=09=09if (ret)
->> +=09=09=09goto err;
->>   =09}
->>
->>   =09if (cb->type =3D=3D QRTR_TYPE_RESUME_TX) {
->> @@ -543,8 +557,7 @@ int qrtr_endpoint_post(struct qrtr_endpoint *ep, con=
-st void *data, size_t len)
->>
->>   err:
->>   =09kfree_skb(skb);
->> -=09return -EINVAL;
->> -
->> +=09return ret ? ret : -EINVAL;
-> How do we get here with non error value given we couldn't before?
-
-We don't, but we may have errors in ret other than -EINVAL returned by=20
-the newly added add_device and del_device which we should propagate.
-
->=20
->=20
->>   }
->>   EXPORT_SYMBOL_GPL(qrtr_endpoint_post);
->>
->=20
->> diff --git a/net/qrtr/smd.c b/net/qrtr/smd.c
->> index c91bf030fbc7..fd5ad6a8d1c3 100644
->> --- a/net/qrtr/smd.c
->> +++ b/net/qrtr/smd.c
->> @@ -7,6 +7,7 @@
->=20
->> +
->> +static int qcom_smd_qrtr_uevent(const struct device *dev, struct kobj_u=
-event_env *env)
->> +{
->> +=09const struct qrtr_device *qdev =3D to_qrtr_device(dev);
->> +
->> +=09return add_uevent_var(env, "MODALIAS=3D%s%x:%x", QRTR_MODULE_PREFIX,=
- qdev->service,
->> +=09=09=09      qdev->instance);
->> +}
->=20
->=20
->> +void qrtr_driver_unregister(struct qrtr_driver *drv)
->> +{
->> +=09driver_unregister(&drv->driver);
->> +}
->> +EXPORT_SYMBOL_GPL(qrtr_driver_unregister);
->=20
-> Given this is a 'new thing' maybe namespace it from the start?
-> EXPORT_SYMBOL_NS_GPL();
-
-Ack.
-
->=20
->=20
->> +
->> +static int qcom_smd_qrtr_match_device_by_port(struct device *dev, const=
- void *data)
->> +{
->> +=09struct qrtr_device *qdev =3D to_qrtr_device(dev);
->> +=09unsigned int port =3D *(unsigned int *)data;
-> =09unsinged int *port =3D data;
->=20
-> =09return qdev->port =3D=3D *port;
+On 02/04/2025 2:35, Jacob Keller wrote:
+> From: Christopher S M Hall <christopher.s.hall@intel.com>
+> 
+> All functions in igc_ptp.c called from igc_main.c should check the
+> IGC_PTP_ENABLED flag. Adding check for this flag to stop and reset
+> functions.
+> 
+> Fixes: 5f2958052c58 ("igc: Add basic skeleton for PTP")
+> Signed-off-by: Christopher S M Hall <christopher.s.hall@intel.com>
+> Reviewed-by: Corinna Vinschen <vinschen@redhat.com>
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> ---
+>   drivers/net/ethernet/intel/igc/igc_ptp.c | 7 +++++++
+>   1 file changed, 7 insertions(+)
 >
-
-Ack.
-
->> +
->> +=09return qdev->port =3D=3D port;
->> +}
->> +
->> +static void qcom_smd_qrtr_add_device_worker(struct work_struct *work)
->> +{
->> +=09struct qrtr_new_server *new_server =3D container_of(work, struct qrt=
-r_new_server, work);
->> +=09struct qrtr_smd_dev *qsdev =3D new_server->parent;
->> +=09struct qrtr_device *qdev;
->> +=09int ret;
->> +
->> +=09qdev =3D kzalloc(sizeof(*qdev), GFP_KERNEL);
->> +=09if (!qdev)
->> +=09=09return;
->> +
-> Maybe
-> =09*qdev =3D (struct qrtr_device *) {
-> =09};
-
-(struct qrtr_device)
-...
-
-> and free new_server after all of these are filled in.
->=20
->> +=09qdev->node =3D new_server->node;
->> +=09qdev->port =3D new_server->port;
->> +=09qdev->service =3D new_server->service;
->> +=09qdev->instance =3D new_server->instance;
->> +
->> +=09devm_kfree(qsdev->dev, new_server);
->=20
-> As below.
-
-Ack.
-
->=20
->> +
->> +=09dev_set_name(&qdev->dev, "%d-%d", qdev->node, qdev->port);
->> +
->> +=09qdev->dev.bus =3D &qrtr_bus;
->> +=09qdev->dev.parent =3D qsdev->dev;
->> +=09qdev->dev.release =3D qcom_smd_qrtr_dev_release;
->> +=09qdev->dev.driver =3D NULL;
->=20
-> it's kzalloc'd so no need to set this.
-Ack.
-
->=20
->> +
->> +=09ret =3D device_register(&qdev->dev);
->> +=09if (ret) {
->> +=09=09dev_err(qsdev->dev, "Failed to register QRTR device: %pe\n", ERR_=
-PTR(ret));
->> +=09=09put_device(&qdev->dev);
->> +=09}
->> +}
->> +
->> +static void qcom_smd_qrtr_del_device_worker(struct work_struct *work)
->> +{
->> +=09struct qrtr_del_server *del_server =3D container_of(work, struct qrt=
-r_del_server, work);
->> +=09struct qrtr_smd_dev *qsdev =3D del_server->parent;
->> +=09struct device *dev =3D device_find_child(qsdev->dev, &del_server->po=
-rt,
->> +=09=09=09=09=09       qcom_smd_qrtr_match_device_by_port);
->> +
->> +=09devm_kfree(qsdev->dev, del_server);
-> If we are always going to free what was alocated in qcom_smd_qrtr_del_dev=
-ice()
-> why use devm at all?
-
-True, I guess this one is redundant.
-
->> +
->> +=09if (dev)
->> +=09=09device_unregister(dev);
-> If this doesn't match anything I'm guessing it's a bug?   So maybe an err=
-or message?
-
-I don't quite remember the reason I put this check in the first place=20
-but right now it seems to me like it should always be true so I'll just=20
-remove it and see what happens.
-
->=20
->> +}
->> +
->> +static int qcom_smd_qrtr_add_device(struct qrtr_endpoint *parent, unsig=
-ned int node,
->> +=09=09=09=09    unsigned int port, u16 service, u16 instance)
->> +{
->> +=09struct qrtr_smd_dev *qsdev =3D container_of(parent, struct qrtr_smd_=
-dev, ep);
->> +=09struct qrtr_new_server *new_server;
->> +
->> +=09new_server =3D devm_kzalloc(qsdev->dev, sizeof(struct qrtr_new_serve=
-r), GFP_KERNEL);
->=20
-> As below. sizeof(*new_server)
->=20
->> +=09if (!new_server)
->> +=09=09return -ENOMEM;
->> +
-> =09*new_server =3D (struct qtr_new_server) {
-> =09=09.parent =3D qsdev,
-> =09=09.ndoe =3D node,
-> ...
-> =09};
->=20
-> perhaps a tiny bit easier to read?
-
-Ack.
-
->=20
->> +=09new_server->parent =3D qsdev;
->> +=09new_server->node =3D node;
->> +=09new_server->port =3D port;
->> +=09new_server->service =3D service;
->> +=09new_server->instance =3D instance;
->> +
->> +=09INIT_WORK(&new_server->work, qcom_smd_qrtr_add_device_worker);
->> +=09schedule_work(&new_server->work);
->> +
->> +=09return 0;
->> +}
->> +
->> +static int qcom_smd_qrtr_del_device(struct qrtr_endpoint *parent, unsig=
-ned int port)
->> +{
->> +=09struct qrtr_smd_dev *qsdev =3D container_of(parent, struct qrtr_smd_=
-dev, ep);
->> +=09struct qrtr_del_server *del_server;
->> +
->> +=09del_server =3D devm_kzalloc(qsdev->dev, sizeof(struct qrtr_del_serve=
-r), GFP_KERNEL);
->=20
-> sizeof(*del_server)
-> preferred as then no one has to check types match.
-
-Ack.
-
->=20
->> +=09if (!del_server)
->> +=09=09return -ENOMEM;
->> +
->> +=09del_server->parent =3D qsdev;
->> +=09del_server->port =3D port;
->> +
->> +=09INIT_WORK(&del_server->work, qcom_smd_qrtr_del_device_worker);
->> +=09schedule_work(&del_server->work);
->> +
->> +=09return 0;
->> +}
->> +
->> +static int qcom_smd_qrtr_device_unregister(struct device *dev, void *da=
-ta)
->> +{
->> +=09device_unregister(dev);
->=20
-> One option that may simplify this is to do the device_unregister() handli=
-ng
-> a devm_action_or_reset() handler that is using the parent device as it's =
-dev
-> but unregistering the children.  That way the unregister is called in the
-> reverse order of setup and you only register a handler for those devices
-> registered (rather walking children).  I did this in the CXL pmu driver
-> for instance.
-
-Will look into it.
-
->=20
->> +
->> +=09return 0;
->> +}
->> +
->=20
->> @@ -82,9 +276,11 @@ static int qcom_smd_qrtr_probe(struct rpmsg_device *=
-rpdev)
->>
->>   static void qcom_smd_qrtr_remove(struct rpmsg_device *rpdev)
->>   {
->> -=09struct qrtr_smd_dev *qdev =3D dev_get_drvdata(&rpdev->dev);
->> +=09struct qrtr_smd_dev *qsdev =3D dev_get_drvdata(&rpdev->dev);
->=20
-> May be worth doing the rename in a precursor patch to simplify a little w=
-hat is
-> in this one.
-
-Sure.
-
->=20
->> +
->> +=09device_for_each_child(qsdev->dev, NULL, qcom_smd_qrtr_device_unregis=
-ter);
->>
->> -=09qrtr_endpoint_unregister(&qdev->ep);
->> +=09qrtr_endpoint_unregister(&qsdev->ep);
->>
->>   =09dev_set_drvdata(&rpdev->dev, NULL);
->>   }
->> @@ -104,7 +300,27 @@ static struct rpmsg_driver qcom_smd_qrtr_driver =3D=
- {
->>   =09},
->>   };
->>
->> -module_rpmsg_driver(qcom_smd_qrtr_driver);
->> +static int __init qcom_smd_qrtr_init(void)
->> +{
->> +=09int ret;
->> +
->> +=09ret =3D bus_register(&qrtr_bus);
->> +=09if (!ret)
->> +=09=09ret =3D register_rpmsg_driver(&qcom_smd_qrtr_driver);
-> This style tends to extend badly. Go with more conventional errors
-> out of line style.
->=20
-> =09if (ret)
-> =09=09return ret;
->=20
-> =09ret =3D register_rpmsg_driver(&qcom_smd_qrtr_driver);
-> =09if (ret) {
-> =09=09bus_unregister(&qtr_bus);
-> =09=09return ret;
-> =09}
->=20
-> =09return 0;
->=20
-
-Ack.
-
->> +=09else
->> +=09=09bus_unregister(&qrtr_bus);
->> +
->> +=09return ret;
->> +}
->> +
->> +static void __exit qcom_smd_qrtr_exit(void)
->> +{
->> +=09bus_unregister(&qrtr_bus);
->=20
-> Order should be the reverse of what happened in probe so swap these round=
-.
-
-Ack.
-
->=20
->> +=09unregister_rpmsg_driver(&qcom_smd_qrtr_driver);
->> +}
->> +
->> +subsys_initcall(qcom_smd_qrtr_init);
->> +module_exit(qcom_smd_qrtr_exit);
->>
->>   MODULE_ALIAS("rpmsg:IPCRTR");
->>   MODULE_DESCRIPTION("Qualcomm IPC-Router SMD interface driver");
->>
-
+Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com>
 
