@@ -1,256 +1,349 @@
-Return-Path: <netdev+bounces-181313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A285A84611
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 16:19:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11D79A84647
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 16:27:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7B847AEDFD
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:17:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F415D7AFA92
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DC5E28A41F;
-	Thu, 10 Apr 2025 14:18:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFAB628A41F;
+	Thu, 10 Apr 2025 14:27:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CZW/ZaMG"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Y6SZsQaG"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE2928136F
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 14:18:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04CC1F873E;
+	Thu, 10 Apr 2025 14:27:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744294733; cv=none; b=I2vE8k+XPraI2flIqlaC9QD7LhO/hg7zdZwE4DN60FOqvUvwpkGVaariTRkBN5OzXRk/YhxWaLNxVzD1ClSrQgDTtyLkRkt5n/LhJFYz6OMErJ7QS5ZEHEevm3m8jsGBRcGs8TI0u72qbWljXjQCdbzNUtITCk3A6CntRuI+Ogc=
+	t=1744295254; cv=none; b=NvvdiLn8J96QWlGMOm79WlZmFVdDX8L3jw0/SwHeg8Wkvul8tQAEqGoKseYjdey3SUIOtwj/BKU3FIUGuDM1lFLbBnJpJ27VUQLPcZrZog0qk8fIQCNEK+Avehdg/bPMI2cXbuFoIG4eqTPLty4o0QZiDYmMKG2+77kG6DOj1aA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744294733; c=relaxed/simple;
-	bh=w73Z+SWToipvwY0ppQE3GKDc1Wy8J1qem7rYPsqoNEg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Uh/hjpOSh6hgH7jN0gHLOwMHAsoG182/2cWJibI8Wky3y9J0sB1/FhzlEIrriRziuuSFcu7IqTPl+BYF99OX33pVgXaOmJMawDJ/XN2/mbb1eepikpqDOoFBaqbXmRQ7kxTv4WHfYLBb97fybPTyOYy3Inrwj9RBXIbKXVjoHAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CZW/ZaMG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744294729;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Y7asJtLNtRy2Pycw2tJgzfoU3bLUAEvPjbye8iIV0Ho=;
-	b=CZW/ZaMGlSuYMEO8b+aR0RGvZPtCHzZWoSnq3pTL7F4MzvPpksa+d7Gb9Ymz2/TpIqWllw
-	AiMSUs9VBVQ+i+J5DwY536IZHhvame1wUhMFgT8j1+3M8TUWVAbrWq9epFAFoFjZ5T0e6Y
-	0//UaqDXaT7wQ8x2OwnR1cDNI/VtB9s=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-316-KVd3xlw3Mi6xop4H04o7hA-1; Thu,
- 10 Apr 2025 10:18:45 -0400
-X-MC-Unique: KVd3xlw3Mi6xop4H04o7hA-1
-X-Mimecast-MFC-AGG-ID: KVd3xlw3Mi6xop4H04o7hA_1744294724
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6359619560B3;
-	Thu, 10 Apr 2025 14:18:44 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.225.190])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6CFEA1801A6D;
-	Thu, 10 Apr 2025 14:18:42 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [GIT PULL] Networking for v6.15-rc2
-Date: Thu, 10 Apr 2025 16:18:31 +0200
-Message-ID: <20250410141831.46694-1-pabeni@redhat.com>
+	s=arc-20240116; t=1744295254; c=relaxed/simple;
+	bh=brhRcL/BA3B7ayxZCilOde7eFu+DE09Bp210LvtFnKg=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=ZShVC7KKg6r78bATqnyWR0auCOMOonP6p+8Nql3VOXRc4Rsa+H/bF64fZfcLBzRnzSmps5rGFLWBK8zLEMKeZcIfI9Lea61IwPN43GoSsYZKCvj4Qjep8VYi+xfgd/8NY8GWqKukCu6vYME8RlfkBxuYv2nOKPdLxnOCb0hg7Lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Y6SZsQaG; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1744295239;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pen+hTCi9Y0t6tkeXWgyEYw/3+/q7c9d33Ri3lI9qsM=;
+	b=Y6SZsQaGbhuKaFQxQJXLzu9VuBRzLyBRcr2xzt/+kfdp36cUBZi3yBrxhWAMrONFS20CQG
+	GjuI6Tgtr82vmGj0iQMqzjj8RL7otQ8C50uhO9lFA7B0WnRPngcAuwzT/247rwygKo5SaL
+	BRjvd2xMMm7/0WcJBOQY7DHmq9/hasU=
+Date: Thu, 10 Apr 2025 14:27:17 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
+Message-ID: <0cfe4cc98a818d83a9b4bbe55006a17a7452ee38@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH bpf-next v1] bpf, sockmap: Introduce tracing capability
+ for sockmap
+To: "Jakub Sitnicki" <jakub@cloudflare.com>
+Cc: bpf@vger.kernel.org, mrpre@163.com, "Alexei Starovoitov"
+ <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>, "John
+ Fastabend" <john.fastabend@gmail.com>, "Andrii Nakryiko"
+ <andrii@kernel.org>, "Martin  KaFai Lau" <martin.lau@linux.dev>, "Eduard
+ Zingerman" <eddyz87@gmail.com>, "Song Liu" <song@kernel.org>, "Yonghong
+ Song" <yonghong.song@linux.dev>, "KP  Singh" <kpsingh@kernel.org>,
+ "Stanislav Fomichev" <sdf@fomichev.me>, "Hao  Luo" <haoluo@google.com>,
+ "Jiri Olsa" <jolsa@kernel.org>, "Steven Rostedt" <rostedt@goodmis.org>,
+ "Masami Hiramatsu" <mhiramat@kernel.org>, "Mathieu  Desnoyers"
+ <mathieu.desnoyers@efficios.com>, "David S. Miller"
+ <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub 
+ Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Simon 
+ Horman" <horms@kernel.org>, "Jesper Dangaard Brouer" <hawk@kernel.org>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org
+In-Reply-To: <87ikncgyyd.fsf@cloudflare.com>
+References: <20250409102937.15632-1-jiayuan.chen@linux.dev>
+ <87ikncgyyd.fsf@cloudflare.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Linus!
+April 10, 2025 at 17:14, "Jakub Sitnicki" <jakub@cloudflare.com> wrote:
 
-The following changes since commit 61f96e684edd28ca40555ec49ea1555df31ba619:
 
-  Merge tag 'net-6.15-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-04-04 09:15:35 -0700)
 
-are available in the Git repository at:
+>=20
+>=20On Wed, Apr 09, 2025 at 06:29 PM +08, Jiayuan Chen wrote:
+>=20
+>=20>=20
+>=20> Sockmap has the same high-performance forwarding capability as XDP,=
+ but
+> >=20
+>=20>  operates at Layer 7.
+> >=20
+>=20>  Introduce tracing capability for sockmap, similar to XDP, to trace=
+ the
+> >=20
+>=20>  execution results of BPF programs without modifying the programs
+> >=20
+>=20>  themselves, similar to the existing trace_xdp_redirect{_map}.
+> >=20
+>=20>  It is crucial for debugging BPF programs, especially in production
+> >=20
+>=20>  environments.
+> >=20
+>=20>  Additionally, a header file was added to bpf_trace.h to automatica=
+lly
+> >=20
+>=20>  generate tracepoints.
+> >=20
+>=20>  Test results:
+> >=20
+>=20>  $ echo "1" > /sys/kernel/tracing/events/sockmap/enable
+> >=20
+>=20>  skb:
+> >=20
+>=20>  sockmap_redirect: sk=3D00000000d3266a8d, type=3Dskb, family=3D2, p=
+rotocol=3D6, \
+> >=20
+>=20>  prog_id=3D73, length=3D256, action=3DPASS
+> >=20
+>=20>  msg:
+> >=20
+>=20>  sockmap_redirect: sk=3D00000000528c7614, type=3Dmsg, family=3D2, p=
+rotocol=3D6, \
+> >=20
+>=20>  prog_id=3D185, length=3D5, action=3DREDIRECT
+> >=20
+>=20>  tls:
+> >=20
+>=20>  sockmap_redirect: sk=3D00000000d04d2224, type=3Dskb, family=3D2, p=
+rotocol=3D6, \
+> >=20
+>=20>  prog_id=3D143, length=3D35, action=3DPASS
+> >=20
+>=20>  strparser:
+> >=20
+>=20>  sockmap_skb_strp_parse: sk=3D00000000ecab0b30, family=3D2, protoco=
+l=3D6, \
+> >=20
+>=20>  prog_id=3D170, size=3D5
+> >=20
+>=20>  Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> >=20
+>=20>  ---
+> >=20
+>=20>  MAINTAINERS | 1 +
+> >=20
+>=20>  include/linux/bpf_trace.h | 2 +-
+> >=20
+>=20>  include/trace/events/sockmap.h | 89 ++++++++++++++++++++++++++++++=
+++++
+> >=20
+>=20>  net/core/skmsg.c | 6 +++
+> >=20
+>=20>  4 files changed, 97 insertions(+), 1 deletion(-)
+> >=20
+>=20>  create mode 100644 include/trace/events/sockmap.h
+> >=20
+>=20>  diff --git a/MAINTAINERS b/MAINTAINERS
+> >=20
+>=20>  index a7a1d121a83e..578e16d86853 100644
+> >=20
+>=20>  --- a/MAINTAINERS
+> >=20
+>=20>  +++ b/MAINTAINERS
+> >=20
+>=20>  @@ -4420,6 +4420,7 @@ L: netdev@vger.kernel.org
+> >=20
+>=20>  L: bpf@vger.kernel.org
+> >=20
+>=20>  S: Maintained
+> >=20
+>=20>  F: include/linux/skmsg.h
+> >=20
+>=20>  +F: include/trace/events/sockmap.h
+> >=20
+>=20>  F: net/core/skmsg.c
+> >=20
+>=20>  F: net/core/sock_map.c
+> >=20
+>=20>  F: net/ipv4/tcp_bpf.c
+> >=20
+>=20>  diff --git a/include/linux/bpf_trace.h b/include/linux/bpf_trace.h
+> >=20
+>=20>  index ddf896abcfb6..896346fb2b46 100644
+> >=20
+>=20>  --- a/include/linux/bpf_trace.h
+> >=20
+>=20>  +++ b/include/linux/bpf_trace.h
+> >=20
+>=20>  @@ -3,5 +3,5 @@
+> >=20
+>=20>  #define __LINUX_BPF_TRACE_H__
+> >=20
+>=20>=20=20
+>=20>=20
+>=20>  #include <trace/events/xdp.h>
+> >=20
+>=20>  -
+> >=20
+>=20>  +#include <trace/events/sockmap.h>
+> >=20
+>=20>  #endif /* __LINUX_BPF_TRACE_H__ */
+> >=20
+>=20>  diff --git a/include/trace/events/sockmap.h b/include/trace/events=
+/sockmap.h
+> >=20
+>=20>  new file mode 100644
+> >=20
+>=20>  index 000000000000..2a69b011e88f
+> >=20
+>=20>  --- /dev/null
+> >=20
+>=20>  +++ b/include/trace/events/sockmap.h
+> >=20
+>=20>  @@ -0,0 +1,89 @@
+> >=20
+>=20>  +/* SPDX-License-Identifier: GPL-2.0 */
+> >=20
+>=20>  +#undef TRACE_SYSTEM
+> >=20
+>=20>  +#define TRACE_SYSTEM sockmap
+> >=20
+>=20>  +
+> >=20
+>=20>  +#if !defined(_TRACE_SOCKMAP_H) || defined(TRACE_HEADER_MULTI_READ=
+)
+> >=20
+>=20>  +#define _TRACE_SOCKMAP_H
+> >=20
+>=20>  +
+> >=20
+>=20>  +#include <linux/filter.h>
+> >=20
+>=20>  +#include <linux/tracepoint.h>
+> >=20
+>=20>  +#include <linux/bpf.h>
+> >=20
+>=20>  +#include <linux/skmsg.h>
+> >=20
+>=20>  +
+> >=20
+>=20>  +TRACE_DEFINE_ENUM(__SK_DROP);
+> >=20
+>=20>  +TRACE_DEFINE_ENUM(__SK_PASS);
+> >=20
+>=20>  +TRACE_DEFINE_ENUM(__SK_REDIRECT);
+> >=20
+>=20>  +TRACE_DEFINE_ENUM(__SK_NONE);
+> >=20
+>=20>  +
+> >=20
+>=20>  +#define show_act(x) \
+> >=20
+>=20>  + __print_symbolic(x, \
+> >=20
+>=20>  + { __SK_DROP, "DROP" }, \
+> >=20
+>=20>  + { __SK_PASS, "PASS" }, \
+> >=20
+>=20>  + { __SK_REDIRECT, "REDIRECT" }, \
+> >=20
+>=20>  + { __SK_NONE, "NONE" })
+> >=20
+>=20>  +
+> >=20
+>=20>  +#define trace_sockmap_skmsg_redirect(sk, prog, msg, act) \
+> >=20
+>=20>  + trace_sockmap_redirect((sk), "msg", (prog), (msg)->sg.size, (act=
+))
+> >=20
+>=20>  +
+> >=20
+>=20>  +#define trace_sockmap_skb_redirect(sk, prog, skb, act) \
+> >=20
+>=20>  + trace_sockmap_redirect((sk), "skb", (prog), (skb)->len, (act))
+> >=20
+>=20>  +
+> >=20
+>=20>  +TRACE_EVENT(sockmap_redirect,
+> >=20
+>=20>  + TP_PROTO(const struct sock *sk, const char *type,
+> >=20
+>=20>  + const struct bpf_prog *prog, int length, int act),
+> >=20
+>=20>  + TP_ARGS(sk, type, prog, length, act),
+> >=20
+>=20>  +
+> >=20
+>=20>  + TP_STRUCT__entry(
+> >=20
+>=20>  + __field(const void *, sk)
+> >=20
+>=20>  + __field(const char *, type)
+> >=20
+>=20>  + __field(__u16, family)
+> >=20
+>=20>  + __field(__u16, protocol)
+> >=20
+>=20>  + __field(int, prog_id)
+> >=20
+>=20>  + __field(int, length)
+> >=20
+>=20>  + __field(int, act)
+> >=20
+>=20>  + ),
+> >=20
+>=20>  +
+> >=20
+>=20>  + TP_fast_assign(
+> >=20
+>=20>  + __entry->sk =3D sk;
+> >=20
+>=20>  + __entry->type =3D type;
+> >=20
+>=20>  + __entry->family =3D sk->sk_family;
+> >=20
+>=20>  + __entry->protocol =3D sk->sk_protocol;
+> >=20
+>=20>  + __entry->prog_id =3D prog->aux->id;
+> >=20
+>=20>  + __entry->length =3D length;
+> >=20
+>=20>  + __entry->act =3D act;
+> >=20
+>=20>  + ),
+> >=20
+>=20>  +
+> >=20
+>=20>  + TP_printk("sk=3D%p, type=3D%s, family=3D%d, protocol=3D%d, prog_=
+id=3D%d, length=3D%d, action=3D%s",
+> >=20
+>=20>  + __entry->sk, __entry->type, __entry->family, __entry->protocol,
+> >=20
+>=20>  + __entry->prog_id, __entry->length,
+> >=20
+>=20>  + show_act(__entry->act))
+> >=20
+>=20
+> sk address is useful if you're going to attach a bpf program to the
+> tracepoint. Not so much if you're printing the recorded trace.
+>=20
+>=20I'd print the netns and the socket inode instead, or in addition to.
+> These can be cross-referenced against `lsns` and `ss` output.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.15-rc2
+Good suggestions. I will print all of this.
+sk address helps us track connection more easily.
 
-for you to fetch changes up to eaa517b77e63442260640d875f824d1111ca6569:
-
-  ethtool: cmis_cdb: Fix incorrect read / write length extension (2025-04-10 14:32:43 +0200)
-
-----------------------------------------------------------------
-Including fixes from netfilter.
-
-Current release - regressions:
-
-  - core: hold instance lock during NETDEV_CHANGE
-
-  - rtnetlink: fix bad unlock balance in do_setlink().
-
-  - ipv6:
-    - fix null-ptr-deref in addrconf_add_ifaddr().
-    - align behavior across nexthops during path selection
-
-Previous releases - regressions:
-
-  - sctp: prevent transport UaF in sendmsg
-
-  - mptcp: only inc MPJoinAckHMacFailure for HMAC failures
-
-Previous releases - always broken:
-
-  - sched:
-    - make ->qlen_notify() idempotent
-    - ensure sufficient space when sending filter netlink notifications
-    - sch_sfq: really don't allow 1 packet limit
-
-  - netfilter: fix incorrect avx2 match of 5th field octet
-
-  - tls: explicitly disallow disconnect
-
-  - eth: octeontx2-pf: fix VF root node parent queue priority
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-
-----------------------------------------------------------------
-Arnaud Lecomte (1):
-      net: ppp: Add bound checking for skb data on ppp_sync_txmung
-
-Chenyuan Yang (1):
-      net: libwx: handle page_pool_dev_alloc_pages error
-
-Cong Wang (11):
-      sch_htb: make htb_qlen_notify() idempotent
-      sch_drr: make drr_qlen_notify() idempotent
-      sch_hfsc: make hfsc_qlen_notify() idempotent
-      sch_qfq: make qfq_qlen_notify() idempotent
-      sch_ets: make est_qlen_notify() idempotent
-      codel: remove sch->q.qlen check before qdisc_tree_reduce_backlog()
-      selftests/tc-testing: Add a test case for FQ_CODEL with HTB parent
-      selftests/tc-testing: Add a test case for FQ_CODEL with QFQ parent
-      selftests/tc-testing: Add a test case for FQ_CODEL with HFSC parent
-      selftests/tc-testing: Add a test case for FQ_CODEL with DRR parent
-      selftests/tc-testing: Add a test case for FQ_CODEL with ETS parent
-
-David S. Miller (1):
-      Merge branch 'sch_sfq-derived-limit'
-
-Florian Westphal (2):
-      nft_set_pipapo: fix incorrect avx2 match of 5th field octet
-      selftests: netfilter: add test case for recent mismatch bug
-
-Hariprasad Kelam (1):
-      octeontx2-pf: qos: fix VF root node parent queue index
-
-Ido Schimmel (2):
-      ipv6: Align behavior across nexthops during path selection
-      ethtool: cmis_cdb: Fix incorrect read / write length extension
-
-Jakub Kicinski (4):
-      Merge branch 'fix-wrong-hds-thresh-value-setting'
-      net: tls: explicitly disallow disconnect
-      selftests: tls: check that disconnect does nothing
-      Merge branch 'mptcp-only-inc-mpjoinackhmacfailure-for-hmac-failures'
-
-Jiawen Wu (1):
-      net: libwx: Fix the wrong Rx descriptor field
-
-Kuniyuki Iwashima (3):
-      ipv6: Fix null-ptr-deref in addrconf_add_ifaddr().
-      rtnetlink: Fix bad unlock balance in do_setlink().
-      net: Fix null-ptr-deref by sock_lock_init_class_and_name() and rmmod.
-
-Matthieu Baerts (NGI0) (2):
-      mptcp: only inc MPJoinAckHMacFailure for HMAC failures
-      selftests: mptcp: validate MPJoin HMacFailure counters
-
-Maxime Chevallier (1):
-      net: ethtool: Don't call .cleanup_data when prepare_data fails
-
-Octavian Purdila (3):
-      net_sched: sch_sfq: use a temporary work area for validating configuration
-      net_sched: sch_sfq: move the limit validation
-      selftests/tc-testing: sfq: check that a derived limit of 1 is rejected
-
-Paolo Abeni (2):
-      Merge branch 'net_sched-make-qlen_notify-idempotent'
-      Merge tag 'nf-25-04-10' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
-
-Ricardo Cañuelo Navarro (1):
-      sctp: detect and prevent references to a freed transport in sendmsg
-
-Stanislav Fomichev (1):
-      net: hold instance lock during NETDEV_CHANGE
-
-Taehee Yoo (2):
-      net: ethtool: fix ethtool_ringparam_get_cfg() returns a hds_thresh value always as 0.
-      selftests: drv-net: test random value for hds-thresh
-
-Toke Høiland-Jørgensen (1):
-      tc: Ensure we have enough buffer space when sending filter netlink notifications
-
-Tung Nguyen (1):
-      tipc: fix memory leak in tipc_link_xmit
-
-Vladimir Oltean (2):
-      net: phy: move phy_link_change() prior to mdio_bus_phy_may_suspend()
-      net: phy: allow MDIO bus PM ops to start/stop state machine for phylink-controlled PHY
-
- Documentation/networking/netdevices.rst            |  10 +-
- drivers/net/ethernet/marvell/octeontx2/nic/qos.c   |   5 +
- drivers/net/ethernet/wangxun/libwx/wx_lib.c        |   6 +-
- drivers/net/ethernet/wangxun/libwx/wx_type.h       |   3 +-
- drivers/net/phy/phy_device.c                       |  57 ++++++--
- drivers/net/ppp/ppp_synctty.c                      |   5 +
- include/linux/netdevice.h                          |   2 +
- include/linux/rtnetlink.h                          |   2 +-
- include/net/sctp/structs.h                         |   3 +-
- include/net/sock.h                                 |  40 +++++-
- net/core/dev.c                                     |  11 +-
- net/core/dev_api.c                                 |  16 +++
- net/core/link_watch.c                              |  28 +++-
- net/core/lock_debug.c                              |   2 +-
- net/core/rtnetlink.c                               |  17 ++-
- net/core/sock.c                                    |   5 +
- net/ethtool/cmis.h                                 |   1 -
- net/ethtool/cmis_cdb.c                             |  18 +--
- net/ethtool/common.c                               |   1 +
- net/ethtool/ioctl.c                                |   2 +-
- net/ethtool/netlink.c                              |   8 +-
- net/hsr/hsr_device.c                               |   6 +-
- net/ipv6/addrconf.c                                |   9 +-
- net/ipv6/route.c                                   |   8 +-
- net/mptcp/subflow.c                                |   8 +-
- net/netfilter/nft_set_pipapo_avx2.c                |   3 +-
- net/sched/cls_api.c                                |  66 ++++++---
- net/sched/sch_codel.c                              |   5 +-
- net/sched/sch_drr.c                                |   7 +-
- net/sched/sch_ets.c                                |   8 +-
- net/sched/sch_fq_codel.c                           |   6 +-
- net/sched/sch_hfsc.c                               |   8 +-
- net/sched/sch_htb.c                                |   2 +
- net/sched/sch_qfq.c                                |   7 +-
- net/sched/sch_sfq.c                                |  66 ++++++---
- net/sctp/socket.c                                  |  22 +--
- net/sctp/transport.c                               |   2 +
- net/tipc/link.c                                    |   1 +
- net/tls/tls_main.c                                 |   6 +
- tools/testing/selftests/drivers/net/hds.py         |  33 ++++-
- tools/testing/selftests/net/mptcp/mptcp_join.sh    |  18 +++
- .../selftests/net/netfilter/nft_concat_range.sh    |  39 +++++-
- tools/testing/selftests/net/tls.c                  |  36 +++++
- .../tc-testing/tc-tests/infra/qdiscs.json          | 155 +++++++++++++++++++++
- .../selftests/tc-testing/tc-tests/qdiscs/sfq.json  |  36 +++++
- 45 files changed, 649 insertions(+), 150 deletions(-)
-
+Thanks~
 
