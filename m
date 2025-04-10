@@ -1,64 +1,100 @@
-Return-Path: <netdev+bounces-181183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DBD5A8402E
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:11:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EB86A8403C
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:12:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E60D59E4F73
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 10:05:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45B769E8236
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 10:06:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAD6F26F47B;
-	Thu, 10 Apr 2025 10:03:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D70027703A;
+	Thu, 10 Apr 2025 10:04:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Uta5NtAj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KtOVvpn4"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F773267F70;
-	Thu, 10 Apr 2025 10:03:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3003C27C154;
+	Thu, 10 Apr 2025 10:04:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744279403; cv=none; b=Je9/2pIFLhU4EpxUGDHeI7L/+QxKBEdK7cGsgWQgJCpRrr4SSah4Qa38gXmu5cfritarHVElxdduTbNC/iV+i+uJ3MZs/ozm/g1nJo7fOgmLNg3OA9rMwGBgeDCVvYvuiMTrfRs8+sVfVFtQx2RSWK+EI0b1L7u388XqNt+Hymg=
+	t=1744279481; cv=none; b=fdjd7wDWMoH4g8nCCLWTWNs2WxRzrck3emceZFxXn4abVBGWCp1I+EX9aOrogIqhaXfUfvc6ndjHPQtQrTchZYW/gI6DTY/QdWr0KqPxM+sVzea1SayccIVJ1E52CuzFRmxFSjdEIchKzgj06uepsbLUvnVr7BRnNHYVbcJR78U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744279403; c=relaxed/simple;
-	bh=lmppQfbdrQUGQjfQF8ivePB/2k4sgLFbvW5qYbiK03A=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KN9ZkxiUANTnajhBDMpXjv+rVR5Ww+D5VBz5l19OFxpWqD1NCJTEsEdKOkg7upnRWCWfqZ3iWgz8YAf7M3LHDTQyH7fxn5VVamV9Y0JvaqLKBA+BO5dONFg/pCdmt3lxPeosaFykp8RyLDEoYdkjuDssHu7gstZrbJLZJV4v9Vg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Uta5NtAj; arc=none smtp.client-ip=220.197.31.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=Jo0rD
-	BCUe7dubutz5qYlyihW1Ld3IGN6iN2C5WAGgvg=; b=Uta5NtAjXZSSn6RDFkBTB
-	hlBqqHRksDOPTSeJ8PEE36y7YJ5NypKkHU2FU//kJlqIyj4hoPacbwgZN8g0gRj2
-	PJC9PhZDl+73TXoKZXE/0tgl1aFxBcpVjgDRls9isv6ZwKckcC/CoNfri9jQZK7k
-	ZoTxr8GG6F+LbcPgQu2ExI=
-Received: from localhost.localdomain (unknown [])
-	by gzga-smtp-mtada-g1-1 (Coremail) with SMTP id _____wAnhDEzl_dnH5BEFg--.53412S4;
-	Thu, 10 Apr 2025 18:02:28 +0800 (CST)
-From: lvxiafei <xiafei_xupt@163.com>
-To: fw@strlen.de
-Cc: coreteam@netfilter.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	kadlec@netfilter.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvxiafei@sensetime.com,
+	s=arc-20240116; t=1744279481; c=relaxed/simple;
+	bh=53aga9KLw7CyaLcjpeYJsQ9Pcd736QUc9PfvgXuscs4=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=XGw50gyZJmeLb+jOaRuljfXy4cn7Lgs3SJy+ZEofTCbp+jJoFILLbU21qdVb/ZVtANil6y3h9JSWEoTQS+9mfr4PeZB/QHf8PYwtTLrHc+cOv2T2EsllCPoMi3lkoGo4qUjd5kdjVQei9QnMxrlMjKSRNYgarHMOaNmXfCvIcAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KtOVvpn4; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-43ed8d32a95so5518435e9.3;
+        Thu, 10 Apr 2025 03:04:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744279478; x=1744884278; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OSjX1b+D+//GtnfnALVS0VRTFNxvnCOVfJgFbEnwUWA=;
+        b=KtOVvpn4T+oO7sopHK1KZ1352//Bibg/YBmvGycFA5GR31zp4gSqCVB4Us381Jh0qo
+         BkdFb42U6jgFQcAJl5WLalmOVVrMtMwvWQtR2yKZgY3wAKVbvGU+PpD1jmHI+A4wc6l2
+         qTNRyhI/JSdffNaLbec5GaA7r3iizPGUhncT1mq/H04PYX+1aLu1RYCVjXm6+8xuEnJU
+         KO8yNdn3Vrj+vf/eiGt6V6U0tiuColrI8lHiLU8iM2IxE32UuzbSoHyHa2OLJ6DxAxYf
+         yz76dE16G8vWT00PknPDx6aYKCO3pUN1VvyGtmM9MJsX31Feqk8qDnZmSOcpGlswe1SV
+         vFbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744279478; x=1744884278;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OSjX1b+D+//GtnfnALVS0VRTFNxvnCOVfJgFbEnwUWA=;
+        b=FJIavrGAgUm0YRyns9y1i3ZChkmckRKGVcLN2sEqZF84Ulz662gmwMd2HIVQ4ESX15
+         N+4zpjsaOWrnUZX7nUzxNpa3o/ha7I/SNtB+Q28UL6Vym9B79LBdkiG45CD2p5aOv+RE
+         pkD370J5FiewlstIQTfNa6tpulDYyEj/tTE1O8Tjiq4n0vG8lR+w39d1DuS5kn739+gB
+         2ZFyEi4dAYIkUF+duhxJVS4Mvkx1acTJ9HqWFKyhctolOtOd8xaLspH4qA1VtVJuE1LO
+         /K74m5OdlGABqeIZDvvAN2s6+61jOPnYH++0UMlVzTawF4lPy8nEVxuR/WFYRUkwXkKq
+         FVKw==
+X-Forwarded-Encrypted: i=1; AJvYcCURy0Xz5CZRIJH8zPLBR5XPiiH0SrK6ONWxH7nOJ1hzz1yAN/87dcVoeV2WwMmYQ6iTL9fQgHldPe8mspE=@vger.kernel.org, AJvYcCVtOPikzZb9BCh/REI7a3yCFKnLxsNtVaBunQA/+aNKVlEF+w5bE4TvGk+DGJonxtPgvrQ0J59J@vger.kernel.org
+X-Gm-Message-State: AOJu0YwtLMpVaizN8OoasiPprYcdIF0oQHmKXR7NHf/DsitgPqSfs5Hi
+	Acb+YUEqN65l9EQEt9TKeiwDP9rmq0+/DoaQr+Y73v78Laaje0iV
+X-Gm-Gg: ASbGncvXIr2Xes4nZcikQUv9XgaY4AOco9N++QajfFX0qgBPqNd5eayyMWcJRMEuoH0
+	SMGUNm/eAjTqLKC54ouGxcnZsoR4anONTpslLLkFbdNlGcyfnZKaAK84ehixxFAENewE3K8mJD1
+	anjwUoqvb6FpZV0YzGr/Ereo2y2zYPmCtUdTBdrKZ7jIo3xKbIAZE7jTeaKjOCEHMjNWX4IEBUI
+	B+uoO3EnW3BG6gIhFEkooX6DFPRzO/oOGAZltrWPgaRLokrDR1ZXN9UlqBRaX2mN41R4PC4OW8q
+	UiWU6EUflfFJZnG1dd+eJ6c9xJZ4e9YA9o2kObrS3QfNuLJJIrq8a6YmDy8HKDsPWJ6WR7Zigx2
+	ZoPch1TkfGg==
+X-Google-Smtp-Source: AGHT+IE9rkx7s3lGoXoLv/0fYUbWZ4s7nji/vh3GglXy7KHxv51ZdIrScMmpN4ZbQ9rN1ZnOv01rZg==
+X-Received: by 2002:a05:600c:4ed0:b0:43d:7588:66a5 with SMTP id 5b1f17b1804b1-43f2d9a12bcmr24466125e9.31.1744279478201;
+        Thu, 10 Apr 2025 03:04:38 -0700 (PDT)
+Received: from localhost.localdomain (93-34-88-225.ip49.fastwebnet.it. [93.34.88.225])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-43f2066d109sm50193065e9.20.2025.04.10.03.04.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Apr 2025 03:04:37 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Simon Horman <horms@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
 	netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	pabeni@redhat.com,
-	pablo@netfilter.org,
-	xiafei_xupt@163.com
-Subject: Re: [PATCH V3] netfilter: netns nf_conntrack: per-netns net.netfilter.nf_conntrack_max sysctl
-Date: Thu, 10 Apr 2025 18:02:27 +0800
-Message-Id: <20250410100227.83156-1-xiafei_xupt@163.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20250409094206.GB17911@breakpoint.cc>
-References: <20250409094206.GB17911@breakpoint.cc>
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [net-next PATCH v2 1/2] net: phy: mediatek: permit to compile test GE SOC PHY driver
+Date: Thu, 10 Apr 2025 12:04:03 +0200
+Message-ID: <20250410100410.348-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,72 +102,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wAnhDEzl_dnH5BEFg--.53412S4
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Kw4rKFyfZw1fGFWftw47Arb_yoW8tF4rpw
-	4rt39rJw1DJrs0y3WUX3sFyFsYv3yfAa1Y9Fn8GF95u3ZrKr15Cr45tFyfXryvkr1xKF1S
-	yw4j9ry5Aa10yFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0JUhF4_UUUUU=
-X-CM-SenderInfo: x0ldwvplb031rw6rljoofrz/1tbiKAwqU2f2zrGtbwACsz
 
-Florian Westphal <fw@strlen.de> wrote:
-> net.netfilter.nf_conntrack_max
-> is replaced by init_net.nf_conntrack_max in your patch.
->
-> But not net.nf_conntrack_max, so they are now different and not
-> related at all anymore except that the latter overrides the former
-> even in init_net.
->
-> I'm not sure this is sane.  And it needs an update to
-> Documentation/networking/nf_conntrack-sysctl.rst
+When commit 462a3daad679 ("net: phy: mediatek: fix compile-test
+dependencies") fixed the dependency, it should have also introduced
+an or on COMPILE_TEST to permit this driver to be compile-tested even if
+NVMEM_MTK_EFUSE wasn't selected. The driver makes use of NVMEM API that
+are always compiled (return error) so the driver can actually be
+compiled even without that config.
 
-Yes, it needs an update to
-Documentation/networking/nf_conntrack-sysctl.rst.
+Fix and simplify the dependency condition of this kernel config.
 
-in different netns,
-net.netfilter.nf_conntrack_max = init_net.ct.sysctl_max;
-the global (ancestral) limit,
-net.nf_conntrack_max = nf_conntrack_max = max_factor * nf_conntrack_htable_size;
+Fixes: 462a3daad679 ("net: phy: mediatek: fix compile-test dependencies")
+Acked-by: Daniel Golle <daniel@makrotopia.org>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+---
+Changes v2:
+- Add Ack and Reviewed-by tag
+- Address suggested dependency from Russell
 
-> in any case.
->
-> Also:
->
-> -       if (nf_conntrack_max && unlikely(ct_count > nf_conntrack_max)) {
-> +       if (net->ct.sysctl_max && unlikely(ct_count > min(nf_conntrack_max, net->ct.sysctl_max))) {
->
->
-> ... can't be right, this allows a 0 setting in the netns.
-> So, setting 0 in non-init-net must be disallowed.
+ drivers/net/phy/mediatek/Kconfig | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Yes, setting 0 in non-init-net must be disallowed.
-
-Should be used:
-unsigned int net_ct_sysctl_max = max(min(nf_conntrack_max, net->ct.sysctl_max), 0);
-if (nf_conntrack_max && unlikely(ct_count > net_ct_sysctl_max)) {
-
-min(nf_conntrack_max, net->ct.sysctl_max) is the upper limit of ct_count
-At the same time, when net->ct.sysctl_max == 0, the original intention is no limit,
-but it can be limited by nf_conntrack_max in different netns.
-
-> I suggest to remove nf_conntrack_max as a global variable,
-> make net.nf_conntrack_max use init_net.nf_conntrack_max too internally,
-> so in the init_net both sysctls remain the same.
->
-> Then, change __nf_conntrack_alloc() to do:
->
-> unsigned int nf_conntrack_max = min(net->ct.sysctl_max, &init_net.ct.sysctl_max);
->
-> and leave the if-condition as is, i.e.:
->
-> if (nf_conntrack_max && unlikely(ct_count > nf_conntrack_max)) { ...
-
-Yes, each netns can pick an arbitrary value (but not 0, this ability needs to
-be removed).
-
-Should be used:
-unsigned int nf_conntrack_max = max(min(net->ct.sysctl_max, init_net.ct.sysctl_max, 0);
-
-This also needs an update to Documentation/networking/nf_conntrack-sysctl.rst
-to explain the restrictions.
+diff --git a/drivers/net/phy/mediatek/Kconfig b/drivers/net/phy/mediatek/Kconfig
+index 2a8ac5aed0f8..6a4c2b328c41 100644
+--- a/drivers/net/phy/mediatek/Kconfig
++++ b/drivers/net/phy/mediatek/Kconfig
+@@ -15,8 +15,7 @@ config MEDIATEK_GE_PHY
+ 
+ config MEDIATEK_GE_SOC_PHY
+ 	tristate "MediaTek SoC Ethernet PHYs"
+-	depends on (ARM64 && ARCH_MEDIATEK) || COMPILE_TEST
+-	depends on NVMEM_MTK_EFUSE
++	depends on (ARM64 && ARCH_MEDIATEK && NVMEM_MTK_EFUSE) || COMPILE_TEST
+ 	select MTK_NET_PHYLIB
+ 	help
+ 	  Supports MediaTek SoC built-in Gigabit Ethernet PHYs.
+-- 
+2.48.1
 
 
