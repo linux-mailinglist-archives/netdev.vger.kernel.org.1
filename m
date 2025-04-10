@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-181263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C90FEA84381
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:44:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 41E57A84383
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:44:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 555FE1762EC
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:40:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A6144A4BAD
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:40:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9473C284B5B;
-	Thu, 10 Apr 2025 12:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 327BC2853FA;
+	Thu, 10 Apr 2025 12:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="foBFv3Lm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UQIW1YN8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A36D284B4B;
-	Thu, 10 Apr 2025 12:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E447284B4B
+	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 12:40:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744288803; cv=none; b=dXKDkuKnTtn91bsbekq/LsLmL9PuFLpAEs1aELj+2SSNfzHcNWPgMkmAf9ubK7bldIa7yD2fbkzOOrgdIOJvtAQJgi2cuhz1KJZ/XDfBTVfrIZgLtX0UmgZ2RrcIK1EdcZcSBz+MCYfNthfvyv74fmnQeH/oE4DHCDFICVpSRlg=
+	t=1744288805; cv=none; b=TeF6H52/i9qp7N3cHgfUkx5vRaRyBg1V7zjiBjkmzStKX23y0ANr+gOx7GB7IvNlad+z4kBxxt9R4GoILhEq+1FQNBITvY89bln4u9teB7/ZdPZOxor32kEfk6ITuP4dAUdbP7DNRk/G7gVbgbm1d/GvnJuwqUCRia58v/xakbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744288803; c=relaxed/simple;
-	bh=jZtzN/+Cb6gOitadW2d3v4gSNHImegz7YXSWHHoo5OM=;
+	s=arc-20240116; t=1744288805; c=relaxed/simple;
+	bh=+1/TGOpczVD0Su+kju5DpaZRmGMZI+EkUDlmNF4Kvqk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=D29KraCavj2GAI35grCA/lYm65ffOA74wEuoBelWDj0NqbNkr2z7UjauBsnrs5CoQ6jkoHSFgYC8883nCcjk8V6NQsGphHQGFIzcmkycwOBj3ebInGAJKiv6YfBL/xMTQUb4mo4cXdLzgrtasakPk+0y3j8YY6PM2qaGd4fCJbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=foBFv3Lm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4096AC4CEDD;
-	Thu, 10 Apr 2025 12:40:03 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ThiMGczLqJT9CmwgL+eMhrAPUxbEaJyEJtB72WoE3S6hLaGJYT4KcGazlSPJ31BEifxiDTRSi/0DEyzCorwyr2obsc+BJy13WPVEJI6VMxRH55AYcL8IwldCnsrZrQamrGxYsYpuHRfW8S5qHDWh2vEeKCGZbO0QzqtshOp1oeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UQIW1YN8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78E95C4CEE9;
+	Thu, 10 Apr 2025 12:40:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744288803;
-	bh=jZtzN/+Cb6gOitadW2d3v4gSNHImegz7YXSWHHoo5OM=;
+	s=k20201202; t=1744288804;
+	bh=+1/TGOpczVD0Su+kju5DpaZRmGMZI+EkUDlmNF4Kvqk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=foBFv3LmT7zeJV9DYKupnQgXFsdcQDuyuULXQc+VS2eIdR+YjsuA1CgBnr4kvp5fp
-	 h3EP4TyMYvglYDrqXihmCGBzeOFVeVM90zbmFs+UpWx8YhB4DQnsCu/2Lmj4oFwAYn
-	 DQ8clJgm1R+fBAc6adOoEQ5CjD7YMgF9QgEiLpC+hY4M+cnihWwdU8DqU9Br+hHRtq
-	 cu0wJJHAZqPVVt27SSSQax9X4Vl/ie5+STFGpmbVeXMp8UmugctXzexvTzgHXpgW2W
-	 d6fZqvSWMmma129gwGp1cy5+rn0KEfR8fnWiRBRVvj92j9USfy+Ms7s3Ssgwu5SRoH
-	 86sS5jhWgALAA==
+	b=UQIW1YN8U25FrwYI+5Fm3GDg3wFsAXntxwQi4E0EbL9mYDiLkX5Mw7inT5hEuW1u2
+	 S0qSA5aWGaYJxJYGyz0wI0304rCJXgOqU6hpx93mBzLnHF01/jpQgTIpYKz66B1CaV
+	 PeSyYVSXT+MnZluDy7rBkjM/rkg2C5LZZbmcRYiZLGQastl5AULVxWe7J0aB+a0riE
+	 B1OL9GV7p2uLafpElRpMmQExNBiV5PwWkSkEuc3A2nVmJgJi/z7Z9PdbHoDbkhv4R8
+	 bQZZEDBTdMQKkfWavK5c1BcvBltVzmJtSBAgvk1jHFGIvpTvRCp6jK26pihij2UlAF
+	 dq7aDMoTT5dEQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 001AE380CEF4;
-	Thu, 10 Apr 2025 12:40:41 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34193380CEF4;
+	Thu, 10 Apr 2025 12:40:43 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/2] nft_set_pipapo: fix incorrect avx2 match of 5th field
- octet
+Subject: Re: [PATCH net] ethtool: cmis_cdb: Fix incorrect read / write length
+ extension
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174428884093.3651632.8182681897819384772.git-patchwork-notify@kernel.org>
-Date: Thu, 10 Apr 2025 12:40:40 +0000
-References: <20250410103647.1030244-2-pablo@netfilter.org>
-In-Reply-To: <20250410103647.1030244-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de, horms@kernel.org
+ <174428884203.3651632.2197341307164250382.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Apr 2025 12:40:42 +0000
+References: <20250409112440.365672-1-idosch@nvidia.com>
+In-Reply-To: <20250409112440.365672-1-idosch@nvidia.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, horms@kernel.org,
+ danieller@nvidia.com, petrm@nvidia.com, andrew@lunn.ch,
+ damodharam.ammepalli@broadcom.com, michael.chan@broadcom.com,
+ andrew.gospodarek@broadcom.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On Thu, 10 Apr 2025 12:36:46 +0200 you wrote:
-> From: Florian Westphal <fw@strlen.de>
+On Wed, 9 Apr 2025 14:24:40 +0300 you wrote:
+> The 'read_write_len_ext' field in 'struct ethtool_cmis_cdb_cmd_args'
+> stores the maximum number of bytes that can be read from or written to
+> the Local Payload (LPL) page in a single multi-byte access.
 > 
-> Given a set element like:
-> 
-> 	icmpv6 . dead:beef:00ff::1
-> 
-> The value of 'ff' is irrelevant, any address will be matched
-> as long as the other octets are the same.
+> Cited commit started overwriting this field with the maximum number of
+> bytes that can be read from or written to the Extended Payload (LPL)
+> pages in a single multi-byte access. Transceiver modules that support
+> auto paging can advertise a number larger than 255 which is problematic
+> as 'read_write_len_ext' is a 'u8', resulting in the number getting
+> truncated and firmware flashing failing [1].
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/2] nft_set_pipapo: fix incorrect avx2 match of 5th field octet
-    https://git.kernel.org/netdev/net/c/e042ed950d4e
-  - [net,2/2] selftests: netfilter: add test case for recent mismatch bug
-    https://git.kernel.org/netdev/net/c/27eb86e22f10
+  - [net] ethtool: cmis_cdb: Fix incorrect read / write length extension
+    https://git.kernel.org/netdev/net/c/eaa517b77e63
 
 You are awesome, thank you!
 -- 
