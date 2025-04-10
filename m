@@ -1,138 +1,127 @@
-Return-Path: <netdev+bounces-181431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EA71A84F8A
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 00:15:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F6C0A84F99
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 00:25:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B20C4C79AD
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 22:15:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 411E89A2A77
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 22:25:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC31E20C47B;
-	Thu, 10 Apr 2025 22:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE53420E003;
+	Thu, 10 Apr 2025 22:25:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RkYh24IS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ODCwvPht"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1111BAD5E;
-	Thu, 10 Apr 2025 22:15:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00AF720DD51
+	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 22:25:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744323335; cv=none; b=euuxiwl9POjdmnaoz3o9L/UkLkGQqB4vvMpQ3YgpBsxsuZokY1v+QA7p1jfeidVIcwfjdM9qffMY6WpHLPfiTOP7Nslltk/GZZewcRzpVBqltTQEzmQq+Cv2E6GhXcsSHOmawLg4uAuPdyWeVWuajpXKcM7StMjXBA07UkQZD/I=
+	t=1744323923; cv=none; b=QaTUemkp3Vumzpf6nSz9aj/PhTmbHzv1xyw7omRiXI5XflLtou7qLa3VPD39UC38l3clNJEWpWQBn4shf1wqA3Y9lvu2EfjS9AluI+Sm9PVNck3N9lluzj/+iCZMknd4coV2LlczT/a/XXKEU6Xahh2vVgy33m3ICcQjde4Ew6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744323335; c=relaxed/simple;
-	bh=eD7OpbrV355NOsVgIK+u+xFAJHuoZLTjFTxvYn3y7kk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fkSqFtDIGMu5XIiten+Db2t+BCWaPuPU0LFnPhaJLfOqbA2L0rN/La+AO9eXqyQ5Q2fCgfCczeiHQwtCWEtPkw3pdBu4ToG/tLFxQJGFoLBzcnUSsEtq9BB6CPEN13fxMkLXePFVOfwYK1KC2Xs2pEChZ5w1zxyESy3GgxHpQrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RkYh24IS; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4394a0c65fcso14645555e9.1;
-        Thu, 10 Apr 2025 15:15:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744323332; x=1744928132; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2D0fm6noiDhUqbW229izXLjEq5gR5IU1/g8b5nJLWms=;
-        b=RkYh24ISbo9RkfQU0dZlXu3EXNQo7RUSnionBaRfRBBcp2inqlZF36mCVjQ46sjDhc
-         QChEqEriNep5CmLl5Jz3jOuUIVjNcbqFuc2d6i3/xfLqsCnkJkMtRLJoUNBsO/VIyUYs
-         ZnrbEzPFrH7VbSx0UpMOWlNPmQPuV7fl3/H2+/+6LUOLf3Yn+YNj8Mm3D7E3aa7CGPU5
-         Z0ZFi+z2/wdb4Jp2M0h2c0+/eWUJOYywlgEKi2J0D7D1isJ1Q2y7mNRdI7/rA4MzDY8s
-         crhjf/8OuntNy3xGS7KOjGBciFlSWbwWqwYhOSBx6euTMHrxHrjdxbOi45R9z9FA8B0H
-         Cj0w==
+	s=arc-20240116; t=1744323923; c=relaxed/simple;
+	bh=mfywADYqJ4ew9xI3CclYYcgrZFl/YoOSYDIBc9Dd5cU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pmTGb0M1HSNp9O3XsSWZn2MjdLiqXCfcsJo//vwI3bLQDFru0BfBbCffmOA0KkxaJJsKuMSdhROyn2rueEAEXhpR88lhqFZaGSiDarqBXBZXvnG2m105+odugWcAE2hCl2aQum4/NPwAzQ5/LQFvvDYly+l3JzQhR9H09PjgIas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ODCwvPht; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744323920;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WYR4fCas43gwQw++5uVITo+VmUSNg0r33Tx+gqd6wEw=;
+	b=ODCwvPhtAlOznRhuW3gn6LYvi0U256nNQznMxqZ+b53kHFhpx7wdrLxeuynL8X0Azws62e
+	dwaHPaGJX7rzLF1Wk3w1m++7h3XaAGc6MFn4ajZ44EORHNLH3lh+GOr1wKFQMBuaKz5OrD
+	hqB0jZzyZUEyJh4UUPx4l42QGonpBV8=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-166-yy8NJML9OWK3HZ1QGpIVcQ-1; Thu, 10 Apr 2025 18:25:19 -0400
+X-MC-Unique: yy8NJML9OWK3HZ1QGpIVcQ-1
+X-Mimecast-MFC-AGG-ID: yy8NJML9OWK3HZ1QGpIVcQ_1744323919
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-85e7be4c906so12212939f.3
+        for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 15:25:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744323332; x=1744928132;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2D0fm6noiDhUqbW229izXLjEq5gR5IU1/g8b5nJLWms=;
-        b=eh3fCqnlLH4iXvTCPwac21L965Q8IkKTqOSxFmppylwg2JbMjpLJA1V9WXCQ5+fEyK
-         gv48oSwj26tkn7Gjm8ExwvnEJZiVzdjQnFxtIN45bgKNNHgTIpCIvPy7I96AeaCfmiW6
-         5mVOX+4MkAPv09J9aWbs7KZ2WiWNWiLFwRgNpcDWmxBC34m95NxqT9PYlETBW+0oCJPB
-         SHvpSZiEH5f7tp1mAzQVu9AJjY9VwvjuuFwFghpgnYKMrwaoqxWza2FvTyyMyZ6bKLiA
-         YnEUvbrnYWTYm+Bjx/AU+h84XtzS7d9m56CQqPcYwQPQtQ9L2Su09LAIcSotR1eQsf17
-         GqLg==
-X-Forwarded-Encrypted: i=1; AJvYcCUU/VKL3+KGMKVwANWLbClXk/RrM9p+3ZrO59EcCeuyGwIlluXoVwWiME76TpKJHWsVTT0UBOfYAEaKXUo=@vger.kernel.org, AJvYcCUnOZuqDiW809C2kTpn7tXwJ4e78AAkNYYg8xF11egYnUOOuHJgT3zFb3Qa23tOQRxcRLW6ihYI20dg@vger.kernel.org, AJvYcCXuorECJr9W7K//DFdkZtrGyKmUtqUJRYuY97sjc+dt+eKftExj8MIPBbEwwBL6ETBIXlASQ3Ld@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgXISl6pvdpttlDj5E4ukBvu3uSVEIQ0iMpK+KkOKxgNHt/jX1
-	LPN0h6Y9//ACWvnMQ9Ay2aOeT4sJ4Lp0lRX1oV9EnbiqdXOYTlZH
-X-Gm-Gg: ASbGncv+GP0+V+XavxzJyO6YML8eECd+927f3L+6ldsZNsHFbjVJWSuQbx1hS9gP44X
-	MgQe2QeEymNo9gsfDyoAhfnf2I1Vhrtpd50f+YJG2EcCJ4TTEdQxPGA/d6y/jiFxOSUsnuPBLxt
-	5gi9d6YLHhE3Nokf6k3b2gis/pTPkZEsTMhck1P+hJBPDUy/4AcAC3j68LGoqbmLNtxY5Dnb+29
-	BPepIEgoQBDEBpKS2skQnuajQcwjZIc/ytU+glmAyVw7aXF2PwiobfVeHilkuhU5JHHjatKkMpb
-	+RlRfmt4gUcMmN/vkpxsO4pW94qwbeDJ2eUSDjG9EMNY
-X-Google-Smtp-Source: AGHT+IGFZ4o1lTVxW+yAhuxVsX9mcVfiNdXCNZsSNdzp8rAl0RUCEbUwySvdn6Xq8tbTeM0CQsze8A==
-X-Received: by 2002:a5d:59a3:0:b0:390:e1e0:1300 with SMTP id ffacd0b85a97d-39eaaea4548mr215313f8f.33.1744323332170;
-        Thu, 10 Apr 2025 15:15:32 -0700 (PDT)
-Received: from qasdev.system ([2a02:c7c:6696:8300:a7c3:c7a5:ff1b:f4fa])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eaf445270sm151066f8f.81.2025.04.10.15.15.31
+        d=1e100.net; s=20230601; t=1744323919; x=1744928719;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WYR4fCas43gwQw++5uVITo+VmUSNg0r33Tx+gqd6wEw=;
+        b=diqL5Ew5BIQmkO+JeIZRtBtN9AAqzk/sRlFtVA1rcJgRj2JZ4RlPfDVtg3/Bixg4b0
+         dkcD2VSXZH9epu75VzyBpmMHOoXFoeUyQFYW14mQIIuj55WyWhy52+cLgbOHtsXvRswz
+         5cJ5a94Ar4U4BawZo7hiPieCT1Fc50cnzMjPTLn4dANEL32seNEgKXJNevbzgJj0nkyj
+         X4dXgvHt4o4LRKz82PJfmHOgV5YHYZQ6v6LdoNelip9goeYpAIU5MmfIWOxDnVIz+RA1
+         pQwKxoR9cy5pLKW/QOEErPo0e21v2asgkjyO+9oTSKkIuEzXXTaLXKbQRsbbF1z4G9fR
+         XgKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX0G/lwvclAdLaUj9RTu4KXr/iZDwtkVLlsqgWMxs2trk2dWN4qVEs2Mp2Emcp0hCENKFBMp+k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9jxi/lOoRAK6x072Vs32b2S8LBWGlSMCcD1afQfVML0u+KlAJ
+	NYlwzrhP/pf/YRUaWTsjVhi4Z3RINt0EDTgTkVAD7TtgFXxGJ0PUFRyCFINHa06ILFexOhRD7V+
+	f0bT/5m0zpkJwQKKBep0jfqZudLVIgYoOOLqLJIcfg7582+EnolRRMg==
+X-Gm-Gg: ASbGncshcZpTL5AjznRwc/7TXRoWccJAh9DrL7pVO0g3zKR3P9d5kjrw04HdT3m4ZZl
+	NkI5TvEwk8SAdvXx9qkuTqCfGQsr3TVRMjW+mvdStnJ3kAWcb/wRKC9EqPZXyb0MHT1NNSs9Jko
+	695xHwI5ARSlT4P0y6cws9eik6buaUaUIXm9L1keEuIiBdwupi69RZY5UWfxwPvyTjCDIFMg6JS
+	qsKSzrY0MG/Awai0jmK2slBEOJ07GBvQSdSk0yqD7IvaouIB9YgsO7QhguZoC1vEc861c0bp8BC
+	zYI88mq4lp1SuNI=
+X-Received: by 2002:a05:6602:134b:b0:85e:7974:b0ff with SMTP id ca18e2360f4ac-8617cc2c796mr15149939f.3.1744323918873;
+        Thu, 10 Apr 2025 15:25:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEQkXdAZ+OEzU4A2DZsacWYyZwm7ExYFaPxcS4RRuyEG/aWoQJVBgD7p6QneavEDnZmQ4ZUXg==
+X-Received: by 2002:a05:6602:134b:b0:85e:7974:b0ff with SMTP id ca18e2360f4ac-8617cc2c796mr15148639f.3.1744323918540;
+        Thu, 10 Apr 2025 15:25:18 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4f505e2dce4sm941729173.110.2025.04.10.15.25.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Apr 2025 15:15:31 -0700 (PDT)
-Date: Thu, 10 Apr 2025 23:15:23 +0100
-From: Qasim Ijaz <qasdev00@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot <syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com>
-Subject: Re: [PATCH 1/4] net: fix uninitialised access in mii_nway_restart()
-Message-ID: <Z_hC-9C7Bc2lPrig@qasdev.system>
-References: <20250319112156.48312-1-qasdev00@gmail.com>
- <20250319112156.48312-2-qasdev00@gmail.com>
- <20250325063307.15336182@kernel.org>
+        Thu, 10 Apr 2025 15:25:17 -0700 (PDT)
+Date: Thu, 10 Apr 2025 16:25:16 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>, David
+ Matlack <dmatlack@google.com>, Like Xu <like.xu.linux@gmail.com>, Yong He
+ <alexyonghe@tencent.com>
+Subject: Re: [PATCH 3/7] irqbypass: Take ownership of producer/consumer
+ token tracking
+Message-ID: <20250410162516.6ebfa8ee.alex.williamson@redhat.com>
+In-Reply-To: <Z_hAc3rfMhlyQ9zd@google.com>
+References: <20250404211449.1443336-1-seanjc@google.com>
+	<20250404211449.1443336-4-seanjc@google.com>
+	<20250410152846.184e174f.alex.williamson@redhat.com>
+	<Z_hAc3rfMhlyQ9zd@google.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250325063307.15336182@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 25, 2025 at 06:33:07AM -0700, Jakub Kicinski wrote:
-> On Wed, 19 Mar 2025 11:21:53 +0000 Qasim Ijaz wrote:
-> > --- a/drivers/net/mii.c
-> > +++ b/drivers/net/mii.c
-> > @@ -464,6 +464,8 @@ int mii_nway_restart (struct mii_if_info *mii)
-> >  
-> >  	/* if autoneg is off, it's an error */
-> >  	bmcr = mii->mdio_read(mii->dev, mii->phy_id, MII_BMCR);
-> > +	if (bmcr < 0)
-> > +		return bmcr;
-> >  
-> >  	if (bmcr & BMCR_ANENABLE) {
-> >  		bmcr |= BMCR_ANRESTART;
+On Thu, 10 Apr 2025 15:04:35 -0700
+Sean Christopherson <seanjc@google.com> wrote:
+> On Thu, Apr 10, 2025, Alex Williamson wrote:
+> > The "token" terminology seems a little out of place after all is said
+> > and done in this series.    
 > 
-> We error check just one mdio_read() but there's a whole bunch of them
-> in this file. What's the expected behavior then? Are all of them buggy?
->
- 
-Hi Jakub
-    
-Apologies for my delayed response, I had another look at this and I
-think my patch may be off a bit. You are correct that there are multiple
-mdio_read() calls and looking at the mii.c file we can see that calls to
-functions like mdio_read (and a lot of others) dont check return values.
-  
-So in light of this I think a better patch would be to not edit the 
-mii.c file at all and just make ch9200_mdio_read return 0 on     
-error. This way if mdio_read fails and 0 is returned, the         
-check for "bmcr & BMCR_ANENABLE" won't be triggered and mii_nway_restart
-will just return 0 and end. If we return a negative on error it may
-contain the exact bit the function checks.
+> Ugh, yeah, good point.  I don't know why I left it as "token".
+> 
+> > Should it just be an "index" in anticipation of the usage with xarray and
+> > changed to an unsigned long?  Or at least s/token/eventfd/ and changed to an
+> > eventfd_ctx pointer?  
+> 
+> My strong vote is for "struct eventfd_ctx *eventfd;"
 
-Similiar to this patch:
-<https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=c68b2c9eba38>
+WFM, thanks,
 
-If this sounds good, should i send another patch series with all the
-changes? 
+Alex
 
-> This patch should be split into core and driver parts.
-> -- 
-> pw-bot: cr
 
