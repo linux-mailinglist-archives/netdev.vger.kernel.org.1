@@ -1,311 +1,235 @@
-Return-Path: <netdev+bounces-181068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72637A838D2
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 08:01:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A83CBA838E7
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 08:05:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5600D17D0AD
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 06:01:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F6A644454C
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 06:05:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFBD12AE84;
-	Thu, 10 Apr 2025 06:01:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Thdm/Cb2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BADEC202C45;
+	Thu, 10 Apr 2025 06:05:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D795E1FC8
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 06:01:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744264906; cv=fail; b=WJF5XKz2CO+XTxSn6/DfZ4V5hpXZMj061NxGDmxhFvhlE3EBcwJMyieSrAkKIy0u0IFrjoh3TgtroNg1/dbsYSzC2JU7UL1pu6jyx/0xcPCzFVhRiSEbduVDUUZSW4eldvbpWEhsaubDxIi5THvAo11OWmCoLOr44kA5LlRU6jY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744264906; c=relaxed/simple;
-	bh=0hyh6qX6EBDUgSbsOShRtPV5Y3lw/Uy2PMdAc7KVFoc=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=N7g8kxfPR5Nta5XCm17YBYCqf5N8UuR6pE+xoAAbXYkM2yWXSykUkyxO0rkHARnCs3ji35wcioY4jJxFEf6xVPbkh9vT1X8dZ5R1dnV/eKKTmEaSDOt0iKL+Fshs2h64ihpjM9Npvu5Q63NDUJ1JH+CBmo9Ov+MHjc5h7iytYcc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Thdm/Cb2; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744264904; x=1775800904;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=0hyh6qX6EBDUgSbsOShRtPV5Y3lw/Uy2PMdAc7KVFoc=;
-  b=Thdm/Cb2ItSWNgV/aC0tgCLHVOj3mOBUpXUuG72fhXiGgdn2Sxeh6Dzt
-   MS3eNEq8zIhQxRFkTcwVNhW12O0NMiBs+N6wfCDqgVoikIhGcDsjZpEI1
-   /fSY4v3QeAnb8P/xQ02TYDFIW3pLYEdQguCU/jq0Zcmicg4ZwzJ1F1PvQ
-   reRpSJJIYNx4xnwM77MzyU7YIWlFM3Oz23LC1c+JsBpwFgh/iU4ip+BWb
-   xq36/0toLbbzDU644f/pLYTbGNylAuOl2gP4bm1FY6EQbJhLBUUzMaPPp
-   zwfTpw9seA1+u7o+R8pp1wi71etUDzDYukfWlDmHXt6cf+a5dR9MwrKe4
-   Q==;
-X-CSE-ConnectionGUID: hCsI35+YTzutEgLa+XbVZg==
-X-CSE-MsgGUID: PhrAK9rVTDGzjCsaaH0MkA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11399"; a="45933005"
-X-IronPort-AV: E=Sophos;i="6.15,202,1739865600"; 
-   d="scan'208";a="45933005"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 23:01:28 -0700
-X-CSE-ConnectionGUID: LCIekEyZThCyLwS7ndWZvw==
-X-CSE-MsgGUID: o7Sw/51GTS6zy0WgNTKWbw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,202,1739865600"; 
-   d="scan'208";a="132934444"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2025 23:01:28 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Wed, 9 Apr 2025 23:01:27 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Wed, 9 Apr 2025 23:01:27 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.49) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 9 Apr 2025 23:01:25 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qTs8yQs2wQUThBl4BpKnhWPn3Vi/HJb/k3TshExpCO3R5J4OIgE+n7t13kQxwedrChhi8D1lZgAjycvRKz9/RM36tEJ+/JsyGMvJH88ufdX85G6L8tr+YzIYXkYStDTOXgx5qGELeBM5J3mTdaSVCm9nbfmUJsgF91uxqB5rnd4cSuZxWZGU0ZcT1kVjobwBug9FzOUUHzVJWNVMLCsMi0vvUOm41EETaEmioWXzsPKfi7sv3eGkL05VSFHsLbiIuLaZ01a6QsicP+KF2r675z+CQaD6Af1XSb8wdAyeoRLoFJQgU41MN1nBbGzIDYmNNq5qqraWhdC90RlZsxtcqw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UQ7cMatzG94uUfE7t2nAywUcODxGsdLtHQf2/Dl/v6U=;
- b=o3RlM98EGm5kHxUkoQilmToC1MPSiR9HI1GH3zXk+fLPDN9agAoU1By1gdKeZL3tzzT/o6lo15+uYAsBno/9dsu/EpIhwADFFayqX7hGpN/U3C84+r2+swPR0Z1FCNNvJHHnbiAZFQH0/7e3mBfH5gWWKAZjCWec9EpcfRrQZdlukIoIpaMZmPiMTWzQiPMdS9rKGCclDrqTPV653dA0opQ6kehWEuDxCu63FlY2O6IYz9hBaPH/ZzhGhk8TWOKuKoH9WqXRleahSAiCi9LmOM2+Zlm019ZSDHbiCH1O2pjhb514FvBLgMK+ujZYqD+0Ply9VFjJ/PFX8JEFQEVWzw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by IA1PR11MB6100.namprd11.prod.outlook.com (2603:10b6:208:3d4::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.33; Thu, 10 Apr
- 2025 06:01:20 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8%4]) with mapi id 15.20.8632.017; Thu, 10 Apr 2025
- 06:01:20 +0000
-Message-ID: <119bf05d-17c6-4327-a79b-31e3e2838abe@intel.com>
-Date: Wed, 9 Apr 2025 23:01:18 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 7/8] docs: netdev: break down the instance
- locking info per ops struct
-To: Jakub Kicinski <kuba@kernel.org>, <davem@davemloft.net>
-CC: <netdev@vger.kernel.org>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<andrew+netdev@lunn.ch>, <horms@kernel.org>, <sdf@fomichev.me>,
-	<hramamurthy@google.com>, <kuniyu@amazon.com>, <jdamato@fastly.com>
-References: <20250408195956.412733-1-kuba@kernel.org>
- <20250408195956.412733-8-kuba@kernel.org>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20250408195956.412733-8-kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0327.namprd03.prod.outlook.com
- (2603:10b6:303:dd::32) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4974202C3B
+	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 06:05:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744265121; cv=none; b=reNxAC4mSOQuOOHziXXFoRypuEFGhcjp1sj8HQrXnG+KtrVNrZw9JJpP3aHOTHnJ0Rm7WfRF/JJZAJfWZIVHKInY2O5MF2vZaLsmTVtk+fxo9bBqrgn8Fyp1QSHbS7yNycVEMWxO5BaU/pAubiiOsIvW2XIl3Fbev4+5GV1HC7c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744265121; c=relaxed/simple;
+	bh=q/kBApj8o1DODVLckuFXHWT1k9Qcxm273pF1C9ox4ro=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TQs67hjSWmnKvuInIApQ3YFEZTYDxGUSFR3fn7qWxMdJEboz+Mzqm0KmLWm3QKxmN4944HM9tlvIckXWe3GqOEd9Lh1/lC7NreaY17MWyV9ZTgTlKoankyNqPKp9Axodvmhq7t5dXH2E8qvaDOlo8NpDLpH0XbJCbiSiTbxLZF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1u2l1d-0004XD-C7; Thu, 10 Apr 2025 08:04:33 +0200
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1u2l1Z-004Dlj-2z;
+	Thu, 10 Apr 2025 08:04:29 +0200
+Received: from pengutronix.de (p5b1645f7.dip0.t-ipconnect.de [91.22.69.247])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 75A153F4AE6;
+	Thu, 10 Apr 2025 06:04:29 +0000 (UTC)
+Date: Thu, 10 Apr 2025 08:04:26 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Ming Yu <a0282524688@gmail.com>
+Cc: lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org, 
+	linux-usb@vger.kernel.org, Ming Yu <tmyu0@nuvoton.com>
+Subject: Re: [PATCH v9 4/7] can: Add Nuvoton NCT6694 CANFD support
+Message-ID: <20250410-artichoke-swan-of-abracadabra-33c1dc-mkl@pengutronix.de>
+References: <20250409082752.3697532-1-tmyu0@nuvoton.com>
+ <20250409082752.3697532-5-tmyu0@nuvoton.com>
+ <20250409-cooperative-elastic-pillbug-672a03-mkl@pengutronix.de>
+ <CAOoeyxULns52vAwzsLoXB+BwT+CN+VGBwqrg61pjKJH8bTD5bw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|IA1PR11MB6100:EE_
-X-MS-Office365-Filtering-Correlation-Id: a1a3d1df-0e39-49fa-28bd-08dd77f51d88
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?ZXMwanJKb3pKQ1AzUDJyMEZKRHJkaXY2UjFieEliU2ZjWHkvNkphdTZPcFZh?=
- =?utf-8?B?aGFxQUxkQkFzb2Z3RVRrWHYyRjIvL0Z1VEwwdXVUMkk1UEVUWnkyMy80eXdZ?=
- =?utf-8?B?Sm1HUW9rZGYvNzJQTktqeStKcDk3azFuN0tmdURUcE1RalBQQjJZWHkzb2dv?=
- =?utf-8?B?OWUwc25jY056cFN0eFdZeDEwWS9lSWUrSUROdlpsSVp1TWtMenh3L3lMYnZo?=
- =?utf-8?B?VXFLcGx5V3ppekl2dmR0TVM4MEFRZzNCVEgzenJpa1huQWxYY1hyWmEvTklX?=
- =?utf-8?B?NHlRbVhGdDQ0V0k5QUVYR0F5ZEFCN1NkTUVtcEJlU1dCZG5ZeU0yWk5tdGhy?=
- =?utf-8?B?cDVldmIyeHZSNnFrM0tBRzFKT2kwZFMyQXcxeFBFaWJXNk01SHZiR0ZaREcy?=
- =?utf-8?B?UzJ4eTBrTFlHQlNVN0labzJ4RHd5MkVIdk1PMjd3SHVqRndPeGhiaXRxVTlW?=
- =?utf-8?B?NnRyK3dRdTZXUWpoVGtGcU0ybnZpU1NFQlZYbXg2alBiTklJZERqN25iSDBQ?=
- =?utf-8?B?T1NjOVJURmgvSjM4L1R3OHl5eWQ4VUYwaDF1V2YwOElUU2R0bEprRCtMREpM?=
- =?utf-8?B?eEVka1FCOEJWUG5UTEpPTzZLa2dHSDlKc1BPUlQzY3JaREY2NjNoWmllQTIy?=
- =?utf-8?B?QUZDemZ5RllkMlFRcGlsK2dUU0hmaWQ3VDhKWjZsQTV2eUVJMWhZaUZHbTlo?=
- =?utf-8?B?cW5Gd3kwVVJDQWlQQ0ErR2ZmRzFpUk1PRU9oa0dBVk5BN002dndEWlZqNEpi?=
- =?utf-8?B?bnNxTGdrWDg4MzhlN0M2aEpKbWRrUUswdnhxbTdpMytXWXNuTEhsTUZuMmdl?=
- =?utf-8?B?bS9zd1EyQ2kwNWxFSmZCbVJxNEZsS2dDSEhBNE8xMXZmTFhYN0lHRjVWdXN6?=
- =?utf-8?B?TCtUOVVmeGNhaFZWVkEzemNxNXB5aVZtZ21FbERIZGRBL09VYVJNK1RBc0dm?=
- =?utf-8?B?LzNibmtnTFg4U1R0WHMvQ0VJY2puYnM0dzl3Q3NhSzNRQnpIR05GK0tFS0x3?=
- =?utf-8?B?YTVFK0xubTZxaUxvVTZtdzBTVWN1UU5SNnhQcVFWRjJIMmtsN2cyNzJKTHRD?=
- =?utf-8?B?RDFwQzF2ZXFReWl0NHFwa0VXaXhMSm5yM2w3OE1xUmFyRGVROEFhTFpFRmo0?=
- =?utf-8?B?VTRWZW0zU3hzTGUxTWJGMm5TVEp4clNJdHR5K282MFpISVRnZnhEbWI2c3RK?=
- =?utf-8?B?TEJFcDBGZFJVVTZmRXBkcFArTUFGbUFYTzExNHZ0RjNrL2NFd1o3WlJiY3dP?=
- =?utf-8?B?SDFKcVJVei9QZlZkTFJ5aVBsdVVtSldqVHh1SGJtREQvTHFwb0JZQWdFZnls?=
- =?utf-8?B?NzA3SUlBM3Z1YWtpNk1PTCtwcVBIbU05ZTFxNEdicEE0Ni9BUjBWOXVrdmpN?=
- =?utf-8?B?aU1jK1F3KzlueXFhODhuRytTRFhSUHBvOXBLSVVCTEV6cEhuM3NhTXZMVC9R?=
- =?utf-8?B?UG80TitVblcyTDF0aWVZL2h6YzZDZy9HYWlUQUJwSzlpSGsxMFZ4blBwRW9O?=
- =?utf-8?B?UHVOeU9TeXhEL09jS0Q3NEhma1hBWm9wQ3hNemdNMjhrcDJVN0ZsRUV0b05t?=
- =?utf-8?B?WE04SVg0NFA4NzF6M1E2RmRPZ1ZlckQ3SDNDZnQzS2RQZ2NjcDdTZlNlVXoz?=
- =?utf-8?B?cGdrWks2bG5YREpyK2lpV3ZHSjY2SW96SFVsZS9QTTMxTXByK2VFVTNjK3lt?=
- =?utf-8?B?OGZ5M29GWTJzU1F2dU9IT3QybzFHUngvc1N2Ri9mWElMc2tYUExTTFRtSE4r?=
- =?utf-8?B?b3NVK0hQTit3TENidVRmb2JGb2RyTGl3Y3c4OHZRcUpRMFJ6K2UxcWEvcWNp?=
- =?utf-8?B?eS9hYnZMcG93M1JBcVd2VGVZcFYyQXNlQUxyS0RFS1Joa3VVamgxdW9uNE9X?=
- =?utf-8?B?NldOUW1yWDExcmtLQWx5cXFWaHhhS0FjckV4U3BxVTEzMjd4eWNTUVdacjdF?=
- =?utf-8?Q?MT+Nk/lxQyw=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZnBtVnNIVDgreCtzVGNoaFdyd1BqdWl1WThkTEVZdzBMRzRZeGloRnA5ckZS?=
- =?utf-8?B?MDl4Nm4zVW5VQWN6a2ZjSW9vdFpwaWFBZ1RFVE16NEFKU05HSmd4UmpDUHRw?=
- =?utf-8?B?c3RHM1B3UjJITFRabzFIcjE0bnNzKzlnRzNGY0dyZnEwSXV4MXgyRm9nWTVT?=
- =?utf-8?B?UFVWN1VqQ3dHeG5peHo2NEdsT1l3L0xWRE91dTFLTVVsaStZWHByMHQ2dDlN?=
- =?utf-8?B?NE1ad1ZvcnhaekVxYTN1UDZPdG4xbkh1MktZalM4QmhEL2IyVkw1V0RBbGZk?=
- =?utf-8?B?NHh6aFNZc2dtdmtoVGtJOTM1UkErSm9UbE94Ny9vN2ZGazAwZEVLTThCWVJS?=
- =?utf-8?B?VWF0a1U0RW5rRVN5OUphNWxVNGFCV2tZNVNVaFZmTFhyUkJFUmUzekhQUmc5?=
- =?utf-8?B?YVpVYlZabWtDS1JwZlk4QW8wLzdwR0c3VUdvNjRNZFJIcTdITW5MU2MxSFpk?=
- =?utf-8?B?LytjekdOTXM0YmovRDhiWTcrRVBPV09VVk1NSi9FbjAxZlYrSDljdDlMUG5l?=
- =?utf-8?B?bVZLbTlyZmdvTVNGQjhwd21lczN4VHJ4RDlhMlBzampjSzJpZUJsOTFEZTZi?=
- =?utf-8?B?QzEwTlE5QnYrUTU0SjREQm9WeEtLL1VzVHdwMHpJNDlMbnR5V2RGd1F6YjRS?=
- =?utf-8?B?Z2dUeFRzVHNITXlvR1lKdGlLdlpwNUFUbFgxeVF6b2hyS3VKU0xwVktFQnJK?=
- =?utf-8?B?V0NreUpPOFFsbERMUWlzUkNacExVMlZPbDh5WTFsQUJYVkM0RXNkZkhnc1Zp?=
- =?utf-8?B?bTFCTU5DS2tDOURXVFY5UGM0NE9IeUJHZ1N3NnRxVTU3TFBpS0hIRmRVR0RD?=
- =?utf-8?B?NGhWTU1rSEl6QlI4c1YvSWsxalZJL1VhMXBLd2xXM2pLZWt4RzNhSFBKN1gz?=
- =?utf-8?B?YUd1WlJlcm94Y3NSV2dpMjhTVi9Cd0c2eFB2TGc0SnRRSHduRmYvYnJ2Wjhr?=
- =?utf-8?B?Unc2bC9KdGJXY0NPUzlSMDJrTEhFTHVselFRYWJBTnVSbVlCcUlsbldTQnFw?=
- =?utf-8?B?aUl6YUJlV002dDVvUFgyakZaamNzMmI2NkdSOG1UYVJ1UW0ydTRVQkVnQ1g3?=
- =?utf-8?B?SnJkRlFJekVHaWNzQUluMUk2UXMwcEV6RTRZY3VXVDgrRmZDNEZ2dDlZNG95?=
- =?utf-8?B?Mmk4ZVk5c3M3K1BJWW1nUUcwOEcwR3g2dGJmaGRTWGdQZ3k3czNCbzRkVDZP?=
- =?utf-8?B?MVp6bHNuM0RNNWdQa0J0dk1XejB5eXJheUZtYmVieUV0eXV2bWZYUWFtL2Qw?=
- =?utf-8?B?aStndWFCU2dZMGRsMElGNEFwb1NWeHVwUFlmNDYyc0wvL0J2T2Z2ZndTa2hY?=
- =?utf-8?B?dTBIdzFxSGNJM3FKVGxzeUZkdWVYSUx1Y0ZaRUhvZTdKRWN6aTRkQjlwQkxU?=
- =?utf-8?B?L0dsQVYvT0NzYStoZ0hHMS94aXE1SHpZTmMrOWE1UFArTVArdjJDQmxqNlF5?=
- =?utf-8?B?OEpTaFlEbUpwT2s1K2VSa1FkVDE3bHNESkQ5MTlUQXFUcWtwanh3RWVEeFpH?=
- =?utf-8?B?eEdYK2E3WU5GczBEMU1EZ21iOHlYRlU1K0lYcUhMYXlPSmJ2bXFndTNRY1Vm?=
- =?utf-8?B?NjcxZUJ3aVhmM0NLblU4S1YvbTYxU0tuUDV4dGMyd2RGbTNjUnh5Z0VCOHBP?=
- =?utf-8?B?YnRXT0FtVUVMNkVwcWFPaGp2cEs0TkpYNlV3STlTeVVpZlVNUC9DTjVJQnJC?=
- =?utf-8?B?RXZvRC9kSllNN2pyVnp4YVpOT2t3L2hvb0hNK2NvSGJYYVZ2T2tBR0lmWkNs?=
- =?utf-8?B?R1VOMXR0dmlxZTU4LzMzY2hwdE0yNmNPaDIvL3gwN1RKRUNjRnBtSE5GNFJL?=
- =?utf-8?B?Y1NQbUFWY3ErK2svK0gvQldKQm9UTXFFVmNrUTVxZXgzYlNWWmR1cmdVeld3?=
- =?utf-8?B?aUlseDB6N1hGUUN4Z21Rc1NhNGxXcHAwY20zeG1mc0lRWktBdW5zWkU5aEg1?=
- =?utf-8?B?QmFTWnY5K1E0M3Fsc1FPa0FwS0RaU0dRYWpOSWdCWHhCUnVaVWEvc2xkUlJs?=
- =?utf-8?B?SHc1a3N4aUVRNzRSZndhaTNyN3N4cWYzN1hMdGRDZU13a1VSMTdBT2VZKytT?=
- =?utf-8?B?M25peGZTUStFam5CYk04QnFkSUU0dUZLUHRxZGcxZnluYTBKYnNySnZnZ3dk?=
- =?utf-8?B?S04xV3AyUzZ5NDhRTmlOcUh6VG1pcG51NDdhNWl5bnZqemxDVG50RmRmSDYw?=
- =?utf-8?B?c0E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a1a3d1df-0e39-49fa-28bd-08dd77f51d88
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2025 06:01:20.3891
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qKe44zNCweDMGqTni85vY1c3DANPfCwlJ7stcWn6cTb5WTqnj1Up4lRfgP69P8g0cmUeCWcTXeDc7SIfSBuVmvPVLp93F7zsGnY55EmMcMk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6100
-X-OriginatorOrg: intel.com
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="6ebpqmmsutfol6xr"
+Content-Disposition: inline
+In-Reply-To: <CAOoeyxULns52vAwzsLoXB+BwT+CN+VGBwqrg61pjKJH8bTD5bw@mail.gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 
+--6ebpqmmsutfol6xr
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v9 4/7] can: Add Nuvoton NCT6694 CANFD support
+MIME-Version: 1.0
 
-On 4/8/2025 12:59 PM, Jakub Kicinski wrote:
-> Explicitly list all the ops structs and what locking they provide.
-> Use "ops locked" as a term for drivers which have ops called under
-> the instance lock.
-> 
-> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> v2:
->  - an exception -> exceptions
-> v1: https://lore.kernel.org/20250407190117.16528-8-kuba@kernel.org
-> ---
->  Documentation/networking/netdevices.rst | 54 +++++++++++++++++++------
->  1 file changed, 42 insertions(+), 12 deletions(-)
-> 
-> diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
-> index d6357472d3f1..7ae28c5fb835 100644
-> --- a/Documentation/networking/netdevices.rst
-> +++ b/Documentation/networking/netdevices.rst
-> @@ -314,13 +314,8 @@ struct napi_struct synchronization rules
->  		 softirq
->  		 will be called with interrupts disabled by netconsole.
->  
-> -struct netdev_queue_mgmt_ops synchronization rules
-> -==================================================
-> -
-> -All queue management ndo callbacks are holding netdev instance lock.
-> -
-> -RTNL and netdev instance lock
-> -=============================
-> +netdev instance lock
-> +====================
->  
->  Historically, all networking control operations were protected by a single
->  global lock known as ``rtnl_lock``. There is an ongoing effort to replace this
-> @@ -328,10 +323,13 @@ global lock with separate locks for each network namespace. Additionally,
->  properties of individual netdev are increasingly protected by per-netdev locks.
->  
->  For device drivers that implement shaping or queue management APIs, all control
-> -operations will be performed under the netdev instance lock. Currently, this
-> -instance lock is acquired within the context of ``rtnl_lock``. The drivers
-> -can also explicitly request instance lock to be acquired via
-> -``request_ops_lock``. In the future, there will be an option for individual
-> +operations will be performed under the netdev instance lock.
-> +Drivers can also explicitly request instance lock to be held during ops
-> +by setting ``request_ops_lock`` to true. Code comments and docs refer
-> +to drivers which have ops called under the instance lock as "ops locked".
-> +See also the documentation of the ``lock`` member of struct net_device.
-> +
-> +In the future, there will be an option for individual
->  drivers to opt out of using ``rtnl_lock`` and instead perform their control
->  operations directly under the netdev instance lock.
->  
-> @@ -343,8 +341,40 @@ there are two sets of interfaces: ``dev_xxx`` and ``netif_xxx`` (e.g.,
->  acquiring the instance lock themselves, while the ``netif_xxx`` functions
->  assume that the driver has already acquired the instance lock.
->  
-> +struct net_device_ops
-> +---------------------
-> +
-> +``ndos`` are called without holding the instance lock for most drivers.
-> +
-> +"Ops locked" drivers will have most of the ``ndos`` invoked under
-> +the instance lock.
-> +
-> +struct ethtool_ops
-> +------------------
-> +
-> +Similarly to ``ndos`` the instance lock is only held for select drivers.
-> +For "ops locked" drivers all ethtool ops without exceptions should
-> +be called under the instance lock.
-> +
-> +struct net_shaper_ops
-> +---------------------
-> +
-> +All net shaper callbacks are invoked while holding the netdev instance
-> +lock. ``rtnl_lock`` may or may not be held.
-> +
-> +Note that supporting net shapers automatically enables "ops locking".
-> +
-> +struct netdev_queue_mgmt_ops
-> +----------------------------
-> +
-> +All queue management callbacks are invoked while holding the netdev instance
-> +lock. ``rtnl_lock`` may or may not be held.
-> +
-> +Note that supporting struct netdev_queue_mgmt_ops automatically enables
-> +"ops locking".
-> +
+On 10.04.2025 10:40:34, Ming Yu wrote:
+> Dear Marc,
+>=20
+> Thank you for reviewing.
+>=20
+> Marc Kleine-Budde <mkl@pengutronix.de> =E6=96=BC 2025=E5=B9=B44=E6=9C=889=
+=E6=97=A5 =E9=80=B1=E4=B8=89 =E4=B8=8B=E5=8D=886:21=E5=AF=AB=E9=81=93=EF=BC=
+=9A
+> ...
+> > > +static void nct6694_canfd_handle_state_change(struct net_device *nde=
+v, u8 status)
+> > > +{
+> > > +     struct nct6694_canfd_priv *priv =3D netdev_priv(ndev);
+> > > +     enum can_state new_state, rx_state, tx_state;
+> > > +     struct can_berr_counter bec;
+> > > +     struct can_frame *cf;
+> > > +     struct sk_buff *skb;
+> > > +
+> > > +     nct6694_canfd_get_berr_counter(ndev, &bec);
+> > > +     can_state_get_by_berr_counter(ndev, &bec, &tx_state, &rx_state);
+> > > +
+> > > +     new_state =3D max(tx_state, rx_state);
+> > > +
+> > > +     /* state hasn't changed */
+> > > +     if (new_state =3D=3D priv->can.state)
+> > > +             return;
+> > > +
+> > > +     skb =3D alloc_can_err_skb(ndev, &cf);
+> > > +
+> > > +     can_change_state(ndev, cf, tx_state, rx_state);
+> > > +
+> > > +     if (new_state =3D=3D CAN_STATE_BUS_OFF) {
+> > > +             can_bus_off(ndev);
+> >
+> > What does your device do when it goes into bus off? Does it recover its=
+elf?
+> >
+>=20
+> No, the device does not support automatic bus-off recovery. It
+> requires an explicit CAN Setting and Initialization(CMD0) command to
+> re-initialize the controller after entering bus-off state.
 
-Does this mean we don't allow drivers which support
-netdev_queue_mgmt_ops but don't set request_ops_lock? Or does it mean
-that supporting netdev_queue_mgmt_ops and/or netdev shapers
-automatically implies request_ops_lock? Or is there some other
-behavioral difference?
+Ok
 
-From the wording this sounds like its enforced via code, and it seems
-reasonable to me that we wouldn't allow these without setting
-request_ops_lock to true...
+[...]
+
+> > > +static int nct6694_canfd_start(struct net_device *ndev)
+> > > +{
+> > > +     struct nct6694_canfd_priv *priv =3D netdev_priv(ndev);
+> > > +     const struct can_bittiming *d_bt =3D &priv->can.data_bittiming;
+> > > +     const struct can_bittiming *n_bt =3D &priv->can.bittiming;
+> > > +     struct nct6694_canfd_setting *setting __free(kfree) =3D NULL;
+> > > +     const struct nct6694_cmd_header cmd_hd =3D {
+> > > +             .mod =3D NCT6694_CANFD_MOD,
+> > > +             .cmd =3D NCT6694_CANFD_SETTING,
+> > > +             .sel =3D ndev->dev_port,
+> > > +             .len =3D cpu_to_le16(sizeof(*setting))
+> > > +     };
+> > > +     int ret;
+> > > +
+> > > +     setting =3D kzalloc(sizeof(*setting), GFP_KERNEL);
+> > > +     if (!setting)
+> > > +             return -ENOMEM;
+> > > +
+> > > +     setting->nbr =3D cpu_to_le32(n_bt->bitrate);
+> > > +     setting->dbr =3D cpu_to_le32(d_bt->bitrate);
+> > > +
+> > > +     if (priv->can.ctrlmode & CAN_CTRLMODE_LISTENONLY)
+> > > +             setting->ctrl1 |=3D cpu_to_le16(NCT6694_CANFD_SETTING_C=
+TRL1_MON);
+> > > +
+> > > +     if (priv->can.ctrlmode & CAN_CTRLMODE_FD_NON_ISO)
+> > > +             setting->ctrl1 |=3D cpu_to_le16(NCT6694_CANFD_SETTING_C=
+TRL1_NISO);
+> > > +
+> > > +     if (priv->can.ctrlmode & CAN_CTRLMODE_LOOPBACK)
+> > > +             setting->ctrl1 |=3D cpu_to_le16(NCT6694_CANFD_SETTING_C=
+TRL1_LBCK);
+> > > +
+> > > +     setting->nbtp =3D cpu_to_le32(FIELD_PREP(NCT6694_CANFD_SETTING_=
+NBTP_NSJW,
+> > > +                                            n_bt->sjw - 1) |
+> > > +                                 FIELD_PREP(NCT6694_CANFD_SETTING_NB=
+TP_NBRP,
+> > > +                                            n_bt->brp - 1) |
+> > > +                                 FIELD_PREP(NCT6694_CANFD_SETTING_NB=
+TP_NTSEG2,
+> > > +                                            n_bt->phase_seg2 - 1) |
+> > > +                                 FIELD_PREP(NCT6694_CANFD_SETTING_NB=
+TP_NTSEG1,
+> > > +                                            n_bt->prop_seg + n_bt->p=
+hase_seg1 - 1));
+> > > +
+> > > +     setting->dbtp =3D cpu_to_le32(FIELD_PREP(NCT6694_CANFD_SETTING_=
+DBTP_DSJW,
+> > > +                                            d_bt->sjw - 1) |
+> > > +                                 FIELD_PREP(NCT6694_CANFD_SETTING_DB=
+TP_DBRP,
+> > > +                                            d_bt->brp - 1) |
+> > > +                                 FIELD_PREP(NCT6694_CANFD_SETTING_DB=
+TP_DTSEG2,
+> > > +                                            d_bt->phase_seg2 - 1) |
+> > > +                                 FIELD_PREP(NCT6694_CANFD_SETTING_DB=
+TP_DTSEG1,
+> > > +                                            d_bt->prop_seg + d_bt->p=
+hase_seg1 - 1));
+> >
+> > What does your device do, if you set the bitrates _and_ the bit timing
+> > parameters? They are redundant.
+>=20
+> The firmware calculates the default bit timing parameters when it
+> receives the bitrates, and then overwrites them if it later receives
+> explicit bit timing parameters.
+>=20
+> To avoid confusion and ensure consistent behavior, I will remove the
+> bitrate setting logic in next patch. Instead, the bit timing will be
+> determined solely based on the provided bit timing parameters.
+
+Sounds good.
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--6ebpqmmsutfol6xr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmf3X2cACgkQDHRl3/mQ
+kZy+Bwf/cD7PcXTrBFCGsudbvqhERiXg3j4fGxKlZVoNrTxY13w0WWxCpMBfL9lZ
+k+VJ+pxjPqL64WK5QAAem80jd8Pc+BqG+jdZIMEfTfYXvArLqzvnlfC16d6OoKmS
+cZCI+XAbNQMFCkOSLNa3tS6jA5/rwlsy+mV7CMLeOphSUl+sTbW2PlIiPJIQQXzG
+9Y1kcIlI1HLOTj2ilQ/8xgx+cNGh561Erou4H0fnNyoi4nuvlNcglfNm/m4B2DiQ
+oybJYK34/vHSiz361rkyU32z6TNcW5PaR7FwDGM/pMScYdQOnZSgOhuIBrl71etT
+/MLF7/H4MWskq7PZ97+8f+THFvhH2g==
+=67Py
+-----END PGP SIGNATURE-----
+
+--6ebpqmmsutfol6xr--
 
