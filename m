@@ -1,124 +1,99 @@
-Return-Path: <netdev+bounces-181341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C3E9A848E2
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 17:57:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C06BA8492C
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 18:03:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A1814E756C
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 15:53:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 331AC188DE50
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 16:02:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31A581EDA0B;
-	Thu, 10 Apr 2025 15:51:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A29C1EB1AB;
+	Thu, 10 Apr 2025 16:01:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IkZFaSgD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TUbwObqh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DBBA1E98FC
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 15:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54105189F5C
+	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 16:01:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744300282; cv=none; b=izky0Cnky17MLIoPVoOE4rXJISiCp0zFomHKrzFGjMlA9sYkJabbM5RrlmQE5YS/ynRCw/mRCR4d1llFCJNIKH1OcuCkapvDQaDKTSJN1DYAy75MxrvARuJs1G8SX/D57H12+V26DXof739x/aqe8B8+H3j8+ddPG7qvKhecO7k=
+	t=1744300918; cv=none; b=jm19baCahVtYE8KqrCt7zEk9p+2sotFXYXWtg0Y7H7zhf5D4dxVoZgY23Ac0hqNQn6XIEUy8NKiaFjMR3DZUnTndHeQm8GrZQfpZyVYB1PjieQkzRR4AuPenzQH2Y07vmM+INx76ExVFNUCkl9MbcIy9LbwAhtXLbs4G3Qcesuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744300282; c=relaxed/simple;
-	bh=I1HL4EhttE881MicAtF32b66FddNBn0rz1b+bJ5vSpI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ihXIq+mnf5XHXpsuohSku5tUK8KqUPlzpJcTdObEyBKbzJPaLMQG1rRS2xQxsnlVeRrclLjTHSNLB50pcwny56AjXwGsXZPXPF19xiWnDihbxuZj8Xt9xVk+iy7dslru2S5Hppv8vwaNI63oIXzC6mF7e59+MEGXz5fQs26IJsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IkZFaSgD; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-22aa75e6653so7870525ad.0
-        for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 08:51:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744300280; x=1744905080; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WI+w75MsGfdj1Z+7uV4Y8gvQFBHXDpFpnvwgAEL/2AQ=;
-        b=IkZFaSgDMxVLDJYiztqhLWeJ9BKaBmCbT7F4CFXTzXGHk78dhVZw31jouCnNDop6qG
-         LyvJ2AGGW9B/NjGJES68OuKAKaLBwFvD2KGUWdvUlsG1f0aD8K6C+rGbK5ysE6vJ1dDv
-         +K+JpZcy29v0dUf1sfGwTYaAYrUFfG7GrYAzIQi7CH+jkldW1WG3aBanwL1UNOUAXBRV
-         bHMPWtECNA0qzJQhzQzy4ceyGFHvF2uUxZwwYnkpxqCNMe6h/tq8OFE5STxYBiSEa0NU
-         lfHoRRzZvrm0R3beELu0HF0TwdJm5QdJx8sDTJg7rPPsfd5OuFieaYBGI8NvdpPXr494
-         9s4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744300280; x=1744905080;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WI+w75MsGfdj1Z+7uV4Y8gvQFBHXDpFpnvwgAEL/2AQ=;
-        b=r0dDBTci6p0+yVy0jhp9lEA7yu/XxRSGQIb58OquyHEo2Vemytr4eO7FkV/7XJSFcY
-         QtPe7SwWr3+2EVMy2kZDk/qTxU8AYdoyFAAoE+T7UOZzngaF88/Zv8ZG9rDqlVGMGB3i
-         GPb74ASy0BgBm4zgK3HIomdf3G16nQlhiqcT7ReIDH+7n2fmdNlvmoyGryNy14e6vgLJ
-         tyIrPIi4+xMjtpW++N+adFbYPdwZcHSgPpCopSzJLaKnuCQ8od8FaBm9f+AHGNHCOKrh
-         1KVT0c7JFM2ktBvHPDfbTP9XHW7igLKvS3YC/tYVsvjH/JRPCeETACM+dtrHOy3PQDhX
-         lx9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUtnK8DAtdIlFOH7qUD+xuFKn9SmEvUUNuRRDEagtR4AlSVz1LY1CnKIXA9BeHoF2hFRRjmzAk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQ04Mg1ipcvI0/Obq0fI/03MyxLk6qzpBc/NgOhdD9xdrvUWlZ
-	DyNXBzg+4CuoCuNcbvo9S0p41L5fhPBe5weNVDIpGtLejRdbQjr9h0hVvckrQTfvF2N632laUhd
-	3pw==
-X-Google-Smtp-Source: AGHT+IHHdPvjX46b6rya58AVmth99Sr4qyG2wQ8QULk3PUwKRfJK74c4z91IfDSthvFsL0y+9dnZ4azBoYg=
-X-Received: from plsb7.prod.google.com ([2002:a17:902:b607:b0:229:2f8a:d4ba])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d4cf:b0:220:d601:a704
- with SMTP id d9443c01a7336-22be0302063mr29493945ad.18.1744300279479; Thu, 10
- Apr 2025 08:51:19 -0700 (PDT)
-Date: Thu, 10 Apr 2025 08:51:18 -0700
-In-Reply-To: <BN9PR11MB5276385B4F4DB1919D4908CF8CB72@BN9PR11MB5276.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1744300918; c=relaxed/simple;
+	bh=XTam8G/QSTj9gFXh35TR04Xp0UHGI/oEVf/w18QxKEg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JV1ckXQrg6IZXSAL9bF6p1+KRTWrLu9xejfZzLPZPgCmZkoL0E0smOS/ydU/pBnFa2Ly/Heg7GjMuFER6YHA4OIewIJ7l7zeu/nvrZsvMNEg3L07+RX88fMwcmB0MQkFWtdWt15P95ddrvlJtCsO7BlhD6K3jy64YEgJgJEO+WY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TUbwObqh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D1FFC4CEDD;
+	Thu, 10 Apr 2025 16:01:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744300917;
+	bh=XTam8G/QSTj9gFXh35TR04Xp0UHGI/oEVf/w18QxKEg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TUbwObqhxr3Vw7GH2zVEM9+19Et2PUz+kPIimrWK7PdjwBqd7at/efrw3BL/pSJ/F
+	 OmBsfunPCioGmoljNNYhr+G0aPiWtpVH39EKhhaMbl3jSRqumv8Lh4f7fdHdGDQyTy
+	 n7MF5BOBA6x6l1n4E8dy3BNii1/jhBVbo22c6ExiuudcP+qEvgYyjycR2aW9nsoLDU
+	 u+8qpHuTvGrh66VBJ+9WwhbKmAkOaXDgGzkwDw8O4fZw4e0O0A5Jy/DWaJ6VYyh0Cv
+	 ZM0LMe+z8GNu88NUIes/7VkekdC3WFyz4hFC75qsLNCxgvBa42shlsXcD8xgu57UPZ
+	 o+mJVBvq+IMNQ==
+Date: Thu, 10 Apr 2025 09:01:55 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Richard Cochran <richardcochran@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "Arinzon, David" <darinzon@amazon.com>,
+ David Woodhouse <dwmw2@infradead.org>, David Miller <davem@davemloft.net>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, "Woodhouse, David" <dwmw@amazon.co.uk>, "Machulsky,
+ Zorik" <zorik@amazon.com>, "Matushevsky, Alexander" <matua@amazon.com>,
+ "Bshara, Saeed" <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>,
+ "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
+ <nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal,
+ Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
+ "Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
+ <akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit"
+ <amitbern@amazon.com>, "Allen, Neil" <shayagr@amazon.com>, "Ostrovsky,
+ Evgeny" <evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>,
+ "Machnikowski, Maciek" <maciek@machnikowski.net>, Rahul Rameshbabu
+ <rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH v8 net-next 5/5] net: ena: Add PHC documentation
+Message-ID: <20250410090155.0df1df1c@kernel.org>
+In-Reply-To: <Z_dEH9tKRCT0zOpt@hoboy.vegasvil.org>
+References: <aecb8d12-805b-4592-94f3-4dbfcdcd5cff@lunn.ch>
+	<55f9df6241d052a91dfde950af04c70969ea28b2.camel@infradead.org>
+	<dc253b7be5082d5623ae8865d5d75eb3df788516.camel@infradead.org>
+	<20250402092344.5a12a26a@kernel.org>
+	<38966834-1267-4936-ae24-76289b3764d2@app.fastmail.com>
+	<f37057d315c34b35b9acd93b5b2dcb41@amazon.com>
+	<0294be1a-5530-435a-9717-983f61b94fcf@lunn.ch>
+	<20250407092749.03937ada@kernel.org>
+	<Z_U2-oTlrP6TPuOy@hoboy.vegasvil.org>
+	<20250408082439.4bf78329@kernel.org>
+	<Z_dEH9tKRCT0zOpt@hoboy.vegasvil.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250404211449.1443336-1-seanjc@google.com> <20250404211449.1443336-4-seanjc@google.com>
- <BN9PR11MB5276385B4F4DB1919D4908CF8CB72@BN9PR11MB5276.namprd11.prod.outlook.com>
-Message-ID: <Z_fo9hPpSfpwi5Jn@google.com>
-Subject: Re: [PATCH 3/7] irqbypass: Take ownership of producer/consumer token tracking
-From: Sean Christopherson <seanjc@google.com>
-To: Kevin Tian <kevin.tian@intel.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	David Matlack <dmatlack@google.com>, Like Xu <like.xu.linux@gmail.com>, 
-	Yong He <alexyonghe@tencent.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 10, 2025, Kevin Tian wrote:
-> > From: Sean Christopherson <seanjc@google.com>
-> > +int irq_bypass_register_consumer(struct irq_bypass_consumer *consumer,
-> > +				 struct eventfd_ctx *eventfd)
-> >  {
-> >  	struct irq_bypass_consumer *tmp;
-> >  	struct irq_bypass_producer *producer;
-> >  	int ret;
+On Wed, 9 Apr 2025 21:07:59 -0700 Richard Cochran wrote:
+> On Tue, Apr 08, 2025 at 08:24:39AM -0700, Jakub Kicinski wrote:
+> > On Tue, 8 Apr 2025 07:47:22 -0700 Richard Cochran wrote:  
+> > > But overall I don't those interfaces are great for reporting
+> > > statistics.  netlink seems better.  
 > > 
-> > -	if (!consumer->token ||
-> > -	    !consumer->add_producer || !consumer->del_producer)
-> > +	if (WARN_ON_ONCE(consumer->token))
-> > +		return -EINVAL;
-> > +
-> > +	if (!consumer->add_producer || !consumer->del_producer)
-> >  		return -EINVAL;
-> > 
-> >  	mutex_lock(&lock);
-> > 
-> >  	list_for_each_entry(tmp, &consumers, node) {
-> > -		if (tmp->token == consumer->token || tmp == consumer) {
-> > +		if (tmp->token == eventfd || tmp == consumer) {
-> >  			ret = -EBUSY;
-> >  			goto out_err;
-> >  		}
-> >  	}
+> > Just to be clear, are you asking them to reimplement PTP config
+> > in netlink just to report 4 counters?  
 > 
-> the 2nd check 'tmp == consumer' is redundant. If they are equal 
-> consumer->token is not NULL then the earlier WARN_ON will be
-> triggered already.
+> No, maybe four counters can go into debugfs for this device?
 
-Oh, nice.  Good catch!  That check subtly gets dropped on the conversion to
-xarray, so it definitely makes sense to remove it in this patch.
+Works for me, FWIW.
 
