@@ -1,281 +1,251 @@
-Return-Path: <netdev+bounces-181035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9E0BA83689
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 04:35:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19E7DA83696
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 04:39:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C955B1B64A12
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 02:35:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E29A21B64BB7
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 02:39:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5E51E25EF;
-	Thu, 10 Apr 2025 02:35:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A9381E25F2;
+	Thu, 10 Apr 2025 02:39:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZRimtl9z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8791DED56
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 02:35:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09E113D893;
+	Thu, 10 Apr 2025 02:39:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744252528; cv=none; b=Xyevr+Ub+ae52rAws4e9ivSIKkVHXEpooRuhe+VfjnjN+gFe7yC0mWpcT1pbfadyS3A6RQE2mSU6wxbCXGzosz/hMYcBrIGHKYb/JzIy10KCBxY4dlKov0fXCJaa9CP5A9ndGbzAMxtyfAetGla7IPUKucYwjy9H3lmhAtrbMVw=
+	t=1744252777; cv=none; b=YBXecza8cjcSyGTFCM2Pj0ktYNkkYShESf+2Zd/uSFzNcU2UomXrrPq52LppZRESdZfIVekpwe6B4F3IJbbBjOzHFkhFGNXIi2bEIIA95eC6aQ1rC5bf+EEsVB6VdqzyQWHWj8Sbh30BShLlxmjLN85LIBJPZ34duNlC09ocoK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744252528; c=relaxed/simple;
-	bh=hfzSRZYZmIEbDflOrEzA7qkKhQ5vb71z5d6SFB4i4Aw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=JKjd0WNpLfbGQn+Gw3ktiWT1zs3gZ4sXzMOIrgG45Bd7PXNQG0uwdAzWdZgY1i8kIrQmJsKp16k4z0pCGnTGzfKKoS6mKkWU726C9RdKFXfV/Mozkk0UYAnm4Br8Zg/IlNJccFqzYD/9OLgQKk5hF5Z4AWafLBoV52JlCMY6QLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3d43621bb7eso13564695ab.1
-        for <netdev@vger.kernel.org>; Wed, 09 Apr 2025 19:35:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744252525; x=1744857325;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=seNAskAAqbiE6X+p0D7OjDytS2wTZOQSFjJ1rVdcR0I=;
-        b=HQPQMrX0l2aQW1UfEqjDtQkhkacGr/hyFX7NIOtwZgJSfANWe8goJY8zAF5j0ltUJG
-         h9kJh+44JovQ7aiiP5DOTtnzj13SfSKjr68eH3qrCbzYASdmGrCVyqAbpWAUsxwcG0nM
-         c6JPr8wSX06MLHeOjx+lLC41EASSvjPBFFsMMvBliRy1s2kIwBaN2gFDjiuVQfF+dqr4
-         utk1gnBXpqfoOpjT0VMqx5maiZl8d1Va6JageqcNMvoInwAmX4M2AdImrxtthAqmfZe/
-         n4GIMiPY01PJ7ocKl8dKVF9xYO17/iRCt9ILyHRM/XQNVtAKyfxBc+MboIjS+NQPBH8d
-         aCQg==
-X-Forwarded-Encrypted: i=1; AJvYcCVYMcvGHlggbCxna54dbecr7h836zEmgOkEdmJZXW4Z9Woj/7wOff9xQMMjc/6v3pztCorD5zM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxxHNkuVdHHkmUYhaK3iImUhm73REsSTusOQfhF6t6hR12NXwd
-	OVoj+CGaKGOMKOrJaaA4QSzNp5w6zX5l/UKbP/PORMW775J2lsSTdWS9RqQaOnAEIk24eZShPBs
-	1g7BX09PyakONv5ve7GWeNa9f/wpYoKvmTgcgMbu/CeYdeHtzXMxy9eI=
-X-Google-Smtp-Source: AGHT+IFSzO3OEKc2bnJIX8X3oITkSpdHQTsTC6PQ+mvhzXZeWU8tITDuicmTJ29i/+kBaJzA7tuOSmZIMtn763m4vnYjBITaUI0X
+	s=arc-20240116; t=1744252777; c=relaxed/simple;
+	bh=ZX9V4mtFaUKvC4nYI8o1KOnuFMhsBGoeo6qVGgd2aZs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MUg8t6BILa2L1HOJGBmUZNfdyovo1fSNw9fPHCQ/CLK6ZwvAEB7+G/7llvnrCJPMwDUlQJ+GXiFSCg/HNuZkUSZsEe3QDLZDhoNjL+mTXPG2c/p2mWZbvUcSBfQUuel68D42ozunxhRgyu+vZ+g1wyJLeie3VS1aO2fK8KmglP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZRimtl9z; arc=none smtp.client-ip=99.78.197.217
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744252776; x=1775788776;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Xglbg1VLF0CCvJHLP95t4oo8cq09RJz6JBkY/MuhcsU=;
+  b=ZRimtl9zgU4DH4iOHuZqzc7LkV6R4E9nCT+a1TVNGkGO7Ir6nIDcXOLA
+   9qC8IeJot4ticdTxosOR4kKl2FMgZVjegv9zrK0Edi5bAg6O8Dj1IthJT
+   Pd+1c6CmQNGO4L6nxhyd0Q6EQkhsPadbLgp5wftiSb3PzdgRdwjf8BOAg
+   k=;
+X-IronPort-AV: E=Sophos;i="6.15,201,1739836800"; 
+   d="scan'208";a="39351639"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 02:39:35 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:26040]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.51.140:2525] with esmtp (Farcaster)
+ id 19e0e864-d961-4c79-b4e6-2fffe3a3ab85; Thu, 10 Apr 2025 02:39:34 +0000 (UTC)
+X-Farcaster-Flow-ID: 19e0e864-d961-4c79-b4e6-2fffe3a3ab85
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 10 Apr 2025 02:39:34 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.170.41) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Thu, 10 Apr 2025 02:39:30 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, "Neal
+ Cardwell" <ncardwell@google.com>, Willem de Bruijn <willemb@google.com>,
+	"Pablo Neira Ayuso" <pablo@netfilter.org>, Jozsef Kadlecsik
+	<kadlec@netfilter.org>, Paul Moore <paul@paul-moore.com>, James Morris
+	<jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, Casey Schaufler
+	<casey@schaufler-ca.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki
+ Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>,
+	<selinux@vger.kernel.org>, <linux-security-module@vger.kernel.org>
+Subject: [PATCH v3 net-next 0/4] net: Retire DCCP socket.
+Date: Wed, 9 Apr 2025 19:36:43 -0700
+Message-ID: <20250410023921.11307-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3b84:b0:3d0:26a5:b2c with SMTP id
- e9e14a558f8ab-3d7e4deec38mr8501395ab.8.1744252525351; Wed, 09 Apr 2025
- 19:35:25 -0700 (PDT)
-Date: Wed, 09 Apr 2025 19:35:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67f72e6d.050a0220.258fea.0027.GAE@google.com>
-Subject: [syzbot] [bpf?] [net?] possible deadlock in xsk_bind
-From: syzbot <syzbot+46043677477d6064a1a0@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bjorn@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, jonathan.lemon@gmail.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, maciej.fijalkowski@intel.com, 
-	magnus.karlsson@intel.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D032UWA004.ant.amazon.com (10.13.139.56) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hello,
+As announced by commit b144fcaf46d4 ("dccp: Print deprecation
+notice."), it's time to remove DCCP socket.
 
-syzbot found the following issue on:
+The patch 2 removes net/dccp, LSM code, doc, and etc, leaving
+DCCP netfilter modules.
 
-HEAD commit:    61f96e684edd Merge tag 'net-6.15-rc1' of git://git.kernel...
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=1635523f980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f2054704dd53fb80
-dashboard link: https://syzkaller.appspot.com/bug?extid=46043677477d6064a1a0
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+The patch 3 unexports shared functions for DCCP, and the patch 4
+renames tcp_or_dccp_get_hashinfo() to tcp_get_hashinfo().
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/a3119b4324e8/disk-61f96e68.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ee1ca254d083/vmlinux-61f96e68.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/ed04807ee582/bzImage-61f96e68.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+46043677477d6064a1a0@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-6.14.0-syzkaller-13305-g61f96e684edd #0 Not tainted
-------------------------------------------------------
-syz.0.1422/11074 is trying to acquire lock:
-ffff888035a5cd30 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2751 [inline]
-ffff888035a5cd30 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:42 [inline]
-ffff888035a5cd30 (&dev_instance_lock_key#3){+.+.}-{4:4}, at: xsk_bind+0x2fd/0xfb0 net/xdp/xsk.c:1188
-
-but task is already holding lock:
-ffff88805421d6f0 (&xs->mutex){+.+.}-{4:4}, at: xsk_bind+0x166/0xfb0 net/xdp/xsk.c:1176
-
-which lock already depends on the new lock.
+We can do more cleanup; for example, remove IPPROTO_TCP checks in
+__inet6?_check_established(), remove __module_get() for twsk,
+remove timewait_sock_ops.twsk_destructor(), etc, but it will be
+more of TCP stuff, so I'll defer to a later series.
 
 
-the existing dependency chain (in reverse order) is:
+Changes:
+  v3:
+    * Patch 3
+      * Fix wrong inlining sk_free_unlock_clone()
 
--> #3 (&xs->mutex){+.+.}-{4:4}:
-       lock_acquire+0x116/0x2f0 kernel/locking/lockdep.c:5866
-       __mutex_lock_common kernel/locking/mutex.c:601 [inline]
-       __mutex_lock+0x1a5/0x10c0 kernel/locking/mutex.c:746
-       xsk_notifier+0xcf/0x230 net/xdp/xsk.c:1648
-       notifier_call_chain+0x1a5/0x3f0 kernel/notifier.c:85
-       call_netdevice_notifiers_extack net/core/dev.c:2221 [inline]
-       call_netdevice_notifiers net/core/dev.c:2235 [inline]
-       unregister_netdevice_many_notify+0x1572/0x2510 net/core/dev.c:11980
-       unregister_netdevice_many net/core/dev.c:12044 [inline]
-       unregister_netdevice_queue+0x383/0x400 net/core/dev.c:11896
-       unregister_netdevice include/linux/netdevice.h:3374 [inline]
-       ip6_tnl_siocdevprivate+0x552/0x1570 net/ipv6/ip6_tunnel.c:1717
-       dev_siocdevprivate net/core/dev_ioctl.c:521 [inline]
-       dev_ifsioc+0xc04/0x1010 net/core/dev_ioctl.c:631
-       dev_ioctl+0x8c3/0x1380 net/core/dev_ioctl.c:848
-       sock_ioctl+0x819/0x900 net/socket.c:1236
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:906 [inline]
-       __se_sys_ioctl+0xf1/0x160 fs/ioctl.c:892
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+  v2: https://lore.kernel.org/all/20250409003014.19697-1-kuniyu@amazon.com/
+    * Patch 2
+      * Drop netfilter changes
+    * Patch 3
+      * Leave inet_twsk_put() as is
 
--> #2 (&net->xdp.lock){+.+.}-{4:4}:
-       lock_acquire+0x116/0x2f0 kernel/locking/lockdep.c:5866
-       __mutex_lock_common kernel/locking/mutex.c:601 [inline]
-       __mutex_lock+0x1a5/0x10c0 kernel/locking/mutex.c:746
-       xsk_notifier+0x8b/0x230 net/xdp/xsk.c:1644
-       notifier_call_chain+0x1a5/0x3f0 kernel/notifier.c:85
-       call_netdevice_notifiers_extack net/core/dev.c:2221 [inline]
-       call_netdevice_notifiers net/core/dev.c:2235 [inline]
-       unregister_netdevice_many_notify+0x1572/0x2510 net/core/dev.c:11980
-       unregister_netdevice_many net/core/dev.c:12044 [inline]
-       unregister_netdevice_queue+0x383/0x400 net/core/dev.c:11896
-       unregister_netdevice include/linux/netdevice.h:3374 [inline]
-       _cfg80211_unregister_wdev+0x163/0x590 net/wireless/core.c:1256
-       ieee80211_remove_interfaces+0x4f1/0x700 net/mac80211/iface.c:2316
-       ieee80211_unregister_hw+0x5d/0x2c0 net/mac80211/main.c:1681
-       mac80211_hwsim_del_radio+0x2c6/0x4c0 drivers/net/wireless/virtual/mac80211_hwsim.c:5665
-       hwsim_exit_net+0x5c3/0x670 drivers/net/wireless/virtual/mac80211_hwsim.c:6545
-       ops_exit_list net/core/net_namespace.c:172 [inline]
-       cleanup_net+0x814/0xd60 net/core/net_namespace.c:654
-       process_one_work kernel/workqueue.c:3238 [inline]
-       process_scheduled_works+0xac3/0x18e0 kernel/workqueue.c:3319
-       worker_thread+0x870/0xd50 kernel/workqueue.c:3400
-       kthread+0x7b7/0x940 kernel/kthread.c:464
-       ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #1 (&rdev->wiphy.mtx){+.+.}-{4:4}:
-       lock_acquire+0x116/0x2f0 kernel/locking/lockdep.c:5866
-       __mutex_lock_common kernel/locking/mutex.c:601 [inline]
-       __mutex_lock+0x1a5/0x10c0 kernel/locking/mutex.c:746
-       class_wiphy_constructor include/net/cfg80211.h:6092 [inline]
-       cfg80211_netdev_notifier_call+0x1b3/0x1430 net/wireless/core.c:1547
-       notifier_call_chain+0x1a5/0x3f0 kernel/notifier.c:85
-       call_netdevice_notifiers_extack net/core/dev.c:2221 [inline]
-       call_netdevice_notifiers net/core/dev.c:2235 [inline]
-       __dev_close_many+0x15d/0x760 net/core/dev.c:1680
-       dev_close_many+0x250/0x4c0 net/core/dev.c:1734
-       unregister_netdevice_many_notify+0x628/0x2510 net/core/dev.c:11949
-       unregister_netdevice_many net/core/dev.c:12044 [inline]
-       default_device_exit_batch+0x7ff/0x880 net/core/dev.c:12536
-       ops_exit_list net/core/net_namespace.c:177 [inline]
-       cleanup_net+0x8af/0xd60 net/core/net_namespace.c:654
-       process_one_work kernel/workqueue.c:3238 [inline]
-       process_scheduled_works+0xac3/0x18e0 kernel/workqueue.c:3319
-       worker_thread+0x870/0xd50 kernel/workqueue.c:3400
-       kthread+0x7b7/0x940 kernel/kthread.c:464
-       ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #0 (&dev_instance_lock_key#3){+.+.}-{4:4}:
-       check_prev_add kernel/locking/lockdep.c:3166 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3285 [inline]
-       validate_chain+0xa69/0x24e0 kernel/locking/lockdep.c:3909
-       __lock_acquire+0xad5/0xd80 kernel/locking/lockdep.c:5235
-       lock_acquire+0x116/0x2f0 kernel/locking/lockdep.c:5866
-       __mutex_lock_common kernel/locking/mutex.c:601 [inline]
-       __mutex_lock+0x1a5/0x10c0 kernel/locking/mutex.c:746
-       netdev_lock include/linux/netdevice.h:2751 [inline]
-       netdev_lock_ops include/net/netdev_lock.h:42 [inline]
-       xsk_bind+0x2fd/0xfb0 net/xdp/xsk.c:1188
-       __sys_bind_socket net/socket.c:1810 [inline]
-       __sys_bind+0x1de/0x290 net/socket.c:1841
-       __do_sys_bind net/socket.c:1846 [inline]
-       __se_sys_bind net/socket.c:1844 [inline]
-       __x64_sys_bind+0x7a/0x90 net/socket.c:1844
-       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/syscall_64.c:94
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  &dev_instance_lock_key#3 --> &net->xdp.lock --> &xs->mutex
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&xs->mutex);
-                               lock(&net->xdp.lock);
-                               lock(&xs->mutex);
-  lock(&dev_instance_lock_key#3);
-
- *** DEADLOCK ***
-
-2 locks held by syz.0.1422/11074:
- #0: ffffffff900fc9c8 (rtnl_mutex){+.+.}-{4:4}, at: xsk_bind+0x153/0xfb0 net/xdp/xsk.c:1175
- #1: ffff88805421d6f0 (&xs->mutex){+.+.}-{4:4}, at: xsk_bind+0x166/0xfb0 net/xdp/xsk.c:1176
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 11074 Comm: syz.0.1422 Not tainted 6.14.0-syzkaller-13305-g61f96e684edd #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_circular_bug+0x2e1/0x300 kernel/locking/lockdep.c:2079
- check_noncircular+0x142/0x160 kernel/locking/lockdep.c:2211
- check_prev_add kernel/locking/lockdep.c:3166 [inline]
- check_prevs_add kernel/locking/lockdep.c:3285 [inline]
- validate_chain+0xa69/0x24e0 kernel/locking/lockdep.c:3909
- __lock_acquire+0xad5/0xd80 kernel/locking/lockdep.c:5235
- lock_acquire+0x116/0x2f0 kernel/locking/lockdep.c:5866
- __mutex_lock_common kernel/locking/mutex.c:601 [inline]
- __mutex_lock+0x1a5/0x10c0 kernel/locking/mutex.c:746
- netdev_lock include/linux/netdevice.h:2751 [inline]
- netdev_lock_ops include/net/netdev_lock.h:42 [inline]
- xsk_bind+0x2fd/0xfb0 net/xdp/xsk.c:1188
- __sys_bind_socket net/socket.c:1810 [inline]
- __sys_bind+0x1de/0x290 net/socket.c:1841
- __do_sys_bind net/socket.c:1846 [inline]
- __se_sys_bind net/socket.c:1844 [inline]
- __x64_sys_bind+0x7a/0x90 net/socket.c:1844
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fd38178d169
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fd37f5f6038 EFLAGS: 00000246 ORIG_RAX: 0000000000000031
-RAX: ffffffffffffffda RBX: 00007fd3819a5fa0 RCX: 00007fd38178d169
-RDX: 0000000000000010 RSI: 0000200000000180 RDI: 0000000000000003
-RBP: 00007fd38180e2a0 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007fd3819a5fa0 R15: 00007ffc59db1d08
- </TASK>
+  v1: https://lore.kernel.org/netdev/20250407231823.95927-1-kuniyu@amazon.com/
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Kuniyuki Iwashima (4):
+  selftest: net: Remove DCCP bits.
+  net: Retire DCCP socket.
+  net: Unexport shared functions for DCCP.
+  tcp: Rename tcp_or_dccp_get_hashinfo().
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+ Documentation/admin-guide/bug-hunting.rst     |    2 +-
+ Documentation/networking/dccp.rst             |  219 ---
+ Documentation/networking/index.rst            |    1 -
+ Documentation/networking/ip-sysctl.rst        |    4 +-
+ .../zh_CN/admin-guide/bug-hunting.rst         |    2 +-
+ .../zh_TW/admin-guide/bug-hunting.rst         |    2 +-
+ MAINTAINERS                                   |    9 -
+ arch/m68k/configs/amiga_defconfig             |    2 -
+ arch/m68k/configs/apollo_defconfig            |    2 -
+ arch/m68k/configs/atari_defconfig             |    2 -
+ arch/m68k/configs/bvme6000_defconfig          |    2 -
+ arch/m68k/configs/hp300_defconfig             |    2 -
+ arch/m68k/configs/mac_defconfig               |    2 -
+ arch/m68k/configs/multi_defconfig             |    2 -
+ arch/m68k/configs/mvme147_defconfig           |    2 -
+ arch/m68k/configs/mvme16x_defconfig           |    2 -
+ arch/m68k/configs/q40_defconfig               |    2 -
+ arch/m68k/configs/sun3_defconfig              |    2 -
+ arch/m68k/configs/sun3x_defconfig             |    2 -
+ arch/mips/configs/bigsur_defconfig            |    1 -
+ arch/mips/configs/gpr_defconfig               |    1 -
+ arch/mips/configs/mtx1_defconfig              |    1 -
+ arch/powerpc/configs/pmac32_defconfig         |    1 -
+ arch/powerpc/configs/ppc6xx_defconfig         |    1 -
+ include/linux/dccp.h                          |  289 ---
+ include/linux/tfrc.h                          |   51 -
+ include/net/inet_hashtables.h                 |    7 +-
+ include/net/rstreason.h                       |    2 +-
+ include/net/secure_seq.h                      |    4 -
+ include/net/sock.h                            |    1 -
+ include/trace/events/sock.h                   |    1 -
+ include/trace/events/sunrpc.h                 |    2 -
+ net/Kconfig                                   |    1 -
+ net/Makefile                                  |    1 -
+ net/core/secure_seq.c                         |   42 -
+ net/core/sock.c                               |   32 +-
+ net/core/sock_diag.c                          |    2 -
+ net/dccp/Kconfig                              |   46 -
+ net/dccp/Makefile                             |   30 -
+ net/dccp/ackvec.c                             |  403 -----
+ net/dccp/ackvec.h                             |  136 --
+ net/dccp/ccid.c                               |  219 ---
+ net/dccp/ccid.h                               |  262 ---
+ net/dccp/ccids/Kconfig                        |   55 -
+ net/dccp/ccids/ccid2.c                        |  794 ---------
+ net/dccp/ccids/ccid2.h                        |  121 --
+ net/dccp/ccids/ccid3.c                        |  866 ---------
+ net/dccp/ccids/ccid3.h                        |  148 --
+ net/dccp/ccids/lib/loss_interval.c            |  184 --
+ net/dccp/ccids/lib/loss_interval.h            |   69 -
+ net/dccp/ccids/lib/packet_history.c           |  439 -----
+ net/dccp/ccids/lib/packet_history.h           |  142 --
+ net/dccp/ccids/lib/tfrc.c                     |   46 -
+ net/dccp/ccids/lib/tfrc.h                     |   73 -
+ net/dccp/ccids/lib/tfrc_equation.c            |  702 --------
+ net/dccp/dccp.h                               |  483 -----
+ net/dccp/diag.c                               |   85 -
+ net/dccp/feat.c                               | 1581 -----------------
+ net/dccp/feat.h                               |  133 --
+ net/dccp/input.c                              |  739 --------
+ net/dccp/ipv4.c                               | 1101 ------------
+ net/dccp/ipv6.c                               | 1174 ------------
+ net/dccp/ipv6.h                               |   27 -
+ net/dccp/minisocks.c                          |  266 ---
+ net/dccp/options.c                            |  609 -------
+ net/dccp/output.c                             |  708 --------
+ net/dccp/proto.c                              | 1293 --------------
+ net/dccp/qpolicy.c                            |  136 --
+ net/dccp/sysctl.c                             |  107 --
+ net/dccp/timer.c                              |  272 ---
+ net/dccp/trace.h                              |   82 -
+ net/ipv4/Kconfig                              |    2 +-
+ net/ipv4/af_inet.c                            |    5 +-
+ net/ipv4/inet_connection_sock.c               |   23 +-
+ net/ipv4/inet_diag.c                          |    2 -
+ net/ipv4/inet_hashtables.c                    |   30 +-
+ net/ipv4/inet_timewait_sock.c                 |    4 -
+ net/ipv6/af_inet6.c                           |    1 -
+ net/ipv6/inet6_connection_sock.c              |    2 -
+ net/ipv6/ip6_output.c                         |    2 +-
+ samples/bpf/sockex2_kern.c                    |    1 -
+ scripts/checkpatch.pl                         |    2 +-
+ security/lsm_audit.c                          |   19 -
+ security/selinux/hooks.c                      |   41 +-
+ security/selinux/include/classmap.h           |    2 -
+ security/selinux/nlmsgtab.c                   |    1 -
+ security/smack/smack_lsm.c                    |    9 +-
+ tools/testing/selftests/net/config            |    1 -
+ .../selftests/net/reuseport_addr_any.c        |   36 +-
+ 89 files changed, 47 insertions(+), 14370 deletions(-)
+ delete mode 100644 Documentation/networking/dccp.rst
+ delete mode 100644 include/linux/tfrc.h
+ delete mode 100644 net/dccp/Kconfig
+ delete mode 100644 net/dccp/Makefile
+ delete mode 100644 net/dccp/ackvec.c
+ delete mode 100644 net/dccp/ackvec.h
+ delete mode 100644 net/dccp/ccid.c
+ delete mode 100644 net/dccp/ccid.h
+ delete mode 100644 net/dccp/ccids/Kconfig
+ delete mode 100644 net/dccp/ccids/ccid2.c
+ delete mode 100644 net/dccp/ccids/ccid2.h
+ delete mode 100644 net/dccp/ccids/ccid3.c
+ delete mode 100644 net/dccp/ccids/ccid3.h
+ delete mode 100644 net/dccp/ccids/lib/loss_interval.c
+ delete mode 100644 net/dccp/ccids/lib/loss_interval.h
+ delete mode 100644 net/dccp/ccids/lib/packet_history.c
+ delete mode 100644 net/dccp/ccids/lib/packet_history.h
+ delete mode 100644 net/dccp/ccids/lib/tfrc.c
+ delete mode 100644 net/dccp/ccids/lib/tfrc.h
+ delete mode 100644 net/dccp/ccids/lib/tfrc_equation.c
+ delete mode 100644 net/dccp/dccp.h
+ delete mode 100644 net/dccp/diag.c
+ delete mode 100644 net/dccp/feat.c
+ delete mode 100644 net/dccp/feat.h
+ delete mode 100644 net/dccp/input.c
+ delete mode 100644 net/dccp/ipv4.c
+ delete mode 100644 net/dccp/ipv6.c
+ delete mode 100644 net/dccp/ipv6.h
+ delete mode 100644 net/dccp/minisocks.c
+ delete mode 100644 net/dccp/options.c
+ delete mode 100644 net/dccp/output.c
+ delete mode 100644 net/dccp/proto.c
+ delete mode 100644 net/dccp/qpolicy.c
+ delete mode 100644 net/dccp/sysctl.c
+ delete mode 100644 net/dccp/timer.c
+ delete mode 100644 net/dccp/trace.h
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+-- 
+2.49.0
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
