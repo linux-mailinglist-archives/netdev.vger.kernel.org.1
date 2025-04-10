@@ -1,96 +1,100 @@
-Return-Path: <netdev+bounces-181367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BAA1A84ACF
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 19:18:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68DC5A84AD3
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 19:20:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A8033B8B9B
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 17:18:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 706241892871
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 17:20:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4F101EF377;
-	Thu, 10 Apr 2025 17:18:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F089F1F03D5;
+	Thu, 10 Apr 2025 17:19:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ex3mprEF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o27CXlmQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E56C1E9B38;
-	Thu, 10 Apr 2025 17:18:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8BF81EF397;
+	Thu, 10 Apr 2025 17:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744305502; cv=none; b=ZIvijkRGnVhrDXvCA+zcYohHKVuwX1NQ8LvT6KtvWm7QsHu0MR43cHwMmwlLA8uz0yaXnMq1ds2yQ2S0s0eyV0Bjdhin+7KBf4copA5jZ3mRgYEIb/QpHHnKhJHpQuf/qwZPKtR4nyh5lK7x1XlgfLrElxaGYcPQ1WKlhVNE1Ng=
+	t=1744305595; cv=none; b=KOh6/68I9NjbpuWtvzIKOdaMeGZVY/oKxLJ7uI71BnaM1bH+mhCX+DQsyBmvFWx1jh+zzZSAV9P/eWAMctsPdlvcNPEL2GHFJD5B0aOjj1YEfqljfXNWEtSoNuxFwZyjbpp6EnO0y/QK0oqpALtxq3RZLcxVIeQtKdomo0E/7ks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744305502; c=relaxed/simple;
-	bh=LYuPFryOJZFAuFWo6bmehKK7q5WhgKAnRO5BUTMYnHU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tWlw3WrSoNT5gsITpM207LOXMsKrvJZ6nsfLveOas5v3yDQ5L9ZrOQ9V/8q3hNRX6nfio2zYZkH0oJMv9CP98JCZSpE8hWx0ufxem7c2WKVAScRufy3OJdvWh5dEp6NNpbquzeigI5so6BecM6zKQYLWhbI+W/sYxEMIWO2jvmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ex3mprEF; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ADaVs8RIq509XWF1XqpgqWYK2X74IiqnFiI1FqiLiq8=; b=ex3mprEFji1dKNZIt7B10OGMvu
-	NrHuYL6xJfArmKtW2dF2xpOXvFIJTyci9s4HCwB3xFJifOxaoGjvKG0Ll9izJRC7+8E+xX2ZNl9Bm
-	BcaDLLFQbtvPiHs4j/5RwfpNSsrGoilbx1PfUf1Owj2fzqosuHkVUJQHGuSFGAXwrAVM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u2vXO-008i7f-4S; Thu, 10 Apr 2025 19:18:02 +0200
-Date: Thu, 10 Apr 2025 19:18:02 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Simon Horman <horms@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH v14 06/16] net: mdio: regmap: prepare support
- for multiple valid addr
-Message-ID: <6f29a01d-35da-4d51-b309-a1799950a707@lunn.ch>
-References: <20250408095139.51659-1-ansuelsmth@gmail.com>
- <20250408095139.51659-7-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1744305595; c=relaxed/simple;
+	bh=cfwqnIa+foWB7evC9M5I96CQ2AsMfuh+qMujbdOmI70=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=UNFtbE6D7mkMkNMPP/XX4sChBMQS2UOuwG5TZJ0KUfqashok3CpgwB0qaeCmV6VPqRG2QjCqKPOOaDh49FLhIs5BOSAKi/YxJZSYmA/jm3jQeq1okMkjo5N9VY90TV2x2rz0WTuQENLsxpAZbD/MMKyMkh3VBKFWLMZeRcWv8ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o27CXlmQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A26AC4CEE9;
+	Thu, 10 Apr 2025 17:19:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744305595;
+	bh=cfwqnIa+foWB7evC9M5I96CQ2AsMfuh+qMujbdOmI70=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=o27CXlmQUae4Oq+g3UFfx9PMQJKuyfTJkHZkkvj7+2lK06JkvOHaHvgaAsK1AEqWg
+	 dFgl9q1u6m6SJSgBX5SbMdbrEJJj4cSWhLae91qJfLUixIdCsusTY5Q3lOokc5Mus0
+	 vFVmwVKRcfwxOBZP5UMbVkQLXMXrqNR9PAHGlShkm9Y8HLkrZbo+xJZfZmDYV2klFK
+	 ZW1f3j+4xxtNffaCMAzh2dvZJPU0CekYiY0o5iaJMWOg5dnANKdexvepM85eMZmnco
+	 7Z+FKXk9yEdoR/wxwKCQjKxNT/5+Vcxqng15IZ53lxqrohk7KxasjmTY5GZqEPr0Qs
+	 bdFAFGhzOFexw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE5B380CEF4;
+	Thu, 10 Apr 2025 17:20:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250408095139.51659-7-ansuelsmth@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next v4 0/2] selftests/xsk: Add tests for XDP tail
+ adjustment in AF_XDP
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174430563276.3761227.17315253449500219027.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Apr 2025 17:20:32 +0000
+References: <20250410033116.173617-1-tushar.vyavahare@intel.com>
+In-Reply-To: <20250410033116.173617-1-tushar.vyavahare@intel.com>
+To: Tushar Vyavahare <tushar.vyavahare@intel.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, bjorn@kernel.org,
+ magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+ jonathan.lemon@gmail.com, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
+ tirthendu.sarkar@intel.com
 
-On Tue, Apr 08, 2025 at 11:51:13AM +0200, Christian Marangi wrote:
-> Rework the valid_addr and convert it to a mask in preparation for mdio
-> regmap to support multiple valid addr in the case the regmap can support
-> it.
+Hello:
 
-I think it would be good to pull these MDIO regmap patches out into a
-series of their own. We know there is a user, so i'm happy for us the
-accept it without that user. But this code needs further discusion,
-which will be irrelevant for the switch.
+This series was applied to bpf/bpf-next.git (net)
+by Martin KaFai Lau <martin.lau@kernel.org>:
 
-       Andrew
+On Thu, 10 Apr 2025 03:31:14 +0000 you wrote:
+> This patch series adds tests to validate the XDP tail adjustment
+> functionality, focusing on its use within the AF_XDP context. The tests
+> verify dynamic packet size manipulation using the bpf_xdp_adjust_tail()
+> helper function, covering both single and multi-buffer scenarios.
+> 
+> v1 -> v2:
+> 1. Retain and extend stream replacement: Keep `pkt_stream_replace`
+>    unchanged. Add `pkt_stream_replace_ifobject` for targeted ifobject
+>    handling.
+> 
+> [...]
+
+Here is the summary with links:
+  - [bpf-next,v4,1/2] selftests/xsk: Add packet stream replacement function
+    https://git.kernel.org/bpf/bpf-next/c/3e730fe2af86
+  - [bpf-next,v4,2/2] selftests/xsk: Add tail adjustment tests and support check
+    https://git.kernel.org/bpf/bpf-next/c/4b302092553c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
