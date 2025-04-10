@@ -1,170 +1,207 @@
-Return-Path: <netdev+bounces-180983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF367A835AD
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 03:22:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8208EA835B0
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 03:22:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AA891B80363
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 01:21:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 462988C09B9
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 01:21:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A856B1E7C20;
-	Thu, 10 Apr 2025 01:19:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73E7481ACA;
+	Thu, 10 Apr 2025 01:21:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GAcXiJHG"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="oHmuXsqj"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56ED91E7C19
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 01:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13B11DA4E;
+	Thu, 10 Apr 2025 01:21:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744247966; cv=none; b=bnsO/bTv4IGsopapEagC3Q345aMK8Dq31C2UBh6REfuP97bY4vtgpECjf5pgcGF2rsJcmaOyXLWkmIQT140yv9L0mC/xx4ZBJVFErs5FzJ819gAydv2tnvbIg+Obllw8qxhh+T92gKeCkmI6/TXM99IPJ40iwrMgUgESl7b3RWo=
+	t=1744248069; cv=none; b=bFvdDHv21rzRB3i6rEY8D2zlzuKfj8SlUFSQLQufrmvTMy6ODQJCa9aO9Cx9nQvsCFGgulvoQv3b6ChbyQZ6B1tpycBzjoDVgEev7xE8/h9ehVeiIdBK1UVbXpCcPGs+W96Q/Of+vk1cBjntk63WWHJ6/KqcS/9zrkqBOezztHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744247966; c=relaxed/simple;
-	bh=+695x7pXlPBW4JoEVk0G/GsLItaAy4Iw2gNHwnHxeKU=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=Ogn/y8Fo3sjQWd3O2+tRmNZfeFnzUx8PF5tSCCvL5MClArlgyy3eJvjrdIfYeiGElncAMJMp+ofZOJj5+9CFVe4YBYkbELU6rLD132q5JRy0hZsszDFa+8h3QGqe34X8H5G91d4w8sVBGRpBTNIb/lHIOddkQYvr7qMYahN3vQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GAcXiJHG; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1744248069; c=relaxed/simple;
+	bh=wfQv5qp4h2hEADELBOWE58AgNrClOW5O0aschMVNXMU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=d4TLw25jMj+tfyCmvH9OxWrCRKhwcXuVvPGrmXEKaUyRC1dtH1f47tRdvf9Lk/C5z9s/sh9CcF63bOW2e1Ag4wUMnPdy2E8GlJCbjIUT8mjpQAp8Lf4ibsY89sIXx/0b5H0csoCMSqN7rv1dZAUQCVNkEEUqTaq2UXes/1J2KdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=oHmuXsqj; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1744248054;
+	bh=Cx4J31uASiMwR6P8vvfdcoDVlZLYQgYvAz5AWcgMpZ4=;
+	h=Date:From:To:Cc:Subject:From;
+	b=oHmuXsqjqqxQq5VMTOYtqk3caaJhbXHgPIzYHP6xQVpp8ghQyKaYw5aMUzkEw7JDH
+	 lvbZQUcfSvW6tR//Ohiz027cSx6yHHu02wagHHULLU7LhEFL37MZGpY10cw8ZDzqVA
+	 ceVZXSHnYqxfonzLNcx9nKOqPzfno6G3OSqFJvJXzcp63+odB9NRusHSUjELpmYqNO
+	 PrqYMyTtd/NW9HiaY+ulKroMluAbqwwbaQgeGjN3UIJYtHFcPNJ8xsmgD0lxAv3fP5
+	 NZYkc4MgYfyKbvmbk6e7WKj3iIHQ20AxUd8e0hGxcdlH0miwH75OnydrT+2dZfKW35
+	 hVSh1cny+bNbA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4ZY27p2qSLz4wbn;
+	Thu, 10 Apr 2025 11:20:53 +1000 (AEST)
+Date: Thu, 10 Apr 2025 11:20:52 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Stanislav Fomichev <sdf@fomichev.me>
+Subject: linux-next: manual merge of the net-next tree with the net tree
+Message-ID: <20250410112052.3d7b4f2e@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1744247952;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VwjIhL5eq5nuQH6KgO5e7NYXc2vM8c1wzFZaJmX6O2s=;
-	b=GAcXiJHGnyDBkayIqUeCiyu7aMXAjter9wJQKpd97FONtEJHyKqKoDubyMXwzB1eWQfFoL
-	/83eZu+U7YthXohR6oeZYn4FdhhjnTIS3NqIVs/NexOPxf24HlwtTMd73gYpb3NwLJPisK
-	IkrroqAAaGWUJnaEeTYmMIJqFKlOUGM=
-Date: Thu, 10 Apr 2025 01:19:09 +0000
-Content-Type: text/plain; charset="utf-8"
+Content-Type: multipart/signed; boundary="Sig_/i9SkFbt2pK6WV/8Hn.BUA1k";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/i9SkFbt2pK6WV/8Hn.BUA1k
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <b560604b7b97a58d13c60655747b30a5b9f27a4d@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH bpf-next v1] bpf, sockmap: Introduce tracing capability
- for sockmap
-To: "Cong Wang" <xiyou.wangcong@gmail.com>
-Cc: bpf@vger.kernel.org, mrpre@163.com, "Alexei Starovoitov"
- <ast@kernel.org>, "Daniel Borkmann" <daniel@iogearbox.net>, "John
- Fastabend" <john.fastabend@gmail.com>, "Andrii Nakryiko"
- <andrii@kernel.org>, "Martin KaFai Lau" <martin.lau@linux.dev>, "Eduard
- Zingerman" <eddyz87@gmail.com>, "Song Liu" <song@kernel.org>, "Yonghong
- Song" <yonghong.song@linux.dev>, "KP Singh" <kpsingh@kernel.org>,
- "Stanislav Fomichev" <sdf@fomichev.me>, "Hao Luo" <haoluo@google.com>,
- "Jiri Olsa" <jolsa@kernel.org>, "Jakub Sitnicki" <jakub@cloudflare.com>,
- "Steven Rostedt" <rostedt@goodmis.org>, "Masami Hiramatsu"
- <mhiramat@kernel.org>, "Mathieu Desnoyers"
- <mathieu.desnoyers@efficios.com>, "David S. Miller"
- <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Simon
- Horman" <horms@kernel.org>, "Jesper Dangaard Brouer" <hawk@kernel.org>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org
-In-Reply-To: <Z/aosJ3uvzTZTEXS@pop-os.localdomain>
-References: <20250409102937.15632-1-jiayuan.chen@linux.dev>
- <Z/aosJ3uvzTZTEXS@pop-os.localdomain>
-X-Migadu-Flow: FLOW_OUT
 
-April 10, 2025 at 01:04, "Cong Wang" <xiyou.wangcong@gmail.com> wrote:
->=20
->=20On Wed, Apr 09, 2025 at 06:29:33PM +0800, Jiayuan Chen wrote:
->=20
->=20>=20
->=20> Sockmap has the same high-performance forwarding capability as XDP,=
- but
-> >=20
->=20>  operates at Layer 7.
-> >=20
->=20>=20=20
->=20>=20
->=20>  Introduce tracing capability for sockmap, similar to XDP, to trace=
- the
-> >=20
->=20>  execution results of BPF programs without modifying the programs
-> >=20
->=20>  themselves, similar to the existing trace_xdp_redirect{_map}.
-> >=20
->=20>=20=20
->=20>=20
->=20>  It is crucial for debugging BPF programs, especially in production
-> >=20
->=20>  environments.
-> >=20
->=20>=20=20
->=20>=20
->=20>  Additionally, a header file was added to bpf_trace.h to automatica=
-lly
-> >=20
->=20>  generate tracepoints.
-> >=20
->=20>=20=20
->=20>=20
->=20>  Test results:
-> >=20
->=20>  $ echo "1" > /sys/kernel/tracing/events/sockmap/enable
-> >=20
->=20>=20=20
->=20>=20
->=20>  skb:
-> >=20
->=20>  sockmap_redirect: sk=3D00000000d3266a8d, type=3Dskb, family=3D2, p=
-rotocol=3D6, \
-> >=20
->=20>  prog_id=3D73, length=3D256, action=3DPASS
-> >=20
->=20>=20=20
->=20>=20
->=20>  msg:
-> >=20
->=20>  sockmap_redirect: sk=3D00000000528c7614, type=3Dmsg, family=3D2, p=
-rotocol=3D6, \
-> >=20
->=20>  prog_id=3D185, length=3D5, action=3DREDIRECT
-> >=20
->=20>=20=20
->=20>=20
->=20>  tls:
-> >=20
->=20>  sockmap_redirect: sk=3D00000000d04d2224, type=3Dskb, family=3D2, p=
-rotocol=3D6, \
-> >=20
->=20>  prog_id=3D143, length=3D35, action=3DPASS
-> >=20
->=20>=20=20
->=20>=20
->=20>  strparser:
-> >=20
->=20>  sockmap_skb_strp_parse: sk=3D00000000ecab0b30, family=3D2, protoco=
-l=3D6, \
-> >=20
->=20>  prog_id=3D170, size=3D5
-> >=20
->=20
-> Nice work!
->=20
->=20While you are on it, could we also trace skb->_sk_redir bits too? It =
-is
->=20
->=20very useful to distinguish, at least, ingress from egress redirection=
-.
->=20
->=20Thanks!
->
+Hi all,
 
-Thanks for your suggestion!
-The skb->_sk_redir contains a lot of important information about
-redirection, so it's definitely worth including.
+Today's linux-next merge of the net-next tree got conflicts in:
+
+  Documentation/networking/netdevices.rst
+  net/core/lock_debug.c
+
+between commit:
+
+  04efcee6ef8d ("net: hold instance lock during NETDEV_CHANGE")
+
+from the net tree and commit:
+
+  03df156dd3a6 ("xdp: double protect netdev->xdp_flags with netdev->lock")
+
+from the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc Documentation/networking/netdevices.rst
+index eab601ab2db0,0ccc7dcf4390..000000000000
+--- a/Documentation/networking/netdevices.rst
++++ b/Documentation/networking/netdevices.rst
+@@@ -338,14 -336,51 +336,52 @@@ operations directly under the netdev in
+  Devices drivers are encouraged to rely on the instance lock where possibl=
+e.
+ =20
+  For the (mostly software) drivers that need to interact with the core sta=
+ck,
+ -there are two sets of interfaces: ``dev_xxx`` and ``netif_xxx`` (e.g.,
+ -``dev_set_mtu`` and ``netif_set_mtu``). The ``dev_xxx`` functions handle
+ -acquiring the instance lock themselves, while the ``netif_xxx`` functions
+ -assume that the driver has already acquired the instance lock.
+ +there are two sets of interfaces: ``dev_xxx``/``netdev_xxx`` and ``netif_=
+xxx``
+ +(e.g., ``dev_set_mtu`` and ``netif_set_mtu``). The ``dev_xxx``/``netdev_x=
+xx``
+ +functions handle acquiring the instance lock themselves, while the
+ +``netif_xxx`` functions assume that the driver has already acquired
+ +the instance lock.
+ =20
++ struct net_device_ops
++ ---------------------
++=20
++ ``ndos`` are called without holding the instance lock for most drivers.
++=20
++ "Ops locked" drivers will have most of the ``ndos`` invoked under
++ the instance lock.
++=20
++ struct ethtool_ops
++ ------------------
++=20
++ Similarly to ``ndos`` the instance lock is only held for select drivers.
++ For "ops locked" drivers all ethtool ops without exceptions should
++ be called under the instance lock.
++=20
++ struct netdev_stat_ops
++ ----------------------
++=20
++ "qstat" ops are invoked under the instance lock for "ops locked" drivers,
++ and under rtnl_lock for all other drivers.
++=20
++ struct net_shaper_ops
++ ---------------------
++=20
++ All net shaper callbacks are invoked while holding the netdev instance
++ lock. ``rtnl_lock`` may or may not be held.
++=20
++ Note that supporting net shapers automatically enables "ops locking".
++=20
++ struct netdev_queue_mgmt_ops
++ ----------------------------
++=20
++ All queue management callbacks are invoked while holding the netdev insta=
+nce
++ lock. ``rtnl_lock`` may or may not be held.
++=20
++ Note that supporting struct netdev_queue_mgmt_ops automatically enables
++ "ops locking".
++=20
+  Notifiers and netdev instance lock
+- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++ ----------------------------------
+ =20
+  For device drivers that implement shaping or queue management APIs,
+  some of the notifiers (``enum netdev_cmd``) are running under the netdev
+@@@ -355,7 -390,7 +391,8 @@@ For devices with locked ops, currently=20
+  running under the lock:
+  * ``NETDEV_REGISTER``
+  * ``NETDEV_UP``
+ +* ``NETDEV_CHANGE``
++ * ``NETDEV_XDP_FEAT_CHANGE``
+ =20
+  The following notifiers are running without the lock:
+  * ``NETDEV_UNREGISTER``
+diff --cc net/core/lock_debug.c
+index 941e26c1343d,598c443ef2f3..000000000000
+--- a/net/core/lock_debug.c
++++ b/net/core/lock_debug.c
+@@@ -20,7 -20,7 +20,8 @@@ int netdev_debug_event(struct notifier_
+  	switch (cmd) {
+  	case NETDEV_REGISTER:
+  	case NETDEV_UP:
+ +	case NETDEV_CHANGE:
++ 	case NETDEV_XDP_FEAT_CHANGE:
+  		netdev_ops_assert_locked(dev);
+  		fallthrough;
+  	case NETDEV_DOWN:
+
+--Sig_/i9SkFbt2pK6WV/8Hn.BUA1k
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmf3HPQACgkQAVBC80lX
+0GxnYQgAg8XTjYcv62M6nJ+mxY9jinLg+Vwqwi/GBFZycB9+CWP2P8WssCArwBT2
+409FzC0aBRyE7m4LF7sU1sVtR8scF7Wkk44umX7vUGVxiRE6fxS198H1rEt7rX3e
+hmx4kU5Uh3lF8jTd5xHStrg4tjdRtVQ43JC/IYSR+g+H6Qa37xkXRuRuIoTsxaX5
+HaaIu+yglnrH8PQt7dQUHiEuWPKGpeTlpn8LQgjZ9M9qM/rg/kOjxlTrPh2zRDpE
+GEGTuHHGe4k6/YsuZ2odgQukBRCr+zqz0Ms26+cBznoCscf98AbKbHTVyr4OSGN2
+RKzyVT/S1rbxKxD0/tkD0GvyULJqbQ==
+=l5gp
+-----END PGP SIGNATURE-----
+
+--Sig_/i9SkFbt2pK6WV/8Hn.BUA1k--
 
