@@ -1,132 +1,103 @@
-Return-Path: <netdev+bounces-181349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B1BBA84972
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 18:22:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08D6BA84982
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 18:25:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD87C9A124A
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 16:21:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DB651680DC
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 16:24:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 733CA1EBA19;
-	Thu, 10 Apr 2025 16:21:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60EA11EE031;
+	Thu, 10 Apr 2025 16:24:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="axey5ek3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mKj9ahqO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458421D5CE8;
-	Thu, 10 Apr 2025 16:21:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C337A1E5B64
+	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 16:24:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744302119; cv=none; b=Wx2WN2VN4g/eyvWoqFDouDlvZERlWsm7SbN4w6cWMWZmTEVUjmJ2j4NycXTblRxXLOCpIGV4PwVIcCbjavVgjCMaoSxIuSh46a800foDg8lTCgPUyuHTi7TJsz1m6XJrZPRR90Tl0sVqxkqVdpzP1RlVBR4IKukRDTYwddEZm+w=
+	t=1744302282; cv=none; b=IeQD9Jzztpn0IxW4Wd9jlqmCcKX2rwINL6JSaB6bAeI6BuyoxOMyLbxi0Bgz296mHb7MwBgbt64z9RE+I75H55RHtUJBg2IVyJkR9Ybi2GmxhYOSPa41/1RvloQd2g5GEEvQSRuEEb99mBS2qs/db5aftqOPtIU209R6DC4vx/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744302119; c=relaxed/simple;
-	bh=xE5n6B+MNRMKtpObrYG84EMMt9mli5Pp21a1M9jmvY8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=BXZia38I6JsvfJ2sy8WsoLfY0rYbEsfUISaAzSK4cOSsJ7pj0rAKVu5pfLQcP0cpJzjMvyZKWBezDYLDXF7XhJjCD572EjhsPpIIi1qR6mvkzmzs/pub76Ag9jxptCP+65tHt4gDrOZw1jSGgg9UPdGoflQKD0xTVjbHBUxy4So=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=axey5ek3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78860C4CEDD;
-	Thu, 10 Apr 2025 16:21:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744302118;
-	bh=xE5n6B+MNRMKtpObrYG84EMMt9mli5Pp21a1M9jmvY8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=axey5ek338ZhZvIs+yMX5kJJ3aG2naqpdsmvWwGPjBGv+2dxL32lP+Vxln2MY+k3x
-	 MV4GVEcky/bUOisI26LOF/2Z/m1S3jF8g9b9MPn84WLS1zL+pdrtYZ5rTAQfKG9Vtn
-	 GqcA+Vh07HiUFEm+rXfyIMwmaUN9LKvcY1RhZswB/xfyJVWi0TgDN0Ydh0WhRWA24p
-	 4yUDO4dLScMrqsNpmS97PrnbyyqtdRYkD/x8dzkEiZAxyYC7aodlsk9NEIPBV6xHGA
-	 Mac99+oKtMf8TjP3Wjca6IE2hR74/rWcbHuf1Tr8ryKRm/nFzKE7kvZy0j0jfrug0s
-	 Y/Q2MzxToNdYQ==
-Date: Thu, 10 Apr 2025 11:21:57 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Michael Chan <mchan@broadcom.com>,
-	Potnuri Bharat Teja <bharat@chelsio.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Leon Romanovsky <leon@kernel.org>
-Cc: netdev@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: PCI VPD checksum ambiguity
-Message-ID: <20250410162157.GA328195@bhelgaas>
+	s=arc-20240116; t=1744302282; c=relaxed/simple;
+	bh=6v4nFtyz0M2gdeLy2tyI20AHjBf1pIklC2ygDx7e3SU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=V0aB3JCyuR0VNZuLY6ZpB7lLVX0LP9t+KgrVCYM5MykC5sRj+bUqbSxXUgJ0dwf3dQTxlaN4HT4k6+G/GMkO/j6ZA4LPmeGULmhdRF5sFilpnO1PTGS0Ziv4DHspW/dc1JH7QkcR44/0GwioHiZPWkcazhlSkwQys+aC6EnNbUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mKj9ahqO; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-47677b77725so10055901cf.3
+        for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 09:24:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1744302279; x=1744907079; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6v4nFtyz0M2gdeLy2tyI20AHjBf1pIklC2ygDx7e3SU=;
+        b=mKj9ahqOwM7Wd3EoRd0YMrfHo7E7Y9z3BUFM9QdcBKeUAxWwKT/sVRcpTwhKiPVaeR
+         Cq4Rns/OHdf0vQdztpPo0ss4wo7M3NhkKvq+zrMfnz6ShoqDaNzLB5362oH68r3WwWUQ
+         hmIhdeArCma+E7kFA9VkPYUGgg55UtI46SZ45o0UVfNnsri5TA+R8vgOArwS5xAs7RCm
+         x/L1rG/ZufCoupkB3jd0wBo3KQw7WwS2osKnBi+82j+3aORZgGyxgPf7SujnW56insrY
+         tzOJJY5ON2RvwVsFb6gObLn6rqim77fecGcUmZoCzdFpOHsjWiSR/8WZ8U8kSgDk4aqX
+         p1uQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744302279; x=1744907079;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6v4nFtyz0M2gdeLy2tyI20AHjBf1pIklC2ygDx7e3SU=;
+        b=Ot8ZiNa7LS9YkVyNfunmZ4Amix4PHSv+p9mdqUUpdTGV6P9ebckLIvEqUWSO+ccJjG
+         p8vrc151FJPiKfIqQCy/ZOttNB2dGoeZ0wz8OQJb3gMgR6FRSMMG3/lvP4AmvQ1kr8TK
+         Ext5dyFsJuoWt+oTZ/dYPX6qh2Sd1nV3plmoEsBjsbh/70rCP0I+TuuuNnir6CWW1+TC
+         6XNmNeDg6cGDNkODMeR1h5E6RaQjt11Deq04owkX2NgpgUM2Gvp3UeBNobtvCWoWOq5o
+         1PDKHiXdFKPxrwZdNfqdDnYkENL+zV+xVKx69jK4bH7O/RqV9SDSisGTCABA9q5bz6Wv
+         OhWg==
+X-Gm-Message-State: AOJu0Yy3ICWPVHL52Ki/omqcglBCCd8x5TKFtFPdEeXOkX9WlMkmf78P
+	njWAbzj77Wc5Kxx9BZUjLRyqaHIFHhFArxCNlAzZREeYWnEmHSFuk45Jo+nV7ASIMnHpvNFnp8X
+	iDtbIljF+EW1G1Zm+L6zTejb42QR+QLI2eNNV
+X-Gm-Gg: ASbGnctw0nDGCQoqv8x0++sfaHVxGzPjGS+fHmwvNAT6jI+0RZpDjGxFoemLc5rqvIQ
+	wJJl0hEgn77xPyoHDFtrPx25IkxYDxgIwEU/4h+gRJKjiTUDdkf+PoQV7d+LkuY61ksD0OsTwxg
+	SCz6wfKdcvLnpZkuGpNZeiM7Y=
+X-Google-Smtp-Source: AGHT+IHlJ6gh7u/Utj15awFQ2ygVGE04gXu6kHE36bW0/saInVnGO/KvFIdhEhUEwzFys4KxIRiV+jlvLu2uaF2UkWI=
+X-Received: by 2002:a05:622a:178f:b0:476:9e90:101d with SMTP id
+ d75a77b69052e-4796e362cafmr49091321cf.38.1744302278282; Thu, 10 Apr 2025
+ 09:24:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250401205544.GA1620308@bhelgaas>
+References: <20250410161619.3581785-1-sdf@fomichev.me>
+In-Reply-To: <20250410161619.3581785-1-sdf@fomichev.me>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 10 Apr 2025 18:24:27 +0200
+X-Gm-Features: ATxdqUGgn3yioNYaYTD9zcVd-LskD61diZl4-BAdgTEt9MIzCHOJfqUIc_ybq_w
+Message-ID: <CANn89iJ_CYgP2YQVtL6iQ845GUTkt9Sc6CWgjPB=bJwDPOZr1g@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: drop tcp_v{4,6}_restore_cb
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, ncardwell@google.com, kuniyu@amazon.com, horms@kernel.org, 
+	dsahern@kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 01, 2025 at 03:55:44PM -0500, Bjorn Helgaas wrote:
-> Hi,
-> 
-> The PCIe spec is ambiguous about how the VPD checksum should be
-> computed, and resolving this ambiguity might break drivers.
+On Thu, Apr 10, 2025 at 6:16=E2=80=AFPM Stanislav Fomichev <sdf@fomichev.me=
+> wrote:
+>
+> Instead of moving and restoring IP[6]CB, reorder tcp_skb_cb
+> to alias with inet[6]_skb_parm. Add static asserts to make
+> sure tcp_skb_cb fits into skb.cb and that inet[6]_skb_parm is
+> at the proper offset.
 
-Any more input on this?  It would be great to have more information
-about how vendors compute the checksum on their devices.
+May I ask : why ?
 
-There is a proposed PCIe spec change to resolve the ambiguity, and the
-intent is to make a change that reflects what vendors have actually
-implemented.
-
-The only concrete data I've seen so far is from Pavan at Broadcom
-(thank you very much for that), where the checksum starts at the
-beginning of VPD, not at the beginning of VPD-R.
-
-If you can collect VPD data from devices, you can use something like
-this to compute the checksum from the beginning of VPD:
-
-  addr=0; sum=0; xxd -r -c 32 vpd.txt | xxd -p -g1 -c1 x.bin | while read X; do sum=$(($sum + "0x$X")); printf "addr 0x%04x: 0x%02x sum 0x%02x\n" $addr "0x$X" $(($sum % 256)); addr=$(($addr + 1)); done
-
-(You still have to figure out manually where the RV item is so you
-don't include the writable VPD-W part.)
-
-> PCIe r6.0 sec 6.27 says only the VPD-R list should be included in the
-> checksum:
-> 
->   One VPD-R (10h) tag is used as a header for the read-only keywords.
->   The VPD-R list (including tag and length) must checksum to zero.
-> 
-> But sec 6.27.2.2 says "all bytes in VPD ... up to the checksum byte":
-> 
->   RV   The first byte of this item is a checksum byte. The checksum is
->        correct if the sum of all bytes in VPD (from VPD address 0 up
->        to and including this byte) is zero.
-> 
-> These are obviously different unless VPD-R happens to be the first
-> item in VPD.  But sec 6.27 and 6.27.2.1 suggest that the Identifier
-> String item should be the first item, preceding the VPD-R list:
-> 
->   The first VPD tag is the Identifier String (02h) and provides the
->   product name of the device. [6.27]
-> 
->   Large resource type Identifier String (02h)
-> 
->     This tag is the first item in the VPD storage component. It
->     contains the name of the add-in card in alphanumeric characters.
->     [6.27.2.1, Table 6-23]
-> 
-> I think pci_vpd_check_csum() follows sec 6.27.2.2: it sums all the
-> bytes in the buffer up to and including the checksum byte of the RV
-> keyword.  The range starts at 0, not at the beginning of the VPD-R
-> read-only list, so it likely includes the Identifier String.
-> 
-> As far as I can tell, only the broadcom/tg3 and chelsio/cxgb4/t4
-> drivers use pci_vpd_check_csum().  Of course, other drivers might
-> compute the checksum themselves.
-> 
-> Any thoughts on how this spec ambiguity should be resolved?
-> 
-> Any idea how devices in the field populate their VPD?
-> 
-> Can you share any VPD dumps from devices that include an RV keyword
-> item?
-> 
-> Bjorn
+I think you are simply reverting 971f10eca18 ("tcp: better TCP_SKB_CB
+layout to reduce cache line misses")
+without any performance measurements.
 
