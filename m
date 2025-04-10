@@ -1,82 +1,132 @@
-Return-Path: <netdev+bounces-181348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0FB6A84966
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 18:16:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B1BBA84972
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 18:22:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D11773BA707
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 16:16:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD87C9A124A
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 16:21:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A94981EDA2C;
-	Thu, 10 Apr 2025 16:16:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 733CA1EBA19;
+	Thu, 10 Apr 2025 16:21:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="DM1rEQOJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="axey5ek3"
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8981DEFC6
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 16:16:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458421D5CE8;
+	Thu, 10 Apr 2025 16:21:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744301808; cv=none; b=rCksA4qEFSQo6OAagbnAir/ak+uiZ9XKm9CFUgvmsIR6ftLKAhSYsZENwsZsldLnsqpi5VtemU+s74gGuenhkWHuYD8W3qr0DS8yuQZIyBfTS8Tv9OaXPQu4w3TGHUdToU5r3KZjBKuKvRygok0d49ifayuKvdisVC+sWZuK7I4=
+	t=1744302119; cv=none; b=Wx2WN2VN4g/eyvWoqFDouDlvZERlWsm7SbN4w6cWMWZmTEVUjmJ2j4NycXTblRxXLOCpIGV4PwVIcCbjavVgjCMaoSxIuSh46a800foDg8lTCgPUyuHTi7TJsz1m6XJrZPRR90Tl0sVqxkqVdpzP1RlVBR4IKukRDTYwddEZm+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744301808; c=relaxed/simple;
-	bh=rOcp5slA1igBxXP65k4QkhGet9n8Z5i2uP+Zgc+uwR4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qkyaOWYtY9iVVLAHFFsPc4wfph42IjxsrCaAKgDEf0RmHFaGxzrwxMRbSMeqEi6Xx4BH4hI9Gy4xS+5tHWuitRIy37vGfCCHNwDStPHcr6u3JikNZuZy3XU3Q1lSa2bjNxmkxKmlbfKgZBCwXvSoeDwFOhjLH1d8IBJiH287XL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=DM1rEQOJ; arc=none smtp.client-ip=139.165.32.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
-Received: from [192.168.1.58] (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 710E6200A730;
-	Thu, 10 Apr 2025 18:16:42 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 710E6200A730
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1744301802;
-	bh=+t4YwfglD6ojBVFuopgO9uS3BQoi0GCZe4jx2qHfoH0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=DM1rEQOJ3wXROOmAIiGpnFc61YSvFb9au/YPXy4KVigz8WAP8uE/VQxefkqroMaXT
-	 /PNpSU8J39zzyrLKzcwCXSezfxOBDiLCON8t5Q9T76zuWUuj5FJb5TiANtul7oIRw7
-	 y2LuQsZw8iScv3zJOZeDOV5tg8CuNl+8bGGRoLqJmVhiRl8RP1CuD9bTfKG3jo+KLW
-	 skFAg+0NJJcNOeSnAQjOf52RmVsbRHJXrlQupGkVhAj4TNoQsrbYg+JBtxVRODtuN2
-	 OHLwjmtc4Ild32bx7gIzdgwjyJHtBE3cZlyKAgmkp7CG6aKST1JlBcOHrPQ2N/W2ja
-	 zrgIJaHdK8ExQ==
-Message-ID: <046af9bf-6693-414b-9c65-1a1f982a66a6@uliege.be>
-Date: Thu, 10 Apr 2025 18:16:42 +0200
+	s=arc-20240116; t=1744302119; c=relaxed/simple;
+	bh=xE5n6B+MNRMKtpObrYG84EMMt9mli5Pp21a1M9jmvY8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=BXZia38I6JsvfJ2sy8WsoLfY0rYbEsfUISaAzSK4cOSsJ7pj0rAKVu5pfLQcP0cpJzjMvyZKWBezDYLDXF7XhJjCD572EjhsPpIIi1qR6mvkzmzs/pub76Ag9jxptCP+65tHt4gDrOZw1jSGgg9UPdGoflQKD0xTVjbHBUxy4So=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=axey5ek3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78860C4CEDD;
+	Thu, 10 Apr 2025 16:21:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744302118;
+	bh=xE5n6B+MNRMKtpObrYG84EMMt9mli5Pp21a1M9jmvY8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=axey5ek338ZhZvIs+yMX5kJJ3aG2naqpdsmvWwGPjBGv+2dxL32lP+Vxln2MY+k3x
+	 MV4GVEcky/bUOisI26LOF/2Z/m1S3jF8g9b9MPn84WLS1zL+pdrtYZ5rTAQfKG9Vtn
+	 GqcA+Vh07HiUFEm+rXfyIMwmaUN9LKvcY1RhZswB/xfyJVWi0TgDN0Ydh0WhRWA24p
+	 4yUDO4dLScMrqsNpmS97PrnbyyqtdRYkD/x8dzkEiZAxyYC7aodlsk9NEIPBV6xHGA
+	 Mac99+oKtMf8TjP3Wjca6IE2hR74/rWcbHuf1Tr8ryKRm/nFzKE7kvZy0j0jfrug0s
+	 Y/Q2MzxToNdYQ==
+Date: Thu, 10 Apr 2025 11:21:57 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Michael Chan <mchan@broadcom.com>,
+	Potnuri Bharat Teja <bharat@chelsio.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Leon Romanovsky <leon@kernel.org>
+Cc: netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: PCI VPD checksum ambiguity
+Message-ID: <20250410162157.GA328195@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net: ipv6: ioam6: fix double reallocation
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org
-References: <20250410152432.30246-1-justin.iurman@uliege.be>
- <20250410152432.30246-3-justin.iurman@uliege.be>
-Content-Language: en-US
-From: Justin Iurman <justin.iurman@uliege.be>
-In-Reply-To: <20250410152432.30246-3-justin.iurman@uliege.be>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250401205544.GA1620308@bhelgaas>
 
-On 4/10/25 17:24, Justin Iurman wrote:
-> If the dst_entry is the same post transformation (which is a valid use
-> case for IOAM), we don't add it to the cache to avoid a reference loop.
-> Instead, we use a "fake" dst_entry and add it to the cache as a signal.
-> When we read the cache, we compare it with our "fake" dst_entry and
-> therefore detect if we're in the special case.
+On Tue, Apr 01, 2025 at 03:55:44PM -0500, Bjorn Helgaas wrote:
+> Hi,
+> 
+> The PCIe spec is ambiguous about how the VPD checksum should be
+> computed, and resolving this ambiguity might break drivers.
 
-FYI: double reallocation also happens in seg6_iptunnel and rpl_iptunnel 
-and was fixed previously. However, they don't need this patch, since 
-it's for the case "dst_entry is the same post transformation", which is 
-due to pathological configurations in their cases.
+Any more input on this?  It would be great to have more information
+about how vendors compute the checksum on their devices.
+
+There is a proposed PCIe spec change to resolve the ambiguity, and the
+intent is to make a change that reflects what vendors have actually
+implemented.
+
+The only concrete data I've seen so far is from Pavan at Broadcom
+(thank you very much for that), where the checksum starts at the
+beginning of VPD, not at the beginning of VPD-R.
+
+If you can collect VPD data from devices, you can use something like
+this to compute the checksum from the beginning of VPD:
+
+  addr=0; sum=0; xxd -r -c 32 vpd.txt | xxd -p -g1 -c1 x.bin | while read X; do sum=$(($sum + "0x$X")); printf "addr 0x%04x: 0x%02x sum 0x%02x\n" $addr "0x$X" $(($sum % 256)); addr=$(($addr + 1)); done
+
+(You still have to figure out manually where the RV item is so you
+don't include the writable VPD-W part.)
+
+> PCIe r6.0 sec 6.27 says only the VPD-R list should be included in the
+> checksum:
+> 
+>   One VPD-R (10h) tag is used as a header for the read-only keywords.
+>   The VPD-R list (including tag and length) must checksum to zero.
+> 
+> But sec 6.27.2.2 says "all bytes in VPD ... up to the checksum byte":
+> 
+>   RV   The first byte of this item is a checksum byte. The checksum is
+>        correct if the sum of all bytes in VPD (from VPD address 0 up
+>        to and including this byte) is zero.
+> 
+> These are obviously different unless VPD-R happens to be the first
+> item in VPD.  But sec 6.27 and 6.27.2.1 suggest that the Identifier
+> String item should be the first item, preceding the VPD-R list:
+> 
+>   The first VPD tag is the Identifier String (02h) and provides the
+>   product name of the device. [6.27]
+> 
+>   Large resource type Identifier String (02h)
+> 
+>     This tag is the first item in the VPD storage component. It
+>     contains the name of the add-in card in alphanumeric characters.
+>     [6.27.2.1, Table 6-23]
+> 
+> I think pci_vpd_check_csum() follows sec 6.27.2.2: it sums all the
+> bytes in the buffer up to and including the checksum byte of the RV
+> keyword.  The range starts at 0, not at the beginning of the VPD-R
+> read-only list, so it likely includes the Identifier String.
+> 
+> As far as I can tell, only the broadcom/tg3 and chelsio/cxgb4/t4
+> drivers use pci_vpd_check_csum().  Of course, other drivers might
+> compute the checksum themselves.
+> 
+> Any thoughts on how this spec ambiguity should be resolved?
+> 
+> Any idea how devices in the field populate their VPD?
+> 
+> Can you share any VPD dumps from devices that include an RV keyword
+> item?
+> 
+> Bjorn
 
