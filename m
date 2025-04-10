@@ -1,202 +1,182 @@
-Return-Path: <netdev+bounces-181138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8239AA83C97
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 10:22:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FE59A83CAE
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 10:23:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5FC61B672C4
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 08:22:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D880E1B63090
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 08:23:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E213120AF99;
-	Thu, 10 Apr 2025 08:19:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31BF320B208;
+	Thu, 10 Apr 2025 08:21:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RLlOoNiE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Es0IANls"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E5320AF88;
-	Thu, 10 Apr 2025 08:19:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E342046B5
+	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 08:21:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744273166; cv=none; b=PNxpRtbSJR9kVls/Smj6TMClW70brGbw+K1pm6ef9yvplhMDnfM5wwp3OzXojzYY1qWZqxpKabGvhhfy+Igqea7SA1kO8AGSBm6MCiCyWohoBLJ++Y+FUJ9vskfyjgYHYOgrP3vV/K13SHuDml9FS+CkZ809Q5X9YVDcYafyfF8=
+	t=1744273275; cv=none; b=LxwLP5jA0CIA9odeIb1/xVptxJ6nFZ/SgWycE+PSpE7mKFuUy0xp14Ifz0Gv9TEsBqmajTHdZo6j9uocjMd62ArGJzu0A2ZsYTl68pz2SKtiEjJJv/tKuNrhrI4ZJiOZvNrcbwvp23ghXTlXk8HQZZyisW+vrdsm2C9fxFd++xU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744273166; c=relaxed/simple;
-	bh=vj7HOfbc0VUjF+W4DznIGCuy9zZnueeCps54a42o/9M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aKctJYHNBZpi8TNxIR8/HBU7Y1Vue6VJ0jzizB3jNm2xTs+o8hhJXnoxCCUeiMBzdJixeH0bmCOtua66vRWB1HHS5x+h1MhjWNMx4xNZV67EzevGdf43vJP+d6sOvdrtstxY2yPxgUkZIYN1beuoLq1E2LEJqFeBOgMM3q7WiOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RLlOoNiE; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-22548a28d0cso7416535ad.3;
-        Thu, 10 Apr 2025 01:19:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744273164; x=1744877964; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hHyb6lhohF2wzP2TRq2BN9NjbPL3ptwOR5h1WfQqLIY=;
-        b=RLlOoNiEwwoXR5dQCEOEJkOGNZgrVuK0RaK5ZH7+A5kNn2ZuHZoV8UaZzpTkqoF2+b
-         9Bcoj+84/6d+cCtrV23A03jYEhjBM6xRDwW6RTVAqkiRlY2ovTe1bVVjlfpokxVQYwlD
-         IjZRboHxneMuZ53+MUEyt8SaQ1piNul7bqCpqAx96HYAuNUyRupGsVHudnBgpmyykjdZ
-         mdFSJm+Ae2ujAWoZApZpF+OFVZo+5KVtwtquBbWPTihBtvO7NIpJhmBUMaaa9Bn1jnYh
-         Um54Xlx+6eV/jfKH0Y8bQJOgoUOLHdpZ2AyywZPtMsfQblhjcfmecHtoCsBboJOlgDVb
-         qXoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744273164; x=1744877964;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hHyb6lhohF2wzP2TRq2BN9NjbPL3ptwOR5h1WfQqLIY=;
-        b=ZRjVhIvwo/08QCgUH3RvDSuPxKmQGQxy6FHQTvK5zJURxK7csYC6rWY2AyzpqlJhQU
-         g4JOsfeDhROGunA6IOYckSDOrUl7gfo1oPFhZMfLCyhDWrezlPtORMmILJ3F9DXEADLT
-         tVuYOdqTw0SsVk7thLh9L8WJkYMIh4+bqNoGEtdZE5Vu6gOyFobURlrp4e1tjlbziZjY
-         YdDmSD4vs154gkdt0KxYi/X1LBJRzaiwBiA35g2EoCPuNP8IhOqF1XFbjSUcTiutGZIP
-         GzHYyJSC7OM+oSbEnp2Oz00utw+3c3upanrtd92D9Sx9hn9gpxRu74ApUhlvETrhXE4i
-         QbXA==
-X-Forwarded-Encrypted: i=1; AJvYcCUPM3Ws3TSWdwzUoMEPPD5mYve/VmkJ0W4oYPnFwrsGtmp1T3eMbAXuawmCDOxmNPCqQIWjzpbALtnc47Ir@vger.kernel.org, AJvYcCVMxWOYF08N0BfhKPu7oSR8cZI7wc8zeloD/GxFqgVzXc7SHWsFlYKlYBvik0uJZOrpv5Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzau/8GC6wcSXVlO+Oy2RQLW4hPA5+OCkDfjKYW14LPmGcTg0Yq
-	67h4M/mMgasfGW4BGcAXPRAp7zMT5+N4+ZDPnha5V6Pxr4pczJz1
-X-Gm-Gg: ASbGnctvYBfbvKHazObSDBt7sgqkS/sB2/dP50TDeySRV+myr+piFROXGN9ASCAVtMR
-	oVtOSGpkyI02dI6NHSNVFwdWXmyC4TN5P4fDO7EBHC6QNSPUiAlsYtcxAQ+oh0z/5QzeShMVNsT
-	+mBgA4dFnF7xZBTvYinYbZxB3FhxMw3FN+06m1ryhFo4BZiDkL5UEnQO0BmB/mO3991jq7evFBo
-	y1+95rTDZ/D5+Wf4GjkiVBS4Ja4UaUE1+9bQxcG+nz9hDLVr/p57LHVggaN11eDn148sKbbelJ/
-	sXHeMzRjE/BYM2uL3WnO9+4BiZa9by2OSQ==
-X-Google-Smtp-Source: AGHT+IH17ATIoN+yDWaOFwQRSqTSShuXuEFiLJbcGJtyBxMLgeMII6OtBGNiFxLsRBJFPmmRKIiE9A==
-X-Received: by 2002:a17:903:22c5:b0:224:24d5:f20a with SMTP id d9443c01a7336-22be03f19cbmr22298095ad.48.1744273164355;
-        Thu, 10 Apr 2025 01:19:24 -0700 (PDT)
-Received: from localhost ([144.24.43.60])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73bb1d2afa9sm2669045b3a.22.2025.04.10.01.19.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Apr 2025 01:19:24 -0700 (PDT)
-Date: Thu, 10 Apr 2025 16:19:12 +0800
-From: Furong Xu <0x1207@gmail.com>
-To: Boon Khai Ng <boon.khai.ng@altera.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime
- Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Russell King <linux@armlinux.org.uk>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>, Matthew Gerlach
- <matthew.gerlach@altera.com>, Tien Sung Ang <tien.sung.ang@altera.com>, Mun
- Yew Tham <mun.yew.tham@altera.com>, G Thomas Rohan
- <rohan.g.thomas@altera.com>
-Subject: Re: [PATCH net-next v3 1/2] net: stmmac: Refactor VLAN
- implementation
-Message-ID: <20250410161912.0000168a@gmail.com>
-In-Reply-To: <20250408081354.25881-2-boon.khai.ng@altera.com>
-References: <20250408081354.25881-1-boon.khai.ng@altera.com>
-	<20250408081354.25881-2-boon.khai.ng@altera.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1744273275; c=relaxed/simple;
+	bh=VekH1TtvA9ycbAEh3GkwYb3Y2hHvnuv9qkqAOyAANBg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Mvw4U92AA8zse8B5+Rr1QYPeFwfxbTikChMwLW+v/wIs4iK/VZErmcOTYYFIOiH/R9pePUFxTQNtvxSRjf1rlEVO1Y8B3uYTOGGrD65avTVCTKmd0r1ril/Ve5KBFNJc68KN0gbojGv2wNTERTWIXe85Es5AoJapgoWHHQTQUnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Es0IANls; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744273272;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+979veQE+KclGLEtYrkcPeF+CuZm6IpwHOpzDxyU3C4=;
+	b=Es0IANlsk+WvDNVXNQM5znPpnp9PWCy2OpfmRAVDqPNEHPWFdDR5/JJ3dHRiy4eraDS5Ps
+	BPoYaYDaOHHGHtFBoXAL5J3S0rss+ZYWYVrhb4sNzH3fqDIL1WXDBQCFj65BIRK8qtmpR0
+	Wg+0IAo5K4apOsMSUjwZ6MLFrR4D8Ro=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-520-SEnZhfAjOfi0dJpkj5e4Iw-1; Thu,
+ 10 Apr 2025 04:21:06 -0400
+X-MC-Unique: SEnZhfAjOfi0dJpkj5e4Iw-1
+X-Mimecast-MFC-AGG-ID: SEnZhfAjOfi0dJpkj5e4Iw_1744273264
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9902C1800A3E;
+	Thu, 10 Apr 2025 08:21:02 +0000 (UTC)
+Received: from [10.44.33.222] (unknown [10.44.33.222])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A0F751955DCE;
+	Thu, 10 Apr 2025 08:20:57 +0000 (UTC)
+Message-ID: <b73e1103-a670-43da-8f1a-b9c99cd1a90d@redhat.com>
+Date: Thu, 10 Apr 2025 10:20:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 06/14] mfd: zl3073x: Add macros for device registers
+ access
+To: Krzysztof Kozlowski <krzk@kernel.org>, netdev@vger.kernel.org
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
+ Andy Shevchenko <andy@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, Michal Schmidt <mschmidt@redhat.com>,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+References: <20250409144250.206590-1-ivecera@redhat.com>
+ <20250409144250.206590-7-ivecera@redhat.com>
+ <3e12b213-db36-4a76-9a58-c62dc8b1b2ce@kernel.org>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <3e12b213-db36-4a76-9a58-c62dc8b1b2ce@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Tue,  8 Apr 2025 16:13:53 +0800, Boon Khai Ng <boon.khai.ng@altera.com> wrote:
 
-> Refactor VLAN implementation by moving common code for DWMAC4 and
-> DWXGMAC IPs into a separate VLAN module. VLAN implementation for
-> DWMAC4 and DWXGMAC differs only for CSR base address, the descriptor
-> for the VLAN ID and VLAN VALID bit field.
+
+On 10. 04. 25 9:17 dop., Krzysztof Kozlowski wrote:
+> On 09/04/2025 16:42, Ivan Vecera wrote:
+>> Add several macros to access device registers. These macros
+>> defines a couple of static inline functions to ease an access
+>> device registers. There are two types of registers, the 1st type
+>> is a simple one that is defined by an address and size and the 2nd
+>> type is indexed register that is defined by base address, type,
+>> number of register instances and address stride between instances.
+>>
+>> Examples:
+>> __ZL3073X_REG_DEF(reg1, 0x1234, 4, u32);
+>> __ZL3073X_REG_IDX_DEF(idx_reg2, 0x1234, 2, u16, 4, 0x10);
 > 
-> Signed-off-by: Boon Khai Ng <boon.khai.ng@altera.com>
-> Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/Makefile  |   2 +-
->  drivers/net/ethernet/stmicro/stmmac/common.h  |   1 +
->  drivers/net/ethernet/stmicro/stmmac/dwmac4.h  |  40 ---
->  .../net/ethernet/stmicro/stmmac/dwmac4_core.c | 295 +-----------------
->  .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  13 -
->  .../ethernet/stmicro/stmmac/dwxgmac2_core.c   |  87 ------
->  drivers/net/ethernet/stmicro/stmmac/hwif.c    |   8 +
->  drivers/net/ethernet/stmicro/stmmac/hwif.h    |  61 ++--
->  .../net/ethernet/stmicro/stmmac/stmmac_vlan.c | 294 +++++++++++++++++
->  .../net/ethernet/stmicro/stmmac/stmmac_vlan.h |  63 ++++
->  10 files changed, 401 insertions(+), 463 deletions(-)
->  create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.c
->  create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.h
+> Why can't you use standard FIELD_ macros? Why inventing the wheel again?
+
+This is not about FIELD_* macros replacement. This is an abstraction to 
+access device registers in safe manner. Generated inline functions 
+ensures that proper value or pointer to value type is passed by caller.
+Also in case of arbitrary zl3073x_{read,write_{,idx}_reg() the does not 
+need to know what is the register address.
+
+If the caller just need to read regX or indexed regY it will call just
+
+zl3073x_read_regX(..., &value);
+zl3073x_read_regX(..., idx, &value);
+
+instead of
+
+zl3073x_read_reg(..., ZL3073x_REGX_ADDR, &value);
+zl3073x_read_reg(..., ZL3073x_REGY_ADDR + (idx * ZL3073X_REGY_STRIDE), 
+&value)
+
+The 1st variant is additionally type safe, the caller is warned if it is 
+passing u8 * instead of u32 *.
+
+I tried to take similar approach the mlxsw driver took to access device 
+registers.
+
+If you are only against such macro usage for static inline functions 
+generation, I can avoid them and pre-create them in separate include 
+file like zl3073x_regs.h
+
+>> this defines the following functions:
+>> int zl3073x_read_reg1(struct zl3073x_dev *dev, u32 *value);
+>> int zl3073x_write_reg1(struct zl3073x_dev *dev, u32 value);
+>> int zl3073x_read_idx_reg2(struct zl3073x_dev *dev, unsigned int idx,
+>>                            u32 *value);
+>> int zl3073x_write_idx_reg2(struct zl3073x_dev *dev, unsigned int idx,
+>>                             u32 value);
 > 
-[...]
-> +static void vlan_update_hash(struct mac_device_info *hw, u32 hash,
-> +			     __le16 perfect_match, bool is_double)
-> +{
-> +	void __iomem *ioaddr = hw->pcsr;
-> +	u32 value;
-> +
-> +	writel(hash, ioaddr + VLAN_HASH_TABLE);
-> +
-> +	value = readl(ioaddr + VLAN_TAG);
-> +
-> +	if (hash) {
-> +		value |= VLAN_VTHM | VLAN_ETV;
-> +		if (is_double) {
-> +			value |= VLAN_EDVLP;
-> +			value |= VLAN_ESVL;
-> +			value |= VLAN_DOVLTC;
+> Do not copy code into commit msg. I asked about this last time. Explain
+> why do you need it, why existing API is not good.
 
-I can confirm that 802.1ad (QinQ) has been broken on stmmac for years,
-and it will be so nice if this refactoring includes some fixes for QinQ
+Will drop... I wanted only show how the macros work and what is their output
 
-> +		}
-> +
-> +		writel(value, ioaddr + VLAN_TAG);
-> +	} else if (perfect_match) {
-> +		u32 value = VLAN_ETV;
-> +
-> +		if (is_double) {
-> +			value |= VLAN_EDVLP;
-> +			value |= VLAN_ESVL;
-> +			value |= VLAN_DOVLTC;
-> +		}
-> +
-> +		writel(value | perfect_match, ioaddr + VLAN_TAG);
-> +	} else {
-> +		value &= ~(VLAN_VTHM | VLAN_ETV);
-> +		value &= ~(VLAN_EDVLP | VLAN_ESVL);
-> +		value &= ~VLAN_DOVLTC;
-> +		value &= ~VLAN_VID;
-> +
-> +		writel(value, ioaddr + VLAN_TAG);
-> +	}
-> +}
-> +
-> +static void vlan_enable(struct mac_device_info *hw, u32 type)
-> +{
-> +	void __iomem *ioaddr = hw->pcsr;
-> +	u32 value;
-> +
-> +	value = readl(ioaddr + VLAN_INCL);
-> +	value |= VLAN_VLTI;
-> +	value |= VLAN_CSVL; /* Only use SVLAN */
-> +	value &= ~VLAN_VLC;
-> +	value |= (type << VLAN_VLC_SHIFT) & VLAN_VLC;
-> +	writel(value, ioaddr + VLAN_INCL);
-> +}
-> +
-> +static void vlan_rx_hw(struct mac_device_info *hw,
-> +		       struct dma_desc *rx_desc, struct sk_buff *skb)
-> +{
-> +	if (hw->desc->get_rx_vlan_valid(rx_desc)) {
-> +		u16 vid = hw->desc->get_rx_vlan_tci(rx_desc);
-> +
-> +		__vlan_hwaccel_put_tag(skb, htons(ETH_P_8021Q), vid);
+>>
+>> There are also several shortcut macros to define registers with
+>> certain bit widths: 8, 16, 32 and 48 bits.
+>>
+>> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+>> ---
+> 
+> 
+> ...
+> 
+>> + *
+>> + * Note that these functions have to be called with the device lock
+>> + * taken.
+>> + */
+>> +#define __ZL3073X_REG_IDX_DEF(_name, _addr, _len, _type, _num, _stride)	\
+>> +typedef _type zl3073x_##_name##_t;					\
+>> +static inline __maybe_unused						\
+>> +int zl3073x_read_##_name(struct zl3073x_dev *zldev, unsigned int idx,	\
+>> +			 _type * value)					\
+>> +{									\
+>> +	WARN_ON(idx >= (_num));						\
+> 
+> No need to cause panic reboots. Either review your code so this does not
+> happen or properly handle.
 
-So, as the comment above, ETH_P_8021AD or ETH_P_8021Q shall be set selectively
-depend on the frame type.
+Ack, will replace by
 
-> +	}
-> +}
+if (idx >= (_num))
+	return -EINVAL
+
+Thanks,
+Ivan
 
 
