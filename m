@@ -1,255 +1,307 @@
-Return-Path: <netdev+bounces-181335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66662A84824
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 17:38:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BFD1A84846
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 17:43:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 888F81645A5
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 15:38:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C02EC4E1D76
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 15:42:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 958B71E7C10;
-	Thu, 10 Apr 2025 15:38:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5875C1EB1B9;
+	Thu, 10 Apr 2025 15:41:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=universe-factory.net header.i=@universe-factory.net header.b="OxvxGSqN"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="KLjPic/a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.universe-factory.net (osgiliath.universe-factory.net [141.95.161.142])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF87189913;
-	Thu, 10 Apr 2025 15:38:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.95.161.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB62D1EB19E;
+	Thu, 10 Apr 2025 15:41:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744299519; cv=none; b=n13reNxml6vH4O7BM/5Jy3tJppF50fWZzxKh0c9VxkpkLIkD+2admsFVcOO7+dtR2TIPwMqP+5HSLWjiSWdfV7hFbJ4b/G7ehhd499iizjXUFJYA10CzPCtiRQpnz45gt2yLY7fS7cxVcSOC9ybBwRKNTbgnQjTNUcr+hKFruWU=
+	t=1744299696; cv=none; b=Qt1eB0JY3E1zu1cLPL/J5hNvKqB8d0Qgd8eIFy4rpWP0Pubkuqg69gtZsMf3QLHNmcCv+itLdnFpxOr6kFU7KCrErp3RaIyXF4A/g3iONjNBCNKoMOOs8jP668sY97S8dT7PCkNZM5fA3gDtaPD2Z9rDpM1ZY7gLty5wZbHfLns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744299519; c=relaxed/simple;
-	bh=qZRjEXGAKny5LBHm+0gZDyT2jAe9uIbIhB61DdBPZlM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IEtHXX0yXuH2QghaEYCTdKqQgJiL3t6rPAKPA3JnsLcP87be5P0pOTq+Y0e5ztp+UxoDaUgy3QWiBfchL+fmEhUD05DTpx3NOiCmhdSN6L1n33rKRH5J9407uBnrcA/s7o45Q/7U/4FYXaJ7ueFuZZA60CrVzFL675bTsykZdHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=universe-factory.net; spf=pass smtp.mailfrom=universe-factory.net; dkim=pass (2048-bit key) header.d=universe-factory.net header.i=@universe-factory.net header.b=OxvxGSqN; arc=none smtp.client-ip=141.95.161.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=universe-factory.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=universe-factory.net
-Message-ID: <94e1ac2c-46f1-4787-ad50-e4a5ab11011a@universe-factory.net>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=universe-factory.net;
-	s=dkim; t=1744299512;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=qZRjEXGAKny5LBHm+0gZDyT2jAe9uIbIhB61DdBPZlM=;
-	b=OxvxGSqNEPv9J3+vc8TGXBmMct0cQR0Nt0AorohevYq/vlyHNeJP0S7z+r7kbsoHF1pw8h
-	kM2rvWfdOCa9nBV9PgvWxColMmK3zHu7C5f5JpVsTlns2tN2TMDfKeHlDiZV7iJPPOeb6Q
-	nkTd9pSDOtFlbvwXxv/GkzRbDWGSGpXFdnq5K5WpBPf1ppKY3yoDTMyR4a6emhAJZWRESy
-	HHneQMurS20SCIEtMJrbYhK4uP73GUdrI8giAzPHIFo3N51laGHGQCwTz71J4RgPBEQedf
-	6dL6SisL5iPm8SAc0Kbb5kDgwNT2fvpciZkQ22ezdrE+AWMowYN3226YM7ci2A==
-Authentication-Results: mail.universe-factory.net;
-	auth=pass smtp.mailfrom=mschiffer@universe-factory.net
-Date: Thu, 10 Apr 2025 17:38:30 +0200
+	s=arc-20240116; t=1744299696; c=relaxed/simple;
+	bh=viJoT16Dko4EM6ZifhTxYMhd/X3njgMqptfmCNC1EO0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qf1xkYEaEBABWJD6speJ/TcW2t75KMzWmtG2CIMcyvo54aARryBurjb1yTi1RQ5XeeNtTZDucKz5pn6Wlh+JH23h7ghHkh/wRCEnk8BaakxrHViTeXH2Tt1o1WDjvq0OO6Pm/8wPRjjEAnhupmsgb3yu10i04W6FZlmEkKwcDnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=KLjPic/a; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=UAZhoCAjR8q9qo0ALdUNXnxEL8nlEi/xKakRLeZ+VoY=; b=KLjPic/avaWPJ8zDZ/exaor3WB
+	QrtO6wEGe/nEVwLRV+ZwkNLueO/kaFTqg0Q9I2YaDbCETXAL2cdHbszXtJk9qqS7utSa29HC/LYFE
+	wqliuc0HpGTancZGs3LZh11JZAukxIAXjR5UiHvRdNQOZez1+hd+aWfE84yYiykXA8oJELFw8A3B2
+	yk/4QlKwcsPn8EPK6Avw2FQ1Ka4M95KLw6aecu132tMY4wD9ECh0X8Dn8XN43S8hhCeLZ1Sk1r1oA
+	gaL3VF7sfQ8w+LF2ooyUe2yqvo7JGAwWHBawx9+crwtKhtJvAylwfO0X1i5+3huuZBWVlGerNHxPF
+	BLlTFhWQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48002)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u2u1e-00026l-15;
+	Thu, 10 Apr 2025 16:41:10 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u2u1a-0003hD-1i;
+	Thu, 10 Apr 2025 16:41:06 +0100
+Date: Thu, 10 Apr 2025 16:41:06 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 2/2] net: phy: Add Marvell PHY PTP support
+Message-ID: <Z_fmkuPhqMqWBL2M@shell.armlinux.org.uk>
+References: <20250409101808.43d5a17d@kmaincent-XPS-13-7390>
+ <Z_YwxYZc7IHkTx_C@shell.armlinux.org.uk>
+ <20250409104858.2758e68e@kmaincent-XPS-13-7390>
+ <Z_ZlDLzvu_Y2JWM8@shell.armlinux.org.uk>
+ <20250409143820.51078d31@kmaincent-XPS-13-7390>
+ <Z_Z3lchknUpZS1UP@shell.armlinux.org.uk>
+ <20250409180414.19e535e5@kmaincent-XPS-13-7390>
+ <Z_avqyOX2bi44sO9@shell.armlinux.org.uk>
+ <Z/b2yKMXNwjqTKy4@shell.armlinux.org.uk>
+ <20250410111754.136a5ad1@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] batman-adv: fix duplicate MAC address check
-Content-Language: en-US-large
-To: Paolo Abeni <pabeni@redhat.com>, Marek Lindner
- <marek.lindner@mailbox.org>, Simon Wunderlich <sw@simonwunderlich.de>,
- Antonio Quartulli <antonio@mandelbit.com>,
- Sven Eckelmann <sven@narfation.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, b.a.t.m.a.n@lists.open-mesh.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <c775aab5514f25014f778c334235a21ee39708b4.1744129395.git.mschiffer@universe-factory.net>
- <0c288b2e-9747-4a50-a16f-bf4238829ffa@redhat.com>
-From: Matthias Schiffer <mschiffer@universe-factory.net>
-Autocrypt: addr=mschiffer@universe-factory.net; keydata=
- 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
- cQqe8eRmcdNdqWSiJQ8VLoI=
-In-Reply-To: <0c288b2e-9747-4a50-a16f-bf4238829ffa@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------sNPEAjL00dW0Dw07Asv36qEo"
-X-Spamd-Bar: ----
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250410111754.136a5ad1@kmaincent-XPS-13-7390>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------sNPEAjL00dW0Dw07Asv36qEo
-Content-Type: multipart/mixed; boundary="------------oBMmu7dtOKxnkbs8AgOfZ2ca";
- protected-headers="v1"
-From: Matthias Schiffer <mschiffer@universe-factory.net>
-To: Paolo Abeni <pabeni@redhat.com>, Marek Lindner
- <marek.lindner@mailbox.org>, Simon Wunderlich <sw@simonwunderlich.de>,
- Antonio Quartulli <antonio@mandelbit.com>,
- Sven Eckelmann <sven@narfation.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, b.a.t.m.a.n@lists.open-mesh.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <94e1ac2c-46f1-4787-ad50-e4a5ab11011a@universe-factory.net>
-Subject: Re: [PATCH net] batman-adv: fix duplicate MAC address check
-References: <c775aab5514f25014f778c334235a21ee39708b4.1744129395.git.mschiffer@universe-factory.net>
- <0c288b2e-9747-4a50-a16f-bf4238829ffa@redhat.com>
-In-Reply-To: <0c288b2e-9747-4a50-a16f-bf4238829ffa@redhat.com>
+On Thu, Apr 10, 2025 at 11:17:54AM +0200, Kory Maincent wrote:
+> On Wed, 9 Apr 2025 23:38:00 +0100
+> "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+> > On Wed, Apr 09, 2025 at 06:34:35PM +0100, Russell King (Oracle) wrote:
+> > > On Wed, Apr 09, 2025 at 06:04:14PM +0200, Kory Maincent wrote:  
+> > > > On Wed, 9 Apr 2025 14:35:17 +0100
+> > > > "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+> > > >   
+> >  [...]  
+> >  [...]  
+> >  [...]  
+> > > > 
+> > > > So you are only testing the mvpp2 PTP. It seems there is something broken
+> > > > with it. I don't think it is related to my work.  
+> > > 
+> > > Yes, and it has worked - but probably was never tested with PTPDv2 but
+> > > with linuxptp. As it was more than five years ago when I worked on this
+> > > stuff, I just can't remember the full details of the test setup I used.
+> > > 
+> > > I think the reason I gave up running PTP on my network is the problems
+> > > that having the NIC bound into a Linux bridge essentially means that
+> > > you can't participate in PTP on that machine. That basically means a
+> > > VM host machine using a bridge device for the guests can't use PTP
+> > > to time sync itself.
+> > > 
+> > > Well, it looks like the PHY based timestamping also isn't working -
+> > > ptp4l says its failing to timestamp transmitted packets, but having
+> > > added debug, the driver _is_ timestamping them, so the timestamps
+> > > are getting lost somewhere in the networking layer, or are too late
+> > > for ptp4l, which only waits 1ms, and the schedule_delayed_work(, 2) 
+> > > will be about 20ms at HZ=100. Increasing the wait in ptp4l to 100ms
+> > > still doesn't appear to get a timestamp. According to the timestamps
+> > > on the debug messages, it's only taking 10ms to return the timestamp.
+> > > 
+> > > So, at the moment, ptp looks entirely non-functional. Or the userspace
+> > > tools are broken.  
+> > 
+> > Right, got to the bottom of it at last. I hate linuxptp / ptp4l. The
+> > idea that one looks at the source, sees this:
+> > 
+> >                 res = poll(&pfd, 1, sk_tx_timeout);
+> >                 if (res < 1) {
+> >                         pr_err(res ? "poll for tx timestamp failed: %m" :
+> >                                      "timed out while polling for tx
+> > timestamp"); pr_err("increasing tx_timestamp_timeout may correct "
+> >                                "this issue, but it is likely caused by a
+> > driver bug");
+> > 
+> > finds this in the same file:
+> > 
+> > int sk_tx_timeout = 1;
+> > 
+> > So it seemed obvious and logical that increasing that initialiser would
+> > increase the _default_ timeout... but no, that's not the case, because,
+> > ptp4l.c does:
+> > 
+> >         sk_tx_timeout = config_get_int(cfg, NULL, "tx_timestamp_timeout");
+> > 
+> > unconditionally, and config.c has a table of config options along with
+> > their defaults... meaning that initialiser above for sk_tx_timeout
+> > means absolutely nothing, and one _has_ to use a config file.
+> > 
+> > With that fixed, ptp4l's output looks very similar to that with mvpp2 -
+> > which doesn't inspire much confidence that the ptp stack is operating
+> > properly with the offset and frequency varying all over the place, and
+> > the "delay timeout" messages spamming frequently. I'm also getting
+> > ptp4l going into fault mode - so PHY PTP is proving to be way more
+> > unreliable than mvpp2 PTP. :(
+> 
+> That's really weird. On my board the Marvell PHY PTP is more reliable than MACB.
+> Even by disabling the interrupt.
+> What is the state of the driver you are using? 
 
---------------oBMmu7dtOKxnkbs8AgOfZ2ca
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Right, it seems that some of the problems were using linuxptp v3.0
+rather than v4.4, which seems to work better (in that it doesn't
+seem to time out and drop into fault mode.)
 
-T24gMTAvMDQvMjAyNSAxMTozOCwgUGFvbG8gQWJlbmkgd3JvdGU6DQo+IE9uIDQvOC8yNSA2
-OjMwIFBNLCBNYXR0aGlhcyBTY2hpZmZlciB3cm90ZToNCj4+IGJhdGFkdl9jaGVja19rbm93
-bl9tYWNfYWRkcigpIGlzIGJvdGggdG9vIGxlbmllbnQgYW5kIHRvbyBzdHJpY3Q6DQo+Pg0K
-Pj4gLSBJdCBpcyBjYWxsZWQgZnJvbSBiYXRhZHZfaGFyZGlmX2FkZF9pbnRlcmZhY2UoKSwg
-d2hpY2ggbWVhbnMgdGhhdCBpdA0KPj4gICAgY2hlY2tlZCBpbnRlcmZhY2VzIHRoYXQgYXJl
-IG5vdCB1c2VkIGZvciBiYXRtYW4tYWR2IGF0IGFsbC4gTW92ZSBpdA0KPj4gICAgdG8gYmF0
-YWR2X2hhcmRpZl9lbmFibGVfaW50ZXJmYWNlKCkuIEFsc28sIHJlc3RyaWN0IGl0IHRvIGhh
-cmRpZnMgb2YNCj4+ICAgIHRoZSBzYW1lIG1lc2ggaW50ZXJmYWNlOyBkaWZmZXJlbnQgbWVz
-aCBpbnRlcmZhY2VzIHNob3VsZCBub3QgaW50ZXJhY3QNCj4+ICAgIGF0IGFsbC4gVGhlIGJh
-dGFkdl9jaGVja19rbm93bl9tYWNfYWRkcigpIGFyZ3VtZW50IGlzIGNoYW5nZWQgZnJvbQ0K
-Pj4gICAgYHN0cnVjdCBuZXRfZGV2aWNlYCB0byBgc3RydWN0IGJhdGFkdl9oYXJkX2lmYWNl
-YCB0byBhY2hpZXZlIHRoaXMuDQo+PiAtIFRoZSBjaGVjayBvbmx5IGNhcmVzIGFib3V0IGhh
-cmRpZnMgaW4gQkFUQURWX0lGX0FDVElWRSBhbmQNCj4+ICAgIEJBVEFEVl9JRl9UT19CRV9B
-Q1RJVkFURUQgc3RhdGVzLCBidXQgaW50ZXJmYWNlcyBpbiBCQVRBRFZfSUZfSU5BQ1RJVkUN
-Cj4+ICAgIHN0YXRlIHNob3VsZCBiZSBjaGVja2VkIGFzIHdlbGwsIG9yIHRoZSBmb2xsb3dp
-bmcgc3RlcHMgd2lsbCBub3QNCj4+ICAgIHJlc3VsdCBpbiBhIHdhcm5pbmcgdGhlbiB0aGV5
-IHNob3VsZDoNCj4+DQo+PiAgICAtIEFkZCB0d28gaW50ZXJmYWNlcyBvbiBkb3duIHN0YXRl
-IHdpdGggZGlmZmVyZW50IE1BQyBhZGRyZXNzZXMgdG8NCj4+ICAgICAgYSBtZXNoIGFzIGhh
-cmRpZnMNCj4+ICAgIC0gQ2hhbmdlIHRoZSBNQUMgYWRkcmVzc2VzIHNvIHRoZXkgY29uZmxp
-ZWN0DQo+PiAgICAtIFNldCBpbnRlcmZhY2VzIHRvIHVwIHN0YXRlDQo+Pg0KPj4gICAgTm93
-IHRoZXJlIHdpbGwgYmUgdHdvIGFjdGl2ZSBoYXJkaWZzIHdpdGggdGhlIHNhbWUgTUFDIGFk
-ZHJlc3MsIGJ1dCBubw0KPj4gICAgd2FybmluZy4gRml4IGJ5IG9ubHkgaWdub3JpbmcgaGFy
-ZGlmcyBpbiBCQVRBRFZfSUZfTk9UX0lOX1VTRSBzdGF0ZS4NCj4+DQo+PiBUaGUgUkNVIGxv
-Y2sgY2FuIGJlIGRyb3BwZWQsIGFzIHdlJ3JlIGhvbGRpbmcgUlROTCBhbnl3YXlzIHdoZW4g
-dGhlDQo+PiBmdW5jdGlvbiBpcyBjYWxsZWQuDQo+Pg0KPj4gV2hpbGUgd2UncmUgYXQgaXQs
-IGFsc28gc3dpdGNoIGZyb20gcHJfd2FybigpIHRvIG5ldGRldl93YXJuKCkuDQo+Pg0KPj4g
-Rml4ZXM6IGM2YzhmZWEyOTc2OSAoIm5ldDogQWRkIGJhdG1hbi1hZHYgbWVzaGluZyBwcm90
-b2NvbCIpDQo+PiBTaWduZWQtb2ZmLWJ5OiBNYXR0aGlhcyBTY2hpZmZlciA8bXNjaGlmZmVy
-QHVuaXZlcnNlLWZhY3RvcnkubmV0Pg0KPiANCj4gRXZlbiBpZiBtYXJrZWQgZm9yIG5ldCBJ
-IGFzc3VtZSB0aGlzIHdpbGwgZXZlbnR1YWxseSBnbyBmaXJzdCB2aWEgdGhlDQo+IGJhdG1h
-biB0cmVlLg0KDQpZZXMuIFNob3VsZCBJIGhhdmUgbWFya2VkIHRoaXMgZGlmZmVyZW50bHk/
-DQoNCj4gDQo+PiAtLS0NCj4+DQo+PiBBc2lkZTogYmF0YWR2X2hhcmRpZl9hZGRfaW50ZXJm
-YWNlKCkgYmVpbmcgY2FsbGVkIGZvciBhbGwgZXhpc3RpbmcNCj4+IGludGVyZmFjZXMgYW5k
-IGhhdmluZyBhIGdsb2JhbCBiYXRhZHZfaGFyZGlmX2xpc3QgYXQgYWxsIGlzIGFsc28gbm90
-DQo+PiB2ZXJ5IG5pY2UsIGJ1dCB0aGlzIHdpbGwgYmUgYWRkcmVzc2VkIHNlcGFyYXRlbHks
-IGFzIGNoYW5naW5nIGl0IHdpbGwNCj4+IHJlcXVpcmUgbW9yZSByZWZhY3RvcmluZy4NCj4+
-DQo+PiAgIG5ldC9iYXRtYW4tYWR2L2hhcmQtaW50ZXJmYWNlLmMgfCAzNyArKysrKysrKysr
-KysrKysrKysrKy0tLS0tLS0tLS0tLS0NCj4+ICAgMSBmaWxlIGNoYW5nZWQsIDIyIGluc2Vy
-dGlvbnMoKyksIDE1IGRlbGV0aW9ucygtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9uZXQvYmF0
-bWFuLWFkdi9oYXJkLWludGVyZmFjZS5jIGIvbmV0L2JhdG1hbi1hZHYvaGFyZC1pbnRlcmZh
-Y2UuYw0KPj4gaW5kZXggZjE0NWY5NjYyNjUzLi4wN2I0MzY2MjZhZmIgMTAwNjQ0DQo+PiAt
-LS0gYS9uZXQvYmF0bWFuLWFkdi9oYXJkLWludGVyZmFjZS5jDQo+PiArKysgYi9uZXQvYmF0
-bWFuLWFkdi9oYXJkLWludGVyZmFjZS5jDQo+PiBAQCAtNTA2LDI4ICs1MDYsMzQgQEAgYmF0
-YWR2X2hhcmRpZl9pc19pZmFjZV91cChjb25zdCBzdHJ1Y3QgYmF0YWR2X2hhcmRfaWZhY2Ug
-KmhhcmRfaWZhY2UpDQo+PiAgIAlyZXR1cm4gZmFsc2U7DQo+PiAgIH0NCj4+ICAgDQo+PiAt
-c3RhdGljIHZvaWQgYmF0YWR2X2NoZWNrX2tub3duX21hY19hZGRyKGNvbnN0IHN0cnVjdCBu
-ZXRfZGV2aWNlICpuZXRfZGV2KQ0KPj4gK3N0YXRpYyB2b2lkIGJhdGFkdl9jaGVja19rbm93
-bl9tYWNfYWRkcihjb25zdCBzdHJ1Y3QgYmF0YWR2X2hhcmRfaWZhY2UgKmhhcmRfaWZhY2Up
-DQo+PiAgIHsNCj4+IC0JY29uc3Qgc3RydWN0IGJhdGFkdl9oYXJkX2lmYWNlICpoYXJkX2lm
-YWNlOw0KPj4gKwljb25zdCBzdHJ1Y3QgbmV0X2RldmljZSAqbWVzaF9pZmFjZSA9IGhhcmRf
-aWZhY2UtPm1lc2hfaWZhY2U7DQo+PiArCWNvbnN0IHN0cnVjdCBiYXRhZHZfaGFyZF9pZmFj
-ZSAqdG1wX2hhcmRfaWZhY2U7DQo+PiAgIA0KPj4gLQlyY3VfcmVhZF9sb2NrKCk7DQo+PiAt
-CWxpc3RfZm9yX2VhY2hfZW50cnlfcmN1KGhhcmRfaWZhY2UsICZiYXRhZHZfaGFyZGlmX2xp
-c3QsIGxpc3QpIHsNCj4+IC0JCWlmIChoYXJkX2lmYWNlLT5pZl9zdGF0dXMgIT0gQkFUQURW
-X0lGX0FDVElWRSAmJg0KPj4gLQkJICAgIGhhcmRfaWZhY2UtPmlmX3N0YXR1cyAhPSBCQVRB
-RFZfSUZfVE9fQkVfQUNUSVZBVEVEKQ0KPj4gKwlpZiAoIW1lc2hfaWZhY2UpDQo+PiArCQly
-ZXR1cm47DQo+PiArDQo+PiArCWxpc3RfZm9yX2VhY2hfZW50cnkodG1wX2hhcmRfaWZhY2Us
-ICZiYXRhZHZfaGFyZGlmX2xpc3QsIGxpc3QpIHsNCj4+ICsJCWlmICh0bXBfaGFyZF9pZmFj
-ZSA9PSBoYXJkX2lmYWNlKQ0KPj4gKwkJCWNvbnRpbnVlOw0KPj4gKw0KPj4gKwkJaWYgKHRt
-cF9oYXJkX2lmYWNlLT5tZXNoX2lmYWNlICE9IG1lc2hfaWZhY2UpDQo+PiAgIAkJCWNvbnRp
-bnVlOw0KPj4gICANCj4+IC0JCWlmIChoYXJkX2lmYWNlLT5uZXRfZGV2ID09IG5ldF9kZXYp
-DQo+PiArCQlpZiAodG1wX2hhcmRfaWZhY2UtPmlmX3N0YXR1cyA9PSBCQVRBRFZfSUZfTk9U
-X0lOX1VTRSkNCj4+ICAgCQkJY29udGludWU7DQo+PiAgIA0KPj4gLQkJaWYgKCFiYXRhZHZf
-Y29tcGFyZV9ldGgoaGFyZF9pZmFjZS0+bmV0X2Rldi0+ZGV2X2FkZHIsDQo+PiAtCQkJCQlu
-ZXRfZGV2LT5kZXZfYWRkcikpDQo+PiArCQlpZiAoIWJhdGFkdl9jb21wYXJlX2V0aCh0bXBf
-aGFyZF9pZmFjZS0+bmV0X2Rldi0+ZGV2X2FkZHIsDQo+PiArCQkJCQloYXJkX2lmYWNlLT5u
-ZXRfZGV2LT5kZXZfYWRkcikpDQo+PiAgIAkJCWNvbnRpbnVlOw0KPj4gICANCj4+IC0JCXBy
-X3dhcm4oIlRoZSBuZXdseSBhZGRlZCBtYWMgYWRkcmVzcyAoJXBNKSBhbHJlYWR5IGV4aXN0
-cyBvbjogJXNcbiIsDQo+PiAtCQkJbmV0X2Rldi0+ZGV2X2FkZHIsIGhhcmRfaWZhY2UtPm5l
-dF9kZXYtPm5hbWUpOw0KPj4gLQkJcHJfd2FybigiSXQgaXMgc3Ryb25nbHkgcmVjb21tZW5k
-ZWQgdG8ga2VlcCBtYWMgYWRkcmVzc2VzIHVuaXF1ZSB0byBhdm9pZCBwcm9ibGVtcyFcbiIp
-Ow0KPj4gKwkJbmV0ZGV2X3dhcm4oaGFyZF9pZmFjZS0+bmV0X2RldiwNCj4+ICsJCQkgICAg
-IlRoZSBuZXdseSBhZGRlZCBtYWMgYWRkcmVzcyAoJXBNKSBhbHJlYWR5IGV4aXN0cyBvbjog
-JXNcbiIsDQo+PiArCQkJICAgIGhhcmRfaWZhY2UtPm5ldF9kZXYtPmRldl9hZGRyLCB0bXBf
-aGFyZF9pZmFjZS0+bmV0X2Rldi0+bmFtZSk7DQo+PiArCQluZXRkZXZfd2FybihoYXJkX2lm
-YWNlLT5uZXRfZGV2LA0KPj4gKwkJCSAgICAiSXQgaXMgc3Ryb25nbHkgcmVjb21tZW5kZWQg
-dG8ga2VlcCBtYWMgYWRkcmVzc2VzIHVuaXF1ZSB0byBhdm9pZCBwcm9ibGVtcyFcbiIpOw0K
-Pj4gICAJfQ0KPj4gLQlyY3VfcmVhZF91bmxvY2soKTsNCj4+ICAgfQ0KPiANCj4gSSBmZWVs
-IGxpa2UgdGhlIGFib3ZlIGNvZGUgbWl4ZXMgdW5uZWNlc3NhcmlseSBmaXggYW5kIHJlZmFj
-dG9yDQo+ICh2YXJpYWJsZSByZW5hbWUsIGRpZmZlcmVudCBwcmludCBoZWxwZXIgdXNhZ2Up
-Lg0KPiANCj4gSSB0aGluayB0aGUgZml4IHNob3VsZCBiZSBtaW5pbWFsLCB0aGUgcmVmYWN0
-b3Igc2hvdWxkIGxhbmQgaW4gYQ0KPiBkaWZmZXJlbnQgcGF0Y2ggZm9yIG5leHQuDQoNCk9r
-YXkuIEknbGwgcmVtb3ZlIHRoZSBwcmludCBoZWxwZXIgY2hhbmdlIGZvciBub3cuDQoNCkkg
-dGhpbmsgdGhlIHZhcmlhYmxlIHJlbmFtZSBzaG91bGQgYmUga2VwdCwgYXMgd2Ugbm93IGhh
-dmUgdHdvIA0KYmF0YWR2X2hhcmRfaWZhY2UqIHZhcnMsIHNvIHdlIG5lZWQgdG8gaW50cm9k
-dWNlIGEgc2Vjb25kIG5hbWUuIE5hbWluZyB0aGUgDQppbnRlcmZhY2Ugd2UncmUgd29ya2lu
-ZyBvbiBoYXJkX2lmYWNlIGFuZCB1c2luZyB0bXBfaGFyZF9pZmFjZSBmb3IgYSBsb29wIA0K
-dmFyaWFibGUgbWF0Y2hlcyBzaW1pbGFyIGNvZGUgdGhhdCBhbHJlYWR5IGV4aXN0cyBpbiBi
-YXRtYW4tYWR2Lg0KDQpCZXN0LA0KTWF0dGhpYXMNCg==
+With v4.4, if I try:
 
---------------oBMmu7dtOKxnkbs8AgOfZ2ca--
+# ./ptp4l -i eth2 -m -s -2
+ptp4l[322.396]: selected /dev/ptp0 as PTP clock
+ptp4l[322.453]: port 1 (eth2): INITIALIZING to LISTENING on INIT_COMPLETE
+ptp4l[322.454]: port 0 (/var/run/ptp4l): INITIALIZING to LISTENING on INIT_COMPLETE
+ptp4l[322.455]: port 0 (/var/run/ptp4lro): INITIALIZING to LISTENING on INIT_COMPLETE
+ptp4l[328.797]: selected local clock 005182.fffe.113302 as best master
 
---------------sNPEAjL00dW0Dw07Asv36qEo
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+that's all I see. If I drop the -2, then:
 
------BEGIN PGP SIGNATURE-----
+# ./ptp4l -i eth2 -m -s
+ptp4l[405.516]: selected /dev/ptp0 as PTP clock
+ptp4l[405.521]: port 1 (eth2): INITIALIZING to LISTENING on INIT_COMPLETE
+ptp4l[405.522]: port 0 (/var/run/ptp4l): INITIALIZING to LISTENING on INIT_COMPL
+ETE
+ptp4l[405.523]: port 0 (/var/run/ptp4lro): INITIALIZING to LISTENING on INIT_COMPLETE
+ptp4l[405.833]: port 1 (eth2): new foreign master d063b4.fffe.0243c3-1
+Marvell 88E1510 f212a200.mdio-mii:00: rx timestamp overrun (q=0 stat=0x5 seq=227)
+ptp4l[405.884]: port 1 (eth2): received SYNC without timestamp
+ptp4l[409.833]: selected best master clock d063b4.fffe.0243c3
+ptp4l[409.834]: foreign master not using PTP timescale
+ptp4l[409.834]: running in a temporal vortex
+ptp4l[409.834]: port 1 (eth2): LISTENING to UNCALIBRATED on RS_SLAVE
+ptp4l[410.840]: master offset   -5184050 s0 freq  +10360 path delay     55766
+ptp4l[411.841]: master offset   -5255393 s1 freq  -60982 path delay     55766
+ptp4l[412.840]: master offset      61793 s2 freq    +811 path delay     55766
+ptp4l[412.841]: port 1 (eth2): UNCALIBRATED to SLAVE on MASTER_CLOCK_SELECTED
+ptp4l[413.840]: master offset     -56367 s2 freq  -98811 path delay     73450
+ptp4l[414.840]: master offset      62566 s2 freq   +3212 path delay     73450
+ptp4l[415.840]: master offset     -18947 s2 freq  -59531 path delay     68353
+ptp4l[416.840]: master offset      18277 s2 freq  -27991 path delay     62059
+ptp4l[417.840]: master offset      -8628 s2 freq  -49413 path delay     62059
+ptp4l[418.840]: master offset      44759 s2 freq   +1385 path delay     55766
+ptp4l[419.840]: master offset     -40592 s2 freq  -70538 path delay     55766
+ptp4l[420.840]: master offset      44689 s2 freq   +2565 path delay     42890
+ptp4l[421.840]: master offset     -41672 s2 freq  -70389 path delay     42890
+...
+ptp4l[485.840]: master offset     -32192 s2 freq  -72387 path delay     47615
+ptp4l[486.840]: master offset      58486 s2 freq   +8633 path delay     47615
+ptp4l[487.840]: master offset     -57279 s2 freq  -89586 path delay     53535
+ptp4l[488.840]: master offset      49431 s2 freq     -60 path delay     53535
+ptp4l[489.840]: master offset     -55336 s2 freq  -89997 path delay     58247
+ptp4l[490.840]: master offset      52156 s2 freq    +894 path delay     58247
+ptp4l[491.840]: master offset     -56897 s2 freq  -92512 path delay     65986
+ptp4l[492.840]: master offset      53392 s2 freq    +707 path delay     65986
+ptp4l[493.840]: master offset     -35477 s2 freq  -72144 path delay     71031
+ptp4l[494.840]: master offset      10634 s2 freq  -36676 path delay     71031
+ptp4l[495.840]: master offset     -17451 s2 freq  -61571 path delay     71031
+ptp4l[496.840]: master offset      52024 s2 freq   +2669 path delay     71031
+ptp4l[497.840]: master offset     -36239 s2 freq  -69987 path delay     71031
+ptp4l[498.840]: master offset      10968 s2 freq  -33652 path delay     71031
+ptp4l[499.840]: master offset     -21116 s2 freq  -62445 path delay     61292
+ptp4l[500.840]: master offset      56971 s2 freq   +9307 path delay     39904
+ptp4l[501.840]: master offset     -29442 s2 freq  -60015 path delay     39904
+ptp4l[502.840]: master offset      49644 s2 freq  +10239 path delay     37320
+ptp4l[503.912]: master offset     -30912 s2 freq  -55424 path delay     37934
+ptp4l[504.840]: master offset     -20782 s2 freq  -54568 path delay     41265
 
-wsF5BAABCAAjFiEEZmTnvaa2aYgexS51Fu8/ZMsgHZwFAmf35fYFAwAAAAAACgkQFu8/ZMsgHZx9
-0g//dk/nrApTxdGHS/ubqriFFKtDfsRDDgthWuFpsNbrzPsR0jmxvYJpRMRHC+RyJH4504xbQGAB
-OSD2eEj42lVSnnPUM6m4ggNTtQy5XCbqqwmBSyLB4nVetNZhYBdQe3mKMsItbC1UkL4cI2QU7I+p
-o2uKu7gYQQ64oJkQ1oxSCYI2Ir1a3sTb9RjQ3iPy17LbeffaVj70RoQ/fweC7TYHhzpiX61odqN1
-902ZqwdtNZABKFwX/HuLUWkiCjtDuWRjt5kwTcvuhFV8vfup7/eHH1yoVnLSgd2zcTyyA2PXHEUE
-hxlvmTVqfNobrxF8UPnCvHcTGmt/fGHO6Gq5fcEkkdcRDFO0DrcR/bowVK7Kmk0aRMPJD2USsR68
-/xYZefvd85kcUxGntFU/KkJeN7Fr7RZsXDCuv8q5hogy4ykOMAI4Ej8QTvxZJfdwjlfs6cGFAnqw
-470YpMw1Kil+Okmb2JeMDgG7JNXwO3FJkIzKufhv1lFqo+axuQi+dOnr+AyoHRFjMGUq6AGV1uQ4
-57+GI+n2LuA+8zdHi/C11FjlH7h8BrOy7DpHTT0kjzjfNhPym4NQ3SiNPgROOL0tLAHeNAYiq+r0
-1zyaedMPBmvQh+SQ/fMYzBq6+KtvL3tn0WoRwQHRkDrPdlBZoj94UyFIEvgplmk+OWYqJ0ZcrKBU
-79U=
-=S+Dw
------END PGP SIGNATURE-----
+and from that you can see that the offset and frequency are very much
+all over the place, not what you would expect from something that is
+supposed to be _hardware_ timestamped - which is why I say that NTP
+seems to be superior to PTP at least here.
 
---------------sNPEAjL00dW0Dw07Asv36qEo--
+With mvpp2, it's a very similar story:
+
+ptp4l[628.834]: master offset      38211 s2 freq  -29874 path delay     62949
+ptp4l[629.834]: master offset     -41111 s2 freq  -97733 path delay     66289
+ptp4l[630.834]: master offset      33131 s2 freq  -35824 path delay     63864
+ptp4l[631.834]: master offset     -55578 s2 freq -114594 path delay     63864
+ptp4l[632.833]: master offset      34110 s2 freq  -41579 path delay     57582
+ptp4l[633.834]: master offset     -13137 s2 freq  -78593 path delay     60047
+ptp4l[634.834]: master offset      55063 s2 freq  -14334 path delay     49425
+ptp4l[635.834]: master offset     -41302 s2 freq  -94180 path delay     49425
+ptp4l[636.833]: master offset      11798 s2 freq  -53471 path delay     42796
+ptp4l[637.834]: master offset     -31575 s2 freq  -93304 path delay     42796
+ptp4l[638.833]: master offset      24722 s2 freq  -46480 path delay     46230
+ptp4l[639.834]: master offset     -35568 s2 freq  -99353 path delay     52896
+ptp4l[640.834]: master offset      56812 s2 freq  -17644 path delay     52896
+ptp4l[641.834]: master offset     -63429 s2 freq -120841 path delay     66734
+ptp4l[642.834]: master offset      56669 s2 freq  -19772 path delay     62778
+ptp4l[643.834]: master offset     -31006 s2 freq  -90446 path delay     62778
+ptp4l[644.834]: master offset      40576 s2 freq  -28166 path delay     54047
+ptp4l[645.834]: master offset     -33082 s2 freq  -89651 path delay     54047
+ptp4l[646.833]: master offset       7230 s2 freq  -59264 path delay     50476
+ptp4l[647.834]: master offset     -19581 s2 freq  -83906 path delay     50476
+ptp4l[648.833]: master offset      17652 s2 freq  -52547 path delay     50476
+ptp4l[649.834]: master offset     -13170 s2 freq  -78073 path delay     50476
+ptp4l[650.833]: master offset      18712 s2 freq  -50142 path delay     47967
+
+Again, offset all over the place, frequency also showing that it doesn't
+stabilise.
+
+This _could_ be because of the master clock being random - but then it's
+using the FEC PTP implementation with PTPD v2 - maybe either the FEC
+implementation is buggy or maybe it's PTPD v2 causing this. I have no
+idea how I can debug this - and I'm not going to invest in a "grand
+master" PTP clock on a whim just to find out that isn't the problem.
+
+I thought... maybe I can use the PTP implementation in a Marvell
+switch as the network master, but the 88E6176 doesn't support PTP.
+
+Maybe I can use an x86 platform... nope:
+
+# ethtool -T enp0s25
+Time stamping parameters for enp0s25:
+Capabilities:
+        software-transmit
+        software-receive
+        software-system-clock
+PTP Hardware Clock: none
+Hardware Transmit Timestamp Modes: none
+Hardware Receive Filter Modes: none
+
+Anyway, let's try taking a tcpdump on the x86 machine of the sync
+packets and compare the deviation of the software timestamp to that
+of the hardware timestamp (all deviations relative to the first
+packet part seconds):
+
+16:30:30.577298 - originTimeStamp : 1744299061 seconds, 762464622 nanoseconds
+16:30:31.577270 - originTimeStamp : 1744299062 seconds, 762363987 nanoseconds
+   -28us						-100.635us
+16:30:32.577303 - originTimeStamp : 1744299063 seconds, 762429696 nanoseconds
+   +85us						-34.926us
+16:30:33.577236 - originTimeStamp : 1744299064 seconds, 762328728 nanoseconds
+   -62us						-135.894us
+16:30:34.577280 - originTimeStamp : 1744299065 seconds, 762398770 nanoseconds
+   -18us						-65.852us
+
+We can see here that the timestamp from the software receive is far
+more regular than the origin timestamp in the packets, which, in
+combination with the randomness of both mvpp2 and the 88e151x PTP
+trying to sync with it, makes me question whether there is something
+fundamentally wrong with the FEC PTP implementation / PTPDv2.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
