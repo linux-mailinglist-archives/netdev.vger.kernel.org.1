@@ -1,125 +1,110 @@
-Return-Path: <netdev+bounces-181207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 842A3A84136
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:52:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 543FEA84147
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:57:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 334DA17A844
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 10:52:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3C503B78E3
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 10:53:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0CB7281368;
-	Thu, 10 Apr 2025 10:51:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BfMqTbz4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE43926FDBB;
+	Thu, 10 Apr 2025 10:54:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 371D3280CF5
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 10:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C774690;
+	Thu, 10 Apr 2025 10:54:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744282317; cv=none; b=pK53kJHhBM21QAbDLTs9lsIH1I2shytUULfRM/cgBUTS6Txf2QazCbvZzsMrkCVSXiPbfZkynAGQgxvROhRnc/6QOb0UuAAp8i1bh8PkrZoLMOAeQ98N70PDo9GmgrjzT3DdwXJq9AGwMSBrlaSe8dwKqQGzQFjMZbsvrL0jvlY=
+	t=1744282446; cv=none; b=jy4Dm455BeBm7YwSxqHzvukGSuUyPOMV7elMnVxLCLHe7eu3IAsSN9sv6+JJbFbZDPNJixVgT/0SjDReLdKHUQFEC+jA/2Ic1wWbPlNQCKjF0S5+sRnKj8AZ4R8hSQgCSdmibxKANLEPOB4d6FYwQrBNZ6HzsLj2m9nqJt5KDD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744282317; c=relaxed/simple;
-	bh=Hu/dyNyMQiMt3jY/azDePScdyJcDtyMqgmW7s3RlZB4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R32thJqy6uH2GtYgHJLNwf44/iEmf2KNAZo+3u+3RtjiPpIS2N+wp7437/roqIHofJljA2wCHC/FJ80LojMMDNOIEmrAV4gW47tGMivXzfVpvMOhAQSTqXw3kQrTHy7cvkPqDcL+/AOqOb2WzCx5508sjN0XHCl4khxMU9G5s6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BfMqTbz4; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744282315;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Hu/dyNyMQiMt3jY/azDePScdyJcDtyMqgmW7s3RlZB4=;
-	b=BfMqTbz4uRoPhhebYLBXBh2iPrKeUYvQAnhRwjKYWk3L/MQpDzV5LlqvyP+E14410RWM4Z
-	xhdcy+CBA4a4LrQOeJRi98gRK/Z/Fijhckl4hXcTHZ/OkTHyOetm9CrDZRxmkAImRfljJg
-	6vwubNugLU3K9HejUUF8bLvOS6tgsz4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-574-_-TlEokIPDqryy2gHaOCXQ-1; Thu, 10 Apr 2025 06:51:51 -0400
-X-MC-Unique: _-TlEokIPDqryy2gHaOCXQ-1
-X-Mimecast-MFC-AGG-ID: _-TlEokIPDqryy2gHaOCXQ_1744282311
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3912d9848a7so886470f8f.0
-        for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 03:51:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744282311; x=1744887111;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hu/dyNyMQiMt3jY/azDePScdyJcDtyMqgmW7s3RlZB4=;
-        b=l5IDS3f8nVNH+PmwzQ9eTx/ZtfpIl2AZzF60pUUPod7wZl/O0oWgVcZcbS1cwL9rW8
-         nHG6vbB0WZINeDXZXrxR3g0rx+n06E/dwxPRMRpFQZCcmNMfe840QjAzH/wZXpKFKISC
-         IivL50k/OEKjidp7Lrj7YoTeMqQ/z2XCB4cATOUZWuKBRn8sMlOzh5CWjn1xAcgUtXnZ
-         kw5hIheyFERRG/nu7VOSvcMXYx4X8CXBvgQLJKWodGC8+gCt7gcA85JQ8uMAKjT8rb92
-         1gHkEoeQOEyodkkq62LlRq2euSfSYU7EZt0YtwZLg1ovY7y7k2Z5C/m2YBLD1tFOe35B
-         mpbg==
-X-Forwarded-Encrypted: i=1; AJvYcCW4SL0CGVImqdgj2prbKohaWmCQblVVNqv5Q/PLyow4NF7P8i+kb/0+Eo93nra241GMohen4KE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCrJKhdrmYHWBPKKnxZbqcANpOMRFlFuG3axTv/jCtVotSSD3u
-	xvHEU3S33luXy7VRbHC/u9l6v8Xz7fs5UjmQ63948H8BBo0fHE6ZcNNaNHtb134EluqYGEh5mPG
-	lr1BlU8AuDBw0wiChs9fQONBNTI3JXz3JF01VaqEp9ewKPWv13NbeRA==
-X-Gm-Gg: ASbGncu9xlxzANzJ1je1pkfQgv1f8W6OGp+lFw8DTAR5eLSpkCtyLEhmj4T8vxeiUCq
-	CfPU+IQomHD9PQb8N3SIm4M4N26D9k8uMKz2KApmLEICdBCpW1TPo7mPHK+Xk4WJXOKeiG8MVon
-	yYMN8UKeH59oKdt/K95kTnjmGP2ayLvE6Bkd9BpV1fgeiZn/1OcYJKm6BPj1fJDyiZSS1DqoCZe
-	vd4Il/PBcJuZvjtjCUJt6TKWe+/Sg0J6AmVeFtxkmnafZN2x0L2zrJ9Z91mXp7dICP/wgqBqVT8
-	X4AJ/lIvX45xZgDTSiueSTxdejzdA4EcLZ86pdA=
-X-Received: by 2002:a5d:648c:0:b0:39c:2c0b:8db4 with SMTP id ffacd0b85a97d-39d8f275fbamr1595321f8f.10.1744282310741;
-        Thu, 10 Apr 2025 03:51:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG/0IeDpLk+TZuwsPB4YIsabynndJrajxwaMO5dLlq7dbzR+E2v8IMog4+FmRDVWpawIdK9Kw==
-X-Received: by 2002:a5d:648c:0:b0:39c:2c0b:8db4 with SMTP id ffacd0b85a97d-39d8f275fbamr1595300f8f.10.1744282310374;
-        Thu, 10 Apr 2025 03:51:50 -0700 (PDT)
-Received: from [192.168.88.253] (146-241-84-24.dyn.eolo.it. [146.241.84.24])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39d893fdf8fsm4359327f8f.91.2025.04.10.03.51.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Apr 2025 03:51:49 -0700 (PDT)
-Message-ID: <22ad09e7-f2b3-48c3-9a6b-8a7b9fd935fe@redhat.com>
-Date: Thu, 10 Apr 2025 12:51:48 +0200
+	s=arc-20240116; t=1744282446; c=relaxed/simple;
+	bh=T0Eo6RBz2cS1tU44dJiO8W8b0KC+LupLMrZspOvecns=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q8RRL0ZOHyN00H/lgYQbZiLCmZh4Ue5au1HczQprY4iu5H48RM6qxc6PcSdA2CjuhWnPJE+7rnfRhnB14k4CYolo3NG4RVd+teEvprTvHCKKy0tcDbTbub41hM3wWtfX3ZrMSnAXhUhSSa0VOGAgfjMCqEjwBTJptM3//Kt2w4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1u2pXc-0003K3-9W; Thu, 10 Apr 2025 12:53:52 +0200
+Date: Thu, 10 Apr 2025 12:53:52 +0200
+From: Florian Westphal <fw@strlen.de>
+To: lvxiafei <xiafei_xupt@163.com>
+Cc: fw@strlen.de, coreteam@netfilter.org, davem@davemloft.net,
+	edumazet@google.com, horms@kernel.org, kadlec@netfilter.org,
+	kuba@kernel.org, linux-kernel@vger.kernel.org,
+	lvxiafei@sensetime.com, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com,
+	pablo@netfilter.org
+Subject: Re: [PATCH V3] netfilter: netns nf_conntrack: per-netns
+ net.netfilter.nf_conntrack_max sysctl
+Message-ID: <20250410105352.GB6272@breakpoint.cc>
+References: <20250409094206.GB17911@breakpoint.cc>
+ <20250410100227.83156-1-xiafei_xupt@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] vsock: Linger on unsent data
-To: Michal Luczaj <mhal@rbox.co>, Stefano Garzarella <sgarzare@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20250407-vsock-linger-v1-0-1458038e3492@rbox.co>
- <20250407-vsock-linger-v1-1-1458038e3492@rbox.co>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250407-vsock-linger-v1-1-1458038e3492@rbox.co>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250410100227.83156-1-xiafei_xupt@163.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On 4/7/25 8:41 PM, Michal Luczaj wrote:
-> Change the behaviour of a lingering close(): instead of waiting for all
-> data to be consumed, block until data is considered sent, i.e. until worker
-> picks the packets and decrements virtio_vsock_sock::bytes_unsent down to 0.
+lvxiafei <xiafei_xupt@163.com> wrote:
+> > in any case.
+> >
+> > Also:
+> >
+> > -       if (nf_conntrack_max && unlikely(ct_count > nf_conntrack_max)) {
+> > +       if (net->ct.sysctl_max && unlikely(ct_count > min(nf_conntrack_max, net->ct.sysctl_max))) {
+> >
+> >
+> > ... can't be right, this allows a 0 setting in the netns.
+> > So, setting 0 in non-init-net must be disallowed.
+> 
+> Yes, setting 0 in non-init-net must be disallowed.
+> 
+> Should be used:
+> unsigned int net_ct_sysctl_max = max(min(nf_conntrack_max, net->ct.sysctl_max), 0);
+> if (nf_conntrack_max && unlikely(ct_count > net_ct_sysctl_max)) {
 
-I think it should be better to expand the commit message explaining the
-rationale.
+That would work.  Alternative, probably preferrable, is to do
+something like this:
 
-> Do linger on shutdown() just as well.
+@@ -615,10 +615,10 @@ enum nf_ct_sysctl_index {
+ static struct ctl_table nf_ct_sysctl_table[] = {
+-               .proc_handler   = proc_dointvec,
++               .proc_handler   = proc_douintvec_minmax,
++               .extra1         = SYSCTL_ZERO, /* 0 == no limit */
+        },
+        [NF_SYSCTL_CT_COUNT] = {
+                .procname       = "nf_conntrack_count",
+@@ -1081,9 +1082,11 @@ static int nf_conntrack_standalone_init_sysctl(struct net *net)
 
-Why? Generally speaking shutdown() is not supposed to block. I think you
-should omit this part.
+        /* Don't allow non-init_net ns to alter global sysctls */
+        if (!net_eq(&init_net, net)) {
+                table[NF_SYSCTL_CT_EXPECT_MAX].mode = 0444;
+                table[NF_SYSCTL_CT_BUCKETS].mode = 0444;
++
++               /* 0 means no limit, only allowed in init_net */
++               table[NF_SYSCTL_CT_MAX].extra1 = SYSCTL_ONE;
+        }
 
-Thanks,
+That will make setting a 0 value illegal for non-init net case:
 
-Paolo
+sysctl net.netfilter.nf_conntrack_max=0
+sysctl: setting key "net.netfilter.nf_conntrack_max": Invalid argument
 
+> min(nf_conntrack_max, net->ct.sysctl_max) is the upper limit of ct_count
+> At the same time, when net->ct.sysctl_max == 0, the original intention is no limit,
+> but it can be limited by nf_conntrack_max in different netns.
+
+Sounds good to me.
 
