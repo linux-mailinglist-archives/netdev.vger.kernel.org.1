@@ -1,141 +1,93 @@
-Return-Path: <netdev+bounces-181318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EED1FA846DF
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 16:51:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5340A846DD
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 16:51:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 387C019E2171
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:47:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A14F3B3A86
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:47:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDC6328EA58;
-	Thu, 10 Apr 2025 14:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77EA128CF6A;
+	Thu, 10 Apr 2025 14:46:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="e4ZyCHPC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lblWHTXQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 351B928EA5C;
-	Thu, 10 Apr 2025 14:44:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D69F28CF66
+	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 14:46:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744296247; cv=none; b=S9VrZ/qSkBOHpe1/Ihvq2l+/czvEMz0d0/Q+cdNAtTW1T4EUYfTn2X1BR6pe7hiUJAzWzd1WXXmDQ7LMsw+N4fb1HkoXHdpoJzG53+SU6Y1tEgestFeQG+WdREImS929L54sL1PEEE+h3r0ZIXPPlG0TIlb/BzVpXtIKvWatPck=
+	t=1744296369; cv=none; b=HJpzgiYuF3LVVhmeYGvOQoo2w7EYalBuASdfbYm1mQ/cEYvJ/TtyOP5PtkfkA2R2onJHCzrCdSXzA140/3dqO7ieT29a7vRds39j86N5YHdTF/vHRcRc4RTlFbDeWayr0MMacYYguLPCOtboNPK6xxi8wOwtdGRUl3+eOopkWaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744296247; c=relaxed/simple;
-	bh=7NA7IGx3px2lpOhipDVT0MQpDVEshcCBzuvv5Sl1hlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rt5UZ0yUgnx8bxAV2Qgu7p9UxLp4/0na4pQyq7yDjZIRjAnzH05hkGnTB0ELdmMOd0p68Keewq0+8wzFHRG8d50xWmT1Pi/6jpf2KN/r4+C9w15FE/tVC84GEB7Xta1mDC5eR9b5vTYvd9lDYpFZTtN44ITqW7tk0yioxsfXtWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=e4ZyCHPC; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=CmP5rnVgOFbK3FaMkFul90NMSZkbXqvY+iGtx4H41h0=; b=e4ZyCHPC5onj6x7WOAwSiwT+dY
-	pAtfK+20WpMJ9guxwIrL8g1DCGIjQt4ZvL+WNbTtWCXOAHMBoV8C1t3407tnXrZ3ze/XhvLR5mv71
-	47zDwd2QhsBc6tMuIj+XnHLQCOUn9eRScXZE/mNAPV3uCMelesUXMLAIZUsK4Zsh0LXY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u2t8E-008gyh-Dj; Thu, 10 Apr 2025 16:43:54 +0200
-Date: Thu, 10 Apr 2025 16:43:54 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Fiona Klute <fiona.klute@gmx.de>
-Cc: netdev@vger.kernel.org,
-	Thangaraj Samynathan <Thangaraj.S@microchip.com>,
-	Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
-	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-list@raspberrypi.com, stable@vger.kernel.org
-Subject: Re: [PATCH] net: usb: lan78xx: Enforce a minimum interrupt polling
- period
-Message-ID: <0901d90d-3f20-4a10-b680-9c978e04ddda@lunn.ch>
-References: <20250310165932.1201702-1-fiona.klute@gmx.de>
- <11f5be1d-9250-4aba-8f51-f231b09d3992@lunn.ch>
- <4577e7d7-cadc-41c6-b93f-eca7d5a8eb46@gmx.de>
- <42b5d49b-caf8-492d-8dba-b5292279478a@lunn.ch>
- <dc8ef510-8f7d-4c96-9fd8-76b67a22aaf9@gmx.de>
+	s=arc-20240116; t=1744296369; c=relaxed/simple;
+	bh=H+sFb4nSMqzo0Az07VpAlmhDe0Mav7XDp0oRSWVHraU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=N24MjG/OQ4Rjx+4NVsqcxomlinSvSD5IQIq20lICF94S3tpZD+E2n1Rkv/6eEDfr4wqz0KlJAY0aQ5XlzddN4cFrc1hZN86VG6aURr1G6U0zzI8Jo+M074tcnNH74QqeiZFsjhQONBrqM4GBunHTkwb//L2VDg9uoXkyQrwUArY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lblWHTXQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BE44C4CEDD;
+	Thu, 10 Apr 2025 14:46:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744296368;
+	bh=H+sFb4nSMqzo0Az07VpAlmhDe0Mav7XDp0oRSWVHraU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=lblWHTXQXRbUtOIW+UMLe/wJ1ljrtPYFlgtzP0LVgViKCoqsKNo5EnEXHIZOyALuk
+	 jzYGaC4Nov9GGVgkyyREfod4Mic2MekPXULZIMHtY0huLjYs56ScmwexMFewF/f9tf
+	 ZSEznpaFTAu943eMJ+9R1IAO/akYavbfL/rIx/J1gDyHcjr0qAHvsWCiKCR55qm340
+	 w+wy+G1IpIV3fw/uU0YQPAcSbDHKK9bJquAUx1OnwOI7TomYr3WIDOGhJAS2DrWdcC
+	 5bvkprfkyYo1sFOGeA9QLisRixUPOZDg5D32wfUbqcOx+4GkOpRizNVEUwlwu9s0wW
+	 C0jDK+sI5ifCA==
+Message-ID: <5f939ce9-6d82-4a94-8adc-aab21c330fa0@kernel.org>
+Date: Thu, 10 Apr 2025 08:46:07 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dc8ef510-8f7d-4c96-9fd8-76b67a22aaf9@gmx.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 net-next 06/14] ipv4: ip_tunnel: Convert
+ ip_tunnel_delete_nets() callers to ->exit_rtnl().
+Content-Language: en-US
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ netdev@vger.kernel.org, Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>
+References: <20250410022004.8668-1-kuniyu@amazon.com>
+ <20250410022004.8668-7-kuniyu@amazon.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250410022004.8668-7-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> > Ah, O.K. This tells me the PHY is a lan88xx. And there is a workaround
-> > involved for an issue in this PHY. Often PHYs are driven by polling
-> > for status changes once per second. Not all PHYs/boards support
-> > interrupts. It could be this workaround has only been tested with
-> > polling, not interrupts, and so is broken when interrupts are used.
-> > 
-> > As a quick hack test, in lan78xx_phy_init()
-> > 
-> > 	/* if phyirq is not set, use polling mode in phylib */
-> > 	if (dev->domain_data.phyirq > 0)
-> > 		phydev->irq = dev->domain_data.phyirq;
-> > 	else
-> > 		phydev->irq = PHY_POLL;
-> > 
-> > Hard code phydev->irq to PHY_POLL, so interrupts are not used.
-> > 
-> > See if you can reproduce the issue when interrupts are not used.
-> It took a while, but I'm fairly confident now that the workaround works,
-> I've had over 1000 boots on the hardware in question and didn't see the
-> bug. Someone going by upsampled reported the same in the issue on Github
-> [1], and pointed out that people working with some Nvidia board and a
-> LAN7800 USB device came to the same conclusion a while ago [2].
+On 4/9/25 8:19 PM, Kuniyuki Iwashima wrote:
+> ip_tunnel_delete_nets() iterates the dying netns list and performs the
+> same operations for each.
 > 
-> That leaves me with the question, what does that mean going forward?
-> Would it make sense to add a quirk to unconditionally force polling on
-> lan88xx, at least until/unless the interrupt handling can be fixed?
+> Let's export ip_tunnel_destroy() as ip_tunnel_delete_net() and call it
+> from ->exit_rtnl().
+> 
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+> Cc: David Ahern <dsahern@kernel.org>
+> Cc: Steffen Klassert <steffen.klassert@secunet.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
+>  include/net/ip_tunnels.h |  7 +++----
+>  net/ipv4/ip_gre.c        | 27 ++++++++++++---------------
+>  net/ipv4/ip_tunnel.c     | 25 +++++++------------------
+>  net/ipv4/ip_vti.c        |  9 ++++-----
+>  net/ipv4/ipip.c          |  9 ++++-----
+>  5 files changed, 30 insertions(+), 47 deletions(-)
+> 
 
-I don't think you need a quirk:
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-static struct phy_driver microchip_phy_driver[] = {
-{
-        .phy_id         = 0x0007c132,
-        /* This mask (0xfffffff2) is to differentiate from
-         * LAN8742 (phy_id 0x0007c130 and 0x0007c131)
-         * and allows future phy_id revisions.
-         */
-        .phy_id_mask    = 0xfffffff2,
-        .name           = "Microchip LAN88xx",
 
-        /* PHY_GBIT_FEATURES */
-
-        .probe          = lan88xx_probe,
-        .remove         = lan88xx_remove,
-
-        .config_init    = lan88xx_config_init,
-        .config_aneg    = lan88xx_config_aneg,
-        .link_change_notify = lan88xx_link_change_notify,
-
-        .config_intr    = lan88xx_phy_config_intr,
-        .handle_interrupt = lan88xx_handle_interrupt,
-
-Just remove .config_intr and .handle_interrupt. If these are not
-provided, phylib will poll, even if an interrupt number has been
-passed. And since these functions are not shared with any other PHY,
-you can remove them.
-
-Please write a good commit message, we want it clear why they where
-removed, to try to prevent somebody putting them back again.
-
-And please aim this for net, not net-next:
-
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-
-The change will then get back ported to stable kernels.
-
-	Andrew
 
