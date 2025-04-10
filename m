@@ -1,63 +1,65 @@
-Return-Path: <netdev+bounces-181439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8351A85023
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 01:31:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD39EA8502A
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 01:39:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1F611B82107
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 23:31:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 852444A3B5D
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 23:39:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A22A120D516;
-	Thu, 10 Apr 2025 23:31:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9E0420E037;
+	Thu, 10 Apr 2025 23:39:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h3YDSXNj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qv0K3Cj+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F2A1EB1A1;
-	Thu, 10 Apr 2025 23:31:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8596F20C49F
+	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 23:39:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744327883; cv=none; b=sxze7uQ5mriffe6g+3iTKtpl/m1gwSGugGzvrBoWJ/4VRDg/HGSGKfeBg/d+xOcNoI2NVhPfksmUhFfoQwQZNQDFufXUhwvfNW6xnzUUXx5NMzcaIlfg3AdL4zKF9HwVzbxB351NlrtB80lTRwAw+wdz13EvxFqcic9jV/jocgA=
+	t=1744328350; cv=none; b=AiuvZwiCu0c1vvv5nRORdgjOxfSoTXs5FaqhVw/GJhrCRRcw8hYb0TU96Jgi09e6IT5Pqx5+DdWKfifxpMAU8LwYro8I5HPP3Jd9ffRvHoqCbPr9nblC7xa3A/NNj8XbnoRg4slFy3aMeN2umg2wtaqGiMRUWSdkY155MPI9NN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744327883; c=relaxed/simple;
-	bh=0Vad+E3w7U+JnMUzlV2hA2BHgUo7/l3ew51N/EPhyc0=;
+	s=arc-20240116; t=1744328350; c=relaxed/simple;
+	bh=Tbak8IBPyMkkvCebM90Qho3nuValo+SC5zQu4r9Rcp0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BL0QLwpNqLKeCLk3yDQu6xGB2C6o2/trdlmR/+UEfo8Yh4CrWRGp4g1nnVePWCZ94zuYzd1lU9AcUCY8lCfgLwoZLIlrEhdnHjaP6xLLTNNugxuvqMJbRtrIVTQeVYKbHRZIxXV/s6/YAmQRwFK9ukz0tt8CYamAFxHCdWSUOJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h3YDSXNj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BFFCC4CEDD;
-	Thu, 10 Apr 2025 23:31:22 +0000 (UTC)
+	 MIME-Version:Content-Type; b=qGz1T9DBw+kead3Ah/xv0oqIbf7u4SnxoPY0mPsXc/mTVjaE0sZ6CH4SKRQcDfswtU+zZIg9jiySdsAAa12SqBRrhJ81PrJARW5jeqR7q5dxlUgRBvWyqiRcHIFJ71Y5L9fywGjeFEJxWrvLNDOarXJGT/SODeTYd0PAtbcZQgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qv0K3Cj+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76AF1C4CEDD;
+	Thu, 10 Apr 2025 23:39:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744327882;
-	bh=0Vad+E3w7U+JnMUzlV2hA2BHgUo7/l3ew51N/EPhyc0=;
+	s=k20201202; t=1744328349;
+	bh=Tbak8IBPyMkkvCebM90Qho3nuValo+SC5zQu4r9Rcp0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h3YDSXNjdYnrn2Jp9zAIzIESVGSpxRDPMQNcNfsvkmoPZ8TgwQ/OuAjs+bvtGNrOj
-	 fSeOhwm4flzim0UQRMX755MnuQLUXjK8b6KVBoRhCelg2CWtTLRjteAY/noy6d3UoP
-	 SBFXvk59bnSL2PMyg8mpGO5ShsOsP/rGtqBZhPbs4vp1C9uJs9bS2NgcolxXzjw/1B
-	 o9FlYQZsoHB2jyqBaV68zYU8W0VdGqVdEfSuLU64wl621AV4YTfgPbsqnajUSGWB3d
-	 MypUPhcd9bGO6wSZphj8iBZ9vGnxjQDd36RdRzdtdWIPnl+JQ2SwtunwkaxFcKKT05
-	 uqc+hRXj2Wcng==
-Date: Thu, 10 Apr 2025 16:31:21 -0700
+	b=Qv0K3Cj+BQpnmE9lMYxqNlKltwzja+Q+Yc/huG66598Vv5Mwk7sy0UiiVX8v/3U35
+	 +nA+q6eY5HDqeOrlDwcuABvClOaHt8Fc3d3L/ff71DQ2ZJPPajCh/xE4qTfqDaPL3u
+	 Hy+gsmwNABNKp8zhQTteTkF/Es+gvo/PtcyyhQ/FE99vzeo9kb7wsUVxDuMYtZlpUa
+	 QNssSCMQ6pekx/LT1NjSZ7Dyvk+sjB0gV5AA3WGuOV64Xyyl6j+ouO3BjRSQverYt4
+	 wGYABYIhRLZ9Mbief3xOfdxos6mvTCefMN9yKKKVNZqiOOMs8dj4Aw1mRm56kOdppa
+	 oGC1/UXnA2Myg==
+Date: Thu, 10 Apr 2025 16:39:08 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Christian
- Brauner <brauner@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
- linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org, Herbert Xu
- <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH net-next v2 06/13] rxrpc: rxgk: Provide infrastructure
- and key derivation
-Message-ID: <20250410163121.04d56770@kernel.org>
-In-Reply-To: <2099212.1744268049@warthog.procyon.org.uk>
-References: <20250409190335.3858426f@kernel.org>
-	<20250407161130.1349147-1-dhowells@redhat.com>
-	<20250407161130.1349147-7-dhowells@redhat.com>
-	<2099212.1744268049@warthog.procyon.org.uk>
+To: "Keller, Jacob E" <jacob.e.keller@intel.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "Dumazet, Eric" <edumazet@google.com>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, "andrew+netdev@lunn.ch"
+ <andrew+netdev@lunn.ch>, "horms@kernel.org" <horms@kernel.org>,
+ "sdf@fomichev.me" <sdf@fomichev.me>, "hramamurthy@google.com"
+ <hramamurthy@google.com>, "kuniyu@amazon.com" <kuniyu@amazon.com>, "Damato,
+ Joe" <jdamato@fastly.com>
+Subject: Re: [PATCH net-next v2 7/8] docs: netdev: break down the instance
+ locking info per ops struct
+Message-ID: <20250410163908.07975fa9@kernel.org>
+In-Reply-To: <CO1PR11MB508998C288EEE2BFD2D45F44D6B72@CO1PR11MB5089.namprd11.prod.outlook.com>
+References: <20250408195956.412733-1-kuba@kernel.org>
+	<20250408195956.412733-8-kuba@kernel.org>
+	<119bf05d-17c6-4327-a79b-31e3e2838abe@intel.com>
+	<20250410090802.37207b61@kernel.org>
+	<CO1PR11MB508998C288EEE2BFD2D45F44D6B72@CO1PR11MB5089.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,14 +69,30 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 10 Apr 2025 07:54:09 +0100 David Howells wrote:
-> Good catch, thanks.  That path should never trigger, but it should really do
-> "ret = -EINVAL; goto out;".
+On Thu, 10 Apr 2025 22:35:43 +0000 Keller, Jacob E wrote:
+> > > Does this mean we don't allow drivers which support
+> > > netdev_queue_mgmt_ops but don't set request_ops_lock? Or does it mean
+> > > that supporting netdev_queue_mgmt_ops and/or netdev shapers
+> > > automatically implies request_ops_lock? Or is there some other
+> > > behavioral difference?
+> > >
+> > > From the wording this sounds like its enforced via code, and it seems
+> > > reasonable to me that we wouldn't allow these without setting
+> > > request_ops_lock to true...  
+> > 
+> > "request" is for drivers to optionally request.
+> > If the driver supports queue or shaper APIs it doesn't have a say.  
 > 
-> Do you want me to respin the patches or follow up with a fix patch?
+> Which is to say: if you support either of the new APIs, or you
+> automatically get ops locking regardless of what request_ops_lock is,
+> so that if you do support one of those interfaces, there is no
+> behavioral difference between setting or not setting request_ops_lock.
+> 
+> Ok, I think that's reasonable.
 
-Sorry for the delay. I was hoping you could respin and maybe fix/give
-up on the annotation in patch 3? Right now patch 3 gets flagged as 
-a build warning which terminates the CI processing before we get to
-make htmldocs. And it would be nice to get that run given patch 1.
+Right, and FWIW we may one day actually make the request_ops_lock 
+bit be _the_ decider and auto-set it based on op presence when netdev
+is registered. Purely to simplify the condition in netdev_need_ops_lock().
+For now it isn't that. I was worried if I go into too much detail here
+we'll then forget to update it and stale docs are worse than no docs :(
 
