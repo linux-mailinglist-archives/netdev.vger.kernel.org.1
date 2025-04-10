@@ -1,151 +1,129 @@
-Return-Path: <netdev+bounces-181414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 475BBA84DA0
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 21:59:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 094A8A84DCB
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 22:05:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A069174CCD
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 19:59:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F6F31BA0F90
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 20:05:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30A0428F927;
-	Thu, 10 Apr 2025 19:59:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13F9528FFE8;
+	Thu, 10 Apr 2025 20:05:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z38pf3p3"
+	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="i6LNsZQ/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4C61C3BEB;
-	Thu, 10 Apr 2025 19:59:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9771F17F7
+	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 20:05:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744315183; cv=none; b=OkvEBJFC6KF2NmKNeUywPoiKamNMXZRfNZgZjUcIIp/RNu3cOIbUgOlJ8ZLhcJvlXP+zmboYVFznb1rJkxCZ7kv8H/DkvShufSJbN2tJIdXBHWz6JPXPVWzRZqK4NGx9oe5hZiXJMrbB8ck3YrMigltJDoxDd5eHG9Htu2EWvyU=
+	t=1744315541; cv=none; b=BBCEjQOy3o7UgGqWW77Dqpuyt4FXG6fAQb0M2hbQIGjB6AzGVPzTVfI9ixWtWRFkxkY6MoWz0QsSd3GnEE7U/OslVnMQKx+dlzs0+pc5t95/3nmvIr99mYc/KkLe/xM1yI7qR6Zk6MIC0xwel8Mrl4bkoj89GHfRENMDURUdh30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744315183; c=relaxed/simple;
-	bh=NW63uHkLkcM39Qc6iSVYuH58ir45xfXAXIeZclP1MP8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FCePYWpPZgSuHwq2yj922O3OTvKyAqTtK1b0FUfL5JIeP3QFjBUdKK2Jc++C57mi5Ilw2JB8bABDuiwTE5ZabFhTpY9q2Vlvca3W+3jYkCBIyV8bNooSkMOHAgj+tC0qvXnthbqeE+Mqu9tJ2sBcWRWb6qlxwPCm65mfV3HL0I4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z38pf3p3; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-54b09cb06b0so1292747e87.1;
-        Thu, 10 Apr 2025 12:59:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744315179; x=1744919979; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vwHmA378W6NLdb94l0kIXEG6dN9f+MTetUXmPGeF77o=;
-        b=Z38pf3p3qkoX0yngrrmC3ZyI5AvuzXBnwGputwF/DgSmAdWufmeNQ/iejfsq4CrKH6
-         3qu3r9eVrpzO20/EWTx94Go9tzFVGeiHVjkUWPlkYbVxqZqxSP3AyLPk85NU9InUyrAV
-         Nv+oWjgdXWBb+7aYfcNnZFmQu4zqxPLn2qHm1nkFo2vikwxVwMNI4SJxfQbrR8XFyhUC
-         +tzt20L9S+mZvlrtPNbbsGc0i1nLdQh6tAG+lqnlA/lERKvvrOXwQPWxlOEA7+SBckkH
-         zNlWV0fonXrJt27yU0FIjgdsD9gvPW4WIKNqMlN+30SXuehg432uZNU7ruVv5vHaGR/F
-         jjaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744315179; x=1744919979;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vwHmA378W6NLdb94l0kIXEG6dN9f+MTetUXmPGeF77o=;
-        b=XnuFlf6rpuPXUs1vkq953TphjhGDXvnzd81DDvhzoDKJrf2IJdtwiYfRpM/bKM4Vou
-         1LkTkEJPrptUbHNJn98ITVxDyxyHRpJsA1wPVTcfzxV0RkCZXrppJNNz99y4zLbMTJR6
-         sY6NkQP3iy1bKFKn/hwErNMgmuv6pYSj+B0A2q41iXfqECXhRWpgPSB7wlfzr2l2no1h
-         Uy8N0rYOTIHHlxed9ZfJr2bnX+ZokURISPV1ARdwKENomOQ7w/m6hN/TiKCkLqk519px
-         tWCI8ns9zJKym7bJ4kWHd2zoF4d8mA/zAEN/xzM5RaO3j2GzGNmQATrZ7li3obLlmSGG
-         6ueA==
-X-Forwarded-Encrypted: i=1; AJvYcCVlXkmTmVh8AawJp9z39NZFQSyfzsXgB9O9Ld0O+z6hOtMysaFsy9cJgX4qe9sAK7bbwWC/HDsT@vger.kernel.org, AJvYcCXjxmIUQdmh8Sxv/ePRyrEgc8CrU8/34y9aY1hOM91ppUtjqDA+5L6RD27UK6ODV2UCh3gUoAqLnEIiPZM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YycGF3KIN+UawGlQ0QU2GZOOeZlUUKW0UfjWZMnfj1FoOT1l6W+
-	8DbMHht2bl8Lcl5hrlfWFfJyygpq+BaKcd0jWJJMpjucr68qpQqUeiQTdnR83Xrb94j4QS6AlkY
-	nnGmCbROHsoJ+cNBlWk2BZimGKyI=
-X-Gm-Gg: ASbGncseuc51C+93dFJ0am4k1o7g9Z84Xx57yiqRXNd2XJWa83qIraaYmfiC+f3Euba
-	7FyxJgYccdRIcK9Yn+Y44iXNi1OSg/V6lWVd1s8T/hAmU+uV/5MI44eSCetGl97SBUWeMlTwNPQ
-	wBhXPCc2dz6qwyzROSBSr88KXQAIluUQJ9w6u3sseYZo5klSscaI8UxDs=
-X-Google-Smtp-Source: AGHT+IGY4oluoFyz6GVB34MFhj5G3ks9xo2ahSRLku9GIJQXukB383ULsfDKfh+ZtOCcwWEADCve3h2EUoyMATCSseg=
-X-Received: by 2002:a05:6512:3ba4:b0:54b:1095:6190 with SMTP id
- 2adb3069b0e04-54d452d7ec2mr10657e87.49.1744315179118; Thu, 10 Apr 2025
- 12:59:39 -0700 (PDT)
+	s=arc-20240116; t=1744315541; c=relaxed/simple;
+	bh=+Zmol42jS8R3Khcnyl9L1BbLCQN8pRU8TO9IhC81GR4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Neg73zideimUnmccroTj3NhAgzWsMf6uXkRH4TEo1q7nagMQDXofNdUizYq9pzz8QZajkBYNCN379ysn5xmFdlg953F7q6eG2QzCkA6N9TpNuV7Mum8A+jamFcxfa8Qi2y2M6H0RZOJDybNuDeVzJYBh/iLtdhq9nm5JTylGIzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=i6LNsZQ/; arc=none smtp.client-ip=194.117.254.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	sang-engineering.com; h=date:from:to:cc:subject:message-id
+	:references:mime-version:content-type:in-reply-to; s=k1; bh=+Zmo
+	l42jS8R3Khcnyl9L1BbLCQN8pRU8TO9IhC81GR4=; b=i6LNsZQ/NMGzGWf3q+4R
+	mn7e+uOxw9QRcOroxtls31dtP2MBvF9gfpEvewSnoG1quuG5B7fnFEWtrYLBiAv5
+	7k3hxJwufookVkqHdpYXRUhl29p6Eyz4/OXGVzC+Xhj56Z+5CWAd6S5w3D1H7jVQ
+	vgdE33uLGd1RLScLDRoH4fZyBAwP7pZ9crGou2IUXJCnvOTOfeqKhq5rGcf4Mp0B
+	7zzb5BriqgaDzD47y5ezO18ZKJGWAXiLWFkAE9R8zHrkZzYI2Im+Imr0GLKD8DCy
+	+PRCMVg8g++PDSEBJ6dAx0PA86WLcYiZh0JY3nmL2/x6TgYhJVQqSnqGg/Cj0BPz
+	Ug==
+Received: (qmail 1028174 invoked from network); 10 Apr 2025 22:05:33 +0200
+Received: by mail.zeus03.de with UTF8SMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 10 Apr 2025 22:05:33 +0200
+X-UD-Smtp-Session: l3s3148p1@fzC9G3IyDIoujnsS
+Date: Thu, 10 Apr 2025 22:05:32 +0200
+From: Wolfram Sang <wsa+renesas@sang-engineering.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: linux-renesas-soc@vger.kernel.org,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [RFC PATCH net-next] net: phy: marvell: support DT
+ configurations with only two LEDs
+Message-ID: <Z_gkjKharPsRhT6J@shikoro>
+Mail-Followup-To: Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	Andrew Lunn <andrew@lunn.ch>, linux-renesas-soc@vger.kernel.org,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+References: <20250408063136.5463-2-wsa+renesas@sang-engineering.com>
+ <7f706127-aa48-4385-a7b8-f016e0ba52b7@lunn.ch>
+ <Z_YZ3NiXb15wgDuY@shikoro>
+ <0fe35fe3-b63c-478b-9674-a2522f582167@lunn.ch>
+ <Z_d2CgxLKaEV3w8X@shikoro>
+ <1cb6ec18-9abb-48d9-b9a2-ca79584d4d0d@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250408185759.5088-1-pranav.tyagi03@gmail.com> <1168af15-14dd-4eef-b1d7-c04de4781ea7@amd.com>
-In-Reply-To: <1168af15-14dd-4eef-b1d7-c04de4781ea7@amd.com>
-From: Pranav Tyagi <pranav.tyagi03@gmail.com>
-Date: Fri, 11 Apr 2025 01:29:29 +0530
-X-Gm-Features: ATxdqUGWkHq07QDYT837wHsiO-ekWuaZwFRrPK3PdsygZOVdXNU2Ad9m_XoQj00
-Message-ID: <CAH4c4jKm9ewfL3G7SAGokzGT3VpLaKWQrbrxcLAnb-G8_MUjSA@mail.gmail.com>
-Subject: Re: [PATCH] net: ipconfig: replace strncpy with strscpy_pad
-To: "Nelson, Shannon" <shannon.nelson@amd.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	skhan@linuxfoundation.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kernel-mentees@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Cy7fRQovuYQk0d7r"
+Content-Disposition: inline
+In-Reply-To: <1cb6ec18-9abb-48d9-b9a2-ca79584d4d0d@lunn.ch>
+
+
+--Cy7fRQovuYQk0d7r
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 9, 2025 at 3:14=E2=80=AFAM Nelson, Shannon <shannon.nelson@amd.=
-com> wrote:
->
-> On 4/8/2025 11:57 AM, Pranav Tyagi wrote:
-> >
-> > Replace the deprecated strncpy() function with strscpy_pad() as the
-> > destination buffer is NUL-terminated and requires
-> > trailing NUL-padding
-> >
-> > Signed-off-by: Pranav Tyagi <pranav.tyagi03@gmail.com>
->
-> There should be a Fixes tag here, and usually we put the 'net' tree
-> indicator inside the tag, like this: [PATCH net]
->
->
-> > ---
-> >   net/ipv4/ipconfig.c | 2 +-
-> >   1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/net/ipv4/ipconfig.c b/net/ipv4/ipconfig.c
-> > index c56b6fe6f0d7..7c238d19328f 100644
-> > --- a/net/ipv4/ipconfig.c
-> > +++ b/net/ipv4/ipconfig.c
-> > @@ -1690,7 +1690,7 @@ static int __init ic_proto_name(char *name)
-> >                          *v =3D 0;
-> >                          if (kstrtou8(client_id, 0, dhcp_client_identif=
-ier))
-> >                                  pr_debug("DHCP: Invalid client identif=
-ier type\n");
-> > -                       strncpy(dhcp_client_identifier + 1, v + 1, 251)=
-;
-> > +                       strscpy_pad(dhcp_client_identifier + 1, v + 1, =
-251);
->
-> The strncpy() action, as well as the memcpy() into
-> dhcp_client_identifier elsewhere, are not padding to the end, so I think
-> this only needs to be null-terminated, not fully padded.  If full
-> padding is needed, please let us know why.
->
-> sln
->
-> >                          *v =3D ',';
-> >                  }
-> >                  return 1;
-> > --
-> > 2.49.0
-> >
-> >
->
 
-My initial assumption was on the fact that dhcp_client_identifier
-is directly used in DHCP packet construction
-and may be parsed byte-wise. But on going through the code again
-I see that it does not require to be fully padded.
-Would strscpy() suffice? as it ensures null-termination and
-does not fully pad the buffer.
+> > The 'link_*' files appeared, 'device_name' and 'offloaded' have the
+> > expected values. But now the LED is blinking like crazy despite all the
+> > rx/tx/whatnot triggers still set to 0.
+>=20
+> So that is odd. If offloaded indicates the hardware is doing the
+> blinking, that means we have a problem with the PHY configuration.
+> What model of Marvell PHY is it? There are some differences between
+> the models.
 
-Regards
-Pranav Tyagi
+Thank you for the detailed explanations. I think they could be a basis
+for a documentation file.
+
+My PHY is a M88E1510. This is why changing its init to
+MII_88E1510_PHY_LED0_LINK_LED1_ACTIVE helps.
+
+
+--Cy7fRQovuYQk0d7r
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmf4JIkACgkQFA3kzBSg
+KbZtdg/9HZW8J7RAElNaMj+1BrKb/KB4Cu0o1eFNa71km5gB2jUZ8NcmF7hgGgCT
+kBaJogfXBRBeMYjJzKNOBvoAiVXgKkcjU1NUpw74P1qS2PVgfXjVw0phwvJA6j5k
+ukL49LBCe4NehKw+kn+e7Iw+2VWGcmHcuRXvOJXTB1j9OExjCSasysxjZnM9wKrb
+N8BwGetguhUvJj6Bw5viOTKFZ2xDXBA29pSTrNRVHIM8fyiyhD4ZVsme5I1Gx1Fb
+eSJsKzgjiRSQUrL5P5xKuukwacuWsW7fTXkq9xkBHhPq6zHJAW0RHQ/ZHZ4wuoze
+WUHLkstUdT4uIfsliDgrxfK2cGIazSA1OisFCIKGwPJoN4zKt0EPctSzl/zFCchg
+3MrpkKolzNQEEbD+7prr7yTesbaBcgOEMqLGxukEgsCTNenHATMEuZojGGX3AQwt
+CDEwdrNtZ+EyrhUOu/6wXgeWeYuIQbMrUNoWR8MwcVW7NwsWPh4oTnGvkSo7jgYZ
+AUNEZA8BqwafrDQcTpSbeEKY2g2BqrSZcxsQZzQivBBSv8DxViUVK6MctNYPqZcv
+eggVaic2rx+MOrkhKf8tx3hLy6XfZ5Gt3lFuRv3NkpJaTptuTsA5lQg5U0OfmD8l
+Jazbb/+EHkVHwslqb5k85629cprpoVOZHZ99qy9rEd4QMBTlGU4=
+=HLvt
+-----END PGP SIGNATURE-----
+
+--Cy7fRQovuYQk0d7r--
 
