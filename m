@@ -1,395 +1,226 @@
-Return-Path: <netdev+bounces-181145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44152A83DAB
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 10:59:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D7DBA83DBD
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 11:03:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 18459188C650
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 08:59:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 912799E60F1
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 09:00:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27D8B20C012;
-	Thu, 10 Apr 2025 08:58:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="HFq23ssC";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="odGA+RNw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F91F20C47B;
+	Thu, 10 Apr 2025 08:59:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 017411EB1B7;
-	Thu, 10 Apr 2025 08:58:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1952135A1
+	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 08:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744275535; cv=none; b=LDxyqe0I1sIVfHsx5LQJBvrcEEVYdJuRQJbHfe1mOV6cpxifTjiIzMsiRFctkkIqDwukeFTSEfvRyMAOStI+3rCwzHjuej7NLQiAWgPWcw8Qg2cRi/Kvx1LIIld+se8I5MysCqoGox9VtWQlHE5w1exZ9D1gv0HG0ePLTnA36mA=
+	t=1744275574; cv=none; b=fyHbQGhX6729XEcGPLUi1r5Z3Bf0ivu8NkMMxUW7lVLTouJAnTjxoFAXVaPvfZMgRxBdmV4Bdmz/iNi0Docf+11nebTFbWfgaG7TBYZykl5jT87BPe/ENDYhxTaqRa23sBtHBhxeDrWF348eOyrP/nbEhshxijHTVoudlvwhAZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744275535; c=relaxed/simple;
-	bh=H/k0VjCoexRyyRyGO98xjHCLopgwp0iegsrBR6Pdoi4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FLVrY7fbm7oRU3+vCh0+9wQhgZP1xB3eksaZF5h43QuJo0Dcn7wSG29zPBfCFFCZfLqqXE4mFnysH4zyNNOWypzjzFsccbJrl0e5Xu54ICBoQK7Ve9J9kDkXo5StkybyMjRzOBk2wEiSsShFxFpzpwLKSkaG+PIUHm5572womSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=HFq23ssC; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=odGA+RNw; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Thu, 10 Apr 2025 10:58:49 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1744275531;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=y0fZjq1X48drftBdgJNfYldfk2TLRxBhKA7SkDYyT/E=;
-	b=HFq23ssCTLeNoE+inFKN1qqE4vZEDJGr7V+zS+HiZPI06XcAYsgGNFzHtIlMKWIQUnqdgF
-	YKm7MsKJuoq2QdQ+NVXl3BJEdqfForIWVs2J6GznoMBIGv8Giib9b9jRssWAd2XmtZwj3P
-	gaCgAzEonC7tRthTm5EPFMkNHg6+Ou7q4WkOuuBM5ff+5W/6KsaB2yjHrKn4uUgJtuvZgm
-	jlBIKAKfWtsguf6rL3CrOeke9c8EQ/cFi7T1G2PYfNyL08ZSIkLeFYmBnAchbgVdx5l7Jv
-	6vzGDQMYJyNJP2VX8s7pIPFHDVg3Yzx6txq1nXItZz/vZpYh64mNUnKihSVFBA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1744275531;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=y0fZjq1X48drftBdgJNfYldfk2TLRxBhKA7SkDYyT/E=;
-	b=odGA+RNwvSZp0H+AOTK/4JWkRSG7lP273QLoQmbSvF9mZzLAZD/XfyNLulhyX7h6wXOnGW
-	opa3m6UheacwxADQ==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: linux-rdma@vger.kernel.org, linux-rt-devel@lists.linux.dev,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Joe Damato <jdamato@fastly.com>, Leon Romanovsky <leon@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Yunsheng Lin <linyunsheng@huawei.com>
-Subject: Re: [PATCH net-next v3 1/4] mlnx5: Use generic code for page_pool
- statistics.
-Message-ID: <20250410085849.mdLSesgJ@linutronix.de>
-References: <20250408105922.1135150-1-bigeasy@linutronix.de>
- <20250408105922.1135150-2-bigeasy@linutronix.de>
- <62687af5-32cd-4400-b51f-c956125aaee9@gmail.com>
+	s=arc-20240116; t=1744275574; c=relaxed/simple;
+	bh=0b7y5iAYYN4Xo5PoKGj4h08dGwgF088PLC68yrST5YQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Bf46463B/0zAd5A5m2E7gvW/hRgERGe0L3VQhSYoV4u6zC6hibNXjxp0nzt4EQVwvNQTRuY3hjZyzs519PI8dMI+atF7soE+fLcMjZ+PEwBSk2grEK4lCP987QqMtUNohlkDF47m8EHT50zf3KUesYSCtVo8+mXHxnUpG4CE5pE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3d6d6d82603so5500535ab.2
+        for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 01:59:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744275571; x=1744880371;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rQb81bfwdFlHjYUUvBYsb/oSQx0Gpm6aNzpKBawSPoo=;
+        b=hiHu+VtiWX5o16nVmfjH/YVK6x+BJTHZja7h6QChG4Oh8vI+GPMF1Zq73IpuOzGghv
+         6pzh65XJ4o+d5/nW37NUUq7QLNABhvbwo2yiHGbxzn0LfgKl9bx4uFcPeSmY8dF8BE2I
+         4gK0amZURnsz3D5W7KABG9Tir1eErJZf9KTLmblreI5E3W7d1GJwcbCl7sKCkOOHctFr
+         aXXs4nPAD7QMlV3rRs8fRlHMDCRlYTaRdzWDqJtTmX6mM0UGXt5nwGl5oBtdROPHGw6Q
+         Sgd7+kwOg80BluQWY1CrAPptKf7aV0xuucbzj5w81IQS9pQQ14V6ewgtVgTK/3BUWccT
+         x8iw==
+X-Forwarded-Encrypted: i=1; AJvYcCURZ2DtTtFNCf7HeUrGZtPhORpvXYijXdYy/4RQJLC2odyxiB5oysh4oJi/iBbvzTI0lg04kjE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YywJ713DLIbWoqCeaJXL3+INjALlaglLHJt8+/39J/Jeri9UN+4
+	FE9KH7EU6GzzdfSOGkxNK53iOogXul2YR7AXhn1si0Z6toEbzyPXw65LVRq/8iTyjUiZwVZMIAZ
+	FZmbUI00JlnDBM6IxMcRlslQh4+MnZVW5C+d3k1QEvqkoFEcbIwj6QbM=
+X-Google-Smtp-Source: AGHT+IEkKovLpBp/aYn+lDBjoIkSpDnhygnXj5o6TgsavNtvRRenDPU4TSCHMuP9LiPII4WCjWtwnwq9ARgaQGgc7BG+tS75ykJs
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <62687af5-32cd-4400-b51f-c956125aaee9@gmail.com>
+X-Received: by 2002:a05:6e02:3e8e:b0:3d3:f520:b7e0 with SMTP id
+ e9e14a558f8ab-3d7e5f69f76mr10788165ab.6.1744275571474; Thu, 10 Apr 2025
+ 01:59:31 -0700 (PDT)
+Date: Thu, 10 Apr 2025 01:59:31 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67f78873.050a0220.25d1c8.000f.GAE@google.com>
+Subject: [syzbot] [net?] WARNING in dst_cache_per_cpu_get
+From: syzbot <syzbot+ad0b3740715f38432033@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 2025-04-10 10:16:54 [+0300], Tariq Toukan wrote:
-> Thanks for your patch.
-> 
-> Was this tested?
-> Were you able to run with mlx5 device?
+Hello,
 
-Kind of. The device does optical and I have nothing to bring up the
-link, a few gbic did not work so the guys gave up back then. On link up
-the driver sets up buffers so I saw that the stats incrementing and the
-numbers queries with ethtool made sense.
+syzbot found the following issue on:
 
-> >   .../ethernet/mellanox/mlx5/core/en_stats.c    | 97 ++++++++-----------
-> >   .../ethernet/mellanox/mlx5/core/en_stats.h    | 26 +----
-> >   2 files changed, 43 insertions(+), 80 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
-> > index 1c121b435016d..54303877adb1d 100644
-> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
-> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
-> > @@ -194,17 +194,6 @@ static const struct counter_desc sw_stats_desc[] = {
-> >   	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_arfs_err) },
-> >   #endif
-> >   	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_recover) },
-> > -	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_pp_alloc_fast) },
-> > -	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_pp_alloc_slow) },
-> > -	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_pp_alloc_slow_high_order) },
-> > -	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_pp_alloc_empty) },
-> > -	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_pp_alloc_refill) },
-> > -	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_pp_alloc_waive) },
-> > -	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_pp_recycle_cached) },
-> > -	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_pp_recycle_cache_full) },
-> > -	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_pp_recycle_ring) },
-> > -	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_pp_recycle_ring_full) },
-> > -	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_pp_recycle_released_ref) },
-> >   #ifdef CONFIG_MLX5_EN_TLS
-> >   	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_tls_decrypted_packets) },
-> >   	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_tls_decrypted_bytes) },
-> > @@ -253,7 +242,7 @@ static const struct counter_desc sw_stats_desc[] = {
-> >   static MLX5E_DECLARE_STATS_GRP_OP_NUM_STATS(sw)
-> >   {
-> > -	return NUM_SW_COUNTERS;
-> > +	return NUM_SW_COUNTERS + page_pool_ethtool_stats_get_count();
-> >   }
-> >   static MLX5E_DECLARE_STATS_GRP_OP_FILL_STRS(sw)
-> > @@ -262,6 +251,7 @@ static MLX5E_DECLARE_STATS_GRP_OP_FILL_STRS(sw)
-> >   	for (i = 0; i < NUM_SW_COUNTERS; i++)
-> >   		ethtool_puts(data, sw_stats_desc[i].format);
-> > +	*data = page_pool_ethtool_stats_get_strings(*data);
-> >   }
-> >   static MLX5E_DECLARE_STATS_GRP_OP_FILL_STATS(sw)
-> > @@ -272,6 +262,7 @@ static MLX5E_DECLARE_STATS_GRP_OP_FILL_STATS(sw)
-> >   		mlx5e_ethtool_put_stat(data,
-> >   				       MLX5E_READ_CTR64_CPU(&priv->stats.sw,
-> >   							    sw_stats_desc, i));
-> > +	*data = page_pool_ethtool_stats_get(*data, &priv->stats.sw.page_pool_stats);
-> >   }
-> >   static void mlx5e_stats_grp_sw_update_stats_xdp_red(struct mlx5e_sw_stats *s,
-> > @@ -373,17 +364,6 @@ static void mlx5e_stats_grp_sw_update_stats_rq_stats(struct mlx5e_sw_stats *s,
-> >   	s->rx_arfs_err                += rq_stats->arfs_err;
-> >   #endif
-> >   	s->rx_recover                 += rq_stats->recover;
-> > -	s->rx_pp_alloc_fast          += rq_stats->pp_alloc_fast;
-> > -	s->rx_pp_alloc_slow          += rq_stats->pp_alloc_slow;
-> > -	s->rx_pp_alloc_empty         += rq_stats->pp_alloc_empty;
-> > -	s->rx_pp_alloc_refill        += rq_stats->pp_alloc_refill;
-> > -	s->rx_pp_alloc_waive         += rq_stats->pp_alloc_waive;
-> > -	s->rx_pp_alloc_slow_high_order		+= rq_stats->pp_alloc_slow_high_order;
-> > -	s->rx_pp_recycle_cached			+= rq_stats->pp_recycle_cached;
-> > -	s->rx_pp_recycle_cache_full		+= rq_stats->pp_recycle_cache_full;
-> > -	s->rx_pp_recycle_ring			+= rq_stats->pp_recycle_ring;
-> > -	s->rx_pp_recycle_ring_full		+= rq_stats->pp_recycle_ring_full;
-> > -	s->rx_pp_recycle_released_ref		+= rq_stats->pp_recycle_released_ref;
-> >   #ifdef CONFIG_MLX5_EN_TLS
-> >   	s->rx_tls_decrypted_packets   += rq_stats->tls_decrypted_packets;
-> >   	s->rx_tls_decrypted_bytes     += rq_stats->tls_decrypted_bytes;
-> > @@ -490,27 +470,13 @@ static void mlx5e_stats_grp_sw_update_stats_qos(struct mlx5e_priv *priv,
-> >   	}
-> >   }
-> > -static void mlx5e_stats_update_stats_rq_page_pool(struct mlx5e_channel *c)
-> > +static void mlx5e_stats_update_stats_rq_page_pool(struct mlx5e_sw_stats *s,
-> > +						  struct mlx5e_channel *c)
-> 
-> This per-RQ function should not get the general SW status struct and write
-> to it.
-> 
-> Gathering stats from all RQs into the general SW stats should not be done
-> here.
+HEAD commit:    420aabef3ab5 net: Drop unused @sk of __skb_try_recv_from_q..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=11175070580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f2054704dd53fb80
+dashboard link: https://syzkaller.appspot.com/bug?extid=ad0b3740715f38432033
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-but I have to sum it for the global stats. The old code queried the
-channels again for the global stats. This queries the channels twice,
-once for per-channel and again for the global stats.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-> >   {
-> >   	struct mlx5e_rq_stats *rq_stats = c->rq.stats;
-> > -	struct page_pool *pool = c->rq.page_pool;
-> > -	struct page_pool_stats stats = { 0 };
-> > -	if (!page_pool_get_stats(pool, &stats))
-> > -		return;
-> > -
-> > -	rq_stats->pp_alloc_fast = stats.alloc_stats.fast;
-> > -	rq_stats->pp_alloc_slow = stats.alloc_stats.slow;
-> > -	rq_stats->pp_alloc_slow_high_order = stats.alloc_stats.slow_high_order;
-> > -	rq_stats->pp_alloc_empty = stats.alloc_stats.empty;
-> > -	rq_stats->pp_alloc_waive = stats.alloc_stats.waive;
-> > -	rq_stats->pp_alloc_refill = stats.alloc_stats.refill;
-> > -
-> > -	rq_stats->pp_recycle_cached = stats.recycle_stats.cached;
-> > -	rq_stats->pp_recycle_cache_full = stats.recycle_stats.cache_full;
-> > -	rq_stats->pp_recycle_ring = stats.recycle_stats.ring;
-> > -	rq_stats->pp_recycle_ring_full = stats.recycle_stats.ring_full;
-> > -	rq_stats->pp_recycle_released_ref = stats.recycle_stats.released_refcnt;
-> > +	page_pool_get_stats(c->rq.page_pool, &s->page_pool_stats);
-> > +	page_pool_get_stats(c->rq.page_pool, &rq_stats->page_pool_stats);
-> >   }
-> >   static MLX5E_DECLARE_STATS_GRP_OP_UPDATE_STATS(sw)
-> > @@ -520,15 +486,13 @@ static MLX5E_DECLARE_STATS_GRP_OP_UPDATE_STATS(sw)
-> >   	memset(s, 0, sizeof(*s));
-> > -	for (i = 0; i < priv->channels.num; i++) /* for active channels only */
-> > -		mlx5e_stats_update_stats_rq_page_pool(priv->channels.c[i]);
-> > -
-> >   	for (i = 0; i < priv->stats_nch; i++) {
-> >   		struct mlx5e_channel_stats *channel_stats =
-> >   			priv->channel_stats[i];
-> >   		int j;
-> > +		mlx5e_stats_update_stats_rq_page_pool(s, priv->channels.c[i]);
-> 
-> Should separate, do not mix two roles for the same function.
-> 
-> Moreover, this won't work, it's buggy:
-> You're looping up to priv->stats_nch (largest num of channels ever created)
-> trying to access priv->channels.c[i] (current number of channels), you can
-> get out of bound accessing non-existing channels.
-> 
-> There's a design issue to be solved here:
-> Previously, the page_pool stats existed in RQ stats, also for RQs that no
-> longer exist. We must preserve this behavior here, even if it means
-> assigning zeros for the page_pool stats for non-existing RQs.
-> 
-> Worth mentioning: Due to the nature of the infrastructure, today the
-> page_pool stats are not-persistent, while all our other stats are. They are
-> reset to zeros upon channels down/up events. This is not optimal but that's
-> how it is today, and is not expected to be changed here in your series.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/9e407e3b3a07/disk-420aabef.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/08826ad1cf0b/vmlinux-420aabef.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/df2ffedb4e99/bzImage-420aabef.xz
 
-so just channels.num then.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ad0b3740715f38432033@syzkaller.appspotmail.com
 
-> >   		mlx5e_stats_grp_sw_update_stats_rq_stats(s, &channel_stats->rq);
-> >   		mlx5e_stats_grp_sw_update_stats_xdpsq(s, &channel_stats->rq_xdpsq);
-> >   		mlx5e_stats_grp_sw_update_stats_ch_stats(s, &channel_stats->ch);
-> > @@ -2119,17 +2083,6 @@ static const struct counter_desc rq_stats_desc[] = {
-> >   	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, arfs_err) },
-> >   #endif
-> >   	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, recover) },
-> > -	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, pp_alloc_fast) },
-> > -	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, pp_alloc_slow) },
-> > -	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, pp_alloc_slow_high_order) },
-> > -	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, pp_alloc_empty) },
-> > -	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, pp_alloc_refill) },
-> > -	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, pp_alloc_waive) },
-> > -	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, pp_recycle_cached) },
-> > -	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, pp_recycle_cache_full) },
-> > -	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, pp_recycle_ring) },
-> > -	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, pp_recycle_ring_full) },
-> > -	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, pp_recycle_released_ref) },
-> >   #ifdef CONFIG_MLX5_EN_TLS
-> >   	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, tls_decrypted_packets) },
-> >   	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, tls_decrypted_bytes) },
-> > @@ -2477,7 +2430,32 @@ static MLX5E_DECLARE_STATS_GRP_OP_NUM_STATS(channels)
-> >   	       (NUM_RQ_XDPSQ_STATS * max_nch) +
-> >   	       (NUM_XDPSQ_STATS * max_nch) +
-> >   	       (NUM_XSKRQ_STATS * max_nch * priv->xsk.ever_used) +
-> > -	       (NUM_XSKSQ_STATS * max_nch * priv->xsk.ever_used);
-> > +	       (NUM_XSKSQ_STATS * max_nch * priv->xsk.ever_used) +
-> > +	       page_pool_ethtool_stats_get_count() * max_nch;
-> 
-> Take this closer to the NUM_RQ_STATS * max_nch part.
-> 
-> > +}
-> > +
-> > +static const char pp_stats_mq[][ETH_GSTRING_LEN] = {
-> > +	"rx%d_pp_alloc_fast",
-> > +	"rx%d_pp_alloc_slow",
-> > +	"rx%d_pp_alloc_slow_ho",
-> > +	"rx%d_pp_alloc_empty",
-> > +	"rx%d_pp_alloc_refill",
-> > +	"rx%d_pp_alloc_waive",
-> > +	"rx%d_pp_recycle_cached",
-> > +	"rx%d_pp_recycle_cache_full",
-> > +	"rx%d_pp_recycle_ring",
-> > +	"rx%d_pp_recycle_ring_full",
-> > +	"rx%d_pp_recycle_released_ref",
-> 
-> Why static? Isn't the whole point that we want automatic alignment for
-> changes in net/core/page_pool.c :: struct pp_stats ?
-> I suggest writing the code so that mlx5e pp_stats_mq strings are generated
-> and adjusted automatically from the generic struct pp_stats.
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 6307 at ./include/net/dst.h:238 dst_hold include/net/dst.h:238 [inline]
+WARNING: CPU: 0 PID: 6307 at ./include/net/dst.h:238 dst_cache_per_cpu_get+0x29b/0x2b0 net/core/dst_cache.c:50
+Modules linked in:
+CPU: 0 UID: 0 PID: 6307 Comm: syz.2.120 Not tainted 6.14.0-syzkaller-13320-g420aabef3ab5 #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
+RIP: 0010:dst_hold include/net/dst.h:238 [inline]
+RIP: 0010:dst_cache_per_cpu_get+0x29b/0x2b0 net/core/dst_cache.c:50
+Code: 26 f8 e9 a6 fe ff ff 89 d9 80 e1 07 80 c1 03 38 c1 0f 8c 05 ff ff ff 48 89 df e8 00 2b 26 f8 e9 f8 fe ff ff e8 b6 01 bc f7 90 <0f> 0b 90 e9 0c fe ff ff 66 66 66 66 2e 0f 1f 84 00 00 00 00 00 90
+RSP: 0018:ffffc90000007768 EFLAGS: 00010246
+RAX: ffffffff8a07558a RBX: 0000000000000001 RCX: ffff88807e56bc00
+RDX: 0000000000000100 RSI: 0000000000000004 RDI: ffff888034a8b640
+RBP: ffffc90000007901 R08: ffff888034a8b643 R09: 1ffff110069516c8
+R10: dffffc0000000000 R11: ffffed10069516c9 R12: ffff888034a8b640
+R13: ffff8881463ba418 R14: ffffe8ffffc6a688 R15: ffff888034a8b600
+FS:  00007ff8159186c0(0000) GS:ffff888124f96000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f5a018df440 CR3: 000000007e9a0000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <IRQ>
+ tipc_udp_xmit+0xc2/0xc00 net/tipc/udp_media.c:178
+ tipc_udp_send_msg+0x26b/0x3d0 net/tipc/udp_media.c:271
+ tipc_bearer_xmit_skb+0x306/0x480 net/tipc/bearer.c:575
+ tipc_disc_timeout+0x612/0x770 net/tipc/discover.c:338
+ call_timer_fn+0x189/0x650 kernel/time/timer.c:1789
+ expire_timers kernel/time/timer.c:1840 [inline]
+ __run_timers kernel/time/timer.c:2414 [inline]
+ __run_timer_base+0x66e/0x8e0 kernel/time/timer.c:2426
+ run_timer_base kernel/time/timer.c:2435 [inline]
+ run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2445
+ handle_softirqs+0x2d6/0x9b0 kernel/softirq.c:579
+ __do_softirq kernel/softirq.c:613 [inline]
+ invoke_softirq kernel/softirq.c:453 [inline]
+ __irq_exit_rcu+0xfb/0x220 kernel/softirq.c:680
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:696
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
+ sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1049
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:node_to_entry lib/radix-tree.c:74 [inline]
+RIP: 0010:delete_node+0x2ac/0x780 lib/radix-tree.c:552
+Code: 90 48 89 ee e8 f5 68 15 f9 e9 40 fe ff ff e8 9b 1c 98 f5 40 b5 01 e9 60 04 00 00 e8 8e 1c 98 f5 4c 89 eb 40 b5 01 4c 8b 34 24 <48> 83 cb 02 4c 89 f8 48 c1 e8 03 48 89 44 24 08 42 80 3c 20 00 74
+RSP: 0018:ffffc9000f12ece0 EFLAGS: 00000246
+RAX: ffffffff8c2b3869 RBX: ffff8880263ef440 RCX: 0000000000080000
+RDX: ffffc9000ca55000 RSI: 0000000000011a55 RDI: 0000000000011a56
+RBP: 0000000000000000 R08: ffffffff8c2b3860 R09: 1ffff1100659a0f5
+R10: dffffc0000000000 R11: ffffed100659a0f6 R12: dffffc0000000000
+R13: ffff8880263ef440 R14: ffff88801bef7050 R15: ffff88801bef7058
+ radix_tree_delete_item+0x2e6/0x3f0 lib/radix-tree.c:1430
+ kernfs_put+0x172/0x460 fs/kernfs/dir.c:588
+ kernfs_remove_by_name_ns+0xb5/0x130 fs/kernfs/dir.c:1715
+ kernfs_remove_by_name include/linux/kernfs.h:633 [inline]
+ remove_files fs/sysfs/group.c:28 [inline]
+ sysfs_remove_group+0xfe/0x2c0 fs/sysfs/group.c:322
+ sysfs_remove_groups+0x54/0xb0 fs/sysfs/group.c:346
+ __kobject_del+0x84/0x310 lib/kobject.c:595
+ kobject_del+0x45/0x60 lib/kobject.c:627
+ rpc_sysfs_xprt_switch_destroy+0x59/0x90 net/sunrpc/sysfs.c:813
+ xprt_switch_free net/sunrpc/xprtmultipath.c:194 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ xprt_switch_put+0x33f/0x3c0 net/sunrpc/xprtmultipath.c:221
+ rpc_free_client net/sunrpc/clnt.c:1009 [inline]
+ rpc_free_auth net/sunrpc/clnt.c:1033 [inline]
+ rpc_release_client+0x370/0x6f0 net/sunrpc/clnt.c:1048
+ rpc_shutdown_client+0x4b7/0x6c0 net/sunrpc/clnt.c:972
+ nfsd_destroy_serv+0x1eb/0x4b0 fs/nfsd/nfssvc.c:546
+ nfsd_nl_listener_set_doit+0x17c2/0x1870 fs/nfsd/nfsctl.c:2044
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0xb38/0xf00 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x208/0x480 net/netlink/af_netlink.c:2534
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
+ netlink_unicast+0x7f8/0x9a0 net/netlink/af_netlink.c:1339
+ netlink_sendmsg+0x8c3/0xcd0 net/netlink/af_netlink.c:1883
+ sock_sendmsg_nosec net/socket.c:712 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:727
+ ____sys_sendmsg+0x523/0x860 net/socket.c:2566
+ ___sys_sendmsg net/socket.c:2620 [inline]
+ __sys_sendmsg+0x271/0x360 net/socket.c:2652
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7ff814b8d169
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ff815918038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007ff814da5fa0 RCX: 00007ff814b8d169
+RDX: 0000000000000000 RSI: 0000200000000040 RDI: 0000000000000004
+RBP: 00007ff814c0e730 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007ff814da5fa0 R15: 00007ffdb5c034e8
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	90                   	nop
+   1:	48 89 ee             	mov    %rbp,%rsi
+   4:	e8 f5 68 15 f9       	call   0xf91568fe
+   9:	e9 40 fe ff ff       	jmp    0xfffffe4e
+   e:	e8 9b 1c 98 f5       	call   0xf5981cae
+  13:	40 b5 01             	mov    $0x1,%bpl
+  16:	e9 60 04 00 00       	jmp    0x47b
+  1b:	e8 8e 1c 98 f5       	call   0xf5981cae
+  20:	4c 89 eb             	mov    %r13,%rbx
+  23:	40 b5 01             	mov    $0x1,%bpl
+  26:	4c 8b 34 24          	mov    (%rsp),%r14
+* 2a:	48 83 cb 02          	or     $0x2,%rbx <-- trapping instruction
+  2e:	4c 89 f8             	mov    %r15,%rax
+  31:	48 c1 e8 03          	shr    $0x3,%rax
+  35:	48 89 44 24 08       	mov    %rax,0x8(%rsp)
+  3a:	42 80 3c 20 00       	cmpb   $0x0,(%rax,%r12,1)
+  3f:	74                   	.byte 0x74
 
-I've been told that it does not make sense to make generic because it is
-already possible to query per-queue stats and the mlx driver does its
-own approach here.
 
-> > +};
-> > +
-> > +static void mlx_page_pool_stats_get_strings_mq(u8 **data, unsigned int queue)
-> 
-> Use mlx5e prefix.
-> Can use pp to shorten page_pool in function/struct names.
-> 
-> > +{
-> > +	int i;
-> > +
-> > +	WARN_ON_ONCE(ARRAY_SIZE(pp_stats_mq) != page_pool_ethtool_stats_get_count());
-> 
-> Not good. We don't want to get a WARNING in case someone aded new pp stats
-> without adding to mlx5e.
-> 
-> Shoud write the code so that this is not possible.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-I can't use BUILD_BUG_ON() with page_pool_ethtool_stats_get_count() and
-the array isn't exported.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-> > +
-> > +	for (i = 0; i < ARRAY_SIZE(pp_stats_mq); i++)
-> > +		ethtool_sprintf(data, pp_stats_mq[i], queue);
-> >   }
-> >   static MLX5E_DECLARE_STATS_GRP_OP_FILL_STRS(channels)
-> > @@ -2493,6 +2471,7 @@ static MLX5E_DECLARE_STATS_GRP_OP_FILL_STRS(channels)
-> >   	for (i = 0; i < max_nch; i++) {
-> >   		for (j = 0; j < NUM_RQ_STATS; j++)
-> >   			ethtool_sprintf(data, rq_stats_desc[j].format, i);
-> > +		mlx_page_pool_stats_get_strings_mq(data, i);
-> >   		for (j = 0; j < NUM_XSKRQ_STATS * is_xsk; j++)
-> >   			ethtool_sprintf(data, xskrq_stats_desc[j].format, i);
-> >   		for (j = 0; j < NUM_RQ_XDPSQ_STATS; j++)
-> > @@ -2527,11 +2506,13 @@ static MLX5E_DECLARE_STATS_GRP_OP_FILL_STATS(channels)
-> >   					      ch_stats_desc, j));
-> >   	for (i = 0; i < max_nch; i++) {
-> > +		struct mlx5e_rq_stats *rq_stats = &priv->channel_stats[i]->rq;
-> > +
-> >   		for (j = 0; j < NUM_RQ_STATS; j++)
-> >   			mlx5e_ethtool_put_stat(
-> > -				data, MLX5E_READ_CTR64_CPU(
-> > -					      &priv->channel_stats[i]->rq,
-> > +				data, MLX5E_READ_CTR64_CPU(rq_stats,
-> >   					      rq_stats_desc, j));
-> > +		*data = page_pool_ethtool_stats_get(*data, &rq_stats->page_pool_stats);
-> >   		for (j = 0; j < NUM_XSKRQ_STATS * is_xsk; j++)
-> >   			mlx5e_ethtool_put_stat(
-> >   				data, MLX5E_READ_CTR64_CPU(
-> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
-> > index 8de6fcbd3a033..30c5c2a92508b 100644
-> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
-> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
-> > @@ -33,6 +33,8 @@
-> >   #ifndef __MLX5_EN_STATS_H__
-> >   #define __MLX5_EN_STATS_H__
-> > +#include <net/page_pool/types.h>
-> > +
-> >   #define MLX5E_READ_CTR64_CPU(ptr, dsc, i) \
-> >   	(*(u64 *)((char *)ptr + dsc[i].offset))
-> >   #define MLX5E_READ_CTR64_BE(ptr, dsc, i) \
-> > @@ -215,17 +217,7 @@ struct mlx5e_sw_stats {
-> >   	u64 ch_aff_change;
-> >   	u64 ch_force_irq;
-> >   	u64 ch_eq_rearm;
-> > -	u64 rx_pp_alloc_fast;
-> > -	u64 rx_pp_alloc_slow;
-> > -	u64 rx_pp_alloc_slow_high_order;
-> > -	u64 rx_pp_alloc_empty;
-> > -	u64 rx_pp_alloc_refill;
-> > -	u64 rx_pp_alloc_waive;
-> > -	u64 rx_pp_recycle_cached;
-> > -	u64 rx_pp_recycle_cache_full;
-> > -	u64 rx_pp_recycle_ring;
-> > -	u64 rx_pp_recycle_ring_full;
-> > -	u64 rx_pp_recycle_released_ref;
-> > +	struct page_pool_stats page_pool_stats;
-> 
-> Maybe call it rx_pp_stats ?
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-okay
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-> >   #ifdef CONFIG_MLX5_EN_TLS
-> >   	u64 tx_tls_encrypted_packets;
-> >   	u64 tx_tls_encrypted_bytes;
-> > @@ -383,17 +375,7 @@ struct mlx5e_rq_stats {
-> >   	u64 arfs_err;
-> >   #endif
-> >   	u64 recover;
-> > -	u64 pp_alloc_fast;
-> > -	u64 pp_alloc_slow;
-> > -	u64 pp_alloc_slow_high_order;
-> > -	u64 pp_alloc_empty;
-> > -	u64 pp_alloc_refill;
-> > -	u64 pp_alloc_waive;
-> > -	u64 pp_recycle_cached;
-> > -	u64 pp_recycle_cache_full;
-> > -	u64 pp_recycle_ring;
-> > -	u64 pp_recycle_ring_full;
-> > -	u64 pp_recycle_released_ref;
-> > +	struct page_pool_stats page_pool_stats;
-> 
-> Maybe call it pp_stats ?
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-okay.
-
-> >   #ifdef CONFIG_MLX5_EN_TLS
-> >   	u64 tls_decrypted_packets;
-> >   	u64 tls_decrypted_bytes;
-
-Sebastian
+If you want to undo deduplication, reply with:
+#syz undup
 
