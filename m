@@ -1,106 +1,144 @@
-Return-Path: <netdev+bounces-181261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24687A84379
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:43:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFBBFA84373
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:42:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED6B517247F
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:38:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7703A3BE806
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:39:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3769728541E;
-	Thu, 10 Apr 2025 12:38:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9DCA2853E5;
+	Thu, 10 Apr 2025 12:39:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B8zaV3yk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oq4bLORp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com [209.85.221.67])
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F927284B5C;
-	Thu, 10 Apr 2025 12:38:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4118E2857D1
+	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 12:39:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744288720; cv=none; b=RkvwKlDtswydeWFqn8ZQ2BcjDdxBm8GDMRiZt69v/zo94l3xNgkBD8ELHqIhetut1GqZ7L5ooi0NXr7JwY4WNKPkLDnwAdLs+de1gWxcOL3InsAnYG3X3Sq+b8bmOIVcg3erDqsk2Pr+RdxO+AokYfdnNjJUMppJaPZ0UcN4cNY=
+	t=1744288771; cv=none; b=L/IbfYKN8NF8c00WbTahnxyaaU1gqbxVSj8JCnkqKg3sMAvv9tcLMsDKPnfGO2EkmEYbmxi2ixpnxKkzTC2OZu3mVXirE3g6W6+9qUAnYKvHMNLDxBrAST6VHzLmCYsM73RLNpRt/P6tofxg6nfWVbn3OLOmVfKfDovizqCZqJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744288720; c=relaxed/simple;
-	bh=FdnbocKbRHhtLFIRneUZ+/1khNFKq2SMICJ8698GBPY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D31SawM42w08UIoI/wbBojdDwBMjO91VWZU4hIBPYcbToHaViA7VEUZPxyhbm1F8kKasQpnwDrc/FyvkotL0cO2EWicm+BkJrYu77SlOyfP0IBjzqVlyi3NPxcgko2I6aTJvQgYCpyA2/TeaEKKzdj8TcURAe755Gr+8MWKFVx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B8zaV3yk; arc=none smtp.client-ip=209.85.221.67
+	s=arc-20240116; t=1744288771; c=relaxed/simple;
+	bh=dxsqinKCBDby+aMcRg8hozEEbtmWKqBAKl7vn+kBb+k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bJzIAiOhDtQRrTCGztcl+2jqzzGnh6xVVyhwyaXkmDCTLwvImVMvmLIH58aLnrIsxmVAy3lsHqR7VSI/HrkracZi3IAWEoJDQj96e2xJItucuwe7fs8AQr42gkswqNpuBis5cp/50dndBPHJv7aCz417gf1t+GR9WJbVbTo8R1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Oq4bLORp; arc=none smtp.client-ip=209.85.210.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f67.google.com with SMTP id ffacd0b85a97d-39c1ef4ae3aso466888f8f.1;
-        Thu, 10 Apr 2025 05:38:37 -0700 (PDT)
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-72bb97260ceso258845a34.1
+        for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 05:39:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744288716; x=1744893516; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FdnbocKbRHhtLFIRneUZ+/1khNFKq2SMICJ8698GBPY=;
-        b=B8zaV3ykSYKjzocBkXfMH8sg+cuA356daXrUK1qR29GIXDuVK3Vhq8QyH25VQAR8a0
-         rvDp8BtSN61wy3t5pOaIOHS8Lvdexpvsi5kuIkGg3fk14CJSQmES6oWUoNtZ6SwWdcYq
-         y31PnX+kx3R/940/srM9X94IE8sW8IMH3CeVwikmfB5HLXjTjwJDR5V8jdngP0f1O40W
-         eydFhPbUowWK8+6s5JIbwZjyQ6AZX5U9RmLXG/7T6nv8BSv4uT2hSFTDBJYim44SgBaY
-         bSOjIyLYUpoSJepU94w/SFbFmPtRHRFKxDBjodi9A4yuuiacgxMWTMCxo6MXxmS453Xw
-         pGcA==
+        d=gmail.com; s=20230601; t=1744288769; x=1744893569; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=vHpDfJyfsm5JQxko06+WtFGUMJCaVAWx7r2BKcpshlE=;
+        b=Oq4bLORpipbs8D42r/O47XI/HfX3qf8boLwvyotHBc8ZSZ77ZQ8nEc6vQ42oBXiLZv
+         K5QMa2kmvF4qhBrXqB3TY2jrhWCn5Sp/X6jnopHtfhgi8a+muR5JzNUiOzCmJ100r15D
+         LnL1nSH9VwGpMrhY86RXF5saNjoRakR3TFTTi6fsvEYM8N4q+C24lms+DQByY91mS4QW
+         6EaIreOdpMz5pdadeC91jctyoVP8deN4zXc9IK//W6Bn4WBr9Yr5Ximqgz2bEoWbbqOr
+         IiQGKIkHkvCDpA5rwyIk3EnbtlB5cnj2M2zDvCt2SkMkDssIREJJxHBuzUoNqMS3qivC
+         rOGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744288716; x=1744893516;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FdnbocKbRHhtLFIRneUZ+/1khNFKq2SMICJ8698GBPY=;
-        b=wnekpYQmu1c1p4CtWMq/qIib2UvIxc5q2f1Ak7hFIfP0lOXeck4xyfuHjvoqEHM4+c
-         EYvs3MzB3+SRjNBW42Jenb4r6WreaH6gZOBOFNvk1zrSFgtOk67GSIjiaK82VRZK7RwA
-         1/vSLrFi8rODlUdXara3vswPSBp7y8epdtJx/RWZmosXRJJ8yeHBmLmUWS/Jy1z+dml/
-         0+k2GogmFxobLQeztkZaT3dzITtLKYKtQV6xFBr6Y1kWTu8qfjjCJLq58/0ijlwWFdAp
-         aMPLsUfKWG4t1nLBRne+LG9zK/tURdzR2jGUt+jSwSwuDbQVnOOU2EKLOYru92iQBAhq
-         8jWA==
-X-Forwarded-Encrypted: i=1; AJvYcCUbcXTbgxa9jqP2ncbRvNaoofeu/k3FwZ9b7BgAic00y3mqd3/nSSEt9j3QOSU6R+WUQruer6rJ@vger.kernel.org, AJvYcCUyDgdfjBJmCshMLWQ0DLlyC9QTqJTUQpG6i5lqxjMWCbuIT7QpPiW73WeEg8YQEGAhQG54/WQW0GCzZvu1@vger.kernel.org, AJvYcCXKWn7wh3iwQ+EaWRi0jCxE7XogB/8l0frjnMQuIMBjqLoV2/SycdGoG9lAM3Pgw6lRlC4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7vxiWwUn291e49YJJgbHDvfD4ZPMP+EftDTldre6Nm1ijdpoS
-	WURP4+Lj7FHkdSixC+sEDlpAy6tM3hLxb7wn3bY7P3fvFstp+yFC
-X-Gm-Gg: ASbGncv48gq6UWtCilAUIxfNydnqeN9S4UQvi3sPfRzRkkm5Y6Trjt+hAYVKnTsujrE
-	qtkibioPJv1hoPrKpsL7fmkgXrLOedJte3PSoenGZsLxPjDfUtGsd9hgYx0+s24dPIW+KgS19Pq
-	/YELQJyFsOUTyoWUupqA3U7tIoINKBwOsQDm7rQNM1CoCq4MdMwbSOK182s1QxG+UJv7AmvQd5q
-	ZWZAjBpxcdrVHyd3PlKQJuFESSb/gQAwJMG3Coi8BOxAMXCtfB9mb9ZXCCF0Bpeq+xHD2TlI3tH
-	FyF7mFvkzR+7BFFjMkHz1YQ3dMf7X40=
-X-Google-Smtp-Source: AGHT+IGPYHCm9MQeMD+k3mqRPa0KcnOkInYXb1NuDo5tGwfYXGvXye4g3CVBInQyYWhnhNgabrp8Bg==
-X-Received: by 2002:a05:6000:2585:b0:390:f0ff:2c10 with SMTP id ffacd0b85a97d-39d8f4c95eamr2399057f8f.19.1744288716341;
-        Thu, 10 Apr 2025 05:38:36 -0700 (PDT)
-Received: from localhost ([2a03:2880:31ff:42::])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f2066d069sm54724525e9.17.2025.04.10.05.38.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Apr 2025 05:38:35 -0700 (PDT)
-From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
-To: syzbot+850aaf14624dc0c6d366@syzkaller.appspotmail.com
-Cc: andrii@kernel.org,
-	ast@kernel.org,
-	bpf@vger.kernel.org,
-	daniel@iogearbox.net,
-	haoluo@google.com,
-	john.fastabend@gmail.com,
-	jolsa@kernel.org,
-	kpsingh@kernel.org,
-	linux-kernel@vger.kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	song@kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	yonghong.song@linux.dev
-Subject: [syzbot] [bpf?] possible deadlock in __bpf_ringbuf_reserve
-Date: Thu, 10 Apr 2025 05:38:31 -0700
-Message-ID: <20250410123831.1164580-1-memxor@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <0000000000004aa700061379547e@google.com>
-References: <0000000000004aa700061379547e@google.com>
+        d=1e100.net; s=20230601; t=1744288769; x=1744893569;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vHpDfJyfsm5JQxko06+WtFGUMJCaVAWx7r2BKcpshlE=;
+        b=ScXxEzPUgH0ojpFRN/fKqwvjiGly6lhPrQtZx9+ZsM5r5Q7N6H3R1As/SueLX9VIlc
+         fEH8L7XUGKh1jlogBl98hg5J7ik3rkTizKobSzCGqx/zFB5vJxMkKi2/EowGBftFSP9K
+         cQcPgZOTPhQEFl33vgMxWnALWzYfUGjo69Ysn9LXklTHC5ANSnTiZ//enRFmWrBgmnYC
+         VmPA3clRZqj6R798tX4O7Os3AQSicMRTjxJpA5C/K2KkVOYqGJj219XcqkgcvnTg9WYG
+         YE3BZ0Ba9Bv6igywQ7a+XG/D8DUu+FSqCVqKM5a38lwkoTbQBbdj3N9oyuP/MEofY8wI
+         +XHA==
+X-Forwarded-Encrypted: i=1; AJvYcCUxB2P5zso8ISjhuoA3F7x6bERZKGtgcecOpjvGpRP43wXrDWjeLhsxJszYHpphqEuCnvDcVJM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPWBGf+3bYmNznmUGA27PzKAIsSSc4TW7RukmF/Lf+JZ2Oy+bH
+	d0b8L9pxnxSuBmVf44srYsUdqxy9C8rXX7K6p6esijKnzyAiyaAeOC/X8IYRgUdatn8XyZXKdUk
+	ne/3R1rk9lN/FfGdoYHuWBWeU+rw=
+X-Gm-Gg: ASbGnctVPFwl7N41TqVI1SnbtobZFUCA1Sbqg+E1glka/jgnvOLHeq6+uAEVjT0T857
+	g6EowIzq6zZOwslla1ulxNghLseheaqjWjXVc6/HhbAVBV/yUTrVKSa/Jv1hjTedaXNX0lvFTEf
+	q6qrIroAJ8xlN4He+u9aV7eDBj2kQ7n3XCn+rUoR36MehtQYyszdg=
+X-Google-Smtp-Source: AGHT+IH6gsFYS8VK2ZemAScslG5opdjCmEmPt96ql0j29DuCFkAHUHIxo8hEFxcC1U6uPeFcq3/DVbvo82leVRWHIlo=
+X-Received: by 2002:a05:6808:1a05:b0:3f6:6cbc:9326 with SMTP id
+ 5614622812f47-4007bd4169amr1224486b6e.29.1744288769278; Thu, 10 Apr 2025
+ 05:39:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250410014658.782120-1-kuba@kernel.org> <20250410014658.782120-2-kuba@kernel.org>
+ <495e43ef-ae20-4dda-97c0-cb8ebe97394b@redhat.com>
+In-Reply-To: <495e43ef-ae20-4dda-97c0-cb8ebe97394b@redhat.com>
+From: Donald Hunter <donald.hunter@gmail.com>
+Date: Thu, 10 Apr 2025 13:39:17 +0100
+X-Gm-Features: ATxdqUEGVfBp8oKGlq6FQOR1EG92fmrrGVlEIpMkH1XdSAdsjWvAigoBDPW0H9E
+Message-ID: <CAD4GDZw+Enkd2dA8f7pNxMadwURFd_tHv1sUwkXqFqxsOquHQQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 01/13] netlink: specs: rename rtnetlink specs
+ in accordance with family name
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, edumazet@google.com, 
+	andrew+netdev@lunn.ch, horms@kernel.org, jacob.e.keller@intel.com, 
+	yuyanghuang@google.com, sdf@fomichev.me, gnault@redhat.com, 
+	nicolas.dichtel@6wind.com, petrm@nvidia.com, 
+	"David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
 
-#syz test: https://github.com/kkdwivedi/linux.git res-lock-next
+Yes, Documentation/Makefile goes the extra mile to only try deleting a
+list of .rst files generated from the list of source .yaml files. It
+would be easier to just delete
+Documentation/networking/netlink_spec/*.rst which would be able to
+clean up old generated files in situations like this.
+
+On Thu, 10 Apr 2025 at 09:52, Paolo Abeni <pabeni@redhat.com> wrote:
+>
+>
+>
+> On 4/10/25 3:46 AM, Jakub Kicinski wrote:
+> > The rtnetlink family names are set to rt-$name within the YAML
+> > but the files are called rt_$name. C codegen assumes that the
+> > generated file name will match the family. The use of dashes
+> > is in line with our general expectation that name properties
+> > in the spec use dashes not underscores (even tho, as Donald
+> > points out most genl families use underscores in the name).
+> >
+> > We have 3 un-ideal options to choose from:
+> >
+> >  - accept the slight inconsistency with old families using _, or
+> >  - accept the slight annoyance with all languages having to do s/-/_/
+> >    when looking up family ID, or
+> >  - accept the inconsistency with all name properties in new YAML spec
+> >    being separated with - and just the family name always using _.
+> >
+> > Pick option 1 and rename the rtnl spec files.
+> >
+> > Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> > Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> > ---
+> > v2: extend commit msg
+> > ---
+> >  Documentation/netlink/specs/{rt_addr.yaml => rt-addr.yaml}   | 0
+> >  Documentation/netlink/specs/{rt_link.yaml => rt-link.yaml}   | 0
+> >  Documentation/netlink/specs/{rt_neigh.yaml => rt-neigh.yaml} | 0
+> >  Documentation/netlink/specs/{rt_route.yaml => rt-route.yaml} | 0
+> >  Documentation/netlink/specs/{rt_rule.yaml => rt-rule.yaml}   | 0
+> >  Documentation/userspace-api/netlink/netlink-raw.rst          | 2 +-
+> >  tools/testing/selftests/net/lib/py/ynl.py                    | 4 ++--
+> >  7 files changed, 3 insertions(+), 3 deletions(-)
+> >  rename Documentation/netlink/specs/{rt_addr.yaml => rt-addr.yaml} (100%)
+> >  rename Documentation/netlink/specs/{rt_link.yaml => rt-link.yaml} (100%)
+>
+> My understanding is that this rename triggers rebuild of the related
+> doc, which in turns leads to quite a large number of htmldoc warning,
+> but it's really unharmful/pre-existing issue.
+>
+> /P
+>
 
