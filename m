@@ -1,169 +1,358 @@
-Return-Path: <netdev+bounces-181080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2FFAA83A40
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 09:07:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9455A83A52
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 09:09:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 066884A3AD7
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 07:06:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7298E3B1562
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 07:06:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4475020B7F4;
-	Thu, 10 Apr 2025 07:05:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FE9B205AC5;
+	Thu, 10 Apr 2025 07:06:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mIL/TZVv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dZ6ygRtj"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2069.outbound.protection.outlook.com [40.107.96.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F0F204F6A
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 07:05:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.69
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744268738; cv=fail; b=Boav7QiwM0HU4qMxWBzuPDc/X7lAB6IC9urSTAqg7Rvq+q41NKtuOftiOR4Nk+IXlgTwjiY+WjBLYOdzEAyZiaKg8rNOH4micUe/CQNFYMTFO30kMq5+LEXybYFVTSBK6zSwHJUqs32EsIaB1gIaEyEe3iMllxU9Q2eS4wQuF24=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744268738; c=relaxed/simple;
-	bh=mOgwEBWzcFmLEWW1fuATMvgvPlPr9Fy77nqwknPuGxU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Mbk3s8gC9n1x7PuqyV5lp0zrTHXkm+lt3CgTdhLqMfTB/+4f/P9VqTmR10RMMbYABcrIl/Bhza5KDOiatK6x16px1YDSAqfPLpH8T4CPWPDlt/QCGCWpZqj8FATSuhhdbhTuzpvQRLuGZotIzG2WJRdJ9KtE8HrQTq9hqayjlQo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=mIL/TZVv; arc=fail smtp.client-ip=40.107.96.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=c/POwywcgUGOpqOyYIhHss94ULhVCSu7BBBpUSAOwymGPWEP5sfJyK27g2W2pZ3WLP9SBwfZ3KFCvBg1LKdMX3BA31XBQR2N6c/0cAwk3RrSRDbZ7OUYo3+ekB8a5OsXIoR0MBKKTxyweLTrgp1R87wl3eRqsfMJnrzn4yHpIBo8HjBUgBFlcYNO+bh1oYjlvsqlqYbpIP5q+zD18l+9G42paGEFHVP3kCF/F+E4jAfLajMY84DypPu9C1TTds2Upj+xzhIffJe6ayffcWhpTJ7bPgrLDqkI6HxAn/dcpkbzTP+DOeFhZg25z71CZuTrl+C5TZ+vzEb+imo4jQKtEA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WGmIG1iGJfQi8aEWMCqm9i0n6B7Y/Pw5XllxODB3Aew=;
- b=bc4s1XWjkewDZlrlvzSDt3bXfH+cXfKltuOOvWxytfMJdvKUFlumQsefKccoseetOEsYhsdIS5eyjIZj4VzR50ES+A1KrIFziX9GjEBE/v8eJAe0jqQ0TsquAvuVoxVth25BGm+GvgVK5ULC0lR1dHpwekJYWHvaBcwbAUYbbD7Bg+LSbyYMwwiIhu2WMspjC1feXjivDkzOf5839FUqbkSQmmd9Z43iJ5X4gvfsrcJOzJgGnZlEYJvRaPcbdH61VbHyDZSp2lXOy3aPZJswGnpZt5awEVVn7OFyNTAi3VnjjP2tV44qrI6ISNpp/CHDoFY6vBhi5mQP6/njFj0LDA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WGmIG1iGJfQi8aEWMCqm9i0n6B7Y/Pw5XllxODB3Aew=;
- b=mIL/TZVvfPxt5cjYPhO24k3cgdixciFflmXr9ICZTcvw8glGsy7r3be64CSq9ke2Vhb4M+l/9oAn4O/2kUzSyxx2lzCtY5xgDmDusSZBFhWiC0P7gIWi0pjNPWvOZAt6Nwnhp2SJ/TbjDXDC8tpVpkCJLVw30AUG+k4ZibuTIcCHyH8mPu3OSRzbV0qezcGZ6Uy7lkF8vBC4AouQpFJ72E1LkfUlMcTHGMXEJBeTq4PYEH293Lv2iPiT9ZKz489Q2T59RKrTtI9wRjTdCk+z+D4OXK3mmsUjrf1U1JX0M7KFUeiQPr+/43eoTgchVRj4nqb/BsxkIfJVnVpXpysbiA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
- by MN0PR12MB5812.namprd12.prod.outlook.com (2603:10b6:208:378::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.21; Thu, 10 Apr
- 2025 07:05:30 +0000
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::66fc:f8a2:1bfb:6de8]) by SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::66fc:f8a2:1bfb:6de8%4]) with mapi id 15.20.8606.029; Thu, 10 Apr 2025
- 07:05:30 +0000
-Date: Thu, 10 Apr 2025 10:05:19 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
-	Nikolay Aleksandrov <razor@blackwall.org>
-Subject: Re: [PATCH v1 net-next 09/14] bridge: Convert
- br_net_exit_batch_rtnl() to ->exit_rtnl().
-Message-ID: <Z_dtr9ZuArqIpvmo@shredder>
-References: <20250410022004.8668-1-kuniyu@amazon.com>
- <20250410022004.8668-10-kuniyu@amazon.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250410022004.8668-10-kuniyu@amazon.com>
-X-ClientProxiedBy: LO6P123CA0056.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:310::13) To SA3PR12MB7901.namprd12.prod.outlook.com
- (2603:10b6:806:306::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B97D205ACB;
+	Thu, 10 Apr 2025 07:06:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744268768; cv=none; b=UUgp3dfFwx1Jhf1dFU9eQqnuG3uvWOaof/Am6S+BTK66OLzpubx+G8tnu8M5AriP2luPeeC+D+U702lMgWKJr9GpE/xtNb14JpUcH2d+lqDt9KeRB2USjj1obgPCcGxJHZGBJlpkZv6GDQCTt7xEg2kzaR1b1hlIeRaLbLIKhUA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744268768; c=relaxed/simple;
+	bh=H29HGz5dCVdWsyu4NNvoXXnk11dPJ6OVdf1MoeVHmj0=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=WvPgYxdI/A4BezWbRb5AIqiVpBoS+QHj5j7dVzQ+NFnz2Sq5bgkCEmDmZnChMJgROFdaBGT1hpNi0ebNIqyS2bNAdyI8RJdCpaJpKxSusxOYxT61/HUnXr0YXZVgqj7KyWsROwlWwA7yrDMqYZO/Qpe7RwNCUtk1QTVqppRKJfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dZ6ygRtj; arc=none smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-af51596da56so473427a12.0;
+        Thu, 10 Apr 2025 00:06:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744268765; x=1744873565; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=mtO4Cd3eyEjzyUiq+HOYkzpvu70Qjvaf96k0H5Kwoi8=;
+        b=dZ6ygRtjrth67PYYLgtH/Ze4Bil0q+t4JMMVKJWV8szGEI8pBLKoag0vRgwTjlkRxJ
+         uydXLOmr8CCKwIvbudmhBljV3C+1JpmTykTZMGHjZK0H/7M5OAaCah2FKH0V2lcaDlYL
+         NY6wSQNSjGgE6zvN7Ej71AP8LtxbpMyC9cc1pJwauhfFEATVEy6pL3cZVgZ7UTtHG1tt
+         0GoZsyCuPCAaNyHfH0qblV/lbAePzFS+A8yOv6FSaH8447um9JvKSTAR+LmEk1RdsihI
+         4QTzuTHXDOO+W9tS19A6ihsPrDiCiEEp5yGvuX4YVV5+koER5M5l1rFcV2TxNsZxZWSV
+         Y8dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744268765; x=1744873565;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mtO4Cd3eyEjzyUiq+HOYkzpvu70Qjvaf96k0H5Kwoi8=;
+        b=ZnVaVaR9MEWSVRT1wBRZHxVqDWcQCbCDHkYlBru+nJPZRGzpVANN9/B3gM7LRlBY+7
+         T7yipq16KreUPXMoZr0Yyi0rU/8Rv4YFJDgXAauSnTfTl3pATi+X7V4NeepyMPsbvxxt
+         opbHbXtb+ovcjqXznHaYaFjauIrKupDC2kmVIrY0Mmbuf8XxcfnczqmV+kxX3BXQDVre
+         9G/nI6pdRg+aQY9jI51BjaVUhnRSJYpickXmqZMAnSXp/9Xmg5L3US0yAZ5EpBsMD7O/
+         K3hVZFc06lm9ZgYwfFK3xyXd4rvINAJCLnDsRoCiECtKGwHp++UGvi6FRkFtQa3t4Z+u
+         WrYg==
+X-Forwarded-Encrypted: i=1; AJvYcCVRcWVskZ4Z4PbBPG1nm1AUCW6wa6/3uoOxuD6biFE0eyiDdISW/SeDS1WNGwVHpJTlmXHN2MU8qgRYa658@vger.kernel.org, AJvYcCWI10Nm9jGK5MkGeghItihOTQw7TqdwajqhKUGApIA0ve9HQAWs7txCy1uWe0ympUMf/03t20dp@vger.kernel.org, AJvYcCXSSysX5vcBjWJHPVUMYJm00lv/HcKPcq12xJhUmhFVRLN53u7DMNPXEiF8vPT+Iy6M2Lw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOig1cn1H2UYW0nBCs7uPxBZBc//lbPtrQblOiY2DCtICAdK7B
+	NVvzk92TXWzgzIKm8/bwtAdTeiWxTn55s88uNq+lF+FuOe0IoGN2
+X-Gm-Gg: ASbGncvsBRmK5z2Wj4Tcy6Yok36yWUP3G+ymMaNjXjlG/3uwknWxbkgTvLqDZNjpc0U
+	Rzk+VUnbqrByS5fJx2I5nvRiaiMIikU2k97vCKIjqKSEZUnL6MrJ/Zs9KYCIzMv7V/wv4smjDYl
+	z8qrXSkZH4Ljt912bjVaTX533IiXQsiS+G0N2KiYxyO8z5cvwFObrryyECvUhVXxmCYBP6AIHMg
+	3LCvw/o0d2nx7GcJ8S/oAAvy/4uioyt9Vpo7ceCrDU4XOxeHNzHAMUar/X3wHFKJsbMxNMt0r3v
+	Sllmm52+wST/bjBloK1TzY7tYuLxnMFACVvnlDCIXz+6D8TiLSJsyBhKsOv75zmlF38g4NDW2tR
+	tABpgh/BTE0kcXjRdHY0=
+X-Google-Smtp-Source: AGHT+IFC012ePYdg9YU5IJdv9OMsXwY8Yly4PrymASzDBwjSbXzE/FE47Ok1P78B+yqAZ9Z6q4iZ6w==
+X-Received: by 2002:a05:6a21:9007:b0:1f5:93b1:6a58 with SMTP id adf61e73a8af0-2016cc5eedbmr2153249637.8.1744268765300;
+        Thu, 10 Apr 2025 00:06:05 -0700 (PDT)
+Received: from ?IPV6:2001:ee0:4f0e:fb30:959f:bd4a:33b6:cab1? ([2001:ee0:4f0e:fb30:959f:bd4a:33b6:cab1])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b02a322117bsm1978174a12.64.2025.04.10.00.05.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Apr 2025 00:06:04 -0700 (PDT)
+Message-ID: <4d3a1478-b6fc-47a3-8d77-7eca6a973a06@gmail.com>
+Date: Thu, 10 Apr 2025 14:05:57 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|MN0PR12MB5812:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9033249a-6ba9-4307-f35d-08dd77fe1454
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?O8XotiNTpEA4P+wwYY1gSY6Cm2P3DHnpLhRzhXjHhehTMCDz2lTEw03hzfCV?=
- =?us-ascii?Q?2VP2+Sce9o43tdES2VeVCRBcSD97L6A3CFE/Zes3bWZXgvwi7x/z0tNAbfwB?=
- =?us-ascii?Q?+herWwECrrK/v9nDkR90jPGR/sNOlA4VprskQGrVUaZzN0NBiz8YD3oG9b0D?=
- =?us-ascii?Q?C0SmkgbojRyFsrZI+jW7HHaZZDKKuhRP32IXUpT4jXH++WvFLz3qp4kPY1FD?=
- =?us-ascii?Q?7cBNHA1/MDC0HvoFaLo3JKTXKEws96M6ChG/lguVACoSzEgc2MP3vAoWSPJ3?=
- =?us-ascii?Q?JXviS1emcMlB0I2MO2jinb+T6ccfZW9Qvhllb7Cffx2vKJepFfGwTe6Feke7?=
- =?us-ascii?Q?7xA/6sL002K5JpByLx5A6TaMMFsw/VgADiJUf8pWOHkxhDkB86kzQk5hnVQ0?=
- =?us-ascii?Q?tYum4bXbpJInL4s+1BFxqWZKoFB+YNtS8U096K8i7BlacJHd+C+k+RqM0lex?=
- =?us-ascii?Q?/aArmtVuAtYZIwn/84VtAKFhfFsXMEevwP+aYad+imyJ8xhrfGEDebw/lQr4?=
- =?us-ascii?Q?tgW/X2W30GNCDE2+TFcxkvrSeQ72yw0g6xg8QQYmhqExRjPpApL0MICKQwsm?=
- =?us-ascii?Q?6C/TuWyGdpMiaffG4dgK2sBdCDIk7uEcUt0sGRE/Cc/JGjzEfk/ACzqW4YAD?=
- =?us-ascii?Q?22Jx3L6rsynyUtoc1fySgGu9O/feWyD83oWM39GW58mKH5NtMZJsHmkTVleH?=
- =?us-ascii?Q?+eVyPixTmjCQ5CTjV3dN/2x903PHwdqGs0u8kzTNrtfofVxm4E2XbZqDIYWb?=
- =?us-ascii?Q?ZoyzMCymA/IWxrpQ29XYrIfc8opAHGgq9DMfZs5YEJ1y9Q6ZD/vktUxR3kxn?=
- =?us-ascii?Q?g7FOsp6ytQ9am5UL6SDA+rr9lZYUMiyEQyVVVIYr5pllYjbROcjNd4i6XkWV?=
- =?us-ascii?Q?tW1SuKVVKovsIHdyjX6tAMcjF5Qmk8lSLW/doNwFbB//ttHjtdyPl7ZLWeYw?=
- =?us-ascii?Q?bvsX92csSFDMPkiTCfFmbWKF8xFf0Izp7eJUMUtGKTIU8lNU39+ZOMocpnZs?=
- =?us-ascii?Q?U1vPqlnSKQeXppXdnNHtjj23fPCOANUxfzRSLOr9my91Q2rMq/K1cMeixnoM?=
- =?us-ascii?Q?HH3Ws5uSiLvsZU+CQkdtBcnzjZ+wayXMlYEIgCF/qk+U1ZNb4J9bLt0wRJj6?=
- =?us-ascii?Q?MEOgMDZMg98eaFLgq3Q197SqpVLBllOXsxzkDc+1RJWwd1PU6jRhaSBx0juc?=
- =?us-ascii?Q?PivUe6Swnb6++NZ5OtLMnp6hHCmx9CKP52OwRdJBfmd0PswPFaDGa0hQIlp7?=
- =?us-ascii?Q?s/ffaoL872nGab7bCMA1B7quoNYvo78WHiPr53Y0VXazhMxK7INZdsU/hI+l?=
- =?us-ascii?Q?atKywK8lptNKR2eqxustIn5aJ9XC5gwjwv07lQ9EV//xvYSaSV+5aHDq6pkf?=
- =?us-ascii?Q?PZSLA5eit9paVqyZPY2gCwAxbLkA?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?3kUpOEF11gSW95FpngTodPyL3409RKNybXIKZt2EoiH69I5OFXbOmCchaYKa?=
- =?us-ascii?Q?TBqB28uELxUAUpJpMxREaSLUx9z9hW+Y2MPsnnW+8SCecpkx7kyJ+r6top9v?=
- =?us-ascii?Q?rKZDydQUKT9fBk5kTqJ/kdYywz5WenNiJ9IT+/jl6e37gaF/a9Z6gC7iglko?=
- =?us-ascii?Q?PWwh+6Jjhu42i+lYQrP6x8HvSDA/wNiI5PutScu1Ulj7UHak+5LttBEsmyFa?=
- =?us-ascii?Q?wMCnG0suijV6N1taUrR77lo5rjx57p/pYTDNoPju2fjeISfKZGBuLlkGTRf7?=
- =?us-ascii?Q?0JZTcjHWWAyOKl6mRcn0TssIOQMzzsop1Af4KnJDBqXftrWrt1b236LVB3F4?=
- =?us-ascii?Q?rtjvIl+xSsW0ZlgJ5WR9RiVFpUWj/ICI20MBnEFmjI7wGaF+sB98xRo63CT5?=
- =?us-ascii?Q?3vTR1oK5IAfbhEHfvHNR9Z2If5OT0Bg0pHh3QPMDHQ6rsQAcbQ+p9lG9zinT?=
- =?us-ascii?Q?Dg/ob0f5q6OqS3e9UIwvuRxrI7sMi0ckPiCmj17Ttx7Y/snCXKkpyE7ZQWvm?=
- =?us-ascii?Q?ndncfTsmkFkcuZYKg+VFlKLLTgKgmbmJjfNeJl91ccTY7B8c1ML/ms7FaGyr?=
- =?us-ascii?Q?qhwkC6g6+DXsg98+d+3PUOSogqRKDEFhOFXJbKLzJJsIFaiTtcMcdsY0EhCt?=
- =?us-ascii?Q?70tW8YjXclCuzZ2kQab9LNJ+Fdbd9r3bofjncGAiv1OQ8D3vRsgjfbfS6lEf?=
- =?us-ascii?Q?cJtKpBgzdJsYwuE+pMf1JMoXMljNKUHCw9o3YMXzxt0MX8EkBACPOMDoBL5L?=
- =?us-ascii?Q?AJQDRAvHsMjRbXNPZqvem2MLlTvETUuiSw9S8OGXb0kx5vPlb9pDi+TMcp37?=
- =?us-ascii?Q?vQwaOZ85oS/JjX5WA2/KnODctVOrCZ03PMeqPpoOVlptneuSCElmzCZiPuae?=
- =?us-ascii?Q?hQXLsg9QstRqd9OnUO5C8n6VA6Yk/5aDVw3J/hCYSiqYdPCoSu4yllIZRwEl?=
- =?us-ascii?Q?MuBles8bPDr/7RSx+coXTSa/EVRtg7UkS6bdpWCPx9QTt4AWmPCftKt+qNIr?=
- =?us-ascii?Q?VziB0dMp1S9K0b1fu32ngH9yC/K/cUisIFuTFA7sYnWXR74QsqPgYQjM3typ?=
- =?us-ascii?Q?WD7eC+Rn+bRMKz1W4po3NNHHPdeWhQI58inckCGDpcjPi9gEdwtZlwuk50cN?=
- =?us-ascii?Q?x5aEB6+rEqDhjRl4UghfDXO87Z/Hz5NB0iO6/fI8Qel7rmMrlb7cWJ6bOBd1?=
- =?us-ascii?Q?0OHW+7obOFqIqDdf7Th7zkzgh4Rplw6OVZqK8ovmfPbfTb/Ha98G5hvYK0m1?=
- =?us-ascii?Q?YZh1MsGgPiUoOkuogs8V/69BIJhYcGbCrSKKYDFKjpU6BU4uSlHRi/8xVRxL?=
- =?us-ascii?Q?vNRLDSW1JYtkb48ZG+buhAcO7QT59HyNf4kOadG+f0XZP2q+XdhiQ7W9+JCp?=
- =?us-ascii?Q?KCzExlVFxZObPoLhRfFDj5Gvh+R5Epwboilrsr7LDF45bKwGlP2B+WscbeMo?=
- =?us-ascii?Q?LgLNbMQ64xPzabtFGkAnc/bgp4UvFwrJp2MaHOCu5cVWROoPzwpBSaoQ3Ddn?=
- =?us-ascii?Q?mc06BovA7r9AwamW0uNrxxSEBSwR3CT6O1XHrJLm7IkPmAlAog10QJBa2HXU?=
- =?us-ascii?Q?35EN62GveNxAadhB7yCoZAc3K5YHX5fnhJ05wMTM?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9033249a-6ba9-4307-f35d-08dd77fe1454
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2025 07:05:30.4778
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: U+GK8SLkBw6xELKOHHWNbk10FHbFdju3xFY2vxzZtMKMpXEVxFDPcgwAgVoNQ9a9BfgQ1x7+RYou9KXJkcPN9g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5812
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH] virtio-net: hold netdev_lock when pausing rx
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ virtualization@lists.linux.dev
+References: <20250404093903.37416-1-minhquangbui99@gmail.com>
+ <1743987836.9938157-1-xuanzhuo@linux.alibaba.com>
+ <30419bd6-13b1-4426-9f93-b38b66ef7c3a@gmail.com>
+ <CACGkMEs7O7D5sztwJVn45c+1pap20Oi5f=02Sy_qxFjbeHuYiQ@mail.gmail.com>
+ <4195db62-db43-4d61-88c3-7a7fbb164726@gmail.com>
+ <b7b1f5de-7003-4960-a9d1-883bf2f1aa77@gmail.com>
+Content-Language: en-US
+In-Reply-To: <b7b1f5de-7003-4960-a9d1-883bf2f1aa77@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 09, 2025 at 07:19:30PM -0700, Kuniyuki Iwashima wrote:
-> br_net_exit_batch_rtnl() iterates the dying netns list and
-> performs the same operation for each.
-> 
-> Let's use ->exit_rtnl().
-> 
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+When pausing rx (e.g. set up xdp, xsk pool, rx resize), we call
+napi_disable() on the receive queue's napi. In delayed refill_work, it
+also calls napi_disable() on the receive queue's napi. When
+napi_disable() is called on an already disabled napi, it will sleep in
+napi_disable_locked while still holding the netdev_lock. As a result,
+later napi_enable gets stuck too as it cannot acquire the netdev_lock.
+This leads to refill_work and the pause-then-resume tx are stuck
+altogether.
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+This scenario can be reproducible by binding a XDP socket to virtio-net
+interface without setting up the fill ring. As a result, try_fill_recv
+will fail until the fill ring is set up and refill_work is scheduled.
+
+This commit makes the pausing rx path hold the netdev_lock until
+resuming, prevent any napi_disable() to be called on a temporarily
+disabled napi.
+
+Fixes: 413f0271f396 ("net: protect NAPI enablement with netdev_lock()")
+Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
+---
+  drivers/net/virtio_net.c | 74 +++++++++++++++++++++++++---------------
+  1 file changed, 47 insertions(+), 27 deletions(-)
+
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 7e4617216a4b..74bd1065c586 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -2786,9 +2786,13 @@ static void skb_recv_done(struct virtqueue *rvq)
+  }
+
+  static void virtnet_napi_do_enable(struct virtqueue *vq,
+-                   struct napi_struct *napi)
++                   struct napi_struct *napi,
++                   bool netdev_locked)
+  {
+-    napi_enable(napi);
++    if (netdev_locked)
++        napi_enable_locked(napi);
++    else
++        napi_enable(napi);
+
+      /* If all buffers were filled by other side before we napi_enabled, we
+       * won't get another interrupt, so process any outstanding packets 
+now.
+@@ -2799,16 +2803,16 @@ static void virtnet_napi_do_enable(struct 
+virtqueue *vq,
+      local_bh_enable();
+  }
+
+-static void virtnet_napi_enable(struct receive_queue *rq)
++static void virtnet_napi_enable(struct receive_queue *rq, bool 
+netdev_locked)
+  {
+      struct virtnet_info *vi = rq->vq->vdev->priv;
+      int qidx = vq2rxq(rq->vq);
+
+-    virtnet_napi_do_enable(rq->vq, &rq->napi);
++    virtnet_napi_do_enable(rq->vq, &rq->napi, netdev_locked);
+      netif_queue_set_napi(vi->dev, qidx, NETDEV_QUEUE_TYPE_RX, &rq->napi);
+  }
+
+-static void virtnet_napi_tx_enable(struct send_queue *sq)
++static void virtnet_napi_tx_enable(struct send_queue *sq, bool 
+netdev_locked)
+  {
+      struct virtnet_info *vi = sq->vq->vdev->priv;
+      struct napi_struct *napi = &sq->napi;
+@@ -2825,11 +2829,11 @@ static void virtnet_napi_tx_enable(struct 
+send_queue *sq)
+          return;
+      }
+
+-    virtnet_napi_do_enable(sq->vq, napi);
++    virtnet_napi_do_enable(sq->vq, napi, netdev_locked);
+      netif_queue_set_napi(vi->dev, qidx, NETDEV_QUEUE_TYPE_TX, napi);
+  }
+
+-static void virtnet_napi_tx_disable(struct send_queue *sq)
++static void virtnet_napi_tx_disable(struct send_queue *sq, bool 
+netdev_locked)
+  {
+      struct virtnet_info *vi = sq->vq->vdev->priv;
+      struct napi_struct *napi = &sq->napi;
+@@ -2837,18 +2841,24 @@ static void virtnet_napi_tx_disable(struct 
+send_queue *sq)
+
+      if (napi->weight) {
+          netif_queue_set_napi(vi->dev, qidx, NETDEV_QUEUE_TYPE_TX, NULL);
+-        napi_disable(napi);
++        if (netdev_locked)
++            napi_disable_locked(napi);
++        else
++            napi_disable(napi);
+      }
+  }
+
+-static void virtnet_napi_disable(struct receive_queue *rq)
++static void virtnet_napi_disable(struct receive_queue *rq, bool 
+netdev_locked)
+  {
+      struct virtnet_info *vi = rq->vq->vdev->priv;
+      struct napi_struct *napi = &rq->napi;
+      int qidx = vq2rxq(rq->vq);
+
+      netif_queue_set_napi(vi->dev, qidx, NETDEV_QUEUE_TYPE_RX, NULL);
+-    napi_disable(napi);
++    if (netdev_locked)
++        napi_disable_locked(napi);
++    else
++        napi_disable(napi);
+  }
+
+  static void refill_work(struct work_struct *work)
+@@ -2875,9 +2885,11 @@ static void refill_work(struct work_struct *work)
+           *     instance lock)
+           *   - check netif_running() and return early to avoid a race
+           */
+-        napi_disable(&rq->napi);
++        netdev_lock(vi->dev);
++        napi_disable_locked(&rq->napi);
+          still_empty = !try_fill_recv(vi, rq, GFP_KERNEL);
+-        virtnet_napi_do_enable(rq->vq, &rq->napi);
++        virtnet_napi_do_enable(rq->vq, &rq->napi, true);
++        netdev_unlock(vi->dev);
+
+          /* In theory, this can happen: if we don't get any buffers in
+           * we will *never* try to fill again.
+@@ -3074,8 +3086,8 @@ static int virtnet_poll(struct napi_struct *napi, 
+int budget)
+
+  static void virtnet_disable_queue_pair(struct virtnet_info *vi, int 
+qp_index)
+  {
+-    virtnet_napi_tx_disable(&vi->sq[qp_index]);
+-    virtnet_napi_disable(&vi->rq[qp_index]);
++    virtnet_napi_tx_disable(&vi->sq[qp_index], false);
++    virtnet_napi_disable(&vi->rq[qp_index], false);
+      xdp_rxq_info_unreg(&vi->rq[qp_index].xdp_rxq);
+  }
+
+@@ -3094,8 +3106,8 @@ static int virtnet_enable_queue_pair(struct 
+virtnet_info *vi, int qp_index)
+      if (err < 0)
+          goto err_xdp_reg_mem_model;
+
+-    virtnet_napi_enable(&vi->rq[qp_index]);
+-    virtnet_napi_tx_enable(&vi->sq[qp_index]);
++    virtnet_napi_enable(&vi->rq[qp_index], false);
++    virtnet_napi_tx_enable(&vi->sq[qp_index], false);
+
+      return 0;
+
+@@ -3347,7 +3359,8 @@ static void virtnet_rx_pause(struct virtnet_info 
+*vi, struct receive_queue *rq)
+      bool running = netif_running(vi->dev);
+
+      if (running) {
+-        virtnet_napi_disable(rq);
++        netdev_lock(vi->dev);
++        virtnet_napi_disable(rq, true);
+          virtnet_cancel_dim(vi, &rq->dim);
+      }
+  }
+@@ -3359,8 +3372,10 @@ static void virtnet_rx_resume(struct virtnet_info 
+*vi, struct receive_queue *rq)
+      if (!try_fill_recv(vi, rq, GFP_KERNEL))
+          schedule_delayed_work(&vi->refill, 0);
+
+-    if (running)
+-        virtnet_napi_enable(rq);
++    if (running) {
++        virtnet_napi_enable(rq, true);
++        netdev_unlock(vi->dev);
++    }
+  }
+
+  static int virtnet_rx_resize(struct virtnet_info *vi,
+@@ -3389,7 +3404,7 @@ static void virtnet_tx_pause(struct virtnet_info 
+*vi, struct send_queue *sq)
+      qindex = sq - vi->sq;
+
+      if (running)
+-        virtnet_napi_tx_disable(sq);
++        virtnet_napi_tx_disable(sq, false);
+
+      txq = netdev_get_tx_queue(vi->dev, qindex);
+
+@@ -3423,7 +3438,7 @@ static void virtnet_tx_resume(struct virtnet_info 
+*vi, struct send_queue *sq)
+      __netif_tx_unlock_bh(txq);
+
+      if (running)
+-        virtnet_napi_tx_enable(sq);
++        virtnet_napi_tx_enable(sq, false);
+  }
+
+  static int virtnet_tx_resize(struct virtnet_info *vi, struct 
+send_queue *sq,
+@@ -5961,9 +5976,10 @@ static int virtnet_xdp_set(struct net_device 
+*dev, struct bpf_prog *prog,
+
+      /* Make sure NAPI is not using any XDP TX queues for RX. */
+      if (netif_running(dev)) {
++        netdev_lock(dev);
+          for (i = 0; i < vi->max_queue_pairs; i++) {
+-            virtnet_napi_disable(&vi->rq[i]);
+-            virtnet_napi_tx_disable(&vi->sq[i]);
++            virtnet_napi_disable(&vi->rq[i], true);
++            virtnet_napi_tx_disable(&vi->sq[i], true);
+          }
+      }
+
+@@ -6000,11 +6016,14 @@ static int virtnet_xdp_set(struct net_device 
+*dev, struct bpf_prog *prog,
+          if (old_prog)
+              bpf_prog_put(old_prog);
+          if (netif_running(dev)) {
+-            virtnet_napi_enable(&vi->rq[i]);
+-            virtnet_napi_tx_enable(&vi->sq[i]);
++            virtnet_napi_enable(&vi->rq[i], true);
++            virtnet_napi_tx_enable(&vi->sq[i], true);
+          }
+      }
+
++    if (netif_running(dev))
++        netdev_unlock(dev);
++
+      return 0;
+
+  err:
+@@ -6016,9 +6035,10 @@ static int virtnet_xdp_set(struct net_device 
+*dev, struct bpf_prog *prog,
+
+      if (netif_running(dev)) {
+          for (i = 0; i < vi->max_queue_pairs; i++) {
+-            virtnet_napi_enable(&vi->rq[i]);
+-            virtnet_napi_tx_enable(&vi->sq[i]);
++            virtnet_napi_enable(&vi->rq[i], true);
++            virtnet_napi_tx_enable(&vi->sq[i], true);
+          }
++        netdev_unlock(dev);
+      }
+      if (prog)
+          bpf_prog_sub(prog, vi->max_queue_pairs - 1);
+-- 
+2.43.0
+
+
 
