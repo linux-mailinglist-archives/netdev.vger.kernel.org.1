@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-180989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F097CA835E7
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 03:47:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0333FA835E8
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 03:47:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD306464A62
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 01:47:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AB2C19E7091
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 01:47:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79DE91C1F13;
-	Thu, 10 Apr 2025 01:47:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 096AE1C7007;
+	Thu, 10 Apr 2025 01:47:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UevNFDt/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="brXjfemC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5419A1B4F0F
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 01:47:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FCC1C6FE5
+	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 01:47:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744249632; cv=none; b=M22ShC/bG7XVGN0kJ6qto5XL/vUjzlCvxv1cbXtFkn/EAM1oQJOA9g9xk72fNzh1egrovJZxHXiE/7QiVR7MdPhEYPKFQv6gi2WI8ENV5c20+hTmPhqDlS3fZb0GFZzL1E5qHKi3QhOstJBDUbeS9IMTwdGF9TTo+Ebkivbgvo0=
+	t=1744249632; cv=none; b=DX60AbDsaJx2qiVgj+UKw7kR1Y+dp/MJvEKpp9h77B9J2/P7dNqbjlgU3yvgZUWpfx+CzAA8PhTziaRP7RBN0t595BRjubm8VyRmTy6kQYixRvOCEdxWXa1x//bFKYPxSwrdCETWqheW8+Rgal+XCkuLgIVFLx5vU89JBxufvFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1744249632; c=relaxed/simple;
-	bh=isnKNCougcLmJ5pvVmLSxorQwWo1xGQ1wqKfgVLr7Ic=;
+	bh=oeKoTMmCUvR428RJX3ESWZLmppEv/uJfUKEwolPvzmg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AV/gJvRO6ybLomZdZ0jDRrx5kbEonpbWsqZ2Cjx1d0+NYrMyApB+cAKAgZmp+jJHjmn8D57CXviwhw8UI4B/cKdqbcmE0Qk5bsDdtnCUX6DCe3Pc8oo8FkNxLg6CITM5eu5H0Ogw69r1hh7sPfIdRcDnw2B8Gho/MbeDo8vrfqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UevNFDt/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68615C4CEEA;
+	 MIME-Version; b=PNTcdHq7RScUHN4NI3/hRcdCbOgcW7GNfyG3pgnyycGIEQjMGwCryK1kVegabrNql7y65eQwAlPfMMa/u3Ifbt2pt3tLPPp/StRDjbwkoMfsjCtAAvxRxFEz8x+MWbdkHJpmQoPSEP9mfy/X3fT6F1tJKRBqtIH2jBl0bUeLIuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=brXjfemC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F30C0C4CEE2;
 	Thu, 10 Apr 2025 01:47:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744249631;
-	bh=isnKNCougcLmJ5pvVmLSxorQwWo1xGQ1wqKfgVLr7Ic=;
+	s=k20201202; t=1744249632;
+	bh=oeKoTMmCUvR428RJX3ESWZLmppEv/uJfUKEwolPvzmg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UevNFDt/Xk1rwwhAZKoTkJcOUkzMbUoYxi9VdVNcPuhfnfMNfyUZjTLqUJznPDrqE
-	 qQoOWJWj5TFDdZbUzq9HKhqvsV0cIGziByjTRIYGldjwN3dXxO4PXq7CxI6niZoL1C
-	 HEfWc1LtWa6CMjlisMNk4V8mIGp/Y5au8XQf9A4dljOivfyFEpWhUjOLU5VEpQfGpf
-	 6o2VfSNLrifqON+K3NI7JxzW8Lll2MqZ8WRU3OJI+hHzGqWoUzVWXaT199cKyOTa0q
-	 wzH2/hpayuyia1k895oyqyvPlw1JOCL/l4PTdV0xWtbq4uf56Jvhgt11zhN9iqJ4z7
-	 5US8Zv7YdVyOQ==
+	b=brXjfemC00Vdy4xBL4b4c0O35bq/wE/JoO3NhPaNCvStfmcgLfLxcpydSXNmDei47
+	 19hNR2+ofguejRIvKMOusQ13I/tm+ubUbaPh8XZ2s1SP+FGHp4W7p9Dn62zVGTDjsK
+	 X3Zctulrje0Vlq6+mlZbExcfiX8/jEF/jPbRoKiqJZNeVsrciHtC85LNDb5a3S+LS4
+	 y8zd+aRzXBNvsyEFJIvjjEeqUuZUAdE4grAuv3trdpIgQubeUUgm3jcOQ+xFCBr9xU
+	 hZrrT1BlqhK8WUG9boNOqs2m2MTK5yHMFy0ZGPerC3i5BNJCS9NPq3OXG/IHOm0DuQ
+	 7PvfTSEpW+4xw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -56,9 +56,9 @@ Cc: netdev@vger.kernel.org,
 	nicolas.dichtel@6wind.com,
 	petrm@nvidia.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 02/13] netlink: specs: rt-route: specify fixed-header at operations level
-Date: Wed,  9 Apr 2025 18:46:47 -0700
-Message-ID: <20250410014658.782120-3-kuba@kernel.org>
+Subject: [PATCH net-next v2 03/13] netlink: specs: rt-addr: remove the fixed members from attrs
+Date: Wed,  9 Apr 2025 18:46:48 -0700
+Message-ID: <20250410014658.782120-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250410014658.782120-1-kuba@kernel.org>
 References: <20250410014658.782120-1-kuba@kernel.org>
@@ -70,52 +70,81 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The C codegen currently stores the fixed-header as part of family
-info, so it only supports one fixed-header type per spec. Luckily
-all rtm route message have the same fixed header so just move it up
-to the higher level.
+The purpose of the attribute list is to list the attributes
+which will be included in a given message to shrink the objects
+for families with huge attr spaces. Fixed headers are always
+present in their entirety (between netlink header and the attrs)
+so there's no point in listing their members. Current C codegen
+doesn't expect them and tries to look them up in the attribute space.
 
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/netlink/specs/rt-route.yaml | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+v2: reword the commit msg slightly
+---
+ Documentation/netlink/specs/rt-addr.yaml | 20 +++-----------------
+ 1 file changed, 3 insertions(+), 17 deletions(-)
 
-diff --git a/Documentation/netlink/specs/rt-route.yaml b/Documentation/netlink/specs/rt-route.yaml
-index 292469c7d4b9..6fa3fa24305e 100644
---- a/Documentation/netlink/specs/rt-route.yaml
-+++ b/Documentation/netlink/specs/rt-route.yaml
-@@ -245,12 +245,12 @@ protonum: 0
- 
- operations:
-   enum-model: directional
-+  fixed-header: rtmsg
-   list:
+diff --git a/Documentation/netlink/specs/rt-addr.yaml b/Documentation/netlink/specs/rt-addr.yaml
+index df6b23f06a22..0488ce87506c 100644
+--- a/Documentation/netlink/specs/rt-addr.yaml
++++ b/Documentation/netlink/specs/rt-addr.yaml
+@@ -133,11 +133,6 @@ protonum: 0
+         request:
+           value: 20
+           attributes: &ifaddr-all
+-            - ifa-family
+-            - ifa-flags
+-            - ifa-prefixlen
+-            - ifa-scope
+-            - ifa-index
+             - address
+             - label
+             - local
+@@ -150,11 +145,6 @@ protonum: 0
+         request:
+           value: 21
+           attributes:
+-            - ifa-family
+-            - ifa-flags
+-            - ifa-prefixlen
+-            - ifa-scope
+-            - ifa-index
+             - address
+             - local
      -
-       name: getroute
-       doc: Dump route information.
-       attribute-set: route-attrs
--      fixed-header: rtmsg
+@@ -164,8 +154,7 @@ protonum: 0
+       dump:
+         request:
+           value: 22
+-          attributes:
+-            - ifa-index
++          attributes: []
+         reply:
+           value: 20
+           attributes: *ifaddr-all
+@@ -177,9 +166,7 @@ protonum: 0
        do:
          request:
-           value: 26
-@@ -320,7 +320,6 @@ protonum: 0
-       name: newroute
-       doc: Create a new route
-       attribute-set: route-attrs
--      fixed-header: rtmsg
-       do:
+           value: 58
+-          attributes:
+-            - ifa-family
+-            - ifa-index
++          attributes: []
+         reply:
+           value: 58
+           attributes: &mcaddr-attrs
+@@ -188,8 +175,7 @@ protonum: 0
+       dump:
          request:
-           value: 24
-@@ -329,7 +328,6 @@ protonum: 0
-       name: delroute
-       doc: Delete an existing route
-       attribute-set: route-attrs
--      fixed-header: rtmsg
-       do:
-         request:
-           value: 25
+           value: 58
+-          attributes:
+-            - ifa-family
++          attributes: []
+         reply:
+           value: 58
+           attributes: *mcaddr-attrs
 -- 
 2.49.0
 
