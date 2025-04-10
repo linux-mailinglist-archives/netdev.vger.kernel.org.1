@@ -1,156 +1,163 @@
-Return-Path: <netdev+bounces-181282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6134A84469
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 15:16:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 708E7A8446A
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 15:16:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F2CC4A3EDD
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 13:11:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AE519A3FBC
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 13:11:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17E8128C5D4;
-	Thu, 10 Apr 2025 13:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE61428CF47;
+	Thu, 10 Apr 2025 13:09:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="JyNeQbxg"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="JLIa0Hqu"
 X-Original-To: netdev@vger.kernel.org
-Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
+Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B3528FFCF
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 13:08:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A6F2857F8;
+	Thu, 10 Apr 2025 13:09:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744290527; cv=none; b=iZWaiDGewS+uP3ODvCO6zK1S2ahCsDDvId/3eFunX2DVTYhqCPEU2QtcyqwS9ZlXnXW6G7QwigDTQAQuCxaoKysSqH2oxtLtN1wcOKSO1KHLxH84HSUENHy7sm5ZDUR15Ycu3PKUTDAAxq8XEUdNETcRdqGjvo70ppWk8eYcaN4=
+	t=1744290595; cv=none; b=NgSu++5krTQNvodkP4s1GLwdznBsT9Ac27/o3UGTekjc7VW6wli0xD0DWQLUWpV321b0Zfm2d7KcAYfm3bMxZWI+KLq7LLdqK/X3RBatlwPWOHp2iwwki+Z12xBDfLnU/7e8d3lp/qii9hn3vb1W60iRU8sikcRfB5lDHOnOqKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744290527; c=relaxed/simple;
-	bh=UEVfVn+kRWXLw58hUFtaOx95aRUWamak2EmObPLAGaw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hwQ2Vn4hJ8rhiFen/pSSGca5BnmIyTqLc9Ne5KDwRkjsuNTy6nq/HTOMhzFeZDIPYG23I1bB7GwfLR1saBO7i5xIIdDaMX8PtfjNdW2vdgdeMEW+CW3T6OLQf2zDOwIALglr/8kfUlSC/lQ55HZP9x4Mix/VC8+2aonTWN4NOwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=JyNeQbxg; arc=none smtp.client-ip=213.160.73.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
-	s=20121; t=1744290515;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	s=arc-20240116; t=1744290595; c=relaxed/simple;
+	bh=ohKKNYP3dMZzy/Op3vn2DOLq02k/up894FUlQhaKHxQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=FM0kkmAkmNQcGgjq0ghdoY58BEFH3khYcJEoBX6JAhbG+A472l6BHht0UalAOWIYzaJRnLTxSZRM7/Q3WGW+MowRf5RaGPwthsp1p1JKOxZLi7w3ETZzonQdA7aMAEnDwcXsh84+MSHaZrHH8x8sbCG3QabP1iXYy5LcwrjdqG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=JLIa0Hqu; arc=none smtp.client-ip=80.241.56.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4ZYKsh20Kcz9sFb;
+	Thu, 10 Apr 2025 15:09:44 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1744290584; h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Pnfe4fwyjClx3VajDxfmgLwlfvxavW9WEkk87ykFXUw=;
-	b=JyNeQbxgUmHo6mnKTRmuIvJ+k9h1fRf30quv/HboHWJ8TLvklwbHHZ+E/1/DmG4PL+fhvZ
-	pqovbd+WESgsn+8EsBSyWdSMBC9+YwgmjO9kOIvXj+OsuKNEQc269pIqtG+RKgPouifOYQ
-	ecqEIDtdEQKSPyCfebtbdv2l8i9H8AM=
-From: Sven Eckelmann <sven@narfation.org>
-To: Simon Wunderlich <sw@simonwunderlich.de>, Paolo Abeni <pabeni@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject:
- Re: [PATCH net v3] batman-adv: Fix double-hold of meshif when getting enabled
-Date: Thu, 10 Apr 2025 15:08:25 +0200
-Message-ID: <3807435.LM0AJKV5NW@ripper>
-In-Reply-To: <d72376b8-a794-4c47-b981-11df6e17e417@redhat.com>
-References:
- <20250409073524.557189-1-sven@narfation.org>
- <d72376b8-a794-4c47-b981-11df6e17e417@redhat.com>
+	bh=tNo4RWbN6OOQmatSWnTpJ3Sh3OCGI8DiobFht1mvBP4=;
+	b=JLIa0HquJgjRKsl6VGI2sxxfZVuwKrlEnzrtHs2vUWdYskSAy4m8cWSpMDpMheH5h2Skgi
+	NlwbeHPHoHvO1XAT+3TBkM0DbFgEy4JPwFTVa/IVeHaLXUSdyJgTj4rKjzAOB01rmEvo/Q
+	5q+I26dMY3DK2iGsGaZM54MpPsnfj9WlPBcWukDoF2RC3WD25x4JZW8Zs1VGF5m5BSGTdo
+	QU+DL6NjbZk43TGAtKlQbIJO6q8pDuB7C5MJqGGqZzuSvW6qt+F8eblUpKQwDlEmGqpuey
+	/1E0zRPYbKgYOehnQNlPRH0XFt5yoOCEgiLppCE931Rq9Ml+Jf2cPEGgIV7kcA==
+Message-ID: <c737c89c7ce9174e349c61ab4e5712eee8946f13.camel@mailbox.org>
+Subject: Re: [PATCH 1/3] drm/nouveau: Prevent signaled fences in pending list
+From: Philipp Stanner <phasta@mailbox.org>
+Reply-To: phasta@kernel.org
+To: Christian =?ISO-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>, Philipp
+ Stanner <phasta@kernel.org>, Lyude Paul <lyude@redhat.com>, Danilo
+ Krummrich <dakr@kernel.org>,  David Airlie <airlied@gmail.com>, Simona
+ Vetter <simona@ffwll.ch>, Sabrina Dubroca <sd@queasysnail.net>,  Sumit
+ Semwal <sumit.semwal@linaro.org>
+Cc: dri-devel@lists.freedesktop.org, nouveau@lists.freedesktop.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org, 
+	stable@vger.kernel.org
+Date: Thu, 10 Apr 2025 15:09:39 +0200
+In-Reply-To: <8583665a-6886-4245-be49-fd8839cfe212@amd.com>
+References: <20250410092418.135258-2-phasta@kernel.org>
+	 <20250410092418.135258-3-phasta@kernel.org>
+	 <8583665a-6886-4245-be49-fd8839cfe212@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart17243847.geO5KgaWL5";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
+X-MBO-RS-META: w17gddazuhiderzamj37mege4ojzpn7m
+X-MBO-RS-ID: d885f1ea80fc186b76b
 
---nextPart17243847.geO5KgaWL5
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"; protected-headers="v1"
-From: Sven Eckelmann <sven@narfation.org>
-Date: Thu, 10 Apr 2025 15:08:25 +0200
-Message-ID: <3807435.LM0AJKV5NW@ripper>
-In-Reply-To: <d72376b8-a794-4c47-b981-11df6e17e417@redhat.com>
-MIME-Version: 1.0
+On Thu, 2025-04-10 at 14:58 +0200, Christian K=C3=B6nig wrote:
+> Am 10.04.25 um 11:24 schrieb Philipp Stanner:
+> > Nouveau currently relies on the assumption that dma_fences will
+> > only
+> > ever get signaled through nouveau_fence_signal(), which takes care
+> > of
+> > removing a signaled fence from the list nouveau_fence_chan.pending.
+> >=20
+> > This self-imposed rule is violated in nouveau_fence_done(), where
+> > dma_fence_is_signaled() (somewhat surprisingly, considering its
+> > name)
+> > can signal the fence without removing it from the list. This
+> > enables
+> > accesses to already signaled fences through the list, which is a
+> > bug.
+> >=20
+> > In particular, it can race with nouveau_fence_context_kill(), which
+> > would then attempt to set an error code on an already signaled
+> > fence,
+> > which is illegal.
+> >=20
+> > In nouveau_fence_done(), the call to nouveau_fence_update() already
+> > ensures to signal all ready fences. Thus, the signaling potentially
+> > performed by dma_fence_is_signaled() is actually not necessary.
+>=20
+> Ah, I now got what you are trying to do here! But that won't help.
+>=20
+> The problem is it is perfectly valid for somebody external (e.g.
+> other driver, TTM etc...) to call dma_fence_is_signaled() on a
+> nouveau fence.
+>=20
+> This will then in turn still signal the fence and leave it on the
+> pending list and creating the problem you have.
 
-On Thursday, 10 April 2025 12:13:25 CEST Paolo Abeni wrote:
-> Also this is somewhat strange: the same patch come from 2 different
-> persons (sometimes with garbled SoBs), 
+Good to hear =E2=80=93 precisely that then is the use case for a dma_fence
+callback! ^_^ It guarantees that, no matter who signals a fence, no
+matter at what place, a certain action will always be performed.
 
-Ok, all of that was my fault. Even the original duplicated *dev_hold. Just as summary:
+I can't think of any other mechanism which could guarantee that a
+signaled fence immediately gets removed from nouveau's pending list,
+other than the callbacks.
 
-* v1: accidentally submitted the patch with correct content but from a test
-  git repo which didn't had the actual commit message
-* v2: send correct patch but it was done from the folder which is used to 
-  prepare the branches which will be submitted later by Simon -> git-send-
-  email picked up the Simon's name (see below) and submitted it using my 
-  mailserver
-* v3: submitted it "correctly" and marked the day as "shouldn't have waken up 
-  in the first place"
+But seriously, I don't think that anyone does this currently, nor do I
+think that anyone could get away with doing it without the entire
+computer burning down.
 
-Regarding the v2 situation: This is definitely odd but it had to be done this 
-way because there were complains in the past from netdev when Simon submitted 
-the PR and not all patches in the PR were Signed-off-by him. As result, when I 
-add something in the queue, I directly apply the patches as him (including my 
-own Signed-off-by). And Simon will go through the patches again before 
-actually sending the PR, create a signed tag and submits the PR. I would love 
-not to do this preparation/fakery anymore. But then you will not have the 
-requested full signed-off-by - something which you usually don't have for PRs 
-but which was for some reason required for netdev.
-
-> and we usually receive PR for
-> batman patches.
-
-This was just an attempt to get syzbot happy again (sooner). Besides my direct 
-patch submission, we have different options:
-
-* wait for Simon's PR
-* let Eric Dumazet integrate his (earlier posted) patch from
-  https://lore.kernel.org/r/CANn89iJTHf-sJCqcyrFJiLMLBOBgtN0+KrfPSuW0mhOzLS08Rw@mail.gmail.com
-  This change was also published earlier
-
-> Also I do not see credits given to syzbot  team ?
-
-Correct. Is there a proper way when the reports received were actually about 
-different problems (just the bisecting went the wrong way due to the 
-batman-adv bug)?
-
-For example, I saw the problem with bisecting in:
-
-* https://syzkaller.appspot.com/bug?extid=ff3aa851d46ab82953a3
-  Reported-by: syzbot+ff3aa851d46ab82953a3@syzkaller.appspotmail.com
-* https://syzkaller.appspot.com/bug?extid=4036165fc595a74b09b2
-  Reported-by: syzbot+4036165fc595a74b09b2@syzkaller.appspotmail.com
-* https://syzkaller.appspot.com/bug?extid=c35d73ce910d86c0026e
-  Reported-by: syzbot+c35d73ce910d86c0026e@syzkaller.appspotmail.com
-* https://syzkaller.appspot.com/bug?extid=48c14f61594bdfadb086
-  Reported-by: syzbot+48c14f61594bdfadb086@syzkaller.appspotmail.com
-
-So, a lot of different problems which unfortunately all ended up in bisecting 
-to the batman-adv problem.
-
-On Thursday, 10 April 2025 13:20:21 CEST Eric Dumazet wrote:
-> https://lkml.org/lkml/2025/4/8/1988
-
-You also posted your patch here. Feel free to directly add it. And sorry for 
-adding the problem in the first placed - just tried to make Antonio happy (and 
-then created a big mess for everyone else)
-
-Kind regards,
-	Sven
---nextPart17243847.geO5KgaWL5
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCZ/fCygAKCRBND3cr0xT1
-yxu8AQDvU+PC2pRuTGWFrbC/EbBKa/jN3KL1G23sBsR58qDouAD+JG7Xo0+x8NGC
-lUCspIoHiD2vSNx/5/ydaWuwQyM9cww=
-=lh1b
------END PGP SIGNATURE-----
-
---nextPart17243847.geO5KgaWL5--
+P.
 
 
+
+>=20
+> Regards,
+> Christian.
+>=20
+> >=20
+> > Replace the call to dma_fence_is_signaled() with
+> > nouveau_fence_base_is_signaled().
+> >=20
+> > Cc: <stable@vger.kernel.org> # 4.10+, precise commit not to be
+> > determined
+> > Signed-off-by: Philipp Stanner <phasta@kernel.org>
+> > ---
+> > =C2=A0drivers/gpu/drm/nouveau/nouveau_fence.c | 2 +-
+> > =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/drivers/gpu/drm/nouveau/nouveau_fence.c
+> > b/drivers/gpu/drm/nouveau/nouveau_fence.c
+> > index 7cc84472cece..33535987d8ed 100644
+> > --- a/drivers/gpu/drm/nouveau/nouveau_fence.c
+> > +++ b/drivers/gpu/drm/nouveau/nouveau_fence.c
+> > @@ -274,7 +274,7 @@ nouveau_fence_done(struct nouveau_fence *fence)
+> > =C2=A0			nvif_event_block(&fctx->event);
+> > =C2=A0		spin_unlock_irqrestore(&fctx->lock, flags);
+> > =C2=A0	}
+> > -	return dma_fence_is_signaled(&fence->base);
+> > +	return test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence-
+> > >base.flags);
+> > =C2=A0}
+> > =C2=A0
+> > =C2=A0static long
+>=20
 
 
