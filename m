@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-180986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4A73A835DE
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 03:42:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B7F7A835E5
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 03:47:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CDFC189E6D1
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 01:43:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0B66464283
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 01:47:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70047198A2F;
-	Thu, 10 Apr 2025 01:42:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E6023596F;
+	Thu, 10 Apr 2025 01:47:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tJ7xFxuJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l4wqLxkW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B054BA33
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 01:42:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 388F2BA38
+	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 01:47:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744249369; cv=none; b=TgKE+cUYPZcXrP4G32L0PDlZlwVtH1fzRy/drGoD1AfIH5gz+hMAW3nGzBmJ/BggAk1tdgOFf48fqD9IWMdNibNMxmg8UMWFAg0rfTMSkLyamiF8vok15xtrVoM2KCMX1PSYsHab7LzF9c1RiiHPH01wqfUH3B9Q0GXEhU5aR6Q=
+	t=1744249631; cv=none; b=rqINRyFnN8cTGtJzyTq4EyqCGqv0FTzUiZovD0oEFNVGFPODuqP2Sum01H9OT4LvO7XlWcOz0diGptkTl4GecrZT5DpQjtR92/dcoUOSfLH6Z2diH5HW+Uy9sOkoZKY9fjvpC95aEveH+spmM/CHOWh16FCfSCXIRIQR9LkbPW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744249369; c=relaxed/simple;
-	bh=ZFjZP6b7jXXyGF7nBqOtOt14X+Y6V4wTmhhopewqOC8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t1Hqrk9MizDA0fEsjJ6W2esyyYCOOZ4g2/IpuOvbknIuhPlLktzjknZiIWiyD/o5eiKH7kJyBm5ezwpqTJYkj3m4dL/RnmKN9QCijcMKjARZq6gEPPBxtiJuHjQKgNNEcPRaV9YFlE8YUl5+s2D8mXw9XbKtIfe5yVfXjC9BOQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tJ7xFxuJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BBCAC4CEE2;
-	Thu, 10 Apr 2025 01:42:48 +0000 (UTC)
+	s=arc-20240116; t=1744249631; c=relaxed/simple;
+	bh=DMFKXAyaW0sajoTLfe/tA55sMOZodC6Ikr5XooZwJs0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SHswJQtYi9RgJAaZr0Ui4B9zmD4W/o1NR37FrWfXcLy+czAgOgP4VQRILaBD6BefgaXQFFTMBO4EeHrV303mnBEYFcOOJMmmShVPE9SGkTR7XUSyoyCOuqmHQoP4RUM9MzejzH0h7uCnnIPRqDMex5r+q2XoSZ9MSj2Z9su6AYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l4wqLxkW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4051BC4CEE2;
+	Thu, 10 Apr 2025 01:47:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744249368;
-	bh=ZFjZP6b7jXXyGF7nBqOtOt14X+Y6V4wTmhhopewqOC8=;
+	s=k20201202; t=1744249630;
+	bh=DMFKXAyaW0sajoTLfe/tA55sMOZodC6Ikr5XooZwJs0=;
 	h=From:To:Cc:Subject:Date:From;
-	b=tJ7xFxuJmlAwXg73Tm/7To/ohOEZGXdjXgiogQ7o4P3AcXNoGVWfsUfvccU5Azzh7
-	 Klxeqlrq/mTU0AsaMOfXFnXkMhTn20zJ23z3/A6L2TmkFHVANJjfZKScGzOALPkLOQ
-	 5T/3JlcsYuXxmvxlJrLH+Yd8z+/20EPppgyr7fJCVrbo1NUMBoGKdnsH+NU5356xra
-	 1+5LEMge/PBV+WWd6DfArdDvmmdPXxEfMCohj2xywdt+Pdh/jJ6ri94rpuzr7rRXwq
-	 EqNia2mPc3cvgCEajtctOTiZVSqJ4WNagHtbAnzxlbkng+mIDcdH1AFZSWUNEApdjY
-	 YP3u3vSGbzlvA==
+	b=l4wqLxkWQRRVwrubZ/PxCkKhLIfmhJXwHbaCiRtqU5vPRJ5J75XBBfIf/3BhKKEMA
+	 b4nzRftxzPWvQlpnJdcThClbbALhkIA6Tg/5CziHVOkc7s//qUoY6RnKhw/vL6xhXA
+	 RA1jdqDFZnAExNvN8LVZ756BX/TLo2U9ZcXtW86ZiCbDoBZ9BRyP4OUAIKIoVvbako
+	 lWLwY6moolGYPtLdVSmA4dyVgKczfWf6mvlPO+7MTQgOQWvVDUgJCsgkxA2r/TbgPU
+	 tAIIPPzgcYk0Njx7Me9omBXDD4AWa73DWBuapqTZfmnSi0SFNV1TXB/Xw8n9Z0nlVt
+	 6SlUAWLAbJ/0g==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -47,12 +47,17 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	andrew+netdev@lunn.ch,
 	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
+	donald.hunter@gmail.com,
+	jacob.e.keller@intel.com,
+	yuyanghuang@google.com,
 	sdf@fomichev.me,
-	kuniyu@amazon.com
-Subject: [PATCH net-next] net: convert dev->rtnl_link_state to a bool
-Date: Wed,  9 Apr 2025 18:42:46 -0700
-Message-ID: <20250410014246.780885-1-kuba@kernel.org>
+	gnault@redhat.com,
+	nicolas.dichtel@6wind.com,
+	petrm@nvidia.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next v2 00/13] tools: ynl: c: basic netlink-raw support
+Date: Wed,  9 Apr 2025 18:46:45 -0700
+Message-ID: <20250410014658.782120-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,137 +67,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-netdevice reg_state was split into two 16 bit enums back in 2010
-in commit a2835763e130 ("rtnetlink: handle rtnl_link netlink
-notifications manually"). Since the split the fields have been
-moved apart, and last year we converted reg_state to a normal
-u8 in commit 4d42b37def70 ("net: convert dev->reg_state to u8").
+Basic support for netlink-raw AKA classic netlink in user space C codegen.
+This series is enough to read routes and addresses from the kernel
+(see the samples in patches 12 and 13).
 
-rtnl_link_state being a 16 bitfield makes no sense. Convert it
-to a single bool, it seems very unlikely after 15 years that
-we'll need more values in it.
+Specs need to be slightly adjusted and decorated with the c naming info.
 
-We could drop dev->rtnl_link_ops from the conditions but feels
-like having it there more clearly points at the reason for this
-hack.
+In terms of codegen this series includes just the basic plumbing required
+to skip genlmsghdr and handle request types which may technically also
+be legal in genetlink-legacy but are very uncommon there.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: sdf@fomichev.me
-CC: kuniyu@amazon.com
----
- .../networking/net_cachelines/net_device.rst      |  2 +-
- include/linux/netdevice.h                         | 10 ++--------
- net/core/dev.c                                    |  6 ++----
- net/core/rtnetlink.c                              | 15 ++++++++-------
- 4 files changed, 13 insertions(+), 20 deletions(-)
+Subsequent series will add support for:
+ - handling CRUD-style notifications
+ - code gen for array types classic netlink uses
+ - sub-message support
 
-diff --git a/Documentation/networking/net_cachelines/net_device.rst b/Documentation/networking/net_cachelines/net_device.rst
-index 6327e689e8a8..ca8605eb82ff 100644
---- a/Documentation/networking/net_cachelines/net_device.rst
-+++ b/Documentation/networking/net_cachelines/net_device.rst
-@@ -131,7 +131,7 @@ struct ref_tracker_dir              refcnt_tracker
- struct list_head                    link_watch_list
- enum:8                              reg_state
- bool                                dismantle
--enum:16                             rtnl_link_state
-+bool                                rtnl_link_initilizing
- bool                                needs_free_netdev
- void*priv_destructor                struct net_device
- struct netpoll_info*                npinfo                                          read_mostly         napi_poll/napi_poll_lock
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index dece2ae396a1..d3478e27e350 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -1946,9 +1946,6 @@ enum netdev_reg_state {
-  *
-  *	@reg_state:		Register/unregister state machine
-  *	@dismantle:		Device is going to be freed
-- *	@rtnl_link_state:	This enum represents the phases of creating
-- *				a new link
-- *
-  *	@needs_free_netdev:	Should unregister perform free_netdev?
-  *	@priv_destructor:	Called from unregister
-  *	@npinfo:		XXX: need comments on this one
-@@ -2363,11 +2360,8 @@ struct net_device {
- 
- 	/** @moving_ns: device is changing netns, protected by @lock */
- 	bool moving_ns;
--
--	enum {
--		RTNL_LINK_INITIALIZED,
--		RTNL_LINK_INITIALIZING,
--	} rtnl_link_state:16;
-+	/** @rtnl_link_initializing: Device being created, suppress events */
-+	bool rtnl_link_initializing;
- 
- 	bool needs_free_netdev;
- 	void (*priv_destructor)(struct net_device *dev);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index b52efa4cec56..bd23559bdd82 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11119,8 +11119,7 @@ int register_netdevice(struct net_device *dev)
- 	 *	Prevent userspace races by waiting until the network
- 	 *	device is fully setup before sending notifications.
- 	 */
--	if (!dev->rtnl_link_ops ||
--	    dev->rtnl_link_state == RTNL_LINK_INITIALIZED)
-+	if (!(dev->rtnl_link_ops && dev->rtnl_link_initializing))
- 		rtmsg_ifinfo(RTM_NEWLINK, dev, ~0U, GFP_KERNEL, 0, NULL);
- 
- out:
-@@ -12034,8 +12033,7 @@ void unregister_netdevice_many_notify(struct list_head *head,
- 		 */
- 		call_netdevice_notifiers(NETDEV_UNREGISTER, dev);
- 
--		if (!dev->rtnl_link_ops ||
--		    dev->rtnl_link_state == RTNL_LINK_INITIALIZED)
-+		if (!(dev->rtnl_link_ops && dev->rtnl_link_initializing))
- 			skb = rtmsg_ifinfo_build_skb(RTM_DELLINK, dev, ~0U, 0,
- 						     GFP_KERNEL, NULL, 0,
- 						     portid, nlh);
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index c23852835050..572cacbb39bd 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -3580,7 +3580,7 @@ static int rtnl_dellink(struct sk_buff *skb, struct nlmsghdr *nlh,
- int rtnl_configure_link(struct net_device *dev, const struct ifinfomsg *ifm,
- 			u32 portid, const struct nlmsghdr *nlh)
- {
--	unsigned int old_flags;
-+	unsigned int old_flags, changed;
- 	int err;
- 
- 	old_flags = dev->flags;
-@@ -3591,12 +3591,13 @@ int rtnl_configure_link(struct net_device *dev, const struct ifinfomsg *ifm,
- 			return err;
- 	}
- 
--	if (dev->rtnl_link_state == RTNL_LINK_INITIALIZED) {
--		__dev_notify_flags(dev, old_flags, (old_flags ^ dev->flags), portid, nlh);
--	} else {
--		dev->rtnl_link_state = RTNL_LINK_INITIALIZED;
--		__dev_notify_flags(dev, old_flags, ~0U, portid, nlh);
-+	changed = old_flags ^ dev->flags;
-+	if (dev->rtnl_link_initializing) {
-+		dev->rtnl_link_initializing = false;
-+		changed = ~0U;
- 	}
-+
-+	__dev_notify_flags(dev, old_flags, changed, portid, nlh);
- 	return 0;
- }
- EXPORT_SYMBOL(rtnl_configure_link);
-@@ -3654,7 +3655,7 @@ struct net_device *rtnl_create_link(struct net *net, const char *ifname,
- 
- 	dev_net_set(dev, net);
- 	dev->rtnl_link_ops = ops;
--	dev->rtnl_link_state = RTNL_LINK_INITIALIZING;
-+	dev->rtnl_link_initializing = true;
- 
- 	if (tb[IFLA_MTU]) {
- 		u32 mtu = nla_get_u32(tb[IFLA_MTU]);
+v2:
+ - extend commit messages
+ - [patch 10] fix typo in member name
+ - [patch 12] remove unused arg
+v1: https://lore.kernel.org/20250409000400.492371-1-kuba@kernel.org
+
+Jakub Kicinski (13):
+  netlink: specs: rename rtnetlink specs in accordance with family name
+  netlink: specs: rt-route: specify fixed-header at operations level
+  netlink: specs: rt-addr: remove the fixed members from attrs
+  netlink: specs: rt-route: remove the fixed members from attrs
+  netlink: specs: rt-addr: add C naming info
+  netlink: specs: rt-route: add C naming info
+  tools: ynl: support creating non-genl sockets
+  tools: ynl-gen: don't consider requests with fixed hdr empty
+  tools: ynl: don't use genlmsghdr in classic netlink
+  tools: ynl-gen: consider dump ops without a do "type-consistent"
+  tools: ynl-gen: use family c-name in notifications
+  tools: ynl: generate code for rt-addr and add a sample
+  tools: ynl: generate code for rt-route and add a sample
+
+ .../specs/{rt_addr.yaml => rt-addr.yaml}      | 24 ++----
+ .../specs/{rt_link.yaml => rt-link.yaml}      |  0
+ .../specs/{rt_neigh.yaml => rt-neigh.yaml}    |  0
+ .../specs/{rt_route.yaml => rt-route.yaml}    | 22 ++---
+ .../specs/{rt_rule.yaml => rt-rule.yaml}      |  0
+ .../userspace-api/netlink/netlink-raw.rst     |  2 +-
+ tools/net/ynl/Makefile.deps                   |  2 +
+ tools/net/ynl/generated/Makefile              |  2 +-
+ tools/net/ynl/lib/ynl-priv.h                  |  3 +
+ tools/net/ynl/lib/ynl.h                       |  3 +
+ tools/net/ynl/lib/ynl.c                       | 59 +++++++++-----
+ tools/net/ynl/samples/rt-addr.c               | 80 +++++++++++++++++++
+ tools/net/ynl/samples/rt-route.c              | 80 +++++++++++++++++++
+ tools/net/ynl/pyynl/ynl_gen_c.py              | 55 +++++++++----
+ tools/net/ynl/samples/.gitignore              |  4 +-
+ tools/testing/selftests/net/lib/py/ynl.py     |  4 +-
+ 16 files changed, 263 insertions(+), 77 deletions(-)
+ rename Documentation/netlink/specs/{rt_addr.yaml => rt-addr.yaml} (89%)
+ rename Documentation/netlink/specs/{rt_link.yaml => rt-link.yaml} (100%)
+ rename Documentation/netlink/specs/{rt_neigh.yaml => rt-neigh.yaml} (100%)
+ rename Documentation/netlink/specs/{rt_route.yaml => rt-route.yaml} (93%)
+ rename Documentation/netlink/specs/{rt_rule.yaml => rt-rule.yaml} (100%)
+ create mode 100644 tools/net/ynl/samples/rt-addr.c
+ create mode 100644 tools/net/ynl/samples/rt-route.c
+
 -- 
 2.49.0
 
