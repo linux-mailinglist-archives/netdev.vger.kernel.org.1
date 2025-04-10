@@ -1,100 +1,77 @@
-Return-Path: <netdev+bounces-181072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72AADA83981
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 08:39:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B977A839BC
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 08:48:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FE771B618DA
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 06:39:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA4AF8A5645
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 06:46:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338AD20485F;
-	Thu, 10 Apr 2025 06:38:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4F802040BA;
+	Thu, 10 Apr 2025 06:46:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PAz6w8JZ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Dj7FSe+k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79515204C02;
-	Thu, 10 Apr 2025 06:38:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6253D1CA84;
+	Thu, 10 Apr 2025 06:46:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744267116; cv=none; b=SjQauBUci2w/bsNOaIIgs9PzvBUohYzCO+84iNdqG9CA85DspbuHcb29fqJ68z37CEP2heGU/fHH3QDr1RlxoIdUs/1OrM/2/k9RBPxqlEh0KDtykZrWYa143AAWY0YnkvT8TVX+9bZqkjD6E8TpRfr7gDQ+m6h6X/oHJcEa52Y=
+	t=1744267587; cv=none; b=FV2tFBn9ZNtdsUDsAilfy30hch5Ns0gI4Umv1pikfC+KWqqyXQdzP1h3auMYE2O5M7xOAwcwtf2UO8PaE97cLWQ339+VJZQyQNHp0HL9CzbbjsEBi0c9mfRUygw2zkaCMUd47JeXx+Fh/E92vGP3w8Svc2sRSDLO9ivIy5qZI+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744267116; c=relaxed/simple;
-	bh=bDD5fHC5yG/fqnt/5gyzP8f48vNMjEUjChpk5HqxRAA=;
+	s=arc-20240116; t=1744267587; c=relaxed/simple;
+	bh=jGP+XMZtkwaQWFwwojb3ot3KsCcWojSYKFDlKGgxCYc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p0RX2zciWip5O44stOes04VYVDCZRjg8j8Odilg78zQrvZMP1zDs3vIVwLDtACpu2ROJGdwYcOF4mm5T+WvdYynS0veJjM5wGrAj/JDSYzK1RMIBtbSV9ZBhIirBW3ApkZqcWu+Yw4a5Ui1AIZ985ntNoF+ztCDXlSATuS7odIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PAz6w8JZ; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-227a8cdd241so4916415ad.3;
-        Wed, 09 Apr 2025 23:38:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744267114; x=1744871914; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KuVL+jTm8BlM5ZpgP0Uojq+Y9nMX/V5q2TiLQtlvtmM=;
-        b=PAz6w8JZpg4hsxhEQBMnEuKKVJAPNhKoUN+oSvjSGGVIzOJOimNcRaFMMnqBS6kBf0
-         KiGhTaY6lQnna/ti5ftLYF/WQfysPk/ctXYp66lkONH9OUSARQ3QnO/u81cv9456RnL0
-         giCpG/pp2ycbgpWq2MDcDXgkOXQhql67SuIm90Oa29D2A6KYD7GTVlRrZ1/n2TZbtFxR
-         aHvn4O2Pwuba9JhTDqJSega88ErvNZMopG4qkYr+KCEBHM1+dhOnNAXrnr/ar7Yhz5gC
-         DHdmQ57Etsgam2mQ4M6LeHoSXYbvn084Hzd56oRfIw8xENPfllzqOOueIn05LYlVAAfP
-         Z5gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744267114; x=1744871914;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KuVL+jTm8BlM5ZpgP0Uojq+Y9nMX/V5q2TiLQtlvtmM=;
-        b=NNyqfBLZ7KhDw0Oj5xRuzKf1eQG6Xjzg6uo8UNByH1nwWbng9UpdlRWbUptsV8lmm/
-         9UuNjaaEXmu3UxQTAjhSnuRSrLkJCLN3ZrUs1FR04CXWi6B2fogiZLGg5b3HpjlT5NeZ
-         QEcvnKoYdL2qL6M0FZVZie46/vLT+cGq/CcVq0CZYEJ2NcFjEs+GxI1Gec4qsMdEFWRR
-         onCGHnGzuCsAp+52lJ2Hcg/oZYNhP+pd7Vo7YfxGk7hYgQosfYbvMwlFG34fkuvS4JQW
-         B+bcAg6mTomLIGhU6Ho5YKW928167AQnS8rlG4pp2I4qTozleII6A8tBAyi/BA3naeR2
-         /PGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUzMXTp8KSXsTXjLDxyAZrjwWMNzDR769ZV9M8UD1eTlYBiga1FVcZhU94N5WKWykPgASwUAbqJJk1Pt7kx@vger.kernel.org, AJvYcCXx+xaz5IjfxFDjH+8wWhcs5oIlOlGHmC6lVmYGTLevoPd7uZ1Sv6lpSQAPF55lvlQl6xE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAC6d23hRZ+ugS3LtBMITnfOeeeqPwBCcR5NcYpGy2S8TwVGWT
-	GHdzWY+KUe5kd31vwMDOpKxCtypEAemTxRc11zIBuH1K1Mz9oqu2
-X-Gm-Gg: ASbGncuGt54higWnjiKku4Nt013i+7Kqi6JYDd6ZJMUfMYXLJ8mBRZwDTrN8svtI/H+
-	r/GZTCiphnaUxBAJV+yG5m0MEeoYWD4RhMxgZRnX5kMmZBpPkqfoQUWjp3FIxV4Nas2bSKBiPSp
-	wM0mNdKjne6a7mksH2LmPJ0dU2b4+55gf7w0Esn9UzuAzDWyMli/ozBCGiGscA24sixw+fBVJnG
-	AukPnbHL69f+rdy1a9swzIg6KwrOIrzmYPFOcCH8/m3LTTcpI8v85qKvT9mhi6gKYP423ZvBi3G
-	jVqDl4dKXppt0JDhB6+ND7tYWjFNapN0nB6rxvB2W8rZ
-X-Google-Smtp-Source: AGHT+IFoLHwW+yB8ugnhtjq/Zm+3UsyrrhpRcH51GcUutNiq2TfCMkej9FiKynCN6f6ckD3TqsaTYA==
-X-Received: by 2002:a17:90b:2dca:b0:2fa:17dd:6afa with SMTP id 98e67ed59e1d1-30718b82e6bmr3115309a91.17.1744267113628;
-        Wed, 09 Apr 2025 23:38:33 -0700 (PDT)
-Received: from localhost ([144.24.43.60])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22ac7cb554bsm22850725ad.199.2025.04.09.23.38.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Apr 2025 23:38:33 -0700 (PDT)
-Date: Thu, 10 Apr 2025 14:38:21 +0800
-From: Furong Xu <0x1207@gmail.com>
-To: Boon Khai Ng <boon.khai.ng@altera.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime
- Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Russell King <linux@armlinux.org.uk>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>, Matthew Gerlach
- <matthew.gerlach@altera.com>, Tien Sung Ang <tien.sung.ang@altera.com>, Mun
- Yew Tham <mun.yew.tham@altera.com>, G Thomas Rohan
- <rohan.g.thomas@altera.com>
-Subject: Re: [PATCH net-next v3 1/2] net: stmmac: Refactor VLAN
- implementation
-Message-ID: <20250410143821.000002c0@gmail.com>
-In-Reply-To: <20250408081354.25881-2-boon.khai.ng@altera.com>
-References: <20250408081354.25881-1-boon.khai.ng@altera.com>
-	<20250408081354.25881-2-boon.khai.ng@altera.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	 MIME-Version:Content-Type; b=jppzolpu+c1v1WDKqf3N14Hy25ws/ipSez+SYdk5dzq/EJQ4wG7XxkwNwtQTRY1Q/4dD5LffnEarbMkbJkv8tPf8ZJGPp83IiBdUVaNlsj6aDqfoJb2Q6eIpRZv7Yb7LPPvIJrrsKDXmduqtmOZcjBhfecbLNBQYaRrnclYxZ1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Dj7FSe+k; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id CB5D64435C;
+	Thu, 10 Apr 2025 06:46:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1744267582;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uHfbW2BwhNKtYp0DwDcnPQM1979WkjuSa3wL4YpUPVA=;
+	b=Dj7FSe+kWXd23IvbZ+MSy+pec7Gjo7DJP4LDzOxce5VjGLvIS6UX7tnz07Fbv2sOsYGiH8
+	LsTB5QxV2U7fToDLGpA7wJFGJhr9oG3kvS4U0YoGuE2eAy+N/1zeJ/rsEVWSv79oZwbG46
+	DATvE87ImDnDaOjkUMUY2HtE36Fua6NoNfADlYSQV+t+UfdDkJJ+FfS3TKtdTNNj95VQzt
+	Pkuy1FlNsUg3hd3j9WRkD70FhN3TMGK0VDfGDFvFsH48rctlSY2SPuTK+ymns7AScMV43T
+	LQvaRoMg9v5qrS1z0EhaWPk7As1QOwqqTANPgzYzRSlI+8QDasNT/QNch3O15g==
+Date: Thu, 10 Apr 2025 08:46:18 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Lee Jones <lee@kernel.org>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>, Srinivas
+ Kandagatla <srinivas.kandagatla@linaro.org>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "Chester A.
+ Unal" <chester.a.unal@arinc9.com>, Daniel Golle <daniel@makrotopia.org>,
+ DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>, Simon
+ Horman <horms@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, upstream@airoha.com
+Subject: Re: [net-next PATCH v14 07/16] net: mdio: regmap: add support for
+ C45 read/write
+Message-ID: <20250410084618.43edc269@fedora.home>
+In-Reply-To: <67f620a1.050a0220.347fc7.1fee@mx.google.com>
+References: <20250408095139.51659-1-ansuelsmth@gmail.com>
+	<20250408095139.51659-8-ansuelsmth@gmail.com>
+	<20250409090751.6bc42b5b@fedora.home>
+	<67f620a1.050a0220.347fc7.1fee@mx.google.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,157 +80,101 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtdekvdduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeevledtvdevueehhfevhfelhfekveeftdfgiedufeffieeltddtgfefuefhueeknecukfhppedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjedphhgvlhhopehfvgguohhrrgdrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdejpdhrtghpthhtoheprghnshhuvghlshhmthhhsehgmhgrihhlrdgtohhmpdhrtghpthhtoheplhgvvgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprhhosghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkr
+ hiikhdoughtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegtohhnohhrodgutheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Tue,  8 Apr 2025 16:13:53 +0800, Boon Khai Ng <boon.khai.ng@altera.com> wrote:
+On Wed, 9 Apr 2025 09:24:13 +0200
+Christian Marangi <ansuelsmth@gmail.com> wrote:
 
-> Refactor VLAN implementation by moving common code for DWMAC4 and
-> DWXGMAC IPs into a separate VLAN module. VLAN implementation for
-> DWMAC4 and DWXGMAC differs only for CSR base address, the descriptor
-> for the VLAN ID and VLAN VALID bit field.
+> On Wed, Apr 09, 2025 at 09:07:51AM +0200, Maxime Chevallier wrote:
+> > Hi Christian,
+> > 
+> > On Tue,  8 Apr 2025 11:51:14 +0200
+> > Christian Marangi <ansuelsmth@gmail.com> wrote:
+> >   
+> > > Add support for C45 read/write for mdio regmap. This can be done
+> > > by enabling the support_encoded_addr bool in mdio regmap config and by
+> > > using the new API devm_mdio_regmap_init to init a regmap.
+> > > 
+> > > To support C45, additional info needs to be appended to the regmap
+> > > address passed to regmap OPs.
+> > > 
+> > > The logic applied to the regmap address value:
+> > > - First the regnum value (20, 16)
+> > > - Second the devnum value (25, 21)
+> > > - A bit to signal if it's C45 (26)
+> > > 
+> > > devm_mdio_regmap_init MUST be used to register a regmap for this to
+> > > correctly handle internally the encode/decode of the address.
+> > > 
+> > > Drivers needs to define a mdio_regmap_init_config where an optional regmap
+> > > name can be defined and MUST define C22 OPs (mdio_read/write).
+> > > To support C45 operation also C45 OPs (mdio_read/write_c45).
+> > > 
+> > > The regmap from devm_mdio_regmap_init will internally decode the encoded
+> > > regmap address and extract the various info (addr, devnum if C45 and
+> > > regnum). It will then call the related OP and pass the extracted values to
+> > > the function.
+> > > 
+> > > Example for a C45 read operation:
+> > > - With an encoded address with C45 bit enabled, it will call the
+> > >   .mdio_read_c45 and addr, devnum and regnum will be passed.
+> > >   .mdio_read_c45 will then return the val and val will be stored in the
+> > >   regmap_read pointer and will return 0. If .mdio_read_c45 returns
+> > >   any error, then the regmap_read will return such error.
+> > > 
+> > > With support_encoded_addr enabled, also C22 will encode the address in
+> > > the regmap address and .mdio_read/write will called accordingly similar
+> > > to C45 operation.  
+> > 
+> > This driver's orginal goal is to address the case where we have a
+> > PHY-like device that has the same register layout and behaviour as a
+> > C22 PHY, but where the registers are not accesses through MDIO (MMIO
+> > for example, as in altera-tse or dwmac-socfpga, or potentially SPI even
+> > though  there's no example upstream).
+> > 
+> > What is done here is quite different, I guess it could work if we have
+> > MMIO C45 phys that understand the proposed encoding, but I don't really
+> > understand the dance where C45 accesses are wrapped by this mdio-regmap
+> > driver into regmap accesss, but the regmap itself converts it back to
+> > C45 accesses. Is it just so that it fits well with MFD ?  
 > 
-> Signed-off-by: Boon Khai Ng <boon.khai.ng@altera.com>
-> Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/Makefile  |   2 +-
->  drivers/net/ethernet/stmicro/stmmac/common.h  |   1 +
->  drivers/net/ethernet/stmicro/stmmac/dwmac4.h  |  40 ---
->  .../net/ethernet/stmicro/stmmac/dwmac4_core.c | 295 +-----------------
->  .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  13 -
->  .../ethernet/stmicro/stmmac/dwxgmac2_core.c   |  87 ------
->  drivers/net/ethernet/stmicro/stmmac/hwif.c    |   8 +
->  drivers/net/ethernet/stmicro/stmmac/hwif.h    |  61 ++--
->  .../net/ethernet/stmicro/stmmac/stmmac_vlan.c | 294 +++++++++++++++++
->  .../net/ethernet/stmicro/stmmac/stmmac_vlan.h |  63 ++++
->  10 files changed, 401 insertions(+), 463 deletions(-)
->  create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.c
->  create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.h
+> The main task of this wrapping is to remove from the dev side having to
+> handle the encode/decode part. regmap address is still a single value
+> but if a phy is mmio mapped is difficult to support c45 since you need 3
+> different values (phy id, mmd and addr)
 > 
-[...]
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.c b/drivers/net/ethernet/stmicro/stmmac/hwif.c
-> index 31bdbab9a46c..0a57c5e7497d 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.c
-> @@ -9,6 +9,7 @@
->  #include "stmmac_fpe.h"
->  #include "stmmac_ptp.h"
->  #include "stmmac_est.h"
-> +#include "stmmac_vlan.h"
->  #include "dwmac4_descs.h"
->  #include "dwxgmac2.h"
->  
-> @@ -120,6 +121,7 @@ static const struct stmmac_hwif_entry {
->  	const void *tc;
->  	const void *mmc;
->  	const void *est;
-> +	const void *vlan;
->  	int (*setup)(struct stmmac_priv *priv);
->  	int (*quirks)(struct stmmac_priv *priv);
->  } stmmac_hw[] = {
-> @@ -197,6 +199,7 @@ static const struct stmmac_hwif_entry {
->  		.desc = &dwmac4_desc_ops,
->  		.dma = &dwmac4_dma_ops,
->  		.mac = &dwmac410_ops,
-> +		.vlan = &dwmac_vlan_ops,
+> With this implementation a c45 that is mmio mapped can implement
+> whatever way he wants to configure each parameter for read/write
+> operation.
+> 
+> Example the ecoding might be on different mask and with the additional
+> function it can be reorganized following the specific mask.
+> 
+> > 
+> > I'm not really against that, it still converts mdio access to regmap so
+> > there's that, but is there a way to elaborate or document somewhere why
+> > we need to do go through C45 -> regmap -> C45 instead of just
+> > writing a mii_bus driver in the first place ?  
+> 
+> This was askek to prevent creating additional ""trivial"" mdio driver
+> that would all do the same task. Since mdio-regmap was already in place
+> it could have been extended with a more generic approach.
 
-Rename dwmac_vlan_ops to dwmac4_vlan_ops will be better,
-just like dwmac4_desc_ops/dwmac4_dma_ops
+Ah yes that's the point I was missing, I've browsed more in depth and
+indeed in V11 Vlad suggested to use this.
 
-[...]
-> +const struct stmmac_vlan_ops dwmac_vlan_ops = {
-> +	.update_vlan_hash = vlan_update_hash,
-> +	.enable_vlan = vlan_enable,
-> +	.add_hw_vlan_rx_fltr = vlan_add_hw_rx_fltr,
-> +	.del_hw_vlan_rx_fltr = vlan_del_hw_rx_fltr,
-> +	.restore_hw_vlan_rx_fltr = vlan_restore_hw_rx_fltr,
-> +	.rx_hw_vlan = vlan_rx_hw,
-> +	.set_hw_vlan_mode = vlan_set_hw_mode,
-> +};
-> +
-> +const struct stmmac_vlan_ops dwxlgmac2_vlan_ops = {
-> +	.update_vlan_hash = vlan_update_hash,
-> +	.enable_vlan = vlan_enable,
-> +};
+> Any hint on where to better document this?
 
-dwxlgmac2_vlan_ops looks redundant here, another new struct contains
-totally identical members.
+Given the simplicity of the driver, I think this commit log is good
+enough then :)
 
-stmmac_do_void_callback()/stmmac_do_callback() handles NULL function
-pointers so good, we can leave the un-implemented functions as NULL.
+Let's go for it and hopefully this can be reused elsewhere !
 
-Are you trying to avoid something undefined here?
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.h
-> new file mode 100644
-> index 000000000000..29e7be83161e
-> --- /dev/null
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.h
-> @@ -0,0 +1,63 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (C) 2025, Altera Corporation
-> + * stmmac VLAN(802.1Q) handling
-> + */
-> +
-> +#ifndef __STMMAC_VLAN_H__
-> +#define __STMMAC_VLAN_H__
-> +
-> +#include <linux/bitfield.h>
-> +
-> +#define VLAN_TAG			0x00000050
-> +#define VLAN_TAG_DATA			0x00000054
-> +#define VLAN_HASH_TABLE			0x00000058
-> +#define VLAN_INCL			0x00000060
-> +
-> +#define HW_FEATURE3			0x00000128
-> +
-> +/* MAC VLAN */
-> +#define VLAN_EDVLP			BIT(26)
-> +#define VLAN_VTHM			BIT(25)
-> +#define VLAN_DOVLTC			BIT(20)
-> +#define VLAN_ESVL			BIT(18)
-> +#define VLAN_ETV			BIT(16)
-> +#define VLAN_VID			GENMASK(15, 0)
-> +#define VLAN_VLTI			BIT(20)
-> +#define VLAN_CSVL			BIT(19)
-> +#define VLAN_VLC			GENMASK(17, 16)
-> +#define VLAN_VLC_SHIFT			16
-> +#define VLAN_VLHT			GENMASK(15, 0)
-> +
-> +/* MAC VLAN Tag */
-> +#define VLAN_TAG_VID			GENMASK(15, 0)
-> +#define VLAN_TAG_ETV			BIT(16)
-> +
-> +/* MAC VLAN Tag Control */
-> +#define VLAN_TAG_CTRL_OB		BIT(0)
-> +#define VLAN_TAG_CTRL_CT		BIT(1)
-> +#define VLAN_TAG_CTRL_OFS_MASK		GENMASK(6, 2)
-> +#define VLAN_TAG_CTRL_OFS_SHIFT		2
-> +#define VLAN_TAG_CTRL_EVLS_MASK		GENMASK(22, 21)
-> +#define VLAN_TAG_CTRL_EVLS_SHIFT	21
-> +#define VLAN_TAG_CTRL_EVLRXS		BIT(24)
-> +
-> +#define VLAN_TAG_STRIP_NONE		FIELD_PREP(VLAN_TAG_CTRL_EVLS_MASK, 0x0)
-> +#define VLAN_TAG_STRIP_PASS		FIELD_PREP(VLAN_TAG_CTRL_EVLS_MASK, 0x1)
-> +#define VLAN_TAG_STRIP_FAIL		FIELD_PREP(VLAN_TAG_CTRL_EVLS_MASK, 0x2)
-> +#define VLAN_TAG_STRIP_ALL		FIELD_PREP(VLAN_TAG_CTRL_EVLS_MASK, 0x3)
-> +
-> +/* MAC VLAN Tag Data/Filter */
-> +#define VLAN_TAG_DATA_VID		GENMASK(15, 0)
-> +#define VLAN_TAG_DATA_VEN		BIT(16)
-> +#define VLAN_TAG_DATA_ETV		BIT(17)
-> +
-> +/* MAC VLAN HW FEAT */
-> +#define VLAN_HW_FEAT_NRVF		GENMASK(2, 0)
-> +
-> +extern const struct stmmac_vlan_ops dwmac_vlan_ops;
-> +extern const struct stmmac_vlan_ops dwxlgmac2_vlan_ops;
-> +
-> +u32 stmmac_get_num_vlan(void __iomem *ioaddr);
-> +
-> +#endif /* __STMMAC_VLAN_H__ */
-
-It is a good practice to only keep inside the header those definitions
-which are truly exported by stmmac_vlan.c towards external callers.
-That means those #defines which are only used within stmmac_vlan.c
-shouldn't be here, but inside stmmac_vlan.c file.
+Maxime
 
