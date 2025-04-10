@@ -1,238 +1,238 @@
-Return-Path: <netdev+bounces-181245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1C58A842CB
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:16:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E24BA84269
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:05:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5A9417334C
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:16:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46EA09E6051
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 11:58:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 698EF283C9F;
-	Thu, 10 Apr 2025 12:15:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="gTFxOYtM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35C34283CB5;
+	Thu, 10 Apr 2025 11:57:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2082.outbound.protection.outlook.com [40.107.237.82])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF06C2036E0;
-	Thu, 10 Apr 2025 12:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.82
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744287359; cv=fail; b=J5cTZ1bZC3cQ8Dn7XjEAd4HmE2Ncb+vLrGIhkJGhA5akIKWKLwjGt0myCuhjG6oymCq4zkpmJhzd74zSTkMbhn9wns+ahXtF3INHVzw+CEsYYv++fF0uFSG7gmHnBkhGoKT/gaBNMLy8RjcI8pCNyGeKkKLfqNlgkaJ7PckE0cg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744287359; c=relaxed/simple;
-	bh=EYZBoP/D2yjlxywyLU4kk0o6gH0jDGOy0h4vKdB16qg=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=uB4w1NQjYVFCic/fcaViI/gG3Nl6b9gW7Kz7OwaTRsCtIDUou2WXlHUv7ClGMIIrcxLatmxujBL77xYf0OpzxHGI0CTRSm432hWHTdVL+SonG+ifCGarOflBarCZmdsG6ia1i93XVo+ZvhSSx3VJwBDfhjsFjCsjj/MXhdfPYOU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=gTFxOYtM; arc=fail smtp.client-ip=40.107.237.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=l6TKi84JRfxqLM1BTlDcV1eGR4pyKKQHMmBQMa1lkNCF3NhxvosAputjdor3NMzBW1xmBUgVqcPwoMLmdeKe31FZZFpHyUmlM5zxNnFewYf1u9nmBa22DZp8XRcMQSJ897DRU+PnTn5NlGNGqEgJJqorpxk6SjWVoayI1ptvhCB2rbJrE0GJQBioBWiQvxmSpDucJVO8lIEnf+Xdrn6cnSveRMe2lWdLBEHqQHgTpNkVBc5zlm/9CTVjT9x2rQ3shDKPKCoQxB/6GGYsJ6yz3xbozhPRBv9DHxTk0HfIt5vYK2Kc/geCWeLG298ZJxDsPLDPgrH55eyjwWQO6RaJ0A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hqMMkn1TNfd20ikNc9RR8SFwMaqxV+c4twLCO3zcb9g=;
- b=OyKc+67PAVFnAUklUWvFrbFTBwlZOKGY3rE7s2xYiFcgfLAgSzP5ZbXkI41rz5wKdUh06H0yxH7ugOwa98VYxP9aKvMHjivHfN4UgS6lqbB7tiyjE87exeyxgFnZDonZ69vTWsH7EUWKXNl3FvAIAGtV/26KQfg+k8XdcZw7KTUeLFAI7nRMIwx93xayNILeWI//+uLRpTnkQ8ahTo99SDGQ0fjfe4H/Z6XgxMi+Q9QWt5L3ICG9BTNfByNJVqhSTz0ecOapFJrtLQpsqoBRRL01Rm/AXXU0T2O1987FN/nqan0Iwf0fPC7jh8NUg8GXWjyXDfk/huN+YBdoactcAQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hqMMkn1TNfd20ikNc9RR8SFwMaqxV+c4twLCO3zcb9g=;
- b=gTFxOYtMXq7Nz2V0Leeo10TzpCCjLnoOtZ9VtiBbei1WVSApiXn5/kgNyJKs/+03xVuvokNiEM9hMSX2vn7ZJIlxoTlg5xhbHpg5mLDTeF5OYG8GhK/kMefQ4jeu78UmTcJuA2GNAzzoT62pTb7duVkzCQC8lSGLDisNK6V+e/E=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
- by DM4PR12MB8571.namprd12.prod.outlook.com (2603:10b6:8:187::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.23; Thu, 10 Apr
- 2025 12:15:55 +0000
-Received: from PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::46fb:96f2:7667:7ca5]) by PH7PR12MB5685.namprd12.prod.outlook.com
- ([fe80::46fb:96f2:7667:7ca5%5]) with mapi id 15.20.8632.021; Thu, 10 Apr 2025
- 12:15:55 +0000
-Message-ID: <7603cbad-2fed-47cc-91f1-81d6f529afb8@amd.com>
-Date: Thu, 10 Apr 2025 14:15:49 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] drm/nouveau: Remove surplus if-branch
-To: Philipp Stanner <phasta@kernel.org>, Lyude Paul <lyude@redhat.com>,
- Danilo Krummrich <dakr@kernel.org>, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>, Sabrina Dubroca <sd@queasysnail.net>,
- Sumit Semwal <sumit.semwal@linaro.org>
-Cc: dri-devel@lists.freedesktop.org, nouveau@lists.freedesktop.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org
-References: <20250410092418.135258-2-phasta@kernel.org>
- <20250410092418.135258-4-phasta@kernel.org>
-Content-Language: en-US
-From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
-In-Reply-To: <20250410092418.135258-4-phasta@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0258.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:e8::12) To PH7PR12MB5685.namprd12.prod.outlook.com
- (2603:10b6:510:13c::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5263920766E;
+	Thu, 10 Apr 2025 11:57:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744286271; cv=none; b=N7AzqVW818/Zg3B2rcnWqr5i43SnCbNVlUfFA1XTUP2Md0stJHZDoM6MDjWZgQA2kzDtcpIb7MOF/IvTNbOZ+cZLsPPDGEmcAByIJqQjosSJZhDuxU0amwfWtqi1gWxL+Vs7niwKBDP8kiLYjc6iWHxDJqtF+opiIKtbvfQPQxA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744286271; c=relaxed/simple;
+	bh=tZ/L1lFPR20r47xhtEb1LjsFp1pyGXsMvKeRJbX7D94=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eoupi+T71mnKz6ukiZSHttD2wWzdS1KGS5Yq+H+p9W43UHIpvpcE34XaR2SKC1wab/qddsHnfAv4VbrDjnPD0MuzaDvnqpIqPiLA09YTaF+8+dutRNRcLaFxzY4BbHpR5qcJGWkGahINxofPYwNJIcqjcOtt3ASouTSJzzhpStk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZYJBC4Cb8z6K9DV;
+	Thu, 10 Apr 2025 19:53:55 +0800 (CST)
+Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
+	by mail.maildlp.com (Postfix) with ESMTPS id BDB901400DB;
+	Thu, 10 Apr 2025 19:57:45 +0800 (CST)
+Received: from china (10.220.118.114) by frapeml500005.china.huawei.com
+ (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 10 Apr
+ 2025 13:57:33 +0200
+From: Gur Stavi <gur.stavi@huawei.com>
+To: Gur Stavi <gur.stavi@huawei.com>, Fan Gong <gongfan1@huawei.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Lee Trager
+	<lee@trager.us>, <linux-doc@vger.kernel.org>, Jonathan Corbet
+	<corbet@lwn.net>, Bjorn Helgaas <helgaas@kernel.org>, Cai Huoqing
+	<cai.huoqing@linux.dev>, luosifu <luosifu@huawei.com>, Xin Guo
+	<guoxin09@huawei.com>, Shen Chenyang <shenchenyang1@hisilicon.com>, Zhou
+ Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
+	<shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>, Suman Ghosh
+	<sumang@marvell.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, Joe
+ Damato <jdamato@fastly.com>
+Subject: [PATCH net-next v10 0/1] net: hinic3: Add a driver for Huawei 3rd gen NIC
+Date: Thu, 10 Apr 2025 15:15:50 +0300
+Message-ID: <cover.1744286279.git.gur.stavi@huawei.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|DM4PR12MB8571:EE_
-X-MS-Office365-Filtering-Correlation-Id: 382a1809-449c-4689-e2f4-08dd78297160
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?cFVqcS9iR29oMXJBaFZkcXA3L0QzZWw1dkUzRmNhYjE5bDZRbDNLZWxCNkhl?=
- =?utf-8?B?cGJlcTg5THhBamY2bGxYWnhzOUlQaERkUFVKN3IzTmZ6T0FTbTBRZTBRc3M5?=
- =?utf-8?B?VnRScGZ3b2ZGemFka1hrMnptQWE2OHJFTjYvUWRuOXRJNjJNT2ttdjFaVGM0?=
- =?utf-8?B?NkFBUXViY1k1TDFySzRRbTNVdzVZR0hWc0JPQUJxM1AxWEhqaGV2eHUwT3l5?=
- =?utf-8?B?MUJLL0xsRWprWVBJTUNyY3Y1Y3ltRnhwc3Q3Y1J0UHJIUVNQSEpNb09DN1ZG?=
- =?utf-8?B?anZRK3kzS0l0b3dhdFhaL2xJVURCcmYrL3ZYbzZJQXR2L1ZSR2N4TXg3Q3pV?=
- =?utf-8?B?QnFrQ3FJWEpmRmc3WXI2TzIyNEpCR0xJS1lzYU9MZjJsREtWeFF2SVVZb1FN?=
- =?utf-8?B?UEpGNGFlWHlWb0tDOEpxU292Y29jRHlaLzBJK0xYNnU5Y2E0dkIyZUdHcDl0?=
- =?utf-8?B?WmFpcTdqSXZiR2FFa0hkaFI1ZG4vNmNUV1Vhb2NiNUJXSVZ3TDV6Qkkzc3lj?=
- =?utf-8?B?aW9VTG1qbVBEQXZ1NFhnYklYRTlTajMwVmxjVTIrN1dyK0dyNXRVc1BxamNM?=
- =?utf-8?B?Skx5a0cvNjFzNndOL1diMHFNZEptQVVxb0dMOWZHUmY2dFBTV2RxVmxqOEJ6?=
- =?utf-8?B?UVp1RXlsN0FpR1lxZWlxZ0VqY0xYbTRQUjcvSmRZV2hpQnJQM21yS2hOT1FD?=
- =?utf-8?B?dlE1MWdEQVp3d2ZJZWZkVmtXdzgxQW1nbVYwb053YlczN09UZEdkNFplTSsr?=
- =?utf-8?B?dmVqa3RKM0toR3ZiSEtOQTNzRHpPZVI1Skx6cFRyd0wzcnZWMURsVENhSktm?=
- =?utf-8?B?TUVBODlnNk9mUjQxcFI4Si84RERCSUhGU1EvdjdwL3VaK1d6eXNUOTNoMVg5?=
- =?utf-8?B?Umc4dENSUjIxMHRqNTJQVnZ1VEdyZHRLZmZ5RTB1N3d6cW44MXhnbFJRdGFU?=
- =?utf-8?B?QU1RbE10NXpEZEZsd2RmWHFzd1F2QnA0SG1JU0NxVEZicUIrUjBkSkZqWXVM?=
- =?utf-8?B?N1J6eXovTXRaeXpsemZFUWdiV2k2elIrbDlNVU1CVHVaSGpQYUN3QVBPVVp3?=
- =?utf-8?B?YVMvQXpHa0ppRjFUVUxLcnlLbGZsYUUwM0xUWkx1aitCOVF3dXJBUUhGdndi?=
- =?utf-8?B?T2IxZjFVY0NRWUxHQmdMRGhuY3dPMnBPcUpMZFNtOXlXV0gyQW15NkJ4RE8y?=
- =?utf-8?B?MjZDRHoxeVV3VUpheVJTRGZQRG9oWTk2aDJCS0xYM1lyMjFPRlh3d3BESTFx?=
- =?utf-8?B?WnVTZldUak5od3E2NldsS1hHQUx1UmdjNEgvM2xSeGlJMURQQmhrSHA3L2xx?=
- =?utf-8?B?VEhhMnJQN3N4c2l3QUphSVkrUTErbG5KQUhaTUxDYWZMYjdOS290dUNTdWxR?=
- =?utf-8?B?ZGphRWtocFdrdDBHN2hpRFYwcWk1YjdDUE1hT3VYaUhuQTZqaDYvSllucE5B?=
- =?utf-8?B?azVXUkZENG02Y2x6MENhZE13TVRlOTNabkcwNGxIcWszejZXRnVTU1BZS3o1?=
- =?utf-8?B?STI3VG9GZ3NXOVREMzJPWUNMYTdUdm9JTzJaMGJsRFRPYXlyWkFWMm5iM25B?=
- =?utf-8?B?eDA0UmJyaTdZQVdUaFBMSXhxNHlvV1A3aEZpdGJvK09IN1FKMjQ3c1huWXly?=
- =?utf-8?B?blY3Umc3Y3oxOG41akcvUjJ4SHB3dUFMQmN6NC9aZWEwSTRzc1lSYjB2TDkv?=
- =?utf-8?B?RUVXWDlLRGpTdkxxQWluSXdEeVBmQXVJZ09rSUxZMHRudldTbU84c00xUHpE?=
- =?utf-8?B?eXB6VFJBLzY3UTU1TXZ4b3dERXgvOXk5L1hFVC91M21tVWRRTEoxUCtjV1dQ?=
- =?utf-8?B?MXV0OU9EWW5lQUZSRWRvS2hOd0V1K0h4UkFMSEl2NlQvKzIzbXRlYmdkZThs?=
- =?utf-8?Q?UIgCuBYITm7UA?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WGlFWDJJbGYzVm96ZUh4cHN2UkJoSUZuVS9iRDh5RTVKZWduOVp4bGZNWGFx?=
- =?utf-8?B?c1ZxVzIyWFFxMVdyaHQxYUlSSUFQaFZWcDcrTy9WdENES0MweUtYUE9uaXlM?=
- =?utf-8?B?YXdMeHJQVmdIL0FSci9mYXIvMmpBb240TjJDOHJXMm1QaDAraVpRcmRVVHRV?=
- =?utf-8?B?d1I0cExUWXYrNWVTQWdYWGlBbHRsajJDT2Y1UWxmZ2ZZSkRVb1FCalVsUlU2?=
- =?utf-8?B?Wk5HT25MMFVod1V5dFBSdW5RZTZ2UzF1RC90bkoyNkthNFF6MkhGOWlCbmFx?=
- =?utf-8?B?ZHJISC9zNG12TDFQQ05RUEVpUVNmeDhjWmRHbHlXNEluSXFJSmxUTzYzMFBt?=
- =?utf-8?B?aXhBSCtyK1BlQ3Q5YkhzaFBvRWpPWWp4UnZibW10SmZ4VXR6dVZ6NHBOMnNq?=
- =?utf-8?B?OXE4dmhiMFVVSHJ0c3c0d1hsRGF3eUUvcVEyMVRDTDBlclhUVkk4OXpPa2Jl?=
- =?utf-8?B?ZnowOTVGRFk4dE1FL0VlR09sSUVuQmZNai8rRGtKTU1IMDdjZ1lQSjNGNTRU?=
- =?utf-8?B?Tm0wbnN3UlRvT1BwUzE0VVVGREw2SzVNLzFjeDM3ZkUzMUxJb0tqMkl2UTFG?=
- =?utf-8?B?aWNvcktwNXhTVkFnbDZLdWVobUFzcFpVcnppR3ZlWnBJYk9QMkZMNmlSMkdP?=
- =?utf-8?B?K0ZyaHNQQzlhQVU3NFhIbmExaWYxNHBFclFxVFBUOVBkRlZmbnBjWkpwTitm?=
- =?utf-8?B?cWpzQXBKWjkvRk5reDN4a3pFRW1adUdSa29YeEppSUI1bUR1bEV5bDdDQW0y?=
- =?utf-8?B?eTJHZzl4OHllV3ZIRk5oV1NlSHR1Z2xjOHYvSnlJUHpVajhPY0J0RUM0aEk3?=
- =?utf-8?B?d2tRZktWY3FEMGhGcEtSSnloa2Q2L0gwcEo0MXNVS09ISmFjaFAvUmNud0Qy?=
- =?utf-8?B?bS9XQUJYMmtqM3VVMVlKNUpDMDBNbGNNZzE0ZWpUTkV1R1RiRTRWQzZWWkxL?=
- =?utf-8?B?UG9NdUl4QXhpWGs5UFc3WFBheGtUaWFtS0VVZFkwV3ZRaC96TFZVamxnZDJY?=
- =?utf-8?B?NHgxODc0ZC9oTTRsUTVpYzcyU2hBNlJmV1dHTFVrYVJHQlVZMitOVUFPb3B5?=
- =?utf-8?B?U0JLdGhBZnhtYnExd25HbC9yc043ZlZ3NFJLMjliOXlPdVF1WG5LY01zQmFF?=
- =?utf-8?B?ZE1lUWNPbW1WR0RhcXQxcXNDUmhaWS9NRTVsYnRwZU83L0JJaGtFdmM4dHpK?=
- =?utf-8?B?dEcvaVVOMS8rSzVPWmxETml5MGxPSE5NS01vbTF4d3FQLzJCUktnQnVkR0tJ?=
- =?utf-8?B?aHd2Ty9ONEM0cEpGN2ZRUlRGblROV01hRWZpRGl4QndqOW9hdFdEVi9penI2?=
- =?utf-8?B?YnBkdXNQNGRzZzllZkxHNmk5eEJRSjB6NStxajJWdWJYMnBXUW8zM3oxclFU?=
- =?utf-8?B?bnloT0JhSFRtYjVtWDVPZXlOYzdxSXNlc2tkZ3lDdkV3L3RqODJrZE5McWhB?=
- =?utf-8?B?bWZNdWovMVRtL0FKTmU3RGlmYTlXUWh0VVJDS2trQmhwMVVQOXN6S2F0c0tC?=
- =?utf-8?B?MHJGSXZyZE1QeUZuVTRjMTRmdmJpOGw5MHVwMVRwWWVPUW5udHFQbU5lc0tU?=
- =?utf-8?B?eENVSm5Na29valJ0dHlRZHhpdFJKSjQyZlJNdHVTcjkvN1Fxd290QjFlT1VB?=
- =?utf-8?B?WEZvVmo4Zzc0bmQ1MDhqOWliZjRVRC9vZnFUTS9kUXhIcHh5NjhadEc2OFpy?=
- =?utf-8?B?S2lEK2V5bFc1cGpwMlNFUzJCeFBoMlp1QmRCQWxBelBNTjFIYVNXTnAvdHA4?=
- =?utf-8?B?dEpJc05HK1pGK21GUnh3TEo4eGplaFkwc2hwZUlBV2gyZHBMcXFISU15SWZU?=
- =?utf-8?B?RlBRY3V6UFptUXZQRm5qaEswT2tQcnhNYkhtWU95NVFVbHE4VWZDd2Y0SHNM?=
- =?utf-8?B?NmEwa3kzZTBPVlhReUZNWHZYVzgxNkIrdEZpQjZoMUwwa1VVZFJ4VERVNjk2?=
- =?utf-8?B?YnVpeCtJai9vL2RaY1JFS3U0SXBacStpK2N1cFk3M0tMUmFzak4vbkZWalo2?=
- =?utf-8?B?eU9YSE9VTHE3eERsVFZQMHp4bkx1YmF5eE92clYvWXRPb0FCdm1LQ2krSjk4?=
- =?utf-8?B?aVpab2YzcXdhNVA1L3VIK2xlSEtuRkwvclBKRDc3V1libk1BRUpvb3ZHa05Q?=
- =?utf-8?Q?nehGI4ECT7dlBazA/1FTZTzoH?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 382a1809-449c-4689-e2f4-08dd78297160
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2025 12:15:55.0533
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: llDT9IgFJMxjYHwge0tkJRznFoxdR7uu3F++joE9M7jwyyb/2gavtGOkgRNbbOsO
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8571
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ frapeml500005.china.huawei.com (7.182.85.13)
 
-Am 10.04.25 um 11:24 schrieb Philipp Stanner:
-> nouveau_fence_done() contains an if-branch which checks for the
-> existence of either of two fence backend ops. Those two are the only
-> backend ops existing in Nouveau, however; and at least one backend ops
-> must be in use for the entire driver to be able to work. The if branch
-> is, therefore, surplus.
->
-> Remove the if-branch.
+This is the 1/3 patch of the patch-set described below.
 
-What happens here is that nouveau checks if the fence comes from itself or some external source.
+The patch-set contains driver for Huawei's 3rd generation HiNIC
+Ethernet device that will be available in the future.
 
-So when you remove that check you potentially illegally uses nouveau_fctx() on a non-nouveau fence.
+This is an SRIOV device, designed for data centers.
+Initially, the driver only supports VFs.
 
-Regards,
-Christian.
+Following the discussion over RFC01, the code will be submitted in
+separate smaller patches where until the last patch the driver is
+non-functional. The RFC02 submission contains overall view of the entire
+driver but every patch will be posted as a standalone submission.
 
->
-> Signed-off-by: Philipp Stanner <phasta@kernel.org>
-> ---
->  drivers/gpu/drm/nouveau/nouveau_fence.c | 24 +++++++++++-------------
->  1 file changed, 11 insertions(+), 13 deletions(-)
->
-> diff --git a/drivers/gpu/drm/nouveau/nouveau_fence.c b/drivers/gpu/drm/nouveau/nouveau_fence.c
-> index 33535987d8ed..db6f4494405c 100644
-> --- a/drivers/gpu/drm/nouveau/nouveau_fence.c
-> +++ b/drivers/gpu/drm/nouveau/nouveau_fence.c
-> @@ -259,21 +259,19 @@ nouveau_fence_emit(struct nouveau_fence *fence)
->  bool
->  nouveau_fence_done(struct nouveau_fence *fence)
->  {
-> -	if (fence->base.ops == &nouveau_fence_ops_legacy ||
-> -	    fence->base.ops == &nouveau_fence_ops_uevent) {
-> -		struct nouveau_fence_chan *fctx = nouveau_fctx(fence);
-> -		struct nouveau_channel *chan;
-> -		unsigned long flags;
-> +	struct nouveau_fence_chan *fctx = nouveau_fctx(fence);
-> +	struct nouveau_channel *chan;
-> +	unsigned long flags;
->  
-> -		if (test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->base.flags))
-> -			return true;
-> +	if (test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->base.flags))
-> +		return true;
-> +
-> +	spin_lock_irqsave(&fctx->lock, flags);
-> +	chan = rcu_dereference_protected(fence->channel, lockdep_is_held(&fctx->lock));
-> +	if (chan && nouveau_fence_update(chan, fctx))
-> +		nvif_event_block(&fctx->event);
-> +	spin_unlock_irqrestore(&fctx->lock, flags);
->  
-> -		spin_lock_irqsave(&fctx->lock, flags);
-> -		chan = rcu_dereference_protected(fence->channel, lockdep_is_held(&fctx->lock));
-> -		if (chan && nouveau_fence_update(chan, fctx))
-> -			nvif_event_block(&fctx->event);
-> -		spin_unlock_irqrestore(&fctx->lock, flags);
-> -	}
->  	return test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence->base.flags);
->  }
->  
+Changes:
+
+RFC V01: https://lore.kernel.org/netdev/cover.1730290527.git.gur.stavi@huawei.com
+
+RFC V02: https://lore.kernel.org/netdev/cover.1733990727.git.gur.stavi@huawei.com
+* Reduce overall line of code by removing optional functionality.
+* Break down into smaller patches.
+
+PATCH 01 V01: https://lore.kernel.org/netdev/cover.1734599672.git.gur.stavi@huawei.com
+* Documentation style and consistency fixes (from Bjorn Helgaas)
+* Use ipoll instead of custom code (from Andrew Lunn)
+* Move dev_set_drvdata up in initialization order (from Andrew Lunn)
+* Use netdev's max_mtu, min_mtu (from Andrew Lunn)
+* Fix variable 'xxx' set but not used warnings (from Linux patchwork)
+
+PATCH 01 V02: https://lore.kernel.org/netdev/cover.1735206602.git.gur.stavi@huawei.com
+* Add comment regarding usage of random MAC. (Andrew Lunn)
+* Add COMPILE_TEST to Kconfig (Jakub Kicinski)
+
+PATCH 01 V03: https://lore.kernel.org/netdev/cover.1735735608.git.gur.stavi@huawei.com
+* Rephrase Kconfig comment (Jakub Kicinski)
+* Kconfig: add 'select AUXILIARY_BUS' (Kernel test robot)
+* ARCH=um: missing include 'net/ip6_checksum.h' (Kernel test robot)
+
+PATCH 01 V04: https://lore.kernel.org/netdev/cover.1737013558.git.gur.stavi@huawei.com
+* Improve naming consistency, missing hinic3 prefixes (Suman Ghosh)
+* Change hinic3_remove_func to void (Suman Ghosh)
+* Add adev_event_unregister (Suman Ghosh)
+* Add comment for service types enum (Suman Ghosh)
+
+PATCH 01 V05: https://lore.kernel.org/netdev/cover.1740312670.git.gur.stavi@huawei.com
+* Fix signed-by signatures (Przemek Kitszel)
+* Expand initials in documentation (Przemek Kitszel)
+* Update copyright messages to 2025 (Przemek Kitszel)
+* Sort filenames in makefile (Przemek Kitszel)
+* Sort include statements (Przemek Kitszel)
+* Reduce padding in irq allocation struct (Przemek Kitszel)
+* Replace memset of zero with '= {}' init (Przemek Kitszel)
+* Revise mbox API to avoid using same pointer twice (Przemek Kitszel)
+* Use 2 underscores for header file ifdef guards (Przemek Kitszel)
+* Remove 'Intelligent' from Kconfig (Przemek Kitszel)
+* Documentation, fix line length mismatch to header (Simon Horman)
+
+PATCH 01 V06: https://lore.kernel.org/netdev/cover.1740487707.git.gur.stavi@huawei.com
+* Add hinic3 doc to device_drivers/ethernet TOC (Jakub Kicinski)
+
+PATCH 01 V07: https://lore.kernel.org/netdev/cover.1741069877.git.gur.stavi@huawei.com
+* Remove unneeded conversion to bool (Jakub Kicinski)
+* Use net_prefetch and net_prefetchw (Joe Damato)
+* Push IRQ coalescing and rss alloc/free to later patch (Joe Damato)
+* Pull additional rx/tx/napi code from next patch (Joe Damato)
+
+PATCH 01 V08: https://lore.kernel.org/netdev/cover.1741247008.git.gur.stavi@huawei.com
+* Fix build warning following pulling napi code from later patch (patchwork)
+* Add missing net/gro.h include for napi_gro_flush (patchwork)
+
+PATCH 01 V09: https://lore.kernel.org/netdev/cover.1742202778.git.gur.stavi@huawei.com
+* Maintain non-error paths in the main flow (Simon Horman)
+* Rename Pcie to PCIe in debug messages (Simon Horman)
+* Remove do-nothing goto label (Simon Horman)
+* Remove needless override of error value (Simon Horman)
+
+PATCH 01 V10:
+* Poll Tx before polling Rx (Jakub Kicinski)
+* Use napi_complete_done instead of napi_complete (Jakub Kicinski)
+* Additional napi conformance fixes.
+* Rename goto labels according to target rather than source (Jakub Kicinski)
+* Call netif_carrier_off before register_netdev (Jakub Kicinski)
+
+Fan Gong (1):
+  hinic3: module initialization and tx/rx logic
+
+ .../device_drivers/ethernet/huawei/hinic3.rst | 137 ++++
+ .../device_drivers/ethernet/index.rst         |   1 +
+ MAINTAINERS                                   |   7 +
+ drivers/net/ethernet/huawei/Kconfig           |   1 +
+ drivers/net/ethernet/huawei/Makefile          |   1 +
+ drivers/net/ethernet/huawei/hinic3/Kconfig    |  19 +
+ drivers/net/ethernet/huawei/hinic3/Makefile   |  21 +
+ .../ethernet/huawei/hinic3/hinic3_common.c    |  53 ++
+ .../ethernet/huawei/hinic3/hinic3_common.h    |  27 +
+ .../ethernet/huawei/hinic3/hinic3_hw_cfg.c    |  24 +
+ .../ethernet/huawei/hinic3/hinic3_hw_cfg.h    |  53 ++
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.c   |  32 +
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.h   |  13 +
+ .../ethernet/huawei/hinic3/hinic3_hw_intf.h   | 113 +++
+ .../net/ethernet/huawei/hinic3/hinic3_hwdev.c |  24 +
+ .../net/ethernet/huawei/hinic3/hinic3_hwdev.h |  81 +++
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.c  |  21 +
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.h  |  58 ++
+ .../net/ethernet/huawei/hinic3/hinic3_irq.c   |  53 ++
+ .../net/ethernet/huawei/hinic3/hinic3_lld.c   | 416 +++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_lld.h   |  21 +
+ .../net/ethernet/huawei/hinic3/hinic3_main.c  | 358 +++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_mbox.c  |  16 +
+ .../net/ethernet/huawei/hinic3/hinic3_mbox.h  |  15 +
+ .../net/ethernet/huawei/hinic3/hinic3_mgmt.h  |  13 +
+ .../huawei/hinic3/hinic3_mgmt_interface.h     | 105 +++
+ .../huawei/hinic3/hinic3_netdev_ops.c         |  77 ++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.c   | 230 ++++++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.h   |  39 +
+ .../ethernet/huawei/hinic3/hinic3_nic_dev.h   |  91 +++
+ .../ethernet/huawei/hinic3/hinic3_nic_io.c    |  21 +
+ .../ethernet/huawei/hinic3/hinic3_nic_io.h    | 118 +++
+ .../huawei/hinic3/hinic3_queue_common.c       |  67 ++
+ .../huawei/hinic3/hinic3_queue_common.h       |  54 ++
+ .../net/ethernet/huawei/hinic3/hinic3_rx.c    | 404 +++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_rx.h    |  91 +++
+ .../net/ethernet/huawei/hinic3/hinic3_tx.c    | 684 ++++++++++++++++++
+ .../net/ethernet/huawei/hinic3/hinic3_tx.h    | 131 ++++
+ .../net/ethernet/huawei/hinic3/hinic3_wq.c    |  29 +
+ .../net/ethernet/huawei/hinic3/hinic3_wq.h    |  76 ++
+ 40 files changed, 3795 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/huawei/hinic3.rst
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/Kconfig
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/Makefile
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_common.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_common.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_cfg.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hw_intf.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hwdev.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hwif.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_hwif.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_irq.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_lld.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_lld.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_main.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mbox.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mbox.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mgmt.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_mgmt_interface.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_cfg.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_dev.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_nic_io.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_queue_common.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_queue_common.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rx.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_rx.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_tx.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_tx.h
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_wq.c
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_wq.h
+
+
+base-commit: a9843689e2de1a3727d58b4225e4f8664937aefd
+-- 
+2.45.2
 
 
