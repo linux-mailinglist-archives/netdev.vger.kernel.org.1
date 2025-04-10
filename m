@@ -1,677 +1,104 @@
-Return-Path: <netdev+bounces-181124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61BAFA83B8F
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 09:45:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1885FA83BA2
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 09:49:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2EB077A428D
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 07:43:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37F768C3F41
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 07:44:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21C5F1F1932;
-	Thu, 10 Apr 2025 07:44:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 455B0204687;
+	Thu, 10 Apr 2025 07:44:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ItforuiG"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ooGCdbGA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D1CE1E3DED
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 07:44:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08611F1932;
+	Thu, 10 Apr 2025 07:44:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744271048; cv=none; b=dZBWHLAe1O0iiouqSDU3qzgXd4zDiOG64pV0V0LzKlPWK3/HJ1rvHRpf7Rs1FV+Z1EQsYaDcozCn5tk4johSEVzNk7uYVOyu46pWIIQvJwny2B/FFN7VieSc+zgo8O5fkFn8MXoEcug1+PAEa/MzKPfHD0BU6rp/o2dKlJ3K7YE=
+	t=1744271064; cv=none; b=DzBYRVmJM2UC2aM6kzJELoJnsKk4qjhb5VExbcPToP5g0/fH9r81/HqxS8t1q60am8k9Z6ZbRezQtSTgHpYFPAU1+XvbQcdZWq8FYsU0cO+XA3eGYR8IimnUmKK825OWLBETZuX0+qAPRqYM3WtBu5011PWzRzbso4P2oLtEdvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744271048; c=relaxed/simple;
-	bh=QW/UGqPJzGeHKdg4V9CQb1zEPw6oJk4WwUaItaJACz8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qqXca83VS3OaroYPzjFqopKVvDtHDWu2l1pqaLp6InHGGB99OEOhzSVV4/qRpUkrDjD6J3fzH+fOOICzbCnmy49QL9MSEVDXBXsymAIow/ccLDyo1HY2YjJg/y1+M88wxk5D+b2Arl0ijBQcg+YnT+XNImvlVPU7JstTvwSaOsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ItforuiG; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-3014678689aso392900a91.0
-        for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 00:44:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744271045; x=1744875845; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WFDwdcT9BuAStdNT5zlfQSm0jvuDLBZpRotgfedaCsg=;
-        b=ItforuiGwiLvDqg00N2ollQyxAJGhauNONVN8RHDGvTmMCLKOv+dSwvzEKK2SVFL+1
-         9K7ErLlTFXF9H1aR7AoF1h/U/HsxWFyWeCcZl3kWDYBIt8OSvD5YALReJYyh+FRIOIHP
-         2OZwKUM4cfMOInYUB0P/eh5kud3u60AbLgbSeB1h6XPgQmlZIyYwP6jVR7MQwladrn4n
-         H6ddzeMk7E8Zde6DMej2yw46jHWppgS3q0YwjEBOHnB1qyN8voQwsQuAYJqLyizl3azK
-         lVo1xwSFL2+Dwzz0fKrBwmd9xKItuL5zhE2cgaOWj69vXtTlksF33IyQuUxggLLizINy
-         zCsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744271045; x=1744875845;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WFDwdcT9BuAStdNT5zlfQSm0jvuDLBZpRotgfedaCsg=;
-        b=vqcij/haAynSKmzu/P9lg6Ahd7ojHB4wzctgFpLtScu/mZ9c9zBAkcoTfVujzBw/hn
-         443yCqwCdTocZB+35egjlji99LHbTnlRaF6eyAwOiScqkptVc785HG5lkwHk/9HJcT/I
-         WehDaF6/anPNy0xDbMQhfe5iXpsUkj0Exz+4oF2DI4wA1iQ7fbDc5ysHFJY8UtJKoSeQ
-         tyw/brhAFP5RcS2ICEuyRcspD8cZLhW5UPB3OKTfo28ZWHSywYyBMq3ZR1H9wqmBBWaL
-         QhKzH1qsq0IBQbm/x+xxyhUVtifwlC0PSfxom1Dc6eF6/Iz3gdqTDsDwcR9ai/6btE9w
-         Wjjg==
-X-Forwarded-Encrypted: i=1; AJvYcCWhpb0Zkw4PXB09HlCnuBox0eWbHSFuvBvCe9IMZJya98QdMhDCa2ZMLhH5kcZeGlRRMfwz1Xk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxP5kqU6bW8WHOYKRueeDiy85A2srlz6O25eTKnQCs1Ix1DGhBv
-	p+q71NQGUbnn9w3ZFNl9kd32MQqKu9ZHq2yWIpozZ1JR3zcwq8mI
-X-Gm-Gg: ASbGncsM2sHnWhsOrC/I2SpmFy6M50o4Q3MpjizIggAFMPftOA0WimKfKOGJQJ/wFfq
-	+Y+/+f+EMx4pL7uHFsQHZb5uC63AObaxfEepRNBKPy3A8iFmnC2QNhDIzdxCzRX3ModjcgqLoIK
-	BxNdyEfupov3MQ6i/3OakKavu9ZCh1TUK2hsqWGXxu5S8X2bEI9tEZ7ZBk8ew6GyW121muOcaf5
-	W9H/s9pEHEfP7dUiHMv4WFLzK/Op0xg8wuzHl983GoQnToeNQjnF7ZDSwg8vymEzUoF+f6DZUHC
-	Apo3EmMv0MeLwWZbGpjVfMzvwtWp7w==
-X-Google-Smtp-Source: AGHT+IEr9TiHI1lEU703UikTG/3+wACpvIrJAARuSk9arLYZHzyloG+tX6cgfb9CHQkyuPawckVUBA==
-X-Received: by 2002:a17:90b:58cf:b0:306:b6f7:58ba with SMTP id 98e67ed59e1d1-30718b54075mr2654160a91.6.1744271044934;
-        Thu, 10 Apr 2025 00:44:04 -0700 (PDT)
-Received: from ap.. ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22ac7cb4fa9sm23989795ad.179.2025.04.10.00.44.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Apr 2025 00:44:04 -0700 (PDT)
-From: Taehee Yoo <ap420073@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	hawk@kernel.org,
-	ilias.apalodimas@linaro.org,
-	netdev@vger.kernel.org
-Cc: dw@davidwei.uk,
-	kuniyu@amazon.com,
-	sdf@fomichev.me,
-	ahmed.zaki@intel.com,
-	aleksander.lobakin@intel.com,
-	hongguang.gao@broadcom.com,
-	ap420073@gmail.com,
-	Mina Almasry <almasrymina@google.com>
-Subject: [PATCH v2 net-next] eth: bnxt: add support rx side device memory TCP
-Date: Thu, 10 Apr 2025 07:43:51 +0000
-Message-Id: <20250410074351.4155508-1-ap420073@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1744271064; c=relaxed/simple;
+	bh=c3tSedszmM1WRObiVCTtdoG+H36ZRB/JWvXBI6pWIy8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TpD2wxSY+R6xEEmpAcCwHnqyoVuE9GP1zQWd+r3fFoR1M2Ewq55TvXwdOTgLEPx2C9LI1LtErQJaiOR3ZzL83ow/wsNQeS3RhkkI+wzHSRAQPcZWm9dtNTIDqvDPqGWOsZd7JNh1TQh2JS5L3yKcosjGenDhTQQVd9UlzGLTeV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ooGCdbGA; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=g7ze1sHwoMMFf5hsA17KXxvHh/sfNEypSsSsinv7WnM=; b=ooGCdbGAuSlV5t67xMBev2+Yw3
+	v/xm/DoszcgeMLwzEyWPaYpyx19fn8Io47aWwDAbU389878I3Szj5TsXmFleDIg/CkPFRVO8SGK2g
+	zBFxrFz7sCWdpjh1tfWzT4A0l3vbkYXZWdozRt50ZmtphGtdyrqL/JmldBL0xCtWCfc+QqdGkYOyD
+	BQLhrmwIjT0pwk+oeji+qfDdq4qb3f6m4rQIyD4qWWkmVOcD6EYwiFvSZB4b7uebzpy7nWS9LZtAa
+	Z9I6m8uu99tz2j3hPRs+ZJfB+suxH/sIi3sDdsEmeaG/mlttQFEyMh962ttCjwfXzJSNQpXaUUgKa
+	WLzE4TuQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50790)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u2ma2-0001Vy-0D;
+	Thu, 10 Apr 2025 08:44:10 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u2mZz-0003Pn-07;
+	Thu, 10 Apr 2025 08:44:07 +0100
+Date: Thu, 10 Apr 2025 08:44:06 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Richard Cochran <richardcochran@gmail.com>
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
+	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 2/2] net: phy: Add Marvell PHY PTP support
+Message-ID: <Z_d2xntJMPQYGQ6T@shell.armlinux.org.uk>
+References: <20250409101808.43d5a17d@kmaincent-XPS-13-7390>
+ <Z_YwxYZc7IHkTx_C@shell.armlinux.org.uk>
+ <20250409104858.2758e68e@kmaincent-XPS-13-7390>
+ <Z_ZlDLzvu_Y2JWM8@shell.armlinux.org.uk>
+ <20250409143820.51078d31@kmaincent-XPS-13-7390>
+ <Z_Z3lchknUpZS1UP@shell.armlinux.org.uk>
+ <20250409180414.19e535e5@kmaincent-XPS-13-7390>
+ <Z_avqyOX2bi44sO9@shell.armlinux.org.uk>
+ <Z/b2yKMXNwjqTKy4@shell.armlinux.org.uk>
+ <Z_dGE4ZwjTgLMTju@hoboy.vegasvil.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z_dGE4ZwjTgLMTju@hoboy.vegasvil.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Currently, bnxt_en driver satisfies the requirements of the Device
-memory TCP, which is HDS.
-So, it implements rx-side Device memory TCP for bnxt_en driver.
-It requires only converting the page API to netmem API.
-`struct page` of agg rings are changed to `netmem_ref netmem` and
-corresponding functions are changed to a variant of netmem API.
+On Wed, Apr 09, 2025 at 09:16:19PM -0700, Richard Cochran wrote:
+> On Wed, Apr 09, 2025 at 11:38:00PM +0100, Russell King (Oracle) wrote:
+> 
+> > Right, got to the bottom of it at last. I hate linuxptp / ptp4l.
+> 
+> So don't use it.  Nobody is forcing you.
 
-It also passes PP_FLAG_ALLOW_UNREADABLE_NETMEM flag to a parameter of
-page_pool.
-The netmem will be activated only when a user requests devmem TCP.
+What else is there to test PTP support that is better?
 
-When netmem is activated, received data is unreadable and netmem is
-disabled, received data is readable.
-But drivers don't need to handle both cases because netmem core API will
-handle it properly.
-So, using proper netmem API is enough for drivers.
-
-Device memory TCP can be tested with
-tools/testing/selftests/drivers/net/hw/ncdevmem.
-This is tested with BCM57504-N425G and firmware version 232.0.155.8/pkg
-232.1.132.8.
-
-Reviewed-by: Mina Almasry <almasrymina@google.com>
-Tested-by: David Wei <dw@davidwei.uk>
-Signed-off-by: Taehee Yoo <ap420073@gmail.com>
----
-
-v2:
- - Fix using wrong pointer in error path of bnxt_queue_mem_alloc().
- - Fix compile warning due to a defined but unused variable.
- - Do not define inline function in .c file.
- - Remove unnecessary setting a pp.queue to 0.
- - Add Tested-by tag from David Wei.
- - Add Reviewed-by tag from Mina Almasry.
-
-RFC -> PATCH v1:
- - Drop ring buffer descriptor refactoring patch.
- - Do not convert to netmem API for normal ring(non-agg ring).
- - Remove changes of napi_{enable | disable}() to
-   napi_{enable | disable}_locked().
- - Relocate a need_head_pool in struct bnxt_rx_ring_info due to
-   an alignment hole.
- - Remove *offset parameter of __bnxt_alloc_rx_netmem().
-   *offset is always set to 0 in this function. it's unnecessary.
- - Get skb_shared_info outside of loop in __bnxt_rx_agg_netmems().
- - Drop Tested-by tag due to changes of this patch.
-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 201 +++++++++++++---------
- drivers/net/ethernet/broadcom/bnxt/bnxt.h |   3 +-
- include/linux/netdevice.h                 |   1 +
- include/net/page_pool/helpers.h           |   6 +
- net/core/dev.c                            |   6 +
- 5 files changed, 135 insertions(+), 82 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 28ee12186c37..e5b821e23cee 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -893,9 +893,9 @@ static void bnxt_tx_int(struct bnxt *bp, struct bnxt_napi *bnapi, int budget)
- 		bnapi->events &= ~BNXT_TX_CMP_EVENT;
- }
- 
--static bool bnxt_separate_head_pool(void)
-+static bool bnxt_separate_head_pool(struct bnxt_rx_ring_info *rxr)
- {
--	return PAGE_SIZE > BNXT_RX_PAGE_SIZE;
-+	return rxr->need_head_pool || PAGE_SIZE > BNXT_RX_PAGE_SIZE;
- }
- 
- static struct page *__bnxt_alloc_rx_page(struct bnxt *bp, dma_addr_t *mapping,
-@@ -919,6 +919,20 @@ static struct page *__bnxt_alloc_rx_page(struct bnxt *bp, dma_addr_t *mapping,
- 	return page;
- }
- 
-+static netmem_ref __bnxt_alloc_rx_netmem(struct bnxt *bp, dma_addr_t *mapping,
-+					 struct bnxt_rx_ring_info *rxr,
-+					 gfp_t gfp)
-+{
-+	netmem_ref netmem;
-+
-+	netmem = page_pool_alloc_netmems(rxr->page_pool, gfp);
-+	if (!netmem)
-+		return 0;
-+
-+	*mapping = page_pool_get_dma_addr_netmem(netmem);
-+	return netmem;
-+}
-+
- static inline u8 *__bnxt_alloc_rx_frag(struct bnxt *bp, dma_addr_t *mapping,
- 				       struct bnxt_rx_ring_info *rxr,
- 				       gfp_t gfp)
-@@ -999,21 +1013,19 @@ static inline u16 bnxt_find_next_agg_idx(struct bnxt_rx_ring_info *rxr, u16 idx)
- 	return next;
- }
- 
--static inline int bnxt_alloc_rx_page(struct bnxt *bp,
--				     struct bnxt_rx_ring_info *rxr,
--				     u16 prod, gfp_t gfp)
-+static int bnxt_alloc_rx_netmem(struct bnxt *bp, struct bnxt_rx_ring_info *rxr,
-+				u16 prod, gfp_t gfp)
- {
- 	struct rx_bd *rxbd =
- 		&rxr->rx_agg_desc_ring[RX_AGG_RING(bp, prod)][RX_IDX(prod)];
- 	struct bnxt_sw_rx_agg_bd *rx_agg_buf;
--	struct page *page;
--	dma_addr_t mapping;
- 	u16 sw_prod = rxr->rx_sw_agg_prod;
- 	unsigned int offset = 0;
-+	dma_addr_t mapping;
-+	netmem_ref netmem;
- 
--	page = __bnxt_alloc_rx_page(bp, &mapping, rxr, &offset, gfp);
--
--	if (!page)
-+	netmem = __bnxt_alloc_rx_netmem(bp, &mapping, rxr, gfp);
-+	if (!netmem)
- 		return -ENOMEM;
- 
- 	if (unlikely(test_bit(sw_prod, rxr->rx_agg_bmap)))
-@@ -1023,7 +1035,7 @@ static inline int bnxt_alloc_rx_page(struct bnxt *bp,
- 	rx_agg_buf = &rxr->rx_agg_ring[sw_prod];
- 	rxr->rx_sw_agg_prod = RING_RX_AGG(bp, NEXT_RX_AGG(sw_prod));
- 
--	rx_agg_buf->page = page;
-+	rx_agg_buf->netmem = netmem;
- 	rx_agg_buf->offset = offset;
- 	rx_agg_buf->mapping = mapping;
- 	rxbd->rx_bd_haddr = cpu_to_le64(mapping);
-@@ -1067,11 +1079,11 @@ static void bnxt_reuse_rx_agg_bufs(struct bnxt_cp_ring_info *cpr, u16 idx,
- 		p5_tpa = true;
- 
- 	for (i = 0; i < agg_bufs; i++) {
--		u16 cons;
--		struct rx_agg_cmp *agg;
- 		struct bnxt_sw_rx_agg_bd *cons_rx_buf, *prod_rx_buf;
-+		struct rx_agg_cmp *agg;
- 		struct rx_bd *prod_bd;
--		struct page *page;
-+		netmem_ref netmem;
-+		u16 cons;
- 
- 		if (p5_tpa)
- 			agg = bnxt_get_tpa_agg_p5(bp, rxr, idx, start + i);
-@@ -1088,11 +1100,11 @@ static void bnxt_reuse_rx_agg_bufs(struct bnxt_cp_ring_info *cpr, u16 idx,
- 		cons_rx_buf = &rxr->rx_agg_ring[cons];
- 
- 		/* It is possible for sw_prod to be equal to cons, so
--		 * set cons_rx_buf->page to NULL first.
-+		 * set cons_rx_buf->netmem to 0 first.
- 		 */
--		page = cons_rx_buf->page;
--		cons_rx_buf->page = NULL;
--		prod_rx_buf->page = page;
-+		netmem = cons_rx_buf->netmem;
-+		cons_rx_buf->netmem = 0;
-+		prod_rx_buf->netmem = netmem;
- 		prod_rx_buf->offset = cons_rx_buf->offset;
- 
- 		prod_rx_buf->mapping = cons_rx_buf->mapping;
-@@ -1218,29 +1230,35 @@ static struct sk_buff *bnxt_rx_skb(struct bnxt *bp,
- 	return skb;
- }
- 
--static u32 __bnxt_rx_agg_pages(struct bnxt *bp,
--			       struct bnxt_cp_ring_info *cpr,
--			       struct skb_shared_info *shinfo,
--			       u16 idx, u32 agg_bufs, bool tpa,
--			       struct xdp_buff *xdp)
-+static u32 __bnxt_rx_agg_netmems(struct bnxt *bp,
-+				 struct bnxt_cp_ring_info *cpr,
-+				 u16 idx, u32 agg_bufs, bool tpa,
-+				 struct sk_buff *skb,
-+				 struct xdp_buff *xdp)
- {
- 	struct bnxt_napi *bnapi = cpr->bnapi;
--	struct pci_dev *pdev = bp->pdev;
--	struct bnxt_rx_ring_info *rxr = bnapi->rx_ring;
--	u16 prod = rxr->rx_agg_prod;
-+	struct skb_shared_info *shinfo;
-+	struct bnxt_rx_ring_info *rxr;
- 	u32 i, total_frag_len = 0;
- 	bool p5_tpa = false;
-+	u16 prod;
-+
-+	rxr = bnapi->rx_ring;
-+	prod = rxr->rx_agg_prod;
- 
- 	if ((bp->flags & BNXT_FLAG_CHIP_P5_PLUS) && tpa)
- 		p5_tpa = true;
- 
-+	if (skb)
-+		shinfo = skb_shinfo(skb);
-+	else
-+		shinfo = xdp_get_shared_info_from_buff(xdp);
-+
- 	for (i = 0; i < agg_bufs; i++) {
--		skb_frag_t *frag = &shinfo->frags[i];
--		u16 cons, frag_len;
--		struct rx_agg_cmp *agg;
- 		struct bnxt_sw_rx_agg_bd *cons_rx_buf;
--		struct page *page;
--		dma_addr_t mapping;
-+		struct rx_agg_cmp *agg;
-+		u16 cons, frag_len;
-+		netmem_ref netmem;
- 
- 		if (p5_tpa)
- 			agg = bnxt_get_tpa_agg_p5(bp, rxr, idx, i);
-@@ -1251,27 +1269,41 @@ static u32 __bnxt_rx_agg_pages(struct bnxt *bp,
- 			    RX_AGG_CMP_LEN) >> RX_AGG_CMP_LEN_SHIFT;
- 
- 		cons_rx_buf = &rxr->rx_agg_ring[cons];
--		skb_frag_fill_page_desc(frag, cons_rx_buf->page,
--					cons_rx_buf->offset, frag_len);
--		shinfo->nr_frags = i + 1;
-+		if (skb) {
-+			skb_add_rx_frag_netmem(skb, i, cons_rx_buf->netmem,
-+					       cons_rx_buf->offset,
-+					       frag_len, BNXT_RX_PAGE_SIZE);
-+		} else {
-+			skb_frag_t *frag = &shinfo->frags[i];
-+
-+			skb_frag_fill_netmem_desc(frag, cons_rx_buf->netmem,
-+						  cons_rx_buf->offset,
-+						  frag_len);
-+			shinfo->nr_frags = i + 1;
-+		}
- 		__clear_bit(cons, rxr->rx_agg_bmap);
- 
--		/* It is possible for bnxt_alloc_rx_page() to allocate
-+		/* It is possible for bnxt_alloc_rx_netmem() to allocate
- 		 * a sw_prod index that equals the cons index, so we
- 		 * need to clear the cons entry now.
- 		 */
--		mapping = cons_rx_buf->mapping;
--		page = cons_rx_buf->page;
--		cons_rx_buf->page = NULL;
-+		netmem = cons_rx_buf->netmem;
-+		cons_rx_buf->netmem = 0;
- 
--		if (xdp && page_is_pfmemalloc(page))
-+		if (xdp && netmem_is_pfmemalloc(netmem))
- 			xdp_buff_set_frag_pfmemalloc(xdp);
- 
--		if (bnxt_alloc_rx_page(bp, rxr, prod, GFP_ATOMIC) != 0) {
-+		if (bnxt_alloc_rx_netmem(bp, rxr, prod, GFP_ATOMIC) != 0) {
-+			if (skb) {
-+				skb->len -= frag_len;
-+				skb->data_len -= frag_len;
-+				skb->truesize -= BNXT_RX_PAGE_SIZE;
-+			}
-+
- 			--shinfo->nr_frags;
--			cons_rx_buf->page = page;
-+			cons_rx_buf->netmem = netmem;
- 
--			/* Update prod since possibly some pages have been
-+			/* Update prod since possibly some netmems have been
- 			 * allocated already.
- 			 */
- 			rxr->rx_agg_prod = prod;
-@@ -1279,8 +1311,8 @@ static u32 __bnxt_rx_agg_pages(struct bnxt *bp,
- 			return 0;
- 		}
- 
--		dma_sync_single_for_cpu(&pdev->dev, mapping, BNXT_RX_PAGE_SIZE,
--					bp->rx_dir);
-+		page_pool_dma_sync_netmem_for_cpu(rxr->page_pool, netmem, 0,
-+						  BNXT_RX_PAGE_SIZE);
- 
- 		total_frag_len += frag_len;
- 		prod = NEXT_RX_AGG(prod);
-@@ -1289,32 +1321,28 @@ static u32 __bnxt_rx_agg_pages(struct bnxt *bp,
- 	return total_frag_len;
- }
- 
--static struct sk_buff *bnxt_rx_agg_pages_skb(struct bnxt *bp,
--					     struct bnxt_cp_ring_info *cpr,
--					     struct sk_buff *skb, u16 idx,
--					     u32 agg_bufs, bool tpa)
-+static struct sk_buff *bnxt_rx_agg_netmems_skb(struct bnxt *bp,
-+					       struct bnxt_cp_ring_info *cpr,
-+					       struct sk_buff *skb, u16 idx,
-+					       u32 agg_bufs, bool tpa)
- {
--	struct skb_shared_info *shinfo = skb_shinfo(skb);
- 	u32 total_frag_len = 0;
- 
--	total_frag_len = __bnxt_rx_agg_pages(bp, cpr, shinfo, idx,
--					     agg_bufs, tpa, NULL);
-+	total_frag_len = __bnxt_rx_agg_netmems(bp, cpr, idx, agg_bufs, tpa,
-+					       skb, NULL);
- 	if (!total_frag_len) {
- 		skb_mark_for_recycle(skb);
- 		dev_kfree_skb(skb);
- 		return NULL;
- 	}
- 
--	skb->data_len += total_frag_len;
--	skb->len += total_frag_len;
--	skb->truesize += BNXT_RX_PAGE_SIZE * agg_bufs;
- 	return skb;
- }
- 
--static u32 bnxt_rx_agg_pages_xdp(struct bnxt *bp,
--				 struct bnxt_cp_ring_info *cpr,
--				 struct xdp_buff *xdp, u16 idx,
--				 u32 agg_bufs, bool tpa)
-+static u32 bnxt_rx_agg_netmems_xdp(struct bnxt *bp,
-+				   struct bnxt_cp_ring_info *cpr,
-+				   struct xdp_buff *xdp, u16 idx,
-+				   u32 agg_bufs, bool tpa)
- {
- 	struct skb_shared_info *shinfo = xdp_get_shared_info_from_buff(xdp);
- 	u32 total_frag_len = 0;
-@@ -1322,8 +1350,8 @@ static u32 bnxt_rx_agg_pages_xdp(struct bnxt *bp,
- 	if (!xdp_buff_has_frags(xdp))
- 		shinfo->nr_frags = 0;
- 
--	total_frag_len = __bnxt_rx_agg_pages(bp, cpr, shinfo,
--					     idx, agg_bufs, tpa, xdp);
-+	total_frag_len = __bnxt_rx_agg_netmems(bp, cpr, idx, agg_bufs, tpa,
-+					       NULL, xdp);
- 	if (total_frag_len) {
- 		xdp_buff_set_frags_flag(xdp);
- 		shinfo->nr_frags = agg_bufs;
-@@ -1895,7 +1923,8 @@ static inline struct sk_buff *bnxt_tpa_end(struct bnxt *bp,
- 	}
- 
- 	if (agg_bufs) {
--		skb = bnxt_rx_agg_pages_skb(bp, cpr, skb, idx, agg_bufs, true);
-+		skb = bnxt_rx_agg_netmems_skb(bp, cpr, skb, idx, agg_bufs,
-+					      true);
- 		if (!skb) {
- 			/* Page reuse already handled by bnxt_rx_pages(). */
- 			cpr->sw_stats->rx.rx_oom_discards += 1;
-@@ -2175,9 +2204,10 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
- 	if (bnxt_xdp_attached(bp, rxr)) {
- 		bnxt_xdp_buff_init(bp, rxr, cons, data_ptr, len, &xdp);
- 		if (agg_bufs) {
--			u32 frag_len = bnxt_rx_agg_pages_xdp(bp, cpr, &xdp,
--							     cp_cons, agg_bufs,
--							     false);
-+			u32 frag_len = bnxt_rx_agg_netmems_xdp(bp, cpr, &xdp,
-+							       cp_cons,
-+							       agg_bufs,
-+							       false);
- 			if (!frag_len)
- 				goto oom_next_rx;
- 
-@@ -2229,7 +2259,8 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
- 
- 	if (agg_bufs) {
- 		if (!xdp_active) {
--			skb = bnxt_rx_agg_pages_skb(bp, cpr, skb, cp_cons, agg_bufs, false);
-+			skb = bnxt_rx_agg_netmems_skb(bp, cpr, skb, cp_cons,
-+						      agg_bufs, false);
- 			if (!skb)
- 				goto oom_next_rx;
- 		} else {
-@@ -3445,15 +3476,15 @@ static void bnxt_free_one_rx_agg_ring(struct bnxt *bp, struct bnxt_rx_ring_info
- 
- 	for (i = 0; i < max_idx; i++) {
- 		struct bnxt_sw_rx_agg_bd *rx_agg_buf = &rxr->rx_agg_ring[i];
--		struct page *page = rx_agg_buf->page;
-+		netmem_ref netmem = rx_agg_buf->netmem;
- 
--		if (!page)
-+		if (!netmem)
- 			continue;
- 
--		rx_agg_buf->page = NULL;
-+		rx_agg_buf->netmem = 0;
- 		__clear_bit(i, rxr->rx_agg_bmap);
- 
--		page_pool_recycle_direct(rxr->page_pool, page);
-+		page_pool_recycle_direct_netmem(rxr->page_pool, netmem);
- 	}
- }
- 
-@@ -3746,7 +3777,7 @@ static void bnxt_free_rx_rings(struct bnxt *bp)
- 			xdp_rxq_info_unreg(&rxr->xdp_rxq);
- 
- 		page_pool_destroy(rxr->page_pool);
--		if (bnxt_separate_head_pool())
-+		if (bnxt_separate_head_pool(rxr))
- 			page_pool_destroy(rxr->head_pool);
- 		rxr->page_pool = rxr->head_pool = NULL;
- 
-@@ -3777,15 +3808,19 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
- 	pp.dev = &bp->pdev->dev;
- 	pp.dma_dir = bp->rx_dir;
- 	pp.max_len = PAGE_SIZE;
--	pp.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
-+	pp.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV |
-+		   PP_FLAG_ALLOW_UNREADABLE_NETMEM;
-+	pp.queue_idx = rxr->bnapi->index;
- 
- 	pool = page_pool_create(&pp);
- 	if (IS_ERR(pool))
- 		return PTR_ERR(pool);
- 	rxr->page_pool = pool;
- 
--	if (bnxt_separate_head_pool()) {
-+	rxr->need_head_pool = dev_is_mp_channel(bp->dev, rxr->bnapi->index);
-+	if (bnxt_separate_head_pool(rxr)) {
- 		pp.pool_size = max(bp->rx_ring_size, 1024);
-+		pp.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
- 		pool = page_pool_create(&pp);
- 		if (IS_ERR(pool))
- 			goto err_destroy_pp;
-@@ -4197,6 +4232,8 @@ static void bnxt_reset_rx_ring_struct(struct bnxt *bp,
- 
- 	rxr->page_pool->p.napi = NULL;
- 	rxr->page_pool = NULL;
-+	rxr->head_pool->p.napi = NULL;
-+	rxr->head_pool = NULL;
- 	memset(&rxr->xdp_rxq, 0, sizeof(struct xdp_rxq_info));
- 
- 	ring = &rxr->rx_ring_struct;
-@@ -4321,16 +4358,16 @@ static void bnxt_alloc_one_rx_ring_skb(struct bnxt *bp,
- 	rxr->rx_prod = prod;
- }
- 
--static void bnxt_alloc_one_rx_ring_page(struct bnxt *bp,
--					struct bnxt_rx_ring_info *rxr,
--					int ring_nr)
-+static void bnxt_alloc_one_rx_ring_netmem(struct bnxt *bp,
-+					  struct bnxt_rx_ring_info *rxr,
-+					  int ring_nr)
- {
- 	u32 prod;
- 	int i;
- 
- 	prod = rxr->rx_agg_prod;
- 	for (i = 0; i < bp->rx_agg_ring_size; i++) {
--		if (bnxt_alloc_rx_page(bp, rxr, prod, GFP_KERNEL)) {
-+		if (bnxt_alloc_rx_netmem(bp, rxr, prod, GFP_KERNEL)) {
- 			netdev_warn(bp->dev, "init'ed rx ring %d with %d/%d pages only\n",
- 				    ring_nr, i, bp->rx_ring_size);
- 			break;
-@@ -4371,7 +4408,7 @@ static int bnxt_alloc_one_rx_ring(struct bnxt *bp, int ring_nr)
- 	if (!(bp->flags & BNXT_FLAG_AGG_RINGS))
- 		return 0;
- 
--	bnxt_alloc_one_rx_ring_page(bp, rxr, ring_nr);
-+	bnxt_alloc_one_rx_ring_netmem(bp, rxr, ring_nr);
- 
- 	if (rxr->rx_tpa) {
- 		rc = bnxt_alloc_one_tpa_info_data(bp, rxr);
-@@ -15708,6 +15745,7 @@ static int bnxt_queue_mem_alloc(struct net_device *dev, void *qmem, int idx)
- 	clone->rx_agg_prod = 0;
- 	clone->rx_sw_agg_prod = 0;
- 	clone->rx_next_cons = 0;
-+	clone->need_head_pool = false;
- 
- 	rc = bnxt_alloc_rx_page_pool(bp, clone, rxr->page_pool->p.nid);
- 	if (rc)
-@@ -15750,7 +15788,7 @@ static int bnxt_queue_mem_alloc(struct net_device *dev, void *qmem, int idx)
- 
- 	bnxt_alloc_one_rx_ring_skb(bp, clone, idx);
- 	if (bp->flags & BNXT_FLAG_AGG_RINGS)
--		bnxt_alloc_one_rx_ring_page(bp, clone, idx);
-+		bnxt_alloc_one_rx_ring_netmem(bp, clone, idx);
- 	if (bp->flags & BNXT_FLAG_TPA)
- 		bnxt_alloc_one_tpa_info_data(bp, clone);
- 
-@@ -15766,7 +15804,7 @@ static int bnxt_queue_mem_alloc(struct net_device *dev, void *qmem, int idx)
- 	xdp_rxq_info_unreg(&clone->xdp_rxq);
- err_page_pool_destroy:
- 	page_pool_destroy(clone->page_pool);
--	if (bnxt_separate_head_pool())
-+	if (bnxt_separate_head_pool(clone))
- 		page_pool_destroy(clone->head_pool);
- 	clone->page_pool = NULL;
- 	clone->head_pool = NULL;
-@@ -15785,7 +15823,7 @@ static void bnxt_queue_mem_free(struct net_device *dev, void *qmem)
- 	xdp_rxq_info_unreg(&rxr->xdp_rxq);
- 
- 	page_pool_destroy(rxr->page_pool);
--	if (bnxt_separate_head_pool())
-+	if (bnxt_separate_head_pool(rxr))
- 		page_pool_destroy(rxr->head_pool);
- 	rxr->page_pool = NULL;
- 	rxr->head_pool = NULL;
-@@ -15876,6 +15914,7 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
- 	rxr->page_pool = clone->page_pool;
- 	rxr->head_pool = clone->head_pool;
- 	rxr->xdp_rxq = clone->xdp_rxq;
-+	rxr->need_head_pool = clone->need_head_pool;
- 
- 	bnxt_copy_rx_ring(bp, rxr, clone);
- 
-@@ -15961,7 +16000,7 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
- 	bnxt_hwrm_rx_ring_free(bp, rxr, false);
- 	bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
- 	page_pool_disable_direct_recycling(rxr->page_pool);
--	if (bnxt_separate_head_pool())
-+	if (bnxt_separate_head_pool(rxr))
- 		page_pool_disable_direct_recycling(rxr->head_pool);
- 
- 	if (bp->flags & BNXT_FLAG_SHARED_RINGS)
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 21726cf56586..868a2e5a5b02 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -903,7 +903,7 @@ struct bnxt_sw_rx_bd {
- };
- 
- struct bnxt_sw_rx_agg_bd {
--	struct page		*page;
-+	netmem_ref		netmem;
- 	unsigned int		offset;
- 	dma_addr_t		mapping;
- };
-@@ -1106,6 +1106,7 @@ struct bnxt_rx_ring_info {
- 
- 	unsigned long		*rx_agg_bmap;
- 	u16			rx_agg_bmap_size;
-+	bool                    need_head_pool;
- 
- 	dma_addr_t		rx_desc_mapping[MAX_RX_PAGES];
- 	dma_addr_t		rx_agg_desc_mapping[MAX_RX_AGG_PAGES];
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index a28a08046615..0bc819c4d060 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -4230,6 +4230,7 @@ u8 dev_xdp_sb_prog_count(struct net_device *dev);
- u32 dev_xdp_prog_id(struct net_device *dev, enum bpf_xdp_mode mode);
- 
- u32 dev_get_min_mp_channel_count(const struct net_device *dev);
-+bool dev_is_mp_channel(struct net_device *dev, int i);
- 
- int __dev_forward_skb(struct net_device *dev, struct sk_buff *skb);
- int dev_forward_skb(struct net_device *dev, struct sk_buff *skb);
-diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
-index 582a3d00cbe2..9b7a3a996bbe 100644
---- a/include/net/page_pool/helpers.h
-+++ b/include/net/page_pool/helpers.h
-@@ -395,6 +395,12 @@ static inline void page_pool_recycle_direct(struct page_pool *pool,
- 	page_pool_put_full_page(pool, page, true);
- }
- 
-+static inline void page_pool_recycle_direct_netmem(struct page_pool *pool,
-+						   netmem_ref netmem)
-+{
-+	page_pool_put_full_netmem(pool, netmem, true);
-+}
-+
- #define PAGE_POOL_32BIT_ARCH_WITH_64BIT_DMA	\
- 		(sizeof(dma_addr_t) > sizeof(unsigned long))
- 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index b52efa4cec56..94b781ec8c50 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -10427,6 +10427,12 @@ u32 dev_get_min_mp_channel_count(const struct net_device *dev)
- 	return 0;
- }
- 
-+bool dev_is_mp_channel(struct net_device *dev, int i)
-+{
-+	return !!dev->_rx[i].mp_params.mp_priv;
-+}
-+EXPORT_SYMBOL(dev_is_mp_channel);
-+
- /**
-  * dev_index_reserve() - allocate an ifindex in a namespace
-  * @net: the applicable net namespace
 -- 
-2.34.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
