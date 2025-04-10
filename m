@@ -1,194 +1,106 @@
-Return-Path: <netdev+bounces-181260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C94AA84371
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:41:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24687A84379
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:43:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20D34443B2B
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:38:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED6B517247F
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:38:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 200A1284B53;
-	Thu, 10 Apr 2025 12:38:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3769728541E;
+	Thu, 10 Apr 2025 12:38:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sq55o32u"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B8zaV3yk"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f67.google.com (mail-wr1-f67.google.com [209.85.221.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55CF4204594
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 12:38:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F927284B5C;
+	Thu, 10 Apr 2025 12:38:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744288718; cv=none; b=EOlJGNE47pA4a7gXHqMDIlTEMiqOovjZENf8P7uUxSzp6vJNQn3AYxpunAFuqVhuzTgfj0rclOwhI1t0wN63ebI59B/23e7wdv8O+h4e2xt3gp0Id/AytzmiDjiA9EhcsLW3BNFo/5mEEOzBW1Eon8TJ9343GspEItb8b20K29g=
+	t=1744288720; cv=none; b=RkvwKlDtswydeWFqn8ZQ2BcjDdxBm8GDMRiZt69v/zo94l3xNgkBD8ELHqIhetut1GqZ7L5ooi0NXr7JwY4WNKPkLDnwAdLs+de1gWxcOL3InsAnYG3X3Sq+b8bmOIVcg3erDqsk2Pr+RdxO+AokYfdnNjJUMppJaPZ0UcN4cNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744288718; c=relaxed/simple;
-	bh=O3N2BtvGK2gJmwWJnCkrJEaQrB/DtG48u01XU3dcyZQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hxkluaAdelCLjJOoXtA2Cgg83jFhfoDE2RhdXK8Tj6okuS/KuAyVyr+wTUIoc8HsBvgfXQGmMMqRBk04Wc6EBnVoY4FuWJ6D+QRRXyjQS691PBy4PZB5Ak00Ys3ROWJe04bHGri1xZwqd81jXCCWVZCUb7q5lv7Hsy3ewOXMgIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sq55o32u; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744288715;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/yPAXnrs3Gs5dvTBMjDIRB1XmlVJFG57qJldfBUqlIs=;
-	b=Sq55o32u2Q1dPrxMaV0LNtrRgKKZGGiBMjB3upbOFcSqIYmUtGrN+702M2U1uYrJLP6GZD
-	lrmIUX8lb2t4dRBIBLgZrQ0en/u8LmnAnO5jDS8D0XuxakGuuDGq9xQ1LvY1fWml4kYCJU
-	m427yYxNlGjOirik4LbGYBfFcZO3rIg=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-43-RVSYrwK8M_qjKQRELUP2KA-1; Thu,
- 10 Apr 2025 08:38:32 -0400
-X-MC-Unique: RVSYrwK8M_qjKQRELUP2KA-1
-X-Mimecast-MFC-AGG-ID: RVSYrwK8M_qjKQRELUP2KA_1744288710
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E9A251800259;
-	Thu, 10 Apr 2025 12:38:29 +0000 (UTC)
-Received: from [10.44.33.222] (unknown [10.44.33.222])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CC69A1956094;
-	Thu, 10 Apr 2025 12:38:24 +0000 (UTC)
-Message-ID: <905b14c0-2129-4dcf-b267-e66e23b6b236@redhat.com>
-Date: Thu, 10 Apr 2025 14:38:23 +0200
+	s=arc-20240116; t=1744288720; c=relaxed/simple;
+	bh=FdnbocKbRHhtLFIRneUZ+/1khNFKq2SMICJ8698GBPY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=D31SawM42w08UIoI/wbBojdDwBMjO91VWZU4hIBPYcbToHaViA7VEUZPxyhbm1F8kKasQpnwDrc/FyvkotL0cO2EWicm+BkJrYu77SlOyfP0IBjzqVlyi3NPxcgko2I6aTJvQgYCpyA2/TeaEKKzdj8TcURAe755Gr+8MWKFVx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B8zaV3yk; arc=none smtp.client-ip=209.85.221.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f67.google.com with SMTP id ffacd0b85a97d-39c1ef4ae3aso466888f8f.1;
+        Thu, 10 Apr 2025 05:38:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744288716; x=1744893516; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FdnbocKbRHhtLFIRneUZ+/1khNFKq2SMICJ8698GBPY=;
+        b=B8zaV3ykSYKjzocBkXfMH8sg+cuA356daXrUK1qR29GIXDuVK3Vhq8QyH25VQAR8a0
+         rvDp8BtSN61wy3t5pOaIOHS8Lvdexpvsi5kuIkGg3fk14CJSQmES6oWUoNtZ6SwWdcYq
+         y31PnX+kx3R/940/srM9X94IE8sW8IMH3CeVwikmfB5HLXjTjwJDR5V8jdngP0f1O40W
+         eydFhPbUowWK8+6s5JIbwZjyQ6AZX5U9RmLXG/7T6nv8BSv4uT2hSFTDBJYim44SgBaY
+         bSOjIyLYUpoSJepU94w/SFbFmPtRHRFKxDBjodi9A4yuuiacgxMWTMCxo6MXxmS453Xw
+         pGcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744288716; x=1744893516;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FdnbocKbRHhtLFIRneUZ+/1khNFKq2SMICJ8698GBPY=;
+        b=wnekpYQmu1c1p4CtWMq/qIib2UvIxc5q2f1Ak7hFIfP0lOXeck4xyfuHjvoqEHM4+c
+         EYvs3MzB3+SRjNBW42Jenb4r6WreaH6gZOBOFNvk1zrSFgtOk67GSIjiaK82VRZK7RwA
+         1/vSLrFi8rODlUdXara3vswPSBp7y8epdtJx/RWZmosXRJJ8yeHBmLmUWS/Jy1z+dml/
+         0+k2GogmFxobLQeztkZaT3dzITtLKYKtQV6xFBr6Y1kWTu8qfjjCJLq58/0ijlwWFdAp
+         aMPLsUfKWG4t1nLBRne+LG9zK/tURdzR2jGUt+jSwSwuDbQVnOOU2EKLOYru92iQBAhq
+         8jWA==
+X-Forwarded-Encrypted: i=1; AJvYcCUbcXTbgxa9jqP2ncbRvNaoofeu/k3FwZ9b7BgAic00y3mqd3/nSSEt9j3QOSU6R+WUQruer6rJ@vger.kernel.org, AJvYcCUyDgdfjBJmCshMLWQ0DLlyC9QTqJTUQpG6i5lqxjMWCbuIT7QpPiW73WeEg8YQEGAhQG54/WQW0GCzZvu1@vger.kernel.org, AJvYcCXKWn7wh3iwQ+EaWRi0jCxE7XogB/8l0frjnMQuIMBjqLoV2/SycdGoG9lAM3Pgw6lRlC4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7vxiWwUn291e49YJJgbHDvfD4ZPMP+EftDTldre6Nm1ijdpoS
+	WURP4+Lj7FHkdSixC+sEDlpAy6tM3hLxb7wn3bY7P3fvFstp+yFC
+X-Gm-Gg: ASbGncv48gq6UWtCilAUIxfNydnqeN9S4UQvi3sPfRzRkkm5Y6Trjt+hAYVKnTsujrE
+	qtkibioPJv1hoPrKpsL7fmkgXrLOedJte3PSoenGZsLxPjDfUtGsd9hgYx0+s24dPIW+KgS19Pq
+	/YELQJyFsOUTyoWUupqA3U7tIoINKBwOsQDm7rQNM1CoCq4MdMwbSOK182s1QxG+UJv7AmvQd5q
+	ZWZAjBpxcdrVHyd3PlKQJuFESSb/gQAwJMG3Coi8BOxAMXCtfB9mb9ZXCCF0Bpeq+xHD2TlI3tH
+	FyF7mFvkzR+7BFFjMkHz1YQ3dMf7X40=
+X-Google-Smtp-Source: AGHT+IGPYHCm9MQeMD+k3mqRPa0KcnOkInYXb1NuDo5tGwfYXGvXye4g3CVBInQyYWhnhNgabrp8Bg==
+X-Received: by 2002:a05:6000:2585:b0:390:f0ff:2c10 with SMTP id ffacd0b85a97d-39d8f4c95eamr2399057f8f.19.1744288716341;
+        Thu, 10 Apr 2025 05:38:36 -0700 (PDT)
+Received: from localhost ([2a03:2880:31ff:42::])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f2066d069sm54724525e9.17.2025.04.10.05.38.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Apr 2025 05:38:35 -0700 (PDT)
+From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+To: syzbot+850aaf14624dc0c6d366@syzkaller.appspotmail.com
+Cc: andrii@kernel.org,
+	ast@kernel.org,
+	bpf@vger.kernel.org,
+	daniel@iogearbox.net,
+	haoluo@google.com,
+	john.fastabend@gmail.com,
+	jolsa@kernel.org,
+	kpsingh@kernel.org,
+	linux-kernel@vger.kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	song@kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	yonghong.song@linux.dev
+Subject: [syzbot] [bpf?] possible deadlock in __bpf_ringbuf_reserve
+Date: Thu, 10 Apr 2025 05:38:31 -0700
+Message-ID: <20250410123831.1164580-1-memxor@gmail.com>
+X-Mailer: git-send-email 2.47.1
+In-Reply-To: <0000000000004aa700061379547e@google.com>
+References: <0000000000004aa700061379547e@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 16/28] dt-bindings: dpll: Add support for Microchip
- Azurite chip family
-To: Krzysztof Kozlowski <krzk@kernel.org>, netdev@vger.kernel.org
-Cc: Michal Schmidt <mschmidt@redhat.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
- Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
- Andy Shevchenko <andy@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <20250407172836.1009461-1-ivecera@redhat.com>
- <20250407173149.1010216-7-ivecera@redhat.com>
- <7dfede37-2434-4892-8c8d-4d005fa1072b@kernel.org>
- <280e8a8e-b68f-4536-b9a4-4e924dde0783@redhat.com>
- <b65daab2-8184-45f4-af18-8499e80fbc04@kernel.org>
- <b4d22372-ae85-421c-8ce4-669787160da2@redhat.com>
- <ecde1c37-0fa2-4c2e-ad81-bee3cc7d58c0@kernel.org>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <ecde1c37-0fa2-4c2e-ad81-bee3cc7d58c0@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Transfer-Encoding: 8bit
 
-
-
-On 10. 04. 25 2:19 odp., Krzysztof Kozlowski wrote:
-> On 10/04/2025 12:28, Ivan Vecera wrote:
->>
->>>>> 2. What is 'x'? Wildcard? If so, drop and use specific compatibles.
->>>>
->>>> Microchip refers to the ZL3073x as a family of compatible DPLL chips
->>>> with the same features. There is no need to introduce separate
->>>> compatible string for each of them.
->>>
->>> So a wildcard, thus drop. Use full product names. Google search gives me
->>> no products for ZL3073x but gives me ZL30735.
->>
->> I will use more appropriate microchip,azurite compatible.
-> 
-> Hm? What/who gave such hint? Please read writing bindings or any other
-> guide/speech about it. If that's a zl30735 then use "zl30735" as device
-> part. If you have more devices, use fallbacks. See writing bindings.
-> 
-Something like this:
-
-1)
-properties:
-   compatible:
-     enum:
-       - microchip,zl30731
-       - microchip,zl30732
-       - microchip,zl30732
-       - microchip,zl80032
-       - microchip,zl80732
-
-or
-
-2)
-properties:
-   compatible:
-     items:
-       - enum:
-           - microchip,zl30731
-           - microchip,zl30732
-           - microchip,zl30732
-           - microchip,zl80032
-           - microchip,zl80732
-       - const: microchip,azurite
-
-If 1) what should be the filename ?
-
-Thanks for patience.
-
-Ivan
-
->>
->>>>
->>>>>> +
->>>>>> +  reg:
->>>>>> +    maxItems: 1
->>>>>> +
->>>>>> +required:
->>>>>> +  - compatible
->>>>>> +  - reg
->>>>>> +
->>>>>> +allOf:
->>>>>> +  - $ref: /schemas/dpll/dpll-device.yaml
->>>>>> +
->>>>>> +unevaluatedProperties: false
->>>>>> +
->>>>>> +examples:
->>>>>> +  - |
->>>>>> +    i2c {
->>>>>> +      #address-cells = <1>;
->>>>>> +      #size-cells = <0>;
->>>>>> +
->>>>>> +      dpll@70 {
->>>>>> +        compatible = "microchip,zl3073x-i2c";
->>>>>
->>>>>> +        #address-cells = <0>;
->>>>>> +        #size-cells = <0>;
->>>>>
->>>>> Again, why do you need them if you are not using these two?
->>>>
->>>> The dpll-device.yaml defines them as required. Shouldn't they be
->>>> specified explicitly?
->>>
->>> But you do not use them. Where is any child node?
->>
->> I though I have to specify this due to existence of 'input-pins' and
->> 'output-pins' in the example.
-> 
-> They do not have addressing, so no need for cells.
-
-Thanks for explanation.
-
-> 
-> Best regards,
-> Krzysztof
-> 
-
+#syz test: https://github.com/kkdwivedi/linux.git res-lock-next
 
