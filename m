@@ -1,97 +1,99 @@
-Return-Path: <netdev+bounces-180979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-180980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BE49A83563
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 03:07:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DE9DA83578
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 03:12:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0B5E16E7A1
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 01:07:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22BE63B9BB9
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 01:10:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C107660B8A;
-	Thu, 10 Apr 2025 01:07:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F37214F9D6;
+	Thu, 10 Apr 2025 01:09:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b1jZ0/N8"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F393C13B;
-	Thu, 10 Apr 2025 01:07:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A816C13B
+	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 01:09:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744247257; cv=none; b=ugBydd+g5QVSnat+y/4VIgLT2xIW6KFAjH+QXlcljn0Re4Z8bbSdreE6z+pnHyzqPY6G/Ju4TmlrJAU72jrCm78rIM78jYhq4MXXp+rBJ0rNT2n5Hvs4toJvsJo0sicBEMVOT8Lj7u4cpNOS2PQMjAva5A5u6Vp/Bol5U2tq6BQ=
+	t=1744247395; cv=none; b=tiWdnzSh/JNwZGIQ8IcqVlpP6R1jKidRzCUAnJc/esCUxtK6LCKuCyS7o1415kIDHmzOBjtBfyrz1ZIN8YHKni1g4Ay0i87jzz01Qx4p2Ar15/eVboYl1fFER+fkZiBWW04osv1+drocN/GbRSZD2jaMqEXGEKfJAlAABT6tNL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744247257; c=relaxed/simple;
-	bh=7UkjdxUMmusq4YhAnPcj2YeRtLktLoMfSHH2RWgoajM=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Jjl9Yx/VAeQ5eEZz0y70sqRM6L+Vx9t05TmT6NmOpg5gOsoyIr/P5e3sA3ycMWgx632wPPllJdhWSn8fRV85Z+R0gM2Bjoru1TY4luOOZ7P8OuG4l68JqAelQW/iMXjzHzAmFvRof3roy8THJVuyMTyeecClCgxHLa1ReFDJVSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4ZY1kW4cZSz2TS60;
-	Thu, 10 Apr 2025 09:02:27 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id A84BF1A0188;
-	Thu, 10 Apr 2025 09:07:25 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 10 Apr 2025 09:07:24 +0800
-Message-ID: <7ff44c86-6366-4362-be9a-bde195aa671e@huawei.com>
-Date: Thu, 10 Apr 2025 09:07:23 +0800
+	s=arc-20240116; t=1744247395; c=relaxed/simple;
+	bh=u326eUHaLOH5CMiiKtfTUoGeyV5XdzCJN1M1Ac7WM9o=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bgHXbkl9lvPk8GOox5Zxm2kQ7c71Y58hLrCH16uxJeYIPPPpHXylD8v6+JBKVjVUmVObK6B5yqHd7nIMBeNWxCtPfYYbRUym88/0w2rA7qoBHGKwAi9FLNa9ve08U35v2u9+SpleQRxm49EYmytFmhxKGp6gdP7ja/gh/svQR4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b1jZ0/N8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7FB2C4CEE2;
+	Thu, 10 Apr 2025 01:09:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744247394;
+	bh=u326eUHaLOH5CMiiKtfTUoGeyV5XdzCJN1M1Ac7WM9o=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=b1jZ0/N8JKMg8ZeSJnqnj90fC2b97jeGOSDXbbh/5foBEgosGDw/qAn9Kam7nObOj
+	 jbDruv2zv36w4Zst7DO3cG7xNM73FYHS9IOABCS/X+OWUV42ZNlyNAMd0xV0mvkMfP
+	 TYFw7loKOErSLlTKgqfQYqdv89Pa+VZgNnvQeqlCUS04cwe+Qa/I1LcLv6J/cTrUoh
+	 28/e9pvsfbJJwreu06ITAlJRprtBo8hS91dtWqmslcA7czAv+ldlPyxMY2KKAhR0Se
+	 8T7maSivXuVnm4RDsv95UkrOng/ww4TUyfYLfdIU4Ufp5axKkifJfNSe3N8Avyde6B
+	 0PA2sxv3zk0ZQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7159938111DC;
+	Thu, 10 Apr 2025 01:10:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
-	<shenjian15@huawei.com>, <wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <jonathan.cameron@huawei.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v2 6/7] net: hibmcge: fix not restore rx pause mac
- addr after reset issue
-To: Jakub Kicinski <kuba@kernel.org>
-References: <20250403135311.545633-1-shaojijie@huawei.com>
- <20250403135311.545633-7-shaojijie@huawei.com>
- <20250404075804.42ccf6f0@kernel.org>
- <b3aafd85-cb58-4046-88df-2b3566e2497d@huawei.com>
- <20250407101129.48048623@kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20250407101129.48048623@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3 net 1/2] net: phy: move phy_link_change() prior to
+ mdio_bus_phy_may_suspend()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174424743226.3099560.4640184487712612410.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Apr 2025 01:10:32 +0000
+References: <20250407093900.2155112-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20250407093900.2155112-1-vladimir.oltean@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, florian.fainelli@broadcom.com,
+ wei.fang@nxp.com, rmk+kernel@armlinux.org.uk
 
+Hello:
 
-on 2025/4/8 1:11, Jakub Kicinski wrote:
-> On Mon, 7 Apr 2025 09:06:42 +0800 Jijie Shao wrote:
->> on 2025/4/4 22:58, Jakub Kicinski wrote:
->>> On Thu, 3 Apr 2025 21:53:10 +0800 Jijie Shao wrote:
->>>> In normal cases, the driver must ensure that the value
->>>> of rx pause mac addr is the same as the MAC address of
->>>> the network port. This ensures that the driver can
->>>> receive pause frames whose destination address is
->>>> the MAC address of the network port.
->>> I thought "in normal cases" pause frames use 01:80:C2:00:00:01
->>> as the destination address!?
->> No, the address set in .ndo_set_mac_address() is used.
->> 01:80:C2:00:00:01 is supported by default. No additional configuration is required.
-> Are you talking about source or destination?
-> How does the sender learn the receiver's address? Via LLDP?
-> You need to explain all this much better in the commit message.
-> It is not "normal" for a switched Ethernet network.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
+On Mon,  7 Apr 2025 12:38:59 +0300 you wrote:
+> In an upcoming change, mdio_bus_phy_may_suspend() will need to
+> distinguish a phylib-based PHY client from a phylink PHY client.
+> For that, it will need to compare the phydev->phy_link_change() function
+> pointer with the eponymous phy_link_change() provided by phylib.
+> 
+> To avoid forward function declarations, the default PHY link state
+> change method should be moved upwards. There is no functional change
+> associated with this patch, it is only to reduce the noise from a real
+> bug fix.
+> 
+> [...]
 
-ok,
+Here is the summary with links:
+  - [v3,net,1/2] net: phy: move phy_link_change() prior to mdio_bus_phy_may_suspend()
+    https://git.kernel.org/netdev/net/c/f40a673d6b4a
+  - [v3,net,2/2] net: phy: allow MDIO bus PM ops to start/stop state machine for phylink-controlled PHY
+    https://git.kernel.org/netdev/net/c/fc75ea20ffb4
 
-Thanks
-Jijie Shao
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
