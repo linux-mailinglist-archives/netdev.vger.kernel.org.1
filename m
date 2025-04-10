@@ -1,118 +1,183 @@
-Return-Path: <netdev+bounces-181321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 117E0A846EA
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 16:53:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F705A84733
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 17:02:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 836134A1296
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:52:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB72C9A1B93
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:55:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33FEE28CF5F;
-	Thu, 10 Apr 2025 14:52:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="izl1nAj3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF52128EA5C;
+	Thu, 10 Apr 2025 14:54:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dediextern.your-server.de (dediextern.your-server.de [85.10.215.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A608828CF5D
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 14:52:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C3228CF53;
+	Thu, 10 Apr 2025 14:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.215.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744296730; cv=none; b=pF+zRUfodXG5YV52FEUb6A5FM0gz4WgWueDLP/lEfRlrn23tgCoRYPYUc3Pez9bxD24bZVq7EpUN7XXVOkVKiJYRYa6bPEtYtbSQ24sX93L/i06+SzynTIhEEHtytbFIRDvGQ4v7+5AFu981GCl/WabcWUdTaxNJmG3aooRPEwM=
+	t=1744296893; cv=none; b=ohuvyWI03hITdeYqGi8X1dNp2XBjOmpHSsWgMVqwW+errYRzJcyvm4RQWWc5R0fXOMAbPD3Llj7HUzh2Wc/ZYMGFNU+kyWhc5Nlrs3Q09iMXkLZn6EguEgrwdkAnjbqWh09VZWZPHtA+6ctSMTyea1Cww0y6f02Ur6Ot+m92rds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744296730; c=relaxed/simple;
-	bh=ZIicm+KVsGD+UXLKJQ6xU43zvhsJHugkh0vLpA6ilxk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nPa32BZaodGJvyL7yylLITGGWbNe87uteB/g9zMEU2R9x5HQASt7IBMqPwDiVn9u3MBWGFklieqUHqpzWVjUeSy5bOTOtN8Z91uU/NClWvlm0MIIAbCMnD41ixbzxrK+Y0u7s3BpnfCPhP4Z9vw7MmVcHoCqX0MjLa5LZXM4D6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=izl1nAj3; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-306b51e30ffso856163a91.1
-        for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 07:52:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744296728; x=1744901528; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Z2Z/UC7GMxO7YogACXn6KcfTpVXYjk8lDSafrd3aGw=;
-        b=izl1nAj3UVTkithmtbXKWdZ3RPoDf6Cu2DSf5BRMbhaGXsQGkJt8XoSuU3F+6bP4Bf
-         8wKrWXUFRTx90ueNEW+ZZAU0UxU1P34dio7x/Gc80M6t6zdbPdT2DFE4XJRz7GGmFtgt
-         /UdSJxIsEVis0kvs2ZYnlKLHeSJl7PQ2hYJtDgda6xLip96ccKMglzQmoV/FdQM6WGE0
-         NecIFr2TC5yQaUaKN4TzyRTFDeB3WvR0pN8XxKdHikr0/Il7jt6JtuNQ0J8ymnLwOG2w
-         MudSavFIC8ba4t6X7Z35VKt3G2dsiCteELzBCktXpC9xi61GhECom2/wqVnFAoLhcTRm
-         EU7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744296728; x=1744901528;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Z2Z/UC7GMxO7YogACXn6KcfTpVXYjk8lDSafrd3aGw=;
-        b=uSeWkJEwHIu2SJnKzHIyaQIGAQ1LY6/fTWMLABHW4wPYxDgg1nayCGTMHcpghvpLuZ
-         yU7qtF9dmw4f5f3OArIk9XlXJ4VxuF8VQ1cRIoMQhzZpB6mml/i6yMQoOeXjYAGk99Ma
-         X17WxKtpEmlNCBf+Kl8LTbKtGQm9LMXOxwxB0Uuj8bKV+JIf9EtSEy8H2EPNN+CUc+ly
-         jAwp2wAJn7djId3hHyqOb+vcxs+5T1Ol9b26NZTjzWdVJsy1vAEg5Lu29hstwPhqF/0u
-         //yntabbQz/Ul9XL0O7L08oGaD7a8cqV8hK0yC1/4EKUMiZndRXD6bikLEtgE+ykRvui
-         +jNA==
-X-Forwarded-Encrypted: i=1; AJvYcCXdiC4J9bn/h6y562yuZW8H4fOQoYjD3YaaHphiFoNessI5l8jZaXl2STBxilJgZNss45jHhm4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyO6VQPXeJUilqrWM6W3HBhTJUYElg4GL+ddIk6jdBBRFI/pdi1
-	ATSRtDV+LL2JPzSrVnriONunnYhd3k8h/DNZTeK9U+NaiDrLNhxqizIkafCNR1l59E/4YmcvpWE
-	/mA==
-X-Google-Smtp-Source: AGHT+IGZay7VOQfADYHvwp0kpNoQEUaWaWhAXxEPULjNq/g/UaMADWvkJQ5d2IT2MEsdoUp5QTqBbaB3uao=
-X-Received: from pjvf15.prod.google.com ([2002:a17:90a:da8f:b0:2fc:2c9c:880])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5844:b0:2ee:db8a:2a01
- with SMTP id 98e67ed59e1d1-307e9b43a9dmr3689922a91.30.1744296727781; Thu, 10
- Apr 2025 07:52:07 -0700 (PDT)
-Date: Thu, 10 Apr 2025 07:52:05 -0700
-In-Reply-To: <BN9PR11MB52769DDEE406798D028BC17D8CB72@BN9PR11MB5276.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1744296893; c=relaxed/simple;
+	bh=zuz3T/1PyoNFOubzZPdbLb5UbtDaeeumVWQCB/KASwo=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:Content-Type; b=FdrsyP0bWnv1vmooHo00Fz+rqyUzCtsGjvu2er92xx5do6ziJgXqKo4/ec52UixiKGto8f3e7ocxiH8k92Q9930K3nAQiAkXs2iwoFnWGKGQl7JEwLYuAMeosw7lVTHH++Cyx/3ggxziTw5l6weCfKV1vAuzDt85H46vH8YKjLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de; spf=pass smtp.mailfrom=hetzner-cloud.de; arc=none smtp.client-ip=85.10.215.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hetzner-cloud.de
+Received: from sslproxy01.your-server.de ([78.46.139.224])
+	by dediextern.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
+	id 1u2tIc-000FfK-Nh; Thu, 10 Apr 2025 16:54:38 +0200
+Received: from [2a0d:3344:1523:1f10:f118:b2d4:edbb:54af]
+	by sslproxy01.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
+	id 1u2tIc-000H9S-1X;
+	Thu, 10 Apr 2025 16:54:38 +0200
+Message-ID: <ff7ca6ea-a122-4d7d-9ef2-d091cbdd96d2@hetzner-cloud.de>
+Date: Thu, 10 Apr 2025 16:54:35 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250404211449.1443336-1-seanjc@google.com> <20250404211449.1443336-8-seanjc@google.com>
- <BN9PR11MB52769DDEE406798D028BC17D8CB72@BN9PR11MB5276.namprd11.prod.outlook.com>
-Message-ID: <Z_fbFcT3gxNK_dWr@google.com>
-Subject: Re: [PATCH 7/7] irqbypass: Use xarray to track producers and consumers
-From: Sean Christopherson <seanjc@google.com>
-To: Kevin Tian <kevin.tian@intel.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Alex Williamson <alex.williamson@redhat.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	David Matlack <dmatlack@google.com>, Like Xu <like.xu.linux@gmail.com>, 
-	Yong He <alexyonghe@tencent.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+To: Michal Kubiak <michal.kubiak@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Jay Vosburgh
+ <jv@jvosburgh.net>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ sdn@hetzner-cloud.de
+References: <d33f0ab4-4dc4-49cd-bbd0-055f58dd6758@hetzner-cloud.de>
+ <Z/fWHYETBYQuCno5@localhost.localdomain>
+Content-Language: en-US
+From: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+Autocrypt: addr=marcus.wichelmann@hetzner-cloud.de; keydata=
+ xsFNBGJGrHIBEADXeHfBzzMvCfipCSW1oRhksIillcss321wYAvXrQ03a9VN2XJAzwDB/7Sa
+ N2Oqs6JJv4u5uOhaNp1Sx8JlhN6Oippc6MecXuQu5uOmN+DHmSLObKVQNC9I8PqEF2fq87zO
+ DCDViJ7VbYod/X9zUHQrGd35SB0PcDkXE5QaPX3dpz77mXFFWs/TvP6IvM6XVKZce3gitJ98
+ JO4pQ1gZniqaX4OSmgpHzHmaLCWZ2iU+Kn2M0KD1+/ozr/2bFhRkOwXSMYIdhmOXx96zjqFV
+ vIHa1vBguEt/Ax8+Pi7D83gdMCpyRCQ5AsKVyxVjVml0e/FcocrSb9j8hfrMFplv+Y43DIKu
+ kPVbE6pjHS+rqHf4vnxKBi8yQrfIpQqhgB/fgomBpIJAflu0Phj1nin/QIqKfQatoz5sRJb0
+ khSnRz8bxVM6Dr/T9i+7Y3suQGNXZQlxmRJmw4CYI/4zPVcjWkZyydq+wKqm39SOo4T512Nw
+ fuHmT6SV9DBD6WWevt2VYKMYSmAXLMcCp7I2EM7aYBEBvn5WbdqkamgZ36tISHBDhJl/k7pz
+ OlXOT+AOh12GCBiuPomnPkyyIGOf6wP/DW+vX6v5416MWiJaUmyH9h8UlhlehkWpEYqw1iCA
+ Wn6TcTXSILx+Nh5smWIel6scvxho84qSZplpCSzZGaidHZRytwARAQABzTZNYXJjdXMgV2lj
+ aGVsbWFubiA8bWFyY3VzLndpY2hlbG1hbm5AaGV0em5lci1jbG91ZC5kZT7CwZgEEwEIAEIW
+ IQQVqNeGYUnoSODnU2dJ0we/n6xHDgUCYkascgIbAwUJEswDAAULCQgHAgMiAgEGFQoJCAsC
+ BBYCAwECHgcCF4AACgkQSdMHv5+sRw4BNxAAlfufPZnHm+WKbvxcPVn6CJyexfuE7E2UkJQl
+ s/JXI+OGRhyqtguFGbQS6j7I06dJs/whj9fOhOBAHxFfMG2UkraqgAOlRUk/YjA98Wm9FvcQ
+ RGZe5DhAekI5Q9I9fBuhxdoAmhhKc/g7E5y/TcS1s2Cs6gnBR5lEKKVcIb0nFzB9bc+oMzfV
+ caStg+PejetxR/lMmcuBYi3s51laUQVCXV52bhnv0ROk0fdSwGwmoi2BDXljGBZl5i5n9wuQ
+ eHMp9hc5FoDF0PHNgr+1y9RsLRJ7sKGabDY6VRGp0MxQP0EDPNWlM5RwuErJThu+i9kU6D0e
+ HAPyJ6i4K7PsjGVE2ZcvOpzEr5e46bhIMKyfWzyMXwRVFuwE7erxvvNrSoM3SzbCUmgwC3P3
+ Wy30X7NS5xGOCa36p2AtqcY64ZwwoGKlNZX8wM0khaVjPttsynMlwpLcmOulqABwaUpdluUg
+ soqKCqyijBOXCeRSCZ/KAbA1FOvs3NnC9nVqeyCHtkKfuNDzqGY3uiAoD67EM/R9N4QM5w0X
+ HpxgyDk7EC1sCqdnd0N07BBQrnGZACOmz8pAQC2D2coje/nlnZm1xVK1tk18n6fkpYfR5Dnj
+ QvZYxO8MxP6wXamq2H5TRIzfLN1C2ddRsPv4wr9AqmbC9nIvfIQSvPMBx661kznCacANAP/O
+ wU0EYkascgEQAK15Hd7arsIkP7knH885NNcqmeNnhckmu0MoVd11KIO+SSCBXGFfGJ2/a/8M
+ y86SM4iL2774YYMWePscqtGNMPqa8Uk0NU76ojMbWG58gow2dLIyajXj20sQYd9RbNDiQqWp
+ RNmnp0o8K8lof3XgrqjwlSAJbo6JjgdZkun9ZQBQFDkeJtffIv6LFGap9UV7Y3OhU+4ZTWDM
+ XH76ne9u2ipTDu1pm9WeejgJIl6A7Z/7rRVpp6Qlq4Nm39C/ReNvXQIMT2l302wm0xaFQMfK
+ jAhXV/2/8VAAgDzlqxuRGdA8eGfWujAq68hWTP4FzRvk97L4cTu5Tq8WIBMpkjznRahyTzk8
+ 7oev+W5xBhGe03hfvog+pA9rsQIWF5R1meNZgtxR+GBj9bhHV+CUD6Fp+M0ffaevmI5Untyl
+ AqXYdwfuOORcD9wHxw+XX7T/Slxq/Z0CKhfYJ4YlHV2UnjIvEI7EhV2fPhE4WZf0uiFOWw8X
+ XcvPA8u0P1al3EbgeHMBhWLBjh8+Y3/pm0hSOZksKRdNR6PpCksa52ioD+8Z/giTIDuFDCHo
+ p4QMLrv05kA490cNAkwkI/yRjrKL3eGg26FCBh2tQKoUw2H5pJ0TW67/Mn2mXNXjen9hDhAG
+ 7gU40lS90ehhnpJxZC/73j2HjIxSiUkRpkCVKru2pPXx+zDzABEBAAHCwXwEGAEIACYWIQQV
+ qNeGYUnoSODnU2dJ0we/n6xHDgUCYkascgIbDAUJEswDAAAKCRBJ0we/n6xHDsmpD/9/4+pV
+ IsnYMClwfnDXNIU+x6VXTT/8HKiRiotIRFDIeI2skfWAaNgGBWU7iK7FkF/58ys8jKM3EykO
+ D5lvLbGfI/jrTcJVIm9bXX0F1pTiu3SyzOy7EdJur8Cp6CpCrkD+GwkWppNHP51u7da2zah9
+ CQx6E1NDGM0gSLlCJTciDi6doAkJ14aIX58O7dVeMqmabRAv6Ut45eWqOLvgjzBvdn1SArZm
+ 7AQtxT7KZCz1yYLUgA6TG39bhwkXjtcfT0J4967LuXTgyoKCc969TzmwAT+pX3luMmbXOBl3
+ mAkwjD782F9sP8D/9h8tQmTAKzi/ON+DXBHjjqGrb8+rCocx2mdWLenDK9sNNsvyLb9oKJoE
+ DdXuCrEQpa3U79RGc7wjXT9h/8VsXmA48LSxhRKn2uOmkf0nCr9W4YmrP+g0RGeCKo3yvFxS
+ +2r2hEb/H7ZTP5PWyJM8We/4ttx32S5ues5+qjlqGhWSzmCcPrwKviErSiBCr4PtcioTBZcW
+ VUssNEOhjUERfkdnHNeuNBWfiABIb1Yn7QC2BUmwOvN2DsqsChyfyuknCbiyQGjAmj8mvfi/
+ 18FxnhXRoPx3wr7PqGVWgTJD1pscTrbKnoI1jI1/pBCMun+q9v6E7JCgWY181WjxgKSnen0n
+ wySmewx3h/yfMh0aFxHhvLPxrO2IEQ==
+Subject: Re: [BUG] ixgbe: Detected Tx Unit Hang (XDP)
+In-Reply-To: <Z/fWHYETBYQuCno5@localhost.localdomain>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: marcus.wichelmann@hetzner-cloud.de
+X-Virus-Scanned: Clear (ClamAV 1.0.7/27604/Thu Apr 10 10:55:17 2025)
 
-On Thu, Apr 10, 2025, Kevin Tian wrote:
-> > From: Sean Christopherson <seanjc@google.com>
-> > Sent: Saturday, April 5, 2025 5:15 AM
-> > 
-> > Track IRQ bypass produsers and consumers using an xarray to avoid the
-> > O(2n)
-> > insertion time associated with walking a list to check for duplicate
-> > entries, and to search for an partner.
-> > 
-> > At low (tens or few hundreds) total producer/consumer counts, using a list
-> > is faster due to the need to allocate backing storage for xarray.  But as
-> > count creeps into the thousands, xarray wins easily, and can provide
-> > several orders of magnitude better latency at high counts.  E.g. hundreds
-> > of nanoseconds vs. hundreds of milliseconds.
+Am 10.04.25 um 16:30 schrieb Michal Kubiak:
+> On Wed, Apr 09, 2025 at 05:17:49PM +0200, Marcus Wichelmann wrote:
+>> Hi,
+>>
+>> in a setup where I use native XDP to redirect packets to a bonding interface
+>> that's backed by two ixgbe slaves, I noticed that the ixgbe driver constantly
+>> resets the NIC with the following kernel output:
+>>
+>>   ixgbe 0000:01:00.1 ixgbe-x520-2: Detected Tx Unit Hang (XDP)
+>>     Tx Queue             <4>
+>>     TDH, TDT             <17e>, <17e>
+>>     next_to_use          <181>
+>>     next_to_clean        <17e>
+>>   tx_buffer_info[next_to_clean]
+>>     time_stamp           <0>
+>>     jiffies              <10025c380>
+>>   ixgbe 0000:01:00.1 ixgbe-x520-2: tx hang 19 detected on queue 4, resetting adapter
+>>   ixgbe 0000:01:00.1 ixgbe-x520-2: initiating reset due to tx timeout
+>>   ixgbe 0000:01:00.1 ixgbe-x520-2: Reset adapter
+>>
+>> This only occurs in combination with a bonding interface and XDP, so I don't
+>> know if this is an issue with ixgbe or the bonding driver.
+>> I first discovered this with Linux 6.8.0-57, but kernel 6.14.0 and 6.15.0-rc1
+>> show the same issue.
+>>
+>>
+>> I managed to reproduce this bug in a lab environment. Here are some details
+>> about my setup and the steps to reproduce the bug:
+>>
+>> [...]
+>>
+>> Do you have any ideas what may be causing this issue or what I can do to
+>> diagnose this further?
+>>
+>> Please let me know when I should provide any more information.
+>>
+>>
+>> Thanks!
+>> Marcus
+>>
 > 
-> add a link to the original data collected by Like.
-> 
-> > 
-> > Cc: Oliver Upton <oliver.upton@linux.dev>
-> > Cc: David Matlack <dmatlack@google.com>
-> > Cc: Like Xu <like.xu.linux@gmail.com>
-> > Reported-by: Yong He <alexyonghe@tencent.com>
-> > Closes: https://bugzilla.kernel.org/show_bug.cgi?id=217379
-> > Link: https://lore.kernel.org/all/20230801115646.33990-1-likexu@tencent.com
+> Hi Marcus,
 
-I linked Like's submission here, which has his numbers.  Would it be helpful to
-explictly call this out in the meat of the changelog?
+Hi Michal,
+
+thank you for looking into it. And not even 24 hours after my report, I'm
+very impressed! ;)
+
+> I have just successfully reproduced the problem on our lab machine. What
+> is interesting is that I do not seem to have to use a bonding interface
+> to get the "Tx timeout" that causes the adapter to reset.
+
+Interesting. I just tried again but had no luck yet with reproducing it
+without a bonding interface. May I ask how your setup looks like?
+
+> I will try to debug the problem more closely and let you know of any
+> updates.
+> 
+> Thanks,
+> Michal
+
+Great!
+
+Marcus
+
 
