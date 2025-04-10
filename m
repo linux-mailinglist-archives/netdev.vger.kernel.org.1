@@ -1,165 +1,200 @@
-Return-Path: <netdev+bounces-181311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0A07A84619
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 16:20:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB1FEA8462B
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 16:23:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7970C1B60FBB
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:17:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F8129A3CB5
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:17:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F385228C5B9;
-	Thu, 10 Apr 2025 14:16:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="BwJMNJvC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C8C52853E3;
+	Thu, 10 Apr 2025 14:17:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 446731C174A
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 14:16:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C23DA1519A1;
+	Thu, 10 Apr 2025 14:17:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744294619; cv=none; b=Mm28w7aPCXhR84h5iCCBfvgU77Al3uFLHiRuok8Er9PB39mBVVVa3Dw6iTD1by1mJNesNcoGFzy1BqwdVIRDt+K8c/HpD6uY0lNBHut4n+TXGG4IKfCXKkZbnwamzHt6GHKFApLxk3MJi+r5odBSe7x72VtfXHzW6lElNB20Res=
+	t=1744294630; cv=none; b=K03kS0yBja1mi3DlYCl5iM3XBCM23nsz9Czj0hVOcoi3QBaLUMykkD42h13p/MZRbpRuah7uCLB3aGUsvBm2HXCxkJP3VcEE5qEzj/a2631tIUWouAZS4xQBrFRUjtFCS3FSpAjN2jwnpBtlLeVznqzalTgx7OVLfQHf8P2KmZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744294619; c=relaxed/simple;
-	bh=bOHvdimLqDaAbnABZ4HW9IQe4zFEb1qT6LsJTR6qRu8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kcuKoe9jiQaNyqRhbKXPQN+jk47tOdaeZrIneBWdpw1JoOv18Yt98btVwR0z6LRRuny7qVPmuZnm6Tyzuf7uR2lz0voIRlXq/5i/UDc4F8p5IOvD5VEvNX0C2391b3LojGzX8TWCPnC8E6wqSYt3reXUD+UFdSzi/QIYOJeBvr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=BwJMNJvC; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-abbb12bea54so170184866b.0
-        for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 07:16:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1744294614; x=1744899414; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=UlZPMsmoVGB6t2rST7vEZ644AG6qFhEWTnum5nMbQnw=;
-        b=BwJMNJvCOsPbF3ucBUDTEbrxjm6Go6VD6dDpQnX2QXebOqtD65U7hASn4ymdLntXs7
-         eAv2u5GCpNnbsySzdmdSa9zLW2ErmIB36ryB8o2dtiFiZj9Y+z4/0PtK/jNcuOuPICQ4
-         GagFCJFk/36WdBK09loE4B5wFGmq9NiGFuBJJ1q+o2Eedc4fSkJR32F3kXRsC5Rxt/bQ
-         LJ1qLZbXAp+UaGzJzu0GLNB9sET/WCAX1gz/dsmvgkx8IqTiHNqmrQrC02eryezmYA4o
-         9xy0LV5ejp/NzJj/SrrDfOJpcF5GQ7VeqkvLqtdel3U3AyhJ366/LZZqcwIc5eE1vWUD
-         eleg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744294614; x=1744899414;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UlZPMsmoVGB6t2rST7vEZ644AG6qFhEWTnum5nMbQnw=;
-        b=sJ/uNG5IndrMM6pUeQfb5oOidPxt5OsMLEvlPzhi5eazSXRpX2dAHVYZIZLCWX94me
-         S6JHXwpt3MyfZ05hP9APBMH0A51r/sSxSVjYypiVuccvYmA0x7RxUFCtqGR62YqW1dBr
-         e2ieiqu0ZyxFrquKcAswhohVSu480B3dLfsgfjHTlnKyfoO+SgqKWVhPuQGwVThdXrd7
-         L3C9rmKBRcu5S9FbBU0s3sUTjYoNS+QFGw4cyFMuw4KTJpf04rSNtD7Z9bMLPXkygIQI
-         3eBypbAqWd+2QaWwEdZjlh+r6U57vVNkYcTsOSz6YHQN90Y+zAaXStcNbRuMYG8+Ll3D
-         RcUA==
-X-Gm-Message-State: AOJu0YxQEcgbOqPyufi8FrS5qK3buGNGSpddiyhNBDC0OT+wuFKk71tA
-	392rNHcDSy5GXaeJ9X2iVyeZgknrm89HzYurPgiNyTGK0so9Hx3NDpKN6iriH4tG+eIpwc1IcCY
-	oonKAqHjTr2M7exLJNWBYwuMwRGF5A9Zq4v1Qmb/GDmBSIZU=
-X-Gm-Gg: ASbGncsKmSw0uuf8W3oLlj+b6BWl407V06sBsoOhMTyP7nKSbPiDItMht5FxrS8wFxO
-	6jKQdUSsN3kkdbTX4H2mhMZOvVSasOicpnTUGOIpcY1a4/smluKP5pFhdniRBz/SlHDDxKN3+EI
-	DlETcAZSp+pfI3fCKWii95bIFqshxLJh+atWGGU2D6ALrJyBNxYFL9aGotX88unUPwEtVXpYeXY
-	UGFa/3fklg5+krBMjgVogwtU1JMYzT74w+ttB7ys8/TOIoydddBZaXH0AQUbNDCmLTmvF8fcLeL
-	iMpLOBDgDi7RRilW3Vqeuyt68uwiC+XALoJG0ZoZ51kmgYtNouO5a/Xy4YvDzvotw75gr4VApso
-	5
-X-Google-Smtp-Source: AGHT+IEGkBT3acal4UyeSngNCtmRV8oa/MYqWgCOSt9yirlKqpb+QacYlcTKXCGRlIFeTs9Q7RldZQ==
-X-Received: by 2002:a17:906:5653:b0:aca:c8aa:5899 with SMTP id a640c23a62f3a-acac8aa5e19mr58880066b.22.1744294614336;
-        Thu, 10 Apr 2025 07:16:54 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:18b2:79f:732d:517c? ([2001:67c:2fbc:1:18b2:79f:732d:517c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acaa1cb40e3sm279365366b.122.2025.04.10.07.16.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Apr 2025 07:16:53 -0700 (PDT)
-Message-ID: <1d0f3363-1699-4d9b-93ba-fc9e38493e33@openvpn.net>
-Date: Thu, 10 Apr 2025 16:16:52 +0200
+	s=arc-20240116; t=1744294630; c=relaxed/simple;
+	bh=J3pfcUF75sH/E2NsoPd/DbihyZAVE6hTt4Gbs5k9DEk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fe1c2Nie+HY6oSSTsqj/FvAgSFd9qQ42FQm+vqO/irVLOoUtglSZ3JBfYN85WytpHrJf3pD+WlPn6jOkX7HkIg9LhktUXoJlDtw2e/AXokfUg9MKjhxhZLqx7eBRTMptgiIKQ2dWjuN/s2Zb3ydJe0KcN/03OGR5xRyO5bA5R4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1u2si7-0005OJ-FL; Thu, 10 Apr 2025 16:16:55 +0200
+Date: Thu, 10 Apr 2025 16:16:55 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: lvxiafei <xiafei_xupt@163.com>, coreteam@netfilter.org,
+	davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+	kadlec@netfilter.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
+	lvxiafei@sensetime.com, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com,
+	pablo@netfilter.org
+Subject: Re: [PATCH V3] netfilter: netns nf_conntrack: per-netns
+ net.netfilter.nf_conntrack_max sysctl
+Message-ID: <20250410141655.GA20644@breakpoint.cc>
+References: <20250409094206.GB17911@breakpoint.cc>
+ <20250410130531.17824-1-xiafei_xupt@163.com>
+ <20250410131717.GA14051@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v25 00/23] Introducing OpenVPN Data Channel
- Offload
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>,
- steffen.klassert@secunet.com, antony.antony@secunet.com,
- willemdebruijn.kernel@gmail.com, David Ahern <dsahern@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>, Shuah Khan <skhan@linuxfoundation.org>
-References: <20250407-b4-ovpn-v25-0-a04eae86e016@openvpn.net>
- <Z_fPzdq3PSw1efTW@krikkit>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- xsFNBFN3k+ABEADEvXdJZVUfqxGOKByfkExNpKzFzAwHYjhOb3MTlzSLlVKLRIHxe/Etj13I
- X6tcViNYiIiJxmeHAH7FUj/yAISW56lynAEt7OdkGpZf3HGXRQz1Xi0PWuUINa4QW+ipaKmv
- voR4b1wZQ9cZ787KLmu10VF1duHW/IewDx9GUQIzChqQVI3lSHRCo90Z/NQ75ZL/rbR3UHB+
- EWLIh8Lz1cdE47VaVyX6f0yr3Itx0ZuyIWPrctlHwV5bUdA4JnyY3QvJh4yJPYh9I69HZWsj
- qplU2WxEfM6+OlaM9iKOUhVxjpkFXheD57EGdVkuG0YhizVF4p9MKGB42D70pfS3EiYdTaKf
- WzbiFUunOHLJ4hyAi75d4ugxU02DsUjw/0t0kfHtj2V0x1169Hp/NTW1jkqgPWtIsjn+dkde
- dG9mXk5QrvbpihgpcmNbtloSdkRZ02lsxkUzpG8U64X8WK6LuRz7BZ7p5t/WzaR/hCdOiQCG
- RNup2UTNDrZpWxpwadXMnJsyJcVX4BAKaWGsm5IQyXXBUdguHVa7To/JIBlhjlKackKWoBnI
- Ojl8VQhVLcD551iJ61w4aQH6bHxdTjz65MT2OrW/mFZbtIwWSeif6axrYpVCyERIDEKrX5AV
- rOmGEaUGsCd16FueoaM2Hf96BH3SI3/q2w+g058RedLOZVZtyQARAQABzSdBbnRvbmlvIFF1
- YXJ0dWxsaSA8YW50b25pb0BvcGVudnBuLm5ldD7Cwa0EEwEIAFcCGwMFCwkIBwMFFQoJCAsF
- FgIDAQACHgECF4AFCRWQ2TIWIQTKvaEoIBfCZyGYhcdI8My2j1nRTAUCYRUquBgYaGtwczov
- L2tleXMub3BlbnBncC5vcmcACgkQSPDMto9Z0UzmcxAAjzLeD47We0R4A/14oDKlZxXO0mKL
- fCzaWFsdhQCDhZkgxoHkYRektK2cEOh4Vd+CnfDcPs/iZ1i2+Zl+va79s4fcUhRReuwi7VCg
- 7nHiYSNC7qZo84Wzjz3RoGYyJ6MKLRn3zqAxUtFECoS074/JX1sLG0Z3hi19MBmJ/teM84GY
- IbSvRwZu+VkJgIvZonFZjbwF7XyoSIiEJWQC+AKvwtEBNoVOMuH0tZsgqcgMqGs6lLn66RK4
- tMV1aNeX6R+dGSiu11i+9pm7sw8tAmsfu3kQpyk4SB3AJ0jtXrQRESFa1+iemJtt+RaSE5LK
- 5sGLAO+oN+DlE0mRNDQowS6q/GBhPCjjbTMcMfRoWPCpHZZfKpv5iefXnZ/xVj7ugYdV2T7z
- r6VL2BRPNvvkgbLZgIlkWyfxRnGh683h4vTqRqTb1wka5pmyBNAv7vCgqrwfvaV1m7J9O4B5
- PuRjYRelmCygQBTXFeJAVJvuh2efFknMh41R01PP2ulXAQuVYEztq3t3Ycw6+HeqjbeqTF8C
- DboqYeIM18HgkOqRrn3VuwnKFNdzyBmgYh/zZx/dJ3yWQi/kfhR6TawAwz6GdbQGiu5fsx5t
- u14WBxmzNf9tXK7hnXcI24Z1z6e5jG6U2Swtmi8sGSh6fqV4dBKmhobEoS7Xl496JN2NKuaX
- jeWsF2rOwE0EZmhJFwEIAOAWiIj1EYkbikxXSSP3AazkI+Y/ICzdFDmiXXrYnf/mYEzORB0K
- vqNRQOdLyjbLKPQwSjYEt1uqwKaD1LRLbA7FpktAShDK4yIljkxhvDI8semfQ5WE/1Jj/I/Q
- U+4VXhkd6UvvpyQt/LiWvyAfvExPEvhiMnsg2zkQbBQ/M4Ns7ck0zQ4BTAVzW/GqoT2z03mg
- p1FhxkfzHMKPQ6ImEpuY5cZTQwrBUgWif6HzCtQJL7Ipa2fFnDaIHQeiJG0RXl/g9x3YlwWG
- sxOFrpWWsh6GI0Mo2W2nkinEIts48+wNDBCMcMlOaMYpyAI7fT5ziDuG2CBA060ZT7qqdl6b
- aXUAEQEAAcLBfAQYAQgAJhYhBMq9oSggF8JnIZiFx0jwzLaPWdFMBQJmaEkXAhsMBQkB4TOA
- AAoJEEjwzLaPWdFMbRUP/0t5FrjF8KY6uCU4Tx029NYKDN9zJr0CVwSGsNfC8WWonKs66QE1
- pd6xBVoBzu5InFRWa2ed6d6vBw2BaJHC0aMg3iwwBbEgPn4Jx89QfczFMJvFm+MNc2DLDrqN
- zaQSqBzQ5SvUjxh8lQ+iqAhi0MPv4e2YbXD0ROyO+ITRgQVZBVXoPm4IJGYWgmVmxP34oUQh
- BM7ipfCVbcOFU5OPhd9/jn1BCHzir+/i0fY2Z/aexMYHwXUMha/itvsBHGcIEYKk7PL9FEfs
- wlbq+vWoCtUTUc0AjDgB76AcUVxxJtxxpyvES9aFxWD7Qc+dnGJnfxVJI0zbN2b37fX138Bf
- 27NuKpokv0sBnNEtsD7TY4gBz4QhvRNSBli0E5bGUbkM31rh4Iz21Qk0cCwR9D/vwQVsgPvG
- ioRqhvFWtLsEt/xKolOmUWA/jP0p8wnQ+3jY6a/DJ+o5LnVFzFqbK3fSojKbfr3bY33iZTSj
- DX9A4BcohRyqhnpNYyHL36gaOnNnOc+uXFCdoQkI531hXjzIsVs2OlfRufuDrWwAv+em2uOT
- BnRX9nFx9kPSO42TkFK55Dr5EDeBO3v33recscuB8VVN5xvh0GV57Qre+9sJrEq7Es9W609a
- +M0yRJWJEjFnMa/jsGZ+QyLD5QTL6SGuZ9gKI3W1SfFZOzV7hHsxPTZ6
-Organization: OpenVPN Inc.
-In-Reply-To: <Z_fPzdq3PSw1efTW@krikkit>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250410131717.GA14051@breakpoint.cc>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On 10/04/2025 16:03, Sabrina Dubroca wrote:
-[...]
-> For the series:
-> Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+Florian Westphal <fw@strlen.de> wrote:
+> lvxiafei <xiafei_xupt@163.com> wrote:
+> > Florian Westphal <fw@strlen.de> wrote:
+> > > I suggest to remove nf_conntrack_max as a global variable,
+> > > make net.nf_conntrack_max use init_net.nf_conntrack_max too internally,
+> > > so in the init_net both sysctls remain the same.
+> > 
+> > The nf_conntrack_max global variable is a system calculated
+> > value and should not be removed.
+> > nf_conntrack_max = max_factor * nf_conntrack_htable_size;
 > 
-> Thanks again for your patience, Antonio.
+> Thats the default calculation for the initial sysctl value:
+> 
+> net/netfilter/nf_conntrack_standalone.c:                .data           = &nf_conntrack_max,
+> net/netfilter/nf_conntrack_standalone.c:                .data           = &nf_conntrack_max,
+> 
+> You can make an initial patch that replaces all occurences of
+> nf_conntrack_max with cnet->sysctl_conntrack_max
 
-Thank you (!) Sabrina for all the effort you've put during this long 
-journey.
-You've been of incredible help to the ovpn prototype and to me.
+Something like this:
 
-"And we're just getting started!"
-
-Regards,
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
-
+diff --git a/include/net/netfilter/nf_conntrack.h b/include/net/netfilter/nf_conntrack.h
+--- a/include/net/netfilter/nf_conntrack.h
++++ b/include/net/netfilter/nf_conntrack.h
+@@ -320,7 +320,6 @@ int nf_conntrack_hash_resize(unsigned int hashsize);
+ extern struct hlist_nulls_head *nf_conntrack_hash;
+ extern unsigned int nf_conntrack_htable_size;
+ extern seqcount_spinlock_t nf_conntrack_generation;
+-extern unsigned int nf_conntrack_max;
+ 
+ /* must be called with rcu read lock held */
+ static inline void
+@@ -360,6 +359,11 @@ static inline struct nf_conntrack_net *nf_ct_pernet(const struct net *net)
+ 	return net_generic(net, nf_conntrack_net_id);
+ }
+ 
++static inline unsigned int nf_conntrack_max(const struct net *net)
++{
++	return net->ct.sysctl_conntrack_max;
++}
++
+ int nf_ct_skb_network_trim(struct sk_buff *skb, int family);
+ int nf_ct_handle_fragments(struct net *net, struct sk_buff *skb,
+ 			   u16 zone, u8 family, u8 *proto, u16 *mru);
+diff --git a/include/net/netns/conntrack.h b/include/net/netns/conntrack.h
+--- a/include/net/netns/conntrack.h
++++ b/include/net/netns/conntrack.h
+@@ -102,6 +102,7 @@ struct netns_ct {
+ 	u8			sysctl_acct;
+ 	u8			sysctl_tstamp;
+ 	u8			sysctl_checksum;
++	unsigned int		sysctl_conntrack_max;
+ 
+ 	struct ip_conntrack_stat __percpu *stat;
+ 	struct nf_ct_event_notifier __rcu *nf_conntrack_event_cb;
+diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_conntrack_core.c
+index 7f8b245e287a..8ae9c22cfcb3 100644
+--- a/net/netfilter/nf_conntrack_core.c
++++ b/net/netfilter/nf_conntrack_core.c
+@@ -202,8 +202,6 @@ static void nf_conntrack_all_unlock(void)
+ unsigned int nf_conntrack_htable_size __read_mostly;
+ EXPORT_SYMBOL_GPL(nf_conntrack_htable_size);
+ 
+-unsigned int nf_conntrack_max __read_mostly;
+-EXPORT_SYMBOL_GPL(nf_conntrack_max);
+ seqcount_spinlock_t nf_conntrack_generation __read_mostly;
+ static siphash_aligned_key_t nf_conntrack_hash_rnd;
+ 
+@@ -1509,8 +1507,7 @@ static void gc_worker(struct work_struct *work)
+ 	gc_work = container_of(work, struct conntrack_gc_work, dwork.work);
+ 
+ 	i = gc_work->next_bucket;
+-	if (gc_work->early_drop)
+-		nf_conntrack_max95 = nf_conntrack_max / 100u * 95u;
++		nf_conntrack_max95 = nf_conntrack_max(&init_net) / 100u * 95u;
+ 
+ 	if (i == 0) {
+ 		gc_work->avg_timeout = GC_SCAN_INTERVAL_INIT;
+@@ -1648,13 +1645,14 @@ __nf_conntrack_alloc(struct net *net,
+ 		     gfp_t gfp, u32 hash)
+ {
+ 	struct nf_conntrack_net *cnet = nf_ct_pernet(net);
+-	unsigned int ct_count;
++	unsigned int ct_max, ct_count;
+ 	struct nf_conn *ct;
+ 
+ 	/* We don't want any race condition at early drop stage */
+ 	ct_count = atomic_inc_return(&cnet->count);
++	ct_max = nf_conntrack_max(&init_net);
+ 
+-	if (nf_conntrack_max && unlikely(ct_count > nf_conntrack_max)) {
++	if (ct_max && unlikely(ct_count > ct_max)) {
+ 		if (!early_drop(net, hash)) {
+ 			if (!conntrack_gc_work.early_drop)
+ 				conntrack_gc_work.early_drop = true;
+@@ -2650,7 +2648,7 @@ int nf_conntrack_init_start(void)
+ 	if (!nf_conntrack_hash)
+ 		return -ENOMEM;
+ 
+-	nf_conntrack_max = max_factor * nf_conntrack_htable_size;
++	init_net.ct.sysctl_conntrack_max = max_factor * nf_conntrack_htable_size;
+ 
+ 	nf_conntrack_cachep = kmem_cache_create("nf_conntrack",
+ 						sizeof(struct nf_conn),
+diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_conntrack_netlink.c
+index db23876a6016..f1938204b827 100644
+--- a/net/netfilter/nf_conntrack_netlink.c
++++ b/net/netfilter/nf_conntrack_netlink.c
+@@ -2608,7 +2608,7 @@ ctnetlink_stat_ct_fill_info(struct sk_buff *skb, u32 portid, u32 seq, u32 type,
+ 	if (nla_put_be32(skb, CTA_STATS_GLOBAL_ENTRIES, htonl(nr_conntracks)))
+ 		goto nla_put_failure;
+ 
+-	if (nla_put_be32(skb, CTA_STATS_GLOBAL_MAX_ENTRIES, htonl(nf_conntrack_max)))
++	if (nla_put_be32(skb, CTA_STATS_GLOBAL_MAX_ENTRIES, htonl(nf_conntrack_max(net))))
+ 		goto nla_put_failure;
+ 
+ 	nlmsg_end(skb, nlh);
+diff --git a/net/netfilter/nf_conntrack_standalone.c b/net/netfilter/nf_conntrack_standalone.c
+index 502cf10aab41..8a185dfd3261 100644
+--- a/net/netfilter/nf_conntrack_standalone.c
++++ b/net/netfilter/nf_conntrack_standalone.c
+@@ -615,7 +615,7 @@ enum nf_ct_sysctl_index {
+ static struct ctl_table nf_ct_sysctl_table[] = {
+ 	[NF_SYSCTL_CT_MAX] = {
+ 		.procname	= "nf_conntrack_max",
+-		.data		= &nf_conntrack_max,
++		.data		= &init_net.ct.sysctl_conntrack_max,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_dointvec,
+@@ -944,7 +944,7 @@ static struct ctl_table nf_ct_sysctl_table[] = {
+ static struct ctl_table nf_ct_netfilter_table[] = {
+ 	{
+ 		.procname	= "nf_conntrack_max",
+-		.data		= &nf_conntrack_max,
++		.data		= &init_net.ct.sysctl_conntrack_max,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_dointvec,
 
