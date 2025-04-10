@@ -1,157 +1,328 @@
-Return-Path: <netdev+bounces-181284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CAB0A84478
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 15:18:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3E05A84492
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 15:21:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6EDF177071
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 13:12:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71B58166FBA
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 13:16:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32CDE28C5B4;
-	Thu, 10 Apr 2025 13:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B550D2580D3;
+	Thu, 10 Apr 2025 13:16:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="U6Xav6ef"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="jF/YFLVZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2080.outbound.protection.outlook.com [40.107.244.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E97592857F7;
-	Thu, 10 Apr 2025 13:10:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744290623; cv=none; b=rfVK4jjF5g9jIt37HyS6CuQmbXYzCpAB+2mXGyPbLWI9uXHLXVuGK3ke1v4ySE65h8iGt6/tevztIlT3ZO613ElS82hFprJ2TzuU2ROQVx7wl3gSI+idaSuUQGmR5mrVZhxq8XCEPXlrd/vhgPg0xb+WvzMNQO55S8m0Um3x8SY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744290623; c=relaxed/simple;
-	bh=MoxeGQBB0DlHcBQSkAbqgT6ZAgbftqn1oFID8/wRUxw=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hPcqKnjgaPO8xnANmYN5k3c/3mJRa3hhcBf+jVSMtfPe2mxv452Z2npevbjrRaRf0NYyehdufmtRO21Khe9jmGciErr97k3hMyrIra159VZK7gW75xpjDQvPzujGRw46qVNeEjldIL2KiAJabnEtjhAHhuGKd4YAI63/L22yunQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=U6Xav6ef; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:To:From:Date:From:Sender:Reply-To:Subject:Date:
-	Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=wGP7jv8iNn4I7r6ejBZS9/y63Kx5RjV7Hlwbnu/j0BA=; b=U6Xav6efg0Aef+i5e7mS9u9Tpe
-	MOJE8G6fObtlsILpVVcRFZdesUNZf5meScKsUPS9X9Dw1NjWQuVzD9cWbKHkXQ0SpPrB8UUoR+lfn
-	bXxhZaQ4+NAetGoOq3pOpl+s7opP9pHSRNz1VbwpyN5ZUOz1+UotPZv1WG/g7xAF3oQw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u2rfS-008gOE-5o; Thu, 10 Apr 2025 15:10:06 +0200
-Date: Thu, 10 Apr 2025 15:10:06 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	linux-renesas-soc@vger.kernel.org,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [RFC PATCH net-next] net: phy: marvell: support DT
- configurations with only two LEDs
-Message-ID: <1cb6ec18-9abb-48d9-b9a2-ca79584d4d0d@lunn.ch>
-References: <20250408063136.5463-2-wsa+renesas@sang-engineering.com>
- <7f706127-aa48-4385-a7b8-f016e0ba52b7@lunn.ch>
- <Z_YZ3NiXb15wgDuY@shikoro>
- <0fe35fe3-b63c-478b-9674-a2522f582167@lunn.ch>
- <Z_d2CgxLKaEV3w8X@shikoro>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D92743A8C1;
+	Thu, 10 Apr 2025 13:16:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.80
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744291009; cv=fail; b=RsB+cFt9hBt3Gi9jLcODQT+fyQLLKbrsFNtMXxGn19GWPP72rE9l31ElNrO4AAcCfc75qlFOm8Zh/jN9+RxrYOwINJvFPcZuOIYSgyRBE+Yhnv8jRGSUwK2aoh21FzLm8CjtpYWdiQ2Gzxw6LUC9GHIOHCCRZV5cHxdo9HyiwO8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744291009; c=relaxed/simple;
+	bh=qzYjX+PcyfKV4V3KEsUPQngybEHnSojqqfAURApLEe4=;
+	h=Content-Type:Message-ID:Date:Subject:To:Cc:References:From:
+	 In-Reply-To:MIME-Version; b=XZoj/DXRVIArkHzuYmPeEzLAuA0DhbiNk+ZoqE+iqyMQZyPZXnnv1HgJ4r4RqRQ57OALiFXrfLX15EaSsQ/3eEHRyFF6qSo+3utvphaLnvAWvScyr5PqxbewrAzYriUx47ORVoCuT4UHotgC9o0VDojnCEywjXdYNOGzvOKipoo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=jF/YFLVZ; arc=fail smtp.client-ip=40.107.244.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=CPeK57BVrfWc8VswZM9ml3aHti0Y4O9Mb0D8wicho1+1U4g4PVisDvhuOuv09ifzuh20iZAQlMAZgSAiTTJmDmqH41jzrHKXQkFAictEhIWCx2TnqKWRp8Ofo6F47773RDdXTBetkqiVHAKmKvT0aXO8a7KI8gQld1g8gpfDzlNO2/IitusujWt9NKKOL4hW+zoMBCmFkHrKxqfhT2ny91m0BSKfzRhgtH1n4jUpiW0c1KwO11KWQbL9XtNwBwrUumPEIU9mSh+DtEHGwzFT00LyjSH8DcmzprmMIY7dS5MwgyS+2svisfCXbJ+xb4dLQpkWCZIDBy+NpswY3t5B/w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wcf4RDrAGCSBnRefF597cYmJ3PbYb3Pe4imzdPX6TkE=;
+ b=YCfn9hETjvwO/8WZ0zpV8sF9SSPhvGG3HQOkDKjQGchqzfQfQ/yAnY5vlOe+5dEY3VtlenIvEG3QiRIH45piOCJ3SroIPZFbESilKz2IXvRPjfJpeTFoJ8hC5u6yyIlpUqm3In9TA8ewxINC2CP7exuLo97LqeRPyRkckPhmt+65JduA5G2CDVSkRf6beaXr9X/TVrkYQ9KRmg7JHYO9NAEw3lMYgW1nutJJmhxKXWSMsRXDanFpW87LFuAcl7A5o8F8lcEu3sPeybYDuk9oD1vCkCbhsPU5m4Oe+kMMKfzKeYfwyLRXkGGWITBQkB05oR0il6mpQHxXkX+wrzx6VQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wcf4RDrAGCSBnRefF597cYmJ3PbYb3Pe4imzdPX6TkE=;
+ b=jF/YFLVZaAn56hLQHBqGq+c8LQH9YwOW/DUsyPwY55/ep7cbZLnTIGwd33UBzU+MYTEtvM81N1cx2/R9ihtYGPj7uaUDYdBYe+lcr/v1gvjsksM5Uac80kcsPf/StQLwmZ6vjQ0sbxBnEGn/j6DGOCaQRi51TViZ52pqcipEwCA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
+ by PH7PR12MB8156.namprd12.prod.outlook.com (2603:10b6:510:2b5::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.21; Thu, 10 Apr
+ 2025 13:16:45 +0000
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::46fb:96f2:7667:7ca5]) by PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::46fb:96f2:7667:7ca5%5]) with mapi id 15.20.8632.021; Thu, 10 Apr 2025
+ 13:16:45 +0000
+Content-Type: multipart/mixed; boundary="------------LM0DXO0z16PvcEfueyc1v2b3"
+Message-ID: <50c9530d-e274-4f89-8620-16afe0981239@amd.com>
+Date: Thu, 10 Apr 2025 15:16:39 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] drm/nouveau: Prevent signaled fences in pending list
+To: phasta@kernel.org, Lyude Paul <lyude@redhat.com>,
+ Danilo Krummrich <dakr@kernel.org>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Sabrina Dubroca <sd@queasysnail.net>,
+ Sumit Semwal <sumit.semwal@linaro.org>
+Cc: dri-devel@lists.freedesktop.org, nouveau@lists.freedesktop.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+ stable@vger.kernel.org
+References: <20250410092418.135258-2-phasta@kernel.org>
+ <20250410092418.135258-3-phasta@kernel.org>
+ <8583665a-6886-4245-be49-fd8839cfe212@amd.com>
+ <c737c89c7ce9174e349c61ab4e5712eee8946f13.camel@mailbox.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
+In-Reply-To: <c737c89c7ce9174e349c61ab4e5712eee8946f13.camel@mailbox.org>
+X-ClientProxiedBy: FR4P281CA0123.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:b9::15) To PH7PR12MB5685.namprd12.prod.outlook.com
+ (2603:10b6:510:13c::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z_d2CgxLKaEV3w8X@shikoro>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|PH7PR12MB8156:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8a17d161-e6a3-433b-a195-08dd7831f107
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|1800799024|366016|4053099003;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?ajhZSHpZNkhoWnRTK2FzeXRIRVlnVkt6OGNyV2RzQ0JYT0pwUjFKNit3THdw?=
+ =?utf-8?B?SURMemRoK25pVlhxN3BKZGhlQ1FvQ1ovSjBOSCtDb1JnSm1rOXRHb1IxZGFY?=
+ =?utf-8?B?a2RQTmVQc29BV2E0WmdETTFXRHdvTTBucmUzcGFRWGdySGpsRHNyZDRFZG10?=
+ =?utf-8?B?aGFEb1cxbStYTXF4bktIUTg0VXdrK1R1d25RWHdpd3pPcFl1UEhBSVF4cE5L?=
+ =?utf-8?B?akVEQ29YZXFJSy9wck8waFRyamVzY1E5UjN0cmxtL0dHOGZvcXhyRlcraFpH?=
+ =?utf-8?B?RHZBN2h2K0QxNWJSM2h1NDBBeUdqdVdQN0hxeWZzWGMyUzk0cS90S09RNGNR?=
+ =?utf-8?B?a3pxRmNJMVZFWWtKNEJzZzJxemtkWGN5OGRmL2l6ZTNqMjRleXZ2aWp2VXVk?=
+ =?utf-8?B?V0ZUWGdjQ0xZenJXQmlsL3RMblpwcUoxWEpyQzJ3N0dEYktoL1l1MWdvMVo3?=
+ =?utf-8?B?MjZ4ckVud0dZQWpMdHUxQ05tanVZc0FJZGw0Qk9IeGx6N3RrS2Eyd2M3d2Mv?=
+ =?utf-8?B?aXU5a2F1M3FFSkpHQ1hmVXpDQUxnNTczdk5qQVA5VFhadHhqdmwvUVZxb3FW?=
+ =?utf-8?B?ZzVoL2lZQURDUkRsajl5TlgvS2lDS1c5aFBEckQvWlUyVG9RK01nbGhxa216?=
+ =?utf-8?B?cW9NUmNoNXZlbVh4cGlDVkFkTzM4UW5SYUlLS3pnY0kzb3lHSjNRYmpqY20z?=
+ =?utf-8?B?Y1lDRkdxV0hBdFJoK1BUbDFzMXNnc2ZjRnE2ZFJkYTg4Nm05dFpNVGdTNXhu?=
+ =?utf-8?B?cFhxMzRWOFdCNXp5dmxnaHpqREVtMU5CZHcvREJVcktaNHBpelgvd0l4b3A1?=
+ =?utf-8?B?Ukl0TzBkdSswbnVBcldSUjZoMC9ucTQ0cStMeC9HS1k0YkJrcit4RksvbGhn?=
+ =?utf-8?B?cmtTOWZadjZZdXM4UGNoenREYzVMMWgwRFZOWjhkMEVhQ0FLK2dMbENhaHVu?=
+ =?utf-8?B?Z2ZibkVOOHQ4Mm5NMUVZVjBqbUplekFJMitkWDc3OGFlUXcxMTdYbFoxUXFv?=
+ =?utf-8?B?ejJyeWlRWHlhSHQvc0VZYmlWTFhoWVY2eUxTQVZPOTZlckhJalViOXRyb0ts?=
+ =?utf-8?B?WlhJYTBreHhBL25sZUlEZ1Nva0VaV2JtM2d4KzgxT1NvOFdYYWR1V0FJQW9k?=
+ =?utf-8?B?SlNxb3JJUTJhUHpCR2RhZVo2bVBOZVF1NGwrY3RDNXFYV0s5bCt3SlZ1NU90?=
+ =?utf-8?B?cWVrVXNZN3ZCbElHOWZYQ256cHFHK3R4YnZ3TThTYTI4cGt6NFVtbzFCbFp1?=
+ =?utf-8?B?R0hPaUJIeFpNYW1uZENLRlA5dTlTOXhpT2E2OCtuanRQVXZla21nQlVMaE9S?=
+ =?utf-8?B?NHoxU3hyaHc5aTVzT1drSjhsWER0ci95T3N1cTJFbEs0TW9lTHA2aE8rVlI5?=
+ =?utf-8?B?NmpSa3ZuT2VjeENZdHdYL0ZKQ1pyNGgreFFUWjVvUmJkYlpwTFp2UEI2dnFM?=
+ =?utf-8?B?cDZERmVSSkUzZXh1dmFsbHRzb2F2RlVxTGVEZmJROEMwbzNuWHVuUjdpTE9C?=
+ =?utf-8?B?WHJ4SXJCMWxXZXdyNTRuQnR3R2VTODRGUXdSV1d2REZyK1loVDFDd0dKa01i?=
+ =?utf-8?B?bWFMaEdLWWUxYUVnTWpBZUhFVG9YZFlodGNVM0lJWFIwUGFHbnhPZnhEc3dm?=
+ =?utf-8?B?czFvaytPSGdkL2J6S2VHbkxGKzNSVjdsMEVQM1lGVE1zTHVQQTV6U3FtRTYw?=
+ =?utf-8?B?Sm5LUjNhWGc2TEJUenBJZ2JISm1KVGVQU3Q2RHVKOUI1UjUzb3hyeWIrTjFY?=
+ =?utf-8?B?RlBNeXJ5dmdEVzNOVnIvTmErd3ZNYzhiZUxNVnMwWFhQUVUyek9ib0tCbTYr?=
+ =?utf-8?B?MktJNE1PSlpHMVRKSDhXbm1XTmdRVFF4NWluZVZEVUFvU2NhdldVejRtMVMw?=
+ =?utf-8?Q?HpS0qzQnuGSyk?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(4053099003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Mmx4Ujk5UUcvbDUrOG15ZXdFNitFQkpiaWxwYXB4OVNqUEZJdnF2UktzZVIz?=
+ =?utf-8?B?MGhaUEhycjlaNXFna1RLb2szSy9yZ1FYUUN1UXB2NTcvazN5V1VPY1pWR0Ix?=
+ =?utf-8?B?VVREMzFCTCs0cURoOVhHc1U2SFpFeVl5cTExMWRvREpkWVJqWEkrcTBtU3Ez?=
+ =?utf-8?B?SnFjWFNCclFBVkF4M09HMHlYaVUrQjRKaEpzcUpRUU90NnRvREVmVlRob3Fo?=
+ =?utf-8?B?bFRHWC9TL2c4L3laMVJNMk03RDh1RTZ4Z1VuRFlxRExETXhWY3Jnb0hKZkww?=
+ =?utf-8?B?OGpBMVNsY0lUb1JWc2ovL0V5YXllUUYvWXh3NWE0TnlBUGt6d29LZXpZdUFl?=
+ =?utf-8?B?QWVObE0vWkxiWVVTWVJDeFZyaUR5aUJJNnE4Z0ZibzI1cUFuWWVEMFVFZ3Az?=
+ =?utf-8?B?K2FYTTVHazBwQ21KbUdYQ2JsVUUwdXZvRVZBNDIvZEtmWUJlYkdGQ2x3ZmdB?=
+ =?utf-8?B?bjEydjNXSVgvSVZiMVhlZnJOMUE2a1JOVWdDd0k1b2F0Q2I5OFU3WHBsTEtK?=
+ =?utf-8?B?R2Y0VDVERmlCVjdQdXVZR3VMelY0bFN5ZzdpcXRNeHFhL0diZkJKL0VpWGVW?=
+ =?utf-8?B?bXQ1NzFjTnZRTUpYZWxDYkZKMmRyekM4OFVqaEpnSkpZTjAzM0d6ZVg1YXVj?=
+ =?utf-8?B?NzM2NmdudU0wZHEwTjZJNTNRVGtud2dzMFkxOFNtV3B1QUNtaTF0ZXE3VnR5?=
+ =?utf-8?B?NWJpTkdUZUdmNWNXL3VPZjRZb1owc3Q3VjVoZmRVblJucHNCRlNNdDVPT3d4?=
+ =?utf-8?B?RUlLRm10UWdhMTA4d0c2a0FaOGUrd1NDc0JQb00xd3FWenZvekNENTY5QWIw?=
+ =?utf-8?B?NnA2YlkybzF3OEJFMjV6SE85OXVobmY1VzlDSmgxQldlWXFSYVhoMVhGdnZB?=
+ =?utf-8?B?KzlYZjVybXRoL3hjcmxNekpGYUsydFFNUkIyTTN0bzVUN29LeDBkRDM3V3dK?=
+ =?utf-8?B?emhRT0V0Vkx4YXQrb1FheGRGMVEzZlJ1RlBlL3UyQnZqRjgwcjVKaGNDVGNN?=
+ =?utf-8?B?Tjc5OXNqZ29pdW56YXBrQjJEeE5zbUFGbG1pd01JWUQ2QzVJL2VEZy90b1VZ?=
+ =?utf-8?B?L3owR1ViNnpUSU5wZUdkQjFITDhITFpDQm1aOVV4ZndpcGhIRFFGZmh4WkJt?=
+ =?utf-8?B?NUlpOGc5TFdmTmc4VHR6RWlwNjJwQndXTE42MXBuMVV6Qi9VcCt2WFp0WjJ3?=
+ =?utf-8?B?ZTZzb01MaVNhQ08wS0xuQzE3eisxUUI2VmEwRHVQeEdhVGZLWndEeGcremRj?=
+ =?utf-8?B?TDVnb2NGZE1rOFBLeE9ENzlvdnZXcW5nMWNIYTY0Qy8vcnF1WmVSZmhxNVgz?=
+ =?utf-8?B?RXF6TU9oelhTWEVyc3k5V2lWdjdtYnRJdEtQMG1Tb1JBb1psS0NQTjRaZFQ0?=
+ =?utf-8?B?andhejFvZUE1NGcwYXNocG9nVU5qcnY3ZE1IZ3dlUDJiaWRWTXZKVTN6MC95?=
+ =?utf-8?B?dU1TWHhPTmx4NktHTDkxMlRtQXZ5ekxWUkpldTVXaFE0RHBqRGUrR2I1OGxw?=
+ =?utf-8?B?L1JFcUtIR0o3cGQ0YXUyR29FeGdKc0duMHl1THVNTVlrU21pMDM2S0dVdGxY?=
+ =?utf-8?B?dHdCNnoreHJPcXJxbWQrOVE4aWJOL3pDcGNpYThZVWxvc215MEZ5R0Vod2s2?=
+ =?utf-8?B?c2t2NTNpVlhTaTluQ0I1VnRrWTdGS0V1NHcxa0hTQWpQWEs5c20rWE9POGVs?=
+ =?utf-8?B?amY0M2ZCdWpaU2x0Q1lMem1oc2JWR28vY2Z0d1ErQmh5WXk4SjE4ck91eGNz?=
+ =?utf-8?B?RW9FRnljN2M4NHJCdWJqRUNiRzlGMGFTRWNsUDdNbkUzaWJvK3l0aEF1aXlQ?=
+ =?utf-8?B?WWYweHNBai80eFB5V0k4SE05Y0dVRzF1S2ZXR3dwVjhTWHhuUlRiM21ZYWxF?=
+ =?utf-8?B?bmtPZ2xsWEpXWkM2TjZwLzdjZFROQWFiQ3UrUU5NNkUxMnYxTjl3UEZVS1BL?=
+ =?utf-8?B?d25IREdGS1BBL0s1MHloNmdCaERVeTErbVppU3dJbkJlY1FJUjJ3MEtKZkhi?=
+ =?utf-8?B?akltcUtkQ2swcDk4UnNQbjlmMVV6bk9rUXZJcTUzT1cvWk8wL1pDcHJVZmwz?=
+ =?utf-8?B?Sm9rRjZlQ01sWTM1OW1NbUVYM3VOeXNMVVQvM21VVzJQaStVbG5WZm5hUmhs?=
+ =?utf-8?Q?NzXwF2HsJeGEpPNP/mNZvpJUk?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8a17d161-e6a3-433b-a195-08dd7831f107
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2025 13:16:45.2537
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Y1neUqPFKTJoZqRHLBGZ5FHNhAUbsyfMFzDQj/6CK1p+vEkYaovI3oWH1H7QN6jF
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8156
 
-On Thu, Apr 10, 2025 at 09:40:58AM +0200, Wolfram Sang wrote:
-> 
-> > You should then find that you gain an LED directory per LED in sysfs,
-> > trigger has [netdev] and there are additional files you can use to
-> > configure when the LED lights/blinks for different link speeds, RX and
-> > TX etc.
-> 
-> Again thanks for the pointer, yet I get weird results. After booting,
-> with the interface up:
-> 
-> ===
-> # cd /sys/class/leds/stmmac-0:08:green:lan/
-> # ls -l
-> total 0
-> -rw-r--r--    1 root     root          4096 May  5 10:13 brightness
-> lrwxrwxrwx    1 root     root             0 May  5 10:13 device -> ../../../stmmac-0:08
-> -rw-r--r--    1 root     root          4096 May  5 10:13 device_name
-> -rw-r--r--    1 root     root          4096 May  5 10:13 full_duplex
-> -rw-r--r--    1 root     root          4096 May  5 10:13 half_duplex
-> -rw-r--r--    1 root     root          4096 May  5 10:13 interval
-> -rw-r--r--    1 root     root          4096 May  5 10:13 link
-> -r--r--r--    1 root     root          4096 May  5 10:13 max_brightness
-> -r--r--r--    1 root     root          4096 May  5 10:13 offloaded
-> drwxr-xr-x    2 root     root             0 May  5 10:13 power
-> -rw-r--r--    1 root     root          4096 May  5 10:13 rx
-> -rw-r--r--    1 root     root          4096 May  5 10:13 rx_err
-> lrwxrwxrwx    1 root     root             0 May  5 10:13 subsystem -> ../../../../../../../../../class/leds
-> -rw-r--r--    1 root     root             0 May  5 10:13 trigger
-> -rw-r--r--    1 root     root          4096 May  5 10:13 tx
-> -rw-r--r--    1 root     root          4096 May  5 10:13 tx_err
-> -rw-r--r--    1 root     root          4096 May  5 10:13 uevent
-> # cat trigger device_name offloaded 
-> none kbd-scrolllock kbd-numlock kbd-capslock kbd-kanalock kbd-shiftlock kbd-altgrlock kbd-ctrllock kbd-altlock kbd-shiftllock kbd-shiftrlock kbd-ctrlllock kbd-ctrlrlock [netdev] mmc0
-> 
-> 0
-> ===
-> 
-> This shows that 'netdev' trigger is selected, alas the device name is
-> empty and offloading is disabled despite the driver using those
-> callbacks. The only thing that works is setting 'brightness' manually.
+--------------LM0DXO0z16PvcEfueyc1v2b3
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-There is a weak relationship between the MAC, in this case, stmmac,
-and the PHY. They get created at different times, and have different
-life cycles. The LEDs get created when the PHY is probed. This is
-generally before the MAC is created. At that point, you can use the
-LED as just another LED. However, due to the default trigger, the
-netdev trigger will be assigned to the LED. But at this stage it is
-useless.
+Am 10.04.25 um 15:09 schrieb Philipp Stanner:
+> On Thu, 2025-04-10 at 14:58 +0200, Christian König wrote:
+>> Am 10.04.25 um 11:24 schrieb Philipp Stanner:
+>>> Nouveau currently relies on the assumption that dma_fences will
+>>> only
+>>> ever get signaled through nouveau_fence_signal(), which takes care
+>>> of
+>>> removing a signaled fence from the list nouveau_fence_chan.pending.
+>>>
+>>> This self-imposed rule is violated in nouveau_fence_done(), where
+>>> dma_fence_is_signaled() (somewhat surprisingly, considering its
+>>> name)
+>>> can signal the fence without removing it from the list. This
+>>> enables
+>>> accesses to already signaled fences through the list, which is a
+>>> bug.
+>>>
+>>> In particular, it can race with nouveau_fence_context_kill(), which
+>>> would then attempt to set an error code on an already signaled
+>>> fence,
+>>> which is illegal.
+>>>
+>>> In nouveau_fence_done(), the call to nouveau_fence_update() already
+>>> ensures to signal all ready fences. Thus, the signaling potentially
+>>> performed by dma_fence_is_signaled() is actually not necessary.
+>> Ah, I now got what you are trying to do here! But that won't help.
+>>
+>> The problem is it is perfectly valid for somebody external (e.g.
+>> other driver, TTM etc...) to call dma_fence_is_signaled() on a
+>> nouveau fence.
+>>
+>> This will then in turn still signal the fence and leave it on the
+>> pending list and creating the problem you have.
+> Good to hear – precisely that then is the use case for a dma_fence
+> callback! ^_^ It guarantees that, no matter who signals a fence, no
+> matter at what place, a certain action will always be performed.
+>
+> I can't think of any other mechanism which could guarantee that a
+> signaled fence immediately gets removed from nouveau's pending list,
+> other than the callbacks.
+>
+> But seriously, I don't think that anyone does this currently, nor do I
+> think that anyone could get away with doing it without the entire
+> computer burning down.
 
-Sometime later the MAC will get created. Generally, at this point, the
-MAC and PHY are still not linked together.
+Yeah, I don't think that this is possible at the moment.
 
-When you open the device, i.e. configure it admin up, then the MAC
-driver goes and finds its PHY and connects to it. It is only at this
-point can the LED get the MAC device name, know what speeds are
-supported etc, which is the subset of what the MAC and PHY support
-etc.
+When you do stuff like that from the provider side you will always run into lifetime issues because in the signaling from interrupt case you then drop the last reference before the signaling is completed.
 
-> If I now select the 'netdev' trigger _again_, things change:
+How about the attached (not even compile tested) patch? I think it should fix the issue.
 
-That was how the code was initially developed, and the most tested
-scenario. Using DT to set the trigger came a lot later.
+Regards,
+Christian.
 
-Due to the weak link between the MAC and the PHY, the LED trigger
-firsts asks the PHY what MAC are you connected to when the trigger is
-activated. This can return indicating it is not connected, and this is
-likely with DT configuration.
+>
+> P.
+>
+>
+>
+>> Regards,
+>> Christian.
+>>
+>>> Replace the call to dma_fence_is_signaled() with
+>>> nouveau_fence_base_is_signaled().
+>>>
+>>> Cc: <stable@vger.kernel.org> # 4.10+, precise commit not to be
+>>> determined
+>>> Signed-off-by: Philipp Stanner <phasta@kernel.org>
+>>> ---
+>>>  drivers/gpu/drm/nouveau/nouveau_fence.c | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/gpu/drm/nouveau/nouveau_fence.c
+>>> b/drivers/gpu/drm/nouveau/nouveau_fence.c
+>>> index 7cc84472cece..33535987d8ed 100644
+>>> --- a/drivers/gpu/drm/nouveau/nouveau_fence.c
+>>> +++ b/drivers/gpu/drm/nouveau/nouveau_fence.c
+>>> @@ -274,7 +274,7 @@ nouveau_fence_done(struct nouveau_fence *fence)
+>>>  			nvif_event_block(&fctx->event);
+>>>  		spin_unlock_irqrestore(&fctx->lock, flags);
+>>>  	}
+>>> -	return dma_fence_is_signaled(&fence->base);
+>>> +	return test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence-
+>>>> base.flags);
+>>>  }
+>>>  
+>>>  static long
 
-The trigger also links into the netdev notifier chain. It gets called
-when the MAC registers, changes its name, unregisters, or is
-configured up. The admin up notifier is the one which normally links
-the LED to the MAC. So if you have time to debug this further, i would
-start from netdev_trig_notify().
+--------------LM0DXO0z16PvcEfueyc1v2b3
+Content-Type: text/x-patch; charset=UTF-8;
+ name="0001-drm-nouveau-fix-and-cleanup-fence-handling.patch"
+Content-Disposition: attachment;
+ filename="0001-drm-nouveau-fix-and-cleanup-fence-handling.patch"
+Content-Transfer-Encoding: base64
 
-> The 'link_*' files appeared, 'device_name' and 'offloaded' have the
-> expected values. But now the LED is blinking like crazy despite all the
-> rx/tx/whatnot triggers still set to 0.
+RnJvbSAxNjVkZjM2YjYwM2IzN2Y2ZjE3ODVjZTM1OWY3Y2QxODRkYjYyMTk2IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiA9P1VURi04P3E/Q2hyaXN0aWFuPTIwSz1DMz1CNm5pZz89IDxj
+aHJpc3RpYW4ua29lbmlnQGFtZC5jb20+CkRhdGU6IFRodSwgMTAgQXByIDIwMjUgMTA6MTg6Mjkg
+KzAyMDAKU3ViamVjdDogW1BBVENIXSBkcm0vbm91dmVhdTogZml4IGFuZCBjbGVhbnVwIGZlbmNl
+IGhhbmRsaW5nCk1JTUUtVmVyc2lvbjogMS4wCkNvbnRlbnQtVHlwZTogdGV4dC9wbGFpbjsgY2hh
+cnNldD1VVEYtOApDb250ZW50LVRyYW5zZmVyLUVuY29kaW5nOiA4Yml0CgpUaGUgZmVuY2Ugd2Fz
+IG5vdCByZW1vdmVkIGZyb20gdGhlIHBlbmRpbmcgbGlzdCB3aGVuIHNpZ25hbGVkIGZyb20gdGhl
+Ci5zaWduYWxlZCBjYWxsYmFjay4gRml4IHRoYXQgYW5kIGFsc28gcmVtb3ZlIHRoZSBzdXBlcmZs
+b3VzCi5lbmFibGVfc2lnbmFsaW5nIGNhbGxiYWNrLgoKU2lnbmVkLW9mZi1ieTogQ2hyaXN0aWFu
+IEvDtm5pZyA8Y2hyaXN0aWFuLmtvZW5pZ0BhbWQuY29tPgotLS0KIGRyaXZlcnMvZ3B1L2RybS9u
+b3V2ZWF1L25vdXZlYXVfZmVuY2UuYyB8IDMxICsrKysrKystLS0tLS0tLS0tLS0tLS0tLS0KIDEg
+ZmlsZSBjaGFuZ2VkLCA4IGluc2VydGlvbnMoKyksIDIzIGRlbGV0aW9ucygtKQoKZGlmZiAtLWdp
+dCBhL2RyaXZlcnMvZ3B1L2RybS9ub3V2ZWF1L25vdXZlYXVfZmVuY2UuYyBiL2RyaXZlcnMvZ3B1
+L2RybS9ub3V2ZWF1L25vdXZlYXVfZmVuY2UuYwppbmRleCA3Y2M4NDQ3MmNlY2UuLjUzYzcwZGRl
+Zjk2NCAxMDA2NDQKLS0tIGEvZHJpdmVycy9ncHUvZHJtL25vdXZlYXUvbm91dmVhdV9mZW5jZS5j
+CisrKyBiL2RyaXZlcnMvZ3B1L2RybS9ub3V2ZWF1L25vdXZlYXVfZmVuY2UuYwpAQCAtNDg1LDMy
+ICs0ODUsMTggQEAgc3RhdGljIGJvb2wgbm91dmVhdV9mZW5jZV9pc19zaWduYWxlZChzdHJ1Y3Qg
+ZG1hX2ZlbmNlICpmKQogCQlyZXQgPSAoaW50KShmY3R4LT5yZWFkKGNoYW4pIC0gZmVuY2UtPmJh
+c2Uuc2Vxbm8pID49IDA7CiAJcmN1X3JlYWRfdW5sb2NrKCk7CiAKLQlyZXR1cm4gcmV0OwotfQot
+Ci1zdGF0aWMgYm9vbCBub3V2ZWF1X2ZlbmNlX25vX3NpZ25hbGluZyhzdHJ1Y3QgZG1hX2ZlbmNl
+ICpmKQotewotCXN0cnVjdCBub3V2ZWF1X2ZlbmNlICpmZW5jZSA9IGZyb21fZmVuY2UoZik7Ci0K
+LQkvKgotCSAqIGNhbGxlciBzaG91bGQgaGF2ZSBhIHJlZmVyZW5jZSBvbiB0aGUgZmVuY2UsCi0J
+ICogZWxzZSBmZW5jZSBjb3VsZCBnZXQgZnJlZWQgaGVyZQotCSAqLwotCVdBUk5fT04oa3JlZl9y
+ZWFkKCZmZW5jZS0+YmFzZS5yZWZjb3VudCkgPD0gMSk7CisJaWYgKHJldCkgeworCQkvKgorCQkg
+KiBjYWxsZXIgc2hvdWxkIGhhdmUgYSByZWZlcmVuY2Ugb24gdGhlIGZlbmNlLAorCQkgKiBlbHNl
+IGZlbmNlIGNvdWxkIGdldCBmcmVlZCBoZXJlCisJCSAqLworCQlXQVJOX09OKGtyZWZfcmVhZCgm
+ZmVuY2UtPmJhc2UucmVmY291bnQpIDw9IDEpOwogCi0JLyoKLQkgKiBUaGlzIG5lZWRzIHVldmVu
+dHMgdG8gd29yayBjb3JyZWN0bHksIGJ1dCBkbWFfZmVuY2VfYWRkX2NhbGxiYWNrIHJlbGllcyBv
+bgotCSAqIGJlaW5nIGFibGUgdG8gZW5hYmxlIHNpZ25hbGluZy4gSXQgd2lsbCBzdGlsbCBnZXQg
+c2lnbmFsZWQgZXZlbnR1YWxseSwKLQkgKiBqdXN0IG5vdCByaWdodCBhd2F5LgotCSAqLwotCWlm
+IChub3V2ZWF1X2ZlbmNlX2lzX3NpZ25hbGVkKGYpKSB7CiAJCWxpc3RfZGVsKCZmZW5jZS0+aGVh
+ZCk7Ci0KIAkJZG1hX2ZlbmNlX3B1dCgmZmVuY2UtPmJhc2UpOwotCQlyZXR1cm4gZmFsc2U7CiAJ
+fQogCi0JcmV0dXJuIHRydWU7CisJcmV0dXJuIHJldDsKIH0KIAogc3RhdGljIHZvaWQgbm91dmVh
+dV9mZW5jZV9yZWxlYXNlKHN0cnVjdCBkbWFfZmVuY2UgKmYpCkBAIC01MjUsNyArNTExLDYgQEAg
+c3RhdGljIHZvaWQgbm91dmVhdV9mZW5jZV9yZWxlYXNlKHN0cnVjdCBkbWFfZmVuY2UgKmYpCiBz
+dGF0aWMgY29uc3Qgc3RydWN0IGRtYV9mZW5jZV9vcHMgbm91dmVhdV9mZW5jZV9vcHNfbGVnYWN5
+ID0gewogCS5nZXRfZHJpdmVyX25hbWUgPSBub3V2ZWF1X2ZlbmNlX2dldF9nZXRfZHJpdmVyX25h
+bWUsCiAJLmdldF90aW1lbGluZV9uYW1lID0gbm91dmVhdV9mZW5jZV9nZXRfdGltZWxpbmVfbmFt
+ZSwKLQkuZW5hYmxlX3NpZ25hbGluZyA9IG5vdXZlYXVfZmVuY2Vfbm9fc2lnbmFsaW5nLAogCS5z
+aWduYWxlZCA9IG5vdXZlYXVfZmVuY2VfaXNfc2lnbmFsZWQsCiAJLndhaXQgPSBub3V2ZWF1X2Zl
+bmNlX3dhaXRfbGVnYWN5LAogCS5yZWxlYXNlID0gbm91dmVhdV9mZW5jZV9yZWxlYXNlCkBAIC01
+NDAsNyArNTI1LDcgQEAgc3RhdGljIGJvb2wgbm91dmVhdV9mZW5jZV9lbmFibGVfc2lnbmFsaW5n
+KHN0cnVjdCBkbWFfZmVuY2UgKmYpCiAJaWYgKCFmY3R4LT5ub3RpZnlfcmVmKyspCiAJCW52aWZf
+ZXZlbnRfYWxsb3coJmZjdHgtPmV2ZW50KTsKIAotCXJldCA9IG5vdXZlYXVfZmVuY2Vfbm9fc2ln
+bmFsaW5nKGYpOworCXJldCA9IG5vdXZlYXVfZmVuY2VfaXNfc2lnbmFsZWQoZik7CiAJaWYgKHJl
+dCkKIAkJc2V0X2JpdChETUFfRkVOQ0VfRkxBR19VU0VSX0JJVFMsICZmZW5jZS0+YmFzZS5mbGFn
+cyk7CiAJZWxzZSBpZiAoIS0tZmN0eC0+bm90aWZ5X3JlZikKLS0gCjIuMzQuMQoK
 
-So that is odd. If offloaded indicates the hardware is doing the
-blinking, that means we have a problem with the PHY configuration.
-What model of Marvell PHY is it? There are some differences between
-the models.
-
-	Andrew
+--------------LM0DXO0z16PvcEfueyc1v2b3--
 
