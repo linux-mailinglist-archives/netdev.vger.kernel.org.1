@@ -1,163 +1,157 @@
-Return-Path: <netdev+bounces-181283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 708E7A8446A
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 15:16:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CAB0A84478
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 15:18:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AE519A3FBC
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 13:11:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6EDF177071
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 13:12:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE61428CF47;
-	Thu, 10 Apr 2025 13:09:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32CDE28C5B4;
+	Thu, 10 Apr 2025 13:10:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="JLIa0Hqu"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="U6Xav6ef"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A6F2857F8;
-	Thu, 10 Apr 2025 13:09:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E97592857F7;
+	Thu, 10 Apr 2025 13:10:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744290595; cv=none; b=NgSu++5krTQNvodkP4s1GLwdznBsT9Ac27/o3UGTekjc7VW6wli0xD0DWQLUWpV321b0Zfm2d7KcAYfm3bMxZWI+KLq7LLdqK/X3RBatlwPWOHp2iwwki+Z12xBDfLnU/7e8d3lp/qii9hn3vb1W60iRU8sikcRfB5lDHOnOqKA=
+	t=1744290623; cv=none; b=rfVK4jjF5g9jIt37HyS6CuQmbXYzCpAB+2mXGyPbLWI9uXHLXVuGK3ke1v4ySE65h8iGt6/tevztIlT3ZO613ElS82hFprJ2TzuU2ROQVx7wl3gSI+idaSuUQGmR5mrVZhxq8XCEPXlrd/vhgPg0xb+WvzMNQO55S8m0Um3x8SY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744290595; c=relaxed/simple;
-	bh=ohKKNYP3dMZzy/Op3vn2DOLq02k/up894FUlQhaKHxQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=FM0kkmAkmNQcGgjq0ghdoY58BEFH3khYcJEoBX6JAhbG+A472l6BHht0UalAOWIYzaJRnLTxSZRM7/Q3WGW+MowRf5RaGPwthsp1p1JKOxZLi7w3ETZzonQdA7aMAEnDwcXsh84+MSHaZrHH8x8sbCG3QabP1iXYy5LcwrjdqG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=JLIa0Hqu; arc=none smtp.client-ip=80.241.56.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4ZYKsh20Kcz9sFb;
-	Thu, 10 Apr 2025 15:09:44 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1744290584; h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tNo4RWbN6OOQmatSWnTpJ3Sh3OCGI8DiobFht1mvBP4=;
-	b=JLIa0HquJgjRKsl6VGI2sxxfZVuwKrlEnzrtHs2vUWdYskSAy4m8cWSpMDpMheH5h2Skgi
-	NlwbeHPHoHvO1XAT+3TBkM0DbFgEy4JPwFTVa/IVeHaLXUSdyJgTj4rKjzAOB01rmEvo/Q
-	5q+I26dMY3DK2iGsGaZM54MpPsnfj9WlPBcWukDoF2RC3WD25x4JZW8Zs1VGF5m5BSGTdo
-	QU+DL6NjbZk43TGAtKlQbIJO6q8pDuB7C5MJqGGqZzuSvW6qt+F8eblUpKQwDlEmGqpuey
-	/1E0zRPYbKgYOehnQNlPRH0XFt5yoOCEgiLppCE931Rq9Ml+Jf2cPEGgIV7kcA==
-Message-ID: <c737c89c7ce9174e349c61ab4e5712eee8946f13.camel@mailbox.org>
-Subject: Re: [PATCH 1/3] drm/nouveau: Prevent signaled fences in pending list
-From: Philipp Stanner <phasta@mailbox.org>
-Reply-To: phasta@kernel.org
-To: Christian =?ISO-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>, Philipp
- Stanner <phasta@kernel.org>, Lyude Paul <lyude@redhat.com>, Danilo
- Krummrich <dakr@kernel.org>,  David Airlie <airlied@gmail.com>, Simona
- Vetter <simona@ffwll.ch>, Sabrina Dubroca <sd@queasysnail.net>,  Sumit
- Semwal <sumit.semwal@linaro.org>
-Cc: dri-devel@lists.freedesktop.org, nouveau@lists.freedesktop.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org, 
-	stable@vger.kernel.org
-Date: Thu, 10 Apr 2025 15:09:39 +0200
-In-Reply-To: <8583665a-6886-4245-be49-fd8839cfe212@amd.com>
-References: <20250410092418.135258-2-phasta@kernel.org>
-	 <20250410092418.135258-3-phasta@kernel.org>
-	 <8583665a-6886-4245-be49-fd8839cfe212@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1744290623; c=relaxed/simple;
+	bh=MoxeGQBB0DlHcBQSkAbqgT6ZAgbftqn1oFID8/wRUxw=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hPcqKnjgaPO8xnANmYN5k3c/3mJRa3hhcBf+jVSMtfPe2mxv452Z2npevbjrRaRf0NYyehdufmtRO21Khe9jmGciErr97k3hMyrIra159VZK7gW75xpjDQvPzujGRw46qVNeEjldIL2KiAJabnEtjhAHhuGKd4YAI63/L22yunQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=U6Xav6ef; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:To:From:Date:From:Sender:Reply-To:Subject:Date:
+	Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=wGP7jv8iNn4I7r6ejBZS9/y63Kx5RjV7Hlwbnu/j0BA=; b=U6Xav6efg0Aef+i5e7mS9u9Tpe
+	MOJE8G6fObtlsILpVVcRFZdesUNZf5meScKsUPS9X9Dw1NjWQuVzD9cWbKHkXQ0SpPrB8UUoR+lfn
+	bXxhZaQ4+NAetGoOq3pOpl+s7opP9pHSRNz1VbwpyN5ZUOz1+UotPZv1WG/g7xAF3oQw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u2rfS-008gOE-5o; Thu, 10 Apr 2025 15:10:06 +0200
+Date: Thu, 10 Apr 2025 15:10:06 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	linux-renesas-soc@vger.kernel.org,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [RFC PATCH net-next] net: phy: marvell: support DT
+ configurations with only two LEDs
+Message-ID: <1cb6ec18-9abb-48d9-b9a2-ca79584d4d0d@lunn.ch>
+References: <20250408063136.5463-2-wsa+renesas@sang-engineering.com>
+ <7f706127-aa48-4385-a7b8-f016e0ba52b7@lunn.ch>
+ <Z_YZ3NiXb15wgDuY@shikoro>
+ <0fe35fe3-b63c-478b-9674-a2522f582167@lunn.ch>
+ <Z_d2CgxLKaEV3w8X@shikoro>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MBO-RS-META: w17gddazuhiderzamj37mege4ojzpn7m
-X-MBO-RS-ID: d885f1ea80fc186b76b
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z_d2CgxLKaEV3w8X@shikoro>
 
-On Thu, 2025-04-10 at 14:58 +0200, Christian K=C3=B6nig wrote:
-> Am 10.04.25 um 11:24 schrieb Philipp Stanner:
-> > Nouveau currently relies on the assumption that dma_fences will
-> > only
-> > ever get signaled through nouveau_fence_signal(), which takes care
-> > of
-> > removing a signaled fence from the list nouveau_fence_chan.pending.
-> >=20
-> > This self-imposed rule is violated in nouveau_fence_done(), where
-> > dma_fence_is_signaled() (somewhat surprisingly, considering its
-> > name)
-> > can signal the fence without removing it from the list. This
-> > enables
-> > accesses to already signaled fences through the list, which is a
-> > bug.
-> >=20
-> > In particular, it can race with nouveau_fence_context_kill(), which
-> > would then attempt to set an error code on an already signaled
-> > fence,
-> > which is illegal.
-> >=20
-> > In nouveau_fence_done(), the call to nouveau_fence_update() already
-> > ensures to signal all ready fences. Thus, the signaling potentially
-> > performed by dma_fence_is_signaled() is actually not necessary.
->=20
-> Ah, I now got what you are trying to do here! But that won't help.
->=20
-> The problem is it is perfectly valid for somebody external (e.g.
-> other driver, TTM etc...) to call dma_fence_is_signaled() on a
-> nouveau fence.
->=20
-> This will then in turn still signal the fence and leave it on the
-> pending list and creating the problem you have.
+On Thu, Apr 10, 2025 at 09:40:58AM +0200, Wolfram Sang wrote:
+> 
+> > You should then find that you gain an LED directory per LED in sysfs,
+> > trigger has [netdev] and there are additional files you can use to
+> > configure when the LED lights/blinks for different link speeds, RX and
+> > TX etc.
+> 
+> Again thanks for the pointer, yet I get weird results. After booting,
+> with the interface up:
+> 
+> ===
+> # cd /sys/class/leds/stmmac-0:08:green:lan/
+> # ls -l
+> total 0
+> -rw-r--r--    1 root     root          4096 May  5 10:13 brightness
+> lrwxrwxrwx    1 root     root             0 May  5 10:13 device -> ../../../stmmac-0:08
+> -rw-r--r--    1 root     root          4096 May  5 10:13 device_name
+> -rw-r--r--    1 root     root          4096 May  5 10:13 full_duplex
+> -rw-r--r--    1 root     root          4096 May  5 10:13 half_duplex
+> -rw-r--r--    1 root     root          4096 May  5 10:13 interval
+> -rw-r--r--    1 root     root          4096 May  5 10:13 link
+> -r--r--r--    1 root     root          4096 May  5 10:13 max_brightness
+> -r--r--r--    1 root     root          4096 May  5 10:13 offloaded
+> drwxr-xr-x    2 root     root             0 May  5 10:13 power
+> -rw-r--r--    1 root     root          4096 May  5 10:13 rx
+> -rw-r--r--    1 root     root          4096 May  5 10:13 rx_err
+> lrwxrwxrwx    1 root     root             0 May  5 10:13 subsystem -> ../../../../../../../../../class/leds
+> -rw-r--r--    1 root     root             0 May  5 10:13 trigger
+> -rw-r--r--    1 root     root          4096 May  5 10:13 tx
+> -rw-r--r--    1 root     root          4096 May  5 10:13 tx_err
+> -rw-r--r--    1 root     root          4096 May  5 10:13 uevent
+> # cat trigger device_name offloaded 
+> none kbd-scrolllock kbd-numlock kbd-capslock kbd-kanalock kbd-shiftlock kbd-altgrlock kbd-ctrllock kbd-altlock kbd-shiftllock kbd-shiftrlock kbd-ctrlllock kbd-ctrlrlock [netdev] mmc0
+> 
+> 0
+> ===
+> 
+> This shows that 'netdev' trigger is selected, alas the device name is
+> empty and offloading is disabled despite the driver using those
+> callbacks. The only thing that works is setting 'brightness' manually.
 
-Good to hear =E2=80=93 precisely that then is the use case for a dma_fence
-callback! ^_^ It guarantees that, no matter who signals a fence, no
-matter at what place, a certain action will always be performed.
+There is a weak relationship between the MAC, in this case, stmmac,
+and the PHY. They get created at different times, and have different
+life cycles. The LEDs get created when the PHY is probed. This is
+generally before the MAC is created. At that point, you can use the
+LED as just another LED. However, due to the default trigger, the
+netdev trigger will be assigned to the LED. But at this stage it is
+useless.
 
-I can't think of any other mechanism which could guarantee that a
-signaled fence immediately gets removed from nouveau's pending list,
-other than the callbacks.
+Sometime later the MAC will get created. Generally, at this point, the
+MAC and PHY are still not linked together.
 
-But seriously, I don't think that anyone does this currently, nor do I
-think that anyone could get away with doing it without the entire
-computer burning down.
+When you open the device, i.e. configure it admin up, then the MAC
+driver goes and finds its PHY and connects to it. It is only at this
+point can the LED get the MAC device name, know what speeds are
+supported etc, which is the subset of what the MAC and PHY support
+etc.
 
-P.
+> If I now select the 'netdev' trigger _again_, things change:
 
+That was how the code was initially developed, and the most tested
+scenario. Using DT to set the trigger came a lot later.
 
+Due to the weak link between the MAC and the PHY, the LED trigger
+firsts asks the PHY what MAC are you connected to when the trigger is
+activated. This can return indicating it is not connected, and this is
+likely with DT configuration.
 
->=20
-> Regards,
-> Christian.
->=20
-> >=20
-> > Replace the call to dma_fence_is_signaled() with
-> > nouveau_fence_base_is_signaled().
-> >=20
-> > Cc: <stable@vger.kernel.org> # 4.10+, precise commit not to be
-> > determined
-> > Signed-off-by: Philipp Stanner <phasta@kernel.org>
-> > ---
-> > =C2=A0drivers/gpu/drm/nouveau/nouveau_fence.c | 2 +-
-> > =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/drivers/gpu/drm/nouveau/nouveau_fence.c
-> > b/drivers/gpu/drm/nouveau/nouveau_fence.c
-> > index 7cc84472cece..33535987d8ed 100644
-> > --- a/drivers/gpu/drm/nouveau/nouveau_fence.c
-> > +++ b/drivers/gpu/drm/nouveau/nouveau_fence.c
-> > @@ -274,7 +274,7 @@ nouveau_fence_done(struct nouveau_fence *fence)
-> > =C2=A0			nvif_event_block(&fctx->event);
-> > =C2=A0		spin_unlock_irqrestore(&fctx->lock, flags);
-> > =C2=A0	}
-> > -	return dma_fence_is_signaled(&fence->base);
-> > +	return test_bit(DMA_FENCE_FLAG_SIGNALED_BIT, &fence-
-> > >base.flags);
-> > =C2=A0}
-> > =C2=A0
-> > =C2=A0static long
->=20
+The trigger also links into the netdev notifier chain. It gets called
+when the MAC registers, changes its name, unregisters, or is
+configured up. The admin up notifier is the one which normally links
+the LED to the MAC. So if you have time to debug this further, i would
+start from netdev_trig_notify().
 
+> The 'link_*' files appeared, 'device_name' and 'offloaded' have the
+> expected values. But now the LED is blinking like crazy despite all the
+> rx/tx/whatnot triggers still set to 0.
+
+So that is odd. If offloaded indicates the hardware is doing the
+blinking, that means we have a problem with the PHY configuration.
+What model of Marvell PHY is it? There are some differences between
+the models.
+
+	Andrew
 
