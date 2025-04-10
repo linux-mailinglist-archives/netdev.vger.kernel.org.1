@@ -1,199 +1,184 @@
-Return-Path: <netdev+bounces-181142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01CFEA83CFC
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 10:32:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 410B0A83D5F
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 10:44:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18AEF3A9B46
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 08:27:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C1607A79F3
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 08:43:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDC5320AF77;
-	Thu, 10 Apr 2025 08:27:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEAC720C471;
+	Thu, 10 Apr 2025 08:42:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yd6UoVMm"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="i/THSIDT"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2087.outbound.protection.outlook.com [40.107.243.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B3D1E5204
-	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 08:27:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744273634; cv=none; b=KYQBZ1K1ojq2w2lai5zxJw92DjdG7vbFnWXyjkwMDQd/e+aHwSnytu+Zuloro3oBE2HmaETYdsb+GM4j8HjaTH6m45p9KOA8UgQJ0WlEUuQisq9D1VGBZXnWRILWzF4oXD4CtdE+qFULVazya3l+L7z2rwjJAjV9MqczvVqxsyA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744273634; c=relaxed/simple;
-	bh=7OgjP2r1y+H3C98mILy/OyuBEWsNZ4LMB1R3QgFCf1k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sf341PBVyiSXrvq9gxb1Gt45by7xmau6rMJI8Lqnzld+vpw0ynHGrIF+Ynh1wlHdwwh2tQLSwAVm1w593wsPGCiIWC7dPcv4hlA4PKDlSBeq7Wg9rhjn7kpn5SewbazVBqGQw1phbQg2g8ooFIJbRAYSkudkYcYjNgZA8Eso1kM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Yd6UoVMm; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744273631;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OKzMCc0mBOI4figeschKj6q6v2G4wTIIAmTInqn3cTg=;
-	b=Yd6UoVMmOwcJadb73dYwNI9K01Gxk4Xh2UhLBbF9l/zCshuKMFEEqcBmVmL5yYf3dvjFYg
-	jIJkirLwFT1E72ZohXpXAPBY0aBVsIquqwihOIpsffIRm0xfY0ba3JKxLprY1e5hSoaM7u
-	0IYuqc6cSelny1QKv0RZNq5N4CmuWB4=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-455-eakRA7OoMYml2AecDjx9QQ-1; Thu,
- 10 Apr 2025 04:27:07 -0400
-X-MC-Unique: eakRA7OoMYml2AecDjx9QQ-1
-X-Mimecast-MFC-AGG-ID: eakRA7OoMYml2AecDjx9QQ_1744273625
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C4D9D1800263;
-	Thu, 10 Apr 2025 08:27:04 +0000 (UTC)
-Received: from [10.44.33.222] (unknown [10.44.33.222])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1F9583001D0E;
-	Thu, 10 Apr 2025 08:26:59 +0000 (UTC)
-Message-ID: <c0ef6dad-ce7e-401c-9ae1-42105fcbf9c4@redhat.com>
-Date: Thu, 10 Apr 2025 10:26:58 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FCA420D505
+	for <netdev@vger.kernel.org>; Thu, 10 Apr 2025 08:42:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744274569; cv=fail; b=RVCi28G27E68TaNuwNSqT0UeaDW/xj+uUwIPe46UPZW0hKWxqICQr37YgOc0Yrht+ss/9RgCsPEcSAyiht031s+SjwzsEZd98Sc96TfvWa8cCiPysXmxgACwbg1dmotUfMY9AIsbtnaf4YbD6VSMbTSjBDYQTGClvCChtRZ50js=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744274569; c=relaxed/simple;
+	bh=6El8tI92njLAiespAmqsJ909u7ljGzSixH68SASGyeE=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=FBcLYG00O5QDO/kyouZyg2Ti6ywFov9NrTiHQnoE+bUpRFjhL+/SpXUGOI1u6yNKFwG7PvLVkqir50EqHqe4HmVEyJ8rSaiuCx3zU8p9uBA+9S3TvvGByouJP+V60CdoGy7dRlqxsgSY8YMuE5WD74eFgyaXyRXv3X/Oz3QR3gw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=i/THSIDT; arc=fail smtp.client-ip=40.107.243.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=KdCoRevia5/Y7TUcWWcDs4yOeiSi1Oc5grIcpUpkMm+PJLyBmRbsWUsyAPJsJeMQ+k4U3u7jLqHyelQO9nrD2GT1NXD3HqZM4ium70fP9j9bmVL2hFNiVQVPYOAw76u83k2FGG/2oN3lkjdjIOadGik3Nv0j3GTJ8dwMcs+LQCt7TqNSAB6B8QNmuM94U7S/mxGh2DtigDo40u1o8C2t6Hk40ZvZMA9c7ySHp7go0FMhIXvEYJGuQVSaFVqIjcQSxLNTrbkBrMRhGFXMqLGmLbKR+1HCTj+6Ug8AKkWY0JWM8SgThbakdUqqJOz7+7U9x8OkvVVwKBX7hYOieroUKQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ego57gTFwn/K4BGCF2Q7ld4xpgQpl8svdSepRzAWLZg=;
+ b=IYtxEMhQTe+pIopGZvc/O/z4xhagxVXEFuiIHpf+8oP7LwrnsxPBeIX2UCUpWsZgdAsLGsS3beDCkAju6StK6Hzhluxdxey8TanUiWy/MckuQp9D2eWoUTsGujHwxIWE6yxTfZ/BTnqAXZsDZ2hKDZY2QyjOZE7n92ylGwMNl4XUoXfOyztxwvSRgZhQjQ4tgXW1jijTTk8IliYHP9Kl7wxdScqsG3THmI8vW/JqSo2+bR8UHmiN4kLYhmMypZXg3YWo9BvXD2xdlBslndFl2ihT2lp9XgLFSkM8RKh/tOLQVmwVbTgmrSRRj4vbEAW5voPOo/0y78MtCfkVoUmVnw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=broadcom.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ego57gTFwn/K4BGCF2Q7ld4xpgQpl8svdSepRzAWLZg=;
+ b=i/THSIDTOf2CAcNj2G210lpblSK2Jpe+PYbQw/3g3gpBbgWBXGj3HaOV0OePt4HDnjmUl1suuu7xu0KIH1N7SZLr3q0yQOOp7EGt9ZY9VJUyfRsAIv/PQOTUhHtqEvAI4MOksz8O0afqrbPkvgIbq70gPzcNELO51l7+cQg4OGPIzN9/cdfi15u+mlsOZS2CQrHuKE8btOoZb7Bk7dArmjb72CecqOQGq2/dPrmot4y+zitLX2onN3UF01wq08Me0WIcDrNE5qMqK+RDRRqNKv/RDDz4mGpyQzH4uLRZEhC8Y7xOhaSqn2tVekQVm5wV/Omzxk2KH2t5UxD2notBCg==
+Received: from CY8PR10CA0014.namprd10.prod.outlook.com (2603:10b6:930:4f::21)
+ by CY5PR12MB6322.namprd12.prod.outlook.com (2603:10b6:930:21::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.35; Thu, 10 Apr
+ 2025 08:42:44 +0000
+Received: from CY4PEPF0000EE39.namprd03.prod.outlook.com
+ (2603:10b6:930:4f:cafe::a9) by CY8PR10CA0014.outlook.office365.com
+ (2603:10b6:930:4f::21) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8632.24 via Frontend Transport; Thu,
+ 10 Apr 2025 08:42:44 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000EE39.mail.protection.outlook.com (10.167.242.11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8632.13 via Frontend Transport; Thu, 10 Apr 2025 08:42:44 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 10 Apr
+ 2025 01:42:32 -0700
+Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Thu, 10 Apr
+ 2025 01:42:26 -0700
+References: <20250409112440.365672-1-idosch@nvidia.com>
+User-agent: mu4e 1.8.14; emacs 29.4
+From: Petr Machata <petrm@nvidia.com>
+To: Ido Schimmel <idosch@nvidia.com>
+CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <edumazet@google.com>, <horms@kernel.org>,
+	<danieller@nvidia.com>, <petrm@nvidia.com>, <andrew@lunn.ch>,
+	<damodharam.ammepalli@broadcom.com>, <michael.chan@broadcom.com>,
+	<andrew.gospodarek@broadcom.com>
+Subject: Re: [PATCH net] ethtool: cmis_cdb: Fix incorrect read / write
+ length extension
+Date: Thu, 10 Apr 2025 10:41:40 +0200
+In-Reply-To: <20250409112440.365672-1-idosch@nvidia.com>
+Message-ID: <874iywxv9u.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 07/14] mfd: zl3073x: Add components versions register
- defs
-To: Krzysztof Kozlowski <krzk@kernel.org>, netdev@vger.kernel.org
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
- Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
- Andy Shevchenko <andy@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, Michal Schmidt <mschmidt@redhat.com>,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
-References: <20250409144250.206590-1-ivecera@redhat.com>
- <20250409144250.206590-8-ivecera@redhat.com>
- <df6a57df-8916-4af2-9eee-10921f90ff93@kernel.org>
-Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <df6a57df-8916-4af2-9eee-10921f90ff93@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE39:EE_|CY5PR12MB6322:EE_
+X-MS-Office365-Filtering-Correlation-Id: 77de0de8-d91b-4fbc-0d76-08dd780ba9b9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|1800799024|36860700013|82310400026|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?7ftRK40dk0sM8rLRAo6fu/4DyA6AAGiyACmoVLhov6nkyVKZ4tHPZybZi92T?=
+ =?us-ascii?Q?DJ4KVxMYtm8ATjBx5cwd0vPBXaPFkjQTDDc5yfaEZ+Ex8wkeGu3gFmo+ZDP8?=
+ =?us-ascii?Q?Ua1tFjNvTy9yPjCJTjX/p7gj8RhJlM3sYf4wz2HfJ9OV7gmeI3zwe5hHsLF6?=
+ =?us-ascii?Q?V2tX/WXe4Xkbg+bjZOYz4RQY6/ZW+Y2z/WDU7cdrKVjA9+2tq5WLnWpmsRRo?=
+ =?us-ascii?Q?bh20GsRP46iFYszeVZcYlMDjMZGeeNbiiY3SLZ0TfFdH0674ATP7LujIpCXc?=
+ =?us-ascii?Q?6/Ry3z2Me+HrrI3tEa9s5496y4zaNq+XBcSMmNr2bEydinBF1A+RY+MJ/6qA?=
+ =?us-ascii?Q?DUFuID+SxR5beB7JC+JVlyCry1sJWX64jNbuE/qwySEB6TLJoIEDXPdFp/Oo?=
+ =?us-ascii?Q?UufCjRRTmx5IwL+aCiLgQ/cSkHVlIHJPf6QXobPHLVrAS1oJKKWVQ7ZWJtwc?=
+ =?us-ascii?Q?ZptvnjSog46/u9fYOrrsR+vULOnd4WNQOKJPGrps8vsWYfBy9R5Fz5D9YJi8?=
+ =?us-ascii?Q?VBcRb90b2PktLo6uKRlY9PTVQ+JcjljVd7C0mOyTq6qHSpRHbhesgDMfK14m?=
+ =?us-ascii?Q?fSEzzAqb76saOmEVCPrhpTkiPUzHHr7veDT0tjX6OlzKgL9BsoCLAiHidh4N?=
+ =?us-ascii?Q?PR0p6IUuoJOWIXwYrE+Iea/8QY81WGOpzmqDbQHfOYpm3qeaJS+PEIrrGg+3?=
+ =?us-ascii?Q?U+Mcyur0O9+K9bLkWpVFGjvu9cvEIjeGIR7Tp1r2I7zUlo3M8ZL840DHyGLM?=
+ =?us-ascii?Q?pw9/YEfTsjYcdq4emwVhWedZXJ7kAB7ffzWYgsjOJ8K043D9/NZzv0gcGv4j?=
+ =?us-ascii?Q?k4rX8culATHwtpHj0X5xZw+s/rHrSXgm1jX8EXi9Uc8TsmQUTpeQ/WueTmQm?=
+ =?us-ascii?Q?Q0V4TFNt8is57081AGjIBqCulEZcedAkNvuEASSYDm6HCbxtMM3NSOxDWi2L?=
+ =?us-ascii?Q?XaQ7q7ZHQi2zdN2iF6AZu1iMyOhfHMB8GbgtPs0rTrBlK+BRRXS9oyCUkHMG?=
+ =?us-ascii?Q?FLDg9l1irgBTvI6LvIIQZFkrpexIUqudhSMrthPWGPWeAnnuZHL7HtxgLHNW?=
+ =?us-ascii?Q?8aOShNzEv7Hsy0V5GYBghBuTb+Ie+odIaOq1QAoGu/5zldQ4GbW4KhwSsrEK?=
+ =?us-ascii?Q?fM9d5zq8YtaGFe28Ed6vJCEN/3Q56mAadmUhyNBhZAK2BPz3IGke9W3vA1Zs?=
+ =?us-ascii?Q?mxWqY2UWJjuXJ9mGmBXOfOOgqGlhXr+YV1z3Z6rC5TOLuUqQj8R/4l0RGVOg?=
+ =?us-ascii?Q?PolOxScljOha1VLaEEGYcoiizx+cdRTsoQmiuu7I7rJPPsNt7+SfxFhCQBsZ?=
+ =?us-ascii?Q?yMJa4nZCk0OuwSUVahXuf4wyS0Ydkxg1bUkogs6UT2j5mpqjVJKUa4AabXYZ?=
+ =?us-ascii?Q?fGf4a+zzcULETO3aMKQgNMgoSgw66MGIBvB/Tqhb4iHE+QW9LLNrvBZQVMwm?=
+ =?us-ascii?Q?splkhgN8VSJpDCWzaPHnzkZ8LwrbV3dBVuhEcKzbfscPttfiU2gxWinUG/NB?=
+ =?us-ascii?Q?/Ethc05QW7bXCIfFr3Ri/JdEPbMvYJK3tqzABVVpO30dmZirQPxPa3+ZwQ?=
+ =?us-ascii?Q?=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(36860700013)(82310400026)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2025 08:42:44.3147
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 77de0de8-d91b-4fbc-0d76-08dd780ba9b9
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE39.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6322
 
-On 10. 04. 25 9:13 dop., Krzysztof Kozlowski wrote:
-> On 09/04/2025 16:42, Ivan Vecera wrote:
->> Add register definitions for components versions and report them
->> during probe.
->>
->> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
->> ---
->>   drivers/mfd/zl3073x-core.c | 36 ++++++++++++++++++++++++++++++++++++
->>   1 file changed, 36 insertions(+)
->>
->> diff --git a/drivers/mfd/zl3073x-core.c b/drivers/mfd/zl3073x-core.c
->> index f0d85f77a7a76..28f28d00da1cc 100644
->> --- a/drivers/mfd/zl3073x-core.c
->> +++ b/drivers/mfd/zl3073x-core.c
->> @@ -1,7 +1,9 @@
->>   // SPDX-License-Identifier: GPL-2.0-only
->>   
->>   #include <linux/array_size.h>
->> +#include <linux/bitfield.h>
->>   #include <linux/bits.h>
->> +#include <linux/cleanup.h>
->>   #include <linux/dev_printk.h>
->>   #include <linux/device.h>
->>   #include <linux/export.h>
->> @@ -13,6 +15,14 @@
->>   #include <net/devlink.h>
->>   #include "zl3073x.h"
->>   
->> +/*
->> + * Register Map Page 0, General
->> + */
->> +ZL3073X_REG16_DEF(id,			0x0001);
->> +ZL3073X_REG16_DEF(revision,		0x0003);
->> +ZL3073X_REG16_DEF(fw_ver,		0x0005);
->> +ZL3073X_REG32_DEF(custom_config_ver,	0x0007);
->> +
->>   /*
->>    * Regmap ranges
->>    */
->> @@ -196,7 +206,9 @@ static void zl3073x_devlink_unregister(void *ptr)
->>    */
->>   int zl3073x_dev_init(struct zl3073x_dev *zldev)
->>   {
->> +	u16 id, revision, fw_ver;
->>   	struct devlink *devlink;
->> +	u32 cfg_ver;
->>   	int rc;
->>   
->>   	rc = devm_mutex_init(zldev->dev, &zldev->lock);
->> @@ -205,6 +217,30 @@ int zl3073x_dev_init(struct zl3073x_dev *zldev)
->>   		return rc;
->>   	}
->>   
->> +	/* Take device lock */
-> 
-> What is a device lock? Why do you need to comment standard guards/mutexes?
 
-Just to inform code reader, this is a section that accesses device 
-registers that are protected by this zl3073x device lock.
+Ido Schimmel <idosch@nvidia.com> writes:
 
->> +	scoped_guard(zl3073x, zldev) {
->> +		rc = zl3073x_read_id(zldev, &id);
->> +		if (rc)
->> +			return rc;
->> +		rc = zl3073x_read_revision(zldev, &revision);
->> +		if (rc)
->> +			return rc;
->> +		rc = zl3073x_read_fw_ver(zldev, &fw_ver);
->> +		if (rc)
->> +			return rc;
->> +		rc = zl3073x_read_custom_config_ver(zldev, &cfg_ver);
->> +		if (rc)
->> +			return rc;
->> +	}
-> 
-> Nothing improved here. Andrew comments are still valid and do not send
-> v3 before the discussion is resolved.
+> The 'read_write_len_ext' field in 'struct ethtool_cmis_cdb_cmd_args'
+> stores the maximum number of bytes that can be read from or written to
+> the Local Payload (LPL) page in a single multi-byte access.
+>
+> Cited commit started overwriting this field with the maximum number of
+> bytes that can be read from or written to the Extended Payload (LPL)
+> pages in a single multi-byte access. Transceiver modules that support
+> auto paging can advertise a number larger than 255 which is problematic
+> as 'read_write_len_ext' is a 'u8', resulting in the number getting
+> truncated and firmware flashing failing [1].
+>
+> Fix by ignoring the maximum EPL access size as the kernel does not
+> currently support auto paging (even if the transceiver module does) and
+> will not try to read / write more than 128 bytes at once.
+>
+> [1]
+> Transceiver module firmware flashing started for device enp177s0np0
+> Transceiver module firmware flashing in progress for device enp177s0np0
+> Progress: 0%
+> Transceiver module firmware flashing encountered an error for device enp177s0np0
+> Status message: Write FW block EPL command failed, LPL length is longer
+> 	than CDB read write length extension allows.
+>
+> Fixes: 9a3b0d078bd8 ("net: ethtool: Add support for writing firmware blocks using EPL payload")
+> Reported-by: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
+> Closes: https://lore.kernel.org/netdev/20250402183123.321036-3-michael.chan@broadcom.com/
+> Tested-by: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 
-I'm accessing device registers here and they are protected by the device 
-lock. I have to take the lock, register access functions expect this by 
-lockdep_assert.
-
->> +
->> +	dev_info(zldev->dev, "ChipID(%X), ChipRev(%X), FwVer(%u)\n",
->> +		 id, revision, fw_ver);
->> +	dev_info(zldev->dev, "Custom config version: %lu.%lu.%lu.%lu\n",
->> +		 FIELD_GET(GENMASK(31, 24), cfg_ver),
->> +		 FIELD_GET(GENMASK(23, 16), cfg_ver),
->> +		 FIELD_GET(GENMASK(15, 8), cfg_ver),
->> +		 FIELD_GET(GENMASK(7, 0), cfg_ver));
-> 
-> 
-> Both should be dev_dbg. Your driver should be silent on success.
-
-+1
-will change.
-
->> +
->>   	devlink = priv_to_devlink(zldev);
->>   	devlink_register(devlink);
->>   
-> 
-> 
-> Best regards,
-> Krzysztof
-> 
-
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 
