@@ -1,114 +1,179 @@
-Return-Path: <netdev+bounces-181418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80610A84E29
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 22:27:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C2E50A84E4B
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 22:39:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D6421B872D0
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 20:27:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA45F1BA5063
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 20:39:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E209028F92D;
-	Thu, 10 Apr 2025 20:27:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7032B1FAC4A;
+	Thu, 10 Apr 2025 20:39:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="MWy7gTSc"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wJKaM7wE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AB701E572F;
-	Thu, 10 Apr 2025 20:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0755290086;
+	Thu, 10 Apr 2025 20:39:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744316859; cv=none; b=UBy0eAfqo50+QlIjB+/TGMQIBFE7F79SWNZuDaAL+BK/wVrwWyNhwOUiGWrikAnKceymKqaQXFOXj2jMJFjFJ8ITYwNN2toLk3O/SCVShYBfZYty62c+j5HTWhANa4gbaISOceg5+rizwTbCBp6b7n47mlsGmgB5rPw7mKFa8VE=
+	t=1744317585; cv=none; b=dkCbllSLH/IsC02I23DMGCXludYBWY3mOVjDSMz5X0SL8KinPYsr4ni2x4X+rjOu8kTseWJr5VxpKXeKvABiLpSll4OEGWTIWr5yKwqmCuhv7CaslOs/a6AVwOBUUS2o5S0jXjdPV0AAIY50roX5j65WBgg9a1hHajmipsc6eHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744316859; c=relaxed/simple;
-	bh=cTObNwotxu11Nx1Te+NRPST2pCv6B7KKWQrtPj4ibc8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bA3yQZ6EonyFndd+n2MqQIB9DEEcaWmRbmid3fKHkChOmwONfEyLBEjKWh4bPmMJd/Q/KziJXj+4SO08la4GOFi3yzudk0+Vl/ko738GCvsKu+IfDwOWfmGz8UQg+CGtqhe0cH5sQm253AMyEcHoWfK6MEeL8gN7HHuEKlWOUE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=MWy7gTSc; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1744316858; x=1775852858;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=nSU7psxnbMS4SUGASS6CvjvaoPeLAaxluOoQpsqwWPk=;
-  b=MWy7gTScSODBiFG7QzUlGuDz9c1f23D3WjdK+w+o8IHgBKFyUqzI+1sx
-   dpvOi4lAJMyFk/X2qTwmdDsD6uxxVHiF2U/JaUaC2UJbLzGfaaZoBOlfm
-   EXQixo4vyViYyoNZiMTdtUyaep94iNRePGdiKd5JTEn783v/R3WppsKaI
-   I=;
-X-IronPort-AV: E=Sophos;i="6.15,203,1739836800"; 
-   d="scan'208";a="82682153"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 20:27:35 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:1598]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.132:2525] with esmtp (Farcaster)
- id 62febdba-8fc8-4cb4-ab5c-47169ccf6bd9; Thu, 10 Apr 2025 20:27:34 +0000 (UTC)
-X-Farcaster-Flow-ID: 62febdba-8fc8-4cb4-ab5c-47169ccf6bd9
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 10 Apr 2025 20:27:32 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.106.100.21) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Thu, 10 Apr 2025 20:27:29 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <jordan@jrife.io>
-CC: <aditi.ghag@isovalent.com>, <bpf@vger.kernel.org>, <daniel@iogearbox.net>,
-	<kuniyu@amazon.com>, <martin.lau@linux.dev>, <netdev@vger.kernel.org>,
-	<willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH v1 bpf-next 3/5] bpf: udp: Propagate ENOMEM up from bpf_iter_udp_batch
-Date: Thu, 10 Apr 2025 13:27:12 -0700
-Message-ID: <20250410202718.7676-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250409182237.441532-4-jordan@jrife.io>
-References: <20250409182237.441532-4-jordan@jrife.io>
+	s=arc-20240116; t=1744317585; c=relaxed/simple;
+	bh=2PzKMo4/Mmm0djd3Z1rt2RMSVKmRTqQOhJRhq6bOAOo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J3qbUaKd5AOTCITfBlQLFQ01zHwl13Vjpk5SIcm78MMIBOxZonWeYQXhqEgd1iEOi8RDjbD8augHb9QWl9/4q6I553GJG59FKR4WqOgNxzhQcyturJjPp/SozYX0zBM8wEUC/1NsdzWfdZMRoppTbeFB+ueQ8jqGHt/9RzmcSno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wJKaM7wE; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=nyVxhwk8khAAGT0GsMYgITxfdJKZP7FZgRCWrgQbIxg=; b=wJKaM7wEEO2RhHUXQTFtTrw1Z4
+	fvhxB6xDBGOVeQNxhrl0wD5/QviPBwfYjjK5yda1N/+VWtnj5FnSjjhWsjnc/1d4OaLNbSpfPZ0BB
+	ksABJzU2xppKIcGva4J3iaYiV4nUrinAhIcusycNrqku0UG2gXVDEJKDtB9MR0Rp+yMQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u2ygU-008j9H-D1; Thu, 10 Apr 2025 22:39:38 +0200
+Date: Thu, 10 Apr 2025 22:39:38 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Lee Jones <lee@kernel.org>
+Cc: Tobias Junghans <tobias.junghans@inhub.de>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, linux-leds@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2] leds: trigger: netdev: Match net in
+ netdev_trig_notify()
+Message-ID: <45822bb5-a408-42c1-85b7-e179789d586a@lunn.ch>
+References: <20250404151042.GC372032@google.com>
+ <20250407090455.677846-1-tobias.junghans@inhub.de>
+ <20250410101759.GT372032@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D039UWB003.ant.amazon.com (10.13.138.93) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250410101759.GT372032@google.com>
 
-From: Jordan Rife <jordan@jrife.io>
-Date: Wed,  9 Apr 2025 11:22:32 -0700
-> Stop iteration if the current bucket can't be contained in a single
-> batch to avoid choosing between skipping or repeating sockets. In cases
-> where none of the saved cookies can be found in the current bucket and
-> the batch isn't big enough to contain all the sockets in the bucket,
-> there are really only two choices, neither of which is desirable:
-> 
-> 1. Start from the beginning, assuming we haven't seen any sockets in the
->    current bucket, in which case we might repeat a socket we've already
->    seen.
-> 2. Go to the next bucket to avoid repeating a socket we may have already
->    seen, in which case we may accidentally skip a socket that we didn't
->    yet visit.
-> 
-> To avoid this tradeoff, enforce the invariant that the batch always
-> contains a full snapshot of the bucket from last time by returning
-> -ENOMEM if bpf_iter_udp_realloc_batch() can't grab enough memory to fit
-> all sockets in the current bucket.
-> 
-> To test this code path, I forced bpf_iter_udp_realloc_batch() to return
-> -ENOMEM when called from within bpf_iter_udp_batch() and observed that
-> read() fails in userspace with errno set to ENOMEM. Otherwise, it's a
-> bit hard to test this scenario.
-> 
-> Link: https://lore.kernel.org/bpf/CABi4-ogUtMrH8-NVB6W8Xg_F_KDLq=yy-yu-tKr2udXE2Mu1Lg@mail.gmail.com/
-> 
-> Signed-off-by: Jordan Rife <jordan@jrife.io>
+On Thu, Apr 10, 2025 at 11:17:59AM +0100, Lee Jones wrote:
+> Andrew et al., please could you verify for sanity?
 
-I felt this patch is patch 2 but have no strong preference.
+Sorry, i did not see this before.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Maybe we need a new MAINTAINER entry for
+drivers/leds/triggers/ledtrig-timer.c which points to the netdev list?
+
+Humm:
+
+./scripts/get_maintainer.pl drivers/leds/trigger/ledtrig-netdev.c 
+Lee Jones <lee@kernel.org> (maintainer:LED SUBSYSTEM,commit_signer:4/4=100%)
+Pavel Machek <pavel@kernel.org> (maintainer:LED SUBSYSTEM)
+Andrew Lunn <andrew@lunn.ch> (commit_signer:2/4=50%)
+Marek Vasut <marex@denx.de> (commit_signer:2/4=50%,authored:2/4=50%,added_lines:15/36=42%,removed_lines:3/8=38%)
+Heiner Kallweit <hkallweit1@gmail.com> (commit_signer:1/4=25%,authored:1/4=25%,removed_lines:2/8=25%)
+Lukasz Majewski <lukma@denx.de> (commit_signer:1/4=25%,authored:1/4=25%,added_lines:21/36=58%,removed_lines:3/8=38%)
+linux-leds@vger.kernel.org (open list:LED SUBSYSTEM)
+linux-kernel@vger.kernel.org (open list)
+
+
+So i should of been Cc:ed.
+
+Network names spaces and files in /sysfs probably need netdev
+involved, in order to get a good review.
+
+> 
+> On Mon, 07 Apr 2025, Tobias Junghans wrote:
+> 
+> > Different network devices may have the same device name if they are in
+> > different network namespaces. This confuses ledtrig-netdev and leads to
+> > undesired effects in certain situations.
+> > 
+> > When setting device_name to eth0, the trigger is attached to the
+> > corresponding (physical) network device. Later a Docker container is
+> > started. Docker now creates a virtual Ethernet interface (vethXXXX),
+> > moves it to the container's net namespace and renames it to "eth0".
+> > Subsequently ledtrig-netdev receives a NETDEV_CHANGENAME notification,
+> > recognizes "eth0" as device and and switches its activity over to this
+> > device. As a result the LED no longer blinks for the original (physical)
+> > network device.
+
+O.K. That make sense. So far, this has most been used in the embedded
+world, which does not normally have containers etc.
+
+> > The described erroneous behavior can be fixed by tracking and comparing
+> > the network namespaces of network devices.
+
+I think we need to go through the use cases, because i'm not sure the
+netns is always obvious. When device_name_store() is called, what
+netns is being referenced? Only some parts of /sysfs are netns aware.
+
+I partially agree with tracking the network name space of
+device. However, a struct net_device is unique. An LED trigger bound
+to that netdev should follow that netdev as it moves between name
+spaces. The trigger itself has no real concept of a name space, it is
+the netdev which is in the name space. So where ever possible,
+comparisons should be made based on struct netdev.
+
+In order to make this easier to understand, it might be necessary to
+break up netdev_trig_notify(). UNREGISTER, UP and CHANGE should match
+based on netdev, and the name should not matter.
+
+REGISTER is used to associate a netdev to a trigger, when all we know
+is the name of the netdev, but don't yet have a pointer to it. Here i
+agree we need to somehow know the netns:name tuple in order for the
+match to work.
+
+CHANGENAME falls into both camps. It could be a netdev associated to a
+trigger which is changing name, so we need to follow that name
+change. Or it could be a trigger which is not yet associated to a
+netdev, and the new name of the netdev now matches the trigger, and so
+the netdev needs to be associated to the trigger.
+
+So i think in order to get a good understanding of what is going on,
+it might be necessary to break this patch up, and have good commit
+messages explaining what use cases each patch is addressing.
+
+> > Signed-off-by: Tobias Junghans <tobias.junghans@inhub.de>
+> > ---
+> >  drivers/leds/trigger/ledtrig-netdev.c | 14 +++++++++++---
+> >  1 file changed, 11 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/drivers/leds/trigger/ledtrig-netdev.c b/drivers/leds/trigger/ledtrig-netdev.c
+> > index 4b0863db901a..72bcb86cdcdb 100644
+> > --- a/drivers/leds/trigger/ledtrig-netdev.c
+> > +++ b/drivers/leds/trigger/ledtrig-netdev.c
+> > @@ -62,6 +62,7 @@ struct led_netdev_data {
+> >  
+> >  	struct led_classdev *led_cdev;
+> >  	struct net_device *net_dev;
+> > +	struct net *net;
+> >  
+> >  	char device_name[IFNAMSIZ];
+> >  	atomic_t interval;
+> > @@ -274,6 +275,7 @@ static int set_device_name(struct led_netdev_data *trigger_data,
+> >  	if (trigger_data->net_dev) {
+> >  		dev_put(trigger_data->net_dev);
+> >  		trigger_data->net_dev = NULL;
+> > +		trigger_data->net = NULL;
+> >  	}
+> >  
+> >  	memcpy(trigger_data->device_name, name, size);
+> > @@ -284,6 +286,8 @@ static int set_device_name(struct led_netdev_data *trigger_data,
+> >  	if (trigger_data->device_name[0] != 0)
+> >  		trigger_data->net_dev =
+> >  		    dev_get_by_name(&init_net, trigger_data->device_name);
+
+Given we are talking about network name spaces, is the usage of
+init_net correct here?
+
+	Andrew
 
