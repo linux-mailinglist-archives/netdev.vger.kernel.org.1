@@ -1,244 +1,638 @@
-Return-Path: <netdev+bounces-181251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E818A842EE
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:22:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 603D8A84326
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 14:32:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2EB67AB158
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:20:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBCF719E83AD
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 12:32:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E937D284B37;
-	Thu, 10 Apr 2025 12:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66CF82853E5;
+	Thu, 10 Apr 2025 12:31:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QoZtjUUj"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="m4yLvUYK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mail-0201.mail-europe.com (mail-0201.mail-europe.com [51.77.79.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B4E1E0B62;
-	Thu, 10 Apr 2025 12:21:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744287703; cv=fail; b=lAJwHzVzHLihWKzOQGHQWkRCZuqT4q56oUAyIPpJjoIfgdeEWJzVb5HMDHRhK1I4eWkzfCrUxNto8fnEJ6VEDreb0jKKY2rnQMlpPvgB852Lttg5sEFJX/5skqYYx75wzVNwSGIO3x9g1NF9jdoEezzmZFA0e6VlrhMjaHpUVEc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744287703; c=relaxed/simple;
-	bh=GNYf3+f7bDgKSF89d9SUwJEJ9SYBFTnI1JFRxKtS2xo=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=XpJ4y0S5Sm4ZXI2ab84ckNn8cqhlCjgMJQq08z6k7LOyy1LHJi8DNoAF0JmlU87dp/HmRma5mq1qeZ+PzPRNolgHREGC8Byk4O6aPUOxYlRRQuYwI1es+p3apBnf3BHul4RxwsEta/r3AnNT/gxIKYun/S3H0TLP/FT8vri0w/8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QoZtjUUj; arc=fail smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744287702; x=1775823702;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=GNYf3+f7bDgKSF89d9SUwJEJ9SYBFTnI1JFRxKtS2xo=;
-  b=QoZtjUUjnVcw/hdqRFv25yfceNSsLAeOKrTYlhtcX3VHmCdf+WUoiGaE
-   DtGK5dOrb66Tqousv7cJvl454FNAHjuUmAqFgAad879TbaZ4ii6GzySLI
-   kg93fudYVQM122teFJi+EQ3YGgDcm3WkNI5EgxYN9/815FVjK+wRyxJ4H
-   gqsLo77NdUu+BuNr6tvbRBDKVuUxiVJfEHm0YvZzwmlDnMD+CsVbdCwuq
-   WQdoxgbAjofH8vvD8JLsxvhVvJ8SAP7ZpWCehfgWb0UF1hJknS+RQe7d+
-   eU/74w8NEXz0EkJsoWSZ6tAFU/XcHN/bTo9GLAl5cWwWRhlbBDrOJtVyH
-   Q==;
-X-CSE-ConnectionGUID: cUxtyqnsS5STP7OEEq2pxA==
-X-CSE-MsgGUID: WeShBVCCTFK2E+a7Iqg5mA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11400"; a="49461907"
-X-IronPort-AV: E=Sophos;i="6.15,202,1739865600"; 
-   d="scan'208";a="49461907"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 05:21:40 -0700
-X-CSE-ConnectionGUID: fiHV81EmS/2knu+VTtvGRg==
-X-CSE-MsgGUID: QZwjPHWbQe6lJ3vCiuRqVA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,202,1739865600"; 
-   d="scan'208";a="129422248"
-Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 05:21:39 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Thu, 10 Apr 2025 05:21:37 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Thu, 10 Apr 2025 05:21:37 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.175)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Thu, 10 Apr 2025 05:21:37 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=r4kmxA6OK52JrPGF5hkFrMsGinNtJG9VQWKPVJJ3Clxk3eBPZplDM8pUJjakCsTPM+s88+OT+HAFOtBmpvyDwfZFEvc96m8TliWABoM/fsPlcicrGs8DkaDtztW2X8X95iY8p/lszeVcYG+Y1PbRTc4I0uurlenxWe8jbTcrR1Hx0yutYXt3Gw3edEKeDosIjzJZxEtCCVLMoPMlIsO636lI1WK3ByWB70rw+WixhT1HgBmptjvlWXWlh0R2Y8VwjJp8TvoKOs4RFLAnmEuvfg3EsmoTKWRzAwEfC8ZbVDgGZ3EmOQDwKBL+GMf8TOw0/WTtyIwRDw3cdPQsV0P/yw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IsJwE8Om0NUYPBfEQctF3dnYZVv2rxW0ewvWSRXfWAg=;
- b=d3NNta1Ej1j1k0Hs8vXXHTf+avK0bMyFQrvbmaSUSgvpbm+kTMYLz5QV1bfy0TbtdQGlm8X83XflM+ef9BNyozKMzXP8yBkBJRWqiILstHuObvkSAn0D6z150n8dgGnzf0SO+zp2zI7vmUgDbbcfX4X1Ji1ugvnM2Cn0Aj4WZD9QH7GbM+FSXUqKG8BhBpw6GvAZEBuJG5WgC6lqywtcwg/NQBfiQwJFnziZ1n+ivAY9xUx36spBivGP0fF9p9AZn1hypcepf924ShACHlglN/FZqY5To3mWPVEnkWEOYNdUHYppkiM6MefH9QHtD7Qoabp6ivNVphhk9eJjcZzRzw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8665.namprd11.prod.outlook.com (2603:10b6:8:1b8::6) by
- DS7PR11MB7781.namprd11.prod.outlook.com (2603:10b6:8:e1::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8606.32; Thu, 10 Apr 2025 12:21:34 +0000
-Received: from DS0PR11MB8665.namprd11.prod.outlook.com
- ([fe80::8e7e:4f8:f7e4:3955]) by DS0PR11MB8665.namprd11.prod.outlook.com
- ([fe80::8e7e:4f8:f7e4:3955%5]) with mapi id 15.20.8632.021; Thu, 10 Apr 2025
- 12:21:34 +0000
-Date: Thu, 10 Apr 2025 14:21:21 +0200
-From: Michal Kubiak <michal.kubiak@intel.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-CC: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
- Lunn" <andrew+netdev@lunn.ch>, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
-	<leonro@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
-	<leon@kernel.org>, <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Moshe Shemesh <moshe@nvidia.com>, Mark Bloch
-	<mbloch@nvidia.com>, Vlad Dogaru <vdogaru@nvidia.com>, Yevgeny Kliteynik
-	<kliteyn@nvidia.com>
-Subject: Re: [PATCH net-next 07/12] net/mlx5: HWS, Fix pool size optimization
-Message-ID: <Z/e3wc7q3uGQvwVC@localhost.localdomain>
-References: <1744120856-341328-1-git-send-email-tariqt@nvidia.com>
- <1744120856-341328-8-git-send-email-tariqt@nvidia.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1744120856-341328-8-git-send-email-tariqt@nvidia.com>
-X-ClientProxiedBy: DU7P191CA0001.EURP191.PROD.OUTLOOK.COM
- (2603:10a6:10:54e::20) To DS0PR11MB8665.namprd11.prod.outlook.com
- (2603:10b6:8:1b8::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47C2284B47;
+	Thu, 10 Apr 2025 12:31:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.77.79.158
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744288298; cv=none; b=VecTEdJUkiDB1fSxmPaqHnPnwmG6MaHGR0iKhmsWujo16hgZdj4EdvPrd1GRNMXiwD/VB7D3g4hc+HF4aAeqV5vyVkPEKMXPiuGEaSrS13NOo4O8gJEXiJzMme2cBWNtJ/fzake+2FiNAS636Jy+CDKOZC+okn+u9e+OzQEYAVk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744288298; c=relaxed/simple;
+	bh=AXAIrYdA5K7mk9oH7iLRgku0Phzm9I6EG85S7ojTuN8=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cY98aGmcI7NT4YRcd3n6sBFLVNiAskkIS4PCeMhphc1VfkahQkIBl1u2yp2zFTc6t7xrfVRWaYf4WRu58KvalLWoBnrm90ml9aEKZpR8zJ3pS7F/47z13mhN5XjY8UG9XjQANC/zFELy+oe9WEAg6rxaVCHXwWiTg94k6uXEgxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=m4yLvUYK; arc=none smtp.client-ip=51.77.79.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1744288285; x=1744547485;
+	bh=BBbzojdEiyMbNG9hhVEUrlBXjHWl+9+yM1n+K6GSnLM=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
+	b=m4yLvUYKgR68u7hMgL/8IMIQZ4lZvQ0y+5UR5u/hebDunUkTH3af3P4Tunj9YzyT6
+	 YPvjXbL34D/mcCQAFPoPbaW+U4DsKvQkH5yy0F2kB/9dhsAVfTaIVNStfWWKQnhVAX
+	 mI+jpholZbdUjw9fnjzCVv+HqinTXckuQXHMNv0v0ioDgKN100BbO91DVzCmeEkEHr
+	 lNJlRSlA3ahBGUjp5Qr2hmIFuI5o1AE2MuIkndCNs2jpMB20G8lcHdbLlqe8zVcoAM
+	 j/vKuzmwyfbeg872pPqy1/XrV5Ie+dvMkP/zaqRtH66zQ6YZP7HtTg+GPNLYjMuyLU
+	 TOam9JB9GiNNw==
+Date: Thu, 10 Apr 2025 12:31:20 +0000
+To: Jonathan Cameron <jic23@kernel.org>
+From: Yassine Oudjana <y.oudjana@protonmail.com>
+Cc: Lars-Peter Clausen <lars@metafoo.de>, Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>, Alexander Sverdlin <alexander.sverdlin@gmail.com>, Sean Nyekjaer <sean@geanix.com>, Javier Carrasco <javier.carrasco.cruz@gmail.com>, Matti Vaittinen <mazziesaccount@gmail.com>, Antoniu Miclaus <antoniu.miclaus@analog.com>, Ramona Gradinariu <ramona.gradinariu@analog.com>, "Yo-Jung (Leo) Lin" <0xff07@gmail.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Neil Armstrong <neil.armstrong@linaro.org>, =?utf-8?Q?Barnab=C3=A1s_Cz=C3=A9m=C3=A1n?= <barnabas.czeman@mainlining.org>, Danila Tikhonov
+	<danila@jiaxyga.com>, Antoni Pokusinski <apokusinski01@gmail.com>, Vasileios Amoiridis <vassilisamir@gmail.com>, Petar Stoykov <pd.pstoykov@gmail.com>, shuaijie wang <wangshuaijie@awinic.com>, Yasin Lee <yasin.lee.x@gmail.com>, "Borislav Petkov (AMD)" <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, Tony Luck <tony.luck@intel.com>, Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, Ingo Molnar <mingo@kernel.org>, Yassine Oudjana <yassine.oudjana@gmail.com>, linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org, linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH 3/3] iio: Add Qualcomm Sensor Manager drivers
+Message-ID: <fc9af95b-abbf-454c-97e1-b884baa5317c@protonmail.com>
+In-Reply-To: <20250406172904.1521881e@jic23-huawei>
+References: <20250406140706.812425-1-y.oudjana@protonmail.com> <20250406140706.812425-4-y.oudjana@protonmail.com> <20250406172904.1521881e@jic23-huawei>
+Feedback-ID: 6882736:user:proton
+X-Pm-Message-ID: 57e4469934b6101244ebbe53e5b2a395fe26a34d
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8665:EE_|DS7PR11MB7781:EE_
-X-MS-Office365-Filtering-Correlation-Id: 66c0a951-b8b0-4fc2-4ede-08dd782a3baf
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?XApncPTxkZLZVncY2xAoX3dcYtep/APYt5G9FEX2c7m+AD5xIvtuFRzK5DH7?=
- =?us-ascii?Q?vKpgDlOPgGj8T4Pi0rO6SeP+H00j2sZHyQFEfzVShtTlOBglJaWBTO5Qg58F?=
- =?us-ascii?Q?nBhqVU3CuAyg/IQ+M6DD1oV49MCr0vrbD8fiHWmVWws+bd/PNR/5LEppDSYL?=
- =?us-ascii?Q?+xU/AP09GG9eBuL+76v4CfpsmUSI/63l7I5UM6x0XoRacyCVQyZAj/ZppFe+?=
- =?us-ascii?Q?0cBtoE75NkxDgTW/Cdp1OIf/Tu7M+KjOHZyJ09RGiBEpdUfSfk7aBOsDjlY/?=
- =?us-ascii?Q?uYX+6lbURaNb3dgkGZhY2HsqgCebR57B7cvUiosBYA+2rV13MX0yUNGFcXqD?=
- =?us-ascii?Q?zMFvPVCbCmV5J54mjQi6AUFuauM/kQKmUkCEfoO1dFdyAs6iAuUmMnwTwbc8?=
- =?us-ascii?Q?G5ijlV918cxkyopTH6n5CqicsqS2avcnB76oEAGLO60WguHRRwLpN6s+6dNp?=
- =?us-ascii?Q?N2+0oNjoj1dqtr5BHitLm4gRIflqA8xxgvQpt3WOWS+5gsTbmhQVg90jgITx?=
- =?us-ascii?Q?MzZ3fhm/02BmxeSh4cC8bygXp7dBhkf501U1AcWjAsl7AOCZIAl1NzRnzM0I?=
- =?us-ascii?Q?IGuGAT2EKLqk88/vLxI8XJxd7Ilco3nAZibBTOz7yqT0lmqdOChCxeoB/PBx?=
- =?us-ascii?Q?xqhZSzNH/bVeCcr9uoC2PASDhTcjFoU+tAizvM1y1I4aApan/jSqCuWSUZZx?=
- =?us-ascii?Q?hcRlrwAMQ2ELmO/+KksYfuJjFG2lOHAc3F86E01wG8PEZ5PumLsv8JW0dK8c?=
- =?us-ascii?Q?6HQWkQ7GxClaStUhL4rmLy11fSKP906I/cNR0/+yzV1sDlIn+65Jgqo+KCw3?=
- =?us-ascii?Q?pUijXsQmtpSYkzv1NtgE7/jRRftPnpopPlyIy7Mv1BnMc6cKykoSp8qK5FjS?=
- =?us-ascii?Q?ehLL7tu4WTNzorvUCe8NxRZc4VIeJJyS8asEbfkWW0D7SJ3GvReuC5LQbaOG?=
- =?us-ascii?Q?eBjlA0MUu93sr6J0add26niCh5BYuhxS7T7XpfJHgeFqIxhPOgiTq1H1j1rZ?=
- =?us-ascii?Q?UuvYzeM1S7TzKG+XWwV5ZebOD1C/qgkEUlFf86xPoZm2ugKHo3F12A9kyZie?=
- =?us-ascii?Q?ieC8mDIhZdk/U7w7ivnKZbyTPkL7Bgo38LB5TUDSwgHKCcEFPoRN4gVY5Yju?=
- =?us-ascii?Q?ma5xk5pRiow0S3/yJIvQH3Sv797LIxbrBeRMAdgr71B9BrfWGATVwcIVqCWM?=
- =?us-ascii?Q?58+FcoZfHpOEXjWW6sFBwIWGqqKmUcOHQ6KwBaoAf90fEuYIR9r/vOCDpAdJ?=
- =?us-ascii?Q?V4q9gjZBBEGuG1sL82j3/YS4tNlhqY8l61RckG45zbkyP25jHskmeeg7yJRz?=
- =?us-ascii?Q?Pw2lkLTIkXeusZPP99fE3jaLNCJMWZsUurq5aqT1DpplVCu0HRIg5e1n1ca/?=
- =?us-ascii?Q?k6aZDRdmu0Nnje7h01RhObCAUs1z?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8665.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?1/47TTJp/h1AZcB21NYcUBrOhxmwGMWBtCl8e+TEKraujDw3AClovaxrPaQ7?=
- =?us-ascii?Q?694M+T8ujJRJJp3Uq97DWX7Cp34TLEQaYdBx+l2TkfyNJp1J6YdMhodxI0wJ?=
- =?us-ascii?Q?vD3pX7/LBbHqXohnyEAzuwlFx8WvsfHqzHQStXsEnOu7EHcVEYNNTprvuqj4?=
- =?us-ascii?Q?TRbwK6TKu+5DvX+uZZ6I4VM41WGil0j/DDOUaQoIMbmbiRZWvhdnBC/eZNdG?=
- =?us-ascii?Q?Qmr7DGJEtDX2vmRDQxrVpohoig4m6g5Bc29zjsCJ7TCWZcbWZR6mNNAK2ccP?=
- =?us-ascii?Q?aCoBXWgI2h9SdwLJgleAhMdvCdGlmLbFuTpSPE9g+5Xba+OjuSFfMuZbXphJ?=
- =?us-ascii?Q?0oMENP4nbFk32eQhCNHYr+HpeZWV/V7uTj0FDEvCVl8wOcYTYgporgV93mqo?=
- =?us-ascii?Q?zax/wQBMrETxVqA37ZqXfbPfhN6OObRE2wsH6lb7y/Z/Wv2L1JvnBfDSn3Br?=
- =?us-ascii?Q?p4p3eLKX7s8CkSVwavLkAogLYkvyp59Bv1oSPbmTtGogmmnnsbLRnzLc+Ol+?=
- =?us-ascii?Q?w4LR0NMeN6oW5/80KFE/M54PsRm6uOrkDrdm07ddQa7D1VD+BOWq0X6YyzQR?=
- =?us-ascii?Q?gHFEpleVioHyNmY5sDem7WhnPJFquaDvYFJ5ldbTakCe/x9kFhs/m2kLIj2w?=
- =?us-ascii?Q?I5klNd0Hd4DBPoWtRe87qvVUdmgDvSh1BT21VwA5YvUW9bHK4OvMER1KUMmi?=
- =?us-ascii?Q?7GM4Ktmfl1/S4GQjSogGZU3jMYGZzaoksggaOeRdITZUOHeKQUzxjZq5zKrT?=
- =?us-ascii?Q?NuN5n4yuvZjdM60TjdYOkdj6Oiex338fQJNpWo5lFtGvYkIZ7zyNGSGHCiTc?=
- =?us-ascii?Q?gBk4xukV8E46GvYyT6Hovz3xjz3FDAB/O8QkyTjMTxaa7V39ip2t0xn/QPVY?=
- =?us-ascii?Q?MYLrSc6wmfSL6VorD54UJScD37dNIOBmL17gUpH21rznrOZpl+SWYGF+vfZb?=
- =?us-ascii?Q?jaOv5J5EcTjM4CnIavnteNzU4z5osGnna1mnqZsKkD30edVH+ACFqZys67H9?=
- =?us-ascii?Q?14OmkyZf2lXysDbBs3aollLlbhaD3R+Iubx2KxARPPLKj6emlbeZeJ/GQYVZ?=
- =?us-ascii?Q?rZ/7uc/6Q5KLSYKmd2ffg5uKBZcUoVfLFgVFYeRppL6y4TZM35eZU33H5c/I?=
- =?us-ascii?Q?VpEEYBMoG+F62mL6T1e1y8cg6dv/A+7rV+9bmUvqb2dxCuYfpUbKO2ss+Re4?=
- =?us-ascii?Q?bu6d5IZSJ0eb1Dti39jUUG1wGhcMm6R+WJOvDx7Zp1oHXsnxmbrxKka6msxE?=
- =?us-ascii?Q?z1SCJBAaF5NYCacPKU3qsiD7tECr3uB5yCMmFNiMFe62eJ2TGV3Tt7CqQ/Q/?=
- =?us-ascii?Q?Cz9TgsCl3tkAhlshrwv2RKDv0ezTe3AVTsTOZwlKEqNTEiDbWXCHj7XzENUq?=
- =?us-ascii?Q?ow6b7KbnsZBfDQDuJb5abklpkeuMtJ7TkP8ki9k9NiGkKmmOJSudD2MJ4iqq?=
- =?us-ascii?Q?EZS3UsVE7LTJPFD9scZiZ4rKmY+acyhhyngCjO0sO+A2kNw2ACpVOBBqQ4Rt?=
- =?us-ascii?Q?JVnJCAI5YXndISciF/eHbBEJvvF8j+jAMEZ+DtX4FPrS9Z/XxUta+sQGaysa?=
- =?us-ascii?Q?B51I+59olorqe1G4lT/Mi4UEmkto9sGXsGQmMSWBP2vSgau3FTM2ORzziwMF?=
- =?us-ascii?Q?mA=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 66c0a951-b8b0-4fc2-4ede-08dd782a3baf
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8665.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2025 12:21:34.3247
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: oio9vsSePin6dabdqkRoBp/6DAtjMmK6125CZcvNZbSag9c58I/DLSI9Zv6fImtkzt0udh9Z/3nkYYar3aLlfw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB7781
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 08, 2025 at 05:00:51PM +0300, Tariq Toukan wrote:
-> From: Vlad Dogaru <vdogaru@nvidia.com>
-> 
-> The optimization to create a size-one STE range for the unused direction
-> was broken. The hardware prevents us from creating RTCs over unallocated
-> STE space, so the only reason this has worked so far is because the
-> optimization was never used.
-> 
+On 06/04/2025 7:29 pm, Jonathan Cameron wrote:
+> On Sun, 06 Apr 2025 14:08:03 +0000
+> Yassine Oudjana <y.oudjana@protonmail.com> wrote:
+>=20
+>> Add drivers for sensors exposed by the Qualcomm Sensor Manager service,
+>> which is provided by SLPI or ADSP on Qualcomm SoCs. Supported sensors
+>> include accelerometers, gyroscopes, pressure sensors, proximity sensors
+>> and magnetometers.
+>>
+>> Signed-off-by: Yassine Oudjana <y.oudjana@protonmail.com>
+>> ---
+>>   MAINTAINERS                                 |  18 +
+>>   drivers/iio/accel/Kconfig                   |  10 +
+>>   drivers/iio/accel/Makefile                  |   2 +
+>>   drivers/iio/accel/qcom_smgr_accel.c         | 138 ++++
+>>   drivers/iio/common/Kconfig                  |   1 +
+>>   drivers/iio/common/Makefile                 |   1 +
+>>   drivers/iio/common/qcom_smgr/Kconfig        |  16 +
+>>   drivers/iio/common/qcom_smgr/Makefile       |   8 +
+>>   drivers/iio/common/qcom_smgr/qcom_smgr.c    | 589 ++++++++++++++++
+>>   drivers/iio/common/qcom_smgr/qmi/Makefile   |   3 +
+>>   drivers/iio/common/qcom_smgr/qmi/sns_smgr.c | 711 ++++++++++++++++++++
+>>   drivers/iio/common/qcom_smgr/qmi/sns_smgr.h | 163 +++++
+>>   drivers/iio/gyro/Kconfig                    |  10 +
+>>   drivers/iio/gyro/Makefile                   |   2 +
+>>   drivers/iio/gyro/qcom_smgr_gyro.c           | 138 ++++
+>>   drivers/iio/magnetometer/Kconfig            |   9 +
+>>   drivers/iio/magnetometer/Makefile           |   2 +
+>>   drivers/iio/magnetometer/qcom_smgr_mag.c    | 138 ++++
+>>   drivers/iio/pressure/Kconfig                |  10 +
+>>   drivers/iio/pressure/Makefile               |   1 +
+>>   drivers/iio/pressure/qcom_smgr_pressure.c   | 106 +++
+>>   drivers/iio/proximity/Kconfig               |  10 +
+>>   drivers/iio/proximity/Makefile              |   1 +
+>>   drivers/iio/proximity/qcom_smgr_prox.c      | 106 +++
+>>   include/linux/iio/common/qcom_smgr.h        |  64 ++
+>>   25 files changed, 2257 insertions(+)
+> Split this up.  Common library code first, then
+> individual drivers making use of it.
 
-Is there any chance that the optimization can be used (enabled) by
-someone on previous kernels? If so, maybe the patch is a better candidate
-for the "net" tree?
+Ack.
 
-Thanks,
-Michal
+>=20
+>=20
+>>   create mode 100644 drivers/iio/accel/qcom_smgr_accel.c
+>>   create mode 100644 drivers/iio/common/qcom_smgr/Kconfig
+>>   create mode 100644 drivers/iio/common/qcom_smgr/Makefile
+>>   create mode 100644 drivers/iio/common/qcom_smgr/qcom_smgr.c
+>>   create mode 100644 drivers/iio/common/qcom_smgr/qmi/Makefile
+>>   create mode 100644 drivers/iio/common/qcom_smgr/qmi/sns_smgr.c
+>>   create mode 100644 drivers/iio/common/qcom_smgr/qmi/sns_smgr.h
+>>   create mode 100644 drivers/iio/gyro/qcom_smgr_gyro.c
+>>   create mode 100644 drivers/iio/magnetometer/qcom_smgr_mag.c
+>>   create mode 100644 drivers/iio/pressure/qcom_smgr_pressure.c
+>>   create mode 100644 drivers/iio/proximity/qcom_smgr_prox.c
+>>   create mode 100644 include/linux/iio/common/qcom_smgr.h
+>=20
+>=20
+>> diff --git a/drivers/iio/accel/qcom_smgr_accel.c b/drivers/iio/accel/qco=
+m_smgr_accel.c
+>> new file mode 100644
+>> index 000000000000..ce854312d1d9
+>> --- /dev/null
+>> +++ b/drivers/iio/accel/qcom_smgr_accel.c
+>> @@ -0,0 +1,138 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + * Qualcomm Sensor Manager accelerometer driver
+>> + *
+>> + * Copyright (c) 2022, Yassine Oudjana <y.oudjana@protonmail.com>
+> Given ongoing work, a range on that date to go up to this year
+> probably makes sense!
 
+Yeah
 
-> Signed-off-by: Vlad Dogaru <vdogaru@nvidia.com>
-> Reviewed-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
-> Reviewed-by: Mark Bloch <mbloch@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> ---
->  drivers/net/ethernet/mellanox/mlx5/core/steering/hws/pool.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/pool.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/pool.c
-> index 26d85fe3c417..7e37d6e9eb83 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/pool.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/pool.c
-> @@ -80,7 +80,7 @@ static int hws_pool_resource_alloc(struct mlx5hws_pool *pool)
->  	u32 fw_ft_type, opt_log_range;
->  
->  	fw_ft_type = mlx5hws_table_get_res_fw_ft_type(pool->tbl_type, false);
-> -	opt_log_range = pool->opt_type == MLX5HWS_POOL_OPTIMIZE_ORIG ?
-> +	opt_log_range = pool->opt_type == MLX5HWS_POOL_OPTIMIZE_MIRROR ?
->  				0 : pool->alloc_log_sz;
->  	resource = hws_pool_create_one_resource(pool, opt_log_range, fw_ft_type);
->  	if (!resource) {
-> @@ -94,7 +94,7 @@ static int hws_pool_resource_alloc(struct mlx5hws_pool *pool)
->  		struct mlx5hws_pool_resource *mirror_resource;
->  
->  		fw_ft_type = mlx5hws_table_get_res_fw_ft_type(pool->tbl_type, true);
-> -		opt_log_range = pool->opt_type == MLX5HWS_POOL_OPTIMIZE_MIRROR ?
-> +		opt_log_range = pool->opt_type == MLX5HWS_POOL_OPTIMIZE_ORIG ?
->  					0 : pool->alloc_log_sz;
->  		mirror_resource = hws_pool_create_one_resource(pool, opt_log_range, fw_ft_type);
->  		if (!mirror_resource) {
-> -- 
-> 2.31.1
-> 
-> 
+>=20
+>> + */
+>> +
+>> +#include <linux/mod_devicetable.h>
+>> +#include <linux/platform_device.h>
+>> +#include <linux/iio/buffer.h>
+>> +#include <linux/iio/common/qcom_smgr.h>
+>> +#include <linux/iio/iio.h>
+>> +#include <linux/iio/kfifo_buf.h>
+>> +
+>> +static const struct iio_chan_spec qcom_smgr_accel_iio_channels[] =3D {
+>> +=09{
+>> +=09=09.type =3D IIO_ACCEL,
+>> +=09=09.modified =3D true,
+>> +=09=09.channel2 =3D IIO_MOD_X,
+>> +=09=09.scan_index =3D 0,
+>> +=09=09.scan_type =3D {
+>> +=09=09=09.sign =3D 's',
+>> +=09=09=09.realbits =3D 32,
+>> +=09=09=09.storagebits =3D 32,
+>> +=09=09=09.endianness =3D IIO_LE,
+>> +=09=09},
+>> +=09=09.info_mask_shared_by_type =3D BIT(IIO_CHAN_INFO_SCALE) |
+>> +=09=09=09=09=09    BIT(IIO_CHAN_INFO_SAMP_FREQ),
+>> +=09=09.ext_info =3D qcom_smgr_iio_ext_info
+>> +=09},
+>> +=09{
+>> +=09=09.type =3D IIO_ACCEL,
+>> +=09=09.modified =3D true,
+>> +=09=09.channel2 =3D IIO_MOD_Y,
+>> +=09=09.scan_index =3D 1,
+>> +=09=09.scan_type =3D {
+>> +=09=09=09.sign =3D 's',
+>> +=09=09=09.realbits =3D 32,
+>> +=09=09=09.storagebits =3D 32,
+>> +=09=09=09.endianness =3D IIO_LE,
+>> +=09=09},
+>> +=09=09.info_mask_shared_by_type =3D BIT(IIO_CHAN_INFO_SCALE) |
+>> +=09=09=09=09=09    BIT(IIO_CHAN_INFO_SAMP_FREQ),
+>> +=09=09.ext_info =3D qcom_smgr_iio_ext_info
+>> +=09},
+>> +=09{
+>> +=09=09.type =3D IIO_ACCEL,
+>> +=09=09.modified =3D true,
+>> +=09=09.channel2 =3D IIO_MOD_Z,
+>> +=09=09.scan_index =3D 2,
+>> +=09=09.scan_type =3D {
+>> +=09=09=09.sign =3D 's',
+>> +=09=09=09.realbits =3D 32,
+>> +=09=09=09.storagebits =3D 32,
+>> +=09=09=09.endianness =3D IIO_LE,
+>> +=09=09},
+>> +=09=09.info_mask_shared_by_type =3D BIT(IIO_CHAN_INFO_SCALE) |
+>> +=09=09=09=09=09    BIT(IIO_CHAN_INFO_SAMP_FREQ),
+>> +=09=09.ext_info =3D qcom_smgr_iio_ext_info
+>> +=09},
+>> +=09{
+>> +=09=09.type =3D IIO_TIMESTAMP,
+>> +=09=09.channel =3D -1,
+>> +=09=09.scan_index =3D 3,
+>> +=09=09.scan_type =3D {
+>> +=09=09=09.sign =3D 'u',
+>> +=09=09=09.realbits =3D 32,
+>> +=09=09=09.storagebits =3D 64,
+>> +=09=09=09.endianness =3D IIO_LE,
+>> +=09=09},
+>> +=09},
+>> +};
+>> +
+>> +static int qcom_smgr_accel_probe(struct platform_device *pdev)
+>> +{
+>> +=09struct iio_dev *iio_dev;
+>> +=09struct qcom_smgr_iio_priv *priv;
+>> +=09int ret;
+>> +
+>> +=09iio_dev =3D devm_iio_device_alloc(&pdev->dev, sizeof(*priv));
+>> +=09if (!iio_dev)
+>> +=09=09return -ENOMEM;
+>> +
+>> +=09priv =3D iio_priv(iio_dev);
+>> +=09priv->sensor =3D *(struct qcom_smgr_sensor **)pdev->dev.platform_dat=
+a;
+>> +=09priv->sensor->iio_dev =3D iio_dev;
+>> +
+>> +=09iio_dev->name =3D "qcom-smgr-accel";
+>> +=09iio_dev->info =3D &qcom_smgr_iio_info;
+>> +=09iio_dev->channels =3D qcom_smgr_accel_iio_channels;
+>> +=09iio_dev->num_channels =3D ARRAY_SIZE(qcom_smgr_accel_iio_channels);
+>> +
+>> +=09ret =3D devm_iio_kfifo_buffer_setup(&pdev->dev, iio_dev,
+>> +=09=09=09=09=09  &qcom_smgr_buffer_ops);
+>> +=09if (ret) {
+>> +=09=09dev_err(&pdev->dev, "Failed to setup buffer: %pe\n",
+>> +=09=09=09ERR_PTR(ret));
+> For all error message in probe() use
+> =09=09return dev_err_probe(&pdev->dev, ERR_PTR(ret), "Failed to setup buf=
+fer\n")
+> etc.
+
+Ack.
+
+>=20
+>> +=09=09return ret;
+>> +=09}
+>> +
+>> +=09ret =3D devm_iio_device_register(&pdev->dev, iio_dev);
+>> +=09if (ret) {
+>> +=09=09dev_err(&pdev->dev, "Failed to register IIO device: %pe\n",
+>> +=09=09=09ERR_PTR(ret));
+>> +=09=09return ret;
+>> +=09}
+>> +
+>> +=09platform_set_drvdata(pdev, priv->sensor);
+>> +
+>> +=09return 0;
+>> +}
+>> +
+>> +static void qcom_smgr_accel_remove(struct platform_device *pdev)
+>=20
+> I'm surprised to see a platform device here - will read on but I
+> doubt that is the way to go.  Maybe an auxbus or similar or
+> just squashing this all down to be registered directly by
+> the parent driver.
+I got the idea from cros_ec_sensors which also deals with a similar=20
+sensor hub paradigm.
+
+>=20
+>=20
+>> +{
+>> +=09struct qcom_smgr_sensor *sensor =3D platform_get_drvdata(pdev);
+>> +
+>> +=09sensor->iio_dev =3D NULL;
+>> +}
+>> +
+>> +static const struct platform_device_id qcom_smgr_accel_ids[] =3D {
+>> +=09{ .name =3D "qcom-smgr-accel" },
+>> +=09{ /* sentinel */ }
+>> +};
+>> +MODULE_DEVICE_TABLE(platform, qcom_smgr_accel_ids);
+>> +
+>> +static struct platform_driver qcom_smgr_accel_driver =3D {
+>> +=09.probe =3D qcom_smgr_accel_probe,
+>> +=09.remove =3D qcom_smgr_accel_remove,
+>> +=09.driver=09=3D {
+>> +=09=09.name =3D "qcom_smgr_accel",
+>> +=09},
+>> +=09.id_table =3D qcom_smgr_accel_ids,
+>> +};
+>> +module_platform_driver(qcom_smgr_accel_driver);
+>> +
+>> +MODULE_AUTHOR("Yassine Oudjana <y.oudjana@protonmail.com>");
+>> +MODULE_DESCRIPTION("Qualcomm Sensor Manager accelerometer driver");
+>> +MODULE_LICENSE("GPL");
+>=20
+>> diff --git a/drivers/iio/common/qcom_smgr/qcom_smgr.c b/drivers/iio/comm=
+on/qcom_smgr/qcom_smgr.c
+>> new file mode 100644
+>> index 000000000000..8d46be11d5b6
+>> --- /dev/null
+>> +++ b/drivers/iio/common/qcom_smgr/qcom_smgr.c
+>> @@ -0,0 +1,589 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + * Qualcomm Sensor Manager core driver
+>> + *
+>> + * Copyright (c) 2021, Yassine Oudjana <y.oudjana@protonmail.com>
+>=20
+> As above, I'd add a date range to reflect that this is ongoing.
+
+Ack.
+
+>=20
+>> + */
+>> +
+>> +#include <linux/iio/buffer.h>
+>> +#include <linux/iio/common/qcom_smgr.h>
+>> +#include <linux/iio/iio.h>
+>=20
+> Be consistent with ordering. Above you have iio as a separate block.
+> Either option is fine, but not a mixture.
+
+Ack.
+
+>=20
+>> +#include <linux/math64.h>
+>> +#include <linux/module.h>
+>> +#include <linux/of.h>
+> Unless there are very strong reasons for of specific code please
+> use property.h and the generic firmware accessors.
+
+Ack.
+
+>=20
+>> +#include <linux/platform_device.h>
+>> +#include <linux/remoteproc/qcom_rproc.h>
+>> +#include <linux/soc/qcom/qmi.h>
+>> +#include <linux/soc/qcom/qrtr.h>
+>> +#include <linux/types.h>
+>> +#include <net/sock.h>
+>=20
+>=20
+>> +static void qcom_smgr_buffering_report_handler(struct qmi_handle *hdl,
+>> +=09=09=09=09=09       struct sockaddr_qrtr *sq,
+>> +=09=09=09=09=09       struct qmi_txn *txn,
+>> +=09=09=09=09=09       const void *data)
+>> +{
+>> +=09struct qcom_smgr *smgr =3D
+>> +=09=09container_of(hdl, struct qcom_smgr, sns_smgr_hdl);
+>> +=09struct sns_smgr_buffering_report_ind *ind =3D
+>> +=09=09(struct sns_smgr_buffering_report_ind *)data;
+>=20
+> Casting away a const isn't a good sign. Why do you need to do that?
+> =09const struct sns_smg_buffer_repor_ind *ind =3D data;
+> should be fine I think.
+
+The casted struct was previously not const so I was only casting from=20
+void *. I made it const lately but didn't notice this cast. Will change it.
+
+>=20
+>=20
+>> +=09struct qcom_smgr_sensor *sensor;
+>> +=09u8 i;
+>> +
+>> +=09for (i =3D 0; i < smgr->sensor_count; ++i) {
+>> +=09=09sensor =3D &smgr->sensors[i];
+>> +
+>> +=09=09/* Find sensor matching report */
+>> +=09=09if (sensor->id !=3D ind->report_id)
+>> +=09=09=09continue;
+>> +
+>> +=09=09if (!sensor->iio_dev)
+>> +=09=09=09/* Corresponding driver was unloaded. Ignore remaining reports=
+. */
+>> +=09=09=09return;
+>> +
+>> +=09=09/*
+>> +=09=09 * Since we are matching report rate with sample rate, we only
+>> +=09=09 * get a single sample in every report.
+>> +=09=09 */
+>> +=09=09iio_push_to_buffers_with_timestamp(sensor->iio_dev,
+>> +=09=09=09=09=09=09   ind->samples[0].values,
+>> +=09=09=09=09=09=09   ind->metadata.timestamp);
+> You are using a 64 bit timestamp writer that doesn't know about the endia=
+nness of
+> that timestamp. I'd not do this.  Just write the timestamp in like any no=
+rmal
+> channel and call iio_push_to_buffers().
+
+Will look into it.
+
+>=20
+>> +
+>> +=09=09break;
+>=20
+> return;
+>=20
+>> +=09}
+>> +}
+>> +
+>> +static const struct qmi_msg_handler qcom_smgr_msg_handlers[] =3D {
+>> +=09{
+>> +=09=09.type =3D QMI_INDICATION,
+>> +=09=09.msg_id =3D SNS_SMGR_BUFFERING_REPORT_MSG_ID,
+>> +=09=09.ei =3D sns_smgr_buffering_report_ind_ei,
+>> +=09=09.decoded_size =3D sizeof(struct sns_smgr_buffering_report_ind),
+>> +=09=09.fn =3D qcom_smgr_buffering_report_handler,
+>> +=09},
+>> +=09{}
+> =09{ }
+>=20
+> given it's in IIO and I get to pick silly formatting rules.
+> More seriously I wanted this consistent so picked a choice mostly at rand=
+om.
+
+No objections on my side.
+
+>=20
+>> +};
+>=20
+>> +
+>> +static int qcom_smgr_iio_write_raw(struct iio_dev *iio_dev,
+>> +=09=09=09=09   struct iio_chan_spec const *chan, int val,
+>> +=09=09=09=09   int val2, long mask)
+>> +{
+>> +=09struct qcom_smgr_iio_priv *priv =3D iio_priv(iio_dev);
+>> +
+>> +=09switch (mask) {
+>> +=09case IIO_CHAN_INFO_SAMP_FREQ:
+>> +=09=09priv->sensor->data_types[0].cur_sample_rate =3D val;
+>> +
+>> +=09=09/*
+>> +=09=09 * Send new SMGR buffering request with updated rates
+>> +=09=09 * if buffer is enabled
+>> +=09=09 */
+>> +=09=09if (iio_buffer_enabled(iio_dev))
+>> +=09=09=09return iio_dev->setup_ops->postenable(iio_dev);
+>=20
+> Generally we'd just refuse to set the sampling frequency.
+> This is racy as nothing holds the buffer enabled.
+> So I'd do
+> =09=09if (!iio_device_claim_direct(iio_dev);
+> =09=09=09return -EBUSY;
+>=20
+> =09=09priv->sensor->data_types[0].cur_sample_rate =3D val;
+> =09=09iio_device_release_diect(iio_dev);
+>=20
+> Change sampling frequency when doing buffered capture is really confusing
+> anyway for userspace software as it has no way to know when the
+> change occurred so just don't bother supporting that.
+
+Makes sense.
+
+>=20
+>> +
+>> +=09=09return 0;
+>> +=09}
+>> +
+>> +=09return -EINVAL;
+> Put this in a default in the switch.  That makes it clear we don't
+> expect to see anything else.
+> Same for other similar cases above.
+
+Ack.
+
+>=20
+>> +}
+>> +
+>> +static int qcom_smgr_iio_read_avail(struct iio_dev *iio_dev,
+>> +=09=09=09=09    struct iio_chan_spec const *chan,
+>> +=09=09=09=09    const int **vals, int *type, int *length,
+>> +=09=09=09=09    long mask)
+>> +{
+>> +=09struct qcom_smgr_iio_priv *priv =3D iio_priv(iio_dev);
+>> +=09const int samp_freq_vals[3] =3D {
+>> +=09=091, 1, priv->sensor->data_types[0].cur_sample_rate
+>> +=09};
+>=20
+> Lifetime of this needs to last beyond the end of this call as some users
+> or read_avail hang on to it.  Embed the storage in your priv
+> structure rather than local in this function.
+
+Ack.
+
+> I'm also a little confused how the maximum comes from something called cu=
+r_sample_rate.
+
+This was max_sample_rate previously but at some point while trying to=20
+understand how the sampling rate works on the SMGR side I removed=20
+max_sample_rate and replaced it here with cur_sample_rate without=20
+understanding what I was changing. When I brought back max_sample_rate I=20
+missed this change. Will change it back.
+
+>=20
+>> +
+>> +=09switch (mask) {
+>> +=09case IIO_CHAN_INFO_SAMP_FREQ:
+>> +=09=09*type =3D IIO_VAL_INT;
+>> +=09=09*vals =3D samp_freq_vals;
+>> +=09=09*length =3D ARRAY_SIZE(samp_freq_vals);
+>> +=09=09return IIO_AVAIL_RANGE;
+>> +=09}
+>> +
+>> +=09return -EINVAL;
+>> +}
+>=20
+> ...
+>=20
+>> +const struct iio_chan_spec_ext_info qcom_smgr_iio_ext_info[] =3D {
+>> +=09IIO_MOUNT_MATRIX(IIO_SHARED_BY_DIR, qcom_smgr_iio_get_mount_matrix),
+>> +=09{}
+> trivial but I'm trying to standardize on
+> =09{ }
+> for this in IIO.
+
+Ack.
+
+>=20
+>> +};
+>> +EXPORT_SYMBOL_GPL(qcom_smgr_iio_ext_info);
+>> +
+>> +static int qcom_smgr_probe(struct qrtr_device *qdev)
+>> +{
+>> +=09struct qcom_smgr *smgr;
+>> +=09int i, j;
+>> +=09int ret;
+>> +
+>> +=09smgr =3D devm_kzalloc(&qdev->dev, sizeof(*smgr), GFP_KERNEL);
+>> +=09if (!smgr)
+>> +=09=09return -ENOMEM;
+>> +
+>> +=09smgr->dev =3D &qdev->dev;
+>> +
+>> +=09smgr->sns_smgr_info.sq_family =3D AF_QIPCRTR;
+>> +=09smgr->sns_smgr_info.sq_node =3D qdev->node;
+>> +=09smgr->sns_smgr_info.sq_port =3D qdev->port;
+>> +
+>> +=09dev_set_drvdata(&qdev->dev, smgr);
+>> +
+>> +=09ret =3D qmi_handle_init(&smgr->sns_smgr_hdl,
+>> +=09=09=09      SNS_SMGR_SINGLE_SENSOR_INFO_RESP_MAX_LEN, NULL,
+>> +=09=09=09      qcom_smgr_msg_handlers);
+> On error this handle doesn't seem to be released.
+
+Will fix.
+
+>=20
+>> +=09if (ret < 0) {
+>> +=09=09dev_err(smgr->dev,
+>> +=09=09=09"Failed to initialize sensor manager handle: %d\n",
+>> +=09=09=09ret);
+>> +=09=09return ret;
+>=20
+> return dev_err_probe()
+> Same in all other similar cases that are only called from probe.
+
+Ack.
+
+>=20
+>> +=09}
+>> +
+>> +=09ret =3D qcom_smgr_request_all_sensor_info(smgr, &smgr->sensors);
+>> +=09if (ret < 0) {
+>> +=09=09dev_err(smgr->dev, "Failed to get available sensors: %pe\n",
+>> +=09=09=09ERR_PTR(ret));
+>> +=09=09return ret;
+>> +=09}
+>> +=09smgr->sensor_count =3D ret;
+>> +
+>> +=09/* Get primary and secondary sensors from each sensor ID */
+>> +=09for (i =3D 0; i < smgr->sensor_count; i++) {
+>> +=09=09ret =3D qcom_smgr_request_single_sensor_info(smgr,
+>> +=09=09=09=09=09=09=09   &smgr->sensors[i]);
+>> +=09=09if (ret < 0) {
+>> +=09=09=09dev_err(smgr->dev,
+>> +=09=09=09=09"Failed to get sensors from ID 0x%02x: %pe\n",
+>> +=09=09=09=09smgr->sensors[i].id, ERR_PTR(ret));
+>> +=09=09=09return ret;
+>> +=09=09}
+>> +
+>> +=09=09for (j =3D 0; j < smgr->sensors[i].data_type_count; j++) {
+>> +=09=09=09/* Default to maximum sample rate */
+>> +=09=09=09smgr->sensors[i].data_types->cur_sample_rate =3D
+>> +=09=09=09=09smgr->sensors[i].data_types->max_sample_rate;
+>> +
+>> +=09=09=09dev_dbg(smgr->dev, "0x%02x,%d: %s %s\n",
+>> +=09=09=09=09smgr->sensors[i].id, j,
+>> +=09=09=09=09smgr->sensors[i].data_types[j].vendor,
+>> +=09=09=09=09smgr->sensors[i].data_types[j].name);
+>> +=09=09}
+>> +
+>> +=09=09qcom_smgr_register_sensor(smgr, &smgr->sensors[i]);
+> Above I suggest that maybe you should just skip the platform devices and =
+register
+> directly with IIO as you find the sensors. So have the struct iio_dev->de=
+vice
+> parent directly off this one.
+
+As I said previously I followed the model used in cros_ec_sensors, and=20
+it made sense to me since I always see platform devices used to=20
+represent firmware-backed devices like this.
+
+>=20
+>> +=09}
+>> +
+>> +=09return 0;
+>> +}
+>> +
+>> +static void qcom_smgr_remove(struct qrtr_device *qdev)
+>> +{
+>> +=09struct qcom_smgr *smgr =3D dev_get_drvdata(&qdev->dev);
+>> +
+>> +=09qmi_handle_release(&smgr->sns_smgr_hdl);
+> If that is all you have, use a devm_add_action_or_reset() to
+> register a handler and drop this remove entirely.
+
+Ack.
+
+>=20
+>> +}
+>> +
+>> +static const struct qrtr_device_id qcom_smgr_qrtr_match[] =3D {
+>> +=09{
+>> +=09=09.service =3D SNS_SMGR_QMI_SVC_ID,
+>> +=09=09.instance =3D QRTR_INSTANCE(SNS_SMGR_QMI_SVC_V1,
+>> +=09=09=09=09=09  SNS_SMGR_QMI_INS_ID)
+>> +=09},
+>> +=09{},
+> =09{ }
+>=20
+> for IIO terminating entries like this.
+
+Ack.
+
+>=20
+>> +};
+>> +MODULE_DEVICE_TABLE(qrtr, qcom_smgr_qrtr_match);
+
 
