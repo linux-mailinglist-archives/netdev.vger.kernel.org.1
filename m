@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-181008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1DB9A83657
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 04:21:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCAADA83680
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 04:30:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2880B3B17A1
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 02:19:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D14B8443465
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 02:30:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F1911AF0BB;
-	Thu, 10 Apr 2025 02:19:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E961D2F53;
+	Thu, 10 Apr 2025 02:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jtDKrZEV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PkMau/40"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D4815624D;
-	Thu, 10 Apr 2025 02:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCCB31A2390;
+	Thu, 10 Apr 2025 02:29:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744251595; cv=none; b=CPK1wpuujmnb3pZMKCAcppQ2fRmerLNf/fRMVVRDaK4P8QJpMWTU6ATeqs9zhSBImUOLE6nYbVNC1i7OEcIzrd8997es7quIo4N0F2y0IEb8HQ8POxLEYC5k3fm+Mzify4Ej4tL0aPdq2/uvp9d/4rZal3Hr0mNUVwyS34OOLZI=
+	t=1744252196; cv=none; b=udtEs+jXs8dc1QuXU565Lq+lxKYbBonGf92ZhVllrPnoZeACShgRWzy1fM34Ul6Ce3lWzH3jv0N4A1K5OYEhqDIwiNjHg+pKsUmdCcT0a36X7QzECA7KosxQMBR9lFNu+wOSdENq8hOrUpx5bBnQz1QDrLKik3yobQxdkV0vNDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744251595; c=relaxed/simple;
-	bh=SD+ghgUp24CKe30QbZqObPCHvc9jxW+a+P0BVX6tKsg=;
+	s=arc-20240116; t=1744252196; c=relaxed/simple;
+	bh=E7Des7EK+sUgtkY+WWs2fRdo6Bd/TmZZDDYF1r+l6Bk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=H1ebfgflFxJLlACQXYd2b85jg2//Qf+9MiwXTFHSpm/UgSbFir2ss0ebbgULTtPgdHgP1yHFgWGYkHLblwmKCgoFVsX8WlBQ8+0DieGkW+dKjEiDsbEo701s7M197s8ya/QBtYN6pnaGkicnlla1zXbo97hUOvU/oLhtSLWjQm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jtDKrZEV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5C34C4CEE2;
-	Thu, 10 Apr 2025 02:19:54 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=uu16V3PkGuDADFjwojPxplbTMqHzdwFnPP23ccjNPmpFQWQb9VVJ+ydhdepi/rdXg84DRLFK4hHVmbrVxy+sgjwuzCIs8En/368xhA+GLmCN9Fr5CfQCRU9NAZD0QzlN+6WRtuaLCnySEozVB/pp6lODnrAVXJilb/V2dr/LM/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PkMau/40; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45822C4CEE2;
+	Thu, 10 Apr 2025 02:29:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744251594;
-	bh=SD+ghgUp24CKe30QbZqObPCHvc9jxW+a+P0BVX6tKsg=;
+	s=k20201202; t=1744252196;
+	bh=E7Des7EK+sUgtkY+WWs2fRdo6Bd/TmZZDDYF1r+l6Bk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jtDKrZEVBOvx5MuEyBaDBjwteABkOie1i1sFdH0F+f0MwqQAM8v/+Vqk6Q+6hglCz
-	 fA6dYWgnlzj1f4EpvQE8zGjg4YFVe658EigWhhw1xfgZMzaJ9FGvbn3xlP8tkDuS25
-	 hajYLWIjyi+ASy4Txa340zI9MdJJfrBdZ+so4yZ1pWLA9BribrPNyBGV8tRSEOmuqP
-	 MUQmWQt/KhoJSkBuCctrL30Aa8DbOJjYmMQMU07BOthddKwJWxCwrH8aejmb5TU56T
-	 1+27tOVlyVtx1HeDmeHA96KGGvwZUMFpakZX2sWQP4Y3ksP63C3ZhuuSrUvw9tT9rP
-	 BfnLuVRTI7oZw==
+	b=PkMau/40iG7yghU/12Wz+qD1NdYequg4GpOWJX2XoM9VW32GB2fhJZVeasFTZFPuU
+	 XUwAyZ5WnChtpQY6XUjb8gTlyKEKoD4xCG4dQg0VUy1WUL8Z6fiDQGLIoB1qAO5c7Q
+	 VcYm163376I29iejxAYjVuU+yKrEtm08M8YLl7hEFuOT6Ipg2FshA7Hmw2+G/yJUF/
+	 ZCMHY/4jhTlH2FsJ2C4ueEsPwvUZh5xuFABJdPvA/Eaq+uwvABhJPv2C0gA21P21J3
+	 MrY4Vk7FWcF+YPIsKpeWNJ1LJVsd9XMqiyGB6AiOemvUHKWFr+thFgXpHI4TXF4Jeb
+	 0uKJNSN2UiWjQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E7438111DC;
-	Thu, 10 Apr 2025 02:20:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB23438111DC;
+	Thu, 10 Apr 2025 02:30:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 net] net: Fix null-ptr-deref by
- sock_lock_init_class_and_name() and rmmod.
+Subject: Re: [PATCH net-next 0/2] bridge: Prevent unicast ARP/NS packets from
+ being suppressed by bridge
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174425163226.3117389.4180817468978308602.git-patchwork-notify@kernel.org>
-Date: Thu, 10 Apr 2025 02:20:32 +0000
-References: <20250407163313.22682-1-kuniyu@amazon.com>
-In-Reply-To: <20250407163313.22682-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
+ <174425223377.3120264.13308441300773749640.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Apr 2025 02:30:33 +0000
+References: <cover.1744123493.git.petrm@nvidia.com>
+In-Reply-To: <cover.1744123493.git.petrm@nvidia.com>
+To: Petr Machata <petrm@nvidia.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, willemb@google.com, horms@kernel.org,
- peterz@infradead.org, sfrench@samba.org, ematsumiya@suse.de,
- wangzhaolong1@huawei.com, kuni1840@gmail.com, netdev@vger.kernel.org,
- stable@vger.kernel.org
+ pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+ razor@blackwall.org, idosch@nvidia.com, bridge@lists.linux.dev,
+ mlxsw@nvidia.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 7 Apr 2025 09:33:11 -0700 you wrote:
-> When I ran the repro [0] and waited a few seconds, I observed two
-> LOCKDEP splats: a warning immediately followed by a null-ptr-deref. [1]
+On Tue, 8 Apr 2025 17:40:22 +0200 you wrote:
+> From: Amit Cohen <amcohen@nvidia.com>
 > 
-> Reproduction Steps:
+> Currently, unicast ARP requests/NS packets are replied by bridge when
+> suppression is enabled, then they are also forwarded, which results two
+> replicas of ARP reply/NA - one from the bridge and second from the target.
 > 
->   1) Mount CIFS
->   2) Add an iptables rule to drop incoming FIN packets for CIFS
->   3) Unmount CIFS
->   4) Unload the CIFS module
->   5) Remove the iptables rule
+> The purpose of ARP/ND suppression is to reduce flooding in the broadcast
+> domain, which is not relevant for unicast packets. In addition, the use
+> case of unicast ARP/NS is to poll a specific host, so it does not make
+> sense to have the switch answer on behalf of the host.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3,net] net: Fix null-ptr-deref by sock_lock_init_class_and_name() and rmmod.
-    https://git.kernel.org/netdev/net/c/0bb2f7a1ad1f
+  - [net-next,1/2] net: bridge: Prevent unicast ARP/NS packets from being suppressed by bridge
+    https://git.kernel.org/netdev/net-next/c/827b2ac8e796
+  - [net-next,2/2] selftests: test_bridge_neigh_suppress: Test unicast ARP/NS with suppression
+    https://git.kernel.org/netdev/net-next/c/0ffb594212a0
 
 You are awesome, thank you!
 -- 
