@@ -1,281 +1,204 @@
-Return-Path: <netdev+bounces-181291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 085CEA844A6
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 15:25:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41049A844CE
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 15:31:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 136127A49BD
-	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 13:22:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 598E218859F8
+	for <lists+netdev@lfdr.de>; Thu, 10 Apr 2025 13:27:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18F602836BA;
-	Thu, 10 Apr 2025 13:23:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C266128A405;
+	Thu, 10 Apr 2025 13:27:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rRxghqiG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PUVN7kZ2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E46891EB5F7;
-	Thu, 10 Apr 2025 13:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9754F2857DA;
+	Thu, 10 Apr 2025 13:27:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744291436; cv=none; b=DzQtkL9D12BH+w1mDWUe9ys9pWiYhdnh/gmW8rFeNw2nkoMLd/FYEMpSPsu4hZc7uRYUfpGnH1it7livQTHBj6Q/Du012J9Fe6FgdG3fCQRmx0Kxfxb7xnUN+kx0KMKinJV6sn3hcEXgiOkyMKd1N63CnQD4JB3nexZua2GH+AM=
+	t=1744291634; cv=none; b=RNuo68t09BhLlzFQquMIdgfG7S+sIkOCqYRf7gAPmge4ZUo0p6zON7COyAqJlUxG71JNWFHc7qjSz2+r4JJzMetja7opGj6yho1ZyP7Um5ydx6JpkHBGfEXS41Pm26vbAz9pVMQXt4D+DRE7/hvNtKr9ZnxPgsRPocICS7T6riA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744291436; c=relaxed/simple;
-	bh=35bowL8nZeAUEMUkTdGIDht/faXw5WqatgtW/CTRsXg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ic9Q2ZUl05f7559YdorxM0lw7GoJJxMvISyqp5FMS0Q1QIq0TF8igc60dTxkpphWT/pOnqA4sMaA1qiJYgymSv88I4F/3/gkTGMUD9SVS8nKvvSygW/AAOMyYNifjdkIGvtfuXPKKKEhHpUqyT4W2g6ZDMLLZKZbJYLpVN1E6UE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rRxghqiG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96923C4CEE8;
-	Thu, 10 Apr 2025 13:23:53 +0000 (UTC)
+	s=arc-20240116; t=1744291634; c=relaxed/simple;
+	bh=uJNt4QupPmB5L6K4f/LhHjqr0GkS2EqrPb2R93LqjUg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mo8Ke950UpezlDxet8lVK8o4hRJ/1gQ74+q6YttOwpZywpgxrqcwUtYX6O8FjAMt8C0Qs8My5RqLcGIExvNR/dams3tQC7Nkd4E7jhWx6y6Lnt+vCoqypkQTdhJlylA6Nj5ImBFPJtWV/LJCrXQkqzBKU/IxgC2WZSPbAlduxMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PUVN7kZ2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CBD8C4CEE8;
+	Thu, 10 Apr 2025 13:27:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744291434;
-	bh=35bowL8nZeAUEMUkTdGIDht/faXw5WqatgtW/CTRsXg=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=rRxghqiGdl1XAF4NVWbknHnG5h9cvz3NGkhgXsD2JgppigdbzqAkBLipqN0oiagEQ
-	 D6JWwn1p9M3kfz/GJtFp2c6T7LrsjuVKMFwylsDXn+oB2nBFYZXR2Y0Sl84mdHM4LG
-	 NBj3A0stiagGhOyQ1IK8WzyWqNKeDrmrjv/JgM9Qz/v98dM0xdJV6Apcv+BxCgeK18
-	 G7cLIRoDWQprKHby3OWBXtvhfPtUhXz2N8qP2GMlpZ/XbXectqVw73LPgBuXvOZ6cc
-	 rToSWkv3Cq6M6DPa7YBsBIIYLjgdVq9/U2djrmt9Pnw5TbqFy27phjxPULZL7LRml0
-	 AWMhr6E4Ev0xQ==
-Message-ID: <ff2b7cfb7657a185469747d930b834dbdfdf6eac.camel@kernel.org>
-Subject: Re: [PATCH v2 2/2] net: add debugfs files for showing netns
- refcount tracking info
-From: Jeff Layton <jlayton@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski	 <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman	 <horms@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, 	netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Date: Thu, 10 Apr 2025 09:23:52 -0400
-In-Reply-To: <91d6d3c60ef5d4ed90418f8a06228767be8a5b1b.camel@kernel.org>
-References: <20250408-netns-debugfs-v2-0-ca267f51461e@kernel.org>
-		 <20250408-netns-debugfs-v2-2-ca267f51461e@kernel.org>
-		 <1e717326-8551-419e-b185-5cfb20573b4f@lunn.ch>
-	 <91d6d3c60ef5d4ed90418f8a06228767be8a5b1b.camel@kernel.org>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+	s=k20201202; t=1744291634;
+	bh=uJNt4QupPmB5L6K4f/LhHjqr0GkS2EqrPb2R93LqjUg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PUVN7kZ2Fp/FqfPqkbfWtE/lYMV3vJzYKXcBEzQdd4Si6dFhD8w0kUy9vnDtP+J1h
+	 mgfXKHawgVbFbUmGImkPo2AbKFiyAxDgnU9oicMqt99ev1eUk4EhkQqRe5/QJ3YhCg
+	 rezqbqC/LnQ1bj79R6LAHBg8W5OKYmxKeBzXMkEcXS+PHWPYIkGyl/ukyGbD4KK7Za
+	 xzHjr9XSH0Sy6QuSVLeqPszgKihI8h///9GmK7IrzkkrMQn9EWyxp005B5dxT9ae6g
+	 Nkr1sjNNfJdSwode/OtBqP1Ul9qR0MmsKrhzxMMlOhwKyUuV5nCOleJy4bxdVZWlO8
+	 zJRGh8PwnLRTg==
+Date: Thu, 10 Apr 2025 16:27:06 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Larysa Zaremba <larysa.zaremba@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Tatyana Nikolova <tatyana.e.nikolova@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Lee Trager <lee@trager.us>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Karlsson, Magnus" <magnus.karlsson@intel.com>,
+	Emil Tantilov <emil.s.tantilov@intel.com>,
+	Madhu Chittim <madhu.chittim@intel.com>,
+	Josh Hay <joshua.a.hay@intel.com>,
+	Milena Olech <milena.olech@intel.com>, pavan.kumar.linga@intel.com,
+	"Singhai, Anjali" <anjali.singhai@intel.com>,
+	Phani R Burra <phani.r.burra@intel.com>
+Subject: Re: [PATCH iwl-next 05/14] libeth: add control queue support
+Message-ID: <20250410132706.GR199604@unreal>
+References: <20250408124816.11584-1-larysa.zaremba@intel.com>
+ <20250408124816.11584-6-larysa.zaremba@intel.com>
+ <20250410082137.GO199604@unreal>
+ <Z_ehEXmlEBREQWQM@soc-5CG4396X81.clients.intel.com>
+ <20250410112349.GP199604@unreal>
+ <Z_fAdLJ4quuP2lip@soc-5CG4396X81.clients.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z_fAdLJ4quuP2lip@soc-5CG4396X81.clients.intel.com>
 
-On Thu, 2025-04-10 at 09:08 -0400, Jeff Layton wrote:
-> On Thu, 2025-04-10 at 14:36 +0200, Andrew Lunn wrote:
-> > On Tue, Apr 08, 2025 at 09:36:38AM -0400, Jeff Layton wrote:
-> > > CONFIG_NET_NS_REFCNT_TRACKER currently has no convenient way to displ=
-ay
-> > > its tracking info. Add a new net_ns directory under the debugfs
-> > > ref_tracker directory. Create a directory in there for every netns, w=
-ith
-> > > refcnt and notrefcnt files that show the currently tracked active and
-> > > passive references.
-> >=20
-> > I think most if not all of this should be moved into the tracker
-> > sources, there is very little which is netdev specific.=20
-> >=20
->=20
-> Fair enough. I can move most of this into helpers in ref_tracker.c.
->=20
-> > >=20
-> > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> > > ---
-> > >  net/core/net_namespace.c | 151 +++++++++++++++++++++++++++++++++++++=
-++++++++++
-> > >  1 file changed, 151 insertions(+)
-> > >=20
-> > > diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-> > > index 4303f2a4926243e2c0ff0c0387383cd8e0658019..7e9dc487f46d656ee4ae3=
-d6d18d35bb2aba2b176 100644
-> > > --- a/net/core/net_namespace.c
-> > > +++ b/net/core/net_namespace.c
-> > > @@ -1512,3 +1512,154 @@ const struct proc_ns_operations netns_operati=
-ons =3D {
-> > >  	.owner		=3D netns_owner,
-> > >  };
-> > >  #endif
-> > > +
-> > > +#ifdef CONFIG_DEBUG_FS
-> > > +#ifdef CONFIG_NET_NS_REFCNT_TRACKER
-> > > +
-> > > +#include <linux/debugfs.h>
-> > > +
-> > > +static struct dentry *ns_ref_tracker_dir;
-> > > +static unsigned int ns_debug_net_id;
-> > > +
-> > > +struct ns_debug_net {
-> > > +	struct dentry *netdir;
-> > > +	struct dentry *refcnt;
-> > > +	struct dentry *notrefcnt;
-> > > +};
-> > > +
-> > > +#define MAX_NS_DEBUG_BUFSIZE	(32 * PAGE_SIZE)
-> > > +
-> > > +static int
-> > > +ns_debug_tracker_show(struct seq_file *f, void *v)
-> > > +{
-> > > +	struct ref_tracker_dir *tracker =3D f->private;
-> > > +	int len, bufsize =3D PAGE_SIZE;
-> > > +	char *buf;
-> > > +
-> > > +	for (;;) {
-> > > +		buf =3D kvmalloc(bufsize, GFP_KERNEL);
-> > > +		if (!buf)
-> > > +			return -ENOMEM;
-> > > +
-> > > +		len =3D ref_tracker_dir_snprint(tracker, buf, bufsize);
-> > > +		if (len < bufsize)
-> > > +			break;
-> > > +
-> > > +		kvfree(buf);
-> > > +		bufsize *=3D 2;
-> > > +		if (bufsize > MAX_NS_DEBUG_BUFSIZE)
-> > > +			return -ENOBUFS;
-> >=20
-> > Maybe consider storing bufsize between calls to dump the tracker? I
-> > guess you then have about the correct size for most calls, and from
-> > looking at len, you can decide to downsize it if needed.
-> >=20
->=20
-> Eric had a proposed change to make ref_tracker_dir_snprint() not sit
-> with hard IRQs disabled for so long. That involved passing back a
-> needed size, so I might rather integrate this into that change.
->=20
-> > > +static int
-> > > +ns_debug_init_net(struct net *net)
-> > > +{
-> > > +	struct ns_debug_net *dnet =3D net_generic(net, ns_debug_net_id);
-> > > +	char name[11]; /* 10 decimal digits + NULL term */
-> > > +	int len;
-> > > +
-> > > +	len =3D snprintf(name, sizeof(name), "%u", net->ns.inum);
-> > > +	if (len >=3D sizeof(name))
-> > > +		return -EOVERFLOW;
-> > > +
-> > > +	dnet->netdir =3D debugfs_create_dir(name, ns_ref_tracker_dir);
-> > > +	if (IS_ERR(dnet->netdir))
-> > > +		return PTR_ERR(dnet->netdir);
-> >=20
-> > As i pointed out before, the tracker already has a name. Is that name
-> > useless? Not specific enough? Rather than having two names, maybe
-> > change the name to make it useful. Once it has a usable name, you
-> > should be able to push more code into the core.
-> >=20
->=20
-> I don't understand which name you mean.
->=20
-> This patch creates a ref_tracker/net_ns dir and then creates
-> directories under that that have names that match the net namespace
-> inode numbers as displayed in /proc/<pid>/ns/net symlink. Those
-> directories hold two files "refcnt" and "notrefcnt" that display the
-> different trackers.
->=20
-> It's not clear to me what you'd like to see changed in that scheme.
+On Thu, Apr 10, 2025 at 02:58:28PM +0200, Larysa Zaremba wrote:
+> On Thu, Apr 10, 2025 at 02:23:49PM +0300, Leon Romanovsky wrote:
+> > On Thu, Apr 10, 2025 at 12:44:33PM +0200, Larysa Zaremba wrote:
+> > > On Thu, Apr 10, 2025 at 11:21:37AM +0300, Leon Romanovsky wrote:
+> > > > On Tue, Apr 08, 2025 at 02:47:51PM +0200, Larysa Zaremba wrote:
+> > > > > From: Phani R Burra <phani.r.burra@intel.com>
+> > > > > 
+> > > > > Libeth will now support control queue setup and configuration APIs.
+> > > > > These are mainly used for mailbox communication between drivers and
+> > > > > control plane.
+> > > > > 
+> > > > > Make use of the page pool support for managing controlq buffers.
+> > > > 
+> > > > <...>
+> > > > 
+> > > > >  libeth-y			:= rx.o
+> > > > >  
+> > > > > +obj-$(CONFIG_LIBETH_CP)		+= libeth_cp.o
+> > > > > +
+> > > > > +libeth_cp-y			:= controlq.o
+> > > > 
+> > > > So why did you create separate module for it?
+> > > > Now you have pci -> libeth -> libeth_cp -> ixd, with the potential races between ixd and libeth, am I right?
+> > > >
+> > > 
+> > > I am not sure what kind of races do you mean, all libeth modules themselves are 
+> > > stateless and will stay this way [0], all used data is owned by drivers.
+> > 
+> > Somehow such separation doesn't truly work. There are multiple syzkaller
+> > reports per-cycle where module A tries to access module C, which already
+> > doesn't exist because it was proxied through module B.
+> 
+> Are there similar reports for libeth and libie modules when iavf is enabled?
 
-Oh, ok. I guess you mean these names?
+To get such report, syzkaller should run on physical iavf, it looks like it doesn't.
+Did I miss it here?
+https://syzkaller.appspot.com/upstream/s/net
 
-        ref_tracker_dir_init(&net->refcnt_tracker, 128, "net refcnt");
-        ref_tracker_dir_init(&net->notrefcnt_tracker, 128, "net notrefcnt")=
-;
+> It is basically the same hierarchy. (iavf uses both libeth and libie, libie 
+> depends on libeth).
+> 
+> I am just trying to understand, is this a regular situation or did I just mess 
+> smth up?
 
-Two problems there:
+My review comment was general one. It is almost impossible to review
+this newly proposed architecture split for correctness.
 
-1/ they have an embedded space in the name which is just painful. Maybe we =
-can replace those with underscores?
-2/ they aren't named in a per-net namespace way
+> 
+> > 
+> > > 
+> > > As for the module separation, I think there is no harm in keeping it modular. 
+> > 
+> > Syzkaller reports disagree with you. 
+> >
+> 
+> Could you please share them?
 
-I guess we could do something like these nested dirs:
+It is not an easy question to answer, because all these reports are complaining
+about some wrong locking order or NULL-pointer access. You will never know if
+it is because of programming or design error.
 
-debug
-    ref_tracker
-	net_refcnt
-	net_notrefcnt
+As an approximate example, see commits a27c6f46dcec ("RDMA/bnxt_re: Fix an issue in bnxt_re_async_notifier")
+and f0df225d12fc ("RDMA/bnxt_re: Add sanity checks on rdev validity").
+At the first glance, they look unrelated to our discussion, however
+they can serve as an example or races between deinit/disable paths in
+parent module vs. child.
 
-...and then create files under the net_* directories that match the
-netns ID's. That's what I was trying to ask when I asked about the
-directory structure in the last set. How do you want the directory
-structure laid out?
---=20
-Jeff Layton <jlayton@kernel.org>
+>  
+> > > We intend to use basic libeth (libeth_rx) in drivers that for sure have no use 
+> > > for libeth_cp. libeth_pci and libeth_cp separation is more arbitral, as we have 
+> > > no plans for now to use them separately.
+> > 
+> > So let's not over-engineer it.
+> > 
+> > > 
+> > > Module dependencies are as follows:
+> > > 
+> > > libeth_rx and libeth_pci do not depend on other modules.
+> > > libeth_cp depends on both libeth_rx and libeth_pci.
+> > > idpf directly uses libeth_pci, libeth_rx and libeth_cp.
+> > > ixd directly uses libeth_cp and libeth_pci.
+> > 
+> 
+> I need to amend this: libeth_cp does not depend on libeth_pci in terms of 
+> module namespace, it only uses the header to access struct device that is 
+> stored in libeth_pci-specific mmio_info.
+
+So why did you add SELECT in kconfig?
+
+> 
+> > You can do whatever module architecture for netdev devices, but if you
+> > plan to expose it to RDMA devices, I will vote against any deep layered
+> > module architecture for the drivers.
+> > 
+> > BTW, please add some Intel prefix to the modules names, they shouldn't
+> > be called in generic names like libeth, e.t.c
+> >
+> 
+> We did not think this would be a problem, intel has a tradition of calling the 
+> modules pretty ambiguously.
+
+I know and it is worth to be changed.
+
+> 
+> > Thanks
+> > 
+> > > 
+> > > [0] https://lore.kernel.org/netdev/61bfa880-6a88-4eac-bab7-040bf72a11ef@intel.com/
+> > > 
+> > > > Thanks
+> 
 
