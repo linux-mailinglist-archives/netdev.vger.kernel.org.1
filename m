@@ -1,141 +1,149 @@
-Return-Path: <netdev+bounces-181790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 792F3A8679F
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 22:52:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A20FDA867AB
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 22:53:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F68A4A0891
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 20:51:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E2B01763D6
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 20:53:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71095283CBB;
-	Fri, 11 Apr 2025 20:51:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29BB12857E3;
+	Fri, 11 Apr 2025 20:53:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="CMUZhh1K"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="WDv835vG"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4F4D283CB3
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 20:51:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9866C280A43
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 20:53:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744404705; cv=none; b=WRq9eN0e5raBdQT8LmEs/UvEbEaRa5foNt3Wn/cYojC7hLaa1Qz859nvWbP3hsrmKsEqN8j++f6gpQTcN5u6GlzQSjJkRY9oFDMgq+FfY9sAQjloTHj+vmMo0dlsXpDs701i9zSyJlPX6wkuDGfrOfra/Jm4A1aU33wKX+eNLec=
+	t=1744404799; cv=none; b=YAX4n3Osn40xpXvkiNB4sJmiMMbV/NOsTsCNl8TYBEe24/Sep9i1o/b8dYKpIRnxiFQL9HcmYCLgGExCVB/U++msWKJvk63mWLPQ7zVYjHPAK+xBzzczgndUO/R5imIHesBZCYyF5ndCVorqTeadsTLhKK9HaJDStMic+6Sd2VY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744404705; c=relaxed/simple;
-	bh=wVIy8ayCd18WwaSqN1iZpBGnj+MDFYlmrExgC8P7dWc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Io6L4+ZpYLWhWEmAE4Fn0bE358lGtbZ1q0JA2bdcZ+Rf0Zo+4D/Ntai7+ZuQaUCA6/GT20X80VXj0h8oNdkEAMjkLB2/JRTZVVWDQLXY0FIghUVgCyhIrjtPDEwKS6XdjPcHC/dER5L2QBasIHB2r8rGSB2VzJhuXoU2cHEIzgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=CMUZhh1K; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=UbA83c4HLQ/RTL6SERdiNutEzBiSjFJ9PjEEDv4nZpw=; b=CMUZhh1KtfkcyJSue949cW7xrR
-	OdBaDENFIQD+t5geWRwx+81dx5WzLykZbc/LVNctw3rDjcuyiCASjDRpQEaNTi+9JIXQAwnj0dHxN
-	jOhpMpasx/LgSjwdWB8Q1HHNo4qhK7OE67wn+KmqPC4wO92sT6aSSlGOPwppA33IUgIHBH2m4sjaf
-	JzQ0aA5tNuJsi3oHVY4tKtDPxXy2g5n24CUu52lx8WybH/sCBKIdKYOWoC35Me6VFzMg413yn9Gpo
-	rjcqGVAFw/qEZ0gjYWYpaGVAygbZIwXyIyjZj0KIZ9mI3OU37IswKgT7TEEgYhigF6c3tFybqdIdb
-	VUI3W3Rw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42312)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u3LLg-0003qP-1p;
-	Fri, 11 Apr 2025 21:51:40 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u3LLf-0004vf-1v;
-	Fri, 11 Apr 2025 21:51:39 +0100
-Date: Fri, 11 Apr 2025 21:51:39 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [BUG] 6.14: WARNING: CPU: 0 PID: 478 at net/bridge/br_vlan.c:433
- nbp_vlan_flush+0xc0/0xc4
-Message-ID: <Z/mA27oWj2eSvTTF@shell.armlinux.org.uk>
-References: <Z_lQXNP0s5-IiJzd@shell.armlinux.org.uk>
- <20250411184902.ajifatz3dmx6cqar@skbuf>
- <Z_mAFvJ9w4kn0v_G@shell.armlinux.org.uk>
+	s=arc-20240116; t=1744404799; c=relaxed/simple;
+	bh=rUv5qxbAsH0Jzm9QzPAQNzjDqodg7e5viuHVwg95WPM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ob4W5U18v/ipmxYu19t3HM00cSnXU5VAdF7a3sPQmSIuZVaSDcYEG+SvwVT+/YVr0UUGzhefULA7Qy8q76d2m+RgPCwz+TiwtvnICzwpXJh3BjBm4pbfPNhXFiP2epqpnAJyUfbQM3ljHUjOQx4gzzIgCNX4fw1sT0jf9vY+/Vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=WDv835vG; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744404794; x=1775940794;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=5ZPHPjt93fuS8JzjgkdEghQJwq/1t+S4O/hc77h20Hc=;
+  b=WDv835vGIQC2Lr/zDoeGhSabviCBeZrZSIp4EM6hhiZrFMF/rnQJMvcO
+   MVyxsQBFv+9KpbOaZc7BSDfwC2BIGi3Z7KoTHfbuujNwdSksyqoI9lQtk
+   m/XcK+d+gvZgDRsBSYCnzcehDpAMsnC6DwqfDQB7a+zn/X0Dd2LZ4I2LZ
+   w=;
+X-IronPort-AV: E=Sophos;i="6.15,206,1739836800"; 
+   d="scan'208";a="186717007"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2025 20:53:12 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:15081]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.8.63:2525] with esmtp (Farcaster)
+ id 4313290b-5956-4147-9a28-a6ca2d6f982b; Fri, 11 Apr 2025 20:53:12 +0000 (UTC)
+X-Farcaster-Flow-ID: 4313290b-5956-4147-9a28-a6ca2d6f982b
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 11 Apr 2025 20:53:10 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.119.240.29) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 11 Apr 2025 20:53:07 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v2 net-next 00/14] net: Convert ->exit_batch_rtnl() to ->exit_rtnl().
+Date: Fri, 11 Apr 2025 13:52:29 -0700
+Message-ID: <20250411205258.63164-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z_mAFvJ9w4kn0v_G@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D040UWA003.ant.amazon.com (10.13.139.6) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Fri, Apr 11, 2025 at 09:48:22PM +0100, Russell King (Oracle) wrote:
-> On Fri, Apr 11, 2025 at 09:49:02PM +0300, Vladimir Oltean wrote:
-> > From 508d912b5f6b56c3f588b1bf28d3caed9e30db1b Mon Sep 17 00:00:00 2001
-> > From: Vladimir Oltean <vladimir.oltean@nxp.com>
-> > Date: Fri, 11 Apr 2025 21:38:52 +0300
-> > Subject: [PATCH] net: dsa: mv88e6xxx: fix -ENOENT while deleting user port
-> >  VLANs
-> > 
-> > Russell King reports that on the ZII dev rev B, deleting a bridge VLAN
-> > from a user port fails with -ENOENT:
-> > https://lore.kernel.org/netdev/Z_lQXNP0s5-IiJzd@shell.armlinux.org.uk/
-> > 
-> > This comes from mv88e6xxx_port_vlan_leave() -> mv88e6xxx_mst_put(),
-> > which tries to find an MST entry in &chip->msts associated with the SID,
-> > but fails and returns -ENOENT as such.
-> > 
-> > But we know that this chip does not support MST at all, so that is not
-> > surprising. The question is why does the guard in mv88e6xxx_mst_put()
-> > not exit early:
-> > 
-> > 	if (!sid)
-> > 		return 0;
-> > 
-> > And the answer seems to be simple: the sid comes from vlan.sid which
-> > supposedly was previously populated by mv88e6xxx_vtu_loadpurge().
-> > But some chip->info->ops->vtu_loadpurge() implementations do not look at
-> > vlan.sid at all, for example see mv88e6185_g1_vtu_loadpurge().
-> 
-> This paragraph isn't accurate. It's actually:
-> 
-> mv88e6xxx_port_vlan_leave()
-> {
-> 	struct mv88e6xxx_vtu_entry vlan;
-> 
-> 	err = mv88e6xxx_vtu_get(chip, vid, &vlan);
-> 
-> and _this_ leaves vlan.sid uninitialised when mv88e6xxx_vtu_get()
-> ends up calling mv88e6185_g1_vtu_getnext().
-> 
-> I posioned to vlan (using 0xde) and then hexdump'd it after this call,
-> and got:
-> 
-> [   50.748068] mv88e6085 mdio_mux-0.4:00: p9 dsa_port_do_vlan_del vid 1
-> [   50.754802] e0b61b08: 01 00 02 00 de 01 de 03 03 03 03 03 03 03 03 03
-> [   50.761343] e0b61b18: 00 de de 00 00 00 00 00 00 00 00 00 00 de de de
-> [   50.767855] mv88e6085 mdio_mux-0.4:00: p9 vid 1 valid 0 (0-10)
-> [   50.773943] mv88e6085 mdio_mux-0.4:00: p9 !user err=-2
-> 
-> Note byte 4, which is the sid, is the poison value.
-> 
-> So, should mv88e6xxx_vtu_get(), being the first caller of the iterator,
-> clear vlan entirely before calling chip->info->ops->vtu_getnext()
-> rather than just initialising a few fields? Or should
-> mv88e6185_g1_vtu_getnext() ensure that entry->sid is set to zero?
+While converting nexthop to per-netns RTNL, there are two blockers
+to using rtnl_net_dereference(), flush_all_nexthops() and
+__unregister_nexthop_notifier(), both of which are called from
+->exit_batch_rtnl().
 
-Or maybe test mv88e6xxx_has_stu() before calling mv88e6xxx_mst_put() ?
+Instead of spreading __rtnl_net_lock() over each ->exit_batch_rtnl(),
+we should convert all ->exit_batch_rtnl() to per-net ->exit_rtnl() and
+run it under __rtnl_net_lock() because all ->exit_batch_rtnl() functions
+do not have anything to factor out for batching.
 
-If mv88e6xxx_has_stu() is not sufficient, then mv88e6xxx_vlan_msti_set()
-is another site where mv88e6xxx_vtu_get() is used followed by use of
-vlan.sid.
+Patch 1 & 2 factorise the undo mechanism against ->init() into a single
+function, and Patch 3 adds ->exit_batch_rtnl().
+
+Patch 4 ~ 13 convert all ->exit_batch_rtnl() users.
+
+Patch 14 removes ->exit_batch_rtnl().
+
+Later, we can convert pfcp and ppp to use ->exit_rtnl().
+
+
+v2:
+  * Collect tags
+  * Patch2
+    * Convert free_exit_list() under CONFIG_NET_NS=n
+
+v1: https://lore.kernel.org/all/20250410022004.8668-1-kuniyu@amazon.com/
+
+
+Kuniyuki Iwashima (14):
+  net: Factorise setup_net() and cleanup_net().
+  net: Add ops_undo_single for module load/unload.
+  net: Add ->exit_rtnl() hook to struct pernet_operations.
+  nexthop: Convert nexthop_net_exit_batch_rtnl() to ->exit_rtnl().
+  vxlan: Convert vxlan_exit_batch_rtnl() to ->exit_rtnl().
+  ipv4: ip_tunnel: Convert ip_tunnel_delete_nets() callers to
+    ->exit_rtnl().
+  ipv6: Convert tunnel devices' ->exit_batch_rtnl() to ->exit_rtnl().
+  xfrm: Convert xfrmi_exit_batch_rtnl() to ->exit_rtnl().
+  bridge: Convert br_net_exit_batch_rtnl() to ->exit_rtnl().
+  bonding: Convert bond_net_exit_batch_rtnl() to ->exit_rtnl().
+  gtp: Convert gtp_net_exit_batch_rtnl() to ->exit_rtnl().
+  bareudp: Convert bareudp_exit_batch_rtnl() to ->exit_rtnl().
+  geneve: Convert geneve_exit_batch_rtnl() to ->exit_rtnl().
+  net: Remove ->exit_batch_rtnl().
+
+ drivers/net/bareudp.c           |  16 +--
+ drivers/net/bonding/bond_main.c |  23 ++--
+ drivers/net/geneve.c            |  16 +--
+ drivers/net/gtp.c               |  18 ++--
+ drivers/net/vxlan/vxlan_core.c  |  18 ++--
+ include/net/ip_tunnels.h        |   7 +-
+ include/net/net_namespace.h     |   4 +-
+ net/bridge/br.c                 |  17 ++-
+ net/core/net_namespace.c        | 181 +++++++++++++++++---------------
+ net/ipv4/ip_gre.c               |  27 +++--
+ net/ipv4/ip_tunnel.c            |  25 ++---
+ net/ipv4/ip_vti.c               |   9 +-
+ net/ipv4/ipip.c                 |   9 +-
+ net/ipv4/nexthop.c              |  13 +--
+ net/ipv6/ip6_gre.c              |  22 ++--
+ net/ipv6/ip6_tunnel.c           |  24 ++---
+ net/ipv6/ip6_vti.c              |  27 ++---
+ net/ipv6/sit.c                  |  23 ++--
+ net/xfrm/xfrm_interface_core.c  |  34 +++---
+ 19 files changed, 213 insertions(+), 300 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.49.0
+
 
