@@ -1,171 +1,118 @@
-Return-Path: <netdev+bounces-181722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08E43A8649B
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 19:25:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12E20A864AF
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 19:28:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE6A37AE0EA
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 17:22:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E784C1B8690F
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 17:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B14A230D0A;
-	Fri, 11 Apr 2025 17:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A821F221FBB;
+	Fri, 11 Apr 2025 17:24:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jt0m0Eda"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="RY3/GhXL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f68.google.com (mail-ed1-f68.google.com [209.85.208.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A0EE2367D4;
-	Fri, 11 Apr 2025 17:23:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961B22367D0
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 17:24:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744392217; cv=none; b=tyDc4Cyjl/TeaS1H2+tTr54E5UVGMtBQyNrmDwtbK5O3vl8sDIxvQQvTJeJcmyZnpPFfpfUhvgT8MSZ3YEg7bOwqwvKu1sxSeml5xij8i8pHHb3MOmxY4dPALMd+Fsms6GYEDrwObwuHohAah/smI7DcoYMrskcfoy7xa3EtLX4=
+	t=1744392296; cv=none; b=VcBUoU8OfOfNhoLrW2bC+DVdZlrXTggjDIDLdi2eS3D7T8PFGGr3k6/SyBU0SAmlKmPKlz5XUAxhypul1/5N4MXle3MJQtNDy31/rCBCPWbG6oeXzKBI7p5VvVNmltW1f/wXyHEb8cBCkCHm0sW9kLDBHj+YeBxVo6v+nec7cEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744392217; c=relaxed/simple;
-	bh=SMxvg8ovuok0lFjFhVxVAhPpM5aNbZwXvc5nxaWsdmI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R8LvNv0//sua/hQZqj3Yix8ZVMtAzGNg/w1rJhpKcEaH10EmjSF2Zd0v6toSj52wlpMeImRTg3nV4tTZqFIi1afWDaJSaOTeVevKy//miqedqDLIQ5DjS2GKJyJaiejtEhGElHXWkju3Awuh9sjU2TK10DVf2TZ8ubywLvdCp7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jt0m0Eda; arc=none smtp.client-ip=209.85.208.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f68.google.com with SMTP id 4fb4d7f45d1cf-5efe8d9eb12so3547911a12.1;
-        Fri, 11 Apr 2025 10:23:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744392212; x=1744997012; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Lh2uW3J7zT8acfiEQVh/bxr3CJ0jGtOGgm4RS33x1Ig=;
-        b=jt0m0EdafiaD9R5AhOoQmXWmWTJXOWEeTpvbTvFGapSHy27zA8aVI1xsAo6efmQQhX
-         WIavn7/tSAxaKgAd1Ym+DzN9FNYgW8A5qEhIzHSlZshnyFYf/1KkQozqqdheHOi7xKev
-         fr0foJ6hZGmum92Ka26Z7bcTfgFeoMz36Ntvqnj/llfDUOlFqFxA7TzK72bLh0O1pBhY
-         hGcQSCfyS3WXGL7sNocjdBqkP90Wet9gR1UC4GCLOwdy6Rv2VITPdTaFy3j+FYdjKZp9
-         IYJEkqm3fOkbMlLfT0uVSh8qabKGM3KKpiC57awY2XLwJE6wS7kb/Sioc5naCkMvDypN
-         kCew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744392212; x=1744997012;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Lh2uW3J7zT8acfiEQVh/bxr3CJ0jGtOGgm4RS33x1Ig=;
-        b=wKF2F39vk3cWLIlRyNn0oBZnDj1Faj/kF+GolmiInho+JSH/J4eVBfXHcnfCaUFNQ/
-         53FSJZAqOCuUByazrPhmxCnGWCknaLaUnVZTOKaM5wgeRCLB5eCkxoUBt0QSqIQqh3+P
-         GmZDLfdd3/dRCf4q13axEQi1LB6hqOVObaHb6Ulm9GEXmYQ00dvgtet1yP8birS8ayQg
-         1yUmj709xhRAjXbwxj48xZ02VxJYvC279PoJ4ESqIkJnb855H71eD+5SuXwFUXeJDkSR
-         9VtpgLAHne2g7DwNojm130qG+L7yTu4DN0xKDTFUY+YWff3fANICNAri81tZAwEGLEcR
-         W/0g==
-X-Forwarded-Encrypted: i=1; AJvYcCWUTK2oB+w8a9bzMgI7wmROJB1jKtEm6cqvo4cv7IW9QnArVp3qLjnxfdaksmNqyTUo9k3EBGc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfrqwHq+fZ2Cj+qyZP0Xs2HOGc5rVOOSrKBydfn7qBhs0bJ8Jt
-	0sa7Wi1m54YYnQR1DpOfxziyO90FViJbO7BhiWag1ENgE+dUvs3fgT2DUcAA71cFkYURMlwzXny
-	NFWGKVNIm/8MGwg9R8tzwnAJF/18=
-X-Gm-Gg: ASbGnctJ+6lrMRXX62mxzBDvhPVijEdJHfW7A6IIeXxhoTNjdtfccNG2fTcnl87XgVx
-	7Jx4cpFRCruraduvyC/C7h+8CbIFjfALhvdB8vC0wmRCWulGqJFMg3ll+7wZFOlBLxr9xpBgE9T
-	ceDUwyzW+TiZZZYAgBviKdidYtWsWFtnhsf+I2l8jn6wrILP8g18tei9S/
-X-Google-Smtp-Source: AGHT+IFrSYM2ZtCJYF1N9NfRtuE5yjXPmwOHvxzTKSd0DMGd7gO8WUjG8Qi//a7OurnWquO1kOA7Ys9yFzCHgUahsi8=
-X-Received: by 2002:a05:6402:524b:b0:5e5:bfab:524 with SMTP id
- 4fb4d7f45d1cf-5f36f5253eamr2921389a12.3.1744392212314; Fri, 11 Apr 2025
- 10:23:32 -0700 (PDT)
+	s=arc-20240116; t=1744392296; c=relaxed/simple;
+	bh=Na5waWiBk+f3b24qxXaWHHQJmAHBEy/QHM9IwrVQWdE=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Z/LIRJhBeIcFy/PsYlcKkwZOJdAoX3w8T26A3Cnp7E7WvPfGOulqB5Qdl1lT4qRJhLRC4l9tU2yz185z63QPq55R8S5NOF4PHenspvIwViHS8Am5VgLI6CcKzkBMmMqjPGFcwieu06p7zne3ylpWGX4Nw22mtzhhv0KF7envMdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=RY3/GhXL; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:To:From:Date:Reply-To:Cc:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Xenzcg0MbDbXWrtPxqAuXT1W/PLMqLvkYi0Uj1jj4Ic=; b=RY3/GhXLMrflmtdKqKnwuK8QvU
+	CkX/u5MwnKeyEsZAB3B5sUql+EOi/iBCdrlAgu7FTY8Pky+ShAfOY4u3Er5EUmnMuxtjREYA+HIz/
+	3127yomeWO8iUt5/cRPJ3zWThFDvltCii245SaoXf26Z0bDvsNsuwJEwOTVtr/Qn0zuYefc5POHnX
+	pwIIFratdrkE3KvbDm9T4GogGZamjulYvfAkh+Gzg/jpncDueqIyvQslasu1emFoJcZF2BXOfUc1h
+	i1/gJhfckBcB7f9zFVUWXus6NXWvA0Dfbigulp8PHq3ayfWtPE2E3SPpDOD9XXDMiIurHMA4WwogY
+	O7ZfIkgA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55188)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u3I7R-0003gy-1D
+	for netdev@vger.kernel.org;
+	Fri, 11 Apr 2025 18:24:45 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u3I7Q-0004lq-1G
+	for netdev@vger.kernel.org;
+	Fri, 11 Apr 2025 18:24:44 +0100
+Date: Fri, 11 Apr 2025 18:24:44 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: netdev@vger.kernel.org
+Subject: [BUG] 6.14: WARNING: CPU: 0 PID: 478 at net/bridge/br_vlan.c:433
+ nbp_vlan_flush+0xc0/0xc4
+Message-ID: <Z_lQXNP0s5-IiJzd@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250409214606.2000194-1-ameryhung@gmail.com> <20250409214606.2000194-4-ameryhung@gmail.com>
- <CAP01T77ibGcEhwsyJb1WVaH-vhbZB_M2yVA8Uyv9b5fy=ErWQQ@mail.gmail.com>
- <CAMB2axNqfBpneVc9unn7S65Ewb1u6EpLudjtiq00-sqbfnSY7w@mail.gmail.com>
- <CAP01T76oTKg5H2nqd5ppyLhk1rNjPY0DcYVELmyZU+Du8izbbA@mail.gmail.com> <CAMB2axNbnOoHu6jdkt-59W6p59NjmO580kUw_g45rWG2TAH5mQ@mail.gmail.com>
-In-Reply-To: <CAMB2axNbnOoHu6jdkt-59W6p59NjmO580kUw_g45rWG2TAH5mQ@mail.gmail.com>
-From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
-Date: Fri, 11 Apr 2025 19:22:55 +0200
-X-Gm-Features: ATxdqUG_CI06-dfv09_SEutpifil7xp6JHzq_5njlkODp639SbWU8oDl2Leqfdw
-Message-ID: <CAP01T75vzfeaM=DXhg1zhbj+6hK0u8fKOtZDiMLL1fnUM53u=w@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v7 03/10] bpf: net_sched: Add basic bpf qdisc kfuncs
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, edumazet@google.com, kuba@kernel.org, 
-	xiyou.wangcong@gmail.com, jhs@mojatatu.com, martin.lau@kernel.org, 
-	jiri@resnulli.us, stfomichev@gmail.com, toke@redhat.com, sinquersw@gmail.com, 
-	ekarani.silvestre@ccc.ufcg.edu.br, yangpeihao@sjtu.edu.cn, 
-	yepeilin.cs@gmail.com, kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, 11 Apr 2025 at 19:18, Amery Hung <ameryhung@gmail.com> wrote:
->
-> On Fri, Apr 11, 2025 at 10:08=E2=80=AFAM Kumar Kartikeya Dwivedi
-> <memxor@gmail.com> wrote:
-> >
-> > On Fri, 11 Apr 2025 at 18:59, Amery Hung <ameryhung@gmail.com> wrote:
-> > >
-> > > On Fri, Apr 11, 2025 at 6:32=E2=80=AFAM Kumar Kartikeya Dwivedi
-> > > <memxor@gmail.com> wrote:
-> > > >
-> > > > On Wed, 9 Apr 2025 at 23:46, Amery Hung <ameryhung@gmail.com> wrote=
-:
-> > > > >
-> > > > > From: Amery Hung <amery.hung@bytedance.com>
-> > > > >
-> > > > > Add basic kfuncs for working on skb in qdisc.
-> > > > >
-> > > > > Both bpf_qdisc_skb_drop() and bpf_kfree_skb() can be used to rele=
-ase
-> > > > > a reference to an skb. However, bpf_qdisc_skb_drop() can only be =
-called
-> > > > > in .enqueue where a to_free skb list is available from kernel to =
-defer
-> > > > > the release. bpf_kfree_skb() should be used elsewhere. It is also=
- used
-> > > > > in bpf_obj_free_fields() when cleaning up skb in maps and collect=
-ions.
-> > > > >
-> > > > > bpf_skb_get_hash() returns the flow hash of an skb, which can be =
-used
-> > > > > to build flow-based queueing algorithms.
-> > > > >
-> > > > > Finally, allow users to create read-only dynptr via bpf_dynptr_fr=
-om_skb().
-> > > > >
-> > > > > Signed-off-by: Amery Hung <amery.hung@bytedance.com>
-> > > > > Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> > > > > ---
-> > > >
-> > > > How do we prevent UAF when dynptr is accessed after bpf_kfree_skb?
-> > > >
-> > >
-> > > Good question...
-> > >
-> > > Maybe we can add a ref_obj_id field to bpf_reg_state->dynptr to track
-> > > the ref_obj_id of the object underlying a dynptr?
-> > >
-> > > Then, in release_reference(), in addition to finding ref_obj_id in
-> > > registers, verifier will also search stack slots and invalidate all
-> > > dynptrs with the ref_obj_id.
-> > >
-> > > Does this sound like a feasible solution?
-> >
-> > Yes, though I talked with Andrii and he has better ideas for doing
-> > this generically, but for now I think we can make this fix as a
-> > stopgap.
->
-> Sounds good. Just making sure I am not doing redundant work, you will
-> send the fix you made, right?
->
+Hi,
 
-Yes.
+When executing:
 
-> Thanks,
-> Amery
->
-> > I will add a fixes tag, asked the question because I had the same
-> > question when implementing a similar pattern for my patch, and was
-> > wondering how you solved it.
-> >
-> > I made a similar fix to what you described for now.
-> >
-> > >
-> > > > >  [...]
+# ifdown br0
+
+on the ZII dev rev B platform with br0 being a bridge between mv88e6xxx
+DSA ports, the following was spewed:
+
+[  628.418720] br0: port 9(optical2) failed to delete vlan 1: -ENOENT
+[  628.425297] ------------[ cut here ]------------
+[  628.430124] WARNING: CPU: 0 PID: 478 at net/bridge/br_vlan.c:433 nbp_vlan_flush+0xc0/0xc4
+[  628.438446] Modules linked in: caam_jr ofpart caamhash_desc reset_gpio caamalg_desc tag_dsa crypto_engine cmdlinepart authenc libdes i2c_mux_pca954x mv88e6xxx at24 lm75 spi_nor mtd dsa_core eeprom_93xx46 caam vf610_adc error industrialio_triggered_buffer fsl_edma kfifo_buf virt_dma spi_gpio spi_bitbang sfp iio_hwmon sff mdio_mux_gpio industrialio mdio_i2c mdio_mux rpcsec_gss_krb5 auth_rpcgss
+[  628.473585] CPU: 0 UID: 0 PID: 478 Comm: brctl Not tainted 6.14.0+ #965
+[  628.473621] Hardware name: Freescale Vybrid VF5xx/VF6xx (Device Tree)
+[  628.473634] Call trace: 
+[  628.473655] [<c0009c44>] (unwind_backtrace) from [<c0022b78>] (show_stack+0x10/0x14)
+[  628.473740] [<c0022b78>] (show_stack) from [<c0019b5c>] (dump_stack_lvl+0x50/0x64)
+[  628.473814] [<c0019b5c>] (dump_stack_lvl) from [<c0043cd4>] (__warn+0x80/0x128)
+[  628.473879] [<c0043cd4>] (__warn) from [<c0043ee4>] (warn_slowpath_fmt+0x168/0x16c)
+[  628.473927] [<c0043ee4>] (warn_slowpath_fmt) from [<c09b8a8c>] (nbp_vlan_flush+0xc0/0xc4)
+[  628.473982] [<c09b8a8c>] (nbp_vlan_flush) from [<c099d21c>] (del_nbp+0xc4/0x2c0)
+[  628.474050] [<c099d21c>] (del_nbp) from [<c099de30>] (br_del_if+0x30/0x94)
+[  628.474100] [<c099de30>] (br_del_if) from [<c099f438>] (br_ioctl_stub+0xe4/0x38c)
+[  628.474155] [<c099f438>] (br_ioctl_stub) from [<c07d3084>] (br_ioctl_call+0x5c/0x94)
+[  628.474224] [<c07d3084>] (br_ioctl_call) from [<c0835284>] (dev_ifsioc+0x360/0x61c)
+[  628.474303] [<c0835284>] (dev_ifsioc) from [<c0835868>] (dev_ioctl+0x328/0x634)
+[  628.474357] [<c0835868>] (dev_ioctl) from [<c07d3564>] (sock_ioctl+0x4a8/0x4ec)
+[  628.474410] [<c07d3564>] (sock_ioctl) from [<c0276a80>] (sys_ioctl+0x49c/0xc28)
+[  628.474483] [<c0276a80>] (sys_ioctl) from [<c0008320>] (ret_fast_syscall+0x0/0x54)
+[  628.474530] Exception stack(0xe0961fa8 to 0xe0961ff0)
+[  628.474557] 1fa0:                   007350f0 b6cb0968 00000003 000089a3 becd8c2c 000000d0
+[  628.474582] 1fc0: 007350f0 b6cb0968 00000007 00000036 becd8ed4 00000000 00735000 00000000
+[  628.474601] 1fe0: b6c22f01 becd8c14 00723085 b6c22f08
+[  628.621830] ---[ end trace 0000000000000000 ]---
+
+Unfortunately, because I'm concentrating on PTP stuff right now, I don't
+have time to investigate this beyond reporting this, and it's highly
+probable that after Sunday, it's going to be a few months before I can
+do any further testing.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
