@@ -1,131 +1,149 @@
-Return-Path: <netdev+bounces-181716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1732AA863FA
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 19:05:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F02C8A86417
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 19:09:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 222741BA6148
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 17:03:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D1113AE4B9
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 17:04:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 552A4233150;
-	Fri, 11 Apr 2025 17:01:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF5A0221FB4;
+	Fri, 11 Apr 2025 17:05:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="OxfMaOLn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951D9231C87;
-	Fri, 11 Apr 2025 17:01:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 376F021D3F6
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 17:05:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744390889; cv=none; b=eXt2l1sRskrdcBnExo+yVwZN9w2AfcTXpTPUyoeBF7Gv6G3CKryc8YTTghJYWXJ8KpiyNibZn+UlC1Ccq68UyK0C05pVj4A8ZBczyPqrhZrI/sD8sff1oPQVEeyukUIVL96kGM3H9yNiWrMSUnsny4kIEGMqqtIyvKDPVq+x8k4=
+	t=1744391107; cv=none; b=CgU3eGpQBlgedQq4z8izxnMiDbMDXCFCQj2An3uIYjxsUjRqNZ9odpGQH7/V3BwEU2UUiDY3R4/tZ9PzWQHCOzwSbBjzycp4z6GV/fK/jLT95DuG6M8Pt7W+eV/ATSg7BxdUT7Q5gsfQGUPZ1JRoeDjOeV96vQh69qRDK6NpVK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744390889; c=relaxed/simple;
-	bh=EiG73+aTQE7S/MDqcWls3yhcJw/iCgj/TzJM8CJcM5U=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=hUhvu6k+zAev77C1Fhy7thWl0sxeIFWeMLEKVegyCg8s0/4aSGq8holIozosb8Bkc9E4+QQXPfHyVR9NpEu3jSMDfzvkIkHIGJ8xct14k2xybe3oS/9e+tUOHjRUjw1PMy6JlMvKzDDd1aKxHbNmcyhGP13Nh5TyRJ0zI/D2OZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-ac2902f7c2aso373542466b.1;
-        Fri, 11 Apr 2025 10:01:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744390886; x=1744995686;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+	s=arc-20240116; t=1744391107; c=relaxed/simple;
+	bh=Zs24uJAaPNdL7CMzi1gfleFstPNRatFfxR2lJdWyGy0=;
+	h=From:To:CC:Date:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=fuVYDpMcJQXnhGiB82v1JF5q5NK4f0ypC8usPyhmNVPBw6zWlWJstbk8lkHAOXL2aquUC8QYQ/mGjnF6wTrPzm8h6bv+efxCS/GJRr+WF5jSuDV+OcV/meqqF8sbNgu1B9pufhLoBHpvYfAchCjom2JmROtdLGLves8F3De3oGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=OxfMaOLn; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-227a8cdd241so27610475ad.3
+        for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 10:05:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1744391105; x=1744995905; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:user-agent
+         :references:in-reply-to:message-id:date:cc:to:from:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5UI7p33S7vZdXBZmDGML1UutPV6e0+OcpwTD0JMF0uw=;
-        b=QSYqenM0x0PWIwiX9/cDV5U2AoWJlXspTf9JAFke/VnwLddOr4suQg9t65+qKR4wmj
-         pds+4/XZ5ZUqR35ZkilCc8DDbQhbYrXm5llAuWJoTEoh/FtiS+JCQ13wkrBUSSo+IcPF
-         SNEYRgo9RROJFrvdjYhIbWjuakz88U+2hEOLKE8bxaKEmTYj3cuNmwpBgekSyt8DUYkH
-         ta0Cw2aWf7eq1yPWiFFrGyjrXBQr5863P/m5dP5V+x/zrWFDY+RFz9ZiWLrJPZuLO9sF
-         1UTm9SYEaCYTNfBENpWnmU3ovBedaqX66z40Ob4G4N9p8WTuw62XSIxeK20qq2M/5Y6y
-         qcnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXmpil+a6lEK9uuQcxAtdbSw7KjipfwYg/8rkbfa/9ekokPB1N61suAtgNnv2wm09H63eTCb3ws0ONTD9s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxihQif93so6+Z6XHKiA5F6fpI3LDXbMGwabo17f+kqDK+hpwyq
-	vu5ZHi0f20a14I1CNU1UqS8Dw1CWnOaj11GLT/Ti5rhrbPactBds
-X-Gm-Gg: ASbGnctYADIjhrTbz9g92sTy5s5uN2NIR3c8FGT1uejzmGQhDXSOi40QNL0PtZE8VDY
-	df6JcLtEXYZz5jP1bDjACpR15Ws0ZhQsYAKCoYkM5546oJjockOVueF5N3pUk5VaiBYiThfolQR
-	pJ6hT3GbgdH3tY8rhq5xqd/tUZQq/nlHTK4sy5Q3iH763WnL++9PcwQRxfEwErpKpm73gPH3lGm
-	GGsr9MDCvqVOj2bprorebpaqDYa8TMZ8atF2hg30kNvqbajIanLTO0x+WCA/cJkxza3MT/hT+TZ
-	lGURMxfsJeLW9uriOTod/4UD5+/3sml4
-X-Google-Smtp-Source: AGHT+IGFheNQw47GZmDm459hLRHGPHNCsO7bexNsum73b3cU4B0dDNZU7rLTWcahTtB8zM02x4etvw==
-X-Received: by 2002:a17:907:3d12:b0:ac3:17b6:737 with SMTP id a640c23a62f3a-acad36a465cmr327371066b.45.1744390885717;
-        Fri, 11 Apr 2025 10:01:25 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff:73::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acaa1be913asm461984166b.47.2025.04.11.10.01.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Apr 2025 10:01:25 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-Date: Fri, 11 Apr 2025 10:00:56 -0700
-Subject: [PATCH net-next 9/9] net: fib_rules: Use nlmsg_payload in
- fib_valid_dumprule_req
+        bh=Zs24uJAaPNdL7CMzi1gfleFstPNRatFfxR2lJdWyGy0=;
+        b=OxfMaOLnJQdyVHmKmfgMB7kY7TuYFVxzicfsCuVGmKUc0IH7VQnF6vOCOhGCn3cr4i
+         twP83y65t0+rt4q+fiPg3Azt6k4EBIhzKr0dqqLg4AHRLL9zP2MovlEjHCAvez41PG2c
+         hivN/2ykxTQObCqNZD5pvXlSfHlimyyfgNgNU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744391105; x=1744995905;
+        h=content-transfer-encoding:mime-version:subject:user-agent
+         :references:in-reply-to:message-id:date:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zs24uJAaPNdL7CMzi1gfleFstPNRatFfxR2lJdWyGy0=;
+        b=cwlXtS2nafaTkCGNoUqaZwTSZjOzeVqUvi9On/qWNQTQVZGPGyRxh9mB1yyrYo8e7O
+         NHxaZp0O7cReKdRYlF4Cms8vEtwM6zQCElrB614oPkPEUPS4wG87ZZ8fc3a1d+oHUrj3
+         oyz3CrBOcA7v/uvYBfcK+Iqeeyzi9c2WI3jnRry0QZkB/n0V5XQ32bGIsp7FNiNPKdN3
+         d8LvWd/LvOY1KpEnjWW7c/4tAc8XielkhOtc7ZBz6DXEgG1/Zn4dhMH7MiXFIFxUt27P
+         IaLsw7iLnOwhUhtnWtUj/gjVBZMTTDN04P1ybzUJ5u+MPpnhSB4bDznQRHnl6BlzzoBB
+         SYig==
+X-Forwarded-Encrypted: i=1; AJvYcCWZ+wDELwL7DyAt94pHFFgUQIzEtXCPFpd67OTkI05oG9ecbP3PZG8BolcIVYx6aRKpUmfGyK8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwsfS+6OGIpb7dVhV3XpecDMPOlSixEsQDBTPjqNzx2sYHgDK94
+	AFZgLvsSBR9kD9bmU+kZwwH7ouCyPWk52qoCvxTApov11FPRgvgiq/X/hieaVw==
+X-Gm-Gg: ASbGncsAL6uTVtqLleTQBBcz43VXeN6Y4Z5TXgy8uy3Adib1Hfju0vpaVLNVJQq2lP+
+	iGsRsLzH2YbHOEKZgqfDeNAUKoCu9wHz/xAy225DUzcF8OrkJc6hqE8Wc6oFpwq6qffcFeM5k5R
+	eqmsm4263KpHPos5OlPgjiV7txxv5DhTTAR7La/vku9JsLg92jZfMsxP/S1of4x5f19Qh9ktPBB
+	EdY8+ZndBEh8RwY6QJBs+YWj/4Ggg2oAgKV4lSe577Uwu748yyZRM19W9RKwlKZup33LsI2qHUR
+	XLsCWrmAGo3JRdnFjagrel+qXJes2LexM7OtXTtXICWJ55h4b2zCXMJfRRGUNIh8F88g8jhfYhj
+	M3/E=
+X-Google-Smtp-Source: AGHT+IFsxw8IYiWvCcCfohL9OR/GeWdiXtYFPHAC7JyqV95Ksyc9aMccKi6WlaMRFkxD3Uw+BXU/BA==
+X-Received: by 2002:a17:902:e5cf:b0:215:94eb:adb6 with SMTP id d9443c01a7336-22bea4efe58mr64393975ad.40.1744391105389;
+        Fri, 11 Apr 2025 10:05:05 -0700 (PDT)
+Received: from [192.168.178.39] (f215227.upc-f.chello.nl. [80.56.215.227])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22ac7c93aa3sm52081595ad.149.2025.04.11.10.04.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Apr 2025 10:05:04 -0700 (PDT)
+From: Arend Van Spriel <arend.vanspriel@broadcom.com>
+To: "Kuan-Wei Chiu" <visitorckw@gmail.com>
+CC: Johannes Berg <johannes@sipsolutions.net>, <tglx@linutronix.de>, <mingo@redhat.com>, 
+	<bp@alien8.de>, <dave.hansen@linux.intel.com>, <x86@kernel.org>, 
+	<jk@ozlabs.org>, <joel@jms.id.au>, <eajames@linux.ibm.com>, 
+	<andrzej.hajda@intel.com>, <neil.armstrong@linaro.org>, <rfoss@kernel.org>, 
+	<maarten.lankhorst@linux.intel.com>, <mripard@kernel.org>, 
+	<tzimmermann@suse.de>, <airlied@gmail.com>, <simona@ffwll.ch>, 
+	<dmitry.torokhov@gmail.com>, <mchehab@kernel.org>, <awalls@md.metrocast.net>, 
+	<hverkuil@xs4all.nl>, <miquel.raynal@bootlin.com>, <richard@nod.at>, 
+	<vigneshr@ti.com>, <louis.peens@corigine.com>, <andrew+netdev@lunn.ch>, 
+	<davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>, 
+	<parthiban.veerasooran@microchip.com>, <gregkh@linuxfoundation.org>, 
+	<jirislaby@kernel.org>, <yury.norov@gmail.com>, <akpm@linux-foundation.org>, 
+	<jdelvare@suse.com>, <linux@roeck-us.net>, <alexandre.belloni@bootlin.com>, 
+	<pgaj@cadence.com>, <hpa@zytor.com>, <alistair@popple.id.au>, 
+	<linux@rasmusvillemoes.dk>, <Laurent.pinchart@ideasonboard.com>, 
+	<jonas@kwiboo.se>, <jernej.skrabec@gmail.com>, <kuba@kernel.org>, 
+	<linux-kernel@vger.kernel.org>, <linux-fsi@lists.ozlabs.org>, 
+	<dri-devel@lists.freedesktop.org>, <linux-input@vger.kernel.org>, 
+	<linux-media@vger.kernel.org>, <linux-mtd@lists.infradead.org>, 
+	<oss-drivers@corigine.com>, <netdev@vger.kernel.org>, 
+	<linux-wireless@vger.kernel.org>, <brcm80211@lists.linux.dev>, 
+	<brcm80211-dev-list.pdl@broadcom.com>, <linux-serial@vger.kernel.org>, 
+	<bpf@vger.kernel.org>, <jserv@ccns.ncku.edu.tw>, <Frank.Li@nxp.com>, 
+	<linux-hwmon@vger.kernel.org>, <linux-i3c@lists.infradead.org>, 
+	<david.laight.linux@gmail.com>, <andrew.cooper3@citrix.com>, 
+	Yu-Chun Lin <eleanor15x@gmail.com>
+Date: Fri, 11 Apr 2025 19:04:43 +0200
+Message-ID: <19625cf93f8.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+In-Reply-To: <Z/lFQ85vhSQiFDBm@visitorckw-System-Product-Name>
+References: <20250409154356.423512-1-visitorckw@gmail.com>
+ <20250409154356.423512-4-visitorckw@gmail.com>
+ <25b7888d-f704-493b-a2d7-c5e8fff9cfb4@broadcom.com>
+ <740c7de894d39249665c6333aa3175762cfb13c6.camel@sipsolutions.net>
+ <1961e19ee10.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+ <Z/lFQ85vhSQiFDBm@visitorckw-System-Product-Name>
+User-Agent: AquaMail/1.54.1 (build: 105401536)
+Subject: Re: [PATCH v4 03/13] media: pci: cx18-av-vbi: Replace open-coded parity calculation with parity_odd()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250411-nlmsg-v1-9-ddd4e065cb15@debian.org>
-References: <20250411-nlmsg-v1-0-ddd4e065cb15@debian.org>
-In-Reply-To: <20250411-nlmsg-v1-0-ddd4e065cb15@debian.org>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.15-dev-42535
-X-Developer-Signature: v=1; a=openpgp-sha256; l=939; i=leitao@debian.org;
- h=from:subject:message-id; bh=EiG73+aTQE7S/MDqcWls3yhcJw/iCgj/TzJM8CJcM5U=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBn+UrUuX8oOq/T1XMwMZLWcMYmbmdzdJ4+MYY/N
- cdSv+7ju6KJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ/lK1AAKCRA1o5Of/Hh3
- bRwuEACroZ9Go2FzGXLuZooufe1Uq/n8S479BFqm9VqpmNoqvqqwK5doxtKL7FuhF+j4qg6IV0P
- pTIy1RCICqocTLMII08Ttn4/zDIdfx7k6JdZaNystX4ekjHXSncbdb2ZmfqFTztsaOcgfm3idDC
- UvMF6CYXFRLlwho62gH5z39YRdjn7R4bG1OC9c300t6TdkzCmZc7CXGzWhlM1TPJYDD8cFQJEFv
- X4graiELXoWB6qaVPwjpg6wS+zPQKcWhVzCBETVkxxDVmIqWDPppcgUhX/UDmXtfvC8hEHkQ8gq
- 5Ej+CENeLMk3ETjTzYvb8U+007G2NeUI7L0fR75fuj8EzW+fvjYOQG6/ILp/TK1O/ZIOyDjuL4x
- C4bHX4R4sXghvMVbVWHbHjbPpgM+t6TxYHdZzqFyicQ3xTXGYMZsHK02kPsBncHqH0D4ZmbEf4P
- PPcVr+WV3BZZ1p2rKnfbuk5dfJ3MFRuOViDhZ5o1MdlB+7otNhPt8Bz3SI6Wy4li6JY6SKFmABO
- XEWnPF2q2OmhjuBw9U0KNGAGCmQNW+aqjxxLxfyjsAli6p4k2Zawp+26XW8aFVPmf44JdjGP0wq
- K7yX3lE68x3FtXtoLiyfS4s5LyEjCQU5CtEFAei09BiZPJXP5PACbna7eDDBeNhWURvTBp8oq0f
- 0tbZn8+uE0D7swA==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+Content-Type: text/plain; format=flowed; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
 
-Leverage the new nlmsg_payload() helper to avoid checking for message
-size and then reading the nlmsg data.
+On April 11, 2025 6:37:35 PM Kuan-Wei Chiu <visitorckw@gmail.com> wrote:
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- net/core/fib_rules.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> On Thu, Apr 10, 2025 at 07:08:58AM +0200, Arend Van Spriel wrote:
+>> On April 10, 2025 12:06:52 AM Johannes Berg <johannes@sipsolutions.net> wrote:
+>>
+>>> On Wed, 2025-04-09 at 20:43 +0200, Arend van Spriel wrote:
+>>>>
+>>>> This is orthogonal to the change to parity_odd() though. More specific
+>>>> to the new parity_odd() you can now do following as parity_odd()
+>>>> argument is u64:
+>>>>
+>>>> err = !parity_odd(*(u16 *)p);
+>>>
+>>> Can it though? Need to be careful with alignment with that, I'd think.
+>>
+>> My bad. You are absolutely right.
+> Then maybe we can still go with:
+>
+> err = !parity_odd(p[0] ^ p[1]);
+>
+> I believe this should still be a fairly safe approach?
 
-diff --git a/net/core/fib_rules.c b/net/core/fib_rules.c
-index 4bc64d912a1c0..6a7a28bf631c2 100644
---- a/net/core/fib_rules.c
-+++ b/net/core/fib_rules.c
-@@ -1238,12 +1238,12 @@ static int fib_valid_dumprule_req(const struct nlmsghdr *nlh,
- {
- 	struct fib_rule_hdr *frh;
- 
--	if (nlh->nlmsg_len < nlmsg_msg_size(sizeof(*frh))) {
-+	frh = nlmsg_payload(nlh, sizeof(*frh));
-+	if (!frh) {
- 		NL_SET_ERR_MSG(extack, "Invalid header for fib rule dump request");
- 		return -EINVAL;
- 	}
- 
--	frh = nlmsg_data(nlh);
- 	if (frh->dst_len || frh->src_len || frh->tos || frh->table ||
- 	    frh->res1 || frh->res2 || frh->action || frh->flags) {
- 		NL_SET_ERR_MSG(extack,
+Yes. Or whatever the name will be ;-)
 
--- 
-2.47.1
+Regards,
+Arend
+
 
 
