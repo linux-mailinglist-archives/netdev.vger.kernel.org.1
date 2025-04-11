@@ -1,140 +1,179 @@
-Return-Path: <netdev+bounces-181752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E434A865B0
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 20:44:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD7F4A865C5
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 20:49:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8521E1BA0201
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 18:44:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9252B1BA18C3
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 18:49:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9940B2690F8;
-	Fri, 11 Apr 2025 18:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E33B8269894;
+	Fri, 11 Apr 2025 18:49:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="kvyphb6q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P/18xSVc"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B50B269AFB
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 18:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D3B81F8BD6
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 18:49:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744397047; cv=none; b=de8ylcNhHmpxgi9N+QVTcjrGc/a+piHgP3BDcQUFSiD/+W0vI9G9aM35oEtwZMRWMTnz0KQzS8SOpggmIzLOkEN4cZAwqs4LxddFZeeLqY3qgRZM+zTZo0ksDHL6oP/wGWHONvlM3eFMMq6kCDXKCn1lmc+p60FvuxiGShqIfDQ=
+	t=1744397348; cv=none; b=Bjm6wB1SfzYs+W+dsct3Mm1HKamc/A4uB0UO2RHzeDXaLQ+KX9xFT+OrCOiz8fdwRlCjJhVRkiH2/CJItoU7pWn8ys/F4pH3MwhI0kHs0hyrvNuhqAG9unUqo0vh3G9V6OURmhkqrHKEc3B5KFw5+Z3pNqaTlvlUswiGpQcFEFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744397047; c=relaxed/simple;
-	bh=TXV5PXPIvfyZFbDp5xfpSQQMTwc1Bcupjl/bnbleNWQ=;
+	s=arc-20240116; t=1744397348; c=relaxed/simple;
+	bh=NfQ7udwo6RjripPP2cHolZz7alvS/XkqtPRRl3Mo7i4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r6aXhOlOKY8TVwFr37my079FxOywt6OVTWHM43QLyffB2/t/b9iojyIeC46ulKjJrkLV2unyReTJ5gi2simcB25HdCABuW9VqiszUi5s650guEjU1swpOyYi1ry2bP21ACkoGfPDOuYKzbQjcP0bDYckkEw5Gd2vFXqFhG478XI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=kvyphb6q; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=54JCjDezK1dUGA4BE79HjK51DxJBAgkEma15PQoujG8=; b=kvyphb6qBfl9oZ+RfxE3UKoDn0
-	xNtHI3QJ58t3rsn4alobFvloGASDei6PAhFq6/OPZw24/AfASOp4rmOiWpNdNNMcjCDo2f94h9KR8
-	VHVL8TJOj8WcDkgT4dyC2brkTojNBXpHChhsFfK9GK4yPwXTveQSMxV0Dlg79R08j01GyVnymJgwt
-	bjyikySlrBE73SsT2cC68tqM8bN5WLoHRPmLFj5nbSrFo6hs1cC3WubRNRKgAKwFVuHjUBdQjXa8G
-	8WLaRVKW8X+NAsMFE/OCpKvtFNLx8LzsoTnAN5nGPgMUZCcv3f1Bm+bZx08NigQYCiPO7X5aQnzWU
-	VMGCiz/Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47228)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u3JM9-0003ke-1m;
-	Fri, 11 Apr 2025 19:44:01 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u3JM8-0004po-0v;
-	Fri, 11 Apr 2025 19:44:00 +0100
-Date: Fri, 11 Apr 2025 19:44:00 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [BUG] unbinding mv88e6xxx device spews
-Message-ID: <Z_li8Bj8bD4-BYKQ@shell.armlinux.org.uk>
-References: <Z_lRkMlTJ1KQ0kVX@shell.armlinux.org.uk>
- <20250411180159.ukhejcmuqd3ypewl@skbuf>
+	 Content-Type:Content-Disposition:In-Reply-To; b=f8e2ozvhphwEwvDJj3T6AK44xDTSr93DcBA+VpDy1jKa8wMIw7WoDjSc8oUX2Kq5N08dzurH2BSeRbBALJrnrmd4KznGdpw+qQzZbP7INaomX7IuUEodkN6VIQ3Wk16z+fKwMu+PU3xMx4qWmOkqCxKoeoP8IVjTsx1FdK2ZjrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P/18xSVc; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43d64e6c83eso2916575e9.0
+        for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 11:49:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744397345; x=1745002145; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lJDF4+dOw2KNAQE83quVhIfgCCxP21E5HmkpgNBx4Ng=;
+        b=P/18xSVcidr3wx1cE3NOwTvdlxhsq6R+Ft/yzQRu8nKgjOj5xuwl0U6gx0MY4pGkIR
+         AAEf3qZmtt1VowalvBXYZD/jY3cvGyurB/IKoFb7RxWaKY9pr943FZk9L7xC+OiEUITD
+         ZJXkUlH6yGXP8WjbHgeqPp6W0Uq96j3YPqDIWFahA/muL2a2iZ/+13NOSBlkmELcw2NQ
+         G+k/rOy9NcgA6LqD7zsBNM//XQk18J0kptb/nZuknoSYMlyj9/RWnLZ8qyEtR68+pXLV
+         MCvoUN9LDcls9+eHh+R9y1nVnHdpGWEMKh0RolGWy/tRDCMjNpmQiUlQKjKuXUj4Zzrv
+         3trA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744397345; x=1745002145;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lJDF4+dOw2KNAQE83quVhIfgCCxP21E5HmkpgNBx4Ng=;
+        b=INj3/MQGnvlxwl58ta/0xiN4T2fe37qJZW8UIS147ubdb7lVvZxC1AR7YqIyOS+2G5
+         ihiW12Chh9MK8R8DRMJA6Q4pdDabhdzNNm/w7NPTAvQtumcPb3kaE+W2lX4YWV7UfVWD
+         3MqWsjsu5wJg2ZQZ5crzs4MoDFDKPM3q0vWijWz7SXo/nbv1IQr7Wb/GxqkzgRbYg4es
+         /4/cnEdX8ASUkD4aVytef11jd9Xm9EXBeMS+hUssGdwDcdI/btdTmn5YHoOCJm47VLiK
+         60PT0QkYTBNQKzoKa8Ajxfx5ewxg+IrJzeluNWw31lvj7oQjJX/DfbgM0utPVTZT+5Iy
+         IvKg==
+X-Gm-Message-State: AOJu0Yzxs4P6UAhiKDuIZXlvl1hQezvcA4Cx05fUrl4t+29vy3cFc4+7
+	zOtQ/bk7W1/+0DGPOrJK/tCPeMCeZKc3EBDuzFQjOHM/oF0kPoX+62XXuEvL
+X-Gm-Gg: ASbGnctxHUjvqFhMGphya0E2/Ok96L9sSLksNVl4dwAuYdDEQOLI/oSSZIUN0ijBlJm
+	tSxfUL1S9+EvPuRrarLV8rLXXYSA900NUuDSIXLCdn6za5i2NbwpR4379+20OvPFCSlsZu9AJh+
+	xYMTRa9HcZm2ZF3GARDAkDC4RxFZH64yAouNBQB/suYHt77bLgwEK7xzP4B2gYpbhyUCst1wz1l
+	+KxbnfALGy3nmo5pxc5piCBDmBLTOrtxXX8FQsr3+3tJLBOtJad6yDXBrTtX3AOuLL4env7G1Ir
+	xDdN+RfDUuWw7u0U0fF6e6O7lfvr9cd0DxOS8SA=
+X-Google-Smtp-Source: AGHT+IHmNL3hw+Z1MhxTjvXmDGoglEu+SPRhXg+hD7kPUcLehqgCgO7tiTsFPcQwiarfUGWyRMfhIw==
+X-Received: by 2002:a5d:6d8f:0:b0:39b:f12c:3862 with SMTP id ffacd0b85a97d-39ea51ed97bmr1056313f8f.2.1744397345189;
+        Fri, 11 Apr 2025 11:49:05 -0700 (PDT)
+Received: from skbuf ([188.25.50.178])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eaf44572csm2943137f8f.90.2025.04.11.11.49.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Apr 2025 11:49:04 -0700 (PDT)
+Date: Fri, 11 Apr 2025 21:49:02 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org
+Subject: Re: [BUG] 6.14: WARNING: CPU: 0 PID: 478 at net/bridge/br_vlan.c:433
+ nbp_vlan_flush+0xc0/0xc4
+Message-ID: <20250411184902.ajifatz3dmx6cqar@skbuf>
+References: <Z_lQXNP0s5-IiJzd@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="kxt463rxpj2cfx7o"
+Content-Disposition: inline
+In-Reply-To: <Z_lQXNP0s5-IiJzd@shell.armlinux.org.uk>
+
+
+--kxt463rxpj2cfx7o
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250411180159.ukhejcmuqd3ypewl@skbuf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, Apr 11, 2025 at 09:01:59PM +0300, Vladimir Oltean wrote:
-> On Fri, Apr 11, 2025 at 06:29:52PM +0100, Russell King (Oracle) wrote:
-> > Hi,
-> > 
-> > Unbinding a mv88e6xxx device spews thusly:
+On Fri, Apr 11, 2025 at 06:24:44PM +0100, Russell King (Oracle) wrote:
+> Hi,
 > 
-> Odd. I never saw this on the 6190 and 6390 I've been testing on, and I
-> think I know why. Could you please confirm that the attached patch fixes
-> the issue?
+> When executing:
+> 
+> # ifdown br0
+> 
+> on the ZII dev rev B platform with br0 being a bridge between mv88e6xxx
+> DSA ports, the following was spewed:
+> 
+> [  628.418720] br0: port 9(optical2) failed to delete vlan 1: -ENOENT
 
-What else can go wrong... well, the build PC can inexplicably lose
-power just before it transfers the kernel to the TFTP server and
-modules to the target... yep, it's one of those days that if something
-can go wrong it will go wrong. I'm expecting a meteorite to destroy
-the earth in the next few minutes.
+(trimming the rest, which is just the bridge complaining that &vg->vlan_list
+is not empty, but __vlan_del() aborted the VLAN deletion due to
+br_switchdev_port_vlan_del() returning an error, and left the VLAN in
+the VLAN group's list. So that part is expected and is just a symptom,
+we should focus on why DSA returns -ENOENT when requesting to delete
+VLAN 1 from the CPU port).
 
-Your patch seems to fix that issue, so:
+Please test the attached patch. This is more speculative, but I've run
+all the options in my mind and this is the only thing that makes sense.
 
-Tested-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+--kxt463rxpj2cfx7o
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-net-dsa-mv88e6xxx-fix-ENOENT-while-deleting-user-por.patch"
 
-but... of course there's another issue buried beneath:
+From 508d912b5f6b56c3f588b1bf28d3caed9e30db1b Mon Sep 17 00:00:00 2001
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+Date: Fri, 11 Apr 2025 21:38:52 +0300
+Subject: [PATCH] net: dsa: mv88e6xxx: fix -ENOENT while deleting user port
+ VLANs
 
-[   73.552305] WARNING: CPU: 0 PID: 398 at net/dsa/dsa.c:1486 dsa_switch_release_ports+0x114/0x118 [dsa_core]
-[   73.562504] Modules linked in: caam_jr ofpart caamhash_desc caamalg_desc reset_gpio tag_dsa crypto_engine cmdlinepart authenc libdes i2c_mux_pca954x lm75 at24 mv88e6xxx spi_nor mtd dsa_core eeprom_93xx46 caam vf610_adc error industrialio_triggered_buffer fsl_edma kfifo_buf virt_dma spi_gpio sfp spi_bitbang iio_hwmon sff mdio_mux_gpio mdio_i2c industrialio mdio_mux rpcsec_gss_krb5 auth_rpcgss
-[   73.597676] CPU: 0 UID: 0 PID: 398 Comm: bash Tainted: G        W          6.14.0+ #966
-[   73.597716] Tainted: [W]=WARN
-[   73.597724] Hardware name: Freescale Vybrid VF5xx/VF6xx (Device Tree)
-[   73.597737] Call trace:
-[   73.597758] [<c0009c44>] (unwind_backtrace) from [<c0022b78>] (show_stack+0x10/0x14)
-[   73.597849] [<c0022b78>] (show_stack) from [<c0019b5c>] (dump_stack_lvl+0x50/0x64)
-[   73.597921] [<c0019b5c>] (dump_stack_lvl) from [<c0043cd4>] (__warn+0x80/0x128)
-[   73.597986] [<c0043cd4>] (__warn) from [<c0043ee4>] (warn_slowpath_fmt+0x168/0x16c)
-[   73.598034] [<c0043ee4>] (warn_slowpath_fmt) from [<bf0b8764>] (dsa_switch_release_ports+0x114/0x118 [dsa_core])
-[   73.598297] [<bf0b8764>] (dsa_switch_release_ports [dsa_core]) from [<bf0b929c>] (dsa_unregister_switch+0x28/0x184 [dsa_core])
-[   73.598654] [<bf0b929c>] (dsa_unregister_switch [dsa_core]) from [<bf105b30>] (mv88e6xxx_remove+0x34/0xbc [mv88e6xxx])
-[   73.599326] [<bf105b30>] (mv88e6xxx_remove [mv88e6xxx]) from [<c066f838>] (mdio_remove+0x1c/0x30)
-[   73.599577] [<c066f838>] (mdio_remove) from [<c05e15f8>] (device_release_driver_internal+0x180/0x1f4)
-[   73.599666] [<c05e15f8>] (device_release_driver_internal) from [<c05df3bc>] (unbind_store+0x54/0x90)
-[   73.599726] [<c05df3bc>] (unbind_store) from [<c02f9388>] (kernfs_fop_write_iter+0x10c/0x1cc)
-[   73.599790] [<c02f9388>] (kernfs_fop_write_iter) from [<c02608a4>] (vfs_write+0x2a4/0x3dc)
-[   73.599839] [<c02608a4>] (vfs_write) from [<c0260adc>] (ksys_write+0x50/0xac)
-[   73.599876] [<c0260adc>] (ksys_write) from [<c0008320>] (ret_fast_syscall+0x0/0x54)
-[   73.599912] Exception stack(0xe0b25fa8 to 0xe0b25ff0)
-[   73.599940] 5fa0:                   00000010 024dd820 00000001 024dd820 00000010 00000001
-[   73.599964] 5fc0: 00000010 024dd820 b6bb5d50 00000004 00000010 0055db68 00000000 00000000
-[   73.599982] 5fe0: 00000004 bea469a0 b6b4e3fb b6ac7656
-[   73.767849] ---[ end trace 0000000000000000 ]---
-bash-5.0# [   74.466821] fec 400d0000.ethernet eth0: Graceful transmit stop did not complete!
-[   74.474953] fec 400d0000.ethernet eth0: Link is Down
+Russell King reports that on the ZII dev rev B, deleting a bridge VLAN
+from a user port fails with -ENOENT:
+https://lore.kernel.org/netdev/Z_lQXNP0s5-IiJzd@shell.armlinux.org.uk/
 
-which seems to be due to:
+This comes from mv88e6xxx_port_vlan_leave() -> mv88e6xxx_mst_put(),
+which tries to find an MST entry in &chip->msts associated with the SID,
+but fails and returns -ENOENT as such.
 
-                WARN_ON(!list_empty(&dp->vlans));
+But we know that this chip does not support MST at all, so that is not
+surprising. The question is why does the guard in mv88e6xxx_mst_put()
+not exit early:
 
-This is probably due to the other issue I reported:
+	if (!sid)
+		return 0;
 
-[   44.485597] br0: port 9(optical2) entered disabled state
-[   44.498847] br0: port 9(optical2) failed to delete vlan 1: -ENOENT
-[   44.505353] ------------[ cut here ]------------
-[   44.510052] WARNING: CPU: 0 PID: 438 at net/bridge/br_vlan.c:433 nbp_vlan_flu
-sh+0xc0/0xc4
+And the answer seems to be simple: the sid comes from vlan.sid which
+supposedly was previously populated by mv88e6xxx_vtu_loadpurge().
+But some chip->info->ops->vtu_loadpurge() implementations do not look at
+vlan.sid at all, for example see mv88e6185_g1_vtu_loadpurge().
 
+It was probably intended for the on-stack struct mv88e6xxx_vtu_entry
+vlan entry to be zero-initialized, because currently it looks like we're
+looking at a garbage sid which is just residual stack memory. So
+zero-initialize this to avoid MST operations on switches which don't
+support MST.
+
+Fixes: acaf4d2e36b3 ("net: dsa: mv88e6xxx: MST Offloading")
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+---
+ drivers/net/dsa/mv88e6xxx/chip.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index 29a89ab4b789..c94c228434fc 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -2706,7 +2706,7 @@ static int mv88e6xxx_port_vlan_add(struct dsa_switch *ds, int port,
+ static int mv88e6xxx_port_vlan_leave(struct mv88e6xxx_chip *chip,
+ 				     int port, u16 vid)
+ {
+-	struct mv88e6xxx_vtu_entry vlan;
++	struct mv88e6xxx_vtu_entry vlan = {};
+ 	int i, err;
+ 
+ 	if (!vid)
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.34.1
+
+
+--kxt463rxpj2cfx7o--
 
