@@ -1,173 +1,139 @@
-Return-Path: <netdev+bounces-181631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 603FCA85DEB
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 14:57:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29D00A85DFA
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 15:00:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF9D918988C2
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 12:55:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BEE4E7AE449
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 12:58:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D899F2367D5;
-	Fri, 11 Apr 2025 12:54:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55EA82367D8;
+	Fri, 11 Apr 2025 12:59:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="ORXkI7Ty"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="CncDUBw/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACBB72367B7;
-	Fri, 11 Apr 2025 12:54:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C402367C9
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 12:59:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744376081; cv=none; b=bV7y6pPPRNoMpYQS8d6fdmToPdy0BwyXedfJBER8UjPaRbo/2fto1DJhsWM0wD9xeTmsaY49LQ3RrkRUnyFzhHhmnd39FOXGldK2TRvVkEReZJzLZNUY87QtJaNOS/zwUPht2YILydiIA7h6zwRzx9puwgSRHmmfLV9gk5kaFb8=
+	t=1744376352; cv=none; b=ZrQJe5pu2Osf8qLP85I/uwBA8wNvPCRLKyHUCPinAN78n7vD7yrL0Ym4DAfOdDtrQHiRES8UOmfN58S8qDL4x8UqC1RJczUQrPDhweQgcohESNdOqsLP8ph9ia+yT2m7iKCygmzsyEUlHi4q/oSrkxaISY5fkKfvAcGKKRZX0Bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744376081; c=relaxed/simple;
-	bh=Q4jxB9ZrVGxAJUQQh1yJ586UOZiG9G2p9tGKu+B+EwE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Gum/IXR8Tmc57ROXN1MNtIBceGZPApSIEivYlZCjLB5kkXnQPFvGPumkX+j8bna9O2QPPIvrx09iYnT9Fth4yVFYVqK58gCB4R84xpEnCczjZYNX8/VK7Olvy6PF1wce5ZouSb3d4TLEiFsYTORi505NsBww/DrU//JFnWMmj1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=ORXkI7Ty; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B916C102E4621;
-	Fri, 11 Apr 2025 14:54:32 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1744376076; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=hAJSv9h5wRcXrptqovOOWtspStxTbyq+MpU6paZIMew=;
-	b=ORXkI7Tys/+aHAwaPzH3zrM4L5cGkNhSVzUbIDX0YfMWN2nmpnVIdNGWdw1/8legxzCPD1
-	wtxw+ELgb18/QG6eSReH1fXjuApQuStP+GTgStG2YHP2bngukJjBylJWSNlGZnVTHVDxUC
-	RrGPy0ilcuVPtmar0YlqFU1otWHJv3I8NLc3CN8bq8J+9JV1x3q6S+yGHvI9GjcISdlgwT
-	SoA3YKJFln0pH9iS36F/46RRRzRKIxuzOrXxN7x1xISn4EM4ZRQ8cCSysEFxMeHI1TFoN5
-	o5Sno3HBfomj0RLS+u1bhaQIAtaxERGudlso5SFwuuZq/u59w/0Jbe/vftu0vw==
-Date: Fri, 11 Apr 2025 14:54:30 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Shawn Guo
- <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix
- Kernel Team <kernel@pengutronix.de>, Fabio Estevam <festevam@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
- <wahrenst@gmx.net>
-Subject: Re: [net-next v4 4/5] net: mtip: The L2 switch driver for imx287
-Message-ID: <20250411145430.3001f1db@wsk>
-In-Reply-To: <20250409162854.069abe88@wsk>
-References: <20250407145157.3626463-1-lukma@denx.de>
-	<20250407145157.3626463-5-lukma@denx.de>
-	<20250408151447.GX395307@horms.kernel.org>
-	<20250409162854.069abe88@wsk>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1744376352; c=relaxed/simple;
+	bh=rY1UFxG66AZgsLjOZDqEKWwTBbAxmKs5ER3eJZuwnGA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ZXWhBIZCRlh6HHr7vEIRDLxxjrWJYdW29IsNTY21f41tDx8oZfE73TvN1/DVJ6GUVCnWgqslFqZqMFZ2F+10+JOePzu6sJuND+w9SNXyTcwtD04jRbPqsyDGg1xxedYc1Sypw/2XbMn26tbc1ZnFeWVeE8QFQa9eG/qclzqbsEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=CncDUBw/; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-ac25d2b2354so318445266b.1
+        for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 05:59:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1744376348; x=1744981148; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YSGIw4q8pstTZ6OBCwLFEQhJ8StUrT9v8m/BBXZBL8A=;
+        b=CncDUBw/A4Kg04P7zM39ZFW7gZyxvSPni3Wfl/W9tfJkc4igXvyX+mJnbAR0NfLl4C
+         DLdG2/XXKSRBLj7GQzSJBmnh1xwWcPvxfsqRUqsGb4ALr2AGUWg6r80JQMOFPNtJx8Wt
+         2DErJAvjyP8BID0t/qKxVpjXVCt8z34FH1SN8s8IwHsUTPZ60Z+fHd6DrvoXjP0UI7qy
+         RvKWR95JImXsWkPdf2bs+yHu8+fKgHjnF78g46ZSZcjR0ABT5uAfGoLb9tJxGolnGw88
+         fT5z9wzH/XEM+ie9E2xSKZHiDddXMetEhfT3rF3vcT2XFXZWk0JoiPt2gcXmZHbKpF1E
+         Z4/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744376348; x=1744981148;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YSGIw4q8pstTZ6OBCwLFEQhJ8StUrT9v8m/BBXZBL8A=;
+        b=asXqxr+tbMusyUChZLPORnt1TEOSYPBbVtkMGGJrXRoo6dr605la+Ob3R770c4/LUx
+         UYlasv7FLkHFoyYAapzDvH64t+0ezApRP5JFzqI+SzXwpG1KY2Zzi7QeU58DRodi3roz
+         4foig7Z3FnZNGAZb3iPcDSkJnFAPWziINfgzDN5z2WD29dbkYlYSKb8XGM95/A+kW5Kd
+         Rn6UDhrxGlVk4QvY5rZT8ZFje4pFJU4kGRc9CzaK8kgidaGoRW+feKaQ24JaP1UZ7FXv
+         phzvPs0RpEuQhZvCkz1CNdCgPzquS6+lzxGVn91cMNFmCAU16Qv/RTmgS4uFEvGenZKi
+         SXTQ==
+X-Gm-Message-State: AOJu0YyXnqpwQspM9wvolSybOQw2QMjz5kG0JzebRzsB9AfvCMgg5Dga
+	X5K+yGen8PaNFVkyUJdLaqKV+P0w5AbQMlX9KJZuYf/McrB0WqWCUZ6SkWIY4EPpTRY4EY8cemQ
+	i
+X-Gm-Gg: ASbGncumry3suktX6AaSqVPg7Ip2QnZ6fr8WlcfEwK49B7vyqMN27XeGQvjUsCoDHeu
+	XWjBjnhzP8jz/EjMSD3fJBAA+ItAgzxW7rwWlBIpdO4DsnGa5+4Li8XHoDTDB/wqzlQE+mKAqnx
+	+98m/XiRCHV10Ut4uDWAKPCy34RPXnillD7NptEBJQifTDrt6NAlaYytWFHEtpZZXdFoghN58zw
+	HnXTABZ/34Yn+AsHfDYBWETMEApPV3oAsRTtjvaQKqBkXFrwCsy3B3DGvhupq+OUe8Jp319JIMS
+	+50ydl80ZMiW/a6qEIbwZXYM6mv+UMv3
+X-Google-Smtp-Source: AGHT+IFUOH4el20wLJrnf4kez8QMAu2dwjSG3e+nwIJ6hcuc3ODkPFTqhx4cYs897gW+Rvgo+MBUiw==
+X-Received: by 2002:a17:907:3cd4:b0:aca:d1db:9c63 with SMTP id a640c23a62f3a-acad3445ef8mr221448266b.5.1744376348155;
+        Fri, 11 Apr 2025 05:59:08 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:506a:2387::38a:3])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acaa1ccad01sm438171566b.125.2025.04.11.05.59.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Apr 2025 05:59:07 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: netdev@vger.kernel.org,  Jakub Kicinski <kuba@kernel.org>,
+  bpf@vger.kernel.org,  tom@herbertland.com,  Eric Dumazet
+ <eric.dumazet@gmail.com>,  "David S. Miller" <davem@davemloft.net>,  Paolo
+ Abeni <pabeni@redhat.com>,  Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?=
+ <toke@toke.dk>,
+  dsahern@kernel.org,  makita.toshiaki@lab.ntt.co.jp,
+  kernel-team@cloudflare.com
+Subject: Re: [PATCH net-next V2 0/2] veth: qdisc backpressure and qdisc
+ check refactor
+In-Reply-To: <174412623473.3702169.4235683143719614624.stgit@firesoul> (Jesper
+	Dangaard Brouer's message of "Tue, 08 Apr 2025 17:31:13 +0200")
+References: <174412623473.3702169.4235683143719614624.stgit@firesoul>
+Date: Fri, 11 Apr 2025 14:59:06 +0200
+Message-ID: <87ecxyhn1h.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/EDd9PYuJ_JPMOcH6VsFq/w0";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain
 
---Sig_/EDd9PYuJ_JPMOcH6VsFq/w0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Tue, Apr 08, 2025 at 05:31 PM +02, Jesper Dangaard Brouer wrote:
+> This series addresses TX drops observed in production when using veth
+> devices with threaded NAPI, and refactors a common qdisc check into a
+> shared helper.
+>
+> In threaded NAPI mode, packet drops can occur when the ptr_ring backing
+> the veth peer fills up. This is typically due to a combination of
+> scheduling delays and the consumer (NAPI thread) being slower than the
+> producer. When the ring overflows, packets are dropped in veth_xmit().
+>
+> Patch 1 introduces a backpressure mechanism: when the ring is full, the
+> driver returns NETDEV_TX_BUSY, signaling the qdisc layer to requeue the
+> packet. This allows Active Queue Management (AQM) - such as fq or sfq -
+> to spread traffic more fairly across flows and reduce damage from
+> elephant flows.
+>
+> To minimize invasiveness, this backpressure behavior is only enabled when
+> a qdisc is attached. If no qdisc is present, the driver retains its
+> original behavior (dropping packets on a full ring), avoiding behavior
+> changes for configurations without a qdisc.
+>
+> Detecting the presence of a "real" qdisc relies on a check that is
+> already duplicated across multiple drivers (e.g., veth, vrf). Patch-2
+> consolidates this logic into a new helper, qdisc_txq_is_noop(), to avoid
+> duplication and clarify intent.
+>
+> ---
+>
+> Jesper Dangaard Brouer (2):
+>       veth: apply qdisc backpressure on full ptr_ring to reduce TX drops
+>       net: sched: generalize check for no-op qdisc
+>
+>
+>  drivers/net/veth.c        | 49 ++++++++++++++++++++++++++++++++-------
+>  drivers/net/vrf.c         |  3 +--
+>  include/net/sch_generic.h |  7 +++++-
+>  3 files changed, 48 insertions(+), 11 deletions(-)
 
-Hi Simon,
+This setup scenario is currently not covered by the veth selftest [1].
+Would be great to extend it so the code gets exercised by the CI.
 
-> > It is unclear why hwentry, which is a pointer, is being cast to an
-> > integer and then back to a pointer. I see pointer arithmetic, but
-> > that can operate on pointers just as well as integers, without
-> > making assumptions about how wide pointers are with respect to
-> > longs.
-> >=20
-> > And in any case, can't the types be used to directly access the
-> > offsets needed like this?
-> >=20
-> > 	atable =3D fep->hwentry.mtip_table64b_entry;
-> >=20
-> > 	*read_lo =3D readl(&atable[index].lo);
-> > 	*read_hi =3D readl(&atable[index].hi);
-> >  =20
->=20
-> The code as is seems to be OK.
->=20
-> The (atable) memory structure is as follows:
->=20
-> 1. You can store 2048 MAC addresses (2x32 bit each).
->=20
-> 2. Memory from point 1 is addressed as follows:
-> 	2.1 -> from MAC address the CRC8 is calculated (0x00 - 0xFF).
-> 	This is the 'index' in the original code.
-> 	2.2 -> as it may happen that for two different MAC address the
-> 	same CRC8 is calculated (i.e. 'index' is the same), each
-> 	'index' can store 8 entries for MAC addresses (and it is
-> 	searched in a linear way if needed).
->=20
-> IMHO, the index above shall be multiplied by 8.
-
-I've double check it and it turned out that you were right :-)
-
-The following code:
-
-struct addr_table64b_entry *atable_base =3D
-fep->hwentry->mtip_table64b_entry;
-
-*read_lo =3D readl(&atable_base[index].lo);
-*read_hi =3D readl(&atable_base[index].hi);
-
-Is more readable than the current code.
-
-The same would be used for atable_write()
-
-I will change it for v5.
-
->=20
-> > Also, and perhaps more importantly, readl expects to be passed
-> > a pointer to __iomem. But the appropriate annotations seem
-> > to be missing (forcing them with a cast is not advisable here IMHO).
-> >  =20
->=20
-> I think that the code below:
-> unsigned long atable_base =3D (unsigned long)fep->hwentry;
->=20
-> could be replaced with
-> void __iomem *atable_base =3D fep->hwentry;
->=20
-> and the (index << 3) with (index * ATABLE_ENTRY_PER_SLOT)
-
-
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/EDd9PYuJ_JPMOcH6VsFq/w0
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmf5EQYACgkQAR8vZIA0
-zr3A6Qf9GXE29Y/XpPCVSfPKZ01QAhFm6OWDn29Hd19Xc5zaiBO3NFgCJzxJpCM/
-hv949OWXQbxs2glV9RSPxw1OJAIUL+Kub2pt23XEMkkobCV0XzuAW/VqPfjjv8in
-Za9ur5L7E840u1z8uu24NbWBDdoRJBCxLy7Z9YSSxPA9UDMytwLWDwelSQADb1lj
-FhdpA0swhuzHJsTUfu0NL9NZcbQbVapyKUsNZ+OzZJV682VIOSw7DGrwazG9NWYX
-KpHcwfAMp2iiEbVVjjjl5n0VXMXO/Lth4LuGGJaAUd+4ZyZk7n8qoTRldy/PjdJZ
-WPYNyrpUjZEEzphLwmzo6N/RRxxp3Q==
-=QEuc
------END PGP SIGNATURE-----
-
---Sig_/EDd9PYuJ_JPMOcH6VsFq/w0--
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/tools/testing/selftests/net/veth.sh
 
