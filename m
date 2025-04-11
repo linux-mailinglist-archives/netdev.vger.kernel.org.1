@@ -1,152 +1,163 @@
-Return-Path: <netdev+bounces-181724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D35C9A864BF
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 19:30:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECAB8A864D4
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 19:36:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6B81177FB0
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 17:30:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7BB01898560
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 17:36:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 088A5232367;
-	Fri, 11 Apr 2025 17:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF83238D3A;
+	Fri, 11 Apr 2025 17:36:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="sKQWu3YD"
+	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="yHADy6hY"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 457DC231C9C
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 17:29:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8331C21B908
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 17:36:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744392598; cv=none; b=Sbh9Hjy7bWFp0aEmGdVlsgkRPfAaLoPpAQGhV2/YoB9QurwLHdcuyoGbSEeBWFc7TRMXCiZ7mAe0LlzuK43ocL7uT8bMcW2LbPY/WYIQRokL8SbpDHF8Shvdg/8/9DpWlyrjbQWftffioEcOREW4x0N0ZdTyinqGlbFyVH26O+E=
+	t=1744392973; cv=none; b=Map2m5IDvfptHRME7ZYz25nbxRewIIE9YG0OkSv0cUq5gG12Ik/3jlbnl7dXUcCBg+2+kl3awRsiryjgAhZBT09CptpV5FdoPwmFmng2UiUYiZfdrYNq0ZLTfH9IvfRAKcR8kTy/IfUlbqKJHYdRRpO3DjZ4iD7iQdbKRr/4MbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744392598; c=relaxed/simple;
-	bh=wukxpWXxfQgRAmuEQ26w8VVefMr/cw7IZTgU3rpzGKE=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=QjL7NZbT0wtJd0AT/D2j0T/lCplGJfJmzOaPB5gUQZeCjVSSpg1MV7nsuUsunOBzu5fa2tqvMzHigGiQmLUP83Rd/RDnzd3zktZqkpnXQm8FLOmG9HYwKbJwVTsYp6VAwltii++ejCPMDpNSLHUttG1PBDZfEV1dPguzt4+0qZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=sKQWu3YD; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
-	Message-ID:Subject:To:From:Date:Reply-To:Cc:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=2ZvKUvd6az/nWtVro7yi4KrKw+tjTF6b5A48Jnp2ySE=; b=sKQWu3YDJ2SCMdnp6zksojOAbH
-	AoYX85kLR3aCfVv85JlK04PfbRsFTP7UEenXmaaqt+LLeKttmAT2ZO7ruKRZ/qiQ5IELJYjmSONGY
-	AUN9BBgW812NB8yIwGbIiRNEdrQ2nYG1AjCebYKMQT+s0nwJa8Ubs5IqsXN+phwesB1p0TMCYrYyK
-	tn5wBGwwHc0fTK7Atj3tByH3LlnJC3e2XNpZvPyieIbDh1LFjMsu7NPKcq9pXvbjOcQYwZRDIWwgS
-	CRn2bexwx5gbIQtoWXasaHG3X60YDFQpQqvA32vQ5ae6TAEyU/GiGGQxX7sfpyU5yolHgt/jecmog
-	UcX9ji3g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41392)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u3ICP-0003hO-1e;
-	Fri, 11 Apr 2025 18:29:53 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u3ICO-0004m2-0T;
-	Fri, 11 Apr 2025 18:29:52 +0100
-Date: Fri, 11 Apr 2025 18:29:52 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
-Subject: [BUG] unbinding mv88e6xxx device spews
-Message-ID: <Z_lRkMlTJ1KQ0kVX@shell.armlinux.org.uk>
+	s=arc-20240116; t=1744392973; c=relaxed/simple;
+	bh=AJg+h0xjKCp/cv4dncQ508kXQVo7GYvpDgk5nigHSEg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dXW0YN0E5ggB3AZhuD3jRdZwTKRkR25F7Meu5E82KUSY+alQ2Uc4wMK5GorvWNVeK6plj0Hoe6jYAks6ExJRcOMqIwVWPucHINZm5N5LawF+KO8ieFHRdUF52Yruig7UDgKfil305Ip54+dCXg6Khkm0x51y0s68m+tvbCqF234=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=yHADy6hY; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-af5499ca131so264148a12.3
+        for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 10:36:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1744392970; x=1744997770; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=z5lT0EMfO1WRM6uQZ3dhOnHkrfi/KKbft0plZaI5c4k=;
+        b=yHADy6hYrvaebJ390VQJC+bryhXh4w0xckvbNZbidbB/4tT6963LnnHIxQKpl1AFZB
+         yfSrbX1KN2XQ25URON7SApAKkA2LPiAUd8fTK+/2tMOYeQJwZWqIuqT0NdJuf5WJJSA8
+         pnQvZ5PNPomWjaSqhKDq5CVgfZ/pSW1upG29JWuYiCKxD0A/rGAHWVTkXht8xft70j7h
+         /Sl9AK4OlQn763pqX8nycHbU3Hw17pOry2KOQz5sepFpw5vxh6HEHhMbCPDUZ7Ii15j2
+         B6ItUARHCQk3VeLm7w7Lgh2YS48EvFOnPQWjktXBM8TcvW+ZoNrXNcB5/kSc/EJ5PdEI
+         WdOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744392970; x=1744997770;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=z5lT0EMfO1WRM6uQZ3dhOnHkrfi/KKbft0plZaI5c4k=;
+        b=HoShLN+qojUZHNF7JeLfX2Tj1+c4phV6lQ3+Ha9MbuZO4gEjrulWTONvsyueS1w8ee
+         7R1xp9TBAraDULOPwEb/6SmCf6OESNgzkZzhsHxAqE2AkDa4Gkqf8jutoEeIuww6YFdo
+         93E1wEVDc1ycvDZb3HXBOq06gk8s5ee5Idy8CspzMi4y5okMFMjwGn3QhCDQel5ZIUWZ
+         TREWit+dIcJ/9DLWZy1I3G4NnbYob3IDnwOdxs6HAB19Z37hsxfNrRkOx0h83ccExb9j
+         Wu+Z72Toj5C3q+9gqn+AyijfkX3MbWq+u+BziQiOjwiayAklOTEw9mXv8kIe3spjcKtg
+         UibQ==
+X-Gm-Message-State: AOJu0YwK8D//HW3vRwKeLHN9877sg0Im5wU7g4yz5LvOYYbemjai/B3+
+	u6swVB1OtMklfmiy2NIgaQNunA7nXJSiHd/8NVFAI5izpHOopS7tKvsGm7IUXp+6/xArGJlNC40
+	bIbw=
+X-Gm-Gg: ASbGncupZH1ysJV96qvqAKKLPfNT8wU1Ln4CFwUCOHCl8/85JBAwE9aX/HaK08CwK2F
+	KB1CUOU6tdobdp3RkeMgSiRYElzFk1OoCh0uYdrYQ7UMsycGPeMZ4MlvqhigVSRTIeOfHojP5Ik
+	uwzw7WJBm28vlN6lfgs1/AifBT86al9Xr7qP3ZNcWdEGnPDH7eZZCQnfhkJsVOLZlzUsCKDTKaC
+	VEOVyd5nxvvf/fPVJ7AL261eVN+bN25qEgqJ6qEfa2nn9ulYso9/1oTgprKI5zWAVpPtrczxwhz
+	64I45CQBp3TC07FnVQb0s29GkhWC8w==
+X-Google-Smtp-Source: AGHT+IGJoCJ14aCk7csQlJsDVgBQpUgpZfHxoorcgN6SNpmmlceF9xmW9CEw5QtS3HDgg37ApBzh5Q==
+X-Received: by 2002:a17:902:cec7:b0:215:a96d:ec36 with SMTP id d9443c01a7336-22bea4b3c13mr19603345ad.5.1744392970337;
+        Fri, 11 Apr 2025 10:36:10 -0700 (PDT)
+Received: from t14.. ([2001:5a8:4528:b100:fd98:4c7f:39fa:a5c6])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22ac7cb6a50sm52317725ad.205.2025.04.11.10.36.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Apr 2025 10:36:09 -0700 (PDT)
+From: Jordan Rife <jordan@jrife.io>
+To: netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: Jordan Rife <jordan@jrife.io>,
+	Aditi Ghag <aditi.ghag@isovalent.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>
+Subject: [PATCH v2 bpf-next 0/5] bpf: udp: Exactly-once socket iteration
+Date: Fri, 11 Apr 2025 10:35:40 -0700
+Message-ID: <20250411173551.772577-1-jordan@jrife.io>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-Hi,
+Both UDP and TCP socket iterators use iter->offset to track progress
+through a bucket, which is a measure of the number of matching sockets
+from the current bucket that have been seen or processed by the
+iterator. On subsequent iterations, if the current bucket has
+unprocessed items, we skip at least iter->offset matching items in the
+bucket before adding any remaining items to the next batch. However,
+iter->offset isn't always an accurate measure of "things already seen"
+when the underlying bucket changes between reads which can lead to
+repeated or skipped sockets. Instead, this series remembers the cookies
+of the sockets we haven't seen yet in the current bucket and resumes
+from the first cookie in that list that we can find on the next
+iteration.
 
-Unbinding a mv88e6xxx device spews thusly:
+To be more specific, this series replaces struct sock **batch inside
+struct bpf_udp_iter_state with union bpf_udp_iter_batch_item *batch,
+where union bpf_udp_iter_batch_item can contain either a pointer to a
+socket or a socket cookie. During reads, batch contains pointers to all
+sockets in the current batch while between reads batch contains all the
+cookies of the sockets in the current bucket that have yet to be
+processed. On subsequent reads, when iteration resumes,
+bpf_iter_udp_batch finds the first saved cookie that matches a socket in
+the bucket's socket list and picks up from there to construct the next
+batch. On average, assuming it's rare that the next socket disappears
+before the next read occurs, we should only need to scan as much as we
+did with the offset-based approach to find the starting point. In the
+case that the next socket is no longer there, we keep scanning through
+the saved cookies list until we find a match. The worst case is when
+none of the sockets from last time exist anymore, but again, this should
+be rare.
 
-[ 1499.372164] 8<--- cut here ---
-[ 1499.375412] Unable to handle kernel NULL pointer dereference at virtual address 00000000 when read
-[ 1499.384463] [00000000] *pgd=00000000
-[ 1499.388126] Internal error: Oops: 5 [#1] SMP ARM
-[ 1499.392774] Modules linked in: caam_jr ofpart caamhash_desc reset_gpio caamalg_desc tag_dsa crypto_engine cmdlinepart authenc libdes i2c_mux_pca954x mv88e6xxx at24 lm75 spi_nor mtd dsa_core eeprom_93xx46 caam vf610_adc error industrialio_triggered_buffer fsl_edma kfifo_buf virt_dma spi_gpio spi_bitbang sfp iio_hwmon sff mdio_mux_gpio industrialio mdio_i2c mdio_mux rpcsec_gss_krb5 auth_rpcgss
-[ 1499.427797] CPU: 0 UID: 0 PID: 561 Comm: bash Tainted: G        W          6.14.0+ #965
-[ 1499.435834] Tainted: [W]=WARN
-[ 1499.438813] Hardware name: Freescale Vybrid VF5xx/VF6xx (Device Tree)
-[ 1499.445270] PC is at devlink_region_destroy+0x8/0x28
-[ 1499.450309] LR is at mv88e6xxx_teardown_devlink_regions_global+0x20/0x2c [mv88e6xxx]
-[ 1499.458500] pc : [<c09cc4b8>]    lr : [<bf13ba88>]    psr: 800d0013
-[ 1499.464780] sp : e09b5e40  ip : c2f5bf00  fp : 00000000
-[ 1499.470020] r10: 00000000  r9 : c0a79388  r8 : c2c085d4
-[ 1499.475260] r7 : 00000000  r6 : c2dc0748  r5 : c1caaaf8  r4 : 00000000
-[ 1499.481802] r3 : c2f5bf00  r2 : 00000000  r1 : 00000000  r0 : 00000000
-[ 1499.488346] Flags: Nzcv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment none
-[ 1499.495506] Control: 10c5387d  Table: 842d404a  DAC: 00000051
-[ 1499.501263] Register r0 information: NULL pointer
-[ 1499.506000] Register r1 information: NULL pointer
-[ 1499.510728] Register r2 information: NULL pointer
-[ 1499.515456] Register r3 information: slab task_struct start c2f5bf00 pointer offset 0 size 2304
-[ 1499.524220] Register r4 information: NULL pointer
-[ 1499.528947] Register r5 information: non-slab/vmalloc memory
-[ 1499.534630] Register r6 information: slab kmalloc-64 start c2dc0740 pointer offset 8 size 64
-[ 1499.543124] Register r7 information: NULL pointer
-[ 1499.547853] Register r8 information: slab kmalloc-4k start c2c08000 pointer offset 1492 size 4096
-[ 1499.556780] Register r9 information: non-slab/vmalloc memory
-[ 1499.562463] Register r10 information: NULL pointer
-[ 1499.567278] Register r11 information: NULL pointer
-[ 1499.572093] Register r12 information: slab task_struct start c2f5bf00 pointer offset 0 size 2304
-[ 1499.580935] Process bash (pid: 561, stack limit = 0xe09b4000)
-[ 1499.586705] Stack: (0xe09b5e40 to 0xe09b6000)
-[ 1499.591092] 5e40: c1caaaf4 c1caaaf8 c2dc0748 bf13ba88 c2bdfa00 c1ca8040 c2dc0748 bf134844
-[ 1499.599297] 5e60: c2bdfa00 c2f13800 c2dc0748 bf0b8620 c2dc0740 c2bdfa00 bf148000 c284e444
-[ 1499.607504] 5e80: c2c085d4 bf0b9350 c1ca8040 c2c08590 bf148000 c284e444 c2c085d4 c0a79388
-[ 1499.615712] 5ea0: 00000000 bf136b30 c284e400 c2c08590 bf148000 c066f838 c284e400 c05e15f8
-[ 1499.623919] 5ec0: c0ac99bc c284e400 00000010 bf148000 c2a9e010 c05df3bc 00000010 c2959dc0
-[ 1499.632127] 5ee0: c2a9e000 e09b5f40 c2a9e010 c02f9388 00000000 00000000 c2b68460 e09b5f88
-[ 1499.640334] 5f00: c02f927c 00000010 00000000 00000000 00000000 c02608a4 c2caa1b0 00000000
-[ 1499.648541] 5f20: b6999000 e09b5fb0 00010000 00000010 00ce6b00 00000000 00000001 00000000
-[ 1499.656748] 5f40: c2b68460 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-[ 1499.664948] 5f60: 00000000 00000000 c2b68460 c2b68460 00000000 00000000 c0008584 c2f5bf00
-[ 1499.673155] 5f80: 00000004 c0260adc 00000000 00000000 00000000 00000074 00ce6b00 b6ca5db0
-[ 1499.681354] 5fa0: 00000004 c0008320 00000074 00ce6b00 00000001 00ce6b00 00000010 00000000
-[ 1499.689561] 5fc0: 00000074 00ce6b00 b6ca5db0 00000004 00000010 00000010 00000000 00000000
-[ 1499.697769] 5fe0: 00000004 bef1b880 b6c3d5b3 b6bc6746 60070030 00000001 00000000 00000000
-[ 1499.705956] Call trace:
-[ 1499.705981] [<c09cc4b8>] (devlink_region_destroy) from [<bf13ba88>] (mv88e6xxx_teardown_devlink_regions_global+0x20/0x2c [mv88e6xxx])
-[ 1499.720797] [<bf13ba88>] (mv88e6xxx_teardown_devlink_regions_global [mv88e6xxx]) from [<bf134844>] (mv88e6xxx_teardown+0x30/0x3c [mv88e6xxx])
-[ 1499.733871] [<bf134844>] (mv88e6xxx_teardown [mv88e6xxx]) from [<bf0b8620>] (dsa_tree_teardown_switches+0x94/0xc4 [dsa_core])
-[ 1499.745857] [<bf0b8620>] (dsa_tree_teardown_switches [dsa_core]) from [<bf0b9350>] (dsa_unregister_switch+0xdc/0x184 [dsa_core])
-[ 1499.757799] [<bf0b9350>] (dsa_unregister_switch [dsa_core]) from [<bf136b30>] (mv88e6xxx_remove+0x34/0xbc [mv88e6xxx])
-[ 1499.768948] [<bf136b30>] (mv88e6xxx_remove [mv88e6xxx]) from [<c066f838>] (mdio_remove+0x1c/0x30)
-[ 1499.778077] [<c066f838>] (mdio_remove) from [<c05e15f8>] (device_release_driver_internal+0x180/0x1f4)
-[ 1499.787394] [<c05e15f8>] (device_release_driver_internal) from [<c05df3bc>] (unbind_store+0x54/0x90)
-[ 1499.796588] [<c05df3bc>] (unbind_store) from [<c02f9388>] (kernfs_fop_write_iter+0x10c/0x1cc)
-[ 1499.805181] [<c02f9388>] (kernfs_fop_write_iter) from [<c02608a4>] (vfs_write+0x2a4/0x3dc)
-[ 1499.813500] [<c02608a4>] (vfs_write) from [<c0260adc>] (ksys_write+0x50/0xac)[ 1499.820681] [<c0260adc>] (ksys_write) from [<c0008320>] (ret_fast_syscall+0x0/0x54)
-[ 1499.828383] Exception stack(0xe09b5fa8 to 0xe09b5ff0)
-[ 1499.833460] 5fa0:                   00000074 00ce6b00 00000001 00ce6b00 00000010 00000000
-[ 1499.841660] 5fc0: 00000074 00ce6b00 b6ca5db0 00000004 00000010 00000010 00000
-[ 1499.849863] 5fe0: 00000004 bef1b880 b6c3d5b3 b6bc6746
-[ 1499.854947] Code: e8bd41f0 eae1baa6 e92d4070 e1a04000 (e5905000)
-[ 1499.861264] ---[ end trace 0000000000000000 ]---
-[ 1499.896270] fec 400d0000.ethernet eth0: Graceful transmit stop did not complete!
-[ 1499.903874] fec 400d0000.ethernet eth0: Link is Down
+CHANGES
+=======
+v1 -> v2:
+* Drop WARN_ON_ONCE from bpf_iter_udp_realloc_batch (Kuniyuki).
+* Fixed memcpy size parameter in bpf_iter_udp_realloc_batch; before it
+  was missing sizeof(elem) * (Kuniyuki).
+* Move "bpf: udp: Propagate ENOMEM up from bpf_iter_udp_batch" to patch
+  two in the series (Kuniyuki).
 
-and the nice thing is, because it's using rootfs over eth0 (which is not
-the NIC used for DSA) that's the end of the platform without hard
-rebooting.
+rfc [1] -> v1:
+* Use hlist_entry_safe directly to retrieve the first socket in the
+  current bucket's linked list instead of immediately breaking from
+  udp_portaddr_for_each_entry (Martin).
+* Cancel iteration if bpf_iter_udp_realloc_batch() can't grab enough
+  memory to contain a full snapshot of the current bucket to prevent
+  unwanted skips or repeats [2].
 
-Again, won't be able to do anything with this after Sunday for a few
-months, and I'm otherwise completely focused on PTP stuff right now.
+[1]: https://lore.kernel.org/bpf/20250404220221.1665428-1-jordan@jrife.io/
+[2]: https://lore.kernel.org/bpf/CABi4-ogUtMrH8-NVB6W8Xg_F_KDLq=yy-yu-tKr2udXE2Mu1Lg@mail.gmail.com/
+
+Jordan Rife (5):
+  bpf: udp: Use bpf_udp_iter_batch_item for bpf_udp_iter_state batch
+    items
+  bpf: udp: Propagate ENOMEM up from bpf_iter_udp_batch
+  bpf: udp: Avoid socket skips and repeats during iteration
+  selftests/bpf: Return socket cookies from sock_iter_batch progs
+  selftests/bpf: Add tests for bucket resume logic in UDP socket
+    iterators
+
+ include/linux/udp.h                           |   3 +
+ net/ipv4/udp.c                                | 100 +++-
+ .../bpf/prog_tests/sock_iter_batch.c          | 451 +++++++++++++++++-
+ .../selftests/bpf/progs/bpf_tracing_net.h     |   1 +
+ .../selftests/bpf/progs/sock_iter_batch.c     |  24 +-
+ 5 files changed, 537 insertions(+), 42 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.43.0
+
 
