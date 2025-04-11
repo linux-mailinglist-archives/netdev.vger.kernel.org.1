@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-181771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23E0AA86775
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 22:44:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9161AA86778
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 22:44:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30FD29A1115
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 20:43:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BD684C3C8C
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 20:44:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 582562853F4;
-	Fri, 11 Apr 2025 20:44:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F65A28F937;
+	Fri, 11 Apr 2025 20:44:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e3gx7keJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZkT5v9+H"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A10E578F45
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 20:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F80284B29
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 20:44:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744404249; cv=none; b=TZjdefK6+TK5duKTpeiTcfYPKDRqhgoDxUQ6ejIDjKKgyqDSHb2/dpwue1eEM6wItLUILsgxSMgy77EfqnwnfnfXIz8fEuyJ87H7CLhf4gZVvDIfTIwOKP1ArDOuP5IsfsMWmL4gueePMvKQPiaoQdsa6ydvt9TQTAFq6RhpImY=
+	t=1744404250; cv=none; b=ndRoGAkk3aKp/M2NSKm7MaDZ0ZHWtx3SATfzMgIcXYbYaOtBIv65PiazeaVFL7sqjJJtfKG7TbXWFT25n6HGzhgp3Y/H5aIGbWG9H68YkQ6pgq2z/OG4o8X/yv6m5TxHWgBSiirCMS+q2b/Y/wYeksAgzXNxtP1gR04sGeNKkyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744404249; c=relaxed/simple;
-	bh=0Y4JSU4xu8NjaqzAb4QJdqHMSLtMFXNN8v96e4mgTrU=;
+	s=arc-20240116; t=1744404250; c=relaxed/simple;
+	bh=cwqMNYrWMTywxJZvVuIVBXSFwl2fCdZz9eRlaAZSjAI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LEaGHr2nJboSlcvyIhMtfMS6gjsB9UKZTPC7U2SptrEgeSUUpSek+dv3coNoe0yho3sPH1nS0sPz8MSLqnQCIARhFjxsnbwAQ3TmAXgWqONJHTGzmC3YzFa90G77y3fMPgLnxyjYdt4rRRT0F1tG03GIUhLNL2Xl972GW/5iEA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e3gx7keJ; arc=none smtp.client-ip=192.198.163.19
+	 MIME-Version; b=PAxqu16wvRsgv/92QMN8LN2wGOyN4arctTA/QVJ//zkD8chocmN2tU9jO5lY7z8kdgJo5YT/jIJLz7cEGyE2QfxRUEPb+5m9XndWnj8emCUCgoykttE22uyTTVJGH0BJ1mTKRRbIXcQTONXzCpxSivZs26L/cwW1YY5peQj8BEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZkT5v9+H; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744404248; x=1775940248;
+  t=1744404249; x=1775940249;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=0Y4JSU4xu8NjaqzAb4QJdqHMSLtMFXNN8v96e4mgTrU=;
-  b=e3gx7keJKY+Eqcw5f24rcKr554nMeaetKnLAakQn5qOK0Q4RA7cJkLKL
-   LfT29brAE3KDQ1hIJcnvQ3EG7pDZUvS4D6zr4Hbxozwn5ZCg1x1QzGfs7
-   ZGTCFEQyQ3/kUnjtAr+Umn1qt/nCdSXopJyty5gpCdVksZjbKM/IbHpSW
-   XhTJlDQrq4vlyW+VM9RwQfX80zhx/G7JXM4U2JpNQDz3KVhKyAta4g/1L
-   MUVXEUITtn78upuFmWpJTvQExveYoXhrJDU7rnzPpqHQsFjNcYfo0jCP8
-   0wByWnQG7Bm7Q4P6BHjKLh8GDSogfMo8oc/L7hyeRwnrCcHCVLeSG5UGC
+  bh=cwqMNYrWMTywxJZvVuIVBXSFwl2fCdZz9eRlaAZSjAI=;
+  b=ZkT5v9+HaxRRcObIr6i7BBxT5dEqFxAwdzORo/CmmvIkkNwjGMV862dr
+   QVwtOXlTMT7WXN+aIXHFPGBDLvb3N7Bjs5rdwzAcGYf0SCSFXML7DbQfv
+   s7cZ42BPW93+MC88VGiOTjchU3di8x3hzusN4srevCtBez2OloPoEEAA0
+   2qfPppmRbwgJrQKcjwxNwTmA1+/sUbDCxvEZbSqFHB6x6keTZOsjfM16A
+   Cj2zg1dFijsyCD9XPvSg+H2bDXYNyt2M6EDI8pTHEAqNFSzAHeRjxtcbZ
+   1KjNaCFHImmP9PO9qW2oTby7PID3+tVieAcRgfo2priaD2ZpEyNBpgMMc
    w==;
-X-CSE-ConnectionGUID: EQWPjnSXTEy2cAh5W1hzdQ==
-X-CSE-MsgGUID: eVRK8XpES8+864POCA8ypQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11401"; a="45103843"
+X-CSE-ConnectionGUID: qgwWvHU4T3ao51sJa0ez2w==
+X-CSE-MsgGUID: de61hlNeTCe5MhCCeThjQw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11401"; a="45103850"
 X-IronPort-AV: E=Sophos;i="6.15,206,1739865600"; 
-   d="scan'208";a="45103843"
+   d="scan'208";a="45103850"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
   by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2025 13:44:06 -0700
-X-CSE-ConnectionGUID: oWDPxzIoS9WoDWrdnGY4Dg==
-X-CSE-MsgGUID: UpbRRnC2SZClY6NL0d+XMQ==
+X-CSE-ConnectionGUID: 2iHUTRetTEiGKZR7tiNoqg==
+X-CSE-MsgGUID: idrZxMSYSly8Y4CI6k8Hww==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,206,1739865600"; 
-   d="scan'208";a="129241794"
+   d="scan'208";a="129241798"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa010.jf.intel.com with ESMTP; 11 Apr 2025 13:44:05 -0700
+  by orviesa010.jf.intel.com with ESMTP; 11 Apr 2025 13:44:06 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -65,16 +65,14 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Mateusz Pacuszka <mateuszx.pacuszka@intel.com>,
+Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
 	anthony.l.nguyen@intel.com,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Larysa Zaremba <larysa.zaremba@intel.com>,
 	Simon Horman <horms@kernel.org>,
 	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net-next 01/15] ice: fix check for existing switch rule
-Date: Fri, 11 Apr 2025 13:43:42 -0700
-Message-ID: <20250411204401.3271306-2-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 02/15] ice: do not add LLDP-specific filter if not necessary
+Date: Fri, 11 Apr 2025 13:43:43 -0700
+Message-ID: <20250411204401.3271306-3-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250411204401.3271306-1-anthony.l.nguyen@intel.com>
 References: <20250411204401.3271306-1-anthony.l.nguyen@intel.com>
@@ -86,51 +84,136 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Mateusz Pacuszka <mateuszx.pacuszka@intel.com>
+From: Larysa Zaremba <larysa.zaremba@intel.com>
 
-In case the rule already exists and another VSI wants to subscribe to it
-new VSI list is being created and both VSIs are moved to it.
-Currently, the check for already existing VSI with the same rule is done
-based on fdw_id.hw_vsi_id, which applies only to LOOKUP_RX flag.
-Change it to vsi_handle. This is software VSI ID, but it can be applied
-here, because vsi_map itself is also based on it.
+Commit 34295a3696fb ("ice: implement new LLDP filter command")
+introduced the ability to use LLDP-specific filter that directs all
+LLDP traffic to a single VSI. However, current goal is for all trusted VFs
+to be able to see LLDP neighbors, which is impossible to do with the
+special filter.
 
-Additionally change return status in case the VSI already exists in the
-VSI map to "Already exists". Such case should be handled by the caller.
+Make using the generic filter the default choice and fall back to special
+one only if a generic filter cannot be added. That way setups with "NVMs
+where an already existent LLDP filter is blocking the creation of a filter
+to allow LLDP packets" will still be able to configure software Rx LLDP on
+PF only, while all other setups would be able to forward them to VFs too.
 
-Signed-off-by: Mateusz Pacuszka <mateuszx.pacuszka@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_switch.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/intel/ice/ice.h        |  1 +
+ drivers/net/ethernet/intel/ice/ice_common.c | 14 +++++++++----
+ drivers/net/ethernet/intel/ice/ice_common.h |  3 +--
+ drivers/net/ethernet/intel/ice/ice_lib.c    | 23 ++++++++++++++-------
+ 4 files changed, 28 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
-index 4a91e0aaf0a5..9d9a7edd3618 100644
---- a/drivers/net/ethernet/intel/ice/ice_switch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_switch.c
-@@ -3146,7 +3146,7 @@ ice_add_update_vsi_list(struct ice_hw *hw,
- 		u16 vsi_handle_arr[2];
+diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+index fd083647c14a..2694951a0b1d 100644
+--- a/drivers/net/ethernet/intel/ice/ice.h
++++ b/drivers/net/ethernet/intel/ice/ice.h
+@@ -515,6 +515,7 @@ enum ice_pf_flags {
+ 	ICE_FLAG_MTU_CHANGED,
+ 	ICE_FLAG_GNSS,			/* GNSS successfully initialized */
+ 	ICE_FLAG_DPLL,			/* SyncE/PTP dplls initialized */
++	ICE_FLAG_LLDP_AQ_FLTR,
+ 	ICE_PF_FLAGS_NBITS		/* must be last */
+ };
  
- 		/* A rule already exists with the new VSI being added */
--		if (cur_fltr->fwd_id.hw_vsi_id == new_fltr->fwd_id.hw_vsi_id)
-+		if (cur_fltr->vsi_handle == new_fltr->vsi_handle)
- 			return -EEXIST;
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index 59df31c2c83f..e725b785d093 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -6011,15 +6011,21 @@ bool ice_fw_supports_lldp_fltr_ctrl(struct ice_hw *hw)
+ /**
+  * ice_lldp_fltr_add_remove - add or remove a LLDP Rx switch filter
+  * @hw: pointer to HW struct
+- * @vsi_num: absolute HW index for VSI
++ * @vsi: VSI to add the filter to
+  * @add: boolean for if adding or removing a filter
++ *
++ * Return: 0 on success, -EOPNOTSUPP if the operation cannot be performed
++ *	   with this HW or VSI, otherwise an error corresponding to
++ *	   the AQ transaction result.
+  */
+-int
+-ice_lldp_fltr_add_remove(struct ice_hw *hw, u16 vsi_num, bool add)
++int ice_lldp_fltr_add_remove(struct ice_hw *hw, struct ice_vsi *vsi, bool add)
+ {
+ 	struct ice_aqc_lldp_filter_ctrl *cmd;
+ 	struct ice_aq_desc desc;
  
- 		vsi_handle_arr[0] = cur_fltr->vsi_handle;
-@@ -5978,7 +5978,7 @@ ice_adv_add_update_vsi_list(struct ice_hw *hw,
++	if (vsi->type != ICE_VSI_PF || !ice_fw_supports_lldp_fltr_ctrl(hw))
++		return -EOPNOTSUPP;
++
+ 	cmd = &desc.params.lldp_filter_ctrl;
  
- 		/* A rule already exists with the new VSI being added */
- 		if (test_bit(vsi_handle, m_entry->vsi_list_info->vsi_map))
--			return 0;
-+			return -EEXIST;
+ 	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_lldp_filter_ctrl);
+@@ -6029,7 +6035,7 @@ ice_lldp_fltr_add_remove(struct ice_hw *hw, u16 vsi_num, bool add)
+ 	else
+ 		cmd->cmd_flags = ICE_AQC_LLDP_FILTER_ACTION_DELETE;
  
- 		/* Update the previously created VSI list set with
- 		 * the new VSI ID passed in
+-	cmd->vsi_num = cpu_to_le16(vsi_num);
++	cmd->vsi_num = cpu_to_le16(vsi->vsi_num);
+ 
+ 	return ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
+ }
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
+index 9b00aa0ddf10..64c530b39191 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.h
++++ b/drivers/net/ethernet/intel/ice/ice_common.h
+@@ -290,8 +290,7 @@ int
+ ice_aq_set_lldp_mib(struct ice_hw *hw, u8 mib_type, void *buf, u16 buf_size,
+ 		    struct ice_sq_cd *cd);
+ bool ice_fw_supports_lldp_fltr_ctrl(struct ice_hw *hw);
+-int
+-ice_lldp_fltr_add_remove(struct ice_hw *hw, u16 vsi_num, bool add);
++int ice_lldp_fltr_add_remove(struct ice_hw *hw, struct ice_vsi *vsi, bool add);
+ int ice_lldp_execute_pending_mib(struct ice_hw *hw);
+ int
+ ice_aq_read_i2c(struct ice_hw *hw, struct ice_aqc_link_topo_addr topo_addr,
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index 0bcf9d127ac9..542b76b5707a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -2085,19 +2085,28 @@ void ice_cfg_sw_lldp(struct ice_vsi *vsi, bool tx, bool create)
+ 		status = eth_fltr(vsi, ETH_P_LLDP, ICE_FLTR_TX,
+ 				  ICE_DROP_PACKET);
+ 	} else {
+-		if (ice_fw_supports_lldp_fltr_ctrl(&pf->hw)) {
+-			status = ice_lldp_fltr_add_remove(&pf->hw, vsi->vsi_num,
+-							  create);
+-		} else {
++		if (!test_bit(ICE_FLAG_LLDP_AQ_FLTR, pf->flags)) {
+ 			status = eth_fltr(vsi, ETH_P_LLDP, ICE_FLTR_RX,
+ 					  ICE_FWD_TO_VSI);
++			if (!status || !create)
++				goto report;
++
++			dev_info(dev,
++				 "Failed to add generic LLDP Rx filter on VSI %i error: %d, falling back to specialized AQ control\n",
++				 vsi->vsi_num, status);
+ 		}
++
++		status = ice_lldp_fltr_add_remove(&pf->hw, vsi, create);
++		if (!status)
++			set_bit(ICE_FLAG_LLDP_AQ_FLTR, pf->flags);
++
+ 	}
+ 
++report:
+ 	if (status)
+-		dev_dbg(dev, "Fail %s %s LLDP rule on VSI %i error: %d\n",
+-			create ? "adding" : "removing", tx ? "TX" : "RX",
+-			vsi->vsi_num, status);
++		dev_warn(dev, "Failed to %s %s LLDP rule on VSI %i error: %d\n",
++			 create ? "add" : "remove", tx ? "Tx" : "Rx",
++			 vsi->vsi_num, status);
+ }
+ 
+ /**
 -- 
 2.47.1
 
