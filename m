@@ -1,92 +1,94 @@
-Return-Path: <netdev+bounces-181808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88CB4A86815
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 23:19:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11EB5A86816
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 23:20:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A78E8174A54
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 21:18:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 366411BA2474
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 21:20:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3438B29AB0D;
-	Fri, 11 Apr 2025 21:18:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3247290BD9;
+	Fri, 11 Apr 2025 21:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eUSYJRts"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="no107ab6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 046E427E1B0;
-	Fri, 11 Apr 2025 21:18:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06FFB28EA63;
+	Fri, 11 Apr 2025 21:19:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744406329; cv=none; b=huMp5JmJIUZshtR0P1mh5g4348rUyUOJJWvs9lrIou9dN3PsdaxBzj+9L5SjAb/ll6K3MOOw7BE5tnR4L5mHRm2Ls06FP2H1WLd6Eco5nGnKa52atsNAMgnbdbrRZMzCTEbWY+A8G3hTwzyhwKTQ3wNGp+lWDaKdCh1cBueSQII=
+	t=1744406400; cv=none; b=TvEgUXxiQ2rmNlqPePNFqzwJRrChcmrxpTQcaeSmHDe/3RWe28PjIrentNWx9La70eBjE97jLU9xHG0H1kiypu+T1C6poWg2+HP1/WWTCedn2pRRMjkSmqWxNrcwuXYc+MLcsLQBkTS5KiB54pzoA67kP2GaGs3U1B8iVIycw5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744406329; c=relaxed/simple;
-	bh=0+8SOdZHpARtPKiOteQjtALkLBWbvVG2+mmUnczmE6k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d6OGRHvAmDcEZTqfbsVk5u6UEdu5/88SBoS201eV1hiqJdBng6PofYkMAo+g2Ql1a8x7z/H8HTxOYvvbnJ9a59f/ZJ+x5esHa9QwiygKJICilEQBpIuChUUMDlHYCmX0Un9t+c5RQR34l/6Wgwx7wcaumeNV+/99UCWrLKYT2V0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eUSYJRts; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05D44C4CEE2;
-	Fri, 11 Apr 2025 21:18:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744406328;
-	bh=0+8SOdZHpARtPKiOteQjtALkLBWbvVG2+mmUnczmE6k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eUSYJRtsz0gqNFUtQzmCGPrW/hjcU/fV1v3EUKrVUCHeUHQCF/QhOeSNGADnYl+aC
-	 PdCzw4h+2c365BC1VVrAw2Yg6TL1HTZ7RX1k0NYkuIiHho3+wwCRrAXYU13v985kNe
-	 RAS/tmcJ60mcCO/54quTUZQckfa/7TqfVu+sb10hwxmHQYY3+aCVANq4exr2vvon/0
-	 JXgFRdC9/3cEs7Ro7mHv48ny5inlbk1y4xWKH1sJZ0xt4zLxUXpom4OdOwOR7/5QNI
-	 f226gcwTSS68TrnwJAfyhhpTdjeimOAT5vu+ycF7BstGAXE0OJePO+I8jRsQwr8Fcn
-	 Jlby+osCVN8kA==
-Date: Fri, 11 Apr 2025 14:18:47 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: Antonio Quartulli <antonio@openvpn.net>, netdev@vger.kernel.org, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Donald
- Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman
- <horms@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>,
- steffen.klassert@secunet.com, antony.antony@secunet.com
-Subject: Re: [PATCH net-next v25 01/23] net: introduce OpenVPN Data Channel
- Offload (ovpn)
-Message-ID: <20250411141847.6dba6987@kernel.org>
-In-Reply-To: <Z_keORW4OWc8i5Vz@krikkit>
-References: <20250407-b4-ovpn-v25-0-a04eae86e016@openvpn.net>
-	<20250407-b4-ovpn-v25-1-a04eae86e016@openvpn.net>
-	<20250410195440.3ba7ba0f@kernel.org>
-	<f11e8a14-deb0-456f-bb4a-b5e4e16a79d7@openvpn.net>
-	<Z_keORW4OWc8i5Vz@krikkit>
+	s=arc-20240116; t=1744406400; c=relaxed/simple;
+	bh=owHBfoHj2681o4ExRPeNeCnZ5AZ6HnK7rZE38w1goao=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=e50H2iR2HVs/tMCSfAHMMbeTBsMxPLQhb4KNv5gPUJovBlqwfbP2Zg+X2uJ8cGHF+atnilvDavvaLoM2gRleOwHj01awamqO4FTZSuKaSS2iBWd8lDtTmk/CjKcdEaoW9ThieDTAoNIa68CiwmDiU8G5mSdDZt/w/K/QhQysaTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=no107ab6; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744406399; x=1775942399;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=IHcoMfBK8wmAFaZYd0OkQw5glemWFZU/vVnde6R0URc=;
+  b=no107ab6gUVUGxDVr7IE+lgdZal8dI1zu+G0kHGBNsFdpodhUTYPqPLb
+   CnGLZMBb/S+LGXUS7QvXSlUczHVi9+q/vpZ4c9BN26IPAbpAp3tU6yakl
+   gB6kRKmwA2yqvAvQNkjfIrUKdFUKSYU31p8NHL7VXMMr08HHAriaNE+Gh
+   g=;
+X-IronPort-AV: E=Sophos;i="6.15,206,1739836800"; 
+   d="scan'208";a="734962792"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2025 21:19:57 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:24969]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.49.222:2525] with esmtp (Farcaster)
+ id 48b82784-7a6f-4b7f-aaf0-cd797f1943b9; Fri, 11 Apr 2025 21:19:56 +0000 (UTC)
+X-Farcaster-Flow-ID: 48b82784-7a6f-4b7f-aaf0-cd797f1943b9
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 11 Apr 2025 21:19:55 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.119.240.29) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 11 Apr 2025 21:19:52 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <leitao@debian.org>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, Kuniyuki Iwashima
+	<kuniyu@amazon.com>
+Subject: Re: [PATCH net-next 2/9] neighbour: Use nlmsg_payload in neightbl_valid_dump_info
+Date: Fri, 11 Apr 2025 14:19:37 -0700
+Message-ID: <20250411211943.67176-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250411-nlmsg-v1-2-ddd4e065cb15@debian.org>
+References: <20250411-nlmsg-v1-2-ddd4e065cb15@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D045UWC004.ant.amazon.com (10.13.139.203) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Fri, 11 Apr 2025 15:50:49 +0200 Sabrina Dubroca wrote:
-> > My understanding is that this is the standard approach to:
-> > 1) hook in the middle of registration/deregistration;
-> > 2) handle events generated by other components/routines.
-> > 
-> > I see in /drivers/net/ almost every driver registers a notifier for their
-> > own device.  
+From: Breno Leitao <leitao@debian.org>
+Date: Fri, 11 Apr 2025 10:00:49 -0700
+> Update neightbl_valid_dump_info function to utilize the new
+> nlmsg_payload() helper function.
 > 
-> I think most of them register a notifier for their lower device
-> (bridge port, real device under a vlan, or similar).
+> This change improves code clarity and safety by ensuring that the
+> Netlink message payload is properly validated before accessing its data.
 > 
-> I've mentioned at some point that it would be more usual to replace
-> this notifier with a custom dellink, and that ovpn->registered could
-> likely be replaced with checking for NETREG_REGISTERED. I just thought
-> it could be cleaned up a bit later, but it seems Jakub wants it done
-> before taking the patches :)
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-Ideally, yes. One fewer place for us to check when trying to figure 
-out if we will break anything with the locking changes :(
-Notifiers are very powerful but that comes at high maintenance cost.
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
