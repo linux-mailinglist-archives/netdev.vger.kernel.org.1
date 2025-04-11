@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-181482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 520F0A85207
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 05:30:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F27FAA85208
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 05:30:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D42B445DDB
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 03:30:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 406058C3F97
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 03:29:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D62A27C858;
-	Fri, 11 Apr 2025 03:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2180427CB01;
+	Fri, 11 Apr 2025 03:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HhrR22Ve"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="leQue0dp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17C7427C851
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 03:29:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20FA27C87B
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 03:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744342198; cv=none; b=rgqkO0jRE7Xnz3U7LpsTBzbiOPaYKf8njcYXajkOD/Ivz/iEOJfFYPQULVVIh01lmmhF00uiZCLhZYek2uoE04ypziesN6FhR9J0fSVog/ASZrwNbRmbxbByycws3/e2p6VNv0CCgR+oZvGi5/ggQb4e5Kg38OEETyYzFMHqNHs=
+	t=1744342200; cv=none; b=NavPuaQsw09LE6hRuKpMEg/PZxmHwiseNWUYQmBv97UJOZnGs4a+wSGJe5pu6uEmkeVmrRluKSUIUmsKFPDQio3pnX74hDyuYd2eoXQYUHjmNslTPiogresb4QtWRghqznB/O2pencck88rGS9KTLaKvslavuSlAGBBY8WLdQww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744342198; c=relaxed/simple;
-	bh=C66Im0AzE8+U+XgUGXegfxZJ6mcriFsk/jwDevFX4jw=;
+	s=arc-20240116; t=1744342200; c=relaxed/simple;
+	bh=mUL2z/EIZiZq8JKPIuXjz9JurKt+uudGsHYKwpnvE4k=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Y5v5exxWflo6lxg4dPyCXvuVEbhkWiXNZKQXc0WaoMBUXS/N5Mfx7IADBF0EGXUQkOtx0Pu6UdH/U8nzPyuGOfuqt8bLcrbqgNQCaYdV5M4plIE1t2jmneW6XKCtuZ7PidULq9IYpc/M1EEMUJ82EQvywKd4c9lEcXt2iZf9BwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HhrR22Ve; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF358C4CEE2;
-	Fri, 11 Apr 2025 03:29:57 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=GJz0ik1HdMmvLggSjEbx0kDIvkWpyyQcGQdsTPAmZB3zNWqFtg1JIZKUqzqmUwwTUPgR5L3jZkhz3KiKK1F9IF5/f0941h0AgYNPa4XSFh1W/aUVdLMNlbTh79MY9PeuOxjwlvbAXQCk9pD1U1E06jY7XH71r6DsVqhHrRxgCsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=leQue0dp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62019C4CEE5;
+	Fri, 11 Apr 2025 03:29:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744342197;
-	bh=C66Im0AzE8+U+XgUGXegfxZJ6mcriFsk/jwDevFX4jw=;
+	s=k20201202; t=1744342199;
+	bh=mUL2z/EIZiZq8JKPIuXjz9JurKt+uudGsHYKwpnvE4k=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HhrR22VeVlH1H2Zg8KtkW7Mn5XkEchGTkcQB3OildkMlKSvQDl1INnEZkhzYgl1Sd
-	 tD79zqrGvuTDRyFYsumjv6XNwkvOBIvYblW+uhawFNfKD+us0RxhrrKzfToKXD5me0
-	 xqEEsI7AB4uf7axk4biFiyr1G5AJQK+frIbAzH3FGk1RJOrKnkofFc83h5W0yRgBMs
-	 E+S8nlig4rSCgKb3vFgIXPOTJAwm6k9HrV3qbFihGvzgi0Rt0raHb3YwWmRCBNqdam
-	 dl0L+qihGr4m7moOZVknk4ox/jPv1/6nnKbh9fRVUFtYlUAYy+YToOlhHV8sbPCxTH
-	 o/SQUWbtq8vLw==
+	b=leQue0dpBjoaL+5MaWRmaAShuNkkk1QSHsKwcCzpdA+kuMmC62AQUT9l4iyaMGOuM
+	 +StM8982nXMNGB3G8gkJUmLxfDn4T2EJiYtjUbtLRGjOnW21NlCRCDgdvadmO065qU
+	 42IEuTeq2ZSkRX/yhxFAUYZOnPc0ffrQqyLifCxEvI6okdq7ILzgPyo5SUpB7GvVTL
+	 A2nABpSwBpsmhNIqzwLQojsfz7WWrCYYoW/5KP8olQ/FNUi9X/ph9vLmaLSlrOMWbI
+	 jmSt+7hRFtn2OqBQCCPGgbB6OnRTBuiTDjbiwJUmzzRqvABU+N/bMaPjcgsXi1xndB
+	 0jP6LEafu1Ghg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE37F380CEF4;
-	Fri, 11 Apr 2025 03:30:36 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B86380CEF4;
+	Fri, 11 Apr 2025 03:30:38 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,65 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 00/13] tools: ynl: c: basic netlink-raw support
+Subject: Re: [PATCH net-next] ipv4: remove unnecessary judgment in
+ ip_route_output_key_hash_rcu
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174434223551.3945310.12371352099269592658.git-patchwork-notify@kernel.org>
-Date: Fri, 11 Apr 2025 03:30:35 +0000
-References: <20250410014658.782120-1-kuba@kernel.org>
-In-Reply-To: <20250410014658.782120-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- donald.hunter@gmail.com, jacob.e.keller@intel.com, yuyanghuang@google.com,
- sdf@fomichev.me, gnault@redhat.com, nicolas.dichtel@6wind.com,
- petrm@nvidia.com
+ <174434223675.3945310.4555224487531250688.git-patchwork-notify@kernel.org>
+Date: Fri, 11 Apr 2025 03:30:36 +0000
+References: <20250409033321.108244-1-shaozhengchao@163.com>
+In-Reply-To: <20250409033321.108244-1-shaozhengchao@163.com>
+To: shaozhengchao <shaozhengchao@163.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  9 Apr 2025 18:46:45 -0700 you wrote:
-> Basic support for netlink-raw AKA classic netlink in user space C codegen.
-> This series is enough to read routes and addresses from the kernel
-> (see the samples in patches 12 and 13).
+On Wed,  9 Apr 2025 11:33:21 +0800 you wrote:
+> From: Zhengchao Shao <shaozhengchao@163.com>
 > 
-> Specs need to be slightly adjusted and decorated with the c naming info.
-> 
-> In terms of codegen this series includes just the basic plumbing required
-> to skip genlmsghdr and handle request types which may technically also
-> be legal in genetlink-legacy but are very uncommon there.
+> In the ip_route_output_key_cash_rcu function, the input fl4 member saddr is
+> first checked to be non-zero before entering multicast, broadcast and
+> arbitrary IP address checks. However, the fact that the IP address is not
+> 0 has already ruled out the possibility of any address, so remove
+> unnecessary judgment.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2,01/13] netlink: specs: rename rtnetlink specs in accordance with family name
-    https://git.kernel.org/netdev/net-next/c/cd5e64fb959a
-  - [net-next,v2,02/13] netlink: specs: rt-route: specify fixed-header at operations level
-    https://git.kernel.org/netdev/net-next/c/97a33caa9071
-  - [net-next,v2,03/13] netlink: specs: rt-addr: remove the fixed members from attrs
-    https://git.kernel.org/netdev/net-next/c/d460016e7bca
-  - [net-next,v2,04/13] netlink: specs: rt-route: remove the fixed members from attrs
-    https://git.kernel.org/netdev/net-next/c/295ff1e95201
-  - [net-next,v2,05/13] netlink: specs: rt-addr: add C naming info
-    https://git.kernel.org/netdev/net-next/c/52d062362c05
-  - [net-next,v2,06/13] netlink: specs: rt-route: add C naming info
-    https://git.kernel.org/netdev/net-next/c/1652e1f35dfb
-  - [net-next,v2,07/13] tools: ynl: support creating non-genl sockets
-    (no matching commit)
-  - [net-next,v2,08/13] tools: ynl-gen: don't consider requests with fixed hdr empty
-    https://git.kernel.org/netdev/net-next/c/e0a7903c323f
-  - [net-next,v2,09/13] tools: ynl: don't use genlmsghdr in classic netlink
-    https://git.kernel.org/netdev/net-next/c/7e8ba0c7de2b
-  - [net-next,v2,10/13] tools: ynl-gen: consider dump ops without a do "type-consistent"
-    https://git.kernel.org/netdev/net-next/c/e8025e72aad6
-  - [net-next,v2,11/13] tools: ynl-gen: use family c-name in notifications
-    https://git.kernel.org/netdev/net-next/c/882e7b1365ce
-  - [net-next,v2,12/13] tools: ynl: generate code for rt-addr and add a sample
-    (no matching commit)
-  - [net-next,v2,13/13] tools: ynl: generate code for rt-route and add a sample
-    (no matching commit)
+  - [net-next] ipv4: remove unnecessary judgment in ip_route_output_key_hash_rcu
+    https://git.kernel.org/netdev/net-next/c/3b4f78f9ad29
 
 You are awesome, thank you!
 -- 
