@@ -1,120 +1,107 @@
-Return-Path: <netdev+bounces-181759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E1AAA865FE
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 21:15:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22E99A86626
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 21:20:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 882A99C15B2
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 19:14:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46BE21748AC
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 19:19:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C2BE278159;
-	Fri, 11 Apr 2025 19:14:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB775278178;
+	Fri, 11 Apr 2025 19:19:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N0c0cTYG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LqiB2ID6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50F9D25C716
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 19:14:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B70258CFD
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 19:19:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744398893; cv=none; b=mP6jtp6mXht7auPIEjw7Ik0WymIaAbNNDqBWa2OFi3aVwUU/d+wXpI5pd7D+3CZDloHGd2XAyOED+VWvW79d3Qp+E0FRknpwJc/8wXwh6NFeGd5Cb5l2xgiaycJtyDqXhYV2PkOLNyTBHFweSRGueY9HIN4Ah3ZwOKHQOvWMEVI=
+	t=1744399180; cv=none; b=bSdFTd3hiw1d1i3VVyJgaBDK2/qlh/WanbtHiUGcatP6CHVvze4NtQIE8Tw7vmg0OEZWHTKkzjhm0iaKzffhbAT1MCfJoIUwmxVvV6oyoTNPXDevCkYL1LOlBOk0P0xU6OkglqSIdPevzDllhYE4fDIGvKJF4wyCu49NOEBGuOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744398893; c=relaxed/simple;
-	bh=ew7G7nUzJHLDTCLZM/6FKEFOKCNCWkL2tLpyxx1BaMk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pU7rBorg4g6rv5j1qZ/xJuh1auqIs5KqkjXp6GUfpD3HfdkFjT8RGQOSIH3liOGDE9S/tS0eCENRcozFo+b/4k6zB6W3nMGVler1l1nIYXq1Wr0eHHwcFVFAyiKwZbb9u/X0J5NKiPBeJE1BSIQ91XulD4vclsf/iTY/UTLXugQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N0c0cTYG; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43cf7c2c351so2500705e9.0
-        for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 12:14:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744398890; x=1745003690; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=a0QGGpkm8jXMLW9ND7pujumQ83GWkKr2keM5EXPaDmE=;
-        b=N0c0cTYGxTD30DxKYyiNIX6I2pgtE+agd4kEjfWjVkkWFGo16JU3mBc9OpXsITEyQw
-         YGbBbT6q+jDNmqxez3KiSoTm9S7MuWBaTF5qBl0/+QtJOHX/q3o3CDoIMyDk1ZuN/8na
-         7wJO0GsqCPNLruuPsobb7NXX6J5mEB18NuTY1s5fHeE1oebx4PaK7cSvAffk7CV7LAVN
-         gd2MyHmXo1Hs1DhjuC6lg6Axo/2lXhCBBFNwfEko06O65eSGQWlQ6MUFgdkdCrXLWnu0
-         IbiuhJKjoRNVCwtNmo3oRrwLLzLPHR+VftbwVvwN13lPLIMxdm/O/HMwn/rNJ5pelKNX
-         fQ0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744398890; x=1745003690;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a0QGGpkm8jXMLW9ND7pujumQ83GWkKr2keM5EXPaDmE=;
-        b=AyCZ0an77dfRgFIIhGcEks3PRDww8O/38szrM/sIKd13jwlOcTwdlkwbnTSYLzH59j
-         RvW2sX6yD440cGQ2wqYzHd5QCLfwBy/HltFH8sqsuu9/NSBOTmbDhXous6NRkjf+lvvA
-         bUqWubhqq0tacp+wOPudhWIFCo+QLXlgOEhQaIdMoJS9fJEyB51yEda9cWfTwxuLwI8S
-         m6YMAlOJtdk1Ogfnf4+puRlFP9xvXJu1DbZDNBBGKlLOMNQcnXQAZjLnH/nu6wkbD2jx
-         r3HfJ8ctDuiYNaYSo2Y5cpvNcwyKwdGMkYrIH6egb4mR3w8a+cD1YmLiwf8JvGHO7iGn
-         J8Ow==
-X-Gm-Message-State: AOJu0Yxne8Xzzjaubs724u1SoTFPR/4NpZlcygSBsKSRYy0sHu86iScI
-	hKggockPA0R34GeCJQvbCQFvqIVVfjpHv9+BNTN8YXpITkO7wSCCtxVTkIUo
-X-Gm-Gg: ASbGncun5W340K37WSXWIq+pWHMNYSUp3BNemr/S9FHok7cEjbvS3wu2E1hLT3lGwW5
-	O1MTaS5uTf3dEfR5WP9yR6gVOFr2GvE3268kehAVOgkOehG1qRR+Gmz/zNbRXUX/ChMAXcJIvNB
-	5+X8QFEUojchh5MJNLuizz4q1f8VHuz8Da3f/8TAoI0prMjxhyBytJj+Ohhracq7Y6yA49lK1vv
-	eFePLXKgR+pBnUj3lYoufOhvlxaSyLQuDATnv3Uj4AShJOqXXQnsWnBVPuJfAp9qrVg46+k2Cc/
-	Dp4EvKsQfU6TecO9gR5PeZLPD64u
-X-Google-Smtp-Source: AGHT+IGTbGUZLMYsomwqsQDmfPdIJyUecJYiNvQT9TE4TF7C/REi4x9jPe88/5EsgVcuAPFaUC/bJg==
-X-Received: by 2002:a05:600c:1e02:b0:439:a1c7:7b3a with SMTP id 5b1f17b1804b1-43f3cc812c6mr12391055e9.1.1744398890280;
-        Fri, 11 Apr 2025 12:14:50 -0700 (PDT)
-Received: from skbuf ([188.25.50.178])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f233c817dsm91417185e9.23.2025.04.11.12.14.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Apr 2025 12:14:49 -0700 (PDT)
-Date: Fri, 11 Apr 2025 22:14:47 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [BUG] unbinding mv88e6xxx device spews
-Message-ID: <20250411191447.b3p3neasoxk5bz6e@skbuf>
-References: <Z_lRkMlTJ1KQ0kVX@shell.armlinux.org.uk>
- <20250411180159.ukhejcmuqd3ypewl@skbuf>
- <Z_li8Bj8bD4-BYKQ@shell.armlinux.org.uk>
- <20250411185430.ywnlnkba4jyb7rie@skbuf>
+	s=arc-20240116; t=1744399180; c=relaxed/simple;
+	bh=9Y15rTW2VSOUk8bOlguRZuDu9ioANCbUlgWc4+05hLs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fxkwH+0McD3esH8YAfJu5L40DT1fejDYkj7/v4YkhnPbQsvc6RDu3pAuf8dQQwmxqMRyYFo1Pr+BuqNO8wcsXe9E0md8fNMbkDF6ruJAfOgT7hHxj34a10WudBSd8cUI30CDZ7wvqH0VZb7Ngt3zrArS6+wtiTNxmEB2YVbqdtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LqiB2ID6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5943C4CEE2;
+	Fri, 11 Apr 2025 19:19:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744399180;
+	bh=9Y15rTW2VSOUk8bOlguRZuDu9ioANCbUlgWc4+05hLs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LqiB2ID6SEMFT4mRC4UBulwwtkJ2E04sH1EK695ZQUUEvkFzJXp/x5JEfweRoO6UC
+	 UqUPcQhOCiSOOlGRZ/Nee7UjVaYBi5M6yjSBOmhhr2qcX97P5KtN5+chWPNHHJ6Hb0
+	 eowA0STMMq/Co47gi0qkpgZhUw6+G5bFvIY16AqzoLILkdjNINcM5RxRoMjhoI2inu
+	 WdzLMa6SE4T4vqXKACYrw85DaX49PHCJClAd/85uGhgjj6okJfLbmDGtl9Ok8EiQ9D
+	 E6yXeH2QFDejileVB8dgXbg/1txpmDiqHTsICPPJux+dFdUQqSdozTwhSELw7qsrP9
+	 P8VkWV39BWCXA==
+Date: Fri, 11 Apr 2025 12:19:38 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: sdf@fomichev.me, Kuniyuki Iwashima <kuniyu@amazon.com>,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ horms@kernel.org, hramamurthy@google.com, jdamato@fastly.com,
+ netdev@vger.kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH net-next v2 6/8] netdev: depend on netdev->lock for xdp
+ features
+Message-ID: <20250411121938.0afae1b3@kernel.org>
+In-Reply-To: <Z_lUZgRc9JYhjnIG@mini-arch>
+References: <20250408195956.412733-7-kuba@kernel.org>
+	<20250410171019.62128-1-kuniyu@amazon.com>
+	<20250410191028.31a0eaf2@kernel.org>
+	<20250410192326.0a5dbb10@kernel.org>
+	<Z_lUZgRc9JYhjnIG@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250411185430.ywnlnkba4jyb7rie@skbuf>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 11, 2025 at 09:54:30PM +0300, Vladimir Oltean wrote:
-> > but... of course there's another issue buried beneath:
+On Fri, 11 Apr 2025 10:41:58 -0700 Stanislav Fomichev wrote:
+> > Ugh, REGISTER is ops locked we'd need conditional locking here.
 > > 
-> > which seems to be due to:
-> > 
-> >                 WARN_ON(!list_empty(&dp->vlans));
-> > 
-> > This is probably due to the other issue I reported:
-> > 
-> > [   44.485597] br0: port 9(optical2) entered disabled state
-> > [   44.498847] br0: port 9(optical2) failed to delete vlan 1: -ENOENT
-> > [   44.505353] ------------[ cut here ]------------
-> > [   44.510052] WARNING: CPU: 0 PID: 438 at net/bridge/br_vlan.c:433 nbp_vlan_flu
-> > sh+0xc0/0xc4
+> > Stanislav, I can make the REGISTERED notifier fully locked, right?
+> > I suspect any new object we add that's protected by the instance
+> > lock will want to lock the dev.  
 > 
-> No, they're not related. This is the third one, and I already know about it,
-> but it's relatively harmless.  Since I knocked down 2 already, let me
-> just go and take care of this one as well.
+> Are you suggesting to do s/netdev_lock_ops/netdev_lock/ around
+> call_netdevice_notifiers in register_netdevice?
 
-Actually, I think you're right. The WARN_ON() that &dp->vlans isn't
-empty should be a consequence of the STU issue. Please let me know if
-this WARN_ON() disappears when testing the patch in the other thread.
+Aha
 
-I was under the impression that you were hitting a different WARN_ON(),
-just one or two lines above this one, where &dp->fdbs or &dp->mdbs are
-not empty. That's what I was aware of, but it looks like you're not
-there just yet.
+> We can try, the biggest concern, as usual, are the stacking devices
+> (with an extra lock), but casually grepping for NETDEV_REGISTER
+> doesn't bring up anything suspicious.
+> 
+> But if you're gonna do conditional locking for NETDEV_UNREGISTER, any
+> reason not to play it safe and add conditional locking to
+> NETDEV_REGISTER in netdev_genl_netdevice_event?
+
+Just trying to think what will lead to fewer problems down the line.
+
+Let's me think it thru. So we have this situation:
+ - device A - getting registered
+ - device L - listens / has the notifier
+with upper devs our concern is usually that taking the A's lock
+around the notifier forces A -> L lock ordering (between A's instance
+lock and whatever lock of L, can be either instance or some other).
+
+If A is an arbitrary device then L has to already be ready to handle
+its REGISTER callback under A's instance lock, because A may be ops
+locked. So as you say for generic bonding/team changing lock type
+is a noop.
+
+If A is a specific device that L is looking for - changing the lock type
+around REGISTER may impact L. /me goes to look at the code
+Ugh there is a bunch of drivers that wait for a specific device to
+register and then take a lock. Let me play it safe then...
 
