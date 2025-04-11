@@ -1,71 +1,72 @@
-Return-Path: <netdev+bounces-181794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A67CA867B2
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 22:54:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19DC9A867B4
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 22:54:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E6B38C2505
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 20:54:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15CC0188DD54
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 20:55:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BD5E28FFEF;
-	Fri, 11 Apr 2025 20:54:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C286E28F93B;
+	Fri, 11 Apr 2025 20:54:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Cdw5HRuO"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="cjoA1uIn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA26028D853
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 20:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA22B347C7
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 20:54:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744404871; cv=none; b=m5Zbxu/nvYXNqr7+GNOyyOJui13EMG0/PA+eMpnrBaHeL4LjKFW0WKqWFZuaRtG2sTbCeUB55rrD68oMO+XC0vq5nXRupJ8BKYUrwPNQbkm3YMo0Aongetmi+nI+jpFaSMKQCX8kWIesIzA8UW2eO00XXSrsPsk/qU3P+q9pYMk=
+	t=1744404893; cv=none; b=hlzOGcGAwy1V+BnEWa5SnjGWQuydi73shTdT2XxEV1fTocMFOQ/6xrurkSvvNq6tkNq2rwHFZ9WdZ7EV7nQAc6xhLYVsGHu93B4WRV8ym9T/shl01soMUlRB6L6PEbC0yjHSs+UACUC/O2UW7LyeSbf3S5UzhnAbfUSS728za1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744404871; c=relaxed/simple;
-	bh=ekfRNNSjyNbVab7zWqe6Y8vo5Kq50AYwi9XJcGfiMG8=;
+	s=arc-20240116; t=1744404893; c=relaxed/simple;
+	bh=4OnDo4C8NF4l3A9CoHjtZEgLAHb1G/XUE60IZrVLwBM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iffClOO0Vg3pyVwNz+MWHtbH2Y3fSTTQMfc1qMY8fKgQx61m6hU5FSxnD+OyLpC7C1uIumIkWe1yQHaLdsmh8vPwRyfQBwYzdE8drb8sHFN7lwiMPsa/Uuv4+21PPQqrb8m5ZrXt6FTWqebSIGzr+nWey52KgJdmcvfbr0BYlwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Cdw5HRuO; arc=none smtp.client-ip=207.171.188.206
+	 MIME-Version:Content-Type; b=hdYrR3IfhqOMEZFjjN8jQ9IERE7VP2wge8/2LlIH9TWoiN5WKMn6YGmk/Tm5GhAJeOlHwpnrSfFhSGBi1k8zhqUxsrrqLCnSfI/y4tm6Wj8xms5JIzhgwcRbZMdoss0uapLMpBGU+kjKNkunCDDlKIFNUyd5oZcwyRsRoEalUkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=cjoA1uIn; arc=none smtp.client-ip=52.95.48.154
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1744404869; x=1775940869;
+  t=1744404893; x=1775940893;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=W5vQy/D2/12VH3wihbYu2oqTtzdSTmLyt8iUR3bsF/E=;
-  b=Cdw5HRuOFNfYP7GyZ5ccieHyumOOoArZFbcQyQGw4qDoVCf8EKLpkZCE
-   hGb2HP+6yNJhrlk1gFhtIlIxoRLmIVn25HkJnOkgjCJgj+gc74N1E65zF
-   CvPaMKNhiSXeeuFKXOVewcO6E43kiWShDl+WRYIAee1muP9OMEACoD003
-   0=;
+  bh=LBqEaUxy1ZDMEIFXt3S600q44gxxRKiehS70srHhIeY=;
+  b=cjoA1uInx62uQBh/SHQVqTPhnFCRpfu5MyF0eXOR8SM4P1exPGFwMnIp
+   YMi+anIkuPFOJyAHZLqXUcCE8C/YjHM+dB3+9kLzf97k7N/IPr9ircC8m
+   haap2yvu6DAqQFWIkMecYEfeZekdBVJpANBFHBFsS4jH+45kFNK3Un0Ih
+   Q=;
 X-IronPort-AV: E=Sophos;i="6.15,206,1739836800"; 
-   d="scan'208";a="815395962"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2025 20:54:24 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:4557]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.132:2525] with esmtp (Farcaster)
- id eedb0a07-35fa-41ab-b94d-448b655b90f2; Fri, 11 Apr 2025 20:54:23 +0000 (UTC)
-X-Farcaster-Flow-ID: eedb0a07-35fa-41ab-b94d-448b655b90f2
+   d="scan'208";a="479715540"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2025 20:54:49 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:50188]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.47.226:2525] with esmtp (Farcaster)
+ id 1c4307d1-9d89-45ad-b728-bd32431828bc; Fri, 11 Apr 2025 20:54:48 +0000 (UTC)
+X-Farcaster-Flow-ID: 1c4307d1-9d89-45ad-b728-bd32431828bc
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 11 Apr 2025 20:54:23 +0000
+ Fri, 11 Apr 2025 20:54:47 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.119.240.29) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Fri, 11 Apr 2025 20:54:20 +0000
+ Fri, 11 Apr 2025 20:54:45 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v2 net-next 03/14] net: Add ->exit_rtnl() hook to struct pernet_operations.
-Date: Fri, 11 Apr 2025 13:52:32 -0700
-Message-ID: <20250411205258.63164-4-kuniyu@amazon.com>
+	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>, David Ahern
+	<dsahern@kernel.org>
+Subject: [PATCH v2 net-next 04/14] nexthop: Convert nexthop_net_exit_batch_rtnl() to ->exit_rtnl().
+Date: Fri, 11 Apr 2025 13:52:33 -0700
+Message-ID: <20250411205258.63164-5-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250411205258.63164-1-kuniyu@amazon.com>
 References: <20250411205258.63164-1-kuniyu@amazon.com>
@@ -77,141 +78,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D032UWA003.ant.amazon.com (10.13.139.37) To
+X-ClientProxiedBy: EX19D035UWA001.ant.amazon.com (10.13.139.101) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-struct pernet_operations provides two batching hooks; ->exit_batch()
-and ->exit_batch_rtnl().
+nexthop_net_exit_batch_rtnl() iterates the dying netns list and
+performs the same operation for each.
 
-The batching variant is beneficial if ->exit() meets any of the
-following conditions:
-
-  1) ->exit() repeatedly acquires a global lock for each netns
-
-  2) ->exit() has a time-consuming operation that can be factored
-     out (e.g. synchronize_rcu(), smp_mb(), etc)
-
-  3) ->exit() does not need to repeat the same iterations for each
-     netns (e.g. inet_twsk_purge())
-
-Currently, none of the ->exit_batch_rtnl() functions satisfy any of
-the above conditions because RTNL is factored out and held by the
-caller and all of these functions iterate over the dying netns list.
-
-Also, we want to hold per-netns RTNL there but avoid spreading
-__rtnl_net_lock() across multiple locations.
-
-Let's add ->exit_rtnl() hook and run it under __rtnl_net_lock().
-
-The following patches will convert all ->exit_batch_rtnl() users
-to ->exit_rtnl().
+Let's use ->exit_rtnl().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Reviewed-by: David Ahern <dsahern@kernel.org>
 ---
- include/net/net_namespace.h |  2 ++
- net/core/net_namespace.c    | 53 +++++++++++++++++++++++++++----------
- 2 files changed, 41 insertions(+), 14 deletions(-)
+ net/ipv4/nexthop.c | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
 
-diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
-index bd57d8fb54f1..b071e6eed9d5 100644
---- a/include/net/net_namespace.h
-+++ b/include/net/net_namespace.h
-@@ -475,6 +475,8 @@ struct pernet_operations {
- 	void (*exit)(struct net *net);
- 	void (*exit_batch)(struct list_head *net_exit_list);
- 	/* Following method is called with RTNL held. */
-+	void (*exit_rtnl)(struct net *net,
-+			  struct list_head *dev_kill_list);
- 	void (*exit_batch_rtnl)(struct list_head *net_exit_list,
- 				struct list_head *dev_kill_list);
- 	unsigned int * const id;
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index 37026776ae4e..afaa3d1bda8d 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -163,16 +163,51 @@ static void ops_pre_exit_list(const struct pernet_operations *ops,
- 	}
+diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
+index 467151517023..d9cf06b297d1 100644
+--- a/net/ipv4/nexthop.c
++++ b/net/ipv4/nexthop.c
+@@ -4040,14 +4040,11 @@ void nexthop_res_grp_activity_update(struct net *net, u32 id, u16 num_buckets,
  }
+ EXPORT_SYMBOL(nexthop_res_grp_activity_update);
  
-+static void ops_exit_rtnl_list(const struct list_head *ops_list,
-+			       const struct pernet_operations *ops,
-+			       struct list_head *net_exit_list)
-+{
-+	const struct pernet_operations *saved_ops = ops;
-+	LIST_HEAD(dev_kill_list);
-+	struct net *net;
-+
-+	rtnl_lock();
-+
-+	list_for_each_entry(net, net_exit_list, exit_list) {
-+		__rtnl_net_lock(net);
-+
-+		ops = saved_ops;
-+		list_for_each_entry_continue_reverse(ops, ops_list, list) {
-+			if (ops->exit_rtnl)
-+				ops->exit_rtnl(net, &dev_kill_list);
-+		}
-+
-+		__rtnl_net_unlock(net);
-+	}
-+
-+	ops = saved_ops;
-+	list_for_each_entry_continue_reverse(ops, ops_list, list) {
-+		if (ops->exit_batch_rtnl)
-+			ops->exit_batch_rtnl(net_exit_list, &dev_kill_list);
-+	}
-+
-+	unregister_netdevice_many(&dev_kill_list);
-+
-+	rtnl_unlock();
-+}
-+
- static void ops_exit_list(const struct pernet_operations *ops,
- 			  struct list_head *net_exit_list)
+-static void __net_exit nexthop_net_exit_batch_rtnl(struct list_head *net_list,
+-						   struct list_head *dev_to_kill)
++static void __net_exit nexthop_net_exit_rtnl(struct net *net,
++					     struct list_head *dev_to_kill)
  {
 -	struct net *net;
- 	if (ops->exit) {
-+		struct net *net;
-+
- 		list_for_each_entry(net, net_exit_list, exit_list) {
- 			ops->exit(net);
- 			cond_resched();
- 		}
- 	}
-+
- 	if (ops->exit_batch)
- 		ops->exit_batch(net_exit_list);
- }
-@@ -213,18 +248,8 @@ static void ops_undo_list(const struct list_head *ops_list,
- 	else
- 		synchronize_rcu();
- 
--	if (hold_rtnl) {
--		LIST_HEAD(dev_kill_list);
 -
--		ops = saved_ops;
--		rtnl_lock();
--		list_for_each_entry_continue_reverse(ops, ops_list, list) {
--			if (ops->exit_batch_rtnl)
--				ops->exit_batch_rtnl(net_exit_list, &dev_kill_list);
--		}
--		unregister_netdevice_many(&dev_kill_list);
--		rtnl_unlock();
--	}
-+	if (hold_rtnl)
-+		ops_exit_rtnl_list(ops_list, saved_ops, net_exit_list);
+-	ASSERT_RTNL();
+-	list_for_each_entry(net, net_list, exit_list)
+-		flush_all_nexthops(net);
++	ASSERT_RTNL_NET(net);
++	flush_all_nexthops(net);
+ }
  
- 	ops = saved_ops;
- 	list_for_each_entry_continue_reverse(ops, ops_list, list)
-@@ -238,7 +263,7 @@ static void ops_undo_list(const struct list_head *ops_list,
- static void ops_undo_single(struct pernet_operations *ops,
- 			    struct list_head *net_exit_list)
- {
--	bool hold_rtnl = !!ops->exit_batch_rtnl;
-+	bool hold_rtnl = ops->exit_rtnl || ops->exit_batch_rtnl;
- 	LIST_HEAD(ops_list);
+ static void __net_exit nexthop_net_exit(struct net *net)
+@@ -4072,7 +4069,7 @@ static int __net_init nexthop_net_init(struct net *net)
+ static struct pernet_operations nexthop_net_ops = {
+ 	.init = nexthop_net_init,
+ 	.exit = nexthop_net_exit,
+-	.exit_batch_rtnl = nexthop_net_exit_batch_rtnl,
++	.exit_rtnl = nexthop_net_exit_rtnl,
+ };
  
- 	list_add(&ops->list, &ops_list);
+ static const struct rtnl_msg_handler nexthop_rtnl_msg_handlers[] __initconst = {
 -- 
 2.49.0
 
