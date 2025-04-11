@@ -1,145 +1,145 @@
-Return-Path: <netdev+bounces-181596-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181597-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E7A6A85A15
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 12:32:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B32DAA85A17
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 12:34:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A423A1BA24DE
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 10:33:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDC1D1BA38B2
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 10:34:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B55822128B;
-	Fri, 11 Apr 2025 10:32:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EEBB17D2;
+	Fri, 11 Apr 2025 10:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fDpMayJk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l9oC6gpn"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF22A204581
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 10:32:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B855278E51
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 10:34:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744367564; cv=none; b=qnMgUeax8eUQRnnabPIMGtyPDm777m6l1OVvYPflXo2Dkesaf1zkKCz4VD38UnuTMzLzC+7CGUXTjOCI3ByZvXeIN8kVq+ip3ALgyRYK016oxpT5kJyLNPrDBtt/cPmn0ZggdiCAgLzwQ8h4z70L80yBB3oqV+hK58bQkuIv4L4=
+	t=1744367649; cv=none; b=FnF60zlZWRQ3wjliJC9U050hyYA4IIYTzT9kPdoMcIInjnP6jV4wRdrvBcMQyek4RhZ5KmYfKHJv2xoVRr+QuC4pRNaF12QmOVRemlpxwEK/D8bnFptg2zovm7Ho/8+YNeZSWlzevwdZ+vlcRPDiOZpYz2YhfY2+dNavwaFnvx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744367564; c=relaxed/simple;
-	bh=dZAp+0aFkf7MK8MICOzGUOv26hrZwzczT8o2iMxm/5A=;
+	s=arc-20240116; t=1744367649; c=relaxed/simple;
+	bh=6o92jC9swnpSd0EXL3URyIIGVULDuxwQJCe4pRKoIbQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cg+4O4I/CLYAXiaYSGPS+O/TxNdIlrArcEUwQ6peslXc55fO9jgi7tVYS+hEchzhjbEdyHLjp3b/uVCWWpFwTYdocP3ecOaQ27nwsaFMVeVtV4gEydHYUyHMvbpvfO15RrLbETMfPopepcdTzlfUGofaI4BIWfH3xDaUnSihEVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fDpMayJk; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744367561;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/Y+9d61eT9fS3Nx5t35n8P/kCjRV2k1+1b7KNobnOYs=;
-	b=fDpMayJkSg33a8nNW13J6HEbmekXc+ztNSfeKx7/lV4VTPzhxgnTkj6lO4smChmDb8jag2
-	tcRy9tmC8bE/OBUTAHNSN0waJndHnlfwajHhq18QGfeTEV28OTn7a4I/a7YCM920eDDg5y
-	7tLSwWn3nkum1WuQNTiwcrKKLyGimpw=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-312-CKGJwfpdMgyVvoNpPc6E_w-1; Fri, 11 Apr 2025 06:32:38 -0400
-X-MC-Unique: CKGJwfpdMgyVvoNpPc6E_w-1
-X-Mimecast-MFC-AGG-ID: CKGJwfpdMgyVvoNpPc6E_w_1744367557
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5e6b2b8339fso1871657a12.3
-        for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 03:32:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744367557; x=1744972357;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/Y+9d61eT9fS3Nx5t35n8P/kCjRV2k1+1b7KNobnOYs=;
-        b=dkJZwS2f/C8C2jxAz1gH44m2fgTfSJudkLnLfW4r7EAX+0ELh9gtgASEJV/CT7qLFW
-         08aNoCkAwMltfYiq7kPuTTPCnHR7ptVhvTz03scRwv1OcifG6GzxYhd4UdmvjXtrjCgE
-         ufKDwJqHlVDVw7ZhKI7ZWOQuVDYNMunHsgWii/3HbIJzpYnI9THhKwriyLDQo9HbSQQQ
-         kjj+kiHV39DG9CH9sEIWiWd8cHbKHq7ic7ihbge0s69HVRyBR0D4Kfhc2S7q7ZV4nYhx
-         7CvDTzFxpeNUy1zvsNbagQQle7r1bD2X+Ah2cT2PbdcsZVNvzyrAPAwFCZqJ0TxgEid9
-         IONw==
-X-Forwarded-Encrypted: i=1; AJvYcCU0ZSUVgnBDSCopIlE98exTM8f+dvuwr1hnRB9YjspshS6xF0uZl7bGF8cI+jC/SxoywHGcqBc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywvtzd+a1c73IKVoShDiOBT+se2LY3xKkHCSUnv0EQMjZRw9418
-	cLQAg6/AHLr0lbMb7KXQyRURvcpX4OGJYHroWXag6DaPtLAqHjfnBeh/LwKZlBQrl2xdr4gb1Vq
-	NYjrhWke6QJDGPisIjO7/hylFRYuleGgOfSCUd0R9xDzXCeZtbrVLQA==
-X-Gm-Gg: ASbGncsS7jfL6zWnwLB+NflWQW0ZbYB2TZ5y5ndy1P6b7N6cgklxa76kZm02jTm//ve
-	Y/QVkkzs6kR2OflHWxGrYA+xk2nkDeMCzEW133E2qjIQ5kFMe5Y7hy8YCCX9/l97sJblw7F3VzG
-	8QXO2ysbPiBNAHnNC40JWdqI75GsyGIM93gMYdljpCuTLFwFpwuOn8rui4VuabT5f3d63lH/wy4
-	Dr4ItmkYM0l8vtxDwj72B2R4UbfvkAJRPztkCNTbfFK6vBBJ1gXzl3rKxDmXiTigTwDsZa5+Vl4
-	a4+PCLvrVEY7TtiTbfwrfcM1mTOS+SfCDgsu7w89qZA6iHEOGe5ZMbYsvz6Y
-X-Received: by 2002:a05:6402:5106:b0:5ec:cd52:27c9 with SMTP id 4fb4d7f45d1cf-5f370298d8dmr1508107a12.31.1744367557232;
-        Fri, 11 Apr 2025 03:32:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF+YAD1Ckz71pvCMRdEbnpWp0EQ9xGd4Ocngq4UiSw7duGE/YHv0R0ZgCt/NsMlKk+AEHR8Kw==
-X-Received: by 2002:a05:6402:5106:b0:5ec:cd52:27c9 with SMTP id 4fb4d7f45d1cf-5f370298d8dmr1508083a12.31.1744367556669;
-        Fri, 11 Apr 2025 03:32:36 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-53-30-213.retail.telecomitalia.it. [79.53.30.213])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f36ee54e11sm789475a12.2.2025.04.11.03.32.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Apr 2025 03:32:36 -0700 (PDT)
-Date: Fri, 11 Apr 2025 12:32:31 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Michal Luczaj <mhal@rbox.co>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Simon Horman <horms@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] vsock: Linger on unsent data
-Message-ID: <hu4kfdobwdhrvlm5egbbfzxjiyi6q32666hpdinywi2fd5kl5j@36dvktqp753a>
-References: <20250407-vsock-linger-v1-0-1458038e3492@rbox.co>
- <20250407-vsock-linger-v1-1-1458038e3492@rbox.co>
- <22ad09e7-f2b3-48c3-9a6b-8a7b9fd935fe@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LyljywterZpOE067/15Wh3aJ4zmj4WWsgsTqtipr1YmkDJmfltJh0vVgcQhIlU2DzTR/aCtLn89anfaolVd3opM56+JX6TbDxVrMWjIS4C4BLeFV1OfvklK3VRGAxBvM9KrexI4HGnQiLTAZTS0UKmyhW8vh5YeDsAm5Jd79hGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l9oC6gpn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 492F4C4CEE2;
+	Fri, 11 Apr 2025 10:34:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744367648;
+	bh=6o92jC9swnpSd0EXL3URyIIGVULDuxwQJCe4pRKoIbQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=l9oC6gpnRCJZKPgPJ0UWl16wBVVNfMEe9+i+UsM6yesv4nAZpjxib6isBO9tKyy6z
+	 qlgIzafNdIuLH7J2pYBLy2q5QCth0+Q7gOxMGDp/QR5IHcVj+bzUnmjQOTt0zsUbm1
+	 09ZyTOpdmeju1t6xW0UYbqOqZ+as+7dAJCFYd8oQyaNRqoxO33Q4522ujV8EPpR4hF
+	 KIW/Qeu+xWbCi3pmq3B7/YrCuZJVjO+cgI3NGC5LOd5HVVHm0DVgIjvZtGf2x7STGg
+	 BqRwQO8edfdBSY/e5kNj0pkWf6lFL7kWGhCjhfkE1LgqebZcyOcpobBM/PpPvG5DWG
+	 oTWIIZEqnDDsQ==
+Date: Fri, 11 Apr 2025 11:34:04 +0100
+From: Simon Horman <horms@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 10/14] ipv6: Factorise
+ ip6_route_multipath_add().
+Message-ID: <20250411103404.GY395307@horms.kernel.org>
+References: <20250409011243.26195-1-kuniyu@amazon.com>
+ <20250409011243.26195-11-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <22ad09e7-f2b3-48c3-9a6b-8a7b9fd935fe@redhat.com>
+In-Reply-To: <20250409011243.26195-11-kuniyu@amazon.com>
 
-On Thu, Apr 10, 2025 at 12:51:48PM +0200, Paolo Abeni wrote:
->On 4/7/25 8:41 PM, Michal Luczaj wrote:
->> Change the behaviour of a lingering close(): instead of waiting for all
->> data to be consumed, block until data is considered sent, i.e. until worker
->> picks the packets and decrements virtio_vsock_sock::bytes_unsent down to 0.
->
->I think it should be better to expand the commit message explaining the
->rationale.
->
->> Do linger on shutdown() just as well.
->
->Why? Generally speaking shutdown() is not supposed to block. I think you
->should omit this part.
+On Tue, Apr 08, 2025 at 06:12:18PM -0700, Kuniyuki Iwashima wrote:
+> We will get rid of RTNL from RTM_NEWROUTE and SIOCADDRT and rely
+> on RCU to guarantee dev and nexthop lifetime.
+> 
+> Then, the RCU section will start before ip6_route_info_create_nh()
+> in ip6_route_multipath_add(), but ip6_route_info_create() is called
+> in the same loop and will sleep.
+> 
+> Let's split the loop into ip6_route_mpath_info_create() and
+> ip6_route_mpath_info_create_nh().
+> 
+> Note that ip6_route_info_append() is now integrated into
+> ip6_route_mpath_info_create_nh() because we need to call different
+> free functions for nexthops that passed ip6_route_info_create_nh().
+> 
+> In case of failure, the remaining nexthops that ip6_route_info_create_nh()
+> has not been called for will be freed by ip6_route_mpath_info_cleanup().
+> 
+> OTOH, if a nexthop passes ip6_route_info_create_nh(), it will be linked
+> to a local temporary list, which will be spliced back to rt6_nh_list.
+> In case of failure, these nexthops will be released by fib6_info_release()
+> in ip6_route_multipath_add().
+> 
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+>  net/ipv6/route.c | 205 ++++++++++++++++++++++++++++++-----------------
+>  1 file changed, 130 insertions(+), 75 deletions(-)
+> 
+> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
 
-I thought the same, but discussing with Michal we discovered this on
-socket(7) man page:
+...
 
-   SO_LINGER
-          Sets or gets the SO_LINGER option.  The argument is a
-          linger structure.
+> +static int ip6_route_mpath_info_create_nh(struct list_head *rt6_nh_list,
+> +					  struct netlink_ext_ack *extack)
+> +{
+> +	struct rt6_nh *nh, *nh_next, *nh_tmp;
+> +	LIST_HEAD(tmp);
+> +	int err;
+> +
+> +	list_for_each_entry_safe(nh, nh_next, rt6_nh_list, next) {
+> +		struct fib6_info *rt = nh->fib6_info;
+> +
+> +		err = ip6_route_info_create_nh(rt, &nh->r_cfg, extack);
+> +		if (err) {
+> +			nh->fib6_info = NULL;
+> +			goto err;
+> +		}
+> +
+> +		rt->fib6_nh->fib_nh_weight = nh->weight;
+> +
+> +		list_move_tail(&nh->next, &tmp);
+> +
+> +		list_for_each_entry(nh_tmp, rt6_nh_list, next) {
+> +			/* check if fib6_info already exists */
+> +			if (rt6_duplicate_nexthop(nh_tmp->fib6_info, rt)) {
+> +				err = -EEXIST;
+> +				goto err;
+> +			}
+> +		}
+> +	}
+> +out:
+> +	list_splice(&tmp, rt6_nh_list);
+> +	return err;
 
-              struct linger {
-                  int l_onoff;    /* linger active */
-                  int l_linger;   /* how many seconds to linger for */
-              };
+Hi Kuniyuki-san,
 
-          When enabled, a close(2) or shutdown(2) will not return
-          until all queued messages for the socket have been
-          successfully sent or the linger timeout has been reached.
-          Otherwise, the call returns immediately and the closing is
-          done in the background.  When the socket is closed as part
-          of exit(2), it always lingers in the background.
+Perhaps it can't happen in practice, but if the loop above iterates zero
+times then err will be used uninitialised. As it's expected that err is 0
+here, perhaps it would be simplest to just:
 
-In AF_VSOCK we supported SO_LINGER only on close(), but it seems that 
-shutdown must also do it from the manpage.
+	return 0;
 
-Thanks,
-Stefano
+> +err:
+> +	ip6_route_mpath_info_cleanup(rt6_nh_list);
+> +	goto out;
+>  }
 
+...
 
