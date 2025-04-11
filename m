@@ -1,442 +1,314 @@
-Return-Path: <netdev+bounces-181548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94ED3A85698
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 10:33:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49407A856AE
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 10:36:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E0DB1B8476A
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 08:33:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A9BA4C8032
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 08:35:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C1A2980B2;
-	Fri, 11 Apr 2025 08:32:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CD362980B9;
+	Fri, 11 Apr 2025 08:34:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VUn3PeaB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GVoZBH3K"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A815E2980A6
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 08:32:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744360379; cv=none; b=iuYVVf0EjCn3Mee4e00mAdWZpwxeGdgi+OZmFuMqJ2s4G6MWFBKL0kNQA8q1avYire57hJesi15gYv29KzdkJznQWrDTlexQFe5OJGirui70Udb7zNSavykihnMc9f456VztSV/v2KY4eXLlluIp6v7SXP5ls1/m5IB+sBZpOxc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744360379; c=relaxed/simple;
-	bh=lgrNRIFjhj6cjp4P03cOwtb0ckMI+mMDroBzDgh4FQY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p40apIiCFqCMOaY7qJOtlZntmEyP+WICCipXNquqoLMe3C2cenBOWdVdpHhBSEHv5CDhpvfZrJ8kROayHyRDlzcuP3DXVL6Pdvi4OtbfZE4IkzcumufAcXzpOVM5uCLamXu2TBqT6uCMdcezAVjsObeFwe/0+stum+SWV4sO130=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VUn3PeaB; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744360376;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d8ujDQyl7nKAjtDljWHbr44QpF+FLzPUnk9PsDaPq38=;
-	b=VUn3PeaBuOZI1WizeegnOUCsmQWhd6jeG9TS/K30M5ynzQOFjaBxHA3149/4jY9DGlrljv
-	22Mqrod6gP4bFYxjkPxz6WZqHuQI2IDRNUtpXUhjs8y2KapmfqfZK5ShImnZpoEzOgyIpl
-	PjkhCO0lDhvizNZu+Nvh2HIYJlPaHsQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-509-g9fmNEDdMQGwVO4BUqv4Qw-1; Fri, 11 Apr 2025 04:32:55 -0400
-X-MC-Unique: g9fmNEDdMQGwVO4BUqv4Qw-1
-X-Mimecast-MFC-AGG-ID: g9fmNEDdMQGwVO4BUqv4Qw_1744360374
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-39c1b1c0969so1125753f8f.1
-        for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 01:32:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744360374; x=1744965174;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d8ujDQyl7nKAjtDljWHbr44QpF+FLzPUnk9PsDaPq38=;
-        b=DyB6Wl+ATs2gHyfYUiZgMgYvllDyYkf2tJWUxU5MnSs+YlSMmZRaDg1uSFHnouACrD
-         81Wb9XClPoeWVsLcDdiEBjZ+SHxrlN7ej2G19sR0ZU4Gclg+Gx+XVc0ceTLlEikrneM3
-         IA77BC4FH3VJKecCn0TLZ8T78Cg+NJCeZmppi6JLHcmFrouhaMK0+CD9ZBxAbDoGiZqP
-         IHz6smmzUTXY4INHlzqwjZfjqdaTINH4GfcRlKFTB8Cx8o2p2JM7OOiOXqQ3rbjbpC/X
-         a9UXpBhncvZ/a/u0DYz44WG5BOyvCTcIj9r4zh/zQNn0LCzTifmkGyXU3E6Z6UDLKtAB
-         I5cQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWz5fR986dk1F3yTJMDdT3QjlWEdju60Zz2gpc2Vuv1oLYWYkjrKXYIdZtmfiKFYHBT1akqJpU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnSdxzg5WlpfdVRYdkhBxHa83+Hu5jPFEnFs+FbMBJ/T5v+Nje
-	50dURzNlqRSvr9TkRHYKv6R8MlELZ2Gt2SuPWsCgFPEgMhuIceAO9ek2d7zmfTvESSMmo7mDXnP
-	fbR/8RJhr5d/scrAEjKp5FaycAQUhyh5tej+Tg2gUhKcZ2Ne7R6rGHw==
-X-Gm-Gg: ASbGncuQU97g3Y2uy3zabfJG+RzHwfyXG62dOQnbqPyoqLIW4RrmAYLwNFAnLY8oHaX
-	Bsm21EuGFdbxH4IIu0db4rZ83iKSRBdSSkcqIUa/8kfLrZiRFzIYC8Cc+OG1GGc+W3/gVCFmrZq
-	J9hQg1O/OO5sDi0HXo9vrlwMO92FKFWw+bP9xU2upfnYvTxdqgkzt3MSwP42mW6GED3wxaSCVg3
-	g9T5WQ/2Alf65AT3kOJTt9GYIMOs1Abrw0dETsJsWr3wP+YD1BBd425J6eTiPp+E+2AOPbBNs9v
-	Dd/5HYOJncgoCOcy0QBcrlfA20bOnmbepML8ArIFax9u+HCn/ekHTNJ6YOtG
-X-Received: by 2002:a05:6000:1867:b0:391:3124:f287 with SMTP id ffacd0b85a97d-39ea52071d9mr1169986f8f.16.1744360373886;
-        Fri, 11 Apr 2025 01:32:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHYRObXGVdy7Fk5Huz1lKq/zXGFWZpzxM8mzE0+DPpVva9VRqqW0i3itgSpYq9hY1Wb+D8CEg==
-X-Received: by 2002:a05:6000:1867:b0:391:3124:f287 with SMTP id ffacd0b85a97d-39ea52071d9mr1169957f8f.16.1744360373377;
-        Fri, 11 Apr 2025 01:32:53 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-53-30-213.retail.telecomitalia.it. [79.53.30.213])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eaf43cd17sm1302888f8f.78.2025.04.11.01.32.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Apr 2025 01:32:52 -0700 (PDT)
-Date: Fri, 11 Apr 2025 10:32:45 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	kvm@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next] selftests/vsock: add initial vmtest.sh for vsock
-Message-ID: <36wtdlekqx7hii6s7uydxeyrwwj7x5dmx5k5g474eseds6lshk@yrefm7laynyp>
-References: <20250410-vsock-vmtest-v1-1-f35a81dab98c@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F26296171;
+	Fri, 11 Apr 2025 08:34:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744360464; cv=fail; b=VymXWvsyOJyXrVrk9RyyCMF10VAR8jdukzIx4Xd9E3V8CIppgUW4ar9+2VU76/MpZOG3QD8bweCHkZvqrUrClgx4oCoheEDEE9Qxs/fQaNt/1G2F1AmxbEsQCuu5UPEV4Q48Kf1mlABIDa/0gQPIq/WCEWNlpv/mZ2QYCEjz0EY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744360464; c=relaxed/simple;
+	bh=6ndgf379qSSdo8bdwb2EUURKppEu67/m00reEVLv57c=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=vD2ekAoQkx955Gds44F42/NpNg6zwW72CX2gzs/ZJdGGjpF23WxtzAdgzWM63MxFdFnac8kF/nN+n6uSTy86VLUYcpWzlz8YrWhGQVDpBDsS3bzoDJe5CfyPz3GtAwKy1SXk95Wlg/fi/W2HJGfOasntR6bTQWa6MqRf41MVgDA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GVoZBH3K; arc=fail smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744360462; x=1775896462;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=6ndgf379qSSdo8bdwb2EUURKppEu67/m00reEVLv57c=;
+  b=GVoZBH3KBtCnKDvgFeJc+6a/xM6WUy9OHjoi2wt8UUOCIfh7uvMvASv8
+   kxNc8uN/uBn9i7y//AdhEbajwN77EzsOTf2wkVHC3fYK3fjujHR1LsuxK
+   NQunyHY4m5LyzaGBdqN7UUMqc0XBJuUmb1SsWB/vrDYQQTywN2u3SQr9O
+   d8SjeuawBJCu11+L4J8YhnuxijE52a+6/yzLRf8DD0Kuvt4gZaILBQOH4
+   9maeCxOB0rtz6wjdjXqQqYeXcGRPydSQv/ErZ5HOMJQ1n5PkOxQZUFhkh
+   v/SrYYAiFByfd/qpeIOo9sg4KzhfpuoPaUKWE8VOM9r9Y4ZrvBIDH5olN
+   A==;
+X-CSE-ConnectionGUID: RWMOkiBESNiRRIfG+6Krdw==
+X-CSE-MsgGUID: FpD5JkkSTAmiKd2rJMyX5Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11400"; a="45045940"
+X-IronPort-AV: E=Sophos;i="6.15,203,1739865600"; 
+   d="scan'208";a="45045940"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2025 01:34:19 -0700
+X-CSE-ConnectionGUID: 5gVCOdmdSCKCsaoYyMrANQ==
+X-CSE-MsgGUID: ItNUaRXDTv2USlbLukxEyQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,203,1739865600"; 
+   d="scan'208";a="160118858"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2025 01:34:19 -0700
+Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Fri, 11 Apr 2025 01:34:18 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Fri, 11 Apr 2025 01:34:18 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.175)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Fri, 11 Apr 2025 01:34:18 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=KzkZopgJU7rK7FzMtpwVl+4ML8UbkpEpN/YlLR5Gl1IU7BgFMS+aPsQhlKbv0sz73OwVhcfdWqMTR3u8SO1iQVIWlGoDCYHR/OTexzzDOMqIoyUdKpkBk40136vPaxL22mC0XyF+8Ig9lSclQyrJI/8FhUYfHnVDNKHQOVoOV/d1LGzM9nnTQ4nkVpza1Wrg//im6imsf1UFpw1Nx2YapAgDofugqC7igpcs76uTtXKSLyCx+DxWjD1NPNJgv1MRyjSeUrySRb7YosVEd7Dq1VMkcCKOv72b0RIgo3UvWC+G+xMeHVJvZBNcTFCg6md6w8s+k7Wij16N6g34JR3m+A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xOtQzRWYp19CIdY/PubYEcyrHAJNo81LtUZg3G2Wkt8=;
+ b=nCFq2qHbFq5CW7pBO5rro4EvBEzTTAPkRovB+5IypVMVkBPmSpPU5uFuoQxCrWojnVHuhj5eRoQ07yyC5EXw217h1uBe2WEsNUvWKdNfglVeJ8Ip2igsw8Z+J4hZKQX7c2IE2x3nwDn2kT9UMUNNfJwK46IxCP9pYCwKv2cp5MkBXZmtqObcodYwILUIgS0XjKjKBZXvg9pDdQysGSAFOKlds9w0/75xGNERUeFcEIAaJtbpnLu57agKqOltVBsUl8qpy3c1Ddz9hFmL+uTaRc7IeuNBOzrHBXSLFh5Wrsxm0SSN9yNy5ok2vaph3FaqD3a5Lq8wZML3vu7/37o1JA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
+ by IA1PR11MB7176.namprd11.prod.outlook.com (2603:10b6:208:418::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.27; Fri, 11 Apr
+ 2025 08:33:57 +0000
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::399f:ff7c:adb2:8d29]) by SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::399f:ff7c:adb2:8d29%4]) with mapi id 15.20.8606.029; Fri, 11 Apr 2025
+ 08:33:57 +0000
+Date: Fri, 11 Apr 2025 10:33:44 +0200
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: Raju Rangoju <Raju.Rangoju@amd.com>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <Shyam-sundar.S-k@amd.com>
+Subject: Re: [PATCH net-next 1/5] amd-xgbe: reorganize the code of XPCS access
+Message-ID: <Z_jT6M_GYhMlxZE1@soc-5CG4396X81.clients.intel.com>
+References: <20250408182001.4072954-1-Raju.Rangoju@amd.com>
+ <20250408182001.4072954-2-Raju.Rangoju@amd.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250408182001.4072954-2-Raju.Rangoju@amd.com>
+X-ClientProxiedBy: WA2P291CA0047.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1f::16) To SN7PR11MB7540.namprd11.prod.outlook.com
+ (2603:10b6:806:340::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250410-vsock-vmtest-v1-1-f35a81dab98c@gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|IA1PR11MB7176:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9a8475df-8664-403d-6f97-08dd78d399fc
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|10070799003|366016|376014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?XMxUmO1tgfAWWmeliU8dJvFO4Zml+koKUGgH25MWejczfgO8tOhkrH9em0OI?=
+ =?us-ascii?Q?n7VNK5qnggfyLLyw6b7prtY/elkiBviKPiZnzmwsZC2p4L0Fw8E70hvAMBWs?=
+ =?us-ascii?Q?JoTJ3KD2az2bvrMAs7Ouhki5n43nyAwJnACRYVWunVwOxb/qoMQEhcUQ3lus?=
+ =?us-ascii?Q?BS/aCe7RT/NjwPxIZVz8d2PyG31piVlEF3/PXwjYjUXNQ/nQYbJTsvuXioOV?=
+ =?us-ascii?Q?D562n0mxE07+hOwDpG5iYVj7sthT0oEd/yqMl+veRp1IX5Xlt6BBl+PODAUN?=
+ =?us-ascii?Q?pi9g8ezm8pyzFU+YY21CVgDajPATE4hD46s3UAoge3HFgELpkYw/2QO9YDwj?=
+ =?us-ascii?Q?sjdxnnybusMz9DjKt5OGelXc3uioleq28cO+WR9rmBQNryhFv3jrA+LMLaJE?=
+ =?us-ascii?Q?9a/DXzDMf7j+Ogkb3nZpg52x12aHluQNkz/k4z4OEWqs0KGudQQ8NEO8VqRQ?=
+ =?us-ascii?Q?sHqbUiRshT+lWp+miYOmBxR7jRAHmtMZo57gqiVQn7Puj33swlCkg02JmXHE?=
+ =?us-ascii?Q?4DXSUN7J0BI0j9sT4O265t3Ex4C2VZesOJFf4O3uqHzxHZSUKa4FLwypaPH4?=
+ =?us-ascii?Q?8YyjGAWLY2KrXtdbAVQjgthDZLHo0P0ZsBfpz6G2UsgJ8B2huSuxZD8io94X?=
+ =?us-ascii?Q?v6oiLuIDngZhrsFo8LYRX0RBLSQJYVOO7cpKGIvWhlrSz8H5gAj6oTPgb0J/?=
+ =?us-ascii?Q?ylHP08/lQhNrC0Hp2nJQs0q4qvYs0mIUWact0LArEVHMS47iN0Rab5htigAa?=
+ =?us-ascii?Q?LNcrd61ytugesA2mQbX73Fk87CV+hLdzdIE0Tik3Uze3f/O18LHEF1BWSA36?=
+ =?us-ascii?Q?tXpo/L1iU1jE+qHJNrBvQiherPJ0vTK2XDqYUjEqxj7b6XCDR4y3koL7SyHl?=
+ =?us-ascii?Q?Q5aUeqdKpqUNRmV76jcxmXI5JDG83PPwQOBtYkgWOsYhRhIDA36Zczb7ey+n?=
+ =?us-ascii?Q?Bm+TmyySZ2dCVzl41W+siNiX2RGfU93u4uIXv0L0HRjeaYLjpwfioh6O0qMM?=
+ =?us-ascii?Q?FE0roG0/d63FVl6Lab9+7lYZ8GU/FarOp/WS5rxPVDyjFjKGf3ZKdTbpKlxg?=
+ =?us-ascii?Q?FUg12AKstBhrutV9pe5AtF9V547MZFp1VK0UMxKk79buQi/a4jWdzaUmb9bw?=
+ =?us-ascii?Q?XkKrZRC4SCRE1Ui2yJIiSAUS+0nPE6u4jqKpshiZv0bO2tKWqqAXQyhUC2OX?=
+ =?us-ascii?Q?jSnA6zwxn0g8wSQoYJR/ORfet4NC+M1iVS9SOXCbH67LLZwMx8VeYdT37B+8?=
+ =?us-ascii?Q?HhXyKBSKU8boNQ+PkK6x/yqRFbECydZo0PjAov9g1gzYECC6lTS37j5qVlAU?=
+ =?us-ascii?Q?v1duqDkQucb4lTO73JmB0ZdziLXQWobXJ4VJgpT7319fxbi9ZfGj8UEodfw2?=
+ =?us-ascii?Q?i4my885F6+y7zQb0q5DH0iu884iL9KjAJQ0AfEZ5rOrei6FXXRVD/A7YLw4V?=
+ =?us-ascii?Q?ByC4Xx9KGqk=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(10070799003)(366016)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Ir+xiYqMmbCu5b+EE7LkkLw858DPeOYIGVZINM0yBf68rslLjxRV4tPy/hyq?=
+ =?us-ascii?Q?icQIlQxdoK2fMxAB9rdT53R1aRcs/FVz1x1z/lDI8yiF86iC8f3M4wKBj4+w?=
+ =?us-ascii?Q?/GZcD4oJdDlOvsBywUVU2luF95W44uLoMe0kw8z2lzskWso5Vz7YYuCeAEER?=
+ =?us-ascii?Q?3EiJkYoyY6VQy6u859+bp9lD8j2jBcXKs+KnavqvSFvTwNaylIlTd/tz0gid?=
+ =?us-ascii?Q?Bs7g2Rv91uvdX2Lc9+8F1FyejtN1C5h3/7be81843+a60mM+WJKyrVvhxH3U?=
+ =?us-ascii?Q?v/Np++yi9kVxQWtzaAhhwu8zQkeJ2yZL9FFAxKSmrUy1UAIPC8Bx9acCGUIN?=
+ =?us-ascii?Q?QZwMLOpD4Thwpo4/4xSGnZTn5UhTn8fJ9p/Th47ZX2OviS4X0DnjvEo1tcyF?=
+ =?us-ascii?Q?kkl14y34XYEWIVxx4dBBQoy3uyCPurOFbvaScPL1huSox8GZlaXyI/GI2oJA?=
+ =?us-ascii?Q?/yVXprJJdyRMpBpwPhbEGXutfzuAK1YLTj01HW81QDpd1VlaPoGmi/JsT8fc?=
+ =?us-ascii?Q?HWJK8T9JoMAtZ3cTWpxieq8W6nMRE6aay64SdgDO8EzQvH3fvymnkyxyYk7/?=
+ =?us-ascii?Q?+mvdNaX4turCPIhINyUp7Uz1bQNS1DKhYV1urd+3gGszotDgO9E4jQ3OTIjD?=
+ =?us-ascii?Q?Dr1TU7ZlytHjGGg6Aukkr3MWWd/oCwJbcqjaQ7Lrm43/Go2nyeDFN+TYho3v?=
+ =?us-ascii?Q?8Jhwpo2mx6sSCL0jKqQoJYaumGLc0+3Mse/uVXEYsbPAGjeRdmBXOwF16fgF?=
+ =?us-ascii?Q?wCCCc8kXXrYW+kqupeBwc+Yp26gXaBsz17jHw3Gm+IJrs1HpZHRU2fLHZ9Fw?=
+ =?us-ascii?Q?1ao8iKf5sc/E+GhcfWHvdr9strwkx9bZRR3a5mOu3DKj5eHDt9kWcjyiW4Kr?=
+ =?us-ascii?Q?Jo0ISmQUJbpLTPCR0x86ya5veKvfchv5Av4WDSSWOk6EbAXQYm1I//fnaAuY?=
+ =?us-ascii?Q?LG2l6EnROXmull+tcVqcjkwIPGGd9QOlr9ooV3FHlCIUCf27TXnJF9eaz+Jk?=
+ =?us-ascii?Q?lUDlTDQkXoStWaupiNclvs26xKP1lUrwudLsSF9MpZIqTdfTj9++IGp1hsuI?=
+ =?us-ascii?Q?/Q11f7FS7qodphfeHDpDE7TdpVqmO7/0qi0FMoP4mPteRpZBsBjje6BAkdEF?=
+ =?us-ascii?Q?UpgeuYmpS/E6n/owHAxjFXsUE+7SuNYLrLum16jbmnqPPONpi1HkmD6VwOq5?=
+ =?us-ascii?Q?xi3XfY5OpbjDMmr37R1u5XI8UTTR37iNTVLEpF+cCtB/zU6hbaSnPb8spAzD?=
+ =?us-ascii?Q?uZWLtuipKBOtyKo9yywcjGbPzUtzpIuoiHm85FduolZ3ByBOV3erSWtVx49m?=
+ =?us-ascii?Q?Q1ayawS5eNRLtPvIWpifjRGrYZJQ46uc5R9nhqHPiHl+wGHZncAUHnXVHb5M?=
+ =?us-ascii?Q?oXfi6H5nSF7LSFVVkO0iX3MNQ60S0BEcH60DdPwY7FnBM+hquec4wqSMZrk2?=
+ =?us-ascii?Q?1WRUU0AOwy46CWDkLiNe8NrtamrOkFP66NERafCCA5OJJtVgWv2qCa1+HZJg?=
+ =?us-ascii?Q?zcxyMoYs/E4iQQ6ovDUy2uZK5ehIiJRrWBytz5/X8RNKtvcku49YeRipe+B0?=
+ =?us-ascii?Q?agq3x/oanwkRmwtIgR6LzpK5hU8HS5VsbTOmYgRTHaDFM5BQl53g8iiyguMn?=
+ =?us-ascii?Q?oBkwPZS+6Tf0TNlfG/+jBX5UwGuwDPuhMdM4rmnUH8RGCWTpwjWHsja2pzLV?=
+ =?us-ascii?Q?wqBQng=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9a8475df-8664-403d-6f97-08dd78d399fc
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Apr 2025 08:33:57.4889
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QlzVc3gwu7FsgE6mC/g7LZnQ2IqZ86hFCAW8Qx9tloPFtYVHPEVyX3nxOOO5Julo+nCQGBALNgehNKuzR4a1qLgpmQFwpYm0IwTdv6XhV0E=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7176
+X-OriginatorOrg: intel.com
 
-On Thu, Apr 10, 2025 at 06:07:59PM -0700, Bobby Eshleman wrote:
->This commit introduces a new vmtest.sh runner for vsock.
->
->It uses virtme-ng/qemu to run tests in a VM. The tests are designed to
->validate both G2H and H2G paths. The testing tools from tools from
->tools/testing/vsock/ are reused. Currently, only vsock_test is used.
-
-Coool, thanks for that.
-I'll leave some comments, but I'll try this next week since today I'm a 
-bit busy.
-
->
->Only tested on x86.
->
->To run:
->
->  $ tools/testing/selftests/vsock/vmtest.sh
->
->Signed-off-by: Bobby Eshleman <bobbyeshleman@gmail.com>
->---
-> MAINTAINERS                                |   1 +
-> tools/testing/selftests/vsock/.gitignore   |   1 +
-> tools/testing/selftests/vsock/config.vsock |   6 +
-> tools/testing/selftests/vsock/vmtest.sh    | 247 +++++++++++++++++++++++++++++
-> 4 files changed, 255 insertions(+)
->
->diff --git a/MAINTAINERS b/MAINTAINERS
->index c3fce441672349f7850c57d788bc1a29b203fba5..f214cf7c4fb59ec67885ee6c81daa44e17c80f5f 100644
->--- a/MAINTAINERS
->+++ b/MAINTAINERS
->@@ -25323,6 +25323,7 @@ F:	include/uapi/linux/vm_sockets.h
-> F:	include/uapi/linux/vm_sockets_diag.h
-> F:	include/uapi/linux/vsockmon.h
-> F:	net/vmw_vsock/
->+F:	tools/testing/selftests/vsock/
-> F:	tools/testing/vsock/
->
-> VMALLOC
->diff --git a/tools/testing/selftests/vsock/.gitignore b/tools/testing/selftests/vsock/.gitignore
->new file mode 100644
->index 0000000000000000000000000000000000000000..1950aa8ac68c0831c12c1aaa429da45bbe41e60f
->--- /dev/null
->+++ b/tools/testing/selftests/vsock/.gitignore
->@@ -0,0 +1 @@
->+vsock_selftests.log
->diff --git a/tools/testing/selftests/vsock/config.vsock b/tools/testing/selftests/vsock/config.vsock
->new file mode 100644
->index 0000000000000000000000000000000000000000..a229c329d44e4a0b650d073b74949b577da3dc64
->--- /dev/null
->+++ b/tools/testing/selftests/vsock/config.vsock
->@@ -0,0 +1,6 @@
->+CONFIG_VSOCKETS=y
->+CONFIG_VSOCKETS_DIAG=y
->+CONFIG_VSOCKETS_LOOPBACK=y
->+CONFIG_VIRTIO_VSOCKETS=y
->+CONFIG_VIRTIO_VSOCKETS_COMMON=y
->+CONFIG_VHOST_VSOCK=y
-
-Should we enabled also other transports?
-
-(I'm not sure since we don't test it)
-
->diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
->new file mode 100755
->index 0000000000000000000000000000000000000000..f2dafcb893232f95ebb22104a62ce1e0312f4e89
->--- /dev/null
->+++ b/tools/testing/selftests/vsock/vmtest.sh
->@@ -0,0 +1,247 @@
->+#!/bin/bash
->+# SPDX-License-Identifier: GPL-2.0
->+#
->+# Copyright (c) 2025 Meta Platforms, Inc. and affiliates
->+#
->+# Dependencies:
->+#		* virtme-ng
->+#		* busybox-static (used by virtme-ng)
->+#		* qemu	(used by virtme-ng)
->+
->+SCRIPT_DIR="$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
->+KERNEL_CHECKOUT=$(realpath ${SCRIPT_DIR}/../../../..)
->+PLATFORM=${PLATFORM:-$(uname -m)}
->+
->+if [[ -z "${QEMU:-}" ]]; then
->+	QEMU=$(which qemu-system-${PLATFORM})
->+fi
->+
->+VSOCK_TEST=${KERNEL_CHECKOUT}/tools/testing/vsock/vsock_test
->+
->+TEST_GUEST_PORT=51000
->+TEST_HOST_PORT=50000
->+TEST_HOST_PORT_LISTENER=50001
->+SSH_GUEST_PORT=22
->+SSH_HOST_PORT=2222
->+VSOCK_CID=1234
->+
->+QEMU_PIDFILE=/tmp/qemu.pid
->+
->+# virtme-ng offers a netdev for ssh when using "--ssh", but we also need a
->+# control port forwarded for vsock_test.  Because virtme-ng doesn't support
->+# adding an additional port to forward to the device created from "--ssh" and
->+# virtme-init mistakenly sets identical IPs to the ssh device and additional
->+# devices, we instead opt out of using --ssh, add the device manually, and also
->+# add the kernel cmdline options that virtme-init uses to setup the interface.
->+QEMU_OPTS=""
->+QEMU_OPTS="${QEMU_OPTS} -netdev user,id=n0,hostfwd=tcp::${TEST_HOST_PORT}-:${TEST_GUEST_PORT}"
->+QEMU_OPTS="${QEMU_OPTS},hostfwd=tcp::${SSH_HOST_PORT}-:${SSH_GUEST_PORT}"
->+QEMU_OPTS="${QEMU_OPTS} -device virtio-net-pci,netdev=n0"
->+QEMU_OPTS="${QEMU_OPTS} -device vhost-vsock-pci,guest-cid=${VSOCK_CID}"
->+QEMU_OPTS="${QEMU_OPTS} --pidfile ${QEMU_PIDFILE}"
->+KERNEL_CMDLINE="virtme.dhcp net.ifnames=0 biosdevname=0 virtme.ssh virtme_ssh_user=$USER"
->+
->+LOG=${SCRIPT_DIR}/vsock_selftests.log
->+
->+#		Name				Description
->+tests="
->+	vm_server_host_client			Run vsock_test in server mode on the VM and in client mode on the host.
->+	vm_client_host_server			Run vsock_test in client mode on the VM and in server mode on the host.
-
-What about adding tests also with loopback in the VM?
-
->+"
->+
->+usage() {
->+	echo
->+	echo "$0 [OPTIONS]"
->+	echo
->+	echo "Options"
->+	echo "  -v: verbose output"
->+	echo
->+	echo "Available tests${tests}"
->+	exit 1
->+}
->+
->+die() {
->+	echo "$*" >&2
->+	exit 1
->+}
->+
->+vm_ssh() {
->+	ssh -q -o UserKnownHostsFile=/dev/null -p 2222 localhost $*
->+	return $?
->+}
->+
->+cleanup() {
->+	if [[ -f "${QEMU_PIDFILE}" ]]; then
->+		pkill -9 -F ${QEMU_PIDFILE} 2>&1 >/dev/null
->+	fi
->+}
->+
->+build() {
->+	log_setup "Building kernel and tests"
->+
->+	pushd ${KERNEL_CHECKOUT} >/dev/null
->+	vng \
->+		--kconfig \
->+		--config ${KERNEL_CHECKOUT}/tools/testing/selftests/vsock/config.vsock
->+	make -j$(nproc)
->+	make -C ${KERNEL_CHECKOUT}/tools/testing/vsock
->+	popd >/dev/null
->+	echo
->+}
->+
->+vm_setup() {
->+	local VNG_OPTS=""
->+	if [[ "${VERBOSE}" = 1 ]]; then
->+		VNG_OPTS="--verbose"
->+	fi
->+	vng \
->+		$VNG_OPTS	\
->+		--run ~/local/linux \
->+		--qemu /bin/qemu-system-x86_64 \
->+		--qemu-opts="${QEMU_OPTS}" \
->+		--user root \
->+		--append "${KERNEL_CMDLINE}" \
->+		--rw  2>&1 >/dev/null &
->+}
->+
->+vm_wait_for_ssh() {
->+	i=0
->+	while [[ true ]]; do
->+		if (( i > 20 )); then
->+			die "Timed out waiting for guest ssh"
->+		fi
->+		vm_ssh -- true
->+		if [[ $? -eq 0 ]]; then
->+			break
->+		fi
->+		i=$(( i + 1 ))
->+		sleep 5
->+	done
->+}
->+
->+wait_for_listener() {
->+	local PORT=$1
->+	local i=0
->+	while ! ss -ltn | grep -q ":${PORT}"; do
->+		if (( i > 30 )); then
->+			die "Timed out waiting for listener on port ${PORT}"
->+		fi
->+		sleep 3
->+		i=$(( i + 1 ))
->+	done
->+}
->+
->+vm_wait_for_listener() {
->+	vm_ssh -- "$(declare -f wait)for_listener); wait_for_listener 
->${TEST_GUEST_PORT}"
->+}
->+
->+host_wait_for_listener() {
->+	wait_for_listener ${TEST_HOST_LISTENER_PORT}
->+}
->+
->+log() {
->+	local prefix="$1"
->+	shift
->+
->+	if [[ "$#" -eq 0 ]]; then
->+		cat | awk '{ printf "%s:\t%s\n","'"${prefix}"'", $0 }' | tee -a ${LOG}
->+	else
->+		echo "$*" | awk '{ printf "%s:\t%s\n","'"${prefix}"'", $0 }' | tee -a ${LOG}
->+	fi
->+}
->+
->+log_setup() {
->+	log "setup" "$@"
->+}
->+
->+log_host() {
->+	testname=$1
->+	shift
->+	log "test:${testname}:host" "$@"
->+}
->+
->+log_guest() {
->+	testname=$1
->+	shift
->+	log "test:${testname}:guest" "$@"
->+}
->+
->+test_vm_server_host_client() {
->+	local testname="vm_server_host_client"
->+	vm_ssh -- "${VSOCK_TEST}" \
->+							--mode=server \
->+							--control-port="${TEST_GUEST_PORT}" \
->+							--peer-cid=2 \
->+							2>&1 | log_guest "${testname}" &
-
-Strange indentation here.
-
->+
->+	vm_wait_for_listener
->+	${VSOCK_TEST}	\
->+		--mode=client	\
->+		--control-host=127.0.0.1	\
->+		--peer-cid="${VSOCK_CID}"	\
->+		--control-port="${TEST_HOST_PORT}" 2>&1 | log_host "${testname}"
->+
->+	rc=$?
->+}
->+
->+test_vm_client_host_server() {
->+	local testname="vm_client_host_server"
->+
->+	${VSOCK_TEST}	\
->+		--mode "server" \
->+		--control-port "${TEST_HOST_PORT_LISTENER}" \
->+		--peer-cid "${VSOCK_CID}" 2>&1 | log_host "${testname}" &
->+
->+	host_wait_for_listener
->+
->+	vm_ssh -- "${VSOCK_TEST}"	\
->+		--mode=client	\
->+		--control-host=10.0.2.2	\
->+		--peer-cid=2	\
->+		--control-port="${TEST_HOST_PORT_LISTENER}" 2>&1 | log_guest "${testname}"
->+
->+	rc=$?
->+}
->+
->+run_test() {
->+	unset IFS
->+	name=$(echo "${1}" | awk '{ print $1 }')
->+	eval test_"${name}"
->+}
->+
->+while getopts :hv o
->+do
->+	case $o in
->+	v) VERBOSE=1;;
->+	h|*) usage;;
->+	esac
->+done
->+shift $((OPTIND-1))
->+
->+trap cleanup EXIT
->+
->+> ${LOG}
->+build
->+log_setup "Booting up VM"
->+vm_setup
->+vm_wait_for_ssh
->+log_setup "VM booted up"
->+
->+IFS="
->+"
->+cnt=0
->+for t in ${tests}; do
->+	rc=0
->+	run_test "${t}"
->+	if [[ ${rc} != 0 ]]; then
->+		cnt=$(( cnt + 1 ))
->+	fi
->+done
->+
->+if [[ ${cnt} = 0 ]]; then
->+	echo OK
-
-In my suite I also check if we have some kernel warnings or oops.
-Should we add something similar or does the infrastructure already
-handle that?
-
-Thanks,
-Stefano
-
->+else
->+	echo FAILED: ${cnt}
->+fi
->+echo "Log: ${LOG}"
->+exit ${cnt}
->
->---
->base-commit: cc04ed502457412960d215b9cd55f0d966fda255
->change-id: 20250325-vsock-vmtest-b3a21d2102c2
->
->Best regards,
->-- 
->Bobby Eshleman <bobbyeshleman@gmail.com>
+On Tue, Apr 08, 2025 at 11:49:57PM +0530, Raju Rangoju wrote:
+> The xgbe_{read/write}_mmd_regs_v* functions have common code which can
+> be moved to helper functions. Add new helper functions to calculate the
+> mmd_address for v1/v2 of xpcs access.
 >
 
+Overall seems reasonable, but the new functions are missing the xgbe_ prefix, 
+contrary to other in this file.
+
+> Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
+> ---
+>  drivers/net/ethernet/amd/xgbe/xgbe-dev.c | 63 ++++++++++--------------
+>  1 file changed, 27 insertions(+), 36 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
+> index b51a3666dddb..ae82dc3ac460 100644
+> --- a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
+> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
+> @@ -1041,18 +1041,17 @@ static int xgbe_set_gpio(struct xgbe_prv_data *pdata, unsigned int gpio)
+>  	return 0;
+>  }
+>  
+> -static int xgbe_read_mmd_regs_v2(struct xgbe_prv_data *pdata, int prtad,
+> -				 int mmd_reg)
+> +static unsigned int get_mmd_address(struct xgbe_prv_data *pdata, int mmd_reg)
+>  {
+> -	unsigned long flags;
+> -	unsigned int mmd_address, index, offset;
+> -	int mmd_data;
+> -
+> -	if (mmd_reg & XGBE_ADDR_C45)
+> -		mmd_address = mmd_reg & ~XGBE_ADDR_C45;
+> -	else
+> -		mmd_address = (pdata->mdio_mmd << 16) | (mmd_reg & 0xffff);
+> +	return (mmd_reg & XGBE_ADDR_C45) ?
+> +		mmd_reg & ~XGBE_ADDR_C45 :
+> +		(pdata->mdio_mmd << 16) | (mmd_reg & 0xffff);
+> +}
+>  
+> +static void get_pcs_index_and_offset(struct xgbe_prv_data *pdata,
+> +				     unsigned int mmd_address,
+> +				     unsigned int *index, unsigned int *offset)
+> +{
+>  	/* The PCS registers are accessed using mmio. The underlying
+>  	 * management interface uses indirect addressing to access the MMD
+>  	 * register sets. This requires accessing of the PCS register in two
+> @@ -1063,8 +1062,20 @@ static int xgbe_read_mmd_regs_v2(struct xgbe_prv_data *pdata, int prtad,
+>  	 * offset 1 bit and reading 16 bits of data.
+>  	 */
+>  	mmd_address <<= 1;
+> -	index = mmd_address & ~pdata->xpcs_window_mask;
+> -	offset = pdata->xpcs_window + (mmd_address & pdata->xpcs_window_mask);
+> +	*index = mmd_address & ~pdata->xpcs_window_mask;
+> +	*offset = pdata->xpcs_window + (mmd_address & pdata->xpcs_window_mask);
+> +}
+> +
+> +static int xgbe_read_mmd_regs_v2(struct xgbe_prv_data *pdata, int prtad,
+> +				 int mmd_reg)
+> +{
+> +	unsigned long flags;
+> +	unsigned int mmd_address, index, offset;
+> +	int mmd_data;
+> +
+> +	mmd_address = get_mmd_address(pdata, mmd_reg);
+> +
+> +	get_pcs_index_and_offset(pdata, mmd_address, &index, &offset);
+>  
+>  	spin_lock_irqsave(&pdata->xpcs_lock, flags);
+>  	XPCS32_IOWRITE(pdata, pdata->xpcs_window_sel_reg, index);
+> @@ -1080,23 +1091,9 @@ static void xgbe_write_mmd_regs_v2(struct xgbe_prv_data *pdata, int prtad,
+>  	unsigned long flags;
+>  	unsigned int mmd_address, index, offset;
+>  
+> -	if (mmd_reg & XGBE_ADDR_C45)
+> -		mmd_address = mmd_reg & ~XGBE_ADDR_C45;
+> -	else
+> -		mmd_address = (pdata->mdio_mmd << 16) | (mmd_reg & 0xffff);
+> +	mmd_address = get_mmd_address(pdata, mmd_reg);
+>  
+> -	/* The PCS registers are accessed using mmio. The underlying
+> -	 * management interface uses indirect addressing to access the MMD
+> -	 * register sets. This requires accessing of the PCS register in two
+> -	 * phases, an address phase and a data phase.
+> -	 *
+> -	 * The mmio interface is based on 16-bit offsets and values. All
+> -	 * register offsets must therefore be adjusted by left shifting the
+> -	 * offset 1 bit and writing 16 bits of data.
+> -	 */
+> -	mmd_address <<= 1;
+> -	index = mmd_address & ~pdata->xpcs_window_mask;
+> -	offset = pdata->xpcs_window + (mmd_address & pdata->xpcs_window_mask);
+> +	get_pcs_index_and_offset(pdata, mmd_address, &index, &offset);
+>  
+>  	spin_lock_irqsave(&pdata->xpcs_lock, flags);
+>  	XPCS32_IOWRITE(pdata, pdata->xpcs_window_sel_reg, index);
+> @@ -1111,10 +1108,7 @@ static int xgbe_read_mmd_regs_v1(struct xgbe_prv_data *pdata, int prtad,
+>  	unsigned int mmd_address;
+>  	int mmd_data;
+>  
+> -	if (mmd_reg & XGBE_ADDR_C45)
+> -		mmd_address = mmd_reg & ~XGBE_ADDR_C45;
+> -	else
+> -		mmd_address = (pdata->mdio_mmd << 16) | (mmd_reg & 0xffff);
+> +	mmd_address = get_mmd_address(pdata, mmd_reg);
+>  
+>  	/* The PCS registers are accessed using mmio. The underlying APB3
+>  	 * management interface uses indirect addressing to access the MMD
+> @@ -1139,10 +1133,7 @@ static void xgbe_write_mmd_regs_v1(struct xgbe_prv_data *pdata, int prtad,
+>  	unsigned int mmd_address;
+>  	unsigned long flags;
+>  
+> -	if (mmd_reg & XGBE_ADDR_C45)
+> -		mmd_address = mmd_reg & ~XGBE_ADDR_C45;
+> -	else
+> -		mmd_address = (pdata->mdio_mmd << 16) | (mmd_reg & 0xffff);
+> +	mmd_address = get_mmd_address(pdata, mmd_reg);
+>  
+>  	/* The PCS registers are accessed using mmio. The underlying APB3
+>  	 * management interface uses indirect addressing to access the MMD
+> -- 
+> 2.34.1
+> 
+> 
 
