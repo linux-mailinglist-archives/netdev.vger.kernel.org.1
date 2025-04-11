@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-181456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4C4EA850AB
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 02:40:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3B72A850C1
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 02:50:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FFC34C36BA
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 00:40:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF8AE7B2B08
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 00:48:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5592C29CE1;
-	Fri, 11 Apr 2025 00:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65B1826F462;
+	Fri, 11 Apr 2025 00:49:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PEyYAwMF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RtCnq414"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C4110A1E
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 00:39:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35FAD26F44F;
+	Fri, 11 Apr 2025 00:49:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744331995; cv=none; b=GQ0aU6NQYwc5JAXiBi/W2I96Zfr+ui67fvFN2tYOAGNsBAF4HpxFcDnaaho+FENDcp7WjG+PyHntHlFYIffYzZ4Kq/vySoUKxgHEO/EDdkBxddox1pHvu83ZJhZfetIa3T7q3Ki0s9lN/WED6l04EkYR2+0aDWMq0IqrnOX+2vE=
+	t=1744332594; cv=none; b=dBHoyBvZARuTGp/qhnDYCN2x26YoT/bYup0WuQgE4i7y8+5sRkH15kXdbbr3GybbWOOLgz8iqKPItvtPHfoiSYLBUe8KXoxZeIAcQNvuOiCI2gRnzhTncGgvL3APCt8ygirDhIPthl6DCupZMdF31CW1HrGd+hF5GdfxI2/uhCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744331995; c=relaxed/simple;
-	bh=pVKE2jDQF6OgVSo4v9ss4yjjh444S2nDUrdjccccDUM=;
+	s=arc-20240116; t=1744332594; c=relaxed/simple;
+	bh=qxLkRPGGCz0k3o8LbxhXlIhdlTIWT3NdMzYjQvJrCIQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dGP36tfruJpjpO31VK7HMKtVIlaJOeeq91TfZyrZtuQmSmZwXCzqJ14acq45ge80GJLUcOJi58ZiGrC8HIEaH+DGftHNSLxJU/jUqOVVy7MRU+TRFemxLnK9H/Tsh3tnUdrYim094MUIVadY+kd9q5B/EYsLlvhKUQhbEg5fczo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PEyYAwMF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2C2CC4CEDD;
-	Fri, 11 Apr 2025 00:39:54 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=nZFQfJKClDBKbbAvWyAK975zTleLoLcIy2HyVjTcHdew44tThe/THFc1m2zErtfepypewgIcrra5fT2mHnxi0ciAlUEjf9YQ35AaB1B7rv3ignHPcJfQn6dLIY25TFPL0iwFAkiHUnjtGZAHaAPxeaE8+PLnsPBF7HIimkZvsKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RtCnq414; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A58DCC4CEDD;
+	Fri, 11 Apr 2025 00:49:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744331994;
-	bh=pVKE2jDQF6OgVSo4v9ss4yjjh444S2nDUrdjccccDUM=;
+	s=k20201202; t=1744332593;
+	bh=qxLkRPGGCz0k3o8LbxhXlIhdlTIWT3NdMzYjQvJrCIQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PEyYAwMF62M/myraNRjWA8LwnQuhXUm6H3ZAfi/WWXhcesrSgmcRVZhyAZzikcgH6
-	 9OwRJH7HKX0lCvg1IR4cQxIz8GLOOTWFRDnumqgnyqdeofnXbc6ot7nsD48hikon2o
-	 DB4DDWUFGW9+8sMTduhP2WlHdgv5mDKGP3SGvBYZ3uJyvbLnmFittg4dPUcmM/TUP9
-	 JSXwQXDpmyF7nIevbpzYlsl+Yk6kAM02T6R8TcHpkzBjLklFfrfsyfd7djNbVrjkV0
-	 TPsRdajxkdzyD/VZiVIdsZddtWDkdxBlDiVhnu8NQRKXlUD98LcEX7ZLbNHFaMZ8o4
-	 ARbVzl3Wzfnvg==
+	b=RtCnq414HjjFly8X9uOWM5kZDpK85zUC9+8LSr06+agBwwfQs71eYNTa2yuchvS1q
+	 yacbwWe6VyUEpSRO9+Ns6TZj6cJqjun8GHn8sxV9Rqsd8bh3OtIiH5ariR44pUUkXN
+	 1M1//r3IHDiFOgzd23Ff2tajPL4jgP19kPYNypp1Yqfxe7aI8JxDKOsh7kFnXYo3A/
+	 vy1OQSs2CZ2l+YfhmnLJITB9AkAWssAnokAewLAB3fSjxVFavHCqjQgjBVQh5vuyXA
+	 zYHJnKnhKd2LM3POetOIAmxCxHxPecXldZ7xT52fRHNPYNwHv6ImNSE8mXSzwaYMf9
+	 fFg2+9zpEenPQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71126380CEF4;
-	Fri, 11 Apr 2025 00:40:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 710E2380CEF4;
+	Fri, 11 Apr 2025 00:50:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] io_uring/zcrx: enable tcp-data-split in selftest
+Subject: Re: [PATCH net-next] af_unix: Remove unix_unhash()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174433203228.3874879.12009244231647703546.git-patchwork-notify@kernel.org>
-Date: Fri, 11 Apr 2025 00:40:32 +0000
-References: <20250409163153.2747918-1-dw@davidwei.uk>
-In-Reply-To: <20250409163153.2747918-1-dw@davidwei.uk>
-To: David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, kuba@kernel.org,
- pabeni@redhat.com, davem@davemloft.net, edumazet@google.com
+ <174433263104.3877366.17329943918437576552.git-patchwork-notify@kernel.org>
+Date: Fri, 11 Apr 2025 00:50:31 +0000
+References: <20250409-cleanup-drop-unix-unhash-v1-1-1659e5b8ee84@rbox.co>
+In-Reply-To: <20250409-cleanup-drop-unix-unhash-v1-1-1659e5b8ee84@rbox.co>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: kuniyu@amazon.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  9 Apr 2025 09:31:53 -0700 you wrote:
-> For bnxt when the agg ring is used then tcp-data-split is automatically
-> reported to be enabled, but __net_mp_open_rxq() requires tcp-data-split
-> to be explicitly enabled by the user.
+On Wed, 09 Apr 2025 14:50:58 +0200 you wrote:
+> Dummy unix_unhash() was introduced for sockmap in commit 94531cfcbe79
+> ("af_unix: Add unix_stream_proto for sockmap"), but there's no need to
+> implement it anymore.
 > 
-> Enable tcp-data-split explicitly in io_uring zc rx selftest.
-> 
-> Signed-off-by: David Wei <dw@davidwei.uk>
+> ->unhash() is only called conditionally: in unix_shutdown() since commit
+> d359902d5c35 ("af_unix: Fix NULL pointer bug in unix_shutdown"), and in BPF
+> proto's sock_map_unhash() since commit 5b4a79ba65a1 ("bpf, sockmap: Don't
+> let sock_map_{close,destroy,unhash} call itself").
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] io_uring/zcrx: enable tcp-data-split in selftest
-    https://git.kernel.org/netdev/net/c/6afd0a3c7ecb
+  - [net-next] af_unix: Remove unix_unhash()
+    https://git.kernel.org/netdev/net-next/c/709894c52c1c
 
 You are awesome, thank you!
 -- 
