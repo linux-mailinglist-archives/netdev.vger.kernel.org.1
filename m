@@ -1,237 +1,174 @@
-Return-Path: <netdev+bounces-181651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FA62A85FBA
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 15:55:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50D7FA85FAF
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 15:52:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE4463B9A88
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 13:49:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 252477BB14E
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 13:50:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02621953A1;
-	Fri, 11 Apr 2025 13:49:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1BB21D79B8;
+	Fri, 11 Apr 2025 13:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SfRvqQTu"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="lynEyBVh";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="XHXPK9Yc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9482D1C3BEB
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 13:49:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744379364; cv=fail; b=KG4spDAko/cq/SUu/xocEHjokCCx4WOu5n2mzTSDNZhoZ0CL2KIWtjsadUWl2q+pFqk1VxzMrghzLhAKhjAFKxJNiBO/IdNeKiSbqgz4AIM/COblZirmxVYW18FTzCRKC22sSoUGGf0uTcPRQlgfilsrUd2ootHvYFPiLlwZOQg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744379364; c=relaxed/simple;
-	bh=Ygz7mNt4tF1HCG8OAQz6A1djgBzrGf7mUmF6y0JEfVQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=j1k4m9vVH3bE6gHqYkS6VlHwrgYnJtmBOi0+JfHIbKs0yPTyq1vRASAE1EV/9nG7glnAtiGMYFMa5JjD2cAogtwSiBBBZ2FXpia05YmXDz4FNXiiMLpLTWz03gCE2yN3zwJZxlLp0uifYwqlv7uHmgWaNPRkbg1JlYn/fPUCBsQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SfRvqQTu; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744379359; x=1775915359;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=Ygz7mNt4tF1HCG8OAQz6A1djgBzrGf7mUmF6y0JEfVQ=;
-  b=SfRvqQTu+ScY6/2KXTYIxgRlmAYx3zakYjoJEYSU3TCtVwI/eaFrQnzO
-   kYRwubscqG08Pw3vbgjNQnn1Qv8iDqWYGgw98VHszRpXsE2imov2dgPzo
-   EYrJYw/2FnENjWQzuAn5rg3xzNe2148CGjRYhIuWLUlYYDaco5kYW4oSy
-   oXecaq3W/+jtWjyZf71pzmtyZsHcdSvwhSAY0r/L4aowVIsPUZu048dWE
-   II+RGHH305dfIT/k0EqwuRvmngOv760fDxxMEPsuC9fBcuVoXsZrDVPJ9
-   lfqg/4mImryCKOTlohg/6fOKS2/8BYpG08OaL5J+TzG0jUtxJu0DRXUxF
-   Q==;
-X-CSE-ConnectionGUID: fhpUfXYnR1Gp2iEypsQtLw==
-X-CSE-MsgGUID: a1ISiV1DSXS2cEA58rT91Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11401"; a="63474180"
-X-IronPort-AV: E=Sophos;i="6.15,205,1739865600"; 
-   d="scan'208";a="63474180"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2025 06:49:19 -0700
-X-CSE-ConnectionGUID: cvgenspHS1mOwsgEnSd0MA==
-X-CSE-MsgGUID: v4Mjs3ZJRt64Nd5NHXQ0zg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,205,1739865600"; 
-   d="scan'208";a="166394021"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2025 06:49:19 -0700
-Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Fri, 11 Apr 2025 06:49:18 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Fri, 11 Apr 2025 06:49:18 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.40) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Fri, 11 Apr 2025 06:49:17 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=IldBYnzpz4b/8idhXJl8n838QTE6YOSzKLuHBykjhW0lOO33dB3PtwlH0+YnDVz7EQZIWt4yIuMKAjN9Od6pYcOZmkUV6P9iK+Rd2qo6iXVHxTxyY4+1TKnrJSmHR1w55AIY/zhGGeYMUu5lHrFK24XNgiq5BYy4GUIM/nLkKeOsvRId6hyu0nonsSPF5EX9eFntvAVORElFpL4hEz6Sd/CmB5D0lhS36bSxRv1EdFLKMWlYwxKPKkVddccm09z5uL2UE4GSbop2YlovBMiqO/YiDD8+OxSlml9pRR27B/2FZh2+KDAFr0zWeFWnY0pvbvRue2NfwJ0GAMQyA9okIQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mnJ8XMCRt/rNiJYBuxeQDAF5s51cbiY341HcD7fHH+A=;
- b=cTDc1I7/fWsFQApn7RLKYN+OMHSNc3MGCnxBgVdblG1GAmhlt/a7sLX+SPkTPWLHFgPrc0xrXtESRaweVDP+Y2ZBttjzKgZ3ATtLHFvE1S0rc0abR3Uu7lzK+erbOLpecUH1FgbSvurLx15qUi1fxUZqBAZsWo8px5LLa8l8avt/JkNkuMPXqDIJ9lzUuV8xwlAM7X9IPv4sD4blazA78cq54xW4D+6COzB3+OpltzfVW+3IwBBo+vWIF7Oqd2OzjySRQGApIvNBkPfXUpNSqKyKVXIk+UV1ZtVvCxXdi4bhdxV+3PiDRCLKXQMcOohugSNwmBASGsAybv6Q9Cr+IA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8665.namprd11.prod.outlook.com (2603:10b6:8:1b8::6) by
- SJ5PPF2FCF00E1F.namprd11.prod.outlook.com (2603:10b6:a0f:fc02::81e) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.27; Fri, 11 Apr
- 2025 13:49:13 +0000
-Received: from DS0PR11MB8665.namprd11.prod.outlook.com
- ([fe80::8e7e:4f8:f7e4:3955]) by DS0PR11MB8665.namprd11.prod.outlook.com
- ([fe80::8e7e:4f8:f7e4:3955%5]) with mapi id 15.20.8632.025; Fri, 11 Apr 2025
- 13:49:13 +0000
-Date: Fri, 11 Apr 2025 15:49:02 +0200
-From: Michal Kubiak <michal.kubiak@intel.com>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-CC: <netdev@vger.kernel.org>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<horms@kernel.org>, <dlemoal@kernel.org>, <jdamato@fastly.com>,
-	<saikrishnag@marvell.com>, <vadim.fedorenko@linux.dev>,
-	<przemyslaw.kitszel@intel.com>, <ecree.xilinx@gmail.com>,
-	<rmk+kernel@armlinux.org.uk>, <mengyuanlou@net-swift.com>
-Subject: Re: [PATCH net-next 1/2] net: txgbe: Support to set UDP tunnel port
-Message-ID: <Z/kdt3KkcSdzOSTn@localhost.localdomain>
-References: <20250410074456.321847-1-jiawenwu@trustnetic.com>
- <20250410074456.321847-2-jiawenwu@trustnetic.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250410074456.321847-2-jiawenwu@trustnetic.com>
-X-ClientProxiedBy: DU7P194CA0008.EURP194.PROD.OUTLOOK.COM
- (2603:10a6:10:553::25) To DS0PR11MB8665.namprd11.prod.outlook.com
- (2603:10b6:8:1b8::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7218C1C3BEB;
+	Fri, 11 Apr 2025 13:50:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744379457; cv=none; b=N0gwma7Skw0kxG5g8wQH+vPwBbZNVJA1mnpQXr5JU7c0QA3/ebI3u6VorFNtNak40s/a4CRqWG5YTwBWUNDQ0EphB4viW2Sm/pe+aD4gJZVOa5LA2CKWzuVTQC8dw/p1FQtI+O4mgoQYzB2WcvTWcHc3oeXWHWoaC0n8MMXaNmg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744379457; c=relaxed/simple;
+	bh=qtOV60ECJZu9Fi40Bf5lH+RBr8bVEl7SPzPMLSpbslo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TtgGemACEBpDKCsa8KvWOynEi4Z3HFuBLTNxRcFgWSqFCBe9DMJhxZzf0C9a8qJpV9uTesi9YVDWj3W2YYo9Od7+Gzo9gnbWJvbmEZJ6HAzrCYGTtZvdquumMXDYJ7WSeH0lI044U3a4v5g2NcGlX/5sgZZCDNObJUsSP+qV8AA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=lynEyBVh; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=XHXPK9Yc; arc=none smtp.client-ip=103.168.172.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
+	by mailfout.phl.internal (Postfix) with ESMTP id 6439B13802B1;
+	Fri, 11 Apr 2025 09:50:53 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-09.internal (MEProxy); Fri, 11 Apr 2025 09:50:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1744379453; x=
+	1744465853; bh=Y1OSHZSZRnVHTncatSZJml8c2A69m+s5Vr0UXqqvqfQ=; b=l
+	ynEyBVhe4Sz+Xi3AgsWBDOxUNFh1FL2InBt59AGa0xdbXkhQbP3Py3G+rIiJ/muD
+	uUAx72fAM68BKOMI8SsflJXBdxdj8iF7hYB2VSn68oEezdOA2JM5hcXzTwxLBw5+
+	SUh/HUyGIlm5+gmzhvGNkztrKNXmm5+oQJ++g8Jq2YZak3QJMX9tTyEOtg5Wp51M
+	8VaAFzToLV4boXfRtUsOmCkzUKIhUH170zQez89cehVjTQ4SEHlu2TOaG4BA6nae
+	khQRT9xB5xdWFvwbWWFtqW3DyxL9UOc3xESSWCzs6iuCEKYtb20kaoKxP2COSmvl
+	g0m//ZjNJJt3JEpbQzMCA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1744379453; x=1744465853; bh=Y1OSHZSZRnVHTncatSZJml8c2A69m+s5Vr0
+	UXqqvqfQ=; b=XHXPK9Yci0zzoHLVvgAwg6ZA28WsHFw+TPedlNEN/8jdvkxE+ue
+	Q2yja/SAS3xV1Ys8uqmqQpFHaPYNWPFDqmVrQpj5eXhg+CY35o6px4EKw+6T14aW
+	Rv+H7v7H/jrWjOm6s7zo1mD/SDGftbgh2h87SFkvG8Q3cmfDx1i7LBp7bMv2fEeG
+	gkxuiiS4bdRiI+ihbVi+/PhvkYTwktIL/4xlRcXQZjQTzHmwWw+pqjHMTxhFAJrn
+	LiyDV8qg+UnkDQZ53OKIOvLJkzCbQ7zHGEC3C7F3uk/GweJYrU2AxfZ+BOpRIFWB
+	HPgS65+AuPKK86Drjw8VCedc4H4py3RJ/qA==
+X-ME-Sender: <xms:PB75Z3PdTJWbL-EYX19JeLDwA77yl_nbEC3AUrCvQdrLM5Dw8OQyvA>
+    <xme:PB75Zx-4qciYr6TILHli5NCvqcg72ZXbvOHQgnYIxKiN_oqR_dB3GX08Xg7Rh3Ixz
+    j7PjHDXRniOeGiQtMM>
+X-ME-Received: <xmr:PB75Z2SXo4FLPtLgP3cE6RJRZFw92yb4F_2ChNYkc5tPDtP2kv5i8KDHkcxb>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvudduleekucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddt
+    jeenucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihsh
+    hnrghilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdef
+    hfekgeetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhn
+    sggprhgtphhtthhopeduhedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnth
+    honhhiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghl
+    rdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpd
+    hrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehp
+    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhhuhhnth
+    gvrhesghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhr
+    ghdprhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdprhgtph
+    htthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghh
+X-ME-Proxy: <xmx:PB75Z7u5vrlCWPEgZTQsqDxNamNyQkNBDuL0n0IXaH8LXqRleJZCiA>
+    <xmx:PB75Z_faug92tfCJp0aKdS57AkNXwJ0P11VU0mwuKnqz7FzwrU5GeA>
+    <xmx:PB75Z33B4yHa1LlSkzJ-o-9W3PKUeMMklwsDAoqjWDC2chNLdoGcTw>
+    <xmx:PB75Z79BqUUcq0xQYbFg3nn2Sj4DmiSy_fOEwUu_oNrBtEMe9KP0Tg>
+    <xmx:PR75Z6rliDh_6ma4bSc2SFswX7tQTDhYEiTk5D2w52UXpS81YpxnnaTy>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 11 Apr 2025 09:50:51 -0400 (EDT)
+Date: Fri, 11 Apr 2025 15:50:49 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>,
+	steffen.klassert@secunet.com, antony.antony@secunet.com
+Subject: Re: [PATCH net-next v25 01/23] net: introduce OpenVPN Data Channel
+ Offload (ovpn)
+Message-ID: <Z_keORW4OWc8i5Vz@krikkit>
+References: <20250407-b4-ovpn-v25-0-a04eae86e016@openvpn.net>
+ <20250407-b4-ovpn-v25-1-a04eae86e016@openvpn.net>
+ <20250410195440.3ba7ba0f@kernel.org>
+ <f11e8a14-deb0-456f-bb4a-b5e4e16a79d7@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8665:EE_|SJ5PPF2FCF00E1F:EE_
-X-MS-Office365-Filtering-Correlation-Id: be6339c4-a1f1-4997-eb70-08dd78ffa4ef
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?JGCIAt3nAj1MQaEiLVLuPVozMlvBuBLrhzjmqd1FFTcO+rwp3j/mt09K5B5S?=
- =?us-ascii?Q?0xsbB68n9+pqEvyMMC/yo3jMCFT22v5AfnNR6G1eiIetEaSEDA5B4pGuE2B7?=
- =?us-ascii?Q?MiFenLZbEu+osz5LCD50uh/BRnp8yp9+yEICY1vto6i5gpx2njPZXJhj1jaP?=
- =?us-ascii?Q?ITlL0Wr5oPNfQpaRhjqtemOIzz+5NKf9L4OzoBqlWtFV7Y9MSUuPx4rz3zJB?=
- =?us-ascii?Q?39Dtz33Mg7+GdHcaPQXvIJiiuCidx2snASmRChtF/GLhDCDRSEPL6gPD/W3y?=
- =?us-ascii?Q?TLfB/HyU7FpF0iiwR9QqVwRBeKKNUiVR7fYNe2GrSAToNAOGsn+B64dNvWHB?=
- =?us-ascii?Q?xOObZvOqOdL+Lmh9tVzwdIuf65Zytdh4KUOJElGN/VqbPQOu7xkaDEfi09It?=
- =?us-ascii?Q?WUjg8A0HI0G2AWA0m6NSZWz7/fC/SSWGaN1OELzGS+DMBTuV6krwLxobzp2x?=
- =?us-ascii?Q?i26kqu7nGuw37J6zWfoc9aY5oQHLInXwSuMGY2BfDBW/dookKFiO8wm1PVvr?=
- =?us-ascii?Q?XjNfZaw7KSO0o2u4YUV9XLaIHTJpibBU2xqBsHvxyhHB0yAtgjtFdBCfEgfv?=
- =?us-ascii?Q?ce/BUl9gya7b1mDJ/yf4RBLDAtPbC4bcaAdnfOyt4gpiWelAOAfBGBqwCP2i?=
- =?us-ascii?Q?N2m8lENx3u70Cz7q2zV25BaXeCW2RtyvwMQsvKOQOK6oweIfZztYsm8q3pOG?=
- =?us-ascii?Q?G0JFtcRvYt9vGAXL0eztaWFq5WknelFGEEWe0ae/In9wE+qLDoKtIcsaAof0?=
- =?us-ascii?Q?8m2zsDrToonVsRpvgk8qdcHHIT9s+xrN6o/D3QxYWEUgGZilFdj1B8x/H0uS?=
- =?us-ascii?Q?jHvECcYFvYY1gEUuIEY/UNxYhQkOLy4O5magyRJ9n/drbN5jwAwfttlWJxcz?=
- =?us-ascii?Q?ZYWTwqq/Jins5VRZXwxqf+pnRQnT7ZAVEYSpiByDpTa4YlWNMqijrKS0oy+L?=
- =?us-ascii?Q?wPQdCxNOff4aPlHK7mIH3VcZLZt8uOwWATPKhNI+9oXmdjp+Jv67g8AXKJNu?=
- =?us-ascii?Q?FpoVIP1/0cc3w0GE1InXxKrJPl3gNzT2MTolGmkI+QkH8jAklwgBMg/0IrC0?=
- =?us-ascii?Q?5Mtk+1+kkrD+nimFEuGkCbuHcxHZJw+J2UqmHL0MkhHDBXplolq6BHfL+Dfv?=
- =?us-ascii?Q?/r9ZOTQdSx2q3kC9TPpG/G0o7ERQicNeqhCfblep9OteM87zXRMenjk4u+7F?=
- =?us-ascii?Q?v2fwzPKWWfhdLkrgjC6VrbrKii7E8U6lcatKZ2h6tlUlP4VCX4H48Z4SGWjG?=
- =?us-ascii?Q?wYH2OVIHiBDGI6gUatOSXRrAt9SMoe534OOCxYVY+KL88kTMXXLTMt3sc1KY?=
- =?us-ascii?Q?9itBIRJYKjyoAnArDApyGC1c0YJnjd1lMm5Gcl35/VhYD4QVOXLwfUxmAFux?=
- =?us-ascii?Q?+tFSekMR0+XFwB7/TH6ZMJ4sMRPmY17RIxKd09yb6ANTTwj/fQ=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8665.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?nhHQqWuNLJnl/zxjwyofsTKOjXYJCJPd4z8i4n7w8R/aKG0magVVb52aixJx?=
- =?us-ascii?Q?QS6mMP3OfNJVs8UHQsLqRczkgQ/9lLjJVfj8uYCXn/lwPaTcdYm0329vqNuU?=
- =?us-ascii?Q?Pq6P6NHj7LfqqnuWHBXeewF54YqN0YmkoRKRDyt0sHemAaHjg6ZxTBNMWxru?=
- =?us-ascii?Q?A8UpL9R3+5KP0rTuyyiji6Iays69qytGZWpmM29oW8tRiAw8DyWx2proP67e?=
- =?us-ascii?Q?H5GKpfnFvMAmAqN+f78K4O2wvWEd3julx79Kj/pZSlk6Edhkp0u1QHU4ox4z?=
- =?us-ascii?Q?MqfXvSqgxgvrujx2tSbl4C1kr1N6JT206Bmm+SRp31BNm37JOkut0xJ4rXjf?=
- =?us-ascii?Q?KBPOAgKgAVphCogNWxVKD01sQ6lltFcrzzkFbk2KzXzfA3xZmWz4jbnsivCt?=
- =?us-ascii?Q?4jXasVr05diK79JMUcfId+FFtdw3eQQY/ejc2yZKn7tugnlvaABUy/EfUD9Q?=
- =?us-ascii?Q?M1NdBnKrs73BhFrayKCYmeCeCTyeYcrMHsBfiABQ66NdHzMmHm6U7QaQWXuy?=
- =?us-ascii?Q?L97elSp/PHe/wI9hAylmrfJ0kmpIF6CMVfcBaCfi1icOaWkJRlWAWNwFjeJT?=
- =?us-ascii?Q?iiqwc1r/9rRJRlCbvThsz0d+fDU3y5U+rOnm39mK/6S9l7a1Ib+dx9th54JN?=
- =?us-ascii?Q?unUtdwgcm1F3LGPeIq8fqAdhgJBv1ah2YE1PCcIIBirLvCx4o9HfWQtkMdG8?=
- =?us-ascii?Q?qAIw5iaxGtUd9xLrJQEfMYP6vj6+Atl3HWzzBHcjcBlvaBxiDYYno/XF/aOD?=
- =?us-ascii?Q?h0RNWG4MXTfAAjkez7WePPdkTelU+tm7iDd7jCUxnwIGYgsoyeGVCiPnzTLr?=
- =?us-ascii?Q?KSlk/leQ21mG64QFgtPsZmhuEUht3Te7q0UupPpWtFvgaIQ+UABnUaqpqlLj?=
- =?us-ascii?Q?XE25x1PaHUR29nfDi5Z0pRY/zHNueYmgyKZwmq2MbKFE7Zs7hhEIGaW6GClM?=
- =?us-ascii?Q?SJqutRyc2EMNfEHzp0UZaBGlVKIEQydowYGqI7+HA04EHvesjIo+CVGnFhRS?=
- =?us-ascii?Q?4FsBswdXvKMSYsEZOZXh8VbZioMvTX1xG8wpGcMtXF9DDowVhBRu/gY2PB4R?=
- =?us-ascii?Q?vNEAm9MeyP/43ZYg/3OHcf7+CVSDSpEo740lenkqc3g0qUl+kkanLOdseR1h?=
- =?us-ascii?Q?kMTToqkV29Ed/NiLfwUWCUcdgHx7Rsz91rz788tHIDYprVKZz5oFUdn5MpPW?=
- =?us-ascii?Q?2iVxEIJgbPhw7LHn0Y6bJt5PGb/e1lULwv4bkKdKOjLSChO7gZNEX5Q1P15q?=
- =?us-ascii?Q?u/k8lxS2n37eKZ+Sgft9fZ9ExMT+QqPo6y0Li+wbhIkMTWMM+BdDxSnCECpL?=
- =?us-ascii?Q?STTRL/630OSKCxf4DnWrBcJOdoqe/UC5e+J9spG2CVqMVux8cOXeqgU3DQAY?=
- =?us-ascii?Q?/fBph/SXRcwCVdfCKstXJ7d2jqra8NHy+i7wlb5O4phCGzaLYi22W/Qjw9iQ?=
- =?us-ascii?Q?erSd0NbduoONpZaJnOoa8mJXcn9XcxTyqRYQ4S8HpHDkVEGh+WjKbmkn5fGL?=
- =?us-ascii?Q?GsMSHsvURxT7JbMc9jD8Tj2vPwXcwj82kKSNr/rVF+1dHVmRNb3v8yEglt4C?=
- =?us-ascii?Q?JRla7Tb0Kml/ZVx+f24Itp07z8HsZQIskuKxMmQ9r386oa3z8+nvGtoU9cIB?=
- =?us-ascii?Q?jA=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: be6339c4-a1f1-4997-eb70-08dd78ffa4ef
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8665.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Apr 2025 13:49:13.7713
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tgXTFp6B81tP5oJZRj254WRDx7rx3ScBdViEjzWCNFx4JqgAhk6nmzT2rK8w2+Nv2J1V5ehxaR1Hs5md57/KYw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ5PPF2FCF00E1F
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <f11e8a14-deb0-456f-bb4a-b5e4e16a79d7@openvpn.net>
 
-On Thu, Apr 10, 2025 at 03:44:55PM +0800, Jiawen Wu wrote:
-> Tunnel types VXLAN/VXLAN_GPE/GENEVE are supported for txgbe devices. The
-> hardware supports to set only one port for each tunnel type.
+2025-04-11, 10:04:10 +0200, Antonio Quartulli wrote:
+> Hi Jakub,
 > 
-> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
-> ---
->  .../net/ethernet/wangxun/txgbe/txgbe_main.c   | 113 ++++++++++++++++++
->  .../net/ethernet/wangxun/txgbe/txgbe_type.h   |   8 ++
->  2 files changed, 121 insertions(+)
+> thanks for taking the time to go through my patchset :)
 > 
-> diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
+> On 11/04/2025 04:54, Jakub Kicinski wrote:
+> > On Mon, 07 Apr 2025 21:46:09 +0200 Antonio Quartulli wrote:
+> > > +static int ovpn_netdev_notifier_call(struct notifier_block *nb,
+> > > +				     unsigned long state, void *ptr)
+> > > +{
+> > > +	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
+> > > +
+> > > +	if (!ovpn_dev_is_valid(dev))
+> > > +		return NOTIFY_DONE;
+> > > +
+> > > +	switch (state) {
+> > > +	case NETDEV_REGISTER:
+> > > +		/* add device to internal list for later destruction upon
+> > > +		 * unregistration
+> > > +		 */
+> > > +		break;
+> > > +	case NETDEV_UNREGISTER:
+> > > +		/* can be delivered multiple times, so check registered flag,
+> > > +		 * then destroy the interface
+> > > +		 */
+> > > +		break;
+> > > +	case NETDEV_POST_INIT:
+> > > +	case NETDEV_GOING_DOWN:
+> > > +	case NETDEV_DOWN:
+> > > +	case NETDEV_UP:
+> > > +	case NETDEV_PRE_UP:
+> > > +	default:
+> > > +		return NOTIFY_DONE;
+> > > +	}
+> > 
+> > Why are you using a notifier to get events for your own device?
+> 
+> My understanding is that this is the standard approach to:
+> 1) hook in the middle of registration/deregistration;
+> 2) handle events generated by other components/routines.
+> 
+> I see in /drivers/net/ almost every driver registers a notifier for their
+> own device.
 
-[...]
+I think most of them register a notifier for their lower device
+(bridge port, real device under a vlan, or similar).
 
-> index 5937cbc6bd05..67ea81dfe786 100644
-> --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-> +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-> @@ -88,6 +88,9 @@
->  /* Port cfg registers */
->  #define TXGBE_CFG_PORT_ST                       0x14404
->  #define TXGBE_CFG_PORT_ST_LINK_UP               BIT(0)
-> +#define TXGBE_CFG_VXLAN                         0x14410
-> +#define TXGBE_CFG_VXLAN_GPE                     0x14414
-> +#define TXGBE_CFG_GENEVE                        0x14418
->  
->  /* I2C registers */
->  #define TXGBE_I2C_BASE                          0x14900
-> @@ -359,6 +362,11 @@ struct txgbe {
->  	union txgbe_atr_input fdir_mask;
->  	int fdir_filter_count;
->  	spinlock_t fdir_perfect_lock; /* spinlock for FDIR */
-> +
-> +	/* tunnel port */
-> +	__be16 vxlan_port;
-> +	__be16 geneve_port;
-> +	__be16 vxlan_gpe_port;
+I've mentioned at some point that it would be more usual to replace
+this notifier with a custom dellink, and that ovpn->registered could
+likely be replaced with checking for NETREG_REGISTERED. I just thought
+it could be cleaned up a bit later, but it seems Jakub wants it done
+before taking the patches :)
 
-nitpick: Can these definitions be reordered to keep the consistent order in
-         newly added code?
-         (In all other places you have the order: VXLAN, GPE, GENEVE).
-
-Thanks,
-Michal
-
-[...]
+-- 
+Sabrina
 
