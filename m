@@ -1,113 +1,113 @@
-Return-Path: <netdev+bounces-181635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3170CA85E69
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 15:14:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F3FFA85E6B
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 15:14:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46BBD1B64E39
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 13:12:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A561188D9CA
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 13:15:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2472C2AEFB;
-	Fri, 11 Apr 2025 13:12:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF7CE130AC8;
+	Fri, 11 Apr 2025 13:14:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="sjrSMRRs";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="fEZpPoP2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gcf0TmoG"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f195.google.com (mail-pf1-f195.google.com [209.85.210.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79CEF2367B2
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 13:12:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6363C17BA1;
+	Fri, 11 Apr 2025 13:14:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744377156; cv=none; b=aCl/6ocG4Y6mt6DZQaQj//P/PU/bBvz8p1lLL/8vFq7zv+VjfNoDpUKeilfcaH0n/4NxMSQ2w6FG/D+vwNE2q1jzgba+n6vIOvnJfJ7cqpUH0LfK5divBn7cvW4vujv5DV8997rdRnqQVScK9pC612kqOr8fdAnNH+MtJT2UrY0=
+	t=1744377288; cv=none; b=PudPSoYd41I8L7crceTTCzVhCG5Ksh3iHYS8MskAa3fnX0/cUf3BmGwqj/X9XH1pstWiE49CF292vJJRHglqG2t1leRLO5jIDkrrGJxBWbXOp4P+pRT0+sPTIzhgDite+PJ8LJuJ5ZIDZHwf2RpOffmF+AaNlIkrl0El10F5zTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744377156; c=relaxed/simple;
-	bh=4YP1XQ6IPyOe1vy/B3rhLSW91fEOZJFL8Oqay3GwNQQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NQf0eZubLgNA2IY8RW3EtVv1jH/7ZFUXGnZ1pespUSZBlYMAOwzsC/rTMktPtPahruhVyaAmNskCvH/8b8D56b9eDjQsPDHlddxKjzgimc0tAlplM4UyjnftRjOGpVXgyc8Uhx5SAl5zXC/1v+fQpZ4PoOY+x2I5z8Mk9JRxtNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=sjrSMRRs; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=fEZpPoP2; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Fri, 11 Apr 2025 15:12:30 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1744377152;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xl6pjqyQnrwcBkuqqJQwT94m+WOd7q6TSPXu61MjdI0=;
-	b=sjrSMRRsAWSvMHHovaGREdgbc4qxew8Pdbvn/TvRMmVO0qOM2JCN3qcsQXM7n6M2VzUcvO
-	r7sQrjM+gsXjLhXUE+F641e+RHsszEmRbAqursmnCNQD93MsnDN+xtJ63s7wendKwxHtG0
-	EVnkt03w6J1LjAQr0vECN6Ys4Yi7QL03W9JHtF77mCNMorYXHYUvV7zpeV4DLdx0yrhQEN
-	+8fH2IkXiXD+UZSTdvq6oseO4IA+DLSCRf8SbxZHfVhUJlXqFBQ6pRXp7FBAcj/6dt60aO
-	1Z3vv5J3zIijLj20glxqfqHqCya/WoAdP2iwA3j4R3Qzks2UaJg5OWLBd1YNkg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1744377152;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xl6pjqyQnrwcBkuqqJQwT94m+WOd7q6TSPXu61MjdI0=;
-	b=fEZpPoP2GFk2kVIDhRhgjWnz+ZeZc7X4qyFCF4LlzN9D8KCeNzehb/1+pnRCeNQE8oCvcO
-	jlnaEq9MugHpA+AA==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Davide Caratti <dcaratti@redhat.com>
-Cc: netdev@vger.kernel.org, linux-rt-devel@lists.linux.dev,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>
-Subject: Re: [PATCH net-next 13/18] net/sched: act_mirred: Move the recursion
- counter struct netdev_xmit.
-Message-ID: <20250411131230.Wm6eVlkb@linutronix.de>
-References: <20250309144653.825351-1-bigeasy@linutronix.de>
- <20250309144653.825351-14-bigeasy@linutronix.de>
- <CAKa-r6s69JbQX7ZuGiz37bbfQYWs+r6odhVB7Ygct8DYN=ApJQ@mail.gmail.com>
+	s=arc-20240116; t=1744377288; c=relaxed/simple;
+	bh=1UWUISv2DT7w0ljeiMVoiOZmsDc2AkD2/AxvOAuUcNg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qPSxMdgGZswDgdy51TJs7H5KJGRM3zw115jqADoA0zf9VRDzorquNXkAC5pp0NKqaot66S/vR4snQaNmllUXTPTy6/MX+lba7coUYvxW4SSVaEJ8Mt98uOq7ah3Ro4qGonuHdX1bwlJlpVvmTyx++E7HKBKv6jfJL84ccx7tqTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gcf0TmoG; arc=none smtp.client-ip=209.85.210.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f195.google.com with SMTP id d2e1a72fcca58-7376e311086so2522153b3a.3;
+        Fri, 11 Apr 2025 06:14:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744377287; x=1744982087; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XthcdcN8Iyv55J5M18ylV0pZBSRnbvsK3fQGBG1/ZS0=;
+        b=Gcf0TmoGTe2JMaaTzKwcP+hpr4OXwCO3So3ae87ao311GfGYrKrxalP4F2JuV7B5un
+         vtPgADnhr+BtfDWiseEN1MJFq6ktVRfU2xPZIyZ+gYzDgukEbQCtsp5gICMh96l8P/Am
+         cxDvElEyCZoenUZNHXYjLnIOMb73gcig/xT/8NP2wjnlRje0p2ZUIlObGyYrZAXSQaAa
+         gSsA74nYXiCv+IdHD96VYWiJmPEVEHYuuLhAsOIj+MIrjS+29n4XH67Q8zKZN0j6PpkL
+         weZlRjTtmpSLWmVGWfMfYzXPR8ezFuMqUPHovYIAB9juRYhyAFJfwY047pO5sGeTNGKd
+         +s8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744377287; x=1744982087;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XthcdcN8Iyv55J5M18ylV0pZBSRnbvsK3fQGBG1/ZS0=;
+        b=YdK+TRLTd7uDBuhZXROksX3Uv4x+3t2RN/8pqemP5uJXKEhn/g53xeJAPQDh84FC/9
+         UvtX6rxD3xLDNVPdIf/fGII9qDVM1gBXqNSbLFS/BfIxAKEFqr7TGNY4+HChhQNaC0jX
+         Su1b1tZYe8t0RtObsCxIm+xhyUsL7CN3gAnC/gweQLzfwjq8lX9+93aKbrDxCLrjPoZQ
+         G8+wR5xOP00El4MKMAVEbbzNOpS075I8XRBbmpV6Omdu0d0D31o1Sv8GBWX8QWEsz+PP
+         N4k0XYfVc02GVAo1g/gtjLSWvxGmmzGpb91vuaPr0Y1tx9WZ+CjqVemaspyKp1Ja5GRB
+         qNPA==
+X-Forwarded-Encrypted: i=1; AJvYcCVAPf5ng/ercjQpEpU+/bKiZkb7K4Fj+U6cMAqzawTBH+UlmMIgy2nAFyLe4JHTI71vJSd5UzBMiZcb0s4=@vger.kernel.org, AJvYcCWV9ziCqedApPpBOvqhyDuqwnL6c5IgBwT4frPHj5gdGGnLFH5tBSeJ9bSN39RLd0qWcMyHK2oC+HgONA==@vger.kernel.org, AJvYcCXP2RX7I9gBV765vr4cEN9msoU63VCxdKwfukp9P2BKEDjbw5ll7MiD0mT0rCGFTVYZafi4q50M@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjQJfvWwlEAfKAv2Io1c2tf84lgTvyqOOOfOqvPU5pTOPhoESG
+	bSSfwatHsbcubMFbI8MfGbusEkAs2LffNA88uWcj3wv3g4lBYu6P
+X-Gm-Gg: ASbGncvodgWnv7I2y84GGZq/SOqIExnSokNOsyX6YLA9qT5vVRixyqdhpuBmBNcHjEy
+	Gu0iq5l5R5GZcjWLk5aFPEvqKP73V1LhG+jSH4hTvhumPJhKKSuIQlWG34aUsaD4tPJfIBR2jnr
+	Wxp+eXa4RmSmrB3rKOA5L8AVpVAd34fTocuRrZwms437B2e40r9IbwBpFSSMoMyfm79Y1tyjHCz
+	8Gp4e1wy4LoMksKXkcIstLNoR0SDu5CrzwpCSkraJVLyyv1QoP7QCo2471O3oOjlCY7Qu/5VXx0
+	/WySPhVh7T5FWPO8eiWdgo4BJIYrVP+Hw7+WTzfFn9+p3kyZf8Ob45XyiAhAEphP
+X-Google-Smtp-Source: AGHT+IHmGROtDU7FGfj92ZtlqT45b3qBFiBzD4gjS4C6XnOuqIUxsSIhZ2n2lqx9HDyQ6OcXD/Mg8Q==
+X-Received: by 2002:a05:6a21:3943:b0:1fd:e9c8:b8c3 with SMTP id adf61e73a8af0-20179975a19mr4204075637.26.1744377286370;
+        Fri, 11 Apr 2025 06:14:46 -0700 (PDT)
+Received: from henry.localdomain ([223.72.104.59])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b02a0de8926sm3967494a12.30.2025.04.11.06.14.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Apr 2025 06:14:45 -0700 (PDT)
+From: Henry Martin <bsdhenrymartin@gmail.com>
+To: saeedm@nvidia.com,
+	leon@kernel.org,
+	tariqt@nvidia.com,
+	netdev@vger.kernel.org
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	amirtz@nvidia.com,
+	ayal@nvidia.com,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Henry Martin <bsdhenrymartin@gmail.com>
+Subject: [PATCH v4 0/1] net/mlx5: Fix null-ptr-deref in TTC table creation
+Date: Fri, 11 Apr 2025 21:14:30 +0800
+Message-Id: <20250411131431.46537-1-bsdhenrymartin@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <CAKa-r6s69JbQX7ZuGiz37bbfQYWs+r6odhVB7Ygct8DYN=ApJQ@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On 2025-03-21 18:14:50 [+0100], Davide Caratti wrote:
-> hi,
-Hi,
+This patch fixes a NULL pointer dereference in
+mlx5_create_{inner_,}ttc_table() by adding NULL checks for
+mlx5_get_flow_namespace() return values.
 
-> > index 5b38143659249..8d8cfac6cc6af 100644
-> > --- a/net/sched/act_mirred.c
-> > +++ b/net/sched/act_mirred.c
-> > @@ -30,7 +30,29 @@ static LIST_HEAD(mirred_list);
-=E2=80=A6
-> > +#else
-> > +static u8 tcf_mirred_nest_level_inc_return(void)
-> > +{
-> > +       return current->net_xmit.nf_dup_skb_recursion++;
-> > +}
-> > +
-> > +static void tcf_mirred_nest_level_dec(void)
-> > +{
-> > +       current->net_xmit.nf_dup_skb_recursion--;
-> > +}
-> > +#endif
->=20
-> sorry for reviewing this late - but shouldn't we use sched_mirred_nest
-> instead of nf_dup_skb_recursion in case CONFIG_PREEMPT_RT is set?
+Henry Martin (1):
+  net/mlx5: Fix null-ptr-deref in mlx5_create_{inner_,}ttc_table()
 
-you are correct, thank you.
+ drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-> thanks,
+-- 
+2.34.1
 
-Sebastian
 
