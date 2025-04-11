@@ -1,127 +1,155 @@
-Return-Path: <netdev+bounces-181694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC0D3A86331
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 18:27:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 638ECA8633C
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 18:30:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDEDA7AF330
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 16:26:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3BE317637A
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 16:29:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F286D21B9C4;
-	Fri, 11 Apr 2025 16:27:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1680421B9D3;
+	Fri, 11 Apr 2025 16:29:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PjurHYzZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ipf26ffV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2266126C13;
-	Fri, 11 Apr 2025 16:27:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33E322367DD
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 16:29:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744388834; cv=none; b=Op1iUrBv9RT1Rf+YMRrjjsbEaeoOxIjkyCYj6vug5Lz73sSXxQgD8D4xMHxUUlLELNiynbxuk8Y7jSoDfSWKFkAjNcVMjojawJe5cjNujuhuv0tzgl/pqPi9s0Xq3QKLFttZF/55vlNhBx1g8uNKe/1PSZFQ3f2Gkd5le8Elid0=
+	t=1744388950; cv=none; b=W+lUKQt5h21TNbbL/vYIp94BJG9q34kZY27xVfjTUPms/+LFRhAw93F72Du6n+ipCCWXSrIXxZkT8O1W2IIX8kRrsEpedxqeAHcLQo/yqL5ndTtKDxv8NBtXIoIrAUswUZbUldbVSS1uE1vrA7DzXl/qKJ+u6BcjGkgGd7w5JoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744388834; c=relaxed/simple;
-	bh=DzmZ98UHOcBa/uDcZVOeIvJFc1PO8euYkm5Q5FQwIOc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K4hjX/VVFRjmya02P7wd7iE/SOsWLAAdhcyuMHcfZY/sT2ruYBoIJInRl7+7HNQCxMAFVBfCTR/Siy6NHcfaiCvVWM3ANQGIADMfVkN/D9d4dJf2azDseYAGdwpMwcbkq7wKciJPKV+nkbNodDE1qU+BZOaoj7nLLI+SCxo8gSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PjurHYzZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89B78C4CEE8;
-	Fri, 11 Apr 2025 16:27:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744388834;
-	bh=DzmZ98UHOcBa/uDcZVOeIvJFc1PO8euYkm5Q5FQwIOc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PjurHYzZOQN4uXaLNZNK8RjGupHq3dHjtJ+hzR3/aZ4DOEn7KHKOeXl+L2Lbotkwr
-	 9TXYlia3Fy88adO9DQCwSa5bIEoon7tKKpAihh6MVe/jYjsd9mk5aufUgb0bTY9MuG
-	 2W3njw3FD2CMrJG16WcPZOdbYddag5vUVNsFwWn6SLY1wKT+93K5kZ+J7OxSUelHsf
-	 4odvMCcQ5WXabNegXRZDJuu53hCQAIKnJJ6k4sQ4JWSe5UvuIokMtZedbzM5NV3xJ6
-	 nqmd0n9mBEyeM+NqvYR6IuadjG5/s+A0oCPoKCpWVTn5z9G8FijAsMelN6MMHCr6Fo
-	 ACNVIagXKA95g==
-Date: Fri, 11 Apr 2025 17:27:08 +0100
-From: Simon Horman <horms@kernel.org>
-To: Furong Xu <0x1207@gmail.com>
-Cc: Boon Khai Ng <boon.khai.ng@altera.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Matthew Gerlach <matthew.gerlach@altera.com>,
-	Tien Sung Ang <tien.sung.ang@altera.com>,
-	Mun Yew Tham <mun.yew.tham@altera.com>,
-	G Thomas Rohan <rohan.g.thomas@altera.com>
-Subject: Re: [PATCH net-next v3 1/2] net: stmmac: Refactor VLAN implementation
-Message-ID: <20250411162708.GL395307@horms.kernel.org>
-References: <20250408081354.25881-1-boon.khai.ng@altera.com>
- <20250408081354.25881-2-boon.khai.ng@altera.com>
- <20250410161912.0000168a@gmail.com>
+	s=arc-20240116; t=1744388950; c=relaxed/simple;
+	bh=v8bB1PRYznkD5aDxXMWD1FLhoAkfkV0ZYHTAI2pWT6k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DazaM3ut6iBAxSZ0ncb8JGRc1qCUGoGKmIjZtg3ezoluS9nMGG76sZD+Q5YXBzmfF/ARi2NeDEaHSfVk8eeXYzYDayY+VTIwOTtXlDG40WD4LYjkVMf3bulb3rDaMEiJ+xPWMb7ovEB80w6YJcHH1ZmhrNEHuX/r8n/Pv5Co+MY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ipf26ffV; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744388948; x=1775924948;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=v8bB1PRYznkD5aDxXMWD1FLhoAkfkV0ZYHTAI2pWT6k=;
+  b=Ipf26ffVPX8KeSzihDkjwixBZsP0fNpc+9HWHMAWgmF2bDq6fsbJPMvz
+   Ty0bhGAIGa5r3cdlG1WRg0Na39tjiKsXetuSojaUHgSMxqQTMXx3lOJvz
+   t+6Emtahrj0d21Elr2PM6mNAungeou1C72vOClLX0LeiRsGs1PdNpgoN/
+   vDHWwCTJvGfLqPGVtyKP4fRjPXpchULgWiJJiBXQAo4E3lzzJJ59KYBWv
+   NLW8g9pbWwxDfvlEDHGwjiKbzjge5Tz78RYYrfX5CZynpfpKP1KHkgG0a
+   OHbEianW+LH/Qn2y4LQhDoEcETU6fBRNoimgTmCCtMQduvRhCCGELmgTE
+   A==;
+X-CSE-ConnectionGUID: Gd0Zi15JTuyqvn4+m0rrlw==
+X-CSE-MsgGUID: Kl7zDLXNThCl2tg5bWiT/A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11401"; a="56610933"
+X-IronPort-AV: E=Sophos;i="6.15,205,1739865600"; 
+   d="scan'208";a="56610933"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2025 09:29:07 -0700
+X-CSE-ConnectionGUID: ZQGaHFdCSj+KAln/ZHV+oQ==
+X-CSE-MsgGUID: mYcLYH3ZTH2Jb5UIWqgqbg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,205,1739865600"; 
+   d="scan'208";a="133343128"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa003.fm.intel.com with ESMTP; 11 Apr 2025 09:29:07 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	christopher.s.hall@intel.com,
+	jacob.e.keller@intel.com,
+	vinicius.gomes@intel.com,
+	david.zage@intel.com,
+	michal.swiatkowski@linux.intel.com,
+	richardcochran@gmail.com,
+	vinschen@redhat.com,
+	rodrigo.cadore@l-acoustics.com
+Subject: [PATCH net 0/6][pull request] igc: Fix PTM timeout
+Date: Fri, 11 Apr 2025 09:28:49 -0700
+Message-ID: <20250411162857.2754883-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250410161912.0000168a@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 10, 2025 at 04:19:12PM +0800, Furong Xu wrote:
-> On Tue,  8 Apr 2025 16:13:53 +0800, Boon Khai Ng <boon.khai.ng@altera.com> wrote:
-> 
-> > Refactor VLAN implementation by moving common code for DWMAC4 and
-> > DWXGMAC IPs into a separate VLAN module. VLAN implementation for
-> > DWMAC4 and DWXGMAC differs only for CSR base address, the descriptor
-> > for the VLAN ID and VLAN VALID bit field.
-> > 
-> > Signed-off-by: Boon Khai Ng <boon.khai.ng@altera.com>
-> > Reviewed-by: Matthew Gerlach <matthew.gerlach@altera.com>
-> > ---
-> >  drivers/net/ethernet/stmicro/stmmac/Makefile  |   2 +-
-> >  drivers/net/ethernet/stmicro/stmmac/common.h  |   1 +
-> >  drivers/net/ethernet/stmicro/stmmac/dwmac4.h  |  40 ---
-> >  .../net/ethernet/stmicro/stmmac/dwmac4_core.c | 295 +-----------------
-> >  .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  13 -
-> >  .../ethernet/stmicro/stmmac/dwxgmac2_core.c   |  87 ------
-> >  drivers/net/ethernet/stmicro/stmmac/hwif.c    |   8 +
-> >  drivers/net/ethernet/stmicro/stmmac/hwif.h    |  61 ++--
-> >  .../net/ethernet/stmicro/stmmac/stmmac_vlan.c | 294 +++++++++++++++++
-> >  .../net/ethernet/stmicro/stmmac/stmmac_vlan.h |  63 ++++
-> >  10 files changed, 401 insertions(+), 463 deletions(-)
-> >  create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.c
-> >  create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.h
-> > 
-> [...]
-> > +static void vlan_update_hash(struct mac_device_info *hw, u32 hash,
-> > +			     __le16 perfect_match, bool is_double)
-> > +{
-> > +	void __iomem *ioaddr = hw->pcsr;
-> > +	u32 value;
-> > +
-> > +	writel(hash, ioaddr + VLAN_HASH_TABLE);
-> > +
-> > +	value = readl(ioaddr + VLAN_TAG);
-> > +
-> > +	if (hash) {
-> > +		value |= VLAN_VTHM | VLAN_ETV;
-> > +		if (is_double) {
-> > +			value |= VLAN_EDVLP;
-> > +			value |= VLAN_ESVL;
-> > +			value |= VLAN_DOVLTC;
-> 
-> I can confirm that 802.1ad (QinQ) has been broken on stmmac for years,
-> and it will be so nice if this refactoring includes some fixes for QinQ
+Christopher S M Hall says:
 
-FWIIW, please be sure that fixes are separate patches from refactoring.
+There have been sporadic reports of PTM timeouts using i225/i226 devices
+
+These timeouts have been root caused to:
+
+1) Manipulating the PTM status register while PTM is enabled and triggered
+2) The hardware retrying too quickly when an inappropriate response is
+   received from the upstream device
+
+The issue can be reproduced with the following:
+
+$ sudo phc2sys -R 1000 -O 0 -i tsn0 -m
+
+Note: 1000 Hz (-R 1000) is unrealistically large, but provides a way to
+quickly reproduce the issue.
+
+PHC2SYS exits with:
+
+"ioctl PTP_OFFSET_PRECISE: Connection timed out" when the PTM transaction
+  fails
+
+The first patch in this series also resolves an issue reported by Corinna
+Vinschen relating to kdump:
+
+  This patch also fixes a hang in igc_probe() when loading the igc
+  driver in the kdump kernel on systems supporting PTM.
+
+  The igc driver running in the base kernel enables PTM trigger in
+  igc_probe().  Therefore the driver is always in PTM trigger mode,
+  except in brief periods when manually triggering a PTM cycle.
+
+  When a crash occurs, the NIC is reset while PTM trigger is enabled.
+  Due to a hardware problem, the NIC is subsequently in a bad busmaster
+  state and doesn't handle register reads/writes.  When running
+  igc_probe() in the kdump kernel, the first register access to a NIC
+  register hangs driver probing and ultimately breaks kdump.
+
+  With this patch, igc has PTM trigger disabled most of the time,
+  and the trigger is only enabled for very brief (10 - 100 us) periods
+  when manually triggering a PTM cycle.  Chances that a crash occurs
+  during a PTM trigger are not zero, but extremly reduced.
+---
+IWL: https://lore.kernel.org/intel-wired-lan/20250401-jk-igc-ptm-fixes-v4-v4-0-c0efb82bbf85@intel.com/
+
+The following are changes since commit cfe82469a00f0c0983bf4652de3a2972637dfc56:
+  ipv6: add exception routes to GC list in rt6_insert_exception
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 1GbE
+
+Christopher S M Hall (6):
+  igc: fix PTM cycle trigger logic
+  igc: increase wait time before retrying PTM
+  igc: move ktime snapshot into PTM retry loop
+  igc: handle the IGC_PTP_ENABLED flag correctly
+  igc: cleanup PTP module if probe fails
+  igc: add lock preventing multiple simultaneous PTM transactions
+
+ drivers/net/ethernet/intel/igc/igc.h         |   1 +
+ drivers/net/ethernet/intel/igc/igc_defines.h |   6 +-
+ drivers/net/ethernet/intel/igc/igc_main.c    |   1 +
+ drivers/net/ethernet/intel/igc/igc_ptp.c     | 113 ++++++++++++-------
+ 4 files changed, 81 insertions(+), 40 deletions(-)
+
+-- 
+2.47.1
+
 
