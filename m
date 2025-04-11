@@ -1,176 +1,143 @@
-Return-Path: <netdev+bounces-181500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E96FA853DB
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 08:03:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E5DAA853F5
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 08:11:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 071F3161EDE
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 06:03:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A68007AD92B
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 06:08:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3AD51EE00C;
-	Fri, 11 Apr 2025 06:02:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD0227CCFB;
+	Fri, 11 Apr 2025 06:08:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JcitliSo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lrNxE96D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA4D1E0E15
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 06:02:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8794327CCE4;
+	Fri, 11 Apr 2025 06:08:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744351371; cv=none; b=KLIVCiP9rMnhnZhveNlvSw4sBmpoTYO1zLhKGAIt0wBWcGDDfijUXcyJDScdCUO4AWcxuYbKDIk94UFB7kT5q1VCMt71q0FPXO5t3QsKxgOhqwtE1RMh7+PfxqsW8rgB5Cqkv8bTEWsoNs75eUfbG+M+EgTki//gAf8SsuoG+EQ=
+	t=1744351736; cv=none; b=BTNFPHuo7hmPEk0VBpmDtvjHzOTkgOZTIYIigDyhiqveEs85owaqUKKtHPAwYyHEupXLKp5C1aUqjAQV6N1i99FRaOdG2/kP+srQsLGVOKS3TO4GQGWzY/cyAFkC5OdOQhhgF+tO/xiLZmO8lw7RQViVBMJaU87KPb1OXApzoQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744351371; c=relaxed/simple;
-	bh=NKf5KeOfLVorPYyoK1YgtGvlZbAV4fKd+y+iIgoc1QM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m+0KPhkSCj8va3gxhauJRYh2GWMyVe6ez0r9nEHdVJMAusmwCN29mJE4a3MQ6yzc0G25nA6ng9tiS4U0cEXFLQ23/r2Zr/GwRiHDOQfOx5Df+Pr+mKRQ++vStZRWgRuK1LTJlpV/If1XVaaz99hJcB+CGMRoZsrk5DldeLq3OTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JcitliSo; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744351370; x=1775887370;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=NKf5KeOfLVorPYyoK1YgtGvlZbAV4fKd+y+iIgoc1QM=;
-  b=JcitliSobItio4XOZul2V0FQ9Bl/00i+ufKX//eZ3XPVCLyy5hZ0mi2z
-   BBF7+TkEEiMWnjdqZuzJ/ghXpQ3ZM/FbHyFRdZLXBbzP3FRIbcBBHLcsi
-   C8ZsD6AAls5ijb3mrD4WB8CiHG1HlgcfEYKD83vmGcdjTOdrqfmRCEZMA
-   81ivJuJ9C5tqCkUumB0Dq6v+Ulwe4jUho1dQ5M0LriugyRx61zQdqPAY6
-   pJpqOpQwA7eg9Y50J7nD0n0DldcWPC/CFVRJtiT/z/6keCUujrpMCDDu7
-   TPkJUISHQnA73hKtqf6PpcXKoYS39MyLHBpkVfQRn/zp/jvNKeVBc5B5X
-   w==;
-X-CSE-ConnectionGUID: uFQx8oQAShqGbRYtN8a5vA==
-X-CSE-MsgGUID: e46FKx8mTIGgH+i4YneSmA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11400"; a="45134283"
-X-IronPort-AV: E=Sophos;i="6.15,203,1739865600"; 
-   d="scan'208";a="45134283"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 23:02:49 -0700
-X-CSE-ConnectionGUID: Ffy9UZLTSQ+xVtBq5owDwg==
-X-CSE-MsgGUID: m+1ODMQyQL+LR7bUxitJlw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,203,1739865600"; 
-   d="scan'208";a="129072671"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 23:02:48 -0700
-Date: Fri, 11 Apr 2025 08:02:31 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Dave Marquardt <davemarq@linux.ibm.com>
-Cc: netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH net-next] ibmveth: Use WARN_ON with error handling rather
- than BUG_ON
-Message-ID: <Z/iwd8qonlrfOkO5@mev-dev.igk.intel.com>
-References: <20250410183918.422936-1-davemarq@linux.ibm.com>
+	s=arc-20240116; t=1744351736; c=relaxed/simple;
+	bh=WouuxWKXIXaHJdNjkcZzsFrXBb+9BPzw8tsW2/aQSNg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lTcHrJrlN+FqawCqX8TJoE3A/MQfS/vAp0Ay07Sa1pdr+O3b+eM+fS54k0iS/GF4lgPq7jl71gKOtrAB2pUXEshf9LNHL4Fr2vHuRlU0Ns0rxIytdw/si8K46kz7xkSgojGF/ahCJS07fDoZR4XCGydVoPuhk971cDR8MGGOJsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lrNxE96D; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7376dd56eccso1782660b3a.0;
+        Thu, 10 Apr 2025 23:08:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744351733; x=1744956533; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=50hxH2EGQQWIvDNzL74QsMeOx3mDaobRYvxxKWb0q9Q=;
+        b=lrNxE96Dl5eUCskhkwNLtSlN5/yQ9z3i6khD21hpZm+MetWk6qF+L1bFUioQFwZ5dH
+         ceyuwsyAVT2fgUmg5u5wu/l1eegxNOp1/YbYjSt7E7wqvqSEtABiDjqA2RG6j6TLugiu
+         tNeBCqGi9fGGfF136606uW5mi0Snbf3ahpqPhlRkodSDdhRUhF5nnZ3LknKWDwH5GKcs
+         oRkP0dpQZbnw+5uEyHLNYVr3r7ndkZpXpKEzogpFGHQAVMA7iQFc5pzKj/lIgxASQwKD
+         3bf1YyZCsXPp+N7Toq32hgIM+HKOReWnvPVtkuv2v4FBlS/7tE5HofFsaNcksnptoXVj
+         o6fA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744351733; x=1744956533;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=50hxH2EGQQWIvDNzL74QsMeOx3mDaobRYvxxKWb0q9Q=;
+        b=l35LO4uRkIkSc6oZQ659QT5Aq/JXeeOzpxWpZDZ4up6y0V0wpPKRWNQnflCAPCOOxE
+         P4aXIXQjiy0rIO+7roVUMzgbfY11fPZZTND/xap0FidGCFW0Cv/JBTCcN4Nwg6l4TEwm
+         37RM8Djr+hzy6UfAwV1EwOUQj2OV7jgZnuAdRIZLQwC6jReoXcRW5e8I/ZRy/4PRQrFl
+         CAXSGj9S+SpRqwmeJoQ1wVd3vJ8f48rU+CjGk7Jy6XiNxfj9i/z+B/YmE/YFLYPSVEG9
+         wiboeLAqjn8tUW9dUKWI6Nx7xnCxuH+TI50cYd1bhr36OQj/u/T+gAtMNaheS0Dgoogd
+         oxDw==
+X-Forwarded-Encrypted: i=1; AJvYcCW+xM3p2Jwu35QUpN7jmiCNoh6SwXOJH0M7JkWd+NNCbjkXua+ZhnEtXRe4cf5mVfUNx/s5R4/0@vger.kernel.org, AJvYcCXsdHk4ctVY6Js4mB5HCKkLcEYc2K+HLQxi5fWbwJ+ctW63nTgQU+JOo04rdt26+qEJQ2z8FkvQBi6RC1w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvEyDQxthUp0dnHz7LZ1ZggqUKap+0ElMwfWtutMEPAXNdoY1d
+	s3XuPIaBALYkKFA2Fe257bSbIXHz1jZIWRVS2ft+Q0CM5NR/mUiQ
+X-Gm-Gg: ASbGncuhxFA5cgpa5VHIRcyPWMDPY/Y4Qjk8edvZVim+wrZbhi7QolyX6Ygi9oJygdd
+	eLjj1qdKUEcDfOQ3R4oSrfYzIdgfv9MGIHda/cCyYM+z+sL4NJ72a2yZimCBF/ILEkvKPF9o6Lq
+	0HW3ZKXTyyYnhx0xlqzT5lgGr5sT7J3GMapUrcI4JsX6vi00wYqfniX8ukFcrkr5tjoBelgCMNv
+	IlCDpJIxb6CEKw3om6nmjVxZIXTEtPIdvc1e+dcIDZkKUn5IkY+NTcQasNTpY/Wpb9wz7SxsRQW
+	0iHi5pnRAgzOMuZD8t2Us+9HVfcM1g5YOk9qfu55soh4Ua9w6gpVlJ8s/hM=
+X-Google-Smtp-Source: AGHT+IHHKmCThas9V8uvHhyBV40jdH5I/sNyIn7KwfblLgO395ERfwFGclBVoIOKeawjjUbdqv32+Q==
+X-Received: by 2002:a05:6a00:b89:b0:736:562b:9a9c with SMTP id d2e1a72fcca58-73bd12b1a09mr2332868b3a.18.1744351732606;
+        Thu, 10 Apr 2025 23:08:52 -0700 (PDT)
+Received: from localhost.localdomain ([2401:4900:4fe1:c798:5bf3:ef7a:ab5:388f])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73bd21e0469sm647640b3a.79.2025.04.10.23.08.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Apr 2025 23:08:52 -0700 (PDT)
+From: Kevin Paul Reddy Janagari <kevinpaul468@gmail.com>
+To: jmaloy@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org,
+	tung.quang.nguyen@est.tech
+Cc: Kevin Paul Reddy Janagari <kevinpaul468@gmail.com>
+Subject: [PATCH net-next] Removing deprecated strncpy()
+Date: Fri, 11 Apr 2025 11:37:54 +0530
+Message-Id: <20250411060754.11955-1-kevinpaul468@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250410183918.422936-1-davemarq@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 10, 2025 at 01:39:18PM -0500, Dave Marquardt wrote:
-> - Replaced BUG_ON calls with WARN_ON calls with error handling,
->   with calls to a new ibmveth_reset routine, which resets the device.
-> - Added KUnit tests for ibmveth_remove_buffer_from_pool and
->   ibmveth_rxq_get_buffer under new IBMVETH_KUNIT_TEST config option.
-> - Removed unneeded forward declaration of ibmveth_rxq_harvest_buffer.
+This patch suggests the replacement of strncpy with strscpy
+as per Documentation/process/deprecated.
+The strncpy() fails to guarantee NULL termination,
+The function adds zero pads which isn't really convenient for short strings
+as it may cause performance issues.
 
-It will be great if you split this patch into 3 patches according to
-your description.
+strscpy() is a preferred replacement because
+it overcomes the limitations of strncpy mentioned above.
 
-> 
-> Signed-off-by: Dave Marquardt <davemarq@linux.ibm.com>
-> ---
->  drivers/net/ethernet/ibm/Kconfig   |  13 ++
->  drivers/net/ethernet/ibm/ibmveth.c | 242 ++++++++++++++++++++++++++---
->  drivers/net/ethernet/ibm/ibmveth.h |  65 ++++----
->  3 files changed, 269 insertions(+), 51 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/ibm/Kconfig b/drivers/net/ethernet/ibm/Kconfig
-> index c0c112d95b89..4f4b23465c47 100644
-> --- a/drivers/net/ethernet/ibm/Kconfig
-> +++ b/drivers/net/ethernet/ibm/Kconfig
-> @@ -27,6 +27,19 @@ config IBMVETH
->  	  To compile this driver as a module, choose M here. The module will
->  	  be called ibmveth.
->  
-> +config IBMVETH_KUNIT_TEST
-> +	bool "KUnit test for IBM LAN Virtual Ethernet support" if !KUNIT_ALL_TESTS
-> +	depends on KUNIT
-> +	depends on KUNIT=y && IBMVETH=y
-> +	default KUNIT_ALL_TESTS
-> +	help
-> +	  This builds unit tests for the IBM LAN Virtual Ethernet driver.
-> +
-> +	  For more information on KUnit and unit tests in general, please refer
-> +	  to the KUnit documentation in Documentation/dev-tools/kunit/.
-> +
-> +	  If unsure, say N.
-> +
->  source "drivers/net/ethernet/ibm/emac/Kconfig"
->  
->  config EHEA
-> diff --git a/drivers/net/ethernet/ibm/ibmveth.c b/drivers/net/ethernet/ibm/ibmveth.c
-> index 04192190beba..ea201e5cc8bc 100644
-> --- a/drivers/net/ethernet/ibm/ibmveth.c
-> +++ b/drivers/net/ethernet/ibm/ibmveth.c
-> @@ -28,6 +28,7 @@
->  #include <linux/ip.h>
->  #include <linux/ipv6.h>
->  #include <linux/slab.h>
-> +#include <linux/workqueue.h>
->  #include <asm/hvcall.h>
->  #include <linux/atomic.h>
->  #include <asm/vio.h>
-> @@ -39,8 +40,6 @@
->  #include "ibmveth.h"
->  
->  static irqreturn_t ibmveth_interrupt(int irq, void *dev_instance);
-> -static void ibmveth_rxq_harvest_buffer(struct ibmveth_adapter *adapter,
-> -				       bool reuse);
->  static unsigned long ibmveth_get_desired_dma(struct vio_dev *vdev);
->  
->  static struct kobj_type ktype_veth_pool;
-> @@ -231,7 +230,10 @@ static void ibmveth_replenish_buffer_pool(struct ibmveth_adapter *adapter,
->  		index = pool->free_map[free_index];
->  		skb = NULL;
->  
-> -		BUG_ON(index == IBM_VETH_INVALID_MAP);
-> +		if (WARN_ON(index == IBM_VETH_INVALID_MAP)) {
-> +			(void)schedule_work(&adapter->work);
+Compile Tested
 
-What is the purpose of void casting here (and in other places in this
-patch)?
+Signed-off-by: Kevin Paul Reddy Janagari <kevinpaul468@gmail.com>
+---
+ net/tipc/link.c | 2 +-
+ net/tipc/node.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-> +			goto failure2;
+diff --git a/net/tipc/link.c b/net/tipc/link.c
+index 18be6ff4c3db..3ee44d731700 100644
+--- a/net/tipc/link.c
++++ b/net/tipc/link.c
+@@ -2228,7 +2228,7 @@ static int tipc_link_proto_rcv(struct tipc_link *l, struct sk_buff *skb,
+ 			break;
+ 		if (msg_data_sz(hdr) < TIPC_MAX_IF_NAME)
+ 			break;
+-		strncpy(if_name, data, TIPC_MAX_IF_NAME);
++		strscpy(if_name, data, TIPC_MAX_IF_NAME);
+ 
+ 		/* Update own tolerance if peer indicates a non-zero value */
+ 		if (tipc_in_range(peers_tol, TIPC_MIN_LINK_TOL, TIPC_MAX_LINK_TOL)) {
+diff --git a/net/tipc/node.c b/net/tipc/node.c
+index ccf5e427f43e..cb43f2016a70 100644
+--- a/net/tipc/node.c
++++ b/net/tipc/node.c
+@@ -1581,7 +1581,7 @@ int tipc_node_get_linkname(struct net *net, u32 bearer_id, u32 addr,
+ 	tipc_node_read_lock(node);
+ 	link = node->links[bearer_id].link;
+ 	if (link) {
+-		strncpy(linkname, tipc_link_name(link), len);
++		strscpy(linkname, tipc_link_name(link), len);
+ 		err = 0;
+ 	}
+ 	tipc_node_read_unlock(node);
+-- 
+2.39.5
 
-Maybe increment_buffer_failure, or sth that is telling what happen after
-goto.
-
-> +		}
->  
->  		/* are we allocating a new buffer or recycling an old one */
->  		if (pool->skbuff[index])
-> @@ -300,6 +302,7 @@ static void ibmveth_replenish_buffer_pool(struct ibmveth_adapter *adapter,
->  		                 DMA_FROM_DEVICE);
->  	dev_kfree_skb_any(pool->skbuff[index]);
->  	pool->skbuff[index] = NULL;
-> +failure2:
->  	adapter->replenish_add_buff_failure++;
->  
->  	mb();
-> @@ -370,20 +373,36 @@ static void ibmveth_free_buffer_pool(struct ibmveth_adapter *adapter,
->  	}
->  }
->  
-
-[...]
 
