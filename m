@@ -1,131 +1,108 @@
-Return-Path: <netdev+bounces-181473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A06A9A851AD
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 04:44:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 146E6A851C3
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 04:54:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 630261BA2600
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 02:44:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2E8E4A5684
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 02:54:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6F3327BF8B;
-	Fri, 11 Apr 2025 02:44:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EAA927BF94;
+	Fri, 11 Apr 2025 02:54:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KI9TVVpf"
 X-Original-To: netdev@vger.kernel.org
-Received: from spam.asrmicro.com (asrmicro.com [210.13.118.86])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07C0044C94
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 02:44:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.13.118.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CCCD347C7;
+	Fri, 11 Apr 2025 02:54:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744339445; cv=none; b=HTkxjV6oMMwxo29mbE9Yy+BCBD6LQAjJVOFZDEejau5w5ryJvxQsf/vXjBEj3OC5i85AGFWbSlpPyJhBqEABnIRica7CyBJIK6JJmjcMnyXCI6Z85+IbNnOtVrz0mUAYArPhWKtOIvGXWQqVPhN4XVVVS1OZYxGfD/8WRPuP7mg=
+	t=1744340082; cv=none; b=TraAem+ZCfVa7wNshJwW95Xq/HBbFd6x+k26PdAnu/AXXA4xi4SfB25EWM+RQgupcJpXB6wktia+AXfz/aZjrxD7oIl1CD0VSegHTXJpeeGhfhdQUz6IRMkLSMO3q8EPsDgNAnx48+IRqRP2Wex7Hl1uKjxOkfyL9QWTPwNjt74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744339445; c=relaxed/simple;
-	bh=UCa/jybotYpcnxVFXxMFtM0241fEygkIsjF25VUQSpo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cQv3R2ztHsy9vXPT0sZ41eGCefEMtWW9YRDHnkgSay+SaRJLffxVpyEsa//pUL0TmV1O2Y33LVTW3i5rRKNmo9D9YD8rn4knB/EQ5sRM0U6sVTGJASSvGFK/bc/lkBlKQk1MN8KsIi1pYUGeHkMGJ6siSst3zjyDKV20kNjMMAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=asrmicro.com; spf=pass smtp.mailfrom=asrmicro.com; arc=none smtp.client-ip=210.13.118.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=asrmicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asrmicro.com
-Received: from exch02.asrmicro.com (exch02.asrmicro.com [10.1.24.122])
-	by spam.asrmicro.com with ESMTPS id 53B2hkuN041767
-	(version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=FAIL);
-	Fri, 11 Apr 2025 10:43:46 +0800 (GMT-8)
-	(envelope-from huajianyang@asrmicro.com)
-Received: from exch03.asrmicro.com (10.1.24.118) by exch02.asrmicro.com
- (10.1.24.122) with Microsoft SMTP Server (TLS) id 15.0.847.32; Fri, 11 Apr
- 2025 10:43:47 +0800
-Received: from exch03.asrmicro.com ([::1]) by exch03.asrmicro.com ([::1]) with
- mapi id 15.00.0847.030; Fri, 11 Apr 2025 10:43:36 +0800
-From: =?gb2312?B?WWFuZyBIdWFqaWFuo6jR7ruqvaGjqQ==?= <huajianyang@asrmicro.com>
-To: Florian Westphal <fw@strlen.de>
-CC: "pablo@netfilter.org" <pablo@netfilter.org>,
-        "kadlec@netfilter.org"
-	<kadlec@netfilter.org>,
-        "razor@blackwall.org" <razor@blackwall.org>,
-        "idosch@nvidia.com" <idosch@nvidia.com>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "dsahern@kernel.org" <dsahern@kernel.org>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org"
-	<kuba@kernel.org>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "horms@kernel.org" <horms@kernel.org>,
-        "netfilter-devel@vger.kernel.org"
-	<netfilter-devel@vger.kernel.org>,
-        "coreteam@netfilter.org"
-	<coreteam@netfilter.org>,
-        "bridge@lists.linux.dev" <bridge@lists.linux.dev>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: =?gb2312?B?tPC4tDogW1BBVENIXSBuZXQ6IE1vdmUgc3BlY2lmaWMgZnJhZ21lbnRlZCBw?=
- =?gb2312?Q?acket_to_slow=5Fpath_instead_of_dropping_it?=
-Thread-Topic: [PATCH] net: Move specific fragmented packet to slow_path
- instead of dropping it
-Thread-Index: AQHbqe43btIvaVaBvESzU8w5bMigsLOcKc8AgAGQvBA=
-Date: Fri, 11 Apr 2025 02:43:35 +0000
-Message-ID: <717907fcffc7406191a71297fc07f6b3@exch03.asrmicro.com>
-References: <20250410075726.8599-1-huajianyang@asrmicro.com>
- <20250410101824.GA6272@breakpoint.cc>
-In-Reply-To: <20250410101824.GA6272@breakpoint.cc>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1744340082; c=relaxed/simple;
+	bh=Kj630UcPeGWaDB3XzRiRfg5UFlo6vctTLIVOGFTwTJ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Tt8A672WMSGc7e2UItlrTPj5ao6dL2tbbKPlNaODPpR2/IZlSovYuHj5jyVgN00U2zDZclUy3oP9jBX83E6mZHtb77y1ZuA4BSp5k4XQttH5m5WX8Ie/NBIo7XOpc6ddjN4TCkd/YHz5YJzS3ApmcnjmFplQbe/K67MOJr7iYRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KI9TVVpf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E80AC4CEDD;
+	Fri, 11 Apr 2025 02:54:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744340081;
+	bh=Kj630UcPeGWaDB3XzRiRfg5UFlo6vctTLIVOGFTwTJ8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KI9TVVpf/y5TEay5tHqFH7V7Biol4zFduwdUy09wcbugxBslHq3oErASwuXcHuG9K
+	 feVpmWLh4oPy/pTqlyBUKi2WogI3+OslP3IPDipQ3EoJ9Fvav++vXl0rD06IgwD9uo
+	 gl8T+q8YroGd5/ghVUhWCp4TQkC75NAhUXDrnLg9GcVK5Y71be8Kv92j/ekDF3bxOk
+	 FAAK4xIdVC/s7GyncgeWmXMP5HAQ889IGIEy0/QHgd6gnGfQqFz0kfgxjc3UzTPAY/
+	 SxlAQm5fnnZPJVlOIJpfRGudYAWki/00Ry6BMflMtWvrKKAq5A2DwZjE+Vychj9NFJ
+	 35mlYWtYIzkcw==
+Date: Thu, 10 Apr 2025 19:54:40 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>, Shuah Khan
+ <shuah@kernel.org>, sd@queasysnail.net, ryazanov.s.a@gmail.com, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, Xiao Liang
+ <shaw.leon@gmail.com>, steffen.klassert@secunet.com,
+ antony.antony@secunet.com
+Subject: Re: [PATCH net-next v25 01/23] net: introduce OpenVPN Data Channel
+ Offload (ovpn)
+Message-ID: <20250410195440.3ba7ba0f@kernel.org>
+In-Reply-To: <20250407-b4-ovpn-v25-1-a04eae86e016@openvpn.net>
+References: <20250407-b4-ovpn-v25-0-a04eae86e016@openvpn.net>
+	<20250407-b4-ovpn-v25-1-a04eae86e016@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-DNSRBL: 
-X-SPAM-SOURCE-CHECK: pass
-X-MAIL:spam.asrmicro.com 53B2hkuN041767
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-VGhhbmsgeW91IGZvciB5b3VyIHJlcGx5IQ0KDQpJbiBhbiBlYXJsaWVyIGVtYWlsIEkgd3JvdGU6
-DQoNCj4gU29tZSBuZXR3b3JrIGRldmljZXMgdGhhdCB3b3VsZCBub3QgYWJsZSB0byBwaW5nIGxh
-cmdlIHBhY2tldCB1bmRlciANCj4gYnJpZGdlLCBidXQgbGFyZ2UgcGFja2V0IHBpbmcgaXMgc3Vj
-Y2Vzc2Z1bCBpZiBub3QgZW5hYmxlIE5GX0NPTk5UUkFDS19CUklER0UuDQoNCklmIHRoZSBwaW5n
-IHRlc3Qgc3VjY2Vzc2VkIHdpdGhvdXQgTkZfQ09OTlRSQUNLX0JSSURHRSwgaXQgaXMgYmVjYXVz
-ZSB0aGUgbmV0ZGV2IGRvZXNuJ3QgbmVlZCBzdWNoIGEgbGFyZ2UgaGVhZHJvb20gaW4gYWN0dWFs
-IG5ldHdvcmsgZm9yd2FyZGluZy4NCg0KSWYgdGhlIG5ldGRldiByZWFseSBuZWVkIGl0LCB0aGUg
-b3JpZ2luYWwgYnJpZGdlIGZvcndhcmRpbmcgd2lsbCBmYWlsIHRvby4NCg0KTWF5YmUgd2UgbmVl
-ZCByZWNvbmZpZyBvdXIgd2lmaSBuZXRkZXYgb3Igc29tZXRoaW5nIGVsc2UuDQoNClNvIGlzIHRo
-ZSBuZl9icl9pcF9mcmFnbWVudCBkb25lIHRvIGJlIGNvbnNpc3RlbnQgd2l0aCB0aGUgb3JpZ2lu
-YWwgYnJpZGdlIGZvcndhcmRpbmc/DQoNClRoZXJlIGFyZSB0d28gdmVyeSBkaWZmZXJlbnQgaWRl
-YXMgaGVyZToNCg0KT25lIGlzIHRvIHRyeSB0byBtYWludGFpbiB0aGUgc2FtZSB0cmVhdG1lbnQg
-YXMgdGhlIG9yaWdpbmFsIGJyaWRnZSwgYXMgaXQgaXMgY3VycmVudGx5Lg0KDQpUaGUgb3RoZXIg
-aXMgdG8gdHJ5IHRvIGVuc3VyZSB0aGF0IHRoZSBwYWNrZXQgaXMgZm9yd2FyZGVkLg0KDQo+IEkg
-d291bGQgcHJlZmVyIHRvIGtlZXAgYmxhY2tob2xlIGxvZ2ljIGZvciB0aGUgbXR1IHRlc3RzLCBp
-LmUuDQo+ICBpZiAoZmlyc3RfbGVuIC0gaGxlbiA+IG10dSkNCj4gICAgICBnb3RvIGJsYWNraG9s
-ZTsNCg0KQW55d2F5LCB0aGlzIG1vZGlmaWNhdGlvbiBpcyBtb3JlIGFwcHJvcHJpYXRlLg0KDQpC
-ZWNhdXNlIEkgaGF2ZSB0ZXN0ZWQgYnkgY2hhbmdlIG10dSBqdXN0IG5vdywgZ290byBzbG93cGF0
-aCBjYW5ub3QgZm9yd2FyZCBpdCBlaXRoZXIuDQoNCg0KQmVzdCBSZWdhcmRzLA0KSHVhamlhbg0K
-DQotLS0tLdPKvP7Urbz+LS0tLS0NCreivP7IyzogRmxvcmlhbiBXZXN0cGhhbCBbbWFpbHRvOmZ3
-QHN0cmxlbi5kZV0gDQq3osvNyrG85DogMjAyNcTqNNTCMTDI1SAxODoxOA0KytW8/sjLOiBZYW5n
-IEh1YWppYW6jqNHuu6q9oaOpIDxodWFqaWFueWFuZ0Bhc3JtaWNyby5jb20+DQqzrcvNOiBwYWJs
-b0BuZXRmaWx0ZXIub3JnOyBmd0BzdHJsZW4uZGU7IGthZGxlY0BuZXRmaWx0ZXIub3JnOyByYXpv
-ckBibGFja3dhbGwub3JnOyBpZG9zY2hAbnZpZGlhLmNvbTsgZGF2ZW1AZGF2ZW1sb2Z0Lm5ldDsg
-ZHNhaGVybkBrZXJuZWwub3JnOyBlZHVtYXpldEBnb29nbGUuY29tOyBrdWJhQGtlcm5lbC5vcmc7
-IHBhYmVuaUByZWRoYXQuY29tOyBob3Jtc0BrZXJuZWwub3JnOyBuZXRmaWx0ZXItZGV2ZWxAdmdl
-ci5rZXJuZWwub3JnOyBjb3JldGVhbUBuZXRmaWx0ZXIub3JnOyBicmlkZ2VAbGlzdHMubGludXgu
-ZGV2OyBuZXRkZXZAdmdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3Jn
-DQrW98ziOiBSZTogW1BBVENIXSBuZXQ6IE1vdmUgc3BlY2lmaWMgZnJhZ21lbnRlZCBwYWNrZXQg
-dG8gc2xvd19wYXRoIGluc3RlYWQgb2YgZHJvcHBpbmcgaXQNCg0KSHVhamlhbiBZYW5nIDxodWFq
-aWFueWFuZ0Bhc3JtaWNyby5jb20+IHdyb3RlOg0KPiAtLS0gYS9uZXQvYnJpZGdlL25ldGZpbHRl
-ci9uZl9jb25udHJhY2tfYnJpZGdlLmMNCj4gKysrIGIvbmV0L2JyaWRnZS9uZXRmaWx0ZXIvbmZf
-Y29ubnRyYWNrX2JyaWRnZS5jDQo+IEBAIC02MSwxOCArNjEsMTQgQEAgc3RhdGljIGludCBuZl9i
-cl9pcF9mcmFnbWVudChzdHJ1Y3QgbmV0ICpuZXQsIHN0cnVjdCBzb2NrICpzaywNCj4gIAkJc3Ry
-dWN0IHNrX2J1ZmYgKmZyYWc7DQo+ICANCj4gIAkJaWYgKGZpcnN0X2xlbiAtIGhsZW4gPiBtdHUg
-fHwNCj4gLQkJICAgIHNrYl9oZWFkcm9vbShza2IpIDwgbGxfcnMpDQo+IC0JCQlnb3RvIGJsYWNr
-aG9sZTsNCg0KSSB3b3VsZCBwcmVmZXIgdG8ga2VlcCBibGFja2hvbGUgbG9naWMgZm9yIHRoZSBt
-dHUgdGVzdHMsIGkuZS4NCiAgaWYgKGZpcnN0X2xlbiAtIGhsZW4gPiBtdHUpDQogICAgICBnb3Rv
-IGJsYWNraG9sZTsNCg0Kc2FtZSBmb3IgdGhlIGZyYWctPmxlbiB0ZXN0IGluIHRoZSBza2Jfd2Fs
-a19mcmFncyBsb29wLg0KRnJvbSB3aGF0IEkgdW5kZXJzdG9vZCB0aGUgcHJvYmxlbSBpcyBvbmx5
-IGJlY2F1c2Ugb2YgdGhlIGxvd2VyIGRldmljZXMnIGhlYWRyb29tIHJlcXVpcmVtZW50Lg0K
+On Mon, 07 Apr 2025 21:46:09 +0200 Antonio Quartulli wrote:
+> +static int ovpn_netdev_notifier_call(struct notifier_block *nb,
+> +				     unsigned long state, void *ptr)
+> +{
+> +	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
+> +
+> +	if (!ovpn_dev_is_valid(dev))
+> +		return NOTIFY_DONE;
+> +
+> +	switch (state) {
+> +	case NETDEV_REGISTER:
+> +		/* add device to internal list for later destruction upon
+> +		 * unregistration
+> +		 */
+> +		break;
+> +	case NETDEV_UNREGISTER:
+> +		/* can be delivered multiple times, so check registered flag,
+> +		 * then destroy the interface
+> +		 */
+> +		break;
+> +	case NETDEV_POST_INIT:
+> +	case NETDEV_GOING_DOWN:
+> +	case NETDEV_DOWN:
+> +	case NETDEV_UP:
+> +	case NETDEV_PRE_UP:
+> +	default:
+> +		return NOTIFY_DONE;
+> +	}
+
+Why are you using a notifier to get events for your own device?
+
+> +	return NOTIFY_OK;
+> +}
+
+> +MODULE_DESCRIPTION("OpenVPN data channel offload (ovpn)");
+> +MODULE_AUTHOR("(C) 2020-2025 OpenVPN, Inc.");
+
+Companies can't author code, only people. Note that MODULE_AUTHOR()
+is optional.
 
