@@ -1,117 +1,91 @@
-Return-Path: <netdev+bounces-181822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2E63A86845
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 23:30:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A7C4A8684F
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 23:31:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4C701BA649A
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 21:30:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39AF03B1C0B
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 21:30:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0847829C325;
-	Fri, 11 Apr 2025 21:29:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 185CA29AB04;
+	Fri, 11 Apr 2025 21:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="fiXwQ/R4"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="mCwF0l8t"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69ADC29B20D
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 21:29:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D90428F948;
+	Fri, 11 Apr 2025 21:30:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744406993; cv=none; b=EQ8e7Q4c+/ftAL+pWZAwpBeys0d/RUukOZ7urJw3fRyd58UJiV03xmK42coiYooTSKA7JMy9X02+P0G42r98XW9+YHYP7JXHxn7nLugW3/dX/znnhdSaXMhtAJbmGHXPwJxa+bjkiqrW3g+567Cq6DbWPicBuSqRjZrfidrWm1M=
+	t=1744407020; cv=none; b=QUCTZS4dv1mztj3kvsmJ14j18mG3dAYMlKUJY16P+8T1T/HT9UbLJ/vu3svsgn2ZWZP4VMwMhG/cg75JzdZDPdaCeI0z56YP3ev2RXj/dcvQqDcAiVFJQqKBbW+DQCFh920KLFHa8xZNKdAviL6rIu477X59mWVtgCQ/m8op/fs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744406993; c=relaxed/simple;
-	bh=xGlmk+WcSn/rBCIknjQR4+iAPzxuubI4s2uuH8po28s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cszJs4kZWMFSC8by87WqN5G11XHh2B/MeTQ94HognP5dxmzNWgLQSQb2+HzgLJHnByK1w/cOU09QSZOqmxH47Up0WLjN8RxZAi3fvVwZhl+FltGMSUBd6lFFiz2uJwQJcYf7ihpjo5OvKAwi9wnhIgYjScypdQqYBjXHe0GWMAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=fiXwQ/R4; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=CGBJ6J9Ke4YhWqBt6NYgRofc9jx/kLx5Q4eLTh5q0D0=; b=fiXwQ/R4IIrqpeJ2q6+P3utjMy
-	aqm8WtpK6zZ/jadpoOLKRgh3zZHb5pP0BME7hLOcrezdrfhu03AuKrAj2ahwZGrOsIoSyjFDkLGyt
-	Rj0mj6T7A29X9GckDCvQoUYLdi3m3oCyoIXtFpFsDKDKxLddWgAr8bFfEJDCC0zZ5wMcWNTLXMufY
-	E9utEORg1Ir+JJwyCaLEN2HS2tt3+JhvvilkSsFC8cn4JFACu9I/qaIDNNQgItj19L0S+4AVzW2er
-	RBa7aN9+y9uzLQi+N3oWUJlqPDplY6Q5O9vKdKxhy8DKx/mQfEcckX5/o4AOqTF2dx/2YK6jP7CZG
-	4p0W8dXg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54796)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u3LwY-0003sn-0v;
-	Fri, 11 Apr 2025 22:29:47 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u3LwW-0004x6-0C;
-	Fri, 11 Apr 2025 22:29:44 +0100
-Date: Fri, 11 Apr 2025 22:29:43 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH RFC net-next 1/5] net: mvpp2: add support for hardware
- timestamps
-Message-ID: <Z_mJx1qqpYVngnTb@shell.armlinux.org.uk>
-References: <Z_mI94gkKkBslWmv@shell.armlinux.org.uk>
- <E1u3LtP-000COv-Ut@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1744407020; c=relaxed/simple;
+	bh=XVxw6LOgWRpGJiGsthLSryBgD3+rmO3MGOkkcc3ZEko=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=u3jgaTMxMM2BLtrBOevP5HmC2tIACMzWKUfxuiCvxNPC2uLkr1jWr+ZVi15Uk+PHRuqOo5Fi43HRLYXKNvyCP56zwhD2Hryc3amsWSh1TF9Zbpl5nr0UBfoYRyg7wcHKjMONsNebs4J06WBnMPIYrkjwxjdLSr8NvZKwBt3q9Zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=mCwF0l8t; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744407019; x=1775943019;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=6s0hdPerFls8LLlhcTti2w0fnB1wx/SYJN/ngrhN6LE=;
+  b=mCwF0l8t2OHYD13w6f7NHTc0pHL2w0AwKpQ1c7Soza0az2zvGHL1o4VG
+   I7iBzcnYlIkfL9gHmPbz6xSkNQmAeywfI4+mUd0ku+eFAQXJhz9CHN9VX
+   wgIVHQl/soG2kBE5JdPHd8qI5Oa63ci9mp8fI9B/21u/yeY5E/44qUJ6w
+   8=;
+X-IronPort-AV: E=Sophos;i="6.15,206,1739836800"; 
+   d="scan'208";a="713178947"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2025 21:30:14 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:9921]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.21.195:2525] with esmtp (Farcaster)
+ id 5dee78f0-868d-480d-8c35-29481329231e; Fri, 11 Apr 2025 21:30:13 +0000 (UTC)
+X-Farcaster-Flow-ID: 5dee78f0-868d-480d-8c35-29481329231e
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 11 Apr 2025 21:30:06 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.119.240.29) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 11 Apr 2025 21:30:03 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <leitao@debian.org>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, Kuniyuki Iwashima
+	<kuniyu@amazon.com>
+Subject: Re: [PATCH net-next 6/9] ipv6: Use nlmsg_payload in inet6_valid_dump_ifaddr_req
+Date: Fri, 11 Apr 2025 14:29:54 -0700
+Message-ID: <20250411212955.68593-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250411-nlmsg-v1-6-ddd4e065cb15@debian.org>
+References: <20250411-nlmsg-v1-6-ddd4e065cb15@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1u3LtP-000COv-Ut@rmk-PC.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D038UWC004.ant.amazon.com (10.13.139.229) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Fri, Apr 11, 2025 at 10:26:31PM +0100, Russell King wrote:
-> Add support for hardware timestamps in (e.g.) the PHY by calling
-> skb_tx_timestamp() as close as reasonably possible to the point that
-> the hardware is instructed to send the queued packets.
+From: Breno Leitao <leitao@debian.org>
+Date: Fri, 11 Apr 2025 10:00:53 -0700
+> Leverage the new nlmsg_payload() helper to avoid checking for message
+> size and then reading the nlmsg data.
 > 
-> Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-This patch dates from prior to me joining Oracle, and is unchanged
-apart from normal rebasing.
-
-> ---
->  drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-> index 416a926a8281..e3f8aa139d1e 100644
-> --- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-> +++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-> @@ -4439,6 +4439,8 @@ static netdev_tx_t mvpp2_tx(struct sk_buff *skb, struct net_device *dev)
->  		txq_pcpu->count += frags;
->  		aggr_txq->count += frags;
->  
-> +		skb_tx_timestamp(skb);
-> +
->  		/* Enable transmit */
->  		wmb();
->  		mvpp2_aggr_txq_pend_desc_add(port, frags);
-> -- 
-> 2.30.2
-> 
-> 
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
