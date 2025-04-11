@@ -1,73 +1,61 @@
-Return-Path: <netdev+bounces-181827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7FC4A86854
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 23:31:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84249A86852
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 23:31:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AEF49C18AA
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 21:30:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BAFD189B7C5
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 21:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2663F29B237;
-	Fri, 11 Apr 2025 21:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8950829CB28;
+	Fri, 11 Apr 2025 21:31:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="rOlpn+SF"
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="TqMF6yKQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D3C528CF60
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 21:31:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24637293B6E
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 21:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744407065; cv=none; b=RmyL8cWVgScYx1ls/QbS1fXirVRzhtYDEySt4C2Bd/DAiDo6Cgj7dFHZb2QcR2qC5SkcPpR8CP8XuWG7o9GplEY5gFNbWZ47osLt8gMXhrWmth1gBQsSuVfOEbGMdNRmDveTBur+IZYsMk2fWX+lBJy3WSbUCNjSIF0Xhp9k7hc=
+	t=1744407086; cv=none; b=M2O6ZPaIzzLZBEd42z6UtHTNv6tK8pznT3cgGRhabmcbU9udJnJBrYBrkgtuWtfuLUrk1scNDD/RKcS5oaV6eZBRIVPNgVql1hPakGDB2LDknpk026ku20F7TF185T/bH9SVtZSaLvvddxTEMR0xkj/jIs2+2vt+gz5sxRRmDT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744407065; c=relaxed/simple;
-	bh=q4Mx8C0N4oxivl40Jwc5N2ASBlhM17dqchZeV3gA2ng=;
+	s=arc-20240116; t=1744407086; c=relaxed/simple;
+	bh=fbIAzUNZ3TK4HGT1AClmfn49H8txlEyt7S+52oGkJWs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IxSqTIV1z7cYGfnxYzgSik7+wTt9YYelr9w66qldw313e+1yjoh3Xn1AYM+WcItkwkLpsCG+XiLqFGmK5hSGYifuORpNncFPgIC2F5QH1RIYStQh7rSEhX6ZRaXGEFoztMbcxw8Z3xElTQUpIYIQC8SqeMNDRxdPdy02IBezMps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=rOlpn+SF; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=zOebsP5Wd+9+esFUfRPcHA4C39JkYxV8/m9rWyUv9u4=; b=rOlpn+SF1rNu0Hsq/7B5pIolU5
-	i55U0QEAJ7/xAk7GS0ImfjOQQHsMuUZzdrv7oyx2dupZZIFgl8S5Sc77pkYhoeIss5VJxI8b8Su2B
-	O4dcRWdbyJhqR056X/Vp2ar5TaghU7YypRkiWf739alLwjgKPIa0zrAXMmqYkfbuUd7P3/7qhQ8ZK
-	wv4EtWFf3nb1k4Qy6pZKIEm4bnKUHchhFQqLZRn5V5ojEA2YLex1yxLSr7WGltbIjMhyLPyDXkEQK
-	0p4DqyR5dgfKaW9R8RU1cPTk7xh5w+aif6AnldXmHdtloJ7fZf5wpzJNp02hKcnvCTE7Z0iUag+9V
-	YRSSuUJA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45166)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u3Lxi-0003tD-2C;
-	Fri, 11 Apr 2025 22:30:58 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u3Lxh-0004xN-15;
-	Fri, 11 Apr 2025 22:30:57 +0100
-Date: Fri, 11 Apr 2025 22:30:57 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>
-Subject: Re: [PATCH RFC net-next 0/5] Marvell PTP support
-Message-ID: <Z_mKEVwp1tXMsJdr@shell.armlinux.org.uk>
-References: <Z_mI94gkKkBslWmv@shell.armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=XSwYpVBa3wX2VdCcEBKInnPlYIkUfvRIJpHDDL4TFXhccD6oHQCKSD+I78A0Z1vLWddLJCEoHo3/AuL+J8PnEIfsJJEPiuRPctIGnRcCB1PZL1VxOCfzkU06Vf+jHNL5bzZbKqBhlzJM3y4+UbH6etIj404U4PZn6i6/ov0bj0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=TqMF6yKQ; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=eANgi2y0ed10Jn7+5U/LGgbRCBvTRX/JcwMzCgW3s7I=; b=TqMF6yKQeNkdTOehrK5khooulx
+	H0d0gB2Jh5cB6N4J1JoNS/pXG8P0vkshaSQ1ImrlIg/TIS4luV+i2cXqCMM36T14ftNIUcPyWWFBL
+	g2jBc6IkZM2ypMkSrjKYeWe82+hMSOlA6p2nBZ7AJ0YX6E1xHwZRLDTbZQDo0ULywwKNcjBHx7M4m
+	DPEnnbL9nDa0dMD2Eyjm2CwgdvI3E9iNr3CGuTizFcNn6ySG27fQHNMk1+C42t48QmOJfDfZM0Bhm
+	dieACbh7REuxXqm7kwsP5HhPyLomszCElx73o3LZ6Hn9wdEiVwGMlIfDoPz+Z8s/9/CTRpwJk5P2/
+	zHYRR9+Q==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <carnil@debian.org>)
+	id 1u3Lxt-000pXm-4l; Fri, 11 Apr 2025 21:31:09 +0000
+Received: by eldamar.lan (Postfix, from userid 1000)
+	id 5908BBE2DE0; Fri, 11 Apr 2025 23:31:08 +0200 (CEST)
+Date: Fri, 11 Apr 2025 23:31:08 +0200
+From: Salvatore Bonaccorso <carnil@debian.org>
+To: Michal Kubecek <mkubecek@suse.cz>, netdev@vger.kernel.org
+Cc: asciiwolf@seznam.cz, Petter Reinholdtsen <pere@hungry.com>
+Subject: Re: [PATCH ethtool] Set type property to console-application for
+ provided AppStream metainfo XML
+Message-ID: <Z_mKHHSNscT09VwJ@eldamar.lan>
+References: <20250411141023.14356-2-carnil@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,99 +64,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z_mI94gkKkBslWmv@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250411141023.14356-2-carnil@debian.org>
+X-Debian-User: carnil
 
-On Fri, Apr 11, 2025 at 10:26:15PM +0100, Russell King (Oracle) wrote:
-> Hi,
-> 
-> This series is a work in progress, and represents the current state of
-> things, superseding Kory's patches which were based in a very old
-> version of my patches - and my patches were subsequently refactored
-> and further developed about five years ago. Due to them breaking
-> mvpp2 if merged, there was no point in posting them until such time
-> that the underlying issues with PTP were resolved - and they now have
-> been.
-> 
-> Marvell re-uses their PTP IP in several of their products - PHYs,
-> switches and even some ethernet MACs contain the same IP. It really
-> doesn't make sense to duplicate the code in each of these use cases.
-> 
-> Therefore, this series introduces a Marvell PTP core that can be
-> re-used - a TAI module, which handles the global parts of the PTP
-> core, and the TS module, which handles the per-port timestamping.
-> 
-> I will note at this point that although the Armada 388 TRM states that
-> NETA contains the same IP, attempts to access the registers returns
-> zero, and it is not known if that is due to the board missing something
-> or whether it isn't actually implemented. I do have some early work
-> re-using this, but when I discovered that the TAI registers read as
-> zero and wouldn't accept writes, I haven't progressed that.
-> 
-> Today, I have converted the mv88e6xxx DSA code to use the Marvell TAI
-> module from patch 1, and for the sake of getting the code out there,
+Hi Michal,
 
-Correction: patch 2.
-
-> I have included the "hacky" patches in this series - with the issues
-> with DSA VLANs that I reported this evening and subsequently
-> investigated, I've not had any spare time to properly prepare that
-> part of this series. (Being usurped from phylink by stmmac - for which
-> I have a big stack of patches that I can't get out because of being
-> usurped, and then again by Marvell PTP, and then again by DSA VLAN
-> stuff... yea, I'm feeling like I have zero time to do anything right
-> now.) The mv88e6xxx DSA code still needs to be converted to use the
-> Marvell TS part of patch 1, but I won't be able to test that after
-> Sunday, and I'm certainly not working on this over this weekend.
+On Fri, Apr 11, 2025 at 04:10:24PM +0200, Salvatore Bonaccorso wrote:
+> As pointed out in the Debian downstream report, as ethtool is a
+> command-line tool the XML root myst have the type property set to
+> console-application.
 > 
-> Anyway, this is what it is - and this is likely the state of it for
-> a while yet, because I won't be able to sensibly access the hardware
-> for testing for an undefined period of time.
+> Additionally with the type propety set to desktop, ethtool is user
+> uninstallable via GUI (such as GNOME Software or KDE Discover).
 > 
-> The PHY parts seem to work, although not 100% reliably, with the
-> occasional overrun, particularly on the receive side. I'm not sure
-> whether this is down to a hardware bug or not, or MDIO driver bug,
-> because we certainly aren't missing timestamping a SKB. This has been
-> tested at L2 and L4.
+> Fixes: 02d505bba6fe ("Add AppStream metainfo XML with modalias documented supported hardware.")
+> Reported-by: asciiwolf@seznam.cz
+> Cc: Petter Reinholdtsen <pere@hungry.com>
+> Link: https://bugs.debian.org/1102647
+> Link: https://bugzilla.redhat.com/show_bug.cgi?id=2359069
+> Link: https://freedesktop.org/software/appstream/docs/sect-Metadata-ConsoleApplication.html
+> Signed-off-by: Salvatore Bonaccorso <carnil@debian.org>
+> ---
+>  org.kernel.software.network.ethtool.metainfo.xml | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> I'm not sure which packets we should be timestamping (remembering
-> that this is global config across all ports.)
-> https://chronos.uk/wordpress/wp-content/uploads/TechnicalBrief-IEEE1588v2PTP.pdf
-> suggests Sync, Delay_req and Delay_resp need to be timestamped,
-> possibly PDelay_req and PDelay_resp as well, but I haven't seen
-> those produced by PTPDv2 nor ptp4l.
-> 
-> There's probably other stuff I should mention, but as I've been at
-> this into the evening for almost every day this week, I'm mentally
-> exhausted.
-> 
-> Sorry also if this isn't coherent.
-> 
->  drivers/net/dsa/mv88e6xxx/Kconfig               |   1 +
->  drivers/net/dsa/mv88e6xxx/chip.h                |  26 +-
->  drivers/net/dsa/mv88e6xxx/hwtstamp.c            |  17 +-
->  drivers/net/dsa/mv88e6xxx/hwtstamp.h            |   1 +
->  drivers/net/dsa/mv88e6xxx/ptp.c                 | 519 ++++++++-------------
->  drivers/net/dsa/mv88e6xxx/ptp.h                 |   1 -
->  drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c |   2 +
->  drivers/net/phy/Kconfig                         |  13 +
->  drivers/net/phy/Makefile                        |   1 +
->  drivers/net/phy/marvell.c                       |  21 +-
->  drivers/net/phy/marvell_ptp.c                   | 307 ++++++++++++
->  drivers/net/phy/marvell_ptp.h                   |  21 +
->  drivers/ptp/Kconfig                             |   4 +
->  drivers/ptp/Makefile                            |   2 +
->  drivers/ptp/ptp_marvell_tai.c                   | 449 ++++++++++++++++++
->  drivers/ptp/ptp_marvell_ts.c                    | 593 ++++++++++++++++++++++++
->  include/linux/marvell_ptp.h                     | 129 ++++++
->  17 files changed, 1764 insertions(+), 343 deletions(-)
-> 
+> diff --git a/org.kernel.software.network.ethtool.metainfo.xml b/org.kernel.software.network.ethtool.metainfo.xml
+> index efe84c17e4cd..c31cae4bede6 100644
+> --- a/org.kernel.software.network.ethtool.metainfo.xml
+> +++ b/org.kernel.software.network.ethtool.metainfo.xml
+> @@ -1,5 +1,5 @@
+>  <?xml version="1.0" encoding="UTF-8"?>
+> -<component type="desktop">
+> +<component type="console-application">
+>    <id>org.kernel.software.network.ethtool</id>
+>    <metadata_license>MIT</metadata_license>
+>    <name>ethtool</name>
 > -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
-> 
+> 2.49.0
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+ignore that please as Daniel and Petter have the proper proposal
+building up.
+
+Thanks Daniel and Petter.
+
+Petter, once it's commited upstream I will cherry-pick back for
+Debian.
+
+Regards,
+Salvatore
 
