@@ -1,60 +1,62 @@
-Return-Path: <netdev+bounces-181561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBE5AA8586C
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 11:54:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96D21A85870
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 11:54:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8EF91B8382D
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 09:53:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A05C1BC1C08
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 09:54:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64267298CCB;
-	Fri, 11 Apr 2025 09:53:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6170629AAEF;
+	Fri, 11 Apr 2025 09:53:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UchL1O98"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F3mdGOh/"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D95827CCC2
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 09:53:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56610298CDE
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 09:53:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744365203; cv=none; b=f/tIaKQ1e4SiLj8Th+FnAxRqnDc03QsSDX1jBILEP112NhfhKhgCrtRm1fpaX0Mo5lsG0ydjyXt/X/hxEdiwoMMCEZ4g0e/Rk+s/M6IqMyGstVBEyXa308XrRJabxTVJoJESei4fw0BAiEzOvOQhHkefqu5nZFv/pBs7CVHdEA8=
+	t=1744365206; cv=none; b=m5eaaUMNp/Nkcxnq5lG3LrJdERw30FrnkE8c+Ju8FIzhLEHd6yUrM3qqhABLTLKaBAJ8+2cwlXC1HBx5iX50UzCqiXMqJoSd3O39tIJteI/Q0l2VLZMVgbphBpYeYa2VfO8iHEFRkwLWwcBSh3FRn3KGIgYzZQXTuKROYwG2B7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744365203; c=relaxed/simple;
-	bh=yKoA9Namj7yNT7c8W3MYzYbO+Ykh9lszAVjUm4BhDSc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h063ZVDEz/Xb+EwlI6hq3n/G1bXZCdmSJWeZc57TfuX/STecgRQ+joAQ+7V0rWio5fJkH4uMIo9IqjEguNjz6/Ooc960Thfzp/K4TyfrdgQxycAzXlE7+2XDOQqf+iZPaBHh8ClJT7fN4Q84t1h3f6ZoJ1peq75XWMgW9pWtofs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UchL1O98; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1744365206; c=relaxed/simple;
+	bh=4rjnrKSxX8HaNn/73iXYKPvNT0PQ3HoDi0UZVDDqFQI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ivmjIEqWVyj/Bj0Rm8Lhsy2ixewpI6AIMKyLKlqo+5aOyT2A9iu0cf+aYdVc5jSfYrbB7eJFh7Emk+nTlSlpxrjE7h+bdA1zoD8NrSgz0MNUaeAWNCt1/frYRppci6CQUTzJ4r8lpqfWF9CMiLn4P2/7xuJc9jJ8wICQJYeyFw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F3mdGOh/; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744365198;
+	s=mimecast20190719; t=1744365203;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=xvO7V3S78cYx1yzlKhGUaydwdvq61boBgSY2GyqChTs=;
-	b=UchL1O98ul7TlR6Sb15VFMXO3/B0sEeS0bwzhK6lTfm31CMYXOxurRlyxHtocVHgzR1s/V
-	//kKUc86coCCjTD6UfDLnRYyJ2/lFb/D0MxOvqj+634zwVesgBg5jc0KUA8yN2lrhXuN6a
-	qlHNDnhSu1p8U4vQb7g9klEHlsEX6Os=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=basKNt/dVdZJlhN9BG9jPJBE93HbNbifjaEI7gA+qSw=;
+	b=F3mdGOh/WZ6Xz7o2PD5sOLEVwYdxCY0WlLp5B2WAJqxKM8smyuo0XfolmPZ4agE1KMe0Et
+	EOS8g6Bbkb2UZ6i39Pli2ZiCfKFnlOTCyWaGWBlH7rJsKez10LTLCiRJRuh5mRXgEUvAAx
+	aeN4O5Ihf5W7RGkxJ1NUZKwe/aTCy+k=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-507-_oP_b7wcODiMSj2sfVuYwg-1; Fri,
- 11 Apr 2025 05:53:13 -0400
-X-MC-Unique: _oP_b7wcODiMSj2sfVuYwg-1
-X-Mimecast-MFC-AGG-ID: _oP_b7wcODiMSj2sfVuYwg_1744365191
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-91-OIVXdlqLPPqF2TCpjbaPPA-1; Fri,
+ 11 Apr 2025 05:53:17 -0400
+X-MC-Unique: OIVXdlqLPPqF2TCpjbaPPA-1
+X-Mimecast-MFC-AGG-ID: OIVXdlqLPPqF2TCpjbaPPA_1744365196
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AF8171956050;
-	Fri, 11 Apr 2025 09:53:10 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AAC50195609E;
+	Fri, 11 Apr 2025 09:53:15 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.40])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1A1B91955BF2;
-	Fri, 11 Apr 2025 09:53:06 +0000 (UTC)
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 14BFF1809B65;
+	Fri, 11 Apr 2025 09:53:11 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -68,9 +70,11 @@ Cc: David Howells <dhowells@redhat.com>,
 	Chuck Lever <chuck.lever@oracle.com>,
 	linux-afs@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 00/14] rxrpc, afs: Add AFS GSSAPI security class to AF_RXRPC and kafs
-Date: Fri, 11 Apr 2025 10:52:45 +0100
-Message-ID: <20250411095303.2316168-1-dhowells@redhat.com>
+Subject: [PATCH net-next v3 01/14] rxrpc: kdoc: Update function descriptions and add link from rxrpc.rst
+Date: Fri, 11 Apr 2025 10:52:46 +0100
+Message-ID: <20250411095303.2316168-2-dhowells@redhat.com>
+In-Reply-To: <20250411095303.2316168-1-dhowells@redhat.com>
+References: <20250411095303.2316168-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,132 +82,268 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-Here's a set of patches to add basic support for the AFS GSSAPI security
-class to AF_RXRPC and kafs.  It provides transport security for keys that
-match the security index 6 (YFS) for connections to the AFS fileserver and
-VL server.
+Update the kerneldoc function descriptions to add "Return:" sections for
+AF_RXRPC exported functions that have return values to stop the kdoc
+builder from throwing warnings.
 
-Note that security index 4 (OpenAFS) can also be supported using this, but
-it needs more work as it's slightly different.
+Also add links from the rxrpc.rst API doc to add a function API reference
+at the end.  (Note that the API doc really needs updating, but that's
+beyond this patchset).
 
-The patches also provide the ability to secure the callback channel -
-connections from the fileserver back to the client that are used to pass
-file change notifications, amongst other things.  When challenged by the
-fileserver, kafs will generate a token specific to that server and include
-it in the RESPONSE packet as the appdata.  The server then extracts this
-and uses it to send callback RPC calls back to the client.
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: Simon Horman <horms@kernel.org>
+cc: linux-afs@lists.infradead.org
+cc: netdev@vger.kernel.org
+---
+ Documentation/networking/rxrpc.rst | 11 +++++++++++
+ net/rxrpc/af_rxrpc.c               | 21 +++++++++++++++++----
+ net/rxrpc/key.c                    |  2 ++
+ net/rxrpc/peer_object.c            | 22 ++++++++++++++++++----
+ net/rxrpc/recvmsg.c                | 12 ++++++------
+ net/rxrpc/sendmsg.c                |  7 +++++--
+ net/rxrpc/server_key.c             |  2 ++
+ 7 files changed, 61 insertions(+), 16 deletions(-)
 
-It can also be used to provide transport security on the callback channel,
-but a further set of patches is required to provide the token and key to
-set that up when the client responds to the fileserver's challenge.
-
-This makes use of the previously added crypto-krb5 library that is now
-upstream (last commit fc0cf10c04f4).
-
-This series of patches consist of the following parts:
-
- (0) Update kdoc comments to remove some kdoc builder warnings.
-
- (1) Push reponding to CHALLENGE packets over to recvmsg() or the kernel
-     equivalent so that the application layer can include user-defined
-     information in the RESPONSE packet.  In a follow-up patch set, this
-     will allow the callback channel to be secured by the AFS filesystem.
-
- (2) Add the AF_RXRPC RxGK security class that uses a key obtained from the
-     AFS GSS security service to do Kerberos 5-based encryption instead of
-     pcbc(fcrypt) and pcbc(des).
-
- (3) Add support for callback channel encryption in kafs.
-
- (4) Provide the test rxperf server module with some fixed krb5 keys.
-
-David
-
-The patches can be found on this branch also:
-
-	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=rxrpc-next
-
-CHANGES
-=======
-ver #3)
- - Fixed a leak in an error return path.
- - Added a patch to remove/adjust some __acquires() and __releases()
-   annotations to remove some checker warnings[*].
- - Removed the additional __releases() notifications from oob.c.
-
- [*] Note that lock_sock() and release_sock() should probably have some
-     sort of lock annotation so they can be checked.
-
-ver #2)
- - Fix use of %zx instead of %lx.
- - Add a patch to add 'Return:' descriptions into existing kdoc comments.
- - Add 'Return:' descriptions into new kdoc comments.
- - Add a function API ref at the end of rxrpc.rst.
-
-David Howells (14):
-  rxrpc: kdoc: Update function descriptions and add link from rxrpc.rst
-  rxrpc: Pull out certain app callback funcs into an ops table
-  rxrpc: Remove some socket lock acquire/release annotations
-  rxrpc: Allow CHALLENGEs to the passed to the app for a RESPONSE
-  rxrpc: Add the security index for yfs-rxgk
-  rxrpc: Add YFS RxGK (GSSAPI) security class
-  rxrpc: rxgk: Provide infrastructure and key derivation
-  rxrpc: rxgk: Implement the yfs-rxgk security class (GSSAPI)
-  rxrpc: rxgk: Implement connection rekeying
-  rxrpc: Allow the app to store private data on peer structs
-  rxrpc: Display security params in the afs_cb_call tracepoint
-  afs: Use rxgk RESPONSE to pass token for callback channel
-  rxrpc: Add more CHALLENGE/RESPONSE packet tracing
-  rxrpc: rxperf: Add test RxGK server keys
-
- Documentation/networking/rxrpc.rst |   15 +
- fs/afs/Kconfig                     |    1 +
- fs/afs/Makefile                    |    1 +
- fs/afs/cm_security.c               |  340 +++++++
- fs/afs/internal.h                  |   20 +
- fs/afs/main.c                      |    1 +
- fs/afs/misc.c                      |   27 +
- fs/afs/rxrpc.c                     |   40 +-
- fs/afs/server.c                    |    2 +
- include/crypto/krb5.h              |    5 +
- include/keys/rxrpc-type.h          |   17 +
- include/net/af_rxrpc.h             |   51 +-
- include/trace/events/afs.h         |   11 +-
- include/trace/events/rxrpc.h       |  163 +++-
- include/uapi/linux/rxrpc.h         |   77 +-
- net/rxrpc/Kconfig                  |   23 +
- net/rxrpc/Makefile                 |    6 +-
- net/rxrpc/af_rxrpc.c               |   93 +-
- net/rxrpc/ar-internal.h            |   82 +-
- net/rxrpc/call_accept.c            |   34 +-
- net/rxrpc/call_object.c            |   24 +-
- net/rxrpc/conn_event.c             |  134 ++-
- net/rxrpc/conn_object.c            |    2 +
- net/rxrpc/insecure.c               |   13 +-
- net/rxrpc/io_thread.c              |   12 +-
- net/rxrpc/key.c                    |  187 ++++
- net/rxrpc/oob.c                    |  379 ++++++++
- net/rxrpc/output.c                 |   60 +-
- net/rxrpc/peer_object.c            |   22 +-
- net/rxrpc/protocol.h               |   20 +
- net/rxrpc/recvmsg.c                |  132 ++-
- net/rxrpc/rxgk.c                   | 1367 ++++++++++++++++++++++++++++
- net/rxrpc/rxgk_app.c               |  285 ++++++
- net/rxrpc/rxgk_common.h            |  139 +++
- net/rxrpc/rxgk_kdf.c               |  288 ++++++
- net/rxrpc/rxkad.c                  |  296 +++---
- net/rxrpc/rxperf.c                 |   78 +-
- net/rxrpc/security.c               |    3 +
- net/rxrpc/sendmsg.c                |   25 +-
- net/rxrpc/server_key.c             |   42 +
- 40 files changed, 4272 insertions(+), 245 deletions(-)
- create mode 100644 fs/afs/cm_security.c
- create mode 100644 net/rxrpc/oob.c
- create mode 100644 net/rxrpc/rxgk.c
- create mode 100644 net/rxrpc/rxgk_app.c
- create mode 100644 net/rxrpc/rxgk_common.h
- create mode 100644 net/rxrpc/rxgk_kdf.c
+diff --git a/Documentation/networking/rxrpc.rst b/Documentation/networking/rxrpc.rst
+index e807e18ba32a..2680abd1cb26 100644
+--- a/Documentation/networking/rxrpc.rst
++++ b/Documentation/networking/rxrpc.rst
+@@ -1172,3 +1172,14 @@ adjusted through sysctls in /proc/net/rxrpc/:
+      header plus exactly 1412 bytes of data.  The terminal packet must contain
+      a four byte header plus any amount of data.  In any event, a jumbo packet
+      may not exceed rxrpc_rx_mtu in size.
++
++
++API Function Reference
++======================
++
++.. kernel-doc:: net/rxrpc/af_rxrpc.c
++.. kernel-doc:: net/rxrpc/key.c
++.. kernel-doc:: net/rxrpc/peer_object.c
++.. kernel-doc:: net/rxrpc/recvmsg.c
++.. kernel-doc:: net/rxrpc/sendmsg.c
++.. kernel-doc:: net/rxrpc/server_key.c
+diff --git a/net/rxrpc/af_rxrpc.c b/net/rxrpc/af_rxrpc.c
+index 86873399f7d5..2841ce72d7b8 100644
+--- a/net/rxrpc/af_rxrpc.c
++++ b/net/rxrpc/af_rxrpc.c
+@@ -265,7 +265,10 @@ static int rxrpc_listen(struct socket *sock, int backlog)
+  * @gfp: Allocation flags
+  *
+  * Lookup or create a remote transport endpoint record for the specified
+- * address and return it with a ref held.
++ * address.
++ *
++ * Return: The peer record found with a reference, %NULL if no record is found
++ * or a negative error code if the address is invalid or unsupported.
+  */
+ struct rxrpc_peer *rxrpc_kernel_lookup_peer(struct socket *sock,
+ 					    struct sockaddr_rxrpc *srx, gfp_t gfp)
+@@ -283,9 +286,11 @@ EXPORT_SYMBOL(rxrpc_kernel_lookup_peer);
+ 
+ /**
+  * rxrpc_kernel_get_peer - Get a reference on a peer
+- * @peer: The peer to get a reference on.
++ * @peer: The peer to get a reference on (may be NULL).
++ *
++ * Get a reference for a remote peer record (if not NULL).
+  *
+- * Get a record for the remote peer in a call.
++ * Return: The @peer argument.
+  */
+ struct rxrpc_peer *rxrpc_kernel_get_peer(struct rxrpc_peer *peer)
+ {
+@@ -296,6 +301,8 @@ EXPORT_SYMBOL(rxrpc_kernel_get_peer);
+ /**
+  * rxrpc_kernel_put_peer - Allow a kernel app to drop a peer reference
+  * @peer: The peer to drop a ref on
++ *
++ * Drop a reference on a peer record.
+  */
+ void rxrpc_kernel_put_peer(struct rxrpc_peer *peer)
+ {
+@@ -320,10 +327,12 @@ EXPORT_SYMBOL(rxrpc_kernel_put_peer);
+  *
+  * Allow a kernel service to begin a call on the nominated socket.  This just
+  * sets up all the internal tracking structures and allocates connection and
+- * call IDs as appropriate.  The call to be used is returned.
++ * call IDs as appropriate.
+  *
+  * The default socket destination address and security may be overridden by
+  * supplying @srx and @key.
++ *
++ * Return: The new call or an error code.
+  */
+ struct rxrpc_call *rxrpc_kernel_begin_call(struct socket *sock,
+ 					   struct rxrpc_peer *peer,
+@@ -437,6 +446,8 @@ EXPORT_SYMBOL(rxrpc_kernel_put_call);
+  *
+  * Allow a kernel service to find out whether a call is still alive - whether
+  * it has completed successfully and all received data has been consumed.
++ *
++ * Return: %true if the call is still ongoing and %false if it has completed.
+  */
+ bool rxrpc_kernel_check_life(const struct socket *sock,
+ 			     const struct rxrpc_call *call)
+@@ -456,6 +467,8 @@ EXPORT_SYMBOL(rxrpc_kernel_check_life);
+  *
+  * Allow a kernel service to retrieve the epoch value from a service call to
+  * see if the client at the other end rebooted.
++ *
++ * Return: The epoch of the call's connection.
+  */
+ u32 rxrpc_kernel_get_epoch(struct socket *sock, struct rxrpc_call *call)
+ {
+diff --git a/net/rxrpc/key.c b/net/rxrpc/key.c
+index 33e8302a79e3..8c99cf19b19d 100644
+--- a/net/rxrpc/key.c
++++ b/net/rxrpc/key.c
+@@ -531,6 +531,8 @@ EXPORT_SYMBOL(rxrpc_get_server_data_key);
+  *
+  * Generate a null RxRPC key that can be used to indicate anonymous security is
+  * required for a particular domain.
++ *
++ * Return: The new key or a negative error code.
+  */
+ struct key *rxrpc_get_null_key(const char *keyname)
+ {
+diff --git a/net/rxrpc/peer_object.c b/net/rxrpc/peer_object.c
+index 71b6e07bf161..e2f35e6c04d6 100644
+--- a/net/rxrpc/peer_object.c
++++ b/net/rxrpc/peer_object.c
+@@ -475,6 +475,8 @@ void rxrpc_destroy_all_peers(struct rxrpc_net *rxnet)
+  * @call: The call to query
+  *
+  * Get a record for the remote peer in a call.
++ *
++ * Return: The call's peer record.
+  */
+ struct rxrpc_peer *rxrpc_kernel_get_call_peer(struct socket *sock, struct rxrpc_call *call)
+ {
+@@ -486,7 +488,9 @@ EXPORT_SYMBOL(rxrpc_kernel_get_call_peer);
+  * rxrpc_kernel_get_srtt - Get a call's peer smoothed RTT
+  * @peer: The peer to query
+  *
+- * Get the call's peer smoothed RTT in uS or UINT_MAX if we have no samples.
++ * Get the call's peer smoothed RTT.
++ *
++ * Return: The RTT in uS or %UINT_MAX if we have no samples.
+  */
+ unsigned int rxrpc_kernel_get_srtt(const struct rxrpc_peer *peer)
+ {
+@@ -499,7 +503,10 @@ EXPORT_SYMBOL(rxrpc_kernel_get_srtt);
+  * @peer: The peer to query
+  *
+  * Get a pointer to the address from a peer record.  The caller is responsible
+- * for making sure that the address is not deallocated.
++ * for making sure that the address is not deallocated.  A fake address will be
++ * substituted if %peer in NULL.
++ *
++ * Return: The rxrpc address record or a fake record.
+  */
+ const struct sockaddr_rxrpc *rxrpc_kernel_remote_srx(const struct rxrpc_peer *peer)
+ {
+@@ -512,7 +519,10 @@ EXPORT_SYMBOL(rxrpc_kernel_remote_srx);
+  * @peer: The peer to query
+  *
+  * Get a pointer to the transport address from a peer record.  The caller is
+- * responsible for making sure that the address is not deallocated.
++ * responsible for making sure that the address is not deallocated.  A fake
++ * address will be substituted if %peer in NULL.
++ *
++ * Return: The transport address record or a fake record.
+  */
+ const struct sockaddr *rxrpc_kernel_remote_addr(const struct rxrpc_peer *peer)
+ {
+@@ -527,7 +537,9 @@ EXPORT_SYMBOL(rxrpc_kernel_remote_addr);
+  * @app_data: The data to set
+  *
+  * Set the app-specific data on a peer.  AF_RXRPC makes no effort to retain
+- * anything the data might refer to.  The previous app_data is returned.
++ * anything the data might refer to.
++ *
++ * Return: The previous app_data.
+  */
+ unsigned long rxrpc_kernel_set_peer_data(struct rxrpc_peer *peer, unsigned long app_data)
+ {
+@@ -540,6 +552,8 @@ EXPORT_SYMBOL(rxrpc_kernel_set_peer_data);
+  * @peer: The peer to query
+  *
+  * Retrieve the app-specific data from a peer.
++ *
++ * Return: The peer's app data.
+  */
+ unsigned long rxrpc_kernel_get_peer_data(const struct rxrpc_peer *peer)
+ {
+diff --git a/net/rxrpc/recvmsg.c b/net/rxrpc/recvmsg.c
+index 32cd5f1d541d..4c622752a569 100644
+--- a/net/rxrpc/recvmsg.c
++++ b/net/rxrpc/recvmsg.c
+@@ -477,14 +477,14 @@ int rxrpc_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
+  * @_service: Where to store the actual service ID (may be upgraded)
+  *
+  * Allow a kernel service to receive data and pick up information about the
+- * state of a call.  Returns 0 if got what was asked for and there's more
+- * available, 1 if we got what was asked for and we're at the end of the data
+- * and -EAGAIN if we need more data.
++ * state of a call.  Note that *@_abort should also be initialised to %0.
+  *
+- * Note that we may return -EAGAIN to drain empty packets at the end of the
+- * data, even if we've already copied over the requested data.
++ * Note that we may return %-EAGAIN to drain empty packets at the end
++ * of the data, even if we've already copied over the requested data.
+  *
+- * *_abort should also be initialised to 0.
++ * Return: %0 if got what was asked for and there's more available, %1
++ * if we got what was asked for and we're at the end of the data and
++ * %-EAGAIN if we need more data.
+  */
+ int rxrpc_kernel_recv_data(struct socket *sock, struct rxrpc_call *call,
+ 			   struct iov_iter *iter, size_t *_len,
+diff --git a/net/rxrpc/sendmsg.c b/net/rxrpc/sendmsg.c
+index 84dc6c94f23b..3f62c34ce7de 100644
+--- a/net/rxrpc/sendmsg.c
++++ b/net/rxrpc/sendmsg.c
+@@ -794,6 +794,8 @@ int rxrpc_do_sendmsg(struct rxrpc_sock *rx, struct msghdr *msg, size_t len)
+  * appropriate to sending data.  No control data should be supplied in @msg,
+  * nor should an address be supplied.  MSG_MORE should be flagged if there's
+  * more data to come, otherwise this data will end the transmission phase.
++ *
++ * Return: %0 if successful and a negative error code otherwise.
+  */
+ int rxrpc_kernel_send_data(struct socket *sock, struct rxrpc_call *call,
+ 			   struct msghdr *msg, size_t len,
+@@ -829,8 +831,9 @@ EXPORT_SYMBOL(rxrpc_kernel_send_data);
+  * @error: Local error value
+  * @why: Indication as to why.
+  *
+- * Allow a kernel service to abort a call, if it's still in an abortable state
+- * and return true if the call was aborted, false if it was already complete.
++ * Allow a kernel service to abort a call if it's still in an abortable state.
++ *
++ * Return: %true if the call was aborted, %false if it was already complete.
+  */
+ bool rxrpc_kernel_abort_call(struct socket *sock, struct rxrpc_call *call,
+ 			     u32 abort_code, int error, enum rxrpc_abort_reason why)
+diff --git a/net/rxrpc/server_key.c b/net/rxrpc/server_key.c
+index e51940589ee5..eb7525e92951 100644
+--- a/net/rxrpc/server_key.c
++++ b/net/rxrpc/server_key.c
+@@ -152,6 +152,8 @@ int rxrpc_server_keyring(struct rxrpc_sock *rx, sockptr_t optval, int optlen)
+  *
+  * Set the server security keyring on an rxrpc socket.  This is used to provide
+  * the encryption keys for a kernel service.
++ *
++ * Return: %0 if successful and a negative error code otherwise.
+  */
+ int rxrpc_sock_set_security_keyring(struct sock *sk, struct key *keyring)
+ {
 
 
