@@ -1,184 +1,172 @@
-Return-Path: <netdev+bounces-181765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29D56A866C0
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 22:03:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47895A866C5
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 22:07:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31C4A1896D31
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 20:03:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34898179AC2
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 20:07:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C807235C1E;
-	Fri, 11 Apr 2025 20:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mijS2O8e"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED424280CD9;
+	Fri, 11 Apr 2025 20:07:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC721280A21;
-	Fri, 11 Apr 2025 20:03:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411A827932C
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 20:07:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744401794; cv=none; b=nbAcYa4plZ/Y99FqkI6+PSKsKdz5v/LlDcZyfy1hdxPxiP0L/ZX5j9ebjkYLEiaFdVz+IL27bPJBOtBbFSEAYTBO3VtR778Rwg3ZktP7FpuwkTGfxX5ggW00knnMx1tYN/lgaEtYy4PHSZ8fUJy9KvYAr568BL5/IfdRoIRNxa4=
+	t=1744402049; cv=none; b=sHWatGQ27NEj4DCi5c598V/csVw5cpxRdGsE0Tz7umPNUhE/Dhz6HKMsrCS9UGdwXhc7CK1f7d8CVvHDvKwtqKrkgOvEbfnG3bGFvzw6Ia7S2HYYUBae2eYP9KoleUCEVNCPPFx/yDXDZmUbpFYzA3FsNNLCfUBMHYJU4RagXUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744401794; c=relaxed/simple;
-	bh=WrzflKNEW7LUuZ1yEyggMY9woYQSBwBr8weVr3lx7mk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=At88FvkmvO6Sv+LiUP5Ys27Pv/DG1SrRZOStw77zaMCU1P6Ap0GpLe2RjLGR2FV4VkLqJZH9WzIf/R8OQfEugl6/kmP+t5i8RtJFlKxJmH1ZkPNx0wOIPKJk8h0e988cxBjR+KhySJrfST/xxYE986SlJyLU5c4PG5IEfbZIc6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mijS2O8e; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6fecfae554bso21382697b3.0;
-        Fri, 11 Apr 2025 13:03:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744401791; x=1745006591; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WrzflKNEW7LUuZ1yEyggMY9woYQSBwBr8weVr3lx7mk=;
-        b=mijS2O8eklI0E9bAdujdkEAtPU4KA9Af70fRHoHRVuFvsLTxqskbuRPTYi4K/he55d
-         MPLY1NYhzzcaR2B6GHrzIKlFuAgkkI/aeCT6Od7tBL5GZvF0AJgyp3GlsTnUU5/ldaom
-         wVwAfyUoe6KpoN4EIl/JkeEPqjaz+lt16JUC5QmUPK73QtRJRSh3AlrDsPSSpd+xvPMT
-         gd+VePLSV0pdKuBGXs4hGkJoZw+Q3gUfD2jrs6asAV7HAfIwYgoRuiobLETJnv3M9kfj
-         a5oaoKA+8FTfacjfhSdnTr2U8Hu7EyGLGcY8qK7GfE6kOHTSbf/7hyaTX65c/nwBKAY+
-         o9Jw==
+	s=arc-20240116; t=1744402049; c=relaxed/simple;
+	bh=MC1GxL3YNgplNVXsU7o24+sQqmgQXfDMNauEZcGstVE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=jzI1sy9b1xxMq8hV6f5dY5SidlmRzmE0hIUQVkVHHYFAun6VN+Uc19IEkiN0ABZN6PCRE944TBQCUGBKe84fL/ymVwEed8pSHxXBFnUEcJQY5VAyzjiavt0PpqfDNaE6cTnANIvm1jLhzJDdpZrhvUzpUV1p66mhukJRbjfmM78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3d6e10f4b85so45715835ab.0
+        for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 13:07:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744401791; x=1745006591;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WrzflKNEW7LUuZ1yEyggMY9woYQSBwBr8weVr3lx7mk=;
-        b=fzbae7GlqMHP75eG7zZ/LRDbpCXD/PYF97ePHPBkbFNen+wtYNlmpTB6o/PdYTqd4N
-         m3ongiBLheC6UfCVr1BZr4J9rMG/hrpwWHwl0cr/y/JTu0MTgNhASOGYQ1ZkyoeWCQBb
-         RKSowA4c4KFchOkRQozDRiPEzIwYGxPCkg9HWuA4I37JDux704rWF3WwrbH9bxAooZ5r
-         z9rtRcJcxh2E7slsrxDAp9XYElCf3CfVU36S0JpwkJ4P4vXatd3xWiZF6Er3n7Eor7Af
-         oqyMhVLWwpSSz9DFv9XSB63mw82MrYfCODhiX2+3eHN65GFU8Zs9H0FuFsaswvt4nk3d
-         2avg==
-X-Forwarded-Encrypted: i=1; AJvYcCUcwdY1AJXHFTBr76BKSegeZp9Jlo6BKovOwEEsXf9WMeWvrCaSCurAqygLNi8Nuu48+sUoo1zH@vger.kernel.org, AJvYcCUvKXglAV/rElfc5mlpo1abqJXiFkzzSQ21MueQqWbpSwa2EKhUfZBrdVizwc0dnJlRUwo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyay059ZwgF/yS1rrK9iGgjxqmvNSToyT2oLl0a8ZR2WrYOLfcN
-	yAucufto/SOfIR/qkSp0eeHtnp1GKF8pb02bhVAHvfTeg2xwlUjhlM6nyuPhgMEYgoXKAR96PZy
-	fSKg4cNuXdwWBWbf4AofZiEHX93hqXrS7
-X-Gm-Gg: ASbGnctmWKakAk/9LsOhwHeOztILevVhFCNl3p8L4duabF/QCrnS53bxxLICG4cJucr
-	+ed0qHUEqyaA2EQ38AOf5uMaCiSwX27fNdszJVAzNIecCVpkMj+hv+evCqm5M212trhkl7jZfIU
-	9FrHoTZfHb/UTLAPiypUL3NYnFsAI3fSeb
-X-Google-Smtp-Source: AGHT+IFtHpBdPLTlZy2DY8+8yKjBHjKkYtXcgK0E2nrEpBVZQw6DG/5H01WSLSQ7wROgGzTkYg2hhfzBlxF6Bi4C91U=
-X-Received: by 2002:a05:690c:640f:b0:702:46a3:4721 with SMTP id
- 00721157ae682-705599cdeb9mr74513207b3.15.1744401791526; Fri, 11 Apr 2025
- 13:03:11 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1744402047; x=1745006847;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PHWntVF7Lj9UqD4Jmbr2lpcm7Lsg+sulLP9wseK5UK8=;
+        b=v1fKVY175ZExpmH2+HY2vyFRTCDrZ7OUTZmW1lcctZWi1nXjjOnIwSUip5u5mBz772
+         r+pPZLTu7vX3lJspZh5Uk32oT7CnPqT/nRXiQRO+5nG/iOtvjw6WoXuzSIeVC7utxp0Q
+         pVhtaWAHzBB4xoMzORJBG10icaMXFwJMWyzYG1/KNY5mC3VG8Kt8Y698tgqTfQr/rA8Q
+         QttUbGm2Qo3dnkD3E74yO2KAFMfBOe2ew6TrQXyvFHHVijBY5szL1CLlYYlisziTScwY
+         Y2JAt9t4OL/+gEvHLWTwMs7JRoSKl7INx9n0UEBJ0JVYlJDFmTqdxaNc9LN0MH6eIt9I
+         0flg==
+X-Forwarded-Encrypted: i=1; AJvYcCUBSJJ5EJtAbrwPohB9LBAn2uvDBMV5voOtUNZyttJl59/xlWandhWvEcxATmejPi5KJJH7jj8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVfKaAMd0drxtpmOuNx2m2vD4HMl343azzhZOa2UCwVmOZZy0F
+	urEdxxxWbioGnrC49loGmb8oFfrve8DS/2gDjqG/iNO/tNHmKlCi8gxHjnOmYkEy0BV31AcVWn4
+	OIDZfdhtVuqBtslbjWGmPMZjnz/KU81Y5jPFerISe+6DBYXxikn/NnPo=
+X-Google-Smtp-Source: AGHT+IFt0RFpOsth3RSP9XD28/8HE4I6EKvTyTaa7qsdjH0oA2BN9IKKV2+cqrfSuNjPF9dz+31fybHGGIBF2XcnMVWmutII2eyO
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250409214606.2000194-1-ameryhung@gmail.com> <20250409214606.2000194-4-ameryhung@gmail.com>
- <CAP01T77ibGcEhwsyJb1WVaH-vhbZB_M2yVA8Uyv9b5fy=ErWQQ@mail.gmail.com>
- <CAMB2axNqfBpneVc9unn7S65Ewb1u6EpLudjtiq00-sqbfnSY7w@mail.gmail.com>
- <CAP01T76oTKg5H2nqd5ppyLhk1rNjPY0DcYVELmyZU+Du8izbbA@mail.gmail.com> <08811dd9-2449-42c9-8028-8a4dfec20afd@linux.dev>
-In-Reply-To: <08811dd9-2449-42c9-8028-8a4dfec20afd@linux.dev>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Fri, 11 Apr 2025 13:03:00 -0700
-X-Gm-Features: ATxdqUFH7t81tOD218wbwMclN6XIWa7IqFaLFAVSaaySjBg_kj2iSt5q7Oo6SM0
-Message-ID: <CAMB2axNeb-UzO8AOkdXPcqrwnw2J6vKVLSRVM_R+oN=SJEsx9g@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v7 03/10] bpf: net_sched: Add basic bpf qdisc kfuncs
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Kumar Kartikeya Dwivedi <memxor@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net, 
-	edumazet@google.com, kuba@kernel.org, xiyou.wangcong@gmail.com, 
-	jhs@mojatatu.com, martin.lau@kernel.org, jiri@resnulli.us, 
-	stfomichev@gmail.com, toke@redhat.com, sinquersw@gmail.com, 
-	ekarani.silvestre@ccc.ufcg.edu.br, yangpeihao@sjtu.edu.cn, 
-	yepeilin.cs@gmail.com, kernel-team@meta.com
+X-Received: by 2002:a05:6e02:1f0e:b0:3d5:8103:1a77 with SMTP id
+ e9e14a558f8ab-3d7ec1dc7d5mr49842395ab.1.1744402047375; Fri, 11 Apr 2025
+ 13:07:27 -0700 (PDT)
+Date: Fri, 11 Apr 2025 13:07:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67f9767f.050a0220.379d84.0003.GAE@google.com>
+Subject: [syzbot] [openvswitch?] KMSAN: uninit-value in validate_set (2)
+From: syzbot <syzbot+b07a9da40df1576b8048@syzkaller.appspotmail.com>
+To: aconole@redhat.com, davem@davemloft.net, dev@openvswitch.org, 
+	echaudro@redhat.com, edumazet@google.com, horms@kernel.org, 
+	i.maximets@ovn.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, pshelar@ovn.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 11, 2025 at 11:37=E2=80=AFAM Martin KaFai Lau <martin.lau@linux=
-.dev> wrote:
->
-> On 4/11/25 10:08 AM, Kumar Kartikeya Dwivedi wrote:
-> > On Fri, 11 Apr 2025 at 18:59, Amery Hung <ameryhung@gmail.com> wrote:
-> >>
-> >> On Fri, Apr 11, 2025 at 6:32=E2=80=AFAM Kumar Kartikeya Dwivedi
-> >> <memxor@gmail.com> wrote:
-> >>>
-> >>> On Wed, 9 Apr 2025 at 23:46, Amery Hung <ameryhung@gmail.com> wrote:
-> >>>>
-> >>>> From: Amery Hung <amery.hung@bytedance.com>
-> >>>>
-> >>>> Add basic kfuncs for working on skb in qdisc.
-> >>>>
-> >>>> Both bpf_qdisc_skb_drop() and bpf_kfree_skb() can be used to release
-> >>>> a reference to an skb. However, bpf_qdisc_skb_drop() can only be cal=
-led
-> >>>> in .enqueue where a to_free skb list is available from kernel to def=
-er
-> >>>> the release. bpf_kfree_skb() should be used elsewhere. It is also us=
-ed
-> >>>> in bpf_obj_free_fields() when cleaning up skb in maps and collection=
-s.
-> >>>>
-> >>>> bpf_skb_get_hash() returns the flow hash of an skb, which can be use=
-d
-> >>>> to build flow-based queueing algorithms.
-> >>>>
-> >>>> Finally, allow users to create read-only dynptr via bpf_dynptr_from_=
-skb().
-> >>>>
-> >>>> Signed-off-by: Amery Hung <amery.hung@bytedance.com>
-> >>>> Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> >>>> ---
-> >>>
-> >>> How do we prevent UAF when dynptr is accessed after bpf_kfree_skb?
-> >>>
-> >>
-> >> Good question...
-> >>
-> >> Maybe we can add a ref_obj_id field to bpf_reg_state->dynptr to track
-> >> the ref_obj_id of the object underlying a dynptr?
-> >>
-> >> Then, in release_reference(), in addition to finding ref_obj_id in
-> >> registers, verifier will also search stack slots and invalidate all
-> >> dynptrs with the ref_obj_id.
-> >>
-> >> Does this sound like a feasible solution?
-> >
-> > Yes, though I talked with Andrii and he has better ideas for doing
-> > this generically, but for now I think we can make this fix as a
-> > stopgap.
->
-> In case the better fix will take longer, just want to mention that an opt=
-ion is
-> to remove the bpf_dynptr_from_skb() from bpf qdisc. I don't see an urgent=
- need
-> for the bpf qdisc to be able to directly access the skb->data. btw, I don=
-'t
-> think bpf qdisc should write to the skb->data.
->
-> The same goes for the bpf_kfree_skb(). I was thinking if it is useful at =
-all
-> considering there is already a bpf_qdisc_skb_drop(). I kept it there beca=
-use it
-> is a little more intuitive in case the .reset/.destroy wanted to do a "sk=
-b =3D
-> bpf_kptr_xchg(&skbn->skb, NULL);" and then explicitly free the
-> bpf_kfree_skb(skb). However, the bpf prog can also directly do the
-> bpf_obj_drop(skbn) and then bpf_kfree_skb() is not needed, right?
->
->
+Hello,
 
-My rationale for keeping two skb releasing kfuncs: bpf_kfree_skb() is
-the dtor and since dtor can only have one argument, so
-bpf_qdisc_skb_drop() can not replace it. Since bpf_kfree_skb() is here
-to stay, I allow users to call it directly for convenience. Only
-exposing bpf_qdisc_skb_drop() and calling kfree_skb() in
-bpf_qdisc_skb_drop() when to_free is NULL will also do. I don=E2=80=99t hav=
-e a
-strong opinion.
+syzbot found the following issue on:
 
-Yes, bpf_kfree_skb() will not be needed if doing bpf_obj_drop(skbn).
-bpf_obj_drop() internally will call the dtor of a kptr (i.e., in this
-case, bpf_kfree_skb()) in an allocated object.
+HEAD commit:    0af2f6be1b42 Linux 6.15-rc1
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=14e26d78580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7cfe1169d7fc8523
+dashboard link: https://syzkaller.appspot.com/bug?extid=b07a9da40df1576b8048
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1367bb4c580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1495d23f980000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/7526e189e315/disk-0af2f6be.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/60a25cc98e41/vmlinux-0af2f6be.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/2d7bf8af0faf/bzImage-0af2f6be.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b07a9da40df1576b8048@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in validate_set+0x1a2/0x1640 net/openvswitch/flow_netlink.c:2879
+ validate_set+0x1a2/0x1640 net/openvswitch/flow_netlink.c:2879
+ __ovs_nla_copy_actions+0x2efc/0x61a0 net/openvswitch/flow_netlink.c:3383
+ ovs_nla_copy_actions+0x36b/0x550 net/openvswitch/flow_netlink.c:3543
+ get_flow_actions+0x99/0x1d0 net/openvswitch/datapath.c:1148
+ ovs_nla_init_match_and_action+0x221/0x420 net/openvswitch/datapath.c:1198
+ ovs_flow_cmd_set+0x320/0xec0 net/openvswitch/datapath.c:1236
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0x1214/0x12c0 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x375/0x650 net/netlink/af_netlink.c:2534
+ genl_rcv+0x40/0x60 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1313 [inline]
+ netlink_unicast+0xf52/0x1260 net/netlink/af_netlink.c:1339
+ netlink_sendmsg+0x10da/0x11e0 net/netlink/af_netlink.c:1883
+ sock_sendmsg_nosec net/socket.c:712 [inline]
+ __sock_sendmsg+0x30f/0x380 net/socket.c:727
+ ____sys_sendmsg+0x890/0xda0 net/socket.c:2566
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2620
+ __sys_sendmsg net/socket.c:2652 [inline]
+ __do_sys_sendmsg net/socket.c:2657 [inline]
+ __se_sys_sendmsg net/socket.c:2655 [inline]
+ __x64_sys_sendmsg+0x212/0x3c0 net/socket.c:2655
+ x64_sys_call+0x2e0f/0x3c80 arch/x86/include/generated/asm/syscalls_64.h:47
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4157 [inline]
+ slab_alloc_node mm/slub.c:4200 [inline]
+ kmem_cache_alloc_node_noprof+0x921/0xe10 mm/slub.c:4252
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:577
+ __alloc_skb+0x366/0x7b0 net/core/skbuff.c:668
+ alloc_skb include/linux/skbuff.h:1340 [inline]
+ netlink_alloc_large_skb+0x1b4/0x280 net/netlink/af_netlink.c:1187
+ netlink_sendmsg+0xa96/0x11e0 net/netlink/af_netlink.c:1858
+ sock_sendmsg_nosec net/socket.c:712 [inline]
+ __sock_sendmsg+0x30f/0x380 net/socket.c:727
+ ____sys_sendmsg+0x890/0xda0 net/socket.c:2566
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2620
+ __sys_sendmsg net/socket.c:2652 [inline]
+ __do_sys_sendmsg net/socket.c:2657 [inline]
+ __se_sys_sendmsg net/socket.c:2655 [inline]
+ __x64_sys_sendmsg+0x212/0x3c0 net/socket.c:2655
+ x64_sys_call+0x2e0f/0x3c80 arch/x86/include/generated/asm/syscalls_64.h:47
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+CPU: 1 UID: 0 PID: 5787 Comm: syz-executor365 Not tainted 6.15.0-rc1-syzkaller #0 PREEMPT(undef) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
