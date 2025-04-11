@@ -1,135 +1,158 @@
-Return-Path: <netdev+bounces-181614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E005A85B48
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 13:15:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F5A9A85B72
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 13:22:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E3FD17A1E7
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 11:11:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C819B8C72B6
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 11:19:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D801A221260;
-	Fri, 11 Apr 2025 11:11:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 767C5211472;
+	Fri, 11 Apr 2025 11:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dBPn+ti2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a2lkDOXj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28878278E7D;
-	Fri, 11 Apr 2025 11:11:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE50B203716
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 11:19:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744369907; cv=none; b=uJN2TKWX/TgaINsuToueL5NlRPvlm82F1fxych7dZD+KajkRD5vxlfgVsm5xE0OACdg4rgePzd64vOpVhZevGsCDXiFMxhQZYZcxJ4IZti4k/lL3UJ9F8Uk+E5Q0AQsKADu8rgVx8KEvhbNldSCPU8xlG255lvadvNOIU0ND2rg=
+	t=1744370394; cv=none; b=jyPyskc8In99s1IHDU/OqKSPWFNHX3sLPQ9rsq6xAY4p3t8HN8q/dPBSBVkNnSAVZFeeDAuPujM27DfQ6FyZGHDk7ekCB0CYbm+JvOtYTnKyW3rRXNkFi/GiGDxIJ58Xjjrcl4DwTjMANezWAYyPYvqycDRifvT7Hay1BDB0Xvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744369907; c=relaxed/simple;
-	bh=r47D4va+hMH0nDuBINvAukqzGK5b0T3bIPft0LLGe1w=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=VbbYLfl3Lzi4CPHXqYHhT83RydEUCnH75w+D8ZZvvTiMB3vadb04xKzYM23yZVVY4LPpkeWMtyvI4Et0CBi0x8XX2kAHilJokt8NYUWP9SBC/cK3sqipGVFkIbKc5h/rVhfAB7lA7xmzXPiqp2pd9E0UALiGR9ICSa8v4jFWHvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dBPn+ti2; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43cef035a3bso12910485e9.1;
-        Fri, 11 Apr 2025 04:11:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744369904; x=1744974704; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hpXQKfyaLGLKe3xI0l3a3j00vTUAb2QPam0PVoMhfq4=;
-        b=dBPn+ti2Zp5nkv/QQ3lAtYxMEMf/Nh0mIC0SVRNgV38h7+7eM4fcev79bNM3YSoSbH
-         BUFjkLaHw0fPSBYDvKoYCsGukL3xzJlp14spfCfBzbKHtf4Ql1qOG4RkYVKNZYqwlxp1
-         12IP4MmSggKn284GM5+oK6jrRD37hFtp33gunPA0SOaNGnt27KMlYFVqfQcrigOlMaV8
-         1nmsZ4dvQUiQ77kbZuX5XX74i4XZ+cXXkNiUhEfi8nzbF6bduftxltRTM6FzHMoa+hc8
-         HPJO2XploqyMTnXK5qu9U0R8M79iaReifntoKsRxdh51730hXR31RP86qntbq+RI+FHr
-         e/NA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744369904; x=1744974704;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hpXQKfyaLGLKe3xI0l3a3j00vTUAb2QPam0PVoMhfq4=;
-        b=VM8oVh3ZvXH/1Oiz4PZVz0YvOBRDWTMFX4FWXvBNNvk9R69efDIxyoCX9dm0b/caSa
-         Gok2ImrFxoHDuDYBUSzFZnB9A4ZMYNmjT3zNbH7cZnf9hwJizLYTxp/+o2UoaLRBWSrX
-         7JM0mZYRdye1p5OnAkUM7jsx9j7wnXtLmHPBH6+WfKQHtx3hUiT0swwbKehDjTWYkaqr
-         x4acjQpFrziu16o1/IfesNs832TrxrfHE9dz6qPY4FmSHBF/du3/E//orTw6olDufava
-         79iRSipMfTlfzzGjBQp2cC1sYYrSs57srZ2Ca/pG/0xGBdOYMdAHYPzB0hPgKYmAK08T
-         2RLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW3x3tb4m0E/kUJEzaP4Ukr35dLrgyXPvxrzExqwn3Z2AnXg4kSL2XKfUqacPqtVBwMrXhMb9A7DN0=@vger.kernel.org, AJvYcCW8ilWNWvvR07D5Sx6UW/5EBfM+LDUaY4bDipdRXp0/JYUWf8cEiDiSaY06zsXJhr1PuraEXh7x@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZED/EF9zqHyFoVumZiywF79Z/XesoiTD3Mxepm6Cs9FvX9+B5
-	xS42Ppz+NpSabmk+1cYMdHkRNSeQKfDScdTFE5zmIt5XFDpmf6mi
-X-Gm-Gg: ASbGnctRhnNDvYi5GvgmyQCwgp+PlcuVh+Qx0iVsT0JtkX+mgVI5K/UrYzBtJ7Q7TMN
-	Wkt/KcBIgyRwdkFpmXm0cbDvWOKZtTapd2PtIKwV1awU+UQo9NLHPtJklf7j70CA/00j4w6uznc
-	l9j3PvLAf9z2wLIaKu3CYU4WYz3qdU5Hl0S/hvuW9j4DFR/GvGf8JKEYwqF5keGHDnAvUwkRejC
-	/X1GVrL+WgTNE7g/9uKe9UTOlTA3KOqlvf+AKpDrma/6P8np3rfA0o4stGkj8LGeWQMXbOQBzul
-	hCyzvkDh9CLK0/MhRFQdGoahmbDoJJ9fp+31+WwlLqZjWdwDK5ra9BgGw7EtujKwj6OP998xJSF
-	A8zkke2pkNkHf3VoJ7TSD8s5ouXPVn+m/BC4aPGM=
-X-Google-Smtp-Source: AGHT+IHGfWqGKYK2XCsLaggmdsTg8N3NYT4RvucqIT58PsOgAUm1Rp915BQIxxI3WxJe3J7VXocRuw==
-X-Received: by 2002:a05:600c:5107:b0:43c:fe15:41dd with SMTP id 5b1f17b1804b1-43f3a926606mr18010065e9.6.1744369904282;
-        Fri, 11 Apr 2025 04:11:44 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f2338db88sm81134385e9.6.2025.04.11.04.11.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Apr 2025 04:11:43 -0700 (PDT)
-Subject: Re: [PATCH net-next 01/15] devlink: add value check to
- devlink_info_version_put()
-To: "Nelson, Shannon" <shannon.nelson@amd.com>,
- Jakub Kicinski <kuba@kernel.org>,
- "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
-Cc: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "pabeni@redhat.com" <pabeni@redhat.com>, "Dumazet, Eric"
- <edumazet@google.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
- "jiri@resnulli.us" <jiri@resnulli.us>, "horms@kernel.org"
- <horms@kernel.org>, "corbet@lwn.net" <corbet@lwn.net>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
- "R, Bharath" <bharath.r@intel.com>
-References: <20250407215122.609521-1-anthony.l.nguyen@intel.com>
- <20250407215122.609521-2-anthony.l.nguyen@intel.com>
- <d9638476-1778-4e34-96ac-448d12877702@amd.com>
- <DS0PR11MB7785C2BC22AE770A31D7427AF0B52@DS0PR11MB7785.namprd11.prod.outlook.com>
- <7e5aecb4-cb28-4f55-9970-406ec35a5ae7@amd.com>
- <DS0PR11MB7785945F6C0A9907A4E51AD6F0B42@DS0PR11MB7785.namprd11.prod.outlook.com>
- <20250409073942.26be7914@kernel.org>
- <5f896919-6397-4806-ab1a-946c4d20a1b3@amd.com>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <20a047ba-6b99-22d9-93e0-de7b4ed60b34@gmail.com>
-Date: Fri, 11 Apr 2025 12:11:42 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	s=arc-20240116; t=1744370394; c=relaxed/simple;
+	bh=0r0XdZLQZTKCfWrlvdr3kIJq4bXiXhg9OZrf3YuzUpo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iXWX6mtG/08xVEOjD5MzdqXGUZGlfXqxSxgzXIo64DmiCIRPgJU8vvloKhTHpmJLWEEKdqYTi4K+kvkWd72Oi8H8tLiNA+hEQK6Uxeyk5CkcP7hZ64q/NT1DUNN1pGYxa7cenLqin9pa28sMa5ouYm7B02iW1tD1XZipCkX16z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a2lkDOXj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744370391;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wzPWtVMosS8yz6213SvlQbIOghMt7zjrea3KyihzWNI=;
+	b=a2lkDOXj0AFt4P9dE18K3g9OlS+7zq1JhtU6ZbWPHIPtcvHMNYxLn2bX7KzrfveOdL+NQp
+	HaRZ6F6ftIXcWuBjW5y+Zti90jZXV5nmNq25EFamt/Z+JOvPIqZbHamo+3AerZMVdmt/nP
+	IgmiRBZUERwz/1o1QxW0WNNkLA3+lYI=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-321-afkO1osCNiOUWDbyswIf-A-1; Fri,
+ 11 Apr 2025 07:19:48 -0400
+X-MC-Unique: afkO1osCNiOUWDbyswIf-A-1
+X-Mimecast-MFC-AGG-ID: afkO1osCNiOUWDbyswIf-A_1744370386
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1DC2F1800257;
+	Fri, 11 Apr 2025 11:19:46 +0000 (UTC)
+Received: from [10.45.225.124] (unknown [10.45.225.124])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 68B621801A69;
+	Fri, 11 Apr 2025 11:19:40 +0000 (UTC)
+Message-ID: <b7e223bd-d43b-4cdd-9d48-4a1f80a482e8@redhat.com>
+Date: Fri, 11 Apr 2025 13:19:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <5f896919-6397-4806-ab1a-946c4d20a1b3@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 07/14] mfd: zl3073x: Add components versions register
+ defs
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
+ Andy Shevchenko <andy@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, Michal Schmidt <mschmidt@redhat.com>,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+References: <20250409144250.206590-1-ivecera@redhat.com>
+ <20250409144250.206590-8-ivecera@redhat.com>
+ <CAHp75Ve4LO5rB3HLDV5XXMd4SihOQbPZBEZC8i1VY_Nz0E9tig@mail.gmail.com>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <CAHp75Ve4LO5rB3HLDV5XXMd4SihOQbPZBEZC8i1VY_Nz0E9tig@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On 09/04/2025 18:25, Nelson, Shannon wrote:
-> On 4/9/2025 7:39 AM, Jakub Kicinski wrote:
+
+
+On 10. 04. 25 7:50 odp., Andy Shevchenko wrote:
+> On Wed, Apr 9, 2025 at 5:43 PM Ivan Vecera <ivecera@redhat.com> wrote:
 >>
->> On Wed, 9 Apr 2025 14:14:23 +0000 Jagielski, Jedrzej wrote:
->>> No insisting on that but should empty entry be really presented to the user?
->>> Especially unintentionally? Actually it's exposing some driver's shortcomings.
->>> That means the output was not properly validated so imho there's no point in
->>> printing it.
->>
->> +1, FWIW, I don't see the point of outputting keys without values.
+>> Add register definitions for components versions and report them
+>> during probe.
 > 
-> Because I like to see hints that something might be wrong, rather than hiding them.
+> JFYI: disabling regmap lock (independently of having an additional one
+> or not) is not recommended. With that you actually disable the useful
+> debugging feature of regmap, your device will not be present in the
+> (regmap) debugfs after that.
+> 
 
-+1 to this.  Failures should be noisy.  Time you care most about these
- data is when something *is* wrong and you're trying to debug it.
-AFAICT the argument on the other side is "it makes the driver look bad",
- which has (expletive)-all to do with engineering.
-Value often comes from firmware, anyway, in which case driver's (& core's)
- job is to be a dumb pipe, not go around 'validating' things.
+I will follow Andrew's recommendation:
+
+1st regmap for direct registers (pages 0-9) with config like:
+
+regmap_config {
+	...
+	.lock = mutex_lock,
+	.unlock = mutex_unlock,
+	.lock_arg = &zl3073x_dev->lock
+	...
+};
+
+2nd regmap for indirect registers (mailboxes) (pages 10-15) with 
+disabled locking:
+
+regmap_config {
+	...
+	.disable_lock = true,
+	...
+};
+
+For direct registers the lock will be handled automatically by regmap 1.
+For indirect registers the lock will be managed explicitly by the driver 
+to ensure atomic access to mailbox.
+
+The range for regmap 1: (registers 0x000-0x4FF)
+regmap_range_cfg {
+	.range_min = 0,
+	.range_max = 10 * 128 - 1, /* 10 pages, 128 registers each */
+	.selector_reg = 0x7f,      /* page selector at each page */
+	.selector_shift = 0,       /* no shift in page selector */
+	.selector_mask = GENMASK(3, 0),	/* 4 bits for page sel */
+	.window_start = 0,         /* 128 regs from 0x00-0x7f */
+	.window_len = 128,
+};
+
+The range for regmap 2: (registers 0x500-0x77F)
+regmap_range_cfg {
+	.range_min = 10 * 128,
+	.range_max = 15 * 128 - 1, /* 5 pages, 128 registers each */
+	.selector_reg = 0x7f,      /* page selector at each page */
+	.selector_shift = 0,       /* no shift in page selector */
+	.selector_mask = GENMASK(3, 0),	/* 4 bits for page sel */
+	.window_start = 0,         /* 128 regs from 0x00-0x7f */
+	.window_len = 128,
+};
+
+Is it now OK?
+
+Thanks,
+Ivan
+
 
