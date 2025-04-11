@@ -1,203 +1,154 @@
-Return-Path: <netdev+bounces-181525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B097DA854F2
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 09:07:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB304A85562
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 09:26:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF16E1BA7128
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 07:07:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C22DB4454AE
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 07:26:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 953231EB1AF;
-	Fri, 11 Apr 2025 07:06:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 100CD2857ED;
+	Fri, 11 Apr 2025 07:26:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rzYd2ovA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rGFCGQyC"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2071.outbound.protection.outlook.com [40.107.93.71])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5D81E8323;
-	Fri, 11 Apr 2025 07:06:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.71
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744355202; cv=fail; b=dtKNYaxpiO7V/9QJxburGNmWbtT/rZyCK12PpCA71Mx3I82mX8pz8cJp9H10o5ZKOh/buZwFhbE1T+ddbfP2qaCtB15Eg7ctcZ9d+r3qMzvIhFLSYVOlQXlM313h2dQnt+wwxvxO1I6kK57WSAp8YlhHRoXdBNJWl6z15T6Ibc4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744355202; c=relaxed/simple;
-	bh=P15uL7Ke4wrq6bctLkrx0Dl8a6dTCbiRK7qoS6Z7gc0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=gNj6OnHpg4TYjcljMmoQeh7PGr6FmmKJpQFzpxu1RA9O8YSGiToQQZWvJCzSUFwP72WhHWiy6ZHF0xcRKf5UNFIjLjyuTixaoKD6Unpj57Uopg/05CyEMOrN3kxR9LTiPfxscjA7k2w2/PD14GEqekZ67/iVZUlxI02bV6CKp5E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rzYd2ovA; arc=fail smtp.client-ip=40.107.93.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LjVJGtdFvEC2nEH/37W0zTIhqM6DSVNW3u64ttIV11SvREZ0kTnACnq7/Psz3G96gV0VlrQTafOkh6z6vlxbSwFTbST9iXvjAY3h5i+BOQD9iWtPf1TdYJqveIMx2zdvcZsPWxHF3cQSh4MVowzwN11oDJpdEACtoO3uzmfASnnNu3pUh9DmEASEHuX4q7l16opm7cw7wuzXfh+/UjMGD7hRrAjOiZWo68XRaSk2xqWiwEBBgH02CnpuSrsbQ7mu2t1hgLk5aHv9lGJVn0LyPFsErBQdcoNpqmTAhdLYXoM6IyttzWIQOfrHl6lwfWakG0HnZplr6IDz+Ln2sLHV8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=P15uL7Ke4wrq6bctLkrx0Dl8a6dTCbiRK7qoS6Z7gc0=;
- b=Cxj301w6qext7jNfFCHkZkz7MkhGlgBJx06oibNtglSJZKvUOI5Kng98ALD3VzwPbiU1Imee9R7MAyEvHXo5bjK+AA0TUkBDH5MQ6zdeZFeOV54bL9J1a8QZuXKdW4qAykdwnqBkpscyo3fikEZ8GfIv844XzAJ9lD/jWeBbRQpH2ndEpkYCkytNxfLxG6NiINsE+9OZutoW9b49WhoN+bUD5u1u6h02qoE4sAXYsIBWX2MKLrNFRLRF0U4nZL9JSGQS1Je3laEUR5/mHY5Xv2Mqsy1wBeN9A8H6iNFg08YNA1z22p/h7FRVyBzhi9sH/p2JlLM8+bTn9Hkiv6QhAA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=P15uL7Ke4wrq6bctLkrx0Dl8a6dTCbiRK7qoS6Z7gc0=;
- b=rzYd2ovAdNCuQfAMc/2i5ceQVplTbdVoYPTWCZY7X+7I9qUxqMSO6udN8lWR/w5yErFlZmQ3BLV1UdW+GiOo6SEEw3X/E2ORt07p/Jus5e3GzXQZOr6l2/wNWOKHPTVzW7CEoQboxDGD+03u6vKwkHv/U1VJr4dDJSuWgzZAsdhXQqvEMElGbJDek42e/H2UUCVkcINMs42oEbCxINbDWkJFMjCxM6f21TdzDefu4+g+NKkXGgBoXmiA8W5kIB4tPWPx8WxMYalSUSl6g+JfcUfq5bLKwj/0UR3IcOJRltCdbJfnDbHoVKpsLQnSaiQEnwv7e8AI6420Sink7Ka+ng==
-Received: from DS0PR12MB6560.namprd12.prod.outlook.com (2603:10b6:8:d0::22) by
- BL1PR12MB5754.namprd12.prod.outlook.com (2603:10b6:208:391::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.22; Fri, 11 Apr
- 2025 07:06:34 +0000
-Received: from DS0PR12MB6560.namprd12.prod.outlook.com
- ([fe80::4c05:4274:b769:b8af]) by DS0PR12MB6560.namprd12.prod.outlook.com
- ([fe80::4c05:4274:b769:b8af%2]) with mapi id 15.20.8606.029; Fri, 11 Apr 2025
- 07:06:34 +0000
-From: Cosmin Ratiu <cratiu@nvidia.com>
-To: "liuhangbin@gmail.com" <liuhangbin@gmail.com>
-CC: "anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
-	"bbhushan2@marvell.com" <bbhushan2@marvell.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "hkelam@marvell.com" <hkelam@marvell.com>,
-	"davem@davemloft.net" <davem@davemloft.net>, "jv@jvosburgh.net"
-	<jv@jvosburgh.net>, "razor@blackwall.org" <razor@blackwall.org>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, Leon Romanovsky <leonro@nvidia.com>,
-	"ayush.sawal@chelsio.com" <ayush.sawal@chelsio.com>, Jianbo Liu
-	<jianbol@nvidia.com>, "sbhatta@marvell.com" <sbhatta@marvell.com>,
-	"horms@kernel.org" <horms@kernel.org>, "kuba@kernel.org" <kuba@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"steffen.klassert@secunet.com" <steffen.klassert@secunet.com>,
-	"gakula@marvell.com" <gakula@marvell.com>, "przemyslaw.kitszel@intel.com"
-	<przemyslaw.kitszel@intel.com>, "louis.peens@corigine.com"
-	<louis.peens@corigine.com>, "linux-kselftest@vger.kernel.org"
-	<linux-kselftest@vger.kernel.org>, "sgoutham@marvell.com"
-	<sgoutham@marvell.com>
-Subject: Re: [PATCH net-next v2 6/6] bonding: Fix multiple long standing
- offload races
-Thread-Topic: [PATCH net-next v2 6/6] bonding: Fix multiple long standing
- offload races
-Thread-Index: AQHbqV2u53yuQAFXAU2ouudIrJu3qLOcOKQAgAHVIYA=
-Date: Fri, 11 Apr 2025 07:06:34 +0000
-Message-ID: <08b9f4c633070dca1ddf7409c94a9ee591666ef4.camel@nvidia.com>
-References: <20250409144133.2833606-1-cratiu@nvidia.com>
-	 <20250409144133.2833606-7-cratiu@nvidia.com> <Z_c17jxZz-cQLjjm@fedora>
-In-Reply-To: <Z_c17jxZz-cQLjjm@fedora>
-Reply-To: Cosmin Ratiu <cratiu@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR12MB6560:EE_|BL1PR12MB5754:EE_
-x-ms-office365-filtering-correlation-id: 7c43d46b-5fae-4dd9-c729-08dd78c764d8
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|376014|7416014|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?V3VrK1dtWWNGMERuWi9qVnhnZTJ3ZzRQY2FLNG1KNVZSNmxZYXNyR2pOQVdp?=
- =?utf-8?B?bmkxRWdmRDk5YTZKU2FBejN0eXJjTUY5YmVGcGlkbzJhRUJ3QmtTN1p4MmFT?=
- =?utf-8?B?QXdCQ3V0YkJiSjVMUzAva0ZQNU95Q0VXNS9majJnaHEzdi9Ba29YckNYRCt5?=
- =?utf-8?B?cDlaMU5zTm5CUmxPQldaSEtiUHlkYWdYOGM5bmNYZ3o2THVraGpvRk1admtP?=
- =?utf-8?B?QW9tRW5NSTNXUm5xYkpOcjliOVhENlo5c2J1dzg5eEVuMzZrUnpZcUxzemti?=
- =?utf-8?B?MjFCNzMrbkZ4bkNPc1Iwd3l5UVNqWVBGQktMSUtNMGZIZmMwaXRXZEF3d1N5?=
- =?utf-8?B?QWZNUVdLT0MzOC9qNEdRdndLVy9mZ05lUjYzakVMUHBPTnhTdUFOVTFTTmVa?=
- =?utf-8?B?ejFQcytMR0ZFMmFuMlRTVzZVanpaU0tNMElKVmhzRUhJUFJCL2JaZUZGNEw1?=
- =?utf-8?B?TGdHdFJSalZJM1ZnZ1pQNkxhcXY2YjJYNlppQ2x6MXd5cVlwcGJwYTN0a0lz?=
- =?utf-8?B?WVc4RTdKdlU5NjYrWVNpQW9WajUydDZRcjJ1cTh0ZmVOSnFVbC8zVkY4Qjdi?=
- =?utf-8?B?d0RzSDEyOGxrd1FvZkZwRVovUHR6Q2tRNW94OGZpOE8wZFdVNlFVMnoyRjlP?=
- =?utf-8?B?T1hWYjExMFdNQUhOc1dtV3h0MThZSHIvUW1zek55TlhVYU9RWVNUVkJXbVNC?=
- =?utf-8?B?bWVWWDc2eDNuUGI3bytPVnlzVWd2UzJQSHZSUkVQYXlrTWJxdkxpd1hST1Fo?=
- =?utf-8?B?RTUwbC9QUnpTL2ZUcm5xbnpmdWsxVnE5a0JIOUp1aGFwbkpvTnVrMGVwL1Zw?=
- =?utf-8?B?TTRHcHNxaFVpSm5OUnpidkc5MFZuNnQzRWFSRzlybUxiNlNpT0xQTC91b0ZV?=
- =?utf-8?B?QW9hV0hEMmNNTmVsOFJPTmczd2h3UzBwZ2pHVGhYMTFIdU1LNzVvWXN3U2ly?=
- =?utf-8?B?QXNmc2VndkFFZnVEek9qc1BWNVd2bFE5alBrR1VWZlQ1YTJlRDBJS1FBdERv?=
- =?utf-8?B?YkVrZXZCbHdQc21ocFFPRTdJcGJCeVYyYmFUZmROTnliTzlJU0F5bkVmZTZu?=
- =?utf-8?B?NjZ0R21MWGpkcC9WM2N3NFlMazAzYXdZL080UFo5TGpOd1IvYXl4cUQ4UXZy?=
- =?utf-8?B?QU1yejQ3L2w0QmFNWUFlb3lyNUtzY0t6Ynp3MUhKMkJtTGwxTUdvenJFZ1pz?=
- =?utf-8?B?eVBRRE9Wcy9paldOdmVKUGU1VXFZdGFjVUE0czZ5TEN0c0tnRXZlVjN6TjY2?=
- =?utf-8?B?UmVDdG5BNVVOTkMwUUJvOVhadHJnWkUwbjBSNEtvVXZ5MUU2clViMHpnaWpX?=
- =?utf-8?B?bWVqcDk2dzFxcWs5dlptb0hCMzgyNHIyb3JRYXpjRXdmZjFYSFY5bVVPNGpv?=
- =?utf-8?B?TGt0QWRzamc3a1l0OTZiMWc3cnRWN3FqbzBlVFVVZldNWk41M3Q5Wkgzdnhs?=
- =?utf-8?B?b2Nuei9nKzZ5aXlZYzdNOExxU3paaTI0VStPVE5rL00zTlM4aHBhMm5ic0dB?=
- =?utf-8?B?SnVSSE1YMFJ3ekNtdTQ5bHRtNGhtTDZrbDNNR0ErQkg2TWlGR2s5bGl4ODFT?=
- =?utf-8?B?U2UyTnVyVkc5UDQrWkVyeWVFZHF5YjgxZnhCZFJwQ0I3ZTQvNkw3bjQ0aGxw?=
- =?utf-8?B?Vk4wTG5ZR20xSEt1bkwwV1hQRTZiemZEbXJYZ3FaN3Zzbzk3SFBJNHNJWWhM?=
- =?utf-8?B?WVFHRW9uQ1huZ0JoTzVCOWh6RTVoL1ZucE1UcU1lMXBPd1N3Rm94MUwxV055?=
- =?utf-8?B?Y1F2Um1mbFdrNkw2U2RsUUxrcUcwUnRTN3ZkbExtei9GaTI4VjAxQ1graWtq?=
- =?utf-8?B?M1d6OWwyRzlzMTFYZ3dYMG5jZzlDNlNOMTFxM1g0MWE1V05lS1VGdUFuaENm?=
- =?utf-8?B?OVRpSklwUVFhWnJVV1JLOU9YQW1SVXEvT3Jac0lSS01mc0lLdG96WjN4VjhG?=
- =?utf-8?B?N2s2dkVMakwzd2dnczdYcVU0cDdOSnErZWdCZHhabU4xdUplZzlxOGFJMi9j?=
- =?utf-8?B?WFhLNlAzNHF3PT0=?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6560.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?aERpMTM3NDN6M1VhL204WDRwQlVGQ0ZWN24xRk5Ta20wVXRES2pyY3dpYjBI?=
- =?utf-8?B?WXJDUkI1dzBJYklUajZCQUNGQlhodTFUYkN6a21YVWJHYm00UTZCT0FuS0Y5?=
- =?utf-8?B?K1BjSE9vUGlSL3l4TXdQdk82MERkNVBFZnFuTS9xRnYvY1piSXB6QWJWTGdj?=
- =?utf-8?B?bk1IaFJEcDNVdnJwQ0d6QUFZc0tqblJEU05XbXNTbDlMa25mZ3pBbDB2M01M?=
- =?utf-8?B?TFJLcXBsR3dkSVJMQi9NV0M1dXRyR2MzcnNwM21RYis0NTJJUTBlWG1CSW9k?=
- =?utf-8?B?YjgvR01kZ1dLWnFjY2NjMzloMFFrZWlaem9TaW9sb09LbXhvR2NqMFByMzAy?=
- =?utf-8?B?S3lYVDU3M1FlTkQweWYrY0FDQmJCSUpEendEM1RjU1FHbGtMU1pRYmI5VTM2?=
- =?utf-8?B?dDk3OXNtcmdRb2I1Mm00NGZKdDU2czcrNHUxYUJiUlJINlRRekltWHp3UzAr?=
- =?utf-8?B?a05kak1NZGw2VGhObmNCcUZ6bUJFTUxMeTFqcmdyOTZGM3ZMTDBFMk9xd2ZQ?=
- =?utf-8?B?VUkvVzJXalFmWHVIdW5kdFR1c1prQ2FQR05hczlweTZqSVEzbVRSN2RkUUNh?=
- =?utf-8?B?U2NXblVNTzU3MGZUL25ncDFqZ3RYNUljQ1M3WW5icFBkeCtxMlBlb3N3dERy?=
- =?utf-8?B?OXNDQ1A3TG9ucGhKUW1UdXN5TDc3VUtSVHlIZnBaKzVzU1RnQndDcnNTNVJ6?=
- =?utf-8?B?YUFlQmI5bU85QjRDZDdYZmdkaldZck9VWDM1UHJOOSs1NWpMY28rMTVuQXB6?=
- =?utf-8?B?UnMybW5Ub3NTbTRxQngwWkZJcnJYM09aSjBwV2ZBNmpvc1ZzK2tOdG51VTFJ?=
- =?utf-8?B?WlA0Q2pJb040SmxHOUdNOVNPbEdieHB5L21HRGVpbXhLa3NrUmlFVW5nSWVk?=
- =?utf-8?B?Smp3MDlvRzJObUI4RmhEYVZ5c0lNZUEvUUFONm5qZEZOdGFZcXFZanlvL21R?=
- =?utf-8?B?VjA5T2hka1JNWjlTWmFBQXZId0xuSGc0MWpSMjVzdVFTWjFPME03cFdOdFFY?=
- =?utf-8?B?UnB5Y2NuQktXcWxZUUdaTUFPcDNRRStGNlQxeC95TS9EL3RUU1B4enRTM3Zm?=
- =?utf-8?B?R09ZMG9MNlNxQ3pjNFZHcjdNaEpaVmRtQWpXVTdEV01UTjVrRStQckx6UDk3?=
- =?utf-8?B?RUM5QlhDeFRXZFJzRE9OcmVXUTlMaFRKQTNJNVI4eVh0ZGI5Vm9GYlRtYmJr?=
- =?utf-8?B?d0lvOTE4R2VVRkdyS3pqMms3cEJrdE8wVGNzb2pUUyt1dWtwRXE4Vm9MRnRm?=
- =?utf-8?B?VGFBcmovU0FQclFvZzJIaHhrd2hwdGhUd2tSam14c3JlcGR2bGJGbG00bTFy?=
- =?utf-8?B?RWFFNTdiUnJTQndlRFlBTnRxbWlKRXk3b0JjYzlyUTBoQUJGWjJmSzFJVTd4?=
- =?utf-8?B?c1pSOFVRVUp0dWU3TU44L04vS2p0b0c2aGVaYnl0K0E0K094SVlRSE1KWU5o?=
- =?utf-8?B?RlM4YThFN1dzZHhjcGR3V3ovbzU2bmUwbU9DMTVOd1pHZUh2bDVXM3N0OTVG?=
- =?utf-8?B?ZXBrUSt5d3AwTVFTeHBWZm5NdHJ5b1IwS0ZVbHk4cS9mWkg2WXJiN0F0L1dk?=
- =?utf-8?B?c0RpWWVqaXZkVWN2a0FDZlI4aWFtd2NqalJZMnczcTFsbGd1ZllSbGcvb1la?=
- =?utf-8?B?cjdhcWlXMzlldEVoL1VlblgyQmh6VmxaSDNRTk5zbHFPZEdIV2RieWd0K29C?=
- =?utf-8?B?M0gvcElWblJVMVZWSVRad25yU3NkRm55eGE1Q3lxdTFRemtrdll6N2dkYUZw?=
- =?utf-8?B?UHV1b1hQaUNldVpqdUE3OWZGSjY3ZlBZTlR3QzIxM09oYXh0NWtDNkxHVU9x?=
- =?utf-8?B?ZFVrd0Jma0RaVTFnMFE0dmwzNWpuYnZ2MEI0M3M5SjhvRlMvSmRyMEsyTHl5?=
- =?utf-8?B?S0Z5NDQ3dmVlYTBPTDE2WEUvVGFUR1UvRHlFWmdNTEFCRmE2UWw3K2ttSlln?=
- =?utf-8?B?TVh1SnlOcHB3MllhaG9DTnNYTmNVKzdkWFQvN1VPQWl6OE1HT3pSSzI4OHRP?=
- =?utf-8?B?V0ZZcktCcEZ1bFBURWl2R3o4SlVBVHhqajE5VlNOY2ZCSUZTSSt0TS9ad01C?=
- =?utf-8?B?RkpBSHdyYnZqWURnUWkwL1NablU4V1gzenBVVEZReGR2elJDdUhMTHZVdlNy?=
- =?utf-8?Q?Eg1RLa47oofYWWaEU0htvAG6a?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <174A679A7243F24BB725F4CB8D2F9FC4@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0FD27E1BA;
+	Fri, 11 Apr 2025 07:26:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744356382; cv=none; b=kNQqR2cxQRm2czEnw5z0kzVwazTHXXEq55V7BWJMSIVuMeO/QZ5ge9knbNr9QR0jxWtujUeVTMKqvZFL6LuaC53GOEfI5U5AWiL4lkVDBZqATOB9o2ditEfoZ1EQVtVM9Pcd5RGJmcXPjQzrt6pyX4ctBkUaQz3w6zhmC9DUtxk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744356382; c=relaxed/simple;
+	bh=5Rg6L5vCgyyzAuifngdzvR71Cxvlb+0w2mCfgATmgcU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fFm7u2xkVBxroql5WnWTrRxrYKBIomTrJ0mzn6AYYYawZCoBTPl/o6gJ3nn3OBr3RGBFcekPWp7MfO7iVVQqznbcG8IhkHAqGl4hN17ntHsFt60KSAZHKRR76VBM7fDVQKny0bgvSUCvJswHnogdQbfu8LOG8dvuwLULlnARQL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rGFCGQyC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24432C4CEE2;
+	Fri, 11 Apr 2025 07:26:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744356382;
+	bh=5Rg6L5vCgyyzAuifngdzvR71Cxvlb+0w2mCfgATmgcU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rGFCGQyCjTxLmWdaiiMoMRvSSsATBuLX+9GFCwSFmWkr4kDyoLU7cBPWlkzLl2vRN
+	 sOBxcLkTJJj1uEJW8qiZnKNBJeq/8KaIGUdVolR6m/b2TaSmKeh+3cTdfr+GYvjJFv
+	 pSwNR7A4iNHJ5LX0pe3LdKUyV0k8GfXzS7mcRJfyqtR5VkGVE9h9ZLaIXGzmIJ7gm1
+	 VIbnr5yEHWBICw1Dcs5ffHL6ssMpRp25Wuyqbc4SPfeQbmnU3n+Qs2tzqlT65bMDAq
+	 LxfrSgnxU2YTskh88+4BJA1TFOwNKLPes8yZwgU8WsnSUbhAdhqJLzI19iXpj4L/B9
+	 lbVqGWE74AmyQ==
+Date: Fri, 11 Apr 2025 08:26:16 +0100
+From: Lee Jones <lee@kernel.org>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Kees Cook <kees@kernel.org>, Andy Shevchenko <andy@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2 00/14] Add Microchip ZL3073x support (part 1)
+Message-ID: <20250411072616.GU372032@google.com>
+References: <20250409144250.206590-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6560.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7c43d46b-5fae-4dd9-c729-08dd78c764d8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Apr 2025 07:06:34.1936
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: x4CIYESMWWY6wzJdskWVBW8+I5RkFVK7g3svnXU3oG61CAIMXnhxHcIF9lpYQKKbwsmmdAqhbvWMjs8TvaxHrQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5754
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250409144250.206590-1-ivecera@redhat.com>
 
-T24gVGh1LCAyMDI1LTA0LTEwIGF0IDAzOjA3ICswMDAwLCBIYW5nYmluIExpdSB3cm90ZToNCj4g
-DQo+IFRoZSBib25kIGlzIG5vdCB1c2VkIGluIGJvbmRfaXBzZWNfZGVsX3NhKCkgYW55IG1vcmUu
-IFlvdSBjYW4gcmVtb3ZlDQo+IGl0IHRvby4NCg0KUmlnaHQsIHdpbGwgZG8sIHRoYW5rcyBmb3Ig
-cG9pbnRpbmcgaXQgb3V0Lg0KDQpDb3NtaW4uDQo=
+On Wed, 09 Apr 2025, Ivan Vecera wrote:
+
+> Add support for Microchip Azurite DPLL/PTP/SyncE chip family that
+> provides DPLL and PTP functionality. This series bring first part
+> that adds the common MFD driver that provides an access to the bus
+> that can be either I2C or SPI.
+> 
+> The next series will bring the DPLL driver that will covers DPLL
+> functionality. And another ones will bring PTP driver and flashing
+> capability via devlink.
+> 
+> Testing was done by myself and by Prathosh Satish on Microchip EDS2
+> development board with ZL30732 DPLL chip connected over I2C bus.
+> 
+> Patch breakdown
+> ===============
+> Patch 1 - Common DT schema for DPLL device and pin
+> Patch 3 - Basic support for I2C, SPI and regmap
+> Patch 4 - Devlink registration
+> Patches 5-6 - Helpers for accessing device registers
+> Patches 7-8 - Component versions reporting via devlink dev info
+> Patches 9-10 - Helpers for accessing register mailboxes
+> Patch 11 - Clock ID generation for DPLL driver
+> Patch 12 - Export strnchrnul function for modules
+>            (used by next patch)
+> Patch 13 - Support for MFG config initialization file
+> Patch 14 - Fetch invariant register values used by DPLL and later by
+>            PTP driver
+> 
+> Ivan Vecera (14):
+>   dt-bindings: dpll: Add device tree bindings for DPLL device and pin
+>   dt-bindings: dpll: Add support for Microchip Azurite chip family
+>   mfd: Add Microchip ZL3073x support
+>   mfd: zl3073x: Register itself as devlink device
+>   mfd: zl3073x: Add register access helpers
+>   mfd: zl3073x: Add macros for device registers access
+>   mfd: zl3073x: Add components versions register defs
+>   mfd: zl3073x: Implement devlink device info
+>   mfd: zl3073x: Add macro to wait for register value bits to be cleared
+>   mfd: zl3073x: Add functions to work with register mailboxes
+>   mfd: zl3073x: Add clock_id field
+>   lib: Allow modules to use strnchrnul
+>   mfd: zl3073x: Load mfg file into HW if it is present
+>   mfd: zl3073x: Fetch invariants during probe
+> 
+>  .../devicetree/bindings/dpll/dpll-device.yaml |  76 ++
+>  .../devicetree/bindings/dpll/dpll-pin.yaml    |  44 +
+>  .../bindings/dpll/microchip,zl3073x-i2c.yaml  |  74 ++
+>  .../bindings/dpll/microchip,zl3073x-spi.yaml  |  77 ++
+>  MAINTAINERS                                   |  11 +
+>  drivers/mfd/Kconfig                           |  32 +
+>  drivers/mfd/Makefile                          |   5 +
+>  drivers/mfd/zl3073x-core.c                    | 883 ++++++++++++++++++
+>  drivers/mfd/zl3073x-i2c.c                     |  59 ++
+>  drivers/mfd/zl3073x-spi.c                     |  59 ++
+>  drivers/mfd/zl3073x.h                         |  14 +
+>  include/linux/mfd/zl3073x.h                   | 363 +++++++
+>  lib/string.c                                  |   1 +
+>  13 files changed, 1698 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/dpll/dpll-device.yaml
+>  create mode 100644 Documentation/devicetree/bindings/dpll/dpll-pin.yaml
+>  create mode 100644 Documentation/devicetree/bindings/dpll/microchip,zl3073x-i2c.yaml
+>  create mode 100644 Documentation/devicetree/bindings/dpll/microchip,zl3073x-spi.yaml
+>  create mode 100644 drivers/mfd/zl3073x-core.c
+>  create mode 100644 drivers/mfd/zl3073x-i2c.c
+>  create mode 100644 drivers/mfd/zl3073x-spi.c
+>  create mode 100644 drivers/mfd/zl3073x.h
+>  create mode 100644 include/linux/mfd/zl3073x.h
+
+Not only are all of the added abstractions and ugly MACROs hard to read
+and troublesome to maintain, they're also completely unnecessary at this
+(driver) level.  Nicely authored, easy to read / maintain code wins over
+clever code 95% of the time.  Exporting functions to pass around
+pointers to private structures is also a non-starter.
+
+After looking at the code, there doesn't appear to be any inclusion of
+the MFD core header.  How can this be an MFD if you do not use the MFD
+API?  MFD is not a dumping area for common code and call-backs.  It's a
+subsystem used to neatly separate out and share resources between
+functionality that just happens to share the same hardware chip.
+
+-- 
+Lee Jones [李琼斯]
 
