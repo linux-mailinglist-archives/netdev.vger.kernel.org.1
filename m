@@ -1,139 +1,145 @@
-Return-Path: <netdev+bounces-181595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1AC3A859A0
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 12:27:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E7A6A85A15
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 12:32:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E4AF7A60C7
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 10:22:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A423A1BA24DE
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 10:33:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEC6F204840;
-	Fri, 11 Apr 2025 10:23:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B55822128B;
+	Fri, 11 Apr 2025 10:32:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B5POn7xQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fDpMayJk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4DEA278E7C;
-	Fri, 11 Apr 2025 10:23:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF22A204581
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 10:32:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744366993; cv=none; b=bMeWbvRoQqitay5Fq+xMdOvIi/wRbu0pRPgcqgxU0ZD7RjHlmY+07awfiOfOqHx5Pf6CqzuIHjhLf6kF/Jtsa1QO9mAC+/MrdUvaduBjI16mFHz8sQ9Hl8eJvy3cN+jCdAGUurp2wZa2A2TSMMDN/hwtgO0hD3wY+qnGmFJa3bk=
+	t=1744367564; cv=none; b=qnMgUeax8eUQRnnabPIMGtyPDm777m6l1OVvYPflXo2Dkesaf1zkKCz4VD38UnuTMzLzC+7CGUXTjOCI3ByZvXeIN8kVq+ip3ALgyRYK016oxpT5kJyLNPrDBtt/cPmn0ZggdiCAgLzwQ8h4z70L80yBB3oqV+hK58bQkuIv4L4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744366993; c=relaxed/simple;
-	bh=Atz93oKz2UiAG36ViypesYktnrowE+YmNw7wI/Xmg2o=;
+	s=arc-20240116; t=1744367564; c=relaxed/simple;
+	bh=dZAp+0aFkf7MK8MICOzGUOv26hrZwzczT8o2iMxm/5A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H6aJV0933KOmuu6QV+/T1ii+E/V5KVybWb7S2qnWsZbURQd45wTprYjQEkrXR1SYuE0DCb2Vp5tNr2BhIi09IiLedpO4MX0nwuUPpWupuerA7QnK+b2+obLEh9b+J9NKCDBXkAttEnRLB6T+qLLhY9nUGU6nB9sioDK8nqfZMgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B5POn7xQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48056C4CEE2;
-	Fri, 11 Apr 2025 10:23:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744366993;
-	bh=Atz93oKz2UiAG36ViypesYktnrowE+YmNw7wI/Xmg2o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=B5POn7xQhMlH+mXmOEgnmOxYGScuLqft0/JihGI2g3FwOtNOPzVI6Xspc5khE+owS
-	 Xky8QMJZp52FQq6aJ3oFsgXbDFEjaZS+F8byf4ncgkgvIT/kR5YhGWUt6Pc0HQBvSn
-	 uykJyOf1i3gMA6v12d3qaDYZtZmK+azFPTBpWgf73yi3WQ5kvqewP1iXdzIgdusHJs
-	 z0KyowxVHhgZ5QDncv3ZGggo3+cCtVMLyq4hcCVOWwyj7L37B0NXci6bhm4OWIwDy7
-	 s3vuPD205IpEg/WD1GR6mbRTKHVuqrNF6Y7OSVqF+lmL4yzPlV15fNLqc0cvwNZ4ho
-	 bspNVgyR8qdFw==
-Date: Fri, 11 Apr 2025 11:23:08 +0100
-From: Simon Horman <horms@kernel.org>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netfilter-devel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 nf-next 2/3] netfilter: nf_flow_table_core: teardown
- direct xmit when destination changed
-Message-ID: <20250411102308.GX395307@horms.kernel.org>
-References: <20250408142848.96281-1-ericwouds@gmail.com>
- <20250408142848.96281-3-ericwouds@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=cg+4O4I/CLYAXiaYSGPS+O/TxNdIlrArcEUwQ6peslXc55fO9jgi7tVYS+hEchzhjbEdyHLjp3b/uVCWWpFwTYdocP3ecOaQ27nwsaFMVeVtV4gEydHYUyHMvbpvfO15RrLbETMfPopepcdTzlfUGofaI4BIWfH3xDaUnSihEVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fDpMayJk; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744367561;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/Y+9d61eT9fS3Nx5t35n8P/kCjRV2k1+1b7KNobnOYs=;
+	b=fDpMayJkSg33a8nNW13J6HEbmekXc+ztNSfeKx7/lV4VTPzhxgnTkj6lO4smChmDb8jag2
+	tcRy9tmC8bE/OBUTAHNSN0waJndHnlfwajHhq18QGfeTEV28OTn7a4I/a7YCM920eDDg5y
+	7tLSwWn3nkum1WuQNTiwcrKKLyGimpw=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-312-CKGJwfpdMgyVvoNpPc6E_w-1; Fri, 11 Apr 2025 06:32:38 -0400
+X-MC-Unique: CKGJwfpdMgyVvoNpPc6E_w-1
+X-Mimecast-MFC-AGG-ID: CKGJwfpdMgyVvoNpPc6E_w_1744367557
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5e6b2b8339fso1871657a12.3
+        for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 03:32:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744367557; x=1744972357;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/Y+9d61eT9fS3Nx5t35n8P/kCjRV2k1+1b7KNobnOYs=;
+        b=dkJZwS2f/C8C2jxAz1gH44m2fgTfSJudkLnLfW4r7EAX+0ELh9gtgASEJV/CT7qLFW
+         08aNoCkAwMltfYiq7kPuTTPCnHR7ptVhvTz03scRwv1OcifG6GzxYhd4UdmvjXtrjCgE
+         ufKDwJqHlVDVw7ZhKI7ZWOQuVDYNMunHsgWii/3HbIJzpYnI9THhKwriyLDQo9HbSQQQ
+         kjj+kiHV39DG9CH9sEIWiWd8cHbKHq7ic7ihbge0s69HVRyBR0D4Kfhc2S7q7ZV4nYhx
+         7CvDTzFxpeNUy1zvsNbagQQle7r1bD2X+Ah2cT2PbdcsZVNvzyrAPAwFCZqJ0TxgEid9
+         IONw==
+X-Forwarded-Encrypted: i=1; AJvYcCU0ZSUVgnBDSCopIlE98exTM8f+dvuwr1hnRB9YjspshS6xF0uZl7bGF8cI+jC/SxoywHGcqBc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywvtzd+a1c73IKVoShDiOBT+se2LY3xKkHCSUnv0EQMjZRw9418
+	cLQAg6/AHLr0lbMb7KXQyRURvcpX4OGJYHroWXag6DaPtLAqHjfnBeh/LwKZlBQrl2xdr4gb1Vq
+	NYjrhWke6QJDGPisIjO7/hylFRYuleGgOfSCUd0R9xDzXCeZtbrVLQA==
+X-Gm-Gg: ASbGncsS7jfL6zWnwLB+NflWQW0ZbYB2TZ5y5ndy1P6b7N6cgklxa76kZm02jTm//ve
+	Y/QVkkzs6kR2OflHWxGrYA+xk2nkDeMCzEW133E2qjIQ5kFMe5Y7hy8YCCX9/l97sJblw7F3VzG
+	8QXO2ysbPiBNAHnNC40JWdqI75GsyGIM93gMYdljpCuTLFwFpwuOn8rui4VuabT5f3d63lH/wy4
+	Dr4ItmkYM0l8vtxDwj72B2R4UbfvkAJRPztkCNTbfFK6vBBJ1gXzl3rKxDmXiTigTwDsZa5+Vl4
+	a4+PCLvrVEY7TtiTbfwrfcM1mTOS+SfCDgsu7w89qZA6iHEOGe5ZMbYsvz6Y
+X-Received: by 2002:a05:6402:5106:b0:5ec:cd52:27c9 with SMTP id 4fb4d7f45d1cf-5f370298d8dmr1508107a12.31.1744367557232;
+        Fri, 11 Apr 2025 03:32:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF+YAD1Ckz71pvCMRdEbnpWp0EQ9xGd4Ocngq4UiSw7duGE/YHv0R0ZgCt/NsMlKk+AEHR8Kw==
+X-Received: by 2002:a05:6402:5106:b0:5ec:cd52:27c9 with SMTP id 4fb4d7f45d1cf-5f370298d8dmr1508083a12.31.1744367556669;
+        Fri, 11 Apr 2025 03:32:36 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-53-30-213.retail.telecomitalia.it. [79.53.30.213])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f36ee54e11sm789475a12.2.2025.04.11.03.32.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Apr 2025 03:32:36 -0700 (PDT)
+Date: Fri, 11 Apr 2025 12:32:31 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Michal Luczaj <mhal@rbox.co>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Simon Horman <horms@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] vsock: Linger on unsent data
+Message-ID: <hu4kfdobwdhrvlm5egbbfzxjiyi6q32666hpdinywi2fd5kl5j@36dvktqp753a>
+References: <20250407-vsock-linger-v1-0-1458038e3492@rbox.co>
+ <20250407-vsock-linger-v1-1-1458038e3492@rbox.co>
+ <22ad09e7-f2b3-48c3-9a6b-8a7b9fd935fe@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250408142848.96281-3-ericwouds@gmail.com>
+In-Reply-To: <22ad09e7-f2b3-48c3-9a6b-8a7b9fd935fe@redhat.com>
 
-On Tue, Apr 08, 2025 at 04:28:47PM +0200, Eric Woudstra wrote:
-> In case of a bridge in the forward-fastpath or bridge-fastpath the fdb is
-> used to create the tuple. In case of roaming at layer 2 level, for example
-> 802.11r, the destination device is changed in the fdb. The destination
-> device of a direct transmitting tuple is no longer valid and traffic is
-> send to the wrong destination. Also the hardware offloaded fastpath is not
-> valid anymore.
-> 
-> In case of roaming, a switchdev notification is send to delete the old fdb
-> entry. Upon receiving this notification, mark all direct transmitting flows
-> with the same ifindex, vid and hardware address as the fdb entry to be
-> teared down. The hardware offloaded fastpath is still in effect, so
-> minimize the delay of the work queue by setting the delay to zero.
-> 
-> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
-> ---
->  net/netfilter/nf_flow_table_core.c | 65 ++++++++++++++++++++++++++++++
->  1 file changed, 65 insertions(+)
-> 
-> diff --git a/net/netfilter/nf_flow_table_core.c b/net/netfilter/nf_flow_table_core.c
+On Thu, Apr 10, 2025 at 12:51:48PM +0200, Paolo Abeni wrote:
+>On 4/7/25 8:41 PM, Michal Luczaj wrote:
+>> Change the behaviour of a lingering close(): instead of waiting for all
+>> data to be consumed, block until data is considered sent, i.e. until worker
+>> picks the packets and decrements virtio_vsock_sock::bytes_unsent down to 0.
+>
+>I think it should be better to expand the commit message explaining the
+>rationale.
+>
+>> Do linger on shutdown() just as well.
+>
+>Why? Generally speaking shutdown() is not supposed to block. I think you
+>should omit this part.
 
-...
+I thought the same, but discussing with Michal we discovered this on
+socket(7) man page:
 
-> +struct notifier_block nf_flow_table_switchdev_nb __read_mostly = {
-> +	.notifier_call = nf_flow_table_switchdev_event,
-> +};
+   SO_LINGER
+          Sets or gets the SO_LINGER option.  The argument is a
+          linger structure.
 
-Hi Eric,
+              struct linger {
+                  int l_onoff;    /* linger active */
+                  int l_linger;   /* how many seconds to linger for */
+              };
 
-A minor nit from my side:
+          When enabled, a close(2) or shutdown(2) will not return
+          until all queued messages for the socket have been
+          successfully sent or the linger timeout has been reached.
+          Otherwise, the call returns immediately and the closing is
+          done in the background.  When the socket is closed as part
+          of exit(2), it always lingers in the background.
 
-nf_flow_table_switchdev_nb seems only be used in this file and if so it
-should be static.
+In AF_VSOCK we supported SO_LINGER only on close(), but it seems that 
+shutdown must also do it from the manpage.
 
-Flagged by Sparse.
+Thanks,
+Stefano
 
-> +
->  void nf_flow_table_free(struct nf_flowtable *flow_table)
->  {
->  	mutex_lock(&flowtable_lock);
-> @@ -816,6 +874,10 @@ static int __init nf_flow_table_module_init(void)
->  	if (ret)
->  		goto out_offload;
->  
-> +	ret = register_switchdev_notifier(&nf_flow_table_switchdev_nb);
-> +	if (ret < 0)
-> +		goto out_sw_noti;
-> +
->  	ret = nf_flow_register_bpf();
->  	if (ret)
->  		goto out_bpf;
-> @@ -823,6 +885,8 @@ static int __init nf_flow_table_module_init(void)
->  	return 0;
->  
->  out_bpf:
-> +	unregister_switchdev_notifier(&nf_flow_table_switchdev_nb);
-> +out_sw_noti:
->  	nf_flow_table_offload_exit();
->  out_offload:
->  	unregister_pernet_subsys(&nf_flow_table_net_ops);
-> @@ -831,6 +895,7 @@ static int __init nf_flow_table_module_init(void)
->  
->  static void __exit nf_flow_table_module_exit(void)
->  {
-> +	unregister_switchdev_notifier(&nf_flow_table_switchdev_nb);
->  	nf_flow_table_offload_exit();
->  	unregister_pernet_subsys(&nf_flow_table_net_ops);
->  }
-> -- 
-> 2.47.1
-> 
 
