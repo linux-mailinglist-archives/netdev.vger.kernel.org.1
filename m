@@ -1,81 +1,65 @@
-Return-Path: <netdev+bounces-181841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9E4DA8690B
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 01:14:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BED6AA86919
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 01:19:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 930A946783C
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 23:14:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1F5E1B846A1
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 23:19:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 464272BD5A4;
-	Fri, 11 Apr 2025 23:14:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7272E23A995;
+	Fri, 11 Apr 2025 23:18:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b="hAJKhcMS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lOvBmeiD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A4DA2BD5A2
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 23:14:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D86D4202F87;
+	Fri, 11 Apr 2025 23:18:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744413264; cv=none; b=UPfGFlgWnc+gWCvJE9lxiFnn/s77YfCLFHHamXnHpA1LQz2/ockw/iOc348VryKbHqFIhcdt7BM0Yz3enZffxi7TkN2nm/X1UM6K+TcIhrxdXr6XE07IQzOpmojgGJtQTQhqF08CXIITm47PmbQNq3qnOI0Rm9Q0s/rc384zNl4=
+	t=1744413538; cv=none; b=IrvbL1HHaS1LpU03yNkOwoPCtd5SWddyGkTeE7zrfu0R5kotA3O9Jl61g9/rXDutlQZV7Y7w4o/f6BQTFEm4hHEEyJOm+wt25Fl8i5sDxw1ujFfay/7UBGqg8LHMkq/gu3yLEAzSevqiyYagHv9qLguKhmRI6P6Xw1rnM9H+q4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744413264; c=relaxed/simple;
-	bh=5+IYzvxdGiVJBQrU6OvpI8zkSDj8uS4VrXAb+7K70s4=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=gSgouo4+1ZoWxjDWdNiNA+gB0fKJ8ZziKqwAzIT53Jwf9719tBdHiQTf8kM/bmzYeYGfr4qiRTfxAyfUjn+GOGD3wr20p6DVo/nMMxl0EVN+leoOUwP80cEhqURAGhm8y2bRMjvWcnL9FvNYf5g4iMRPL859C6YrABd5L1a6xiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info; spf=pass smtp.mailfrom=jacekk.info; dkim=pass (2048-bit key) header.d=jacekk.info header.i=@jacekk.info header.b=hAJKhcMS; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jacekk.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jacekk.info
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-ac2bdea5a38so431338266b.0
-        for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 16:14:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jacekk.info; s=g2024; t=1744413259; x=1745018059; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=L7gZ2a4kNRAu7jwQR+r8fyDCj7+uKKM15SUMg3PT2KM=;
-        b=hAJKhcMSpno0bnTzg0oOR85rz8Lo1KK1HWvajM20l00m+olMNBlOVchTVMEmTEcdEv
-         w4lD022cZurW4RBK9m0E33cg8lf9UE/qZDq9zObzs1HciU2qXzuD0Vw5M+YuALbhJ3Ec
-         H/Im/ArWpMlck5FPZ+BSddiLr7wN6PradrEBmYrK9wDZAkIhfEdOQ+CRy69NIMXj2ugA
-         YL4AVMtvTxwbWw24nDVv/ng+6Vucu5/HF33lhtUztkErXxtBRoqXsJkFQXqZJzJOQssR
-         906bOOfKMjrUB2uRWvCHCqbpjtMAg/hC4j1Ayn1o6FZtx4JQNxy0UzCzxuEKbYxQQepp
-         vrZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744413259; x=1745018059;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L7gZ2a4kNRAu7jwQR+r8fyDCj7+uKKM15SUMg3PT2KM=;
-        b=kyopUBXxZBzw7QfkPL5YDjlCPC8AYcwwIAcuApOIW7+XXs5W8WGnc1HkOOErMMxfB4
-         p44ooBessmQLhOh1tUCDCXcRXJS9z65shICb1QxqQvd0eO5rzlagxdh8Nxn5Wl5Sn1dF
-         5OxQB0LFWPCNeirqJ161c8ebDvNsuJv6VL+9FtxIroOtvU82XQTidD9BjOr08i7lZgm/
-         KtZsKAyAtqSU8RLBMZej31BNo6txAkAuICNz46KTWdLpR5pcipK8PdhXJBjJ97IGZwG6
-         JqcjAlIL2245I1xiE0sN9wN1+LI/zzAnscvpSxMPwe2WCgNuQfkUdNOjUTjlxxjT6dYU
-         R+ww==
-X-Forwarded-Encrypted: i=1; AJvYcCWM1OTsFxMmm750VKiSLvouXgJofviH7HCG4W1rJ4kSBA0NSKSvSyxz/93gx5N3R3S5ZTv65Gc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykJ4KxIl9hLQgAHA8eDKHMn1XKkB6VptgjfHy3BtRm3s7G80so
-	fSpQrc+m7/C3evGio6VTTtwP+KrAWSEhQ+lHs1qI+IOKVX0iAzlWxwl4txbVjA==
-X-Gm-Gg: ASbGncub4NXMHG50cBTcNEFc3OxQt3jq81AFSihyomxeLA1UL4IenoSgK+FySd1GNXh
-	Mo+NQsKLegtty6bnyCYYW2AstwRGQpNfgwDzaBDqSl6adY9gG1xPvPkFGBG+yeps9P84lbk07c+
-	Wb1GYHdc3tkW0vj52kRFWCRvMjUQWBoxKgZiTS1uoKNE9/zZJaGXZV8c1UnCQ2XSYSY2IHyZHsW
-	mPzA6qm5EZNDvg88n0n96xc+ryY+xcBAn+l3vkKXuNtr5PpvXU7mAb4wEILwIw/b5G4HSZYxlVq
-	a9fi1Agjr3IpnRCztnn0JheIFoxsboqMGWuIpBMB/innkon2VQ==
-X-Google-Smtp-Source: AGHT+IEvy6kgULlZZh+g/Jo9ZEWmTjrbZlUGLIqKPnfHXoHdBf0RzSc9G7gT62xhdLc+tXmoYTQ/WQ==
-X-Received: by 2002:a17:906:f58d:b0:aca:a1de:5e62 with SMTP id a640c23a62f3a-acad359505amr320916466b.42.1744413259061;
-        Fri, 11 Apr 2025 16:14:19 -0700 (PDT)
-Received: from [10.2.1.132] ([194.53.194.238])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acaa1cb4104sm513940666b.99.2025.04.11.16.14.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Apr 2025 16:14:18 -0700 (PDT)
-From: Jacek Kowalski <jacek@jacekk.info>
-X-Google-Original-From: Jacek Kowalski <Jacek@jacekk.info>
-Message-ID: <1c4b00b6-f6e3-4b04-a129-24452df60903@jacekk.info>
-Date: Sat, 12 Apr 2025 01:14:17 +0200
+	s=arc-20240116; t=1744413538; c=relaxed/simple;
+	bh=vQs2PxrGrDmqMMOZu/dnXDoyB1thjPde63wtCSz4rs0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hGGvfm7xQdSV9pXvdIwZYJFmehXf8H0aGtj5jm8p0pf0EVXOFSprGzpzRqGq1cYoXoZGryRBIKPBIcoT88zuHlnBeZsgbqGR3JhL+w2fx70OyFxNeQf0jzOo7GVkJiScMLN/8LtfmNrdPKEisp5gv1DS4y7wuOxdzc4CBka5/Tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lOvBmeiD; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744413536; x=1775949536;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=vQs2PxrGrDmqMMOZu/dnXDoyB1thjPde63wtCSz4rs0=;
+  b=lOvBmeiDihFNZt2K8x2pMkxM4oA4fPmaVKLh3udmTMDBOZytgJPJK9N0
+   vawPXNQw09ebKaREAKFiKz0uHRcvHoiuf0BYP9iSRqkFBypfuvJp1PwRw
+   8a52QexNZdHrC1L3gYA/E8mqtiIJ4JR1WXVIf1jmU/UcZvXWO0MfCJgdn
+   KYgkG7UdeFphehBxhlUNlsmxTymk/JObHvCZKzPF10kjrcf32J6SbucjU
+   aF+qMsVgachCWgMVYC+a3IfwPxtwA+x4O3eBQF8r2XQyXtxQWlNpRvJlU
+   jQldR+VR0MjkZyYlZkc/H3W58ne0fo37g2uxi98xFm4QxruNrikxJmMzt
+   A==;
+X-CSE-ConnectionGUID: QNgp6QlLR8Kh7N1aYknBSQ==
+X-CSE-MsgGUID: CxPPmbuRSoax11RDCNf6cg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11401"; a="57354213"
+X-IronPort-AV: E=Sophos;i="6.15,206,1739865600"; 
+   d="scan'208";a="57354213"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2025 16:18:54 -0700
+X-CSE-ConnectionGUID: 2omd6tn8SC29N2dQEEB9/Q==
+X-CSE-MsgGUID: gZHV8M2vSO+DrRm98G9ZXw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,206,1739865600"; 
+   d="scan'208";a="134299768"
+Received: from inaky-mobl1.amr.corp.intel.com (HELO [10.125.108.170]) ([10.125.108.170])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2025 16:18:53 -0700
+Message-ID: <9913bfa1-c612-4b51-8b53-4b5449c8dd30@intel.com>
+Date: Fri, 11 Apr 2025 16:18:52 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,85 +67,270 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH] e1000e: add option not to verify NVM
- checksum
-To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <c0435964-44ad-4b03-b246-6db909e419df@jacekk.info>
- <9ad46cc5-0d49-8f51-52ff-05eb7691ef61@intel.com>
- <a6d71bdc-3c40-49a1-94e5-369029693d06@jacekk.info>
- <ca5e7925-1d75-5168-2c54-1f4fa9ef523e@intel.com>
+Subject: Re: [PATCH v12 18/23] cxl: allow region creation by type2 drivers
+To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
+ netdev@vger.kernel.org, dan.j.williams@intel.com, edward.cree@amd.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+Cc: Alejandro Lucero <alucerop@amd.com>
+References: <20250331144555.1947819-1-alejandro.lucero-palau@amd.com>
+ <20250331144555.1947819-19-alejandro.lucero-palau@amd.com>
 Content-Language: en-US
-In-Reply-To: <ca5e7925-1d75-5168-2c54-1f4fa9ef523e@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Dave Jiang <dave.jiang@intel.com>
+In-Reply-To: <20250331144555.1947819-19-alejandro.lucero-palau@amd.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
->> I'll experiment a little more and get back to you.>> Specifically I'll try to dump the NVM contents before
->> and after running e1000e_update_nvm_checksum and after
->> a reboot.
-
-I finally had a moment to take a look at the issue again.
-
-This change also makes everything work on my system:
 
 
-diff --git a/drivers/net/ethernet/intel/e1000e/ich8lan.c b/drivers/net/ethernet/intel/e1000e/ich8lan.c
-index 364378133526..4538059091e6 100644
---- a/drivers/net/ethernet/intel/e1000e/ich8lan.c
-+++ b/drivers/net/ethernet/intel/e1000e/ich8lan.c
-@@ -4266,7 +4266,7 @@ static s32 e1000_validate_nvm_checksum_ich8lan(struct e1000_hw *hw)
-         if (!(data & valid_csum_mask)) {
-                 e_dbg("NVM Checksum valid bit not set\n");
-  
--               if (hw->mac.type < e1000_pch_tgp) {
-+               if (hw->mac.type <= e1000_pch_tgp) {
-                         data |= valid_csum_mask;
-                         ret_val = e1000_write_nvm(hw, word, 1, &data);
-                         if (ret_val)
+On 3/31/25 7:45 AM, alejandro.lucero-palau@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
+> 
+> Creating a CXL region requires userspace intervention through the cxl
+> sysfs files. Type2 support should allow accelerator drivers to create
+> such cxl region from kernel code.
+> 
+> Adding that functionality and integrating it with current support for
+> memory expanders.
+> 
+> Based on https://lore.kernel.org/linux-cxl/168592159835.1948938.1647215579839222774.stgit@dwillia2-xfh.jf.intel.com/
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> ---
+>  drivers/cxl/core/region.c | 135 +++++++++++++++++++++++++++++++++++---
+>  drivers/cxl/port.c        |   5 +-
+>  include/cxl/cxl.h         |   4 ++
+>  3 files changed, 135 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+> index 892fb799bf46..f2e1d5719a70 100644
+> --- a/drivers/cxl/core/region.c
+> +++ b/drivers/cxl/core/region.c
+> @@ -2310,6 +2310,17 @@ static int cxl_region_detach(struct cxl_endpoint_decoder *cxled)
+>  	return rc;
+>  }
+>  
+> +int cxl_accel_region_detach(struct cxl_endpoint_decoder *cxled)
+> +{
+> +	int rc;
+> +
+> +	guard(rwsem_write)(&cxl_region_rwsem);
+> +	cxled->part = -1;
+> +	rc = cxl_region_detach(cxled);
+> +	return rc;
+> +}
+> +EXPORT_SYMBOL_NS_GPL(cxl_accel_region_detach, "CXL");
+> +
+>  void cxl_decoder_kill_region(struct cxl_endpoint_decoder *cxled)
+>  {
+>  	down_write(&cxl_region_rwsem);
+> @@ -2816,6 +2827,14 @@ cxl_find_region_by_name(struct cxl_root_decoder *cxlrd, const char *name)
+>  	return to_cxl_region(region_dev);
+>  }
+>  
+> +static void drop_region(struct cxl_region *cxlr)
+> +{
+> +	struct cxl_root_decoder *cxlrd = to_cxl_root_decoder(cxlr->dev.parent);
+> +	struct cxl_port *port = cxlrd_to_port(cxlrd);
+> +
+> +	devm_release_action(port->uport_dev, unregister_region, cxlr);
+> +}
+> +
+>  static ssize_t delete_region_store(struct device *dev,
+>  				   struct device_attribute *attr,
+>  				   const char *buf, size_t len)
+> @@ -3520,14 +3539,12 @@ static int __construct_region(struct cxl_region *cxlr,
+>  	return 0;
+>  }
+>  
+> -/* Establish an empty region covering the given HPA range */
+> -static struct cxl_region *construct_region(struct cxl_root_decoder *cxlrd,
+> -					   struct cxl_endpoint_decoder *cxled)
+> +static struct cxl_region *construct_region_begin(struct cxl_root_decoder *cxlrd,
+> +						 struct cxl_endpoint_decoder *cxled)
+>  {
+>  	struct cxl_memdev *cxlmd = cxled_to_memdev(cxled);
+> -	struct cxl_port *port = cxlrd_to_port(cxlrd);
+>  	struct cxl_dev_state *cxlds = cxlmd->cxlds;
+> -	int rc, part = READ_ONCE(cxled->part);
+> +	int part = READ_ONCE(cxled->part);
+>  	struct cxl_region *cxlr;
+>  
+>  	do {
+> @@ -3536,13 +3553,23 @@ static struct cxl_region *construct_region(struct cxl_root_decoder *cxlrd,
+>  				       cxled->cxld.target_type);
+>  	} while (IS_ERR(cxlr) && PTR_ERR(cxlr) == -EBUSY);
+>  
+> -	if (IS_ERR(cxlr)) {
+> +	if (IS_ERR(cxlr))
+>  		dev_err(cxlmd->dev.parent,
+>  			"%s:%s: %s failed assign region: %ld\n",
+>  			dev_name(&cxlmd->dev), dev_name(&cxled->cxld.dev),
+>  			__func__, PTR_ERR(cxlr));
+> -		return cxlr;
+> -	}
+> +	return cxlr;
+> +}
+> +
+> +/* Establish an empty region covering the given HPA range */
+> +static struct cxl_region *construct_region(struct cxl_root_decoder *cxlrd,
+> +					   struct cxl_endpoint_decoder *cxled)
+> +{
+> +	struct cxl_port *port = cxlrd_to_port(cxlrd);
+> +	struct cxl_region *cxlr;
+> +	int rc;
+> +
+> +	cxlr = construct_region_begin(cxlrd, cxled);
+>  
+>  	rc = __construct_region(cxlr, cxlrd, cxled);
+>  	if (rc) {
+> @@ -3553,6 +3580,98 @@ static struct cxl_region *construct_region(struct cxl_root_decoder *cxlrd,
+>  	return cxlr;
+>  }
+>  
+> +static struct cxl_region *
+> +__construct_new_region(struct cxl_root_decoder *cxlrd,
+> +		       struct cxl_endpoint_decoder *cxled, int ways)
+> +{
+> +	struct cxl_memdev *cxlmd = cxled_to_memdev(cxled);
+> +	struct cxl_decoder *cxld = &cxlrd->cxlsd.cxld;
+> +	struct cxl_region_params *p;
+> +	struct cxl_region *cxlr;
+> +	int rc;
+> +
+> +	cxlr = construct_region_begin(cxlrd, cxled);
+> +	if (IS_ERR(cxlr))
+> +		return cxlr;
+> +
+> +	guard(rwsem_write)(&cxl_region_rwsem);
+> +
+> +	/*
+> +	 * Sanity check. This should not happen with an accel driver handling
+> +	 * the region creation.
+> +	 */
+> +	p = &cxlr->params;
+> +	if (p->state >= CXL_CONFIG_INTERLEAVE_ACTIVE) {
+> +		dev_err(cxlmd->dev.parent,
+> +			"%s:%s: %s  unexpected region state\n",
+> +			dev_name(&cxlmd->dev), dev_name(&cxled->cxld.dev),
+> +			__func__);
+> +		rc = -EBUSY;
+> +		goto err;
+> +	}
+> +
+> +	rc = set_interleave_ways(cxlr, ways);
+> +	if (rc)
+> +		goto err;
+> +
+> +	rc = set_interleave_granularity(cxlr, cxld->interleave_granularity);
+> +	if (rc)
+> +		goto err;
+> +
+> +	rc = alloc_hpa(cxlr, resource_size(cxled->dpa_res));
+> +	if (rc)
+> +		goto err;
+> +
+> +	down_read(&cxl_dpa_rwsem);
+> +	rc = cxl_region_attach(cxlr, cxled, 0);> +	up_read(&cxl_dpa_rwsem);
+> +> +	if (rc)
+> +		goto err;
+
+	scoped_guard(rwsem_read, &cxl_dpa_rwsem) {
+		rc = cxl_region_attach(cxlr, cxled, 0);
+		if (rc)
+			goto err;
+	}
 
 
-(the modification is not persisted - it is lost even after rmmod/insmod).
 
-The diff between "before" and "after" NVM rewrite looks like this
-(MAC address masked):
+> +
+> +	rc = cxl_region_decode_commit(cxlr);
+> +	if (rc)
+> +		goto err;
+> +
+> +	p->state = CXL_CONFIG_COMMIT;
+> +
+> +	return cxlr;
+> +err:
+> +	drop_region(cxlr);
+> +	return ERR_PTR(rc);
+> +}
+> +
+> +/**
+> + * cxl_create_region - Establish a region given an endpoint decoder
+> + * @cxlrd: root decoder to allocate HPA
+> + * @cxled: endpoint decoder with reserved DPA capacity
+> + * @ways: interleave ways required
+> + *
+> + * Returns a fully formed region in the commit state and attached to the
+> + * cxl_region driver.
+> + */
+> +struct cxl_region *cxl_create_region(struct cxl_root_decoder *cxlrd,
+> +				     struct cxl_endpoint_decoder *cxled, int ways)
+> +{
+> +	struct cxl_region *cxlr;
+> +
+> +	mutex_lock(&cxlrd->range_lock);
+> +	cxlr = __construct_new_region(cxlrd, cxled, ways);> +	mutex_unlock(&cxlrd->range_lock);
+> +
+> +	if (IS_ERR(cxlr))
+> +		return cxlr;
+	scoped_guard(mutex, &cxlrd->range_lock) {
+		cxlr = __construct_new_region(cxlrd, cxled, ways);
+		if (IS_ERR(cxlr))
+			return cxlr;
+	}
 
-< 0x0000:               XX XX XX XX XX XX 00 08 ff ff 84 00 01 00 70 00
----
-> 0x0000:               XX XX XX XX XX XX 01 08 ff ff 84 00 01 00 70 00 
-10c10
-< 0x0070:               ff ff ff ff ff ff ff ff ff ff 00 02 ff ff fe 36
----
-> 0x0070:               ff ff ff ff ff ff ff ff ff ff 00 02 ff ff fd 34
+DJ
 
+> +
+> +	if (device_attach(&cxlr->dev) <= 0) {
+> +		dev_err(&cxlr->dev, "failed to create region\n");
+> +		drop_region(cxlr);
+> +		return ERR_PTR(-ENODEV);
+> +	}
+> +
+> +	return cxlr;
+> +}
+> +EXPORT_SYMBOL_NS_GPL(cxl_create_region, "CXL");
+> +
+>  int cxl_add_to_region(struct cxl_port *root, struct cxl_endpoint_decoder *cxled)
+>  {
+>  	struct cxl_memdev *cxlmd = cxled_to_memdev(cxled);
+> diff --git a/drivers/cxl/port.c b/drivers/cxl/port.c
+> index d2bfd1ff5492..f352f2b1c481 100644
+> --- a/drivers/cxl/port.c
+> +++ b/drivers/cxl/port.c
+> @@ -33,6 +33,7 @@ static void schedule_detach(void *cxlmd)
+>  static int discover_region(struct device *dev, void *root)
+>  {
+>  	struct cxl_endpoint_decoder *cxled;
+> +	struct cxl_memdev *cxlmd;
+>  	int rc;
+>  
+>  	if (!is_endpoint_decoder(dev))
+> @@ -42,7 +43,9 @@ static int discover_region(struct device *dev, void *root)
+>  	if ((cxled->cxld.flags & CXL_DECODER_F_ENABLE) == 0)
+>  		return 0;
+>  
+> -	if (cxled->state != CXL_DECODER_STATE_AUTO)
+> +	cxlmd = cxled_to_memdev(cxled);
+> +	if (cxled->state != CXL_DECODER_STATE_AUTO ||
+> +	    cxlmd->cxlds->type == CXL_DEVTYPE_DEVMEM)
+>  		return 0;
+>  
+>  	/*
+> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+> index 22061646b147..133d6db3a70a 100644
+> --- a/include/cxl/cxl.h
+> +++ b/include/cxl/cxl.h
+> @@ -261,4 +261,8 @@ struct cxl_endpoint_decoder *cxl_request_dpa(struct cxl_memdev *cxlmd,
+>  					     bool is_ram,
+>  					     resource_size_t alloc);
+>  int cxl_dpa_free(struct cxl_endpoint_decoder *cxled);
+> +struct cxl_region *cxl_create_region(struct cxl_root_decoder *cxlrd,
+> +				     struct cxl_endpoint_decoder *cxled, int ways);
+> +
+> +int cxl_accel_region_detach(struct cxl_endpoint_decoder *cxled);
+>  #endif
 
-
-Reading https://bugzilla.kernel.org/show_bug.cgi?id=213667 the issue
-started with yet another Dell system, Precision 7760, locking itself
-up with such modification.
-
-The "fix" (4051f68318: e1000e: Do not take care about recovery NVM checksum)
-fixed some problems (i.e. Precision 7760) and "broke" some configurations
-(i.e. mine Latitude 5420).
-
-The condition itself was changed once already (ffd24fa2fc: e1000e: Correct
-NVM checksum verification flow).
-
-
-> If this approach is acceptable to you, I will prepare a patch with
-> the proposed fix and send it to you next week for testing on your system.
-
-What solution do you have in mind?
-
-The only one I can think of is to ignore the checksum completely if the
-valid_csum_mask condition is not met on e1000_pch_tgp.
-
--- 
-Best regards,
-   Jacek Kowalski
 
