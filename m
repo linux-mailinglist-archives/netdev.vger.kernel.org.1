@@ -1,175 +1,146 @@
-Return-Path: <netdev+bounces-181603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3540A85AC0
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 12:59:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12570A85B28
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 13:11:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FF7D1BA720E
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 10:58:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A24729C1B6B
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 11:05:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8981238C1A;
-	Fri, 11 Apr 2025 10:57:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3472A1BA;
+	Fri, 11 Apr 2025 11:05:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GGXHXDtf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GK47s3BL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CE6C221276;
-	Fri, 11 Apr 2025 10:57:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD14278E7C;
+	Fri, 11 Apr 2025 11:05:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744369077; cv=none; b=ehjH808AqKPEx5RgPE+QOnovegqvU0WgbiM/eIWbuemfErKmf3TXc73bE0GASo7oKuWzKhJFltyyhuBPJvZuY3Npk+d/S5x/JffjZHmHzRCk+45MtUXXBR1KlMqNxgO+nzQTJlMgRVA/85UXoIea97Gxjm+O4hnND7CWKfJLEME=
+	t=1744369513; cv=none; b=d+26oj/eKGmPKMzyNH/jTAHy/NT7p0xgAJnp0hY2NYNaqe2YVIu/HlNcpgB9QucOTKVK2oUcXpNKcfvwi8hC3zvrhrLpB+jUMLjXMMS/pKv5pEv6A86IWgL8KFI6u6iw3GeHIrE/J/QyQBzs2Ihu1KV8VGVPPqc4rRoA+l41ll4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744369077; c=relaxed/simple;
-	bh=dOLfMsGYoa8n4VxA/SB6P5E9xmgLVBfZVob9Iy+LyNk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RRIl2VG4TMwXKcyK+k1q3T7l6J45VJHiy3c2u6Ojl71VBtmb6Q+c2eB5Mk89X1YCWqQX5nw9y91mCm6G8B9r6TVXkgBoIVhVH2hUEJ51TWOsJxoJexW9/37k1v4FZDI2KqaPIz3W0gZ/vO+AeNF8YRd3q/BYzdkQzMSNvEkm9iE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GGXHXDtf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3876C4CEE2;
-	Fri, 11 Apr 2025 10:57:53 +0000 (UTC)
+	s=arc-20240116; t=1744369513; c=relaxed/simple;
+	bh=VtWB41B6yR9gWpr/0ENOCffQUwmUd+NKMGYJW0viGuI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=IBw1iVMMbJ6J/tPyBlFZCfboI5yMiqCeeFVYY4NJasw/QIRuZDirupiJeq0nn7wbpukXS1cnhve2Q4CLnuEhm717nzMFpzujEHESjF1UsgyQh8C9buPmSXKcErMqbaujRB70c7gepTm1oniGcnmEer4NvIubrx8xWX09qg+1d+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GK47s3BL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE49EC4CEE7;
+	Fri, 11 Apr 2025 11:05:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744369077;
-	bh=dOLfMsGYoa8n4VxA/SB6P5E9xmgLVBfZVob9Iy+LyNk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GGXHXDtfuIbGy03F6HlfruFGf18al3w2/1qb/klvReuXxiJa7BWPX22nTC3N/bVQX
-	 aXqrMWZ6DKIkz6JUHvZkJmzGiPwHhMPP3JSIlk8g+T631xA980hEXxdbKlPVJVYOlY
-	 SWxw1Y/bA9yJ2+s0barJuUgyHoh1BsEe6BgJHyoxMK8MGsx5dKH0xzZz0t5+S/xgGw
-	 Ym5YY8NK1A/zFCaZKomCv0E5O4TSpCvLv6A7Er2YrbzYNrxkAjuL143zcNWsUlbjgc
-	 EFcKxH8U9WR4oNp0uvgGGVHr00XvcHHVH+Ke1S3a2FNBs1Y5mx9W/KdyKkAObG6WB4
-	 +7yffSBFTUGsw==
-Date: Fri, 11 Apr 2025 11:57:51 +0100
-From: Simon Horman <horms@kernel.org>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	bridge@lists.linux.dev
-Subject: Re: [PATCH v11 nf-next 6/6] netfilter: nft_flow_offload: Add
- bridgeflow to nft_flow_offload_eval()
-Message-ID: <20250411105751.GA1156507@horms.kernel.org>
-References: <20250408142802.96101-1-ericwouds@gmail.com>
- <20250408142802.96101-7-ericwouds@gmail.com>
+	s=k20201202; t=1744369512;
+	bh=VtWB41B6yR9gWpr/0ENOCffQUwmUd+NKMGYJW0viGuI=;
+	h=From:Subject:Date:To:Cc:From;
+	b=GK47s3BL6TO6eSZI3cYIgxhZoPvS7Wma1lrZ+A08QkDZyqVeZZn8Rnw6hklmi6byZ
+	 0+4iFZIJFX13ewBtGomzr8auNxI2/VtjIPCLXGkH0XG+EB4elfnqL5PNTf7HJa4Pzh
+	 pmuyPeh/F9P0KG6StG6tivI7R7XVdv3MpOPtcg9cPcl2oAJ2VK0I2gp4lnL0jRqNpR
+	 JLVtGnVrfSkiO+3dkI8VHHpvGkmIiwxkLE/3go95Rgq7e0mSRXYOffjWV1DXyAgEPa
+	 DVY7cG0e5rIpSCdM3qxhLBP/qzZvFEE2nyfzurE1Qz/obzDDFQpWqWxKWOprIqTHyq
+	 S2nZdxGJxvYKA==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net-next 0/8] mptcp: various small and unrelated
+ improvements
+Date: Fri, 11 Apr 2025 13:04:46 +0200
+Message-Id: <20250411-net-next-mptcp-sched-mib-sft-misc-v1-0-85ac8c6654c3@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250408142802.96101-7-ericwouds@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAE73+GcC/zWNwQqEMAxEf0VyNmCLFdlfEQ/appqD3dIUEcR/N
+ yzsYQ5v4M3cIFSYBD7NDYVOFv4mBdM24PclbYQclMF21nW9MZioaq6KR64+o/idAh68okTtWDx
+ aF90yWDPGMILu5EKRr9/HBH8d5ud5Af7aO8x9AAAA
+X-Change-ID: 20250411-net-next-mptcp-sched-mib-sft-misc-25f5a6218fd8
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Thorsten Blum <thorsten.blum@linux.dev>, 
+ zhenwei pi <pizhenwei@bytedance.com>, Geliang Tang <geliang@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2280; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=VtWB41B6yR9gWpr/0ENOCffQUwmUd+NKMGYJW0viGuI=;
+ b=owEBbQKS/ZANAwAKAfa3gk9CaaBzAcsmYgBn+Pdb5U2bpBiBfEBZ3e2fhQE9xAp9KPrNpHv4k
+ o5YsQkT/+SJAjMEAAEKAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ/j3WwAKCRD2t4JPQmmg
+ cxdbEACNQF5NuntG/ICbN52UfBKTLU7VYnvCPK3Z/k1NcInemjL1RrKTFm5nzPkou12IQr85Usz
+ 8HJrxerrj64vW/gGxy2r7mC+TfgrEPULzWCibUJ1/Tge9DoBZHvYdFtxQqGEnHztuxg1R/K2FSR
+ NYv+Hyjie8D413PIJrFgrj2qEdVWsbR3pwATd1Ee66EwmEA9I/8vbaCunsmnRM00hkBTN9rjKpD
+ xkntUZiNJsszsP8Y+XyNlunwgZQ+zGhiknl+A3vVC/mE6Zlxggax4jG7zRZHVYYPRtR1tWIA153
+ izmwsN5QWIbtVySDOjhJDchBrXx2KL1hu1nOdKU9L3rAtZ/6KMXeD/OwbF2O+QsJG/ZFN4/RHVw
+ i8zoEHr0rqzSMq0rj1D6eh31feTfHXXnmpY+u5FdHUQhCyIb61L1gLW21IT6XwCZFaOEZutrWZU
+ xfkDNWaoLC7watL1+b59Y1MzARyZDiKXGVPlrDVBesdfFtJhVg3lrvjylx5QnnJ5szH9xw6QFUj
+ jF5IZA/YIhIPiWpsbTMmKdnmPqf1Zst79yKZNBTKhUc54Yb6O0LSUXlFA+NTX4N/OLK5v1ajQ4c
+ 2gYhQcfOxF9aKqFZHnHoIinzAT5DJnCcvabiBvZ1hYPhWi246d3RCbY8OBaE672dGhRIKilo9Kb
+ xlJ2YFfge6RupIQ==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-On Tue, Apr 08, 2025 at 04:28:02PM +0200, Eric Woudstra wrote:
-> Edit nft_flow_offload_eval() to make it possible to handle a flowtable of
-> the nft bridge family.
-> 
-> Use nft_flow_offload_bridge_init() to fill the flow tuples. It uses
-> nft_dev_fill_bridge_path() in each direction.
-> 
-> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
-> ---
->  net/netfilter/nft_flow_offload.c | 148 +++++++++++++++++++++++++++++--
->  1 file changed, 143 insertions(+), 5 deletions(-)
-> 
-> diff --git a/net/netfilter/nft_flow_offload.c b/net/netfilter/nft_flow_offload.c
+Here are various unrelated patches:
 
-...
+- Patch 1: sched: remove unused structure.
 
-> +static int nft_dev_fill_bridge_path(struct flow_offload *flow,
-> +				    struct nft_flowtable *ft,
-> +				    enum ip_conntrack_dir dir,
-> +				    const struct net_device *src_dev,
-> +				    const struct net_device *dst_dev,
-> +				    unsigned char *src_ha,
-> +				    unsigned char *dst_ha)
-> +{
-> +	struct flow_offload_tuple_rhash *th = flow->tuplehash;
-> +	struct net_device_path_ctx ctx = {};
-> +	struct net_device_path_stack stack;
-> +	struct nft_forward_info info = {};
-> +	int i, j = 0;
-> +
-> +	for (i = th[dir].tuple.encap_num - 1; i >= 0 ; i--) {
-> +		if (info.num_encaps >= NF_FLOW_TABLE_ENCAP_MAX)
-> +			return -1;
-> +
-> +		if (th[dir].tuple.in_vlan_ingress & BIT(i))
-> +			continue;
-> +
-> +		info.encap[info.num_encaps].id = th[dir].tuple.encap[i].id;
-> +		info.encap[info.num_encaps].proto = th[dir].tuple.encap[i].proto;
-> +		info.num_encaps++;
-> +
-> +		if (th[dir].tuple.encap[i].proto == htons(ETH_P_PPP_SES))
-> +			continue;
-> +
-> +		if (ctx.num_vlans >= NET_DEVICE_PATH_VLAN_MAX)
-> +			return -1;
-> +		ctx.vlan[ctx.num_vlans].id = th[dir].tuple.encap[i].id;
-> +		ctx.vlan[ctx.num_vlans].proto = th[dir].tuple.encap[i].proto;
-> +		ctx.num_vlans++;
-> +	}
-> +	ctx.dev = src_dev;
-> +	ether_addr_copy(ctx.daddr, dst_ha);
-> +
-> +	if (dev_fill_bridge_path(&ctx, &stack) < 0)
-> +		return -1;
-> +
-> +	nft_dev_path_info(&stack, &info, dst_ha, &ft->data);
-> +
-> +	if (!info.indev || info.indev != dst_dev)
-> +		return -1;
-> +
-> +	th[!dir].tuple.iifidx = info.indev->ifindex;
-> +	for (i = info.num_encaps - 1; i >= 0; i--) {
-> +		th[!dir].tuple.encap[j].id = info.encap[i].id;
-> +		th[!dir].tuple.encap[j].proto = info.encap[i].proto;
-> +		if (info.ingress_vlans & BIT(i))
-> +			th[!dir].tuple.in_vlan_ingress |= BIT(j);
-> +		j++;
-> +	}
-> +	th[!dir].tuple.encap_num = info.num_encaps;
-> +
-> +	th[dir].tuple.mtu = dst_dev->mtu;
-> +	ether_addr_copy(th[dir].tuple.out.h_source, src_ha);
-> +	ether_addr_copy(th[dir].tuple.out.h_dest, dst_ha);
-> +	th[dir].tuple.out.ifidx = info.outdev->ifindex;
-> +	th[dir].tuple.out.hw_ifidx = info.hw_outdev->ifindex;
-> +	th[dir].tuple.out.bridge_vid = info.bridge_vid;
+- Patch 2: sched: split the validation part, a preparation for later.
 
-Hi Eric,
+- Patch 3: pm: clarify code, not to think there is a possible UaF.
+  Note: a previous version has already been sent individually to Netdev.
 
-I guess I am doing something daft.
-But with this patchset applied on top of nf-next I see
-the following with allmodconfig builds on x86_64.:
+- Patch 4: subflow: simplify subflow_hmac_valid by passing subflow_req.
 
-  CC [M]  net/netfilter/nft_flow_offload.o
-net/netfilter/nft_flow_offload.c: In function 'nft_dev_fill_bridge_path':
-net/netfilter/nft_flow_offload.c:248:26: error: 'struct <anonymous>' has no member named 'bridge_vid'
-  248 |         th[dir].tuple.out.bridge_vid = info.bridge_vid;
-      |                          ^
-net/netfilter/nft_flow_offload.c:248:44: error: 'struct nft_forward_info' has no member named 'bridge_vid'
-  248 |         th[dir].tuple.out.bridge_vid = info.bridge_vid;
-      |                                            ^
+- Patch 5: mib: add counter for MPJoin rejected by the PM.
 
-> +	th[dir].tuple.xmit_type = FLOW_OFFLOAD_XMIT_DIRECT;
-> +
-> +	return 0;
-> +}
+- Patch 6: selftests: validate this new MPJoinRejected counter.
 
-...
+- Patch 7: selftests: define nlh variable only where needed.
+
+- Patch 8: selftests: show how to use IPPROTO_MPTCP with getaddrinfo.
+  Note: a previous version has already been sent individually to Netdev.
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Geliang Tang (2):
+      mptcp: sched: split validation part
+      selftests: mptcp: diag: drop nlh parameter of recv_nlmsg
+
+Matthieu Baerts (NGI0) (4):
+      mptcp: sched: remove mptcp_sched_data
+      mptcp: pass right struct to subflow_hmac_valid
+      mptcp: add MPJoinRejected MIB counter
+      selftests: mptcp: validate MPJoinRejected counter
+
+Thorsten Blum (1):
+      mptcp: pm: Return local variable instead of freed pointer
+
+zhenwei pi (1):
+      selftests: mptcp: use IPPROTO_MPTCP for getaddrinfo
+
+ include/net/mptcp.h                               | 13 ++-------
+ net/mptcp/mib.c                                   |  1 +
+ net/mptcp/mib.h                                   |  1 +
+ net/mptcp/pm.c                                    |  5 +++-
+ net/mptcp/protocol.c                              |  4 ++-
+ net/mptcp/protocol.h                              |  1 +
+ net/mptcp/sched.c                                 | 35 ++++++++++++++---------
+ net/mptcp/subflow.c                               | 12 ++++----
+ tools/testing/selftests/net/mptcp/mptcp_connect.c | 21 +++++++++++---
+ tools/testing/selftests/net/mptcp/mptcp_diag.c    |  7 ++---
+ tools/testing/selftests/net/mptcp/mptcp_join.sh   | 26 +++++++++++++----
+ 11 files changed, 80 insertions(+), 46 deletions(-)
+---
+base-commit: 61499764e5cc5918c9f63026d3b7a34c8668d4b8
+change-id: 20250411-net-next-mptcp-sched-mib-sft-misc-25f5a6218fd8
+
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
 
