@@ -1,62 +1,58 @@
-Return-Path: <netdev+bounces-181462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0551A8513D
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 03:28:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 315A8A85168
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 04:10:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 127428C68EE
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 01:28:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BAC38C008C
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 02:10:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAD3227702F;
-	Fri, 11 Apr 2025 01:28:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63092279336;
+	Fri, 11 Apr 2025 02:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lB664Kb6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rUxnZM9l"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6049270EB9
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 01:28:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D36F1CA84
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 02:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744334904; cv=none; b=l/rAP9H4uzdm0ycj7MPZBDqwVgx99Uv68kUnaz+OM+p0AhHqZJKcBPmSNGGKGuCrA5ngsN7SeW5mLcHjj146gJROx29eXNd6D6LOcC2ghOTJEHKWBPBhvKiAfEg/X4k/pn1H/Ndv7KGOscUgYEzBb7mm/C7+aRBMU7HW8JcAWNc=
+	t=1744337430; cv=none; b=rlaGW5kHlcDEHN503Jy+T8fMw8L+nirSxnr2NmfzDtu7rPt0u99gpEozZRSKTCp2gUPO5qvvjoFmPxL7HTVzEA4vdIlGOpVtcPiFDMm8YUuilejIPp7pCfFASl1wVVDrIv+HXXaSrFoqaST0Dfki7RjyWJZhGTHAWsSxzoK/2WQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744334904; c=relaxed/simple;
-	bh=bKgTzteQgd/rqmkVCqc5FDR0rQ6PgNyAEnBdPq6NfTQ=;
+	s=arc-20240116; t=1744337430; c=relaxed/simple;
+	bh=cOqmthV/8ltgapeI+DoVZm6PBvaFbwmX5CsNCLwJRHo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CjbSk5BsPiqLNpiKSbCe7IlOUe5UydrGsBq4VHGfsYMP0BvA2YnWiehe2n5x0v2AUelGYR8at4B/1YDHA8AqSEl4cIB8zYrmbpPoQfq5+qsG438munKD92+E5N6jBi6XCp6VraFZK2dNc739CY2Q7N58aJW/W2BHs5vzXOVjd88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lB664Kb6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7B4FC4CEDD;
-	Fri, 11 Apr 2025 01:28:23 +0000 (UTC)
+	 MIME-Version:Content-Type; b=iOli8Fg8gPEOLBEaYPlWWNpvZqWfi/WSA5tE58m9ADfsgJn9yAAY1J9wIv5JaMElspv7Ra9bW4haYlBljEGbRvCqW1uVV9bfHGXCntVdeF7V7IsbREYHyVQcVJ18Bfuk8rMs37ZV8mTH+KYydxJW086UM/LhxsFvqz552vLMKUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rUxnZM9l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E6DEC4CEDD;
+	Fri, 11 Apr 2025 02:10:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744334904;
-	bh=bKgTzteQgd/rqmkVCqc5FDR0rQ6PgNyAEnBdPq6NfTQ=;
+	s=k20201202; t=1744337429;
+	bh=cOqmthV/8ltgapeI+DoVZm6PBvaFbwmX5CsNCLwJRHo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lB664Kb6cXj/rd+/zX6A6DEgC62wOA0fM/HEPNjg+++pbkkBKZd+8kGfJ5nU/09QX
-	 EWtvDVlHNnUS/TUK7hp2BvQ54aCcfs72ArLxvzcj/T1kKR7Jj1m0CX+Aum9QFMQmJr
-	 dV+xs/iazB1Zi8kpMGwP6Z4g+ajoLnccyER/KjejtQHYhT+3qHLUL6RmbX6UE/G+Ev
-	 Kx4CPUn5XOvmSHyso2+FwZ9bsukMPSRsd1CEgECrHseZU7oRqPUp2UNIXOiAfc4fdF
-	 UtOGA3qPfB9HXYXmp+iKUcB8UuGK1wy4pTK893rtJeUPbkra6a2SmVHJm4/e3pbmI4
-	 PG4t5iXZ1TBeQ==
-Date: Thu, 10 Apr 2025 18:28:17 -0700
+	b=rUxnZM9lpcTYLxs2raRJa6gyz0g085MwtyjFOecevyNgkbuABxWO3xuLqPx4Bz/ys
+	 i0ghT6TRj5r9GnvPYvNEP0vzfNoGgmH4s0cML4ITvmIYTU6GcXfQl8cgotVloOamTc
+	 l+a0vVuyxd/FODQut77Y+A14wKDt1g5VXmRjWmh8NoLGoPzqQpKjFASc1PsDG4Ghd0
+	 F3IhKmuLNRiWXPdF19/RcXRdzRuMkkqh6SA455EYyZf9agojWN6c1C6E6r9xHUB6H/
+	 Uz7rpLObcdXgtjBcGzyoELCNuYKZ5wOyFaFvAavsfJu/UL1ygx9KXhSNj8iuUXD7HG
+	 12/URaSZyZnWQ==
+Date: Thu, 10 Apr 2025 19:10:28 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- edumazet@google.com, andrew+netdev@lunn.ch, horms@kernel.org,
- jacob.e.keller@intel.com, yuyanghuang@google.com, sdf@fomichev.me,
- gnault@redhat.com, nicolas.dichtel@6wind.com, petrm@nvidia.com, "David S.
- Miller" <davem@davemloft.net>
-Subject: Re: [PATCH net-next v2 01/13] netlink: specs: rename rtnetlink
- specs in accordance with family name
-Message-ID: <20250410182817.7e0b838d@kernel.org>
-In-Reply-To: <CAD4GDZw+Enkd2dA8f7pNxMadwURFd_tHv1sUwkXqFqxsOquHQQ@mail.gmail.com>
-References: <20250410014658.782120-1-kuba@kernel.org>
-	<20250410014658.782120-2-kuba@kernel.org>
-	<495e43ef-ae20-4dda-97c0-cb8ebe97394b@redhat.com>
-	<CAD4GDZw+Enkd2dA8f7pNxMadwURFd_tHv1sUwkXqFqxsOquHQQ@mail.gmail.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+ <horms@kernel.org>, <hramamurthy@google.com>, <jdamato@fastly.com>,
+ <netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@fomichev.me>
+Subject: Re: [PATCH net-next v2 6/8] netdev: depend on netdev->lock for xdp
+ features
+Message-ID: <20250410191028.31a0eaf2@kernel.org>
+In-Reply-To: <20250410171019.62128-1-kuniyu@amazon.com>
+References: <20250408195956.412733-7-kuba@kernel.org>
+	<20250410171019.62128-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,14 +62,46 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 10 Apr 2025 13:39:17 +0100 Donald Hunter wrote:
-> Yes, Documentation/Makefile goes the extra mile to only try deleting a
-> list of .rst files generated from the list of source .yaml files. It
-> would be easier to just delete
-> Documentation/networking/netlink_spec/*.rst which would be able to
-> clean up old generated files in situations like this.
+On Thu, 10 Apr 2025 10:10:01 -0700 Kuniyuki Iwashima wrote:
+> syzkaller reported splats in register_netdevice() and
+> unregister_netdevice_many_notify().
+> 
+> In register_netdevice(), some devices cannot use
+> netdev_assert_locked().
+> 
+> In unregister_netdevice_many_notify(), maybe we need to
+> hold ops lock in UNREGISTER as you initially suggested.
+> Now do_setlink() deadlock does not happen.
 
-Hm, that would work. I think it's only the second time we hit this
-problem, tho, so I'm just going to apply and clean up manually.
-If it happens again I can change the build script..
+Ah...  Thank you.
+
+Do you have a reference to use as Reported-by, or its from a
+non-public instance ?
+
+I'll test this shortly:
+
+diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+index b64c614a00c4..891e2f60922f 100644
+--- a/net/core/netdev-genl.c
++++ b/net/core/netdev-genl.c
+@@ -38,7 +38,8 @@ netdev_nl_dev_fill(struct net_device *netdev, struct sk_buff *rsp,
+        u64 xdp_rx_meta = 0;
+        void *hdr;
+ 
+-       netdev_assert_locked(netdev); /* note: rtnl_lock may not be held! */
++       /* note: rtnl_lock may or may not be held! */
++       netdev_assert_locked_or_invisible(netdev);
+ 
+        hdr = genlmsg_iput(rsp, info);
+        if (!hdr)
+@@ -966,7 +967,9 @@ static int netdev_genl_netdevice_event(struct notifier_block *nb,
+                netdev_genl_dev_notify(netdev, NETDEV_CMD_DEV_ADD_NTF);
+                break;
+        case NETDEV_UNREGISTER:
++               netdev_lock(netdev);
+                netdev_genl_dev_notify(netdev, NETDEV_CMD_DEV_DEL_NTF);
++               netdev_unlock(netdev);
+                break;
+        case NETDEV_XDP_FEAT_CHANGE:
+                netdev_genl_dev_notify(netdev, NETDEV_CMD_DEV_CHANGE_NTF);
 
