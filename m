@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-181778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A341A86781
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 22:45:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D73F2A8677F
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 22:45:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5D5D7B251A
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 20:43:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C0E37B1690
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 20:43:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A535298CCC;
-	Fri, 11 Apr 2025 20:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DBCE293B55;
+	Fri, 11 Apr 2025 20:44:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KocHXqqI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EMfVai9/"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 996B928F93B
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 20:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D14B28FFE2
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 20:44:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744404254; cv=none; b=n/EwANnsPlsOhEzOvmAE2wj2AAA1aRscXW9HTywjzvmsVBC89fNygpGEzgyHUDA1Z2i3E7b9spZU3jgCGuzBqJHRFnA92jHITDkDVjl1F2mrLphcyPQ9MKjJ0Y2oVeSUETpdJy+KxQIztU2Vzd+S8p9G+RSPMB64N8e2Sd/2XI4=
+	t=1744404253; cv=none; b=l+JcYZ6h0sR+A5nLQ1k83jFiY1MjgOfjXqhNlYRDhTa7BUTSE8jCFwC55WhC8MsHMd9n3J8vRgGkEfkM71MZLY4eSmUDNa7v/66kxgZq5vIuy+kb9HlRplJyHFUW2lyOXFxC/H89Gjp97RasJn97XX1G4QvwaMS2mSmNk7KfIFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744404254; c=relaxed/simple;
-	bh=cKk3PR/jIpoBksiYzheRtkVCobZJcAwv6AW6YQKXf1k=;
+	s=arc-20240116; t=1744404253; c=relaxed/simple;
+	bh=rciRK/cct95zL8D8vMhj7zbDuwBLml6Td8ojzVGmRR4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eCdD8+sC4UVb1/TvMtd3hQ12PoabnqagKcAYmkZNiSo3vo6yfquS1D9DwHi8WhxDfPEdySEHPds82+csBTgWVU4jNOmMt6h61b2jB8qEZjpIyApPN/tYQ4TwBfhA1JFTyjDKhhxfyJdPwK8PWx4FdBr2XAjz3KGOSij74RsXnGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KocHXqqI; arc=none smtp.client-ip=192.198.163.19
+	 MIME-Version; b=sZSQ8ToF+PHTzw9J5sTLuQJpH59FNJq4WVTrlfPM75MaxzimJ2Yz1bp+WR75ctyQHMfW7UiMcVXlWf5dKBNMhUXMXdjQFiZwHJwMlvjrBexiMgqa9JJpYyEINT8UKgKJ/KqqYWn2tq0vCIGi71XYfBt2g7CBYqWHo4NkSQgnAYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EMfVai9/; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744404250; x=1775940250;
+  t=1744404251; x=1775940251;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=cKk3PR/jIpoBksiYzheRtkVCobZJcAwv6AW6YQKXf1k=;
-  b=KocHXqqIqONz9m0QVhBkN/YDCJLBSN4w+WZcgDA2v7GHWKebjfHMCXF9
-   Ce8U1vMtJcTREvND7ikypy1nS76ae9sOAfTuZmlgArIa1X1A+b7ba5NcX
-   rdGKTQMLN9U2bsgVEgvy5oq1C4seOS8fhhjo0cao4biZwdEWygv8f384X
-   tXbIdBmc61ez86K19gdmZZ7QEgvUFHQxAFTIpOyw3Pt7nE+86/EW6Q1qV
-   wXEuKvn0GAF+vl4f4nYWl0cqm69lGjUtMnbz3a9M8TNXQNf6OF6p3PdO6
-   zlPsgRDBb+0A47V02Mv2cqujJOqqujckIBgZ/tB+Zw0GXA0twAgNEaCa9
-   A==;
-X-CSE-ConnectionGUID: xcXoVJvJQPipDrz1JNlisQ==
-X-CSE-MsgGUID: Fo2w5OOyTHKY7FB/0IJLZQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11401"; a="45103869"
+  bh=rciRK/cct95zL8D8vMhj7zbDuwBLml6Td8ojzVGmRR4=;
+  b=EMfVai9/WONveI43tLn3QG07WKeVXJHIzWe8xtpH5Hiwcf9Q5AAnQaRQ
+   R4CmOdSwo0pGjiAQpUNXM1/Kbu+CmZwOlIwegHcHKeARk1Z1mqggRbiG9
+   4dFlfEY/7l1omPwpt5CYu+Q82DpWyzZffySShDM1t0L9n1amTJfpKhxgb
+   hHlgIMKB9ThDRMkfznzHhpY+lUlfYohoK6xypGql0JSlIBVvzifitNB41
+   pzWm5RuxFWaAAIiGUpDteKhJp2c+5CGmdprCwe3lXmKI3pzRXOWUmZgkj
+   3lwQu49u2YAZKVMi+ApW+7NKuUloTDNiaZIgqOvYZZEOyYjNA+GBINWQs
+   w==;
+X-CSE-ConnectionGUID: LsPKiS7BSOuzNSnq6+4ScA==
+X-CSE-MsgGUID: OmkkTQsoQKCFje+wrwpC7Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11401"; a="45103875"
 X-IronPort-AV: E=Sophos;i="6.15,206,1739865600"; 
-   d="scan'208";a="45103869"
+   d="scan'208";a="45103875"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2025 13:44:06 -0700
-X-CSE-ConnectionGUID: 8Xs9v8aYSNG0HUpC8s29Fw==
-X-CSE-MsgGUID: /1Yd03+iQHmbPTyU5PKtaA==
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2025 13:44:07 -0700
+X-CSE-ConnectionGUID: VDwqaIiNQ6ebIIHhXc5Lig==
+X-CSE-MsgGUID: ifz7ELQ1QuWLPtNg1yPOFA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,206,1739865600"; 
-   d="scan'208";a="129241808"
+   d="scan'208";a="129241811"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa010.jf.intel.com with ESMTP; 11 Apr 2025 13:44:06 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -70,9 +70,9 @@ Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
 	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
 	Simon Horman <horms@kernel.org>,
 	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net-next 05/15] ice: support egress drop rules on PF
-Date: Fri, 11 Apr 2025 13:43:46 -0700
-Message-ID: <20250411204401.3271306-6-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 06/15] ice: enable LLDP TX for VFs through tc
+Date: Fri, 11 Apr 2025 13:43:47 -0700
+Message-ID: <20250411204401.3271306-7-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250411204401.3271306-1-anthony.l.nguyen@intel.com>
 References: <20250411204401.3271306-1-anthony.l.nguyen@intel.com>
@@ -86,20 +86,31 @@ Content-Transfer-Encoding: 8bit
 
 From: Larysa Zaremba <larysa.zaremba@intel.com>
 
-tc clsact qdisc allows us to add offloaded egress rules with commands such
-as the following one:
+Only a single VSI can be in charge of sending LLDP frames, sometimes it is
+beneficial to assign this function to a VF, that is possible to do with tc
+capabilities in the switchdev mode. It requires first blocking the PF from
+sending the LLDP frames with a following command:
 
 tc filter add dev <ifname> egress protocol lldp flower skip_sw action drop
 
-Support the egress rule drop action when added to PF, with a few caveats:
-* in switchdev mode, all PF traffic has to go uplink with an exception for
-  LLDP that can be delegated to a single VSI at a time
-* in legacy mode, we cannot delegate LLDP functionality to another VSI, so
-  such packets from PF should not be blocked.
+Then it becomes possible to configure a forward rule from a VF port
+representor to uplink instead.
 
-Also, simplify the rule direction logic, it was previously derived from
-actions, but actually can be inherited from the tc block (and flipped in
-case of port representors).
+tc filter add dev <vf_ifname> ingress protocol lldp flower skip_sw
+action mirred egress redirect dev <ifname>
+
+How LLDP exclusivity was done previously is LLDP traffic was blocked for a
+whole port by a single rule and PF was bypassing that. Now at least in the
+switchdev mode, every separate VSI has to have its own drop rule. Another
+complication is the fact that tc does not respect when the driver refuses
+to delete a rule, so returning an error results in a HW rule still present
+with no way to reference it through tc. This is addressed by allowing the
+PF rule to be deleted at any time, but making the VF forward rule "dormant"
+in such case, this means it is deleted from HW but stays in tc and driver's
+bookkeeping to be restored when drop rule is added back to the PF.
+
+Implement tc configuration handling which enables the user to transmit LLDP
+packets from VF instead of PF.
 
 Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
@@ -107,414 +118,292 @@ Reviewed-by: Simon Horman <horms@kernel.org>
 Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_eswitch.c |  4 +
- drivers/net/ethernet/intel/ice/ice_main.c    | 63 ++++++++++++--
- drivers/net/ethernet/intel/ice/ice_repr.c    |  3 +-
- drivers/net/ethernet/intel/ice/ice_tc_lib.c  | 86 +++++++++++++++-----
- drivers/net/ethernet/intel/ice/ice_tc_lib.h  |  9 +-
- drivers/net/ethernet/intel/ice/ice_txrx.c    | 17 ++--
- 6 files changed, 138 insertions(+), 44 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_eswitch.c |   2 +
+ drivers/net/ethernet/intel/ice/ice_repr.c    |   7 +
+ drivers/net/ethernet/intel/ice/ice_tc_lib.c  | 160 +++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_tc_lib.h  |   2 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h  |   4 +
+ 5 files changed, 175 insertions(+)
 
 diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-index ed21d7f55ac1..206a7d839aef 100644
+index 206a7d839aef..6aae03771746 100644
 --- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
 +++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-@@ -245,6 +245,10 @@ ice_eswitch_set_target_vsi(struct sk_buff *skb,
- 	u64 cd_cmd, dst_vsi;
+@@ -29,6 +29,7 @@ static int ice_eswitch_setup_env(struct ice_pf *pf)
+ 			return -ENODEV;
  
- 	if (!dst) {
-+		struct ethhdr *eth = (struct ethhdr *)skb_mac_header(skb);
-+
-+		if (unlikely(eth->h_proto == htons(ETH_P_LLDP)))
-+			return;
- 		cd_cmd = ICE_TX_CTX_DESC_SWTCH_UPLINK << ICE_TXD_CTX_QW1_CMD_S;
- 		off->cd_qw1 |= (cd_cmd | ICE_TX_DESC_DTYPE_CTX);
- 	} else {
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index d390157b59fe..1fbe13ee93a8 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -8330,11 +8330,16 @@ void ice_tx_timeout(struct net_device *netdev, unsigned int txqueue)
-  * @np: net device to configure
-  * @filter_dev: device on which filter is added
-  * @cls_flower: offload data
-+ * @ingress: if the rule is added to an ingress block
-+ *
-+ * Return: 0 if the flower was successfully added or deleted,
-+ *	   negative error code otherwise.
-  */
- static int
- ice_setup_tc_cls_flower(struct ice_netdev_priv *np,
- 			struct net_device *filter_dev,
--			struct flow_cls_offload *cls_flower)
-+			struct flow_cls_offload *cls_flower,
-+			bool ingress)
- {
- 	struct ice_vsi *vsi = np->vsi;
+ 	ice_remove_vsi_fltr(&pf->hw, uplink_vsi->idx);
++	ice_vsi_cfg_sw_lldp(uplink_vsi, true, false);
  
-@@ -8343,7 +8348,7 @@ ice_setup_tc_cls_flower(struct ice_netdev_priv *np,
- 
- 	switch (cls_flower->command) {
- 	case FLOW_CLS_REPLACE:
--		return ice_add_cls_flower(filter_dev, vsi, cls_flower);
-+		return ice_add_cls_flower(filter_dev, vsi, cls_flower, ingress);
- 	case FLOW_CLS_DESTROY:
- 		return ice_del_cls_flower(vsi, cls_flower);
- 	default:
-@@ -8352,20 +8357,46 @@ ice_setup_tc_cls_flower(struct ice_netdev_priv *np,
+ 	netif_addr_lock_bh(netdev);
+ 	__dev_uc_unsync(netdev, NULL);
+@@ -282,6 +283,7 @@ static void ice_eswitch_release_env(struct ice_pf *pf)
+ 	ice_fltr_add_mac_and_broadcast(uplink_vsi,
+ 				       uplink_vsi->port_info->mac.perm_addr,
+ 				       ICE_FWD_TO_VSI);
++	ice_vsi_cfg_sw_lldp(uplink_vsi, true, true);
  }
  
  /**
-- * ice_setup_tc_block_cb - callback handler registered for TC block
-+ * ice_setup_tc_block_cb_ingress - callback handler for ingress TC block
-  * @type: TC SETUP type
-  * @type_data: TC flower offload data that contains user input
-  * @cb_priv: netdev private data
-+ *
-+ * Return: 0 if the setup was successful, negative error code otherwise.
-  */
- static int
--ice_setup_tc_block_cb(enum tc_setup_type type, void *type_data, void *cb_priv)
-+ice_setup_tc_block_cb_ingress(enum tc_setup_type type, void *type_data,
-+			      void *cb_priv)
- {
- 	struct ice_netdev_priv *np = cb_priv;
- 
- 	switch (type) {
- 	case TC_SETUP_CLSFLOWER:
- 		return ice_setup_tc_cls_flower(np, np->vsi->netdev,
--					       type_data);
-+					       type_data, true);
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
-+/**
-+ * ice_setup_tc_block_cb_egress - callback handler for egress TC block
-+ * @type: TC SETUP type
-+ * @type_data: TC flower offload data that contains user input
-+ * @cb_priv: netdev private data
-+ *
-+ * Return: 0 if the setup was successful, negative error code otherwise.
-+ */
-+static int
-+ice_setup_tc_block_cb_egress(enum tc_setup_type type, void *type_data,
-+			     void *cb_priv)
-+{
-+	struct ice_netdev_priv *np = cb_priv;
-+
-+	switch (type) {
-+	case TC_SETUP_CLSFLOWER:
-+		return ice_setup_tc_cls_flower(np, np->vsi->netdev,
-+					       type_data, false);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-@@ -9310,16 +9341,32 @@ ice_setup_tc(struct net_device *netdev, enum tc_setup_type type,
- 	     void *type_data)
- {
- 	struct ice_netdev_priv *np = netdev_priv(netdev);
-+	enum flow_block_binder_type binder_type;
- 	struct ice_pf *pf = np->vsi->back;
-+	flow_setup_cb_t *flower_handler;
- 	bool locked = false;
- 	int err;
- 
- 	switch (type) {
- 	case TC_SETUP_BLOCK:
-+		binder_type =
-+			((struct flow_block_offload *)type_data)->binder_type;
-+
-+		switch (binder_type) {
-+		case FLOW_BLOCK_BINDER_TYPE_CLSACT_INGRESS:
-+			flower_handler = ice_setup_tc_block_cb_ingress;
-+			break;
-+		case FLOW_BLOCK_BINDER_TYPE_CLSACT_EGRESS:
-+			flower_handler = ice_setup_tc_block_cb_egress;
-+			break;
-+		default:
-+			return -EOPNOTSUPP;
-+		}
-+
- 		return flow_block_cb_setup_simple(type_data,
- 						  &ice_block_cb_list,
--						  ice_setup_tc_block_cb,
--						  np, np, true);
-+						  flower_handler,
-+						  np, np, false);
- 	case TC_SETUP_QDISC_MQPRIO:
- 		if (ice_is_eswitch_mode_switchdev(pf)) {
- 			netdev_err(netdev, "TC MQPRIO offload not supported, switchdev is enabled\n");
-@@ -9380,7 +9427,7 @@ ice_indr_setup_block_cb(enum tc_setup_type type, void *type_data,
- 	case TC_SETUP_CLSFLOWER:
- 		return ice_setup_tc_cls_flower(np, priv->netdev,
- 					       (struct flow_cls_offload *)
--					       type_data);
-+					       type_data, false);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
 diff --git a/drivers/net/ethernet/intel/ice/ice_repr.c b/drivers/net/ethernet/intel/ice/ice_repr.c
-index fb7a1b9a4313..f81bf60f8365 100644
+index f81bf60f8365..cb08746556a6 100644
 --- a/drivers/net/ethernet/intel/ice/ice_repr.c
 +++ b/drivers/net/ethernet/intel/ice/ice_repr.c
-@@ -219,7 +219,8 @@ ice_repr_setup_tc_cls_flower(struct ice_repr *repr,
+@@ -337,6 +337,7 @@ void ice_repr_destroy(struct ice_repr *repr)
+ static void ice_repr_rem_vf(struct ice_repr *repr)
  {
- 	switch (flower->command) {
- 	case FLOW_CLS_REPLACE:
--		return ice_add_cls_flower(repr->netdev, repr->src_vsi, flower);
-+		return ice_add_cls_flower(repr->netdev, repr->src_vsi, flower,
-+					  true);
- 	case FLOW_CLS_DESTROY:
- 		return ice_del_cls_flower(repr->src_vsi, flower);
- 	default:
+ 	ice_eswitch_decfg_vsi(repr->src_vsi, repr->parent_mac);
++	ice_pass_vf_tx_lldp(repr->src_vsi, true);
+ 	unregister_netdev(repr->netdev);
+ 	ice_devlink_destroy_vf_port(repr->vf);
+ 	ice_virtchnl_set_dflt_ops(repr->vf);
+@@ -418,6 +419,10 @@ static int ice_repr_add_vf(struct ice_repr *repr)
+ 	if (err)
+ 		goto err_netdev;
+ 
++	err = ice_drop_vf_tx_lldp(repr->src_vsi, true);
++	if (err)
++		goto err_drop_lldp;
++
+ 	err = ice_eswitch_cfg_vsi(repr->src_vsi, repr->parent_mac);
+ 	if (err)
+ 		goto err_cfg_vsi;
+@@ -430,6 +435,8 @@ static int ice_repr_add_vf(struct ice_repr *repr)
+ 	return 0;
+ 
+ err_cfg_vsi:
++	ice_pass_vf_tx_lldp(repr->src_vsi, true);
++err_drop_lldp:
+ 	unregister_netdev(repr->netdev);
+ err_netdev:
+ 	ice_devlink_destroy_vf_port(vf);
 diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.c b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-index d8d28d74222a..229cd29ff92a 100644
+index 229cd29ff92a..49b87071b7dc 100644
 --- a/drivers/net/ethernet/intel/ice/ice_tc_lib.c
 +++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-@@ -681,26 +681,26 @@ static int ice_tc_setup_action(struct net_device *filter_dev,
- 	fltr->action.fltr_act = action;
- 
- 	if (ice_is_port_repr_netdev(filter_dev) &&
--	    ice_is_port_repr_netdev(target_dev)) {
-+	    ice_is_port_repr_netdev(target_dev) &&
-+	    fltr->direction == ICE_ESWITCH_FLTR_EGRESS) {
- 		repr = ice_netdev_to_repr(target_dev);
- 
- 		fltr->dest_vsi = repr->src_vsi;
--		fltr->direction = ICE_ESWITCH_FLTR_EGRESS;
- 	} else if (ice_is_port_repr_netdev(filter_dev) &&
--		   ice_tc_is_dev_uplink(target_dev)) {
-+		   ice_tc_is_dev_uplink(target_dev) &&
-+		   fltr->direction == ICE_ESWITCH_FLTR_EGRESS) {
- 		repr = ice_netdev_to_repr(filter_dev);
- 
- 		fltr->dest_vsi = repr->src_vsi->back->eswitch.uplink_vsi;
--		fltr->direction = ICE_ESWITCH_FLTR_EGRESS;
- 	} else if (ice_tc_is_dev_uplink(filter_dev) &&
--		   ice_is_port_repr_netdev(target_dev)) {
-+		   ice_is_port_repr_netdev(target_dev) &&
-+		   fltr->direction == ICE_ESWITCH_FLTR_INGRESS) {
- 		repr = ice_netdev_to_repr(target_dev);
- 
- 		fltr->dest_vsi = repr->src_vsi;
--		fltr->direction = ICE_ESWITCH_FLTR_INGRESS;
- 	} else {
- 		NL_SET_ERR_MSG_MOD(fltr->extack,
--				   "Unsupported netdevice in switchdev mode");
-+				   "The action is not supported for this netdevice");
- 		return -EINVAL;
- 	}
- 
-@@ -713,13 +713,11 @@ ice_tc_setup_drop_action(struct net_device *filter_dev,
- {
- 	fltr->action.fltr_act = ICE_DROP_PACKET;
- 
--	if (ice_is_port_repr_netdev(filter_dev)) {
--		fltr->direction = ICE_ESWITCH_FLTR_EGRESS;
--	} else if (ice_tc_is_dev_uplink(filter_dev)) {
--		fltr->direction = ICE_ESWITCH_FLTR_INGRESS;
--	} else {
-+	if (!ice_tc_is_dev_uplink(filter_dev) &&
-+	    !(ice_is_port_repr_netdev(filter_dev) &&
-+	      fltr->direction == ICE_ESWITCH_FLTR_INGRESS)) {
- 		NL_SET_ERR_MSG_MOD(fltr->extack,
--				   "Unsupported netdevice in switchdev mode");
-+				   "The action is not supported for this netdevice");
- 		return -EINVAL;
- 	}
- 
-@@ -809,6 +807,11 @@ ice_eswitch_add_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
- 		rule_info.sw_act.flag |= ICE_FLTR_RX;
- 		rule_info.sw_act.src = hw->pf_id;
- 		rule_info.flags_info.act = ICE_SINGLE_ACT_LB_ENABLE;
-+	} else if (fltr->direction == ICE_ESWITCH_FLTR_EGRESS &&
-+		   !fltr->dest_vsi && vsi == vsi->back->eswitch.uplink_vsi) {
-+		/* PF to Uplink */
-+		rule_info.sw_act.flag |= ICE_FLTR_TX;
-+		rule_info.sw_act.src = vsi->idx;
- 	} else if (fltr->direction == ICE_ESWITCH_FLTR_EGRESS &&
- 		   fltr->dest_vsi == vsi->back->eswitch.uplink_vsi) {
- 		/* VF to Uplink */
-@@ -1051,8 +1054,13 @@ ice_add_tc_flower_adv_fltr(struct ice_vsi *vsi,
- 			tc_fltr->action.fwd.q.hw_queue, lkups_cnt);
- 		break;
- 	case ICE_DROP_PACKET:
--		rule_info.sw_act.flag |= ICE_FLTR_RX;
--		rule_info.sw_act.src = hw->pf_id;
-+		if (tc_fltr->direction == ICE_ESWITCH_FLTR_EGRESS) {
-+			rule_info.sw_act.flag |= ICE_FLTR_TX;
-+			rule_info.sw_act.src = vsi->idx;
-+		} else {
-+			rule_info.sw_act.flag |= ICE_FLTR_RX;
-+			rule_info.sw_act.src = hw->pf_id;
-+		}
- 		rule_info.priority = ICE_SWITCH_FLTR_PRIO_VSI;
- 		break;
- 	default:
-@@ -1458,11 +1466,16 @@ ice_parse_tunnel_attr(struct net_device *dev, struct flow_rule *rule,
-  * @filter_dev: Pointer to device on which filter is being added
-  * @f: Pointer to struct flow_cls_offload
-  * @fltr: Pointer to filter structure
-+ * @ingress: if the rule is added to an ingress block
-+ *
-+ * Return: 0 if the flower was parsed successfully, -EINVAL if the flower
-+ *	   cannot be parsed, -EOPNOTSUPP if such filter cannot be configured
-+ *	   for the given VSI.
-  */
- static int
- ice_parse_cls_flower(struct net_device *filter_dev, struct ice_vsi *vsi,
- 		     struct flow_cls_offload *f,
--		     struct ice_tc_flower_fltr *fltr)
-+		     struct ice_tc_flower_fltr *fltr, bool ingress)
- {
- 	struct ice_tc_flower_lyr_2_4_hdrs *headers = &fltr->outer_headers;
- 	struct flow_rule *rule = flow_cls_offload_flow_rule(f);
-@@ -1546,6 +1559,20 @@ ice_parse_cls_flower(struct net_device *filter_dev, struct ice_vsi *vsi,
- 			fltr->flags |= ICE_TC_FLWR_FIELD_ETH_TYPE_ID;
- 		}
- 
-+		if (!ingress) {
-+			bool switchdev =
-+				ice_is_eswitch_mode_switchdev(vsi->back);
-+
-+			if (switchdev != (n_proto_key == ETH_P_LLDP)) {
-+				NL_SET_ERR_MSG_FMT_MOD(fltr->extack,
-+						       "%sLLDP filtering is not supported on egress in %s mode",
-+						       switchdev ? "Non-" : "",
-+						       switchdev ? "switchdev" :
-+								   "legacy");
-+				return -EOPNOTSUPP;
-+			}
-+		}
-+
- 		headers->l2_key.n_proto = cpu_to_be16(n_proto_key);
- 		headers->l2_mask.n_proto = cpu_to_be16(n_proto_mask);
- 		headers->l3_key.ip_proto = match.key->ip_proto;
-@@ -1721,6 +1748,14 @@ ice_parse_cls_flower(struct net_device *filter_dev, struct ice_vsi *vsi,
- 			return -EINVAL;
- 		}
- 	}
-+
-+	/* Ingress filter on representor results in an egress filter in HW
-+	 * and vice versa
-+	 */
-+	ingress = ice_is_port_repr_netdev(filter_dev) ? !ingress : ingress;
-+	fltr->direction = ingress ? ICE_ESWITCH_FLTR_INGRESS :
-+				    ICE_ESWITCH_FLTR_EGRESS;
-+
+@@ -762,6 +762,154 @@ static int ice_eswitch_tc_parse_action(struct net_device *filter_dev,
  	return 0;
  }
  
-@@ -1970,14 +2005,18 @@ static int ice_del_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
-  * @vsi: Pointer to VSI
-  * @f: Pointer to flower offload structure
-  * @__fltr: Pointer to struct ice_tc_flower_fltr
-+ * @ingress: if the rule is added to an ingress block
-  *
-  * This function parses TC-flower input fields, parses action,
-  * and adds a filter.
-+ *
-+ * Return: 0 if the filter was successfully added,
-+ *	   negative error code otherwise.
-  */
++static bool ice_is_fltr_lldp(struct ice_tc_flower_fltr *fltr)
++{
++	return fltr->outer_headers.l2_key.n_proto == htons(ETH_P_LLDP);
++}
++
++static bool ice_is_fltr_pf_tx_lldp(struct ice_tc_flower_fltr *fltr)
++{
++	struct ice_vsi *vsi = fltr->src_vsi, *uplink;
++
++	if (!ice_is_switchdev_running(vsi->back))
++		return false;
++
++	uplink = vsi->back->eswitch.uplink_vsi;
++	return vsi == uplink && fltr->action.fltr_act == ICE_DROP_PACKET &&
++	       ice_is_fltr_lldp(fltr) &&
++	       fltr->direction == ICE_ESWITCH_FLTR_EGRESS &&
++	       fltr->flags == ICE_TC_FLWR_FIELD_ETH_TYPE_ID;
++}
++
++static bool ice_is_fltr_vf_tx_lldp(struct ice_tc_flower_fltr *fltr)
++{
++	struct ice_vsi *vsi = fltr->src_vsi, *uplink;
++
++	uplink = vsi->back->eswitch.uplink_vsi;
++	return fltr->src_vsi->type == ICE_VSI_VF && ice_is_fltr_lldp(fltr) &&
++	       fltr->direction == ICE_ESWITCH_FLTR_EGRESS &&
++	       fltr->dest_vsi == uplink;
++}
++
++static struct ice_tc_flower_fltr *
++ice_find_pf_tx_lldp_fltr(struct ice_pf *pf)
++{
++	struct ice_tc_flower_fltr *fltr;
++
++	hlist_for_each_entry(fltr, &pf->tc_flower_fltr_list, tc_flower_node)
++		if (ice_is_fltr_pf_tx_lldp(fltr))
++			return fltr;
++
++	return NULL;
++}
++
++static bool ice_any_vf_lldp_tx_ena(struct ice_pf *pf)
++{
++	struct ice_vf *vf;
++	unsigned int bkt;
++
++	ice_for_each_vf(pf, bkt, vf)
++		if (vf->lldp_tx_ena)
++			return true;
++
++	return false;
++}
++
++int ice_pass_vf_tx_lldp(struct ice_vsi *vsi, bool deinit)
++{
++	struct ice_rule_query_data remove_entry = {
++		.rid = vsi->vf->lldp_recipe_id,
++		.rule_id = vsi->vf->lldp_rule_id,
++		.vsi_handle = vsi->idx,
++	};
++	struct ice_pf *pf = vsi->back;
++	int err;
++
++	if (vsi->vf->lldp_tx_ena)
++		return 0;
++
++	if (!deinit && !ice_find_pf_tx_lldp_fltr(vsi->back))
++		return -EINVAL;
++
++	if (!deinit && ice_any_vf_lldp_tx_ena(pf))
++		return -EINVAL;
++
++	err = ice_rem_adv_rule_by_id(&pf->hw, &remove_entry);
++	if (!err)
++		vsi->vf->lldp_tx_ena = true;
++
++	return err;
++}
++
++int ice_drop_vf_tx_lldp(struct ice_vsi *vsi, bool init)
++{
++	struct ice_rule_query_data rule_added;
++	struct ice_adv_rule_info rinfo = {
++		.priority = 7,
++		.src_vsi = vsi->idx,
++		.sw_act = {
++			.src = vsi->idx,
++			.flag = ICE_FLTR_TX,
++			.fltr_act = ICE_DROP_PACKET,
++			.vsi_handle = vsi->idx,
++		},
++		.flags_info.act_valid = true,
++	};
++	struct ice_adv_lkup_elem list[3];
++	struct ice_pf *pf = vsi->back;
++	int err;
++
++	if (!init && !vsi->vf->lldp_tx_ena)
++		return 0;
++
++	memset(list, 0, sizeof(list));
++	ice_rule_add_direction_metadata(&list[0]);
++	ice_rule_add_src_vsi_metadata(&list[1]);
++	list[2].type = ICE_ETYPE_OL;
++	list[2].h_u.ethertype.ethtype_id = htons(ETH_P_LLDP);
++	list[2].m_u.ethertype.ethtype_id = htons(0xFFFF);
++
++	err = ice_add_adv_rule(&pf->hw, list, ARRAY_SIZE(list), &rinfo,
++			       &rule_added);
++	if (err) {
++		dev_err(&pf->pdev->dev,
++			"Failed to add an LLDP rule to VSI 0x%X: %d\n",
++			vsi->idx, err);
++	} else {
++		vsi->vf->lldp_recipe_id = rule_added.rid;
++		vsi->vf->lldp_rule_id = rule_added.rule_id;
++		vsi->vf->lldp_tx_ena = false;
++	}
++
++	return err;
++}
++
++static void ice_handle_add_pf_lldp_drop_rule(struct ice_vsi *vsi)
++{
++	struct ice_tc_flower_fltr *fltr;
++	struct ice_pf *pf = vsi->back;
++
++	hlist_for_each_entry(fltr, &pf->tc_flower_fltr_list, tc_flower_node) {
++		if (!ice_is_fltr_vf_tx_lldp(fltr))
++			continue;
++		ice_pass_vf_tx_lldp(fltr->src_vsi, true);
++		break;
++	}
++}
++
++static void ice_handle_del_pf_lldp_drop_rule(struct ice_pf *pf)
++{
++	int i;
++
++	/* Make the VF LLDP fwd to uplink rule dormant */
++	ice_for_each_vsi(pf, i) {
++		struct ice_vsi *vf_vsi = pf->vsi[i];
++
++		if (vf_vsi && vf_vsi->type == ICE_VSI_VF)
++			ice_drop_vf_tx_lldp(vf_vsi, false);
++	}
++}
++
  static int
- ice_add_tc_fltr(struct net_device *netdev, struct ice_vsi *vsi,
- 		struct flow_cls_offload *f,
--		struct ice_tc_flower_fltr **__fltr)
-+		struct ice_tc_flower_fltr **__fltr, bool ingress)
+ ice_eswitch_add_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
  {
- 	struct ice_tc_flower_fltr *fltr;
- 	int err;
-@@ -1994,7 +2033,7 @@ ice_add_tc_fltr(struct net_device *netdev, struct ice_vsi *vsi,
- 	fltr->src_vsi = vsi;
- 	INIT_HLIST_NODE(&fltr->tc_flower_node);
- 
--	err = ice_parse_cls_flower(netdev, vsi, f, fltr);
-+	err = ice_parse_cls_flower(netdev, vsi, f, fltr, ingress);
- 	if (err < 0)
- 		goto err;
- 
-@@ -2037,10 +2076,13 @@ ice_find_tc_flower_fltr(struct ice_pf *pf, unsigned long cookie)
-  * @netdev: Pointer to filter device
-  * @vsi: Pointer to VSI
-  * @cls_flower: Pointer to flower offload structure
-+ * @ingress: if the rule is added to an ingress block
-+ *
-+ * Return: 0 if the flower was successfully added,
-+ *	   negative error code otherwise.
-  */
--int
--ice_add_cls_flower(struct net_device *netdev, struct ice_vsi *vsi,
--		   struct flow_cls_offload *cls_flower)
-+int ice_add_cls_flower(struct net_device *netdev, struct ice_vsi *vsi,
-+		       struct flow_cls_offload *cls_flower, bool ingress)
- {
- 	struct netlink_ext_ack *extack = cls_flower->common.extack;
- 	struct net_device *vsi_netdev = vsi->netdev;
-@@ -2075,7 +2117,7 @@ ice_add_cls_flower(struct net_device *netdev, struct ice_vsi *vsi,
+@@ -779,6 +927,9 @@ ice_eswitch_add_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
+ 		return -EOPNOTSUPP;
  	}
  
- 	/* prep and add TC-flower filter in HW */
--	err = ice_add_tc_fltr(netdev, vsi, cls_flower, &fltr);
-+	err = ice_add_tc_fltr(netdev, vsi, cls_flower, &fltr, ingress);
- 	if (err)
- 		return err;
++	if (ice_is_fltr_vf_tx_lldp(fltr))
++		return ice_pass_vf_tx_lldp(vsi, false);
++
+ 	lkups_cnt = ice_tc_count_lkups(flags, fltr);
+ 	list = kcalloc(lkups_cnt, sizeof(*list), GFP_ATOMIC);
+ 	if (!list)
+@@ -850,6 +1001,9 @@ ice_eswitch_add_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
+ 		goto exit;
+ 	}
  
++	if (ice_is_fltr_pf_tx_lldp(fltr))
++		ice_handle_add_pf_lldp_drop_rule(vsi);
++
+ 	/* store the output params, which are needed later for removing
+ 	 * advanced switch filter
+ 	 */
+@@ -1969,6 +2123,12 @@ static int ice_del_tc_fltr(struct ice_vsi *vsi, struct ice_tc_flower_fltr *fltr)
+ 	struct ice_pf *pf = vsi->back;
+ 	int err;
+ 
++	if (ice_is_fltr_pf_tx_lldp(fltr))
++		ice_handle_del_pf_lldp_drop_rule(pf);
++
++	if (ice_is_fltr_vf_tx_lldp(fltr))
++		return ice_drop_vf_tx_lldp(vsi, false);
++
+ 	rule_rem.rid = fltr->rid;
+ 	rule_rem.rule_id = fltr->rule_id;
+ 	rule_rem.vsi_handle = fltr->dest_vsi_handle;
 diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.h b/drivers/net/ethernet/intel/ice/ice_tc_lib.h
-index d84f153517ec..df9f90f793b9 100644
+index df9f90f793b9..8a3ab2f22af9 100644
 --- a/drivers/net/ethernet/intel/ice/ice_tc_lib.h
 +++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.h
-@@ -211,11 +211,10 @@ static inline int ice_chnl_dmac_fltr_cnt(struct ice_pf *pf)
- }
- 
- struct ice_vsi *ice_locate_vsi_using_queue(struct ice_vsi *vsi, int queue);
--int
--ice_add_cls_flower(struct net_device *netdev, struct ice_vsi *vsi,
--		   struct flow_cls_offload *cls_flower);
--int
--ice_del_cls_flower(struct ice_vsi *vsi, struct flow_cls_offload *cls_flower);
-+int ice_add_cls_flower(struct net_device *netdev, struct ice_vsi *vsi,
-+		       struct flow_cls_offload *cls_flower, bool ingress);
-+int ice_del_cls_flower(struct ice_vsi *vsi,
-+		       struct flow_cls_offload *cls_flower);
+@@ -217,6 +217,8 @@ int ice_del_cls_flower(struct ice_vsi *vsi,
+ 		       struct flow_cls_offload *cls_flower);
  void ice_replay_tc_fltrs(struct ice_pf *pf);
  bool ice_is_tunnel_supported(struct net_device *dev);
++int ice_drop_vf_tx_lldp(struct ice_vsi *vsi, bool init);
++int ice_pass_vf_tx_lldp(struct ice_vsi *vsi, bool deinit);
  
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
-index 1e4f6f6ee449..0e5107fe62ad 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-@@ -2440,19 +2440,20 @@ ice_xmit_frame_ring(struct sk_buff *skb, struct ice_tx_ring *tx_ring)
+ static inline bool ice_is_forward_action(enum ice_sw_fwd_act_type fltr_act)
+ {
+diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.h b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
+index f4c9ca1f51ce..482f4285fd35 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vf_lib.h
++++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
+@@ -124,6 +124,7 @@ struct ice_vf {
+ 	u8 spoofchk:1;
+ 	u8 link_forced:1;
+ 	u8 link_up:1;			/* only valid if VF link is forced */
++	u8 lldp_tx_ena:1;
  
- 	/* allow CONTROL frames egress from main VSI if FW LLDP disabled */
- 	eth = (struct ethhdr *)skb_mac_header(skb);
--	if (unlikely((skb->priority == TC_PRIO_CONTROL ||
--		      eth->h_proto == htons(ETH_P_LLDP)) &&
--		     vsi->type == ICE_VSI_PF &&
--		     vsi->port_info->qos_cfg.is_sw_lldp))
--		offload.cd_qw1 |= (u64)(ICE_TX_DESC_DTYPE_CTX |
--					ICE_TX_CTX_DESC_SWTCH_UPLINK <<
--					ICE_TXD_CTX_QW1_CMD_S);
+ 	u32 ptp_caps;
  
--	ice_tstamp(tx_ring, skb, first, &offload);
- 	if ((ice_is_switchdev_running(vsi->back) ||
- 	     ice_lag_is_switchdev_running(vsi->back)) &&
- 	    vsi->type != ICE_VSI_SF)
- 		ice_eswitch_set_target_vsi(skb, &offload);
-+	else if (unlikely((skb->priority == TC_PRIO_CONTROL ||
-+			   eth->h_proto == htons(ETH_P_LLDP)) &&
-+			   vsi->type == ICE_VSI_PF &&
-+			   vsi->port_info->qos_cfg.is_sw_lldp))
-+		offload.cd_qw1 |= (u64)(ICE_TX_DESC_DTYPE_CTX |
-+					ICE_TX_CTX_DESC_SWTCH_UPLINK <<
-+					ICE_TXD_CTX_QW1_CMD_S);
+@@ -150,6 +151,9 @@ struct ice_vf {
+ 	/* devlink port data */
+ 	struct devlink_port devlink_port;
+ 
++	u16 lldp_recipe_id;
++	u16 lldp_rule_id;
 +
-+	ice_tstamp(tx_ring, skb, first, &offload);
- 
- 	if (offload.cd_qw1 & ICE_TX_DESC_DTYPE_CTX) {
- 		struct ice_tx_ctx_desc *cdesc;
+ 	u16 num_msix;			/* num of MSI-X configured on this VF */
+ 	struct ice_vf_qs_bw qs_bw[ICE_MAX_RSS_QS_PER_VF];
+ };
 -- 
 2.47.1
 
