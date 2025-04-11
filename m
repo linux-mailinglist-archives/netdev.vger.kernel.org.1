@@ -1,132 +1,131 @@
-Return-Path: <netdev+bounces-181464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CA2AA85178
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 04:17:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A06A9A851AD
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 04:44:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03288464E1A
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 02:17:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 630261BA2600
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 02:44:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E851EA90;
-	Fri, 11 Apr 2025 02:17:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6F3327BF8B;
+	Fri, 11 Apr 2025 02:44:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
+Received: from spam.asrmicro.com (asrmicro.com [210.13.118.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A06BC27932A
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 02:17:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07C0044C94
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 02:44:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.13.118.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744337860; cv=none; b=ucaenQsoSlIWg/leTUel7VNK8mlCb57suLuwW02BdzNDVwi7sD2jYFmu+Q/rt9llQ8YzXr6vl4QPilJ99WfK9SfkckDgcqHIEbYNVMl6mRq8Aofx2EDNgvf4X7c/M5OU8MmqFAN4QHo4oEbRvwhq6upDC411rKqL2n6R3YubQG4=
+	t=1744339445; cv=none; b=HTkxjV6oMMwxo29mbE9Yy+BCBD6LQAjJVOFZDEejau5w5ryJvxQsf/vXjBEj3OC5i85AGFWbSlpPyJhBqEABnIRica7CyBJIK6JJmjcMnyXCI6Z85+IbNnOtVrz0mUAYArPhWKtOIvGXWQqVPhN4XVVVS1OZYxGfD/8WRPuP7mg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744337860; c=relaxed/simple;
-	bh=rCwNUhMjQO4zSOp8eCZR5c1yD2ffSdot1jqUoKHbfp4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=i1Wo+ugLapzQEySYYnYYF0fb6RUmAnevZ95LxV3OhLO680y1PZC0gArw9/EAp8uRy6WV5oRUbq/6BEXH7mALGMAAM/MSrkgDBXX9OPgsacQIL64UPIMyi+wuU4nx36kxjjh4gJT0QpePYBdU7r2y6FBSpWmOQ1nYdakgZXyuSVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=15.184.224.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: bizesmtpsz7t1744337780tbfb407
-X-QQ-Originating-IP: H+ByFVKiVrppbXyKOIlmKLpL3WrGzdfQij9dS8vhY8Q=
-Received: from wxdbg.localdomain.com ( [220.184.249.159])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 11 Apr 2025 10:16:12 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 5105452606245489037
-EX-QQ-RecipientCnt: 9
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org
-Cc: mengyuanlou@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v2] net: txgbe: Update module description
-Date: Fri, 11 Apr 2025 10:42:05 +0800
-Message-Id: <20250411024205.332613-1-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.27.0
+	s=arc-20240116; t=1744339445; c=relaxed/simple;
+	bh=UCa/jybotYpcnxVFXxMFtM0241fEygkIsjF25VUQSpo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=cQv3R2ztHsy9vXPT0sZ41eGCefEMtWW9YRDHnkgSay+SaRJLffxVpyEsa//pUL0TmV1O2Y33LVTW3i5rRKNmo9D9YD8rn4knB/EQ5sRM0U6sVTGJASSvGFK/bc/lkBlKQk1MN8KsIi1pYUGeHkMGJ6siSst3zjyDKV20kNjMMAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=asrmicro.com; spf=pass smtp.mailfrom=asrmicro.com; arc=none smtp.client-ip=210.13.118.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=asrmicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asrmicro.com
+Received: from exch02.asrmicro.com (exch02.asrmicro.com [10.1.24.122])
+	by spam.asrmicro.com with ESMTPS id 53B2hkuN041767
+	(version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=FAIL);
+	Fri, 11 Apr 2025 10:43:46 +0800 (GMT-8)
+	(envelope-from huajianyang@asrmicro.com)
+Received: from exch03.asrmicro.com (10.1.24.118) by exch02.asrmicro.com
+ (10.1.24.122) with Microsoft SMTP Server (TLS) id 15.0.847.32; Fri, 11 Apr
+ 2025 10:43:47 +0800
+Received: from exch03.asrmicro.com ([::1]) by exch03.asrmicro.com ([::1]) with
+ mapi id 15.00.0847.030; Fri, 11 Apr 2025 10:43:36 +0800
+From: =?gb2312?B?WWFuZyBIdWFqaWFuo6jR7ruqvaGjqQ==?= <huajianyang@asrmicro.com>
+To: Florian Westphal <fw@strlen.de>
+CC: "pablo@netfilter.org" <pablo@netfilter.org>,
+        "kadlec@netfilter.org"
+	<kadlec@netfilter.org>,
+        "razor@blackwall.org" <razor@blackwall.org>,
+        "idosch@nvidia.com" <idosch@nvidia.com>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "dsahern@kernel.org" <dsahern@kernel.org>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "kuba@kernel.org"
+	<kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "horms@kernel.org" <horms@kernel.org>,
+        "netfilter-devel@vger.kernel.org"
+	<netfilter-devel@vger.kernel.org>,
+        "coreteam@netfilter.org"
+	<coreteam@netfilter.org>,
+        "bridge@lists.linux.dev" <bridge@lists.linux.dev>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: =?gb2312?B?tPC4tDogW1BBVENIXSBuZXQ6IE1vdmUgc3BlY2lmaWMgZnJhZ21lbnRlZCBw?=
+ =?gb2312?Q?acket_to_slow=5Fpath_instead_of_dropping_it?=
+Thread-Topic: [PATCH] net: Move specific fragmented packet to slow_path
+ instead of dropping it
+Thread-Index: AQHbqe43btIvaVaBvESzU8w5bMigsLOcKc8AgAGQvBA=
+Date: Fri, 11 Apr 2025 02:43:35 +0000
+Message-ID: <717907fcffc7406191a71297fc07f6b3@exch03.asrmicro.com>
+References: <20250410075726.8599-1-huajianyang@asrmicro.com>
+ <20250410101824.GA6272@breakpoint.cc>
+In-Reply-To: <20250410101824.GA6272@breakpoint.cc>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: ONeCszOCk2GV9GfJLl88X2e6YZeh5IXmY+fM8WZx4031JKTfcF6djCeC
-	/GCxdivWuGXC1CWe8kjmSMdiDnuPCc/QuRBqoTqgbz4XoLA+AEnfNC2w5UcuomXyvw6XtFA
-	VO94WwUJUreY9IVZ3UTd/qqjgXjzXIfJ8rT8+p3ZTVkfGOOwpzON0TYcamDQHcn8LCGR+aB
-	duw7IdTjjH8q67wEKkSxrReMhUr9t+DfqlhjOJHq/SBWBd6AKP7fdUukbqpCZvttUcfsrfT
-	63p8yBZLbWRlNIBFodTBnSJCv72rMB5mdOTKRBq83ny4c78kRJZ2uZrHcpn9on0yAA9JEuc
-	pSsD6VuEEH42euLdMstlo1OEiR2r9AF1XosS5Hgbg6EPTWhNXaHHyKHawZc202LySBUMztg
-	J5Ap82xu2HhOAPBGUW464u+b3fzB/sTVAEuBjccPQ39I9ncqytMIt19Zn5zNDTcHBeERjLO
-	xsBRmQoB0aZuCmGGxrpGEmzEqZlUTtf7B0cLsnkeZswajX2OQceXeqkYuPH6LjB5MHEON8E
-	KESdz5Jl/LoRxS5+IdnMnCwmB0ShlNyKRdOPUJPg2oEPFqw/4Py7srjDo6wUEvEW8dvj9D8
-	m0BMhX2Kj6MCO7BPuCru9LC1fpVIYmCq2SmYZ1LOwzNn+yzScLDjDkSN99JI0vpZtWeG1vb
-	yxFTkm/KV98eRm73vNR1WWOg7+4SDUj8vzd43lbNVYLUimDbe50ib+nRe9v6L+wTaqPOpEA
-	a8vuIUt6wQ2WtdKv7mTQf5YpwZsELug2RWvmKAJX6Zzu8LAb9o3ujYaXSKTpbVizLM42N4C
-	ij9oodMg9gMwFS9rLFKo/w0hHaFsQ2Mpi7VI++brucQ11tbSUaqdRgVkOEAuWrWzwS8MIkx
-	S4aMHiLRerGC4TLJaxXv2/sHn8y9D3TLCPzYoNaBlByvAb347b3rloNpqBbNWP3pSTBHRLN
-	UQU+6isp15cphmWE90iN69Qejm6pze36TsilvoNpp0i4uNSzTeNcNuc/b5Db/v5CBAtkv6w
-	tOW1Yq7qZEikJr0stO
-X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
-X-QQ-RECHKSPAM: 0
+X-DNSRBL: 
+X-SPAM-SOURCE-CHECK: pass
+X-MAIL:spam.asrmicro.com 53B2hkuN041767
 
-Because of the addition of support for 25G/40G devices, update the module
-description.
-
-Fixes: 2e5af6b2ae85 ("net: txgbe: Add basic support for new AML devices")
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
-v2:
- - post for net-next
- - sort device speeds from the slowest
----
- drivers/net/ethernet/wangxun/Kconfig            | 4 ++--
- drivers/net/ethernet/wangxun/txgbe/txgbe_main.c | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/wangxun/Kconfig b/drivers/net/ethernet/wangxun/Kconfig
-index 47e3e8434b9e..e5fc942c28cc 100644
---- a/drivers/net/ethernet/wangxun/Kconfig
-+++ b/drivers/net/ethernet/wangxun/Kconfig
-@@ -40,7 +40,7 @@ config NGBE
- 	  will be called ngbe.
- 
- config TXGBE
--	tristate "Wangxun(R) 10GbE PCI Express adapters support"
-+	tristate "Wangxun(R) 10/25/40GbE PCI Express adapters support"
- 	depends on PCI
- 	depends on COMMON_CLK
- 	depends on I2C_DESIGNWARE_PLATFORM
-@@ -55,7 +55,7 @@ config TXGBE
- 	select PCS_XPCS
- 	select LIBWX
- 	help
--	  This driver supports Wangxun(R) 10GbE PCI Express family of
-+	  This driver supports Wangxun(R) 10/25/40GbE PCI Express family of
- 	  adapters.
- 
- 	  More specific information on configuring the driver is in
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index 6d9134a3ce4d..db5166a6db2c 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -849,5 +849,5 @@ module_pci_driver(txgbe_driver);
- 
- MODULE_DEVICE_TABLE(pci, txgbe_pci_tbl);
- MODULE_AUTHOR("Beijing WangXun Technology Co., Ltd, <software@trustnetic.com>");
--MODULE_DESCRIPTION("WangXun(R) 10 Gigabit PCI Express Network Driver");
-+MODULE_DESCRIPTION("WangXun(R) 10/25/40 Gigabit PCI Express Network Driver");
- MODULE_LICENSE("GPL");
--- 
-2.27.0
-
+VGhhbmsgeW91IGZvciB5b3VyIHJlcGx5IQ0KDQpJbiBhbiBlYXJsaWVyIGVtYWlsIEkgd3JvdGU6
+DQoNCj4gU29tZSBuZXR3b3JrIGRldmljZXMgdGhhdCB3b3VsZCBub3QgYWJsZSB0byBwaW5nIGxh
+cmdlIHBhY2tldCB1bmRlciANCj4gYnJpZGdlLCBidXQgbGFyZ2UgcGFja2V0IHBpbmcgaXMgc3Vj
+Y2Vzc2Z1bCBpZiBub3QgZW5hYmxlIE5GX0NPTk5UUkFDS19CUklER0UuDQoNCklmIHRoZSBwaW5n
+IHRlc3Qgc3VjY2Vzc2VkIHdpdGhvdXQgTkZfQ09OTlRSQUNLX0JSSURHRSwgaXQgaXMgYmVjYXVz
+ZSB0aGUgbmV0ZGV2IGRvZXNuJ3QgbmVlZCBzdWNoIGEgbGFyZ2UgaGVhZHJvb20gaW4gYWN0dWFs
+IG5ldHdvcmsgZm9yd2FyZGluZy4NCg0KSWYgdGhlIG5ldGRldiByZWFseSBuZWVkIGl0LCB0aGUg
+b3JpZ2luYWwgYnJpZGdlIGZvcndhcmRpbmcgd2lsbCBmYWlsIHRvby4NCg0KTWF5YmUgd2UgbmVl
+ZCByZWNvbmZpZyBvdXIgd2lmaSBuZXRkZXYgb3Igc29tZXRoaW5nIGVsc2UuDQoNClNvIGlzIHRo
+ZSBuZl9icl9pcF9mcmFnbWVudCBkb25lIHRvIGJlIGNvbnNpc3RlbnQgd2l0aCB0aGUgb3JpZ2lu
+YWwgYnJpZGdlIGZvcndhcmRpbmc/DQoNClRoZXJlIGFyZSB0d28gdmVyeSBkaWZmZXJlbnQgaWRl
+YXMgaGVyZToNCg0KT25lIGlzIHRvIHRyeSB0byBtYWludGFpbiB0aGUgc2FtZSB0cmVhdG1lbnQg
+YXMgdGhlIG9yaWdpbmFsIGJyaWRnZSwgYXMgaXQgaXMgY3VycmVudGx5Lg0KDQpUaGUgb3RoZXIg
+aXMgdG8gdHJ5IHRvIGVuc3VyZSB0aGF0IHRoZSBwYWNrZXQgaXMgZm9yd2FyZGVkLg0KDQo+IEkg
+d291bGQgcHJlZmVyIHRvIGtlZXAgYmxhY2tob2xlIGxvZ2ljIGZvciB0aGUgbXR1IHRlc3RzLCBp
+LmUuDQo+ICBpZiAoZmlyc3RfbGVuIC0gaGxlbiA+IG10dSkNCj4gICAgICBnb3RvIGJsYWNraG9s
+ZTsNCg0KQW55d2F5LCB0aGlzIG1vZGlmaWNhdGlvbiBpcyBtb3JlIGFwcHJvcHJpYXRlLg0KDQpC
+ZWNhdXNlIEkgaGF2ZSB0ZXN0ZWQgYnkgY2hhbmdlIG10dSBqdXN0IG5vdywgZ290byBzbG93cGF0
+aCBjYW5ub3QgZm9yd2FyZCBpdCBlaXRoZXIuDQoNCg0KQmVzdCBSZWdhcmRzLA0KSHVhamlhbg0K
+DQotLS0tLdPKvP7Urbz+LS0tLS0NCreivP7IyzogRmxvcmlhbiBXZXN0cGhhbCBbbWFpbHRvOmZ3
+QHN0cmxlbi5kZV0gDQq3osvNyrG85DogMjAyNcTqNNTCMTDI1SAxODoxOA0KytW8/sjLOiBZYW5n
+IEh1YWppYW6jqNHuu6q9oaOpIDxodWFqaWFueWFuZ0Bhc3JtaWNyby5jb20+DQqzrcvNOiBwYWJs
+b0BuZXRmaWx0ZXIub3JnOyBmd0BzdHJsZW4uZGU7IGthZGxlY0BuZXRmaWx0ZXIub3JnOyByYXpv
+ckBibGFja3dhbGwub3JnOyBpZG9zY2hAbnZpZGlhLmNvbTsgZGF2ZW1AZGF2ZW1sb2Z0Lm5ldDsg
+ZHNhaGVybkBrZXJuZWwub3JnOyBlZHVtYXpldEBnb29nbGUuY29tOyBrdWJhQGtlcm5lbC5vcmc7
+IHBhYmVuaUByZWRoYXQuY29tOyBob3Jtc0BrZXJuZWwub3JnOyBuZXRmaWx0ZXItZGV2ZWxAdmdl
+ci5rZXJuZWwub3JnOyBjb3JldGVhbUBuZXRmaWx0ZXIub3JnOyBicmlkZ2VAbGlzdHMubGludXgu
+ZGV2OyBuZXRkZXZAdmdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3Jn
+DQrW98ziOiBSZTogW1BBVENIXSBuZXQ6IE1vdmUgc3BlY2lmaWMgZnJhZ21lbnRlZCBwYWNrZXQg
+dG8gc2xvd19wYXRoIGluc3RlYWQgb2YgZHJvcHBpbmcgaXQNCg0KSHVhamlhbiBZYW5nIDxodWFq
+aWFueWFuZ0Bhc3JtaWNyby5jb20+IHdyb3RlOg0KPiAtLS0gYS9uZXQvYnJpZGdlL25ldGZpbHRl
+ci9uZl9jb25udHJhY2tfYnJpZGdlLmMNCj4gKysrIGIvbmV0L2JyaWRnZS9uZXRmaWx0ZXIvbmZf
+Y29ubnRyYWNrX2JyaWRnZS5jDQo+IEBAIC02MSwxOCArNjEsMTQgQEAgc3RhdGljIGludCBuZl9i
+cl9pcF9mcmFnbWVudChzdHJ1Y3QgbmV0ICpuZXQsIHN0cnVjdCBzb2NrICpzaywNCj4gIAkJc3Ry
+dWN0IHNrX2J1ZmYgKmZyYWc7DQo+ICANCj4gIAkJaWYgKGZpcnN0X2xlbiAtIGhsZW4gPiBtdHUg
+fHwNCj4gLQkJICAgIHNrYl9oZWFkcm9vbShza2IpIDwgbGxfcnMpDQo+IC0JCQlnb3RvIGJsYWNr
+aG9sZTsNCg0KSSB3b3VsZCBwcmVmZXIgdG8ga2VlcCBibGFja2hvbGUgbG9naWMgZm9yIHRoZSBt
+dHUgdGVzdHMsIGkuZS4NCiAgaWYgKGZpcnN0X2xlbiAtIGhsZW4gPiBtdHUpDQogICAgICBnb3Rv
+IGJsYWNraG9sZTsNCg0Kc2FtZSBmb3IgdGhlIGZyYWctPmxlbiB0ZXN0IGluIHRoZSBza2Jfd2Fs
+a19mcmFncyBsb29wLg0KRnJvbSB3aGF0IEkgdW5kZXJzdG9vZCB0aGUgcHJvYmxlbSBpcyBvbmx5
+IGJlY2F1c2Ugb2YgdGhlIGxvd2VyIGRldmljZXMnIGhlYWRyb29tIHJlcXVpcmVtZW50Lg0K
 
