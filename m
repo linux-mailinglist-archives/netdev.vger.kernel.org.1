@@ -1,115 +1,91 @@
-Return-Path: <netdev+bounces-181828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84249A86852
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 23:31:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4522BA8685C
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 23:34:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BAFD189B7C5
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 21:31:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DD178C4D2F
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 21:33:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8950829CB28;
-	Fri, 11 Apr 2025 21:31:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49C1A290BD2;
+	Fri, 11 Apr 2025 21:33:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="TqMF6yKQ"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bR7TNaMm"
 X-Original-To: netdev@vger.kernel.org
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24637293B6E
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 21:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D627A280A45;
+	Fri, 11 Apr 2025 21:33:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744407086; cv=none; b=M2O6ZPaIzzLZBEd42z6UtHTNv6tK8pznT3cgGRhabmcbU9udJnJBrYBrkgtuWtfuLUrk1scNDD/RKcS5oaV6eZBRIVPNgVql1hPakGDB2LDknpk026ku20F7TF185T/bH9SVtZSaLvvddxTEMR0xkj/jIs2+2vt+gz5sxRRmDT4=
+	t=1744407215; cv=none; b=eHUDI5NCYArS2r2yHUzcLzrtyG3/t6kr175hW6R9TIkzAQVKggo/qhvx72zADkzRGLs+oKwLYwyJ4nO5gh2ggnT+krLTgIYSovUx/LcmXn3rPkDS0QHRkLiUjglNbbT+isgzwWwq6n7keEd3ZA2grDIB6XcbBaSRdEgAV7RbfoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744407086; c=relaxed/simple;
-	bh=fbIAzUNZ3TK4HGT1AClmfn49H8txlEyt7S+52oGkJWs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XSwYpVBa3wX2VdCcEBKInnPlYIkUfvRIJpHDDL4TFXhccD6oHQCKSD+I78A0Z1vLWddLJCEoHo3/AuL+J8PnEIfsJJEPiuRPctIGnRcCB1PZL1VxOCfzkU06Vf+jHNL5bzZbKqBhlzJM3y4+UbH6etIj404U4PZn6i6/ov0bj0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=TqMF6yKQ; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=eANgi2y0ed10Jn7+5U/LGgbRCBvTRX/JcwMzCgW3s7I=; b=TqMF6yKQeNkdTOehrK5khooulx
-	H0d0gB2Jh5cB6N4J1JoNS/pXG8P0vkshaSQ1ImrlIg/TIS4luV+i2cXqCMM36T14ftNIUcPyWWFBL
-	g2jBc6IkZM2ypMkSrjKYeWe82+hMSOlA6p2nBZ7AJ0YX6E1xHwZRLDTbZQDo0ULywwKNcjBHx7M4m
-	DPEnnbL9nDa0dMD2Eyjm2CwgdvI3E9iNr3CGuTizFcNn6ySG27fQHNMk1+C42t48QmOJfDfZM0Bhm
-	dieACbh7REuxXqm7kwsP5HhPyLomszCElx73o3LZ6Hn9wdEiVwGMlIfDoPz+Z8s/9/CTRpwJk5P2/
-	zHYRR9+Q==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <carnil@debian.org>)
-	id 1u3Lxt-000pXm-4l; Fri, 11 Apr 2025 21:31:09 +0000
-Received: by eldamar.lan (Postfix, from userid 1000)
-	id 5908BBE2DE0; Fri, 11 Apr 2025 23:31:08 +0200 (CEST)
-Date: Fri, 11 Apr 2025 23:31:08 +0200
-From: Salvatore Bonaccorso <carnil@debian.org>
-To: Michal Kubecek <mkubecek@suse.cz>, netdev@vger.kernel.org
-Cc: asciiwolf@seznam.cz, Petter Reinholdtsen <pere@hungry.com>
-Subject: Re: [PATCH ethtool] Set type property to console-application for
- provided AppStream metainfo XML
-Message-ID: <Z_mKHHSNscT09VwJ@eldamar.lan>
-References: <20250411141023.14356-2-carnil@debian.org>
+	s=arc-20240116; t=1744407215; c=relaxed/simple;
+	bh=hgKQvQr0rIaG+2vyORx/Vj9aw9+m9FntNVoHMPe6dGE=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Iqi/QeLh4/MwZ8ydbWHjlqqP7JsZKvfsfeAJShef/L37i04Z9VRLSHAKX4OTzKHiX47MIbSMdSvfnKQhFLHO5bViQmKdW5fqWmxe1OTz0A3noj5ZSkFLXpcGK+y85kVfhDzJnL8m195122Q5wuJLUsg74A4HHoMzGXhB7yRz9FE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=bR7TNaMm; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744407213; x=1775943213;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=56QyNo1oxvXr5JMfcmEYxVEBzWsF7ck7mjQTHndG6DA=;
+  b=bR7TNaMmsMvhzid7fCS/W4Goew1kTPCGNEYoZz9zjOMxQnyecEQ64rYU
+   knaqWU4NPNCNxlGeY6EyJkUf9L8OQYIoQ5DBekTz1kS7PVH+uypHJJRMz
+   8qJBLcD9yRr3OlaruystxDQLgJe0d6ah4YwsTzxQzww2tG0wQXSXzITfp
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.15,206,1739836800"; 
+   d="scan'208";a="186725718"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2025 21:33:33 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:4747]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.8.63:2525] with esmtp (Farcaster)
+ id fe1ed29c-94ac-4b99-8cf2-06d0f0de9c88; Fri, 11 Apr 2025 21:33:33 +0000 (UTC)
+X-Farcaster-Flow-ID: fe1ed29c-94ac-4b99-8cf2-06d0f0de9c88
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 11 Apr 2025 21:33:32 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.119.240.29) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 11 Apr 2025 21:33:29 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <leitao@debian.org>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, Kuniyuki Iwashima
+	<kuniyu@amazon.com>
+Subject: Re: [PATCH net-next 7/9] ipv6: Use nlmsg_payload in inet6_rtm_valid_getaddr_req
+Date: Fri, 11 Apr 2025 14:33:20 -0700
+Message-ID: <20250411213321.68920-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250411-nlmsg-v1-7-ddd4e065cb15@debian.org>
+References: <20250411-nlmsg-v1-7-ddd4e065cb15@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250411141023.14356-2-carnil@debian.org>
-X-Debian-User: carnil
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D033UWA002.ant.amazon.com (10.13.139.10) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hi Michal,
-
-On Fri, Apr 11, 2025 at 04:10:24PM +0200, Salvatore Bonaccorso wrote:
-> As pointed out in the Debian downstream report, as ethtool is a
-> command-line tool the XML root myst have the type property set to
-> console-application.
+From: Breno Leitao <leitao@debian.org>
+Date: Fri, 11 Apr 2025 10:00:54 -0700
+> Leverage the new nlmsg_payload() helper to avoid checking for message
+> size and then reading the nlmsg data.
 > 
-> Additionally with the type propety set to desktop, ethtool is user
-> uninstallable via GUI (such as GNOME Software or KDE Discover).
-> 
-> Fixes: 02d505bba6fe ("Add AppStream metainfo XML with modalias documented supported hardware.")
-> Reported-by: asciiwolf@seznam.cz
-> Cc: Petter Reinholdtsen <pere@hungry.com>
-> Link: https://bugs.debian.org/1102647
-> Link: https://bugzilla.redhat.com/show_bug.cgi?id=2359069
-> Link: https://freedesktop.org/software/appstream/docs/sect-Metadata-ConsoleApplication.html
-> Signed-off-by: Salvatore Bonaccorso <carnil@debian.org>
-> ---
->  org.kernel.software.network.ethtool.metainfo.xml | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/org.kernel.software.network.ethtool.metainfo.xml b/org.kernel.software.network.ethtool.metainfo.xml
-> index efe84c17e4cd..c31cae4bede6 100644
-> --- a/org.kernel.software.network.ethtool.metainfo.xml
-> +++ b/org.kernel.software.network.ethtool.metainfo.xml
-> @@ -1,5 +1,5 @@
->  <?xml version="1.0" encoding="UTF-8"?>
-> -<component type="desktop">
-> +<component type="console-application">
->    <id>org.kernel.software.network.ethtool</id>
->    <metadata_license>MIT</metadata_license>
->    <name>ethtool</name>
-> -- 
-> 2.49.0
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-ignore that please as Daniel and Petter have the proper proposal
-building up.
-
-Thanks Daniel and Petter.
-
-Petter, once it's commited upstream I will cherry-pick back for
-Debian.
-
-Regards,
-Salvatore
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
