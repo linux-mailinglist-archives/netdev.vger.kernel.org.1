@@ -1,58 +1,66 @@
-Return-Path: <netdev+bounces-181688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6DB9A86254
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 17:51:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BEDAA86260
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 17:53:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 121501BA114E
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 15:52:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9CA13B0137
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 15:53:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6DA20F063;
-	Fri, 11 Apr 2025 15:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CED620FA90;
+	Fri, 11 Apr 2025 15:53:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AJV8RtgE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CbhzcTJ/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49C8035961
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 15:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B8B1FDA;
+	Fri, 11 Apr 2025 15:53:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744386708; cv=none; b=AKed3dsIUq7QwGhRM3AuZLVXG8X6bQx9VhhNSqrdXBvrZCxJHE6mNAWsUF697WQbje7Fy5ZZNNkq2YTRSv42q/45bbvHa9NHLpyk3E652Lw7T66xQyrdZhnO+F4E1tsscdWhd/927a2pAnbGKqIpcagGiEIa+6QMCUZke+mhAxs=
+	t=1744386808; cv=none; b=NmEYmo0+ybqEGwIkQqcitGRQlCNLysQxk2diM9r73EXo8Uv0aV8QD8lgPh7WLyrCy9+moKf0xGYd2Iz0LUVeanEBbD2VTvFZpU+Wu6rQMFmfZL7n4YWJd857TQJScwp0eaFRP29tY31ObubgK7WS+pYqJqitVGR1gtnXG9VBsUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744386708; c=relaxed/simple;
-	bh=WUlpEvUyYqtQN+coMNo0xuXkthk/nI+QBNZ5QVY2IEI=;
+	s=arc-20240116; t=1744386808; c=relaxed/simple;
+	bh=WpLLjD7bOW1+fhZZ7vlzZrNDNsR7j0cmT3HhyvWs3dE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PsRBIthb09pBkNJTvVIHKsE0eMA44yVvoWbJyP9ghcFqTHCkJT7r/L3bVPKDfpc4y7In+viQUMWbI4N3M8F9yUaEpQfrT8OBx3ng2TofZbWrNnNZx9FQ10zhdikcTIYsa0YkTgrQ4WtPkAvFspF9QM7F4neI97tqvYuXJLCH6Cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AJV8RtgE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8737AC4CEE2;
-	Fri, 11 Apr 2025 15:51:46 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=BO5kQhy2sfONziC7o0XSu4uUtwvQqu2MgNacgeTHz1lT1VRjCGcA2i8c0onwr/i9KyuSRt1eQm58+6KD8UHiIbc3748CRe1Rmq5wIzytntzAHLq8mOWiLLsxCQxb45pPMxWbWZFb8AxYt+sZoAP90+fT/yEh6Owa+jTRPn2oSB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CbhzcTJ/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84F5CC4CEE2;
+	Fri, 11 Apr 2025 15:53:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744386707;
-	bh=WUlpEvUyYqtQN+coMNo0xuXkthk/nI+QBNZ5QVY2IEI=;
+	s=k20201202; t=1744386808;
+	bh=WpLLjD7bOW1+fhZZ7vlzZrNDNsR7j0cmT3HhyvWs3dE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AJV8RtgEypwQNef0ye9KfcaXQa74Cyotrouoa9xRTpGTPIktpvkSgg/SvTfwtLUxL
-	 OvN/DGKSindUTGn6KcSxn4KEugaGYVF/ZzV4wK/aLvKDOAEMdjut80+Qqzq18pPg9F
-	 AF5bm28C1IQ238e7uudusF32MBNI7+1pZ2RrPTWm4JxJQ37IZyJ9PTmaZ6qZlDGme/
-	 F7Lp+DIvvALwhv6yG6yD8Q+SOHD4yNFQ+EGDxRhhYQeRF4wFrL8Ue5ZXqfEN00VNno
-	 yRkvfwMwpp+JD2N/nvtP9seuU1wY852N0rN5YMMUIUwVherOjE9WXQb2C5TZWIJL9H
-	 kKiSpzbR+uyyg==
-Date: Fri, 11 Apr 2025 16:51:44 +0100
+	b=CbhzcTJ/RcGu4IXToUC3ZYA40ZZJtE9BKTx9YhPlHKNMv9K3T70fHI/McAFA9hPHY
+	 cg6juXNyihAA4hVHHcsfqtlhAC6GMkMOkKKJRszHAeHE+zi3M0ilQPCTQ2KGv2L/b9
+	 LBY8ggDrYbuhadgyBz7t1e7lZ+PYdoD2xvFpkwJJe76TbWVHAcTp4aROeJPnGUlg4x
+	 xtVfg/CA1u0/3qj04YOkSocRlsTIZIn8SaHwlbjWpf7SREQsWNTgQmU5MlPzwtCP1t
+	 GbtbU27P5qU2qVnIZXt2pMVpNfEhFE/zJBg8+nGh3rY/KwE2zw23P8eDPqQBia2DCN
+	 DWZDUwWqjkErQ==
+Date: Fri, 11 Apr 2025 16:53:23 +0100
 From: Simon Horman <horms@kernel.org>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: Re: [PATCH iwl-net v1] idpf: fix potential memory leak on kcalloc()
- failure
-Message-ID: <20250411155144.GJ395307@horms.kernel.org>
-References: <20250404105421.1257835-1-michal.swiatkowski@linux.intel.com>
- <20250407104350.GA395307@horms.kernel.org>
- <Z/ij+J8kGYM5ezC/@mev-dev.igk.intel.com>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Russell King <rmk+kernel@armlinux.org.uk>
+Subject: Re: [PATCH net-next v2 2/2] net: phy: Add Marvell PHY PTP support
+Message-ID: <20250411155323.GK395307@horms.kernel.org>
+References: <20250407-feature_marvell_ptp-v2-0-a297d3214846@bootlin.com>
+ <20250407-feature_marvell_ptp-v2-2-a297d3214846@bootlin.com>
+ <20250408154934.GZ395307@horms.kernel.org>
+ <20250409100757.07b00067@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,37 +69,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z/ij+J8kGYM5ezC/@mev-dev.igk.intel.com>
+In-Reply-To: <20250409100757.07b00067@kmaincent-XPS-13-7390>
 
-On Fri, Apr 11, 2025 at 07:09:12AM +0200, Michal Swiatkowski wrote:
-> On Mon, Apr 07, 2025 at 11:43:50AM +0100, Simon Horman wrote:
-> > On Fri, Apr 04, 2025 at 12:54:21PM +0200, Michal Swiatkowski wrote:
-> > > In case of failing on rss_data->rss_key allocation the function is
-> > > freeing vport without freeing earlier allocated q_vector_idxs. Fix it.
+On Wed, Apr 09, 2025 at 10:07:57AM +0200, Kory Maincent wrote:
+> On Tue, 8 Apr 2025 16:49:34 +0100
+> Simon Horman <horms@kernel.org> wrote:
+> 
+> > On Mon, Apr 07, 2025 at 04:03:01PM +0200, Kory Maincent wrote:
+> > > From: Russell King <rmk+kernel@armlinux.org.uk>
 > > > 
-> > > Move from freeing in error branch to goto scheme.
+> > > From: Russell King <rmk+kernel@armlinux.org.uk>
 > > > 
-> > > Fixes: 95af467d9a4e ("idpf: configure resources for RX queues")
+> > > Add PTP basic support for Marvell 88E151x PHYs. These PHYs support
+> > > timestamping the egress and ingress of packets, but does not support
+> > > any packet modification.
+> > > 
+> > > The PHYs support hardware pins for providing an external clock for the
+> > > TAI counter, and a separate pin that can be used for event capture or
+> > > generation of a trigger (either a pulse or periodic).  This code does
+> > > not support either of these modes.
+> > > 
+> > > The driver takes inspiration from the Marvell 88E6xxx DSA and DP83640
+> > > drivers.  The hardware is very similar to the implementation found in
+> > > the 88E6xxx DSA driver, but the access methods are very different,
+> > > although it may be possible to create a library that both can use
+> > > along with accessor functions.
+> > > 
+> > > Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+> > > 
+> > > Add support for interruption.
+> > > Fix L2 PTP encapsulation frame detection.
+> > > Fix first PTP timestamp being dropped.
+> > > Fix Kconfig to depends on MARVELL_PHY.
+> > > Update comments to use kdoc.
+> > > 
+> > > Co-developed-by: Kory Maincent <kory.maincent@bootlin.com>
+> > > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>  
 > > 
-> > Hi Michal,
+> > Hi Kory,
 > > 
-> > WRT leaking q_vector_indxs, that allocation is not present at
-> > the commit cited above, so I think the correct Fixes tag for
-> > that problem is the following, where that allocation was added:
+> > Some minor feedback from my side.
 > > 
-> > Fixes: d4d558718266 ("idpf: initialize interrupts and enable vport")
+> > > ---
+> > > 
+> > > Russell I don't know which email I should use, so I keep your old SOB.  
+> > 
+> > Russell's SOB seems to be missing.
 > 
-> Thanks for checking that. I agree, my fixes is wrong.
-> 
-> > 
-> > I do note that adapter->vport_config[idx] may be allocated but
-> > not freed on error in idpf_vport_alloc(). But I assume that this
-> > is not a leak as it will eventually be cleaned up by idpf_remove().
-> 
-> Right, it will be better to free it directly for better readable.
-> Probably candidate for net-next changes.
+> It is, 5 lines higher, but maybe you prefer to have them all together. 
 
-Thanks, that does sound like a nice idea.
+This thread seems to have subsequently gone elsewhere.
+But, FTR, yes, I would prefer all tags together.
 
 ...
 
