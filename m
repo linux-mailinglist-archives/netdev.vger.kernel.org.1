@@ -1,532 +1,385 @@
-Return-Path: <netdev+bounces-181641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1398DA85EC5
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 15:25:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23501A85E43
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 15:10:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B50716CAA5
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 13:21:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1D783B791C
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 13:06:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F026139D0A;
-	Fri, 11 Apr 2025 13:21:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 738392CCC5;
+	Fri, 11 Apr 2025 13:06:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WxXgg1U6"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="rhsqe5+q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2062.outbound.protection.outlook.com [40.107.92.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F3113635E
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 13:21:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744377694; cv=none; b=m4BeTNfkli475ppcKNTVl6UUADSUF/uyqG+TQ2zt5poaZw//+RIWLntlIwquCFXd+hVWQfvBWKwL4q2pfBhCtGnQKexeNgTd2OSzMy+Ae5bzKPiGA6pLJVNoQ4ft3pDgaPucUmvT69WSlWzP0W1z812f5psq9tDDrD/oq7gyj/4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744377694; c=relaxed/simple;
-	bh=L8M59lJhMhRY1Mk96YdHLMEhcBcK7CKGx7aWpOtwnZo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tP0ZLIxPuPQGrdJB2qenwP9qBoq0xUlGWFt0WFt0AcyR1kr5Cf8CzXm7//LMwF+wTmlPHPX1RdxBddLSWQFgZY4YSfr7UpxdPwWIQ6e9FYVIsGrZCMes43jSDrqP3Dtijh2s/znnlMdpIhYIaRUD1SKgTQUmDUkizQUGqnMdSrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WxXgg1U6; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744377692; x=1775913692;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=L8M59lJhMhRY1Mk96YdHLMEhcBcK7CKGx7aWpOtwnZo=;
-  b=WxXgg1U6DS8qjQPz/giDpPSOVzNpmz8GwTuqX40i8BTRPThehk+N4s+h
-   Y05cS5Vh9sKs9BtGmxDXfJnZW7V/kRKO0GrcicDEoVQ0FY2edFp9AnwOI
-   nW5UegvXzw72x/FEnLWSd/PJ89pxIIPIz++L7ccMpXFPqAPL7DPSsC0C2
-   EG7Hkbde41bqUweewKcq81HnekrGPtUpM4dQAZ/lpF21wyqOtnIHqOAD2
-   OhbrFkfK1Qwj5jnneV4fwv0gl50XagL6ES6AJuwjXIi+JVBZ9Tm73+bYT
-   AsRyTdG8qyn9cVJQZ4sLpyT62LaIIgOXSo2a4k5csN/G+ygR7Ii/2Y8gi
-   Q==;
-X-CSE-ConnectionGUID: OTwiYrD8TSunG2x5vH0dBw==
-X-CSE-MsgGUID: 4BNhP5H4Tcqr8qPutjY50Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11401"; a="63329064"
-X-IronPort-AV: E=Sophos;i="6.15,205,1739865600"; 
-   d="scan'208";a="63329064"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2025 06:21:31 -0700
-X-CSE-ConnectionGUID: VGXsYK8vQgSGgelB2ewlbQ==
-X-CSE-MsgGUID: hco3pdCfSHSxF7s2xtrhjw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,205,1739865600"; 
-   d="scan'208";a="128971395"
-Received: from os-delivery.igk.intel.com ([10.102.18.218])
-  by orviesa009.jf.intel.com with ESMTP; 11 Apr 2025 06:21:29 -0700
-From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org,
-	Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Subject: [PATCH iwl-next v1] ixgbe: devlink: add devlink region support for E610
-Date: Fri, 11 Apr 2025 15:06:26 +0200
-Message-Id: <20250411130626.535291-1-jedrzej.jagielski@intel.com>
-X-Mailer: git-send-email 2.31.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF6625634;
+	Fri, 11 Apr 2025 13:06:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.62
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744376813; cv=fail; b=H3GQm0E2Eeho5P+uSsQKldpjFc48Cn0R7ycblRSE5ou1IhU5xvsqWUcX2KdSfW2VavxjFOa6J19axjd7q/oY7mSpOC4A1CvI1VqYBYKfyf3o2c8kLCqzHbG0NEombQlxyUQqa+32bXBi6BjgX7IfolFYQhkfmGJOTQZUA3MUC7k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744376813; c=relaxed/simple;
+	bh=zL8ff4io6IhwZ9lWkfCF/P1KVpL+Tnu7kh0TU7GaX5Y=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=qhsggqaKrfysrnIoTPBUGdCoVlCOfypT+PV6tgXqALHdxiCVoT17J53GbqVrCyQ0MVx8Sf3gJxbIm+uim9/TjyTehw6ezstd69Kim1Lb83EjuV1nFOoqr8oT63KvTcWEkIju/xpNDHYeLh00Pixx5HIkfr/dVGt84GxP851Vqv0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=rhsqe5+q; arc=fail smtp.client-ip=40.107.92.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=U+BPeQHvxEVFnVu4lHdVlRj4Y18hZGj9cFSR5MpK4/PMDcL5aWQRNnoTR4lppc0GUVc3bgwsHMZtvelqGMb2qKy+TtM3PFLBDPH43FHbg8O3L8QPVPgfsITsWcnCnPVjlxbJ+LMRoP5Jy9TvhHi3++p/Oa2YVT7i7hO00zfdEzhlg0aasuhmXKO4mP1RSRwStOJWXzsod5N4vSrezNhnH1brraCA4EFiO6CoLItk6wIgWKYJFdFPkmYWXCF4xyXHOx5oZWy9aOuyrSwkrIREYZSg7fTuyMgWa80kL+9AlDyZFgcPvX9ix7qoN+NT4LIqNsK2/z9PoqyEJx4g/kSBgQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aTMb7VnqWoHTDoqZbbtsVA5rIQLqQrii6NRN8mfueZA=;
+ b=yIy7rWHYbcGcWl3EuIqKoxne07ry6Cher89JuDifs28C17SoCQlh+jiCEi2HNnntj/mTa0r1A3VzXDbs/9YzxeaIXZpS7namgN1Gi5jT38JSriVI/SGcxP9KykkP/XBbPql+CXeHjrAKbxFt+/W/i1U18v9Dyx2hSj1FQfizSevlb1edm2k71WdU3pYiZkebNPyN2Fle2kT2l5dZ0w4NRCOdZiFZP7dYjJJIVgWbDVnA6yrEaAH8HaXHwmd0srNZ4zHjPw+p/+qg+ZlcR84BZTCezwaJgWuP42IZ3P8X3T6YRCKt97HDmecETV675rItjOXqF1SPhhGidOSXZfdbiA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aTMb7VnqWoHTDoqZbbtsVA5rIQLqQrii6NRN8mfueZA=;
+ b=rhsqe5+qbZiP/nj2he+hqkmi1ezT0Z0/IKmUGsNTHz9DSbwRbz7uxJ6ljxyRoD2azNYlqR60AqpGgBV/EQSleb2r0OPgR0PW+Y1D4wiXJKFCbdbIv+15PSeSH7UmFK/R1Rw714MmFXD3+dktyYEw60glAcMAyixvaOk8OyR38qM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com (2603:10b6:510:13c::22)
+ by IA1PR12MB6258.namprd12.prod.outlook.com (2603:10b6:208:3e6::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8606.35; Fri, 11 Apr
+ 2025 13:06:48 +0000
+Received: from PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::46fb:96f2:7667:7ca5]) by PH7PR12MB5685.namprd12.prod.outlook.com
+ ([fe80::46fb:96f2:7667:7ca5%5]) with mapi id 15.20.8632.021; Fri, 11 Apr 2025
+ 13:06:48 +0000
+Message-ID: <45d66ca4-5390-42e9-869a-f5f9125d05b6@amd.com>
+Date: Fri, 11 Apr 2025 15:06:41 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] drm/nouveau: Prevent signaled fences in pending list
+To: phasta@kernel.org, Lyude Paul <lyude@redhat.com>,
+ Danilo Krummrich <dakr@kernel.org>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Sabrina Dubroca <sd@queasysnail.net>,
+ Sumit Semwal <sumit.semwal@linaro.org>
+Cc: dri-devel@lists.freedesktop.org, nouveau@lists.freedesktop.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+ stable@vger.kernel.org
+References: <20250410092418.135258-2-phasta@kernel.org>
+ <20250410092418.135258-3-phasta@kernel.org>
+ <8583665a-6886-4245-be49-fd8839cfe212@amd.com>
+ <c737c89c7ce9174e349c61ab4e5712eee8946f13.camel@mailbox.org>
+ <50c9530d-e274-4f89-8620-16afe0981239@amd.com>
+ <1a73e5fe4350d6ee4b7d807612264eb637c4f2a9.camel@mailbox.org>
+ <d3dee321cd6b70d6ca98768fbcf6f1e6134c43a1.camel@mailbox.org>
+ <81a70ba6-94b1-4bb3-a0b2-9e8890f90b33@amd.com>
+ <aca00cb25b813da4fd2f215829f02337f05642f3.camel@mailbox.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>
+In-Reply-To: <aca00cb25b813da4fd2f215829f02337f05642f3.camel@mailbox.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR4P281CA0149.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:b8::15) To PH7PR12MB5685.namprd12.prod.outlook.com
+ (2603:10b6:510:13c::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH7PR12MB5685:EE_|IA1PR12MB6258:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1c400ddb-93c9-4066-461b-08dd78f9b7ed
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?WHJxaWVzc0tqSDdHVWJEbnZMTmNieWNMN2haQWpOV09nbENQcnBtSU94UHph?=
+ =?utf-8?B?MTVIUTF4OUNHYnlVZWtVSmZSdnBIZVJnd3FBZ0xmWEpqazRnYUUrS3FjODA3?=
+ =?utf-8?B?eUpvZFZGT1A5UVFpM2tXNlAyS0NrTTA5MmtpYllRZFAvVzdZZHFaamZQMi95?=
+ =?utf-8?B?NVRvOU1nZ1RiUEVucGh3bkx4QkdhamJXazRMUkcyOG0zWUYrd0lUa1M5NUwz?=
+ =?utf-8?B?b2ZmVEFOcXl5MUtEblY2ZU1zMkVVUkJYeFVBQWtIbFRVazdMamgwS2dFZFc5?=
+ =?utf-8?B?Z01rdGJmaEp0eVprN0hETDZPTi9QbHZqK0tjNTdrUGg3bG5tcDNFR3NMOGFE?=
+ =?utf-8?B?YldJdmE0Ui9tWFI1c1lZUUhmd1YvR0JnN1orNE5HcjNYMTllQ0VSSE5rSytM?=
+ =?utf-8?B?V2RseWVyb3VBZlBub3YrV1JmR3JUYkkzcUR6TEplcC9RMDlNTHk4NFJFUFk1?=
+ =?utf-8?B?ZklMbmhxZkZ6eGxsNWU5Q3ZjeVdvY09BQ2VxTnp1L2tUWjQ4NzZmQzREZmR3?=
+ =?utf-8?B?d2lXbEdQeUJQTmY2dXNKejJyZ0VMQ1Azak5DZHZFRTZ6TjBTRUhDRUR4WDZx?=
+ =?utf-8?B?Q08zeVIzT0habmQ2anM5NTQ2S0FmQS9zUlBuZXZIL0tSNFozcHROZDBzeE9U?=
+ =?utf-8?B?dnE3NXE4cFcwejVMY0tVdWZ3ZUhHalRZMkNMckpXd2liSTNBSHc1TTJ5Njdk?=
+ =?utf-8?B?VlNVMllwb3lpTkJsa2c4ekIxQnNBNSt1Tk42aXJQY3l5QnZIbkwyQ09tR2lI?=
+ =?utf-8?B?S3g2YjREMnlnZ1hTTkY5NDJVR1Y2T2d6MWtVMFJwYzIxZTBWN0pHUCtMZ3BP?=
+ =?utf-8?B?MThOV1JtSlppME5td0o4RnQvcGJ4SHlWcjVKVmZUUGJhUVNtZzBmR0JYbUxq?=
+ =?utf-8?B?bnd2dnJPdmtmSVhERnRHOVBCUmJRbUMwSElZM3Q2UWk4Qy9aL1NtS2d4TE9v?=
+ =?utf-8?B?ZEZLckJyYVlmZWJ4aGJFV0xkcUdxazZRdUVjUjNFVXc3ME8yUjZUdlhYRStr?=
+ =?utf-8?B?M0NJSU9OaUV0b3liREE2WDJmUUJLaEt5ZENpQ0lmK0t6c3ZmWXRFU2NkbTBa?=
+ =?utf-8?B?VDlwWERIcWlsbWlOV05lYVl2UUE4Uy8rb3FHcmlod0h1MExpSUhJZko5Y01h?=
+ =?utf-8?B?V0kvQ2xvN0QzN0x5bXpDUGJTZUtQTHRqdEJOcWthcnN2UnczZjF1UnJ1QmNC?=
+ =?utf-8?B?Yis3cXA2UnN2QXRQdWNYY2o3eTZMTURTbUVvTXIyeHIyZDhMWFJXUVowdWN1?=
+ =?utf-8?B?eTU5UlZKanBGM3BLT3ZTcHM0WWxTNzhtWnh0c3NzNGJiUGQ5Z2JLQ3U5eE1E?=
+ =?utf-8?B?VHhHQUJhb2dYeGdLSTVmTmI1cUEyT1NaaGdXUkRXR1FoVGhPRG9yN2JmU0Yv?=
+ =?utf-8?B?c0JjdWFlZUFjS3g4UkgwMEdNUXM5WkpKK0RLUVVPZHpzeXlOZkZJcjRhUC9y?=
+ =?utf-8?B?cW5ZYzM0cEJJMnZ3bDc1SHpnUEhxRGg4ZDVJZ2lFeldWR0RjTko5S3ZlYmtl?=
+ =?utf-8?B?eDF0amN3NmVSSG1MUWQ2c3dsN2ZyclRTUzR6YVRyYTA0Z29WSXZ1WE9oeFBa?=
+ =?utf-8?B?RW0vcG9LRTZVbnMvdksyd3ZSMkRLWFUwbmYxY3hrdFdKYWlYV0xnQUcxL2lI?=
+ =?utf-8?B?L3RPMUJFeWNxTGRzbDk5MHNIQXVwaVdtUVNzeWIwb1hnd3VDSWhZOUZGN1FM?=
+ =?utf-8?B?VUZnOTE2cEJZWk1JRUN0TzZlTFVmcHA5M0ZrU3Vmem9SWUQ5STJlSERJWXEz?=
+ =?utf-8?B?eU44UHFoamYvaVp6Mk9Bck1ETjlKdmxhRnhpYmJhWkx4K3Y2dUlCNm9jVjJE?=
+ =?utf-8?B?aTZQNGRaWmM4TDhrVm1oR1BDTFY1cFhxc2xMZURrYXJJakFQZWZpTW1NY0Fk?=
+ =?utf-8?B?aWJtaGFCSEJjUXF3MFEyOU43Z1NxaUJNb3lSa3dNbDRGM0lnN3ZmY1liY3Ju?=
+ =?utf-8?Q?4mrc0qgd8QU=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5685.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?R2p5TDlBM1YwZ2pUYWV5YUJEd1l0RDJ2b2Y3eG10ZS9kdkkwWS9FcDM1bFA3?=
+ =?utf-8?B?ZXVrcktEaWsxdzc2RHNPVWkzRkJqTXFwVlE5dHRTVDQ3K2N6VnRyUDBFMVBV?=
+ =?utf-8?B?aWhjTmNkSjFLak5ZRS96Y3kwbkRMdkJiT01mU0pSajROendwa2hNbUJlZEhu?=
+ =?utf-8?B?YWtCYVNEYWxDek1CNjdTeHNaYnJDc3BhWXQ2WWh2ZmtPeEJsSWFzTDZodEZE?=
+ =?utf-8?B?OEdRU1daRnhKaVJPTXZteTNqOGNDczl1RzJOakVmZklCQmhGd2JVWG5qMmNl?=
+ =?utf-8?B?N1M4QWNSUG1wTDJuU1VkSGJhMVlnNHpENHhsMnZYenVYTmYwRC8wT2JBZHpU?=
+ =?utf-8?B?WXNmMXRIWExPSUhHdW5IWHdsc0YzdTlmS1B5bGxRU1NLSEJxL1FVOEdnaThD?=
+ =?utf-8?B?a01CclM5b0RQVklnbU9penNDRzdXLzh3TGZ5QnpEYTd1T1V4K21XRW1iQXAr?=
+ =?utf-8?B?WlptUWdJcEJnMjV6UTJQZmtZSUFHeVRZbE5zbklEUUZZWVBqMXdQSEZvd1pU?=
+ =?utf-8?B?a1hxdTZjSFk0SUdHaWljS05HazZlM1V3MlpjaXJHTTlxZERvNFJWUXIyUWNy?=
+ =?utf-8?B?czRvNVdyRERyVzlKZWMwWmNUV0txd1VKUDgvdDdndHpqVlR5MEJlWU50dVd4?=
+ =?utf-8?B?U1BBWXZkTXZNRjlubFUva0Y4Q3ViWTlhZEpzaTdoeHpDaVhmSXRCdHM2L0Nr?=
+ =?utf-8?B?ZnI0K2dJZldKNEpZeFNad2NTR2dYNlY1azhIVVRrc29HbWN5MmNkeXl5QVJX?=
+ =?utf-8?B?VFV1ZFhaS2sxUXM3VVdORFRqNEpRWlhEOFZ5bFQvMU9POFVXS2JBd21Zb1dm?=
+ =?utf-8?B?OFRhbTJRRkdiT2l3cDQ3WnJkOW5lekJSMmljRVZteGpyK2lsdDJPZzkrUFY4?=
+ =?utf-8?B?dzBDVVp6b09nRWNEZkJkNnhVSEo4RVp5WHFRRTVKaSt6S2ZOM3J0WFdyWS8v?=
+ =?utf-8?B?Vk9wNjlsUW9yRk4zb2NSVmhMR3pqdGVrV3h0L2RmN1Ryc2tzQlJZYnpTVnJV?=
+ =?utf-8?B?VEpNdzVWOUdjSU45TXE1SE5HWSsvcHJZMi9aYlh1eW1YMDNSdjh6ZGdCWW1t?=
+ =?utf-8?B?MDVPRVErYXNZTkM2K0QrQm4vejdTcDBSbUhIQjlyVG9rM2xEWjAyMW9MSmx0?=
+ =?utf-8?B?T2E1WHRmaTU0Y2hlcmZKdHR6QVVKTGFJTm5KdXVrN2M5K2hoalFxVzZ6KzJw?=
+ =?utf-8?B?NUtWU1RwNWRZVXpMVTlOQmFiYWIwZGFBV0Z3bUlKTGFkMXNxekhnTUZXSVFq?=
+ =?utf-8?B?a3U2eEVrUmhpekwxb3VRNDd3VVpGLytVUzgxUjk1eFBsbnlXVEhEemFKL1FU?=
+ =?utf-8?B?bitEakZubUEyazlHcy9kTk5SUWE2a1F1WEkxUWxkS3p3STU0RUR0c2Q5WUxm?=
+ =?utf-8?B?TVNDNmVZVWRRcm5BRlpoeGlQY0gzR2Qzd2dkUGZJUEJwSzNuV0FzdWs5TnRm?=
+ =?utf-8?B?YWFsQXQxMFFvK21kdUZnM05UMWc0YXAwbFhJc09uM2VyZXA5cndjNi9EcG5z?=
+ =?utf-8?B?SitwQXBISDVmWW1XRDBOWnQ4QlFuY2tmUkNhTTRQZDRrTXU1ZWovSEw1d1la?=
+ =?utf-8?B?SXhIUGRRKzc0WXlBM3h6RmlNSWlDWUFha1g5WFBYN252cEhvbGVycGxhL2Z4?=
+ =?utf-8?B?ZlpuQzh0NWZmaHZsZ2dtZlRkbU42VloyeUt0aGxrR3d5SkgySGI3VmtCeVcr?=
+ =?utf-8?B?RTFGQWxocmowbDJ3SmlaNkxEOXBSd1ZUSDJIdTRlMFZSN09xa3lZTy9KSFI4?=
+ =?utf-8?B?d3FCdjh0cWNCMVo4ajFRV3poakN2bmk3UG1oSFlFQjZsWjdWUThaYzE4SVJj?=
+ =?utf-8?B?N0JHaS9tREJhclI2OXpPVGFlVExocXQrSk9OYTRZeTZ6Y2pvS2dkdUl1ZzRQ?=
+ =?utf-8?B?QlI1TTRuVVVhQUNCM3Y2MzU3YVhvMXhTU1RiRG5BZGwzdmhpVnRUYiszMmp6?=
+ =?utf-8?B?MXZDTExPQ1I5VlJYT2J4Tll6c3N2SmtxR3N5Wmk5bjkzSUJzVCtYWENzRjJi?=
+ =?utf-8?B?VFg2MkxjeVVXeUd1eFY5ZmJzS2Q0emp1SDZQWEdCQnhTamx5YlF5RWxiaWdi?=
+ =?utf-8?B?UVFQWnZONHhjbUxtK0syQlpRVm1yT05QSVoxK24vQXh6N01peEJvdDhVUVVs?=
+ =?utf-8?Q?8XfcSqgPhpV9ueO8Lzczm+vqT?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c400ddb-93c9-4066-461b-08dd78f9b7ed
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5685.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Apr 2025 13:06:48.7239
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: C2O9m6EPjyCbvim/gWfhC4I+FirD3ZRhbP4J0XK4X2cDcKC0CchQ2uatSMSaRct9
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6258
 
-From: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>
+Am 11.04.25 um 14:44 schrieb Philipp Stanner:
+> On Fri, 2025-04-11 at 13:05 +0200, Christian König wrote:
+>>  Am 11.04.25 um 11:29 schrieb Philipp Stanner:
+>>  
+>>> [SNIP]
+>>>  
+>>> It could be, however, that at the same moment
+>>> nouveau_fence_signal() is
+>>> removing that entry, holding the appropriate lock.
+>>>
+>>> So we have a race. Again.
+>>>  
+>>  
+>>  Ah, yes of course. If signaled is called with or without the lock is
+>> actually undetermined.
+>>  
+>>  
+>>>  
+>>> You see, fixing things in Nouveau is difficult :)
+>>> It gets more difficult if you want to clean it up "properly", so it
+>>> conforms to rules such as those from dma_fence.
+>>>
+>>> I have now provided two fixes that both work, but you are not
+>>> satisfied
+>>> with from the dma_fence-maintainer's perspective. I understand
+>>> that,
+>>> but please also understand that it's actually not my primary task
+>>> to
+>>> work on Nouveau. I just have to fix this bug to move on with my
+>>> scheduler work.
+>>>  
+>>  
+>>  Well I'm happy with whatever solution as long as it works, but as
+>> far as I can see the approach with the callback simply doesn't.
+>>  
+>>  You just can't drop the fence reference for the list from the
+>> callback.
+>>  
+>>  
+>>>  
+>>> So if you have another idea, feel free to share it. But I'd like to
+>>> know how we can go on here.
+>>>  
+>>  
+>>  Well the fence code actually works, doesn't it? The problem is
+>> rather that setting the error throws a warning because it doesn't
+>> expect signaled fences on the pending list.
+>>  
+>>  Maybe we should fix that instead.
+> The fence code works as the author intended, but I would be happy if it
+> were more explicitly documented.
+>
+> Regarding the WARN_ON: It occurs in dma_fence_set_error() because there
+> is an attempt to set an error code on a signaled fence. I don't think
+> that should be "fixed", it works as intended: You must not set an error
+> code of a fence that was already signaled.
+>
+> The reason seems to be that once a fence is signaled, a third party
+> might evaluate the error code.
 
-Provide support for the following devlink cmds:
- -DEVLINK_CMD_REGION_GET
- -DEVLINK_CMD_REGION_NEW
- -DEVLINK_CMD_REGION_DEL
- -DEVLINK_CMD_REGION_READ
+Yeah, more or less correct. The idea is you can't declare an operation as having an error after the operation has already completed.
 
-ixgbe devlink region implementation, similarly to the ice one,
-lets user to create snapshots of content of Non Volatile Memory,
-content of Shadow RAM, and capabilities of the device.
+Because everyone will just wait for the completion and nobody checks the status again after that.
 
-For both NVM and SRAM regions provide .read() handler to let user
-read their contents without the need to create full snapshots.
+>
+> But I think this wasn't wat you meant with "fix".
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>
-Co-developed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
----
- Documentation/networking/devlink/ixgbe.rst    |  49 +++
- drivers/net/ethernet/intel/ixgbe/Makefile     |   3 +-
- .../ethernet/intel/ixgbe/devlink/devlink.h    |   2 +
- .../net/ethernet/intel/ixgbe/devlink/region.c | 290 ++++++++++++++++++
- drivers/net/ethernet/intel/ixgbe/ixgbe.h      |   3 +
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |   3 +
- 6 files changed, 349 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/ethernet/intel/ixgbe/devlink/region.c
+The idea was to avoid calling dma_fence_set_error() on already signaled fences. Something like this:
 
-diff --git a/Documentation/networking/devlink/ixgbe.rst b/Documentation/networking/devlink/ixgbe.rst
-index e5fef951c6f5..d47e3f1acd65 100644
---- a/Documentation/networking/devlink/ixgbe.rst
-+++ b/Documentation/networking/devlink/ixgbe.rst
-@@ -103,3 +103,52 @@ EMP firmware image.
- 
- The driver does not currently support reloading the driver via
- ``DEVLINK_RELOAD_ACTION_DRIVER_REINIT``.
-+
-+Regions
-+=======
-+
-+The ``ixgbe`` driver implements the following regions for accessing internal
-+device data.
-+
-+.. list-table:: regions implemented
-+    :widths: 15 85
-+
-+    * - Name
-+      - Description
-+    * - ``nvm-flash``
-+      - The contents of the entire flash chip, sometimes referred to as
-+        the device's Non Volatile Memory.
-+    * - ``shadow-ram``
-+      - The contents of the Shadow RAM, which is loaded from the beginning
-+        of the flash. Although the contents are primarily from the flash,
-+        this area also contains data generated during device boot which is
-+        not stored in flash.
-+    * - ``device-caps``
-+      - The contents of the device firmware's capabilities buffer. Useful to
-+        determine the current state and configuration of the device.
-+
-+Both the ``nvm-flash`` and ``shadow-ram`` regions can be accessed without a
-+snapshot. The ``device-caps`` region requires a snapshot as the contents are
-+sent by firmware and can't be split into separate reads.
-+
-+Users can request an immediate capture of a snapshot for all three regions
-+via the ``DEVLINK_CMD_REGION_NEW`` command.
-+
-+.. code:: shell
-+
-+    $ devlink region show
-+    pci/0000:01:00.0/nvm-flash: size 10485760 snapshot [] max 1
-+    pci/0000:01:00.0/device-caps: size 4096 snapshot [] max 10
-+
-+    $ devlink region new pci/0000:01:00.0/nvm-flash snapshot 1
-+
-+    $ devlink region dump pci/0000:01:00.0/nvm-flash snapshot 1
-+    0000000000000000 0014 95dc 0014 9514 0035 1670 0034 db30
-+    0000000000000010 0000 0000 ffff ff04 0029 8c00 0028 8cc8
-+    0000000000000020 0016 0bb8 0016 1720 0000 0000 c00f 3ffc
-+    0000000000000030 bada cce5 bada cce5 bada cce5 bada cce5
-+
-+    $ devlink region read pci/0000:01:00.0/nvm-flash snapshot 1 address 0 length 16
-+    0000000000000000 0014 95dc 0014 9514 0035 1670 0034 db30
-+
-+    $ devlink region delete pci/0000:01:00.0/device-caps snapshot 1
-diff --git a/drivers/net/ethernet/intel/ixgbe/Makefile b/drivers/net/ethernet/intel/ixgbe/Makefile
-index ce447540d146..2e7738f41c58 100644
---- a/drivers/net/ethernet/intel/ixgbe/Makefile
-+++ b/drivers/net/ethernet/intel/ixgbe/Makefile
-@@ -10,7 +10,8 @@ obj-$(CONFIG_IXGBE) += ixgbe.o
- ixgbe-y := ixgbe_main.o ixgbe_common.o ixgbe_ethtool.o \
-            ixgbe_82599.o ixgbe_82598.o ixgbe_phy.o ixgbe_sriov.o \
-            ixgbe_mbx.o ixgbe_x540.o ixgbe_x550.o ixgbe_lib.o ixgbe_ptp.o \
--           ixgbe_xsk.o ixgbe_e610.o devlink/devlink.o ixgbe_fw_update.o
-+           ixgbe_xsk.o ixgbe_e610.o devlink/devlink.o ixgbe_fw_update.o \
-+	   devlink/region.o
- 
- ixgbe-$(CONFIG_IXGBE_DCB) +=  ixgbe_dcb.o ixgbe_dcb_82598.o \
-                               ixgbe_dcb_82599.o ixgbe_dcb_nl.o
-diff --git a/drivers/net/ethernet/intel/ixgbe/devlink/devlink.h b/drivers/net/ethernet/intel/ixgbe/devlink/devlink.h
-index 0b27653a3407..381558058048 100644
---- a/drivers/net/ethernet/intel/ixgbe/devlink/devlink.h
-+++ b/drivers/net/ethernet/intel/ixgbe/devlink/devlink.h
-@@ -6,5 +6,7 @@
- 
- struct ixgbe_adapter *ixgbe_allocate_devlink(struct device *dev);
- int ixgbe_devlink_register_port(struct ixgbe_adapter *adapter);
-+void ixgbe_devlink_init_regions(struct ixgbe_adapter *adapter);
-+void ixgbe_devlink_destroy_regions(struct ixgbe_adapter *adapter);
- 
- #endif /* _IXGBE_DEVLINK_H_ */
-diff --git a/drivers/net/ethernet/intel/ixgbe/devlink/region.c b/drivers/net/ethernet/intel/ixgbe/devlink/region.c
-new file mode 100644
-index 000000000000..ad242d4fc860
---- /dev/null
-+++ b/drivers/net/ethernet/intel/ixgbe/devlink/region.c
-@@ -0,0 +1,290 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2025, Intel Corporation. */
-+
-+#include "ixgbe.h"
-+#include "devlink.h"
-+
-+#define IXGBE_DEVLINK_READ_BLK_SIZE (1024 * 1024)
-+
-+static const struct devlink_region_ops ixgbe_nvm_region_ops;
-+static const struct devlink_region_ops ixgbe_sram_region_ops;
-+
-+static int ixgbe_devlink_parse_region(struct ixgbe_hw *hw,
-+				      const struct devlink_region_ops *ops,
-+				      bool *read_shadow_ram, u32 *nvm_size)
-+{
-+	if (ops == &ixgbe_nvm_region_ops) {
-+		*read_shadow_ram = false;
-+		*nvm_size = hw->flash.flash_size;
-+	} else if (ops == &ixgbe_sram_region_ops) {
-+		*read_shadow_ram = true;
-+		*nvm_size = hw->flash.sr_words * 2u;
-+	} else {
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * ixgbe_devlink_nvm_snapshot - Capture a snapshot of the NVM content
-+ * @devlink: the devlink instance
-+ * @ops: the devlink region being snapshotted
-+ * @extack: extended ACK response structure
-+ * @data: on exit points to snapshot data buffer
-+ *
-+ * This function is called in response to the DEVLINK_CMD_REGION_NEW cmd.
-+ *
-+ * Capture a snapshot of the whole requested NVM region.
-+ *
-+ * No need to worry with freeing @data, devlink core takes care if it.
-+ *
-+ * Return: 0 on success, -EOPNOTSUPP for unsupported regions, -EBUSY when
-+ * cannot lock NVM, -ENOMEM when cannot alloc mem and -EIO when erorr
-+ * occurs during reading.
-+ */
-+static int ixgbe_devlink_nvm_snapshot(struct devlink *devlink,
-+				      const struct devlink_region_ops *ops,
-+				      struct netlink_ext_ack *extack, u8 **data)
-+{
-+	struct ixgbe_adapter *adapter = devlink_priv(devlink);
-+	struct ixgbe_hw *hw = &adapter->hw;
-+	bool read_shadow_ram;
-+	u8 *nvm_data, *buf;
-+	u32 nvm_size, left;
-+	u8 num_blks;
-+	int err;
-+
-+	err = ixgbe_devlink_parse_region(hw, ops, &read_shadow_ram, &nvm_size);
-+	if (err)
-+		return err;
-+
-+	nvm_data = kvzalloc(nvm_size, GFP_KERNEL);
-+	if (!nvm_data)
-+		return -ENOMEM;
-+
-+	num_blks = DIV_ROUND_UP(nvm_size, IXGBE_DEVLINK_READ_BLK_SIZE);
-+	buf = nvm_data;
-+	left = nvm_size;
-+
-+	for (int i = 0; i < num_blks; i++) {
-+		u32 read_sz = min_t(u32, IXGBE_DEVLINK_READ_BLK_SIZE, left);
-+
-+		/* Need to acquire NVM lock during each loop run because the total
-+		 * period of reading whole NVM is longer than the maximum period
-+		 * the lock can be taken defined by the IXGBE_NVM_TIMEOUT.
-+		 */
-+		err = ixgbe_acquire_nvm(hw, IXGBE_RES_READ);
-+		if (err) {
-+			NL_SET_ERR_MSG_MOD(extack,
-+					   "Failed to acquire NVM semaphore");
-+			kvfree(nvm_data);
-+			return -EBUSY;
-+		}
-+
-+		err = ixgbe_read_flat_nvm(hw, i * IXGBE_DEVLINK_READ_BLK_SIZE,
-+					  &read_sz, buf, read_shadow_ram);
-+		if (err) {
-+			NL_SET_ERR_MSG_MOD(extack,
-+					   "Failed to read RAM content");
-+			ixgbe_release_nvm(hw);
-+			kvfree(nvm_data);
-+			return -EIO;
-+		}
-+
-+		ixgbe_release_nvm(hw);
-+
-+		buf += read_sz;
-+		left -= read_sz;
-+	}
-+
-+	*data = nvm_data;
-+	return 0;
-+}
-+
-+/**
-+ * ixgbe_devlink_devcaps_snapshot - Capture a snapshot of device capabilities
-+ * @devlink: the devlink instance
-+ * @ops: the devlink region being snapshotted
-+ * @extack: extended ACK response structure
-+ * @data: on exit points to snapshot data buffer
-+ *
-+ * This function is called in response to the DEVLINK_CMD_REGION_NEW for
-+ * the device-caps devlink region.
-+ *
-+ * Capture a snapshot of the device capabilities reported by firmware.
-+ *
-+ * No need to worry with freeing @data, devlink core takes care if it.
-+ *
-+ * Return: 0 on success, -ENOMEM when cannot alloc mem, or return code of
-+ * the reading operation.
-+ */
-+static int ixgbe_devlink_devcaps_snapshot(struct devlink *devlink,
-+					  const struct devlink_region_ops *ops,
-+					  struct netlink_ext_ack *extack,
-+					  u8 **data)
-+{
-+	struct ixgbe_adapter *adapter = devlink_priv(devlink);
-+	struct ixgbe_aci_cmd_list_caps_elem *caps;
-+	struct ixgbe_hw *hw = &adapter->hw;
-+	int err;
-+
-+	caps = kvzalloc(IXGBE_ACI_MAX_BUFFER_SIZE, GFP_KERNEL);
-+	if (!caps)
-+		return -ENOMEM;
-+
-+	err = ixgbe_aci_list_caps(hw, caps, IXGBE_ACI_MAX_BUFFER_SIZE, NULL,
-+				  ixgbe_aci_opc_list_dev_caps);
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Failed to read device capabilities");
-+		kvfree(caps);
-+		return err;
-+	}
-+
-+	*data = (u8 *)caps;
-+	return 0;
-+}
-+
-+/**
-+ * ixgbe_devlink_nvm_read - Read a portion of NVM flash content
-+ * @devlink: the devlink instance
-+ * @ops: the devlink region to snapshot
-+ * @extack: extended ACK response structure
-+ * @offset: the offset to start at
-+ * @size: the amount to read
-+ * @data: the data buffer to read into
-+ *
-+ * This function is called in response to DEVLINK_CMD_REGION_READ to directly
-+ * read a section of the NVM contents.
-+ *
-+ * Read from either the nvm-flash region either shadow-ram region.
-+ *
-+ * Return: 0 on success, -EOPNOTSUPP for unsupported regions, -EBUSY when
-+ * cannot lock NVM, -ERANGE when buffer limit exceeded and -EIO when error
-+ * occurs during reading.
-+ */
-+static int ixgbe_devlink_nvm_read(struct devlink *devlink,
-+				  const struct devlink_region_ops *ops,
-+				  struct netlink_ext_ack *extack,
-+				  u64 offset, u32 size, u8 *data)
-+{
-+	struct ixgbe_adapter *adapter = devlink_priv(devlink);
-+	struct ixgbe_hw *hw = &adapter->hw;
-+	bool read_shadow_ram;
-+	u32 nvm_size;
-+	int err;
-+
-+	err = ixgbe_devlink_parse_region(hw, ops, &read_shadow_ram, &nvm_size);
-+	if (err)
-+		return err;
-+
-+	if (offset + size > nvm_size) {
-+		NL_SET_ERR_MSG_MOD(extack, "Cannot read beyond the region size");
-+		return -ERANGE;
-+	}
-+
-+	err = ixgbe_acquire_nvm(hw, IXGBE_RES_READ);
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Failed to acquire NVM semaphore");
-+		return -EBUSY;
-+	}
-+
-+	err = ixgbe_read_flat_nvm(hw, (u32)offset, &size, data, read_shadow_ram);
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack, "Failed to read NVM contents");
-+		ixgbe_release_nvm(hw);
-+		return -EIO;
-+	}
-+
-+	ixgbe_release_nvm(hw);
-+	return 0;
-+}
-+
-+static const struct devlink_region_ops ixgbe_nvm_region_ops = {
-+	.name = "nvm-flash",
-+	.destructor = kvfree,
-+	.snapshot = ixgbe_devlink_nvm_snapshot,
-+	.read = ixgbe_devlink_nvm_read,
-+};
-+
-+static const struct devlink_region_ops ixgbe_sram_region_ops = {
-+	.name = "shadow-ram",
-+	.destructor = kvfree,
-+	.snapshot = ixgbe_devlink_nvm_snapshot,
-+	.read = ixgbe_devlink_nvm_read,
-+};
-+
-+static const struct devlink_region_ops ixgbe_devcaps_region_ops = {
-+	.name = "device-caps",
-+	.destructor = kvfree,
-+	.snapshot = ixgbe_devlink_devcaps_snapshot,
-+};
-+
-+/**
-+ * ixgbe_devlink_init_regions - Initialize devlink regions
-+ * @adapter: adapter instance
-+ *
-+ * Create devlink regions used to enable access to dump the contents of the
-+ * flash memory of the device.
-+ */
-+void ixgbe_devlink_init_regions(struct ixgbe_adapter *adapter)
-+{
-+	struct devlink *devlink = adapter->devlink;
-+	struct device *dev = &adapter->pdev->dev;
-+	u64 nvm_size, sram_size;
-+
-+	if (adapter->hw.mac.type != ixgbe_mac_e610)
-+		return;
-+
-+	nvm_size = adapter->hw.flash.flash_size;
-+	adapter->nvm_region = devl_region_create(devlink,
-+					&ixgbe_nvm_region_ops, 1, nvm_size);
-+	if (IS_ERR(adapter->nvm_region)) {
-+		dev_err(dev,
-+			"Failed to create NVM devlink region, err %ld\n",
-+			PTR_ERR(adapter->nvm_region));
-+		adapter->nvm_region = NULL;
-+	}
-+
-+	sram_size = adapter->hw.flash.sr_words * 2u;
-+	adapter->sram_region = devl_region_create(devlink,
-+					&ixgbe_sram_region_ops, 1, sram_size);
-+	if (IS_ERR(adapter->sram_region)) {
-+		dev_err(dev,
-+			"Failed to create shadow-ram devlink region, err %ld\n",
-+			PTR_ERR(adapter->sram_region));
-+		adapter->sram_region = NULL;
-+	}
-+
-+	adapter->devcaps_region = devl_region_create(devlink,
-+					&ixgbe_devcaps_region_ops, 10,
-+					IXGBE_ACI_MAX_BUFFER_SIZE);
-+	if (IS_ERR(adapter->devcaps_region)) {
-+		dev_err(dev,
-+			"Failed to create device-caps devlink region, err %ld\n",
-+			PTR_ERR(adapter->devcaps_region));
-+		adapter->devcaps_region = NULL;
-+	}
-+}
-+
-+/**
-+ * ixgbe_devlink_destroy_regions - Destroy devlink regions
-+ * @adapter: adapter instance
-+ *
-+ * Remove previously created regions for this adapter instance.
-+ */
-+void ixgbe_devlink_destroy_regions(struct ixgbe_adapter *adapter)
-+{
-+	if (adapter->hw.mac.type != ixgbe_mac_e610)
-+		return;
-+
-+	if (adapter->nvm_region)
-+		devl_region_destroy(adapter->nvm_region);
-+
-+	if (adapter->sram_region)
-+		devl_region_destroy(adapter->sram_region);
-+
-+	if (adapter->devcaps_region)
-+		devl_region_destroy(adapter->devcaps_region);
-+}
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-index fe35eb50b441..215672d60bf1 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-@@ -620,6 +620,9 @@ struct ixgbe_adapter {
- 	struct mii_bus *mii_bus;
- 	struct devlink *devlink;
- 	struct devlink_port devlink_port;
-+	struct devlink_region *nvm_region;
-+	struct devlink_region *sram_region;
-+	struct devlink_region *devcaps_region;
- 
- 	unsigned long state;
- 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 90cffa50221c..839fdb4fd029 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -11494,6 +11494,7 @@ static int ixgbe_recovery_probe(struct ixgbe_adapter *adapter)
- 	ixgbe_devlink_register_port(adapter);
- 	SET_NETDEV_DEVLINK_PORT(adapter->netdev,
- 				&adapter->devlink_port);
-+	ixgbe_devlink_init_regions(adapter);
- 	devl_register(adapter->devlink);
- 	devl_unlock(adapter->devlink);
- 
-@@ -12001,6 +12002,7 @@ static int ixgbe_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	if (err)
- 		goto err_netdev;
- 
-+	ixgbe_devlink_init_regions(adapter);
- 	devl_register(adapter->devlink);
- 	devl_unlock(adapter->devlink);
- 	return 0;
-@@ -12059,6 +12061,7 @@ static void ixgbe_remove(struct pci_dev *pdev)
- 	netdev  = adapter->netdev;
- 	devl_lock(adapter->devlink);
- 	devl_unregister(adapter->devlink);
-+	ixgbe_devlink_destroy_regions(adapter);
- 	ixgbe_dbg_adapter_exit(adapter);
- 
- 	set_bit(__IXGBE_REMOVING, &adapter->state);
--- 
-2.31.1
+@@ -90,7 +90,7 @@ nouveau_fence_context_kill(struct nouveau_fence_chan *fctx, int error)
+        while (!list_empty(&fctx->pending)) {
+                fence = list_entry(fctx->pending.next, typeof(*fence), head);
+ 
+-               if (error)
++               if (error & !dma_fence_is_signaled_locked(&fence->base))
+                        dma_fence_set_error(&fence->base, error);
+ 
+                if (nouveau_fence_signal(fence))
+
+That would also improve the handling quite a bit since we now don't set errors on fences which are already completed even if we haven't realized that they are already completed yet.
+
+> In any case, there must not be signaled fences in nouveau's pending-
+> list. They must be removed immediately once they signal, and this must
+> not race.
+
+Why actually? As far as I can see the pending list is not for the unsignaled fences, but rather the pending interrupt processing.
+
+So having signaled fences on the pending list is perfectly possible.
+
+Regards,
+Christian.
+
+>
+>>  
+>>  
+>>>  
+>>> I'm running out of ideas. What I'm wondering if we couldn't just
+>>> remove
+>>> performance hacky fastpath functions such as
+>>> nouveau_fence_is_signaled() completely. It seems redundant to me.
+>>>  
+>>  
+>>  That would work for me as well.
+> I'll test this approach. Seems a bit like the nuclear approach, but if
+> it works we'd at least clean up a lot of this mess.
+>
+>
+> P.
+>
+>
+>>  
+>>  
+>>>  
+>>>
+>>> Or we might add locking to it, but IDK what was achieved with RCU
+>>> here.
+>>> In any case it's definitely bad that Nouveau has so many redundant
+>>> and
+>>> half-redundant mechanisms.
+>>>  
+>>  
+>>  Yeah, agree messing with the locks even more won't help us here.
+>>  
+>>  Regards,
+>>  Christian.
+>>  
+>>  
+>>>  
+>>>
+>>>
+>>> P.
+>>>
+>>>  
+>>>>  
+>>>>
+>>>> P.
+>>>>
+>>>>  
+>>>>>  
+>>>>> Regards,
+>>>>> Christian.
+>>>>>
+>>>>>  
+>>>>>>  
+>>>>>> P.
+>>>>>>
+>>>>>>
+>>>>>>
+>>>>>>  
+>>>>>>>  
+>>>>>>> Regards,
+>>>>>>> Christian.
+>>>>>>>
+>>>>>>>  
+>>>>>>>>  
+>>>>>>>> Replace the call to dma_fence_is_signaled() with
+>>>>>>>> nouveau_fence_base_is_signaled().
+>>>>>>>>
+>>>>>>>> Cc: <stable@vger.kernel.org> # 4.10+, precise commit not
+>>>>>>>> to
+>>>>>>>> be
+>>>>>>>> determined
+>>>>>>>> Signed-off-by: Philipp Stanner <phasta@kernel.org>
+>>>>>>>> ---
+>>>>>>>>  drivers/gpu/drm/nouveau/nouveau_fence.c | 2 +-
+>>>>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>>>>
+>>>>>>>> diff --git a/drivers/gpu/drm/nouveau/nouveau_fence.c
+>>>>>>>> b/drivers/gpu/drm/nouveau/nouveau_fence.c
+>>>>>>>> index 7cc84472cece..33535987d8ed 100644
+>>>>>>>> --- a/drivers/gpu/drm/nouveau/nouveau_fence.c
+>>>>>>>> +++ b/drivers/gpu/drm/nouveau/nouveau_fence.c
+>>>>>>>> @@ -274,7 +274,7 @@ nouveau_fence_done(struct
+>>>>>>>> nouveau_fence
+>>>>>>>> *fence)
+>>>>>>>>  			nvif_event_block(&fctx->event);
+>>>>>>>>  		spin_unlock_irqrestore(&fctx->lock,
+>>>>>>>> flags);
+>>>>>>>>  	}
+>>>>>>>> -	return dma_fence_is_signaled(&fence->base);
+>>>>>>>> +	return test_bit(DMA_FENCE_FLAG_SIGNALED_BIT,
+>>>>>>>> &fence-
+>>>>>>>>  
+>>>>>>>>>  
+>>>>>>>>> base.flags);
+>>>>>>>>>  
+>>>>>>>>  
+>>>>>>>>  }
+>>>>>>>>  
+>>>>>>>>  static long
+>>>>>>>>  
+>>>>>>>  
+>>>>>>  
+>>>>>  
+>>>>   
+>>>   
+>>  
+>>  
 
 
