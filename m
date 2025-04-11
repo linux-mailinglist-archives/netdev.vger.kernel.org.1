@@ -1,116 +1,57 @@
-Return-Path: <netdev+bounces-181704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CFDBA86377
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 18:38:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 19F9CA863D2
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 18:58:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3ADE3A0515
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 16:37:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D390A3A78B2
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 16:53:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2B221CFE0;
-	Fri, 11 Apr 2025 16:37:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F62021A451;
+	Fri, 11 Apr 2025 16:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JQtwrvNo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tR2Tz26S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6E82C80;
-	Fri, 11 Apr 2025 16:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27312202F70;
+	Fri, 11 Apr 2025 16:53:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744389456; cv=none; b=DY4TL3AneT6fi4XzU07EqFDhEI5filGoMRe/IEUwHV1nVA4fo/oHh1hxykG0laybe+PjVbdOJXZfxLo4SMYILhVrvHH/8dtds3OBo6wuZPUZJ1bDn+97E3XYnv4K9EQJkli3/0mvAAxVOl7QdLYd4c5+ijCZqk3meezKggUO2eA=
+	t=1744390438; cv=none; b=jGxGl8fvI+8qi2YGh8c7aGwa2pWytG7WoPgDGpwdw//3Pi3KHZcSgdjEetMbSFptqY1l4HY9x8C3/nFRuQRXZyFWU1tOsM3MOGJBQ/vxMttrIF9csW0Vuttso/1zBdBbsy6ekD51z3fgFFTV4+7ZjBTye7C8bG3/WH+PULE2NHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744389456; c=relaxed/simple;
-	bh=QDqqnNFS8H3+6xvxJhKf4PlhsdEl3XTPqWR+CfGmy6s=;
+	s=arc-20240116; t=1744390438; c=relaxed/simple;
+	bh=AF4RjAgYfBcqR9rc19DAX62S1KIV6sMe+X020c/P1Tc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EPyHxbtMe7EcYRlkJsKJEO6WdOnVr1ABFPbNVxlVYJy9RONrBHWeccYGygvv9PYQBb9iORpqIko4L88hYfi2bNaoseFy9ZJV6elW7WpcWaAKtpZt0m1VAP9woZbaVqQBDSgBN7D3mqTR67ydxYI3/NcLXvHolbo/v4ksSTU5k84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JQtwrvNo; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-224341bbc1dso22347485ad.3;
-        Fri, 11 Apr 2025 09:37:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744389454; x=1744994254; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MjzA0YnYKabpFVnU6SCdVYbRaI+R9P9oLUcK7MMUODI=;
-        b=JQtwrvNo+jIx9Xl8BHM+rnc0umYf8ySAhAMGgWbwtNeynrH4OI0opesEOUFYP5VRMK
-         D9s1zvrKvQcUPvEc1ZLaaacklGiXV2hqLJMILTpl22UnDLuScfSxsLocptN+kpqFsbsH
-         +FI8D5AJRkh3VM5RJwAbY2geHr4+lgS1TCvaygbxJSAqzPWv83OLay9lP0FvUPMIY3ZD
-         yQymKjYpK18JXWPBCyh3ArWQRWwCVNnQ5OZn4d6fxqY4kfs96dp4fO+bfd9sNFbu05iU
-         kHecRxW+yGewVrLf7h4St8p7q/9mS+Cc9RQa3aLNR1jCY6bgZTzKw6Bsgjr1kOlabCDi
-         bA6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744389454; x=1744994254;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MjzA0YnYKabpFVnU6SCdVYbRaI+R9P9oLUcK7MMUODI=;
-        b=Z3CgqOLDbj+o5yltZl3fjFje4iKyXXIfQo91+MNvtfOUzHfRqD+tIYPaMQAhhbOMdV
-         klgSvaYG/cMaMKAkVYA/ehx2sURatAocNtz0+9XtWMiIovwBGoNxU020sXAUkz0iluiH
-         kxoxBWve/OSPpgjbWKZiTSE3YAh8gkYxNqe62qOIEsyQxqRgtByA5DYXo1z2d3JdD5RV
-         f+t0zkZ0XloA0/xCITSACdDVgCWcY8sG3zq/aqdvIqpVdlvE/gqcXt41hzxUl6G1fT5J
-         LNVDOOJxAYC3rXpYgynvXp5YxQtZW4nxXQUropOeX8feXm8sqxI8Ch40+3G7SEO+tWVv
-         JbcA==
-X-Forwarded-Encrypted: i=1; AJvYcCUsPMvXMq8d/MeEOkgbrIwII8X7ZC9DR019zHaDTlZaLIYwBZ4ObCwIOgef6qGGKYmlbw8lyU6GKLRnvik=@vger.kernel.org, AJvYcCVSXRQI5Wt5pSJPdRBeA/4zfyra+p/rQO4mj4RCt8Ghl1960YQyuczRLv3eV4tpDTPYh8BfgbwgZYTVEJ9c@vger.kernel.org, AJvYcCW/rf62HbnpkzAjRAD5p//5o0Y+VJrOGJHG8GbDspZa6iIEs7rICu3IDJc78Hs484CBRNg0wwfmptAivD40@vger.kernel.org, AJvYcCWYvdJlV2j4cAZx3fWSZnopdANXTqI/qtLGhDwtkISv3T/JfU0YWZTFgBufnb4PIidSwL0FwS5NNLWaZulfLjI=@vger.kernel.org, AJvYcCXcc+bLD05hBLriBoqe0jYMBR+vH0q8DNHrZOQvlLiqh9SHzDb49xJ5u7/llCRAGCY3+642lNyn3Fv5isQ=@vger.kernel.org, AJvYcCXl1X7NRvpeiNEd0I2TCHyOkwNU4uLdaPD219WYSMbfCIpg0CPV/Fx6X4I9oy9GGji4C0k=@vger.kernel.org, AJvYcCXqV8GCpMirRTZHla8YAwlx2/BR2CP34aqGTPXYXCTGuKrPrKEy1JCeKDQbwL4YsYtye83weDEn0TAwZxg=@vger.kernel.org, AJvYcCXw6f466opHRKOJJhWkBEtRLSwSFsXT1tzBSSCySTJZh4SH/RdYZWppGBFESJWlWrbAOr+6IFM5@vger.kernel.org
-X-Gm-Message-State: AOJu0YwR0sj86O4yA+RKJOMHhO2/tTUsdSJwMkMq8nE9Z6DTq3iJ6+17
-	mjVlFy0zzrG9XE2RVKPkM2qFieQ0R62IEodLRQ7tE31VTU+4PoY/
-X-Gm-Gg: ASbGncuF3lZ/gC4MHyBhpybEG8xAFvVooDFoj8MuWC5tbGqXKGv141vLCOaij4Kdosa
-	eUD5NiBB/tBbZo4s6vWueFVU026/SsDwCa5srUWvB4KXQtGpvN1njxDzKAhTMmkd1xZtxvugB8I
-	7WmTnom33afl+Ma5eqmZLY27au/B26Cn/1mqSFoxhcTMsV4CCRgPRoeMd8Nln++jcai0ydXg0Mz
-	HJ3G7ilOVucfrLg07EdkUI1txQr4xi2I0EWhXeN3sYikA4Y/DClgulGF/d1XhdKnemFGIQ1J5xL
-	X3d6jpZnrYtp8mZ2EsKTjU1yoBDrTAQyNet76p6dZXHUeFLFy614UuDzrxaxmwNgxrjM
-X-Google-Smtp-Source: AGHT+IGlMlFJxwXfO1vN1lbAUVxQSfZJdWvCgXvyYRfzP61vo51gp8lcBZ4/5fk7RALG9+wgB3IUnA==
-X-Received: by 2002:a17:902:d4d1:b0:223:42ca:10ef with SMTP id d9443c01a7336-22bea4fee72mr44963195ad.43.1744389454075;
-        Fri, 11 Apr 2025 09:37:34 -0700 (PDT)
-Received: from visitorckw-System-Product-Name ([140.113.216.168])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22ac7c971fcsm51537235ad.111.2025.04.11.09.37.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Apr 2025 09:37:33 -0700 (PDT)
-Date: Sat, 12 Apr 2025 00:37:23 +0800
-From: Kuan-Wei Chiu <visitorckw@gmail.com>
-To: Arend Van Spriel <arend.vanspriel@broadcom.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>, tglx@linutronix.de,
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-	x86@kernel.org, jk@ozlabs.org, joel@jms.id.au,
-	eajames@linux.ibm.com, andrzej.hajda@intel.com,
-	neil.armstrong@linaro.org, rfoss@kernel.org,
-	maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-	tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
-	dmitry.torokhov@gmail.com, mchehab@kernel.org,
-	awalls@md.metrocast.net, hverkuil@xs4all.nl,
-	miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
-	louis.peens@corigine.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	parthiban.veerasooran@microchip.com, gregkh@linuxfoundation.org,
-	jirislaby@kernel.org, yury.norov@gmail.com,
-	akpm@linux-foundation.org, jdelvare@suse.com, linux@roeck-us.net,
-	alexandre.belloni@bootlin.com, pgaj@cadence.com, hpa@zytor.com,
-	alistair@popple.id.au, linux@rasmusvillemoes.dk,
-	Laurent.pinchart@ideasonboard.com, jonas@kwiboo.se,
-	jernej.skrabec@gmail.com, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, linux-fsi@lists.ozlabs.org,
-	dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
-	oss-drivers@corigine.com, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
-	brcm80211-dev-list.pdl@broadcom.com, linux-serial@vger.kernel.org,
-	bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw, Frank.Li@nxp.com,
-	linux-hwmon@vger.kernel.org, linux-i3c@lists.infradead.org,
-	david.laight.linux@gmail.com, andrew.cooper3@citrix.com,
-	Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH v4 03/13] media: pci: cx18-av-vbi: Replace open-coded
- parity calculation with parity_odd()
-Message-ID: <Z/lFQ85vhSQiFDBm@visitorckw-System-Product-Name>
-References: <20250409154356.423512-1-visitorckw@gmail.com>
- <20250409154356.423512-4-visitorckw@gmail.com>
- <25b7888d-f704-493b-a2d7-c5e8fff9cfb4@broadcom.com>
- <740c7de894d39249665c6333aa3175762cfb13c6.camel@sipsolutions.net>
- <1961e19ee10.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Va6xcabhKeVgvHqVZxT3W3C/yvDYrhx/trWhKC+E4uhTTzYs4reZMi5pC3ORg+5RasbAndxLMyt6X+2FbsTPnYioDMkK/JmsGzERJr9DXQMy6wZDbnYoSIkV3r9xkLRbTeibW4oJsUPVgTIw+3zLK6kZaWGrEahBmwjFxr7VDDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tR2Tz26S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A56C2C4CEE2;
+	Fri, 11 Apr 2025 16:53:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744390437;
+	bh=AF4RjAgYfBcqR9rc19DAX62S1KIV6sMe+X020c/P1Tc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tR2Tz26SEwY/Iqqp+8Dc1SdxxwQ/Oe4pzKoi0FYMsNjzpsuIMXep/4LJxe5x/BUAw
+	 ai98mdp8UD9p6MIquQKTK/MRJOOzdOwDkVLhHxoUlmwZdMMXiwelCsSjzeuvl6JrBX
+	 pfd/jKpQpyIGLykhtDNcFydRUWQjrslj7kJIBd9jH23sQFoRhBQ8uMk9hT9YlicNkV
+	 h6MLif0NZf9/QlHdF7QZ+WA0nEXrkFGUnR/PKvNJKdiojDix9LKDBPe3wij9GhW+Af
+	 ZTSSaxokBnI6NGQlPDCBCHkBTtC4neqfozELV2C8BeWchmVQIm7HjvmMDmpuiL1kcC
+	 4iZ0NcTVkCj6w==
+Date: Fri, 11 Apr 2025 17:53:53 +0100
+From: Simon Horman <horms@kernel.org>
+To: Thangaraj Samynathan <thangaraj.s@microchip.com>
+Cc: netdev@vger.kernel.org, bryan.whitehead@microchip.com,
+	UNGLinuxDriver@microchip.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: ethernet: microchip: lan743x: Fix
+ memory allocation failure
+Message-ID: <20250411165353.GN395307@horms.kernel.org>
+References: <20250410041034.17423-1-thangaraj.s@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -119,29 +60,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1961e19ee10.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+In-Reply-To: <20250410041034.17423-1-thangaraj.s@microchip.com>
 
-On Thu, Apr 10, 2025 at 07:08:58AM +0200, Arend Van Spriel wrote:
-> On April 10, 2025 12:06:52 AM Johannes Berg <johannes@sipsolutions.net> wrote:
+On Thu, Apr 10, 2025 at 09:40:34AM +0530, Thangaraj Samynathan wrote:
+> The driver allocates ring elements using GFP_DMA flags. There is
+> no dependency from LAN743x hardware on memory allocation should be
+> in DMA_ZONE. Hence modifying the flags to use only GFP_ATOMIC
 > 
-> > On Wed, 2025-04-09 at 20:43 +0200, Arend van Spriel wrote:
-> > > 
-> > > This is orthogonal to the change to parity_odd() though. More specific
-> > > to the new parity_odd() you can now do following as parity_odd()
-> > > argument is u64:
-> > > 
-> > > err = !parity_odd(*(u16 *)p);
-> > 
-> > Can it though? Need to be careful with alignment with that, I'd think.
+> Signed-off-by: Thangaraj Samynathan <thangaraj.s@microchip.com>
+> ---
+> v0
+> -Initial Commit
 > 
-> My bad. You are absolutely right.
+> v1
+> -Modified GFP flags from GFP_KERNEL to GFP_ATOMIC
+> -added fixes tag
 > 
-Then maybe we can still go with:
+> v2
+> -Resubmit net-next instead of net
 
-	err = !parity_odd(p[0] ^ p[1]);
+Hi Thangaraj,
 
-I believe this should still be a fairly safe approach?
+Thanks for the update. And sorry for not noticing this
+in my earlier review. But I have some more feedback:
 
-Regards,
-Kuan-Wei
+* I don't think it is correct to refer to this as fixing a failure
+  in the subject.
+
+* I do think the subject prefix can be shortened to 'net: lan743x: '
+
+
+
+Perhaps something more like this?
+
+	[PATCH net-next v3] net: lan743x: Allocate rings outside ZONE_DMA
+
+And perhaps also mention in the commit message that this
+is consistent with the other caller of lan743x_rx_init_ring_element().
+
+Thanks!
 
