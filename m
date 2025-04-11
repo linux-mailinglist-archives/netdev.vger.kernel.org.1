@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-181747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D3FFA86567
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 20:22:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59055A8656A
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 20:23:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEBBF1B81A96
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 18:22:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B93A29A75A5
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 18:22:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74E025A32D;
-	Fri, 11 Apr 2025 18:22:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D544025C702;
+	Fri, 11 Apr 2025 18:22:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Oirkpbgt"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="kOxaV7hA"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2056.outbound.protection.outlook.com [40.107.236.56])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2088.outbound.protection.outlook.com [40.107.94.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0640D259CA0;
-	Fri, 11 Apr 2025 18:22:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B76425A34F;
+	Fri, 11 Apr 2025 18:22:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.88
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744395727; cv=fail; b=a9A6bUCpEXO7lvfKa6GxUuWQoZf5Z69nmARO/uMK76BExOQjq7CKO0hn/cDYQ4KOcqr7PYeSNc85pOHo5x9/KgLYH266F2sJtUAYPjrCJTBw6qdwrpjIfFUHSwIbDLVJBFS4/8sdrTnjGoiuTj5NYy/LrXOSc0ZtB1wFXF2UBDY=
+	t=1744395729; cv=fail; b=CmBlRcZM/3Dkcfu7ue9w5ZKAuOwZ2hz/PDTA7I1iN8qRn/4I8N53Bmld73Yqa4REtRl+jYOebAo+0UMlL/YU98g3l+VtDsEC4pB2Pm1wHgBrxYc1AxZSV+iApwOARzIAmWJzgiJidPhItupPGcKS6CUZQH7ifE9lSm/jEND8mY4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744395727; c=relaxed/simple;
-	bh=+mtYAFoFxXbknTXyRPVTehQeOkgvKc4xV1f0wXhtjZs=;
+	s=arc-20240116; t=1744395729; c=relaxed/simple;
+	bh=MyEQr0pqNroTIuiiVHylHmJz8gNp9nghrUJuP6YbpWI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mutu3vgQwLVMKe/uFrhrFqfZitEDyZ9NRRPwo1SQvm0IEIYMH/yYNSrvvUnT1mWUsyl7X/dTtqtt91dayvx2bxXHUCgBn/E9pgEFGGahJE+jldUuKLzKyDEnaWu549OZSY/sCYs1BSeQxFycmOXRjZaeT6Sz0mukvc+8S7WPdf8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Oirkpbgt; arc=fail smtp.client-ip=40.107.236.56
+	 MIME-Version:Content-Type; b=hUyjqUgyjMFsRqfz0mLgE3/izIA9r9cb6Dvegxcwj3VWL/RLBCEw53RjPbEAHuQGb7Hdp16uMqc3jl657+MqlhEPuqTEb2ldl36IuOaq4tNFJcE8PhmhDeAnWdMjA3v65Kr1RPK+3CDs0gHZbr8K4B97YX6uRgGo79rBS/bxYw4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=kOxaV7hA; arc=fail smtp.client-ip=40.107.94.88
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pHmsxDAlkAyv7T3j3ppKAXmhp1W/7MgVlmrRwVLQRs0DRzwCnuMrsRShWb5rPa7fU0LkJB43gdzSMKMEWgFeHWtBC82jGmmWJHvDfAkLn/0fTl/T6Ce7dl47ActI2PlKVFQn66Fv5SQYKV08RcWVWYi27n583P2uMH47ex7NxSsOU9+igIQ4V+Uw8/7dhMRgtXpEl7vG151kDaKr0mT4P9mNsk0bZrYAmmzIdCDcRtQuAR25GHkNwLFsn5/d/r/3pIkq58HuY2E665tUwSS3TAs1UNlYUJg/GsKWO+gHtWybnY2pk1qoMSbxZ6/BtpwLNuaiRGhBmSuuq9Ak8fefKg==
+ b=CuaAjIc8JB9k8zVCxDT0sTyZnTEnjazE/+PKo1GMiZJy+bqwSumNR+r/WS/qplY0q7hJRIA++/2+7X3I9kBd6Jh+0d5aWpHtbJvyVgh6sXnh//ifahAngQX3j8xv/7fvIh7BsWvyC/QoEOSxtUriuSXUvmF7RGmK+lb2Wr0LF2Juqy2fkKkgFRi/byjxz37nnPWfMQzTCj3EvoojkwOMkwT7wWgKTc/DfpqM1m48wgB9m7s4P823LRwymHyWH6BsbG4c8W9Yh+5ODE7z+v/QlvD7Cd+Q7Ed4qJ2ZFRAIjpPqGE+AEQBp981j8yhmoPaG+SGF2ZvzxYvlM1emehWjSQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YbR77VT5YzN4grR0CaqqrvISNy55Idi/z8Cf80mi9XU=;
- b=jB5C+mTso9g1vIWbt2zqCNkQSJ+3lUs5o/1rKIjFzP/gQJNS4a0j6we9hkAIfPxRjqPkkQ5fETsYuxZFPypGotk8TERy6JB8lCrR27sGeBCuKJUEqRiAWcmxMNQqNge+W3OZFymbeUDuaEFycpl+ZIXC9b3NWY/Zak+USkD2wFI/OKB2mSmLlvvjFM+uy7lCEsXfCETYxqxJ4Wms5JaTSbm+8aDolSVkbQAEylS2L08kwQIRCpVQHbRe/7dJ7n5Q7BDS7DQ0ssO84nvCNKsWSdsooe0Jo0Ik8X6mBKQbnyX/I7lIbVSDhGb0QKAooEpx6104KpWieVQYg1fT8ht9qA==
+ bh=ff/w18+f1OseMFSch/LRK3Va+WXFnn0aguc/A3dbxmM=;
+ b=EQNnRAQapkC/CMJcuwF09pxQVLHcucVR15Wg8IwFF4OouEr4j1m4RtV04CZ8HuC0cprQ2rmtlal2lqfIVmuWyoJstAnT/lgYO0auG5d9li7zGjCtSS+6HegLH73jb/9R+aGl939F215yXOBvZaQRgRPoDBNNoIdAKpAjnrK9tJudUus0Yp9+dHdmhL5tNq5ID4IwBcei+seTmymMDOrvfj+yWz+azDMSsaTHcJAPQFh/n2FpG26chjVYUMp3UxiGTrMOoj+k00ASzsU9NphDqaqkLRUQuSsgru3nsD2kQntSnAyt3cfhgcS6M6UYzGe5+EaauNCq5HEznc0Y9lksPA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=lunn.ch smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YbR77VT5YzN4grR0CaqqrvISNy55Idi/z8Cf80mi9XU=;
- b=OirkpbgtkCrwkT5vvw0jL4qehiscMR0skgJenlrO1LQCDM31HT3ryhLHH5XdX4FHF9xCvEXdNYpYTseHT7azen0O870qDmSlwxSkXrAvyl8DGgzx1HgtUXk21640u6mbVn5nsyypzTeMn5k/GFGk8Bk1wC5uLGy1ajf4ZZaxUAA=
-Received: from DS7P222CA0014.NAMP222.PROD.OUTLOOK.COM (2603:10b6:8:2e::34) by
- SJ1PR12MB6027.namprd12.prod.outlook.com (2603:10b6:a03:48a::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8632.27; Fri, 11 Apr 2025 18:22:01 +0000
+ bh=ff/w18+f1OseMFSch/LRK3Va+WXFnn0aguc/A3dbxmM=;
+ b=kOxaV7hAEdnDkS8hMniP/ArX5D9ksRoXpFnWm3VPhiuROpnGS2Xtvl1X0DLOoFF/9ndyy5CuDOXc7WoIignBS6nMivx0FbdFOp/VFvOMgzpApDtaVmjVamcfg9wu6MKaIcg/7NvapiEkaAZmlavlA+IGkP/AiMLeIA3KD99mRVM=
+Received: from DS7P222CA0028.NAMP222.PROD.OUTLOOK.COM (2603:10b6:8:2e::21) by
+ SA1PR12MB8117.namprd12.prod.outlook.com (2603:10b6:806:334::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.27; Fri, 11 Apr
+ 2025 18:22:04 +0000
 Received: from DS3PEPF000099DA.namprd04.prod.outlook.com
- (2603:10b6:8:2e:cafe::1a) by DS7P222CA0014.outlook.office365.com
- (2603:10b6:8:2e::34) with Microsoft SMTP Server (version=TLS1_3,
+ (2603:10b6:8:2e:cafe::a8) by DS7P222CA0028.outlook.office365.com
+ (2603:10b6:8:2e::21) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.8632.26 via Frontend Transport; Fri,
- 11 Apr 2025 18:22:01 +0000
+ 11 Apr 2025 18:22:04 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -64,19 +65,19 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  DS3PEPF000099DA.mail.protection.outlook.com (10.167.17.11) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8655.12 via Frontend Transport; Fri, 11 Apr 2025 18:22:01 +0000
+ 15.20.8655.12 via Frontend Transport; Fri, 11 Apr 2025 18:22:04 +0000
 Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 11 Apr
- 2025 13:21:59 -0500
+ 2025 13:22:00 -0500
 From: Shannon Nelson <shannon.nelson@amd.com>
 To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
 	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
 CC: <brett.creeley@amd.com>, Shannon Nelson <shannon.nelson@amd.com>
-Subject: [PATCH net-next 2/3] ionic: support ethtool get_module_eeprom_by_page
-Date: Fri, 11 Apr 2025 11:21:39 -0700
-Message-ID: <20250411182140.63158-3-shannon.nelson@amd.com>
+Subject: [PATCH net-next 3/3] ionic: add module eeprom channel data to ionic_if and ethtool
+Date: Fri, 11 Apr 2025 11:21:40 -0700
+Message-ID: <20250411182140.63158-4-shannon.nelson@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20250411182140.63158-1-shannon.nelson@amd.com>
 References: <20250411182140.63158-1-shannon.nelson@amd.com>
@@ -91,164 +92,110 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099DA:EE_|SJ1PR12MB6027:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5aa06ec4-286f-4b3c-5f56-08dd7925c102
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099DA:EE_|SA1PR12MB8117:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6e5b43f3-926f-4cc7-c3d7-08dd7925c28b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ISljVVmWBlR6WUq2wKMaxk1rY8m1B4tOeMqGYz36rcED11LRSYUpIJPXIHlm?=
- =?us-ascii?Q?wnjlGminxNZHjhfy6H3Yzuwo+MpWNoyiixi4ZrKh4oQf+OgnYT0VSTxntN/X?=
- =?us-ascii?Q?J09nNJX74UR00/P5xmiXsLY8JCzAGLCvLfIaGbUS/H25aqBw5f7sZgj3NFy7?=
- =?us-ascii?Q?j+90c7rVY9wfeLFRWeZTaPif3zQ7CDHpop4fMKZD34GHR0GYlvmGffoDaHIa?=
- =?us-ascii?Q?bmmrpI4VYq3FAoheAUYuV0tKoBNU2r6QfdP6ugKW9oByqmUaD8y9VQ1GwTeL?=
- =?us-ascii?Q?U5BmFAVqumxBO5V8pSi2cTpmVJdHYt9RUp40acuHWD/nkrZhx7lvaj0Ob6js?=
- =?us-ascii?Q?T35mlzpHw2jHf+LQMoxNDvkqDmZ4XJdzaMxfx48bU7vMAJHqybmQzTJvDfe6?=
- =?us-ascii?Q?TS/4BIrhbTjSmuh4sYwwPuxgboB3p3i3HTJxrqdSPrsClIRVRO2znhhwwHEd?=
- =?us-ascii?Q?OAidRB7hVazC8PkZiOwcI2mp+xc8rf1O6PsW9ozetzlkyzd1If0w22pidCu1?=
- =?us-ascii?Q?2QohByWg9mzXuC5hkbomj5eV8i1wHx4O2rdrKnBhIrjnSOwM345tUgK+r3Gn?=
- =?us-ascii?Q?CKUNtdMzrKwIMXdiiSmH7HXDTg0tkD6XcDHX1OxL6bdygByrWhrFvTkWdwcQ?=
- =?us-ascii?Q?D9ZC8LYxEOtrBjxKnBjn/vYLWjP/Uo4+e7PA+/rmH3Dbeyz8EVWaFTS2hPgo?=
- =?us-ascii?Q?hWu7En7Mzx+8cGjkyCKn2OWNmO00tQ5HSCgF90QsKTmIeQ3+YP/tht8ObmFs?=
- =?us-ascii?Q?JlCvDNYV6ZknmuRCOAyTSrNwp9eLC1Ry3axB3eUetDe6iQ6MMRXAiTcrcRFR?=
- =?us-ascii?Q?hNJZL42QW5eg5Zm+0P1BdHcMQFm9XwbsbRC4hme18MDAE49JLDc/BtfFuLbV?=
- =?us-ascii?Q?kRyQcNJ5/cBzhL+GY9xmBrg+4pQjBauVdx7xxbAHNSj4eZYD74p6i0cABe9W?=
- =?us-ascii?Q?XT1iw2GmNrQ1TaN6uvAIOTbZIlSxY6KUF8WZ1KKcXYtic8zQDKUc6dL3Wgzv?=
- =?us-ascii?Q?WeI834TWYXp4t9bTWxVKjlbzWnYXbZO6pIOcCNiM0mqFsK8uAvVDjylvB02E?=
- =?us-ascii?Q?kJNnF5jizXlFUPessef55+jZ7Muzsg514HJSApORY8WX+s1254Vz7jg2UCT/?=
- =?us-ascii?Q?epybWcxNnZgKFMdjfwOm+z302pMWxXAqG8ZkZ+AtOHfeYPhfzWskoT5/Am/X?=
- =?us-ascii?Q?mYhmtcgMH/svUrqbMwOO3z2ndrggYNCR8Edcrn6qemN0a4EHoRCVW1RAY+Ck?=
- =?us-ascii?Q?+0tNvQtRJp0DdN01DH/fZNmAVELi8yaHVhhSdGwWxv+HOXawuuBjoqSkbNGJ?=
- =?us-ascii?Q?PrdvJRSbhAH7fQBpDPQVh3dg2HFZBV0ExpcsX38MscPrmOmzA8lx7zcQ3rCx?=
- =?us-ascii?Q?B3vBaoxTzgRvF57TcWl5FhZAPH/a1+xczJ5WBwvqla4bCutGlv1LL+cCknG0?=
- =?us-ascii?Q?appNXRwc005Yx/zhD1Ywp6kYAjxDciNdieBJ5OQUOUksgobAvbQ+5xqyYcSY?=
- =?us-ascii?Q?7qChXjWKs/8Zph/Tm349JfIKDMXcF0p9mBE5?=
+	=?us-ascii?Q?BGUJ/6roLzch/b41PAYfIXQME8avxkwDDWxNBKSRn41I3627MPQo1av6yuRd?=
+ =?us-ascii?Q?v3leGnrrfMx0yiJRNrCrzWnmZjrs3IGEu3Dr02Le6PxgHMAE97gWR2oE6rm4?=
+ =?us-ascii?Q?rhnvvZ+xoSnQYx0SvnitjCZ/5FT+T0ONF1YNTNsF3LNV/5GLY11UgXn5E3YW?=
+ =?us-ascii?Q?yMfWqwMCiCjdv50wWkT6JV74Kd+1O7BALeLcCDwi/KZNV7gB3xTknRgkVufX?=
+ =?us-ascii?Q?ClJYQdsnNeG4ddUP8WgsjbXvFHATnKBxqvUmUy9FY3WJp9dYkphSlklWWb0f?=
+ =?us-ascii?Q?iOP6puGs6bHU4afsy5d5ujpR8WVvxx787kxNUOKKfq4SS1qZtI6Qnxin++JI?=
+ =?us-ascii?Q?/udxJxpzPkqtpyDj/bZqC/6kHnN8+sq/qt32vLnvpq9l1ts6UG8+xRGj0HdZ?=
+ =?us-ascii?Q?Cfvb8MSjIOYwXNUlpZ+pAcX23igSkqqtvTsDMOwHo3EK3380bvtiDS5PoJHe?=
+ =?us-ascii?Q?9sdsH8ZPHLRaAJHiA/2TYlUCro1jj+zonKgg3YvlZDkX1T/ClFLq5ue03IYg?=
+ =?us-ascii?Q?tI94FdBRaQm+D45+UA99dNlf90TSWOR98gxttPDPaqEe4VBZU4MWIlz46hnI?=
+ =?us-ascii?Q?PGsFLbgslBvPGkxIRfS0HoxkS76/sOeoo72Y2vfS4bjyO3qkFomXhztgW7NF?=
+ =?us-ascii?Q?UHt/AhKDm5xG5qxvrHyEAdc/OxDW+KW67TrvKPxLlxVmzWww91nzT/LBc6u5?=
+ =?us-ascii?Q?msOtuWSJ1H8uWAbdMmlVapKgWa3igdrKIxqTLsHQn4R63BdYf4rZTrlEOycl?=
+ =?us-ascii?Q?R9n7BLpWSQ8blZFauTvN34tLNK4SsimvkWTBb3r00I01+u6zFbXWudKycZ/m?=
+ =?us-ascii?Q?YVhc8pCKK4wSLiLThDan0pJs2pl/A6pBgVLw7N2stzGvLFz3+x0gmmHwJzso?=
+ =?us-ascii?Q?Ru6bqG3g01CVjx5bFU0L+ZZTZ077BgGhgtc/nJAYnQyG4ef+bqxP7qtMjFnH?=
+ =?us-ascii?Q?Jgr8BNn37l3Ou5psX8qFtwD9HWyuT1XOOsCEBMWKooFTVVqeQ6Vv9qGSjwsq?=
+ =?us-ascii?Q?uKkfj1tKWKpt32AaQraTNFmpDlRnKu4PRtTCfUO3qHmnEqgmCT4+Jtl0xXff?=
+ =?us-ascii?Q?mrjF7jGeOyd++qZMgwQDe56sqBhba6/f5Lpt/JR/MlXXv1/nXDb5UWGLZQG1?=
+ =?us-ascii?Q?FW4Qm9qfZm3N/1u63eJiz5iwwMSBpeSSo2VqXtNMbPbCRsMmUNCfAqUVOVvS?=
+ =?us-ascii?Q?EWDgxIT8C4ZaatLCOvquLMTtlZvAaORcARcJL5Ct62gQ2io7uEf8dRed7Xbx?=
+ =?us-ascii?Q?vVjhfMOKfX6HqWwjcmNBt66lknofIX8rfAeBj4RzXLisdVaRn6424Ur5r3j0?=
+ =?us-ascii?Q?z++bJVUcunrrd7xfN1Zr4U1UzNKdUQ5PAVYdY+SOkLo8IrMcKMaNNUnMQLDm?=
+ =?us-ascii?Q?C85LF2dCXmJwFKSIFFe04e025B64atGOI4dDqSHZB3dEXDNgG6liKtcjfo9u?=
+ =?us-ascii?Q?mVlmdi7b1bphA41XgFlqSlkGU6cFslfzCH9eJP7dY6HHzv8ZxMyCwv38iaCA?=
+ =?us-ascii?Q?NUXmfOqzLZPMgQsT7OQRyltKWrBDx0wB6Ll7?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Apr 2025 18:22:01.4449
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Apr 2025 18:22:04.0231
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5aa06ec4-286f-4b3c-5f56-08dd7925c102
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6e5b43f3-926f-4cc7-c3d7-08dd7925c28b
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	DS3PEPF000099DA.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6027
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8117
 
-Add support for the newer get_module_eeprom_by_page interface.
-Only the upper half of the 256 byte page is available for
-reading, and the firmware puts the two sections into the
-extended sprom buffer, so a union is used over the extended
-sprom buffer to make clear which page is to be accessed.
+Make the CMIS module type's page 17 channel data available for
+ethtool to request.  As done previously, carve space for this
+data from the port_info reserved space.
+
+In the future, if additional pages are needed, a new firmware
+AdminQ command will be added for accessing random pages.
 
 Reviewed-by: Brett Creeley <brett.creeley@amd.com>
 Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 ---
- .../ethernet/pensando/ionic/ionic_ethtool.c   | 50 +++++++++++++++++++
- .../net/ethernet/pensando/ionic/ionic_if.h    | 12 ++++-
- 2 files changed, 60 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/pensando/ionic/ionic_ethtool.c | 3 +++
+ drivers/net/ethernet/pensando/ionic/ionic_if.h      | 6 ++++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c b/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
-index 66f172e28f8b..25dca4b36bcf 100644
+index 25dca4b36bcf..66685cfb3571 100644
 --- a/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
 +++ b/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
-@@ -1052,6 +1052,55 @@ static int ionic_get_module_eeprom(struct net_device *netdev,
- 	return err;
- }
- 
-+static int ionic_get_module_eeprom_by_page(struct net_device *netdev,
-+					   const struct ethtool_module_eeprom *page_data,
-+					   struct netlink_ext_ack *extack)
-+{
-+	struct ionic_lif *lif = netdev_priv(netdev);
-+	struct ionic_dev *idev = &lif->ionic->idev;
-+	u32 err = -EINVAL;
-+	u8 *src;
-+
-+	if (!page_data->length)
-+		return -EINVAL;
-+
-+	if (page_data->bank != 0) {
-+		NL_SET_ERR_MSG_MOD(extack, "Only bank 0 is supported");
-+		return -EINVAL;
-+	}
-+
-+	if (page_data->offset < 128 && page_data->page != 0) {
-+		NL_SET_ERR_MSG_MOD(extack, "High side only for pages other than 0");
-+		return -EINVAL;
-+	}
-+
-+	if ((page_data->length + page_data->offset) > 256) {
-+		NL_SET_ERR_MSG_MOD(extack, "Read past the end of the page");
-+		return -EINVAL;
-+	}
-+
-+	switch (page_data->page) {
-+	case 0:
-+		src = &idev->port_info->status.xcvr.sprom[page_data->offset];
+@@ -1089,6 +1089,9 @@ static int ionic_get_module_eeprom_by_page(struct net_device *netdev,
+ 	case 2:
+ 		src = &idev->port_info->sprom_page2[page_data->offset - 128];
+ 		break;
++	case 17:
++		src = &idev->port_info->sprom_page17[page_data->offset - 128];
 +		break;
-+	case 1:
-+		src = &idev->port_info->sprom_page1[page_data->offset - 128];
-+		break;
-+	case 2:
-+		src = &idev->port_info->sprom_page2[page_data->offset - 128];
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	memset(page_data->data, 0, page_data->length);
-+	err = ionic_do_module_copy(page_data->data, src, page_data->length);
-+	if (err)
-+		return err;
-+
-+	return page_data->length;
-+}
-+
- static int ionic_get_ts_info(struct net_device *netdev,
- 			     struct kernel_ethtool_ts_info *info)
- {
-@@ -1199,6 +1248,7 @@ static const struct ethtool_ops ionic_ethtool_ops = {
- 	.set_tunable		= ionic_set_tunable,
- 	.get_module_info	= ionic_get_module_info,
- 	.get_module_eeprom	= ionic_get_module_eeprom,
-+	.get_module_eeprom_by_page	= ionic_get_module_eeprom_by_page,
- 	.get_pauseparam		= ionic_get_pauseparam,
- 	.set_pauseparam		= ionic_set_pauseparam,
- 	.get_fecparam		= ionic_get_fecparam,
+ 	default:
+ 		return -EINVAL;
+ 	}
 diff --git a/drivers/net/ethernet/pensando/ionic/ionic_if.h b/drivers/net/ethernet/pensando/ionic/ionic_if.h
-index 4943ebb27ab3..23218208b711 100644
+index 23218208b711..f1ddbe9994a3 100644
 --- a/drivers/net/ethernet/pensando/ionic/ionic_if.h
 +++ b/drivers/net/ethernet/pensando/ionic/ionic_if.h
-@@ -2839,7 +2839,9 @@ union ionic_port_identity {
-  * @status:          Port status data
-  * @stats:           Port statistics data
-  * @mgmt_stats:      Port management statistics data
-- * @sprom_epage:     Extended Transceiver sprom, high page 1 and 2
-+ * @sprom_epage:     Extended Transceiver sprom
-+ * @sprom_page1:     Extended Transceiver sprom, page 1
-+ * @sprom_page2:     Extended Transceiver sprom, page 2
+@@ -2842,6 +2842,7 @@ union ionic_port_identity {
+  * @sprom_epage:     Extended Transceiver sprom
+  * @sprom_page1:     Extended Transceiver sprom, page 1
+  * @sprom_page2:     Extended Transceiver sprom, page 2
++ * @sprom_page17:    Extended Transceiver sprom, page 17
   * @rsvd:            reserved byte(s)
   * @pb_stats:        uplink pb drop stats
   */
-@@ -2850,7 +2852,13 @@ struct ionic_port_info {
- 		struct ionic_port_stats      stats;
+@@ -2853,13 +2854,14 @@ struct ionic_port_info {
  		struct ionic_mgmt_port_stats mgmt_stats;
  	};
--	u8     sprom_epage[256];
-+	union {
-+		u8     sprom_epage[256];
-+		struct {
-+			u8 sprom_page1[128];
-+			u8 sprom_page2[128];
-+		};
-+	};
- 	u8     rsvd[504];
+ 	union {
+-		u8     sprom_epage[256];
++		u8     sprom_epage[384];
+ 		struct {
+ 			u8 sprom_page1[128];
+ 			u8 sprom_page2[128];
++			u8 sprom_page17[128];
+ 		};
+ 	};
+-	u8     rsvd[504];
++	u8     rsvd[376];
  
  	/* pb_stats must start at 2k offset */
+ 	struct ionic_port_pb_stats  pb_stats;
 -- 
 2.17.1
 
