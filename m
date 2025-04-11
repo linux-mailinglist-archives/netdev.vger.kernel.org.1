@@ -1,321 +1,533 @@
-Return-Path: <netdev+bounces-181507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAAB6A85417
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 08:25:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8823CA854B2
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 08:53:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 216687B29E5
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 06:24:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51C644C0392
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 06:53:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C7D427CCCF;
-	Fri, 11 Apr 2025 06:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14FD027CCD5;
+	Fri, 11 Apr 2025 06:53:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fossekall.de header.i=@fossekall.de header.b="tTyJVGz7";
-	dkim=permerror (0-bit key) header.d=fossekall.de header.i=@fossekall.de header.b="5RXs4eJG"
+	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="IUxo7HAW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p02-ob.smtp.rzone.de (mo4-p02-ob.smtp.rzone.de [85.215.255.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sg-1-14.ptr.blmpb.com (sg-1-14.ptr.blmpb.com [118.26.132.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FEDC27CB36;
-	Fri, 11 Apr 2025 06:24:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.80
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744352690; cv=pass; b=W9butUd13xPFndbWF6OQrORhP4KheVa0mpDktArYUz/DAxaGE72utlPPDFeLkgpcqv841/kyPbsw46vk8rpk0QtrK2dw/o2NlvOikuYf0cMY1KTaZhrNaKnAfA161QxlnfIf7xxlP82E88QNkzYrPHWmU8aEeW4ixAAfgfj5Lyg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744352690; c=relaxed/simple;
-	bh=l+I6yaZDQZFzU/0lOna1bxv1XefK864QEYTNwA/sEjc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m7JDKJfFs0Jvk6HXBitiAPa6vFY5dG82U7ZStwVJaOTDjnMNTGAZp4Adi0twvM5TtqHmuIvPsOoyZHU607QE6uhj0ElMATdlienD4i0qUp8bNTCOPUBj9rW8VvvPhrXH8nUECQzcdYJeMuELfFq2r3iIY3UuvIgGl17fE2PmbNg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fossekall.de; spf=pass smtp.mailfrom=a98shuttle.de; dkim=pass (2048-bit key) header.d=fossekall.de header.i=@fossekall.de header.b=tTyJVGz7; dkim=permerror (0-bit key) header.d=fossekall.de header.i=@fossekall.de header.b=5RXs4eJG; arc=pass smtp.client-ip=85.215.255.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fossekall.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=a98shuttle.de
-ARC-Seal: i=1; a=rsa-sha256; t=1744352677; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=kk0uNfbOtzMQ8ForAz8b6Lt/k7bXB2s+CHd+GpQDCe/NYJj/UwpebXwIf7+SDf1Sln
-    rKXllh6RCHYpgQ9GCO8W3NOvdFImzdNhcO5siWFpYo5AVXhRbIIJbH2nlVpEG4iOBzQo
-    1zL7P0UlJxacWXWM/ZponojxCyMy9Q6Ws9mESn3SDVou74RTaq7//Gx3opZPRej2+D2z
-    d0mXCHHxcDoFXrsy4NhsnSczLMVPcquw2ZkIaUOlcRil43UyCTQxUeIUOCn9DYRxd9mj
-    krTf8fwLKJX09Bc+Wl2UCN9pbdA/b2dJ7416kAUGZMhwnxAqC6hRqJa9UXdUqNXZ6eAj
-    ajBg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1744352677;
-    s=strato-dkim-0002; d=strato.com;
-    h=References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=GOW7EgaK4eTMqPSWF+IPv4cYDIseNc2HtpiUiSUFm3M=;
-    b=Bwf0n1nwuy9C2bPDdtFB7XDkyD7Y2l8tr5jxEyngd1RHklsQvVeuQLLv/dyXEGQUrX
-    4/o0L9fz72wpvGbt9SCyn1+6lQ/MUS5FX//rte+HXbwZjwc8MB+aoXT5VD3djt6UeWu2
-    vFAn7agjASgCj5bRWVOVNl2i5qtfDTVmRL6gSDwFQniqeyWDfdKRol4baHjZPfM8Ssau
-    iik9fux553Ec7Wbtdmz74qHHI0KL0tNIqNeiOl33CXnT29cz8Jeg2npgJE+JlvXVhTVx
-    2YQ7NXz+zhLn2mN5X2SlBfXjEBDDA8hWoY9JafGxSYGwV/TMdMqq+HKvvIeFQM2x/D1v
-    loqA==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo02
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1744352677;
-    s=strato-dkim-0002; d=fossekall.de;
-    h=References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=GOW7EgaK4eTMqPSWF+IPv4cYDIseNc2HtpiUiSUFm3M=;
-    b=tTyJVGz7GWMYjq9wJD/2fFLB6QiD1iKe11NQGviPtWNAN7Nxf3xe5FEjGlnzwIcdt4
-    ogUPqsDhymWtwjgchgmXuy5U390bqd5cbhg3AWmmPmYUrRR91I+O8YDwh2wEtHsGdUiM
-    2Y0DyJZho4xicql8ZYuogPAkO2g4aT4nywdahux1G6L+BE577GH+pWxYAUUzLK8XHaEk
-    uRv145FqR4eLGNGnI8ynrnQWj1KxLzdwrwlJ1uocPEKxSoKRYrG16WxfipLqMQXslheC
-    xSDOZy3gWC6fzj2B+i4J5YTMHludKCEJh0jft5xkY9ek04bbHVq/f0UUozVpPekCVLJB
-    7vVQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1744352677;
-    s=strato-dkim-0003; d=fossekall.de;
-    h=References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=GOW7EgaK4eTMqPSWF+IPv4cYDIseNc2HtpiUiSUFm3M=;
-    b=5RXs4eJGxZJMKw39+mgUX5pGHyDtJPTiHknySH+W7L4dA8eseQrQ1Fgi5oA0Xk8swu
-    ZpcW2eZVhQsTm7A7DIAw==
-X-RZG-AUTH: ":O2kGeEG7b/pS1EzgE2y7nF0STYsSLflpbjNKxx7cGrBdao6FTL4AJcMdm+lap4JEHkzok9eyEg=="
-Received: from aerfugl
-    by smtp.strato.de (RZmta 51.3.0 AUTH)
-    with ESMTPSA id f28b3513B6ObHae
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Fri, 11 Apr 2025 08:24:37 +0200 (CEST)
-Received: from koltrast.home ([192.168.1.27] helo=a98shuttle.de)
-	by aerfugl with smtp (Exim 4.96)
-	(envelope-from <michael@a98shuttle.de>)
-	id 1u37oa-0000Nm-2r;
-	Fri, 11 Apr 2025 08:24:36 +0200
-Received: (nullmailer pid 8911 invoked by uid 502);
-	Fri, 11 Apr 2025 06:24:36 -0000
-From: Michael Klein <michael@fossekall.de>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Michael Klein <michael@fossekall.de>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [net-next v6 4/4] net: phy: realtek: Add support for PHY LEDs on RTL8211E
-Date: Fri, 11 Apr 2025 08:24:26 +0200
-Message-Id: <20250411062426.8820-5-michael@fossekall.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250411062426.8820-1-michael@fossekall.de>
-References: <20250411062426.8820-1-michael@fossekall.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D3768635B
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 06:53:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=118.26.132.14
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744354387; cv=none; b=I/oFTjHH2ZPrwiUqe5ANgsK5nNkBrggKGqIMs9ueW5zHhpnZ1i+QOgOqF6wRsX6wyso0HYGswwp32UbDbvhk6dGIgZqQLBM6KYN1jSv7vximCTal4mx1uVX9a823y5DmurlSrNmjDhKFiwzDiLMUaxOWb6dAexeInijT3qpjRjI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744354387; c=relaxed/simple;
+	bh=0rK93ZTImaU9vJS703fQCmnZAqGUfwmtWmViVy6oCls=;
+	h=To:Cc:From:Subject:Date:In-Reply-To:Message-Id:Mime-Version:
+	 Content-Type:References; b=g1LcXyA1Q4MPqsf0woVSitY+Jnc2qH8T/RSzu+C4uD0GyNVIl+/GlIHAwZ3za5KIeuIzyEGFn4cOlw5YO74ZIKCJ/g+XDyI2iHF/hsT2Voni2K6T/v/Iz5qYrxbhrsbyOzdpVBAJtk/q0qDK8hvmq3ZgeHvcKVPpXqSWP96nuUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=IUxo7HAW; arc=none smtp.client-ip=118.26.132.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=feishu2403070942; d=yunsilicon.com; t=1744354370; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=VBkiYvCn91jiP/TxYlT+RJZL3sQ8VH+EFrX0BBdbmQo=;
+ b=IUxo7HAWyKWlaygsc8zkbLPK1cpg6USUWoyvH9z6QLKwErti5FbClg2eNQ2oylTRiohOnU
+ AfiLiK/nLGXkg3douLsdS/938C0XQbLVTx/XGhW6u4aeezjFquBgKvSsWyHSciENWwA2+l
+ UcKttWeP3Q7F6iZvkArHRBMPvRMJK0WnkmVoLXRTJwg3bGlSkblyeOEO7d7A9bdqWkwp/I
+ kFtTgqC5z0D3zmqeEi2rNybvmBGT89kZdhdp73g8qVPVHe8uPRIgZzrR9W9/63sOKAeu6+
+ B3D52KwCzH3u7WFrvgvYtkewcXKaSUTkWoIxTGvtLafxqHdacnNGahTeTfjCSg==
+To: <netdev@vger.kernel.org>
+Cc: <leon@kernel.org>, <andrew+netdev@lunn.ch>, <kuba@kernel.org>, 
+	<pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>, 
+	<jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>, 
+	<weihg@yunsilicon.com>, <wanry@yunsilicon.com>, <jacky@yunsilicon.com>, 
+	<horms@kernel.org>, <parthiban.veerasooran@microchip.com>, 
+	<masahiroy@kernel.org>, <kalesh-anakkur.purayil@broadcom.com>, 
+	<geert+renesas@glider.be>, <pabeni@redhat.com>, <geert@linux-m68k.org>
+From: "Xin Tian" <tianx@yunsilicon.com>
+Subject: [PATCH net-next v10 01/14] xsc: Add xsc driver basic framework
+X-Lms-Return-Path: <lba+267f8bc40+571c0d+vger.kernel.org+tianx@yunsilicon.com>
+Date: Fri, 11 Apr 2025 14:52:48 +0800
+X-Original-From: Xin Tian <tianx@yunsilicon.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20250411065246.2303550-1-tianx@yunsilicon.com>
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250411065246.2303550-2-tianx@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="us-ascii"
+Mime-Version: 1.0
+Received: from ubuntu-liun.yunsilicon.com ([58.34.192.114]) by smtp.feishu.cn with ESMTPS; Fri, 11 Apr 2025 14:52:48 +0800
+Content-Type: text/plain; charset=UTF-8
+References: <20250411065246.2303550-1-tianx@yunsilicon.com>
 
-Like the RTL8211F, the RTL8211E PHY supports up to three LEDs.
-Add netdev trigger support for them, too.
+1. Add yunsilicon xsc driver basic compile framework, including
+xsc_pci driver and xsc_eth driver
+2. Implemented PCI device initialization.
 
-Signed-off-by: Michael Klein <michael@fossekall.de>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
+Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
+Co-developed-by: Lei Yan <jacky@yunsilicon.com>
+Signed-off-by: Lei Yan <jacky@yunsilicon.com>
+Signed-off-by: Xin Tian <tianx@yunsilicon.com>
 ---
- drivers/net/phy/realtek/realtek_main.c | 125 +++++++++++++++++++++++--
- 1 file changed, 119 insertions(+), 6 deletions(-)
+ MAINTAINERS                                   |   7 +
+ drivers/net/ethernet/Kconfig                  |   1 +
+ drivers/net/ethernet/Makefile                 |   1 +
+ drivers/net/ethernet/yunsilicon/Kconfig       |  26 +++
+ drivers/net/ethernet/yunsilicon/Makefile      |   7 +
+ .../ethernet/yunsilicon/xsc/common/xsc_core.h |  43 ++++
+ .../net/ethernet/yunsilicon/xsc/net/Kconfig   |  17 ++
+ .../net/ethernet/yunsilicon/xsc/net/Makefile  |   9 +
+ .../net/ethernet/yunsilicon/xsc/pci/Kconfig   |  14 ++
+ .../net/ethernet/yunsilicon/xsc/pci/Makefile  |   9 +
+ .../net/ethernet/yunsilicon/xsc/pci/main.c    | 214 ++++++++++++++++++
+ 11 files changed, 348 insertions(+)
+ create mode 100644 drivers/net/ethernet/yunsilicon/Kconfig
+ create mode 100644 drivers/net/ethernet/yunsilicon/Makefile
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/Kconfig
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/Makefile
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
+ create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/main.c
 
-diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index cf310cc90b97..a37be6b4e9f4 100644
---- a/drivers/net/phy/realtek/realtek_main.c
-+++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -50,6 +50,20 @@
- #define RTL8211E_RX_DELAY			BIT(11)
- #define RTL8211E_DELAY_MASK			GENMASK(13, 11)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 96b827049..19664829b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -26632,6 +26632,13 @@ S:	Maintained
+ F:	Documentation/input/devices/yealink.rst
+ F:	drivers/input/misc/yealink.*
  
-+#define RTL8211E_LEDCR_EXT_PAGE			0x2c
++YUNSILICON XSC DRIVERS
++M:	Honggang Wei <weihg@yunsilicon.com>
++M:	Xin Tian <tianx@yunsilicon.com>
++L:	netdev@vger.kernel.org
++S:	Maintained
++F:	drivers/net/ethernet/yunsilicon/xsc
 +
-+#define RTL8211E_LEDCR1				0x1a
-+#define RTL8211E_LEDCR1_ACT_TXRX		BIT(4)
-+#define RTL8211E_LEDCR1_MASK			BIT(4)
-+#define RTL8211E_LEDCR1_SHIFT			1
+ Z8530 DRIVER FOR AX.25
+ M:	Joerg Reuter <jreuter@yaina.de>
+ L:	linux-hams@vger.kernel.org
+diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
+index 0baac25db..aa6016597 100644
+--- a/drivers/net/ethernet/Kconfig
++++ b/drivers/net/ethernet/Kconfig
+@@ -82,6 +82,7 @@ source "drivers/net/ethernet/i825xx/Kconfig"
+ source "drivers/net/ethernet/ibm/Kconfig"
+ source "drivers/net/ethernet/intel/Kconfig"
+ source "drivers/net/ethernet/xscale/Kconfig"
++source "drivers/net/ethernet/yunsilicon/Kconfig"
+ 
+ config JME
+ 	tristate "JMicron(R) PCI-Express Gigabit Ethernet support"
+diff --git a/drivers/net/ethernet/Makefile b/drivers/net/ethernet/Makefile
+index c03203439..c16c34d4b 100644
+--- a/drivers/net/ethernet/Makefile
++++ b/drivers/net/ethernet/Makefile
+@@ -51,6 +51,7 @@ obj-$(CONFIG_NET_VENDOR_INTEL) += intel/
+ obj-$(CONFIG_NET_VENDOR_I825XX) += i825xx/
+ obj-$(CONFIG_NET_VENDOR_MICROSOFT) += microsoft/
+ obj-$(CONFIG_NET_VENDOR_XSCALE) += xscale/
++obj-$(CONFIG_NET_VENDOR_YUNSILICON) += yunsilicon/
+ obj-$(CONFIG_JME) += jme.o
+ obj-$(CONFIG_KORINA) += korina.o
+ obj-$(CONFIG_LANTIQ_ETOP) += lantiq_etop.o
+diff --git a/drivers/net/ethernet/yunsilicon/Kconfig b/drivers/net/ethernet/yunsilicon/Kconfig
+new file mode 100644
+index 000000000..1bf5b7fcf
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/Kconfig
+@@ -0,0 +1,26 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++# All rights reserved.
++# Yunsilicon driver configuration
++#
 +
-+#define RTL8211E_LEDCR2				0x1c
-+#define RTL8211E_LEDCR2_LINK_1000		BIT(2)
-+#define RTL8211E_LEDCR2_LINK_100		BIT(1)
-+#define RTL8211E_LEDCR2_LINK_10			BIT(0)
-+#define RTL8211E_LEDCR2_MASK			GENMASK(2, 0)
-+#define RTL8211E_LEDCR2_SHIFT			4
++config NET_VENDOR_YUNSILICON
++	bool "Yunsilicon devices"
++	default y
++	depends on PCI
++	depends on ARM64 || X86_64 || COMPILE_TEST
++	help
++	  If you have a network (Ethernet) device belonging to this class,
++	  say Y.
 +
- #define RTL8211F_PHYCR1				0x18
- #define RTL8211F_PHYCR2				0x19
- #define RTL8211F_CLKOUT_EN			BIT(0)
-@@ -66,7 +80,8 @@
- #define RTL8211F_LEDCR_MASK			GENMASK(4, 0)
- #define RTL8211F_LEDCR_SHIFT			5
- 
--#define RTL8211F_LED_COUNT			3
-+/* RTL8211E and RTL8211F support up to three LEDs */
-+#define RTL8211x_LED_COUNT			3
- 
- #define RTL8211F_TX_DELAY			BIT(8)
- #define RTL8211F_RX_DELAY			BIT(3)
-@@ -141,6 +156,21 @@ static int rtl821x_write_page(struct phy_device *phydev, int page)
- 	return __phy_write(phydev, RTL821x_PAGE_SELECT, page);
- }
- 
-+static int rtl8211e_read_ext_page(struct phy_device *phydev, u16 ext_page,
-+				  u32 regnum)
++	  Note that the answer to this question doesn't directly affect the
++	  kernel: saying N will just cause the configurator to skip all
++	  the questions about Yunsilicon cards. If you say Y, you will be asked
++	  for your specific card in the following questions.
++
++if NET_VENDOR_YUNSILICON
++
++source "drivers/net/ethernet/yunsilicon/xsc/net/Kconfig"
++source "drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig"
++
++endif # NET_VENDOR_YUNSILICON
+diff --git a/drivers/net/ethernet/yunsilicon/Makefile b/drivers/net/ethernet/yunsilicon/Makefile
+new file mode 100644
+index 000000000..05aa35c3c
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/Makefile
+@@ -0,0 +1,7 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++# All rights reserved.
++# Makefile for the Yunsilicon device drivers.
++#
++
++obj-$(CONFIG_YUNSILICON_XSC_PCI) += xsc/pci/
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+new file mode 100644
+index 000000000..0673e34fe
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
+@@ -0,0 +1,43 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++ * All rights reserved.
++ */
++
++#ifndef __XSC_CORE_H
++#define __XSC_CORE_H
++
++#include <linux/pci.h>
++
++#define XSC_PCI_VENDOR_ID		0x1f67
++
++#define XSC_MC_PF_DEV_ID		0x1011
++#define XSC_MC_VF_DEV_ID		0x1012
++#define XSC_MC_PF_DEV_ID_DIAMOND	0x1021
++
++#define XSC_MF_HOST_PF_DEV_ID		0x1051
++#define XSC_MF_HOST_VF_DEV_ID		0x1052
++#define XSC_MF_SOC_PF_DEV_ID		0x1053
++
++#define XSC_MS_PF_DEV_ID		0x1111
++#define XSC_MS_VF_DEV_ID		0x1112
++
++#define XSC_MV_HOST_PF_DEV_ID		0x1151
++#define XSC_MV_HOST_VF_DEV_ID		0x1152
++#define XSC_MV_SOC_PF_DEV_ID		0x1153
++
++struct xsc_dev_resource {
++	/* protect buffer allocation according to numa node */
++	struct mutex		alloc_mutex;
++};
++
++struct xsc_core_device {
++	struct pci_dev		*pdev;
++	struct device		*device;
++	struct xsc_dev_resource	*dev_res;
++	int			numa_node;
++
++	void __iomem		*bar;
++	int			bar_num;
++};
++
++#endif
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/net/Kconfig b/drivers/net/ethernet/yunsilicon/xsc/net/Kconfig
+new file mode 100644
+index 000000000..b2f95370f
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/xsc/net/Kconfig
+@@ -0,0 +1,17 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++# All rights reserved.
++# Yunsilicon driver configuration
++#
++
++config YUNSILICON_XSC_ETH
++	tristate "Yunsilicon XSC ethernet driver"
++	depends on YUNSILICON_XSC_PCI
++	depends on NET
++	select PAGE_POOL
++	help
++	  This driver provides ethernet support for
++	  Yunsilicon XSC devices.
++
++	  To compile this driver as a module, choose M here. The module
++	  will be called xsc_eth.
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/net/Makefile b/drivers/net/ethernet/yunsilicon/xsc/net/Makefile
+new file mode 100644
+index 000000000..53300be3c
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/xsc/net/Makefile
+@@ -0,0 +1,9 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++# All rights reserved.
++
++ccflags-y += -I$(srctree)/drivers/net/ethernet/yunsilicon/xsc
++
++obj-$(CONFIG_YUNSILICON_XSC_ETH) += xsc_eth.o
++
++xsc_eth-y := main.o
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig b/drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig
+new file mode 100644
+index 000000000..b707da28b
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig
+@@ -0,0 +1,14 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++# All rights reserved.
++# Yunsilicon PCI configuration
++#
++
++config YUNSILICON_XSC_PCI
++	tristate "Yunsilicon XSC PCI driver"
++	help
++	  This driver is common for Yunsilicon XSC
++	  ethernet and RDMA drivers.
++
++	  To compile this driver as a module, choose M here. The module
++	  will be called xsc_pci.
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/Makefile b/drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
+new file mode 100644
+index 000000000..709270df8
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
+@@ -0,0 +1,9 @@
++# SPDX-License-Identifier: GPL-2.0
++# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++# All rights reserved.
++
++ccflags-y += -I$(srctree)/drivers/net/ethernet/yunsilicon/xsc
++
++obj-$(CONFIG_YUNSILICON_XSC_PCI) += xsc_pci.o
++
++xsc_pci-y := main.o
+diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/main.c b/drivers/net/ethernet/yunsilicon/xsc/pci/main.c
+new file mode 100644
+index 000000000..b8fc25679
+--- /dev/null
++++ b/drivers/net/ethernet/yunsilicon/xsc/pci/main.c
+@@ -0,0 +1,214 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
++ * All rights reserved.
++ */
++
++#include "common/xsc_core.h"
++
++static const struct pci_device_id xsc_pci_id_table[] = {
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MC_PF_DEV_ID) },
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MC_PF_DEV_ID_DIAMOND) },
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MF_HOST_PF_DEV_ID) },
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MF_SOC_PF_DEV_ID) },
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MS_PF_DEV_ID) },
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MV_HOST_PF_DEV_ID) },
++	{ PCI_DEVICE(XSC_PCI_VENDOR_ID, XSC_MV_SOC_PF_DEV_ID) },
++	{ 0 }
++};
++
++static int xsc_set_dma_caps(struct pci_dev *pdev)
 +{
-+	int oldpage, ret = 0;
++	int err;
 +
-+	oldpage = phy_select_page(phydev, RTL8211E_SET_EXT_PAGE);
-+	if (oldpage >= 0) {
-+		ret = __phy_write(phydev, RTL8211E_EXT_PAGE_SELECT, ext_page);
-+		if (ret == 0)
-+			ret = __phy_read(phydev, regnum);
-+	}
++	err = dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(64));
++	if (!err)
++		dma_set_max_seg_size(&pdev->dev, SZ_2G);
 +
-+	return phy_restore_page(phydev, oldpage, ret);
++	return err;
 +}
 +
- static int rtl8211e_modify_ext_page(struct phy_device *phydev, u16 ext_page,
- 				    u32 regnum, u16 mask, u16 set)
- {
-@@ -530,7 +560,7 @@ static int rtl821x_resume(struct phy_device *phydev)
- 	return 0;
- }
- 
--static int rtl8211f_led_hw_is_supported(struct phy_device *phydev, u8 index,
-+static int rtl8211x_led_hw_is_supported(struct phy_device *phydev, u8 index,
- 					unsigned long rules)
- {
- 	const unsigned long mask = BIT(TRIGGER_NETDEV_LINK_10) |
-@@ -549,9 +579,11 @@ static int rtl8211f_led_hw_is_supported(struct phy_device *phydev, u8 index,
- 	 *      rates and Active indication always at all three 10+100+1000
- 	 *      link rates.
- 	 * This code currently uses mode B only.
-+	 *
-+	 * RTL8211E PHY LED has one mode, which works like RTL8211F mode B.
- 	 */
- 
--	if (index >= RTL8211F_LED_COUNT)
-+	if (index >= RTL8211x_LED_COUNT)
- 		return -EINVAL;
- 
- 	/* Filter out any other unsupported triggers. */
-@@ -570,7 +602,7 @@ static int rtl8211f_led_hw_control_get(struct phy_device *phydev, u8 index,
- {
- 	int val;
- 
--	if (index >= RTL8211F_LED_COUNT)
-+	if (index >= RTL8211x_LED_COUNT)
- 		return -EINVAL;
- 
- 	val = phy_read_paged(phydev, 0xd04, RTL8211F_LEDCR);
-@@ -603,7 +635,7 @@ static int rtl8211f_led_hw_control_set(struct phy_device *phydev, u8 index,
- 	const u16 mask = RTL8211F_LEDCR_MASK << (RTL8211F_LEDCR_SHIFT * index);
- 	u16 reg = 0;
- 
--	if (index >= RTL8211F_LED_COUNT)
-+	if (index >= RTL8211x_LED_COUNT)
- 		return -EINVAL;
- 
- 	if (test_bit(TRIGGER_NETDEV_LINK_10, &rules))
-@@ -626,6 +658,84 @@ static int rtl8211f_led_hw_control_set(struct phy_device *phydev, u8 index,
- 	return phy_modify_paged(phydev, 0xd04, RTL8211F_LEDCR, mask, reg);
- }
- 
-+static int rtl8211e_led_hw_control_get(struct phy_device *phydev, u8 index,
-+				       unsigned long *rules)
++static int xsc_pci_init(struct xsc_core_device *xdev,
++			const struct pci_device_id *id)
 +{
-+	int ret;
-+	u16 cr1, cr2;
++	struct pci_dev *pdev = xdev->pdev;
++	void __iomem *bar_base;
++	int bar_num = 0;
++	int err;
 +
-+	if (index >= RTL8211x_LED_COUNT)
-+		return -EINVAL;
++	xdev->numa_node = dev_to_node(&pdev->dev);
 +
-+	ret = rtl8211e_read_ext_page(phydev, RTL8211E_LEDCR_EXT_PAGE,
-+				     RTL8211E_LEDCR1);
-+	if (ret < 0)
-+		return ret;
-+
-+	cr1 = ret >> RTL8211E_LEDCR1_SHIFT * index;
-+	if (cr1 & RTL8211E_LEDCR1_ACT_TXRX) {
-+		__set_bit(TRIGGER_NETDEV_RX, rules);
-+		__set_bit(TRIGGER_NETDEV_TX, rules);
++	err = pci_enable_device(pdev);
++	if (err) {
++		pci_err(pdev, "failed to enable PCI device: err=%d\n", err);
++		goto err_out;
 +	}
 +
-+	ret = rtl8211e_read_ext_page(phydev, RTL8211E_LEDCR_EXT_PAGE,
-+				     RTL8211E_LEDCR2);
-+	if (ret < 0)
-+		return ret;
-+
-+	cr2 = ret >> RTL8211E_LEDCR2_SHIFT * index;
-+	if (cr2 & RTL8211E_LEDCR2_LINK_10)
-+		__set_bit(TRIGGER_NETDEV_LINK_10, rules);
-+
-+	if (cr2 & RTL8211E_LEDCR2_LINK_100)
-+		__set_bit(TRIGGER_NETDEV_LINK_100, rules);
-+
-+	if (cr2 & RTL8211E_LEDCR2_LINK_1000)
-+		__set_bit(TRIGGER_NETDEV_LINK_1000, rules);
-+
-+	return ret;
-+}
-+
-+static int rtl8211e_led_hw_control_set(struct phy_device *phydev, u8 index,
-+				       unsigned long rules)
-+{
-+	const u16 cr1mask =
-+		RTL8211E_LEDCR1_MASK << (RTL8211E_LEDCR1_SHIFT * index);
-+	const u16 cr2mask =
-+		RTL8211E_LEDCR2_MASK << (RTL8211E_LEDCR2_SHIFT * index);
-+	u16 cr1 = 0, cr2 = 0;
-+	int ret;
-+
-+	if (index >= RTL8211x_LED_COUNT)
-+		return -EINVAL;
-+
-+	if (test_bit(TRIGGER_NETDEV_RX, &rules) ||
-+	    test_bit(TRIGGER_NETDEV_TX, &rules)) {
-+		cr1 |= RTL8211E_LEDCR1_ACT_TXRX;
++	err = pci_request_region(pdev, bar_num, KBUILD_MODNAME);
++	if (err) {
++		pci_err(pdev, "failed to request %s pci_region=%d: err=%d\n",
++			KBUILD_MODNAME, bar_num, err);
++		goto err_disable;
 +	}
 +
-+	cr1 <<= RTL8211E_LEDCR1_SHIFT * index;
-+	ret = rtl8211e_modify_ext_page(phydev, RTL8211E_LEDCR_EXT_PAGE,
-+				       RTL8211E_LEDCR1, cr1mask, cr1);
-+	if (ret < 0)
-+		return ret;
++	pci_set_master(pdev);
 +
-+	if (test_bit(TRIGGER_NETDEV_LINK_10, &rules))
-+		cr2 |= RTL8211E_LEDCR2_LINK_10;
++	err = xsc_set_dma_caps(pdev);
++	if (err) {
++		pci_err(pdev, "failed to set DMA capabilities mask: err=%d\n",
++			err);
++		goto err_clr_master;
++	}
 +
-+	if (test_bit(TRIGGER_NETDEV_LINK_100, &rules))
-+		cr2 |= RTL8211E_LEDCR2_LINK_100;
++	bar_base = pci_ioremap_bar(pdev, bar_num);
++	if (!bar_base) {
++		pci_err(pdev, "failed to ioremap %s bar%d\n", KBUILD_MODNAME,
++			bar_num);
++		err = -ENOMEM;
++		goto err_clr_master;
++	}
 +
-+	if (test_bit(TRIGGER_NETDEV_LINK_1000, &rules))
-+		cr2 |= RTL8211E_LEDCR2_LINK_1000;
++	err = pci_save_state(pdev);
++	if (err) {
++		pci_err(pdev, "pci_save_state failed: err=%d\n", err);
++		goto err_io_unmap;
++	}
 +
-+	cr2 <<= RTL8211E_LEDCR2_SHIFT * index;
-+	ret = rtl8211e_modify_ext_page(phydev, RTL8211E_LEDCR_EXT_PAGE,
-+				       RTL8211E_LEDCR2, cr2mask, cr2);
++	xdev->bar_num = bar_num;
++	xdev->bar = bar_base;
 +
-+	return ret;
++	return 0;
++
++err_io_unmap:
++	pci_iounmap(pdev, bar_base);
++err_clr_master:
++	pci_clear_master(pdev);
++	pci_release_region(pdev, bar_num);
++err_disable:
++	pci_disable_device(pdev);
++err_out:
++	return err;
 +}
 +
- static int rtl8211e_config_init(struct phy_device *phydev)
- {
- 	u16 val;
-@@ -1401,6 +1511,9 @@ static struct phy_driver realtek_drvs[] = {
- 		.resume		= genphy_resume,
- 		.read_page	= rtl821x_read_page,
- 		.write_page	= rtl821x_write_page,
-+		.led_hw_is_supported = rtl8211x_led_hw_is_supported,
-+		.led_hw_control_get = rtl8211e_led_hw_control_get,
-+		.led_hw_control_set = rtl8211e_led_hw_control_set,
- 	}, {
- 		PHY_ID_MATCH_EXACT(0x001cc916),
- 		.name		= "RTL8211F Gigabit Ethernet",
-@@ -1414,7 +1527,7 @@ static struct phy_driver realtek_drvs[] = {
- 		.read_page	= rtl821x_read_page,
- 		.write_page	= rtl821x_write_page,
- 		.flags		= PHY_ALWAYS_CALL_SUSPEND,
--		.led_hw_is_supported = rtl8211f_led_hw_is_supported,
-+		.led_hw_is_supported = rtl8211x_led_hw_is_supported,
- 		.led_hw_control_get = rtl8211f_led_hw_control_get,
- 		.led_hw_control_set = rtl8211f_led_hw_control_set,
- 	}, {
++static void xsc_pci_fini(struct xsc_core_device *xdev)
++{
++	struct pci_dev *pdev = xdev->pdev;
++
++	pci_iounmap(pdev, xdev->bar);
++	pci_clear_master(pdev);
++	pci_release_region(pdev, xdev->bar_num);
++	pci_disable_device(pdev);
++}
++
++static int xsc_dev_res_init(struct xsc_core_device *xdev)
++{
++	struct xsc_dev_resource *dev_res;
++
++	dev_res = kvzalloc(sizeof(*dev_res), GFP_KERNEL);
++	if (!dev_res)
++		return -ENOMEM;
++
++	xdev->dev_res = dev_res;
++	mutex_init(&dev_res->alloc_mutex);
++
++	return 0;
++}
++
++static void xsc_dev_res_cleanup(struct xsc_core_device *xdev)
++{
++	kfree(xdev->dev_res);
++}
++
++static int xsc_core_dev_init(struct xsc_core_device *xdev)
++{
++	int err;
++
++	err = xsc_dev_res_init(xdev);
++	if (err) {
++		pci_err(xdev->pdev, "xsc dev res init failed %d\n", err);
++		return err;
++	}
++
++	return 0;
++}
++
++static void xsc_core_dev_cleanup(struct xsc_core_device *xdev)
++{
++	xsc_dev_res_cleanup(xdev);
++}
++
++static int xsc_pci_probe(struct pci_dev *pci_dev,
++			 const struct pci_device_id *id)
++{
++	struct xsc_core_device *xdev;
++	int err;
++
++	xdev = kzalloc(sizeof(*xdev), GFP_KERNEL);
++	if (!xdev)
++		return -ENOMEM;
++
++	xdev->pdev = pci_dev;
++	xdev->device = &pci_dev->dev;
++
++	pci_set_drvdata(pci_dev, xdev);
++	err = xsc_pci_init(xdev, id);
++	if (err) {
++		pci_err(pci_dev, "xsc_pci_init failed %d\n", err);
++		goto err_unset_pci_drvdata;
++	}
++
++	err = xsc_core_dev_init(xdev);
++	if (err) {
++		pci_err(pci_dev, "xsc_core_dev_init failed %d\n", err);
++		goto err_pci_fini;
++	}
++
++	return 0;
++err_pci_fini:
++	xsc_pci_fini(xdev);
++err_unset_pci_drvdata:
++	pci_set_drvdata(pci_dev, NULL);
++	kfree(xdev);
++
++	return err;
++}
++
++static void xsc_pci_remove(struct pci_dev *pci_dev)
++{
++	struct xsc_core_device *xdev = pci_get_drvdata(pci_dev);
++
++	xsc_core_dev_cleanup(xdev);
++	xsc_pci_fini(xdev);
++	pci_set_drvdata(pci_dev, NULL);
++	kfree(xdev);
++}
++
++static struct pci_driver xsc_pci_driver = {
++	.name		= "xsc-pci",
++	.id_table	= xsc_pci_id_table,
++	.probe		= xsc_pci_probe,
++	.remove		= xsc_pci_remove,
++};
++
++static int __init xsc_init(void)
++{
++	int err;
++
++	err = pci_register_driver(&xsc_pci_driver);
++	if (err) {
++		pr_err("failed to register pci driver\n");
++		return err;
++	}
++
++	return 0;
++}
++
++static void __exit xsc_fini(void)
++{
++	pci_unregister_driver(&xsc_pci_driver);
++}
++
++module_init(xsc_init);
++module_exit(xsc_fini);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Yunsilicon XSC PCI driver");
 -- 
-2.39.5
-
+2.43.0
 
