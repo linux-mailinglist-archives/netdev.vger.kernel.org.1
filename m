@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-181478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA0D2A851E4
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 05:07:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3135CA851EB
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 05:13:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C24B74C2D0C
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 03:07:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5236C19E354A
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 03:13:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB70627C178;
-	Fri, 11 Apr 2025 03:07:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BCF027C17B;
+	Fri, 11 Apr 2025 03:13:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OJJyt5NW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FHeS7M9I"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFAE526FA65;
-	Fri, 11 Apr 2025 03:07:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2561E27C175;
+	Fri, 11 Apr 2025 03:13:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744340854; cv=none; b=i9gBItqhi0v2ZXxh6/QOYyp71wwmBfwfTnHbIAYQqgqgcLmzX9gOrtbDwjxVdaxbVixvtP+J5hU69/yRnvmvyO0msaAxZrJNIr2rFEhHmni/cniKgugjSoHJYjya9ZtmpPwFUcf+WbB36OdNvRaUtPd9XkPMTKZXb5SFrWs/1Gw=
+	t=1744341223; cv=none; b=hRTzqA+YEE2aAdacLN9a8NdGfYIFDlaAo+upLgqevvFPLw3qe7ToQTrig7gASka56rdCNxdxLvZMNCWyF1sVOuXJ1oVR10F/11QrpgwGelXPIIEF4LRvPX5tY67MdtDFQwX7GPKS7uwKUwYLgCVspqK/19g+5KZd1xuGjk5zPA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744340854; c=relaxed/simple;
-	bh=q/d5G1A5ErYINEVHEdS+Kp1TEKYUBI8nJNPQ1hWXajg=;
+	s=arc-20240116; t=1744341223; c=relaxed/simple;
+	bh=Kxd1/K4Kw8r1pEXzeL4ujOBLRHH0U8GijbKbrkFGCyY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QWf0Zhb8SMYtrUo/O0n/laN2gNF0OM2aif8LVDRcnq5WZ2QtE0tfmKpwTgLGasgk+UtgJjSJZlqX73RurOLgKlJSq+q5VJoE/L+0OpAi+HhJadaAilGx3C2XWobM8U8e9O3QfvMQc/COaB5Of+uw7T5o3OeXZgSSS5Ht6aeRGeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OJJyt5NW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0696DC4CEEA;
-	Fri, 11 Apr 2025 03:07:33 +0000 (UTC)
+	 MIME-Version:Content-Type; b=rYXGQb5/mXG3zfRyHM+yNCkDe4OAphvKB+nLj5gUNvv5aF537JNotBb8awVFDCj3rBPjidW/YVfm7C7X5hqQse5UWivUdopJLznuAd+g5/V8mzXWumyxEkMaHpK5Lx83W4trRlxneC8uXVPkQA+j+hHydG2AvhVjckpvwgJ31Zk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FHeS7M9I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0ABCAC4CEDD;
+	Fri, 11 Apr 2025 03:13:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744340854;
-	bh=q/d5G1A5ErYINEVHEdS+Kp1TEKYUBI8nJNPQ1hWXajg=;
+	s=k20201202; t=1744341222;
+	bh=Kxd1/K4Kw8r1pEXzeL4ujOBLRHH0U8GijbKbrkFGCyY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OJJyt5NWunYLI5VwPqhNMo3XqfhdXvxn8/NorrPfgttzpZXGZmp4x+UsTzkQhiYTx
-	 Pb+CP0olEO7RtfA+ldHgN1dXmeE/f9nqyVRNE89jO2iI+Qu9/kMTsJl694Tqg+s1d0
-	 BHX0KJff1otG3lzqRaOa0v0GRk5djb6MpeE2dywN2nxAkUldHE10gPkGBC/9Fj7wh3
-	 UVQVTTJ+feq78Aldb27RpnBW7Hg04Tdg4KCgDCdHDsvt4DyJ5UJ9aj6VuoEEMFoW4E
-	 JEOS9jYN1SlvGxknEVdWYj9KBUgC/VqGSozFa1VQrnPWoBUA7skkXC/yeuJ8ovRBWN
-	 AOiysi+FrmEFQ==
-Date: Thu, 10 Apr 2025 20:07:33 -0700
+	b=FHeS7M9Ieb716BXN46FghNAOcXJewBPbNEqopbA7V9ybuRYjaqsmyn8IYEwC0qKrn
+	 PdM4HhhzbA8L7KsdWl51WQrkN4Rij/BcjDozGweyReUFhIu+gZE+pLOQHt1z12APOA
+	 ll15abvxEKL4xGxoK1wSWG0Z6axguCWRolhq8VbgELwSsjqvaohEvBwgqFdrqgcUBC
+	 i4qyft4SZiL1cinTPPoWnWUQnrh3N86iaojJsOJbvxgy0/a952Cq0kv7btbjs6xMnx
+	 pzmc7N6AAzA5sM69lmUntXylj0BtnGBZ9nkM1ysQDpg+kh15sl0GK08FToSsZoc+DN
+	 0yoaut2nSGauw==
+Date: Thu, 10 Apr 2025 20:13:41 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>, Shuah Khan
- <shuah@kernel.org>, sd@queasysnail.net, ryazanov.s.a@gmail.com, Andrew Lunn
- <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, Xiao Liang
- <shaw.leon@gmail.com>
-Subject: Re: [PATCH net-next v25 07/23] ovpn: implement basic TX path (UDP)
-Message-ID: <20250410200733.4fea860f@kernel.org>
-In-Reply-To: <20250407-b4-ovpn-v25-7-a04eae86e016@openvpn.net>
-References: <20250407-b4-ovpn-v25-0-a04eae86e016@openvpn.net>
-	<20250407-b4-ovpn-v25-7-a04eae86e016@openvpn.net>
+To: Joseph Huang <Joseph.Huang@garmin.com>
+Cc: <netdev@vger.kernel.org>, Joseph Huang <joseph.huang.2024@gmail.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>, Roopa
+ Prabhu <roopa@nvidia.com>, Simon Horman <horms@kernel.org>,
+ <linux-kernel@vger.kernel.org>, <bridge@lists.linux.dev>
+Subject: Re: [Patch v4 net-next 1/3] net: bridge: mcast: Add offload failed
+ mdb flag
+Message-ID: <20250410201341.17660e10@kernel.org>
+In-Reply-To: <20250408154116.3032467-2-Joseph.Huang@garmin.com>
+References: <20250408154116.3032467-1-Joseph.Huang@garmin.com>
+	<20250408154116.3032467-2-Joseph.Huang@garmin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,34 +65,30 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 07 Apr 2025 21:46:15 +0200 Antonio Quartulli wrote:
-> diff --git a/drivers/net/ovpn/socket.c b/drivers/net/ovpn/socket.c
-> index 97f6a249b09fe26cc6d078d80abc955f8d35e821..200036757fcd0a7f2ae554a1e3a3c03915c0e32f 100644
-> --- a/drivers/net/ovpn/socket.c
-> +++ b/drivers/net/ovpn/socket.c
-> @@ -185,9 +185,8 @@ struct ovpn_socket *ovpn_socket_new(struct socket *sock, struct ovpn_peer *peer)
->  		goto sock_release;
+On Tue, 8 Apr 2025 11:41:09 -0400 Joseph Huang wrote:
+> -	if (err)
+> -		goto err;
+> +	if (err == -EOPNOTSUPP)
+> +		goto notsupp;
+>  
+>  	spin_lock_bh(&br->multicast_lock);
+>  	mp = br_mdb_ip_get(br, &data->ip);
+> @@ -516,11 +516,12 @@ static void br_switchdev_mdb_complete(struct net_device *dev, int err, void *pri
+>  	     pp = &p->next) {
+>  		if (p->key.port != port)
+>  			continue;
+> -		p->flags |= MDB_PG_FLAGS_OFFLOAD;
+> +
+> +		br_multicast_set_pg_offload_flags(p, !err);
 >  	}
->  
-> -	ovpn_sock->ovpn = peer->ovpn;
-> -	ovpn_sock->sock = sock;
->  	kref_init(&ovpn_sock->refcount);
-> +	ovpn_sock->sock = sock;
+>  out:
+>  	spin_unlock_bh(&br->multicast_lock);
+> -err:
+> +notsupp:
 
-> @@ -31,7 +262,7 @@ int ovpn_udp_socket_attach(struct ovpn_socket *ovpn_sock,
->  {
->  	struct socket *sock = ovpn_sock->sock;
->  	struct ovpn_socket *old_data;
-> -	int ret = 0;
-> +	int ret;
->  
->  	/* make sure no pre-existing encapsulation handler exists */
->  	rcu_read_lock();
+One small nit, please name the jump label after the target, 
+not the reason for the jump. So here "out_free" would be 
+a good name.
 
-Some unrelated-looking chunks here
-
-> +			dev_core_stats_tx_dropped_inc(ovpn->dev);
-
-Since you're already using TSTATS could you switch to DSTATS 
-to count drops, and leave the core stats for the core ?
+>  	kfree(priv);
 
