@@ -1,149 +1,151 @@
-Return-Path: <netdev+bounces-181717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F02C8A86417
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 19:09:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9BEEA8644B
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 19:14:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D1113AE4B9
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 17:04:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 405E44C6815
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 17:11:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF5A0221FB4;
-	Fri, 11 Apr 2025 17:05:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFE3723373F;
+	Fri, 11 Apr 2025 17:08:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="OxfMaOLn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EUqmUT2L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-ej1-f68.google.com (mail-ej1-f68.google.com [209.85.218.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 376F021D3F6
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 17:05:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA352221FA5;
+	Fri, 11 Apr 2025 17:08:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744391107; cv=none; b=CgU3eGpQBlgedQq4z8izxnMiDbMDXCFCQj2An3uIYjxsUjRqNZ9odpGQH7/V3BwEU2UUiDY3R4/tZ9PzWQHCOzwSbBjzycp4z6GV/fK/jLT95DuG6M8Pt7W+eV/ATSg7BxdUT7Q5gsfQGUPZ1JRoeDjOeV96vQh69qRDK6NpVK0=
+	t=1744391320; cv=none; b=PiTiu+PuwZHNtNWLBO1UryMcj5tHdVQidI/yup8agLs1lo3WDRCVONcdDMySCmQ3CBdR/yTAW/q+7MOFkY4f+kV0+gCUJM1lWb/BN7+Qcyn5QIClibXBnDwnWMpsd97joJpxgTMJ3PDsEIMv2epgoG1UjEghM28e6f61HPDRrEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744391107; c=relaxed/simple;
-	bh=Zs24uJAaPNdL7CMzi1gfleFstPNRatFfxR2lJdWyGy0=;
-	h=From:To:CC:Date:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=fuVYDpMcJQXnhGiB82v1JF5q5NK4f0ypC8usPyhmNVPBw6zWlWJstbk8lkHAOXL2aquUC8QYQ/mGjnF6wTrPzm8h6bv+efxCS/GJRr+WF5jSuDV+OcV/meqqF8sbNgu1B9pufhLoBHpvYfAchCjom2JmROtdLGLves8F3De3oGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=OxfMaOLn; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-227a8cdd241so27610475ad.3
-        for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 10:05:05 -0700 (PDT)
+	s=arc-20240116; t=1744391320; c=relaxed/simple;
+	bh=D3KtKMQYdkJYf2YN9ITQ1Y9ff9xFw8ASy+2JgvutajA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OoJUujYsWCMP9XykE7gUtiVNvlTdAYhAyVh1uJ87G0gKia/R5g6Lu4AZA6PH+nKINQwpJvT6d9AAxsAtY1g+0Un4k8Wu1kZFeIlV2ssKTXZiPZP7mdiIQdxCZ/UN+/9NUOLrK0xz2yBVo3cM+riQ5bn4LfOZDvAOywEufSEeK0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EUqmUT2L; arc=none smtp.client-ip=209.85.218.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f68.google.com with SMTP id a640c23a62f3a-ac2ab99e16eso449641366b.0;
+        Fri, 11 Apr 2025 10:08:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1744391105; x=1744995905; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:user-agent
-         :references:in-reply-to:message-id:date:cc:to:from:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Zs24uJAaPNdL7CMzi1gfleFstPNRatFfxR2lJdWyGy0=;
-        b=OxfMaOLnJQdyVHmKmfgMB7kY7TuYFVxzicfsCuVGmKUc0IH7VQnF6vOCOhGCn3cr4i
-         twP83y65t0+rt4q+fiPg3Azt6k4EBIhzKr0dqqLg4AHRLL9zP2MovlEjHCAvez41PG2c
-         hivN/2ykxTQObCqNZD5pvXlSfHlimyyfgNgNU=
+        d=gmail.com; s=20230601; t=1744391317; x=1744996117; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KVl+L+m1ll7TwdhJXg0KpefIZfJmTlR1fTVGe/qAkw0=;
+        b=EUqmUT2LQkBA3j9g6CLILP9ZS62loqDVtAt3U9OFniFtJPSLVjACOWHLODNHTi/8mW
+         VX7EVLc228v6egc7X5uS/PDDFvJ4ow094RtDxh3x3Xop0vzOOs2NZe2IF0vj5V4/qjH0
+         znBjio1o78UwIL5c1bs84j1MXfcD7eUXfx2J9c+WrLk3nDyuqBgS5h6RZCbevsDMCc6U
+         6IQTVqYPifq6UW/IiIYaOMQbif3TQMpY9wk6frLh/X9f33uJ7iHUKhKuQ9ulz9RtYVup
+         TfaT5wHP7lxDu4osPI/XZLbdycwKFUCvBTlK6ifOQoIvIpeNescus+XgkVavVywqWw36
+         w7kQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744391105; x=1744995905;
-        h=content-transfer-encoding:mime-version:subject:user-agent
-         :references:in-reply-to:message-id:date:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zs24uJAaPNdL7CMzi1gfleFstPNRatFfxR2lJdWyGy0=;
-        b=cwlXtS2nafaTkCGNoUqaZwTSZjOzeVqUvi9On/qWNQTQVZGPGyRxh9mB1yyrYo8e7O
-         NHxaZp0O7cReKdRYlF4Cms8vEtwM6zQCElrB614oPkPEUPS4wG87ZZ8fc3a1d+oHUrj3
-         oyz3CrBOcA7v/uvYBfcK+Iqeeyzi9c2WI3jnRry0QZkB/n0V5XQ32bGIsp7FNiNPKdN3
-         d8LvWd/LvOY1KpEnjWW7c/4tAc8XielkhOtc7ZBz6DXEgG1/Zn4dhMH7MiXFIFxUt27P
-         IaLsw7iLnOwhUhtnWtUj/gjVBZMTTDN04P1ybzUJ5u+MPpnhSB4bDznQRHnl6BlzzoBB
-         SYig==
-X-Forwarded-Encrypted: i=1; AJvYcCWZ+wDELwL7DyAt94pHFFgUQIzEtXCPFpd67OTkI05oG9ecbP3PZG8BolcIVYx6aRKpUmfGyK8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsfS+6OGIpb7dVhV3XpecDMPOlSixEsQDBTPjqNzx2sYHgDK94
-	AFZgLvsSBR9kD9bmU+kZwwH7ouCyPWk52qoCvxTApov11FPRgvgiq/X/hieaVw==
-X-Gm-Gg: ASbGncsAL6uTVtqLleTQBBcz43VXeN6Y4Z5TXgy8uy3Adib1Hfju0vpaVLNVJQq2lP+
-	iGsRsLzH2YbHOEKZgqfDeNAUKoCu9wHz/xAy225DUzcF8OrkJc6hqE8Wc6oFpwq6qffcFeM5k5R
-	eqmsm4263KpHPos5OlPgjiV7txxv5DhTTAR7La/vku9JsLg92jZfMsxP/S1of4x5f19Qh9ktPBB
-	EdY8+ZndBEh8RwY6QJBs+YWj/4Ggg2oAgKV4lSe577Uwu748yyZRM19W9RKwlKZup33LsI2qHUR
-	XLsCWrmAGo3JRdnFjagrel+qXJes2LexM7OtXTtXICWJ55h4b2zCXMJfRRGUNIh8F88g8jhfYhj
-	M3/E=
-X-Google-Smtp-Source: AGHT+IFsxw8IYiWvCcCfohL9OR/GeWdiXtYFPHAC7JyqV95Ksyc9aMccKi6WlaMRFkxD3Uw+BXU/BA==
-X-Received: by 2002:a17:902:e5cf:b0:215:94eb:adb6 with SMTP id d9443c01a7336-22bea4efe58mr64393975ad.40.1744391105389;
-        Fri, 11 Apr 2025 10:05:05 -0700 (PDT)
-Received: from [192.168.178.39] (f215227.upc-f.chello.nl. [80.56.215.227])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22ac7c93aa3sm52081595ad.149.2025.04.11.10.04.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Apr 2025 10:05:04 -0700 (PDT)
-From: Arend Van Spriel <arend.vanspriel@broadcom.com>
-To: "Kuan-Wei Chiu" <visitorckw@gmail.com>
-CC: Johannes Berg <johannes@sipsolutions.net>, <tglx@linutronix.de>, <mingo@redhat.com>, 
-	<bp@alien8.de>, <dave.hansen@linux.intel.com>, <x86@kernel.org>, 
-	<jk@ozlabs.org>, <joel@jms.id.au>, <eajames@linux.ibm.com>, 
-	<andrzej.hajda@intel.com>, <neil.armstrong@linaro.org>, <rfoss@kernel.org>, 
-	<maarten.lankhorst@linux.intel.com>, <mripard@kernel.org>, 
-	<tzimmermann@suse.de>, <airlied@gmail.com>, <simona@ffwll.ch>, 
-	<dmitry.torokhov@gmail.com>, <mchehab@kernel.org>, <awalls@md.metrocast.net>, 
-	<hverkuil@xs4all.nl>, <miquel.raynal@bootlin.com>, <richard@nod.at>, 
-	<vigneshr@ti.com>, <louis.peens@corigine.com>, <andrew+netdev@lunn.ch>, 
-	<davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>, 
-	<parthiban.veerasooran@microchip.com>, <gregkh@linuxfoundation.org>, 
-	<jirislaby@kernel.org>, <yury.norov@gmail.com>, <akpm@linux-foundation.org>, 
-	<jdelvare@suse.com>, <linux@roeck-us.net>, <alexandre.belloni@bootlin.com>, 
-	<pgaj@cadence.com>, <hpa@zytor.com>, <alistair@popple.id.au>, 
-	<linux@rasmusvillemoes.dk>, <Laurent.pinchart@ideasonboard.com>, 
-	<jonas@kwiboo.se>, <jernej.skrabec@gmail.com>, <kuba@kernel.org>, 
-	<linux-kernel@vger.kernel.org>, <linux-fsi@lists.ozlabs.org>, 
-	<dri-devel@lists.freedesktop.org>, <linux-input@vger.kernel.org>, 
-	<linux-media@vger.kernel.org>, <linux-mtd@lists.infradead.org>, 
-	<oss-drivers@corigine.com>, <netdev@vger.kernel.org>, 
-	<linux-wireless@vger.kernel.org>, <brcm80211@lists.linux.dev>, 
-	<brcm80211-dev-list.pdl@broadcom.com>, <linux-serial@vger.kernel.org>, 
-	<bpf@vger.kernel.org>, <jserv@ccns.ncku.edu.tw>, <Frank.Li@nxp.com>, 
-	<linux-hwmon@vger.kernel.org>, <linux-i3c@lists.infradead.org>, 
-	<david.laight.linux@gmail.com>, <andrew.cooper3@citrix.com>, 
-	Yu-Chun Lin <eleanor15x@gmail.com>
-Date: Fri, 11 Apr 2025 19:04:43 +0200
-Message-ID: <19625cf93f8.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
-In-Reply-To: <Z/lFQ85vhSQiFDBm@visitorckw-System-Product-Name>
-References: <20250409154356.423512-1-visitorckw@gmail.com>
- <20250409154356.423512-4-visitorckw@gmail.com>
- <25b7888d-f704-493b-a2d7-c5e8fff9cfb4@broadcom.com>
- <740c7de894d39249665c6333aa3175762cfb13c6.camel@sipsolutions.net>
- <1961e19ee10.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
- <Z/lFQ85vhSQiFDBm@visitorckw-System-Product-Name>
-User-Agent: AquaMail/1.54.1 (build: 105401536)
-Subject: Re: [PATCH v4 03/13] media: pci: cx18-av-vbi: Replace open-coded parity calculation with parity_odd()
+        d=1e100.net; s=20230601; t=1744391317; x=1744996117;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KVl+L+m1ll7TwdhJXg0KpefIZfJmTlR1fTVGe/qAkw0=;
+        b=LO6yBpySbsIHzaPvatJn3zT2ciuXlrpNzvSkba2AMydYRbaMzwYONsi/KEgTnYyGNS
+         3A4lfHLNDZkwLXnGUgDbV5B7Rfa4u1TMLUpnmHLPRJIPzAXCP/Q6S8ZH7+HA5+/P9ZSq
+         PjcFUEVCvexlqw4b9rBPD65YgYa0Buktu14Mq3Uc3g5iuqnTB5gEn6zJY3CitZgZ9Ij/
+         VcEv9AXr8lne7tQmI10ouS7/UYrYTI0SjkPv2AAiiTRdBdAc3/79gHtGM1mYkZHsZpP8
+         XkKVsHc519Z3xG75LKJ63MfhwBKcYaOuiN6vrSZYeLC391opOHwTzPEJ5cj6ikCygkFO
+         VQMA==
+X-Forwarded-Encrypted: i=1; AJvYcCUuRQK+BZNBVMnGGHjQQR+ARAB1qcoIGynFZGQdZXTf6wzcbcTBhof5W9H0jbfPSceRBizbTh4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTzyOpKCELNvTSfSMFMezOq9JZvyxileE+IEFLNoG7XJjNRJ3C
+	4dS/EekUkAFO9539lnRnrsV8/6+d2yNP6nWR+z3W7JUSPvf1yXNzUDggZ4NhXAzMMsuCYUurxNb
+	j3hypGxXmTrzPow+TO/PSMytc4Dc=
+X-Gm-Gg: ASbGnctkMGDGRaAI+hDZWekEOl44IqRkiIRR9PKEAIvGdoI9pwW7rWWlWtvhfeI5CSe
+	00IcXp81QDv7Ikp0eOZ9/v8CISBT4gM1EVIswatEGDwZrbQVysyDkVrhDml2p//BVH1ESGwcskE
+	WQwJNuGYli4iYPQsYLtCSs/13MA95N375Z6WyJB9Ndl0LUCnjyMm+CmimrNUIdxUAfm1Y=
+X-Google-Smtp-Source: AGHT+IE1S5/pMfPq8srWnliFtQB++Im0wBa1VUhuq3j7YbNBfngu2Iana4iKCogFdkJCJeU0B4F77hTTSk+V3vr6aHI=
+X-Received: by 2002:a17:906:dc94:b0:ac7:3a23:569c with SMTP id
+ a640c23a62f3a-acad34468e4mr374508366b.1.1744391316810; Fri, 11 Apr 2025
+ 10:08:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="us-ascii"
-Content-Transfer-Encoding: 8bit
+References: <20250409214606.2000194-1-ameryhung@gmail.com> <20250409214606.2000194-4-ameryhung@gmail.com>
+ <CAP01T77ibGcEhwsyJb1WVaH-vhbZB_M2yVA8Uyv9b5fy=ErWQQ@mail.gmail.com> <CAMB2axNqfBpneVc9unn7S65Ewb1u6EpLudjtiq00-sqbfnSY7w@mail.gmail.com>
+In-Reply-To: <CAMB2axNqfBpneVc9unn7S65Ewb1u6EpLudjtiq00-sqbfnSY7w@mail.gmail.com>
+From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
+Date: Fri, 11 Apr 2025 19:08:00 +0200
+X-Gm-Features: ATxdqUEovh7GnQ8DIeoN0dqTqbyrGAL3wyyGR0LW_E-rCblthR5o6-ehz6zduiY
+Message-ID: <CAP01T76oTKg5H2nqd5ppyLhk1rNjPY0DcYVELmyZU+Du8izbbA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v7 03/10] bpf: net_sched: Add basic bpf qdisc kfuncs
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, edumazet@google.com, kuba@kernel.org, 
+	xiyou.wangcong@gmail.com, jhs@mojatatu.com, martin.lau@kernel.org, 
+	jiri@resnulli.us, stfomichev@gmail.com, toke@redhat.com, sinquersw@gmail.com, 
+	ekarani.silvestre@ccc.ufcg.edu.br, yangpeihao@sjtu.edu.cn, 
+	yepeilin.cs@gmail.com, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On April 11, 2025 6:37:35 PM Kuan-Wei Chiu <visitorckw@gmail.com> wrote:
-
-> On Thu, Apr 10, 2025 at 07:08:58AM +0200, Arend Van Spriel wrote:
->> On April 10, 2025 12:06:52 AM Johannes Berg <johannes@sipsolutions.net> wrote:
->>
->>> On Wed, 2025-04-09 at 20:43 +0200, Arend van Spriel wrote:
->>>>
->>>> This is orthogonal to the change to parity_odd() though. More specific
->>>> to the new parity_odd() you can now do following as parity_odd()
->>>> argument is u64:
->>>>
->>>> err = !parity_odd(*(u16 *)p);
->>>
->>> Can it though? Need to be careful with alignment with that, I'd think.
->>
->> My bad. You are absolutely right.
-> Then maybe we can still go with:
+On Fri, 11 Apr 2025 at 18:59, Amery Hung <ameryhung@gmail.com> wrote:
 >
-> err = !parity_odd(p[0] ^ p[1]);
+> On Fri, Apr 11, 2025 at 6:32=E2=80=AFAM Kumar Kartikeya Dwivedi
+> <memxor@gmail.com> wrote:
+> >
+> > On Wed, 9 Apr 2025 at 23:46, Amery Hung <ameryhung@gmail.com> wrote:
+> > >
+> > > From: Amery Hung <amery.hung@bytedance.com>
+> > >
+> > > Add basic kfuncs for working on skb in qdisc.
+> > >
+> > > Both bpf_qdisc_skb_drop() and bpf_kfree_skb() can be used to release
+> > > a reference to an skb. However, bpf_qdisc_skb_drop() can only be call=
+ed
+> > > in .enqueue where a to_free skb list is available from kernel to defe=
+r
+> > > the release. bpf_kfree_skb() should be used elsewhere. It is also use=
+d
+> > > in bpf_obj_free_fields() when cleaning up skb in maps and collections=
+.
+> > >
+> > > bpf_skb_get_hash() returns the flow hash of an skb, which can be used
+> > > to build flow-based queueing algorithms.
+> > >
+> > > Finally, allow users to create read-only dynptr via bpf_dynptr_from_s=
+kb().
+> > >
+> > > Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+> > > Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> > > ---
+> >
+> > How do we prevent UAF when dynptr is accessed after bpf_kfree_skb?
+> >
 >
-> I believe this should still be a fairly safe approach?
+> Good question...
+>
+> Maybe we can add a ref_obj_id field to bpf_reg_state->dynptr to track
+> the ref_obj_id of the object underlying a dynptr?
+>
+> Then, in release_reference(), in addition to finding ref_obj_id in
+> registers, verifier will also search stack slots and invalidate all
+> dynptrs with the ref_obj_id.
+>
+> Does this sound like a feasible solution?
 
-Yes. Or whatever the name will be ;-)
+Yes, though I talked with Andrii and he has better ideas for doing
+this generically, but for now I think we can make this fix as a
+stopgap.
+I will add a fixes tag, asked the question because I had the same
+question when implementing a similar pattern for my patch, and was
+wondering how you solved it.
 
-Regards,
-Arend
+I made a similar fix to what you described for now.
 
-
+>
+> > >  [...]
 
