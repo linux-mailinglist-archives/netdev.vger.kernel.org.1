@@ -1,117 +1,127 @@
-Return-Path: <netdev+bounces-181686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34B87A86227
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 17:43:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C985A8623C
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 17:47:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E45B99C2C0B
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 15:40:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA2B41BA879B
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 15:45:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CD2F20E33F;
-	Fri, 11 Apr 2025 15:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C643211A15;
+	Fri, 11 Apr 2025 15:45:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="Dql7r5rm"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="PKfuqoTB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A401F584C
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 15:41:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA2620E33F;
+	Fri, 11 Apr 2025 15:45:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744386068; cv=none; b=Xtp0G06tkui2dXSXeStADKMzIlxJupTSWIEjqETDGaHHuk1iJ+NgjXRKkKq3/CeHVc4SmHsp4Fp0xa3rGbv5xz1yeFOki6++jOgyKkPFqfSU56vyXnodd9TkCTf8J7xR3R4ObNmjjU1tmDBLlOos9rGYFbEWZmaIJNAYsSTqeJU=
+	t=1744386338; cv=none; b=svjIsITF89v0t09hWT0e81KwldoikFzkAJME9p2YYiBjAP1pfs1RA9sf4HwDZTUFC3EJlSbB/aU8N/rZ2TBTuQp9cBM7KBQlptSFQTlzmNdXf25R5IMtnh6aPA9xlj5XUQ+KRL5maJ6P+OGPZ/6ntuZbhRO4C91bJjfw3LAdGy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744386068; c=relaxed/simple;
-	bh=6xqHOzSEtizESNQeKofm4qGWhQziFiLceka4SYrVITY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BP+a83/kseCjOlLR8ZRCcaS3dy3ogmj/E6BSLtFwDAPMFmi9XgpDQt20vVfUFH5rk7/pceCwkln/t0OuDyrmgpuG55/NwTPwUH4M2UNqLE/OoMqwqDIU6Twe9Q9yt/T9J2ieqZihFO40xjY1fHES8x/f09qoyUAspMuAywu2skQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=Dql7r5rm; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-391342fc0b5so1583966f8f.3
-        for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 08:41:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1744386065; x=1744990865; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=m1ER5xB9Jg+xmJZBLV8A7QxFaT92qRl63hkizFpOJiI=;
-        b=Dql7r5rmQzMOlU6VW6yqRnZysUz/nR/j+OfMlApbmo1Cmr4MUs/GB9K+FARMSM4590
-         VZxxURd09WiXmPp39CBnYKE2cidBT2ib7hbLBnVGj3DbR0HK1V8reI96Oyw1eWB44fzh
-         FvrS5mGEJUlee+nqv6TSiMCjXevbjQsGJr1QA+ixLCYSSoEr2wx7+ZGDMrqbHg6hLeXW
-         SxsosR1lTQAHh24uswbK6XQkRalKX3EzP0p3xZlshEA4DdwdD2h8U2rDm9K7s+tJpQgR
-         9sXG2LZcoUeB7aTjentuirYFgPNKCl8Pwofw97jlKgq4s0ntjyrauBu9SkGcHgwj8nLj
-         iOHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744386065; x=1744990865;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m1ER5xB9Jg+xmJZBLV8A7QxFaT92qRl63hkizFpOJiI=;
-        b=lPFoc7jKAk/Qt2hdxqgU++kSP1W2oLHvlZhogmgKy1UKMNx5nW2raufLywvS4JH5Hp
-         VLJNpSZk06dq7L1RQN2RjUdJvDCqGqg7cETO1KitmYEQK7+xsBxmKndRVpZIUmG+lLOY
-         3own+N9uBTGG/JMmwzag+mZ5CvGejspU5gYWAXEChLuiVkeZ88RoLUukchOr0fTD36OI
-         TZjcAsuOsUvR+bP8kLpljaGfY+fFwJg+7QJnVDccugW+eQKMNMTXYCA23Xvt8wXYDLM3
-         u0fM9ZPcMvUiBZFCpxNzkM7B+8nwGZVQzAOdz6cj1e4hL2LXot304zdBtkVh6LaWCC+1
-         DvzA==
-X-Forwarded-Encrypted: i=1; AJvYcCXkJJDYYqH29sQ4LVBlQfDQ+KICKAjweF4G7LyCyOvb7lRHSCtExqA6JB5XfPu1Wxr7t3OezBQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywjh45dktt+69gI7zORYd8nZetVS0lKfyY9/14aNNQnD/rxI6Y2
-	9HM/2UlsrBXouowqdkgrjfTCeSqXt78UR8SNHlH2aymctGJexlRDEW3PcaHFi4c=
-X-Gm-Gg: ASbGncsDNbrG6YE4Elu0UdgRG0c7hAOVTPN3J3gwBKk31hN/jLS3qBk10zLl5sLxEyh
-	uOe5nBEZA2YgfPMtGm/zO8/vgbLIZADy0AXIU8Pu9R/QLQ2COoVolUaN+lUyRMbGO4P20icICzu
-	9i5qKdGX0PcHwC/S0QfkElmbigT7KR4mZD8vsiB/118hEGoxZ9DkCQUmPQYJraJRA9OgEtyqO3I
-	pRT6vW7BmOEHW35eBtjgGbcHkNmSUNzeKxzBZUFJGe8WvOjpf53qsBWNFd6r+hGlFhEzsrghInc
-	ZpU3yZ1KHBmLTvCq2P8nB7Y2BjnCq4w4ZzAHK3PmNgoi1ac79A/HnIPPJAVNw5DFZMpv+7cSQ91
-	RYKkC34A=
-X-Google-Smtp-Source: AGHT+IEisQGsleHy4Zv5Gzb/47cBIzfdWyFjOgUR75w0kWOWSpMn5SkcGKo3Imt6toqDOuEhLNofAQ==
-X-Received: by 2002:a5d:5f94:0:b0:39c:1f02:44ae with SMTP id ffacd0b85a97d-39ea54fd3d6mr3226660f8f.27.1744386064350;
-        Fri, 11 Apr 2025 08:41:04 -0700 (PDT)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f235b050fsm90397935e9.40.2025.04.11.08.41.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Apr 2025 08:41:03 -0700 (PDT)
-Message-ID: <7e7746f3-3113-4f80-b9e1-71d28048c2d3@blackwall.org>
-Date: Fri, 11 Apr 2025 18:41:02 +0300
+	s=arc-20240116; t=1744386338; c=relaxed/simple;
+	bh=P6bHlax7gtaFOXyBlmDivlwl4i2XuFH3nXhBHUOMVX0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Stv55MIM82vaCpUnF1dowsfirS3DRbE0Y13FAcAlyutKmvI+ASCQGRUVYl1BrK9Fz32J0pSY0SWNMEkbrbhWWpBw2TK5XtFDgoaclQ6gn7ScglNrqQlaWup7gyoSNVkO1BWqjDuWevkS1fp2kfTpPHWYxy8ZSDekzYOPS5NUC10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=PKfuqoTB; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0A915103B92D7;
+	Fri, 11 Apr 2025 17:45:29 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1744386333; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=+Upffkr9Yy13DmAWHLsmplXaonISPjC+YsZOOcmdckk=;
+	b=PKfuqoTBF8hjxW1TDHptk6vQF1Na4fKu97/graZ1upeWhnoUHjsLEoWYFxyC8VPu6oyC99
+	9Uto9JRbj8FkfXTq/K2/OC0pPMDnatJ/j0bxpB7riTgd/Jqke49Bgzflc6fdFcHFOanZJn
+	IiVZ+p8nvpYIH3+z3iY0V2MWcYw78Xee0+ek4V462morBil0Sys8qMkL8eyjcbd+psxghK
+	gzS33Lz3HveHbzpPwh1qjeHaGodlFLGGQlBO99IBW//nRUwfcn4Ljj+OZ9ZMAweKB4HhLx
+	qzgbqyXNiZ/XBU8hl79FMd3XYTtb3Se3FpwE2iOyV9P099yoH20PPiJxKrHfKQ==
+Date: Fri, 11 Apr 2025 17:45:27 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Fabio Estevam <festevam@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Shawn Guo
+ <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, Pengutronix
+ Kernel Team <kernel@pengutronix.de>, Richard Cochran
+ <richardcochran@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ imx@lists.linux.dev, linux-arm-kernel@lists.infradead.org, Stefan Wahren
+ <wahrenst@gmx.net>
+Subject: Re: [net-next v4 3/5] ARM: dts: nxp: mxs: Adjust XEA board's DTS to
+ support L2 switch
+Message-ID: <20250411174527.14a175d1@wsk>
+In-Reply-To: <CAOMZO5B6q06nvk3+hzbioGpcW8_JXPZGEebApTU5JZbKvMLzxA@mail.gmail.com>
+References: <20250407145157.3626463-1-lukma@denx.de>
+	<20250407145157.3626463-4-lukma@denx.de>
+	<CAOMZO5B6q06nvk3+hzbioGpcW8_JXPZGEebApTU5JZbKvMLzxA@mail.gmail.com>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Patch v5 net-next 1/3] net: bridge: mcast: Add offload failed
- mdb flag
-To: Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org
-Cc: Joseph Huang <joseph.huang.2024@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Roopa Prabhu <roopa@nvidia.com>, Simon Horman <horms@kernel.org>,
- linux-kernel@vger.kernel.org, bridge@lists.linux.dev
-References: <20250411150323.1117797-1-Joseph.Huang@garmin.com>
- <20250411150323.1117797-2-Joseph.Huang@garmin.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250411150323.1117797-2-Joseph.Huang@garmin.com>
+Content-Type: multipart/signed; boundary="Sig_/RjsyxtHSE6bgRB8ADC.4s63";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Last-TLS-Session-Version: TLSv1.3
+
+--Sig_/RjsyxtHSE6bgRB8ADC.4s63
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On 4/11/25 18:03, Joseph Huang wrote:
-> Add MDB_FLAGS_OFFLOAD_FAILED and MDB_PG_FLAGS_OFFLOAD_FAILED to indicate
-> that an attempt to offload the MDB entry to switchdev has failed.
-> 
-> Signed-off-by: Joseph Huang <Joseph.Huang@garmin.com>
-> ---
->  include/uapi/linux/if_bridge.h |  9 +++++----
->  net/bridge/br_mdb.c            |  2 ++
->  net/bridge/br_private.h        | 20 +++++++++++++++-----
->  net/bridge/br_switchdev.c      |  9 +++++----
->  4 files changed, 27 insertions(+), 13 deletions(-)
-> 
+Hi Fabio,
 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+> Hi Lukasz,
+>=20
+> On Mon, Apr 7, 2025 at 11:52=E2=80=AFAM Lukasz Majewski <lukma@denx.de> w=
+rote:
+>=20
+> > +               ethphy0: ethernet-phy@0 {
+> > +                       reg =3D <0>;
+> > +                       smsc,disable-energy-detect;
+> > +                       /* Both PHYs (i.e. 0,1) have the same,
+> > single GPIO, */
+> > +                       /* line to handle both, their interrupts
+> > (OR'ed) */ =20
+>=20
+> Please fix the multi-line comment style.
 
+Ok, I will fix it.
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/RjsyxtHSE6bgRB8ADC.4s63
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmf5ORcACgkQAR8vZIA0
+zr2oJwf8Ck6aJmjSk5FB00W4YTIEgy2n/BJVaK1BTJCll5U54B+Hlrwra2iixLwh
+jvZqm01bg4Qncx7bYbcHaUeyiW7B7SBc/ikaBi56eDthprdbKS0r3s5wFHTEW8vg
+V2JzJjT6jeGJT+nMW7wRouLuZ5EQvi2rrUWbbi8gCKaztEHwEVqbc8BOJ4Kbhinz
+gB1OakDJzWZPtgadY8QOUYQMdLx68vBOG9tsttGiiKQG0+s0a4Tih0jqbQCfBgwJ
+CQAYHWX11CLdPW7yNvJFKO7nTdw3fNRmFQf3+fk5LbkeLKt7IWNHBPoiB3m3bUZh
+YFEUvNsexJb+gquBquCl/bIpp/AVCQ==
+=OHjq
+-----END PGP SIGNATURE-----
+
+--Sig_/RjsyxtHSE6bgRB8ADC.4s63--
 
