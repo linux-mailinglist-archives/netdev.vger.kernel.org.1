@@ -1,119 +1,142 @@
-Return-Path: <netdev+bounces-181674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7E4DA860FB
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 16:46:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B322EA860FF
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 16:47:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A60044C429F
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 14:46:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77B7C1899A2B
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 14:46:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CE901DE896;
-	Fri, 11 Apr 2025 14:46:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B0C41DD9AC;
+	Fri, 11 Apr 2025 14:46:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="ZFWMKgWP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qKK8RTdV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6B0136A
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 14:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF94136A;
+	Fri, 11 Apr 2025 14:46:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744382800; cv=none; b=uvMh6h3hF46bvV6m54RtgSAU8KL6HtdtEvVSThpVhb/5PYjfXUJ5lHbMf6Jx4i+hTVLW1UlraujtWUClT7TZ94FGiWLIul1uEQIB/gBX5q3+paYvrsJuNYW7JMPz3I3m/dluLz9Ob8ccUPggvzYmXlo423SQ8AC1wTcuAbhej9Y=
+	t=1744382791; cv=none; b=KF+sswdrbGx1yskjmpMavHNtsx5dStJs/QbotWFJMo53YjIFKDaLT/lsVPF/lG2vhcER6rG45dtvSMNXk0TBm79g96O6cxi2D2mEqrcTzqaj23vDRLA14I2kL2ee8ryhE9JpXhOw2om+Ig4k5bFC5gRy4PvGtwu4FIhKlTL3ABs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744382800; c=relaxed/simple;
-	bh=qqDf4vE8Jlrdw5uIZbXUKlMN/WijEt7Egx1NwUKsiwA=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=L2tDhNQiMIkWMSZ9A6dV5gAr1el8PCYmthSp74z1MvhnN5aNUK8tbAkkIUDwVyLjc74USy8jBOF7u7lGlgE1a3TSmA7plzmZpVApFwCaa0+PgMpmGVnabcANjZzcAXMrYZ1T85wiVGcyUZJkMEuEEGVWApURRIaqdekDi+yJeoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=ZFWMKgWP; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1u3FeM-006GRA-H7; Fri, 11 Apr 2025 16:46:34 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
-	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
-	bh=DzlRx388jjgSUECxtxgu4Ya7I0Ur05qU1L+e+YdIZOY=; b=ZFWMKgWPQ/Rb3JgQT58jjEfDbN
-	R0RouX+k/Q1P+a2rvFGYZ9kL4xLBLNVcARgL0okhtID21d+y1IWeddpJNsUA+0vzHrsBL2W7ICs4h
-	g3jedIfOsC5pamVmcfb3UR43uUOMAQ8kIFdEKDwgDfEudCQMIKNJy4nOpWR4aex0oZvCw5wZ+Gj5D
-	ytjaM74dkfjlZ+pvg5RsxffzQ2hgG3xeB4GQbHIV6x1bHOJpE2g4THyOMN03prwfKDDf+m6fqHjFA
-	BDIOn4zwnE5QpORis76YA/jV37R/RepJnBKDcDtgg02gLclQKl5gCx80NgcY3ZOEHC8T3thYYeS/e
-	NDntdZaw==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1u3FeG-00061k-D8; Fri, 11 Apr 2025 16:46:28 +0200
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1u3Fdy-00DkoL-4I; Fri, 11 Apr 2025 16:46:10 +0200
-Message-ID: <54481a3b-280f-4945-a513-f8a93b5568b4@rbox.co>
-Date: Fri, 11 Apr 2025 16:46:09 +0200
+	s=arc-20240116; t=1744382791; c=relaxed/simple;
+	bh=Bv4WfyfmVmF7hRkpF+0ZvKaumGH3BR2ukC/ouCyuHqI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IRX6fRtPyoV0euCsSQvP+Wv3W3zYSpwlwQ/7h7quE0cVv7qBwU/SqAou5xFyYuBxFhlnnxQZYRT7oufICVBHlXkzp26aHT1GemlXMCn2xJGr4sLH/O+Cn05XQbQtjnNRb/Beq58hoat8I1olPaEkujUFIKwFqNzdiC5igTaYHc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qKK8RTdV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A396C4CEEB;
+	Fri, 11 Apr 2025 14:46:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744382790;
+	bh=Bv4WfyfmVmF7hRkpF+0ZvKaumGH3BR2ukC/ouCyuHqI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qKK8RTdVzRm3FZ76rmw9V7LuFRybMzPQjR9gckgbPmZEQ/b5GS7owyemcvXCMnCjL
+	 MHAQF6NDjjimEGSQ32g2Ms/TqzYpr64fItAE18dwvIpjefiivBBVaNJ5gpDHK7wNoC
+	 9goeHtWbQcRsKad3LhLeRX/bonO2RgcjDx3HhV1iI7KxYS1SZ3gv4YuH5vXY9mnanc
+	 uvqbbiGBEAv7Ck/ljZLLvmrOWqPZtr+E81dr/hJgNdKKPd8GAwS6YPmgoffZ+u5Cz0
+	 7R24QoTpvztlS2qjs4CsdPsvz9WZ3DVogauTy65aVc4AQOo53SdQNzTu+20aChjys4
+	 N8+Q5fUru5P7g==
+Date: Fri, 11 Apr 2025 09:46:29 -0500
+From: Rob Herring <robh@kernel.org>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
+	upstream@airoha.com, Christian Marangi <ansuelsmth@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Michal Simek <michal.simek@amd.com>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Robert Hancock <robert.hancock@calian.com>,
+	devicetree@vger.kernel.org
+Subject: Re: [net-next PATCH v2 01/14] dt-bindings: net: Add Xilinx PCS
+Message-ID: <20250411144629.GA3223171-robh@kernel.org>
+References: <20250407231746.2316518-1-sean.anderson@linux.dev>
+ <20250407231746.2316518-2-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Michal Luczaj <mhal@rbox.co>
-Subject: connect() disconnects TCP_ESTABLISHED (was Re: [PATCH net 2/2]
- vsock/test: Add test for SO_LINGER null ptr deref)
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org
-References: <n3azri2tr3mzyo2ahwtrddkcwfsgyzdyuowekl34kkehk4zgf7@glvhh6bg4rsi>
- <5c19a921-8d4d-44a3-8d82-849e95732726@rbox.co>
- <vsghmgwurw3rxzw32najvwddolmrbroyryquzsoqt5jr3trzif@4rjr7kwlaowa>
- <df2d51fd-03e7-477f-8aea-938446f47864@rbox.co>
- <xafz4xrgpi5m3wedkbhfx6qoqbbpogryxycrvawwzerge3l4t3@d6r6jbnpiyhs>
- <f201fcb6-9db9-4751-b778-50c44c957ef2@rbox.co>
- <hkhwrfz4dzhaco4mb25st5zyfybimchac3zcqsgzmtim53sq5o@o4u6privahp3>
- <aa00af3b-2bb1-4c09-8222-edeec0520ae1@rbox.co>
- <cd7chdxitqx7pvusgt45p7s4s4cddyloqog2koases4ocvpayg@ryndsxdgm5ul>
- <7566fe52-23b7-46cc-95ef-63cbbd3071a1@rbox.co>
- <kiz4tjwsvauyupixpccqug5wt7tq7g3mld5yy5drpg5zxkmiap@3z625aedysx7>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <kiz4tjwsvauyupixpccqug5wt7tq7g3mld5yy5drpg5zxkmiap@3z625aedysx7>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250407231746.2316518-2-sean.anderson@linux.dev>
 
-On 4/11/25 15:21, Stefano Garzarella wrote:
-> On Fri, Apr 04, 2025 at 12:06:36AM +0200, Michal Luczaj wrote:
->> On 4/1/25 12:32, Stefano Garzarella wrote:
->>> On Tue, Mar 25, 2025 at 02:22:45PM +0100, Michal Luczaj wrote:
->>>> ...
->>>> That said, I may be missing a bigger picture, but is it worth supporting
->>>> this "signal disconnects TCP_ESTABLISHED" behaviour in the first place?
->>>
->>> Can you elaborate a bit?
->>
->> There isn't much to it. I just wondered if connect() -- that has already
->> established a connection -- could ignore the signal (or pretend it came too
->> late), to avoid carrying out this kind of disconnect.
+On Mon, Apr 07, 2025 at 07:17:32PM -0400, Sean Anderson wrote:
+> Add a binding for the Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII LogiCORE
+> IP. This device is a soft device typically used to adapt between GMII
+> and SGMII or 1000BASE-X (possbilty in combination with a serdes).
+> pcs-modes reflects the modes available with the as configured when the
+> device is synthesized. Multiple modes may be specified if dynamic
+> reconfiguration is supported.
 > 
-> Okay, I see now!
+> One PCS may contain "shared logic in core" which can be connected to
+> other PCSs with "shared logic in example design." This primarily refers
+> to clocking resources, allowing a reference clock to be shared by a bank
+> of PCSs. To support this, if #clock-cells is defined then the PCS will
+> register itself as a clock provider for other PCSs.
 > 
-> Yeah, I think after `schedule_timeout()`, if `sk->sk_state == 
-> TCP_ESTABLISHED` we should just exit from the while() and return a
-> succesful connection IMHO, as I fixed for closing socket.
->
-> Maybe we should check what we do in other cases such as AF_UNIX,
-> AF_INET.
+> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+> ---
+> 
+> Changes in v2:
+> - Change base compatible to just xlnx,pcs
+> - Drop #clock-cells description
+> - Move #clock-cells after compatible
+> - Remove second example
+> - Rename pcs-modes to xlnx,pcs-modes
+> - Reword commit message
+> 
+>  .../devicetree/bindings/net/xilinx,pcs.yaml   | 115 ++++++++++++++++++
+>  1 file changed, 115 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/xilinx,pcs.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/xilinx,pcs.yaml b/Documentation/devicetree/bindings/net/xilinx,pcs.yaml
+> new file mode 100644
+> index 000000000000..f9ec032127cf
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/xilinx,pcs.yaml
+> @@ -0,0 +1,115 @@
+> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/xilinx,pcs.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Xilinx 1G/2.5G Ethernet PCS/PMA or SGMII LogiCORE IP
+> +
+> +maintainers:
+> +  - Sean Anderson <sean.anderson@seco.com>
+> +
+> +description:
 
-OK, I suspect that would simplify things a lot (and solve the other issues
-mentioned; the EINTR connect() issue and the elevated bytes_unsent issue).
+Needs '>' modifier for paragraphs.
 
-Please feel free to tackle it, or let me do this once I'm done with the
-backlog.
+With that,
 
-Thanks,
-Michal
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+
+> +  This is a soft device which implements the PCS and (depending on
+> +  configuration) PMA layers of an IEEE Ethernet PHY. On the MAC side, it
+> +  implements GMII. It may have an attached SERDES (internal or external), or
+> +  may directly use LVDS IO resources. Depending on the configuration, it may
+> +  implement 1000BASE-X, SGMII, 2500BASE-X, or 2.5G SGMII.
+> +
+> +  This device has a notion of "shared logic" such as reset and clocking
+> +  resources which must be shared between multiple PCSs using the same I/O
+> +  banks. Each PCS can be configured to have the shared logic in the "core"
+> +  (instantiated internally and made available to other PCSs) or in the "example
+> +  design" (provided by another PCS). PCSs with shared logic in the core are
+> +  reset controllers, and generally provide several resets for other PCSs in the
+> +  same bank.
 
