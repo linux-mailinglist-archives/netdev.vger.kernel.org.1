@@ -1,111 +1,105 @@
-Return-Path: <netdev+bounces-181493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDC3CA852E3
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 07:10:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AC8DA852EE
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 07:13:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F68A1BA0DBD
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 05:10:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF5AB3B56E8
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 05:12:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6558C27CB1A;
-	Fri, 11 Apr 2025 05:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 834E227CB35;
+	Fri, 11 Apr 2025 05:12:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jAgJ1/Af"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kR1ygnB+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435D12AF04
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 05:10:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 288766FB9;
+	Fri, 11 Apr 2025 05:12:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744348204; cv=none; b=PGJQOVq2Knz5rZcDstlh7Lc+JJpR4GhdywML9/b2BIToIADfwvQvlC2K/W0nlYd1qZINKgGp/lPxHmcvaXAtxsazf2Jhc1IH1a7Dua7gzDOAvH2FAJpUcTku5Rbr7XiFqVUWjrrrDalgs7mhCKBviFe26NotgVYhCtgdBIFMR24=
+	t=1744348360; cv=none; b=W8sCpVpPVshpOytJv/wzBs7eE0nZAYm74TRdBzQRP78SXL+pXzfScFgSxxUkJIGdGnfuINpBPB1Hn5U76tfmtoKhOkKUWB/7ywtjleuFYNQgWJri49Cl+4cJcn2/HixS5bRcVnO2U5tc3bUwDkDrLT833Te6p+rF0rceMpKFHzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744348204; c=relaxed/simple;
-	bh=vehC3ir6+DUEoeBnIcaM4TgFoy1EgQz2HdFOnUoLOR4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oSYCi+ekgUouk5yF5G1irHTZ4WLA4vLAeV+tu1Fx6QoZ3zTrSo1qNUn/V6GS3Up34Qu6Q+gNzH2eUkz1u/MiWPGzR1Dn/eDF+8ZRUkllMiij2r4qT/FwLxxSxb432riBQ7kWUPi5GsMyrNPhq1Bf5Moh1r6ZnJwaNN9n5+Rgbf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jAgJ1/Af; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744348202; x=1775884202;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=vehC3ir6+DUEoeBnIcaM4TgFoy1EgQz2HdFOnUoLOR4=;
-  b=jAgJ1/AfBwo/tlmb0OHTvw7l0+DrOZdLx+Sxov9MAO+5b+hxwyf1R9ZY
-   wR1W+cQ/O5kiyHLsjAnB+nj7IuW18uM3YExCsAv2zyeyi2laJwDlVdfy+
-   KxHIQmKMHnzj40peySOAE4Ns9k1LJpemlgeIWMPmLWk0HBI7prnRce21M
-   P/qlu9+qiqBuEvbfl/S+6L2jGtGhIIOZPq5BYaC6RyjXy5TpMip61Y3l6
-   OPhueQYDY/8ZPUZjT4SmF8i4g2pfDxHO6eSy/vkuUvygs7Efklaeipxr6
-   ty9WSicx+kvm6chPC9MkY9rIsi1evF8pcwA9CdEJ2tmzlCb1wRKywA+Nm
-   A==;
-X-CSE-ConnectionGUID: /DYP47rqTpuYdnUUMBj/+g==
-X-CSE-MsgGUID: N26X50XTTYakrwttDc9eiw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11400"; a="63291119"
-X-IronPort-AV: E=Sophos;i="6.15,203,1739865600"; 
-   d="scan'208";a="63291119"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 22:10:01 -0700
-X-CSE-ConnectionGUID: P7rnjctfTkWTewgQb+nfFA==
-X-CSE-MsgGUID: cSRGpC/ET8y/s3Objjb5ag==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,203,1739865600"; 
-   d="scan'208";a="129436869"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2025 22:09:59 -0700
-Date: Fri, 11 Apr 2025 07:09:47 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: Simon Horman <horms@kernel.org>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1] idpf: fix potential memory
- leak on kcalloc() failure
-Message-ID: <Z/ikGxzPOysJZvUh@mev-dev.igk.intel.com>
-References: <20250404105421.1257835-1-michal.swiatkowski@linux.intel.com>
- <20250407104350.GA395307@horms.kernel.org>
- <bcf8dcc5-527d-41ae-95e4-3c0b6439d959@intel.com>
+	s=arc-20240116; t=1744348360; c=relaxed/simple;
+	bh=vo8r/Ou3ozFqcXy6Mh3RzCaqty4iUiS/E4l4z6f5pK8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=ZFxp9BlfPeISXssjddvIoZPTumvmQzXdtmOw8/88gO5YEC4oyRWwbc2w6Yj/xsCwn6PDcQawGWX0GbEJPwgoB71aMdCR22EG/dVDBNxl29osUF4u8QpgiUvyCK7Plw063vj5R6iUwJDino/pUWuTpna5YbU0rRuyBUa7j17rJ2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kR1ygnB+; arc=none smtp.client-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-301c4850194so1282292a91.2;
+        Thu, 10 Apr 2025 22:12:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744348358; x=1744953158; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vo8r/Ou3ozFqcXy6Mh3RzCaqty4iUiS/E4l4z6f5pK8=;
+        b=kR1ygnB+vqkoWxmWybcFlg/fldyAmHjx/FQRS25m/z4+42/6tRvvAJ0U/S7W4J9m0O
+         CRI6aiVTg4s3C158Sg2Iu8lCcQFY9x1RaCI6wAD2L2IxSw6ZrVep9K3FUxKS0HE/nWs7
+         cgl+sXGAQDDukA66pXwbvVRTL2Trz1zdJa6Jb5hOzTtBhIbzRIYv0KCNesNNxfkhusd0
+         ul1+25auFFMuc3M9J8NU1FBP/jIj1vsyWw5foDlHZ31sVChyPlXKG/XWXMuNJIw/xE0H
+         73sIILw21CH3uI74lxeu9cBoSZdokAELBOxr9+nb9pfWExGQYHgc90LT6VkFdRPUzdUL
+         79Mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744348358; x=1744953158;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vo8r/Ou3ozFqcXy6Mh3RzCaqty4iUiS/E4l4z6f5pK8=;
+        b=e2QiRk9n8fg2CJjDu2mThUNBXFvO2PkqKQ8T+v/8lNBJIQr61Zttx6kPqQMYwh2aQZ
+         OoKvGDgzx4w/vFkNrm+ZHa8Me0VdGWvS4b6B5kHT54qD9k66HTnthzimR8ZgLseSRZeo
+         qGYJSvwBq8YUvcSK1WfJ8dUHokuNFNXsr6YravBZmmTebTrEbXOW7wWX4jxlXI8gvYiz
+         wmtNFpXBGvgoVHiPpZsdnxyjWrV2gfP2ckvx98HEYgieSuFV7ichmqb+yy5TRRSfrcwB
+         moUOJdUtWHC4wL2j3/i5r8RH3XEnFwSW0+ROhqpK5qqjEAxuaE/JCkY6vTA8Dll+q7kR
+         Ty2w==
+X-Forwarded-Encrypted: i=1; AJvYcCUc2ShjMPYZTleJKcFhh3XxIBOX6QQaBI8vgs9/C/5szCptKxz6z1aPqrxEq7SO3tHgbUMoVux4TkJrx9I=@vger.kernel.org, AJvYcCXWR8x+4rbCQWMDXMFHwqD9Nl3E5CpoiFJ6d7MCfVnbCHoDez7O5eMNPYtFIxFe06HC1o57yoLd@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCFNp3QCsjZR6fEkpQFr2M1NshwBuvbS3EhAvv64xBpNN7njg8
+	Dbuzalo+eJPBoj+BbI6mXTc5LEkVLS+e6kSP3lNNkEmxw708DwF8
+X-Gm-Gg: ASbGncu2G4MFeXN4vEHjwnFTpXc5NlYxQV7G/o2zFxDq9jIsRiLVUMDj048rL4NjhZd
+	es5rNQDlVl5HyxSyp4VAfrbQO8Cz7L74CSLEjjMA/BCdOzQ03cL+ydLIqfZWDpS5Rtf7BmbKbIB
+	UvNRhO7OLPjbC0HR/C+yiLRLaJB+/kH/i7ll9xxuR58/GchdMlVovbGeQBESpgL/IWEY6/FGgV5
+	uwjxwvOP4TZGwVhrlPP71ls6LgwQA90M9rh2UVYEVUEOpTIjM4jJ+mnTWLCGfMp3nMiPp+Nqlz+
+	sDLWmhxC1JaFajhAfy9WSYFSbJ4RvSA2hlwArpBAmuSLFxsoDW+fK6RsmCg=
+X-Google-Smtp-Source: AGHT+IGPuha9IEWXXQhYvGYvPGaGwx9cZ9ISMGBmaKa3UnwNPkt4D4uZlG6jSPVIF2+OYnHf7r2QFw==
+X-Received: by 2002:a17:90b:380d:b0:2fe:9581:fbea with SMTP id 98e67ed59e1d1-308237c0d78mr2210311a91.29.1744348358151;
+        Thu, 10 Apr 2025 22:12:38 -0700 (PDT)
+Received: from localhost.localdomain ([2401:4900:4fe1:c798:5bf3:ef7a:ab5:388f])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-306df082327sm4534805a91.15.2025.04.10.22.12.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Apr 2025 22:12:37 -0700 (PDT)
+From: Kevin Paul Reddy Janagari <kevinpaul468@gmail.com>
+To: tung.quang.nguyen@est.tech
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	horms@kernel.org,
+	jmaloy@redhat.com,
+	kevinpaul468@gmail.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	tipc-discussion@lists.sourceforge.net
+Subject: replacement of strncpy in ticp_node_get_linkname()
+Date: Fri, 11 Apr 2025 10:42:21 +0530
+Message-Id: <20250411051221.13075-1-kevinpaul468@gmail.com>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <PRAP189MB1897ABBF1EB2124C3F4FD05BC6B62@PRAP189MB1897.EURP189.PROD.OUTLOOK.COM>
+References: <PRAP189MB1897ABBF1EB2124C3F4FD05BC6B62@PRAP189MB1897.EURP189.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bcf8dcc5-527d-41ae-95e4-3c0b6439d959@intel.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 10, 2025 at 03:04:16PM -0700, Tony Nguyen wrote:
-> On 4/7/2025 3:43 AM, Simon Horman wrote:
-> > On Fri, Apr 04, 2025 at 12:54:21PM +0200, Michal Swiatkowski wrote:
-> > > In case of failing on rss_data->rss_key allocation the function is
-> > > freeing vport without freeing earlier allocated q_vector_idxs. Fix it.
-> > > 
-> > > Move from freeing in error branch to goto scheme.
-> > > 
-> > > Fixes: 95af467d9a4e ("idpf: configure resources for RX queues")
-> > 
-> > Hi Michal,
-> > 
-> > WRT leaking q_vector_indxs, that allocation is not present at
-> > the commit cited above, so I think the correct Fixes tag for
-> > that problem is the following, where that allocation was added:
-> > 
-> > Fixes: d4d558718266 ("idpf: initialize interrupts and enable vport")
-> 
-> Patch applied. I do agree with Simon's assessment so plan to use this fixes.
-> 
+https://lore.kernel.org/all/20250411050613.10550-1-kevinpaul468@gmail.com
 
-Thanks Tony, I also agree.
-
-> Thanks,
-> Tony
-> 
+Reguards
+kevin
 
