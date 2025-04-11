@@ -1,59 +1,90 @@
-Return-Path: <netdev+bounces-181490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4639BA852BD
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 06:45:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDA55A852DB
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 07:07:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A261445230
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 04:45:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 461767ABFC7
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 05:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EB5327C87D;
-	Fri, 11 Apr 2025 04:45:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC83327CCE6;
+	Fri, 11 Apr 2025 05:06:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="W+XewHD5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B621/crY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC5AC27CB2F;
-	Fri, 11 Apr 2025 04:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D8B27CCD7;
+	Fri, 11 Apr 2025 05:06:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744346709; cv=none; b=qW5kGFWhuAEXvrgelpMYNoCToswA2T1A/kLStu+gZE7As2KX8V77u0gseinU/JZMIus8FKQtzzyfwjEvXS+mow6qq9GEEi+39VSNHbj9uozWohdIKESlRW/SH0//olBe0zzQxTT2vOMWVET+sCJ5jpfB055j+QH7PUUF2/rO5LA=
+	t=1744348005; cv=none; b=pdaTZnO89+9hkLatMH0faeKwReeqrT82KOUzOPlt7ZiqYbSh4DtkOEtwmOgWc3Hdzvo/8mrX8YcA/T6wc9mE4EgCfySjU06RmM7qNthvKELu7ysMrHH7bbF4OC/EXEsh+xSza3gAigrHmyN/IAuIPuzCXGZ3yZQBacyAquC74w8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744346709; c=relaxed/simple;
-	bh=DNTUCAbzivbGtmjnFnIu06G0T3ku4zWDyqLTUN10mns=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=d6Dvw/SJwTQ9Je7BGtXDvq4i0JSgBZUqPVjpKxOrdTQBGAbul3a/kDz+qveKcVoWHMjhudSj528JV28JWuZ0/+D8GrZt/Xwlrwu1DS9f9JRKo/C3B4/EKmmY+jt+afgllD8wsM0fLpOvv+44dCI0H1bslgvTtTCm7qStTf2cmfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=W+XewHD5; arc=none smtp.client-ip=45.254.49.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
-Received: from localhost.localdomain (unknown [202.119.23.198])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 117c6ece2;
-	Fri, 11 Apr 2025 12:44:59 +0800 (GMT+08:00)
-From: Zilin Guan <zilin@seu.edu.cn>
-To: wenjia@linux.ibm.com
-Cc: jaka@linux.ibm.com,
-	alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	davem@davemloft.net,
+	s=arc-20240116; t=1744348005; c=relaxed/simple;
+	bh=ph9yxNJxjytif7MW6JGpN2VeP3cdtJrpIHatp3pjQx8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lK0S9FWxRn+ujO5wvGc8hqoFSm21Xw88L+VT5YE++OKshlv7gLYAgY+tf4cq0AAaiSa5NKz2uiuGJg5+GG/wRY/F3AWobG02CVyr0Phr+UVKdEoZrqqsnkDO9c+Rbl6/zU9XnRCJokJQDtP6o1Q4DCrL/vbtFCu3OE5XFOX81T4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B621/crY; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7370a2d1981so1236500b3a.2;
+        Thu, 10 Apr 2025 22:06:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744348003; x=1744952803; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5UnJapsshMAFNTg0PJpSBNJuS/1ozPTcqpFD6vI6lxo=;
+        b=B621/crYDeWP4HAetCsiXYcpu6+oOu1Y9mDyMskKgrOZCuOjrsExVTb4ozbUfG4IqJ
+         i9F7xeHav0C3ASIN4jSMBIVbAcKNBXUYyNh/HbTxC24fyL+Mi80/l1VybDQripC+4PlT
+         DLpsQYGlDcnrtbimuQlS8ZrJL828TljtMhdEB17+3WDM0FxI2gvwRbSQEK+NALpgbnXR
+         5tqHGjr59vstvSaRDd26y9B4TYsnCeZt8v4AZtQEvHDe03d08XolomdCTEWKWtnGZUdB
+         709rgkXqUs6R8Op184ntlEoiufxp1XNHXT5DiYeaxgaMqJA9eM3oZlQpXCoYkEFvRl2+
+         brMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744348003; x=1744952803;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5UnJapsshMAFNTg0PJpSBNJuS/1ozPTcqpFD6vI6lxo=;
+        b=XFqhnO56fc0xMlYCxQqdtA7d1KdIk4PdEARbKSbVREelOHQJs2Mt/c5Fp4YM1Um3QT
+         JjHvZW86nLEyZ+VUl4O71rHskVjeZLZWHngwm52xlWqYkvcCIIbhqz+ccPjPgfOY/HnR
+         gbI6fRaEPgFi4viEl3CT/NcZFNuXmlJFB05FwhIM/HVpdiq5C0vJpCbIF3Fkzv8QIQYn
+         r3OwBZiL9NSelkB5PZDYQOMu2JxoFHQgfeeNVa2SnqBmSZwCQnCRY1piu2PwuIfsMxXI
+         F81nzdbb/NLsMFeeuny8WiWPPyTQtlMJ/yyqSPGQYGHs96VnX/eA9+9PHKEvwOEJKBMA
+         BU8A==
+X-Forwarded-Encrypted: i=1; AJvYcCU+ms2j0LfyG456zhqIv6Cs7xfWDWU6bU3raA8mvGq/65XP6vsZ0JKGHRZzTrTNVXwcxsC37RcZ/xFbbeE=@vger.kernel.org, AJvYcCWghIuCVhwTNJo5lVRngaAdaylnt6ik8pjOwZkagxcL1T1cZGHH7cBfJ4tDh80bj5mXCTkQ3nlp@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxd/UtTgbMkDXNmIzEd+TrG/D1W9Sg/hcHBUHI7p64PV4XQQN8c
+	g/mz9+oC3RAdOI7PgkQT95VkVKYbMsKqVM7jNEB5dwjY1ueiK4ku7SDduZ15Q1k=
+X-Gm-Gg: ASbGncvil4YGlfBIz6J11uN21FZNBE6lmOEVcGaMWYtXOfKjGYrRADah24MSniyVMGc
+	ilPcVP+tuLaD2MrF9ZeWbA4u2l4mJliSXRbxq9aDFNb4hmndRzx9nyW9mjh6oxhXKpbL490vrZh
+	GSLWU/ZCY7wS1RqDlle7jVYDMQ8UKysvwj5I7VLtsFvXAJc9xEwh2irUPI6aavoF6bbUpS0gwpA
+	pQt6a2fIRda12wCkCyoECOdXD4jFcApwR4wIUyHtOxZB9RWvUpDSsh6oyX8u8rP9yHsIg9OQz0E
+	QyDXEB2j6rSmNahC2XB0Llr6WacFEKlU7kEttF7sHvZRFHHe3YT5OVariaQ=
+X-Google-Smtp-Source: AGHT+IGLIi/7HyMpkoEks+uXZ/UWMvLn9AKsYBa2512q1PEkAkv3NJRwEgNHcO1lAPn2wY8N9VWyfQ==
+X-Received: by 2002:a05:6a00:a8e:b0:736:50d1:fc84 with SMTP id d2e1a72fcca58-73bd12a1937mr1899353b3a.21.1744348003106;
+        Thu, 10 Apr 2025 22:06:43 -0700 (PDT)
+Received: from localhost.localdomain ([2401:4900:4fe1:c798:5bf3:ef7a:ab5:388f])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73bd230da87sm525712b3a.127.2025.04.10.22.06.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Apr 2025 22:06:42 -0700 (PDT)
+From: Kevin Paul Reddy Janagari <kevinpaul468@gmail.com>
+To: jmaloy@redhat.com
+Cc: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	horms@kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org,
 	netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
 	linux-kernel@vger.kernel.org,
-	jianhao.xu@seu.edu.cn,
-	Zilin Guan <zilin@seu.edu.cn>
-Subject: [RFC PATCH] net/smc: Consider using kfree_sensitive() to free cpu_addr
-Date: Fri, 11 Apr 2025 04:44:56 +0000
-Message-Id: <20250411044456.1661380-1-zilin@seu.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	kevinpaul468@gmail.com
+Subject: [PATCH] Removing deprecated strncpy()
+Date: Fri, 11 Apr 2025 10:36:13 +0530
+Message-Id: <20250411050613.10550-1-kevinpaul468@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,63 +92,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlCTEhCVkJIGh0aQkkZSUIeTlYeHw5VEwETFhoSFy
-	QUDg9ZV1kYEgtZQVlJS0lVSkpCVUlIVUpCQ1lXWRYaDxIVHRRZQVlPS0hVSktISk9ITFVKS0tVSk
-	JLS1kG
-X-HM-Tid: 0a96232a562603a1kunm117c6ece2
-X-HM-MType: 10
-X-HM-Sender-Digest: e1kMHhlZQR0aFwgeV1kSHx4VD1lBWUc6Pxg6Izo*NDJKLDUcMSkcEhoz
-	FUIKCitVSlVKTE9PSE9NTEtLTUhOVTMWGhIXVQESFxIVOwgeDlUeHw5VGBVFWVdZEgtZQVlJS0lV
-	SkpCVUlIVUpCQ1lXWQgBWUFJSE5DNwY+
-DKIM-Signature:a=rsa-sha256;
-	b=W+XewHD5T/DrVlYlf70G4CwonfJrv16/xwTI5F6FKPD1zcqZYxYBc2SH6Xf5Hsig9SYBXgEZa5tzTSoqb3EqTtzLXfZ+ATofbKKL1zlwHkZfxh4dqygk2yG+3xBRcDdD1zNxg1Up+ajZQO8HuWC7Yq6lmw3Ut42V0pCpKglAFVU=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
-	bh=PL2S5ZNY/lfRwbYp6izyK3pe6SK3sLEiQc6v851Wktc=;
-	h=date:mime-version:subject:message-id:from;
 
-Hello,
+This patch suggests the replacement of strncpy with strscpy
+as per Documentation/process/deprecated.
+The strncpy() fails to guarntee NULL termination,
+The function adds zero pads which isn't really convenient for short strings
+as it may cause performce issues
 
-In smcr_buf_unuse() and smc_buf_unuse(), memzero_explicit() is used to
-clear cpu_addr when it is no longer in use, suggesting that cpu_addr
-may contain sensitive information.
+strscpy() is a preffered replacement because
+it overcomes the limitations of strncpy mentioned above
 
-To ensure proper handling of this sensitive memory, I propose using
-kfree_sensitive()/kvfree_sensitive instead of kfree()/vfree() to free
-cpu_addr in both smcd_buf_free() and smc_buf_free(). This change aims
-to prevent potential sensitive data leaks.
+Compile Tested
 
-I am submitting this as an RFC to seek feedback on whether this change
-is appropriate and aligns with the subsystem's expectations. If confirmed
-to be useful, I will send a formal patch.
-
-Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
+Signed-off-by: Kevin Paul Reddy Janagari <kevinpaul468@gmail.com>
 ---
- net/smc/smc_core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/tipc/node.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
-index ac07b963aede..1b5eb0149b89 100644
---- a/net/smc/smc_core.c
-+++ b/net/smc/smc_core.c
-@@ -1388,7 +1388,7 @@ static void smcr_buf_free(struct smc_link_group *lgr, bool is_rmb,
- 	if (!buf_desc->is_vm && buf_desc->pages)
- 		__free_pages(buf_desc->pages, buf_desc->order);
- 	else if (buf_desc->is_vm && buf_desc->cpu_addr)
--		vfree(buf_desc->cpu_addr);
-+		kvfree_sensitive(buf_desc->cpu_addr, buf_desc->len);
- 	kfree(buf_desc);
- }
- 
-@@ -1400,7 +1400,7 @@ static void smcd_buf_free(struct smc_link_group *lgr, bool is_dmb,
- 		buf_desc->len += sizeof(struct smcd_cdc_msg);
- 		smc_ism_unregister_dmb(lgr->smcd, buf_desc);
- 	} else {
--		kfree(buf_desc->cpu_addr);
-+		kfree_sensitive(buf_desc->cpu_addr);
+diff --git a/net/tipc/node.c b/net/tipc/node.c
+index ccf5e427f43e..cb43f2016a70 100644
+--- a/net/tipc/node.c
++++ b/net/tipc/node.c
+@@ -1581,7 +1581,7 @@ int tipc_node_get_linkname(struct net *net, u32 bearer_id, u32 addr,
+ 	tipc_node_read_lock(node);
+ 	link = node->links[bearer_id].link;
+ 	if (link) {
+-		strncpy(linkname, tipc_link_name(link), len);
++		strscpy(linkname, tipc_link_name(link), len);
+ 		err = 0;
  	}
- 	kfree(buf_desc);
- }
+ 	tipc_node_read_unlock(node);
 -- 
-2.34.1
+2.39.5
 
 
