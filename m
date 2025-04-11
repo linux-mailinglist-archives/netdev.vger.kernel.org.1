@@ -1,91 +1,72 @@
-Return-Path: <netdev+bounces-181501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E5DAA853F5
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 08:11:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91B5AA853ED
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 08:09:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A68007AD92B
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 06:08:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51C76441642
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 06:09:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD0227CCFB;
-	Fri, 11 Apr 2025 06:08:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7247D27CB2A;
+	Fri, 11 Apr 2025 06:09:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lrNxE96D"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Rzfjm3gK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8794327CCE4;
-	Fri, 11 Apr 2025 06:08:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EA6923A9;
+	Fri, 11 Apr 2025 06:09:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744351736; cv=none; b=BTNFPHuo7hmPEk0VBpmDtvjHzOTkgOZTIYIigDyhiqveEs85owaqUKKtHPAwYyHEupXLKp5C1aUqjAQV6N1i99FRaOdG2/kP+srQsLGVOKS3TO4GQGWzY/cyAFkC5OdOQhhgF+tO/xiLZmO8lw7RQViVBMJaU87KPb1OXApzoQs=
+	t=1744351778; cv=none; b=EqBC/MW0X9JRGZRa8wQdwpSZhBe5GvoSS+bwxXgTlRXHRRp0QsNmf04XkWeczDk/R+mU+4DV5Hx5u4U97BUAbNZkTIABBZ1+ObIiVKDTHJXpiwZL6J1OkYxsdBqLGWgPXclOXiJPgZqs6XjUkHmUYjTRKtayVdbCu1E0EmlseGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744351736; c=relaxed/simple;
-	bh=WouuxWKXIXaHJdNjkcZzsFrXBb+9BPzw8tsW2/aQSNg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lTcHrJrlN+FqawCqX8TJoE3A/MQfS/vAp0Ay07Sa1pdr+O3b+eM+fS54k0iS/GF4lgPq7jl71gKOtrAB2pUXEshf9LNHL4Fr2vHuRlU0Ns0rxIytdw/si8K46kz7xkSgojGF/ahCJS07fDoZR4XCGydVoPuhk971cDR8MGGOJsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lrNxE96D; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7376dd56eccso1782660b3a.0;
-        Thu, 10 Apr 2025 23:08:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744351733; x=1744956533; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=50hxH2EGQQWIvDNzL74QsMeOx3mDaobRYvxxKWb0q9Q=;
-        b=lrNxE96Dl5eUCskhkwNLtSlN5/yQ9z3i6khD21hpZm+MetWk6qF+L1bFUioQFwZ5dH
-         ceyuwsyAVT2fgUmg5u5wu/l1eegxNOp1/YbYjSt7E7wqvqSEtABiDjqA2RG6j6TLugiu
-         tNeBCqGi9fGGfF136606uW5mi0Snbf3ahpqPhlRkodSDdhRUhF5nnZ3LknKWDwH5GKcs
-         oRkP0dpQZbnw+5uEyHLNYVr3r7ndkZpXpKEzogpFGHQAVMA7iQFc5pzKj/lIgxASQwKD
-         3bf1YyZCsXPp+N7Toq32hgIM+HKOReWnvPVtkuv2v4FBlS/7tE5HofFsaNcksnptoXVj
-         o6fA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744351733; x=1744956533;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=50hxH2EGQQWIvDNzL74QsMeOx3mDaobRYvxxKWb0q9Q=;
-        b=l35LO4uRkIkSc6oZQ659QT5Aq/JXeeOzpxWpZDZ4up6y0V0wpPKRWNQnflCAPCOOxE
-         P4aXIXQjiy0rIO+7roVUMzgbfY11fPZZTND/xap0FidGCFW0Cv/JBTCcN4Nwg6l4TEwm
-         37RM8Djr+hzy6UfAwV1EwOUQj2OV7jgZnuAdRIZLQwC6jReoXcRW5e8I/ZRy/4PRQrFl
-         CAXSGj9S+SpRqwmeJoQ1wVd3vJ8f48rU+CjGk7Jy6XiNxfj9i/z+B/YmE/YFLYPSVEG9
-         wiboeLAqjn8tUW9dUKWI6Nx7xnCxuH+TI50cYd1bhr36OQj/u/T+gAtMNaheS0Dgoogd
-         oxDw==
-X-Forwarded-Encrypted: i=1; AJvYcCW+xM3p2Jwu35QUpN7jmiCNoh6SwXOJH0M7JkWd+NNCbjkXua+ZhnEtXRe4cf5mVfUNx/s5R4/0@vger.kernel.org, AJvYcCXsdHk4ctVY6Js4mB5HCKkLcEYc2K+HLQxi5fWbwJ+ctW63nTgQU+JOo04rdt26+qEJQ2z8FkvQBi6RC1w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvEyDQxthUp0dnHz7LZ1ZggqUKap+0ElMwfWtutMEPAXNdoY1d
-	s3XuPIaBALYkKFA2Fe257bSbIXHz1jZIWRVS2ft+Q0CM5NR/mUiQ
-X-Gm-Gg: ASbGncuhxFA5cgpa5VHIRcyPWMDPY/Y4Qjk8edvZVim+wrZbhi7QolyX6Ygi9oJygdd
-	eLjj1qdKUEcDfOQ3R4oSrfYzIdgfv9MGIHda/cCyYM+z+sL4NJ72a2yZimCBF/ILEkvKPF9o6Lq
-	0HW3ZKXTyyYnhx0xlqzT5lgGr5sT7J3GMapUrcI4JsX6vi00wYqfniX8ukFcrkr5tjoBelgCMNv
-	IlCDpJIxb6CEKw3om6nmjVxZIXTEtPIdvc1e+dcIDZkKUn5IkY+NTcQasNTpY/Wpb9wz7SxsRQW
-	0iHi5pnRAgzOMuZD8t2Us+9HVfcM1g5YOk9qfu55soh4Ua9w6gpVlJ8s/hM=
-X-Google-Smtp-Source: AGHT+IHHKmCThas9V8uvHhyBV40jdH5I/sNyIn7KwfblLgO395ERfwFGclBVoIOKeawjjUbdqv32+Q==
-X-Received: by 2002:a05:6a00:b89:b0:736:562b:9a9c with SMTP id d2e1a72fcca58-73bd12b1a09mr2332868b3a.18.1744351732606;
-        Thu, 10 Apr 2025 23:08:52 -0700 (PDT)
-Received: from localhost.localdomain ([2401:4900:4fe1:c798:5bf3:ef7a:ab5:388f])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73bd21e0469sm647640b3a.79.2025.04.10.23.08.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Apr 2025 23:08:52 -0700 (PDT)
-From: Kevin Paul Reddy Janagari <kevinpaul468@gmail.com>
-To: jmaloy@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
-	linux-kernel@vger.kernel.org,
-	tung.quang.nguyen@est.tech
-Cc: Kevin Paul Reddy Janagari <kevinpaul468@gmail.com>
-Subject: [PATCH net-next] Removing deprecated strncpy()
-Date: Fri, 11 Apr 2025 11:37:54 +0530
-Message-Id: <20250411060754.11955-1-kevinpaul468@gmail.com>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1744351778; c=relaxed/simple;
+	bh=t0HYUXLB2DaPJtMpf06vUrKOtSAvVcdv/VPIrYPXwgQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=b6J+5XvD7O9LivxIIlJNRHxqLMpeSTMdyaCg268PlqsKwfhpdfibIrS0IiR51uk+JbiKaE844YVwOvU6MgLDBCoAZ3riHL5nPzPTgO3JTczoyUyHyYTWvc4kKYq8eczSod5dJAg0ofWv3L7Pj67u5ghjyEZJv5gfrowY4ss3geE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Rzfjm3gK; arc=none smtp.client-ip=198.47.19.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 53B69NGE2027079
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 11 Apr 2025 01:09:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1744351763;
+	bh=p6L9ox8QbZEfucXdJkpzXmXO81CguHbCQdxOp/2KlFk=;
+	h=From:To:CC:Subject:Date;
+	b=Rzfjm3gK/5E1dv7/TMK2yt4uSnlJ5SSq+1nIrJ7HSl1eY6LEuzYT2mJc5aGdCxfp1
+	 2j3VW5FVNWpasODqmkC+KhynaPcOxrVqum48vXjg17d0GvJ0rofOMG6LQd/V1+CW93
+	 +P57LGVlIAUk1bFicEBd2CMGx8xyDTDGsUMHv/NM=
+Received: from DLEE105.ent.ti.com (dlee105.ent.ti.com [157.170.170.35])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 53B69NXZ049796
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 11 Apr 2025 01:09:23 -0500
+Received: from DLEE101.ent.ti.com (157.170.170.31) by DLEE105.ent.ti.com
+ (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 11
+ Apr 2025 01:09:22 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE101.ent.ti.com
+ (157.170.170.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 11 Apr 2025 01:09:22 -0500
+Received: from uda0492258.dhcp.ti.com (uda0492258.dhcp.ti.com [10.24.72.113])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 53B69I9x065579;
+	Fri, 11 Apr 2025 01:09:18 -0500
+From: Siddharth Vadapalli <s-vadapalli@ti.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <robh@kernel.org>,
+        <krzk+dt@kernel.org>, <conor+dt@kernel.org>, <rogerq@kernel.org>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <srk@ti.com>, <s-vadapalli@ti.com>
+Subject: [PATCH net-next 0/2] CPSW Bindings for 5000M Fixed-Link
+Date: Fri, 11 Apr 2025 11:39:15 +0530
+Message-ID: <20250411060917.633769-1-s-vadapalli@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,51 +74,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-This patch suggests the replacement of strncpy with strscpy
-as per Documentation/process/deprecated.
-The strncpy() fails to guarantee NULL termination,
-The function adds zero pads which isn't really convenient for short strings
-as it may cause performance issues.
+Hello,
 
-strscpy() is a preferred replacement because
-it overcomes the limitations of strncpy mentioned above.
+This series adds 5000M as a valid speed for fixed-link mode of operation
+and also updates the CPSW bindings to evaluate fixed-link property. This
+series is in the context of the following device-tree overlay which
+enables USXGMII 5000M Fixed-link mode of operation with CPSW on TI's
+J784S4 SoC:
+https://github.com/torvalds/linux/blob/v6.15-rc1/arch/arm64/boot/dts/ti/k3-j784s4-evm-usxgmii-exp1-exp2.dtso
 
-Compile Tested
+Series is based on commit
+0c49baf099ba r8169: add helper rtl8125_phy_param
+of the main branch of net-next tree.
 
-Signed-off-by: Kevin Paul Reddy Janagari <kevinpaul468@gmail.com>
----
- net/tipc/link.c | 2 +-
- net/tipc/node.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Regards,
+Siddharth.
 
-diff --git a/net/tipc/link.c b/net/tipc/link.c
-index 18be6ff4c3db..3ee44d731700 100644
---- a/net/tipc/link.c
-+++ b/net/tipc/link.c
-@@ -2228,7 +2228,7 @@ static int tipc_link_proto_rcv(struct tipc_link *l, struct sk_buff *skb,
- 			break;
- 		if (msg_data_sz(hdr) < TIPC_MAX_IF_NAME)
- 			break;
--		strncpy(if_name, data, TIPC_MAX_IF_NAME);
-+		strscpy(if_name, data, TIPC_MAX_IF_NAME);
- 
- 		/* Update own tolerance if peer indicates a non-zero value */
- 		if (tipc_in_range(peers_tol, TIPC_MIN_LINK_TOL, TIPC_MAX_LINK_TOL)) {
-diff --git a/net/tipc/node.c b/net/tipc/node.c
-index ccf5e427f43e..cb43f2016a70 100644
---- a/net/tipc/node.c
-+++ b/net/tipc/node.c
-@@ -1581,7 +1581,7 @@ int tipc_node_get_linkname(struct net *net, u32 bearer_id, u32 addr,
- 	tipc_node_read_lock(node);
- 	link = node->links[bearer_id].link;
- 	if (link) {
--		strncpy(linkname, tipc_link_name(link), len);
-+		strscpy(linkname, tipc_link_name(link), len);
- 		err = 0;
- 	}
- 	tipc_node_read_unlock(node);
+Siddharth Vadapalli (2):
+  dt-bindings: net: ethernet-controller: add 5000M speed to fixed-link
+  dt-bindings: net: ti: k3-am654-cpsw-nuss: evaluate fixed-link property
+
+ Documentation/devicetree/bindings/net/ethernet-controller.yaml  | 2 +-
+ .../devicetree/bindings/net/ti,k3-am654-cpsw-nuss.yaml          | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
 -- 
-2.39.5
+2.34.1
 
 
