@@ -1,119 +1,184 @@
-Return-Path: <netdev+bounces-181764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A6CDA8669F
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 21:47:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29D56A866C0
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 22:03:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 315024A5180
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 19:45:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31C4A1896D31
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 20:03:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E858D283C85;
-	Fri, 11 Apr 2025 19:45:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C807235C1E;
+	Fri, 11 Apr 2025 20:03:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D+XhEpOS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mijS2O8e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E7CD28368D
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 19:45:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC721280A21;
+	Fri, 11 Apr 2025 20:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744400723; cv=none; b=u1loQZ0CY3mkKCrl1mspIECiwpmCBOrG42D7T0p1swuqF+GDRBaBYF6pBvPz7XfEsxlii9A7ZkNVrWxm22pgkkyP/N+VLb/ShCiRmDIRxEFCROz9mJ3XIPwV7IWM4TcWJoqoyWVpeu2Fq6gOT6tz/udgtd2hXzY82iPc0cajZec=
+	t=1744401794; cv=none; b=nbAcYa4plZ/Y99FqkI6+PSKsKdz5v/LlDcZyfy1hdxPxiP0L/ZX5j9ebjkYLEiaFdVz+IL27bPJBOtBbFSEAYTBO3VtR778Rwg3ZktP7FpuwkTGfxX5ggW00knnMx1tYN/lgaEtYy4PHSZ8fUJy9KvYAr568BL5/IfdRoIRNxa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744400723; c=relaxed/simple;
-	bh=0k+RRSIshNmJjhWDP0sDhEaJ74DfqYYPE9poDNlKT+4=;
+	s=arc-20240116; t=1744401794; c=relaxed/simple;
+	bh=WrzflKNEW7LUuZ1yEyggMY9woYQSBwBr8weVr3lx7mk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EAiUQrRz5ighoOmV8FL4RrE7C8EKiRJPbjDwRMnW4VQ5++g4jTnAEPpNW1ArP4Rn0mlYBfYHvKh0039yX4grZZyI95+Dpq9AqeZHYXGKcg3bqUMTgb4AOU2ONdzD8ybRIdyXlvtxLWhPcvgGOPlwwj+7kgDRJQqc2PgXa/HJrTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D+XhEpOS; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5499614d3d2so2725941e87.3
-        for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 12:45:20 -0700 (PDT)
+	 To:Cc:Content-Type; b=At88FvkmvO6Sv+LiUP5Ys27Pv/DG1SrRZOStw77zaMCU1P6Ap0GpLe2RjLGR2FV4VkLqJZH9WzIf/R8OQfEugl6/kmP+t5i8RtJFlKxJmH1ZkPNx0wOIPKJk8h0e988cxBjR+KhySJrfST/xxYE986SlJyLU5c4PG5IEfbZIc6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mijS2O8e; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6fecfae554bso21382697b3.0;
+        Fri, 11 Apr 2025 13:03:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744400719; x=1745005519; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1744401791; x=1745006591; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kxYbMPJ9/3WWUWhZ50uH3rQ7QOEKEgqBV9xF/3bzbaw=;
-        b=D+XhEpOSTY2iRLZNvIyJdESthVk9ylxkqTJv7FokRICCYftCzTmK6xnJDojYwW89ji
-         2AFg7ifCj9Veb3HJw873OFYIKlcMfUwFcfLXsp2HXhuitNezaqLNBx9+23vmpUuXzJDF
-         ca90T4zKAs9ScilMaX8jACwZ2Mhsys399QeR8BUlMz18Lo2iclMaj0m6Lx72mjpYlKt0
-         IXgJRRcRWK+9UTF/5UNRWF9lWXl68EAgpiNrsN5uxI+dEGhs1HdEZ9zBFtlaKhEkzmcC
-         3nYCrj3X6NYHQ+cAsW5szj5GX+YQyRsmMSNEWT/iB29b9JyVms4Kg8IkxxE2Wd/7Up6f
-         I76g==
+        bh=WrzflKNEW7LUuZ1yEyggMY9woYQSBwBr8weVr3lx7mk=;
+        b=mijS2O8eklI0E9bAdujdkEAtPU4KA9Af70fRHoHRVuFvsLTxqskbuRPTYi4K/he55d
+         MPLY1NYhzzcaR2B6GHrzIKlFuAgkkI/aeCT6Od7tBL5GZvF0AJgyp3GlsTnUU5/ldaom
+         wVwAfyUoe6KpoN4EIl/JkeEPqjaz+lt16JUC5QmUPK73QtRJRSh3AlrDsPSSpd+xvPMT
+         gd+VePLSV0pdKuBGXs4hGkJoZw+Q3gUfD2jrs6asAV7HAfIwYgoRuiobLETJnv3M9kfj
+         a5oaoKA+8FTfacjfhSdnTr2U8Hu7EyGLGcY8qK7GfE6kOHTSbf/7hyaTX65c/nwBKAY+
+         o9Jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744400719; x=1745005519;
+        d=1e100.net; s=20230601; t=1744401791; x=1745006591;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kxYbMPJ9/3WWUWhZ50uH3rQ7QOEKEgqBV9xF/3bzbaw=;
-        b=P1Uu5xa7ld3Blb+kf9uHAUMSjwCDDafKC/DhpEErln6n0IHELa4ud6HmabxJUjh0f2
-         OxgrQd+uEsMe5CFwCWyx41voabqiYue9lY9L9ueQA8UkUK/VT3z/rOrIajh97hlwdL0a
-         jt6ZbhPzahZgKkNsr7Fl9GABPMjc5T+f2xFqtzUpcDSFrK5HJ2q9bifwlDzzNPiM9q3+
-         7Kvy0kB8VNPKjpTPjY57u+ht2iFDY6yIZPdYcAxUSpa6yHFvFNnp5OizlEGi2f9QrACQ
-         +hG6dDASW6PIZjiXArWbnishned/lLnEekH4oOQzUAzP7WyPjXlVMP8g7XOQ9/1Zh0eT
-         xuPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVdkL9BibNevklJKh1ZTxXKR03P0vH6QmviiLwbs6LJeYqrFHPqpujj8zupxz/tbUhmDFJXudU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywr/mJ+dvRGPmRU28X1v7Ty32n1YMe6SGwSJ3TMLjU4gIJ0YZss
-	TJAnKN/DD803aLKmpL8wcEceqAy4YzIMDxTZQuf74H2Be2GKqDiKqKyXQXWoAcxnKXNCIrS0Rqq
-	e0yOVd2EiANsnIAoZt++XK1ij5j53mml3CHaU
-X-Gm-Gg: ASbGncslwFTu2KT3Zlwu6ZOYDW5y44UqIrQEGp904VHaua4tLlA9DZ0qCLJ8CVkTB1w
-	PemCX0/mdpoYk4GPUWbwwNQ4FAZrwz/xkc6DxZYj8TwcSLSlcoC6q6D0h4K9SSnwJc/0bi3ccoO
-	49y2pmLJzzQfVUrA6zxHw3
-X-Google-Smtp-Source: AGHT+IFQGifPI7ndsGleSodbkGXAUKIZ07u6ZNQvsjF+hIGRNgR8glp2xAOBfn6+WWgANIaxwBpEYzIsWHLxnZAfzB4=
-X-Received: by 2002:a05:6512:1154:b0:549:55df:8af6 with SMTP id
- 2adb3069b0e04-54d452d543amr1362508e87.53.1744400718920; Fri, 11 Apr 2025
- 12:45:18 -0700 (PDT)
+        bh=WrzflKNEW7LUuZ1yEyggMY9woYQSBwBr8weVr3lx7mk=;
+        b=fzbae7GlqMHP75eG7zZ/LRDbpCXD/PYF97ePHPBkbFNen+wtYNlmpTB6o/PdYTqd4N
+         m3ongiBLheC6UfCVr1BZr4J9rMG/hrpwWHwl0cr/y/JTu0MTgNhASOGYQ1ZkyoeWCQBb
+         RKSowA4c4KFchOkRQozDRiPEzIwYGxPCkg9HWuA4I37JDux704rWF3WwrbH9bxAooZ5r
+         z9rtRcJcxh2E7slsrxDAp9XYElCf3CfVU36S0JpwkJ4P4vXatd3xWiZF6Er3n7Eor7Af
+         oqyMhVLWwpSSz9DFv9XSB63mw82MrYfCODhiX2+3eHN65GFU8Zs9H0FuFsaswvt4nk3d
+         2avg==
+X-Forwarded-Encrypted: i=1; AJvYcCUcwdY1AJXHFTBr76BKSegeZp9Jlo6BKovOwEEsXf9WMeWvrCaSCurAqygLNi8Nuu48+sUoo1zH@vger.kernel.org, AJvYcCUvKXglAV/rElfc5mlpo1abqJXiFkzzSQ21MueQqWbpSwa2EKhUfZBrdVizwc0dnJlRUwo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyay059ZwgF/yS1rrK9iGgjxqmvNSToyT2oLl0a8ZR2WrYOLfcN
+	yAucufto/SOfIR/qkSp0eeHtnp1GKF8pb02bhVAHvfTeg2xwlUjhlM6nyuPhgMEYgoXKAR96PZy
+	fSKg4cNuXdwWBWbf4AofZiEHX93hqXrS7
+X-Gm-Gg: ASbGnctmWKakAk/9LsOhwHeOztILevVhFCNl3p8L4duabF/QCrnS53bxxLICG4cJucr
+	+ed0qHUEqyaA2EQ38AOf5uMaCiSwX27fNdszJVAzNIecCVpkMj+hv+evCqm5M212trhkl7jZfIU
+	9FrHoTZfHb/UTLAPiypUL3NYnFsAI3fSeb
+X-Google-Smtp-Source: AGHT+IFtHpBdPLTlZy2DY8+8yKjBHjKkYtXcgK0E2nrEpBVZQw6DG/5H01WSLSQ7wROgGzTkYg2hhfzBlxF6Bi4C91U=
+X-Received: by 2002:a05:690c:640f:b0:702:46a3:4721 with SMTP id
+ 00721157ae682-705599cdeb9mr74513207b3.15.1744401791526; Fri, 11 Apr 2025
+ 13:03:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250407231746.2316518-1-sean.anderson@linux.dev>
- <20250407232249.2317158-1-sean.anderson@linux.dev> <174438283512.3232416.2867703266953952359.robh@kernel.org>
-In-Reply-To: <174438283512.3232416.2867703266953952359.robh@kernel.org>
-From: Saravana Kannan <saravanak@google.com>
-Date: Fri, 11 Apr 2025 12:44:42 -0700
-X-Gm-Features: ATxdqUFdZE_uhkHLsbxiOOiN0d_S9dmu-M7D17wvEEtC9Aa85-uCx9f3jAHFoIs
-Message-ID: <CAGETcx8FVb91mL-LYN2=7yJGMaVsadpe_WiMn=OkEjMEHdJU3g@mail.gmail.com>
-Subject: Re: [net-next PATCH v2 14/14] of: property: Add device link support
- for PCS
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Sean Anderson <sean.anderson@linux.dev>, devicetree@vger.kernel.org, 
-	Russell King <linux@armlinux.org.uk>, Paolo Abeni <pabeni@redhat.com>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, upstream@airoha.com, 
-	Kory Maincent <kory.maincent@bootlin.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Christian Marangi <ansuelsmth@gmail.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Rob Herring <robh+dt@kernel.org>
+References: <20250409214606.2000194-1-ameryhung@gmail.com> <20250409214606.2000194-4-ameryhung@gmail.com>
+ <CAP01T77ibGcEhwsyJb1WVaH-vhbZB_M2yVA8Uyv9b5fy=ErWQQ@mail.gmail.com>
+ <CAMB2axNqfBpneVc9unn7S65Ewb1u6EpLudjtiq00-sqbfnSY7w@mail.gmail.com>
+ <CAP01T76oTKg5H2nqd5ppyLhk1rNjPY0DcYVELmyZU+Du8izbbA@mail.gmail.com> <08811dd9-2449-42c9-8028-8a4dfec20afd@linux.dev>
+In-Reply-To: <08811dd9-2449-42c9-8028-8a4dfec20afd@linux.dev>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Fri, 11 Apr 2025 13:03:00 -0700
+X-Gm-Features: ATxdqUFH7t81tOD218wbwMclN6XIWa7IqFaLFAVSaaySjBg_kj2iSt5q7Oo6SM0
+Message-ID: <CAMB2axNeb-UzO8AOkdXPcqrwnw2J6vKVLSRVM_R+oN=SJEsx9g@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v7 03/10] bpf: net_sched: Add basic bpf qdisc kfuncs
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Kumar Kartikeya Dwivedi <memxor@gmail.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	alexei.starovoitov@gmail.com, andrii@kernel.org, daniel@iogearbox.net, 
+	edumazet@google.com, kuba@kernel.org, xiyou.wangcong@gmail.com, 
+	jhs@mojatatu.com, martin.lau@kernel.org, jiri@resnulli.us, 
+	stfomichev@gmail.com, toke@redhat.com, sinquersw@gmail.com, 
+	ekarani.silvestre@ccc.ufcg.edu.br, yangpeihao@sjtu.edu.cn, 
+	yepeilin.cs@gmail.com, kernel-team@meta.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 11, 2025 at 7:47=E2=80=AFAM Rob Herring (Arm) <robh@kernel.org>=
- wrote:
+On Fri, Apr 11, 2025 at 11:37=E2=80=AFAM Martin KaFai Lau <martin.lau@linux=
+.dev> wrote:
 >
+> On 4/11/25 10:08 AM, Kumar Kartikeya Dwivedi wrote:
+> > On Fri, 11 Apr 2025 at 18:59, Amery Hung <ameryhung@gmail.com> wrote:
+> >>
+> >> On Fri, Apr 11, 2025 at 6:32=E2=80=AFAM Kumar Kartikeya Dwivedi
+> >> <memxor@gmail.com> wrote:
+> >>>
+> >>> On Wed, 9 Apr 2025 at 23:46, Amery Hung <ameryhung@gmail.com> wrote:
+> >>>>
+> >>>> From: Amery Hung <amery.hung@bytedance.com>
+> >>>>
+> >>>> Add basic kfuncs for working on skb in qdisc.
+> >>>>
+> >>>> Both bpf_qdisc_skb_drop() and bpf_kfree_skb() can be used to release
+> >>>> a reference to an skb. However, bpf_qdisc_skb_drop() can only be cal=
+led
+> >>>> in .enqueue where a to_free skb list is available from kernel to def=
+er
+> >>>> the release. bpf_kfree_skb() should be used elsewhere. It is also us=
+ed
+> >>>> in bpf_obj_free_fields() when cleaning up skb in maps and collection=
+s.
+> >>>>
+> >>>> bpf_skb_get_hash() returns the flow hash of an skb, which can be use=
+d
+> >>>> to build flow-based queueing algorithms.
+> >>>>
+> >>>> Finally, allow users to create read-only dynptr via bpf_dynptr_from_=
+skb().
+> >>>>
+> >>>> Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+> >>>> Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> >>>> ---
+> >>>
+> >>> How do we prevent UAF when dynptr is accessed after bpf_kfree_skb?
+> >>>
+> >>
+> >> Good question...
+> >>
+> >> Maybe we can add a ref_obj_id field to bpf_reg_state->dynptr to track
+> >> the ref_obj_id of the object underlying a dynptr?
+> >>
+> >> Then, in release_reference(), in addition to finding ref_obj_id in
+> >> registers, verifier will also search stack slots and invalidate all
+> >> dynptrs with the ref_obj_id.
+> >>
+> >> Does this sound like a feasible solution?
+> >
+> > Yes, though I talked with Andrii and he has better ideas for doing
+> > this generically, but for now I think we can make this fix as a
+> > stopgap.
 >
-> On Mon, 07 Apr 2025 19:22:49 -0400, Sean Anderson wrote:
-> > This adds device link support for PCS devices, providing
-> > better probe ordering.
-> >
-> > Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
-> > ---
-> >
-> > Changes in v2:
-> > - Reorder pcs_handle to come before suffix props
-> >
-> >  drivers/of/property.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> >
+> In case the better fix will take longer, just want to mention that an opt=
+ion is
+> to remove the bpf_dynptr_from_skb() from bpf qdisc. I don't see an urgent=
+ need
+> for the bpf qdisc to be able to directly access the skb->data. btw, I don=
+'t
+> think bpf qdisc should write to the skb->data.
 >
-> Acked-by: Rob Herring (Arm) <robh@kernel.org>
+> The same goes for the bpf_kfree_skb(). I was thinking if it is useful at =
+all
+> considering there is already a bpf_qdisc_skb_drop(). I kept it there beca=
+use it
+> is a little more intuitive in case the .reset/.destroy wanted to do a "sk=
+b =3D
+> bpf_kptr_xchg(&skbn->skb, NULL);" and then explicitly free the
+> bpf_kfree_skb(skb). However, the bpf prog can also directly do the
+> bpf_obj_drop(skbn) and then bpf_kfree_skb() is not needed, right?
+>
 >
 
-Reviewed-by: Saravana Kannan <saravanak@google.com>
+My rationale for keeping two skb releasing kfuncs: bpf_kfree_skb() is
+the dtor and since dtor can only have one argument, so
+bpf_qdisc_skb_drop() can not replace it. Since bpf_kfree_skb() is here
+to stay, I allow users to call it directly for convenience. Only
+exposing bpf_qdisc_skb_drop() and calling kfree_skb() in
+bpf_qdisc_skb_drop() when to_free is NULL will also do. I don=E2=80=99t hav=
+e a
+strong opinion.
+
+Yes, bpf_kfree_skb() will not be needed if doing bpf_obj_drop(skbn).
+bpf_obj_drop() internally will call the dtor of a kptr (i.e., in this
+case, bpf_kfree_skb()) in an allocated object.
 
