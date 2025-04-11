@@ -1,124 +1,102 @@
-Return-Path: <netdev+bounces-181622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 283B5A85CBF
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 14:16:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 25F05A85D0B
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 14:27:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DAC78C4C61
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 12:13:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13B083ACA6D
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 12:22:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 211E42BF3FD;
-	Fri, 11 Apr 2025 12:11:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 732E5293479;
+	Fri, 11 Apr 2025 12:22:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="KJrmP+Jo"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LibqZGDO"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A111D2BF3DF;
-	Fri, 11 Apr 2025 12:11:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E4B238C29;
+	Fri, 11 Apr 2025 12:22:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744373479; cv=none; b=aij4CgPGVQkySSXi0TARSksd/JdqDE5Yp9+VYYZpoRubs0yAAPuf3CC82XoT0UdP5eghz78Yz2E60OP0ImnLzpQnmOmuRNX+1u9Fg/kWvYHZXNFaaVPfmHGEmcVmcjJW9NEgIXT1m3ikbahWAKqQQIMa3jwZwBBnyF9IBG4m8As=
+	t=1744374165; cv=none; b=AK60Fdr8syof8X6rWVZcm/H0PUA935Y8WAb+0P8TrhURq0bFx6Zu/6gS3uzrVOPj1sML7q9jC3u+ZmYL+mBjHSC5ZKO9jJFSNYDfdx4zjCwZfCgHmS6GLyrDrNF01tcDLphfcnMG+sSYRUPsLtkVA87jwAxA0ihvIB9S45AX/Xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744373479; c=relaxed/simple;
-	bh=yzF33gKvYRvTTNQyiHSKd1m6sCWnvqK2EfrNCow/rKs=;
+	s=arc-20240116; t=1744374165; c=relaxed/simple;
+	bh=equTgokpuZkQxYIZ9DBl3iW8zloSceBoyhSWlBB/p74=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qd0quCBjdTksYbOM4/cSfYqlDOUXoB26lEbWJC4dATODuQEN4SxlYFyI5Hq2f3J114ESvUEmVmaiCzF9tDqa/YjSc7V+NeC8dHVVd2J9Wf9gxAc8gxd0WrHBWyy6K/Z5DgMyVdWjyYi2S67dLcsdrtjorR/4wx5WGfKugD/9s0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=KJrmP+Jo; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=rNYHj+jMsjKcQ0NBqVY00CTxiyNat9iFuHkI3uiocOY=; b=KJrmP+JovP2P9xpa3JDZx/JtZP
-	JtWQwOoCQvVCPB4QGUr5YlNkKzL3r7Q5mOODeZKTr1+MR3Dhk7G+Paus7+haNrtDezlEwg0j3NSKd
-	YcQudvJbx9SMzW55WVSP0oT924FtLAFG5eyLkvjBQKf+Cie6VGV/D73o5BfqDN5fT+Pkc67908pAp
-	0KhKLNFsCx4PTo+fip5FDCjhK/MFYrHbEOofJZiTd3Gp0CMf4cuYeGZtr8rxgKVUBtzqY5m6NtZ8k
-	PYv2jHn1UBaDECx067z/Fi7ZPPXJ/bPK0S5bsXIhQsnWK6ENdII4+oKiiHi/5bVoTtEiKwGkKZXc7
-	1nPsgQIg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54684)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u3DDq-0003Js-0Q;
-	Fri, 11 Apr 2025 13:11:02 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u3DDh-0004bC-1Y;
-	Fri, 11 Apr 2025 13:10:53 +0100
-Date: Fri, 11 Apr 2025 13:10:53 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Frank Sae <Frank.Sae@motor-comm.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Parthiban.Veerasooran@microchip.com, linux-kernel@vger.kernel.org,
-	"andrew+netdev @ lunn . ch" <andrew+netdev@lunn.ch>, lee@trager.us,
-	horms@kernel.org, linux-doc@vger.kernel.org, corbet@lwn.net,
-	geert+renesas@glider.be, xiaogang.fan@motor-comm.com,
-	fei.zhang@motor-comm.com, hua.sun@motor-comm.com
-Subject: Re: [PATCH net-next v4 00/14] yt6801: Add Motorcomm yt6801 PCIe
- driver
-Message-ID: <Z_kGzeUfQB9qa2EN@shell.armlinux.org.uk>
-References: <20250408092835.3952-1-Frank.Sae@motor-comm.com>
- <Z_T6vv013jraCzSD@shell.armlinux.org.uk>
- <da434f13-fb08-4036-96ed-7de579cb9ddc@motor-comm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=MivX7pT9y8LtcaGu7GQ2hC9JA64mf529KFjCdtXT8I4h+6Q1DEqSD0MgcRNgkKr0ZWhO3UbTpY2nbBhShYX7m0idLf+4bR5OWievyKrQ0p7PMDRPfNwkFQmrfJn/EzhAmdeb9eLhJ0SolqDrAD0Q3qVvyb+zdj9kt27tjF9Ql24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LibqZGDO; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=/Dr1EVnQsm860pDgPjXDhoAUeaZ+4e/5Ai84hP8ZNJo=; b=LibqZGDO63LY/KDGsKMHpYwhI1
+	8qj0pjT7qLtKFPMzyk6FfS2pFGGSy7pdktoMh2SdcmKA6lWeUJvHWGfAjyN7cj3ME8mdnPKRARFJt
+	5k5YrzCsJ/fM/2vC+eb5oqrF4EvpQn/G7X8wgtYpqbpYq9i0xsm6NO9D9dXSa9t1KuKE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u3DOm-008nts-Va; Fri, 11 Apr 2025 14:22:20 +0200
+Date: Fri, 11 Apr 2025 14:22:20 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Zilin Guan <zilin@seu.edu.cn>
+Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn
+Subject: Re: [RFC PATCH] net/smc: Consider using kfree_sensitive() to free
+ cpu_addr
+Message-ID: <19237943-5a2d-4930-9aa5-6419819ff51c@lunn.ch>
+References: <20250411044456.1661380-1-zilin@seu.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <da434f13-fb08-4036-96ed-7de579cb9ddc@motor-comm.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250411044456.1661380-1-zilin@seu.edu.cn>
 
-On Fri, Apr 11, 2025 at 05:50:55PM +0800, Frank Sae wrote:
+On Fri, Apr 11, 2025 at 04:44:56AM +0000, Zilin Guan wrote:
+> Hello,
 > 
+> In smcr_buf_unuse() and smc_buf_unuse(), memzero_explicit() is used to
+> clear cpu_addr when it is no longer in use, suggesting that cpu_addr
+> may contain sensitive information.
 > 
-> On 2025/4/8 18:30, Russell King (Oracle) wrote:
-> > On Tue, Apr 08, 2025 at 05:28:21PM +0800, Frank Sae wrote:
-> >> This series includes adding Motorcomm YT6801 Gigabit ethernet driver
-> >>  and adding yt6801 ethernet driver entry in MAINTAINERS file.
-> >> YT6801 integrates a YT8531S phy.
-> > 
-> > What is different between this and the Designware GMAC4 core supported
-> > by drivers/net/ethernet/stmicro/stmmac/ ?
-> > 
-> 
-> We support more features: NS, RSS, wpi, wol pattern and aspm control.
+> To ensure proper handling of this sensitive memory, I propose using
+> kfree_sensitive()/kvfree_sensitive instead of kfree()/vfree() to free
+> cpu_addr in both smcd_buf_free() and smc_buf_free(). This change aims
+> to prevent potential sensitive data leaks.
 
-Is it not possible to add those features?
+There is another possible meaning:
 
-> > Looking at the register layout, it looks very similar. The layout of the
-> > MAC control register looks similar. The RX queue and PMT registers are
-> > at the same relative offset. The MDIO registers as well.
-> > 
-> > Can you re-use the stmmac driver?
-> > 
-> 
-> I can not re-use the stmmac driver, because pcie and ephy can not work well on
-> the stmmac driver.
+			memzero_explicit(conn->sndbuf_desc->cpu_addr, bufsize);
+			WRITE_ONCE(conn->sndbuf_desc->used, 0);
 
-Doesn't the stmmac driver support PCIe already (e.g. for Intel
-platforms?) Can't it be fixed?
+The WRITE_ONCE() probably tells the hardware the buffer is ready for
+it. In order to ensure they memzero has completed and that the
+compiler does not reorder the instructions you need a memory barrier:
 
-We shouldn't be duplicating what we already have, but fixing it if
-there are problems.
+static inline void memzero_explicit(void *s, size_t count)
+{
+	memset(s, 0, count);
+	barrier_data(s);
+}
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+So it could be using memzero_explicit() just for the barrier_data().
+
+Please spend some time to analyze this code, look at the git history
+etc, see if there are any clues as to why memzero_explicit is used, or
+if there is any indication of sensitive information.
+
+	Andrew
 
