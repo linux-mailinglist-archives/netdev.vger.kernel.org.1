@@ -1,142 +1,260 @@
-Return-Path: <netdev+bounces-181627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B0F8A85D61
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 14:42:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA6FDA85DA6
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 14:50:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 196471BA7BEB
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 12:41:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF9589C1200
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 12:45:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03B3A221FC7;
-	Fri, 11 Apr 2025 12:37:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73A052367A5;
+	Fri, 11 Apr 2025 12:44:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iycIUIfY"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="YnvjuG45"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D32E3221FBF
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 12:36:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667B22367A2;
+	Fri, 11 Apr 2025 12:44:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744375019; cv=none; b=XJ2M7c0v0sZ5FK6S/MuFuZcoffc2GYipyt1myTzaKpNRsjZfRKfF3QjXDVMsyrsiw0X7m3MWhM3Oggp77hJjr3TW0uRFCIyLTS8f5PWMkdquq5mPBA/odAcsYSUhorXjQGwfdtjq+V4uhfH0lP+Bci4bHSxNg0wf7vG7hg13Eq0=
+	t=1744375470; cv=none; b=BITIjBIaI0m3wlln3/xwpWvLRoE7ydL0ed6SmsTUrshAs90N40TE+uF17iVv5T3XfiFULs+hE5lgRc3KbtSgcvW5EW36IosI0coq8luvRSJuZzlMHSFOOcudwgaYdnt5ZDVvpOAbDKLZUyP4oOhEkqZS00ErFTaqO0H+/1wKOxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744375019; c=relaxed/simple;
-	bh=KnsVY9sZXhd6B4Lr+cWrYHT+qQpOxeZV9n2BSY5yzQE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DUvVjEDosU/vGx0zrd4GpN5am69El+xSQkBAvyo1KkY9CFypbzNYKU34wNCIUptrDXDScLvCDpGdok/SaNaldlU16Y9YVwPa2mAmr3+hsov+v30Pyi/VwmDGCjjjaYIzmmO9ix1rHBArNUeXIvq+DltQQCK7GcGIeVyDzU9U/IE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iycIUIfY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9B48C4CEE8;
-	Fri, 11 Apr 2025 12:36:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744375019;
-	bh=KnsVY9sZXhd6B4Lr+cWrYHT+qQpOxeZV9n2BSY5yzQE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iycIUIfYtY9JOui2TvKnm6XF4OcI453O76KcvoWb2Thw2frzIIcjny4BhaYrz6mEK
-	 pOjJrJiMcLawF/jbWBiZyge2n0mKsp0sqfNbzGUXJBJvEyBK8WJkQx3sDsJh5L9M3q
-	 Va187xejr4Xnexl3e3chSx9dfoR/WEa/IAKXqFRxqF8in6+tJjv9uisiOwX2frS7cQ
-	 5ZVpc10qZ/gPRsVtm9Jjx878OKmQFReYfe/ZidBHuOADFtVG52wR0GwqHkPSO9c/nn
-	 2n3Kc1UkaHP74dEMETl5+TgqO3FnI+6KXTYHU84OY7DtaT7WcforsJ8LQXLcbQ7sL/
-	 UXevDsg78v4uQ==
-Date: Fri, 11 Apr 2025 13:36:55 +0100
-From: Simon Horman <horms@kernel.org>
-To: Karol Kolacinski <karol.kolacinski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Milena Olech <milena.olech@intel.com>
-Subject: Re: [PATCH v2 iwl-next 02/10] ice: rename TSPLL and CGU functions
- and definitions
-Message-ID: <20250411123655.GC395307@horms.kernel.org>
-References: <20250409122830.1977644-12-karol.kolacinski@intel.com>
- <20250409122830.1977644-14-karol.kolacinski@intel.com>
+	s=arc-20240116; t=1744375470; c=relaxed/simple;
+	bh=AXcAHh4A99ApfSw7e1FE0t9CbPKh5z2rMgIkiKLkgjQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=TaDyl1yRe/ku5iDuSjyEKjfCLGIAV6A2Uy0KXqPSpDdTNADPUVgcqGruwnmPgMFrIuimIJ5QcG95Im915ud0qBzLZAcBsEsfy8jCR0dmlEWqEyNZd+tfMKUop/htUur2LQAPCVKBfaSKofFbWgQoCaYeRmPNCZHSM6tRxb+j7YY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=YnvjuG45; arc=none smtp.client-ip=80.241.56.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4ZYxG02S0Mz9snx;
+	Fri, 11 Apr 2025 14:44:24 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1744375464; h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Du4qqvATMM8DpLvGgTuHF9F5VvpdjpJA6n9DJyaGPRs=;
+	b=YnvjuG45lTJrdSA3FlIcRfV0ksiDBOXoKjJN0mjnLaQUNzPuBAjcFfot2/hiu3vR8zsgTe
+	ZWsGvPf36O008LxYT3JtfR5ONeTc3yK+XD4fYXqo0kE0CGZIl0vvL4vN3MTQEvEZV4fObB
+	NM+Q6dSFX5aiVEQQ8M5KQfRn+9g/dMezD+Kx+ChA7HJgHBc3W6ISY7hyPbR98IOCjjjYZ0
+	Qmv+6lcQBHKVPlTf8W2iIwg7d7axNo0Ynk8HBrj6EgRF8OXZ3MWUCdCR3X33XgG02Ggiz5
+	wj23pZUS5kKeHJ9842CTJVfibOv40lTZ8Ca8AiW4oBZ4gCow7hBqCqK4Fz6TRw==
+Message-ID: <aca00cb25b813da4fd2f215829f02337f05642f3.camel@mailbox.org>
+Subject: Re: [PATCH 1/3] drm/nouveau: Prevent signaled fences in pending list
+From: Philipp Stanner <phasta@mailbox.org>
+Reply-To: phasta@kernel.org
+To: Christian =?ISO-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>, 
+	phasta@kernel.org, Lyude Paul <lyude@redhat.com>, Danilo Krummrich
+	 <dakr@kernel.org>, David Airlie <airlied@gmail.com>, Simona Vetter
+	 <simona@ffwll.ch>, Sabrina Dubroca <sd@queasysnail.net>, Sumit Semwal
+	 <sumit.semwal@linaro.org>
+Cc: dri-devel@lists.freedesktop.org, nouveau@lists.freedesktop.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org, 
+	stable@vger.kernel.org
+Date: Fri, 11 Apr 2025 14:44:18 +0200
+In-Reply-To: <81a70ba6-94b1-4bb3-a0b2-9e8890f90b33@amd.com>
+References: <20250410092418.135258-2-phasta@kernel.org>
+	 <20250410092418.135258-3-phasta@kernel.org>
+	 <8583665a-6886-4245-be49-fd8839cfe212@amd.com>
+	 <c737c89c7ce9174e349c61ab4e5712eee8946f13.camel@mailbox.org>
+	 <50c9530d-e274-4f89-8620-16afe0981239@amd.com>
+	 <1a73e5fe4350d6ee4b7d807612264eb637c4f2a9.camel@mailbox.org>
+	 <d3dee321cd6b70d6ca98768fbcf6f1e6134c43a1.camel@mailbox.org>
+	 <81a70ba6-94b1-4bb3-a0b2-9e8890f90b33@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250409122830.1977644-14-karol.kolacinski@intel.com>
+X-MBO-RS-META: i96m4o7hgfmzjg76chu9n7jme4bognqy
+X-MBO-RS-ID: f5ad7dea73dd44f5d10
 
-On Wed, Apr 09, 2025 at 02:24:59PM +0200, Karol Kolacinski wrote:
-> Rename TSPLL and CGU functions, definitions etc. to match the file name
-> and have consistent naming scheme.
-> 
-> Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
-> Reviewed-by: Milena Olech <milena.olech@intel.com>
-> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+On Fri, 2025-04-11 at 13:05 +0200, Christian K=C3=B6nig wrote:
+> =C2=A0Am 11.04.25 um 11:29 schrieb Philipp Stanner:
+> =C2=A0
+> > [SNIP]
+> > =C2=A0
+> > It could be, however, that at the same moment
+> > nouveau_fence_signal() is
+> > removing that entry, holding the appropriate lock.
+> >=20
+> > So we have a race. Again.
+> > =C2=A0
+> =C2=A0
+> =C2=A0Ah, yes of course. If signaled is called with or without the lock i=
+s
+> actually undetermined.
+> =C2=A0
+> =C2=A0
+> > =C2=A0
+> > You see, fixing things in Nouveau is difficult :)
+> > It gets more difficult if you want to clean it up "properly", so it
+> > conforms to rules such as those from dma_fence.
+> >=20
+> > I have now provided two fixes that both work, but you are not
+> > satisfied
+> > with from the dma_fence-maintainer's perspective. I understand
+> > that,
+> > but please also understand that it's actually not my primary task
+> > to
+> > work on Nouveau. I just have to fix this bug to move on with my
+> > scheduler work.
+> > =C2=A0
+> =C2=A0
+> =C2=A0Well I'm happy with whatever solution as long as it works, but as
+> far as I can see the approach with the callback simply doesn't.
+> =C2=A0
+> =C2=A0You just can't drop the fence reference for the list from the
+> callback.
+> =C2=A0
+> =C2=A0
+> > =C2=A0
+> > So if you have another idea, feel free to share it. But I'd like to
+> > know how we can go on here.
+> > =C2=A0
+> =C2=A0
+> =C2=A0Well the fence code actually works, doesn't it? The problem is
+> rather that setting the error throws a warning because it doesn't
+> expect signaled fences on the pending list.
+> =C2=A0
+> =C2=A0Maybe we should fix that instead.
 
-...
+The fence code works as the author intended, but I would be happy if it
+were more explicitly documented.
 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_tspll.h b/drivers/net/ethernet/intel/ice/ice_tspll.h
-> index 181ca24a2739..0e28e97e09be 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_tspll.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_tspll.h
-> @@ -2,16 +2,16 @@
->  #define _ICE_TSPLL_H_
->  
->  /**
-> - * struct ice_cgu_pll_params_e82x - E82X CGU parameters
-> + * struct ice_tspll_params_e82x
+Regarding the WARN_ON: It occurs in dma_fence_set_error() because there
+is an attempt to set an error code on a signaled fence. I don't think
+that should be "fixed", it works as intended: You must not set an error
+code of a fence that was already signaled.
 
-nit: tooling expects a short description here.
+The reason seems to be that once a fence is signaled, a third party
+might evaluate the error code.
 
-Flagged by ./scripts/kernel-doc -none
+But I think this wasn't wat you meant with "fix".
 
->   * @refclk_pre_div: Reference clock pre-divisor
->   * @feedback_div: Feedback divisor
->   * @frac_n_div: Fractional divisor
->   * @post_pll_div: Post PLL divisor
->   *
->   * Clock Generation Unit parameters used to program the PLL based on the
-> - * selected TIME_REF frequency.
-> + * selected TIME_REF/TCXO frequency.
->   */
-> -struct ice_cgu_pll_params_e82x {
-> +struct ice_tspll_params_e82x {
->  	u32 refclk_pre_div;
->  	u32 feedback_div;
->  	u32 frac_n_div;
-> @@ -19,25 +19,25 @@ struct ice_cgu_pll_params_e82x {
->  };
->  
->  /**
-> - * struct ice_cgu_pll_params_e825c - E825C CGU parameters
-> - * @tspll_ck_refclkfreq: tspll_ck_refclkfreq selection
-> - * @tspll_ndivratio: ndiv ratio that goes directly to the pll
-> - * @tspll_fbdiv_intgr: TS PLL integer feedback divide
-> - * @tspll_fbdiv_frac:  TS PLL fractional feedback divide
-> - * @ref1588_ck_div: clock divider for tspll ref
-> + * struct ice_tspll_params_e825c
+In any case, there must not be signaled fences in nouveau's pending-
+list. They must be removed immediately once they signal, and this must
+not race.
 
-Ditto.
+> =C2=A0
+> =C2=A0
+> > =C2=A0
+> > I'm running out of ideas. What I'm wondering if we couldn't just
+> > remove
+> > performance hacky fastpath functions such as
+> > nouveau_fence_is_signaled() completely. It seems redundant to me.
+> > =C2=A0
+> =C2=A0
+> =C2=A0That would work for me as well.
 
-> + * @ck_refclkfreq: ck_refclkfreq selection
-> + * @ndivratio: ndiv ratio that goes directly to the PLL
-> + * @fbdiv_intgr: TSPLL integer feedback divisor
-> + * @fbdiv_frac: TSPLL fractional feedback divisor
-> + * @ref1588_ck_div: clock divisor for tspll ref
->   *
->   * Clock Generation Unit parameters used to program the PLL based on the
->   * selected TIME_REF/TCXO frequency.
->   */
-> -struct ice_cgu_pll_params_e825c {
-> -	u32 tspll_ck_refclkfreq;
-> -	u32 tspll_ndivratio;
-> -	u32 tspll_fbdiv_intgr;
-> -	u32 tspll_fbdiv_frac;
-> +struct ice_tspll_params_e825c {
-> +	u32 ck_refclkfreq;
-> +	u32 ndivratio;
-> +	u32 fbdiv_intgr;
-> +	u32 fbdiv_frac;
->  	u32 ref1588_ck_div;
->  };
+I'll test this approach. Seems a bit like the nuclear approach, but if
+it works we'd at least clean up a lot of this mess.
 
-...
+
+P.
+
+
+> =C2=A0
+> =C2=A0
+> > =C2=A0
+> >=20
+> > Or we might add locking to it, but IDK what was achieved with RCU
+> > here.
+> > In any case it's definitely bad that Nouveau has so many redundant
+> > and
+> > half-redundant mechanisms.
+> > =C2=A0
+> =C2=A0
+> =C2=A0Yeah, agree messing with the locks even more won't help us here.
+> =C2=A0
+> =C2=A0Regards,
+> =C2=A0Christian.
+> =C2=A0
+> =C2=A0
+> > =C2=A0
+> >=20
+> >=20
+> > P.
+> >=20
+> > =C2=A0
+> > > =C2=A0
+> > >=20
+> > > P.
+> > >=20
+> > > =C2=A0
+> > > > =C2=A0
+> > > > Regards,
+> > > > Christian.
+> > > >=20
+> > > > =C2=A0
+> > > > > =C2=A0
+> > > > > P.
+> > > > >=20
+> > > > >=20
+> > > > >=20
+> > > > > =C2=A0
+> > > > > > =C2=A0
+> > > > > > Regards,
+> > > > > > Christian.
+> > > > > >=20
+> > > > > > =C2=A0
+> > > > > > > =C2=A0
+> > > > > > > Replace the call to dma_fence_is_signaled() with
+> > > > > > > nouveau_fence_base_is_signaled().
+> > > > > > >=20
+> > > > > > > Cc: <stable@vger.kernel.org> # 4.10+, precise commit not
+> > > > > > > to
+> > > > > > > be
+> > > > > > > determined
+> > > > > > > Signed-off-by: Philipp Stanner <phasta@kernel.org>
+> > > > > > > ---
+> > > > > > > =C2=A0drivers/gpu/drm/nouveau/nouveau_fence.c | 2 +-
+> > > > > > > =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
+> > > > > > >=20
+> > > > > > > diff --git a/drivers/gpu/drm/nouveau/nouveau_fence.c
+> > > > > > > b/drivers/gpu/drm/nouveau/nouveau_fence.c
+> > > > > > > index 7cc84472cece..33535987d8ed 100644
+> > > > > > > --- a/drivers/gpu/drm/nouveau/nouveau_fence.c
+> > > > > > > +++ b/drivers/gpu/drm/nouveau/nouveau_fence.c
+> > > > > > > @@ -274,7 +274,7 @@ nouveau_fence_done(struct
+> > > > > > > nouveau_fence
+> > > > > > > *fence)
+> > > > > > > =C2=A0			nvif_event_block(&fctx->event);
+> > > > > > > =C2=A0		spin_unlock_irqrestore(&fctx->lock,
+> > > > > > > flags);
+> > > > > > > =C2=A0	}
+> > > > > > > -	return dma_fence_is_signaled(&fence->base);
+> > > > > > > +	return test_bit(DMA_FENCE_FLAG_SIGNALED_BIT,
+> > > > > > > &fence-
+> > > > > > > =C2=A0
+> > > > > > > > =C2=A0
+> > > > > > > > base.flags);
+> > > > > > > > =C2=A0
+> > > > > > > =C2=A0
+> > > > > > > =C2=A0}
+> > > > > > > =C2=A0
+> > > > > > > =C2=A0static long
+> > > > > > > =C2=A0
+> > > > > > =C2=A0
+> > > > > =C2=A0
+> > > > =C2=A0
+> > > =C2=A0=C2=A0
+> > =C2=A0=C2=A0
+> =C2=A0
+> =C2=A0
+
 
