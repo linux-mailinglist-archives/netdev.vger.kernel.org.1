@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-181483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F27FAA85208
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 05:30:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27301A85209
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 05:30:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 406058C3F97
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 03:29:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 817C819E81DE
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 03:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2180427CB01;
-	Fri, 11 Apr 2025 03:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BDDC27CB13;
+	Fri, 11 Apr 2025 03:30:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="leQue0dp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q0PM1ryl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20FA27C87B
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 03:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F4927CB0F
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 03:30:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744342200; cv=none; b=NavPuaQsw09LE6hRuKpMEg/PZxmHwiseNWUYQmBv97UJOZnGs4a+wSGJe5pu6uEmkeVmrRluKSUIUmsKFPDQio3pnX74hDyuYd2eoXQYUHjmNslTPiogresb4QtWRghqznB/O2pencck88rGS9KTLaKvslavuSlAGBBY8WLdQww=
+	t=1744342201; cv=none; b=Y0NAjEHUGe1bt6NoDAWsNZ54zVHrsKefRDxt9jhCCK7e5HGxvCC2UUoyMT1a0YqabPBnTK2mUifw+AP7F9O+AOVAr34IL/qOWQXSiJyGv5vGZ/vKRLWzeiucjnZrLgzBCfcwFttuDOaNFekT/MKV60CyNziF9HXAXtDmmConcss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744342200; c=relaxed/simple;
-	bh=mUL2z/EIZiZq8JKPIuXjz9JurKt+uudGsHYKwpnvE4k=;
+	s=arc-20240116; t=1744342201; c=relaxed/simple;
+	bh=lz6Hj6kg0WUb4jkDyBhkQ/SB+4L0KFrtG9B1MacIlUs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GJz0ik1HdMmvLggSjEbx0kDIvkWpyyQcGQdsTPAmZB3zNWqFtg1JIZKUqzqmUwwTUPgR5L3jZkhz3KiKK1F9IF5/f0941h0AgYNPa4XSFh1W/aUVdLMNlbTh79MY9PeuOxjwlvbAXQCk9pD1U1E06jY7XH71r6DsVqhHrRxgCsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=leQue0dp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62019C4CEE5;
-	Fri, 11 Apr 2025 03:29:59 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=lF5mX03/W1H6F2xYInol0fk5Gl8QMCgnksgRi47fPyirrBia2mDSdP78CQpe+UeJGt5mU0TNRPfkF+/BZqJhKWNat47/gzKY2/b817V9nIkbyLnzM+1RHrIvOPRAKWn/EqTnzM/T18wyS7nPCAoOYn5MOMEj1uVHOM5FObwLJqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q0PM1ryl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E510CC4CEE2;
+	Fri, 11 Apr 2025 03:30:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744342199;
-	bh=mUL2z/EIZiZq8JKPIuXjz9JurKt+uudGsHYKwpnvE4k=;
+	s=k20201202; t=1744342201;
+	bh=lz6Hj6kg0WUb4jkDyBhkQ/SB+4L0KFrtG9B1MacIlUs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=leQue0dpBjoaL+5MaWRmaAShuNkkk1QSHsKwcCzpdA+kuMmC62AQUT9l4iyaMGOuM
-	 +StM8982nXMNGB3G8gkJUmLxfDn4T2EJiYtjUbtLRGjOnW21NlCRCDgdvadmO065qU
-	 42IEuTeq2ZSkRX/yhxFAUYZOnPc0ffrQqyLifCxEvI6okdq7ILzgPyo5SUpB7GvVTL
-	 A2nABpSwBpsmhNIqzwLQojsfz7WWrCYYoW/5KP8olQ/FNUi9X/ph9vLmaLSlrOMWbI
-	 jmSt+7hRFtn2OqBQCCPGgbB6OnRTBuiTDjbiwJUmzzRqvABU+N/bMaPjcgsXi1xndB
-	 0jP6LEafu1Ghg==
+	b=Q0PM1rylgXpirbF8rJdqVi/ldQrgMfNZTTKtyUe3WbYplPO+j26zG5ZgU/i7+Dh+4
+	 K86jdyrJQZe88LQ7C1J4v1SmAIhsDbJn2tL5ZLmIUly2/dm4iDE+IRSYXzNKjbbiuU
+	 JfwWQ9jgYuTbOhoNbAw6/qXPhI0KMoeS3rG4uY8bGyDrnQCgKpmO8wb6DnmH3TKmqV
+	 JUJdL1LEYr2KnLlVOAXmpTT7IiWYguT5CPpOB182BWZrM8yA8RiC6oI7n/h0O+VI3E
+	 yKyBarRotq1jbXKIu3YL7mTVgpcxjyeON4dWSf44BExUTNP2xV15QD381CQSC7yqYz
+	 nJN/WD/nVZcKA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B86380CEF4;
-	Fri, 11 Apr 2025 03:30:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AF221380CEF4;
+	Fri, 11 Apr 2025 03:30:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] ipv4: remove unnecessary judgment in
- ip_route_output_key_hash_rcu
+Subject: Re: [PATCH net-next] r8169: add helper rtl_csi_mod for accessing extended
+ config space
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174434223675.3945310.4555224487531250688.git-patchwork-notify@kernel.org>
-Date: Fri, 11 Apr 2025 03:30:36 +0000
-References: <20250409033321.108244-1-shaozhengchao@163.com>
-In-Reply-To: <20250409033321.108244-1-shaozhengchao@163.com>
-To: shaozhengchao <shaozhengchao@163.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
+ <174434223826.3945310.15387011074147423969.git-patchwork-notify@kernel.org>
+Date: Fri, 11 Apr 2025 03:30:38 +0000
+References: <b368fd91-57d7-4cb5-9342-98b4d8fe9aea@gmail.com>
+In-Reply-To: <b368fd91-57d7-4cb5-9342-98b4d8fe9aea@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: nic_swsd@realtek.com, andrew+netdev@lunn.ch, pabeni@redhat.com,
+ kuba@kernel.org, davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+ netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  9 Apr 2025 11:33:21 +0800 you wrote:
-> From: Zhengchao Shao <shaozhengchao@163.com>
+On Wed, 9 Apr 2025 21:05:37 +0200 you wrote:
+> Add a helper for the Realtek-specific mechanism for accessing extended
+> config space if native access isn't possible.
+> This avoids code duplication.
 > 
-> In the ip_route_output_key_cash_rcu function, the input fl4 member saddr is
-> first checked to be non-zero before entering multicast, broadcast and
-> arbitrary IP address checks. However, the fact that the IP address is not
-> 0 has already ruled out the possibility of any address, so remove
-> unnecessary judgment.
-> 
-> [...]
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+>  drivers/net/ethernet/realtek/r8169_main.c | 26 ++++++++++++++---------
+>  1 file changed, 16 insertions(+), 10 deletions(-)
 
 Here is the summary with links:
-  - [net-next] ipv4: remove unnecessary judgment in ip_route_output_key_hash_rcu
-    https://git.kernel.org/netdev/net-next/c/3b4f78f9ad29
+  - [net-next] r8169: add helper rtl_csi_mod for accessing extended config space
+    https://git.kernel.org/netdev/net-next/c/8c40d99e5f43
 
 You are awesome, thank you!
 -- 
