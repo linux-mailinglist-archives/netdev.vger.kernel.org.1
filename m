@@ -1,119 +1,110 @@
-Return-Path: <netdev+bounces-181645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1F08A85F12
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 15:34:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22173A85F38
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 15:39:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E1F767AE801
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 13:32:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2FB63B3A6D
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 13:34:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 661821DF98D;
-	Fri, 11 Apr 2025 13:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AD531F7098;
+	Fri, 11 Apr 2025 13:32:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xx+P+TWN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lX5sPk/E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f67.google.com (mail-ej1-f67.google.com [209.85.218.67])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9415618A93F;
-	Fri, 11 Apr 2025 13:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 428F81F76C2;
+	Fri, 11 Apr 2025 13:32:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744378360; cv=none; b=kQsMqgNOJRtOpdmeK0AgiZ7yx6lSPVxnpfPKAT8INPyiwq0yoLewFL7I7QEl9REsBHN7QoU7dKRj0AycqKsT6KmKHGhWe8rNKEUpoFlpKXDT5+LyLXZYi7qgGqCBSkrI3XHAxesh38CnQyUHuX/XgVZCGW51Xo9Oug92sxZP9eg=
+	t=1744378367; cv=none; b=CuhGj2gQDG259JNo9FxGf/tLPOooQ9AtQDXIEJBsFBcam5/3uaHzMLXVMtY67vjOy+3gAL4fsUwrV9qH6r+TfqpTIPGLniklTmycM2AW2qNYn9rRCL/nfZAFmXKhT3bRhWFbaHn05FIk/T08trAq7ykXn9DiqtgeGwCRHDMac2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744378360; c=relaxed/simple;
-	bh=6auAeTvEbGMRITZyY4M5w7DUVgwBUd9Oo/zM3cb3fiM=;
+	s=arc-20240116; t=1744378367; c=relaxed/simple;
+	bh=T8OPPQ63sB53cKU/lE9eCiUIlHMKwl45r6Cu0slEsfM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f/c7B65ljYZTBDLFDBe9NJf9+VW9w0qmNvbIo6J8UVyjuwW/oG1ny38kq73rycgg9hHqOXvTfnNbwFu2z+MVPps4Gtdmb/XCpIizAZMFa5vWObBJXWzmcTuzwQSyApA84shpXCZuAH7FTvuwpBlc4oIHRW59gUC16OTX1u7MAvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xx+P+TWN; arc=none smtp.client-ip=209.85.218.67
+	 To:Cc:Content-Type; b=gUndhmBl2Q51j+OaQTHmWGbNLGxZ06/Wpfdj8HunOfCRhjWkwxD7lrhNJ4wH5i0rSwJNpIIwp67EkJt6ZFVt8BBNyJ4SWkuEkL9R/VIK/Bsuqhl9xI1+4t+Bxx9+TTcUg74GWXWkN+cpZ7si8iA30TlCyyvP2JcnTiluMcfQyn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lX5sPk/E; arc=none smtp.client-ip=209.85.167.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f67.google.com with SMTP id a640c23a62f3a-ac2963dc379so325173366b.2;
-        Fri, 11 Apr 2025 06:32:38 -0700 (PDT)
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-54998f865b8so1952194e87.3;
+        Fri, 11 Apr 2025 06:32:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744378357; x=1744983157; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1744378363; x=1744983163; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0GlathsTjceQi/t2GjCVPqqGTc//79C9q6C7CdCvnNE=;
-        b=Xx+P+TWNMQnpKK4OYe94JVYWP+eDL3Wepho2zznRqhcUeFD2QXH4SSKccevu9U3nuI
-         tBRJJpeUvcH9Jig9P4P44WRNFvRqQs8yQsazM1A8mVIUur4ny8G/HBU5+dtHyQz8jbcr
-         GiJbRSxOko4JHdl65yZzi7Io9VfGsaPoq69GyycTAb3wFYkGk2TntEPUOUagEim6GesL
-         buQAc3hBB/XIPLwCcscv1qEZNjtb62K43wxIqgPMKP9yhF2bWJVQj8AthsSICOsr18ck
-         h+uWWBj8Y3PXXEJNEkMzkfTqptzwUK1pmpxR/btl+9DTpwnTGumftepEMC2T9mAYlWzo
-         wmFQ==
+        bh=3HdsNeALPBRl7TJQey6t9d/l1PV0RD8jB7VsA4lZuNc=;
+        b=lX5sPk/E/Aymyu8BjoWPougN+pmHA03vEVvFH0ErnDHVTbOJgSolBIMfJKrfA3nHpz
+         MSS7R6ALlRZTWOrW1o6xfJygeNvLurkwrOXI9Oi7CrI0QnWx80T/Tx0HLNhGS5s4NxcW
+         2xKnkkvBvhQdEbW8ySZUqfe5HGlQsnLtEVe+9NxdJBgKBbIU/SSs2O6kOPph4lNMnR4i
+         NYfzYRcNhipRTA9YUJzggLjQITLnod1OcYKzXyUXfhCrNagZHsYSN48dQu5pe2zZ27wE
+         nKB4Mso2ZpN0pNfr3Lxs8PaFF9NFXRPTtcLAEaPde6iPa0gzyr/XTsY5VUwAku2+hY1H
+         /awA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744378357; x=1744983157;
+        d=1e100.net; s=20230601; t=1744378363; x=1744983163;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0GlathsTjceQi/t2GjCVPqqGTc//79C9q6C7CdCvnNE=;
-        b=TGO8BhbJxhG1nPd/9AqhijHboiKAZ8Rlvb5weXRGyEdbVm2uatrq+3JiAARq2djZ/T
-         3Tu3qEqc5vuI9NDByA6lBose33QU6K+Td+Qo71bi/mbOG1LjBSDYlQwjNTBY7hgkf1SP
-         Vgu3GZf8LEs0folSphMqzL5xa+LHODycPihgUAHqnFnndq2E4gUjcGGk7q1jdrbZGLS3
-         9DNrzlrRGMWoJcqZhzg2AqcidEbQbwN8dS5VQgs5zxTBO1WGnFM2eI166Pw5/1A4b07L
-         gOw6srpYuNLh7A5WhnSNyEQJgEWKp+/B4Kk05i366Bj/044Mqccg1JrtwzhoZbCHAfNN
-         VJlg==
-X-Forwarded-Encrypted: i=1; AJvYcCVLcrXLLa7HABPb1SIw7umybQPMVlwOIUJs/gsvgYIvwAbVaac7xQgDXeeNSCpE1q1ajFnVg7M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWA98PEuAQmGUKhzYyLJIdwZHMsEQBvZACgzv0MGphM3VxkAVU
-	sbQeNZOw7NbG2ucRJMT5E0dwm/d4VzPOxqqNyR9n1MpZI9WTTnbMyrWnS7d6GReku07FK51SRrK
-	wqxNWyVBoZJm7/ZhObMY2uH0PDTo=
-X-Gm-Gg: ASbGncs1ydLcn26tDd8arkb2qZEy4VKDzUmLczNS26zCiodNBdTBsfq5lvzguQ8KvF0
-	8MtojtVQ/+j2Mm9F5seAF53RN+V+5w+Ui4csdyqh8liiRbtT6syuvi5YbY44C1yadFtAdSnys3/
-	e8hxzF1+MUbNcI19B6k9LGL0pv3198TKQzsufzleaQyYHsxG/DTd2bh6gwRP5f3YG3Vo4=
-X-Google-Smtp-Source: AGHT+IEef5n8uwBF/gIUihQgoeIsWcFRzHG+hVacnglE/XMRvf9In/DoYsn+f4JZmYDYh06uIq7IcjNU8SxXxMY52sQ=
-X-Received: by 2002:a17:907:6d0b:b0:ac7:31a4:d4e9 with SMTP id
- a640c23a62f3a-acad343a069mr261189666b.4.1744378356705; Fri, 11 Apr 2025
- 06:32:36 -0700 (PDT)
+        bh=3HdsNeALPBRl7TJQey6t9d/l1PV0RD8jB7VsA4lZuNc=;
+        b=dBFqmICDp7bbZZCDeZ5MFe7eImjbvSop6HpCec9ZfA91VVSG6eSrkQgppjkU/SCxxj
+         I1WtutXgqMiF/N/NL4AWwwysfECykfYEdeSX3R7icbZGYUB9cHBAUwX1wTRA30HEca0F
+         Tf6eI60QkDCgir3PMUQPfQjKJwziEFqjs+uznk2n8/GdzPnbZEm81q69iicI6VPbvzAO
+         m+X1dnwZ79H568waUhVI1OvO5p+YJOodJoLWTUNnm+/pgY8jt8OlFSIJ/vxWBo5xQ9Rb
+         05TUeBiwRzKC9IXltBfItr3qlt4myac7uDogWHoi3uazoYCfx3IB+Q9SJT1nrRmsY5bp
+         dX0w==
+X-Forwarded-Encrypted: i=1; AJvYcCW7dQMZ+axi2wmANKeiaowNpezY4zphMSQWW5R7A/e9VL0x7MboMhW1jf5Nm0xWoH0fFbuSOeSH@vger.kernel.org, AJvYcCX5EbHqOIMQNWbbKZLdx+uLPuKG42lDDwgL3n7P1ftNW9zNy78Ub0gGHkF8mIEVnp6kHcW8OlzRAuNL@vger.kernel.org, AJvYcCXAyENw2cI1nq5g+LdeDremB0VBIpKiP74sfZLtwTyJV+7rMr9Bj5cCK/rae6drEG0Rhrwh32Hzrc2A3/d2@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWamZqcArGcdkr43JKcfXkyLOjtYSNExuCwX0pGV3ERGNg/g9p
+	bYFSZgDMfSNZfyqRS/RRaNvw9+6MxDcLj0z9DUikGAIf7pnWAN9tLCOnx6sjw3uFQEEiwWOKUQx
+	Az/nydLj9JHOeKQD1svjKYaIwU+U=
+X-Gm-Gg: ASbGncu4RtZJ9s2kqtsrnzMjYin6RVqlwUnNK5yk+K1XLBq8216zUcO7H0pmykxS2hc
+	1WGDUUrU/mraso4tNZ3ErbUijLIRLZKNQgFK4yYszxvcnrfWoXhCbVe20NRwOHQs7gA/Pgb1Cqu
+	t+DPeoDl/dvxnx7Nj3+LGAecWo3d6T8M6KkUUUVxgQJ3DY5IUizjhwOg==
+X-Google-Smtp-Source: AGHT+IE33NDJqid6qPgYC+c0Q5rSljAhPbuipqNwWv+AwO2kvaeyl/9m5RUa6zx/o/+6PMIcz7x+vDzf+xQLmDGeeMs=
+X-Received: by 2002:a05:6512:1095:b0:545:aaf:13fd with SMTP id
+ 2adb3069b0e04-54d452e33e4mr939323e87.51.1744378362995; Fri, 11 Apr 2025
+ 06:32:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250409214606.2000194-1-ameryhung@gmail.com> <20250409214606.2000194-4-ameryhung@gmail.com>
-In-Reply-To: <20250409214606.2000194-4-ameryhung@gmail.com>
-From: Kumar Kartikeya Dwivedi <memxor@gmail.com>
-Date: Fri, 11 Apr 2025 15:32:00 +0200
-X-Gm-Features: ATxdqUGWpUTEathunBsuySzmg3x2f27Znxy4IMfqg7gdZwufPJ91_5KJ5tt-gns
-Message-ID: <CAP01T77ibGcEhwsyJb1WVaH-vhbZB_M2yVA8Uyv9b5fy=ErWQQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v7 03/10] bpf: net_sched: Add basic bpf qdisc kfuncs
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, edumazet@google.com, kuba@kernel.org, 
-	xiyou.wangcong@gmail.com, jhs@mojatatu.com, martin.lau@kernel.org, 
-	jiri@resnulli.us, stfomichev@gmail.com, toke@redhat.com, sinquersw@gmail.com, 
-	ekarani.silvestre@ccc.ufcg.edu.br, yangpeihao@sjtu.edu.cn, 
-	yepeilin.cs@gmail.com, kernel-team@meta.com
+References: <20250407145157.3626463-1-lukma@denx.de> <20250407145157.3626463-4-lukma@denx.de>
+In-Reply-To: <20250407145157.3626463-4-lukma@denx.de>
+From: Fabio Estevam <festevam@gmail.com>
+Date: Fri, 11 Apr 2025 10:32:31 -0300
+X-Gm-Features: ATxdqUHrNbX-n4olVG1x03xQyfka5HcmTFZKe3_PzzPGFy-GrmPZgKlTzpzOW2Q
+Message-ID: <CAOMZO5B6q06nvk3+hzbioGpcW8_JXPZGEebApTU5JZbKvMLzxA@mail.gmail.com>
+Subject: Re: [net-next v4 3/5] ARM: dts: nxp: mxs: Adjust XEA board's DTS to
+ support L2 switch
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, davem@davemloft.net, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, 
+	Pengutronix Kernel Team <kernel@pengutronix.de>, Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, imx@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, Stefan Wahren <wahrenst@gmx.net>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 9 Apr 2025 at 23:46, Amery Hung <ameryhung@gmail.com> wrote:
->
-> From: Amery Hung <amery.hung@bytedance.com>
->
-> Add basic kfuncs for working on skb in qdisc.
->
-> Both bpf_qdisc_skb_drop() and bpf_kfree_skb() can be used to release
-> a reference to an skb. However, bpf_qdisc_skb_drop() can only be called
-> in .enqueue where a to_free skb list is available from kernel to defer
-> the release. bpf_kfree_skb() should be used elsewhere. It is also used
-> in bpf_obj_free_fields() when cleaning up skb in maps and collections.
->
-> bpf_skb_get_hash() returns the flow hash of an skb, which can be used
-> to build flow-based queueing algorithms.
->
-> Finally, allow users to create read-only dynptr via bpf_dynptr_from_skb()=
-.
->
-> Signed-off-by: Amery Hung <amery.hung@bytedance.com>
-> Acked-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> ---
+Hi Lukasz,
 
-How do we prevent UAF when dynptr is accessed after bpf_kfree_skb?
+On Mon, Apr 7, 2025 at 11:52=E2=80=AFAM Lukasz Majewski <lukma@denx.de> wro=
+te:
 
->  [...]
+> +               ethphy0: ethernet-phy@0 {
+> +                       reg =3D <0>;
+> +                       smsc,disable-energy-detect;
+> +                       /* Both PHYs (i.e. 0,1) have the same, single GPI=
+O, */
+> +                       /* line to handle both, their interrupts (OR'ed) =
+*/
+
+Please fix the multi-line comment style.
 
