@@ -1,159 +1,131 @@
-Return-Path: <netdev+bounces-181637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9672A85E73
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 15:15:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 71D1EA85EAB
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 15:22:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02926188FA19
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 13:15:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E20A7189BA33
+	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 13:19:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A2DC18E03A;
-	Fri, 11 Apr 2025 13:15:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B76C51917D8;
+	Fri, 11 Apr 2025 13:17:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mYfi++gk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PeStRHd+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f196.google.com (mail-pf1-f196.google.com [209.85.210.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEC1618B470;
-	Fri, 11 Apr 2025 13:15:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2391624E1
+	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 13:17:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744377304; cv=none; b=foYwEQBAtEnfJftgS3qDcQiywFVqcDTf9AiZgffhS2jWL0T7D3RSYJv9OilUO3kTZBYLCbHnO34yWjqAuR2nosNEduqGO3lSwEfl1WGNVWXcGHvNdxlp2AOzGsdkGy31BtWOxNgBqvkbmE9wpItKy7rs2FeS2vuW9z32Ov65Ae8=
+	t=1744377461; cv=none; b=Sx1HN5e65GBzKja2AYYMNlkSXC1JYVs00FpyFP3iF3T4IhPdCuAm2fPANH4p0Izb24yRgGEadAofMgoicYhSM1911bEhuYZ86mZsaT+ycge36xrWdUhJ9yUbB0KJztGbKrP3lrLd2njqWkP9WtMTmFZjsgdftvUxv7BPHAJ8cFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744377304; c=relaxed/simple;
-	bh=1xElfPbg5LprFHa+7E7IJti0RGRNpFDBXm8RZTk7Vxo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=emUQ3HvCYTamB8rl1krsZaDfNV2Wzc12zTQagtedmCU6WUA4rv2vYv7L/pcSu3+XVCiBuGiH1jA3PYDb7P62TjgZGxYX1OU/CP145h9qBL3f8OeksjqHYvZWtBZZV/XrRBW8kWd5NsYbz0Fp0Tcnt9MyFzSskeU6i0ToKrmMUXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mYfi++gk; arc=none smtp.client-ip=209.85.210.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f196.google.com with SMTP id d2e1a72fcca58-7376dd56f8fso2359348b3a.2;
-        Fri, 11 Apr 2025 06:15:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744377302; x=1744982102; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X7FlRNWTcgplkRXj12mO4wOxnjCeWCo2WAzWI8tsM/E=;
-        b=mYfi++gk8i0gaPPMnRTwjuKAx/ogW4oPvTbR2yZpwMVfW3NHUyUp1/Hxq5D6AiwkIW
-         oXWDWxYgyTdnJb6n30iwUZ76GoPFxx6aCTItbdbuyg/WbKRd9ym3LgVFw+yFu/QRZ0eC
-         NRhxwREouvReae5ar0iygsVoMnDG+ffnn/Vi2ZuNOjesw5d+vt6S0DG/bGTHyh6ta+0g
-         15wh+acEi/3eb4Iqz4/FBzjcwquPjrAmA8u3b4kjAO/vA937Pui/NcqiFO5XOQzFzeJv
-         y1CPO7oexJ/BdV+6GYi0QlhaqGO+Hv4m0KQbooqq737VGXh9bdb1X9htpwTuj/qADLQL
-         EIng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744377302; x=1744982102;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=X7FlRNWTcgplkRXj12mO4wOxnjCeWCo2WAzWI8tsM/E=;
-        b=sZ4Dnll+vIs07cez8msKwYcxKGrvIlIrAdehigSRQDpdbCstQfTa2hnkAPjs2HjRBC
-         YUAJW6td0kueRMudBpaI76zFkEKJbGlGEDArru6gIMEGcQXAMxdv8bQZ+prhhtRsxEta
-         YOGmOv1lEkGnAp9jx8HWsr4+wM/6C+9FqqXQTYW6N0iOq8lgEn9dCus4JQV7wTKdh3vb
-         b/vl5eLcBc6zV4IKh0YKXT0sye/y/UcEDMBoTMg43IIIIblI1AFS8EqBWtDW74Qki4Gb
-         XOstkB89zlWBJIXSp8PJAS0RDkY2TbkU8mXIZmak2C3tAZ7tdSRYU78eJ3nxT/D0/uKR
-         34ww==
-X-Forwarded-Encrypted: i=1; AJvYcCVOdE2iCnYnzMfu+P6kgOO26LVYPozvOWq7pWeZPkS/Cc5iA8T1s5Re2j0HsAouT5aGUR9ZPwB2@vger.kernel.org, AJvYcCW0o20Q3fDiAfXbqIeCphr36uYJpsSGunBq2jxLu1y+6Q9wXdVu2u75EtkZ9XuqQLAzUtL8g4vY+0oKQw==@vger.kernel.org, AJvYcCW4GX2N7Zy2ERjwMxlxYPXerBTczSaYhpEAN71OoPcBttbFBajG1cAdTKYwzsurRe2Sh5RVLWVoPBgzZFE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8lfPwGR3rX9oF6lXsUeQJbZkACmmZ9YOEM1q2hdPBBjWZP6hC
-	kLQQQi2OyjuLjRpOGJfjwrLZzTfiNV4coPzXEcvs9G6nkT8SAgVUUSNmg5ZQDtKUew==
-X-Gm-Gg: ASbGncu+YLLXWi8lI2nxxY/jT3AbOXXZqmZ491vMpkefKvnnB+2jpqwnU20esL9QJZH
-	f4ndQ/fLhoeIcvUQsh3Fq6/VroSqkkJm+cfw77V6ZvrpYsA2gjbmCLQyqR5n6chQZnS53zDQqHr
-	j/ZcA19S4gJSGaQNm8wjAXh865M+0dpvrGHhYoCcyeGYWdFXuafUp3mEVKDGdUHV++wVMiZgX51
-	Wv0xv48JMjbozbb3ZUiuHCYvKPfGMZ3sc0ngOnI0V4pef/mTfJORLct1iNzGao2KUaetuntPd04
-	q5oTWaiahq/FSO+9UQ8dkHjadMvLlDWRGSYGwYTylDTRoH5YWuL1BKA/H9kd8JPG
-X-Google-Smtp-Source: AGHT+IG5I1bNinfDP/O1uYGJxOmBtZhz/dbIOEH92jRoyRq5qsxGiwtrY2TE3DF/rcri6j6RHpXUIg==
-X-Received: by 2002:a05:6a21:918a:b0:1f5:902e:1e8c with SMTP id adf61e73a8af0-20179982404mr4449880637.42.1744377301956;
-        Fri, 11 Apr 2025 06:15:01 -0700 (PDT)
-Received: from henry.localdomain ([223.72.104.59])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b02a0de8926sm3967494a12.30.2025.04.11.06.14.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Apr 2025 06:15:01 -0700 (PDT)
-From: Henry Martin <bsdhenrymartin@gmail.com>
-To: saeedm@nvidia.com,
-	leon@kernel.org,
-	tariqt@nvidia.com,
-	netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	amirtz@nvidia.com,
-	ayal@nvidia.com,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Henry Martin <bsdhenrymartin@gmail.com>
-Subject: [PATCH v4 1/1] net/mlx5: Fix null-ptr-deref in mlx5_create_{inner_,}ttc_table()
-Date: Fri, 11 Apr 2025 21:14:31 +0800
-Message-Id: <20250411131431.46537-2-bsdhenrymartin@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250411131431.46537-1-bsdhenrymartin@gmail.com>
-References: <20250411131431.46537-1-bsdhenrymartin@gmail.com>
+	s=arc-20240116; t=1744377461; c=relaxed/simple;
+	bh=0vAlQXUS7Qy2jeHeUT8fAxf4F02U5tCBQQ3d2Vwre84=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=IyHIUpJIys2IqoHeH64zyYu0kOkMn+kNt8ECP2oWTMzRgQ53gRYR59ZdkHQ3VUDQ6E45Dq8j97PdscvS8mtskOC3HHBfEdZsKpZ2V0zzrEAekQSPYNMqp1fr/KErYlOkqCjI+0WA6Jg9mJp1jpW3KwT4yrtTjx2eRRsKL1CQjLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PeStRHd+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744377458;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aAPMnr15UUC2IJaasw8kvWmrIDi+EshqBG8kRRliicc=;
+	b=PeStRHd+ZuxRczB9v9N6+4GrVZGsb8GVqmhnuUPw+L6+T50+d4nBUmjUg/ptX886DTS4DE
+	f6Nr8Q5Rs0HyzbiqJRy/lyu7ifNGiCH6HiP05w9qyJBO76Sh9C11VLS4J3kUEl0WXRDriv
+	j5iz6CdTwKnuGnN4I+qLb4bjYNjRe/Y=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-104-xSJHeetwPd2MxncaHr6QqA-1; Fri,
+ 11 Apr 2025 09:17:32 -0400
+X-MC-Unique: xSJHeetwPd2MxncaHr6QqA-1
+X-Mimecast-MFC-AGG-ID: xSJHeetwPd2MxncaHr6QqA_1744377442
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 863C81800EC5;
+	Fri, 11 Apr 2025 13:17:21 +0000 (UTC)
+Received: from [10.45.225.124] (unknown [10.45.225.124])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 55E621828ABC;
+	Fri, 11 Apr 2025 13:17:16 +0000 (UTC)
+Message-ID: <46ff3480-caca-4e2c-9382-2897c611758a@redhat.com>
+Date: Fri, 11 Apr 2025 15:17:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 07/14] mfd: zl3073x: Add components versions register
+ defs
+From: Ivan Vecera <ivecera@redhat.com>
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: netdev@vger.kernel.org, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
+ Andy Shevchenko <andy@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, Michal Schmidt <mschmidt@redhat.com>,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
+References: <20250409144250.206590-1-ivecera@redhat.com>
+ <20250409144250.206590-8-ivecera@redhat.com>
+ <CAHp75Ve4LO5rB3HLDV5XXMd4SihOQbPZBEZC8i1VY_Nz0E9tig@mail.gmail.com>
+ <b7e223bd-d43b-4cdd-9d48-4a1f80a482e8@redhat.com>
+Content-Language: en-US
+In-Reply-To: <b7e223bd-d43b-4cdd-9d48-4a1f80a482e8@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-Add NULL check for mlx5_get_flow_namespace() returns in
-mlx5_create_inner_ttc_table() and mlx5_create_ttc_table() to prevent
-NULL pointer dereference.
+On 11. 04. 25 1:19 odp., Ivan Vecera wrote:
+> The range for regmap 1: (registers 0x000-0x4FF)
+> regmap_range_cfg {
+>      .range_min = 0,
+>      .range_max = 10 * 128 - 1, /* 10 pages, 128 registers each */
+>      .selector_reg = 0x7f,      /* page selector at each page */
+>      .selector_shift = 0,       /* no shift in page selector */
+>      .selector_mask = GENMASK(3, 0),    /* 4 bits for page sel */
+>      .window_start = 0,         /* 128 regs from 0x00-0x7f */
+>      .window_len = 128,
+> };
+> 
+> The range for regmap 2: (registers 0x500-0x77F)
+> regmap_range_cfg {
+>      .range_min = 10 * 128,
+>      .range_max = 15 * 128 - 1, /* 5 pages, 128 registers each */
+>      .selector_reg = 0x7f,      /* page selector at each page */
+>      .selector_shift = 0,       /* no shift in page selector */
+>      .selector_mask = GENMASK(3, 0),    /* 4 bits for page sel */
+>      .window_start = 0,         /* 128 regs from 0x00-0x7f */
+>      .window_len = 128,
+> };
+> 
+> Is it now OK?
 
-Fixes: 137f3d50ad2a ("net/mlx5: Support matching on l4_type for ttc_table")
-Signed-off-by: Henry Martin <bsdhenrymartin@gmail.com>
----
-V3 -> V4: Fix potential memory leak.
-V2 -> V3: No functional changes, just gathering the patches in a series.
-V1 -> V2: Add a empty line after the return statement.
+No this is not good... I cannot use 2 ranges.
 
- drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+This is not safe... if the caller use regmap 2 to read/write something 
+below 0x500 (by mistake), no mapping is applied and value is directly 
+used as register number that's wrong :-(.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c
-index eb3bd9c7f66e..077fe908bf86 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/fs_ttc.c
-@@ -651,10 +651,16 @@ struct mlx5_ttc_table *mlx5_create_inner_ttc_table(struct mlx5_core_dev *dev,
- 			MLX5_CAP_NIC_RX_FT_FIELD_SUPPORT_2(dev, inner_l4_type);
- 		break;
- 	default:
-+		kvfree(ttc);
- 		return ERR_PTR(-EINVAL);
- 	}
- 
- 	ns = mlx5_get_flow_namespace(dev, params->ns_type);
-+	if (!ns) {
-+		kvfree(ttc);
-+		return ERR_PTR(-EOPNOTSUPP);
-+	}
-+
- 	groups = use_l4_type ? &inner_ttc_groups[TTC_GROUPS_USE_L4_TYPE] :
- 			       &inner_ttc_groups[TTC_GROUPS_DEFAULT];
- 
-@@ -724,10 +730,16 @@ struct mlx5_ttc_table *mlx5_create_ttc_table(struct mlx5_core_dev *dev,
- 			MLX5_CAP_NIC_RX_FT_FIELD_SUPPORT_2(dev, outer_l4_type);
- 		break;
- 	default:
-+		kvfree(ttc);
- 		return ERR_PTR(-EINVAL);
- 	}
- 
- 	ns = mlx5_get_flow_namespace(dev, params->ns_type);
-+	if (!ns){
-+		kvfree(ttc);
-+		return ERR_PTR(-EOPNOTSUPP);
-+	}
-+
- 	groups = use_l4_type ? &ttc_groups[TTC_GROUPS_USE_L4_TYPE] :
- 			       &ttc_groups[TTC_GROUPS_DEFAULT];
- 
--- 
-2.34.1
+Should I use rather single mapping range to cover all pages and ensure 
+at driver level that regmap 2 is not used for regs < 0x500?
+-or-
+what would be the best approach?
+
+I.
 
 
