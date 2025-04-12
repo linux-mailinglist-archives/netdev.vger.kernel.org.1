@@ -1,205 +1,168 @@
-Return-Path: <netdev+bounces-181892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A800DA86CBE
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 13:21:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 892F9A86CDE
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 14:24:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38DA57B3795
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 11:20:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5978F46028A
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 12:24:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E1681DC9B1;
-	Sat, 12 Apr 2025 11:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B2341BD9E3;
+	Sat, 12 Apr 2025 12:24:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oM6fDVwJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jaocKa5h"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3335F19F42C;
-	Sat, 12 Apr 2025 11:21:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 572FA1519BA;
+	Sat, 12 Apr 2025 12:24:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744456897; cv=none; b=SbjdBOxKCHtbgjQGZvqoGVngLQyyMZ2DnTE4lxDTMP7RxiJ2sbChARrqFwa0vmFS3tKlOSZgeVKUMbepoQq8ZaUXG7nTvNr5B7DINxRR4kkJ3PJ4kfhJ9vhEBaHe1IdZnaH2CJEPSRCkLKPRCcGj2284O5XMAsyuXy5spIFTa60=
+	t=1744460676; cv=none; b=gyZseV57LgRqlxxVS0XskpBW05mLU5ok/cqkWrDoXfiWo91LJ6tcVGBoV1W1qedxyEbyb3GtSfYZWXlSBUX9074g7RnbnGs2fiZuPCJUsVex0KDYgmEtXSgzI/CoNXgpgcoFOlxctOZOW/ChlWlUUrzIujBmj8CRrsQ1hCfSuBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744456897; c=relaxed/simple;
-	bh=YfOlKE6PAfGsLaLJzFsbc4yvi3sBWRZ8irx5t8xPNqU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FZmwwwDCtwNviyZlFtvJnQB7H/OL+xbGBO65b4tXLX6rGCug4jKdLQtBNb341maYfgyboymTp5cQV3UpMu7H6wDvlKR3Jb9DPad6/lm4kd1XZAaj5aqtQfzpC78a6TfeOx9a53jRQU3x3oQoRWFgh9yTeE5ot+ktbQxjUd8ldvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oM6fDVwJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B17BC4CEE3;
-	Sat, 12 Apr 2025 11:21:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744456896;
-	bh=YfOlKE6PAfGsLaLJzFsbc4yvi3sBWRZ8irx5t8xPNqU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oM6fDVwJXVvIiSz6YzL+sqXFarnOxeDB/V9gDHvtXh2pStzqt+qSSOGhrDe39m8r1
-	 QN91NiF9YguPYt8vikQ7haD+S/t7MWG8OSROc3VqFDJ8/RHspiNsz/6yO6f9uw79xz
-	 zi9OMDnNtNWFSNV2kaA4DE6PDZZ68BsPFDfybAdzE3TnSCS1DCu21C0wipU67YV8RK
-	 udS9kl08sM77TgcPIccOuGUAKdHa90+KqG4bkTnqxCJRoW1ibn5RTeA5dQmDzTiHcR
-	 Uswr9VCQZq0sUezMCh+qEXR8Ub3VMNCtso88fnhRg9Rsu8jH9CUy6Qt73d0HZSWr8g
-	 pqztiNKbrLUPQ==
-Date: Sat, 12 Apr 2025 12:21:22 +0100
-From: Jonathan Cameron <jic23@kernel.org>
-To: Yassine Oudjana <y.oudjana@protonmail.com>
-Cc: Lars-Peter Clausen <lars@metafoo.de>, Bjorn Andersson
- <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, Manivannan
- Sadhasivam <manivannan.sadhasivam@linaro.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Nathan
- Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>,
- Alexander Sverdlin <alexander.sverdlin@gmail.com>, Sean Nyekjaer
- <sean@geanix.com>, Javier Carrasco <javier.carrasco.cruz@gmail.com>, Matti
- Vaittinen <mazziesaccount@gmail.com>, Antoniu Miclaus
- <antoniu.miclaus@analog.com>, Ramona Gradinariu
- <ramona.gradinariu@analog.com>, "Yo-Jung (Leo) Lin" <0xff07@gmail.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Neil Armstrong
- <neil.armstrong@linaro.org>, =?UTF-8?B?QmFybmFiw6FzIEN6w6ltw6Fu?=
- <barnabas.czeman@mainlining.org>, Danila Tikhonov <danila@jiaxyga.com>,
- Antoni Pokusinski <apokusinski01@gmail.com>, Vasileios Amoiridis
- <vassilisamir@gmail.com>, Petar Stoykov <pd.pstoykov@gmail.com>, shuaijie
- wang <wangshuaijie@awinic.com>, Yasin Lee <yasin.lee.x@gmail.com>,
- "Borislav Petkov (AMD)" <bp@alien8.de>, Dave Hansen
- <dave.hansen@linux.intel.com>, Tony Luck <tony.luck@intel.com>, Pawan Gupta
- <pawan.kumar.gupta@linux.intel.com>, Ingo Molnar <mingo@kernel.org>,
- Yassine Oudjana <yassine.oudjana@gmail.com>, linux-kernel@vger.kernel.org,
- linux-iio@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- netdev@vger.kernel.org, linux-kbuild@vger.kernel.org
-Subject: Re: [PATCH 3/3] iio: Add Qualcomm Sensor Manager drivers
-Message-ID: <20250412122122.43d1b2a7@jic23-huawei>
-In-Reply-To: <fc9af95b-abbf-454c-97e1-b884baa5317c@protonmail.com>
-References: <20250406140706.812425-1-y.oudjana@protonmail.com>
-	<20250406140706.812425-4-y.oudjana@protonmail.com>
-	<20250406172904.1521881e@jic23-huawei>
-	<fc9af95b-abbf-454c-97e1-b884baa5317c@protonmail.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1744460676; c=relaxed/simple;
+	bh=J80O7lx+S9pEIU6bV6NeFN2f6XCVqGZw2Hw8t5NoRHE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ScjHWKJ4A9b9FDtY2lGhxlmYfu88lTjPDWHfMIMXnja+phjksikNVVKApXOSZ1b1Xq8b3+8DodhwL/u2s1xorIggGxk1bpXFmgpnr/YaJwTeDY/RCEcgxx8SP8YBDcTTGeWspcj7rkaeSMfT8Mzl3tB615SzM8bMpvuIsiHFilA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jaocKa5h; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5efe8d9eb12so4534741a12.1;
+        Sat, 12 Apr 2025 05:24:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744460673; x=1745065473; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bVuqSu3NOK87RkcbSVOR8gLBwOzmPgPAFU9FS4oYFp4=;
+        b=jaocKa5hMxDYZyIc08OZZCJPKFTkUegZufrmHZp2BfEX40OsgLfqt0ZVjKnHDmMhVo
+         j1A8Bnj1Bv0JeJK6qobMgItFQEe2PC+fp656cx3cLMISMZzQM+pSsr2KJSbrEVPC3ztw
+         4nmiqJF/CQwxKAOdyMUF/O4BkWkTHIvZsJxVF3hkc0Otf2TyMc+vgprD12csa0Gr628s
+         Lo8zHrXw6rHHXXi3jHWNXs3nyJWk2R2KMnKTIX/ucV193BpjqUo4joAbaXNE7ZYxCHIs
+         YwYkNxirKIDYJj5wAKTHrOM1ugpF3WcFS3DiZiDkWyTEbkbLvfIANr4SekTgzDgFsL9g
+         MAwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744460673; x=1745065473;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bVuqSu3NOK87RkcbSVOR8gLBwOzmPgPAFU9FS4oYFp4=;
+        b=QJgEfLBZKdIxTPMVq+bnXbC9qpb1nzUpbJfR9ncjOGWh1jMMGDkfLHBGeXxGkfAdgk
+         Zi4Y7Qe9FBc4HghB1YNseUFA4qxzU9EWk8zo85eKS7Qdt4iBGX9yGpHn3ECkRELet6T6
+         33rCrUcRAjCc13YMVGb6PZACupbHwF3AeoBOxaRBZl6oOFIziFpIJ+CT+kb9WHNquueb
+         uLkNr+D5wFIjm43DsW/p5ZYKMtM6S4wWzM6HNJHJf/dhiI1aG9pOew3E43ntm/TtsF3s
+         nExyIAovCbirbhP75o0NAoM6uDX+tXscvctxRpeE4x+5cTVXoktomod5eQ/DlEYwAt6d
+         5gew==
+X-Forwarded-Encrypted: i=1; AJvYcCU8DL6JMnmVMrM2EFUOcoGQsII2tAcqvUj00ZHKVtl/NIaaQGf2RKmqVF5A62sB+EB0CFkO0O+4@vger.kernel.org, AJvYcCVPeMG8NDQWx5Ato2TD+rHhCkeU1K8w6QJIh1daBsexodVlmaP2uxkJpiHa+/P8QofUkbunyAcNg9LGFb0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWYL0Kdh9Yyn9BLLmbzD/fogz8do2KOVh3hONfxHV37i9GIn/y
+	aJ8AIjl5I4RXHMPcGwFWXIVin0zwXMJyKCt+Zh4Oe174v2aqzrLI
+X-Gm-Gg: ASbGncvvieZOL8MtRo9BdilIdRhbtOel8TS9l3Qum5/rDnIQ0YTWvUVyZi/BZefSNS5
+	oJtiEMhbd57RI7TqNadIZpSZKQPEDw4rfhfYz6hpAOIzhliLbD7btY22Kzy6bm7EfxqbQdQ7Ytr
+	a8ptyzpATngYdlUT0OKpBwKQGph/iaKCzSSCGjlNLXjOGHrhL1xjL5Oy1YktAB4Ot2Y9yrUhufg
+	/6MuwN2kK2lpfkiH+T48ya7omG/84U9S7dAGFbodvz6+R+VB4OCfIaOQzAXoN4rpH+ll0PkrTFw
+	32WC7QWDEJmXvRgMq/Fg3LJfup0KkZDmlNxFJk95Z5CO7hxuRc1PyZLz63h2x/2UQu0yYEpKZYQ
+	H5sPUAZ0QXoNXzCq07e1q
+X-Google-Smtp-Source: AGHT+IFc5anELwtiJCusv+yFZK/tdXxvnsuy47DJan7xHGiTN/SrWnZQYj+SMt5guZE4sgjUUqlcjg==
+X-Received: by 2002:a17:907:3f16:b0:aca:c7e0:6375 with SMTP id a640c23a62f3a-acad3456e7fmr561981366b.2.1744460672462;
+        Sat, 12 Apr 2025 05:24:32 -0700 (PDT)
+Received: from localhost (dslb-002-205-021-146.002.205.pools.vodafone-ip.de. [2.205.21.146])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acaa1be91a3sm588742766b.44.2025.04.12.05.24.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 12 Apr 2025 05:24:31 -0700 (PDT)
+From: Jonas Gorski <jonas.gorski@gmail.com>
+To: Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>,
+	bridge@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH RFC net 0/2] net: dsa: fix handling brentry vlans with flags
+Date: Sat, 12 Apr 2025 14:24:26 +0200
+Message-ID: <20250412122428.108029-1-jonas.gorski@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-> >> +
-> >> +static void qcom_smgr_accel_remove(struct platform_device *pdev)  
-> > 
-> > I'm surprised to see a platform device here - will read on but I
-> > doubt that is the way to go.  Maybe an auxbus or similar or
-> > just squashing this all down to be registered directly by
-> > the parent driver.  
-> I got the idea from cros_ec_sensors which also deals with a similar 
-> sensor hub paradigm.
+While trying to figure out the hardware behavior of a DSA supported
+switch chip and printing various internal vlan state changes, I noticed
+that some flows never triggered adding the cpu port to vlans, preventing
+it from receiving any of the VLANs traffic.
 
-Generally the use of platform drivers for subfunctions of something
-is now not considered the way to go.  Here there seems to be little
-point in spinning out another layer of devices.
-> >   
-> >> +static void qcom_smgr_buffering_report_handler(struct qmi_handle *hdl,
-> >> +					       struct sockaddr_qrtr *sq,
-> >> +					       struct qmi_txn *txn,
-> >> +					       const void *data)
-> >> +{
-> >> +	struct qcom_smgr *smgr =
-> >> +		container_of(hdl, struct qcom_smgr, sns_smgr_hdl);
-> >> +	struct sns_smgr_buffering_report_ind *ind =
-> >> +		(struct sns_smgr_buffering_report_ind *)data;  
-> > 
-> > Casting away a const isn't a good sign. Why do you need to do that?
-> > 	const struct sns_smg_buffer_repor_ind *ind = data;
-> > should be fine I think.  
-> 
-> The casted struct was previously not const so I was only casting from 
-> void *. I made it const lately but didn't notice this cast. Will change it.
+E.g. the following sequence would cause the cpu port not being member of
+the vlan, despite the bridge vlan output looking correct:
 
-Ok. But never a reason to cast from a void *.  The C spec says that
-happens implicitly just fine.
+$ ip link add swbridge type bridge vlan_filtering 1 vlan_default_pvid 1
+$ ip link set lan1 master swbridge
+$ bridge vlan add dev lan1 vid 1 pvid untagged
+$ bridge vlan add dev swbridge vid 1 pvid untagged self
 
-> >> +	ret = qcom_smgr_request_all_sensor_info(smgr, &smgr->sensors);
-> >> +	if (ret < 0) {
-> >> +		dev_err(smgr->dev, "Failed to get available sensors: %pe\n",
-> >> +			ERR_PTR(ret));
-> >> +		return ret;
-> >> +	}
-> >> +	smgr->sensor_count = ret;
-> >> +
-> >> +	/* Get primary and secondary sensors from each sensor ID */
-> >> +	for (i = 0; i < smgr->sensor_count; i++) {
-> >> +		ret = qcom_smgr_request_single_sensor_info(smgr,
-> >> +							   &smgr->sensors[i]);
-> >> +		if (ret < 0) {
-> >> +			dev_err(smgr->dev,
-> >> +				"Failed to get sensors from ID 0x%02x: %pe\n",
-> >> +				smgr->sensors[i].id, ERR_PTR(ret));
-> >> +			return ret;
-> >> +		}
-> >> +
-> >> +		for (j = 0; j < smgr->sensors[i].data_type_count; j++) {
-> >> +			/* Default to maximum sample rate */
-> >> +			smgr->sensors[i].data_types->cur_sample_rate =
-> >> +				smgr->sensors[i].data_types->max_sample_rate;
-> >> +
-> >> +			dev_dbg(smgr->dev, "0x%02x,%d: %s %s\n",
-> >> +				smgr->sensors[i].id, j,
-> >> +				smgr->sensors[i].data_types[j].vendor,
-> >> +				smgr->sensors[i].data_types[j].name);
-> >> +		}
-> >> +
-> >> +		qcom_smgr_register_sensor(smgr, &smgr->sensors[i]);  
-> > Above I suggest that maybe you should just skip the platform devices and register
-> > directly with IIO as you find the sensors. So have the struct iio_dev->device
-> > parent directly off this one.  
-> 
-> As I said previously I followed the model used in cros_ec_sensors, and 
-> it made sense to me since I always see platform devices used to 
-> represent firmware-backed devices like this.
+Adding more printk debugging, I traced it br_vlan_add_existing() setting
+changed to true (since the vlan "gained" the pvid untagged flags), and
+then the dsa code ignoring the vlan notification, since it is a vlan for
+the cpu port that is updated.
 
-In this case you end up with
+Then I noticed that deleting that vlan didn't work either:
 
-parent device
-    |
-    |____________________
-    |         |          |
-ChildA     ChildB       ChildC  (all platform devices)
-    |         |          |
-IIODevA    IIODevB      IIODEVC
+$ bridge vlan
+port              vlan-id
+lan1              1 PVID Egress Untagged
+swbridge          1 PVID Egress Untagged
+$ bridge vlan del dev swbridge vid 1 self
+$ bridge vlan
+port              vlan-id
+lan1              1 PVID Egress Untagged
+swbridge          1 Egress Untagged
 
-Today we'd probably do those child devices using auxiliary devices but
-aside from that, the only reason to do this is you want to have separate
-drivers for each child.
+which is caused by the same issue, because from the dsa standpoint I am
+now trying to delete a non-existing vlan.
 
-You can just do
+After fixing that, both were now correctly working, but the configured
+vlan on the cpu port would be stuck with whatever the initial add set.
 
-parent device
-   |
-   |_______________________
-   |         |             |
-IIODevA    IIODevB       IIODevC
+E.g.:
+$ bridge vlan add dev swbridge vid 1 pvid untagged self
+$ bridge vlan add dev swbridge vid 1 self
 
-for the case where there no separate child drivers.
+would change the flags in the vlandb, but the hardware configured vlan
+would still untag at egress to the cpu port.
 
-That is the parent driver can just instantiate the IIO Bus Devices
-directly (it's kind of a Class really but a bus for historical reasons).
-Various IMUs do this when they have separately controlled sampling frequencies
-for different types of sensor or even separate fifos. (They are really
-sensor hubs, just connected of SPI or similar).
+Patch two fixes this by allowing changed = true vlan add notifications
+for the cpu port, but skip the refcounting. Presumably with the patch
+there should never be a vlan add notification for the brentry with
+changed set to true anymore.
 
-So it's up to you whether you want the separate per channel type devices and
-to handle the potential races around those going away.
-qcom_smgr_buffering_report_handler() for instance needs a lock to
-stop the child driver being unbound between the checks on iio_dev and the
-use of it. With one driver that complexity doesn't occur.
-See for example drivers/iio/st_lsm6dsx/ that does it this way.
+In case my reasoning is wrong, I added a WARN_ON(), but I didn't get to
+trigger it so far.
 
-Also possible would be a single IIO device with multiple buffers.
-We only have a few of those though so you might run into missing bits of ABI
-taking that path.
+I did a check of all handlers of switchdev port vlan add notifications,
+but DSA seems to be the only one that even looks at the changed flag.
 
-Jonathan
+Sent as RFC as I am not too familiar with the dsa/vlan code, so I might
+very well have overlooked something.
 
+Jonas Gorski (2):
+  net: bridge: switchdev: do not notify new brentries as changed
+  net: dsa: propagate brentry flag changes
+
+ net/bridge/br_vlan.c |  4 +++-
+ net/dsa/switch.c     | 22 ++++++++++++----------
+ 2 files changed, 15 insertions(+), 11 deletions(-)
+
+-- 
+2.43.0
 
 
