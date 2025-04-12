@@ -1,237 +1,155 @@
-Return-Path: <netdev+bounces-181856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9934DA86A00
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 03:20:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12CA1A86A19
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 03:31:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7792A1BA3C2E
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 01:21:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA4D37AA121
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 01:30:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81B6E73477;
-	Sat, 12 Apr 2025 01:20:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ene4xxBX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96A142367C6;
+	Sat, 12 Apr 2025 01:31:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f65.google.com (mail-ej1-f65.google.com [209.85.218.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 471E817BB6;
-	Sat, 12 Apr 2025 01:20:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA625F4ED;
+	Sat, 12 Apr 2025 01:31:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744420847; cv=none; b=T5cHXYMM9kaOKXUB7uh/0TiTSL+GRIGW4NS+E1L7RnmY/uN/oAPNmQ/EzX0DV52kHMKW4+NDXiuaCSRKK8NOcUbNX3qTqaoYYkX4JItyVna0UKRNgUkLKw7bkis9VLG6DMHYtMQV2au/MxdrKEwHLDxWkGv+PmXbFoTcVcYVYD4=
+	t=1744421501; cv=none; b=oe5/XIP6U5sqythDcicQOtgRXFYY/IZegsUTKzKpregiASl4LF+5y30F4Ip6aw4LvUMzjFkE4QTeH+dImPR1ZIMpTSsCMzWgmvB2WrKF/Wj3Gi0VRNQc2ulAsoVXGaFtiDjclh4vLMxCraRYSrVRZJPCQ2zVHVezrOw9ufccdig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744420847; c=relaxed/simple;
-	bh=CoQliKqWOHFzGKP4DchqFP7OVdp1mTfrv/cHHzKnePg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kvN1MdAemvzSjLYU25NtlJE2fECHFIW7KlRmGqc7mKmSKp01Fcv3K0b9ROz7t02Ww1JFhTb8vFkc3NgM2y0/S65wuM5OgIZkGJ69NrhaacinBvnVhloZAk/P5eoL3ufEDtgwpuzoiMHmmlHSKsbQmHAG+UKAgQZA1tel1YB1s4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ene4xxBX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2EADC4CEE2;
-	Sat, 12 Apr 2025 01:20:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744420846;
-	bh=CoQliKqWOHFzGKP4DchqFP7OVdp1mTfrv/cHHzKnePg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ene4xxBXkuYwEtUfKCDeZCNQW9Xqn8hwwVQ4k/lsQOd3e7aMDfsfd0on6GZcyYpzQ
-	 b7+Uwtjlo3+dsguHMuOf17/c/C1rTQGgOS2ZnvEwAUr8lT1vwNNTCr4jzPHyqZGX8U
-	 X/tjMvTlvx8F/O9euitLcAg/olViXuQwC9WWzrRz19n+zhVFp32HDaUQdNi8RRJ+UN
-	 x4rh4i2BuWNa0P7WglvTJ3kSK/beT0TyjIMQk6/svtSgvkIu67PYoVR4cvEYTWcKba
-	 OVswweFe4z7/gWfyTv2rven6NbFwiX7YTB/7AUWfcxP+3R9SSR31KaLfzDv0C5tceC
-	 c8ghQbKeC2yGA==
-Date: Fri, 11 Apr 2025 18:20:44 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, Leon
- Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Bryan
- Whitehead <bryan.whitehead@microchip.com>, UNGLinuxDriver@microchip.com,
- Horatiu Vultur <horatiu.vultur@microchip.com>, Paul Barker
- <paul.barker.ct@bp.renesas.com>, Niklas =?UTF-8?B?U8O2ZGVybHVuZA==?=
- <niklas.soderlund@ragnatech.se>, Richard Cochran
- <richardcochran@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, Russell
- King <linux@armlinux.org.uk>, Andrei Botila <andrei.botila@oss.nxp.com>,
- Claudiu Manoil <claudiu.manoil@nxp.com>, Alexandre Belloni
- <alexandre.belloni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
- linux-rdma@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] net: ptp: introduce .supported_extts_flags
- to ptp_clock_info
-Message-ID: <20250411182044.0ee40963@kernel.org>
-In-Reply-To: <20250408-jk-supported-perout-flags-v1-1-d2f8e3df64f3@intel.com>
-References: <20250408-jk-supported-perout-flags-v1-0-d2f8e3df64f3@intel.com>
-	<20250408-jk-supported-perout-flags-v1-1-d2f8e3df64f3@intel.com>
+	s=arc-20240116; t=1744421501; c=relaxed/simple;
+	bh=wdfhgLAKF0XQ/SWRigNLTl6LPPORJ/PXEZEHW8rdH4E=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=s5U1fptDl9MqwSTLYLSx4rLbPhRKI92B0yzZUEtBy9aUi9Ej0qrlGyfU9cnw7cOEsq0zFoxUv4ZqN9Res086Wsjmt5ND38mRdDy4SS7rSjA96O60L/V9srrj/Nk4XWUQOi4iKPLaLVlTxmHuSejVBvNi5jlmNrr90cZRr94yGBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f65.google.com with SMTP id a640c23a62f3a-acacb8743a7so297350966b.1;
+        Fri, 11 Apr 2025 18:31:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744421498; x=1745026298;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:cc:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FOiDyjHQN21i1dF9nmEh6ABpVyg391P9Z34V42IDnXM=;
+        b=aEX5JiRgiyrM1hJQtEniHybRGIw38fFXbvaTeDffvxh2TRGdAeaIe/ZRNZLoeVuerl
+         0s+MPplqac+nFaRb5oPTfpNILslmUT1Iiaisf0OrN6PvfFhVcOjYdQaqZUajNRw7TCuZ
+         aM/5lNdjNN0fpExmPRXlmWw/0VaJX+tnMH2p7IgvWikxTnIRx6RDmN2z2C5F8ftGuaQk
+         B2Kt+KfN07LuBc3ieiGkCKvKvn9UNJ8fa/KjI78ISc9URYn096nmrwuZSJLzsiY96i32
+         VSLAkqrFEwhmMvfIn436DjzQkS3/q24EhT8pyzPpjcpN/1oPKOXLFmw+zimp2ihKOq5r
+         EBgA==
+X-Forwarded-Encrypted: i=1; AJvYcCV04dx/P51WM7VShx/N6W4V8ZB5svu23FL61FfeNgfEKl2oduc9CS+tsJzG98us4JLPeKWPrGVCeu+q7ao=@vger.kernel.org, AJvYcCV9E8WQWJ8/TtGdTG+0+SILSL+/ImiF/44Tcs9KvR4kFz5DN5WdGTzp4fPAXYbQ0x72HULMIC6k@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZRFaN7rDfKPDE5BZGAyqHv0kxStSRqrcD1+idd04NZewbRgKE
+	FxUJ95isX18GGkDA7nd5eV37qPyUJ4e5l+bRZEYTdQyZowf6o2Z8
+X-Gm-Gg: ASbGncs0hj1MRwZJyOrvn3kKkc9fvS38eohOJDp5pQhiUOKOAIlTCK/P9WXu1HgTL5z
+	xijHeyS8rmEqVKivHQQ/Qft/l+2y129sfcNUIiwOld6S7y1yw+6XU74qlM9f3ecKR5Z+AFH3Q2x
+	jLspx4RTQwskc0LDYfcnd5fs3e03qt9dG19wMgzFm2gfS0jOlykP8tbDYbjEaaJ/d/m9Sqp8cpR
+	NYlHjq26H04WCPSyS5wmw72gkWUo77/lkUlCJ7SSQI5qdQOrgnlSpvg/xdMutpNhD5rmSYDjqPI
+	rHDKeLkXcot8WgK+Za8RrVuHedAK5NxIhCPePl5rGPHQyVO30rEOuroPswsqmxXuldFfNN677A=
+	=
+X-Google-Smtp-Source: AGHT+IF6uOXfqVH2vhHaQUcO/ldFAH1J35rJhBFF4DJEfgSvRefNvQeFectdQ6OZE4SbNKRRpEcvLA==
+X-Received: by 2002:a17:907:6d0d:b0:ac7:3929:25fa with SMTP id a640c23a62f3a-acabcac8d7cmr732254366b.30.1744421497699;
+        Fri, 11 Apr 2025 18:31:37 -0700 (PDT)
+Received: from [192.168.0.234] (ip-86-49-44-151.bb.vodafone.cz. [86.49.44.151])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acaa1c0227bsm521200666b.82.2025.04.11.18.31.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Apr 2025 18:31:37 -0700 (PDT)
+Message-ID: <d16ba399-8ddb-4d4e-9c1c-3f657ea86abe@ovn.org>
+Date: Sat, 12 Apr 2025 03:31:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Cc: i.maximets@ovn.org
+Subject: Re: [syzbot] [openvswitch?] KMSAN: uninit-value in validate_set (2)
+To: syzbot <syzbot+b07a9da40df1576b8048@syzkaller.appspotmail.com>,
+ aconole@redhat.com, davem@davemloft.net, dev@openvswitch.org,
+ echaudro@redhat.com, edumazet@google.com, horms@kernel.org, kuba@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ pshelar@ovn.org, syzkaller-bugs@googlegroups.com
+References: <67f9767f.050a0220.379d84.0003.GAE@google.com>
+Content-Language: en-US
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ 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
+In-Reply-To: <67f9767f.050a0220.379d84.0003.GAE@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Sorry for the late nit but the conversion is pretty inconsistent..
+On 4/11/25 10:07 PM, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    0af2f6be1b42 Linux 6.15-rc1
+> git tree:       upstream
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=14e26d78580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=7cfe1169d7fc8523
+> dashboard link: https://syzkaller.appspot.com/bug?extid=b07a9da40df1576b8048
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1367bb4c580000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1495d23f980000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/7526e189e315/disk-0af2f6be.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/60a25cc98e41/vmlinux-0af2f6be.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/2d7bf8af0faf/bzImage-0af2f6be.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+b07a9da40df1576b8048@syzkaller.appspotmail.com
+> 
+> =====================================================
 
-On Tue, 08 Apr 2025 13:55:14 -0700 Jacob Keller wrote:
-> diff --git a/drivers/net/dsa/mv88e6xxx/ptp.c b/drivers/net/dsa/mv88e6xxx/ptp.c
-> index aed4a4b07f34b1643a8bf51c2501d1f61ef0cf0b..4c037d4853fdbb86b5082437efe2ae7308559d66 100644
-> --- a/drivers/net/dsa/mv88e6xxx/ptp.c
-> +++ b/drivers/net/dsa/mv88e6xxx/ptp.c
-> @@ -332,13 +332,6 @@ static int mv88e6352_ptp_enable_extts(struct mv88e6xxx_chip *chip,
->  	int pin;
->  	int err;
->  
-> -	/* Reject requests with unsupported flags */
-> -	if (rq->extts.flags & ~(PTP_ENABLE_FEATURE |
-> -				PTP_RISING_EDGE |
-> -				PTP_FALLING_EDGE |
-> -				PTP_STRICT_FLAGS))
-> -		return -EOPNOTSUPP;
-> -
->  	/* Reject requests to enable time stamping on both edges. */
->  	if ((rq->extts.flags & PTP_STRICT_FLAGS) &&
->  	    (rq->extts.flags & PTP_ENABLE_FEATURE) &&
-> @@ -566,6 +559,11 @@ int mv88e6xxx_ptp_setup(struct mv88e6xxx_chip *chip)
->  	chip->ptp_clock_info.verify	= ptp_ops->ptp_verify;
->  	chip->ptp_clock_info.do_aux_work = mv88e6xxx_hwtstamp_work;
->  
-> +	chip->ptp_clock_info.supported_extts_flags = PTP_ENABLE_FEATURE |
-> +						     PTP_RISING_EDGE |
-> +						     PTP_FALLING_EDGE |
-> +						     PTP_STRICT_FLAGS;
+#syz test: https://github.com/igsilya/linux.git tmp-validate-set
 
-Sometimes you leave all the flags be..
-
->  	if (ptp_ops->set_ptp_cpu_port) {
->  		struct dsa_port *dp;
->  		int upstream = 0;
-> diff --git a/drivers/net/dsa/sja1105/sja1105_ptp.c b/drivers/net/dsa/sja1105/sja1105_ptp.c
-> index 08b45fdd1d2482b0f1f922aae4ff18db8e279f09..a7e9f9ab7a19a8413f2f450c3b4b3f636a177c67 100644
-> --- a/drivers/net/dsa/sja1105/sja1105_ptp.c
-> +++ b/drivers/net/dsa/sja1105/sja1105_ptp.c
-> @@ -820,13 +820,6 @@ static int sja1105_extts_enable(struct sja1105_private *priv,
->  	if (extts->index != 0)
->  		return -EOPNOTSUPP;
->  
-> -	/* Reject requests with unsupported flags */
-> -	if (extts->flags & ~(PTP_ENABLE_FEATURE |
-> -			     PTP_RISING_EDGE |
-> -			     PTP_FALLING_EDGE |
-> -			     PTP_STRICT_FLAGS))
-> -		return -EOPNOTSUPP;
-> -
->  	/* We can only enable time stamping on both edges, sadly. */
->  	if ((extts->flags & PTP_STRICT_FLAGS) &&
->  	    (extts->flags & PTP_ENABLE_FEATURE) &&
-> @@ -912,6 +905,9 @@ int sja1105_ptp_clock_register(struct dsa_switch *ds)
->  		.n_pins		= 1,
->  		.n_ext_ts	= 1,
->  		.n_per_out	= 1,
-> +		.supported_extts_flags = PTP_ENABLE_FEATURE |
-> +					 PTP_EXTTS_EDGES |
-> +					 PTP_STRICT_FLAGS,
-
-..sometimes you combine FALLNIG|RISING -> EDGES ..
-
->  	};
->  
->  	/* Only used on SJA1105 */
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-> index 1fd1ae03eb90960d1e3e20acb0638baecaa995f5..96f68c356fe81b6954653f8903faf433ef6018f5 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-> @@ -1624,14 +1624,6 @@ static int ice_ptp_cfg_extts(struct ice_pf *pf, struct ptp_extts_request *rq,
->  	int pin_desc_idx;
->  	u8 tmr_idx;
->  
-> -	/* Reject requests with unsupported flags */
-> -
-> -	if (rq->flags & ~(PTP_ENABLE_FEATURE |
-> -			  PTP_RISING_EDGE |
-> -			  PTP_FALLING_EDGE |
-> -			  PTP_STRICT_FLAGS))
-> -		return -EOPNOTSUPP;
-> -
->  	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
->  	chan = rq->index;
->  
-> @@ -2737,6 +2729,10 @@ static void ice_ptp_set_caps(struct ice_pf *pf)
->  	info->enable = ice_ptp_gpio_enable;
->  	info->verify = ice_verify_pin;
->  
-> +	info->supported_extts_flags = PTP_RISING_EDGE |
-> +				      PTP_FALLING_EDGE |
-> +				      PTP_STRICT_FLAGS;
-
-sometimes you drop ENABLE
-
-> +
->  	switch (pf->hw.mac_type) {
->  	case ICE_MAC_E810:
->  		ice_ptp_set_funcs_e810(pf);
-> diff --git a/drivers/net/ethernet/intel/igb/igb_ptp.c b/drivers/net/ethernet/intel/igb/igb_ptp.c
-> index f323e1c1989f1bfbbf1f04043c2c0f14ae8c716f..7dd5bf02ca32506666ce422ae3da23e66b0adfca 100644
-> --- a/drivers/net/ethernet/intel/igb/igb_ptp.c
-> +++ b/drivers/net/ethernet/intel/igb/igb_ptp.c
-> @@ -502,13 +502,6 @@ static int igb_ptp_feature_enable_82580(struct ptp_clock_info *ptp,
->  
->  	switch (rq->type) {
->  	case PTP_CLK_REQ_EXTTS:
-> -		/* Reject requests with unsupported flags */
-> -		if (rq->extts.flags & ~(PTP_ENABLE_FEATURE |
-> -					PTP_RISING_EDGE |
-> -					PTP_FALLING_EDGE |
-> -					PTP_STRICT_FLAGS))
-> -			return -EOPNOTSUPP;
-> -
->  		/* Both the rising and falling edge are timestamped */
->  		if (rq->extts.flags & PTP_STRICT_FLAGS &&
->  		    (rq->extts.flags & PTP_ENABLE_FEATURE) &&
-> @@ -658,13 +651,6 @@ static int igb_ptp_feature_enable_i210(struct ptp_clock_info *ptp,
->  
->  	switch (rq->type) {
->  	case PTP_CLK_REQ_EXTTS:
-> -		/* Reject requests with unsupported flags */
-> -		if (rq->extts.flags & ~(PTP_ENABLE_FEATURE |
-> -					PTP_RISING_EDGE |
-> -					PTP_FALLING_EDGE |
-> -					PTP_STRICT_FLAGS))
-> -			return -EOPNOTSUPP;
-> -
->  		/* Reject requests failing to enable both edges. */
->  		if ((rq->extts.flags & PTP_STRICT_FLAGS) &&
->  		    (rq->extts.flags & PTP_ENABLE_FEATURE) &&
-> @@ -1356,6 +1342,10 @@ void igb_ptp_init(struct igb_adapter *adapter)
->  		adapter->ptp_caps.n_per_out = IGB_N_PEROUT;
->  		adapter->ptp_caps.n_pins = IGB_N_SDP;
->  		adapter->ptp_caps.pps = 0;
-> +		adapter->ptp_caps.supported_extts_flags = PTP_ENABLE_FEATURE |
-> +							  PTP_RISING_EDGE |
-> +							  PTP_FALLING_EDGE |
-> +							  PTP_STRICT_FLAGS;
->  		adapter->ptp_caps.pin_config = adapter->sdp_config;
->  		adapter->ptp_caps.adjfine = igb_ptp_adjfine_82580;
->  		adapter->ptp_caps.adjtime = igb_ptp_adjtime_82576;
-> @@ -1378,6 +1368,8 @@ void igb_ptp_init(struct igb_adapter *adapter)
->  		adapter->ptp_caps.n_ext_ts = IGB_N_EXTTS;
->  		adapter->ptp_caps.n_per_out = IGB_N_PEROUT;
->  		adapter->ptp_caps.n_pins = IGB_N_SDP;
-> +		adapter->ptp_caps.supported_extts_flags = PTP_EXTTS_EDGES |
-> +							  PTP_STRICT_FLAGS;
-
-sometimes you both drop the enabled and combine the edges 
-
->  		adapter->ptp_caps.pps = 1;
->  		adapter->ptp_caps.pin_config = adapter->sdp_config;
->  		adapter->ptp_caps.adjfine = igb_ptp_adjfine_82580;
-
-No preference which version you pick but shouldn't we go with one?
-Or is this on purpose to show we have no preference?
--- 
-pw-bot: cr
 
