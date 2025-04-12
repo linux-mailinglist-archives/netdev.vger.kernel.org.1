@@ -1,87 +1,92 @@
-Return-Path: <netdev+bounces-181921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13111A86ED3
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 20:38:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EF29A86ED4
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 20:38:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C0D4189F44B
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 18:38:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 426B6189F88F
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 18:38:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7C4620FA90;
-	Sat, 12 Apr 2025 18:38:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2F3021A447;
+	Sat, 12 Apr 2025 18:38:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lrqIsWg2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DSOcUrku"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 340D6193402;
-	Sat, 12 Apr 2025 18:38:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3640D1C3C08;
+	Sat, 12 Apr 2025 18:38:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744483090; cv=none; b=p9GLqSmdSutLjpKjqaKjFL3iF1rmvgFD1HYysKaUinkWQoCbuJdIunxD1fb2m3eVH1oEvBxfnWipTLGdgUcZr5Rp0EKtK/izHWPqLPrj1Rjhw1A9JrcqWXE7k6EZoY/zVNY4I63hZCjKJBTt8qTb9nlvH60YWXnwhotMzFg2LmQ=
+	t=1744483121; cv=none; b=hRPBVtqhHwRRlG5IAmRVf3zJcgSoRc/FZ90A3Nh+LUiNIcZ1HBXluJ/rOs7yIWF9MmcnAwYZ9OAb7Ff+2vb8KQQhPIZmlSjAMqt3cCDq+GEqDmE54ed0PQWzO56W6+jPMyrPafM0tVdTv9rkvIm36Qss8b49DRS+Bg3diZKEKpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744483090; c=relaxed/simple;
-	bh=DB3ehN9uGhewpt+zV2BiPfCcLuTfwl7hGoU5BtcOe2Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=du+mtEfBX4L96VDOoMjMp1HljUCoA2rnTW4M8ljQu0bUmG2/bt3PMQIblSa7n2aUeU5hfVPf/m+g/KkWjTNNtZi9rTnLEmnj50+g7ElGFM/8Owrn6ZwENIanNDf0TG5X7vCfl9ehE6z7b1eGDbWGFaapgXVXGJEarMKgHIeMhK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lrqIsWg2; arc=none smtp.client-ip=209.85.214.177
+	s=arc-20240116; t=1744483121; c=relaxed/simple;
+	bh=qxcy0FfdjGh7AAF60opuU2EqK81hdzm1pQJ8NUSrICk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=POrtJzaqa9+DEJBCzzOzRh/XyocdkrWipGC8x8/MYHrxPgNkBs9wLzXopCphh2vDr8wa4a/ChDKN/if35ARYYhwDGM2dAfu2LH9dU+rIBZBbsuRy9CeseqOq/fvyhbMKjv0WWBZ7Dox8n1t2Nmx4SEswzDSpNtErTqT1GzyyqLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DSOcUrku; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2240b4de12bso41960205ad.2;
-        Sat, 12 Apr 2025 11:38:08 -0700 (PDT)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-43cfebc343dso23004015e9.2;
+        Sat, 12 Apr 2025 11:38:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744483088; x=1745087888; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1744483118; x=1745087918; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=qQM8fmMFppc/FCmln+vq9h3fENBqnRGQqbR3PeHRC9g=;
-        b=lrqIsWg2xe+eIWuzWtSTGa7NTwDGQKTA7i5IGIy6tJ7ZD5SpVqut509YhqiIbA+Ta4
-         sNXGal1yutKybawH5NrWEQlBeIjVpBgvCO+vcjGqwqYvb9J6FSitsa7JjyD1T/4OQswD
-         s6UOzfDhdAeMtRwcNBR7qu4eEIsMdKmIXdHlUru5jM+s0Z5y99iOXC9IXbp/o6u9i1UK
-         pqgkRHb7lzMP040/JdAyCYY9L5k1gP1Wqis1HfvtdvF8bE3cHSZytS0fAYqgrexegJ8c
-         mL79m2lb7BLL8H4bv4IjBRKyRRmQ5tm9KJ5RZY1ISK78b3z0FyfuULkqz5Fk/at9hTzr
-         rkyw==
+        bh=s9gisPQjnG9jpPLrR1ZKCJyzGMn74eV0TOMh3IuxXps=;
+        b=DSOcUrku+YpXd/DMbrwUPHJp9yRsemTnNclYu7ozLJFNXUiCwrmM5DdIqTx9Z8DvPE
+         zdSbYjg2n3wjhgaSJWmTZtOw/lcIkg40kUiUcepytNRPWO3zMVBu1BDQQrK15o3mfgYk
+         xAhPWbrGXU1tTgD0eYhZknxS8lUCYor49k0bpxXtmEQG77w/F+wUkOge4bVEdk7KiIKi
+         Et1Nungh6GbHx4OVQ242nrv5ZCyqR44vs+fGI0j2BZz59s94CAL/pfUe6CCIVbkGsGuX
+         I4CG8Q0xYXljEG5WRzCH56TwR+P89oKu+X9B8n5H/C08hJMQk3RDnAKIGVsTyr2nZ1u2
+         2gfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744483088; x=1745087888;
+        d=1e100.net; s=20230601; t=1744483118; x=1745087918;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=qQM8fmMFppc/FCmln+vq9h3fENBqnRGQqbR3PeHRC9g=;
-        b=TUkc5UkA6O77b+NgtgVHwxhME4muMnUTcH5bj5eB1gV6bfRH03+G7v2Qcd+do2fMd4
-         gWyMMXf7W0WaWC6s3h6wVfPx5ai55IK4JmjszuyD3i4FyzmIzmGKgdc2HiyiZAY5me9Q
-         Fa//dQiebZ8UVv7nJkGbkwjewYS1ChbIIB2Tk5bt/wHmkDnbrgLS7kmTBXrNh/woGeym
-         E5A/yXUUNhvizP45KMpoDvgBbsw0RA8POZmYomDgCDQEj6z+SQsHBmAkY0GQC9tKsLn+
-         CqNq9TwTSUWobPvCS+KCHA4yC46tm+mU30r1ev1quyzSVKghq2zTDyt9x5BBd4Zo3B1v
-         fsZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUHbylFJ5zgMTodNCoa5xP7pSpiNCZkB1cjBSmFEANrywzmA9PWcbQuqSP9x2KoDD5IeWMKnXc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywq5+i7yXXsRdFZMnNxhFTsoIWQYZBThaWCkmkZNa0aQ4X6m5jP
-	yNk6dTGq3PUwGBalxQCFDTAb/5gaMOtKOD27pfsDf+aFWrLH9xf6
-X-Gm-Gg: ASbGncuP0T0/12P3PenTjjw1eDfc7YMhLpSjvu23ZfEphyv43wY/DB4tvog4r/I/cfo
-	egzD3QLOqVR7CWeEvmaksJnTmXqrntO5jkrU1dePZN2dHwr/RhjU43qnB0GAWR06BdN8Bvc/QRN
-	J/DYU9lEwm6bRnl9zY754jzG16j1gygLtjNcxo7eryJoACkEk76NvadYIpGvlp9PzSfMu29sDvT
-	VdT3UebrWlVtnDRFDfeAl8sM//hFU0a8r2XlKeYZ592uIt0CvO7Zrtzb+at35kJ+hGCWrMOiSw9
-	iloHkLMNqRDdkNMaLM8qJV+Jd7FmXZ3haJk7YFKDJ3w7SHJOFHa/VRWCZhGIfI1zQXhUseGe4g=
-	=
-X-Google-Smtp-Source: AGHT+IHSywlzTeWPXiJ6eCS/vmFZYOxJH3s1j9ZXTbS+pQJjjWRL9LMRKY9z3kRM4vP86uBPI3R7VQ==
-X-Received: by 2002:a17:903:fae:b0:223:37ec:63d5 with SMTP id d9443c01a7336-22bea4c6beemr117609235ad.28.1744483088169;
-        Sat, 12 Apr 2025 11:38:08 -0700 (PDT)
-Received: from localhost.localdomain ([2620:10d:c090:400::5:67d1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22ac7c9c59dsm70251615ad.151.2025.04.12.11.38.06
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 12 Apr 2025 11:38:07 -0700 (PDT)
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To: torvalds@linux-foundation.org
-Cc: bpf@vger.kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@kernel.org,
-	netdev@vger.kernel.org
-Subject: [GIT PULL] BPF fixes for 6.15-rc2
-Date: Sat, 12 Apr 2025 11:38:04 -0700
-Message-Id: <20250412183804.36400-1-alexei.starovoitov@gmail.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+        bh=s9gisPQjnG9jpPLrR1ZKCJyzGMn74eV0TOMh3IuxXps=;
+        b=Fc/GPKO21bfSiRHzl5U1Za103IV342eqJ9YjTPGuG/PSdH1/bO8Ac07upp4gCuoslh
+         Hy4n3XLEEqS8VKdt8VAkuJONAS7RlV5Zo8p8j1fLVHkoUwa/zvttKbS1+0SSqiSxSuK0
+         9RjmgtFTbga5EmRKi2NOYohCfbXoF4IfQVCZ1ZGExi/1kkydyaYcKyzftNY5ov0//Lq3
+         Ri8G2LfZMe2IEgtUDV0ytwqYnIPsvJjdoeDUNHYD4a02iRk5ne4AkhK3CO4lqJxloA3G
+         /0T/O9+gNNXTdQkIHqP70Kx+DKEAlQqAapCFMAu6oEXplj0O7Gc99xw0orsGAX8+0vzQ
+         HaTw==
+X-Forwarded-Encrypted: i=1; AJvYcCVKPdc1NsBW2XIkHWfSCNrwNsBCKClqB+B0EPubhTd7cUViIqHHS2hChEWoWk+X7OYb38cXjFFGQN3n@vger.kernel.org, AJvYcCVO/XMgRPQ6a/ZRORAjqFa1YwASLHqhXEqm9b7PaB3/eEgoFvGcwt+R1kOJV17bJE9aqHepkWst@vger.kernel.org, AJvYcCW+zYe2xYU5viVqAX1y7336B/VnNlq5ncSOF/OFvxwX3ZSWqMVysYRjo305qyfpV67LlevwZYqeXjBxJ0A=@vger.kernel.org, AJvYcCX6nLxBIAJbOn1aGut2FsHYhXdj1I31jXBcO1EYyXcezjQG5++rPyOZKD8pbQuBcG/Soac1L3AT@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3kSDmtuK+K2QjUpjsSnJkGEWCEvd8ZQynXQCWy/9qAIkzouyd
+	6Z2UguIR3U3FbBZXbj4AapjTA/sitS+C06h4vTzxbGa2ZEsLibzC
+X-Gm-Gg: ASbGncvNMm03sva5F6+G2A3TigI+QVWC6U8cwM6RN30Uol9rU6dJ+6Ui3pJPSH0fEye
+	Dh1z/bvSvszMWSb8UArgTwz/BOndJlekfja5gaGJn+ZuzC9cAvbUKWeuzuX9MofaOhGMhLy+yre
+	futpraaaXY8KebIzhUOrprqIwVvfY523sGHSjGe71y6nNAbSUEdHdOZWsfKLKLnI+uRspByxNrK
+	B71PPhFybFcX4/6QfjGvoPtbhe8KaAhLrpHs9qeIUno2gGALAr24wHgc0lsCDS988vpxelPukle
+	IOJn6HsKSFpvkJA+mKMgfVQwOBgrLJtM6mUR+Hf7Y2Dqqd/Y0GhJlmh3/antSLJ77w==
+X-Google-Smtp-Source: AGHT+IFR7mxHjBPjFVXUJpWZ/+3fCdlG6JHP+8K+2Kc8E8YzLmgTezRgDejxJhR0zvfJ3dXp44O+2A==
+X-Received: by 2002:a05:600c:1d93:b0:43c:e9d0:9ee5 with SMTP id 5b1f17b1804b1-43f3a959c51mr66826555e9.18.1744483118061;
+        Sat, 12 Apr 2025 11:38:38 -0700 (PDT)
+Received: from localhost.localdomain ([2a02:c7c:6696:8300:f069:f1cb:5bbc:db26])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f233c817dsm120599515e9.23.2025.04.12.11.38.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 12 Apr 2025 11:38:37 -0700 (PDT)
+From: Qasim Ijaz <qasdev00@gmail.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com,
+	stable@vger.kernel.org
+Cc: Qasim Ijaz <qasdev00@gmail.com>
+Subject: [PATCH 0/5] net: ch9200: fix various bugs and improve qinheng ch9200 driver
+Date: Sat, 12 Apr 2025 19:38:24 +0100
+Message-Id: <20250412183829.41342-1-qasdev00@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,60 +95,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi Linus,
+This patch series aims to fix various issues throughout the QinHeng CH9200
+driver. This driver fails to handle various failures, which in one
+case has lead to a uninit access bug found via syzbot. Upon reviewing
+the driver I fixed a few more issues which I have included in this patch
+series.
 
-The following changes since commit a8662bcd2ff152bfbc751cab20f33053d74d0963:
+Parts of this series are the product of discussions and suggestions I had
+from others like Andrew Lunn, Simon Horman and Jakub Kicinski you can view those
+discussions below:
 
-  Merge tag 'v6.15-p3' of git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6 (2025-04-04 19:34:38 -0700)
+Link: <https://lore.kernel.org/all/20250319112156.48312-1-qasdev00@gmail.com>
+Link: <https://lore.kernel.org/all/20250218002443.11731-1-qasdev00@gmail.com/>
+Link: <https://lore.kernel.org/all/20250311161157.49065-1-qasdev00@gmail.com/>
 
-are available in the Git repository at:
+Qasim Ijaz (5):
+  fix uninitialised access bug during mii_nway_restart
+  remove extraneous return that prevents error propagation
+  fail fast on control_read() failures during get_mac_address()
+  add missing error handling in ch9200_bind()
+  avoid triggering NWay restart on non-zero PHY ID
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/bpf-fixes
+ drivers/net/usb/ch9200.c | 61 ++++++++++++++++++++++++++--------------
+ 1 file changed, 40 insertions(+), 21 deletions(-)
 
-for you to fetch changes up to a650d38915c194b87616a0747a339b20958d17db:
+-- 
+2.39.5
 
-  bpf: Convert ringbuf map to rqspinlock (2025-04-11 10:28:26 -0700)
-
-----------------------------------------------------------------
-- Followup fixes for resilient spinlock (Kumar Kartikeya Dwivedi)
-  . Make res_spin_lock test less verbose, since it was spamming
-    BPF CI on failure, and make the check for AA deadlock stronger
-  . Fix rebasing mistake and use architecture provided
-    res_smp_cond_load_acquire
-  . Convert BPF maps (queue_stack and ringbuf) to resilient
-    spinlock to address long standing syzbot reports
-
-- Make sure that classic BPF load instruction from SKF_[NET|LL]_OFF
-  offsets works when skb is fragmeneted (Willem de Bruijn) 
-
-Signed-off-by: Alexei Starovoitov <ast@kernel.org>
-----------------------------------------------------------------
-Alexei Starovoitov (1):
-      Merge branch 'support-skf_net_off-and-skf_ll_off-on-skb-frags'
-
-Kumar Kartikeya Dwivedi (5):
-      selftests/bpf: Make res_spin_lock test less verbose
-      selftests/bpf: Make res_spin_lock AA test condition stronger
-      bpf: Use architecture provided res_smp_cond_load_acquire
-      bpf: Convert queue_stack map to rqspinlock
-      bpf: Convert ringbuf map to rqspinlock
-
-Willem de Bruijn (2):
-      bpf: support SKF_NET_OFF and SKF_LL_OFF on skb frags
-      selftests/net: test sk_filter support for SKF_NET_OFF on frags
-
- arch/arm64/include/asm/rqspinlock.h                |   2 +-
- kernel/bpf/queue_stack_maps.c                      |  35 +--
- kernel/bpf/ringbuf.c                               |  17 +-
- kernel/bpf/rqspinlock.c                            |   2 +-
- net/core/filter.c                                  |  80 ++++---
- .../selftests/bpf/prog_tests/res_spin_lock.c       |   7 +-
- tools/testing/selftests/bpf/progs/res_spin_lock.c  |  10 +-
- tools/testing/selftests/net/.gitignore             |   1 +
- tools/testing/selftests/net/Makefile               |   2 +
- tools/testing/selftests/net/skf_net_off.c          | 244 +++++++++++++++++++++
- tools/testing/selftests/net/skf_net_off.sh         |  30 +++
- 11 files changed, 354 insertions(+), 76 deletions(-)
- create mode 100644 tools/testing/selftests/net/skf_net_off.c
- create mode 100755 tools/testing/selftests/net/skf_net_off.sh
 
