@@ -1,72 +1,59 @@
-Return-Path: <netdev+bounces-181936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9E3EA8703E
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 01:29:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C3CDBA87040
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 01:30:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2953619E0A08
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 23:29:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 006D119E09FD
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 23:30:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5320C222595;
-	Sat, 12 Apr 2025 23:28:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462531A3169;
+	Sat, 12 Apr 2025 23:30:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="g0tvWINM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eOSptyep"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B742119E83C;
-	Sat, 12 Apr 2025 23:28:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 215F21993BD
+	for <netdev@vger.kernel.org>; Sat, 12 Apr 2025 23:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744500539; cv=none; b=QtG3Vv91h1TEFidKsEZ8Q2pTeKKnZ5YNFLDOe1HAb70gd13D1REQl6dTMDmA12WjZOGRmCahwnHa8kIHLgfUZYdulBjiuflRFI3K0zyHjTc0423PPycW1xF7ZY7+fxB+bN0uxNWfYhgxnbmkrAsu3EKDIQXusUuZpCTUT8D/uKw=
+	t=1744500617; cv=none; b=TSVHGUPJUSe1oMrRhEAJWfs2OilmeFpGKMiIrnxzTZw9m3EDlLKGZ2T/BIhPz/W1fmdbyUWbs6f8GSCszN823K+GkXIpGpVRqSFFj9nZtpv64CXyCuPZxwzF3BWOZOLr/323nB7nAZzlBnsVkoBm7EqXz4gqGUD3emic/WaqY/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744500539; c=relaxed/simple;
-	bh=gQMrL4+swJuQvx5mpzAd7Rauv7uGkymlaI2Gdq19Beg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hRJPpXEMVJjAINSJOsrSct9eI5QDMB9+oqgl+A4VPJrGW8/zQQ/Y4I1beCrKe2eV5T7rGySVigM+QTnuf1/VtDI3GRK0GvuPfjZIbCY5RwJHaXQ+gSTjPt3JVwfB1nLxNUj4Le4s/a4JpnqmeV78rg4lcc5Lze6fq3ZLvGkCxuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=g0tvWINM; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1744500537; x=1776036537;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=fLsPIBKLCkZ+nG1Keg61Tbv/X4V+aLxUpZHUG+AmbOo=;
-  b=g0tvWINMiXh6uwLdtAHoiEdpryNaYe0+0VxU5FKzo3OaJg7MUJyIMclO
-   P4I3EL3IxfdnkPOlqez5x+uZ/YsnjeW7D66bsna1xqxVKl9mr0w7OtP8j
-   TtCcbPwAEXnO7+QuJu6pTLhix4ZEiI9a9UX2cbwId/VOqRPNXa8RWW3EH
-   w=;
-X-IronPort-AV: E=Sophos;i="6.15,209,1739836800"; 
-   d="scan'208";a="186895245"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2025 23:28:55 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:23025]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.8.63:2525] with esmtp (Farcaster)
- id e1f47f7b-e72f-4af3-bd5c-2e670cfbc360; Sat, 12 Apr 2025 23:28:54 +0000 (UTC)
-X-Farcaster-Flow-ID: e1f47f7b-e72f-4af3-bd5c-2e670cfbc360
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Sat, 12 Apr 2025 23:28:54 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.187.170.45) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Sat, 12 Apr 2025 23:28:52 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <qasdev00@gmail.com>
-CC: <jlayton@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>
-Subject: Re: [PATCH] net: use %ld format specifier for PTR_ERR in pr_warn
-Date: Sat, 12 Apr 2025 16:28:38 -0700
-Message-ID: <20250412232839.66642-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1744500617; c=relaxed/simple;
+	bh=VE2+NexlsQkF1yffVVBLgIjSM/Dix2Wr3+JiVVDlO/w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hxC8qbKTzGNE4b/WLWPZRSxHuBJZLbPRYhxLCDjBAEdMBXi9lm5vZGsmvqtkNNMTrLq9i/hZMAOeiIULX9LQOW7f2Y3TeWuoN91OqDKduv7HlkZjHwLQompy6bKmaSqLA76zR3acgUZxZROgk+GW4byDScw6/91lwLQMuxBmf5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eOSptyep; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B678C4CEE3;
+	Sat, 12 Apr 2025 23:30:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744500615;
+	bh=VE2+NexlsQkF1yffVVBLgIjSM/Dix2Wr3+JiVVDlO/w=;
+	h=From:To:Cc:Subject:Date:From;
+	b=eOSptyepqEI1muES+5xcdUridrV02v45KFWrG4946hLLCovMCIysxZ4hc7ud7ahle
+	 LZyq3Ck0ucg0u5mVk5pAMh20yRBpERETRiU9j5bhrrT7EMNKCZ/gpxU+jTibHy9F5o
+	 FfjzhcZoJgRdx9YDt9bgvudy1z1QGtscn/q4VmxujHprNXb/syoq2HrtiKxchQFMy4
+	 bJQacIz7F9IsyHqXmL/Ef/5Yrhj8AXfiaxcdcIm0f6W4iNK+ZQglmEUhkfuwx5VHLg
+	 sBG1H86gDUcdpaQ0NkkGtjRqlRqBLJ8t0+rpI1IhQ7rqxX7+c7Wcftni0PcvQC3SdC
+	 YrOCvtzpTgxAQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	syzbot+6f588c78bf765b62b450@syzkaller.appspotmail.com,
+	sdf@fomichev.me
+Subject: [PATCH net] net: don't mix device locking in dev_close_many() calls
+Date: Sat, 12 Apr 2025 16:30:11 -0700
+Message-ID: <20250412233011.309762-1-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250412225528.12667-1-qasdev00@gmail.com>
-References: <20250412225528.12667-1-qasdev00@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,45 +61,93 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D035UWB001.ant.amazon.com (10.13.138.33) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Qasim Ijaz <qasdev00@gmail.com>
-Date: Sat, 12 Apr 2025 23:55:28 +0100
-> PTR_ERR yields type long, so use %ld format specifier in pr_warn.
+Lockdep found the following dependency:
 
-errno fits in the range of int, so no need to use %ld.
+  &dev_instance_lock_key#3 -->
+     &rdev->wiphy.mtx -->
+        &net->xdp.lock -->
+	   &xs->mutex -->
+	      &dev_instance_lock_key#3
 
+The first dependency is the problem. wiphy mutex should be outside
+the instance locks. The problem happens in notifiers (as always)
+for CLOSE. We only hold the instance lock for ops locked devices
+during CLOSE, and WiFi netdevs are not ops locked. Unfortunately,
+when we dev_close_many() during netns dismantle we may be holding
+the instance lock of _another_ netdev when issuing a CLOSE for
+a WiFi device.
 
-> 
-> Fixes: 193510c95215 ("net: add debugfs files for showing netns refcount tracking info")
+Lockdep's "Possible unsafe locking scenario" only prints 3 locks
+and we have 4, plus I think we'd need 3 CPUs, like this:
 
-The series is not yet applied.  It's not necessary this time, but
-in such a case, please reply to the original patch thread.
+       CPU0                 CPU1              CPU2
+       ----                 ----              ----
+  lock(&xs->mutex);
+                       lock(&dev_instance_lock_key#3);
+                                         lock(&rdev->wiphy.mtx);
+                                         lock(&net->xdp.lock);
+                                         lock(&xs->mutex);
+                       lock(&rdev->wiphy.mtx);
+  lock(&dev_instance_lock_key#3);
 
-Also, please make sure your patch can be applied cleanly on the latest
-remote net-next.git and the Fixes tag points to an existing commit.
+Tho, I don't think that's possible as CPU1 and CPU2 would
+be under rtnl_lock. Even if we have per-netns rtnl_lock and
+wiphy can span network namespaces - CPU0 and CPU1 must be
+in the same netns to see dev_instance_lock, so CPU0 can't
+be installing a socket as CPU1 is tearing the netns down.
 
+Regardless, our expected lock ordering is that wiphy lock
+is taken before instance locks, so let's fix this.
 
-> Signed-off-by: Qasim Ijaz <qasdev00@gmail.com> 
-> ---
->  net/core/net_namespace.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-> index f47b9f10af24..a419a3aa57a6 100644
-> --- a/net/core/net_namespace.c
-> +++ b/net/core/net_namespace.c
-> @@ -1652,7 +1652,7 @@ static int __init ns_debug_init(void)
->  	if (ref_tracker_debug_dir) {
->  		ns_ref_tracker_dir = debugfs_create_dir("net_ns", ref_tracker_debug_dir);
->  		if (IS_ERR(ns_ref_tracker_dir)) {
-> -			pr_warn("net: unable to create ref_tracker/net_ns directory: %d\n",
-> +			pr_warn("net: unable to create ref_tracker/net_ns directory: %ld\n",
->  				PTR_ERR(ns_ref_tracker_dir));
->  			goto out;
->  		}
-> -- 
-> 2.39.5
+Go over the ops locked and non-locked devices separately.
+Note that calling dev_close_many() on an empty list is perfectly
+fine. All processing (including RCU syncs) are conditional
+on the list not being empty, already.
+
+Fixes: 7e4d784f5810 ("net: hold netdev instance lock during rtnetlink operations")
+Reported-by: syzbot+6f588c78bf765b62b450@syzkaller.appspotmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: sdf@fomichev.me
+---
+ net/core/dev.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 75e104322ad5..5fcbc66d865e 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -11932,15 +11932,24 @@ void unregister_netdevice_many_notify(struct list_head *head,
+ 		BUG_ON(dev->reg_state != NETREG_REGISTERED);
+ 	}
+ 
+-	/* If device is running, close it first. */
++	/* If device is running, close it first. Start with ops locked... */
+ 	list_for_each_entry(dev, head, unreg_list) {
+-		list_add_tail(&dev->close_list, &close_head);
+-		netdev_lock_ops(dev);
++		if (netdev_need_ops_lock(dev)) {
++			list_add_tail(&dev->close_list, &close_head);
++			netdev_lock(dev);
++		}
++	}
++	dev_close_many(&close_head, true);
++	/* ... now unlock them and go over the rest. */
++	list_for_each_entry(dev, head, unreg_list) {
++		if (netdev_need_ops_lock(dev))
++			netdev_unlock(dev);
++		else
++			list_add_tail(&dev->close_list, &close_head);
+ 	}
+ 	dev_close_many(&close_head, true);
+ 
+ 	list_for_each_entry(dev, head, unreg_list) {
+-		netdev_unlock_ops(dev);
+ 		/* And unlink it from device chain. */
+ 		unlist_netdevice(dev);
+ 		netdev_lock(dev);
+-- 
+2.49.0
+
 
