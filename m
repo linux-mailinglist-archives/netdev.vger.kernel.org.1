@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-181877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5AE2A86BC8
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 10:09:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CC90A86BCC
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 10:09:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B477D8A7A31
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 08:09:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D105A8A7AB3
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 08:09:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E242B19ABC3;
-	Sat, 12 Apr 2025 08:09:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFB3B19CC06;
+	Sat, 12 Apr 2025 08:09:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="svstFTNk"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="g2fL0SiJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A99199238
-	for <netdev@vger.kernel.org>; Sat, 12 Apr 2025 08:09:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1F8199238
+	for <netdev@vger.kernel.org>; Sat, 12 Apr 2025 08:09:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744445359; cv=none; b=qIsyuOmblL5Vsgfsd702/7nfnqHLKOTk1W+AFgNkOojhYISJB1IRm8AptfMeGGNnrR3yBzh40UmmDnRRiimKBved8IPwSeWU+S4cVEONgBdFe547bAmfdf0ypFdxE0tiLt3JRoxE2c/x7mytypW+5P4JwNA0E54K8iif/ZUwiik=
+	t=1744445363; cv=none; b=qropi33/Wpk5rmkkf1JGbNSZLe0HEcbxMX5ZoT8dNYLOo7/XjiauwkT51SzCz4rKVjmj5mvbBjRI+jObBH1KDKeoIbdNEDdHhvBrsw3A2fNTERMN813+VU6x21NdW/oF4gwachGWSdNSefDynN0IUQ8YerTzqhf7KArHdKzx2FM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744445359; c=relaxed/simple;
-	bh=yJi/Mc1NOpNjJ/MeGCoCFFVncbkLTl/GbrWDve+FX6g=;
+	s=arc-20240116; t=1744445363; c=relaxed/simple;
+	bh=WAFOqUl/TRyBIk15Ch1++vj9j2oY+PsMb9v3GEcnEcI=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=g7qxlgLLQ3wkVaqX7BXXXWdHd829ub9TdMykcEC+sDqqJxMWOxgMH9vTIla53vr9f9Y1xHsUTQmeVVR9WZRaSnQ4kVUXIAPSWBtCDtv415g9X4UwP9/Hc6bTWUzYc6tVdxHfS8CNvqFRWDI4ZupZhycSa2/0gvuDZ4tzjTRl0n0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=svstFTNk; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=s+4W6J3F7rXg2bOMFkwUi7hzDhHUxHcpRW0Wp0QaLwX1sgzYO8FUN3lDoj2WyfRFxBbfhvQPAM2CF7eMrRP5TDMyfI8QSi1/s97N1MbW5wRujyllbbVzq3xU9i8EWI3Wq4r6wAj+Vt3jd/Tymg8AyJYt7SwqSYnchRrO3UgbibQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=g2fL0SiJ; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=T1Mb38BSjKzMqPH9UJFq9q1axHklKlcNwBEoVhdqgOg=; b=svstFTNkQmymYuNbmb76DKR8jj
-	KUdMC1U5AIo8ggJDqlkxWgF8MmMloTAw9Rzm1U0GNtI51U2Y5Lc77sTzdLArj+gWXWdvkHSvfM0Ep
-	GAP9VQreSQzh4XPLpyCaE68mGNS0s04QQgNt1lQjW+Dn5u7mxT5al2xfmOPMnsgv7qc4jlaThT8Pt
-	LhX4CCwntotIoCWeFMs5nctO+wupOvLJT240wxFuIBCWjttTpFT+BMWbddIvRd8MY4A1ZuUvuUCGg
-	esQZ03zHo54z2NLRZniWYXZggO/se9cEJKrpJx4i+AW64mgzYCgfIvIF+hEB6Pu3cpPd2yxIVMJeE
-	W+zDC5qQ==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:45140 helo=rmk-PC.armlinux.org.uk)
+	bh=9qMIXcNMzblzp9RIwLXwsUxv9/cysEMvIvuAUsNL+zQ=; b=g2fL0SiJm1hmi1VzInrX3ZYfMq
+	uuYlNlRB+f7yCCkY3QMlKa9fYEPqgCpzZXCyIYChVXHRcOANErQJbGwbMXP+288je+oc/oT7Ldyyg
+	NYdv6TsaGWNeJa+EeSIu6lSswNPbfKbDCZDfpQpd2IAWFFxYm8Y9/A9NWeoNuiXMhxefzYWt5OSLY
+	+gZbXpgOkuh3/cKVaiQLbfOmy2uvkFbJ1z6nWwtWeTs1pha+WCQWOky9qPgJS6151JkpFGaXx1DYB
+	WTNmrEFxMJ4Ac/YOf57/EkPMFPfaI1ox0ELGIQgl4RVmHPQZy16jvrfGNkjBo4NHxPtY9YqdkbL/D
+	7BUmxJmQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42084 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1u3VvH-0004Lt-0f;
-	Sat, 12 Apr 2025 09:09:07 +0100
+	id 1u3VvM-0004M4-1G;
+	Sat, 12 Apr 2025 09:09:12 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1u3Vuf-000E7g-U4; Sat, 12 Apr 2025 09:08:29 +0100
+	id 1u3Vul-000E7m-1j; Sat, 12 Apr 2025 09:08:35 +0100
 In-Reply-To: <Z_oe0U5E0i3uZbop@shell.armlinux.org.uk>
 References: <Z_oe0U5E0i3uZbop@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -71,8 +71,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Philipp Zabel <p.zabel@pengutronix.de>,
 	Richard Cochran <richardcochran@gmail.com>,
 	Thierry Reding <treding@nvidia.com>
-Subject: [PATCH net-next v2 1/5] net: stmmac: dwc-qos: remove
- tegra_eqos_init()
+Subject: [PATCH net-next v2 2/5] net: stmmac: intel: remove eee_usecs_rate and
+ hardware write
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,87 +82,59 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1u3Vuf-000E7g-U4@rmk-PC.armlinux.org.uk>
+Message-Id: <E1u3Vul-000E7m-1j@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Sat, 12 Apr 2025 09:08:29 +0100
+Date: Sat, 12 Apr 2025 09:08:35 +0100
 
-tegra_eqos_init() initialises the 1US TIC counter for the EEE timers.
-However, the DWGMAC core is reset after this write, which clears
-this register to its default.
+Remove the write to GMAC_1US_TIC_COUNTER for two reasons:
 
-However, dwmac4_core_init() configures this register using the same
-clock, which happens after reset - thus this is the write which
-ensures that the register is correctly configured.
+1. during initialisation or reinitialisation of the DWMAC core, the
+   core is reset, which sets this register back to its default value.
+   Writing it prior to stmmac_dvr_probe() has no effect.
 
-Therefore, tegra_eqos_init() is not required and is removed. This also
-means eqos->clk_slave can also be removed.
+2. Since commit 8efbdbfa9938 ("net: stmmac: Initialize
+   MAC_ONEUS_TIC_COUNTER register"), GMAC4/5 core code will set
+   this register based on the rate of plat->stmmac_clk. This clock
+   is created by the same code which initialises plat->eee_usecs_rate,
+   which is also created to run at this same rate. Since Marek's
+   commit, this will set this register appropriately using the
+   rate of this clock.
+
+Therefore, dwmac-intel.c writing GMAC_1US_TIC_COUNTER serves no
+useful purpose and can be removed.
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- .../stmicro/stmmac/dwmac-dwc-qos-eth.c        | 24 +------------------
- 1 file changed, 1 insertion(+), 23 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c | 8 --------
+ 1 file changed, 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-index 5db318327d33..583b5c071cd1 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
-@@ -29,7 +29,6 @@ struct tegra_eqos {
- 	void __iomem *regs;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+index c8bb9265bbb4..54db5b778304 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+@@ -682,7 +682,6 @@ static int intel_mgbe_common_data(struct pci_dev *pdev,
+ 	plat->axi->axi_blen[2] = 16;
  
- 	struct reset_control *rst;
--	struct clk *clk_slave;
+ 	plat->ptp_max_adj = plat->clk_ptp_rate;
+-	plat->eee_usecs_rate = plat->clk_ptp_rate;
  
- 	struct gpio_desc *reset;
- };
-@@ -199,20 +198,6 @@ static void tegra_eqos_fix_speed(void *priv, int speed, unsigned int mode)
- 	}
- }
+ 	/* Set system clock */
+ 	sprintf(clk_name, "%s-%s", "stmmac", pci_name(pdev));
+@@ -1313,13 +1312,6 @@ static int intel_eth_pci_probe(struct pci_dev *pdev,
+ 	memset(&res, 0, sizeof(res));
+ 	res.addr = pcim_iomap_table(pdev)[0];
  
--static int tegra_eqos_init(struct platform_device *pdev, void *priv)
--{
--	struct tegra_eqos *eqos = priv;
--	unsigned long rate;
--	u32 value;
+-	if (plat->eee_usecs_rate > 0) {
+-		u32 tx_lpi_usec;
 -
--	rate = clk_get_rate(eqos->clk_slave);
+-		tx_lpi_usec = (plat->eee_usecs_rate / 1000000) - 1;
+-		writel(tx_lpi_usec, res.addr + GMAC_1US_TIC_COUNTER);
+-	}
 -
--	value = (rate / 1000000) - 1;
--	writel(value, eqos->regs + GMAC_1US_TIC_COUNTER);
--
--	return 0;
--}
--
- static int tegra_eqos_probe(struct platform_device *pdev,
- 			    struct plat_stmmacenet_data *plat_dat,
- 			    struct stmmac_resources *res)
-@@ -227,7 +212,6 @@ static int tegra_eqos_probe(struct platform_device *pdev,
- 
- 	eqos->dev = &pdev->dev;
- 	eqos->regs = res->addr;
--	eqos->clk_slave = plat_dat->stmmac_clk;
- 
- 	if (!is_of_node(dev->fwnode))
- 		goto bypass_clk_reset_gpio;
-@@ -267,17 +251,11 @@ static int tegra_eqos_probe(struct platform_device *pdev,
- bypass_clk_reset_gpio:
- 	plat_dat->fix_mac_speed = tegra_eqos_fix_speed;
- 	plat_dat->set_clk_tx_rate = stmmac_set_clk_tx_rate;
--	plat_dat->init = tegra_eqos_init;
- 	plat_dat->bsp_priv = eqos;
- 	plat_dat->flags |= STMMAC_FLAG_SPH_DISABLE;
- 
--	err = tegra_eqos_init(pdev, eqos);
--	if (err < 0)
--		goto reset;
--
- 	return 0;
--reset:
--	reset_control_assert(eqos->rst);
-+
- reset_phy:
- 	gpiod_set_value(eqos->reset, 1);
- 
+ 	ret = stmmac_config_multi_msi(pdev, plat, &res);
+ 	if (ret) {
+ 		ret = stmmac_config_single_msi(pdev, plat, &res);
 -- 
 2.30.2
 
