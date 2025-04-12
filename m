@@ -1,115 +1,211 @@
-Return-Path: <netdev+bounces-181889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3281A86C92
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 12:41:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E3C7A86CAB
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 12:58:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFE0F17740A
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 10:41:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A0869A0B1F
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 10:58:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94EBE1A08AF;
-	Sat, 12 Apr 2025 10:41:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63D0E1D88D0;
+	Sat, 12 Apr 2025 10:58:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pT/VsOF5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f68.google.com (mail-wm1-f68.google.com [209.85.128.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3266319E7ED;
-	Sat, 12 Apr 2025 10:40:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C4BF1A5B91;
+	Sat, 12 Apr 2025 10:58:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744454460; cv=none; b=OaMpWRksVZni4C08kUuNDc+MiCL4hcyPX/EvbS+BlnX6ahOCvY+hrL8EQzSfVrlA/KHTn5Hu2YXCGhnKEmVtmvQFUkwUxlmFojHKLUHj5/j/WSWNWCIAUaFFkIogA65Eqtq5fm1cv6TpH7AxtP+KMaktfBkaD4iK+8TcD/zN1V8=
+	t=1744455516; cv=none; b=UcWq73Sp+AskzsGEa3gJoNi2r/7nrC4MUmIQuGcUq0yUDFkWPl417+P2ynVmEOxuR08MT/m6N9631uHyzDwHm3xGCNbUVh/g1R8Ohw1JFnPuGEjNBQeZCBqT3hZ9th2F/Xgl5bAOSGOar5xh32QmnyKFlvtKRbZuIvWTqQRwUnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744454460; c=relaxed/simple;
-	bh=1JyIRWLYbbGPyvyz+jktTJKne0DLaNrSnI6GUVG/O/U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=seK6AhBK3x/rzgjIrmLMU+tbyZ6S6WNRjOxg4pKaG7FZtQAb5nOsSB6g8a9AdR6CZ8/Fhhta1jCXkkAs190gWLhWsJgKHM+cEGUqjAUG/LEPD3ZVsEIVrVyZ/nWS9MBz4jc1FBTMlOAm5SPY8Iyq1LRAeDQtPAr3IDx2Ay5eCgA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f68.google.com with SMTP id 5b1f17b1804b1-43cfe63c592so30344385e9.2;
-        Sat, 12 Apr 2025 03:40:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744454456; x=1745059256;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sPpGEdLLDLP9afcNxJK057G2Q4dt6mDwWuMuvaUGFQI=;
-        b=fgSUoBaFV/ei5P45d5H2Hm7In6bNyiSwBiikKuekPFHUoUOYgB/WGvarZw+ap993Os
-         gPYEu91cwgR9znL98n1Bfh5jm9Kk+jDcgZXHc+y+6TNZm7M9+bqNvwOx/wW5HwHHinBB
-         /rOqn28zrDdM8ki9UMGhg8v6BeU4E9HaxQf6RbeK8gELtgHuuKCG8gmJXt5i/onLkEIJ
-         C+dwV518aOxZo1oosT5FXycfIx6zRoUCR37D8ZwunWytUABCmd1tNBMGIPvFT0s+/A0W
-         KCZ8MkhVuyQ4lqeVQo4wq3OQ9907gIrn3MHhGPk5ZnaXg0D8KEc0r6yN9Or2KoPmQ3tC
-         cxCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUK9fcWs7ofbYUxa26x5K2IMaZtLPKxd6CCplvqtRzMazX3u44iNnv8MECLBIJlC7s+CPJn01cf/8l4r1g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGptqHcKJkwVLrs4MY2j1EK0Sv2SHu2TW+2E9XMFF3xF3aQ0PR
-	iVP+loY/siQrAuMdgOQ9nbis0EaltocP3VdaUGAyivlwu9FuAIXdiZmkA+uO
-X-Gm-Gg: ASbGncuC3VEo9w25eTPKLJ6TGkLjJQSZpXf00GreucbpHYPSh+kz8xz18xD0thLXXMt
-	qYQSzrTtSYcKKiEzxpip1udipv09/kKSoPioqd6J914g+mqc0dvy/Z++He63ZHTNCR0sS2QJB++
-	mXlqqvHfVu3HxHBv+TEfD/ozqFTM9syZDyq/FMI7CHwbB6JtuN/56I14chRXGPgiO/onfzmPKOV
-	vBF6oPc+R94adeWsAjPgCKHqxJGSfAKngtpvxAnGsLe5LlVkbo+UM8kDpgInxNLxc91eag59Tvr
-	U9aQBYApTTcrfEJgaGnyZCDL8Um6AyPIWjz/L8mQ3cIHy4kpVVciQB+Tn51s7w2iS53k8kkY/GT
-	dtXc=
-X-Google-Smtp-Source: AGHT+IGzLyaTB1RvYYX77BpfekTlQrZrf+ZGoA0FeukFOp/MLONdezaHDAiIfqlDbTgoFbCOAgtV8w==
-X-Received: by 2002:a05:600c:b8f:b0:43c:fe15:41c9 with SMTP id 5b1f17b1804b1-43f3a93f343mr53814905e9.9.1744454456112;
-        Sat, 12 Apr 2025 03:40:56 -0700 (PDT)
-Received: from im-t490s.redhat.com (ip-86-49-44-151.bb.vodafone.cz. [86.49.44.151])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f206332d9sm113611045e9.13.2025.04.12.03.40.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Apr 2025 03:40:55 -0700 (PDT)
-From: Ilya Maximets <i.maximets@ovn.org>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	dev@openvswitch.org,
-	linux-kernel@vger.kernel.org,
-	Eelco Chaudron <echaudro@redhat.com>,
-	Aaron Conole <aconole@redhat.com>,
-	Ilya Maximets <i.maximets@ovn.org>,
-	syzbot+b07a9da40df1576b8048@syzkaller.appspotmail.com
-Subject: [PATCH net] net: openvswitch: fix nested key length validation in the set() action
-Date: Sat, 12 Apr 2025 12:40:18 +0200
-Message-ID: <20250412104052.2073688-1-i.maximets@ovn.org>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1744455516; c=relaxed/simple;
+	bh=v1schcvx/waqBZ5un5XqVAQVNS19s1oAx1ITFiQcrpE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kAAUceAC2ULRQ/06D2qTrV/DjoNhJ616v6gMtxEOHQDVYERGBKV661PLY5/6MrDWo0YC390UY3lOwZsUZdKnFeoam3xbMJMAVplOzaCD5muqWeOXFvPgznhzpvgFn5qFMk/G59MLCHxYJ8iKgDWV2juwVdoVoqol2lYu8VJnhZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pT/VsOF5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1102CC4CEE3;
+	Sat, 12 Apr 2025 10:58:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744455516;
+	bh=v1schcvx/waqBZ5un5XqVAQVNS19s1oAx1ITFiQcrpE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=pT/VsOF5b+4t5DIlcEnuLMdNtbl7VP9O+54QQsU9sdRQVz/CT15xo4WkXVJbUsHpY
+	 thgH0oJNZOA12yp7RyUWEVgKR+s3BW+E+6AahjBthYf7EOpxYj3XdhA7UMxkyKEY2T
+	 TcX8SBCYPrYUwPpat/DuqWXfmrd8n1nHDcfU/zMbC/OXPJhLnkA9aKQJHaMttgMe27
+	 PM6T+Cv9VCeX5UcQf698EfS4S44EXmh+IzvzTH6LLBCtyz6LCuSmN1Uuy4Ssj8uCCu
+	 VCIqIn/3olCUDrItzMQcmUMAbil4kjtOougBPv0pXZalmWYJ08F2qvsZJOFZ0dHLsO
+	 PvdTgqSSMGXNA==
+Date: Sat, 12 Apr 2025 11:58:21 +0100
+From: Jonathan Cameron <jic23@kernel.org>
+To: Yassine Oudjana <y.oudjana@protonmail.com>
+Cc: Lars-Peter Clausen <lars@metafoo.de>, Bjorn Andersson
+ <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, Manivannan
+ Sadhasivam <manivannan.sadhasivam@linaro.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, Nathan
+ Chancellor <nathan@kernel.org>, Nicolas Schier <nicolas.schier@linux.dev>,
+ Alexander Sverdlin <alexander.sverdlin@gmail.com>, Sean Nyekjaer
+ <sean@geanix.com>, Javier Carrasco <javier.carrasco.cruz@gmail.com>, Matti
+ Vaittinen <mazziesaccount@gmail.com>, Antoniu Miclaus
+ <antoniu.miclaus@analog.com>, Ramona Gradinariu
+ <ramona.gradinariu@analog.com>, "Yo-Jung (Leo) Lin" <0xff07@gmail.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Neil Armstrong
+ <neil.armstrong@linaro.org>, =?UTF-8?B?QmFybmFiw6FzIEN6w6ltw6Fu?=
+ <barnabas.czeman@mainlining.org>, Danila Tikhonov <danila@jiaxyga.com>,
+ Antoni Pokusinski <apokusinski01@gmail.com>, Vasileios Amoiridis
+ <vassilisamir@gmail.com>, Petar Stoykov <pd.pstoykov@gmail.com>, shuaijie
+ wang <wangshuaijie@awinic.com>, Yasin Lee <yasin.lee.x@gmail.com>,
+ "Borislav Petkov (AMD)" <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, Tony Luck <tony.luck@intel.com>, Pawan Gupta
+ <pawan.kumar.gupta@linux.intel.com>, Ingo Molnar <mingo@kernel.org>,
+ Yassine Oudjana <yassine.oudjana@gmail.com>, linux-kernel@vger.kernel.org,
+ linux-iio@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH 1/3] net: qrtr: Turn QRTR into a bus
+Message-ID: <20250412115821.72f35c07@jic23-huawei>
+In-Reply-To: <02aeebee-0acc-4a03-a7f1-a920a34fb378@protonmail.com>
+References: <20250406140706.812425-1-y.oudjana@protonmail.com>
+	<20250406140706.812425-2-y.oudjana@protonmail.com>
+	<20250406170111.7a11437a@jic23-huawei>
+	<02aeebee-0acc-4a03-a7f1-a920a34fb378@protonmail.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-It's not safe to access nla_len(ovs_key) if the data is smaller than
-the netlink header.  Check that the attribute is OK first.
+On Thu, 10 Apr 2025 12:10:54 +0000
+Yassine Oudjana <y.oudjana@protonmail.com> wrote:
 
-Fixes: ccb1352e76cf ("net: Add Open vSwitch kernel components.")
-Reported-by: syzbot+b07a9da40df1576b8048@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=b07a9da40df1576b8048
-Tested-by: syzbot+b07a9da40df1576b8048@syzkaller.appspotmail.com
-Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
----
- net/openvswitch/flow_netlink.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> On 06/04/2025 7:01 pm, Jonathan Cameron wrote:
+> > On Sun, 06 Apr 2025 14:07:43 +0000
+> > Yassine Oudjana <y.oudjana@protonmail.com> wrote:
+> >   
+> >> Implement a QRTR bus to allow for creating drivers for individual QRTR
+> >> services. With this in place, devices are dynamically registered for QRTR
+> >> services as they become available, and drivers for these devices are
+> >> matched using service and instance IDs.
+> >>
+> >> In smd.c, replace all current occurences of qdev with qsdev in order to
+> >> distinguish between the newly added QRTR device which represents a QRTR
+> >> service with the existing QRTR SMD device which represents the endpoint
+> >> through which services are provided.
+> >>
+> >> Signed-off-by: Yassine Oudjana <y.oudjana@protonmail.com>  
+> > Hi Yassine
+> > 
+> > Just took a quick look through.
+> > 
+> > It might make more sense to do this with an auxiliary_bus rather
+> > than defining a new bus.
+> > 
+> > I'd also split out the renames as a precursor patch.
+> > 
+> > Various other comments inline.
+> > 
+> > Jonathan
+> >   
+> >> diff --git a/net/qrtr/af_qrtr.c b/net/qrtr/af_qrtr.c
+> >> index 00c51cf693f3..e11682fd7960 100644
+> >> --- a/net/qrtr/af_qrtr.c
+> >> +++ b/net/qrtr/af_qrtr.c
+> >> @@ -435,6 +435,7 @@ static void qrtr_node_assign(struct qrtr_node *node, unsigned int nid)
+> >>   int qrtr_endpoint_post(struct qrtr_endpoint *ep, const void *data, size_t len)
+> >>   {
+> >>   	struct qrtr_node *node = ep->node;
+> >> +	const struct qrtr_ctrl_pkt *pkt;
+> >>   	const struct qrtr_hdr_v1 *v1;
+> >>   	const struct qrtr_hdr_v2 *v2;
+> >>   	struct qrtr_sock *ipc;
+> >> @@ -443,6 +444,7 @@ int qrtr_endpoint_post(struct qrtr_endpoint *ep, const void *data, size_t len)
+> >>   	size_t size;
+> >>   	unsigned int ver;
+> >>   	size_t hdrlen;
+> >> +	int ret = 0;
+> >>
+> >>   	if (len == 0 || len & 3)
+> >>   		return -EINVAL;
+> >> @@ -516,12 +518,24 @@ int qrtr_endpoint_post(struct qrtr_endpoint *ep, const void *data, size_t len)
+> >>
+> >>   	qrtr_node_assign(node, cb->src_node);
+> >>
+> >> +	pkt = data + hdrlen;
+> >> +
+> >>   	if (cb->type == QRTR_TYPE_NEW_SERVER) {
+> >>   		/* Remote node endpoint can bridge other distant nodes */
+> >> -		const struct qrtr_ctrl_pkt *pkt;
+> >> -
+> >> -		pkt = data + hdrlen;
+> >>   		qrtr_node_assign(node, le32_to_cpu(pkt->server.node));
+> >> +
+> >> +		/* Create a QRTR device */
+> >> +		ret = ep->add_device(ep, le32_to_cpu(pkt->server.node),
+> >> +					       le32_to_cpu(pkt->server.port),
+> >> +					       le32_to_cpu(pkt->server.service),
+> >> +					       le32_to_cpu(pkt->server.instance));
+> >> +		if (ret)
+> >> +			goto err;
+> >> +	} else if (cb->type == QRTR_TYPE_DEL_SERVER) {
+> >> +		/* Remove QRTR device corresponding to service */
+> >> +		ret = ep->del_device(ep, le32_to_cpu(pkt->server.port));
+> >> +		if (ret)
+> >> +			goto err;
+> >>   	}
+> >>
+> >>   	if (cb->type == QRTR_TYPE_RESUME_TX) {
+> >> @@ -543,8 +557,7 @@ int qrtr_endpoint_post(struct qrtr_endpoint *ep, const void *data, size_t len)
+> >>
+> >>   err:
+> >>   	kfree_skb(skb);
+> >> -	return -EINVAL;
+> >> -
+> >> +	return ret ? ret : -EINVAL;  
+> > How do we get here with non error value given we couldn't before?  
+> 
+> We don't, but we may have errors in ret other than -EINVAL returned by 
+> the newly added add_device and del_device which we should propagate.
 
-diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
-index 95e0dd14dc1a..518be23e48ea 100644
---- a/net/openvswitch/flow_netlink.c
-+++ b/net/openvswitch/flow_netlink.c
-@@ -2876,7 +2876,8 @@ static int validate_set(const struct nlattr *a,
- 	size_t key_len;
- 
- 	/* There can be only one key in a action */
--	if (nla_total_size(nla_len(ovs_key)) != nla_len(a))
-+	if (!nla_ok(ovs_key, nla_len(a)) ||
-+	    nla_total_size(nla_len(ovs_key)) != nla_len(a))
- 		return -EINVAL;
- 
- 	key_len = nla_len(ovs_key);
--- 
-2.49.0
+Ah. Got it (I misread that!).  Personally I'd go for setting ret in the
+other error paths explicitly to -EINVAL.  Mixing two styles of handling
+where you have some paths setting ret and some not is rather confusing to read.
 
+
+
+
+> >> +
+> >> +	return qdev->port == port;
+> >> +}
+> >> +
+> >> +static void qcom_smd_qrtr_add_device_worker(struct work_struct *work)
+> >> +{
+> >> +	struct qrtr_new_server *new_server = container_of(work, struct qrtr_new_server, work);
+> >> +	struct qrtr_smd_dev *qsdev = new_server->parent;
+> >> +	struct qrtr_device *qdev;
+> >> +	int ret;
+> >> +
+> >> +	qdev = kzalloc(sizeof(*qdev), GFP_KERNEL);
+> >> +	if (!qdev)
+> >> +		return;
+> >> +  
+> > Maybe
+> > 	*qdev = (struct qrtr_device *) {
+> > 	};  
+> 
+> (struct qrtr_device)
+
+oops. Indeed that!
+
+
+Jonathan
 
