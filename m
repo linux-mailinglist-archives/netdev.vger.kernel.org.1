@@ -1,91 +1,63 @@
-Return-Path: <netdev+bounces-181915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D4CBA86E0C
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 18:06:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0EF9A86E66
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 19:27:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 059BB7B277A
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 16:05:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BC2D8A8861
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 17:26:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C93D21FBCAE;
-	Sat, 12 Apr 2025 16:06:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 303141F8BD6;
+	Sat, 12 Apr 2025 17:27:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DxupO1j4"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="a+PylrlD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 621C1192D66;
-	Sat, 12 Apr 2025 16:06:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DAC518C035;
+	Sat, 12 Apr 2025 17:26:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744473998; cv=none; b=Inyp1b4ztL8wbaxP4Ez40QHGVvfBqD0yt70g7fRgAvC7Io9Jmivz3Y/uq024z4P9G7AkGg7q/gCGu+YA3ozCwgqs+wLUTgVTBQAPSmRTK6lZuQbwK5mKrIN1mpBTKT0SUKOC9aHOnpytqEv0R4S8ZK+oBPHMza76eDAtsnlGRfU=
+	t=1744478821; cv=none; b=Gag2LDgJ1Fk8sGJWKYxyhHLxaFbay49ET5vAH5H3M4/jHEURum65bQ3POEKkH+tSLGv3KCNyB1TO+TnHr/U2RkY0hc+TVj8Bu9upakVhHsqTI2OPrgo6MiobXr3JRp5WCtARyVFSnbRnvE+Y4FKXyyNXAmv0Rp9m1Xy9Ab6vpHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744473998; c=relaxed/simple;
-	bh=5pjImVyaUSqRmZRdn2LiZv08c/e1+C24mgMzF4falaU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bmnrXZ3JGqKLsa8VLYuyuiQZmjjMAovFGuMQ16duoQQ830xnAXb0L1db44M+QirluC+OTmJdbcSgbJfzosVevOWDZkYL75M1jlUgP5oAuap4rkk11BK9GfNvaaosIr4kSXL7hEk9f1dMI/ifkMaGWYQLXYGFX18aIU44Y2X+1Ac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DxupO1j4; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-22401f4d35aso34401465ad.2;
-        Sat, 12 Apr 2025 09:06:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744473996; x=1745078796; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ewF251k2sP2DDRu+cfWYtdHJ78ZbeiTilTLAfoCOfS8=;
-        b=DxupO1j4p0Sklig3um10ntfhWdj130wOa6kPkuJgQMQjGxct9EkSxr8Lz6ERSBa3pu
-         Z4gmJRs+PdBDgLp16A9O3/m4T5A03fPCi3KMLYDwVnqUvxcTn1UKvsBN6rlq30Xq0qtT
-         JVl3Fqx1LfLPKq3L4DNPoRYPxAblyBs4nE/JZG2iSx4eQXDTO/mGSFlsS1nNcerSeICG
-         s6f8JllzFut0Db4H0kGUssXqXHwv7ird9k4ObKcauqymlKOnql4oq+o/4nT8CBR4qkXh
-         lVsxlF76ZkO5AwLbhmDQ8rg+MNbD4+Wr98d3T6LdgoxeTf5iwiVaYVgUPvYQeXQXXAnm
-         U3EA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744473996; x=1745078796;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ewF251k2sP2DDRu+cfWYtdHJ78ZbeiTilTLAfoCOfS8=;
-        b=B/PAg9vbNJDtb6O+RazFFDjEjhZ/xihtoqYA9b/eqw1wNp+qoXJSLI56QB1oHNA7X1
-         I3HO7zGEe2BmPmVWv3UJsvi195jEHHH+CXtsqC5RvyeKSrojl8N8/uoeuamQ7LDcRs5N
-         DuqWmRrSvcn7Uq6do5qgOTN3SOABgOD84WiazZSiDXRHl2Eq+9efeOe9up5IaO/wvY37
-         lPNpCL8383WffhT6wNmEC2Snl7txBIqvrXVhh0Pw56ktgNmJQ4AcS+ASc6CbS41tkRjX
-         ieRY5XpUMq/Gmp3cGgTqOXSQFwEAGgOjPrjuxp+EV1/JkMKyMOSyFSAydu3S2Wj3Er5S
-         aWJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVg2HSaC8cLmN+LhSl/drRSka94aOsy+ZfP7zbdofKnA5WIe5QwnsFh4CQedt1coOsvRhqTn2wmQcPqD2o=@vger.kernel.org, AJvYcCVx+tuNyH+opSiZqFBDRJ6WuEFIlo5cyrkCxFhKHlrOwlr4zkvfvldhS/FetiOkEfOX5lpOpXBK@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4XKLOa/HKQm+gt/hdfpHXBIqShY6IvkqLcd8qJabE+kL/wQks
-	rw3sf6DQ/vlpNv7WtABahQxyChtlA641goD5APocFRJ0+s5lIqR5oAEkcGwL
-X-Gm-Gg: ASbGnct5PcQzE/9pzjVjjamX1T+g+kVKQMBzTsDweYwil8zmKUpATo7ylGmVZs+LRjP
-	xJNvdBaqtEsbDWfxiqYpx6HliWmZ9vhKgBLo8dRu9nyvxB+5eh9TcfdsnypP8Vq90F198IfuXwa
-	61O7AuD7hg0iYLZGWPtNX8Ax5N6KytQJT4wZWbN5uo9l6FeUYZll5zCLq0xCmvsP04EWfbBMdul
-	YpkMBcTO/sTWSZOdPkYCzL3EUP0oiA1VcY2zxF2h+/rB+EWLm8WnfsuNNVSg9MRBJIUU0UeTIrE
-	P/6UMSqW+6CWONf4gaeFjLENtOQbDlalLYLoDIlr8/PjoVCSuQeZFtMrpsld9Bg=
-X-Google-Smtp-Source: AGHT+IGXh4kfZjPxYfbZ3hjPWbProLo0Qzsresv2r7n6gjlLxMEEblQMxjL50En14mw8sraWfIkB4A==
-X-Received: by 2002:a17:902:f60b:b0:223:3ef1:a30a with SMTP id d9443c01a7336-22bea4fee8fmr90347365ad.45.1744473996419;
-        Sat, 12 Apr 2025 09:06:36 -0700 (PDT)
-Received: from localhost.localdomain ([2405:201:5c08:585d:6eb6:f5fb:b572:c7c7])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b02a322114fsm6558498a12.73.2025.04.12.09.06.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Apr 2025 09:06:35 -0700 (PDT)
-From: Pranav Tyagi <pranav.tyagi03@gmail.com>
-To: davem@davemloft.net,
-	dsahern@kernel.org,
+	s=arc-20240116; t=1744478821; c=relaxed/simple;
+	bh=rntbUba3VSODfucFgd/aEty8d+8oEPtjZTsGP/8gO8w=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=TGVUJQ/ng3HxkHPCpBF42cl2fH4TEWKBXA+1YqdGt9XE10ZhdXnVlGZYqivdI9arbGpYxzcMYx0c4UhE6pGBDDtdxELzMjyH4f7p6OVo86R4SexHXx4ZLucTB2JIad9Zwoi/UT/RcjLv34tyRHt5v5h3BxGLLoTmmYKaPrSPZJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=a+PylrlD; arc=none smtp.client-ip=220.197.31.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=1PbZA
+	dHOMzXKSunlx61DMfXhxLlD4hJummMQ3WG5sXA=; b=a+PylrlDlO9dEhz+GuMCL
+	wnBQ7vYSnHXrWd8vWjxGcY4YEECLei4Hk/3mtNUYcPcNKxezr7UbtCY27RYcYX/S
+	x0zw66jLd9FhxH4ojuc12T9lzg0jF/+NLHUlN1Tlg28hoN1ta0Ebpdx5KLXXdAOy
+	WqMVcd1udekvE6x9DkfIcQ=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wB3Vfg0ovpnzpIFGA--.26751S4;
+	Sun, 13 Apr 2025 01:26:13 +0800 (CST)
+From: lvxiafei <xiafei_xupt@163.com>
+To: xiafei_xupt@163.com
+Cc: coreteam@netfilter.org,
+	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
 	horms@kernel.org,
-	skhan@linuxfoundation.org,
-	netdev@vger.kernel.org,
+	kadlec@netfilter.org,
+	kuba@kernel.org,
 	linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@lists.linux.dev
-Cc: Pranav Tyagi <pranav.tyagi03@gmail.com>
-Subject: [PATCH net-next] net: ipconfig: replace strncpy with strscpy
-Date: Sat, 12 Apr 2025 21:36:23 +0530
-Message-ID: <20250412160623.9625-1-pranav.tyagi03@gmail.com>
-X-Mailer: git-send-email 2.49.0
+	lvxiafei@sensetime.com,
+	netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	pabeni@redhat.com,
+	pablo@netfilter.org
+Subject: [PATCH V5] netfilter: netns nf_conntrack: per-netns net.netfilter.nf_conntrack_max sysctl
+Date: Sun, 13 Apr 2025 01:26:10 +0800
+Message-Id: <20250412172610.37844-1-xiafei_xupt@163.com>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20250407095052.49526-1-xiafei_xupt@163.com>
+References: <20250407095052.49526-1-xiafei_xupt@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,30 +65,253 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wB3Vfg0ovpnzpIFGA--.26751S4
+X-Coremail-Antispam: 1Uf129KBjvJXoW3tFy5ZryUWry5AFy7GF43GFg_yoWDXw15pF
+	1ft347Jw17Jr4Yya1j93yDAFsxG393Ca4a9rn8CFyrCwsI9r15CF4rKFyxJF98JrykAFy3
+	ZF4jvr1UAan5taDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRdsqAUUUUU=
+X-CM-SenderInfo: x0ldwvplb031rw6rljoofrz/xtbBMRQtU2f6mL7IKwAAsD
 
-Replace the deprecated strncpy() with strscpy() as the destination
-buffer is NUL-terminated and does not require any
-trailing NUL-padding.
+From: lvxiafei <lvxiafei@sensetime.com>
 
-Signed-off-by: Pranav Tyagi <pranav.tyagi03@gmail.com>
+Support net.netfilter.nf_conntrack_max settings per
+netns, net.netfilter.nf_conntrack_max is used to more
+flexibly limit the ct_count in different netns. The
+default value belongs to the init_net limit.
+
+After net.netfilter.nf_conntrack_max is set in different
+netns, it is not allowed to be greater than the init_net
+limit when working.
+
+Signed-off-by: lvxiafei <lvxiafei@sensetime.com>
 ---
- net/ipv4/ipconfig.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../networking/nf_conntrack-sysctl.rst        | 29 +++++++++++++++----
+ include/net/netfilter/nf_conntrack.h          |  8 ++++-
+ include/net/netns/conntrack.h                 |  1 +
+ net/netfilter/nf_conntrack_core.c             | 19 ++++++------
+ net/netfilter/nf_conntrack_netlink.c          |  2 +-
+ net/netfilter/nf_conntrack_standalone.c       |  7 +++--
+ 6 files changed, 46 insertions(+), 20 deletions(-)
 
-diff --git a/net/ipv4/ipconfig.c b/net/ipv4/ipconfig.c
-index c56b6fe6f0d7..eb9b32214e60 100644
---- a/net/ipv4/ipconfig.c
-+++ b/net/ipv4/ipconfig.c
-@@ -1690,7 +1690,7 @@ static int __init ic_proto_name(char *name)
- 			*v = 0;
- 			if (kstrtou8(client_id, 0, dhcp_client_identifier))
- 				pr_debug("DHCP: Invalid client identifier type\n");
--			strncpy(dhcp_client_identifier + 1, v + 1, 251);
-+			strscpy(dhcp_client_identifier + 1, v + 1, 251);
- 			*v = ',';
+diff --git a/Documentation/networking/nf_conntrack-sysctl.rst b/Documentation/networking/nf_conntrack-sysctl.rst
+index 238b66d0e059..6e7f17f5959a 100644
+--- a/Documentation/networking/nf_conntrack-sysctl.rst
++++ b/Documentation/networking/nf_conntrack-sysctl.rst
+@@ -93,12 +93,29 @@ nf_conntrack_log_invalid - INTEGER
+ 	Log invalid packets of a type specified by value.
+ 
+ nf_conntrack_max - INTEGER
+-        Maximum number of allowed connection tracking entries. This value is set
+-        to nf_conntrack_buckets by default.
+-        Note that connection tracking entries are added to the table twice -- once
+-        for the original direction and once for the reply direction (i.e., with
+-        the reversed address). This means that with default settings a maxed-out
+-        table will have a average hash chain length of 2, not 1.
++    - 0 - disabled (unlimited)
++    - not 0 - enabled
++
++    Maximum number of allowed connection tracking entries per netns. This value
++    is set to nf_conntrack_buckets by default.
++
++    Note that connection tracking entries are added to the table twice -- once
++    for the original direction and once for the reply direction (i.e., with
++    the reversed address). This means that with default settings a maxed-out
++    table will have a average hash chain length of 2, not 1.
++
++    The limit of other netns cannot be greater than init_net netns.
++    +----------------+-------------+----------------+
++    | init_net netns | other netns | limit behavior |
++    +----------------+-------------+----------------+
++    | 0              | 0           | unlimited      |
++    +----------------+-------------+----------------+
++    | 0              | not 0       | other          |
++    +----------------+-------------+----------------+
++    | not 0          | 0           | init_net       |
++    +----------------+-------------+----------------+
++    | not 0          | not 0       | min            |
++    +----------------+-------------+----------------+
+ 
+ nf_conntrack_tcp_be_liberal - BOOLEAN
+ 	- 0 - disabled (default)
+diff --git a/include/net/netfilter/nf_conntrack.h b/include/net/netfilter/nf_conntrack.h
+index 3f02a45773e8..062e67b9a5d7 100644
+--- a/include/net/netfilter/nf_conntrack.h
++++ b/include/net/netfilter/nf_conntrack.h
+@@ -320,7 +320,6 @@ int nf_conntrack_hash_resize(unsigned int hashsize);
+ extern struct hlist_nulls_head *nf_conntrack_hash;
+ extern unsigned int nf_conntrack_htable_size;
+ extern seqcount_spinlock_t nf_conntrack_generation;
+-extern unsigned int nf_conntrack_max;
+ 
+ /* must be called with rcu read lock held */
+ static inline void
+@@ -360,6 +359,13 @@ static inline struct nf_conntrack_net *nf_ct_pernet(const struct net *net)
+ 	return net_generic(net, nf_conntrack_net_id);
+ }
+ 
++static inline unsigned int nf_conntrack_max(const struct net *net)
++{
++	return likely(init_net.ct.sysctl_max && net->ct.sysctl_max) ?
++	    min(init_net.ct.sysctl_max, net->ct.sysctl_max) :
++	    max(init_net.ct.sysctl_max, net->ct.sysctl_max);
++}
++
+ int nf_ct_skb_network_trim(struct sk_buff *skb, int family);
+ int nf_ct_handle_fragments(struct net *net, struct sk_buff *skb,
+ 			   u16 zone, u8 family, u8 *proto, u16 *mru);
+diff --git a/include/net/netns/conntrack.h b/include/net/netns/conntrack.h
+index bae914815aa3..d3fcd0b92b2d 100644
+--- a/include/net/netns/conntrack.h
++++ b/include/net/netns/conntrack.h
+@@ -102,6 +102,7 @@ struct netns_ct {
+ 	u8			sysctl_acct;
+ 	u8			sysctl_tstamp;
+ 	u8			sysctl_checksum;
++	unsigned int		sysctl_max;
+ 
+ 	struct ip_conntrack_stat __percpu *stat;
+ 	struct nf_ct_event_notifier __rcu *nf_conntrack_event_cb;
+diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_conntrack_core.c
+index 7f8b245e287a..a738564923ec 100644
+--- a/net/netfilter/nf_conntrack_core.c
++++ b/net/netfilter/nf_conntrack_core.c
+@@ -202,8 +202,6 @@ static void nf_conntrack_all_unlock(void)
+ unsigned int nf_conntrack_htable_size __read_mostly;
+ EXPORT_SYMBOL_GPL(nf_conntrack_htable_size);
+ 
+-unsigned int nf_conntrack_max __read_mostly;
+-EXPORT_SYMBOL_GPL(nf_conntrack_max);
+ seqcount_spinlock_t nf_conntrack_generation __read_mostly;
+ static siphash_aligned_key_t nf_conntrack_hash_rnd;
+ 
+@@ -1498,7 +1496,7 @@ static bool gc_worker_can_early_drop(const struct nf_conn *ct)
+ 
+ static void gc_worker(struct work_struct *work)
+ {
+-	unsigned int i, hashsz, nf_conntrack_max95 = 0;
++	unsigned int i, hashsz;
+ 	u32 end_time, start_time = nfct_time_stamp;
+ 	struct conntrack_gc_work *gc_work;
+ 	unsigned int expired_count = 0;
+@@ -1509,8 +1507,6 @@ static void gc_worker(struct work_struct *work)
+ 	gc_work = container_of(work, struct conntrack_gc_work, dwork.work);
+ 
+ 	i = gc_work->next_bucket;
+-	if (gc_work->early_drop)
+-		nf_conntrack_max95 = nf_conntrack_max / 100u * 95u;
+ 
+ 	if (i == 0) {
+ 		gc_work->avg_timeout = GC_SCAN_INTERVAL_INIT;
+@@ -1538,6 +1534,7 @@ static void gc_worker(struct work_struct *work)
  		}
- 		return 1;
+ 
+ 		hlist_nulls_for_each_entry_rcu(h, n, &ct_hash[i], hnnode) {
++			unsigned int nf_conntrack_max95 = 0;
+ 			struct nf_conntrack_net *cnet;
+ 			struct net *net;
+ 			long expires;
+@@ -1567,11 +1564,14 @@ static void gc_worker(struct work_struct *work)
+ 			expires = clamp(nf_ct_expires(tmp), GC_SCAN_INTERVAL_MIN, GC_SCAN_INTERVAL_CLAMP);
+ 			expires = (expires - (long)next_run) / ++count;
+ 			next_run += expires;
++			net = nf_ct_net(tmp);
++
++			if (gc_work->early_drop)
++				nf_conntrack_max95 = nf_conntrack_max(net) / 100u * 95u;
+ 
+ 			if (nf_conntrack_max95 == 0 || gc_worker_skip_ct(tmp))
+ 				continue;
+ 
+-			net = nf_ct_net(tmp);
+ 			cnet = nf_ct_pernet(net);
+ 			if (atomic_read(&cnet->count) < nf_conntrack_max95)
+ 				continue;
+@@ -1648,13 +1648,14 @@ __nf_conntrack_alloc(struct net *net,
+ 		     gfp_t gfp, u32 hash)
+ {
+ 	struct nf_conntrack_net *cnet = nf_ct_pernet(net);
+-	unsigned int ct_count;
++	unsigned int ct_max, ct_count;
+ 	struct nf_conn *ct;
+ 
+ 	/* We don't want any race condition at early drop stage */
+ 	ct_count = atomic_inc_return(&cnet->count);
++	ct_max = nf_conntrack_max(net);
+ 
+-	if (nf_conntrack_max && unlikely(ct_count > nf_conntrack_max)) {
++	if (ct_max && unlikely(ct_count > ct_max)) {
+ 		if (!early_drop(net, hash)) {
+ 			if (!conntrack_gc_work.early_drop)
+ 				conntrack_gc_work.early_drop = true;
+@@ -2650,7 +2651,7 @@ int nf_conntrack_init_start(void)
+ 	if (!nf_conntrack_hash)
+ 		return -ENOMEM;
+ 
+-	nf_conntrack_max = max_factor * nf_conntrack_htable_size;
++	init_net.ct.sysctl_max = max_factor * nf_conntrack_htable_size;
+ 
+ 	nf_conntrack_cachep = kmem_cache_create("nf_conntrack",
+ 						sizeof(struct nf_conn),
+diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_conntrack_netlink.c
+index 2cc0fde23344..73e6bb1e939b 100644
+--- a/net/netfilter/nf_conntrack_netlink.c
++++ b/net/netfilter/nf_conntrack_netlink.c
+@@ -2608,7 +2608,7 @@ ctnetlink_stat_ct_fill_info(struct sk_buff *skb, u32 portid, u32 seq, u32 type,
+ 	if (nla_put_be32(skb, CTA_STATS_GLOBAL_ENTRIES, htonl(nr_conntracks)))
+ 		goto nla_put_failure;
+ 
+-	if (nla_put_be32(skb, CTA_STATS_GLOBAL_MAX_ENTRIES, htonl(nf_conntrack_max)))
++	if (nla_put_be32(skb, CTA_STATS_GLOBAL_MAX_ENTRIES, htonl(nf_conntrack_max(net))))
+ 		goto nla_put_failure;
+ 
+ 	nlmsg_end(skb, nlh);
+diff --git a/net/netfilter/nf_conntrack_standalone.c b/net/netfilter/nf_conntrack_standalone.c
+index 2f666751c7e7..5db6df0e4eb3 100644
+--- a/net/netfilter/nf_conntrack_standalone.c
++++ b/net/netfilter/nf_conntrack_standalone.c
+@@ -615,7 +615,7 @@ enum nf_ct_sysctl_index {
+ static struct ctl_table nf_ct_sysctl_table[] = {
+ 	[NF_SYSCTL_CT_MAX] = {
+ 		.procname	= "nf_conntrack_max",
+-		.data		= &nf_conntrack_max,
++		.data		= &init_net.ct.sysctl_max,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_dointvec_minmax,
+@@ -948,7 +948,7 @@ static struct ctl_table nf_ct_sysctl_table[] = {
+ static struct ctl_table nf_ct_netfilter_table[] = {
+ 	{
+ 		.procname	= "nf_conntrack_max",
+-		.data		= &nf_conntrack_max,
++		.data		= &init_net.ct.sysctl_max,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_dointvec_minmax,
+@@ -1063,6 +1063,7 @@ static int nf_conntrack_standalone_init_sysctl(struct net *net)
+ 
+ 	table[NF_SYSCTL_CT_COUNT].data = &cnet->count;
+ 	table[NF_SYSCTL_CT_CHECKSUM].data = &net->ct.sysctl_checksum;
++	table[NF_SYSCTL_CT_MAX].data = &net->ct.sysctl_max;
+ 	table[NF_SYSCTL_CT_LOG_INVALID].data = &net->ct.sysctl_log_invalid;
+ 	table[NF_SYSCTL_CT_ACCT].data = &net->ct.sysctl_acct;
+ #ifdef CONFIG_NF_CONNTRACK_EVENTS
+@@ -1087,7 +1088,6 @@ static int nf_conntrack_standalone_init_sysctl(struct net *net)
+ 
+ 	/* Don't allow non-init_net ns to alter global sysctls */
+ 	if (!net_eq(&init_net, net)) {
+-		table[NF_SYSCTL_CT_MAX].mode = 0444;
+ 		table[NF_SYSCTL_CT_EXPECT_MAX].mode = 0444;
+ 		table[NF_SYSCTL_CT_BUCKETS].mode = 0444;
+ 	}
+@@ -1139,6 +1139,7 @@ static int nf_conntrack_pernet_init(struct net *net)
+ 	int ret;
+ 
+ 	net->ct.sysctl_checksum = 1;
++	net->ct.sysctl_max = init_net.ct.sysctl_max;
+ 
+ 	ret = nf_conntrack_standalone_init_sysctl(net);
+ 	if (ret < 0)
 -- 
-2.49.0
+2.40.1
 
 
