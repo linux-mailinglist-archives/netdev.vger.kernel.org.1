@@ -1,93 +1,92 @@
-Return-Path: <netdev+bounces-181858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 366B2A86A1D
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 03:32:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4955A86A20
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 03:40:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29A897AA85D
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 01:31:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B23C04A2382
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 01:40:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0306F4ED;
-	Sat, 12 Apr 2025 01:32:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8504136672;
+	Sat, 12 Apr 2025 01:39:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HWvmFUIp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CMb78eqH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C805E4A0C;
-	Sat, 12 Apr 2025 01:32:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D79B2367D9;
+	Sat, 12 Apr 2025 01:39:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744421534; cv=none; b=OgrliwcnzP7UTlKzrzf1XwNUT3GKXM+uhjsRGJ3OOo3zTBWgxP9WT4n5JMs8veEQ4tmOUQ1B/lmuF/f8lIWf9PgUdqMXjlpdrD/wv5xMB4MluQ0zy3aYzHvIbZ//V4uwoNrtSHrwvU1clrt5kyXIHKbvi0GbZyF6vunOvcBwT9E=
+	t=1744421996; cv=none; b=gKogpqLfe5P9+DonuqmIpFOH2hcXxCxsfZ0l+/N61PsVdk5q1g4YvOPPFVbvX0usSsL1WFcNULnA3BlSCpQDVuS/kfnlj3SKNaEqeSqQmh7y6/+ORg4ceUfXG/bHIIeNYBFb+u3aIPbTBn+hLj9meXehcITYkTjAG6ie/038YVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744421534; c=relaxed/simple;
-	bh=O+KwZdkujNvzxCORrfTfkbjJm+iKBPW7dMUVSOqhsus=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QucO2S8K+9Sfsqp56n+bwR4WaAFmg1a9ZHB161gJUErrCjHoNFNKO0XfV06v0knAFPfyoZr6ezzmgpNJF+SncmtA/WIa527E0NE71dxTcWa7/mvr5pk2bwRukTUTgmL4MI1d9JjXsYyV6Z53utOYb0hMH0+9GAgkUvz6FPTxWjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HWvmFUIp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D054CC4CEE2;
-	Sat, 12 Apr 2025 01:32:13 +0000 (UTC)
+	s=arc-20240116; t=1744421996; c=relaxed/simple;
+	bh=wSiakA3qRlMurrbQ/8KoOOJ68Ed4h9Ec/AjDsd/aTjI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=VnVyvZ3fAamVIzwQT1v0nzjw3F6nvXjR/JEdOHMMczc2pPtw5TaL6+VXNVCqpJYXgYc1uGv8TVYxDk14JJtoAUKDuykpkGoIz2TbHNmh/+msXmB5nWq/wF/Ssm+r5irRuI+frZpQREqjXe8vmzCarLpYyIH5BPetM89WGujWkUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CMb78eqH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02570C4CEE2;
+	Sat, 12 Apr 2025 01:39:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744421534;
-	bh=O+KwZdkujNvzxCORrfTfkbjJm+iKBPW7dMUVSOqhsus=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HWvmFUIpYcpVhaWlsEilexPSUUlsrwhQqqtJQOZTFygMPUNg+5o+8VJFM9We1SVIK
-	 MWamkAXzJt2t1CiufpM7KXkScefV/R8RUtT9rhfRwk+Zr2/vmhzVKO1hgiB6MFqRgk
-	 86Y5/x5PPVSD5prAI3d5n5K0b8nmzPkrrirNRKShOqMAG7+PzZWgca1DvjTbbIwzDJ
-	 UKnRAPKcMVYxnH7rYw1Gk3dmte87NmJIOcM5dNLsZS8frnbb3VuTPeHEWktDszcdnq
-	 vpmkQHk8r04FYfs9ABcnsuSu8FfvjruBfMVwYsVlJrU7R1tGqLqbgmdYc3261vtm0S
-	 tBs/3U/R1J02A==
-Date: Fri, 11 Apr 2025 18:32:12 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Abdun Nihaal <abdun.nihaal@gmail.com>
-Cc: Markus Elfring <Markus.Elfring@web.de>, netdev@vger.kernel.org, LKML
- <linux-kernel@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Edward Cree <ecree.xilinx@gmail.com>,
- Eric Dumazet <edumazet@google.com>, Jiawen Wu <jiawenwu@trustnetic.com>,
- Mengyuan Lou <mengyuanlou@net-swift.com>, Paolo Abeni <pabeni@redhat.com>,
- Sai Krishna <saikrishnag@marvell.com>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next] net: ngbe: fix memory leak in ngbe_probe()
- error path
-Message-ID: <20250411183212.51b084af@kernel.org>
-In-Reply-To: <pok6kit3b7c7sv34mpvmzulycblqys3ntdrz7oyeofxhtfcht6@xa7iihddqrf5>
-References: <20250409053804.47855-1-abdun.nihaal@gmail.com>
-	<7ff3877b-1a76-45a1-ad03-922582679397@web.de>
-	<pok6kit3b7c7sv34mpvmzulycblqys3ntdrz7oyeofxhtfcht6@xa7iihddqrf5>
+	s=k20201202; t=1744421996;
+	bh=wSiakA3qRlMurrbQ/8KoOOJ68Ed4h9Ec/AjDsd/aTjI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=CMb78eqHHS4tTy3+S+MoglcvIDNktBBjpCdFqbyiTF3jIsSKq78I8A0/x9W9Tt8kC
+	 z+9HmJnk5ymNhdiKyNn4/298PncXLFhdElEc7doE9j8v58mHXL1v2zjYm0rdim3WUe
+	 rS0oDY6hprSWZIQn+D88NhYh5Pmv33T0L1BpjP3s7xsFqPFigBaOxxZ9irxzpHO/dc
+	 +iADGx3tOWQYM4mcIpq1vPQDH6wJXgWiIE+cW1foGkRZbiGV051j3v6OlIgX3dJNJq
+	 ob+nSrEMPaR4ZFLCORukg9HpHZYTkp+Y6qbMsyNJzu7Nv7VBW9qbRjJnLbGE3Y9yDZ
+	 lxkzJkanpmimw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AF053380CEF4;
+	Sat, 12 Apr 2025 01:40:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] pds_core: fix memory leak in pdsc_debugfs_add_qcq()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <174442203351.545628.3124504461389914908.git-patchwork-notify@kernel.org>
+Date: Sat, 12 Apr 2025 01:40:33 +0000
+References: <20250409054450.48606-1-abdun.nihaal@gmail.com>
+In-Reply-To: <20250409054450.48606-1-abdun.nihaal@gmail.com>
+To: Abdun Nihaal <abdun.nihaal@gmail.com>
+Cc: shannon.nelson@amd.com, brett.creeley@amd.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, 11 Apr 2025 10:44:55 +0530 Abdun Nihaal wrote:
-> Hello Markus,
->=20
-> On Wed, Apr 09, 2025 at 05:23:39PM +0200, Markus Elfring wrote:
-> > How do you think about to add any tags (like =E2=80=9CFixes=E2=80=9D an=
-d =E2=80=9CCc=E2=80=9D) accordingly?
-> > https://web.git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/=
-tree/Documentation/process/submitting-patches.rst?h=3Dv6.15-rc1#n145 =20
->=20
-> Thanks for pointing that out. Actually I wasn't sure about which commit
-> to add as the Fixes tag, so I left it assuming that the maintainers
-> would know better.
->=20
-> I was confused between the following two commits both of which change
-> the kfree(wx->mac_table) line.
-> - 02338c484ab6 ("net: ngbe: Initialize sw info and register netdev")
-> - 9607a3e62645 ("net: wangxun: Rename private structure in libwx")
+Hello:
 
-I think:
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Fixes: 02338c484ab6 ("net: ngbe: Initialize sw info and register netdev")
+On Wed,  9 Apr 2025 11:14:48 +0530 you wrote:
+> The memory allocated for intr_ctrl_regset, which is passed to
+> debugfs_create_regset32() may not be cleaned up when the driver is
+> removed. Fix that by using device managed allocation for it.
+> 
+> Fixes: 45d76f492938 ("pds_core: set up device and adminq")
+> Signed-off-by: Abdun Nihaal <abdun.nihaal@gmail.com>
+> 
+> [...]
 
-rss_key gets allocated at that point but never freed. The later patches
-just move it around and fix up a little but first broken patch counts.
+Here is the summary with links:
+  - [net-next] pds_core: fix memory leak in pdsc_debugfs_add_qcq()
+    https://git.kernel.org/netdev/net/c/8b82f656826c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
