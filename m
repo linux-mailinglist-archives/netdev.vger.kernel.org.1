@@ -1,79 +1,96 @@
-Return-Path: <netdev+bounces-181930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F73BA86FB4
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 22:58:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 871B6A86FC5
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 23:16:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3714B17B10D
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 20:58:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7828D8A5CA2
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 21:16:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A5ED221725;
-	Sat, 12 Apr 2025 20:58:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B15522A4F1;
+	Sat, 12 Apr 2025 21:16:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QmWrIo04"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TA7ONDyj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E8D521D3EE;
-	Sat, 12 Apr 2025 20:58:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4FA197A7A;
+	Sat, 12 Apr 2025 21:16:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744491529; cv=none; b=ipwJmVnwStzmY0qLf/flvDEcwJzon6ct7dwUkz14MQZP0Q4ckXBX6koX+7PC8jGW9sTsfL9IUKwD3ntxo6RmQ9dgUsCQlgi4K/Jj78z4rU1RL/Hu176rQM3P8ss0XCT4m3ZBUFgUTEeIREWo/nSptabV0qFx9WaOzLspu8eQnMg=
+	t=1744492592; cv=none; b=OA45PdIPrKhPdUxynBbDQgniqvIAfbfZYZZQpPQJ/b5yk1GBpbBoNou0krB+hQYFJwtm8N0Y7gQIbbBaGJ3So7KO2rdq38O1hnSPCWSbJ0V8xwGmoWvhKS+dG/MDFLtrwVjTp2KlZrwet+uhSE+hK+3eR+rV3e0wJZ94QbpTOjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744491529; c=relaxed/simple;
-	bh=9QDgZiGGPT+SOjTJ3/U31CUZVzGlsc8DDX0Q+18Tils=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=tEEYGmLhuPScAYFs4zZ3Fx0EJS1W1XZrcF95cWJC5zExCExqG/3tvZvujuiKf2vciawofjknTs1YgbQyZAXMBcY1txOvY9jcFc0ANcoY0Qx4XGjj3Q9Fz1d7NHkYE2VF4VMdJ+CStZEeK7uWUVE4CZ9dez+Rxg1HynuiEmm6f+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QmWrIo04; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0767BC4CEE3;
-	Sat, 12 Apr 2025 20:58:49 +0000 (UTC)
+	s=arc-20240116; t=1744492592; c=relaxed/simple;
+	bh=LSm8n2JgBGQCeORLX5c07y6Iq9IWghBzRfmMe+pyr3Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OYvC5ncCvOWdh8ccABVcHMsUmrnkM0qpf7ASrXzhGUV1XPmOTfg2sckUlYKhqmSjBUaTu+1urBV7TVxORkTW6r5JZkXPSv7zw+15pxD0MJlgsWpdcQy9W0LmRBy+2efNWcPmTlArw47zNWjo9RsDnnSLeau6fYg/kLfS1JLT9TQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TA7ONDyj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B05FC4CEE3;
+	Sat, 12 Apr 2025 21:16:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744491529;
-	bh=9QDgZiGGPT+SOjTJ3/U31CUZVzGlsc8DDX0Q+18Tils=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=QmWrIo04/RLWN34KFXkANRxS6mvQqZrr4ef3gV7/6g2i5Z3kws1sfgEixxiOdn4Ee
-	 yFO7dPMMKocNO91SV6geFB0MZ1rs/kAMiza5AjrLOkDoAoXtPXoXw5Ek2Jmuvxmmhp
-	 eLfqOfFDZnSg8iWdu17d1s2ys+Wly3WYZa1DMeJFXlpATcN5S+qFC5lthjVB3Z4r71
-	 q9U8E/SnXTwex12bkX+j+pzwNIVr2gt9d6ele7Dh+GcPWKgZhAVSWdf2+kLGXdgPep
-	 O06zbsacfx+2o+7rL/Q4T0uIxT/Aj6Bx7W+8OR9KnaeUfPuV65La/Lb+SzMynvvcTN
-	 HX0AY4K9zNR1g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB036380CED9;
-	Sat, 12 Apr 2025 20:59:27 +0000 (UTC)
-Subject: Re: [GIT PULL] BPF fixes for 6.15-rc2
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20250412183804.36400-1-alexei.starovoitov@gmail.com>
-References: <20250412183804.36400-1-alexei.starovoitov@gmail.com>
-X-PR-Tracked-List-Id: <bpf.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20250412183804.36400-1-alexei.starovoitov@gmail.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/bpf-fixes
-X-PR-Tracked-Commit-Id: a650d38915c194b87616a0747a339b20958d17db
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: b676ac484f847bbe5c7d29603f41475b64fefe55
-Message-Id: <174449156658.752726.18363607173128379033.pr-tracker-bot@kernel.org>
-Date: Sat, 12 Apr 2025 20:59:26 +0000
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: torvalds@linux-foundation.org, bpf@vger.kernel.org, daniel@iogearbox.net, andrii@kernel.org, martin.lau@kernel.org, netdev@vger.kernel.org
+	s=k20201202; t=1744492591;
+	bh=LSm8n2JgBGQCeORLX5c07y6Iq9IWghBzRfmMe+pyr3Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TA7ONDyjxdZCdBDb304gFf4xzIuDoNv4zFL/14N8yKiQiINbcs6ZdPsWT437tuL5G
+	 0/myzNd7c8OfzqRDn/NXTAbe8KKaLPwMXQyFA8VqCJRcYXODdECAJjHavyW9yywiZw
+	 VHXql/6NMZApCD0E7QUY7h19ALR81BsqMuopDbXZ1W+Wjgp4EtMFgj6/Oa2uzfDX0s
+	 uZI831l0pMfyXQ01/0B661njG+ox4K3tG7VCTGHUlkiMKfHuyaDyNjSaM6eQlE3Mnm
+	 X5yCIUCl3qzyDFKtjr2F4QEZ4lLz0XxwPtTGHXyTQntCaIsEbqdf1gMBYiMHFvKuJY
+	 gcNACIKN2egNg==
+Date: Sat, 12 Apr 2025 14:16:30 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: lvxiafei <xiafei_xupt@163.com>
+Cc: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com,
+ horms@kernel.org, kadlec@netfilter.org, linux-kernel@vger.kernel.org,
+ lvxiafei@sensetime.com, netdev@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org
+Subject: Re: [PATCH V5] netfilter: netns nf_conntrack: per-netns
+ net.netfilter.nf_conntrack_max sysctl
+Message-ID: <20250412141630.635c2b34@kernel.org>
+In-Reply-To: <20250412172610.37844-1-xiafei_xupt@163.com>
+References: <20250407095052.49526-1-xiafei_xupt@163.com>
+	<20250412172610.37844-1-xiafei_xupt@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-The pull request you sent on Sat, 12 Apr 2025 11:38:04 -0700:
+On Sun, 13 Apr 2025 01:26:10 +0800 lvxiafei wrote:
+> +static inline unsigned int nf_conntrack_max(const struct net *net)
+> +{
+> +	return likely(init_net.ct.sysctl_max && net->ct.sysctl_max) ?
+> +	    min(init_net.ct.sysctl_max, net->ct.sysctl_max) :
+> +	    max(init_net.ct.sysctl_max, net->ct.sysctl_max);
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/bpf-fixes
+If you CC netdev@ please do not post multiple versions a day.
+Please wait with posting v6 until you get some feedback (and
+this email does not count).
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/b676ac484f847bbe5c7d29603f41475b64fefe55
+You need to be careful with the Kconfig, this file may be included=20
+when contrack is not built:
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+In file included from ./include/linux/kernel.h:28,
+                 from ./include/linux/cpumask.h:11,
+                 from ./arch/x86/include/asm/cpumask.h:5,
+                 from ./arch/x86/include/asm/msr.h:11,
+                 from ./arch/x86/include/asm/tsc.h:10,
+                 from ./arch/x86/include/asm/timex.h:6,
+                 from ./include/linux/timex.h:67,
+                 from ./include/linux/time32.h:13,
+                 from ./include/linux/time.h:60,
+                 from ./include/linux/compat.h:10,
+                 from ./include/linux/ethtool.h:17,
+                 from drivers/net/vrf.c:12:
+include/net/netfilter/nf_conntrack.h:365:25: error: =E2=80=98struct net=E2=
+=80=99 has no member named =E2=80=98ct=E2=80=99
+  365 |             min(init_net.ct.sysctl_max, net->ct.sysctl_max) :
+      |                         ^
 
