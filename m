@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-181905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BED90A86D85
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 16:10:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67BB1A86D99
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 16:17:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC5951B63796
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 14:11:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14EA03A3988
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 14:17:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C5DF1E9B0D;
-	Sat, 12 Apr 2025 14:10:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 217E113E02D;
+	Sat, 12 Apr 2025 14:17:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="W7pGDeRs"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="dBOO0Ydf"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCAC31E835C;
-	Sat, 12 Apr 2025 14:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7D71804A
+	for <netdev@vger.kernel.org>; Sat, 12 Apr 2025 14:17:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744467048; cv=none; b=d1OkeyATil23lXj5ejzqjZesI2qPRG/8zFWmL3GAqWGLjygeN4sDT5/C3XbVJmZJr694UfSDLO/bu5h4mpskZNgE/oHBhdSj6/BAl8Eil42yga29RFrlNxg9Nu6y/1qDoWFAlwdfuOAp8WIJ+wit+dJCm+ukVBX8SNoWLxS30os=
+	t=1744467462; cv=none; b=GNOJ0YirLpN87xYbgVDbpwjjlgyBOol0B3fk6u7AVQCZmM1UC9Wldo9MiXdI3NP1EhbisOQony/AX2g3S04gj2Uq1QEPLl6c544mLCDLGFsDxwMm9zh5yyrQ+TwKVgjT98OZp4I1j5IuhqM8KctllWTAJ+x7YLiE+yLq/RGKWSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744467048; c=relaxed/simple;
-	bh=Zuh6rjYqHv/udRISGAo+nGTrjAsjQpYiiu+wvf1BIA4=;
+	s=arc-20240116; t=1744467462; c=relaxed/simple;
+	bh=lER4b2oqxeAHTQ6KUQM56C/5ev5JvmcDKouPzzCSP8k=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=SZrc0sM9GihFLZ1d+q3uHhI5sZ6TgjymlLdioMZGGesoKsDMlkzlR3ESFWzhe/rWZ+LVcuhNbq5sBlfJ8s8P4OoXztQdDXX1O4olAliCnN7Bh+Jy2UOnBEj25xafQmSTU+iVf1IvucNyoxdjYLBAvppAGe+XEs5yNzvHNwLR+A0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=W7pGDeRs; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=rvjdtgSCCEyoTsqhRI9hk44OaghRnLDppvIkDRAhpA/rdRzip5p4lh5SAdA2/L2TnqpOQUGDtOphHme2mZ3P9e1FQJYB4MwsHQgnjz0bIRr9OO3Tfz8TbCePdRq+/vJ2q4uZKggKgJlPweh/tx0fPUdLZnm3lZWGlTi+rr2a3G8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=dBOO0Ydf; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,23 +37,23 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=AjpPx4diUTD55faBtP4P4XYjVA7r8a4pIDQt1k+4gFo=; b=W7pGDeRsVYz/bLC54KhffjdXao
-	qUE9VUc2SW30decX6bDS+huRGHympzQaT3nviRrKPfsk44bET76kjQxbG8G7gDrG+qBqIRmZfn5Gx
-	0302N+RzkVlzUSraDNkrL1JaxkVfjSNT+c6KlnB65appcts3xDojgF4RuTRskmX47OWKZS0FBp9bf
-	amIXzlSnEqCdxyzOO3gUIQ8Pf75uxLoLrKq3pZDKYgmAxHdQFtOUHCoYqUIq46nD8rK7Ot9Iyzk5b
-	1t7/NSKRES7BJfIoh8y7kyi/n43T3/iJX0myCxCyiipkbeDsuze3Vy69/ye+hOYuWtpvyEQoVyd+3
-	L2vw1wHQ==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:43894 helo=rmk-PC.armlinux.org.uk)
+	bh=9FSsaukLF8royeXNwHBuaIKUVxUX+OAyF91g37Orbx4=; b=dBOO0Ydfxn5g7p0sW8qa3xoVny
+	QX/V9c/9/O793CIfBsZEEKhDIaU8vgaljiCmO2d9WJrCgz+iS/zPqi8XVh1xl82Jh1WzQTUQ8Z9LT
+	3PNQm8SLNFTmt4QOBGZXyG/PuGYwpMT9Q3XzUbO/shGQSPN30635uKpQBgxi04E5E7g5UVjGaNuh9
+	7ekzA+ojoRXlFBGOKSAhu+aqky+asHuMdzd2eyFEprVJBTKqobdWQUmyr0xDognUqevDcH+NyVTAO
+	KIE/tQSpMUwm3juY3627jLcxyBgvmkSA/bb03Ds5+eAiNdsVWFZOCiU1REwBIA8roizH4AswoQR7m
+	H63pfzdQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:60238 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1u3bZB-0004az-2M;
-	Sat, 12 Apr 2025 15:10:41 +0100
+	id 1u3bfq-0004c0-1u;
+	Sat, 12 Apr 2025 15:17:34 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1u3bYa-000EcW-H1; Sat, 12 Apr 2025 15:10:04 +0100
-In-Reply-To: <Z_p0LzY2_HFupWK0@shell.armlinux.org.uk>
-References: <Z_p0LzY2_HFupWK0@shell.armlinux.org.uk>
+	id 1u3bfF-000Eli-C5; Sat, 12 Apr 2025 15:16:57 +0100
+In-Reply-To: <Z_p16taXJ1sOo4Ws@shell.armlinux.org.uk>
+References: <Z_p16taXJ1sOo4Ws@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 To: Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>
@@ -63,14 +63,12 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
-	linux-arm-msm@vger.kernel.org,
 	linux-stm32@st-md-mailman.stormreply.com,
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
 	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>
-Subject: [PATCH net-next 4/4] net: stmmac: qcom-ethqos: remove
- speed_mode_2500() method
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next 1/4] net: stmmac: anarion: clean up
+ anarion_config_dt() error handling
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,48 +78,41 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1u3bYa-000EcW-H1@rmk-PC.armlinux.org.uk>
+Message-Id: <E1u3bfF-000Eli-C5@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Sat, 12 Apr 2025 15:10:04 +0100
+Date: Sat, 12 Apr 2025 15:16:57 +0100
 
-qcom-ethqos doesn't need to implement the speed_mode_2500() method as
-it is only setting priv->plat->phy_interface to 2500BASE-X, which is
-already a pre-condition for assigning speed_mode_2500 in
-qcom_ethqos_probe(). So, qcom_ethqos_speed_mode_2500() has no effect.
-Remove it.
+When enabled, print a user friendly description of the error when
+failing to ioremap() the control resource, and use ERR_CAST() when
+propagating the error. This allows us to get rid of the "err" local
+variable in anarion_config_dt().
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 9 ---------
- 1 file changed, 9 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index e8d4925be21c..e30bdf72331a 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -672,13 +672,6 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos, int speed)
- 	return val;
- }
- 
--static void qcom_ethqos_speed_mode_2500(struct net_device *ndev, void *data)
--{
--	struct stmmac_priv *priv = netdev_priv(ndev);
--
--	priv->plat->phy_interface = PHY_INTERFACE_MODE_2500BASEX;
--}
--
- static int ethqos_configure(struct qcom_ethqos *ethqos, int speed)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c
+index 37fe7c288878..232aae752690 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-anarion.c
+@@ -65,13 +65,12 @@ anarion_config_dt(struct platform_device *pdev,
  {
- 	return ethqos->configure_func(ethqos, speed);
-@@ -800,8 +793,6 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 		ethqos->configure_func = ethqos_configure_rgmii;
- 		break;
- 	case PHY_INTERFACE_MODE_2500BASEX:
--		plat_dat->speed_mode_2500 = qcom_ethqos_speed_mode_2500;
--		fallthrough;
- 	case PHY_INTERFACE_MODE_SGMII:
- 		ethqos->configure_func = ethqos_configure_sgmii;
- 		break;
+ 	struct anarion_gmac *gmac;
+ 	void __iomem *ctl_block;
+-	int err;
+ 
+ 	ctl_block = devm_platform_ioremap_resource(pdev, 1);
+ 	if (IS_ERR(ctl_block)) {
+-		err = PTR_ERR(ctl_block);
+-		dev_err(&pdev->dev, "Cannot get reset region (%d)!\n", err);
+-		return ERR_PTR(err);
++		dev_err(&pdev->dev, "Cannot get reset region (%pe)!\n",
++			ctl_block);
++		return ERR_CAST(ctl_block);
+ 	}
+ 
+ 	gmac = devm_kzalloc(&pdev->dev, sizeof(*gmac), GFP_KERNEL);
 -- 
 2.30.2
 
