@@ -1,114 +1,75 @@
-Return-Path: <netdev+bounces-181881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39DDDA86BCE
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 10:10:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 94994A86BDC
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 10:40:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCEAA8A8371
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 08:09:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A1448C0D9F
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 08:39:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FFA1199EA2;
-	Sat, 12 Apr 2025 08:09:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="lxnIHExP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 609511922ED;
+	Sat, 12 Apr 2025 08:40:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vuizook.err.no (vuizook.err.no [178.255.151.162])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8880919ABC3
-	for <netdev@vger.kernel.org>; Sat, 12 Apr 2025 08:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C9FC1632C8
+	for <netdev@vger.kernel.org>; Sat, 12 Apr 2025 08:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.255.151.162
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744445378; cv=none; b=l1Wry6rBfeiNLPCfWz1c3kKYqwab7ArT/2wPTLC7bwRgf7zV35tD9iHZg+yAKSTUPqxJIgtD8YXTDeRf1SS6BEB/4IM0vcHOLOKonGsoUFZ2Drn/+ihvlmVLyk2IOWDlGBwfDY1Cy+HXAj++zoskdOOdBFcF1PgvvZU5d0AXlL8=
+	t=1744447202; cv=none; b=F8dgAbOv0cvZlYoYYkb0A/Mbn1cI62W0XAJv0BVnEyGrIMtrYgya/ysTSqx40sBwcs2moy6yKIlMJzOYa30xRdKpX6z97mGRHDDvbORXtM6DoWQOsb5W6jUK2o+TbgjPnDSawOM/uxTF1d4IEzIZfc42VYVLaI2RnLPJcgLdsmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744445378; c=relaxed/simple;
-	bh=CmUJMjvFPycEqYFrhh7aPxH/JrXnk5lYH2hn1P1WwQ8=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=o81a7v+lXCC0r+iWQwyK43Qj4o8m6Wbzww9lZzAd9z3amL+Pqhdlkv87rnqfLWXLyPa7eVWrmTNRadgJev4uw6lvtEWdCgfVzCH2o/mGOSYOnszafzKpFvcIDDGVEzO4Y5+oQYW+doAuGH+v9g8eKFYEoGDGxoJV/I/MOBI5AXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=lxnIHExP; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=KLYAQmm0EdRBLRzzdd3lLjh/IOTbvjXhFDeOUE0zWgY=; b=lxnIHExPZpx7rC9L0Q6P+pHgGW
-	7Chlw2h2JegOWClBM4xpicZd9J+lOMTfPqCyJdWB6qtsLjaQBYm1B14xm+P2s8uzYnXdTe86vTyNN
-	b1hWgIWDVPtYP/PreB3Me1uk8DOCClo2q21GRD/CvBKvVpDvIpmizOKHzDXBUGV1ZpQceuFKFy5kI
-	le/eMXpJ4waVYpxsvT0obbx+3kZoaRzioJSbDz7qnyQ0gOPsm17B9tIEL4ZSb5/SWaelBs5pK2WA1
-	tAnhZ6mWQMPl5WyL/qR7Am9Wg18CnrM4YjwuooRBIf1fCf046tjsjAklXwphB/8kkHNnt0hTzh9ge
-	UP2mWU2A==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:33820 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	s=arc-20240116; t=1744447202; c=relaxed/simple;
+	bh=zABR6WSHXaIMOoCHJhF9OsTL9e2JJE7bAB7M3ddXMGw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=VrymVu4QrtMhT5z989ppqpuPvN20gOISPlQhTwVcJkHuDuZaFEH/zGR/+U9qrJpJjS91RNOnvXj9Yrr4SoR556GkbAOEHL2fNacXFt3HBM7GjvABA1I5qIMFR0Cpts0+tuXAqDpJF66BFdhMhysBAQ6w1ePrUYWYa7E+FCSerPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hungry.com; spf=none smtp.mailfrom=hungry.com; arc=none smtp.client-ip=178.255.151.162
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hungry.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=hungry.com
+Received: from [2a02:fe1:180:7c00:3cca:aff:fe28:58e0] (helo=hjemme.reinholdtsen.name)
+	by vuizook.err.no with smtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1u3Vvc-0004My-0B;
-	Sat, 12 Apr 2025 09:09:28 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1u3Vv0-000E87-DQ; Sat, 12 Apr 2025 09:08:50 +0100
-In-Reply-To: <Z_oe0U5E0i3uZbop@shell.armlinux.org.uk>
-References: <Z_oe0U5E0i3uZbop@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jon Hunter <jonathanh@nvidia.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Thierry Reding <treding@nvidia.com>
-Subject: [PATCH net-next v2 5/5] net: stmmac: remove GMAC_1US_TIC_COUNTER
- definition
+	(envelope-from <pere@hungry.com>)
+	id 1u3WOz-00DqBx-22;
+	Sat, 12 Apr 2025 08:39:54 +0000
+Received: (nullmailer pid 2369751 invoked by uid 10001);
+	Sat, 12 Apr 2025 08:39:47 -0000
+From: Petter Reinholdtsen <pere@hungry.com>
+To: Salvatore Bonaccorso <carnil@debian.org>, Michal Kubecek <mkubecek@suse.cz>
+Cc: netdev@vger.kernel.org, Daniel Rusek <asciiwolf@seznam.cz>, Michal Kubecek <mkubecek@suse.cz>
+Subject: Re: [PATCH ethtool] Set type property to console-application for
+ provided AppStream metainfo XML
+In-Reply-To: <Z_n7jpRVr_Sv-gxC@eldamar.lan>
+References: <20250411141023.14356-2-carnil@debian.org>
+ <Z_mKHHSNscT09VwJ@eldamar.lan> <sa65xjaromx.fsf@hjemme.reinholdtsen.name>
+ <Z_n7jpRVr_Sv-gxC@eldamar.lan>
+Date: Sat, 12 Apr 2025 10:39:47 +0200
+Message-ID: <sa634edsrho.fsf@hjemme.reinholdtsen.name>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1u3Vv0-000E87-DQ@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Sat, 12 Apr 2025 09:08:50 +0100
+Content-Type: text/plain
 
-GMAC_1US_TIC_COUNTER is now no longer used, so remove the definition.
-This was duplicated by GMAC4_MAC_ONEUS_TIC_COUNTER further down in the
-same file.
+[Salvatore Bonaccorso]
+> Can we add a Tested-by: Petter Reinholdtsen <pere@hungry.com> ?
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac4.h | 1 -
- 1 file changed, 1 deletion(-)
+Sure. :)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4.h b/drivers/net/ethernet/stmicro/stmmac/dwmac4.h
-index 42fe29a4e300..5f387ec27c8c 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac4.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4.h
-@@ -31,7 +31,6 @@
- #define GMAC_RXQ_CTRL3			0x000000ac
- #define GMAC_INT_STATUS			0x000000b0
- #define GMAC_INT_EN			0x000000b4
--#define GMAC_1US_TIC_COUNTER		0x000000dc
- #define GMAC_PCS_BASE			0x000000e0
- #define GMAC_PHYIF_CONTROL_STATUS	0x000000f8
- #define GMAC_PMT			0x000000c0
+> I think at least the summary-first-word-not-capitalized should be done
+> in a seprate commit? Not sure about the other two reported info level
+> issues.
+
+Note, I believe neither of them need to be addressed, as they are minor
+nitpick issues that do not affect the usefulnes of the entry, and only
+affect the amount of noise from appstreamcli validate-tree. :)
+
 -- 
-2.30.2
-
+Happy hacking
+Petter Reinholdtsen
 
