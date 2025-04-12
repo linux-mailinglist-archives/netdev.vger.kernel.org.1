@@ -1,131 +1,91 @@
-Return-Path: <netdev+bounces-181927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17D95A86EE4
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 20:40:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58583A86F08
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 20:51:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADA6319E1DD2
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 18:40:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CD3419E2568
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 18:51:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 713F1230274;
-	Sat, 12 Apr 2025 18:38:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2498C1DE3D1;
+	Sat, 12 Apr 2025 18:51:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jvhsn3BK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lAIyXFd6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A19E422AE59;
-	Sat, 12 Apr 2025 18:38:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F421C19049B
+	for <netdev@vger.kernel.org>; Sat, 12 Apr 2025 18:51:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744483136; cv=none; b=juUCChTKX8Kb5wmv0z41zJOd32e5RRzKR19Iskp4V1Z8vnF16YAvVH87Tc6Az80VaUDwaYx0D+sMzeRL+bppBKqdQ8mH0p8ffyuTmlBYUDXa8u4cNn9Au2Xwdjs28c0WLVn8LrtBjB64JE2pm1uJ0O/PoapTvKFLido4K0WVXSI=
+	t=1744483900; cv=none; b=FS+cVuAueyxYZceop9AW2IbZpw2FxQFO29jF/LfJy8QqrjsPFTfQQi+FYwiJrdjX1Xp8zQBv5LTZLxtHYJR6CcUZAZUN+WplP5UWYYp2Jc7TjaSyKDh5p3njBBalRWzvpdXNN4cy+VLQrzTsg8y3K/BEmdCioskE0sy2H3iapHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744483136; c=relaxed/simple;
-	bh=p33eXj35w3OqPN5REOigU1xwZ+LWQdjRStna6ySff7w=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZESyQM5RiamfVgj4CTFsY5F41PWJTOAMsosd3j+hz9g/YkeWce4dzw/10S7pTao7UN3gbJw0m/paNru6ryv1plWRiJNlFCL8yCE7L7DK+G+pXdxJEV7k11Ia81+Dav/FWNOVJPiXytAZ7WUNPJF6hdwJHCUOTQW5oPZFqRI8Yss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jvhsn3BK; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43cfebc343dso23005635e9.2;
-        Sat, 12 Apr 2025 11:38:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744483133; x=1745087933; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wuavb+wGeDAlFow8byd6Kbt5rrT1hwsnu7KsTIYCUj8=;
-        b=Jvhsn3BKcNnGg86cf3EiVHlwantllw53Ee8q9Pqb+bdx3kSmevr5p3xWBnpYJcsLaT
-         9/qF+0pfarwQfVY2VoJma6n+iO+roRNw6dRvpomlR7fql9D3+CRcQJpIYJVtRmCpDZ1w
-         9jAy6Pix9NvdQROcTDKFQo9rPZjwVG4a0vxadbxMUDwDNm87XXMD5CeodZjRPEJbhxMQ
-         zx/75BePmBVJnc1DxjdISdeaAMM0unPAuwQWC6AENOx2lagaEEYg53eEUli7wdZzNecr
-         sredGs/oDY8gf0mXgfOktfKywhjnTyBoh6dU1G6auKCI7FhZEhCgNfj3s1H6gkPMlY5D
-         raVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744483133; x=1745087933;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Wuavb+wGeDAlFow8byd6Kbt5rrT1hwsnu7KsTIYCUj8=;
-        b=S+CEggTZlpBcKhJ9UootcGE3O8FxG2Vz6khZCVST0Hy7kN5ElW1uxNHULoBqYNUpqw
-         OYclIlWHIN+aTqb2ZAtKERx+pgqrFRVpbm5dVSTdBG9TGgyRXtkgBglYqbuINvZ1t5Gc
-         3kIxWBBiipVCJSkh9NRxv3tRX5B6OGVvrVe2tiVQakbc6tks+fZiBh2bdvqsxV8+EEDW
-         6B9W0T4KzQ7/Y3T7XrUn9LUZhNTI4nnvo1DWirYQ0xhbOCi+gke0qVEWddozXb8ajpYS
-         eggk8XnVvJmRyKznJ2sXzv3cnxC4t/Nl0KOFmkgcpRULM0nDowPJCMBum+eykNPiYcVG
-         uYfA==
-X-Forwarded-Encrypted: i=1; AJvYcCVkS0PjY5dX6djq9U0G8c6Phc5ylkDy0ns0qjktz6TSrTyB7DQiW0dcxaABKBKMsEghnZ66YI4p@vger.kernel.org, AJvYcCWuFJ0zs+P9RZ0YXgEnm6yW1WT6LrYV+eT/tMJ2wzatRuj/J4+achV9KRIScprVn0wx6sgZAUTQ@vger.kernel.org, AJvYcCX1SlvQiq5DV1HH3WKMEQzqUd0oN0e5rhOVs/WUUT5StygHKOkDFdAM167kZOH+rwisbfgqBUBj8S7i@vger.kernel.org, AJvYcCXV48bfnCEk6CDJol/XwJvAoXQZtVV4ZrpE3oF6C6upn+wlDNm0hj49z5hD25JmryToIBhS0h09qDThUtw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1vapzgcIeRnDc/+WlvjRbbhR+8SGAKBlw0Szben4Tfa2wb5pu
-	x8X0Nyn9/6LrWLvlu/EayDNO9pV2azZMIq8cw11B8I9dyKAikG+h
-X-Gm-Gg: ASbGncvwIY1SiCXWOfwCu27RQ4Ht/BRaYyqF5gig8HJNPWsDPsw6anyegtLHQvUeRA9
-	0jfDr1w0Tj2lL5EjpCYlgd2GAUvLE5MxB0D6UarZJRLpIZcQ6MwRyRIFc97M0/35ZacBN51IuS/
-	pzZ2HATYk4IA71Jdh4+ZJ16C0xbh0fS1w5vaHPsbkX3lLpLMsNvB6cBo+PyKqmsHXwBXkwzVN7c
-	PrKennGJM/vvmYsHYx2Ub7ieEzBhph5qjIXU9uL8vbX6V+7ilzlA1I2cCi31JbWPPpYuP8yA+nf
-	XMFW1d/HZGH5Ao3gjWtIQ3B0AC3YrmbcDiQbfO/tpU47l2AWnIdBDssr25JYzEmoOA==
-X-Google-Smtp-Source: AGHT+IHyKoiHQ3xiUNTu3aWxUuAKb6FNb2OtIDwxap3KWvdKSy23MCSs0vOxYXNK6dEdmWtotysHww==
-X-Received: by 2002:a05:6000:1883:b0:391:2eb9:bdc5 with SMTP id ffacd0b85a97d-39ea521772emr5505267f8f.23.1744483132825;
-        Sat, 12 Apr 2025 11:38:52 -0700 (PDT)
-Received: from localhost.localdomain ([2a02:c7c:6696:8300:f069:f1cb:5bbc:db26])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f233c817dsm120599515e9.23.2025.04.12.11.38.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Apr 2025 11:38:52 -0700 (PDT)
-From: Qasim Ijaz <qasdev00@gmail.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+3361c2d6f78a3e0892f9@syzkaller.appspotmail.com,
-	stable@vger.kernel.org
-Cc: Qasim Ijaz <qasdev00@gmail.com>
-Subject: [PATCH 5/5] net: ch9200: avoid triggering NWay restart on non-zero PHY ID
-Date: Sat, 12 Apr 2025 19:38:29 +0100
-Message-Id: <20250412183829.41342-6-qasdev00@gmail.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250412183829.41342-1-qasdev00@gmail.com>
-References: <20250412183829.41342-1-qasdev00@gmail.com>
+	s=arc-20240116; t=1744483900; c=relaxed/simple;
+	bh=TJeAhN7UVWxKbz3b/oizNT6LyE4kHo/KOvKEu07vtLg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aegpOdbl+nSxzZxFHkcu8+HRjsv8BmuaG6mEcu8SVn/i98GqEb/3yOUiOeEIJiz4/78gpip5TPK+bGYbhazP2kFFw76M7pSzLISRjPA7hBT8MabAMindTN7BN68PONzt5eEyoX26RHIYoaow6P+XC5FpPwO/2oXhLl4jNYuk9HA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lAIyXFd6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46A1AC4CEE3;
+	Sat, 12 Apr 2025 18:51:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744483899;
+	bh=TJeAhN7UVWxKbz3b/oizNT6LyE4kHo/KOvKEu07vtLg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lAIyXFd6exOgyUDReZVkzxe/lcBoXJM4hyi8P6AultpmXSFeONVfHE5IysRUKZxmo
+	 S3FXR4r/QNIz305NOwAwNNr4jLoVCijU6OFLyXSZHBM2Z+ld5u8SHghYRyvfhFKkBl
+	 SwE8lmmcA4CWfa+cGy6UMAWIeaiR7zyyemyrt2CWHlMrUUUWkEL5rn94bxWWB3OlRw
+	 56zCAlPdHdH1GnYhqx3v4fpPlfGqBRf95OfslL5eFb+YYTLVKINAOj+ywHpKAUOqSO
+	 sjkT148npoTtNC+4VPHYsI2WxjDue0kkbckZUODh1os/HmsPRfTdNGAnLoGydKw9li
+	 i2QvJh2Hzlkhw==
+Date: Sat, 12 Apr 2025 19:51:35 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Anthony Nguyen <anthony.l.nguyen@intel.com>,
+	Intel Wired LAN <intel-wired-lan@lists.osuosl.org>,
+	netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH net] ice: fix vf->num_mac count with port representors
+Message-ID: <20250412185135.GR395307@horms.kernel.org>
+References: <20250410-jk-fix-v-num-mac-count-v1-1-19b3bf8fe55a@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250410-jk-fix-v-num-mac-count-v1-1-19b3bf8fe55a@intel.com>
 
-During ch9200_mdio_read if the phy_id is not 0 -ENODEV is returned.
+On Thu, Apr 10, 2025 at 11:13:52AM -0700, Jacob Keller wrote:
+> The ice_vc_repr_add_mac() function indicates that it does not store the MAC
+> address filters in the firmware. However, it still increments vf->num_mac.
+> This is incorrect, as vf->num_mac should represent the number of MAC
+> filters currently programmed to firmware.
+> 
+> Indeed, we only perform this increment if the requested filter is a unicast
+> address that doesn't match the existing vf->hw_lan_addr. In addition,
+> ice_vc_repr_del_mac() does not decrement the vf->num_mac counter. This
+> results in the counter becoming out of sync with the actual count.
+> 
+> As it turns out, vf->num_mac is currently only used in legacy made without
+> port representors. The single place where the value is checked is for
+> enforcing a filter limit on untrusted VFs.
+> 
+> Upcoming patches to support VF Live Migration will use this value when
+> determining the size of the TLV for MAC address filters. Fix the
+> representor mode function to stop incrementing the counter incorrectly.
+> 
+> Fixes: ac19e03ef780 ("ice: allow process VF opcodes in different ways")
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> ---
+> I am not certain if there is currently a way to trigger a bug from
+> userspace due to this incorrect count, but I think it still warrants a net
+> fix.
 
-In certain cases such as in mii_nway_restart returning a negative such
-as -ENODEV triggers the "bmcr & BMCR_ANENABLE" check, we should avoid 
-this on error and just end the function.
-
-To address this just return 0.
-
-Signed-off-by: Qasim Ijaz <qasdev00@gmail.com> 
----
- drivers/net/usb/ch9200.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/usb/ch9200.c b/drivers/net/usb/ch9200.c
-index 187bbfc991f5..281800bb2ff2 100644
---- a/drivers/net/usb/ch9200.c
-+++ b/drivers/net/usb/ch9200.c
-@@ -182,7 +182,7 @@ static int ch9200_mdio_read(struct net_device *netdev, int phy_id, int loc)
- 		   __func__, phy_id, loc);
- 
- 	if (phy_id != 0)
--		return -ENODEV;
-+		return 0;
- 
- 	ret = control_read(dev, REQUEST_READ, 0, loc * 2, buff, 0x02,
- 			   CONTROL_TIMEOUT_MS);
--- 
-2.39.5
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
