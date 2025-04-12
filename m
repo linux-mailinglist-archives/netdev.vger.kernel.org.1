@@ -1,94 +1,91 @@
-Return-Path: <netdev+bounces-181914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACD1EA86E02
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 17:50:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D4CBA86E0C
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 18:06:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6DB616777C
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 15:50:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 059BB7B277A
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 16:05:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2F06193402;
-	Sat, 12 Apr 2025 15:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C93D21FBCAE;
+	Sat, 12 Apr 2025 16:06:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dqg9yM7h"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DxupO1j4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E63718E3F;
-	Sat, 12 Apr 2025 15:50:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 621C1192D66;
+	Sat, 12 Apr 2025 16:06:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744473009; cv=none; b=HtGzlWdtN/3iTk2a4UkqH/fJ7Zd5XtNHnrAvNmKdiUj0/JCvaI3M0KVkDJc9UnxrQVC0Or6XQ9gGmftaeg2M9vIEHLjIdqe/G4y3NBAT006T8LltSHX6Pb8VilyiKR9KRFl6fjGkZyZdAweSbJqDefhrm+2JdUmPCzMd0e/xXQs=
+	t=1744473998; cv=none; b=Inyp1b4ztL8wbaxP4Ez40QHGVvfBqD0yt70g7fRgAvC7Io9Jmivz3Y/uq024z4P9G7AkGg7q/gCGu+YA3ozCwgqs+wLUTgVTBQAPSmRTK6lZuQbwK5mKrIN1mpBTKT0SUKOC9aHOnpytqEv0R4S8ZK+oBPHMza76eDAtsnlGRfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744473009; c=relaxed/simple;
-	bh=khl++lgzyDmxLxZyYpPyevPlGEvdB/5Y/xk5sQE5LF8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LWNJ/yyiE/260llYJXX2EpDHKpIIyZaNLkd4CBxuCUdZoKOISsKOBEZzMkD15o9Dyd1PZBFeJUHwNoEgA0u8yI+mHt1k/avd0ERU6ev7SDoiEOKu0Zgl4aTb1Lkc38bg0Gp6zE2/0J6G2HgNL38t6pdUfEimIT7I/9u91+qbBks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dqg9yM7h; arc=none smtp.client-ip=209.85.214.178
+	s=arc-20240116; t=1744473998; c=relaxed/simple;
+	bh=5pjImVyaUSqRmZRdn2LiZv08c/e1+C24mgMzF4falaU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bmnrXZ3JGqKLsa8VLYuyuiQZmjjMAovFGuMQ16duoQQ830xnAXb0L1db44M+QirluC+OTmJdbcSgbJfzosVevOWDZkYL75M1jlUgP5oAuap4rkk11BK9GfNvaaosIr4kSXL7hEk9f1dMI/ifkMaGWYQLXYGFX18aIU44Y2X+1Ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DxupO1j4; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-226185948ffso32662335ad.0;
-        Sat, 12 Apr 2025 08:50:08 -0700 (PDT)
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-22401f4d35aso34401465ad.2;
+        Sat, 12 Apr 2025 09:06:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744473007; x=1745077807; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1744473996; x=1745078796; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=yvLakejU+EHM6ubcv+pTGic7/jCzSqnHXu7AP1oYfpM=;
-        b=Dqg9yM7hMppOcuwnPpXhxQaET9kGuidMDLp/tIj//tqe+QS+0tYFwc4AzSxKbF+e2r
-         vHvZfwG2tArctjuR3wtQ2VKst625MYneeJpi3pMvAM0cyoH5gPUsf2f0IWuAmHOMSYgB
-         5umK6mv50zteRrP+gBOEgqXE8WMjuntjyEB24HYg1ddGuWde0TqCPpAqo6keX2Uk/ypf
-         A5UJnwoSzqwX3soIFZEkmXWwwYfiASGsDze6ZMsC0JS0IWpWmTRmiixFxsXBc9cCDviC
-         2p1qHOmrNEhHWtHCzuZAntRGlRVwJtAIEoaoJ+2JaOt0luMG7lk4wB0ePcMFudo3c9zd
-         eXtA==
+        bh=ewF251k2sP2DDRu+cfWYtdHJ78ZbeiTilTLAfoCOfS8=;
+        b=DxupO1j4p0Sklig3um10ntfhWdj130wOa6kPkuJgQMQjGxct9EkSxr8Lz6ERSBa3pu
+         Z4gmJRs+PdBDgLp16A9O3/m4T5A03fPCi3KMLYDwVnqUvxcTn1UKvsBN6rlq30Xq0qtT
+         JVl3Fqx1LfLPKq3L4DNPoRYPxAblyBs4nE/JZG2iSx4eQXDTO/mGSFlsS1nNcerSeICG
+         s6f8JllzFut0Db4H0kGUssXqXHwv7ird9k4ObKcauqymlKOnql4oq+o/4nT8CBR4qkXh
+         lVsxlF76ZkO5AwLbhmDQ8rg+MNbD4+Wr98d3T6LdgoxeTf5iwiVaYVgUPvYQeXQXXAnm
+         U3EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744473007; x=1745077807;
+        d=1e100.net; s=20230601; t=1744473996; x=1745078796;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=yvLakejU+EHM6ubcv+pTGic7/jCzSqnHXu7AP1oYfpM=;
-        b=wWS12AQJyc6ETY5eOFzqQsmnWOfCh0LZ+7VbG8jS1KSz/SAg9h7H0DVARyMqkISo+S
-         x1SZIrybNAz1pPYYNKR34tHxbNi0pmv68U11uBMcZ7Ri4u2raP94euiJXBe5I0XIuJ+x
-         EnaIPGBrt2uWpbLV/wucXF/28HC5WD/bO6CE89e/IUe6u0E7eWUTk2kBZMZRALBGGhnq
-         FaA9CK71082OlGBjGJw5TFJYTp5F/wTz2Dl6TaydPqJlRxOa4c27yr0vDVcWTbCxepeP
-         PSaqHL2CC3ilAQG4CfE9rnGhm1hOCz+48PoVbcY+moio/fJQeZSGzPuBes7rrArNKdE5
-         ZIbA==
-X-Forwarded-Encrypted: i=1; AJvYcCVhJpViXFcWByf+F27md1An5qPYaQh/38JS6HuO0Efq5alu0l9sKqg7qAExU/022uq2OEBJmiSJ@vger.kernel.org, AJvYcCW4+F10iSFmMHK/uYgiYpGv+NPhWc/BAmyJtVzHFJMsW6ho6tCef3fGeU9uNcu95p/MKKQ2uFgG6P5EkrI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSSeS0gqrZCndTX13GdNm/gmhyfzf9TTovIGxVdfbZSZM0XBIL
-	pVxicNKVZHIZ7AJKqHrXGiFZZFCfPsfyFIwRoszvrH8z31TQR25+xt4z2g==
-X-Gm-Gg: ASbGncvDB9guPoPlnYKcFZjYw4VIiim2+t50X+tzVQjkQZyOEyI0PZynqqjvU0759XI
-	zBZZQ1ZMc/CAPK+Dzh3qXmSmiksY3jZySFDM5jv5JSi0vwzZbcnCIfxQxcCj9q5gUl+EhVlQAL3
-	5agCNZ++JBd+ppNJc4U+omDHDent9kYwiyLtfGG671gAMnwXre21Axo7dnS6num6CMGX7bi6XBg
-	KfSUzYwW1OB4TAJKaESXnWWX6q/FSz1jwJvm1e1xtsxIfrTHMeo0Ws4Z3iVo+Liw+ITC6rjrFL3
-	eD9FCoLSUGKjqdQn1+QUhILeLyouObNql2dq6N8NmIEqLybqxZoV0cKq
-X-Google-Smtp-Source: AGHT+IHSWJuHJwnhDT1o/e3ieyd/vRmTtnmhVS/y4JQQi6s8i8CTOj12wgmQ4rVo4RX8rmm5CoCUDg==
-X-Received: by 2002:a17:902:ec92:b0:223:62f5:fd44 with SMTP id d9443c01a7336-22bea4f20bemr88684355ad.40.1744473007401;
-        Sat, 12 Apr 2025 08:50:07 -0700 (PDT)
-Received: from localhost.localdomain ([49.37.219.212])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-73bd2334468sm3521817b3a.169.2025.04.12.08.50.01
+        bh=ewF251k2sP2DDRu+cfWYtdHJ78ZbeiTilTLAfoCOfS8=;
+        b=B/PAg9vbNJDtb6O+RazFFDjEjhZ/xihtoqYA9b/eqw1wNp+qoXJSLI56QB1oHNA7X1
+         I3HO7zGEe2BmPmVWv3UJsvi195jEHHH+CXtsqC5RvyeKSrojl8N8/uoeuamQ7LDcRs5N
+         DuqWmRrSvcn7Uq6do5qgOTN3SOABgOD84WiazZSiDXRHl2Eq+9efeOe9up5IaO/wvY37
+         lPNpCL8383WffhT6wNmEC2Snl7txBIqvrXVhh0Pw56ktgNmJQ4AcS+ASc6CbS41tkRjX
+         ieRY5XpUMq/Gmp3cGgTqOXSQFwEAGgOjPrjuxp+EV1/JkMKyMOSyFSAydu3S2Wj3Er5S
+         aWJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVg2HSaC8cLmN+LhSl/drRSka94aOsy+ZfP7zbdofKnA5WIe5QwnsFh4CQedt1coOsvRhqTn2wmQcPqD2o=@vger.kernel.org, AJvYcCVx+tuNyH+opSiZqFBDRJ6WuEFIlo5cyrkCxFhKHlrOwlr4zkvfvldhS/FetiOkEfOX5lpOpXBK@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4XKLOa/HKQm+gt/hdfpHXBIqShY6IvkqLcd8qJabE+kL/wQks
+	rw3sf6DQ/vlpNv7WtABahQxyChtlA641goD5APocFRJ0+s5lIqR5oAEkcGwL
+X-Gm-Gg: ASbGnct5PcQzE/9pzjVjjamX1T+g+kVKQMBzTsDweYwil8zmKUpATo7ylGmVZs+LRjP
+	xJNvdBaqtEsbDWfxiqYpx6HliWmZ9vhKgBLo8dRu9nyvxB+5eh9TcfdsnypP8Vq90F198IfuXwa
+	61O7AuD7hg0iYLZGWPtNX8Ax5N6KytQJT4wZWbN5uo9l6FeUYZll5zCLq0xCmvsP04EWfbBMdul
+	YpkMBcTO/sTWSZOdPkYCzL3EUP0oiA1VcY2zxF2h+/rB+EWLm8WnfsuNNVSg9MRBJIUU0UeTIrE
+	P/6UMSqW+6CWONf4gaeFjLENtOQbDlalLYLoDIlr8/PjoVCSuQeZFtMrpsld9Bg=
+X-Google-Smtp-Source: AGHT+IGXh4kfZjPxYfbZ3hjPWbProLo0Qzsresv2r7n6gjlLxMEEblQMxjL50En14mw8sraWfIkB4A==
+X-Received: by 2002:a17:902:f60b:b0:223:3ef1:a30a with SMTP id d9443c01a7336-22bea4fee8fmr90347365ad.45.1744473996419;
+        Sat, 12 Apr 2025 09:06:36 -0700 (PDT)
+Received: from localhost.localdomain ([2405:201:5c08:585d:6eb6:f5fb:b572:c7c7])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b02a322114fsm6558498a12.73.2025.04.12.09.06.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Apr 2025 08:50:06 -0700 (PDT)
-From: Abdun Nihaal <abdun.nihaal@gmail.com>
-To: jiawenwu@trustnetic.com
-Cc: Abdun Nihaal <abdun.nihaal@gmail.com>,
-	Markus.Elfring@web.de,
-	mengyuanlou@net-swift.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
+        Sat, 12 Apr 2025 09:06:35 -0700 (PDT)
+From: Pranav Tyagi <pranav.tyagi03@gmail.com>
+To: davem@davemloft.net,
+	dsahern@kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	saikrishnag@marvell.com,
-	przemyslaw.kitszel@intel.com,
-	ecree.xilinx@gmail.com,
+	horms@kernel.org,
+	skhan@linuxfoundation.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 net] net: ngbe: fix memory leak in ngbe_probe() error path
-Date: Sat, 12 Apr 2025 21:19:24 +0530
-Message-ID: <20250412154927.25908-1-abdun.nihaal@gmail.com>
-X-Mailer: git-send-email 2.47.2
+	linux-kernel@vger.kernel.org,
+	linux-kernel-mentees@lists.linux.dev
+Cc: Pranav Tyagi <pranav.tyagi03@gmail.com>
+Subject: [PATCH net-next] net: ipconfig: replace strncpy with strscpy
+Date: Sat, 12 Apr 2025 21:36:23 +0530
+Message-ID: <20250412160623.9625-1-pranav.tyagi03@gmail.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,49 +94,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When ngbe_sw_init() is called, memory is allocated for wx->rss_key
-in wx_init_rss_key(). However, in ngbe_probe() function, the subsequent
-error paths after ngbe_sw_init() don't free the rss_key. Fix that by
-freeing it in error path along with wx->mac_table.
+Replace the deprecated strncpy() with strscpy() as the destination
+buffer is NUL-terminated and does not require any
+trailing NUL-padding.
 
-Also change the label to which execution jumps when ngbe_sw_init()
-fails, because otherwise, it could lead to a double free for rss_key,
-when the mac_table allocation fails in wx_sw_init().
-
-Fixes: 02338c484ab6 ("net: ngbe: Initialize sw info and register netdev")
-Signed-off-by: Abdun Nihaal <abdun.nihaal@gmail.com>
+Signed-off-by: Pranav Tyagi <pranav.tyagi03@gmail.com>
 ---
-v1 -> v2:
-- Add fixes tag, as suggested by Markus and Jakub.
-- Also set the branch target as net instead of net-next as it is a fix
+ net/ipv4/ipconfig.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-v1 link: https://lore.kernel.org/all/20250409053804.47855-1-abdun.nihaal@gmail.com
-
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-index a6159214ec0a..91b3055a5a9f 100644
---- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-+++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
-@@ -625,7 +625,7 @@ static int ngbe_probe(struct pci_dev *pdev,
- 	/* setup the private structure */
- 	err = ngbe_sw_init(wx);
- 	if (err)
--		goto err_free_mac_table;
-+		goto err_pci_release_regions;
- 
- 	/* check if flash load is done after hw power up */
- 	err = wx_check_flash_load(wx, NGBE_SPI_ILDR_STATUS_PERST);
-@@ -719,6 +719,7 @@ static int ngbe_probe(struct pci_dev *pdev,
- err_clear_interrupt_scheme:
- 	wx_clear_interrupt_scheme(wx);
- err_free_mac_table:
-+	kfree(wx->rss_key);
- 	kfree(wx->mac_table);
- err_pci_release_regions:
- 	pci_release_selected_regions(pdev,
+diff --git a/net/ipv4/ipconfig.c b/net/ipv4/ipconfig.c
+index c56b6fe6f0d7..eb9b32214e60 100644
+--- a/net/ipv4/ipconfig.c
++++ b/net/ipv4/ipconfig.c
+@@ -1690,7 +1690,7 @@ static int __init ic_proto_name(char *name)
+ 			*v = 0;
+ 			if (kstrtou8(client_id, 0, dhcp_client_identifier))
+ 				pr_debug("DHCP: Invalid client identifier type\n");
+-			strncpy(dhcp_client_identifier + 1, v + 1, 251);
++			strscpy(dhcp_client_identifier + 1, v + 1, 251);
+ 			*v = ',';
+ 		}
+ 		return 1;
 -- 
-2.47.2
+2.49.0
 
 
