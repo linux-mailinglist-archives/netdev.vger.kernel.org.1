@@ -1,205 +1,266 @@
-Return-Path: <netdev+bounces-181853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2F93A86980
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 01:57:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20CDCA869BA
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 02:18:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86ED2448178
-	for <lists+netdev@lfdr.de>; Fri, 11 Apr 2025 23:57:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA6371BA4C45
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 00:18:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 738932BD5AD;
-	Fri, 11 Apr 2025 23:57:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E1678828;
+	Sat, 12 Apr 2025 00:18:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="NKPI6ys8";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Uc4N2DLP"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="r+U5Oade"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2061.outbound.protection.outlook.com [40.107.95.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B5EF2253EA
-	for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 23:57:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744415875; cv=none; b=r+XVGl87RxJeA/N2SPUzooNSCewITNHyv08YulF++ZCaIUvelySIfRuWBx+uBpiytDF1qdgPOvWzAWjISA2gV9jnw1Ey+RWduOH3UAV0AZmlR+BF7EmpzQmjAmCi3elJjtz322cn22BlNh2iUA1zbv1khlysLJKrqw55GIQ19pM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744415875; c=relaxed/simple;
-	bh=LDbUBZePXoPknG3mS5k3zgG5m4awine77om1NsD72fM=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=LHqPT34hnvzX76cMH4rQjSrZj1cldEoEsNpNfNCKP0sxtig8O08nUSI9wDwa2JkEa3SSoL5Qy0se/BOr/WjzXuaHuBcxeWb4gOVGUMBqSHcs0a9uJqewgBA4F6UeAQ3EZG86cqb6uBtl8S2XQmk0qTDUYkg8dqlJDPH8LP5+VHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=NKPI6ys8; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Uc4N2DLP; arc=none smtp.client-ip=103.168.172.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id ED91011401D1;
-	Fri, 11 Apr 2025 19:57:50 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Fri, 11 Apr 2025 19:57:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-id:content-transfer-encoding:content-type
-	:content-type:date:date:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to; s=fm3; t=1744415870; x=1744502270; bh=xADss857YAk905T3CeGog
-	EmmfF+4Z7rjogB7DLXuKEo=; b=NKPI6ys8ipNuTV48X3FiJgYz8D39/5luW46do
-	gGQll1TNVaStNxxDt2KkNogJUX7y0NTuKo5rfDNhCF154BRA1RfFfqRUPL/MtmQF
-	OdLxMZW5qcQFo73dG1ADHHnRgaiV1owapJ5mk+PEctw72sLgg5/8W5a7UKju40Lc
-	B9Z/oyuuLTGWZ+M2nvhrxAHm+y2gJqlshhOs66A9czq39XavzVzVLDO2KQ0Iz0Ky
-	HiYqePttplgAz5h1ExymYT1HVxkWis03nd9/gASpsBl+lylDSzVEdQD/oly4QM3j
-	fA3cWjMfpT5g5eOIt0P6tEQ2Ac2OzvQhZYPSW7svYVryxQG6Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-id
-	:content-transfer-encoding:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1744415870; x=1744502270; bh=xADss857YAk905T3CeGogEmmfF+4Z7rjogB
-	7DLXuKEo=; b=Uc4N2DLPFNAymZenwpTgVkbKaKIJQIaQCO7Yfgql7EWmYBHZ6Mg
-	NWBlyRLuEPqwXeDd6sXgz3NY8fkB0121Wuon382ppz9pTYtM2sZ3hm5DcoSDZ4tA
-	qPp7puqOe0aE16IKZI3mIYt5wJGtGUS9ttRKWzzQHLQ3/XTLrwqo/pOgLECN8yxm
-	JpYMXpIKoiEl2PrS4Rs8zagy6aDlpnRBAqeaQOlXCUoAvH/37a38rNrqSHkcGFKC
-	rfz4ZWn7pKOWtTlwblVFdwHSSj3bIObg0ZiKFy0DiXqL/dO6ozd2ggHLszz5GUDB
-	GV1CXKUVLvMQyRtf52eLf+AQASaRIZAPeiA==
-X-ME-Sender: <xms:fqz5Z5X6yEM828ZVkz5O4fjZvxPI5Ikd8pxWFxOFTj2yma7Bt7EBxQ>
-    <xme:fqz5Z5mrBu3k2A2cZkDWHtk1JShAvPh5bQNs1JMsE9opExwMnnZk4rCG-3LyFYdnp
-    IMAvApmLpZP_W7euK0>
-X-ME-Received: <xmr:fqz5Z1bebsBgUzwnMtGcRW5Y9Z8O2TzBRV1ZLAr1jQj5LinwGRi-NQAh2M4QCr0jKbO6tw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvudefvddtucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhephffvvefujghfofggtgfgfffksehtqhertder
-    tddvnecuhfhrohhmpeflrgihucggohhssghurhhghhcuoehjvhesjhhvohhssghurhhghh
-    drnhgvtheqnecuggftrfgrthhtvghrnhepieefvdelfeeljeevtefhfeeiudeuiedvfeei
-    veelffduvdevfedtheffffetfeffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
-    hmpehmrghilhhfrhhomhepjhhvsehjvhhoshgsuhhrghhhrdhnvghtpdhnsggprhgtphht
-    thhopeegpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehprhgruggvvghpsheslh
-    hinhhugidrvhhnvghtrdhisghmrdgtohhmpdhrtghpthhtohepphhrrgguvggvphesuhhs
-    rdhisghmrdgtohhmpdhrtghpthhtohepfihilhguvghrsehushdrihgsmhdrtghomhdprh
-    gtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:fqz5Z8VaIVs0TQRb8w2bUypgjy3Ht89xZ_hRIbFyGkyRgROUFhbH5Q>
-    <xmx:fqz5ZzlooIQdkRcNevKLwOx65m69EXiZaufCGtRrn5bz5A52tJEWSw>
-    <xmx:fqz5Z5cyYpnxZBZrxix9ejs2y85qQ7idJVq0ix9fbFKEewQ-H7CCFg>
-    <xmx:fqz5Z9HFFJCdKGkAXl7N-XrfMWSEfy-V8-fPfUe9vxkRxTpz3f8Gmg>
-    <xmx:fqz5Z32jwZpwpkGeUZyHPpus3GBbckDl0wNCWO1KXQRSdMXQOvp5Rz5p>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 11 Apr 2025 19:57:50 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id B86A89FD3C; Fri, 11 Apr 2025 16:57:48 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id B56F99FC3F;
-	Fri, 11 Apr 2025 16:57:48 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: David J Wilder <wilder@us.ibm.com>
-cc: netdev@vger.kernel.org, pradeeps@linux.vnet.ibm.com,
-    pradeep@us.ibm.com
-Subject: Re: [PATCH net-next v1 1/1] bonding: Adding limmited support for ARP
- monitoring with ovs.
-In-reply-to: <20250411174906.21022-2-wilder@us.ibm.com>
-References: <20250411174906.21022-1-wilder@us.ibm.com>
- <20250411174906.21022-2-wilder@us.ibm.com>
-Comments: In-reply-to David J Wilder <wilder@us.ibm.com>
-   message dated "Fri, 11 Apr 2025 10:48:15 -0700."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D0BC80B
+	for <netdev@vger.kernel.org>; Sat, 12 Apr 2025 00:18:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.61
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744417120; cv=fail; b=H2Fv4fu8uEaFk0m+Bduqc5m4Fqiv30HvML+++NA+9W+gA+y0RGLesdirP/u04GTbTWaOKHAJ2CJ8QrVGTDNYxbKRT0yLNk3w+iyHJVMX4f7TDks8dk14KuI3C8/xlB6zDnox3uby6WlP8RVFBvTu/qnIMcxrrOv63+aKcaHb8vs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744417120; c=relaxed/simple;
+	bh=cbFy5I9dWoMuohbzjTCQlvHcV7olnVfGzDhFqEkNko4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=OhxctUaegfI1vRqZP/qx+vABhWEyb8zhROD1t5JqRftdPoBTfSeQJzHsnuraWfyL6VNiFx2iIGH823BVJebULo/JzUXG35xkLB/8KfCYo7n4oDyo7JxWP49S+1zBINyaud8ywng8TVRtHQb0rEoX4q28IogD7WHPYSByhj59WJ0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=r+U5Oade; arc=fail smtp.client-ip=40.107.95.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pacd8ZpaMZn/0oeXKiOR3sBzVPvaNCtf18BNk1xKV+upwV8IlPcJFxTLp6VOUGVsqQYVgpap8aBdiFXfdbiKcpAsHM9pnJfUrJQhLlVLYe3MJNNNRs6zLnkIrGQPViA0S0v0fxD/H2zsJ7H1qG5Uz16kgUkSgX5XnOsnPTI6mBZIaYSUYoHPyUdF+xDEK0bIrBXRs6tx4lXdnR1sTfvEb20bkaXCO1OM58Kbm4E/UvWTICM5syxIWbjZtXRewP0AwiW8gfT3+tlD29ifGJBn0JsK7mBwO9HDBpErGfDXvXVMyki7OkyO+86gHWneMCqYiEDXgbKyd2kndUIRSkPE8w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KswYS20VuCqpwnQinfsaR7Xmw7lFlfjGvoEvqDM/sEw=;
+ b=Z7lk3hv4kb5fbTHL9xFFHVqn3uZG2P4vqXM6oopRe904Hxnr+RkZ6ANiLLsMy43/ccBDZNySMwVIqdg9zVE/A6BVjvCOlyxaZulssTQlC+2nSGbPtDF0YKJw9gKRsB64lZJplqmS4Asm4zz8aBQ+Mv04ZCfwDY2tLx/jkdaWl1CQ+2e1b/w4H3p/m69MIKRWz5RSZy9MOJ1xh3owcm0y99sY6ZQK13PvzdgLtouQcsUPWH8ED3IIYzcITmMExAJqenOgT2gqOZJMzPEtcTpdrNbSQzfrXA7DLTIiJ+1OTHYwF9S82ioafk2vTGnV8MCs06bSMjXdPh6BF0dczocWjQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KswYS20VuCqpwnQinfsaR7Xmw7lFlfjGvoEvqDM/sEw=;
+ b=r+U5OadeY2L2w5eXnyhd9gboiZPA0UTb1Uh9nMscLkFWQnrcl47hDe43hI8e/HZIT62VKwLOG8LnlDQGXtJBgLHUb06dVXX0gmYHAVF+UeKW/vywLlXoPHzpnrU8uLDmt3JwrUM+dd1BYpRd5AAJLf0cnBnttXFrhwYDn7bFX55UPh9nl4QWYLaTWTY/6E25ZfzzAlW2jNQHkGVRFbh/xf8cOx3mczyrxM9ahvxdgGWZ/xtOlIHFKQUr8q9oaGJ3DHnamwo5GZ46Z80kuVLRJ4PC8iXpBDzYAElVLuwMDBO2sy4HdIw6BINipMIgg2jUqlJI2cJxxSSiyWU+X11Mbg==
+Received: from DM3PR11MB8736.namprd11.prod.outlook.com (2603:10b6:0:47::9) by
+ SN7PR11MB7592.namprd11.prod.outlook.com (2603:10b6:806:343::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.27; Sat, 12 Apr
+ 2025 00:18:34 +0000
+Received: from DM3PR11MB8736.namprd11.prod.outlook.com
+ ([fe80::b929:8bd0:1449:67f0]) by DM3PR11MB8736.namprd11.prod.outlook.com
+ ([fe80::b929:8bd0:1449:67f0%4]) with mapi id 15.20.8632.025; Sat, 12 Apr 2025
+ 00:18:34 +0000
+From: <Tristram.Ha@microchip.com>
+To: <olteanv@gmail.com>
+CC: <linux@armlinux.org.uk>, <andrew@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <hkallweit1@gmail.com>, <kuba@kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<UNGLinuxDriver@microchip.com>, <Woojung.Huh@microchip.com>
+Subject: RE: [PATCH RFC net-next 0/4] net: xpcs: cleanups and partial support
+ for KSZ9477
+Thread-Topic: [PATCH RFC net-next 0/4] net: xpcs: cleanups and partial support
+ for KSZ9477
+Thread-Index: AQHbd9G7VcLFvSdnAUmXjlhnL1yQjrM9UseAgDw9RUCAFBN7bIAR7B9Q
+Date: Sat, 12 Apr 2025 00:18:33 +0000
+Message-ID:
+ <DM3PR11MB8736B75C8846DE3816F42935ECB12@DM3PR11MB8736.namprd11.prod.outlook.com>
+References: <Z6NnPm13D1n5-Qlw@shell.armlinux.org.uk>
+ <Z6dHo0DFWUiMMUyN@shell.armlinux.org.uk>
+ <Z6NnPm13D1n5-Qlw@shell.armlinux.org.uk>
+ <Z6dHo0DFWUiMMUyN@shell.armlinux.org.uk>
+ <DM3PR11MB8736D45A311DA7C448825BABECDE2@DM3PR11MB8736.namprd11.prod.outlook.com>
+ <DM3PR11MB8736D45A311DA7C448825BABECDE2@DM3PR11MB8736.namprd11.prod.outlook.com>
+ <20250331143113.r6t5we52wp77qqjr@skbuf>
+In-Reply-To: <20250331143113.r6t5we52wp77qqjr@skbuf>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM3PR11MB8736:EE_|SN7PR11MB7592:EE_
+x-ms-office365-filtering-correlation-id: a711c2e1-4fa7-4ebf-7127-08dd79578fec
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?bObASAID6SxWHnCQdmTQMoWi/bfrZNnyDMbi70iympUbHxZPdxBt16IcZ9bm?=
+ =?us-ascii?Q?Jh/hyPsq6S8pqFiohzooGQ154kjyf+Sl1aMkOhKzdRCsxBeCnWIydkPbtw/6?=
+ =?us-ascii?Q?XO+H0eQEmDfkjROehLXft8RZ4++6m+yaZhF6iL2PMtFFHwR2h8kTMBBth2XE?=
+ =?us-ascii?Q?wHJcFoVIaGJB9T0J3+8iuwBsbDqhk5zU9Kyi0oxfG8kSULxaxIfUcJqNCiIk?=
+ =?us-ascii?Q?BQdTCfki4Htq5B15vpvWGM7lx04jR2iX3aPTFOx90fJ7cBEvnNgtII45eqM0?=
+ =?us-ascii?Q?5uQb5rPKDlQvna50HGklkVrSTewos+o1CsVmNfDXGTYq1To+OShhc0dgfqGt?=
+ =?us-ascii?Q?EGbPMDQUhahQv7qfsnEYQY6M4eZU7CUyzSVz41EkhumJgkongF6p00fbb0bY?=
+ =?us-ascii?Q?mcSfO4+iuSciB6NaKpGr1m/lQD65DeZjKUgEI692ved8W0Q9xRRG38LY//+b?=
+ =?us-ascii?Q?xfqNoRsf4lFRrE84U/3sZIP+2EGvON6FV9/1ayricBnK/CsAh13fToed8ebn?=
+ =?us-ascii?Q?EOxtdYX5E+XWjDoNDwgvXaNnbqMZyHsw88oRxFr/v7OQ9EEqmjNfJ0Ne/BuO?=
+ =?us-ascii?Q?o1i5glbdIsRShhHY/cCqSOh5kozqAY/oI83DA/e2x0/EPfwll5JAuYGTNmbT?=
+ =?us-ascii?Q?4O5W7aIvAng2LoYt2pmwxgrU6tD++UvPHiigEmXZzm93HnEcYXsgbUWX07w+?=
+ =?us-ascii?Q?VJOVWT0Ojggg6zWFyrirEx6LScPHr/drpPDS1SGN3zBbIjsRMIzmZIHoflKA?=
+ =?us-ascii?Q?fW/XdtJC/F6IUzaiKNwu95xuJmdISKIHtIY8Tkr5NL2fWMV97El4IATb871z?=
+ =?us-ascii?Q?nLSEr/qPJrWU+wXvbEoAzb7Ga0vYVMNLPZ5s86SwM10A/B6o30pylyNI+Aln?=
+ =?us-ascii?Q?ejBIUDCxbhkYFffwi2ocrNpt+UrjuJ2wtP9OgF0h1RQKocDZadjw1sMgBKD0?=
+ =?us-ascii?Q?GZrfaJ9UAXfHyZQ2lAa43eRWtbK3Z+WxicsjuNYS16ka9gi9w5n5IaubbDTm?=
+ =?us-ascii?Q?uewh/qqCLR6ZHUHtv8Dr5dHeUSGA9rYnTLlQeGWkeVcEAGhwhY7/7fdHMaVG?=
+ =?us-ascii?Q?8GUY3+yyrgCFvLQwqnaicnN14UBsSpKomVLzaDXKLR5aqJFLmKXWccl2WQQi?=
+ =?us-ascii?Q?LvZAwxXASRvVmUgj3/cmvcgG9Sm3L3LNfDUAHwMULMd2zFCl6oDz9MZw8pv8?=
+ =?us-ascii?Q?twfwNnwn5jYG2135PR9XiPffYYjQL2F1AugVfIEbQ4yCzaHyZhCk1Pq0BHJW?=
+ =?us-ascii?Q?m6fu1p7/rmj8AMxr/pPcEM4DFztupk762VrJd40f09MKO2untILozn3iLtun?=
+ =?us-ascii?Q?F/03ozEx8JJpFHlJTED05HPawxAbIdhzD7bDqV/TvyS3WX0W40d+/VbRV7RB?=
+ =?us-ascii?Q?mMPdimuUuvcMPoM9MKlBJd46sB2Ey8Nfka1UHI8OrHXfIATZD1VC5ybeptOW?=
+ =?us-ascii?Q?MihedHs/U8tIP5tYQNz56W4vlOA/sHye?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM3PR11MB8736.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?vP2HGOtc650K48je7v2/qEWJEz9Ef2DqkecBHXWE3Zm6yoKVGeFMfdyC99kD?=
+ =?us-ascii?Q?zHPQC4+xn51hWqBM/2cm0Ecr8pvi7uZFf/YPmZt+K58jOokN6dmJlg7npZVU?=
+ =?us-ascii?Q?pOYBLg9Kl/r9OcMeAvgrQAWyo3h0dCgmNwPdHYSZIEEMWLsi0Ba9piMkM96k?=
+ =?us-ascii?Q?yQYHg4OhwpeCCiyIR+acpZ4v0w0oUl4LuTlO12SrGbds0cXmbLF2lRONNK/W?=
+ =?us-ascii?Q?hX2VwoYLaOYIPhP9NCS0EhiSmDVwek9/Sot2+CGlDahvsg4SZBHxxFDiwP22?=
+ =?us-ascii?Q?zMQg/PnRlTiifkex+FaqQh3SPe9C3ynD0sjKaILWaXmtY1uV8hk90AyE08Tc?=
+ =?us-ascii?Q?uu+7qrxr1nAQHQN5BwQFzvPiIsbelTyQcZQe7rWnIQVNOHzShXQFIjUZ7JIt?=
+ =?us-ascii?Q?oubWyfQv9RAxqbuqyb+Ys6RhdAOF3z9esVH98tqw47jNxVuq7FdrsdRc8lko?=
+ =?us-ascii?Q?iAH1r4KDCVj+PZpoNVAkmDpaYcWXBhoNB+8N1bq2dyR1+axDPiqQYg8dC5ul?=
+ =?us-ascii?Q?4k37uOTEHGd8EP9QlCkWA4/VfYZeo7AJtUGmKhleWOSuRgyKM1v9U08fkp4L?=
+ =?us-ascii?Q?txVTl7BEoYF5HC9IlXbirO52ewQx6f2ybqBKcRRCy2AMmfA5A/ku1By+EPeq?=
+ =?us-ascii?Q?a6+mvPaHi95i6SfsiBXInFyo9e3Q2ciBl2VHmTnbZ61eicNgCDxmcwj4Ut5A?=
+ =?us-ascii?Q?kVxqr/1VvWWK9tv7OczjJMGVWaEwYNDIqpObwknu9s/8ygZube5knV4SV81u?=
+ =?us-ascii?Q?X/2nl/+9t680OZm9EoFYn4LAH5zoHiJkXpz9dWFun4YMiisBjYHaeoUFML9X?=
+ =?us-ascii?Q?84E0hsKyEmxSDBlKVWb7x6BJrtcD3qyS37NjZgbeeH2Qy8VE6tUwiWKqNGFb?=
+ =?us-ascii?Q?yyxW8XQvlYHjBRDxzKdFYUq3MRpn4WoUt62CQUSCbv1q4otyg2c0CtIbeJ03?=
+ =?us-ascii?Q?JTeiQ1eQDUQkcE7rcxoa+l9YSc/TWVDfADoJ6H3Ig0ELjyXqle8DaHIxkydd?=
+ =?us-ascii?Q?/6YzSdxFJnESt55wsh4Wi0vzBr64I0g57lTsy3852RhEmHFWXYmTy/Q+oI5Y?=
+ =?us-ascii?Q?LujJxCSiYCQrq2qnNDB2ktrfAbqf+RB6/sufb6hMMHy/4nM+lHJm6Sak3Ciw?=
+ =?us-ascii?Q?A5l14+exb8vxoQCX0fHnn/YsLESSpH70zOUrT5zZg1nllJ1Wzw6TzO5jfOII?=
+ =?us-ascii?Q?TmLzp02EfLVx71lat/EL2otpreduEmVLnOklcCjgJbHmApKTjJRw0Gq2t1XQ?=
+ =?us-ascii?Q?EYIo1LfRS59KbqI7dX4h3C91651ix4L2lQBkBOEJ32zSJolee4pyIWcWgdyg?=
+ =?us-ascii?Q?5lz2QyKMIKfRR3bcT8PoCRuovsbSm9xKkrpshHNhH61JlSvN+FazieUpTzRL?=
+ =?us-ascii?Q?AZ8dX2sSDKZJKgpAXDZTlwEPu6wA48tFIGH+5Q63Koq0Ms8AQXnfQds1xMLJ?=
+ =?us-ascii?Q?4s9nL7folr4+wrcqQ53ivBQ/SvjnSEy7pgjN3N6laMKkXUqlq9GQqZo3p4XD?=
+ =?us-ascii?Q?axj0kOcuETQW9wq2k98WNmTlIM0sSZqdvJsRlAZLiZ6J0PNOfarN2oJwVq/H?=
+ =?us-ascii?Q?IC5exk8PrsOG/XiUM43eBTqQ5b7a44G9jTx8RU5j?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3885708.1744415868.1@famine>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 11 Apr 2025 16:57:48 -0700
-Message-ID: <3885709.1744415868@famine>
+X-OriginatorOrg: microchip.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM3PR11MB8736.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a711c2e1-4fa7-4ebf-7127-08dd79578fec
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Apr 2025 00:18:33.9846
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: MSE4Ws0QM4ZG5g3TJgoKedyoP5qMynDACJLUjC+wPblVm40EZkzgOmgtJzonkBCGt6ZAre3Jfd1Cx1kFexYAX5+/CNPwQAKYfwV4cHzI/1M=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7592
 
-David J Wilder <wilder@us.ibm.com> wrote:
+> Subject: Re: [PATCH RFC net-next 0/4] net: xpcs: cleanups and partial sup=
+port for
+> KSZ9477
+>=20
+> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
+e content
+> is safe
+>=20
+> Hi Tristram,
+>=20
+> On Tue, Mar 18, 2025 at 07:59:07PM +0000, Tristram.Ha@microchip.com wrote=
+:
+> > Sorry for the long delay.  After discussing with the Microchip design
+> > team we come up with this explanation for setting the
+> > DW_VR_MII_TX_CONFIG_PHY_SIDE_SGMII (bit 3) of DW_VR_MII_AN_CTRL
+> (0x8001)
+> > register in 1000Base-X mode to make it work with AN on.
+> >
+> > KSZ9477 has the older version of 1000Base-X Synopsys IP which works in
+> > 1000Base-X mode without AN.
+>=20
+> I was unaware of the existence of such Synopsys IP. In which relevant
+> way is it "older"? Does it specifically claim it supports 1000Base-X,
+> but only without AN? Or if not, is it an SGMII-only base IP, then? The
+> two are compatible when AN is disabled and the SGMII IP is configured
+> for 1Gbps, and can be mistaken for one another.
+>=20
+> You're making it sound as if "1000Base-X" support was patched by the
+> Microchip integration over a base PCS IP which did not support it.
 
->Adding limited support for the ARP Monitoring feature when ovs is
->configured above the bond. When no vlan tags are used in the configuratio=
-n
->or when the tag is added between the bond interface and the ovs bridge ar=
-p
->monitoring will function correctly. The use of tags between the ovs bridg=
-e
->and the routed interface are not supported.
+The 1000Base-X config word is sent correctly by KSZ9477 and link partner
+can receive it.  This is verified by changing the register MII_ADVERTISE
+and observing the link partner's MII_LPA register for the same value with
+additional bit 0x4000 set.
 
-	Looking at the patch, it isn't really "adding support," but
-rather is disabling the "is this IP address configured above the bond"
-checks if the bond is a member of an OVS bridge.  It also seems like it
-would permit any ARP IP target, as long as the address is configured
-somewhere on the system.
+The KSZ9477 1000Base-X AN is broken and requires the workaround mentioned
+in the app note.  Mainly the MII_ADVERTISE register needs to be written
+once after PCS mode is changed before restarting the auto-negotiation for
+the config word to be sent correctly.
 
-	Stated another way, the route lookup in bond_arp_send_all() for
-the target IP address must return a device, but the logic to match that
-device to the interface stack above the bond will always succeed if the
-bond is a member of any OVS bridge.
+> > When AN is on the port does not pass traffic because it does not
+> > detect a link.
+>=20
+> Which port does not detect a link? The KSZ9477 port or its link partner?
 
-	For example, given:
-	=
+The link detection issue is for the local port device.  The link can be
+detected properly, and the interrupt can even signal the link up is
+completed.  It is just the port will not forward traffic as the link
+status is not passed to the local device.  Setting the 2 bits mentioned
+before allows the port to know about the link.  This is just a side
+effect and is not an intended design as it is really the hardware's
+problem not to pass the link status to the local device.
 
-[ eth0, eth1 ] -> bond0 -> ovs-br -> ovs-port IP=3D10.0.0.1
-eth2 IP=3D20.0.0.2
+> > Setting DW_VR_MII_TX_CONFIG_PHY_SIDE_SGMII allows the link to be
+> > turned on by either setting DW_VR_MII_SGMII_LINK_STS (bit 4) or
+> > DW_VR_MII_DIG_CTRL1_PHY_MODE_CTRL (bit 0) in DW_VR_MII_DIG_CTRL1
+> > (0x8000) register.  After that the port can pass traffic.
+>=20
+> Can you comment on whether Microchip has given these bits some
+> integration-specific meaning, or whether their meaning from the base IP,
+> summarized by me in this table taken from the XPCS data book, has been
+> preserved unchanged?
+> https://lore.kernel.org/netdev/20250128152324.3p2ccnxoz5xta7ct@skbuf/
+>=20
+> So far, the only noted fact is that they take effect also for
+> PCS_MODE=3D0b00 (1000Base-X), and not just for PCS_MODE=3D0b10 (SGMII),
+> as originally intended in the base IP. But we don't exactly know what
+> they do. Just that the Microchip IP wants them set to one.
+>=20
+> If their meaning is otherwise the same, all data available to me points
+> to the conclusion that the "1000Base-X with autoneg on" mode in KSZ9477
+> is actually SGMII with a config word customized by software, and with
+> some conditions commented out from the base IP, to allow the code word
+> to be customizable even in PCS_MODE=3D0b00.
+>=20
+> If the above conclusion is true, I think we need to pay more attention
+> at whether the transmitted config word is truly 1000Base-X compatible,
+> as Russell pointed out here:
+> https://lore.kernel.org/netdev/Z5iiXWkhm2OvbjOx@shell.armlinux.org.uk/#t
+> The discussion there got pretty involved and branched out into other
+> topics, but I couldn't find a response from you on that specific second
+> paragraph.
+>=20
+> > This is still a specific KSZ9477 problem so it may be safer to put this
+> > code under "if (xpcs->info.pma =3D=3D MICROCHIP_KSZ9477_PMD_ID)" check.
+>=20
+> If the meaning of these fields was not kept 100% intact by Microchip
+> during their integration, including the context in which they are valid,
+> then I 100% agree. But I would still like an answer to the questions abov=
+e.
 
-	Configuring arp_ip_target=3D20.0.0.2 on bond0 would apparently
-succeed after this patch is applied, and the bond would send ARPs for
-20.0.0.2.
+Since this is a KSZ9477 specific problem is it okay to just program those
+bits inside the KSZ9477 DSA driver when the PCS mode is changed from
+SGMII to 1000Base-X?  Then the XPCS driver does not need to concern with
+this code change.  If a SFP does not work then it is the fault of KSZ9477
+hardware and its driver.
 
->For example:
->1) bond0 -> ovs-br -> ovs-port (x.x.x.x) is supported
->2) bond0 -> bond0.100 -> ovs-br -> ovs-port (x.x.x.x) is supported.
->3) bond0 -> ovs-br -> ovs-port -> ovs-port.100 (x.x.x.x) is not supported=
-.
->
->Configurations #1 and #2 were tested and verified to function corectly.
->In the second configuration the correct vlan tags were seen in the arp.
-
-	Assuming that I'm understanding the behavior correctly, I'm not
-sure that "if OVS then do whatever" is the right way to go, particularly
-since this would still exhibit mysterious failures if a VLAN is
-configured within OVS itself (case 3, above).
-
-	I understand that the architecture of OVS limits the ability to
-do these sorts of checks, but I'm unconvinced that implementing this
-support halfway is going to create more issues than it solves.
-
-	Lastly, thinking out loud here, I'm generally loathe to add more
-options to bonding, but I'm debating whether this would be worth an
-"ovs-is-a-black-box" option somewhere, so that users would have to
-opt-in to the OVS alternate realm.
-
-	-J
-
->Signed-off-by: David J Wilder <wilder@us.ibm.com>
->Signed-off-by: Pradeep Satyanarayana <pradeeps@linux.vnet.ibm.com>
->---
-> drivers/net/bonding/bond_main.c | 8 +++++++-
-> 1 file changed, 7 insertions(+), 1 deletion(-)
->
->diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_m=
-ain.c
->index 950d8e4d86f8..6f71a567ba37 100644
->--- a/drivers/net/bonding/bond_main.c
->+++ b/drivers/net/bonding/bond_main.c
->@@ -3105,7 +3105,13 @@ struct bond_vlan_tag *bond_verify_device_path(stru=
-ct net_device *start_dev,
-> 	struct net_device *upper;
-> 	struct list_head  *iter;
-> =
-
->-	if (start_dev =3D=3D end_dev) {
->+	/* If start_dev is an OVS port then we have encountered an openVswitch
->+	 * bridge and can't go any further. The programming of the switch table
->+	 * will determine what packets will be sent to the bond. We can make no
->+	 * further assumptions about the network above the bond.
->+	 */
->+
->+	if (start_dev =3D=3D end_dev || netif_is_ovs_port(start_dev)) {
-> 		tags =3D kcalloc(level + 1, sizeof(*tags), GFP_ATOMIC);
-> 		if (!tags)
-> 			return ERR_PTR(-ENOMEM);
-
----
-	-Jay Vosburgh, jv@jvosburgh.net
 
