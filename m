@@ -1,331 +1,140 @@
-Return-Path: <netdev+bounces-181870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23E1BA86AE6
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 06:34:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EBA4A86AF9
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 07:08:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42E3D8C63BA
-	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 04:33:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DCEA16391F
+	for <lists+netdev@lfdr.de>; Sat, 12 Apr 2025 05:08:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8002B17C210;
-	Sat, 12 Apr 2025 04:33:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A84616BE17;
+	Sat, 12 Apr 2025 05:08:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kvpMkGA6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7D42581
-	for <netdev@vger.kernel.org>; Sat, 12 Apr 2025 04:33:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA3A914C5B0;
+	Sat, 12 Apr 2025 05:08:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744432413; cv=none; b=X2bxi5xPBl3te139CwORPj8m+mHSjaW8ev4RkfFunG38fsDdE43prx1qXgpSMB121xB4GRXFMv8POyx1ZdMrU7JFFtbzyjGWuAQXBtXCWj+LyYXuIxEUTrjiJvUMJuyD+faEddJBZh261GJcQLtUE0kIrYNB9jQ2Cabx11FQPCQ=
+	t=1744434518; cv=none; b=LJNNu5iF0or8CSBt8/E4R9q5AOKIM5+WRxR33yA25gsHJP+J5X58j+8KnvcC74AtwV0ev/9qhMTaGgediWc6HfQPCXxS4vjnnAJ4UN06GfRI8xeJHd9Mx7X0C+iQZdfckJD/ynDpTt96gYwR04cjF7RS2Qnkk43WyVxgEEb/y6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744432413; c=relaxed/simple;
-	bh=ojitbJHEMKFRhmI/vwHyzo6nauks425Nhh2K8ScZBts=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Sz7wRFsf4QBhTlOwCmrJ45OqfKz7uLkvWU26GXSeYUpw7Eytd1XWRQczCbG/GH6JHSDaKI1JU/Q/qTRi2rl8X46Slx2lUGExsiuWzTTEEM9iucpXhnz4VP5uUK/0sLGRxUO3iqRswJUAi58jgKSmT/iQufmTbAy4ETmP5tICDdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-86186c58c41so82245239f.1
-        for <netdev@vger.kernel.org>; Fri, 11 Apr 2025 21:33:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744432410; x=1745037210;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	s=arc-20240116; t=1744434518; c=relaxed/simple;
+	bh=rj12iUgxA7Udn/SJKWvTNJypF8jyZrWGvK9iSvp3vbQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bm+hB/5jXuG7tw/VxRKvVYC6Uq7Ymh5v6wVTzr/t3YfM43kK7AoT6Ous3wCw6helWgNqymMqRK1ze14JxwhHQoyGTKSdV7T3KVI4vpO/Z2eMX55kAn0njLJd13a9ngGPemrqwaM0kRmOQfaFa1ZU2gl7KGtAwvH9Ny8h87TZd2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kvpMkGA6; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-3054e2d13a7so506897a91.2;
+        Fri, 11 Apr 2025 22:08:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744434515; x=1745039315; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=U88TuH7H09UT3JLeEKRiNAgRtjuMARbsQFruKUYbc80=;
-        b=Kfw9psa/IGJYD5eWfWAC/DrolRCzi8jyt7zmInK4eqU1FDL5jQYy+gPKUMob8uGIAY
-         CJ2kOxmvRGoBBzfZ4cwPVUJXIVE57VcIKpYZp6toR+jXVTQY58jbSI4O4S3y+gyxH+2T
-         KkSF6NUtgvvzx0qVBP8exYICw2gEHCLaUBZPvjmWG5rdC3zSKJa0HsbIPFSx4N9QZpZO
-         nzjg55nXQns1Tb3DLNReyw32EJCa2bAg6ceUmN2Kjcg3OwjJWTMj2er46sdwxsGxd/xV
-         lo0agZEOa7smkH4i3GVlDPxxxKacKNO9amExBPXpffgCfJFgxEU5qFHjfCSyqedxUaZj
-         NTFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX3DWhtJCMAvz8RTghGoEDrlP59s47pWax8Dv5RuRR9HMnH9lyCaEiOjLEovUr4U/CbUuOUnds=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDkcPWvMnMUYlCc6u+DWOzml/lQ6QoPiE5C6tnBOVIgpISSSAH
-	I71Es2JYBUv1blBu/bgjbNMVYFy/XCKP9yrA1xW8z28x/tIDxrznspDJTY2J43keYnn0JJN7Pr1
-	K7L8LfN/9eEFV8MPXLmwGEd08/uJOLh/YDsPrBRxNU8uDrqL89ckIbpU=
-X-Google-Smtp-Source: AGHT+IFlhbrTv5tNodhf+fEsKccMSh5Ykk/2nT1WKVpFogTCgLvV1Bd38sQYtoYa5lVBwoqdi0y0jVPJd//FOlZO/N02hQcU1VDC
+        bh=EhOmZMRqYppVnUKcge32grxQ8tPBj7VzBuC0NKHh94g=;
+        b=kvpMkGA6iZwAVr/giytZqzudoM7NPidRdo4iXolhSvuO24O5q73T0S3lj6U0iZoyhk
+         QMJ4vYgY7RNXXqXJZkZwpXzHvzUcVKFkQcC+46DxhJREDyZxc4ev1hUQbiZ8LJFAFWKe
+         jPsdCNvnSCRXiAXe86cpN/KkN1f6qYkwZOjh7q9IDPBOsomonvF4Hafglak9Dbp3iha7
+         2Okep3Jskq6lU/DJ98Jo43hYPVW8IBCz+c1EY7ZpjBf61syAF14G+izq4s7GgjB9VtbG
+         FQ2Dh7O6mVDi8eSR54/EDt+jDVJOKX3a5Rg68qvRd4qKuYmLmIMYydP9nuAtKJ4SrMFR
+         /H/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744434515; x=1745039315;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EhOmZMRqYppVnUKcge32grxQ8tPBj7VzBuC0NKHh94g=;
+        b=JSgr3XDgg56+79Cv2SGoyfLfVR6csta0gTM+XvrWDyv93MXJq/U2qtjTUASPDvsfc8
+         XWXT/Q8MnAjgvHGMCeTvmJzsC5wlJBQSo8YmqklyqF048s/atbES87urchErAPaL1IJE
+         9xmSrC+mxPP47dF9I/5oLRyyZMSienHy0v2DbnpXhAp18z+JGbK7TITAwl4UEFcUkWkP
+         42cxHAIxTzt4Q5s3+Equb7axrMP685Qq2vJwdKY28oA9I+bKczuKIVBIbymf37q47PJH
+         NHMfhzwlWTRoVD5uT5OUpN1v16WPEt6jWXE0yOYzAQU5JNAPCpybeAV+kov80UUVIuXd
+         6qjA==
+X-Forwarded-Encrypted: i=1; AJvYcCUK9zQdpAZKppRvrXPGciNeBD407i1hG4GLjXFWsvEiRAhEeCFMsBqr1Zg3DOMqU3RKo2PcLlPh@vger.kernel.org, AJvYcCWBfucIt/Vl629L2SNod0rxPCIJ+28attrXmd6wfc9sAmJUQny1EhkVTjWCPSjyHxtwYObt5vrAXJ304Wc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjVMeye6Gpj3oHd97+FFhA2/ZDb6+nHQyR5jyRTqu1zFDhM0UV
+	jUDr7NIjZPwzGNukP8cGaCwP/R9vQnEenNaVSUNnUsuHZNw2d7Zm
+X-Gm-Gg: ASbGnctLb7gGQjhGIGIPHpRxjGUFFlR5lsLzsKLA/Y49HJ5C1JfdKFdim0RIGEOzmp8
+	3vrf7aEiALGBtN0iTDGrUWoOSwQi+lZ7WNBQdM6AsRml8Xf5LL1YAA6wa1B6VN3C3LtBO5mJMEl
+	hMmzk+CVrM+pF6Az/aqYjtSRLu6v5SXpCd6tKxk1gXF1q7wCMo2TJqPPzTzeh2OaA/wmCU7QNjD
+	pxvg/D3VmJANvgjZmoOLlP8zGilQAF4f9JwMAvmnPxuOiN/p5Ih+dNOi0coMJhO3GFvBjR9HzUz
+	79rRxHZJzeXksVi2sBRAmfnfJy/W5FnSBrxEpxXvuatdR96YxvMc9YBlIUHD
+X-Google-Smtp-Source: AGHT+IH/9KKSlXTgfG2gzb8jrgxGKh4HZyuaPppT6Q8UMkZvzTGRxFIzHkNr4opC+YEfJefEGCIovA==
+X-Received: by 2002:a17:90b:3ece:b0:2fa:6055:17e7 with SMTP id 98e67ed59e1d1-3082378c79bmr2977888a91.8.1744434514628;
+        Fri, 11 Apr 2025 22:08:34 -0700 (PDT)
+Received: from [192.168.1.7] ([110.78.157.64])
+        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-306dd10c447sm6896535a91.3.2025.04.11.22.08.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Apr 2025 22:08:34 -0700 (PDT)
+Message-ID: <e1c64e01-2076-4d87-8814-8124bfa76d0b@gmail.com>
+Date: Sat, 12 Apr 2025 12:08:29 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1889:b0:3cf:c7d3:e4b with SMTP id
- e9e14a558f8ab-3d7ec27efd0mr65166545ab.21.1744432410456; Fri, 11 Apr 2025
- 21:33:30 -0700 (PDT)
-Date: Fri, 11 Apr 2025 21:33:30 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67f9ed1a.050a0220.379d84.0005.GAE@google.com>
-Subject: [syzbot] [bpf?] [net?] possible deadlock in xsk_notifier (2)
-From: syzbot <syzbot+6f588c78bf765b62b450@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bjorn@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, jonathan.lemon@gmail.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, maciej.fijalkowski@intel.com, 
-	magnus.karlsson@intel.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 net-next] rndis_host: Flag RNDIS modems as WWAN devices
+To: =?UTF-8?Q?Micha=C5=82_Pecio?= <michal.pecio@gmail.com>,
+ Lubomir Rintel <lkundrak@v3.sk>
+Cc: linux-usb@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew+netdev@lunn.ch>
+References: <20250325095842.1567999-1-lkundrak@v3.sk>
+ <20250412004203.099e482a@foxbook>
+Content-Language: en-US
+From: Lars Melin <larsm17@gmail.com>
+In-Reply-To: <20250412004203.099e482a@foxbook>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hello,
+On 2025-04-12 05:42, Michał Pecio wrote:
+> On Tue, 25 Mar 2025 10:58:41 +0100, Lubomir Rintel wrote:
+>> Set FLAG_WWAN instead of FLAG_ETHERNET for RNDIS interfaces on Mobile
+>> Broadband Modems, as opposed to regular Ethernet adapters.
+>>
+>> Otherwise NetworkManager gets confused, misjudges the device type,
+>> and wouldn't know it should connect a modem to get the device to work.
+>> What would be the result depends on ModemManager version -- older
+>> ModemManager would end up disconnecting a device after an unsuccessful
+>> probe attempt (if it connected without needing to unlock a SIM), while
+>> a newer one might spawn a separate PPP connection over a tty interface
+>> instead, resulting in a general confusion and no end of chaos.
+>>
+>> The only way to get this work reliably is to fix the device type
+>> and have good enough version ModemManager (or equivalent).
+>>
+>> Signed-off-by: Lubomir Rintel <lkundrak@v3.sk>
+>> Fixes: 63ba395cd7a5 ("rndis_host: support Novatel Verizon USB730L")
+> 
+> Hi,
+> 
+> This patch appears to have caused a regression for some users,
+> who opened a bug against the USB subsystem here:
+> 
+> https://bugzilla.kernel.org/show_bug.cgi?id=220002
+> 
+> Regards,
+> Michal
+> 
 
-syzbot found the following issue on:
+Hi,
+the problem seems to be that the patch matches devices by their 
+class/subclass/proto attributes assuming that all rndis devices matching 
+those are rndis usb modems but it also catches rndis tethering with 
+phones/tablets.
+Better is to match by vid:pid as is done in the cdc_ether driver to flag 
+ethernet interfaced modems to become wwan devices.
 
-HEAD commit:    900241a5cc15 Merge tag 'drm-fixes-2025-04-11-1' of https:/..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1604ef4c580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=eecd7902e39d7933
-dashboard link: https://syzkaller.appspot.com/bug?extid=6f588c78bf765b62b450
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: i386
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/2c469c14915e/disk-900241a5.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/5ec97d2ebbd8/vmlinux-900241a5.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0a9190b11490/bzImage-900241a5.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6f588c78bf765b62b450@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-6.15.0-rc1-syzkaller-00246-g900241a5cc15 #0 Not tainted
-------------------------------------------------------
-syz.3.3171/15285 is trying to acquire lock:
-ffff88807d2fc6f0 (&xs->mutex){+.+.}-{4:4}, at: xsk_notifier+0xcf/0x230 net/xdp/xsk.c:1648
-
-but task is already holding lock:
-ffff88805fc3bc58 (&net->xdp.lock){+.+.}-{4:4}, at: xsk_notifier+0x8b/0x230 net/xdp/xsk.c:1644
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #3 (&net->xdp.lock){+.+.}-{4:4}:
-       lock_acquire+0x116/0x2f0 kernel/locking/lockdep.c:5866
-       __mutex_lock_common kernel/locking/mutex.c:601 [inline]
-       __mutex_lock+0x1a5/0x10c0 kernel/locking/mutex.c:746
-       xsk_notifier+0x8b/0x230 net/xdp/xsk.c:1644
-       notifier_call_chain+0x1a5/0x3f0 kernel/notifier.c:85
-       call_netdevice_notifiers_extack net/core/dev.c:2212 [inline]
-       call_netdevice_notifiers net/core/dev.c:2226 [inline]
-       unregister_netdevice_many_notify+0x1572/0x2510 net/core/dev.c:11971
-       unregister_netdevice_many net/core/dev.c:12035 [inline]
-       unregister_netdevice_queue+0x383/0x400 net/core/dev.c:11887
-       unregister_netdevice include/linux/netdevice.h:3374 [inline]
-       _cfg80211_unregister_wdev+0x163/0x590 net/wireless/core.c:1256
-       ieee80211_remove_interfaces+0x4f1/0x700 net/mac80211/iface.c:2316
-       ieee80211_unregister_hw+0x5d/0x2c0 net/mac80211/main.c:1681
-       mac80211_hwsim_del_radio+0x2c6/0x4c0 drivers/net/wireless/virtual/mac80211_hwsim.c:5665
-       hwsim_exit_net+0x5c3/0x670 drivers/net/wireless/virtual/mac80211_hwsim.c:6545
-       ops_exit_list net/core/net_namespace.c:172 [inline]
-       cleanup_net+0x814/0xd60 net/core/net_namespace.c:654
-       process_one_work kernel/workqueue.c:3238 [inline]
-       process_scheduled_works+0xac3/0x18e0 kernel/workqueue.c:3319
-       worker_thread+0x870/0xd50 kernel/workqueue.c:3400
-       kthread+0x7b7/0x940 kernel/kthread.c:464
-       ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #2 (&rdev->wiphy.mtx){+.+.}-{4:4}:
-       lock_acquire+0x116/0x2f0 kernel/locking/lockdep.c:5866
-       __mutex_lock_common kernel/locking/mutex.c:601 [inline]
-       __mutex_lock+0x1a5/0x10c0 kernel/locking/mutex.c:746
-       class_wiphy_constructor include/net/cfg80211.h:6092 [inline]
-       cfg80211_netdev_notifier_call+0x1b3/0x1430 net/wireless/core.c:1547
-       notifier_call_chain+0x1a5/0x3f0 kernel/notifier.c:85
-       call_netdevice_notifiers_extack net/core/dev.c:2212 [inline]
-       call_netdevice_notifiers net/core/dev.c:2226 [inline]
-       __dev_close_many+0x15d/0x760 net/core/dev.c:1671
-       dev_close_many+0x250/0x4c0 net/core/dev.c:1725
-       unregister_netdevice_many_notify+0x628/0x2510 net/core/dev.c:11940
-       unregister_netdevice_many net/core/dev.c:12035 [inline]
-       default_device_exit_batch+0x7ff/0x880 net/core/dev.c:12527
-       ops_exit_list net/core/net_namespace.c:177 [inline]
-       cleanup_net+0x8af/0xd60 net/core/net_namespace.c:654
-       process_one_work kernel/workqueue.c:3238 [inline]
-       process_scheduled_works+0xac3/0x18e0 kernel/workqueue.c:3319
-       worker_thread+0x870/0xd50 kernel/workqueue.c:3400
-       kthread+0x7b7/0x940 kernel/kthread.c:464
-       ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:153
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-
--> #1 (&dev_instance_lock_key#3){+.+.}-{4:4}:
-       lock_acquire+0x116/0x2f0 kernel/locking/lockdep.c:5866
-       __mutex_lock_common kernel/locking/mutex.c:601 [inline]
-       __mutex_lock+0x1a5/0x10c0 kernel/locking/mutex.c:746
-       netdev_lock include/linux/netdevice.h:2751 [inline]
-       netdev_lock_ops include/net/netdev_lock.h:42 [inline]
-       xsk_bind+0x2fd/0xfb0 net/xdp/xsk.c:1188
-       __sys_bind_socket net/socket.c:1810 [inline]
-       __sys_bind+0x1de/0x290 net/socket.c:1841
-       __do_sys_bind net/socket.c:1846 [inline]
-       __se_sys_bind net/socket.c:1844 [inline]
-       __ia32_sys_bind+0x7a/0x90 net/socket.c:1844
-       do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
-       __do_fast_syscall_32+0xb4/0x110 arch/x86/entry/syscall_32.c:306
-       do_fast_syscall_32+0x34/0x80 arch/x86/entry/syscall_32.c:331
-       entry_SYSENTER_compat_after_hwframe+0x84/0x8e
-
--> #0 (&xs->mutex){+.+.}-{4:4}:
-       check_prev_add kernel/locking/lockdep.c:3166 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3285 [inline]
-       validate_chain+0xa69/0x24e0 kernel/locking/lockdep.c:3909
-       __lock_acquire+0xad5/0xd80 kernel/locking/lockdep.c:5235
-       lock_acquire+0x116/0x2f0 kernel/locking/lockdep.c:5866
-       __mutex_lock_common kernel/locking/mutex.c:601 [inline]
-       __mutex_lock+0x1a5/0x10c0 kernel/locking/mutex.c:746
-       xsk_notifier+0xcf/0x230 net/xdp/xsk.c:1648
-       notifier_call_chain+0x1a5/0x3f0 kernel/notifier.c:85
-       call_netdevice_notifiers_extack net/core/dev.c:2212 [inline]
-       call_netdevice_notifiers net/core/dev.c:2226 [inline]
-       unregister_netdevice_many_notify+0x1572/0x2510 net/core/dev.c:11971
-       unregister_netdevice_many net/core/dev.c:12035 [inline]
-       unregister_netdevice_queue+0x383/0x400 net/core/dev.c:11887
-       unregister_netdevice include/linux/netdevice.h:3374 [inline]
-       ip_tunnel_ctl+0x1f6/0xc40 net/ipv4/ip_tunnel.c:998
-       ip_tunnel_siocdevprivate+0x107/0x1a0 net/ipv4/ip_tunnel.c:1061
-       dev_siocdevprivate net/core/dev_ioctl.c:521 [inline]
-       dev_ifsioc+0xc04/0x1010 net/core/dev_ioctl.c:631
-       dev_ioctl+0x8c3/0x1380 net/core/dev_ioctl.c:848
-       sock_ioctl+0x819/0x900 net/socket.c:1236
-       compat_sock_ioctl_trans net/socket.c:-1 [inline]
-       compat_sock_ioctl+0x293/0xf50 net/socket.c:3507
-       __do_compat_sys_ioctl fs/ioctl.c:1004 [inline]
-       __se_compat_sys_ioctl+0x50e/0xc30 fs/ioctl.c:947
-       do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
-       __do_fast_syscall_32+0xb4/0x110 arch/x86/entry/syscall_32.c:306
-       do_fast_syscall_32+0x34/0x80 arch/x86/entry/syscall_32.c:331
-       entry_SYSENTER_compat_after_hwframe+0x84/0x8e
-
-other info that might help us debug this:
-
-Chain exists of:
-  &xs->mutex --> &rdev->wiphy.mtx --> &net->xdp.lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&net->xdp.lock);
-                               lock(&rdev->wiphy.mtx);
-                               lock(&net->xdp.lock);
-  lock(&xs->mutex);
-
- *** DEADLOCK ***
-
-2 locks held by syz.3.3171/15285:
- #0: ffffffff900fd3c8 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_net_lock include/linux/rtnetlink.h:130 [inline]
- #0: ffffffff900fd3c8 (rtnl_mutex){+.+.}-{4:4}, at: dev_ioctl+0x8b0/0x1380 net/core/dev_ioctl.c:847
- #1: ffff88805fc3bc58 (&net->xdp.lock){+.+.}-{4:4}, at: xsk_notifier+0x8b/0x230 net/xdp/xsk.c:1644
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 15285 Comm: syz.3.3171 Not tainted 6.15.0-rc1-syzkaller-00246-g900241a5cc15 #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/12/2025
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_circular_bug+0x2e1/0x300 kernel/locking/lockdep.c:2079
- check_noncircular+0x142/0x160 kernel/locking/lockdep.c:2211
- check_prev_add kernel/locking/lockdep.c:3166 [inline]
- check_prevs_add kernel/locking/lockdep.c:3285 [inline]
- validate_chain+0xa69/0x24e0 kernel/locking/lockdep.c:3909
- __lock_acquire+0xad5/0xd80 kernel/locking/lockdep.c:5235
- lock_acquire+0x116/0x2f0 kernel/locking/lockdep.c:5866
- __mutex_lock_common kernel/locking/mutex.c:601 [inline]
- __mutex_lock+0x1a5/0x10c0 kernel/locking/mutex.c:746
- xsk_notifier+0xcf/0x230 net/xdp/xsk.c:1648
- notifier_call_chain+0x1a5/0x3f0 kernel/notifier.c:85
- call_netdevice_notifiers_extack net/core/dev.c:2212 [inline]
- call_netdevice_notifiers net/core/dev.c:2226 [inline]
- unregister_netdevice_many_notify+0x1572/0x2510 net/core/dev.c:11971
- unregister_netdevice_many net/core/dev.c:12035 [inline]
- unregister_netdevice_queue+0x383/0x400 net/core/dev.c:11887
- unregister_netdevice include/linux/netdevice.h:3374 [inline]
- ip_tunnel_ctl+0x1f6/0xc40 net/ipv4/ip_tunnel.c:998
- ip_tunnel_siocdevprivate+0x107/0x1a0 net/ipv4/ip_tunnel.c:1061
- dev_siocdevprivate net/core/dev_ioctl.c:521 [inline]
- dev_ifsioc+0xc04/0x1010 net/core/dev_ioctl.c:631
- dev_ioctl+0x8c3/0x1380 net/core/dev_ioctl.c:848
- sock_ioctl+0x819/0x900 net/socket.c:1236
- compat_sock_ioctl_trans net/socket.c:-1 [inline]
- compat_sock_ioctl+0x293/0xf50 net/socket.c:3507
- __do_compat_sys_ioctl fs/ioctl.c:1004 [inline]
- __se_compat_sys_ioctl+0x50e/0xc30 fs/ioctl.c:947
- do_syscall_32_irqs_on arch/x86/entry/syscall_32.c:83 [inline]
- __do_fast_syscall_32+0xb4/0x110 arch/x86/entry/syscall_32.c:306
- do_fast_syscall_32+0x34/0x80 arch/x86/entry/syscall_32.c:331
- entry_SYSENTER_compat_after_hwframe+0x84/0x8e
-RIP: 0023:0xf744d579
-Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90
-RSP: 002b:00000000f50b555c EFLAGS: 00000206 ORIG_RAX: 0000000000000036
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00000000000089f2
-RDX: 0000000080000500 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000206 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-----------------
-Code disassembly (best guess), 2 bytes skipped:
-   0:	10 06                	adc    %al,(%rsi)
-   2:	03 74 b4 01          	add    0x1(%rsp,%rsi,4),%esi
-   6:	10 07                	adc    %al,(%rdi)
-   8:	03 74 b0 01          	add    0x1(%rax,%rsi,4),%esi
-   c:	10 08                	adc    %cl,(%rax)
-   e:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
-  1e:	00 51 52             	add    %dl,0x52(%rcx)
-  21:	55                   	push   %rbp
-  22:	89 e5                	mov    %esp,%ebp
-  24:	0f 34                	sysenter
-  26:	cd 80                	int    $0x80
-* 28:	5d                   	pop    %rbp <-- trapping instruction
-  29:	5a                   	pop    %rdx
-  2a:	59                   	pop    %rcx
-  2b:	c3                   	ret
-  2c:	90                   	nop
-  2d:	90                   	nop
-  2e:	90                   	nop
-  2f:	90                   	nop
-  30:	90                   	nop
-  31:	90                   	nop
-  32:	90                   	nop
-  33:	90                   	nop
-  34:	90                   	nop
-  35:	90                   	nop
-  36:	90                   	nop
-  37:	90                   	nop
-  38:	90                   	nop
-  39:	90                   	nop
-  3a:	90                   	nop
-  3b:	90                   	nop
-  3c:	90                   	nop
-  3d:	90                   	nop
+Lars
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
