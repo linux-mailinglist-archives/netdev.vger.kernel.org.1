@@ -1,82 +1,79 @@
-Return-Path: <netdev+bounces-181970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14E3DA8722B
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 15:49:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08E98A87232
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 16:08:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 60F447A93C0
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 13:48:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D27953B074B
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 14:08:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 750FE64A98;
-	Sun, 13 Apr 2025 13:49:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2814A18B47C;
+	Sun, 13 Apr 2025 14:08:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SAN3Q83G"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TxQEPT6I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5561729D19;
-	Sun, 13 Apr 2025 13:49:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59E992F4A
+	for <netdev@vger.kernel.org>; Sun, 13 Apr 2025 14:08:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744552154; cv=none; b=YGny5BBjjhM/35MOMld9iyve9nQAgHGTHWFNbaI+Bkt9x0VGJwFaYZK3vS3INA9t8uFMKIoXRY1CVFIROK23XgLm5qmpo1fso1xjgaqUWr15CZExQvYA/2Fr99bAdOZQegJnSAvAnvTHz397SK+n5v6BRiA2Pa6pxK+bOkTciQI=
+	t=1744553330; cv=none; b=IFv6HU4PvIT0HArNadE3LtyRzDZ7u/DddKlmMUxYtAD/egLQbusDldFbHFfbIgX9vfUQkHQzEVgKyPYkGy8ybdS9IsXrssU40bxkJP3zxwZa8fie65wC8OswNiXL5RDW1ifiVlA8Y8hMl+RzUPLmzzn5QdFk9sHGf/mWW3JxSl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744552154; c=relaxed/simple;
-	bh=jeQsVJa0vppm+ID7Xf8rHqgwVUOGxnSmKmlpNXztA6A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Jo0YhuvIsaTKsojsSLaZPjLW+cDrkzN8u/DAq0HT5xI6tkDYPp0sMmvaI6vMySs7jjUWZhyBeGwZdtiIaRMZce0PmL5aF9KcgwoNWm0W2kPAzSCStNpaa1c76fuVkYJhRmiYIz7blzZTQfJiNmqJR0wWc5nzJEiYbjB3XJ+HHjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SAN3Q83G; arc=none smtp.client-ip=209.85.128.42
+	s=arc-20240116; t=1744553330; c=relaxed/simple;
+	bh=R5rl61+IGQ9L8sm8i1k5KgogSGBRisE4kf8Vhlnh6jQ=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=uMPI7tZOvIUxhbgpBAsux5+g1AcAnIpoRiMUbq14YfuYb1CzQ6Wu+IEF5xRIykKq4OT0rt0m3fNjgkQextDOevj/ilAZqCWXQdRSI9Jk9Bcgm8zAt+NdAjl3BFqYTgqRbhS23KBO0bUjS3WO5Kz+GJeAC4SIEUB7gGREqSN4IbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TxQEPT6I; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43cf05f0c3eso23855335e9.0;
-        Sun, 13 Apr 2025 06:49:12 -0700 (PDT)
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4394a823036so35021675e9.0
+        for <netdev@vger.kernel.org>; Sun, 13 Apr 2025 07:08:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744552151; x=1745156951; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=7+kRcuKH5IFKqnlJs+Igo3/04AUw/PWeejVPoDXRmXY=;
-        b=SAN3Q83G97CKroirUDOyixpERqQhYGvPkOVVqgXbU5meOZkIXOwyq41C6NqZdkuwRM
-         mCKWHXPxT3MXzRdLojtwl5c7sKoidArzDStUwJDsh+qDPAUKAFPQskwWlP48owPRxK5G
-         KiHIb8MPW518Ih+SfyrZJk/2y6SdHlxtXswM+LBgPa/+leYa1kzHm5zVKKEb5jZuqDA2
-         ywV5sWLdyAekDNqYC6iKrKPZVYakmgNlu73f2symG3n1seqYD0EEtq7wd/ixUBOTx21L
-         d4KU6ZZT8b6cNZkqec4qd4ALJtJZZoeM2mT0c3CqQqowBqe/0QRIY1ZgYr6RMdvTrGtn
-         e/qA==
+        d=gmail.com; s=20230601; t=1744553326; x=1745158126; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ymjiRwtWbx2EbBlY63Bj/H8padSyy1HWwvIBZV2kNlY=;
+        b=TxQEPT6I/ld0DjrlQOcDalBFMaWxN69vSKRuiXUADgMznc7yJVEElv8CAfdMSHN6SP
+         ZJCAKrM4VYsNm/HO93sTBsK9EQyya5zcNmU8zOFzR7iNbcE6bSHBET96dsK7Y2sq6Tmm
+         kpKYdsTvN8YpZGo72WwTEnQwuoI7P6geCAtAR39cGWMeh4w6VIKKU7q84PB5oXLzc6aD
+         OTFKFOP66ay5QGf9fLDGjUfw4J5mBWN5Cu/Xcd08aJegsBgjfFRVxxNb+6WCiMeRNk8a
+         sWonFoho61K3Ak9D/upaOUF5kTsrn4vf1ATN515enG4MGWJ9xFWblEhkYarJydGKuKZ3
+         voHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744552151; x=1745156951;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7+kRcuKH5IFKqnlJs+Igo3/04AUw/PWeejVPoDXRmXY=;
-        b=R0FDbM8CEPEpJLIGJeHDaboIvG2Mz8yE083BNN3XvciV0Xwu0POyy27YU4AZk5T60F
-         0AxL6V4vPcohf1r8UqD/BMTYKklrVSm1glb9PpoJtQ+QiAZKDvEvyJuDZBJ9g6nt0INX
-         YHQ1KSJfmthPkSTkw9j9swLeO1jz0wSoX2vr+PA5nliLAGBAmTA5jc9duXWvIk1yAL8f
-         0ewa1joqOydhdzlPdDj86YLCHEMurKHQn3bY24cvcPUn0aozcGo/4gWrV/VqjCscYr9H
-         N6cV8oBbM7p4ejSkxPRSx6FBZofCbespK/GCAq51XAYwnXaRiAw8nHb8iSXVwNEUvO+c
-         5m3g==
-X-Forwarded-Encrypted: i=1; AJvYcCW2bN3PN3DS+WsU2eWs881r1GnBJYv/Th5QSzaHLcgcuUXVHIeEQzXCNTeMPK1ZHvfK9aLOwowkKT/Ug/Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzzHlODLHaA4QutQFeDFKmt3YhJBO8v8KDxmZ4Fhy1Ib2CWcX+w
-	g6RBsKytVeB4TenZHzWr+QgjtSdP9v0r8hjxw7x7KIpNANUhrqKIJqtACw==
-X-Gm-Gg: ASbGnctOpegtV0tv2l6/R4dtg8D2mSCY8K62PhDhYgm1Jl5ljIt+Oh6frFOADhVRq11
-	nKyj2nOMLlktHe41uwjvs0/rtNTUCcgj2R+iMB3+ToD0Ij/K0Psf9wt2ZVNwQwnvNn2GqvAu98K
-	DOZW32PnGQCxWg3s7aGDCCXawH78g0NPVXvGDzknTNxt8MOKUusSA0RjSUyfIOF4l30bP9bCeYu
-	drTuU2ITPwto5xlHB7ezAlPTcAg2GGSFz+M1XekLvVUhqy2t03kHbJtXZdT6u8CH0xuG9fszqjo
-	DjbKGsKlnl6vtI6SbfnFX4xPxLL2Z8hoF5Ay9Vi/ns9ThifiD40KQwnm+PWAb8zzSXKeX2Mb93n
-	SuxxTeuprDnrhqsCpvIu71iuefqAKDaAG8CAV3To+kUCZrkkl9NWMpMI3Zet+dYihPLUrCLtIEq
-	tlYZIYG66hWUnpFUe49cr3KR2YHAE7XOS1rGqQ8/vb
-X-Google-Smtp-Source: AGHT+IG4xi8tiIswAd3XNRiLSzJQjEinJlQdM72KWa1bQmPEbjAKBYNuqQyXI4yolX+J7mAhmZ8FhA==
-X-Received: by 2002:a05:600c:5494:b0:43c:f050:fed3 with SMTP id 5b1f17b1804b1-43f3a93d850mr82183425e9.11.1744552150259;
-        Sun, 13 Apr 2025 06:49:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1744553326; x=1745158126;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ymjiRwtWbx2EbBlY63Bj/H8padSyy1HWwvIBZV2kNlY=;
+        b=MHkb9dwmKdXVIsvlGXAsrgVdS9lSTKcuLUUDs4fcFMuGLaYqfM85TzTf1WaG7ITqoD
+         nM59DCTYLiB6MfRBbDykjB/ue95ZRa2UhD64Agq5HX47VeVpxr5pv7guPgsoY+Lmipxr
+         daZMZB4XYUnVKvRjdc1pKnzAQMiGAhhF0zTFjues/tnAN7OBNdz8yd/PbC3xJIdtQ1TC
+         K+bgDsLLjmEKHaVDZrQMz2sZHmiDYNKXIVSGCu2qfdQRTgNF633HY1l+aW+HxuBJnBmZ
+         Wz6msDU8CQQuz8jZfykz4j6V9FwuQ33W9+OknjCpUkmI6a2QmWTOwW8SO/OVRYojHSHs
+         tsWw==
+X-Gm-Message-State: AOJu0YwmtlPKdj9SiTYZD8DW2c2SE2Uv94PV6IIEORwup8xmYxBGoMZJ
+	jhc2gXpQeeLiKErcHjCHbonq5V1hAF1j5AudlNfm0koZl5GF94qZ0k/4YA==
+X-Gm-Gg: ASbGncuDnErSC5S2K4wNTbAzxA0am25Ucse4Xf6VP+cXQ6kC1t8T+ffDUb3UH7+OFLM
+	1JNu/Wzjds08KJrptM+tM3sDc1AuUNkJzPf3s/JFAWlw/GgslkutZUWDCpFZN0EwCSP+Eqw96v4
+	TMHLlBPXKw3xjUmQ0VWWQPKvUVDZHjw3+xAQrS2j8NSE4E2WxG7vCmEJ6+lr7tv8zPROpBCU+DV
+	S/BgXbsXyBn2HFXz9zd1CQ7fytIubnygOaBJBzhPECs6+m2wXqCiPipNax9CEjwXmU695gjyu9U
+	nBJF88dIrdn/lVcrK7c98KuJKTUCaWwFTuNJPrEY2xwGmodBmJQqt3iGJN/iuNb3uodnm9VtXOi
+	/P3jVl4552XS8XaBMim7fyr+vvC67aD9POMr4H5gBXdEa+9Xd8qpsBsrDIe4m93PPNvibaNSUCV
+	s8J5+nJrA8XY93q2ylXt1O5EDHkPr5qA==
+X-Google-Smtp-Source: AGHT+IGaYfVgL5fr767ZE2bJQdnnM6+xXXGj75XCi8990cWNjTpDuDJaXjazV8c7F8Skjp8+oIP1Pg==
+X-Received: by 2002:a05:600c:674a:b0:43c:efed:733e with SMTP id 5b1f17b1804b1-43f4da84f37mr22400995e9.14.1744553326407;
+        Sun, 13 Apr 2025 07:08:46 -0700 (PDT)
 Received: from ?IPV6:2a02:3100:af2b:bc00:419e:9df:ec7f:c3f4? (dynamic-2a02-3100-af2b-bc00-419e-09df-ec7f-c3f4.310.pool.telefonica.de. [2a02:3100:af2b:bc00:419e:9df:ec7f:c3f4])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-43f235a5e90sm145143165e9.38.2025.04.13.06.49.08
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-39eaf43ccd8sm8123228f8f.72.2025.04.13.07.08.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 13 Apr 2025 06:49:08 -0700 (PDT)
-Message-ID: <0fd79f9e-fe6d-4c85-8dda-7f64e917129c@gmail.com>
-Date: Sun, 13 Apr 2025 15:50:03 +0200
+        Sun, 13 Apr 2025 07:08:45 -0700 (PDT)
+Message-ID: <ab7b8094-2eea-4e82-a047-fd60117f220b@gmail.com>
+Date: Sun, 13 Apr 2025 16:09:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,13 +81,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net: phy: Fix return value when !CONFIG_PHYLIB
-To: hhtracer@gmail.com, andrew@lunn.ch, linux@armlinux.org.uk
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- huhai <huhai@kylinos.cn>
-References: <20250413133709.5784-1-huhai@kylinos.cn>
-Content-Language: en-US
 From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] net: phy: remove device_phy_find_device
+To: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Andrew Lunn <andrew@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Language: en-US
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
  xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
  sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
@@ -134,68 +132,67 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
  H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
  lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
  OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-In-Reply-To: <20250413133709.5784-1-huhai@kylinos.cn>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 13.04.2025 15:37, hhtracer@gmail.com wrote:
-> From: huhai <huhai@kylinos.cn>
-> 
-> Many call sites of get_phy_device() and fwnode_get_phy_node(), such as
-> sfp_sm_probe_phy(), phylink_fwnode_phy_connect(), etc., rely on IS_ERR()
-> to check for errors in the returned pointer.
-> 
-> Furthermore, the implementations of get_phy_device() and
-> fwnode_get_phy_node() themselves use ERR_PTR() to return error codes.
-> 
-> Therefore, when CONFIG_PHYLIB is disabled, returning NULL is incorrect,
-> as this would bypass IS_ERR() checks and may lead to NULL pointer
-> dereference.
-> 
-Is there actually any call site which doesn't select PHYLIB directly or
-indirectly? When briefly checking I didn't find one.
-So my question would be rather: Do we need/want stubs for the following
-functions at all?
+AFAICS this function has never had a user.
 
-fwnode_get_phy_id
-fwnode_mdio_find_device
-fwnode_phy_find_device
-device_phy_find_device
-fwnode_get_phy_node
-get_phy_device
-phy_device_register
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/phy/phy_device.c | 12 ------------
+ include/linux/phy.h          |  6 ------
+ 2 files changed, 18 deletions(-)
+
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 675fbd225..d948e4d86 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -3208,18 +3208,6 @@ struct phy_device *fwnode_phy_find_device(struct fwnode_handle *phy_fwnode)
+ }
+ EXPORT_SYMBOL(fwnode_phy_find_device);
+ 
+-/**
+- * device_phy_find_device - For the given device, get the phy_device
+- * @dev: Pointer to the given device
+- *
+- * Refer return conditions of fwnode_phy_find_device().
+- */
+-struct phy_device *device_phy_find_device(struct device *dev)
+-{
+-	return fwnode_phy_find_device(dev_fwnode(dev));
+-}
+-EXPORT_SYMBOL_GPL(device_phy_find_device);
+-
+ /**
+  * fwnode_get_phy_node - Get the phy_node using the named reference.
+  * @fwnode: Pointer to fwnode from which phy_node has to be obtained.
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index a2bfae80c..fb755358d 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -1757,7 +1757,6 @@ struct phy_device *phy_device_create(struct mii_bus *bus, int addr, u32 phy_id,
+ int fwnode_get_phy_id(struct fwnode_handle *fwnode, u32 *phy_id);
+ struct mdio_device *fwnode_mdio_find_device(struct fwnode_handle *fwnode);
+ struct phy_device *fwnode_phy_find_device(struct fwnode_handle *phy_fwnode);
+-struct phy_device *device_phy_find_device(struct device *dev);
+ struct fwnode_handle *fwnode_get_phy_node(const struct fwnode_handle *fwnode);
+ struct phy_device *get_phy_device(struct mii_bus *bus, int addr, bool is_c45);
+ int phy_device_register(struct phy_device *phy);
+@@ -1779,11 +1778,6 @@ struct phy_device *fwnode_phy_find_device(struct fwnode_handle *phy_fwnode)
+ 	return NULL;
+ }
+ 
+-static inline struct phy_device *device_phy_find_device(struct device *dev)
+-{
+-	return NULL;
+-}
+-
+ static inline
+ struct fwnode_handle *fwnode_get_phy_node(struct fwnode_handle *fwnode)
+ {
+-- 
+2.49.0
 
 
-And a formal remark:
-Your v2 has no change log, and please allow 24h before sending a new version.
-
-> Returning ERR_PTR(-ENXIO) is the correct and consistent way to indicate
-> that PHY support is not available, and it avoids such issues.
-> 
-> Signed-off-by: huhai <huhai@kylinos.cn>
-> ---
->  include/linux/phy.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/linux/phy.h b/include/linux/phy.h
-> index a2bfae80c449..be299c572d73 100644
-> --- a/include/linux/phy.h
-> +++ b/include/linux/phy.h
-> @@ -1787,13 +1787,13 @@ static inline struct phy_device *device_phy_find_device(struct device *dev)
->  static inline
->  struct fwnode_handle *fwnode_get_phy_node(struct fwnode_handle *fwnode)
->  {
-> -	return NULL;
-> +	return ERR_PTR(-ENXIO);
->  }
->  
->  static inline
->  struct phy_device *get_phy_device(struct mii_bus *bus, int addr, bool is_c45)
->  {
-> -	return NULL;
-> +	return ERR_PTR(-ENXIO);
->  }
->  
->  static inline int phy_device_register(struct phy_device *phy)
 
 
