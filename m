@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-181984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F3D9A873F6
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 23:08:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE80BA873F8
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 23:09:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 784327A48E2
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 21:07:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B0D33AAC2E
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 21:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBBD51E5711;
-	Sun, 13 Apr 2025 21:08:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC6A81E5711;
+	Sun, 13 Apr 2025 21:09:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XxvNdeTv"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oSfh+knY"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3094C2629D
-	for <netdev@vger.kernel.org>; Sun, 13 Apr 2025 21:08:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76C727466
+	for <netdev@vger.kernel.org>; Sun, 13 Apr 2025 21:09:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744578526; cv=none; b=cCZak2ON97qCsuXS+lyTd1Zl0/t/dl53OpI8RxI2F95kEDqN/jLHQOPSbHb4eKs7dCvNipc7B0POWb/9QmaJuNYgVU8g0XJQMjk7GktdwjiabPhb347rCGvzBg2RpbzZpLyn0tXvbygxqXM6fW1KnDmQh5nVj45avQxScbOV4Kk=
+	t=1744578585; cv=none; b=S/I/AFt374pW8Oo2zZbMWumZ+0T9pA4Ngii5IBM0oTIvgJ9hSxJY31MlchnAltaf5Vria7F/r80u1XdktyPKus7bryuRFoITsnykXKcSFVRH1yk47JT7iJhvZ8Hl5hBqEpHmQm84KTk9exkSMKgctGnIqu9h0MRGOPhh22EW4gI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744578526; c=relaxed/simple;
-	bh=UwcCzTZYeYtBSgzDF05O+kHKklzMPlgXGxXChxcjOgA=;
+	s=arc-20240116; t=1744578585; c=relaxed/simple;
+	bh=ct6oQgiEi4kuRjZiPFUcCJ9HtEqIt6FbPPWtsObiYgU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f8eD9YcDgk/s9E5qKiMAzvvuhI28G3e3jLHAve/o8nTj0USQBPy4QkiXgO6E50cNg0vqIp7KyL1hHmmucuyOVXyNpQSzmfLoFw90FVhJfuT8WADjT3AXccqOyC2gzkkHq0aCdkguxXN0VhlAG93IkfwYInv2NXPQGfYExuCUZIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XxvNdeTv; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=hfZiouVGtstg+JxkKTaX+gDBzEzKvOFCljbbQJV9BeUFEgeRrC8IK8YwnmsDlUpu0rsn2bLHKyGtFRCwYpYZ4/j6RUVZ616Diji+C1YkPdP3m6SxDpRnHABZkdNSBh6eR+5Q1QFkeL95idQmyGtWc1OSHkJTLxNGCKu5y4rRaus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oSfh+knY; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=NUe/akxxdd5c7PreeaH46gc38+PUPMPsy9pqhCZI6so=; b=XxvNdeTv0zle75/6+fVO5MC2AX
-	+LnDFJJ19t83kFQgIb3uubrraNDj4uRjPP/Q3ay62kUaZiiwwnHe9Uk50IP9Pa2j5C07dtuuwgH6p
-	b+h8ClD2GXRAEXGMG+pwNigS77R8KcJjqUEBWvr9xrX+932WKFypTgZaWmqArXa2Sjes=;
+	bh=UfX9FuNz/xoujw3pgB2m7ZmTW064Rlef0hhXLoTluGo=; b=oSfh+knYqeFyoNjFEmu20gUUvP
+	S6iIN9hcNRD58S4Zokevy47Hvuo33kNtH6IxEZWR65neVd5VDFisTm/Q1lFhocIdv2Fs8iYVWcISq
+	TmrA+6slPl/PgBoBYw4xdZnlM+uFdZ9RqBRbpRb8W0Z4errNL3LkGfPLBqlLxA8GcCJA=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1u44ZB-0096Kj-0r; Sun, 13 Apr 2025 23:08:37 +0200
-Date: Sun, 13 Apr 2025 23:08:37 +0200
+	id 1u44a2-0096Lr-8v; Sun, 13 Apr 2025 23:09:30 +0200
+Date: Sun, 13 Apr 2025 23:09:30 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 Cc: Heiner Kallweit <hkallweit1@gmail.com>,
@@ -55,11 +55,11 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	linux-stm32@st-md-mailman.stormreply.com,
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 1/4] net: stmmac: anarion: clean up
- anarion_config_dt() error handling
-Message-ID: <ad4d5a18-c89f-408b-b668-82fd83098c6b@lunn.ch>
+Subject: Re: [PATCH net-next 2/4] net: stmmac: anarion: clean up interface
+ parsing
+Message-ID: <a5d370d0-2f21-4f7c-92a3-922e17fe81ff@lunn.ch>
 References: <Z_p16taXJ1sOo4Ws@shell.armlinux.org.uk>
- <E1u3bfF-000Eli-C5@rmk-PC.armlinux.org.uk>
+ <E1u3bfK-000Elr-Fa@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,13 +68,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1u3bfF-000Eli-C5@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1u3bfK-000Elr-Fa@rmk-PC.armlinux.org.uk>
 
-On Sat, Apr 12, 2025 at 03:16:57PM +0100, Russell King (Oracle) wrote:
-> When enabled, print a user friendly description of the error when
-> failing to ioremap() the control resource, and use ERR_CAST() when
-> propagating the error. This allows us to get rid of the "err" local
-> variable in anarion_config_dt().
+On Sat, Apr 12, 2025 at 03:17:02PM +0100, Russell King (Oracle) wrote:
+> anarion_config_dt() used a switch statement to check for the RGMII
+> modes, complete with an unnecessary "fallthrough", and also printed
+> the numerical value of the PHY interface mode on error. Clean this
+> up using the phy_interface_mode_is_rgmii() helper, and print the
+> English version of the PHY interface mode on error.
 > 
 > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
