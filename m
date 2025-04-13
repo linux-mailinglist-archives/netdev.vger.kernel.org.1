@@ -1,91 +1,122 @@
-Return-Path: <netdev+bounces-181944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3555A8711B
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 10:51:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77808A87130
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 11:09:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 416957AEC07
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 08:50:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE4DC189C1BA
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 09:08:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C87901547F2;
-	Sun, 13 Apr 2025 08:51:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=unidef.net header.i=@unidef.net header.b="I6oOm7PK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D6EF18FDDB;
+	Sun, 13 Apr 2025 09:08:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mr85p00im-ztdg06011101.me.com (mr85p00im-ztdg06011101.me.com [17.58.23.185])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7729522F
-	for <netdev@vger.kernel.org>; Sun, 13 Apr 2025 08:51:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.23.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5FED18FDA5;
+	Sun, 13 Apr 2025 09:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744534304; cv=none; b=SQcbuGJXR9ik1exAWW3O0MG07JnQQGIiRJNJRLPMyXoErB7tKg2GoVfcUgOAdfXFkWi7kx5XnoyZ8+e7Bz/AylAm19yjAGvwxjjq5bEwlQRVJK+oDavP2wcRxUj18jUEXMRrnMGhR02log9vut5Kn65jKxW1KCarFJ4XTH5IrHc=
+	t=1744535305; cv=none; b=COK3z91p8kqJaXpZyS/COheBnp8u7s1EXSFy7c9qIQrt82yhpiqXZ2hULLYnT3gDrkgtfg6DNg9ZHjJicka0XW2/2y3Ugqsx9XwApWdvOEaiDNpLM0C/KEfaV04cHhz0j8gOazWWCZLNEllr3u2rlgmppXpRgmVEZYwdypbiEk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744534304; c=relaxed/simple;
-	bh=N7qUEkJ8ZX+io23MYSOp+PfOw/WMnVUyN9Ts+IJ0YFE=;
-	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:To; b=L83Uiw7L8im2ayOwcdTY8K7D8z7mcrm35pQ4IxfzOkLq7HN65EAcOG5vo5HmkvvvEs9Mv/G6w95CP8Hw81Q3zxfTp0woXw6O5tY2R0Ma7GG6JKp5PLgA6Uz+5kq/Mh4e4OguNHaod7ch1yCCkdC6oE69oJd/zPcYD8WtbW7DKTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=unidef.net; spf=fail smtp.mailfrom=unidef.net; dkim=pass (2048-bit key) header.d=unidef.net header.i=@unidef.net header.b=I6oOm7PK; arc=none smtp.client-ip=17.58.23.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=unidef.net
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=unidef.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=unidef.net; s=sig1;
-	bh=N7qUEkJ8ZX+io23MYSOp+PfOw/WMnVUyN9Ts+IJ0YFE=;
-	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:To:x-icloud-hme;
-	b=I6oOm7PKZBG4kV31owXljJOv3qHQfLgI5uvgjWCPfA4404r+XXwSu8dzrTKeERtj2
-	 y4kvVqZktf3AZS30qUoT7cYFppBFKqpPJg7juPqnJONQBogXpWveNZx3VACgPZ/P6Z
-	 bFa5JtaEIhfWDTp92ulqcThwq4ZOEn++YVJa0emGqLClsgJzMgonfTVAv47hTf+06z
-	 utit946CWE1zWuTQfpHl1rl0HdZNUgtCe1dvuxxZiKiIz5bqxy6Q7GnL/RSI5kEVlR
-	 d+dtr3YgjacS0ehXRca9Ge69F3dCIq4Z4EKGXeQPZK8Va2Y+IlY6qJ9zl53gbeCaeW
-	 WtSlK2e0dIIpQ==
-Received: from mr85p00im-ztdg06011101.me.com (mr85p00im-ztdg06011101.me.com [17.58.23.185])
-	by mr85p00im-ztdg06011101.me.com (Postfix) with ESMTPS id 90293DA013D
-	for <netdev@vger.kernel.org>; Sun, 13 Apr 2025 08:51:40 +0000 (UTC)
-Received: from smtpclient.apple (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
-	by mr85p00im-ztdg06011101.me.com (Postfix) with ESMTPSA id DF112DA0088
-	for <netdev@vger.kernel.org>; Sun, 13 Apr 2025 08:51:39 +0000 (UTC)
-From: Jon <jon@unidef.net>
-Content-Type: text/plain;
-	charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1744535305; c=relaxed/simple;
+	bh=hY70RgUzIaYDB8r9oBPfUFVbPt7/tFSK8kAT5IQ5R2E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UhnaLsnsWr3IPQ/duyzlHWj1TvSfdabNwQmP7F09I1nvEkyuldMjDlCaALW14l6z9VnHE5C5wDnNSBwILyripKHOscoWcons9IhKUcuOoH/vHJfdRE2Rj94MwlVEtU6341xvj937jcfaxEVL/GpiibGnrHRCArHA2GBCw11HEu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1u3tJj-0001aS-JW; Sun, 13 Apr 2025 11:07:55 +0200
+Date: Sun, 13 Apr 2025 11:07:55 +0200
+From: Florian Westphal <fw@strlen.de>
+To: lvxiafei <xiafei_xupt@163.com>
+Cc: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com,
+	horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, lvxiafei@sensetime.com,
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	pabeni@redhat.com, pablo@netfilter.org
+Subject: Re: [PATCH V5] netfilter: netns nf_conntrack: per-netns
+ net.netfilter.nf_conntrack_max sysctl
+Message-ID: <20250413090755.GA5987@breakpoint.cc>
+References: <20250407095052.49526-1-xiafei_xupt@163.com>
+ <20250412172610.37844-1-xiafei_xupt@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.500.181.1.5\))
-Subject: Is there a way for ifconfig to return wan ip addresses?
-Message-Id: <711321ED-4C88-4006-8612-B7699E838481@unidef.net>
-Date: Sun, 13 Apr 2025 01:51:29 -0700
-To: netdev@vger.kernel.org
-X-Mailer: Apple Mail (2.3826.500.181.1.5)
-X-Proofpoint-GUID: vwDBcX6NShAjai-UNfajUXINvNlNKIYd
-X-Proofpoint-ORIG-GUID: vwDBcX6NShAjai-UNfajUXINvNlNKIYd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-13_04,2025-04-10_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=17 mlxlogscore=70 phishscore=0
- malwarescore=0 suspectscore=0 spamscore=17 adultscore=0 clxscore=1030
- mlxscore=17 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2504130068
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250412172610.37844-1-xiafei_xupt@163.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Maybe by interfacing with the router?
+lvxiafei <xiafei_xupt@163.com> wrote:
+> +    Maximum number of allowed connection tracking entries per netns. This value
+> +    is set to nf_conntrack_buckets by default.
+> +
+> +    Note that connection tracking entries are added to the table twice -- once
+> +    for the original direction and once for the reply direction (i.e., with
+> +    the reversed address). This means that with default settings a maxed-out
+> +    table will have a average hash chain length of 2, not 1.
+> +
+> +    The limit of other netns cannot be greater than init_net netns.
+> +    +----------------+-------------+----------------+
+> +    | init_net netns | other netns | limit behavior |
+> +    +----------------+-------------+----------------+
+> +    | 0              | 0           | unlimited      |
+> +    +----------------+-------------+----------------+
+> +    | 0              | not 0       | other          |
+> +    +----------------+-------------+----------------+
+> +    | not 0          | 0           | init_net       |
+> +    +----------------+-------------+----------------+
+> +    | not 0          | not 0       | min            |
+> +    +----------------+-------------+----------------+
+>  
+>  nf_conntrack_tcp_be_liberal - BOOLEAN
+>  	- 0 - disabled (default)
+> diff --git a/include/net/netfilter/nf_conntrack.h b/include/net/netfilter/nf_conntrack.h
+> index 3f02a45773e8..062e67b9a5d7 100644
+> --- a/include/net/netfilter/nf_conntrack.h
+> +++ b/include/net/netfilter/nf_conntrack.h
+> @@ -320,7 +320,6 @@ int nf_conntrack_hash_resize(unsigned int hashsize);
+>  extern struct hlist_nulls_head *nf_conntrack_hash;
+>  extern unsigned int nf_conntrack_htable_size;
+>  extern seqcount_spinlock_t nf_conntrack_generation;
+> -extern unsigned int nf_conntrack_max;
+>  
+>  /* must be called with rcu read lock held */
+>  static inline void
+> @@ -360,6 +359,13 @@ static inline struct nf_conntrack_net *nf_ct_pernet(const struct net *net)
+>  	return net_generic(net, nf_conntrack_net_id);
+>  }
+>  
+> +static inline unsigned int nf_conntrack_max(const struct net *net)
+> +{
+> +	return likely(init_net.ct.sysctl_max && net->ct.sysctl_max) ?
+> +	    min(init_net.ct.sysctl_max, net->ct.sysctl_max) :
+> +	    max(init_net.ct.sysctl_max, net->ct.sysctl_max);
+> +}
 
-You can somehow send some kind of query to the router using router =
-protocols, and it=E2=80=99ll process a return packet with the wan ip =
-address I think, per wan ip address attached to the router
+Is there a reason you did not follow my suggstion in
+https://lore.kernel.org/netdev/20250410105352.GB6272@breakpoint.cc/
 
-Or you can flat out make a standard for all routers to adhere to when =
-returning wan ip addresses, along with others stuff like live latency =
-checks or some kind of network security module
+to disable net->ct.sysctl_max == 0 for non init netns?
 
-Or someone awesome can implement some kind of protocol or handshake =
-method for linux router distributions to return the wan ip address =
-directly from the linux router
+You could then make this
 
-I think my packet thing will work
+   if (likely(init_net.ct.sysctl_max))
+	return min(init_net.ct.sysctl_max, net->ct.sysctl_max);
 
-You can send a packet through the lan network, and it should return the =
-wan ip address, I think, just through multiple layers or something=
+   return net->ct.sysctl_max;
+
+... or am i missing something?
+
+Aside from that (and the needed #IS_ENABLED() guard) this change looks
+good to me.
 
