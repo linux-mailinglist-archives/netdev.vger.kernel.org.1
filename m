@@ -1,84 +1,81 @@
-Return-Path: <netdev+bounces-181962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C12C5A871AA
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 12:45:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D79D9A871AE
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 12:46:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E32B3AD6ED
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 10:44:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F78C1680CD
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 10:45:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 081ED1A3171;
-	Sun, 13 Apr 2025 10:44:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E5E31A4F12;
+	Sun, 13 Apr 2025 10:44:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RvGhtNRI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OCgAbWfW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CAC11AAE2E;
-	Sun, 13 Apr 2025 10:44:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A5E1AF0B5;
+	Sun, 13 Apr 2025 10:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744541050; cv=none; b=UIdFQJ+QS2DmrPkS8ScSA2k+4GTKAGtusT6w+grVZ+/bRrUC4ugYS3rZ8ky+eSBrYzWwkVbqLK6lIJ58BPFJcPp4pvLqkQHnEYYfMXlkYMILHfGnT4DKpd+05/0sRJaGKQ1vxYYRSnThXej12GPRmccmF1Y1BCwLkhvMpY18eoM=
+	t=1744541056; cv=none; b=qO1A9PV8GVM4+14TEE82oJ6DWnJsURisiomJELL9fgr2IQukGmU5A8Q3pPKfWNVd08FbY61gRKHAUbIL/fp5gakYuyLPUpLe/Kxs9FtRjjcpIn5W2kPdsWVSbOg+d+MzQ8r4vXL5053MTak3IVzKfO0qMOyUQLqcPjfeuKOfmHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744541050; c=relaxed/simple;
-	bh=FRv0zURbSztvldjjHd6IPO8aj6GITfpWGVJmSmvg/MY=;
+	s=arc-20240116; t=1744541056; c=relaxed/simple;
+	bh=JD2Vcha6ElX+5r3tPICprQGEcLCZ3uM4HJkKZyfdIl0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=o0PmP8Tz/76IboQ+btCDz8ZVY07sCJ9sJHPFFqbtVx6UNnYbX7Pq7wq8pbYqj0QpSaBP/3jdYVIJiOpS9mo+7B2YRmSTddeD3f2P+L9sZWGj6cpB9vyMxM+Hn2JxS2olVThV1gJ0lPK9+PH8bk/hJFjb46NQFR9oKNC2gfKjRbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RvGhtNRI; arc=none smtp.client-ip=209.85.214.177
+	 MIME-Version; b=HCRB9VeJUzv37zsZbPwudEWOcWBR/1KRTf3Vf9AtfDd21fJbmX8VB05D/tbHV/e8cduSJQzxf5GRLCyFOOIEtdsiw1EKYM/m5ybjPX11vZqXhXtkcWgkp2KYkI9YzMcnFLUo5CPRW0JXyF8frozhCXh8e2w8LBrFWyskvyaQxi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OCgAbWfW; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-22403cbb47fso35312455ad.0;
-        Sun, 13 Apr 2025 03:44:08 -0700 (PDT)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2264aefc45dso49455195ad.0;
+        Sun, 13 Apr 2025 03:44:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744541047; x=1745145847; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1744541054; x=1745145854; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dXYh9opa2X5pw5Rnzm4RLKwzbCVPmlk5ZFIxldQ6nv8=;
-        b=RvGhtNRIwjXPUXxMAnw5DHiEx5LlyNbbTU52baIfgMOGcnluMc2o2ygBMXcwB3LvWF
-         8B+srV5piOKLuEAoE7Aq3Akw0aSvRLxMY5yPT8fUeRb2SCeMxW1IkbqjZFkoEJo+rpZY
-         HKupA12/34qjhv7SyMlm3Kb2sd84P/bo7VNNdE7t6GZxSXHQCjNxjp567PPKzMWQkAMV
-         ELyJgvaWc6uYBPknc62yhU6j5ldNUPWm+DCUbh330IX+TjYnGV8e8VFHK3FK70P9mHap
-         +f4qsNEYDMB/MC/k8YGBT6C+Ejnbs+XRFG5XFeIqBHMQIKyJBHM6OVvZPL5YtF+Cu+yD
-         HNNg==
+        bh=ZdoJvmpW6qddfbJB5WSgVAlVfvRBkfyp+bE+C2KQ9c0=;
+        b=OCgAbWfW2nFoyC6v2xKjEKNGbQmAhdEx58/EpS3BNWVu+UfPVeOICaOESAWoA/gmEi
+         cuj2hFa1EM7P7lHjrJC/yOaAPPVyk1YUHD4eX19z7AXzvfm/MJtjhFfENkDSD0Fu85Dn
+         iRIQQGZWW8osze0Hm0hfcds78YJ8oiK2U8qQV6wcc6tbw93CkEMjpmeL08ypv3heQKq4
+         PNGleKlQuUro6KCeZuUHrcy7wZwc+kkmULomOSbqebsKtRev2N3P68/xmZwIXdgXdnOY
+         5Ihal1oQTd1HGkmITBFzbqS4P8nTh146oyozIpx9sDQqdf3QvF+gdRKhFd+M/Llxj2gt
+         vlMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744541047; x=1745145847;
+        d=1e100.net; s=20230601; t=1744541054; x=1745145854;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dXYh9opa2X5pw5Rnzm4RLKwzbCVPmlk5ZFIxldQ6nv8=;
-        b=iDDxdf32zVcfIr129SoIKpmTbtvlVKTYt7Py+YgxYZhoaqMTMmICE9tsgDGb8+kDBv
-         zbe2WfDZZbhjoKnsRe7sr/dmCSyTsXWk3Ep0Dg99J4NHAciZRxA8Txpj+D4qkRfbykEm
-         sPIhRXTcDFw9l+w9xZWsTTBZytKdhR1+A7ENbbkLxw2z0GrTSojYr5+xW5QnmaJ3pqlX
-         By5zypZan+YKG3MoROPeU89XzAKG56YlK1bQv6ZIRGtMzei2YUFSNZiD4UL+uB7oA91j
-         gxDuElN4rpbDwP9N5icBwULeUXEVK8xvqBYBVHpKQmK0FqxzcipxK7Qm2oB2ATwoQVNi
-         Eftw==
-X-Forwarded-Encrypted: i=1; AJvYcCUO5rdMHLzx2DtCJlpA2uWgT10FD6FcpHO18aH59nVVBOTcP7FiyIHctE2N7lLJwmyVBYepZjdV@vger.kernel.org, AJvYcCUXpvUbdgmHmbugXDZCwBAk2smDjPeYlmXQJT+m6hyo2QRCIzriqJHHvmbZMwt1Cz0e8fXNPdICZGXzUwM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwddJaiWTT6KMikRZAPWKHsX4ROu1ccX/20EGgolxYe7huJmA/3
-	TZt6xwQF/MYjiTdDNX93+vrzaVeleJq4SwiUPDDPOf2KMnc1+25a7F/NU4U+
-X-Gm-Gg: ASbGnctK7htoNiIzSZ7M+YHaERql8eSh6xP3/TgaFedCrQaqfcnzlHeoL+Li4kkdPMM
-	CRm0hUeYzjrjGXClDYAamGQoCt3X6q8kDH9qGm5ZkerA2+uGmj/AK+7v1MeHetyY65mwT+SvAui
-	Xa3RpeqeZ6xaOq8IDHxCg/7iqFEkxJEW618wEfQkptCB1ImMTlTry45PtjMKxgsOJdugrADski5
-	3ITEokRA4PNYEqljbD8S1/rV6Z5rV7K+3xJu4xlqThhU2kGAbAl6zQeSqzFNbj2TM5fyX8L+LoR
-	wNwJNHkZxfTwkscpkPLRg1r02Q9kRnhCxiRUqLjRWFRkEc8yt9cQBJ3DnAkL8JlO/z3jSwZorTF
-	TU4XeRYZO0aFO7WWQdA==
-X-Google-Smtp-Source: AGHT+IFypWOBT4wfsDQKHBuJUDjAJz72aQLPZ2NaN1OHXhRN1dQG4TjZcQjsuIdLpwZtdcbDumqOpQ==
-X-Received: by 2002:a17:902:e5c8:b0:224:78e:4eb4 with SMTP id d9443c01a7336-22bea50017emr120282245ad.39.1744541046974;
-        Sun, 13 Apr 2025 03:44:06 -0700 (PDT)
+        bh=ZdoJvmpW6qddfbJB5WSgVAlVfvRBkfyp+bE+C2KQ9c0=;
+        b=UvecQDdjclnAsvHNjj3tWHyKau9WqIArqZcGiwpcuTyr2L4asN1Mt1qRCA7uiiSwDj
+         Drf6h0iNgVNFlFDjG21PEPGfJhXdCi9ctM/QChPzkuvHbrg8sjWcF85gggh7NXy5lfAN
+         eh4hrM8duAbSl+smkspokVr+dIkb0J87aHxUJY+1K9A+IoqpWCEjmCFdlwmnh88wk1Q1
+         Vpp12rvOuXx6dpnmoa3FUaXdBtLWqv41YqNXUcmOrdxlxUK8vtCc2Jeep8LTXxIIFC7K
+         9fjxCtHv0of6fKeOGl+4Ba4C2Rq534hcT0O0lMmQBLTeuSiiQ0BA0+jO1VGXc21toZ0a
+         42KQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVWwQkE5VULQbPTifN7rD1kylkTtisJ6IgYgiD7dW3QeGVUMkKTyDz3HO52yvMgO+FScHqApmaCYNuD7N4=@vger.kernel.org, AJvYcCVleSyJOBIBgWIXP8YnMdRadl8u+mrCGPuV6n3lZ2yztZf3+AYBKwvhsrxq8JCrf0RUEF7L6G8J@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOYhyn2QPrpxCG1yKj6uwBMdnomtpiq6g1/zHvskPMOcv40cxm
+	QhUSlgM3Mq3TUyGLr/ZZ0LrkPZ64xoMiP+s2V7QqJqGTlU09lM0Fk5Awuzf4
+X-Gm-Gg: ASbGncuYf5Mv471rtOR5u3zxItnOg/8iULlt7ZSHgdxXs397ok0HfyarIV+HcieJoCi
+	1GEEpLR4HvLRub7HTaFqVOJ48EV2MfcdBdYAdXhrvCmEcObWvlmQuZWdQ7sM0iatJBMQRME0Rlz
+	m2dA2EKPwEMjIY5o0wESKQaZHb52lvOac81u23SRFivaIfxmvPf89Zv+Fyf6Ub4Q/BKsNd1lhM0
+	Fndb6T1wYFMnSsXN8bnG7absx5vsEx+c4AUJ2RWulmtWIOm0/ywH5WUSuRQXL8KpTyzwNFn+ipd
+	NztkzdGGfzccE4riuE3vs2q8PbHJgrtjifYfLaFTYAYK+qcpN/HcJLIhcO9artZqtTMV3rEOtPd
+	c68QyzVe50XEcaTwRlTLeROr3Eerb
+X-Google-Smtp-Source: AGHT+IFA/SwdxFVR9lqyRwioQ6mLAepuc6c36TjHQ1kU80v2qwDra/68I4JucotYa72SVT3yX3pXvA==
+X-Received: by 2002:a17:903:41c3:b0:223:5a6e:b16 with SMTP id d9443c01a7336-22bea49542dmr131704475ad.5.1744541053570;
+        Sun, 13 Apr 2025 03:44:13 -0700 (PDT)
 Received: from mew.. (p4138183-ipxg22701hodogaya.kanagawa.ocn.ne.jp. [153.129.206.183])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22ac7b8af56sm80160885ad.66.2025.04.13.03.44.00
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22ac7b8af56sm80160885ad.66.2025.04.13.03.44.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Apr 2025 03:44:06 -0700 (PDT)
+        Sun, 13 Apr 2025 03:44:13 -0700 (PDT)
 From: FUJITA Tomonori <fujita.tomonori@gmail.com>
 To: rust-for-linux@vger.kernel.org
-Cc: Gary Guo <gary@garyguo.net>,
-	Alice Ryhl <aliceryhl@google.com>,
-	Fiona Behrens <me@kloenk.dev>,
-	Daniel Almeida <daniel.almeida@collabora.com>,
+Cc: Boqun Feng <boqun.feng@gmail.com>,
 	Andreas Hindborg <a.hindborg@kernel.org>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
@@ -87,9 +84,11 @@ Cc: Gary Guo <gary@garyguo.net>,
 	tmgross@umich.edu,
 	ojeda@kernel.org,
 	alex.gaynor@gmail.com,
+	gary@garyguo.net,
 	bjorn3_gh@protonmail.com,
 	benno.lossin@proton.me,
 	a.hindborg@samsung.com,
+	aliceryhl@google.com,
 	anna-maria@linutronix.de,
 	frederic@kernel.org,
 	tglx@linutronix.de,
@@ -106,10 +105,11 @@ Cc: Gary Guo <gary@garyguo.net>,
 	mgorman@suse.de,
 	vschneid@redhat.com,
 	tgunders@redhat.com,
+	me@kloenk.dev,
 	david.laight.linux@gmail.com
-Subject: [PATCH v13 4/5] rust: time: Add wrapper for fsleep() function
-Date: Sun, 13 Apr 2025 19:43:09 +0900
-Message-ID: <20250413104310.162045-5-fujita.tomonori@gmail.com>
+Subject: [PATCH v13 5/5] MAINTAINERS: rust: Add a new section for all of the time stuff
+Date: Sun, 13 Apr 2025 19:43:10 +0900
+Message-ID: <20250413104310.162045-6-fujita.tomonori@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250413104310.162045-1-fujita.tomonori@gmail.com>
 References: <20250413104310.162045-1-fujita.tomonori@gmail.com>
@@ -121,131 +121,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a wrapper for fsleep(), flexible sleep functions in
-include/linux/delay.h which typically deals with hardware delays.
+Add a new section for all of the time stuff to MAINTAINERS file, with
+the existing hrtimer entry fold.
 
-The kernel supports several sleep functions to handle various lengths
-of delay. This adds fsleep(), automatically chooses the best sleep
-method based on a duration.
-
-sleep functions including fsleep() belongs to TIMERS, not
-TIMEKEEPING. They are maintained separately. rust/kernel/time.rs is an
-abstraction for TIMEKEEPING. To make Rust abstractions match the C
-side, add rust/kernel/time/delay.rs for this wrapper.
-
-fsleep() can only be used in a nonatomic context. This requirement is
-not checked by these abstractions, but it is intended that klint [1]
-or a similar tool will be used to check it in the future.
-
-Link: https://rust-for-linux.com/klint [1]
-Reviewed-by: Gary Guo <gary@garyguo.net>
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-Reviewed-by: Fiona Behrens <me@kloenk.dev>
-Tested-by: Daniel Almeida <daniel.almeida@collabora.com>
+Reviewed-by: Boqun Feng <boqun.feng@gmail.com>
 Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
 Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
 ---
- rust/helpers/helpers.c    |  1 +
- rust/helpers/time.c       |  8 +++++++
- rust/kernel/time.rs       |  1 +
- rust/kernel/time/delay.rs | 49 +++++++++++++++++++++++++++++++++++++++
- 4 files changed, 59 insertions(+)
- create mode 100644 rust/helpers/time.c
- create mode 100644 rust/kernel/time/delay.rs
+ MAINTAINERS | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/rust/helpers/helpers.c b/rust/helpers/helpers.c
-index e1c21eba9b15..48143cdd26b3 100644
---- a/rust/helpers/helpers.c
-+++ b/rust/helpers/helpers.c
-@@ -33,6 +33,7 @@
- #include "spinlock.c"
- #include "sync.c"
- #include "task.c"
-+#include "time.c"
- #include "uaccess.c"
- #include "vmalloc.c"
- #include "wait.c"
-diff --git a/rust/helpers/time.c b/rust/helpers/time.c
-new file mode 100644
-index 000000000000..7ae64ad8141d
---- /dev/null
-+++ b/rust/helpers/time.c
-@@ -0,0 +1,8 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <linux/delay.h>
-+
-+void rust_helper_fsleep(unsigned long usecs)
-+{
-+	fsleep(usecs);
-+}
-diff --git a/rust/kernel/time.rs b/rust/kernel/time.rs
-index bc5082c01152..8d6aa88724ad 100644
---- a/rust/kernel/time.rs
-+++ b/rust/kernel/time.rs
-@@ -24,6 +24,7 @@
- //! C header: [`include/linux/jiffies.h`](srctree/include/linux/jiffies.h).
- //! C header: [`include/linux/ktime.h`](srctree/include/linux/ktime.h).
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 96b827049501..104cec84146f 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10583,20 +10583,23 @@ F:	kernel/time/timer_list.c
+ F:	kernel/time/timer_migration.*
+ F:	tools/testing/selftests/timers/
  
-+pub mod delay;
- pub mod hrtimer;
+-HIGH-RESOLUTION TIMERS [RUST]
++DELAY, SLEEP, TIMEKEEPING, TIMERS [RUST]
+ M:	Andreas Hindborg <a.hindborg@kernel.org>
+ R:	Boqun Feng <boqun.feng@gmail.com>
++R:	FUJITA Tomonori <fujita.tomonori@gmail.com>
+ R:	Frederic Weisbecker <frederic@kernel.org>
+ R:	Lyude Paul <lyude@redhat.com>
+ R:	Thomas Gleixner <tglx@linutronix.de>
+ R:	Anna-Maria Behnsen <anna-maria@linutronix.de>
++R:	John Stultz <jstultz@google.com>
++R:	Stephen Boyd <sboyd@kernel.org>
+ L:	rust-for-linux@vger.kernel.org
+ S:	Supported
+ W:	https://rust-for-linux.com
+ B:	https://github.com/Rust-for-Linux/linux/issues
+-T:	git https://github.com/Rust-for-Linux/linux.git hrtimer-next
+-F:	rust/kernel/time/hrtimer.rs
+-F:	rust/kernel/time/hrtimer/
++T:	git https://github.com/Rust-for-Linux/linux.git rust-timekeeping-next
++F:	rust/kernel/time.rs
++F:	rust/kernel/time/
  
- /// The number of nanoseconds per microsecond.
-diff --git a/rust/kernel/time/delay.rs b/rust/kernel/time/delay.rs
-new file mode 100644
-index 000000000000..02b8731433c7
---- /dev/null
-+++ b/rust/kernel/time/delay.rs
-@@ -0,0 +1,49 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+//! Delay and sleep primitives.
-+//!
-+//! This module contains the kernel APIs related to delay and sleep that
-+//! have been ported or wrapped for usage by Rust code in the kernel.
-+//!
-+//! C header: [`include/linux/delay.h`](srctree/include/linux/delay.h).
-+
-+use super::Delta;
-+use crate::ffi::c_ulong;
-+
-+/// Sleeps for a given duration at least.
-+///
-+/// Equivalent to the C side [`fsleep()`], flexible sleep function,
-+/// which automatically chooses the best sleep method based on a duration.
-+///
-+/// `delta` must be within `[0, i32::MAX]` microseconds;
-+/// otherwise, it is erroneous behavior. That is, it is considered a bug
-+/// to call this function with an out-of-range value, in which case the function
-+/// will sleep for at least the maximum value in the range and may warn
-+/// in the future.
-+///
-+/// The behavior above differs from the C side [`fsleep()`] for which out-of-range
-+/// values mean "infinite timeout" instead.
-+///
-+/// This function can only be used in a nonatomic context.
-+///
-+/// [`fsleep`]: https://docs.kernel.org/timers/delay_sleep_functions.html#c.fsleep
-+pub fn fsleep(delta: Delta) {
-+    // The maximum value is set to `i32::MAX` microseconds to prevent integer
-+    // overflow inside fsleep, which could lead to unintentional infinite sleep.
-+    const MAX_DELTA: Delta = Delta::from_micros(i32::MAX as i64);
-+
-+    let delta = if (Delta::ZERO..=MAX_DELTA).contains(&delta) {
-+        delta
-+    } else {
-+        // TODO: Add WARN_ONCE() when it's supported.
-+        MAX_DELTA
-+    };
-+
-+    // SAFETY: It is always safe to call `fsleep()` with any duration.
-+    unsafe {
-+        // Convert the duration to microseconds and round up to preserve
-+        // the guarantee; `fsleep()` sleeps for at least the provided duration,
-+        // but that it may sleep for longer under some circumstances.
-+        bindings::fsleep(delta.as_micros_ceil() as c_ulong)
-+    }
-+}
+ HIGH-SPEED SCC DRIVER FOR AX.25
+ L:	linux-hams@vger.kernel.org
 -- 
 2.43.0
 
