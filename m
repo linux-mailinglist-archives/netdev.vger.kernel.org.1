@@ -1,141 +1,172 @@
-Return-Path: <netdev+bounces-181964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52FC5A871B1
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 12:56:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3A7FA871B3
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 12:59:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C02E43BCE57
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 10:56:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 619D31896321
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 11:00:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3330199FAF;
-	Sun, 13 Apr 2025 10:56:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2EC219DF4C;
+	Sun, 13 Apr 2025 10:59:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MlunAQoJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hJ80hxkP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0742D16A395;
-	Sun, 13 Apr 2025 10:56:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88A118E3F;
+	Sun, 13 Apr 2025 10:59:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744541783; cv=none; b=IExxu7u6JT9nizTeH+rqaeTkCPtv/+57kVlm3GiItC1I57IxalJ+svuyewqOttQ7zQvUoLW6pMfsOyA99X4G/IA9LARqucRCAk7rLvJUtorOxfkFn7wIv149sXSHjM2Zw5r44b9H6DybmSzamSQvLe4p4reDRor+IsZ3PSnUqnw=
+	t=1744541991; cv=none; b=PzM+MpRUs0bUZBbkQD4FDn2vOHvsI552Vf1KOSz3Vj1722wSex+8PT9pkPGjC9z3uVE7sNERu1/xnCbZJ3hmXVx3v1Q6rmOw73T3lF60DPTZsnj/kJVYcj7ZQnlRc3N2j59Fszz4SVxe1fr7Qqwhx1hU5FCrh1lNXAEOEKqNQK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744541783; c=relaxed/simple;
-	bh=+n1kNUp9ctpglIjl+OjOVnEJhfaR3aQXMqdU8q2XJGM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cnyOSqZmIjrvGuzYXgh5pOC/ARBbKkOVUFhvDnYMWkINi4RXwM6GccDsIR7rse2/zi4gJ4I8EKnQKzZJd3c8VbiYJhyqaHlfzmmj8Y4bsQo2z8/bfMw/oVY1UiNNUVvcxyIt2OuGoMh2Z3GSp+73U5VrCWLAcpYyAQCWtaWvst0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MlunAQoJ; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43cef035a3bso23800435e9.1;
-        Sun, 13 Apr 2025 03:56:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744541780; x=1745146580; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=unfA7H7Wh4ud0mT4r/dlHs6FABHRLDpE/p/zG6LT3DU=;
-        b=MlunAQoJf0IaMqrkT5NXMsu7cvoJXHnm1xw2DtOqGpRGugyaWPO+EytjAG3gHnlhTh
-         zQic3hJOb7wdv6M1rb7QpAsUUwoXGhfvIJL/I0c8DjYJhInyDr5xk11oKcS/57KvrUl5
-         eGaa6i/fowBboCUAHgayyjruja6N71Q2Lj2/wgP67+WagOi99OajUgG1HoVOPay5/Ggn
-         NfeoUgjGi8ygUtH0v+Lg2zHa5finWazzNmh5tEjCBR6pwiLdANftvs8wXiALsp1jFu66
-         V7/pSuXR7oMfZZUIs1CuQ2tHIYleodQDnWVwP1U0XOCy3U2S84Q+lysbOZhvVT9Ep9pV
-         mbhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744541780; x=1745146580;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=unfA7H7Wh4ud0mT4r/dlHs6FABHRLDpE/p/zG6LT3DU=;
-        b=a8kDhkxLjgsGM6IIhLCLUETKdqAOQAZZvgeje3CVW1+4fW1olzayh/za6T0q5PZSVe
-         avIDgJX+lkLlqdJLZV9c6S2ecgRVy3COfJsTOzGHIuV3CCGnmp7S3YHGgVVkStct4Sf9
-         zJELhJ247+/glrF21IUoi2EaGZTckzFAYTdnbTNNpdaALMQxG+dT0rqAJ09VsdRFrPUb
-         EYVY9IZuzrsI5rVYnHcTf3xmkwhuDwFh6G6p915B7k3il5lH7PYcQ+fFe1zJktnktSlX
-         r6F9hTlq42UicR8/dRiUVdPUgLZjB3vSv1xo+H6Gpw13+Fya3mNf/HAlEhm4kmZX+mDb
-         MM5w==
-X-Forwarded-Encrypted: i=1; AJvYcCUrzqD6ldNNXmGTPkW0TwoVRBUO6C1K3tHifXZUJELJBfVPWwtndhEh4qMJq5SxnXA9xs75elO8gAlXS+Y=@vger.kernel.org, AJvYcCWcmno0Gq8fRqcQA/JOENauSeJ6UFwRP58rYz6WDbl+7WswO7OoW3i7Rv2ZQW3GBIYaIKBTFT2X@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywj+PRLHvUojLKegp5KGzFJoeeYbffM6j5hYne0M1nL4ypUc0l0
-	o5AnVVZfTRsU+9z4Iy9blEKWLtdl1+ruiPlT3tgjIFQR1hhSdoDkogoxGA==
-X-Gm-Gg: ASbGncuo77//WqKxUysgOKh/tn3Hz5nkKtQjgkSzgGZdWlTzO8DOnbJPPIfBbalG9x9
-	PHHheesbdH94tVbCgj1Q6ls5Jn0AObGrDznilMIyjznYHhID/fjxjCCQNXZiYYNgpoj2S4On34M
-	XVB6aIsQLF05sX77QBQyE2NfEgNZ8q3rJsk78qzLbVazDYx/1DvcvzWoZgJc5nnYYpSjY5ICJeD
-	6Bb3Kt5z5t0wJ6RDx5HZ0SvMLMkOxsMDCIW/fCcjE5WkP5hX4nBsQM1IBty4UNB87noYnQBe4DQ
-	PxKLtTvgIYFKVIu5U+iA9q2WURMmHZjjG1UNgnYEVFRk
-X-Google-Smtp-Source: AGHT+IGoA82m5Y33dJSGa3g4clowsff9mfCHwBq9BWiDnFKC/LW37vHHW3yX7XeJ3OvB5yGCOiVabA==
-X-Received: by 2002:a05:600c:3baa:b0:43c:efed:732c with SMTP id 5b1f17b1804b1-43f3a9b0285mr68786485e9.28.1744541779941;
-        Sun, 13 Apr 2025 03:56:19 -0700 (PDT)
-Received: from qasdev.system ([2a02:c7c:6696:8300:71dd:ba03:ed49:5ad0])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eae979684sm7661805f8f.55.2025.04.13.03.56.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Apr 2025 03:56:19 -0700 (PDT)
-Date: Sun, 13 Apr 2025 11:56:10 +0100
-From: Qasim Ijaz <qasdev00@gmail.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: jlayton@kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, nathan@kernel.org
+	s=arc-20240116; t=1744541991; c=relaxed/simple;
+	bh=GJ5d8E/A4Dn0tz6AOhtMSgISSqjLGiutsjzodGBnEJI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=D22Azs+mmv4VaT56SiWKqfHmJcIcWmvbi3szApri+M/eroYX+ewghh0ok+0kZ9B+hFmsH/McADBOdiJyo3lAcJohoV/1mUaIKUfSqY4ClU+l2zcIX6CXYKQ4hc2OEA4hD7UqJW4HOyFRrBk0bz09U3Zqps4TKZaf+MIvM45YIg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hJ80hxkP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E55DBC4CEDD;
+	Sun, 13 Apr 2025 10:59:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744541991;
+	bh=GJ5d8E/A4Dn0tz6AOhtMSgISSqjLGiutsjzodGBnEJI=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=hJ80hxkPx0nP8Lb+IAD/cBr1E4OzP0LCh5aqPHY+uN60L+CkHEofhK+JQ/9Me0QNg
+	 zhOEj87o6iDnts1HDIxKx1fkE9nxcNX1pT1B9RPF3+6SoohxCD8a23aVVOi9xpzJD4
+	 OQZ+O1Y2e/Xf3OKMgF97Jryx0gDKSVetZWLWzK9SL7ib/y6Cp163mNfs+UaK63FHTF
+	 vCN0JB2+5IgDzJkMQkt6l+2Fkd+c8y+OnaYoEv7GzQ+kffBzMc2VA50yU5JcncSpJy
+	 dCjdvMEQMesn/mOakgLOwxjui3lW3rSjVnFGgUbXzYNDqlstPTCG48qClp7fq1bO14
+	 QZuERiBfcYtbA==
+Message-ID: <3fb6238636b4e20172a357a043001426e7fa34c2.camel@kernel.org>
 Subject: Re: [PATCH] net: use %ld format specifier for PTR_ERR in pr_warn
-Message-ID: <Z_uYSmMDHE_vpFcQ@qasdev.system>
+From: Jeff Layton <jlayton@kernel.org>
+To: Qasim Ijaz <qasdev00@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Sun, 13 Apr 2025 06:59:49 -0400
+In-Reply-To: <20250412225528.12667-1-qasdev00@gmail.com>
 References: <20250412225528.12667-1-qasdev00@gmail.com>
- <20250412232839.66642-1-kuniyu@amazon.com>
+Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
+ keydata=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
+ QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250412232839.66642-1-kuniyu@amazon.com>
 
-On Sat, Apr 12, 2025 at 04:28:38PM -0700, Kuniyuki Iwashima wrote:
-> From: Qasim Ijaz <qasdev00@gmail.com>
-> Date: Sat, 12 Apr 2025 23:55:28 +0100
-> > PTR_ERR yields type long, so use %ld format specifier in pr_warn.
-> 
-> errno fits in the range of int, so no need to use %ld.
-> 
-> 
-> > 
-> > Fixes: 193510c95215 ("net: add debugfs files for showing netns refcount tracking info")
-> 
-> The series is not yet applied.  It's not necessary this time, but
-> in such a case, please reply to the original patch thread.
-> 
-> Also, please make sure your patch can be applied cleanly on the latest
-> remote net-next.git and the Fixes tag points to an existing commit.
-> 
-Hi Kuniyuki
+On Sat, 2025-04-12 at 23:55 +0100, Qasim Ijaz wrote:
+> PTR_ERR yields type long, so use %ld format specifier in pr_warn.
+>=20
+> Fixes: 193510c95215 ("net: add debugfs files for showing netns refcount t=
+racking info")
+> Signed-off-by: Qasim Ijaz <qasdev00@gmail.com>=20
+> ---
+>  net/core/net_namespace.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+> index f47b9f10af24..a419a3aa57a6 100644
+> --- a/net/core/net_namespace.c
+> +++ b/net/core/net_namespace.c
+> @@ -1652,7 +1652,7 @@ static int __init ns_debug_init(void)
+>  	if (ref_tracker_debug_dir) {
+>  		ns_ref_tracker_dir =3D debugfs_create_dir("net_ns", ref_tracker_debug_=
+dir);
+>  		if (IS_ERR(ns_ref_tracker_dir)) {
+> -			pr_warn("net: unable to create ref_tracker/net_ns directory: %d\n",
+> +			pr_warn("net: unable to create ref_tracker/net_ns directory: %ld\n",
+>  				PTR_ERR(ns_ref_tracker_dir));
+>  			goto out;
+>  		}
 
-Thank you for your comments, as Nathan said the current code emits a
-compiler warning as per the kernel test robot. 
+Thanks, that will silence a potential compiler warning. This is not
+merged yet, but I'll make sure to incorporate this change in the next
+version.
 
-Given this would you like me to resend patch v2 with the changes you and
-Nathan specified?
+FWIW, I'm planning to put together a v3 that will require less
+involvement with net/ code, so most of these bits will probably get
+deleted anyway.
 
-Regards,
-Qasim
-> 
-> > Signed-off-by: Qasim Ijaz <qasdev00@gmail.com> 
-> > ---
-> >  net/core/net_namespace.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-> > index f47b9f10af24..a419a3aa57a6 100644
-> > --- a/net/core/net_namespace.c
-> > +++ b/net/core/net_namespace.c
-> > @@ -1652,7 +1652,7 @@ static int __init ns_debug_init(void)
-> >  	if (ref_tracker_debug_dir) {
-> >  		ns_ref_tracker_dir = debugfs_create_dir("net_ns", ref_tracker_debug_dir);
-> >  		if (IS_ERR(ns_ref_tracker_dir)) {
-> > -			pr_warn("net: unable to create ref_tracker/net_ns directory: %d\n",
-> > +			pr_warn("net: unable to create ref_tracker/net_ns directory: %ld\n",
-> >  				PTR_ERR(ns_ref_tracker_dir));
-> >  			goto out;
-> >  		}
-> > -- 
-> > 2.39.5
+Cheers!
+--=20
+Jeff Layton <jlayton@kernel.org>
 
