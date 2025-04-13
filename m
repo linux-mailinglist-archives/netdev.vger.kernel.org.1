@@ -1,128 +1,104 @@
-Return-Path: <netdev+bounces-181942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EDF9A870E0
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 08:39:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B0C5A870E2
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 09:26:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 300563BC3B3
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 06:39:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B619C7AE87E
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 07:25:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E766213541B;
-	Sun, 13 Apr 2025 06:39:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3796F1487D1;
+	Sun, 13 Apr 2025 07:26:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="b4tnsWbj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m6k6bXQO"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-63-194.mail.qq.com (out162-62-63-194.mail.qq.com [162.62.63.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC9904A08
-	for <netdev@vger.kernel.org>; Sun, 13 Apr 2025 06:39:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.63.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B466B8460;
+	Sun, 13 Apr 2025 07:26:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744526378; cv=none; b=VoXyzACu+WsKz8AWSkg6V/VjbtCcOX0qikdrvqtowvrk/6uXqYk1hQHvxRD6YmTdTdaHwXTa4DPuXBmLg72EsdHksGE5tOvlB6z6byPLsPkatXF0HZRnOftxVj+bN9myrsv/v0MExX60D60Ks3mIQM5of3BGSQ/qxb4/yGytJTQ=
+	t=1744529173; cv=none; b=ZCW5vGRzuOJry55wA627F0Bvgjgt0QwcAFw2y7yhxmFC/nbZ/d4hrKtFI0LhwQvIFHPQNKFTbk5rGSIJoaoPPPJmIo+F28LGZpHu/Mu6aL7suz7mTi9Z29ggPQ5nGXv8tF4HQBimPfufhOySX9Rjr+8c1aH1ervaBE5RSlPlfLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744526378; c=relaxed/simple;
-	bh=VfjOKrdlXknj6vXHwWJVj/PZAb+mg4jlr/TvsLO2kuQ=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=TRWwiI6lRNuajyzL7QZ7WCUUCfN38MDYxXFxvwX980oNOIRP0vvMTZQnE3nEOZJkBsWNFHkOZeDyWYwi3+PGrPFeAzdi3fDhVtio9Zws+Bt0HajnZZEPMXTsXlPsmcR4WZGVm48Sc0gkzEMwGHOJcr2Qd9f/e6pD3bh4lGkcftA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=b4tnsWbj; arc=none smtp.client-ip=162.62.63.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1744526368; bh=D0ZirlimTq5Afw6FKAt5hzKPG4G54aL2TbVMhjYhzlk=;
-	h=From:To:Cc:Subject:Date;
-	b=b4tnsWbjPr4eItwnN1C59EUSbxQGnkF3dDSJVziD85xcM7c7ebpSintw3hbUs2v2u
-	 4OgOXWL8M+smPZWm6+lHCqYFxvyLaYLlV1b2Y3AnEKgcfUP7SI64q0enqGKG0HBpfC
-	 69wAMEmmEGDLkL1LJdds6IbKz9lQrdI4TG1cEEDk=
-Received: from ground-ThinkStation-P3-Tower.. ([159.226.94.115])
-	by newxmesmtplogicsvrszb16-1.qq.com (NewEsmtp) with SMTP
-	id 42AADAF5; Sun, 13 Apr 2025 14:16:42 +0800
-X-QQ-mid: xmsmtpt1744525002t7211d50w
-Message-ID: <tencent_20ED8A5A99ECCFE616B18F17D8056B5AF707@qq.com>
-X-QQ-XMAILINFO: OQ59tfF64tJLUuC/UaBXPGpc48yfl8ikeVT8EldQ9/JSA1xi0KT6CnB5h+ygdL
-	 yAi4dcg4GWRX5w0iOjTgpCPgf7owO7fFlHn1rO0nyeZqLbXnmmdif5W6ZLwrvIV2P24TWPIi//vw
-	 hVEROrgssqRDOdjKnqkcGnM5tsNSGuZ5gz+gZ8LbND6+xUE9O/KnIYMK2VOBknTrZQaMG+Q8Nedr
-	 uE2h7mPKWRcoT1CoRLIONBVSkLewM9jxmmbNUEhisK+1jdHXDMXJSplC8RaMBFSVveOXf+7UVdGP
-	 2TjrV93cYnI4xAmX4KJyp5BF4DMDBmFPrbTvAwO7LkdoDRw7WUd140GPSfW0MBxE9+9YskhEUjO/
-	 sNfT8FdcFs1x66drPsgfHXfwOiikiMtZtUHqBI3gDNJP7N2qVUt8EzkXCcbxYs9kHPtjajmLvq9N
-	 QEWe9eMgQl4a3YJN7TsGTc8py4pUkXPLRu/qFGej1fr1V3ONfUnLuuWlXcEohUsicEa1CkkHsJNM
-	 7tt8iSg6IWpoij83wpzK4QZOTrXXJmBoN0uGRB5qD8ZXKD7AB4Me8bja0DdQyg1nzR7Kr/ymeGm+
-	 MN8qPN94abOG134g/V1J4aPa28fJAnqzSV5twvkrJGv82xnc0nHVwz1TCnKQOcvHIeyPghEegyOl
-	 98Qjv4GUQk6sLRO+ul/XzdDB/uecJsaEGKVEJBXiV0VNZCu07rZc0/83ckrH5PeBzhX6CflZDhbD
-	 RsayhWW/hCBBsw0AovPIEIABRUzM7DPQYRjMp/X+FoVWfuQD3IiKeKGVe0TZkZXt6uItgRWj4CHP
-	 wf2/Xoq+2X+wAb62oEgk1LKEyiV37/GMNzlLL3vPdvYSTlgakkbBAx9yaKYe3dUYX3Prvuy8EUaP
-	 Pha73Z/JlqhDlj9LSbAIpT2PRoUkWA6u4wcx2Gw44x0JeJu3kxDlyVt0r4Zzqfmvv6j6DfFOdc
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-From: cxxz16 <990492108@qq.com>
-To: sgoutham@marvell.com,
-	gakula@marvell.com,
-	sbhatta@marvell.com,
-	hkelam@marvell.com,
-	bbhushan2@marvell.com,
-	netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	linux-kernel@vger.kernel.org,
-	cxxz16 <990492108@qq.com>
-Subject: [Patch next] octeontx2-pf: fix potential double free in rvu_rep_create()
-Date: Sun, 13 Apr 2025 14:16:39 +0800
-X-OQ-MSGID: <20250413061639.2162285-1-990492108@qq.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1744529173; c=relaxed/simple;
+	bh=o4AzouUi7VIx4Jpnr1y460PhYao9sduxoaPAVVMF5Tg=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=W5rSExFQN8627A3/e82+YmZYmM7S4ko5rqgE/sR5VYGpFc6671+qwSeGgakeAhc16RCDnpGIQUHBT2HNojLaNTfOBQGdsFRMUbm0OfqoWdxDvM7Iofi8qxxaFcTnF75xUtHEtyXECVD4iQ8e+C5pmfhCGNL0EIGIu9YJN52LbQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m6k6bXQO; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-30820167b47so2569868a91.0;
+        Sun, 13 Apr 2025 00:26:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744529170; x=1745133970; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=od3VOhmgG64I8q1xef8CGnXB4ZBUqWgfySPpsP8vdFU=;
+        b=m6k6bXQOMLgYVEwQmBKsMH9bZMRhmKBKiNvi2M1WHgqZXWTm1upFaD4Q0xpdGjXuJU
+         NHt1cPibMZx093maupc95S3M5VzKDF4IKXi17LqWe/+n3M6Xqze7uPSKFokKn38oOVnc
+         +ifWF4vSLu1agkbu6jZ7Nh87VfdnCwLAlDO7R7f6LarqbQhfsZ5ctpBBXiKgjEsAE0mB
+         jRJ4vszhp/gSqgImJ1DXJD9rpfylR3veq9gt8fiKk8tKILfJq15goXrfSt9sbSNLMs25
+         uc6mFBwBJDWLpos1l1VV0VaLtS1zTZY2PnOoEqa33vYzra0nAC1Ft32hSzwLbTixtifC
+         vEgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744529170; x=1745133970;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=od3VOhmgG64I8q1xef8CGnXB4ZBUqWgfySPpsP8vdFU=;
+        b=fInY2ziMQzN3bXTyZNKt9+EI+qxc67l36wlvJwbb/3dGXdwz12E4KR8kg4gI7tQrab
+         8732IxPJAHw9RC1EApXdAZdixz82nveWLrwovRRK3dIngomyQSK0NfDoArNbFbETw1HZ
+         hlwqwKuZ8ZKHsyXcRsQHkh8nmrSF5UrI7qpSqSCJt/3NDQRE8yFfhkbDJNE7Ptj/4rm1
+         KlCnBzRlls5xtmap6WcJ8WcFRng7WVe9zV6Z+wKTqbFkMgZ09vokIV7a5C8FktqzBcGC
+         1K8Sp7DS17zzmWbOESMuvicvbE7HKyLlggF+z8ZotUui7gw3YSG6jGaBVuJkW16vyzuf
+         t5/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUH0wZGIM7V4dXS7kTPgN2GKoGa3mx40Y0vp2YUJSBm2JtePBnEzmulMwM8qpcdyLx8/KeCKGoF@vger.kernel.org, AJvYcCXU2K2/4/zZ2kAK0sjwiWqMnFzHWy2Hqwv/6RWC4Gc6eNZ1SL1wD5+hc+A0UiinjyCDiN8v6l4x10l8PFs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEajjfHAPChjUtZqtm+zD1Pl3xpGTGBBVFB/E6HEwyqdK4E1Wf
+	RMvw/z63udlTHQ1DIehD0MZ0BERFvggZgUVXe0OTikvp7AvxYLm5C2LornVVJ/PwHi0uC+k8jqc
+	3yDPp7g6cBjeKgVUhazvSJgZ6Cg==
+X-Gm-Gg: ASbGncsbwwjhvm8z5u8HV4XpdwDMOcthSLPvAO0x3c9adHRzfbI2FisFxqtaYT9itvw
+	ADSaFkQtrDABY8L2mP2OcnJfs7gR6crbVrxHQDVbdTpRkWY1Rzc/swGxBZlZUvZKVxuneCxgCpe
+	LEtSSSYevM+wovZMylp/Bka4wqk9VVTp3jTaP768ZtIMsHfYCbr4dRSc4=
+X-Google-Smtp-Source: AGHT+IE1/b5sjrbLlWni48LfSIwYxcrrKKtJGNhl/KGBr6YTcQNTnoyypcLjyBVic9TFh9zrY0L11rPFEM0hVqZQWJg=
+X-Received: by 2002:a17:90b:5111:b0:2ff:53d6:2b82 with SMTP id
+ 98e67ed59e1d1-30784d3f77emr19811667a91.11.1744529169875; Sun, 13 Apr 2025
+ 00:26:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Ujwal Kundur <ujwal.kundur@gmail.com>
+Date: Sun, 13 Apr 2025 12:55:58 +0530
+X-Gm-Features: ATxdqUEjycNNStPWtYc9zsABVuK0vCzjMN7f8Pw2fPvgiCymzDtMO11MHkorkX4
+Message-ID: <CALkFLL+LxVk+M--+qHiP6g31rcvXxBGRJpKvp=CCFekL9OyUww@mail.gmail.com>
+Subject: [ethernet/broadcom/bgmac]: Implement software multicast filter clear
+To: rafal@milecki.pl, bcm-kernel-feedback-list@broadcom.com
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, shuah@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-In rvu_rep_create(), the netdev is allocated via alloc_etherdev()
-and assigned to rep->netdev. This rep structure is then stored
-in the priv->reps array indexed by rep_id.
+Hi,
+   I'm trying to work on a few TODOs in the
+drivers/net/ethernet/broadcom/bgmac.c driver code and came across the
+"Clear software multicast filter list" item.
+   I tried comparing the multicast filter implementation of the
+sb1250-mac.c driver for inspiration but realized that most of the code
+for bgmac has been written by reverse-engineering the specs:
+   hhttps://bcm-v4.sipsolutions.net/Specification/
 
-If either rvu_rep_devlink_port_register() or register_netdev() fails,
-the function frees ndev using free_netdev(ndev) before jumping to 
-the 'exit:' label. However, in the 'exit:' section, the function 
-iterates over priv->reps[] and again frees rep->netdev, which points 
-to the same ndev.
+   I'd like to try my hand at this if there are documents/guides
+around this topic or if there's a canonical source for the binary that
+I can try reverse engineering. Please let me know if you have any
+leads/advice.
 
-This results in a potential double free of the same netdev pointer,
-which can cause memory corruption or crashes.
+   Apologies if this is misdirected, I've just started to get into
+Linux kernel development / networking stack.
 
-To fix this, avoid calling free_netdev(ndev) before jumping to 'exit:'.
-The cleanup logic at 'exit:' should handle the freeing safely.
-
-Signed-off-by: cxxz16 <990492108@qq.com>
----
- drivers/net/ethernet/marvell/octeontx2/nic/rep.c | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-index 04e08e06f30f..de9a50f2fc39 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-@@ -681,7 +681,6 @@ int rvu_rep_create(struct otx2_nic *priv, struct netlink_ext_ack *extack)
- 		eth_hw_addr_random(ndev);
- 		err = rvu_rep_devlink_port_register(rep);
- 		if (err) {
--			free_netdev(ndev);
- 			goto exit;
- 		}
- 
-@@ -691,7 +690,6 @@ int rvu_rep_create(struct otx2_nic *priv, struct netlink_ext_ack *extack)
- 			NL_SET_ERR_MSG_MOD(extack,
- 					   "PFVF representor registration failed");
- 			rvu_rep_devlink_port_unregister(rep);
--			free_netdev(ndev);
- 			goto exit;
- 		}
- 
--- 
-2.34.1
-
+Thanks,
+            Ujwal Kundur
 
