@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-181987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3EAEA873FC
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 23:10:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9567AA87400
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 23:11:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB56E16B80D
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 21:10:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B96B3ABF9E
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 21:10:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 898121F2BA1;
-	Sun, 13 Apr 2025 21:10:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A8CC1F3FC8;
+	Sun, 13 Apr 2025 21:11:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rjIWPxJe"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HtE2hq4w"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AC8512B94
-	for <netdev@vger.kernel.org>; Sun, 13 Apr 2025 21:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC70C12B94;
+	Sun, 13 Apr 2025 21:11:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744578634; cv=none; b=R+t8T7CENsLaeMB/XUp0Taf9shefI9qmRDzHtAg8xHXijGt9xhJfIyF4qrYe+OYlmTvRvEGs/0MIf1bMJctCVCv6YNd5vni+33l5/oP+jB/DDMvaRAcX82uWFsGzFDv/lV3FAEKXEF0EfMcV68JSwjFkbvKx48D4GUtLBKp9YyY=
+	t=1744578662; cv=none; b=t8qQ53MALKKTqHwHp0xzT5EbPi/HZyOzWGsmrOGuE/wVaJU3WVSjV/7tN0Fz54vVZKCkg0TzhsopNCFwPOJbw7KOYNsT0415+4PQucTPNlIBmqBAqtyhuX5e8bGFBg7/4JaESI/HZrVDfFBg10LeMwb970ZCvBqrApCb/WKHwro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744578634; c=relaxed/simple;
-	bh=Q97+TtzUeXh2Y9j3wcKOKQxiU0ak6LXaoNjg21svgI0=;
+	s=arc-20240116; t=1744578662; c=relaxed/simple;
+	bh=s71rSJTh6/fuLKrk6Z86CCnI8BfIN3Ohn2A0M9DWY7o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dJYKLWRJIgDLW0pVWgcUbi/VgJmIYv53zUAn0icpnANmvY3630rdEMV3R3s62KA+IORHBqPr2DKD999i34iYOL8UiM/MZznziQo8OnWwncFld1ZAIl27BE3M8li/TQdv+6jY/pMLZatEW5uPEub3xGYjUyPJdA3VgDPUL3yroXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rjIWPxJe; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=p5jpGriNQaXSZdErc/u9tSNbFgjIG0OPN/folgPtbWQ9ti1GgOv3lyaLYuBBL41Aky3W6S5IFRXufyK0Af9WFNHmNU10jQ6N3wPp5uJQ2XkYfQuzupr0660dw0VKvqXPf9rUYWo+wa95cLYTi5OwC6NI1/GWc6Rb181HPp/xZFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HtE2hq4w; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=kYQPdO0zzHv8R4sjKJkwdjp3Oz2SICXW1PKdW6fjF2Q=; b=rjIWPxJeD6xvm78cU1Lgp2JXxs
-	vB/Z39UEidtoqwhYJ53+gRx+Nan2R80vtTR5OM+d3VsBJqpbDSbiq6dpN/H2R/6jzYQMQpxjBiN06
-	Ihtf2xpZ20Wa6r2cEvo4QgiEhQ6pzs+ohEBgFHMSoaX2+nwS+vKqIV+rncDXFX9w6+EI=;
+	bh=4kXxKWG4xnX5hbgFzNzMCOzAiI2t1KSHm3OrucboMKI=; b=HtE2hq4wUD8Cedqn/0watg9XD0
+	m1hv00N5hhgIS9i6yL0CBPklVuO7PalWSplRcwQflKmyTsRm51/IWjXFHx+YhDumsFwuhtbVNuK5a
+	o7ixMxuvACbi9qMjLyjJ3GAWjj+GfLUzU8j5ZfPjDFdORhK87cRfxpZhMJqKrYvHwoFE=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1u44au-0096Nz-Ho; Sun, 13 Apr 2025 23:10:24 +0200
-Date: Sun, 13 Apr 2025 23:10:24 +0200
+	id 1u44bP-0096PC-M0; Sun, 13 Apr 2025 23:10:55 +0200
+Date: Sun, 13 Apr 2025 23:10:55 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 Cc: Heiner Kallweit <hkallweit1@gmail.com>,
@@ -50,16 +50,18 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@gmail.com>, imx@lists.linux.dev,
 	Jakub Kicinski <kuba@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-stm32@st-md-mailman.stormreply.com,
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 4/4] net: stmmac: anarion: use
- devm_stmmac_pltfr_probe()
-Message-ID: <acd537c9-51f2-4d5c-a07d-032ea628d241@lunn.ch>
-References: <Z_p16taXJ1sOo4Ws@shell.armlinux.org.uk>
- <E1u3bfU-000Em3-Mh@rmk-PC.armlinux.org.uk>
+	Paolo Abeni <pabeni@redhat.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Shawn Guo <shawnguo@kernel.org>
+Subject: Re: [PATCH net-next] net: stmmac: imx: use stmmac_pltfr_probe()
+Message-ID: <e4688664-7ebe-41a8-937b-5a308123fb39@lunn.ch>
+References: <E1u3bfm-000Enq-MC@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,11 +70,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1u3bfU-000Em3-Mh@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1u3bfm-000Enq-MC@rmk-PC.armlinux.org.uk>
 
-On Sat, Apr 12, 2025 at 03:17:12PM +0100, Russell King (Oracle) wrote:
-> Convert anarion to use devm_stmmac_pltfr_probe() which allows the
-> removal of an explicit call to stmmac_pltfr_remove().
+On Sat, Apr 12, 2025 at 03:17:30PM +0100, Russell King (Oracle) wrote:
+> Using stmmac_pltfr_probe() simplifies the probe function. This will not
+> only call plat_dat->init (imx_dwmac_init), but also plat_dat->exit
+> (imx_dwmac_exit) appropriately if stmmac_dvr_probe() fails. This
+> results in an overall simplification of the glue driver.
 > 
 > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
