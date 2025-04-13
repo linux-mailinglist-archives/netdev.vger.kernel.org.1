@@ -1,54 +1,64 @@
-Return-Path: <netdev+bounces-181965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3A7FA871B3
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 12:59:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09FC4A871E3
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 13:41:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 619D31896321
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 11:00:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 277F218906ED
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 11:41:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2EC219DF4C;
-	Sun, 13 Apr 2025 10:59:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0E3F19F13B;
+	Sun, 13 Apr 2025 11:41:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hJ80hxkP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p0S29jIJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88A118E3F;
-	Sun, 13 Apr 2025 10:59:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B40CB1DFE8;
+	Sun, 13 Apr 2025 11:41:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744541991; cv=none; b=PzM+MpRUs0bUZBbkQD4FDn2vOHvsI552Vf1KOSz3Vj1722wSex+8PT9pkPGjC9z3uVE7sNERu1/xnCbZJ3hmXVx3v1Q6rmOw73T3lF60DPTZsnj/kJVYcj7ZQnlRc3N2j59Fszz4SVxe1fr7Qqwhx1hU5FCrh1lNXAEOEKqNQK4=
+	t=1744544461; cv=none; b=VjmMXIz5uHrnp8DEJySXWVn7boEiNttK+zbG9WH7CwjNHxt6jni7pzz9i29V/9LcqGAp9kxtrnPLXkmZh9TwR6cx+hxjDscfvgwnBx0DzkD16C77VzQ8X7ZHujWEzGKREEmd91l1gMxyyXhqa0Uu/X2b6Fm6Bl94FspW5INp2TQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744541991; c=relaxed/simple;
-	bh=GJ5d8E/A4Dn0tz6AOhtMSgISSqjLGiutsjzodGBnEJI=;
+	s=arc-20240116; t=1744544461; c=relaxed/simple;
+	bh=ffvqt8L01qWYtXJDqwSfuXvM+gZQInj456g8b/wy6CY=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=D22Azs+mmv4VaT56SiWKqfHmJcIcWmvbi3szApri+M/eroYX+ewghh0ok+0kZ9B+hFmsH/McADBOdiJyo3lAcJohoV/1mUaIKUfSqY4ClU+l2zcIX6CXYKQ4hc2OEA4hD7UqJW4HOyFRrBk0bz09U3Zqps4TKZaf+MIvM45YIg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hJ80hxkP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E55DBC4CEDD;
-	Sun, 13 Apr 2025 10:59:50 +0000 (UTC)
+	 Content-Type:MIME-Version; b=HJ/eZvUguLB/cJAuauMBs15bljOcYkNEAgZsnR9MiQotz1bm+uBOnB+xUo47+MHjL/R1ljU76OPVKr7jyyHJvQUYV2M1aP4jZTCTJIVs8FKtUQ8CG7vUyiY7lm5OMYHN8kg4MLYYdqOQstXNI4i2P6P418IjY5MMo6E/hT6jfUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p0S29jIJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E161C4CEDD;
+	Sun, 13 Apr 2025 11:41:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744541991;
-	bh=GJ5d8E/A4Dn0tz6AOhtMSgISSqjLGiutsjzodGBnEJI=;
+	s=k20201202; t=1744544461;
+	bh=ffvqt8L01qWYtXJDqwSfuXvM+gZQInj456g8b/wy6CY=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=hJ80hxkPx0nP8Lb+IAD/cBr1E4OzP0LCh5aqPHY+uN60L+CkHEofhK+JQ/9Me0QNg
-	 zhOEj87o6iDnts1HDIxKx1fkE9nxcNX1pT1B9RPF3+6SoohxCD8a23aVVOi9xpzJD4
-	 OQZ+O1Y2e/Xf3OKMgF97Jryx0gDKSVetZWLWzK9SL7ib/y6Cp163mNfs+UaK63FHTF
-	 vCN0JB2+5IgDzJkMQkt6l+2Fkd+c8y+OnaYoEv7GzQ+kffBzMc2VA50yU5JcncSpJy
-	 dCjdvMEQMesn/mOakgLOwxjui3lW3rSjVnFGgUbXzYNDqlstPTCG48qClp7fq1bO14
-	 QZuERiBfcYtbA==
-Message-ID: <3fb6238636b4e20172a357a043001426e7fa34c2.camel@kernel.org>
-Subject: Re: [PATCH] net: use %ld format specifier for PTR_ERR in pr_warn
+	b=p0S29jIJh00W66s/Fkm4AVC4rhG67CtKcdbeRtkbqDfqrEoEr7rW5W5gMs1MKVqVs
+	 hdiJl2UYR+1mqkTNPap5B7g0lLeh4FLjnMw4e4py/foHsF1n9w6mxluEwka2p+F+S7
+	 4u7evALw0XCMe8wgWWRSg1nJzTKnO6l9Yn8zustcrPlApbfFZ2S+IeFjEWaX5WIBaf
+	 C2A+3ggPG+pPzGvrKx8kXqOIBAVbbEWrI6Lq8nFGlY3HSWHs7lSuaZBpQumCNCNfIM
+	 co4ZqrBjKMRWrRbYnTuGZEIPIWosRKabtQ5521PKzFeyL36nPmMueKGu6bSe114fXi
+	 zsOkmKktNUuUw==
+Message-ID: <23f93f84e000ebee28614bf85a4013648fa66a00.camel@kernel.org>
+Subject: Re: [PATCH v2 2/2] net: add debugfs files for showing netns
+ refcount tracking info
 From: Jeff Layton <jlayton@kernel.org>
-To: Qasim Ijaz <qasdev00@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Sun, 13 Apr 2025 06:59:49 -0400
-In-Reply-To: <20250412225528.12667-1-qasdev00@gmail.com>
-References: <20250412225528.12667-1-qasdev00@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski	 <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman	 <horms@kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, 	netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Date: Sun, 13 Apr 2025 07:40:59 -0400
+In-Reply-To: <f4722246-5694-4b1a-9b1b-d4352fa54ee7@lunn.ch>
+References: <20250408-netns-debugfs-v2-0-ca267f51461e@kernel.org>
+	 <20250408-netns-debugfs-v2-2-ca267f51461e@kernel.org>
+	 <1e717326-8551-419e-b185-5cfb20573b4f@lunn.ch>
+	 <91d6d3c60ef5d4ed90418f8a06228767be8a5b1b.camel@kernel.org>
+	 <ff2b7cfb7657a185469747d930b834dbdfdf6eac.camel@kernel.org>
+	 <f4722246-5694-4b1a-9b1b-d4352fa54ee7@lunn.ch>
 Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
  keydata=mQINBE6V0TwBEADXhJg7s8wFDwBMEvn0qyhAnzFLTOCHooMZyx7XO7dAiIhDSi7G1NPxw
  n8jdFUQMCR/GlpozMFlSFiZXiObE7sef9rTtM68ukUyZM4pJ9l0KjQNgDJ6Fr342Htkjxu/kFV1Wv
@@ -133,40 +143,89 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-On Sat, 2025-04-12 at 23:55 +0100, Qasim Ijaz wrote:
-> PTR_ERR yields type long, so use %ld format specifier in pr_warn.
+On Thu, 2025-04-10 at 16:12 +0200, Andrew Lunn wrote:
+> > Oh, ok. I guess you mean these names?
+> >=20
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ref_tracker_dir_init(&n=
+et->refcnt_tracker, 128, "net refcnt");
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ref_tracker_dir_init(&n=
+et->notrefcnt_tracker, 128, "net notrefcnt");
+> >=20
+> > Two problems there:
+> >=20
+> > 1/ they have an embedded space in the name which is just painful. Maybe=
+ we can replace those with underscores?
+> > 2/ they aren't named in a per-net namespace way
 >=20
-> Fixes: 193510c95215 ("net: add debugfs files for showing netns refcount t=
-racking info")
-> Signed-off-by: Qasim Ijaz <qasdev00@gmail.com>=20
-> ---
->  net/core/net_namespace.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> So the first question is, are the names ABI? Are they exposed to
+> userspace anywhere? Can we change them?
 >=20
-> diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-> index f47b9f10af24..a419a3aa57a6 100644
-> --- a/net/core/net_namespace.c
-> +++ b/net/core/net_namespace.c
-> @@ -1652,7 +1652,7 @@ static int __init ns_debug_init(void)
->  	if (ref_tracker_debug_dir) {
->  		ns_ref_tracker_dir =3D debugfs_create_dir("net_ns", ref_tracker_debug_=
-dir);
->  		if (IS_ERR(ns_ref_tracker_dir)) {
-> -			pr_warn("net: unable to create ref_tracker/net_ns directory: %d\n",
-> +			pr_warn("net: unable to create ref_tracker/net_ns directory: %ld\n",
->  				PTR_ERR(ns_ref_tracker_dir));
->  			goto out;
->  		}
+> If we can change them, space to _ is a simple change. Another option
+> is what hwmon does, hwmon_sanitize_name() which turns a name into
+> something which is legal in a filesystem. If all of this code can be
+> pushed into the core tracker, so all trackers appear in debugfs, such
+> a sanitiser is the way i would go.
+>=20
+> And if we can change the name, putting the netns into the name would
+> also work. There is then no need for the directory, if they have
+> unique names.
+>=20
+> Looking at other users of ref_tracker_dir_init():
+>=20
+> ~/linux$ grep -r ref_tracker_dir_init
+> lib/test_ref_tracker.c:	ref_tracker_dir_init(&ref_dir, 100, "selftest");
+>=20
+> Can only be loaded once, so is unique.
+>
+> drivers/gpu/drm/i915/intel_wakeref.c:	ref_tracker_dir_init(&wf->debug, IN=
+TEL_REFTRACK_DEAD_COUNT, name);
+>=20
+> Looks like it is unique for one GPU, but if you have multiple GPUs
+> they are not unique.
+>=20
 
-Thanks, that will silence a potential compiler warning. This is not
-merged yet, but I'll make sure to incorporate this change in the next
-version.
+We'll need some input from the i915 folks then.
 
-FWIW, I'm planning to put together a v3 that will require less
-involvement with net/ code, so most of these bits will probably get
-deleted anyway.
+> drivers/gpu/drm/i915/intel_runtime_pm.c:	ref_tracker_dir_init(&rpm->debug=
+, INTEL_REFTRACK_DEAD_COUNT, dev_name(rpm->kdev));
+>=20
+> At a guess kdev is unique.
+>=20
 
-Cheers!
+Yeah, looks like it.
+
+> drivers/gpu/drm/display/drm_dp_tunnel.c:	ref_tracker_dir_init(&mgr->ref_t=
+racker, 16, "dptun");
+>=20
+> Probably not unique.
+>=20
+
+Looking more here, perhaps we can incorporate mgr->dev->unique into the
+name? I don't know much about dp drivers. Can multiple mgrs point to
+the same device?
+
+> net/core/net_namespace.c:	ref_tracker_dir_init(&net->refcnt_tracker, 128,=
+ "net refcnt");
+> net/core/net_namespace.c:	ref_tracker_dir_init(&net->notrefcnt_tracker, 1=
+28, "net notrefcnt");
+>=20
+> Not unique across name spaces, but ...
+
+That's easily fixable. net->ns.inum is unique.
+
+>=20
+> So could the tracker core check if the debugfs file already exists,
+> emit a warning if it does, and keep going? I think debugfs_lookup()
+> will tell you if a file already exists, or debugfs_create_file() will
+> return -EEXIST, which is probably safer, no race condition.
+>=20
+
+
+Yeah, that should be possible. I think too that we can eliminate the
+buffer management in this codepath by allowing pr_ostream() to output
+directly to a seq_file. I'll look into that as well.
+
+Thanks for the input!
 --=20
 Jeff Layton <jlayton@kernel.org>
 
