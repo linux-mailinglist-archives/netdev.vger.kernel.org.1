@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-181975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA76EA873C4
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 22:09:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA8DFA873CA
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 22:15:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1B7617138C
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 20:09:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 357AF1890BC8
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 20:15:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E7641F30BE;
-	Sun, 13 Apr 2025 20:09:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0613155CB3;
+	Sun, 13 Apr 2025 20:15:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZcGKUAeh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tMlcgf0U"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A92C78F4C;
-	Sun, 13 Apr 2025 20:09:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51676B67A
+	for <netdev@vger.kernel.org>; Sun, 13 Apr 2025 20:15:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744574963; cv=none; b=AjTRXL/orHFXYqAVoH4voQN1Mc/Sq5KwJv9Yy+XoI8C2y7q6Cfm7w3eYG3au7s0wG+n47Rr56Oa1axr/3o6dw8gAu1Fi9Ce/5JSGt1bTYKxqNP5YQOu1L6epHJiS6/xhkDGE33Q+zMFV9SxAoqNatbRNSMS/2KUiX4Rn83NqSuU=
+	t=1744575334; cv=none; b=B3wPz8XE7N5WzBo1ENVYUsILbtaVHniHQt+yVwK+1pJww3xb75bs5giJtcqvSxdViFpITBNzkmgW6haAHrPCSCQ2cIIYaktstDm59k7MCEq+U/Q717WmrNIwCM7jf15J9QqcrVQs8e/g5PbwhzRgCSfUwhwZEhefbgGUFq0RYiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744574963; c=relaxed/simple;
-	bh=g5Kl44xfliZtc3F8mEZvzsmuva57Nej/HbnbF9B9CTc=;
+	s=arc-20240116; t=1744575334; c=relaxed/simple;
+	bh=YOxHEY+9N5S1oYam1ga0FTyUuN87LZsJ/yDeCS6kEao=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eXooqcVi3So/EP2TZdp22ymz3Jx5VVsweyE4eCMwmAOxuXQI96O8bKxIYQ9gcduNLX6kRTDDENmx1LcXCUSLoK10YZ7ReDwrrGhc31d8V2Cy1EEoZ1C3PIVOpIpjCm4QEAB6oplUixqcFpz4f98tsh+SkUxSG12aS1laF1JOE4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZcGKUAeh; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=moG/HzNHkOWSvaT73V8hPsHUg34RPfNdBbL/v9Gol85lCm0wHmIee0/JNmx8SKVkZfjMsMv9iPkeTZIRNToTP058VWGe4qxy3QiaF7fGf7hztOB1iyXYK3LEUmUQJV4b+vxZLtAhzz9UI68XHPXH9n9KzdEKnFd/IS5mson5xCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tMlcgf0U; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,25 +36,23 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=4+bWvLNfqVXKoM92yRwQ99BQCTFezGqLq0CQ17PjyRk=; b=ZcGKUAeh7QEUUa1hdlTLhnNbV/
-	iwc2eD/oDOI5JIH62/PG9XxJIzQV3QExdX6K+g5ZBNZrdW8JqakiMP/tZ3fWTI8ZRp5gSii7IKKIq
-	gglFdW0PxMfuww6tSpdbHmNFgmoYdq6CJGpkQROcxxo7bOSd0T+BYj47VyfysMOPmh/s=;
+	bh=ga6zr6tC8YyIRXhBXTictPu4Ydf+raIvJ99cGyjOU8U=; b=tMlcgf0UVVqCf4ZM+sQk0MPDeM
+	Jf/wLwpQ3wmERLTBbxo3LxXPaLYJ3wi+31XmHg0uTWiuvZLR4MWUrC8W2GlLqgj+GQ3e7SeihIfVF
+	qYLung55epeUlq2qkUgLpG6ejbWBddTxJA9xZJXWLJYxDUcF7zg3MpTN/gRJDB7hgMJM=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1u43dh-0095hS-QW; Sun, 13 Apr 2025 22:09:13 +0200
-Date: Sun, 13 Apr 2025 22:09:13 +0200
+	id 1u43jf-0095lc-M6; Sun, 13 Apr 2025 22:15:23 +0200
+Date: Sun, 13 Apr 2025 22:15:23 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org, Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH] arm64: dts: qcom: remove max-speed = 1G for RGMII for
- ethernet
-Message-ID: <a21ccb50-1f32-47b4-b37d-d8250a505afb@lunn.ch>
-References: <E1u3bkm-000Epw-QU@rmk-PC.armlinux.org.uk>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Russell King - ARM Linux <linux@armlinux.org.uk>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: phy: remove device_phy_find_device
+Message-ID: <eb481421-cda9-4955-b418-8d98430062c1@lunn.ch>
+References: <ab7b8094-2eea-4e82-a047-fd60117f220b@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,15 +61,12 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1u3bkm-000Epw-QU@rmk-PC.armlinux.org.uk>
+In-Reply-To: <ab7b8094-2eea-4e82-a047-fd60117f220b@gmail.com>
 
-On Sat, Apr 12, 2025 at 03:22:40PM +0100, Russell King (Oracle) wrote:
-> The RGMII interface is designed for speeds up to 1G. Phylink already
-> imposes the design limits for MII interfaces, and additional
-> specification is unnecessary. Therefore, we can remove this property
-> without any effect.
+On Sun, Apr 13, 2025 at 04:09:40PM +0200, Heiner Kallweit wrote:
+> AFAICS this function has never had a user.
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
