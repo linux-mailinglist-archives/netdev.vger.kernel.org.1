@@ -1,79 +1,66 @@
-Return-Path: <netdev+bounces-181989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-181990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 197C9A87405
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 23:22:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F6CDA8740C
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 23:34:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BF7C1708B6
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 21:22:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96D95188F78E
+	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 21:34:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9671A1F2B88;
-	Sun, 13 Apr 2025 21:22:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bEpy1/VU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 118AB481CD;
+	Sun, 13 Apr 2025 21:34:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C781F1931
-	for <netdev@vger.kernel.org>; Sun, 13 Apr 2025 21:22:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 585801EB36
+	for <netdev@vger.kernel.org>; Sun, 13 Apr 2025 21:34:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744579354; cv=none; b=ekRHYKMDvGscMfJTri8J2O8mJaHQsPlXUsG5SnCwR5x7gI/HUN3twYlQ3Mwg97J7EtJR7PpTiguqWPzWmgHPgor//jVlVszCsvJw8mjCjQ2LYb4nOyPc467bcEz/TL7TofbEWFOjNgOQ/mvVDk++VI9rFSk50RBd1b/0Ij07n2U=
+	t=1744580063; cv=none; b=IlYaK1NJWmhBwsNVS/KWq0cuXrq5FPwHgz/pu3i6gfCuMtC4KukkwAyeknKCjNjA3GJEtzK1Mcq1WX6C4058DJ5Wt182/wy9sdxl8ZrZt0t2dSpaGv+5Wcn+Q3tQkByYjGIG+lXplvJAyYu7KFbf2JfQ7XTPB9zjCeCfV22yHqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744579354; c=relaxed/simple;
-	bh=ogCdg/PCG+hWRlJihkja8r4kjguAaXNKxU8l3aoGDOA=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=JaWSolrt29aDPOw13ytT9ob9XnEWjUp3fUo8JsGSw3dFzYVQFj3DBSJIgAYA8K4PcH1+ax+EMC3Kt9YvOWdEInYiv7opw749G4gsQfWWhxWzcUiGOuaZPMVSLeeaOuABzST2M0n8jrMj9OaiJvDcjElcSzMGQiIlmPKxPLKsYe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bEpy1/VU; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1744580063; c=relaxed/simple;
+	bh=KazbEz929nwZrvt12XlQujXV8p8r6I7jJkJfIKGgT3M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TGH0BH1lMPIItPvabYGVmAzVv4b21V/zNyE8KVBpRfBTIH317t26ktS/mxi/KNgufUwgdSNZjm7KQsT9URlnLRxz6nuHbI1cCEZHOT3O9pOgD6QCGsldGozqwV0LAYLRFGpslh2n8FtYWXaO2pklFkjMO7tuw2yhvzsdgrWH4E4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-abbb12bea54so733086966b.0
-        for <netdev@vger.kernel.org>; Sun, 13 Apr 2025 14:22:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744579351; x=1745184151; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:autocrypt:subject:from
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=I5kYb1c8wtLaA7P8jZfnvl4y6hb4mGCoF9SlUTQ4pa8=;
-        b=bEpy1/VUqUJosm+Cnz9wjwjtr5C6oDvAtIm7CsIoQdUdhR5jT8CrILY49edZelIL7e
-         A8Hm8hahBG0BDoH6esgq61X12olV7GZpalj4cfTigtht9P9QZL4JBNkYdGsSWGsfA5Ae
-         1Q2ZXkL5LdyiW6Z6E3E32Ll9ZF621hqt79/5iFBilo/C50yPdw5Mr9hoyBCuDcztvRdB
-         oMwGhT8pvZ8LUuPr791AkrVkCg6KFgty4Ttfb3ZYQQv6MepklTepumjNKmvuvA3s/TXr
-         niQItRJ49CyJJjJ1RBZ7UmRpsu7Bs0oLSqYQtAbB7rPgfCinXgjlGaNjqBndFbE890ql
-         okNA==
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ac28e66c0e1so572432266b.0
+        for <netdev@vger.kernel.org>; Sun, 13 Apr 2025 14:34:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744579351; x=1745184151;
-        h=content-transfer-encoding:cc:to:autocrypt:subject:from
-         :content-language:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1744580059; x=1745184859;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I5kYb1c8wtLaA7P8jZfnvl4y6hb4mGCoF9SlUTQ4pa8=;
-        b=peR/oVc0HFUv0GBMnIx1UdYMkU/L1bIw+z4CBQqw27WXZYDpIEm4tsA8hgqCgswa5/
-         nQtAZCHQgVQv4tDMhZI/BNwKsyr3ZnsZkPPCyUGn4ixu5FUaWCR/NsiDxVpw12G0YD7T
-         ltQ7N9dQuUV3JBO3j4D4Uw+5Y25ZVfkJ7y2trfBh1RdGgGhW6gE3/dnwpAI4vI5/+4ta
-         /pp+VwHCT82+HZ8Vy7qKpwCN3bdDTILXoWXvdZy0i6LGrJ9Kmjr9LuSWcZw0xAVjEP5B
-         HvkfoXOfIaiAE5LLkLDQlsseheKdylO5WPB7zehyZ22QLfqA8EXgxK1mAvaiUxqzbGbV
-         3ovg==
-X-Gm-Message-State: AOJu0Yxb1QiQ7gbwAzhG5miqmiuipOiiqVtH7wXOUSNDjFXjhQVj5I5C
-	BQPprKc33/PKVaeYlcuWpvsyXpq4XfWf4n5FsK+1g/BJMMbzzZFY
-X-Gm-Gg: ASbGncutO+4HgEw2muVIFzuidMHQnftjfeBTzu9KtpwkCVmKnMvk3lQzs5Ae1mzA/GR
-	swn+T7e2eWgDE1NggEMKEadwRjR5dERvHRW8V5Nv2yiiBog1/witoKQqdnLRZDL+oDSDAQyN8ya
-	rdRDa2r+mKI3u2aYNzWkHPOFb07EGeq4IwrloTt/oBUnpE7Yx3kofJtJ1M+TRpzT7rbpXyunzGX
-	Z67+MbrLykRlCE2mBtTeTX+hr/2CKA9l9+hDqfvJaWML3IQL6TcmObet3bwoxJeD3TIqcRn2jcF
-	KLcfjkTtGe3gq1NhVyAJJWaG8iI10ZIApuuw34KVNlZ1XsuI3aupUxXoB9hmxmtgfhPIBTKhpXr
-	6Oy86AF+xmJGsyrxJjCSVGYeDjAs04sLlEQwtOn1TdXobUYROqJp7N/op4SqVkAa6AU2w086Dmp
-	O3PdIVHiRJ6S8ICChl7RlMJKYqBjNsrA==
-X-Google-Smtp-Source: AGHT+IH7mrNJuE32mjK2TEepcmWPqMyqTtSxmpw7rQHhtagRfF1tpd0nbmUsZmZbhPgTnMN4J6ch+Q==
-X-Received: by 2002:a17:907:76b7:b0:aca:e338:9959 with SMTP id a640c23a62f3a-acae3389abamr445954366b.61.1744579350746;
-        Sun, 13 Apr 2025 14:22:30 -0700 (PDT)
-Received: from ?IPV6:2a02:3100:af2b:bc00:419e:9df:ec7f:c3f4? (dynamic-2a02-3100-af2b-bc00-419e-09df-ec7f-c3f4.310.pool.telefonica.de. [2a02:3100:af2b:bc00:419e:9df:ec7f:c3f4])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-acaa1bb2e15sm807361666b.17.2025.04.13.14.22.29
+        bh=oY9DAo74r4exJprf7TJtFDjlUJmPXgaf3ueWxOaOJyw=;
+        b=oz4r0xYJfBLQLmso3lHsTiaKppAwSe18m0gxOJMHXkJTSie179sIeR2+n3yVTdekNi
+         RRy9NYDq4n89UDZF8HQXy+qurA5TM4qvIQWUS1NwA4Z2v8yp9XkhvnMNBNtxiYYTvDfK
+         Gjiz/yrZnwBxbjJVYqBJB4v3NT5lGzMLqPdTrLtcJycXMnYYDYR63A2vvmXqjD7Uc09z
+         w/Mg85sznshZDDQ3MLsPFgy/H4Vk4RN/shjjmDae4+ds2d/I/O+Cu9z5UDGHeZlWyXjq
+         Rj9Oeax6Xeu99vGLlV2q9u8/O++mGx7zUR66ztLlS78McfHDsSBpErJ9YYLBP3FAHrD5
+         mQdg==
+X-Forwarded-Encrypted: i=1; AJvYcCU7p7B2heFOWlfknFke9eT23v9wnHmRtG1Oqp5BDo+ZreekMRZX20HE6DnLBH27E8qzCXktVO0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUb852S4j6Uzcb2zLTnKoa9PBc66H6jfUXyJ0htxAof++32UrJ
+	0WmTN8dOWXL/PSZzxvB24FobcF7Gax7B020ZcdKII6bJIzwxZ9PSnHTe3g==
+X-Gm-Gg: ASbGnctlh67IDmwtga7gom9hVus12t6n0hRbkP8g/JwUwqLKf78fpFUq6sWzHl4vpK1
+	qitCynVcHxgH32K2DTuvCl/wQM8pOiS2xI52qbk4TWwB4BWT9AsLVcoLwXhX5pw0lQtGQWah08g
+	b8DZriYZ+FBsWoa7m1rcOaADKYTnCTWVz3YSHnYEfkZIf4RGq17hqFeagwtSWXaXLWl4cXN5kU0
+	+rmhLdGGFY3DpXA3YA32dYL9pa7FLyUz2sv5eLrGmkT6Uv+n39UGmJQFecURly5s7Es9/fGLdoD
+	/yye5BnYF9A73MgyBBzOotG+ebIcJUydTToclDXa0g/WOhOegH7KokLXlMVEl1GV+A+qfdkIcpO
+	qv9MpmQI=
+X-Google-Smtp-Source: AGHT+IG0t3nAXqCqb3B24ba6YdgSLbeS24vuu3x39YaNdujNcVKuWQholBtQa6Nc6IHsIuQ3PMT8rQ==
+X-Received: by 2002:a17:906:6a0f:b0:ac3:48e4:f8bb with SMTP id a640c23a62f3a-acad36a08dbmr904460266b.41.1744580059293;
+        Sun, 13 Apr 2025 14:34:19 -0700 (PDT)
+Received: from [10.10.9.121] (u-1j-178-175-199.4bone.mynet.it. [178.175.199.47])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acaa1ccc2d0sm797099966b.137.2025.04.13.14.34.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 13 Apr 2025 14:22:30 -0700 (PDT)
-Message-ID: <085892cd-aa11-4c22-bf8a-574a5c6dcd7c@gmail.com>
-Date: Sun, 13 Apr 2025 23:23:25 +0200
+        Sun, 13 Apr 2025 14:34:18 -0700 (PDT)
+Message-ID: <e747a278-7cc9-433f-b093-56487c629d3a@grimberg.me>
+Date: Mon, 14 Apr 2025 00:34:17 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,92 +68,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v27 15/20] net/mlx5e: NVMEoTCP, use KLM UMRs for buffer
+ registration
+To: Aurelien Aptel <aaptel@nvidia.com>, Christoph Hellwig <hch@lst.de>
+Cc: Simon Horman <horms@kernel.org>, kuba@kernel.org,
+ linux-nvme@lists.infradead.org, netdev@vger.kernel.org, kbusch@kernel.org,
+ axboe@fb.com, chaitanyak@nvidia.com, davem@davemloft.net,
+ aurelien.aptel@gmail.com, smalin@nvidia.com, malin1024@gmail.com,
+ ogerlitz@nvidia.com, yorayz@nvidia.com, borisp@nvidia.com,
+ galshalom@nvidia.com, mgurtovoy@nvidia.com, tariqt@nvidia.com
+References: <20250303095304.1534-1-aaptel@nvidia.com>
+ <20250303095304.1534-16-aaptel@nvidia.com>
+ <20250304174510.GI3666230@kernel.org> <253jz8cyqst.fsf@nvidia.com>
+ <20250403044320.GA22803@lst.de> <253cydizv99.fsf@nvidia.com>
 Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] net: phy: remove redundant dependency on NETDEVICES
- for PHYLINK and PHYLIB
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-To: Andrew Lunn <andrew@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <253cydizv99.fsf@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-drivers/net/phy/Kconfig is included from drivers/net/Kconfig in an
-"if NETDEVICES" section. Therefore we don't have to duplicate the
-dependency here. And if e.g. PHYLINK is selected somewhere, then the
-dependency is ignored anyway (see note in Kconfig help).
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/phy/Kconfig | 2 --
- 1 file changed, 2 deletions(-)
 
-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index d29f9f7fd..0b8cc325e 100644
---- a/drivers/net/phy/Kconfig
-+++ b/drivers/net/phy/Kconfig
-@@ -5,7 +5,6 @@
- 
- config PHYLINK
- 	tristate
--	depends on NETDEVICES
- 	select PHYLIB
- 	select SWPHY
- 	help
-@@ -15,7 +14,6 @@ config PHYLINK
- 
- menuconfig PHYLIB
- 	tristate "PHY Device support and infrastructure"
--	depends on NETDEVICES
- 	select MDIO_DEVICE
- 	select MDIO_DEVRES
- 	help
--- 
-2.49.0
+On 11/04/2025 16:24, Aurelien Aptel wrote:
+> Christoph Hellwig <hch@lst.de> writes:
+>> Btw, just as a reminder nvme code has to go through the nvme tree, and
+>> there is absolutely no consesnsus on this feature yet.
+> Sagi, could you give your input on this?
 
+As mentioned before, my personal opinion is in favor of getting this 
+upstream. 6 years into nvme-tcp,
+some people (which are allergic to rdma) are asking for less CPU 
+utilization. This would be an optional
+compromise to these users. I've expressed concerns that this offload has 
+been poorly designed because
+it does not interoperate with TLS (offload nor SW). This is somewhat of 
+a turn off. I will say that having this
+work with TLS offload would make it a more appealing feature than what 
+it is right now.
+
+I think that the hesitance is understandable given the history of 
+storage offload engines which never really
+justified their own existence.
+
+As mentioned before, I acked the series, as I think that this could 
+benefit users, despite adding foreign single-vendor
+offload code to the driver (granted, not a niche vendor).
 
