@@ -1,117 +1,118 @@
-Return-Path: <netdev+bounces-182376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23313A88980
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 19:14:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06DD0A8898E
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 19:16:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2661172EDE
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 17:14:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9BBA3A63F4
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 17:16:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95827274668;
-	Mon, 14 Apr 2025 17:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J/8TYjC1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F090289359;
+	Mon, 14 Apr 2025 17:16:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70F4F270EA4
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 17:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 658D52820BB
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 17:16:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744650838; cv=none; b=XuLQ/Fl2fI+xR2H/Gxf37KWVYFq8cixfrckHoD8IAboLG55ko7OGIzrhNH1/iRv0w5XAKacqdEGYVVR5vd4c+6KmRkriM7tGsFLJXfKvEN29B6h8cttU3qY9ApHhvG7CW2XbtFaPCUp0qSlo+vA5+mgO5lrEJ5kE0RMa8Fb5RKk=
+	t=1744650990; cv=none; b=sm9tkmHegENZaFxELLpgDTOioStNKsO117j8iHJYfdOOyJJWBtHnoWt66QBCZLvdlAwfJXw/qGOSJtdrVl8R7zpBUHhnAd91FHLvf+2Bk4arJ8kW7MhkK7Qubz7qIQZm4LykwuzJnSl8NdqDpSXq2FjBEiCE96ndUzV2QhHd4Ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744650838; c=relaxed/simple;
-	bh=zyUpIVX0QCk3pxGqIW6VEAq8dDFWNrb9QmuSzx7bpo0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DmZK9De5TGyk3DaoWbKF6gzJDJ6K6K6VTFyr4mJJEJrhUOoSMWF+/CgUIirTGCAFGOI5xpVR6vmG+2usBUf4zZ8PfZjvp5MR7zN7WBN3mIrWCJijLQtogHtv5LkHVqSWi99aeVuM9uS0UR+aIbH/skB9pZccpSnbADP0f+5uD8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J/8TYjC1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCF17C4CEE2;
-	Mon, 14 Apr 2025 17:13:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744650837;
-	bh=zyUpIVX0QCk3pxGqIW6VEAq8dDFWNrb9QmuSzx7bpo0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=J/8TYjC10L6yq2MmNG0Ktbb3noYudyNAjr1dhnjVPTpvhovP8yIXMHPG/LDMxa8tB
-	 RN/S+IIIsRxo0E8YOpQX2V9zXUCgt3rQx8AAMw266AN7JAQnqiqec8KR1/naiwmbUf
-	 MXEA0WeGsCYYN69zGa9IVaWdPLnBF8JYmF//zZUq3S5LHFQhoms6qOVBCp9P30Pfbq
-	 R1mcH7+unkifz/IhIGLC3JQi2GDiMRfo3jyvc53a/95+20sObP3Ijy6+vT9xuzrl4l
-	 JPxjZL6uXrTHjPoDSCNKGrjR5MTYf0JqAxxkWqnZnrc3w5mQqSz7yyy6OdGaSIHpjI
-	 qKJpVYVmKsZzA==
-Date: Mon, 14 Apr 2025 10:13:56 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org
-Subject: Re: [Question] Any config needed for packetdrill testing?
-Message-ID: <20250414101348.497aa783@kicinski-fedora-PF5CM1Y0>
-In-Reply-To: <Z_0FA77jteipe4l-@fedora>
-References: <Z_0FA77jteipe4l-@fedora>
+	s=arc-20240116; t=1744650990; c=relaxed/simple;
+	bh=OJcs/XVthOpv6Q27QIk83Dxn+e3WU8k80K16H2ugiB8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=N6jk5jsR9zHA2As17MVXUrTdTz63Sw8i/63enK1GCG1jEcoGr9fEYzD/IpiDs5yUaTx1N7JPPE3MsIS6FqWYbCh0RQY03rZQ9nRXG+GVkctDeumEtb5Uog8vtSF8LsC6vV0cJBfIR2+IQ2UOUW2tkfYskWQMLLABrHQnR+SGCo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.43] (g43.guest.molgen.mpg.de [141.14.220.43])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id D72EF61E647A7;
+	Mon, 14 Apr 2025 19:15:51 +0200 (CEST)
+Message-ID: <559a9953-cd51-42ce-b2a5-83bd185cf008@molgen.mpg.de>
+Date: Mon, 14 Apr 2025 19:15:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] Increased memory usage on NUMA nodes with ICE
+ driver after upgrade to 6.13.y (regression in commit 492a044508ad)
+To: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemyslaw Kitszel <przemyslaw.kitszel@intel.com>
+Cc: jdamato@fastly.com, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, Igor Raits <igor@gooddata.com>,
+ Daniel Secik <daniel.secik@gooddata.com>,
+ Zdenek Pesek <zdenek.pesek@gooddata.com>, regressions@lists.linux.dev
+References: <CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, 14 Apr 2025 12:52:19 +0000 Hangbin Liu wrote:
-> Hi Willem,
-> 
-> I tried to run packetdrill in selftest, but doesn't work. e.g.
-> 
-> # rpm -q packetdrill
-> packetdrill-2.0~20220927gitc556afb-10.fc41.x86_64
-> # make mrproper
-> # vng --build \
->             --config tools/testing/selftests/net/packetdrill/config \
->             --config kernel/configs/debug.config
-> # vng -v --run . --user root --cpus 4 -- \
->             make -C tools/testing/selftests TARGETS=net/packetdrill run_tests
-> make: Entering directory '/home/net/tools/testing/selftests'
-> make[1]: Nothing to be done for 'all'.
-> TAP version 13                                                                                                                  1..66
-> # timeout set to 45
-> # selftests: net/packetdrill: tcp_blocking_blocking-accept.pkt
-> # TAP version 13
-> # 1..2
-> #
-> not ok 1 selftests: net/packetdrill: tcp_blocking_blocking-accept.pkt # TIMEOUT 45 seconds
-> # timeout set to 45
-> # selftests: net/packetdrill: tcp_blocking_blocking-connect.pkt
-> # TAP version 13
-> # 1..2
-> # tcp_blocking_blocking-connect.pkt:13: error handling packet: live packet field ipv4_total_length: expected: 40 (0x28) vs actua
-> l: 60 (0x3c)
-> # script packet:  0.234272 . 1:1(0) ack 1
-> # actual packet:  1.136447 S 0:0(0) win 65535 <mss 1460,sackOK,TS val 3684156121 ecr 0,nop,wscale 8>
-> # not ok 1 ipv4
-> # ok 2 ipv6
-> # # Totals: pass:1 fail:1 xfail:0 xpass:0 skip:0 error:0
-> not ok 2 selftests: net/packetdrill: tcp_blocking_blocking-connect.pkt # exit=1
-> 
-> All the test failed. Even I use ksft_runner.sh it also failed.
-> 
-> # ./ksft_runner.sh tcp_inq_client.pkt
-> TAP version 13
-> 1..2
-> tcp_inq_client.pkt:17: error handling packet: live packet field ipv4_total_length: expected: 52 (0x34) vs actual: 60 (0x3c)
-> script packet:  0.013980 . 1:1(0) ack 1 <nop,nop,TS val 200 ecr 700>
-> actual packet:  1.056058 S 0:0(0) win 65535 <mss 1460,sackOK,TS val 1154 ecr 0,nop,wscale 8>
-> not ok 1 ipv4
-> ok 2 ipv6
-> # Totals: pass:1 fail:1 xfail:0 xpass:0 skip:0 error:0
-> # echo $?
-> 1
-> 
-> Is there any special config needed for packetdrill testing?
+#regzbot ^introduced: 492a044508ad13a490a24c66f311339bf891cb5f
 
-FWIW we don't do anything special for packetdrill in NIPA.
-Here is the config and the build logs:
-
-https://netdev-3.bots.linux.dev/vmksft-packetdrill/results/75222/config
-https://netdev-3.bots.linux.dev/vmksft-packetdrill/results/77484/build/
+Am 14.04.25 um 18:29 schrieb Jaroslav Pulchart:
+> Hello,
+> 
+> While investigating increased memory usage after upgrading our
+> host/hypervisor servers from Linux kernel 6.12.y to 6.13.y, I observed
+> a regression in available memory per NUMA node. Our servers allocate
+> 60GB of each NUMA node’s 64GB of RAM to HugePages for VMs, leaving 4GB
+> for the host OS.
+> 
+> After the upgrade, we noticed approximately 500MB less free RAM on
+> NUMA nodes 0 and 2 compared to 6.12.y, even with no VMs running (just
+> the host OS after reboot). These nodes host Intel 810-XXV NICs. Here's
+> a snapshot of the NUMA stats on vanilla 6.13.y:
+> 
+>       NUMA nodes:  0     1     2     3     4     5     6     7     8     9    10    11    12    13    14    15
+>       HPFreeGiB:   60    60    60    60    60    60    60    60    60    60   60    60    60    60    60    60
+>       MemTotal:    64989 65470 65470 65470 65470 65470 65470 65453 65470 65470 65470 65470 65470 65470 65470 65462
+>       MemFree:     2793  3559  3150  3438  3616  3722  3520  3547  3547  3536  3506  3452  3440  3489  3607  3729
+> 
+> We traced the issue to commit 492a044508ad13a490a24c66f311339bf891cb5f
+> "ice: Add support for persistent NAPI config".
+> 
+> We limit the number of channels on the NICs to match local NUMA cores
+> or less if unused interface (from ridiculous 96 default), for example:
+>     ethtool -L em1 combined 6       # active port; from 96
+>     ethtool -L p3p2 combined 2      # unused port; from 96
+> 
+> This typically aligns memory use with local CPUs and keeps NUMA-local
+> memory usage within expected limits. However, starting with kernel
+> 6.13.y and this commit, the high memory usage by the ICE driver
+> persists regardless of reduced channel configuration.
+> 
+> Reverting the commit restores expected memory availability on nodes 0
+> and 2. Below are stats from 6.13.y with the commit reverted:
+>      NUMA nodes:  0     1     2     3     4     5     6     7     8     9    10    11    12    13    14    15
+>      HPFreeGiB:   60    60    60    60    60    60    60    60    60    60   60    60    60    60    60    60
+>      MemTotal:    64989 65470 65470 65470 65470 65470 65470 65453 65470 65470 65470 65470 65470 65470 65470 65462
+>      MemFree:     3208  3765  3668  3507  3811  3727  3812  3546  3676  3596 ...
+> 
+> This brings nodes 0 and 2 back to ~3.5GB free RAM, similar to kernel
+> 6.12.y, and avoids swap pressure and memory exhaustion when running
+> services and VMs.
+> 
+> I also do not see any practical benefit in persisting the channel
+> memory allocation. After a fresh server reboot, channels are not
+> explicitly configured, and the system will not automatically resize
+> them back to a higher count unless manually set again. Therefore,
+> retaining the previous memory footprint appears unnecessary and
+> potentially harmful in memory-constrained environments
+> 
+> Best regards,
+> Jaroslav Pulchart
 
