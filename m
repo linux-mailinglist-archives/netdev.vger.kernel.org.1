@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-182039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E6DDA877A9
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 08:02:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 007C8A877A8
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 08:02:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 657A87A74D6
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 06:00:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F3CA7A3150
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 06:00:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ACD41AD41F;
-	Mon, 14 Apr 2025 06:01:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A79861AB6D4;
+	Mon, 14 Apr 2025 06:01:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nmp04mx0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h3N7LvDU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1D91A2564;
-	Mon, 14 Apr 2025 06:01:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02EE71A23B1;
+	Mon, 14 Apr 2025 06:01:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744610487; cv=none; b=XIcI+ORQb18KYy5k9ACM3tje/5a8y1bm44HqQxrUyIe6y15b5alNrod6xH9mq8yk3Igl3KtmnUx1f4/1GvLHdpXOQAHgBKW8fKgZw18B7zf9nFL9LjtlbQEsewn5bATRLfoIcq7DMCg9fwb/30DgC4zLV7M4X4HfJ5V9vkNvods=
+	t=1744610486; cv=none; b=qYIVp/BMDPz5ISY1yBfZllPA5XG1b/v2VDOD9asUCjCTeLqUFyC0EkIHFuEUZ4I6oNYF1YfSGtljwg4AgYQFbf6058s77EZAJAF3N7JcEDo1tM1tI0hx/b5K3gPwsgq6r8s4sGMIYHQ2InFc+p6+KSjIVZ9nLK6aPI0EX5lmWlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744610487; c=relaxed/simple;
-	bh=0a0sKTLnZCu8ERlafxFR8eDC2liFbwaV8kBs40QJ5AE=;
+	s=arc-20240116; t=1744610486; c=relaxed/simple;
+	bh=46AnLWGOvwy4R4xqUGhMY1GRT3BPqIPloV90uxpkFIs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uspe4jhIueAtxjiFvEWbnqcx9D0e/91E17qF+nG3ENm0AjzzdARzYVLODHZDg+JUqcZN76ItoUunBxkapS8KM+JcRAHFM5bhC/89XCKEVW4t6klW5CioEYj2THWEXZGdWfsVa0MSQvN2HssbVOF/VRgyzWpOqm2lCCo7hxPtFQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nmp04mx0; arc=none smtp.client-ip=209.85.219.45
+	 MIME-Version; b=cHc+lcRSFdXLNOf0p85oesQsm4d3TjzHb8i0F/RryLCzc5ssYsfZQQ/vCZPBRm8jiP+3LJ6/4c4uOjkL312HYzHgHUa+Lw87y/yOnoG/Sp9dAXh4oD3I2dMz+NAnGauHzp0JzzlqW2tcEZXxIiIuUWhmaIKU0gWWLhONQQnZqDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h3N7LvDU; arc=none smtp.client-ip=209.85.219.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6e904f53151so35091236d6.3;
-        Sun, 13 Apr 2025 23:01:25 -0700 (PDT)
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6f0ad744811so23548276d6.1;
+        Sun, 13 Apr 2025 23:01:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1744610484; x=1745215284; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:feedback-id:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=crSoWmS+wlxuDSJzcFBATB5TfRUeFAx3Edno5+zB6/o=;
-        b=nmp04mx06rTQiN+A7tKaCjhvmrSokinyu3LHHlvmc7529SNIMw+HSTISh/Pt8D2htI
-         Pd/DGiM7r8Cu6GZwSmKCe1rCDVr9ZWytGG3r30Yo79rE4rRcqFYdrABBLQsgs6c5hmw+
-         Up09p1GpYbptUnGdSE7sMcuNXhRBBF0TVAhwOH/h2dYWATXTubRGvcHlt6enmCOjCBEO
-         SnBuCwHD02aDOIFVj7DJvLFrhjKQk2oYap62rEtHgJQeK+em8SdqHR5y0iMPeqvkZCe8
-         YIUTWVhsdUk4CabGHjGOHqN6drx1SZPsZXh7QhNYUMDKOXuYqkxcnPF4gv6gWajkH2Q3
-         WEpg==
+        bh=hLSzZQgiNEWo3FbcTs2LNPwbUJUrF+q+NANxOYOv6MA=;
+        b=h3N7LvDUFY+dJ4T3xJbkR8Pl7u5+JA1j8ZhaixW/mvcbe42qwhqvsuFHXpB6Kr6ztG
+         vNuJXjZAlaAT1mVl5444W1qMAn5K8NJV941UH7fvsg79wc1DkTygEooRER9bWMu3jKrq
+         U9yG2Uz5F3vYjeC29kpcXbiE3K95zMQZVf3B4uUVVWxI3N2//oYU4BTH6HDoctAE6CWa
+         H8mp1me3vW0gcP/aGvDvHOSlQIpulkluNkroNyGAvSkl39yuyl843Y8PvkRxEMehEbKp
+         DFYGCpE/rhw0xKasPmaD0l41rYbKY/Ne/vmn8+KQj/wjfLImhaeOlaFErd2vS6R3MWNJ
+         bpQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1744610484; x=1745215284;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:feedback-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=crSoWmS+wlxuDSJzcFBATB5TfRUeFAx3Edno5+zB6/o=;
-        b=HnczNQaP8YCIOAbhhoeB72YvrCXmvjj9PDRtI/Ag7eWmDYZvBE8YGTkMGk98H6rJzV
-         7fY954NimpIblCmL4cg/G4btKFonf9ruhbDDafc7u+bqVxZGX365zp8g7dsk8dnjD++n
-         qbOTrHEWUMV7wjG40eOwlDne1IAyR133JY0YVlxx6QlfHKu3qT8QiamjRjkT2T75x9cn
-         4i8PWk2TMnKkqFHttLYRWTTmW5x20R06gEdOlNsfJZoJBZplRyitjCjjl/PYunR0DdfA
-         ZiTIk3mEh7HfW5hxX35iQ4eXqsLe4D42PaAgZ4JMzoVcHRAcxGWkK8Egp23EQE54FpMu
-         HFZw==
-X-Forwarded-Encrypted: i=1; AJvYcCUHJafggFpaEU2CfStkxVO1hOj7ErcE1amZ+jSG0xCOoiZ97J9N+IrtRBH/uKhzBCcdHVXCLWgZ8HFCZFY=@vger.kernel.org, AJvYcCWnXBGzej159CUMBpvjZOjwst/Ehh+xv5MwiS/d1TzGQfFDnKTqIyb5lhij7yth/geuB97Qagdz@vger.kernel.org, AJvYcCXmTc7Z0qBrP6gHKp42e8PBFfXnGJTv4aUjDGAH8eMbRltth7mHwRYLI+7qwRx9HbcOolnH@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9oPbEGZ8Q8QT3FvzxV2/LCnB+4WdaJOcExTf1ywszMNgiI0hK
-	fEDggQMZGVbJPaYV2cMjQryf+RE9TpeWXeqZUsa6eE1b0I//1EXUMyEFLg==
-X-Gm-Gg: ASbGnctIPRSteLY16pJmd08h2FZCWKlMvlcv3jMHgMadwFT9sMwPcapwp9BR76BhQ5k
-	4ikvyCA37r8dT4CE5U+kzEIqrEYIlPDAAxKR7J086UiXv2L0/X89ZPPserLtsGMsfyj7x6WFujJ
-	7azTddogBDqhYjwbQG/t/p9h/pnCOxVtHbrpTRwvs9NiYP7nq/GLY3Vu2a9yQb0127zrGeXC5Iq
-	A64rd4Zs/a2PtqeGvibRDfEj/3nYVV5E9aiqaskGpJSe/cttrNIfJVAkvxCXJR8qJ9JEeIGSyyD
-	LgjNTVApSjVNsC1it4z194F31HFajGZUridcRqFQxgw5cWifJz/yz9cvEBhsDBK9hPdmy4cnFn8
-	GlaeyBqsUp5K6w696oxNWscYJ9vptFDo=
-X-Google-Smtp-Source: AGHT+IGUm83pSj0m13ld8odbNA7X/XFuelxmJULW6GNlofNBV4oRp5k19QpyqoObZltGPO3/o2xurA==
-X-Received: by 2002:a05:6214:5089:b0:6e8:86d3:be78 with SMTP id 6a1803df08f44-6f23f14665dmr155990676d6.37.1744610484032;
-        Sun, 13 Apr 2025 23:01:24 -0700 (PDT)
+        bh=hLSzZQgiNEWo3FbcTs2LNPwbUJUrF+q+NANxOYOv6MA=;
+        b=aQa1Gdc+BzQ00COmLrS9CB/0mhua3Zh2y25s88tEwn51377+RkXsPQoQgSSdy6RrPE
+         q7Qe+XSW0iD4rzN+maX1X2eeWcR/m+Q1/jh4mFd7ACDTAyzWKIAS3Zd4u/OIYMiSOgCS
+         3bV+n7L+msNf2Ozol4enfWHs8hPAZoukhdy30FLLBx9F7OLPN4c6ObP4H8ekzit+++hw
+         NM8zBWa1dru+hbZH+eXsvBt5YEn9B99M5Ux/iTkcuoZoEwA7mzFkbjYBL+El5T1eS3xb
+         hQduXqCy+k1eS2sXBUIdQUlPXRGDOaOHLhBpp+GGKgTWhYm3kmmWpLJSjYMobq5kWDYE
+         s55g==
+X-Forwarded-Encrypted: i=1; AJvYcCVHhYV7TkBpXFzSLShOYXkdv6IBYXu32EMqxpvQaYm3mzP6Vg8f3fb7p2FwJ/l2dbTu4qqm@vger.kernel.org, AJvYcCWTMpaXjMWd2uIyOZi8UtqYfevs7TtspuDi2KoKHHbe6cjkdNtPHJQ10F16Yj+78NZFA96MPO6v@vger.kernel.org, AJvYcCXNjFLS2i7r96QbaB6+KEUYftYcCEU8LeMwegIoD28nRDJzUsNBjXvc305h92JnsK0wmJL8hLkM4ZvJ1YA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweWRUs8Ie4xywaYcxmoPZr0/Vk5s1tNnRnIp1rK747TIcHuJRq
+	WvTM5FkDMl1IS7EF0thkjsCRwaUW5LB65SOrriiW/PDOQ0Z8T2tv
+X-Gm-Gg: ASbGncsNhld3BGThyACVXB+Kbt2z+N59oRRE4d3O+MfqxjnVmPTmLXtNvXAUChJ6vgN
+	nyB3TpgUZWNUZ4t8sA+3Njx+x+kvXPsi7/CgdVd4ojJkxMIm0sIGTkDc0XYguNJaiYBcTTxJ0ts
+	4ZEHnnEeW8Hb7+iU8ayAEpco2QIVyVvS4haZjyVUvtDnMNjZbGP6cl+QFWpjyz3IewnLyea8Myd
+	3Vp8RzrMO4VECr6hLXh4X8eRbE1XNhUlXEIn3HGuhpU2GW8kbvHRRSu3vM5IXIj0AeV9fT4rRwP
+	5GR4GkOq8IHwPt6SYL3Is/VfqY7b+RmWUaFALPAKj+IO6cBqDsZ5drf7+l/bfiwJiyuJkpZf+DE
+	6k4bkZQvJnhLG2RfyiWZgzd05rSbpdH1p97M/14XtHw==
+X-Google-Smtp-Source: AGHT+IHxjTo84xD1QJtcQfo6b2PbGTrIcy6W1myY8lywI+/f1fLgFOTQuFvktp2h5zmiI7EZ4JRoJQ==
+X-Received: by 2002:a05:6214:d83:b0:6e8:f3af:ed44 with SMTP id 6a1803df08f44-6f230ccfa37mr147657136d6.12.1744610483624;
+        Sun, 13 Apr 2025 23:01:23 -0700 (PDT)
 Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c7a896b01fsm684471485a.65.2025.04.13.23.01.22
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f0de95f7bdsm79022596d6.23.2025.04.13.23.01.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Sun, 13 Apr 2025 23:01:23 -0700 (PDT)
-Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 046FB1200043;
-	Mon, 14 Apr 2025 02:01:21 -0400 (EDT)
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 720101200068;
+	Mon, 14 Apr 2025 02:01:22 -0400 (EDT)
 Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-04.internal (MEProxy); Mon, 14 Apr 2025 02:01:21 -0400
-X-ME-Sender: <xms:sKT8Z3LDG-V5pgBpp_hsSnR1QGv7H0ghkpeoumbrx4RfZuoRKCok8w>
-    <xme:sKT8Z7K_eM9iVru8ON8mxKkMhPdv5BUQXiFp1H67jnWVgFRhH1ZPmrgMpt452EAvi
-    XPmax52gORb7T84Jg>
-X-ME-Received: <xmr:sKT8Z_viG96-padrAA5dQtUhsiweo2XA4m6Bn4NjulEI_Hkn3NgxqFEB5MFDdg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvudeljeejucetufdoteggodetrf
+  by phl-compute-06.internal (MEProxy); Mon, 14 Apr 2025 02:01:22 -0400
+X-ME-Sender: <xms:sqT8Z_L-NwRg-ypOtx_fTrFiQJdzqCPawPvGCST2k5YBYZ0V7T0afw>
+    <xme:sqT8ZzIV80Wf9EwWntzOU4bL2BpeBGW6A2AEhPYtFDVQBnNUJMKv_4_AM9kDFhUIA
+    VVdP-BOP11RwBXjsA>
+X-ME-Received: <xmr:sqT8Z3tKAwvnXFwtrYmr9BryLQb4_p8SvXzpf9RtSdFdXLNftZtAha0yQHA8Jg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvudeljeekucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
     pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
     gvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgjfhgggfestdekredtredt
@@ -100,14 +100,14 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvudeljeejucetufdote
     gvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhg
     vghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglh
     gvrdgtohhm
-X-ME-Proxy: <xmx:sKT8ZwaTFM5qlJUFs7ayw_CML6aVpx-s9NAtlk5rjRPZGNDYnDfwxA>
-    <xmx:sKT8Z-bBpTSqR8rXMkSlX3D_7vo1-mUzt_pZQmjS5x6mOf6GFjAKSw>
-    <xmx:sKT8Z0DPtgs0RXekk6ZYkHUmP8xUTVkuWLE6ZRT-lLTsgc2c4j5Neg>
-    <xmx:sKT8Z8ZPpzySOFYjFUZy2KchFY0Fv4umag2Iwa5SuQs6wcgABwt5pQ>
-    <xmx:sKT8ZyqoIWyuk3coXidMDHKlHA-kztWIRZ8qhDSS7AFkpYx11K38dXEh>
+X-ME-Proxy: <xmx:sqT8Z4akmD0ZFBcTma9sOJrMJDPQdEYpk9pS0lvYNNeK0afQ0V0PNQ>
+    <xmx:sqT8Z2Y1mnkRVXnFrmftFnj2vGypRH4NVjnG4LU2NBQiwSOqpNuOYg>
+    <xmx:sqT8Z8D8kIGeN0qdAot4eEnwL_vam3mukVYA_oIR7AY6go2Y1gYO_w>
+    <xmx:sqT8Z0avbWE_gjlWh2JC6vKfnWU1bB-HoacNIcRdQ8a7kZQ-bTLhVA>
+    <xmx:sqT8Z6pRZVh62gahkDhRnY4Ph634swemuKszCaKa3pU9nht04pO3lD_4>
 Feedback-ID: iad51458e:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 14 Apr 2025 02:01:20 -0400 (EDT)
+ 14 Apr 2025 02:01:21 -0400 (EDT)
 From: Boqun Feng <boqun.feng@gmail.com>
 To: Breno Leitao <leitao@debian.org>,
 	Peter Zijlstra <peterz@infradead.org>,
@@ -128,9 +128,9 @@ Cc: aeh@meta.com,
 	Uladzislau Rezki <urezki@gmail.com>,
 	rcu@vger.kernel.org,
 	Boqun Feng <boqun.feng@gmail.com>
-Subject: [RFC PATCH 2/8] shazptr: Add refscale test
-Date: Sun, 13 Apr 2025 23:00:49 -0700
-Message-ID: <20250414060055.341516-3-boqun.feng@gmail.com>
+Subject: [RFC PATCH 3/8] shazptr: Add refscale test for wildcard
+Date: Sun, 13 Apr 2025 23:00:50 -0700
+Message-ID: <20250414060055.341516-4-boqun.feng@gmail.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250414060055.341516-1-boqun.feng@gmail.com>
 References: <20250414060055.341516-1-boqun.feng@gmail.com>
@@ -142,42 +142,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add the refscale test for shazptr to measure the reader side
-performance.
+Add the refscale test for shazptr, which starts another shazptr critical
+section inside an existing one to measure the reader side performance
+when wildcard logic is triggered.
 
 Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
 ---
- kernel/rcu/refscale.c | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ kernel/rcu/refscale.c | 40 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 39 insertions(+), 1 deletion(-)
 
 diff --git a/kernel/rcu/refscale.c b/kernel/rcu/refscale.c
-index f11a7c2af778..154520e4ee4c 100644
+index 154520e4ee4c..fdbb4a2c91fe 100644
 --- a/kernel/rcu/refscale.c
 +++ b/kernel/rcu/refscale.c
-@@ -29,6 +29,7 @@
- #include <linux/reboot.h>
- #include <linux/sched.h>
- #include <linux/seq_buf.h>
-+#include <linux/shazptr.h>
- #include <linux/spinlock.h>
- #include <linux/smp.h>
- #include <linux/stat.h>
-@@ -890,6 +891,43 @@ static const struct ref_scale_ops typesafe_seqlock_ops = {
- 	.name		= "typesafe_seqlock"
+@@ -928,6 +928,44 @@ static const struct ref_scale_ops shazptr_ops = {
+ 	.name		= "shazptr"
  };
  
-+static void ref_shazptr_read_section(const int nloops)
++static void ref_shazptr_wc_read_section(const int nloops)
 +{
 +	int i;
 +
 +	for (i = nloops; i >= 0; i--) {
 +		preempt_disable();
-+		{ guard(shazptr)(ref_shazptr_read_section); }
++		{
++			guard(shazptr)(ref_shazptr_read_section);
++			/* Trigger wildcard logic */
++			guard(shazptr)(ref_shazptr_wc_read_section);
++		}
 +		preempt_enable();
 +	}
 +}
 +
-+static void ref_shazptr_delay_section(const int nloops, const int udl, const int ndl)
++static void ref_shazptr_wc_delay_section(const int nloops, const int udl, const int ndl)
 +{
 +	int i;
 +
@@ -185,32 +182,30 @@ index f11a7c2af778..154520e4ee4c 100644
 +		preempt_disable();
 +		{
 +			guard(shazptr)(ref_shazptr_delay_section);
++			/* Trigger wildcard logic */
++			guard(shazptr)(ref_shazptr_wc_delay_section);
 +			un_delay(udl, ndl);
 +		}
 +		preempt_enable();
 +	}
 +}
 +
-+static bool ref_shazptr_init(void)
-+{
-+	return true;
-+}
-+
-+static const struct ref_scale_ops shazptr_ops = {
++static const struct ref_scale_ops shazptr_wildcard_ops = {
 +	.init		= ref_shazptr_init,
-+	.readsection	= ref_shazptr_read_section,
-+	.delaysection	= ref_shazptr_delay_section,
-+	.name		= "shazptr"
++	.readsection	= ref_shazptr_wc_read_section,
++	.delaysection	= ref_shazptr_wc_delay_section,
++	.name		= "shazptr_wildcard"
 +};
 +
  static void rcu_scale_one_reader(void)
  {
  	if (readdelay <= 0)
-@@ -1197,6 +1235,7 @@ ref_scale_init(void)
+@@ -1235,7 +1273,7 @@ ref_scale_init(void)
  		&refcnt_ops, &rwlock_ops, &rwsem_ops, &lock_ops, &lock_irq_ops,
  		&acqrel_ops, &sched_clock_ops, &clock_ops, &jiffies_ops,
  		&typesafe_ref_ops, &typesafe_lock_ops, &typesafe_seqlock_ops,
-+		&shazptr_ops,
+-		&shazptr_ops,
++		&shazptr_ops, &shazptr_wildcard_ops,
  	};
  
  	if (!torture_init_begin(scale_type, verbose))
