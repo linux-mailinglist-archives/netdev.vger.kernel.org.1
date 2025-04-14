@@ -1,168 +1,133 @@
-Return-Path: <netdev+bounces-182102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07827A87D2C
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 12:12:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77B01A87D24
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 12:11:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94BC43BAFB2
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 10:10:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC319188DB9F
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 10:11:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 726D9263C8E;
-	Mon, 14 Apr 2025 10:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A374264FB2;
+	Mon, 14 Apr 2025 10:11:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k7d8rnx0"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="huxKY3SZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73B5D190679;
+	Mon, 14 Apr 2025 10:11:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744625504; cv=none; b=thX+egDmLZajktKczdM6Dr3Kr8hBlxxiZswpi3mkoLX+46cyQabdLhQdXtuR0HoiSq2FIp3rS97m6mRxdZMAsDiZ83Fi5EevBjGxGknBDI9kjCwEvHklOKDd881XGfTUDxSY6AiB/63LlNwOzbgN6puvCrz2lGJ412pWW0Ha0Pk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744625504; c=relaxed/simple;
+	bh=A5JrYJudGl3DhGQV8xarh0BdKwPSWfzjJojbct/oWAA=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EdCl8TFNiItyuPPfJzuiTCtfDhMKITYRZNbMzvy+hLePIV6H6cg/18qRmR4DieemPNPIEwaoCzwL8jqt+6Fy6ZS0Hg7YY8bELwR7Xb70LHGtvOWhc/VtE7OfG1yR8lGbP9dK04JTvT17ejk8eVYF9YbvqdI76pM3dGdzcFGVkIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=huxKY3SZ; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 1514620523;
+	Mon, 14 Apr 2025 12:11:38 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id qlytawnqRQOS; Mon, 14 Apr 2025 12:11:37 +0200 (CEST)
+Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D288525D8FF
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 10:10:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744625409; cv=none; b=q1j5jjVPK1Nj5ge9n21uS0IYtMctRyfsiZtmtDL6xkCguW4wJHkN9NEP1Khgz4B73ByUoN3cGmybhL9VjpKABDTlmLPBfRSCbYhQUMsV2iFVBux21nnuRMyr8ja0NHEYXR3P+00wBvjNHRHkUTYbdaG1HWz1ItCUI8voZGnd8Pg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744625409; c=relaxed/simple;
-	bh=fGWwn0NFNGz3cyx9yOIs6RFqZALVqMR0ypHAWFSsy+s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PwgP3/LbG4+PJaGfPzbijUC/O1s8ieFrujLTUdD6pLuYz/dlhukwz+8GvxjrbPuJMBOFVoJVSvPd82SQ07NEkCNhFYamwvmmE0vxPv1haIZG/NQ247FlLgT/Zd0ULUDlOIi/1es/ZEw9SSFhlKr7w4QQ51y3asghIv8FNYOhdzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k7d8rnx0; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-301d6cbbd5bso4225385a91.3
-        for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 03:10:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744625407; x=1745230207; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=G4dyRQS+tNwC/wK8lTSjYczGh73JBS96X94A+tyYXEk=;
-        b=k7d8rnx0xhDULSlJjkL++BNbZhJHc3S0TlCnoI8NCL7LqUkWMHiGATnr8iNemDAb+c
-         tE9RwoTZ+Qw8rlN8ZT5RSlapQ1ZCDQ7NScyW4q5SsJ8WA8i/mvWO7UTr2GEphYiDSHVr
-         OVLor8j4dsvT1eZWyXWPKS5zrxYie2nsVwZSrjTyhZgjxLglAR8sBZ4kvDOpa37lIqPj
-         mJpuTcSG40ni2QN9S5PhEWZs1XFLhFU8q7OTwgPCePuME1Anw1NHCXs/hyh3lIDORyxA
-         LHyXjOiUMaaqlxVKTaojh5Rc8M93OiOzWfqO/JfjgVpASAmJ0vWyyEmu+LKOlyN/Sg8g
-         0kJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744625407; x=1745230207;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=G4dyRQS+tNwC/wK8lTSjYczGh73JBS96X94A+tyYXEk=;
-        b=m1nCkKEum6nIleljmpZP/yAbNoCHj4E5wu/qoXYdfV5/BbuPicBNVoFYfVMtGABDav
-         KCy8sAR0Koud2vl4zA0RnAVWflJuv6YM4CHR/vDLCJfO4r6bI0DjlNssrr38WyMhavZj
-         wNTXvnGOKQOt4znfGxoiFrVsobbm2jpr8FWf1p77krUb+RNb/YPwZFYZKyFGMYjoGIPW
-         2q7k1HmY/Li4230Suo3ARzKyVXnrEabJRsruxUC/odtjAT9essDQA+ZslLiuPWTLg9MN
-         z5KpLibq5k67pd8n7jeRhGX73JRhFQXkPR6XJRbFqCZSunBAZEg2Nyh+uyBMmk9yuQSY
-         pP/g==
-X-Gm-Message-State: AOJu0YwMauPDQrTULxuVh5qEWBm+t8unIjkDel1A68bNY8Z2KXftam/Q
-	816U+AHQNJcRNUJ7pcSEyNlQnzwaOPvTNJRb/TjTLW/MhdEwRALtzx5Jc/Z0sYjTxYNJm4KXGm2
-	IF7J4IYGm+pVrUVjVGJwgHU7f5SY=
-X-Gm-Gg: ASbGncs6MHMKjG8q/NODV6Tiv1Gqwhj86U5HTYFpmu5jT+2wOn92ZeTWI3JYtJq+OyX
-	q37gtFqy/U6krc2c99G02HxTgAga7KolKCqpP1+JHuGc5rkg0mzxQn/Sei+QpnSUAMqOu7yBUBn
-	DSJkQcue6LE6QQmp1ba0IapdVDdex4HLzhAzDMvwmIbxkessPf
-X-Google-Smtp-Source: AGHT+IEscJF5ijK5WAvqnTfCUswPqtHdQaGRM9PFu/pInN5ezfj3p9C1I8zQZjdXOQcLrmaeFWxu1RH1WL4+jOhkWPs=
-X-Received: by 2002:a17:90b:2e44:b0:2ee:b8ac:73b0 with SMTP id
- 98e67ed59e1d1-308236343famr16501427a91.2.1744625406774; Mon, 14 Apr 2025
- 03:10:06 -0700 (PDT)
+	by mx1.secunet.com (Postfix) with ESMTPS id 3534E20189;
+	Mon, 14 Apr 2025 12:11:37 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 3534E20189
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1744625497;
+	bh=Weyznl+15m4X8CsfGwNOCXhpIw7Y6wOODlPtRSZ+HV4=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=huxKY3SZmtyVuMCV846LSXff4w1KwmquZdZPvh27Hxmg4fAcZq/66nLyqU/7cTy1h
+	 m9f1ANEJ1iFM9x+WD1xODHbrGdAdvzNNZc+ycTSjw1LKni79fK8JE5ZvhPzEbE9QjY
+	 Wgy8/2+E9OYz1RcCHcRRuIYTrfzXt15P4WerwPc18TRjw0irlRYdPFbh6QDKXdgRcl
+	 m3IljHCyd+zC6qChKqm7qh5ODGEhCqk1nEm6XgU8Peh0TBGCH1g/kU06tNRYmwKY/T
+	 UCohCR9MS6GUWuCzuHdnDZzCG6dh5yqDXTPleRn4mDLs3a5aqDvfiH0gfcpyJy2GFb
+	 8BFynpTVih7Xw==
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 14 Apr 2025 12:11:36 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 14 Apr
+ 2025 12:11:36 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 2284A3182D8A; Mon, 14 Apr 2025 12:11:36 +0200 (CEST)
+Date: Mon, 14 Apr 2025 12:11:36 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+CC: <netdev@vger.kernel.org>, Hangbin Liu <liuhangbin@gmail.com>, Jay Vosburgh
+	<jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Nikolay Aleksandrov
+	<razor@blackwall.org>, Simon Horman <horms@kernel.org>, Saeed Mahameed
+	<saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu
+	<jianbol@nvidia.com>, Herbert Xu <herbert@gondor.apana.org.au>, Ayush Sawal
+	<ayush.sawal@chelsio.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, "Przemek
+ Kitszel" <przemyslaw.kitszel@intel.com>, Sunil Goutham
+	<sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, Subbaraya
+ Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, Bharat
+ Bhushan <bbhushan2@marvell.com>, Louis Peens <louis.peens@corigine.com>,
+	"Leon Romanovsky" <leonro@nvidia.com>, <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 0/6] xfrm & bonding: Correct use of
+ xso.real_dev
+Message-ID: <Z/zfWKfhR0GcuCki@gauss3.secunet.de>
+References: <20250411074958.2858496-1-cratiu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250414010912.816413-1-xiyou.wangcong@gmail.com>
- <20250414010912.816413-2-xiyou.wangcong@gmail.com> <CALYGNiOV2sJY5gQwMX+U6ot9fFURHLWW+F87pBtH3T-RLDL+5Q@mail.gmail.com>
-In-Reply-To: <CALYGNiOV2sJY5gQwMX+U6ot9fFURHLWW+F87pBtH3T-RLDL+5Q@mail.gmail.com>
-From: Konstantin Khlebnikov <koct9i@gmail.com>
-Date: Mon, 14 Apr 2025 12:09:54 +0200
-X-Gm-Features: ATxdqUHEDhkgN4tMe9E5qywx6IGrAJQLuvQg9T8OGmDu_jZdpcw8SCUos-D0mtA
-Message-ID: <CALYGNiMtTKpn-BBPpnY+r9WxTPzgMB3rUS5ePO4HQNH1QgZEFQ@mail.gmail.com>
-Subject: Re: [Patch net 1/2] net_sched: hfsc: Fix a UAF vulnerability in class handling
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us, 
-	gerrard.tai@starlabs.sg
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250411074958.2858496-1-cratiu@nvidia.com>
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-On Mon, 14 Apr 2025 at 11:39, Konstantin Khlebnikov <koct9i@gmail.com> wrote:
->
-> On Mon, 14 Apr 2025 at 03:09, Cong Wang <xiyou.wangcong@gmail.com> wrote:
-> >
-> > This patch fixes a Use-After-Free vulnerability in the HFSC qdisc class
-> > handling. The issue occurs due to a time-of-check/time-of-use condition
-> > in hfsc_change_class() when working with certain child qdiscs like netem
-> > or codel.
-> >
-> > The vulnerability works as follows:
-> > 1. hfsc_change_class() checks if a class has packets (q.qlen != 0)
-> > 2. It then calls qdisc_peek_len(), which for certain qdiscs (e.g.,
-> >    codel, netem) might drop packets and empty the queue
-> > 3. The code continues assuming the queue is still non-empty, adding
-> >    the class to vttree
-> > 4. This breaks HFSC scheduler assumptions that only non-empty classes
-> >    are in vttree
-> > 5. Later, when the class is destroyed, this can lead to a Use-After-Free
-> >
-> > The fix adds a second queue length check after qdisc_peek_len() to verify
-> > the queue wasn't emptied.
-> >
-> > Fixes: 21f4d5cc25ec ("net_sched/hfsc: fix curve activation in hfsc_change_class()")
-> > Reported-by: Gerrard Tai <gerrard.tai@starlabs.sg>
-> > Cc: Konstantin Khlebnikov <koct9i@gmail.com>
-> > Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
-> > ---
-> >  net/sched/sch_hfsc.c | 9 +++++++--
-> >  1 file changed, 7 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/net/sched/sch_hfsc.c b/net/sched/sch_hfsc.c
-> > index ce5045eea065..b368ac0595d5 100644
-> > --- a/net/sched/sch_hfsc.c
-> > +++ b/net/sched/sch_hfsc.c
-> > @@ -961,6 +961,7 @@ hfsc_change_class(struct Qdisc *sch, u32 classid, u32 parentid,
-> >
-> >         if (cl != NULL) {
-> >                 int old_flags;
-> > +               int len = 0;
-> >
-> >                 if (parentid) {
-> >                         if (cl->cl_parent &&
-> > @@ -991,9 +992,13 @@ hfsc_change_class(struct Qdisc *sch, u32 classid, u32 parentid,
-> >                 if (usc != NULL)
-> >                         hfsc_change_usc(cl, usc, cur_time);
-> >
-> > +               if (cl->qdisc->q.qlen != 0)
-> > +                       len = qdisc_peek_len(cl->qdisc);
-> > +               /* Check queue length again since some qdisc implementations
-> > +                * (e.g., netem/codel) might empty the queue during the peek
-> > +                * operation.
-> > +                */
-> >                 if (cl->qdisc->q.qlen != 0) {
-> > -                       int len = qdisc_peek_len(cl->qdisc);
-> > -
->
-> I don't see any functional changes in the code.
+On Fri, Apr 11, 2025 at 10:49:52AM +0300, Cosmin Ratiu wrote:
+> This patch series was motivated by fixing a few bugs in the bonding
+> driver related to xfrm state migration on device failover.
+> 
+> struct xfrm_dev_offload has two net_device pointers: dev and real_dev.
+> The first one is the device the xfrm_state is offloaded on and the
+> second one is used by the bonding driver to manage the underlying device
+> xfrm_states are actually offloaded on. When bonding isn't used, the two
+> pointers are the same.
+> 
+> This causes confusion in drivers: Which device pointer should they use?
+> If they want to support bonding, they need to only use real_dev and
+> never look at dev.
+> 
+> Furthermore, real_dev is used without proper locking from multiple code
+> paths and changing it is dangerous. See commit [1] for example.
+> 
+> This patch series clears things out by removing all uses of real_dev
+> from outside the bonding driver.
+> Then, the bonding driver is refactored to fix a couple of long standing
+> races and the original bug which motivated this patch series.
 
-Oh, I see. "peek" indeed can drop some packets.
-But it is supposed to return skb, which should still be still part of the queue.
-I guess you are also seeing the warning "%s: %s qdisc %X: is
-non-work-conserving?".
+I'm still a bit skeptical about the bonding offloads itself as
+mentioned here:
 
-Actually, following code cares about size of next packet so it could
-be clearer to rewrite it as:
+https://lore.kernel.org/all/ZsbkdzvjVf3GiYHa@gauss3.secunet.de/
 
-if (cl->qdisc->q.qlen != 0) {
-    int len = qdisc_peek_len(cl->qdisc);
-    if (len != 0) {
-        <insert class>
-    }
-}
+but I'm OK with this particular pachset.
 
->
-> >                         if (cl->cl_flags & HFSC_RSC) {
-> >                                 if (old_flags & HFSC_RSC)
-> >                                         update_ed(cl, len);
-> > --
-> > 2.34.1
-> >
+How should we merge this patchset? It touches several subsystems,
+including xfrm. I'm fine merging it through the ipsec-next tree,
+but would be also ok if it goes though the net-next tree if
+that's easier.
 
