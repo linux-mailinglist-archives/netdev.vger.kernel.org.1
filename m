@@ -1,177 +1,173 @@
-Return-Path: <netdev+bounces-182227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69C83A88402
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:10:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A485BA88476
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:20:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 865A57A4493
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 14:09:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CE6119022D4
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 14:11:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14B902749F0;
-	Mon, 14 Apr 2025 13:39:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5FF5288CB6;
+	Mon, 14 Apr 2025 13:43:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="XteWAv+h"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XftFHVNK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDEC423D29F
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 13:39:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B46B82749D8;
+	Mon, 14 Apr 2025 13:43:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744637996; cv=none; b=BqSsYh1ImLwcDjf6505tZuTvyy3h4hVvUXMQH1hepK2q8Afki4sKE4co5m8IiYGOcYCv7kb2iTytJNZfSPZrCGos+srdCDGiW3us2UR6X26lK7GO3TOfWVjZ8L0WxrriHewLsWUPoeh1IpAqTY36IiNSHEoXRjEJOpcLEgdBFAY=
+	t=1744638210; cv=none; b=C6BfSUdxT8eNnrbnOaYixOjBRUw8pcUFglDWjoDSb426WMQ0MTBMwGh0w5bLB1+MouhWl3pAkF0MsBOiAe0vpqLcwwAHk5+vWCd3M8fF82gGDLZy9126ObcI2eTK0u3NR0oMPVefty0r0a2CRYQGJtBb+YclimVBzTA8hLKwi8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744637996; c=relaxed/simple;
-	bh=NtCW/E8exydYTxFSwUlIDYXeH3TA9ME05Yx8nihFiFg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZrLd98h6jxeFSvja7nx5z+nAQAnUXx2Iz6Pig68H8ETHQ14cT1q9swdqKQQ9wSoLkJDMgIU5H0sTK6XXCT+MpBCGI3QEKHzGiOnE8Y2t6q10qioFQVDM9j/Q/tos+K1GxCcgUuWy0hBwYfstRIikGe9erPE4OC415F+f6cNMvHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=XteWAv+h; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5e61375c108so5453015a12.1
-        for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 06:39:53 -0700 (PDT)
+	s=arc-20240116; t=1744638210; c=relaxed/simple;
+	bh=p8jcNjG+YENQNEfk3hLMJSOgALwsNYI5NHNTYAn1Cbc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NzckfZME1Gvd5X+3sP8rRo8YblrukVuAhDqJiFXzXyjZKbEkHc+KAAHuAhfp0GzssQOPIybBrVUeD30Bgt5PLCC3/e202OEBpmFSRrUPAAEDJcnow3z+RgLGLBZqplw1OQ0ch84ypP9F4B3fnnasqZqBEIJq2XaZ0VAQThIiFfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XftFHVNK; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5e6167d0536so8122880a12.1;
+        Mon, 14 Apr 2025 06:43:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1744637992; x=1745242792; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZquJTzO2TMrzx3oM3vRZxn3X9pd2r24oUtQt3eHPnLc=;
-        b=XteWAv+h8B74asVCm/j/e0NLRp4TEeKg6pdI/nhhYbAsUNJVE3IKA3re7QUrGNfoC+
-         vTfI3OuJKiGhJAiEK/eMQOuQtBkRgxHt/86RkPF6rsaIIUM1JS9hswRObGwZSGF28fLv
-         6kKYMPKNZNeBUdW63FI6Iln97wCpqnBahwtJYXskzglvw4RR4qw9BTzYLmSFSyzH04GJ
-         nG0mRiJpC8Jfjs8tVIHSkqpg/aC6hJH2O40fgk4DyOFwA9MRHE8r4SoRTpWvEKmjhZge
-         C6ZGNXzx5J8XcBhQiD99pFCYJC7895BUXj2W2k6ss5P88v0xC8aQXDKJffcka/FhaBJv
-         aW3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744637992; x=1745242792;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1744638207; x=1745243007; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZquJTzO2TMrzx3oM3vRZxn3X9pd2r24oUtQt3eHPnLc=;
-        b=IY45HtD3+goVztoNiGWf0hhZxHc3kjhOjYPkb29NVQ+PkcCkIyfSYBsPmQX8EzSyqs
-         swW/QMvdlWIgq9Mv/eKRUh0kavXkKh7iLp501/CskGPEQe84MIxHQosIieMijWkmL0/o
-         x6uoIS7uKK+cKIE2gJiYKzmSnIQsiiSOjm0lyRLZrrr49L4z/k4vXWE2awcXJj8cSKug
-         2YZIfgLwGhwRRdFk46SOEBwrUDwDkiTHXcoa+QeZm8m3+AcwQ4p1WnUspaHk1ww20Cum
-         xL2953mu3AqN9SlVYa7/c/0EWh81EpM7cRGUJkE268VNYx6Jbm3BtAsPOWzPlWaZHvmJ
-         MauA==
-X-Gm-Message-State: AOJu0Yxgg85g9/RE39nsr/CfjRcZGYk7Kpgkr8w9AukDtXfKuXT3xQKf
-	LXEBysuMSZvMl9lszqHMx3WuxGHn+gf0xs7yCjpXjhiTtVXWNASKOTUh/YR9ZSgh67IlEQeYXIJ
-	nFNSfupZ1kORTBkQFwPrBQYCAFZPH5yfeebBAWIJDTWpWUBafGVOA9ry8awxO
-X-Gm-Gg: ASbGncs8SbPWzqGBe6IJ07WdOsIrm8brju6E4TfHjq4bvNl57lFDb6tzSNPp6oNyZJt
-	fhYv0CakKI3diNEIHm9Lp8AC+OlzC3/VnCK0uEllqrUDYcKqjW6zlM/bUmpEKVU/U5GO9/3iH8J
-	fT7v73qe9foIBTkaT5TpwScp2BnjLCQBFO5FAqF/KfuKuasjkmCMzd0hpBoNr+G13rKS/niqG/d
-	+aRmT4n21Sqk4MJFSVpP4O7+N/LAK5dkNtexVF9ZGKDPMHQJsdyC9jufcfqpXYY7a23EpmB3/h7
-	7Up+z0KR98KefYSIV1lgjIvpTHwlkp2ZcVpWKO+9/fui5ZoVFo3bT+ZJwAfyxQkHiMULChv5L+j
-	GYsyEYs66gCHwYg==
-X-Google-Smtp-Source: AGHT+IFPxNqtw28ADerWg6CufaL1pKk/7NGw4kAzwMNIMYRZtCBUOHqCketsjh37yheEVO4bOxUj2g==
-X-Received: by 2002:a05:6402:3487:b0:5ec:f769:db07 with SMTP id 4fb4d7f45d1cf-5f36fefc74amr8488977a12.29.1744637992033;
-        Mon, 14 Apr 2025 06:39:52 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:7de8:ff34:becd:c8f0? ([2001:67c:2fbc:1:7de8:ff34:becd:c8f0])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f36ef5c445sm4905583a12.31.2025.04.14.06.39.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Apr 2025 06:39:51 -0700 (PDT)
-Message-ID: <963c2166-aed8-4928-bdeb-6acbec2b0ea7@openvpn.net>
-Date: Mon, 14 Apr 2025 15:39:50 +0200
+        bh=KCg0q41Q1oTIolDKQucNc+JCqwuUZQ7/4IT71QAggp4=;
+        b=XftFHVNK3dotypFJSVZFtvzyNAVKqS7uhQdvA09t+kVkt+v/w9DWfN4Hqvt6gS/80X
+         bg9eQM8R/2fMrdQDVd4sxhIAHIYyMrqddLwbq+Cd70b79q9zMPThZNBPl8DsSl+ar0f+
+         0fp9Z0nPEomb/WeljO5vDmKUW2iXCoDNlMPGfoKgV7bEc7UeDzTKQH8yqxmH0XJuudfd
+         YmhTM/Opu6qilKuoQVVg5Wpn2TpIC5NvD/NKugsnloB3OgZwsBLqOQ+JaEPycI+KNSDY
+         cr6XTpy3ImHKpUMEp3JwYW+LZ3V7OWMWaqw/Tj3XZxKJ6gFlbIl6JCIjPHxgNqgZOIc3
+         YxdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744638207; x=1745243007;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KCg0q41Q1oTIolDKQucNc+JCqwuUZQ7/4IT71QAggp4=;
+        b=HgCQ8IDuKSV8TeT5oVJQHFy6rAFYAuO7cdnBhRF7WLUF5w+ZMstllaolAmMI0AckOR
+         OIP6i49HJ8vUxk5IHzOTHz3g3od37P4FVE1bAwtXDctxkgYhagiihrFxBxiMSkE2lEYp
+         660wdAKiVcN3awj2mePBPghCGuCv6QqxW1cWh0xzTCYFYyBiDMtbsl4oWqvv0w5TM1ML
+         wv80xiz5/Me4ljwXy55NwOJgKyaHPxVtGPNeba66gIIwwfZ9bo5Of4R3xB0cSPJDgb4Z
+         qYaTXLKhEFU4T91b5uuNwNU0Fdpm9d/nZoK3LvEa1dbmtWEUVlGYf/dIX8ngnXCr5qt3
+         wmZw==
+X-Forwarded-Encrypted: i=1; AJvYcCVHw0ndXN8E9F1GMEp8VdZuAoppHoSxmw2B1GSt/seb9oyIz5LZu6u2qUA6jiobD3460Yt3O7oh@vger.kernel.org, AJvYcCVihWS/LzWaGL9izFjIZ14mlSh+HSSzwL8tRbYgsYhdzZ+Dg3X2D+ZXgpH6ONhvQ5Gx9w3xbMP4QT8s/yI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3psKxrvcgLi5vL3poDyCFIjxQjx0w+q5jzxYpIw/G1B4p14nd
+	meZa9B746PfGowbpH22Ic8iEgdqGJ7Ch4fursGiiDXF1jsXefc5o3Lfz1+zleeDiamQeYEJElmt
+	IiQhpS2gdVV0PdOhdxvJsK5cqkB4=
+X-Gm-Gg: ASbGncvXLh8T+dAiCUm10ZpYcKAgvUq1Ty2CdE7vNAoBANdG5DCmlnpKxRuyZkE0Zq3
+	sf6ZRSJ+W2ZG07Om4lRWLu5Gxg0sihvM8NILiaJB601Nk8eWFa3sPnoxMiu3nz2pbiJZcsaR2Cy
+	IG3gHMan/hN+YFp3/4HjNf
+X-Google-Smtp-Source: AGHT+IHBKai4hTiuuz7fgaIpw5CrF4/y6ESvZ6lBc0Xyp0erRglMZFuqA7qlxIgDj5nEv4p5lze2WGYBDpBcRjg5EQY=
+X-Received: by 2002:a17:907:60d0:b0:ac2:2ba5:5471 with SMTP id
+ a640c23a62f3a-acad34a2f53mr1078321566b.24.1744638206565; Mon, 14 Apr 2025
+ 06:43:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v25 01/23] net: introduce OpenVPN Data Channel
- Offload (ovpn)
-To: Jakub Kicinski <kuba@kernel.org>, Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
- Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Xiao Liang <shaw.leon@gmail.com>, steffen.klassert@secunet.com,
- antony.antony@secunet.com
-References: <20250407-b4-ovpn-v25-0-a04eae86e016@openvpn.net>
- <20250407-b4-ovpn-v25-1-a04eae86e016@openvpn.net>
- <20250410195440.3ba7ba0f@kernel.org>
- <f11e8a14-deb0-456f-bb4a-b5e4e16a79d7@openvpn.net> <Z_keORW4OWc8i5Vz@krikkit>
- <20250411141847.6dba6987@kernel.org>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <20250411141847.6dba6987@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250414085412.117120-1-maimon.sagi@gmail.com>
+ <b6aea926-ebb6-48fe-a1be-6f428a648eae@linux.dev> <CAMuE1bG_+qj++Q0OXfBe3Z_aA-zFj3nmzr9CHCuKJ_Jr19oWEg@mail.gmail.com>
+ <aa9a1485-0a0b-442b-b126-a00ee5d4801c@linux.dev> <CAMuE1bETL1+sGo9wq46O=Ad-_aa8xNLK0kWC63Mm5rTFdebp=w@mail.gmail.com>
+ <39839bcb-90e9-4886-913d-311c75c92ad8@linux.dev>
+In-Reply-To: <39839bcb-90e9-4886-913d-311c75c92ad8@linux.dev>
+From: Sagi Maimon <maimon.sagi@gmail.com>
+Date: Mon, 14 Apr 2025 16:43:00 +0300
+X-Gm-Features: ATxdqUFheaLcNBvxKZc-9VetpJLUgftYHI2jRhqXyQE-taAumEvII3I0dU9QJyE
+Message-ID: <CAMuE1bHsPeaokc-_qR4Ai8o=b3Qpbosv6MiR5_XufyRTtE4QFQ@mail.gmail.com>
+Subject: Re: [PATCH v1] ptp: ocp: fix NULL deref in _signal_summary_show
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: jonathan.lemon@gmail.com, richardcochran@gmail.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/04/2025 23:18, Jakub Kicinski wrote:
-> On Fri, 11 Apr 2025 15:50:49 +0200 Sabrina Dubroca wrote:
->>> My understanding is that this is the standard approach to:
->>> 1) hook in the middle of registration/deregistration;
->>> 2) handle events generated by other components/routines.
->>>
->>> I see in /drivers/net/ almost every driver registers a notifier for their
->>> own device.
->>
->> I think most of them register a notifier for their lower device
->> (bridge port, real device under a vlan, or similar).
->>
->> I've mentioned at some point that it would be more usual to replace
->> this notifier with a custom dellink, and that ovpn->registered could
->> likely be replaced with checking for NETREG_REGISTERED. I just thought
->> it could be cleaned up a bit later, but it seems Jakub wants it done
->> before taking the patches :)
-> 
-> Ideally, yes. One fewer place for us to check when trying to figure
-> out if we will break anything with the locking changes :(
-> Notifiers are very powerful but that comes at high maintenance cost.
-
-ACK, working on it!
-
-Thanks,
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
-
+On Mon, Apr 14, 2025 at 4:01=E2=80=AFPM Vadim Fedorenko
+<vadim.fedorenko@linux.dev> wrote:
+>
+> On 14/04/2025 12:38, Sagi Maimon wrote:
+> > On Mon, Apr 14, 2025 at 2:09=E2=80=AFPM Vadim Fedorenko
+> > <vadim.fedorenko@linux.dev> wrote:
+> >>
+> >> On 14/04/2025 11:56, Sagi Maimon wrote:
+> >>> On Mon, Apr 14, 2025 at 12:37=E2=80=AFPM Vadim Fedorenko
+> >>> <vadim.fedorenko@linux.dev> wrote:
+> >>>>
+> >>>> On 14/04/2025 09:54, Sagi Maimon wrote:
+> >>>>> Sysfs signal show operations can invoke _signal_summary_show before
+> >>>>> signal_out array elements are initialized, causing a NULL pointer
+> >>>>> dereference. Add NULL checks for signal_out elements to prevent ker=
+nel
+> >>>>> crashes.
+> >>>>>
+> >>>>> Fixes: b325af3cfab9 ("ptp: ocp: Add signal generators and update sy=
+sfs nodes")
+> >>>>> Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
+> >>>>> ---
+> >>>>>     drivers/ptp/ptp_ocp.c | 3 +++
+> >>>>>     1 file changed, 3 insertions(+)
+> >>>>>
+> >>>>> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+> >>>>> index 7945c6be1f7c..4c7893539cec 100644
+> >>>>> --- a/drivers/ptp/ptp_ocp.c
+> >>>>> +++ b/drivers/ptp/ptp_ocp.c
+> >>>>> @@ -3963,6 +3963,9 @@ _signal_summary_show(struct seq_file *s, stru=
+ct ptp_ocp *bp, int nr)
+> >>>>>         bool on;
+> >>>>>         u32 val;
+> >>>>>
+> >>>>> +     if (!bp->signal_out[nr])
+> >>>>> +             return;
+> >>>>> +
+> >>>>>         on =3D signal->running;
+> >>>>>         sprintf(label, "GEN%d", nr + 1);
+> >>>>>         seq_printf(s, "%7s: %s, period:%llu duty:%d%% phase:%llu po=
+l:%d",
+> >>>>
+> >>>> That's not correct, the dereference of bp->signal_out[nr] happens be=
+fore
+> >>>> the check. But I just wonder how can that even happen?
+> >>>>
+> >>> The scenario (our case): on ptp_ocp_adva_board_init we
+> >>> initiate only signals 0 and 1 so 2 and 3 are NULL.
+> >>> Later ptp_ocp_summary_show runs on all 4 signals and calls _signal_su=
+mmary_show
+> >>> when calling signal 2 or 3  the dereference occurs.
+> >>> can you please explain: " the dereference of bp->signal_out[nr] happe=
+ns before
+> >>> the check", where exactly? do you mean in those lines:
+> >>> struct signal_reg __iomem *reg =3D bp->signal_out[nr]->mem;
+> >>      ^^^
+> >> yes, this is the line which dereferences the pointer.
+> >>
+> >> but in case you have only 2 pins to configure, why the driver exposes =
+4
+> >> SMAs? You can simply adjust the attributes (adva_timecard_attrs).
+> >>
+> > I can (and will) expose only 2 sma in adva_timecard_attrs, but still
+> > ptp_ocp_summary_show runs
+> > on all 4 signals and not only on the on that exposed, is it not a bug?
+>
+> Yeah, it's a bug, but different one, and we have to fix it other way.
+>
+Do you want to instruct me how to fix it , or will you fix it?
+> >>> struct ptp_ocp_signal *signal =3D &bp->signal[nr];
+> >>>> I believe the proper fix is to move ptp_ocp_attr_group_add() closer =
+to
+> >>>> the end of ptp_ocp_adva_board_init() like it's done for other boards=
+.
+> >>>>
+> >>>> --
+> >>>> pw-bot: cr
+> >>
+>
 
