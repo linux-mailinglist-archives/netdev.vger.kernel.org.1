@@ -1,159 +1,228 @@
-Return-Path: <netdev+bounces-182308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71B89A8875C
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 17:37:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99473A88730
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 17:31:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E74C4188CC7E
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 15:28:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96174169ED9
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 15:31:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 446BB27A134;
-	Mon, 14 Apr 2025 15:27:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88E3274641;
+	Mon, 14 Apr 2025 15:31:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=fiona.klute@gmx.de header.b="maMGq3ye"
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=fiona.klute@gmx.de header.b="ttIKMaFO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA89427A111;
-	Mon, 14 Apr 2025 15:27:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851ED142E86;
+	Mon, 14 Apr 2025 15:31:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744644426; cv=none; b=ABK68NiU7rBaLhb1NXaEZ/q30JFypyPdLgcUolLa897R2e9jG3xBVEPCrevR8VOZSH8Vi0GNYpr5oHyuZ4RGZQbwivSq5mQ9qGKuHBFdaO404RrL50SLgLcbOP4WelMvhvwMFyrRiB7jZ+m5zNbjtoGoMZYR8MUEETC2tvEw/Yw=
+	t=1744644712; cv=none; b=R6JJEe9+zS88knj25z04YQoVmtUfXeJDa2ibwUHwc/3p0aeQmozFKQgCA3NVOGKxxlqPO32mTgllH/HqA1joXjv/HZ0lPmA58JBEXWLJQ/jf2IMdlzaM6/AadVXv/Pw8Kbw6UPA+cBZucoUv3dkK2fPDvyU5pfJSeJjRhIV0S7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744644426; c=relaxed/simple;
-	bh=rZvHJrIwJz7NQmb5THdH9cX3LUXpNIok5gWtBcArh/o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=acUfVWjpr3l92zwcochefZ8+OXkuSLPkBhHH5+a5+l56RInvk7Qh3R5qEHtfiBKfneTi7S7P8RErwh2i4iwh+mH1pmJ4lAXiHSz47Hf3eGuNRt3WoHlg9FJTnuNkQ7zyCdIi3IyBgE5URCdSVoyK9wvhVk1kbiQRnzQOapWRH6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=fiona.klute@gmx.de header.b=maMGq3ye; arc=none smtp.client-ip=212.227.15.19
+	s=arc-20240116; t=1744644712; c=relaxed/simple;
+	bh=jJ/xH2Q6el5v5Of3RuHWI+z95JiuifI1i5iGzRB/CQM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lBG/kmhXZdYCY+lgeBjuhwVjzOySNZ7W83m2SnSwXN6GKCwJxizCc3gUSyO/XdDXrem4QABeqEQK6HO8Rt9ctEXCoyqbpwoWadEDQB0+8QbAv6zALdrz3d42fawWaahjlFf3zMqDVa1B+yq2X446bZI46aJlJ81JSEnXIxmDKzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=fiona.klute@gmx.de header.b=ttIKMaFO; arc=none smtp.client-ip=212.227.15.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1744644407; x=1745249207; i=fiona.klute@gmx.de;
-	bh=rZvHJrIwJz7NQmb5THdH9cX3LUXpNIok5gWtBcArh/o=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:
-	 MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=maMGq3yeDJYE6YVHxnKZNhqf7GrxMof5O/AzQQ0vsUQ4+rMjtb/iYVnak9m//uvQ
-	 tmU1+G4zvr+JImCMhRz3QC8uoSlS4zihGozDYxVCoO61jaBjPe18LSXhER/Z56C4x
-	 e46242K0nS4iXxx5eRkG/jzdlt8wB3dT23oTHGFl8p6PdFaPQOVFKCv+7V46WX0T+
-	 lBwpUdIBwsoYcFq5kJHWuf3bSw52OzmuN6fWzUWo1PTb5ZcQEwY3L/KJ6wLloIJby
-	 +SqKTaSivmwoiRQfXPCxlxI5hc0kaM8fnvu17WFjAZz3vVg4w0rUoXqlOWKL+Lj10
-	 Eq3RAdXAX1kUx/ZenQ==
+	s=s31663417; t=1744644697; x=1745249497; i=fiona.klute@gmx.de;
+	bh=4mh1jy0J5FdGZIQddvKgIrKEMu83MuJJ/ir6XHpsbp4=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=ttIKMaFO/yTBCQlRWyrhrgKpdKP3UDBcQlEPb9lRoUChVkfT3k10pKRAcrAVyKsC
+	 rPXUt3pAmLBQPAY35emBNLuxtGxmVMpdxhVvmsdEzr/mFF59rpebJr2sHWnBz89XL
+	 b/bcWohnam1vfnA+OCnbeLRbz70aO+EmRc9QysrQ1WiAkS8B4vThF0K0kLcpfHL2B
+	 YgxC4lhau3hs77yxdZ/0maQvTGDkKl85e20maihVI3wxUTWCgUwuKh1NGZe2IUAwr
+	 KnGwtCWJevyfANXWhuJIHDAkNmE0sBs4u5aZh0LKPdHg5S861X4WcT3BNqL/uYzUa
+	 lvrTQly1CED8yyDo6Q==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from haruka.home.arpa ([85.22.122.10]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MRCK6-1thLCl2S84-00Tvpo; Mon, 14
- Apr 2025 17:26:47 +0200
-From: Fiona Klute <fiona.klute@gmx.de>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	Thangaraj Samynathan <Thangaraj.S@microchip.com>,
-	Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kernel-list@raspberrypi.com,
-	Fiona Klute <fiona.klute@gmx.de>
-Subject: [PATCH net] net: phy: microchip: force IRQ polling mode for lan88xx
-Date: Mon, 14 Apr 2025 17:26:33 +0200
-Message-ID: <20250414152634.2786447-1-fiona.klute@gmx.de>
-X-Mailer: git-send-email 2.49.0
+Received: from [192.168.7.2] ([85.22.122.10]) by mail.gmx.net (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1N1Obh-1t2zZ40zOd-00w7zF; Mon, 14
+ Apr 2025 17:31:37 +0200
+Message-ID: <c20b01c9-0412-482d-b82e-c1bf1c7ef4ef@gmx.de>
+Date: Mon, 14 Apr 2025 17:31:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-X-Provags-ID: V03:K1:fQISuGsE84gb9tJCLkCkO/Mr1OEt+VwdckZX4vn2g6nRJr9qfV2
- XFXA5hN8qUCg7Uo3lWax82mXATulmmp3btqvx1w4VJ81U7bBLgM3P4XNqrl27JLD7YVsRT2
- 1V5G3JE/qERxCZiwQNUFdqSXx1FDSRODP+3zMn1cAK43D9vKwEprLDyKU/Kdh1WMWhlBm6j
- 1q7Leab/kGBEZfo8ugD0Q==
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: usb: lan78xx: Enforce a minimum interrupt polling
+ period
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Thangaraj Samynathan <Thangaraj.S@microchip.com>,
+ Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
+ UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-usb@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-list@raspberrypi.com,
+ stable@vger.kernel.org
+References: <20250310165932.1201702-1-fiona.klute@gmx.de>
+ <11f5be1d-9250-4aba-8f51-f231b09d3992@lunn.ch>
+ <4577e7d7-cadc-41c6-b93f-eca7d5a8eb46@gmx.de>
+ <42b5d49b-caf8-492d-8dba-b5292279478a@lunn.ch>
+ <dc8ef510-8f7d-4c96-9fd8-76b67a22aaf9@gmx.de>
+ <0901d90d-3f20-4a10-b680-9c978e04ddda@lunn.ch>
+Content-Language: en-US, de-DE-1901, de-DE
+From: Fiona Klute <fiona.klute@gmx.de>
+Autocrypt: addr=fiona.klute@gmx.de; keydata=
+ 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
+In-Reply-To: <0901d90d-3f20-4a10-b680-9c978e04ddda@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:puq4CQgy8dxCjw60VLrwH7jmu06fJQstdI/TKmkXlc++xW7FidT
+ Jlgl2HXD/XlQ3UXGQOBI1BUtMMpERknbHT31QtzNpdktcdhRVF9DBxrdVZYHkTe6Ped5YSM
+ 7CCHY1shr+xt6uyUuZdSK2BV6MTElva5+mAkyMxtEsyjH78YUx/a9dNQ9IhR7zCaU8I7XhH
+ x7SPSTprGw0zc+/qcmYDw==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:dpJC4PaD+dY=;X9vXcRxFnoJzXghKFD6BZKcLZaw
- K1ubuCV0EmOCMCWujG1Y5NV6rEcjxdP4I3Za75rU2PaGSLfZqPOedOtAI46ArtTeiglGi3kPm
- G4stvDoIbgS9a996Sen55Vymmo0j0L22NerOg/5lKjBV8zpIgkMU70LSS4ezg4ABPknEJJrQt
- k6LlYMsWIlPwRjpr+8ku+QZQd3eppa4d68fbTdSmNdFbFWgTnzljzWKYUQwqOSIpSF6d1gi7u
- mgR6VIlborTIHrzaqnY27CwobF2cfEXUGg2fYMptHF8grPJEzoEdMRX6V3JKi2meRYz/bISpP
- NGeXBh/F3lf+jRimIvuAukXWZISyJXAVI5cULfCSRhpjA0+Qta+RKqYG7FLH3x1iZuzOObtq6
- 13Z9x4X063xXFAfmy0xVUmSnlYPzHzY7ZIKZOt36YFgHnlxKbwuMw0qZ4tzXY46FHHFkV6x/c
- 1BO0VT5dM/r0lmvexYj6Zty/FJvESiZwuK+xhWMFw85XOzoUzijWa90WR2bMR56/bAceOg9bJ
- mWl0NhKrzLDUqH0Uwr4636nmk1BDb7gQmmjjdAtx4gX4RBgJnfJR3pP4HzG9qa4yerXDlIo/t
- Fg8iKZmt+ClyWAX4sKMK88xVFYQ2WcWVYE5ygenXG2pT4TdzkkpjnQZpEmfFCzv1YZ6jxyJJz
- cylFI6HYqJ/UKDABCR6TP1FIPxoY73wv+vu+HO79wwxN6N28x5XPvqhxbRPZ6M6m4twH+lW2w
- 1BoB2S5HfINUEHrDCihzXWvC1iBpMganRp4QDfXUFptQROj+ikXifTOca9QdORlHGc1OrWxgU
- PGLpOy5SKYTbXwzpYcq3XIVl2rKDOmI+tWOlqrg1UBfKrwC+9FMPJg8QQaFU+jW3R1jaFPh7n
- /9718vMiIHyGIQPQQ/0QcHYJbxNfXtYmdrLg+CDYyjdOEWSsSUKLZaaSc5DjnqRL2AxCTZceD
- +gEBgjDY30vaoeqCWjDmeDrur66C1cWuWanZD67NwCNN7+imd/Bt+VSqGNR+1shypx01LqnBJ
- G83yEXe0r50ovExTl7H8DlnEo0LVzJE1mlEP/3DvPDax9ztt349hK7FigjFreauomXsuLNxDA
- 7KEGkP6R9fBv9eKmIAcaev9wK6R/4vweNdMNCaoIsat0ATD00/llpFZyL8ox4DyR3uJFHzT2C
- mEpo4EM4Sn7BqEKq+2yh1KjR5OGcy7NC6hCTRT5QZ2ng53TijjebxZUcJyEK3poMBCjkrk7hl
- WcVD8V7RZVYZ1VW1rnboB16NtrowaU94S4ZfChmrJm48yuF2leoJ2wlvUHBe6IbbcEgeYniGh
- ezCuhuavhmMIJGUHwf43swcmZjYryf144g8c0I9ZFoSAZ2I+QEr8CLYezBSz6aqT81xOiCAMj
- YXE83bQYgRsGU31zy6Hvgo20bo9G7KfYk6qNVqzs9oZCRMctjNk6xz0sDvGOUg7vV9e9+XgIo
- 5BZiz7XJBkg9GTD/6SEOPgL7bzJF5v7eDLuTNWs2J/Lvjsb/p230HLEfpgx3HoWPEdHidtba+
- dktz9RFq2gZFfPchq0s=
+UI-OutboundReport: notjunk:1;M01:P0:oLHzECRR8UM=;XVJzPjUV4adEj7Nixd9l7JURA0X
+ O9/Dq5oqqqWKAKGPtG51Rn7fnw7WHBmoAE7dYgea6RqyXYr/E/hXQiI/grfGm87Rga562MvsF
+ VXbG7JhIjN4yOcdLZSrbOqN8cS7fPQa+1porMQ24tpcY9IbjiZy7Iqo+g27R1Fb2tlPjm5DQL
+ qzEjUMHIGiUUdvKAbK3WwzzPfEoi0iF9pjJRgNNl0nCLHvX9XPeX21vdRhpL6iSJ6F7uNvciR
+ wRotUT6T/2oM4X3SZzYy24b0Kl1I8WAKgeLbRpSLSlSX0VJG6v8L0mmZFTW/OE+xIyr5uF+Xm
+ PTMJfSrXo+dAzY28GbHzzuEnf+LXTWXEK2HvTnBUOkgccENQtpviT2Kfi2T/jyzt/NKz4ytZR
+ cMQE8XlZ4uozhBhZZW9vI73QQNiOYX/9kQLjWfnBmOLA+4RPqiynC15dwkvH4r/8ZQLc78l1/
+ 5Yl30YTNXmnm2+2EV5daqp8H90g0yZScdJ3kV8k1ZRo2AjuSySpOcCg4PmqlINZF+4KPSDUl1
+ UeUhnemVWeAMNcsvTfoi+1wWBBOSmPgNzAgMkFOfI3TwwpMkjK0nXXvnWAaPbMCkuqbSkE4Kq
+ IOzPVclqzFBDPII1kt9iOihuPLAZ9IaF4Du7yev9/rTe4czd6/tqnVX+chHYXNLeZUn8AhtAu
+ 4N4X1S/nt1Iun7xp24wEteBhRfD315FaxiCwS/DE8eL70I4MrQX41HiC7FelzJYCaHRsSVZBo
+ wkiB4U9c0Uui5yeYfka2qHk0Orwui0Ms9271gAgDNnz3i+CIa8i58mvZpilZ5HEbTfcfICWyl
+ uNrFcmBH2bET9zIPW5aAlQELJsyiYv81OamiSpN90wUdOwXtSSGIgcLxB1SjdzI18w6E2QVB4
+ j9OdTMkbushjHtUNaktwwBfqJDAFvK0Ch1lWDmIQbo84WJRnYa5inl5IoBPN2g/UHwd4xev1+
+ fxoRyH6kBuBK2f+kOScSca6kHy6y/Ja/4UgC4MKTuzfgs/n2Ms6SQ4l3DgCFi/yxotlMtp1Kb
+ KOfH7XL7oH2q8e9ZKXWNIcjLm/iIpXCZQIdsSPYSdph7py2TRphYWYtW68Gur+nXASFE1dk3c
+ cSFwni5D7AhoSmW2HC360ArYR4cWZv3+gLoSgRh7oGbIMog/aFP1vMFQJpy3fa9zV0KCA3KHO
+ BcaHBiNKuSm2BsFujOvFxHWDe5NI34qcZUheIg/ozoIwYTrJseAElL5dzOYywfMJ/HgkTLG1h
+ oIQ8KGXYA8qRB5mTcRbUHcxpYFk/bjFYW4Yo7pMl6YXDF/3wSFG7NwfTlrd8UYLHFzVpb/GQ3
+ UYEqWWR9HRHgV/6xuP2x2X5kRfer4UyVbbVy8IDRy3vUP5Vs/SVVuYuzjJebMgN+lDD8SVUW4
+ JQuukegwylgfBJeVHth4ZFfRD0MZr98FdtZdAVSJL/HJuEByj2VJJnJmXmyBvNXGjwzbMgfEn
+ lS8Tr6tmIlL4s8Lyp4HWr9/IQBCA=
 
-V2l0aCBsYW44OHh4IGJhc2VkIGRldmljZXMgdGhlIGxhbjc4eHggZHJpdmVyIGNhbiBnZXQgc3R1
-Y2sgaW4gYW4KaW50ZXJydXB0IGxvb3Agd2hpbGUgYnJpbmdpbmcgdGhlIGRldmljZSB1cCwgZmxv
-b2RpbmcgdGhlIGtlcm5lbCBsb2cKd2l0aCBtZXNzYWdlcyBsaWtlIHRoZSBmb2xsb3dpbmc6Cgps
-YW43OHh4IDItMzoxLjAgZW5wMXMwdTM6IGtldmVudCA0IG1heSBoYXZlIGJlZW4gZHJvcHBlZAoK
-UmVtb3ZpbmcgaW50ZXJydXB0IHN1cHBvcnQgZnJvbSB0aGUgbGFuODh4eCBQSFkgZHJpdmVyIGZv
-cmNlcyB0aGUKZHJpdmVyIHRvIHVzZSBwb2xsaW5nIGluc3RlYWQsIHdoaWNoIGF2b2lkcyB0aGUg
-cHJvYmxlbS4KClRoZSBpc3N1ZSBoYXMgYmVlbiBvYnNlcnZlZCB3aXRoIFJhc3BiZXJyeSBQaSBk
-ZXZpY2VzIGF0IGxlYXN0IHNpbmNlCjQuMTQgKHNlZSBbMV0sIGJ1ZyByZXBvcnQgZm9yIHRoZWly
-IGRvd25zdHJlYW0ga2VybmVsKSwgYXMgd2VsbCBhcwp3aXRoIE52aWRpYSBkZXZpY2VzIFsyXSBp
-biAyMDIwLCB3aGVyZSBkaXNhYmxpbmcgcG9sbGluZyB3YXMgdGhlCnZlbmRvci1zdWdnZXN0ZWQg
-d29ya2Fyb3VuZCAodG9nZXRoZXIgd2l0aCB0aGUgY2xhaW0gdGhhdCBwaHlsaWIKY2hhbmdlcyBp
-biA0LjkgbWFkZSB0aGUgaW50ZXJydXB0IGhhbmRsaW5nIGluIGxhbjc4eHggaW5jb21wYXRpYmxl
-KS4KCklwZXJmIHJlcG9ydHMgd2VsbCBvdmVyIDkwME1iaXRzL3NlYyBwZXIgZGlyZWN0aW9uIHdp
-dGggY2xpZW50IGluCi0tZHVhbHRlc3QgbW9kZSwgc28gdGhlcmUgZG9lcyBub3Qgc2VlbSB0byBi
-ZSBhIHNpZ25pZmljYW50IGltcGFjdCBvbgp0aHJvdWdocHV0IChsYW44OHh4IGRldmljZSBjb25u
-ZWN0ZWQgdmlhIHN3aXRjaCB0byB0aGUgcGVlcikuCgpbMV0gaHR0cHM6Ly9naXRodWIuY29tL3Jh
-c3BiZXJyeXBpL2xpbnV4L2lzc3Vlcy8yNDQ3ClsyXSBodHRwczovL2ZvcnVtcy5kZXZlbG9wZXIu
-bnZpZGlhLmNvbS90L2pldHNvbi14YXZpZXItYW5kLWxhbjc4MDAtcHJvYmxlbS8xNDIxMzQvMTEK
-Ckxpbms6IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnLzA5MDFkOTBkLTNmMjAtNGExMC1iNjgwLTlj
-OTc4ZTA0ZGRkYUBsdW5uLmNoClNpZ25lZC1vZmYtYnk6IEZpb25hIEtsdXRlIDxmaW9uYS5rbHV0
-ZUBnbXguZGU+CkNjOiBrZXJuZWwtbGlzdEByYXNwYmVycnlwaS5jb20KQ2M6IHN0YWJsZUB2Z2Vy
-Lmtlcm5lbC5vcmcKLS0tCiBkcml2ZXJzL25ldC9waHkvbWljcm9jaGlwLmMgfCA0NCAtLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCiAxIGZpbGUgY2hhbmdlZCwgNDQgZGVsZXRp
-b25zKC0pCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQvcGh5L21pY3JvY2hpcC5jIGIvZHJpdmVy
-cy9uZXQvcGh5L21pY3JvY2hpcC5jCmluZGV4IDBlMTdjYzQ1OGVmZC4uMDZlMjg2Mzg3ZmE5IDEw
-MDY0NAotLS0gYS9kcml2ZXJzL25ldC9waHkvbWljcm9jaGlwLmMKKysrIGIvZHJpdmVycy9uZXQv
-cGh5L21pY3JvY2hpcC5jCkBAIC0zNyw0NyArMzcsNiBAQCBzdGF0aWMgaW50IGxhbjg4eHhfd3Jp
-dGVfcGFnZShzdHJ1Y3QgcGh5X2RldmljZSAqcGh5ZGV2LCBpbnQgcGFnZSkKIAlyZXR1cm4gX19w
-aHlfd3JpdGUocGh5ZGV2LCBMQU44OFhYX0VYVF9QQUdFX0FDQ0VTUywgcGFnZSk7CiB9CiAKLXN0
-YXRpYyBpbnQgbGFuODh4eF9waHlfY29uZmlnX2ludHIoc3RydWN0IHBoeV9kZXZpY2UgKnBoeWRl
-dikKLXsKLQlpbnQgcmM7Ci0KLQlpZiAocGh5ZGV2LT5pbnRlcnJ1cHRzID09IFBIWV9JTlRFUlJV
-UFRfRU5BQkxFRCkgewotCQkvKiB1bm1hc2sgYWxsIHNvdXJjZSBhbmQgY2xlYXIgdGhlbSBiZWZv
-cmUgZW5hYmxlICovCi0JCXJjID0gcGh5X3dyaXRlKHBoeWRldiwgTEFOODhYWF9JTlRfTUFTSywg
-MHg3RkZGKTsKLQkJcmMgPSBwaHlfcmVhZChwaHlkZXYsIExBTjg4WFhfSU5UX1NUUyk7Ci0JCXJj
-ID0gcGh5X3dyaXRlKHBoeWRldiwgTEFOODhYWF9JTlRfTUFTSywKLQkJCSAgICAgICBMQU44OFhY
-X0lOVF9NQVNLX01ESU5UUElOX0VOXyB8Ci0JCQkgICAgICAgTEFOODhYWF9JTlRfTUFTS19MSU5L
-X0NIQU5HRV8pOwotCX0gZWxzZSB7Ci0JCXJjID0gcGh5X3dyaXRlKHBoeWRldiwgTEFOODhYWF9J
-TlRfTUFTSywgMCk7Ci0JCWlmIChyYykKLQkJCXJldHVybiByYzsKLQotCQkvKiBBY2sgaW50ZXJy
-dXB0cyBhZnRlciB0aGV5IGhhdmUgYmVlbiBkaXNhYmxlZCAqLwotCQlyYyA9IHBoeV9yZWFkKHBo
-eWRldiwgTEFOODhYWF9JTlRfU1RTKTsKLQl9Ci0KLQlyZXR1cm4gcmMgPCAwID8gcmMgOiAwOwot
-fQotCi1zdGF0aWMgaXJxcmV0dXJuX3QgbGFuODh4eF9oYW5kbGVfaW50ZXJydXB0KHN0cnVjdCBw
-aHlfZGV2aWNlICpwaHlkZXYpCi17Ci0JaW50IGlycV9zdGF0dXM7Ci0KLQlpcnFfc3RhdHVzID0g
-cGh5X3JlYWQocGh5ZGV2LCBMQU44OFhYX0lOVF9TVFMpOwotCWlmIChpcnFfc3RhdHVzIDwgMCkg
-ewotCQlwaHlfZXJyb3IocGh5ZGV2KTsKLQkJcmV0dXJuIElSUV9OT05FOwotCX0KLQotCWlmICgh
-KGlycV9zdGF0dXMgJiBMQU44OFhYX0lOVF9TVFNfTElOS19DSEFOR0VfKSkKLQkJcmV0dXJuIElS
-UV9OT05FOwotCi0JcGh5X3RyaWdnZXJfbWFjaGluZShwaHlkZXYpOwotCi0JcmV0dXJuIElSUV9I
-QU5ETEVEOwotfQotCiBzdGF0aWMgaW50IGxhbjg4eHhfc3VzcGVuZChzdHJ1Y3QgcGh5X2Rldmlj
-ZSAqcGh5ZGV2KQogewogCXN0cnVjdCBsYW44OHh4X3ByaXYgKnByaXYgPSBwaHlkZXYtPnByaXY7
-CkBAIC01MjgsOSArNDg3LDYgQEAgc3RhdGljIHN0cnVjdCBwaHlfZHJpdmVyIG1pY3JvY2hpcF9w
-aHlfZHJpdmVyW10gPSB7CiAJLmNvbmZpZ19hbmVnCT0gbGFuODh4eF9jb25maWdfYW5lZywKIAku
-bGlua19jaGFuZ2Vfbm90aWZ5ID0gbGFuODh4eF9saW5rX2NoYW5nZV9ub3RpZnksCiAKLQkuY29u
-ZmlnX2ludHIJPSBsYW44OHh4X3BoeV9jb25maWdfaW50ciwKLQkuaGFuZGxlX2ludGVycnVwdCA9
-IGxhbjg4eHhfaGFuZGxlX2ludGVycnVwdCwKLQogCS5zdXNwZW5kCT0gbGFuODh4eF9zdXNwZW5k
-LAogCS5yZXN1bWUJCT0gZ2VucGh5X3Jlc3VtZSwKIAkuc2V0X3dvbAk9IGxhbjg4eHhfc2V0X3dv
-bCwKLS0gCjIuNDkuMAoK
+Am 10.04.25 um 16:43 schrieb Andrew Lunn:
+>>> Ah, O.K. This tells me the PHY is a lan88xx. And there is a workaround
+>>> involved for an issue in this PHY. Often PHYs are driven by polling
+>>> for status changes once per second. Not all PHYs/boards support
+>>> interrupts. It could be this workaround has only been tested with
+>>> polling, not interrupts, and so is broken when interrupts are used.
+>>>
+>>> As a quick hack test, in lan78xx_phy_init()
+>>>
+>>> 	/* if phyirq is not set, use polling mode in phylib */
+>>> 	if (dev->domain_data.phyirq > 0)
+>>> 		phydev->irq =3D dev->domain_data.phyirq;
+>>> 	else
+>>> 		phydev->irq =3D PHY_POLL;
+>>>
+>>> Hard code phydev->irq to PHY_POLL, so interrupts are not used.
+>>>
+>>> See if you can reproduce the issue when interrupts are not used.
+>> It took a while, but I'm fairly confident now that the workaround works=
+,
+>> I've had over 1000 boots on the hardware in question and didn't see the
+>> bug. Someone going by upsampled reported the same in the issue on Githu=
+b
+>> [1], and pointed out that people working with some Nvidia board and a
+>> LAN7800 USB device came to the same conclusion a while ago [2].
+>>
+>> That leaves me with the question, what does that mean going forward?
+>> Would it make sense to add a quirk to unconditionally force polling on
+>> lan88xx, at least until/unless the interrupt handling can be fixed?
+>=20
+> I don't think you need a quirk:
+>=20
+> static struct phy_driver microchip_phy_driver[] =3D {
+> {
+>          .phy_id         =3D 0x0007c132,
+>          /* This mask (0xfffffff2) is to differentiate from
+>           * LAN8742 (phy_id 0x0007c130 and 0x0007c131)
+>           * and allows future phy_id revisions.
+>           */
+>          .phy_id_mask    =3D 0xfffffff2,
+>          .name           =3D "Microchip LAN88xx",
+>=20
+>          /* PHY_GBIT_FEATURES */
+>=20
+>          .probe          =3D lan88xx_probe,
+>          .remove         =3D lan88xx_remove,
+>=20
+>          .config_init    =3D lan88xx_config_init,
+>          .config_aneg    =3D lan88xx_config_aneg,
+>          .link_change_notify =3D lan88xx_link_change_notify,
+>=20
+>          .config_intr    =3D lan88xx_phy_config_intr,
+>          .handle_interrupt =3D lan88xx_handle_interrupt,
+>=20
+> Just remove .config_intr and .handle_interrupt. If these are not
+> provided, phylib will poll, even if an interrupt number has been
+> passed. And since these functions are not shared with any other PHY,
+> you can remove them.
+>=20
+> Please write a good commit message, we want it clear why they where
+> removed, to try to prevent somebody putting them back again.
+>=20
+> And please aim this for net, not net-next:
+>=20
+> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+>=20
+> The change will then get back ported to stable kernels.
+
+I just sent the new patch, I hope I got that right, thank you! Test got=20
+to about 650 successful boots by now. :-)
+
+Best regards,
+Fiona
+
 
