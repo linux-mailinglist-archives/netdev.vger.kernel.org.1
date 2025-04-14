@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-182334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 799E8A8880B
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:09:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87CE3A8880E
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:10:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09D8D189933B
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:09:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4527D176E21
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0922288CB2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E720288CA9;
 	Mon, 14 Apr 2025 16:08:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="k5W1s5Tq";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="s0DhBvqx"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="u0p8o9lS";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="7o7XSzmx"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C32284695
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B515D284699
 	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 16:08:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744646898; cv=none; b=GK7jcu4FtnrCUGeTcOYyUsaGFB1qXi1DBJYcSJ2vVXnUOy4RBzehdMC1DMrvIQdaGZdKiOhyg2LGrIuOtirspogNdqI8Xr7lG182e/b+0enx8PjLzmXb1u8pZSeB21YJmvYqRJ9bap6YkJHfUt3sYeDl5vpUTuYMjRmgD3FETAY=
+	t=1744646898; cv=none; b=Ao/kpFz6D4cNjObYX/g2dFlu0mfGh1RVYPJ3bG2sMn661RZ81+Ei5TPDEAO2DOrCr3UHgpeG68Oscw6FkeI5Ysmiqwm6eAW4cCDCGGHmI65yJUW1wMyxGFkchOkYw9GT9nZRKsUhhmPihMsc6Jz7pPFLDb81ISrSMkLHG8nuT34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1744646898; c=relaxed/simple;
-	bh=mpWnrGSrlTSO+lFgale6qOtBfvpFAUndKnFyjpu3eeA=;
+	bh=zrHr0oIdmFVvuqReRS6A1Vk8JfCJLTqEyMuMgmRm85A=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=M0TC7fh2ND6dh/0AaUSq/TefHfK8uc93uSqnoeLj+uhNo+KXve8BgMjqCU/EOgnGmdLzXjF9qK8Q2lkPsMB/4U+pVu+NQeeSosfZoYZ9i5HkRBPne2xxQ8SEJcMutnVGey2drkyrhjwcalNC4DRNSn09bk5ZCb7jydIErLwzvbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=k5W1s5Tq; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=s0DhBvqx; arc=none smtp.client-ip=193.142.43.55
+	 MIME-Version; b=l1HaPTgpMq2QAKofJzniY/5IurJTL4KyP35DFqRDTJhO810m0NWalbM/xJKtKbX05GufmODomR8DD8W72FQp8tt2AeoEcRqIagAQvqpi1uhx3h8LmVGxbm3cUCndlbeQiHrQw+fONQN7Rm88wu17ip6+G0C/7N9XN4FFTcyKjNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=u0p8o9lS; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=7o7XSzmx; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1744646892;
+	s=2020; t=1744646893;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=B91Vs7Kr8/n30DMdAVzJeH1Fm4E83+3x5T7eHPmZihs=;
-	b=k5W1s5TqIhHJwVsdXZz1ElipHlvaHC4AGz8OjCHTwTfYeJYfHj7VSrGhy7bBqpQLO3waxN
-	v02Q7neFlckKw+On5Z+OMJ3M4kA6MyyiNMyJWYvJfyMRALNPEHxUh/D+pMqQVHx0PH5Sf0
-	oh0nZPFPslTZKXOBK+yBsk0nSmpeqS5RarJu32Y87CPLOgLdmRs+tUvuaHhknHp2I/x2gv
-	tK836WFIEO1BQ/2DNfV0251SkrCor1dctExfEPixn0pHKI0WgstAp294YuxWTjuxaeIQ7C
-	hbOdUThAZ1Rsyp4PEeJQpJNzo3VQahozafld+6ig0F3HYACfCsDHCfZfuUtonQ==
+	bh=ItheQOXN0W8/U3eIeVElS1GMGBEBaL1p1NvXJGWnpLY=;
+	b=u0p8o9lSr8QSW5yjQvmHEHfTLSQ1cjSD+GMUHGAjsBaSkMiQkBGTW7BNgndXGSbM6pM/X6
+	2IMKASyTEQCszA3vfJnT6DNIudR/ZUMrAGnTZIzgzQZ5eJ5Yk90K505ZUFZzU0hJvYqChz
+	9Q9Ig/wkZBonYfl/+gHJsVTjii0D6j55TJ/cg5+D9XT9fVpsjpTObP0FztPx4+ww099oCA
+	spvOXQ4V/a9g33xyilwEH0JQ1XfmQbMQBPTo3RQASib2GXQYLqrpEjOQeD1YEkb+S2w9rV
+	uXO18WEVwYZQDNXN9M9spuYkQpOTtr8uKIrJHCkQ4zD6C+XMcU9/KOP30FcK1w==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1744646892;
+	s=2020e; t=1744646893;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=B91Vs7Kr8/n30DMdAVzJeH1Fm4E83+3x5T7eHPmZihs=;
-	b=s0DhBvqx8C59BTwRoUKTqfduQrYFixN+YMaFGYY964squ9tATPyqPn2kx9BGHlkMbWJIP/
-	z4/9jUOQB2RuorCw==
+	bh=ItheQOXN0W8/U3eIeVElS1GMGBEBaL1p1NvXJGWnpLY=;
+	b=7o7XSzmxcMa4Pl4d2mBEf53ukv6SKPSmNrSfSxM8hpIuh7VZeUsncz6fKPrHDz3PMpnjKz
+	n216a2vVAgUR8dAg==
 To: netdev@vger.kernel.org,
 	linux-rt-devel@lists.linux.dev
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -63,13 +63,12 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Simon Horman <horms@kernel.org>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Aaron Conole <aconole@redhat.com>,
-	Eelco Chaudron <echaudro@redhat.com>,
-	Ilya Maximets <i.maximets@ovn.org>,
-	dev@openvswitch.org
-Subject: [PATCH net-next v2 12/18] openvswitch: Move ovs_frag_data_storage into the struct ovs_pcpu_storage
-Date: Mon, 14 Apr 2025 18:07:48 +0200
-Message-ID: <20250414160754.503321-13-bigeasy@linutronix.de>
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>
+Subject: [PATCH net-next v2 13/18] net/sched: act_mirred: Move the recursion counter struct netdev_xmit
+Date: Mon, 14 Apr 2025 18:07:49 +0200
+Message-ID: <20250414160754.503321-14-bigeasy@linutronix.de>
 In-Reply-To: <20250414160754.503321-1-bigeasy@linutronix.de>
 References: <20250414160754.503321-1-bigeasy@linutronix.de>
 Precedence: bulk
@@ -80,112 +79,91 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-ovs_frag_data_storage is a per-CPU variable and relies on disabled BH for i=
-ts
+mirred_nest_level is a per-CPU variable and relies on disabled BH for its
 locking. Without per-CPU locking in local_bh_disable() on PREEMPT_RT
 this data structure requires explicit locking.
 
-Move ovs_frag_data_storage into the struct ovs_pcpu_storage which already
-provides locking for the structure.
+Move mirred_nest_level to struct netdev_xmit as u8, provide wrappers.
 
-Cc: Aaron Conole <aconole@redhat.com>
-Cc: Eelco Chaudron <echaudro@redhat.com>
-Cc: Ilya Maximets <i.maximets@ovn.org>
-Cc: dev@openvswitch.org
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: Jiri Pirko <jiri@resnulli.us>
 Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 ---
- net/openvswitch/actions.c  | 20 ++------------------
- net/openvswitch/datapath.h | 16 ++++++++++++++++
- 2 files changed, 18 insertions(+), 18 deletions(-)
+ include/linux/netdevice_xmit.h |  3 +++
+ net/sched/act_mirred.c         | 28 +++++++++++++++++++++++++---
+ 2 files changed, 28 insertions(+), 3 deletions(-)
 
-diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-index f4996c11aefac..4d20eadd77ceb 100644
---- a/net/openvswitch/actions.c
-+++ b/net/openvswitch/actions.c
-@@ -39,22 +39,6 @@
- #include "flow_netlink.h"
- #include "openvswitch_trace.h"
-=20
--#define MAX_L2_LEN	(VLAN_ETH_HLEN + 3 * MPLS_HLEN)
--struct ovs_frag_data {
--	unsigned long dst;
--	struct vport *vport;
--	struct ovs_skb_cb cb;
--	__be16 inner_protocol;
--	u16 network_offset;	/* valid only for MPLS */
--	u16 vlan_tci;
--	__be16 vlan_proto;
--	unsigned int l2_len;
--	u8 mac_proto;
--	u8 l2_data[MAX_L2_LEN];
--};
--
--static DEFINE_PER_CPU(struct ovs_frag_data, ovs_frag_data_storage);
--
- DEFINE_PER_CPU(struct ovs_pcpu_storage, ovs_pcpu_storage) =3D {
- 	.bh_lock =3D INIT_LOCAL_LOCK(bh_lock),
- };
-@@ -771,7 +755,7 @@ static int set_sctp(struct sk_buff *skb, struct sw_flow=
-_key *flow_key,
- static int ovs_vport_output(struct net *net, struct sock *sk,
- 			    struct sk_buff *skb)
- {
--	struct ovs_frag_data *data =3D this_cpu_ptr(&ovs_frag_data_storage);
-+	struct ovs_frag_data *data =3D this_cpu_ptr(&ovs_pcpu_storage.frag_data);
- 	struct vport *vport =3D data->vport;
-=20
- 	if (skb_cow_head(skb, data->l2_len) < 0) {
-@@ -823,7 +807,7 @@ static void prepare_frag(struct vport *vport, struct sk=
-_buff *skb,
- 	unsigned int hlen =3D skb_network_offset(skb);
- 	struct ovs_frag_data *data;
-=20
--	data =3D this_cpu_ptr(&ovs_frag_data_storage);
-+	data =3D this_cpu_ptr(&ovs_pcpu_storage.frag_data);
- 	data->dst =3D skb->_skb_refdst;
- 	data->vport =3D vport;
- 	data->cb =3D *OVS_CB(skb);
-diff --git a/net/openvswitch/datapath.h b/net/openvswitch/datapath.h
-index 4a665c3cfa906..1b5348b0f5594 100644
---- a/net/openvswitch/datapath.h
-+++ b/net/openvswitch/datapath.h
-@@ -13,6 +13,7 @@
- #include <linux/skbuff.h>
- #include <linux/u64_stats_sync.h>
- #include <net/ip_tunnels.h>
-+#include <net/mpls.h>
-=20
- #include "conntrack.h"
- #include "flow.h"
-@@ -173,6 +174,20 @@ struct ovs_net {
- 	bool xt_label;
+diff --git a/include/linux/netdevice_xmit.h b/include/linux/netdevice_xmit.h
+index 3bbbc1a9860a3..4793ec42b1faa 100644
+--- a/include/linux/netdevice_xmit.h
++++ b/include/linux/netdevice_xmit.h
+@@ -11,6 +11,9 @@ struct netdev_xmit {
+ #if IS_ENABLED(CONFIG_NF_DUP_NETDEV)
+ 	u8 nf_dup_skb_recursion;
+ #endif
++#if IS_ENABLED(CONFIG_NET_ACT_MIRRED)
++	u8 sched_mirred_nest;
++#endif
  };
 =20
-+#define MAX_L2_LEN	(VLAN_ETH_HLEN + 3 * MPLS_HLEN)
-+struct ovs_frag_data {
-+	unsigned long dst;
-+	struct vport *vport;
-+	struct ovs_skb_cb cb;
-+	__be16 inner_protocol;
-+	u16 network_offset;	/* valid only for MPLS */
-+	u16 vlan_tci;
-+	__be16 vlan_proto;
-+	unsigned int l2_len;
-+	u8 mac_proto;
-+	u8 l2_data[MAX_L2_LEN];
-+};
+ #endif
+diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+index 5b38143659249..5f01f567c934d 100644
+--- a/net/sched/act_mirred.c
++++ b/net/sched/act_mirred.c
+@@ -30,7 +30,29 @@ static LIST_HEAD(mirred_list);
+ static DEFINE_SPINLOCK(mirred_list_lock);
+=20
+ #define MIRRED_NEST_LIMIT    4
+-static DEFINE_PER_CPU(unsigned int, mirred_nest_level);
 +
- struct deferred_action {
- 	struct sk_buff *skb;
- 	const struct nlattr *actions;
-@@ -200,6 +215,7 @@ struct action_flow_keys {
- struct ovs_pcpu_storage {
- 	struct action_fifo action_fifos;
- 	struct action_flow_keys flow_keys;
-+	struct ovs_frag_data frag_data;
- 	int exec_level;
- 	struct task_struct *owner;
- 	local_lock_t bh_lock;
++#ifndef CONFIG_PREEMPT_RT
++static u8 tcf_mirred_nest_level_inc_return(void)
++{
++	return __this_cpu_inc_return(softnet_data.xmit.sched_mirred_nest);
++}
++
++static void tcf_mirred_nest_level_dec(void)
++{
++	__this_cpu_dec(softnet_data.xmit.sched_mirred_nest);
++}
++
++#else
++static u8 tcf_mirred_nest_level_inc_return(void)
++{
++	return current->net_xmit.sched_mirred_nest++;
++}
++
++static void tcf_mirred_nest_level_dec(void)
++{
++	current->net_xmit.sched_mirred_nest--;
++}
++#endif
+=20
+ static bool tcf_mirred_is_act_redirect(int action)
+ {
+@@ -423,7 +445,7 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *sk=
+b,
+ 	int m_eaction;
+ 	u32 blockid;
+=20
+-	nest_level =3D __this_cpu_inc_return(mirred_nest_level);
++	nest_level =3D tcf_mirred_nest_level_inc_return();
+ 	if (unlikely(nest_level > MIRRED_NEST_LIMIT)) {
+ 		net_warn_ratelimited("Packet exceeded mirred recursion limit on dev %s\n=
+",
+ 				     netdev_name(skb->dev));
+@@ -454,7 +476,7 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *sk=
+b,
+ 				   retval);
+=20
+ dec_nest_level:
+-	__this_cpu_dec(mirred_nest_level);
++	tcf_mirred_nest_level_dec();
+=20
+ 	return retval;
+ }
 --=20
 2.49.0
 
