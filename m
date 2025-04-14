@@ -1,196 +1,105 @@
-Return-Path: <netdev+bounces-182082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57315A87B3B
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 11:01:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C877A87B6F
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 11:06:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 620FD1723AC
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 09:00:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB36D3A2B7B
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 09:06:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 194E825E819;
-	Mon, 14 Apr 2025 09:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B81BA2580DD;
+	Mon, 14 Apr 2025 09:06:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Zp9kwcVA"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Kgb3xxE+"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FE031B21A7;
-	Mon, 14 Apr 2025 09:00:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB05B25A2DE
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 09:06:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744621243; cv=none; b=mO8S+Z7VZlYiRuAULwfELAqi+OKEe1Fn8OYR03/id/fr892g6cXB6RoZbqkxIXWdctL4vDFW8q3RgM482bMBsPYtZiNEnsUcHzkgXwfqxIiiXiVKYmslHnmdDVOE0VWneOnfJmhT8gZbQ3qXqsxzmatUjbRCOo1/lA1c7Lf67ek=
+	t=1744621574; cv=none; b=c978luxQafj4z1l5wWC5vxpuo4iwBXgigZP3GCjrx+KznxWZuSj1nE48e7fgOF8rter+vvFSdJRqh/xMUJAkXSHn/prMstNPuqPujXYCRIgAgPB02uwZW8/cTLjlSl65hwPaKGuRaltlHOg6jKonKiwE7Tq6GZ7QHqU5fRe+JBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744621243; c=relaxed/simple;
-	bh=SgC9nKmAXqOqD7lU7C44bE42f0kscW5919alLDnydik=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=BUMIQUWNC97ed3OXO0yQ1Zxv+G4tNPxnrEzUKHCC7nMr6kXnRy5NY5onc75REUYFuMQvcbVR3HZp3xMuNX5cvYfcWpRbmL4RlapfsfkNOSgr/rFak2zyBkIB8j+WdkX1BS5NF8znIYDNoOsIyVfiE3nWPIqtIRbll3i1VjcwHCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Zp9kwcVA; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1186)
-	id D1C3821180D3; Mon, 14 Apr 2025 02:00:34 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D1C3821180D3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1744621234;
-	bh=1yD9vuRJtl+z43VxkiUGzUyb0pDEZDwEzowuVDXBCEs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Zp9kwcVAi/aESsVoaTeho7EVkrFMBtx98eeWTWrv44BzJQoklx3mFYadji++dRIZE
-	 VsysN9fDIZxhyTL9zqkV/46DFhlNd4r6ChngqBhgoxX2pSpWOCdRsgs2CbW0s3VMc5
-	 QUkcEfNrNovpfKqD+tSw8NzepOuKma3wzXHmX4iM=
-From: Konstantin Taranov <kotaranov@linux.microsoft.com>
-To: kotaranov@microsoft.com,
-	pabeni@redhat.com,
-	haiyangz@microsoft.com,
-	kys@microsoft.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	decui@microsoft.com,
-	wei.liu@kernel.org,
-	longli@microsoft.com,
-	jgg@ziepe.ca,
-	leon@kernel.org
-Cc: linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH rdma-next v2 3/3] RDMA/mana_ib: Add support of 4M, 1G, and 2G pages
-Date: Mon, 14 Apr 2025 02:00:34 -0700
-Message-Id: <1744621234-26114-4-git-send-email-kotaranov@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1744621234-26114-1-git-send-email-kotaranov@linux.microsoft.com>
-References: <1744621234-26114-1-git-send-email-kotaranov@linux.microsoft.com>
+	s=arc-20240116; t=1744621574; c=relaxed/simple;
+	bh=Q3fsHT+DJ5ypFErijp7VmxB91Vyz0k4CULXXQ3IXaTw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=aJKFNgO+cLsYJ+2uC1fTB05AlZ3cf+tt5wkr5VVT//AMu5Kjrpm/+2PqufGyen0fFDTSfV5jSaPrGIvrRte+nqTU2sVKQlL6TfcFlLTGv4FHPymiyI/8R54fcSW6L3v2yfZJf+R/Fd71k5+qTnsjkYO6n1rqel+0bLJIPNczRl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Kgb3xxE+; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=gnja6srub3n8tJYS03csOlPaZZrQF5QqUXIS5NZAuvw=; b=Kgb3xxE+36KP1bFTLvCdZqc0HL
+	e/Fh3IlAjOp4ZAvzc4UcuLthtIZD34391hP9VimUS8hvGE+b3sKLTkM2RJhz2ICgBX2q/L3W2N8PU
+	tK23bjbOibkojsSFIa9MszfDB3ZqiVdtK5IetR771Sb9pCDCnCzMZ/cLZV7Yi7A5i5iefVyOMj6y0
+	xLUXAV3hdJFU+iXPVjzBmlESzekW1wK6ZlrGTDjPBvL7IjmK2yfljrSDtaRHX2j43UO6l13L1SM+4
+	i+Z6Aby5Njc4n79Je8xr+hSKWDIAiJDOUBWqyWFah6Syxj5YpL7SjxZ+Wgt92r7IPxQ2USKmRZg23
+	LAP1tBMA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58320)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u4FlQ-0006CB-22;
+	Mon, 14 Apr 2025 10:06:00 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u4FlM-0007cR-16;
+	Mon, 14 Apr 2025 10:05:56 +0100
+Date: Mon, 14 Apr 2025 10:05:56 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH v2 net-next 0/4] net: stmmac: anarion: cleanups
+Message-ID: <Z_zP9BvZlqeq3Ssl@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Konstantin Taranov <kotaranov@microsoft.com>
+A series of cleanups to the anarion glue driver.
 
-Check PF capability flag whether the 4M, 1G, and 2G pages are
-supported. Add these pages sizes to mana_ib, if supported.
+Clean up anarion_config_dt() error handling, printing a human readable
+error rather than the numeric errno, and use ERR_CAST().
 
-Define possible page sizes in enum gdma_page_type and
-remove unused enum atb_page_size.
+Using a switch statement with incorrect "fallthrough;" for RGMII vs
+non-RGMII is unnecessary when we have phy_interface_mode_is_rgmii().
+Convert to use the helper.
 
-Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
----
- drivers/infiniband/hw/mana/main.c               | 10 +++++++---
- drivers/infiniband/hw/mana/mana_ib.h            |  1 +
- drivers/net/ethernet/microsoft/mana/gdma_main.c |  1 +
- include/net/mana/gdma.h                         | 17 +++--------------
- 4 files changed, 12 insertions(+), 17 deletions(-)
+Use stmmac_pltfr_probe() rahter than open-coding the call to the
+init function (which stmmac_pltfr_probe() will do for us.)
 
-diff --git a/drivers/infiniband/hw/mana/main.c b/drivers/infiniband/hw/mana/main.c
-index 730f958..a28b712 100644
---- a/drivers/infiniband/hw/mana/main.c
-+++ b/drivers/infiniband/hw/mana/main.c
-@@ -479,7 +479,7 @@ int mana_ib_create_dma_region(struct mana_ib_dev *dev, struct ib_umem *umem,
- {
- 	unsigned long page_sz;
- 
--	page_sz = ib_umem_find_best_pgsz(umem, PAGE_SZ_BM, virt);
-+	page_sz = ib_umem_find_best_pgsz(umem, dev->adapter_caps.page_size_cap, virt);
- 	if (!page_sz) {
- 		ibdev_dbg(&dev->ib_dev, "Failed to find page size.\n");
- 		return -EINVAL;
-@@ -494,7 +494,7 @@ int mana_ib_create_zero_offset_dma_region(struct mana_ib_dev *dev, struct ib_ume
- 	unsigned long page_sz;
- 
- 	/* Hardware requires dma region to align to chosen page size */
--	page_sz = ib_umem_find_best_pgoff(umem, PAGE_SZ_BM, 0);
-+	page_sz = ib_umem_find_best_pgoff(umem, dev->adapter_caps.page_size_cap, 0);
- 	if (!page_sz) {
- 		ibdev_dbg(&dev->ib_dev, "Failed to find page size.\n");
- 		return -EINVAL;
-@@ -577,7 +577,7 @@ int mana_ib_query_device(struct ib_device *ibdev, struct ib_device_attr *props,
- 
- 	memset(props, 0, sizeof(*props));
- 	props->max_mr_size = MANA_IB_MAX_MR_SIZE;
--	props->page_size_cap = PAGE_SZ_BM;
-+	props->page_size_cap = dev->adapter_caps.page_size_cap;
- 	props->max_qp = dev->adapter_caps.max_qp_count;
- 	props->max_qp_wr = dev->adapter_caps.max_qp_wr;
- 	props->device_cap_flags = IB_DEVICE_RC_RNR_NAK_GEN;
-@@ -696,6 +696,10 @@ int mana_ib_gd_query_adapter_caps(struct mana_ib_dev *dev)
- 	caps->max_recv_sge_count = resp.max_recv_sge_count;
- 	caps->feature_flags = resp.feature_flags;
- 
-+	caps->page_size_cap = PAGE_SZ_BM;
-+	if (mdev_to_gc(dev)->pf_cap_flags1 & GDMA_DRV_CAP_FLAG_1_GDMA_PAGES_4MB_1GB_2GB)
-+		caps->page_size_cap |= (SZ_4M | SZ_1G | SZ_2G);
-+
- 	return 0;
- }
- 
-diff --git a/drivers/infiniband/hw/mana/mana_ib.h b/drivers/infiniband/hw/mana/mana_ib.h
-index 6903946..f0dbd90 100644
---- a/drivers/infiniband/hw/mana/mana_ib.h
-+++ b/drivers/infiniband/hw/mana/mana_ib.h
-@@ -60,6 +60,7 @@ struct mana_ib_adapter_caps {
- 	u32 max_recv_sge_count;
- 	u32 max_inline_data_size;
- 	u64 feature_flags;
-+	u64 page_size_cap;
- };
- 
- struct mana_ib_queue {
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 4a2b17f..b5156d4 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -937,6 +937,7 @@ int mana_gd_verify_vf_version(struct pci_dev *pdev)
- 			err, resp.hdr.status);
- 		return err ? err : -EPROTO;
- 	}
-+	gc->pf_cap_flags1 = resp.pf_cap_flags1;
- 	if (resp.pf_cap_flags1 & GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG) {
- 		err = mana_gd_query_hwc_timeout(pdev, &hwc->hwc_timeout);
- 		if (err) {
-diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-index 3db506d..89abf98 100644
---- a/include/net/mana/gdma.h
-+++ b/include/net/mana/gdma.h
-@@ -407,6 +407,8 @@ struct gdma_context {
- 
- 	/* Azure RDMA adapter */
- 	struct gdma_dev		mana_ib;
-+
-+	u64 pf_cap_flags1;
- };
- 
- #define MAX_NUM_GDMA_DEVICES	4
-@@ -556,6 +558,7 @@ enum {
- #define GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX BIT(2)
- #define GDMA_DRV_CAP_FLAG_1_HWC_TIMEOUT_RECONFIG BIT(3)
- #define GDMA_DRV_CAP_FLAG_1_VARIABLE_INDIRECTION_TABLE_SUPPORT BIT(5)
-+#define GDMA_DRV_CAP_FLAG_1_GDMA_PAGES_4MB_1GB_2GB BIT(4)
- 
- #define GDMA_DRV_CAP_FLAGS1 \
- 	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
-@@ -704,20 +707,6 @@ struct gdma_query_hwc_timeout_resp {
- 	u32 reserved;
- };
- 
--enum atb_page_size {
--	ATB_PAGE_SIZE_4K,
--	ATB_PAGE_SIZE_8K,
--	ATB_PAGE_SIZE_16K,
--	ATB_PAGE_SIZE_32K,
--	ATB_PAGE_SIZE_64K,
--	ATB_PAGE_SIZE_128K,
--	ATB_PAGE_SIZE_256K,
--	ATB_PAGE_SIZE_512K,
--	ATB_PAGE_SIZE_1M,
--	ATB_PAGE_SIZE_2M,
--	ATB_PAGE_SIZE_MAX,
--};
--
- enum gdma_mr_access_flags {
- 	GDMA_ACCESS_FLAG_LOCAL_READ = BIT_ULL(0),
- 	GDMA_ACCESS_FLAG_LOCAL_WRITE = BIT_ULL(1),
+Finally, convert to use devm_stmmac_pltfr_probe() which allows the
+removal of the .remove initialiser in the driver structure.
+
+Not tested on hardware.
+
+v2: fix build error, add Andrew's r-bs.
+
+ .../net/ethernet/stmicro/stmmac/dwmac-anarion.c    | 25 +++++++---------------
+ 1 file changed, 8 insertions(+), 17 deletions(-)
+
 -- 
-2.43.0
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
