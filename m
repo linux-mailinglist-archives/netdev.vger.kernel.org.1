@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-182049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F9F4A8780D
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 08:42:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D657DA87812
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 08:45:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6EF63AED15
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 06:42:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F415E188F512
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 06:45:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D54A1AAE08;
-	Mon, 14 Apr 2025 06:42:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 465881ACEDA;
+	Mon, 14 Apr 2025 06:45:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IB+7zURI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YpqQYCoL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9E163CF;
-	Mon, 14 Apr 2025 06:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E1CB539A;
+	Mon, 14 Apr 2025 06:44:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744612935; cv=none; b=ff5SsvdCDwarBu9k8fxUpoQu7JcEuXcjGpMlMslX+FBSLvZW4fspVmK+ipWLgJ1w8wRHwrbF9x3WGm/dwkCf76Jwmd6PLaZsL3TESNaUfebVIL46aWoyKNJmtp/JBfcy9C9AkBFijE6UicC0oIWfB8x1uy65W2O2SHJUnmlVDdc=
+	t=1744613100; cv=none; b=EBUkFg3aG47D4XgR43CLniRh0yBgf6KchnHVvZAr12kLyRMmsBOZ+x/Cm+b93BAxFboEVejailQTbMlJjdLGicCoSlZFke+HCqkuO2nAF9EgPBsOU+qfkQ1Hnkmoy+0vjadA8iZAj0dhBOS8FB6XBGaVVTn+jqn4ngJ5B4t4DD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744612935; c=relaxed/simple;
-	bh=LaC8Uk1rtpi3w4IKl1aeaKwG5cGfT1cAT2ZxnrVAd+M=;
+	s=arc-20240116; t=1744613100; c=relaxed/simple;
+	bh=scgY6rSdG64gMCtLdTUGZRrDotfGZMZY7IF2n6pjUFQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wx52BieSg0/tEO3ihLUUGap4Amml2ISALqTpUIYGpkaiKPV6r63f09xqxDhpDnIQ7PchyKjxvvqhq5xjlgeYS+3hFkp0da+Zb8ijv2fJpJag8ybvzHqgW8dNDoBZ6IMS9uJErLzFC+N9vqbx8GXvrSvTvIpZ+Yvja+KR0FgJyRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IB+7zURI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA62FC4CEE2;
-	Mon, 14 Apr 2025 06:42:10 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=LkJPlhYuyJ4a0HsjfQdbiD+/SNFWgfqXvs4GK3xRtHyvNkM/f+dy6hdxzI8U0Ph3qRg4z7WAgE9fZsgc6SGnDVAABgcNjoz2Necqm5QHBdm3bfsqIVSu1TgclNYq6Chk5sVc5k23HsnWHWEXs0LzwDUi2LvGjPy7yu47efvHwIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YpqQYCoL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F5BDC4CEE2;
+	Mon, 14 Apr 2025 06:44:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744612934;
-	bh=LaC8Uk1rtpi3w4IKl1aeaKwG5cGfT1cAT2ZxnrVAd+M=;
+	s=k20201202; t=1744613099;
+	bh=scgY6rSdG64gMCtLdTUGZRrDotfGZMZY7IF2n6pjUFQ=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=IB+7zURIQ8uuLEwH+z+U+/7ZnI4he6ysTeZQSzEoHnUet+hyIZsT7mvtxdInsasmJ
-	 M5lMpQjBgFChMZRdm50Lo4RSvs9gsM7YYTttLH0Fmypv7MUpawASSsUE2kvoHMsq7h
-	 x1ptBt0i7zE3FuxIVC6wynoJPVr+zBqQCDH03JwW1OE3ae5xfYNJlbFyc96FrVCLSp
-	 0SRj4q7Dm14HI/bFZcvIKygKnbJHeWdXTesBnLcOEtAkquYLVdUVYoMdBFzknYS+l/
-	 cQOadcYDEo43+dbkMLjLSmld7vkVzmEETuB/RSI4DsGqz9lVVf+JP30pqtKaZiBBKr
-	 OXtzX17J3pE8w==
-Message-ID: <f5f59282-3551-4f2c-9c85-09a3ccec4745@kernel.org>
-Date: Mon, 14 Apr 2025 08:42:06 +0200
+	b=YpqQYCoLJXEAN1H4bmdNl4RvynF9xU7bn6JwrdWRrn6da80hSjGpHoM99vVzSWW0y
+	 s9IurUkRB6JP29DvpYXiH7+p70jrhFQ+Jf/J0LBE4joFYaBR1onU40gtKPNmPgjmX6
+	 MeFAbW0LaV+p/hnRFKZCzErGbGTkTbRTFlRL0Y4pZh/8JxNaiWRTBsVukgwTiNjttu
+	 GHXKjrydl32v2Vg4Zo61ygb1n5IzicqurYPeDitmI0LsJaDhbcuz/lF99BgUF4dbk2
+	 Kh9GjVCdGfcX+zWvAab51UJcSz+SM47rp0iJFUqFHaYGHTkAOkRC/kzZomYnS2sSma
+	 zTOWe2kCj0F9A==
+Message-ID: <55586a5f-522f-4b42-b8ef-078043752e4b@kernel.org>
+Date: Mon, 14 Apr 2025 08:44:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,8 +50,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 5/5] clk: sophgo: Add clock controller support for
- SG2044 SoC
+Subject: Re: [PATCH v4 1/5] dt-bindings: soc: sophgo: Add SG2044 top syscon
+ device
 To: Inochi Amaoto <inochiama@gmail.com>,
  Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
  <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
@@ -66,7 +66,7 @@ Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
  netdev@vger.kernel.org, Yixun Lan <dlan@gentoo.org>,
  Longbin Li <looong.bin@gmail.com>
 References: <20250413224450.67244-1-inochiama@gmail.com>
- <20250413224450.67244-6-inochiama@gmail.com>
+ <20250413224450.67244-2-inochiama@gmail.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -112,51 +112,24 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20250413224450.67244-6-inochiama@gmail.com>
+In-Reply-To: <20250413224450.67244-2-inochiama@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 14/04/2025 00:44, Inochi Amaoto wrote:
-> +
-> +static int sg2044_clk_probe(struct platform_device *pdev)
-> +{
-> +	struct device *dev = &pdev->dev;
-> +	struct sg2044_clk_ctrl *ctrl;
-> +	const struct sg2044_clk_desc_data *desc;
-> +	void __iomem *reg;
-> +	u32 num_clks;
-> +
-> +	reg = devm_platform_ioremap_resource(pdev, 0);
-> +	if (IS_ERR(reg))
-> +		return PTR_ERR(reg);
-> +
-> +	desc = device_get_match_data(dev);
-> +	if (!desc)
-> +		return dev_err_probe(dev, -EINVAL, "no match data for platform\n");
-> +
-> +	num_clks = desc->num_div + desc->num_gate + desc->num_mux;
-> +
-> +	ctrl = devm_kzalloc(dev, struct_size(ctrl, data.hws, num_clks), GFP_KERNEL);
-> +	if (!ctrl)
-> +		return -ENOMEM;
-> +
-> +	ctrl->data.num = num_clks;
-> +
-> +	return sg2044_clk_init_ctrl(dev, reg, ctrl, desc);
-> +}
-> +
-> +static struct sg2044_clk_desc_data sg2044_clk_desc_data = {
+> The SG2044 top syscon device provide PLL clock control and some other
+> misc feature of the SoC.
+> 
+> Add the compatible string for SG2044 top syscon device.
+> 
+> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+> ---
+>  .../soc/sophgo/sophgo,sg2044-top-syscon.yaml  | 49 +++++++++++++++++++
+>  include/dt-bindings/clock/sophgo,sg2044-pll.h | 27 ++++++++++
+>  2 files changed, 76 insertions(+)
 
-This must be const.
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-> +	.div = sg2044_div_commons,
-> +	.mux = sg2044_mux_commons,
-> +	.gate = sg2044_gate_commons,
-> +	.num_div = ARRAY_SIZE(sg2044_div_commons),
-> +	.num_mux = ARRAY_SIZE(sg2044_mux_commons),
-> +	.num_gate = ARRAY_SIZE(sg2044_gate_commons),
-> +};
-> +
 Best regards,
 Krzysztof
 
