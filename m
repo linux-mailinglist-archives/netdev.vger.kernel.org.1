@@ -1,261 +1,252 @@
-Return-Path: <netdev+bounces-182196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 397D0A88178
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 15:16:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 352A0A8815B
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 15:14:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C06D9178E58
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 13:15:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92E7F18883B3
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 13:14:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE77B267395;
-	Mon, 14 Apr 2025 13:14:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="BpnSzPwz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68342D1F71;
+	Mon, 14 Apr 2025 13:13:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-VI1-obe.outbound.protection.outlook.com (mail-vi1eur03on2053.outbound.protection.outlook.com [40.107.103.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A278F2D4B44;
-	Mon, 14 Apr 2025 13:14:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.103.53
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744636471; cv=fail; b=KtkgePPbEuB/vJBjdC9bIl1bxwKrnYIYuFWC8Chq68BiCJgG1QbGTLfy94ZyuGdEq4STV3UNPooWQVt6aK40TsB3C0KF1VrpfAPOTfADgfePfqoOuRqLENfxeX+BxlC4FySyWcYCL6BWaU+D/AnHucygbpHZBfSjM8srkxpW7h8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744636471; c=relaxed/simple;
-	bh=WJHQxI6i/fEm60bcI2XfCDvqnlxwPFZf87Vi7aVBoy0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M+VmKOy4nAnhoOGdSUmumIdu9LasZiCaK3uBzhpYjINeW+QstfE45tx7l7BIatR1Awau2Wb+p6kt8bIkH2LgMsPeVNKUj0+6t1NQ/iiMqzLLJ1RZ95B2oXFDcl901moS/VAGCZWCF+VVvvS4AShQgMIoWy8f0B0UDtvWFZDys3A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=BpnSzPwz; arc=fail smtp.client-ip=40.107.103.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YsD3XlxGCYuVco19uPI7BoV1LCM10wbnC11GKic5dZgIfD+OrqUmaN68qbAcsGkdBJUWV3k0rRx8FccEMt2ieEN9z2+OZElw12ZlnQJLuMj85gheO/8gjoAxyh9v4ig3133ziFyXEQ9cxliNIVOKp/Ik8p5/Hf59sRnF7Ni0O+3PHZUXkoPUZEQ/222vT2rYX460BwNxkiEVtYsRKN8p9ge66Mks/cIHVtE7DJKpIoDPA3P+g4ELqH1rFzZ/x+gCvVoL9RPQVawJPDbb08OOp9cSdIfeSTw4C8la3bwIP30AKEB2ameat03mbl3R05RPVRjZnl/5Akqvb4cjKYtPBw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bJrGNiiOHulkzV3MesfEyK14yRPd86Kdu/49Wik9ee0=;
- b=DBsAR6OqwnfY0e8YSry6e0rPTrezNhdjJIAvxy9xlhKcBwVxo7mvopIHovPt1jZ/8w1h627qt9s9tk2QN3mrlcj8X/RERTrCi+wrkWTq8k02CWtPoW9K2OS9buqZpKru1r62AhHq4Tji6B2gRuEtNSVZfhHuom03J9wu31rERYsjPxvdkScrR0ogvaVeW9oeinQ9pUlNha0B6wGZxk36gi7jiDqcmA5ZsX2ShyPcPnqtIMFb+panJoX8hT325S7ebK0gtfMjXes7cWmIxUr53e3dIvRL+GxC57nF3/16Rqr8cZQyvwUD6iOYHmXSY130N2GzJbYh2AROzWf/DGd/SA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=temperror (sender ip
- is 131.228.6.101) smtp.rcpttodomain=nokia-bell-labs.com
- smtp.mailfrom=nokia-bell-labs.com; dmarc=temperror action=none
- header.from=nokia-bell-labs.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bJrGNiiOHulkzV3MesfEyK14yRPd86Kdu/49Wik9ee0=;
- b=BpnSzPwzvcOXam9geQuEL53FR94BnjM5fqD2szeu5SwB81GN+5EV8tSqsZrOQ3JhbTs/qXd31PvkJU80sPfGd9cA8SwMVazggowuXpjvES+NAJxue/JkNQy7qnujA9kM1aIXDFYlzPVyiaJ7n1B0FTL5oiCqVlFHbmTj3smE8sGBK+UdK2olwDoLsAm9878J7LFIrTyIWJzCaTPe1pYhvIe0ZkuUeXzJZqDCYDzZRM9ESf/Eqet0p/A7dkiu/7dr+Q88HUcc9JpIqU44GX5EUMUhu85qaa2ZPc+yYkEUzZyOv487H/vOpvvfVwHzNvtQuL+nucLd++QEER9ibVYE8Q==
-Received: from CWLP265CA0475.GBRP265.PROD.OUTLOOK.COM (2603:10a6:400:18a::19)
- by DBAPR07MB6983.eurprd07.prod.outlook.com (2603:10a6:10:193::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.30; Mon, 14 Apr
- 2025 13:14:24 +0000
-Received: from AM3PEPF00009B9B.eurprd04.prod.outlook.com
- (2603:10a6:400:18a:cafe::a5) by CWLP265CA0475.outlook.office365.com
- (2603:10a6:400:18a::19) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8632.35 via Frontend Transport; Mon,
- 14 Apr 2025 13:14:24 +0000
-X-MS-Exchange-Authentication-Results: spf=temperror (sender IP is
- 131.228.6.101) smtp.mailfrom=nokia-bell-labs.com; dkim=none (message not
- signed) header.d=none;dmarc=temperror action=none
- header.from=nokia-bell-labs.com;
-Received-SPF: TempError (protection.outlook.com: error in processing during
- lookup of nokia-bell-labs.com: DNS Timeout)
-Received: from fr712usmtp1.zeu.alcatel-lucent.com (131.228.6.101) by
- AM3PEPF00009B9B.mail.protection.outlook.com (10.167.16.20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8655.12 via Frontend Transport; Mon, 14 Apr 2025 13:14:22 +0000
-Received: from sarah.nbl.nsn-rdnet.net (sarah.nbl.nsn-rdnet.net [10.0.73.150])
-	by fr712usmtp1.zeu.alcatel-lucent.com (GMO) with ESMTP id 53EDDQBQ009623;
-	Mon, 14 Apr 2025 13:14:21 GMT
-From: chia-yu.chang@nokia-bell-labs.com
-To: netdev@vger.kernel.org, dave.taht@gmail.com, pabeni@redhat.com,
-        jhs@mojatatu.com, kuba@kernel.org, stephen@networkplumber.org,
-        xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
-        edumazet@google.com, horms@kernel.org, andrew+netdev@lunn.ch,
-        donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
-        shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
-        ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
-        g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
-        mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
-        Jason_Livingood@comcast.com, vidhi_goel@apple.com
-Cc: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-Subject: [PATCH v3 net-next 15/15] tcp: try to avoid safer when ACKs are thinned
-Date: Mon, 14 Apr 2025 15:13:15 +0200
-Message-Id: <20250414131315.97456-16-chia-yu.chang@nokia-bell-labs.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250414131315.97456-1-chia-yu.chang@nokia-bell-labs.com>
-References: <20250414131315.97456-1-chia-yu.chang@nokia-bell-labs.com>
+Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029902BEC2D;
+	Mon, 14 Apr 2025 13:13:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744636436; cv=none; b=QybrmnmpWoFVCJVbZndD5PTDEqd6RrBO0UFMP5K9ZsVvlhSfnME80LNyPQg7QSZbjvbEhHIWcr3zc4TpUeKq+DSaIReVLwG7Ui2cmwo3CY10b7zTaBDbi3sbHG5rA4SclvNv3lXj9GqpQp80huHrwSLt1NsQbVBt9vvl6Q3W17k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744636436; c=relaxed/simple;
+	bh=1lQ7JQW5S4G+/LBdiOzM9bdyiUOGo93ut2ZCIvpNqNo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BxwiZ9j1eSeV1eQAd6T8C8nlJY4JTmcYzLxfLFKm6JdhUib5spHQQRDAXGfJNaSSrlDm7Aue1eluvcvnk/qZz9BKGiW0UkKQmGSEaA5d7/+EBX454cO6ToRYw1G4b1eqGlVH3chfcd6tXBE7LgQo14Zg8gqx++gJuSq7/9Tw854=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+X-CSE-ConnectionGUID: Q88s0WCoTpy8kQw+Z7mjWQ==
+X-CSE-MsgGUID: BdcF5JAqRmKL37V0LnFwwQ==
+Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
+  by relmlie5.idc.renesas.com with ESMTP; 14 Apr 2025 22:13:47 +0900
+Received: from [10.226.92.218] (unknown [10.226.92.218])
+	by relmlir6.idc.renesas.com (Postfix) with ESMTP id 71E9041C595F;
+	Mon, 14 Apr 2025 22:13:39 +0900 (JST)
+Message-ID: <f20e6589-37d9-458b-af82-92fb1ed0db18@bp.renesas.com>
+Date: Mon, 14 Apr 2025 14:13:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 3/3] net: stmmac: Add DWMAC glue layer for
+ Renesas GBETH
+To: Prabhakar <prabhakar.csengg@gmail.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Philipp Zabel <p.zabel@pengutronix.de>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Jose Abreu <joabreu@synopsys.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org,
+ Biju Das <biju.das.jz@bp.renesas.com>,
+ Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+ Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+References: <20250407120317.127056-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250407120317.127056-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Language: en-GB
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+In-Reply-To: <20250407120317.127056-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------5XZcBvmkaTabxuEc9swqfILM"
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------5XZcBvmkaTabxuEc9swqfILM
+Content-Type: multipart/mixed; boundary="------------ueneKmR1e1Faq6614lRwIjUE";
+ protected-headers="v1"
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+To: Prabhakar <prabhakar.csengg@gmail.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Philipp Zabel <p.zabel@pengutronix.de>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Jose Abreu <joabreu@synopsys.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org,
+ Biju Das <biju.das.jz@bp.renesas.com>,
+ Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+ Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Message-ID: <f20e6589-37d9-458b-af82-92fb1ed0db18@bp.renesas.com>
+Subject: Re: [PATCH net-next v5 3/3] net: stmmac: Add DWMAC glue layer for
+ Renesas GBETH
+References: <20250407120317.127056-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250407120317.127056-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
+In-Reply-To: <20250407120317.127056-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
+
+--------------ueneKmR1e1Faq6614lRwIjUE
+Content-Type: multipart/mixed; boundary="------------Zc6ku6fXf3RcrzFBSscMfX9c"
+
+--------------Zc6ku6fXf3RcrzFBSscMfX9c
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM3PEPF00009B9B:EE_|DBAPR07MB6983:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0937f453-912c-49d0-0f3c-08dd7b5645d2
-X-LD-Processed: 5d471751-9675-428d-917b-70f44f9630b0,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
- BCL:0;ARA:13230040|36860700013|7416014|376014|1800799024|82310400026|921020;
-X-Microsoft-Antispam-Message-Info:
- =?utf-8?B?YzhNbmo1bzkzTDl0SE9GNUJlMEJUdzUzejUzaDFHMm93QUpxaFgwNFZXTWZM?=
- =?utf-8?B?NlhrYjFsYThWMkplNUxteDZzb29YWGdUditscVlSaGdvUUNCbGN0SjBmN0t4?=
- =?utf-8?B?Vkc1NWtMam1Vb1dpRlA5NGNyUi9oSnpMTm0xalNwT2ZreFp5NTZrSUw4UzJy?=
- =?utf-8?B?Yzc5eG1xUGZSWjBxc1NOUk1TMCs1QW5ycUJtYUNNNk5rZ09kODVXWWtQS1lp?=
- =?utf-8?B?NU92aFoxaTlET3cyZjVNUk1wcFZaWVRBcDVQYTRYRE5xN29UVmNCY3p1bnBU?=
- =?utf-8?B?T3NaWkdKQ095NEd2Mkl5TDlXazE5OC9VTkJmeTEzeWRUY3ppNFFVVU55Y1BK?=
- =?utf-8?B?czlkK1NnSXlwQnhlL2FXQ3JMWHd0bEk4bmFWTThJcGtSb2xYRXRlNGF6MXpE?=
- =?utf-8?B?cFJLNmd6ejNCbUd3UHdmeGJaekpmSEdHd1ZpM3dURDFFaW1qcnQ3Nnh4UlQ2?=
- =?utf-8?B?aFhUczVnWUd6MmpXQkdZeVdhTmxpbGd4RjBnS2VuTEFZdU9OeUNoOVRUNlJi?=
- =?utf-8?B?Sys2WW0ybFpSV2tSVXNSSGs4aktVY2QvVHVENnd2UzJTdmltaE44TlQwcWta?=
- =?utf-8?B?U3YyYzNXSmwrTzQxVXAvRlRzWVpyZXdSdFpCV0YxNktTcSs1K3VpNEk5S0dw?=
- =?utf-8?B?eWZ0MVJNN1VQYVd3Z2twdnRwT3ZxRFlUKzRRTHR5WkJZNjRjVEpEdUNFTHZY?=
- =?utf-8?B?bld4aDloTG5WUzZOcHBWaU5KdXhpWWxlUC9RY0QyY2hqRTR1RmNhbVp0UWFW?=
- =?utf-8?B?WjJQTFY1YkJ3QngzVnVFb09oY0ZHWWI1RG0vaDV6QkVHOExRTVFsYVIrSUwz?=
- =?utf-8?B?UEpGcWl6UUxsNmRFUkZMOGxYZzhlWmxkQ0dvWFZ6VGJhZndSSmhRc0UzNEcw?=
- =?utf-8?B?emViTjFwamh3cjZzVk1zbGFvcXhsUC9TT0xkWUJ2blprQXFucjcxVHBKSXN4?=
- =?utf-8?B?SndlZm1QeCtqbXNrd1lSRDN5cjhKb29acDFOUjhla3dYVGI5TzhxWDRTVFcr?=
- =?utf-8?B?OTBSbTA4Z2FhVnJYeEQ2ZzNCQm82Y0E0eVVuWnRhM1I0WWR3UjNWS2xCVVZ1?=
- =?utf-8?B?OE4ybHR0SnpRUUtWRXpkZzBiQ1NweEhXVFZVNTFtWEZ4SzNxTWY4djcvUFh0?=
- =?utf-8?B?MFNhVmNmTmNoYllNOCtCbEFmWlVxa2toYnpKdHcwMVdiNEswRkhIS3dVQ0FX?=
- =?utf-8?B?bnZITnFFREFtS0tHVFFDOEVkSDZWaXprYlgrOElwSWtlRERHOEdtWHFFZmdn?=
- =?utf-8?B?ZzV0QVFwWVFMdUpEVUs2SFV3MTdaSVYxRDZGV3ZRVDg2Tm1ob3pzRTZMc3JY?=
- =?utf-8?B?d1NobWV0S0h3anJOQzBtaWtRc3NtdTZ6STFWcHkvVHM1dTMvTEJidjVJSkRX?=
- =?utf-8?B?eE1HeUNZN3VNSDBSa2c2UHJYTTNqcExkVThWNXRmcFJzVksxVlZOeWhNTXJu?=
- =?utf-8?B?TEhQdDd3YzJyTUFLN3FJMDJudE9DSnhqUFhwRzEyeXpZME41a2czNWxOV1BP?=
- =?utf-8?B?WFpJRGRDREVySUhpMXQ2c24yTm00b3k5aGUya05QKzRwSUQyaDBma01OTDdQ?=
- =?utf-8?B?WVBMU1kxRzV2aUlmdUp4bHZLYnA1a0VFRkUzbmFnandTVExEOXpBOTBhMmI3?=
- =?utf-8?B?anNLN0ZIdGlKank2OWRCTmJOUDkzdVVnZVFhNU1zSGJWdTZSUnNUYjhtaDNX?=
- =?utf-8?B?Y2xSQTlDYWVOMjNGVEdHcVlLdytZczE2UjNvZjRvby9kWk1VdVRzZDJieG82?=
- =?utf-8?B?NERnQTZqNEpzOEFyMGg1d1F0UmxQaVRQT1U2VlVid3ZOTW1oUW1xdGcvVy9B?=
- =?utf-8?B?Q1ZNMCtrNEszM2tFWGY2MmxpdmQ1d3BOSjFsZGNGUnN0UkFqRE5raU5xWWdG?=
- =?utf-8?B?SGFnNUY2OS9scUwvVDRxNXZhU0h3L1E4cnhhRDBxL1pFVHNVOFpHMUd2aUxG?=
- =?utf-8?B?MllQR2xzWG4vY0l5RFl2NUpvYkgzNXE2RTVtbGVOT0FpSGxKcExNdkFRZ1BX?=
- =?utf-8?B?bXpaVU5iQ20xWXZzR1lvb1QvRUs5ZUhjWUUzUmg3SSsxQnU5NTRZN2kxZE8w?=
- =?utf-8?B?c3liVUpYQXlGemV5S2JYZ0dwQkgxS0VuSzMwZz09?=
-X-Forefront-Antispam-Report:
- CIP:131.228.6.101;CTRY:FI;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:fr712usmtp1.zeu.alcatel-lucent.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(7416014)(376014)(1800799024)(82310400026)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: nokia-bell-labs.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2025 13:14:22.4495
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0937f453-912c-49d0-0f3c-08dd7b5645d2
-X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5d471751-9675-428d-917b-70f44f9630b0;Ip=[131.228.6.101];Helo=[fr712usmtp1.zeu.alcatel-lucent.com]
-X-MS-Exchange-CrossTenant-AuthSource: AM3PEPF00009B9B.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR07MB6983
+Content-Transfer-Encoding: quoted-printable
 
-From: Ilpo Järvinen <ij@kernel.org>
+Hi Prabhakar,
 
-Add newly acked pkts EWMA. When ACK thinning occurs, select
-between safer and unsafe cep delta in AccECN processing based
-on it. If the packets ACKed per ACK tends to be large, don't
-conservatively assume ACE field overflow.
+On 07/04/2025 13:03, Prabhakar wrote:
+> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+>=20
+> Add the DWMAC glue layer for the GBETH IP found in the Renesas RZ/V2H(P=
+)
+> SoC.
+>=20
+> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-Signed-off-by: Ilpo Järvinen <ij@kernel.org>
-Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
----
- include/linux/tcp.h  |  1 +
- net/ipv4/tcp.c       |  4 +++-
- net/ipv4/tcp_input.c | 20 +++++++++++++++++++-
- 3 files changed, 23 insertions(+), 2 deletions(-)
+[snip]
 
-diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-index 782e4dd58bf7..230f55b22a51 100644
---- a/include/linux/tcp.h
-+++ b/include/linux/tcp.h
-@@ -313,6 +313,7 @@ struct tcp_sock {
- 		prev_ecnfield:2,/* ECN bits from the previous segment */
- 		accecn_opt_demand:2,/* Demand AccECN option for n next ACKs */
- 		est_ecnfield:2;/* ECN field for AccECN delivered estimates */
-+	u16	pkts_acked_ewma;/* Pkts acked EWMA for AccECN cep heuristic */
- 	u64	accecn_opt_tstamp;	/* Last AccECN option sent timestamp */
- 	u32	app_limited;	/* limited until "delivered" reaches this val */
- 	u32	rcv_wnd;	/* Current receiver window		*/
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 8e3582c1b5bb..673224273540 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -3371,6 +3371,7 @@ int tcp_disconnect(struct sock *sk, int flags)
- 	tcp_accecn_init_counters(tp);
- 	tp->prev_ecnfield = 0;
- 	tp->accecn_opt_tstamp = 0;
-+	tp->pkts_acked_ewma = 0;
- 	if (icsk->icsk_ca_initialized && icsk->icsk_ca_ops->release)
- 		icsk->icsk_ca_ops->release(sk);
- 	memset(icsk->icsk_ca_priv, 0, sizeof(icsk->icsk_ca_priv));
-@@ -5109,6 +5110,7 @@ static void __init tcp_struct_check(void)
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, delivered_ecn_bytes);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, received_ce);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, received_ecn_bytes);
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, pkts_acked_ewma);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, accecn_opt_tstamp);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, app_limited);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, rcv_wnd);
-@@ -5117,7 +5119,7 @@ static void __init tcp_struct_check(void)
- 	/* 32bit arches with 8byte alignment on u64 fields might need padding
- 	 * before tcp_clock_cache.
- 	 */
--	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx, 130 + 6);
-+	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx, 132 + 4);
- 
- 	/* RX read-write hotpath cache lines */
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, bytes_received);
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index c6dac3c2d47a..5bdd82d3c201 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -689,6 +689,10 @@ static void tcp_count_delivered(struct tcp_sock *tp, u32 delivered,
- 		tcp_count_delivered_ce(tp, delivered);
- }
- 
-+#define PKTS_ACKED_WEIGHT	6
-+#define PKTS_ACKED_PREC		6
-+#define ACK_COMP_THRESH		4
-+
- /* Returns the ECN CE delta */
- static u32 __tcp_accecn_process(struct sock *sk, const struct sk_buff *skb,
- 				u32 delivered_pkts, u32 delivered_bytes,
-@@ -708,6 +712,19 @@ static u32 __tcp_accecn_process(struct sock *sk, const struct sk_buff *skb,
- 	opt_deltas_valid = tcp_accecn_process_option(tp, skb,
- 						     delivered_bytes, flag);
- 
-+	if (delivered_pkts) {
-+		if (!tp->pkts_acked_ewma) {
-+			tp->pkts_acked_ewma = delivered_pkts << PKTS_ACKED_PREC;
-+		} else {
-+			u32 ewma = tp->pkts_acked_ewma;
-+
-+			ewma = (((ewma << PKTS_ACKED_WEIGHT) - ewma) +
-+				(delivered_pkts << PKTS_ACKED_PREC)) >>
-+				PKTS_ACKED_WEIGHT;
-+			tp->pkts_acked_ewma = min_t(u32, ewma, 0xFFFFU);
-+		}
-+	}
-+
- 	if (!(flag & FLAG_SLOWPATH)) {
- 		/* AccECN counter might overflow on large ACKs */
- 		if (delivered_pkts <= TCP_ACCECN_CEP_ACE_MASK)
-@@ -756,7 +773,8 @@ static u32 __tcp_accecn_process(struct sock *sk, const struct sk_buff *skb,
- 		if (d_ceb <
- 		    safe_delta * tp->mss_cache >> TCP_ACCECN_SAFETY_SHIFT)
- 			return delta;
--	}
-+	} else if (tp->pkts_acked_ewma > (ACK_COMP_THRESH << PKTS_ACKED_PREC))
-+		return delta;
- 
- 	return safe_delta;
- }
--- 
-2.34.1
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c =
+b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
+> new file mode 100644
+> index 000000000000..a0f7cacea810
+> --- /dev/null
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
+> @@ -0,0 +1,165 @@
+> +// SPDX-License-Identifier: GPL-2.0+
+> +/*
+> + * dwmac-renesas-gbeth.c - DWMAC Specific Glue layer for Renesas GBETH=
 
+> + *
+> + * The Rx and Tx clocks are supplied as follows for the GBETH IP.
+> + *
+> + *                         Rx / Tx
+> + *   -------+------------- on / off -------
+> + *          |
+> + *          |            Rx-180 / Tx-180
+> + *          +---- not ---- on / off -------
+> + *
+> + * Copyright (C) 2025 Renesas Electronics Corporation
+> + */
+> +
+> +#include <linux/clk.h>
+> +#include <linux/device.h>
+> +#include <linux/module.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/reset.h>
+> +
+> +#include "dwmac4.h"
+
+I'm looking at this while working on RZ/T2H Ethernet support, clangd
+says inclusion of dwmac4.h is not needed here and compilation succeeds
+with the include removed.
+
+Thanks,
+
+--=20
+Paul Barker
+--------------Zc6ku6fXf3RcrzFBSscMfX9c
+Content-Type: application/pgp-keys; name="OpenPGP_0x27F4B3459F002257.asc"
+Content-Disposition: attachment; filename="OpenPGP_0x27F4B3459F002257.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+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3D
+=3DsIIN
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------Zc6ku6fXf3RcrzFBSscMfX9c--
+
+--------------ueneKmR1e1Faq6614lRwIjUE--
+
+--------------5XZcBvmkaTabxuEc9swqfILM
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQSiu8gv1Xr0fIw/aoLbaV4Vf/JGvQUCZ/0KAQUDAAAAAAAKCRDbaV4Vf/JGvVy9
+AQC8bBQR7l5ED4UfiLb0EhysVsbVdBOhfqkFNise9GXRIAD+OwNb0RGxiJZGo/+yeHP1gGhfWVRI
++rBlwKWwdQaQ6A4=
+=dLCZ
+-----END PGP SIGNATURE-----
+
+--------------5XZcBvmkaTabxuEc9swqfILM--
 
