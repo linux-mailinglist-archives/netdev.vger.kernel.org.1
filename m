@@ -1,153 +1,138 @@
-Return-Path: <netdev+bounces-182337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72141A8880F
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:10:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F38EFA88820
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:12:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EC9B3B46C2
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:09:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 880213B5290
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:10:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E48B28A1CF;
-	Mon, 14 Apr 2025 16:08:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28AD52820CE;
+	Mon, 14 Apr 2025 16:09:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="XeEdGD5Y";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="S1e8lcqC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NVMZrJCr"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A941F28468F;
-	Mon, 14 Apr 2025 16:08:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DB2B27990D;
+	Mon, 14 Apr 2025 16:09:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744646900; cv=none; b=fj/g2K00RsjnaQFOJCUTtH9Lln/cSjORMQqJmbqNNK+r3Ysjv1C9D7Fs7lvnNCsPMrdETU53ix3xnfJ4uSS+0Sc9pY3+HFF2L6gGrD3Tj2pYB2upgYSEBOOhuPWQ1hvMMoS8pvjG+sUDpzBC+dzF8LluoJ7L7IjBtZh1n3M898g=
+	t=1744646975; cv=none; b=HE7XJNZhvjqMPAQdP8FA435kfUvpjEwKCNVqZ6PxSwFK4abjyqNlh+NglsQ/4nKRUJBRaUAi1QHm/PinaOL/BaMKvspUBVeF2+Q2+Bj1mmgzRoIEFSp94JUQ1yn6/e6DzQkS8jm4a75FD9+jxmGnb+4m+MeEofloHCFRvO1WV4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744646900; c=relaxed/simple;
-	bh=znTzkElG+15BqXoaBmnxoK9Wf2NNmf8iaeTKQhTwaWg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VZo1tGhsznYEMHWT88wbr3OcxhmhcJiIifpTutHlWLCAnBXp1R1oqyZkEcUNOwvaS/PCawGGjUz9+AT5vE2LsTMbXpdlAOYvSjTc6uzBWXTTZT0TwhvvQq2/1QaV8LLUgM6CwKOM3a2Laeuz7qyc5j2hUVkF+4lPqpp/xzrJjn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=XeEdGD5Y; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=S1e8lcqC; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1744646895;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aD3CNIqIdKGjQEvqGC7xw6ktmCbjt3ZQtV6T8srOrPY=;
-	b=XeEdGD5Y/VOxosQ72ZO5iuHDekthUpf/fsaoy6pRjvVi1hx57pTiaVrSh1oBdvzQwugDUK
-	awDIKifwsPiEIXcW234DdoHoDuPMf/qEgPf+iN6yMkzar6x1mgd0cawhIEDhgxjg+xyFN8
-	so0XjfI+X7JqotccKNvoISCgcvQcM+SBLt3/fyy3puTBMnJ1uq+qjiYnL2qNJa9vcFQgzZ
-	WVeK3Enq+UGjM05qgkl7kb1MCrDRCwhhPghETSzoGDBebCTr78mFoQetiGDMxDBqLzm8xS
-	Q3lsbnMlkVPxZe2Cgl/v11EMV0SK4BDxz9A9ZUOuWCsbFQW2hda3RDleZ2GwGQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1744646895;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aD3CNIqIdKGjQEvqGC7xw6ktmCbjt3ZQtV6T8srOrPY=;
-	b=S1e8lcqC50em4bGFDAptPTuBr6ww+Fca/f/jbFvNvlF8p+bqhcLn/Pi95G9iJCdqW1KKz7
-	Nz7IcuAC5p8oSaBA==
-To: netdev@vger.kernel.org,
-	linux-rt-devel@lists.linux.dev
-Cc: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1744646975; c=relaxed/simple;
+	bh=o098pNY1KIdzMyd0dCjsn6jbyXgc1lerA3ii2JKfdFw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O10DVgDxXl/WgqKRiS0lfyzII7G7CUsf8EL54tWCADxz4rGWWdbXWO4JkK9DFAMNrtOYaWFAaufcs/kczhacat1MLQLLSiMDSXkAZGGyAQxbzu6AyWJiq6LjuCphqFQAVrwF6zJHvej5FxNV3QpdNB+GbcmMADdgSp5bfS1d5pU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NVMZrJCr; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744646974; x=1776182974;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=o098pNY1KIdzMyd0dCjsn6jbyXgc1lerA3ii2JKfdFw=;
+  b=NVMZrJCr47sW/2QD/HualWcnhfbUl/T45lblRYJGI8fhoJiXEwQgO6ba
+   md2tAQFrl2zY0rl7B1eAFpkbhKLGQiQDwx1q9kXG3eXBMABoXpFHlGhXd
+   9J5JsWKD7hLyMGuVFSDhgix66EVe1pjenIFnlU9b2SjKVS10dA1j9WFFh
+   ZV+MDkQW1dozWEV5WT1LuIPz/S5DEBzC1hiWGCKq07vffGZEwWT2QNSXq
+   qPg04jh+3i9flFoThedDWovXCZmz63AmGENRzWXcfCjWY8bqkc1LMP1Bl
+   HcCsYyiQNrJduYVuffbXLDukr5FVJkMGX66Bi9Pd9rVU+VN1FNL/57wxU
+   g==;
+X-CSE-ConnectionGUID: LUGI8wkKR7yRrXdoAa7r4A==
+X-CSE-MsgGUID: UTknH2NcSR6ySoKDWx3cNg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11403"; a="49782700"
+X-IronPort-AV: E=Sophos;i="6.15,212,1739865600"; 
+   d="scan'208";a="49782700"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2025 09:09:33 -0700
+X-CSE-ConnectionGUID: CnMxJUlmSIiTzbm9YFg+pA==
+X-CSE-MsgGUID: 9cu2Bq3oQ4CxIuDdss/0dw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,212,1739865600"; 
+   d="scan'208";a="130836760"
+Received: from lkp-server01.sh.intel.com (HELO b207828170a5) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 14 Apr 2025 09:09:26 -0700
+Received: from kbuild by b207828170a5 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1u4MN9-000ER0-2g;
+	Mon, 14 Apr 2025 16:09:23 +0000
+Date: Tue, 15 Apr 2025 00:08:40 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>, bpf@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, mrpre@163.com,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Allison Henderson <allison.henderson@oracle.com>,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH net-next v2 18/18] rds: Use nested-BH locking for rds_page_remainder
-Date: Mon, 14 Apr 2025 18:07:54 +0200
-Message-ID: <20250414160754.503321-19-bigeasy@linutronix.de>
-In-Reply-To: <20250414160754.503321-1-bigeasy@linutronix.de>
-References: <20250414160754.503321-1-bigeasy@linutronix.de>
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next v2] bpf, sockmap: Introduce tracing capability
+ for sockmap
+Message-ID: <202504142349.tfXMGMOg-lkp@intel.com>
+References: <20250411091634.336371-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250411091634.336371-1-jiayuan.chen@linux.dev>
 
-rds_page_remainder is a per-CPU variable and relies on disabled BH for its
-locking. Without per-CPU locking in local_bh_disable() on PREEMPT_RT
-this data structure requires explicit locking.
+Hi Jiayuan,
 
-Add a local_lock_t to the data structure and use
-local_lock_nested_bh() for locking. This change adds only lockdep
-coverage and does not alter the functional behaviour for !PREEMPT_RT.
+kernel test robot noticed the following build errors:
 
-Cc: Allison Henderson <allison.henderson@oracle.com>
-Cc: linux-rdma@vger.kernel.org
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- net/rds/page.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+[auto build test ERROR on bpf-next/master]
 
-diff --git a/net/rds/page.c b/net/rds/page.c
-index 58a8548a915a9..afb151eac271c 100644
---- a/net/rds/page.c
-+++ b/net/rds/page.c
-@@ -40,10 +40,12 @@
- struct rds_page_remainder {
- 	struct page	*r_page;
- 	unsigned long	r_offset;
-+	local_lock_t	bh_lock;
- };
-=20
--static
--DEFINE_PER_CPU_SHARED_ALIGNED(struct rds_page_remainder, rds_page_remainde=
-rs);
-+static DEFINE_PER_CPU_SHARED_ALIGNED(struct rds_page_remainder, rds_page_r=
-emainders) =3D {
-+	.bh_lock =3D INIT_LOCAL_LOCK(bh_lock),
-+};
-=20
- /**
-  * rds_page_remainder_alloc - build up regions of a message.
-@@ -87,6 +89,7 @@ int rds_page_remainder_alloc(struct scatterlist *scat, un=
-signed long bytes,
- 	}
-=20
- 	local_bh_disable();
-+	local_lock_nested_bh(&rds_page_remainders.bh_lock);
- 	rem =3D this_cpu_ptr(&rds_page_remainders);
-=20
- 	while (1) {
-@@ -115,11 +118,13 @@ int rds_page_remainder_alloc(struct scatterlist *scat=
-, unsigned long bytes,
- 		}
-=20
- 		/* alloc if there is nothing for us to use */
-+		local_unlock_nested_bh(&rds_page_remainders.bh_lock);
- 		local_bh_enable();
-=20
- 		page =3D alloc_page(gfp);
-=20
- 		local_bh_disable();
-+		local_lock_nested_bh(&rds_page_remainders.bh_lock);
- 		rem =3D this_cpu_ptr(&rds_page_remainders);
-=20
- 		if (!page) {
-@@ -138,6 +143,7 @@ int rds_page_remainder_alloc(struct scatterlist *scat, =
-unsigned long bytes,
- 		rem->r_offset =3D 0;
- 	}
-=20
-+	local_unlock_nested_bh(&rds_page_remainders.bh_lock);
- 	local_bh_enable();
- out:
- 	rdsdebug("bytes %lu ret %d %p %u %u\n", bytes, ret,
---=20
-2.49.0
+url:    https://github.com/intel-lab-lkp/linux/commits/Jiayuan-Chen/bpf-sockmap-Introduce-tracing-capability-for-sockmap/20250414-093146
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20250411091634.336371-1-jiayuan.chen%40linux.dev
+patch subject: [PATCH bpf-next v2] bpf, sockmap: Introduce tracing capability for sockmap
+config: csky-randconfig-001-20250414 (https://download.01.org/0day-ci/archive/20250414/202504142349.tfXMGMOg-lkp@intel.com/config)
+compiler: csky-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250414/202504142349.tfXMGMOg-lkp@intel.com/reproduce)
 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202504142349.tfXMGMOg-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   csky-linux-ld: kernel/bpf/core.o: in function `trace_event_raw_event_sockmap_redirect':
+>> core.c:(.text+0x15e0): undefined reference to `sock_i_ino'
+   csky-linux-ld: kernel/bpf/core.o: in function `trace_event_raw_event_sockmap_strparser':
+   core.c:(.text+0x1684): undefined reference to `sock_i_ino'
+>> csky-linux-ld: core.c:(.text+0x1688): undefined reference to `init_net'
+>> csky-linux-ld: core.c:(.text+0x16a8): undefined reference to `sock_i_ino'
+   csky-linux-ld: kernel/bpf/core.o: in function `___bpf_prog_run':
+   core.c:(.text+0x1838): undefined reference to `sock_i_ino'
+   csky-linux-ld: core.c:(.text+0x183c): undefined reference to `init_net'
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
