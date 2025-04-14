@@ -1,118 +1,92 @@
-Return-Path: <netdev+bounces-182432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3884A88B84
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 20:42:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4FBFA88BA1
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 20:45:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2EEC7A49D7
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:41:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40C0D189AAE5
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:45:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BE92288CB1;
-	Mon, 14 Apr 2025 18:42:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0363828DF06;
+	Mon, 14 Apr 2025 18:43:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uOMHbypO"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="iSQYpmVd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD824192D6B
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B04F28DEF6;
+	Mon, 14 Apr 2025 18:43:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744656130; cv=none; b=owoPOuDF9VJkSul+JL6fokqN4vPw1CvC0XfpTira0qqQXD5j/iaLd5qCnpoTAyUpQNQ20zy0gxSL2FufUfKU3IQRyhW1RAftqIJz5AIJNjzX9/cKCuN1ego/rfbLVRntw4g51/Esl9kDmizfMHKHR6TjWUTLupz0B+1iVbCWkoY=
+	t=1744656194; cv=none; b=sgmIOn8nKV/+M7QU+YVJlQnXwhvtStJY5mYOUz63QUjiIlhQKwH+LPj7GnjPYmrZTKVSpJZGzSUoDnMvTo7MvjuKCXcuGK4K/0i+ZdLQG/e/NoeTIUMx6FtisqluSHeuQJU/Fjt+K/A6VnCKQG5vnGGkWwIVR8GI6rGi8wApffE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744656130; c=relaxed/simple;
-	bh=jsFptswUmeSJtX6rTryRDrID87DOTelrBduenEncJL0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cYgJsOznLRd8UviFb930HP3ZhToJq5cyCI0750PjUE9CnjmBXi+aD8vGYI9Kn7aNrsN8hVeD7ZHbJ+oL/1qPEWCJpprZggFgfym3IcnUKdCl10YirKNKEheyUtF7s0TYFJAN+9sJpCfXZwKBLDAHDp2JYN4iU9RIy1/L065fwv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uOMHbypO; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-47677b77725so49135111cf.3
-        for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 11:42:08 -0700 (PDT)
+	s=arc-20240116; t=1744656194; c=relaxed/simple;
+	bh=CNAcKEMoLHo5rUgoIFzXti24BJ8eYY521IhF/1qOoXU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=p1maojDC5uS+j0uF86N3gfMo+StSadL1suuHtmovQ23dMVWsyYe57plh8nhw8/pBaC6MTTH5vLlSHsCoL+4db8seSL924CdE2ldAJgZrLXhiXJDcKv/B0DTnGionqHJxnEelcz/cYNO1KJUvW7aVVorHusz84kWORn7unBiTucI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=iSQYpmVd; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1744656127; x=1745260927; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RVj63pLHPDOADttU5mk9xoBgxj6+KEfzLF7NO/zyIHU=;
-        b=uOMHbypOAzjtg5SrSTosxoZXY8+EGqyI1UKtgfpbLsg5RlckaH5C6jY23Z44cG+0dN
-         bCuJaB4xARojZ/h77WOmEWxSTYhFHVBXW4TuwE6QV7VoneTCJCvrTpLmrAc8z/0dLo/w
-         lFNHqMh9bprTNVjwTJWm/IDHfeyeygPuKupSghbZ9lQKnu7wkVA46vJ9uo6cMWk2qVlf
-         3cLTBgncMDBMtLBYG2wWdK5Oj9Bre5puSMEkf/27DWVEiFMAPznDcomd5j2EH803/V0z
-         6apNiTygZtKsD55rNci8KcFU1ceOzsH4vhVk+VUk9toQ5k5EXrhY4XzsFapv4pG1RMj2
-         m1fQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744656127; x=1745260927;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RVj63pLHPDOADttU5mk9xoBgxj6+KEfzLF7NO/zyIHU=;
-        b=RsRY1t+VlnvN1Af6taSxne1JeH65OWdGj9+MgHFGcPOUHzIrqJ+9e6pOj2Dfz1t04C
-         kuTCRb3kE3HNwmfsvxIBwx3i+d5mWavxwM5UuxhSNn8UF/q2krUv/HOspCZIyt/pofJI
-         tEaZXpPnxsJezqYaPORw5ac57E2V1/tap753ca0JQIqyUrX87i3uFNroGz9CmkTdJtsh
-         J2stRMeceq+iDWWbAwalXp+4EjZ1ZB+dNLyV800WDIr/77sPyUu/28RpAIEIaelDwZsU
-         tumr+BFgOH7dxNsPEvrtQToaS7ia/tixORnx33A7Tsq5F6QQWrOx9Jliyw29sBfLyxuw
-         4DZA==
-X-Forwarded-Encrypted: i=1; AJvYcCWrqQFXbT/HO/5OzipLTjm292IEHL5CEaE1rJFjxkK6GEM4M3lOgTvMMiWwW857X43BvSbwKoI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPloeRRv/dz9EQdksjh5gRFVozk0oKSgNiTtL9VhDt+fYEygNE
-	4RFnU1U96svcHgGxbY2yEW2nSVJu7ch9oEtwjPjapBanOwuIgTc6Uibsb10rVpKqOlk5uv5W9yf
-	8xPKSTC4aLHayeVZkjaHzpaIpIPNh+FdxNx3K
-X-Gm-Gg: ASbGncsk0z7usew2fd83yZlg84xnP0hPao0gwj+0sev7rzq06t2HdEC6q7akI9zN7NU
-	65rKilfxOUMxDtKbuQ9EhsqFA84GqqaqX05X7KWMZxDb20sDOJYtad9/P/20yI+6991+uJqTYRW
-	Vq7nAAuOTW6zLBDudFW3zqQjigyyV/ynmsb4Np7QwqsZZM5zXAL73f
-X-Google-Smtp-Source: AGHT+IEM2908mcWzVKMjpolQ0hIG1B9gw1c/6MnW5biuy6F3HJ9GSftRvzmu/S4TKHnQCd3lqvgWhDveMpG2O2LCLJQ=
-X-Received: by 2002:a05:622a:250:b0:476:77ba:f7 with SMTP id
- d75a77b69052e-479775d5ac4mr205613591cf.34.1744656127177; Mon, 14 Apr 2025
- 11:42:07 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1744656193; x=1776192193;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=3C/EUWugg8VrXEaYq0yJFAtr97plt9xfvTx4VUENKPU=;
+  b=iSQYpmVdmvH0Ochoihd+fNWFYJ/pkGgLl5m+fmVpvRxCpHZX3IcysZAj
+   xbZ6JYFv+P993b6KfQEPsL1NvJQ/dorkUhCeZONVXAKHr2RW1EL3j0X1u
+   l4D5y/iNz6RgYx3XM7oWiXI051mIweUzWZIbvIctMwbs26QflYtQU49Ny
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.15,212,1739836800"; 
+   d="scan'208";a="187307659"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2025 18:43:11 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:10738]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.43.57:2525] with esmtp (Farcaster)
+ id 1828d1ba-87ba-4c13-bfd9-558c14d8d136; Mon, 14 Apr 2025 18:43:11 +0000 (UTC)
+X-Farcaster-Flow-ID: 1828d1ba-87ba-4c13-bfd9-558c14d8d136
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 14 Apr 2025 18:43:09 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.170.39) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 14 Apr 2025 18:43:06 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <leitao@debian.org>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<horms@kernel.org>, <kernel-team@meta.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2 10/10] net: fib_rules: Use nlmsg_payload in fib_{new,del}rule()
+Date: Mon, 14 Apr 2025 11:42:52 -0700
+Message-ID: <20250414184255.39609-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.49.0
+In-Reply-To: <20250414-nlmsg-v2-10-3d90cb42c6af@debian.org>
+References: <20250414-nlmsg-v2-10-3d90cb42c6af@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250414-double_hold_fix-v5-1-10e056324cde@narfation.org>
-In-Reply-To: <20250414-double_hold_fix-v5-1-10e056324cde@narfation.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 14 Apr 2025 11:41:56 -0700
-X-Gm-Features: ATxdqUF7AI_OOcycjc1SsjBq1YuDR9GVzjAZt9KIbXpqOALRRD2LjaN3l9RR8PI
-Message-ID: <CANn89iJEFq4QeFDSq=-7NdPnqPgwMJDd5xvQ70YUEqHjNjdchw@mail.gmail.com>
-Subject: Re: [PATCH net v5] batman-adv: Fix double-hold of meshif when getting enabled
-To: Sven Eckelmann <sven@narfation.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, b.a.t.m.a.n@lists.open-mesh.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzbot+ff3aa851d46ab82953a3@syzkaller.appspotmail.com, 
-	syzbot+4036165fc595a74b09b2@syzkaller.appspotmail.com, 
-	syzbot+c35d73ce910d86c0026e@syzkaller.appspotmail.com, 
-	syzbot+48c14f61594bdfadb086@syzkaller.appspotmail.com, 
-	syzbot+f37372d86207b3bb2941@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D045UWC003.ant.amazon.com (10.13.139.198) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Mon, Apr 14, 2025 at 11:05=E2=80=AFAM Sven Eckelmann <sven@narfation.org=
-> wrote:
->
-> It was originally meant to replace the dev_hold with netdev_hold. But thi=
-s
-> was missed in batadv_hardif_enable_interface(). As result, there was an
-> imbalance and a hang when trying to remove the mesh-interface with
-> (previously) active hard-interfaces:
->
->   unregister_netdevice: waiting for batadv0 to become free. Usage count =
-=3D 3
->
-> Fixes: 00b35530811f ("batman-adv: adopt netdev_hold() / netdev_put()")
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Reported-by: syzbot+ff3aa851d46ab82953a3@syzkaller.appspotmail.com
-> Reported-by: syzbot+4036165fc595a74b09b2@syzkaller.appspotmail.com
-> Reported-by: syzbot+c35d73ce910d86c0026e@syzkaller.appspotmail.com
-> Reported-by: syzbot+48c14f61594bdfadb086@syzkaller.appspotmail.com
-> Reported-by: syzbot+f37372d86207b3bb2941@syzkaller.appspotmail.com
-> Signed-off-by: Sven Eckelmann <sven@narfation.org>
+From: Breno Leitao <leitao@debian.org>
+Date: Mon, 14 Apr 2025 06:24:16 -0700
+> Leverage the new nlmsg_payload() helper to avoid checking for message
+> size and then reading the nlmsg data.
+> 
+> Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
