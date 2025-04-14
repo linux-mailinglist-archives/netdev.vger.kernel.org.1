@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-182210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E1A5A881CF
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 15:26:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9011A881D6
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 15:26:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DB113B9732
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 13:25:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BE8A3B84E1
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 13:26:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEE9924729E;
-	Mon, 14 Apr 2025 13:24:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 743E02472BC;
+	Mon, 14 Apr 2025 13:24:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456AF247289;
-	Mon, 14 Apr 2025 13:24:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A962624728E;
+	Mon, 14 Apr 2025 13:24:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744637085; cv=none; b=AOvxTQdHJRiCAY4YdTmrztbHnrqIK2tJMk7n12f4vsq/iIs432Hi1U2ogI3hH6GY7uONE9VszvwmmK3i7sJOsY6vNxIH6/IKKPa3a/SkS6+7ulrL6IowPuwISm8l43T89WiBlkeM1W01FWf+A4malFelyIUAiQRenLLI75KkTvM=
+	t=1744637086; cv=none; b=bAjtDCFIQ5Z2HPH6gserjpQMluChPRNp8Km56y3r3vFMn40GjbTFONjzO8muUqkgbxJtrq+yawKN0aB+Kb40Lwywxl4V69L91icPnSRtz7XdSsMrxNE5YwPyf9YmIaVPrJVCV7/6kv+6UlUP4s/WyrEyQd4rHfR8bQTDOnEC1zE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744637085; c=relaxed/simple;
-	bh=BeHZLdzECqUINxpRH3TbRKrvymamvWqDpttGTBLG8kk=;
+	s=arc-20240116; t=1744637086; c=relaxed/simple;
+	bh=Pi7dAziMSlR3ymqB9s+k3fs1KGbdD8zdHAEwvBXg3ZY=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=AZjIfZqI/+nyr5+u1aRa6Y5fWU5VLN4IDmuppFeGFHfpvggg3wf8qcc1z9CZakSsYAukW7jhlGqGuJ7fvFc6CjBinvECsxFR2tpa4jKh0ZOMEbfgx5xiOcI4ZAql171jcwUFmciXbdKP3fuAa8VQDU68bjvN7bPHITcYUOzh/SE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.53
+	 In-Reply-To:To:Cc; b=RaodBBoAly2KSAlSRZcJB6+v4pl8gtBEYVioZyQg7mMPccqk7TScJ0vjRxVKQXOXsT7sfkePo+zSHWV2SEA5I/Qaz8nM/O7f/j25lyKOyWEe/hKcwD3BDfKOBoYrgBoseI48vpnDoNjKCADp61czkjBNjABrwWWpBgGoqg3mWu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5e5cd420781so8558155a12.2;
-        Mon, 14 Apr 2025 06:24:42 -0700 (PDT)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5e5e0caa151so7467792a12.0;
+        Mon, 14 Apr 2025 06:24:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744637081; x=1745241881;
+        d=1e100.net; s=20230601; t=1744637083; x=1745241883;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uEkPNAzwNjB8l3D6JqgcGTPbVionTGNe1sx+qPQk13g=;
-        b=NqMi0XHvJPWuzCS7/mY/FukPmR968b0Z697fuJK7U4LIB/4Eu4UVomsZ035XWxWAv9
-         Dd9EyoulahJp7wkO4eLbSWVnLbscPVNDEnfzpzt7hPmweNJdnvAHUAFvmRSAx4ExBmRG
-         wchin+h0o5vxow4XwS+BbyBQhvIlM5feuOX3Wo9dPSvkXQT8nJ6sFZAiz0Z0cz6RWTID
-         tvxtI9MnjrVW6jOZ97XYf01h7oBZFZ/B3FIa3dHa0ZboQlxmdV9LIENkpPF23mW0bQTf
-         dANlSghGKgGKGQvH0a2I8t8gUb6BrGk/ZAmh31Xaqn64Epw04/sDFPyUtm9sUFgB6/A4
-         kY3A==
-X-Forwarded-Encrypted: i=1; AJvYcCUvB9IpwlHmJsqaSkYVSgcpnW9dRJvrcNEosYu1c6M3anX3rMiVsd6hWW14BhywOuLntjdtXy/6JM/HZbo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7A9ajItU8RL/8ChS0voMkquT9Ivy7png7daW+lrksu9fSL6nV
-	rRuHNy+9T8qduIPCfp1d3Ocii1r8rFh0SJ4KFRV0rtg44ArZTqIA
-X-Gm-Gg: ASbGncu4XY+6kbdvbH5Zgpq1U8RoE63PnOcLcjNG941Yne1IVdy+hcSH5VO7hkjMHGH
-	vdNtFVtcVhkU5ojOpxFqlXaBxVEy8g1mX96AJYyWHYNrJxmjLIXVEMGhbIF3V7wR9MRTu4+UhzI
-	qCcKVgNQstGTxaJiYmIQMoTrE0mVV31qdXyZHJe0mBY1fqn0m4k3BHjKYBWOkt//EQi9DpREZFB
-	44x0QUqOR7efQbXCdh1rRtD6IlbR6u/z2EOVsljQMex1o4V1Ft0jAr8MSAMCQxR14apzF7QqGlI
-	pnOxkll8GLeqM5eTi9286AmO9kXSfaR+
-X-Google-Smtp-Source: AGHT+IFQQNlHXBQncGv93dqH0UDQzDTmNKlSKlaC4dGQwbHvfWdmCHZCAoDKQ3q3Q163bNzxbswVZg==
-X-Received: by 2002:a17:907:d92:b0:ac2:c1e:dff0 with SMTP id a640c23a62f3a-acad3491ec9mr1108522766b.19.1744637081342;
-        Mon, 14 Apr 2025 06:24:41 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff:71::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acaa1bb3159sm911015966b.37.2025.04.14.06.24.40
+        bh=PSlWr+LCRENelw1f6mytuxXdWnM6i/hVASYqyjr5v94=;
+        b=XF97ORakxrrPyyLrsTacsazVJh0iLNWP0c4W7lbY7NyJO7POCESnWMmBMlnYCjk6jU
+         7AvJO1KsbyC9FRgNopLakaqrbp06vXu9qQs2XQshos2iTuZf4wR4zBjgkN6D0tVi/Mkg
+         uSs3Ij8WROdmNxoaC5cfb9ZJWiFNZH1gK7FjYOduTieU3maqENfqVzA3DYW70PMSO64A
+         b0Rz4OGlCrS0HftM53QC21WEcbLIb1wxn6hzc6bbfb9cQJNlJFKO20WSJ+8sYYFxUHSV
+         GXaNNX41921JrZLpOrCfeSDtiVYlVLFqTDVz4RCtb38XB3qhjCOff4E16X8PjTForvvl
+         8W2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXsSk1kK6aOCYI+awUuV0cBuBal4emOjjmYzF4DKUuvhz/bEMITKSrE8MvnMYkVmVdS63vdB+Se2X8IsJQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0KRKhgzzad3CGOMUWwGdY707oTgMiZYfFaOdl/U/IOHPNAJJx
+	NqVMF6o8SlmVnNDSgruminDcZzS8Me0kVItOrVMkHY/vjQM31UFB
+X-Gm-Gg: ASbGncsUJgF/vyPkwmCTCwewABH5LIzMY2pL4C5v0bzKSzzkbl4M5mbcNGuIrY94RPz
+	h3FbgkAEF2oWx9Muc5KEg3Uhn87Ce7wJb8RLdtLg/OyDPz0AKMiacvdoEVhPjhugsNoJUNshMP4
+	xWEXqPOf2PKE/z6xPLGGmZKazPShdi9GxoKP7k/aWv5+O0ufzA4udt25QXxX0LzGjDWYgaJZu2M
+	419yGQBW/kbbM7D5XAFSevt7Hj3jNXoxPpldP/XG2MazRGGbZQnaKeLcDA0R3Zp9ZQPn4VJFj5N
+	VjmE8qeXx4oVAPSjvdF3XcV//LK//Ks=
+X-Google-Smtp-Source: AGHT+IGH/bFChpxan8KnZ04VF6vTDjyMXi4Rg+e8qLEHcNs8Xf8UJmWLgWJuTsUABLUOO0fe09LNbg==
+X-Received: by 2002:a05:6402:3487:b0:5e6:1352:c53d with SMTP id 4fb4d7f45d1cf-5f370292bcemr10499004a12.28.1744637082778;
+        Mon, 14 Apr 2025 06:24:42 -0700 (PDT)
+Received: from localhost ([2a03:2880:30ff:7::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5f36f5056b9sm4834761a12.51.2025.04.14.06.24.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Apr 2025 06:24:40 -0700 (PDT)
+        Mon, 14 Apr 2025 06:24:42 -0700 (PDT)
 From: Breno Leitao <leitao@debian.org>
-Date: Mon, 14 Apr 2025 06:24:12 -0700
-Subject: [PATCH net-next v2 06/10] ipv6: Use nlmsg_payload in
- inet6_valid_dump_ifaddr_req
+Date: Mon, 14 Apr 2025 06:24:13 -0700
+Subject: [PATCH net-next v2 07/10] ipv6: Use nlmsg_payload in
+ inet6_rtm_valid_getaddr_req
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,7 +70,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250414-nlmsg-v2-6-3d90cb42c6af@debian.org>
+Message-Id: <20250414-nlmsg-v2-7-3d90cb42c6af@debian.org>
 References: <20250414-nlmsg-v2-0-3d90cb42c6af@debian.org>
 In-Reply-To: <20250414-nlmsg-v2-0-3d90cb42c6af@debian.org>
 To: "David S. Miller" <davem@davemloft.net>, 
@@ -81,20 +81,20 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  Breno Leitao <leitao@debian.org>, kernel-team@meta.com, 
  Kuniyuki Iwashima <kuniyu@amazon.com>
 X-Mailer: b4 0.15-dev-42535
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1018; i=leitao@debian.org;
- h=from:subject:message-id; bh=BeHZLdzECqUINxpRH3TbRKrvymamvWqDpttGTBLG8kk=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBn/QyOji0lpgZoo31f34mvxasPoBxU5JVqNNHC8
- OHcWOO0PpuJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ/0MjgAKCRA1o5Of/Hh3
- bSefEACCuaZmLpa3vZYziuz8MJ9l+gc8cojb6qsv7y4MhPuwHEcdkbRRFWLhdytpfm5AIZlEFAk
- RqqJqNgHEyDCWDW6J3m98EJhUJTvbqUxe4KrKcZd7Ocfefr8aF2JIyP9K22G3HuW8SaQxtvDDN8
- xCsJTXkF3yktiyLIVlASiYLWc1tcYpX1k6IDFJ785t8Vn16+p//LCHDCslX5u5PylrWcf9BMkkw
- gO8AGHgEMTj+GCYcUwLxWDjnqXF0oyPb4NGK9mkFNUHOneRqazNEARiMTOl2g3hI0Zo+7WxTr2Q
- aStaVWUCdlS84VU7FZCLiFj4C8npRr/hc8IZ17G2fvUfZsOn9iNJ7p3OAWTHs5vSvFc4YoWakn0
- nd8NjKwuJRq/YumHJnOxMYTiIUo/1HHausszjy3Z/lKXU4hdi9wFwlDXo8wVBVwz9ziBBcguTfi
- +TDn8NKOrW1DL1j2XZB8kyP+JIj4sGvYlhe+Jj+RnlN4a10981v8/GSKRM24JNXiBDuWGCL1HzN
- tdyWjjnNPX25fXDtk0ofz/+GkW9PBQq4DvG0MxJ3FaE/TfRRSdeyfNYdvz4hpFTgwC/DuQ/EZcy
- i+TMlQdGyl+7oyH5zS3y2cCH6GwXk+Syin23B5t9X5UVowHO2PEZ9dsOGYJh6ROsuuV6pZmC6Hk
- I4US/JpEQZ374sw==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1195; i=leitao@debian.org;
+ h=from:subject:message-id; bh=Pi7dAziMSlR3ymqB9s+k3fs1KGbdD8zdHAEwvBXg3ZY=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBn/QyO3Xje36ECT19iFNC4PH++wWurTGneO4Uuo
+ w4fLFZ/CIiJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ/0MjgAKCRA1o5Of/Hh3
+ beCqD/9YfKQ5OyO3mMLqQv796HMbQAdoEvDosywTXtGq9aenF2dMTeOUbF2IsE+6hoDTPscDxrx
+ 6nM6e4fCUIfnZ3iz/hwg4qJvYSpKMcctxrj/kpqxEf00xqyRdNf/wH50aGMQNKEGm6RF8TV++L7
+ bCZh2f3e5+O1u1QFTA0rRxJhiX3MhElhA1B7fKI/MmHZf9KMNq4sKhdxJdT4V+eAiy7/ybBWmq8
+ Zg4lh8MAOTh6pfm9F2Fbqd6szlqPjBMNDbXiBqhKudLLVCo0+SOPCuz6Itfpi6JeFRrIXr0agRT
+ QrfLIrUNtOeK6LJjs5X55U0U5xGlEaNhenaDWOU8/X2UnShnueEaPF71VYyutFtfwzCYsyohKZl
+ qVsYsz3i+gbST5fyQcW08fDkaTrASB4hMQHU/GK/JRkgRraDCXP0U1Sp+sDmlSqctF0b4QUSYjc
+ He8D0aWaLtKbh1uYiK/jVf8FUgmkhvCSI6aKrU+xcwYNvCqf6lwNAvUtJQdPkpBPpPZxGXwYFu1
+ ZI9g5Xiva9tlyQTzTPhhpCsKZq3Pwy8hpneZNyYgFwGSiSMgFDyxs1x8+hiZezsm7mUS0Ol60Zs
+ h+rLjc6JqG0EG3nKX24esEZkCquXl29BHZqUiCXqDtW71KxF2I8LIKHRZ9VPDvK5hTV3XgZY8J1
+ ReOPE7M6wY1WRsg==
 X-Developer-Key: i=leitao@debian.org; a=openpgp;
  fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
@@ -108,23 +108,26 @@ Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 9ba83f0c99283..a9aeb949d9c8e 100644
+index a9aeb949d9c8e..4af2761795428 100644
 --- a/net/ipv6/addrconf.c
 +++ b/net/ipv6/addrconf.c
-@@ -5346,12 +5346,12 @@ static int inet6_valid_dump_ifaddr_req(const struct nlmsghdr *nlh,
+@@ -5484,7 +5484,8 @@ static int inet6_rtm_valid_getaddr_req(struct sk_buff *skb,
  	struct ifaddrmsg *ifm;
- 	int err, i;
+ 	int i, err;
  
 -	if (nlh->nlmsg_len < nlmsg_msg_size(sizeof(*ifm))) {
 +	ifm = nlmsg_payload(nlh, sizeof(*ifm));
 +	if (!ifm) {
- 		NL_SET_ERR_MSG_MOD(extack, "Invalid header for address dump request");
+ 		NL_SET_ERR_MSG_MOD(extack, "Invalid header for get address request");
  		return -EINVAL;
  	}
+@@ -5493,7 +5494,6 @@ static int inet6_rtm_valid_getaddr_req(struct sk_buff *skb,
+ 		return nlmsg_parse_deprecated(nlh, sizeof(*ifm), tb, IFA_MAX,
+ 					      ifa_ipv6_policy, extack);
  
 -	ifm = nlmsg_data(nlh);
  	if (ifm->ifa_prefixlen || ifm->ifa_flags || ifm->ifa_scope) {
- 		NL_SET_ERR_MSG_MOD(extack, "Invalid values in header for address dump request");
+ 		NL_SET_ERR_MSG_MOD(extack, "Invalid values in header for get address request");
  		return -EINVAL;
 
 -- 
