@@ -1,212 +1,146 @@
-Return-Path: <netdev+bounces-182044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F529A877B6
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 08:04:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 336C8A877BC
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 08:06:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C536F1887122
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 06:04:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1B8A7A1C09
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 06:05:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 027B41DDC3E;
-	Mon, 14 Apr 2025 06:01:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 197EA191F95;
+	Mon, 14 Apr 2025 06:06:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eKQXjyFX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lgiR4Wde"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498F31D63EE;
-	Mon, 14 Apr 2025 06:01:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9667428F4;
+	Mon, 14 Apr 2025 06:06:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744610493; cv=none; b=tPo6fSwLVIWwUMvNTQvGNmgq4Gm89jRN8lfTreHHpE/yxb847BiyD2MwBJyGIVk25/626QD0c758pEF4UU/QBScYmiSYa6jcvBLVLmy2DoOKTvOKO0mDAU5NZseaH890XAjPsSEuwzxYN5nJ/GBST1PIt8GBu9iFx6oPHbbfB3k=
+	t=1744610808; cv=none; b=oQzVpdje7Gg379hbD+9vSp3f3JlGIi5ADT6eNEqlHVg9kG+7Kqfb/8xR8nYqZXlScJNS7Nyz8ZSB0s41dfu5JoZo/DtF4dXWVbsoxklKLVrOQVZToLFMuq0S/+wP2+kePT67DJK1sOrgSXNmVTRYSwsZpcclold4X2VpqOl4VtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744610493; c=relaxed/simple;
-	bh=gSFvINbMx+mpurJjbuzYdJO9KVleuEcbzdDZgdWmmk8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=llP4Ffw1UzYoVRfXdq11ZA/yjJo7DCcUWFPJchui2J/5t7Hax9LBuLYEUMMDXaaR5K0dOZKy3aVMHShnhBFBMkhwy/fVwzOsRP/lPqa2+Hl+/FZbPhFBY/4JI8s2MZaNCxmjSXFFJJmkuHYQaXbJBjw8uQOY6aLtzOMnA62nYCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eKQXjyFX; arc=none smtp.client-ip=209.85.160.177
+	s=arc-20240116; t=1744610808; c=relaxed/simple;
+	bh=9mJ1ouKP6AUJco+IEEwgsZRlDCRhET75JLATzGghxnM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dsQOUf9dRNMM3RosvKRo2IJjMMF2xSvsThRYK8ndfzlSt2wg+mCfhiDgnHxZCd/eR6JwkYasuAis48GSYJP7mwaoEzZ62x3QhRP6wKagbCg7VL2roT51MZ5+TqmNOnVCo/CCSAdZM9vV7jTf4OPfE3bvEcYeguSUV0GFV/RY35c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lgiR4Wde; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4774d68c670so56759131cf.0;
-        Sun, 13 Apr 2025 23:01:31 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-22403cbb47fso40012775ad.0;
+        Sun, 13 Apr 2025 23:06:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744610491; x=1745215291; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:feedback-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=8yEZCCjAIKX8Bcif/S/pGprjlBDXpto+eqqOQvtfBHY=;
-        b=eKQXjyFXrSCPvnyv1YTcT3o5a9SCJyKmbdV994s5qz0eLxjG/1EJbPrdxeqWWIVdU0
-         F7mnGFazccSlEJ6M9GxxPtfJMaqaD9TPfVqiTu2gs576kDHm2kms/zVoJGeInFicXhA3
-         8dRj4vtzfGhKlxHbS8qfzzF/wWzz/VUL17fTxvIWbyuVsftNzVji2AWpFn8VVhqXKgPi
-         b5K/2GZonQO7WbKQqvBTvZi7f3FE4A1MQfp35i5+VOkSsjNOyc4KIL7x8aBbK6+35m7E
-         dII/VjUG9jzD08qh3m8J1+mISJvBCBN/s9UbOK7qMcW91AGE8BbcSvy7ebtnF9abFcfT
-         ww+w==
+        d=gmail.com; s=20230601; t=1744610806; x=1745215606; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xxIaHbBXZ+RwgLgvB4tQny1ra/FHDti7NjCX7XAn8CI=;
+        b=lgiR4WdewkCN8KItHOYLXd7fkB8WSnrz6OY+5tch8oZPpLXZ62wzLjRd0REtJGQfbg
+         pOnBVzB540qKww+ERekMNh3oHJEGRZakdUJsZcain1Mb3hclWP55MFptP5gPaFTk611t
+         6wAlBeSEOeRyB3AYhYOWj1qr0xhYd9z0+Xh/uvqE2V3rPdKIw99YuGo3o2u52kyHg9E2
+         eQTvch/I8vAMS8iBRqnzW8Ol3f4q6432Y2+TTeYOJDLxjh7rYxg8LSwcL7dhmXA4Bd1S
+         Ya3OPEA99nKXy3E82kLJSVbX1FMtju+LoBix/yNBQFxBjCXIMH7t91D8C1zYDadFCJJ0
+         dXGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744610491; x=1745215291;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:feedback-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8yEZCCjAIKX8Bcif/S/pGprjlBDXpto+eqqOQvtfBHY=;
-        b=mx3v1YcYt/1Hgop4AowfkPd2+VrKiL8RguJ9/8SY05bt8XZrEc6Yo75lK2/xGRNoEF
-         IICVVLFVY0/065RHEW+PKgnTNUW3jGjSxt3IzmtKTn/MOfiSnR7gj5zzUWfRtDmtPTMO
-         oW1WL1Y5rm3G/e/B1AKN0pC+NVM7d5IlSFajsDx7ENxoxv3/3C0tHJuJ5qwMNi8e2hcz
-         gSdrGmV277Hg2NPCRbqFlmGFlrWbx2rFF1u/pZd/OQPa8KltlknDiuCv3RjlNjL47zSm
-         qVePhNCeOaIAXmhLAf1gFh8SJue0efcbsqzAP4OuAFsOsJlNg6O/YPHcDFIQkmLhxbTl
-         eqhA==
-X-Forwarded-Encrypted: i=1; AJvYcCUW2hktAFmUcxcPKAXP8Y94vMdyTH855bz3eIEoB2ARJrfJmGN0dTf3i5F9oiebzNOtmcDm@vger.kernel.org, AJvYcCUzyfHmAupOw+s33NcleUnubsG8VVLg4Yr1rMEVzP4kkkCmOzHukl/yrlSICfzHjqDFUicHjLOV@vger.kernel.org, AJvYcCW6rb/313aloITG0NDsRUUugyrJD7PP78uDoAUsVIGU4fMp38lDdUIZQIGiZIyuvXcdyWlnTxPzP7hVdx0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDoYdItgEKpq7qqfjxvjJnYNYSiTZ5MGua6HHuGfYMZVvdlkNr
-	QnWA/9cBUq52ojyZVbW3sHerVC8PsumVc0BnKQttj+73/A5gg2oZ
-X-Gm-Gg: ASbGncvOULVFHUAHzBZRjE1xipAZp9cRf2Ff3Z/UURmcViLwA1Hm8eWpkply+qnkonX
-	2QaQ1YCGn9e1hhwlD/bz+A1cSP7LG5q6CdDMyNqiH0dhy1gG5mp1spWvhuOOI/4K7wXS5TNKNuq
-	r7qstTGYefA9BsyQhKAIt0yQqoaPiId0KBokrB31Upec7EpVLrcGyHHY45mdk/sHkq3HiruI9oc
-	UJgEJ7Lm/8KPvjus0KTLkyPw5POIoVxrwhjpGrcJxqBvCJlUu1f9LK/IY/1rVMEANDmcHXViO8N
-	wZasUpnfsN6XgKUZF9K7UHzBkyW/YCGEiChxTJHpcw+swHgvBo++1aZFGEk+dWlvCHi+lCEJaFJ
-	6wFQpIDn82VbsnT/Jk6sF86CKM1KAwUI=
-X-Google-Smtp-Source: AGHT+IHDWExJgXvc7ntxhN+BtiblsGHzc2LmReFgtphjkcdAbqKB5qry0e5AfEx4TNIw1Qs3SvIh3g==
-X-Received: by 2002:a05:622a:1449:b0:476:87f6:3ce4 with SMTP id d75a77b69052e-479775d3200mr175981031cf.39.1744610490778;
-        Sun, 13 Apr 2025 23:01:30 -0700 (PDT)
-Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4796eb15d12sm69685261cf.27.2025.04.13.23.01.29
+        d=1e100.net; s=20230601; t=1744610806; x=1745215606;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xxIaHbBXZ+RwgLgvB4tQny1ra/FHDti7NjCX7XAn8CI=;
+        b=TIkfH6LXdb6oSvb9u/VjPU7FVISFjnv+sMtBaAAPoD0h/5u5o7Cg3e7r0wyoLxTXDN
+         199fcXSd3Cu9JmMgcs1bJZfZFQVXH+xq0c+bSGIyYbIdDem6ixAykPI/eakZWyd3XH8M
+         c46Xm/9fvXRo/LMrm+Qtx7BxNG2u19iPJtPT0luexB4DtXcnwpeHTewX8ShN4HMrFJ9e
+         vJatCMNVNMvSZgiiOew5n+VoGbCcuj5/+o/XykTArvugcJB7dY9kmNMVtgRpYuu0KzLR
+         iAgaSVWFo5ohxLSyrGCERjHikF24cn2sSm4Z1DsKEUEthgD+nT3Ok1lkktebWCvarBv1
+         Lfxw==
+X-Forwarded-Encrypted: i=1; AJvYcCUvkZDIk8IAc69wXurIill/2gpi9B3DkW2CDrVJ+1Wb89iM31lHvHbZAqamNC49Wyh15gSNTW4+eGIOauA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRU3w5Y8g9rB7bTj6Ce+QRhqpUfKfGItr3kAnCc4zeD7sagpSy
+	eEKu5Y34tLC14qJkthnNIpfDCqciK7A59HvLaBZ4e6/1xCIdIp6C
+X-Gm-Gg: ASbGncvsgARs75Hi54e1OSnxaTTOxraR9vESvBbfObIiFZuVlO8Af42plVQ0GE8feD/
+	tqFBS+l1HiH27zM6cKzc+VWNPmJmMDlXOOz7U2LGrBoY+o5LYtX3wwDg+uz88ffnOZoXwQRaveb
+	h+b84xF5mlY1Q9XU2wze3dOG3l2plGfsdY4x1kegT0XqrCp7PSh7ayzzjlJC4Xkt22b+MBtOdRI
+	TJMEQchV5jfTbQI6CcPolfSsTHPZOy4rnF3cj5n+zULTgNIzVaexpc6ZzefGzgATIMI6s9XmS9a
+	xmKiR7F9w4LVq2IZn01mn5Qg722gIrILNbMnh2YDv6XhLYcXdeY=
+X-Google-Smtp-Source: AGHT+IEqkd3bo9jG14/uA5feef7+vpo4LRa0tq592FJ1o8s6/vtXDY497Yo7Vmw0Crv9MiyXUqBpBA==
+X-Received: by 2002:a17:902:eb8a:b0:224:1e7a:43fe with SMTP id d9443c01a7336-22bea50df42mr155742075ad.46.1744610805520;
+        Sun, 13 Apr 2025 23:06:45 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22ac7cb536bsm91840835ad.201.2025.04.13.23.06.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Apr 2025 23:01:30 -0700 (PDT)
-Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
-	by mailfauth.phl.internal (Postfix) with ESMTP id D4E601200043;
-	Mon, 14 Apr 2025 02:01:29 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Mon, 14 Apr 2025 02:01:29 -0400
-X-ME-Sender: <xms:uaT8ZydELvQrIgVwszF6wU11o2rahUFItTrF3zadihTQqwhCsatsOw>
-    <xme:uaT8Z8Mq2HY5L8zMm3J72rFNw00Qj0WcF8pxDZzTkdpzkb4SVaEkD9wwgqVlg60Dv
-    9IK7JI-jGAtDxSOzw>
-X-ME-Received: <xmr:uaT8Zzi_mU2pxqqc_Ce7FyyoC9KTuIACSf4u10_oOlkFcMKVNm16J2teSi2Hzg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvudeljeekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgjfhgggfestdekredtredt
-    tdenucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrih
-    hlrdgtohhmqeenucggtffrrghtthgvrhhnpefghfffvefhhfdvgfejgfekvdelgfekgeev
-    ueehlefhiedvgeffjefgteeugfehieenucffohhmrghinhepkhgvrhhnvghlrdhorhhgne
-    cuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsghoqhhu
-    nhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieegqdduje
-    ejkeehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihmvgdr
-    nhgrmhgvpdhnsggprhgtphhtthhopeduledpmhhouggvpehsmhhtphhouhhtpdhrtghpth
-    htoheplhgvihhtrghoseguvggsihgrnhdrohhrghdprhgtphhtthhopehpvghtvghriies
-    ihhnfhhrrgguvggrugdrohhrghdprhgtphhtthhopehmihhnghhosehrvgguhhgrthdrtg
-    homhdprhgtphhtthhopeifihhllheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhho
-    nhhgmhgrnhesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprggvhhesmhgvthgrrdgtoh
-    hmpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdho
-    rhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtg
-    hpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
-X-ME-Proxy: <xmx:uaT8Z_8mxkiy8oDxgoCUsMjw2axgTr0RETjqKWwXbjaBwgvASKq-Uw>
-    <xmx:uaT8Z-t4v1QZbAyzPoJYPJZk-aNcATPkOOh09_umb363Um3CbzcRqg>
-    <xmx:uaT8Z2E6tN__OtMKc-flKBoe7vcBUF4te7zg0y8e-g4PIGCSdNJswA>
-    <xmx:uaT8Z9OSOY4GkjNvy3_cWkXp2h05ZPGh98opqud4MQ6Z0BkxP5T6dw>
-    <xmx:uaT8Z7PioaUMssI2L9JsqcZnNTvN7vj5XZHepuzjcOU14oODaUHyJpom>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 14 Apr 2025 02:01:29 -0400 (EDT)
-From: Boqun Feng <boqun.feng@gmail.com>
-To: Breno Leitao <leitao@debian.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Will Deacon <will@kernel.org>,
-	Waiman Long <longman@redhat.com>
-Cc: aeh@meta.com,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	edumazet@google.com,
-	jhs@mojatatu.com,
-	kernel-team@meta.com,
-	Erik Lundgren <elundgren@meta.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	rcu@vger.kernel.org,
-	Boqun Feng <boqun.feng@gmail.com>
-Subject: [RFC PATCH 8/8] locking/lockdep: Use shazptr to protect the key hashlist
-Date: Sun, 13 Apr 2025 23:00:55 -0700
-Message-ID: <20250414060055.341516-9-boqun.feng@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250414060055.341516-1-boqun.feng@gmail.com>
-References: <20250414060055.341516-1-boqun.feng@gmail.com>
+        Sun, 13 Apr 2025 23:06:44 -0700 (PDT)
+Date: Mon, 14 Apr 2025 06:06:38 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jay Vosburgh <jv@jvosburgh.net>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv2 net] bonding: use permanent address for MAC swapping if
+ device address is same
+Message-ID: <Z_yl7tQne6YTcU6S@fedora>
+References: <20250401090631.8103-1-liuhangbin@gmail.com>
+ <3383533.1743802599@famine>
+ <Z_OcP36h_XOhAfjv@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z_OcP36h_XOhAfjv@fedora>
 
-Erik Lundgren and Breno Leitao reported [1] a case where
-lockdep_unregister_key() can be called from time critical code pathes
-where rntl_lock() may be held. And the synchronize_rcu() in it can slow
-down operations such as using tc to replace a qdisc in a network device.
+Hi Jay,
+On Mon, Apr 07, 2025 at 09:35:03AM +0000, Hangbin Liu wrote:
+> > 	So this patch's change wouldn't actually resolve the MAC
+> > conflict until a failover takes place?  I.e., if we only do step 4 but
+> > not step 5 or 6, eth0 and eth1 will both have the same MAC address.  Am
+> > I understanding correctly?
+> 
+> Yes, you are right. At step 4, there is no failover, so eth0 is still using
+> it's own mac address. How about set the mac at enslave time, with this we
+> can get correct mac directly. e.g.
 
-In fact the synchronize_rcu() in lockdep_unregister_key() is to wait for
-all is_dynamic_key() callers to finish so that removing a key from the
-key hashlist, and we can use shazptr to protect the hashlist as well.
+Any comments for the new approach?
 
-Compared to the proposed solution which replaces synchronize_rcu() with
-synchronize_rcu_expedited(), using shazptr here can achieve the
-same/better synchronization time without the need to send IPI. Hence use
-shazptr here.
-
-Reported-by: Erik Lundgren <elundgren@meta.com>
-Reported-by: Breno Leitao <leitao@debian.org>
-Link: https://lore.kernel.org/lkml/20250321-lockdep-v1-1-78b732d195fb@debian.org/
-Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
----
- kernel/locking/lockdep.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
-
-diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
-index 58d78a33ac65..c5781d2dc8c6 100644
---- a/kernel/locking/lockdep.c
-+++ b/kernel/locking/lockdep.c
-@@ -58,6 +58,7 @@
- #include <linux/context_tracking.h>
- #include <linux/console.h>
- #include <linux/kasan.h>
-+#include <linux/shazptr.h>
- 
- #include <asm/sections.h>
- 
-@@ -1265,14 +1266,18 @@ static bool is_dynamic_key(const struct lock_class_key *key)
- 
- 	hash_head = keyhashentry(key);
- 
--	rcu_read_lock();
-+	/* Need preemption disable for using shazptr. */
-+	guard(preempt)();
-+
-+	/* Protect the list search with shazptr. */
-+	guard(shazptr)(hash_head);
-+
- 	hlist_for_each_entry_rcu(k, hash_head, hash_entry) {
- 		if (k == key) {
- 			found = true;
- 			break;
- 		}
- 	}
--	rcu_read_unlock();
- 
- 	return found;
- }
-@@ -6614,7 +6619,7 @@ void lockdep_unregister_key(struct lock_class_key *key)
- 		call_rcu(&delayed_free.rcu_head, free_zapped_rcu);
- 
- 	/* Wait until is_dynamic_key() has finished accessing k->hash_entry. */
--	synchronize_rcu();
-+	synchronize_shazptr(keyhashentry(key));
- }
- EXPORT_SYMBOL_GPL(lockdep_unregister_key);
- 
--- 
-2.47.1
-
+Thanks
+Hangbin
+> 
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> index 950d8e4d86f8..0d4e1ddd900d 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -2120,6 +2120,24 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
+>  			slave_err(bond_dev, slave_dev, "Error %d calling set_mac_address\n", res);
+>  			goto err_restore_mtu;
+>  		}
+> +	} else if (bond->params.fail_over_mac == BOND_FOM_FOLLOW &&
+> +		   BOND_MODE(bond) == BOND_MODE_ACTIVEBACKUP &&
+> +		   memcmp(slave_dev->dev_addr, bond_dev->dev_addr, bond_dev->addr_len) == 0) {
+> +		/* Set slave to current active slave's permanent mac address to
+> +		 * avoid duplicate mac address.
+> +		 */
+> +		curr_active_slave = rcu_dereference(bond->curr_active_slave);
+> +		if (curr_active_slave) {
+> +			memcpy(ss.__data, curr_active_slave->perm_hwaddr,
+> +			       curr_active_slave->dev->addr_len);
+> +			ss.ss_family = slave_dev->type;
+> +			res = dev_set_mac_address(slave_dev, (struct sockaddr *)&ss,
+> +					extack);
+> +			if (res) {
+> +				slave_err(bond_dev, slave_dev, "Error %d calling set_mac_address\n", res);
+> +				goto err_restore_mtu;
+> +			}
+> +		}
+>  	}
+> 
+> Thanks
+> Hangbin
 
