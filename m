@@ -1,124 +1,288 @@
-Return-Path: <netdev+bounces-182434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AC5BA88BA4
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 20:45:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1009AA88BB8
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 20:50:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 350CB3B5662
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:45:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0136016E272
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:50:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761D328BAAC;
-	Mon, 14 Apr 2025 18:44:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3947727586B;
+	Mon, 14 Apr 2025 18:50:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="E12PzeVZ"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="m8+64CHq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC77E26E16B
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:44:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C58BE4A
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744656271; cv=none; b=cOKsdWj1tMdavHGVN0OZxxcHJQDJWqWn+0JhqeXlRPn5ozIIBKvLKSoMbMYDKJOQXuU1PLfEThwemBt46vY2GBZYIMHYya6KsCXPpzg3vjzFCOIcy/qJit3WuRVP26JFlojfg4sLxCMHG6E2W1OCq/4Y02ZmS79goT/6jkuWs7A=
+	t=1744656638; cv=none; b=WGzkrJQ+xDFeVxtgcN30KKukcq4ilXkvs4/kwIFdyexrunOWQMjOMs0bHRAQOAa4effZ2wKA/TzNiaLyEeEsVKLtJdDDeXfhHdgslJLCxWaY3jmplqzO1nttxFsOOTJlLPU4XJXZuzMT57CijZgdEIPCLu/JaXCGBR/Vv6tIwYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744656271; c=relaxed/simple;
-	bh=YpSfHpLk4g82/Efaxxr4vcOeA7lwSVP0ZoulsVdeGLY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Raed8jaeW6dLObWDGGQEuhWq8AGRTa/fJuFlSToScBnNW7V67HnjrEg0ahvlG+zE9ClXHPlRHGSqr8EjLJNSAhY9Wa4sAnwuvLiO78IHtGuXUcPwOz5Hpe9AGbrf+YQNjs/4iT9DgRLh35KKGpSInkWFEOBrTvvH/qaRnbszwOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=E12PzeVZ; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-7fd581c2bf4so4048832a12.3
-        for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 11:44:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1744656269; x=1745261069; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=YpSfHpLk4g82/Efaxxr4vcOeA7lwSVP0ZoulsVdeGLY=;
-        b=E12PzeVZu5Exwy8LyxFk9HWgo0LQ+XxMijoqt+C1B+Mp3AYP3HgimWmrf9iOztUsrf
-         4UHJRw1rgGT5K2jugGhaZYNqMS6qBc4LSCCwbOjuZ1TPhvHD/SZzcqq2/oTv/wxv6qsY
-         hKoy7XFhw7AZeIAB4v0NuPvLvGIFSngF5FTv0=
+	s=arc-20240116; t=1744656638; c=relaxed/simple;
+	bh=jLN0n2xt5CbXqoNpco1LBcazaX1As/MXTlzfsbM/lXc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=G/KNJOyQJhezvFBTIpGBuBLtJRGVTtx/wH6WtZrk2iV+j1HUK1JUp9VDPJvEc0xw3oiiKJnl9sfzTF4Bbcj3SqxOYc8zTQ4drF2EQHe03bhDoB0s2kVw2hdYzJfad5xw75c9/kpl0GfmrUmXWyRRf2fE8K3XONfa410xeuKcwAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=m8+64CHq; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53E99jnX013541
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:50:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	THJt1ysyy4K5ekl/K/EUtMeZx+hNLLdmSYcsttCB3zQ=; b=m8+64CHqMh+Y/M/x
+	ksr4ezFJMzi4KzuIJQJ+1XJF8AlzZcZi5tRxSm234G8f1tUIb1M/6y05JDH7Qqev
+	7g+ZycmQlWrY8LnSwFz6POV8mvQkvi3wlZnhckeVFFAa2uODi9KaJm3h2W3WOE0W
+	02M5kp1g4ybrogbblP3RO+jJVAZwmUcwxkFRej1qTDGIPBRoeQpaebUTGzgV1fw9
+	3U2ShEkcaBwvhu+yRhoBGU31MF7DXwnYDQBS1Fg2dnJqh2zJUwwqAAzxMxEXiBl/
+	KO+P8Vgc0o1Mj5s5kV0UOXPEXLVt9lumAIP5oP8r78SiDXzfRnWnX+Kk+iRWw9x2
+	3BEAwg==
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com [209.85.219.70])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 45yhfcwebb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:50:35 +0000 (GMT)
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6e8f9450b19so93520686d6.1
+        for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 11:50:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744656269; x=1745261069;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YpSfHpLk4g82/Efaxxr4vcOeA7lwSVP0ZoulsVdeGLY=;
-        b=dzHYLNXKI0qL3KfZdf+1bOFrXnaLg3/zRnVf/EXYrEdL/og/ZM26uJSQaqetIFITmj
-         AzUKMfL+92b4i13nUkCyE3TbE0z1tpnO9XdF612jyqgd27iDD/HGEmXVTDxMJY1A1P16
-         9ajUR5J4wpKw0I9mi07aYOIriLbu4KB34dgq/jZMPp6urv5aISKOYLTe0LF9GMkSKA+j
-         T7r8N4gWsSiiGVjYZLuSWVm1JE/LsMmobE3Bh5kZtGhDwwQ2RMe3hUF48pev6ZXmxSKN
-         D3VR6e6kFxAgM9yGcw7+bWrldJ5VmTQw9kPluxtijxs2U1yuWuwydl9ce9Kso45vF5sP
-         zH1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWMqWd1VxXIEWozVnrtU2yGfUu0f6vrzSAxAV38IBbZOvWU95Vws4iEKvDjSsstGPtdSIJXFZY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywsb0aS4BzBZrZdh/Ngb1BKM+yEFL1X7lLq6LgRqHCnhiCqfwCz
-	7wiGmJx1R8nSUHzFL0H13rtzAtaVP6a49kfHlcEF9rsmbIPs0b8/S/8GAKRebw==
-X-Gm-Gg: ASbGncuVO/t7JiTb1Pj3AwvTXSe2xXaru2Oy2Op1RiHzSZ7aY2AQMAhXpCHSNiOvq9A
-	YJ2tBj3B28DdeLq7M4gUYepUr1SqvaA8JRs+OxwvZirVkqYlpCcsX9TGZJML+oW74r2hdmNA+d2
-	/JJriXVGV6FjaJGXCTqYu13lwcmFEstRllSbMeOaQR6E1R0ttomjQGxQed8TYzJkrMqv7tsZS4D
-	OEVhgztxNNE4EjLk1npO6lnJ55P1O0N38aBJ9ppIWLfX5dijuD/lFnkAwEjFuD/+cXWBULG0ka0
-	1cOccbXlsdXhYFeHUy0PG6qxbDKDThjtKEoP5urWavtyyk8snLKPxI/KPPPFcetd6sgSo+MKGT6
-	Mzw==
-X-Google-Smtp-Source: AGHT+IHRnGevNVFCEzzLtuARDY+GV3b1ySMboNdXjtt9nCxP859MMeYdEqvd7RpkkuyGR22MEOT6ZQ==
-X-Received: by 2002:a17:90b:2752:b0:301:1bce:c255 with SMTP id 98e67ed59e1d1-308237ba788mr18304386a91.27.1744656268888;
-        Mon, 14 Apr 2025 11:44:28 -0700 (PDT)
-Received: from localhost ([2a00:79e0:2e14:7:cfd0:cb73:1c0:728a])
-        by smtp.gmail.com with UTF8SMTPSA id 98e67ed59e1d1-306df082327sm11386410a91.15.2025.04.14.11.44.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Apr 2025 11:44:27 -0700 (PDT)
-Date: Mon, 14 Apr 2025 11:44:24 -0700
-From: Brian Norris <briannorris@chromium.org>
-To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <thomas.weissschuh@linutronix.de>
-Cc: Jeff Johnson <jjohnson@kernel.org>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Francesco Dolcini <francesco@dolcini.it>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
-	ath10k@lists.infradead.org, linux-kernel@vger.kernel.org,
-	ath11k@lists.infradead.org, ath12k@lists.infradead.org,
-	wcn36xx@lists.infradead.org, linux-wireless@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: Re: [PATCH net-next 0/7] net: Don't use %pK through printk
-Message-ID: <Z_1XiNY2ujreEo69@google.com>
-References: <20250414-restricted-pointers-net-v1-0-12af0ce46cdd@linutronix.de>
+        d=1e100.net; s=20230601; t=1744656618; x=1745261418;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=THJt1ysyy4K5ekl/K/EUtMeZx+hNLLdmSYcsttCB3zQ=;
+        b=de1rekj1klh6y2AjqMj7uTZXAgwa8OWDQZUTkOOcZEWdbAP0HsHxOzlzE8TT9qNKAV
+         EFliSfw39notiPNJLdF6TdKexgQ5JbwWVMKZ5AvkPehCYBSeos8tVGila1EziaAcLe2W
+         GJ/7amN4U2t+yGFwzlHPqBEo66oHRY5JrusN+u6vENRhVKqls6qEQ/ZpFpZaUG5TtOZe
+         yNkmBvOZSkyzeNbZE+W9C97Ks2zqV3Jwf1TNaw/uyL1cfqrtA2Mpo1zHGZ4PsPaYyc0t
+         28nU4vN/Ll4TCUHnyvh4y9NASCKT3Nf4bsDOm5USZTE3QRjNT7OclkVXAl9HztzTg8Ud
+         Fpag==
+X-Forwarded-Encrypted: i=1; AJvYcCXOuqoQHlLYeLkXyOqBY66K1rwcbWaTYTlzGO4ndrZ72ZI+8/06oSVV9el5l45h5KfHn+2AM58=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCsGHlcCeUz+lTTsvtzqbpsyg5UkjHm2LHA5n5HS6hB5Gpuv+0
+	rOunR75UhvRPe3w6XdhCbD/Qbt+DanW/BcYBwZVJM9Zi9AgLF3HUMWqmPRYeoMpjJD27JYebe6N
+	XVM4EcOU5MB0cyqlFjbRTx5cCygJ5/o6uYJd8pRBtGbzevtmWkmDzR28ekUYwrfHXJecDhRmYrR
+	Z6kPazdu7Qm3ybTNmI4ZlC9SBC+P4AkQ==
+X-Gm-Gg: ASbGncvk9CYjBKJ0Egm9vAzoH0mrEJeW77PFmf9bUipdrJfEC3WMa17pok/0YTzNiVt
+	bYQBu0ICVVwlM3dMJ7jsRjD3smJH02hBOV3nWJaeF5Eb2KH8JG5MCgdkfR2LKzGHTSXWajig=
+X-Received: by 2002:a05:6214:cc1:b0:6ea:ee53:5751 with SMTP id 6a1803df08f44-6f2a187d6a2mr7479036d6.21.1744656618288;
+        Mon, 14 Apr 2025 11:50:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IErluBWZouUKelRuft9Bk55OO15YgovGljfqK99RJEReA4Gvl5Tg2WhLiePYbBVcXyDbKdOd2DQJAoOiOAZvq4=
+X-Received: by 2002:a05:6214:cc1:b0:6ea:ee53:5751 with SMTP id
+ 6a1803df08f44-6f2a187d6a2mr7478606d6.21.1744656617834; Mon, 14 Apr 2025
+ 11:50:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250414-restricted-pointers-net-v1-0-12af0ce46cdd@linutronix.de>
+References: <20250408233118.21452-1-ryazanov.s.a@gmail.com> <20250408233118.21452-3-ryazanov.s.a@gmail.com>
+In-Reply-To: <20250408233118.21452-3-ryazanov.s.a@gmail.com>
+From: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Date: Mon, 14 Apr 2025 20:50:06 +0200
+X-Gm-Features: ATxdqUE2cRwd5TlaGqsGRESqc15AaHJe5katCXRMeavRQ2HBsv42-Wtfnq57rQg
+Message-ID: <CAFEp6-0kBH2HMVAWK_CAoo-Hd3FU8k-54L1tzvBnqs=eS39Gkg@mail.gmail.com>
+Subject: Re: [RFC PATCH 2/6] net: wwan: core: split port creation and registration
+To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Authority-Analysis: v=2.4 cv=CfUI5Krl c=1 sm=1 tr=0 ts=67fd58fb cx=c_pps a=oc9J++0uMp73DTRD5QyR2A==:117 a=IkcTkHD0fZMA:10 a=XR8D0OoHHMoA:10 a=pGLkceISAAAA:8 a=MYKxjJogAk15MAgVHxkA:9 a=QEXdDO2ut3YA:10 a=iYH6xdkBrDN1Jqds4HTS:22
+X-Proofpoint-GUID: N66ibtR0xIzyPtRxZQK5bKFuZcZAvEO2
+X-Proofpoint-ORIG-GUID: N66ibtR0xIzyPtRxZQK5bKFuZcZAvEO2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-04-14_07,2025-04-10_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 malwarescore=0 impostorscore=0 spamscore=0 phishscore=0
+ lowpriorityscore=0 suspectscore=0 mlxlogscore=999 mlxscore=0 clxscore=1015
+ adultscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
+ definitions=main-2504140137
 
-On Mon, Apr 14, 2025 at 10:26:01AM +0200, Thomas Weißschuh wrote:
-> Furthermore, restricted pointers ("%pK") were never meant to be used
-> through printk().
+Hi Sergey,
 
-Is this really true? Documentation/admin-guide/sysctl/kernel.rst still
-has a section on kptr_restrict which talks about dmesg, CAP_SYSLOG, and
-%pK, which sounds like it's intended. But I'm not highly familiar with
-this space, so maybe I'm misreading something.
+On Wed, Apr 9, 2025 at 1:31=E2=80=AFAM Sergey Ryazanov <ryazanov.s.a@gmail.=
+com> wrote:
+>
+> Upcoming GNSS (NMEA) port type support requires exporting it via the
+> GNSS subsystem. On another hand, we still need to do basic WWAN core
+> work: find or allocate the WWAN device, make it the port parent, etc. To
+> reuse as much code as possible, split the port creation function into
+> the registration of a regular WWAN port device, and basic port struct
+> initialization.
+>
+> Signed-off-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+> ---
+>  drivers/net/wwan/wwan_core.c | 86 ++++++++++++++++++++++--------------
+>  1 file changed, 53 insertions(+), 33 deletions(-)
+>
+> diff --git a/drivers/net/wwan/wwan_core.c b/drivers/net/wwan/wwan_core.c
+> index ade8bbffc93e..045246d7cd50 100644
+> --- a/drivers/net/wwan/wwan_core.c
+> +++ b/drivers/net/wwan/wwan_core.c
+> @@ -357,16 +357,19 @@ static struct attribute *wwan_port_attrs[] =3D {
+>  };
+>  ATTRIBUTE_GROUPS(wwan_port);
+>
+> -static void wwan_port_destroy(struct device *dev)
+> +static void __wwan_port_destroy(struct wwan_port *port)
+>  {
+> -       struct wwan_port *port =3D to_wwan_port(dev);
+> -
+> -       ida_free(&minors, MINOR(port->dev.devt));
+>         mutex_destroy(&port->data_lock);
+>         mutex_destroy(&port->ops_lock);
+>         kfree(port);
+>  }
+>
+> +static void wwan_port_destroy(struct device *dev)
+> +{
+> +       ida_free(&minors, MINOR(dev->devt));
+> +       __wwan_port_destroy(to_wwan_port(dev));
+> +}
+> +
+>  static const struct device_type wwan_port_dev_type =3D {
+>         .name =3D "wwan_port",
+>         .release =3D wwan_port_destroy,
+> @@ -440,6 +443,49 @@ static int __wwan_port_dev_assign_name(struct wwan_p=
+ort *port, const char *fmt)
+>         return dev_set_name(&port->dev, "%s", buf);
+>  }
+>
+> +/* Register a regular WWAN port device (e.g. AT, MBIM, etc.)
+> + *
+> + * NB: in case of error function frees the port memory.
+> + */
+> +static int wwan_port_register_wwan(struct wwan_port *port)
+> +{
+> +       struct wwan_device *wwandev =3D to_wwan_dev(port->dev.parent);
+> +       char namefmt[0x20];
+> +       int minor, err;
+> +
+> +       /* A port is exposed as character device, get a minor */
+> +       minor =3D ida_alloc_range(&minors, 0, WWAN_MAX_MINORS - 1, GFP_KE=
+RNEL);
+> +       if (minor < 0) {
+> +               __wwan_port_destroy(port);
 
-(I do see that commit a48849e2358e ("printk: clarify the documentation
-for plain pointer printing") updated
-Documentation/core-api/printk-formats.rst.)
+I see this is documented above, but it's a bit weird that the port is
+freed inside the register function, it should be up to the caller to
+do this. Is there a reason for this?
 
-In any case, even if the advice has changed, it seems (again, to an
-outsider) a bit much to say it was "never" meant to be used through
-printk().
-
-Brian
+> +               return minor;
+> +       }
+> +
+> +       port->dev.class =3D &wwan_class;
+> +       port->dev.type =3D &wwan_port_dev_type;
+> +       port->dev.devt =3D MKDEV(wwan_major, minor);
+> +
+> +       /* allocate unique name based on wwan device id, port type and nu=
+mber */
+> +       snprintf(namefmt, sizeof(namefmt), "wwan%u%s%%d", wwandev->id,
+> +                wwan_port_types[port->type].devsuf);
+> +
+> +       /* Serialize ports registration */
+> +       mutex_lock(&wwan_register_lock);
+> +
+> +       __wwan_port_dev_assign_name(port, namefmt);
+> +       err =3D device_register(&port->dev);
+> +
+> +       mutex_unlock(&wwan_register_lock);
+> +
+> +       if (err) {
+> +               put_device(&port->dev);
+> +               return err;
+> +       }
+> +
+> +       dev_info(&wwandev->dev, "port %s attached\n", dev_name(&port->dev=
+));
+> +
+> +       return 0;
+> +}
+> +
+>  struct wwan_port *wwan_create_port(struct device *parent,
+>                                    enum wwan_port_type type,
+>                                    const struct wwan_port_ops *ops,
+> @@ -448,8 +494,7 @@ struct wwan_port *wwan_create_port(struct device *par=
+ent,
+>  {
+>         struct wwan_device *wwandev;
+>         struct wwan_port *port;
+> -       char namefmt[0x20];
+> -       int minor, err;
+> +       int err;
+>
+>         if (type > WWAN_PORT_MAX || !ops)
+>                 return ERR_PTR(-EINVAL);
+> @@ -461,17 +506,9 @@ struct wwan_port *wwan_create_port(struct device *pa=
+rent,
+>         if (IS_ERR(wwandev))
+>                 return ERR_CAST(wwandev);
+>
+> -       /* A port is exposed as character device, get a minor */
+> -       minor =3D ida_alloc_range(&minors, 0, WWAN_MAX_MINORS - 1, GFP_KE=
+RNEL);
+> -       if (minor < 0) {
+> -               err =3D minor;
+> -               goto error_wwandev_remove;
+> -       }
+> -
+>         port =3D kzalloc(sizeof(*port), GFP_KERNEL);
+>         if (!port) {
+>                 err =3D -ENOMEM;
+> -               ida_free(&minors, minor);
+>                 goto error_wwandev_remove;
+>         }
+>
+> @@ -485,31 +522,14 @@ struct wwan_port *wwan_create_port(struct device *p=
+arent,
+>         mutex_init(&port->data_lock);
+>
+>         port->dev.parent =3D &wwandev->dev;
+> -       port->dev.class =3D &wwan_class;
+> -       port->dev.type =3D &wwan_port_dev_type;
+> -       port->dev.devt =3D MKDEV(wwan_major, minor);
+>         dev_set_drvdata(&port->dev, drvdata);
+>
+> -       /* allocate unique name based on wwan device id, port type and nu=
+mber */
+> -       snprintf(namefmt, sizeof(namefmt), "wwan%u%s%%d", wwandev->id,
+> -                wwan_port_types[port->type].devsuf);
+> -
+> -       /* Serialize ports registration */
+> -       mutex_lock(&wwan_register_lock);
+> -
+> -       __wwan_port_dev_assign_name(port, namefmt);
+> -       err =3D device_register(&port->dev);
+> -
+> -       mutex_unlock(&wwan_register_lock);
+> -
+> +       err =3D wwan_port_register_wwan(port);
+>         if (err)
+> -               goto error_put_device;
+> +               goto error_wwandev_remove;
+>
+> -       dev_info(&wwandev->dev, "port %s attached\n", dev_name(&port->dev=
+));
+>         return port;
+>
+> -error_put_device:
+> -       put_device(&port->dev);
+>  error_wwandev_remove:
+>         wwan_remove_dev(wwandev);
+>
+> --
+> 2.45.3
+>
 
