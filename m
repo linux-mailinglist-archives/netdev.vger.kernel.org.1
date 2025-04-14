@@ -1,89 +1,118 @@
-Return-Path: <netdev+bounces-182429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AE4AA88B70
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 20:36:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 84F44A88BAA
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 20:46:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54B46179BD7
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:36:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9B5616AEDD
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:46:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 387C928BAAF;
-	Mon, 14 Apr 2025 18:33:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B3E6290BC6;
+	Mon, 14 Apr 2025 18:44:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="yBqLlOBv"
+	dkim=pass (1024-bit key) header.d=nppct.ru header.i=@nppct.ru header.b="GvqD5kMv"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail.nppct.ru (mail.nppct.ru [195.133.245.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DB58289374;
-	Mon, 14 Apr 2025 18:33:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2405528BA94
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:44:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.133.245.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744655627; cv=none; b=qYMf/msedmmNsPtSpAsOIHN4PJHdGZRhebKJJINfcFB4ccAXxAC5PMDk1LrbVvceg4F6TwZnxpVP5UBZrVyS0/8NwDmGV36i+bCcjuBukJzprL8VHTBDlGALHgx/GOQKyv9c2OQ5HeVQItiV2xK1gQlP56y0eXu5F1GKLY8XH8I=
+	t=1744656293; cv=none; b=GJ60lBdZVUahkVbWguUvJYfZPY2UQhKo5bDbxYxL1PYuPbXT10ZX3jMUcTmg+P04LpW/I7A8Af+8gjNCUxmyARN6gGh6RYF1vwicCfNiBgqM4yt/0GXQykG3OQOEjqwgadNdCcVlEgb++/nrOJ5NIehHzLOJuZ+fyBMr+f4y3hk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744655627; c=relaxed/simple;
-	bh=0KlXQUK/yjPJs0KzyxFhDati+DmJRIoM6Y0yhXzHQtM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nrQ6P/xG0qwuUI0qctsH45exSsybUqN36x4v3iuXW23izm5JC6nuE6XipKaCDYcGFm1bc+a8KcuZkCRXsG7eh9BKcAM6pmiRgOfjqR9B+JpCwe7Shbo67OOANG0cmmt6qVoialnphqhAmosbP5T0EFbBxhCLqopDduTuOZA7gL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=yBqLlOBv; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=6Q1p3SoV9fj9HQbqaNCm0CDhPwNjm8pWMFbjGasjMes=; b=yBqLlOBv3qyaA7CLZ4BZMWHM6t
-	NzdK8UQt7WEVrI8DSvBtHl3QK/tWZJPuKoFK9hbzx4pDhEU6Ey4dObR5j1wWRxQOIIOh0LcYtD9QP
-	gDCzqX2MzratlnYF8yOk+zp5ODLN8t18YdZNEGioy/r+IvsffSk7LzLYsBhwhqS7KR9w=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u4Ocb-009FfA-H7; Mon, 14 Apr 2025 20:33:29 +0200
-Date: Mon, 14 Apr 2025 20:33:29 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Bo-Cun Chen <bc-bocun.chen@mediatek.com>, Felix Fietkau <nbd@nbd.name>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1744656293; c=relaxed/simple;
+	bh=s2YUvKONZpYv6BeESkipXTOMCM3/ZgRQk8zLNK4GcdM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=At2k9Rcukb4XYRCr4TMmHtlHSRehEYn69RlNaPpvjze3s0TYJ6O/ufYqVOJ3uHilBcrEXBgONRAObBCA+u1Poftwr+aBX1azqDd76hTQK3dBXIsxCZuHGHHSAB6NeftPAHnxmJaQfq8BagklN5kqiY+pfDtk2J5CCFEXbaE22Rk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nppct.ru; spf=pass smtp.mailfrom=nppct.ru; dkim=pass (1024-bit key) header.d=nppct.ru header.i=@nppct.ru header.b=GvqD5kMv; arc=none smtp.client-ip=195.133.245.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nppct.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nppct.ru
+Received: from mail.nppct.ru (localhost [127.0.0.1])
+	by mail.nppct.ru (Postfix) with ESMTP id 5F2F21C0E8A
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 21:34:38 +0300 (MSK)
+Authentication-Results: mail.nppct.ru (amavisd-new); dkim=pass (1024-bit key)
+	reason="pass (just generated, assumed good)" header.d=nppct.ru
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nppct.ru; h=
+	content-transfer-encoding:mime-version:x-mailer:message-id:date
+	:date:subject:subject:to:from:from; s=dkim; t=1744655671; x=
+	1745519672; bh=s2YUvKONZpYv6BeESkipXTOMCM3/ZgRQk8zLNK4GcdM=; b=G
+	vqD5kMv08/Gl0A6ZNIs8xnnTZ4OfWCMIPyVsVsS2X+MR3SfTxAQ9DRc2t3PF2b8G
+	QnFFBWuRw6inla9znKqRTdv+1AaTKTHwNyw68lstTr+TsLiwSgT6/4U+pMR+SO0H
+	IUfMZcdCRAWcE0uDLMRITAXMLqk/+vf3IHtHlu3WsI=
+X-Virus-Scanned: Debian amavisd-new at mail.nppct.ru
+Received: from mail.nppct.ru ([127.0.0.1])
+	by mail.nppct.ru (mail.nppct.ru [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id pT2DYhInY1yK for <netdev@vger.kernel.org>;
+	Mon, 14 Apr 2025 21:34:31 +0300 (MSK)
+Received: from localhost.localdomain (unknown [87.249.24.51])
+	by mail.nppct.ru (Postfix) with ESMTPSA id 9EB5A1C08C3;
+	Mon, 14 Apr 2025 21:34:15 +0300 (MSK)
+From: Alexey Nepomnyashih <sdl@nppct.ru>
+To: Juergen Gross <jgross@suse.com>
+Cc: Alexey Nepomnyashih <sdl@nppct.ru>,
+	Stefano Stabellini <sstabellini@kernel.org>,
+	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net 5/5] net: ethernet: mtk_eth_soc: convert cap_bit in
- mtk_eth_muxc struct to u64
-Message-ID: <7d990c0a-c9d3-4d07-bae7-70e4438fd6a2@lunn.ch>
-References: <08498e31e830cf0ee1ceb4fc1313d5c528a69150.1744654076.git.daniel@makrotopia.org>
- <dde46bff10fc0ac5e7c6facd1bab018b147356d9.1744654076.git.daniel@makrotopia.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	xen-devel@lists.xenproject.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	stable@vger.kernel.org
+Subject: [PATCH] xen-netfront: handle NULL returned by xdp_convert_buff_to_frame()
+Date: Mon, 14 Apr 2025 18:34:01 +0000
+Message-ID: <20250414183403.265943-1-sdl@nppct.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dde46bff10fc0ac5e7c6facd1bab018b147356d9.1744654076.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Apr 14, 2025 at 07:12:53PM +0100, Daniel Golle wrote:
-> From: Bo-Cun Chen <bc-bocun.chen@mediatek.com>
-> 
-> Wihtout this patch, the mtk_eth_mux_setup() function may not correctly
-> search the Mux.
+The function xdp_convert_buff_to_frame() may return NULL if it fails
+to correctly convert the XDP buffer into an XDP frame due to memory
+constraints, internal errors, or invalid data. Failing to check for NULL
+may lead to a NULL pointer dereference if the result is used later in
+processing, potentially causing crashes, data corruption, or undefined
+behavior.
 
-This commit message is not particularly good, especially for a Fixes:
-patch. Please could you expand it.
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-
-    Andrew
-
+Cc: stable@vger.kernel.org # v5.9+
+Fixes: 6c5aa6fc4def ("xen networking: add basic XDP support for xen-netfront")
+Signed-off-by: Alexey Nepomnyashih <sdl@nppct.ru>
 ---
-pw-bot: cr
+ drivers/net/xen-netfront.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/net/xen-netfront.c b/drivers/net/xen-netfront.c
+index 8425226c09f0..e99561de3cda 100644
+--- a/drivers/net/xen-netfront.c
++++ b/drivers/net/xen-netfront.c
+@@ -987,6 +987,10 @@ static u32 xennet_run_xdp(struct netfront_queue *queue, struct page *pdata,
+ 	case XDP_TX:
+ 		get_page(pdata);
+ 		xdpf = xdp_convert_buff_to_frame(xdp);
++		if (unlikely(!xdpf)) {
++			trace_xdp_exception(queue->info->netdev, prog, act);
++			break;
++		}
+ 		err = xennet_xdp_xmit(queue->info->netdev, 1, &xdpf, 0);
+ 		if (unlikely(!err))
+ 			xdp_return_frame_rx_napi(xdpf);
+-- 
+2.43.0
+
 
