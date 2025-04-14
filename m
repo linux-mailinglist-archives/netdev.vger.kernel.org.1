@@ -1,109 +1,97 @@
-Return-Path: <netdev+bounces-182353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E61AA8888C
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:27:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B3DAA88895
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:29:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D0857A18CD
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:25:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9778E3B3104
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:28:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B3A27A93E;
-	Mon, 14 Apr 2025 16:27:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FA46284685;
+	Mon, 14 Apr 2025 16:28:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f/RoK1KO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sK929LWN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E9D25E813
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 16:27:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C5B0279903;
+	Mon, 14 Apr 2025 16:28:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744648022; cv=none; b=nweK8TfYyLRBDN1IIMT6dRzzFlQECaBcBAl+X65jYMdsUkLhQdpfXaJcdF59ONV4/c38whR306cuYWPs5rAFO2bVu55yU5wu9CbxQCP8kirRu8kaDYDLxoes/2a/iDEsqgdNhkYhImsTeuE4S1Qwet79mYFo+Ofjg0Ry4mK4jFU=
+	t=1744648126; cv=none; b=X3dS0ZVXpvQuyaoxrLoP4L6Fmc9Ubpb0D/WRhgV0xYuBgIlOYw43HyNvRMoOod1hbOukGPYWFRWEttyBG2Su+AHzqOedsZHIM6F4Wm5uSLARzyxSe5U0cCjE93OWK3x3JkLVMxOCwKkTBsuIGKCYNWDykwXhLuQYUFpTKdrcQSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744648022; c=relaxed/simple;
-	bh=ZaYKAjJdQmxjzYrffS9KwgAW2DzLB47X+LtCrL0RnQw=;
+	s=arc-20240116; t=1744648126; c=relaxed/simple;
+	bh=P/fa8u8mypyH0+6vdYrtZjJEaFzYh19+DjXazRmCLPg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mffduaj/nqXLbut288eTQQ+UlQzwQSZApk6Z0oILeY1dPGfKTJFUbpMIoBUJ2weOQOrePM6BlfMXnkQGzWB50Urk0zvCTHLFE8PYwrJ5B2+YDdMAaWjCaN2rcHQmdYxdcKt0IUaimwScdSkS98350T6iRQQVnVEGofgBPIuOeNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f/RoK1KO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C76FBC4CEEA;
-	Mon, 14 Apr 2025 16:27:00 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ZrJI3DAnTPTYoTrhSbqUdGvh31oYVxQ5S3D2j2SgdmUTj4uqeM4RXqV2HpKlQdJ0qoj7Zu4M+PwBaK3Qja1LmBCASB/oc8yLsvMzGWwz4awrOG7ARdCFK/11QWBB3SX/Do1XlEwBdAPkuOKSCX5UoXMP7SYRX3qkdLy9j167kf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sK929LWN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28C61C4CEEB;
+	Mon, 14 Apr 2025 16:28:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744648021;
-	bh=ZaYKAjJdQmxjzYrffS9KwgAW2DzLB47X+LtCrL0RnQw=;
+	s=k20201202; t=1744648126;
+	bh=P/fa8u8mypyH0+6vdYrtZjJEaFzYh19+DjXazRmCLPg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=f/RoK1KOJvBcXG92R8TtsudI7iiOZ4oYxt79b04VhSCdMLhRWUARRyXfkAyLd+U8V
-	 k48U9o0mLe7rnSRw73Q7c0K17KC+19iAIRM8gZdkhrchYaHAb6xvnhCgVx4RzGQkqW
-	 /QXLCHOq7bGKzSdCEiIjhEaJBxTHu1Wpev4LlRnm3aDBJWv6C4knjDYmgJWwm2YseC
-	 aIGcZqDK+TuPJ0xxOcURIcESsh83hgpFBZcVqRZQSQqaG1I9KgaGx5KGmgtgJJuucK
-	 lAXeV3YGguBRbIugL7rHuqqDt8YdKjQEEP74YwWG9yLIwF5PbZrZXc4DmNe0v+td+W
-	 1cDu9dlxzhrFw==
-Date: Mon, 14 Apr 2025 09:27:00 -0700
+	b=sK929LWNbvs845GbWY+rfc/M02ZlGNFxZwVDINnN5mSSEZOVzRx5BbM9eiPNLwD8W
+	 VChZqkmLlSEFvE002cJO/oAZil7ruyP3ou8ywNsmPTUr9U+KvFoTT7byucRGAgYYlJ
+	 3EzZvxi/TGFTic4AqyIL3GIrzC4L/P7jfKTEhAJyXKi2cTafz1/KXrppnOyyvRrfVF
+	 NeqVXmnJNA9Gf9rxd8wW/13nU5uM4BDkclidQoiC4i2sLxuxrq54NrpHxfodDdyb/I
+	 LCNHQaUuLSSDP4ke82MUU/9YDqui7lhAO1Bv2W3wzoUoHmTnpHKQmc4DAwuE2FIhPw
+	 9wZ39T/yFzK9A==
+Date: Mon, 14 Apr 2025 09:28:44 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Carolina Jubran <cjubran@nvidia.com>
-Cc: Cosmin Ratiu <cratiu@nvidia.com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "horms@kernel.org" <horms@kernel.org>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
- <davem@davemloft.net>, Tariq Toukan <tariqt@nvidia.com>, Gal Pressman
- <gal@nvidia.com>, "jiri@resnulli.us" <jiri@resnulli.us>,
- "edumazet@google.com" <edumazet@google.com>, Saeed Mahameed
- <saeedm@nvidia.com>, "pabeni@redhat.com" <pabeni@redhat.com>
-Subject: Re: net-shapers plan
-Message-ID: <20250414092700.5965984a@kernel.org>
-In-Reply-To: <9768e1e0-3a76-47af-b0f5-17793721bb0a@nvidia.com>
-References: <d9831d0c940a7b77419abe7c7330e822bbfd1cfb.camel@nvidia.com>
-	<20250328051350.5055efe9@kernel.org>
-	<a3e8c008-384f-413e-bfa0-6e4568770213@nvidia.com>
-	<20250401075045.1fa012f5@kernel.org>
-	<1fc5aaa2-1c3d-48cc-99a8-523ed82b4cf9@nvidia.com>
-	<20250409150639.30a4c041@kernel.org>
-	<2f747aac-767c-4631-b1db-436b11b83015@nvidia.com>
-	<20250410161611.5321eb9f@kernel.org>
-	<9768e1e0-3a76-47af-b0f5-17793721bb0a@nvidia.com>
+To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Richard Cochran <richardcochran@gmail.com>,
+ Philipp Zabel <p.zabel@pengutronix.de>, Geert Uytterhoeven
+ <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, "Russell
+ King (Oracle)" <rmk+kernel@armlinux.org.uk>, Giuseppe Cavallaro
+ <peppe.cavallaro@st.com>, Jose Abreu <joabreu@synopsys.com>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org,
+ Biju Das <biju.das.jz@bp.renesas.com>, Fabrizio Castro
+ <fabrizio.castro.jz@renesas.com>, Lad Prabhakar
+ <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH net-next v5 0/3] Add GBETH glue layer driver for Renesas
+ RZ/V2H(P) SoC
+Message-ID: <20250414092844.77999958@kernel.org>
+In-Reply-To: <CA+V-a8uqkG+u_ZXztPe7R0BNV6BA46KgGRHRW-G3axBt566pEQ@mail.gmail.com>
+References: <20250407120317.127056-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	<20250407104447.072449cd@kernel.org>
+	<CA+V-a8uqkG+u_ZXztPe7R0BNV6BA46KgGRHRW-G3axBt566pEQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, 14 Apr 2025 11:27:00 +0300 Carolina Jubran wrote:
-> > I hope you understand my concern, tho. Since you're providing the first
-> > implementation, if the users can grow dependent on such behavior we'd
-> > be in no position to explain later that it's just a quirk of mlx5 and
-> > not how the API is intended to operate. =20
->=20
-> Thanks for bringing this up. I want to make it clear that traffic=20
-> classes must be properly matched to queues. We don=E2=80=99t rely on the=
-=20
-> hardware fallback behavior in mlx5. If the driver or firmware isn=E2=80=
-=99t=20
-> configured correctly, traffic class bandwidth control won=E2=80=99t work =
-as=20
-> expected =E2=80=94 the user will suffer from constant switching of the TX=
- queue=20
-> between scheduling queues and head-of-line blocking. As a result, users=20
-> shouldn=E2=80=99t expect reliable performance or correct bandwidth alloca=
-tion.
-> We don=E2=80=99t encourage configuring this without proper TX queue mappi=
-ng, so=20
-> users won=E2=80=99t grow dependent on behavior that only happens to work =
-without it.
-> We tried to highlight this in the plan section discussing queue=20
-> selection and head-of-line blocking: To make traffic class shaping work,=
-=20
-> we must keep traffic classes separate for each transmit queue.
+On Mon, 14 Apr 2025 09:52:03 +0100 Lad, Prabhakar wrote:
+> > On Mon,  7 Apr 2025 13:03:14 +0100 Prabhakar wrote:  
+> > > This patch series adds support for the GBETH (Gigabit Ethernet) glue layer
+> > > driver for the Renesas RZ/V2H(P) SoC. The GBETH IP is integrated with
+> > > the Synopsys DesignWare MAC (version 5.20). The changes include updating
+> > > the device tree bindings, documenting the GBETH bindings, and adding the
+> > > DWMAC glue layer for the Renesas GBETH.  
+> >
+> > This was posted prior to the "net-next is OPEN" announcement:
+> > https://lore.kernel.org/all/20250407055403.7a8f40df@kernel.org/
+> >
+> > In the interest of fairness towards those who correctly wait
+> > for the tree to be open I will ask you to repost this again,
+> > in a couple of days.
+> >  
+> Are you ok for me to now respin this series?
 
-Right, my concern is more that there is no requirement for explicit
-configuration of the queues, as long as traffic arrives silo'ed WRT
-DSCP markings. As long as a VF sorts the traffic it does not have
-to explicitly say (or even know) that queue A will land in TC N.
-
-BTW the classification is before all rewrites? IOW flower or any other
-forwarding rules cannot affect scheduling?
+yessir
 
