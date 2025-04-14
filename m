@@ -1,140 +1,161 @@
-Return-Path: <netdev+bounces-182051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCE28A87816
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 08:46:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50050A87853
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 09:02:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A76773AD8C8
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 06:46:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 994333AC924
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 07:02:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE0B11A5BAC;
-	Mon, 14 Apr 2025 06:46:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D1B61BD4F7;
+	Mon, 14 Apr 2025 07:02:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OxphVQxS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j6hGA2kE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B8BB45C18;
-	Mon, 14 Apr 2025 06:46:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C27001B85CA;
+	Mon, 14 Apr 2025 07:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744613181; cv=none; b=ACvSFr6S4Ssjd8u2pXqUn+XOf+FcFGuJSiWrT8I0ZJDVReJ6ur9qInSsykt9V8nll6PvNy5r1aGcYFE6WYqv2ngU2dNB6XfdEWq+c6RB6QhTuVzC7dA1NL02Bx4bqsau4eSF2DtlL1eAgreooa+d6It8lxPeNdizs+CVhnzDSKg=
+	t=1744614138; cv=none; b=sEjPrlPFviDVtGG6Ri0ga9rpz2L1LMZ2uD3fDlCo6vTQibqDasBxmp3rMN3lSp5mB2gVEdeqdCCaPy+XHP0psCE6dwMdd78O8ypmEcaVeC1JZS9NF70H7wP9r+0EdtWD07k2E3/YajnHnmTTCUS7DN02QW+QWi3eGyGWcUKDzIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744613181; c=relaxed/simple;
-	bh=KB9ckovQW0KS07mBts2/M7BqP5T6fvTlC9TNv3/9r8Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MnjfIYUteGxOCFP9I/Ge31SyKD6/Vd4Jl0rZhaLVSTKNQI3M+gnomUd/n+NlcGxGguUnsw7o9yu6M2v2SDcDh9C5PyfYMqw4NM+WYT93i65EBlgB1mJ6LL0bYS/YA+6guTzcy/eZyn3MF1Z30Ghd4bDBnZ6hN55DG6qHZA52Jsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OxphVQxS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E339BC4CEE2;
-	Mon, 14 Apr 2025 06:46:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744613176;
-	bh=KB9ckovQW0KS07mBts2/M7BqP5T6fvTlC9TNv3/9r8Q=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=OxphVQxSSazPlouGIg+LbD262nIqnXcTUWTRdztsZC9diesWorut6UnGE4uiUhyXU
-	 oz/eGmUa+DKOrBsURxP5GsPUJTAzYko+20DqZj9FGb7X76l/0x5zdIHcxE81zYYFbe
-	 4akB26IhwO74lZBI5nHqecBBwEe6LE/+Ljf7btwMmC8V+x7tm4Or1CusuCyHx2xcvu
-	 ZkO9iHTMPl7/6Cvnc1onTS0TyKFYlpEf3Iinwn8MGzvhwiEeXfmbQvT95jV4Uu05oK
-	 IwQ7nZPMzlMGwrzvYwqoElIxnhg1u360l/RezzzL49QqWHbjyvtBqNpsFjIXpn3Ala
-	 3irrXXWurxbaQ==
-Message-ID: <62cb29e1-9974-4fe9-9d64-f9d9c56d84dc@kernel.org>
-Date: Mon, 14 Apr 2025 08:46:11 +0200
+	s=arc-20240116; t=1744614138; c=relaxed/simple;
+	bh=x+uSXNvn9FeBjHyDFM/li09nu7ZSVOMIL/PFUN+aRuY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lNZq7jKIO0D8uNiTUIA/HxbABAZtqk4mZGp/L4nZffI3yLc1Av2dAVM7sPukxGhz4kpbZKYs2kQkI/2R8xZ935OWsn0dZwbZxIdIY8ojkmexNtJa2XdvCEO5JIALw0FVNYJPdlrmllDy/W9qlLZ2Qn1kKLFe8yErbOiyOlDavNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j6hGA2kE; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2295d78b45cso54860855ad.0;
+        Mon, 14 Apr 2025 00:02:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744614135; x=1745218935; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=plir7rmRtb7MsHHpJy0jinf92wikNIwAjXLhVwuX7rY=;
+        b=j6hGA2kEcC3b7SepYcF9SGQLSUuNMDf/+Kf0k3t4fOw+JE9jhHV54llihWj5Q3291C
+         FLIQuMUk1kHJLYsmdbTfFjFj9owNGvJZxaXL3956lycRHSgDmikwHqmzdJSwScEZ4mGn
+         JOHbGcOahj2XJFkz5SQ4nqbIRRTO/FKzWUlCP/1ivsk42fhAD9bpjnqEX3o3DNZ7Awar
+         6RXayEQZuSnsDvLvcYxy4Z5o4HSy6InbXZY/877xe0+tvrpwNWq+gA9OtgG5EIRyKJAB
+         jyghSFicdXiGRgDxuhSxgHDPYL4H+FdqC7fq0kI+SxVbD4OyPfNZjXTNZOc0misU9o/p
+         NgMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744614135; x=1745218935;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=plir7rmRtb7MsHHpJy0jinf92wikNIwAjXLhVwuX7rY=;
+        b=Pitv09ComIvCssxOI5cdEDpn1Rf4H8URR9UsrSDQpEEI+jwTjXoUkqon00ka5h5FBV
+         1BFcTs26yVmj3eW7C9SWpSUlDi/D2Av8nA+/SSxlGs7OxGL+c6bnOkcoXrbMdoXbfQRO
+         z7/wSeIaNdUJNA0yccuc/W10PPqRnva2ne9ElZkdvtJMAVqKo6gL+hU2QJNfYLhjFrVH
+         a3XY8MHCzobRktUop8gXFN4RQRkHbGGCK9M51U+omSvAuBdo59OFzhLXPiu88Uur6yQv
+         OzAU/t91m4JAbxQZDYLW2uSUbzv+/0QzSOmsZUQ7gCc0Tys/gabz+Edx2NiKLTXod7Kb
+         LOiw==
+X-Forwarded-Encrypted: i=1; AJvYcCXXOt5drBIeLSFsWQEe5RfbxZi3KiX7MO35yIPnJ44oOvL4Or8KJDA4iaU1vP5uoWOgsFm+vnCFrrbVOfixKHk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5rit4kb6zCYKeedj9Se6moR7/jUUh2xiewzB4csgKYK4lz5lI
+	0RGtFk9EHvbzW7/fgblv87zsGS7VZC2iX8t3GHnxN+ISmyMxFxk4
+X-Gm-Gg: ASbGncttgxRG5+MrC8Rd0fY3CC7e0LBCZj8dsryz8Y3yQYysM86qR8Xt9g3s8OFEiX6
+	vqTDAQIzeA7kQv0bDc7B2T1ycepw55UgkSEkXi5mvt/4p0Mk4X3rAF6Ih6z29ONdJoQZ6WXJsRD
+	CG0v1Rc2yecNNFOp25vcCNKmBxkqWizTM8SVWAsZdKY35u0cEMMPr3rwdaMxru4ljQhGR6ka/S2
+	KoRXdV+w7/0J4JnjksAQd5PebGH85HsHoWOyYcyfXMwPlsBYljzPO8JJw2YxT0Kl1LupQQ3hTjq
+	dTC33V525Jp98RlTQh8l6kF2hYGyaLwEyYhXu48mBiJAdg==
+X-Google-Smtp-Source: AGHT+IEK1O22aNB0eKKTPhWz3Ft05m1zE4K6+TWwl5hUjLMJaTp+MWO7fU/xLicld4E0gAy6XTcaGw==
+X-Received: by 2002:a17:902:d2c2:b0:227:e6fe:2908 with SMTP id d9443c01a7336-22bea50bd27mr152267275ad.48.1744614134683;
+        Mon, 14 Apr 2025 00:02:14 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22ac7c971b4sm93001735ad.116.2025.04.14.00.02.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Apr 2025 00:02:14 -0700 (PDT)
+Date: Mon, 14 Apr 2025 07:02:05 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Xiao Liang <shaw.leon@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Venkat Venkatsubra <venkat.x.venkatsubra@oracle.com>,
+	Etienne Champetier <champetier.etienne@gmail.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net 1/3] ipvlan: fix NETDEV_UP/NETDEV_DOWN event handling
+Message-ID: <Z_yy7WpZQWJiScJl@fedora>
+References: <20250403085857.17868-1-liuhangbin@gmail.com>
+ <20250403085857.17868-2-liuhangbin@gmail.com>
+ <Z-5i5rsrIyE0fM-V@krikkit>
+ <Z-6IbvorOVx6hpxM@fedora>
+ <Z-6ifi46d2JmnIch@krikkit>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 3/5] dt-bindings: clock: sophgo: add clock controller
- for SG2044
-To: Inochi Amaoto <inochiama@gmail.com>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Chen Wang <unicorn_wang@outlook.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Alexander Sverdlin <alexander.sverdlin@gmail.com>,
- Arnd Bergmann <arnd@arndb.de>, Linus Walleij <linus.walleij@linaro.org>,
- Vinod Koul <vkoul@kernel.org>, Nikita Shubin <nikita.shubin@maquefel.me>
-Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
- sophgo@lists.linux.dev, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, Yixun Lan <dlan@gentoo.org>,
- Longbin Li <looong.bin@gmail.com>
-References: <20250413224450.67244-1-inochiama@gmail.com>
- <20250413224450.67244-4-inochiama@gmail.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20250413224450.67244-4-inochiama@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z-6ifi46d2JmnIch@krikkit>
 
-On 14/04/2025 00:44, Inochi Amaoto wrote:
-> +
-> +maintainers:
-> +  - Inochi Amaoto <inochiama@gmail.com>
-> +
-> +description: |
-> +  The Sophgo SG2044 clock controller requires an external oscillator
-> +  as input clock.
-> +
-> +  All available clocks are defined as preprocessor macros in
-> +  dt-bindings/clock/sophgo,sg2044-clk.h
+On Thu, Apr 03, 2025 at 05:00:14PM +0200, Sabrina Dubroca wrote:
+> 2025-04-03, 13:09:02 +0000, Hangbin Liu wrote:
+> > Hi Sabrina,
+> > On Thu, Apr 03, 2025 at 12:28:54PM +0200, Sabrina Dubroca wrote:
+> > > Hello Hangbin,
+> > > 
+> > > 2025-04-03, 08:58:55 +0000, Hangbin Liu wrote:
+> > > > When setting the lower-layer link up/down, the ipvlan device synchronizes
+> > > > its state via netif_stacked_transfer_operstate(), which only checks the
+> > > > carrier state. However, setting the link down does not necessarily change
+> > > > the carrier state for virtual interfaces like bonding. This causes the
+> > > > ipvlan state to become out of sync with the lower-layer link state.
+> > > > 
+> > > > If the lower link and ipvlan are in the same namespace, this issue is
+> > > > hidden because ip link show checks the link state in IFLA_LINK and has
+> > > > a m_flag to control the state, displaying M-DOWN in the flags. However,
+> > > > if the ipvlan and the lower link are in different namespaces, this
+> > > > information is not available, and the ipvlan link state remains unchanged.
+> > > 
+> > > Is the issue with the actual behavior (sending/receiving packets,
+> > > etc), or just in how it's displayed by iproute?
+> > 
+> > The upper link in netns up while lower link down will cause the traffic break
+> > in the pod.
+> 
+> That seems like the correct behavior based on the actual (not
+> displayed) state of the links.
 
-Full path, so include/......
-so tool can actually validate it.
+Hmm, since this behavior is controversial, do you think if we should
+drop this until some users request?
 
-With this fixed:
+> 
+> 
+> I wonder if netif_stacked_transfer_operstate should consider the admin
+> state of the lower device as well as link state:
+> 
+> @@ -10724,7 +10724,7 @@ void netif_stacked_transfer_operstate(const struct net_device *rootdev,
+>  	else
+>  		netif_testing_off(dev);
+>  
+> -	if (netif_carrier_ok(rootdev))
+> +	if (netif_carrier_ok(rootdev) && rootdev->flags & IFF_UP)
+>  		netif_carrier_on(dev);
+>  	else
+>  		netif_carrier_off(dev);
+> 
+> 
+> but I haven't looked at all the consequences and possible side
+> effects.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+I'm not sure. Only sync link carrier seems reasonable too.
 
-Best regards,
-Krzysztof
+Thanks
+Hangbin
 
