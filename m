@@ -1,169 +1,104 @@
-Return-Path: <netdev+bounces-182522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 718D1A88FF8
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 01:13:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5F55A88FFF
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 01:16:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 666EF17A49F
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 23:13:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91EDB188EEE5
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 23:16:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C669D1F4604;
-	Mon, 14 Apr 2025 23:13:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9335F1F3FC0;
+	Mon, 14 Apr 2025 23:16:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bv+NOf4b"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UAHmw+/I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF3671922E7;
-	Mon, 14 Apr 2025 23:13:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1A01C861C;
+	Mon, 14 Apr 2025 23:16:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744672402; cv=none; b=Y8V9+FQ2OMaa1l8WTgeqQc8EeEL9wA097R0k5N5SyrR19RfurB5VdScI2JLG7o5rg1rsJcrXP5O3asgNBWmmBZNPZNnmmwA+sIAPKskEuPhVTytgDnbINm+tuEJZhcRYIYN8f6TMySjFRpiSRpSXXjO3QmQp1e5QHMSjYe3pfw8=
+	t=1744672580; cv=none; b=O3X0WERJ62Na4/osS9jm7jOqrohqN0jav2UbQHdVhz2DGH8+frAo00W4UFn7SzpxW0PYdjBMg7X8ZD18ho4rYPrUFNNbnBHFwfDjm9qUt1DcDiwvUWa4pF/iCN4kALXWa0atChxi5B9lV9SoNJsHOx2DdAtgf0p+cBPVMLkvwhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744672402; c=relaxed/simple;
-	bh=s7lYy6Gjwr7+ohU27xkU6KmUU9Hw/CPMrjC9cXo/IVE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tWCHA+AdSDMNEjmfny3/GkoDdaG4HPJm+30eKCxqI0klpd5orBM8sAIxTrN2Z/AK6HoibZsnRYVzL7x6nd7amMtIGwj6mb8ntkcCsr7GT+v+I4AWis8baxBbzmQZ0kWyEJv1czmZkIWxQKTSG/OHTxeLMiK/uLQIXl08iPjQspQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bv+NOf4b; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-39ac56756f6so4241157f8f.2;
-        Mon, 14 Apr 2025 16:13:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744672399; x=1745277199; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sV7ESO7TJMFGqjSzG7njEawZQ/DVEKwwzXitSslkjq8=;
-        b=bv+NOf4bBHpB0lyGh7Dx2N73D2+qNFN0IaLvT/ubNxzto/VPhJ/YpctzXYnA/7lsVm
-         DzXKEvUi3Io46THvlU+J/R087I7NpjB0QhjvnScdWWhaaT/VCZJteqdOwkozUyN3jHlx
-         yGsTJ8END35Fk7RucEQR3GDmE/X7rM5qwWWpbehLMUdqc1RvDR+9Do3AURca269o7Pdz
-         nmb0nweoAdKaUjiD1B8RGV6U5g/X6+SdD0a1XXzMywBvefbnLokqVFJYD+c1XJ0ncnVQ
-         sI3nCUXzJbwe/V6N1lxL0Xl68QyQ2hgdcVoJMgUkLOHx21dsduJOSldZ/LgfXsaL3g/b
-         RFcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744672399; x=1745277199;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sV7ESO7TJMFGqjSzG7njEawZQ/DVEKwwzXitSslkjq8=;
-        b=mzjwKn8e+bEGGqseyqhbKDMnOqeIgyyi2N+FSh9zsPEOV76qx1foPgJt/HIAllL92C
-         Wo8u9OtmVKqaePNz3QE05KRmjO2vvvmaR0SARYv4HbM2H5rK8Sy/1ty0cZGd7+o7vp1i
-         GuoualxdDIe42EnMUf3LQKuBOg4DxJv2WIWyBRVfveM254Xw60rxaNWEFCpfUqRmCxcX
-         oWE11zerjDGrrDg99Fntsf3GdCNXy4sJUxbAn0kQK6YLNNV8PZ2CfpDIpDmgC8Gd/e7g
-         TkfSz/UUPp6XTNM5o8cBSr4nO2arnOu1rOH2/FOHp7YDQKibfQtANpW9cirIuqmEtBLq
-         9k4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCViG2xokJbOzGaC0UsRuGpXgNcJ5i/rYBf/FBAS1OcQw1amV9WgIdfHIr5jUtSoa3Lx0Zs=@vger.kernel.org, AJvYcCW0y+P1di734Jv5trZt/5v82qeIgt44wBsmK8fDDkYjf9kQxHKG6kxIVNytQCbH7coxBD/D95I5@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPiBRnpU0seH34E+DftaznWjaG9ls77pna9G08TLoS5QqSUlnA
-	qrIo2Vx1JvtRsJWNZEWX02vz9FTbGWzbra4y7/lcWXt5Rfw3m0YGCCNTiobbBoleg6KXrqIcooc
-	1lEmeqWqrAQBUn8rMZR4xMts5JxYLwNY0
-X-Gm-Gg: ASbGncu53CgBnhS6/+Yohy8twvHdrv8Ptj302KYRVwqfkI3cuawa40fQW6oR4u6zBA+
-	jwwhhpdKtRR26j3HyNdk98hGJqW/GQQJgjXURfUQYx+l9sv8mPyzZPz4g8F6Hb78WamB63U6RV7
-	vxRDO5lba2kTBpTxbC7xT/7YNCRoe8R204Q/FQlBLOdY4k5HY/
-X-Google-Smtp-Source: AGHT+IHATyOEVtrIA6Rno5VINK0I9Fz97npa8shrxkLXsT0qSY8SOtZw7i7kAAZsAkOqBSqupc3gg5jOkzPlr2b38hE=
-X-Received: by 2002:a05:6000:1448:b0:39c:140b:feec with SMTP id
- ffacd0b85a97d-39ea51f4081mr12842961f8f.7.1744672398939; Mon, 14 Apr 2025
- 16:13:18 -0700 (PDT)
+	s=arc-20240116; t=1744672580; c=relaxed/simple;
+	bh=0WqDJG69FEs0KkciHDeVevftpF1QWOSoCvGqGBsnecM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tkvRvvFnko5G+s8E82KAy+RtpWZN6O0HrmUKj5TkAWLXfDlhs2292zG+TESTiJijgu7Snyq6uIHU9DwtyYIf2eb6bje8rLf/ih3eS5H5+4Fg6Im7yKVbc0ewS+Ly+1F6RN+hSmpTbJyp2IHvQxKBx9EYZf5dF3bAUpYtSbd1JI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UAHmw+/I; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=k3Dqh+OTN4sR3eT1lMWrg0MEuvqz/VfkV60i8wzfX/A=; b=UAHmw+/I2Jn1sZWh5meC29DmAg
+	TQ6CXyLvFuyzSlFLlL5rQ1TA9j3RGyse5map2+ERUcrFBhOlbFCuAhcf/kDfUdkiX7fzi1HLd9FHJ
+	4Kj/RWZhmro0zgNckfF2by7mlwJF2kTzJLBEB+Vy112fJpQrDlVJUzfBeu3IvFRU0NoU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u4T2B-009IXJ-5I; Tue, 15 Apr 2025 01:16:11 +0200
+Date: Tue, 15 Apr 2025 01:16:11 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: jlayton@kernel.org, akpm@linux-foundation.org, davem@davemloft.net,
+	edumazet@google.com, horms@kernel.org, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, nathan@kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com, qasdev00@gmail.com
+Subject: Re: [PATCH 4/4] net: register debugfs file for net_device refcnt
+ tracker
+Message-ID: <782ca402-83a0-4a7b-b29b-ac021932d081@lunn.ch>
+References: <20250414-reftrack-dbgfs-v1-4-f03585832203@kernel.org>
+ <20250414222926.72911-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250403083956.13946-1-justin.iurman@uliege.be>
- <Z-62MSCyMsqtMW1N@mini-arch> <cb0df409-ebbf-4970-b10c-4ea9f863ff00@uliege.be>
- <CAADnVQLiM5MA3Xyrkqmubku6751ZPrDk6v-HmC1jnOaL47=t+g@mail.gmail.com>
- <20250404141955.7Rcvv7nB@linutronix.de> <85eefdd9-ec5d-4113-8a50-5d9ea11c8bf5@uliege.be>
- <CAADnVQK7vNPbMS7T9TUOW7s6HNbfr4H8CWbjPgVXW7xa+ybPsw@mail.gmail.com> <d326726d-7050-4e88-b950-f49cf5901d34@uliege.be>
-In-Reply-To: <d326726d-7050-4e88-b950-f49cf5901d34@uliege.be>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Mon, 14 Apr 2025 16:13:07 -0700
-X-Gm-Features: ATxdqUGOwfu5vm8RFr5a2kuWwGTKTohLd392D86QHISug07sUXQdUf7HVPOQM3M
-Message-ID: <CAADnVQ++4Lf0ucHjfyK0OakPYsbN2Q9yX0Ru3ymWo4YtLOi-HA@mail.gmail.com>
-Subject: Re: [PATCH net] net: lwtunnel: disable preemption when required
-To: Justin Iurman <justin.iurman@uliege.be>
-Cc: Sebastian Sewior <bigeasy@linutronix.de>, Stanislav Fomichev <stfomichev@gmail.com>, 
-	Network Development <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>, bpf <bpf@vger.kernel.org>, 
-	Andrea Mayer <andrea.mayer@uniroma2.it>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250414222926.72911-1-kuniyu@amazon.com>
 
-On Fri, Apr 11, 2025 at 11:34=E2=80=AFAM Justin Iurman <justin.iurman@ulieg=
-e.be> wrote:
->
-> On 4/7/25 19:54, Alexei Starovoitov wrote:
-> > On Sun, Apr 6, 2025 at 1:59=E2=80=AFAM Justin Iurman <justin.iurman@uli=
-ege.be> wrote:
-> >>
-> >> On 4/4/25 16:19, Sebastian Sewior wrote:
-> >>> Alexei, thank you for the Cc.
-> >>>
-> >>> On 2025-04-03 13:35:10 [-0700], Alexei Starovoitov wrote:
-> >>>> Stating the obvious...
-> >>>> Sebastian did a lot of work removing preempt_disable from the networ=
-king
-> >>>> stack.
-> >>>> We're certainly not adding them back.
-> >>>> This patch is no go.
-> >>>
-> >>> While looking through the code, it looks as if lwtunnel_xmit() lacks =
-a
-> >>> local_bh_disable().
-> >>
-> >> Thanks Sebastian for the confirmation, as the initial idea was to use
-> >> local_bh_disable() as well. Then I thought preempt_disable() would be
-> >> enough in this context, but I didn't realize you made efforts to remov=
-e
-> >> it from the networking stack.
-> >>
-> >> @Alexei, just to clarify: would you ACK this patch if we do
-> >> s/preempt_{disable|enable}()/local_bh_{disable|enable}()/g ?
-> >
-> > You need to think it through and not sprinkle local_bh_disable in
-> > every lwt related function.
-> > Like lwtunnel_input should be running with bh disabled already.
->
-> Having nested calls to local_bh_{disable|enable}() is fine (i.e.,
-> disabling BHs when they're already disabled), but I guess it's cleaner
-> to avoid it here as you suggest. And since lwtunnel_input() is indeed
-> (always) running with BHs disabled, no changes needed. Thanks for the
-> reminder.
->
-> > I don't remember the exact conditions where bh is disabled in xmit path=
-.
->
-> Right. Not sure for lwtunnel_xmit(), but lwtunnel_output() can
-> definitely run with or without BHs disabled. So, what I propose is the
-> following logic (applied to lwtunnel_xmit() too): if BHs disabled then
-> NOP else local_bh_disable(). Thoughts on this new version? (sorry, my
-> mailer messes it up, but you got the idea):
->
-> diff --git a/net/core/lwtunnel.c b/net/core/lwtunnel.c
-> index e39a459540ec..d44d341683c5 100644
-> --- a/net/core/lwtunnel.c
-> +++ b/net/core/lwtunnel.c
-> @@ -331,8 +331,13 @@ int lwtunnel_output(struct net *net, struct sock
-> *sk, struct sk_buff *skb)
->         const struct lwtunnel_encap_ops *ops;
->         struct lwtunnel_state *lwtstate;
->         struct dst_entry *dst;
-> +       bool in_softirq;
->         int ret;
->
-> +       in_softirq =3D in_softirq();
-> +       if (!in_softirq)
-> +               local_bh_disable();
-> +
+On Mon, Apr 14, 2025 at 03:27:36PM -0700, Kuniyuki Iwashima wrote:
+> From: Jeff Layton <jlayton@kernel.org>
+> Date: Mon, 14 Apr 2025 10:45:49 -0400
+> > As a nearly-final step in register_netdevice(), finalize the name in the
+> > refcount tracker, and register a debugfs file for it.
+> > 
+> > Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> > ---
+> >  net/core/dev.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/net/core/dev.c b/net/core/dev.c
+> > index 2f7f5fd9ffec7c0fc219eb6ba57d57a55134186e..db9cac702bb2230ca2bbc2c04ac0a77482c65fc3 100644
+> > --- a/net/core/dev.c
+> > +++ b/net/core/dev.c
+> > @@ -10994,6 +10994,8 @@ int register_netdevice(struct net_device *dev)
+> >  	    dev->rtnl_link_state == RTNL_LINK_INITIALIZED)
+> >  		rtmsg_ifinfo(RTM_NEWLINK, dev, ~0U, GFP_KERNEL, 0, NULL);
+> >  
+> > +	/* Register debugfs file for the refcount tracker */
+> > +	ref_tracker_dir_debugfs(&dev->refcnt_tracker, dev->name);
+> 
+> dev->name is not unique across network namespaces, so we should specify
+> a netns-specific parent dir here.
+> 
+> For example, syzkaller creates a bunch of devices with the same name in
+> different network namespaces.
+> 
+> Then, we also need to move the file when dev is moved to another netns
+> in __dev_change_net_namespace().
 
-This looks like a hack to me.
+The address of dev should be unique, and does not change as the netdev
+moves between network name spaces. So you could postfix it with the
+hashed version of an address, as produced by %pK. This is debugfs, it
+does not need to be too friendly.
 
-Instead analyze the typical xmit path. If bh is not disabled
-then add local_bh_disable(). It's fine if it happens to be nested
-in some cases.
+       Andrew
 
