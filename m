@@ -1,65 +1,84 @@
-Return-Path: <netdev+bounces-182011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9887DA8751D
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 02:55:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AB59A8752A
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 03:09:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E68C7A7B72
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 00:53:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDB251890B32
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 01:09:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8435B15B115;
-	Mon, 14 Apr 2025 00:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F15C3149E17;
+	Mon, 14 Apr 2025 01:09:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="QaCb4klh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O+6Ybnw+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7BA77483;
-	Mon, 14 Apr 2025 00:53:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 835B853E23
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 01:09:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744592025; cv=none; b=rk6rLT7LP9tfM/P2EOHf/2M67ZYPH458iKjiy+8eJKrTNED+c70Bvu+0+2CnN2cfgYDBRMJUBZnhq0xHKuboLz2Xf4f3k7Dnzjnv/9aKsXU4LtWLnB7GrfbXuonn0/H+zgeTujjsPCWAj66XSVLMZ2em5v+yuyqEK9rxdVDv3xI=
+	t=1744592967; cv=none; b=TUAGb3AdPFfY8eLKteW3kOt8fIr9aemSW9Dc1BGPpCoDDlHz6IQmNLmOK7rs+cJPXwFuzufrLHnl+2xxLd6pyutnsrDnqKhuhfJzrc+nbloCZ5A76hS30OIYUVePohzICR/telha4t4nkQcDhqV1rUBXa/3swqxIDTbqge89/lY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744592025; c=relaxed/simple;
-	bh=5LgjGmbeAbyuA2oxz2CuckC0PL4cwfnn4oCcCSDAWbU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cfIDfjNyrcEbJCwBCo8zLNwQ6Jh8K9S4SB/0geRpZLO/ZXqSmnPtEihlfTtltoWSR/z0mpgNx0eeJVu1TbnCxukRD+Hc2Dvj0/FtvUF+2Qj1RtTFhqN+Tl2SfF4zG21YgYu0PHgtOVuLafoaP4qGO2EpkqmtON5vvWa1saN6cl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=QaCb4klh; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=mszcztkCsSN4S8dihwOkYEm86zUy3fblRN6AQg5iZjc=; b=QaCb4klhndz5FV7G
-	1pIlPPczQCCeSw2dygHuHhKZwde2vrH+tflAJXmvQsO0NtgEuRuUreicjxdCR0AtzKmHtP0bd3FB/
-	aOI2S9Tq9AHAhulRVthZ0YkXgRw0p4nIt8/wGlS05cBWahJyWXDfvn3iedzuNlrCMxrYuhkwKUXBo
-	dsjwF1C+VyvEuyLK+L22QCj0BG+EglMJEx9mpo4mGf4vafI9jLjYU5fD4yuty04UjhfhlB3QX1BMg
-	GX3UcS98+WTAjJDMzSavQHk4+9CUgJmDE8JerjNJCevVcaLQaxqQd9V45h+rkeVl3GOODRLw/u+pH
-	im4b45DzDWiRsgyCHw==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1u484u-00B6OC-2j;
-	Mon, 14 Apr 2025 00:53:36 +0000
-From: linux@treblig.org
-To: manishc@marvell.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH net-next 5/5] qed: Remove unused qed_db_recovery_dp
-Date: Mon, 14 Apr 2025 01:52:47 +0100
-Message-ID: <20250414005247.341243-6-linux@treblig.org>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250414005247.341243-1-linux@treblig.org>
-References: <20250414005247.341243-1-linux@treblig.org>
+	s=arc-20240116; t=1744592967; c=relaxed/simple;
+	bh=stkTAHnyEr4JB/uuUNiFScITA+1rWoKR0S76zrmtADU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rPVjbCJeqYgMtjxsl07JPWscfFqfVJz0CC8UXTPIpGHdJE3AdQCnmoEWBEsmphuOfVc+7OkH+5Hm8V3Op4qGoOH16ayPb8X4W0qtLzUJe5UYtpQPrNZ8DIkui/QhPd4ctYRNxt3EJUeX9EWGHtHJ6G/KiytyzWxQ5FHvsx1QaO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O+6Ybnw+; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-227a8cdd241so44640535ad.3
+        for <netdev@vger.kernel.org>; Sun, 13 Apr 2025 18:09:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744592965; x=1745197765; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ANz3WNeYYiJJMo1zQElSvoqfM06lbNuYtFmP4v7/0PE=;
+        b=O+6Ybnw+QJQNZnLIk1CS6/r5/H8A60LFtjFsvYo/CNeqql90v/gWRaaGaNR3BQfn1r
+         yRUJtOI6p+tCz3NdfDwgF0uc3HKskk12f0p/VEi8U/9X7F83z+vg7Zx3ta3viMP1Ftve
+         9IPaZqjqiS/HDJz+op3K/Rb0YMXhaGGjq8hpnkhdBabuy80L2vz/RXH0gYQexnRpK9XW
+         OI1GcNzuOqJ4WUy/BocIg4cmkZPV/v1kM2bsTfwJUb3VrHIhC0V+poiHwzGOeJNEeG9q
+         VVgahCgkecvHRhehXL+2j6WcYs16kY5KX0dnPbRcj0CwntOcsyaBwWw6BVjQ9x7Vo3OP
+         LG8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744592965; x=1745197765;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ANz3WNeYYiJJMo1zQElSvoqfM06lbNuYtFmP4v7/0PE=;
+        b=tFYnr0k/AiZOXcmhXluZD33c6eQk6p6rnGnbfHZmZekuLACGci88oBilkVMvfI1ajb
+         PJm/yU3Pp1lpWnHkV4K1QhNJCKSNwGrGwASZR7NOOmxypEkcCslaW62AL3qSqcaf8ySm
+         wyO9NU/uPi+olsB2qcjWkVSo+Uobgg4OTjsEXOuNsQNG54r8aSEyQjoOKER6fIB2DABn
+         RFqNSX/xmZ+cQvI32h8fqQCEwJm4QIxB3Vx9fWrbKsFchr5cOB/rDaBYCmmjagmQ/8rk
+         0+l3XFA6AQQyqptR9C/CABJgF6DHGOGJ9NK+pEVoPlCvHFo0zFfymPU2kdsdDsb4C+dK
+         z3mQ==
+X-Gm-Message-State: AOJu0YwxGS3l1gUvYmy+wKP1/X5h/+snAQNrT0oBhDJIUcNi9wSJpWI7
+	n8EnVpxzbED5V4c05R5Q0aKGkZ9EJYduGo7NzbWeq1endwyP3zg4CGFQLg==
+X-Gm-Gg: ASbGncveej2hKInqcLLLoN+pZF84CDcALgpw4wySLuqpiLVlM6WeYCRIVqZm7Zk2l33
+	i9OyRVBFXcGJHUwED2zn90ev8BZrQvNOriX9n1dY7CoEgWf1D//142JvFBBeKCuJkCc0FowXXz2
+	CX4B/kf/RCsWG1JQSX4OCzUbmEjiPL8mD7r2gJiD5ObdNu26JJlNt726okpJBNDa//I56+SNP57
+	BeXawKi+zhCr+uy86qWH2Eu4J2oUWb65Ru34aqFhnVVy/JGUV1nG5RJ9Zzecni6y8wQ4gohBRvT
+	R9Su7vSXvBPGmQ378WCGBnJz42CrAaFeaRwEVjIUlDEUeSZW7hoQV/PB
+X-Google-Smtp-Source: AGHT+IEoeLl+G8krZaZOA4qbZdJT8kSIVdIzz5928v6qWpd3Jgu+wDt9VW/pTgTAD7U5ADVSqBqy0Q==
+X-Received: by 2002:a17:902:d2ca:b0:220:faa2:c911 with SMTP id d9443c01a7336-22bea4ab6f9mr140019655ad.14.1744592965203;
+        Sun, 13 Apr 2025 18:09:25 -0700 (PDT)
+Received: from pop-os.. ([2601:647:6881:9060:66ce:777d:b821:87fc])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-306dd1717cesm10158183a91.31.2025.04.13.18.09.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 13 Apr 2025 18:09:24 -0700 (PDT)
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: netdev@vger.kernel.org
+Cc: jhs@mojatatu.com,
+	jiri@resnulli.us,
+	gerrard.tai@starlabs.sg,
+	Cong Wang <xiyou.wangcong@gmail.com>
+Subject: [Patch net 0/2] net_sched: Fix a UAF vulnerability in HFSC class handling
+Date: Sun, 13 Apr 2025 18:09:10 -0700
+Message-Id: <20250414010912.816413-1-xiyou.wangcong@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,63 +87,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+This patchset contains a bug fix and a selftest for it, please check
+each patch description for details.
 
-qed_db_recovery_dp() was added in 2018 as part of
-commit 36907cd5cd72 ("qed: Add doorbell overflow recovery mechanism")
-but has remained unused.
-
-Remove it.
-
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 ---
- drivers/net/ethernet/qlogic/qed/qed.h     |  1 -
- drivers/net/ethernet/qlogic/qed/qed_dev.c | 19 -------------------
- 2 files changed, 20 deletions(-)
+Cong Wang (2):
+  net_sched: hfsc: Fix a UAF vulnerability in class handling
+  selftests/tc-testing: Add test for HFSC queue emptying during peek
+    operation
 
-diff --git a/drivers/net/ethernet/qlogic/qed/qed.h b/drivers/net/ethernet/qlogic/qed/qed.h
-index b7def3b54937..016b575861b9 100644
---- a/drivers/net/ethernet/qlogic/qed/qed.h
-+++ b/drivers/net/ethernet/qlogic/qed/qed.h
-@@ -939,7 +939,6 @@ u16 qed_get_cm_pq_idx_ofld_mtc(struct qed_hwfn *p_hwfn, u8 tc);
- u16 qed_get_cm_pq_idx_llt_mtc(struct qed_hwfn *p_hwfn, u8 tc);
- 
- /* doorbell recovery mechanism */
--void qed_db_recovery_dp(struct qed_hwfn *p_hwfn);
- void qed_db_recovery_execute(struct qed_hwfn *p_hwfn);
- bool qed_edpm_enabled(struct qed_hwfn *p_hwfn);
- 
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_dev.c b/drivers/net/ethernet/qlogic/qed/qed_dev.c
-index 86a93cac2647..9659ce5b0712 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_dev.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_dev.c
-@@ -255,25 +255,6 @@ static void qed_db_recovery_teardown(struct qed_hwfn *p_hwfn)
- 	p_hwfn->db_recovery_info.db_recovery_counter = 0;
- }
- 
--/* Print the content of the doorbell recovery mechanism */
--void qed_db_recovery_dp(struct qed_hwfn *p_hwfn)
--{
--	struct qed_db_recovery_entry *db_entry = NULL;
--
--	DP_NOTICE(p_hwfn,
--		  "Displaying doorbell recovery database. Counter was %d\n",
--		  p_hwfn->db_recovery_info.db_recovery_counter);
--
--	/* Protect the list */
--	spin_lock_bh(&p_hwfn->db_recovery_info.lock);
--	list_for_each_entry(db_entry,
--			    &p_hwfn->db_recovery_info.list, list_entry) {
--		qed_db_recovery_dp_entry(p_hwfn, db_entry, "Printing");
--	}
--
--	spin_unlock_bh(&p_hwfn->db_recovery_info.lock);
--}
--
- /* Ring the doorbell of a single doorbell recovery entry */
- static void qed_db_recovery_ring(struct qed_hwfn *p_hwfn,
- 				 struct qed_db_recovery_entry *db_entry)
+ net/sched/sch_hfsc.c                          |  9 ++++-
+ .../tc-testing/tc-tests/infra/qdiscs.json     | 39 +++++++++++++++++++
+ 2 files changed, 46 insertions(+), 2 deletions(-)
+
 -- 
-2.49.0
+2.34.1
 
 
