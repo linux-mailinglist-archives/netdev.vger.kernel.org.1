@@ -1,100 +1,159 @@
-Return-Path: <netdev+bounces-182368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1214BA88919
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:55:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A913A88920
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:56:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 816191889565
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:55:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44DA43A65A1
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:56:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D3EE2749E2;
-	Mon, 14 Apr 2025 16:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76BF3288C87;
+	Mon, 14 Apr 2025 16:56:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VsoRwWB1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kaWWEpYQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72DF51A29A;
-	Mon, 14 Apr 2025 16:55:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C066E2749F1;
+	Mon, 14 Apr 2025 16:56:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744649728; cv=none; b=iwR2Qrhewwilqk7cjQY7JH6C2FqA8thXATJjdSzkPKA7MnnJDPBA9hY/MbBO6AM2/f7F/iqmO8WiMNRGl+QkFxB1/Fa3blEdrRgRJ3cbbJmLrZymkFGQtDihibtgvo0KGHA56+XVFewlIW8hRT1lant5izKKtPtcVq9/gswJbsc=
+	t=1744649804; cv=none; b=RHgZpgkgE7pxrw05/MYJyMyDGJ9lDPDi+VKrbytT3+kuEaBNwq1aB4aQHMItBZ8RByDGNmf4iBtXXSrqug/c7g54DsDFUR0EpD4ggJyF8n6NbFF/NsTcS5YqVfGB6dU3dMOtIsr0bx8wsv4g9LY/xVno3rDI2GMx6PMuxJuMXbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744649728; c=relaxed/simple;
-	bh=B/f8nfuCKrz3hf3ccJBtDMWjTuWvH9EW7AkbfWjqkrs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BLBCeJUyHjYTQmO4CJqGkmCaDW6lvqD/7X47G0fUZkl3P9PkkUbqWzSqBNX+EF4h6Yb4xfO7v9ti1mI0zJdVvlw66e8cpwCR+3bJj4BPrrlDEF68FgoIw701QeSQpp9m4YrGHYSlAkFpT5AiBfREJ+WUrUn6bIrPMsPjdGBnwTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VsoRwWB1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 407D4C4CEE2;
-	Mon, 14 Apr 2025 16:55:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744649727;
-	bh=B/f8nfuCKrz3hf3ccJBtDMWjTuWvH9EW7AkbfWjqkrs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VsoRwWB1aQivpwc5jmlzMzh0dvP+D9thuMGPLW6og/2G6EpsUigpcwI1L8xYjMQA8
-	 bM6yoTrT8/JEyVUbhPljmzTG+U14OfV4knZxc5iL8ISIjCYzOnaumc7y/WFt/F843t
-	 qoza24nMp8VO0BJmK9nlAK7q/fZ4fEH5FHOfNPHPtzu7LFztzWtHzpFJn+jgoqNg7t
-	 aRFgVj39xnnz5qnh/a7thobFPe/rkxwIw19icHBDmZFC3sWgzMmVo+AJ5A7gZMFWd4
-	 XK7yDgHlPpTNDUw2VLNN5G2jUxD7O14+aHWGRMGXgSvDhQXBr/jm3LExUVHC+C3cGi
-	 J0snPHWvjbjLA==
-Date: Mon, 14 Apr 2025 17:55:23 +0100
-From: Simon Horman <horms@kernel.org>
-To: Sven Eckelmann <sven@narfation.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	b.a.t.m.a.n@lists.open-mesh.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v4] batman-adv: Fix double-hold of meshif when
- getting enabled
-Message-ID: <20250414165523.GV395307@horms.kernel.org>
-References: <20250410-double_hold_fix-v4-1-2f606fe8c204@narfation.org>
+	s=arc-20240116; t=1744649804; c=relaxed/simple;
+	bh=qioOoY3NHQQEpjtRQrFyHraXZimPdq715yX3nesHumU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UCx9+cf4CPk1AmjK6INsb/BTwLdjSs4cYQahULbDzpISDU5Cp0T0ZtfMh98OPaWn0JTlya9wa1Lv9lPDKoFs+CaNpxxFb7rjaTDYMK/CJbFwfuKZOgSItymLvjLlRKBbY0BE0ZDVis6iCH/hJAxWEDFebLXW8oHJNtUVmXEbWAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kaWWEpYQ; arc=none smtp.client-ip=209.85.221.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-523ee30e0d4so1934687e0c.2;
+        Mon, 14 Apr 2025 09:56:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744649802; x=1745254602; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=udtwR14oubKebFu5rW6k4e0weoZf4m2R815HfEK738g=;
+        b=kaWWEpYQhxgz23204PRwltLHoYlmjo7Gnevh5hgbECXM+btr/A98eeCFw9TBK+ATA5
+         KOxlwwJBYbgddanC/zZpm3HsSdhEH/j2pA251j9Lx2tuCXNpdng5JjMDd44PDtwK+nSx
+         mLhAxf3alf2RHKiLbS5+2tcbl+Cx8be9LmaeUKS7DRnubX6lAA4tfI+zZ7VlN2bRpUPJ
+         2mOxepn64fSGsrIOxpJPCv0ojZg4w8snJdm3WSSkXhhyeWux5CBNhELe8w/ugx2Ra7m3
+         jmzqPt9FWHJyqQEbBw8+m+Fk54ySggp82+JUNpDj31uk75I0Cb/nuuNxAfOp5tEDJ3cK
+         6ERQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744649802; x=1745254602;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=udtwR14oubKebFu5rW6k4e0weoZf4m2R815HfEK738g=;
+        b=qRKXXPGTtYs1Hr8ia8XUKcSWwzIPENfAGlNB1GAp7MsndQhzQOd5TPwaJxFnEuJqhj
+         vP5eq6PKGDiHNgWDHbIQgsfkIgbgJVpktnXgLJUKfgh5rgpJKtwlws7uwCdsw9K3ejWU
+         o/wJW/g6UWZ0LS3OoIbDXqEp9QmoM2GUnxUhHo3HnbzMD1zpxKgh0LZmB4Ia+Ok+uuaG
+         UaFXWHZweQhKzCDSKmVdtZwvBIovlMBHGmqjWnXnwh+wI6QAlPo7K0i2fHd63kMcePxz
+         tJfU+M4FILe5eaUdqHqory4zJ+jJ+pNjaPPCj1Wmtv8qNHlxA5FIOUWxnypgac/vRh9x
+         n2IA==
+X-Forwarded-Encrypted: i=1; AJvYcCU2AcBMcs6GYmfOPlF6XoiOWaf8fiIQIMU0LvzSDaRV0mGbbmn0BtdmiZNXs2rj8Rmb2p3q8njZliREBUio@vger.kernel.org, AJvYcCUs2MHjTqaP78it1o/sVUch5ciDDnDpL+1UpXZAdvCbcu8L5rJwEzzCaIDnJheFej/hQfb1xLVq@vger.kernel.org, AJvYcCW1Ig5IQgxZWX1AUAE43zuzamjvLHAP7FedpAnQIlLRasGIJUr2s6DInTHlbg6keu/U4JcgIpLRG80W@vger.kernel.org, AJvYcCWysA9OOSwP5cv8nt8dKPzRWjuoqxrxAdEWkaBtf+p6rCU0vV33UPKOh03j3azinP4+EiUTGqVXPY21Fbv7eZZFolI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzf2gz6dPE4tl9Ho7UMl7wMRrk2ymtQfB6QWbCuSaC8z7J8VOYt
+	YCM4iBHou+oP1a0NGWTVx99S65AqLQq4i8r5ThEoMUnoYm5xtRqn0NH23JdZq/MdCrlfPsUfwIK
+	oE2VAjraGyTzEqEBF01ZFh8QCvx8=
+X-Gm-Gg: ASbGnctDoyBhr9uQJnB1JeVqKmvZxonE1Lt/UgkkdgFPyXXJfztPh2azmsxEdO6DDqh
+	OZw20tY2PWOsR+IKkCYeDYilIrv7KLIc2u3FjoSOEdtXWaVvQaXfY13soECDUuvtnrQHUWbFbAS
+	6u9USz7rAG/7HaXsyW94Sbe1FPTJgeXXo/siyiv6pSIVibE2FS/rpNiA==
+X-Google-Smtp-Source: AGHT+IFQpsz/ji8MKcAuYh+qFnh6pm7Cs4klNHHbzk4kp5149hgyDeoWHHM5lEKz3qpRzffoQj33KxW8IfZk7jM+Cro=
+X-Received: by 2002:a05:6122:209f:b0:50b:e9a5:cd7b with SMTP id
+ 71dfb90a1353d-527c35ae10cmr8117351e0c.9.1744649801573; Mon, 14 Apr 2025
+ 09:56:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250410-double_hold_fix-v4-1-2f606fe8c204@narfation.org>
+References: <20250407120317.127056-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250407120317.127056-4-prabhakar.mahadev-lad.rj@bp.renesas.com> <f20e6589-37d9-458b-af82-92fb1ed0db18@bp.renesas.com>
+In-Reply-To: <f20e6589-37d9-458b-af82-92fb1ed0db18@bp.renesas.com>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Mon, 14 Apr 2025 17:56:15 +0100
+X-Gm-Features: ATxdqUHsvC58AXJcSX9DHfg067ybVtkBeQg9WB3LjBGtUZ7gtnbYUDxCu53XU_M
+Message-ID: <CA+V-a8uho8xKikEmSQeDM4Qe5y0jaZfYE3vNc8qehb_NLHGJ6g@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 3/3] net: stmmac: Add DWMAC glue layer for
+ Renesas GBETH
+To: Paul Barker <paul.barker.ct@bp.renesas.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
+	Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 10, 2025 at 08:58:51PM +0200, Sven Eckelmann wrote:
-> It was originally meant to replace the dev_hold with netdev_hold. But this
-> was missed in batadv_hardif_enable_interface(). As result, there was an
-> imbalance and a hang when trying to remove the mesh-interface with
-> (previously) active hard-interfaces:
-> 
->   unregister_netdevice: waiting for batadv0 to become free. Usage count = 3
-> 
-> Fixes: 00b35530811f ("batman-adv: adopt netdev_hold() / netdev_put()")
-> Signed-off-by: Sven Eckelmann <sven@narfation.org>
-> ---
-> This patch is skipping Simon's normal PR submission to get this problem
-> fixed faster in Linus' tree. This currently creates quite a lot of wrong
-> bisect results for syzkaller and it would be better to have this fixed
-> sooner than later.
-> ---
-> Changes in v4:
-> - added Suggested-by: Eric Dumazet <edumazet@google.com>
-> - added Reported-by: of various syzkaller reports which were affected (during
->   bisecting) by this problem
+Hi Paul,
 
-FWIIW, I don't see those tags at the bottom of the commit message.
+On Mon, Apr 14, 2025 at 2:13=E2=80=AFPM Paul Barker
+<paul.barker.ct@bp.renesas.com> wrote:
+>
+> Hi Prabhakar,
+>
+> On 07/04/2025 13:03, Prabhakar wrote:
+> > From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> >
+> > Add the DWMAC glue layer for the GBETH IP found in the Renesas RZ/V2H(P=
+)
+> > SoC.
+> >
+> > Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+>
+> [snip]
+>
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c =
+b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
+> > new file mode 100644
+> > index 000000000000..a0f7cacea810
+> > --- /dev/null
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
+> > @@ -0,0 +1,165 @@
+> > +// SPDX-License-Identifier: GPL-2.0+
+> > +/*
+> > + * dwmac-renesas-gbeth.c - DWMAC Specific Glue layer for Renesas GBETH
+> > + *
+> > + * The Rx and Tx clocks are supplied as follows for the GBETH IP.
+> > + *
+> > + *                         Rx / Tx
+> > + *   -------+------------- on / off -------
+> > + *          |
+> > + *          |            Rx-180 / Tx-180
+> > + *          +---- not ---- on / off -------
+> > + *
+> > + * Copyright (C) 2025 Renesas Electronics Corporation
+> > + */
+> > +
+> > +#include <linux/clk.h>
+> > +#include <linux/device.h>
+> > +#include <linux/module.h>
+> > +#include <linux/platform_device.h>
+> > +#include <linux/reset.h>
+> > +
+> > +#include "dwmac4.h"
+>
+> I'm looking at this while working on RZ/T2H Ethernet support, clangd
+> says inclusion of dwmac4.h is not needed here and compilation succeeds
+> with the include removed.
+>
+Agreed, I will drop this.
 
-> - resubmission after 24h cooldown time
-> - added kernel message during hang to commit message
-> - Link to v3: https://lore.kernel.org/r/20250409073524.557189-1-sven@narfation.org
-> Changes in v3:
-> - fix submitter address
-> - Link to v2: https://lore.kernel.org/r/20250409073304.556841-1-sw@simonwunderlich.de
-> Changes in v2:
-> - add missing commit message
-> - Link to v1: https://lore.kernel.org/r/20250409073000.556263-1-sven@narfation.org
-
-...
+Cheers,
+Prabhakar
 
