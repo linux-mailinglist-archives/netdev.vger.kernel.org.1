@@ -1,93 +1,93 @@
-Return-Path: <netdev+bounces-182437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00D7EA88BD7
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 20:54:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47935A88BD9
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 20:56:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8D0B7A9F30
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:53:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECF0F3B5B55
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:56:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE4AC23D285;
-	Mon, 14 Apr 2025 18:54:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8C901AF0AE;
+	Mon, 14 Apr 2025 18:56:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="GAUoT+Au"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Vki2Dbt6"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B504156236
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:54:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A08DDDC3
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:56:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744656874; cv=none; b=OVswAHJglzhe5wZlGx4Nfx3dFg1+amVTN8sVEsSyDZYMrScx1YYNX/2k7OXFeY7PpQ88gMWprPWXl6+O5mAG+bSl781yhwXUZUScYPrQpODGVJt7MTdrok2U42b/nPdxq5kTXFlK83e2QQ2xS4+k/tKXZmmoJ0ITqfsT6D8ImFE=
+	t=1744657002; cv=none; b=KHimasOvzfaKjvs1JDt6ovodpmGjIASz6fDlBe5utsTav6G71h6+EEOWTwLdAYJjF7t9kLEb4h+DRYm/jmARn1JSGmGCrpxrqwcLilJdW3mUwTBQX88eo/uIuC8up+Ni1EXiF7tkOxByKCFEG+CJ4r2jr0SHPX4UStc2EaiSBSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744656874; c=relaxed/simple;
-	bh=rC6PVrL6ZhUlEEufGDTsQskw5mjSP2EVhi6ZE4fKH7s=;
+	s=arc-20240116; t=1744657002; c=relaxed/simple;
+	bh=m4n/Im+Gnx8SffOix3LPwL4MdLXi9D4xkKwy+KbrkCw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PVuClLebNIqyQJl1+Iyv0dxHC2mZiBD/9Li1Mzbqq4/L/1NhOnHZEapV0Ukh1Ne4gdb8+EJ9FjNfimWLqkogg3ujYg7GH08D3ViMbnGhQHPgRSgBby2t5GIJRyJZWqprP+fygvQKaCdA4tVzD15y7x3rLX86MmUJDY26bqRay4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=GAUoT+Au; arc=none smtp.client-ip=205.220.180.131
+	 To:Cc:Content-Type; b=IWyKlYFF0TZBPa6BTmdPz293xnxRxL/WbiNHsY4XsuOr26hTgnRh7G4obKVrEou7M4HDVZzu/yVjnn1qtqpTmKpi5jZM2TNRVbIqAlWqitRcMLt1cn6IIkjijEkAypc8Xkz12/NOwSd8w4YLctljgHzazNn5cYgkdAMpVcBYk7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Vki2Dbt6; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53E99mio028981
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:54:32 GMT
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53E99rPn016340
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:56:38 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	naeqesCUXl8xXz5acV8f9amN/jzSddHMszqyup4gsGk=; b=GAUoT+Auk3mwfJmo
-	9s5E0CWXJ4BsGDuYorH8Mplg8/vU0GHuySEnRiw4pgQSuBPKCd8smozjUof9Rb1U
-	/9m1altp28NTjC4uv4xqTMQA6VSf+bZ2faM5qZtdrObadG7p8P7x6IUQDBd32elm
-	tpYrvwvnQI4jkUlb6xCl/vUJdEAyEMtSSu6c52wRK6XgrSRpD7NKgx9d6AgGcnhQ
-	ylexfn/Y+ho7S9D8plBeZq6EdWYgvUJ8NZiLPBhiUICpec3cts+HGI1ApR+nWOoM
-	WNsPWFhWPUA37m5lCxyhDPawz3mEKHRDXIupxQDA5JcK4KosIsuA3J/Bv4WYKDoO
-	Ofg0rQ==
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com [209.85.222.200])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 45yfs15k14-1
+	m4n/Im+Gnx8SffOix3LPwL4MdLXi9D4xkKwy+KbrkCw=; b=Vki2Dbt6eoJeCTQL
+	RuUKXeL/gVkEnu6zJeRuZOueaSGRVxFEEgyIIPcP0/pMj+8PB/YEtu4XPKYv/nFo
+	F0X6ETDTqYGZXyAwCEaqEr3o069oPvGYhIp0zKmSIhLjVnmcPSxyAansJoDpsUOk
+	9lCO1ru4FeEGwvo1JVTzP1f10/FLLJFZDUW2RSJZBEsrfjJu9A2tMinuEE+W1kpQ
+	h4IeV1CScrdWuG9claUGcKaIs1V2kgs0cckyRnb/oG/5XRoks3OtYSlBlSCyGwEi
+	UayR2Nwtne7p0qnOvDlebftIkIGCSP//vzl8AKYkjh1bUSUz0C4DFL+mx643NhHn
+	S8jz5A==
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com [209.85.219.71])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 45yfgjdht4-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:54:31 +0000 (GMT)
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7c793d573b2so854314485a.1
-        for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 11:54:31 -0700 (PDT)
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:56:38 +0000 (GMT)
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6e91a184588so138412016d6.2
+        for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 11:56:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744656871; x=1745261671;
+        d=1e100.net; s=20230601; t=1744656998; x=1745261798;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=naeqesCUXl8xXz5acV8f9amN/jzSddHMszqyup4gsGk=;
-        b=LW07RZinOzKoKcuMaNw/2qo75C5OMSqZkwkAp1kV718xmC63ne5STm1eB195uEf3Ym
-         eJg9HIB/V9Q8uJE2tjMfET4ZtLzVb5/wlqfaDeokZgRPAM5QQjmZUtUQKHeAxy0VNcj7
-         DKXcx3La3v3nvYlT/hdJK76RLtSSciCq4BwnELM/kZlqh8emB/7bakoXceWb1H/HOQ3a
-         TdiQGSfLluHJkxOLlHnC9ZxcWq2yh9Z7WL4l9RGFKZvHuERa8UatIwUZwehKMC7YmCSM
-         k7Ni1ynZwpV7M5cuuv4V5s0Kgtzo/zOXq0G/n1Vs7hWGpVKNLPWBkHf/pXzE4s8Jq9K/
-         9GmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXzlSlgpENrkulhLp9I3dwuiDGXiH15/6JGYqzBoQlu+4WWUOoC1j6MbcN9yvwpU599ocJqDOU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxV8EeWHiwkyYpzYS7fMKc2nizXBVVbdJlWQDoxSdhC9a1wF2da
-	VYh15xPMYOc16UIp10LYLYnEIuk0hT4+RowfAZw6BobcSldt3598Boi5kJBpMk+s2D0tOl0C7dc
-	9S3TVurDoOtmtoYY5wA7A1tRBFp4eM61qTK3Dm8MlgiMPNQ/N5Kv2PqMXHB9bNMHVWXtrkfIH2w
-	1sfJ69sU3q/P6jK98ZmGg1rtHdkmeRcw==
-X-Gm-Gg: ASbGncsneKt43JflfkBq9N43jokLn55D4QljVCVGY6GWN6TabJWYc84wog5XJVLY+qJ
-	UgNRb7aSJFgnOOjp+okbS5HSDJ3vL+VpftmiwbBFPQlaNj6+4A43MlM7v3030lsDDQjHleKI=
-X-Received: by 2002:a05:620a:294f:b0:7c7:9813:4ad9 with SMTP id af79cd13be357-7c7af12ecabmr2182443085a.58.1744656870778;
-        Mon, 14 Apr 2025 11:54:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFJbBEFny49dJELVm80GxiDrcFM/inn4iBMNTjRPt9d0m+aM5aaJmcG0ylxKspayTaZzyKnKrqbzzlGolrjmSA=
-X-Received: by 2002:a05:620a:294f:b0:7c7:9813:4ad9 with SMTP id
- af79cd13be357-7c7af12ecabmr2182438485a.58.1744656870200; Mon, 14 Apr 2025
- 11:54:30 -0700 (PDT)
+        bh=m4n/Im+Gnx8SffOix3LPwL4MdLXi9D4xkKwy+KbrkCw=;
+        b=oYRlrF7/Yqgm5SqZYBbo3R3DDqyfQoEWayja8xX2Pvs+kZWPvWAI51EsPuN8SPxXmn
+         y1CdEdTZN/6q/wZuVvQbNVrrKhzSjVVBtFFsYYKYaa09g7EOPW3CqEPig6hJKlRi8O2g
+         OztFht4sDZoEJ5fX+mtagDXFLlYCzSO8ijTordJLoHNP4WfKzeVKB/mKu2ms/g2Mdq8Y
+         mHeaYkgAgXiLP2evmasXtKMpvcYHxuF1oXiXPXvwaEyzqrS6zMo15qI4k70REUZJ8kzi
+         9qOIgcDr10K+sCeb+AfG/qfCXa98wEqnZKU71+QUIJDUuWCYIdQEou4Oibur87YTmHnf
+         m50A==
+X-Forwarded-Encrypted: i=1; AJvYcCWBbFIImxEL0CKWr5GYqbB00giWKBlNuY8D3HDiNXqoksetnPckB6y9cbt66r6vTHbxKcGBbVY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YytrEEXl7BXpWXgvze9x2FIG9uEL7gy2xgNvbsVsxzQv7lvb8X7
+	WMjztl9rrCr1LsOtNeV9J30Kd/Tv3AJ5RtQ9ECJjaK1hcuU0iTUqmU06w/2yQVG7+k20SJysmMN
+	DTVPsmN4/gtIKmZe53BlfNiImDd4+t33YTkDRGhN7gRIoKIGcgFdVEra3xwY/gSevimjmD4D17Z
+	NsqGmbKFjpke8Lyk4ALmTMwcEDHV7qiw==
+X-Gm-Gg: ASbGnctU42Os/M+Rvc6j4EKji5H77m/Ym/Mat5VuaCZ2vZ3ieoI7kJGL+srFPoJkraJ
+	hx0F7iuynr30aYY4sH2O5M+hlpO5CsapJLtgz7Mrb1y587yEuGy9WCf0RPXeRsDn0jdoBahE=
+X-Received: by 2002:ad4:5bc7:0:b0:6e8:9b26:8c5 with SMTP id 6a1803df08f44-6f230ceb5a1mr218866726d6.10.1744656997867;
+        Mon, 14 Apr 2025 11:56:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE1b2Q1EnFBY7+Jr6M1TxbjF1hEia4FwQtheN/1o1ocMpWBfB/D2wF5Ob7BH359dF+dRq3RLgFt5oY+PoN9jOk=
+X-Received: by 2002:ad4:5bc7:0:b0:6e8:9b26:8c5 with SMTP id
+ 6a1803df08f44-6f230ceb5a1mr218866376d6.10.1744656997471; Mon, 14 Apr 2025
+ 11:56:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250408233118.21452-1-ryazanov.s.a@gmail.com> <20250408233118.21452-4-ryazanov.s.a@gmail.com>
-In-Reply-To: <20250408233118.21452-4-ryazanov.s.a@gmail.com>
+References: <20250408233118.21452-1-ryazanov.s.a@gmail.com> <20250408233118.21452-6-ryazanov.s.a@gmail.com>
+In-Reply-To: <20250408233118.21452-6-ryazanov.s.a@gmail.com>
 From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Date: Mon, 14 Apr 2025 20:54:19 +0200
-X-Gm-Features: ATxdqUE4VEbT9YFrdrozGj2rqqwU3xpDUkD2ZWw9zEPQlZIqTJfc-rx-sgFORQ8
-Message-ID: <CAFEp6-2MxMohojOeSPzcuP_Fs0fps1EBGHKGcoHSUt+9fMLqJQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 3/6] net: wwan: core: split port unregister and stop
+Date: Mon, 14 Apr 2025 20:56:26 +0200
+X-Gm-Features: ATxdqUFpRCz3XRZZ1VQ9zND1HUopT0BxvHGJp0N0dgkHvGmDwkCrqp5R6IBW8VA
+Message-ID: <CAFEp6-1DhbDFuWYhdM=uM8eVRtruacd9psVPLTOgnOQ4XVGiGA@mail.gmail.com>
+Subject: Re: [RFC PATCH 5/6] net: wwan: hwsim: refactor to support more port types
 To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
 Cc: Johannes Berg <johannes@sipsolutions.net>,
         Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -97,88 +97,31 @@ Cc: Johannes Berg <johannes@sipsolutions.net>,
         netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Authority-Analysis: v=2.4 cv=P9I6hjAu c=1 sm=1 tr=0 ts=67fd59e7 cx=c_pps a=hnmNkyzTK/kJ09Xio7VxxA==:117 a=IkcTkHD0fZMA:10 a=XR8D0OoHHMoA:10 a=pGLkceISAAAA:8 a=Paicb_rpB2J0kmePFMEA:9 a=QEXdDO2ut3YA:10 a=PEH46H7Ffwr30OY-TuGO:22
-X-Proofpoint-GUID: eNY-2N1ZYFT9pvXq8_2scTFJej61m8Yg
-X-Proofpoint-ORIG-GUID: eNY-2N1ZYFT9pvXq8_2scTFJej61m8Yg
+X-Proofpoint-GUID: AtsP5Rmr5FvpTE1QmtUMikZbZ_OtP_m2
+X-Proofpoint-ORIG-GUID: AtsP5Rmr5FvpTE1QmtUMikZbZ_OtP_m2
+X-Authority-Analysis: v=2.4 cv=Cve/cm4D c=1 sm=1 tr=0 ts=67fd5a66 cx=c_pps a=UgVkIMxJMSkC9lv97toC5g==:117 a=IkcTkHD0fZMA:10 a=XR8D0OoHHMoA:10 a=pGLkceISAAAA:8 a=EUspDBNiAAAA:8 a=XIB30I8Fq4NfyXnsoAUA:9 a=QEXdDO2ut3YA:10 a=1HOtulTD9v-eNWfpl4qZ:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-04-14_07,2025-04-10_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- clxscore=1015 bulkscore=0 impostorscore=0 phishscore=0 suspectscore=0
- mlxscore=0 spamscore=0 malwarescore=0 adultscore=0 priorityscore=1501
- mlxlogscore=999 classifier=spam authscore=0 authtc=n/a authcc=
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1015
+ malwarescore=0 lowpriorityscore=0 bulkscore=0 spamscore=0 phishscore=0
+ suspectscore=0 impostorscore=0 mlxlogscore=630 mlxscore=0
+ priorityscore=1501 classifier=spam authscore=0 authtc=n/a authcc=
  route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
- definitions=main-2504140137
+ definitions=main-2504140138
 
 On Wed, Apr 9, 2025 at 1:31=E2=80=AFAM Sergey Ryazanov <ryazanov.s.a@gmail.=
 com> wrote:
 >
-> Upcoming GNSS (NMEA) port type support requires exporting it via the
-> GNSS subsystem. On another hand, we still need to do basic WWAN core
-> work: call the port stop operation, purge queues, release the parent
-> WWAN device, etc. To reuse as much code as possible, split the port
-> unregistering function into the deregistration of a regular WWAN port
-> device, and the common port tearing down code.
+> Just introduced WWAN NMEA port type needs a testing option. The WWAN HW
+> simulator was developed with the AT port type in mind and cannot be
+> easily extended. Refactor it now to make it capable to support more port
+> types.
+>
+> No big functional changes, mostly renaming with a little code
+> rearrangement.
 >
 > Signed-off-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-> ---
->  drivers/net/wwan/wwan_core.c | 21 ++++++++++++++++-----
->  1 file changed, 16 insertions(+), 5 deletions(-)
->
-> diff --git a/drivers/net/wwan/wwan_core.c b/drivers/net/wwan/wwan_core.c
-> index 045246d7cd50..439a57bc2b9c 100644
-> --- a/drivers/net/wwan/wwan_core.c
-> +++ b/drivers/net/wwan/wwan_core.c
-> @@ -486,6 +486,18 @@ static int wwan_port_register_wwan(struct wwan_port =
-*port)
->         return 0;
->  }
->
-> +/* Unregister regular WWAN port (e.g. AT, MBIM, etc) */
-> +static void wwan_port_unregister_wwan(struct wwan_port *port)
 
-Wouldn't it be simpler to name it  `wwan_port_unregister` ?
-
-> +{
-> +       struct wwan_device *wwandev =3D to_wwan_dev(port->dev.parent);
-> +
-> +       dev_set_drvdata(&port->dev, NULL);
-> +
-> +       dev_info(&wwandev->dev, "port %s disconnected\n", dev_name(&port-=
->dev));
-> +
-> +       device_unregister(&port->dev);
-> +}
-> +
->  struct wwan_port *wwan_create_port(struct device *parent,
->                                    enum wwan_port_type type,
->                                    const struct wwan_port_ops *ops,
-> @@ -542,18 +554,17 @@ void wwan_remove_port(struct wwan_port *port)
->         struct wwan_device *wwandev =3D to_wwan_dev(port->dev.parent);
->
->         mutex_lock(&port->ops_lock);
-> -       if (port->start_count)
-> +       if (port->start_count) {
->                 port->ops->stop(port);
-> +               port->start_count =3D 0;
-> +       }
->         port->ops =3D NULL; /* Prevent any new port operations (e.g. from=
- fops) */
->         mutex_unlock(&port->ops_lock);
->
->         wake_up_interruptible(&port->waitqueue);
-> -
->         skb_queue_purge(&port->rxq);
-> -       dev_set_drvdata(&port->dev, NULL);
->
-> -       dev_info(&wwandev->dev, "port %s disconnected\n", dev_name(&port-=
->dev));
-> -       device_unregister(&port->dev);
-> +       wwan_port_unregister_wwan(port);
->
->         /* Release related wwan device */
->         wwan_remove_dev(wwandev);
-> --
-> 2.45.3
->
+Reviewed-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
 
