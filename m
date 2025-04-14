@@ -1,123 +1,107 @@
-Return-Path: <netdev+bounces-182525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6218DA8900A
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 01:20:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A2A7A8902C
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 01:30:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C17C2189B247
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 23:20:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7177E17CF4D
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 23:30:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B8F81F417D;
-	Mon, 14 Apr 2025 23:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2FCB1FF7A5;
+	Mon, 14 Apr 2025 23:30:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oCaaE14K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HBDAGf0z"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD6D1C861C
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 23:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC801FECBA
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 23:30:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744672802; cv=none; b=J60C4GWkcWNGbAkl/d8bBbUYHDJuAdCOwNQiQMF8lu/cm77r5uDLvf2zACoTg7PwQ65WIvSiDVfz7He0IweCv58yXkBnSko3tLFwYGEEFQ+VC8j1/lQO0hW0LtZcoMRt3CbwYS2j0UIh0dZm0mETH0j4UpfqFRoKfnQ9RxzBtvc=
+	t=1744673404; cv=none; b=I0MeSjEfu5pEMI53nIHXom03bdRxfoaUaU0216ICwjppgIXwAnXdeVtzKqfZu/QDFqfOt0895fyki3yDNhY22crHM8JcYGoTbG9lSb3mMcEQrMTW8EqMcqZrD2FqWzVz28qAFnMMOa1LWJ0yN1vcSkupRRzcInb4Wc0kJ/YsABM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744672802; c=relaxed/simple;
-	bh=nl0WsaXN8zfDqKqQsUBbPg9P8XprSfYxUzITxU1ys6U=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=HMFfbk3YiCzXYxLj7HfHjGCAYuDaH0ztttEfuYXDGA6De7Pd/TsL240VKWkgrcarH/bYfU1XoL3CmIk/1IXeUQyn7Ajj3jS7zhHUil8LBkFiLUfb9Q9GijYJdUiJVZHHNxuwesIyAsbiVNyx2fAbsnLbPI6eKh52LCfJfURrBrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oCaaE14K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48D16C4CEE2;
-	Mon, 14 Apr 2025 23:20:02 +0000 (UTC)
+	s=arc-20240116; t=1744673404; c=relaxed/simple;
+	bh=9FPxyHvmK86b7zqc4lYgfC1sZb0i4TzzabkBuGotnds=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pyU+UtraSiVLoZ3O1tQsBorndj7jny227atmqookKGO/l+krCLmGkfzJd6OROPnkfpY/3nVr+yi15q4jHRG1xszJ/Y8XtCe/PtVAfvvJNqU3gTRfM5LFJrrPKJdloadZaLNte35qquFe+ms6uQCNTGrOLAZTX2tbPXm8YhxUKEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HBDAGf0z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96A41C4CEE2;
+	Mon, 14 Apr 2025 23:30:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744672802;
-	bh=nl0WsaXN8zfDqKqQsUBbPg9P8XprSfYxUzITxU1ys6U=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=oCaaE14KMi3hjJUYg+IniMdeHEyb5JIbagJTB1f/CkPc6v2HEYeNWzfQxovuTssNO
-	 So0YKKd8h2tLLVqY3stG28AxUgX3x1xMLbQXvbLd9ecXfx0Xli5TT0Ndy093C4uHBQ
-	 KOfoE5Z8JTAWo8CH+yN6sjbDLwKpS0JNn0IvMyDBsC98d5QnOdLNDdEO8SKpH+jelR
-	 ITL9/zR6m5ngKbAHNA2iURf/YP3B6B907MVZT20j8Vzuv1wGxzyfAJiN1pDFlJs64M
-	 6YOb/tCzF5DO5JB1VCCUB94uSrGLyVeTZOfzmP6anO0+Qox+Yb7qZq7rpQmFfjq6gA
-	 opMfj+Frnq7BA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 714973822D1A;
-	Mon, 14 Apr 2025 23:20:41 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1744673403;
+	bh=9FPxyHvmK86b7zqc4lYgfC1sZb0i4TzzabkBuGotnds=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HBDAGf0zYFWzp6m1ye8QZC73cQWwlQ3pSDPvnmigCO6mksYbH8hwitr1tiuk1MA+z
+	 EzI5Xoy7QModP55AB01nGamhEALPot5YhNFplpxGW6rW+5/wldc5JuxLYUAU+6iTZE
+	 GCcGI/isQCsUMR5sK30mTkIRlIl/CJA32wdiKqzSWetAt2cVX7whIe7nnYn5UBVaCE
+	 Z9SkqykpGa2aDEhQ4pPz5/0d/dAxFklElRkFXrxTXr0s1n+dWVHUbEKxw8xwBBUQXp
+	 CtAFF8ZapZXKNL1RfHv+iYbpfM8sxsHcUb1RNWA5B9AXovAI3zR1Ieiqg+pj/qQ5sz
+	 NyZIBiGcn9eRQ==
+Date: Mon, 14 Apr 2025 16:30:02 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Byungchul Park <byungchul@sk.com>
+Cc: willy@infradead.org, ilias.apalodimas@linaro.org,
+ almasrymina@google.com, kernel_team@skhynix.com, 42.hyeyoo@gmail.com,
+ linux-mm@kvack.org, hawk@kernel.org, netdev@vger.kernel.org
+Subject: Re: [RFC] shrinking struct page (part of page pool)
+Message-ID: <20250414163002.166d1a36@kernel.org>
+In-Reply-To: <20250414015207.GA50437@system.software.com>
+References: <20250414013627.GA9161@system.software.com>
+	<20250414015207.GA50437@system.software.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/15][pull request] Intel Wired LAN Driver Updates
- 2025-04-11 (ice, i40e, ixgbe, igc, e1000e)
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174467284024.2070846.4505710834726481114.git-patchwork-notify@kernel.org>
-Date: Mon, 14 Apr 2025 23:20:40 +0000
-References: <20250411204401.3271306-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20250411204401.3271306-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 14 Apr 2025 10:52:07 +0900 Byungchul Park wrote:
+> > Fortunately, many prerequisite works have been done by Mina but I guess
+> > he or she has done it for other purpose than 'shrinking struct page'.
+> > 
+> > I'd like to just finalize the work so that the fields above can be
+> > removed from struct page.  However, I need to resolve a curiousity
+> > before starting.
 
-This series was applied to netdev/net-next.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+I don't understand what the question is but FWIW from my perspective
+the ZC APIs are fairly contained, or at least we tried to make sure
+that net_iov pages cannot reach random parts of the stack.
 
-On Fri, 11 Apr 2025 13:43:41 -0700 you wrote:
-> For ice:
-> Mateusz and Larysa add support for LLDP packets to be received on a VF
-> and transmitted by a VF in switchdev mode. Additional information:
-> https://lore.kernel.org/intel-wired-lan/20250214085215.2846063-1-larysa.zaremba@intel.com/
-> 
-> Karol adds timesync support for E825C devices using 2xNAC (Network
-> Acceleration Complex) configuration. 2xNAC mode is the mode in which
-> IO die is housing two complexes and each of them has its own PHY
-> connected to it.
-> 
-> [...]
+Replacing all uses of struct page would require converting much more
+of the stack, AFAIU. But that's best discussed over posted patches.
 
-Here is the summary with links:
-  - [net-next,01/15] ice: fix check for existing switch rule
-    https://git.kernel.org/netdev/net-next/c/a808691df39b
-  - [net-next,02/15] ice: do not add LLDP-specific filter if not necessary
-    https://git.kernel.org/netdev/net-next/c/4d5a1c4e6d49
-  - [net-next,03/15] ice: receive LLDP on trusted VFs
-    https://git.kernel.org/netdev/net-next/c/2296345416b0
-  - [net-next,04/15] ice: remove headers argument from ice_tc_count_lkups
-    https://git.kernel.org/netdev/net-next/c/5787179c5183
-  - [net-next,05/15] ice: support egress drop rules on PF
-    https://git.kernel.org/netdev/net-next/c/40f42dc1cbb6
-  - [net-next,06/15] ice: enable LLDP TX for VFs through tc
-    https://git.kernel.org/netdev/net-next/c/517f7a08ca5f
-  - [net-next,07/15] ice: remove SW side band access workaround for E825
-    https://git.kernel.org/netdev/net-next/c/1e05c5a05d0d
-  - [net-next,08/15] ice: refactor ice_sbq_msg_dev enum
-    https://git.kernel.org/netdev/net-next/c/1fd9c91f7e8f
-  - [net-next,09/15] ice: enable timesync operation on 2xNAC E825 devices
-    https://git.kernel.org/netdev/net-next/c/e2193f9f9ec9
-  - [net-next,10/15] ice: improve error message for insufficient filter space
-    https://git.kernel.org/netdev/net-next/c/6cb10c063d6c
-  - [net-next,11/15] ice: make const read-only array dflt_rules static
-    https://git.kernel.org/netdev/net-next/c/fee4a79a1224
-  - [net-next,12/15] i40e: fix MMIO write access to an invalid page in i40e_clear_hw
-    https://git.kernel.org/netdev/net-next/c/015bac5daca9
-  - [net-next,13/15] ixgbe: Fix unreachable retry logic in combined and byte I2C write functions
-    https://git.kernel.org/netdev/net-next/c/cdcb3804eeda
-  - [net-next,14/15] igc: enable HW vlan tag insertion/stripping by default
-    https://git.kernel.org/netdev/net-next/c/f9c961efb0f4
-  - [net-next,15/15] net: e1000e: convert to ndo_hwtstamp_get() and ndo_hwtstamp_set()
-    https://git.kernel.org/netdev/net-next/c/39aa687a8494
+> >    Network guys already introduced a sperate strcut, struct net_iov,
+> >    to overlay the interesting fields.  However, another separate struct
+> >    for system memory might be also needed e.g. struct bump so that
+> >    struct net_iov and struct bump can be overlayed depending on the
+> >    source:
+> > 
+> >    struct bump {
+> > 	unsigned long _page_flags;
+> > 	unsigned long bump_magic;
+> > 	struct page_pool *bump_pp;
+> > 	unsigned long _pp_mapping_pad;
+> > 	unsigned long dma_addr;
+> > 	atomic_long_t bump_ref_count;
+> > 	unsigned int _page_type;
+> > 	atomic_t _refcount;
+> >    };
+> > 
+> > To netwrok guys, any thoughts on it?
+> > To Willy, do I understand correctly your direction?
+> > 
+> > Plus, it's a quite another issue but I'm curious, that is, what do you
+> > guys think about moving the bump allocator(= page pool) code from
+> > network to mm?  I'd like to start on the work once gathering opinion
+> > from both Willy and network guys.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I don't see any benefit from moving page pool to MM. It is quite
+networking specific. But we can discuss this later. Moving code
+is trivial, it should not be the initial focus.
 
