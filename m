@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-182050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D657DA87812
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 08:45:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCE28A87816
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 08:46:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F415E188F512
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 06:45:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A76773AD8C8
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 06:46:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 465881ACEDA;
-	Mon, 14 Apr 2025 06:45:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE0B11A5BAC;
+	Mon, 14 Apr 2025 06:46:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YpqQYCoL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OxphVQxS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E1CB539A;
-	Mon, 14 Apr 2025 06:44:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B8BB45C18;
+	Mon, 14 Apr 2025 06:46:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744613100; cv=none; b=EBUkFg3aG47D4XgR43CLniRh0yBgf6KchnHVvZAr12kLyRMmsBOZ+x/Cm+b93BAxFboEVejailQTbMlJjdLGicCoSlZFke+HCqkuO2nAF9EgPBsOU+qfkQ1Hnkmoy+0vjadA8iZAj0dhBOS8FB6XBGaVVTn+jqn4ngJ5B4t4DD4=
+	t=1744613181; cv=none; b=ACvSFr6S4Ssjd8u2pXqUn+XOf+FcFGuJSiWrT8I0ZJDVReJ6ur9qInSsykt9V8nll6PvNy5r1aGcYFE6WYqv2ngU2dNB6XfdEWq+c6RB6QhTuVzC7dA1NL02Bx4bqsau4eSF2DtlL1eAgreooa+d6It8lxPeNdizs+CVhnzDSKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744613100; c=relaxed/simple;
-	bh=scgY6rSdG64gMCtLdTUGZRrDotfGZMZY7IF2n6pjUFQ=;
+	s=arc-20240116; t=1744613181; c=relaxed/simple;
+	bh=KB9ckovQW0KS07mBts2/M7BqP5T6fvTlC9TNv3/9r8Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LkJPlhYuyJ4a0HsjfQdbiD+/SNFWgfqXvs4GK3xRtHyvNkM/f+dy6hdxzI8U0Ph3qRg4z7WAgE9fZsgc6SGnDVAABgcNjoz2Necqm5QHBdm3bfsqIVSu1TgclNYq6Chk5sVc5k23HsnWHWEXs0LzwDUi2LvGjPy7yu47efvHwIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YpqQYCoL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F5BDC4CEE2;
-	Mon, 14 Apr 2025 06:44:55 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=MnjfIYUteGxOCFP9I/Ge31SyKD6/Vd4Jl0rZhaLVSTKNQI3M+gnomUd/n+NlcGxGguUnsw7o9yu6M2v2SDcDh9C5PyfYMqw4NM+WYT93i65EBlgB1mJ6LL0bYS/YA+6guTzcy/eZyn3MF1Z30Ghd4bDBnZ6hN55DG6qHZA52Jsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OxphVQxS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E339BC4CEE2;
+	Mon, 14 Apr 2025 06:46:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744613099;
-	bh=scgY6rSdG64gMCtLdTUGZRrDotfGZMZY7IF2n6pjUFQ=;
+	s=k20201202; t=1744613176;
+	bh=KB9ckovQW0KS07mBts2/M7BqP5T6fvTlC9TNv3/9r8Q=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=YpqQYCoLJXEAN1H4bmdNl4RvynF9xU7bn6JwrdWRrn6da80hSjGpHoM99vVzSWW0y
-	 s9IurUkRB6JP29DvpYXiH7+p70jrhFQ+Jf/J0LBE4joFYaBR1onU40gtKPNmPgjmX6
-	 MeFAbW0LaV+p/hnRFKZCzErGbGTkTbRTFlRL0Y4pZh/8JxNaiWRTBsVukgwTiNjttu
-	 GHXKjrydl32v2Vg4Zo61ygb1n5IzicqurYPeDitmI0LsJaDhbcuz/lF99BgUF4dbk2
-	 Kh9GjVCdGfcX+zWvAab51UJcSz+SM47rp0iJFUqFHaYGHTkAOkRC/kzZomYnS2sSma
-	 zTOWe2kCj0F9A==
-Message-ID: <55586a5f-522f-4b42-b8ef-078043752e4b@kernel.org>
-Date: Mon, 14 Apr 2025 08:44:53 +0200
+	b=OxphVQxSSazPlouGIg+LbD262nIqnXcTUWTRdztsZC9diesWorut6UnGE4uiUhyXU
+	 oz/eGmUa+DKOrBsURxP5GsPUJTAzYko+20DqZj9FGb7X76l/0x5zdIHcxE81zYYFbe
+	 4akB26IhwO74lZBI5nHqecBBwEe6LE/+Ljf7btwMmC8V+x7tm4Or1CusuCyHx2xcvu
+	 ZkO9iHTMPl7/6Cvnc1onTS0TyKFYlpEf3Iinwn8MGzvhwiEeXfmbQvT95jV4Uu05oK
+	 IwQ7nZPMzlMGwrzvYwqoElIxnhg1u360l/RezzzL49QqWHbjyvtBqNpsFjIXpn3Ala
+	 3irrXXWurxbaQ==
+Message-ID: <62cb29e1-9974-4fe9-9d64-f9d9c56d84dc@kernel.org>
+Date: Mon, 14 Apr 2025 08:46:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,8 +50,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/5] dt-bindings: soc: sophgo: Add SG2044 top syscon
- device
+Subject: Re: [PATCH v4 3/5] dt-bindings: clock: sophgo: add clock controller
+ for SG2044
 To: Inochi Amaoto <inochiama@gmail.com>,
  Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
  <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
@@ -66,7 +66,7 @@ Cc: linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
  netdev@vger.kernel.org, Yixun Lan <dlan@gentoo.org>,
  Longbin Li <looong.bin@gmail.com>
 References: <20250413224450.67244-1-inochiama@gmail.com>
- <20250413224450.67244-2-inochiama@gmail.com>
+ <20250413224450.67244-4-inochiama@gmail.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -112,21 +112,26 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20250413224450.67244-2-inochiama@gmail.com>
+In-Reply-To: <20250413224450.67244-4-inochiama@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 14/04/2025 00:44, Inochi Amaoto wrote:
-> The SG2044 top syscon device provide PLL clock control and some other
-> misc feature of the SoC.
-> 
-> Add the compatible string for SG2044 top syscon device.
-> 
-> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
-> ---
->  .../soc/sophgo/sophgo,sg2044-top-syscon.yaml  | 49 +++++++++++++++++++
->  include/dt-bindings/clock/sophgo,sg2044-pll.h | 27 ++++++++++
->  2 files changed, 76 insertions(+)
+> +
+> +maintainers:
+> +  - Inochi Amaoto <inochiama@gmail.com>
+> +
+> +description: |
+> +  The Sophgo SG2044 clock controller requires an external oscillator
+> +  as input clock.
+> +
+> +  All available clocks are defined as preprocessor macros in
+> +  dt-bindings/clock/sophgo,sg2044-clk.h
+
+Full path, so include/......
+so tool can actually validate it.
+
+With this fixed:
 
 Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
