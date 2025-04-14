@@ -1,123 +1,212 @@
-Return-Path: <netdev+bounces-182430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE435A88B7A
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 20:38:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 24725A88B80
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 20:39:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE4B5188248C
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:38:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58C091899C85
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:39:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D61022820AF;
-	Mon, 14 Apr 2025 18:38:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF26F28BA99;
+	Mon, 14 Apr 2025 18:39:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="niJ9a4qZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a4u+Jjyc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E7A4192D6B
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:38:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E0B42820AF
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:39:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744655896; cv=none; b=pnBB4bRuMTJ1FwCtJJZKdKxYlAMeT4XWPTTwJSzRJ2pt/JpFBuKJjS2kzpZsgTDqZ5NsWlkWlTA9RHCgkoCTZUdNTLE+Q2ev3nvas1bMYxMAbSEFUyXpaSHZOgej8DN2lR/QjfMiSK8S8SPYWy3KAWGIE1v+0cG8RvcOtV0O8oA=
+	t=1744655954; cv=none; b=opxal6PdPMYPra8yNTmh9c8sPHdPzA1LzrFs4w5V2K5Hig5tYMYl+FzQHZiEiaKEavjsOTRYz85XZsPaVbgxqk1IQzxMRrNebg+e4MyHyvR19Blrdu+pK/dcu+hMJ3vOOv8zsIM2qzBfrLAgyix5WjDeHPzHlYp9KucpEK800mg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744655896; c=relaxed/simple;
-	bh=kVuTySIzGwZ0NsBWBZfQiNPB6+9LtFwOJxGANJZuFFY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ai4GMAhu340oHTn+d9kj4Jxz5olMGP8WRGAWGUhkvv7h0WsT+1f3QkKuOZPwbDBNxvNVqwoTfIc6JvSgUC6OPulLlacscnOXuJQYdWU2VGyFaDX/r5gGGpAQNKyZy7rtqqm4IBsegQ2rqsqZjXoZpBDpDaewqHwLkHoD6Q33hqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=niJ9a4qZ; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53E99mlf012976
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:38:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	kVuTySIzGwZ0NsBWBZfQiNPB6+9LtFwOJxGANJZuFFY=; b=niJ9a4qZ4Bj8yt4w
-	RiLzG5l4enDSFO2UW6QyITz5s9SJIdOobOPGWi750JBf6s6No/8KECGsl1g58BzH
-	CuzNbOe8paxomXUhIMHW+LpMB55Phv/hNg//m3YZTcgEy2sl1PWKqh2GPXIS7Bnv
-	CyOfNKUatZyScMJKre2Io9pjojtu1o1rXwj6hhf5Nhgy1KxS11CY1137cnHaUYQA
-	9ENoshBLfrbGMBgLWtbM/eUASxoFhqmqt7uPrqohgYKJvZ09DHZvHp0EbKpxUX5a
-	AlasQz3VDaKEF1b1UTp4C11QhWXBh8tMmqsRNt7yJA3dc1ahAsLKEmP4JX3Tw7il
-	M+Firw==
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com [209.85.219.71])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 45ygj95fve-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:38:12 +0000 (GMT)
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6e8feffbe08so113720906d6.0
-        for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 11:38:12 -0700 (PDT)
+	s=arc-20240116; t=1744655954; c=relaxed/simple;
+	bh=3l2S1L46U8XsU4sWtbSp+mYEbAJYokaHNWfzbDztxOM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sD9K0lhdymdCpJaNWxzOX4B6MDl4aI6sGo+bkE5flQwNbIktFRGk9uTWB6NiVU6LapAwToKPEQtwKXMWh13V212Z/X1QHoZgHAl7WlJEcLynDfdDQ7YdsZMwLUgFLOBjuJlH66GNbmflPj8GqCIyz/BZ/Xqv+AW6XzZfDr0ga/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a4u+Jjyc; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744655951;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=r/iXXqChlzjbODZfwDRdIt5xwYfNbSaluxaykDmQl48=;
+	b=a4u+JjycIOQczNHwuilROJyIVCqBxzZByBQ8ewOpzah/nlJEsmFrlds+eZFw/ONuuc34T0
+	nxHJ8znueRnIVvYMT9HltmS1yFGpdhxBbq1M3H4vI0CahHOS9H+Eg3jJkrdZAgENIZ33av
+	MokxF8ll4mw4KM6mGmOfLjeha7JIaVQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-333-_DqPCqtkOAGnT6G4zkXaJw-1; Mon, 14 Apr 2025 14:39:09 -0400
+X-MC-Unique: _DqPCqtkOAGnT6G4zkXaJw-1
+X-Mimecast-MFC-AGG-ID: _DqPCqtkOAGnT6G4zkXaJw_1744655948
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-39131f2bbe5so1719041f8f.3
+        for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 11:39:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744655892; x=1745260692;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kVuTySIzGwZ0NsBWBZfQiNPB6+9LtFwOJxGANJZuFFY=;
-        b=AighVLivjZUVIV7uXoOnf/es48mStJbsVmpM5nJBV5s6TOWKKKiQDD8f1/EISCNgsa
-         xbii8LGnQw4USGPSd9trOVoVSWjPKU0oQfL5+76Ld4kqt3FW/tqC5a2VaPqPXtGFgV5R
-         s5NRDxPGgixxLM5T4vysbMS54n4d6yutYn6PpzqV/6ooFmIV2/wcVBcEkVQz8ZZZO/Mn
-         gyMYPoMAPOv+JQ+JJpOgGTSX2sWpOTVu8aMrlzkEpBMlb3jDVtGkCNk6cwCDk6lO2iU6
-         m5g6BN+9fQ9wT1uVayOQWrwqKJYdT03LOTClns08EcO37/RbnS7Fg5+lxKtXImigQN6/
-         HMWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUanQREkYgyLMHNF39kk8sfIZNcyT/b0wULXToWvSNPDcGQKpWRNu0Tgd8144EcBBXz85/p/HY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDfbLOaj8URQb18MAicDj+cxHk0o/Abx9ffoqBcau99HmS+eYD
-	Nns298xQiSzAn2TebYVyQz3IN7XUunUJ7SYV1lxDTiqDFJXdsugQ97T89UOu/3zFhyCUWB8pVaZ
-	/bG81KU9sWOTe8CCG6fVfHC/t606er8vaw30HfhcPBbLd4QIGI+RLzcBPV5zeoH+czYOTckS9YY
-	vdFqx5mN3bpcnpVFHP6aocvU3fYYDBqaAYNoCB5MUE
-X-Gm-Gg: ASbGncvw5Qjl8JQDlCtgoYLd4JVNUqfjyFyRhL3tXkwW/tK19IN0G+WbNGXSBUg8jKF
-	r8Aj1RloeNlsGgfZxVcl2DBOb18rMlbh4kKnfwerP5V3ksX+41ui+AP8hkBRJ3p4wJVkgF2E=
-X-Received: by 2002:ad4:5742:0:b0:6eb:28e4:8519 with SMTP id 6a1803df08f44-6f230d52924mr221239726d6.21.1744655891906;
-        Mon, 14 Apr 2025 11:38:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG6AhTnIkqPOvUucOSgYp1R5nhvfa7WTIcoQfUItzoTzZmDa9zsjVEF60Xh5J0/TFMeoBYXOiYRjSmqqk+YtIU=
-X-Received: by 2002:ad4:5742:0:b0:6eb:28e4:8519 with SMTP id
- 6a1803df08f44-6f230d52924mr221239326d6.21.1744655891383; Mon, 14 Apr 2025
- 11:38:11 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1744655948; x=1745260748;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r/iXXqChlzjbODZfwDRdIt5xwYfNbSaluxaykDmQl48=;
+        b=bOWjBCMS0DP+B50+4fq8wSI6UHAOpk6n+XNyGi+9aJjUqxnIAt546+EbSqcH8eRxJ4
+         VLaPFkm4IbUB7kRdJ2NHVJYb1G1Wdi50wY7GBSUEfTvHzp1o1A16Uvs2wX3uS7jNOUnV
+         3bpi+Xg9LniN7XXnwyoOrQTyNfCGhRU1kxhNLJ6+xXm0pSa8ayfxjZkxhECd8rke8q+J
+         lz6dnStmkztUz/PwBP3HMqD1Uu+QbWMoMXhO1bzsCxUtwZ55pe0hBw04n0PZfPhOx0DU
+         oyM+YpDUCV2a8GbAiLQ4/5JiYGCsUk3TSnkWmC1e9KS8/X9wddpmCktgVTKsSYseaKoz
+         K7oQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVGPL3SnLXWjFou41QNB/UgcC8INzEQ2H44gpZbzLSvCBajeaBoVHPJlf12M5la3XnPZ64l40I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrwWcj+BgSxSAPULW1QLiN3vLmCBtLd6YSNSXpKhq33GOrseH7
+	WrlFUg8EPRs4xbNiMSY2iNbeger+K19Yih7bhkDER8sZuZOicRqIDAMenEkF+qdIzSZYfzSY5+U
+	iwK38u1FRHqDdBrc82u0VM+iRWm3ONzwXHOv7q+AbLZjjyj2DGbkhyw==
+X-Gm-Gg: ASbGnctv/Bz9+yo40CZ2IbqdriZqqGBFfLmfZsiEyGVyLxITKkB4tnq956fyFuRDkug
+	yKC0EuSncMQqWq+bWJz03FY+OcGbPPd5WegkoABWQ1KeZDmiM4QDBJHLFvA8oYH7jFrs1zn1+Xg
+	VptDH4l60qeQNVDuuQcAvmiJmBTFhvaA+WjEceB2XDGxKNTLAnjROkFwkfdvw7Rh5kpOkEt6LYQ
+	YrWyOCHAMUqBd2BzMEJXAl9UxNmelHZ66/I0mBEld4jy7B+RrC3YKfMB1xKOTCKckR4Ri2RZ48s
+	IFK6ng==
+X-Received: by 2002:a5d:6da8:0:b0:39c:1424:3246 with SMTP id ffacd0b85a97d-39ea51d3527mr9946037f8f.2.1744655948210;
+        Mon, 14 Apr 2025 11:39:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHAxTcLnqSrTxH65+u6GiRouP7vWe1kbCg6AHGAsfsrltSDOoWgKmUYeCud8h0C9/BhA/o+Iw==
+X-Received: by 2002:a5d:6da8:0:b0:39c:1424:3246 with SMTP id ffacd0b85a97d-39ea51d3527mr9946011f8f.2.1744655947712;
+        Mon, 14 Apr 2025 11:39:07 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eaf445788sm11861921f8f.93.2025.04.14.11.39.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Apr 2025 11:39:06 -0700 (PDT)
+Date: Mon, 14 Apr 2025 14:39:04 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: virtualization@lists.linux.dev, kvm@vger.kernel.org,
+	netdev@vger.kernel.org, jasowang@redhat.com,
+	michael.christie@oracle.com, pbonzini@redhat.com,
+	stefanha@redhat.com, eperezma@redhat.com, joao.m.martins@oracle.com,
+	joe.jin@oracle.com, si-wei.liu@oracle.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 9/9] vhost: add WARNING if log_num is more than limit
+Message-ID: <20250414143039-mutt-send-email-mst@kernel.org>
+References: <20250403063028.16045-1-dongli.zhang@oracle.com>
+ <20250403063028.16045-10-dongli.zhang@oracle.com>
+ <20250414123119-mutt-send-email-mst@kernel.org>
+ <e00d882e-9ce7-48b0-bc2f-bf937ff6b9c3@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250408233118.21452-1-ryazanov.s.a@gmail.com> <20250408233118.21452-2-ryazanov.s.a@gmail.com>
-In-Reply-To: <20250408233118.21452-2-ryazanov.s.a@gmail.com>
-From: Loic Poulain <loic.poulain@oss.qualcomm.com>
-Date: Mon, 14 Apr 2025 20:38:00 +0200
-X-Gm-Features: ATxdqUFuHOimNHN_cfgMEQF-1vCmIOAy604IslgDpmjO1QC11tdJfK_wuf3ntPE
-Message-ID: <CAFEp6-2A5VkYP1HjywXChoAhFmRnUi=EgBrXatwiwKJfQJ6GTg@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/6] net: wwan: core: remove unused port_id field
-To: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-ORIG-GUID: 5crBkrX9rz4JzZzIN1RDZ4z6YzJ9kx1s
-X-Authority-Analysis: v=2.4 cv=PruTbxM3 c=1 sm=1 tr=0 ts=67fd5614 cx=c_pps a=UgVkIMxJMSkC9lv97toC5g==:117 a=IkcTkHD0fZMA:10 a=XR8D0OoHHMoA:10 a=pGLkceISAAAA:8 a=EUspDBNiAAAA:8 a=XIB30I8Fq4NfyXnsoAUA:9 a=QEXdDO2ut3YA:10 a=1HOtulTD9v-eNWfpl4qZ:22
-X-Proofpoint-GUID: 5crBkrX9rz4JzZzIN1RDZ4z6YzJ9kx1s
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-14_07,2025-04-10_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- priorityscore=1501 malwarescore=0 adultscore=0 lowpriorityscore=0
- impostorscore=0 clxscore=1015 spamscore=0 mlxscore=0 mlxlogscore=703
- phishscore=0 classifier=spam authscore=0 authtc=n/a authcc= route=outbound
- adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
- definitions=main-2504140135
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e00d882e-9ce7-48b0-bc2f-bf937ff6b9c3@oracle.com>
 
-On Wed, Apr 9, 2025 at 1:31=E2=80=AFAM Sergey Ryazanov <ryazanov.s.a@gmail.=
-com> wrote:
->
-> It was used initially for a port id allocation, then removed, and then
-> accidently introduced again, but it is still unused. Drop it again to
-> keep code clean.
->
-> Signed-off-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+On Mon, Apr 14, 2025 at 09:52:04AM -0700, Dongli Zhang wrote:
+> Hi Michael,
+> 
+> On 4/14/25 9:32 AM, Michael S. Tsirkin wrote:
+> > On Wed, Apr 02, 2025 at 11:29:54PM -0700, Dongli Zhang wrote:
+> >> Since long time ago, the only user of vq->log is vhost-net. The concern is
+> >> to add support for more devices (i.e. vhost-scsi or vsock) may reveals
+> >> unknown issue in the vhost API. Add a WARNING.
+> >>
+> >> Suggested-by: Joao Martins <joao.m.martins@oracle.com>
+> >> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> > 
+> > 
+> > Userspace can trigger this I think, this is a problem since
+> > people run with reboot on warn.
+> 
+> I think it will be a severe kernel bug (page fault) if userspace can trigger this.
+> 
+> If (*log_num >= vq->dev->iov_limit), the next line will lead to an out-of-bound
+> memory access:
+> 
+>     log[*log_num].addr = vhost64_to_cpu(vq, desc.addr);
+> 
+> I could not propose a case to trigger the WARNING from userspace. Would you mind
+> helping explain if that can happen?
 
-Reviewed-by: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Oh I see. the commit log made me think this is an actual issue,
+not a debugging aid just in case.
+
+
+> > Pls grammar issues in comments... I don't think so.
+> 
+> I did an analysis of code and so far I could not identify any case to trigger
+> (*log_num >= vq->dev->iov_limit).
+> 
+> The objective of the patch is to add a WARNING to double confirm the case won't
+> happen.
+> 
+> Regarding "I don't think so", would you mean we don't need this patch/WARNING
+> because the code is robust enough?
+> 
+> Thank you very much!
+> 
+> Dongli Zhang
+
+
+Let me clarify the comment is misleading.
+All it has to say is:
+
+	/* Let's make sure we are not out of bounds. */
+	BUG_ON(*log_num >= vq->dev->iov_limit);
+
+at the same time, this is unnecessary pointer chasing
+on critical path, and I don't much like it that we are
+making an assumption about array size here.
+
+If you strongly want to do it, you must document it near
+get_indirect: 
+@log - array of size at least vq->dev->iov_limit
+
+
+> > 
+> >> ---
+> >>  drivers/vhost/vhost.c | 18 ++++++++++++++++++
+> >>  1 file changed, 18 insertions(+)
+> >>
+> >> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> >> index 494b3da5423a..b7d51d569646 100644
+> >> --- a/drivers/vhost/vhost.c
+> >> +++ b/drivers/vhost/vhost.c
+> >> @@ -2559,6 +2559,15 @@ static int get_indirect(struct vhost_virtqueue *vq,
+> >>  		if (access == VHOST_ACCESS_WO) {
+> >>  			*in_num += ret;
+> >>  			if (unlikely(log && ret)) {
+> >> +				/*
+> >> +				 * Since long time ago, the only user of
+> >> +				 * vq->log is vhost-net. The concern is to
+> >> +				 * add support for more devices (i.e.
+> >> +				 * vhost-scsi or vsock) may reveals unknown
+> >> +				 * issue in the vhost API. Add a WARNING.
+> >> +				 */
+> >> +				WARN_ON_ONCE(*log_num >= vq->dev->iov_limit);
+> >> +
+> >>  				log[*log_num].addr = vhost64_to_cpu(vq, desc.addr);
+> >>  				log[*log_num].len = vhost32_to_cpu(vq, desc.len);
+> >>  				++*log_num;
+> >> @@ -2679,6 +2688,15 @@ int vhost_get_vq_desc(struct vhost_virtqueue *vq,
+> >>  			 * increment that count. */
+> >>  			*in_num += ret;
+> >>  			if (unlikely(log && ret)) {
+> >> +				/*
+> >> +				 * Since long time ago, the only user of
+> >> +				 * vq->log is vhost-net. The concern is to
+> >> +				 * add support for more devices (i.e.
+> >> +				 * vhost-scsi or vsock) may reveals unknown
+> >> +				 * issue in the vhost API. Add a WARNING.
+> >> +				 */
+> >> +				WARN_ON_ONCE(*log_num >= vq->dev->iov_limit);
+> >> +
+> >>  				log[*log_num].addr = vhost64_to_cpu(vq, desc.addr);
+> >>  				log[*log_num].len = vhost32_to_cpu(vq, desc.len);
+> >>  				++*log_num;
+> >> -- 
+> >> 2.39.3
+> > 
+
 
