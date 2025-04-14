@@ -1,149 +1,112 @@
-Return-Path: <netdev+bounces-182094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1929A87C0F
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 11:40:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35D2DA87C15
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 11:42:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B941188BE81
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 09:40:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F12793A7029
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 09:41:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53EBA1A83E8;
-	Mon, 14 Apr 2025 09:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C7D9261381;
+	Mon, 14 Apr 2025 09:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EDpu7pvd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SEHudgZN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA7F225DD0A
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 09:40:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F271ACECD;
+	Mon, 14 Apr 2025 09:41:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744623603; cv=none; b=K+j3LVOJwJYb7Tqcc9i/ztgqmeSqCUBWRW6BZDcVbbUBGhGExzRnulo4cKHEX6eLSVRtxc261ybW/jN8QjmuVY59c5nsXHQmo4R1uvSO6nZDu7js8qhdo3O4Cn1akDX4rNbFsNHC8Z/AfoKpgXLKmYweVe1lMr0C1+u6R/+6hJg=
+	t=1744623715; cv=none; b=dH9MhWhVwa0lr15Nfpre4QqtQs8AVwFKo3rWgR3OhTMAeJMpF1sG/+nScEormt2O1KjmIYH1c8JSq4pi10EGW1FPuUWrHRNZswRnUu3f3+pZy0lGF41MGNDlb3VNz7xTRk4EYRX4KMz9daJ+Y4pSLn09hkyJa8/ump6kp4FZbM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744623603; c=relaxed/simple;
-	bh=UMfBWltjn+H3qXvdamXbvVQE5gCj8EIURaEEJ/phrcg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RNXZkV/rN2XOMxP2F9e+g1g3EBeVyjmaN3k5vD9SmyLTAeIVSZTcs8/XZX1PQ83gVkWbDG2jM/XP7Bc6iIkkxOYMAT1PZdSzHuw6IQ8EbL5jAddVaeiEffUHTaLSDy02Q/RGxbJM061Y23Bb6pQJe8v+nEnh/jTPUvgLg6grwvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EDpu7pvd; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-736a7e126c7so3420958b3a.3
-        for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 02:40:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744623601; x=1745228401; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=l1MkEC0z+xbic1UiZTC7jZcA/ZklHXMVIFlXtYWxaS4=;
-        b=EDpu7pvdIDFPsf7slCCff8Q4qvk543DqjFYwSbXcKOyvgeNe7OzdAvBIKJGSdg+oke
-         PSkElCdQMeAoANIcrqjALKyaG1Hp0fsHlgaEaPEfKS6RJ8tMQsJYJskfxz3DPxML42bO
-         Ph3i7K57jphIJ5XZtrorBoO4zAE76Zfph3EV/nh1wMB1XNAfxQT23HxMUvuuriL7hBHK
-         D1Nw5pw2NjwtX0v/BrYm2chCBGCek0fBxhfN+pRS6RHGz3WVEUc+FxarNQFO6HKfu6RL
-         KOazxAuekttREsjCR6JiBk3R+eTcRXaPcF6EXXWMo9ZwDPDmuZqjrkRTC3DVUrYeT1Dm
-         JSFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744623601; x=1745228401;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=l1MkEC0z+xbic1UiZTC7jZcA/ZklHXMVIFlXtYWxaS4=;
-        b=d2cg7GmbWP/v/pfRv6wpVkGPfc2ALlPVnNEEC84rtk/nX1lfoN07uPwKjMm7uOkTu5
-         S1E3aLRlBKLoQ47ibiSKIsCaZndb8QhJevQPwBKMhxkvuyEVo1Qt06lQIXhPiYPfT5sh
-         qlenIUq2S6/YZy0vCBGl9ja1bPn4kv1gvK+Sos5RwtCV+4buvFHXTvynxg08gCQjqF0K
-         PZwUoduAPrScbmpy4r75BDZmRLTYXHVG0cPsio6yZDnd6KkjhBduL8BKIRMizc3bkCvc
-         txIdDtZ/SrNfQToca3CIbc04CvmspNtioZzmGJTZ7XFgyqPLi/RCuwGKGWy/Hnc2ZWQd
-         jmPw==
-X-Gm-Message-State: AOJu0YzKBtX/LCnOZMgmh5SB5GTp2bRLOm/7wbzvCwh3dfJGrkw6I6Xy
-	eYnJTnBpWypRLrvDs634oEykyYtliOmUXtbKFJVE6qDBkXAuHjgtnX8RTz7J6l4NpseG/NYdSWC
-	nNeXu0jFuDDQwuZ8eYPlxkibLpL4=
-X-Gm-Gg: ASbGnct5XKYVAWzPVV6unPCms+WaRzqfsWUo7TEb4NE74dWXIQ0gsDJBvQV6oG0/1xZ
-	Wu+5oJ0NEtMQpy1BmSTy5YyXYsfvI6GXiH8uVMzG5VzqWcjQkJvoUoYJnofqMakQrrwWF5Se4el
-	AqwFIvUVdeIoov4q4kSJIgLTrG9JmsTsx1somI95BolsqLte7O
-X-Google-Smtp-Source: AGHT+IEyFW8Emk0lBn06KY7RdFx4BKTF5Ez/RA0FwgQuriAfB5NB2Bc6pA+IOTmVIeYBFdnoJh8YSvaF+B7Kk4s3ni4=
-X-Received: by 2002:a05:6a00:b89:b0:736:34a2:8a20 with SMTP id
- d2e1a72fcca58-73bd12c9e39mr15567894b3a.21.1744623600745; Mon, 14 Apr 2025
- 02:40:00 -0700 (PDT)
+	s=arc-20240116; t=1744623715; c=relaxed/simple;
+	bh=HESKiQDsGmkF6MyUv/is1NIBBgXIVGAlmjj3/sqJxdc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kwlDmhpsxmU8+J8XqtocDkC1PBQQGTQXdBAboOliFBnl0gdCKCDH/kxPOvv7H9YaEhpGCkxS8zrAorR8ZAESTWhhuAZrv/ZboHGMY9E6P75H1bTwxL51ObFF2C1/tUdEUJgl0C/Izei29r5hR2j4KIOt1pLlmEG8ZIQa+kXLbhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SEHudgZN; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744623714; x=1776159714;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=HESKiQDsGmkF6MyUv/is1NIBBgXIVGAlmjj3/sqJxdc=;
+  b=SEHudgZNlGmKDkEfL1yXHaxLxuNdhjIgn3GZeKTTaHJGSbElZuN7gbRp
+   UZf19ErBX6FqDYILWBGf1OCttMD6whLfNyy0GYfKvnOSQw9zOvU1K+bF6
+   U5objI1YgtkIsXzF4zV9T2IgTEZ3KWDxvKJ1w33E4iB/wChxgMjxgQ5Kl
+   4Ugg+YZlpxOm0YtXjaIck0JZfyChptCvnHHtvk9IemABLwKie5t+EDfV3
+   utUJuBnOWWyknQuMxqzUTJDqJ62Rpr9InVYskyr2khDiG3blpWOSEyH8M
+   yRt68lxAwx501MHxKuGtujBOrs6jc35BbHExo721SwEzkTeTzTFObckPL
+   g==;
+X-CSE-ConnectionGUID: b83k9IILRn+6ppILhZfGYQ==
+X-CSE-MsgGUID: xtlvsXquQDu03nqgiXr4FA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11402"; a="57451976"
+X-IronPort-AV: E=Sophos;i="6.15,212,1739865600"; 
+   d="scan'208";a="57451976"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2025 02:41:53 -0700
+X-CSE-ConnectionGUID: QILs7P9hT2GdVjR+dt2dVQ==
+X-CSE-MsgGUID: ecnqt37XRxCTiivTMBJTZg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,212,1739865600"; 
+   d="scan'208";a="133871789"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by fmviesa003.fm.intel.com with ESMTP; 14 Apr 2025 02:41:50 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+	id F35AC8A2; Mon, 14 Apr 2025 12:41:48 +0300 (EEST)
+Date: Mon, 14 Apr 2025 12:41:48 +0300
+From: Andy Shevchenko <andriy.shevchenko@intel.com>
+To: Jonathan Corbet <corbet@lwn.net>
+Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+	Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+	linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Kees Cook <kees@kernel.org>, Russell King <linux@armlinux.org.uk>,
+	linux-hardening@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 00/33] Implement kernel-doc in Python
+Message-ID: <Z_zYXAJcTD-c3xTe@black.fi.intel.com>
+References: <cover.1744106241.git.mchehab+huawei@kernel.org>
+ <871pu1193r.fsf@trenco.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250414010912.816413-1-xiyou.wangcong@gmail.com> <20250414010912.816413-2-xiyou.wangcong@gmail.com>
-In-Reply-To: <20250414010912.816413-2-xiyou.wangcong@gmail.com>
-From: Konstantin Khlebnikov <koct9i@gmail.com>
-Date: Mon, 14 Apr 2025 11:39:49 +0200
-X-Gm-Features: ATxdqUFdME70f-wl6WueLSXr2RQ0r9NTAtvZnLHVmHJkNBedU1oPzDiaFU8DKh0
-Message-ID: <CALYGNiOV2sJY5gQwMX+U6ot9fFURHLWW+F87pBtH3T-RLDL+5Q@mail.gmail.com>
-Subject: Re: [Patch net 1/2] net_sched: hfsc: Fix a UAF vulnerability in class handling
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us, 
-	gerrard.tai@starlabs.sg
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <871pu1193r.fsf@trenco.lwn.net>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Mon, 14 Apr 2025 at 03:09, Cong Wang <xiyou.wangcong@gmail.com> wrote:
->
-> This patch fixes a Use-After-Free vulnerability in the HFSC qdisc class
-> handling. The issue occurs due to a time-of-check/time-of-use condition
-> in hfsc_change_class() when working with certain child qdiscs like netem
-> or codel.
->
-> The vulnerability works as follows:
-> 1. hfsc_change_class() checks if a class has packets (q.qlen != 0)
-> 2. It then calls qdisc_peek_len(), which for certain qdiscs (e.g.,
->    codel, netem) might drop packets and empty the queue
-> 3. The code continues assuming the queue is still non-empty, adding
->    the class to vttree
-> 4. This breaks HFSC scheduler assumptions that only non-empty classes
->    are in vttree
-> 5. Later, when the class is destroyed, this can lead to a Use-After-Free
->
-> The fix adds a second queue length check after qdisc_peek_len() to verify
-> the queue wasn't emptied.
->
-> Fixes: 21f4d5cc25ec ("net_sched/hfsc: fix curve activation in hfsc_change_class()")
-> Reported-by: Gerrard Tai <gerrard.tai@starlabs.sg>
-> Cc: Konstantin Khlebnikov <koct9i@gmail.com>
-> Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
-> ---
->  net/sched/sch_hfsc.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
->
-> diff --git a/net/sched/sch_hfsc.c b/net/sched/sch_hfsc.c
-> index ce5045eea065..b368ac0595d5 100644
-> --- a/net/sched/sch_hfsc.c
-> +++ b/net/sched/sch_hfsc.c
-> @@ -961,6 +961,7 @@ hfsc_change_class(struct Qdisc *sch, u32 classid, u32 parentid,
->
->         if (cl != NULL) {
->                 int old_flags;
-> +               int len = 0;
->
->                 if (parentid) {
->                         if (cl->cl_parent &&
-> @@ -991,9 +992,13 @@ hfsc_change_class(struct Qdisc *sch, u32 classid, u32 parentid,
->                 if (usc != NULL)
->                         hfsc_change_usc(cl, usc, cur_time);
->
-> +               if (cl->qdisc->q.qlen != 0)
-> +                       len = qdisc_peek_len(cl->qdisc);
-> +               /* Check queue length again since some qdisc implementations
-> +                * (e.g., netem/codel) might empty the queue during the peek
-> +                * operation.
-> +                */
->                 if (cl->qdisc->q.qlen != 0) {
-> -                       int len = qdisc_peek_len(cl->qdisc);
-> -
+On Wed, Apr 09, 2025 at 12:30:00PM -0600, Jonathan Corbet wrote:
+> Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
+> 
+> > This changeset contains the kernel-doc.py script to replace the verable
+> > kernel-doc originally written in Perl. It replaces the first version and the
+> > second series I sent on the top of it.
+> 
+> OK, I've applied it, looked at the (minimal) changes in output, and
+> concluded that it's good - all this stuff is now in docs-next.  Many
+> thanks for doing this!
+> 
+> I'm going to hold off on other documentation patches for a day or two
+> just in case anything turns up.  But it looks awfully good.
 
-I don't see any functional changes in the code.
+This started well, until it becomes a scripts/lib/kdoc.
+So, it makes the `make O=...` builds dirty *). Please make sure this doesn't leave
+"disgusting turd" )as said by Linus) in the clean tree.
 
->                         if (cl->cl_flags & HFSC_RSC) {
->                                 if (old_flags & HFSC_RSC)
->                                         update_ed(cl, len);
-> --
-> 2.34.1
->
+*) it creates that __pycache__ disaster. And no, .gitignore IS NOT a solution.
+
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
