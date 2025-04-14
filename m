@@ -1,160 +1,128 @@
-Return-Path: <netdev+bounces-182261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A6CBA885D0
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:53:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4513A88649
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 17:05:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8A1A564E07
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 14:43:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 317215602F9
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 14:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 880FD296D3A;
-	Mon, 14 Apr 2025 14:27:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EC0627587B;
+	Mon, 14 Apr 2025 14:31:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=invisiblethingslab.com header.i=@invisiblethingslab.com header.b="UEvAevRo";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Ft8asqhg"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Zm9eD3mk"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b6-smtp.messagingengine.com (fhigh-b6-smtp.messagingengine.com [202.12.124.157])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A9F296D1C;
-	Mon, 14 Apr 2025 14:27:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86474275872;
+	Mon, 14 Apr 2025 14:31:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744640845; cv=none; b=sPFJPHMI8abPtVxeXOBt80ptXnmPz2zOre5q9ncuGGG473V9pX4aqgfdhGePbWqnEhTPjbNNizhfXt7H/VR8PZZFZD7Z74vXW5Y+yameJiaUSrXTWjBa12zhK8GI9TGvWQdQZRYnh0o6xjmxADHSiNXJcnd7raF5SZ3D9XZc7Iw=
+	t=1744641116; cv=none; b=jUIIRb8cfpB2v0b+bq0Pqx8Y7ufq4H0BbKbKZnmQXL8zmsK0Lbgctx6IBhlXvu5aXLoLCbBaYsz0NL1SW7DGFNDJLy7b+rWKnxkPUlnbmwDU3zUmKu9/SwUo8eA3Cw9/4EvhxkQTVf92Jp/7zL52KCVlI2Lj55YeiSc13euV5Bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744640845; c=relaxed/simple;
-	bh=7HUhjmwcPNmFHFopEOLG3LYIR4w1KoVGOZxGdF8k7C4=;
+	s=arc-20240116; t=1744641116; c=relaxed/simple;
+	bh=JTrzdiz7XhEyL0SreHMCxYY3DvYmAUsCVxY/Glddl2o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uMFqM7ZEPZ5n+AeO9W3ZEkixkWCnO5/B9ZOqo27BySBxNzL45YyRBBhv8nYAMOSuDKP1d8GcGaQspENxWMYqsSLZvf1kyMyqkF5uMdUkUU5079D4eyWfIn2Sdp/FTMSVXD9ifTAWYUOkbSR7CZ+Tf8sTaTBFw28y20aTXnZytjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=invisiblethingslab.com; spf=pass smtp.mailfrom=invisiblethingslab.com; dkim=pass (2048-bit key) header.d=invisiblethingslab.com header.i=@invisiblethingslab.com header.b=UEvAevRo; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Ft8asqhg; arc=none smtp.client-ip=202.12.124.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=invisiblethingslab.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=invisiblethingslab.com
-Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id B218A2540092;
-	Mon, 14 Apr 2025 10:27:22 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-05.internal (MEProxy); Mon, 14 Apr 2025 10:27:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	invisiblethingslab.com; h=cc:cc:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1744640842;
-	 x=1744727242; bh=FGczV9RNjMQmfxd5ITnC2B5H9+mipmvnLLOBr0rYbCM=; b=
-	UEvAevRoNXvAlB6qUjAuZfSlFYe2Ibhl4BhFljf1+2Nm4Ha3jEVpBG2uSY+vnrt7
-	iba8gjnrbVNXWYOXsEsh3LyvkltxP1U3b4f20X/j65dN4D9DOqtwPOW+3L2h/o7/
-	QsHJpdjDr9qSkVo8+AI30nqkLr2c08tp1/6Cei2QUOIHzsAAdi7JmmWdHIS3v4ff
-	G0bMMITqPF13ZlfO84m14/OV1hX3kPC7RUy4H0vcmo5/i3KkYBSFPrDi784NHIjD
-	FLI6OvytE+Veiq4CDcFh1LdhvNOydXphG3kfDnthXrzMqoebz+kjMuMQ0St5vrtb
-	ksK99U+bsQ7O+nHFFrOIeQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1744640842; x=1744727242; bh=FGczV9RNjMQmfxd5ITnC2B5H9+mipmvnLLO
-	Br0rYbCM=; b=Ft8asqhgNZHMhjVRK6nSuhT1hEzeVjLo80WQTha3IeT1kv1nqdY
-	8RK8d9bqGlD2t4mgyo5/xzjKUeJ8DDqUtmIhoN+ArcuQBZlG8io+5OocvXmotAlj
-	ABfcc6gmwi+GnwkPBhDG5TvWO6CVXewTvGjXcWFAxkYh5urzB7epEt5gbMpXAuw3
-	M0WO4heXjoMmMKZrcuxbaShyja3bhECRElcpftxygfjeDqeLnCuUIHbHNJjJoref
-	iHgesMXHQfn7kHEDDDrK7hKJpxKiaXJxG/dbwGQETwImXKUmsa0nnHGmXQraPcj+
-	q7Cp2qNannKUWBSKOrBVURgdGP13ydiu/LA==
-X-ME-Sender: <xms:Shv9Z-HDHvZB7J3iBDdUSQ-ZH4y0ki1OipAAXf4o5xFAnQRcefx5mA>
-    <xme:Shv9Z_Wod2hOamRjVzLqxeUd5gvVdrTm5wTZPZA6wxi9CDX9rgxkMkOZTD71r6-q1
-    XjdvOk36Pwptw>
-X-ME-Received: <xmr:Shv9Z4Jm-ytIC-oRHDGWRfSpk24IcOPqJQ7e9gLNPjaBmIhoB1WXkAXSWYvp9YOxucJDY8EHeKn3AihIoqcofxDQ23eRbGbt8w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvvddtjeelucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesghdtreertddt
-    jeenucfhrhhomhepofgrrhgvkhcuofgrrhgtiiihkhhofihskhhiqdfikphrvggtkhhiuc
-    eomhgrrhhmrghrvghksehinhhvihhsihgslhgvthhhihhnghhslhgrsgdrtghomheqnecu
-    ggftrfgrthhtvghrnhepgfduleetfeevhfefheeiteeliefhjefhleduveetteekveettd
-    dvgeeuteefjedunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhf
-    rhhomhepmhgrrhhmrghrvghksehinhhvihhsihgslhgvthhhihhnghhslhgrsgdrtghomh
-    dpnhgspghrtghpthhtohepkedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepvhhi
-    thgrlhihrdhlihhfshhhihhtshesihhnthgvlhdrtghomhdprhgtphhtthhopehjvghssh
-    gvrdgsrhgrnhguvggsuhhrghesihhnthgvlhdrtghomhdprhgtphhtthhopegrnhhthhho
-    nhihrdhlrdhnghhuhigvnhesihhnthgvlhdrtghomhdprhgtphhtthhopehnvghtuggvvh
-    esvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehinhhtvghlqdifihhrvggu
-    qdhlrghnsehlihhsthhsrdhoshhuohhslhdrohhrghdprhgtphhtthhopehrvghgrhgvsh
-    hsihhonhhssehlihhsthhsrdhlihhnuhigrdguvghvpdhrtghpthhtohepshhtrggslhgv
-    sehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshgrshhhrghlsehkvghrnh
-    gvlhdrohhrgh
-X-ME-Proxy: <xmx:Shv9Z4Hd3hjCGEhxqSrTN-ZRylr_4bd5M6TKcw8eAUwC8tpq5lTtfg>
-    <xmx:Shv9Z0X6FR_S9SvvzCR2Xzd1BJr2or9LUQkBPICM2Bu8lUUEIqVb5w>
-    <xmx:Shv9Z7MpuAl91ymTARkmz2H49ltLoE1-Ye4UIzEBipuYQF3qIxzdbQ>
-    <xmx:Shv9Z70kgrarP4T3-kbgzpcQCe_Bh-5Vb2O450Rc19EB47Wgo46_RQ>
-    <xmx:Shv9Z2IenmIynaODyFpXHB4RWhJU5kVtpLZgV5kntx7VeHSUKVGeTTaF>
-Feedback-ID: i1568416f:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 14 Apr 2025 10:27:20 -0400 (EDT)
-Date: Mon, 14 Apr 2025 16:27:18 +0200
-From: Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>
-To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, regressions@lists.linux.dev,
-	stable@vger.kernel.org, Sasha Levin <sashal@kernel.org>
-Subject: Re: [REGRESSION] e1000e heavy packet loss on Meteor Lake - 6.14.2
-Message-ID: <Z_0bRoXicYoDN8Yf@mail-itl>
-References: <Z_z9EjcKtwHCQcZR@mail-itl>
- <b1f5e997-033c-33ed-5e3b-6fe2632bf718@intel.com>
- <Z_0GYR8jR-5NWZ9K@mail-itl>
+	 Content-Type:Content-Disposition:In-Reply-To; b=iBb9mxK0FZwJOnZWg1mhPvU8SoyofL+iAUU9FajBTW7je8KNgc0AdLmp2moltKjet8tmjVBgRReXLXnarDHPuyEDTGiaT1J7B7tpl/5mqiw1mOcJdUVMqNt6NUYAO2bTKgeJWHNhLGxVmyXCYtodBJ/jdcTP3nM34LyMN5fQACM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Zm9eD3mk; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=cuaKggYDRTaGllYGEl45fC0lvQ48d6zJXW22p95ihu0=; b=Zm9eD3mk3WM5hftniSBwFF1yr9
+	wvxNTAJzgVasbkxZJHOK1DR3oOVb/26e4oc2Nzpgxl1KKp3lmgm7r0q4O4v1RXq44g3YXAnkmPM43
+	2ha6YdMWO85CxFeTmi0XPvzd/aM0EX4N1G0Bo7ih03EUeqbV7ZcBOWGPdcG+MVbfEwUGIeKhmBY1g
+	wZUp8xPG4mf95iso0eT2piUlROajI6jwnHoSX8Ei8Of0/zZAt3qtyK3lSb39SV9/9l7TRKiqaPBao
+	z2gd3UeLxHusJWeDBZkkC2cny2t4IQ9/61aLTMG/t/Bj2Ul5kUTCL/MpnPtuL1et0NBwMJz/BygFc
+	P5hiyRbA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58820)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u4KqS-0006gu-0p;
+	Mon, 14 Apr 2025 15:31:32 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u4KqM-0007pA-1n;
+	Mon, 14 Apr 2025 15:31:26 +0100
+Date: Mon, 14 Apr 2025 15:31:26 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH net-next v5 3/3] net: stmmac: Add DWMAC glue layer for
+ Renesas GBETH
+Message-ID: <Z_0cPmY_LzI_fo4S@shell.armlinux.org.uk>
+References: <20250407120317.127056-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20250407120317.127056-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <Z_QSHpvSK7I--xPq@shell.armlinux.org.uk>
+ <CA+V-a8vgavmN7c9KYjc-3tm-9GC1_aVUkF-dF=Ws9axTBmSa5g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="rTRxnz3WOg1FQi+e"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Z_0GYR8jR-5NWZ9K@mail-itl>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+V-a8vgavmN7c9KYjc-3tm-9GC1_aVUkF-dF=Ws9axTBmSa5g@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+On Mon, Apr 07, 2025 at 07:07:49PM +0100, Lad, Prabhakar wrote:
+> On Mon, Apr 7, 2025 at 6:58 PM Russell King (Oracle)
+> <linux@armlinux.org.uk> wrote:
+> >
+> > On Mon, Apr 07, 2025 at 01:03:17PM +0100, Prabhakar wrote:
+> > > +static struct clk *renesas_gbeth_find_clk(struct plat_stmmacenet_data *plat_dat,
+> > > +                                       const char *name)
+> > > +{
+> > > +     for (unsigned int i = 0; i < plat_dat->num_clks; i++)
+> > > +             if (!strcmp(plat_dat->clks[i].id, name))
+> > > +                     return plat_dat->clks[i].clk;
+> > > +
+> > > +     return NULL;
+> > > +}
+> >
+> > In addition to Jakub's request, I'll ask that you hold off for a week
+> > because I have the following that I'd like to submit:
+> >
+> Ack, please add me in Cc while you post this patch.
 
---rTRxnz3WOg1FQi+e
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 14 Apr 2025 16:27:18 +0200
-From: Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>
-To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, regressions@lists.linux.dev,
-	stable@vger.kernel.org, Sasha Levin <sashal@kernel.org>
-Subject: Re: [REGRESSION] e1000e heavy packet loss on Meteor Lake - 6.14.2
+FYI, the patch was merged last Thursday, so please update to replace
+the above with stmmac_pltfr_find_clk() which will do this for you.
 
-On Mon, Apr 14, 2025 at 02:58:09PM +0200, Marek Marczykowski-G=C3=B3recki w=
-rote:
-> On Mon, Apr 14, 2025 at 03:38:39PM +0300, Lifshits, Vitaly wrote:
-> > Do you see the high packet loss without the virtualization?
->=20
-> I can't check that easily right now, will try later.
+Thanks.
 
-Tried now, the same issue is without any virtualization too.
-
---=20
-Best Regards,
-Marek Marczykowski-G=C3=B3recki
-Invisible Things Lab
-
---rTRxnz3WOg1FQi+e
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhrpukzGPukRmQqkK24/THMrX1ywFAmf9G0YACgkQ24/THMrX
-1yweRgf/aORxxg52KTbf5Wzyo3+4I32anJhuAiYfyvBI6iVxylb/WPaUmJpWgEyg
-AbIRZ1AH+VEQBrEkp8MnHwzohTVJoujvoNxtYm3cXcyimvdTlF8Kxs0pbPJRvqYp
-UJoJnJfssPcA5/SMOaggYVAbRl6YWm8V3MC+PNWyyc6p9Pk8sU7RBM/0MQZ2ev8V
-G1m24gH9ZrEwKZRhJnGdPz/eUNEYzFBd2lfodkRt0rw/suep/JhzxJNm5mfcn/WC
-mVZfU8/j8sJxO58tFRjIZ7Cw24W1TVorM2c8MC6NDYMbKSmn2q1odXEs9PYeRO0W
-viBB/84x4D82qNVmbDS1Q96Qw93B7g==
-=M5lp
------END PGP SIGNATURE-----
-
---rTRxnz3WOg1FQi+e--
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
