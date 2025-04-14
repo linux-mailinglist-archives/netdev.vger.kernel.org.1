@@ -1,279 +1,214 @@
-Return-Path: <netdev+bounces-182201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F371A881A9
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 15:20:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B76DEA88154
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 15:13:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA88B178F65
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 13:20:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7FE91756FD
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 13:13:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D0052E338F;
-	Mon, 14 Apr 2025 13:19:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E8002D1F60;
+	Mon, 14 Apr 2025 13:13:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="asa+UNFH"
+	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="jSiXWvMf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011064.outbound.protection.outlook.com [40.107.130.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0758718B0F
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 13:19:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744636795; cv=none; b=XznpZ1rn3Ng0hgthoAdX5a6LmFTv1F1owJ6erbVNJWRx5elzKUtJefDLa2uJRI3AVQ4DIB1n8shFVNpItCPWlQKqgcu8bDdAyWFcKxbP3AYc5hpuWsQ8LYKCShDfnyzkJdN/e8WVviXFjwKuQa64Jk15deMGp9ngKf2Bdt7YvnA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744636795; c=relaxed/simple;
-	bh=hjn39AG/I7dihpzS3bivPZpwz9rCyoJkkbzTr2kbI/A=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kQPHkSxdLmBAZwpe9VVjxQjKiQprh2rNCN/P6AQYFOyzZflFUdZD0rSbWAiKQx59J3TgSo/Zbn+++NPI+g5XM+rLmelhzq6OAgX7/lvWP7bLDphgdTAG1zUqp0/ZZTIEa3U537/Gr5HROEFbL7TWLRDD5P0/ZuP8vx0FRooAHQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=asa+UNFH; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744636793; x=1776172793;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=hjn39AG/I7dihpzS3bivPZpwz9rCyoJkkbzTr2kbI/A=;
-  b=asa+UNFHZWuPJnIcgBS2ZmXR7dUQmQ/vYkDbqxDzXHaREtqyaDcur+nm
-   1AOGYaPrwTOJt17zTZ8JVyGfEtEko4uQQPxtIwfNOP7VqmxdZ6ZgWlhqk
-   DZG90aHZjmZgxbPkJw/TTvyiGyMFsedAxAS0sA4e0a29hznTeBMjvHJmi
-   EB6TJlNYl3Ty6UACWdrrg/MDl6YK5PAWu11idI1lGhMKzLZkH6tRt3utC
-   /4Kf81/qxkKJCFNjHKt67wBihamP5SZILoAI1XQJO8LyE9l4BhJyOHr2T
-   nj+hh1l2sqZexzSKb6g+pkr5+F/ZHo3zj0MYJHyhIFc1kOYa5NcYvs/Ym
-   w==;
-X-CSE-ConnectionGUID: mSesFPCtSfCXzckFnjZUVw==
-X-CSE-MsgGUID: yJv8roT6Ri6o8nOfRPXLFA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11402"; a="68594778"
-X-IronPort-AV: E=Sophos;i="6.15,212,1739865600"; 
-   d="scan'208";a="68594778"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2025 06:19:52 -0700
-X-CSE-ConnectionGUID: NkKCUYg0T1eLwvf/UXpbNg==
-X-CSE-MsgGUID: z6/5z8B+R9artRd/7I7BQA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.15,212,1739865600"; 
-   d="scan'208";a="130140515"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa008.fm.intel.com with ESMTP; 14 Apr 2025 06:19:48 -0700
-Received: from vecna.igk.intel.com (vecna.igk.intel.com [10.123.220.17])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id D9E0032CB0;
-	Mon, 14 Apr 2025 14:19:46 +0100 (IST)
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: netdev@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Karol Kolacinski <karol.kolacinski@intel.com>,
-	Grzegorz Nitka <grzegorz.nitka@intel.com>,
-	Michal Schmidt <mschmidt@redhat.com>,
-	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH iwl-net v4] ice: use DSN instead of PCI BDF for ice_adapter index
-Date: Mon, 14 Apr 2025 15:12:41 +0200
-Message-Id: <20250414131241.122855-1-przemyslaw.kitszel@intel.com>
-X-Mailer: git-send-email 2.39.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A68146447;
+	Mon, 14 Apr 2025 13:13:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.64
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744636419; cv=fail; b=A0Zzk6XYFPyLiSRzDmyW8jxNTDK5mNsyFQYosmfZ6+ehxFT9nPsLe/AkromP057bL/MqmsOPGL7adsYnfH8qxLtk1CABoCIOH0JNrGlYcaT4OihQnIC6L6PiVV7yALfppefukY4VowIA4ePqN1A0XBLS1tXejNT10RmDnGsXN9U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744636419; c=relaxed/simple;
+	bh=IYDVG7Bsz4Dzau0WyEiLZTe6exBbiIkKys0xrrjlHYM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Nej+I9GT99eRJGm9F6L1JrzMTOzcQ4jANHnSG+VRLt0vvjqLxXGY2i5Rpsh9hpMuZU6A6twrok+lvNkzxEwr9me0Uaa1h5aNnt4sxkWnDSqbpzQkVLOeyAHJ7ZjTvLYODgSjSEWYOrPnEnaSbL8LT8Dh183Liqg6cxKA3UjoxnY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=jSiXWvMf; arc=fail smtp.client-ip=40.107.130.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kPuAkpnZoi197XVOuMTb8JsKJxJLD5CYquWsBf7hM59T3daHfGiSSmnJCXjeAGJw0OXx6NZEKYSGYp3zK2KIRoF5jbdMWtTPxpbpcfGsgZqidr9T0C8YUwyW71jJN8jNEbpjois9IBjSB/nhJ4zgzY6p8/DeMQQnIoGzKvoYs7EuTaBkkj2H7ISQKweHBx4i7S11LjY2mhbA8wot8SFPMV/Bn6MmEmdsCkuJYIH+KtuX7YUYIL/a1hwgEqVxXiGAtkRuFq4ahjysmE9lR01tVX5WogLYcjP6IImb1+9WjlquQXzu6R7PslDypOCv5QpvY/yXxzGyYKeFWwQg4bUOAQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bVfNtaoj6l3ceB8QOIPPbdsRvQwI8Ihl6TR0rjSwNL4=;
+ b=sHIvEMi/0s/KbUepg+QjVerqLlS8kYJp/ZcCRe9sOYzf+UhyLlYL4vwilcBk52KEI+QCQ+f0IIKhWRfDORtC3wjJ0eSsDUaNuAbPYnMNXBbajPVhwg1wIE9DYhHIdDqcdZMR4wrgRI0B4DGa4dLp586UkwxEnITtyJ2Bb8o1UmtZ2pTBNIsX40l6f7EbjvvQfN1vJHaYu9q9ublKH+nLxPzUkzCr89HE6WQIMX6rEshNa05h7hAsnHUsYgCCFSdFTm+fA1c0joLo8K4e4ZJMeKLoUo/vHbVbhssUmJKsu7QxAvo4g0IX1S6O2VJMObr1TJssxZH423FexD9o6EHEmw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 131.228.6.101) smtp.rcpttodomain=nokia-bell-labs.com
+ smtp.mailfrom=nokia-bell-labs.com; dmarc=pass (p=reject sp=reject pct=100)
+ action=none header.from=nokia-bell-labs.com; dkim=none (message not signed);
+ arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bVfNtaoj6l3ceB8QOIPPbdsRvQwI8Ihl6TR0rjSwNL4=;
+ b=jSiXWvMfn0T3qIMbh2LKQNkVBXPUWWotSb3K3Vptqvk9DfNke50AVK7+4/LyTI/MWq/pH5j5DibYX2L1eQ901hCHnWEr8AY9oEmrPFqxLYaNouV8EjutU2ON1q6UbalQyy9KSSvtZmzXGfKiynNXmHo/DK7jIBnLDwGPe84o+Ui6Jp9y7Q1cbTKl2X/G/F3hugQFBITNu7MKJH3aVvzLnORCaKc5ckMc+Y2paLbes59p2sw2/NiJui7a8VR8cBh4+Rp+n2Z2zGnFB77Wsf2Vfz5Q9z2gOMv+RjlnMBHh47FbHpzCvz9QlUneRmW5V+gd53xpb4bD7ep5wiclq0pfMg==
+Received: from AS4P189CA0035.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:5dd::14)
+ by AS8PR07MB8373.eurprd07.prod.outlook.com (2603:10a6:20b:444::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.33; Mon, 14 Apr
+ 2025 13:13:29 +0000
+Received: from AM3PEPF0000A79A.eurprd04.prod.outlook.com
+ (2603:10a6:20b:5dd:cafe::4) by AS4P189CA0035.outlook.office365.com
+ (2603:10a6:20b:5dd::14) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8632.35 via Frontend Transport; Mon,
+ 14 Apr 2025 13:13:29 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 131.228.6.101)
+ smtp.mailfrom=nokia-bell-labs.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nokia-bell-labs.com;
+Received-SPF: Pass (protection.outlook.com: domain of nokia-bell-labs.com
+ designates 131.228.6.101 as permitted sender)
+ receiver=protection.outlook.com; client-ip=131.228.6.101;
+ helo=fr712usmtp1.zeu.alcatel-lucent.com; pr=C
+Received: from fr712usmtp1.zeu.alcatel-lucent.com (131.228.6.101) by
+ AM3PEPF0000A79A.mail.protection.outlook.com (10.167.16.105) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8655.12 via Frontend Transport; Mon, 14 Apr 2025 13:13:28 +0000
+Received: from sarah.nbl.nsn-rdnet.net (sarah.nbl.nsn-rdnet.net [10.0.73.150])
+	by fr712usmtp1.zeu.alcatel-lucent.com (GMO) with ESMTP id 53EDDQBB009623;
+	Mon, 14 Apr 2025 13:13:26 GMT
+From: chia-yu.chang@nokia-bell-labs.com
+To: netdev@vger.kernel.org, dave.taht@gmail.com, pabeni@redhat.com,
+        jhs@mojatatu.com, kuba@kernel.org, stephen@networkplumber.org,
+        xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
+        edumazet@google.com, horms@kernel.org, andrew+netdev@lunn.ch,
+        donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
+        shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
+        ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+        g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
+        mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+        Jason_Livingood@comcast.com, vidhi_goel@apple.com
+Cc: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+Subject: [PATCH v3 net-next 00/15] AccECN protocol patch series
+Date: Mon, 14 Apr 2025 15:13:00 +0200
+Message-Id: <20250414131315.97456-1-chia-yu.chang@nokia-bell-labs.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM3PEPF0000A79A:EE_|AS8PR07MB8373:EE_
+X-MS-Office365-Filtering-Correlation-Id: deb00961-d236-4421-0d8c-08dd7b5625d4
+X-LD-Processed: 5d471751-9675-428d-917b-70f44f9630b0,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+ BCL:0;ARA:13230040|82310400026|36860700013|376014|7416014|1800799024|921020|13003099007;
+X-Microsoft-Antispam-Message-Info:
+ =?utf-8?B?cmdLMkZSYUo3ZFpaenZqZzNNZUhseUdyT3Z2L2krUlh2dzlpTjZZVjM0NERG?=
+ =?utf-8?B?ZmR1TWs5aTdFZnUwRUVwVUlLNFdMR1B6S0hGUDcyaFMvNTJ5NmJPUlVUemlJ?=
+ =?utf-8?B?Q2J6UGZHT0FGa2xiM1BpUU9xRFdmMGg2dmtwNlRiL0QwS1JvY2NSdk8yd1ZB?=
+ =?utf-8?B?Tk5lUFE0U2NrdDRrRFhxa25nMEtkVHRrWnpFS0tOZ2tETm0xMi84RzFqaENI?=
+ =?utf-8?B?dDBHRHppOHV2TFY4bjAxMVBhY1ViNzE3K0xuMkYva0NpWWdpdjNqZW1UVVFQ?=
+ =?utf-8?B?ME9BeWtJZjRwT1kydW5vYWJEUGtQaDZJSWpWeUhyOFMrQ0dBV21GN3RzQWFL?=
+ =?utf-8?B?SU5JY1BZQXhKb003TnhiM1REVDJZbEdrbUtMMjQyRUVkOEwwWjB6TDF1Sk9m?=
+ =?utf-8?B?U29vY1JUOTVoell1cVNFOW1TbSs3SmRGa2FxaW14SFVlZlhIRlhIaUlWZ0NT?=
+ =?utf-8?B?MnV0YjJrclZiODhTcW9tUEIxNGVVSjdDZzRPWmMzRTV1SWF1ZWhiKzIzR0Ri?=
+ =?utf-8?B?Q2R1bEtHVFVVcTlvVlg2cDR5NnMwWVhmbUd0YzQyZkVGNm9rVjRnK1NKMENl?=
+ =?utf-8?B?MkJmRlI1eXVwNTI0Q0V0WWprbG5xbUNsdUtoWkFVTjJvT3FMMk5KVVM1NWw4?=
+ =?utf-8?B?SjM1VExRZFBMMWhETnhUNmRyWnJZbWlER0lqcnZVczhIL3J1ejFNZ2k4bjJO?=
+ =?utf-8?B?OUlpRGtRT2lqbE01cjB1alB0TC9kS3JIdEtESEVaeVR3OW5XYTd3R1V5dDc2?=
+ =?utf-8?B?dmhNdnBwRC9tSU5vbzROZGIrUVNIeEhBWi9FN0hDaG1UMzkvN2I3ckhkZ0Nl?=
+ =?utf-8?B?S2NrZWtkSmM1b290WC83NjYwYUtZdVBVdXU2UmpUczVCdFV5dW5qai92RSt1?=
+ =?utf-8?B?UFg5N1lUTzZTdnY5VjBjb3RFenNzMkx6Y25WelNSYXBoY3BWUlZJbkJJcHdG?=
+ =?utf-8?B?L2l6RFhzM1RVdUE1MzkyU0gyazJrUzVHbXhMU211RHA5U2ZubVJjS0FZeEFw?=
+ =?utf-8?B?WG1YcEVUSFE2T2lYNXV2bHdsTTBTSTNLemFsZEhwYkNBNVQxNnd5emQxQjJs?=
+ =?utf-8?B?dm1mRHVzSFlpK3psMHFzbnlLRG91ZFMzeGJGb1NuMFQ0a1k5TCtHb2sxbjBt?=
+ =?utf-8?B?bXVIZ0lqMktxanFCUmxLU2dlbjk5K1pPVjlWYzg5bHBZV1pXZlkzOVRLMFpk?=
+ =?utf-8?B?UVJqbjd1OTZHVlVWeGhCN05WSWFHNzF3djNiM1B6REgxT296NDNPMmE5WWhO?=
+ =?utf-8?B?MWFkV2dOR1gzTnRsUUJHT3QvcVYyUzhwd2JtSXdHM3NIV0U2cTNLYjEvT3Yx?=
+ =?utf-8?B?RDhQUXRkTmRJOWNRYlB6dW1TS0ZOd2RyUXhHYmhUdXcwdkwwUXpRL2ZKdk5P?=
+ =?utf-8?B?bU5PaFowOTBEdDJva1lYd3Rrb056Y2dkVUI4SnpPNGVSWU5kbllINkVWRTFr?=
+ =?utf-8?B?cEFuVFhkZ3B6dXZ4b0ozZmJCTytNL2RzRkZDc3ZzUzBmTG9hMUsyU3V2czcx?=
+ =?utf-8?B?ejNrQ282Q0hPMXd0ZGRLc2NEcjdSREF6S1pMVGdRT0xianRwQVp2b1dXYTEy?=
+ =?utf-8?B?Z3RuY215YVBnZ29NOVdjVmFDNjRHWFNhSXFDSjZLOHZGUGY4Y3VLS0MwS1ox?=
+ =?utf-8?B?d2V0akljTGsxOGZDVzJTdEdXMXN4azJPTDB0L2RHTDJwVnpMSGl1eDgyV1gy?=
+ =?utf-8?B?VEhaQWk0L0V6UHBna3lJbkVaczAvVmZMMUIyVUhjR1MxdmRub0NXRGxiRmxE?=
+ =?utf-8?B?Ujk3TUQrdUludkVNVXJNYmNqRHJxUWY2RTdxVXpvZnEzQWs5V3FIcUlDT1Ay?=
+ =?utf-8?B?Q2pvVGt1bzdXajE1YUdGa3orY081Z1lxOXFPbmVKZytQUlppVUJEWFdqSkww?=
+ =?utf-8?B?RGt6ajZCWkNlN2VQT3ZkRE9xdStzTHZIM3lGdzFNNW1rWkxGK2U5T1M2c0x4?=
+ =?utf-8?B?UkhZZmJnWGtMOGhKTE5uRzdZNnFSMHVocElWRDUzdVFzN1pOYUp6OURFMDdV?=
+ =?utf-8?B?bFJ3L2dVaDBQL2J6cFdBemhEaWZlL1pNUldPRGV5bG56a3hqWTFMejE1Wkp4?=
+ =?utf-8?B?Q1pPRzRJQmM1a3hDV3VqeFhwb056blloREJQUT09?=
+X-Forefront-Antispam-Report:
+ CIP:131.228.6.101;CTRY:FI;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:fr712usmtp1.zeu.alcatel-lucent.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(376014)(7416014)(1800799024)(921020)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: nokia-bell-labs.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2025 13:13:28.7598
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: deb00961-d236-4421-0d8c-08dd7b5625d4
+X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5d471751-9675-428d-917b-70f44f9630b0;Ip=[131.228.6.101];Helo=[fr712usmtp1.zeu.alcatel-lucent.com]
+X-MS-Exchange-CrossTenant-AuthSource: AM3PEPF0000A79A.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR07MB8373
 
-Use Device Serial Number instead of PCI bus/device/function for
-the index of struct ice_adapter.
+From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
 
-Functions on the same physical device should point to the very same
-ice_adapter instance, but with two PFs, when at least one of them is
-PCI-e passed-through to a VM, it is no longer the case - PFs will get
-seemingly random PCI BDF values, and thus indices, what finally leds to
-each of them being on their own instance of ice_adapter. That causes them
-to don't attempt any synchronization of the PTP HW clock usage, or any
-other future resources.
+Hello,
 
-DSN works nicely in place of the index, as it is "immutable" in terms of
-virtualization.
+Plese find the v3:
 
-Fixes: 0e2bddf9e5f9 ("ice: add ice_adapter for shared data across PFs on the same NIC")
-Suggested-by: Jacob Keller <jacob.e.keller@intel.com>
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Suggested-by: Jiri Pirko <jiri@resnulli.us>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
----
-CC: Karol Kolacinski <karol.kolacinski@intel.com>
-CC: Grzegorz Nitka <grzegorz.nitka@intel.com>
-CC: Michal Schmidt <mschmidt@redhat.com>
-CC: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-CC: Michal Kubiak <michal.kubiak@intel.com>
-CC: Simon Horman <horms@kernel.org>
+v3(14-Apr-2025)
+- Fix patch apply issue in v2 (Jakub Kicinski <kuba@kernel.org>)
 
-v4:
- - Add fixes tag for real... (Simon)
- - extend commit message (Simon)
- - pass dsn to ice_adapter_new() to have simpler code
-   (I happened to do that as (local) followup) (me)
+v2 (18-Mar-2025)
+- Add one missing patch from previous AccECN protocol preparation patch series to this patch series
 
-v3:
-https://lore.kernel.org/intel-wired-lan/20250408134655.4287-1-przemyslaw.kitszel@intel.com/
- - Add fixes tag (Michal K)
- - add missing braces (lkp bot), turns out it's hard to purge C++ from your mind
- - (no changes in the collision handling on 32bit systems)
+The full patch series can be found in
+https://github.com/L4STeam/linux-net-next/commits/upstream_l4steam/
 
-v2:
-https://lore.kernel.org/intel-wired-lan/20250407112005.85468-1-przemyslaw.kitszel@intel.com/
- - target to -net (Jiri)
- - mix both halves of u64 DSN on 32bit systems (Jiri)
- - (no changes in terms of fallbacks for pre-prod HW)
- - warn when there is DSN collision after reducing to 32bit
+The Accurate ECN draft can be found in
+https://datatracker.ietf.org/doc/html/draft-ietf-tcpm-accurate-ecn-28
 
-v1:
-https://lore.kernel.org/netdev/20250306211159.3697-2-przemyslaw.kitszel@intel.com
----
- drivers/net/ethernet/intel/ice/ice_adapter.h |  6 ++-
- drivers/net/ethernet/intel/ice/ice_adapter.c | 47 ++++++++------------
- 2 files changed, 22 insertions(+), 31 deletions(-)
+Best regards,
+Chia-Yu
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.h b/drivers/net/ethernet/intel/ice/ice_adapter.h
-index e233225848b3..ac15c0d2bc1a 100644
---- a/drivers/net/ethernet/intel/ice/ice_adapter.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adapter.h
-@@ -32,17 +32,19 @@ struct ice_port_list {
-  * @refcount: Reference count. struct ice_pf objects hold the references.
-  * @ctrl_pf: Control PF of the adapter
-  * @ports: Ports list
-+ * @device_serial_number: DSN cached for collision detection on 32bit systems
-  */
- struct ice_adapter {
- 	refcount_t refcount;
- 	/* For access to the GLTSYN_TIME register */
- 	spinlock_t ptp_gltsyn_time_lock;
- 
- 	struct ice_pf *ctrl_pf;
- 	struct ice_port_list ports;
-+	u64 device_serial_number;
- };
- 
--struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev);
--void ice_adapter_put(const struct pci_dev *pdev);
-+struct ice_adapter *ice_adapter_get(struct pci_dev *pdev);
-+void ice_adapter_put(struct pci_dev *pdev);
- 
- #endif /* _ICE_ADAPTER_H */
-diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/ethernet/intel/ice/ice_adapter.c
-index 01a08cfd0090..66e070095d1b 100644
---- a/drivers/net/ethernet/intel/ice/ice_adapter.c
-+++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
-@@ -1,7 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0-only
- // SPDX-FileCopyrightText: Copyright Red Hat
- 
--#include <linux/bitfield.h>
- #include <linux/cleanup.h>
- #include <linux/mutex.h>
- #include <linux/pci.h>
-@@ -14,39 +13,24 @@
- static DEFINE_XARRAY(ice_adapters);
- static DEFINE_MUTEX(ice_adapters_mutex);
- 
--/* PCI bus number is 8 bits. Slot is 5 bits. Domain can have the rest. */
--#define INDEX_FIELD_DOMAIN GENMASK(BITS_PER_LONG - 1, 13)
--#define INDEX_FIELD_DEV    GENMASK(31, 16)
--#define INDEX_FIELD_BUS    GENMASK(12, 5)
--#define INDEX_FIELD_SLOT   GENMASK(4, 0)
--
--static unsigned long ice_adapter_index(const struct pci_dev *pdev)
-+static unsigned long ice_adapter_index(u64 dsn)
- {
--	unsigned int domain = pci_domain_nr(pdev->bus);
--
--	WARN_ON(domain > FIELD_MAX(INDEX_FIELD_DOMAIN));
--
--	switch (pdev->device) {
--	case ICE_DEV_ID_E825C_BACKPLANE:
--	case ICE_DEV_ID_E825C_QSFP:
--	case ICE_DEV_ID_E825C_SFP:
--	case ICE_DEV_ID_E825C_SGMII:
--		return FIELD_PREP(INDEX_FIELD_DEV, pdev->device);
--	default:
--		return FIELD_PREP(INDEX_FIELD_DOMAIN, domain) |
--		       FIELD_PREP(INDEX_FIELD_BUS,    pdev->bus->number) |
--		       FIELD_PREP(INDEX_FIELD_SLOT,   PCI_SLOT(pdev->devfn));
--	}
-+#if BITS_PER_LONG == 64
-+	return dsn;
-+#else
-+	return (u32)dsn ^ (u32)(dsn >> 32);
-+#endif
- }
- 
--static struct ice_adapter *ice_adapter_new(void)
-+static struct ice_adapter *ice_adapter_new(u64 dsn)
- {
- 	struct ice_adapter *adapter;
- 
- 	adapter = kzalloc(sizeof(*adapter), GFP_KERNEL);
- 	if (!adapter)
- 		return NULL;
- 
-+	adapter->device_serial_number = dsn;
- 	spin_lock_init(&adapter->ptp_gltsyn_time_lock);
- 	refcount_set(&adapter->refcount, 1);
- 
-@@ -77,23 +61,26 @@ static void ice_adapter_free(struct ice_adapter *adapter)
-  * Return:  Pointer to ice_adapter on success.
-  *          ERR_PTR() on error. -ENOMEM is the only possible error.
-  */
--struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev)
-+struct ice_adapter *ice_adapter_get(struct pci_dev *pdev)
- {
--	unsigned long index = ice_adapter_index(pdev);
-+	u64 dsn = pci_get_dsn(pdev);
- 	struct ice_adapter *adapter;
-+	unsigned long index;
- 	int err;
- 
-+	index = ice_adapter_index(dsn);
- 	scoped_guard(mutex, &ice_adapters_mutex) {
- 		err = xa_insert(&ice_adapters, index, NULL, GFP_KERNEL);
- 		if (err == -EBUSY) {
- 			adapter = xa_load(&ice_adapters, index);
- 			refcount_inc(&adapter->refcount);
-+			WARN_ON_ONCE(adapter->device_serial_number != dsn);
- 			return adapter;
- 		}
- 		if (err)
- 			return ERR_PTR(err);
- 
--		adapter = ice_adapter_new();
-+		adapter = ice_adapter_new(dsn);
- 		if (!adapter)
- 			return ERR_PTR(-ENOMEM);
- 		xa_store(&ice_adapters, index, adapter, GFP_KERNEL);
-@@ -110,11 +97,13 @@ struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev)
-  *
-  * Context: Process, may sleep.
-  */
--void ice_adapter_put(const struct pci_dev *pdev)
-+void ice_adapter_put(struct pci_dev *pdev)
- {
--	unsigned long index = ice_adapter_index(pdev);
-+	u64 dsn = pci_get_dsn(pdev);
- 	struct ice_adapter *adapter;
-+	unsigned long index;
- 
-+	index = ice_adapter_index(dsn);
- 	scoped_guard(mutex, &ice_adapters_mutex) {
- 		adapter = xa_load(&ice_adapters, index);
- 		if (WARN_ON(!adapter))
+Chia-Yu Chang (1):
+  tcp: accecn: AccECN option failure handling
+
+Ilpo Järvinen (14):
+  tcp: reorganize SYN ECN code
+  tcp: fast path functions later
+  tcp: AccECN core
+  tcp: accecn: AccECN negotiation
+  tcp: accecn: add AccECN rx byte counters
+  tcp: accecn: AccECN needs to know delivered bytes
+  tcp: allow embedding leftover into option padding
+  tcp: sack option handling improvements
+  tcp: accecn: AccECN option
+  tcp: accecn: AccECN option send control
+  tcp: accecn: AccECN option ceb/cep heuristic
+  tcp: accecn: AccECN ACE field multi-wrap heuristic
+  tcp: accecn: try to fit AccECN option with SACK
+  tcp: try to avoid safer when ACKs are thinned
+
+ include/linux/tcp.h        |  27 +-
+ include/net/netns/ipv4.h   |   2 +
+ include/net/tcp.h          | 198 +++++++++++--
+ include/uapi/linux/tcp.h   |   7 +
+ net/ipv4/syncookies.c      |   3 +
+ net/ipv4/sysctl_net_ipv4.c |  19 ++
+ net/ipv4/tcp.c             |  26 +-
+ net/ipv4/tcp_input.c       | 591 +++++++++++++++++++++++++++++++++++--
+ net/ipv4/tcp_ipv4.c        |   5 +-
+ net/ipv4/tcp_minisocks.c   |  92 +++++-
+ net/ipv4/tcp_output.c      | 302 +++++++++++++++++--
+ net/ipv6/syncookies.c      |   1 +
+ net/ipv6/tcp_ipv6.c        |   1 +
+ 13 files changed, 1178 insertions(+), 96 deletions(-)
+
 -- 
-2.39.3
+2.34.1
 
 
