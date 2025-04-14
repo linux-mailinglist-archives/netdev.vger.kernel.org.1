@@ -1,152 +1,134 @@
-Return-Path: <netdev+bounces-182134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4360A87FC0
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 13:52:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2A11A87FD0
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 13:55:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D695A188D343
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 11:52:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F5C01888D80
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 11:55:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E59229B20B;
-	Mon, 14 Apr 2025 11:52:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40EA42980BA;
+	Mon, 14 Apr 2025 11:55:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I1x99f8n"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hq/DHZAO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC14C2980D9
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 11:52:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 721371684AE;
+	Mon, 14 Apr 2025 11:54:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744631551; cv=none; b=d5+QpvMrvFeyq7D3tsLiQ+n/+k5aznOSbbTZVoPcNJXh34fAsCI49AlTO3h0cLJ8Um1nl716DmrWcyc1BMtQVMix4wrufwSfujmelDpQn0Mr3ZoGynjTZ4MIfow9dSeONRtGKHtsm7AIyb+C1aIg9ChYA/xxkAwpSZ3ntur9LB0=
+	t=1744631701; cv=none; b=VX8+8OS37RbKVWuxqP7F0lNaFilfgwf6+TnXecBhKr/nuvYVM4jHq+UIN6uFtdO493fmSD2Y0VgKW0vIRISUYs/0gNjQficpkPKTiOMgmvDJZ3PFsuSHx9Hc6vhhaQ1KDjRr4tisIgPWTFeLjjqcCSLc753ICmagYKMl1hYK+xY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744631551; c=relaxed/simple;
-	bh=D91Ia1pGKZJkmlOIZvvVBQnMUMbHaF4O3dvtsIBon9s=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=EEpcmgVyJahNLdLj28JDhct1FkE4iiMEpnRyegLZVKICKgPsdQwsiXo+4HQjQa3bCeAl//dO7pREdu5PCo4bShUpQ4MQ4hofqUnSSpnKrpB1OtBTtXoBnEkqGBxptRaB4LAjjZoNJgN6rarf1oCW546DVfLHaAOYikBWNoQsqL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I1x99f8n; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744631549;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=00kkU7VDnxwaz8Oj1ywsgzfiYZTZml1BEDq6NOcZlJk=;
-	b=I1x99f8nrwVvnBTbCTe6IsDqO6U9UHb3MfJb6fkPMXPw5J5p7P6eCHLoF+G/TV6BELHstV
-	R2nwFjtwPyW1LZcw2CxfGl8K1qQlZVXy1Vlx3iqzRXrWPvUMwAK3twOmKXpD+C+FdUSSIV
-	1LE8hegGuWpA81S1x074R1ZN6STKnIU=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-620-wGqhvCzaMKWjkn9M7OImMg-1; Mon,
- 14 Apr 2025 07:52:24 -0400
-X-MC-Unique: wGqhvCzaMKWjkn9M7OImMg-1
-X-Mimecast-MFC-AGG-ID: wGqhvCzaMKWjkn9M7OImMg_1744631542
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F2B3A180034D;
-	Mon, 14 Apr 2025 11:52:21 +0000 (UTC)
-Received: from [10.44.32.81] (unknown [10.44.32.81])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 877E3180B487;
-	Mon, 14 Apr 2025 11:52:16 +0000 (UTC)
-Message-ID: <79b9ee2f-091d-4e0f-bbe3-c56cf02c3532@redhat.com>
-Date: Mon, 14 Apr 2025 13:52:15 +0200
+	s=arc-20240116; t=1744631701; c=relaxed/simple;
+	bh=jUon0xsIAf39XK7R0f7zGH5y3a+2qTlsy3SgS8J3sp0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aZXmFlOEOM6wneAXG9/13MywpRA+LO+Zf6rPv4IWd9lmJzzBDBCe6WzTwCKsvu+SjpIdqkYVDeBq2e4dWGzWpbbHrIRyJOpP47TfUFyF5yVSD+v6EYoJpZAb41hmGBWIVDZGbl3NoYK6l1f8UX6j7c1cBnPqleqflHo4uSXIswo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hq/DHZAO; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744631700; x=1776167700;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=jUon0xsIAf39XK7R0f7zGH5y3a+2qTlsy3SgS8J3sp0=;
+  b=hq/DHZAODAX8egwulkvStoNLZqUFcBp3s6cX1fqYCtP2yz5qogPGSQEH
+   5OEbvtPJCK6WcBgtSHeuMpo47zSDtVQDxOrPsNmr4xMVQpFlrd2aClThk
+   oXTde+QkAIJuzuoznEQtA47gePHP885cEiaDA9+zTYlGpxD4iyTC0Xair
+   n6DdvFKveYvActpdlhHFjt2uS3uSX46yY9TFTdxndbtXzzNFWMvjpDdxL
+   AF87wCD1Gegzx21Z5FBDZOj2PBuR+wbksj4IqDWavvKNlu/tAiYlV+ZpL
+   +zzMCtN+/xN2HaPuzmU9zrvszHBw8o44g5ccoER3FhTLxg4h6PqpYBiEg
+   Q==;
+X-CSE-ConnectionGUID: KoGoaPLQRROdH40bQYzvdw==
+X-CSE-MsgGUID: MrJnkncBTQ6WxpdRR3E20w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11402"; a="46186516"
+X-IronPort-AV: E=Sophos;i="6.15,212,1739865600"; 
+   d="scan'208";a="46186516"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2025 04:54:59 -0700
+X-CSE-ConnectionGUID: eJd6RnMmTU2XFtQmnOQqBQ==
+X-CSE-MsgGUID: u8qeO+m7SXGY03+CMkeYWg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,212,1739865600"; 
+   d="scan'208";a="134638722"
+Received: from lkp-server01.sh.intel.com (HELO b207828170a5) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 14 Apr 2025 04:54:52 -0700
+Received: from kbuild by b207828170a5 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1u4IOn-000E98-2k;
+	Mon, 14 Apr 2025 11:54:49 +0000
+Date: Mon, 14 Apr 2025 19:54:40 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>, bpf@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, mrpre@163.com,
+	Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next v2] bpf, sockmap: Introduce tracing capability
+ for sockmap
+Message-ID: <202504141925.PFNOfZzb-lkp@intel.com>
+References: <20250411091634.336371-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/28] mfd: Add Microchip ZL3073x support
-From: Ivan Vecera <ivecera@redhat.com>
-To: Andy Shevchenko <andy@kernel.org>
-Cc: netdev@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Prathosh Satish <Prathosh.Satish@microchip.com>,
- Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <20250407172836.1009461-1-ivecera@redhat.com>
- <20250407172836.1009461-2-ivecera@redhat.com>
- <Z_QTzwXvxcSh53Cq@smile.fi.intel.com>
- <eeddcda2-efe4-4563-bb2c-70009b374486@redhat.com>
- <Z_ys4Lo46KusTBIj@smile.fi.intel.com>
- <f3fc9556-60ba-48c0-95f2-4c030e5c309e@redhat.com>
-Content-Language: en-US
-In-Reply-To: <f3fc9556-60ba-48c0-95f2-4c030e5c309e@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250411091634.336371-1-jiayuan.chen@linux.dev>
 
+Hi Jiayuan,
 
+kernel test robot noticed the following build errors:
 
-On 14. 04. 25 1:39 odp., Ivan Vecera wrote:
-> 
-> 
-> On 14. 04. 25 8:36 dop., Andy Shevchenko wrote:
->>> What is wrong here?
->>>
->>> I have a device that uses 7-bit addresses and have 16 register pages.
->>> Each pages is from 0x00-0x7f and register 0x7f is used as page selector
->>> where bits 0-3 select the page.
->> The problem is that you overlap virtual page over the real one (the 
->> main one).
->>
->> The drivers you mentioned in v2 discussions most likely are also buggy.
->> As I implied in the above question the developers hardly get the 
->> regmap ranges
->> right. It took me quite a while to see the issue, so it's not 
->> particularly your
->> fault.
-> Hi Andy,
-> 
-> thank you I see the point.
-> 
-> Do you mean that the selector register should not be part of the range?
-> 
-> If so, does it mean that I have to specify a range for each page? Like 
-> this:
-> 
->      {
->          /* Page 0 */
->          .range_min    = 0x000,
->          .range_max    = 0x07e,
->          .selector_reg    = ZL3073x_PAGE_SEL,
->          .selector_mask    = GENMASK(3, 0),
->          .selector_shift    = 0,
->          .window_start    = 0,
->          .window_len    = 0x7e,
->      },
->      {
->          /* Page 1 */
->          .range_min    = 0x080,
->          .range_max    = 0x0fe,
->          .selector_reg    = ZL3073x_PAGE_SEL,
->          .selector_mask    = GENMASK(3, 0),
->          .selector_shift    = 0,
->          .window_start    = 0,
->          .window_len    = 0x7e,
->      },
-> ...
-> 
-> 
-> Thank you,
-> Ivan
-Sorry,
-.window_len = 0x7f /* Exclude selector reg */
+[auto build test ERROR on bpf-next/master]
 
-I.
+url:    https://github.com/intel-lab-lkp/linux/commits/Jiayuan-Chen/bpf-sockmap-Introduce-tracing-capability-for-sockmap/20250414-093146
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20250411091634.336371-1-jiayuan.chen%40linux.dev
+patch subject: [PATCH bpf-next v2] bpf, sockmap: Introduce tracing capability for sockmap
+config: arm64-randconfig-001-20250414 (https://download.01.org/0day-ci/archive/20250414/202504141925.PFNOfZzb-lkp@intel.com/config)
+compiler: clang version 21.0.0git (https://github.com/llvm/llvm-project f819f46284f2a79790038e1f6649172789734ae8)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250414/202504141925.PFNOfZzb-lkp@intel.com/reproduce)
 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202504141925.PFNOfZzb-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> ld.lld: error: undefined symbol: sock_i_ino
+   >>> referenced by sockmap.h:70 (include/trace/events/sockmap.h:70)
+   >>>               kernel/bpf/core.o:(trace_event_raw_event_sockmap_redirect) in archive vmlinux.a
+   >>> referenced by sockmap.h:121 (include/trace/events/sockmap.h:121)
+   >>>               kernel/bpf/core.o:(trace_event_raw_event_sockmap_strparser) in archive vmlinux.a
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
