@@ -1,148 +1,161 @@
-Return-Path: <netdev+bounces-182381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 207AFA88994
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 19:18:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86F65A88999
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 19:19:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79EFD1895CEE
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 17:18:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA49D7A9920
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 17:18:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31B5827A110;
-	Mon, 14 Apr 2025 17:18:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7016A289350;
+	Mon, 14 Apr 2025 17:19:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AZ8f2c9l"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA2823E25B;
-	Mon, 14 Apr 2025 17:18:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395571F236B;
+	Mon, 14 Apr 2025 17:19:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744651121; cv=none; b=FzcjilyGHIQVgp9beMNRNVclpw1vAPZNQzB22/Z6OhFNPdI3FQJede/O0pGAgG1EdssZje6ZP4xwWFTvFT0r36pRt9XU7kODEmYMgMZGLLhDrbUWQxjilGgf3MWnoERNunFDqPG3rMF0W8bswoFxVPf0h5vVtN4NZXpWK9HlOvI=
+	t=1744651188; cv=none; b=UvC30c+BF0elcM4NUSeaUBaozCaNSsJw6AySu6YNL5oMqlX6aB3o5qoti4j2JrHWd0YZV0DL1K67O8ryh9Y0/xRqhNjqf4Meh/M6r43hKkWH94UlkANzhmp3rhakXfqT4u+m+OP0DSt6+zGsTBkJVOq5TJ4hvXVtqLM0m/JcJYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744651121; c=relaxed/simple;
-	bh=Bi6MjyvNxAdltopf0J1FHXTPq7j6JHlwNPAo3aXWj/s=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Spy8qAxXgLTAjKjAGeKsJjeqLflSfCd5ltmzPytApqpTtgcecf5nCj3GAH+O7V1gGbSq51W1ZdVs1xMYZQPdY/dU1QOkb90PjvE8ruz28T65pU4iy6mp8dKjbWZ8m69v2UB1WL/xrx/P3DKYkRGGPjIkxXZKToiXZTtJgdlaEYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Zbv6R2LtMz6M4wd;
-	Tue, 15 Apr 2025 01:14:39 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 93F731402F4;
-	Tue, 15 Apr 2025 01:18:35 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Mon, 14 Apr
- 2025 19:18:35 +0200
-Date: Mon, 14 Apr 2025 18:18:33 +0100
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: <alejandro.lucero-palau@amd.com>
-CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<dave.jiang@intel.com>, Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v13 04/22] cxl: move register/capability check to driver
-Message-ID: <20250414181833.00003eca@huawei.com>
-In-Reply-To: <20250414151336.3852990-5-alejandro.lucero-palau@amd.com>
-References: <20250414151336.3852990-1-alejandro.lucero-palau@amd.com>
-	<20250414151336.3852990-5-alejandro.lucero-palau@amd.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1744651188; c=relaxed/simple;
+	bh=z37GMPLQfQqtOQrNOtRcvsIzo/ZNg3+Bc9JSK7Jgb08=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jylm6NB7eI/TvUC3ChU4FTrYAU1pip7n8ANijToTvFcrvOgY1qCfFuiISFjc2qOCF/KrG+RU8Gp/8xZI9Y1Nsf3Zcm5Gal/tFcJrlt+jLX8olI5HMUQJ0OJS43wkorImg/DieyEzZ/W3YxMUb9OlbTvuZbGl/PetOhvi6TcruG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AZ8f2c9l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C958C4CEE2;
+	Mon, 14 Apr 2025 17:19:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744651187;
+	bh=z37GMPLQfQqtOQrNOtRcvsIzo/ZNg3+Bc9JSK7Jgb08=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AZ8f2c9lqfQZuQfWRr3KwemWv7exS/LcHLgCoLIJY1DNeczSaMQ2+K/p3z/mVRHXf
+	 5fYgsygYh/xIH5tIyU6QCvN2kjL9ycG1XsUaTCvSMyNM4nLwmEiQOuIVQJBGnIU6Wi
+	 eH72/9HbUpRpNs98Zbzt7Vw2DVusLEdBAFtqH9l7CD88Y6x5GgcdBgeL04Bde+YmwC
+	 uvjY5W2kBUh85KIg46dZSjcc6e1uqYGFbQIOnKSpCtulOiaTYwdjG2KKrMZ9DZebqt
+	 cv8y7JFEPsnuR9d4g+wONPywfX0U+hqROxapwUq2PEVZlBBIUUt0Kmcio/GxuCMMnk
+	 0927u0k2ScVQw==
+Date: Mon, 14 Apr 2025 18:19:41 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Prathosh.Satish@microchip.com,
+	krzk@kernel.org, netdev@vger.kernel.org, vadim.fedorenko@linux.dev,
+	arkadiusz.kubalewski@intel.com, jiri@resnulli.us, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, lee@kernel.org,
+	kees@kernel.org, andy@kernel.org, akpm@linux-foundation.org,
+	mschmidt@redhat.com, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2 02/14] dt-bindings: dpll: Add support for Microchip
+ Azurite chip family
+Message-ID: <20250414-residual-unblended-c21c7bc6eeb2@spud>
+References: <20250409144250.206590-3-ivecera@redhat.com>
+ <20250410-skylark-of-silent-symmetry-afdec9@shite>
+ <1a78fc71-fcf6-446e-9ada-c14420f9c5fe@redhat.com>
+ <20250410-puritan-flatbed-00bf339297c0@spud>
+ <6dc1fdac-81cc-4f2c-8d07-8f39b9605e04@redhat.com>
+ <CY5PR11MB6462412A953AF5D93D97DCE5ECB72@CY5PR11MB6462.namprd11.prod.outlook.com>
+ <bd7d005b-c715-4fd9-9b0d-52956d28d272@lunn.ch>
+ <7ab19530-d0d4-4df1-9f75-060c3055585b@redhat.com>
+ <4e331736-36f2-4796-945f-613279329585@lunn.ch>
+ <7e6bf69b-0916-4ad9-b42f-8645f5c95d5d@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500001.china.huawei.com (7.191.163.213) To
- frapeml500008.china.huawei.com (7.182.85.71)
-
-On Mon, 14 Apr 2025 16:13:18 +0100
-alejandro.lucero-palau@amd.com wrote:
-
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> Type3 has some mandatory capabilities which are optional for Type2.
-> 
-> In order to support same register/capability discovery code for both
-> types, avoid any assumption about what capabilities should be there, and
-> export the capabilities found for the caller doing the capabilities
-> check based on the expected ones.
-> 
-> Add a function for facilitating the report of capabiities missing the
-> expected ones.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-Hi Alejandro.
-
-A request if we end up with a v14 - please add notes on what changed
-in each patch. It's really handy for reviewers to tell which patches
-they need to take another look at.   More info that we get from
-absence of our own tags!
-
-One minor thing inline. 
-
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="2OKUgsrCAQgxlv5y"
+Content-Disposition: inline
+In-Reply-To: <7e6bf69b-0916-4ad9-b42f-8645f5c95d5d@redhat.com>
 
 
-> diff --git a/drivers/cxl/pci.c b/drivers/cxl/pci.c
-> index 0996e228b26a..7d94e81b2e3b 100644
-> --- a/drivers/cxl/pci.c
-> +++ b/drivers/cxl/pci.c
-> @@ -836,6 +836,8 @@ static int cxl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  {
->  	struct pci_host_bridge *host_bridge = pci_find_host_bridge(pdev->bus);
->  	struct cxl_dpa_info range_info = { 0 };
-> +	DECLARE_BITMAP(expected, CXL_MAX_CAPS);
-Trivial but can do
-	DECLARE_BITMAP(expected, CXL_MAX_CAPS) = {};
-to avoid need for the zeroing below.
+--2OKUgsrCAQgxlv5y
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> +	DECLARE_BITMAP(found, CXL_MAX_CAPS);
->  	struct cxl_memdev_state *mds;
->  	struct cxl_dev_state *cxlds;
->  	struct cxl_register_map map;
-> @@ -871,7 +873,19 @@ static int cxl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  
->  	cxlds->rcd = is_cxl_restricted(pdev);
->  
-> -	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_MEMDEV, &map);
-> +	bitmap_zero(expected, CXL_MAX_CAPS);
-> +	bitmap_zero(found, CXL_MAX_CAPS);
-> +
-> +	/*
-> +	 * These are the mandatory capabilities for a Type3 device.
-> +	 * Only checking capabilities used by current Linux drivers.
-> +	 */
-> +	set_bit(CXL_DEV_CAP_HDM, expected);
-> +	set_bit(CXL_DEV_CAP_DEV_STATUS, expected);
-> +	set_bit(CXL_DEV_CAP_MAILBOX_PRIMARY, expected);
-> +	set_bit(CXL_DEV_CAP_MEMDEV, expected);
-> +
+On Fri, Apr 11, 2025 at 11:56:15AM +0200, Ivan Vecera wrote:
+>=20
+>=20
+> On 10. 04. 25 11:12 odp., Andrew Lunn wrote:
+> > On Thu, Apr 10, 2025 at 08:33:31PM +0200, Ivan Vecera wrote:
+> > >=20
+> > >=20
+> > > On 10. 04. 25 7:36 odp., Andrew Lunn wrote:
+> > > > > Prathosh, could you please bring more light on this?
+> > > > >=20
+> > > > > > Just to clarify, the original driver was written specifically w=
+ith 2-channel
+> > > > > > chips in mind (ZL30732) with 10 input and 20 outputs, which led=
+ to some confusion of using zl3073x as compatible.
+> > > > > > However, the final version of the driver will support the entir=
+e ZL3073x family
+> > > > > > ZL30731 to ZL30735 and some subset of ZL30732 like ZL80732 etc
+> > > > > > ensuring compatibility across all variants.
+> > > >=20
+> > > > Hi Prathosh
+> > > >=20
+> > > > Your email quoting is very odd, i nearly missed this reply.
+> > > >=20
+> > > > Does the device itself have an ID register? If you know you have
+> > > > something in the range ZL30731 to ZL30735, you can ask the hardware
+> > > > what it is, and the driver then does not need any additional
+> > > > information from DT, it can hard code it all based on the ID in the
+> > > > register?
+> > > >=20
+> > > > 	Andrew
+> > > >=20
+> > > Hi Andrew,
+> > > yes there is ID register that identifies the ID. But what compatible =
+should
+> > > be used?
+> > >=20
+> > > microchip,zl3073x was rejected as wildcard and we should use all
+> > > compatibles.
+> >=20
+> > You have two choices really:
+> >=20
+> > 1) You list each device with its own compatible, because they are in
+> > fact not compatible. You need to handle each one different, they have
+> > different DT properties, etc. If you do that, please validate the ID
+> > register against the compatible and return -ENODEV if they don't
+> > match.
+> >=20
+> > 2) You say the devices are compatible. So the DT compatible just
+> > indicates the family, enough information for the driver to go find the
+> > ID register. This does however require the binding is the same for all
+> > devices. You cannot have one family member listing 10 inputs in its
+> > binding, and another family member listing 20.
+> >=20
+> > If you say your devices are incompatible, and list lots of
+> > compatibles, you can then use constraints in the yaml, based on the
+> > compatible, to limit each family member to what it supports.
+> >=20
+> > My guess is, you are going to take the first route.
+>=20
+> Yes, this looks reasonable... in this case should I use
+> microchip,zl3073x.yaml like e.g. gpio/gpio-pca95xx.yaml?
 
+No, please pick one of the compatibles in the file and name the same as
+one of those.
 
+--2OKUgsrCAQgxlv5y
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
 
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZ/1DrQAKCRB4tDGHoIJi
+0tgQAQDiMG2LA+SQ4PGFUrDaU4IzQmjpflF0phs6a37CN+1gnwEA/FHtd04YGCSz
+Oc9nrC2QJLVRLTQhkJ6c3IA9ypnSrwU=
+=DfiI
+-----END PGP SIGNATURE-----
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+--2OKUgsrCAQgxlv5y--
 
