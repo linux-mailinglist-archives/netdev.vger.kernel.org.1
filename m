@@ -1,190 +1,173 @@
-Return-Path: <netdev+bounces-182496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBF97A88DD1
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 23:30:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DC73A88DD3
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 23:33:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30C75188B198
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 21:30:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F2073B3B9E
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 21:33:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944E01CAA6D;
-	Mon, 14 Apr 2025 21:30:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D615C1CCEC8;
+	Mon, 14 Apr 2025 21:33:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="k3GXTEYj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hikp9ZJL"
 X-Original-To: netdev@vger.kernel.org
-Received: from AS8PR03CU001.outbound.protection.outlook.com (mail-westeuropeazon11012058.outbound.protection.outlook.com [52.101.71.58])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD51C42AA1
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 21:30:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.71.58
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744666235; cv=fail; b=dG9ZJkRoMHtu2cYHw5UBOBmDVT6sFqhHVEeDbBptDV4TeplEJyEYbR6rbuSGxsh3++sAoeRPGc0Zv+ewyWnJdOW+pvPzX/8a5HS/f2CKVkzt4p7QHY+g1Yc+RSasLAD21HOQE/IAyqsUvLBEVmcCwPs1JXAh3pffd3mAxE2y77k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744666235; c=relaxed/simple;
-	bh=LwPmkarIqCeuJ0u/lSgoqedMR64xagBFGNv35G7siqM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=EjeWXjmEehPCsnW00i2bXd1AUPpptP426mUvPoOSvxJWWwMW0am5+JBJkN9RhdOcRkxzAfRsvLqE4yIp/bAdnhfdbyWXfK12D0MZjC0A6aX2tJ2Ka/rlFFyNxP3vPsr6ge1k/sRHIAXu5wVZEy9gCICUF2SOQJ+Y+MYxCby4/YE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=k3GXTEYj; arc=fail smtp.client-ip=52.101.71.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZhhSvmd7WqDCusyooQZ6w3uesFvzYz6zB+seQ9u1Ht02ivblSQxlsh/kdGvyiIMUEQXt0z0bUhhfm9EaO+71QLrWPLjl5o9YgxGhbNnsZDgwIbO0cGFYztDycgq9aBcRcMMhEi67CZZbDMwCImijDywOQDXXc71B0XqR0ljc0QJKceHdzw1AP1GBkTf0g3oRa91x8/nojSnJ2fm4PZ91TUfpQw2eOt8les9sZKZ7CVMmHgamVgvs7yBxiY3edSjCgpeayDMM2wLC1ZSZixrTdrJFS8BlI8yZHTpFEcRk9Y80kp2Jn9cUSY9dPFvlzx1D+HLlUM2cYioX4L3ZZrQknA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SXk4yr+bsvlLKcEgegy3pjIFJfKqDJ9YW1caL05I+Y0=;
- b=V3D3zvx66+Ztcy2TU+NYG8piXnhAscz7sws3yAAzS57k55u7QdfkKjaFI9yaVUXPfV7Uc5FJwzUlrRaY4MB60jJSwrnXRpV2Y0BomzY2y295SkWVBXB0SaRbkPOnPE5/TPiF+WrgmbLBHCl4BlEwzcdRu/xFkXf17+UTmY3SDYJUaff/SeqFOH29aa7uOCVJUwWaUDZwabLHYfEjH03r0CCS+j97fNJ4vEvJ+80Hevq5nG2AQbjUiICNOpzCbzWRKW0hpRLTr3Q3WfSmXm9M1JMC2kBlOf/ijNf4BSxPrLG5fHt+LdlKnlVNrG3msILv4AUs1/YfpPIBta/JX/Gmrw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SXk4yr+bsvlLKcEgegy3pjIFJfKqDJ9YW1caL05I+Y0=;
- b=k3GXTEYjRshlgb2HH7WP0zpfWxmbHTSd0wccQ+pJAyL5p1VEhMSC5kRB1/hCK5aIssgE8+aglQfqgCnsZiNBrpsUT2qOgrTg9i+SeXFYTZdahtR5sRm2I5xBqihUEOYOdOgU9iYzEZ/gNA/y4n4qbzhCEjYNtTIQzA9PiAqYOtkHxXvSmvld8fUKLEltLz59ED1Ssnm/f4QBoO/4gM6bpfQNlqwehnBSGX5/s/C3S7PggvlprzBnIRtAw2U6BRzRv2pPv4nVOGgn0T7HjbBeiPxFrSFmBPdI89Q0XR0NIJkCgvf2DS2Brg98+wuJg/6Qq4pRUoqPw7tYvB/ukipJSQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by AS4PR04MB9506.eurprd04.prod.outlook.com (2603:10a6:20b:4c9::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.34; Mon, 14 Apr
- 2025 21:30:31 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%4]) with mapi id 15.20.8632.035; Mon, 14 Apr 2025
- 21:30:31 +0000
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Russell King <linux@armlinux.org.uk>,
-	Tobias Waldekranz <tobias@waldekranz.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net 5/5] net: dsa: avoid refcount warnings when ds->ops->tag_8021q_vlan_del() fails
-Date: Tue, 15 Apr 2025 00:30:20 +0300
-Message-ID: <20250414213020.2959021-1-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250414212708.2948164-1-vladimir.oltean@nxp.com>
-References: <20250414212708.2948164-1-vladimir.oltean@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: VI1PR04CA0136.eurprd04.prod.outlook.com
- (2603:10a6:803:f0::34) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB5419995D
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 21:33:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744666415; cv=none; b=SWafCjHP19JIsvdEks1207Dn2g9nNqYamxGkD0+m5gvuJFlOA4aoeHc+vRuK2nVFDLHgUIiQYl5uRMSc4aFaKwTvmZPt1LBd0Kdt5TZAiXsR5Rr3cfJEwpdjlNBqf+rLHwuLAqDNO87o3chyi+0sqt70AcaluCp5Dbfj/OSPwRo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744666415; c=relaxed/simple;
+	bh=sPrJpBEyZXVTEk+LVLFLXo0MtquKsXP3NkMAg0bkd9A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aGRNWyKA9HdeiVyImTe6FXGwgLi6dccNVt1OEghvparseRMiGpusQ2I7ojyCfCRkv6fieQVDJrwoZgLWxxHtP5SR5TwXCzX3mVtan9KYPvT1kZNwuyQlAp2ZseYtwOq/GfgncvTgMmNRkKJgSwA4DOsj9GljcG1Ajk8bcDwCxZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hikp9ZJL; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3913b539aabso2894102f8f.2
+        for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 14:33:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744666412; x=1745271212; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Gsv7Vj6x1hszdqAaptXmFjZ3eGC452SY1cG8kKbwzqA=;
+        b=Hikp9ZJLmfF9xfO7Q4zn7CwEUhFAMHteUrCdpxrZ/uB2dR639x/950tWmo4oPc4OHi
+         VmOd4kIu1fwsL/u6F6p+hbWDfkkhVErh9AeW3BZModwE3+lCw3GoDDnqH5rwpt8dLsBC
+         Fr9j/2dbXuUGP4qkZkt4qfnzFuc2+NTJqKKm79amzfO/d4+CHTNnL9I7eXsj6WSsxwTh
+         PXxhs5sEb5WktKyOPCDB7JdRikCy269O8xk+cvNqYy4DZ7lwGPYwKrSnoTG3VK5k7lCE
+         Pw9Ihzis9mQqshGftYw2fvVe4sNgQJpRVybdh1Nf1lsBi0BpvlxLZC4j6bTzFFXVnwal
+         FNRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744666412; x=1745271212;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Gsv7Vj6x1hszdqAaptXmFjZ3eGC452SY1cG8kKbwzqA=;
+        b=cJoMtk2tmt+490ZYzNJ6lBTpXfXzfVpfjtLVtPyGNuVaRTIEJwMZ57xQrLFnUFw3Zp
+         6ztlgAQbSQNI4FsIH32V7TytFOFVQg01E6Lzf2XTySGvkGmj8jhBesFugoT7LI/LkJxp
+         Drkdjqx2rx+QfMY4lDbOH+MEzutSRrQiPyptV/NRFb+giNnVZmiTjIcTnVlQ1mO5ctfG
+         +UZ+0sMwIRfy0KrMtovgRHspHbrKdGFDICMUPUh4egO0ngC12k9SXubQohFBDikaBNdj
+         23FnJ9pk1w56G1RNG+wC321Qny1kpzOpOi30keulBaIWTubC9Ryy0fZbImhDO9SjwX07
+         ceBA==
+X-Forwarded-Encrypted: i=1; AJvYcCXTRIkiQVXflKIBGnYCQOIAy+inn4ZjT3QlenG5dr0Y2cweU0u9xr5CZ4sBBRCWTCb5ju9KH6k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvE3ORfwsWK9vyOHHTz2I4YO1QyiBer3lXJkGpd9t5U3bRMwzC
+	7VZijScFAwh5B8Voz4EUxBLgYPHODDH57Cgk7H3qgHtO+SF+PHxU
+X-Gm-Gg: ASbGncuNhjBwlj0mx0RRf0+AB9sQjTT5Qr2fYaNI6cpqk8Zjqj9hB9YoYH35nbGHvcS
+	rvf6zJlqkebUEYprpQhuM8DyfcqitZ2mdSSPka0L1K2A94uTZdWt66jNWcCoF/I35JWCMnmLaCh
+	8t/Svr+CIzAYeyAR0tZco2p8v7+h0JWfXVYqvdzu0e5tbdPxCScKNqrFd05Fi37hcc7WvXI/O9Q
+	j0guCkj8BMATpBgy1VSPbkAlMepakIMPiE+rQsL3SLWiwYzjUK+GEDZfBM5TnAHAF0jHSibpVjM
+	uNYix6vt8csB/w0fH8SMyVCklCA1pu3bx/oVuagmhi8F
+X-Google-Smtp-Source: AGHT+IF9PZ1+AciwteorV5KNKkphW30Nb75VSmGtj4uPBtknJQ9VWyba3hDGvXABHogN+jUzRQS5fg==
+X-Received: by 2002:a05:6000:2282:b0:391:1806:e23f with SMTP id ffacd0b85a97d-39ea51f5c52mr11235058f8f.17.1744666411977;
+        Mon, 14 Apr 2025 14:33:31 -0700 (PDT)
+Received: from [192.168.0.2] ([212.50.121.5])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eaf43cb29sm12080988f8f.76.2025.04.14.14.33.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Apr 2025 14:33:31 -0700 (PDT)
+Message-ID: <0e061258-b7d1-47ca-b0d2-5e8a815136af@gmail.com>
+Date: Tue, 15 Apr 2025 00:34:02 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|AS4PR04MB9506:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9a7f28b0-87e6-45c7-63e6-08dd7b9b9546
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|52116014|376014|1800799024|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?R8cKev8xr95ZIVC6YvWEcMXn01MzBXyFEmrzb1HkszsK56rC/WorEdnPuxe+?=
- =?us-ascii?Q?aa0LaHFI49XCvYo6ZZ678LOkn5equrx+LmkcVkWDPD0yZkS4nWJGkogWkjMr?=
- =?us-ascii?Q?uM/ZdnKdxgWFI4izCwbjpx+YWcwcoNg1hDU7u+h5u/+eRnUNTsGW2Js3zOs7?=
- =?us-ascii?Q?4IQBxa/S73zlIH2H4YcaWsbZoNfKF0zY1MtpwOWV3EIsu8QQb+FyTqRDj4m6?=
- =?us-ascii?Q?cdZnT+r+nISAN/qRBEaEEBjEdGAa6k+uaSRs53kuTSQ45HcoJxj4LrmXxaKy?=
- =?us-ascii?Q?YVmVIj5W5CcmmqgZcDQ9AVn3xObQjPaF7D4mmm06KLXgP/8VmQAUmNHlJuwK?=
- =?us-ascii?Q?vXcth26KEjM/QhIHsyMxZQAk3qsQomOWY6TSf+G45UmXJD3Eykqxg55LIoTH?=
- =?us-ascii?Q?+9ZiXlHaYkKiYdM7mU0GeiBVwuZKsJN3qlCTFKWPNzJ/o/EoRtwLkNGl8+bu?=
- =?us-ascii?Q?mj4W1cLH/Pl2lGzClsn2e6CsXxHzdbOdNu67jHaeBjxQLczW3t3jhAe6cuvD?=
- =?us-ascii?Q?ZHQdsm+GXXfyEZj69qyOFVusAN+10AjZbQQnfwq7AHFe6WRSVB74d6KyoMXp?=
- =?us-ascii?Q?lVBIR9NIcKaQvd781PN6bFEYMlZsN8vHrf1FQYwFj04VFGwKv2djK0fEEdv2?=
- =?us-ascii?Q?4EzmAVhdKwhajpH//50QYP56yDPLKy4wb0MDRGb0xZRq4yU12pon49SOjGr1?=
- =?us-ascii?Q?6Cheu0MfjqnJ7YKLNrH7Vps4ct7chwkJfedxLyMC9vFzB7XZ76RTz/Kl6qc1?=
- =?us-ascii?Q?wBHH+iaIL+oSRLZg/iaKYgwwgxbOIQZPbBAed88hHC0z6P4Ttu3+UW5oOAPb?=
- =?us-ascii?Q?VPAceoooNhkIu+lMicyRN5MTzrXOvqDf/aotI4ggzKGJxDsgaZsQ6SXz6s/E?=
- =?us-ascii?Q?Nc0S7l/DultSLb1CvnuP+vdk4DZ7CiWJzgLqdYqy3VvA08gMTuFFv6mH2GVu?=
- =?us-ascii?Q?c6BGBuXqj/x9RkOfaIO7vTVppNBTd6VSoQBPtbXbv+mOUoZgxLgxRECFaAsw?=
- =?us-ascii?Q?W+SwAe9bhDXXshr25PfYuILwNspi9EKZ5TWO0JFOgrRuI/ZXKuaBr9X1pLwd?=
- =?us-ascii?Q?FP+DyNX0DvcH0c5FlSewakqxstPErc5+ES9f+60FuVQK7v8yZdpQa2M2Tcy8?=
- =?us-ascii?Q?sy/yjnMKz0/D48qr+dSlqqovFnBdWrS9/j6s+X3hxd/0Plh7jlGL9GfhnWJu?=
- =?us-ascii?Q?FTL5Eu1TeMzEHfgYwqBcp24TeeYbpHEDsRV+pbsjkm95z7Syp/sMpV1g2xcC?=
- =?us-ascii?Q?0W/JYOaZQjHVTOtxHVb8HoC2xoIpU/rtAOIYd6sOHgKHW4xp8Lmp/7AhpXzQ?=
- =?us-ascii?Q?8SZgVrrOXfhnauMGpwU5LOqWAm4hj2bJmCRIfwCaJAZ0rRoU4wDGC2I8Z0Dn?=
- =?us-ascii?Q?5usB59RXqS00NZJ6fjN2xPV+8MB+w15NEXO2KxCZwTEpfxgf4xAn2AwDCJRA?=
- =?us-ascii?Q?g38VFQXYFA3a+Xj4pFSP0PVpHJSYTc4DiSKrbAXbZwcMqVePKnXsNQ=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(52116014)(376014)(1800799024)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?nlaKGfND5+gmn79gvfDCDTllbF15QJ3llQBEBKcIaE40Q1Ga/ChT59z32BT/?=
- =?us-ascii?Q?xrh5qHzYLPAbjmJqRGasYfwc9oKjs2kt/+joDn8p1rh1FO/yswfbAnfCKpVK?=
- =?us-ascii?Q?I0AwSXhbnnMM2gybisio7kCoiYhLvus25Mz+hICm+fC3mlkccdwpiPQpLTBl?=
- =?us-ascii?Q?AaTqgDGsXuddqKLL2xFYGNFF3Y41mgx/V1I+ZoaXEq5iVCc87WmnyoQmkPqu?=
- =?us-ascii?Q?jPBeJ04ctswYlR8s3OzMYALhfeR+C2ob4Gy2jcptR/tGThfQJfR460x3ZlMC?=
- =?us-ascii?Q?QCnfYzne8QVmnuB066Y5KrIIY4V0DnmHjKIJ88M5u7wcepGIsYdLpu7sG/V+?=
- =?us-ascii?Q?0p1HNBg9wAKRtal85VMR1se64TN+cQlYfqdbqIYoSjWSssDiey9q4EMbyf+O?=
- =?us-ascii?Q?R6+lR/WEcK8FdbHsj6nP2Y19EFuV0thLKB0Mx1BCUUd5d/92ZnVkmPlg/RSA?=
- =?us-ascii?Q?CTmcH4HZF6T/MznsnpcEEzijnmWn0mH50e3V4+W6QpX4AmhwsNPs1j59wkga?=
- =?us-ascii?Q?KirmEPQVIf1GEaYwLnaRgszp+0V2OFrgiL4kK2Hak7hvEdenoTeF06FpYbHv?=
- =?us-ascii?Q?0aYscOLLsh78/M+e0eEmw3dtXvzvh8r5Peodfa9NEjh0uTIEBz66rEbAqsZ4?=
- =?us-ascii?Q?kHD7B8DOGaafIqZCSlbXkGy09Jh4/bNPe6W+6GUxd0ZoChr1djGA8n7S7m0n?=
- =?us-ascii?Q?nEft5aoU1YHoT2ck/ANJx0doNPoZsTOWTp2aJ2tiJbK5/8HbJfKchEMPUrUu?=
- =?us-ascii?Q?m4dj4DSggkzyx7arZW1YK96s7fJrDU/GwtfeUTsuXn9TJcX5h35SLrSwQA2x?=
- =?us-ascii?Q?69saqSXm6Aj1da7+y3VXcXgOCLNY94KQ6MI7exFKbJis3wyl9kd2HLGRk9A7?=
- =?us-ascii?Q?Bu/4wiDD0rHRE4dqC7FMQGncRyvTKgQyIh3qBsnJtvjKg9DJvRtAWpvw2a+E?=
- =?us-ascii?Q?EoYtzJJKNNuIe5s3NEIFYGioyyW3T3/2CDG+dsuIZRgmlDxQEmbvPz0zRS3X?=
- =?us-ascii?Q?Wts8iJkowp6u6JD7TVG+//eb0lE+rJwkbbkUE8mh8HYFcThj5bcpNVoUf0pi?=
- =?us-ascii?Q?txIdp1btQD+cVfd8WqBLBxFGrC87GDxsDDZPP1g12XJK1mLdpSLVRYKJy9Ar?=
- =?us-ascii?Q?O7KMeri+mTxoUQdYIU7ZU1ZyFS49mCkT+FmdCu9Is1/M1UYjNlLjppoQIizj?=
- =?us-ascii?Q?8LoXgaA726ahB4LKE2rI6KhzAZzAub0dXnZ6IA92uhgNaz9w5aofZVUEZoTS?=
- =?us-ascii?Q?wzFscQsC1sKAfKIDQFJEvI2DTAKxp/3AGHYltzNq+2rMKq1ZHRRD/m7YQ0XH?=
- =?us-ascii?Q?GTP6QDvfPiAbfXFK7dsMOiMrmw7U15qsNJX5y8Nl+zDaQP3FDduO5HRK1Lwl?=
- =?us-ascii?Q?OaZZr4N4w8adS9gcpfflDhBqGU4lhtsgS+ekiv/duuVogsVx2HtmTf2WNoH+?=
- =?us-ascii?Q?kqBk3Y+CzVpiu3+XFOR0ZeWoukoMJNxaT4NIHvyPaTsLsT+HJ5Uy57JwPvU6?=
- =?us-ascii?Q?yWTFgncmkFJz5gtr2RjnV8UBjJ8iORH3xisM38ZnlBy+B1ZSzN0YGeneu/3G?=
- =?us-ascii?Q?SHN4bV39R4SCAJjbqSbHnXiq2zvMKNubSXyXjhJY6JNmuyDewlAaIJnIhbiZ?=
- =?us-ascii?Q?rw=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9a7f28b0-87e6-45c7-63e6-08dd7b9b9546
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2025 21:30:31.3118
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2pctQFOmtjBm75g07ejaOakpDWw48ofvFbTUBr51bno0fiZgaTB2zdWkXFNxMueIHUaYr9wvrlqFrSQJarmujA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR04MB9506
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 3/6] net: wwan: core: split port unregister and stop
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+References: <20250408233118.21452-1-ryazanov.s.a@gmail.com>
+ <20250408233118.21452-4-ryazanov.s.a@gmail.com>
+ <CAFEp6-2MxMohojOeSPzcuP_Fs0fps1EBGHKGcoHSUt+9fMLqJQ@mail.gmail.com>
+Content-Language: en-US
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <CAFEp6-2MxMohojOeSPzcuP_Fs0fps1EBGHKGcoHSUt+9fMLqJQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-This is very similar to the problem and solution from commit
-232deb3f9567 ("net: dsa: avoid refcount warnings when
-->port_{fdb,mdb}_del returns error"), except for the
-dsa_port_do_tag_8021q_vlan_del() operation.
+On 14.04.2025 21:54, Loic Poulain wrote:
+> On Wed, Apr 9, 2025 at 1:31 AM Sergey Ryazanov <ryazanov.s.a@gmail.com> wrote:
+>>
+>> Upcoming GNSS (NMEA) port type support requires exporting it via the
+>> GNSS subsystem. On another hand, we still need to do basic WWAN core
+>> work: call the port stop operation, purge queues, release the parent
+>> WWAN device, etc. To reuse as much code as possible, split the port
+>> unregistering function into the deregistration of a regular WWAN port
+>> device, and the common port tearing down code.
+>>
+>> Signed-off-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+>> ---
+>>   drivers/net/wwan/wwan_core.c | 21 ++++++++++++++++-----
+>>   1 file changed, 16 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/drivers/net/wwan/wwan_core.c b/drivers/net/wwan/wwan_core.c
+>> index 045246d7cd50..439a57bc2b9c 100644
+>> --- a/drivers/net/wwan/wwan_core.c
+>> +++ b/drivers/net/wwan/wwan_core.c
+>> @@ -486,6 +486,18 @@ static int wwan_port_register_wwan(struct wwan_port *port)
+>>          return 0;
+>>   }
+>>
+>> +/* Unregister regular WWAN port (e.g. AT, MBIM, etc) */
+>> +static void wwan_port_unregister_wwan(struct wwan_port *port)
+> 
+> Wouldn't it be simpler to name it  `wwan_port_unregister` ?
 
-Fixes: c64b9c05045a ("net: dsa: tag_8021q: add proper cross-chip notifier support")
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
- net/dsa/tag_8021q.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I came with this complex name for a symmetry purpose. The next patch 
+going to introduce wwan_port_unregister_gnss() handler.
 
-diff --git a/net/dsa/tag_8021q.c b/net/dsa/tag_8021q.c
-index 3ee53e28ec2e..53e03fd8071b 100644
---- a/net/dsa/tag_8021q.c
-+++ b/net/dsa/tag_8021q.c
-@@ -197,7 +197,7 @@ static int dsa_port_do_tag_8021q_vlan_del(struct dsa_port *dp, u16 vid)
- 
- 	err = ds->ops->tag_8021q_vlan_del(ds, port, vid);
- 	if (err) {
--		refcount_inc(&v->refcount);
-+		refcount_set(&v->refcount, 1);
- 		return err;
- 	}
- 
--- 
-2.43.0
+The prefix indicates the module and the suffix indicates the type of the 
+unregistering port.
+
+>> +{
+>> +       struct wwan_device *wwandev = to_wwan_dev(port->dev.parent);
+>> +
+>> +       dev_set_drvdata(&port->dev, NULL);
+>> +
+>> +       dev_info(&wwandev->dev, "port %s disconnected\n", dev_name(&port->dev));
+>> +
+>> +       device_unregister(&port->dev);
+>> +}
+>> +
+>>   struct wwan_port *wwan_create_port(struct device *parent,
+>>                                     enum wwan_port_type type,
+>>                                     const struct wwan_port_ops *ops,
+>> @@ -542,18 +554,17 @@ void wwan_remove_port(struct wwan_port *port)
+>>          struct wwan_device *wwandev = to_wwan_dev(port->dev.parent);
+>>
+>>          mutex_lock(&port->ops_lock);
+>> -       if (port->start_count)
+>> +       if (port->start_count) {
+>>                  port->ops->stop(port);
+>> +               port->start_count = 0;
+>> +       }
+>>          port->ops = NULL; /* Prevent any new port operations (e.g. from fops) */
+>>          mutex_unlock(&port->ops_lock);
+>>
+>>          wake_up_interruptible(&port->waitqueue);
+>> -
+>>          skb_queue_purge(&port->rxq);
+>> -       dev_set_drvdata(&port->dev, NULL);
+>>
+>> -       dev_info(&wwandev->dev, "port %s disconnected\n", dev_name(&port->dev));
+>> -       device_unregister(&port->dev);
+>> +       wwan_port_unregister_wwan(port);
+>>
+>>          /* Release related wwan device */
+>>          wwan_remove_dev(wwandev);
+>> --
+>> 2.45.3
+>>
 
 
