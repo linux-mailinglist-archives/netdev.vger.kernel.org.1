@@ -1,221 +1,105 @@
-Return-Path: <netdev+bounces-182420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94ABBA88AED
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 20:21:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF343A88ADC
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 20:15:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C65D3189904E
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:21:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9767B1746F3
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:15:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7205D288C94;
-	Mon, 14 Apr 2025 18:21:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC19B28B50C;
+	Mon, 14 Apr 2025 18:15:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="LpQ3IKQ9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fGO+gefx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B62E2DFA4D
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:21:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC0F428466C;
+	Mon, 14 Apr 2025 18:15:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744654873; cv=none; b=uHxlWm4W0nWfRHjJD+vSCKIhwILmk8lRE5Ecl6+CqLDop1873NP6qRXlsH4r5H6X08u0xR7iyzGxVhUHgeidu77MTfyB5pKFsmCjash0ga9FKk+nut+xyVxgXEGLdGWoWrdU7wgrKKJxkcIfUufCgbZ2K6QAUboV2AXJwZ8GwXA=
+	t=1744654538; cv=none; b=YdwZhEj0LowFLKNiPmJuUTwSTb+XGhAYcB3FjGEpoNt9PQBwpSjXUQmOeYEK2vwRs76LpJj60Uu1tM+9zUscVd5F47zsC4zj1omuFsm3/rKqGZCODL+RdxRrVqzGb6CWAuEpxM6NMsuLzguUPJMTO5qs0ydXH/HDd0FbUyQvXK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744654873; c=relaxed/simple;
-	bh=lkfx4wEUBDtgGmfx40gFypPYhkAcypCC2TieschWJKA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hzRp4mcMWg0mbFs5Y4JDmVOmDjJQnye/seoOvLCKxXxWjpOjg58rUjqiMZYd5L6Vot3bsuQivnPY/s1+OD7zwIvdN/LNTv241G8+O5/SqPdumWv5iXB96XVaoY9ObPW9Kgzv1NRPwoxE8GJtpSPlTGp7pztMwhmFtPy6OpPo3xQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=LpQ3IKQ9; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1744654872; x=1776190872;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=/OahKHp4RzMtryuDF5g+wSvmQOb/zOm0amXNribpGvI=;
-  b=LpQ3IKQ9R4Rt8rK55uFtuWUZI2mIYzd4HyH21er09nC1VYVwNFDKC4ah
-   FFB7J5yaAdbHJbWZoeddIfkLOm2cNcRAWVBdovzFoU38Wtq+EW7ueprPF
-   yRu/iuIBq9/b2P/aFTjIxoZ4DlhtJtZ+lGbj+u7w9kFBO8burATLL3duc
-   s=;
-X-IronPort-AV: E=Sophos;i="6.15,212,1739836800"; 
-   d="scan'208";a="288349837"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2025 18:21:10 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:28340]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.21.195:2525] with esmtp (Farcaster)
- id ed000482-c344-4ee1-99ff-7917231b8019; Mon, 14 Apr 2025 18:21:09 +0000 (UTC)
-X-Farcaster-Flow-ID: ed000482-c344-4ee1-99ff-7917231b8019
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 14 Apr 2025 18:21:07 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.187.170.39) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 14 Apr 2025 18:21:05 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>
-CC: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH RESEND v2 net-next 14/14] ipv6: Get rid of RTNL for SIOCADDRT and RTM_NEWROUTE.
-Date: Mon, 14 Apr 2025 11:15:02 -0700
-Message-ID: <20250414181516.28391-15-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250414181516.28391-1-kuniyu@amazon.com>
-References: <20250414181516.28391-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1744654538; c=relaxed/simple;
+	bh=PAL6Fdin15ZsYYISJz3KRiYem+ZfqDMCAM39+28DJTo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=t7Tky3D9P1XpOaCHgfy3EMDH/2eSBynIw8OjoY+dpdXwS1hsiNr1C0X8OCaHYBCv77Grv/w6opL3fKBH6fqJ/t4Bpkfl/1/Ahx7svLoARafNmG4AErBeCDw3PRGzQihvvBCd97Ve/Qz9RZPbILJdsY/CLlESmGP5gAHrC+TV2vs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fGO+gefx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCA19C4CEE5;
+	Mon, 14 Apr 2025 18:15:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744654538;
+	bh=PAL6Fdin15ZsYYISJz3KRiYem+ZfqDMCAM39+28DJTo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fGO+gefxTykAXxVmbAHAthGqtbgISn4JDy/pM0b8+8AyL3wLnIhk2GD1mIZlQm63f
+	 dqZmW8HUF2e0w+jLqKhYMx0JbmmMVMbRgcG2Lp3mitSKf6m+PU0ZQswcTaa/zIViMt
+	 EZXpUTpbafzYFQ7yaSS/UcUliHk40EdzjrjBsd5+kRPG5e3jmh0QacAngkkQsdWry8
+	 6eA2F9LlY9+KFnLpIlytULgk8ERUdndF08myN9I1Gag1TNHA7Sfaek7nphUqu3XT53
+	 Lhd3yF7zdPH5ujaFL0m7lTCu5pueZzHD090IcCaba1xiIwrACtlZ50b5KmwKvKS8cn
+	 3nlTnx8u5Fjtg==
+Date: Mon, 14 Apr 2025 11:15:36 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: <cratiu@nvidia.com>, <davem@davemloft.net>, <edumazet@google.com>,
+ <horms@kernel.org>, <linux-kernel@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@fomichev.me>,
+ <syzbot+de1c7d68a10e3f123bdd@syzkaller.appspotmail.com>,
+ <syzkaller-bugs@googlegroups.com>
+Subject: Re: [syzbot] [net?] general protection fault in rtnl_create_link
+Message-ID: <20250414111536.6d6493f1@kernel.org>
+In-Reply-To: <20250414180257.24176-1-kuniyu@amazon.com>
+References: <20250414103727.0ea92049@kernel.org>
+	<20250414180257.24176-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D035UWA002.ant.amazon.com (10.13.139.60) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Now we are ready to remove RTNL from SIOCADDRT and RTM_NEWROUTE.
+On Mon, 14 Apr 2025 11:01:59 -0700 Kuniyuki Iwashima wrote:
+> From: Jakub Kicinski <kuba@kernel.org>
+> Date: Mon, 14 Apr 2025 10:37:27 -0700
+> > On Sun, 13 Apr 2025 19:30:46 -0700 Kuniyuki Iwashima wrote:  
+> > > diff --git a/include/net/netdev_lock.h b/include/net/netdev_lock.h
+> > > index 5706835a660c..270e157a4a79 100644
+> > > --- a/include/net/netdev_lock.h
+> > > +++ b/include/net/netdev_lock.h
+> > > @@ -30,7 +30,8 @@ static inline bool netdev_need_ops_lock(const struct net_device *dev)
+> > >  	bool ret = dev->request_ops_lock || !!dev->queue_mgmt_ops;
+> > >  
+> > >  #if IS_ENABLED(CONFIG_NET_SHAPER)
+> > > -	ret |= !!dev->netdev_ops->net_shaper_ops;
+> > > +	if (dev->netdev_ops)
+> > > +		ret |= !!dev->netdev_ops->net_shaper_ops;
+> > >  #endif  
+> > 
+> > This is a bit surprising, we pretty much never validate if dev has ops.
+> > 
+> > I think we're guaranteed that IFF_UP will not be set if we just
+> > allocated the device, so we can remove the locks in rtnl_create_link()
+> > and to double confirm add a netdev_ops_assert_locked_or_invisible() 
+> > in netif_state_change() ?  
+> 
+> Removing the lock from NEWLINK makes sense, but my concern
+> was NETDEV_CHANGE, which will requires more caution ?
+> 
+> commit 04efcee6ef8d0f01eef495db047e7216d6e6e38f
+> Author: Stanislav Fomichev <sdf@fomichev.me>
+> Date:   Fri Apr 4 09:11:22 2025 -0700
+> 
+>     net: hold instance lock during NETDEV_CHANGE
 
-The remaining things to do are
+How could we fire a notifier for a device that hasn't been initialized,
+let alone registered?
 
-  1. pass false to lwtunnel_valid_encap_type_attr()
-  2. use rcu_dereference_rtnl() in fib6_check_nexthop()
-  3. place rcu_read_lock() before ip6_route_info_create_nh().
-
-Let's complete the RTNL-free conversion.
-
-When each CPU-X adds 100000 routes on table-X in a batch
-concurrently on c7a.metal-48xl EC2 instance with 192 CPUs,
-
-without this series:
-
-  $ sudo ./route_test.sh
-  ...
-  added 19200000 routes (100000 routes * 192 tables).
-  time elapsed: 191577 milliseconds.
-
-with this series:
-
-  $ sudo ./route_test.sh
-  ...
-  added 19200000 routes (100000 routes * 192 tables).
-  time elapsed: 62854 milliseconds.
-
-I changed the number of routes in each table (1000 ~ 100000)
-and consistently saw it finish 3x faster with this series.
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/ipv4/nexthop.c |  4 ++--
- net/ipv6/route.c   | 18 ++++++++++++------
- 2 files changed, 14 insertions(+), 8 deletions(-)
-
-diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-index 5e47166512e2..329f33a2be51 100644
---- a/net/ipv4/nexthop.c
-+++ b/net/ipv4/nexthop.c
-@@ -1556,12 +1556,12 @@ int fib6_check_nexthop(struct nexthop *nh, struct fib6_config *cfg,
- 	if (nh->is_group) {
- 		struct nh_group *nhg;
- 
--		nhg = rtnl_dereference(nh->nh_grp);
-+		nhg = rcu_dereference_rtnl(nh->nh_grp);
- 		if (nhg->has_v4)
- 			goto no_v4_nh;
- 		is_fdb_nh = nhg->fdb_nh;
- 	} else {
--		nhi = rtnl_dereference(nh->nh_info);
-+		nhi = rcu_dereference_rtnl(nh->nh_info);
- 		if (nhi->family == AF_INET)
- 			goto no_v4_nh;
- 		is_fdb_nh = nhi->fdb_nh;
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index c026f8fe5f78..5ccbbfb68e3d 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -3902,12 +3902,16 @@ int ip6_route_add(struct fib6_config *cfg, gfp_t gfp_flags,
- 	if (IS_ERR(rt))
- 		return PTR_ERR(rt);
- 
-+	rcu_read_lock();
-+
- 	err = ip6_route_info_create_nh(rt, cfg, extack);
- 	if (err)
--		return err;
-+		goto unlock;
- 
- 	err = __ip6_ins_rt(rt, &cfg->fc_nlinfo, extack);
- 	fib6_info_release(rt);
-+unlock:
-+	rcu_read_unlock();
- 
- 	return err;
- }
-@@ -4528,12 +4532,10 @@ int ipv6_route_ioctl(struct net *net, unsigned int cmd, struct in6_rtmsg *rtmsg)
- 
- 	switch (cmd) {
- 	case SIOCADDRT:
--		rtnl_lock();
- 		/* Only do the default setting of fc_metric in route adding */
- 		if (cfg.fc_metric == 0)
- 			cfg.fc_metric = IP6_RT_PRIO_USER;
- 		err = ip6_route_add(&cfg, GFP_KERNEL, NULL);
--		rtnl_unlock();
- 		break;
- 	case SIOCDELRT:
- 		err = ip6_route_del(&cfg, NULL);
-@@ -5112,7 +5114,7 @@ static int rtm_to_fib6_multipath_config(struct fib6_config *cfg,
- 	} while (rtnh_ok(rtnh, remaining));
- 
- 	return lwtunnel_valid_encap_type_attr(cfg->fc_mp, cfg->fc_mp_len,
--					      extack, newroute);
-+					      extack, false);
- }
- 
- static int rtm_to_fib6_config(struct sk_buff *skb, struct nlmsghdr *nlh,
-@@ -5250,7 +5252,7 @@ static int rtm_to_fib6_config(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		cfg->fc_encap_type = nla_get_u16(tb[RTA_ENCAP_TYPE]);
- 
- 		err = lwtunnel_valid_encap_type(cfg->fc_encap_type,
--						extack, newroute);
-+						extack, false);
- 		if (err < 0)
- 			goto errout;
- 	}
-@@ -5517,6 +5519,8 @@ static int ip6_route_multipath_add(struct fib6_config *cfg,
- 	if (err)
- 		return err;
- 
-+	rcu_read_lock();
-+
- 	err = ip6_route_mpath_info_create_nh(&rt6_nh_list, extack);
- 	if (err)
- 		goto cleanup;
-@@ -5608,6 +5612,8 @@ static int ip6_route_multipath_add(struct fib6_config *cfg,
- 	}
- 
- cleanup:
-+	rcu_read_unlock();
-+
- 	list_for_each_entry_safe(nh, nh_safe, &rt6_nh_list, next) {
- 		fib6_info_release(nh->fib6_info);
- 		list_del(&nh->next);
-@@ -6890,7 +6896,7 @@ static void bpf_iter_unregister(void)
- 
- static const struct rtnl_msg_handler ip6_route_rtnl_msg_handlers[] __initconst_or_module = {
- 	{.owner = THIS_MODULE, .protocol = PF_INET6, .msgtype = RTM_NEWROUTE,
--	 .doit = inet6_rtm_newroute},
-+	 .doit = inet6_rtm_newroute, .flags = RTNL_FLAG_DOIT_UNLOCKED},
- 	{.owner = THIS_MODULE, .protocol = PF_INET6, .msgtype = RTM_DELROUTE,
- 	 .doit = inet6_rtm_delroute, .flags = RTNL_FLAG_DOIT_UNLOCKED},
- 	{.owner = THIS_MODULE, .protocol = PF_INET6, .msgtype = RTM_GETROUTE,
--- 
-2.49.0
-
+I'm hoping that the _or_invisible assert in my suggestion will flag to
+future developers trying to change netif_state_change() that the device
+here may not be fully constructed.
 
