@@ -1,144 +1,124 @@
-Return-Path: <netdev+bounces-182371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1341A8892E
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:59:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E926FA88931
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 19:00:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E00763A6990
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:58:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9CE73A2CF1
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C284B288C8F;
-	Mon, 14 Apr 2025 16:58:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B18B27B513;
+	Mon, 14 Apr 2025 17:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="OjIeHuD9"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="B965oPYh"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2FD27FD79;
-	Mon, 14 Apr 2025 16:58:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD5E27B4F8
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 16:59:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744649890; cv=none; b=uGDAWxwauVbPtDWFHAInPEI+EoKhn2dDhKxuizI/ZhB0xaXsQGHN6mgxjifOvpgKUrxFTskDSzio1w2FyLT7ysfIQ92lQbWO6wRgocd4J1HS0JpXW4QV3SCJbEEBwnFhxMoNJLO4gLgnTHyJTc0eDl6slmFybLC+it20KXTq8ow=
+	t=1744650001; cv=none; b=G4PzD8plgD/OYq7VF6QvyHMSizYh7DQST7qXNdfSH2eCp11qjn2Q/jgApYndUfwfXrD3NO8zQ8RikashvZ0kM87r8usD8Fe0IV3X0MDBfudQvrGFGmieu88sM0Q9BczxBV6XHPzN8+uiVjLudkpWc1Zl7P1zxoOBktg2SWTSHM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744649890; c=relaxed/simple;
-	bh=4hYhsz4kTt2pLX6PzDOVl8NRG0L8du4Knh7lEqCz75w=;
+	s=arc-20240116; t=1744650001; c=relaxed/simple;
+	bh=7+W/bBKIMa1dyTG3JW61Q2y4E76AiZlElKYKlW3Tal8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JAhVTFmQDk/QXG58AUaLiFRCo7nijxJ0FcW78FVROaIotEEsQDomOe4f7jyxG1EKf7WIquBgxl1Ju1N42DEi4h3CZa2YO5mpjVN+zYgVff1ZuuS+HzvnQLHOcp7V8dfjmld/l9uQiPdXxxX9+Bb/UAaTjCVyd9lYb4sytGz0+hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=OjIeHuD9; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=yZVRVFitHVYKh8lUFpDXz29jMQ4TVL55S2+Fg6L3zdM=; b=OjIeHuD93l2eyXtskX24h8WOtk
-	L0lAdRcCp2gO9pW7MVq+3mm1HqBIp0Qpome2851bjAZ/uO0U4rITvM2C13uYfxaq5jcMJlLhx46gb
-	CFyTcWeFOjvOWJuTu23KNEiGhH/TJiPjV2yV9bOq86Zto0+sQ5ACQ3wFcc0BXltuA+S6veUoXhKOZ
-	9givV4yMZuESfUKFgiHLB6mudZhFAdWPUxka2yklXXBHXCWKHWA1An3lhBuu1ogx0NNNbjgn0d+se
-	KNKSCbD+JBnwkWd7Lfk9p/Qv8HiRzUoOjhd8wKNXJCvd/DVerSJ2YlJT6Lz/j4YmfUNVhRMBuisF8
-	wlBiGAnw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35404)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u4N83-0006rx-0D;
-	Mon, 14 Apr 2025 17:57:51 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u4N7w-0007v6-0o;
-	Mon, 14 Apr 2025 17:57:44 +0100
-Date: Mon, 14 Apr 2025 17:57:44 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Prabhakar <prabhakar.csengg@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=BMH8xGZO0c9VtSxcPdiTMXGe9Nnf66GVGi45Aa7Ru3gfNyy/VkGrkkilU5xD9OZ7ntMQ5C5laPY+kI0oIYEUESHUoZfg8XZb0Jwx52zzzRcCu0SipChIK/Q/iH1mv/xv6UfhEyU+BPz8lpA5WOHzt8C2a7/TOu/w5nP9o2j0SVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=B965oPYh; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=5d5MDT5d07M+ebJOanarer1Ld3dS9fKE8f4h3PXifqg=; b=B965oPYhVuAQ3kwx
+	ED7iBhin8rXGdfYwnVdsBEYAuyriHYVWv27s+99wm0AxNEsZWRP/fzpfL90rWGhW5s4QS41oMjwH+
+	//GwC/JcErhxgeNtB9hZrXPGUGG7GcTbiFET18qQP983qDlUO8+Jme4EvYX4ihuYOyJH+j1FGE88a
+	q5VAKLwXxz2NuJGSSDlVAJnAd5ytflp1peLU3AK2EKcl3i/Rc3rkTvWvChNbw9Zx0r5mbY9Qq9ihI
+	tlYuZJADziVXB46kswxWVe5Q/yHpc2HcvCms1wNOmdYTbGMaef4ZpELDcMFFHFTlBcitZlMgtwa5D
+	pilvf1YaGUvbUIv9gA==;
+Received: from dg by mx.treblig.org with local (Exim 4.96)
+	(envelope-from <dg@treblig.org>)
+	id 1u4N9v-00BNau-1t;
+	Mon, 14 Apr 2025 16:59:47 +0000
+Date: Mon, 14 Apr 2025 16:59:47 +0000
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
+To: Simon Horman <horms@kernel.org>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-renesas-soc@vger.kernel.org,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH net-next v5 3/3] net: stmmac: Add DWMAC glue layer for
- Renesas GBETH
-Message-ID: <Z_0-iH91A4Sexlzj@shell.armlinux.org.uk>
-References: <20250407120317.127056-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250407120317.127056-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	Shinas Rasheed <srasheed@marvell.com>,
+	Veerasenareddy Burru <vburru@marvell.com>,
+	Sathesh Edara <sedara@marvell.com>,
+	Satananda Burla <sburla@marvell.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] octeon_ep_vf: Remove octep_vf_wq
+Message-ID: <Z_0_AyjQRT58dYIb@gallifrey>
+References: <20250414-octeon-wq-v1-1-23700e4bd208@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20250407120317.127056-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250414-octeon-wq-v1-1-23700e4bd208@kernel.org>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
+X-Uptime: 16:59:23 up 341 days,  4:13,  1 user,  load average: 0.04, 0.03,
+ 0.00
+User-Agent: Mutt/2.2.12 (2023-09-09)
 
-On Mon, Apr 07, 2025 at 01:03:17PM +0100, Prabhakar wrote:
-> +	gbeth->rstc = devm_reset_control_get_exclusive(dev, NULL);
-> +	if (IS_ERR(gbeth->rstc))
-> +		return PTR_ERR(gbeth->rstc);
-> +
-> +	gbeth->dev = dev;
-> +	gbeth->regs = stmmac_res.addr;
-> +	gbeth->plat_dat = plat_dat;
-> +	plat_dat->bsp_priv = gbeth;
-> +	plat_dat->set_clk_tx_rate = stmmac_set_clk_tx_rate;
-> +	plat_dat->clks_config = renesas_gbeth_clks_config;
-> +	plat_dat->flags |= STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY |
-> +			   STMMAC_FLAG_EN_TX_LPI_CLK_PHY_CAP |
-> +			   STMMAC_FLAG_SPH_DISABLE;
-> +
-> +	err = renesas_gbeth_clks_config(gbeth, true);
-> +	if (err)
-> +		return err;
-> +
-> +	err = stmmac_dvr_probe(dev, plat_dat, &stmmac_res);
-> +	if (err)
-> +		renesas_gbeth_clks_config(gbeth, false);
-> +
-> +	return err;
-> +}
-> +
-> +static void renesas_gbeth_remove(struct platform_device *pdev)
-> +{
-> +	stmmac_dvr_remove(&pdev->dev);
-> +
-> +	renesas_gbeth_clks_config(get_stmmac_bsp_priv(&pdev->dev), false);
-> +}
+* Simon Horman (horms@kernel.org) wrote:
+> commit cb7dd712189f ("octeon_ep_vf: Add driver framework and device
+> initialization") added octep_vf_wq but it has never been used. Remove it.
+> 
+> Reported-by: Dr. David Alan Gilbert <linux@treblig.org>
+> Closes: https://lore.kernel.org/netdev/Z70bEoTKyeBau52q@gallifrey/
+> Signed-off-by: Simon Horman <horms@kernel.org>
 
-Would calling renesas_gbeth_clks_config() in the suspend/resume paths
-cause problems?
+Thanks,
 
-If not, please consider using plat_dat->init() and plat_dat->exit()
-to control these clocks, and then use devm_stmmac_pltfr_probe()
-which will call the ->init and ->exit functions around the probe
-as necessary and at removal time (and you won't need the remove
-method.)
+Reviewed-by: Dr. David Alan Gilbert <linux@treblig.org>
 
-Thanks.
-
+> ---
+>  drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c | 2 --
+>  drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h | 2 --
+>  2 files changed, 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
+> index 18c922dd5fc6..5841e30dff2a 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
+> +++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
+> @@ -18,8 +18,6 @@
+>  #include "octep_vf_config.h"
+>  #include "octep_vf_main.h"
+>  
+> -struct workqueue_struct *octep_vf_wq;
+> -
+>  /* Supported Devices */
+>  static const struct pci_device_id octep_vf_pci_id_tbl[] = {
+>  	{PCI_DEVICE(PCI_VENDOR_ID_CAVIUM, OCTEP_PCI_DEVICE_ID_CN93_VF)},
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h
+> index 1a352f41f823..b9f13506f462 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h
+> +++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h
+> @@ -320,8 +320,6 @@ static inline u16 OCTEP_VF_MINOR_REV(struct octep_vf_device *oct)
+>  #define octep_vf_read_csr64(octep_vf_dev, reg_off)         \
+>  	readq((octep_vf_dev)->mmio.hw_addr + (reg_off))
+>  
+> -extern struct workqueue_struct *octep_vf_wq;
+> -
+>  int octep_vf_device_setup(struct octep_vf_device *oct);
+>  int octep_vf_setup_iqs(struct octep_vf_device *oct);
+>  void octep_vf_free_iqs(struct octep_vf_device *oct);
+> 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
 
