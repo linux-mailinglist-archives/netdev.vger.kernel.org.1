@@ -1,89 +1,86 @@
-Return-Path: <netdev+bounces-182390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6DDFA889D9
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 19:30:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AD74A889F1
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 19:37:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC4E91898AAD
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 17:30:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE5F63B48B9
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 17:37:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D89519E806;
-	Mon, 14 Apr 2025 17:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8A6D274641;
+	Mon, 14 Apr 2025 17:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uiQtc286"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UtMKiUok"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7491F19CC0A
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 17:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DF782DFA3B;
+	Mon, 14 Apr 2025 17:37:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744651822; cv=none; b=n8332o4c/TfU4vQFAZUhcwzuG0PhL5FlLyAp4iuSchP5oXiWdjD4OJWSqIaiRjTgJVBK9P0iVw7nkkiseQp8/wlIUC0NkXvzyU1a1wtF/7li2gl55FXJHZmX8c1Q4Oj6NLLzPFUvKpqul1huRJasPkBo2LDMgk8Eiw5CQXbJZwc=
+	t=1744652249; cv=none; b=J+urJ9SpUVJ1wNugelSFnl0hEnokgJWZe/YZUjjFxcdAFmsDF6tyiEPm7eBTFdkA0GzyT1Ow4seEoAJih+JTsE6iIX8j81PKMmZHnaSY5ofmr2n0pQjzQQySOvYk+kdfyu/ICA/JtIDd59rQuujFkeZeHUGSyua+cbWroCCac5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744651822; c=relaxed/simple;
-	bh=CkCUah9vGUhgVPN/4lnrfDpXCLChP6GAWZa7t1EKBig=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FO5H0D7zppf0NSDLPtkqhcNHhv+evPYff0Hg9e1PZRQUuf7NGZcD/1epaVySX7qWBqi59avhxshpVJrngAY6Pgc7r8AE1jpNcOBc+iIgM/aTuQVUsWSahyT23bInu813jYoJ64g+L10lO+ULW8c+YY1HGlB+LVWctSOPW4IOKYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uiQtc286; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=p2zIMHrDMq/1rVu7mSYz5FdoQpd9TCLFKHxSveT/LnM=; b=uiQtc286DG+TEz1K2TajQcfXO3
-	aQ0Y9O0hmoN5pCPsCMlbmDgwvhULDn5VvCjNv1LLl1N/SIYOowrisvGqF03MaajJguqGvyX9mrfMl
-	GOolssWUjGb+kAbkALZ2H5E00Z30Hu9ZfS0Y7kzSADc+y/wW9dmsnwzOabuIRQv0L1p8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u4NdM-009Eyo-Ic; Mon, 14 Apr 2025 19:30:12 +0200
-Date: Mon, 14 Apr 2025 19:30:12 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 1/2] net: stmmac: ingenic: convert to
- stmmac_pltfr_pm_ops
-Message-ID: <df7dfb2e-ac3b-4d27-b7a1-2a36e2ee4567@lunn.ch>
-References: <Z_0u9pA0Ziop-BuU@shell.armlinux.org.uk>
- <E1u4M5N-000YGD-5i@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1744652249; c=relaxed/simple;
+	bh=bv3JKaNt5rx0LnwZ1DOrPwjLkqw6RVsySzVRPn8KFwc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HOJa80rJuP6t9mkVhaH4S6DbIKOvD2eeGMkJyappaNmaqUBD9bx1c+90yl6Ehr/TcyEpZ3FQORb2Pf2VzgY8kWqo6yDZh8+qTHMK1Ucr0Uc2zYaIZDpuiIGmUJx2iGmAl3giUnC95+S8GxyDR7o33r+6kaEyIoewtRYpxrlS9ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UtMKiUok; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 915ABC4CEE2;
+	Mon, 14 Apr 2025 17:37:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744652249;
+	bh=bv3JKaNt5rx0LnwZ1DOrPwjLkqw6RVsySzVRPn8KFwc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UtMKiUok7FM2vHx7iVPzBMdDnSKkEIgdvBTqIlcNK0utqs2dV/9dmN6DjWJKlCPKn
+	 7cVsd2ZJHgcSxPPrDWyGnEDzLgzqZVs7xcMsYmiIrYGO1VqhZ8AjxFidFzXitVmFDf
+	 ZoTxzxf3Uq63+D3einbLEUYZsLF/1SBX7tDMYvmfrxHLVb5tsvupavzXHtCJRZS1j9
+	 k02a9aORyFXj6ttDLM6W+4WIgoCypDYIHNLCmSlhMFlczX3WOjV1779MMVu22ffEH8
+	 b+/VDbRoAM0/xobEsPMpoNyN04XYuutAA9ULdyNioHO6bFnIE2ipVWPny5f3kFENbj
+	 hoAcJCDtmPrTw==
+Date: Mon, 14 Apr 2025 10:37:27 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: <syzbot+de1c7d68a10e3f123bdd@syzkaller.appspotmail.com>,
+ <cratiu@nvidia.com>, <davem@davemloft.net>, <edumazet@google.com>,
+ <horms@kernel.org>, <linux-kernel@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@fomichev.me>,
+ <syzkaller-bugs@googlegroups.com>
+Subject: Re: [syzbot] [net?] general protection fault in rtnl_create_link
+Message-ID: <20250414103727.0ea92049@kernel.org>
+In-Reply-To: <20250414023048.44721-1-kuniyu@amazon.com>
+References: <67fc6f85.050a0220.2970f9.039e.GAE@google.com>
+	<20250414023048.44721-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1u4M5N-000YGD-5i@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 14, 2025 at 04:51:01PM +0100, Russell King (Oracle) wrote:
-> Convert the Ingenic glue driver to use the generic stmmac platform
-> power management operations.
-> 
-> In order to do this, we need to make ingenic_mac_init() arguments
-> compatible with plat_dat->init() by adding a plat_dat member to struct
-> ingenic_mac. This allows the custom suspend/resume operations to be
-> removed, and the PM ops pointer replaced with stmmac_pltfr_pm_ops.
-> 
-> This will adds runtime PM and noirq suspend/resume ops to this driver.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+On Sun, 13 Apr 2025 19:30:46 -0700 Kuniyuki Iwashima wrote:
+> diff --git a/include/net/netdev_lock.h b/include/net/netdev_lock.h
+> index 5706835a660c..270e157a4a79 100644
+> --- a/include/net/netdev_lock.h
+> +++ b/include/net/netdev_lock.h
+> @@ -30,7 +30,8 @@ static inline bool netdev_need_ops_lock(const struct net_device *dev)
+>  	bool ret = dev->request_ops_lock || !!dev->queue_mgmt_ops;
+>  
+>  #if IS_ENABLED(CONFIG_NET_SHAPER)
+> -	ret |= !!dev->netdev_ops->net_shaper_ops;
+> +	if (dev->netdev_ops)
+> +		ret |= !!dev->netdev_ops->net_shaper_ops;
+>  #endif
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+This is a bit surprising, we pretty much never validate if dev has ops.
 
-    Andrew
+I think we're guaranteed that IFF_UP will not be set if we just
+allocated the device, so we can remove the locks in rtnl_create_link()
+and to double confirm add a netdev_ops_assert_locked_or_invisible() 
+in netif_state_change() ?
 
