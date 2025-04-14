@@ -1,124 +1,135 @@
-Return-Path: <netdev+bounces-182372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E926FA88931
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 19:00:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 409BDA88958
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 19:07:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9CE73A2CF1
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:59:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F26873AEC1F
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 17:07:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B18B27B513;
-	Mon, 14 Apr 2025 17:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 354F4284685;
+	Mon, 14 Apr 2025 17:07:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="B965oPYh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kXae/3fB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD5E27B4F8
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 16:59:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B29191F98;
+	Mon, 14 Apr 2025 17:07:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744650001; cv=none; b=G4PzD8plgD/OYq7VF6QvyHMSizYh7DQST7qXNdfSH2eCp11qjn2Q/jgApYndUfwfXrD3NO8zQ8RikashvZ0kM87r8usD8Fe0IV3X0MDBfudQvrGFGmieu88sM0Q9BczxBV6XHPzN8+uiVjLudkpWc1Zl7P1zxoOBktg2SWTSHM4=
+	t=1744650433; cv=none; b=UA1zzLwmGAEsqPh9kO71QySvtQsmWb/e1/ieSc/19A03jiaSTSnhH//0WLvtjwTPis2suOwHYfque21VAhTj58zJQJhzNGmz5oDhPFpLK4OjjkQPlY5P/VCUkUz8/C0TOQGRc1Z9fJglQZ9S1mP0R/RH8Ho82KLg/uzQSyOhXZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744650001; c=relaxed/simple;
-	bh=7+W/bBKIMa1dyTG3JW61Q2y4E76AiZlElKYKlW3Tal8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BMH8xGZO0c9VtSxcPdiTMXGe9Nnf66GVGi45Aa7Ru3gfNyy/VkGrkkilU5xD9OZ7ntMQ5C5laPY+kI0oIYEUESHUoZfg8XZb0Jwx52zzzRcCu0SipChIK/Q/iH1mv/xv6UfhEyU+BPz8lpA5WOHzt8C2a7/TOu/w5nP9o2j0SVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=B965oPYh; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=5d5MDT5d07M+ebJOanarer1Ld3dS9fKE8f4h3PXifqg=; b=B965oPYhVuAQ3kwx
-	ED7iBhin8rXGdfYwnVdsBEYAuyriHYVWv27s+99wm0AxNEsZWRP/fzpfL90rWGhW5s4QS41oMjwH+
-	//GwC/JcErhxgeNtB9hZrXPGUGG7GcTbiFET18qQP983qDlUO8+Jme4EvYX4ihuYOyJH+j1FGE88a
-	q5VAKLwXxz2NuJGSSDlVAJnAd5ytflp1peLU3AK2EKcl3i/Rc3rkTvWvChNbw9Zx0r5mbY9Qq9ihI
-	tlYuZJADziVXB46kswxWVe5Q/yHpc2HcvCms1wNOmdYTbGMaef4ZpELDcMFFHFTlBcitZlMgtwa5D
-	pilvf1YaGUvbUIv9gA==;
-Received: from dg by mx.treblig.org with local (Exim 4.96)
-	(envelope-from <dg@treblig.org>)
-	id 1u4N9v-00BNau-1t;
-	Mon, 14 Apr 2025 16:59:47 +0000
-Date: Mon, 14 Apr 2025 16:59:47 +0000
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shinas Rasheed <srasheed@marvell.com>,
-	Veerasenareddy Burru <vburru@marvell.com>,
-	Sathesh Edara <sedara@marvell.com>,
-	Satananda Burla <sburla@marvell.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] octeon_ep_vf: Remove octep_vf_wq
-Message-ID: <Z_0_AyjQRT58dYIb@gallifrey>
-References: <20250414-octeon-wq-v1-1-23700e4bd208@kernel.org>
+	s=arc-20240116; t=1744650433; c=relaxed/simple;
+	bh=fNUgT7DJYQcXoNCcmnlI9t3Uad037thoynfSCazQZT0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Cxoq53eOOVXoxcx3dvA68yD5PSeINCNIggL/4wQJ9S+u/j5sACOHtnJlXGkVtrix2oAJbuU5f1IjOwVADD0aNiLWjgDd6ld9ziRiuGtT+kLli6fCBqedgMdtvY25y4328wYAz03pZGgm0ECRGx5xPLr/gmYqawrmkBZuGoFcHZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kXae/3fB; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2255003f4c6so47432965ad.0;
+        Mon, 14 Apr 2025 10:07:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744650429; x=1745255229; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/aC8nbQnSsY/ycvYA2e+g0txRbF4OxqLuWWrvhhoWrA=;
+        b=kXae/3fBYgcCnwxb0w/E55XxS7+sVMEPSmkGylnotiLQMtc8o7aEvU9wjgugADIDqN
+         IfOy/kFlmoUv6zqbFlh/oH5fBdXW/GgE4g5Dv+eigjT2swgNPic5Whip6wZ2nEpgG5GR
+         uLBz22Tx5yNH+YjK9o0HKmpL2dn6mHTR/S/WzUhXqyenju59C8Kmj0xlSW9TBEsZ/Fc+
+         7RTaMw6OZKgBx9aORYfvfcA3LoZVAE9uXz6hxrsOtAfRlzfwVFwb4QLFuiffmqe+Dqwo
+         EdDt07xZTiRGMU+jenLmQVvWvgCxsZUWvZAEftYl+vToTwI0POkP/fms1coEUvmnMjL3
+         yzeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744650429; x=1745255229;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/aC8nbQnSsY/ycvYA2e+g0txRbF4OxqLuWWrvhhoWrA=;
+        b=Nptodxz6QD4e3pV36YqQd62d+yH/LNbuOo2EfP8/U2DrVNFd4N5mpLs9uml9gbKX45
+         PLybzNwJPsnFMChpcGXKqnGMb2iHH58WnolrxQesCcvonrvShQRKhIw9iItgSyrWgmUa
+         UJhn1cB3S2qdMH4jf7XNF52loMB/y3yxaI5a/kFBimbfwC8CEDY1fuM+XxyRvp821sbR
+         YkAe4TqoFocF6SKXzJEOCO+IRd3q4zWgv87DAMggiaQ/VXmFplkPpBz9La1v7GqJXDV5
+         J8O75sYL54jfe06mvlvm2aco9C7oJxk/LRiO6WyHpjqc0VQn/X6vwJ9dSyrZ5UlMb5nd
+         OCfg==
+X-Forwarded-Encrypted: i=1; AJvYcCWZJusW5CbXjro3SPXsp88mLS5AH62NFct6zVHoAl8HzrXxBcW8yWFbILcqWMtsmuXt3hTvzk9p@vger.kernel.org, AJvYcCWfzyZvC7nw8AmPV0deXLcLpFGz/6xKpRJwmj9b5XRD4JybdG0XqmWYrFOMSz8sAJmETDLUxGO43FyA+js=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7fInCirWZdIo01YwjFsB0PnfQQXbofB8OsPHOfl/YTn88DJan
+	I3ny7X+H+QXM1dStRXRTvsynRqkWO01WDpxu+HaKbB10J0qhWjzS
+X-Gm-Gg: ASbGncveI/hmFz5NtaOZUo+qKf2aVnsyFg8LDsiJ7MuYO8seHTZ+ofgerFzXQuQgcsP
+	dz0pyBf0kpf2URHVlm1cJ0JktcASj0au8NZTtVUH5hgWwqNf/eIdA+rR5Nk3ORJ2ttviPetaGyn
+	MhejTNKh/MtOWPZ6UrQc8Th2EiPO1QvuivTp5UtVTkm8AQ2FOuG/WZg5ZPoXRjSyreg8R5N0cne
+	PZnVgj4Yfuhlhi6HgjEjgYgs/soN3tElTFseG4N88Y/Y7D50dlLrAbQlEuJsY16yRDOIwefelm/
+	f5nWOdYdVkfZjnQlQXjd0YOQihh8zB/ydvrbgL/s9NDQj2cOj/2f/Wm0
+X-Google-Smtp-Source: AGHT+IHy3L0sRObM5h249A+XUtwuSyc4JgCYWx+PjAgceH3ncF9lhZgv07boVjBJOwpPAYsZzwXr6Q==
+X-Received: by 2002:a17:902:ea01:b0:21a:8300:b9ce with SMTP id d9443c01a7336-22bea4fd0a0mr186730335ad.49.1744650428600;
+        Mon, 14 Apr 2025 10:07:08 -0700 (PDT)
+Received: from localhost.localdomain ([49.37.219.136])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-22ac7b8c6b3sm101818335ad.77.2025.04.14.10.07.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Apr 2025 10:07:08 -0700 (PDT)
+From: Abdun Nihaal <abdun.nihaal@gmail.com>
+To: bharat@chelsio.com
+Cc: Abdun Nihaal <abdun.nihaal@gmail.com>,
+	horms@kernel.org,
+	Markus.Elfring@web.de,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	rahul.lakkireddy@chelsio.com,
+	vishal@chelsio.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 net] cxgb4: fix memory leak in cxgb4_init_ethtool_filters() error path
+Date: Mon, 14 Apr 2025 22:36:46 +0530
+Message-ID: <20250414170649.89156-1-abdun.nihaal@gmail.com>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20250414-octeon-wq-v1-1-23700e4bd208@kernel.org>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
-X-Uptime: 16:59:23 up 341 days,  4:13,  1 user,  load average: 0.04, 0.03,
- 0.00
-User-Agent: Mutt/2.2.12 (2023-09-09)
+Content-Transfer-Encoding: 8bit
 
-* Simon Horman (horms@kernel.org) wrote:
-> commit cb7dd712189f ("octeon_ep_vf: Add driver framework and device
-> initialization") added octep_vf_wq but it has never been used. Remove it.
-> 
-> Reported-by: Dr. David Alan Gilbert <linux@treblig.org>
-> Closes: https://lore.kernel.org/netdev/Z70bEoTKyeBau52q@gallifrey/
-> Signed-off-by: Simon Horman <horms@kernel.org>
+In the for loop used to allocate the loc_array and bmap for each port, a
+memory leak is possible when the allocation for loc_array succeeds,
+but the allocation for bmap fails. This is because when the control flow
+goes to the label free_eth_finfo, only the allocations starting from
+(i-1)th iteration are freed.
 
-Thanks,
+Fix that by freeing the loc_array in the bmap allocation error path.
 
-Reviewed-by: Dr. David Alan Gilbert <linux@treblig.org>
+Fixes: d915c299f1da ("cxgb4: add skeleton for ethtool n-tuple filters")
+Signed-off-by: Abdun Nihaal <abdun.nihaal@gmail.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+v1 -> v2:
+- Added the Reviewed-by tag from Simon Horman
+- Also set the branch target as net instead of net-next as it is a fix
 
-> ---
->  drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c | 2 --
->  drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h | 2 --
->  2 files changed, 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
-> index 18c922dd5fc6..5841e30dff2a 100644
-> --- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
-> +++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
-> @@ -18,8 +18,6 @@
->  #include "octep_vf_config.h"
->  #include "octep_vf_main.h"
->  
-> -struct workqueue_struct *octep_vf_wq;
-> -
->  /* Supported Devices */
->  static const struct pci_device_id octep_vf_pci_id_tbl[] = {
->  	{PCI_DEVICE(PCI_VENDOR_ID_CAVIUM, OCTEP_PCI_DEVICE_ID_CN93_VF)},
-> diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h
-> index 1a352f41f823..b9f13506f462 100644
-> --- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h
-> +++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h
-> @@ -320,8 +320,6 @@ static inline u16 OCTEP_VF_MINOR_REV(struct octep_vf_device *oct)
->  #define octep_vf_read_csr64(octep_vf_dev, reg_off)         \
->  	readq((octep_vf_dev)->mmio.hw_addr + (reg_off))
->  
-> -extern struct workqueue_struct *octep_vf_wq;
-> -
->  int octep_vf_device_setup(struct octep_vf_device *oct);
->  int octep_vf_setup_iqs(struct octep_vf_device *oct);
->  void octep_vf_free_iqs(struct octep_vf_device *oct);
-> 
+v1 link: https://patchwork.kernel.org/project/netdevbpf/patch/20250409054323.48557-1-abdun.nihaal@gmail.com/
+
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_ethtool.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_ethtool.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_ethtool.c
+index 7f3f5afa864f..1546c3db08f0 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_ethtool.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_ethtool.c
+@@ -2270,6 +2270,7 @@ int cxgb4_init_ethtool_filters(struct adapter *adap)
+ 		eth_filter->port[i].bmap = bitmap_zalloc(nentries, GFP_KERNEL);
+ 		if (!eth_filter->port[i].bmap) {
+ 			ret = -ENOMEM;
++			kvfree(eth_filter->port[i].loc_array);
+ 			goto free_eth_finfo;
+ 		}
+ 	}
 -- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+2.47.2
+
 
