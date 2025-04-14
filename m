@@ -1,238 +1,248 @@
-Return-Path: <netdev+bounces-182159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C727CA880DB
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 14:53:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 761EEA880E8
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 14:58:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C437B1749B7
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 12:53:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 734187A1FFE
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 12:57:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B61F29C32A;
-	Mon, 14 Apr 2025 12:52:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0A102BE7C4;
+	Mon, 14 Apr 2025 12:58:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="OzJoXIJX"
+	dkim=pass (2048-bit key) header.d=invisiblethingslab.com header.i=@invisiblethingslab.com header.b="SDln8aV1";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="svJeRnNi"
 X-Original-To: netdev@vger.kernel.org
-Received: from MRWPR03CU001.outbound.protection.outlook.com (mail-francesouthazon11011012.outbound.protection.outlook.com [40.107.130.12])
+Received: from fout-b6-smtp.messagingengine.com (fout-b6-smtp.messagingengine.com [202.12.124.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD82C2BD5A6;
-	Mon, 14 Apr 2025 12:52:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.130.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744635176; cv=fail; b=BFf7MzH2DjHbwWqXyNItRyvLLccweuSgVwg8K/P9NuHCVRg682gaEnpDvHzXJx3488dsReJJxruemp5sKlvayyAl78cBGOxc7RPPjgcxNos27lW1+J9vJCNAlcAWaWtOl2RmY6wszjQO11NgQf2FWX9ctMGdH2zK/5ADjH3dlDk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744635176; c=relaxed/simple;
-	bh=1zIyYAVsDMzg9oMuQw6tFwTJTLWVBKD33AXLSHUImBU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Ek5iQn8/lOFr/NVi74/5EQ2f9ehuNrYqnVYQ7z4Ycq8vyzaW1KDyY0C+2NfG2Kasp8Kq1oJk6nUsOEv0yqntMWFHPFcWJEWB9kVRi0AbsdGPMB0Q0o7VHY8AxaoWOk1O3pGdS6rkCnTfsQngiCMIvMGI1qpEKK+IOddEWJ0bmW8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=OzJoXIJX; arc=fail smtp.client-ip=40.107.130.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xKGLeJ2ZUJugsSK+7IbU8NO4irvsZKQMmDOlmGKJBaCFhpR4k+rlHxXslwspxi9jbqilDyElwE0g0sE8851awr8LyGzznKJx5Iw/WjbptOE13NX1xyPwjdfpUlZfLQxmJpuUoQKEZk+mDQVkP7jhv7ACwYHxifLtZb6aAcu1CUp9MHpr20Sys4THLinNTxSJs204EOFVxe2Bzn+fIsksUA5UJGq5ixEZ3fmLaLUoDgMq8L6U56XRaWm3tkVjJzW5VucafI9ha50gzPsucDzxOF92zK23wvOHn1QUalJ7M0BZMc6RzMOMV0hw5i9/y0B29AbxKB67JQJ3Ym+s6nqRFg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yuavfLqxYO5LcOrU4tQIen8hEJMS35/rJohzkF/NS4E=;
- b=GRlw9QuZcrr2PdFa9u0zmwXJj3PEOHBrVq1qPDw8PMd4Ri4OFqoSdmWABtkvTBa9sJOMxQG+BMvx67ILK9uGTF3GQzeDwzZ+m3cBdFRNF8s2FvzYlK3PvJLcSjVqC/C/9iTFo5xg6GjKu4xAVVsAuz45c5R900BTcGvmL8dKU9pwU070hGdlHD00nSXXMxWUKg03O+m5E1DI8Y7C4VwlAD+vxVRXK9mprS6Ee93N4r9U0Rm3dSPy6/ZVtNPt/QsKpqXZtKSlX/m/PaKos9vx+RfpG9uZb4/OHdQUzLJLkKpgowGig1eOI8RE1dl+LSnZsH+bE9S46UQkpVP+k/OnwQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yuavfLqxYO5LcOrU4tQIen8hEJMS35/rJohzkF/NS4E=;
- b=OzJoXIJXqepfkyWlvLbIJ/OBDtMz8QzKiSqeUtbcmJR6/DWGgmlQJc0mO9FWHHJl9zS7oHQEySLqRN9ULCin30wWUUovufqBqFzbH0WrUMwjoyzfOZfsTz/NQL2LG64hKYRMORlvThC6xysgrlSxuQRlu4O5R2mL7Pbme8ZCPo4YnmOtA6+2fWTk7xSdW0UGMx0ft0he6UgWJW5VLwpCV1En3naHeXOBvP1eRtg5odHvEzBlNxgkVAZXbGGqDgyD6SwLHpX/C1Sn+WT0jxJ6H2VvHqXDPUwJU/QbrZXv8NyUq0hPuESN2bVzGKSL8aA+zxDpIu1VD/LMcm1ooYNUwA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by AS8PR04MB8897.eurprd04.prod.outlook.com (2603:10a6:20b:42c::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.33; Mon, 14 Apr
- 2025 12:52:51 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%4]) with mapi id 15.20.8632.035; Mon, 14 Apr 2025
- 12:52:51 +0000
-Date: Mon, 14 Apr 2025 15:52:48 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Jonas Gorski <jonas.gorski@gmail.com>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	bridge@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC net 2/2] net: dsa: propagate brentry flag changes
-Message-ID: <20250414125248.55kdsbjfllz4jjed@skbuf>
-References: <20250412122428.108029-3-jonas.gorski@gmail.com>
- <20250412122428.108029-3-jonas.gorski@gmail.com>
- <20250414124930.j435ccohw3lna4ig@skbuf>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250414124930.j435ccohw3lna4ig@skbuf>
-X-ClientProxiedBy: VI1P191CA0008.EURP191.PROD.OUTLOOK.COM
- (2603:10a6:800:1ba::6) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5549539A;
+	Mon, 14 Apr 2025 12:58:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.149
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744635496; cv=none; b=G6681JZ2e0avqz+OAmd9rXl9XUwOZDKPvKVcABExNWRoTjgCZ5yKjkU0qmOZ3K1hV54aEO4puoC2UfBMU6RtBfdrgG2PjSCJystPIKCo/cUx+jHQtGnueP8BkqbgWJG1gqpLeWM3bwThjCQqJizxrqhbHWiMbS71d6D3eTFv5LE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744635496; c=relaxed/simple;
+	bh=GuS4kD8hqpTqJstJPkWgHhRffVNevrduFdkI/CdwkvI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RzvEHR3BgtPj8yICPQ7D2ZOSUStb+ZZk9qtlYXDEF5GgZf6LQ6f6tJCeGnLayHPdvD8L4sEWBuDMZIDSqpNv/0PNkHhnM0YoxRj/6EW+/UTqyIeCoKdYO8eEp+90vevHNYTNVUCxtCr5fb2d3rujfYMkUFv0k6ZbI/q7v4+dLn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=invisiblethingslab.com; spf=pass smtp.mailfrom=invisiblethingslab.com; dkim=pass (2048-bit key) header.d=invisiblethingslab.com header.i=@invisiblethingslab.com header.b=SDln8aV1; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=svJeRnNi; arc=none smtp.client-ip=202.12.124.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=invisiblethingslab.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=invisiblethingslab.com
+Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
+	by mailfout.stl.internal (Postfix) with ESMTP id 9DD0311400A8;
+	Mon, 14 Apr 2025 08:58:13 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-08.internal (MEProxy); Mon, 14 Apr 2025 08:58:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	invisiblethingslab.com; h=cc:cc:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1744635493;
+	 x=1744721893; bh=ZdtjygeQwRRON2KbdpHTn72DZDHfbhRKvMnYK9WBN70=; b=
+	SDln8aV1wIvrC+L+Eu3kFn2nWEm4gM1S4n0hdIikSpx0dIzFqSKe2L9YzorvZXSj
+	J0sCy1bzHRMz9ZpLM0nh6B9BoPigX77eOs0ZKbaAnGGXKXBpQ/e9e3gr57OanASY
+	joQ/Mm1SrY2dTsh/G4en4gBAYcwpScfgv7bVVdEK25T6XrkjECE0RQZG4JyXxbKH
+	G8/yW9TM3e0J3DQz+YAIfQKQGmtsmCA8t+RbBVVBzQ+Ows7IMW1VsdWZ1rY0UQXn
+	lbl7X7kf0qMZHpQiPCfMloJH4a71NjP4ZZ9biesaYKnSFzWsdL3M8JXe6CfxP66m
+	0jF7a99BNt/Tw9NQnsN43w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1744635493; x=1744721893; bh=ZdtjygeQwRRON2KbdpHTn72DZDHfbhRKvMn
+	YK9WBN70=; b=svJeRnNi/9e2Hc2GAlXV3usuUtxKc+S5U0thcmfF6QdBNzZIBde
+	Sp2xj2NyMVYAx+cuI5lUr4ZikEHQigSWnav5o6yA5LOv5sE3hzzQeK+zPoSKobfN
+	GUuc0n/voEmBXj+p6Goi3cyAdcKsRtTF8tbVkMyAaoj+Mv4dOkkFrMNMxIq1CQTB
+	7uFxPnEaagJ56uvWcfHlK8CyCeKT0wGz0NiWH0mUNlPAFo4xP5eCRD3rTEdvcU8i
+	nz+oKymC0U7an1KMUjkrTb7L2EPLveFdKgr8WHazbI57a7zuMcmGhGj4vrejx2Gs
+	3RNTxHYIvrcIUMid3zYF6Qhg9uHuDj8tWKg==
+X-ME-Sender: <xms:ZQb9Z4mW49M8EELf4w9Og69C2_o-jcr7JJ9QRHX0yWxxLo6g1eKYrw>
+    <xme:ZQb9Z31KaI0Au0Kb00PDX96vEsgm-d-VUy4M2v3B6PG9SzJhI_9qv1KFS4m5aGK5s
+    nmRLdSWIvj_cA>
+X-ME-Received: <xmr:ZQb9Z2pd8PCXbdwXL8cqCxwJB3O6Cd02uwVuD_lD5pay0t6UzWg8T0Ll-qolsSxxMieGfFo-zqPjQSmNz1FKZVXH2uoo3ZKLPA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvvddtiedvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
+    gvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesghdtreertddt
+    jeenucfhrhhomhepofgrrhgvkhcuofgrrhgtiiihkhhofihskhhiqdfikphrvggtkhhiuc
+    eomhgrrhhmrghrvghksehinhhvihhsihgslhgvthhhihhnghhslhgrsgdrtghomheqnecu
+    ggftrfgrthhtvghrnhepgfduleetfeevhfefheeiteeliefhjefhleduveetteekveettd
+    dvgeeuteefjedunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhf
+    rhhomhepmhgrrhhmrghrvghksehinhhvihhsihgslhgvthhhihhnghhslhgrsgdrtghomh
+    dpnhgspghrtghpthhtohepkedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepvhhi
+    thgrlhihrdhlihhfshhhihhtshesihhnthgvlhdrtghomhdprhgtphhtthhopehjvghssh
+    gvrdgsrhgrnhguvggsuhhrghesihhnthgvlhdrtghomhdprhgtphhtthhopegrnhhthhho
+    nhihrdhlrdhnghhuhigvnhesihhnthgvlhdrtghomhdprhgtphhtthhopehnvghtuggvvh
+    esvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehinhhtvghlqdifihhrvggu
+    qdhlrghnsehlihhsthhsrdhoshhuohhslhdrohhrghdprhgtphhtthhopehrvghgrhgvsh
+    hsihhonhhssehlihhsthhsrdhlihhnuhigrdguvghvpdhrtghpthhtohepshhtrggslhgv
+    sehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshgrshhhrghlsehkvghrnh
+    gvlhdrohhrgh
+X-ME-Proxy: <xmx:ZQb9Z0lu4NiL_ful3VhbQ4wGuUq8v6uz5XVHjJwAi2K_xo6aBDu99Q>
+    <xmx:ZQb9Z21PNDD7SqkDApNtPOpOvmJ7ntvjz206t-aADhjt3vk2XKcDkQ>
+    <xmx:ZQb9Z7tbBMXbuYmBsMy--HFpR9ELE3szOWMohCyMDGmG5KHd-DphYg>
+    <xmx:ZQb9ZyWiRvpRyAzAOKD-QyFVtKw6cuR5B5dp_y7grP0vuMfEGGyp_w>
+    <xmx:ZQb9Z4pYFe8Sq2TAt5DY4F0Pb-qIuv2BrR0XLkpyq6JINvYHWuULAMH2>
+Feedback-ID: i1568416f:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 14 Apr 2025 08:58:11 -0400 (EDT)
+Date: Mon, 14 Apr 2025 14:58:09 +0200
+From: Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>
+To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, regressions@lists.linux.dev,
+	stable@vger.kernel.org, Sasha Levin <sashal@kernel.org>
+Subject: Re: [REGRESSION] e1000e heavy packet loss on Meteor Lake - 6.14.2
+Message-ID: <Z_0GYR8jR-5NWZ9K@mail-itl>
+References: <Z_z9EjcKtwHCQcZR@mail-itl>
+ <b1f5e997-033c-33ed-5e3b-6fe2632bf718@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|AS8PR04MB8897:EE_
-X-MS-Office365-Filtering-Correlation-Id: f4577aad-8b64-4b64-d63e-08dd7b5343f7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|7416014|366016|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?kLTjISv/k+zVV0jGKMJYDwugtk0F3nXUAdnSRO1kfMUEYAH4iLWg/qCcSCgU?=
- =?us-ascii?Q?wyn90CG2RXVSo8Ft9UbSLT8/rZzdfkQTrwjwvkIZC1ims1IqAbGqQ7MJJLHQ?=
- =?us-ascii?Q?Ui6LJnBj6D2znle+iKtxwOfUfAHhkA6pa1ItQnhWxRNEKzgyB3qpvkanJF5Z?=
- =?us-ascii?Q?APhQzdc1BUa5UNbw6a8+5Htg+STGFw1ofBimvG/o6R0BwIPsmMU0Ibz8Hafa?=
- =?us-ascii?Q?CfWLfmn9Chgjdw2FJhAmv+UYxBQ7XU5GgOHdKg8SSHvmP5hm4120zSN+dTUx?=
- =?us-ascii?Q?x885tphR/4GJ/PP7qzvmH+hB6cH7VieOAbvqXcmAf94gtnjcZRPVxIsFsD0k?=
- =?us-ascii?Q?z5LspjHm+YsPRj12XZrrVQ4w0qFzgeFI8xc3TQXKaCTF8vM0hsc29J19TWT3?=
- =?us-ascii?Q?vB8irKQ+9B96/o1MIPR9h3ChUmx4TVGl0Cc+DeU2MefSMdnM81rDLr5tt6RE?=
- =?us-ascii?Q?nhUt/ZqsUk3L1d2j+L4f6vS+pwsUGJtqeL6pZINulc/CWdnRtE/pgV2/PEEe?=
- =?us-ascii?Q?it3NRS8LlhHL7Iv7miQd2bFzHKQvyY8NdFq7Z+j+i22pOLm88zcGDg4XE+Fk?=
- =?us-ascii?Q?reKPqD5v27Rn0q+NzNlkRPDjoWRMnEp3q/dkBNdlzVNW+5cj/Y+tRf0RyVHe?=
- =?us-ascii?Q?KduMnomKtUorxOg+VCuis4aeD7K2niiBrIM5oKjof7t4qxk0rNLOVFiM5uYG?=
- =?us-ascii?Q?g5HpYYSoung3tZWHWB+EG+H2PnFBjx8UAIU8Z8OvOHRUBGn2rI09Imo7zH8+?=
- =?us-ascii?Q?PDneGemS+I2fTXPwQ8tgv8vNBXC0I8on/fxuR7QdWrUpAZ5zUxzKsQfwTY53?=
- =?us-ascii?Q?kW0nfBJSwoBhWohYRCVOz+CyikU8mhy0skkuucYAIw0zJQy6pGPRGoGnFf3+?=
- =?us-ascii?Q?OBKwLUwBlc7A/lHl2mYtpVqVjGBLk7q8T2v3ls05WUveVFoySHxgBE2sB2md?=
- =?us-ascii?Q?QmYgC8OLc8efVhE0ogQ5opGR78L7IMfyitlafgT8GA/HLe7HcAc/gVA5vGYI?=
- =?us-ascii?Q?l1K0QSOb/zOHHublsV/YegAPkgWZ5qLSNlwzfvHmhBxgzDvRMB0TlNEDTSxm?=
- =?us-ascii?Q?4eHeLPXFYpDrmjdK1VBKIn9aiBbMZNe0/7u4BCxYSR2fveTZoTrPyRmWhPek?=
- =?us-ascii?Q?phVQeFBG0RCVKHnYq5JZzhd9cYgw2CIOxzgmRWnqvXQ1/f9dNtpXZzMztLvq?=
- =?us-ascii?Q?NFdGREnDbFGzGCsXzrRyS+zt68C1dJwbqoer7WY6t/uF2iypZ9xjejpGb21L?=
- =?us-ascii?Q?0eIMLyezth35h4r4vKH+8HGFL8nKdOuUe5a2ymrvoAqlIeehi5QBoGm8LhGo?=
- =?us-ascii?Q?8FGdAp85Vqo9KzgaXYn0160x50d8RAgaJ6t4i8Shct+5L+q31YZCnFyLf0w6?=
- =?us-ascii?Q?z5KvMI7VrhwmnI/+dZMo2mY5+4vHTvZyudb32jOJ49Rvz3STyPPKafoeh1nr?=
- =?us-ascii?Q?kyq6+AQDBb8=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?91lEOfbP49fFBkJKQlKoV4ye/OCpcspdrDNew/hRcicuIM/uJyJjn3nYvBRl?=
- =?us-ascii?Q?5tBGYn4NDEiHGtMAKwDPDHEV1H3LMjGZHzPkRpZa+j/SiFgQpTzlvHwybC+n?=
- =?us-ascii?Q?9sIqrxY0I36Q3a+oMhnxJu76yH8xzBMPK0yhnTYL5BuY8Z+99Gms3t+Tzz0h?=
- =?us-ascii?Q?es6zKscdczLyPo63V9a/MsAMLsWC1naeuInqyViy8D0mdVvs6vkbjKe5F005?=
- =?us-ascii?Q?bg52ilLhDwsWsaEgHN0ipr8q4l3STv3YJGuunTDBS111eapkQd7/FfeXqkuI?=
- =?us-ascii?Q?h+Y43MNv1CHrZhftmRU/USs1cjqBHH0AZtkwEYqJ6rIJW9Fy7WLKqYH3zk0i?=
- =?us-ascii?Q?e+vkEhOdTNeCrJZ+G6vio8mz+/f44Tjr4kNDflwwRqvJH+inpexRKVcWNaRy?=
- =?us-ascii?Q?OVGHdOzqkGdpkT8ndCkf3hxs2YOLWB1SaTbc0rw/it3Xg8ksxZa4QBErrHtp?=
- =?us-ascii?Q?lmD0dVBA4w+rJjiT2A0QqRJc1pKLChzOLdno/Divj6NZ8r/CBc7v04M8OWwK?=
- =?us-ascii?Q?l3EzrVBeDr0qMbKZefNJHY6HD9ODVvGJHWORbww9gG2nsaH2cGEvbAbWQEYg?=
- =?us-ascii?Q?nnYfYbgIt1M9gOyXoDW8ez9wVq6aB4FRmde7m1N/wwZkpmKdfvyA7OYsQOfY?=
- =?us-ascii?Q?QVhIcrx5bnp/N/7WQh+83Wx5DO6wRuSAKCrqYAUt+ML/5IH4+iuWsITZcbf5?=
- =?us-ascii?Q?R7aMK4lj3HglJkSNn3n3fiCI6GlUd2avk/bq7htlou1ufGLYzexUl04dpcAv?=
- =?us-ascii?Q?VHnlv00CLFBMnbibtWgsu1M2wFp4fesUfn0JJMlAbDLV8kMj32sMhCg8HekE?=
- =?us-ascii?Q?ECdIOBDr/g5Zj/jIzNLeshqB3M8qEwK+7iv+WeTPway1c2N1g0aZELR5tr9M?=
- =?us-ascii?Q?xvrXYTSGso++55UIH5wxPFYqxNIgoelyx0AAGiIy9mhLK3tgG+yVlyRJIVDm?=
- =?us-ascii?Q?dGQF89ZgDqW0ULPh/EVgL3v0PurjNdhtvR61lnoMP7sGoVsfbW857FqvBxwN?=
- =?us-ascii?Q?yrckGKQzdlagSBmSPZZHaUcj1Ccix99S6WlPV70AiHXRZqmyjxvpbKL2hjA9?=
- =?us-ascii?Q?ak1TAj5fJvG/CXR1Kfp9mAPtHfBy132cUVR5RhPKczdl6gZolMg5uPFybc4q?=
- =?us-ascii?Q?fiZPI+7Q7fMfcBjVhyf3xSIG3VlK8PV0yr4Rtjg/YNSRNuOEyKt5nz1mKBwc?=
- =?us-ascii?Q?Nx6uJHso50ZphYync3rPEVHeD5R5z/6pFWpinqulr2qOYRKWW+f7VfJa5QVl?=
- =?us-ascii?Q?jKdnSuqWLPA6bJk7aP/30ou2ACdUUredb8RpZvoM90Sai4NydqhxKjgYy3Of?=
- =?us-ascii?Q?H6ZP2o6Au13geEebg7fR8h7uno4cgCmKKE5/uftJ7E1UuPF5AdQc3iwmkNO+?=
- =?us-ascii?Q?H+fKSemsmSkL8SFxT/40edIy+BeLbrrW8hBHC62/fDseQ3dhKt9Ay2fFA1NL?=
- =?us-ascii?Q?K2aL532a4KxCgcSvPJOA/R9lWQIoKimH3HTO4tx3ppVXjQkp2aqfiA7O2gsT?=
- =?us-ascii?Q?rh2dAIWhN39EPQkrgenzfI/oUMG+2EMIoF3/6kzXd5eiecz+CQm6NzuQb1xm?=
- =?us-ascii?Q?yQprz+IAdnkB3RXZ1LoBizSt8Lp5eoV0MgHAKnx4vbP/96SnIuReZov1KgZZ?=
- =?us-ascii?Q?kA=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f4577aad-8b64-4b64-d63e-08dd7b5343f7
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2025 12:52:51.0472
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: COuyRzvr6WW1Oq3p1KkU9XpAyCtl9ydj6z3EkISRK1dWEJw84ImKKIvTQgDX0J9N0VcDbupObteAzq0z6egF3w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8897
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="3dtuJQ5HLXloIV6T"
+Content-Disposition: inline
+In-Reply-To: <b1f5e997-033c-33ed-5e3b-6fe2632bf718@intel.com>
 
-+Jonas, whom I've mistakenly removed from To: :-/
 
-On Mon, Apr 14, 2025 at 03:49:30PM +0300, Vladimir Oltean wrote:
-> On Sat, Apr 12, 2025 at 02:24:28PM +0200, Jonas Gorski wrote:
-> > Currently any flag changes for brentry vlans are ignored, so the
-> > configured cpu port vlan will get stuck at whatever the original flags
-> > were.
-> > 
-> > E.g.
-> > 
-> > $ bridge vlan add dev swbridge vid 10 self pvid untagged
-> > $ bridge vlan add dev swbridge vid 10 self
-> > 
-> > Would cause the vlan to get "stuck" at pvid untagged in the hardware,
-> > despite now being configured as tagged on the bridge.
-> > 
-> > Fix this by passing on changed vlans to drivers, but do not increase the
-> > refcount for updates.
-> > 
-> > Since we should never get an update for a non-existing VLAN, add a
-> > WARN_ON() in case it happens.
-> > 
-> > Fixes: 134ef2388e7f ("net: dsa: add explicit support for host bridge VLANs")
-> > Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
-> > ---
-> 
-> I think it's important to realize that the meaning of the "flags" of
-> VLANs offloaded to the CPU port is not completely defined.
-> "egress-untagged" from the perspective of the hardware CPU port is the
-> opposite direction compared to "egress-untagged" from the perspective of
-> the bridge device (one is Linux RX, the other is Linux TX).
-> 
-> Additionally, we install in DSA as host VLANs also those bridge port VLANs
-> which were configured by the user on foreign interfaces. It's not exactly
-> clear how to reconcile the "flags" of a VLAN installed on the bridge
-> itself with the "flags" of a VLAN installed on a foreign bridge port.
-> 
-> Example:
-> ip link add br0 type bridge vlan_filtering 1 vlan_default_pvid 0
-> ip link set veth0 master br0 # foreign interface, unrelated to DSA
-> ip link set swp0 master br0 # DSA interface
-> bridge vlan add dev br0 vid 1 self pvid untagged # leads to an "dsa_vlan_add_hw: cpu port N vid 1 untagged" trace event
-> bridge vlan add dev veth0 vid 1 # still leads to an "dsa_vlan_add_bump: cpu port N vid 1 refcount 2" trace event after your change
-> 
-> Depending on your expectations, you might think that host VID 1 would
-> also need to become egress-tagged in this case, although from the
-> bridge's perspective, it hasn't "changed", because it is a VLAN from a
-> different VLAN group (port veth0 vs bridge br0).
-> 
-> The reverse is true as well. Because the user can toggle the "pvid" flag
-> of the bridge VLAN, that will make the switchdev object be notified with
-> changed=true. But since DSA clears BRIDGE_VLAN_INFO_PVID, the host VLAN,
-> as programmed to hardware, would be identical, yet we reprogram it anyway.
-> 
-> Both would seem to indicate that "changed" from the bridge perspective
-> is not what matters for calling the driver, but a different "changed"
-> flag, calculated by DSA from its own perspective.
-> 
-> I was a bit reluctant to add such complexity in dsa_port_do_vlan_add(),
-> considering that many drivers treat the VLANs on the CPU port as
-> always-tagged towards software (not b53 though, except for
-> b53_vlan_port_needs_forced_tagged() which is only for DSA_TAG_PROTO_NONE).
-> In fact, what is not entirely clear to me is what happens if they _don't_
-> treat the CPU port in a special way. Because software needs to know in
-> which VLAN did the hardware begin to process a packet: if the software
-> bridge needs to continue the processing of that packet, it needs to do
-> so _in the same VLAN_. If the accelerator sends packets as VLAN-untagged
-> to software, that information is lost and VLAN hopping might take place.
-> So I was hoping that nobody would notice that the change of flags on
-> host VLANs isn't propagated to drivers, because none of the flags should
-> be of particular relevance in the first place.
-> 
-> I would like to understand better, in terms of user-visible impact, what
-> is the problem that you see?
+--3dtuJQ5HLXloIV6T
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 14 Apr 2025 14:58:09 +0200
+From: Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>
+To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, regressions@lists.linux.dev,
+	stable@vger.kernel.org, Sasha Levin <sashal@kernel.org>
+Subject: Re: [REGRESSION] e1000e heavy packet loss on Meteor Lake - 6.14.2
+
+On Mon, Apr 14, 2025 at 03:38:39PM +0300, Lifshits, Vitaly wrote:
+> Do you see the high packet loss without the virtualization?
+
+I can't check that easily right now, will try later.
+
+> Can you please share the lspci output?
+
+Sure:
+
+00:07.0 Ethernet controller [0200]: Intel Corporation Device [8086:550a] (r=
+ev 20)
+	Subsystem: CLEVO/KAPOK Computer Device [1558:a743]
+	Physical Slot: 7
+	Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr- Steppi=
+ng- SERR- FastB2B- DisINTx+
+	Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=3Dfast >TAbort- <TAbort- =
+<MAbort- >SERR- <PERR- INTx-
+	Latency: 64
+	Interrupt: pin D routed to IRQ 69
+	Region 0: Memory at f2000000 (32-bit, non-prefetchable) [size=3D128K]
+	Capabilities: [c8] Power Management version 3
+		Flags: PMEClk- DSI+ D1- D2- AuxCurrent=3D0mA PME(D0-,D1-,D2-,D3hot-,D3col=
+d-)
+		Status: D0 NoSoftRst+ PME-Enable- DSel=3D0 DScale=3D1 PME-
+	Capabilities: [d0] MSI: Enable+ Count=3D1/1 Maskable- 64bit+
+		Address: 00000000fee00000  Data: 0000
+	Kernel driver in use: e1000e
+	Kernel modules: e1000e
+
+
+
+> Does your switch/link partner support flow control? if it is configurable
+> can you try to enable it?
+
+It does support it. Enabling it makes things much worse...
+
+> Do you see any errors in dmesg related to the e1000e driver?
+
+Not really.
+dmesg | grep 'e1000e\|ens7':
+
+[    3.088489] e1000e: Intel(R) PRO/1000 Network Driver
+[    3.088512] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+[    3.093256] e1000e 0000:00:07.0: Interrupt Throttling Rate (ints/sec) se=
+t to dynamic conservative mode
+[    3.343378] e1000e 0000:00:07.0 0000:00:07.0 (uninitialized): registered=
+ PHC clock
+[    3.718946] e1000e 0000:00:07.0 eth0: (PCI Express:2.5GT/s:Width x1) d4:=
+93:90:3e:0d:bb
+[    3.718966] e1000e 0000:00:07.0 eth0: Intel(R) PRO/1000 Network Connecti=
+on
+[    3.719101] e1000e 0000:00:07.0 eth0: MAC: 16, PHY: 12, PBA No: FFFFFF-0=
+FF
+[    3.759444] e1000e 0000:00:07.0 ens7: renamed from eth0
+[    8.632317] e1000e 0000:00:07.0 ens7: NIC Link is Up 1000 Mbps Full Dupl=
+ex, Flow Control: None
+[  239.458205] e1000e 0000:00:07.0 ens7: NIC Link is Down
+[  242.485869] e1000e 0000:00:07.0 ens7: NIC Link is Up 1000 Mbps Full Dupl=
+ex, Flow Control: Rx/Tx
+
+(you can also see a test with flow control above)
+
+
+And also ethtool output if useful:
+Settings for ens7:
+	Supported ports: [ TP ]
+	Supported link modes:   10baseT/Half 10baseT/Full
+	                        100baseT/Half 100baseT/Full
+	                        1000baseT/Full
+	Supported pause frame use: Symmetric Receive-only
+	Supports auto-negotiation: Yes
+	Supported FEC modes: Not reported
+	Advertised link modes:  10baseT/Half 10baseT/Full
+	                        100baseT/Half 100baseT/Full
+	                        1000baseT/Full
+	Advertised pause frame use: Symmetric Receive-only
+	Advertised auto-negotiation: Yes
+	Advertised FEC modes: Not reported
+	Link partner advertised link modes:  10baseT/Half 10baseT/Full
+	                                     100baseT/Half 100baseT/Full
+	                                     1000baseT/Full
+	Link partner advertised pause frame use: No
+	Link partner advertised auto-negotiation: Yes
+	Link partner advertised FEC modes: Not reported
+	Speed: 1000Mb/s
+	Duplex: Full
+	Auto-negotiation: on
+	Port: Twisted Pair
+	PHYAD: 1
+	Transceiver: internal
+	MDI-X: on (auto)
+	Supports Wake-on: d
+	Wake-on: d
+        Current message level: 0x00000007 (7)
+                               drv probe link
+	Link detected: yes
+
+
+--=20
+Best Regards,
+Marek Marczykowski-G=C3=B3recki
+Invisible Things Lab
+
+--3dtuJQ5HLXloIV6T
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhrpukzGPukRmQqkK24/THMrX1ywFAmf9BmEACgkQ24/THMrX
+1ywZZQf/VzpE9UiEUa/4GQjlzqL4ic3Lfu4aN6g4RuEVdM9dIGS1ZsNSg6r5Z9Vj
+qxmm/J7h6i+ma685KIK62ZaFKmK29sTYh0dq0oI0TldQeWj5g9BHKmbMJevXJdKJ
+F/zdOAqnaY7U2iT3nVQ5I38dwgCwrPH7WYruF582LgFeFIgvcA23ya4EmGqIVolX
+Uu/JeU3MICCM3HvEv3VvFpWSGHGVSdpc4WnCr6KoywLVwz2QCO49GmNDcykRwkjL
+NbEdi9/1N7W6i1+J1ISUqrv6dLAJvpYyK3HP7bovdFjs01BQ5lXKmsX0Gn7SYa89
+LuB2k2oNOpoLJgFxcjrIkGzfX/8dRA==
+=+RlG
+-----END PGP SIGNATURE-----
+
+--3dtuJQ5HLXloIV6T--
 
