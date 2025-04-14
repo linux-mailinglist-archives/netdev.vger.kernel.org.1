@@ -1,148 +1,126 @@
-Return-Path: <netdev+bounces-182054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81CF0A87862
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 09:04:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E9E98A8788D
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 09:17:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C84016F032
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 07:04:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAC9A16E500
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 07:17:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF5051B0439;
-	Mon, 14 Apr 2025 07:04:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7C57257AE8;
+	Mon, 14 Apr 2025 07:17:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q5NT3ooc"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="QxNGzkn2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908021624CE;
-	Mon, 14 Apr 2025 07:04:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7AF3257AC8
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 07:17:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744614278; cv=none; b=Sh7ECoLKk5LgA2akQu7xsskuu50ql+2M0eTn7Uy4svWgrdnDwrW9D4OgAGHiTFqiFNEqKL9OYfUEmxChx1I3Tet7o++3MQBt4s1ib3TOIltCdH4HMX+5SGUyMwYhrxfJgBddXFZxHzr0aJnqITuYLa31Et5hcJN1MBOIvvmcGXs=
+	t=1744615057; cv=none; b=AueX8LWqlfkW7xBFVgCIs5kSNdbQyLid2n7dpWVIC2JRNgSzwgGMWePV9f4qBCE+rqzl8lkdq4SuyyQe5n7mETm3ZO4mjYPA70wh3I423jNzTjcoN8zTAdhpjaHxtZz2wk0YgcTutCaizAgpkgXDD6lZLS/ugKg6BzmCtnCoRUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744614278; c=relaxed/simple;
-	bh=e8t9Yt/78Y9gJKGdmcEE+Tpq2s1D34EAKw9+eAeebPw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=m8hYVs+1jDTlB0VEJWgiz/ESS+0fWXfWqW2dObFkZ88J/y54iNlx84aaU5YkiUtWqtuj+Mdg/HKTbyYZ9KUsriJS3x2XZvkPta0vPTPjVMLDdWz2MCBExYJ8Sbh58rLlXBFyN7go1OcNC84/rYZMpLBpEfH364UsuB6Y6do38hA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q5NT3ooc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAE8AC4CEE2;
-	Mon, 14 Apr 2025 07:04:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744614278;
-	bh=e8t9Yt/78Y9gJKGdmcEE+Tpq2s1D34EAKw9+eAeebPw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=q5NT3oocdPwqqKncN8reoub2EWcy4spT2POT/eTUEvYw8X3+fpT5X0+yPGdUmZE/T
-	 MJCMTaNroQF3vRg8TWn5ubN5OK/Cmbw5iWXkzNqsJxmvfvTQd/nU6DDSrA9LLvoqzK
-	 1ja+o3MdwAiRIcYD7qHNdRFAe4B5vqqVXYpBz0YmPlwHY3Q0qKOEcz62uamiX7rjpL
-	 Sx9runKySf8m+A83VzBW+Z40b+11j4bwGdhOdbJZCdJCySUT60cSBKShhGKS1579gq
-	 zLhQMbvlCXfrFmpiiATFr1f8dK6QYVvPF16nHBMXVgQFFhiBTWJAlrWEik/G/Rzwfh
-	 5Gvt3rDJE+MRg==
-From: Andreas Hindborg <a.hindborg@kernel.org>
-To: "Boqun Feng" <boqun.feng@gmail.com>
-Cc: "FUJITA Tomonori" <fujita.tomonori@gmail.com>,
-  <rust-for-linux@vger.kernel.org>,  "Gary Guo" <gary@garyguo.net>,  "Fiona
- Behrens" <me@kloenk.dev>,  "Daniel Almeida"
- <daniel.almeida@collabora.com>,  <linux-kernel@vger.kernel.org>,
-  <netdev@vger.kernel.org>,  <andrew@lunn.ch>,  <hkallweit1@gmail.com>,
-  <tmgross@umich.edu>,  <ojeda@kernel.org>,  <alex.gaynor@gmail.com>,
-  <bjorn3_gh@protonmail.com>,  <benno.lossin@proton.me>,
-  <a.hindborg@samsung.com>,  <aliceryhl@google.com>,
-  <anna-maria@linutronix.de>,  <frederic@kernel.org>,
-  <tglx@linutronix.de>,  <arnd@arndb.de>,  <jstultz@google.com>,
-  <sboyd@kernel.org>,  <mingo@redhat.com>,  <peterz@infradead.org>,
-  <juri.lelli@redhat.com>,  <vincent.guittot@linaro.org>,
-  <dietmar.eggemann@arm.com>,  <rostedt@goodmis.org>,
-  <bsegall@google.com>,  <mgorman@suse.de>,  <vschneid@redhat.com>,
-  <tgunders@redhat.com>,  <david.laight.linux@gmail.com>
-Subject: Re: [PATCH v13 3/5] rust: time: Introduce Instant type
-In-Reply-To: <67fc517b.050a0220.301460.dfe7@mx.google.com> (Boqun Feng's
-	message of "Sun, 13 Apr 2025 17:06:15 -0700")
-References: <20250413104310.162045-1-fujita.tomonori@gmail.com>
-	<20250413104310.162045-4-fujita.tomonori@gmail.com>
-	<gfamC5NjhLe9s4hmTvSZ7QKdHWaDanKv8IgocjF5GbeWMHvfFm0bGedvpqm5ZedrHFp-Nl6jEQC3618e3UQRrQ==@protonmail.internalid>
-	<67fc517b.050a0220.301460.dfe7@mx.google.com>
-User-Agent: mu4e 1.12.7; emacs 29.4
-Date: Mon, 14 Apr 2025 09:04:14 +0200
-Message-ID: <87lds3cjgx.fsf@kernel.org>
+	s=arc-20240116; t=1744615057; c=relaxed/simple;
+	bh=j6SwR74zPcLnawGyfD6E/DUW+Qkj4TkGT0i1w4bdZW8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QJ3cog36fcPS1syttCSZurtmwwKXW3jggAqLh8rInQWj63VLauFqkErE1u//IBXm7R3dPMTyI5YxHXzkcAfIaLart+hDAK6fmItmS9JxMlXCb9w7kBI0VPA44PfADKJxlrc32y9V1oVRaGwuI2j9edJ5SpYLtW5qIwWNhfUra/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=QxNGzkn2; arc=none smtp.client-ip=103.168.172.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id D8D5E11401E4;
+	Mon, 14 Apr 2025 03:17:34 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-05.internal (MEProxy); Mon, 14 Apr 2025 03:17:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1744615054; x=1744701454; bh=iQIHwn72PtERMcqWnBytQofOT8EqjeadFEn
+	JU+qbYuI=; b=QxNGzkn2FJrXyHlKJ5zrF8gw+8GBRCxrpaYcZAAHQ2ObHcNaFlg
+	sXOi8NTSvQk4y/Rmz7HE4fPHka6JeM4W5SoQjzduO9g3c1+ztPW2v+kV/ddRTIV7
+	l3JRfwzDxNym5LQdasR3gpn+qNfUoOwhAU/f8G0IV3m1PQhjJILc8REEPEnm9JCw
+	UUcfT+eqH6BRhaThS6RIluF8N0ex1dD8/1zi+hpo3PiOCnZ4Dyq1COsu15zCd7F5
+	SNkiiCCRIvKxsHFmrngR1hSOSBkop/qRRF7QOOE3ADA3KnF1FNZiTPLilV+lcCtp
+	Ir6yG+PMsFa/24i3jY6MlIQsE5cSRsCkcnQ==
+X-ME-Sender: <xms:jrb8Z3-KPK29vGE00FXtJGUFobdlgLMtDHpZP-mRVIGvlQ0yRtdTuA>
+    <xme:jrb8ZzsuPz4Y5eUsPG_4SPK_emJyV78Z8icgoEhdisfUORYYbLWQNDtas4NiJ2AZk
+    0sFeX3PWZFYVoA>
+X-ME-Received: <xmr:jrb8Z1AJNAQb8H9fxLRKEJYV42cNBxWuUxg-4x5KMbbBQ9DaRCLNL0--P98A>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvudelleefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
+    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucenucfjughrpeffhf
+    fvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefkughoucfutghhihhmmhgv
+    lhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtthgvrhhnpedvud
+    efveekheeugeeftddvveefgfduieefudeifefgleekheegleegjeejgeeghfenucevlhhu
+    shhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiughoshgthhesih
+    guohhstghhrdhorhhgpdhnsggprhgtphhtthhopeegpdhmohguvgepshhmthhpohhuthdp
+    rhgtphhtthhopehhrghnhhhuihhhuhhiheeshhhurgifvghirdgtohhmpdhrtghpthhtoh
+    epughsrghhvghrnheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvghr
+    nhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdroh
+    hrgh
+X-ME-Proxy: <xmx:jrb8ZzdDKcXlzZPAjkRTpbMUYVaelaEb9OiB4pTuUNA-NIJ_lwQpPg>
+    <xmx:jrb8Z8PM7OkJj-SzhGdOA2B6XifREg2qvYv8dL3wEgxDMxo3blFrzw>
+    <xmx:jrb8Z1n9dLgPmI5WnYmWxkFoGyzz5lNsBZQ87XyasPOKvzn92xdiyg>
+    <xmx:jrb8Z2tmF9SeG0mEzFAcsjNplRyU8DTstVFnixMIx4qG_ZG4DoP5-w>
+    <xmx:jrb8Z2uQYy7Skd1zKaiIhorWpJWitoVXTgPSwHSSFCOy9Y04uSJ_XFdN>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 14 Apr 2025 03:17:33 -0400 (EDT)
+Date: Mon, 14 Apr 2025 10:17:31 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: hanhuihui <hanhuihui5@huawei.com>
+Cc: dsahern@kernel.org, kuba@kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] resume oif rule match l3mdev in fib_lookup
+Message-ID: <Z_y2i05h0uLFnkhb@shredder>
+References: <Z_V--XONvQZaFCJ8@shredder>
+ <20250412131910.15559-1-hanhuihui5@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250412131910.15559-1-hanhuihui5@huawei.com>
 
-"Boqun Feng" <boqun.feng@gmail.com> writes:
+On Sat, Apr 12, 2025 at 09:19:10PM +0800, hanhuihui wrote:
+> flowi_oif will be reset if flowi_oif set to a l3mdev (e.g., VRF) device.
+> This causes the oif rule to fail to match the l3mdev device in fib_lookup.
+> Let's get back to previous behavior.
+> 
+> Fixes: 40867d74c374 ("net: Add l3mdev index to flow struct and avoid oif reset for port devices")
+> Signed-off-by: hanhuihui hanhuihui5@huawei.com
+> ---
+>  net/core/fib_rules.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/core/fib_rules.c b/net/core/fib_rules.c
+> index 4bc64d9..3c2a2db 100644
+> --- a/net/core/fib_rules.c
+> +++ b/net/core/fib_rules.c
+> @@ -268,7 +268,7 @@ static int fib_rule_match(struct fib_rule *rule, struct fib_rules_ops *ops,
+>  		goto out;
+>  
+>  	oifindex = READ_ONCE(rule->oifindex);
+> -	if (oifindex && (oifindex != fl->flowi_oif))
+> +	if (oifindex && (oifindex != (fl->flowi_l3mdev ? : fl->flowi_oif)))
 
-> On Sun, Apr 13, 2025 at 07:43:08PM +0900, FUJITA Tomonori wrote:
->> Introduce a type representing a specific point in time. We could use
->> the Ktime type but C's ktime_t is used for both timestamp and
->> timedelta. To avoid confusion, introduce a new Instant type for
->> timestamp.
->>
->> Rename Ktime to Instant and modify their methods for timestamp.
->>
->> Implement the subtraction operator for Instant:
->>
->> Delta = Instant A - Instant B
->>
->> Reviewed-by: Boqun Feng <boqun.feng@gmail.com>
->
-> I probably need to drop my Reviewed-by because of something below:
->
->> Reviewed-by: Gary Guo <gary@garyguo.net>
->> Reviewed-by: Fiona Behrens <me@kloenk.dev>
->> Tested-by: Daniel Almeida <daniel.almeida@collabora.com>
->> Reviewed-by: Andreas Hindborg <a.hindborg@kernel.org>
->> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
->> ---
-> [...]
->> diff --git a/rust/kernel/time/hrtimer.rs b/rust/kernel/time/hrtimer.rs
->> index ce53f8579d18..27243eaaf8ed 100644
->> --- a/rust/kernel/time/hrtimer.rs
->> +++ b/rust/kernel/time/hrtimer.rs
->> @@ -68,7 +68,7 @@
->>  //! `start` operation.
->>
->>  use super::ClockId;
->> -use crate::{prelude::*, time::Ktime, types::Opaque};
->> +use crate::{prelude::*, time::Instant, types::Opaque};
->>  use core::marker::PhantomData;
->>  use pin_init::PinInit;
->>
->> @@ -189,7 +189,7 @@ pub trait HrTimerPointer: Sync + Sized {
->>
->>      /// Start the timer with expiry after `expires` time units. If the timer was
->>      /// already running, it is restarted with the new expiry time.
->> -    fn start(self, expires: Ktime) -> Self::TimerHandle;
->> +    fn start(self, expires: Instant) -> Self::TimerHandle;
->
-> We should be able to use what I suggested:
->
-> 	https://lore.kernel.org/rust-for-linux/Z_ALZsnwN53ZPBrB@boqun-archlinux/
->
-> to make different timer modes (rel or abs) choose different expire type.
->
-> I don't think we can merge this patch as it is, unfortunately, because
-> it doesn't make sense for a relative timer to take an Instant as expires
-> value.
+This will prevent us from matching on the output device when the device
+is enslaved to a VRF. We should try to match on L3 domain only if the
+FIB rule matches on a VRF device. I will try to send a fix today (wasn't
+feeling well in the last few days).
 
-I told Tomo he could use `Instant` in this location and either he or I
-would fix it up later [1].
-
-I don't want to block the series on this since the new API is not worse
-than the old one where Ktime is overloaded for both uses.
-
-
-Best regards,
-Andreas Hindborg
-
-
-
-[1] https://lore.kernel.org/all/877c41v7kf.fsf@kernel.org
-
+>  		goto out;
+>  
+>  	if ((rule->mark ^ fl->flowi_mark) & rule->mark_mask)
+> -- 
+> 2.27.0
+> 
 
