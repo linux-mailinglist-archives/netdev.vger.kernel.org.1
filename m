@@ -1,126 +1,385 @@
-Return-Path: <netdev+bounces-182076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CCA9A87B14
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 10:54:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EB4BA87B17
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 10:54:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FA631893BB1
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 08:54:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 533B416D96E
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 08:54:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53865258CE6;
-	Mon, 14 Apr 2025 08:54:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A1CD25A63F;
+	Mon, 14 Apr 2025 08:54:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bXgaSmRT"
+	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="puHe2RNs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AFCE1B4234;
-	Mon, 14 Apr 2025 08:54:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9740258CE6;
+	Mon, 14 Apr 2025 08:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744620860; cv=none; b=Xl9A0aaSHSjCnrZ1/PVnjLnFS2NeKupvNvnCQQHrLIE/VIgWEZlqM2JS0OCe0gLnlmVeQAguBwtGKubgvTLP316jdlSTe7mhX0I26WORvV9CmSq6WWWGwHa73CR/6WHVxaELzE0UyQBaDdMkRd7BOIFdsyP3S0/yKngVn+q4mHA=
+	t=1744620881; cv=none; b=fHLzfyyMYFjdyD1dNqOLdtRN4RFLsrsgHU+pWrSiB4XQ6GzdDENHelYeATz81A9lTDfop9/d1RxrqtdiZZo6GcdSM6fHC8KYpF5gbL3LWcpHoXn/6um3pvpBo9Ro9hrQAu3e/plTRYWF7YZkA+O/WgihbrDCivkMxl97PLBSEGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744620860; c=relaxed/simple;
-	bh=nw8eVmRqVwF9alcDHpVkbbL/Rtrj2jc+FZjU1k6Gs98=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y46YXtxJlSwGy7QXTmFVX/eMXVyQpcNwwiZ0zN4eUzFBliAJ/W+z+EKM0euN1dyw/d0lnSK6UP8I7FFYY/lfF4To6tQs2Sm//a7b+Tkaai/96PdQEJ5vLZmj+FjdqJOAMVU76Q3kkAtNxDgS5B2pLtSAbN7hVf94GXe53Koc8TA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bXgaSmRT; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43d04dc73b7so42303595e9.3;
-        Mon, 14 Apr 2025 01:54:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744620857; x=1745225657; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=V6YosFn/tXjoFJpxYO7loq2FcKuVEdfZqaplaUa/7TI=;
-        b=bXgaSmRToecUS+CCkHFiB7ppjKVHDQBLWufmhRMA01vwae6g/93pTDmlSBpem2AQu1
-         ECGrjMy7CVhmDOxWybhKDPHWbh6eVGA8uc72qa/FainecKJDLYl4kDclN/g8PR8yHXcL
-         cQ+3GQWxbi8azPlCF2WQcKD4Mfw7bue0zNYWdjdClc6bL0bjK+Q77047Tsn9W4Hasg9F
-         5ZddeyZ7vk6Mr4cPAsE+Tij/avu/BdiFbkdpYzIMiplDEM43+57ZxX3pOzsKqwqK63Nc
-         I4zGbU0qBjEFLlxfQ7yskGUd9x0o3fujwSAPxAc5v+nPwZTHsGtMUeYwMa809D3qO9L9
-         3JNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744620857; x=1745225657;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=V6YosFn/tXjoFJpxYO7loq2FcKuVEdfZqaplaUa/7TI=;
-        b=EprXprYK4+uL/n5Kn7Q2UZ+JZ+0p3JpbuTSCcMruwr3aRsBaThqixFRP3vqyklWzlz
-         m9Djp1Vsw2mTjqclMtEoooYrQKmnzNBQcQ+dLWPwEBKacV/TRk5hVZSYt064K9IZLp8i
-         SJmA7q26UEaZ20AC2+ontEYtPHQgKUvHGBVasPYFp9rpDU0iVGL1BFI6i4tK+GMrGkbc
-         zjrkZRjzJ5uOZ1iD+XxRrTDbaSqIJvvEz0f2KmlTwyLTzdXZzGkhzoFOJhdlMFVJHLqc
-         /51rDgyxnGrVsUYTKxBmlc9/2uNklokNx3XNpTn6/qOo/DdORgRCQf4TzcXUvOQslvZ7
-         f7Rg==
-X-Forwarded-Encrypted: i=1; AJvYcCXhd17kfTDt9sYQ7NZXi7Nsr/ug2GMyzhChF8esKs4Gj7zKUjz/gK8/87bJosUJSs5DMp3bAno=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxp9fgzALfiiqLRcov6utxxR8yGnRtmfFuxIEsNFbopF9sZz/Or
-	9hb32z7tWjSV8f+qYNkXHz9Hd7TzvzKQ5z+1jW0YbPEniXQehABS
-X-Gm-Gg: ASbGnctgcZDlGkftoV4jyM2jYvQjeTopGQmZfxJTXyy1CJgWEUZobyIQcZNU5mUHqBU
-	hO40jkHJjuwGltK6dWaF9/Sd56WQ0Trt9TrBz9Vt+BQ+Cu9xcfjmb2LBSRnmObMvPA0EMHrtHMW
-	mHcQ9h+IWklcn4Cd80iB1eSZHBleVIKkVR2TmTrQ6+D2q/Py0L34siXRMTL+oAh9dm9bs6pHoig
-	KTMNZrjpYPnrmtIo0CJlhQ8byma6ZQGx+iLBfh+4ei7vSfKLG/6LfWcNTJk0+0kVGvdGymWd0iT
-	Vk7IQbUqZvbIxKVm6CJPdSuw0WTVV7QC5BKE5MtZlFShelB+VlRWuzE/gxly8Kb5/rXNCy9AIYB
-	kt0QPqLao9S5N
-X-Google-Smtp-Source: AGHT+IGv81mv0E2ZY2JTv11bML10mU1xHuSqraOTLvYxFwFu0n9xeDQ1S00X1ItmrMpz1s4tyMS3rw==
-X-Received: by 2002:a05:600c:3b0d:b0:43c:fdbe:43be with SMTP id 5b1f17b1804b1-43f3a9beb77mr107495785e9.27.1744620856564;
-        Mon, 14 Apr 2025 01:54:16 -0700 (PDT)
-Received: from fedora.advaoptical.com ([82.166.23.19])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f20625ea4sm172390675e9.12.2025.04.14.01.54.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Apr 2025 01:54:16 -0700 (PDT)
-From: Sagi Maimon <maimon.sagi@gmail.com>
-To: jonathan.lemon@gmail.com,
-	vadim.fedorenko@linux.dev,
-	richardcochran@gmail.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Sagi Maimon <maimon.sagi@gmail.com>
-Subject: [PATCH v1] ptp: ocp: fix NULL deref in _signal_summary_show
-Date: Mon, 14 Apr 2025 11:54:12 +0300
-Message-ID: <20250414085412.117120-1-maimon.sagi@gmail.com>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1744620881; c=relaxed/simple;
+	bh=OtiWinAuGO/x93pZnnzNNLZp08Nnd24jDLjZ+uXGI6c=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ZZfAtFEXKHcgSad6yBf/TSbBL3WqEBdeYECsQaH35SpfSET3DB8l355b6M6AusbJTi9sNJrvm/x/8huNAyykH6tuupSBbttPRXLi8XRqHGNCzdQD2NG9J5TcssB2UlLZPlgD99lHdoyKv3TT9TEY763Jl9yegbCJP6iFJm6DSPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=puHe2RNs; arc=none smtp.client-ip=80.241.56.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [IPv6:2001:67c:2050:b231:465::2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4Zbh1K4KBGz9sRF;
+	Mon, 14 Apr 2025 10:54:29 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
+	t=1744620869; h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gej7AqCpSA3orQMGhM8SSQJE32kRxp+nL8xnfMUk6a0=;
+	b=puHe2RNsvSvWeQBm3qE75E7ZxMKc6VjiDeEAOvNGA/g5lcwmiIzzDjUDlYmdALMdSBhhPE
+	S4bkqVD4sD77zbhQm1k2eX18U8svvkusXuQn2VX8QUeQARQvjXpix1p5fErlsVuSR0FsPr
+	PNLjnPqPPUgMJPeDHSI+bRwsBOrCOD+P6BcdwJrK6Em+DLshmcgjlYz9IUTqaKTRVAnPWO
+	28mZuRHonPoUP3+hDvBwxCC5/EKn94bIkguGZxpxdqkFOzFqRUqolDA76+SgXiT4T+R5iK
+	nFcrT692Alj3eu5Eq+qhXpHh9cm275m/sZ+DlUJSZzfs9g0HPoX7CUDIdE/i/A==
+Message-ID: <6e4628c3cfc7e0d1e4ea9af510ce0b09b34a8cf8.camel@mailbox.org>
+Subject: Re: [PATCH 1/3] drm/nouveau: Prevent signaled fences in pending list
+From: Philipp Stanner <phasta@mailbox.org>
+Reply-To: phasta@kernel.org
+To: phasta@kernel.org, Christian =?ISO-8859-1?Q?K=F6nig?=
+ <christian.koenig@amd.com>, Lyude Paul <lyude@redhat.com>, Danilo Krummrich
+ <dakr@kernel.org>, David Airlie <airlied@gmail.com>, Simona Vetter
+ <simona@ffwll.ch>, Sabrina Dubroca <sd@queasysnail.net>, Sumit Semwal
+ <sumit.semwal@linaro.org>
+Cc: dri-devel@lists.freedesktop.org, nouveau@lists.freedesktop.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org, 
+	stable@vger.kernel.org
+Date: Mon, 14 Apr 2025 10:54:25 +0200
+In-Reply-To: <1127db242503055b2e5e8d07db3aeae46cfb7a24.camel@mailbox.org>
+References: <20250410092418.135258-2-phasta@kernel.org>
+	 <20250410092418.135258-3-phasta@kernel.org>
+	 <8583665a-6886-4245-be49-fd8839cfe212@amd.com>
+	 <c737c89c7ce9174e349c61ab4e5712eee8946f13.camel@mailbox.org>
+	 <50c9530d-e274-4f89-8620-16afe0981239@amd.com>
+	 <1a73e5fe4350d6ee4b7d807612264eb637c4f2a9.camel@mailbox.org>
+	 <d3dee321cd6b70d6ca98768fbcf6f1e6134c43a1.camel@mailbox.org>
+	 <81a70ba6-94b1-4bb3-a0b2-9e8890f90b33@amd.com>
+	 <aca00cb25b813da4fd2f215829f02337f05642f3.camel@mailbox.org>
+	 <45d66ca4-5390-42e9-869a-f5f9125d05b6@amd.com>
+	 <1127db242503055b2e5e8d07db3aeae46cfb7a24.camel@mailbox.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MBO-RS-META: imzx7ok4x3qs7k5uuj4gn5k6or54yunk
+X-MBO-RS-ID: abfa6d929ede9d90be3
 
-Sysfs signal show operations can invoke _signal_summary_show before
-signal_out array elements are initialized, causing a NULL pointer
-dereference. Add NULL checks for signal_out elements to prevent kernel
-crashes.
+On Fri, 2025-04-11 at 16:10 +0200, Philipp Stanner wrote:
+> On Fri, 2025-04-11 at 15:06 +0200, Christian K=C3=B6nig wrote:
+> > Am 11.04.25 um 14:44 schrieb Philipp Stanner:
+> > > On Fri, 2025-04-11 at 13:05 +0200, Christian K=C3=B6nig wrote:
+> > > > =C2=A0Am 11.04.25 um 11:29 schrieb Philipp Stanner:
+> > > > =C2=A0
+> > > > > [SNIP]
+> > > > > =C2=A0
+> > > > > It could be, however, that at the same moment
+> > > > > nouveau_fence_signal() is
+> > > > > removing that entry, holding the appropriate lock.
+> > > > >=20
+> > > > > So we have a race. Again.
+> > > > > =C2=A0
+> > > > =C2=A0
+> > > > =C2=A0Ah, yes of course. If signaled is called with or without the
+> > > > lock is
+> > > > actually undetermined.
+> > > > =C2=A0
+> > > > =C2=A0
+> > > > > =C2=A0
+> > > > > You see, fixing things in Nouveau is difficult :)
+> > > > > It gets more difficult if you want to clean it up "properly",
+> > > > > so it
+> > > > > conforms to rules such as those from dma_fence.
+> > > > >=20
+> > > > > I have now provided two fixes that both work, but you are not
+> > > > > satisfied
+> > > > > with from the dma_fence-maintainer's perspective. I
+> > > > > understand
+> > > > > that,
+> > > > > but please also understand that it's actually not my primary
+> > > > > task
+> > > > > to
+> > > > > work on Nouveau. I just have to fix this bug to move on with
+> > > > > my
+> > > > > scheduler work.
+> > > > > =C2=A0
+> > > > =C2=A0
+> > > > =C2=A0Well I'm happy with whatever solution as long as it works, bu=
+t
+> > > > as
+> > > > far as I can see the approach with the callback simply doesn't.
+> > > > =C2=A0
+> > > > =C2=A0You just can't drop the fence reference for the list from the
+> > > > callback.
+> > > > =C2=A0
+> > > > =C2=A0
+> > > > > =C2=A0
+> > > > > So if you have another idea, feel free to share it. But I'd
+> > > > > like to
+> > > > > know how we can go on here.
+> > > > > =C2=A0
+> > > > =C2=A0
+> > > > =C2=A0Well the fence code actually works, doesn't it? The problem i=
+s
+> > > > rather that setting the error throws a warning because it
+> > > > doesn't
+> > > > expect signaled fences on the pending list.
+> > > > =C2=A0
+> > > > =C2=A0Maybe we should fix that instead.
+> > > The fence code works as the author intended, but I would be happy
+> > > if it
+> > > were more explicitly documented.
+> > >=20
+> > > Regarding the WARN_ON: It occurs in dma_fence_set_error() because
+> > > there
+> > > is an attempt to set an error code on a signaled fence. I don't
+> > > think
+> > > that should be "fixed", it works as intended: You must not set an
+> > > error
+> > > code of a fence that was already signaled.
+> > >=20
+> > > The reason seems to be that once a fence is signaled, a third
+> > > party
+> > > might evaluate the error code.
+> >=20
+> > Yeah, more or less correct. The idea is you can't declare an
+> > operation as having an error after the operation has already
+> > completed.
+> >=20
+> > Because everyone will just wait for the completion and nobody
+> > checks
+> > the status again after that.
+> >=20
+> > >=20
+> > > But I think this wasn't wat you meant with "fix".
+> >=20
+> > The idea was to avoid calling dma_fence_set_error() on already
+> > signaled fences. Something like this:
+> >=20
+> > @@ -90,7 +90,7 @@ nouveau_fence_context_kill(struct
+> > nouveau_fence_chan *fctx, int error)
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 while (!list_empty(&fctx->pe=
+nding)) {
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 fence =3D list_entry(fctx->pending.next,
+> > typeof(*fence), head);
+> > =C2=A0
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 if (error)
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 if (error & !dma_fence_is_signaled_locked(&fence-
+> > > base))
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dma_f=
+ence_set_error(&fence->base, error);
+> > =C2=A0
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 if (nouveau_fence_signal(fence))
+> >=20
+> > That would also improve the handling quite a bit since we now don't
+> > set errors on fences which are already completed even if we haven't
+> > realized that they are already completed yet.
+> >=20
+> > > In any case, there must not be signaled fences in nouveau's
+> > > pending-
+> > > list. They must be removed immediately once they signal, and this
+> > > must
+> > > not race.
+> >=20
+> > Why actually? As far as I can see the pending list is not for the
+> > unsignaled fences, but rather the pending interrupt processing.
+>=20
+> That's a list of fences that are "in the air", i.e., whose jobs are
+> currently being processed by the hardware. Once a job is done, its
+> fence must be removed.
+>=20
+> >=20
+> > So having signaled fences on the pending list is perfectly
+> > possible.
+>=20
+> It is possible, and that is a bug. The list is used by
+> nouveau_fence_context_kill() to kill still pending jobs. It shall not
+> try to kill and set error codes for fences that are already signaled.
 
-Fixes: b325af3cfab9 ("ptp: ocp: Add signal generators and update sysfs nodes")
-Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
----
- drivers/ptp/ptp_ocp.c | 3 +++
- 1 file changed, 3 insertions(+)
+@Danilo:
+We have now 2 possible solutions for the firing WARN_ON floating.
 
-diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
-index 7945c6be1f7c..4c7893539cec 100644
---- a/drivers/ptp/ptp_ocp.c
-+++ b/drivers/ptp/ptp_ocp.c
-@@ -3963,6 +3963,9 @@ _signal_summary_show(struct seq_file *s, struct ptp_ocp *bp, int nr)
- 	bool on;
- 	u32 val;
- 
-+	if (!bp->signal_out[nr])
-+		return;
-+
- 	on = signal->running;
- 	sprintf(label, "GEN%d", nr + 1);
- 	seq_printf(s, "%7s: %s, period:%llu duty:%d%% phase:%llu pol:%d",
--- 
-2.47.0
+Version A (Christian)
+Check in nouveau_fence_context_kill() whether a fence is already
+signaled before setting an error.
+
+Version B (Me)
+This patch series here. Make sure that in Nouveau, only
+nouveau_fence_signal() signals fences.
+
+
+Both should do the trick. Please share a maintainer-preference so I can
+move on here.
+
+Thx
+P.
+
+>=20
+>=20
+>=20
+> Anyways, forget about the "remove callbacks solution" it actually
+> causes a MASSIVE performance regression. No idea why, AFAICS the fast
+> path is only ever evaluated in nouveau_fence_done(), but maybe I
+> missed
+> something.
+>=20
+> Will re-iterate next week=E2=80=A6
+>=20
+>=20
+> P.
+>=20
+>=20
+> >=20
+> > Regards,
+> > Christian.
+> >=20
+> > >=20
+> > > > =C2=A0
+> > > > =C2=A0
+> > > > > =C2=A0
+> > > > > I'm running out of ideas. What I'm wondering if we couldn't
+> > > > > just
+> > > > > remove
+> > > > > performance hacky fastpath functions such as
+> > > > > nouveau_fence_is_signaled() completely. It seems redundant to
+> > > > > me.
+> > > > > =C2=A0
+> > > > =C2=A0
+> > > > =C2=A0That would work for me as well.
+> > > I'll test this approach. Seems a bit like the nuclear approach,
+> > > but
+> > > if
+> > > it works we'd at least clean up a lot of this mess.
+> > >=20
+> > >=20
+> > > P.
+> > >=20
+> > >=20
+> > > > =C2=A0
+> > > > =C2=A0
+> > > > > =C2=A0
+> > > > >=20
+> > > > > Or we might add locking to it, but IDK what was achieved with
+> > > > > RCU
+> > > > > here.
+> > > > > In any case it's definitely bad that Nouveau has so many
+> > > > > redundant
+> > > > > and
+> > > > > half-redundant mechanisms.
+> > > > > =C2=A0
+> > > > =C2=A0
+> > > > =C2=A0Yeah, agree messing with the locks even more won't help us
+> > > > here.
+> > > > =C2=A0
+> > > > =C2=A0Regards,
+> > > > =C2=A0Christian.
+> > > > =C2=A0
+> > > > =C2=A0
+> > > > > =C2=A0
+> > > > >=20
+> > > > >=20
+> > > > > P.
+> > > > >=20
+> > > > > =C2=A0
+> > > > > > =C2=A0
+> > > > > >=20
+> > > > > > P.
+> > > > > >=20
+> > > > > > =C2=A0
+> > > > > > > =C2=A0
+> > > > > > > Regards,
+> > > > > > > Christian.
+> > > > > > >=20
+> > > > > > > =C2=A0
+> > > > > > > > =C2=A0
+> > > > > > > > P.
+> > > > > > > >=20
+> > > > > > > >=20
+> > > > > > > >=20
+> > > > > > > > =C2=A0
+> > > > > > > > > =C2=A0
+> > > > > > > > > Regards,
+> > > > > > > > > Christian.
+> > > > > > > > >=20
+> > > > > > > > > =C2=A0
+> > > > > > > > > > =C2=A0
+> > > > > > > > > > Replace the call to dma_fence_is_signaled() with
+> > > > > > > > > > nouveau_fence_base_is_signaled().
+> > > > > > > > > >=20
+> > > > > > > > > > Cc: <stable@vger.kernel.org> # 4.10+, precise
+> > > > > > > > > > commit
+> > > > > > > > > > not
+> > > > > > > > > > to
+> > > > > > > > > > be
+> > > > > > > > > > determined
+> > > > > > > > > > Signed-off-by: Philipp Stanner <phasta@kernel.org>
+> > > > > > > > > > ---
+> > > > > > > > > > =C2=A0drivers/gpu/drm/nouveau/nouveau_fence.c | 2 +-
+> > > > > > > > > > =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
+> > > > > > > > > >=20
+> > > > > > > > > > diff --git
+> > > > > > > > > > a/drivers/gpu/drm/nouveau/nouveau_fence.c
+> > > > > > > > > > b/drivers/gpu/drm/nouveau/nouveau_fence.c
+> > > > > > > > > > index 7cc84472cece..33535987d8ed 100644
+> > > > > > > > > > --- a/drivers/gpu/drm/nouveau/nouveau_fence.c
+> > > > > > > > > > +++ b/drivers/gpu/drm/nouveau/nouveau_fence.c
+> > > > > > > > > > @@ -274,7 +274,7 @@ nouveau_fence_done(struct
+> > > > > > > > > > nouveau_fence
+> > > > > > > > > > *fence)
+> > > > > > > > > > =C2=A0			nvif_event_block(&fctx-
+> > > > > > > > > > > event);
+> > > > > > > > > > =C2=A0		spin_unlock_irqrestore(&fctx-
+> > > > > > > > > > >lock,
+> > > > > > > > > > flags);
+> > > > > > > > > > =C2=A0	}
+> > > > > > > > > > -	return dma_fence_is_signaled(&fence-
+> > > > > > > > > > >base);
+> > > > > > > > > > +	return
+> > > > > > > > > > test_bit(DMA_FENCE_FLAG_SIGNALED_BIT,
+> > > > > > > > > > &fence-
+> > > > > > > > > > =C2=A0
+> > > > > > > > > > > =C2=A0
+> > > > > > > > > > > base.flags);
+> > > > > > > > > > > =C2=A0
+> > > > > > > > > > =C2=A0
+> > > > > > > > > > =C2=A0}
+> > > > > > > > > > =C2=A0
+> > > > > > > > > > =C2=A0static long
+> > > > > > > > > > =C2=A0
+> > > > > > > > > =C2=A0
+> > > > > > > > =C2=A0
+> > > > > > > =C2=A0
+> > > > > > =C2=A0=C2=A0
+> > > > > =C2=A0=C2=A0
+> > > > =C2=A0
+> > > > =C2=A0
+> >=20
+>=20
 
 
