@@ -1,245 +1,368 @@
-Return-Path: <netdev+bounces-182493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B71F2A88DCE
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 23:29:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F138A88DCB
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 23:28:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB5301899659
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 21:29:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EAE1169FBF
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 21:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 713231D63E4;
-	Mon, 14 Apr 2025 21:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33EDF1624CE;
+	Mon, 14 Apr 2025 21:28:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="W+sd9bWm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L86q7Bi4"
 X-Original-To: netdev@vger.kernel.org
-Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11012046.outbound.protection.outlook.com [52.101.66.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 426F517555
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 21:29:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744666167; cv=fail; b=Y+r9SGzWq4q/m111xsP60/NCsJgNRs2PcLSIjm70zVkMBMhMxmE5uB1NZznCXQHk8s56sdlO7hTDWgbaK6bMbdlYsuRlmRu8xNS1ugXr6w4WYR18z0WoB4ro7/uZIq0rIKJXbPPJVp9agKQvb68OOhGgIUVhhWoEdmlIodhbePA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744666167; c=relaxed/simple;
-	bh=Ci6FtpM4IjO1r+LRn4FiSIiH99QXb4g4dz8FCK+YEEQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=PjCf3PgqkcF9TfLYNX19rUmx/OXLQagBMtalAfEFyTAfBlqNNXpXXsV4tzB90skGWhIP7yPV9D5NLBu2j5JDFMlm8EMG6fMBxzSLE4eeU9pqou07g8U2+SvZyh7ShSJkEqdWe5lZv97peKv1NPVGT4oz2G3LEQiyfm9aW6T8V30=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=W+sd9bWm; arc=fail smtp.client-ip=52.101.66.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vJF2XaKh5Sj8SRd5xWoURonVili9DoIeh/CUcb1SMblIzgpMnDqL/IEZvvszVVnDDP+X0no0K7O3CWRx/DImaswWj7LOmYoL7Pyyu+N7ESQhNzZnTDvjHtibjNxyU7DBFYkqS/2Uq+NVItdBAy1NlwzMTNTERkqNLQ2GeP4rb99qOT3hjIZSNEC80T3LehHSnGJ+DBPk3mAVJS3PvDQO5NLQImVpQPyvybpNRhLQ8zgTX+Bt/BTz+Xjg2xUa7GSZXvXjhsexBZ1q95YRNdsCH4uIWewbleoHu+wyl9aYauAyvsib4wzOqcdWINEQf9prjm+iSfd33x2zx/qgF4j+Rg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=s8MQVRCn8Un0/z08lpKpNB2JWgwZBnluL4+dZ2xFk2w=;
- b=kxZy1uaUaYjZGGCkKuISWhVAOUFTSGXwG/SwdWOc72iXfGh9iudkjqoXe1m6ODcLeeynRIHCQ09DYKSXIHwzodXxcCESXSQPfD11K51OvU16EkK/Ipz+I6KPmJJdW0ul87aNw4OMDgu1GVafTAmqU2QpM8r30OI+fzMU3T/iDs94NJkJ7BkZ88Ydr8bMCNWTY2ISuIFhD+SAske+3Ed80NutwEdxDh34URDOCYeAYu+NOPWzo3XQP2EH54FxEN354D7Htr5OP0PUF8hV4nuh8nwFDg6VwmbEFxaerIJRCyS2mPVZsrKj4D9FRfIb1NP18icPt9KLvabMOdA4/mj9Hg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=s8MQVRCn8Un0/z08lpKpNB2JWgwZBnluL4+dZ2xFk2w=;
- b=W+sd9bWmgeCbtrfpEWNnewADNve0Em0od3QaPdB9z073SPJ4DcKVaf/DZazZ9u6cne+G2/hLbXWolhPK+DSYNO3vQQIwUAEl3YfnFVV/ZLioIRc4n1waf3XsWQaNQvx9EHcW9pyJt5kYYm9bADavakoStII5u9AkJY8zQt/8iHaNmu8GdRFERqvBhW8ZAd+RttSBOp3Hto2J36qp3CZ3+KUeF6kfrF3ApNtRqjHRi1tUQk5deOFvdE/Q6p0Sxzotf2MByTuDoudkeV78fFvezojypOQfSgAWn2X3qoUi1UbRJSQL3Fj8khCLukhs5i5vHV3aJ7fJUoumyzr41JLkHg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by AS4PR04MB9506.eurprd04.prod.outlook.com (2603:10a6:20b:4c9::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.34; Mon, 14 Apr
- 2025 21:29:23 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%4]) with mapi id 15.20.8632.035; Mon, 14 Apr 2025
- 21:29:22 +0000
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Russell King <linux@armlinux.org.uk>,
-	Tobias Waldekranz <tobias@waldekranz.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net 2/5] net: dsa: mv88e6xxx: fix -ENOENT when deleting VLANs and MST is unsupported
-Date: Tue, 15 Apr 2025 00:29:13 +0300
-Message-ID: <20250414212913.2955253-1-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250414212708.2948164-1-vladimir.oltean@nxp.com>
-References: <20250414212708.2948164-1-vladimir.oltean@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: VI1PR09CA0177.eurprd09.prod.outlook.com
- (2603:10a6:800:120::31) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 209551CACF3
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 21:28:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744666129; cv=none; b=nR/TFT4w/s5xr4K0ZWqnmpIXmplfa1mUY4fQiu5DBk7ndIBTTwcytlePIKbIHGV4IZYP2Y1EeI7cRFEKec/AvPJ+a/uEpGtpJlpCG7RULYW7SlT7QJ/rg08RE21132sVKZonMVeTRzylEp8ZCCogRm7XMHwMYoB7KosI8X7k5eo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744666129; c=relaxed/simple;
+	bh=j/5qHHIyG+EfjwuSn/z37Wg54z5mQMVAj0u9RxMOK3w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nG9yxQ+w6FFYrvkmdLZurbtl3pJcfob2jjaikTqkY+iu3vHszG2jfuxQH1RnwtF2e9GjsxC/chNK7+VWZwr3SeCnVSkh66V/kObhJR5WnKXmh+F/P33UFGV9m18WAjWBrl9A9Bg3kWiN/xRyH86XN3fWyjyl1FcJflWFjuao9ME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L86q7Bi4; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4394a823036so48660765e9.0
+        for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 14:28:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744666125; x=1745270925; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=f6rLonSS1IRYgwVzhVYfx8+TvS/Xpb0X8A+rRi6mFUY=;
+        b=L86q7Bi4TYSoyst3Bfjz4XBo/roMnMsPTcp3DQ+P5qWPa+5JRbuy4EujABovEuz6Xf
+         wABgoqHr/7Smx71t8a6Vvnpx4LmZEZ65b06JzvniipbvVP7eGIp/8Q84NbnyAD5rav4K
+         GpusRoVuIsb7uzOX4F1be5b4D6IgEWYPMh6HdVBfn9TCXTZ52xhHeM1Cwi5MlpBoPFcx
+         6GYuGZHXaTmlBr4FOZ7lYmiGWqarKE3M45r/s1/dYb/7+tLMmcyDeTDkJ3zAFIHO4Zb4
+         RBC9I3Lw0aBOTW7ILvGediBmi96Up5JmzVu3iAwXOsHk4mWaNocEO3VJtoJowF4nNHq4
+         8xng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744666125; x=1745270925;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=f6rLonSS1IRYgwVzhVYfx8+TvS/Xpb0X8A+rRi6mFUY=;
+        b=PIbwT/ywhEIupjAKD/bc6YeAOe+CKErnIg2dOxkFpJW2afb9VJS0jKH7t5Kuk+yWXb
+         45xp8yuPyZS0roTDbij/fORtjzSX2cX3mWCGY6dMM6/eSKsX1CoyW5R/hJGRIFKvSGkY
+         vxSpQUtq/73p96LXUwol73EQN8uwAUc/VCn57mxwAR8Lm4ypnNWMw5Kr1lx7/dHnMxI3
+         TOE9R4W4dhcpIEmo/Yl8hUTU23vEwVJfy6YJmaR5pYkAM+zNeZnGB6e/UkoDlDM0LvJ6
+         mKMcAo7ABvKTC3lCrkSEjLL89oGwAAoM6VvNec4uoAYpWWLXNLFBicRJUjvnAv4xTROP
+         gwKA==
+X-Forwarded-Encrypted: i=1; AJvYcCUv2trHHMTrh7grg+F4UB4Z57FV+/ID0yMV4Sdp4Rcvxw+co+pUM9jgorYwz6KOQla2W9s9VWI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwX1VUpreSagRxdvcJjeRqvP1kF6O1jSuLWDN0LNw8zhLy6PAPG
+	UAFKEmQMDl33Rst3VCffr8AY7DMF3zg6Q9Zx12gWOC33eFICqLcB
+X-Gm-Gg: ASbGncuwPcB1N17TzD0OHqFaRRbd6PSTjn0gqs2nC+NerHtcD2FfcTe9DYzim58hAaZ
+	A4NxladL6oOvDD1DXH6FmI54FCxfetIXqfJZZFtMICZACz9swsbq6bTzKvUOeWrvYvOTgYKD3dn
+	9qxszMoc5eiovxxiSXK9BaFuB0+iTkcKv/rB6jJT9epUAKXSwbYMi9Z/BoBnMcH3CTcUsSA+rsT
+	AQJcfP/HsHm2mICP+TQHA3zClugF1ysLVz1AzEhQKZ5VWq+6Eth6LpR8pmGa/p8csvxqHoAowad
+	hZjKpVQrP6+hdT1i8r63mqoxjKWxM6o6GM7rcxLKVdD3
+X-Google-Smtp-Source: AGHT+IH0OCErbfWzPxCUziEz0u4t1r8R/esQglYEth8JdgjmrYks0lJthixT0SRHixc5LE47eqDLtQ==
+X-Received: by 2002:a05:600c:674a:b0:43c:efed:733e with SMTP id 5b1f17b1804b1-43f4da84f37mr64620895e9.14.1744666125010;
+        Mon, 14 Apr 2025 14:28:45 -0700 (PDT)
+Received: from [192.168.0.2] ([212.50.121.5])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eae977fc8sm11892224f8f.48.2025.04.14.14.28.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Apr 2025 14:28:43 -0700 (PDT)
+Message-ID: <a43d7bce-5f70-4d69-8bad-c65976245996@gmail.com>
+Date: Tue, 15 Apr 2025 00:29:14 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|AS4PR04MB9506:EE_
-X-MS-Office365-Filtering-Correlation-Id: f85b5d0c-cf3d-49de-9c8d-08dd7b9b6c82
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|52116014|376014|1800799024|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?SnWC9QYPvw316GEVRZhENvvfMOSksqNTHnEalNY5JBg4aLopGwvk9qSqBYM1?=
- =?us-ascii?Q?r6laBUXfC/gnrsZ6aSKis0hQ1XhirsCjn1WihmcmguZUHvrrh9idfAhGw1Ze?=
- =?us-ascii?Q?gXRNafzZ4LMU6Cj7M/vJCoHEm0ysR7crus/zWGEG2KJpPjmAtfde6fwp3aXE?=
- =?us-ascii?Q?1kVj9qeMIzAXdJ4smntrlazBII3qgBB0t7D+PkQCXGCu5fHhmOl+yVWDHkBI?=
- =?us-ascii?Q?pbT/MXZPyGPGgdn7gNRiwXEk/UOG9ZglW5QfcrqcCCoE99FmaVX/8JtF1YHG?=
- =?us-ascii?Q?8A6S9v7YYAvaQMfeqLncIbULa/gbl3C7dP64Ky3/n69WZGNmpRGELi/xFKoA?=
- =?us-ascii?Q?L1vGXe0LoXF3C8qOKz+MA6FU0aoPsayICVF8Hj+UHT/7ESKJ/jQhxTOqXGhV?=
- =?us-ascii?Q?GRm3+ZUecUozapnL8kNQdi1AchNVpIv45lAAgtGFCeef8bmL2P8uoM8U8duH?=
- =?us-ascii?Q?fQSlqLRq+LNuaxmmHljUEWhNDTEsjr3ArMH1N3MWmBIDoGVmWQLriGxqmy+V?=
- =?us-ascii?Q?K5ip9VLjaIpTdc7Quk170bHB6f4DwqK9KtLfFBBv7y2EjIodwy9isZ4jIqf8?=
- =?us-ascii?Q?2bRefQ9SD9stJyPPBEthW0ZStoL86Jbt0OjIV9eS9CrDoYS7zYC8gtgPayQ5?=
- =?us-ascii?Q?jEVHKfnU1vO2QVo7rN20zM6yA5XqbgZjR/eI5khiGg1qOMTrpu3EXmdUN2HA?=
- =?us-ascii?Q?eIwtHDoSk6RiEZ77etjxTgQ91T4ytEaOo+bQEAIu9i0SV7UoZN3lRj2e7D85?=
- =?us-ascii?Q?H410Vsg5dty/yE/KvMKPfGLArcGFS1vJD84ExkyHKYS7nVnCKS/7akHSXnjk?=
- =?us-ascii?Q?b5i+Mh8vBMtolLlJ/qz+tV4mdsd4pPnYiGv7ClA0mPTH/5jPI64c8dq04EBY?=
- =?us-ascii?Q?wGpoxdLIIxiVcDK5lNtWOyRdYMIOFwGDXgphH8T6Qz1ZASMHtUeA91EAKA+K?=
- =?us-ascii?Q?lR/NUEn3x2Q0x241dPUJBnci79tWTkRUOPshX9OKzctiln+FX+ChtMeGAMiz?=
- =?us-ascii?Q?lzsZ9fsVj3RygBmjwCkWDf0yCqWLMsSTZ1lHN/m9r4IlhPFZoWXvwOSBWWEA?=
- =?us-ascii?Q?Hy6uw8UU9556mCY2/YqdjOI/etGr3XsNj5uWHcm1DlKUMWKmCqAtmMaebYfg?=
- =?us-ascii?Q?EnHzYvQ2I1/fDj1mxyJ/Dy/a2Fz+28Mz6n10HvP8a/aczQHg7n6GUrPYhEkU?=
- =?us-ascii?Q?gd8pINxfS2nQ8xgVmmIrFGaY/18ZiDThWwNDGTAJt4dSwKeXFa1ikvjfOK2R?=
- =?us-ascii?Q?gjksMpSFJUIXD/Plz8HEu7XI+diKEoUCz8rctRhSkgPo7Q0LrjdHxukFO0Uu?=
- =?us-ascii?Q?ssHAZdIzvODHa85DVRFgUUVDxPobJnSCBYNdCQnQxj8X1u/2xPbCAw6l5fv1?=
- =?us-ascii?Q?HojSmLk/lIDZe88ica6eri7w482BECB96wcr7k27j8uk3RnpFoLt2VII0kDs?=
- =?us-ascii?Q?JOvycqx0kp/XLsF0VHOGq1cBbDzl1KJGGOk8PAekuuSWsoS/xCwePJ4oQt85?=
- =?us-ascii?Q?7cGlXalES4Z4BpU=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(52116014)(376014)(1800799024)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?WXW7j3vDt1akLksf/NYMWQwaV+JF+0O4a84F2716UEa1wlQ95E1IwxDxdJTB?=
- =?us-ascii?Q?SD5MEUN+7KaNj6xbRQbjc5WjEc/1NkKkGEVSGMEfyMeTGdp3Idabp1b7C/dY?=
- =?us-ascii?Q?u98hHn3i1fScCpRdtSi0X2Lrp/dJdHm68MAWelZx8V322OygPd6kN7U9UfRq?=
- =?us-ascii?Q?Rs1xL4PPAQVbghtsXM8cnEg1IkI7I/0P66uCzQtGYGroesYH1GwlQcSkBTht?=
- =?us-ascii?Q?mTBDe5V8WJFS5HSsmY01CoA8cZ5f+fJk/YJEtOf8NzOF+3XAYHKYZTyjJIWM?=
- =?us-ascii?Q?ran+9aODb5capdbtWEx09fC6xMQhwWRZjfu8Advp3smg5EPbJ2c+6/uxPZZ6?=
- =?us-ascii?Q?3fjOGiuTXLm6N+0BgiH74vxy5/aXVX21RAgr2J7Y9a5TlHZo2VwXqqq9tgvU?=
- =?us-ascii?Q?hE7gRKFGxaRY30tpFyBeUY23wLab6BO6Pw2PHmMU7lq9+9VTnBLBJjqK5UNn?=
- =?us-ascii?Q?yEGiqKPIxvvm6ZoQ7Jvoynm3FpzOeDksDYL416YuRlgzEPfGWiNeTIxljxq1?=
- =?us-ascii?Q?Z6aTHzGH1487Q72r5RUfV6VUHw4Lvd7aeMV8cvRSpENmbknW8iccsbzraKns?=
- =?us-ascii?Q?mlTYsQ2y6hQ6gdqO2MiNOtkUVENp0HsuU39OXddoWcMy41FfqY2L77yqZyCv?=
- =?us-ascii?Q?esr3dWlGIThWmKQhuZeFeSGxdU24OQygC0fNWGsKDTYxYDCfoRVKGA++oGsY?=
- =?us-ascii?Q?iky39fWmgo0s3z7IVSANOlfXUPgKZRpMBoM4mGQeCsvxxX5ujQIeH6T+uiEn?=
- =?us-ascii?Q?L7wE63sdI0u3ARwSTI+CYawUHpabelqbI/XbR/AmaDyAWupJ3OXvU/pt4RkY?=
- =?us-ascii?Q?HvEaL8QArze0kMB7WHX0Ge0VHWUUyZ6cNnMEzAV2fitGhWS5FQxNZKNPZeJK?=
- =?us-ascii?Q?b3Dab292BW2eOu53/iSRw6y9naUQa72cPR50zXP2lE1blVt6ujm59DrBC+AZ?=
- =?us-ascii?Q?h5gonLISw/dKJ33Ec4GvfiRp4aweII2i8E+BdunUfBUAlEi3xbG2zFmQpuaS?=
- =?us-ascii?Q?/34S4Ioh1q4rY5wPjIwfLG51NgHxkBnpLLl8HFZ97SLhi7GYEPfsxBbIMZxz?=
- =?us-ascii?Q?tmuMIhuelZcZrk9r9qE3Xo+UNtE25UEiyuCgtAXoKpIX5B9kn8Wp7C2K/WmC?=
- =?us-ascii?Q?3Mu4+90vcOftVagsKLIn4F+7NZlLV6zRGvRURkceJX76RaTibsIQgObeiHaH?=
- =?us-ascii?Q?a57pE6P3WZ+3LOdogfTFDDE9FZ6MMrSjY/XeIsCPS6kjRCa/ulsIS9K7KMmb?=
- =?us-ascii?Q?gspZH8rMOG2jTuNYKu2USCF5mZyWl6GYZmD8LCfZKKpqHuJnoKRbnwGKqesi?=
- =?us-ascii?Q?aLEa1NzAdhe5GoXDUqbu1oK+DG4aHhp4dhyItvjmCMSKiJlDoedRab995JPR?=
- =?us-ascii?Q?X19PKflPFk6a+k5Oky10FDiE/PimmnSkOFu9aDJ85VTrdH6M5hIJl7kw3+7G?=
- =?us-ascii?Q?7DwTx9HzcqkhZ6f3GRegJ3OZM5Xv4RMwP+OXuFBI0bAUrKIXitTCgkhU0V+K?=
- =?us-ascii?Q?MdmdE/hDMpFbJaGEhnSUNKf2YqILtlg5vxTdKMo5WhAy040irLUB4HBKrFBh?=
- =?us-ascii?Q?rEq8db5ueq/rKaC57i0FDWIWx0+NkofFGSOPwmcEUSJ+CWMBmrNLoMghOxFS?=
- =?us-ascii?Q?Hg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f85b5d0c-cf3d-49de-9c8d-08dd7b9b6c82
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2025 21:29:22.9197
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RDXBvPM5/K7hkPzVlU3iRpTwrW0NaC2xzd6fWTfLpqdm8r8lpetxF1/TyFsAQL2mkzDBrxX1cUhCIaHy4t6J5A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR04MB9506
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 2/6] net: wwan: core: split port creation and
+ registration
+To: Loic Poulain <loic.poulain@oss.qualcomm.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+References: <20250408233118.21452-1-ryazanov.s.a@gmail.com>
+ <20250408233118.21452-3-ryazanov.s.a@gmail.com>
+ <CAFEp6-0kBH2HMVAWK_CAoo-Hd3FU8k-54L1tzvBnqs=eS39Gkg@mail.gmail.com>
+Content-Language: en-US
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <CAFEp6-0kBH2HMVAWK_CAoo-Hd3FU8k-54L1tzvBnqs=eS39Gkg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Russell King reports that on the ZII dev rev B, deleting a bridge VLAN
-from a user port fails with -ENOENT:
-https://lore.kernel.org/netdev/Z_lQXNP0s5-IiJzd@shell.armlinux.org.uk/
+Hi Loic,
 
-This comes from mv88e6xxx_port_vlan_leave() -> mv88e6xxx_mst_put(),
-which tries to find an MST entry in &chip->msts associated with the SID,
-but fails and returns -ENOENT as such.
+thank you that you found a time to check it. See the explanation below, 
+might be you can suggest a better solution.
 
-But we know that this chip does not support MST at all, so that is not
-surprising. The question is why does the guard in mv88e6xxx_mst_put()
-not exit early:
+On 14.04.2025 21:50, Loic Poulain wrote:
+> Hi Sergey,
+> 
+> On Wed, Apr 9, 2025 at 1:31 AM Sergey Ryazanov <ryazanov.s.a@gmail.com> wrote:
+>>
+>> Upcoming GNSS (NMEA) port type support requires exporting it via the
+>> GNSS subsystem. On another hand, we still need to do basic WWAN core
+>> work: find or allocate the WWAN device, make it the port parent, etc. To
+>> reuse as much code as possible, split the port creation function into
+>> the registration of a regular WWAN port device, and basic port struct
+>> initialization.
+>>
+>> Signed-off-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+>> ---
+>>   drivers/net/wwan/wwan_core.c | 86 ++++++++++++++++++++++--------------
+>>   1 file changed, 53 insertions(+), 33 deletions(-)
+>>
+>> diff --git a/drivers/net/wwan/wwan_core.c b/drivers/net/wwan/wwan_core.c
+>> index ade8bbffc93e..045246d7cd50 100644
+>> --- a/drivers/net/wwan/wwan_core.c
+>> +++ b/drivers/net/wwan/wwan_core.c
+>> @@ -357,16 +357,19 @@ static struct attribute *wwan_port_attrs[] = {
+>>   };
+>>   ATTRIBUTE_GROUPS(wwan_port);
+>>
+>> -static void wwan_port_destroy(struct device *dev)
+>> +static void __wwan_port_destroy(struct wwan_port *port)
+>>   {
+>> -       struct wwan_port *port = to_wwan_port(dev);
+>> -
+>> -       ida_free(&minors, MINOR(port->dev.devt));
+>>          mutex_destroy(&port->data_lock);
+>>          mutex_destroy(&port->ops_lock);
+>>          kfree(port);
+>>   }
+>>
+>> +static void wwan_port_destroy(struct device *dev)
+>> +{
+>> +       ida_free(&minors, MINOR(dev->devt));
+>> +       __wwan_port_destroy(to_wwan_port(dev));
+>> +}
+>> +
+>>   static const struct device_type wwan_port_dev_type = {
+>>          .name = "wwan_port",
+>>          .release = wwan_port_destroy,
+>> @@ -440,6 +443,49 @@ static int __wwan_port_dev_assign_name(struct wwan_port *port, const char *fmt)
+>>          return dev_set_name(&port->dev, "%s", buf);
+>>   }
+>>
+>> +/* Register a regular WWAN port device (e.g. AT, MBIM, etc.)
+>> + *
+>> + * NB: in case of error function frees the port memory.
+>> + */
+>> +static int wwan_port_register_wwan(struct wwan_port *port)
+>> +{
+>> +       struct wwan_device *wwandev = to_wwan_dev(port->dev.parent);
+>> +       char namefmt[0x20];
+>> +       int minor, err;
+>> +
+>> +       /* A port is exposed as character device, get a minor */
+>> +       minor = ida_alloc_range(&minors, 0, WWAN_MAX_MINORS - 1, GFP_KERNEL);
+>> +       if (minor < 0) {
+>> +               __wwan_port_destroy(port);
+> 
+> I see this is documented above, but it's a bit weird that the port is
+> freed inside the register function, it should be up to the caller to
+> do this. Is there a reason for this?
 
-	if (!sid)
-		return 0;
+I agree that this looks weird and asymmetrical. I left the port 
+allocation in wwan_create_port() because both WWAN-exported and 
+GNSS-exported types of port share the same port allocation. And the port 
+struct is used as a container to keep all the port registration arguments.
 
-And the answer seems to be simple: the sid comes from vlan.sid which
-supposedly was previously populated by mv88e6xxx_vtu_get().
-But some chip->info->ops->vtu_getnext() implementations do not populate
-vlan.sid, for example see mv88e6185_g1_vtu_getnext(). In that case,
-later in mv88e6xxx_port_vlan_leave() we are using a garbage sid which is
-just residual stack memory.
+I did the port freeing inside this function because we free the port 
+differently depending of the device registration state. If we fail to 
+initialize the port at earlier stage then we use __wwan_port_destroy() 
+which basically just releases the memory.
 
-Testing for sid == 0 covers all cases of a non-bridge VLAN or a bridge
-VLAN mapped to the default MSTI. For some chips, SID 0 is valid and
-installed by mv88e6xxx_stu_setup(). A chip which does not support the
-STU would implicitly only support mapping all VLANs to the default MSTI,
-so although SID 0 is not valid, it would be sufficient, if we were to
-zero-initialize the vlan structure, to fix the bug, due to the
-coincidence that a test for vlan.sid == 0 already exists and leads to
-the same (correct) behavior.
+But if device_register() fails then we are required to use put_device() 
+which does more job.
 
-Another option which would be sufficient would be to add a test for
-mv88e6xxx_has_stu() inside mv88e6xxx_mst_put(), symmetric to the one
-which already exists in mv88e6xxx_mst_get(). But that placement means
-the caller will have to dereference vlan.sid, which means it will access
-uninitialized memory, which is not nice even if it ignores it later.
+I do not think it is acceptable to skip put_device() call and just 
+release the memory. Also I do not find maintainable to partially open 
+code put_device() here in the WWAN-exportable handler and release the 
+memory in caller function wwan_create_port().
 
-So we end up making both modifications, in order to not rely just on the
-sid == 0 coincidence, but also to avoid having uninitialized structure
-fields which might get temporarily accessed.
+We could somehow try to return this information from 
+wwan_port_register_wwan() to wwan_create_port(), so the caller could 
+decide, shall it use __wwan_port_destroy() or put_device() in case of 
+failure.
 
-Fixes: acaf4d2e36b3 ("net: dsa: mv88e6xxx: MST Offloading")
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
- drivers/net/dsa/mv88e6xxx/chip.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+But I can not see a way to clearly indicate, which releasing approach 
+should be used by the caller. And even in this case it going to look 
+weird since the called function controls the caller.
 
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 29a89ab4b789..08db846cda8d 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -1852,6 +1852,8 @@ static int mv88e6xxx_vtu_get(struct mv88e6xxx_chip *chip, u16 vid,
- 	if (!chip->info->ops->vtu_getnext)
- 		return -EOPNOTSUPP;
- 
-+	memset(entry, 0, sizeof(*entry));
-+
- 	entry->vid = vid ? vid - 1 : mv88e6xxx_max_vid(chip);
- 	entry->valid = false;
- 
-@@ -1960,7 +1962,16 @@ static int mv88e6xxx_mst_put(struct mv88e6xxx_chip *chip, u8 sid)
- 	struct mv88e6xxx_mst *mst, *tmp;
- 	int err;
- 
--	if (!sid)
-+	/* If the SID is zero, it is for a VLAN mapped to the default MSTI,
-+	 * and mv88e6xxx_stu_setup() made sure it is always present, and thus,
-+	 * should not be removed here.
-+	 *
-+	 * If the chip lacks STU support, numerically the "sid" variable will
-+	 * happen to also be zero, but we don't want to rely on that fact, so
-+	 * we explicitly test that first. In that case, there is also nothing
-+	 * to do here.
-+	 */
-+	if (!mv88e6xxx_has_stu(chip) || !sid)
- 		return 0;
- 
- 	list_for_each_entry_safe(mst, tmp, &chip->msts, node) {
--- 
-2.43.0
+Another solution for the asymmetry problem is to move the allocation 
+from the caller to the called function. So the memory will be allocated 
+and released in the same function. But in this case we will need to pass 
+all the parameters from wwan_create_port() to wwan_port_register_wwan(). 
+Even if we consolidate the port basic allocation/initialization in a 
+common routine, the final solution going to look a duplication. E.g.
+
+struct wwan_port *wwan_port_allocate(struct wwan_device *wwandev,
+                                      enum wwan_port_type type,
+                                      const struct wwan_port_ops *ops,
+                                      struct wwan_port_caps *caps,
+                                      void *drvdata)
+{
+     /* Do the mem allocation and init here */
+     return port;
+}
+
+struct wwan_port *wwan_port_register_wwan(struct wwan_device *wwandev,
+                        enum wwan_port_type type,
+                        const struct wwan_port_ops *ops,
+                        struct wwan_port_caps *caps,
+                        void *drvdata)
+{
+     port = wwan_port_allocate(wwandev, type, ops, caps, drvdata);
+     /* Proceed with chardev registration or release on failure */
+     /* return port; or return ERR_PTR(-err); */
+}
+
+struct wwan_port *wwan_port_register_gnss(struct wwan_device *wwandev,
+                        enum wwan_port_type type,
+                        const struct wwan_port_ops *ops,
+                        struct wwan_port_caps *caps,
+                        void *drvdata)
+{
+     port = wwan_port_allocate(wwandev, type, ops, caps, drvdata);
+     /* Proceed with GNSS registration or release on failure */
+     /* return port; or return ERR_PTR(-err); */
+}
+
+struct wwan_port *wwan_create_port(struct device *parent,
+                                    enum wwan_port_type type,
+                                    const struct wwan_port_ops *ops,
+                                    struct wwan_port_caps *caps,
+                                    void *drvdata)
+{
+     ...
+     wwandev = wwan_create_dev(parent);
+     if (type == WWAN_PORT_NMEA)
+         port = wwan_port_register_gnss(wwandev, type, ops,
+                                        caps, drvdata);
+     else
+         port = wwan_port_register_wwan(wwandev, type, ops,
+                                        caps, drvdata);
+     if (!IS_ERR(port))
+         return port;
+     wwan_remove_dev(wwandev);
+     return ERR_CAST(port);
+}
+
+wwan_create_port() looks better in prices of passing a list of arguments 
+and allocating the port in multiple places.
+
+Maybe some other design approach, what was overseen?
+
+
+For me, the ideal solution would be a routine that works like 
+put_device() except calling the device type release handler. Then we can 
+use it to cleanup leftovers of the failed device_register() call and 
+then release the memory in the calling wwan_create_port() function.
+
+>> +               return minor;
+>> +       }
+>> +
+>> +       port->dev.class = &wwan_class;
+>> +       port->dev.type = &wwan_port_dev_type;
+>> +       port->dev.devt = MKDEV(wwan_major, minor);
+>> +
+>> +       /* allocate unique name based on wwan device id, port type and number */
+>> +       snprintf(namefmt, sizeof(namefmt), "wwan%u%s%%d", wwandev->id,
+>> +                wwan_port_types[port->type].devsuf);
+>> +
+>> +       /* Serialize ports registration */
+>> +       mutex_lock(&wwan_register_lock);
+>> +
+>> +       __wwan_port_dev_assign_name(port, namefmt);
+>> +       err = device_register(&port->dev);
+>> +
+>> +       mutex_unlock(&wwan_register_lock);
+>> +
+>> +       if (err) {
+>> +               put_device(&port->dev);
+>> +               return err;
+>> +       }
+>> +
+>> +       dev_info(&wwandev->dev, "port %s attached\n", dev_name(&port->dev));
+>> +
+>> +       return 0;
+>> +}
+>> +
+>>   struct wwan_port *wwan_create_port(struct device *parent,
+>>                                     enum wwan_port_type type,
+>>                                     const struct wwan_port_ops *ops,
+>> @@ -448,8 +494,7 @@ struct wwan_port *wwan_create_port(struct device *parent,
+>>   {
+>>          struct wwan_device *wwandev;
+>>          struct wwan_port *port;
+>> -       char namefmt[0x20];
+>> -       int minor, err;
+>> +       int err;
+>>
+>>          if (type > WWAN_PORT_MAX || !ops)
+>>                  return ERR_PTR(-EINVAL);
+>> @@ -461,17 +506,9 @@ struct wwan_port *wwan_create_port(struct device *parent,
+>>          if (IS_ERR(wwandev))
+>>                  return ERR_CAST(wwandev);
+>>
+>> -       /* A port is exposed as character device, get a minor */
+>> -       minor = ida_alloc_range(&minors, 0, WWAN_MAX_MINORS - 1, GFP_KERNEL);
+>> -       if (minor < 0) {
+>> -               err = minor;
+>> -               goto error_wwandev_remove;
+>> -       }
+>> -
+>>          port = kzalloc(sizeof(*port), GFP_KERNEL);
+>>          if (!port) {
+>>                  err = -ENOMEM;
+>> -               ida_free(&minors, minor);
+>>                  goto error_wwandev_remove;
+>>          }
+>>
+>> @@ -485,31 +522,14 @@ struct wwan_port *wwan_create_port(struct device *parent,
+>>          mutex_init(&port->data_lock);
+>>
+>>          port->dev.parent = &wwandev->dev;
+>> -       port->dev.class = &wwan_class;
+>> -       port->dev.type = &wwan_port_dev_type;
+>> -       port->dev.devt = MKDEV(wwan_major, minor);
+>>          dev_set_drvdata(&port->dev, drvdata);
+>>
+>> -       /* allocate unique name based on wwan device id, port type and number */
+>> -       snprintf(namefmt, sizeof(namefmt), "wwan%u%s%%d", wwandev->id,
+>> -                wwan_port_types[port->type].devsuf);
+>> -
+>> -       /* Serialize ports registration */
+>> -       mutex_lock(&wwan_register_lock);
+>> -
+>> -       __wwan_port_dev_assign_name(port, namefmt);
+>> -       err = device_register(&port->dev);
+>> -
+>> -       mutex_unlock(&wwan_register_lock);
+>> -
+>> +       err = wwan_port_register_wwan(port);
+>>          if (err)
+>> -               goto error_put_device;
+>> +               goto error_wwandev_remove;
+>>
+>> -       dev_info(&wwandev->dev, "port %s attached\n", dev_name(&port->dev));
+>>          return port;
+>>
+>> -error_put_device:
+>> -       put_device(&port->dev);
+>>   error_wwandev_remove:
+>>          wwan_remove_dev(wwandev);
+>>
+
+--
+Sergey
 
 
