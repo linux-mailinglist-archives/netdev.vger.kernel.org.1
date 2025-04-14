@@ -1,160 +1,194 @@
-Return-Path: <netdev+bounces-182198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C222A88192
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 15:18:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9C59A8819C
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 15:19:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7948E164997
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 13:18:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CEA307A5EF0
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 13:18:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 452382A1AA;
-	Mon, 14 Apr 2025 13:18:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CCDB142E86;
+	Mon, 14 Apr 2025 13:19:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Wu687hea"
+	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="bowhSn2k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11011026.outbound.protection.outlook.com [52.101.65.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D4622097
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 13:18:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744636684; cv=none; b=tRQgXrCw9XJmAs4DKo/G86PD38iZ3QNYHoP6yAZV50V4KAFoD2dWW4G+P0sdEnmsTPQEqi6udoBVV8Gh0msjb9Zs0bm/PHXsMtt7AbDiqsBdaN6eQf0oQLbYh7fpgtL/zyHmFqEnWYTD42FQyREqRBgG5U27VS4AOS8BzakZLgw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744636684; c=relaxed/simple;
-	bh=j6qaFjEHnf91faduCcvIC+Q3Tft1VA4mqpCBxh4GFvk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=qi3HqoHIVAkPhw+icPlAiIR1FG0L0uWGZL69rEqML9mWYrLucVDIRE8t+iaNnk7Ynp483aFSM0RBxiQe7C13LquNIR893nJxoNUmK9ekuDtwKFHwKHhOi4X1ke7SB467plKbAEy+5EKT9vkaR7j6vDuEmwo26Pm7E5DH+MqFGy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Wu687hea; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 53EAej3p012665;
-	Mon, 14 Apr 2025 13:17:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=8VE57CFYuSWnpfedeptxs8N1kct+AU
-	Ft+N8bO011XO4=; b=Wu687heaFzkO1n45JIgh//CUD9GtU97lXkw+PgC5KWpYSA
-	7iVKbKJ8+ICYs1EimM/k8qqCs/4LxGY8E3UNqEkfTYoZozYD63hYaaPliCl1yj14
-	OKwc8/XvTJVVNLmg6zyqpVBCixVJXfqokMNxfAfzkDclYQjWbFqtD9Orx0iZayob
-	WeJ2wMYX4sMS9gbbc+yua0ir8CtipUl9zXu/hDnWdcMPf67AUNWNXV6RxYZCDNWM
-	vVIqdicqOMGV537l55+otgWUc9lHuF6ktevu4DCzN+bxOFD1DuO3k3W5AQKBTZT5
-	dJhxC/RSpUzb1hr+aIryAWYEbu2AiRTU7uv2l11g==
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4610tp8q70-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 14 Apr 2025 13:17:51 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 53EAxas6024914;
-	Mon, 14 Apr 2025 13:17:50 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 4602gt6njv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 14 Apr 2025 13:17:50 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 53EDHlcJ31392442
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 14 Apr 2025 13:17:47 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1BC7858055;
-	Mon, 14 Apr 2025 13:17:50 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CF2835804B;
-	Mon, 14 Apr 2025 13:17:49 +0000 (GMT)
-Received: from d.ibm.com (unknown [9.61.3.79])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 14 Apr 2025 13:17:49 +0000 (GMT)
-From: Dave Marquardt <davemarq@linux.ibm.com>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH net-next] ibmveth: Use WARN_ON with error handling
- rather than BUG_ON
-In-Reply-To: <Z/iwd8qonlrfOkO5@mev-dev.igk.intel.com> (Michal Swiatkowski's
-	message of "Fri, 11 Apr 2025 08:02:31 +0200")
-References: <20250410183918.422936-1-davemarq@linux.ibm.com>
-	<Z/iwd8qonlrfOkO5@mev-dev.igk.intel.com>
-Date: Mon, 14 Apr 2025 08:17:49 -0500
-Message-ID: <87o6wyhog2.fsf@linux.ibm.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6823217E4;
+	Mon, 14 Apr 2025 13:19:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.26
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744636751; cv=fail; b=AYFmS6LSL5STCP7xkYIdU+scuxZi+VIGtnQfaqRlMQTHtUdy3w673h4aUNVRwZZNtzggw5/XRualMlbmAmkjIVGzyM5LIxKP6ccNWUspuRWKnLyszxCVUGzHx2nKXLuVrCZalqs9B/69Uw/trYoafqpzd5c1JN98hHHc1iAa6U0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744636751; c=relaxed/simple;
+	bh=4sgpQ7f4I3yUANtvVpOPWHyCFoHGvRHomTsAc5RHcF8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=ltK1IN9gbLpM/dhEcM7WQcWW1gi714W1p+F4W5/g+RdQedR0ka716XOZm4H4AzkOz4Cmb5SX6LGWMve4Vo+nGWhXUyWgPCKb4OybFPiZKc6A3Vij6NBIuMf93kUKp81pChJeaHYLJubnLDsj+vVeM7dCYrU4g3Y7xc9MZ9hoiP0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=bowhSn2k; arc=fail smtp.client-ip=52.101.65.26
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Mi9/iLbfjfzH1dOiMR2JAvltCZDmpUtYm6os8RtmkGYJZrbXLURlQxYOIJT7VC+jQ/PRqp36VUDNqR69y6gqePrb4/stD9ieyCvP4bEhorknIttJMbHHQHfS/Q+Cnn9rwdzbdKIcsg4oqA5ZzGGhYuieds1/RzZOAjkpgu4gO1qOdD6aQnj1RALU2Hb8w257351WeKfyZ2YU8086VWzrEsGN+PNukINUapMdMe1ITlyIhhKLKJhZnvCq6K7XcBv/fJY7zmxK/qoYawNNH+ZFfld774UYgXGiWoNq+niTPIKkHD/R8FH64ZWbGKVGzf7c4e6l9oT8uta2on2UQht1TA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VOExgHc3dICviRF58uoTasWU3DOp9GwRx1JceNTDDqw=;
+ b=keEVC3FGRyaIelxIP1L3QkwzqcaFfiIemu6Q/wBZmimBwpykr9qazq4FuRnnnmKE8WaLbfZevrjLBgdLNp2C5o7ksQv1NMmMM8gloTlKfCEdCLI6u6z6xgXs5YceV05HYahQUSXOZT3SHP40IpE6iinktNFz0FXdTqcYOkRfxGPepFrV16UndVfGc+RwsHNxxDUcaIv59qvfjqBX9JW2Zu59cxNf/nXbXix/9yYy8mL1V8LhW3UkAoA1j1Sbq7M5xKRcJQVnhHPr2rIH9AioFhQ12Ue1jgpbvz0ILg5iqJ0Omkit2agLnfbmJB7mEbiiBpSZWCD7A5IRKs9m98Z3gw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=temperror (sender ip
+ is 131.228.6.100) smtp.rcpttodomain=nokia-bell-labs.com
+ smtp.mailfrom=nokia-bell-labs.com; dmarc=temperror action=none
+ header.from=nokia-bell-labs.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VOExgHc3dICviRF58uoTasWU3DOp9GwRx1JceNTDDqw=;
+ b=bowhSn2k+e27Z2jmWaFBjomnJlKWGGDFHMMCPWfDIoHfw4/Y7WfULbWFboMD6ewi5lT+ZTgoQOQJMOWDCgi9UfhNL89SPpmemIvvLqSzZaX81j8MmzM++outHWzxPV6ni6BcrUDUEdNqBmrb3mOfyCTgCeO4oI2+2dAmqb0mOfhcTgvnDrutxR1ykkUMyn1zVOy8fFTk73dZDpl2zvrlDmQ/tGpIUHW8Nx0Tixw6C0kQjfJ+YLHKW9QdPzm0yXqmBQy6StgNFfwiwNNL8NVp+QJJZbiH+xTQXK6jagJIc2EbnYWjN2WmvcFc6ERmPqZCNBYQW7uqrdfvmK36ILXHyQ==
+Received: from DB8P191CA0019.EURP191.PROD.OUTLOOK.COM (2603:10a6:10:130::29)
+ by DBBPR07MB7434.eurprd07.prod.outlook.com (2603:10a6:10:1ef::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.32; Mon, 14 Apr
+ 2025 13:19:06 +0000
+Received: from DU6PEPF0000B61C.eurprd02.prod.outlook.com
+ (2603:10a6:10:130:cafe::32) by DB8P191CA0019.outlook.office365.com
+ (2603:10a6:10:130::29) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8632.32 via Frontend Transport; Mon,
+ 14 Apr 2025 13:19:06 +0000
+X-MS-Exchange-Authentication-Results: spf=temperror (sender IP is
+ 131.228.6.100) smtp.mailfrom=nokia-bell-labs.com; dkim=none (message not
+ signed) header.d=none;dmarc=temperror action=none
+ header.from=nokia-bell-labs.com;
+Received-SPF: TempError (protection.outlook.com: error in processing during
+ lookup of nokia-bell-labs.com: DNS Timeout)
+Received: from fr711usmtp2.zeu.alcatel-lucent.com (131.228.6.100) by
+ DU6PEPF0000B61C.mail.protection.outlook.com (10.167.8.135) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8655.12 via Frontend Transport; Mon, 14 Apr 2025 13:19:05 +0000
+Received: from sarah.nbl.nsn-rdnet.net (sarah.nbl.nsn-rdnet.net [10.0.73.150])
+	by fr711usmtp2.zeu.alcatel-lucent.com (GMO) with ESMTP id 53EDJKYr027866;
+	Mon, 14 Apr 2025 13:19:20 GMT
+From: chia-yu.chang@nokia-bell-labs.com
+To: netdev@vger.kernel.org, dave.taht@gmail.com, pabeni@redhat.com,
+        jhs@mojatatu.com, kuba@kernel.org, stephen@networkplumber.org,
+        xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
+        edumazet@google.com, horms@kernel.org, andrew+netdev@lunn.ch,
+        donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
+        shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
+        ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+        g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
+        mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+        Jason_Livingood@comcast.com, vidhi_goel@apple.com
+Cc: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+Subject: [PATCH v5 RESEND iproute2-next 0/1] DUALPI2 iproute2 patch
+Date: Mon, 14 Apr 2025 15:18:58 +0200
+Message-Id: <20250414131859.97517-1-chia-yu.chang@nokia-bell-labs.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DU6PEPF0000B61C:EE_|DBBPR07MB7434:EE_
 Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 4I7gNUnM2h20g9MDMZfyoQQWrFIHVeLR
-X-Proofpoint-ORIG-GUID: 4I7gNUnM2h20g9MDMZfyoQQWrFIHVeLR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1095,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-04-14_04,2025-04-10_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 clxscore=1011 mlxlogscore=999 adultscore=0 lowpriorityscore=0
- malwarescore=0 impostorscore=0 suspectscore=0 mlxscore=0 bulkscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502280000 definitions=main-2504140095
+X-MS-Office365-Filtering-Correlation-Id: 6480135c-73b7-4e7a-207a-08dd7b56ee83
+X-LD-Processed: 5d471751-9675-428d-917b-70f44f9630b0,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+ BCL:0;ARA:13230040|376014|7416014|1800799024|36860700013|82310400026|13003099007|921020;
+X-Microsoft-Antispam-Message-Info:
+ =?us-ascii?Q?8yM7/PUDzrtmITfAORZidsDd84CIUbp0KPHr9/+YBxJrORBHZOvAcnZhyB6B?=
+ =?us-ascii?Q?tcFjL3ECgiawpuqiLvt7Vn5IeRT1GowBzIIgNFm28IeitC4oS9Y/SWc5oF9J?=
+ =?us-ascii?Q?IfggcRqOa0qwnl3251hR75x8jCJXCIZ9OSshJfbsyw8MJWbpDQOcXmLHqhFA?=
+ =?us-ascii?Q?+6QgmZXAeyPfPXlpDsBV3SSzNEWAiVuuiCejhngXysxyCgo3Sib6Xye/uUcc?=
+ =?us-ascii?Q?W5tCFFmEoQVTHgojSJl3UZi9Pzr7vQSBaL+KOQvTKnnb39y/5jg3PLHN/kjl?=
+ =?us-ascii?Q?tbl7HnQRDjiut3Yixke75iM/FXW/PrnhYZOKDFVMi9Ni7+XJOXirQjkIv2w9?=
+ =?us-ascii?Q?mG01ZhJLHQO3KD1LqIeiE4Dn3xCrSUo2dI+KtEjE4V4oz+ObBsifwNO3/gfv?=
+ =?us-ascii?Q?O3pKyYuXWj5sgXcZ50aEHyChbwAXtWRHROtK0COI4ltEXooDpoECoJF15tKF?=
+ =?us-ascii?Q?oB9GbfVPN79g7meA6d8fz2WmWaEslAP7s37/98Ef5UtpHe9iBZlfOtejZd31?=
+ =?us-ascii?Q?ZZKe+bZDPr1IAzKi3serMH76dTATNs0Q7ANvLUOrfN7MPSlNzr0Kz9cAhAOu?=
+ =?us-ascii?Q?7ZBY0FdFoSiTugzoaQmFyyWZfiu7nVw0SHtdupV+rFMk+KhgsSqsRrQo7S9b?=
+ =?us-ascii?Q?Eu710zkbMaGvbS9BGkkEmMlryIdLw0/4fXF4WNjSk4xr85QezE7/tom5bgya?=
+ =?us-ascii?Q?zkY7RyXu7l2xQjqrNbiJORXzIhQ7H1t6y/c6Nk6ZqYT7CmivVjyvxmZ9g7Rc?=
+ =?us-ascii?Q?0dD+5D8bjGZX/nkNoyjbcSDGwwJhQejaES1JUB0cu9HNt/13SJFjrurtQcYo?=
+ =?us-ascii?Q?9vRfl9zqyMB8svkDFcSBKemyDNQRbu7Mdfejz3Bd2KpTWRr/bWSUf0u+w8xd?=
+ =?us-ascii?Q?PTrDjcPDSNgeAZVQPVtMvwIhOH8sc7v92Y/6fW0RScGjaafaESeinQZvFYbZ?=
+ =?us-ascii?Q?BLnYiTTJf+qYdwaKpcCxoHfYE+igcmaj2ZETBkES7sm7+c9bA6HZTY9LDcxm?=
+ =?us-ascii?Q?rCUuidxCVtvzFJHGicnjzlcvSQ8zvA9umzEZWmBgBUfMMv88ncPh/phZMq0m?=
+ =?us-ascii?Q?5mkQ0seAZJyU0ynzpVCGbAyQgsbDLaDJMUIz3vZI7Pb8FHok/humCOztIO8Q?=
+ =?us-ascii?Q?he0dETjlaQsFRiIGPEeJFsujXfBEBTdXr+3Ug2USJAnpG1bYRAsyo6efilYF?=
+ =?us-ascii?Q?UdakE+jyZoWOQLm98s1UOlm0DL5XqQzu+2f9j6wlgOvKeS0tv5t7FVHl2emk?=
+ =?us-ascii?Q?e867f+yTSB2nE5XRT43devjVp0MZmn1CbRrOtgW/b8x8+A8dG9+NJwtbchGl?=
+ =?us-ascii?Q?vZdfFSTV2GD3I1rG4/GTAsOVjImj6U9meW4F/4Qkt+YIeT6xuq8n3AQa/Fos?=
+ =?us-ascii?Q?OHyfrs2XArJbH/p2j7hGDPmmZbGWQzqhMjPQlGKrp15p3ep4SWyZHKMHMSQr?=
+ =?us-ascii?Q?OwaRFWtsCFbOyFkJNNftGVjEMGjvDWems6QOykC8fsh1Fb1wxyBz7SDS2ryU?=
+ =?us-ascii?Q?eRf+3bl/lOJj2qLrwfaAXhCtJCC6TXNeRkHDheW1IZCgPJUs5T+77kNd/w?=
+ =?us-ascii?Q?=3D=3D?=
+X-Forefront-Antispam-Report:
+ CIP:131.228.6.100;CTRY:FI;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:fr711usmtp2.zeu.alcatel-lucent.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(36860700013)(82310400026)(13003099007)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: nokia-bell-labs.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2025 13:19:05.4515
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6480135c-73b7-4e7a-207a-08dd7b56ee83
+X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=5d471751-9675-428d-917b-70f44f9630b0;Ip=[131.228.6.100];Helo=[fr711usmtp2.zeu.alcatel-lucent.com]
+X-MS-Exchange-CrossTenant-AuthSource: DU6PEPF0000B61C.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR07MB7434
 
-Michal Swiatkowski <michal.swiatkowski@linux.intel.com> writes:
+From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
 
-> On Thu, Apr 10, 2025 at 01:39:18PM -0500, Dave Marquardt wrote:
->> - Replaced BUG_ON calls with WARN_ON calls with error handling,
->>   with calls to a new ibmveth_reset routine, which resets the device.
->> - Added KUnit tests for ibmveth_remove_buffer_from_pool and
->>   ibmveth_rxq_get_buffer under new IBMVETH_KUNIT_TEST config option.
->> - Removed unneeded forward declaration of ibmveth_rxq_harvest_buffer.
->
-> It will be great if you split this patch into 3 patches according to
-> your description.
+Hello,
 
-Thanks. I debated the right approach here. Thanks for the guidance.
+  Please find DUALPI2 iproute2 patch v4.
 
->>  static struct kobj_type ktype_veth_pool;
->> @@ -231,7 +230,10 @@ static void ibmveth_replenish_buffer_pool(struct ibmveth_adapter *adapter,
->>  		index = pool->free_map[free_index];
->>  		skb = NULL;
->>  
->> -		BUG_ON(index == IBM_VETH_INVALID_MAP);
->> +		if (WARN_ON(index == IBM_VETH_INVALID_MAP)) {
->> +			(void)schedule_work(&adapter->work);
->
-> What is the purpose of void casting here (and in other places in this
-> patch)?
+v5 (25-Mar-25)
+- Use matches() to replace current strcmp() (Stephen Hemminger <stephen@networkplumber.org>)
+- Use general parse_percent() for handling scaled percentage values (Stephen Hemminger <stephen@networkplumber.org>)
+- Add print function for JSON of dualpi2 stats (Stephen Hemminger <stephen@networkplumber.org>)
 
-I'm indicating that I'm ignoring the bool returned by schedule_work().
-Since this seemed odd to you, I take it the convention in Linux code is
-not doing this.
+v4 (16-Mar-25)
+- Add min_qlen_step to dualpi2 attribute as the minimum queue length in number of packets in the L-queue to start step amrking.
 
->> +			goto failure2;
->
-> Maybe increment_buffer_failure, or sth that is telling what happen after
-> goto.
+v3 (21-Feb-25)
+- Add memlimit to dualpi2 attribute, and add memory_used, max_memory_used, memory_limit in dualpi2 stats (Dave Taht <dave.taht@gmail.com>)
+- Update manual to align latest implementation and clarify the queue naming and default unit
+- Use common "get_scaled_alpha_beta" and clean print_opt for Dualpi2
 
-Okay, I can change that.
+v2 (23-Oct-24)
+- Rename get_float in dualpi2 to get_float_min_max in utils.c
+- Move get_float from iplink_can.c in utils.c (Stephen Hemminger <stephen@networkplumber.org>)
+- Add print function for JSON of dualpi2 (Stephen Hemminger <stephen@networkplumber.org>)
 
->> +		}
->>  
->>  		/* are we allocating a new buffer or recycling an old one */
->>  		if (pool->skbuff[index])
->> @@ -300,6 +302,7 @@ static void ibmveth_replenish_buffer_pool(struct ibmveth_adapter *adapter,
->>  		                 DMA_FROM_DEVICE);
->>  	dev_kfree_skb_any(pool->skbuff[index]);
->>  	pool->skbuff[index] = NULL;
->> +failure2:
->>  	adapter->replenish_add_buff_failure++;
->>  
->>  	mb();
->> @@ -370,20 +373,36 @@ static void ibmveth_free_buffer_pool(struct ibmveth_adapter *adapter,
->>  	}
->>  }
->>  
->
-> [...]
+For more details of DualPI2, plesae refer IETF RFC9332
+(https://datatracker.ietf.org/doc/html/rfc9332).
 
-Thanks for your review!
+Best Regards,
+Chia-Yu
 
--Dave
+Chia-Yu Chang (1):
+  tc: add dualpi2 scheduler module
+
+ bash-completion/tc             |  11 +-
+ include/uapi/linux/pkt_sched.h |  39 +++
+ include/utils.h                |   2 +
+ ip/iplink_can.c                |  14 -
+ lib/utils.c                    |  30 ++
+ man/man8/tc-dualpi2.8          | 249 ++++++++++++++++
+ tc/Makefile                    |   1 +
+ tc/q_dualpi2.c                 | 519 +++++++++++++++++++++++++++++++++
+ 8 files changed, 850 insertions(+), 15 deletions(-)
+ create mode 100644 man/man8/tc-dualpi2.8
+ create mode 100644 tc/q_dualpi2.c
+
+-- 
+2.34.1
+
 
