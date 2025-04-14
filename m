@@ -1,183 +1,209 @@
-Return-Path: <netdev+bounces-182001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 792CBA874D2
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 00:57:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDCC5A874E9
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 02:02:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7287F16050B
-	for <lists+netdev@lfdr.de>; Sun, 13 Apr 2025 22:57:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 60DC07A6061
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 00:01:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D63019885F;
-	Sun, 13 Apr 2025 22:57:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57AFF186A;
+	Mon, 14 Apr 2025 00:02:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=frank.fyi header.i=@frank.fyi header.b="AxyU4evI"
+	dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b="t6GWOy2B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.frank.fyi (mx01.frank.fyi [5.189.178.148])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6038A1946AA
-	for <netdev@vger.kernel.org>; Sun, 13 Apr 2025 22:56:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=5.189.178.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B56A139B
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 00:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744585021; cv=none; b=GRG5K0s1r3coDnLMmB0xLzhV3dUCy+68hGMJsWWYEv1NKI8vwpOgsSYm5X1+Fr2O9MFJkk1cDA2nuDc/9TWgC/f2GRFz1TxmBsO6Ibnf2tWsIMDLtB/bIURJr7EshlC91kDBejE+9Za1+N4/5E/10H/xb0dXAR5O3Rkp2xMlOXU=
+	t=1744588939; cv=none; b=GiUXHIlFTO1gTfImwu477gSPrzESCiJcsW6VKxEgL684VYmml+0ooq1/r7eeESIUa8FjsXSJS6frxOVQd99qihIB6Jd/wqEvGuSLWCZKmKjCC03NEZscIhK5qXT1TSTD/oUkoGSoVq3QLpDJSYSIaFwWmmzO9tzlw8slmZ8y9cU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744585021; c=relaxed/simple;
-	bh=WkHQmS/XzH9hb69sm8D0SwJxvdp3CBHAdp24qoCi4oE=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N2KneFzYcVvwJvjeiVoK7MBHHii3g1LWk+Sudf5FfP2HPhYNFfqXjmI9V9lJk/ywpcVxNErriEg+cYN9ST8o6yHCy7kIGFMWYyUxfnSy51OvqrRn1A+o2ByueAcAR7xs0cI5erSg2LJEMeVR3yXjz4ILs8aJpZOI3yNUttBKxHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=frank.fyi; spf=pass smtp.mailfrom=frank.fyi; dkim=pass (2048-bit key) header.d=frank.fyi header.i=@frank.fyi header.b=AxyU4evI; arc=none smtp.client-ip=5.189.178.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=frank.fyi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=frank.fyi
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=frank.fyi; s=mail;
-	t=1744585017; bh=WkHQmS/XzH9hb69sm8D0SwJxvdp3CBHAdp24qoCi4oE=;
-	h=Date:From:To:Subject:Reply-To:References:In-Reply-To:From;
-	b=AxyU4evI0RyIzZ3MquPm0BjNrJAEMydM9haaE77RitN6sviUo3iDGCDZy4xJCuPu9
-	 4xw5/I2favITgT2arnEDX3cplD4lDoDHQ1HNxf87KEP4lxzmTSycI+pTJ8A8H9usrT
-	 u/yXiCL5ROaSnHf4alil7IQbjKEPn8k2ybNpvRlw1B5eVjIDVwIse9xBci4LQ79ouc
-	 lCEsN+w9MuDjvXqACvFldF8iUbBqxj7BM+WZcKvmUYvWkp8dx2pS2iLQy1oE8VJNI4
-	 brNOhn20Vb735QMd94MwsrOe48IRJXwqBkEgIcUtT2QUen3BxJ0VcPzl6sneCCwu2g
-	 Q8k4+XZWcv2Wg==
-Received: by mx01.frank.fyi (Postfix, from userid 1001)
-	id 16BC21120180; Mon, 14 Apr 2025 00:56:57 +0200 (CEST)
-Date: Sun, 13 Apr 2025 22:56:57 +0000
-From: Klaus Frank <vger.kernel.org@frank.fyi>
-To: jon@unidef.net, netdev@vger.kernel.org
-Subject: Re: Is there a way for ifconfig to return wan ip addresses?
-Message-ID: <3cde6506-821c-43f9-a53e-4ddddbb90f79@frank.fyi>
-Reply-To: netdev@vger.kernel.org
-User-Agent: Mozilla Thunderbird
-References: <711321ED-4C88-4006-8612-B7699E838481@unidef.net>
+	s=arc-20240116; t=1744588939; c=relaxed/simple;
+	bh=4Oqkr+rpv7H6kt3IBhANjW0bZ7rBvBjcskA+y6OqtEs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mawDw2RbdpO/CjR/RuFMJ96vq1EKa66fr1wAdDtu1+W7uIWrBmVwqTLX2ewzhwgCpAt6nq5H7thmXHoQ0RvpX2aLyC+Ri1iAlK/rQHUuQkrGOGXD5kNOiawND85rKSaRClGmOmgk5ObNIN1YfQ9DF8FMfW1WI0QCYUcQl+iKKws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io; spf=none smtp.mailfrom=jrife.io; dkim=pass (2048-bit key) header.d=jrife-io.20230601.gappssmtp.com header.i=@jrife-io.20230601.gappssmtp.com header.b=t6GWOy2B; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jrife.io
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=jrife.io
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7393eab4a75so261284b3a.2
+        for <netdev@vger.kernel.org>; Sun, 13 Apr 2025 17:02:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=jrife-io.20230601.gappssmtp.com; s=20230601; t=1744588937; x=1745193737; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1pBqpLJXRxqlQHWXQGJzDZjxbJdMmmwZFwpMlsJTNtM=;
+        b=t6GWOy2BNlDBXP9E8Ur0wyB5+OfBkAIxUAPe3yBNQe4bDqVt3/+PCO2H4jiQ51CM+3
+         vgjMmz67rifd4KIzIrWZpwyDoy0xtukwQJmybPgvis9GXL9ld0rOLixytohyxyzI56FG
+         MfiHe4sQyBzDn5wopQUYeLZHFH29jfo1seaEaK0Y9+8OkaoMF6BmWeunRY1KyYLGEkuT
+         QGX+KSuv9o3O2ypqxVDfgTGOK6To36YUa+AkUlsnwlVEPPEcS5LSo4Os5tkiTea0lP3u
+         YloNisojNyvqeN2w8PjSTDBC97VLDBufAnB7B0bH43lQPrgx2VyteqmZav8JDrMt9vBT
+         a0NQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744588937; x=1745193737;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1pBqpLJXRxqlQHWXQGJzDZjxbJdMmmwZFwpMlsJTNtM=;
+        b=V7G/A8Bzp+uNzFVj8WTJQUKM3qGJ8oF4P1SWraaRZqORkDDU/pkHeQ8wQdZ5j9hofA
+         p2z3uRJeANOcrXu1b3gzW8umqU/hUOi6J2jk/QOtOLxGUcaZQ3BHHdKbMrWssQX0xfzq
+         cj++A29VLcXchX0Lgtez+Cr/9mDRajf24t6jwSb21S7FfEOKZNZUsQBs0a221j/TPpNy
+         TfZMAF4fMvIHyG/GArj1eFcRMI5jULy7u6iYOIsYO7dyEC4f1njrJm9Zaq4RXjGdfXRf
+         fv35FjCub6GSumO1tdfoiYdSJUa2DSvUhQNbJ/RXvyTd111EfjeF30cuSKU+vnvUo7pY
+         Hxfg==
+X-Forwarded-Encrypted: i=1; AJvYcCUquMnd/l0aqcWvU6uXxizZXESslFq68IKE6teQB6yNXy6wOn6U7SqcmZd63Gb7fpWGKX1iaqk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7ByWvSDx4OrwATn5slvVMnsaeOJiPXK/HHDuAwoXDzW514Tps
+	yp3HBOBW6qse56Oy+pZzx3pWEeLq+otIO7EJcPhf6Gt+4U87xzO0Vff7WWQyjg8=
+X-Gm-Gg: ASbGncvTMrfkrPyjCVC+Wsfp9zrgYKhWPm7yC8z1NOd8neuGUKaGfKck6ia4WZtpEru
+	SHZPtjxmBeqqNuIkmkq9uToKdcUqE9kGYeWOZqfYeL6PbHc1YesPVSgCbpyLhlTsnkHw8wdCTcI
+	M29LCSI7VO0fa1FxMYKIBGDHdrRm7u9uovsL0aQHDcMuCWF51gXpBCP8o4DRBtSrYfV1fv1HCDh
+	CitycCvUBrXj7CHjD+hzzKXncHehFtObgoO8/+LcuyJSVBhV6IYGJeEzpjDrvRx054GXZ+h2nQ+
+	nSDB6XuaRAxuTJ3Iq6+5rwa2
+X-Google-Smtp-Source: AGHT+IEwTQ8n/oq4WA0TVwMdQlA7DuR7NSHWr2cz0ehvbqPQNZ2jrjdjgyjx7z4YfsFctHmdzgEMSQ==
+X-Received: by 2002:a05:6a00:3a0c:b0:730:9989:d2d4 with SMTP id d2e1a72fcca58-73bd126b0f0mr5430376b3a.3.1744588936403;
+        Sun, 13 Apr 2025 17:02:16 -0700 (PDT)
+Received: from t14 ([2601:643:8b00:2360:f92:4f6:9504:a65a])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73bd233554asm5490923b3a.180.2025.04.13.17.02.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 13 Apr 2025 17:02:16 -0700 (PDT)
+Date: Sun, 13 Apr 2025 17:02:14 -0700
+From: Jordan Rife <jordan@jrife.io>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Aditi Ghag <aditi.ghag@isovalent.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 bpf-next 2/5] bpf: udp: Propagate ENOMEM up from
+ bpf_iter_udp_batch
+Message-ID: <Z_xQhm4aLW9UBykJ@t14>
+References: <20250411173551.772577-1-jordan@jrife.io>
+ <20250411173551.772577-3-jordan@jrife.io>
+ <7ed28273-a716-4638-912d-f86f965e54bb@linux.dev>
+ <CABi4-ojQVb=8SKGNubpy=bG4pg1o=tNaz9UspYDTbGTPZTu8gQ@mail.gmail.com>
+ <daa3f02a-c982-4a7a-afcd-41f5e9b2f79c@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: de-DE, en-US-large, en-US
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <711321ED-4C88-4006-8612-B7699E838481@unidef.net>
+In-Reply-To: <daa3f02a-c982-4a7a-afcd-41f5e9b2f79c@linux.dev>
 
-Hi,
-
-the short or the long answer?
-The short answer "yes, but no".
-Also your router may not even know your wan ip either (in case of CG-NAT).
-
-The long anser:
-It is quite complicated as there are way too many "standards" for this 
-and none of them is universal. Basically you'd have to try a bunch of 
-different approaches and somehow also figure out what to do with 
-conflicting information. I'll provide them as a kind of list as maybe 
-one of them alone (without having a truely universal algorithm for it) 
-may be enough. Further I'm going to assume you mean for IPv4 as in an 
-IPv6 network you'd already have your GUA(s) on your interface (well, or 
-at least on a interface, not necessarily the upstream one but anyway 
-thats a different topic).
-* RFC 7788 "Home Network Control Protocol"
-* RFC 7618 "Dynamic Shared IPv4 Allocation"
-* RFC 6886 "NAT Port Mapping Protocol (NAT-PMP)"
-* RFC 6970 "Universal Plug and Play (UPnP) Internet Gateway Device - 
-Port Control Protocol Interworking Function (IGD-PCP IWF)"
-* RFC 7291 "DHCP Options for the Port Control Protocol (PCP)"
-* RFC 7225 "Discovering NAT64 IPv6 Prefixes Using the Port Control 
-Protocol (PCP)"
-* RFC 2663 "IP Network Address Translator (NAT) Terminology and 
-Considerations" See address binding and e.g. RSIP, RSA-IP, RSAP-IP in 
-Section 5
-* RFC 3022 "Traditional NAT" Section 5.3 says your border router may 
-allow some hosts to use public IPs and may (without mentioning how) 
-advertise information (like the public IP) from the public link to them.
-* [RFC 5597 "NAT DCCP Requirements" Section 1: "Also, a separate, 
-unspecified mechanism may be needed, such as Unilateral Self Address 
-Fixing (UNSAF) [RFC3424] protocols, if an endpoint needs to learn its 
-own external NAT mappings."]
-* RFC 3424 "IAB Considerations for UNilateral Self-Address Fixing 
-(UNSAF) Across Network Address Translation"
-* RFC 2766 "Network Address Translation - Protocol Translation (NAT-PT)"
-* RFC 2765 "Stateless IP/ICMP Translation Algorithm (SIIT)" can be 
-parsed out of the statelessly translated IPv6 address interestingly that 
-RFC also mentions "Determine when (...) needs to be allocated and then 
-allocation needs to be refreshed/renewed" but it doesn't mention how to 
-do this.
-* MIPv6 RFC 3519, RFC 5944, ...: But doesn't specify how the 
-implementation looks like, just that it is needed. "In the presence of 
-NATs, an improved solution would require the ability to discover the 
-translations done by each NAT along the route"
-* RFC 3027 "Protocol Complications with NAT" Section 2.3, and 5
-* draft-ermagan-lisp-nat-traversal-20 "NAT traversal for LISP" also 
-specifies a way to discover the public IP
-* Host_Identity_Protocol RFC 9028 and RFC 5207 Section 4
-* RFC 8445, RFC 8489, RFC 5245, RFC 8656, RFC 5128, 
-draft-rosenberg-mmusic-ice-nonsip-01 aka. ICE, STUN, TURN, WebRTC, SIP, ...
-* RFC 5853 "Requirements from Session Initiation Protocol (SIP) Session 
-Border Control (SBC) Deployments" Section-3.4.2
-* RFC 2205 "Resource ReSerVation Protocol (RSVP)" + RFC 6780 "RSVP 
-ASSOCIATION Object Extensions"
-* RFC 7599, RFC 7598, RFC 6145 "MAP-T"
-* RFC 7597, RFC 7598, RFC 2473 "MAP-E"
-* RFC 6346 "The Address plus Port (A+P) Approach to the IPv4 Address 
-Shortage"
-* RFC 7600 "IPv4 Residual Deployment via IPv6 - A Stateless Solution 
-(4rd)" by reversing the address mapping or if the CE supports it using 
-one of the other approaches.
-* TR-069 CWMP (WAN/ISP side)
-* TR-064 LAN side
-* "curl -4 https://ifconfig.co"
-
-
-But if you're asking for advice on how to handle this I'd say:
-1. Try to go IPv6-first and/or IPv6-mostly, just way less headach and 
-better performance.
-2. Where not possible either go the kinda radical way and use tor or i2p 
-as an overlay and have them deal with nat traversal or if that is 
-undesirable use something like libp2p or a webrtc library.
-3. If all of that doesn't work try to connect to and proxy through a 
-TURN server.
-4. If that also doesn't work try to connect to a HTTP(S) proxy that 
-supports HTTP-CONNECT tunnel
-5. (no experience so far, but is newer and could work in some 
-environments) the *-over-QUIC RFCs (RFC 9250, RFC 9221, RFC 9000, RFC 
-9220, RFC 9484, RFC 9298, RFC 9297, and ongoing drafts: 
-https://datatracker.ietf.org/wg/masque/documents/)
-
-Tbh I personally when neither going IPv6-only or working around the v4 
-NAT with e.g. a VPN isn't an option would just use tor, i2p, libp2p, or 
-Yggdrasil as my overlay and let them deal with the hard parts. Basically 
-I'd use e.g. the Tor Projects Arti project as my transport layer 
-https://gitlab.torproject.org/tpo/core/arti Tor and i2p have the added 
-benefit of being fully End-to-End encrypted and the endpoint addresses 
-being unambiguous and cryptographically ensured.
-
-Also just a note if you're leaving the SOHO and SMB environments and 
-also having to deal with enterprise networks then you basically don't 
-have any way to autodetect this as there are ofte multiple (literally 
-countless) nats to different public IPs depending on destination, 
-protocol, or even network saturation. You basically have to let the 
-admin/user provide one manually.
-(And side note, I also have already used it to link stuff together 
-without a centralized public server)
-
-
-Sincerely,
-Klaus Frank
-
-On 2025-04-13 10:51:29, Jon wrote:
-> Maybe by interfacing with the router?
+> static void *bpf_iter_udp_seq_next(struct seq_file *seq, void *v, loff_t *pos)
+> {
+>         if (iter->cur_sk < iter->end_sk) {
+>                 u64 cookie;
 >
-> You can somehow send some kind of query to the router using router protocols, and it’ll process a return packet with the wan ip address I think, per wan ip address attached to the router
+>                 cookie = iter->st_bucket_done ?
+>                         0 : __sock_gen_cookie(iter->batch[iter->cur_sk].sock);
+>                 sock_put(iter->batch[iter->cur_sk].sock);
+>                 iter->batch[iter->cur_sk++].cookie = cookie;
+>         }
 >
-> Or you can flat out make a standard for all routers to adhere to when returning wan ip addresses, along with others stuff like live latency checks or some kind of network security module
+>         /* ... */
+> }
 >
-> Or someone awesome can implement some kind of protocol or handshake method for linux router distributions to return the wan ip address directly from the linux router
->
-> I think my packet thing will work
->
-> You can send a packet through the lan network, and it should return the wan ip address, I think, just through multiple layers or something
+> In bpf_iter_udp_resume(), if it cannot find the first sk from find_cookie to
+> end_cookie, then it searches backward from find_cookie to 0. If nothing found,
+> then it should start from the beginning of the resume_bucket. Would it work?
 
+It seems like the intent here is to avoid repeating sockets that we've
+already visited?
 
+This would work if you need to process a bucket in two batches or less,
+but it would still be possible to repeat a socket if you have to process
+a bucket in more than two batches: during the transition from batch two
+to batch three you don't have any context about what you saw in batch
+one, so in the worst case where all the cookies we remembered from batch
+two are not found, we restart from the beginning of the list where we
+might revisit sockets from batch one. I guess you can say this reduces
+the probability of repeats but doesn't eliminate it.
+
+e.g.: socket A gets repeated in batch three after two consecutive calls
+      to bpf_iter_udp_batch() hit the resized == true case due to heavy
+      churn in the current bucket.
+
+|               Thread 1            Thread 2   Batch State    List State
+|  -------------------------------  ---------  ------------   ----------
+|                                              [_]            A->B
+|  bpf_iter_udp_batch()                        "              "
+|    spin_lock_bh(&hslot2->lock)               "              "
+|    ...                                       [A]            "
+|    spin_unlock_bh(&hslot2->lock)             "              "
+|                                   add C,D    "              A->B->C->D
+|    bpf_iter_udp_realloc_batch(3)             "              "
+|    spin_lock_bh(&hslot2->lock)               [A,_,_]        "
+|    ...                                       [A,B,C]        "
+|    spin_unlock_bh(&hslot2->lock)             "              "
+|    resized == true                           "              "
+|    return A                                  "              "
+|                                   del B,C    "              A->D
+|                                   add E,F,G  "              A->D->E->
+t                                                             F->G
+i  bpf_iter_udp_batch()                        "              "
+m    spin_lock_bh(&hslot2->lock)               "              "
+e    ...                                       [D,E,F]        "
+|    spin_unlock_bh(&hslot2->lock)             "              "
+|                                   add H,I,J  "              A->D->E->
+|                                                             F->G->H->
+|                                                             I->J
+|    bpf_iter_udp_realloc_batch(6)             [D,E,F,_,_,_]  "
+|    spin_lock_bh(&hslot2->lock)               "              "
+|    ...                                       [D,E,F,G,H,I]  "
+|    spin_unlock_bh(&hslot2->lock)             "              "
+|    resized == true                           "              "
+|    return D                                  "              "
+|                                   del D,E,   "              A->J
+|                                       F,G,                   
+|                                       H,I,                   
+|  bpf_iter_udp_batch()                        "              "
+|    spin_lock_bh(&hslot2->lock)               "              "
+|    ...                                       [A,J,_,_,_,_]  "
+|                         !!! A IS REPEATED !!! ^
+|    spin_unlock_bh(&hslot2->lock)             "              "
+|    return A                                  "              "
+v
+
+There's a fundamental limitation where if we have to process a bucket in
+more than two batches, we can lose context about what we've visited
+before, so there's always some edge case like this. The choice is
+basically:
+
+(1) Make a best-effort attempt to avoid repeating sockets, and accept
+    that repeats can still happen in rare cases. Maybe the chances are
+    close enough to zero to never actually happen, although it's hard to
+    say; it may be more probable in some scenarios.
+
+or
+
+(2) Guarantee that repeats can't happen by requiring that a bucket
+    completely fits into one (or two?) batches: either error out in the
+    resized == true case or prevent it altogether by holding onto the
+    lock across reallocs with GFP_ATOMIC to prevent races.
+
+All things being equal, (2) is a nice guarantee to have, but I sense
+some hesitance to hold onto hslot2->lock any longer than we already are.
+Is there a high performance cost I'm not seeing there? I guess there's a
+higher chance of lock contention, and with GFP_ATOMIC allocation is more
+likely to fail, but reallocs should be fairly rare? Maybe we could
+reduce the chance of reallocs during iteration by "right-sizing" the
+batch from the start, e.g. on iterator init, allocate the batch size to
+be 3/2 * the maximum list length currently in the UDP table, since you
+know you'll eventually need it to be that size anyway. Of course, lists
+might grow after that point requiring a realloc somewhere along the way,
+but it would avoid any reallocs in cases where the lengths are mostly
+stable. I'm fine with (1) if that's the only viable option, but I just
+wanted to make sure I'm accurately understanding the constraints here.
+
+Thanks!
+
+-Jordan
 
