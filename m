@@ -1,160 +1,110 @@
-Return-Path: <netdev+bounces-182356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B66EA888A3
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:32:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 53A5AA888A5
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:34:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 695F11899582
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:32:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B72F71899465
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:34:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6062820D9;
-	Mon, 14 Apr 2025 16:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2CB625E813;
+	Mon, 14 Apr 2025 16:33:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VrppPEBy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uEOWyo0z"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A65619309E
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 16:32:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8615C2DFA3D;
+	Mon, 14 Apr 2025 16:33:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744648360; cv=none; b=tuz+EcTOPPoF89OHz2gLSuU+1bdgfnionvWYnRJ8DcD2PVJ5lhsK1TXGeHJlxjmEyJ9/Dp5ODz8ztEFkEd93U60TQiVnRvtqiKhtjTB0sCjSegqoBRIm4uc5iiEirTOa6rrhRvBCOeJ/ypqJrr3yO/uHzK/yUqtJudB2UlEcXmA=
+	t=1744648438; cv=none; b=YLWArqWQpxK1XaeDqc7+/p5uEN8bLmIbQjYTfeSrpEZvFSVclV5kXQSptqL8WDFjieY5xHRMM/HRV5k0lT3kFmW1uWaJXWz+TFdwBqsy3W2n0bT1e1Anz37UjEB9VN7eWewtVDwBG3qPZl1UNP8xabVj+WYWYK76qnuKGmlfDzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744648360; c=relaxed/simple;
-	bh=LxeEjXsTzyjmpn+ReNlLxMKLEF/tsQrcB3L0UMTB9is=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GOrTDWn29XpKA4E2LiYUl6cruO3nhdW47pzCusm4iZKLhivawLHmpnMSLSVEqIVbytX/40S/RqRWABU75CaToIgDPcTa/omhPd8IfYstOmPoLaQA0evtHbEOB6cvghr7n2vt15i++4RdvdyoSZcVIUfIay3DHWDveOtfaSmcRXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VrppPEBy; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1744648356;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=psPpYVaNQlJBPoNb/90nh8sbsObK4AuLZcGNe09lj5c=;
-	b=VrppPEByuDEadsvSH+p/M1HnQCMj2v5XF6AtS80foymTitPpmiIE2Wd7OklxnBTn8KptjP
-	cMjxNz1BJIYJykiYD3CB73znx6OgDQqRRwARqkF/FoecqbhK0Nmhp1qdoAywk9Rs0p/YYk
-	4KZxmYhS1mgx26NWN4iNlWa6vHVGH2A=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-76-niRSeQtJMeGkNnRObHRTjg-1; Mon, 14 Apr 2025 12:32:35 -0400
-X-MC-Unique: niRSeQtJMeGkNnRObHRTjg-1
-X-Mimecast-MFC-AGG-ID: niRSeQtJMeGkNnRObHRTjg_1744648354
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43d3b211d0eso28858445e9.1
-        for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 09:32:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744648354; x=1745253154;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=psPpYVaNQlJBPoNb/90nh8sbsObK4AuLZcGNe09lj5c=;
-        b=MGSBDRX970SyKa3YQVsD1lHOormO7SWoFODDZ5JPEpA3c5WoX5YCNJo86BADFW7XMx
-         Du8QP7c2mCK1TIJ1YpW369RSD9BNSXDTOJQE/x2in55EUTe9vO/t6N+LLR7QSzyVdYfZ
-         C+fV3Gsi0fzPzI16WVFu6Yf2/jkpVbMHFw8c+SaOEQj5uU0X0X4o5WzBE+k5ukbhcbAF
-         s0tUWG/GUhCSU4Bw0sYcx7OH935BVk25r1fLd7ZJzzckxY2FZr4IJfb5naykxia/SjEd
-         30zabjgbgXsUxoJl9lx9i4X3hQAOW11haZ6dxDevjvOY/hXX89vwJ7zIZLc8kNXJzbt0
-         JVPg==
-X-Forwarded-Encrypted: i=1; AJvYcCXbeP2eaZXwX0ZQ2moFFvHFYbEk2DymM5FyaVpQOmig2mlAoDgABcoYLJmk4fXmbFxf9mz2Df4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzF2myVyv0fzNMSJ5Zy8YL17pWABFtmk7nfUlV2lQng7wM6PeuW
-	UuXZlpcm7xR4PmW94xdaI8fy195UjGKtRoNkDYXD6y+nRPplcmTaeDs+pheqIzantVyMWT5sS7/
-	AeWC2MdKRzKqKqFUlup9k7C+nJ0XK//QFT/yn2zxM7FAPd56IFX5F/A==
-X-Gm-Gg: ASbGncsysjQLzg+mQt4WUwomZjSpNhaArNjXfOxw1ljmw80JFIoL9PdHfc8F3rsX1jq
-	lu5m3cOV0aEgrdK1BoRIHm0pTfL2IaDg3mt4rMiqnLBX1OMZhWaNu4t/PbHpvBdbAdRQ6NF9x+L
-	zD29RJse5g4M+LDUB/avCZmVp0ukpgqfu+VIbXJhQR9J4DkKWjw8dgXbz8rMmW/1pEgu8n2+KnC
-	ONgi5FAQKpHola62LY24/hRjpQvQS52z/ynIEyZ3a1i6tnG19VocAcmzU7Su1uCTFsFD8FC0194
-	VqDtXw==
-X-Received: by 2002:a05:6000:248a:b0:39e:cbca:8a72 with SMTP id ffacd0b85a97d-39edc3059aamr38187f8f.12.1744648353749;
-        Mon, 14 Apr 2025 09:32:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IErshira9b65DJz4U+YOoZ2EfEQ5MJmWz7qS8OqJT6VLSYpu4hvsslk7OCkkLLr5Vcu2G6UIQ==
-X-Received: by 2002:a05:6000:248a:b0:39e:cbca:8a72 with SMTP id ffacd0b85a97d-39edc3059aamr38167f8f.12.1744648353322;
-        Mon, 14 Apr 2025 09:32:33 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc0:1517:1000:ea83:8e5f:3302:3575])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f233a2a13sm179644545e9.10.2025.04.14.09.32.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Apr 2025 09:32:32 -0700 (PDT)
-Date: Mon, 14 Apr 2025 12:32:29 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: virtualization@lists.linux.dev, kvm@vger.kernel.org,
-	netdev@vger.kernel.org, jasowang@redhat.com,
-	michael.christie@oracle.com, pbonzini@redhat.com,
-	stefanha@redhat.com, eperezma@redhat.com, joao.m.martins@oracle.com,
-	joe.jin@oracle.com, si-wei.liu@oracle.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 9/9] vhost: add WARNING if log_num is more than limit
-Message-ID: <20250414123119-mutt-send-email-mst@kernel.org>
-References: <20250403063028.16045-1-dongli.zhang@oracle.com>
- <20250403063028.16045-10-dongli.zhang@oracle.com>
+	s=arc-20240116; t=1744648438; c=relaxed/simple;
+	bh=d+ZRTx+RD81P0rFTl+nUP/1QZulDzYY8KvICn1C4bls=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=igg0AQOaJHTXiwiW2k+D/QT4AIQdyC8xbW77EihBcZ5nLwj7BoAhS0nYbaNG21gRe2j8mu29mbtPLr8kvKBt/4NTKCzwzqeK+sBDLwrAsi0BFn6Fa9xXjqd4bD1oHlmWKgfrRMCq6cZHbidVCz/bj1vRr7HNsS2meonWJf00Kv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uEOWyo0z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BC6BC4CEE2;
+	Mon, 14 Apr 2025 16:33:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744648438;
+	bh=d+ZRTx+RD81P0rFTl+nUP/1QZulDzYY8KvICn1C4bls=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uEOWyo0z3Vhi0x3jgeHCXbWlBHnpp14a2akmPJ27kwkZ+ubwypzexMevHalO8+W96
+	 uwIAagW/Q5Z+e31k1HDBDYRXeEvK/lxpcRjRDuossGwwcv05iWkmWSBtX2Iqqx5/vd
+	 BZ0ExtPCm4Rh4LG9s3Kvc9UjHyjsuNLbm74rPthBFXIJxeqjxCZV/NCtLTJ9MVYwtG
+	 4oLB9j6PQj6msOYPtE2gLOyd1TNgdyjrDWbbFL9uDx+sboRHl7Qux8xGZE86oeA9us
+	 sdhoTuSql7goYtmhhj3J/hlpu9aUW0SeFj6nP6cHemuQUPlGAAsXd+rkxIhbm5hiBi
+	 +2DD3I3V6c1Kw==
+Date: Mon, 14 Apr 2025 09:33:56 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Edward Cree <ecree.xilinx@gmail.com>, "Nelson, Shannon"
+ <shannon.nelson@amd.com>, "Jagielski, Jedrzej"
+ <jedrzej.jagielski@intel.com>, "Nguyen, Anthony L"
+ <anthony.l.nguyen@intel.com>, "davem@davemloft.net" <davem@davemloft.net>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, "Dumazet, Eric"
+ <edumazet@google.com>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jiri@resnulli.us"
+ <jiri@resnulli.us>, "horms@kernel.org" <horms@kernel.org>, "corbet@lwn.net"
+ <corbet@lwn.net>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+ Kalesh AP <kalesh-anakkur.purayil@broadcom.com>, "R, Bharath"
+ <bharath.r@intel.com>
+Subject: Re: [PATCH net-next 01/15] devlink: add value check to
+ devlink_info_version_put()
+Message-ID: <20250414093356.52868a1d@kernel.org>
+In-Reply-To: <69a0bf15-5f52-4974-bbaf-d4ba04e1f983@intel.com>
+References: <20250407215122.609521-1-anthony.l.nguyen@intel.com>
+	<20250407215122.609521-2-anthony.l.nguyen@intel.com>
+	<d9638476-1778-4e34-96ac-448d12877702@amd.com>
+	<DS0PR11MB7785C2BC22AE770A31D7427AF0B52@DS0PR11MB7785.namprd11.prod.outlook.com>
+	<7e5aecb4-cb28-4f55-9970-406ec35a5ae7@amd.com>
+	<DS0PR11MB7785945F6C0A9907A4E51AD6F0B42@DS0PR11MB7785.namprd11.prod.outlook.com>
+	<20250409073942.26be7914@kernel.org>
+	<5f896919-6397-4806-ab1a-946c4d20a1b3@amd.com>
+	<20a047ba-6b99-22d9-93e0-de7b4ed60b34@gmail.com>
+	<69a0bf15-5f52-4974-bbaf-d4ba04e1f983@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250403063028.16045-10-dongli.zhang@oracle.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 02, 2025 at 11:29:54PM -0700, Dongli Zhang wrote:
-> Since long time ago, the only user of vq->log is vhost-net. The concern is
-> to add support for more devices (i.e. vhost-scsi or vsock) may reveals
-> unknown issue in the vhost API. Add a WARNING.
+On Mon, 14 Apr 2025 14:28:31 +0200 Przemek Kitszel wrote:
+> On 4/11/25 13:11, Edward Cree wrote:
+> > On 09/04/2025 18:25, Nelson, Shannon wrote:  
+> >> On 4/9/2025 7:39 AM, Jakub Kicinski wrote:  
+> > AFAICT the argument on the other side is "it makes the driver look bad",
+> >   which has (expletive)-all to do with engineering.
+> > Value often comes from firmware, anyway, in which case driver's (& core's)
+> >   job is to be a dumb pipe, not go around 'validating' things.  
 > 
-> Suggested-by: Joao Martins <joao.m.martins@oracle.com>
-> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
-
-
-Userspace can trigger this I think, this is a problem since
-people run with reboot on warn.
-Pls grammar issues in comments... I don't think so.
-
-> ---
->  drivers/vhost/vhost.c | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
+> that way we will stick with the ugly, repetitive, overly bloated code,
+> repetitive and hard to fix in all places, (and repetitive) drivers
 > 
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index 494b3da5423a..b7d51d569646 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -2559,6 +2559,15 @@ static int get_indirect(struct vhost_virtqueue *vq,
->  		if (access == VHOST_ACCESS_WO) {
->  			*in_num += ret;
->  			if (unlikely(log && ret)) {
-> +				/*
-> +				 * Since long time ago, the only user of
-> +				 * vq->log is vhost-net. The concern is to
-> +				 * add support for more devices (i.e.
-> +				 * vhost-scsi or vsock) may reveals unknown
-> +				 * issue in the vhost API. Add a WARNING.
-> +				 */
-> +				WARN_ON_ONCE(*log_num >= vq->dev->iov_limit);
-> +
->  				log[*log_num].addr = vhost64_to_cpu(vq, desc.addr);
->  				log[*log_num].len = vhost32_to_cpu(vq, desc.len);
->  				++*log_num;
-> @@ -2679,6 +2688,15 @@ int vhost_get_vq_desc(struct vhost_virtqueue *vq,
->  			 * increment that count. */
->  			*in_num += ret;
->  			if (unlikely(log && ret)) {
-> +				/*
-> +				 * Since long time ago, the only user of
-> +				 * vq->log is vhost-net. The concern is to
-> +				 * add support for more devices (i.e.
-> +				 * vhost-scsi or vsock) may reveals unknown
-> +				 * issue in the vhost API. Add a WARNING.
-> +				 */
-> +				WARN_ON_ONCE(*log_num >= vq->dev->iov_limit);
-> +
->  				log[*log_num].addr = vhost64_to_cpu(vq, desc.addr);
->  				log[*log_num].len = vhost32_to_cpu(vq, desc.len);
->  				++*log_num;
-> -- 
-> 2.39.3
+> yeah, good that we bikeshed on something so simple :)
+> If anyone is "strongly opposed", please say so once more, and we will
+> drop this patch. Otherwise we are going to keep it.
 
+Unrelated (I think?) this is a relatively big series so I don't want 
+to race with it, but I think we should rename the defines. 
+
+DEVLINK_INFO_VERSION_GENERIC_x -> DEVLINK_VER_x ?
+
+You did some major devlink refactors, maybe you want to take this on? :)
+The 40 char defines lead to pretty ugly wrapping, and make constructs
+like:
+
+	if (something)
+		devlink_info_version_running_put(...
+
+impossible. We could also rename the helpers to s/_version// ..
 
