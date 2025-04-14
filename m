@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-182219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E41C3A882E2
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 15:46:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 874C7A882D0
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 15:45:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C97F13BD42D
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 13:41:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CF8D188BBFD
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 13:42:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9666E24729D;
-	Mon, 14 Apr 2025 13:28:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7AF3294A19;
+	Mon, 14 Apr 2025 13:28:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EFlPPZZE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DS9p+br0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BFE7247285;
-	Mon, 14 Apr 2025 13:28:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1D3294A15;
+	Mon, 14 Apr 2025 13:28:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744637315; cv=none; b=GwLL0A+N7zWZKyOqSOHyymOIJuUBeyLKLin+02wfiAp4zjd/hQmeB77L4Zp1KB23wFt63GkM8JqbNAhhdswCy3X+NA9VAWrljQmEsaACq2I4r5szKH4JG3tS7zdM3zSI3vwMvpWnp7yEWrMFWK/9atzIixZg4X1Z8N3EHjQboJE=
+	t=1744637323; cv=none; b=gsdlKyFd+J7VNwItKrMYz4mpl5WB/SAD6jXdrhverIjicADOugpf/JQC4h4sp2NRoDz+pNnSxzV/M/XcWooSwV4+oBZsMMCkZDVDYsgZ44CYsSTkIyy3LHVybtNl/ynpE5koqGa0GlXjoyujrQrRdUpfobHrsiuECa2TuTR/m60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744637315; c=relaxed/simple;
-	bh=DDLp9F3hw0/j5DNaV3tFyRMhvyjy0IKOIaq0JQaile8=;
+	s=arc-20240116; t=1744637323; c=relaxed/simple;
+	bh=ive9HXjdFaLlIvQIi8OCLS8jzkis2suMRljyaH5H8HI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=I03dbLOA7AUXDAOM3WDctkhIFO4/KTO4to/m76HFamsEuOUzq4ZkYy1FI5TRQGVkK/kd7d70uuEjVfEkRdxV7v9LWhETlI8qI3OcZRtveQE5ZlSwMIhwC0TK4nQm3fwJMAm7hwwwTD/6FPnoXmVk2NosUNkmnO+XvxRRAE4xHEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EFlPPZZE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DC43C4CEE2;
-	Mon, 14 Apr 2025 13:28:33 +0000 (UTC)
+	 MIME-Version; b=IqDg2ExRBbDGJECMrRsu0RxL+ml6kC74J0CzQuOJ5CwPtVrunj3jBlJBSBFZScqnSDhDRnOtRC7MnJaYa/iU2zxAxPGu4Z8rRk21DYGf8FEjeVDSX82BOmZy02x+MedV8wkcLHEvIHUTz73ucYCF4mFsJbvp3ThXsqmu71nl12c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DS9p+br0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 991D8C4CEE9;
+	Mon, 14 Apr 2025 13:28:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744637314;
-	bh=DDLp9F3hw0/j5DNaV3tFyRMhvyjy0IKOIaq0JQaile8=;
+	s=k20201202; t=1744637323;
+	bh=ive9HXjdFaLlIvQIi8OCLS8jzkis2suMRljyaH5H8HI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EFlPPZZE1BLxqHOWBiycbj6BUxo73H3LIXlQuEi2YoOzTMopYN47F3AYS+PGb+LXI
-	 jXahkZy4HXas40sjKkNYe9esxAY4uJljAryu4MP4MCKjuLik46P/i7RYGIV0EpeA3e
-	 1o9rq8GJS0/AMUEDHlVIwEp7DsN0uFByMHjpPNz47qUAt8tZAtKqVZmncyWrmsgD9P
-	 2VXF/o0Zo1LmK7A1TEFxrAVbB3i3fN1eYl5nB4hsYKjW5dG8HpSjBCMghITWSET/O8
-	 LuGXe9ReKJZJUX7Zx+HDMsf4bAxrD3BZZOwBpSCnMpsD33vUYhz324hdecITmayptr
-	 jk1HR3oL1w+mw==
+	b=DS9p+br0eyIzYkVdDwIlWStVjVy4IenrPvwbE3ZtrgzQYL1VzIuOt58GTA5zay0cK
+	 dYk4fcivCGM9uydU4qwqNN1azZUQeayxoKqy+v5IIOcLFZ1njmVwktdzbH3CjeTWBl
+	 gzS3Ulm+1VIB66nJZYzYeoLTLdM4TuwHlb609GlwArDyn7lxZ03+Ktc+umunU10a4e
+	 LYnfNhfIIkNXtLK9gzACtOOwrZw5fh7/KYFsNyXZiSXM9tgOOExD7euCyIiCZIYL7y
+	 pNP8xR9cxxWSunOrJjWy7qf5/751g+o5LP8P1Fhw0QBmQXWxCQF7/wIldtkz+npyGJ
+	 Y+YU2fh6AyjxQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Octavian Purdila <tavip@google.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	jhs@mojatatu.com,
-	jiri@resnulli.us,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.13 28/34] net_sched: sch_sfq: use a temporary work area for validating configuration
-Date: Mon, 14 Apr 2025 09:27:22 -0400
-Message-Id: <20250414132729.679254-28-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.13 32/34] net: phy: move phy_link_change() prior to mdio_bus_phy_may_suspend()
+Date: Mon, 14 Apr 2025 09:27:26 -0400
+Message-Id: <20250414132729.679254-32-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250414132729.679254-1-sashal@kernel.org>
 References: <20250414132729.679254-1-sashal@kernel.org>
@@ -71,120 +71,73 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.13.11
 Content-Transfer-Encoding: 8bit
 
-From: Octavian Purdila <tavip@google.com>
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-[ Upstream commit 8c0cea59d40cf6dd13c2950437631dd614fbade6 ]
+[ Upstream commit f40a673d6b4a128fe95dd9b8c3ed02da50a6a862 ]
 
-Many configuration parameters have influence on others (e.g. divisor
--> flows -> limit, depth -> limit) and so it is difficult to correctly
-do all of the validation before applying the configuration. And if a
-validation error is detected late it is difficult to roll back a
-partially applied configuration.
+In an upcoming change, mdio_bus_phy_may_suspend() will need to
+distinguish a phylib-based PHY client from a phylink PHY client.
+For that, it will need to compare the phydev->phy_link_change() function
+pointer with the eponymous phy_link_change() provided by phylib.
 
-To avoid these issues use a temporary work area to update and validate
-the configuration and only then apply the configuration to the
-internal state.
+To avoid forward function declarations, the default PHY link state
+change method should be moved upwards. There is no functional change
+associated with this patch, it is only to reduce the noise from a real
+bug fix.
 
-Signed-off-by: Octavian Purdila <tavip@google.com>
-Acked-by: Cong Wang <xiyou.wangcong@gmail.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Link: https://patch.msgid.link/20250407093900.2155112-1-vladimir.oltean@nxp.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/sched/sch_sfq.c | 56 +++++++++++++++++++++++++++++++++++----------
- 1 file changed, 44 insertions(+), 12 deletions(-)
+ drivers/net/phy/phy_device.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/net/sched/sch_sfq.c b/net/sched/sch_sfq.c
-index 65d5b59da5830..7714ae94e0521 100644
---- a/net/sched/sch_sfq.c
-+++ b/net/sched/sch_sfq.c
-@@ -631,6 +631,15 @@ static int sfq_change(struct Qdisc *sch, struct nlattr *opt,
- 	struct red_parms *p = NULL;
- 	struct sk_buff *to_free = NULL;
- 	struct sk_buff *tail = NULL;
-+	unsigned int maxflows;
-+	unsigned int quantum;
-+	unsigned int divisor;
-+	int perturb_period;
-+	u8 headdrop;
-+	u8 maxdepth;
-+	int limit;
-+	u8 flags;
-+
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 5f1ad0c7fb534..eedcdae883982 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -289,6 +289,19 @@ static bool phy_drv_wol_enabled(struct phy_device *phydev)
+ 	return wol.wolopts != 0;
+ }
  
- 	if (opt->nla_len < nla_attr_size(sizeof(*ctl)))
- 		return -EINVAL;
-@@ -656,36 +665,59 @@ static int sfq_change(struct Qdisc *sch, struct nlattr *opt,
- 		NL_SET_ERR_MSG_MOD(extack, "invalid limit");
- 		return -EINVAL;
- 	}
++static void phy_link_change(struct phy_device *phydev, bool up)
++{
++	struct net_device *netdev = phydev->attached_dev;
 +
- 	sch_tree_lock(sch);
++	if (up)
++		netif_carrier_on(netdev);
++	else
++		netif_carrier_off(netdev);
++	phydev->adjust_link(netdev);
++	if (phydev->mii_ts && phydev->mii_ts->link_state)
++		phydev->mii_ts->link_state(phydev->mii_ts, phydev);
++}
 +
-+	limit = q->limit;
-+	divisor = q->divisor;
-+	headdrop = q->headdrop;
-+	maxdepth = q->maxdepth;
-+	maxflows = q->maxflows;
-+	perturb_period = q->perturb_period;
-+	quantum = q->quantum;
-+	flags = q->flags;
-+
-+	/* update and validate configuration */
- 	if (ctl->quantum)
--		q->quantum = ctl->quantum;
--	WRITE_ONCE(q->perturb_period, ctl->perturb_period * HZ);
-+		quantum = ctl->quantum;
-+	perturb_period = ctl->perturb_period * HZ;
- 	if (ctl->flows)
--		q->maxflows = min_t(u32, ctl->flows, SFQ_MAX_FLOWS);
-+		maxflows = min_t(u32, ctl->flows, SFQ_MAX_FLOWS);
- 	if (ctl->divisor) {
--		q->divisor = ctl->divisor;
--		q->maxflows = min_t(u32, q->maxflows, q->divisor);
-+		divisor = ctl->divisor;
-+		maxflows = min_t(u32, maxflows, divisor);
- 	}
- 	if (ctl_v1) {
- 		if (ctl_v1->depth)
--			q->maxdepth = min_t(u32, ctl_v1->depth, SFQ_MAX_DEPTH);
-+			maxdepth = min_t(u32, ctl_v1->depth, SFQ_MAX_DEPTH);
- 		if (p) {
--			swap(q->red_parms, p);
--			red_set_parms(q->red_parms,
-+			red_set_parms(p,
- 				      ctl_v1->qth_min, ctl_v1->qth_max,
- 				      ctl_v1->Wlog,
- 				      ctl_v1->Plog, ctl_v1->Scell_log,
- 				      NULL,
- 				      ctl_v1->max_P);
- 		}
--		q->flags = ctl_v1->flags;
--		q->headdrop = ctl_v1->headdrop;
-+		flags = ctl_v1->flags;
-+		headdrop = ctl_v1->headdrop;
- 	}
- 	if (ctl->limit) {
--		q->limit = min_t(u32, ctl->limit, q->maxdepth * q->maxflows);
--		q->maxflows = min_t(u32, q->maxflows, q->limit);
-+		limit = min_t(u32, ctl->limit, maxdepth * maxflows);
-+		maxflows = min_t(u32, maxflows, limit);
- 	}
+ static bool mdio_bus_phy_may_suspend(struct phy_device *phydev)
+ {
+ 	struct device_driver *drv = phydev->mdio.dev.driver;
+@@ -1101,19 +1114,6 @@ struct phy_device *phy_find_first(struct mii_bus *bus)
+ }
+ EXPORT_SYMBOL(phy_find_first);
  
-+	/* commit configuration */
-+	q->limit = limit;
-+	q->divisor = divisor;
-+	q->headdrop = headdrop;
-+	q->maxdepth = maxdepth;
-+	q->maxflows = maxflows;
-+	WRITE_ONCE(q->perturb_period, perturb_period);
-+	q->quantum = quantum;
-+	q->flags = flags;
-+	if (p)
-+		swap(q->red_parms, p);
-+
- 	qlen = sch->q.qlen;
- 	while (sch->q.qlen > q->limit) {
- 		dropped += sfq_drop(sch, &to_free);
+-static void phy_link_change(struct phy_device *phydev, bool up)
+-{
+-	struct net_device *netdev = phydev->attached_dev;
+-
+-	if (up)
+-		netif_carrier_on(netdev);
+-	else
+-		netif_carrier_off(netdev);
+-	phydev->adjust_link(netdev);
+-	if (phydev->mii_ts && phydev->mii_ts->link_state)
+-		phydev->mii_ts->link_state(phydev->mii_ts, phydev);
+-}
+-
+ /**
+  * phy_prepare_link - prepares the PHY layer to monitor link status
+  * @phydev: target phy_device struct
 -- 
 2.39.5
 
