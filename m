@@ -1,170 +1,175 @@
-Return-Path: <netdev+bounces-182398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 539AAA88AB7
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 20:07:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78AF0A88AC0
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 20:11:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 847D818948C2
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:08:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35BFD3A64F2
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:11:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DDAA27B4F0;
-	Mon, 14 Apr 2025 18:07:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="rl80Shz/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 870EB28935A;
+	Mon, 14 Apr 2025 18:11:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1410827467D
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:07:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A5BB2749E2;
+	Mon, 14 Apr 2025 18:11:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744654066; cv=none; b=f6fk73+r5QZMS0HkEaxFkhbwBpJ7wB5Fpks2kGxTv6o5yUdjRDgzB9IVEP+rUITpRCUmFwVq4awwjiOYcPcV2yWmrkIEgG6BID2+7VoSRkgwS0UQc7mzmZOzGo4w0oW8xIhlu41gULBMwyR7SYFbXPigoXNjlh1Ium+/mqPM7/Y=
+	t=1744654302; cv=none; b=UZTakHmnoyFPYKWAMApeNoLRyE5KG0mQbhy3DKgz1IDRXQsLe23ijc0yOdS70iozfaTpqURJpID6xDLmqJVfNuats379Z6cU4yPqIpAnR14HR+2QhRFkY4sc5wFzgws/0K2uoykThQiI8wYzjV6O5I9WVeuiGjctSfMuJjRLMnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744654066; c=relaxed/simple;
-	bh=wwfzw9cElkhMpJqzG3NEJxYlstI/SNrAWm6plYVWLHs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TYXKMNyL/RIQoYR5ZYmPBu12EmCfwV7jQ5OQ8bDEcTh6sDqlZeiR3ZQUdlOQqZtqnltGheeBH+YHWn0Vg/rM8K0ZfQDzLxqqsUhmRhpkC35jtk2jX70TsUQio7/F+xGYcBvKQ7Ge+XuPGOPyJ+u3b8mY/1Ur7AeXG+t2S+mTP74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=rl80Shz/; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1744654065; x=1776190065;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=gOZO9I5TvVbrz8jzJg9YfTR3q0paJDHrI29qVW1wvBg=;
-  b=rl80Shz/+FGj/ld+Ni0tP4oFlMzW1ukN+Pq/fYcu7I7jRjj0vLr1tqqS
-   HOX4fPd81Cfxcv2XZUy9mEERDweKqNXqLUfObjW4b/rep3BP8KL17cH/S
-   oTIZq1sK8u1pbaa/j3UeAZeM1b/8tejktgNvm1T0v9IqtHpCIlVFZpHZc
-   E=;
-X-IronPort-AV: E=Sophos;i="6.15,212,1739836800"; 
-   d="scan'208";a="187297551"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2025 18:07:43 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:10671]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.21.195:2525] with esmtp (Farcaster)
- id 8d04718f-2884-4ae2-ae26-df939416a736; Mon, 14 Apr 2025 18:07:42 +0000 (UTC)
-X-Farcaster-Flow-ID: 8d04718f-2884-4ae2-ae26-df939416a736
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 14 Apr 2025 18:07:41 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.187.170.39) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 14 Apr 2025 18:07:39 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <horms@kernel.org>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v2 net-next 10/14] ipv6: Factorise ip6_route_multipath_add().
-Date: Mon, 14 Apr 2025 11:06:58 -0700
-Message-ID: <20250414180731.26130-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250414145226.GS395307@horms.kernel.org>
-References: <20250414145226.GS395307@horms.kernel.org>
+	s=arc-20240116; t=1744654302; c=relaxed/simple;
+	bh=L0LuWuYWyu5iFwHL6RLiQ0aKxB+TMYcjnp6vfKBxSFc=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=adZEKd4JLEfa0I2Nnf9uZuX11OWxROuJqvYiWKIVFLhnZGBb7M6ksx1mLAshY08pbRBfXI4iom0tFWThSHsavONTG12RN7j7xPYPUoXOfQ1PPnJfnlOsAPp3i7IeiRcABvH1ShO9RvtXmiesy6DDKWKDW6srWGsnLAPFfa70elc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1u4OHE-000000003xa-28sl;
+	Mon, 14 Apr 2025 18:11:24 +0000
+Date: Mon, 14 Apr 2025 19:11:20 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Bo-Cun Chen <bc-bocun.chen@mediatek.com>, Felix Fietkau <nbd@nbd.name>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH net 1/5] net: ethernet: mtk_eth_soc: revise mdc divider
+ configuration
+Message-ID: <08498e31e830cf0ee1ceb4fc1313d5c528a69150.1744654076.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWC002.ant.amazon.com (10.13.139.242) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-From: Simon Horman <horms@kernel.org>
-Date: Mon, 14 Apr 2025 15:52:26 +0100
-> On Fri, Apr 11, 2025 at 12:33:46PM -0700, Kuniyuki Iwashima wrote:
-> > From: Simon Horman <horms@kernel.org>
-> > Date: Fri, 11 Apr 2025 11:34:04 +0100
-> > > > +static int ip6_route_mpath_info_create_nh(struct list_head *rt6_nh_list,
-> > > > +					  struct netlink_ext_ack *extack)
-> > > > +{
-> > > > +	struct rt6_nh *nh, *nh_next, *nh_tmp;
-> > > > +	LIST_HEAD(tmp);
-> > > > +	int err;
-> > > > +
-> > > > +	list_for_each_entry_safe(nh, nh_next, rt6_nh_list, next) {
-> > > > +		struct fib6_info *rt = nh->fib6_info;
-> > > > +
-> > > > +		err = ip6_route_info_create_nh(rt, &nh->r_cfg, extack);
-> > > > +		if (err) {
-> > > > +			nh->fib6_info = NULL;
-> > > > +			goto err;
-> > > > +		}
-> > > > +
-> > > > +		rt->fib6_nh->fib_nh_weight = nh->weight;
-> > > > +
-> > > > +		list_move_tail(&nh->next, &tmp);
-> > > > +
-> > > > +		list_for_each_entry(nh_tmp, rt6_nh_list, next) {
-> > > > +			/* check if fib6_info already exists */
-> > > > +			if (rt6_duplicate_nexthop(nh_tmp->fib6_info, rt)) {
-> > > > +				err = -EEXIST;
-> > > > +				goto err;
-> > > > +			}
-> > > > +		}
-> > > > +	}
-> > > > +out:
-> > > > +	list_splice(&tmp, rt6_nh_list);
-> > > > +	return err;
-> > > 
-> > > Hi Kuniyuki-san,
-> > > 
-> > > Perhaps it can't happen in practice,
-> > 
-> > Yes, it never happens by patch 1 as rtm_to_fib6_multipath_config()
-> > returns an error in such a case.
-> > 
-> > 
-> > > but if the loop above iterates zero
-> > > times then err will be used uninitialised. As it's expected that err is 0
-> > > here, perhaps it would be simplest to just:
-> > > 
-> > > 	return 0;
-> > 
-> > If we want to return 0 above, we need to duplicate list_splice() at
-> > err: and return err; there.  Or initialise err = 0, but this looks
-> > worse to me.
-> 
-> Thanks. I should have dug a bit deeper to determine that this
-> is a false-positive.
-> 
-> > Btw, was this caught by Smatch, Coverity, or something ?  I don't
-> > see such a report at CI.
-> > https://patchwork.kernel.org/project/netdevbpf/patch/20250409011243.26195-11-kuniyu@amazon.com/
-> 
-> Sorry for not mentioning that it was flagged by Smatch,
-> I certainly should have done so.
+From: Bo-Cun Chen <bc-bocun.chen@mediatek.com>
 
-Thanks for confirming!
+In the current method, the MDC divider was reset to the default setting
+of 2.5MHz after the NETSYS SER. Therefore, we need to move the MDC
+divider configuration function to mtk_hw_init().
 
-> 
-> 
-> > 
-> > If so, I'm just curious if we have an official guideline for
-> > false-positives flagged by such tools, like we should care about it
-> > while writing a code and should try to be safer to make it happy.
-> > 
-> > We are also running Coverity for the mainline kernel and have tons
-> > of false-positive reports due to lack of contexts.
-> 
-> I think that the current non-guideline is that we don't change
-> code just to keep the tools happy. Perhaps we should add something
-> about that to the process document?
+Fixes: c0a440031d431 ("net: ethernet: mtk_eth_soc: set MDIO bus clock frequency")
+Signed-off-by: Bo-Cun Chen <bc-bocun.chen@mediatek.com>
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c | 60 ++++++++++++++-------
+ 1 file changed, 42 insertions(+), 18 deletions(-)
 
-Makes sense.
-
-But looks like the series was marked Changes Requested, not sure
-if it's accidental or intentional, so I'll resend v2 to see others'
-opinion.
-
-Thanks!
+diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+index 43197b28b3e74..fd643cc1b7dd2 100644
+--- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
++++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
+@@ -871,11 +871,11 @@ static const struct phylink_mac_ops mtk_phylink_ops = {
+ 	.mac_enable_tx_lpi = mtk_mac_enable_tx_lpi,
+ };
+ 
+-static int mtk_mdio_init(struct mtk_eth *eth)
++static int mtk_mdio_config(struct mtk_eth *eth)
+ {
+ 	unsigned int max_clk = 2500000, divider;
+ 	struct device_node *mii_np;
+-	int ret;
++	int ret = 0;
+ 	u32 val;
+ 
+ 	mii_np = of_get_available_child_by_name(eth->dev->of_node, "mdio-bus");
+@@ -884,22 +884,6 @@ static int mtk_mdio_init(struct mtk_eth *eth)
+ 		return -ENODEV;
+ 	}
+ 
+-	eth->mii_bus = devm_mdiobus_alloc(eth->dev);
+-	if (!eth->mii_bus) {
+-		ret = -ENOMEM;
+-		goto err_put_node;
+-	}
+-
+-	eth->mii_bus->name = "mdio";
+-	eth->mii_bus->read = mtk_mdio_read_c22;
+-	eth->mii_bus->write = mtk_mdio_write_c22;
+-	eth->mii_bus->read_c45 = mtk_mdio_read_c45;
+-	eth->mii_bus->write_c45 = mtk_mdio_write_c45;
+-	eth->mii_bus->priv = eth;
+-	eth->mii_bus->parent = eth->dev;
+-
+-	snprintf(eth->mii_bus->id, MII_BUS_ID_SIZE, "%pOFn", mii_np);
+-
+ 	if (!of_property_read_u32(mii_np, "clock-frequency", &val)) {
+ 		if (val > MDC_MAX_FREQ || val < MDC_MAX_FREQ / MDC_MAX_DIVIDER) {
+ 			dev_err(eth->dev, "MDIO clock frequency out of range");
+@@ -922,6 +906,42 @@ static int mtk_mdio_init(struct mtk_eth *eth)
+ 
+ 	dev_dbg(eth->dev, "MDC is running on %d Hz\n", MDC_MAX_FREQ / divider);
+ 
++err_put_node:
++	of_node_put(mii_np);
++	return ret;
++}
++
++static int mtk_mdio_init(struct mtk_eth *eth)
++{
++	struct device_node *mii_np;
++	int ret;
++
++	mii_np = of_get_child_by_name(eth->dev->of_node, "mdio-bus");
++	if (!mii_np) {
++		dev_err(eth->dev, "no %s child node found", "mdio-bus");
++		return -ENODEV;
++	}
++
++	if (!of_device_is_available(mii_np)) {
++		ret = -ENODEV;
++		goto err_put_node;
++	}
++
++	eth->mii_bus = devm_mdiobus_alloc(eth->dev);
++	if (!eth->mii_bus) {
++		ret = -ENOMEM;
++		goto err_put_node;
++	}
++
++	eth->mii_bus->name = "mdio";
++	eth->mii_bus->read = mtk_mdio_read_c22;
++	eth->mii_bus->write = mtk_mdio_write_c22;
++	eth->mii_bus->read_c45 = mtk_mdio_read_c45;
++	eth->mii_bus->write_c45 = mtk_mdio_write_c45;
++	eth->mii_bus->priv = eth;
++	eth->mii_bus->parent = eth->dev;
++
++	snprintf(eth->mii_bus->id, MII_BUS_ID_SIZE, "%pOFn", mii_np);
+ 	ret = of_mdiobus_register(eth->mii_bus, mii_np);
+ 
+ err_put_node:
+@@ -3974,6 +3994,10 @@ static int mtk_hw_init(struct mtk_eth *eth, bool reset)
+ 	else
+ 		mtk_hw_reset(eth);
+ 
++	/* No MT7628/88 support yet */
++	if (!MTK_HAS_CAPS(eth->soc->caps, MTK_SOC_MT7628))
++		mtk_mdio_config(eth);
++
+ 	if (mtk_is_netsys_v3_or_greater(eth)) {
+ 		/* Set FE to PDMAv2 if necessary */
+ 		val = mtk_r32(eth, MTK_FE_GLO_MISC);
+-- 
+2.49.0
 
