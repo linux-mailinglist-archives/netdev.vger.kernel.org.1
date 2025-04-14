@@ -1,219 +1,231 @@
-Return-Path: <netdev+bounces-182155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64BEDA880C1
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 14:48:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C883FA880CD
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 14:49:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23F663B0DAE
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 12:48:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE44B1897D26
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 12:50:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37DEB1B4159;
-	Mon, 14 Apr 2025 12:48:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEA2A29DB80;
+	Mon, 14 Apr 2025 12:49:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="afVN0bFU"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="EKTr8CTM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from OSPPR02CU001.outbound.protection.outlook.com (mail-norwayeastazon11013027.outbound.protection.outlook.com [40.107.159.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D1561A28D;
-	Mon, 14 Apr 2025 12:48:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744634909; cv=none; b=ZoitksxqSXHCAW+XGAmMgZl6tRoRx3nUjff6mtfsTbx8F+fz9Gw4gz6iU6rLwcv3BdtLRbgPbwe2Be/tHebdXMkQAIvrHtSoGdghM9i04f6Qc6nEcNE6R720psgpdxY9wueJtTt5sMqpg+VHSOiZBbp76JqhxowcBiZE0ZnvKjw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744634909; c=relaxed/simple;
-	bh=5RzIFJOiTbN0vX462+6AoJyYWW3P/YzuGGmYLNmznIs=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=U/12Fd4K/hdQS7k1e2TwRC6tNtix+RG24Fr+/JLgvoztjwoz2CM1P87jwulMkeRGATP50CPzGVOdgZV3fAuV5dwJqdbhDauhcV+4xOtrchWHBi/vsMuVEpI7N9YtXzylxeyr04VoH9U6NdLv6gvalH3GT/YRO2EGiYew2eBDXdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=afVN0bFU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1603C4CEE2;
-	Mon, 14 Apr 2025 12:48:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744634908;
-	bh=5RzIFJOiTbN0vX462+6AoJyYWW3P/YzuGGmYLNmznIs=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=afVN0bFU9Zb+3grQfOLGhD9Ol+1maQWMmnpbyABr8RjS1k1Pyl85OFI9js7C1BJwg
-	 UJv+v4+OwLj2+dJgsSwSe6NLJgsg2TmFng8yp3ZUqDfUhv7MUtH3mKWSTiQJ6yyZYq
-	 T1jyMWwfw15AWLTUaeWrb7Bnhg3qTzrX+ESvLXZCvUa/r8HuvpLXemBqKmO8FqsMox
-	 8SyAiLZeMabyBD1iqVtCSLxH0WYrvHNynk1fA59EYYmvr+Hf2P654M3Qd5yoWks3ny
-	 LfrYx4GrBphwDLpzbkGtjn3xmMG183v8o8sT1Evyb6HFrMFwXYWJjSvnMG9BEyqQg/
-	 /B18nvyGa4WNA==
-Message-ID: <cc695a916d9abd79fa1cd9725c767c7e294a3b39.camel@kernel.org>
-Subject: Re: [PATCH v2 2/2] net: add debugfs files for showing netns
- refcount tracking info
-From: Jeff Layton <jlayton@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski	 <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman	 <horms@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, 	netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Date: Mon, 14 Apr 2025 08:48:26 -0400
-In-Reply-To: <1bc3164b-0e41-49e1-9ed2-cf37997ab53e@lunn.ch>
-References: <20250408-netns-debugfs-v2-0-ca267f51461e@kernel.org>
-	 <20250408-netns-debugfs-v2-2-ca267f51461e@kernel.org>
-	 <1e717326-8551-419e-b185-5cfb20573b4f@lunn.ch>
-	 <91d6d3c60ef5d4ed90418f8a06228767be8a5b1b.camel@kernel.org>
-	 <ff2b7cfb7657a185469747d930b834dbdfdf6eac.camel@kernel.org>
-	 <f4722246-5694-4b1a-9b1b-d4352fa54ee7@lunn.ch>
-	 <23f93f84e000ebee28614bf85a4013648fa66a00.camel@kernel.org>
-	 <71adf369-a803-4d06-906c-97b5bf48bcf8@lunn.ch>
-	 <a34f5e6d34210bae0badfd08aec15bed0bdb306e.camel@kernel.org>
-	 <1bc3164b-0e41-49e1-9ed2-cf37997ab53e@lunn.ch>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=mQINBE6V0TwBEADXhJg7s8wFDwBMEvn0qyhAnzFLTOCHooMZyx7XO7dAiIhDSi7G1NPxw
- n8jdFUQMCR/GlpozMFlSFiZXiObE7sef9rTtM68ukUyZM4pJ9l0KjQNgDJ6Fr342Htkjxu/kFV1Wv
- egyjnSsFt7EGoDjdKqr1TS9syJYFjagYtvWk/UfHlW09X+jOh4vYtfX7iYSx/NfqV3W1D7EDi0PqV
- T2h6v8i8YqsATFPwO4nuiTmL6I40ZofxVd+9wdRI4Db8yUNA4ZSP2nqLcLtFjClYRBoJvRWvsv4lm
- 0OX6MYPtv76hka8lW4mnRmZqqx3UtfHX/hF/zH24Gj7A6sYKYLCU3YrI2Ogiu7/ksKcl7goQjpvtV
- YrOOI5VGLHge0awt7bhMCTM9KAfPc+xL/ZxAMVWd3NCk5SamL2cE99UWgtvNOIYU8m6EjTLhsj8sn
- VluJH0/RcxEeFbnSaswVChNSGa7mXJrTR22lRL6ZPjdMgS2Km90haWPRc8Wolcz07Y2se0xpGVLEQ
- cDEsvv5IMmeMe1/qLZ6NaVkNuL3WOXvxaVT9USW1+/SGipO2IpKJjeDZfehlB/kpfF24+RrK+seQf
- CBYyUE8QJpvTZyfUHNYldXlrjO6n5MdOempLqWpfOmcGkwnyNRBR46g/jf8KnPRwXs509yAqDB6sE
- LZH+yWr9LQZEwARAQABtCVKZWZmIExheXRvbiA8amxheXRvbkBwb29jaGllcmVkcy5uZXQ+iQI7BB
- MBAgAlAhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAUCTpXWPAIZAQAKCRAADmhBGVaCFc65D/4
- gBLNMHopQYgG/9RIM3kgFCCQV0pLv0hcg1cjr+bPI5f1PzJoOVi9s0wBDHwp8+vtHgYhM54yt43uI
- 7Htij0RHFL5eFqoVT4TSfAg2qlvNemJEOY0e4daljjmZM7UtmpGs9NN0r9r50W82eb5Kw5bc/r0km
- R/arUS2st+ecRsCnwAOj6HiURwIgfDMHGPtSkoPpu3DDp/cjcYUg3HaOJuTjtGHFH963B+f+hyQ2B
- rQZBBE76ErgTDJ2Db9Ey0kw7VEZ4I2nnVUY9B5dE2pJFVO5HJBMp30fUGKvwaKqYCU2iAKxdmJXRI
- ONb7dSde8LqZahuunPDMZyMA5+mkQl7kpIpR6kVDIiqmxzRuPeiMP7O2FCUlS2DnJnRVrHmCljLkZ
- Wf7ZUA22wJpepBligemtSRSbqCyZ3B48zJ8g5B8xLEntPo/NknSJaYRvfEQqGxgk5kkNWMIMDkfQO
- lDSXZvoxqU9wFH/9jTv1/6p8dHeGM0BsbBLMqQaqnWiVt5mG92E1zkOW69LnoozE6Le+12DsNW7Rj
- iR5K+27MObjXEYIW7FIvNN/TQ6U1EOsdxwB8o//Yfc3p2QqPr5uS93SDDan5ehH59BnHpguTc27Xi
- QQZ9EGiieCUx6Zh2ze3X2UW9YNzE15uKwkkuEIj60NvQRmEDfweYfOfPVOueC+iFifbQgSmVmZiBM
- YXl0b24gPGpsYXl0b25AcmVkaGF0LmNvbT6JAjgEEwECACIFAk6V0q0CGwMGCwkIBwMCBhUIAgkKC
- wQWAgMBAh4BAheAAAoJEAAOaEEZVoIViKUQALpvsacTMWWOd7SlPFzIYy2/fjvKlfB/Xs4YdNcf9q
- LqF+lk2RBUHdR/dGwZpvw/OLmnZ8TryDo2zXVJNWEEUFNc7wQpl3i78r6UU/GUY/RQmOgPhs3epQC
- 3PMJj4xFx+VuVcf/MXgDDdBUHaCTT793hyBeDbQuciARDJAW24Q1RCmjcwWIV/pgrlFa4lAXsmhoa
- c8UPc82Ijrs6ivlTweFf16VBc4nSLX5FB3ls7S5noRhm5/Zsd4PGPgIHgCZcPgkAnU1S/A/rSqf3F
- LpU+CbVBDvlVAnOq9gfNF+QiTlOHdZVIe4gEYAU3CUjbleywQqV02BKxPVM0C5/oVjMVx3bri75n1
- TkBYGmqAXy9usCkHIsG5CBHmphv9MHmqMZQVsxvCzfnI5IO1+7MoloeeW/lxuyd0pU88dZsV/riHw
- 87i2GJUJtVlMl5IGBNFpqoNUoqmvRfEMeXhy/kUX4Xc03I1coZIgmwLmCSXwx9MaCPFzV/dOOrju2
- xjO+2sYyB5BNtxRqUEyXglpujFZqJxxau7E0eXoYgoY9gtFGsspzFkVNntamVXEWVVgzJJr/EWW0y
- +jNd54MfPRqH+eCGuqlnNLktSAVz1MvVRY1dxUltSlDZT7P2bUoMorIPu8p7ZCg9dyX1+9T6Muc5d
- Hxf/BBP/ir+3e8JTFQBFOiLNdFtB9KZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+iQI4BBM
- BAgAiBQJOldK9AhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAAKCRAADmhBGVaCFWgWD/0ZRi4h
- N9FK2BdQs9RwNnFZUr7JidAWfCrs37XrA/56olQl3ojn0fQtrP4DbTmCuh0SfMijB24psy1GnkPep
- naQ6VRf7Dxg/Y8muZELSOtsv2CKt3/02J1BBitrkkqmHyni5fLLYYg6fub0T/8Kwo1qGPdu1hx2BQ
- RERYtQ/S5d/T0cACdlzi6w8rs5f09hU9Tu4qV1JLKmBTgUWKN969HPRkxiojLQziHVyM/weR5Reu6
- FZVNuVBGqBD+sfk/c98VJHjsQhYJijcsmgMb1NohAzwrBKcSGKOWJToGEO/1RkIN8tqGnYNp2G+aR
- 685D0chgTl1WzPRM6mFG1+n2b2RR95DxumKVpwBwdLPoCkI24JkeDJ7lXSe3uFWISstFGt0HL8Eew
- P8RuGC8s5h7Ct91HMNQTbjgA+Vi1foWUVXpEintAKgoywaIDlJfTZIl6Ew8ETN/7DLy8bXYgq0Xzh
- aKg3CnOUuGQV5/nl4OAX/3jocT5Cz/OtAiNYj5mLPeL5z2ZszjoCAH6caqsF2oLyAnLqRgDgR+wTQ
- T6gMhr2IRsl+cp8gPHBwQ4uZMb+X00c/Amm9VfviT+BI7B66cnC7Zv6Gvmtu2rEjWDGWPqUgccB7h
- dMKnKDthkA227/82tYoFiFMb/NwtgGrn5n2vwJyKN6SEoygGrNt0SI84y6hEVbQlSmVmZiBMYXl0b
- 24gPGpsYXl0b25AcHJpbWFyeWRhdGEuY29tPokCOQQTAQIAIwUCU4xmKQIbAwcLCQgHAwIBBhUIAg
- kKCwQWAgMBAh4BAheAAAoJEAAOaEEZVoIV1H0P/j4OUTwFd7BBbpoSp695qb6HqCzWMuExsp8nZjr
- uymMaeZbGr3OWMNEXRI1FWNHMtcMHWLP/RaDqCJil28proO+PQ/yPhsr2QqJcW4nr91tBrv/MqItu
- AXLYlsgXqp4BxLP67bzRJ1Bd2x0bWXurpEXY//VBOLnODqThGEcL7jouwjmnRh9FTKZfBDpFRaEfD
- FOXIfAkMKBa/c9TQwRpx2DPsl3eFWVCNuNGKeGsirLqCxUg5kWTxEorROppz9oU4HPicL6rRH22Ce
- 6nOAON2vHvhkUuO3GbffhrcsPD4DaYup4ic+DxWm+DaSSRJ+e1yJvwi6NmQ9P9UAuLG93S2MdNNbo
- sZ9P8k2mTOVKMc+GooI9Ve/vH8unwitwo7ORMVXhJeU6Q0X7zf3SjwDq2lBhn1DSuTsn2DbsNTiDv
- qrAaCvbsTsw+SZRwF85eG67eAwouYk+dnKmp1q57LDKMyzysij2oDKbcBlwB/TeX16p8+LxECv51a
- sjS9TInnipssssUDrHIvoTTXWcz7Y5wIngxDFwT8rPY3EggzLGfK5Zx2Q5S/N0FfmADmKknG/D8qG
- IcJE574D956tiUDKN4I+/g125ORR1v7bP+OIaayAvq17RP+qcAqkxc0x8iCYVCYDouDyNvWPGRhbL
- UO7mlBpjW9jK9e2fvZY9iw3QzIPGKtClKZWZmIExheXRvbiA8amVmZi5sYXl0b25AcHJpbWFyeWRh
- dGEuY29tPokCOQQTAQIAIwUCU4xmUAIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEAAOa
- EEZVoIVzJoQALFCS6n/FHQS+hIzHIb56JbokhK0AFqoLVzLKzrnaeXhE5isWcVg0eoV2oTScIwUSU
- apy94if69tnUo4Q7YNt8/6yFM6hwZAxFjOXR0ciGE3Q+Z1zi49Ox51yjGMQGxlakV9ep4sV/d5a50
- M+LFTmYSAFp6HY23JN9PkjVJC4PUv5DYRbOZ6Y1+TfXKBAewMVqtwT1Y+LPlfmI8dbbbuUX/kKZ5d
- dhV2736fgyfpslvJKYl0YifUOVy4D1G/oSycyHkJG78OvX4JKcf2kKzVvg7/Rnv+AueCfFQ6nGwPn
- 0P91I7TEOC4XfZ6a1K3uTp4fPPs1Wn75X7K8lzJP/p8lme40uqwAyBjk+IA5VGd+CVRiyJTpGZwA0
- jwSYLyXboX+Dqm9pSYzmC9+/AE7lIgpWj+3iNisp1SWtHc4pdtQ5EU2SEz8yKvDbD0lNDbv4ljI7e
- flPsvN6vOrxz24mCliEco5DwhpaaSnzWnbAPXhQDWb/lUgs/JNk8dtwmvWnqCwRqElMLVisAbJmC0
- BhZ/Ab4sph3EaiZfdXKhiQqSGdK4La3OTJOJYZphPdGgnkvDV9Pl1QZ0ijXQrVIy3zd6VCNaKYq7B
- AKidn5g/2Q8oio9Tf4XfdZ9dtwcB+bwDJFgvvDYaZ5bI3ln4V3EyW5i2NfXazz/GA/I/ZtbsigCFc
- 8ftCBKZWZmIExheXRvbiA8amxheXRvbkBrZXJuZWwub3JnPokCOAQTAQIAIgUCWe8u6AIbAwYLCQg
- HAwIGFQgCCQoLBBYCAwECHgECF4AACgkQAA5oQRlWghUuCg/+Lb/xGxZD2Q1oJVAE37uW308UpVSD
- 2tAMJUvFTdDbfe3zKlPDTuVsyNsALBGclPLagJ5ZTP+Vp2irAN9uwBuacBOTtmOdz4ZN2tdvNgozz
- uxp4CHBDVzAslUi2idy+xpsp47DWPxYFIRP3M8QG/aNW052LaPc0cedYxp8+9eiVUNpxF4SiU4i9J
- DfX/sn9XcfoVZIxMpCRE750zvJvcCUz9HojsrMQ1NFc7MFT1z3MOW2/RlzPcog7xvR5ENPH19ojRD
- CHqumUHRry+RF0lH00clzX/W8OrQJZtoBPXv9ahka/Vp7kEulcBJr1cH5Wz/WprhsIM7U9pse1f1g
- Yy9YbXtWctUz8uvDR7shsQxAhX3qO7DilMtuGo1v97I/Kx4gXQ52syh/w6EBny71CZrOgD6kJwPVV
- AaM1LRC28muq91WCFhs/nzHozpbzcheyGtMUI2Ao4K6mnY+3zIuXPygZMFr9KXE6fF7HzKxKuZMJO
- aEZCiDOq0anx6FmOzs5E6Jqdpo/mtI8beK+BE7Va6ni7YrQlnT0i3vaTVMTiCThbqsB20VrbMjlhp
- f8lfK1XVNbRq/R7GZ9zHESlsa35ha60yd/j3pu5hT2xyy8krV8vGhHvnJ1XRMJBAB/UYb6FyC7S+m
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DCC02BF3C5;
+	Mon, 14 Apr 2025 12:49:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.159.27
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744634980; cv=fail; b=FnY27eLeFTFkwjnXkhieexd2fRRrM+q7XfYoXKxBfEOkxoEedGkMB73l8arkB9NnKi+Pz8hFa92dHgBmCym1F6z2P3/hDPZEguZAnrrxMVXZ7881SzauTKfliXda0DPH16hsXhxEV3BrfETAMBX5DzNBYBkPxv8ao8W3NsKVgZo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744634980; c=relaxed/simple;
+	bh=xevKO1RsEPlxooes/u1ay21jR8eYtSIf6iGg8Ma4YdQ=;
+	h=Date:From:Cc:Subject:Message-ID:Content-Type:Content-Disposition:
+	 In-Reply-To:MIME-Version; b=TxmN+Tmp65VXmXahGsNgeuGQxrJuzaoP2V17OT/wuuMd1Qp8B8DAJsWwcUnLFFabN6Nh82f0tPlB4msiFxovY4S323XLkRc4hC7R94fqmzH8eIWUP2kzjcI0jNGzc/C6O8xrtuH1KZxrgLXlxnB4zJV0pUUHzS30EcuvGIOfMQQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=EKTr8CTM; arc=fail smtp.client-ip=40.107.159.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pJbDVax9M2xeyTRpx1wWIHtU17wkzV+6TNg5kbNcIa0scQCaJA2cnretogyt/rLiOA2BfleEA0mpWveYReozY0u5s7+LgAcG9elRqGxgvrbV8/ezhCjzNUycNv8YwlqiJeb3clJMgA1sKgeTAo7ynGfqyfa/E6IblRvNO0sa8jRotFzP+TUCP43myylLvyG+ArnfxfUka514V1xSH5QB9U9BZORVQKVr0uqkAas2lDdyA0ZAXZPJ2n0dpMewJdHj/ikVrC+pGLX8EgWSB9SBfDbdW2qixCgqOcUYwSuFkCZr9/BKHLrIUhLr2tX8fO7iqth2J511dIrugeuDViyMig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mHL3ACAMjGdfjpMLN+ZHvnKPbf8y++fpU2kIyEuO1Qw=;
+ b=IybI56bMT/Dk9P6cP6HW1mVFTGouJ3sn/97OGipa8EUfL8kkhqzYZvsi4Kjx9YXJO4tZAPIrSYmKcUu3iFjIvt9kaziMyqOn2a6c65yK36myzOlWRxMqU/Cbrx08RGC6svvRn21UzIJ260wkhr6vEMp7ZH1BTO+SVadZf1hQV6/ZmUtgcXUQzdtb8QeaB5uMT524phqSKlZHc2YYeWGNDmSMY0twMzQ5Z2jlCfRCto9PCZk5xgjWuQrhwbO9LZgAiB8fXak67VsBzlVzMehlVzcLE1OyBFypzMjVSZuoBvqr56j+oQoP7dgCUr8QWSb6c+gmZQO9P8uvCkAiLQeZKA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mHL3ACAMjGdfjpMLN+ZHvnKPbf8y++fpU2kIyEuO1Qw=;
+ b=EKTr8CTMgH6qTbl8Ruf6FjNwkdlAjaRz6E3SecnCRzsVrc/g/N/PYrbKN0SdmLMsDIpKEEX4DbgGoMnAmpt83TLA5Fs/RcRM2IVzwfJk20PAKi8jP7xpgRb7uSV47iK7EXqSjCPSEhRI7l7FBq8l0yX44XRk27PCtyN/hU4VdSja/Ptv6pvuFP0XN7cquGiwGf6XsAh2zEcja+7h9nWn0EQyZpaovnXGQFgYRY/sVWiZFRnu+2OJxA2MVHzJggjl/IHDTkFUacAGDk36L19kj+Ydjnmae6kFG6+WfGBDPwC4ucDSV1iS6GPUy/ERiUYvDAXUC8pvbfn00hPtlxafwQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by AS8PR04MB8977.eurprd04.prod.outlook.com (2603:10a6:20b:42c::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.32; Mon, 14 Apr
+ 2025 12:49:34 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%4]) with mapi id 15.20.8632.035; Mon, 14 Apr 2025
+ 12:49:34 +0000
+Date: Mon, 14 Apr 2025 15:49:30 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>, bridge@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net 2/2] net: dsa: propagate brentry flag changes
+Message-ID: <20250414124930.j435ccohw3lna4ig@skbuf>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250412122428.108029-3-jonas.gorski@gmail.com>
+ <20250412122428.108029-3-jonas.gorski@gmail.com>
+X-ClientProxiedBy: PA7P264CA0216.FRAP264.PROD.OUTLOOK.COM
+ (2603:10a6:102:374::15) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|AS8PR04MB8977:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5e9a1f32-e26d-4777-863c-08dd7b52ce49
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?H1QI/BBzLRV8G2qXz7LZnA5ExFXliU/CJ+7iXvRjxkru8XUdnIYfvYFs3UD1?=
+ =?us-ascii?Q?dtnB+18K/td6QuOC+8bgHePV6CY7fVRzRAppQsXYZ0cS1ZISkFpxQG1KE1Iv?=
+ =?us-ascii?Q?IxaVbTPoFOVLqp0Vsoc7tdlhk3Gd+zvhe3zjiLFriJPzW7EzRL+YEiRZe1BX?=
+ =?us-ascii?Q?ns9+eJ8oConFdgiH/Dlxx7aCXA1SUhmn1b4wmjuJBPHqUr1kkWDbTlqJFlde?=
+ =?us-ascii?Q?aGld4uJQj6SHAYT+5GgrrpMcDo35ECdOm8Fdj7+uK7MNvSG9iUPrG3kwjqTC?=
+ =?us-ascii?Q?UdtHcxvqLtXw5bdvj4GovVN6Nyrrm5jqVwpflrMEk7LoBLyTfvZvxyxIcmLS?=
+ =?us-ascii?Q?kiTRWQMs2qTBVgU8CC9hi7Ji5EKKv2OZeLEq4ocKQerIItI2nrEOboi59AZu?=
+ =?us-ascii?Q?tmBmqSoFLYxKQA+oFvE9ofin10mauzFLdm89Smkyh9x/huAZ+1lMnHPaDJvf?=
+ =?us-ascii?Q?NXFgKBMpOws74UgOlaqwnmvraNF9AfmW2XCUzzmJXyP3Vgm872vhWpfZlmGk?=
+ =?us-ascii?Q?bbsMJ5Oj1k3raeZ8fqEYGqpsxJJ/eo7E2YgiOX8KDfDF0ogUPKNhI0jwxOFt?=
+ =?us-ascii?Q?YcA4xY4fFkmfbrACYJuUd4TN1DfECDeiANDABvKRbqqCPcYEL/7RkYK4MMJw?=
+ =?us-ascii?Q?xOtjEyy+nVT1UBCWvcsl3zIo9HS9wJjXPAQ9yqNckw80fCXJBpJCpDwhviNr?=
+ =?us-ascii?Q?B7L8ntnwBrZu+yS0wJBEQ8Haaa5wYy3oTCZqAcYe8UBxdcytqiOLUrLlYZXL?=
+ =?us-ascii?Q?ylsPJmWeqzW+MS+tEO4WI608JOFm7U9FZSKAD69THDuZiUJ9Py6Zo9vLD1lA?=
+ =?us-ascii?Q?tnIk19HWQ4cEJQOn2quFssNJlDy6aOcI89EIuz1CJolhvZfkyk623eqeG5zP?=
+ =?us-ascii?Q?sGqSh99fYSMQ2filjsFKni8Y6P/HjVN+eIwzKvsffsSINXhHIqAo9wdyRNor?=
+ =?us-ascii?Q?S3gMzu8pXQMQIpZc1d7c+J8tQo3o862Cxg0yJTQ7NOV31mOLwaOizH/h8zBR?=
+ =?us-ascii?Q?h3EsvE8CNk0JoLNQkJpXllVp6WBDnPur8Y8BUYUwePjHGyq+53XIoyotwWsg?=
+ =?us-ascii?Q?dS6N3Mu7hEGCyyO2PfYtCBE/aSqQjy/aXU03UFYo1RkVP8R6/OI9Z+gDi3B6?=
+ =?us-ascii?Q?YiMinU3I/Jf9WR5fI4/3be9I50QSUuulS/DOKZ3TumjjtB282X35zQmyAAO4?=
+ =?us-ascii?Q?5dZklRZYDUfGHduE7a5iicC0jNw3ikZp6NExR9zovg0U7erY9We/0ij1UIls?=
+ =?us-ascii?Q?+tdRH+9Xm9iP1nlkA2OrrH/ppKf90lEsBT8RbikMgoRkTOntvStD7YMjMNOS?=
+ =?us-ascii?Q?CQxoGfivUPV8JDg1wpcsBikJB+k7xU07eh3gT9KLlDtRO4Vjdibc0kNkTzfJ?=
+ =?us-ascii?Q?fqE/uShiZBG1377+pQ0pUgW9aAmwvG5sRdERIi1k16/e7u7DDDAGpNMr3Lml?=
+ =?us-ascii?Q?fgf3tvs7cHQ=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?SESL8W7TezzadUP2ajiXZYVICQ5FtGGz9t/3G7LQ3wIFB4g0WlAgBpB+JMGg?=
+ =?us-ascii?Q?JZyQrDCGBGtAE0IWncCpkJtIwjb00S0OmF5TpjhOcKSiRWc2JiD0xHDALG9r?=
+ =?us-ascii?Q?/oalQYrcDNANJDEEMTvq6t/NC1PAtX9SEIcmwzT7KNSlFtsDvTQM7pqwxaya?=
+ =?us-ascii?Q?izBtz8ytCVq0NwhayrVMM1FGiG10wgqpkx7QkVam5d420yDLkV5jBdROtQJz?=
+ =?us-ascii?Q?6drPgusCrf3V7tQtaR01wPejhohPHUFWyTTqwFUxlh4sX/f/MXvnTfg5uX+A?=
+ =?us-ascii?Q?Sr/dhEIzQPUgNWuMluiiuU0NTJGjb5jjwIYzTBGE7wq7CiwPuuObXgYoJtEu?=
+ =?us-ascii?Q?GKLKdsjNziWNYhPtmRA+leA9dE2gsKv4VXRqjbfTCmjfJOm0jnRF8O2MAcVe?=
+ =?us-ascii?Q?sd+hwKFuAk9L48FVqVmMgkKiVea97wezi5ffO9UyVzDc+r+JnTnfFG3NnghM?=
+ =?us-ascii?Q?seV/9KHcggGJmfsMcM2dg6Ns284PnsZ8rKLcKPFPuJw0b2qeHZFLIlbCNEt4?=
+ =?us-ascii?Q?sKdBX2MG6o9fGTvlGa/dcWIVL3vOynB7R3lIgi2FU6QiFpNgUnCexfVtGdcH?=
+ =?us-ascii?Q?qU93gmh+1nZ9y0WCyWby0w0BsPRuPTmgHzxRwJaiK3zCz7EjYmte3t0mQKyn?=
+ =?us-ascii?Q?wGqmasiPDOzVk9VIOa2IC2p6OpLLFw/qjw63u4KnBPca2xmfw/z8hqzbcyH7?=
+ =?us-ascii?Q?kaLBNNXknAGHq7/KdpT3OFb1TVCF1m/QsMwx4YBWfhSFboAECVbfJUWBtaeW?=
+ =?us-ascii?Q?49Vh/qevkWphlQvnD8EwtsaUrKy4cdqUrZ5ln5S/Dqpn0axc7yQtqxBwTotM?=
+ =?us-ascii?Q?z40zdS7TrPKfHA2Xx4osodUleXLTEzRnZlDbM87o+FGMy1gSLmEKMUun48IZ?=
+ =?us-ascii?Q?WGplqaqrZpDO3FM6+ufS5HYGdwioDzzr6DcsJI/QrPhU8GuMDtHG5slYINGS?=
+ =?us-ascii?Q?jooRUFjOShHdLV1G9LkzCalo7dflTVkuYnNB0e0BG+DZccsVm+Sp1vOvcXwV?=
+ =?us-ascii?Q?6TtF8g/KAmrkRjte4sK2UeQQSZbncEbFT/iYX4k6Rx/ThyLCKkU7XMgvCwSc?=
+ =?us-ascii?Q?h6n7UQqg+uLj9hdqBFEiW2ySV3X88wg6mHVBp/j/h2vOEJ6TVjuVZma4h3I0?=
+ =?us-ascii?Q?RR1Og+6zOcas/StlF0OT7HC1RNBbZqSrPZcufevVxs5kzSO6u4cNb9hZ/DLW?=
+ =?us-ascii?Q?w/7jIHtCABWi9w5XbllyKO/JN4G5ZgYwqal94cH3ojMTm64aU/55tjTNtjI2?=
+ =?us-ascii?Q?ZqLijlzUuMdrb9lzmbBPQNE6ziyVKUfN+6171qC+FGEOoDtSsAmYWd3PI7S+?=
+ =?us-ascii?Q?J30+eFY8qORiiek02ES8UB+KRfW7zOCI5TtuxajQyT1PJeAvQM7MDyfDbfzD?=
+ =?us-ascii?Q?anUriZK5iuHjztonjUyf1kU7/UYuzJ9aJwwnZJ/xbVW5fHUzSTXMG35X6g29?=
+ =?us-ascii?Q?cG0wX14Rv38cBrQE4WDs1cCJuc5HYbIS5s6b5KlsNFpDBnYbH0+kID2bYoxr?=
+ =?us-ascii?Q?Oyo2zLl6FBEjOSlESEjt+4T2RY0oRGP7bSOv0/YqWBq2Muq6AnS/wQikvcNJ?=
+ =?us-ascii?Q?8C5LZ3regBttCQOLA2F2K08qSple3OU6uNB5lQfFHtMAEREv8UoXsj3iynbi?=
+ =?us-ascii?Q?ww=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5e9a1f32-e26d-4777-863c-08dd7b52ce49
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2025 12:49:34.1237
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gOHvcto8C4U0ZdJhahl4MurFBdyx61OSSsZyFKSEooB3FkU9VZkQ+kIWeysmvzxd8740GivyMa1LzWj2sq3vPw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8977
 
-On Mon, 2025-04-14 at 14:46 +0200, Andrew Lunn wrote:
-> > > > We'll need some input from the i915 folks then.
-> > >=20
-> > > That is why i think it would be better to add a warning, give the i91=
-5
-> > > folks a heads up, and leave them to fix it how they want. We want the
-> > > warning anyway to cover new refcount instances being added.
-> > >=20
-> >=20
-> > There will definitely be a pr_warn() if creation fails. I was hoping to
-> > send a suggested change alongside the patchset, but I may have to just
-> > leave it up to them.
-> >=20
-> > I threw together a draft patchset that auto-registers a debugfs file
-> > for every call to ref_tracker_dir_init(). The problem I've hit now
-> > though is that at least in the networking cases, the kernel calls
-> > ref_tracker_dir_init() very early in the process of creating a new
-> > objects, so we're not getting good names here:
-> >=20
-> > The "name" in alloc_netdev_mqs is actually a format string, so we end
-> > up with a name like "eth%d" here:
-> >=20
-> > net/core/dev.c: ref_tracker_dir_init(&dev->refcnt_tracker, 128, name);
-> =C2=A0
->=20
->=20
->=20
-> Oh, yes, never thought about that...
->=20
-> It also seems like it might be a common problem, the subsystem defined
-> name has not been given yet, although the core dev_name(dev) should
-> work. But in netdev drivers, alloc_netdev_mqs() does not have access
-> to that.
->=20
-> > At the point that we call these (preinit), net->ns.inum hasn't been
-> > assigned yet, so we can't incorporate it properly into the dentry name:
-> >=20
-> > net/core/net_namespace.c:       ref_tracker_dir_init(&net->refcnt_track=
-er, 128, "net refcnt");
-> > net/core/net_namespace.c:       ref_tracker_dir_init(&net->notrefcnt_tr=
-acker, 128, "net notrefcnt");
-> >=20
-> > We could do the ref_tracker_dir_init() calls later, but we may end up
-> > missing some references that way (or end up crashing because the "dir"
-> > isn't initialized.
-> >=20
-> > My current thinking is to add a new ref_tracker_dir_finalize() function
-> > that we could use to=C2=A0finalize the name and register the debugfs fi=
-les
-> > after we have the requisite info. It's an extra manual step, but I like
-> > that better than moving around the ref_tracker_dir_init() calls.
->=20
-> Agree. Although, bike shedding, i don't really like the _finalize in
-> ref_tracker_dir_finalize(). Ideally this should be optional and
-> populate debugfs.  _finalize does not sound particularly optional. So
-> maybe ref_tracker_dir_debugfs()?
->=20
+On Sat, Apr 12, 2025 at 02:24:28PM +0200, Jonas Gorski wrote:
+> Currently any flag changes for brentry vlans are ignored, so the
+> configured cpu port vlan will get stuck at whatever the original flags
+> were.
+> 
+> E.g.
+> 
+> $ bridge vlan add dev swbridge vid 10 self pvid untagged
+> $ bridge vlan add dev swbridge vid 10 self
+> 
+> Would cause the vlan to get "stuck" at pvid untagged in the hardware,
+> despite now being configured as tagged on the bridge.
+> 
+> Fix this by passing on changed vlans to drivers, but do not increase the
+> refcount for updates.
+> 
+> Since we should never get an update for a non-existing VLAN, add a
+> WARN_ON() in case it happens.
+> 
+> Fixes: 134ef2388e7f ("net: dsa: add explicit support for host bridge VLANs")
+> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+> ---
 
-I'm terrible at naming, so we can go with that. That last step will
-definitely be optional.
+I think it's important to realize that the meaning of the "flags" of
+VLANs offloaded to the CPU port is not completely defined.
+"egress-untagged" from the perspective of the hardware CPU port is the
+opposite direction compared to "egress-untagged" from the perspective of
+the bridge device (one is Linux RX, the other is Linux TX).
 
-> This also has the advantage of we need to worry less about GPU
-> drivers. They see no change in behaviour, but we can give them a heads
-> up the new call exists if they want to use it to populate debugfs.
->=20
+Additionally, we install in DSA as host VLANs also those bridge port VLANs
+which were configured by the user on foreign interfaces. It's not exactly
+clear how to reconcile the "flags" of a VLAN installed on the bridge
+itself with the "flags" of a VLAN installed on a foreign bridge port.
 
-+1
---=20
-Jeff Layton <jlayton@kernel.org>
+Example:
+ip link add br0 type bridge vlan_filtering 1 vlan_default_pvid 0
+ip link set veth0 master br0 # foreign interface, unrelated to DSA
+ip link set swp0 master br0 # DSA interface
+bridge vlan add dev br0 vid 1 self pvid untagged # leads to an "dsa_vlan_add_hw: cpu port N vid 1 untagged" trace event
+bridge vlan add dev veth0 vid 1 # still leads to an "dsa_vlan_add_bump: cpu port N vid 1 refcount 2" trace event after your change
+
+Depending on your expectations, you might think that host VID 1 would
+also need to become egress-tagged in this case, although from the
+bridge's perspective, it hasn't "changed", because it is a VLAN from a
+different VLAN group (port veth0 vs bridge br0).
+
+The reverse is true as well. Because the user can toggle the "pvid" flag
+of the bridge VLAN, that will make the switchdev object be notified with
+changed=true. But since DSA clears BRIDGE_VLAN_INFO_PVID, the host VLAN,
+as programmed to hardware, would be identical, yet we reprogram it anyway.
+
+Both would seem to indicate that "changed" from the bridge perspective
+is not what matters for calling the driver, but a different "changed"
+flag, calculated by DSA from its own perspective.
+
+I was a bit reluctant to add such complexity in dsa_port_do_vlan_add(),
+considering that many drivers treat the VLANs on the CPU port as
+always-tagged towards software (not b53 though, except for
+b53_vlan_port_needs_forced_tagged() which is only for DSA_TAG_PROTO_NONE).
+In fact, what is not entirely clear to me is what happens if they _don't_
+treat the CPU port in a special way. Because software needs to know in
+which VLAN did the hardware begin to process a packet: if the software
+bridge needs to continue the processing of that packet, it needs to do
+so _in the same VLAN_. If the accelerator sends packets as VLAN-untagged
+to software, that information is lost and VLAN hopping might take place.
+So I was hoping that nobody would notice that the change of flags on
+host VLANs isn't propagated to drivers, because none of the flags should
+be of particular relevance in the first place.
+
+I would like to understand better, in terms of user-visible impact, what
+is the problem that you see?
 
