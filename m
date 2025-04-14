@@ -1,94 +1,94 @@
-Return-Path: <netdev+bounces-182042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 230C3A877B2
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 08:03:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00878A877B4
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 08:04:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECEFD3ADFF1
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 06:02:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6E34188A920
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 06:03:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90171C862C;
-	Mon, 14 Apr 2025 06:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2205F1D5CDD;
+	Mon, 14 Apr 2025 06:01:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iNFJBilc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RyMIcpFR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE0F1BEF7D;
-	Mon, 14 Apr 2025 06:01:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AAB61A4F2F;
+	Mon, 14 Apr 2025 06:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744610490; cv=none; b=f+TePK/USjqLReOSXgZJTMAdborS5TRzUZ9BoBZSzM0dlgK++TKyWe4Kq+RKXl57HK5PiEa39S+c9fSn07gpetplwNIpqSnAlG2jh1H3vfOtQLln9TtmaxFZ+NBLs1Oi8Tp5cfCGs1wbvXTwWncL6uUMQcsJiYikkkvk5JVryiQ=
+	t=1744610492; cv=none; b=KZqrBfevVmz7XGqxWTos5w2ddeqnizcubJySzqbOYqjQ0VF0Lv0rkQidhAEG68YL+6WtCy8wz6D9Kk9Beq+vEuruoaTUCkqVA2UczK7dZsGSO/tFuamTIPKrnWvS8Qw/81jJ18ZmbOcAAEI5m6sMusBmcDXAVSSlPTwdM8hC6ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744610490; c=relaxed/simple;
-	bh=cPAIxLpCJd/jsKJtkLMVLNpBa5sHhRlJb5p/IMXI0Fc=;
+	s=arc-20240116; t=1744610492; c=relaxed/simple;
+	bh=o4mB1YbCjqOm0ivTnYwzfnJZ2vRxG5qWVplnqdlWr2I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ocr7jIGf9/i7btwFVLmoTXwYg89B+zUR2ndBROWDBzalwOnIVLD/18CmzgoRSCsJDN8ZIaaX98+B5oFKNjo+Bz5Ey2WkWC1Zd+MBKxaZyBdeNqjfqFBernXJztmT0kjrhIr9RyEuPcJmwZJHLxH9kedlkIngK67U+UtAQjrKprg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iNFJBilc; arc=none smtp.client-ip=209.85.222.177
+	 MIME-Version; b=mwf2ZbRLK/aeYRtPzssXdEEta1rJWYBGoTfc4j202teH+D0QEsfVzd9HAHxYh+jzF5Cx3mVISkjQ/9/I390KwFZ1InEtJ4kI+40q8M06gVXPq6drgBNlXAKWf5nOZkkncTgf5Dak+WA9pfBp3q6VtXy5RIf+VumWhxz5fvZaYmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RyMIcpFR; arc=none smtp.client-ip=209.85.222.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7c5ba363f1aso539441785a.0;
-        Sun, 13 Apr 2025 23:01:28 -0700 (PDT)
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7c59e7039eeso580951885a.2;
+        Sun, 13 Apr 2025 23:01:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744610488; x=1745215288; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1744610489; x=1745215289; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:feedback-id:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=G1QmxPKlOY2AJ0bwfuxV24rh+8soVup+peq0V7qXYkg=;
-        b=iNFJBilczHPum+QZwwP7VKiWrR3hoPdPmwJmuFlnXz3VQUCgWewPWekg5sswW3yUnv
-         P37gN7yqcaj/pEfG6inKsey4Ky23uqiY8jTvhkG11Z4zHtJ6ETp/YgC1MPDmJc7U1dN2
-         9p5yFa0KOWXnEaoKOkUy+qifk9afUytJU3trdIMFhZAj/p+v/x7JYVzR6pLUAkcokKLO
-         Tpvn+1Tc6hX38KRLABfOO8KDnkmRW/blapfn6V0qJzN+wisJ2JgnOICGkR+urHrcoC6f
-         E5D0dUMgJNNbs0fklcwVJlIkvj4yR6ZbWI7Y6ukj0mEUixZx/iCaHVNx6TqMiDtB7Ich
-         35GA==
+        bh=0yyPz4XrJINYrh8fPH3G34ZmNN9tSR8UbhBvw2fpH+U=;
+        b=RyMIcpFRRxLpbj5SzaIEqQ6Kxa49pZIVQZKIiY/H/oSzObbCLb8LqeuOKVB+gCgaHp
+         ga+7s7MwVMfL+tWnQNIlNCYxrsLZXr87rXAjyz7M9ruK2ws3SHFRGWTwVJn9uGr2Vrzr
+         h57w5hur/PWHxZ3Nukokz+XApyJ2pAxsK64iGr+1jrPFzDfiEwi62l68qOD8P41Q8CWN
+         E9dMgg4qX/CYLLGxm6nSrDYyeDA8yPmr8eYOWYvMte0COlMBR50bLE7ObOyXNMnVlwX7
+         uYw4ylUdaMoO5l2N7mTkOddKudsSt4YIO8EdJIXbckoLmSWSs8ZBBWDQ/VfZ5Ldc/wM0
+         ijJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744610488; x=1745215288;
+        d=1e100.net; s=20230601; t=1744610489; x=1745215289;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:feedback-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=G1QmxPKlOY2AJ0bwfuxV24rh+8soVup+peq0V7qXYkg=;
-        b=ViBlomGRhc7m2Bb93UE0W0bD7BuhZAIJdsMq75LiPPHkvbRywBmI1YoAALxppbbzn2
-         idiDhozesVU92hDVrafX1U0kHFZ8UesevoK2Vk0N0EhoR5FhwliVzIosbhuKlpEUF6yk
-         mePT/Ro5F2Fa3Z9wNvptfkV0vadR3AGTjSvy6O1S/dlOr279GnkgRddiW+TgK/QOtUd4
-         MR9HvBfLele7gLxSiymScWRrl4VcYiZLiYNumnkGnVbmfxGFB10BIIoLfgRGSf1GXuNS
-         J1TsnSXaTe9RTysT+ffphr8HIe1LPtxb68JgX8GpL0YZVJpS894UDSKIfMOdDDzveh9l
-         GOWw==
-X-Forwarded-Encrypted: i=1; AJvYcCWHlSjsabVzeot+TpMOEHlC81IwYxJLPrAMVFZ2TCUE/pJm4r+nAtecqzzNcwyXf05Z77Mo@vger.kernel.org, AJvYcCXP945JKQ8dRqxiy3QJfFVIHxptbFpsPmwXwFjQHqLKYwybeNP4jdF0dpM/CjzcpQJvu//BSNJH5dygYQM=@vger.kernel.org, AJvYcCXgxbujlxgdOkS3L3HdDXsOjqGT/rSZ1oRlCwTHFiFPMpuX0rkRvkUB2XIzU0++lLA9ZI3kojHV@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzTqEXXmaBb57JqXCduuW024d1z3lnPxG/UtK5xChkEpZk7gAy
-	XreMQ9Hz0y0eQRQ403e5Xmlw2bSdgODYX/Se/X9fGC1Nlk33BK09
-X-Gm-Gg: ASbGncvK2SU2NMqhxoQQfNAzmPHEXsNaYTGJZZ+oAupzrORI6MME/EHgCAGtMevp3gK
-	6RgmQ4Xv9NBY4tEhQpPWCKb1dSK6cLR9tpds17JumjzfP4uYTkYDBu96SfKgx2rwN4fSZQFzOPc
-	Zuj0CSq0rp3tCV355As3pLzTi9oFKYqAYL9kuD+4jxGo2GnWLck38Tt1HrU+yMwZproHymmab4r
-	1XIAiEygBGqz2Owov/nNZDluElAGYV4lLXAPzFSwSJOzaIRbB4Zu6SPKd8CMwTw25aef1GcMQza
-	2MltI1fQUlfQg0psZh63QqM51tPrEEUEMegNFCdRMGs6+Z5hIL8O03CcKKw9frkicP2K8iemdQT
-	uK9c0MGUm4J2T+gXcTswbLruVHc1klGc=
-X-Google-Smtp-Source: AGHT+IEkDKGgjvm3RVX2cBPaGJLH15qauFWnGGanryIKVwCwoPAa7fmI4pjLTlYeFgZ79MAusuX89A==
-X-Received: by 2002:a05:620a:280e:b0:7c5:6dc7:7e7c with SMTP id af79cd13be357-7c7af12a073mr1532923285a.26.1744610487682;
-        Sun, 13 Apr 2025 23:01:27 -0700 (PDT)
+        bh=0yyPz4XrJINYrh8fPH3G34ZmNN9tSR8UbhBvw2fpH+U=;
+        b=M2r6wwPJ+gxrPIRyBDvFCLI3Vh80MK7zfwIh69nZNYqCBBoS7LB+mmgXOUsNqe99Sn
+         0KMCm6BeMt4RAPdjBNvwbiFZD4E0fQ2SpUP1cLBUhfpZ8GfBCv8SDW/G4btqKqiKlhjZ
+         LfsZFooBJbhoBolLYt8vN0Pi/hZ0N8+hu1WoWWpqa4mINy7rVSJfs2A9vCsBCHkXmUxv
+         oXlpz6bGkP5WLqOSgw5izAcS1u9sxPzXR3FLOHvlh6FtxoNFagbpaCFr3ulTCRuhaqYs
+         mSDcuSEU+gTmTGc3suWBIdVkeUdn7WW0KGXl7u6GZbpcPtbkiUF9d3v7tCv9B7d/QlZe
+         5GLA==
+X-Forwarded-Encrypted: i=1; AJvYcCUWIqCyPo37+sWtMrHHb3b37IzuNtL7W1zXo18oGgxqG/Bdz9D/zprhIqBI18SWDaJeLf1/@vger.kernel.org, AJvYcCVpGKD7vr/U+PR/qwnVnY7qLxskvQvNWWRTtWoKVoARkDHTnWJiIoxbAiH+P45LbSYb+gH2ezue@vger.kernel.org, AJvYcCVwBl0OJ2MljJJaEJY31R9RTLTXtQ7/OwpKsv0O8k/rEispiuQm55Gm8INWJVgkHRs0p8IOsI0zjJU8kGg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynsAXrBhMYHkHkYEJwJttH5/g6zOUcqhgtf53BRi8X8UdVDRwv
+	P0oz5o8rmMzGS4ddaxxmtKcjmwjwprwiE0RR4VSJywOhij17P90A
+X-Gm-Gg: ASbGnct7npZmZEvutGJOkqm43vXQd8doZLemm0co0mpIY6u5cL2SMP1ljWiwWWH88+b
+	GGk7RcFUIg0FhXYqJvTMYVA2HTCH8eweg6kIzUDaXrq4ahEFMCzG/HKfDPUyvITKfQtrhD+5g39
+	zNYYbOTLfTr1zSvbA0dm8rk1Dqylrm0ijGFPhJ5YKimicutWAwqC1B04FKT0WXT7dwjd28Fb8WO
+	PXQ/qxVvVeMvrSLB1hWeXefxgKLie0djLfzSCsG6IZ1RxZlNepseYMLHKSa19e4SqdZ1MiNRnQH
+	dkseiLaY9L/uqKLiYdeKciHlvgtQIRXYQz9vF7m2Vk3iFd12txU6d5IP6YBy+okBi+sI71cYddJ
+	JDuwx8DzetAZrKpVBW1xF2XG0p/aFzwQ=
+X-Google-Smtp-Source: AGHT+IGdwbtcc/LhSM+g7SxvZuQaQmJqgZUb+rWK7xVQAi5pEHJFx90WVfW5h8ejkETd2bD7aLB+Fg==
+X-Received: by 2002:a05:620a:4001:b0:7c7:a5f5:5616 with SMTP id af79cd13be357-7c7af1d8653mr1402849885a.42.1744610489258;
+        Sun, 13 Apr 2025 23:01:29 -0700 (PDT)
 Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f0de95f7a7sm78160046d6.13.2025.04.13.23.01.26
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f0de98096bsm77957846d6.59.2025.04.13.23.01.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Apr 2025 23:01:27 -0700 (PDT)
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfauth.phl.internal (Postfix) with ESMTP id D3F181200066;
-	Mon, 14 Apr 2025 02:01:26 -0400 (EDT)
+        Sun, 13 Apr 2025 23:01:28 -0700 (PDT)
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 616EC1200066;
+	Mon, 14 Apr 2025 02:01:28 -0400 (EDT)
 Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Mon, 14 Apr 2025 02:01:26 -0400
-X-ME-Sender: <xms:tqT8Z0p82G3YoKdcib5y9ag8dRTrEDyQJOkAicF53ra2x0rUJUw0Xg>
-    <xme:tqT8Z6qDBU2do9rvacisrkP55FLWLlZz2HUwKoi7USQfGRrQnefBbR12GcaujYSGL
-    ul17rvXiYqNJxx6wQ>
-X-ME-Received: <xmr:tqT8Z5MjvIOqwZQeAH4z0Es0ZNBkCQGshuFIRZFpgl4TH84cL0Qw7jN7p2LcXA>
+  by phl-compute-06.internal (MEProxy); Mon, 14 Apr 2025 02:01:28 -0400
+X-ME-Sender: <xms:uKT8ZwI6gtnFL6uDBVBY9aTm-ILNBXpUc5xToKTs0XgLwc2jf-oaRw>
+    <xme:uKT8ZwKbXhojk9lRbGqDPaxKV_GkRm5DtqL4rz5MfwZP8nFR16qrWdgBDAA3cXe2z
+    XKJdQsN2UpjnOAWIA>
+X-ME-Received: <xmr:uKT8ZwskxNKMSByKo6neGt8EvF9VMkr7TMkW_ONQ176BB5TIXJvIxsN-TmM1EA>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvudeljeekucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
     pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
     gvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgjfhgggfestdekredtredt
     tdenucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrih
     hlrdgtohhmqeenucggtffrrghtthgvrhhnpeegleejiedthedvheeggfejveefjeejkefg
-    veffieeujefhueeigfegueehgeeggfenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
+    veffieeujefhueeigfegueehgeeggfenucevlhhushhtvghrufhiiigvpedunecurfgrrh
     grmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgr
     lhhithihqdeiledvgeehtdeigedqudejjeekheehhedvqdgsohhquhhnrdhfvghngheppe
     hgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvgdpnhgspghrtghpthhtohepudelpdhm
@@ -100,14 +100,14 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvudeljeekucetufdote
     gvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhg
     vghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglh
     gvrdgtohhm
-X-ME-Proxy: <xmx:tqT8Z76jeKnIWq2GoQJ9CG6lCp-gdKDtmhM_3wUATUgNd75GobDtzw>
-    <xmx:tqT8Zz4w5n44-4n4zpRAH5Ken6j4pzKiBBmrVExMmBiWw7BEHJM1oQ>
-    <xmx:tqT8Z7jaaJWESqbqxO_bII36-0qVVm-yfH0fD6a7Ew-Wf4WsIeDVXA>
-    <xmx:tqT8Z94BZHYp7jjgsKQDDHe2IAoX_9k7ZH7tEFZJx06eOcdn8RbcRg>
-    <xmx:tqT8Z2IMm4dz674ld7nSiXJMTkGrRDptm1gaZ1BtE1CZDp4iy6c17iLs>
+X-ME-Proxy: <xmx:uKT8Z9am7P75Qr6_1xO6B5s38caRNCUcsH7346-OBMQ-U3BUqU5IPQ>
+    <xmx:uKT8Z3YRM8ajBHJdf8TkZ9NzAOMXcKqFJM471cilfjnmwlh3i_Tazg>
+    <xmx:uKT8Z5APHTNK9zNg6w_bQoTzvgAzeavGsk3rOiAw9jl95NcRJXy1rQ>
+    <xmx:uKT8Z9aRuIoyP-HrkI8KJBlORoUUeK103wWGJktXXCB5FUTubd6nfg>
+    <xmx:uKT8Z_oolfHCFFSrRGv9EUnnuCaIZNjGIqQAurguf9GG2VDLI2nCiEAV>
 Feedback-ID: iad51458e:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 14 Apr 2025 02:01:26 -0400 (EDT)
+ 14 Apr 2025 02:01:27 -0400 (EDT)
 From: Boqun Feng <boqun.feng@gmail.com>
 To: Breno Leitao <leitao@debian.org>,
 	Peter Zijlstra <peterz@infradead.org>,
@@ -128,9 +128,9 @@ Cc: aeh@meta.com,
 	Uladzislau Rezki <urezki@gmail.com>,
 	rcu@vger.kernel.org,
 	Boqun Feng <boqun.feng@gmail.com>
-Subject: [RFC PATCH 6/8] rcuscale: Allow rcu_scale_ops::get_gp_seq to be NULL
-Date: Sun, 13 Apr 2025 23:00:53 -0700
-Message-ID: <20250414060055.341516-7-boqun.feng@gmail.com>
+Subject: [RFC PATCH 7/8] rcuscale: Add tests for simple hazard pointers
+Date: Sun, 13 Apr 2025 23:00:54 -0700
+Message-ID: <20250414060055.341516-8-boqun.feng@gmail.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250414060055.341516-1-boqun.feng@gmail.com>
 References: <20250414060055.341516-1-boqun.feng@gmail.com>
@@ -142,45 +142,93 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-For synchronization mechanisms similar to RCU, there could be no "grace
-period" concept (e.g. hazard pointers), therefore allow
-rcu_scale_ops::get_gp_seq to be a NULL pointer for these cases, and
-simply treat started and finished grace period as 0.
+Add two rcu_scale_ops to include tests from simple hazard pointers
+(shazptr). One is with evenly distributed readers, and the other is with
+all WILDCARD readers. This could show the best and worst case scenarios
+for the synchronization time of simple hazard pointers.
 
 Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
 ---
- kernel/rcu/rcuscale.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ kernel/rcu/rcuscale.c | 52 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 51 insertions(+), 1 deletion(-)
 
 diff --git a/kernel/rcu/rcuscale.c b/kernel/rcu/rcuscale.c
-index 0f3059b1b80d..d9bff4b1928b 100644
+index d9bff4b1928b..cab42bcc1d26 100644
 --- a/kernel/rcu/rcuscale.c
 +++ b/kernel/rcu/rcuscale.c
-@@ -568,8 +568,10 @@ rcu_scale_writer(void *arg)
- 		if (gp_exp) {
- 			b_rcu_gp_test_started =
- 				cur_ops->exp_completed() / 2;
--		} else {
-+		} else if (cur_ops->get_gp_seq) {
- 			b_rcu_gp_test_started = cur_ops->get_gp_seq();
-+		} else {
-+			b_rcu_gp_test_started = 0;
- 		}
- 	}
+@@ -32,6 +32,7 @@
+ #include <linux/freezer.h>
+ #include <linux/cpu.h>
+ #include <linux/delay.h>
++#include <linux/shazptr.h>
+ #include <linux/stat.h>
+ #include <linux/srcu.h>
+ #include <linux/slab.h>
+@@ -429,6 +430,54 @@ static struct rcu_scale_ops tasks_tracing_ops = {
  
-@@ -625,9 +627,11 @@ rcu_scale_writer(void *arg)
- 				if (gp_exp) {
- 					b_rcu_gp_test_finished =
- 						cur_ops->exp_completed() / 2;
--				} else {
-+				} else if (cur_ops->get_gp_seq) {
- 					b_rcu_gp_test_finished =
- 						cur_ops->get_gp_seq();
-+				} else {
-+					b_rcu_gp_test_finished = 0;
- 				}
- 				if (shutdown) {
- 					smp_mb(); /* Assign before wake. */
+ #endif // #else // #ifdef CONFIG_TASKS_TRACE_RCU
+ 
++static int shazptr_scale_read_lock(void)
++{
++	long cpu = raw_smp_processor_id();
++
++	/* Use cpu + 1 as the key */
++	guard(shazptr)((void *)(cpu + 1));
++
++	return 0;
++}
++
++static int shazptr_scale_wc_read_lock(void)
++{
++	guard(shazptr)(SHAZPTR_WILDCARD);
++
++	return 0;
++}
++
++
++static void shazptr_scale_read_unlock(int idx)
++{
++	/* Do nothing, it's OK since readers are doing back-to-back lock+unlock*/
++}
++
++static void shazptr_scale_sync(void)
++{
++	long cpu = raw_smp_processor_id();
++
++	synchronize_shazptr((void *)(cpu + 1));
++}
++
++static struct rcu_scale_ops shazptr_ops = {
++	.ptype		= RCU_FLAVOR,
++	.readlock	= shazptr_scale_read_lock,
++	.readunlock	= shazptr_scale_read_unlock,
++	.sync		= shazptr_scale_sync,
++	.exp_sync	= shazptr_scale_sync,
++	.name		= "shazptr"
++};
++
++static struct rcu_scale_ops shazptr_wc_ops = {
++	.ptype		= RCU_FLAVOR,
++	.readlock	= shazptr_scale_wc_read_lock,
++	.readunlock	= shazptr_scale_read_unlock,
++	.sync		= shazptr_scale_sync,
++	.exp_sync	= shazptr_scale_sync,
++	.name		= "shazptr_wildcard"
++};
++
+ static unsigned long rcuscale_seq_diff(unsigned long new, unsigned long old)
+ {
+ 	if (!cur_ops->gp_diff)
+@@ -1090,7 +1139,8 @@ rcu_scale_init(void)
+ 	long i;
+ 	long j;
+ 	static struct rcu_scale_ops *scale_ops[] = {
+-		&rcu_ops, &srcu_ops, &srcud_ops, TASKS_OPS TASKS_RUDE_OPS TASKS_TRACING_OPS
++		&rcu_ops, &srcu_ops, &srcud_ops, &shazptr_ops, &shazptr_wc_ops,
++		TASKS_OPS TASKS_RUDE_OPS TASKS_TRACING_OPS
+ 	};
+ 
+ 	if (!torture_init_begin(scale_type, verbose))
 -- 
 2.47.1
 
