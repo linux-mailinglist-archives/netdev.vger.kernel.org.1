@@ -1,137 +1,115 @@
-Return-Path: <netdev+bounces-182267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C2CDA885B1
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:50:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86FD6A88685
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 17:10:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 466907A7717
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 14:49:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E62CB56197A
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 14:51:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17F0527F75D;
-	Mon, 14 Apr 2025 14:43:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DECD27585F;
+	Mon, 14 Apr 2025 14:45:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="C0R7sCDs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dR35RARg"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C7AA2798F2
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 14:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42C1018DF8D;
+	Mon, 14 Apr 2025 14:45:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744641811; cv=none; b=ssf4kWCysBap+ctKEbjR0YVi6rmIimg8UdPGdausNR7zLnrs67NKZm6dXczOblEr7HBzi9ND7ubAixQtGxiuxKuvz3IHZWzqKfYjP8Rh4pEhtp1QJXMak1rkNMI08mvso9hpRKWSiCuCSlvyTHleYN8tAn667alwOY7e7msjFms=
+	t=1744641956; cv=none; b=QP8RfG0ube6gmSxF/TuwtLfVwWKUUxoMCq64BHeyFRlpn8mHcUkHkGu369OWkTEH1u4udEPx5gISmASeSgw37kNuGNe3luL/2M/5/I4oEI2vKcowHqxDtjUMjpSNA/DDLhYjjjJkSoy5Fw5sWiSLMM/pLrB/hks7daAJn4vjO7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744641811; c=relaxed/simple;
-	bh=BxXUZjpivNfbFwEbrqCFeCAHAEGbL7LW5Vs5Uqk8ooQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cDLe1v1V7T+OoRSDmCBCIMoclJnU8bycae4/lDVqDZ07IznHkN1B5raFVCTJ0np++wvNoFVMildyEf+/QznBYeMcuO/UU2CEFX7qCKTdYvfkki6Vu0eqIYJPGexgz8g+EK4s3LJMp9H6E8WVsDB/AFavhhHd/Wb+mnS9jz9Ae+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=C0R7sCDs; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=FNA1zxNgRzVAYOYdkpbodnjhqInFluzcIiosE3gBtSU=; b=C0R7sCDsQVUCPijiChHskc1/HN
-	io1CdXZ6cJsbEj0GePEh9tlrQW9Ar7x9j22JXkofY/fJesdzJyMGkvFYm7VcAS4YJ7ww/I+qtJdo5
-	ODFMxFGMFdKiLzaKgscMhbKvpAr2Pt2nRu6BopVQT/pa3eXp3cETlrje87o3iNDxU7jzLZThliKOf
-	z64uSi77GH86+WDgJYFTs6U5XtRtHK2OcKUZsGzLYs4Pyfgm80PHF45PEahO8ees2AeDYo/ms4gWb
-	584k32Q77Bl+sofaGSnj3ymHWBSxRC9HKmPJar0DnN7/g2bs7cDqsQrDFnfztluDpXHE6rG7/mRWl
-	hankRLzw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41464)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u4L1v-0006iR-3A;
-	Mon, 14 Apr 2025 15:43:24 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u4L1u-0007qB-1J;
-	Mon, 14 Apr 2025 15:43:22 +0100
-Date: Mon, 14 Apr 2025 15:43:22 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH RFC net-next 1/5] net: mvpp2: add support for hardware
- timestamps
-Message-ID: <Z_0fCjkiry0AKS7j@shell.armlinux.org.uk>
-References: <Z_mI94gkKkBslWmv@shell.armlinux.org.uk>
- <E1u3LtP-000COv-Ut@rmk-PC.armlinux.org.uk>
- <20250414145150.63b29770@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1744641956; c=relaxed/simple;
+	bh=G1Rfo59lIcmgxlV/FcZQX3VT2H7a7D1+qS9qITl6KS0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=gtfnWViW+tCNHNBO8wjwb2n8gmudP28ClNG3UHZ9UrhmU07RH9LDIkOaE0ilmxQimJX/W+e7tNvcX9vXNsagMdFSill8XcAhWlIkGGa/J7zgjWtyQMWdVartpUZxcPk/RrwOxxMvCuncaW9hrXfWiOAo4PIJsWThI3iErmcZq+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dR35RARg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABB60C4CEE2;
+	Mon, 14 Apr 2025 14:45:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744641955;
+	bh=G1Rfo59lIcmgxlV/FcZQX3VT2H7a7D1+qS9qITl6KS0=;
+	h=From:Subject:Date:To:Cc:From;
+	b=dR35RARgl3lQtxaTwdiuI+U5g+AMQPYMvbPIgh9gYGE9L3uuYNE5FrS0qqLzO64Dt
+	 px/mhK4HqdkQgcrOGplPJR5sjBx7u+KWCiLm93z//puKh+EdHIzAlSGN1fPR71Ghu+
+	 J5qwsKPTqeWv8Z/UpxmjWv4e5LCySE+q7qOUhlLFgQJjUOqunQq5rdLDKXYYRMdjC5
+	 pfWEclNdUVP9PoZBJfYc8aWRl0yDlSxoTJvvCBipHiaH8bO6PYK7i2UdHOHv2jITUG
+	 5MBWY0WbXvW4x7mbjZ/5/6aE6yH99lvtt9SySTDEuK+6LOlkR6n5G7vQbPnmWUp4k4
+	 Jwpqk5yNuSSuA==
+From: Jeff Layton <jlayton@kernel.org>
+Subject: [PATCH 0/4] ref_tracker: register debugfs files for each
+ ref_tracker_dir
+Date: Mon, 14 Apr 2025 10:45:45 -0400
+Message-Id: <20250414-reftrack-dbgfs-v1-0-f03585832203@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250414145150.63b29770@kmaincent-XPS-13-7390>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJof/WcC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1MDE0Nj3aLUtJKixORs3ZSk9LRiXWNzM/MkYwPjVKO0RCWgpgKgfGYF2MD
+ o2NpaABAUGs9gAAAA
+X-Change-ID: 20250413-reftrack-dbgfs-3767b303e2fa
+To: Andrew Morton <akpm@linux-foundation.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: Qasim Ijaz <qasdev00@gmail.com>, Nathan Chancellor <nathan@kernel.org>, 
+ Andrew Lunn <andrew@lunn.ch>, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, Jeff Layton <jlayton@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1233; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=G1Rfo59lIcmgxlV/FcZQX3VT2H7a7D1+qS9qITl6KS0=;
+ b=owEBbQKS/ZANAwAIAQAOaEEZVoIVAcsmYgBn/R+d/lGondyBSN5HmQOIATCeysTU0XUjOAbi0
+ jNpXubQElGJAjMEAAEIAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCZ/0fnQAKCRAADmhBGVaC
+ FRCdD/oDoSl0OorBSNTCjYBLcEfbh3oq7wuwX1tVkyrtMSTiEq9sUopoAvtriArCduKGXKHKL7j
+ h3Zaf1oWyTUN9ycpApfaZGqgYS9BHKU+NczB8oykJPrxb3RpIx1+78xXO7tTtI5Bx94ep8bQvyb
+ EptyCZj8oq7gyZn0EsyFPhAnssxlORYKrIwg7YUTeWo5fpGBwlR4nqX97P0ILfghLlTJlg9CB0E
+ p7Cs552sKnRl6KQSybQ4pLVMbPRQ9+NEWhtvotXVh34Eab353HTtrWrZLDQbIlHjN8C9CtTRqFy
+ fPDMgBhdAp4msDNQAH1CblV62aVwIOiOmF4itbJDLxefbgh1z2goYoopkoyOkbABs9DMjW7xy6j
+ 1BMRijGuh1P2gke8Q7FeeqbZhQ+1rrdJc76scNJSN2D1dp013VZAskeD9lZqHGtDs4bbvRvlj9z
+ fsn7ykab3QrcEmy10RYwcQTLFuBSOIw9+2FggmeGhLnrtm6elNly/7jz0UjvgsUUXTEmCbBMhL2
+ OwHGkvQLvI2s4T1cleAHQJe+/mdhRL8MpQ+VTljvJcw2zPbB82v8Br+SCQvMWJASa7yjcvjqPFF
+ VpEsQw21kpPKbkZVmSLXVI9MZLm557qEk7ozsSPPl6HIIX7EOO0F+k+X2hLmdsRolVXgFXxojec
+ SeoY/RoTzZrLpTA==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-On Mon, Apr 14, 2025 at 02:51:50PM +0200, Kory Maincent wrote:
-> On Fri, 11 Apr 2025 22:26:31 +0100
-> Russell King <rmk+kernel@armlinux.org.uk> wrote:
-> 
-> > Add support for hardware timestamps in (e.g.) the PHY by calling
-> > skb_tx_timestamp() as close as reasonably possible to the point that
-> > the hardware is instructed to send the queued packets.
-> > 
-> > Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
-> 
-> Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
-> 
-> > ---
-> >  drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c | 2 ++
-> >  1 file changed, 2 insertions(+)
-> > 
-> > diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-> > b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c index
-> > 416a926a8281..e3f8aa139d1e 100644 ---
-> > a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c +++
-> > b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c @@ -4439,6 +4439,8 @@
-> > static netdev_tx_t mvpp2_tx(struct sk_buff *skb, struct net_device *dev)
-> > txq_pcpu->count += frags; aggr_txq->count += frags;
-> >  
-> > +		skb_tx_timestamp(skb);
-> > +
-> >  		/* Enable transmit */
-> >  		wmb();
-> >  		mvpp2_aggr_txq_pend_desc_add(port, frags);
-> 
-> Small question for my curiosity here. Shouldn't we move the skb_tx_timestamp()
-> call after the memory barrier for a better precision or is it negligible?
+I had previously sent some patches to add debugfs files for the net
+namespace refcount trackers, but Andrew convinced me to make this more
+generic and better-integrated into the ref_tracker infrastructure.
 
-Depends what the wmb() is there for, which is entirely undocumented.
+This adds a new ref_tracker_dir_debugfs() call that subsystems can call
+to finalize the name of their dir and register a debugfs file for it.
+The last two patches add these calls for the netns and netdev
+ref_trackers.
 
-mvpp2_aggr_txq_pend_desc_add() uses writel(), which is itself required
-to ensure that writes to memory before the writel() occurs are visible
-to DMA agents. So, the wmb() there shouldn't be necessary if all
-that's going on here is to ensure that the packet is visible to the
-buffer manager hardware.
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
+---
+Jeff Layton (4):
+      ref_tracker: add a top level debugfs directory for ref_tracker
+      ref_tracker: add ability to register a file in debugfs for a ref_tracker_dir
+      net: add ref_tracker_dir_debugfs() calls for netns refcount tracking
+      net: register debugfs file for net_device refcnt tracker
 
-On arm64, that's __io_wmb(), which becomes __dma_wmb() and ultimately
-"dmb oshst". wmb() on the other hand is a heavier barrier, "dsb st".
-This driver ends up doing both, inexplicably.
+ include/linux/ref_tracker.h | 13 ++++++
+ lib/ref_tracker.c           | 98 ++++++++++++++++++++++++++++++++++++++++++++-
+ net/core/dev.c              |  2 +
+ net/core/net_namespace.c    | 34 +++++++++++++++-
+ 4 files changed, 145 insertions(+), 2 deletions(-)
+---
+base-commit: 695caca9345a160ecd9645abab8e70cfe849e9ff
+change-id: 20250413-reftrack-dbgfs-3767b303e2fa
 
-It would help if people would document what purpose a barrier exists
-for.
-
-Without knowing what the wmb() is there for, I wouldn't like to move
-it the other side.
-
+Best regards,
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Jeff Layton <jlayton@kernel.org>
+
 
