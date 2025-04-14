@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-182480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23A92A88DA8
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 23:20:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98DF7A88DAA
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 23:20:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B1C6189840F
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 21:20:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 009651898D72
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 21:20:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225AC1F3BB4;
-	Mon, 14 Apr 2025 21:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11DAC1F3FEC;
+	Mon, 14 Apr 2025 21:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MIBczYrL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W7Z2qR7X"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF92F1F3B9E
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 21:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2AF81F3FC0
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 21:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744665602; cv=none; b=p5iKD25xYWI+PhPTh9TfKUX+TYzfKu9IfW4x0JoDX6z6JumR2gI/W3bZjyp6KifNilrIwr+S5dECPn3PQ6zgoAl91/vH6j+CsbtE+yANH+WM+Sy70AfMQCPMSTi9xPsJQ2QdM75DLQzFcYfgnjnYhLs1TGplIrfBOImvFhyimfk=
+	t=1744665603; cv=none; b=GhIQe7IZVQ5LLsnXtd5bxfOaBU6/BunPEyXZdcEp7nhXecjb2LCHATYS/XxliJx4HGrlBsgNpfg58DExFtoyI9+UfPKZR0nhXps1Y4tgHXaztGyAx7jUZ+UZpyH2Abj5k2kNGJ5hHK0E7S/Ez1isFWTnumVCDdk9rxDGyBHcKkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744665602; c=relaxed/simple;
-	bh=hcFL0r4rBPCfWHgqcNaOMIEOIgrB7jh6uwyqYKIwMN0=;
+	s=arc-20240116; t=1744665603; c=relaxed/simple;
+	bh=5i+ERuGuMAIuYvf3O2iyOdPFU2DUz1XEX7hlDog/eb8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tscxU69gQAR0iHXG/td2gLb/xy6wIzBBp5Zv9qXAWWCxpg7TPBH+r2juq3dsJjKpxTWB1MWT7W8/9100VSTjxzM/I8QFqmSVLmuEzu4qk+JfMl1nM7cHr4+Oqw5TgfoCI5TtZjcn4k02UQgEa8F3l1TxGKujWraHMNbTXZ2Io2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MIBczYrL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 722E2C4CEE5;
+	 MIME-Version; b=WbEJlFxHJ/U36B9OoO6UhGraTrkZGk3enXUPTHneFlvysha37nREpFt0oStHQjp5sDaJZNhJIJ4uRg6nGuznPjfvGNItluZPKvzq6zV8Ad11+jPkzsFI/MBg8SdwJc2o6a99FmdiNC8MCOx0Np9eSpR9q/A0Uf3+KojZjD6L64Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W7Z2qR7X; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F18B5C4CEEF;
 	Mon, 14 Apr 2025 21:20:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744665601;
-	bh=hcFL0r4rBPCfWHgqcNaOMIEOIgrB7jh6uwyqYKIwMN0=;
+	s=k20201202; t=1744665602;
+	bh=5i+ERuGuMAIuYvf3O2iyOdPFU2DUz1XEX7hlDog/eb8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MIBczYrLnZtCoOcInvnWA/diiBfUB2HG8Nhv8YzDq0Dn9YlAolArCMY1V8KksH5Uy
-	 d5ej61AzZ9YTjJZ3ffPbDVA/HHiLH+J0lT7+vsnk+LCDRk0WHv9PglYLYCuC9QSLV8
-	 ixMAIIms8pwIeO7z8+EvHHkGLWaaFH9Mev1YytxPdorMXdWhpnHM1kbH/Bt3HiMH+C
-	 zUTuyzUY9FDvKHd3pNgzLxf0Jt3Q7hs67F0xpSbWlw5Z/5GOdIBYdawtJfhWdd24Ar
-	 xPv45ksOrrT9rFO2coZRq8DI18ydtnmss8G2h8zQo77/k2B3TkLRRu+F7OmBY8qHZM
-	 L5nH9IlZDsLow==
+	b=W7Z2qR7XEEtGA8m2oj5DzGI6iKeu3azU/xsuUxHfB8HJ+BBDfs5nzmovaoMvxWAjP
+	 IZ8VOkWlOEK/K3jhjlSpMDT4GNWExISz45zzN/E3FNFKPGEaJKS5HazilhYgpKPXT7
+	 UibPt1KiafffUtEy/6nrbHk5FHOs12cIEDjnYVNM+HDXChPiauDlytr19s8euPt5AS
+	 4+rxTzHXPZflcoLPVibThSfM4vTA7kxW8LtwCuAn/qb8I2pfEjPhrvRrEOf0ylOknC
+	 JxzpsMOyVrWjk1ynBqhfaJz1GqUmPzkuQO4N8nBYsb7OMN7AXioye0/T09LjNGpBI8
+	 whWopM84kBnLA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: donald.hunter@gmail.com,
@@ -53,9 +53,9 @@ Cc: donald.hunter@gmail.com,
 	sdf@fomichev.me,
 	jacob.e.keller@intel.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net 5/8] netlink: specs: rt-link: add an attr layer around alt-ifname
-Date: Mon, 14 Apr 2025 14:18:48 -0700
-Message-ID: <20250414211851.602096-6-kuba@kernel.org>
+Subject: [PATCH net 6/8] netlink: specs: rtnetlink: attribute naming corrections
+Date: Mon, 14 Apr 2025 14:18:49 -0700
+Message-ID: <20250414211851.602096-7-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250414211851.602096-1-kuba@kernel.org>
 References: <20250414211851.602096-1-kuba@kernel.org>
@@ -67,55 +67,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-alt-ifname attr is directly placed in requests (as an alternative
-to ifname) but in responses its wrapped up in IFLA_PROP_LIST
-and only there is may be multi-attr. See rtnl_fill_prop_list().
+Some attribute names diverge in very minor ways from the C names.
+These are most likely typos, and they prevent the C codegen from
+working.
 
+Fixes: bc515ed06652 ("netlink: specs: Add a spec for neighbor tables in rtnetlink")
 Fixes: b2f63d904e72 ("doc/netlink: Add spec for rt link messages")
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/netlink/specs/rt_link.yaml | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ Documentation/netlink/specs/rt_link.yaml  | 6 +++---
+ Documentation/netlink/specs/rt_neigh.yaml | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/Documentation/netlink/specs/rt_link.yaml b/Documentation/netlink/specs/rt_link.yaml
-index 31238455f8e9..200e9a7e5b11 100644
+index 200e9a7e5b11..03323d7f58dc 100644
 --- a/Documentation/netlink/specs/rt_link.yaml
 +++ b/Documentation/netlink/specs/rt_link.yaml
-@@ -1113,11 +1113,10 @@ protonum: 0
-       -
-         name: prop-list
-         type: nest
--        nested-attributes: link-attrs
-+        nested-attributes: prop-list-link-attrs
-       -
-         name: alt-ifname
-         type: string
--        multi-attr: true
-       -
-         name: perm-address
-         type: binary
-@@ -1163,6 +1162,13 @@ protonum: 0
-       -
-         name: netns-immutable
+@@ -1591,7 +1591,7 @@ protonum: 0
+         name: nf-call-iptables
          type: u8
-+  -
-+    name: prop-list-link-attrs
-+    subset-of: link-attrs
-+    attributes:
-+      -
-+        name: alt-ifname
-+        multi-attr: true
-   -
-     name: af-spec-attrs
-     attributes:
-@@ -2453,7 +2459,6 @@ protonum: 0
-             - min-mtu
-             - max-mtu
-             - prop-list
--            - alt-ifname
-             - perm-address
-             - proto-down-reason
-             - parent-dev-name
+       -
+-        name: nf-call-ip6-tables
++        name: nf-call-ip6tables
+         type: u8
+       -
+         name: nf-call-arptables
+@@ -2083,7 +2083,7 @@ protonum: 0
+         name: id
+         type: u16
+       -
+-        name: flag
++        name: flags
+         type: binary
+         struct: ifla-vlan-flags
+       -
+@@ -2171,7 +2171,7 @@ protonum: 0
+         type: binary
+         struct: ifla-cacheinfo
+       -
+-        name: icmp6-stats
++        name: icmp6stats
+         type: binary
+         struct: ifla-icmp6-stats
+       -
+diff --git a/Documentation/netlink/specs/rt_neigh.yaml b/Documentation/netlink/specs/rt_neigh.yaml
+index e670b6dc07be..a1e137a16abd 100644
+--- a/Documentation/netlink/specs/rt_neigh.yaml
++++ b/Documentation/netlink/specs/rt_neigh.yaml
+@@ -189,7 +189,7 @@ protonum: 0
+         type: binary
+         display-hint: ipv4
+       -
+-        name: lladr
++        name: lladdr
+         type: binary
+         display-hint: mac
+       -
 -- 
 2.49.0
 
