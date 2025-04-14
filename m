@@ -1,176 +1,279 @@
-Return-Path: <netdev+bounces-182178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 627CAA8814C
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 15:13:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F371A881A9
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 15:20:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A2C7177D99
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 13:12:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA88B178F65
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 13:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E19F2BD5BC;
-	Mon, 14 Apr 2025 13:12:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D0052E338F;
+	Mon, 14 Apr 2025 13:19:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="igrcAXJs"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="asa+UNFH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 648DF2D3A74
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 13:12:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0758718B0F
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 13:19:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744636358; cv=none; b=qdaasyvceYFTa5EKoIQ942o7jHPpPXAADyE/Nw/AOf4+NOt+qK8uw0gtObbf57d38iooe68bwjOrjBhHgLtfJJ17IFbRdarxy0Q2VuQUH0MZvLtuTh2z0VyDPnT8wEAEW7ez9QFN0WPcU+S6WqhHfdF9rJLKENjVZTspBnOu97U=
+	t=1744636795; cv=none; b=XznpZ1rn3Ng0hgthoAdX5a6LmFTv1F1owJ6erbVNJWRx5elzKUtJefDLa2uJRI3AVQ4DIB1n8shFVNpItCPWlQKqgcu8bDdAyWFcKxbP3AYc5hpuWsQ8LYKCShDfnyzkJdN/e8WVviXFjwKuQa64Jk15deMGp9ngKf2Bdt7YvnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744636358; c=relaxed/simple;
-	bh=zxrmEtApbR1+NFxrh23dKs/vscGUN0aWWypjYeI/it8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DDxlcmDpVphh3ustO8cCOfiTd/V4tQd1Z9WpBPVObS7HXfnN6i9Sii2V9fnO4SAfXI3wrLwCvzWnt3n5ipZjNR4lBq4hY36Autbpk2xoOBpW+6exkNTDDang2yQz7ZZp9WSsjELsCiTa4O4Pt18R/kIsk3rAbaaf/+nPeKJch6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=igrcAXJs; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1744636795; c=relaxed/simple;
+	bh=hjn39AG/I7dihpzS3bivPZpwz9rCyoJkkbzTr2kbI/A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kQPHkSxdLmBAZwpe9VVjxQjKiQprh2rNCN/P6AQYFOyzZflFUdZD0rSbWAiKQx59J3TgSo/Zbn+++NPI+g5XM+rLmelhzq6OAgX7/lvWP7bLDphgdTAG1zUqp0/ZZTIEa3U537/Gr5HROEFbL7TWLRDD5P0/ZuP8vx0FRooAHQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=asa+UNFH; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1744636357; x=1776172357;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=zxrmEtApbR1+NFxrh23dKs/vscGUN0aWWypjYeI/it8=;
-  b=igrcAXJsZc2Ykf3DfJoGdTkIcDYiJiwXgqH65AzPvuQpeuBdHLK0i9RO
-   vmOaFNfeRFeGOR0echZKL4w4OSOjt7SrzDuCVRugMYSlACAunCOIw6tci
-   W0XIFUD1QcirTaSAcikEZnDH92ki/5TpIgMrhI49QakIVMtxXESdy6qom
-   1UtAMAC/Jc1npLyYYg/j8EsZ04m84HuwuCcjrQO2fqHkbBDyuCqvKa1tX
-   jVj7TmzD1Uv5WgytmDT6bkx0pcMIYXFpxEc32QalGfdgZf9C44RS87bAk
-   ldOcRXS7wgT0NEf+ux60/8fm95oflWqVpIpM4ooEykoUffziG4pkGwL2d
-   Q==;
-X-CSE-ConnectionGUID: JgRM7N1YSn+sOwbqvap89A==
-X-CSE-MsgGUID: nvVz7wKCRWSUlNJMM9lt8g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11402"; a="45240824"
+  t=1744636793; x=1776172793;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=hjn39AG/I7dihpzS3bivPZpwz9rCyoJkkbzTr2kbI/A=;
+  b=asa+UNFHZWuPJnIcgBS2ZmXR7dUQmQ/vYkDbqxDzXHaREtqyaDcur+nm
+   1AOGYaPrwTOJt17zTZ8JVyGfEtEko4uQQPxtIwfNOP7VqmxdZ6ZgWlhqk
+   DZG90aHZjmZgxbPkJw/TTvyiGyMFsedAxAS0sA4e0a29hznTeBMjvHJmi
+   EB6TJlNYl3Ty6UACWdrrg/MDl6YK5PAWu11idI1lGhMKzLZkH6tRt3utC
+   /4Kf81/qxkKJCFNjHKt67wBihamP5SZILoAI1XQJO8LyE9l4BhJyOHr2T
+   nj+hh1l2sqZexzSKb6g+pkr5+F/ZHo3zj0MYJHyhIFc1kOYa5NcYvs/Ym
+   w==;
+X-CSE-ConnectionGUID: mSesFPCtSfCXzckFnjZUVw==
+X-CSE-MsgGUID: yJv8roT6Ri6o8nOfRPXLFA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11402"; a="68594778"
 X-IronPort-AV: E=Sophos;i="6.15,212,1739865600"; 
-   d="scan'208";a="45240824"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2025 06:12:36 -0700
-X-CSE-ConnectionGUID: 68LT2WeKQ/6m5FT1X51I3g==
-X-CSE-MsgGUID: RhP1dXvoSd27ztQQMQqmFg==
+   d="scan'208";a="68594778"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2025 06:19:52 -0700
+X-CSE-ConnectionGUID: NkKCUYg0T1eLwvf/UXpbNg==
+X-CSE-MsgGUID: z6/5z8B+R9artRd/7I7BQA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.15,212,1739865600"; 
-   d="scan'208";a="134653252"
-Received: from mszapar-mobl1.ger.corp.intel.com (HELO [10.245.98.242]) ([10.245.98.242])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2025 06:12:35 -0700
-Message-ID: <4012b88a-091d-4f81-92ab-ad32727914ff@linux.intel.com>
-Date: Mon, 14 Apr 2025 15:12:32 +0200
+   d="scan'208";a="130140515"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa008.fm.intel.com with ESMTP; 14 Apr 2025 06:19:48 -0700
+Received: from vecna.igk.intel.com (vecna.igk.intel.com [10.123.220.17])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id D9E0032CB0;
+	Mon, 14 Apr 2025 14:19:46 +0100 (IST)
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: netdev@vger.kernel.org,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Karol Kolacinski <karol.kolacinski@intel.com>,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH iwl-net v4] ice: use DSN instead of PCI BDF for ice_adapter index
+Date: Mon, 14 Apr 2025 15:12:41 +0200
+Message-Id: <20250414131241.122855-1-przemyslaw.kitszel@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next 1/2] ice: add link_down_events
- statistic
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-References: <20250409113622.161379-2-martyna.szapar-mudlaw@linux.intel.com>
- <20250409113622.161379-4-martyna.szapar-mudlaw@linux.intel.com>
- <55ae83fc-8333-4a04-9320-053af1fd6f46@molgen.mpg.de>
-Content-Language: en-US
-From: "Szapar-Mudlaw, Martyna" <martyna.szapar-mudlaw@linux.intel.com>
-In-Reply-To: <55ae83fc-8333-4a04-9320-053af1fd6f46@molgen.mpg.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+Use Device Serial Number instead of PCI bus/device/function for
+the index of struct ice_adapter.
 
+Functions on the same physical device should point to the very same
+ice_adapter instance, but with two PFs, when at least one of them is
+PCI-e passed-through to a VM, it is no longer the case - PFs will get
+seemingly random PCI BDF values, and thus indices, what finally leds to
+each of them being on their own instance of ice_adapter. That causes them
+to don't attempt any synchronization of the PTP HW clock usage, or any
+other future resources.
 
-On 4/9/2025 2:08 PM, Paul Menzel wrote:
-> Dear Martyna,
-> 
-> 
-> Thank you for your patch.
-> 
-> Am 09.04.25 um 13:36 schrieb Martyna Szapar-Mudlaw:
->> Introduce a new ethtool statistic to ice driver, `link_down_events`,
->> to track the number of times the link transitions from up to down.
->> This counter can help diagnose issues related to link stability,
->> such as port flapping or unexpected link drops.
->>
->> The counter increments when a link-down event occurs and is exposed
->> via ethtool stats as `link_down_events.nic`.
-> 
-> It’d be great if you pasted an example output.
+DSN works nicely in place of the index, as it is "immutable" in terms of
+virtualization.
 
-In v2 (which I just submitted) the generic ethtool statistic is used for 
-this, instead of driver specific, so I guess no need to paste the 
-example output now.
+Fixes: 0e2bddf9e5f9 ("ice: add ice_adapter for shared data across PFs on the same NIC")
+Suggested-by: Jacob Keller <jacob.e.keller@intel.com>
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Suggested-by: Jiri Pirko <jiri@resnulli.us>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+---
+CC: Karol Kolacinski <karol.kolacinski@intel.com>
+CC: Grzegorz Nitka <grzegorz.nitka@intel.com>
+CC: Michal Schmidt <mschmidt@redhat.com>
+CC: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+CC: Michal Kubiak <michal.kubiak@intel.com>
+CC: Simon Horman <horms@kernel.org>
 
-> 
->> Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
->> Signed-off-by: Martyna Szapar-Mudlaw <martyna.szapar- 
->> mudlaw@linux.intel.com>
->> ---
->>   drivers/net/ethernet/intel/ice/ice.h         | 1 +
->>   drivers/net/ethernet/intel/ice/ice_ethtool.c | 1 +
->>   drivers/net/ethernet/intel/ice/ice_main.c    | 3 +++
->>   3 files changed, 5 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ 
->> ethernet/intel/ice/ice.h
->> index 7200d6042590..6304104d1900 100644
->> --- a/drivers/net/ethernet/intel/ice/ice.h
->> +++ b/drivers/net/ethernet/intel/ice/ice.h
->> @@ -621,6 +621,7 @@ struct ice_pf {
->>       u16 globr_count;    /* Global reset count */
->>       u16 empr_count;        /* EMP reset count */
->>       u16 pfr_count;        /* PF reset count */
->> +    u32 link_down_events;
-> 
-> Why not u16?
+v4:
+ - Add fixes tag for real... (Simon)
+ - extend commit message (Simon)
+ - pass dsn to ice_adapter_new() to have simpler code
+   (I happened to do that as (local) followup) (me)
 
-So now using u32 instead of u16 is more justified, as the v2 uses the 
-generic ethtool stat, where this value is also u32 :)
+v3:
+https://lore.kernel.org/intel-wired-lan/20250408134655.4287-1-przemyslaw.kitszel@intel.com/
+ - Add fixes tag (Michal K)
+ - add missing braces (lkp bot), turns out it's hard to purge C++ from your mind
+ - (no changes in the collision handling on 32bit systems)
 
-> 
->>       u8 wol_ena : 1;        /* software state of WoL */
->>       u32 wakeup_reason;    /* last wakeup reason */
->> diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/ 
->> net/ethernet/intel/ice/ice_ethtool.c
->> index b0805704834d..7bad0113aa88 100644
->> --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
->> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
->> @@ -137,6 +137,7 @@ static const struct ice_stats 
->> ice_gstrings_pf_stats[] = {
->>       ICE_PF_STAT("mac_remote_faults.nic", stats.mac_remote_faults),
->>       ICE_PF_STAT("fdir_sb_match.nic", stats.fd_sb_match),
->>       ICE_PF_STAT("fdir_sb_status.nic", stats.fd_sb_status),
->> +    ICE_PF_STAT("link_down_events.nic", link_down_events),
->>       ICE_PF_STAT("tx_hwtstamp_skipped", ptp.tx_hwtstamp_skipped),
->>       ICE_PF_STAT("tx_hwtstamp_timeouts", ptp.tx_hwtstamp_timeouts),
->>       ICE_PF_STAT("tx_hwtstamp_flushed", ptp.tx_hwtstamp_flushed),
->> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ 
->> ethernet/intel/ice/ice_main.c
->> index a03e1819e6d5..d68dd2a3f4a6 100644
->> --- a/drivers/net/ethernet/intel/ice/ice_main.c
->> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
->> @@ -1144,6 +1144,9 @@ ice_link_event(struct ice_pf *pf, struct 
->> ice_port_info *pi, bool link_up,
->>       if (link_up == old_link && link_speed == old_link_speed)
->>           return 0;
->> +    if (!link_up && old_link)
->> +        pf->link_down_events++;
->> +
->>       ice_ptp_link_change(pf, link_up);
->>       if (ice_is_dcb_active(pf)) {
-> 
-> The diff looks good.
+v2:
+https://lore.kernel.org/intel-wired-lan/20250407112005.85468-1-przemyslaw.kitszel@intel.com/
+ - target to -net (Jiri)
+ - mix both halves of u64 DSN on 32bit systems (Jiri)
+ - (no changes in terms of fallbacks for pre-prod HW)
+ - warn when there is DSN collision after reducing to 32bit
 
-Thank you for the review,
-Martyna
-> 
-> 
-> Kind regards,
-> 
-> Paul
-> 
-> 
+v1:
+https://lore.kernel.org/netdev/20250306211159.3697-2-przemyslaw.kitszel@intel.com
+---
+ drivers/net/ethernet/intel/ice/ice_adapter.h |  6 ++-
+ drivers/net/ethernet/intel/ice/ice_adapter.c | 47 ++++++++------------
+ 2 files changed, 22 insertions(+), 31 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.h b/drivers/net/ethernet/intel/ice/ice_adapter.h
+index e233225848b3..ac15c0d2bc1a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adapter.h
++++ b/drivers/net/ethernet/intel/ice/ice_adapter.h
+@@ -32,17 +32,19 @@ struct ice_port_list {
+  * @refcount: Reference count. struct ice_pf objects hold the references.
+  * @ctrl_pf: Control PF of the adapter
+  * @ports: Ports list
++ * @device_serial_number: DSN cached for collision detection on 32bit systems
+  */
+ struct ice_adapter {
+ 	refcount_t refcount;
+ 	/* For access to the GLTSYN_TIME register */
+ 	spinlock_t ptp_gltsyn_time_lock;
+ 
+ 	struct ice_pf *ctrl_pf;
+ 	struct ice_port_list ports;
++	u64 device_serial_number;
+ };
+ 
+-struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev);
+-void ice_adapter_put(const struct pci_dev *pdev);
++struct ice_adapter *ice_adapter_get(struct pci_dev *pdev);
++void ice_adapter_put(struct pci_dev *pdev);
+ 
+ #endif /* _ICE_ADAPTER_H */
+diff --git a/drivers/net/ethernet/intel/ice/ice_adapter.c b/drivers/net/ethernet/intel/ice/ice_adapter.c
+index 01a08cfd0090..66e070095d1b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adapter.c
++++ b/drivers/net/ethernet/intel/ice/ice_adapter.c
+@@ -1,7 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ // SPDX-FileCopyrightText: Copyright Red Hat
+ 
+-#include <linux/bitfield.h>
+ #include <linux/cleanup.h>
+ #include <linux/mutex.h>
+ #include <linux/pci.h>
+@@ -14,39 +13,24 @@
+ static DEFINE_XARRAY(ice_adapters);
+ static DEFINE_MUTEX(ice_adapters_mutex);
+ 
+-/* PCI bus number is 8 bits. Slot is 5 bits. Domain can have the rest. */
+-#define INDEX_FIELD_DOMAIN GENMASK(BITS_PER_LONG - 1, 13)
+-#define INDEX_FIELD_DEV    GENMASK(31, 16)
+-#define INDEX_FIELD_BUS    GENMASK(12, 5)
+-#define INDEX_FIELD_SLOT   GENMASK(4, 0)
+-
+-static unsigned long ice_adapter_index(const struct pci_dev *pdev)
++static unsigned long ice_adapter_index(u64 dsn)
+ {
+-	unsigned int domain = pci_domain_nr(pdev->bus);
+-
+-	WARN_ON(domain > FIELD_MAX(INDEX_FIELD_DOMAIN));
+-
+-	switch (pdev->device) {
+-	case ICE_DEV_ID_E825C_BACKPLANE:
+-	case ICE_DEV_ID_E825C_QSFP:
+-	case ICE_DEV_ID_E825C_SFP:
+-	case ICE_DEV_ID_E825C_SGMII:
+-		return FIELD_PREP(INDEX_FIELD_DEV, pdev->device);
+-	default:
+-		return FIELD_PREP(INDEX_FIELD_DOMAIN, domain) |
+-		       FIELD_PREP(INDEX_FIELD_BUS,    pdev->bus->number) |
+-		       FIELD_PREP(INDEX_FIELD_SLOT,   PCI_SLOT(pdev->devfn));
+-	}
++#if BITS_PER_LONG == 64
++	return dsn;
++#else
++	return (u32)dsn ^ (u32)(dsn >> 32);
++#endif
+ }
+ 
+-static struct ice_adapter *ice_adapter_new(void)
++static struct ice_adapter *ice_adapter_new(u64 dsn)
+ {
+ 	struct ice_adapter *adapter;
+ 
+ 	adapter = kzalloc(sizeof(*adapter), GFP_KERNEL);
+ 	if (!adapter)
+ 		return NULL;
+ 
++	adapter->device_serial_number = dsn;
+ 	spin_lock_init(&adapter->ptp_gltsyn_time_lock);
+ 	refcount_set(&adapter->refcount, 1);
+ 
+@@ -77,23 +61,26 @@ static void ice_adapter_free(struct ice_adapter *adapter)
+  * Return:  Pointer to ice_adapter on success.
+  *          ERR_PTR() on error. -ENOMEM is the only possible error.
+  */
+-struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev)
++struct ice_adapter *ice_adapter_get(struct pci_dev *pdev)
+ {
+-	unsigned long index = ice_adapter_index(pdev);
++	u64 dsn = pci_get_dsn(pdev);
+ 	struct ice_adapter *adapter;
++	unsigned long index;
+ 	int err;
+ 
++	index = ice_adapter_index(dsn);
+ 	scoped_guard(mutex, &ice_adapters_mutex) {
+ 		err = xa_insert(&ice_adapters, index, NULL, GFP_KERNEL);
+ 		if (err == -EBUSY) {
+ 			adapter = xa_load(&ice_adapters, index);
+ 			refcount_inc(&adapter->refcount);
++			WARN_ON_ONCE(adapter->device_serial_number != dsn);
+ 			return adapter;
+ 		}
+ 		if (err)
+ 			return ERR_PTR(err);
+ 
+-		adapter = ice_adapter_new();
++		adapter = ice_adapter_new(dsn);
+ 		if (!adapter)
+ 			return ERR_PTR(-ENOMEM);
+ 		xa_store(&ice_adapters, index, adapter, GFP_KERNEL);
+@@ -110,11 +97,13 @@ struct ice_adapter *ice_adapter_get(const struct pci_dev *pdev)
+  *
+  * Context: Process, may sleep.
+  */
+-void ice_adapter_put(const struct pci_dev *pdev)
++void ice_adapter_put(struct pci_dev *pdev)
+ {
+-	unsigned long index = ice_adapter_index(pdev);
++	u64 dsn = pci_get_dsn(pdev);
+ 	struct ice_adapter *adapter;
++	unsigned long index;
+ 
++	index = ice_adapter_index(dsn);
+ 	scoped_guard(mutex, &ice_adapters_mutex) {
+ 		adapter = xa_load(&ice_adapters, index);
+ 		if (WARN_ON(!adapter))
+-- 
+2.39.3
 
 
