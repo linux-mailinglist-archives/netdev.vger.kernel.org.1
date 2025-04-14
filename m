@@ -1,161 +1,119 @@
-Return-Path: <netdev+bounces-182052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50050A87853
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 09:02:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85C45A87857
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 09:03:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 994333AC924
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 07:02:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B17EB1892435
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 07:03:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D1B61BD4F7;
-	Mon, 14 Apr 2025 07:02:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95A181ADC7C;
+	Mon, 14 Apr 2025 07:03:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j6hGA2kE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dZGkpFXN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C27001B85CA;
-	Mon, 14 Apr 2025 07:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E94A225776
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 07:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744614138; cv=none; b=sEjPrlPFviDVtGG6Ri0ga9rpz2L1LMZ2uD3fDlCo6vTQibqDasBxmp3rMN3lSp5mB2gVEdeqdCCaPy+XHP0psCE6dwMdd78O8ypmEcaVeC1JZS9NF70H7wP9r+0EdtWD07k2E3/YajnHnmTTCUS7DN02QW+QWi3eGyGWcUKDzIQ=
+	t=1744614194; cv=none; b=fKVLJXB4UdKm4kmKBZKJztwWCSoAP/4soo6rVgKbKARYS9C74HlfPe+mVoFT5TpaK+6YMFr3Yu2d9C5E9TjgK6ODZrO2quWyDgB2snmZumxmvEXld20UMQPCtOJONXKf8I6j9ztoDKQxaiOjIjLtq/QFLOclYJocMMfkCnOqKD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744614138; c=relaxed/simple;
-	bh=x+uSXNvn9FeBjHyDFM/li09nu7ZSVOMIL/PFUN+aRuY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lNZq7jKIO0D8uNiTUIA/HxbABAZtqk4mZGp/L4nZffI3yLc1Av2dAVM7sPukxGhz4kpbZKYs2kQkI/2R8xZ935OWsn0dZwbZxIdIY8ojkmexNtJa2XdvCEO5JIALw0FVNYJPdlrmllDy/W9qlLZ2Qn1kKLFe8yErbOiyOlDavNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j6hGA2kE; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2295d78b45cso54860855ad.0;
-        Mon, 14 Apr 2025 00:02:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744614135; x=1745218935; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=plir7rmRtb7MsHHpJy0jinf92wikNIwAjXLhVwuX7rY=;
-        b=j6hGA2kEcC3b7SepYcF9SGQLSUuNMDf/+Kf0k3t4fOw+JE9jhHV54llihWj5Q3291C
-         FLIQuMUk1kHJLYsmdbTfFjFj9owNGvJZxaXL3956lycRHSgDmikwHqmzdJSwScEZ4mGn
-         JOHbGcOahj2XJFkz5SQ4nqbIRRTO/FKzWUlCP/1ivsk42fhAD9bpjnqEX3o3DNZ7Awar
-         6RXayEQZuSnsDvLvcYxy4Z5o4HSy6InbXZY/877xe0+tvrpwNWq+gA9OtgG5EIRyKJAB
-         jyghSFicdXiGRgDxuhSxgHDPYL4H+FdqC7fq0kI+SxVbD4OyPfNZjXTNZOc0misU9o/p
-         NgMw==
+	s=arc-20240116; t=1744614194; c=relaxed/simple;
+	bh=M8n0PSHddyTE6fc+cZMW8tLH2wTWAC9GQYr616Qmvlw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DwaiWpfCNahfXgKxp5DQA573gknzp1yPC9yCdBm9RgW/eJwRtTKPu4Ckqqj2WQrU5qOvmeJu412uq0VAuFcj98ItsCm4KaTV4JqcK42esyOoDUcKkaSBHrvW92aV0qVQMWTgG3cXAL/LkxGI253tKtJ2nLj5Jh0qYzKp+QVkNOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dZGkpFXN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744614191;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KJ4c0a3Aexij9u47Hm76JUGfKE2lcIO7FCQlwEhiSF0=;
+	b=dZGkpFXNsGg/U8jaHidpE+xbw1IYKSfnGZUw5LoeK/HNqKj039QfbTtu/KwzunU+YMgvRF
+	L52bABXh9v9ssm+lit9YHCwTckTRu0mbqWOuhHx2du1LYzMgXxztHZR//F1l2kikdLwszP
+	XaUdGxFdmRlKZooa3oum+tG2iAIHrDM=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-529-MceeAE3LMRqgrnDhF3oA5Q-1; Mon, 14 Apr 2025 03:03:09 -0400
+X-MC-Unique: MceeAE3LMRqgrnDhF3oA5Q-1
+X-Mimecast-MFC-AGG-ID: MceeAE3LMRqgrnDhF3oA5Q_1744614188
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ac3dca41591so364911666b.1
+        for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 00:03:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744614135; x=1745218935;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=plir7rmRtb7MsHHpJy0jinf92wikNIwAjXLhVwuX7rY=;
-        b=Pitv09ComIvCssxOI5cdEDpn1Rf4H8URR9UsrSDQpEEI+jwTjXoUkqon00ka5h5FBV
-         1BFcTs26yVmj3eW7C9SWpSUlDi/D2Av8nA+/SSxlGs7OxGL+c6bnOkcoXrbMdoXbfQRO
-         z7/wSeIaNdUJNA0yccuc/W10PPqRnva2ne9ElZkdvtJMAVqKo6gL+hU2QJNfYLhjFrVH
-         a3XY8MHCzobRktUop8gXFN4RQRkHbGGCK9M51U+omSvAuBdo59OFzhLXPiu88Uur6yQv
-         OzAU/t91m4JAbxQZDYLW2uSUbzv+/0QzSOmsZUQ7gCc0Tys/gabz+Edx2NiKLTXod7Kb
-         LOiw==
-X-Forwarded-Encrypted: i=1; AJvYcCXXOt5drBIeLSFsWQEe5RfbxZi3KiX7MO35yIPnJ44oOvL4Or8KJDA4iaU1vP5uoWOgsFm+vnCFrrbVOfixKHk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5rit4kb6zCYKeedj9Se6moR7/jUUh2xiewzB4csgKYK4lz5lI
-	0RGtFk9EHvbzW7/fgblv87zsGS7VZC2iX8t3GHnxN+ISmyMxFxk4
-X-Gm-Gg: ASbGncttgxRG5+MrC8Rd0fY3CC7e0LBCZj8dsryz8Y3yQYysM86qR8Xt9g3s8OFEiX6
-	vqTDAQIzeA7kQv0bDc7B2T1ycepw55UgkSEkXi5mvt/4p0Mk4X3rAF6Ih6z29ONdJoQZ6WXJsRD
-	CG0v1Rc2yecNNFOp25vcCNKmBxkqWizTM8SVWAsZdKY35u0cEMMPr3rwdaMxru4ljQhGR6ka/S2
-	KoRXdV+w7/0J4JnjksAQd5PebGH85HsHoWOyYcyfXMwPlsBYljzPO8JJw2YxT0Kl1LupQQ3hTjq
-	dTC33V525Jp98RlTQh8l6kF2hYGyaLwEyYhXu48mBiJAdg==
-X-Google-Smtp-Source: AGHT+IEK1O22aNB0eKKTPhWz3Ft05m1zE4K6+TWwl5hUjLMJaTp+MWO7fU/xLicld4E0gAy6XTcaGw==
-X-Received: by 2002:a17:902:d2c2:b0:227:e6fe:2908 with SMTP id d9443c01a7336-22bea50bd27mr152267275ad.48.1744614134683;
-        Mon, 14 Apr 2025 00:02:14 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22ac7c971b4sm93001735ad.116.2025.04.14.00.02.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Apr 2025 00:02:14 -0700 (PDT)
-Date: Mon, 14 Apr 2025 07:02:05 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	Xiao Liang <shaw.leon@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Venkat Venkatsubra <venkat.x.venkatsubra@oracle.com>,
-	Etienne Champetier <champetier.etienne@gmail.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net 1/3] ipvlan: fix NETDEV_UP/NETDEV_DOWN event handling
-Message-ID: <Z_yy7WpZQWJiScJl@fedora>
-References: <20250403085857.17868-1-liuhangbin@gmail.com>
- <20250403085857.17868-2-liuhangbin@gmail.com>
- <Z-5i5rsrIyE0fM-V@krikkit>
- <Z-6IbvorOVx6hpxM@fedora>
- <Z-6ifi46d2JmnIch@krikkit>
+        d=1e100.net; s=20230601; t=1744614188; x=1745218988;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KJ4c0a3Aexij9u47Hm76JUGfKE2lcIO7FCQlwEhiSF0=;
+        b=YgEp6j+RKtxtriqWXso018WY8VQTMieALz8r2ujJDHh33c1ssWYEjckLRW1urem+yg
+         Lu/ocGbhNuRsg5k5Dj0d9Q62Y/O3CHGyoW27546dLYC9aPulu0fcXh1BhMDjHIA7khpN
+         PebKnNAe7YeYGGyn3xb2HHmWcSj0bum/qFqkpJg4eFSUQo7h9Bhxad4wGhZ/PW+NatpF
+         O9q4nbhtEEDHF2c9RQwx0RhF9jhDTwYODd79dumNjAREaQ7Uj8cxoRf6EqPK91x6i7pS
+         NECKbvS9dmk2hAamPChvw0zUg4VXTUDxJULYrQ1WX4S+E6Ev3ACBSy5HrRCKumOO1MMV
+         Norw==
+X-Gm-Message-State: AOJu0Yy/AUkIKPtWvLoiEIfPxLHKfgJVsRkcpWqGIUEJdkxxQgsbsy+d
+	/Od//Dp+uFudYvitd9ppwSfo220ahmpwHiWUIxSdHOSK3H6ltBpiGVbm281WHBcokll60njsnBA
+	v3pncEOIaoTa7X2IObFloMwVOiCGhz/6MNZDSSNLwTofi/4U778vFoQ==
+X-Gm-Gg: ASbGncugf2jRXxWyP45JAtecaJ9z8WPK/hq4QcS4zplR+lr8S9Jk1JEmIbdqyxwrSuj
+	0UhiGqpvyxFa/96cAjGZgvdoUcX3IO3MChpwt74G0Sl42y2SGbtmN6oUIRgGQmZ5SwTcfld4OEG
+	RoWsFBjtINIhnO5zycKsJj9UdCB4rsTrhgf9SwvbI2nd6MRNN2t1vzbzH8CwGbCtX9rWLlTqSg8
+	obpmEHaL+CLdW5ZiX8pc1xny10a1DvVOqi/3x/cT9Qynd6l/akDyFQA46EKIF/Z6uVmzYu46M48
+	LH3TbwU3WXaS9cYgvR4+ojkVjcNq5hLRbxjagnCTDjuf1QiWi6H22Q4=
+X-Received: by 2002:a17:907:3d0e:b0:ac4:5fd:6e29 with SMTP id a640c23a62f3a-acad34d8a60mr1051268266b.26.1744614187911;
+        Mon, 14 Apr 2025 00:03:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG6kUFXmElchnX/VTz9gfGixQp4NvnPe/DcOgLrFIMflSHFpxy7Try/58ehYN202cHqJyyGXw==
+X-Received: by 2002:a17:907:3d0e:b0:ac4:5fd:6e29 with SMTP id a640c23a62f3a-acad34d8a60mr1051264966b.26.1744614187474;
+        Mon, 14 Apr 2025 00:03:07 -0700 (PDT)
+Received: from [172.16.2.76] (5920ab7b.static.cust.trined.nl. [89.32.171.123])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acaa1ce818bsm851777166b.182.2025.04.14.00.03.06
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 14 Apr 2025 00:03:06 -0700 (PDT)
+From: Eelco Chaudron <echaudro@redhat.com>
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ dev@openvswitch.org, linux-kernel@vger.kernel.org,
+ Aaron Conole <aconole@redhat.com>,
+ syzbot+b07a9da40df1576b8048@syzkaller.appspotmail.com
+Subject: Re: [PATCH net] net: openvswitch: fix nested key length validation in
+ the set() action
+Date: Mon, 14 Apr 2025 09:03:06 +0200
+X-Mailer: MailMate (2.0r6244)
+Message-ID: <8141724C-7CC1-4715-B5DF-0469273E8358@redhat.com>
+In-Reply-To: <20250412104052.2073688-1-i.maximets@ovn.org>
+References: <20250412104052.2073688-1-i.maximets@ovn.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z-6ifi46d2JmnIch@krikkit>
+Content-Type: text/plain
 
-On Thu, Apr 03, 2025 at 05:00:14PM +0200, Sabrina Dubroca wrote:
-> 2025-04-03, 13:09:02 +0000, Hangbin Liu wrote:
-> > Hi Sabrina,
-> > On Thu, Apr 03, 2025 at 12:28:54PM +0200, Sabrina Dubroca wrote:
-> > > Hello Hangbin,
-> > > 
-> > > 2025-04-03, 08:58:55 +0000, Hangbin Liu wrote:
-> > > > When setting the lower-layer link up/down, the ipvlan device synchronizes
-> > > > its state via netif_stacked_transfer_operstate(), which only checks the
-> > > > carrier state. However, setting the link down does not necessarily change
-> > > > the carrier state for virtual interfaces like bonding. This causes the
-> > > > ipvlan state to become out of sync with the lower-layer link state.
-> > > > 
-> > > > If the lower link and ipvlan are in the same namespace, this issue is
-> > > > hidden because ip link show checks the link state in IFLA_LINK and has
-> > > > a m_flag to control the state, displaying M-DOWN in the flags. However,
-> > > > if the ipvlan and the lower link are in different namespaces, this
-> > > > information is not available, and the ipvlan link state remains unchanged.
-> > > 
-> > > Is the issue with the actual behavior (sending/receiving packets,
-> > > etc), or just in how it's displayed by iproute?
-> > 
-> > The upper link in netns up while lower link down will cause the traffic break
-> > in the pod.
-> 
-> That seems like the correct behavior based on the actual (not
-> displayed) state of the links.
 
-Hmm, since this behavior is controversial, do you think if we should
-drop this until some users request?
 
-> 
-> 
-> I wonder if netif_stacked_transfer_operstate should consider the admin
-> state of the lower device as well as link state:
-> 
-> @@ -10724,7 +10724,7 @@ void netif_stacked_transfer_operstate(const struct net_device *rootdev,
->  	else
->  		netif_testing_off(dev);
->  
-> -	if (netif_carrier_ok(rootdev))
-> +	if (netif_carrier_ok(rootdev) && rootdev->flags & IFF_UP)
->  		netif_carrier_on(dev);
->  	else
->  		netif_carrier_off(dev);
-> 
-> 
-> but I haven't looked at all the consequences and possible side
-> effects.
+On 12 Apr 2025, at 12:40, Ilya Maximets wrote:
 
-I'm not sure. Only sync link carrier seems reasonable too.
+> It's not safe to access nla_len(ovs_key) if the data is smaller than
+> the netlink header.  Check that the attribute is OK first.
+>
+> Fixes: ccb1352e76cf ("net: Add Open vSwitch kernel components.")
+> Reported-by: syzbot+b07a9da40df1576b8048@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=b07a9da40df1576b8048
+> Tested-by: syzbot+b07a9da40df1576b8048@syzkaller.appspotmail.com
+> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
 
-Thanks
-Hangbin
+The patch looks good to me.
+
+Reviewed-by:  Eelco Chaudron <echaudro@redhat.com>
+
 
