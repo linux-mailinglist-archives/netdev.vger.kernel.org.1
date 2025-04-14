@@ -1,252 +1,205 @@
-Return-Path: <netdev+bounces-182181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 352A0A8815B
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 15:14:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FA0FA8817D
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 15:16:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92E7F18883B3
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 13:14:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E1BD3B8AFD
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 13:15:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68342D1F71;
-	Mon, 14 Apr 2025 13:13:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD5F22D3A7B;
+	Mon, 14 Apr 2025 13:15:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="cCimE9+k"
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029902BEC2D;
-	Mon, 14 Apr 2025 13:13:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744636436; cv=none; b=QybrmnmpWoFVCJVbZndD5PTDEqd6RrBO0UFMP5K9ZsVvlhSfnME80LNyPQg7QSZbjvbEhHIWcr3zc4TpUeKq+DSaIReVLwG7Ui2cmwo3CY10b7zTaBDbi3sbHG5rA4SclvNv3lXj9GqpQp80huHrwSLt1NsQbVBt9vvl6Q3W17k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744636436; c=relaxed/simple;
-	bh=1lQ7JQW5S4G+/LBdiOzM9bdyiUOGo93ut2ZCIvpNqNo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BxwiZ9j1eSeV1eQAd6T8C8nlJY4JTmcYzLxfLFKm6JdhUib5spHQQRDAXGfJNaSSrlDm7Aue1eluvcvnk/qZz9BKGiW0UkKQmGSEaA5d7/+EBX454cO6ToRYw1G4b1eqGlVH3chfcd6tXBE7LgQo14Zg8gqx++gJuSq7/9Tw854=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-X-CSE-ConnectionGUID: Q88s0WCoTpy8kQw+Z7mjWQ==
-X-CSE-MsgGUID: BdcF5JAqRmKL37V0LnFwwQ==
-Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
-  by relmlie5.idc.renesas.com with ESMTP; 14 Apr 2025 22:13:47 +0900
-Received: from [10.226.92.218] (unknown [10.226.92.218])
-	by relmlir6.idc.renesas.com (Postfix) with ESMTP id 71E9041C595F;
-	Mon, 14 Apr 2025 22:13:39 +0900 (JST)
-Message-ID: <f20e6589-37d9-458b-af82-92fb1ed0db18@bp.renesas.com>
-Date: Mon, 14 Apr 2025 14:13:37 +0100
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2079.outbound.protection.outlook.com [40.107.237.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D9DF2853EB;
+	Mon, 14 Apr 2025 13:15:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.79
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744636503; cv=fail; b=oasQ2uW0O4x2dDsfcVw7szdqaliApW1Km8LPMypXbrr9b3jHS5z76CJZx1c1fKPH+A2jdWBQbYghknoA9MM1aBOuHYf15Z746CcR/A0dY+5Gq6b3PON+n79LhSrWIgUXp+5IoRAGJPxJgubPdvl/aOWo8j1q/l5Gz4OmywJUBwo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744636503; c=relaxed/simple;
+	bh=czd2o24anLe/H/1rzvgep6DiO7vGclNO3EmnToNoxhQ=;
+	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=lG80Tg3sccDTuNxygCTjgpw+nkgzg1oBOeSug5r8zU7rbFb5q6Op7e/zseLGRubf/g6w/VyjMyaYm86zvjrdI23Lf+ln/Oxdhb6A5u746EjrdgM8WNMTRPSxjw1X0nmjBdksQPiEfyShfj0jq2lt8sdxUxnz/1h60fF2b5OJdfQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=cCimE9+k; arc=fail smtp.client-ip=40.107.237.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pfoTXW+8ZQpB7qkXLzX8PxcDgskumh4BxJ275H8qvq3lbpHd6aI4aseiH2jgGVD9Q39eIEBT5UfrloaLx7zYs3Q9+4Ba/H43pDFpyYxoVArHn7F2n3TUvEo0jGjFMrdPFwLAHudtNUc0MPZKTi2ry/iF+WQIvCMUwYZqU5IN9DBp3EgZZYT9scKOUQq2GjrEVGshp35KZT3Ex4HZ8CO9p9gNjIsbgA0UbvwbBj0c456n/F7MmZY/V6BW3laT4NULe5huDeTwX1FMOsUFYGsYT/oSE1m2nMNQqn6G5zlEYzVtM879K7+NkPWJY9jfaY+iBsPaktgnrJB8WOnHCxDetA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kbmAXxQaSjOLhpzEKi2ciOFv/tHgB8oXQ66FKt36Q5c=;
+ b=zOP/PYc+N0rDQK8JvHr5rO5oZcMrFrGNgLaG3Rxe21CMpUZSsdSvrONkGbjLrkNaZsO5CZt9tGn1p/ZUHS895nQHSiQdyJdUfTvvPcuumV5XnpuL6HJf7bTSw43CXmqwzD7A5WzHqNcT2NGQlFjRSdnY3CXWlSqyzj/12CNicWqN69zacDpyhkXZX6/6vuvLsWfCvINp2S5mDU9nYDDkgI3PZtzslSLWZni9ItzhEW/+yr9zUXodRRdNixH1dlfPS3R3RAkfRFJtdNxFrn145noAcW56LnqTfU6Bbjgfi96NY4aDx3swvwzDb+czvRmND/G797I0GSe6McErQ/2s7g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kbmAXxQaSjOLhpzEKi2ciOFv/tHgB8oXQ66FKt36Q5c=;
+ b=cCimE9+ke3RSN5i+YDjXuwR9udD7+zS0u8vj4TYzr8IxLOqGPuvp1VYLB76OdR3e1sMmymB+xU6sF+Dt5bfAJc/rHup+VrNK7gLH4K0Q+L0/FumJudj8gd8w3IBGjtlJ7IqlDh0uHeA/pH9kaQoMGGIYDzDzwG9jQUBvizTlKls=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by IA1PR12MB9029.namprd12.prod.outlook.com (2603:10b6:208:3f0::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.35; Mon, 14 Apr
+ 2025 13:14:53 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%6]) with mapi id 15.20.8632.025; Mon, 14 Apr 2025
+ 13:14:53 +0000
+Message-ID: <1989d6b4-905c-4784-ba68-5a0e97ecaeab@amd.com>
+Date: Mon, 14 Apr 2025 14:14:49 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 11/23] cxl: define a driver interface for HPA free
+ space enumeration
+Content-Language: en-US
+To: Dave Jiang <dave.jiang@intel.com>, alejandro.lucero-palau@amd.com,
+ linux-cxl@vger.kernel.org, netdev@vger.kernel.org, dan.j.williams@intel.com,
+ edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com
+References: <20250331144555.1947819-1-alejandro.lucero-palau@amd.com>
+ <20250331144555.1947819-12-alejandro.lucero-palau@amd.com>
+ <8b954086-a896-4787-aa0b-cdf796e6d3bc@intel.com>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <8b954086-a896-4787-aa0b-cdf796e6d3bc@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P123CA0224.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:1a6::13) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 3/3] net: stmmac: Add DWMAC glue layer for
- Renesas GBETH
-To: Prabhakar <prabhakar.csengg@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Philipp Zabel <p.zabel@pengutronix.de>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Magnus Damm <magnus.damm@gmail.com>,
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Jose Abreu <joabreu@synopsys.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org,
- Biju Das <biju.das.jz@bp.renesas.com>,
- Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
- Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-References: <20250407120317.127056-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250407120317.127056-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Language: en-GB
-From: Paul Barker <paul.barker.ct@bp.renesas.com>
-In-Reply-To: <20250407120317.127056-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------5XZcBvmkaTabxuEc9swqfILM"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|IA1PR12MB9029:EE_
+X-MS-Office365-Filtering-Correlation-Id: 43cac266-8fbd-42a0-f16a-08dd7b565804
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?aEZMSXF5eXdGQVhxWmM3Qk83Q25IZVFNVVdJNTR6N3dlWnRBWWJRZE84eStn?=
+ =?utf-8?B?WEd2djJrZm16VlFiTWhCVHlmeVhDd1pvREZQNitlV1dWUnpJdlA3Rm9hSVUr?=
+ =?utf-8?B?bW11OUxvNUIyb0dzQTZjdzdqQm41OFB1dzRmRjkvbTh2b3Y2RXlzYjRjM2lR?=
+ =?utf-8?B?WGZ3OFdpaUgxRXJwS1BFR1pMR3Y5MDBKMzFHK2d1S0J3MG5xUTc4bStKYWR2?=
+ =?utf-8?B?dG84N2JtMDFidUUwaUQ5cFhoTC84QWZuNUJxRGVjeEJkdUJ3S2N4V0UvZnhz?=
+ =?utf-8?B?QlZrVlB1cTVGMlRqb2JIZmQ2alN5YnpFbHl3R0NGbkpUd2JaT1FvRW16S3NG?=
+ =?utf-8?B?VlBiYXZGdmdYS0lmeFpyKzJ1c1J3NmNGN1R5a3c0ZHVaRFBqVVMyZWhkYzM2?=
+ =?utf-8?B?azYxL3NVbjM4Zk4rUmZTK0Y4TWE2SlRqeFg5Nm5qdmVWbzhJMTE3cWdBQWw4?=
+ =?utf-8?B?TDJrVFZFNjhIa0RnNG12UDN5THFIRVh6QzBFdzVaRC92SEVpbmRabWZyM0Vo?=
+ =?utf-8?B?SHZVUkJZRUw3Sm1yZDRscngxdW4vTUVzeTZEbkpBeDRGblo0OHZ3WHlMc2RN?=
+ =?utf-8?B?cjhYcmJic3JJVEdzOUxTRHRyU3pLak5KM1NwdHNUSkZRM0NQSTV5K3pOaFo2?=
+ =?utf-8?B?WFZTOHBpdE1iUjVSZTRzMStGbTVjbytIYWZqQklLVzNDUFpmS1Qvd09iV2Ux?=
+ =?utf-8?B?QllaeEh5bG1nTUlnVExsUld4VC9BeWtHT2VoTk0rb0QybWIwaDk3QzZaZm1v?=
+ =?utf-8?B?WjUrd3o0aG50M1Mycy9UeWIzdHdyTDZEOEFwS29Xc012MENtZjg1djl5SkhY?=
+ =?utf-8?B?OC95LzhpdE9VbmVoSWY5RUhCVW04cnhuemVqRDFMc2xiUUhNaW5MRk1RV3Q3?=
+ =?utf-8?B?d3I2Mmt1Ukt6TEFiSUhVVkZLcUNMVkxZRkROZGdGTWY1S0UyMDdMdEtzUVBI?=
+ =?utf-8?B?eWpBUnAvRnpiWjNtcWJRc1ptUGROdnRpd29HWUhQT1k5T3BHakJxbGZIU2ZN?=
+ =?utf-8?B?OXNrWlZYNjdNaWJWR0VVamUwMXo3QmNGN1lUelFXRkt2Q1NFRlZMTzRLSldM?=
+ =?utf-8?B?QXhId3VlSHBnbWI2aXFjSGtTNkF2d1oreWV5RnBHQWtabVpBeGNuM2hWOWFO?=
+ =?utf-8?B?Wmt3WkVUR0g3OTNrYS9nL1pnSE93R0ppU2djRlg0T3M2b3FaZ2drY0VGNFd3?=
+ =?utf-8?B?Ylp6V3cxTVR0U0VKYnJTc2FHRE1sSkd0RDd0MkJoODhXekkxVGpTRVU1R09v?=
+ =?utf-8?B?OHdLYmFnc1RQTFl0MitNMTN1K0dpQ3hubCtFVnA1RnF0MEtiOG4rOUU5M2ty?=
+ =?utf-8?B?a2hOZjJvLy9nOVJHc3JNOGNwTGVzYVI5TWgvYUF4bUpmU1l2YldSY0Y2bGg0?=
+ =?utf-8?B?NkxMelFYYlR3V1dYQmRPUENadG1jclhtSnVFMDVxS0NacFRnNmhYeW9QNmFz?=
+ =?utf-8?B?TDBtVWpDdk00QW04MVJSR1pTNGovaUZ6elorSzdCd24xdFMraFlqY1lGWG52?=
+ =?utf-8?B?WjNmTWp0TkZ0b3h2dWQrazVPU0UzckdOYkhQWDhscVlDZzJMdFVMRE5WVGVv?=
+ =?utf-8?B?ZXE1RGZMeGx4VHdMckgzeFJkQzBKSXFUMC82dElzckFVSHRYV0UzKytFdGhr?=
+ =?utf-8?B?dVpBYzJjK1ZEbWdkV3RzZmJNemlUNVRTK0Nldk40R2xrVlVYK2Zxb0tkZ0Z4?=
+ =?utf-8?B?L09pcW15YmR1eFF0bCtnM1RwQmszYTU2ZC9LQkhXTFlTdng5cWNMa3Y3NS9I?=
+ =?utf-8?B?cWxROE1NK0xFelExM0REcFVPdVRnc1dLNGZCZzBGUGVLRW10UkhZY3pFU21a?=
+ =?utf-8?B?Z0RkRCtyUStydHovUnNlOEcwbGZKbkVWQzYrR2c4bTg1YVk3cVAyM1VhdGxa?=
+ =?utf-8?B?ZzI1aFFnNGRlOS9RR3JOdzlrNFlROGZyeHk4Q3BMZEFNQzJnb0FkZy9nT2dD?=
+ =?utf-8?B?cC9rSHdRa3RaUkxYR0NWNENHc3VwMWY3ZU5jN29zblhzdkNWYWpmU1lUWk8r?=
+ =?utf-8?B?T2NhdllDRVJRPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MTJHVTVBYVh6b0UyWGc2VGdBNlNIR2toU1B0T0ptckxtVkRLNldlL2RETjZY?=
+ =?utf-8?B?bHVLWUxVcjZ6WncxMkc0SjRuQkRiU1hRVnIyTVNxWHVvWlZiM0tXalpnTjRW?=
+ =?utf-8?B?ZDVXR0lHcVVZT1RabUozNVVjb29rN3BMeFkwbVpINktZTkNmOGV6Z3JZdjhL?=
+ =?utf-8?B?RjNhc1UzT0E1VzRoM3ViREJQS0d4MERHTjZWM3pSb1JTTHJ1cFdZd1k5ZzU2?=
+ =?utf-8?B?Q1dLRDlVZnBWc3lDV0pIeVJOVS9ocTlEaWRFb3lkUmhwOExkcFNlcThKZjdZ?=
+ =?utf-8?B?TWUwdXBMTnVHTE1GTmczR0IrYnVoUzh3cTBwTDJwZHcrRnFLZFhkdWoySEJl?=
+ =?utf-8?B?cWVpdDJVUW9RSHFkb2YwT0I3ajVGSjFZUENZNGFOdDM1YmFpNGJkckZBcHdG?=
+ =?utf-8?B?SVVUZ3hvSFQwZjFsRjJTMXZ1dHhHdUVNcjJEMHI3M2s4NWk2ZG02OTdyL2E3?=
+ =?utf-8?B?QTJ5QVB2RmFqcS80c2Y2ZjllYjk4OHdnZDNXTUNuczl4dEkzQytVNVU2K29M?=
+ =?utf-8?B?SlRYK2pjejFoQlpESGFjdkYySUZaUzZhMjBjaVZwanQ0VHVMM0lVcWduTnB0?=
+ =?utf-8?B?aGJDWTNpc1V0bThNUllTVkhwTCtWLzRYbDlHeTVUUTRjM243NXhKSXcyOFVr?=
+ =?utf-8?B?c0hweStxSnhoUHNBOCtLdytQLzZmR3RHK1ZsVmdWQ3pjK01hSmRvUHZjQXJG?=
+ =?utf-8?B?WGFtL1pqSHAwS000L3ZPeC9hTFZyWnZyVlhlUVprVGFvdEY4SWwzRWtFUmR4?=
+ =?utf-8?B?dWpyRkozWXNjNUM5YzdCTC92WlQ4aTNDejN1ZWpVWFZXaVo3UXZ2V0NJZG5C?=
+ =?utf-8?B?SUViajRyNjFQTmRlWU4xalNwNy9uS2Vsa1MrN2x0MjI2UGNXd1lLSk8wRkJu?=
+ =?utf-8?B?ZjlEakJxM0wrTDlVZ0VYcDM3eW5DbGYvWDY3TjBCaVdvNXl5VmVNMytvb0oz?=
+ =?utf-8?B?dVpPcXB1WGdMY0FJZVorVmNnYklxQkhOdy9VS2tMMHdaYzFXbExleS9wb2NJ?=
+ =?utf-8?B?VmhGNDlRQjRIdWRQcVNzczNCR3RnVVFxb2lxTjNmRURqQnVXYmN3cHIrVGhO?=
+ =?utf-8?B?YjY4N3pMYzlnd1Z0VmhrbmRDaXRPdFVHdTQ3dUwxcXNsN2l1WEFyR3J4SnlC?=
+ =?utf-8?B?dDVLeXQyVGNhSXh0c25lblhLdUdsdXdWNUdqWi9sdUl6SzFYZ3crVkhhR0Y4?=
+ =?utf-8?B?VEtuSDdPNHFiRlpFb1drektieC8yVDBPVG1DWUZKZUxjb2lIT2VhSjhhd1dk?=
+ =?utf-8?B?T1laajNDV0tXMFRHcFRKVlN4a0pvQUcxYndnWmZNTDJzaHJaYmVIV1pLQWpC?=
+ =?utf-8?B?L0pWeHJrRkgyNDdtTTZQVEFockdjZGFhME9ZdmlvUTFKb3ZMeUd3K3IxSERk?=
+ =?utf-8?B?MS9CcVQ5QUdFbGkyRnFNQkxOSXZWTXpIUDN1Q1ZkYnprcEorcDdwdlhBdXhZ?=
+ =?utf-8?B?SXZacmNGK1k1MERSa2d1T1krcWNSNWg5VUx2NjF3dURsb21rRVZkUVFDcy9m?=
+ =?utf-8?B?amNiUDNTdXJPR1JQQ1crblp0czFnWWRKNEZJSng4ZG1sRnMwWGVzZ1hUNkx1?=
+ =?utf-8?B?Y1p5L1FvQTM4TmtMVCszTzZkM2V3bzV5c0grWEpZRjd6UjVYWFliSlZYRWtk?=
+ =?utf-8?B?MklydVpOandnZVl3bVFLUmdIbUJKeEZZMGRPb2haNFo3LzNTTFZpM3d0cjVR?=
+ =?utf-8?B?azd3L1AxYS9QWHFYc2t4Z0ZSS3RCN25ubzVvWldXS2VSSUpnWnBoY0YvMk1x?=
+ =?utf-8?B?Y1RhQ2FWclJ5akpFYStqamtpN2MwVHlwdkR4d0UxY25LQVM2OWFWQjdqTmdG?=
+ =?utf-8?B?UTFuUHlpRSs3QjVhL3h0cG9WTXA4OHdsM3Y2UGFndHV3UU5DalA4OWpQb2Y5?=
+ =?utf-8?B?T2FoQUY5ZHB2alBrMGliUytmazB6cktnMVl0T1kzK1hiV0txZ0Ixc3JHN3RS?=
+ =?utf-8?B?aW1TS1c3KzYzeXMwM1ljZDdMSjJFYzZkL2o5Zm5NR2tpMGgwa0E5ZGU0NzlY?=
+ =?utf-8?B?TUg3U09paUkvMEdjd1VmUVFmS25XK0hUNFQ3QlBzL3RpNUxTdUhUQVdXRXV0?=
+ =?utf-8?B?VU1FTTVQZVBLaXBiV2dwaFVpc25FWGFDNmxQN2JRM01IWTdENk9pcVNzbUdF?=
+ =?utf-8?Q?qzuxfGigDkMUAqDp1t19R3yNn?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 43cac266-8fbd-42a0-f16a-08dd7b565804
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Apr 2025 13:14:53.3151
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: o5oNSGqRxsRjXQWeNH73mcKDEyxW7LIsIpYRCHJKAnDo+518NaStXDkuNMJLT/xufwxiz2nka0slZ+s3ZGF2kw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB9029
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------5XZcBvmkaTabxuEc9swqfILM
-Content-Type: multipart/mixed; boundary="------------ueneKmR1e1Faq6614lRwIjUE";
- protected-headers="v1"
-From: Paul Barker <paul.barker.ct@bp.renesas.com>
-To: Prabhakar <prabhakar.csengg@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Philipp Zabel <p.zabel@pengutronix.de>,
- Geert Uytterhoeven <geert+renesas@glider.be>,
- Magnus Damm <magnus.damm@gmail.com>,
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Jose Abreu <joabreu@synopsys.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org,
- Biju Das <biju.das.jz@bp.renesas.com>,
- Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
- Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Message-ID: <f20e6589-37d9-458b-af82-92fb1ed0db18@bp.renesas.com>
-Subject: Re: [PATCH net-next v5 3/3] net: stmmac: Add DWMAC glue layer for
- Renesas GBETH
-References: <20250407120317.127056-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250407120317.127056-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
-In-Reply-To: <20250407120317.127056-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
 
---------------ueneKmR1e1Faq6614lRwIjUE
-Content-Type: multipart/mixed; boundary="------------Zc6ku6fXf3RcrzFBSscMfX9c"
+On 4/11/25 22:30, Dave Jiang wrote:
+>
+> On 3/31/25 7:45 AM, alejandro.lucero-palau@amd.com wrote:
+>> From: Alejandro Lucero <alucerop@amd.com>
+>>
+>>
+>> +	if (!root) {
+>> +		dev_dbg(&endpoint->dev, "endpoint can not be related to a root port\n");
+>> +		return ERR_PTR(-ENXIO);
+>> +	}
+>> +
+>> +	root_port = &root->port;
+>> +	down_read(&cxl_region_rwsem);
+>> +	device_for_each_child(&root_port->dev, &ctx, find_max_hpa);> +	up_read(&cxl_region_rwsem);
+> Since we are moving new code to guard(),
+>
+> scoped_guard(rwsem_read, &cxl_region_rwsem)
+> 	device_for_each_child(&root_port->dev, &ctx, find_max_hpa);
+>
+> DJ
 
---------------Zc6ku6fXf3RcrzFBSscMfX9c
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
 
-Hi Prabhakar,
+I'll do.
 
-On 07/04/2025 13:03, Prabhakar wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
->=20
-> Add the DWMAC glue layer for the GBETH IP found in the Renesas RZ/V2H(P=
-)
-> SoC.
->=20
-> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Thanks
 
-[snip]
-
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c =
-b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-> new file mode 100644
-> index 000000000000..a0f7cacea810
-> --- /dev/null
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-> @@ -0,0 +1,165 @@
-> +// SPDX-License-Identifier: GPL-2.0+
-> +/*
-> + * dwmac-renesas-gbeth.c - DWMAC Specific Glue layer for Renesas GBETH=
-
-> + *
-> + * The Rx and Tx clocks are supplied as follows for the GBETH IP.
-> + *
-> + *                         Rx / Tx
-> + *   -------+------------- on / off -------
-> + *          |
-> + *          |            Rx-180 / Tx-180
-> + *          +---- not ---- on / off -------
-> + *
-> + * Copyright (C) 2025 Renesas Electronics Corporation
-> + */
-> +
-> +#include <linux/clk.h>
-> +#include <linux/device.h>
-> +#include <linux/module.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/reset.h>
-> +
-> +#include "dwmac4.h"
-
-I'm looking at this while working on RZ/T2H Ethernet support, clangd
-says inclusion of dwmac4.h is not needed here and compilation succeeds
-with the include removed.
-
-Thanks,
-
---=20
-Paul Barker
---------------Zc6ku6fXf3RcrzFBSscMfX9c
-Content-Type: application/pgp-keys; name="OpenPGP_0x27F4B3459F002257.asc"
-Content-Disposition: attachment; filename="OpenPGP_0x27F4B3459F002257.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-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3D
-=3DsIIN
------END PGP PUBLIC KEY BLOCK-----
-
---------------Zc6ku6fXf3RcrzFBSscMfX9c--
-
---------------ueneKmR1e1Faq6614lRwIjUE--
-
---------------5XZcBvmkaTabxuEc9swqfILM
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wnsEABYIACMWIQSiu8gv1Xr0fIw/aoLbaV4Vf/JGvQUCZ/0KAQUDAAAAAAAKCRDbaV4Vf/JGvVy9
-AQC8bBQR7l5ED4UfiLb0EhysVsbVdBOhfqkFNise9GXRIAD+OwNb0RGxiJZGo/+yeHP1gGhfWVRI
-+rBlwKWwdQaQ6A4=
-=dLCZ
------END PGP SIGNATURE-----
-
---------------5XZcBvmkaTabxuEc9swqfILM--
 
