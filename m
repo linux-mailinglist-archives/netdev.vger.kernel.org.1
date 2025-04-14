@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-182419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DB86A88AEC
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 20:20:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94ABBA88AED
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 20:21:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B8AD178B04
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:20:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C65D3189904E
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:21:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C521728A1F8;
-	Mon, 14 Apr 2025 18:20:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7205D288C94;
+	Mon, 14 Apr 2025 18:21:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="AU5k80ao"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="LpQ3IKQ9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28C27288C94
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:20:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B62E2DFA4D
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:21:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744654852; cv=none; b=YZjlfMhawJy+AypiBxGqDS5CzwrOQ1WMnJBpLDIaQ8CYFSCJFafLrymA0d4neh29NtbzoP+NJ86SNKb4Mq31atE9SXU40pS4PGgoQDZ1B/gOpJgUEjPZCfvVCY4HC64EgIeouJ4AVvgB3v5mMdA4a3KiuwYFizsOLTwhOk/r3bU=
+	t=1744654873; cv=none; b=uHxlWm4W0nWfRHjJD+vSCKIhwILmk8lRE5Ecl6+CqLDop1873NP6qRXlsH4r5H6X08u0xR7iyzGxVhUHgeidu77MTfyB5pKFsmCjash0ga9FKk+nut+xyVxgXEGLdGWoWrdU7wgrKKJxkcIfUufCgbZ2K6QAUboV2AXJwZ8GwXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744654852; c=relaxed/simple;
-	bh=yqwHSC+ZrOU/b77QfqFX3WmOoNK8Ae1Fu9lk0uQ9+Rg=;
+	s=arc-20240116; t=1744654873; c=relaxed/simple;
+	bh=lkfx4wEUBDtgGmfx40gFypPYhkAcypCC2TieschWJKA=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YhKk5nujnhEtK6KYxbnhgdX6rBjH0mvdG0bX039vJYRnvKsw1hblROtPsiz211WFwpnliPmf2jGnc2CT74HvvMyzh7EdeE54SG7W5BiWebRObTIzoqPcyP09n++HJvKnnnB0vOMS5p8EVe5TwPBUDfEOuAlg11O54uLthLPwcSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=AU5k80ao; arc=none smtp.client-ip=207.171.188.206
+	 MIME-Version:Content-Type; b=hzRp4mcMWg0mbFs5Y4JDmVOmDjJQnye/seoOvLCKxXxWjpOjg58rUjqiMZYd5L6Vot3bsuQivnPY/s1+OD7zwIvdN/LNTv241G8+O5/SqPdumWv5iXB96XVaoY9ObPW9Kgzv1NRPwoxE8GJtpSPlTGp7pztMwhmFtPy6OpPo3xQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=LpQ3IKQ9; arc=none smtp.client-ip=52.119.213.154
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1744654851; x=1776190851;
+  t=1744654872; x=1776190872;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=zZdh8rMF+q/XqULGU6qPfPEhaQ/b/Ju4EI9IQkvXYVM=;
-  b=AU5k80ao9/xbKgw/sfKHzMO98CzgXOY0zPgP4bujI4CQ9WrWWjsfS5+c
-   AokkBZlVUILHOEYTO5aCa+0WfVgGiDFaYSuUaQvi24K9S7GFefyQZvBWg
-   aVugOUsZ/8c1fOsx+gpGbEqRtla2/60iPNnrQ/zXd2lskBfyn2OtYG88n
-   g=;
+  bh=/OahKHp4RzMtryuDF5g+wSvmQOb/zOm0amXNribpGvI=;
+  b=LpQ3IKQ9R4Rt8rK55uFtuWUZI2mIYzd4HyH21er09nC1VYVwNFDKC4ah
+   FFB7J5yaAdbHJbWZoeddIfkLOm2cNcRAWVBdovzFoU38Wtq+EW7ueprPF
+   yRu/iuIBq9/b2P/aFTjIxoZ4DlhtJtZ+lGbj+u7w9kFBO8burATLL3duc
+   s=;
 X-IronPort-AV: E=Sophos;i="6.15,212,1739836800"; 
-   d="scan'208";a="815946686"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2025 18:20:45 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:8409]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.132:2525] with esmtp (Farcaster)
- id 2a91ca03-1dd8-4060-b2a7-948afe2da5ed; Mon, 14 Apr 2025 18:20:44 +0000 (UTC)
-X-Farcaster-Flow-ID: 2a91ca03-1dd8-4060-b2a7-948afe2da5ed
+   d="scan'208";a="288349837"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2025 18:21:10 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:28340]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.21.195:2525] with esmtp (Farcaster)
+ id ed000482-c344-4ee1-99ff-7917231b8019; Mon, 14 Apr 2025 18:21:09 +0000 (UTC)
+X-Farcaster-Flow-ID: ed000482-c344-4ee1-99ff-7917231b8019
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 14 Apr 2025 18:20:43 +0000
+ Mon, 14 Apr 2025 18:21:07 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.187.170.39) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 14 Apr 2025 18:20:41 +0000
+ Mon, 14 Apr 2025 18:21:05 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
  Abeni" <pabeni@redhat.com>
 CC: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH RESEND v2 net-next 13/14] ipv6: Protect nh->f6i_list with spinlock and flag.
-Date: Mon, 14 Apr 2025 11:15:01 -0700
-Message-ID: <20250414181516.28391-14-kuniyu@amazon.com>
+Subject: [PATCH RESEND v2 net-next 14/14] ipv6: Get rid of RTNL for SIOCADDRT and RTM_NEWROUTE.
+Date: Mon, 14 Apr 2025 11:15:02 -0700
+Message-ID: <20250414181516.28391-15-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250414181516.28391-1-kuniyu@amazon.com>
 References: <20250414181516.28391-1-kuniyu@amazon.com>
@@ -77,151 +77,144 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D039UWB002.ant.amazon.com (10.13.138.79) To
+X-ClientProxiedBy: EX19D035UWA002.ant.amazon.com (10.13.139.60) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-We will get rid of RTNL from RTM_NEWROUTE and SIOCADDRT.
+Now we are ready to remove RTNL from SIOCADDRT and RTM_NEWROUTE.
 
-Then, we may be going to add a route tied to a dying nexthop.
+The remaining things to do are
 
-The nexthop itself is not freed during the RCU grace period, but
-if we link a route after __remove_nexthop_fib() is called for the
-nexthop, the route will be leaked.
+  1. pass false to lwtunnel_valid_encap_type_attr()
+  2. use rcu_dereference_rtnl() in fib6_check_nexthop()
+  3. place rcu_read_lock() before ip6_route_info_create_nh().
 
-To avoid the race between IPv6 route addition under RCU vs nexthop
-deletion under RTNL, let's add a dead flag and protect it and
-nh->f6i_list with a spinlock.
+Let's complete the RTNL-free conversion.
 
-__remove_nexthop_fib() acquires the nexthop's spinlock and sets false
-to nh->dead, then calls ip6_del_rt() for the linked route one by one
-without the spinlock because fib6_purge_rt() acquires it later.
+When each CPU-X adds 100000 routes on table-X in a batch
+concurrently on c7a.metal-48xl EC2 instance with 192 CPUs,
 
-While adding an IPv6 route, fib6_add() acquires the nexthop lock and
-checks the dead flag just before inserting the route.
+without this series:
+
+  $ sudo ./route_test.sh
+  ...
+  added 19200000 routes (100000 routes * 192 tables).
+  time elapsed: 191577 milliseconds.
+
+with this series:
+
+  $ sudo ./route_test.sh
+  ...
+  added 19200000 routes (100000 routes * 192 tables).
+  time elapsed: 62854 milliseconds.
+
+I changed the number of routes in each table (1000 ~ 100000)
+and consistently saw it finish 3x faster with this series.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- include/net/nexthop.h |  2 ++
- net/ipv4/nexthop.c    | 18 +++++++++++++++---
- net/ipv6/ip6_fib.c    | 30 +++++++++++++++++++++++++-----
- 3 files changed, 42 insertions(+), 8 deletions(-)
+ net/ipv4/nexthop.c |  4 ++--
+ net/ipv6/route.c   | 18 ++++++++++++------
+ 2 files changed, 14 insertions(+), 8 deletions(-)
 
-diff --git a/include/net/nexthop.h b/include/net/nexthop.h
-index d9fb44e8b321..572e69cda476 100644
---- a/include/net/nexthop.h
-+++ b/include/net/nexthop.h
-@@ -152,6 +152,8 @@ struct nexthop {
- 	u8			protocol;   /* app managing this nh */
- 	u8			nh_flags;
- 	bool			is_group;
-+	bool			dead;
-+	spinlock_t		lock;       /* protect dead and f6i_list */
- 
- 	refcount_t		refcnt;
- 	struct rcu_head		rcu;
 diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-index 467151517023..5e47166512e2 100644
+index 5e47166512e2..329f33a2be51 100644
 --- a/net/ipv4/nexthop.c
 +++ b/net/ipv4/nexthop.c
-@@ -541,6 +541,7 @@ static struct nexthop *nexthop_alloc(void)
- 		INIT_LIST_HEAD(&nh->f6i_list);
- 		INIT_LIST_HEAD(&nh->grp_list);
- 		INIT_LIST_HEAD(&nh->fdb_list);
-+		spin_lock_init(&nh->lock);
- 	}
- 	return nh;
+@@ -1556,12 +1556,12 @@ int fib6_check_nexthop(struct nexthop *nh, struct fib6_config *cfg,
+ 	if (nh->is_group) {
+ 		struct nh_group *nhg;
+ 
+-		nhg = rtnl_dereference(nh->nh_grp);
++		nhg = rcu_dereference_rtnl(nh->nh_grp);
+ 		if (nhg->has_v4)
+ 			goto no_v4_nh;
+ 		is_fdb_nh = nhg->fdb_nh;
+ 	} else {
+-		nhi = rtnl_dereference(nh->nh_info);
++		nhi = rcu_dereference_rtnl(nh->nh_info);
+ 		if (nhi->family == AF_INET)
+ 			goto no_v4_nh;
+ 		is_fdb_nh = nhi->fdb_nh;
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index c026f8fe5f78..5ccbbfb68e3d 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -3902,12 +3902,16 @@ int ip6_route_add(struct fib6_config *cfg, gfp_t gfp_flags,
+ 	if (IS_ERR(rt))
+ 		return PTR_ERR(rt);
+ 
++	rcu_read_lock();
++
+ 	err = ip6_route_info_create_nh(rt, cfg, extack);
+ 	if (err)
+-		return err;
++		goto unlock;
+ 
+ 	err = __ip6_ins_rt(rt, &cfg->fc_nlinfo, extack);
+ 	fib6_info_release(rt);
++unlock:
++	rcu_read_unlock();
+ 
+ 	return err;
  }
-@@ -2118,7 +2119,7 @@ static void remove_nexthop_group(struct nexthop *nh, struct nl_info *nlinfo)
- /* not called for nexthop replace */
- static void __remove_nexthop_fib(struct net *net, struct nexthop *nh)
- {
--	struct fib6_info *f6i, *tmp;
-+	struct fib6_info *f6i;
- 	bool do_flush = false;
- 	struct fib_info *fi;
+@@ -4528,12 +4532,10 @@ int ipv6_route_ioctl(struct net *net, unsigned int cmd, struct in6_rtmsg *rtmsg)
  
-@@ -2129,13 +2130,24 @@ static void __remove_nexthop_fib(struct net *net, struct nexthop *nh)
- 	if (do_flush)
- 		fib_flush(net);
+ 	switch (cmd) {
+ 	case SIOCADDRT:
+-		rtnl_lock();
+ 		/* Only do the default setting of fc_metric in route adding */
+ 		if (cfg.fc_metric == 0)
+ 			cfg.fc_metric = IP6_RT_PRIO_USER;
+ 		err = ip6_route_add(&cfg, GFP_KERNEL, NULL);
+-		rtnl_unlock();
+ 		break;
+ 	case SIOCDELRT:
+ 		err = ip6_route_del(&cfg, NULL);
+@@ -5112,7 +5114,7 @@ static int rtm_to_fib6_multipath_config(struct fib6_config *cfg,
+ 	} while (rtnh_ok(rtnh, remaining));
  
--	/* ip6_del_rt removes the entry from this list hence the _safe */
--	list_for_each_entry_safe(f6i, tmp, &nh->f6i_list, nh_list) {
-+	spin_lock_bh(&nh->lock);
-+
-+	nh->dead = true;
-+
-+	while (!list_empty(&nh->f6i_list)) {
-+		f6i = list_first_entry(&nh->f6i_list, typeof(*f6i), nh_list);
-+
- 		/* __ip6_del_rt does a release, so do a hold here */
- 		fib6_info_hold(f6i);
-+
-+		spin_unlock_bh(&nh->lock);
- 		ipv6_stub->ip6_del_rt(net, f6i,
- 				      !READ_ONCE(net->ipv4.sysctl_nexthop_compat_mode));
-+
-+		spin_lock_bh(&nh->lock);
- 	}
-+
-+	spin_unlock_bh(&nh->lock);
+ 	return lwtunnel_valid_encap_type_attr(cfg->fc_mp, cfg->fc_mp_len,
+-					      extack, newroute);
++					      extack, false);
  }
  
- static void __remove_nexthop(struct net *net, struct nexthop *nh,
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index 9e9db5470bbf..dac9596cf532 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -1048,8 +1048,14 @@ static void fib6_purge_rt(struct fib6_info *rt, struct fib6_node *fn,
- 	rt6_flush_exceptions(rt);
- 	fib6_drop_pcpu_from(rt, table);
+ static int rtm_to_fib6_config(struct sk_buff *skb, struct nlmsghdr *nlh,
+@@ -5250,7 +5252,7 @@ static int rtm_to_fib6_config(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 		cfg->fc_encap_type = nla_get_u16(tb[RTA_ENCAP_TYPE]);
  
--	if (rt->nh && !list_empty(&rt->nh_list))
--		list_del_init(&rt->nh_list);
-+	if (rt->nh) {
-+		spin_lock(&rt->nh->lock);
-+
-+		if (!list_empty(&rt->nh_list))
-+			list_del_init(&rt->nh_list);
-+
-+		spin_unlock(&rt->nh->lock);
-+	}
- 
- 	if (refcount_read(&rt->fib6_ref) != 1) {
- 		/* This route is used as dummy address holder in some split
-@@ -1498,7 +1504,23 @@ int fib6_add(struct fib6_node *root, struct fib6_info *rt,
+ 		err = lwtunnel_valid_encap_type(cfg->fc_encap_type,
+-						extack, newroute);
++						extack, false);
+ 		if (err < 0)
+ 			goto errout;
  	}
- #endif
+@@ -5517,6 +5519,8 @@ static int ip6_route_multipath_add(struct fib6_config *cfg,
+ 	if (err)
+ 		return err;
  
--	err = fib6_add_rt2node(fn, rt, info, extack, &purge_list);
-+	if (rt->nh) {
-+		spin_lock(&rt->nh->lock);
++	rcu_read_lock();
 +
-+		if (rt->nh->dead) {
-+			NL_SET_ERR_MSG(extack, "Nexthop has been deleted");
-+			err = -EINVAL;
-+		} else {
-+			err = fib6_add_rt2node(fn, rt, info, extack, &purge_list);
-+			if (!err)
-+				list_add(&rt->nh_list, &rt->nh->f6i_list);
-+		}
+ 	err = ip6_route_mpath_info_create_nh(&rt6_nh_list, extack);
+ 	if (err)
+ 		goto cleanup;
+@@ -5608,6 +5612,8 @@ static int ip6_route_multipath_add(struct fib6_config *cfg,
+ 	}
+ 
+ cleanup:
++	rcu_read_unlock();
 +
-+		spin_unlock(&rt->nh->lock);
-+	} else {
-+		err = fib6_add_rt2node(fn, rt, info, extack, &purge_list);
-+	}
-+
- 	if (!err) {
- 		struct fib6_info *iter, *next;
+ 	list_for_each_entry_safe(nh, nh_safe, &rt6_nh_list, next) {
+ 		fib6_info_release(nh->fib6_info);
+ 		list_del(&nh->next);
+@@ -6890,7 +6896,7 @@ static void bpf_iter_unregister(void)
  
-@@ -1508,8 +1530,6 @@ int fib6_add(struct fib6_node *root, struct fib6_info *rt,
- 			fib6_info_release(iter);
- 		}
- 
--		if (rt->nh)
--			list_add(&rt->nh_list, &rt->nh->f6i_list);
- 		__fib6_update_sernum_upto_root(rt, fib6_new_sernum(info->nl_net));
- 
- 		if (rt->fib6_flags & RTF_EXPIRES)
+ static const struct rtnl_msg_handler ip6_route_rtnl_msg_handlers[] __initconst_or_module = {
+ 	{.owner = THIS_MODULE, .protocol = PF_INET6, .msgtype = RTM_NEWROUTE,
+-	 .doit = inet6_rtm_newroute},
++	 .doit = inet6_rtm_newroute, .flags = RTNL_FLAG_DOIT_UNLOCKED},
+ 	{.owner = THIS_MODULE, .protocol = PF_INET6, .msgtype = RTM_DELROUTE,
+ 	 .doit = inet6_rtm_delroute, .flags = RTNL_FLAG_DOIT_UNLOCKED},
+ 	{.owner = THIS_MODULE, .protocol = PF_INET6, .msgtype = RTM_GETROUTE,
 -- 
 2.49.0
 
