@@ -1,115 +1,148 @@
-Return-Path: <netdev+bounces-182396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66EBEA88AA8
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 20:03:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E27BAA88AB0
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 20:06:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C03E1189A7D2
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:03:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 20DA87A8358
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:05:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BF0428A1FB;
-	Mon, 14 Apr 2025 18:03:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC0E28A1FB;
+	Mon, 14 Apr 2025 18:06:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="jWPjvl2A"
+	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="vSMFu7i0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B040328A1D8;
-	Mon, 14 Apr 2025 18:03:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 306D0280A4D;
+	Mon, 14 Apr 2025 18:06:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744653794; cv=none; b=kt1SQi5AcACFLUrGAbHz3Glyi7y/S5ZFlJCTIkkn1P5HFmDgAsNUAZLEo9jiiotbVkK33kzVEf4i60ABEnHUDGSueMDDfMviOTb5eMPvGPQOg4FJ2YYgENGXwGrCkgKXqB+aIXOwL58onmyotEj7Drwuyxez/4x+PLw7J6+tdm0=
+	t=1744653965; cv=none; b=nlgN/nWa/N091xetyvUsoXi/Tsb0KCtZdQJ3hEWF200nyl9jb75Wi0q1LewOKPEelOjLMXI3gKUBmtAxZ+3r7SzzBl7cA+GLLqcOHuM5fKCO1yLxEwrpQ8oaVgi0QqWWOyUR0RCnnRrlakjHQoO1LKg0LnG4zry2whpDQcEp3kE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744653794; c=relaxed/simple;
-	bh=IvCN0e3lwsHf7OdOMBKG5+Nd/K9HqBR64ZQRpqFZl1E=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nbVq8FW4cdZmAcpHBHbC0VISNJpZlldi0SlS7prK4gw4+TUznFXd0k9fr2o5FqoQ4jj/iOmmsCtH1Ih3Q60JlWmDOzbB2oOM2SJo6jNLfuPgT0+tHZQp26GH3VyTkPW43C9piY0w/VFAmlzhmqsxgrJlpz6Mrh/xeAjTTsBGFlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=jWPjvl2A; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1744653793; x=1776189793;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Yuqhv70Qpdlh41BSvGFlFVdrjtED8FZobMK/ZVdtmRw=;
-  b=jWPjvl2ANJrWGwnDVyadm2b2CaV4yI6w8SbFJ8T4GRL0iDeeh9CM9J1A
-   R68d9UK3aXUMa7Ko5l1b+0IlfwSyOpghRL4aaylmt+1JbYhT5QgNwhV+8
-   +AD59D6tg6NT+tWwVg7jMZOcDv+P4AU3PUF9PQrMqTv4WU2ZTYvrxuSe6
-   o=;
-X-IronPort-AV: E=Sophos;i="6.15,212,1739836800"; 
-   d="scan'208";a="288344776"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2025 18:03:09 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:3005]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.132:2525] with esmtp (Farcaster)
- id 8731aede-ab58-43d1-809e-d3097ff60170; Mon, 14 Apr 2025 18:03:08 +0000 (UTC)
-X-Farcaster-Flow-ID: 8731aede-ab58-43d1-809e-d3097ff60170
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 14 Apr 2025 18:03:08 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.187.170.39) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 14 Apr 2025 18:03:05 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuba@kernel.org>
-CC: <cratiu@nvidia.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@fomichev.me>,
-	<syzbot+de1c7d68a10e3f123bdd@syzkaller.appspotmail.com>,
-	<syzkaller-bugs@googlegroups.com>
-Subject: Re: [syzbot] [net?] general protection fault in rtnl_create_link
-Date: Mon, 14 Apr 2025 11:01:59 -0700
-Message-ID: <20250414180257.24176-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250414103727.0ea92049@kernel.org>
-References: <20250414103727.0ea92049@kernel.org>
+	s=arc-20240116; t=1744653965; c=relaxed/simple;
+	bh=Bf2kK2Vw4Tc37/Kz4l3ukL8jF1/nrr/RnuXgsQDbdLs=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=eDJWnRYpctJnkmoQNSwZyGv0iYS888xUx2Y7LZpIyayLANsBSvIXcv656OGq4OcX0E2j8r15bSBr9bEP0EjnBXEuiYomXNHaWn3G4EVWtsYd11AUF7QEkY4b1coJhF0KnUtGszInjW3Z5wBKecH2UDFsDl0wj4/rvjVSIwjlUi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=vSMFu7i0; arc=none smtp.client-ip=213.160.73.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
+Received: from sven-desktop.home.narfation.org (unknown [IPv6:2a00:1ca0:1d86:99fc::ab85])
+	by dvalin.narfation.org (Postfix) with UTF8SMTPSA id 255F2202C6;
+	Mon, 14 Apr 2025 18:05:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
+	s=20121; t=1744653953;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=EOcHNaKvVT/0mARZxcxaig61vSP0GsRncJz7Dz1LbTQ=;
+	b=vSMFu7i02yBYutbzGc4yaiiv848nkAprKsfWC59Cm0HKIA6pep/onmXU+uxnVS2Ki16pMs
+	Hu1zg6PYkolTC/JkAezLlNPSuolL8+I9VKBl6B9phFqiCc5JAGgiHVOGaZzxg4cj0ylOyw
+	tfIiAzFkwhcpfqToOu7NcFI9ZM0l6j0=
+From: Sven Eckelmann <sven@narfation.org>
+Date: Mon, 14 Apr 2025 20:05:37 +0200
+Subject: [PATCH net v5] batman-adv: Fix double-hold of meshif when getting
+ enabled
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D043UWC002.ant.amazon.com (10.13.139.222) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250414-double_hold_fix-v5-1-10e056324cde@narfation.org>
+X-B4-Tracking: v=1; b=H4sIAHFO/WcC/3XO0QrCIBgF4FcZXudwpnPrqveIMWz+TmFpqEkx9
+ u7ZriLo8hw4H2dFEYKFiE7VigJkG613JfBDhSYj3QzYqpIRJZQT1hCs/OO6wGj8okZtn7jTRHZ
+ CCypVj8rqHqDUu3hBDhIaSqmDv+FkAsgvjPREHDllNeei6Xrc4JjBnZ0MWqZyo/Zh/ojGxuTDa
+ 7+Y2e7+fZNZYahuSauhmyhhP9ywbdsbojOGnfQAAAA=
+X-Change-ID: 20250410-double_hold_fix-8f0a87f72ad9
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: b.a.t.m.a.n@lists.open-mesh.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ syzbot+ff3aa851d46ab82953a3@syzkaller.appspotmail.com, 
+ syzbot+4036165fc595a74b09b2@syzkaller.appspotmail.com, 
+ syzbot+c35d73ce910d86c0026e@syzkaller.appspotmail.com, 
+ syzbot+48c14f61594bdfadb086@syzkaller.appspotmail.com, 
+ syzbot+f37372d86207b3bb2941@syzkaller.appspotmail.com, 
+ Sven Eckelmann <sven@narfation.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2668; i=sven@narfation.org;
+ h=from:subject:message-id; bh=Bf2kK2Vw4Tc37/Kz4l3ukL8jF1/nrr/RnuXgsQDbdLs=;
+ b=owGbwMvMwCXmy1+ufVnk62nG02pJDOl//apd1TRu/bi/dqudDOvvmMppzPUSNf1VsTduprE3h
+ 7Kcyz3TUcrCIMbFICumyLLnSv75zexv5T9P+3gUZg4rE8gQBi5OAZhIQCvDX7FNwhP/1qwsSJNa
+ W1/2Omxx+KslTe4d2w4mNhzw2M6w8BjDX/EHS6N6JzV9XJnaGp7y8rLpsj11/PMKbpRkctif9eD
+ pZgIA
+X-Developer-Key: i=sven@narfation.org; a=openpgp;
+ fpr=522D7163831C73A635D12FE5EC371482956781AF
 
-From: Jakub Kicinski <kuba@kernel.org>
-Date: Mon, 14 Apr 2025 10:37:27 -0700
-> On Sun, 13 Apr 2025 19:30:46 -0700 Kuniyuki Iwashima wrote:
-> > diff --git a/include/net/netdev_lock.h b/include/net/netdev_lock.h
-> > index 5706835a660c..270e157a4a79 100644
-> > --- a/include/net/netdev_lock.h
-> > +++ b/include/net/netdev_lock.h
-> > @@ -30,7 +30,8 @@ static inline bool netdev_need_ops_lock(const struct net_device *dev)
-> >  	bool ret = dev->request_ops_lock || !!dev->queue_mgmt_ops;
-> >  
-> >  #if IS_ENABLED(CONFIG_NET_SHAPER)
-> > -	ret |= !!dev->netdev_ops->net_shaper_ops;
-> > +	if (dev->netdev_ops)
-> > +		ret |= !!dev->netdev_ops->net_shaper_ops;
-> >  #endif
-> 
-> This is a bit surprising, we pretty much never validate if dev has ops.
-> 
-> I think we're guaranteed that IFF_UP will not be set if we just
-> allocated the device, so we can remove the locks in rtnl_create_link()
-> and to double confirm add a netdev_ops_assert_locked_or_invisible() 
-> in netif_state_change() ?
+It was originally meant to replace the dev_hold with netdev_hold. But this
+was missed in batadv_hardif_enable_interface(). As result, there was an
+imbalance and a hang when trying to remove the mesh-interface with
+(previously) active hard-interfaces:
 
-Removing the lock from NEWLINK makes sense, but my concern
-was NETDEV_CHANGE, which will requires more caution ?
+  unregister_netdevice: waiting for batadv0 to become free. Usage count = 3
 
-commit 04efcee6ef8d0f01eef495db047e7216d6e6e38f
-Author: Stanislav Fomichev <sdf@fomichev.me>
-Date:   Fri Apr 4 09:11:22 2025 -0700
+Fixes: 00b35530811f ("batman-adv: adopt netdev_hold() / netdev_put()")
+Suggested-by: Eric Dumazet <edumazet@google.com>
+Reported-by: syzbot+ff3aa851d46ab82953a3@syzkaller.appspotmail.com
+Reported-by: syzbot+4036165fc595a74b09b2@syzkaller.appspotmail.com
+Reported-by: syzbot+c35d73ce910d86c0026e@syzkaller.appspotmail.com
+Reported-by: syzbot+48c14f61594bdfadb086@syzkaller.appspotmail.com
+Reported-by: syzbot+f37372d86207b3bb2941@syzkaller.appspotmail.com
+Signed-off-by: Sven Eckelmann <sven@narfation.org>
+---
+This patch is skipping Simon's normal PR submission to get this problem
+fixed faster in Linus' tree. This currently creates quite a lot of wrong
+bisect results for syzkaller and it would be better to have this fixed
+sooner than later.
+---
+Changes in v5:
+- added Suggested-by: Eric Dumazet <edumazet@google.com>
+- added Reported-by: of various syzkaller reports which were affected (during
+  bisecting) by this problem
+- Link to v4: https://lore.kernel.org/r/20250410-double_hold_fix-v4-1-2f606fe8c204@narfation.org
 
-    net: hold instance lock during NETDEV_CHANGE
+Changes in v4:
+- resubmission after 24h cooldown time
+- added kernel message during hang to commit message
+- Link to v3: https://lore.kernel.org/r/20250409073524.557189-1-sven@narfation.org
+
+Changes in v3:
+- fix submitter address
+- Link to v2: https://lore.kernel.org/r/20250409073304.556841-1-sw@simonwunderlich.de
+
+Changes in v2:
+- add missing commit message
+- Link to v1: https://lore.kernel.org/r/20250409073000.556263-1-sven@narfation.org
+---
+ net/batman-adv/hard-interface.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/net/batman-adv/hard-interface.c b/net/batman-adv/hard-interface.c
+index f145f96626531053bbf8f58a31f28f625a9d80f9..7cd4bdcee43935b9e5fb7d1696430909b7af67b4 100644
+--- a/net/batman-adv/hard-interface.c
++++ b/net/batman-adv/hard-interface.c
+@@ -725,7 +725,6 @@ int batadv_hardif_enable_interface(struct batadv_hard_iface *hard_iface,
+ 
+ 	kref_get(&hard_iface->refcount);
+ 
+-	dev_hold(mesh_iface);
+ 	netdev_hold(mesh_iface, &hard_iface->meshif_dev_tracker, GFP_ATOMIC);
+ 	hard_iface->mesh_iface = mesh_iface;
+ 	bat_priv = netdev_priv(hard_iface->mesh_iface);
+
+---
+base-commit: 61f96e684edd28ca40555ec49ea1555df31ba619
+change-id: 20250410-double_hold_fix-8f0a87f72ad9
+
+Best regards,
+-- 
+Sven Eckelmann <sven@narfation.org>
+
 
