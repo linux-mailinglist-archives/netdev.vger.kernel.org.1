@@ -1,152 +1,191 @@
-Return-Path: <netdev+bounces-182215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6EE8A881DE
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 15:27:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59522A88260
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 15:34:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A626717937F
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 13:27:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B6E8189AAFD
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 13:33:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 764812798E1;
-	Mon, 14 Apr 2025 13:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA5C4275868;
+	Mon, 14 Apr 2025 13:27:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mulfRhHI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B203427585C;
-	Mon, 14 Apr 2025 13:24:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D5C628467F;
+	Mon, 14 Apr 2025 13:27:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744637090; cv=none; b=EpQ+YABmDV/Z5uJhDX/bilLjTltM/nQwinAAkUNUQVSuTnyjUP7f2XNMf502XBfFlBOybPd/tIfjXcT3PbxrTXMwwnuW8C5XgEq2jvXof8XfY06BdwLj8ULRWkiqSGmZB6ycvMnKiarXQ9Sc+mkUMji6MpbkmMeA2R5aG0VeJY4=
+	t=1744637238; cv=none; b=PTJek+ecEW5hnpTs4xh7fC4M8migc9XGtQfsP5fyMiZzRtCu0kYWeOyyrgmjNdNi9UeRuxOU2vJ/2VEx6xDvVwjAztyfiOvRmDxD9ugo8ndcu3WSrLP1u76EVDAED6jQBlANz+NkFTu0kPzKaHUe1tgWsVyy1p0e2zo2BvImHa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744637090; c=relaxed/simple;
-	bh=QH4HBkEgzWlR+iLppNxzhUiHrA5hDihNEzcMAW7W4Oo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=fmNRxZw0RrwBujwmbO9PkP8lB+SdqDOt6oEbL1pv4s3lZD3N8wGamljQAVB7ZOz6b2a15w8kTeFHP6Ne4+82rN49PnzjfZit5y3mjCXdx3mYvQzN4+xItwFnuTLUO18nKkSQkmOhNZkY7vP3CPdmEAVA2J/Z3Nvkjaf2pfkbBv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ac289147833so866674266b.2;
-        Mon, 14 Apr 2025 06:24:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744637087; x=1745241887;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZRtNPlxz2zfsOHt7gPeh2UUvvFdJM11RSUvY0S+WMYU=;
-        b=APeJONcCn286sZy66aYe+LgaT/3EFz/WatTUntgPKOMt96yulQb7BI7rhxzEY7hNtM
-         LSCV6zbPtd+e/EF/vtgW+aWXITw7IQD0goiQvqJUF9BF8yRSxkDGCeOubBGou8WYKt4u
-         Mps5sdVTqdtvqiXfkHl7RXXSIjJotBcD95sBz1LN5MT20bmFd+XZEH3sxUO9csnly8/a
-         ziUqxjFUZ4rkcs3IlQ5NnS0MuemI/CKFgsifJa2YKSmkkqCopokzSZOk1rXQo1u+ywbG
-         j9vq1uBcLX3D4H5Mx3jMf4Zg4Q6IO16HECnCz9Stcbd+tbd9mB3Z2ySfnDBpUbUSLP98
-         GgdA==
-X-Forwarded-Encrypted: i=1; AJvYcCU1ifWjG5770oDD+jcrTJTd1Z5fAnlCX8rE0kj/9XZIxoddliAU1G/oZOHMchEGGddNg70D1sdFYWxaa/o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIT5lj/JHG4EM0dlfM+OJqgqVYvHDtC/O0wJo3dLQWlYepBkOt
-	k11aa+g4LdP0BxWPSW5nX9sP+Pf5gLeK1tyfab8Zx6c+koOfymgy
-X-Gm-Gg: ASbGnctqigL0f5zC7tS0RIfm3tZ1d0X1UA1mPzUFAKuXOnsKA9VOr88AbzGcigvCurE
-	91ngxHuzUg1hGYROnkzz2HYauL1lHH/4Rjk77rsRpJkJCOOwV+oj1AwZAfnzIoC9BWYXvwwhdeF
-	k7ie1MU+fk76rHUtvHUZXOUwXwUTyab2kcc6pdWZAm+Y/KTYLA+H3OqOTsnasjfJK6yOuzyyKuL
-	wcWoKshngSHb3voNbrRkoRxUfGuqin8rCH/vniyrPuk6rQjVYvF6qy9iIk7il2phTcSIKkZvwS7
-	M2FBMOiVB/+KcH3HKk7CbrYICo3mINQ=
-X-Google-Smtp-Source: AGHT+IGOWuCkTf+8tbhnvHToKES03iq4QshkRj7yoBfScEmpqVGoq4VGxClzsOy3zoBI1YXrodGUDw==
-X-Received: by 2002:a17:906:4889:b0:acb:e1:6503 with SMTP id a640c23a62f3a-acb00e1666emr226128366b.50.1744637087053;
-        Mon, 14 Apr 2025 06:24:47 -0700 (PDT)
-Received: from localhost ([2a03:2880:30ff:8::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-acaa1ce7fdcsm921165966b.176.2025.04.14.06.24.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Apr 2025 06:24:46 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-Date: Mon, 14 Apr 2025 06:24:16 -0700
-Subject: [PATCH net-next v2 10/10] net: fib_rules: Use nlmsg_payload in
- fib_{new,del}rule()
+	s=arc-20240116; t=1744637238; c=relaxed/simple;
+	bh=DDLp9F3hw0/j5DNaV3tFyRMhvyjy0IKOIaq0JQaile8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=qi5n7qr1TYnG+DbKDlCAao5R9jDCujfA6lUndhbQE2v2QLzp1GRD2irmu6crq2BLghqLnkEoMU051CV5GjbnzXjbd75Jc8++a5PNiR9cqsZI7ApMb6a9spwrqoFPE+RmKiPtlx6vH93ZHdtqk0EUvzMXcQSDgt7MGtignynRvZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mulfRhHI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8B1BC4CEE2;
+	Mon, 14 Apr 2025 13:27:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744637236;
+	bh=DDLp9F3hw0/j5DNaV3tFyRMhvyjy0IKOIaq0JQaile8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=mulfRhHI5WbFFyzsr9MFwBRv6fe2WQQiwYWtixB3FXbY3FEti6+WB8kqjoCWolAbT
+	 XCDlfAwuRFQj0FdKmPUke00eV9EtTqsW1AH6pwgwfTNWbIBLH6pn8qi61aP4jR0x40
+	 vAYHe6KYjLvfNm1P3eX13tk1lM+3nItNXXqQsmHEzeWj/R1iFOksW0kloCGdE09Pkc
+	 uei8rsWnKAqCIADMDaPFU7DBkqA2uNPdTmeUv3opx2YN1Jw1hiLocUSR2jN8k58+rv
+	 p4y9YhXWyKyFoZXpu9NZ5CxNicE/da9dDcMxxjeCy8UsGaIZytArSovVHEr0KCnWVW
+	 pWaIQZ8PDKKjg==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Octavian Purdila <tavip@google.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Sasha Levin <sashal@kernel.org>,
+	jhs@mojatatu.com,
+	jiri@resnulli.us,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.14 28/34] net_sched: sch_sfq: use a temporary work area for validating configuration
+Date: Mon, 14 Apr 2025 09:26:04 -0400
+Message-Id: <20250414132610.677644-28-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250414132610.677644-1-sashal@kernel.org>
+References: <20250414132610.677644-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250414-nlmsg-v2-10-3d90cb42c6af@debian.org>
-References: <20250414-nlmsg-v2-0-3d90cb42c6af@debian.org>
-In-Reply-To: <20250414-nlmsg-v2-0-3d90cb42c6af@debian.org>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Breno Leitao <leitao@debian.org>, kernel-team@meta.com, 
- Kuniyuki Iwashima <kuniyu@amazon.com>
-X-Mailer: b4 0.15-dev-42535
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1686; i=leitao@debian.org;
- h=from:subject:message-id; bh=QH4HBkEgzWlR+iLppNxzhUiHrA5hDihNEzcMAW7W4Oo=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBn/QyO/SuSwBqi5s9qnVkbc6llOeGblYxm27yEv
- ZvXm0acPDSJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ/0MjgAKCRA1o5Of/Hh3
- bTecEACpv2HtCD+FWwLu+5RJN460rj/87oBfaM8dK1Gu+3sOHXt/OW/YdI0jkj4HC+uz4OZpLKj
- 5YeLycdVwlfHUf23eT04t7VlcTreOucWB7SmfM6MCOV5EbdnAxwGxczKSI53HZG3fM4ndTIE2Q1
- 6vf+/BZO3XiX47Z7GZ+Qh9cdp4Zvqc/fSltIVCldkp7P/81DsWwKYRep4CHehWMHJzzEDRql469
- huXTxjzBH+aI30gCjBXCgCuUpLFqPX/0D7bW9H3GMx2q9kaoUKmj+DDTonN6frejmSoWfcF8Y7e
- 6ELwFg2oPC4ENWLlXOhHJOX8ddKqqtoNiDh29MkxsNVgpmmjJ6XkxkEU/BABAA/uIM1Fsbi/93f
- 4gV+uS1LIsrmWu5P2LO9hC2BcHutVQNZXoggNkWOieoMkaG4ZrXEmUeom+C8Sqf6obe0gzDR+Xf
- SDlvUwRSKL+WT9lBrKQ/ybTganD2KRnoI+aZibaukiDqQ0H4FsgBkhk5xJWcwtAcgFepk9by561
- ccx8tzzBPtz3HRqFxhpeKyX7LtbvcXEvpUaiXvWH9ur5DxIvSuN5q0JTwUrj2jh6XHxVEd2K+U9
- /qNMsJNBFn2SYRS4ugTlnb6ZIRDHH5Nq67IWy6aOeBSV3q7uHXU6qJIZUDfAsRlFD1LisGh81rR
- NOPSYSElMrNXQPg==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.14.2
+Content-Transfer-Encoding: 8bit
 
-Leverage the new nlmsg_payload() helper to avoid checking for message
-size and then reading the nlmsg data.
+From: Octavian Purdila <tavip@google.com>
 
-Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Signed-off-by: Breno Leitao <leitao@debian.org>
+[ Upstream commit 8c0cea59d40cf6dd13c2950437631dd614fbade6 ]
+
+Many configuration parameters have influence on others (e.g. divisor
+-> flows -> limit, depth -> limit) and so it is difficult to correctly
+do all of the validation before applying the configuration. And if a
+validation error is detected late it is difficult to roll back a
+partially applied configuration.
+
+To avoid these issues use a temporary work area to update and validate
+the configuration and only then apply the configuration to the
+internal state.
+
+Signed-off-by: Octavian Purdila <tavip@google.com>
+Acked-by: Cong Wang <xiyou.wangcong@gmail.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/core/fib_rules.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ net/sched/sch_sfq.c | 56 +++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 44 insertions(+), 12 deletions(-)
 
-diff --git a/net/core/fib_rules.c b/net/core/fib_rules.c
-index 6a7a28bf631c2..06052b6c946b9 100644
---- a/net/core/fib_rules.c
-+++ b/net/core/fib_rules.c
-@@ -852,13 +852,14 @@ int fib_newrule(struct net *net, struct sk_buff *skb, struct nlmsghdr *nlh,
- 		struct netlink_ext_ack *extack, bool rtnl_held)
- {
- 	struct fib_rule *rule = NULL, *r, *last = NULL;
--	struct fib_rule_hdr *frh = nlmsg_data(nlh);
- 	int err = -EINVAL, unresolved = 0;
- 	struct fib_rules_ops *ops = NULL;
- 	struct nlattr *tb[FRA_MAX + 1];
- 	bool user_priority = false;
-+	struct fib_rule_hdr *frh;
+diff --git a/net/sched/sch_sfq.c b/net/sched/sch_sfq.c
+index 65d5b59da5830..7714ae94e0521 100644
+--- a/net/sched/sch_sfq.c
++++ b/net/sched/sch_sfq.c
+@@ -631,6 +631,15 @@ static int sfq_change(struct Qdisc *sch, struct nlattr *opt,
+ 	struct red_parms *p = NULL;
+ 	struct sk_buff *to_free = NULL;
+ 	struct sk_buff *tail = NULL;
++	unsigned int maxflows;
++	unsigned int quantum;
++	unsigned int divisor;
++	int perturb_period;
++	u8 headdrop;
++	u8 maxdepth;
++	int limit;
++	u8 flags;
++
  
--	if (nlh->nlmsg_len < nlmsg_msg_size(sizeof(*frh))) {
-+	frh = nlmsg_payload(nlh, sizeof(*frh));
-+	if (!frh) {
- 		NL_SET_ERR_MSG(extack, "Invalid msg length");
- 		goto errout;
+ 	if (opt->nla_len < nla_attr_size(sizeof(*ctl)))
+ 		return -EINVAL;
+@@ -656,36 +665,59 @@ static int sfq_change(struct Qdisc *sch, struct nlattr *opt,
+ 		NL_SET_ERR_MSG_MOD(extack, "invalid limit");
+ 		return -EINVAL;
  	}
-@@ -980,13 +981,14 @@ int fib_delrule(struct net *net, struct sk_buff *skb, struct nlmsghdr *nlh,
- 		struct netlink_ext_ack *extack, bool rtnl_held)
- {
- 	struct fib_rule *rule = NULL, *nlrule = NULL;
--	struct fib_rule_hdr *frh = nlmsg_data(nlh);
- 	struct fib_rules_ops *ops = NULL;
- 	struct nlattr *tb[FRA_MAX+1];
- 	bool user_priority = false;
-+	struct fib_rule_hdr *frh;
- 	int err = -EINVAL;
++
+ 	sch_tree_lock(sch);
++
++	limit = q->limit;
++	divisor = q->divisor;
++	headdrop = q->headdrop;
++	maxdepth = q->maxdepth;
++	maxflows = q->maxflows;
++	perturb_period = q->perturb_period;
++	quantum = q->quantum;
++	flags = q->flags;
++
++	/* update and validate configuration */
+ 	if (ctl->quantum)
+-		q->quantum = ctl->quantum;
+-	WRITE_ONCE(q->perturb_period, ctl->perturb_period * HZ);
++		quantum = ctl->quantum;
++	perturb_period = ctl->perturb_period * HZ;
+ 	if (ctl->flows)
+-		q->maxflows = min_t(u32, ctl->flows, SFQ_MAX_FLOWS);
++		maxflows = min_t(u32, ctl->flows, SFQ_MAX_FLOWS);
+ 	if (ctl->divisor) {
+-		q->divisor = ctl->divisor;
+-		q->maxflows = min_t(u32, q->maxflows, q->divisor);
++		divisor = ctl->divisor;
++		maxflows = min_t(u32, maxflows, divisor);
+ 	}
+ 	if (ctl_v1) {
+ 		if (ctl_v1->depth)
+-			q->maxdepth = min_t(u32, ctl_v1->depth, SFQ_MAX_DEPTH);
++			maxdepth = min_t(u32, ctl_v1->depth, SFQ_MAX_DEPTH);
+ 		if (p) {
+-			swap(q->red_parms, p);
+-			red_set_parms(q->red_parms,
++			red_set_parms(p,
+ 				      ctl_v1->qth_min, ctl_v1->qth_max,
+ 				      ctl_v1->Wlog,
+ 				      ctl_v1->Plog, ctl_v1->Scell_log,
+ 				      NULL,
+ 				      ctl_v1->max_P);
+ 		}
+-		q->flags = ctl_v1->flags;
+-		q->headdrop = ctl_v1->headdrop;
++		flags = ctl_v1->flags;
++		headdrop = ctl_v1->headdrop;
+ 	}
+ 	if (ctl->limit) {
+-		q->limit = min_t(u32, ctl->limit, q->maxdepth * q->maxflows);
+-		q->maxflows = min_t(u32, q->maxflows, q->limit);
++		limit = min_t(u32, ctl->limit, maxdepth * maxflows);
++		maxflows = min_t(u32, maxflows, limit);
+ 	}
  
--	if (nlh->nlmsg_len < nlmsg_msg_size(sizeof(*frh))) {
-+	frh = nlmsg_payload(nlh, sizeof(*frh));
-+	if (!frh) {
- 		NL_SET_ERR_MSG(extack, "Invalid msg length");
- 		goto errout;
- 	}
-
++	/* commit configuration */
++	q->limit = limit;
++	q->divisor = divisor;
++	q->headdrop = headdrop;
++	q->maxdepth = maxdepth;
++	q->maxflows = maxflows;
++	WRITE_ONCE(q->perturb_period, perturb_period);
++	q->quantum = quantum;
++	q->flags = flags;
++	if (p)
++		swap(q->red_parms, p);
++
+ 	qlen = sch->q.qlen;
+ 	while (sch->q.qlen > q->limit) {
+ 		dropped += sfq_drop(sch, &to_free);
 -- 
-2.47.1
+2.39.5
 
 
