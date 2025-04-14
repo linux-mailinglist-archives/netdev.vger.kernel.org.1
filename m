@@ -1,126 +1,186 @@
-Return-Path: <netdev+bounces-182486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A167A88DB8
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 23:25:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0CA4A88DBE
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 23:26:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79CD4179060
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 21:25:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6C007A8CCF
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 21:25:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B00B91E51E7;
-	Mon, 14 Apr 2025 21:25:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C71C1E51E7;
+	Mon, 14 Apr 2025 21:26:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iprZvO/B"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G0uMc+bH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487C41A83F2;
-	Mon, 14 Apr 2025 21:25:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073B32AF0A;
+	Mon, 14 Apr 2025 21:26:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744665935; cv=none; b=qD6awZDpZZC5q42oJlnArr9BtLU/Pq+onGrMuAwuowE2b4mY1B8fJgJ3Vy3DZU7fNEHVQBNEDi8slSbwU5/oAsa1df2QMkgS7PhxlZ2IMSvzgsgGjB2ZGlvH84X7m19wXMrsVGfns84vnDDgAbYfNBg4aElfVgQrBXOymiOM/vM=
+	t=1744666009; cv=none; b=UNwbvCfRpXjUSFkKdyu3Tth8yyHpYrYnSmkFogjw+Eglol61xqpA+xDfJIDz2klWiC8Pbmr4cdsE8VST3MSklrZUb8nXk1ouU7jRgL0Z5AjZnQeub3PpPRhgRSz9IPBiEqVTjconGRJp5YHgb41OQ5yCBwRyLyN/BVIFgZVOD1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744665935; c=relaxed/simple;
-	bh=N4BFEDl7uYJZ/uee6Yh5jrAWw8mBsknP61/45paC1Mc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lsViYzfuhdyI21i7aZ2bEFU39OPkQcO8B1YpT8INf+vxMETZjG8IWXPVCeadpt/TLNe5YcjqwLs2s7Xrr8JbnFRfBUvD5OD/hLf6SwNCCVjqn5wUgJn798MjBY9xZx0CM+ZuKlcY1gwX29G5VmhLTW7SdV3i7fCMCaXIZ/Zq8pY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iprZvO/B; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-225477548e1so46803305ad.0;
-        Mon, 14 Apr 2025 14:25:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744665933; x=1745270733; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=u1IQBK50cTzuspbb54qXzEgBNmv1ZuYACNvXUgrmt94=;
-        b=iprZvO/B9S2fQNXB5AFWQtXBCz3xY2V5ZLQlqJcTxMwJXasIAxvyg3B2e08enEM8w9
-         CigXEN3y1F33YK+wrgZ3ykhX5EdvE4KVPH9SM81W9XU2TwpudvkpnTTG1150yxIX5Zis
-         1t14vUsWYs+cTwz8sLnOJUOonm/bjA0BsDz2CuuHI/l7QMrBlxglifvTe+G7jcIpkFdC
-         tHdrYk/GnAFvauIy3lA1ZDJOae4v7PwJ4vwZ8XGnsbBY5xKPuyppzOoplEybRfE3YUiY
-         MdN3uORktmvXk8gB+DjuC1qMEet2g5m7qFapSq7ptVsbZ/VpVczHXuIx7BjneJZKNcux
-         qXoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744665933; x=1745270733;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u1IQBK50cTzuspbb54qXzEgBNmv1ZuYACNvXUgrmt94=;
-        b=WpTFhcc2oybi8yXKPKciBeEihtxYTK3z0AvnCc5aQdh+1izJWzeAX72rT/OaN0F1Y8
-         hMSN6rrMbsjX04m3+njBEFTEu/WWa2a/V5gWqSMWWlgtPJte/Kuo+fALPrzq8j036t4S
-         4oJkZWL4/ylS1L2vtTo2XwLb8K/IoplmwuOsN7so8tfNdQyCvhCrjZTloM9Po2a1Xfqh
-         nzBiE6/dt6URbcRSMhumynmjDP60fdNBtIZ5Er/hihEECF4Dgsm+uabi3H1GsUKUbzCZ
-         E8XGV51+NZ++V9XT1Sazq/x+PtwPVY3rXvx1AdTWcs1XzqqYVaCRhWZjFBAp2RythQ1w
-         p8/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU/DtncBTYX0K21c4CdOu2bZRtJDmBv3ZXdv+JslaM3MdUoHLmNrxzkaUR4dcjDqELaS2HzZXCp@vger.kernel.org, AJvYcCUXyO+wD8Hdgdc1LwUl9YHIYopYncK5RMuOJHq4Iq/t0MpVikkDQVH3B5LQ1+K2V7akhGYj/VzgBdMWV1s=@vger.kernel.org, AJvYcCUcbPPyn0xgaowJwhfkEi/Hbmn2+fmFUxgLIHPqB5WcFD6YbAwerrLnFw3S3QaAOqgZ2hFhk1DUoP+dyiPv5COl/0AU@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRTUuFaI8+Vty/PjfrFbzBkViScW5OVAARovs5SN5QLdHtEHzZ
-	LlHEimP1+fx4arX1Zr/bbxoFq3RSpUd+jgBJc4m/7C/nGb1ERp2H
-X-Gm-Gg: ASbGncuZ72oBQTSmmj70gMSagbCESBiVDeaxSZ6kVV3C1+6SZHZu+PdxVmh137jsJwy
-	gzMAGQlx4kLaDMsS/9y6851ygbVVkN7XzdPqhs36rzwYpbzfc6kLjR7wrRPMSK8zzSLXx86qiXR
-	DxS9ufTANXxM1BJ0ujQltrVSR2asJCcRqfQeodIsDjcBPDWrJ4Ulu93JESezelEr5D9SfBakduX
-	1h6k5vFq2V77fItQePmsBIEH7LaQwZDVBjviuDONzDHSpKaE+1228SBzFPqrG7/2IiwcqeKmHWw
-	4Oh7U+VH3iOeokwBwtwcSutTm65uivV25Da4fYS+KFQy
-X-Google-Smtp-Source: AGHT+IFSueGj0QdNKNpNqsLVoIp4A4P4xbJ2sCbD0cXBKvhK0NSuw7f6ErhqZ15aCkOjkYVOXZ5F1Q==
-X-Received: by 2002:a17:902:f709:b0:223:fabd:4f99 with SMTP id d9443c01a7336-22bea4953demr206548995ad.5.1744665933444;
-        Mon, 14 Apr 2025 14:25:33 -0700 (PDT)
-Received: from localhost ([129.210.115.104])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22ac7ccb82fsm103617715ad.219.2025.04.14.14.25.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Apr 2025 14:25:32 -0700 (PDT)
-Date: Mon, 14 Apr 2025 14:25:31 -0700
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Jiayuan Chen <jiayuan.chen@linux.dev>
-Cc: bpf@vger.kernel.org, mrpre@163.com,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next v3 1/2] bpf, sockmap: Introduce tracing
- capability for sockmap
-Message-ID: <Z/19S2yMP/2TViMa@pop-os.localdomain>
-References: <20250414161153.14990-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1744666009; c=relaxed/simple;
+	bh=AcuwE8JaJ3lT4gvBhoaVTGVJ/yEd3t9suqvwbBI4EbA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=IE8batblwx60HAhHRdclSh+HYZw4hLY/his6/lrYJHX0DwAx+yxPWTnoMshgsmkv4cXo7o/vU5++qJFlwvtWt/gbN/hBEKpz/VNIyuY0uTIKsIO3m4xSXyAq2IibuhhyjyekHJCXSZSstNVMxmpr9tI26r7z/P2md7p1dpO9f3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G0uMc+bH; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744666007; x=1776202007;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=AcuwE8JaJ3lT4gvBhoaVTGVJ/yEd3t9suqvwbBI4EbA=;
+  b=G0uMc+bHSTD1cYRoHSZzmG0RycGwavI0ckIZ36qwe1IZKrSmQbmSrbQP
+   KGfX+OIMiRlKsF27XxhhI6BgXN8k5vO5wfOf//6h1zlzqYSk2ujocdEGP
+   RQWGJyotpwwAIwwmMRfUz5ADpXwU2sA+UnhOKfTXtiI88dfIlLshVhh1c
+   EVnfRvLg7LaqX4zecopPxlJ80GaPLHAxq2QXJgU8RLwUTwFUCtQBRwt+U
+   po8n2fWg/M8dQ4XmygKQtMDyHymNlCAAZgJvS4JAjudX5hMRT6RI6D2f3
+   6e0TBE/ODy6AeNCoFftQ88Zbcret/nA+wbFAFpMkitLVr7QnE+V5O72/v
+   w==;
+X-CSE-ConnectionGUID: g8VICSFARfynZrD7zXmk4w==
+X-CSE-MsgGUID: LhzGXAywRyiWw324BJz+fQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11403"; a="46163851"
+X-IronPort-AV: E=Sophos;i="6.15,212,1739865600"; 
+   d="scan'208";a="46163851"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2025 14:26:45 -0700
+X-CSE-ConnectionGUID: xcsM0XrkSEmbD1/whsfu2g==
+X-CSE-MsgGUID: 0s24PglrTX2QBP6rlUfdQg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,212,1739865600"; 
+   d="scan'208";a="130896307"
+Received: from jekeller-desk.jf.intel.com ([10.166.241.15])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2025 14:26:46 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH net-next v2 0/2] net: ptp: driver opt-in for supported PTP
+ ioctl flags
+Date: Mon, 14 Apr 2025 14:26:29 -0700
+Message-Id: <20250414-jk-supported-perout-flags-v2-0-f6b17d15475c@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250414161153.14990-1-jiayuan.chen@linux.dev>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIV9/WcC/42NQQ6CMBBFr0Jm7ZjSogFX3MOwIHQKo9g2bSEYw
+ t1tOIHLl5f//g6RAlOER7FDoJUjO5tBXgoYpt6OhKwzgxTyJipR4+uNcfHehUQaPQW3JDRzP0a
+ slCwbPRCJRkHe+0CGt7P9BEsJLW0JumwmjsmF73m6lqf/o7+WKFBLU5PS5l4Z1bJNNF8H94HuO
+ I4ffFzFfcwAAAA=
+X-Change-ID: 20250408-jk-supported-perout-flags-43219dcee093
+To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+ Tariq Toukan <tariqt@nvidia.com>, 
+ Bryan Whitehead <bryan.whitehead@microchip.com>, 
+ UNGLinuxDriver@microchip.com, Horatiu Vultur <horatiu.vultur@microchip.com>, 
+ Paul Barker <paul.barker.ct@bp.renesas.com>, 
+ =?utf-8?q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ Andrei Botila <andrei.botila@oss.nxp.com>, 
+ Claudiu Manoil <claudiu.manoil@nxp.com>, 
+ Alexandre Belloni <alexandre.belloni@bootlin.com>, 
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org, 
+ linux-renesas-soc@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>
+X-Mailer: b4 0.14.2
 
-On Tue, Apr 15, 2025 at 12:11:45AM +0800, Jiayuan Chen wrote:
-> +#ifndef __TRACE_SOCKMAP_HELPER_ONCE_ONLY
-> +#define __TRACE_SOCKMAP_HELPER_ONCE_ONLY
-> +
-> +enum sockmap_direct_type {
-> +	SOCKMAP_REDIR_NONE	= 0,
-> +	SOCKMAP_REDIR_INGRESS,
-> +	SOCKMAP_REDIR_EGRESS,
-> +};
+Both the PTP_EXTTS_REQUEST(2) and PTP_PEROUT_REQUEST(2) ioctls take flags
+from userspace to modify their behavior. Drivers are supposed to check
+these flags, rejecting requests for flags they do not support.
 
-I am curious why you need to define them here since you already pass
-'ingress' as a parameter? Is it possible to reuse the BPF_F_INGRESS bit?
+Many drivers today do not check these flags, despite many attempts to
+squash individual drivers as these mistakes are discovered. Additionally,
+any new flags added can require updating every driver if their validation
+checks are poorly implemented.
 
-Thanks!
+It is clear that driver authors will not reliably check for unsupported
+flags. The root of the issue is that drivers must essentially opt out of
+every flag, rather than opt in to the ones they support.
+
+Instead, lets introduce .supported_perout_flags and .supported_extts_flags
+to the ptp_clock_info structure. This is a pattern taken from several
+ethtool ioctls which enabled validation to move out of the drivers and into
+the shared ioctl handlers. This pattern has worked quite well and makes it
+much more difficult for drivers to accidentally accept flags they do not
+support.
+
+With this approach, drivers which do not set the supported fields will have
+the core automatically reject any request which has flags. Drivers must opt
+in to each flag they support by adding it to the list, with the sole
+exception being the PTP_ENABLE_FEATURE flag of the PTP_EXTTS_REQUEST ioctl
+since it is entirely handled by the ptp_chardev.c file.
+
+This change will ensure that all current and future drivers are safe for
+extension when we need to extend these ioctls.
+
+I opted to keep all the driver changes into one patch per ioctl type. The
+changes are relatively small and straight forward. Splitting it per-driver
+would make the series large, and also break flags between the introduction
+of the supported field and setting it in each driver.
+
+The non-Intel drivers are compile-tested only, and I would appreciate
+confirmation and testing from their respective maintainers. (It is also
+likely that I missed some of the driver authors especially for drivers
+which didn't make any checks at all and do not set either of the supported
+flags yet)
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+---
+Changes in v2:
+- Expand PTP_EXTTS_EDGES in all .supported_extts_flags assignment
+- Remove PTP_ENABLE_FEATURE from all .supported_extts_flags assignment
+- Add a .supported_extts_flags assignment to ravb driver, even tho it
+  doesn't currently support PTP_STRICT_FLAGS. The driver did previously
+  check these, so I think its better to add them even if its equivalent.
+- Added Vadim's Reviewed-by to patch 2/2
+- Link to v1: https://lore.kernel.org/r/20250408-jk-supported-perout-flags-v1-0-d2f8e3df64f3@intel.com
+
+---
+Jacob Keller (2):
+      net: ptp: introduce .supported_extts_flags to ptp_clock_info
+      net: ptp: introduce .supported_perout_flags to ptp_clock_info
+
+ include/linux/ptp_clock_kernel.h                   | 18 +++++++++++++++
+ drivers/net/dsa/mv88e6xxx/ptp.c                    | 11 ++++-----
+ drivers/net/dsa/sja1105/sja1105_ptp.c              | 14 +++---------
+ drivers/net/ethernet/intel/ice/ice_ptp.c           | 16 +++++--------
+ drivers/net/ethernet/intel/igb/igb_ptp.c           | 20 +++++------------
+ drivers/net/ethernet/intel/igc/igc_ptp.c           | 14 +++---------
+ .../net/ethernet/mellanox/mlx5/core/lib/clock.c    | 26 ++++++----------------
+ drivers/net/ethernet/microchip/lan743x_ptp.c       | 14 ++++--------
+ .../net/ethernet/microchip/lan966x/lan966x_ptp.c   | 14 ++++--------
+ drivers/net/ethernet/mscc/ocelot_ptp.c             |  5 -----
+ drivers/net/ethernet/mscc/ocelot_vsc7514.c         |  2 ++
+ drivers/net/ethernet/renesas/ravb_ptp.c            | 11 +--------
+ drivers/net/phy/dp83640.c                          | 13 +++--------
+ drivers/net/phy/micrel.c                           | 17 +++++---------
+ drivers/net/phy/microchip_rds_ptp.c                |  5 +----
+ drivers/net/phy/nxp-c45-tja11xx.c                  | 13 ++++-------
+ drivers/ptp/ptp_chardev.c                          | 16 ++++++++++++-
+ drivers/ptp/ptp_clockmatrix.c                      | 14 ++----------
+ drivers/ptp/ptp_fc3.c                              |  1 +
+ drivers/ptp/ptp_idt82p33.c                         | 15 +++----------
+ 20 files changed, 91 insertions(+), 168 deletions(-)
+---
+base-commit: b65999e7238e6f2a48dc77c8c2109c48318ff41b
+change-id: 20250408-jk-supported-perout-flags-43219dcee093
+
+Best regards,
+-- 
+Jacob Keller <jacob.e.keller@intel.com>
+
 
