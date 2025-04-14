@@ -1,140 +1,128 @@
-Return-Path: <netdev+bounces-182070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03719A87AD8
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 10:46:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AEF7A87B07
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 10:52:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20D861883C7F
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 08:46:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93F681890D76
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 08:52:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F7226A089;
-	Mon, 14 Apr 2025 08:43:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E775258CD0;
+	Mon, 14 Apr 2025 08:52:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JMaaZInp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AW6qmC5I"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09CF5269D1D;
-	Mon, 14 Apr 2025 08:43:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2E1BDF42;
+	Mon, 14 Apr 2025 08:52:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744620237; cv=none; b=oIkGMggqNIrvDkweZFPh72RuZ1wQ/Jso0ofWP375YV5GAVO4jODxgAcTICo9PCazVYj0D0QDXh1OI/BKSpeo4MJVcF6E3WuywwOjVmQiMentV0dhZxqjuF7O3LzAmKzI+HoJvcWb6xERnd2wf15t+b5ca2ecPDAjJdsC/wMORQQ=
+	t=1744620752; cv=none; b=G++C6qUDOcsXqB+LT0fs6Y1MRaHilEgAR9QA7mZo9XdbpPZ6CwEfgx0sE6YVRmCJ95AESuRpexuJMewMqpT/Hv4KMUt+SbA4KerpqfDiSApwp/ZZ+eshgshIz5KxIr5mFDPmNFyICRjCYkb8cFNl5xegHC6f45Qnl/AaTSea+i4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744620237; c=relaxed/simple;
-	bh=eUd5GxwszVXXzpuC1+ozLa4oZQpxUDf8OIF6/2qk9Ho=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CWYPXfubCNqbOaXOYU3I+1fucp2jWJ22hs5CmHn/QbBMm2jui+MHsgonEDakEuJ2u/5zVa3twrkp4mZrfav2YzA2heTKpqSldbKKZe26LvNKz2aqLH4Tg+FXnjimmAF444VTn7WJAcH636w95my/3slWGpWrkIdHj9a60xskKs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JMaaZInp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E0BEC4CEEC;
-	Mon, 14 Apr 2025 08:43:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744620236;
-	bh=eUd5GxwszVXXzpuC1+ozLa4oZQpxUDf8OIF6/2qk9Ho=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JMaaZInpYv91Z0K+UTSGxHcfCYpKA001Mh0LT58uFmgEBS7yNsE8y0wmXIakIm8qh
-	 A2FpWGTbbqX7VYBXIdHQhK5+ctAt7oVFygD5USlZSXL9RAQQwgp94Nos2jZr5bUfi2
-	 Z8Cc1YrDv6oFiHHVQ26a1DvpKVVSwZ2+S+YgOTsppjKiUwVfDKrOC8sTIsmggmRaly
-	 Y8Iv9FNtlTuZ+LWOKkRLxApeYCS2pWB/Mond34KJS3Ui+lNjq75E5zjZ4VSB73KjmI
-	 o77fpA+FWsNRMtOn3j/44u74tyOWZjzg0uCjCjIPmKA+PMHgh46b04gVjVoZpRNUyF
-	 r49Pc8F1Nhi9w==
-From: Michael Walle <mwalle@kernel.org>
-To: Saravana Kannan <saravanak@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Michael Walle <mwalle@kernel.org>
-Subject: [PATCH net-next v2 2/2] net: ethernet: ti: am65-cpsw: handle -EPROBE_DEFER
-Date: Mon, 14 Apr 2025 10:43:36 +0200
-Message-Id: <20250414084336.4017237-3-mwalle@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250414084336.4017237-1-mwalle@kernel.org>
-References: <20250414084336.4017237-1-mwalle@kernel.org>
+	s=arc-20240116; t=1744620752; c=relaxed/simple;
+	bh=njlJ6wOPTfgXbiVOtvyAn8VB29ZgxhG14ZDHCkhqO1c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UXF6RVylfc12feN5NuMHwn82mQ+16mAKDSCyMVZm858QrcQs2zOx7rR4QU7yt26Uf4yphIhPaWpwMywANjm/XdVU2Vys/oGa8Bf9i3znHMx394i5/J/5EXdTX6HBgxuDmmp2SpwmhLido0Om88xCVlrEmPbBcQATXnubWjt9CCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AW6qmC5I; arc=none smtp.client-ip=209.85.221.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-52413efd0d3so1707430e0c.2;
+        Mon, 14 Apr 2025 01:52:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744620749; x=1745225549; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RK1FjQCAv98Eay4SPuOitMP3sY6he/myS3klmD5dY54=;
+        b=AW6qmC5IPbxz4Os6/GQ7QlrGXje+Ynhqgf5gEeZhCfvhwfoY+s1JApLJKoX0agIs68
+         mFIiLXV+X3RrIiAm2ZWw3gaXrpgGXGZ0BMmu2QHjTHJfx6g8GFL+XNFczrnMeMQlDZ+E
+         teubzc4eUzcU26cwt4XPo75NGxdZ5PXX/ID+h+iv9mXt8PA2XIBiL3TxDlOzE1nqWnjo
+         5D1eZbkBJKwpwep9tCZEGCIefLCKCmOETbE23aPuC8qpMiKDoZr+VhrNnZRrtmnxDHSH
+         7ijwP0Zla/F1WxMl4KXYksd9cJeEsOvNfmxy3cmR0ok4fmYsaYZTPgciEC03F2XYmazv
+         Qoig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744620749; x=1745225549;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RK1FjQCAv98Eay4SPuOitMP3sY6he/myS3klmD5dY54=;
+        b=UZ0a60jdoRjP104cvqr1fYY+Zh4VJAEGCB2PgjqXmJzdAZKGBhfjPS6RM8ZsFUJ5cp
+         utyeaWrm/XJrakW8eKNKsxk2KSeMGUMgr1ApsWNV/4ln9+po7y0L9vm9JH0hADg+fjm+
+         /qH/ip2xtC5s7UQ3rRnbYwRCZ3v6OYwEQPTmNg53ePjFGWiDB6jlU2ZzJqa2RgY+G57X
+         1nfgvJUaEh9+Z4O5rzwhNrnXP4TzS1XRC8BTKNdfDxGsR1cV6OE521bjtbjn1jSLpKq3
+         shQQSA3+KGZ0gQjFDUhffQfKMUBOFcVapS6uqMGMZ8VDwBdbtjQb9tOiNjM8S8I2wGBM
+         WnJw==
+X-Forwarded-Encrypted: i=1; AJvYcCViPkdkEpqHoQRQhU1ru8YG0UHobQYTDrwIzS3x7wYv4FbBjprD0TZlKMehzxKRyhJ/+5Nkmv5y@vger.kernel.org, AJvYcCWGqQ7bWB965qkivPnNMl1hJQc4wTCEdHt8JQtv2U3JtjEGLtGJRyKetjZ8uxauogV1GuuLZxA6dFyg85L1@vger.kernel.org, AJvYcCXAC1ssdgWYd6UpdG3eAfiVcz/q7aJfB/3C2nx3BErNcIhGZpbUwGLPP8fv8didMrxl6Nxo9vlJ+OHa@vger.kernel.org, AJvYcCXkUgiZn4aU0KdtWRP1scEEjpkhNLMOy4VtQlJWeZta9mabVlRtJS543si52LvY1kGNVl7Lg2I9vdGJScWlCJLgyKs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOnGsHLfZLig6LCa0xDjKJMHtqj0bRtCF1quwzsv/H93cc0Mfc
+	xt7/yU6LzHMyrLBxMmTFl/Ame81zTL/BhXqjpowr2cKtTq5ca7Ha9rb2/a83lsSmijoCmH6nU5I
+	BrG8Q00cG5JmJQ9X6MzONdlEQL8o=
+X-Gm-Gg: ASbGnctjPh6TC4Xiu4WOWvudlsaUOgm8yaKYroliU9MNnDXPuIoRLxs8yor3qeHGdka
+	pzB4NT50QksGBWevm/gSOA5pp6exVQV8JbRQvS4kKSl9n7Ca5iyjMoetHlyBoXGFZoY2vUbQyC5
+	fMjUaUhc1Apoy4jaWfsQAxtA==
+X-Google-Smtp-Source: AGHT+IHDQYAJXdFj/iNG0npq557KpIZpBxXkLL2l+9hPwfBOs75fehWJLdCe6um+3vhYJFwWD4BbKD7nZni0VXc/gQE=
+X-Received: by 2002:a05:6122:319d:b0:527:67da:74ee with SMTP id
+ 71dfb90a1353d-527c34d1fd1mr7094050e0c.5.1744620749318; Mon, 14 Apr 2025
+ 01:52:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250407120317.127056-1-prabhakar.mahadev-lad.rj@bp.renesas.com> <20250407104447.072449cd@kernel.org>
+In-Reply-To: <20250407104447.072449cd@kernel.org>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Mon, 14 Apr 2025 09:52:03 +0100
+X-Gm-Features: ATxdqUEHxcklYN6PVPbrfMER-iWYYX-JiIMzDYloXSJi2mPCrezqGIzibq2L6CY
+Message-ID: <CA+V-a8uqkG+u_ZXztPe7R0BNV6BA46KgGRHRW-G3axBt566pEQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 0/3] Add GBETH glue layer driver for Renesas
+ RZ/V2H(P) SoC
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
+	Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-of_get_mac_address() might fetch the MAC address from NVMEM and that
-driver might not have been loaded. In that case, -EPROBE_DEFER is
-returned. Right now, this will trigger an immediate fallback to
-am65_cpsw_am654_get_efuse_macid() possibly resulting in a random MAC
-address although the MAC address is stored in the referenced NVMEM.
+Hi Jakub,
 
-Fix it by handling the -EPROBE_DEFER return code correctly. This also
-means that the creation of the MDIO device has to be moved to a later
-stage as -EPROBE_DEFER must not be returned after child devices are
-created.
+On Mon, Apr 7, 2025 at 6:44=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Mon,  7 Apr 2025 13:03:14 +0100 Prabhakar wrote:
+> > This patch series adds support for the GBETH (Gigabit Ethernet) glue la=
+yer
+> > driver for the Renesas RZ/V2H(P) SoC. The GBETH IP is integrated with
+> > the Synopsys DesignWare MAC (version 5.20). The changes include updatin=
+g
+> > the device tree bindings, documenting the GBETH bindings, and adding th=
+e
+> > DWMAC glue layer for the Renesas GBETH.
+>
+> This was posted prior to the "net-next is OPEN" announcement:
+> https://lore.kernel.org/all/20250407055403.7a8f40df@kernel.org/
+>
+> In the interest of fairness towards those who correctly wait
+> for the tree to be open I will ask you to repost this again,
+> in a couple of days.
+>
+Are you ok for me to now respin this series?
 
-Signed-off-by: Michael Walle <mwalle@kernel.org>
----
-
-v2:
- - none
-
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 24 +++++++++++++-----------
- 1 file changed, 13 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 55a0c37da54c..988ce9119306 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -2679,7 +2679,9 @@ static int am65_cpsw_nuss_init_slave_ports(struct am65_cpsw_common *common)
- 			goto of_node_put;
- 
- 		ret = of_get_mac_address(port_np, port->slave.mac_addr);
--		if (ret) {
-+		if (ret == -EPROBE_DEFER) {
-+			goto of_node_put;
-+		} else if (ret) {
- 			am65_cpsw_am654_get_efuse_macid(port_np,
- 							port->port_id,
- 							port->slave.mac_addr);
-@@ -3561,6 +3563,16 @@ static int am65_cpsw_nuss_probe(struct platform_device *pdev)
- 		return ret;
- 	}
- 
-+	am65_cpsw_nuss_get_ver(common);
-+
-+	ret = am65_cpsw_nuss_init_host_p(common);
-+	if (ret)
-+		goto err_pm_clear;
-+
-+	ret = am65_cpsw_nuss_init_slave_ports(common);
-+	if (ret)
-+		goto err_pm_clear;
-+
- 	node = of_get_child_by_name(dev->of_node, "mdio");
- 	if (!node) {
- 		dev_warn(dev, "MDIO node not found\n");
-@@ -3577,16 +3589,6 @@ static int am65_cpsw_nuss_probe(struct platform_device *pdev)
- 	}
- 	of_node_put(node);
- 
--	am65_cpsw_nuss_get_ver(common);
--
--	ret = am65_cpsw_nuss_init_host_p(common);
--	if (ret)
--		goto err_of_clear;
--
--	ret = am65_cpsw_nuss_init_slave_ports(common);
--	if (ret)
--		goto err_of_clear;
--
- 	/* init common data */
- 	ale_params.dev = dev;
- 	ale_params.ale_ageout = AM65_CPSW_ALE_AGEOUT_DEFAULT;
--- 
-2.39.5
-
+Cheers,
+Prabhakar
 
