@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-182499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86924A88E28
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 23:48:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CD0AA88E7E
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 23:56:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39B213A9E5B
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 21:48:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 696AF172F8F
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 21:56:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 796461EF0BA;
-	Mon, 14 Apr 2025 21:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5192A2356C3;
+	Mon, 14 Apr 2025 21:49:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u9VUPHtZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ANw6pMfs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51F5E1E47B0;
-	Mon, 14 Apr 2025 21:48:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273852356B4;
+	Mon, 14 Apr 2025 21:49:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744667315; cv=none; b=F2iTUYNtbaJ5gjbBYqkGYlL6TOLri0z441zH0psDV1KEEphaLFNsKk/8X4l97QD5YSnDJAUTELF3Lc0li9uU4yjIZ8WzGGfep3xbVKjaOLDHJD73UzLS3E8iICQ84cts2/o7MEkgFDop0uGtbs90Jn7jdkDezKzjXtUz1ipibvM=
+	t=1744667362; cv=none; b=HCp9baJMOtoIkrTG5aeHHVaRx13JgP6So7yGHJne6pJ1GDpXL6t/Rds6R157TGnkm2E7NgQ2FIvrlMy5blIUtDUUAP6KNjE2ihUaeGh52fh8JgvZgLihfi+XTgObD2iZ6VSuUJkWlOiek4UQKvv1lXj1txcRSGq3BLBfvbfwGiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744667315; c=relaxed/simple;
-	bh=w6PSwBtMwyxQwRU6pbgmBPwhQ23482V1wf2Ekl+BAbQ=;
+	s=arc-20240116; t=1744667362; c=relaxed/simple;
+	bh=jFZt0KvrTr1LbLxZyMCPpQPqLXRpwCSYwOOLHWfTgZY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=B8JoDdTbizSC6lGMyAKNYev3aPVkNuLUmISnjegipocxKc7qJQ9/wdLRo9jCzNmBUfHeRPn5G3q8J8EROzKcjnQBOnTR7tw89cxv9cpDGigFBkYzkYl5YWi7GbTW3/RkBWXswnJPDzVSKuOFdkxlaLbnm465E4An5ETUmSBiG+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u9VUPHtZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71728C4CEE2;
-	Mon, 14 Apr 2025 21:48:34 +0000 (UTC)
+	 MIME-Version:Content-Type; b=bPWbTJMGf6ZEp7OU0g9AcPq42o6zKhF+jpOQsk/v9x3kBVzD4kHQhXclVGMMROZEnqAupt8sEf+AKRXsOBBIhFX8CPdlwktS7Do/ZQmoq2rOmA+ROHxRYRykSumDGTUtXlX2j+fnRgaPc7GhiJMyUxcbDJ2HyCU+0r0M0q2XBfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ANw6pMfs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C557C4CEE2;
+	Mon, 14 Apr 2025 21:49:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744667314;
-	bh=w6PSwBtMwyxQwRU6pbgmBPwhQ23482V1wf2Ekl+BAbQ=;
+	s=k20201202; t=1744667361;
+	bh=jFZt0KvrTr1LbLxZyMCPpQPqLXRpwCSYwOOLHWfTgZY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=u9VUPHtZZc3b3rBTPM1uwEWFXSbDKKNRuHRqKq+5faag+Kd+55nRVIJMTeN6SgNa/
-	 XtZ6mYd8y3wVGLkwX3Ny+wS6GxJZHllS1zsOTNyD4l+JtLL5V09x4AVw7p5nuuIjvN
-	 st/U0F0NRrwKipDDItD6PcNYztY5MS7m5EJVD7ewbvX89KL/ioPLd4ENIzvwkffHEk
-	 wHYfwlhI9bWPQGuNlm5fp3/W7tveXW7920dqAO/7zq9vBILO13P196tPyQh/Oskvsp
-	 jKOQS209RsTjbpzT9M4ymmL8PtMlTvEj5Jy8fUlQa/QSv+Lwx7VqXNPCSRyWqRkur7
-	 8rUCVcECSeeNA==
-Date: Mon, 14 Apr 2025 14:48:33 -0700
+	b=ANw6pMfsVIpE/wWOtMamlbzbgieuaEftXKvj2PCs0yCDuvZ3grY6/jt44cr9ISSoV
+	 9+yIrHEYNy/nA1PPL60ofRRfrRSYpzgcxpSTWmCWskfD4CHcccnpJN2B17yozedvNp
+	 rNj9izSvDrYceI+UsCiklPIpkuFQAEIZrL3V68jXeSkDvOQA98Vt6YMsJpDau9Xxk2
+	 sPYZXDrUgWnnogsf8nmgxgsO3k4vhJgRHo+0dH9+Hw6tZsi0UH5wBL/t3hox52OJiC
+	 jWlut+RkV0EGi+fXwh7esjMKXXn7Oltqf/WX0LxxNAcnBTXR2H3PPurOQR29Xe7uQ2
+	 /ypN5umsuTdPA==
+Date: Mon, 14 Apr 2025 14:49:20 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Peter Seiderer <ps.report@gmx.net>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, "David S . Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
  <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next v1 03/11] net: pktgen: fix code style (ERROR:
- else should follow close brace '}')
-Message-ID: <20250414144833.063237ae@kernel.org>
-In-Reply-To: <20250410071749.30505-4-ps.report@gmx.net>
+Subject: Re: [PATCH net-next v1 04/11] net: pktgen: fix code style (WARNING:
+ please, no space before tabs)
+Message-ID: <20250414144920.3bdd68bc@kernel.org>
+In-Reply-To: <20250410071749.30505-5-ps.report@gmx.net>
 References: <20250410071749.30505-1-ps.report@gmx.net>
-	<20250410071749.30505-4-ps.report@gmx.net>
+	<20250410071749.30505-5-ps.report@gmx.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,11 +62,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 10 Apr 2025 09:17:40 +0200 Peter Seiderer wrote:
-> -		}
-> -		else
-> +		} else
->  			sprintf(pg_result, "ERROR: node not possible");
+On Thu, 10 Apr 2025 09:17:41 +0200 Peter Seiderer wrote:
+> Fix checkpatch code style warnings:
+> 
+>   WARNING: please, no space before tabs
+>   #230: FILE: net/core/pktgen.c:230:
+>   +#define M_NETIF_RECEIVE ^I1^I/* Inject packets into stack */$
 
-While you touch this you should add brackets around the else
+Prefer tabs, when possible
 
