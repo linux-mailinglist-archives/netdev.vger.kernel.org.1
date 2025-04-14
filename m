@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-182516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 741DEA88FD5
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 00:57:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37028A88FD6
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 00:57:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 824E517C763
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 22:57:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AAA617C58D
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 22:57:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AD901F755B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B99961F873A;
 	Mon, 14 Apr 2025 22:56:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AI5gdb6J"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VXYE3CMp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613821B4227;
-	Mon, 14 Apr 2025 22:56:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91BD61F867F;
+	Mon, 14 Apr 2025 22:56:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744671417; cv=none; b=RppYvu9p9Mq5e5VMEuXBwP4bur5eGqPHvpQ4yYU658mzh0vlXoO+K0J1QAnUqXfTsUoJz+o0d4q7+dowgL+nmwatjZXozbbqzXKfzjuM6WYn1icPN9qi9XQ0MPYQBZAmojvXWQvjKNMdApsAYpmy/eEf8rW4LDGoTlFY8Q515mk=
+	t=1744671417; cv=none; b=to6s3U3PfiSGVGSCtJCuxohL5LWYllix46TRM09yXKg2ZmTZ6FFT++fklW5pcKXMyQntb5Itmq/96yOuJpuUiUsFtOctt9HLSxa1kOWawM0AjPXM5CSlcNooltCkRxWEgTHAilHrYvqhr2aaUn2Q1Uz29ZdQh/Vg4+P5xbYT9D0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1744671417; c=relaxed/simple;
-	bh=SkKZFM7nlwMawFGvdPiTDYYerrSRQlIXzuWAlpp1oJI=;
+	bh=6XCxiEE0f6aFdryeR9gXZd01V4lTfiAVuXBv0meC0mw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=f0AfaXAkb1TJzoLzxQCmJEMak1y5Y0PMpD6q+7FB444j/lb5Jf/k3JetTRdcbz8gsSebTXNpA3bvR5Y1bl9XTexQmdyuM8qNh4igYn6ElpbviGAeItlOb9vLjjhbuAILDTxkrbOuK89TJ+sDV/SaqtMkdus6cJUF2k663Kv5RKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AI5gdb6J; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C77A5C4CEE2;
-	Mon, 14 Apr 2025 22:56:55 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=iUvtApftTUiAA7BXP6G7+H+W03ADagoquIetIDAlYFUEFaW35p3euTq7BY8wUI2WhPznmBGZWwBiyc/PGcyKYV1AtQRWgY3TIoF74h7bhWWPisxdGy5ZaHGXPpLdlO91jdoi5o2z5IfRFlKbqjZasoMidJfuRsYAlsMNvXKe9HA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VXYE3CMp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11AAAC4CEE9;
+	Mon, 14 Apr 2025 22:56:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744671415;
-	bh=SkKZFM7nlwMawFGvdPiTDYYerrSRQlIXzuWAlpp1oJI=;
+	s=k20201202; t=1744671417;
+	bh=6XCxiEE0f6aFdryeR9gXZd01V4lTfiAVuXBv0meC0mw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=AI5gdb6JT2a2yBcU7KvTGOs5fpaJvEeWr2IzuOlMjLr5S7Hu6IgwE9EBvJLL0rCyG
-	 qKSDmxOLs8uwZ7jTURO1in8PiUZAzT1LUIKajscnfKxWXXgUC+ZCuC92cJGRspc5Lu
-	 zDOnXZDY4EBhLxxMDjR+zsIm57FXW8I3Q5rH9Nygmy6cWbH6/3p+XG6KAE1/b91fK+
-	 nigbjPC8foI6KurtN91WFreM6IG3+vPu0rnWQ28ZJRoWP9FexU09CLLydXuNsTimdv
-	 /Zf+HFVSLkeaQZd8LzoF9ZaXygQ8ZnSKC301HZLQDHd2eMNLr5WYDjwutOIL/CZ7td
-	 EW44jNncQon3A==
+	b=VXYE3CMp5xOdYHJMHh4v4qIkuEa4vvgbo69iOkRmmodzNdLg5BVA4Y4zQeOTJNeDC
+	 tCh+UcmXsZQPcWIk1fPctNVA3xESUfwQyR6DC4QJIjdrAl+0vMIlNHX3ysPmdB4Big
+	 FyDChJYLa8EMsJvpZOaClxm7wulRNHnrxPSAo7u9LtcVn8BjLTdsGn4rhiB41MeqNZ
+	 BWfPtGqNAfBb1JglnP16CDwgWSe1boO1NLUAMIFlDOt7HsJsUpgE5gW9+wrdYMl231
+	 yr8cHSGxmTUEbG3PmxVJfY4GFZ7Ri5lEEjB/6d0jFXPNU9l6zCi9BpWrmzYaEWfqu6
+	 2hbFWkHjXh6bg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB16F3822D1A;
-	Mon, 14 Apr 2025 22:57:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B563822D1A;
+	Mon, 14 Apr 2025 22:57:36 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,51 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] bna: bnad_dim_timeout: Rename del_timer_sync in comment
+Subject: Re: [PATCH v2 1/5] bna: bnad_dim_timeout: Rename del_timer_sync in
+ comment
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174467145374.2060374.17090389080964951465.git-patchwork-notify@kernel.org>
-Date: Mon, 14 Apr 2025 22:57:33 +0000
-References: <61DDCE7AB5B6CE82+20250411101736.160981-1-wangyuli@uniontech.com>
-In-Reply-To: <61DDCE7AB5B6CE82+20250411101736.160981-1-wangyuli@uniontech.com>
+ <174467145500.2060374.2711094592170219314.git-patchwork-notify@kernel.org>
+Date: Mon, 14 Apr 2025 22:57:35 +0000
+References: <66962B9D4666B555+20250414042629.63019-1-wangyuli@uniontech.com>
+In-Reply-To: <66962B9D4666B555+20250414042629.63019-1-wangyuli@uniontech.com>
 To: WangYuli <wangyuli@uniontech.com>
-Cc: rmody@marvell.com, skalluru@marvell.com, GR-Linux-NIC-Dev@marvell.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@kernel.org,
- zhanjun@uniontech.com, niecheng1@uniontech.com
+Cc: akpm@linux-foundation.org, guanwentao@uniontech.com,
+ linux-kernel@vger.kernel.org, mingo@kernel.org, niecheng1@uniontech.com,
+ tglx@linutronix.de, zhanjun@uniontech.com, rmody@marvell.com,
+ skalluru@marvell.com, GR-Linux-NIC-Dev@marvell.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 11 Apr 2025 18:17:36 +0800 you wrote:
+On Mon, 14 Apr 2025 12:26:25 +0800 you wrote:
 > Commit 8fa7292fee5c ("treewide: Switch/rename to timer_delete[_sync]()")
 > switched del_timer_sync to timer_delete_sync, but did not modify the
 > comment for bnad_dim_timeout(). Now fix it.
 > 
+> Cc: Rasesh Mody <rmody@marvell.com>
+> Cc: Sudarsana Kalluru <skalluru@marvell.com>
+> Cc: GR-Linux-NIC-Dev@marvell.com
+> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: netdev@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
 > Signed-off-by: WangYuli <wangyuli@uniontech.com>
-> ---
->  drivers/net/ethernet/brocade/bna/bnad.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> [...]
 
 Here is the summary with links:
-  - [net] bna: bnad_dim_timeout: Rename del_timer_sync in comment
+  - [v2,1/5] bna: bnad_dim_timeout: Rename del_timer_sync in comment
     https://git.kernel.org/netdev/net-next/c/1450e4525f9a
+  - [v2,4/5] ipvs: ip_vs_conn_expire_now: Rename del_timer in comment
+    (no matching commit)
 
 You are awesome, thank you!
 -- 
