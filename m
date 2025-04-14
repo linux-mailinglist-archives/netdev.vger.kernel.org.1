@@ -1,84 +1,126 @@
-Return-Path: <netdev+bounces-182485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFBEBA88DB3
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 23:24:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A167A88DB8
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 23:25:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB61017712E
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 21:24:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79CD4179060
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 21:25:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA59C1DE3B5;
-	Mon, 14 Apr 2025 21:24:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B00B91E51E7;
+	Mon, 14 Apr 2025 21:25:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QomymD2N"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iprZvO/B"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 962461C6FF3
-	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 21:24:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487C41A83F2;
+	Mon, 14 Apr 2025 21:25:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744665858; cv=none; b=Iy2oKwKYQ04OVXh3bGupczTLMRkTvuc85nx4cvdyXR1fWgeWJVKphOsWsdGM+qcGunAejAg92KCUGD5oP59ovqxynGdMYTZfHTYlCfsNPuI0JXzfLdyF28k2DXc8T2bWlqO2vYUPxemujSuaMVl8jYpW8b8q9+waCD9S5HiJvlo=
+	t=1744665935; cv=none; b=qD6awZDpZZC5q42oJlnArr9BtLU/Pq+onGrMuAwuowE2b4mY1B8fJgJ3Vy3DZU7fNEHVQBNEDi8slSbwU5/oAsa1df2QMkgS7PhxlZ2IMSvzgsgGjB2ZGlvH84X7m19wXMrsVGfns84vnDDgAbYfNBg4aElfVgQrBXOymiOM/vM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744665858; c=relaxed/simple;
-	bh=phLluQepQHPpy0EycaYCH27m19SWuvJ+nWqWfx5X8U4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fnFdharH9On/L9IwvmMCRZ8uAmqt8Lq/pu7CO/UXDiWDJNx4SQlLJQV9JwBjAAWxoP+dS6T0stbHqv5/PemSNTsiNHqE3RDIHTDTqQP7gTDGTX0bbms3NAQ2c27KD37h4LDLQcpWmp3xdXglw/ym/dDR5L4Qp6xpqSxkmQnhYO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QomymD2N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3D76C4CEE5;
-	Mon, 14 Apr 2025 21:24:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744665858;
-	bh=phLluQepQHPpy0EycaYCH27m19SWuvJ+nWqWfx5X8U4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QomymD2NflLXn6n+Ej+dLHYQYjq00JJxInIa82Esu4RmCl+c2Se5wulE0GMrfekfw
-	 m2I33reKH6w2YxelOk4+PxMArYdmTxPI6TSF3ldtB26D3Nj+UuN5HxkOWsaklvXsgD
-	 QYpRCuG9Y3gAvc/quxUBFrplO2UN/w5zBSrEv442lVxGbIerkaKBW+CP1DI/m/bTFh
-	 rvK6CPBnpI4f1M3zJ7LR8p8ObU10GMWq9aKfJNqesA8YabpRqwz64IGy8CGz7LJ99c
-	 IyWR94QXpqQ6pwoVN75yts4t9B4i8lsGiqYccioiISAMm2UoyAP4YQTfXRbmtfX/CT
-	 O41RLNXrcmMHw==
-Date: Mon, 14 Apr 2025 14:24:16 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>, Jamal
- Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] tc: Return an error if filters try to attach
- too many actions
-Message-ID: <20250414142416.7a4936d2@kernel.org>
-In-Reply-To: <Z/14I68bvZRza6eB@pop-os.localdomain>
-References: <20250409145523.164506-1-toke@redhat.com>
-	<Z/aj8D1TRQBC7QtU@pop-os.localdomain>
-	<20250409171016.57d7d4b7@kernel.org>
-	<Z/14I68bvZRza6eB@pop-os.localdomain>
+	s=arc-20240116; t=1744665935; c=relaxed/simple;
+	bh=N4BFEDl7uYJZ/uee6Yh5jrAWw8mBsknP61/45paC1Mc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lsViYzfuhdyI21i7aZ2bEFU39OPkQcO8B1YpT8INf+vxMETZjG8IWXPVCeadpt/TLNe5YcjqwLs2s7Xrr8JbnFRfBUvD5OD/hLf6SwNCCVjqn5wUgJn798MjBY9xZx0CM+ZuKlcY1gwX29G5VmhLTW7SdV3i7fCMCaXIZ/Zq8pY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iprZvO/B; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-225477548e1so46803305ad.0;
+        Mon, 14 Apr 2025 14:25:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744665933; x=1745270733; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=u1IQBK50cTzuspbb54qXzEgBNmv1ZuYACNvXUgrmt94=;
+        b=iprZvO/B9S2fQNXB5AFWQtXBCz3xY2V5ZLQlqJcTxMwJXasIAxvyg3B2e08enEM8w9
+         CigXEN3y1F33YK+wrgZ3ykhX5EdvE4KVPH9SM81W9XU2TwpudvkpnTTG1150yxIX5Zis
+         1t14vUsWYs+cTwz8sLnOJUOonm/bjA0BsDz2CuuHI/l7QMrBlxglifvTe+G7jcIpkFdC
+         tHdrYk/GnAFvauIy3lA1ZDJOae4v7PwJ4vwZ8XGnsbBY5xKPuyppzOoplEybRfE3YUiY
+         MdN3uORktmvXk8gB+DjuC1qMEet2g5m7qFapSq7ptVsbZ/VpVczHXuIx7BjneJZKNcux
+         qXoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744665933; x=1745270733;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u1IQBK50cTzuspbb54qXzEgBNmv1ZuYACNvXUgrmt94=;
+        b=WpTFhcc2oybi8yXKPKciBeEihtxYTK3z0AvnCc5aQdh+1izJWzeAX72rT/OaN0F1Y8
+         hMSN6rrMbsjX04m3+njBEFTEu/WWa2a/V5gWqSMWWlgtPJte/Kuo+fALPrzq8j036t4S
+         4oJkZWL4/ylS1L2vtTo2XwLb8K/IoplmwuOsN7so8tfNdQyCvhCrjZTloM9Po2a1Xfqh
+         nzBiE6/dt6URbcRSMhumynmjDP60fdNBtIZ5Er/hihEECF4Dgsm+uabi3H1GsUKUbzCZ
+         E8XGV51+NZ++V9XT1Sazq/x+PtwPVY3rXvx1AdTWcs1XzqqYVaCRhWZjFBAp2RythQ1w
+         p8/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU/DtncBTYX0K21c4CdOu2bZRtJDmBv3ZXdv+JslaM3MdUoHLmNrxzkaUR4dcjDqELaS2HzZXCp@vger.kernel.org, AJvYcCUXyO+wD8Hdgdc1LwUl9YHIYopYncK5RMuOJHq4Iq/t0MpVikkDQVH3B5LQ1+K2V7akhGYj/VzgBdMWV1s=@vger.kernel.org, AJvYcCUcbPPyn0xgaowJwhfkEi/Hbmn2+fmFUxgLIHPqB5WcFD6YbAwerrLnFw3S3QaAOqgZ2hFhk1DUoP+dyiPv5COl/0AU@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRTUuFaI8+Vty/PjfrFbzBkViScW5OVAARovs5SN5QLdHtEHzZ
+	LlHEimP1+fx4arX1Zr/bbxoFq3RSpUd+jgBJc4m/7C/nGb1ERp2H
+X-Gm-Gg: ASbGncuZ72oBQTSmmj70gMSagbCESBiVDeaxSZ6kVV3C1+6SZHZu+PdxVmh137jsJwy
+	gzMAGQlx4kLaDMsS/9y6851ygbVVkN7XzdPqhs36rzwYpbzfc6kLjR7wrRPMSK8zzSLXx86qiXR
+	DxS9ufTANXxM1BJ0ujQltrVSR2asJCcRqfQeodIsDjcBPDWrJ4Ulu93JESezelEr5D9SfBakduX
+	1h6k5vFq2V77fItQePmsBIEH7LaQwZDVBjviuDONzDHSpKaE+1228SBzFPqrG7/2IiwcqeKmHWw
+	4Oh7U+VH3iOeokwBwtwcSutTm65uivV25Da4fYS+KFQy
+X-Google-Smtp-Source: AGHT+IFSueGj0QdNKNpNqsLVoIp4A4P4xbJ2sCbD0cXBKvhK0NSuw7f6ErhqZ15aCkOjkYVOXZ5F1Q==
+X-Received: by 2002:a17:902:f709:b0:223:fabd:4f99 with SMTP id d9443c01a7336-22bea4953demr206548995ad.5.1744665933444;
+        Mon, 14 Apr 2025 14:25:33 -0700 (PDT)
+Received: from localhost ([129.210.115.104])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-22ac7ccb82fsm103617715ad.219.2025.04.14.14.25.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Apr 2025 14:25:32 -0700 (PDT)
+Date: Mon, 14 Apr 2025 14:25:31 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: bpf@vger.kernel.org, mrpre@163.com,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next v3 1/2] bpf, sockmap: Introduce tracing
+ capability for sockmap
+Message-ID: <Z/19S2yMP/2TViMa@pop-os.localdomain>
+References: <20250414161153.14990-1-jiayuan.chen@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250414161153.14990-1-jiayuan.chen@linux.dev>
 
-On Mon, 14 Apr 2025 14:03:31 -0700 Cong Wang wrote:
-> > > I wonder ENOSPC is a better errno than EINVAL here?  
-> > 
-> > I think EINVAL is fine, it's the generic "netlink says no" error code. 
-> > The string error should be clear enough.  
-> 
-> IMHO, EINVAL is abused (which is probably why we introduced extack). I
-> prefer to find a better errno than EINVAL whenever possible.
->  
-> Extack is available but it is mostly for human to read, not technically
-> an API for programs to interpret.
+On Tue, Apr 15, 2025 at 12:11:45AM +0800, Jiayuan Chen wrote:
+> +#ifndef __TRACE_SOCKMAP_HELPER_ONCE_ONLY
+> +#define __TRACE_SOCKMAP_HELPER_ONCE_ONLY
+> +
+> +enum sockmap_direct_type {
+> +	SOCKMAP_REDIR_NONE	= 0,
+> +	SOCKMAP_REDIR_INGRESS,
+> +	SOCKMAP_REDIR_EGRESS,
+> +};
 
-How is user space going to interpret the error code here?
-Seems to me that'd mean the user space is both aware of the limit 
-and yet trying to send more actions.
+I am curious why you need to define them here since you already pass
+'ingress' as a parameter? Is it possible to reuse the BPF_F_INGRESS bit?
+
+Thanks!
 
