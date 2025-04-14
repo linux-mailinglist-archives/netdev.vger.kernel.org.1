@@ -1,133 +1,100 @@
-Return-Path: <netdev+bounces-182103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77B01A87D24
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 12:11:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FA09A87D53
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 12:17:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC319188DB9F
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 10:11:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26C353B925E
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 10:17:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A374264FB2;
-	Mon, 14 Apr 2025 10:11:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="huxKY3SZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DC8A25F96A;
+	Mon, 14 Apr 2025 10:17:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73B5D190679;
-	Mon, 14 Apr 2025 10:11:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744625504; cv=none; b=thX+egDmLZajktKczdM6Dr3Kr8hBlxxiZswpi3mkoLX+46cyQabdLhQdXtuR0HoiSq2FIp3rS97m6mRxdZMAsDiZ83Fi5EevBjGxGknBDI9kjCwEvHklOKDd881XGfTUDxSY6AiB/63LlNwOzbgN6puvCrz2lGJ412pWW0Ha0Pk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744625504; c=relaxed/simple;
-	bh=A5JrYJudGl3DhGQV8xarh0BdKwPSWfzjJojbct/oWAA=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EdCl8TFNiItyuPPfJzuiTCtfDhMKITYRZNbMzvy+hLePIV6H6cg/18qRmR4DieemPNPIEwaoCzwL8jqt+6Fy6ZS0Hg7YY8bELwR7Xb70LHGtvOWhc/VtE7OfG1yR8lGbP9dK04JTvT17ejk8eVYF9YbvqdI76pM3dGdzcFGVkIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=huxKY3SZ; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 1514620523;
-	Mon, 14 Apr 2025 12:11:38 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id qlytawnqRQOS; Mon, 14 Apr 2025 12:11:37 +0200 (CEST)
-Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 3534E20189;
-	Mon, 14 Apr 2025 12:11:37 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 3534E20189
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1744625497;
-	bh=Weyznl+15m4X8CsfGwNOCXhpIw7Y6wOODlPtRSZ+HV4=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=huxKY3SZmtyVuMCV846LSXff4w1KwmquZdZPvh27Hxmg4fAcZq/66nLyqU/7cTy1h
-	 m9f1ANEJ1iFM9x+WD1xODHbrGdAdvzNNZc+ycTSjw1LKni79fK8JE5ZvhPzEbE9QjY
-	 Wgy8/2+E9OYz1RcCHcRRuIYTrfzXt15P4WerwPc18TRjw0irlRYdPFbh6QDKXdgRcl
-	 m3IljHCyd+zC6qChKqm7qh5ODGEhCqk1nEm6XgU8Peh0TBGCH1g/kU06tNRYmwKY/T
-	 UCohCR9MS6GUWuCzuHdnDZzCG6dh5yqDXTPleRn4mDLs3a5aqDvfiH0gfcpyJy2GFb
-	 8BFynpTVih7Xw==
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 14 Apr 2025 12:11:36 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 14 Apr
- 2025 12:11:36 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 2284A3182D8A; Mon, 14 Apr 2025 12:11:36 +0200 (CEST)
-Date: Mon, 14 Apr 2025 12:11:36 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Cosmin Ratiu <cratiu@nvidia.com>
-CC: <netdev@vger.kernel.org>, Hangbin Liu <liuhangbin@gmail.com>, Jay Vosburgh
-	<jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Nikolay Aleksandrov
-	<razor@blackwall.org>, Simon Horman <horms@kernel.org>, Saeed Mahameed
-	<saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu
-	<jianbol@nvidia.com>, Herbert Xu <herbert@gondor.apana.org.au>, Ayush Sawal
-	<ayush.sawal@chelsio.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, "Przemek
- Kitszel" <przemyslaw.kitszel@intel.com>, Sunil Goutham
-	<sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, Subbaraya
- Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, Bharat
- Bhushan <bbhushan2@marvell.com>, Louis Peens <louis.peens@corigine.com>,
-	"Leon Romanovsky" <leonro@nvidia.com>, <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH net-next v3 0/6] xfrm & bonding: Correct use of
- xso.real_dev
-Message-ID: <Z/zfWKfhR0GcuCki@gauss3.secunet.de>
-References: <20250411074958.2858496-1-cratiu@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC45258CCF
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 10:17:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744625846; cv=none; b=ILKAS1PBwlPQ4KNHUiVq+4n9Y6kUEP8Z2JmkwRnblnPAvW3f2mMeWNrzlWLu89aKGPzNuXONZLcymODPVrPop+l2lBr/BNHm11qakAIZuQJGo5MkiUhEid29HhUkyBZFZBX1MmrGjaOxwV6z4otlFszzvSF1aqhtMVJEPiR1Fhg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744625846; c=relaxed/simple;
+	bh=2c7M1E1lRjaBDF0DTAAPrSRSxY+BYWh8WNPLmGeCIVw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Yi+1qo7lGVv5267whJOnu8rtqWUkSG4zt5om7xa516NWIWFhX7sbtXywNGhDbXPeXWSxA5dnkF+nK/Qm0HZt4XCYRKnF5dxyRiN4WS9XsUiVZnv+nZlvDf3Q2/o0EADeDkPm7U9R6gx9dOgTVuofGbTymfY3mI1pB1j8eleawpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-85b3a6c37e2so439529639f.0
+        for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 03:17:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744625844; x=1745230644;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CtlMRSkBTs7/GQxA1jZuBkOtfqExXnDhTxodFQXsVWE=;
+        b=ZXoD+NCQEWRboCtHJPciyoHFwia28XBrS/+fbMnvoXx/0P/7hFlogVmKtwX/zFzGaC
+         45BtCYPoGbZQdojSp0XykWkD9N6z+zJmQ6FmKBUg14ibAz0+lh/n4KB0kt+CTvJf4act
+         JfSOhsFaD7SQf0AcmL2wK6UQ0OPB2JcHdMmZNoMdmp/rCQPEqZa5+E+8kGAZBsdQtlUr
+         IrcheHHUA9+H9SEaIZOs8XHe0WZAe5Gg8X08mnYMNq1xR7E/szOaIoBJ/uLTtuO2E1z7
+         zE1deP08Rz8ReQzdG+QQI5WDUBdlWP2Zo5wRLicZNXACTVCZDtqm/jOZ8Q4O0AeQs+O1
+         3H8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUfVavVx8xdzwgBzPAdpk/XKLS798amCtTjI07fUnKebAnUyxjbymNGB27tkkSTIYP0RHCrCwo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYjwVAlO/VnxiiyLxaZDPrjaQpLc+2KdEJDXGPpmWpi8E4tR2X
+	bSNXMSUDzt1RqhT80C4akEJSy3yH1Y/9EBWcZoNSTw9XDOMMvAF2UeQ/86y6lf9dZd0m/mHYdm7
+	4mV9wVvYaO6sNjGLeMDp82B67ziMxPX+UsKUBuSVVnJVv1ui/G/hwLDk=
+X-Google-Smtp-Source: AGHT+IEsWK/XLzkCHRNQgrHF5KhLezLNJO4VLrlEScGVacAR/kgdUOYuphvjLeyiCMwRREts1QtXMXzftrH3GbUhtWKQod+vnsQX
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250411074958.2858496-1-cratiu@nvidia.com>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+X-Received: by 2002:a05:6e02:2190:b0:3d3:dece:3dab with SMTP id
+ e9e14a558f8ab-3d7ec1dd57cmr100206425ab.1.1744625843764; Mon, 14 Apr 2025
+ 03:17:23 -0700 (PDT)
+Date: Mon, 14 Apr 2025 03:17:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67fce0b3.050a0220.3483fc.0024.GAE@google.com>
+Subject: [syzbot] Monthly sctp report (Apr 2025)
+From: syzbot <syzbot+list56b130d2c18ef7a5ca58@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	lucien.xin@gmail.com, marcelo.leitner@gmail.com, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Apr 11, 2025 at 10:49:52AM +0300, Cosmin Ratiu wrote:
-> This patch series was motivated by fixing a few bugs in the bonding
-> driver related to xfrm state migration on device failover.
-> 
-> struct xfrm_dev_offload has two net_device pointers: dev and real_dev.
-> The first one is the device the xfrm_state is offloaded on and the
-> second one is used by the bonding driver to manage the underlying device
-> xfrm_states are actually offloaded on. When bonding isn't used, the two
-> pointers are the same.
-> 
-> This causes confusion in drivers: Which device pointer should they use?
-> If they want to support bonding, they need to only use real_dev and
-> never look at dev.
-> 
-> Furthermore, real_dev is used without proper locking from multiple code
-> paths and changing it is dangerous. See commit [1] for example.
-> 
-> This patch series clears things out by removing all uses of real_dev
-> from outside the bonding driver.
-> Then, the bonding driver is refactored to fix a couple of long standing
-> races and the original bug which motivated this patch series.
+Hello sctp maintainers/developers,
 
-I'm still a bit skeptical about the bonding offloads itself as
-mentioned here:
+This is a 31-day syzbot report for the sctp subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/sctp
 
-https://lore.kernel.org/all/ZsbkdzvjVf3GiYHa@gauss3.secunet.de/
+During the period, 2 new issues were detected and 0 were fixed.
+In total, 3 issues are still open and 70 have already been fixed.
 
-but I'm OK with this particular pachset.
+Some of the still happening issues:
 
-How should we merge this patchset? It touches several subsystems,
-including xfrm. I'm fine merging it through the ipsec-next tree,
-but would be also ok if it goes though the net-next tree if
-that's easier.
+Ref Crashes Repro Title
+<1> 3863    Yes   KMSAN: uninit-value in sctp_inq_pop (2)
+                  https://syzkaller.appspot.com/bug?extid=70a42f45e76bede082be
+<2> 29      No    KMSAN: uninit-value in sctp_assoc_bh_rcv
+                  https://syzkaller.appspot.com/bug?extid=773e51afe420baaf0e2b
+<3> 1       No    WARNING: refcount bug in sctp_generate_timeout_event
+                  https://syzkaller.appspot.com/bug?extid=c7dd9f1bd1d2ad0e5637
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
