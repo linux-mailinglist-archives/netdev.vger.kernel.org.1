@@ -1,159 +1,290 @@
-Return-Path: <netdev+bounces-182234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05CA1A88468
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:19:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30C97A884C2
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:27:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B7067A32BF
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 14:18:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A98616BD66
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 14:22:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60E07296D07;
-	Mon, 14 Apr 2025 13:56:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06A29274FE2;
+	Mon, 14 Apr 2025 13:57:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fyj4513e"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Sk8Gf83k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9474F2957D6;
-	Mon, 14 Apr 2025 13:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F26E274FD7
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 13:57:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744638982; cv=none; b=bgIjapD0N3+iHc97+2HczfyMto7wFwPpTOlOwCHEV5uWO6u1cedMzLEjun2s7mqo+Ekv+BT/GQKfHrIXDguK+iPV00u4PLaCctJcLs5d5Zk0LZ5HoQ7YIvjPuEZfRWT7cRq+H9jyVTwv2Ny/JAtf4Qd0Cbb3fnFw6aPPoIp5+NI=
+	t=1744639076; cv=none; b=fcSaezIRWXvB8sXnaCqtIAALDiUvkvh4OLap/OtG2nkK7bDHNRYjC5RBNS6KZNiO8jD9jow1obAsjej+wBSFkfC/XDlYESYgfS2jjsvb3wk0J5EFurU4/YGufvelPYyDoxbMUguuZkTrIBS4XAp7r9Sf3yfeyzzLAgr6wG53h9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744638982; c=relaxed/simple;
-	bh=byjSjrxCbhU5uc7aHlaZTnC0DJF5shLq5b+r4tgNpok=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=C0A69Anw0KTTDl9YQekvYT6SCZf666iz5i6rLjpNHQem8d09rpFEI86L/8gtVuHRVdJPvzYS1S1wpuVXZVGHt1VW6GIKwX+3ayOJl2zmsOzixFheoA/m8C6DAZ/8zEsxLFJp68xVATrLkktHrFRIwt40BZGrRerIDYs6MCrBW50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fyj4513e; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-abbb12bea54so868665166b.0;
-        Mon, 14 Apr 2025 06:56:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744638978; x=1745243778; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BTeEt1RU6eyQY7vNutEMrHzrVqwSVTKDzRQxwATIcm8=;
-        b=fyj4513eKAzRE2++cFFBP/ezTSebu2fuyb03TwCaTTAQeUDBGv4Vq1/4p+LHZ9x7Pp
-         gMDLZDzcg8+VKTI/pgqJmuLczLvU2WsCdrMSPp0j/2grn5RI3N+P4dU/1spGIdQtylUV
-         sh0dBZ1OSyEwKtDoQSRY1LBCoDa0VLc1cIU0Et51xBPoOwx+E5aumkELhKgmY+Wqheph
-         25WDK2uaGV7wKKbtn3PftWUEqWWucxKDpX5XS850lOE6dOzV1M6gvZJ34JM2L6Wz5M1T
-         0l08NGiITuvRzRnsJMSH7kGqzdeagByDhHOGHtLAUeYnbzuoK9BwGkXzWMq8YOVccXtz
-         x3Pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744638978; x=1745243778;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BTeEt1RU6eyQY7vNutEMrHzrVqwSVTKDzRQxwATIcm8=;
-        b=koLZHG/JVoDeBVUkWlE0WOG9bfbFbbBm/2wNQvGXxU9N/QpqTpwvUcR2o56liIwbqP
-         Vy5WtZB6joKcPNgpvaeAJd07W+xxQJYq3AxPh2nTnGD4qW3ip6f1qVB5PGfQQ4owshuO
-         gEl7KSiZFTM8FEEPF/rd3KXKatMFvWdWyWSqF5bnvDSuP/iLxOpoolWAJxhReVyqfPp/
-         rfGXkL6oGoMjdsP6dWFGP5GpWEbSN5nfguuXqNqM92IJwQ6THs98KXN9Vb4KNIJ2La6N
-         Dl93mky2bSSd0LwGuON4mVWJZIIhDI0HrgqnJL2hhmFZ2Wkzgc9ZBtMQy3RQCjraOo3J
-         F4Lw==
-X-Forwarded-Encrypted: i=1; AJvYcCWHIKX/cVPLto8NTBjmWKuxfrY1qGit7aDleuCmUEVUhXaTE+Rvu1HPdOZWqmX3MeIjbPc74wcE@vger.kernel.org, AJvYcCWdPibqy8wjdwJbvoYO0V77XeJl1YV+Q9RhQIILZ6xaZU7RSJ+i6HM1bje4DjUt0ns5BAGjmQGioLAB@vger.kernel.org, AJvYcCWzk1gYspYURUmwgignkbVOXdhTiTMNspAY05UntrrBG166teEI01BXIHBwDWRB3hlRVMvR54gS5wPCyKfbYB7p@vger.kernel.org, AJvYcCXWu+f/xmmsfHDhgOy40h/b2l2JOttC7Q/pI2p1wMRGLePrq94Y+F60pXI1MWdaMQkfCH6YXEzSoJcw3Y1M@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywv4Pu2z6Q4Fs3EASZzJa+nK8FO0N0GmY0jFgwz8sthx2k/DnYE
-	jgLlNERQrkm++6MZSDyPo/DqYl6mOMtMiDi7gqW4jPjU+BpvLBDtHw+JkHiYn1P6g8DQYlxXpzo
-	1h6spczlCBFo++niexNqTLkN1LT4=
-X-Gm-Gg: ASbGncs4an7WzsiapHDMMywd7dklSMGZ1ECh7GQWZLQzEdja+9PYg2qoVA1sTSV8pax
-	p43Y5RaDynjtkqPFllpIL61aGSleYxeQf6hybX2CE3Zyx7UgUqvm9usyYKZuE8hSMA9V+z3oATR
-	fvbYiy5lcoLyN9V7NApSm3+w==
-X-Google-Smtp-Source: AGHT+IFUEu21Nbm/up+QwdSenWnwKsVw3A+E365YsrpZGwvNI/jyUUt21jdvv4Cojd3nbC1DCrPVyWKa+GqwZyFv1UU=
-X-Received: by 2002:a17:907:2ce5:b0:ac3:49f0:4d10 with SMTP id
- a640c23a62f3a-acad359bc31mr910919266b.38.1744638977471; Mon, 14 Apr 2025
- 06:56:17 -0700 (PDT)
+	s=arc-20240116; t=1744639076; c=relaxed/simple;
+	bh=QjmgDS7PGY4l/dkpIoo4Ca6kD6gcTPgFLu051s1wLTM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iPwnhzM3RaikfUHFSwduiQtd+3RfDHMNOc3wGujteD/rG7yFQO0JZpRuKdIoDolwUYPKZqjUb4575/rEX0Qa2VHuvZZHGwWIxAuxdXCsxAlp/6a7UQ3zOt85JenoHqac1DOm0tU2583fZRUmxeLN4LhrcsMimO5como++fgtbwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Sk8Gf83k; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=mEL46ZEHPzNOvWO7vJTDhVAM23gYy2Oet0voTH1QzP0=; b=Sk8Gf83k1xK9pYTi2iM0cLWxJM
+	5+ISyFiKN3W5EzJTz7voWDNybA/8GpgOk+qf8wKx+T7fusveqgtymIM/lDm+6itgtdMT4yb4MeBgC
+	NCtPlcjFE3aPsMhNenfFd51Pb6XGG/69smb0+I+vdo9ZNGrvxDm8Nmva9lTyC67/zLwvOI3phADiN
+	kpU4zPp4tFfofu2hFcRoPwpC8hNMMRe6YijfdhaH0PHUXiqrkvpfQAi4H+I2USHgPYuBKajbvfGt9
+	WZf833zpqCZnZPqj2ZMhi2hS9DUFyrTaJnaaPc7FsGsYf/5nDyfGmORzv91cxL7/S37sf56vyHDAi
+	L0vrn+vQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45212)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u4KJn-0006do-1w;
+	Mon, 14 Apr 2025 14:57:47 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u4KJk-0007no-13;
+	Mon, 14 Apr 2025 14:57:44 +0100
+Date: Mon, 14 Apr 2025 14:57:44 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>
+Subject: Re: [PATCH RFC net-next 3/5] net: phy: add Marvell PHY PTP support
+Message-ID: <Z_0UWKouGwMF9G1w@shell.armlinux.org.uk>
+References: <Z_mI94gkKkBslWmv@shell.armlinux.org.uk>
+ <E1u3Lta-000CP7-7r@rmk-PC.armlinux.org.uk>
+ <20250414143306.036c1e2e@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250407172836.1009461-1-ivecera@redhat.com> <20250407172836.1009461-2-ivecera@redhat.com>
- <Z_QTzwXvxcSh53Cq@smile.fi.intel.com> <eeddcda2-efe4-4563-bb2c-70009b374486@redhat.com>
- <Z_ys4Lo46KusTBIj@smile.fi.intel.com> <f3fc9556-60ba-48c0-95f2-4c030e5c309e@redhat.com>
- <79b9ee2f-091d-4e0f-bbe3-c56cf02c3532@redhat.com>
-In-Reply-To: <79b9ee2f-091d-4e0f-bbe3-c56cf02c3532@redhat.com>
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Mon, 14 Apr 2025 16:55:41 +0300
-X-Gm-Features: ATxdqUHTg1jcbOzMa7pipDhqGfFcA0usaAkeGfTb7SQC00-heg8_75ap0kABLcc
-Message-ID: <CAHp75VcumcH_9-2P2iayGWwD3Y87A7CZyO9vxqvbaUptS1FeQw@mail.gmail.com>
-Subject: Re: [PATCH 01/28] mfd: Add Microchip ZL3073x support
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: Andy Shevchenko <andy@kernel.org>, netdev@vger.kernel.org, 
-	Michal Schmidt <mschmidt@redhat.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Prathosh Satish <Prathosh.Satish@microchip.com>, Lee Jones <lee@kernel.org>, 
-	Kees Cook <kees@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250414143306.036c1e2e@kmaincent-XPS-13-7390>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Apr 14, 2025 at 2:52=E2=80=AFPM Ivan Vecera <ivecera@redhat.com> wr=
-ote:
-> On 14. 04. 25 1:39 odp., Ivan Vecera wrote:
-> > On 14. 04. 25 8:36 dop., Andy Shevchenko wrote:
-> >>> What is wrong here?
-> >>>
-> >>> I have a device that uses 7-bit addresses and have 16 register pages.
-> >>> Each pages is from 0x00-0x7f and register 0x7f is used as page select=
-or
-> >>> where bits 0-3 select the page.
-> >> The problem is that you overlap virtual page over the real one (the
-> >> main one).
-> >>
-> >> The drivers you mentioned in v2 discussions most likely are also buggy=
-.
-> >> As I implied in the above question the developers hardly get the
-> >> regmap ranges
-> >> right. It took me quite a while to see the issue, so it's not
-> >> particularly your
-> >> fault.
-> > Hi Andy,
-> >
-> > thank you I see the point.
-> >
-> > Do you mean that the selector register should not be part of the range?
-> >
-> > If so, does it mean that I have to specify a range for each page? Like
-> > this:
-> >
-> >      {
-> >          /* Page 0 */
-> >          .range_min    =3D 0x000,
-> >          .range_max    =3D 0x07e,
-> >          .selector_reg    =3D ZL3073x_PAGE_SEL,
-> >          .selector_mask    =3D GENMASK(3, 0),
-> >          .selector_shift    =3D 0,
-> >          .window_start    =3D 0,
-> >          .window_len    =3D 0x7e,
-> >      },
-> >      {
-> >          /* Page 1 */
-> >          .range_min    =3D 0x080,
-> >          .range_max    =3D 0x0fe,
-> >          .selector_reg    =3D ZL3073x_PAGE_SEL,
-> >          .selector_mask    =3D GENMASK(3, 0),
-> >          .selector_shift    =3D 0,
-> >          .window_start    =3D 0,
-> >          .window_len    =3D 0x7e,
-> >      },
+On Mon, Apr 14, 2025 at 02:33:06PM +0200, Kory Maincent wrote:
+> On Fri, 11 Apr 2025 22:26:42 +0100
+> Russell King <rmk+kernel@armlinux.org.uk> wrote:
+> 
+> > Add PTP basic support for Marvell 88E151x single port PHYs.  These
+> > PHYs support timestamping the egress and ingress of packets, but does
+> > not support any packet modification, nor do we support any filtering
+> > beyond selecting packets that the hardware recognises as PTP/802.1AS.
+> > 
+> > The PHYs support hardware pins for providing an external clock for the
+> > TAI counter, and a separate pin that can be used for event capture or
+> > generation of a trigger (either a pulse or periodic). Only event
+> > capture is supported.
+> > 
+> > We currently use a delayed work to poll for the timestamps which is
+> > far from ideal, but we also provide a function that can be called from
+> > an interrupt handler - which would be good to tie into the main Marvell
+> > PHY driver.
+> > 
+> > The driver takes inspiration from the Marvell 88E6xxx DSA and DP83640
+> > drivers. The hardware is very similar to the implementation found in
+> > the 88E6xxx DSA driver, but the access methods are very different,
+> > although it may be possible to create a library that both can use
+> > along with accessor functions.
+> 
+> I wanted to test it, but this patch does not build.
+> 
+> drivers/net/phy/marvell_ptp.c:269:33: error: passing argument 4 of ‘marvell_tai_probe’ from incompatible pointer type [-Werror=incompatible-pointer-types]
+>   269 |                                 "Marvell PHY", dev);
+>       |                                 ^~~~~~~~~~~~~
+>       |                                 |
+>       |                                 char *
+> In file included from drivers/net/phy/marvell_ptp.c:9:
+> ./include/linux/marvell_ptp.h:81:44: note: expected ‘struct ptp_pin_desc *’ but argument is of type ‘char *’
+>    81 |                       struct ptp_pin_desc *pin_config, int n_pins,
+>       |                       ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~
+> drivers/net/phy/marvell_ptp.c:269:48: warning: passing argument 5 of ‘marvell_tai_probe’ makes integer from pointer without a cast [-Wint-conversion]
+>   269 |                                 "Marvell PHY", dev);
+>       |                                                ^~~
+>       |                                                |
+>       |                                                struct device *
+> In file included from drivers/net/phy/marvell_ptp.c:9:
+> ./include/linux/marvell_ptp.h:81:60: note: expected ‘int’ but argument is of type ‘struct device *’
+>    81 |                       struct ptp_pin_desc *pin_config, int n_pins,
+>       |                                                        ~~~~^~~~~~
+> drivers/net/phy/marvell_ptp.c:267:15: error: too few arguments to function ‘marvell_tai_probe’
+>   267 |         err = marvell_tai_probe(&tai, &marvell_phy_ptp_ops,
+>       |               ^~~~~~~~~~~~~~~~~
+> In file included from drivers/net/phy/marvell_ptp.c:9:
+> ./include/linux/marvell_ptp.h:78:5: note: declared here
+>    78 | int marvell_tai_probe(struct marvell_tai **taip,
+>       |     ^~~~~~~~~~~~~~~~~
+> 
 
-...
+Looks like it's because this patch is missing - it's marked in my tree
+as a HACK and I don't remember why as it's been soo many years since I
+was working on this.
 
-> Sorry,
-> .window_len =3D 0x7f /* Exclude selector reg */
+I also have no way to test whether this even works (all of my platforms
+that have any kind of PTP support don't wire any of the "ext" pins for
+synchronisation.)
 
-It actually will make things worse. If selector register is accessible
-to all of the pages, it's better to include it in all pages.
+Simplest solution is as I said in my previous reply - pass NULL, 0 in
+the appropriate place to marvell_tai_probe() and then this patch won't
+be necessary.
 
---=20
-With Best Regards,
-Andy Shevchenko
+8<===
+From: Russell King <rmk+kernel@armlinux.org.uk>
+Subject: [PATCH] net: phy: marvell TAI: pin support *HACK*
+
+Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/phy/marvell_ptp.c | 84 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 84 insertions(+)
+
+diff --git a/drivers/net/phy/marvell_ptp.c b/drivers/net/phy/marvell_ptp.c
+index 3ba71c44ffb0..ff24d4a8ad41 100644
+--- a/drivers/net/phy/marvell_ptp.c
++++ b/drivers/net/phy/marvell_ptp.c
+@@ -29,6 +29,7 @@
+ struct marvell_phy_ptp {
+ 	struct marvell_ptp ptp;
+ 	struct mii_timestamper mii_ts;
++	struct ptp_pin_desc pins[2];
+ };
+ 
+ static struct marvell_phy_ptp *mii_ts_to_phy_ptp(struct mii_timestamper *mii_ts)
+@@ -101,6 +102,76 @@ static u64 marvell_phy_tai_clock_read(struct device *dev,
+ 	return lo | hi << 16;
+ }
+ 
++static int marvell_phy_tai_extts_read(struct device *dev, int reg,
++				      struct marvell_extts *ts)
++{
++	struct phy_device *phydev = to_phy_device(dev);
++	int ret, oldpage;
++
++	oldpage = phy_select_page(phydev, MARVELL_PAGE_TAI_GLOBAL);
++	if (oldpage >= 0) {
++		ret = __phy_read(phydev, reg);
++		if (ret < 0)
++			goto restore;
++
++		ts->status = ret;
++		if (!(ts->status & MV_STATUS_EVENTCAPVALID)) {
++			ret = 0;
++			goto restore;
++		}
++
++		/* Read low timestamp */
++		ret = __phy_read(phydev, reg + 1);
++		if (ret < 0)
++			goto restore;
++
++		ts->time = ret;
++
++		/* Read high timestamp */
++		ret = __phy_read(phydev, reg + 2);
++		if (ret < 0)
++			goto restore;
++
++		ts->time |= ret << 16;
++
++		/* Clear valid */
++		__phy_write(phydev, reg, 0);
++
++		ret = 1;
++	}
++
++restore:
++	return phy_restore_page(phydev, oldpage, ret);
++}
++
++static int marvell_phy_tai_pin_verify(struct device *dev, int pin,
++				      enum ptp_pin_function func,
++				      unsigned int chan)
++{
++	if (pin == 1 && func == PTP_PF_EXTTS)
++		return 0;
++
++	return -EOPNOTSUPP;
++}
++
++static int marvell_phy_tai_pin_setup(struct device *dev, int pin,
++				     unsigned int flags, int enable)
++{
++	struct phy_device *phydev = to_phy_device(dev);
++	struct marvell_phy_ptp *phy_ptp = mii_ts_to_phy_ptp(phydev->mii_ts);
++
++	if (phy_ptp->pins[pin].func != PTP_PF_EXTTS)
++		return -EOPNOTSUPP;
++
++	if (enable && (!(flags & PTP_RISING_EDGE) || flags & PTP_FALLING_EDGE))
++		return -EOPNOTSUPP;
++
++	/* Route LED[1] to event input */
++	return phy_modify_paged(phydev, MARVELL_PAGE_MISC, GCR,
++				GCR_PTP_INPUT_SOURCE,
++				enable ? GCR_PTP_INPUT_SOURCE : 0);
++}
++
+ static int marvell_phy_tai_write(struct device *dev, u8 reg, u16 val)
+ {
+ 	struct phy_device *phydev = to_phy_device(dev);
+@@ -210,6 +281,9 @@ static long marvell_phy_ptp_aux_work(struct device *dev)
+ static const struct marvell_ptp_ops marvell_phy_ptp_ops = {
+ 	.tai_enable = marvell_phy_tai_enable,
+ 	.tai_clock_read = marvell_phy_tai_clock_read,
++	.tai_extts_read = marvell_phy_tai_extts_read,
++	.tai_pin_verify = marvell_phy_tai_pin_verify,
++	.tai_pin_setup = marvell_phy_tai_pin_setup,
+ 	.tai_write = marvell_phy_tai_write,
+ 	.tai_modify = marvell_phy_tai_modify,
+ 	.ptp_global_write = marvell_phy_ptp_global_write,
+@@ -225,6 +299,8 @@ static const struct marvell_tai_param marvell_phy_tai_param = {
+ 	.cc_mult_den = 15625U,
+ 	.cc_mult = 8 << 28,
+ 	.cc_shift = 28,
++
++	.n_ext_ts = 1,
+ };
+ 
+ /* This function should be called from the PHY threaded interrupt
+@@ -263,9 +339,17 @@ int marvell_phy_ptp_probe(struct phy_device *phydev)
+ 	phy_ptp->mii_ts.hwtstamp = marvell_phy_ptp_hwtstamp;
+ 	phy_ptp->mii_ts.ts_info = marvell_phy_ptp_ts_info;
+ 
++	strscpy(phy_ptp->pins[0].name, "CONFIG", sizeof(phy_ptp->pins[0].name));
++	phy_ptp->pins[0].index = 0;
++	phy_ptp->pins[0].func = PTP_PF_NONE;
++	strscpy(phy_ptp->pins[1].name, "LED[1]", sizeof(phy_ptp->pins[1].name));
++	phy_ptp->pins[1].index = 0;
++	phy_ptp->pins[1].func = PTP_PF_NONE;
++
+ 	/* Get the TAI for this PHY. */
+ 	err = marvell_tai_probe(&tai, &marvell_phy_ptp_ops,
+ 				&marvell_phy_tai_param,
++				phy_ptp->pins, ARRAY_SIZE(phy_ptp->pins),
+ 			        "Marvell PHY", dev);
+ 	if (err)
+ 		return err;
+-- 
+2.30.2
+
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
