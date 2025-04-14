@@ -1,159 +1,148 @@
-Return-Path: <netdev+bounces-182380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37428A88992
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 19:17:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 207AFA88994
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 19:18:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B5761897361
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 17:18:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79EFD1895CEE
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 17:18:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 272CC284698;
-	Mon, 14 Apr 2025 17:17:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Dx/VuRjp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31B5827A110;
+	Mon, 14 Apr 2025 17:18:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 120E7284685;
-	Mon, 14 Apr 2025 17:17:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA2823E25B;
+	Mon, 14 Apr 2025 17:18:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744651066; cv=none; b=u93ZIC7WfErsmHVNShEN2JEpb4oj9cHLXbXRXpklJnxh3ijO0kuawaKCupf47QkhQHo8xd3R9fG7V7iVXnKsyF3wrqP1PmEwAakVM+x8XUG1yziiYaal6M3UzzckMbOT9WZCBBrirSxQQxyFwYmxBZmzS18kakoVh9Ttrs3IjJw=
+	t=1744651121; cv=none; b=FzcjilyGHIQVgp9beMNRNVclpw1vAPZNQzB22/Z6OhFNPdI3FQJede/O0pGAgG1EdssZje6ZP4xwWFTvFT0r36pRt9XU7kODEmYMgMZGLLhDrbUWQxjilGgf3MWnoERNunFDqPG3rMF0W8bswoFxVPf0h5vVtN4NZXpWK9HlOvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744651066; c=relaxed/simple;
-	bh=rzA20/pIdWBHMGU7xAsPsa+U0QCOSidUUd989Wkkeeg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EEWzRrB+1Byo7CWF1hkbc/xX/bh8yyykWLOa+rd5TIJvjY3voWsi2a+2crDHWN3Joa4Hg1KCtF/IUB/xmml4i7qymU4/0LebdfYCBcmNb2mOrkUpoB8gA75U96KfVFYZCQ1xtPVY80dwEwfQlGg4/HZmB8pzBQ/r3qmQYiQlx2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Dx/VuRjp; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=IYRKGwR89Rpw68pdLeCst1myOZk4GqPsPOkkIazWR3w=; b=Dx
-	/VuRjp0nFQKNbq1x3+XqZofv0ZRl6pr8c0elKq4L5tqkwKQSiOVIkavVio24lxk1k60DTPHSABwJ8
-	mWgekEFQAkOwh3KxZqIcUmirU6CVu0e92MYFR/WHbtCvI27sadxWQC7gSaWj3rKB2Y/KmiKMCAeoL
-	Jlaa3jt9wRrFnb0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1u4NRA-009EqC-1B; Mon, 14 Apr 2025 19:17:36 +0200
-Date: Mon, 14 Apr 2025 19:17:36 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sai Krishna Gajula <saikrishnag@marvell.com>
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Geethasowjanya Akula <gakula@marvell.com>,
-	Linu Cherian <lcherian@marvell.com>,
-	Jerin Jacob <jerinj@marvell.com>,
-	Hariprasad Kelam <hkelam@marvell.com>,
-	Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	"nathan@kernel.org" <nathan@kernel.org>,
-	"ndesaulniers@google.com" <ndesaulniers@google.com>,
-	"morbo@google.com" <morbo@google.com>,
-	"justinstitt@google.com" <justinstitt@google.com>,
-	"llvm@lists.linux.dev" <llvm@lists.linux.dev>,
-	"horms@kernel.org" <horms@kernel.org>,
-	kernel test robot <lkp@intel.com>
-Subject: Re: [net-next PATCH v3 1/2] octeontx2-af: correct __iomem
- annotations flagged by Sparse
-Message-ID: <e80bd0f7-f38e-4882-aa48-ff98d0fd0101@lunn.ch>
-References: <20250311182631.3224812-1-saikrishnag@marvell.com>
- <20250311182631.3224812-2-saikrishnag@marvell.com>
- <7009d4cc-a008-49ea-8f50-1e9aec63b592@lunn.ch>
- <BY3PR18MB4707C3348715B237C0A95C47A0B32@BY3PR18MB4707.namprd18.prod.outlook.com>
+	s=arc-20240116; t=1744651121; c=relaxed/simple;
+	bh=Bi6MjyvNxAdltopf0J1FHXTPq7j6JHlwNPAo3aXWj/s=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Spy8qAxXgLTAjKjAGeKsJjeqLflSfCd5ltmzPytApqpTtgcecf5nCj3GAH+O7V1gGbSq51W1ZdVs1xMYZQPdY/dU1QOkb90PjvE8ruz28T65pU4iy6mp8dKjbWZ8m69v2UB1WL/xrx/P3DKYkRGGPjIkxXZKToiXZTtJgdlaEYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Zbv6R2LtMz6M4wd;
+	Tue, 15 Apr 2025 01:14:39 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 93F731402F4;
+	Tue, 15 Apr 2025 01:18:35 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Mon, 14 Apr
+ 2025 19:18:35 +0200
+Date: Mon, 14 Apr 2025 18:18:33 +0100
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: <alejandro.lucero-palau@amd.com>
+CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<dave.jiang@intel.com>, Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v13 04/22] cxl: move register/capability check to driver
+Message-ID: <20250414181833.00003eca@huawei.com>
+In-Reply-To: <20250414151336.3852990-5-alejandro.lucero-palau@amd.com>
+References: <20250414151336.3852990-1-alejandro.lucero-palau@amd.com>
+	<20250414151336.3852990-5-alejandro.lucero-palau@amd.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <BY3PR18MB4707C3348715B237C0A95C47A0B32@BY3PR18MB4707.namprd18.prod.outlook.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500001.china.huawei.com (7.191.163.213) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-On Mon, Apr 14, 2025 at 04:38:53PM +0000, Sai Krishna Gajula wrote:
-> > -----Original Message-----
-> > From: Andrew Lunn <andrew@lunn.ch>
-> > Sent: Wednesday, March 12, 2025 2:52 AM
-> > To: Sai Krishna Gajula <saikrishnag@marvell.com>
-> > Cc: davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
-> > pabeni@redhat.com; netdev@vger.kernel.org; linux-kernel@vger.kernel.org;
-> > Sunil Kovvuri Goutham <sgoutham@marvell.com>; Geethasowjanya Akula
-> > <gakula@marvell.com>; Linu Cherian <lcherian@marvell.com>; Jerin Jacob
-> > <jerinj@marvell.com>; Hariprasad Kelam <hkelam@marvell.com>; Subbaraya
-> > Sundeep Bhatta <sbhatta@marvell.com>; andrew+netdev@lunn.ch; Bharat
-> > Bhushan <bbhushan2@marvell.com>; nathan@kernel.org;
-> > ndesaulniers@google.com; morbo@google.com; justinstitt@google.com;
-> > llvm@lists.linux.dev; horms@kernel.org; kernel test robot <lkp@intel.com>
-> > Subject: Re: [net-next PATCH v3 1/2] octeontx2-af: correct
-> > __iomem annotations flagged by Sparse
-> > 
-> > > if (mbox->mbox. hwbase) > - iounmap(mbox->mbox. hwbase); > +
-> > > iounmap((void __iomem *)mbox->mbox. hwbase); This looks wrong. If you
-> > > are unmapping it, you must of mapped it somewhere. And that mapping
-> > > would of returned an __iomem
-> > 
-> > >  	if (mbox->mbox.hwbase)
-> > > -		iounmap(mbox->mbox.hwbase);
-> > > +		iounmap((void __iomem *)mbox->mbox.hwbase);
-> > 
-> > This looks wrong. If you are unmapping it, you must of mapped it
-> > somewhere. And that mapping would of returned an __iomem value. So
-> > mbox.hwbase should be an __iomem value and you would not need this
-> > cast.
+On Mon, 14 Apr 2025 16:13:18 +0100
+alejandro.lucero-palau@amd.com wrote:
 
-> Yes,  mbox->mbox.hwbase is ioremapped with cache (ioremap_wc), while initialization it is declared as __iomem. But this hwbase is actually a DRAM memory mapped to BAR for better accessibility across the system. Since we use large memcpy (64KB and more) to/from this hwbase, we forced it to use as "void */u64" before exiting with unmap. As this is DRAM memory, memory access will not have side effects. Infact the AI applications also recommended similar mechanism. Please suggest if you have any other view and this can be addressed in some other way.
-
-Please configure your email client to correctly wrap emails.
-
-Did you check the performance of memcpy_fromio()? That is the API you
-are supposed to be using with an __iomem. I _think_ memcpy is only
-going to work for some architectures and other architectures will give
-you problems. That is the whole point of the __iomem, to make sure you
-use the correct API which works across architectures.
-
-> > 
-> > >  	for (qidx = 0; qidx < pf->qset.cq_cnt; qidx++) {
-> > > -		ptr = otx2_get_regaddr(pf, NIX_LF_CQ_OP_INT);
-> > > +		ptr = (__force u64 *)otx2_get_regaddr(pf,
-> > NIX_LF_CQ_OP_INT);
-> > >  		val = otx2_atomic64_add((qidx << 44), ptr);
-> > 
-> > This also looks questionable. You should be removing casts, not adding them.
-> > otx2_get_regaddr() returns an __iomem. So maybe
-> > otx2_atomic64_add() is actually broken here?
-> Similar to the above case, otx2_atomic64_add is a special case where it uses assembly code as part of definition, hence we had to use typecasting the "ptr". Please suggest if there is any better way.
+> From: Alejandro Lucero <alucerop@amd.com>
 > 
-> static inline u64 otx2_atomic64_add(u64 incr, u64 *ptr)
-> {
->         u64 result;
+> Type3 has some mandatory capabilities which are optional for Type2.
 > 
+> In order to support same register/capability discovery code for both
+> types, avoid any assumption about what capabilities should be there, and
+> export the capabilities found for the caller doing the capabilities
+> check based on the expected ones.
+> 
+> Add a function for facilitating the report of capabiities missing the
+> expected ones.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+Hi Alejandro.
 
-Teach this function to accept an __iomem. Worst case, you remove the
-cast here, before going into assembly.
+A request if we end up with a v14 - please add notes on what changed
+in each patch. It's really handy for reviewers to tell which patches
+they need to take another look at.   More info that we get from
+absence of our own tags!
 
->         __asm__ volatile(".cpu   generic+lse\n"
->                          "ldadd %x[i], %x[r], [%[b]]"
->                          : [r]"=r"(result), "+m"(*ptr)
->                          : [i]"r"(incr), [b]"r"(ptr)
->                          : "memory");
+One minor thing inline. 
 
-What actually happens if you keep the attribute? My guess is
-nothing. These are sparse markups, and gcc/as never seems them.
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
-	Andrew
+
+> diff --git a/drivers/cxl/pci.c b/drivers/cxl/pci.c
+> index 0996e228b26a..7d94e81b2e3b 100644
+> --- a/drivers/cxl/pci.c
+> +++ b/drivers/cxl/pci.c
+> @@ -836,6 +836,8 @@ static int cxl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  {
+>  	struct pci_host_bridge *host_bridge = pci_find_host_bridge(pdev->bus);
+>  	struct cxl_dpa_info range_info = { 0 };
+> +	DECLARE_BITMAP(expected, CXL_MAX_CAPS);
+Trivial but can do
+	DECLARE_BITMAP(expected, CXL_MAX_CAPS) = {};
+to avoid need for the zeroing below.
+
+> +	DECLARE_BITMAP(found, CXL_MAX_CAPS);
+>  	struct cxl_memdev_state *mds;
+>  	struct cxl_dev_state *cxlds;
+>  	struct cxl_register_map map;
+> @@ -871,7 +873,19 @@ static int cxl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  
+>  	cxlds->rcd = is_cxl_restricted(pdev);
+>  
+> -	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_MEMDEV, &map);
+> +	bitmap_zero(expected, CXL_MAX_CAPS);
+> +	bitmap_zero(found, CXL_MAX_CAPS);
+> +
+> +	/*
+> +	 * These are the mandatory capabilities for a Type3 device.
+> +	 * Only checking capabilities used by current Linux drivers.
+> +	 */
+> +	set_bit(CXL_DEV_CAP_HDM, expected);
+> +	set_bit(CXL_DEV_CAP_DEV_STATUS, expected);
+> +	set_bit(CXL_DEV_CAP_MAILBOX_PRIMARY, expected);
+> +	set_bit(CXL_DEV_CAP_MEMDEV, expected);
+> +
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
