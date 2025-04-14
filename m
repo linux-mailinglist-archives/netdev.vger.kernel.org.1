@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-182479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C232CA88DA9
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 23:20:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23A92A88DA8
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 23:20:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3C4A177C83
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 21:20:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B1C6189840F
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 21:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F17051F3BA4;
-	Mon, 14 Apr 2025 21:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225AC1F3BB4;
+	Mon, 14 Apr 2025 21:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nPFJFgCM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MIBczYrL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB30A1F3B8D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF92F1F3B9E
 	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 21:20:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744665601; cv=none; b=cDd1CIzqbSM4W3cnOjemr4Nt20UCTCuXCG8o6b0fneuDAGkMPaALEL+bcJ5rVlEhtUkQGY0SodGC4iiNIzxUMEtO00PXGP1WX7RdcFOh+XlxazPCxR7pJgGqv+v8p36p9phV3I+aIdpGd2atbcJCbDvTNEx7mifPqdgBC9wytWw=
+	t=1744665602; cv=none; b=p5iKD25xYWI+PhPTh9TfKUX+TYzfKu9IfW4x0JoDX6z6JumR2gI/W3bZjyp6KifNilrIwr+S5dECPn3PQ6zgoAl91/vH6j+CsbtE+yANH+WM+Sy70AfMQCPMSTi9xPsJQ2QdM75DLQzFcYfgnjnYhLs1TGplIrfBOImvFhyimfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744665601; c=relaxed/simple;
-	bh=nZ2CgW2ofgP+ZXqesZ8y0Jtl4HesSUJ6ElUfLaRaLE4=;
+	s=arc-20240116; t=1744665602; c=relaxed/simple;
+	bh=hcFL0r4rBPCfWHgqcNaOMIEOIgrB7jh6uwyqYKIwMN0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XcswEFs+XxEF8UIcpteu5WIIYdPdglof+926PR5zaaRT2epx4jnxoar1Rg4e+LPKc9z9C1Yf+ql2NXkhucyZ3j7q4+ac4aYQ6UJVNcYVDomk9q89KpgKVLNEMybsGCB7WS6t9sKilNNo8LcH1MsNiKgWI8xOG29d2MZnqqe0hOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nPFJFgCM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00D58C4CEEB;
-	Mon, 14 Apr 2025 21:20:00 +0000 (UTC)
+	 MIME-Version; b=tscxU69gQAR0iHXG/td2gLb/xy6wIzBBp5Zv9qXAWWCxpg7TPBH+r2juq3dsJjKpxTWB1MWT7W8/9100VSTjxzM/I8QFqmSVLmuEzu4qk+JfMl1nM7cHr4+Oqw5TgfoCI5TtZjcn4k02UQgEa8F3l1TxGKujWraHMNbTXZ2Io2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MIBczYrL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 722E2C4CEE5;
+	Mon, 14 Apr 2025 21:20:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1744665601;
-	bh=nZ2CgW2ofgP+ZXqesZ8y0Jtl4HesSUJ6ElUfLaRaLE4=;
+	bh=hcFL0r4rBPCfWHgqcNaOMIEOIgrB7jh6uwyqYKIwMN0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nPFJFgCM02vzdkpMPQCNunrV5ss3Rk/4Gv1POepD7AYaCEMoPQhiHv3b+e7KTnMyb
-	 Ga9N+5t1a8bFXcOn2Is9tkN0Zr6TsjxPkCX5taaxztsHIHlYxXIZKx+pk/EEcE6k11
-	 VuaDci8HNHPQWWNI7w5jnM/x2vpHlfU42istl5hf1crb2Sg7ZKXSyDsPbIDrnRyXbz
-	 AbcoVEzlvS/1Td1Pn6kIGRyj4epkudfeSI8WfKVcU43fkMmOLWLXpyVepqrk2fNM/p
-	 jOiHHo+pWNZ9VksX6GZ9wQwsSmJ/rAciXx+Qt0hwVwxQbiWUQw3EX4EyGZu+S0ustM
-	 XOc0T5apaCNOw==
+	b=MIBczYrLnZtCoOcInvnWA/diiBfUB2HG8Nhv8YzDq0Dn9YlAolArCMY1V8KksH5Uy
+	 d5ej61AzZ9YTjJZ3ffPbDVA/HHiLH+J0lT7+vsnk+LCDRk0WHv9PglYLYCuC9QSLV8
+	 ixMAIIms8pwIeO7z8+EvHHkGLWaaFH9Mev1YytxPdorMXdWhpnHM1kbH/Bt3HiMH+C
+	 zUTuyzUY9FDvKHd3pNgzLxf0Jt3Q7hs67F0xpSbWlw5Z/5GOdIBYdawtJfhWdd24Ar
+	 xPv45ksOrrT9rFO2coZRq8DI18ydtnmss8G2h8zQo77/k2B3TkLRRu+F7OmBY8qHZM
+	 L5nH9IlZDsLow==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: donald.hunter@gmail.com,
@@ -53,9 +53,9 @@ Cc: donald.hunter@gmail.com,
 	sdf@fomichev.me,
 	jacob.e.keller@intel.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net 4/8] tools: ynl-gen: make sure we validate subtype of array-nest
-Date: Mon, 14 Apr 2025 14:18:47 -0700
-Message-ID: <20250414211851.602096-5-kuba@kernel.org>
+Subject: [PATCH net 5/8] netlink: specs: rt-link: add an attr layer around alt-ifname
+Date: Mon, 14 Apr 2025 14:18:48 -0700
+Message-ID: <20250414211851.602096-6-kuba@kernel.org>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250414211851.602096-1-kuba@kernel.org>
 References: <20250414211851.602096-1-kuba@kernel.org>
@@ -67,35 +67,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-ArrayNest AKA indexed-array support currently skips inner type
-validation. We count the attributes and then we parse them,
-make sure we call validate, too. Otherwise buggy / unexpected
-kernel response may lead to crashes.
+alt-ifname attr is directly placed in requests (as an alternative
+to ifname) but in responses its wrapped up in IFLA_PROP_LIST
+and only there is may be multi-attr. See rtnl_fill_prop_list().
 
-Fixes: be5bea1cc0bf ("net: add basic C code generators for Netlink")
+Fixes: b2f63d904e72 ("doc/netlink: Add spec for rt link messages")
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/net/ynl/pyynl/ynl_gen_c.py | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ Documentation/netlink/specs/rt_link.yaml | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/tools/net/ynl/pyynl/ynl_gen_c.py b/tools/net/ynl/pyynl/ynl_gen_c.py
-index 2d856ccc88f4..30c0a34b2784 100755
---- a/tools/net/ynl/pyynl/ynl_gen_c.py
-+++ b/tools/net/ynl/pyynl/ynl_gen_c.py
-@@ -714,8 +714,11 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
-     def _attr_get(self, ri, var):
-         local_vars = ['const struct nlattr *attr2;']
-         get_lines = [f'attr_{self.c_name} = attr;',
--                     'ynl_attr_for_each_nested(attr2, attr)',
--                     f'\t{var}->n_{self.c_name}++;']
-+                     'ynl_attr_for_each_nested(attr2, attr) {',
-+                     '\tif (ynl_attr_validate(yarg, attr2))',
-+                     '\t\treturn YNL_PARSE_CB_ERROR;',
-+                     f'\t{var}->n_{self.c_name}++;',
-+                     '}']
-         return get_lines, None, local_vars
- 
- 
+diff --git a/Documentation/netlink/specs/rt_link.yaml b/Documentation/netlink/specs/rt_link.yaml
+index 31238455f8e9..200e9a7e5b11 100644
+--- a/Documentation/netlink/specs/rt_link.yaml
++++ b/Documentation/netlink/specs/rt_link.yaml
+@@ -1113,11 +1113,10 @@ protonum: 0
+       -
+         name: prop-list
+         type: nest
+-        nested-attributes: link-attrs
++        nested-attributes: prop-list-link-attrs
+       -
+         name: alt-ifname
+         type: string
+-        multi-attr: true
+       -
+         name: perm-address
+         type: binary
+@@ -1163,6 +1162,13 @@ protonum: 0
+       -
+         name: netns-immutable
+         type: u8
++  -
++    name: prop-list-link-attrs
++    subset-of: link-attrs
++    attributes:
++      -
++        name: alt-ifname
++        multi-attr: true
+   -
+     name: af-spec-attrs
+     attributes:
+@@ -2453,7 +2459,6 @@ protonum: 0
+             - min-mtu
+             - max-mtu
+             - prop-list
+-            - alt-ifname
+             - perm-address
+             - proto-down-reason
+             - parent-dev-name
 -- 
 2.49.0
 
