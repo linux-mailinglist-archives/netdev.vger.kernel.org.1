@@ -1,107 +1,152 @@
-Return-Path: <netdev+bounces-182517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37028A88FD6
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 00:57:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 106F1A88FEE
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 01:09:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AAA617C58D
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 22:57:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1803817961A
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 23:09:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B99961F873A;
-	Mon, 14 Apr 2025 22:56:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 627C81F4180;
+	Mon, 14 Apr 2025 23:08:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VXYE3CMp"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pk1Pe09B"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91BD61F867F;
-	Mon, 14 Apr 2025 22:56:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C6861E1DE2;
+	Mon, 14 Apr 2025 23:08:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744671417; cv=none; b=to6s3U3PfiSGVGSCtJCuxohL5LWYllix46TRM09yXKg2ZmTZ6FFT++fklW5pcKXMyQntb5Itmq/96yOuJpuUiUsFtOctt9HLSxa1kOWawM0AjPXM5CSlcNooltCkRxWEgTHAilHrYvqhr2aaUn2Q1Uz29ZdQh/Vg4+P5xbYT9D0=
+	t=1744672137; cv=none; b=amYbBjsKiKZ6NWvfgxKc31Z+DDPHIuOVTiALwVRl+ktMpUJnY1zWPz6nWZf3PNQnUBum3l0WCJrYmPXFhR8NyqFXXi0itIBfJBiLuM81zS8+xiXfkwNBAtZUTMFV64xoC/m5l7avP+LEJoSURs9G3VqjfQPKyjwUN3u8KzgsD6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744671417; c=relaxed/simple;
-	bh=6XCxiEE0f6aFdryeR9gXZd01V4lTfiAVuXBv0meC0mw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iUvtApftTUiAA7BXP6G7+H+W03ADagoquIetIDAlYFUEFaW35p3euTq7BY8wUI2WhPznmBGZWwBiyc/PGcyKYV1AtQRWgY3TIoF74h7bhWWPisxdGy5ZaHGXPpLdlO91jdoi5o2z5IfRFlKbqjZasoMidJfuRsYAlsMNvXKe9HA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VXYE3CMp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11AAAC4CEE9;
-	Mon, 14 Apr 2025 22:56:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744671417;
-	bh=6XCxiEE0f6aFdryeR9gXZd01V4lTfiAVuXBv0meC0mw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VXYE3CMp5xOdYHJMHh4v4qIkuEa4vvgbo69iOkRmmodzNdLg5BVA4Y4zQeOTJNeDC
-	 tCh+UcmXsZQPcWIk1fPctNVA3xESUfwQyR6DC4QJIjdrAl+0vMIlNHX3ysPmdB4Big
-	 FyDChJYLa8EMsJvpZOaClxm7wulRNHnrxPSAo7u9LtcVn8BjLTdsGn4rhiB41MeqNZ
-	 BWfPtGqNAfBb1JglnP16CDwgWSe1boO1NLUAMIFlDOt7HsJsUpgE5gW9+wrdYMl231
-	 yr8cHSGxmTUEbG3PmxVJfY4GFZ7Ri5lEEjB/6d0jFXPNU9l6zCi9BpWrmzYaEWfqu6
-	 2hbFWkHjXh6bg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B563822D1A;
-	Mon, 14 Apr 2025 22:57:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1744672137; c=relaxed/simple;
+	bh=ZVpS49bQ4BvR+DujUjxAEvHyKAz8vHDD53m4RUH41pc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R0/gSYj0ZQc6KpUm+AHS+Crcyx/WswVbNwixWgpnnsLgR6q52A8qCh+gLrOlsMfCpCtDmTmfej5Jf+YJL/doj6C1G3T1v8VGQi6FI8lmyYfimrP0RqUbDGif7LyjqRE+6Ae2i4hgf6Vvir5K/RtTPnXkBR6QwzJekiEezC2fu7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pk1Pe09B; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=2Rf/9AzJwwGXUcQuYwxw97asEq6b3Sz7YHXKHLk4RTQ=; b=pk1Pe09Bp4gLKVzNZeV/QEJ1kL
+	+Ce1wz2mLCJHJJtHeKrQXny+ad2CeV9FtqmSckM2kHja1Sxdfw8TtXkH29mte2yAvLBltNryA9sy7
+	dONJQtzPigcacFTGYN7G13EApv/XxYSDG/hp0/MY27UXQyoxktDfWE202qpc6eHfcSTQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u4Sv2-009IQp-0W; Tue, 15 Apr 2025 01:08:48 +0200
+Date: Tue, 15 Apr 2025 01:08:47 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Qasim Ijaz <qasdev00@gmail.com>,
+	Nathan Chancellor <nathan@kernel.org>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 2/4] ref_tracker: add ability to register a file in
+ debugfs for a ref_tracker_dir
+Message-ID: <a86aab21-c539-48f5-bad1-25db9b8f3ced@lunn.ch>
+References: <20250414-reftrack-dbgfs-v1-0-f03585832203@kernel.org>
+ <20250414-reftrack-dbgfs-v1-2-f03585832203@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 1/5] bna: bnad_dim_timeout: Rename del_timer_sync in
- comment
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174467145500.2060374.2711094592170219314.git-patchwork-notify@kernel.org>
-Date: Mon, 14 Apr 2025 22:57:35 +0000
-References: <66962B9D4666B555+20250414042629.63019-1-wangyuli@uniontech.com>
-In-Reply-To: <66962B9D4666B555+20250414042629.63019-1-wangyuli@uniontech.com>
-To: WangYuli <wangyuli@uniontech.com>
-Cc: akpm@linux-foundation.org, guanwentao@uniontech.com,
- linux-kernel@vger.kernel.org, mingo@kernel.org, niecheng1@uniontech.com,
- tglx@linutronix.de, zhanjun@uniontech.com, rmody@marvell.com,
- skalluru@marvell.com, GR-Linux-NIC-Dev@marvell.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250414-reftrack-dbgfs-v1-2-f03585832203@kernel.org>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 14 Apr 2025 12:26:25 +0800 you wrote:
-> Commit 8fa7292fee5c ("treewide: Switch/rename to timer_delete[_sync]()")
-> switched del_timer_sync to timer_delete_sync, but did not modify the
-> comment for bnad_dim_timeout(). Now fix it.
+On Mon, Apr 14, 2025 at 10:45:47AM -0400, Jeff Layton wrote:
+> Currently, there is no convenient way to see the info that the
+> ref_tracking infrastructure collects. Add a new function that other
+> subsystems can optionally call to update the name field in the
+> ref_tracker_dir and register a corresponding seq_file for it in the
+> top-level ref_tracker directory.
 > 
-> Cc: Rasesh Mody <rmody@marvell.com>
-> Cc: Sudarsana Kalluru <skalluru@marvell.com>
-> Cc: GR-Linux-NIC-Dev@marvell.com
-> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: netdev@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: WangYuli <wangyuli@uniontech.com>
-> 
-> [...]
+> Also, alter the pr_ostream infrastructure to allow the caller to specify
+> a seq_file to which the output should go instead of printing to an
+> arbitrary buffer or the kernel's ring buffer.
 
-Here is the summary with links:
-  - [v2,1/5] bna: bnad_dim_timeout: Rename del_timer_sync in comment
-    https://git.kernel.org/netdev/net-next/c/1450e4525f9a
-  - [v2,4/5] ipvs: ip_vs_conn_expire_now: Rename del_timer in comment
-    (no matching commit)
+When i see an Also, or And, or a list in a commit message, i always
+think, should this be multiple patches?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+>  struct ostream {
+>  	char *buf;
+> +	struct seq_file *seq;
+>  	int size, used;
+>  };
+>  
+> @@ -73,7 +83,9 @@ struct ostream {
+>  ({ \
+>  	struct ostream *_s = (stream); \
+>  \
+> -	if (!_s->buf) { \
+> +	if (_s->seq) { \
+> +		seq_printf(_s->seq, fmt, ##args); \
+> +	} else if (!_s->buf) { \
+>  		pr_err(fmt, ##args); \
+>  	} else { \
+>  		int ret, len = _s->size - _s->used; \
 
+The pr_ostream() macro is getting pretty convoluted. It currently
+supports two user cases:
 
+struct ostream os = {}; which means just use pr_err().
+
+And os.buf points to an allocated buffer and the output should be
+dumped there.
+
+You are about to add a third.
+
+Is it about time this got split up into three helper functions, and
+you pass one to __ref_tracker_dir_pr_ostream()? Your choice.
+
+> +/**
+> + * ref_tracker_dir_debugfs - create debugfs file for ref_tracker_dir
+> + * @dir: ref_tracker_dir to finalize
+> + * @name: updated name of the ref_tracker_dir
+> + *
+> + * In some cases, the name given to a ref_tracker_dir is based on incomplete information,
+> + * and may not be unique. Call this to finalize the name of @dir, and create a debugfs
+> + * file for it.
+
+Maybe extend the documentation with a comment that is name is not
+unique within debugfs directory, a warning will be emitted but it is
+not fatal to the tracker.
+
+> + */
+> +void ref_tracker_dir_debugfs(struct ref_tracker_dir *dir, const char *name)
+> +{
+> +	strscpy(dir->name, name, sizeof(dir->name));
+
+I don't know about this. Should we really overwrite the name passed
+earlier? Would it be better to treat the name here only as the debugfs
+filename?
+
+> +	if (ref_tracker_debug_dir) {
+
+Not needed
+
+> +		dir->dentry = debugfs_create_file(dir->name, S_IFREG | 0400,
+> +						  ref_tracker_debug_dir, dir,
+> +						  &ref_tracker_debugfs_fops);
+> +		if (IS_ERR(dir->dentry)) {
+> +			pr_warn("ref_tracker: unable to create debugfs file for %s: %pe\n",
+> +				dir->name, dir->dentry);
+> +			dir->dentry = NULL;
+
+this last statement should also be unneeded.
+
+	Andrew
 
