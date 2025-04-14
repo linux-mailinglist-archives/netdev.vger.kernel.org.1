@@ -1,113 +1,113 @@
-Return-Path: <netdev+bounces-182043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00878A877B4
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 08:04:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F529A877B6
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 08:04:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6E34188A920
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 06:03:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C536F1887122
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 06:04:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2205F1D5CDD;
-	Mon, 14 Apr 2025 06:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 027B41DDC3E;
+	Mon, 14 Apr 2025 06:01:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RyMIcpFR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eKQXjyFX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AAB61A4F2F;
-	Mon, 14 Apr 2025 06:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498F31D63EE;
+	Mon, 14 Apr 2025 06:01:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744610492; cv=none; b=KZqrBfevVmz7XGqxWTos5w2ddeqnizcubJySzqbOYqjQ0VF0Lv0rkQidhAEG68YL+6WtCy8wz6D9Kk9Beq+vEuruoaTUCkqVA2UczK7dZsGSO/tFuamTIPKrnWvS8Qw/81jJ18ZmbOcAAEI5m6sMusBmcDXAVSSlPTwdM8hC6ko=
+	t=1744610493; cv=none; b=tPo6fSwLVIWwUMvNTQvGNmgq4Gm89jRN8lfTreHHpE/yxb847BiyD2MwBJyGIVk25/626QD0c758pEF4UU/QBScYmiSYa6jcvBLVLmy2DoOKTvOKO0mDAU5NZseaH890XAjPsSEuwzxYN5nJ/GBST1PIt8GBu9iFx6oPHbbfB3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744610492; c=relaxed/simple;
-	bh=o4mB1YbCjqOm0ivTnYwzfnJZ2vRxG5qWVplnqdlWr2I=;
+	s=arc-20240116; t=1744610493; c=relaxed/simple;
+	bh=gSFvINbMx+mpurJjbuzYdJO9KVleuEcbzdDZgdWmmk8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mwf2ZbRLK/aeYRtPzssXdEEta1rJWYBGoTfc4j202teH+D0QEsfVzd9HAHxYh+jzF5Cx3mVISkjQ/9/I390KwFZ1InEtJ4kI+40q8M06gVXPq6drgBNlXAKWf5nOZkkncTgf5Dak+WA9pfBp3q6VtXy5RIf+VumWhxz5fvZaYmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RyMIcpFR; arc=none smtp.client-ip=209.85.222.170
+	 MIME-Version; b=llP4Ffw1UzYoVRfXdq11ZA/yjJo7DCcUWFPJchui2J/5t7Hax9LBuLYEUMMDXaaR5K0dOZKy3aVMHShnhBFBMkhwy/fVwzOsRP/lPqa2+Hl+/FZbPhFBY/4JI8s2MZaNCxmjSXFFJJmkuHYQaXbJBjw8uQOY6aLtzOMnA62nYCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eKQXjyFX; arc=none smtp.client-ip=209.85.160.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7c59e7039eeso580951885a.2;
-        Sun, 13 Apr 2025 23:01:30 -0700 (PDT)
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4774d68c670so56759131cf.0;
+        Sun, 13 Apr 2025 23:01:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744610489; x=1745215289; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1744610491; x=1745215291; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:feedback-id:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=0yyPz4XrJINYrh8fPH3G34ZmNN9tSR8UbhBvw2fpH+U=;
-        b=RyMIcpFRRxLpbj5SzaIEqQ6Kxa49pZIVQZKIiY/H/oSzObbCLb8LqeuOKVB+gCgaHp
-         ga+7s7MwVMfL+tWnQNIlNCYxrsLZXr87rXAjyz7M9ruK2ws3SHFRGWTwVJn9uGr2Vrzr
-         h57w5hur/PWHxZ3Nukokz+XApyJ2pAxsK64iGr+1jrPFzDfiEwi62l68qOD8P41Q8CWN
-         E9dMgg4qX/CYLLGxm6nSrDYyeDA8yPmr8eYOWYvMte0COlMBR50bLE7ObOyXNMnVlwX7
-         uYw4ylUdaMoO5l2N7mTkOddKudsSt4YIO8EdJIXbckoLmSWSs8ZBBWDQ/VfZ5Ldc/wM0
-         ijJA==
+        bh=8yEZCCjAIKX8Bcif/S/pGprjlBDXpto+eqqOQvtfBHY=;
+        b=eKQXjyFXrSCPvnyv1YTcT3o5a9SCJyKmbdV994s5qz0eLxjG/1EJbPrdxeqWWIVdU0
+         F7mnGFazccSlEJ6M9GxxPtfJMaqaD9TPfVqiTu2gs576kDHm2kms/zVoJGeInFicXhA3
+         8dRj4vtzfGhKlxHbS8qfzzF/wWzz/VUL17fTxvIWbyuVsftNzVji2AWpFn8VVhqXKgPi
+         b5K/2GZonQO7WbKQqvBTvZi7f3FE4A1MQfp35i5+VOkSsjNOyc4KIL7x8aBbK6+35m7E
+         dII/VjUG9jzD08qh3m8J1+mISJvBCBN/s9UbOK7qMcW91AGE8BbcSvy7ebtnF9abFcfT
+         ww+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744610489; x=1745215289;
+        d=1e100.net; s=20230601; t=1744610491; x=1745215291;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:feedback-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=0yyPz4XrJINYrh8fPH3G34ZmNN9tSR8UbhBvw2fpH+U=;
-        b=M2r6wwPJ+gxrPIRyBDvFCLI3Vh80MK7zfwIh69nZNYqCBBoS7LB+mmgXOUsNqe99Sn
-         0KMCm6BeMt4RAPdjBNvwbiFZD4E0fQ2SpUP1cLBUhfpZ8GfBCv8SDW/G4btqKqiKlhjZ
-         LfsZFooBJbhoBolLYt8vN0Pi/hZ0N8+hu1WoWWpqa4mINy7rVSJfs2A9vCsBCHkXmUxv
-         oXlpz6bGkP5WLqOSgw5izAcS1u9sxPzXR3FLOHvlh6FtxoNFagbpaCFr3ulTCRuhaqYs
-         mSDcuSEU+gTmTGc3suWBIdVkeUdn7WW0KGXl7u6GZbpcPtbkiUF9d3v7tCv9B7d/QlZe
-         5GLA==
-X-Forwarded-Encrypted: i=1; AJvYcCUWIqCyPo37+sWtMrHHb3b37IzuNtL7W1zXo18oGgxqG/Bdz9D/zprhIqBI18SWDaJeLf1/@vger.kernel.org, AJvYcCVpGKD7vr/U+PR/qwnVnY7qLxskvQvNWWRTtWoKVoARkDHTnWJiIoxbAiH+P45LbSYb+gH2ezue@vger.kernel.org, AJvYcCVwBl0OJ2MljJJaEJY31R9RTLTXtQ7/OwpKsv0O8k/rEispiuQm55Gm8INWJVgkHRs0p8IOsI0zjJU8kGg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YynsAXrBhMYHkHkYEJwJttH5/g6zOUcqhgtf53BRi8X8UdVDRwv
-	P0oz5o8rmMzGS4ddaxxmtKcjmwjwprwiE0RR4VSJywOhij17P90A
-X-Gm-Gg: ASbGnct7npZmZEvutGJOkqm43vXQd8doZLemm0co0mpIY6u5cL2SMP1ljWiwWWH88+b
-	GGk7RcFUIg0FhXYqJvTMYVA2HTCH8eweg6kIzUDaXrq4ahEFMCzG/HKfDPUyvITKfQtrhD+5g39
-	zNYYbOTLfTr1zSvbA0dm8rk1Dqylrm0ijGFPhJ5YKimicutWAwqC1B04FKT0WXT7dwjd28Fb8WO
-	PXQ/qxVvVeMvrSLB1hWeXefxgKLie0djLfzSCsG6IZ1RxZlNepseYMLHKSa19e4SqdZ1MiNRnQH
-	dkseiLaY9L/uqKLiYdeKciHlvgtQIRXYQz9vF7m2Vk3iFd12txU6d5IP6YBy+okBi+sI71cYddJ
-	JDuwx8DzetAZrKpVBW1xF2XG0p/aFzwQ=
-X-Google-Smtp-Source: AGHT+IGdwbtcc/LhSM+g7SxvZuQaQmJqgZUb+rWK7xVQAi5pEHJFx90WVfW5h8ejkETd2bD7aLB+Fg==
-X-Received: by 2002:a05:620a:4001:b0:7c7:a5f5:5616 with SMTP id af79cd13be357-7c7af1d8653mr1402849885a.42.1744610489258;
-        Sun, 13 Apr 2025 23:01:29 -0700 (PDT)
+        bh=8yEZCCjAIKX8Bcif/S/pGprjlBDXpto+eqqOQvtfBHY=;
+        b=mx3v1YcYt/1Hgop4AowfkPd2+VrKiL8RguJ9/8SY05bt8XZrEc6Yo75lK2/xGRNoEF
+         IICVVLFVY0/065RHEW+PKgnTNUW3jGjSxt3IzmtKTn/MOfiSnR7gj5zzUWfRtDmtPTMO
+         oW1WL1Y5rm3G/e/B1AKN0pC+NVM7d5IlSFajsDx7ENxoxv3/3C0tHJuJ5qwMNi8e2hcz
+         gSdrGmV277Hg2NPCRbqFlmGFlrWbx2rFF1u/pZd/OQPa8KltlknDiuCv3RjlNjL47zSm
+         qVePhNCeOaIAXmhLAf1gFh8SJue0efcbsqzAP4OuAFsOsJlNg6O/YPHcDFIQkmLhxbTl
+         eqhA==
+X-Forwarded-Encrypted: i=1; AJvYcCUW2hktAFmUcxcPKAXP8Y94vMdyTH855bz3eIEoB2ARJrfJmGN0dTf3i5F9oiebzNOtmcDm@vger.kernel.org, AJvYcCUzyfHmAupOw+s33NcleUnubsG8VVLg4Yr1rMEVzP4kkkCmOzHukl/yrlSICfzHjqDFUicHjLOV@vger.kernel.org, AJvYcCW6rb/313aloITG0NDsRUUugyrJD7PP78uDoAUsVIGU4fMp38lDdUIZQIGiZIyuvXcdyWlnTxPzP7hVdx0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDoYdItgEKpq7qqfjxvjJnYNYSiTZ5MGua6HHuGfYMZVvdlkNr
+	QnWA/9cBUq52ojyZVbW3sHerVC8PsumVc0BnKQttj+73/A5gg2oZ
+X-Gm-Gg: ASbGncvOULVFHUAHzBZRjE1xipAZp9cRf2Ff3Z/UURmcViLwA1Hm8eWpkply+qnkonX
+	2QaQ1YCGn9e1hhwlD/bz+A1cSP7LG5q6CdDMyNqiH0dhy1gG5mp1spWvhuOOI/4K7wXS5TNKNuq
+	r7qstTGYefA9BsyQhKAIt0yQqoaPiId0KBokrB31Upec7EpVLrcGyHHY45mdk/sHkq3HiruI9oc
+	UJgEJ7Lm/8KPvjus0KTLkyPw5POIoVxrwhjpGrcJxqBvCJlUu1f9LK/IY/1rVMEANDmcHXViO8N
+	wZasUpnfsN6XgKUZF9K7UHzBkyW/YCGEiChxTJHpcw+swHgvBo++1aZFGEk+dWlvCHi+lCEJaFJ
+	6wFQpIDn82VbsnT/Jk6sF86CKM1KAwUI=
+X-Google-Smtp-Source: AGHT+IHDWExJgXvc7ntxhN+BtiblsGHzc2LmReFgtphjkcdAbqKB5qry0e5AfEx4TNIw1Qs3SvIh3g==
+X-Received: by 2002:a05:622a:1449:b0:476:87f6:3ce4 with SMTP id d75a77b69052e-479775d3200mr175981031cf.39.1744610490778;
+        Sun, 13 Apr 2025 23:01:30 -0700 (PDT)
 Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6f0de98096bsm77957846d6.59.2025.04.13.23.01.28
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4796eb15d12sm69685261cf.27.2025.04.13.23.01.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 13 Apr 2025 23:01:28 -0700 (PDT)
+        Sun, 13 Apr 2025 23:01:30 -0700 (PDT)
 Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 616EC1200066;
-	Mon, 14 Apr 2025 02:01:28 -0400 (EDT)
+	by mailfauth.phl.internal (Postfix) with ESMTP id D4E601200043;
+	Mon, 14 Apr 2025 02:01:29 -0400 (EDT)
 Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Mon, 14 Apr 2025 02:01:28 -0400
-X-ME-Sender: <xms:uKT8ZwI6gtnFL6uDBVBY9aTm-ILNBXpUc5xToKTs0XgLwc2jf-oaRw>
-    <xme:uKT8ZwKbXhojk9lRbGqDPaxKV_GkRm5DtqL4rz5MfwZP8nFR16qrWdgBDAA3cXe2z
-    XKJdQsN2UpjnOAWIA>
-X-ME-Received: <xmr:uKT8ZwskxNKMSByKo6neGt8EvF9VMkr7TMkW_ONQ176BB5TIXJvIxsN-TmM1EA>
+  by phl-compute-06.internal (MEProxy); Mon, 14 Apr 2025 02:01:29 -0400
+X-ME-Sender: <xms:uaT8ZydELvQrIgVwszF6wU11o2rahUFItTrF3zadihTQqwhCsatsOw>
+    <xme:uaT8Z8Mq2HY5L8zMm3J72rFNw00Qj0WcF8pxDZzTkdpzkb4SVaEkD9wwgqVlg60Dv
+    9IK7JI-jGAtDxSOzw>
+X-ME-Received: <xmr:uaT8Zzi_mU2pxqqc_Ce7FyyoC9KTuIACSf4u10_oOlkFcMKVNm16J2teSi2Hzg>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvudeljeekucetufdoteggodetrf
     dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
     pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
     gvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgjfhgggfestdekredtredt
     tdenucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrih
-    hlrdgtohhmqeenucggtffrrghtthgvrhhnpeegleejiedthedvheeggfejveefjeejkefg
-    veffieeujefhueeigfegueehgeeggfenucevlhhushhtvghrufhiiigvpedunecurfgrrh
-    grmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgr
-    lhhithihqdeiledvgeehtdeigedqudejjeekheehhedvqdgsohhquhhnrdhfvghngheppe
-    hgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvgdpnhgspghrtghpthhtohepudelpdhm
-    ohguvgepshhmthhpohhuthdprhgtphhtthhopehlvghithgrohesuggvsghirghnrdhorh
-    hgpdhrtghpthhtohepphgvthgvrhiisehinhhfrhgruggvrggurdhorhhgpdhrtghpthht
-    ohepmhhinhhgohesrhgvughhrghtrdgtohhmpdhrtghpthhtohepfihilhhlsehkvghrnh
-    gvlhdrohhrghdprhgtphhtthhopehlohhnghhmrghnsehrvgguhhgrthdrtghomhdprhgt
-    phhtthhopegrvghhsehmvghtrgdrtghomhdprhgtphhtthhopehlihhnuhigqdhkvghrnh
-    gvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhg
-    vghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglh
-    gvrdgtohhm
-X-ME-Proxy: <xmx:uKT8Z9am7P75Qr6_1xO6B5s38caRNCUcsH7346-OBMQ-U3BUqU5IPQ>
-    <xmx:uKT8Z3YRM8ajBHJdf8TkZ9NzAOMXcKqFJM471cilfjnmwlh3i_Tazg>
-    <xmx:uKT8Z5APHTNK9zNg6w_bQoTzvgAzeavGsk3rOiAw9jl95NcRJXy1rQ>
-    <xmx:uKT8Z9aRuIoyP-HrkI8KJBlORoUUeK103wWGJktXXCB5FUTubd6nfg>
-    <xmx:uKT8Z_oolfHCFFSrRGv9EUnnuCaIZNjGIqQAurguf9GG2VDLI2nCiEAV>
+    hlrdgtohhmqeenucggtffrrghtthgvrhhnpefghfffvefhhfdvgfejgfekvdelgfekgeev
+    ueehlefhiedvgeffjefgteeugfehieenucffohhmrghinhepkhgvrhhnvghlrdhorhhgne
+    cuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsghoqhhu
+    nhdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieegqdduje
+    ejkeehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihmvgdr
+    nhgrmhgvpdhnsggprhgtphhtthhopeduledpmhhouggvpehsmhhtphhouhhtpdhrtghpth
+    htoheplhgvihhtrghoseguvggsihgrnhdrohhrghdprhgtphhtthhopehpvghtvghriies
+    ihhnfhhrrgguvggrugdrohhrghdprhgtphhtthhopehmihhnghhosehrvgguhhgrthdrtg
+    homhdprhgtphhtthhopeifihhllheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhho
+    nhhgmhgrnhesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprggvhhesmhgvthgrrdgtoh
+    hmpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdho
+    rhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtg
+    hpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
+X-ME-Proxy: <xmx:uaT8Z_8mxkiy8oDxgoCUsMjw2axgTr0RETjqKWwXbjaBwgvASKq-Uw>
+    <xmx:uaT8Z-t4v1QZbAyzPoJYPJZk-aNcATPkOOh09_umb363Um3CbzcRqg>
+    <xmx:uaT8Z2E6tN__OtMKc-flKBoe7vcBUF4te7zg0y8e-g4PIGCSdNJswA>
+    <xmx:uaT8Z9OSOY4GkjNvy3_cWkXp2h05ZPGh98opqud4MQ6Z0BkxP5T6dw>
+    <xmx:uaT8Z7PioaUMssI2L9JsqcZnNTvN7vj5XZHepuzjcOU14oODaUHyJpom>
 Feedback-ID: iad51458e:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 14 Apr 2025 02:01:27 -0400 (EDT)
+ 14 Apr 2025 02:01:29 -0400 (EDT)
 From: Boqun Feng <boqun.feng@gmail.com>
 To: Breno Leitao <leitao@debian.org>,
 	Peter Zijlstra <peterz@infradead.org>,
@@ -128,9 +128,9 @@ Cc: aeh@meta.com,
 	Uladzislau Rezki <urezki@gmail.com>,
 	rcu@vger.kernel.org,
 	Boqun Feng <boqun.feng@gmail.com>
-Subject: [RFC PATCH 7/8] rcuscale: Add tests for simple hazard pointers
-Date: Sun, 13 Apr 2025 23:00:54 -0700
-Message-ID: <20250414060055.341516-8-boqun.feng@gmail.com>
+Subject: [RFC PATCH 8/8] locking/lockdep: Use shazptr to protect the key hashlist
+Date: Sun, 13 Apr 2025 23:00:55 -0700
+Message-ID: <20250414060055.341516-9-boqun.feng@gmail.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250414060055.341516-1-boqun.feng@gmail.com>
 References: <20250414060055.341516-1-boqun.feng@gmail.com>
@@ -142,93 +142,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add two rcu_scale_ops to include tests from simple hazard pointers
-(shazptr). One is with evenly distributed readers, and the other is with
-all WILDCARD readers. This could show the best and worst case scenarios
-for the synchronization time of simple hazard pointers.
+Erik Lundgren and Breno Leitao reported [1] a case where
+lockdep_unregister_key() can be called from time critical code pathes
+where rntl_lock() may be held. And the synchronize_rcu() in it can slow
+down operations such as using tc to replace a qdisc in a network device.
 
+In fact the synchronize_rcu() in lockdep_unregister_key() is to wait for
+all is_dynamic_key() callers to finish so that removing a key from the
+key hashlist, and we can use shazptr to protect the hashlist as well.
+
+Compared to the proposed solution which replaces synchronize_rcu() with
+synchronize_rcu_expedited(), using shazptr here can achieve the
+same/better synchronization time without the need to send IPI. Hence use
+shazptr here.
+
+Reported-by: Erik Lundgren <elundgren@meta.com>
+Reported-by: Breno Leitao <leitao@debian.org>
+Link: https://lore.kernel.org/lkml/20250321-lockdep-v1-1-78b732d195fb@debian.org/
 Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
 ---
- kernel/rcu/rcuscale.c | 52 ++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 51 insertions(+), 1 deletion(-)
+ kernel/locking/lockdep.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/kernel/rcu/rcuscale.c b/kernel/rcu/rcuscale.c
-index d9bff4b1928b..cab42bcc1d26 100644
---- a/kernel/rcu/rcuscale.c
-+++ b/kernel/rcu/rcuscale.c
-@@ -32,6 +32,7 @@
- #include <linux/freezer.h>
- #include <linux/cpu.h>
- #include <linux/delay.h>
+diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
+index 58d78a33ac65..c5781d2dc8c6 100644
+--- a/kernel/locking/lockdep.c
++++ b/kernel/locking/lockdep.c
+@@ -58,6 +58,7 @@
+ #include <linux/context_tracking.h>
+ #include <linux/console.h>
+ #include <linux/kasan.h>
 +#include <linux/shazptr.h>
- #include <linux/stat.h>
- #include <linux/srcu.h>
- #include <linux/slab.h>
-@@ -429,6 +430,54 @@ static struct rcu_scale_ops tasks_tracing_ops = {
  
- #endif // #else // #ifdef CONFIG_TASKS_TRACE_RCU
+ #include <asm/sections.h>
  
-+static int shazptr_scale_read_lock(void)
-+{
-+	long cpu = raw_smp_processor_id();
-+
-+	/* Use cpu + 1 as the key */
-+	guard(shazptr)((void *)(cpu + 1));
-+
-+	return 0;
-+}
-+
-+static int shazptr_scale_wc_read_lock(void)
-+{
-+	guard(shazptr)(SHAZPTR_WILDCARD);
-+
-+	return 0;
-+}
-+
-+
-+static void shazptr_scale_read_unlock(int idx)
-+{
-+	/* Do nothing, it's OK since readers are doing back-to-back lock+unlock*/
-+}
-+
-+static void shazptr_scale_sync(void)
-+{
-+	long cpu = raw_smp_processor_id();
-+
-+	synchronize_shazptr((void *)(cpu + 1));
-+}
-+
-+static struct rcu_scale_ops shazptr_ops = {
-+	.ptype		= RCU_FLAVOR,
-+	.readlock	= shazptr_scale_read_lock,
-+	.readunlock	= shazptr_scale_read_unlock,
-+	.sync		= shazptr_scale_sync,
-+	.exp_sync	= shazptr_scale_sync,
-+	.name		= "shazptr"
-+};
-+
-+static struct rcu_scale_ops shazptr_wc_ops = {
-+	.ptype		= RCU_FLAVOR,
-+	.readlock	= shazptr_scale_wc_read_lock,
-+	.readunlock	= shazptr_scale_read_unlock,
-+	.sync		= shazptr_scale_sync,
-+	.exp_sync	= shazptr_scale_sync,
-+	.name		= "shazptr_wildcard"
-+};
-+
- static unsigned long rcuscale_seq_diff(unsigned long new, unsigned long old)
- {
- 	if (!cur_ops->gp_diff)
-@@ -1090,7 +1139,8 @@ rcu_scale_init(void)
- 	long i;
- 	long j;
- 	static struct rcu_scale_ops *scale_ops[] = {
--		&rcu_ops, &srcu_ops, &srcud_ops, TASKS_OPS TASKS_RUDE_OPS TASKS_TRACING_OPS
-+		&rcu_ops, &srcu_ops, &srcud_ops, &shazptr_ops, &shazptr_wc_ops,
-+		TASKS_OPS TASKS_RUDE_OPS TASKS_TRACING_OPS
- 	};
+@@ -1265,14 +1266,18 @@ static bool is_dynamic_key(const struct lock_class_key *key)
  
- 	if (!torture_init_begin(scale_type, verbose))
+ 	hash_head = keyhashentry(key);
+ 
+-	rcu_read_lock();
++	/* Need preemption disable for using shazptr. */
++	guard(preempt)();
++
++	/* Protect the list search with shazptr. */
++	guard(shazptr)(hash_head);
++
+ 	hlist_for_each_entry_rcu(k, hash_head, hash_entry) {
+ 		if (k == key) {
+ 			found = true;
+ 			break;
+ 		}
+ 	}
+-	rcu_read_unlock();
+ 
+ 	return found;
+ }
+@@ -6614,7 +6619,7 @@ void lockdep_unregister_key(struct lock_class_key *key)
+ 		call_rcu(&delayed_free.rcu_head, free_zapped_rcu);
+ 
+ 	/* Wait until is_dynamic_key() has finished accessing k->hash_entry. */
+-	synchronize_rcu();
++	synchronize_shazptr(keyhashentry(key));
+ }
+ EXPORT_SYMBOL_GPL(lockdep_unregister_key);
+ 
 -- 
 2.47.1
 
