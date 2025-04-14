@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-182333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87CE3A8880E
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:10:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE17AA8880D
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 18:10:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4527D176E21
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:09:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36CFA1899BF6
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:09:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E720288CA9;
-	Mon, 14 Apr 2025 16:08:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DAB8284678;
+	Mon, 14 Apr 2025 16:08:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="u0p8o9lS";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="7o7XSzmx"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="UweF2BbX";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="xlUvTn8O"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B515D284699
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B14284670
 	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 16:08:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744646898; cv=none; b=Ao/kpFz6D4cNjObYX/g2dFlu0mfGh1RVYPJ3bG2sMn661RZ81+Ei5TPDEAO2DOrCr3UHgpeG68Oscw6FkeI5Ysmiqwm6eAW4cCDCGGHmI65yJUW1wMyxGFkchOkYw9GT9nZRKsUhhmPihMsc6Jz7pPFLDb81ISrSMkLHG8nuT34=
+	t=1744646899; cv=none; b=GbUW4623cxU+wK6YUGVwFwezJTfk3w0Vu6dfS84DRHd9SoB/yffjAMjUUkSEzjzFDLH9ytCvuRPrBWoJX1DXJW95DjAZOvv6+r6L1K6W0Nmsxfjj7xyE5/2OV6q9PGjENP2v/I3ZOLj5NZR78kAx5gVWAwOLtKJINBZeJKXkS0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744646898; c=relaxed/simple;
-	bh=zrHr0oIdmFVvuqReRS6A1Vk8JfCJLTqEyMuMgmRm85A=;
+	s=arc-20240116; t=1744646899; c=relaxed/simple;
+	bh=psMK5D/Ej6r9TOHK0/N777uNZ7fI4FJf9tekZNqyEP4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=l1HaPTgpMq2QAKofJzniY/5IurJTL4KyP35DFqRDTJhO810m0NWalbM/xJKtKbX05GufmODomR8DD8W72FQp8tt2AeoEcRqIagAQvqpi1uhx3h8LmVGxbm3cUCndlbeQiHrQw+fONQN7Rm88wu17ip6+G0C/7N9XN4FFTcyKjNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=u0p8o9lS; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=7o7XSzmx; arc=none smtp.client-ip=193.142.43.55
+	 MIME-Version; b=bIlX3EP0DOOYG/bbkASrPlm/lfMWzXsl+ElrqhU73/JohD7PVioCRRelJfSimJrdaeAXJyaRlpeogtnMT3CrUuw5/+molWf4cfvfkVKiUn/KvmeL/8TRcLL2oc2r8JseMgp3s/SOOPLblszRAP4qlpDU3qkCwCngdwY8r5vL12k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=UweF2BbX; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=xlUvTn8O; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1744646893;
+	s=2020; t=1744646894;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ItheQOXN0W8/U3eIeVElS1GMGBEBaL1p1NvXJGWnpLY=;
-	b=u0p8o9lSr8QSW5yjQvmHEHfTLSQ1cjSD+GMUHGAjsBaSkMiQkBGTW7BNgndXGSbM6pM/X6
-	2IMKASyTEQCszA3vfJnT6DNIudR/ZUMrAGnTZIzgzQZ5eJ5Yk90K505ZUFZzU0hJvYqChz
-	9Q9Ig/wkZBonYfl/+gHJsVTjii0D6j55TJ/cg5+D9XT9fVpsjpTObP0FztPx4+ww099oCA
-	spvOXQ4V/a9g33xyilwEH0JQ1XfmQbMQBPTo3RQASib2GXQYLqrpEjOQeD1YEkb+S2w9rV
-	uXO18WEVwYZQDNXN9M9spuYkQpOTtr8uKIrJHCkQ4zD6C+XMcU9/KOP30FcK1w==
+	bh=g9V0amf8yCnsZjanHGDleuk2ou6MuA9/QgqDODlZotE=;
+	b=UweF2BbXcEz4vcWWIeBB4PO+6elYVD4F1vDlQY80Ogf2DrYxj7JYBa0TGNtjld/k0FAIiU
+	Z3QM5xf1cFxIMytPlL96UQhVves5TcRjDwAk2YWMrIL6OhrIU7FWZeahofmXEGF1sv62t7
+	FupN8WNK9tBKKMT97wZwtJ7DzqGSxfCNucwtvG2Xxv82CQXrDl3WfJU65W6NXApBNzjWBF
+	+8dHuGndj+X3IoAn5YX0eHN1uR+vCbsEZq2OFPidMLm/4DxEG3kpt8k1HC6vJWROZ7F6/F
+	zqYSt4emBIUnLbyuaVajV1XPo9b8uAosCo7aqxjeMl7kmSLLf/p+IbTineNqKA==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1744646893;
+	s=2020e; t=1744646894;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ItheQOXN0W8/U3eIeVElS1GMGBEBaL1p1NvXJGWnpLY=;
-	b=7o7XSzmxcMa4Pl4d2mBEf53ukv6SKPSmNrSfSxM8hpIuh7VZeUsncz6fKPrHDz3PMpnjKz
-	n216a2vVAgUR8dAg==
+	bh=g9V0amf8yCnsZjanHGDleuk2ou6MuA9/QgqDODlZotE=;
+	b=xlUvTn8OtwmKyqUsih+ilHZhjUDM4doduM5Q1XmSuyO7iFbT9Ivj9pzFZfAcXyXF0ByMVi
+	DcuxW5su2W0wa1DA==
 To: netdev@vger.kernel.org,
 	linux-rt-devel@lists.linux.dev
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -66,9 +66,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Jamal Hadi Salim <jhs@mojatatu.com>,
 	Cong Wang <xiyou.wangcong@gmail.com>,
 	Jiri Pirko <jiri@resnulli.us>
-Subject: [PATCH net-next v2 13/18] net/sched: act_mirred: Move the recursion counter struct netdev_xmit
-Date: Mon, 14 Apr 2025 18:07:49 +0200
-Message-ID: <20250414160754.503321-14-bigeasy@linutronix.de>
+Subject: [PATCH net-next v2 14/18] net/sched: Use nested-BH locking for sch_frag_data_storage
+Date: Mon, 14 Apr 2025 18:07:50 +0200
+Message-ID: <20250414160754.503321-15-bigeasy@linutronix.de>
 In-Reply-To: <20250414160754.503321-1-bigeasy@linutronix.de>
 References: <20250414160754.503321-1-bigeasy@linutronix.de>
 Precedence: bulk
@@ -79,91 +79,80 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 
-mirred_nest_level is a per-CPU variable and relies on disabled BH for its
-locking. Without per-CPU locking in local_bh_disable() on PREEMPT_RT
-this data structure requires explicit locking.
+sch_frag_data_storage is a per-CPU variable and relies on disabled BH
+for its locking. Without per-CPU locking in local_bh_disable() on
+PREEMPT_RT this data structure requires explicit locking.
 
-Move mirred_nest_level to struct netdev_xmit as u8, provide wrappers.
+Add local_lock_t to the struct and use local_lock_nested_bh() for locking.
+This change adds only lockdep coverage and does not alter the functional
+behaviour for !PREEMPT_RT.
 
 Cc: Jamal Hadi Salim <jhs@mojatatu.com>
 Cc: Cong Wang <xiyou.wangcong@gmail.com>
 Cc: Jiri Pirko <jiri@resnulli.us>
 Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 ---
- include/linux/netdevice_xmit.h |  3 +++
- net/sched/act_mirred.c         | 28 +++++++++++++++++++++++++---
- 2 files changed, 28 insertions(+), 3 deletions(-)
+ net/sched/sch_frag.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/netdevice_xmit.h b/include/linux/netdevice_xmit.h
-index 3bbbc1a9860a3..4793ec42b1faa 100644
---- a/include/linux/netdevice_xmit.h
-+++ b/include/linux/netdevice_xmit.h
-@@ -11,6 +11,9 @@ struct netdev_xmit {
- #if IS_ENABLED(CONFIG_NF_DUP_NETDEV)
- 	u8 nf_dup_skb_recursion;
- #endif
-+#if IS_ENABLED(CONFIG_NET_ACT_MIRRED)
-+	u8 sched_mirred_nest;
-+#endif
+diff --git a/net/sched/sch_frag.c b/net/sched/sch_frag.c
+index ce63414185fd6..d1d87dce7f3f7 100644
+--- a/net/sched/sch_frag.c
++++ b/net/sched/sch_frag.c
+@@ -16,14 +16,18 @@ struct sch_frag_data {
+ 	unsigned int l2_len;
+ 	u8 l2_data[VLAN_ETH_HLEN];
+ 	int (*xmit)(struct sk_buff *skb);
++	local_lock_t bh_lock;
  };
 =20
- #endif
-diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
-index 5b38143659249..5f01f567c934d 100644
---- a/net/sched/act_mirred.c
-+++ b/net/sched/act_mirred.c
-@@ -30,7 +30,29 @@ static LIST_HEAD(mirred_list);
- static DEFINE_SPINLOCK(mirred_list_lock);
+-static DEFINE_PER_CPU(struct sch_frag_data, sch_frag_data_storage);
++static DEFINE_PER_CPU(struct sch_frag_data, sch_frag_data_storage) =3D {
++	.bh_lock =3D INIT_LOCAL_LOCK(bh_lock),
++};
 =20
- #define MIRRED_NEST_LIMIT    4
--static DEFINE_PER_CPU(unsigned int, mirred_nest_level);
-+
-+#ifndef CONFIG_PREEMPT_RT
-+static u8 tcf_mirred_nest_level_inc_return(void)
-+{
-+	return __this_cpu_inc_return(softnet_data.xmit.sched_mirred_nest);
-+}
-+
-+static void tcf_mirred_nest_level_dec(void)
-+{
-+	__this_cpu_dec(softnet_data.xmit.sched_mirred_nest);
-+}
-+
-+#else
-+static u8 tcf_mirred_nest_level_inc_return(void)
-+{
-+	return current->net_xmit.sched_mirred_nest++;
-+}
-+
-+static void tcf_mirred_nest_level_dec(void)
-+{
-+	current->net_xmit.sched_mirred_nest--;
-+}
-+#endif
-=20
- static bool tcf_mirred_is_act_redirect(int action)
+ static int sch_frag_xmit(struct net *net, struct sock *sk, struct sk_buff =
+*skb)
  {
-@@ -423,7 +445,7 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *sk=
-b,
- 	int m_eaction;
- 	u32 blockid;
+ 	struct sch_frag_data *data =3D this_cpu_ptr(&sch_frag_data_storage);
 =20
--	nest_level =3D __this_cpu_inc_return(mirred_nest_level);
-+	nest_level =3D tcf_mirred_nest_level_inc_return();
- 	if (unlikely(nest_level > MIRRED_NEST_LIMIT)) {
- 		net_warn_ratelimited("Packet exceeded mirred recursion limit on dev %s\n=
-",
- 				     netdev_name(skb->dev));
-@@ -454,7 +476,7 @@ TC_INDIRECT_SCOPE int tcf_mirred_act(struct sk_buff *sk=
-b,
- 				   retval);
++	lockdep_assert_held(&data->bh_lock);
+ 	if (skb_cow_head(skb, data->l2_len) < 0) {
+ 		kfree_skb(skb);
+ 		return -ENOMEM;
+@@ -95,6 +99,7 @@ static int sch_fragment(struct net *net, struct sk_buff *=
+skb,
+ 		struct rtable sch_frag_rt =3D { 0 };
+ 		unsigned long orig_dst;
 =20
- dec_nest_level:
--	__this_cpu_dec(mirred_nest_level);
-+	tcf_mirred_nest_level_dec();
++		local_lock_nested_bh(&sch_frag_data_storage.bh_lock);
+ 		sch_frag_prepare_frag(skb, xmit);
+ 		dst_init(&sch_frag_rt.dst, &sch_frag_dst_ops, NULL,
+ 			 DST_OBSOLETE_NONE, DST_NOCOUNT);
+@@ -105,11 +110,13 @@ static int sch_fragment(struct net *net, struct sk_bu=
+ff *skb,
+ 		IPCB(skb)->frag_max_size =3D mru;
 =20
- 	return retval;
- }
+ 		ret =3D ip_do_fragment(net, skb->sk, skb, sch_frag_xmit);
++		local_unlock_nested_bh(&sch_frag_data_storage.bh_lock);
+ 		refdst_drop(orig_dst);
+ 	} else if (skb_protocol(skb, true) =3D=3D htons(ETH_P_IPV6)) {
+ 		unsigned long orig_dst;
+ 		struct rt6_info sch_frag_rt;
+=20
++		local_lock_nested_bh(&sch_frag_data_storage.bh_lock);
+ 		sch_frag_prepare_frag(skb, xmit);
+ 		memset(&sch_frag_rt, 0, sizeof(sch_frag_rt));
+ 		dst_init(&sch_frag_rt.dst, &sch_frag_dst_ops, NULL,
+@@ -122,6 +129,7 @@ static int sch_fragment(struct net *net, struct sk_buff=
+ *skb,
+=20
+ 		ret =3D ipv6_stub->ipv6_fragment(net, skb->sk, skb,
+ 					       sch_frag_xmit);
++		local_unlock_nested_bh(&sch_frag_data_storage.bh_lock);
+ 		refdst_drop(orig_dst);
+ 	} else {
+ 		net_warn_ratelimited("Fail frag %s: eth=3D%x, MRU=3D%d, MTU=3D%d\n",
 --=20
 2.49.0
 
