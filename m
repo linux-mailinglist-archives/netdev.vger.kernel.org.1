@@ -1,128 +1,103 @@
-Return-Path: <netdev+bounces-182262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4513A88649
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 17:05:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE50AA885CD
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 16:53:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 317215602F9
-	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 14:45:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB90019024A3
+	for <lists+netdev@lfdr.de>; Mon, 14 Apr 2025 14:45:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EC0627587B;
-	Mon, 14 Apr 2025 14:31:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C4592797B0;
+	Mon, 14 Apr 2025 14:32:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Zm9eD3mk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UQooXDFi"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86474275872;
-	Mon, 14 Apr 2025 14:31:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3611C27979D
+	for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 14:32:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744641116; cv=none; b=jUIIRb8cfpB2v0b+bq0Pqx8Y7ufq4H0BbKbKZnmQXL8zmsK0Lbgctx6IBhlXvu5aXLoLCbBaYsz0NL1SW7DGFNDJLy7b+rWKnxkPUlnbmwDU3zUmKu9/SwUo8eA3Cw9/4EvhxkQTVf92Jp/7zL52KCVlI2Lj55YeiSc13euV5Bw=
+	t=1744641132; cv=none; b=XMraWqmGQNmbGiqv6aBB9rkeb/ptQwdozC+tfZNG+sM+pZKy8a8wmTOfkSLhWmTFFWdAEuaVFunu12ZX8Kh6wDGtiWzjGaKmnxxStlqYAQisZ80E2UJR/kTc39Dqs0We+UCWEbfdrWi7aHdFQ91Z3EwTxjNgphwNWCdX71VkdQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744641116; c=relaxed/simple;
-	bh=JTrzdiz7XhEyL0SreHMCxYY3DvYmAUsCVxY/Glddl2o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iBb9mxK0FZwJOnZWg1mhPvU8SoyofL+iAUU9FajBTW7je8KNgc0AdLmp2moltKjet8tmjVBgRReXLXnarDHPuyEDTGiaT1J7B7tpl/5mqiw1mOcJdUVMqNt6NUYAO2bTKgeJWHNhLGxVmyXCYtodBJ/jdcTP3nM34LyMN5fQACM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Zm9eD3mk; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=cuaKggYDRTaGllYGEl45fC0lvQ48d6zJXW22p95ihu0=; b=Zm9eD3mk3WM5hftniSBwFF1yr9
-	wvxNTAJzgVasbkxZJHOK1DR3oOVb/26e4oc2Nzpgxl1KKp3lmgm7r0q4O4v1RXq44g3YXAnkmPM43
-	2ha6YdMWO85CxFeTmi0XPvzd/aM0EX4N1G0Bo7ih03EUeqbV7ZcBOWGPdcG+MVbfEwUGIeKhmBY1g
-	wZUp8xPG4mf95iso0eT2piUlROajI6jwnHoSX8Ei8Of0/zZAt3qtyK3lSb39SV9/9l7TRKiqaPBao
-	z2gd3UeLxHusJWeDBZkkC2cny2t4IQ9/61aLTMG/t/Bj2Ul5kUTCL/MpnPtuL1et0NBwMJz/BygFc
-	P5hiyRbA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58820)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u4KqS-0006gu-0p;
-	Mon, 14 Apr 2025 15:31:32 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u4KqM-0007pA-1n;
-	Mon, 14 Apr 2025 15:31:26 +0100
-Date: Mon, 14 Apr 2025 15:31:26 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-renesas-soc@vger.kernel.org,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH net-next v5 3/3] net: stmmac: Add DWMAC glue layer for
- Renesas GBETH
-Message-ID: <Z_0cPmY_LzI_fo4S@shell.armlinux.org.uk>
-References: <20250407120317.127056-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20250407120317.127056-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <Z_QSHpvSK7I--xPq@shell.armlinux.org.uk>
- <CA+V-a8vgavmN7c9KYjc-3tm-9GC1_aVUkF-dF=Ws9axTBmSa5g@mail.gmail.com>
+	s=arc-20240116; t=1744641132; c=relaxed/simple;
+	bh=Z4hsuMye1QWPaRlENCQ3hF2g0yGPZJXBKHsUZzi2MP8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YBo7ROqxAxcNcIRN1vJMyhPfvA/frjrRU1xO/qOHHG+u9g7rRGw8EJIFc7gUTBFXhs8aP4i1ScFGBCeJ7RKcyDuHeMzf8zliFJU8qhxOE5UaevPQIIaXcANwLiDE/LF3NasnZ8YK2VWrh1W9DceDINmSPgW1UFUI2TziB626X1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UQooXDFi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C370C4CEE2;
+	Mon, 14 Apr 2025 14:32:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744641131;
+	bh=Z4hsuMye1QWPaRlENCQ3hF2g0yGPZJXBKHsUZzi2MP8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=UQooXDFi4h1/ISfVPj+QxqFX9LNr1ZTem+MGKfQevdt+2S5tGH+ayeAmn/tvifycN
+	 efoszND+CF8rSng0bMFMm7tsQiZWPmW4sNL5qeiuzMBZNGSxtCVo9ICcCWyinHaWUX
+	 YEnsHqPCVLfPY91WtUZGPoivJFBsT2OZsJkWjEfwbtCujOfeozoqEtfXjpJ4N/XHLS
+	 JK03ccRfRKOblk387GDAODzsvTAtZgNU41pkhWFdZrtJmuQ6oQaagH6J9ypX4tq6IB
+	 VIJ60AdpcTV0dmvEg8ubzs5im5fX7qpha7/u7BuuayziGDxZy8GF2xPmNRucgADZq3
+	 dgzHw0VVzo9nQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com
+Subject: [PATCH net] eth: bnxt: fix missing ring index trim on error path
+Date: Mon, 14 Apr 2025 07:32:10 -0700
+Message-ID: <20250414143210.458625-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+V-a8vgavmN7c9KYjc-3tm-9GC1_aVUkF-dF=Ws9axTBmSa5g@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Apr 07, 2025 at 07:07:49PM +0100, Lad, Prabhakar wrote:
-> On Mon, Apr 7, 2025 at 6:58 PM Russell King (Oracle)
-> <linux@armlinux.org.uk> wrote:
-> >
-> > On Mon, Apr 07, 2025 at 01:03:17PM +0100, Prabhakar wrote:
-> > > +static struct clk *renesas_gbeth_find_clk(struct plat_stmmacenet_data *plat_dat,
-> > > +                                       const char *name)
-> > > +{
-> > > +     for (unsigned int i = 0; i < plat_dat->num_clks; i++)
-> > > +             if (!strcmp(plat_dat->clks[i].id, name))
-> > > +                     return plat_dat->clks[i].clk;
-> > > +
-> > > +     return NULL;
-> > > +}
-> >
-> > In addition to Jakub's request, I'll ask that you hold off for a week
-> > because I have the following that I'd like to submit:
-> >
-> Ack, please add me in Cc while you post this patch.
+Commit under Fixes converted tx_prod to be free running but missed
+masking it on the Tx error path. This crashes on error conditions,
+for example when DMA mapping fails.
 
-FYI, the patch was merged last Thursday, so please update to replace
-the above with stmmac_pltfr_find_clk() which will do this for you.
+Fixes: 6d1add95536b ("bnxt_en: Modify TX ring indexing logic.")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: michael.chan@broadcom.com
+CC: pavan.chebbi@broadcom.com
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks.
-
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 8725e1e13908..c8e3468eee61 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -787,7 +787,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	dev_kfree_skb_any(skb);
+ tx_kick_pending:
+ 	if (BNXT_TX_PTP_IS_SET(lflags)) {
+-		txr->tx_buf_ring[txr->tx_prod].is_ts_pkt = 0;
++		txr->tx_buf_ring[RING_TX(bp, txr->tx_prod)].is_ts_pkt = 0;
+ 		atomic64_inc(&bp->ptp_cfg->stats.ts_err);
+ 		if (!(bp->fw_cap & BNXT_FW_CAP_TX_TS_CMP))
+ 			/* set SKB to err so PTP worker will clean up */
+@@ -795,7 +795,7 @@ static netdev_tx_t bnxt_start_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	}
+ 	if (txr->kick_pending)
+ 		bnxt_txr_db_kick(bp, txr, txr->tx_prod);
+-	txr->tx_buf_ring[txr->tx_prod].skb = NULL;
++	txr->tx_buf_ring[RING_TX(bp, txr->tx_prod)].skb = NULL;
+ 	dev_core_stats_tx_dropped_inc(dev);
+ 	return NETDEV_TX_OK;
+ }
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.49.0
+
 
