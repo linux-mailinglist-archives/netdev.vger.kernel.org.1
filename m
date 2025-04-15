@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-182863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EC68A8A319
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:41:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB346A8A31B
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:41:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CACC61902808
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:40:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFC901902692
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:41:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0651A29DB7D;
-	Tue, 15 Apr 2025 15:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22F8529E061;
+	Tue, 15 Apr 2025 15:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iPNcoFFi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kZ2dJAHZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5A7292911
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 15:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05DB29E057;
+	Tue, 15 Apr 2025 15:40:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744731607; cv=none; b=CIj1+Uy3D31taxSWD4cvlBJHLGqtLkZU+N6QvyGTrgGuVQ3+ABKPJ0vdwXb/ZxKd0QW5956RS/virkN5HujY8KPOrZoxNtZmlhhgiFALqJcAA05sWXv+tNFxs/MN4AU0oUySJNnrIENTl9CwsFA4qigWkyQr2eQFBKIT/ImFbME=
+	t=1744731609; cv=none; b=N5OsRde4Bk6uf5kUMB+sqpvMuHx7R5Xc/Hrch6tjsP5ZZZV2dsYEji/NIkVwGLNBiJLxvjkliUQwFoLPrih4ZNKyKH6m1M3PkGFaEWL7jMAcIPSU/CbqojorACg8GFeaYAq+KiiWzQNh1dtsVGE+u566AtfhRF+bWXKXhtbm8/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744731607; c=relaxed/simple;
-	bh=3PBzp3Gj/tJrXMNAsg6j+1B15zZArgDVt6x/slcwt+E=;
+	s=arc-20240116; t=1744731609; c=relaxed/simple;
+	bh=5mg9Z64bCpKpIIpcC0BqYxuIjrycrX/0DIFqvmluXnU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QD4W8yjhbd8Ep9eWWYMFX0UNyFFf6DUNwM1hRR5tZgJBjXpH5FQ3twgoDL4cJGPWATPfFs37RVRMluXruNxT90hZTaSBavZwc1mM3zG8CHCeeQDqO/bbq3NVqTATmjuzPbCatBXfSDH0dg4X3+fYU66e8NRHDbgSdwt1NGfQ/rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iPNcoFFi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D65CC4CEEE;
-	Tue, 15 Apr 2025 15:40:07 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=tZpBp8L1fcfPzvDRKTu38oFlgDf5Cj0AoqfrHATm2+vgjtNxCbBVSuWYkYS6Uf1HbhMGF1ZpJdUhFjZAF7uc8fCZKtIwZvCVcdKbdpOkBObH5VBuq43OEd9b2S+8B5biq5fS+I0tTlQyyVQNDI3ipYqg7Jf5AWaIQFhvuCXvCZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kZ2dJAHZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65F97C4CEEF;
+	Tue, 15 Apr 2025 15:40:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744731607;
-	bh=3PBzp3Gj/tJrXMNAsg6j+1B15zZArgDVt6x/slcwt+E=;
+	s=k20201202; t=1744731608;
+	bh=5mg9Z64bCpKpIIpcC0BqYxuIjrycrX/0DIFqvmluXnU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iPNcoFFiURAARrQ1Pso0iIGOuIhsCz6G6Bd1Jwv/Q3Q65FY3V2oM/32gVXFcUqn92
-	 Ja6L9FhIz3hTSR1liVCHLLXFUB5cnNY59SLEcrq+1NswLNxO6Ed/iCjy/MNHgpWOpH
-	 2E67kqIblVVRmoNF2O+kF9vlveUQl/XRP4mVajTDJoVlE+rL/S6WpnVOtqFE1lBpcQ
-	 yiN8uobrtFptLI8+gBkGswue4u0jgNaXvX/YrEvaNwjFCFplQmh/c7TdoWFiBm2Di1
-	 Y8+PnIdQAa8gSCnIj/LqSYwpaNQrUDWNge7lV0KZMrBGCoIqu7Ty6qpZ2WN4V23QOR
-	 PDlYIOyvMjAOg==
+	b=kZ2dJAHZEFCx8JMm7l4tFUV+YKv7SYsmpEgLVianYG7XCfZGSVybMljiUMtKq/qP9
+	 UzWeofPEE+wF52cQuDDd4wMw+O6QKc9DIDC3kaI1sGcfzcgn7NkwFGNfX4EAmFvHa5
+	 DPrAbNobWzyzjbkwGWk+jmof6TWvWuMDqZcRhUOl5mlfXfK+aoPuFxa+r3hgpaJSu0
+	 /P0bb+7iGulQLKM7lpOSyNmEoU2/3AGTefuXv4sG/F1OuPXVBZv544pHVUWnvMTVN/
+	 VBXbQyd9aEn6RYhKH3i2db8HsFOPK5DlmFpJOrbGQTZro4pYZUmGDjRymABol96mHp
+	 98tSV78UUzMyg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C313822D55;
-	Tue, 15 Apr 2025 15:40:46 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CD33822D55;
+	Tue, 15 Apr 2025 15:40:47 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,35 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: phy: remove device_phy_find_device
+Subject: Re: [PATCH net-next 0/5] qed deadcoding
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <174473164476.2680773.9253709874568879632.git-patchwork-notify@kernel.org>
-Date: Tue, 15 Apr 2025 15:40:44 +0000
-References: <ab7b8094-2eea-4e82-a047-fd60117f220b@gmail.com>
-In-Reply-To: <ab7b8094-2eea-4e82-a047-fd60117f220b@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: pabeni@redhat.com, kuba@kernel.org, davem@davemloft.net,
- edumazet@google.com, andrew@lunn.ch, linux@armlinux.org.uk,
- netdev@vger.kernel.org
+ <174473164624.2680773.10700489026700314444.git-patchwork-notify@kernel.org>
+Date: Tue, 15 Apr 2025 15:40:46 +0000
+References: <20250414005247.341243-1-linux@treblig.org>
+In-Reply-To: <20250414005247.341243-1-linux@treblig.org>
+To: Dr. David Alan Gilbert <linux@treblig.org>
+Cc: manishc@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun, 13 Apr 2025 16:09:40 +0200 you wrote:
-> AFAICS this function has never had a user.
+On Mon, 14 Apr 2025 01:52:42 +0100 you wrote:
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
 > 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
->  drivers/net/phy/phy_device.c | 12 ------------
->  include/linux/phy.h          |  6 ------
->  2 files changed, 18 deletions(-)
+> Hi,
+>   This is a set of deadcode removals for the qed ethernet
+> device.  I've tried to avoid removing anything that
+> are trivial firmware wrappers.
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next] net: phy: remove device_phy_find_device
-    https://git.kernel.org/netdev/net-next/c/f99564688f38
+  - [net-next,1/5] qed: Remove unused qed_memset_*ctx functions
+    https://git.kernel.org/netdev/net-next/c/e056d3d70388
+  - [net-next,2/5] qed: Remove unused qed_calc_*_ctx_validation functions
+    https://git.kernel.org/netdev/net-next/c/fa381e21a907
+  - [net-next,3/5] qed: Remove unused qed_ptt_invalidate
+    https://git.kernel.org/netdev/net-next/c/3c18acefaf9f
+  - [net-next,4/5] qed: Remove unused qed_print_mcp_trace_*
+    https://git.kernel.org/netdev/net-next/c/058fa8736570
+  - [net-next,5/5] qed: Remove unused qed_db_recovery_dp
+    https://git.kernel.org/netdev/net-next/c/915359abc68c
 
 You are awesome, thank you!
 -- 
