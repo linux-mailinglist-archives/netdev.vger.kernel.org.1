@@ -1,91 +1,84 @@
-Return-Path: <netdev+bounces-182937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6D83A8A604
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 19:49:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83D4AA8A61B
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 19:57:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38E0016C8EA
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:49:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20F1B3B6C2D
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:57:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4E4221F24;
-	Tue, 15 Apr 2025 17:49:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08AFB221DB3;
+	Tue, 15 Apr 2025 17:57:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="dAfn01Uk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PzYIbW/Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23899222578
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 17:49:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2730C20DF4;
+	Tue, 15 Apr 2025 17:57:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744739344; cv=none; b=HqoE5MOAf4N9ruC7ldoSMv4J5yGR+KJ0o+4B/Y7TQSZr5Z3BPqXQRKp2Gh0NhoTHXEse6KrhpNnqrriLd8wko7/cHAXusaySkAXVyOfIHPsuZSCJXSaGfx+RYy904dqpUPXZnh2KN6pRv8c+gv4vT3Z8MaTYMwA9942GN9qAFNk=
+	t=1744739834; cv=none; b=FOZNeMTAnAeXuPMbizXC80vd5DBgWwH6vhkuXc8eIsAo3zBtGCVBitxlv8LZ+a4OIIZMPjfPwNeU96phrYxgRztGybkDQjH/E9eDQR0lVDOUQkvkjKR2PHxD733zKNIrkLdoyIF7uM0s5/JWtUELN3vTav90Sm4kQ9ovcPT0JJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744739344; c=relaxed/simple;
-	bh=dJxRfYEp2QuH4TryMHj3DfMxIJ06gv4yfAAKnOyob3E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HWtUkBaTS1GtSWT0g4MfSRhzRBLIF/r2gdbBFmsvl/iZTii3zO7aaxiW84XoSwdqSc7sqImMfQv4Z5MtnKSPR4Q8llvuxroH6tt+tAZ6Ka7i9lzf+bFJKjhs6d03lZdDPOrsMSGHMT8985YtlHKnZNLQM6bD4oM8tWwvSgU78O4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=dAfn01Uk; arc=none smtp.client-ip=209.85.161.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-60245c7309bso1428614eaf.3
-        for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 10:49:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1744739342; x=1745344142; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tsBl+7evj4S3BwRvVEmsLlhXAkdHNshIeD4Nby9HkP0=;
-        b=dAfn01UknO9PSfzRxjBEbPDdBr5QtdaWlBqwtQ7ObV8iy7tEX7AIqJDkwdCXKfJvgD
-         I/k7zXRQ/qz3gYuHEaOIKXZGvlDFmu6ovx51q6Ur3VjRNbR8pY4IkvV8OVgFOVSy8eXG
-         xT9A+Ls5/rt84f7yFpilGXgttknZvdd+juPig=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744739342; x=1745344142;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tsBl+7evj4S3BwRvVEmsLlhXAkdHNshIeD4Nby9HkP0=;
-        b=HerYVxCYEYPdyQDW4SRl8mTLgvqdajPgBqlxrHKubX1s958N8h2L7HM5A+hZw3L5kU
-         4J7blwlSozhbFc8L8AJArWqf/SZg31TUhO3w1VXjk8LCLsVS+G9Wqu5mBfHUE7k8/Rx2
-         eGLPfWnA0EfJ5Mi98I0qyzsSsvwGt6dZi043GGSJfy1U90/1C6Q09s/la8tvN7HPnK7B
-         aef34TfRfwGeTTJUiUc4E3Fkxt7KWX5F8vNaI1S7D/VPJ1SCNZCqGnkBmOFh3SI0WXal
-         4D//vUE41bLdbB1MerkcPJ4EX1LLnFU5I9MmixmsDlMNT2zX9XGDl3cRt6YeAABvQuVe
-         K3hQ==
-X-Gm-Message-State: AOJu0Ywkap26PwqUCgRYnt4TKjod6ULPiIezsnyE4xahgG9PF6vlv9WI
-	FNJleHdgba7NsyVaDMqMYwV3+ZO9pvL3+5bA+INxUhEJ5ANP5B61o+lCmK6pdA==
-X-Gm-Gg: ASbGncvKlZxBltuT3GBRFjWyidvpiJ3MYQsVQeb6FSJl2VbB8UV5HUm6Ym7Hdwd5Yr5
-	jm5ok/PTY9cNtxyx9TlEO36wthj0/uctUmpwyD3ynH5Gfqjc1dSYKrv84PpdK4TuDPliiipwKel
-	NSFmvHQRfyuFUSsylCsrbsfJVhh4GGpb2G2nXT2+bFhiH/BzjoGj5O37SseLjVI52a4oKwFBho/
-	6ZLNqv7+2SyHLhJPMq9hj0PhMdXsGBuXnulDpRDmFl+QezUQjvgDpdNIdVXXa6WkCfwnDlWG940
-	RXIe0JQB1oCAQBQkDNwVWWJaku4djrbz2op6PaagGR/1d+rwDSuglzP3XuH42+8rpdic4UIR7uv
-	saF1TX5xCcb85KQ4A
-X-Google-Smtp-Source: AGHT+IFNcmbW7ktns5Jay6yqphO94w+ZT0e7wMbDZwii9eRNe04vOhW8Xmr7gJF/ZPy4r7tGmbpQLg==
-X-Received: by 2002:a05:6820:1c8c:b0:603:f1b5:ca0e with SMTP id 006d021491bc7-6046f584d84mr8659999eaf.3.1744739342175;
-        Tue, 15 Apr 2025 10:49:02 -0700 (PDT)
-Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6045f50ee87sm2457073eaf.7.2025.04.15.10.49.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Apr 2025 10:49:00 -0700 (PDT)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
+	s=arc-20240116; t=1744739834; c=relaxed/simple;
+	bh=LkjYzFPBTOFgIp6/N6gKViQpronUbr8w7O5lyHYgdS0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Zfh3X3JsaQIRX0mPjqJ4ZoiXg/+P6tEky04h5tl6HFc9GQJeqIXtY2dH6oswE2/xxvmAdfcwaCUR/icxPsJZjxnFXYNnpwFVvRScLW79dpUZS6dgnBpip/ov7yzR5NraKpmIksYJcTzotbSXpPjGBd9IICVZsMrqyuxtAZHY6EI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PzYIbW/Q; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744739833; x=1776275833;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=LkjYzFPBTOFgIp6/N6gKViQpronUbr8w7O5lyHYgdS0=;
+  b=PzYIbW/Qzwy0p5uCJI7+eNrTlaTrPeiU1nKh30je6xk9xPp2kDSBiNaW
+   IwUOkmQfkdcgqpIbzs/rgARys9HYUZlnsX33ytFNbItKf7pPCl9wBPbwp
+   Dm960NAylhEbYTKoMk9eA22OxeCqqkl8K78C0VEWG6un5c7gs8BOjNmDe
+   XK8v2KZQurV0Du8WAi0bxE00xAIttsAsieLsz7gONC82wGRM9of51hqp4
+   NKJGwtcgclAlqI2pKt/V3cJXVfffyMTMpNnV5ntfZlorwBcpsnTMDF3FU
+   TOa7sgzb1oSLpBmiPtLKaOFAohztZySRQVUpNm3EdPnfLZnoNnBahWDge
+   g==;
+X-CSE-ConnectionGUID: bbfln7MdT0aOmmSg/WzYRg==
+X-CSE-MsgGUID: E0vXpaxnQuCOAzgZ6MMYBA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11404"; a="57650407"
+X-IronPort-AV: E=Sophos;i="6.15,213,1739865600"; 
+   d="scan'208";a="57650407"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 10:57:12 -0700
+X-CSE-ConnectionGUID: lAuP0HNSSGmgEJmHMoj02A==
+X-CSE-MsgGUID: 5bEefThrTfWE8815NKIprA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,213,1739865600"; 
+   d="scan'208";a="167364086"
+Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
+  by orviesa001.jf.intel.com with ESMTP; 15 Apr 2025 10:57:08 -0700
+From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+To: donald.hunter@gmail.com,
 	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
 	pabeni@redhat.com,
+	horms@kernel.org,
+	vadim.fedorenko@linux.dev,
+	jiri@resnulli.us,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
 	andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
-	Shruti Parab <shruti.parab@broadcom.com>
-Subject: [PATCH net-next 4/4] bnxt_en: Remove unused macros in bnxt_ulp.h
-Date: Tue, 15 Apr 2025 10:48:18 -0700
-Message-ID: <20250415174818.1088646-5-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.43.4
-In-Reply-To: <20250415174818.1088646-1-michael.chan@broadcom.com>
-References: <20250415174818.1088646-1-michael.chan@broadcom.com>
+	aleksandr.loktionov@intel.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-rdma@vger.kernel.org,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Subject: [PATCH net-next v1 0/3] dpll: add ref-sync pins feature
+Date: Tue, 15 Apr 2025 19:51:12 +0200
+Message-Id: <20250415175115.1066641-1-arkadiusz.kubalewski@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,33 +87,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Allow to bind two pins and become a single source of clock signal, where
+first of the pins is carring the base frequency and second provides SYNC
+pulses.
 
-BNXT_ROCE_ULP and BNXT_MAX_ULP are no longer used.  Remove them to
-clean up the code.
+Verify pins bind state/capabilities:
+$ ./tools/net/ynl/pyynl/cli.py \
+ --spec Documentation/netlink/specs/dpll.yaml \
+ --do pin-get \
+ --json '{"id":0}'
+{'board-label': 'CVL-SDP22',
+ 'id': 0,
+ [...]
+ 'reference-sync': [{'id': 1, 'state': 'disconnected'}],
+ [...]}
 
-Reviewed-by: Shruti Parab <shruti.parab@broadcom.com>
-Signed-off-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h | 3 ---
- 1 file changed, 3 deletions(-)
+Bind the pins by setting connected state between them:
+$ ./tools/net/ynl/pyynl/cli.py \
+ --spec Documentation/netlink/specs/dpll.yaml \
+ --do pin-set \
+ --json '{"id":0, "reference-sync":{"id":1, "state":"connected"}}'
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
-index f6b5efb5e775..7b9dd8ebe4bc 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h
-@@ -10,9 +10,6 @@
- #ifndef BNXT_ULP_H
- #define BNXT_ULP_H
- 
--#define BNXT_ROCE_ULP	0
--#define BNXT_MAX_ULP	1
--
- #define BNXT_MIN_ROCE_CP_RINGS	2
- #define BNXT_MIN_ROCE_STAT_CTXS	1
- 
+Verify pins bind state:
+$ ./tools/net/ynl/pyynl/cli.py \
+ --spec Documentation/netlink/specs/dpll.yaml \
+ --do pin-get \
+ --json '{"id":0}'
+{'board-label': 'CVL-SDP22',
+ 'id': 0,
+ [...]
+ 'reference-sync': [{'id': 1, 'state': 'connected'}],
+ [...]}
+
+Unbind the pins by setting disconnected state between them:
+$ ./tools/net/ynl/pyynl/cli.py \
+ --spec Documentation/netlink/specs/dpll.yaml \
+ --do pin-set \
+ --json '{"id":0, "reference-sync":{"id":1, "state":"disconnected"}}'
+
+
+Arkadiusz Kubalewski (3):
+  dpll: add reference-sync netlink attribute
+  dpll: add reference sync get/set
+  ice: add ref-sync dpll pins
+
+ Documentation/netlink/specs/dpll.yaml         |  19 ++
+ drivers/dpll/dpll_core.c                      |  27 +++
+ drivers/dpll/dpll_core.h                      |   1 +
+ drivers/dpll/dpll_netlink.c                   | 188 ++++++++++++++++--
+ drivers/dpll/dpll_nl.c                        |  10 +-
+ drivers/dpll/dpll_nl.h                        |   1 +
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   2 +
+ drivers/net/ethernet/intel/ice/ice_dpll.c     | 186 +++++++++++++++++
+ include/linux/dpll.h                          |  10 +
+ include/uapi/linux/dpll.h                     |   1 +
+ 10 files changed, 425 insertions(+), 20 deletions(-)
+
+
+base-commit: 420aabef3ab5fa743afb4d3d391f03ef0e777ca8
 -- 
-2.30.1
+2.38.1
 
 
