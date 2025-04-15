@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-182651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E726A897DB
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 11:26:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D960AA897FD
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 11:29:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44C9F3ABDF6
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 09:25:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1BF57A2675
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 09:28:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB4A2820DD;
-	Tue, 15 Apr 2025 09:25:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED517284673;
+	Tue, 15 Apr 2025 09:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="UEIM/HiP"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="XHCVQ/P1"
 X-Original-To: netdev@vger.kernel.org
 Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C0027FD68;
-	Tue, 15 Apr 2025 09:25:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C030428466A
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 09:29:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744709157; cv=none; b=hBLZmiZI54PqJ+Qdv/jMgwBSj8/dm3UUIoUrSs9QXdngGIlgYQlacAKR7Soh42BjtcCCDVf4x8qZ7jenmDJO5ALzm8qO6lVnOryvS2P5jXgVhSSpOW3+muth8r+8b+9Ije2YHAXBJxS6karMart+V3TpoXL2HkyDUZ7TkeOTVcQ=
+	t=1744709387; cv=none; b=SZdt9Rpj7hbNZkcV97taNNdIpluHh9P6bxvvIxZ8itaZ0bqvPNQlyjL0CJ/FsDIMIDo1KwQYNMxN17fZP8lbd274obIdsPQ8s2h9A6x0xpZaBDorvfhP/aLZH2KvWnwob8dTHrCEjUEW94vF1sb4u5HNeisGcwXNNT8d2SywyTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744709157; c=relaxed/simple;
-	bh=ytDuicykfqxTsQX4cJhgtKs+BJvoEITplUzVLGWV8L0=;
+	s=arc-20240116; t=1744709387; c=relaxed/simple;
+	bh=fIvX4K90QnzvcHrbsLpfxLYLZ0zU9LuMhu1ogutJ8vg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=itN/3MHIT69+ttb8WFD0UPyUiQJiEkVxbW5OKVHUkFFBeI9F4DVIbh9vr4/+RqpPSB6jw0flPTq+vpMc9BviqQaqfLmeZN1olrFZq9qSLPwQVFIyiUayiyTKs5NwPKMDC909MtRzRVkAKy5+3TKTK3+RU+Xtedw+HojS94xygiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=UEIM/HiP; arc=none smtp.client-ip=139.165.32.111
+	 In-Reply-To:Content-Type; b=cr3XLcVOj3RzOQOv+mpZnXaHWO4usFMT7i9bx+TYifIll3iqPV+9xIsGWBiZBrLE+B2J4ZCzJsK5OC8CXlcMK5CoaRR4EVECTLl0hU21ogrwu7taysR5jp0ZtL7he673Ksy+l8UHPf0PFz21bB3ezewICjujGetPQJdptgNKxrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=XHCVQ/P1; arc=none smtp.client-ip=139.165.32.111
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
 Received: from [192.168.1.58] (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 19DCE200DF84;
-	Tue, 15 Apr 2025 11:25:53 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 19DCE200DF84
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id BB60A200DF81;
+	Tue, 15 Apr 2025 11:29:43 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be BB60A200DF81
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1744709153;
-	bh=VIyob7deFo4f05HYLzENtLpGESAZmECjGyEhhqncH/A=;
+	s=ulg20190529; t=1744709383;
+	bh=R9tcLzpBT1e66f/XqFclz0u4cq/unBnvVYkQTTwfPVs=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=UEIM/HiP26jXRWjeojcOwTwPOCRGdGwA8KXJwKirLK/UsvB8NKP17B5FIaWn1Qmuw
-	 AthgCwJ4KvE3cMiDEOGMHz/3EJRAzKJ3DguqsR4OYlEx9ZHiXHUfi3ZNhxIEpSCfn9
-	 DnYKq4E0yNMj9akNoXi/BfQluBFZp/mdlbEQDbmSCZvhmSOb/ZmkLsazMHIpOWF9yM
-	 +jseXHsgOTLUIgeAhLe9pumt49GS1rV1rMXs3E9EW+zwigkc/kRG56o1bGRcOJmi6U
-	 ouywGZ0NWwILViEOjc3qmLP929SSh9dnz6TlgwW7Djur0AR9xlIis8ZZcPiCryjks7
-	 /pDpO0fKM2y0w==
-Message-ID: <89c7c05b-096a-4db9-b1dc-d2a95e89f160@uliege.be>
-Date: Tue, 15 Apr 2025 11:25:52 +0200
+	b=XHCVQ/P1laLl0QI5Xxcb+1GR5a5POhvQjE9Uo7Eqn1wq7b5wsUMbJUFjVtpt/MvLM
+	 YZyNRKGU39yOosvSk4ThlDZrEGRPk7bG8a9m8oNm1+srVEK0ijUkd3qw8IfXQRho/v
+	 +PGHjLrbommwAd/ta+nJzltkvHXY+6mu8HL0IYvIxKQ3A4NoIuhP2BgtsgpNk+O/8Z
+	 km1QEJALqYR5u8k5JnC+a6+gioqJnMO8eNVscji24+c1HWKvxhKkFbQHwkEDD7Vdk5
+	 U21cgQjnyTiyPCazA3XmoM1hlIaRK/idTGStiGDyQLIY8HLY8Z2yL6CKTmXVIai6mu
+	 1A3nYAigZffoQ==
+Message-ID: <e5a894e5-5637-4aba-89c2-66173df1a589@uliege.be>
+Date: Tue, 15 Apr 2025 11:29:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,110 +56,132 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: lwtunnel: disable preemption when required
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Sebastian Sewior <bigeasy@linutronix.de>,
- Stanislav Fomichev <stfomichev@gmail.com>,
- Network Development <netdev@vger.kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- bpf <bpf@vger.kernel.org>, Andrea Mayer <andrea.mayer@uniroma2.it>
-References: <20250403083956.13946-1-justin.iurman@uliege.be>
- <Z-62MSCyMsqtMW1N@mini-arch> <cb0df409-ebbf-4970-b10c-4ea9f863ff00@uliege.be>
- <CAADnVQLiM5MA3Xyrkqmubku6751ZPrDk6v-HmC1jnOaL47=t+g@mail.gmail.com>
- <20250404141955.7Rcvv7nB@linutronix.de>
- <85eefdd9-ec5d-4113-8a50-5d9ea11c8bf5@uliege.be>
- <CAADnVQK7vNPbMS7T9TUOW7s6HNbfr4H8CWbjPgVXW7xa+ybPsw@mail.gmail.com>
- <d326726d-7050-4e88-b950-f49cf5901d34@uliege.be>
- <CAADnVQ++4Lf0ucHjfyK0OakPYsbN2Q9yX0Ru3ymWo4YtLOi-HA@mail.gmail.com>
+Subject: Re: [PATCH net v2 0/3] net: fix lwtunnel reentry loops
+To: Eduard Zingerman <eddyz87@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
+References: <20250314120048.12569-1-justin.iurman@uliege.be>
+ <m2h62qwf34.fsf@gmail.com>
 Content-Language: en-US
 From: Justin Iurman <justin.iurman@uliege.be>
-In-Reply-To: <CAADnVQ++4Lf0ucHjfyK0OakPYsbN2Q9yX0Ru3ymWo4YtLOi-HA@mail.gmail.com>
+In-Reply-To: <m2h62qwf34.fsf@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 4/15/25 01:13, Alexei Starovoitov wrote:
-> On Fri, Apr 11, 2025 at 11:34 AM Justin Iurman <justin.iurman@uliege.be> wrote:
->>
->> On 4/7/25 19:54, Alexei Starovoitov wrote:
->>> On Sun, Apr 6, 2025 at 1:59 AM Justin Iurman <justin.iurman@uliege.be> wrote:
->>>>
->>>> On 4/4/25 16:19, Sebastian Sewior wrote:
->>>>> Alexei, thank you for the Cc.
->>>>>
->>>>> On 2025-04-03 13:35:10 [-0700], Alexei Starovoitov wrote:
->>>>>> Stating the obvious...
->>>>>> Sebastian did a lot of work removing preempt_disable from the networking
->>>>>> stack.
->>>>>> We're certainly not adding them back.
->>>>>> This patch is no go.
->>>>>
->>>>> While looking through the code, it looks as if lwtunnel_xmit() lacks a
->>>>> local_bh_disable().
->>>>
->>>> Thanks Sebastian for the confirmation, as the initial idea was to use
->>>> local_bh_disable() as well. Then I thought preempt_disable() would be
->>>> enough in this context, but I didn't realize you made efforts to remove
->>>> it from the networking stack.
->>>>
->>>> @Alexei, just to clarify: would you ACK this patch if we do
->>>> s/preempt_{disable|enable}()/local_bh_{disable|enable}()/g ?
->>>
->>> You need to think it through and not sprinkle local_bh_disable in
->>> every lwt related function.
->>> Like lwtunnel_input should be running with bh disabled already.
->>
->> Having nested calls to local_bh_{disable|enable}() is fine (i.e.,
->> disabling BHs when they're already disabled), but I guess it's cleaner
->> to avoid it here as you suggest. And since lwtunnel_input() is indeed
->> (always) running with BHs disabled, no changes needed. Thanks for the
->> reminder.
->>
->>> I don't remember the exact conditions where bh is disabled in xmit path.
->>
->> Right. Not sure for lwtunnel_xmit(), but lwtunnel_output() can
->> definitely run with or without BHs disabled. So, what I propose is the
->> following logic (applied to lwtunnel_xmit() too): if BHs disabled then
->> NOP else local_bh_disable(). Thoughts on this new version? (sorry, my
->> mailer messes it up, but you got the idea):
->>
->> diff --git a/net/core/lwtunnel.c b/net/core/lwtunnel.c
->> index e39a459540ec..d44d341683c5 100644
->> --- a/net/core/lwtunnel.c
->> +++ b/net/core/lwtunnel.c
->> @@ -331,8 +331,13 @@ int lwtunnel_output(struct net *net, struct sock
->> *sk, struct sk_buff *skb)
->>          const struct lwtunnel_encap_ops *ops;
->>          struct lwtunnel_state *lwtstate;
->>          struct dst_entry *dst;
->> +       bool in_softirq;
->>          int ret;
->>
->> +       in_softirq = in_softirq();
->> +       if (!in_softirq)
->> +               local_bh_disable();
->> +
+On 4/15/25 00:30, Eduard Zingerman wrote:
+> Justin Iurman <justin.iurman@uliege.be> writes:
 > 
-> This looks like a hack to me.
+>> v2:
+>> - removed some patches from the -v1 series
+>> - added a patch that was initially sent separately
+>> - code style for the selftest (thanks Paolo)
+>> v1:
+>> - https://lore.kernel.org/all/20250311141238.19862-1-justin.iurman@uliege.be/
 > 
-> Instead analyze the typical xmit path. If bh is not disabled
+> Hi Justin,
+> 
+> I've noticed a BUG splat likely introduced by this patch.
+> The splat is reported when executing some BPF selftests,
+> e.g. lwt_ip_encap_ipv4/egress
+> (defined in tools/testing/selftests/bpf/prog_tests/lwt_ip_encap.c and
+>              tools/testing/selftests/bpf/progs/test_lwt_ip_encap.c).
+> 
+> Decoded splat is at the end of the email.
+> Line numbers correspond to commit
+> a27a97f71394 ("Merge branch 'bpf-support-atomic-update-for-htab-of-maps'")
+> from the kernel/git/bpf/bpf-next.git tree.
 
-This is already what I did, and it's exactly the reason why I ended up 
-with the above proposal. It's not only about the xmit path but also the 
-output path. Of course, having BHs disabled only where they need to 
-without useless nested calls would be nice, but in reality the solution 
-is not perfect and makes it even more difficult to visualize the path(s) 
-with or without BHs disabled IMO.
+Hi Eduard,
 
-For both lwtunnel_xmit() and lwtunnel_output(), the common functions 
-which are closest in depth and where BHs should be disabled are 
-ip_local_out() and ip6_local_out(). And even when it's not required 
-(which is the tradeoff). The other solution was -v1, which you NACK'ed. 
-Please see my reply to Andrea for the whole story. To summarize, I'd say 
-that it's either (a) what you suggest, i.e., non-required BH disable 
-calls vs. (b) nested BH disable calls. With tradeoffs for each.
+This is currently discussed in [1]. We have a solution, but no consensus 
+on the fix yet.
 
-> then add local_bh_disable(). It's fine if it happens to be nested
-> in some cases.
+   [1] 
+https://lore.kernel.org/netdev/3cee5141-c525-4e83-830e-bf21828aed51@uliege.be/T/#t
+
+Thanks for the report,
+Justin
+
+> Thanks,
+> Eduard
+> 
+> ---
+> 
+> [  193.993893] BUG: using __this_cpu_add() in preemptible [00000000] code: test_progs/206
+> [  193.994292] caller is lwtunnel_xmit (net/core/dev.h:340 net/core/lwtunnel.c:408)
+> [  193.994601] Tainted: [O]=OOT_MODULE, [E]=UNSIGNED_MODULE
+> [  193.994603] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-4.el9 04/01/2014
+> [  193.994605] Call Trace:
+> [  193.994608]  <TASK>
+> [  193.994611] dump_stack_lvl (lib/dump_stack.c:122)
+> [  193.994622] check_preemption_disabled (lib/smp_processor_id.c:0)
+> [  193.994630] ? lwtunnel_xmit (./include/linux/rcupdate.h:331 ./include/linux/rcupdate.h:841 net/core/lwtunnel.c:403)
+> [  193.994637] lwtunnel_xmit (net/core/dev.h:340 net/core/lwtunnel.c:408)
+> [  193.994648] ip_finish_output2 (net/ipv4/ip_output.c:222)
+> [  193.994655] ? ip_skb_dst_mtu (./include/net/ip.h:517)
+> [  193.994659] ? ip_skb_dst_mtu (./include/linux/rcupdate.h:331 ./include/linux/rcupdate.h:841 ./include/net/ip.h:471 ./include/net/ip.h:512)
+> [  193.994669] ? srso_alias_return_thunk (arch/x86/lib/retpoline.S:182)
+> [  193.994672] ? __ip_finish_output (net/ipv4/ip_output.c:306)
+> [  193.994683] ? __ip_queue_xmit (./include/linux/rcupdate.h:331 ./include/linux/rcupdate.h:841 net/ipv4/ip_output.c:470)
+> [  193.994688] __ip_queue_xmit (net/ipv4/ip_output.c:527)
+> [  193.994693] ? srso_alias_return_thunk (arch/x86/lib/retpoline.S:182)
+> [  193.994711] ? __ip_queue_xmit (./include/linux/rcupdate.h:331 ./include/linux/rcupdate.h:841 net/ipv4/ip_output.c:470)
+> [  193.994726] __tcp_transmit_skb (net/ipv4/tcp_output.c:1479)
+> [  193.994800] ? srso_alias_return_thunk (arch/x86/lib/retpoline.S:182)
+> [  193.994804] ? __asan_memset (mm/kasan/shadow.c:84)
+> [  193.994810] ? srso_alias_return_thunk (arch/x86/lib/retpoline.S:182)
+> [  193.994824] tcp_connect (net/ipv4/tcp_output.c:0 net/ipv4/tcp_output.c:4155)
+> [  193.994890] tcp_v4_connect (net/ipv4/tcp_ipv4.c:343)
+> [  193.994926] __inet_stream_connect (net/ipv4/af_inet.c:678)
+> [  193.994944] ? __local_bh_enable_ip (./arch/x86/include/asm/irqflags.h:42 ./arch/x86/include/asm/irqflags.h:119 kernel/softirq.c:412)
+> [  193.994950] ? srso_alias_return_thunk (arch/x86/lib/retpoline.S:182)
+> [  193.994953] ? lockdep_hardirqs_on (kernel/locking/lockdep.c:4473)
+> [  193.994967] inet_stream_connect (net/ipv4/af_inet.c:748)
+> [  193.994976] ? __pfx_inet_stream_connect (net/ipv4/af_inet.c:744)
+> [  193.994981] __sys_connect (./include/linux/file.h:62 ./include/linux/file.h:83 net/socket.c:2058)
+> [  193.995013] __x64_sys_connect (net/socket.c:2063 net/socket.c:2060 net/socket.c:2060)
+> [  193.995022] do_syscall_64 (arch/x86/entry/syscall_64.c:0)
+> [  193.995026] ? srso_alias_return_thunk (arch/x86/lib/retpoline.S:182)
+> [  193.995030] ? lockdep_hardirqs_on (kernel/locking/lockdep.c:4473)
+> [  193.995038] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+> [  193.995042] RIP: 0033:0x7faec2d0f9cb
+> [ 193.995047] Code: 83 ec 18 89 54 24 0c 48 89 34 24 89 7c 24 08 e8 4b 70 f7 ff 8b 54 24 0c 48 8b 34 24 41 89 c0 8b 7c 24 08 b8 2a 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 35 44 89 c7 89 44 24 08 e8 a1 70 f7 ff 8b 44
+> All code
+> ========
+>     0:	83 ec 18             	sub    $0x18,%esp
+>     3:	89 54 24 0c          	mov    %edx,0xc(%rsp)
+>     7:	48 89 34 24          	mov    %rsi,(%rsp)
+>     b:	89 7c 24 08          	mov    %edi,0x8(%rsp)
+>     f:	e8 4b 70 f7 ff       	call   0xfffffffffff7705f
+>    14:	8b 54 24 0c          	mov    0xc(%rsp),%edx
+>    18:	48 8b 34 24          	mov    (%rsp),%rsi
+>    1c:	41 89 c0             	mov    %eax,%r8d
+>    1f:	8b 7c 24 08          	mov    0x8(%rsp),%edi
+>    23:	b8 2a 00 00 00       	mov    $0x2a,%eax
+>    28:	0f 05                	syscall
+>    2a:*	48 3d 00 f0 ff ff    	cmp    $0xfffffffffffff000,%rax		<-- trapping instruction
+>    30:	77 35                	ja     0x67
+>    32:	44 89 c7             	mov    %r8d,%edi
+>    35:	89 44 24 08          	mov    %eax,0x8(%rsp)
+>    39:	e8 a1 70 f7 ff       	call   0xfffffffffff770df
+>    3e:	8b                   	.byte 0x8b
+>    3f:	44                   	rex.R
+> 
+> Code starting with the faulting instruction
+> ===========================================
+>     0:	48 3d 00 f0 ff ff    	cmp    $0xfffffffffffff000,%rax
+>     6:	77 35                	ja     0x3d
+>     8:	44 89 c7             	mov    %r8d,%edi
+>     b:	89 44 24 08          	mov    %eax,0x8(%rsp)
+>     f:	e8 a1 70 f7 ff       	call   0xfffffffffff770b5
+>    14:	8b                   	.byte 0x8b
+>    15:	44                   	rex.R
+> [  193.995050] RSP: 002b:00007fff992d3a20 EFLAGS: 00000293 ORIG_RAX: 000000000000002a
+> [  193.995054] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007faec2d0f9cb
+> [  193.995057] RDX: 0000000000000010 RSI: 00007fff992d3ad8 RDI: 0000000000000035
+> [  193.995059] RBP: 00007fff992d3ac0 R08: 0000000000000000 R09: 0000000000000004
+> [  193.995062] R10: 00007fff992d39b0 R11: 0000000000000293 R12: 00007fff992d7b78
+> [  193.995064] R13: 000000000095f760 R14: 0000000002e38b90 R15: 00007faec373d000
+> [  193.995091]  </TASK>
+> 
 
