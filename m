@@ -1,138 +1,159 @@
-Return-Path: <netdev+bounces-182613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBD4BA89529
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 09:32:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95F1DA89575
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 09:45:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4BBC3B8794
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 07:32:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3133189B90B
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 07:45:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C6E224A043;
-	Tue, 15 Apr 2025 07:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E339227A914;
+	Tue, 15 Apr 2025 07:44:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="esTZfuej"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vswq4AgA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E951F200B99;
-	Tue, 15 Apr 2025 07:32:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9C327A90E;
+	Tue, 15 Apr 2025 07:44:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744702360; cv=none; b=MkjyP+KBiaJuDt/cBlnEIXULWA/UtzP522wfCMoYSLtNboiXxvGUhf4/iCWC2vHLI1vmfpnIdNpR/acB/0wo7Y1LXCvbVZzeHJHoOLSKybJfp6EfWqaTL2WpEDkk3z888fVPNS9ORpZ/Zq5JMtVUOjmLaQQG5zBzCB7EAT9/tfA=
+	t=1744703090; cv=none; b=q/xDHW+DmkZsYhaFfqhdPSHlnnUowHTatTUeQ8APVOh6JElflgfLBA7w451pBMogmww8uIdYnz3AFkGvmirBsj4p8XRPOeMtfAJffuGtk+pcgvXevM/pHUd2sbiyE3gwlsjdWhqAJQEu+SOLe3S1W5coy8cV2s5Kl42V9Mw91rc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744702360; c=relaxed/simple;
-	bh=KYTW3eRKBGe8a7exnVkjZ0yTk1fcE+hKlVewCIxqYjc=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=sIvJxLNRsXhymZlF6n/vq8Zc1A9jG6AaBvCfuWMGO6i6LT1dAKzKIISlUUGCSbiW3PWZTCjOntv3DaQERXZnURkVGjU67onvG2PhmUukaQgu/wRHPI/m/rvwm9xHH8DARH9Rkbxq9Ayf/+q224pfk65YqfnED9GZdn0oS3EtbKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=esTZfuej; arc=none smtp.client-ip=212.227.15.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1744702330; x=1745307130; i=markus.elfring@web.de;
-	bh=Y3hpFMbH2VqFPkSv+RSyZUNBufHp4grv4jlfXWwRjVg=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=esTZfuej/4JfgdaNPozd5RAGY60D4UaT387c0TJjV5lBM73CrPZFu09oGmS5za6+
-	 aT+C6O3V9KRqFDzRZVEq3NCWNf17PoiM/vXSO2YtQBkpr5YgwO/O/qqul3OFVakdu
-	 PnDgFcE9R7Z1nuA3EXSynHx0+P3nXCq7JSLkSzy21Ik35LSzVGzzU9Xyv+iyCMzOk
-	 cmnjXXbloWNavyvwnOJP0Ye2eGtXoL3edUvk1P7AXLCtZ+RdrhXN/mFkB5oht6i+C
-	 E5TAet6rJZ17wbN/w2GpCqyXzTcVOkekB3eXVcvB+lR4o6snzcWmBCkwJM4DiFmq/
-	 zmJGjwXWU1fjgQoPdQ==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.29] ([94.31.70.24]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1My6pf-1t62Mf11SR-013iOd; Tue, 15
- Apr 2025 09:32:10 +0200
-Message-ID: <777db8bb-89d2-46ac-b7b9-0b5f418cc716@web.de>
-Date: Tue, 15 Apr 2025 09:32:07 +0200
+	s=arc-20240116; t=1744703090; c=relaxed/simple;
+	bh=/FMiH6f5AUMprgPLBbbPPAw7emqARXWFCdmaOPkb+7g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uNQz2lEUFX/fmDwMHVehbUoeR/VmGTS6tnjf7dmMDk2XfVGLGLpt9b8E8US8POcpv5Pthk6WEKCTbtRxMTMiok403cBBKD7l4x1h1cYRwp0o5YvbpcFcVHuSLg+b2WGmgmWuOzeGB02nzvCRmDPOGTB3slRMV2M0ce+idF5EreI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vswq4AgA; arc=none smtp.client-ip=209.85.215.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-af59c920d32so3828490a12.0;
+        Tue, 15 Apr 2025 00:44:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744703088; x=1745307888; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=INveNnza9CWIqZPyYaWqCh5Ba9wSoB725eCjLaHauL4=;
+        b=Vswq4AgASRbtXJtavdVePOF8b4KDoxaUTsix7WlNBmLIFCV5wQ30ZKwABG2o6nqBc4
+         i/Fo8zhMllX1T/8Hd/HPpSY5TQszFkMvnBBTrLsuVurSTyDyakWom3gc89eKAe2M09kh
+         hC5Q6QhnR94NYTBBJjlik61axqsTbkBfglPqS3/B2NAl/JEsbkXu11HbV+aftnPkXvRl
+         CKBL5yCsxjHtORj7EiNfUds2izPrgmrComjuzHj9dEpve+SKoMSlf+ATyZGyymuorYht
+         oUKL3qYWoCWvxRTn3OFLC1F3xOT2LRbUPgNydACMRsmCnFExmLcIjl68TUHsUmcRAuHi
+         HcCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744703088; x=1745307888;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=INveNnza9CWIqZPyYaWqCh5Ba9wSoB725eCjLaHauL4=;
+        b=jsvYIA8Z0/+Vbf1a0wc0bPCz4tH+7O1JssZMmAmxOqZ4azo4S9SUwB9yiZExp9f41d
+         n1tLAmBkd4wltCfHnrzCieeaiTpR7E0DhGuIjabeBupy0w3AfZr2YE6LFVzKHHLIdQwt
+         4t82D+KryrwasLHC7Mmd1LqsAKxr3uYDoLWaVkdKreaWAOmS1OJL57pX7ZhZqmTGH5Q/
+         5G//vdRXXn9cLpD0FRHjcDWa6zHThSLzuZ5pC6ZazcnAn26nqsbUuEXpJkaMPDgj1PVO
+         5Fjj8V2hDBKOKocK/Zm/vAXB/YR7NIILVh3E9P1lacjhdy+mo7IBeIOBdt+w3vSa3mgY
+         +3GQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUaWKP/JUVWu/TA4yM5+ET9aGXfk54tKc6v+DK/wWiCy2BInm6l9kjK/78uEGRRrKWOSAQ=@vger.kernel.org, AJvYcCVx+m11jtilEFDiGNuFyYrq50ZkziSp+ik7YjAsqtxbJF0CLPe4aWkBk6UC+F6TKIL4gKDmCX66@vger.kernel.org, AJvYcCXk2NUNnyHee2ApsCXWFLdYbAuGHIE3MBVIqlRdrDSQfGiZp6VvSZnHStDfu2XhzwGJEEj/ykyly3aK3uLq@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyaz6d2nsaAkohP5BD+ti8zZ62fAsjMFLfUyW/h5pRKv5bXfnGV
+	RLBckLgxPJt36G5i1zDebr73VVvbnnLhGrdbVolfsExWiGk1yO3b
+X-Gm-Gg: ASbGncsK+AO9Xp2bVxf05ztj089MRITCPZNpZ5IgLirDJc9pb/yL1T1PetzKYdJV12l
+	FA4sHFqQfhwNmlB61ZYItpTDdIUYiErui3TKZZ8tZ39e3vl8OTQ4qc3F8vgbahSq1yCp8r+P34Z
+	U/GHG4nIIorNgVcKFclqzNr3W3sSIc9qsw9mKklZlvyI0xPCGE3D6Uf7xgTWm9lkbhGXzeFdoXP
+	ltqeaiEdP4XpSxUtHDNC8vZzJG3PIlANNfK0lJXfcE+AgWy9aILVxWoufis9sOqfY2fjZNsgsis
+	f7vZTPrDaFPXjRGrdLMYabLovNohoo2cl3mLNTKwaqp12cVAhIzkzEcM
+X-Google-Smtp-Source: AGHT+IFe3WANt4aQPrZWoKBiNglIghBIABqDLjBb7Rl9R3Vj+PTaviPvNoVUhpOXPz+mqNiZrIE0qw==
+X-Received: by 2002:a17:90b:51c3:b0:2ee:f076:20f1 with SMTP id 98e67ed59e1d1-308235db6f0mr26769695a91.0.1744703088365;
+        Tue, 15 Apr 2025 00:44:48 -0700 (PDT)
+Received: from minh.192.168.1.1 ([2001:ee0:4f0e:fb30:2e0b:88f9:a491:c18a])
+        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-306df401ac8sm12299767a91.45.2025.04.15.00.44.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Apr 2025 00:44:47 -0700 (PDT)
+From: Bui Quang Minh <minhquangbui99@gmail.com>
+To: virtualization@lists.linux.dev
+Cc: "Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	Bui Quang Minh <minhquangbui99@gmail.com>
+Subject: [PATCH v3 0/3] virtio-net: disable delayed refill when pausing rx
+Date: Tue, 15 Apr 2025 14:43:38 +0700
+Message-ID: <20250415074341.12461-1-minhquangbui99@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: 990492108@qq.com, Abdun Nihaal <abdun.nihaal@gmail.com>,
- netdev@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Bharat Bhushan <bbhushan2@marvell.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Geethasowjanya Akula <gakula@marvell.com>,
- Hariprasad Kelam <hkelam@marvell.com>,
- Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
- Sunil Goutham <sgoutham@marvell.com>
-References: <tzi64aergg2ibm622mk54mavjs6vbpdpfeazdbqoyuufa5ispj@wbygyurrsto5>
-Subject: Re: [Patch next] octeontx2-pf: fix potential double free in
- rvu_rep_create()
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <tzi64aergg2ibm622mk54mavjs6vbpdpfeazdbqoyuufa5ispj@wbygyurrsto5>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:Cn3lN5yfy4QAQCRnUGWu6QbWruHRdZjJEumDRw/aCQiwvzl/oCf
- IhLeeQiIHR3ZvOL5+XdXVVsPW0kEDlMyhr39IKjdxHPPrFUtcnJP6T7y9jJutrhzFoptrEl
- mOVz6Vwsi9TuJS3pjpfbrbt1S0zAF78Ev5TqlDB1f+BjFusOBJbadLLpo/J1HIJpcude3rV
- e1q3n3EYTfVLMPPabD/cQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:+6t0dhHJyu0=;VpHcaffIKrlzhF12K6Jya9HChVp
- 9uuCJlAyYrijuDHo/zsjMw+9vSk1Pt9Qbodna8kmecSsxSBzFwJNHIkWPwEo+EAKADTfrgs5u
- 8d/JBpNWzm6EJt0v0whUg0B6OnPswCGvF9rhIpbgfHhjqQTznlUuUevCaoPHlh9X2rKptUpzX
- RWHaHZX+Tg0eoS2Vo41043y4mWj7L0/ji7yIP72RhbkNZvPWxmqTXAR5YrfHxA2eZSIS90vx2
- uSldA/yC9iKplg6oZCSZ9mrVP58yjg1BNPaQs4VmHrVsjJ2khe3a5Z4e7LWrIdtyfPhgN3rL8
- 5ek3RJ5kAx3Y9Ch7E5INukQEHie63bt5lPcNyqb9S9bfN0JB+eMBu5Z7UvqkkHIKhAK8Q17Ev
- uT8YbiIUbBVkvXh/VJUBMTl7Wpr2h2THTi3Li+PBCQo8sVW88R8JR4+peWkZP7brQvTa+Q936
- /PXEpZXvm8oXrGqggV+kIzQ3Sf9xIikBVz9Mi3bFA39nyoIodlLzTN2E5CrB5dLMDy/UGLcZc
- VQMVivL6HawaQ1kW3EFhXH2FSp/d8oJhfwuCWFk15YjBOFp3XgKRKgDOooysqboTCKLX1nXZo
- LQpXul+algKzCgd9JqW0/eDSerdJEe5MFOQiq2W+IugzxwpRONF2S2XLYG1XcM5cSj8WsNF4U
- Kp+uGIz9bX88vWzNJv1nEzI0i3hzLUBWd7uYrdlcBn6Ax43pmt+L3ddttqPf/hmcSIv56OTgj
- PlBIApQ/njyL7d7k0sgxTsvRMgMGEIPhwtZDk7J6brB4LoF4Dd6aXwTYoktokQahVVntpkfo4
- pJX3KpSc1SZXZQnC/sTXMVM090XV5B3rza63S9G+NZ1Lk5qQEDdfiZ3LB39Grs98W23bvqbF9
- /Zm8uBl1x4DyzD2F1Fg2AUyb8FQM2caNty8NgjUd2rcIb6hylpiRq3MK2ZKTf5pvpmq7L03B1
- g9ZkV2zLvguVeV/kOKWcvLJpW4nruc7Wg+/X6HdzhyJOoWlJThFtNSlRo8QVnHVbKMnTYm2iH
- Wqu4kFNlbQAtwXTgX2lAdpFdvIz4nSKshgno2wFJxkRlKiL+TyR+1/JXPY5EcxQ1F79dh+mzT
- Tr0wmCR53Bj+W/QVnp2J5sJYxkUKpp/CKalHNlEh+EXkzNq5oiOCNXf7p6LPRa0hn2g2Xm8LX
- Z87OO5T9cDrKWh+tECrfTGmsVFbS+PIscyPa+uY4axEbNY1p2tKSUe8mBe4wHpVQI42bU8qmd
- kNcZS60IsSzwvfOvAXo3w85IABAzGxF0GmPLAzrQIi+GvgfgNr7Kgf+G5BR81ZOGyKvQnBoxY
- 4KwwxvPOFItr3/u0DMs9wvA4yAJbeCjLDoSWDrsV4LJt/owqY9PBLTrsm8CoEVWjgzjOcfn1S
- gySFYxN9DuiiZ3c+EynLtE8MWFZLfWyeCgXO447DNc4U93LAMopN8sUGREyMpS5znh8QhiAv6
- VcJCNIB+SXtNcxlzfrGUeqth+nBlc81RXPwe23C4PaPRej0WSoAPAgrz2jjBzoTlrP/swzw==
+Content-Transfer-Encoding: 8bit
 
-=E2=80=A6
-> > +++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-=E2=80=A6
-> > @@ -691,7 +690,6 @@ int rvu_rep_create(struct otx2_nic *priv, struct n=
-etlink_ext_ack *extack)
-> >  			NL_SET_ERR_MSG_MOD(extack,
-> >  					   "PFVF representor registration failed");
-> >  			rvu_rep_devlink_port_unregister(rep);
-> > -			free_netdev(ndev);
-> >  			goto exit;
-> >  		}
->
-> There is no potential double free here. If you notice the loop at the
-=E2=80=A6
-> (De)allocations in loops are quite tricky.
->
-> Nacked-by: Abdun Nihaal <abdun.nihaal@gmail.com>
+Hi everyone,
 
-Would you ever become interested to avoid a duplicate free_netdev(ndev) ca=
-ll
-by using an additional label instead?
+This series tries to fix a deadlock in virtio-net when binding/unbinding
+XDP program, XDP socket or resizing the rx queue.
 
-See also:
-[PATCH net v2 1/2] octeontx2-pf: fix netdev memory leak in rvu_rep_create(=
-)
-https://lore.kernel.org/netdev/8d54b21b-7ca9-4126-ba13-bbd333d6ba0c@web.de=
-/
+When pausing rx (e.g. set up xdp, xsk pool, rx resize), we call
+napi_disable() on the receive queue's napi. In delayed refill_work, it
+also calls napi_disable() on the receive queue's napi. When
+napi_disable() is called on an already disabled napi, it will sleep in
+napi_disable_locked while still holding the netdev_lock. As a result,
+later napi_enable gets stuck too as it cannot acquire the netdev_lock.
+This leads to refill_work and the pause-then-resume tx are stuck
+altogether.
 
-Regards,
-Markus
+This scenario can be reproducible by binding a XDP socket to virtio-net
+interface without setting up the fill ring. As a result, try_fill_recv
+will fail until the fill ring is set up and refill_work is scheduled.
+
+This fix adds virtnet_rx_(pause/resume)_all helpers and fixes up the
+virtnet_rx_resume to disable future and cancel all inflights delayed
+refill_work before calling napi_disable() to pause the rx.
+
+Version 3 changes:
+- Patch 1: refactor to avoid code duplication
+
+Version 2 changes:
+- Add selftest for deadlock scenario
+
+Thanks,
+Quang Minh.
+
+Bui Quang Minh (3):
+  virtio-net: disable delayed refill when pausing rx
+  selftests: net: move xdp_helper to net/lib
+  selftests: net: add a virtio_net deadlock selftest
+
+ drivers/net/virtio_net.c                      | 69 +++++++++++++++----
+ tools/testing/selftests/Makefile              |  2 +-
+ tools/testing/selftests/drivers/net/Makefile  |  2 -
+ tools/testing/selftests/drivers/net/queues.py |  4 +-
+ .../selftests/drivers/net/virtio_net/Makefile |  2 +
+ .../selftests/drivers/net/virtio_net/config   |  1 +
+ .../drivers/net/virtio_net/lib/py/__init__.py | 16 +++++
+ .../drivers/net/virtio_net/xsk_pool.py        | 52 ++++++++++++++
+ tools/testing/selftests/net/lib/.gitignore    |  1 +
+ tools/testing/selftests/net/lib/Makefile      |  1 +
+ .../{drivers/net => net/lib}/xdp_helper.c     |  0
+ 11 files changed, 133 insertions(+), 17 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/virtio_net/lib/py/__init__.py
+ create mode 100755 tools/testing/selftests/drivers/net/virtio_net/xsk_pool.py
+ rename tools/testing/selftests/{drivers/net => net/lib}/xdp_helper.c (100%)
+
+-- 
+2.43.0
+
 
