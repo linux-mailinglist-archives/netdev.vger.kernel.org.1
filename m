@@ -1,321 +1,180 @@
-Return-Path: <netdev+bounces-182646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA63EA8978A
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 11:10:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 040F9A8978F
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 11:10:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8280189755E
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 09:10:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C8FF1792C9
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 09:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE60C280CD1;
-	Tue, 15 Apr 2025 09:09:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62FC827FD4F;
+	Tue, 15 Apr 2025 09:10:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="DVF+1joy"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="FdYpkC8r"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA2541624CE;
-	Tue, 15 Apr 2025 09:09:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E07E51624CE;
+	Tue, 15 Apr 2025 09:10:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744708197; cv=none; b=gm91j3ZG3KilOA9OAE3cWn/hLLbomMQ8HFHP22i0338gbVsZX420z1mBlHxlhn2/7W37lsGdqGI6Krwol93+bDICk4vJCVCGwKVbL5sBYOGHmvYOLreL2QXcknEKZaiwAR0tEe/mkZZ1K57TLFra/Z5yIi+Xf0DV53jFhZkpsFE=
+	t=1744708213; cv=none; b=U6rL9J/luxsZK1G2rf+G+py1CBb1g3NqvVtTyrlCqWObPiJsHEX3Tyf0Y4CZ0DxbmBa1OBs6A7e2LbOAU8xkrJKmm6s1Q8Bo1eu7EMp4Xds9tU9qkNdYdOM7WDrx6uPS76XN6PHVzxYI24sLFtQErAZoS9qjUT8MccwS9Oa+ab0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744708197; c=relaxed/simple;
-	bh=+DN455WnonAB9C1766sHXcT9vaWq/MFRkyR6Od5Ne9o=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=m8FOPqwSIaKqm7rgg3rkcf/00ZdV2zbLoqXQOL3cKDvUnpuvbUteRyoz9KcDzPuzDO1faLmI1m26TUH+XNeTMUs24EkRM1/N6gcaLyQ/RnPXstxbHw6zI8OFb7c5VexDvtUJHQfQBlag3qP6z9qchaJHZMkGWzz11Y93FDG8qDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=DVF+1joy; arc=none smtp.client-ip=117.135.210.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=y+ZpA
-	l7MliTj0FVdYv9+vvRQ2sbzJqKY2QgkzqHdZ0U=; b=DVF+1joyQZ5a60IDSDyKK
-	PZndTObbNjkKGUf3LwyDWjYTsoc9uAvbM6blN7+NbcZUbYneugC0+HEJoPNmYiD3
-	I3zy9D/FAtRzYbAC25kT9RPkJoj8xqUV+ze4PgmVWG6usIZmIF6uquWfD1rgKbLp
-	GJs4omD95dI5Rs4ko3oTw4=
-Received: from localhost.localdomain (unknown [])
-	by gzsmtp1 (Coremail) with SMTP id PCgvCgDHjy0WIv5n117eAQ--.55540S4;
-	Tue, 15 Apr 2025 17:08:39 +0800 (CST)
-From: lvxiafei <xiafei_xupt@163.com>
-To: xiafei_xupt@163.com
-Cc: coreteam@netfilter.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	kadlec@netfilter.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvxiafei@sensetime.com,
-	netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	pabeni@redhat.com,
-	pablo@netfilter.org
-Subject: [PATCH V6] netfilter: netns nf_conntrack: per-netns net.netfilter.nf_conntrack_max sysctl
-Date: Tue, 15 Apr 2025 17:08:34 +0800
-Message-Id: <20250415090834.24882-1-xiafei_xupt@163.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20250407095052.49526-1-xiafei_xupt@163.com>
-References: <20250407095052.49526-1-xiafei_xupt@163.com>
+	s=arc-20240116; t=1744708213; c=relaxed/simple;
+	bh=h2ArVH3qZFGXjdMX8JG6QGs7L/Tfo41LxNCQU2OMTBs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QkO4c7ly+QemX53s724CAgcLryZDoFDR4Q/k2nmIx8XLEPFWEc8DzDaRIjquZPc+EgbBu/5coAQDfQhmsBgasr7rC+2yAePKW22vQrY3t+vyHQz6BwxdLGCUFLg0w8++dMH1Srx7GSpCCxDuXCqwZk9LRdcXoqGtIKSwqhsSsDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=FdYpkC8r; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from [192.168.1.58] (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id C9DDF200CCEB;
+	Tue, 15 Apr 2025 11:10:01 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be C9DDF200CCEB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1744708202;
+	bh=eQufNntKfiHJqzsIZr8O0/rtd7FT0xn0S2YrcLl34kI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=FdYpkC8rMJkBVj1bXwAPxx4JiDcZ6DpAMA0O8lNf+yg8ZnnBcpMcPO5nM4ByYUXeF
+	 bc+p22UWjqM+En1zCAuPgelRf5tHX8ejJRDzMZppiDsDpd+b+SgcZ5c1dbiXL1dCzV
+	 Bl3dagddNHjIcPmrWXmlg8yGo9tC/HetcpDJ10L/WOJ0JThpfYpZ98UsAeLIyQy5Nh
+	 bzkYvijjW8WxwFUyAWctwMe9KK8ul6LHoCQqJxVXMSl8FrmZq60qhb4Y/8T51eaTky
+	 t6NMTw95FwCMwKnxNakpBQeZ7XPpZI4g2KF0BZo78Nc333/aEwez7aXFCbl5b6Sr/f
+	 7HETdTlM25kXA==
+Message-ID: <3cee5141-c525-4e83-830e-bf21828aed51@uliege.be>
+Date: Tue, 15 Apr 2025 11:10:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PCgvCgDHjy0WIv5n117eAQ--.55540S4
-X-Coremail-Antispam: 1Uf129KBjvJXoW3tFy5ZryUWry5AFy7GF43GFg_yoWDWF1rp3
-	Wft347Jw17Jr4Yya1j93yDAFsxG393Ca4a9rn8CFyrCwsI9r15CF4rKFyxJF98Jry8AFy3
-	ZF4jvr1UAan5taDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRY2NtUUUUU=
-X-CM-SenderInfo: x0ldwvplb031rw6rljoofrz/1tbiKBYwU2f+GlDknwAAs1
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: lwtunnel: disable preemption when required
+To: Andrea Mayer <andrea.mayer@uniroma2.it>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+ Sebastian Sewior <bigeasy@linutronix.de>,
+ Stanislav Fomichev <stfomichev@gmail.com>,
+ Network Development <netdev@vger.kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+ bpf <bpf@vger.kernel.org>, Stefano Salsano <stefano.salsano@uniroma2.it>,
+ Paolo Lungaroni <paolo.lungaroni@uniroma2.it>
+References: <20250403083956.13946-1-justin.iurman@uliege.be>
+ <Z-62MSCyMsqtMW1N@mini-arch> <cb0df409-ebbf-4970-b10c-4ea9f863ff00@uliege.be>
+ <CAADnVQLiM5MA3Xyrkqmubku6751ZPrDk6v-HmC1jnOaL47=t+g@mail.gmail.com>
+ <20250404141955.7Rcvv7nB@linutronix.de>
+ <85eefdd9-ec5d-4113-8a50-5d9ea11c8bf5@uliege.be>
+ <CAADnVQK7vNPbMS7T9TUOW7s6HNbfr4H8CWbjPgVXW7xa+ybPsw@mail.gmail.com>
+ <d326726d-7050-4e88-b950-f49cf5901d34@uliege.be>
+ <20250415025416.0273812f0322a6b1728d9c7b@uniroma2.it>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@uliege.be>
+In-Reply-To: <20250415025416.0273812f0322a6b1728d9c7b@uniroma2.it>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: lvxiafei <lvxiafei@sensetime.com>
+On 4/15/25 02:54, Andrea Mayer wrote:> I have been looking into the 
+behavior of the lwtunnel_xmit() function in both
+> task and softirq contexts. To facilitate this investigation, I have written a
+> simple eBPF program that only prints messages to the trace pipe. This program
+> is attached to the LWT BPF XMIT hook by configuring a route (on my test node)
+> with a destination address (DA) pointing to an external node, referred to as
+> x.x.x.x, within my testbed network.
+> 
+> To trigger that LWT BPF XMIT instance from a softirq context, it is sufficient
+> to receive (on the test node) a packet with a DA matching x.x.x.x. This packet
+> is then processed through the forwarding path, eventually leading to the
+> ip_output() function. Processing ends with a call to ip_finish_output2(), which
+> then calls lwtunnel_xmit().
+> 
+> Below is the stack trace from my testing machine, highlighting the key
+> functions involved in this processing path:
+> 
+>   ============================================
+>    <IRQ>
+>    ...
+>    lwtunnel_xmit+0x18/0x3f0
+>    ip_finish_output2+0x45a/0xcc0
+>    ip_output+0xe2/0x380
+>    NF_HOOK.constprop.0+0x7e/0x2f0
+>    ip_rcv+0x4bf/0x4d0
+>    __netif_receive_skb_one_core+0x11c/0x130
+>    process_backlog+0x277/0x980
+>    __napi_poll.constprop.0+0x58/0x260
+>    net_rx_action+0x396/0x6e0
+>    handle_softirqs+0x116/0x640
+>    do_softirq+0xa9/0xe0
+>    </IRQ>
+>   ============================================
+> 
+> Conversely, to trigger lwtunnel_xmit() from the task context, simply ping
+> x.x.x.x on the same testing node. Below is the corresponding stack trace:
+> 
+>   ============================================
+>    <TASK>
+>    ...
+>    lwtunnel_xmit+0x18/0x3f0
+>    ip_finish_output2+0x45a/0xcc0
+>    ip_output+0xe2/0x380
+>    ip_push_pending_frames+0x17a/0x200
+>    raw_sendmsg+0x9fa/0x1060
+>    __sys_sendto+0x294/0x2e0
+>    __x64_sys_sendto+0x6d/0x80
+>    do_syscall_64+0x64/0x140
+>    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>    </TASK>
+>   ============================================
+> 
+> So also for the lwtunnel_xmit(), we need to make sure that the functions
+> dev_xmit_recursion{_inc/dec}() and the necessary logic to avoid lwt recursion
+> are protected, i.e. inside a local_bh_{disable/enable} block.
 
-Support net.netfilter.nf_conntrack_max settings per
-netns, net.netfilter.nf_conntrack_max is used to more
-flexibly limit the ct_count in different netns. The
-default value belongs to the init_net limit.
+That's correct, and I ended up with the same conclusion as yours on the 
+possible paths for lwtunnel_xmit() depending on the context (task vs 
+irq). Based on your description, we're using a similar approach with 
+eBPF :-) Note that paths are similar for lwtunnel_output() (see below).
 
-After net.netfilter.nf_conntrack_max is set in different
-netns, it is not allowed to be greater than the init_net
-limit when working.
+> In a non-preemptible real-time environment (i.e., when !PREEMPT_RT), the
+> in_softirq() expands to softirq_count(), which in turn uses the preempt_count()
+> function. On my x86 architecture, preempt_count() accesses the per-CPU
+> __preempt_count variable.
+> 
+> If in_softirq() returns 0, it indicates that no softirqs are currently being
+> processed on the local CPU and BH are not disabled. Therefore, following the
+> logic above, we disable bottom halves (BH) on that particular CPU.
+> 
+> However, there is my opinion an issue that can occur: between the check on
+> in_softirq() and the call to local_bh_disable(), the task may be scheduled on
+> another CPU. As a result, the check on in_softirq() becomes ineffective because
+> we may end up disabling BH on a CPU that is not the one we just checked (with
+> if (in_softirq()) { ... }).
 
-Signed-off-by: lvxiafei <lvxiafei@sensetime.com>
----
- .../networking/nf_conntrack-sysctl.rst        | 29 +++++++++++++++----
- include/net/netfilter/nf_conntrack.h          | 12 +++++++-
- include/net/netns/conntrack.h                 |  1 +
- net/netfilter/nf_conntrack_core.c             | 19 ++++++------
- net/netfilter/nf_conntrack_netlink.c          |  2 +-
- net/netfilter/nf_conntrack_standalone.c       |  7 +++--
- 6 files changed, 50 insertions(+), 20 deletions(-)
+Hmm, I think it's correct... good catch. I went for this solution to (i) 
+avoid useless nested BHs disable calls; and (ii) avoid ending up with a 
+spaghetti graph of possible paths with or without BHs disabled (i.e., 
+with single entry points, namely lwtunnel_xmit() and lwtunnel_output()), 
+which otherwise makes it hard to maintain the code IMO.
 
-diff --git a/Documentation/networking/nf_conntrack-sysctl.rst b/Documentation/networking/nf_conntrack-sysctl.rst
-index 238b66d0e059..6e7f17f5959a 100644
---- a/Documentation/networking/nf_conntrack-sysctl.rst
-+++ b/Documentation/networking/nf_conntrack-sysctl.rst
-@@ -93,12 +93,29 @@ nf_conntrack_log_invalid - INTEGER
- 	Log invalid packets of a type specified by value.
- 
- nf_conntrack_max - INTEGER
--        Maximum number of allowed connection tracking entries. This value is set
--        to nf_conntrack_buckets by default.
--        Note that connection tracking entries are added to the table twice -- once
--        for the original direction and once for the reply direction (i.e., with
--        the reversed address). This means that with default settings a maxed-out
--        table will have a average hash chain length of 2, not 1.
-+    - 0 - disabled (unlimited)
-+    - not 0 - enabled
-+
-+    Maximum number of allowed connection tracking entries per netns. This value
-+    is set to nf_conntrack_buckets by default.
-+
-+    Note that connection tracking entries are added to the table twice -- once
-+    for the original direction and once for the reply direction (i.e., with
-+    the reversed address). This means that with default settings a maxed-out
-+    table will have a average hash chain length of 2, not 1.
-+
-+    The limit of other netns cannot be greater than init_net netns.
-+    +----------------+-------------+----------------+
-+    | init_net netns | other netns | limit behavior |
-+    +----------------+-------------+----------------+
-+    | 0              | 0           | unlimited      |
-+    +----------------+-------------+----------------+
-+    | 0              | not 0       | other          |
-+    +----------------+-------------+----------------+
-+    | not 0          | 0           | init_net       |
-+    +----------------+-------------+----------------+
-+    | not 0          | not 0       | min            |
-+    +----------------+-------------+----------------+
- 
- nf_conntrack_tcp_be_liberal - BOOLEAN
- 	- 0 - disabled (default)
-diff --git a/include/net/netfilter/nf_conntrack.h b/include/net/netfilter/nf_conntrack.h
-index 3f02a45773e8..594439b2f5a1 100644
---- a/include/net/netfilter/nf_conntrack.h
-+++ b/include/net/netfilter/nf_conntrack.h
-@@ -320,7 +320,6 @@ int nf_conntrack_hash_resize(unsigned int hashsize);
- extern struct hlist_nulls_head *nf_conntrack_hash;
- extern unsigned int nf_conntrack_htable_size;
- extern seqcount_spinlock_t nf_conntrack_generation;
--extern unsigned int nf_conntrack_max;
- 
- /* must be called with rcu read lock held */
- static inline void
-@@ -360,6 +359,17 @@ static inline struct nf_conntrack_net *nf_ct_pernet(const struct net *net)
- 	return net_generic(net, nf_conntrack_net_id);
- }
- 
-+static inline unsigned int nf_conntrack_max(const struct net *net)
-+{
-+#if IS_ENABLED(CONFIG_NF_CONNTRACK)
-+	return likely(init_net.ct.sysctl_max && net->ct.sysctl_max) ?
-+	    min(init_net.ct.sysctl_max, net->ct.sysctl_max) :
-+	    max(init_net.ct.sysctl_max, net->ct.sysctl_max);
-+#else
-+	return 0;
-+#endif
-+}
-+
- int nf_ct_skb_network_trim(struct sk_buff *skb, int family);
- int nf_ct_handle_fragments(struct net *net, struct sk_buff *skb,
- 			   u16 zone, u8 family, u8 *proto, u16 *mru);
-diff --git a/include/net/netns/conntrack.h b/include/net/netns/conntrack.h
-index bae914815aa3..d3fcd0b92b2d 100644
---- a/include/net/netns/conntrack.h
-+++ b/include/net/netns/conntrack.h
-@@ -102,6 +102,7 @@ struct netns_ct {
- 	u8			sysctl_acct;
- 	u8			sysctl_tstamp;
- 	u8			sysctl_checksum;
-+	unsigned int		sysctl_max;
- 
- 	struct ip_conntrack_stat __percpu *stat;
- 	struct nf_ct_event_notifier __rcu *nf_conntrack_event_cb;
-diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_conntrack_core.c
-index 7f8b245e287a..a738564923ec 100644
---- a/net/netfilter/nf_conntrack_core.c
-+++ b/net/netfilter/nf_conntrack_core.c
-@@ -202,8 +202,6 @@ static void nf_conntrack_all_unlock(void)
- unsigned int nf_conntrack_htable_size __read_mostly;
- EXPORT_SYMBOL_GPL(nf_conntrack_htable_size);
- 
--unsigned int nf_conntrack_max __read_mostly;
--EXPORT_SYMBOL_GPL(nf_conntrack_max);
- seqcount_spinlock_t nf_conntrack_generation __read_mostly;
- static siphash_aligned_key_t nf_conntrack_hash_rnd;
- 
-@@ -1498,7 +1496,7 @@ static bool gc_worker_can_early_drop(const struct nf_conn *ct)
- 
- static void gc_worker(struct work_struct *work)
- {
--	unsigned int i, hashsz, nf_conntrack_max95 = 0;
-+	unsigned int i, hashsz;
- 	u32 end_time, start_time = nfct_time_stamp;
- 	struct conntrack_gc_work *gc_work;
- 	unsigned int expired_count = 0;
-@@ -1509,8 +1507,6 @@ static void gc_worker(struct work_struct *work)
- 	gc_work = container_of(work, struct conntrack_gc_work, dwork.work);
- 
- 	i = gc_work->next_bucket;
--	if (gc_work->early_drop)
--		nf_conntrack_max95 = nf_conntrack_max / 100u * 95u;
- 
- 	if (i == 0) {
- 		gc_work->avg_timeout = GC_SCAN_INTERVAL_INIT;
-@@ -1538,6 +1534,7 @@ static void gc_worker(struct work_struct *work)
- 		}
- 
- 		hlist_nulls_for_each_entry_rcu(h, n, &ct_hash[i], hnnode) {
-+			unsigned int nf_conntrack_max95 = 0;
- 			struct nf_conntrack_net *cnet;
- 			struct net *net;
- 			long expires;
-@@ -1567,11 +1564,14 @@ static void gc_worker(struct work_struct *work)
- 			expires = clamp(nf_ct_expires(tmp), GC_SCAN_INTERVAL_MIN, GC_SCAN_INTERVAL_CLAMP);
- 			expires = (expires - (long)next_run) / ++count;
- 			next_run += expires;
-+			net = nf_ct_net(tmp);
-+
-+			if (gc_work->early_drop)
-+				nf_conntrack_max95 = nf_conntrack_max(net) / 100u * 95u;
- 
- 			if (nf_conntrack_max95 == 0 || gc_worker_skip_ct(tmp))
- 				continue;
- 
--			net = nf_ct_net(tmp);
- 			cnet = nf_ct_pernet(net);
- 			if (atomic_read(&cnet->count) < nf_conntrack_max95)
- 				continue;
-@@ -1648,13 +1648,14 @@ __nf_conntrack_alloc(struct net *net,
- 		     gfp_t gfp, u32 hash)
- {
- 	struct nf_conntrack_net *cnet = nf_ct_pernet(net);
--	unsigned int ct_count;
-+	unsigned int ct_max, ct_count;
- 	struct nf_conn *ct;
- 
- 	/* We don't want any race condition at early drop stage */
- 	ct_count = atomic_inc_return(&cnet->count);
-+	ct_max = nf_conntrack_max(net);
- 
--	if (nf_conntrack_max && unlikely(ct_count > nf_conntrack_max)) {
-+	if (ct_max && unlikely(ct_count > ct_max)) {
- 		if (!early_drop(net, hash)) {
- 			if (!conntrack_gc_work.early_drop)
- 				conntrack_gc_work.early_drop = true;
-@@ -2650,7 +2651,7 @@ int nf_conntrack_init_start(void)
- 	if (!nf_conntrack_hash)
- 		return -ENOMEM;
- 
--	nf_conntrack_max = max_factor * nf_conntrack_htable_size;
-+	init_net.ct.sysctl_max = max_factor * nf_conntrack_htable_size;
- 
- 	nf_conntrack_cachep = kmem_cache_create("nf_conntrack",
- 						sizeof(struct nf_conn),
-diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_conntrack_netlink.c
-index 2cc0fde23344..73e6bb1e939b 100644
---- a/net/netfilter/nf_conntrack_netlink.c
-+++ b/net/netfilter/nf_conntrack_netlink.c
-@@ -2608,7 +2608,7 @@ ctnetlink_stat_ct_fill_info(struct sk_buff *skb, u32 portid, u32 seq, u32 type,
- 	if (nla_put_be32(skb, CTA_STATS_GLOBAL_ENTRIES, htonl(nr_conntracks)))
- 		goto nla_put_failure;
- 
--	if (nla_put_be32(skb, CTA_STATS_GLOBAL_MAX_ENTRIES, htonl(nf_conntrack_max)))
-+	if (nla_put_be32(skb, CTA_STATS_GLOBAL_MAX_ENTRIES, htonl(nf_conntrack_max(net))))
- 		goto nla_put_failure;
- 
- 	nlmsg_end(skb, nlh);
-diff --git a/net/netfilter/nf_conntrack_standalone.c b/net/netfilter/nf_conntrack_standalone.c
-index 2f666751c7e7..5db6df0e4eb3 100644
---- a/net/netfilter/nf_conntrack_standalone.c
-+++ b/net/netfilter/nf_conntrack_standalone.c
-@@ -615,7 +615,7 @@ enum nf_ct_sysctl_index {
- static struct ctl_table nf_ct_sysctl_table[] = {
- 	[NF_SYSCTL_CT_MAX] = {
- 		.procname	= "nf_conntrack_max",
--		.data		= &nf_conntrack_max,
-+		.data		= &init_net.ct.sysctl_max,
- 		.maxlen		= sizeof(int),
- 		.mode		= 0644,
- 		.proc_handler	= proc_dointvec_minmax,
-@@ -948,7 +948,7 @@ static struct ctl_table nf_ct_sysctl_table[] = {
- static struct ctl_table nf_ct_netfilter_table[] = {
- 	{
- 		.procname	= "nf_conntrack_max",
--		.data		= &nf_conntrack_max,
-+		.data		= &init_net.ct.sysctl_max,
- 		.maxlen		= sizeof(int),
- 		.mode		= 0644,
- 		.proc_handler	= proc_dointvec_minmax,
-@@ -1063,6 +1063,7 @@ static int nf_conntrack_standalone_init_sysctl(struct net *net)
- 
- 	table[NF_SYSCTL_CT_COUNT].data = &cnet->count;
- 	table[NF_SYSCTL_CT_CHECKSUM].data = &net->ct.sysctl_checksum;
-+	table[NF_SYSCTL_CT_MAX].data = &net->ct.sysctl_max;
- 	table[NF_SYSCTL_CT_LOG_INVALID].data = &net->ct.sysctl_log_invalid;
- 	table[NF_SYSCTL_CT_ACCT].data = &net->ct.sysctl_acct;
- #ifdef CONFIG_NF_CONNTRACK_EVENTS
-@@ -1087,7 +1088,6 @@ static int nf_conntrack_standalone_init_sysctl(struct net *net)
- 
- 	/* Don't allow non-init_net ns to alter global sysctls */
- 	if (!net_eq(&init_net, net)) {
--		table[NF_SYSCTL_CT_MAX].mode = 0444;
- 		table[NF_SYSCTL_CT_EXPECT_MAX].mode = 0444;
- 		table[NF_SYSCTL_CT_BUCKETS].mode = 0444;
- 	}
-@@ -1139,6 +1139,7 @@ static int nf_conntrack_pernet_init(struct net *net)
- 	int ret;
- 
- 	net->ct.sysctl_checksum = 1;
-+	net->ct.sysctl_max = init_net.ct.sysctl_max;
- 
- 	ret = nf_conntrack_standalone_init_sysctl(net);
- 	if (ret < 0)
--- 
-2.40.1
+So, if we want to follow what Alexei suggests (see his last response), 
+we'd need to disable BHs in both ip_local_out() and ip6_local_out(). 
+These are the common functions which are closest in depth, and so for 
+both lwtunnel_xmit() and lwtunnel_output(). But... at the "cost" of 
+disabling BHs even when it may not be required. Indeed, ip_local_out() 
+and ip6_local_out() both call dst_output(), which one is usually not 
+lwtunnel_output() (and there may not even be a lwtunnel_xmit() to call 
+either).
 
+The other solution is to always call local_bh_disable() in both 
+lwtunnel_xmit() and lwtunnel_output(), at the cost of disabling BHs when 
+they were already. Which was basically -v1 and received a NACK from Alexei.
+
+At the moment, I'm not sure what's best.
 
