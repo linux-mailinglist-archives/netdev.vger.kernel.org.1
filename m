@@ -1,175 +1,156 @@
-Return-Path: <netdev+bounces-182735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15A99A89C8A
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:36:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A47ABA89C92
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:37:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD03E168EE4
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 11:32:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F8A41901E4D
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 11:33:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08CF52951B8;
-	Tue, 15 Apr 2025 11:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3F9F29615B;
+	Tue, 15 Apr 2025 11:30:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=ps.report@gmx.net header.b="qV8Cpw0J"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iPG9uy8k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5CA629A3EB;
-	Tue, 15 Apr 2025 11:29:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B46872957BB
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 11:30:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744716585; cv=none; b=cCLb1FuW+ZrvOBjw1kgCMREwgFelD3D4ziMAy9+dmPQ2vTO9Tv+Y5pwQIOHJt3j1tnAAEe58nKVSBYbLcZ67ClFkg1C4ihLT+BeyspOdstiYKFLw6XY+CWZ6z3bHD+uj2OhiY6sEXyg3bIsiufa9ZBemN7NJyRk7hQhMUeFnMEg=
+	t=1744716623; cv=none; b=mFqHvQjphlpJCwZOx5V2sUxdY/RMgVjzw0rdlPDa0gf9wM6lU1OkDtW4XXC3oz+maxltMjum8GOjnhN/8ULdbSNRIQv+mFC5q+KFgVau+/iKMhzSS/YQoIHIKpHYIUxBNv0tMYunetc6mNbq3atSUONUVlKzJPMIwbkSwaFFNig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744716585; c=relaxed/simple;
-	bh=n9qZGXD7GYfsn6JDx2SNkZTrCisSdPpoZAIHfFc7Lmw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EniwN6TYnEA1TA7Oykqa+xFVOhQpZHelw/fqAKT/nB7xaBgBn1zBGh94fopyPxwID/E8hlgD+aCIMngiB+Q87QBVIXqYL1AQe116GGvQgyP4I4lIJKnmACqEbqC0jjK5PgD9q4Nt5qB6sZvX1+g4mAgc9nb19dTGpt0OmOd55Oc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=ps.report@gmx.net header.b=qV8Cpw0J; arc=none smtp.client-ip=212.227.15.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1744716570; x=1745321370; i=ps.report@gmx.net;
-	bh=n9qZGXD7GYfsn6JDx2SNkZTrCisSdPpoZAIHfFc7Lmw=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:In-Reply-To:
-	 References:MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=qV8Cpw0JVNfoAkrdVtTkpwHkYtvSgkc+DQRqb8H9YJN6QOivrq7HpJxZknRm02QQ
-	 ronKt1dUkNrZWwVBDk6uS5SUJn8zpmp2qd2VX+bzlK02GPXEaPm32DJBr1LK98xoD
-	 pu6wozsTuIgaA9sqTHHPmzsXOtV7EPE10+1BubyO29I2RDNRk7NmWqDmcPHgu9SJp
-	 9+PliDvyukOUM6GG17lcnFE+6/ieiV+D88EWXsuT/BuBDzI+Z2IoOh2oyrs64I5n0
-	 avUm/vwp5zLgQOmxQiWIdAYeE7W/cpoVEYpK9ZtfF4eVdH6IlN7WAKAbwyb483PIF
-	 Nn/RbdhC8XxwLD48cQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from localhost.fritz.box ([82.135.81.153]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1N9MpS-1szgKM32bE-00uE5K; Tue, 15
- Apr 2025 13:29:30 +0200
-From: Peter Seiderer <ps.report@gmx.net>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Peter Seiderer <ps.report@gmx.net>
-Subject: [PATCH net-next v2 3/3] net: pktgen: fix code style (WARNING: Prefer strscpy over strcpy)
-Date: Tue, 15 Apr 2025 13:29:16 +0200
-Message-ID: <20250415112916.113455-4-ps.report@gmx.net>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250415112916.113455-1-ps.report@gmx.net>
-References: <20250415112916.113455-1-ps.report@gmx.net>
+	s=arc-20240116; t=1744716623; c=relaxed/simple;
+	bh=ho+BIZkkHCNPFh5mOIzlN9sX0n4qGaVKCx7gnc8eyF4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sa68AEfpt6lQX6uUX483TM9YaFG1PzETN5GEikWdWh6+kWIyc3/d/xvV1jm1tk6xZUrkjtyijCH/xcpcnqH4Mufeu/LjDw9cFXB8yfNNqV9+JaVzEnF1H32wOZtOxhfe7BecP8YhSLBPD3NF2r6AwI0f/hhDST+SzLaOjEMN2mE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iPG9uy8k; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744716620;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WL9NlzbUnGnzvSoEyfdI3sGtjP4UhtYp1pIkY1wcER4=;
+	b=iPG9uy8k+xEkozCXTGgj6nPsosdAHIESTYEkHKe9INeAOGPnpAqifpf01CAg0qc5o2UPI6
+	tX51+5LAUh50NiB+Pr29XsoXy2Mqqi0BVS/TPecOKhsem+kEh6PdZI+pV1JIIoyWPJBJ21
+	In9ToWGPKR1Zk75ODKYXLedtz24UNvg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-424-S4LrtPCcNli_dQHPZa9fDg-1; Tue, 15 Apr 2025 07:30:18 -0400
+X-MC-Unique: S4LrtPCcNli_dQHPZa9fDg-1
+X-Mimecast-MFC-AGG-ID: S4LrtPCcNli_dQHPZa9fDg_1744716617
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43d4d15058dso42346445e9.0
+        for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 04:30:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744716617; x=1745321417;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WL9NlzbUnGnzvSoEyfdI3sGtjP4UhtYp1pIkY1wcER4=;
+        b=u3aau54CWvXxOK8XDLNuv4q6jeR+ezBfjispy3zBA8bEBY9Gzl9yptLLzuaOjZhoca
+         chrESmd/P/Qlm9xtjI8fe72lFq3OOE/ZT02fHQXP6pEsuJEnnM8RqOOIra+tVJMzQfT3
+         H6dqnT1d8HujLZkbn5obhNugJr1skElxkEUZhQUoIbOlKburSJxEIwkG4XuJCyXcCU36
+         0V7tbOy7CcAAxCnlymV6XScGNX6nZw2tTUHiPU79fbG/ox3pha3AIZRCFQIVPORwPAMq
+         YxHiwHr4GlRlYwb4mgCCXSL7XJdu2aQq6QgQaLZDSj8+o7pHQqbMfNtnIWR+mKueAtGH
+         oKFw==
+X-Forwarded-Encrypted: i=1; AJvYcCXWPt+j7PffEIanXdhkh4e0DnnTHJygCQ8ekHL0SOMj7AZSjt/4rytY4zkSZeZUSlwOBQ5g8hs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuaRCCCW0nsLQkYsToegktKL+SyUM7NjGmE5Xo0O7z8wqizhdy
+	wMIcESx4pti4T3C/UI9/fTuiQbi9/HobMm/e5RC4qdqK/2NKq2RKdQXMtXI88BbbuMsK1QyDQC/
+	pAv+cuXfk69nlKCyFGiRYNAVZdsNFaQdgJtisrUnrNa1u73zNRglt4Q==
+X-Gm-Gg: ASbGnctFPznk5f9wNMY6kX3p72rR+OlY1u1scv2nAuxwcsIUril+PBWuxgHwQCfHT6K
+	lHiiqp5NLPFozJy2B1VxuAv6pnEjrEIwogab4C9lv5RK1yiZGleTQjWKVzCcAmo9maPMKR5do0p
+	HysiIOLOFJ3O2I5WSg7MRBRIVdU8z78VIGGZ8iYA1PIrUJJ0K4Bpcl7WWqeQVKnSFPdtRWunuHs
+	APjg55LirJ6fsmFIFTtu+tLBkcr5UX9o+OgECjSc6EtXYKFeMN/rgpcZaMNTxmylGVtU+fjl2Qa
+	XrOBIt4C5c86Ks0GmIamfORJvPWkOGOmbtqGoAU=
+X-Received: by 2002:a05:600c:1d88:b0:43d:7588:6688 with SMTP id 5b1f17b1804b1-43f3a94c5a0mr152192765e9.12.1744716617247;
+        Tue, 15 Apr 2025 04:30:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHHTty5zldCcVKBl8bs1qCQdERVonAOGxKe+N9IX3VziaHsTcIq127AQOONK9qhEgPTFMAq+g==
+X-Received: by 2002:a05:600c:1d88:b0:43d:7588:6688 with SMTP id 5b1f17b1804b1-43f3a94c5a0mr152192445e9.12.1744716616861;
+        Tue, 15 Apr 2025 04:30:16 -0700 (PDT)
+Received: from [192.168.88.253] (146-241-34-52.dyn.eolo.it. [146.241.34.52])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f206332d9sm206447235e9.13.2025.04.15.04.30.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Apr 2025 04:30:16 -0700 (PDT)
+Message-ID: <d44f79b3-6b3e-4c20-abdf-3e7da73e932f@redhat.com>
+Date: Tue, 15 Apr 2025 13:30:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-X-Provags-ID: V03:K1:u6y7H1hdnkE2N2yMjXkmXobNOizobzYkBbOaEBQf+tdhN9SRASb
- Tj8TrjW5B+JnbFHkDE7hPlbUiuKW/quMPiECj5yfq7Z28nJ4qPDOl8Kj58c8Wb89ye0ajgb
- OtBmyufseb37ZchU0OIchTt5AD3lB2C+d7D62TDQzVAOPAsWn9CYMmZnfTu/Q9hZCMrOWLk
- u9R5+1w9FaTGXsjNKoCbQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:Ac8MjRSmW9M=;JkoAH0XHkJjGs/Q8BmEt4sAjSw8
- RJsVe307LfTpgGDcv/ITjW+mBhDZLXXYRxLTnrukG4Y2EXeOKvqtpKnvnfWPu9iTv7gcqXGnW
- 39ozDtTYGPpR04US0moddphl/VceoHesl3v9GPEh8iu/S8TR2A475md/7edYoowwMdcVkzjgv
- MOnua6YZDHASqZgvV23UV3Zup01uv5U1mdn0GTLdcykJQWjdK7lDy58xp/JR/1WCGEoPDGgdZ
- RncRH3DEdXC0oIPazkyxmkpVgrGB8RCLbHt1XBmDJUKRt57COc6HS1vWMEHMUsZwRqNadFqGH
- dvZbgNUYWmMNTMgL3x9NCVbFxgY1qIr8TRFs+mHmoj56xqtsJHI/kCd7g1I9PBpYvJnxz+PU8
- gsgjDgafr/FB1yEoCIdYOGCpqgEkaes2uY1B5uADsLyB/CbfKK/eiL8lM+A1U1yZ+rnVfWTnj
- hdpFNrRV+KvwK/PQ9YjjeFz4tOHHhQAmX/M5iXGxHNR7ydOLnNwAb7Rs6edSr/APnCvKBg4DX
- 51BNmk4t5Ozdg+GqUb1YUu3ovWQhli2tLpS0r1OUcmkNsikOMWtro0K+c3FWTwikGQojBkbAx
- YPhGf079bE0JeUz+CE1L11Lrrqp0bQuUKPRa2F8KwEtqFu5J0L/lrPJSSiGgGD5Bb1O462OAE
- bONv9rWtgmAz8LjzDPCcWSDB5tEiBVIO903xYY9eGKdndYvPZqtJpa2LjZJGUTzA5e7GEptIS
- GVszGG7FsSccLE/mFpy54q58Hhuu4CxQZFn6Dw/Akw3116mvaljteuCPVZ8srrZBJdUCpDzRg
- xLuFB2zMAg7kXqfCaoKrvI93fynEzYQ7x86qzTIpvMPu8GbFmH4IrKDk3/n99JtSzmfM41K1A
- aMvHlIYi7xVbMd85noGISOI5w61wONI94o3dZTOZQ0LLO7OyEjfEx+Y/YJP4A9aIUSvXtkohI
- yJMetlLeofWAXKMcvo1NM2HR0SnDRWGLDEVekCSutGblAWykPwBk/fj4EAPsuttEQ8QJOlKjX
- nzgcVzDYlokVw+0RtTw7d3hAdloBnXovCD9rgRVMU9fNElMRAS/kPpAa/HBWmU3aLQfKMpwk+
- j6pCfgLzlmgRGpYvpvzPdehDoTQPR+n5YqnRzIQ1dnEs/Y7M4NiArfmXpo3c1/p4xS2sjYNiD
- nRXGfzQG1RLwDbSC8wA6o8E9Dp2M8o35I5B7aZbVxntIE4eiMiaMhoWvBTFZuCSS86Cd4kbng
- zlwUtIWEcL8DCzjMsYNRElejpRt1hiwl35qfqUTh/uqvQe+VeARLAoDPXBVGo26IlYv65huFF
- z4RMIt9RRc2R1OW4Po/YZYUUwnNWO7gJMz7KqIqnfoo3CG9Y0dqeuT1WODScE05UQis0KDA9e
- xMf8nkDichbbWxC+h4xYG1hoGWVEGLF7kaLJUXjrvUEXrSwyYtvEtilBfh8M+AjVz76jjwM/P
- 01xjCtAvF/wjYvdFMiVFFyQu/z4F4oRzwxhmxd25XWbFlptqel37EfJJF5aJC9oVwhLbGbasZ
- MFj8uUXWTgbIa6Zstq4=
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] tcp: tcp_acceptable_seq select SND.UNA when SND.WND
+ is 0
+To: Luiz Carvalho <luizcmpc@gmail.com>, netdev@vger.kernel.org
+Cc: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>
+References: <20250410175140.10805-3-luizcmpc@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250410175140.10805-3-luizcmpc@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Rml4IGNoZWNrcGF0Y2ggY29kZSBzdHlsZSB3YXJuaW5nczoKCiAgV0FSTklORzogUHJlZmVyIHN0
-cnNjcHkgb3ZlciBzdHJjcHkgLSBzZWU6IGh0dHBzOi8vZ2l0aHViLmNvbS9LU1BQL2xpbnV4L2lz
-c3Vlcy84OAogICMxNDIzOiBGSUxFOiBuZXQvY29yZS9wa3RnZW4uYzoxNDIzOgogICsgICAgICAg
-ICAgICAgICAgICAgICAgIHN0cmNweShwa3RfZGV2LT5kc3RfbWluLCBidWYpOwoKICBXQVJOSU5H
-OiBQcmVmZXIgc3Ryc2NweSBvdmVyIHN0cmNweSAtIHNlZTogaHR0cHM6Ly9naXRodWIuY29tL0tT
-UFAvbGludXgvaXNzdWVzLzg4CiAgIzE0NDQ6IEZJTEU6IG5ldC9jb3JlL3BrdGdlbi5jOjE0NDQ6
-CiAgKyAgICAgICAgICAgICAgICAgICAgICAgc3RyY3B5KHBrdF9kZXYtPmRzdF9tYXgsIGJ1Zik7
-CgogIFdBUk5JTkc6IFByZWZlciBzdHJzY3B5IG92ZXIgc3RyY3B5IC0gc2VlOiBodHRwczovL2dp
-dGh1Yi5jb20vS1NQUC9saW51eC9pc3N1ZXMvODgKICAjMTU1NDogRklMRTogbmV0L2NvcmUvcGt0
-Z2VuLmM6MTU1NDoKICArICAgICAgICAgICAgICAgICAgICAgICBzdHJjcHkocGt0X2Rldi0+c3Jj
-X21pbiwgYnVmKTsKCiAgV0FSTklORzogUHJlZmVyIHN0cnNjcHkgb3ZlciBzdHJjcHkgLSBzZWU6
-IGh0dHBzOi8vZ2l0aHViLmNvbS9LU1BQL2xpbnV4L2lzc3Vlcy84OAogICMxNTc1OiBGSUxFOiBu
-ZXQvY29yZS9wa3RnZW4uYzoxNTc1OgogICsgICAgICAgICAgICAgICAgICAgICAgIHN0cmNweShw
-a3RfZGV2LT5zcmNfbWF4LCBidWYpOwoKICBXQVJOSU5HOiBQcmVmZXIgc3Ryc2NweSBvdmVyIHN0
-cmNweSAtIHNlZTogaHR0cHM6Ly9naXRodWIuY29tL0tTUFAvbGludXgvaXNzdWVzLzg4CiAgIzMy
-MzE6IEZJTEU6IG5ldC9jb3JlL3BrdGdlbi5jOjMyMzE6CiAgKyAgICAgICAgICAgICAgICAgICAg
-ICAgc3RyY3B5KHBrdF9kZXYtPnJlc3VsdCwgIlN0YXJ0aW5nIik7CgogIFdBUk5JTkc6IFByZWZl
-ciBzdHJzY3B5IG92ZXIgc3RyY3B5IC0gc2VlOiBodHRwczovL2dpdGh1Yi5jb20vS1NQUC9saW51
-eC9pc3N1ZXMvODgKICAjMzIzNTogRklMRTogbmV0L2NvcmUvcGt0Z2VuLmM6MzIzNToKICArICAg
-ICAgICAgICAgICAgICAgICAgICBzdHJjcHkocGt0X2Rldi0+cmVzdWx0LCAiRXJyb3Igc3RhcnRp
-bmciKTsKCiAgV0FSTklORzogUHJlZmVyIHN0cnNjcHkgb3ZlciBzdHJjcHkgLSBzZWU6IGh0dHBz
-Oi8vZ2l0aHViLmNvbS9LU1BQL2xpbnV4L2lzc3Vlcy84OAogICMzODQ5OiBGSUxFOiBuZXQvY29y
-ZS9wa3RnZW4uYzozODQ5OgogICsgICAgICAgc3RyY3B5KHBrdF9kZXYtPm9kZXZuYW1lLCBpZm5h
-bWUpOwoKV2hpbGUgYXQgaXQgc3F1YXNoIG1lbXNldC9zdHJjcHkgcGF0dGVybiBpbnRvIHNpbmds
-ZSBzdHJzY3B5X3BhZCBjYWxsLgoKU2lnbmVkLW9mZi1ieTogUGV0ZXIgU2VpZGVyZXIgPHBzLnJl
-cG9ydEBnbXgubmV0PgotLS0KQ2hhbmdlcyB2MSAtPiB2MjoKICAtIHNxdWFzaCBtZW1zZXQvc3Ry
-c2NweSBwYXR0ZXJuIGludG8gc2luZ2xlIHN0cnNjcHlfcGFkIGNhbGwgKHN1Z2dlc3RlZAogICAg
-YnkgSmFrdWIgS2ljaW5za2kpCi0tLQogbmV0L2NvcmUvcGt0Z2VuLmMgfCAxOCArKysrKysrLS0t
-LS0tLS0tLS0KIDEgZmlsZSBjaGFuZ2VkLCA3IGluc2VydGlvbnMoKyksIDExIGRlbGV0aW9ucygt
-KQoKZGlmZiAtLWdpdCBhL25ldC9jb3JlL3BrdGdlbi5jIGIvbmV0L2NvcmUvcGt0Z2VuLmMKaW5k
-ZXggOWQ1NmY5NzY1NDExLi4wZWJlNTQ2MWQ0ZDkgMTAwNjQ0Ci0tLSBhL25ldC9jb3JlL3BrdGdl
-bi5jCisrKyBiL25ldC9jb3JlL3BrdGdlbi5jCkBAIC0xNDE5LDggKzE0MTksNyBAQCBzdGF0aWMg
-c3NpemVfdCBwa3RnZW5faWZfd3JpdGUoc3RydWN0IGZpbGUgKmZpbGUsCiAJCQlyZXR1cm4gLUVG
-QVVMVDsKIAkJYnVmW2xlbl0gPSAwOwogCQlpZiAoc3RyY21wKGJ1ZiwgcGt0X2Rldi0+ZHN0X21p
-bikgIT0gMCkgewotCQkJbWVtc2V0KHBrdF9kZXYtPmRzdF9taW4sIDAsIHNpemVvZihwa3RfZGV2
-LT5kc3RfbWluKSk7Ci0JCQlzdHJjcHkocGt0X2Rldi0+ZHN0X21pbiwgYnVmKTsKKwkJCXN0cnNj
-cHlfcGFkKHBrdF9kZXYtPmRzdF9taW4sIGJ1Zik7CiAJCQlwa3RfZGV2LT5kYWRkcl9taW4gPSBp
-bl9hdG9uKHBrdF9kZXYtPmRzdF9taW4pOwogCQkJcGt0X2Rldi0+Y3VyX2RhZGRyID0gcGt0X2Rl
-di0+ZGFkZHJfbWluOwogCQl9CkBAIC0xNDQwLDggKzE0MzksNyBAQCBzdGF0aWMgc3NpemVfdCBw
-a3RnZW5faWZfd3JpdGUoc3RydWN0IGZpbGUgKmZpbGUsCiAJCQlyZXR1cm4gLUVGQVVMVDsKIAkJ
-YnVmW2xlbl0gPSAwOwogCQlpZiAoc3RyY21wKGJ1ZiwgcGt0X2Rldi0+ZHN0X21heCkgIT0gMCkg
-ewotCQkJbWVtc2V0KHBrdF9kZXYtPmRzdF9tYXgsIDAsIHNpemVvZihwa3RfZGV2LT5kc3RfbWF4
-KSk7Ci0JCQlzdHJjcHkocGt0X2Rldi0+ZHN0X21heCwgYnVmKTsKKwkJCXN0cnNjcHlfcGFkKHBr
-dF9kZXYtPmRzdF9tYXgsIGJ1Zik7CiAJCQlwa3RfZGV2LT5kYWRkcl9tYXggPSBpbl9hdG9uKHBr
-dF9kZXYtPmRzdF9tYXgpOwogCQkJcGt0X2Rldi0+Y3VyX2RhZGRyID0gcGt0X2Rldi0+ZGFkZHJf
-bWF4OwogCQl9CkBAIC0xNTUwLDggKzE1NDgsNyBAQCBzdGF0aWMgc3NpemVfdCBwa3RnZW5faWZf
-d3JpdGUoc3RydWN0IGZpbGUgKmZpbGUsCiAJCQlyZXR1cm4gLUVGQVVMVDsKIAkJYnVmW2xlbl0g
-PSAwOwogCQlpZiAoc3RyY21wKGJ1ZiwgcGt0X2Rldi0+c3JjX21pbikgIT0gMCkgewotCQkJbWVt
-c2V0KHBrdF9kZXYtPnNyY19taW4sIDAsIHNpemVvZihwa3RfZGV2LT5zcmNfbWluKSk7Ci0JCQlz
-dHJjcHkocGt0X2Rldi0+c3JjX21pbiwgYnVmKTsKKwkJCXN0cnNjcHlfcGFkKHBrdF9kZXYtPnNy
-Y19taW4sIGJ1Zik7CiAJCQlwa3RfZGV2LT5zYWRkcl9taW4gPSBpbl9hdG9uKHBrdF9kZXYtPnNy
-Y19taW4pOwogCQkJcGt0X2Rldi0+Y3VyX3NhZGRyID0gcGt0X2Rldi0+c2FkZHJfbWluOwogCQl9
-CkBAIC0xNTcxLDggKzE1NjgsNyBAQCBzdGF0aWMgc3NpemVfdCBwa3RnZW5faWZfd3JpdGUoc3Ry
-dWN0IGZpbGUgKmZpbGUsCiAJCQlyZXR1cm4gLUVGQVVMVDsKIAkJYnVmW2xlbl0gPSAwOwogCQlp
-ZiAoc3RyY21wKGJ1ZiwgcGt0X2Rldi0+c3JjX21heCkgIT0gMCkgewotCQkJbWVtc2V0KHBrdF9k
-ZXYtPnNyY19tYXgsIDAsIHNpemVvZihwa3RfZGV2LT5zcmNfbWF4KSk7Ci0JCQlzdHJjcHkocGt0
-X2Rldi0+c3JjX21heCwgYnVmKTsKKwkJCXN0cnNjcHlfcGFkKHBrdF9kZXYtPnNyY19tYXgsIGJ1
-Zik7CiAJCQlwa3RfZGV2LT5zYWRkcl9tYXggPSBpbl9hdG9uKHBrdF9kZXYtPnNyY19tYXgpOwog
-CQkJcGt0X2Rldi0+Y3VyX3NhZGRyID0gcGt0X2Rldi0+c2FkZHJfbWF4OwogCQl9CkBAIC0zMjI4
-LDExICszMjI0LDExIEBAIHN0YXRpYyB2b2lkIHBrdGdlbl9ydW4oc3RydWN0IHBrdGdlbl90aHJl
-YWQgKnQpCiAKIAkJCXNldF9wa3Rfb3ZlcmhlYWQocGt0X2Rldik7CiAKLQkJCXN0cmNweShwa3Rf
-ZGV2LT5yZXN1bHQsICJTdGFydGluZyIpOworCQkJc3Ryc2NweShwa3RfZGV2LT5yZXN1bHQsICJT
-dGFydGluZyIpOwogCQkJcGt0X2Rldi0+cnVubmluZyA9IDE7CS8qIENyYW5rZSB5ZXNlbGYhICov
-CiAJCQlzdGFydGVkKys7CiAJCX0gZWxzZQotCQkJc3RyY3B5KHBrdF9kZXYtPnJlc3VsdCwgIkVy
-cm9yIHN0YXJ0aW5nIik7CisJCQlzdHJzY3B5KHBrdF9kZXYtPnJlc3VsdCwgIkVycm9yIHN0YXJ0
-aW5nIik7CiAJfQogCXJjdV9yZWFkX3VubG9jaygpOwogCWlmIChzdGFydGVkKQpAQCAtMzg0Niw3
-ICszODQyLDcgQEAgc3RhdGljIGludCBwa3RnZW5fYWRkX2RldmljZShzdHJ1Y3QgcGt0Z2VuX3Ro
-cmVhZCAqdCwgY29uc3QgY2hhciAqaWZuYW1lKQogCWlmICghcGt0X2RldikKIAkJcmV0dXJuIC1F
-Tk9NRU07CiAKLQlzdHJjcHkocGt0X2Rldi0+b2Rldm5hbWUsIGlmbmFtZSk7CisJc3Ryc2NweShw
-a3RfZGV2LT5vZGV2bmFtZSwgaWZuYW1lKTsKIAlwa3RfZGV2LT5mbG93cyA9IHZ6YWxsb2Nfbm9k
-ZShhcnJheV9zaXplKE1BWF9DRkxPV1MsCiAJCQkJCQkgc2l6ZW9mKHN0cnVjdCBmbG93X3N0YXRl
-KSksCiAJCQkJICAgICAgbm9kZSk7Ci0tIAoyLjQ5LjAKCg==
+
+
+On 4/10/25 7:50 PM, Luiz Carvalho wrote:
+> The current tcp_acceptable_seq() returns SND.NXT when the available
+> window shrinks to less then one scaling factor. This works fine for most
+> cases, and seemed to not be a problem until a slight behavior change to
+> how tcp_select_window() handles ZeroWindow cases.
+> 
+> Before commit 8c670bdfa58e ("tcp: correct handling of extreme memory squeeze"),
+> a zero window would only be announced when data failed to be consumed,
+> and following packets would have non-zero windows despite the receiver
+> still not having any available space. After the commit, however, the
+> zero window is stored in the socket and the advertised window will be
+> zero until the receiver frees up space.
+> 
+> For tcp_acceptable_seq(), a zero window case will result in SND.NXT
+> being sent, but the problem now arises when the receptor validates the
+> sequence number in tcp_sequence():
+> 
+> static enum skb_drop_reason tcp_sequence(const struct tcp_sock *tp,
+> 					 u32 seq, u32 end_seq)
+> {
+> 	// ...
+> 	if (after(seq, tp->rcv_nxt + tcp_receive_window(tp)))
+> 		return SKB_DROP_REASON_TCP_INVALID_SEQUENCE;
+> 	// ...
+> }
+> 
+> Because RCV.WND is now stored in the socket as zero, using SND.NXT will fail
+> the INVALID_SEQUENCE check: SEG.SEQ <= RCV.NXT + RCV.WND. A valid ACK is
+> dropped by the receiver, correctly, as RFC793 mentions:
+> 
+> 	There are four cases for the acceptability test for an incoming
+>         segment:
+> 
+> 	Segment Receive  Test
+>         Length  Window
+>         ------- -------  -------------------------------------------
+> 
+>            0       0     SEG.SEQ = RCV.NXT
+> 
+> The ACK will be ignored until tcp_write_wakeup() sends SND.UNA again,
+> and the connection continues. If the receptor announces ZeroWindow
+> again, the stall could be very long, as was in my case. Found this out
+> while giving a shot at bug #213827.
+
+The dropped ack causing the stall is a zero window probe from the sender
+right?
+Could you please describe the relevant scenario with a pktdrill test?
+
+Thanks!
+
+Paolo
+
 
