@@ -1,217 +1,197 @@
-Return-Path: <netdev+bounces-182820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC5D2A89FAF
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:39:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA673A89FA1
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:38:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 494473A49D1
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:38:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C73D3AF863
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:37:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42C991A262A;
-	Tue, 15 Apr 2025 13:38:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2294C14B08C;
+	Tue, 15 Apr 2025 13:38:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="QjK4O07T";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="e7+PfyrZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A66F17A2E6
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 13:38:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684EF33991;
+	Tue, 15 Apr 2025 13:38:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744724303; cv=none; b=LtfEbjXPI2MsxNI/tY77VYQqTk7UZGN6j2uacRo1eIdhB6eol8AQtue5JXZ9CwvXDOiVwgWJp8Dr2h0SAiUAEafkmJcYLsJPeTRATaPr0zZXp9nUpAM5ukACt5kDFrRQfwfSoNoetUsAbp4GQee9kP/sdJESA8RAc4tRrYVkqH4=
+	t=1744724291; cv=none; b=fMWpp+aGkGqYRKdkqQlQX/NNTo1j0y9DYfwkDH44dusD4Q2JPELhAsFxA00kWnWvM+JbFE+RAMIRQ8L3KI4M7FmfgmNmNK4db/5MMLtoHF5B3byUq0e+wdlb7n2P/y38YOYRKbtlzWyW4tULJjRyeMuXh3d+QSCEx4TZbSFdOaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744724303; c=relaxed/simple;
-	bh=tupOFGHM6BdJtTgrpsfRqTV5PyDwJKEBwSPEfgUptpI=;
+	s=arc-20240116; t=1744724291; c=relaxed/simple;
+	bh=VJ3gEoMrY9GSmpMAxaxPj/YimtW7F3AAHn+QjvcDw2c=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=L6IZaUAS+OgiacUJpXPdyGHlKSxj+tpwy7ZLqILws7I6LNzLkjSwMMYkqTQwzGZkuBu+5BtrUrgfUgVYKP3Uw0NQXACw3rTligYzpW5hN1VINtvmW81lnKxTQCViKlronjZgAj4+riZrIFsccLawcSTXvnnlzmsWz6mozxAH/XU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1u4gUC-0006Pd-2X; Tue, 15 Apr 2025 15:38:00 +0200
-Received: from lupine.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::4e] helo=lupine)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1u4gU8-000QdR-03;
-	Tue, 15 Apr 2025 15:37:56 +0200
-Received: from pza by lupine with local (Exim 4.96)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1u4gU7-000BD8-2u;
-	Tue, 15 Apr 2025 15:37:55 +0200
-Message-ID: <c9d8f97470c3c5a8c0214af266b9579086460ba1.camel@pengutronix.de>
-Subject: Re: [PATCH net-next v6 3/4] net: stmmac: Add DWMAC glue layer for
- Renesas GBETH
-From: Philipp Zabel <p.zabel@pengutronix.de>
-To: Prabhakar <prabhakar.csengg@gmail.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>,  "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Maxime
- Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>,  Richard Cochran
- <richardcochran@gmail.com>, Geert Uytterhoeven <geert+renesas@glider.be>,
- Magnus Damm <magnus.damm@gmail.com>, "Russell King (Oracle)"
- <rmk+kernel@armlinux.org.uk>,  Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Jose Abreu <joabreu@synopsys.com>
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org,  Biju Das
- <biju.das.jz@bp.renesas.com>, Fabrizio Castro
- <fabrizio.castro.jz@renesas.com>, Lad Prabhakar
- <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Date: Tue, 15 Apr 2025 15:37:55 +0200
-In-Reply-To: <20250415125642.241427-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
-References: 
-	<20250415125642.241427-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-	 <20250415125642.241427-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	 Content-Type:MIME-Version; b=KrxhMP6AjBc6hTycw2WcqoOajbC4PAswwOUaTY6xqoaY16Fv0taG5XI6+6eK8xcV5Z3IGRs215M4hePgtg1Vwugcfc/1XWfcdW/gE+yD37SyBMsO3TWsLgbS4sK8JaUFfi6VeeQ6zFPRW6jcHZUySCCGvW9GeVkAi27IG0wWGbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=QjK4O07T; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=e7+PfyrZ reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1744724289; x=1776260289;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=dd/5Px/F9IuikFlpnjP8bxiqM2ZSWPgSpxK2sGkLbZ8=;
+  b=QjK4O07Tytno+dSz8Uiti/mMHKSbVXWBH32ZewsCmtGGno+aAXV3bg6e
+   GL72xJFaTQhc0PZq0yllNpPsANq7j3CxO+PjeMmOwDNYup2WWtAV/NYub
+   Cf5ejF5Curr2TgOk67kbvHQ5D4DDXKS1R+WRO/n/AheyeeMJaXrYqvpyN
+   ypetDsGA1Nadg8u0Vvu5LpSdIyj9DVpKlK28ydPAEBZ7njawTNLAPpdP6
+   PqbQiatQjvfMX4wWPInFzp/XUWmziKRXTPzddIFe/gBycOkwQV1BLd93S
+   tqxBKNoQqlSKD2zvFjuZ+cuP+6nzPgTmRN2NP5eJMy9lhLcf1cXIhgxoS
+   g==;
+X-CSE-ConnectionGUID: 7CG+LNsBTBavByIdzUta9A==
+X-CSE-MsgGUID: tHp09WNSSFWLPaU8u9Z0jQ==
+X-IronPort-AV: E=Sophos;i="6.15,213,1739833200"; 
+   d="scan'208";a="43544216"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 15 Apr 2025 15:38:06 +0200
+X-CheckPoint: {67FE613D-31-2417938-F0170C2B}
+X-MAIL-CPID: CB4D6A87F8E3381F1E4D34D623E7452D_2
+X-Control-Analysis: str=0001.0A006370.67FE614B.000C,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id F1AB21661B1;
+	Tue, 15 Apr 2025 15:37:59 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1744724281;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dd/5Px/F9IuikFlpnjP8bxiqM2ZSWPgSpxK2sGkLbZ8=;
+	b=e7+PfyrZ/AJ3fizvjDeYO41owEVjehzE44DjCMmbjQuHWldP5IfQhoBf/9Jw8Ks+ex1Ykw
+	eW5KSMjdZTKSzEP2UzETo8inbTMFu4clfBW2Uwt7Mt9IDD9rmsDHIUtz+iG0r1EuOr9HrS
+	Wj9DNc/wwwF+FRzfnpYD5wxVBwIwbxUR3advPXTXqHNRjjkeYXAFdJHzOjY57YOkl6sBYL
+	upyvE7oROOy6MbhSQAdXhV5zNKMbOYbehKl02OKTNvA8rXKO80W2o/q+FDZnEX21ycGtXw
+	l+wJA99dax0jjBVW5LBZgr4VQVkMMU7nKimucF6WtPmfbGkjMgYT6aOoYqNr8Q==
+Message-ID: <9e0e6365a2c0151c819e442775ece37353468d91.camel@ew.tq-group.com>
+Subject: Re: [PATCH net-next 4/4] checkpatch: check for comment explaining
+ rgmii(|-rxid|-txid) PHY modes
+From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,  Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Andy Whitcroft
+ <apw@canonical.com>, Dwaipayan Ray <dwaipayanray1@gmail.com>, Lukas Bulwahn
+ <lukas.bulwahn@gmail.com>, Joe Perches <joe@perches.com>, Jonathan Corbet
+ <corbet@lwn.net>, Nishanth Menon <nm@ti.com>, Vignesh Raghavendra
+ <vigneshr@ti.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, Roger Quadros
+ <rogerq@kernel.org>, Tero Kristo <kristo@kernel.org>,
+ linux-doc@vger.kernel.org,  linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux@ew.tq-group.com
+Date: Tue, 15 Apr 2025 15:37:59 +0200
+In-Reply-To: <659d6affd7c58474c4bca5c92fc762925591d0d9.camel@ew.tq-group.com>
+References: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
+	 <16a08c72ec6cf68bbe55b82d6fb2f12879941f16.1744710099.git.matthias.schiffer@ew.tq-group.com>
+	 <9d73f6ac-9fee-446b-b011-e664a7311eca@lunn.ch>
+	 <659d6affd7c58474c4bca5c92fc762925591d0d9.camel@ew.tq-group.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: p.zabel@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Di, 2025-04-15 at 13:56 +0100, Prabhakar wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+On Tue, 2025-04-15 at 15:36 +0200, Matthias Schiffer wrote:
+> On Tue, 2025-04-15 at 15:20 +0200, Andrew Lunn wrote:
+> >=20
+> > > +  **UNCOMMENTED_RGMII_MODE**
+> > > +    Historially, the RGMII PHY modes specified in Device Trees have =
+been
+> > > +    used inconsistently, often referring to the usage of delays on t=
+he PHY
+> > > +    side rather than describing the board.
+> > > +
+> > > +    PHY modes "rgmii", "rgmii-rxid" and "rgmii-txid" modes require t=
+he clock
+> > > +    signal to be delayed on the PCB; this unusual configuration shou=
+ld be
+> > > +    described in a comment. If they are not (meaning that the delay =
+is realized
+> > > +    internally in the MAC or PHY), "rgmii-id" is the correct PHY mod=
+e.
+> >=20
+> > It is unclear to me how much ctx_has_comment() will return. Maybe
+> > include an example here of how it should look. I'm assuming:
+> >=20
+> > /* RGMII delays added via PCB traces */
+> > &enet2 {
+> >     phy-mode =3D "rgmii";
+> >     status =3D "okay";
+> >=20
+> > fails, but
+> >=20
+> > &enet2 {
+> >     /* RGMII delays added via PCB traces */
+> >     phy-mode =3D "rgmii";
+> >     status =3D "okay";
+> >=20
+> > passes?
 >=20
-> Add the DWMAC glue layer for the GBETH IP found in the Renesas RZ/V2H(P)
-> SoC.
+> Yes, it works like that. I can't claim to fully understand the checkpatch=
+ code
+> handling comments, but I copied it from other similar checks and tested i=
+t on a
+> few test patches.
 >=20
-> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 ++
->  drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
->  .../stmicro/stmmac/dwmac-renesas-gbeth.c      | 148 ++++++++++++++++++
->  3 files changed, 160 insertions(+)
->  create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbe=
-th.c
+> One thing to note is that I implemented it as a CHK() and not a WARN() be=
+cause
+> that's what is used for other comment checks like DATA_RACE - meaning it =
+will
+> only trigger with --strict.
+
+Oops, DATA_RACE is actually a WARN(). I must have copied it from some other
+comment check that uses CHK(). Let me know which you want me to use.
+
 >=20
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/et=
-hernet/stmicro/stmmac/Kconfig
-> index 3c820ef56775..2c99b23f0faa 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> +++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> @@ -131,6 +131,17 @@ config DWMAC_QCOM_ETHQOS
->  	  This selects the Qualcomm ETHQOS glue layer support for the
->  	  stmmac device driver.
-> =20
-> +config DWMAC_RENESAS_GBETH
-> +	tristate "Renesas RZ/V2H(P) GBETH support"
-> +	default ARCH_RENESAS
-> +	depends on OF && (ARCH_RENESAS || COMPILE_TEST)
-> +	help
-> +	  Support for Gigabit Ethernet Interface (GBETH) on Renesas
-> +	  RZ/V2H(P) SoCs.
-> +
-> +	  This selects the Renesas RZ/V2H(P) Soc specific glue layer support
-> +	  for the stmmac device driver.
-> +
->  config DWMAC_ROCKCHIP
->  	tristate "Rockchip dwmac support"
->  	default ARCH_ROCKCHIP
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/e=
-thernet/stmicro/stmmac/Makefile
-> index 594883fb4164..91050215511b 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/Makefile
-> +++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
-> @@ -20,6 +20,7 @@ obj-$(CONFIG_DWMAC_LPC18XX)	+=3D dwmac-lpc18xx.o
->  obj-$(CONFIG_DWMAC_MEDIATEK)	+=3D dwmac-mediatek.o
->  obj-$(CONFIG_DWMAC_MESON)	+=3D dwmac-meson.o dwmac-meson8b.o
->  obj-$(CONFIG_DWMAC_QCOM_ETHQOS)	+=3D dwmac-qcom-ethqos.o
-> +obj-$(CONFIG_DWMAC_RENESAS_GBETH) +=3D dwmac-renesas-gbeth.o
->  obj-$(CONFIG_DWMAC_ROCKCHIP)	+=3D dwmac-rk.o
->  obj-$(CONFIG_DWMAC_RZN1)	+=3D dwmac-rzn1.o
->  obj-$(CONFIG_DWMAC_S32)		+=3D dwmac-s32.o
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c b/=
-drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-> new file mode 100644
-> index 000000000000..8674b7605d83
-> --- /dev/null
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-> @@ -0,0 +1,148 @@
-> +// SPDX-License-Identifier: GPL-2.0+
-> +/*
-> + * dwmac-renesas-gbeth.c - DWMAC Specific Glue layer for Renesas GBETH
-> + *
-> + * The Rx and Tx clocks are supplied as follows for the GBETH IP.
-> + *
-> + *                         Rx / Tx
-> + *   -------+------------- on / off -------
-> + *          |
-> + *          |            Rx-180 / Tx-180
-> + *          +---- not ---- on / off -------
-> + *
-> + * Copyright (C) 2025 Renesas Electronics Corporation
-> + */
-> +
-> +#include <linux/clk.h>
-> +#include <linux/device.h>
-> +#include <linux/module.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/reset.h>
-> +
-> +#include "stmmac_platform.h"
-> +
-> +struct renesas_gbeth {
-> +	struct plat_stmmacenet_data *plat_dat;
-> +	struct reset_control *rstc;
-> +	struct device *dev;
-> +	void __iomem *regs;
+>=20
+> >=20
+> > > =20
+> > >  Commit message
+> > >  --------------
+> > > diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> > > index 784912f570e9d..57fcbd4b63ede 100755
+> > > --- a/scripts/checkpatch.pl
+> > > +++ b/scripts/checkpatch.pl
+> > > @@ -3735,6 +3735,17 @@ sub process {
+> > >  			}
+> > >  		}
+> > > =20
+> > > +# Check for RGMII phy-mode with delay on PCB
+> > > +		if ($realfile =3D~ /\.dtsi?$/ && $line =3D~ /^\+\s*(phy-mode|phy-c=
+onnection-type)\s*=3D\s*"/ &&
+> >=20
+> > I don't grok perl. Is this only looking a dtsi files? .dts files
+> > should also be checked.
+>=20
+> It is a regular expression - the ? makes the previous character optional,
+> matching both .dts and .dtsi files.
+>=20
+> Best,
+> Matthias
+>=20
+>=20
+> >=20
+> > Thanks for working on this, it will be very useful.
+> >=20
+> > 	Andrew
+>=20
 
-This doesn't seem to be used anywhere.
-
-> +};
-> +
-> +static const char *const renesas_gbeth_clks[] =3D {
-> +	"tx", "tx-180", "rx", "rx-180",
-> +};
-> +
-> +static int renesas_gbeth_clks_config(struct renesas_gbeth *gbeth, bool e=
-nabled)
-> +{
-> +	struct plat_stmmacenet_data *plat_dat;
-> +	int ret;
-> +
-> +	plat_dat =3D gbeth->plat_dat;
-> +	if (enabled) {
-> +		ret =3D reset_control_deassert(gbeth->rstc);
-> +		if (ret) {
-> +			dev_err(gbeth->dev, "Reset deassert failed\n");
-> +			return ret;
-> +		}
-> +
-> +		ret =3D clk_bulk_prepare_enable(plat_dat->num_clks,
-> +					      plat_dat->clks);
-> +		if (ret)
-> +			reset_control_assert(gbeth->rstc);
-> +	} else {
-> +		clk_bulk_disable_unprepare(plat_dat->num_clks, plat_dat->clks);
-> +		ret =3D reset_control_assert(gbeth->rstc);
-> +		if (ret)
-> +			dev_err(gbeth->dev, "Reset assert failed\n");
-> +	}
-> +
-> +	return ret;
-> +}
-
-Apart from the plat_dat assignment, this function has two completely
-separate paths. I'd fold its contents into renesas_gbeth_init/exit().
-
-
-regards
-Philipp
+--=20
+TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
+any
+Amtsgericht M=C3=BCnchen, HRB 105018
+Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
+neider
+https://www.tq-group.com/
 
