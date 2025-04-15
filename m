@@ -1,93 +1,127 @@
-Return-Path: <netdev+bounces-182901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38A1EA8A4E9
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 19:05:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03F08A8A4EA
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 19:05:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32AAA17EBB5
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:05:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B7CB3AB559
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:05:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A997484FAD;
-	Tue, 15 Apr 2025 17:05:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FCDB1581EE;
+	Tue, 15 Apr 2025 17:05:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="rnsHzzdS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fD+wIOA0"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9748D2DFA5B
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 17:05:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E30AD84FAD;
+	Tue, 15 Apr 2025 17:05:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744736728; cv=none; b=ZzJg1NJA2SqEibAmFk4rSY3ynQTMXfM65kC/LpoOJmCgeuvvNV2ganN6Bybh7PnTH3G23ity7frNh2BWaXCphZgHzrE4K32UXSfP/V4kQ4tRK3Kz7yOZ7yDyYBuyBI7czyw5E9i+mQbZrTv/9IqTW/J+vbreEelj1nTAioePI/E=
+	t=1744736746; cv=none; b=Yx/H4Je6r7gZyrmBmEuN3eWpq9AZyXgLMX5fz8DHc8vYhFYpVQioafWkx9gNX4b5X8DLWJ2FZ6eOCHE6DhKkvEf72Fe6+KOVg83zV8nsOBQ1o+K1VCmNbMfG5wItGswqDnJiGPBDkf6x7qvS6KkWTZD51DsbgoA0J0H779Qsn3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744736728; c=relaxed/simple;
-	bh=VutMaZYw6msU9X6Ywu9TUH3pYhZ8Ed8XcVm+BDkirvg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LoTRbweLT2107Cj0ZxFFk6HCxhXpJs1gFg9r/VQnmvMl0on2Uwb/ZNsC8XhqRaC6p8cY5WI9yVUssO91v0kMJZHwb7xRAgP5wptc0IO/T5D+CCQxeREjsjCtjz0WXxLV0oXZu3Y/gsoMbGSZd8apbc82hOzzjET/FcGLGwdhJXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=rnsHzzdS; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=a4i3hHxfGyCeIjXRMb2Hikf5itrwVDBNXFKOz3lUUvY=; b=rnsHzzdS+fdn5LgO4Nx57POx1i
-	6sqbfLUyuVbRypb7Flmf+Yj/m3FH7J6sGHY5405bZc/R/B4ZcOnpxhfF9ia011SUguvNRnt3FjV5/
-	72jUrMwXIifgfmkb7VrbGS2hpeDuFo9CbfnBtR/WlzoOxo1oZ+qEnmj/JIx9iToZpEsyghQ6gaQUH
-	3//nqVr2F5/UTm4UQIWu+Y1ld4LGF57hvsF3q2omApLePPt4a0/o46WreZjDyBR7RkVfxdAzNvWLM
-	pHgckEwXh+IYsg98BiKxMT89RnVP/2z0K+9AHV/qFd5+7/42OA+fPm3r3l5rJsncXX1To6olepKPb
-	RTC60eSA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58348)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1u4jiq-00007M-1r;
-	Tue, 15 Apr 2025 18:05:20 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1u4jio-0000XR-1q;
-	Tue, 15 Apr 2025 18:05:18 +0100
-Date: Tue, 15 Apr 2025 18:05:18 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, David Miller <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: phy: remove redundant dependency on
- NETDEVICES for PHYLINK and PHYLIB
-Message-ID: <Z_6RzimpYVqeOHyN@shell.armlinux.org.uk>
-References: <085892cd-aa11-4c22-bf8a-574a5c6dcd7c@gmail.com>
+	s=arc-20240116; t=1744736746; c=relaxed/simple;
+	bh=ZkblCK2OfPSPmJSFFzHT0HQx5TYG9c06icogDcimMQs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UJKJuMEJbGFUsQpBbY5ZyRHlnpAbk3fHySq+vmLKcXz/KSKrSiAhYwLymAISntjF8Q+/CasrdcMabIKNuxSg+7Z9OWAG1xBg0ewz+gb6QV20aDebayExl1Vyn2DhwLHczK4aquwiZMOUawNG9eHDe5hGkLy2mb6qlgJ+e/aucLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fD+wIOA0; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43cfba466b2so61125265e9.3;
+        Tue, 15 Apr 2025 10:05:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744736743; x=1745341543; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZkblCK2OfPSPmJSFFzHT0HQx5TYG9c06icogDcimMQs=;
+        b=fD+wIOA0UEluB3RuE4SYKlMdpU4IO9alrnYUOJs6e8OllFfOOlUw9TenqbtoMBni5g
+         A+fcJF0ZTXXQfkqpw4lSn+VSLv5BtXtRq3CBPtBhDFwJwT074/pUXpVudqVRR6SL3Jrf
+         86qIA016GOYaZiXOr6RIQjCeDP3sqDjGzCoh2iwek2VIYLRJcAZejlmt3xHE5Z+yUsq8
+         UgCX+7Ap1U4Y5e66VCNSfRkr10gYqk+VaxEAoFcT2SY8Ms4FiR326+Cwx5EVFDj/GS5b
+         7Gv8/yJneDBrRfVAPNKp41re3Jl0CvkGxlbZ8dFfDBBrkWoSzyu9yeE5MlO7+60vI5gb
+         Q5wQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744736743; x=1745341543;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZkblCK2OfPSPmJSFFzHT0HQx5TYG9c06icogDcimMQs=;
+        b=Yca+S5L2wiRLzW3vtWFFRdbiGSbux57C1GO9fHurr9tVX6hPQYhTYwjSBhykf+ZwB+
+         V1+zOkX6NH1ucCuMJIeOImpMhGgTWUZoV0QARkAelmBnXACdIBuRM+CWVQdhO+Ob51ah
+         dimPyRpTzOF8tz/vYB7xt0VYe+wOeVMDDGTcLYCh0h1EGiqii8U46u6DJCKFpalrWhLR
+         r3NWhzka0kKBS3PP1q39h6iAJSEyPS8zPl204kwUSYNhvvmusmkZxwTve7WotHQu3cVd
+         DgD/J1Eunr4Rzl3ArUcKrYYReAcBvpYnTcVERrHmJysJZAQjcXb05E6ZZkQ4iorl4y4L
+         at9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWSt+oLZruLTlTXM2zqVx97J62D2SClA9+ldMTqvqduoWazoYaQJIELJWzKYbF1U+Wwwm/lyNcC@vger.kernel.org, AJvYcCXhtP/viNl51tjv+FejQsKqWZsUXWB9Q3DM8UiuDRByT4mDcogKcLkaoyiYwRVXHcA+Li8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyckvJksAqeVABSj+vc/HCx/RxFCNPHh/bCOfn9eMEtOsRlUfSq
+	V+O0Sg46U01i6Due1/4Z088hzBktjJLGnHdFQjyLAqW3XNwfKaNOw8Hq1bg+xwSPqtzOUqHidoM
+	oKHMGilLdln2Wy3n82BVDSZAIS4Q=
+X-Gm-Gg: ASbGncuy53cJD4GUeV0wXz3+J7liRc+6NY6zv1O6oSHTBE51BIHud/jUD6zocFAh4cE
+	TaTHJM30JA9hwCClC4LKhCHku5+7unhijSGkQh+TgFo/ReEdH/76s4s5OVsCo2xEO2rnwgIiaXQ
+	fWl2k2dw7sh3ByBfwtR2tuBlEQpwSLB+daUYRX
+X-Google-Smtp-Source: AGHT+IHdBCvqQXZzDYomPgk55GCxp8UVjtV4CQ8xrapURgs4B5z8euqZezmpznKTnioXbjbWqdFdwFvwxCgqny1kEwE=
+X-Received: by 2002:a05:600c:1e8f:b0:43d:683:8cb2 with SMTP id
+ 5b1f17b1804b1-43f3a93f78amr158399225e9.14.1744736742921; Tue, 15 Apr 2025
+ 10:05:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <085892cd-aa11-4c22-bf8a-574a5c6dcd7c@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20250415163332.1836826-1-ihor.solodrai@linux.dev>
+ <3cb523bc8eb334cb420508a84f3f1d37543f4253@linux.dev> <02aa843af95ad3413fb37f898007cb17723dd1aa@linux.dev>
+In-Reply-To: <02aa843af95ad3413fb37f898007cb17723dd1aa@linux.dev>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 15 Apr 2025 10:05:31 -0700
+X-Gm-Features: ATxdqUHcb7bcMj8apUeK-XfKrRx216OshBplciVzk_clunJ_ecSIlG9tQ2HJ98g
+Message-ID: <CAADnVQ+5_mqEGnEs-RwBwh7+v2aeCotrbxKRC2qrzoo2hz_1Hw@mail.gmail.com>
+Subject: Re: [PATCH bpf] selftests/bpf: remove sockmap_ktls
+ disconnect_after_delete test
+To: Ihor Solodrai <ihor.solodrai@linux.dev>
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Eduard <eddyz87@gmail.com>, 
+	bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Mykola Lysenko <mykolal@fb.com>, 
+	Kernel Team <kernel-team@meta.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Apr 13, 2025 at 11:23:25PM +0200, Heiner Kallweit wrote:
-> drivers/net/phy/Kconfig is included from drivers/net/Kconfig in an
-> "if NETDEVICES" section. Therefore we don't have to duplicate the
-> dependency here. And if e.g. PHYLINK is selected somewhere, then the
-> dependency is ignored anyway (see note in Kconfig help).
-> 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+On Tue, Apr 15, 2025 at 10:01=E2=80=AFAM Ihor Solodrai <ihor.solodrai@linux=
+.dev> wrote:
+>
+> On 4/15/25 9:53 AM, Jiayuan Chen wrote:
+> > April 16, 2025 at 24:33, "Ihor Solodrai" <ihor.solodrai@linux.dev> wrot=
+e:
+> >>
+> >> "sockmap_ktls disconnect_after_delete" test has been failing on BPF CI
+> >> after recent merges from netdev:
+> >> * https://github.com/kernel-patches/bpf/actions/runs/14458537639
+> >> * https://github.com/kernel-patches/bpf/actions/runs/14457178732
+> >> It happens because disconnect has been disabled for TLS [1], and it
+> >> renders the test case invalid. Remove it from the suite.
+> >> [1] https://lore.kernel.org/netdev/20250404180334.3224206-1-kuba@kerne=
+l.org/
+> >> Signed-off-by: Ihor Solodrai <ihor.solodrai@linux.dev>
+> >
+> > Reviewed-by: Jiayuan Chen <jiayuan.chen@linux.dev>
+> >
+> > The original selftest patch used disconnect to re-produce the endless
+> > loop caused by tcp_bpf_unhash, which has already been removed.
+> >
+> > I hope this doesn't conflict with bpf-next...
+>
+> I just tried applying to bpf-next, and it does indeed have a
+> conflict... Although kdiff3 merged it automatically.
+>
+> What's the right way to resolve this? Send for bpf-next?
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+What commit in bpf-next does it conflict with ?
 
-Thanks!
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+In general, avoiding merge conflicts is preferred.
 
