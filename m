@@ -1,176 +1,100 @@
-Return-Path: <netdev+bounces-182788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2984BA89E82
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 14:47:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5BF5A89E97
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 14:51:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE2823A33CA
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 12:46:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35D07188CC48
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 12:52:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C423292911;
-	Tue, 15 Apr 2025 12:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4851027FD4D;
+	Tue, 15 Apr 2025 12:51:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Pb6tvvc7"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="IpoMe21j"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425BE28B4F1;
-	Tue, 15 Apr 2025 12:47:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B03C72957C7
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 12:51:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744721224; cv=none; b=LYUozLV6/mrODf5gP+l/F9Ji09VCzTorFUP67bvflWQpbqyFaQTRGP55bPx3TvuDRgNL2OK/XotGGBb7TK/cfJMXYPCdnzsVcOXDTmZhC/T8UB875MBhVd8NYLAkvUysuCD0XAYU2pWH+VlFZ9cMXwuuNyIlf6ce2GdT1ZWR4Sc=
+	t=1744721507; cv=none; b=E1TzDj68cnR+ssXc11tCBm5Iz+v2cgLLfe+bX1BR45gdnjxZ0raIcsA93d95gR3gDfuAo+MR80RzMOR7gHyBPv2OAimmlrQ348cQWtMYElBEqEMoB9l0LRD5HSM3S/xI/Vs6hFW/EQRVCHAb7uFdT35CWzAW6x0lErDWVoOZO8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744721224; c=relaxed/simple;
-	bh=5vRosKX5Osw72EvS+mxpqaBtV03BB8wYWXzLNWqTvNU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VscrMf5Z9vcPJLfsdRX8xR3T/IfPYH68qe8JrHNLl0AC1DRdz7qs3ckQXEdliLVBfEm2CygvrlF8ROdjWzEtJQXaYNKzQHTo/TsmXv2FFMUic3UPqY/nYYvfnNA+ntejAJZmU26Tanc3ZMRkmzhc7sD1UlMIJCoS645ztW5ewQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Pb6tvvc7; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 299544397E;
-	Tue, 15 Apr 2025 12:46:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1744721219;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aOROKFQ2lacCi0F/sGRNvCq/N5utu9L8rxls16miSXo=;
-	b=Pb6tvvc76apWhHbdIEqp/Stcts3c7Sm/V+f6ZLnsfk6BojnBRT3ZEPHzce74zAiG4TniuH
-	cf13yoXltXjAjAuMf/nMIooDISY8kg3lLrKYXVpABFT8hWrAiNUXeGmlQPo2GSjvp7E7s8
-	nP0BG3XeaMRpAMTv3JjUC11g9nPwDyW+DWQc64GMv/oDLsNq9lvhQdPPKKwNDCLg9295KJ
-	f1opItPe2LX2cVUnrs1U6ILDCrw+XxVkwlNZM2aH6/vzMyahQXRf/rtH4SAlxny+yiheen
-	/F5b1OniD+8tDZbayxWleJlcC4r8MzWx8MlhSXxh6XKSMiey9Wo2XVxnEROBEw==
-Date: Tue, 15 Apr 2025 14:46:55 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Andy Whitcroft <apw@canonical.com>, Dwaipayan Ray
- <dwaipayanray1@gmail.com>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, Joe
- Perches <joe@perches.com>, Jonathan Corbet <corbet@lwn.net>, Nishanth Menon
- <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>, Siddharth Vadapalli
- <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>, Tero Kristo
- <kristo@kernel.org>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux@ew.tq-group.com, Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH net-next 4/4] checkpatch: check for comment explaining
- rgmii(|-rxid|-txid) PHY modes
-Message-ID: <20250415144655.416c31ab@fedora.home>
-In-Reply-To: <a40072f780a531e5274ce7f2ed28d1319b12d872.camel@ew.tq-group.com>
-References: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
-	<16a08c72ec6cf68bbe55b82d6fb2f12879941f16.1744710099.git.matthias.schiffer@ew.tq-group.com>
-	<20250415131548.0ae3b66f@fedora.home>
-	<a40072f780a531e5274ce7f2ed28d1319b12d872.camel@ew.tq-group.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1744721507; c=relaxed/simple;
+	bh=6+XNT1oBwf2sSkw6/czEQ0TLhxpdT7r413sa8eZYGeM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=M2NWsqCw4wUHNH2zH9kSssnWfHJOmMBk9NgJ6ohoEjfKZvwb23oKlFr2QdpHsTFGP3Ui9YQ4OcFkKs4jsrvGzI3F2ZSS0d3s/zsGQSUZ3CRmXOhu9GieGtL7HCRRSjaqxQBzaxPc0e5tAF1NLDaoKQScrJbcaE+h9eYasyPfqBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=IpoMe21j; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=DJelH3MXeuw+QhgIUBgXCxj63HuDy6jNjoA6xLDiFtY=; b=IpoMe21jYVhJpimOHsXYMa1CF3
+	XHXMrm+vLy33Vb6lHekeOYPP6VH4bJFr6txvj63QglTwI3Ifq8dsNqSRMEGKMJDLa7RbrL4mI3yTA
+	HPACRuylJqGHTUqb8RhlgqFJHdp71mSwAqNAVAJvqgUarnRE8qsqWO3XHGXWpQPUmHpYusLCFt/IF
+	50BMTwR9Z6cVxXYm+HAKLaXDZchnTG9Rgtr47xJWtFESmQcTDUrIj0ppZd3+L9W3a4zACdP5u6/md
+	3/Oj+K+j/wmYjZQgytD9qvBISGett6JnZKTTQse9f1tEDeCKv8EM8X+1kKloCGmJ1V4wb59mHgxkC
+	RgkxXHIA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59424)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1u4flE-0008AB-2Y;
+	Tue, 15 Apr 2025 13:51:32 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1u4fl9-0000Nk-1L;
+	Tue, 15 Apr 2025 13:51:27 +0100
+Date: Tue, 15 Apr 2025 13:51:27 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Chen-Yu Tsai <wens@csie.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-sunxi@lists.linux.dev,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Samuel Holland <samuel@sholland.org>
+Subject: [PATCH net-next 0/3] net: stmmac: sunxi cleanups
+Message-ID: <Z_5WT_jOBgubjWQg@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvvdefheefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepudfgleelvddtffdvkeduieejudeuvedvveffheduhedvueduteehkeehiefgteehnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucfkphepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedviedprhgtphhtthhopehmrghtthhhihgrshdrshgthhhifhhfvghrsegvfidrthhqqdhgrhhouhhprdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvhesl
- hhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehrohgshheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhriihkodgutheskhgvrhhnvghlrdhorhhg
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, 15 Apr 2025 13:21:25 +0200
-Matthias Schiffer <matthias.schiffer@ew.tq-group.com> wrote:
+Hi,
 
-> On Tue, 2025-04-15 at 13:15 +0200, Maxime Chevallier wrote:
-> > On Tue, 15 Apr 2025 12:18:04 +0200
-> > Matthias Schiffer <matthias.schiffer@ew.tq-group.com> wrote:
-> >   
-> > > Historially, the RGMII PHY modes specified in Device Trees have been  
-> >   ^^^^^^^^^^^
-> >   Historically  
-> > > used inconsistently, often referring to the usage of delays on the PHY
-> > > side rather than describing the board; many drivers still implement this
-> > > incorrectly.
-> > > 
-> > > Require a comment in Devices Trees using these modes (usually mentioning
-> > > that the delay is relalized on the PCB), so we can avoid adding more
-> > > incorrect uses (or will at least notice which drivers still need to be
-> > > fixed).
-> > > 
-> > > Suggested-by: Andrew Lunn <andrew@lunn.ch>
-> > > Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-> > > ---
-> > >  Documentation/dev-tools/checkpatch.rst |  9 +++++++++
-> > >  scripts/checkpatch.pl                  | 11 +++++++++++
-> > >  2 files changed, 20 insertions(+)
-> > > 
-> > > diff --git a/Documentation/dev-tools/checkpatch.rst b/Documentation/dev-tools/checkpatch.rst
-> > > index abb3ff6820766..8692d3bc155f1 100644
-> > > --- a/Documentation/dev-tools/checkpatch.rst
-> > > +++ b/Documentation/dev-tools/checkpatch.rst
-> > > @@ -513,6 +513,15 @@ Comments
-> > >  
-> > >      See: https://lore.kernel.org/lkml/20131006222342.GT19510@leaf/
-> > >  
-> > > +  **UNCOMMENTED_RGMII_MODE**
-> > > +    Historially, the RGMII PHY modes specified in Device Trees have been  
-> >        ^^^^^^^^^^^
-> >       	 Historically  
-> > > +    used inconsistently, often referring to the usage of delays on the PHY
-> > > +    side rather than describing the board.
-> > > +
-> > > +    PHY modes "rgmii", "rgmii-rxid" and "rgmii-txid" modes require the clock
-> > > +    signal to be delayed on the PCB; this unusual configuration should be
-> > > +    described in a comment. If they are not (meaning that the delay is realized
-> > > +    internally in the MAC or PHY), "rgmii-id" is the correct PHY mode.
-> > >  
-> > >  Commit message
-> > >  --------------
-> > > diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-> > > index 784912f570e9d..57fcbd4b63ede 100755
-> > > --- a/scripts/checkpatch.pl
-> > > +++ b/scripts/checkpatch.pl
-> > > @@ -3735,6 +3735,17 @@ sub process {
-> > >  			}
-> > >  		}
-> > >  
-> > > +# Check for RGMII phy-mode with delay on PCB
-> > > +		if ($realfile =~ /\.dtsi?$/ && $line =~ /^\+\s*(phy-mode|phy-connection-type)\s*=\s*"/ &&
-> > > +		    !ctx_has_comment($first_line, $linenr)) {
-> > > +			my $prop = $1;
-> > > +			my $mode = get_quoted_string($line, $rawline);
-> > > +			if ($mode =~ /^"rgmii(?:|-rxid|-txid)"$/) {
-> > > +				CHK("UNCOMMENTED_RGMII_MODE",
-> > > +				    "$prop $mode without comment -- delays on the PCB should be described, otherwise use \"rgmii-id\"\n" . $herecurr);
-> > > +			}
-> > > +		}
-> > > +  
-> > 
-> > My Perl-fu isn't good enough for me to review this properly... I think
-> > though that Andrew mentioned something along the lines of 'Comment
-> > should include PCB somewhere', but I don't know if this is easily
-> > doable with checkpatch though.
-> > 
-> > Maxime  
-> 
-> I think it can be done using ctx_locate_comment instead of ctx_has_comment, but
-> I decided against it - requiring to have a comment at all should be sufficient
-> to make people think about the used mode, and a comment with a bad explanation
-> would hopefully be caught during review.
+This series cleans up the sunxi (sun7i) code in two ways:
 
-True, and having looked at other stuff in checkpatch, it looks like
-there's no other example of rules expecting a specific word in a
-comment.
+1. it converts to use the new set_clk_tx_rate() method, even though
+   we don't use clk_tx_i. In doing so, I reformat the function to
+   read better, but with no changes to the code.
 
-So besides the typo above, I'm OK with this patch :)
+2. convert from stmmac_dvr_probe() to stmmac_pltfr_probe(), and then
+   to its devm variant, which allows code simplification.
 
-Maxime
+ drivers/net/ethernet/stmicro/stmmac/dwmac-sunxi.c | 58 +++++++++--------------
+ 1 file changed, 22 insertions(+), 36 deletions(-)
 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
