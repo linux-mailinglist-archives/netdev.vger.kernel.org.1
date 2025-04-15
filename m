@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-182934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D64AA8A600
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 19:49:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4215AA8A601
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 19:49:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3917B1899CAF
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:49:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D953F3A74F7
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:48:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A201221D82;
-	Tue, 15 Apr 2025 17:48:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4DA02222C6;
+	Tue, 15 Apr 2025 17:49:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="AfGja+uv"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="YWDQbDgN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
+Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEFA122068B
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 17:48:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C36B1F3FDC
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 17:48:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744739339; cv=none; b=pX64vg9oaNehvIzU1INtJCjlNl5g3Jk0KhWo79d5HeQ/yGiSi7ZxMAjrhEu4GJ+9oEQaHdZLl/P2pC4Rz99j/fbcBjP92q3/ioTlK3xXqPVWjF6pSUPQaj1Pj0niipfA7BdOfLp7YMfkeeGuPvYNLAeFJaL2AI7XoL0y4VaH3Gc=
+	t=1744739340; cv=none; b=ppCKfiaIEiUNMjpEfeSwGxnrGISkBE96E7fTDDWxsFq0bzkO4Bdc0QLFw9XGGbH/NDHgfGAW7hvS2aVerAvBVUvgIMXL0bVT24MgEx7odc+aCyAtSsy+LhiCQMmvGOPDa7PgmalGlH4Pzmkgj7oKBna5eHrEu3Ber28agAhgIuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744739339; c=relaxed/simple;
-	bh=xR1fVkn1wNqkaw3ORky7nMlg669ti+csesnvz1DWjcE=;
+	s=arc-20240116; t=1744739340; c=relaxed/simple;
+	bh=P4grIgMcFBx6uX0VhGtxuvQCENvc2Rsj2FroJKBMbDQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HEc2+GWstbLNfPdkCZIwO3nz4qzQKEliaHOVpw67/r2CFaPfmaqxeGWuBdXkzMlVaTgUcG5eTVdk9YEQ6idVPnNM2I1cbwD3vhU4837/AVHc6Hp9vMqfPs/ilzCLY6o1nUkOFhnQaHHtFQ90+id6KtJZiVfwPPsIv2f3RupRArA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=AfGja+uv; arc=none smtp.client-ip=209.85.161.45
+	 MIME-Version; b=R9idrMeG/g6QCDh5Oj5x5dcSTpFYNNG8BGlyMfqm2licVl0wB/pNDdqx/Dj2bMM5/I6ii+e+CLuz6M4FEdnzI3L4/FGv+RtD0D67LdP/zD003mDHlN4QD67QXdScm6J4IfiR1FC0GRsYFxdS3ObZgkNwip02HqgblRdpnn+SiNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=YWDQbDgN; arc=none smtp.client-ip=209.85.161.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-603f54a6cb5so2656962eaf.0
-        for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 10:48:57 -0700 (PDT)
+Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-603ff8e915aso1664907eaf.3
+        for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 10:48:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1744739337; x=1745344137; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1744739338; x=1745344138; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zKkupBbuDOJKK8+xfemEK/+fkXeDRge9t/ewMfGoknk=;
-        b=AfGja+uvcq32znKX8gHVO3exCz49IYvcnDZtjx9Av0SNin+o68Mt2a7Q8qMRl03Rk0
-         YkqMQdwopugBhUrvFXyJ6w1TQb/Bt768YkDpukdesYAeLghd5wuKdZXx5i0/4zA2K9DE
-         /1JKuqsvd0yPJ72PVtK6AcBUuCd1JrIJxU8yM=
+        bh=YgSwWLJCnsmrTM6Kf/YHkuzpzYvCE+MfEaXp8mEkXW0=;
+        b=YWDQbDgNNrhR3uQCV7eu3nacB158z+UNmdP3szVzk0GMfrJbznsdw67RVNOp8ZuSng
+         Pklt0AT8P+K7Jo0AsoH4RtfFWW5/TtN0Dljwz8qFWYi9LrrzAPUmdRMNxmRVQB1PySzx
+         WijHqZz5X/XfY50Nk6RUcCPbresSWIhjkrhGY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744739337; x=1745344137;
+        d=1e100.net; s=20230601; t=1744739338; x=1745344138;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zKkupBbuDOJKK8+xfemEK/+fkXeDRge9t/ewMfGoknk=;
-        b=iNdFmov3pfV/+3jX5ncTTeWhtTasRJT6khwDzFRzEnSu/qITDLS6FhmB9JdEoPNni4
-         ZiRCY+vT6eJkB6+oa4AliO99AWiIZ/g0ywvBrLVE1Vq6yKc6FVg/AqxewuFmSMd0lvvL
-         x4km+fR7lRG02bF03wvFWJBnbtDUbH1RbdDxrFdRceuJfN15b/5UnmqcVdB7kAnlGARJ
-         rvnp5emNqqvOT1z2091qA0OMstZKEOxyJ3w7JlhPHqlux/PJXoAIR3SbAZDtku+LlCyf
-         ehxyrhwZOLkuj/3JRopkreWuE7eLMDeqrDkVihYzYvHHhTQ2Uq6zw0iXC1QxVVKF/rhm
-         CBog==
-X-Gm-Message-State: AOJu0YyuO8A3YYSSswFLHmmCWKYE3AW5dIxBxhKhAJhgPFppR6R34tRy
-	7hod6+6l9Sy7B2wxpjCr4zhlvqpx2ixI5UPhw6UyWQzVNngOJX/Mzn1PpP4OJw==
-X-Gm-Gg: ASbGnctF8Fj0aX7Ibw/EqMMply1krM2Ax6T+XXCekAfUhH3jyQA7DeUjXiN1RE/ftHc
-	raV8R4Tv5EnQJMwkVXKOfHGXsMqxjszqwPnpv9+bTlpA7pl6VEKUGKsQCA4lpb0RZN+l3BzJDND
-	h8bWkfaP3QAoax61wHysc0FQROPRYBHQN9Ye1vBUsRNcFX0OPCS5MxKyTsIGenz6hQUy5lZfp7Y
-	V6ShJDKZKA3OLW8l7zPbQ95AytD1JwJkNTd20skITWDYZ/10gjgCP4/fBnTDfOgkxTledEUxhpe
-	Ya/q5/XAAp4S3dvS0aJfq8Qj/isrqwGij7cFmZDjhS4ZDYyOQXhvsIFCYiGcAFOm1dVGH6Kca3n
-	0CWeT498QNE3HWAFehlRFl5U+r+8=
-X-Google-Smtp-Source: AGHT+IEPHzUGZah0t1K1gUDxskdOTdRdcEbGrXOPTMcmpQ1E5uRHXWBDjwtCrFHW4+wozsVQLTmLWg==
-X-Received: by 2002:a05:6820:3087:b0:602:2bd5:121c with SMTP id 006d021491bc7-6046f584f01mr10279931eaf.3.1744739336868;
-        Tue, 15 Apr 2025 10:48:56 -0700 (PDT)
+        bh=YgSwWLJCnsmrTM6Kf/YHkuzpzYvCE+MfEaXp8mEkXW0=;
+        b=pR3VN4Ok1yZUTyc4HF8Sb3Qf1qQ3EQSNHfPkeelUgYUkqdTYLfHoYczHpPUVaLVTBw
+         bCDoBXybNyJL+8WJyz25vunxj7oZzttPB66AZELrY9S75Gm5Dw0jGxOJoLPZMm4Cxj4Z
+         dyuS1oX/RLhOC1Vv6oNGB4d7dyxMbzkWgHhHApYK6VSLTMp+55IExhr79GEXje0rWMOb
+         ADwJ2RuGfdoNG4z2U1v63xdrbwPnuh8oZc9tM33pmBWRWVWRV8lb7kw4YmAX6TNeok3+
+         PstvuPYe5fTglPplh96RnIrhfrAxOeNoos3Y9xMRRroe4QnKKDZwz7kP5BAlczr6cemQ
+         RvpQ==
+X-Gm-Message-State: AOJu0YxSCgaNTZIvaW02JlNqp6nSbaw79ln+cf+21q2A5ENUURWRb1nj
+	SpEB7tz2q2c/N5EdBxcjDgUG/2vMqaw387UMF01QEa/KsaJNjoKk449/kKCBq+T6oTvEJSMydo4
+	=
+X-Gm-Gg: ASbGncsZI74yzTswVE7ZyQPyR0qRU8m11WllHa4a4oty8R14JohhOzmM3/AQDQe6cz3
+	BopbifAH2LBDhLdcMUcGjBuMXefORPvZtTmk9Mu+dFZUxXotOY+DqshFktmXhVDKHyxo1PWN1H9
+	Fh9AaDcCMcOr5IrvV19C0W9QkUPIRAd/iF12NB0cTDKOVjVjzMarbSPK1G/ept5m2mvijY34D/A
+	fc7gm8+6VKj3f9UIXdrqcUXwwrsJbbV945YGUhZWhT+NQq9Jg6o069Z5DZGNguMHkZwv1U3Ar07
+	n8Zyh03+Ini56HNX7qQQq5JOYrhKfmTH8jIqUAcnM2BN0eqhq/qcnX4y+Rlmr2CnojWPsYpFq38
+	ROqorQJhpFunHVCJz
+X-Google-Smtp-Source: AGHT+IFXklvxW0G5/85K69JyhI5pYnciRqWEUyJ/OgBrcHD3g2epaGat13qd2dU3ptOg0IpSpbYEwg==
+X-Received: by 2002:a05:6820:2087:b0:601:d595:3b1f with SMTP id 006d021491bc7-6046f590ac6mr9698025eaf.6.1744739338086;
+        Tue, 15 Apr 2025 10:48:58 -0700 (PDT)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6045f50ee87sm2457073eaf.7.2025.04.15.10.48.54
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6045f50ee87sm2457073eaf.7.2025.04.15.10.48.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Apr 2025 10:48:56 -0700 (PDT)
+        Tue, 15 Apr 2025 10:48:57 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -78,10 +79,11 @@ Cc: netdev@vger.kernel.org,
 	andrew+netdev@lunn.ch,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com,
-	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Subject: [PATCH net-next 1/4] bnxt_en: Change FW message timeout warning
-Date: Tue, 15 Apr 2025 10:48:15 -0700
-Message-ID: <20250415174818.1088646-2-michael.chan@broadcom.com>
+	Shruti Parab <shruti.parab@broadcom.com>,
+	Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
+Subject: [PATCH net-next 2/4] bnxt_en: Report the ethtool coredump length after copying the coredump
+Date: Tue, 15 Apr 2025 10:48:16 -0700
+Message-ID: <20250415174818.1088646-3-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.43.4
 In-Reply-To: <20250415174818.1088646-1-michael.chan@broadcom.com>
 References: <20250415174818.1088646-1-michael.chan@broadcom.com>
@@ -93,41 +95,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The firmware advertises a "hwrm_cmd_max_timeout" value to the driver
-for NVRAM and coredump related functions that can take tens of seconds
-to complete.  The driver polls for the operation to complete under
-mutex and may trigger hung task watchdog warning if the wait is too long.
-To warn the user about this, the driver currently prints a warning if
-this advertised value exceeds 40 seconds:
+From: Shruti Parab <shruti.parab@broadcom.com>
 
-Device requests max timeout of %d seconds, may trigger hung task watchdog
+ethtool first calls .get_dump_flags() to get the dump length.  For
+coredump, the driver calls the FW to get the coredump length (L1).  The
+min. of L1 and the user specified length is then passed to
+.get_dump_data() (L2) to get the coredump.  The actual coredump length
+retrieved by the FW (L3) during .get_dump_data() may be smaller than L1.
+This length discrepancy will trigger a WARN_ON() in
+ethtool_get_dump_data().
 
-The original hope was that newer FW would be able to reduce this timeout
-below 40 seconds.  But 60 seconds is the timeout on most production FW
-and cannot be reduced further.  Change the driver's warning threshold to
-60 seconds to avoid triggering this warning on all production devices.
+ethtool has already vzalloc'ed a buffer with size L1.  Just report
+the coredump length as L2 even though the actual coredump length L3
+may be smaller.  The extra zero padding does not matter.  This will
+prevent the warning that may alarm the user.
 
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+For correctness, only do the final length update if there is no error.
+
 Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Reviewed-by: Damodharam Ammepalli <damodharam.ammepalli@broadcom.com>
+Signed-off-by: Shruti Parab <shruti.parab@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.h
-index 15ca51b5d204..fb5f5b063c3d 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.h
-@@ -58,7 +58,7 @@ void hwrm_update_token(struct bnxt *bp, u16 seq, enum bnxt_hwrm_wait_state s);
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
+index 5576e7cf8463..9b6489e417fc 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_coredump.c
+@@ -496,9 +496,16 @@ static int __bnxt_get_coredump(struct bnxt *bp, u16 dump_type, void *buf,
+ 					  start_utc, coredump.total_segs + 1,
+ 					  rc);
+ 	kfree(coredump.data);
+-	*dump_len += sizeof(struct bnxt_coredump_record);
+-	if (rc == -ENOBUFS)
++	if (!rc) {
++		*dump_len += sizeof(struct bnxt_coredump_record);
++		/* The actual coredump length can be smaller than the FW
++		 * reported length earlier.  Use the ethtool provided length.
++		 */
++		if (buf_len)
++			*dump_len = buf_len;
++	} else if (rc == -ENOBUFS) {
+ 		netdev_err(bp->dev, "Firmware returned large coredump buffer\n");
++	}
+ 	return rc;
+ }
  
- #define BNXT_HWRM_MAX_REQ_LEN		(bp->hwrm_max_req_len)
- #define BNXT_HWRM_SHORT_REQ_LEN		sizeof(struct hwrm_short_input)
--#define HWRM_CMD_MAX_TIMEOUT		40000U
-+#define HWRM_CMD_MAX_TIMEOUT		60000U
- #define SHORT_HWRM_CMD_TIMEOUT		20
- #define HWRM_CMD_TIMEOUT		(bp->hwrm_cmd_timeout)
- #define HWRM_RESET_TIMEOUT		((HWRM_CMD_TIMEOUT) * 4)
 -- 
 2.30.1
 
