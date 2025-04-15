@@ -1,180 +1,295 @@
-Return-Path: <netdev+bounces-182803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8E8CA89EEC
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:04:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C36BAA89EF5
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:07:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC9CF7A2D03
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:03:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD5657A9ABF
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:06:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 790762973D2;
-	Tue, 15 Apr 2025 13:04:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD6FC296D0A;
+	Tue, 15 Apr 2025 13:07:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H8InTvPc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lll8txmx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3FB32DFA4C;
-	Tue, 15 Apr 2025 13:04:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E88FD2820B0
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 13:07:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744722267; cv=none; b=q/5R09GyyJfdWCE4zo+Lk2CGaTJ27uLtPRAOxH3oa6BycSUR8zY+E4nnwI24KVw7lnQ/j6ZkPg+2+LNbh7cI/JMjpXznq+TL0+gWCXKZwNds5/wZDY3Y4fiKu/q5l74CDod7tU2sPsex3M3UyrBDcbkndn4sEwsbLylm48gaLKs=
+	t=1744722451; cv=none; b=OmxlrJLOuGtP2gVlAnxPUlh8eaI4MHcZBRZOnG06QBRV85Rl7KSwPCFQNYSWNm8C4ybEcHT7zyZDoN3ncBdjD0Vy4AKWyOpSQ+6cHjWsd/al2h2LcM/v/HhAHopqzWubUAKh3oqxB3sR/zxLoaOUfA/Mv12aQgWhOZVIclfl0Xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744722267; c=relaxed/simple;
-	bh=sa7Skd2aaXb0VF8USJsNqb1mTJyQs3A826CyqUahHUs=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Brmb+I/lbJR6ibHrC9cVJWLS1TSM17HWfmU4RSLldFPhtea3O5N0+sU/d83d/g0EnrjWzLow0CjGN2Iud4+/n6F/xvoEgFkDAy4w3Pmesq/At2l9tuZcrtrjItTakh/WmLuHUbygi3m3fM9iI1yf1wvNCypRlA5MrExuKjq/Fxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H8InTvPc; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43cf58eea0fso28157835e9.0;
-        Tue, 15 Apr 2025 06:04:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744722264; x=1745327064; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=+PNNMorDjrK3jPX7Cg5O+Ib6RnAEFHMPsiH2T1ynei0=;
-        b=H8InTvPcsb9ERWkwZlzWxp6Yx4ZpsiOGCqyvfi5SwOVmeHBQUCVxf2dHRdxglf6wUF
-         ifiaFcpXerxzI3HoeXlCl0GilG5LApxQkS4Z49wuNAFchs+77CyWGJegEpJ5WRlsF4Bk
-         IcjKL8wKGObODfVo8+gZex6gaxKbkCkeJAUb5aNLg223yy7AEDnCPnwGDS/AEHbuBwja
-         dIlyD6uUmlKoUEQngr142OMq+areqPTKhnoUkxwN75VlPFKqtqyu/1TcWvdYcdgOC7lz
-         sxUF8nLr92BQW7V5EYAoF8iNdimxEYjSh6Pj53izhhWVhkOFpjVwOjeII1W401Amz31h
-         CvOA==
+	s=arc-20240116; t=1744722451; c=relaxed/simple;
+	bh=hbAmnZsh5Ulpas5PQOBKrcCxo8u/pRs+/rsbRISvROI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FqNo47fM2OI1h9U+VKVaHd4r0vGxCd+rZhUmQGJQN/iq/MnFe1n4aXEMTxm1yha9Lh4PwA1Bvt4qViVK1VvChamouVgnGuL9HYuOJaH2eeK0ZcO458Jm1gtE/RarR9NOvXoWeYoNnFJFhjDeYIfCEc38+w04qJaiMbTa21+i9MI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Lll8txmx; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744722448;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nSyTSXqKjTcBXn4151tXkrtZryXo4pU/7BOagEpBZqA=;
+	b=Lll8txmxkDNUAirqesQ82MF4mLMA9VxheTSam7+8thZZiFBv3/nfpg9sj+YQDDAhjacObu
+	bUJxDwLEWup6vjWAuhjyArSTKnnjFY+TwXKQXGH6kHxsddktb0E4KiRFYMVkcVZ0t1OW+Q
+	eBSkCQYd0IK72CXmJag8DNnVLsunqN8=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-367-qNKSl4tmOwu_H17wIbqiSQ-1; Tue, 15 Apr 2025 09:07:26 -0400
+X-MC-Unique: qNKSl4tmOwu_H17wIbqiSQ-1
+X-Mimecast-MFC-AGG-ID: qNKSl4tmOwu_H17wIbqiSQ_1744722445
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3912a0439afso2273129f8f.3
+        for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 06:07:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744722264; x=1745327064;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1744722445; x=1745327245;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+PNNMorDjrK3jPX7Cg5O+Ib6RnAEFHMPsiH2T1ynei0=;
-        b=YnylgSg10XrPi1oA3e+EbdGmednuncjDuH4h1IGpECIM04ERKz9DvVvPcjTVorU804
-         VnkwAp90QcKroyuUeI05gSz8RAXFlv1wFbpzSI/BYIG8G9+HKIDabzuAuOtfkrqtjkQ/
-         dTxkf3epzdlCplkAF/ZRQ3d+vLLbrvLee10vYa3KN/YwQvb8njafnsh64G7zopFCOHBx
-         FJRCidLQRy2GtgvjB2LfEKF9TK6er7b8rk1wstShOPoB+upA4INAifBGHnAH4dFsjtUy
-         dm4JMl+OG1Y9OQ7G1nXpEESOZzEACr7lSNbKuYMTrkCRGEmxRRf88QZlgnqWiAGzLDui
-         BgRg==
-X-Forwarded-Encrypted: i=1; AJvYcCXe+qxMAu4vvIXo1FOZ6+EUukP8nJytFS78I4cLoDfJ0V9HsrLEAqoiUWaw8UZ1TcCrCK1tigvd@vger.kernel.org, AJvYcCXjrFwJeo6Wa1m3qQhEzXeWp+TicytHI65VH+EVmw5wttXEfmmN/40iswfd+YP+ku5Gn7KI3JDgGM49@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpAERN4jo58Q3ohEJ3HGjGfC1rCt8UvonBmdcUe4xfRS1eQh5E
-	fs9thCNlXOqroTLMI1NRGaRi4smThA8j8jK41quMdfR7s4c1fmC2
-X-Gm-Gg: ASbGncsyqf6SnNeFWGy5ufRBcnhGGIzMPqz2Tl6HfpP6AtIiEl2Rf6ZsKBkD0mNwg2V
-	N9HOA1X9URZ83/Tdha4xwmiMpaBmVRGgYLSGJWPsge/v5Zr/v3I1ZKVg2v5Qgblhvbmv00N8gYy
-	j8ciPkLwKLAgupYIpEi5G+3vsyL7X8Yh+YRYFc9KtJMEAa1MWOTPsOeDuOndcirCL4LTo0Ue6rj
-	P3S/OUOOP1t+E5hlpkrSTn/nmJgzCR8nb+wSooz+Lo5LXHmXGRkPFa9FWqoeQEO7S4nlvVofey9
-	ENDnGvQgPPXXFUztqKzSC6rK0+DetQyoUyHsiwEsGc7AGbd5xWqeNyuwCrfYmGv+rlliMahuPca
-	+VKOwCTzA/LVZ
-X-Google-Smtp-Source: AGHT+IFjvOvuLlb3DPkaAYoMi6rOX66PTgUOC+2ABZ7NcqxMs9iL57C5P8JCwArGpmNJpCbge+P5Cg==
-X-Received: by 2002:a05:600c:1e09:b0:43b:cc3c:60bc with SMTP id 5b1f17b1804b1-43f3a959790mr155195855e9.15.1744722263377;
-        Tue, 15 Apr 2025 06:04:23 -0700 (PDT)
-Received: from Ansuel-XPS. (host-95-249-95-100.retail.telecomitalia.it. [95.249.95.100])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43f2075fca5sm216575095e9.32.2025.04.15.06.04.21
+        bh=nSyTSXqKjTcBXn4151tXkrtZryXo4pU/7BOagEpBZqA=;
+        b=plGzHw1cgvSjtssRTiv823JbaxBLaUJj6j+1jSemOJEFyKRfNsstHLSNYqLhldOSil
+         +6oPE5KwCw7nUx7f3N6pCctWbUJ3znrjWMPyzD0f74gHLnZ3yEzW3KzVqvLZGPb5EJn/
+         KSCrEFzRtDBHEx3ndiz465ucFY9OroHLdWvxz1PWDcRTM49yQHBO24vJ3qLnxgTRlAMn
+         /dsIg62VKDG99BeavDoeH/ClMrCaCx6qRsS4RFwvLLAPEgh9teGVVA1TbS/8gC1Kpkwd
+         O8mBqK8YisaxqlcOuDefC1dP6qVafZJcwHFGAQupiS51mNYQ1KlQK65SqZF/ChOCqb+9
+         OXMw==
+X-Forwarded-Encrypted: i=1; AJvYcCUKw3wSYdIPKcLDW4p951cQxDirnkUjamdEuCt4LpIa6ZXpKVLtNUM972DnmrXv5S050E9dgUg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzcepni7vGki/AolVA/XIUDPBF/BWjGEIjNqyckwyVsK2LMlimY
+	b4aI8nvdWeKR+lh+1SHJ5l9NznncGUDdeHFZWnMGUAat8HS48PdH0WApkxfr6jkwAzRVZc8gQ6j
+	pkqoFPPO37Bu8PCnnVmn5O/9kEzl5eNpBTtgZ8SpNPPEh+gtBGNtMpA==
+X-Gm-Gg: ASbGnctEq7f8x8LQ7ty5C1P3hGzbHa5gG58XAT6ZW02a136rkjJr2qjqjVktdgATr/Q
+	DYAbUXG8sV7XVr9rd/evZb9qE3rmg6s5UpbznU1G3yI+vFMd+IBkdWprefbiM5eTPst2SIsH/8+
+	dcutkcmKUAnPM/zh8t0Qs+RPzah2SoODpjGzB4zYidoqNd0moa9WSTfinJx0XWdcGpYDgV4LGAi
+	OdYEWVrjvHHP89GUUjPrxvzvRRk0YQuDD9XX9goiOWgjnU4ahmafhLy9qi4LOO2B+nD1x8eRgra
+	5OKhECcL9LsYUiQMwQ==
+X-Received: by 2002:a05:6000:40c9:b0:39c:1258:2dc7 with SMTP id ffacd0b85a97d-39eaaec9f18mr12258703f8f.56.1744722444831;
+        Tue, 15 Apr 2025 06:07:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFGCpp17azL0waomWVbI/H3QHq8JDgj/Oln6djR13jBcm4wCNObRACIdSPwy7UY64ggQFtQ1w==
+X-Received: by 2002:a05:6000:40c9:b0:39c:1258:2dc7 with SMTP id ffacd0b85a97d-39eaaec9f18mr12258604f8f.56.1744722443728;
+        Tue, 15 Apr 2025 06:07:23 -0700 (PDT)
+Received: from sgarzare-redhat ([193.207.149.183])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eae963f62sm13964116f8f.5.2025.04.15.06.07.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Apr 2025 06:04:22 -0700 (PDT)
-Message-ID: <67fe5956.050a0220.347569.4476@mx.google.com>
-X-Google-Original-Message-ID: <Z_5ZUZuRBn0Um1rd@Ansuel-XPS.>
-Date: Tue, 15 Apr 2025 15:04:17 +0200
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Andrei Botila <andrei.botila@oss.nxp.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Eric Woudstra <ericwouds@gmail.com>,
-	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.or
-Subject: Re: [net-next PATCH v7 5/6] net: phy: Add support for Aeonsemi
- AS21xxx PHYs
-References: <20250410095443.30848-1-ansuelsmth@gmail.com>
- <20250410095443.30848-6-ansuelsmth@gmail.com>
- <Z_4o7SBGxHBdjWFZ@shell.armlinux.org.uk>
- <67fe41e5.5d0a0220.1003f3.9737@mx.google.com>
- <Z_5XQZvgdW6Wfo06@shell.armlinux.org.uk>
+        Tue, 15 Apr 2025 06:07:22 -0700 (PDT)
+Date: Tue, 15 Apr 2025 15:07:16 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+Subject: Re: vsock broken after connect() returns EINTR (was Re: [PATCH net
+ 2/2] vsock/test: Add test for SO_LINGER null ptr deref)
+Message-ID: <js3gdbpaupbglmtowcycniidowz46fp23camtvsohac44eybzd@w5w5mfpyjawd>
+References: <vsghmgwurw3rxzw32najvwddolmrbroyryquzsoqt5jr3trzif@4rjr7kwlaowa>
+ <df2d51fd-03e7-477f-8aea-938446f47864@rbox.co>
+ <xafz4xrgpi5m3wedkbhfx6qoqbbpogryxycrvawwzerge3l4t3@d6r6jbnpiyhs>
+ <f201fcb6-9db9-4751-b778-50c44c957ef2@rbox.co>
+ <hkhwrfz4dzhaco4mb25st5zyfybimchac3zcqsgzmtim53sq5o@o4u6privahp3>
+ <aa00af3b-2bb1-4c09-8222-edeec0520ae1@rbox.co>
+ <cd7chdxitqx7pvusgt45p7s4s4cddyloqog2koases4ocvpayg@ryndsxdgm5ul>
+ <7566fe52-23b7-46cc-95ef-63cbbd3071a1@rbox.co>
+ <kiz4tjwsvauyupixpccqug5wt7tq7g3mld5yy5drpg5zxkmiap@3z625aedysx7>
+ <d3a0a4e3-57bd-43f2-8907-af60c18d53ec@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <Z_5XQZvgdW6Wfo06@shell.armlinux.org.uk>
+In-Reply-To: <d3a0a4e3-57bd-43f2-8907-af60c18d53ec@rbox.co>
 
-On Tue, Apr 15, 2025 at 01:55:29PM +0100, Russell King (Oracle) wrote:
-> On Tue, Apr 15, 2025 at 01:24:16PM +0200, Christian Marangi wrote:
-> > On Tue, Apr 15, 2025 at 10:37:49AM +0100, Russell King (Oracle) wrote:
-> > > > +static int aeon_ipcs_wait_cmd(struct phy_device *phydev, bool parity_status)
-> > > > +{
-> > > > +	u16 val;
-> > > > +
-> > > > +	/* Exit condition logic:
-> > > > +	 * - Wait for parity bit equal
-> > > > +	 * - Wait for status success, error OR ready
-> > > > +	 */
-> > > > +	return phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1, VEND1_IPC_STS, val,
-> > > > +					 FIELD_GET(AEON_IPC_STS_PARITY, val) == parity_status &&
-> > > > +					 (val & AEON_IPC_STS_STATUS) != AEON_IPC_STS_STATUS_RCVD &&
-> > > > +					 (val & AEON_IPC_STS_STATUS) != AEON_IPC_STS_STATUS_PROCESS &&
-> > > > +					 (val & AEON_IPC_STS_STATUS) != AEON_IPC_STS_STATUS_BUSY,
-> > > > +					 AEON_IPC_DELAY, AEON_IPC_TIMEOUT, false);
-> > > 
-> > > Hmm. I'm wondering whether:
-> > > 
-> > > static bool aeon_ipc_ready(u16 val, bool parity_status)
-> > > {
-> > > 	u16 status;
-> > > 
-> > > 	if (FIELD_GET(AEON_IPC_STS_PARITY, val) != parity_status)
-> > > 		return false;
-> > > 
-> > > 	status = val & AEON_IPC_STS_STATUS;
-> > > 
-> > > 	return status != AEON_IPC_STS_STATUS_RCVD &&
-> > > 	       status != AEON_IPC_STS_STATUS_PROCESS &&
-> > > 	       status != AEON_IPC_STS_STATUS_BUSY;
-> > > }
-> > > 
-> > > would be better, and then maybe you can fit the code into less than 80
-> > > columns. I'm not a fan of FIELD_PREP_CONST() when it causes differing
-> > > usage patterns like the above (FIELD_GET(AEON_IPC_STS_STATUS, val)
-> > > would match the coding style, and probably makes no difference to the
-> > > code emitted.)
-> > > 
-> > 
-> > You are suggesting to use a generic readx function or use a while +
-> > sleep to use the suggested _ready function?
-> 
-> To write the other part of it (I thought this would be obvious!):
-> 
-> +	return phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1, VEND1_IPC_STS, val,
-> +					 aeon_ipc_ready(val, parity_status),
-> +					 AEON_IPC_DELAY, AEON_IPC_TIMEOUT, false);
+On Fri, Apr 11, 2025 at 04:43:35PM +0200, Michal Luczaj wrote:
+>On 4/11/25 15:21, Stefano Garzarella wrote:
+>> On Fri, Apr 04, 2025 at 12:06:36AM +0200, Michal Luczaj wrote:
+>>> On 4/1/25 12:32, Stefano Garzarella wrote:
+>>>> On Tue, Mar 25, 2025 at 02:22:45PM +0100, Michal Luczaj wrote:
+>>>>> ...
+>>>>> Plus, it appears to be broken: when I hit this condition and I try to
+>>>>> re-connect to the same listener, I get ETIMEDOUT for loopback and
+>>>>> ECONNRESET for g2h virtio; see [2].
+>>>>
+>>>> Could this be related to the fix I sent some days ago?
+>>>> https://lore.kernel.org/netdev/20250328141528.420719-1-sgarzare@redhat.com/
+>>>
+>>> I've tried that. I've also took a hint from your other mail and attempted
+>>> flushing the listener queue, but to no avail. Crude code below. Is there
+>>> something wrong with it?
+>>
+>> I can't see anything wrong, but I'm starting to get confused :-(
+>> we're talking about too many things in the same thread.
+>
+>Uhm, that's true, sorry. I've split the thread, hope this helps.
+>
+>> What issues do you want to highlight?
+>
+>Once connect() fails with EINTR (e.g. due to a signal delivery), retrying
+>connect() (to the same listener) fails. That is what the code below was
+>trying to show.
+
+mmm, something is going wrong in the vsock_connect().
+
+IIUC if we fails with EINTR, we are kind of resetting the socket.
+Should we do the same we do in vsock_assign_transport() when we found 
+that we are changing transport?
+
+I mean calling release(), vsock_deassign_transport(). etc.
+I'm worried about having pending packets in flight.
+
+BTW we need to investigate more, I agree.
+
+Thanks,
+Stefano
+
+>
+>> #include <stdio.h>
+>> #include <errno.h>
+>> #include <stdlib.h>
+>> #include <unistd.h>
+>> #include <signal.h>
+>> #include <pthread.h>
+>> #include <sys/socket.h>
+>> #include <linux/vm_sockets.h>
+>>
+>> static void die(const char *msg)
+>> {
+>> 	perror(msg);
+>> 	exit(-1);
+>> }
+>>
+>> static void barrier(pthread_barrier_t *barr)
+>> {
+>> 	errno = pthread_barrier_wait(barr);
+>> 	if (errno && errno != PTHREAD_BARRIER_SERIAL_THREAD)
+>> 		die("pthread_barrier_wait");
+>> }
+>>
+>> static void flush_accept(int s)
+>> {
+>> 	int p = accept(s, NULL, NULL);
+>> 	if (p < 0) {
+>> 		if (errno != EAGAIN)
+>> 			perror("accept");
+>> 		return;
+>> 	}
+>>
+>> 	printf("accept: drained\n");
+>> 	close(p);
+>> }
+>>
+>> static void handler(int signum)
+>> {
+>> 	/* nop */
+>> }
+>>
+>> void static set_accept_timeout(int s)
+>> {
+>> 	struct timeval tv = { .tv_sec = 1 };
+>> 	if (setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)))
+>> 		die("setsockopt SO_RCVTIMEO");
+>> }
+>>
+>> void static set_connect_timeout(int s)
+>> {
+>> 	struct timeval tv = { .tv_sec = 1 };
+>> 	if (setsockopt(s, AF_VSOCK, SO_VM_SOCKETS_CONNECT_TIMEOUT, &tv,
+>> 		       sizeof(tv)))
+>> 		die("setsockopt SO_VM_SOCKETS_CONNECT_TIMEOUT");
+>> }
+>>
+>> static void *killer(void *arg)
+>> {
+>> 	pthread_barrier_t *barr = (pthread_barrier_t *)arg;
+>> 	pid_t pid = getpid();
+>>
+>> 	if ((errno = pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS,
+>> 					   NULL)))
+>> 		die("pthread_setcanceltype");
+>>
+>> 	for (;;) {
+>> 		barrier(barr);
+>> 		if (kill(pid, SIGUSR1))
+>> 			die("kill");
+>> 		barrier(barr);
+>> 	}
+>>
+>> 	return NULL;
+>> }
+>>
+>> int main(void)
+>> {
+>> 	struct sockaddr_vm addr = {
+>> 		.svm_family = AF_VSOCK,
+>> 		.svm_cid = VMADDR_CID_LOCAL,
+>> 		.svm_port = 1234
+>> 	};
+>> 	socklen_t alen = sizeof(addr);
+>> 	pthread_barrier_t barr;
+>> 	pthread_t tid;
+>> 	int s, c;
+>>
+>> 	if ((errno = pthread_barrier_init(&barr, NULL, 2)))
+>> 		die("pthread_barrier_init");
+>>
+>> 	if (signal(SIGUSR1, handler) == SIG_ERR)
+>> 		die("signal");
+>>
+>> 	s = socket(AF_VSOCK, SOCK_STREAM, 0);
+>> 	if (s < 0)
+>> 		die("socket s");
+>> 	set_accept_timeout(s);
+>>
+>> 	if (bind(s, (struct sockaddr *)&addr, alen))
+>> 		die("bind");
+>>
+>> 	if (listen(s, 64))
+>> 		die("listen");
+>>
+>> 	if ((errno = pthread_create(&tid, NULL, killer, &barr)))
+>> 		die("pthread_create");
+>>
+>> 	for (;;) {
+>> 		c = socket(AF_VSOCK, SOCK_STREAM, 0);
+>> 		if (c < 0)
+>> 			die("socket c");
+>>
+>> 		barrier(&barr);
+>> 		if (connect(c, (struct sockaddr *)&addr, sizeof(addr)) &&
+>> 		    errno == EINTR) {
+>> 		    	printf("connect: EINTR\n");
+>> 			break;
+>> 		}
+>> 		barrier(&barr);
+>>
+>> 		close(c);
+>> 		flush_accept(s);
+>> 	}
+>>
+>> 	if ((errno = pthread_cancel(tid)))
+>> 		die("pthread_cancel");
+>>
+>> 	if ((errno = pthread_join(tid, NULL)))
+>> 		die("pthread_join");
+>>
+>> 	flush_accept(s);
+>> 	set_connect_timeout(c);
+>> 	if (connect(c, (struct sockaddr *)&addr, sizeof(addr)))
+>> 		die("re-connect");
+>>
+>> 	printf("okay?\n");
+>>
+>> 	return 0;
+>> }
+>>
+>
 >
 
-Eh I never considered that I could totally pass entire function in the
-condition part. 
-
-> > Mhhh I think I will have to create __ function for locked and non-locked
-> > variant. I think I woulkd just handle the lock in the function using
-> > send and rcv and maybe add some smatch tag to make sure the lock is
-> > taken when entering those functions.
-> 
-> If you don't need the receive part, then pass NULL in for the receive
-> data pointer, and use that to conditionalise that part?
-> 
-
-Ok yes that can also work.
-
--- 
-	Ansuel
 
