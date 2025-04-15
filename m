@@ -1,84 +1,63 @@
-Return-Path: <netdev+bounces-182644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 231D3A8977A
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 11:07:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA63EA8978A
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 11:10:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39AEF3BAAC0
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 09:07:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8280189755E
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 09:10:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C9D127A939;
-	Tue, 15 Apr 2025 09:06:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE60C280CD1;
+	Tue, 15 Apr 2025 09:09:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Ub4eQxzW"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="DVF+1joy"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AC2A289357;
-	Tue, 15 Apr 2025 09:06:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA2541624CE;
+	Tue, 15 Apr 2025 09:09:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744707991; cv=none; b=sP/sm/gq9zHDsuix2LFym018CLh6WCRaYgxn8sALxqgWhxULYo7ehHMT0iJI0MyISunByjVhjy+7Xb27NoPzpOtkjF8Rc14xRUOSeiL5qfNperjjLO0at9p7gMTMsdRCya6Wnd0PsCyLnXgyjgGUxBpMyehUHt4jSoC7qpqgKaA=
+	t=1744708197; cv=none; b=gm91j3ZG3KilOA9OAE3cWn/hLLbomMQ8HFHP22i0338gbVsZX420z1mBlHxlhn2/7W37lsGdqGI6Krwol93+bDICk4vJCVCGwKVbL5sBYOGHmvYOLreL2QXcknEKZaiwAR0tEe/mkZZ1K57TLFra/Z5yIi+Xf0DV53jFhZkpsFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744707991; c=relaxed/simple;
-	bh=SwqYHKdJdLoovSs29qeQIztDbSM1TuvqLAVPWM0G19Q=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Je5Hc9x26+ehFm484adAJCo/wXEyLWUv7avkLDrT1uzezWir9ll24haZ+M/XHs0OWTlYz32jZz4WVcd9v3CQt8TQhjWhGMcRFfkEgVEjlCxnBCEHZH/I8nNpN3n0TpTXhZB1JUuc7zPPMRnDDXBQo6aRNWVi5mmaNoINJWsUMmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Ub4eQxzW; arc=none smtp.client-ip=198.47.19.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 53F95wGH2996245
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 15 Apr 2025 04:05:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1744707958;
-	bh=zbbMws7/JHr51qmHgB5wtBPMnAvtKhFkR+q7a0rSNgo=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=Ub4eQxzWW27JJe6N0qadN8dFErC+Lhph4tzFUZi5nNBT8/Cwlw74266Y72rDSgjjj
-	 fzq9+wFEhh5JK9HFxuPL60pPI589jFMtfH60pstnROOeddhzyRM8zc4OrllXNMF8WU
-	 VWwl6ljMNLKy3tLW62AK6D3NRFeaocOWqwzOZpvw=
-Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 53F95wUn012296
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 15 Apr 2025 04:05:58 -0500
-Received: from DFLE114.ent.ti.com (10.64.6.35) by DFLE100.ent.ti.com
- (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 15
- Apr 2025 04:05:57 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE114.ent.ti.com
- (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 15 Apr 2025 04:05:57 -0500
-Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 53F95v1N029324;
-	Tue, 15 Apr 2025 04:05:57 -0500
-Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 53F95uu5010969;
-	Tue, 15 Apr 2025 04:05:57 -0500
-From: Meghana Malladi <m-malladi@ti.com>
-To: <dan.carpenter@linaro.org>, <javier.carrasco.cruz@gmail.com>,
-        <diogo.ivo@siemens.com>, <horms@kernel.org>,
-        <jacob.e.keller@intel.com>, <m-malladi@ti.com>,
-        <john.fastabend@gmail.com>, <hawk@kernel.org>, <daniel@iogearbox.net>,
-        <ast@kernel.org>, <richardcochran@gmail.com>, <pabeni@redhat.com>,
-        <kuba@kernel.org>, <edumazet@google.com>, <davem@davemloft.net>,
-        <andrew+netdev@lunn.ch>
-CC: <bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
-        Roger Quadros
-	<rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: [PATCH net v4 3/3] net: ti: icss-iep: Fix possible NULL pointer dereference for perout request
-Date: Tue, 15 Apr 2025 14:35:43 +0530
-Message-ID: <20250415090543.717991-4-m-malladi@ti.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250415090543.717991-1-m-malladi@ti.com>
-References: <20250415090543.717991-1-m-malladi@ti.com>
+	s=arc-20240116; t=1744708197; c=relaxed/simple;
+	bh=+DN455WnonAB9C1766sHXcT9vaWq/MFRkyR6Od5Ne9o=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=m8FOPqwSIaKqm7rgg3rkcf/00ZdV2zbLoqXQOL3cKDvUnpuvbUteRyoz9KcDzPuzDO1faLmI1m26TUH+XNeTMUs24EkRM1/N6gcaLyQ/RnPXstxbHw6zI8OFb7c5VexDvtUJHQfQBlag3qP6z9qchaJHZMkGWzz11Y93FDG8qDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=DVF+1joy; arc=none smtp.client-ip=117.135.210.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=y+ZpA
+	l7MliTj0FVdYv9+vvRQ2sbzJqKY2QgkzqHdZ0U=; b=DVF+1joyQZ5a60IDSDyKK
+	PZndTObbNjkKGUf3LwyDWjYTsoc9uAvbM6blN7+NbcZUbYneugC0+HEJoPNmYiD3
+	I3zy9D/FAtRzYbAC25kT9RPkJoj8xqUV+ze4PgmVWG6usIZmIF6uquWfD1rgKbLp
+	GJs4omD95dI5Rs4ko3oTw4=
+Received: from localhost.localdomain (unknown [])
+	by gzsmtp1 (Coremail) with SMTP id PCgvCgDHjy0WIv5n117eAQ--.55540S4;
+	Tue, 15 Apr 2025 17:08:39 +0800 (CST)
+From: lvxiafei <xiafei_xupt@163.com>
+To: xiafei_xupt@163.com
+Cc: coreteam@netfilter.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	horms@kernel.org,
+	kadlec@netfilter.org,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	lvxiafei@sensetime.com,
+	netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	pabeni@redhat.com,
+	pablo@netfilter.org
+Subject: [PATCH V6] netfilter: netns nf_conntrack: per-netns net.netfilter.nf_conntrack_max sysctl
+Date: Tue, 15 Apr 2025 17:08:34 +0800
+Message-Id: <20250415090834.24882-1-xiafei_xupt@163.com>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20250407095052.49526-1-xiafei_xupt@163.com>
+References: <20250407095052.49526-1-xiafei_xupt@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,191 +65,257 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-CM-TRANSID:PCgvCgDHjy0WIv5n117eAQ--.55540S4
+X-Coremail-Antispam: 1Uf129KBjvJXoW3tFy5ZryUWry5AFy7GF43GFg_yoWDWF1rp3
+	Wft347Jw17Jr4Yya1j93yDAFsxG393Ca4a9rn8CFyrCwsI9r15CF4rKFyxJF98Jry8AFy3
+	ZF4jvr1UAan5taDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRY2NtUUUUU=
+X-CM-SenderInfo: x0ldwvplb031rw6rljoofrz/1tbiKBYwU2f+GlDknwAAs1
 
-The ICSS IEP driver tracks perout and pps enable state with flags.
-Currently when disabling pps and perout signals during icss_iep_exit(),
-results in NULL pointer dereference for perout.
+From: lvxiafei <lvxiafei@sensetime.com>
 
-To fix the null pointer dereference issue, the icss_iep_perout_enable_hw
-function can be modified to directly clear the IEP CMP registers when
-disabling PPS or PEROUT, without referencing the ptp_perout_request
-structure, as its contents are irrelevant in this case.
+Support net.netfilter.nf_conntrack_max settings per
+netns, net.netfilter.nf_conntrack_max is used to more
+flexibly limit the ct_count in different netns. The
+default value belongs to the init_net limit.
 
-Fixes: 9b115361248d ("net: ti: icssg-prueth: Fix clearing of IEP_CMP_CFG registers during iep_init")
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Closes: https://lore.kernel.org/all/7b1c7c36-363a-4085-b26c-4f210bee1df6@stanley.mountain/
-Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+After net.netfilter.nf_conntrack_max is set in different
+netns, it is not allowed to be greater than the init_net
+limit when working.
+
+Signed-off-by: lvxiafei <lvxiafei@sensetime.com>
 ---
+ .../networking/nf_conntrack-sysctl.rst        | 29 +++++++++++++++----
+ include/net/netfilter/nf_conntrack.h          | 12 +++++++-
+ include/net/netns/conntrack.h                 |  1 +
+ net/netfilter/nf_conntrack_core.c             | 19 ++++++------
+ net/netfilter/nf_conntrack_netlink.c          |  2 +-
+ net/netfilter/nf_conntrack_standalone.c       |  7 +++--
+ 6 files changed, 50 insertions(+), 20 deletions(-)
 
-Changes from v3 (v4-v3):
-- Fix the logic in icss_iep_perout_enable_hw() to clear IEP registers
-  when disabling periodic signal
-
- drivers/net/ethernet/ti/icssg/icss_iep.c | 121 +++++++++++------------
- 1 file changed, 58 insertions(+), 63 deletions(-)
-
-diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ethernet/ti/icssg/icss_iep.c
-index b4a34c57b7b4..2a1c43316f46 100644
---- a/drivers/net/ethernet/ti/icssg/icss_iep.c
-+++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
-@@ -412,6 +412,22 @@ static int icss_iep_perout_enable_hw(struct icss_iep *iep,
- 	int ret;
- 	u64 cmp;
+diff --git a/Documentation/networking/nf_conntrack-sysctl.rst b/Documentation/networking/nf_conntrack-sysctl.rst
+index 238b66d0e059..6e7f17f5959a 100644
+--- a/Documentation/networking/nf_conntrack-sysctl.rst
++++ b/Documentation/networking/nf_conntrack-sysctl.rst
+@@ -93,12 +93,29 @@ nf_conntrack_log_invalid - INTEGER
+ 	Log invalid packets of a type specified by value.
  
-+	if (!on) {
-+		/* Disable CMP 1 */
-+		regmap_update_bits(iep->map, ICSS_IEP_CMP_CFG_REG,
-+				   IEP_CMP_CFG_CMP_EN(1), 0);
+ nf_conntrack_max - INTEGER
+-        Maximum number of allowed connection tracking entries. This value is set
+-        to nf_conntrack_buckets by default.
+-        Note that connection tracking entries are added to the table twice -- once
+-        for the original direction and once for the reply direction (i.e., with
+-        the reversed address). This means that with default settings a maxed-out
+-        table will have a average hash chain length of 2, not 1.
++    - 0 - disabled (unlimited)
++    - not 0 - enabled
 +
-+		/* clear CMP regs */
-+		regmap_write(iep->map, ICSS_IEP_CMP1_REG0, 0);
-+		if (iep->plat_data->flags & ICSS_IEP_64BIT_COUNTER_SUPPORT)
-+			regmap_write(iep->map, ICSS_IEP_CMP1_REG1, 0);
++    Maximum number of allowed connection tracking entries per netns. This value
++    is set to nf_conntrack_buckets by default.
 +
-+		/* Disable sync */
-+		regmap_write(iep->map, ICSS_IEP_SYNC_CTRL_REG, 0);
++    Note that connection tracking entries are added to the table twice -- once
++    for the original direction and once for the reply direction (i.e., with
++    the reversed address). This means that with default settings a maxed-out
++    table will have a average hash chain length of 2, not 1.
 +
-+		return 0;
-+	}
-+
- 	/* Calculate width of the signal for PPS/PEROUT handling */
- 	ts.tv_sec = req->on.sec;
- 	ts.tv_nsec = req->on.nsec;
-@@ -430,64 +446,39 @@ static int icss_iep_perout_enable_hw(struct icss_iep *iep,
- 		if (ret)
- 			return ret;
++    The limit of other netns cannot be greater than init_net netns.
++    +----------------+-------------+----------------+
++    | init_net netns | other netns | limit behavior |
++    +----------------+-------------+----------------+
++    | 0              | 0           | unlimited      |
++    +----------------+-------------+----------------+
++    | 0              | not 0       | other          |
++    +----------------+-------------+----------------+
++    | not 0          | 0           | init_net       |
++    +----------------+-------------+----------------+
++    | not 0          | not 0       | min            |
++    +----------------+-------------+----------------+
  
--		if (on) {
--			/* Configure CMP */
--			regmap_write(iep->map, ICSS_IEP_CMP1_REG0, lower_32_bits(cmp));
--			if (iep->plat_data->flags & ICSS_IEP_64BIT_COUNTER_SUPPORT)
--				regmap_write(iep->map, ICSS_IEP_CMP1_REG1, upper_32_bits(cmp));
--			/* Configure SYNC, based on req on width */
--			regmap_write(iep->map, ICSS_IEP_SYNC_PWIDTH_REG,
--				     div_u64(ns_width, iep->def_inc));
--			regmap_write(iep->map, ICSS_IEP_SYNC0_PERIOD_REG, 0);
--			regmap_write(iep->map, ICSS_IEP_SYNC_START_REG,
--				     div_u64(ns_start, iep->def_inc));
--			regmap_write(iep->map, ICSS_IEP_SYNC_CTRL_REG, 0); /* one-shot mode */
--			/* Enable CMP 1 */
--			regmap_update_bits(iep->map, ICSS_IEP_CMP_CFG_REG,
--					   IEP_CMP_CFG_CMP_EN(1), IEP_CMP_CFG_CMP_EN(1));
--		} else {
--			/* Disable CMP 1 */
--			regmap_update_bits(iep->map, ICSS_IEP_CMP_CFG_REG,
--					   IEP_CMP_CFG_CMP_EN(1), 0);
--
--			/* clear regs */
--			regmap_write(iep->map, ICSS_IEP_CMP1_REG0, 0);
--			if (iep->plat_data->flags & ICSS_IEP_64BIT_COUNTER_SUPPORT)
--				regmap_write(iep->map, ICSS_IEP_CMP1_REG1, 0);
--		}
-+		/* Configure CMP */
-+		regmap_write(iep->map, ICSS_IEP_CMP1_REG0, lower_32_bits(cmp));
-+		if (iep->plat_data->flags & ICSS_IEP_64BIT_COUNTER_SUPPORT)
-+			regmap_write(iep->map, ICSS_IEP_CMP1_REG1, upper_32_bits(cmp));
-+		/* Configure SYNC, based on req on width */
-+		regmap_write(iep->map, ICSS_IEP_SYNC_PWIDTH_REG,
-+			     div_u64(ns_width, iep->def_inc));
-+		regmap_write(iep->map, ICSS_IEP_SYNC0_PERIOD_REG, 0);
-+		regmap_write(iep->map, ICSS_IEP_SYNC_START_REG,
-+			     div_u64(ns_start, iep->def_inc));
-+		regmap_write(iep->map, ICSS_IEP_SYNC_CTRL_REG, 0); /* one-shot mode */
-+		/* Enable CMP 1 */
-+		regmap_update_bits(iep->map, ICSS_IEP_CMP_CFG_REG,
-+				   IEP_CMP_CFG_CMP_EN(1), IEP_CMP_CFG_CMP_EN(1));
- 	} else {
--		if (on) {
--			u64 start_ns;
--
--			iep->period = ((u64)req->period.sec * NSEC_PER_SEC) +
--				      req->period.nsec;
--			start_ns = ((u64)req->period.sec * NSEC_PER_SEC)
--				   + req->period.nsec;
--			icss_iep_update_to_next_boundary(iep, start_ns);
--
--			regmap_write(iep->map, ICSS_IEP_SYNC_PWIDTH_REG,
--				     div_u64(ns_width, iep->def_inc));
--			regmap_write(iep->map, ICSS_IEP_SYNC_START_REG,
--				     div_u64(ns_start, iep->def_inc));
--			/* Enable Sync in single shot mode  */
--			regmap_write(iep->map, ICSS_IEP_SYNC_CTRL_REG,
--				     IEP_SYNC_CTRL_SYNC_N_EN(0) | IEP_SYNC_CTRL_SYNC_EN);
--			/* Enable CMP 1 */
--			regmap_update_bits(iep->map, ICSS_IEP_CMP_CFG_REG,
--					   IEP_CMP_CFG_CMP_EN(1), IEP_CMP_CFG_CMP_EN(1));
--		} else {
--			/* Disable CMP 1 */
--			regmap_update_bits(iep->map, ICSS_IEP_CMP_CFG_REG,
--					   IEP_CMP_CFG_CMP_EN(1), 0);
--
--			/* clear CMP regs */
--			regmap_write(iep->map, ICSS_IEP_CMP1_REG0, 0);
--			if (iep->plat_data->flags & ICSS_IEP_64BIT_COUNTER_SUPPORT)
--				regmap_write(iep->map, ICSS_IEP_CMP1_REG1, 0);
--
--			/* Disable sync */
--			regmap_write(iep->map, ICSS_IEP_SYNC_CTRL_REG, 0);
--		}
-+		u64 start_ns;
-+
-+		iep->period = ((u64)req->period.sec * NSEC_PER_SEC) +
-+				req->period.nsec;
-+		start_ns = ((u64)req->period.sec * NSEC_PER_SEC)
-+				+ req->period.nsec;
-+		icss_iep_update_to_next_boundary(iep, start_ns);
-+
-+		regmap_write(iep->map, ICSS_IEP_SYNC_PWIDTH_REG,
-+			     div_u64(ns_width, iep->def_inc));
-+		regmap_write(iep->map, ICSS_IEP_SYNC_START_REG,
-+			     div_u64(ns_start, iep->def_inc));
-+		/* Enable Sync in single shot mode  */
-+		regmap_write(iep->map, ICSS_IEP_SYNC_CTRL_REG,
-+			     IEP_SYNC_CTRL_SYNC_N_EN(0) | IEP_SYNC_CTRL_SYNC_EN);
-+		/* Enable CMP 1 */
-+		regmap_update_bits(iep->map, ICSS_IEP_CMP_CFG_REG,
-+				   IEP_CMP_CFG_CMP_EN(1), IEP_CMP_CFG_CMP_EN(1));
- 	}
+ nf_conntrack_tcp_be_liberal - BOOLEAN
+ 	- 0 - disabled (default)
+diff --git a/include/net/netfilter/nf_conntrack.h b/include/net/netfilter/nf_conntrack.h
+index 3f02a45773e8..594439b2f5a1 100644
+--- a/include/net/netfilter/nf_conntrack.h
++++ b/include/net/netfilter/nf_conntrack.h
+@@ -320,7 +320,6 @@ int nf_conntrack_hash_resize(unsigned int hashsize);
+ extern struct hlist_nulls_head *nf_conntrack_hash;
+ extern unsigned int nf_conntrack_htable_size;
+ extern seqcount_spinlock_t nf_conntrack_generation;
+-extern unsigned int nf_conntrack_max;
  
- 	return 0;
-@@ -498,11 +489,21 @@ static int icss_iep_perout_enable(struct icss_iep *iep,
+ /* must be called with rcu read lock held */
+ static inline void
+@@ -360,6 +359,17 @@ static inline struct nf_conntrack_net *nf_ct_pernet(const struct net *net)
+ 	return net_generic(net, nf_conntrack_net_id);
+ }
+ 
++static inline unsigned int nf_conntrack_max(const struct net *net)
++{
++#if IS_ENABLED(CONFIG_NF_CONNTRACK)
++	return likely(init_net.ct.sysctl_max && net->ct.sysctl_max) ?
++	    min(init_net.ct.sysctl_max, net->ct.sysctl_max) :
++	    max(init_net.ct.sysctl_max, net->ct.sysctl_max);
++#else
++	return 0;
++#endif
++}
++
+ int nf_ct_skb_network_trim(struct sk_buff *skb, int family);
+ int nf_ct_handle_fragments(struct net *net, struct sk_buff *skb,
+ 			   u16 zone, u8 family, u8 *proto, u16 *mru);
+diff --git a/include/net/netns/conntrack.h b/include/net/netns/conntrack.h
+index bae914815aa3..d3fcd0b92b2d 100644
+--- a/include/net/netns/conntrack.h
++++ b/include/net/netns/conntrack.h
+@@ -102,6 +102,7 @@ struct netns_ct {
+ 	u8			sysctl_acct;
+ 	u8			sysctl_tstamp;
+ 	u8			sysctl_checksum;
++	unsigned int		sysctl_max;
+ 
+ 	struct ip_conntrack_stat __percpu *stat;
+ 	struct nf_ct_event_notifier __rcu *nf_conntrack_event_cb;
+diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_conntrack_core.c
+index 7f8b245e287a..a738564923ec 100644
+--- a/net/netfilter/nf_conntrack_core.c
++++ b/net/netfilter/nf_conntrack_core.c
+@@ -202,8 +202,6 @@ static void nf_conntrack_all_unlock(void)
+ unsigned int nf_conntrack_htable_size __read_mostly;
+ EXPORT_SYMBOL_GPL(nf_conntrack_htable_size);
+ 
+-unsigned int nf_conntrack_max __read_mostly;
+-EXPORT_SYMBOL_GPL(nf_conntrack_max);
+ seqcount_spinlock_t nf_conntrack_generation __read_mostly;
+ static siphash_aligned_key_t nf_conntrack_hash_rnd;
+ 
+@@ -1498,7 +1496,7 @@ static bool gc_worker_can_early_drop(const struct nf_conn *ct)
+ 
+ static void gc_worker(struct work_struct *work)
  {
- 	int ret = 0;
+-	unsigned int i, hashsz, nf_conntrack_max95 = 0;
++	unsigned int i, hashsz;
+ 	u32 end_time, start_time = nfct_time_stamp;
+ 	struct conntrack_gc_work *gc_work;
+ 	unsigned int expired_count = 0;
+@@ -1509,8 +1507,6 @@ static void gc_worker(struct work_struct *work)
+ 	gc_work = container_of(work, struct conntrack_gc_work, dwork.work);
  
-+	if (!on)
-+		goto disable;
+ 	i = gc_work->next_bucket;
+-	if (gc_work->early_drop)
+-		nf_conntrack_max95 = nf_conntrack_max / 100u * 95u;
+ 
+ 	if (i == 0) {
+ 		gc_work->avg_timeout = GC_SCAN_INTERVAL_INIT;
+@@ -1538,6 +1534,7 @@ static void gc_worker(struct work_struct *work)
+ 		}
+ 
+ 		hlist_nulls_for_each_entry_rcu(h, n, &ct_hash[i], hnnode) {
++			unsigned int nf_conntrack_max95 = 0;
+ 			struct nf_conntrack_net *cnet;
+ 			struct net *net;
+ 			long expires;
+@@ -1567,11 +1564,14 @@ static void gc_worker(struct work_struct *work)
+ 			expires = clamp(nf_ct_expires(tmp), GC_SCAN_INTERVAL_MIN, GC_SCAN_INTERVAL_CLAMP);
+ 			expires = (expires - (long)next_run) / ++count;
+ 			next_run += expires;
++			net = nf_ct_net(tmp);
 +
- 	/* Reject requests with unsupported flags */
- 	if (req->flags & ~(PTP_PEROUT_DUTY_CYCLE |
- 			  PTP_PEROUT_PHASE))
- 		return -EOPNOTSUPP;
++			if (gc_work->early_drop)
++				nf_conntrack_max95 = nf_conntrack_max(net) / 100u * 95u;
  
-+	/* Set default "on" time (1ms) for the signal if not passed by the app */
-+	if (!(req->flags & PTP_PEROUT_DUTY_CYCLE)) {
-+		req->on.sec = 0;
-+		req->on.nsec = NSEC_PER_MSEC;
-+	}
-+
-+disable:
- 	mutex_lock(&iep->ptp_clk_mutex);
+ 			if (nf_conntrack_max95 == 0 || gc_worker_skip_ct(tmp))
+ 				continue;
  
- 	if (iep->pps_enabled) {
-@@ -513,12 +514,6 @@ static int icss_iep_perout_enable(struct icss_iep *iep,
- 	if (iep->perout_enabled == !!on)
- 		goto exit;
+-			net = nf_ct_net(tmp);
+ 			cnet = nf_ct_pernet(net);
+ 			if (atomic_read(&cnet->count) < nf_conntrack_max95)
+ 				continue;
+@@ -1648,13 +1648,14 @@ __nf_conntrack_alloc(struct net *net,
+ 		     gfp_t gfp, u32 hash)
+ {
+ 	struct nf_conntrack_net *cnet = nf_ct_pernet(net);
+-	unsigned int ct_count;
++	unsigned int ct_max, ct_count;
+ 	struct nf_conn *ct;
  
--	/* Set default "on" time (1ms) for the signal if not passed by the app */
--	if (!(req->flags & PTP_PEROUT_DUTY_CYCLE)) {
--		req->on.sec = 0;
--		req->on.nsec = NSEC_PER_MSEC;
--	}
--
- 	ret = icss_iep_perout_enable_hw(iep, req, on);
- 	if (!ret)
- 		iep->perout_enabled = !!on;
+ 	/* We don't want any race condition at early drop stage */
+ 	ct_count = atomic_inc_return(&cnet->count);
++	ct_max = nf_conntrack_max(net);
+ 
+-	if (nf_conntrack_max && unlikely(ct_count > nf_conntrack_max)) {
++	if (ct_max && unlikely(ct_count > ct_max)) {
+ 		if (!early_drop(net, hash)) {
+ 			if (!conntrack_gc_work.early_drop)
+ 				conntrack_gc_work.early_drop = true;
+@@ -2650,7 +2651,7 @@ int nf_conntrack_init_start(void)
+ 	if (!nf_conntrack_hash)
+ 		return -ENOMEM;
+ 
+-	nf_conntrack_max = max_factor * nf_conntrack_htable_size;
++	init_net.ct.sysctl_max = max_factor * nf_conntrack_htable_size;
+ 
+ 	nf_conntrack_cachep = kmem_cache_create("nf_conntrack",
+ 						sizeof(struct nf_conn),
+diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_conntrack_netlink.c
+index 2cc0fde23344..73e6bb1e939b 100644
+--- a/net/netfilter/nf_conntrack_netlink.c
++++ b/net/netfilter/nf_conntrack_netlink.c
+@@ -2608,7 +2608,7 @@ ctnetlink_stat_ct_fill_info(struct sk_buff *skb, u32 portid, u32 seq, u32 type,
+ 	if (nla_put_be32(skb, CTA_STATS_GLOBAL_ENTRIES, htonl(nr_conntracks)))
+ 		goto nla_put_failure;
+ 
+-	if (nla_put_be32(skb, CTA_STATS_GLOBAL_MAX_ENTRIES, htonl(nf_conntrack_max)))
++	if (nla_put_be32(skb, CTA_STATS_GLOBAL_MAX_ENTRIES, htonl(nf_conntrack_max(net))))
+ 		goto nla_put_failure;
+ 
+ 	nlmsg_end(skb, nlh);
+diff --git a/net/netfilter/nf_conntrack_standalone.c b/net/netfilter/nf_conntrack_standalone.c
+index 2f666751c7e7..5db6df0e4eb3 100644
+--- a/net/netfilter/nf_conntrack_standalone.c
++++ b/net/netfilter/nf_conntrack_standalone.c
+@@ -615,7 +615,7 @@ enum nf_ct_sysctl_index {
+ static struct ctl_table nf_ct_sysctl_table[] = {
+ 	[NF_SYSCTL_CT_MAX] = {
+ 		.procname	= "nf_conntrack_max",
+-		.data		= &nf_conntrack_max,
++		.data		= &init_net.ct.sysctl_max,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_dointvec_minmax,
+@@ -948,7 +948,7 @@ static struct ctl_table nf_ct_sysctl_table[] = {
+ static struct ctl_table nf_ct_netfilter_table[] = {
+ 	{
+ 		.procname	= "nf_conntrack_max",
+-		.data		= &nf_conntrack_max,
++		.data		= &init_net.ct.sysctl_max,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_dointvec_minmax,
+@@ -1063,6 +1063,7 @@ static int nf_conntrack_standalone_init_sysctl(struct net *net)
+ 
+ 	table[NF_SYSCTL_CT_COUNT].data = &cnet->count;
+ 	table[NF_SYSCTL_CT_CHECKSUM].data = &net->ct.sysctl_checksum;
++	table[NF_SYSCTL_CT_MAX].data = &net->ct.sysctl_max;
+ 	table[NF_SYSCTL_CT_LOG_INVALID].data = &net->ct.sysctl_log_invalid;
+ 	table[NF_SYSCTL_CT_ACCT].data = &net->ct.sysctl_acct;
+ #ifdef CONFIG_NF_CONNTRACK_EVENTS
+@@ -1087,7 +1088,6 @@ static int nf_conntrack_standalone_init_sysctl(struct net *net)
+ 
+ 	/* Don't allow non-init_net ns to alter global sysctls */
+ 	if (!net_eq(&init_net, net)) {
+-		table[NF_SYSCTL_CT_MAX].mode = 0444;
+ 		table[NF_SYSCTL_CT_EXPECT_MAX].mode = 0444;
+ 		table[NF_SYSCTL_CT_BUCKETS].mode = 0444;
+ 	}
+@@ -1139,6 +1139,7 @@ static int nf_conntrack_pernet_init(struct net *net)
+ 	int ret;
+ 
+ 	net->ct.sysctl_checksum = 1;
++	net->ct.sysctl_max = init_net.ct.sysctl_max;
+ 
+ 	ret = nf_conntrack_standalone_init_sysctl(net);
+ 	if (ret < 0)
 -- 
-2.43.0
+2.40.1
 
 
