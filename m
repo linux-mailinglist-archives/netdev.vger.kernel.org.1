@@ -1,120 +1,156 @@
-Return-Path: <netdev+bounces-182872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AAF1A8A3C3
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 18:13:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6181A8A3CE
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 18:14:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74B5A443D6C
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 16:13:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAF453BECB2
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 16:13:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BD642820D7;
-	Tue, 15 Apr 2025 16:13:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D91129899D;
+	Tue, 15 Apr 2025 16:13:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="gMXKjx2m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iwf/xepf"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic308-15.consmr.mail.ne1.yahoo.com (sonic308-15.consmr.mail.ne1.yahoo.com [66.163.187.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D64C5E571
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 16:13:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.187.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30E52296D1C;
+	Tue, 15 Apr 2025 16:13:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744733601; cv=none; b=FP22quo35cXGt+DrJPC03S+9oWekISZ9U2K/UCgbNa7iUqs34W86R26BHjfOHaJ5PCyE37JoYzGa1ZbkKA4yzQJjd5DlsrEDeW1ixNdmvf7Qa0I3+X57XEr9zOyhpvhDctR27GiFHHRshBuLLg6hesZlTDjC53NnkhhxELOWbIM=
+	t=1744733632; cv=none; b=qldK0s1lxbg7c//gX1wpFmGP5Nk0CCRR5yXi6Wsu1BbSqC23+lm1pUCshydSd3yZRi9O9gY7MGnQ8RAPjY3WJkZTgUqE8FY2+xal/hJB5ZDGE3H3exniu45AijLancNMksZGRy7ZXeno9K2Ma5uL2YYKQsM/oBTlWahR2PEn16Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744733601; c=relaxed/simple;
-	bh=V+yze5hQz8lB1IfMX09lvbL0g1lT4RBGvyMq/xzi9iA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dDtNnliMu7ukDX6cJ4xeU1tm48/G1B1N+BsMO00OPhrIwPDsbFQAfvXgmK42fNi9xa5U8EaBOeFaE15tp/z2dZfP7Mbp/ECMZ8WRJexJ4N2P4UKngJv4qZ7ZslqdqEmW/owxhOtWn0XJTwbiOOLwoRJG6tMZUnCdqVLd5nxuPaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=gMXKjx2m; arc=none smtp.client-ip=66.163.187.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1744733592; bh=XNONWKl0jaudWlmwk2oEYdjO8PF0qEpq0lhcm/vXCEM=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=gMXKjx2mIshOPx/4hnZWhoLY15MwL7Tp6H+i9ClyR+GO/JkPCcZElTQW5sgs/9UQUuXpUiBIaZxGKFYY9CWilZu7jlpYrx650SJAjr/3NM7nuIkYy7Ak9inGEjYKSEjx199q3iIxU3Gu1umYeL2YgDbP+YEKe9PT5wJJQHgVNQdobw1x+K3LKj9ltKRyLziXrtjbIUZMS6cPLiayx74exYoGoWVanyyrt7b5luHMAGFC5th+x1wtjtpj4twzrY5hlR1AEpb6RtnqNamb8VfCPiW6tdBD8iWL6J0rzCBmunT72aXwp4mmON/bxaP+bFEnAsrfPhrDC/JI1XeY2vhyWA==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1744733592; bh=xzWg4C5CztZQ2RZK3oKfaBX1OOpaEcI9z8NJCTg8jsp=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=avOth21YY0THsvb/81T9NeFnAQz2ce259lwAwG4UwQmLwEd3TWO9OAFL8EjBsFtPypizYanqlol62/oK9pE9/QqAP6VoVbjRvUnAuGajthgyf+jhqeLdFapJx+3TYrPE8Twd09DqC7XGqNfkaBxbXoihl4xjPwuUe6YpPGCWGCk47xnwoWOMZWfpoZl3Rvhi85foGGWTA1gy0S9CAR9SZPgimAZ+YNOAv+ia7l23e/Bf6CcLuxXyjLS5TyNEI0effD6u1vm6ceHrMCCsiWOFNyUzVckMOSjxjjskh+QLVk40Rol9ytXvRDqL75feUfNMrBhCk8Sh7Att1WWatv/RTg==
-X-YMail-OSG: ADN_yYgVM1m3z4jaaoyeySxawOtdGlyJ_lplipfhdlepBdw5s2PqpIY6UQOUhjd
- ksnM3pgZUPT2A554AToBCCWeN156xaHCrR5Fb91Drwo9T.57A77RAiknJTlOYwW_aDcUvtbhjN6e
- z_D26GnjuQo9vJFNb_BDVCjcje4GyKk1zhnzDq8Z9kdX5sjyAIt5rTKd8qGmJ8QN9I4PWjEl1gab
- 6gc3FV4uP6PRfiNnmFJsu9WNVDNxtjLuu29b_cD1R_dxnsbfk79neGO2WNmiWNIz46XedSYLSuLX
- iK3ESits3z1nx4UUj455.RBMlkXARNKjUcGRn1H0d.eXVDj_vznDvf_uPcSEoPDfvBhrIEJ3C5Nn
- Ykop45Lh7A5EWxCW4tKIqL4f5ycSaUa64mZhOTeCBm7vId9JdofYISR4Jq1YoYOU3kRCW7C_JWl3
- gXszRK7l8s5szzOlqeLMu4zcrF51od4gJV3WpH6bm6o4Z7uACLjY3n4TMB6K4Mj8vgQFd0x9OVfv
- GIMYvFkEJNgt5Ylw0AZj3bWBxFa0kXT8Z9pbfP5Cmg8xHPCIn6SwE3btbXYjBglVTtrazct5qj_1
- 5g02XRIG_w0GsXn4h7SKxnjG.LvyTTOu09J9p7C6hFfeTQiVjjG9iiteTIoBj4wo0u1L5oawD6cc
- gKcoHA49b5N1KUqsErwkAfwCbRi255cphWDswBSvTV_FRnJ.3tCb.95GEABk3BitBXEOyZ_ZN1.o
- shZ6jgy5JjIe0gWglZ51NGThZotkFWfN8UCX3fYfA3iGfqL0m3t__aTzjWNO518GQp9ndSUpixdt
- nuWk7qXTVNxRZvRATtjtul3sTOePyI2k.GZpq5neEzOQJX6ztMThaJe4aV9q3MDKhoW9Soa.BW1Y
- 8_pOriBArr1..kbfzMSZrBqItBVfjbqgwpnZb9D7daUa8vhJVhu5BavPT50A9kZdLbLUj5Uca_Wj
- 3oL1ElQma1_38tTdYkr3IQXIJyUF1x5hLUpSlKcoUL5fkHUulw850pCCJV5af7MNrVcuoc9YrpWW
- _GlaUyY9yOJ1DhourwVZz23uy8mkmh7D1dsyS7G58iJWT.pWQus3aq.bvBVwE0isPczGk89sr2Lf
- QSrIbLt1WlpOfLLzpEGHc9jjSsqRuHL2RlBvmoPkZJUd1zHH9brK0djLG3nLvXSF10KuRtFJkJ8Y
- lHm1dTmIUGR_2C4yhO2ekSaitTuhwggvgLS8jzNUTAupWhJjBq7qBX4N3TNT704MeAxKwqQE_wdW
- 5QkvhpwycpXvOH21k1iEg5LyjVa3Mpm9bH5Pupz5IDNi8MmtEFwh8T0MM.TF3NemQ65a5KXnBEe4
- o5p9KZKB5XKEQjQINn76h7INbkmtLrUDn_Si7KKFvqMAm_kz3gNprMcNbtihy265zxhP1yMW8ymI
- 9XApn8dNknWK8c7ptNVyK3sf3o2ZQZhoFxxkL.fzTBG6U6jtiZPz16K0dwyHzP6bCcneX39GnpiF
- uG_d4wMhxbX3EA3a96yMPW1cW9_OrpwlTYRIvWSbKEZTMq9H2v9KZxaG5wGbn_KqQ9q9cl14GsYw
- _alA72ciSVX07yIdDkrPJrWUpvZsn_7PJh84AwxE3tm7QJZn_zVVD_p2KMNPPh1xgx96QrcEZe_i
- v.61n58vVn9vg_Udh7nQI7UyIdGshiazXr1XfBvSGgdAGeBcP2d_gDynsYo0WVcc_deqeY28x4fj
- iYjS0HhVxQ.tmbFhrUp6sSLyL5FpKXQBL3DGv4ZAT9xLXjxr34HmoOsaHZvVqH.yHsLkTwbblcCf
- whjfdEdc_mgCbfnGtLUnCqyeqt6alI5PHuA_HhVue_0KZ68pBw72TdMKaRD16YVo4b.5tAXQDWx0
- LadMdNtR2cXNi6jJrtDkJF2TD3RhM.qEtvp.7rQx.gj4fXu1oVK2LQL9htY0SiU66CY.u48YrYfD
- XzP_OVrIMje3xC8BrS_HY_h0ubJwtJnb.5gl.EeGIfZu9e4wMsSvVU1nYVjCUYAFkoOwr.mWRYvq
- M4pJwEem281pMOsfPnsG4xU.GvGHM0AYUjG1RdnMYT9_vEDDm2UR8sXr0Ct6pATlUWhQKf8lh19E
- .mV6AkBci_LQVx6.13qpUQYj3rU0HfTwA2zlXovrPZBIJ44HsMXLjHbTlcOtaKzcJae_p3L.q7AO
- Bgl.CUVtXNPiQ9Mvh.sGr45vxKrty1DilbQQV7tGhKRbFLfJ72A4dGXnUwBp7Yh3zBFrJL65l.fK
- o4HvdUnWPE6.YfvuaTiKtLwXSBVlAA29kR4lWHXP0Gw9Bhl2GqDNJC.QF32ovssYA7zZQBvnH1pA
- jN9v8
-X-Sonic-MF: <casey@schaufler-ca.com>
-X-Sonic-ID: 8f75c530-de34-4864-9dc1-b4323dc33f68
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic308.consmr.mail.ne1.yahoo.com with HTTP; Tue, 15 Apr 2025 16:13:12 +0000
-Received: by hermes--production-gq1-74d64bb7d7-mh87r (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID b5dd3583aeda04525e68f8f8b81efdbb;
-          Tue, 15 Apr 2025 16:13:06 +0000 (UTC)
-Message-ID: <69763528-bb00-44c5-a3ce-8c30530b29ee@schaufler-ca.com>
-Date: Tue, 15 Apr 2025 09:13:05 -0700
+	s=arc-20240116; t=1744733632; c=relaxed/simple;
+	bh=1jFrBy0lzqpyUKpmfkbxvJvV2QeeBiFeu/gLSlD6DXw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X7h7e48Rg0EVMvLug2TXBcg7hFYStYFsb2Tqve7syzw2nBkNI64Dc0XKQOyo+9RcWYYK00PZ1sxt6258ZS+eUoUjTyDSUos5LlnSnsCH4qNv93VCA+g7VxXB9BjxV4cMygi7xDbgC5wGqedteRDIno6ubvWuhXhV7cp3F88xIeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iwf/xepf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 382BAC4CEEB;
+	Tue, 15 Apr 2025 16:13:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744733631;
+	bh=1jFrBy0lzqpyUKpmfkbxvJvV2QeeBiFeu/gLSlD6DXw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Iwf/xepfn8XdaQPkl3OXO2pziEP0MlRo4kLwGSJsiPog0Lg5Q1zc16D6DMGJwuihR
+	 wFxPHaCtVDUNGtTLwsWTrCyK5ML3+2kHLLu+hLOI9049UI/1wvm6ANh7f1RkqDDqZE
+	 sfK6i25rKsc+rZPzOJjQiMNZCqS9qAsXy/ekUZsqbaFi5M/YNucILhk7ZNjcpj8xhR
+	 cTpu1IqsMZdWOGrrLhNg9KBwOnjf8is+U1vUkxZI9HftXGggDq4mt6mtnKRdxCOmja
+	 JYxKuYVHbxzBtX6yyWjjBDmrCV6qBEG+qekX20hC4nqmB77hh3oQmv7Pech6xvsaet
+	 8MiIM487OnzWg==
+Date: Tue, 15 Apr 2025 17:13:37 +0100
+From: Simon Horman <horms@kernel.org>
+To: Kuan-Wei Chiu <visitorckw@gmail.com>
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+	dave.hansen@linux.intel.com, x86@kernel.org, jk@ozlabs.org,
+	joel@jms.id.au, eajames@linux.ibm.com, andrzej.hajda@intel.com,
+	neil.armstrong@linaro.org, rfoss@kernel.org,
+	maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+	tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
+	dmitry.torokhov@gmail.com, mchehab@kernel.org,
+	awalls@md.metrocast.net, hverkuil@xs4all.nl,
+	miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
+	louis.peens@corigine.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	parthiban.veerasooran@microchip.com, arend.vanspriel@broadcom.com,
+	johannes@sipsolutions.net, gregkh@linuxfoundation.org,
+	jirislaby@kernel.org, yury.norov@gmail.com,
+	akpm@linux-foundation.org, jdelvare@suse.com, linux@roeck-us.net,
+	alexandre.belloni@bootlin.com, pgaj@cadence.com, hpa@zytor.com,
+	alistair@popple.id.au, linux@rasmusvillemoes.dk,
+	Laurent.pinchart@ideasonboard.com, jonas@kwiboo.se,
+	jernej.skrabec@gmail.com, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, linux-fsi@lists.ozlabs.org,
+	dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
+	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
+	oss-drivers@corigine.com, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
+	brcm80211-dev-list.pdl@broadcom.com, linux-serial@vger.kernel.org,
+	bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw, Frank.Li@nxp.com,
+	linux-hwmon@vger.kernel.org, linux-i3c@lists.infradead.org,
+	david.laight.linux@gmail.com, andrew.cooper3@citrix.com,
+	Yu-Chun Lin <eleanor15x@gmail.com>
+Subject: Re: [PATCH v4 09/13] wifi: brcm80211: Replace open-coded parity
+ calculation with parity_odd()
+Message-ID: <20250415161337.GZ395307@horms.kernel.org>
+References: <20250409154356.423512-1-visitorckw@gmail.com>
+ <20250409154356.423512-10-visitorckw@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v17 1/3] lsm, selinux: Add setup_report permission to
- binder
-To: Li Li <dualli@chromium.org>, dualli@google.com, corbet@lwn.net,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, donald.hunter@gmail.com, gregkh@linuxfoundation.org,
- arve@android.com, tkjos@android.com, maco@android.com,
- joel@joelfernandes.org, brauner@kernel.org, cmllamas@google.com,
- surenb@google.com, omosnace@redhat.com, shuah@kernel.org, arnd@arndb.de,
- masahiroy@kernel.org, bagasdotme@gmail.com, horms@kernel.org,
- tweek@google.com, paul@paul-moore.com, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, netdev@vger.kernel.org, selinux@vger.kernel.org,
- hridya@google.com
-Cc: smoreland@google.com, ynaffit@google.com, kernel-team@android.com
-References: <20250415071017.3261009-1-dualli@chromium.org>
- <20250415071017.3261009-2-dualli@chromium.org>
-Content-Language: en-US
-From: Casey Schaufler <casey@schaufler-ca.com>
-In-Reply-To: <20250415071017.3261009-2-dualli@chromium.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Mailer: WebService/1.1.23665 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250409154356.423512-10-visitorckw@gmail.com>
 
-On 4/15/2025 12:10 AM, Li Li wrote:
-> From: Thiébaud Weksteen <tweek@google.com>
->
-> Introduce a new permission "setup_report" to the "binder" class.
-> This persmission controls the ability to set up the binder generic
-> netlink driver to report certain binder transactions.
->
-> Signed-off-by: Thiébaud Weksteen <tweek@google.com>
-> Signed-off-by: Li Li <dualli@google.com>
+On Wed, Apr 09, 2025 at 11:43:52PM +0800, Kuan-Wei Chiu wrote:
+> Refactor parity calculations to use the standard parity_odd() helper.
+> This change eliminates redundant implementations.
+> 
+> Co-developed-by: Yu-Chun Lin <eleanor15x@gmail.com>
+> Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
+> Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail.com>
+> Acked-by: Arend van Spriel <arend.vanspriel@broadcom.com>
 > ---
->  include/linux/lsm_hook_defs.h       |  1 +
->  include/linux/security.h            |  6 ++++++
->  security/security.c                 | 13 +++++++++++++
+>  .../wireless/broadcom/brcm80211/brcmsmac/dma.c | 18 ++----------------
+>  1 file changed, 2 insertions(+), 16 deletions(-)
+> 
+> diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmsmac/dma.c b/drivers/net/wireless/broadcom/brcm80211/brcmsmac/dma.c
+> index 80c35027787a..5d7500ee2d3b 100644
+> --- a/drivers/net/wireless/broadcom/brcm80211/brcmsmac/dma.c
+> +++ b/drivers/net/wireless/broadcom/brcm80211/brcmsmac/dma.c
+> @@ -17,6 +17,7 @@
+>  #include <linux/slab.h>
+>  #include <linux/delay.h>
+>  #include <linux/pci.h>
+> +#include <linux/bitops.h>
+>  #include <net/cfg80211.h>
+>  #include <net/mac80211.h>
+>  
+> @@ -283,24 +284,9 @@ struct dma_info {
+>  	bool aligndesc_4k;
+>  };
+>  
+> -/* Check for odd number of 1's */
+> -static u32 parity32(__le32 data)
+> -{
+> -	/* no swap needed for counting 1's */
+> -	u32 par_data = *(u32 *)&data;
+> -
+> -	par_data ^= par_data >> 16;
+> -	par_data ^= par_data >> 8;
+> -	par_data ^= par_data >> 4;
+> -	par_data ^= par_data >> 2;
+> -	par_data ^= par_data >> 1;
+> -
+> -	return par_data & 1;
+> -}
+> -
+>  static bool dma64_dd_parity(struct dma64desc *dd)
+>  {
+> -	return parity32(dd->addrlow ^ dd->addrhigh ^ dd->ctrl1 ^ dd->ctrl2);
+> +	return parity_odd(dd->addrlow ^ dd->addrhigh ^ dd->ctrl1 ^ dd->ctrl2);
+>  }
 
-This patch needs to be sent to the linux-security-module list.
+parity32 expected a little-endian integer as it's argument
+while parity_odd expects a host byte order value.
 
+I realise that the existing code just casts-away the endianness
+annotation, but this patch adds a Sparse warning.
+
+ .../brcmsmac/dma.c:289:66: warning: incorrect type in argument 1 (different base types)
+ .../brcmsmac/dma.c:289:66:    expected unsigned long long [usertype] val
+ .../brcmsmac/dma.c:289:66:    got restricted __le32
+
+>  
+>  /* descriptor bumping functions */
+> -- 
+> 2.34.1
+> 
+> 
 
