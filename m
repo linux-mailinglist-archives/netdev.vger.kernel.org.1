@@ -1,92 +1,126 @@
-Return-Path: <netdev+bounces-182868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35DEAA8A320
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:42:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72837A8A32F
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:43:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE6453B38ED
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:41:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C0C0169DA6
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:43:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFD672973DB;
-	Tue, 15 Apr 2025 15:41:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5340296D1C;
+	Tue, 15 Apr 2025 15:43:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="inmuVdwX";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="RkDHEnNC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ifTFX7Ua"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E426C2DFA29;
-	Tue, 15 Apr 2025 15:41:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB4C920E003;
+	Tue, 15 Apr 2025 15:43:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744731703; cv=none; b=Km4lZsdag5dDPnrQ0ljJdGxhlrwOCz36hDVmDQIU/Z2UvRtM859cIiOBh8y+Ibh0EP7KGVjMYcMtDmuZfUM/DBZMYY+q3qyHa2pb2uomt/TSVyI7lpl2h19mrQDA6DLezSI/6kP2+6tOoGnvoiVn9Gil6ezTh2R4IwEvM9rA7XQ=
+	t=1744731808; cv=none; b=Nhk12nXV1LuyiPl31+rNeTDM7QvenOBqsgTJ3BXuU6hGyDef0qCfkGQeArXXcZKgYLLjpPk+3j7cLUf8qBQ+c27g6hj/VLZqcDAaIFSB1aKVAakjtJfk/iYssdqio+T2HVwCG7QuT9LsHUJDCgmKi/DPrwnWgl4n1TgdiIAljXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744731703; c=relaxed/simple;
-	bh=CIg8QmdP3BeTv3ceN/dvUqOI2TuC4nhVjPF76pREnLE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZDevZGKD8LBfOslgB1sokBm6otVuIUrXdYYQ2eXFIfSic5ckwPa3X+xnDsOdNqXQi7hlPGC9fEIHG6g3Rq7qRRl9d3tDMkzVUjKWvq/50yAYF2g0vpQtep1laKRgzHKxklytE7eVasjqkfKqFDU+2MbdHlY9XzAb0fdS2QLyByg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=inmuVdwX; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=RkDHEnNC; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id 5AD79608C8; Tue, 15 Apr 2025 17:41:39 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1744731699;
-	bh=CIg8QmdP3BeTv3ceN/dvUqOI2TuC4nhVjPF76pREnLE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=inmuVdwXuYLpYwFRvYYzPoAj4KZeZbXpCpyQaeS1OX3yS931k4d9TVDW+sZ0i4GWT
-	 CSYhj0qJ50QSBBxJPjHhTy22zQZAceAXk2/FCWe8JxftLoe4exHxZpchc4tGe70w2o
-	 FOSdmAYgpi+luYfDB+ityxmUpu8YJdt6obz8KrfL1qS/Ws2A02SbSuUBO7Tmpcqx26
-	 lJP4ir1Hh3atYA9YLLcDKUDaNhaks5VPCP2yV2Vwvj/LchKf3OcKmIXrSdT0/rhD0r
-	 Me2MsgzAx/g8XWtwJEC8U2Tm6rObZZzwaqVZf7tjpalt7pmnJkrzkTjCOa2QP/Nzaa
-	 sMrVzGP3czu5A==
-X-Spam-Level: 
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id 740DC60883;
-	Tue, 15 Apr 2025 17:41:37 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1744731697;
-	bh=CIg8QmdP3BeTv3ceN/dvUqOI2TuC4nhVjPF76pREnLE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RkDHEnNC4qIVB0kkMZ0j9le+WBomjWS0Iv/Qz2FKbjVVt1zva6O9+kpDM84wBM9+U
-	 ARtUINfma9QCs4JqjtnrbSI5p80cwrYKSe33mbzcVxXhFclj4VjHQQNXodba+dU3qX
-	 WcFn+qiuar26WLBqD34bSJOAoDN53AMxY7B/Os9mleVicJz++Hf49fsg7TORTE/F87
-	 RGGSPYsgdjGUP/oyL/CANtfdi/MjN6uCzP9XYQRfJaXk7bfrgl9fCBAQUeIwr6wjO8
-	 e/ArCxop0t3SMNz3jX7Ih1caX9YoS+SsKQEGFxQdV1wWTp3ZYrt1lRqUBQ7CJmjLt4
-	 /mGB8WtyIwDjQ==
-Date: Tue, 15 Apr 2025 17:41:34 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Chen Linxuan <chenlinxuan@uniontech.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 nf-next] docs: tproxy: fix formatting for nft code
- block
-Message-ID: <Z_5-LkQaP9gs7O1b@calendula>
-References: <E25F951CDC9F22B2+20250408073550.3319892-2-chenlinxuan@uniontech.com>
+	s=arc-20240116; t=1744731808; c=relaxed/simple;
+	bh=ccucVTibC96ZiE4Hr+vlu4U/HFUEw1R8eJ/1QIq1PMQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=elEZ0qfqdlfXCt02D6F/5gNyYObDy9kWUG4qnjzsoSchVzHHj/vYIXwlQ2aj0b8c1Ilu5zHIGUoS1Oj77TcyFllzxxzf6cRbqU/hIKkUf7pSHeauYFntYdXldA4SL4Wv83VDFaVtCOVVhsBL61xsPWrRDJeGRqb4EIi8vgQ8cOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ifTFX7Ua; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A4B8C4CEEB;
+	Tue, 15 Apr 2025 15:43:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744731808;
+	bh=ccucVTibC96ZiE4Hr+vlu4U/HFUEw1R8eJ/1QIq1PMQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ifTFX7Ua7Nbn0m/QP8+nFy/VLJx29jtfQVfAth5qMaRqnLiKKiVhnU7p2Z2PovKQo
+	 uChH/Esdx8AnHOV3oQ4/4geGq/LY74Y5FmXH2gGpkmhushoEeFh5xReUjl1JFbyQld
+	 syxlCD2xV3YT8wp8aKBwOFZDKCo2L68q4PNPsdlAzBO8Yk9AzTHcMZ0JtzeTdxwp8K
+	 RDju9zjvaGHhktQ7BwU44t5hBezPXGhC/K831x0jH/wk4a+dSK54dr5xPcd7/dxKzC
+	 rkDUNEiWtewS8loLsWu0iGFgdYGCCC8Aa85w7j2huxFBmv4tO26xCpK8tG1U77jTYZ
+	 RqiwlFKmxyy/A==
+Message-ID: <f448fcb8-6330-4517-863f-4bf0a2242313@kernel.org>
+Date: Tue, 15 Apr 2025 08:43:27 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <E25F951CDC9F22B2+20250408073550.3319892-2-chenlinxuan@uniontech.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next V4 1/2] net: sched: generalize check for no-queue
+ qdisc on TX queue
+Content-Language: en-US
+To: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: bpf@vger.kernel.org, tom@herbertland.com,
+ Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+ makita.toshiaki@lab.ntt.co.jp, kernel-team@cloudflare.com, phil@nwl.cc
+References: <174472463778.274639.12670590457453196991.stgit@firesoul>
+ <174472469906.274639.14909448343817900822.stgit@firesoul>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <174472469906.274639.14909448343817900822.stgit@firesoul>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 08, 2025 at 03:35:50PM +0800, Chen Linxuan wrote:
-> The nft command snippet for redirecting traffic isn't formatted
-> in a literal code block like the rest of snippets.
-> Fix the formatting inconsistency.
+On 4/15/25 7:44 AM, Jesper Dangaard Brouer wrote:
+> The "noqueue" qdisc can either be directly attached, or get default
+> attached if net_device priv_flags has IFF_NO_QUEUE. In both cases, the
+> allocated Qdisc structure gets it's enqueue function pointer reset to
+> NULL by noqueue_init() via noqueue_qdisc_ops.
+> 
+> This is a common case for software virtual net_devices. For these devices
+> with no-queue, the transmission path in __dev_queue_xmit() will bypass
+> the qdisc layer. Directly invoking device drivers ndo_start_xmit (via
+> dev_hard_start_xmit).  In this mode the device driver is not allowed to
+> ask for packets to be queued (either via returning NETDEV_TX_BUSY or
+> stopping the TXQ).
+> 
+> The simplest and most reliable way to identify this no-queue case is by
+> checking if enqueue == NULL.
+> 
+> The vrf driver currently open-codes this check (!qdisc->enqueue). While
+> functionally correct, this low-level detail is better encapsulated in a
+> dedicated helper for clarity and long-term maintainability.
+> 
+> To make this behavior more explicit and reusable, this patch introduce a
+> new helper: qdisc_txq_has_no_queue(). Helper will also be used by the
+> veth driver in the next patch, which introduces optional qdisc-based
+> backpressure.
+> 
+> This is a non-functional change.
+> 
+> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+> ---
+>  drivers/net/vrf.c         |    4 +---
+>  include/net/sch_generic.h |    8 ++++++++
+>  2 files changed, 9 insertions(+), 3 deletions(-)
+> 
 
-Applied to nf-next, thanks
+
+>  /* Local traffic destined to local address. Reinsert the packet to rx
+> diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+> index d48c657191cd..b6c177f7141c 100644
+> --- a/include/net/sch_generic.h
+> +++ b/include/net/sch_generic.h
+> @@ -803,6 +803,14 @@ static inline bool qdisc_tx_changing(const struct net_device *dev)
+>  	return false;
+>  }
+>  
+> +/* "noqueue" qdisc identified by not having any enqueue, see noqueue_init() */
+> +static inline bool qdisc_txq_has_no_queue(const struct netdev_queue *txq)
+> +{
+> +	struct Qdisc *qdisc = rcu_access_pointer(txq->qdisc);
+> +
+> +	return qdisc->enqueue == NULL;
+
+Did checkpatch not complain that this should be '!qdisc->enqueue' ?
+
+
+Reviewed-by: David Ahern <dsahern@kernel.org>
+
 
