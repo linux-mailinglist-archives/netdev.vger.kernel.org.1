@@ -1,156 +1,224 @@
-Return-Path: <netdev+bounces-182873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6181A8A3CE
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 18:14:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 059D4A8A412
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 18:26:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAF453BECB2
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 16:13:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 55FC018968C4
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 16:26:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D91129899D;
-	Tue, 15 Apr 2025 16:13:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4634B211472;
+	Tue, 15 Apr 2025 16:26:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iwf/xepf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TWI6KNXr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30E52296D1C;
-	Tue, 15 Apr 2025 16:13:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58D072DFA36
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 16:26:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744733632; cv=none; b=qldK0s1lxbg7c//gX1wpFmGP5Nk0CCRR5yXi6Wsu1BbSqC23+lm1pUCshydSd3yZRi9O9gY7MGnQ8RAPjY3WJkZTgUqE8FY2+xal/hJB5ZDGE3H3exniu45AijLancNMksZGRy7ZXeno9K2Ma5uL2YYKQsM/oBTlWahR2PEn16Q=
+	t=1744734399; cv=none; b=VoicabbITuLv2I40J6NmQG/gMj09FsC1rOyPAlNdZUTfLiAN00Cl3xLPba+Xxgx6HAQpV5abGr2EZrqW2kpl7SKZmY93YUb3PlNdDGc7kr6UXulCKfLuBUjh1dMME9+CgUvY8m43Nnihkq4BQuzV9kygVEiCsyrz27kUOVA9gio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744733632; c=relaxed/simple;
-	bh=1jFrBy0lzqpyUKpmfkbxvJvV2QeeBiFeu/gLSlD6DXw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X7h7e48Rg0EVMvLug2TXBcg7hFYStYFsb2Tqve7syzw2nBkNI64Dc0XKQOyo+9RcWYYK00PZ1sxt6258ZS+eUoUjTyDSUos5LlnSnsCH4qNv93VCA+g7VxXB9BjxV4cMygi7xDbgC5wGqedteRDIno6ubvWuhXhV7cp3F88xIeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iwf/xepf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 382BAC4CEEB;
-	Tue, 15 Apr 2025 16:13:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744733631;
-	bh=1jFrBy0lzqpyUKpmfkbxvJvV2QeeBiFeu/gLSlD6DXw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Iwf/xepfn8XdaQPkl3OXO2pziEP0MlRo4kLwGSJsiPog0Lg5Q1zc16D6DMGJwuihR
-	 wFxPHaCtVDUNGtTLwsWTrCyK5ML3+2kHLLu+hLOI9049UI/1wvm6ANh7f1RkqDDqZE
-	 sfK6i25rKsc+rZPzOJjQiMNZCqS9qAsXy/ekUZsqbaFi5M/YNucILhk7ZNjcpj8xhR
-	 cTpu1IqsMZdWOGrrLhNg9KBwOnjf8is+U1vUkxZI9HftXGggDq4mt6mtnKRdxCOmja
-	 JYxKuYVHbxzBtX6yyWjjBDmrCV6qBEG+qekX20hC4nqmB77hh3oQmv7Pech6xvsaet
-	 8MiIM487OnzWg==
-Date: Tue, 15 Apr 2025 17:13:37 +0100
-From: Simon Horman <horms@kernel.org>
-To: Kuan-Wei Chiu <visitorckw@gmail.com>
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, x86@kernel.org, jk@ozlabs.org,
-	joel@jms.id.au, eajames@linux.ibm.com, andrzej.hajda@intel.com,
-	neil.armstrong@linaro.org, rfoss@kernel.org,
-	maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-	tzimmermann@suse.de, airlied@gmail.com, simona@ffwll.ch,
-	dmitry.torokhov@gmail.com, mchehab@kernel.org,
-	awalls@md.metrocast.net, hverkuil@xs4all.nl,
-	miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
-	louis.peens@corigine.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	parthiban.veerasooran@microchip.com, arend.vanspriel@broadcom.com,
-	johannes@sipsolutions.net, gregkh@linuxfoundation.org,
-	jirislaby@kernel.org, yury.norov@gmail.com,
-	akpm@linux-foundation.org, jdelvare@suse.com, linux@roeck-us.net,
-	alexandre.belloni@bootlin.com, pgaj@cadence.com, hpa@zytor.com,
-	alistair@popple.id.au, linux@rasmusvillemoes.dk,
-	Laurent.pinchart@ideasonboard.com, jonas@kwiboo.se,
-	jernej.skrabec@gmail.com, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, linux-fsi@lists.ozlabs.org,
-	dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
-	oss-drivers@corigine.com, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
-	brcm80211-dev-list.pdl@broadcom.com, linux-serial@vger.kernel.org,
-	bpf@vger.kernel.org, jserv@ccns.ncku.edu.tw, Frank.Li@nxp.com,
-	linux-hwmon@vger.kernel.org, linux-i3c@lists.infradead.org,
-	david.laight.linux@gmail.com, andrew.cooper3@citrix.com,
-	Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH v4 09/13] wifi: brcm80211: Replace open-coded parity
- calculation with parity_odd()
-Message-ID: <20250415161337.GZ395307@horms.kernel.org>
-References: <20250409154356.423512-1-visitorckw@gmail.com>
- <20250409154356.423512-10-visitorckw@gmail.com>
+	s=arc-20240116; t=1744734399; c=relaxed/simple;
+	bh=Ecx2E8Qv1YxpBOd6fr3EdPQkzR19k2SUX06TQq+HJA8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=elveWjOyxLwR3fZjr1VD5uCHel1GbWmv2Uiylz/aEYBB86TDuPly69fa8gLBrDUkw7IBHpngLIYIFCk/GWhNizfIG2nEYjzFYopbMRNUH99bulHmvMwL11gPSym1lkbobhrWws8QwOVO/fX73JlhG1lFHr5s9z6PejicbOrXQAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TWI6KNXr; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1744734396;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YYp/FjE/Zl3CgCYwBLXeVS/jejb255JAZD9BteBawL4=;
+	b=TWI6KNXrIGM+RnyZ9ZYUHbVsmmUeISYSTtxpzGEVbuRxLrSEzgK4sPE1vReksjLRburghV
+	LIm+I4jVHSEYY778sWeyJnRHGSYw9ya5b1MHvGz59BnaGjzzOYyEsbg/8srQsglgyi2InX
+	bpIrgEt9vo3nnroNkqAW4BE0JkCxJyU=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-653-KRlL5dWRN2GejVf7s3zmBA-1; Tue,
+ 15 Apr 2025 12:26:30 -0400
+X-MC-Unique: KRlL5dWRN2GejVf7s3zmBA-1
+X-Mimecast-MFC-AGG-ID: KRlL5dWRN2GejVf7s3zmBA_1744734389
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9B15D1868034;
+	Tue, 15 Apr 2025 16:26:18 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.64.251])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8E82619560AD;
+	Tue, 15 Apr 2025 16:26:15 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: netdev@vger.kernel.org,  linux-rt-devel@lists.linux.dev,  "David S.
+ Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Simon
+ Horman <horms@kernel.org>,  Thomas Gleixner <tglx@linutronix.de>,  Eelco
+ Chaudron <echaudro@redhat.com>,  Ilya Maximets <i.maximets@ovn.org>,
+  dev@openvswitch.org
+Subject: Re: [PATCH net-next v2 12/18] openvswitch: Move
+ ovs_frag_data_storage into the struct ovs_pcpu_storage
+In-Reply-To: <20250414160754.503321-13-bigeasy@linutronix.de> (Sebastian
+	Andrzej Siewior's message of "Mon, 14 Apr 2025 18:07:48 +0200")
+References: <20250414160754.503321-1-bigeasy@linutronix.de>
+	<20250414160754.503321-13-bigeasy@linutronix.de>
+Date: Tue, 15 Apr 2025 12:26:13 -0400
+Message-ID: <f7tbjsxfl22.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250409154356.423512-10-visitorckw@gmail.com>
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Wed, Apr 09, 2025 at 11:43:52PM +0800, Kuan-Wei Chiu wrote:
-> Refactor parity calculations to use the standard parity_odd() helper.
-> This change eliminates redundant implementations.
-> 
-> Co-developed-by: Yu-Chun Lin <eleanor15x@gmail.com>
-> Signed-off-by: Yu-Chun Lin <eleanor15x@gmail.com>
-> Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail.com>
-> Acked-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
+
+> ovs_frag_data_storage is a per-CPU variable and relies on disabled BH for its
+> locking. Without per-CPU locking in local_bh_disable() on PREEMPT_RT
+> this data structure requires explicit locking.
+>
+> Move ovs_frag_data_storage into the struct ovs_pcpu_storage which already
+> provides locking for the structure.
+>
+> Cc: Aaron Conole <aconole@redhat.com>
+> Cc: Eelco Chaudron <echaudro@redhat.com>
+> Cc: Ilya Maximets <i.maximets@ovn.org>
+> Cc: dev@openvswitch.org
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 > ---
->  .../wireless/broadcom/brcm80211/brcmsmac/dma.c | 18 ++----------------
->  1 file changed, 2 insertions(+), 16 deletions(-)
-> 
-> diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmsmac/dma.c b/drivers/net/wireless/broadcom/brcm80211/brcmsmac/dma.c
-> index 80c35027787a..5d7500ee2d3b 100644
-> --- a/drivers/net/wireless/broadcom/brcm80211/brcmsmac/dma.c
-> +++ b/drivers/net/wireless/broadcom/brcm80211/brcmsmac/dma.c
-> @@ -17,6 +17,7 @@
->  #include <linux/slab.h>
->  #include <linux/delay.h>
->  #include <linux/pci.h>
-> +#include <linux/bitops.h>
->  #include <net/cfg80211.h>
->  #include <net/mac80211.h>
+
+I'm going to reply here, but I need to bisect a bit more (though I
+suspect the results below are due to 11/18).  When I tested with this
+patch there were lots of "unexplained" latency spikes during processing
+(note, I'm not doing PREEMPT_RT in my testing, but I guess it would
+smooth the spikes out at the cost of max performance).
+
+With the series:
+[SUM]   0.00-300.00 sec  3.28 TBytes  96.1 Gbits/sec  9417             sender
+[SUM]   0.00-300.00 sec  3.28 TBytes  96.1 Gbits/sec                  receiver
+
+Without the series:
+[SUM]   0.00-300.00 sec  3.26 TBytes  95.5 Gbits/sec  149             sender
+[SUM]   0.00-300.00 sec  3.26 TBytes  95.5 Gbits/sec                  receiver
+
+And while the 'final' numbers might look acceptable, one thing I'll note
+is I saw multiple stalls as:
+
+[  5]  57.00-58.00  sec   128 KBytes   903 Kbits/sec    0   4.02 MBytes
+
+But without the patch, I didn't see such stalls.  My testing:
+
+1. Install openvswitch userspace and ipcalc
+2. start userspace.
+3. Setup two netns and connect them (I have a more complicated script to
+   set up the flows, and I can send that to you)
+4. Use iperf3 to test (-P5 -t 300)
+
+As I wrote I suspect the locking in 11 is leading to these stalls, as
+the data I'm sending shouldn't be hitting the frag path.
+
+Do these results seem expected to you?
+
+>  net/openvswitch/actions.c  | 20 ++------------------
+>  net/openvswitch/datapath.h | 16 ++++++++++++++++
+>  2 files changed, 18 insertions(+), 18 deletions(-)
+>
+> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
+> index f4996c11aefac..4d20eadd77ceb 100644
+> --- a/net/openvswitch/actions.c
+> +++ b/net/openvswitch/actions.c
+> @@ -39,22 +39,6 @@
+>  #include "flow_netlink.h"
+>  #include "openvswitch_trace.h"
 >  
-> @@ -283,24 +284,9 @@ struct dma_info {
->  	bool aligndesc_4k;
+> -#define MAX_L2_LEN	(VLAN_ETH_HLEN + 3 * MPLS_HLEN)
+> -struct ovs_frag_data {
+> -	unsigned long dst;
+> -	struct vport *vport;
+> -	struct ovs_skb_cb cb;
+> -	__be16 inner_protocol;
+> -	u16 network_offset;	/* valid only for MPLS */
+> -	u16 vlan_tci;
+> -	__be16 vlan_proto;
+> -	unsigned int l2_len;
+> -	u8 mac_proto;
+> -	u8 l2_data[MAX_L2_LEN];
+> -};
+> -
+> -static DEFINE_PER_CPU(struct ovs_frag_data, ovs_frag_data_storage);
+> -
+>  DEFINE_PER_CPU(struct ovs_pcpu_storage, ovs_pcpu_storage) = {
+>  	.bh_lock = INIT_LOCAL_LOCK(bh_lock),
+>  };
+> @@ -771,7 +755,7 @@ static int set_sctp(struct sk_buff *skb, struct sw_flow_key *flow_key,
+>  static int ovs_vport_output(struct net *net, struct sock *sk,
+>  			    struct sk_buff *skb)
+>  {
+> -	struct ovs_frag_data *data = this_cpu_ptr(&ovs_frag_data_storage);
+> +	struct ovs_frag_data *data = this_cpu_ptr(&ovs_pcpu_storage.frag_data);
+>  	struct vport *vport = data->vport;
+>  
+>  	if (skb_cow_head(skb, data->l2_len) < 0) {
+> @@ -823,7 +807,7 @@ static void prepare_frag(struct vport *vport, struct sk_buff *skb,
+>  	unsigned int hlen = skb_network_offset(skb);
+>  	struct ovs_frag_data *data;
+>  
+> -	data = this_cpu_ptr(&ovs_frag_data_storage);
+> +	data = this_cpu_ptr(&ovs_pcpu_storage.frag_data);
+>  	data->dst = skb->_skb_refdst;
+>  	data->vport = vport;
+>  	data->cb = *OVS_CB(skb);
+> diff --git a/net/openvswitch/datapath.h b/net/openvswitch/datapath.h
+> index 4a665c3cfa906..1b5348b0f5594 100644
+> --- a/net/openvswitch/datapath.h
+> +++ b/net/openvswitch/datapath.h
+> @@ -13,6 +13,7 @@
+>  #include <linux/skbuff.h>
+>  #include <linux/u64_stats_sync.h>
+>  #include <net/ip_tunnels.h>
+> +#include <net/mpls.h>
+>  
+>  #include "conntrack.h"
+>  #include "flow.h"
+> @@ -173,6 +174,20 @@ struct ovs_net {
+>  	bool xt_label;
 >  };
 >  
-> -/* Check for odd number of 1's */
-> -static u32 parity32(__le32 data)
-> -{
-> -	/* no swap needed for counting 1's */
-> -	u32 par_data = *(u32 *)&data;
-> -
-> -	par_data ^= par_data >> 16;
-> -	par_data ^= par_data >> 8;
-> -	par_data ^= par_data >> 4;
-> -	par_data ^= par_data >> 2;
-> -	par_data ^= par_data >> 1;
-> -
-> -	return par_data & 1;
-> -}
-> -
->  static bool dma64_dd_parity(struct dma64desc *dd)
->  {
-> -	return parity32(dd->addrlow ^ dd->addrhigh ^ dd->ctrl1 ^ dd->ctrl2);
-> +	return parity_odd(dd->addrlow ^ dd->addrhigh ^ dd->ctrl1 ^ dd->ctrl2);
->  }
+> +#define MAX_L2_LEN	(VLAN_ETH_HLEN + 3 * MPLS_HLEN)
+> +struct ovs_frag_data {
+> +	unsigned long dst;
+> +	struct vport *vport;
+> +	struct ovs_skb_cb cb;
+> +	__be16 inner_protocol;
+> +	u16 network_offset;	/* valid only for MPLS */
+> +	u16 vlan_tci;
+> +	__be16 vlan_proto;
+> +	unsigned int l2_len;
+> +	u8 mac_proto;
+> +	u8 l2_data[MAX_L2_LEN];
+> +};
+> +
+>  struct deferred_action {
+>  	struct sk_buff *skb;
+>  	const struct nlattr *actions;
+> @@ -200,6 +215,7 @@ struct action_flow_keys {
+>  struct ovs_pcpu_storage {
+>  	struct action_fifo action_fifos;
+>  	struct action_flow_keys flow_keys;
+> +	struct ovs_frag_data frag_data;
+>  	int exec_level;
+>  	struct task_struct *owner;
+>  	local_lock_t bh_lock;
 
-parity32 expected a little-endian integer as it's argument
-while parity_odd expects a host byte order value.
-
-I realise that the existing code just casts-away the endianness
-annotation, but this patch adds a Sparse warning.
-
- .../brcmsmac/dma.c:289:66: warning: incorrect type in argument 1 (different base types)
- .../brcmsmac/dma.c:289:66:    expected unsigned long long [usertype] val
- .../brcmsmac/dma.c:289:66:    got restricted __le32
-
->  
->  /* descriptor bumping functions */
-> -- 
-> 2.34.1
-> 
-> 
 
