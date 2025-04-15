@@ -1,107 +1,303 @@
-Return-Path: <netdev+bounces-182841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B210A8A157
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 16:38:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D25A5A8A15C
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 16:39:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 656C919014EC
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 14:38:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBB9117E8CE
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 14:39:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 823982957C3;
-	Tue, 15 Apr 2025 14:38:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EC932951A3;
+	Tue, 15 Apr 2025 14:39:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aLvh2l++"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nVhxa57C"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59ACB29117F;
-	Tue, 15 Apr 2025 14:38:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744727900; cv=none; b=jPkakJNHitGT47baeQ3Hlr3xB32TZaKckcw6hhQN1D/0cU7nUTYqMoPmCHbdln2rbcbwPMiMZ0zU+Q04eYDp5h27DVFWjLSh9grUtcYPxuadW1E6zMjbgvjKj4YeXPgWWi5XqQy8ikjJNfAfyExacls8HczO2H8EoMd/pBttFT8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744727900; c=relaxed/simple;
-	bh=ZpM58jgXe8P92kBPX7QG3YnkqxXt6Jj4oTEvwlNQdFw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bfnh9mxS3kSv4Fk7CTB8G9QvXP02wABsFMrBmb75Ir+aFuSy4nzHj8d9kjZe2Wicty2griAdhtco6J4Ol0I2CDEgS4aglz3b7ewto+vHISx34yCR2UAFeNqxE9G7wbo0t5yQEZBFegYE4Ra7q2YfkcUBGc6uLRDOwL4iuU+HAd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aLvh2l++; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EB03C4CEEB;
-	Tue, 15 Apr 2025 14:38:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744727899;
-	bh=ZpM58jgXe8P92kBPX7QG3YnkqxXt6Jj4oTEvwlNQdFw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aLvh2l++VPeBifQEm59TW5nGAWgkqgrhThC69VZ+qGGNKet/quUjw7ZGXXruuqzlP
-	 lkaaH7JvQvawKe+inV2Ll+4rZghPzYQ+tz74EExAZgF7i6MUV+KeuJMTZe5PvRyM8i
-	 CWBNkjomCVpwT2vKF5hnS1DnTA4uZGGf4viZAnFz3pa6QWJ2KNXUEMpVJdJOe4CT1c
-	 Cb/9JHU8PBQD80eXLDzuoMkSK3rW/avVPCt+3D0VTZH6NgKHa/890EPWkN1clv7DgF
-	 kG/fHZIDp/cbDeHEpDPhsYpljSUyJYjmUaKOD/EmhbdT82jZxbXcs824I8I9gqe7IQ
-	 YnDC/jbkyH7kQ==
-Date: Tue, 15 Apr 2025 07:38:18 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Justin Iurman <justin.iurman@uliege.be>
-Cc: Andrea Mayer <andrea.mayer@uniroma2.it>, Alexei Starovoitov
- <alexei.starovoitov@gmail.com>, Sebastian Sewior <bigeasy@linutronix.de>,
- Stanislav Fomichev <stfomichev@gmail.com>, Network Development
- <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>, bpf
- <bpf@vger.kernel.org>, Stefano Salsano <stefano.salsano@uniroma2.it>, Paolo
- Lungaroni <paolo.lungaroni@uniroma2.it>
-Subject: Re: [PATCH net] net: lwtunnel: disable preemption when required
-Message-ID: <20250415073818.06ea327c@kernel.org>
-In-Reply-To: <3cee5141-c525-4e83-830e-bf21828aed51@uliege.be>
-References: <20250403083956.13946-1-justin.iurman@uliege.be>
-	<Z-62MSCyMsqtMW1N@mini-arch>
-	<cb0df409-ebbf-4970-b10c-4ea9f863ff00@uliege.be>
-	<CAADnVQLiM5MA3Xyrkqmubku6751ZPrDk6v-HmC1jnOaL47=t+g@mail.gmail.com>
-	<20250404141955.7Rcvv7nB@linutronix.de>
-	<85eefdd9-ec5d-4113-8a50-5d9ea11c8bf5@uliege.be>
-	<CAADnVQK7vNPbMS7T9TUOW7s6HNbfr4H8CWbjPgVXW7xa+ybPsw@mail.gmail.com>
-	<d326726d-7050-4e88-b950-f49cf5901d34@uliege.be>
-	<20250415025416.0273812f0322a6b1728d9c7b@uniroma2.it>
-	<3cee5141-c525-4e83-830e-bf21828aed51@uliege.be>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 760D3186294
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 14:39:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1744727965; cv=fail; b=sNLsRcdpLExRuL1bYPBPFmUw71vF10UG0vaan11b499tJKt62zvHE1NhkNR8FwtUuWDrYEKJBVp8eVyfq3LCXFEIe5i9JtDL/37SU7Dd/zhiNsTdb1UoSDVAdtARG5ZwLr69nprY6TE0Y2y5cwVlUp1ECWtGpZUndRIMiFdoC+M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1744727965; c=relaxed/simple;
+	bh=JDlEpGTjplQcbXRrzDUInb4BbEctbNloO1busHY6x2g=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=H/MrgGAMj/Uy/SyJpt8WhpRW+SLAIh8ah+aOogO8D2iZzwtBO8PkIXG/kAYsHPicUI6QpkZrLmcwlZXE1gPGZ/jQez25TwsQCSUfZpDj0BGn5h+X6+fgJki2hDuO2/AT8RzzQ++KWB1p+EtIkFJ9uLU4nV0yJtc4iQpT62/qFug=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nVhxa57C; arc=fail smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1744727963; x=1776263963;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=JDlEpGTjplQcbXRrzDUInb4BbEctbNloO1busHY6x2g=;
+  b=nVhxa57C6iKokERKU9/+aiBt9ycG1Bc3OklgPSTUKu8Hsov6FkRlgkwU
+   t3JMArRsdrUa7908AHXqNN5sogvpyr3KlJLzNpoWdtbQLnoREjl/O2Mvv
+   CNYF6NrQVzg8E3FAtkq0DjKSMwlV7wUtCF1knYWeimv6zAbQdK3ypJ1N2
+   BrIvut4l0gbq62DIcsHUX9a0tdHTmUiPYfRyvH/8hbcWn6XKx+TKq0G1c
+   BRqmnS+eL8kJiWbnOwHIqWa290Y7se4+S21mxMMgoWmN5ZaMaGKwaURZN
+   hvE4/ZL3XVBxIo77oWbHy1xye1xsDxdvz9gVpq2jqQbTOAQR2SjUChYae
+   Q==;
+X-CSE-ConnectionGUID: wVUeuLF+QxOHtnpBZKLbQg==
+X-CSE-MsgGUID: XpEsH92URSSykckkHmLH+g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11404"; a="46406453"
+X-IronPort-AV: E=Sophos;i="6.15,213,1739865600"; 
+   d="scan'208";a="46406453"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 07:39:22 -0700
+X-CSE-ConnectionGUID: ZFxpexCjSMai3QUZqfk6AA==
+X-CSE-MsgGUID: SD7NPWJTRBeueJjPu8ck2g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.15,213,1739865600"; 
+   d="scan'208";a="130669247"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa007.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2025 07:39:22 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Tue, 15 Apr 2025 07:39:21 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Tue, 15 Apr 2025 07:39:21 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.45) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Tue, 15 Apr 2025 07:39:20 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Zwxug1ig5iOs1vMAnCkjE0dyDG5sT/sduVFyw5zfxaIr3qol8d6bXi61MuckugnXvkugg27BANnR6DKKQWd6H5a/AIk2m6a1xHAlPkZhE20ZQ830VOHXI+J7aj71tnHpOiSKqOHCeZLKlZIES3YTy/1YhTJzVepm4l1NEf9RfuVVqtFTx+WcyhGw/9+SwtVwgYALa6xZazLuWedOqYGrsHhABbmNLq2rlcSJTt5GSQ9OOleRaBd1oPSE9dwQ+u55el08eM1bsam3GZQGh5x67W7BLPsASysLDaas3HrupbYy1+ik+8zbvXcvffXzONdLu1tIlUkUv4RSu7/+zhfsZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ceah23uTYw873GvIaEEW3GiOt+SEDDQZubpphesmKTI=;
+ b=X04+JF995fJrTUV+w/NLpnyjG9Jyu6wS64AEpYr5XVIUFS7zCttiCbWXfEZlq+vsPBliWWrvZ/lI1HcLE+lPVp215zMkrErr5eO4Yy4M2SmMm2Gi6R6nqxzKrICiSl/pGU0/DEuU4RX/PPQxdFrar5uNuNTaXZi02ikCZbL5tIDOXMSnLdR0anpbokcVgGDLIhHkb+dCHX8nxqO8wxVs5u7UIkhBp9+ZO1hKTVw1/EPMNAy30aaYMzXLsujClbUy8ldszIG4Iv4cHYenw5u1UcN+UwPROv61bhvF3O8f2OXgdkMHJu75/hHdj49lUqIp8wj5E0EbSsgOD8Z4pyICPA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by PH0PR11MB4838.namprd11.prod.outlook.com (2603:10b6:510:40::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.35; Tue, 15 Apr
+ 2025 14:38:46 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%5]) with mapi id 15.20.8632.035; Tue, 15 Apr 2025
+ 14:38:46 +0000
+Message-ID: <4a061a51-8a6c-42b8-9957-66073b4bc65f@intel.com>
+Date: Tue, 15 Apr 2025 16:38:40 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: Increased memory usage on NUMA nodes with ICE driver after
+ upgrade to 6.13.y (regression in commit 492a044508ad)
+To: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+CC: <jdamato@fastly.com>, <intel-wired-lan@lists.osuosl.org>,
+	<netdev@vger.kernel.org>, Tony Nguyen <anthony.l.nguyen@intel.com>, "Igor
+ Raits" <igor@gooddata.com>, Daniel Secik <daniel.secik@gooddata.com>, "Zdenek
+ Pesek" <zdenek.pesek@gooddata.com>, Jakub Kicinski <kuba@kernel.org>, "Eric
+ Dumazet" <edumazet@google.com>, Martin Karsten <mkarsten@uwaterloo.ca>,
+	"Ahmed Zaki" <ahmed.zaki@intel.com>, "Czapnik, Lukasz"
+	<lukasz.czapnik@intel.com>, Michal Swiatkowski
+	<michal.swiatkowski@linux.intel.com>
+References: <CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <CAK8fFZ4hY6GUJNENz3wY9jaYLZXGfpr7dnZxzGMYoE44caRbgw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: WA1P291CA0009.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:19::20) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|PH0PR11MB4838:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5fcb8f0d-487b-4591-a601-08dd7c2b3a7e
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?cEFuUE1ubjBmUk5jblB5Um00U3ZSQmN6N2svUGpEYTFXWHZDYXhBWlhGYzZT?=
+ =?utf-8?B?Z3ZzVEtJN1VkL0hNdHZwNFlMYzR2R3dEcDJFMCtzd2tZVXErVUo0U2Nod3I3?=
+ =?utf-8?B?czNTM2R1Vkx5MEFpTTZ4RGxSQlhoQkQrRWVOSmlVd0krT0oxQWlHRnlhNVV0?=
+ =?utf-8?B?YWN2cVdqRlNlQWhORjFhSHluNWt6emhXR2k1bEEwZUJqZnEvZ0JwVTRKWlFD?=
+ =?utf-8?B?NitMVXNzMldhclhkNW9MaTlkTEJWR3lySmhsT3RUdUtDNWNaQk5yMVdUZU56?=
+ =?utf-8?B?VWVPY04wMEhvekd0eXBtczdwM0FmVHY3cEJGeDdlMkJuZjVZNXROY2ZZbHgw?=
+ =?utf-8?B?SDlsWSsvMXNrVUVqVjZSblM3TDdZdWtKb2xpM0Y4bXVQNElXYTBxK3lKWG1o?=
+ =?utf-8?B?czNmM0V6UHdWMFJNbTRqVnlVMEpBQ2J3S2tXYU1JWUx6a0tuSG9RUHhYV2hv?=
+ =?utf-8?B?N2w5bXU1NWJ1djhTbjc5Tzg1ZGRwNExPQUNqM1VtdERNcEl6dExUbXhpeitj?=
+ =?utf-8?B?bUlORzhxa0V5U2ttWWxUTkRzSUc3ZElWOUt4djgyZ3dURldGQWQxNis2NjhT?=
+ =?utf-8?B?bFFnRDYyZlhFK0dReXdGa3VLUnF6NkJValhHYjhYU2ZSWmp4Wlo1aHhoMWwy?=
+ =?utf-8?B?WDlCK2R2WUo2ZkY4MzFEQ1hmMStoeVNxQzl0eUpyL0dicFVPLzRManI2TGNB?=
+ =?utf-8?B?UHU0VjBUMXNxZjdzaXlaS1p1MVNHd3greklYWU84QUtUaVVMTHluZ2ZBQ3px?=
+ =?utf-8?B?TnFSMjhIdG5xQmFrNHhsSGR4bjNDWWFMVlN6QmxEVGJ5UFNGSmYzMzVFSGtp?=
+ =?utf-8?B?UVduNDQyRGp2aGk4cWIzNm85VlRmcitmTlVNL1ZudThhYW1XTkJjUjN1TjhW?=
+ =?utf-8?B?cHdxV1RXekpwNm5GT1Yydm5qQlpWMVE3UkY4VHV0cmJyazdLSHJsdjF6aDN6?=
+ =?utf-8?B?UitiOGU0ekJ4ZFltbENLRnY2MGZKT3NKQ3V6ZmNZck96S1VjWnZSRlBGQm10?=
+ =?utf-8?B?VlpMeEcwWC9OK0NyWDUxOG11KzRodVFndk1xOGdqRGt1S0JyVFhxRlhGcS9n?=
+ =?utf-8?B?TDVYbUY2YW1RdEJTblZXMjJoWk8rM0s1QmhsYW5pL3pMRXVmM1c4OE1odkFy?=
+ =?utf-8?B?dGhZQ2IzT21TbkRtaEE3QU5XeWd3RzlYVWRlNThvYUl0SXZxWEVVcGt0Q3Yr?=
+ =?utf-8?B?dGZJb2F2UC9CWmg0UzZDWTFuZFgzVTJ2WitSdDZOS2R1cmdqWGtxcDE5U3RR?=
+ =?utf-8?B?cm5yTEhmN2x1QmVza1dTZEhsVHJzM0JWS0pDSm5QczhRODF1cERTVWcwMThu?=
+ =?utf-8?B?eDFsOWZuTTA1aGlMdEtDbWJWbHJVbDNEdmErTCtQTE5SRFBBaFJGTFlpeVV5?=
+ =?utf-8?B?azNoZi8zc3FVUENsdWhLT0gxMW85VW84TmNHdWdWQWpFb0RZdW1abXBPK3N5?=
+ =?utf-8?B?NUhsL21saEIwclU3R2RhVHlHS05WUlIrdVRPUFl1QmxiUXZZakNBNkJURi96?=
+ =?utf-8?B?RTR0MFlUdW1TWGR1dWdGZE1PV0Rla0szdktFbnIwT1lqTW1aZmpsa3dtemUr?=
+ =?utf-8?B?UVVHVEJLUnhHaUIyaFdqOUJtR05CNzlwZUJQOUhSSjBWWFg1Y1pUNGo2SEds?=
+ =?utf-8?B?dWtvNHQvSkU2Y3l1REluMGhEZmh2Tyszd2NYSTI3TURjWXpqSTNkOXZFUmE3?=
+ =?utf-8?B?Q1N2bkVRV3VlSkhYNmVKZGxHaXFpSHhsb294TDB3dHIrcXN0SU9pNmZ6TUsx?=
+ =?utf-8?B?UER2SGJ0UGUwSWYwRDVJcGs4RDgvVWxKM1ZFZGNmQit6bUxCWmdhYmJPdG9I?=
+ =?utf-8?B?djZ6REpabENzbTFWelNWRWdraEd4QXBETU14SlRLd1k0Ui9tU1d5dWFRcEZO?=
+ =?utf-8?B?QXZ0RVl4Q1pDQjBydG0wY09PWUdrTTZUZmxxQnJjMkhxblMrUHhLRlljZTB3?=
+ =?utf-8?Q?0HzrK0MdYvI=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eXoyZzJ4WFVrM2ZxaVl3VUwyU1RZbGxTdjMybjNKSWFmaHc3dHZvUUhFenVC?=
+ =?utf-8?B?ZnBaYTFNU20vc1VYRGdzMitTbjhGdkFEcDJwSmFibHR0RmtKUWJwbDhDSWJV?=
+ =?utf-8?B?S3drUmY1QmVpSk9yRzdub2NVTTVtYjZ3am5LMWNnYU1iZUNtVnlob1htTzAx?=
+ =?utf-8?B?ejBKc1hDTWJVWTNkckwrd0p6REpVc1JqNlRDK0piVnU0djBDZHllUGVIVWVB?=
+ =?utf-8?B?S3EzVTBCTysyV29wS2Npem5XcEdUQVFDTm5ITU5TaG4xV2pOMXZsSER0QlN1?=
+ =?utf-8?B?UjBvMUhobVB3RnlSdDZBRkJ5VTEwZ3ZRRkMwRkJwOWVIS1U0eERoVkllTmNs?=
+ =?utf-8?B?dXZadm9xaTNlN1VrNU1Db3kyVC9PNGhZQ3BwMWNLQkhDOEd2SENCdExER1Rm?=
+ =?utf-8?B?TGpvR0lTU1o1cUJhaVluNWd0YTVoaGNJL3BLQyt6WmZYQXYzU0dQUkVaeVZp?=
+ =?utf-8?B?ZTJpUlpzcU14S3duSGtBTUlaKzdvMUZvcitDalZ3a3ZUR1VmZFJJNVlyRjds?=
+ =?utf-8?B?cHNXU1ltVlpKNi9aNWtLMlJaSHNxRWNyZ1gyNEcyYU9VckZFb1QwUmR5QjFM?=
+ =?utf-8?B?MDRLMGtObUhWVng1MkxqL0wveExQUmI3NHJ5ZTJmN1U0UjhHSmpRUmtqRjZi?=
+ =?utf-8?B?ZStHM1k4WmIwSEt5Q2M0UFBldXlHQnBlcWdOczVQN2NvR1lPZ0ZaTE1PbCsx?=
+ =?utf-8?B?SUJ2OE5XK1prV2dlR2RkNXV0MFJZbk1WemozamloS0FPVFB6NDdrcXV2SFh1?=
+ =?utf-8?B?NjE4VmlPbURlOHRTSXdIckJpVDlxcjFjQjE4VmhMODZsRUJ4Z01OeFdkTGFN?=
+ =?utf-8?B?Y2JwWTI4QnpWOVZ0aEVIOGphc1ZsRXdXc1loRVVNRWtmOVZSR0EzdkNKRjlh?=
+ =?utf-8?B?TFVYdkk5Ly9oR2RobjRpVStPbWhQUTIxeGJ0WHAyMUU4aDBtZ3E2R09qYmtl?=
+ =?utf-8?B?cUZRUzNSMXVBeVBLZWp6OE4vcWZDRVRJWkt3ZFNRT2xnYlA5V1lhcmR4YTQz?=
+ =?utf-8?B?MUZwNUVzcU0xVldxTjdwMGgyemgwOGcwSmFHUXhBS29OUzdNSWJtbkZVV0dn?=
+ =?utf-8?B?ai9VVEFLYndvWWxUdTZRVnJkWnIwMEI5MFRuaktxcVhZeUpJYlo0TStNczVY?=
+ =?utf-8?B?cGJoMUdKeC9CREMwNngzMXNLN2JnNlN6R2g0QUVYL3Z5cXViRWw2N2dmMjNp?=
+ =?utf-8?B?WkgwQkk5ZWJEdkpFWDJTL0VMWlg1M0tBOTBuL3kxNy9lak9YZVlETjRCUDNQ?=
+ =?utf-8?B?ek8xdUtHdERpcGttUE5EdUk0VFAxNXEyZ2RFZTJDcEZncXZuZkNYN08yclor?=
+ =?utf-8?B?WVkva3p1YVFPVysxRXJPSUpwclBPeU5YR1UrYVJBS1EzVXdTOHFiRXhUZWY5?=
+ =?utf-8?B?V1RZYm5SOGhNUWZDTXViakRPWUlkUXR4WGZGZUFoZkpHOFVtUjQ4bG03UDVS?=
+ =?utf-8?B?a0JDazk5dUNpbFNIMXRvQXN2Rk93elJUVDMrUGhKS3hVU1czNVFmbTcwbDZX?=
+ =?utf-8?B?UWl0Y3hBT0pWNDZ6a2hQbTF1UCtPa1FHZVdGNG9Qclc0Ty94UVNUSFhGY1lh?=
+ =?utf-8?B?K0Nuc25LSW50ZklSOW85aEJqWm9COTBDRThRUnczTFZGcHJUVGZkK0J2NE1K?=
+ =?utf-8?B?b1BLL0xYR29QWjdUWFJ3RFJLYm80YzZ5bkNBRmRHam9oMURZSUpxTU1DbXFY?=
+ =?utf-8?B?Ny9BRFdQb3ZoMEYwcmlndzNjcGVMYXNuSHp1MGREWHFXa0k0S1hsaFlJY2d6?=
+ =?utf-8?B?V25MRG5wbG0yWHNTeHY2dVFjSzVVWnhUOVJLRjVUOHRQNm5CR0FNdFk5ZGpi?=
+ =?utf-8?B?bVMwc2hZTmJsd0YwbWhaRGhieW5nemhQQjlOZ1R1TzIzWStFYVM4bGdZTHBQ?=
+ =?utf-8?B?ZFB3TDFDWXVzZ0RHaEQ1RVBpSkoxL0wyck5qQTgrVWpFMndGVnllSFhCZUQ0?=
+ =?utf-8?B?b3MrWGxCdThFdWtVeTVHb2k0Ny9FU0lmUC8xdmFXdVZvM29zNzh0cjNjaVVk?=
+ =?utf-8?B?d0FWOS9iOWhVRmhhTmdqaEQ5cUZ6N21oSTFkdVhDMzVaS09IU1JnS0VSNklT?=
+ =?utf-8?B?VnBWS2hwRTA2am5qOXBod2ZiOE9UQTJyYktMd01Ra2ZMOFcva3Y4Ukk3bHFp?=
+ =?utf-8?B?NG1xdHVkZk0wb2JEd1FlTERid2E0MXRGS3grbzl5MUpGVWY3dHJ3VkN6QzJk?=
+ =?utf-8?B?ZFE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5fcb8f0d-487b-4591-a601-08dd7c2b3a7e
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2025 14:38:46.5763
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: cMlWxlC0B/SJvTfvbykTVqoOlrAgO/l18iXc5ulg0EAqCHaynVSWMNlOyQYFItVpwY1dMdTvRfrTEdXQuwhKyiYfFEPL9WHo0dcXdj3qLaU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4838
+X-OriginatorOrg: intel.com
 
-On Tue, 15 Apr 2025 11:10:01 +0200 Justin Iurman wrote:
-> > However, there is my opinion an issue that can occur: between the check on
-> > in_softirq() and the call to local_bh_disable(), the task may be scheduled on
-> > another CPU. As a result, the check on in_softirq() becomes ineffective because
-> > we may end up disabling BH on a CPU that is not the one we just checked (with
-> > if (in_softirq()) { ... }).  
+On 4/14/25 18:29, Jaroslav Pulchart wrote:
+> Hello,
 
-The context is not affected by migration. The context is fully defined
-by the execution stack.
++CC to co-devs and reviewers of initial napi_config introduction
++CC Ahmed, who leverages napi_config for more stuff in 6.15
 
-> Hmm, I think it's correct... good catch. I went for this solution to (i) 
-> avoid useless nested BHs disable calls; and (ii) avoid ending up with a 
-> spaghetti graph of possible paths with or without BHs disabled (i.e., 
-> with single entry points, namely lwtunnel_xmit() and lwtunnel_output()), 
-> which otherwise makes it hard to maintain the code IMO.
 > 
-> So, if we want to follow what Alexei suggests (see his last response), 
-> we'd need to disable BHs in both ip_local_out() and ip6_local_out(). 
-> These are the common functions which are closest in depth, and so for 
-> both lwtunnel_xmit() and lwtunnel_output(). But... at the "cost" of 
-> disabling BHs even when it may not be required. Indeed, ip_local_out() 
-> and ip6_local_out() both call dst_output(), which one is usually not 
-> lwtunnel_output() (and there may not even be a lwtunnel_xmit() to call 
-> either).
+> While investigating increased memory usage after upgrading our
+> host/hypervisor servers from Linux kernel 6.12.y to 6.13.y, I observed
+> a regression in available memory per NUMA node. Our servers allocate
+> 60GB of each NUMA node’s 64GB of RAM to HugePages for VMs, leaving 4GB
+> for the host OS.
 > 
-> The other solution is to always call local_bh_disable() in both 
-> lwtunnel_xmit() and lwtunnel_output(), at the cost of disabling BHs when 
-> they were already. Which was basically -v1 and received a NACK from Alexei.
+> After the upgrade, we noticed approximately 500MB less free RAM on
+> NUMA nodes 0 and 2 compared to 6.12.y, even with no VMs running (just
+> the host OS after reboot). These nodes host Intel 810-XXV NICs. Here's
+> a snapshot of the NUMA stats on vanilla 6.13.y:
+> 
+>       NUMA nodes:  0     1     2     3     4     5     6     7     8
+>   9    10    11    12    13    14    15
+>       HPFreeGiB:   60    60    60    60    60    60    60    60    60
+>   60   60    60    60    60    60    60
+>       MemTotal:    64989 65470 65470 65470 65470 65470 65470 65453
+> 65470 65470 65470 65470 65470 65470 65470 65462
+>       MemFree:     2793  3559  3150  3438  3616  3722  3520  3547  3547
+>   3536  3506  3452  3440  3489  3607  3729
+> 
+> We traced the issue to commit 492a044508ad13a490a24c66f311339bf891cb5f
+> "ice: Add support for persistent NAPI config".
 
-I thought he nacked preempt_disable()
+thank you for the report and bisection,
+this commit is ice's opt-in into using persistent napi_config
+
+I have checked the code, and there is nothing obvious to inflate memory
+consumption in the driver/core in the touched parts. I have not yet
+looked into how much memory is eaten by the hash array of now-kept
+configs.
+
+> 
+> We limit the number of channels on the NICs to match local NUMA cores
+> or less if unused interface (from ridiculous 96 default), for example:
+
+We will experiment with other defaults, looks like number of total CPUs,
+instead of local NUMA cores, might be better here. And even if that
+would resolve the issue, I would like to have a more direct fix for this
+
+>     ethtool -L em1 combined 6       # active port; from 96
+>     ethtool -L p3p2 combined 2      # unused port; from 96
+> 
+> This typically aligns memory use with local CPUs and keeps NUMA-local
+> memory usage within expected limits. However, starting with kernel
+> 6.13.y and this commit, the high memory usage by the ICE driver
+> persists regardless of reduced channel configuration.
+
+As a workaround, you could try to do devlink reload (action 
+driver_reinit), that should flush all napi instances.
+
+We will try to reproduce the issue locally and work on a fix.
+
+> 
+> Reverting the commit restores expected memory availability on nodes 0
+> and 2. Below are stats from 6.13.y with the commit reverted:
+>      NUMA nodes:  0     1     2     3     4     5     6     7     8
+> 9    10    11    12    13    14    15
+>      HPFreeGiB:   60    60    60    60    60    60    60    60    60
+> 60   60    60    60    60    60    60
+>      MemTotal:    64989 65470 65470 65470 65470 65470 65470 65453 65470
+> 65470 65470 65470 65470 65470 65470 65462
+>      MemFree:     3208  3765  3668  3507  3811  3727  3812  3546  3676  3596 ...
+> 
+> This brings nodes 0 and 2 back to ~3.5GB free RAM, similar to kernel
+> 6.12.y, and avoids swap pressure and memory exhaustion when running
+> services and VMs.
+> 
+> I also do not see any practical benefit in persisting the channel
+> memory allocation. After a fresh server reboot, channels are not
+> explicitly configured, and the system will not automatically resize
+> them back to a higher count unless manually set again. Therefore,
+> retaining the previous memory footprint appears unnecessary and
+> potentially harmful in memory-constrained environments
+
+in this particular case there is indeed no benefit, it was designed
+for keeping the config/stats for queues that were meaningfully used
+it is rather clunky anyway
+
+> 
+> Best regards,
+> Jaroslav Pulchart
+
 
