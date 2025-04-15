@@ -1,67 +1,68 @@
-Return-Path: <netdev+bounces-182765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F8C4A89DCA
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 14:22:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FC37A89DF5
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 14:26:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2FFD189E66C
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 12:22:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A86A73B87B5
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 12:24:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A25E297A76;
-	Tue, 15 Apr 2025 12:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88DA0297A65;
+	Tue, 15 Apr 2025 12:22:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hAeoNV51"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="uuKAAANr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BEC32973AF;
-	Tue, 15 Apr 2025 12:19:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE7B2973BE;
+	Tue, 15 Apr 2025 12:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744719557; cv=none; b=pHstL1nGmTgNtb/9avasTxGLqVFCscBhXJ/tn3RccrTMUEHkud49O488Ii/tX/iCgfv56OE/HkH5AkiFTpStzukvMUR8BCCFNjZj5VluMisELCwZBiBg+MI+NH2kpZi9pfx8TQc27lOXW0KGjAE3T5ETf8u8oyAyJShO52ewEAk=
+	t=1744719756; cv=none; b=XRCuPXidFAGBJ+nJwp2e6epj7Y3lswwQ8eAs6qXIOsKEpk9JFmEnrRTu4UdWs69BcVrgaOIwSelL5m1ZWssGA6cfdzKyNo2IdzZ1pNTJSBjImeGrDebDkaiFHkTUQv/LxMwg/WZJ+qBO3rYPySXo+R+OnkQu6eOJib5DiIOq6u8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744719557; c=relaxed/simple;
-	bh=ExuwwuQWLzkJuGGpl9n1F27u16tfXGWUJL91Td9VQ/k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=u1aGw+cJn7PsS7ord6teWOUOwoSmoOxXdCwoW5vQQALX2NTRIxA8DaSez7t+X7QkrK5A4RjB3+5NmXXwyFCG3HZbmR1D11MDgHH3PpA0763Prww6EiTLT6MkuwfHbbRCsPcg9mMqYP7qtKcuwdNcgAxhk/a+JqlfRo8hdDgfWjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hAeoNV51; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71888C4CEDD;
-	Tue, 15 Apr 2025 12:19:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744719556;
-	bh=ExuwwuQWLzkJuGGpl9n1F27u16tfXGWUJL91Td9VQ/k=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hAeoNV51pdhfYpi5SMPjAlS9s8O23JXovV8fv06NO08eoHRGlibgpic+MlVsAqeJc
-	 MMwpxy35qteiXy3naYT2DqF7eAFZjrrhmV0fDHSDmyq0EjB4OEiDZ721GIgiBxV+LE
-	 aIKwW+x+2Ns5RWixNq91VMPxsD3LRE0+5SVvmJsygLy1eCFyfX1tnX7xfOwKXCwm1K
-	 /r0ktlz++7z1VRTtNiX5fBbTBBwwtPw01tgUa7iZ/1Nlv/nkWXHmSmIQzCZ2mkfaJ8
-	 8pGc8XYasDthBwD0ohlAZjewKdGnW3t1nsZqPfH3pcysXEFP+vQed6MX2hwDbRdq1J
-	 c6t1lm/y+laBg==
-From: Philipp Stanner <phasta@kernel.org>
-To: Lyude Paul <lyude@redhat.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	David Airlie <airlied@gmail.com>,
-	Simona Vetter <simona@ffwll.ch>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>
-Cc: dri-devel@lists.freedesktop.org,
-	nouveau@lists.freedesktop.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-media@vger.kernel.org,
-	linaro-mm-sig@lists.linaro.org,
-	Philipp Stanner <phasta@kernel.org>
-Subject: [PATCH v2 2/2] drm/nouveau: nouveau_fence: Standardize list iterations
-Date: Tue, 15 Apr 2025 14:19:01 +0200
-Message-ID: <20250415121900.55719-4-phasta@kernel.org>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250415121900.55719-2-phasta@kernel.org>
-References: <20250415121900.55719-2-phasta@kernel.org>
+	s=arc-20240116; t=1744719756; c=relaxed/simple;
+	bh=DoEEJAGy5AoYSGe5AvELfoahMUlyejm0QnJ1IyMgB+I=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sYl8tunL7up9+AQ6PhUmZGiKGPnyJtARfTbBA5pkee8q1ARHUkjj52Tz9+69yVFXVbeQFE8x+zVoNLGchzB7KI9/xuJ0gJ5XtZZ2vYJ2geWOncY/vjoE4x8Q5IxCEJXBQjah2XQ4uuV1qqz9DIMzxt65/uBER0qZ2DYDkQX2BzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=uuKAAANr; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 53FCM4SE01309596, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1744719724; bh=DoEEJAGy5AoYSGe5AvELfoahMUlyejm0QnJ1IyMgB+I=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=uuKAAANrORTkcO3xhG9SNTFBxVkX9pbV5+kjfK60X4NoS6ekfuPaL6fMEVWSpi/DQ
+	 d/UmIpCXRRe9QLwoQBjy/9REh+X0a6/vNPpJrEg85HLrUja695h0TfrerQPjbPbBVh
+	 NLn+8zlfPHeppeybxA58F+NgTuhi6+sO/5ak45CARwXdDsw90FQXSbFdTrzE/YLBQU
+	 AuTsWrHdS+flE1H1mcApeMFHBL+v7ugdZKiUNrRY1Ey7s+HoQwWIA/+8pmvKgqDVZ5
+	 mnr/bW83QWoR05CVpyLijXzCZKTwMjLd96WffQC2y4IjcSExHeDrjx0hr7kepNPEPR
+	 IFdkXqPwMYqrw==
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 53FCM4SE01309596
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 15 Apr 2025 20:22:04 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 15 Apr 2025 20:22:05 +0800
+Received: from RTDOMAIN (172.21.210.70) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Tue, 15 Apr
+ 2025 20:21:55 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <andrew+netdev@lunn.ch>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <horms@kernel.org>, <pkshih@realtek.com>,
+        <larry.chiu@realtek.com>, Justin Lai <justinlai0215@realtek.com>
+Subject: [PATCH net 0/3] Fix kernel test robot issue and type error in min_t
+Date: Tue, 15 Apr 2025 20:21:41 +0800
+Message-ID: <20250415122144.8830-1-justinlai0215@realtek.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,53 +70,27 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
 
-nouveau_fence.c iterates over lists in a non-canonical way. Since the
-operations done are just basic for-each-loops, they should be written in
-the standard form.
+This patch set mainly involves fixing the kernel test robot issue and
+the type error in min_t.
+Details are as follows:
+1. Fix the compile error reported by the kernel test robot
+2. Fix the compile warning reported by the kernel test robot
+3. Fix a type error in min_t
 
-Use for_each_safe() instead of the custom loop iterations.
+Justin Lai (3):
+  rtase: Fix the compile error reported by the kernel test robot
+  rtase: Fix the compile warning reported by the kernel test robot
+  rtase: Fix a type error in min_t
 
-Signed-off-by: Philipp Stanner <phasta@kernel.org>
----
- drivers/gpu/drm/nouveau/nouveau_fence.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/realtek/rtase/rtase.h      | 2 +-
+ drivers/net/ethernet/realtek/rtase/rtase_main.c | 8 ++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/gpu/drm/nouveau/nouveau_fence.c b/drivers/gpu/drm/nouveau/nouveau_fence.c
-index 6ded8c2b6d3b..60d961b43488 100644
---- a/drivers/gpu/drm/nouveau/nouveau_fence.c
-+++ b/drivers/gpu/drm/nouveau/nouveau_fence.c
-@@ -84,11 +84,12 @@ void
- nouveau_fence_context_kill(struct nouveau_fence_chan *fctx, int error)
- {
- 	struct nouveau_fence *fence;
-+	struct list_head *pos, *tmp;
- 	unsigned long flags;
- 
- 	spin_lock_irqsave(&fctx->lock, flags);
--	while (!list_empty(&fctx->pending)) {
--		fence = list_entry(fctx->pending.next, typeof(*fence), head);
-+	list_for_each_safe(pos, tmp, &fctx->pending) {
-+		fence = list_entry(pos, struct nouveau_fence, head);
- 
- 		if (error && !dma_fence_is_signaled_locked(&fence->base))
- 			dma_fence_set_error(&fence->base, error);
-@@ -131,11 +132,12 @@ static int
- nouveau_fence_update(struct nouveau_channel *chan, struct nouveau_fence_chan *fctx)
- {
- 	struct nouveau_fence *fence;
-+	struct list_head *pos, *tmp;
- 	int drop = 0;
- 	u32 seq = fctx->read(chan);
- 
--	while (!list_empty(&fctx->pending)) {
--		fence = list_entry(fctx->pending.next, typeof(*fence), head);
-+	list_for_each_safe(pos, tmp, &fctx->pending) {
-+		fence = list_entry(pos, struct nouveau_fence, head);
- 
- 		if ((int)(seq - fence->base.seqno) < 0)
- 			break;
 -- 
-2.48.1
+2.34.1
 
 
