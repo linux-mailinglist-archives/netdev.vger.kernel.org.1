@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-182762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD28AA89D4D
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 14:14:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5F59A89D4B
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 14:14:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 624731900028
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 12:13:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0013217B83C
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 12:13:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 293C22957CA;
-	Tue, 15 Apr 2025 12:13:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91B832951D9;
+	Tue, 15 Apr 2025 12:13:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Mm9C1I/5"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="aFPhHCzX"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2042.outbound.protection.outlook.com [40.107.220.42])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2073.outbound.protection.outlook.com [40.107.244.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E8462951C5
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 12:13:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5EC627A934
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 12:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.73
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744719201; cv=fail; b=k7hGrbMFFdF8jXODeoyc+jECp6U7BoM1lEqQ5EfVkJlEoZ6ZyaowHGP3WxtbbuWsnM8m6UdJcxB20QReWDAET1JqipJ3S4/hxeHHsVA0Zjhs/eXdXvd1yA3uoOSHYfFhktJvlzVriXbWsdbclI9KSeo/9eCkQn3GOflaeQQnsZ4=
+	t=1744719192; cv=fail; b=XEp5rA8BOD+2KpGPb7LpzwZvDdpfcsBBLJINeyfldAOM5yYCUc+Xr6mCSY4qfV5Jd2B/4FlAe7QweQ1a5CWIh1GFR5SjfXxJG+fCxhOt/gPuAGGMBOxiEHoW8wAGzHwHur42IbXLrNxzhv1k67oA3qyhZhNjogCX7vtzJ6u//YQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744719201; c=relaxed/simple;
-	bh=YYC4PrfUCbxbaDbSKoQwbZYLnrWGy+M2m+Y8QdI7dBI=;
+	s=arc-20240116; t=1744719192; c=relaxed/simple;
+	bh=Rath+f3+g8e8CNW9Yl+NqHiic77bxbRAjXyOxx7hG9s=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TNarhN0nf/wSLXcCl8FwotkP4ykHrpkafK0rwGO5CE3mUAQmNrshAjT53C3qQA1IHLsRoOXlvRbXQDSlrSc5IWq8J1idR33wLMK7laWQhqcTdPnsPUE7c0w5qDIt+kROQIlvexb+FC/4QBGbndIDdcH4mpRA/zSJOWAqzU9c6ow=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Mm9C1I/5; arc=fail smtp.client-ip=40.107.220.42
+	 MIME-Version:Content-Type; b=sUSZd0Spjqf7Po4G673+2toMOzWVMqMlc7XVlIousDoAsNSJIDsIA3Vn5hRUnkv7gzyy8mElTfl2LUnvDnFsQuPvFVXEvWvrlzrJLKO35M55fYG4xlyghXxLQW437OlcRSGTsER09tOZ8fEnXHEj+tpDejiSyVg3M8fTei+ThEU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=aFPhHCzX; arc=fail smtp.client-ip=40.107.244.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YIj20XSSg+6iYu6u3DXZTqlqSc3bYycAzoq/+GDUNfC1TyBSfaHVkFW2H6Xrgc0AnRhrjObAXPZNOnZWtNnd99okLhUP/m2jHKafhCdzf6TEdFQNzyeF/x2++Rzbh4R6T3jV9MuchOrloVcJ+E9Y148R1eCBtE45ckNb2ydPYdyQr+jVeSTNByJ6zLjzqo4qkQ/ROnuPM/uWeh/QAKe6+7+hu4bXIfLNu/Qn5+qkqHlrW+zdxBChsLsDUA0zlRh3gfeGWggg7+DqaF+S/GXCm/bqL7FTolqnkR8hHPl/NAL4Mlq4MWrx95WhHlZvL9GChiN7aTrT7T7cRFtYhCcudw==
+ b=I5rCek1UgQ8xjxaVvoyTa/RoVY5BKSWuV43fE99D3XaITvUhu63THwAZpdJ7mOCo0dMuI6Joe1qsDRKpjNseN0C0VvEAU27e1f0fl4Pl5erLcvwDt8GiBEhp5ba43eK7ANZqTZFQxuAy/wehp3lTrVKnGmgDsIhcSlfHE36PilK/Aiqe35cR7ibE11ahfkDX8W9qxxm74UofXQzLr7qOligRL8NkjHEqc4VTnyEo8ieNKK0xyWa/8HYglKc47isT3LIPwbk/wPNPcf1ml/JVJuz+w5XDvPTroe3BNKzFJx+3dG0I3fr1UMKvbtj5E6XVV1+7MriBZ5hbW4V785Vgyg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=T+sMHlK7YnwbBFDqNn9cPGcaiPOGCCs3NGxZ5HuL8+E=;
- b=iWS7ziCZpr0uCe0nRoYFbzXSU3ZvsVY7UKx30NI2JKwqMWh0GKZjMJ+6q4iev5Ond8blKVf/36XR1gTGlBrxgKY7XXYKDOZdc1zP8kq9sHmWYPGO7mJ+8UChfqy3vseKJAMpzN6qIjjN9z7ECCRWIrguufNpBbCeWRJZDhvy/qVF5L+F9MlACNKfmPmji3vdgw91Egj3Hqn3zp3vQiTfYpIk9Qb6RTVPrn84xCKIMuDq4wIEz6EQ8b0PCyKNJ2A7UZYfSvtdrf3EZBWtxn84zGAFImTqfYLU+T5jBL8/aaG105wBq70a+QIx1PlXDZchhUx6tKNIJK0LQFefuWfZYA==
+ bh=+wRzE1PYBsjNwu1jepbYSoBTjFeuJfJ6cTCKMR3t8Bk=;
+ b=lyGHMupGl+so/dwd7oGScXra9o08jJIk4vsYWcyzmaCblTxf6E96eFsJ0Jn6g00u0q0rilalLshCfE2ZRfQxwbI5Vw5ZgYg1mc2L7o5wJ5boGLgcIekJwU6EGB2OXObL+zXfUgLxIVeGqttGPKx3zFnG7mdpIlG+BENt7jZuOVkAk0aspsM7pKW1LWLwUEeq2chRkvvUjp3PYnU/HmC9LVrV62AHPxIqiPf7Z1S8+R+iEw1CoQw76TPQpQjl4P3V/om1XWMvL0BGxBkCmh+8MzME8o0L0E3ruQxrwhT01dJO3y+9DGETMNrVNZ9ypLQZY7G8VQbiwHlReJ3PTQbDGw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,18 +45,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=T+sMHlK7YnwbBFDqNn9cPGcaiPOGCCs3NGxZ5HuL8+E=;
- b=Mm9C1I/5HvuOrwFDE4rVw2tVTHLNWTco4QBMfYF00bnIFEhC9Zgzzflfwt7eMsqr82S90gaG4aZobYXZJ+5lwRA8XRi55UWKH3w1ibnbBcuK9FPKDaw05YScbI9axAiUzKT5JdiQUyWxbHYJvZTpkcQXHav3uVXoVzDl2LRw2I5AloVp9mIqkGRSjeN7B0f91CYD+27ep81r58bGf57Fs0pbcnAa+xTU47Ex26oo7gnUi59v1hkwSEuLgWM6U6M4qUzx12arx+PJqc+gd7H/JQ/2eGIh2fBMNGCcjs58GsE3ccBNn2pW+hjECXcgdqwtXK2IlXx00ou/tPQvje2AKg==
-Received: from BN9PR03CA0581.namprd03.prod.outlook.com (2603:10b6:408:10d::16)
- by CH1PR12MB9623.namprd12.prod.outlook.com (2603:10b6:610:2b3::15) with
+ bh=+wRzE1PYBsjNwu1jepbYSoBTjFeuJfJ6cTCKMR3t8Bk=;
+ b=aFPhHCzXWmityTxLKPsPuWZdNWO2I5idI9YSUlOnIlpwO6o3tDvR8fkPFaKFG6kqC5vCnAp+tKBj6ROZOHCjp7qV15suzr+XE+aW7FeaEdhJ4fkWqlc8uIjg6XliGhGBfLBIvIsIrrLEt+h6CXUFpne9kxEqXdLzoFviGgZ5O5HiMACvErqVoZoQHY72UfK0fzSi+Fi98aCYWkZ0scK1/nX2Lg4nk4uDnu1I+vdQ31Czr8yYKyO76X4fpPgsjghVQzS9p7BqWCFwT0NrorIPFyey6B6RP4nmPGE0ERZZEv0PCD4khdksOx+GVRdpsgdvNr3Lts0F57WXOVRimZgTqA==
+Received: from BL1PR13CA0004.namprd13.prod.outlook.com (2603:10b6:208:256::9)
+ by CH3PR12MB8353.namprd12.prod.outlook.com (2603:10b6:610:12c::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.35; Tue, 15 Apr
- 2025 12:13:05 +0000
-Received: from BL02EPF0001A0FA.namprd03.prod.outlook.com
- (2603:10b6:408:10d:cafe::ef) by BN9PR03CA0581.outlook.office365.com
- (2603:10b6:408:10d::16) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8655.15 via Frontend Transport; Tue,
- 15 Apr 2025 12:13:05 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8632.33; Tue, 15 Apr
+ 2025 12:13:07 +0000
+Received: from BL02EPF0001A100.namprd03.prod.outlook.com
+ (2603:10b6:208:256:cafe::44) by BL1PR13CA0004.outlook.office365.com
+ (2603:10b6:208:256::9) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8655.11 via Frontend Transport; Tue,
+ 15 Apr 2025 12:13:06 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -64,25 +64,25 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.160 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.160) by
- BL02EPF0001A0FA.mail.protection.outlook.com (10.167.242.101) with Microsoft
+ BL02EPF0001A100.mail.protection.outlook.com (10.167.242.107) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8655.12 via Frontend Transport; Tue, 15 Apr 2025 12:13:05 +0000
+ 15.20.8655.12 via Frontend Transport; Tue, 15 Apr 2025 12:13:06 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 15 Apr
- 2025 05:12:50 -0700
+ 2025 05:12:53 -0700
 Received: from shredder.lan (10.126.231.35) by rnnvmail201.nvidia.com
  (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 15 Apr
- 2025 05:12:47 -0700
+ 2025 05:12:50 -0700
 From: Ido Schimmel <idosch@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
 	<edumazet@google.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
 	<petrm@nvidia.com>, <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net-next 14/15] vxlan: Introduce FDB key structure
-Date: Tue, 15 Apr 2025 15:11:42 +0300
-Message-ID: <20250415121143.345227-15-idosch@nvidia.com>
+Subject: [PATCH net-next 15/15] vxlan: Convert FDB table to rhashtable
+Date: Tue, 15 Apr 2025 15:11:43 +0300
+Message-ID: <20250415121143.345227-16-idosch@nvidia.com>
 X-Mailer: git-send-email 2.49.0
 In-Reply-To: <20250415121143.345227-1-idosch@nvidia.com>
 References: <20250415121143.345227-1-idosch@nvidia.com>
@@ -98,254 +98,307 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0001A0FA:EE_|CH1PR12MB9623:EE_
-X-MS-Office365-Filtering-Correlation-Id: f4b88b45-dca0-4235-2a06-08dd7c16e08d
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A100:EE_|CH3PR12MB8353:EE_
+X-MS-Office365-Filtering-Correlation-Id: fc1d74d4-ac1f-4f95-13e9-08dd7c16e155
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026;
+	BCL:0;ARA:13230040|376014|1800799024|82310400026|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?l6ut/X4PP/89e1mGEc0I3jA2HSER8Jf4SD3NsRWBehxBngaUsLHCJCuqn2RT?=
- =?us-ascii?Q?0QPua6mZntrLXihZYpw9QT6PN8sC/6FsBLFotvSADY+EphOxpQtn0Z9sgp/A?=
- =?us-ascii?Q?7dDTjRJL9QgkvAdBHxiTcgXO6o7yYlpM8CmUUKkkIl833EgpCnArR92Jdfhq?=
- =?us-ascii?Q?q1ffCkeaJmTBrBbitsh+LHa5x+P8VSJLPTY0e3X/ZS5FMa/OTk/yaBJX5bfb?=
- =?us-ascii?Q?O88wU0jqTMnE2mMENwHCbedUa1WtUlOcQcw5c2a+Uh88PaSGntliHIDyN8ns?=
- =?us-ascii?Q?yKVHC7WSM7QA50105a8WeBcNJ3OiRLVrbhf8QD9bn/n/0qKtNjXm7Qbj3r+Z?=
- =?us-ascii?Q?oRT4QBbWAg4wwSernB9KT9U0bUNQSonf1FENTGpULXlIlZcjdJojHu9iL9VC?=
- =?us-ascii?Q?Qu0nWIQsGEhqUmla0diY5pS2Vg1k3Mwo2xx1oPdRCb8YaSN3L9wMbAT4bFc6?=
- =?us-ascii?Q?QSGVVf4Idg+hGkImcJL1gMGy4st4zLrOZ64LRp6iL3MmBEdc7F72SBuSESJM?=
- =?us-ascii?Q?Yl7IoNX7+pNzjeJ4BzFr6QxpuoKNlqc2h9EVgwztOn5ClJRfe/Xgw9ae84Tu?=
- =?us-ascii?Q?kb0u1XrBMbo7gdfm5I+F40GJenEn7Ee/elOJ9Y6QqEqK7QgFKqIiapTmIPp1?=
- =?us-ascii?Q?zUHcA99hnJ0153MOxZLmTOYIH3t4LXxMqwxNw2stJkQCddY3/Jx3rhRVjOeq?=
- =?us-ascii?Q?hIha8l4UFZ1pdBYFIXf46clJ13T8d5oWKj/NPX3y4VudxKt6tj57eIhCZ26U?=
- =?us-ascii?Q?3nkEeGjDgxxeo83gRmkAzD1cs4Pr87hIZ7oHYU6DCHj5pfmWAipZVAp2+8Ih?=
- =?us-ascii?Q?S7akJhe1IpPovHs+HmKntNy2j9DO27XxZ4Hq54kejVT6PVPIFz0M20KPVEoY?=
- =?us-ascii?Q?K8NyD85MTXe0iq5iaJKNT5fIQM+BbTWClsPahlSXfwUMDQP4KT4l+eFb3/7C?=
- =?us-ascii?Q?Ava40NXOPJAI50D9o7mo64sxhsBfLNkrITfViun7U9b9MUMm4hcMgOXwPXtr?=
- =?us-ascii?Q?mzlzkvyoQLUzb79/QzWv2nGNtkGkSvLR691u2xqHM5CsLfv03hXYImMWa7Ho?=
- =?us-ascii?Q?Zsv+epKbvisqH06QOhg2URthO7dlRBTXK9atXT+R8fj7MhZMonhnY5ZBrxb5?=
- =?us-ascii?Q?VEcZLtwAdMMJ9YRz9thniQDkFUSVQ0ayFuxHVewt1OHKUrT8diAPecWUKiFT?=
- =?us-ascii?Q?lXdIjGwKenqlEx1Lr/pj2xvU4gj7pLO3A62A7BjkVgNn6wDf8ag/MGk4K2y+?=
- =?us-ascii?Q?kbHiVYzwSIY5wBwIztPKglQ8Oos7Figfh77AOrHi6U6t0jsjTxzk+91OeebB?=
- =?us-ascii?Q?Z4xYQl5L7KG2FB19K1ia90Jbe29+7nRU6Zb+MkMUYesbZIOqxakhJxRpWTWb?=
- =?us-ascii?Q?KZjZqT3NF6XQUELmNpJ00Q6YvL+DWBE1pf2V7vD0UQfJWcdPkel1W/I5rDgP?=
- =?us-ascii?Q?dBhIGBHW+EYAHnlYiEZKYPDoKxdtVdvq6eqr7krlrIdAShfpAG2pF7DjbjZ+?=
- =?us-ascii?Q?ESAUjYiGSb8u3g8Rl7Z4ZoswGn6dPuGH9guY?=
+	=?us-ascii?Q?gVhlrjRFAfwtchm9kRo5NzDD5vHyrys2eYQPCLn7Jt6dVsjvBXTedMdSKn9M?=
+ =?us-ascii?Q?3GIMQBMwnwQRR/iIlIopPBdGOdECSiRkrWVwh7zzXb8VmEtbP5U5r3sYk2v4?=
+ =?us-ascii?Q?8LU2yB3H9iwBUwQbaDCmD3cfIQ15My4EnsKfl21OP7pWVWrtM0roiW2a6nrN?=
+ =?us-ascii?Q?qMNpgJ2onOmPlnTZIt0w7sXdWSdB1ZC7u56NaqZ9AERupYBAHu/74aPcSs4y?=
+ =?us-ascii?Q?FTOiVK2peIXcKq6eIHG5LPjYpUQ+8Zm91L5YF+SvHuFe2ZBvnS9wbSTE7ry5?=
+ =?us-ascii?Q?OlTyVp5uBZupfF3CQ1DkuJm2F4ERMTLlnePrQK86wgIuRk7r2kQRa78hNvrW?=
+ =?us-ascii?Q?0vNu4Gd5eagh4HP17N+506s31Vel+sdDnqqpyoKy387u1+0W8p0tKYlozXCO?=
+ =?us-ascii?Q?1EYFzannPwvTN/uNZOdRwT2Vskh12y7NQ/elJIU2DFy/UzrzPiJ3USmzuzwD?=
+ =?us-ascii?Q?NgzcilXZqgWQ1wzyCv3S6311FcRV6n5GZmT6Aql6hnCWME5NRftXTcfqZE4O?=
+ =?us-ascii?Q?Z94sSUQlVBBKR8ZTF4WGuKzgYigOcxY3zAqxaBUIwXf7CLban8CryvjyUr8/?=
+ =?us-ascii?Q?Qz7MPEjX57Wo7RR8z3rXamnvPF1kiw04odlc9XCwoXshiNbTZLjlWFRnsAEL?=
+ =?us-ascii?Q?i1x92gDUvPzQS6twpFGI7+jKwOh0d0Tmym8HcRoe7gP4OnUYu+goQgLcK1U5?=
+ =?us-ascii?Q?53eiT9y8lC/GxNNW/5boS4lR9LK/gxz2/GgIyGVunOuTvOQydvABHw7xAqwL?=
+ =?us-ascii?Q?+j0ac5PV1O4/nU0AJLeRe8FPj49eIJiVYFSVT/hlBRc3sIlOSAP39jLWtTit?=
+ =?us-ascii?Q?XaIL+FEUWpxqKJdYSbVC3Fttmq9EzE9Aeu9UHwDpuD0YYM7TmpWkFLowq/o6?=
+ =?us-ascii?Q?wyvrFvlJZZ++YBdkfPfggjIz34X6/6R5Osxot4zPn3vmzyCsD5K5tqzwOA9o?=
+ =?us-ascii?Q?g1l7dfJdbRt0Sm3jZP2C0fz4/BNpVzfeR/+tRF4c2GR3yNc+5doHZZJ39gc+?=
+ =?us-ascii?Q?pX/4WCc1hNxqSsXYBAw9oXOD4QptyWk15lF0j1GTG5Fw3Ck4ZBLQquulFmvv?=
+ =?us-ascii?Q?S08u0oUSczzYMcpe3P/zx51OSQDaZHZjawYlqP5wRSxoFuq3YgYo3XzgJk5O?=
+ =?us-ascii?Q?yFS3BKsOvnHPiP3gBhl+U9WvvmLPHzGXKhyie/GxG4cV03lAoVOnUN856+Ab?=
+ =?us-ascii?Q?gcaigBKwbTOrPFO4Kp5TPRTDf+1ZjarxZNUDEMgXE5orGOGapFU54f3nZ1TM?=
+ =?us-ascii?Q?5OQmipUeHfREwa9RSkTxeRR6YE3TXmsja/vYBPEaLQLyXo7wTvTYYf1trs5u?=
+ =?us-ascii?Q?Q+EwBkx2SutDIQRbtl7Sj4QlmHH5EJggvonlMQ4WXLMef4fr8rzQcw2x92Qk?=
+ =?us-ascii?Q?zZm1S6e2ydJMHAHpJZJOnWbMbv3VX0qMh136+qTCklr4+snHS65EmSCBWXsJ?=
+ =?us-ascii?Q?8ylVaBb4MDr8aYrThXrFFyTbPHERDi8GA2CXcCR7WbVeQbq8biDKuKlUfb+a?=
+ =?us-ascii?Q?1RPvJMOTx54XCpTs9SgjNfwmMBWCrG0pTBXy?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(82310400026)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2025 12:13:05.3075
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2025 12:13:06.6021
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f4b88b45-dca0-4235-2a06-08dd7c16e08d
+X-MS-Exchange-CrossTenant-Network-Message-Id: fc1d74d4-ac1f-4f95-13e9-08dd7c16e155
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF0001A0FA.namprd03.prod.outlook.com
+	BL02EPF0001A100.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH1PR12MB9623
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8353
 
-In preparation for converting the FDB table to rhashtable, introduce a
-key structure that includes the MAC address and source VNI.
+FDB entries are currently stored in a hash table with a fixed number of
+buckets (256), resulting in performance degradation as the number of
+entries grows. Solve this by converting the driver to use rhashtable
+which maintains more or less constant performance regardless of the
+number of entries.
 
-No functional changes intended.
+Measured transmitted packets per second using a single pktgen thread
+with varying number of entries when the transmitted packet always hits
+the default entry (worst case):
+
+Number of entries | Improvement
+------------------|------------
+1k                | +1.12%
+4k                | +9.22%
+16k               | +55%
+64k               | +585%
+256k              | +2460%
+
+In addition, the change reduces the size of the VXLAN device structure
+from 2584 bytes to 672 bytes.
 
 Reviewed-by: Petr Machata <petrm@nvidia.com>
 Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 ---
- drivers/net/vxlan/vxlan_core.c    | 44 ++++++++++++++++---------------
- drivers/net/vxlan/vxlan_private.h |  8 ++++--
- 2 files changed, 29 insertions(+), 23 deletions(-)
+ drivers/net/vxlan/vxlan_core.c    | 102 ++++++++++++------------------
+ drivers/net/vxlan/vxlan_private.h |   2 +-
+ include/net/vxlan.h               |   2 +-
+ 3 files changed, 43 insertions(+), 63 deletions(-)
 
 diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index 5c0752161529..8e359cf8dbbd 100644
+index 8e359cf8dbbd..a56d7239b127 100644
 --- a/drivers/net/vxlan/vxlan_core.c
 +++ b/drivers/net/vxlan/vxlan_core.c
-@@ -186,7 +186,7 @@ static int vxlan_fdb_info(struct sk_buff *skb, struct vxlan_dev *vxlan,
- 		} else if (nh) {
- 			ndm->ndm_family = nh_family;
- 		}
--		send_eth = !is_zero_ether_addr(fdb->eth_addr);
-+		send_eth = !is_zero_ether_addr(fdb->key.eth_addr);
- 	} else
- 		ndm->ndm_family	= AF_BRIDGE;
- 	ndm->ndm_state = fdb->state;
-@@ -201,7 +201,7 @@ static int vxlan_fdb_info(struct sk_buff *skb, struct vxlan_dev *vxlan,
- 			peernet2id(dev_net(vxlan->dev), vxlan->net)))
- 		goto nla_put_failure;
+@@ -15,6 +15,7 @@
+ #include <linux/igmp.h>
+ #include <linux/if_ether.h>
+ #include <linux/ethtool.h>
++#include <linux/rhashtable.h>
+ #include <net/arp.h>
+ #include <net/ndisc.h>
+ #include <net/gro.h>
+@@ -63,8 +64,12 @@ static int vxlan_sock_add(struct vxlan_dev *vxlan);
  
--	if (send_eth && nla_put(skb, NDA_LLADDR, ETH_ALEN, &fdb->eth_addr))
-+	if (send_eth && nla_put(skb, NDA_LLADDR, ETH_ALEN, &fdb->key.eth_addr))
- 		goto nla_put_failure;
- 	if (nh) {
- 		if (nla_put_u32(skb, NDA_NH_ID, nh_id))
-@@ -223,9 +223,9 @@ static int vxlan_fdb_info(struct sk_buff *skb, struct vxlan_dev *vxlan,
- 			goto nla_put_failure;
- 	}
+ static void vxlan_vs_del_dev(struct vxlan_dev *vxlan);
  
--	if ((vxlan->cfg.flags & VXLAN_F_COLLECT_METADATA) && fdb->vni &&
-+	if ((vxlan->cfg.flags & VXLAN_F_COLLECT_METADATA) && fdb->key.vni &&
- 	    nla_put_u32(skb, NDA_SRC_VNI,
--			be32_to_cpu(fdb->vni)))
-+			be32_to_cpu(fdb->key.vni)))
- 		goto nla_put_failure;
+-/* salt for hash table */
+-static u32 vxlan_salt __read_mostly;
++static const struct rhashtable_params vxlan_fdb_rht_params = {
++	.head_offset = offsetof(struct vxlan_fdb, rhnode),
++	.key_offset = offsetof(struct vxlan_fdb, key),
++	.key_len = sizeof(struct vxlan_fdb_key),
++	.automatic_shrinking = true,
++};
  
- 	ci.ndm_used	 = jiffies_to_clock_t(now - READ_ONCE(fdb->used));
-@@ -293,8 +293,8 @@ static void vxlan_fdb_switchdev_notifier_info(const struct vxlan_dev *vxlan,
- 	fdb_info->remote_port = rd->remote_port;
- 	fdb_info->remote_vni = rd->remote_vni;
- 	fdb_info->remote_ifindex = rd->remote_ifindex;
--	memcpy(fdb_info->eth_addr, fdb->eth_addr, ETH_ALEN);
--	fdb_info->vni = fdb->vni;
-+	memcpy(fdb_info->eth_addr, fdb->key.eth_addr, ETH_ALEN);
-+	fdb_info->vni = fdb->key.vni;
- 	fdb_info->offloaded = rd->offloaded;
- 	fdb_info->added_by_user = fdb->flags & NTF_VXLAN_ADDED_BY_USER;
- }
-@@ -366,7 +366,7 @@ static void vxlan_fdb_miss(struct vxlan_dev *vxlan, const u8 eth_addr[ETH_ALEN])
- 	};
- 	struct vxlan_rdst remote = { };
- 
--	memcpy(f.eth_addr, eth_addr, ETH_ALEN);
-+	memcpy(f.key.eth_addr, eth_addr, ETH_ALEN);
- 
+ static inline bool vxlan_collect_metadata(struct vxlan_sock *vs)
+ {
+@@ -371,62 +376,21 @@ static void vxlan_fdb_miss(struct vxlan_dev *vxlan, const u8 eth_addr[ETH_ALEN])
  	vxlan_fdb_notify(vxlan, &f, &remote, RTM_GETNEIGH, true, NULL);
  }
-@@ -416,9 +416,9 @@ static struct vxlan_fdb *vxlan_find_mac_rcu(struct vxlan_dev *vxlan,
- 	struct vxlan_fdb *f;
  
- 	hlist_for_each_entry_rcu(f, head, hlist) {
--		if (ether_addr_equal(mac, f->eth_addr)) {
-+		if (ether_addr_equal(mac, f->key.eth_addr)) {
- 			if (vxlan->cfg.flags & VXLAN_F_COLLECT_METADATA) {
--				if (vni == f->vni)
-+				if (vni == f->key.vni)
- 					return f;
- 			} else {
- 				return f;
-@@ -539,7 +539,7 @@ int vxlan_fdb_replay(const struct net_device *dev, __be32 vni,
- 
- 	spin_lock_bh(&vxlan->hash_lock);
- 	hlist_for_each_entry(f, &vxlan->fdb_list, fdb_node) {
--		if (f->vni == vni) {
-+		if (f->key.vni == vni) {
- 			list_for_each_entry(rdst, &f->remotes, list) {
- 				rc = vxlan_fdb_notify_one(nb, vxlan, f, rdst,
- 							  extack);
-@@ -569,7 +569,7 @@ void vxlan_fdb_clear_offload(const struct net_device *dev, __be32 vni)
- 
- 	spin_lock_bh(&vxlan->hash_lock);
- 	hlist_for_each_entry(f, &vxlan->fdb_list, fdb_node) {
--		if (f->vni == vni) {
-+		if (f->key.vni == vni) {
- 			list_for_each_entry(rdst, &f->remotes, list)
- 				rdst->offloaded = false;
- 		}
-@@ -812,15 +812,16 @@ static struct vxlan_fdb *vxlan_fdb_alloc(struct vxlan_dev *vxlan, const u8 *mac,
- 	f = kmalloc(sizeof(*f), GFP_ATOMIC);
- 	if (!f)
- 		return NULL;
-+	memset(&f->key, 0, sizeof(f->key));
- 	f->state = state;
- 	f->flags = ndm_flags;
- 	f->updated = f->used = jiffies;
--	f->vni = src_vni;
-+	f->key.vni = src_vni;
- 	f->nh = NULL;
- 	RCU_INIT_POINTER(f->vdev, vxlan);
- 	INIT_LIST_HEAD(&f->nh_list);
- 	INIT_LIST_HEAD(&f->remotes);
--	memcpy(f->eth_addr, mac, ETH_ALEN);
-+	memcpy(f->key.eth_addr, mac, ETH_ALEN);
- 
- 	return f;
- }
-@@ -959,7 +960,7 @@ static void vxlan_fdb_destroy(struct vxlan_dev *vxlan, struct vxlan_fdb *f,
+-/* Hash Ethernet address */
+-static u32 eth_hash(const unsigned char *addr)
+-{
+-	u64 value = get_unaligned((u64 *)addr);
+-
+-	/* only want 6 bytes */
+-#ifdef __BIG_ENDIAN
+-	value >>= 16;
+-#else
+-	value <<= 16;
+-#endif
+-	return hash_64(value, FDB_HASH_BITS);
+-}
+-
+-u32 eth_vni_hash(const unsigned char *addr, __be32 vni)
+-{
+-	/* use 1 byte of OUI and 3 bytes of NIC */
+-	u32 key = get_unaligned((u32 *)(addr + 2));
+-
+-	return jhash_2words(key, vni, vxlan_salt) & (FDB_HASH_SIZE - 1);
+-}
+-
+-u32 fdb_head_index(struct vxlan_dev *vxlan, const u8 *mac, __be32 vni)
+-{
+-	if (vxlan->cfg.flags & VXLAN_F_COLLECT_METADATA)
+-		return eth_vni_hash(mac, vni);
+-	else
+-		return eth_hash(mac);
+-}
+-
+-/* Hash chain to use given mac address */
+-static inline struct hlist_head *vxlan_fdb_head(struct vxlan_dev *vxlan,
+-						const u8 *mac, __be32 vni)
+-{
+-	return &vxlan->fdb_head[fdb_head_index(vxlan, mac, vni)];
+-}
+-
+ /* Look up Ethernet address in forwarding table */
+ static struct vxlan_fdb *vxlan_find_mac_rcu(struct vxlan_dev *vxlan,
+ 					    const u8 *mac, __be32 vni)
  {
- 	struct vxlan_rdst *rd;
+-	struct hlist_head *head = vxlan_fdb_head(vxlan, mac, vni);
+-	struct vxlan_fdb *f;
++	struct vxlan_fdb_key key;
  
--	netdev_dbg(vxlan->dev, "delete %pM\n", f->eth_addr);
-+	netdev_dbg(vxlan->dev, "delete %pM\n", f->key.eth_addr);
+-	hlist_for_each_entry_rcu(f, head, hlist) {
+-		if (ether_addr_equal(mac, f->key.eth_addr)) {
+-			if (vxlan->cfg.flags & VXLAN_F_COLLECT_METADATA) {
+-				if (vni == f->key.vni)
+-					return f;
+-			} else {
+-				return f;
+-			}
+-		}
+-	}
++	memset(&key, 0, sizeof(key));
++	memcpy(key.eth_addr, mac, sizeof(key.eth_addr));
++	if (!(vxlan->cfg.flags & VXLAN_F_COLLECT_METADATA))
++		key.vni = vxlan->default_dst.remote_vni;
++	else
++		key.vni = vni;
  
- 	--vxlan->addrcnt;
- 	if (do_notify) {
-@@ -1031,8 +1032,8 @@ static int vxlan_fdb_update_existing(struct vxlan_dev *vxlan,
+-	return NULL;
++	return rhashtable_lookup(&vxlan->fdb_hash_tbl, &key,
++				 vxlan_fdb_rht_params);
+ }
  
- 	if ((flags & NLM_F_REPLACE)) {
- 		/* Only change unicasts */
--		if (!(is_multicast_ether_addr(f->eth_addr) ||
--		      is_zero_ether_addr(f->eth_addr))) {
-+		if (!(is_multicast_ether_addr(f->key.eth_addr) ||
-+		      is_zero_ether_addr(f->key.eth_addr))) {
- 			if (nhid) {
- 				rc = vxlan_fdb_nh_update(vxlan, f, nhid, extack);
- 				if (rc < 0)
-@@ -1048,8 +1049,8 @@ static int vxlan_fdb_update_existing(struct vxlan_dev *vxlan,
- 		}
+ static struct vxlan_fdb *vxlan_find_mac_tx(struct vxlan_dev *vxlan,
+@@ -915,15 +879,27 @@ int vxlan_fdb_create(struct vxlan_dev *vxlan,
+ 	if (rc < 0)
+ 		goto errout;
+ 
++	rc = rhashtable_lookup_insert_fast(&vxlan->fdb_hash_tbl, &f->rhnode,
++					   vxlan_fdb_rht_params);
++	if (rc)
++		goto destroy_remote;
++
+ 	++vxlan->addrcnt;
+-	hlist_add_head_rcu(&f->hlist,
+-			   vxlan_fdb_head(vxlan, mac, src_vni));
+ 	hlist_add_head_rcu(&f->fdb_node, &vxlan->fdb_list);
+ 
+ 	*fdb = f;
+ 
+ 	return 0;
+ 
++destroy_remote:
++	if (rcu_access_pointer(f->nh)) {
++		list_del_rcu(&f->nh_list);
++		nexthop_put(rtnl_dereference(f->nh));
++	} else {
++		list_del(&rd->list);
++		dst_cache_destroy(&rd->dst_cache);
++		kfree(rd);
++	}
+ errout:
+ 	kfree(f);
+ 	return rc;
+@@ -974,7 +950,8 @@ static void vxlan_fdb_destroy(struct vxlan_dev *vxlan, struct vxlan_fdb *f,
  	}
- 	if ((flags & NLM_F_APPEND) &&
--	    (is_multicast_ether_addr(f->eth_addr) ||
--	     is_zero_ether_addr(f->eth_addr))) {
-+	    (is_multicast_ether_addr(f->key.eth_addr) ||
-+	     is_zero_ether_addr(f->key.eth_addr))) {
- 		rc = vxlan_fdb_append(f, ip, port, vni, ifindex, &rd);
  
- 		if (rc < 0)
-@@ -2853,7 +2854,7 @@ static void vxlan_cleanup(struct timer_list *t)
- 			spin_lock(&vxlan->hash_lock);
- 			if (!hlist_unhashed(&f->fdb_node)) {
- 				netdev_dbg(vxlan->dev, "garbage collect %pM\n",
--					   f->eth_addr);
-+					   f->key.eth_addr);
- 				f->state = NUD_STALE;
- 				vxlan_fdb_destroy(vxlan, f, true, true);
- 			}
-@@ -2972,7 +2973,8 @@ struct vxlan_fdb_flush_desc {
- static bool vxlan_fdb_is_default_entry(const struct vxlan_fdb *f,
- 				       const struct vxlan_dev *vxlan)
- {
--	return is_zero_ether_addr(f->eth_addr) && f->vni == vxlan->cfg.vni;
-+	return is_zero_ether_addr(f->key.eth_addr) &&
-+	       f->key.vni == vxlan->cfg.vni;
+ 	hlist_del_init_rcu(&f->fdb_node);
+-	hlist_del_rcu(&f->hlist);
++	rhashtable_remove_fast(&vxlan->fdb_hash_tbl, &f->rhnode,
++			       vxlan_fdb_rht_params);
+ 	list_del_rcu(&f->nh_list);
+ 	call_rcu(&f->rcu, vxlan_fdb_free);
+ }
+@@ -2898,10 +2875,14 @@ static int vxlan_init(struct net_device *dev)
+ 	struct vxlan_dev *vxlan = netdev_priv(dev);
+ 	int err;
+ 
++	err = rhashtable_init(&vxlan->fdb_hash_tbl, &vxlan_fdb_rht_params);
++	if (err)
++		return err;
++
+ 	if (vxlan->cfg.flags & VXLAN_F_VNIFILTER) {
+ 		err = vxlan_vnigroup_init(vxlan);
+ 		if (err)
+-			return err;
++			goto err_rhashtable_destroy;
+ 	}
+ 
+ 	err = gro_cells_init(&vxlan->gro_cells, dev);
+@@ -2920,6 +2901,8 @@ static int vxlan_init(struct net_device *dev)
+ err_vnigroup_uninit:
+ 	if (vxlan->cfg.flags & VXLAN_F_VNIFILTER)
+ 		vxlan_vnigroup_uninit(vxlan);
++err_rhashtable_destroy:
++	rhashtable_destroy(&vxlan->fdb_hash_tbl);
+ 	return err;
  }
  
- static bool vxlan_fdb_nhid_matches(const struct vxlan_fdb *f, u32 nhid)
-@@ -2995,7 +2997,7 @@ static bool vxlan_fdb_flush_matches(const struct vxlan_fdb *f,
- 	if (desc->ignore_default_entry && vxlan_fdb_is_default_entry(f, vxlan))
- 		return false;
+@@ -2933,6 +2916,8 @@ static void vxlan_uninit(struct net_device *dev)
+ 		vxlan_vnigroup_uninit(vxlan);
  
--	if (desc->src_vni && f->vni != desc->src_vni)
-+	if (desc->src_vni && f->key.vni != desc->src_vni)
- 		return false;
+ 	gro_cells_destroy(&vxlan->gro_cells);
++
++	rhashtable_destroy(&vxlan->fdb_hash_tbl);
+ }
  
- 	if (desc->nhid && !vxlan_fdb_nhid_matches(f, desc->nhid))
+ /* Start ageing timer and join group when device is brought up */
+@@ -3329,7 +3314,6 @@ static void vxlan_offload_rx_ports(struct net_device *dev, bool push)
+ static void vxlan_setup(struct net_device *dev)
+ {
+ 	struct vxlan_dev *vxlan = netdev_priv(dev);
+-	unsigned int h;
+ 
+ 	eth_hw_addr_random(dev);
+ 	ether_setup(dev);
+@@ -3362,8 +3346,6 @@ static void vxlan_setup(struct net_device *dev)
+ 
+ 	vxlan->dev = dev;
+ 
+-	for (h = 0; h < FDB_HASH_SIZE; ++h)
+-		INIT_HLIST_HEAD(&vxlan->fdb_head[h]);
+ 	INIT_HLIST_HEAD(&vxlan->fdb_list);
+ }
+ 
+@@ -4944,8 +4926,6 @@ static int __init vxlan_init_module(void)
+ {
+ 	int rc;
+ 
+-	get_random_bytes(&vxlan_salt, sizeof(vxlan_salt));
+-
+ 	rc = register_pernet_subsys(&vxlan_net_ops);
+ 	if (rc)
+ 		goto out1;
 diff --git a/drivers/net/vxlan/vxlan_private.h b/drivers/net/vxlan/vxlan_private.h
-index 078702ec604d..3ca19e7167c9 100644
+index 3ca19e7167c9..d328aed9feef 100644
 --- a/drivers/net/vxlan/vxlan_private.h
 +++ b/drivers/net/vxlan/vxlan_private.h
-@@ -24,6 +24,11 @@ struct vxlan_net {
- 	struct notifier_block nexthop_notifier_block;
- };
+@@ -31,7 +31,7 @@ struct vxlan_fdb_key {
  
-+struct vxlan_fdb_key {
-+	u8 eth_addr[ETH_ALEN];
-+	__be32 vni;
-+};
-+
  /* Forwarding table entry */
  struct vxlan_fdb {
- 	struct hlist_node hlist;	/* linked list of entries */
-@@ -31,9 +36,8 @@ struct vxlan_fdb {
+-	struct hlist_node hlist;	/* linked list of entries */
++	struct rhash_head rhnode;
+ 	struct rcu_head	  rcu;
  	unsigned long	  updated;	/* jiffies */
  	unsigned long	  used;
- 	struct list_head  remotes;
--	u8		  eth_addr[ETH_ALEN];
-+	struct vxlan_fdb_key key;
- 	u16		  state;	/* see ndm_state */
--	__be32		  vni;
- 	u16		  flags;	/* see ndm_flags and below */
- 	struct list_head  nh_list;
- 	struct hlist_node fdb_node;
+diff --git a/include/net/vxlan.h b/include/net/vxlan.h
+index 96a6c6f45c2e..e2f7ca045d3e 100644
+--- a/include/net/vxlan.h
++++ b/include/net/vxlan.h
+@@ -304,7 +304,7 @@ struct vxlan_dev {
+ 
+ 	struct vxlan_vni_group  __rcu *vnigrp;
+ 
+-	struct hlist_head fdb_head[FDB_HASH_SIZE];
++	struct rhashtable fdb_hash_tbl;
+ 
+ 	struct rhashtable mdb_tbl;
+ 	struct hlist_head fdb_list;
 -- 
 2.49.0
 
