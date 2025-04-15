@@ -1,164 +1,168 @@
-Return-Path: <netdev+bounces-182745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3C74A89CFC
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 13:57:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F4CDA89D2B
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 14:09:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD5FF172039
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 11:57:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 183213B007F
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 12:09:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18C95292915;
-	Tue, 15 Apr 2025 11:57:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E470294A16;
+	Tue, 15 Apr 2025 12:09:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="huZEZPcJ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wW5cAcCJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3374C1D47AD
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 11:56:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA6312741BF;
+	Tue, 15 Apr 2025 12:09:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744718220; cv=none; b=LSFyE25qvYtZzRnnOFdanDF/soqO3/gT9Jdc1tqtS1BHCfY8u8lR9E1lDZj5Rz3gX6UfWUG70lL4VBmqkXWV78b52+g5j7eoaqDKExNANIozupnGwFBb3KYuol2RllyQrw0yAleCrn6jpEhMB1WE8zbUwlB3Z4hDh+EaRa1Bkhc=
+	t=1744718960; cv=none; b=FPW6k8p7SmHZkrpXdvO7CfPjSL6Z4MiVCBKXAWRPoZeb3i8pD07NgH/p+rTABgUJchuBCr1P817G10Ry5O9chVO2jjfHHbj2m70BWt6duftebLZAJ89rCQeJJL0f/SDZ4kMqvOENeOS7AmdTxIpwYkoQYcVVTI8mm8Nz3N3Coz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744718220; c=relaxed/simple;
-	bh=5yAVcJxOQv8Rb2mbuiu+g6eZAVL0C1KLbuq44NaNCdY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HtxAVsMRlrZ93FDAdbw6iao6oxrkV/kKvmL4im/Te2YIrbKQ9GekmhfQpsw/uZLNOICpOa1fDcwRgPn+EShNBr2grkqxQVurHKVuhhCnShKwKMU4EHCMkytR1rghVUFC2g4ZD7OLHd4f27a5Mvg/nmbGS/nhm+V7pPYdPaSgN3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=huZEZPcJ; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43ce70f9afbso57330595e9.0
-        for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 04:56:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1744718216; x=1745323016; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=N6dtMTXpeA9yP99GdbhluhOJP06ddUlIw3w6Qn/m58Y=;
-        b=huZEZPcJXQIBmQNb0weasfGBiF31AznTu76x5ja4DWt+e6ofcPS9MBzZHAxTSdErcP
-         amefNyrcTCRWco3Mv5HPINAFrGvN3btVmOOoq0HTRvU4vE/wECWsOAPTFhQ9bk9SlGqB
-         x9VP4verC5igH2GFFoRQaqWqp9C9sXaK1yJrSPyk810FIWXOC26+QmHYGVOKyg8Skk6S
-         Y5dJ8Oo4g3npS3tNmo3aJkfd2OrKzpYrFCMwRYVUnYNIDfW1FnC7RefSxMWmt42200D6
-         43HxhX/Q2amoujkWy64CzjGxYR6NmnPGMW9YCMv/HpAMD9LEVBTqO2RSBT2tvjT85rOo
-         YwYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744718216; x=1745323016;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=N6dtMTXpeA9yP99GdbhluhOJP06ddUlIw3w6Qn/m58Y=;
-        b=IwQs0puGTkRcgT3GBkp56fatRyFfaKnwOEKGPAFn9xYg4crJhHBcrW+nGyrH5PUNoU
-         RVybkRiPO5UwL5B0I6fV0f6smwKjV1Cd22oqZB4k0sy1c2G742jUcDcUVDQL2yDBigAg
-         xTPeIshJ0uVad2QG0/eOjiESVjzB9iviWX/BdyyL9KKgDyk6sfzoTuHIWtRjLI5Pl3S4
-         jjjxRxEoVk+oJdFcNc3goH+1FjQplnywYC4D77m2RCgI9gyBjDNlooKiM6QJ8lOgxOQJ
-         x3DM9KlMI7Bdnwr2Eul+c+oIM8XXgmnTbRlhGE6pcJ21l+yAiBrWdedwSSQsX2XB8Dbh
-         0Rrw==
-X-Forwarded-Encrypted: i=1; AJvYcCVpW6FsUMMTZg3IYOu+sHUtW4RnLvvXicc55iZ5aaZhJUXrVcHxDWitldyF9Ej1jwMdGzMwqmA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbEdEg/WYYo2N6TUFsJ6n4d6ABEdoMvx2OA/EK9y+FBbliJRrN
-	/ONPhYvqOtdHQZNuvSdFPGbXm8JvixKahDM4WSS2jgYoeTA4Qza0nU1aG4LZDNE=
-X-Gm-Gg: ASbGncvN8JsNATlr2kqwaC5Qb1M6OrlvUdjfL324I+wN4u22af/FMfLWO0Tx8lG4yfw
-	U8MFxb3vHqb34aWFZVPDMuKUTbP2/BNeOBvL5iY2wAKZrTERjW572Dv5Xj6Af4fwXdY4ieqn6nq
-	+SJh4rgeOQPxanf8XUDw1LEEuq6EjANZhr7r9Ihbp/2zTPsfGWjcDU2Ci1HoPvHgHmONfXcTecj
-	E9Xgqukb4YZ8ysmWKBnEYjA9tJEEqUKvLgasrkLeuHVVCgE+M8Lt5FLSa8mVyRIr4GodSS6rK/k
-	3rNGkJtScnGZIX6vFqHUfUFvpC4FmTlR0SxBtwqJCSlfgN8bc8omdiMFDaUdDIRTKVunppGW
-X-Google-Smtp-Source: AGHT+IFZ/8IzbGBjcCVDGk5eFuHy/8wS8TTEduyN66eJhFjsuFGZWnxgT2nwXvJ2IN9En6IOyhPwOg==
-X-Received: by 2002:a05:6000:1848:b0:39a:c8a8:4fdc with SMTP id ffacd0b85a97d-39ea520372fmr14180025f8f.16.1744718216162;
-        Tue, 15 Apr 2025 04:56:56 -0700 (PDT)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eae979620sm14185229f8f.52.2025.04.15.04.56.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Apr 2025 04:56:55 -0700 (PDT)
-Message-ID: <76b303cb-0912-41f9-885a-9c4c045a6a51@blackwall.org>
-Date: Tue, 15 Apr 2025 14:56:54 +0300
+	s=arc-20240116; t=1744718960; c=relaxed/simple;
+	bh=rQmzUcWv9Msu+Y5N0LxfY+yN9yp1GHh3rCejwhqJfNY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pc0U77WWiahvykjMWpqjx4DTz3HaHLK72XXryTPaNx+6tssPZahAMnyG2Ylbx1herJqKWVQaosOEqTC2IfLyBkmdbTfNnTpNn0adehzlnyUQy/YKqSZHg49fexSxpxL6LGi1rBORIl5DaqebsVN5+2BIEX87iI6vpcsJS5RuzT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wW5cAcCJ; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=vmwziB2QVw1Qr19BFPphA8MaFnyigzwEzdHBN9OFZHs=; b=wW5cAcCJFw2naWbMZ72P4VjQta
+	6HpRQGMmka0nQN542fTwufjaehEQw3hcbvz9hRvt9wcCk37asYm6WYVTIkVLfPsVnvHlUUks0M0Mn
+	PhWdu632aZ0vlSiE/BNMVtaJ/dcCY7iaFmTtesoaeNMN7VjmqooKVo668G81ouU7Ekw0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u4f5z-009Qfa-Cp; Tue, 15 Apr 2025 14:08:55 +0200
+Date: Tue, 15 Apr 2025 14:08:55 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Minda Chen <minda.chen@starfivetech.com>
+Cc: Emil Renner Berthing <kernel@esmil.dk>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Russell King <rmk+kernel@armlinux.org.uk>
+Subject: Re: [net-next v1] net: stmmac: starfive: Add serdes PHY init/deinit
+ function
+Message-ID: <840346cf-52a3-4e40-bf38-9d66231366d7@lunn.ch>
+References: <20250410070453.61178-1-minda.chen@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] net: bridge: switchdev: do not notify new
- brentries as changed
-To: Jonas Gorski <jonas.gorski@gmail.com>, Ido Schimmel <idosch@nvidia.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: bridge@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250414200020.192715-1-jonas.gorski@gmail.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250414200020.192715-1-jonas.gorski@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250410070453.61178-1-minda.chen@starfivetech.com>
 
-On 4/14/25 23:00, Jonas Gorski wrote:
-> When adding a bridge vlan that is pvid or untagged after the vlan has
-> already been added to any other switchdev backed port, the vlan change
-> will be propagated as changed, since the flags change.
-> 
-> This causes the vlan to not be added to the hardware for DSA switches,
-> since the DSA handler ignores any vlans for the CPU or DSA ports that
-> are changed.
-> 
-> E.g. the following order of operations would work:
-> 
-> $ ip link add swbridge type bridge vlan_filtering 1 vlan_default_pvid 0
-> $ ip link set lan1 master swbridge
-> $ bridge vlan add dev swbridge vid 1 pvid untagged self
-> $ bridge vlan add dev lan1 vid 1 pvid untagged
-> 
-> but this order would break:
-> 
-> $ ip link add swbridge type bridge vlan_filtering 1 vlan_default_pvid 0
-> $ ip link set lan1 master swbridge
-> $ bridge vlan add dev lan1 vid 1 pvid untagged
-> $ bridge vlan add dev swbridge vid 1 pvid untagged self
-> 
-> Additionally, the vlan on the bridge itself would become undeletable:
-> 
-> $ bridge vlan
-> port              vlan-id
-> lan1              1 PVID Egress Untagged
-> swbridge          1 PVID Egress Untagged
-> $ bridge vlan del dev swbridge vid 1 self
-> $ bridge vlan
-> port              vlan-id
-> lan1              1 PVID Egress Untagged
-> swbridge          1 Egress Untagged
-> 
-> since the vlan was never added to DSA's vlan list, so deleting it will
-> cause an error, causing the bridge code to not remove it.
-> 
-> Fix this by checking if flags changed only for vlans that are already
-> brentry and pass changed as false for those that become brentries, as
-> these are a new vlan (member) from the switchdev point of view.
-> 
-> Since *changed is set to true for becomes_brentry = true regardless of
-> would_change's value, this will not change any rtnetlink notification
-> delivery, just the value passed on to switchdev in vlan->changed.
-> 
-> Fixes: 8d23a54f5bee ("net: bridge: switchdev: differentiate new VLANs from changed ones")
-> Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
-> ---
-> Changelog v1 -> v2:
-> - dropped the second patch always notifying dsa drivers on brentry changes
-> - dropped the cover letter, as its overkill for one patch and it mostly
->   reiterated what is already written in here
-> - fixed the example in the commit message to use vlan_default_pvid 0
-> - fix thinko brake -> break
-> - extended the changelog to include the assurance that rtnetlink
->   notifications should not be affected
-> 
->  net/bridge/br_vlan.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
+> +static int starfive_dwmac_serdes_powerup(struct net_device *ndev, void *priv)
+> +{
+> +	struct starfive_dwmac *dwmac = priv;
+> +	int ret;
+> +
+> +	ret = phy_init(dwmac->serdes_phy);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return phy_power_on(dwmac->serdes_phy);
+> +}
 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+static int qcom_ethqos_serdes_powerup(struct net_device *ndev, void *priv)
+{
+        struct qcom_ethqos *ethqos = priv;
+        int ret;
 
+        ret = phy_init(ethqos->serdes_phy);
+        if (ret)
+                return ret;
+
+        ret = phy_power_on(ethqos->serdes_phy);
+        if (ret)
+                return ret;
+
+        return phy_set_speed(ethqos->serdes_phy, ethqos->speed);
+}
+
+Similar?
+
+> +static void starfive_dwmac_serdes_powerdown(struct net_device *ndev, void *priv)
+> +{
+> +	struct starfive_dwmac *dwmac = priv;
+> +
+> +	phy_power_off(dwmac->serdes_phy);
+> +	phy_exit(dwmac->serdes_phy);
+> +}
+
+static void qcom_ethqos_serdes_powerdown(struct net_device *ndev, void *priv)
+{
+        struct qcom_ethqos *ethqos = priv;
+
+        phy_power_off(ethqos->serdes_phy);
+        phy_exit(ethqos->serdes_phy);
+}
+
+Pretty much cut & paste.
+
+>  static int starfive_dwmac_probe(struct platform_device *pdev)
+>  {
+>  	struct plat_stmmacenet_data *plat_dat;
+> @@ -102,6 +125,11 @@ static int starfive_dwmac_probe(struct platform_device *pdev)
+>  	if (!dwmac)
+>  		return -ENOMEM;
+>  
+> +	dwmac->serdes_phy = devm_phy_optional_get(&pdev->dev, NULL);
+> +	if (IS_ERR(dwmac->serdes_phy))
+> +		return dev_err_probe(&pdev->dev, PTR_ERR(dwmac->serdes_phy),
+> +				     "Failed to get serdes phy\n");
+> +
+
+        ethqos->serdes_phy = devm_phy_optional_get(dev, "serdes");
+        if (IS_ERR(ethqos->serdes_phy))
+                return dev_err_probe(dev, PTR_ERR(ethqos->serdes_phy),
+                                     "Failed to get serdes phy\n");
+
+
+>  	dwmac->data = device_get_match_data(&pdev->dev);
+>  
+>  	plat_dat->clk_tx_i = devm_clk_get_enabled(&pdev->dev, "tx");
+> @@ -132,6 +160,11 @@ static int starfive_dwmac_probe(struct platform_device *pdev)
+>  	if (err)
+>  		return err;
+>  
+> +	if (dwmac->serdes_phy) {
+> +		plat_dat->serdes_powerup = starfive_dwmac_serdes_powerup;
+> +		plat_dat->serdes_powerdown  = starfive_dwmac_serdes_powerdown;
+> +	}
+> +
+
+        if (ethqos->serdes_phy) {
+                plat_dat->serdes_powerup = qcom_ethqos_serdes_powerup;
+                plat_dat->serdes_powerdown  = qcom_ethqos_serdes_powerdown;
+        }
+
+
+I assume you have seen all the work Russell King has been doing
+recently cleaning up all the copy/paste code between various glue
+drivers. Please don't add to that mess. Please consider how you can
+refactor the ethqos code to make is generic for any stmmac driver
+which has a generic phy.
+
+    Andrew
+
+---
+pw-bot: cr
 
