@@ -1,150 +1,118 @@
-Return-Path: <netdev+bounces-182797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB307A89EC9
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 14:58:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CFBBA89ECE
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 14:58:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60CEB189FB4B
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 12:57:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED58E1900848
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 12:58:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AFBA29A3F5;
-	Tue, 15 Apr 2025 12:56:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940AF2973C9;
+	Tue, 15 Apr 2025 12:57:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q2PSR8AF"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="utNpLyac"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412FE297A74;
-	Tue, 15 Apr 2025 12:56:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9015828E61D;
+	Tue, 15 Apr 2025 12:57:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744721817; cv=none; b=n3TTsCK9RLxIghsjW3ZTJVe8TfzFIOo9Ra56bgQvx9JNEBkrbaNQfg1aeYE5KjyWYlBVQk1eh5e+j5b+UPylgxmAJwbAEyAHEI8mZtFCosW462wCZDYqg1XRfFnEXl0kL2SzMwHe2BvN2YJ899vrIw7iM5Z90J/AtMJirh5bf7I=
+	t=1744721866; cv=none; b=fNvbsWM5DVlfHjyqaghmo/CDA+LWsxbGAMcMpoUO9J9lDPrT9B945vNciUO0zOP3Rr8FdLtHL1OsdUQIqMd8HbyLoYIqowljKcgNA84NMyT+8ZpvnyAmDr7Mb8/sSKEgo9o3bhByENJpmNce2m8/lsn1jhlXE+QObEl+DIYtswc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744721817; c=relaxed/simple;
-	bh=W0j6iaGLICzY08UwsMabAQsvmG4ifO69JE8mK7U9m5k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oRqcROfUWIa3rURMBw8DLtxqKtUbWW+DiRPIU2TjEkqTZbgxD3Ln87RrcUVdp1KIbVrSRDphtEg1t/K9SvlkuQM63WT4EoITNEyGnDjVr5hm3WG2MNCm5syZ+nBBH85yHhCwaGOzPmmxz4m9XpTQmbl3gmktAHzsdI28ZD/RBkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q2PSR8AF; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43d07ca6a80so26428585e9.1;
-        Tue, 15 Apr 2025 05:56:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1744721813; x=1745326613; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TBtNXmS8qjturrEwGtpAmFAuM6DgmNGXr8LZo+XU2no=;
-        b=Q2PSR8AFHwDbfuJi54hhPfA2qhF41DZjEGFsFQSXLH3+tm92OIUx/m9Ldn0yBK4+I/
-         kQluRTXZjSdiqYlBA9BXx7+lGA0Hl9qTgSw6CsOLdKKCPyIhiQBDnffXU8tODivuhMVf
-         fAr3kCuCBTd2s+yHdz7cDUZR0X+oRdpgsD7+7aIg9J80GfYqMM7KNIxTtavNXGHe5mFo
-         Rg9MVvWBYn3u0azK42fKgN5VWY3agz5aGC9VBnOHUxUpVgGwimj+K7/73u/cP8VUgfxw
-         aXoR0uHROCmua5I/rQojN30tLDeO7m+Gdrsxx+dyMdbY1m0JI4TbWq2TWXsIEwj61tSA
-         oesw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1744721813; x=1745326613;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TBtNXmS8qjturrEwGtpAmFAuM6DgmNGXr8LZo+XU2no=;
-        b=KFhFtsk4f47AdWguAJcPpJ+H3VRbwp8hj/r3ketaAmE7KDhpw+kvhMJphj4kyn3nps
-         5ZNQ4wHhroyt44w+6D5dB2S8iSUA7yb8sb41J4XPoSew8OJDyHKUNFaRafTMxXxumvHN
-         7CzBImIUR7r5DLqkLuwtnbqb3Em2r1RevitLEieElc3UTQ1p9jlxDoe4KbhSZgf3Ps7y
-         iOiHtJJvkS+tfYMQ40YzggGQsrlfQFN4bhrckeV3XmnFOyjHDLNvsY2iA8wGlD1CGIYj
-         GVcaFBKMWPmg4oa6PsT43tnpAYLY2r6jAr9W8UAdylYycEukpItx+1QlhIm9diCiPnph
-         U+/A==
-X-Forwarded-Encrypted: i=1; AJvYcCUr8knR0wI+AQXtPQ32zasTTxnc3ET7vFyEirUgDvkIe4kbTBLhwHlUlwLOyEmD/jEZeYfhx+MKS552D/4sBeceCkY=@vger.kernel.org, AJvYcCVvHsnuqevn5LchQyXUOTxixWKGZoFpelqiP7mBkIE4Vrqnmv7Hb1BzAmdCcorUlPU4Wm40pcSgbbi9@vger.kernel.org, AJvYcCWH+mpiuctLvyBUW8V9+pp3+BmUyurowO+CQk187X7ULyAQ3pCyDgMn92RXilk2JbEpv9lYvwFbg2Dh/1h5@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHDhGJwXfEQcfL53UnJach7lIdUJHetkXERsMOYJRNoLQ9yKBs
-	VKvKYNZokFFQGX0LFCEnzzCTeYSiuM7vb7P8HlBG6b1ctgfYaed+
-X-Gm-Gg: ASbGncurFgGJMwL3SxuCWLYw9tnvjgXUFufRarBmF/9HfMBsd0BIoEIW/oiox2WCqKm
-	vpBZjLEywGLeOui4fZNMNGrqlF6RkNzCRr1esfcVh8TZfiF/iNgWl8CDgIFmdRlIRi2+XYM5gSW
-	1EkfUU7nVvEV+BXL/7HtoLhSFZ+leEyhVqpAvf0WI9SNo9jtmg962Hknd8j1v1U6+FQx+QmNZ8r
-	Ju1fa0S7Xn7kcEYHZEdEDnUAMi4lgUb/y/hnaTnw/9IgsXpRM0OcAa6LxAlDfSOXnsJl4B6i4hg
-	CnyZB0aktQPKK1snh2dvHLKJ21MxqPMxGiuaFTLzS27IIqzEs+QPh/+gSB4O97rV
-X-Google-Smtp-Source: AGHT+IE0KqK5XyLGhc+pfdESGQ0FrYBws4qU9UQxP3mB+l7Lk+YFfa+Xsv3uUzwSyeT2UvIbstj7vg==
-X-Received: by 2002:a05:600c:4704:b0:43b:d0fe:b8ac with SMTP id 5b1f17b1804b1-43f3a9af837mr171329065e9.30.1744721813467;
-        Tue, 15 Apr 2025 05:56:53 -0700 (PDT)
-Received: from iku.Home ([2a06:5906:61b:2d00:1883:aa4:a265:bc12])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-39eae96bf97sm13922334f8f.25.2025.04.15.05.56.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Apr 2025 05:56:52 -0700 (PDT)
-From: Prabhakar <prabhakar.csengg@gmail.com>
-X-Google-Original-From: Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
+	s=arc-20240116; t=1744721866; c=relaxed/simple;
+	bh=2EOO+sAkwFqCxra83O6A2BDPgugA7NN6ZkUL1xXLrbY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iyy2K6Q48HZvngR1JjR12rQ5uh6kQf3Zw1Bf/FFKP5jXsjQDAjLMyZUjpypq5ePi4qr9mA6wcJ/9MIgKhGrUzJ5vEbLegvEu2sP96B7x+5m0i/o9fAVhFh+frvBA0CCHYBKz73tT4oMU9KB4GLAkt3MJ2Inn30YLXipJMfnU0lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=utNpLyac; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=/zg+4LuvKN2MfsYaYQDPTMDY3vRum1BuvjjkEVMSOMM=; b=utNpLyacBxVYcE4VG7k4ynrztr
+	ZBf69qa3y5t2IoS/iSjBwfypRhUnM3WBelKCWR4xODoRhm5+CZk6ukSO3TpymSQdE71yemvFAi49c
+	kmH2BrBhX4cgKRtWcDskgGDDpmfpX2xT/loN6Ucwmp+VuXQnUPSac8o1YhnyqNskJMBw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1u4fr1-009RZD-DL; Tue, 15 Apr 2025 14:57:31 +0200
+Date: Tue, 15 Apr 2025 14:57:31 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: Andy Shevchenko <andy@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>, netdev@vger.kernel.org,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>, Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>
-Cc: netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Prabhakar <prabhakar.csengg@gmail.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: [PATCH net-next v6 4/4] MAINTAINERS: Add entry for Renesas RZ/V2H(P) DWMAC GBETH glue layer driver
-Date: Tue, 15 Apr 2025 13:56:42 +0100
-Message-ID: <20250415125642.241427-5-prabhakar.mahadev-lad.rj@bp.renesas.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20250415125642.241427-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-References: <20250415125642.241427-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Lee Jones <lee@kernel.org>, Kees Cook <kees@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Michal Schmidt <mschmidt@redhat.com>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH v2 07/14] mfd: zl3073x: Add components versions register
+ defs
+Message-ID: <e1389e78-ead0-4180-a652-5dc48a691548@lunn.ch>
+References: <20250409144250.206590-1-ivecera@redhat.com>
+ <20250409144250.206590-8-ivecera@redhat.com>
+ <df6a57df-8916-4af2-9eee-10921f90ff93@kernel.org>
+ <c0ef6dad-ce7e-401c-9ae1-42105fcbf9c4@redhat.com>
+ <098b0477-3367-4f96-906b-520fcd95befb@lunn.ch>
+ <003bfece-7487-4c65-b4f1-2de59207bd5d@redhat.com>
+ <8c5fb149-af25-4713-a9c8-f49b516edbff@lunn.ch>
+ <9de10e97-d0fa-4dee-b98a-e4b2a3f7019c@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9de10e97-d0fa-4dee-b98a-e4b2a3f7019c@redhat.com>
 
-From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+> Hi Andrew,
+> the idea looks interesting but there are some caveats and disadvantages.
+> I thought about it but the idea with two regmaps (one for simple registers
+> and one for mailboxes) where the simple one uses implicit locking and
+> mailbox one has locking disabled with explicit locking requirement. There
+> are two main problems:
+> 
+> 1) Regmap cache has to be disabled as it cannot be shared between multiple
+> regmaps... so also page selector cannot be cached.
+> 
+> 2) You cannot mix access to mailbox registers and to simple registers. This
+> means that mailbox accesses have to be wrapped e.g. inside scoped_guard()
+> 
+> The first problem is really pain as I would like to extend later the driver
+> with proper caching (page selector for now).
+> The second one brings only confusions for a developer how to properly access
+> different types of registers.
+> 
+> I think the best approach would be to use just single regmap for all
+> registers with implicit locking enabled and have extra mailbox mutex to
+> protect mailbox registers and ensure atomic operations with them.
+> This will allow to use regmap cache and also intermixing mailbox and simple
+> registers' accesses won't be an issue.
 
-Add a new MAINTAINERS entry for the Renesas RZ/V2H(P) DWMAC GBETH
-glue layer driver.
+As i said, it was just an idea, i had no idea if it was a good idea.
 
-Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
----
- MAINTAINERS | 8 ++++++++
- 1 file changed, 8 insertions(+)
+What is important is that the scope of the locking becomes clear,
+unlike what the first version had. So locking has to be pushed down to
+the lower levels so you lock a single register access, or you lock an
+mailbox access.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1248443035f4..f5141da4d509 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -20606,6 +20606,14 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/usb/renesas,rzn1-usbf.yaml
- F:	drivers/usb/gadget/udc/renesas_usbf.c
- 
-+RENESAS RZ/V2H(P) DWMAC GBETH GLUE LAYER DRIVER
-+M:	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-+L:	netdev@vger.kernel.org
-+L:	linux-renesas-soc@vger.kernel.org
-+S:	Supported
-+F:	Documentation/devicetree/bindings/net/renesas,r9a09g057-gbeth.yaml
-+F:	drivers/net/ethernet/stmicro/stmmac/dwmac-renesas-gbeth.c
-+
- RENESAS RZ/V2M I2C DRIVER
- M:	Fabrizio Castro <fabrizio.castro.jz@renesas.com>
- L:	linux-i2c@vger.kernel.org
--- 
-2.49.0
+Also, you say this is an MFD partially because GPIOs could be added
+later. I assume that GPIO code would have the same locking issue,
+which suggests the locking should be in the MFD core, not the
+individual drivers stacked on top of it.
 
+	Andrew
 
