@@ -1,170 +1,103 @@
-Return-Path: <netdev+bounces-182884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 671CCA8A438
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 18:34:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 010D5A8A43B
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 18:35:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A5F97A5E45
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 16:33:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11BF51684D0
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 16:35:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D1AB2147EF;
-	Tue, 15 Apr 2025 16:34:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD8B22185A0;
+	Tue, 15 Apr 2025 16:35:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yi2BxjzI"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC06A1DF963;
-	Tue, 15 Apr 2025 16:34:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F1B015F306;
+	Tue, 15 Apr 2025 16:35:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744734874; cv=none; b=QFHITFyvECLV5udxeNtgViaxYqyMrYOfsqtvxu3YuugRhJsnTX+cVKEt00bmi7mf8EwQ9pHPTLBSXwrPvw7vpfaNWQvstO9EglviQkS91nGIqudOhmRsfma4AETpXGPixv0iKnKwTx1iqh38YrzU/Tu4fg7lVN0tnCAUGCcdGqM=
+	t=1744734940; cv=none; b=lY2/n8XGqg7s+qiU47rne+VVHlcdKGnyvKHZTz1aaLJEkKxew/aB5MfY80y1sizke4D/5E2pelrbNKNno3dYo7vjJHEyBre9yvtL/62dIjODW66Sk/XvdQK9OJnM/SZepeFe02HzNJyQnX3vt7+4PLy2CCG/XT5upwYuTiROsbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744734874; c=relaxed/simple;
-	bh=Cf9se2zTleLRQBiig193MxIvcQgdOvlF39P3Grsjqp0=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AQmoRbMtjlrtN1IS5qPnjVn29dlm4+bXWTtbbZzUlYgYH+eQuKw2SXtPYPAAk7STtIouoanUuU6ZUg0r8ZjoGyTzTONW6prKXAIgzMLVQy2A0QcAzkHiMdMI9b3mzjMcEcOROZJZcW0uDqwl5mrEWzdgAmd9OdMP8DyE75babNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4ZcV870S8Hz6L4y0;
-	Wed, 16 Apr 2025 00:33:11 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 77C19140144;
-	Wed, 16 Apr 2025 00:34:29 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 15 Apr
- 2025 18:34:28 +0200
-Date: Tue, 15 Apr 2025 17:34:27 +0100
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: Alejandro Lucero Palau <alucerop@amd.com>
-CC: <alejandro.lucero-palau@amd.com>, <linux-cxl@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <dan.j.williams@intel.com>, <edward.cree@amd.com>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <dave.jiang@intel.com>, "Ben Cheatham"
-	<benjamin.cheatham@amd.com>
-Subject: Re: [PATCH v12 05/23] cxl: add function for type2 cxl regs setup
-Message-ID: <20250415173427.00001dfc@huawei.com>
-In-Reply-To: <320c4b16-2029-4792-9288-8ccf99bf07cd@amd.com>
-References: <20250331144555.1947819-1-alejandro.lucero-palau@amd.com>
-	<20250331144555.1947819-6-alejandro.lucero-palau@amd.com>
-	<20250404170329.00000401@huawei.com>
-	<320c4b16-2029-4792-9288-8ccf99bf07cd@amd.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1744734940; c=relaxed/simple;
+	bh=qQPlLCaHQYe+gqLPm35pHARjmiBk4+PpLo1qXkmjFPQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lOMg1ZY2wezGXnEEmDVbl4VHqyZZX4HFVH0xDnSVUqUjr+8OoCxCe8mWwg2s8PXAJO0qdqLSS7Czkt+U/5y4sh37yyUclRmh5HnFYXwVUD241EqhM5nkyGZOK26fZY0txGo1gbs9VZkhC/BXuJelWb7h4BoOvCv2uyTrNKxpcjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yi2BxjzI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 221B2C4CEEB;
+	Tue, 15 Apr 2025 16:35:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1744734940;
+	bh=qQPlLCaHQYe+gqLPm35pHARjmiBk4+PpLo1qXkmjFPQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Yi2BxjzI5SS9GasqB1mrG7VGqf/qr3KLNsPj6olTEq/xwEyFuBJ/CoHDkRfZLCJKl
+	 1wNR0NvBf4CfKpluiko2DxFirtrllqs8Asr7/HLZp/3dCUKp+nTK7MXVjpZmhiRGTA
+	 P8NdCQrfk1p/5EZhfWR/zR3r1OPELisyF6ml5geKUA+1VDQiVWsDQBk14UGhn4/oWB
+	 oovpgwl2GWP7vKpebsgnTLlXUNdCdHsKL6N7AxtUZ3NEyCdxi+E0w9p1L7OZYhMNv1
+	 z01ek110ohyc/yRuFklq1r4sVF+k8Q4AH0lKTb40dQN9n5J3qzSsUx1xocd7ch3iC+
+	 I4hGyaRgW5CpA==
+Date: Tue, 15 Apr 2025 17:35:36 +0100
+From: Simon Horman <horms@kernel.org>
+To: Pranav Tyagi <pranav.tyagi03@gmail.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, skhan@linuxfoundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kernel-mentees@lists.linux.dev
+Subject: Re: [PATCH net-next] net: ipconfig: replace strncpy with strscpy
+Message-ID: <20250415163536.GA395307@horms.kernel.org>
+References: <20250412160623.9625-1-pranav.tyagi03@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: lhrpeml100005.china.huawei.com (7.191.160.25) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250412160623.9625-1-pranav.tyagi03@gmail.com>
 
+On Sat, Apr 12, 2025 at 09:36:23PM +0530, Pranav Tyagi wrote:
+> Replace the deprecated strncpy() with strscpy() as the destination
+> buffer is NUL-terminated and does not require any
+> trailing NUL-padding.
+> 
+> Signed-off-by: Pranav Tyagi <pranav.tyagi03@gmail.com>
 
->=20
-> >> +	 */
-> >> +	if (rc =3D=3D -ENODEV)
-> >> +		return 0; =20
-> > Hmm. I don't mind hugely but I'd expect the -ENODEV handler in the
-> > clearly accelerator specific code that follows not here.
-> >
-> > That would require cxl_map_device_regs() to definitely not return
-> > -ENODEV though which is a bit ugly so I guess this is ok.
-> >
-> > I'm not entirely convinced this helper makes sense though given
-> > the 2 parts of the component regs are just done inline in
-> > cxl_pci_accel_setup_regs() and if you did that then this
-> > accelerator specific 'carry on anyway' would be in the function
-> > with accel in the name.
-> >
-> > 	You'd need a
-> > 	rc =3D cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_MEMDEV, &map, caps);
-> > 	if (rc) {
-> > 		if (rc !=3D -ENODEV)
-> > 			return rc;
-> > 	} else {
-> > 		rc =3D cxl_map_device_regs();
-> > 		if (rc)
-> > 			return rc;=09
-> > 	}=09
-> > though which is a little messy. =20
->=20
->=20
-> That messiness is the reason I added the other function keeping, I=20
-> think, the code clearer.
->=20
-> Note that other function is only used by accel code, but I can change=20
-> the name for making it more visible:
->=20
->=20
-> cxl_pci_setup_memdev_regs=A0 ---> cxl_accel_setup_memdev_regs
-That works.
+Thanks,
 
->=20
->=20
-> >> +
-> >> +	if (rc)
-> >> +		return rc;
-> >> +
-> >> +	return cxl_map_device_regs(&map, &cxlds->regs.device_regs);
-> >> +}
-> >> +
-> >> +int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct cxl_dev_sta=
-te *cxlds,
-> >> +			      unsigned long *caps)
-> >> +{
-> >> +	int rc;
-> >> +
-> >> +	rc =3D cxl_pci_setup_memdev_regs(pdev, cxlds, caps);
-> >> +	if (rc)
-> >> +		return rc;
-> >> +
-> >> +	rc =3D cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_COMPONENT,
-> >> +				&cxlds->reg_map, caps);
-> >> +	if (rc) {
-> >> +		dev_warn(&pdev->dev, "No component registers (%d)\n", rc);
-> >> +		return rc;
-> >> +	}
-> >> +
-> >> +	if (!caps || !test_bit(CXL_CM_CAP_CAP_ID_RAS, caps)) =20
-> > As before. Why not just mandate caps?  If someone really doesn't
-> > care they can provide a bitmap and ignore it.  Seems like a simpler
-> > interface to me. =20
->=20
->=20
-> Not sure what you meant here. This is not just about knowing by the=20
-> caller the capabilities but also mapping the related structures if presen=
-t.
+I agree that strscpy() is the correct choice here for
+the reasons you give above.
 
-I meant the !caps variable not being NULL. Just mandate that there must be =
-a caps
-bitmap passed in always.  Caller can throw away the value if it doesn't wan=
-t it.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
->=20
-> The now returned caps is useful for dealing with mandatory vs optional=20
-> caps which the current code targeting Type3-only can not. In other=20
-> words, the core code can not know if a cap missing is an error or not.
-Not that. Was a much more mundane point ;)
+> ---
+>  net/ipv4/ipconfig.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/ipv4/ipconfig.c b/net/ipv4/ipconfig.c
+> index c56b6fe6f0d7..eb9b32214e60 100644
+> --- a/net/ipv4/ipconfig.c
+> +++ b/net/ipv4/ipconfig.c
+> @@ -1690,7 +1690,7 @@ static int __init ic_proto_name(char *name)
+>  			*v = 0;
+>  			if (kstrtou8(client_id, 0, dhcp_client_identifier))
+>  				pr_debug("DHCP: Invalid client identifier type\n");
+> -			strncpy(dhcp_client_identifier + 1, v + 1, 251);
+> +			strscpy(dhcp_client_identifier + 1, v + 1, 251);
 
->=20
->=20
-> >> +		return 0;
-> >> +
-> >> +	rc =3D cxl_map_component_regs(&cxlds->reg_map,
-> >> +				    &cxlds->regs.component,
-> >> +				    BIT(CXL_CM_CAP_CAP_ID_RAS));
-> >> +	if (rc)
-> >> +		dev_dbg(&pdev->dev, "Failed to map RAS capability.\n");
-> >> +
-> >> +	return rc;
-> >> +}
-> >> +EXPORT_SYMBOL_NS_GPL(cxl_pci_accel_setup_regs, "CXL"); =20
+As an aside, I'm curious to know why the length is 251
+rather than 252 (sizeof(dhcp_client_identifier) -1).
+But that isn't strictly related to this patch.
 
+>  			*v = ',';
+>  		}
+>  		return 1;
+> -- 
+> 2.49.0
+> 
 
