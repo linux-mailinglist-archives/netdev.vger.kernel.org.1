@@ -1,97 +1,92 @@
-Return-Path: <netdev+bounces-182865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0AFEA8A31E
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:41:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35DEAA8A320
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:42:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 805F31902B81
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:41:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE6453B38ED
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:41:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 456762BCF40;
-	Tue, 15 Apr 2025 15:40:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFD672973DB;
+	Tue, 15 Apr 2025 15:41:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lYO4VTGq"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="inmuVdwX";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="RkDHEnNC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2E129E07C;
-	Tue, 15 Apr 2025 15:40:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E426C2DFA29;
+	Tue, 15 Apr 2025 15:41:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744731610; cv=none; b=RcGoQIqrnWwSUek/diQOLGIoWll7+PsEobf4Pe+tFd+erQf85NXbtoPqVny3fDbBw4D+iO+o3Bt/hAMfjU3bZabsYqNxYrYVrbuoWIZ5Q2LltX5TgJu2zsOnXt7mb5jz34qSB8n2HDOAuxrU7PzKKxUqYglijU4hWbsFstkonzI=
+	t=1744731703; cv=none; b=Km4lZsdag5dDPnrQ0ljJdGxhlrwOCz36hDVmDQIU/Z2UvRtM859cIiOBh8y+Ibh0EP7KGVjMYcMtDmuZfUM/DBZMYY+q3qyHa2pb2uomt/TSVyI7lpl2h19mrQDA6DLezSI/6kP2+6tOoGnvoiVn9Gil6ezTh2R4IwEvM9rA7XQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744731610; c=relaxed/simple;
-	bh=dzwTkeVW3m8NZo5p+8+xPOs71OcTG5vKrAZ0wG5pETs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=XgaTKQDmEZioQc7oTk4NBEZpCa3RNF4WANWC3C/vccwCoL5PFH2MsOylZpNsuEVVi1PZl2cWlA6cjPG3PYeaZgW0JlxM+HTsI3JYd6OlUlLL7fBYkfuXiJdVL5sB4TxiJCypD4ATVFSCj/8Bb1jPTC0USrmIY0WUAl49FfKRWeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lYO4VTGq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8538CC4CEED;
-	Tue, 15 Apr 2025 15:40:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744731609;
-	bh=dzwTkeVW3m8NZo5p+8+xPOs71OcTG5vKrAZ0wG5pETs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lYO4VTGqisxqq2ozajFWSqr3ercrEOC8Wwga3+2rt4jygg4ysPzvQWpVqrr/fv4GM
-	 9eQxL9axGqSdqERr97ccZQcI3oB6Cnx0KayrR7JgtoETApG/n/6A1bNmRRDCUa2eWq
-	 szOJu3GdtjV8QQ/oDnvO/hq776avp0CNhrwH09r+dGFlg16aYG7J3A083VGoT+eHz3
-	 Kz2wDPARZYr8KzzgXBcR7sSw88GIB3oCW66knHOOpVJcdxKzxPpMDrNxzbZ8QOxsIi
-	 6eKlUfNxxInkyPwpjzd6C10DbgRo02+FUOw5MhAgsnS21XzXLiOVmvOjBK+0dQHdzc
-	 t+5hqqwodb1IA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADBDC3822D55;
-	Tue, 15 Apr 2025 15:40:48 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1744731703; c=relaxed/simple;
+	bh=CIg8QmdP3BeTv3ceN/dvUqOI2TuC4nhVjPF76pREnLE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZDevZGKD8LBfOslgB1sokBm6otVuIUrXdYYQ2eXFIfSic5ckwPa3X+xnDsOdNqXQi7hlPGC9fEIHG6g3Rq7qRRl9d3tDMkzVUjKWvq/50yAYF2g0vpQtep1laKRgzHKxklytE7eVasjqkfKqFDU+2MbdHlY9XzAb0fdS2QLyByg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=inmuVdwX; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=RkDHEnNC; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id 5AD79608C8; Tue, 15 Apr 2025 17:41:39 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1744731699;
+	bh=CIg8QmdP3BeTv3ceN/dvUqOI2TuC4nhVjPF76pREnLE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=inmuVdwXuYLpYwFRvYYzPoAj4KZeZbXpCpyQaeS1OX3yS931k4d9TVDW+sZ0i4GWT
+	 CSYhj0qJ50QSBBxJPjHhTy22zQZAceAXk2/FCWe8JxftLoe4exHxZpchc4tGe70w2o
+	 FOSdmAYgpi+luYfDB+ityxmUpu8YJdt6obz8KrfL1qS/Ws2A02SbSuUBO7Tmpcqx26
+	 lJP4ir1Hh3atYA9YLLcDKUDaNhaks5VPCP2yV2Vwvj/LchKf3OcKmIXrSdT0/rhD0r
+	 Me2MsgzAx/g8XWtwJEC8U2Tm6rObZZzwaqVZf7tjpalt7pmnJkrzkTjCOa2QP/Nzaa
+	 sMrVzGP3czu5A==
+X-Spam-Level: 
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 740DC60883;
+	Tue, 15 Apr 2025 17:41:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1744731697;
+	bh=CIg8QmdP3BeTv3ceN/dvUqOI2TuC4nhVjPF76pREnLE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RkDHEnNC4qIVB0kkMZ0j9le+WBomjWS0Iv/Qz2FKbjVVt1zva6O9+kpDM84wBM9+U
+	 ARtUINfma9QCs4JqjtnrbSI5p80cwrYKSe33mbzcVxXhFclj4VjHQQNXodba+dU3qX
+	 WcFn+qiuar26WLBqD34bSJOAoDN53AMxY7B/Os9mleVicJz++Hf49fsg7TORTE/F87
+	 RGGSPYsgdjGUP/oyL/CANtfdi/MjN6uCzP9XYQRfJaXk7bfrgl9fCBAQUeIwr6wjO8
+	 e/ArCxop0t3SMNz3jX7Ih1caX9YoS+SsKQEGFxQdV1wWTp3ZYrt1lRqUBQ7CJmjLt4
+	 /mGB8WtyIwDjQ==
+Date: Tue, 15 Apr 2025 17:41:34 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Chen Linxuan <chenlinxuan@uniontech.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 nf-next] docs: tproxy: fix formatting for nft code
+ block
+Message-ID: <Z_5-LkQaP9gs7O1b@calendula>
+References: <E25F951CDC9F22B2+20250408073550.3319892-2-chenlinxuan@uniontech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: stmmac: imx: use stmmac_pltfr_probe()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <174473164749.2680773.17264687658771021637.git-patchwork-notify@kernel.org>
-Date: Tue, 15 Apr 2025 15:40:47 +0000
-References: <E1u4Flp-000XlM-Tb@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1u4Flp-000XlM-Tb@rmk-PC.armlinux.org.uk>
-To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- festevam@gmail.com, imx@lists.linux.dev, kuba@kernel.org,
- linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
- netdev@vger.kernel.org, pabeni@redhat.com, kernel@pengutronix.de,
- s.hauer@pengutronix.de, shawnguo@kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <E25F951CDC9F22B2+20250408073550.3319892-2-chenlinxuan@uniontech.com>
 
-Hello:
+On Tue, Apr 08, 2025 at 03:35:50PM +0800, Chen Linxuan wrote:
+> The nft command snippet for redirecting traffic isn't formatted
+> in a literal code block like the rest of snippets.
+> Fix the formatting inconsistency.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 14 Apr 2025 10:06:25 +0100 you wrote:
-> Using stmmac_pltfr_probe() simplifies the probe function. This will not
-> only call plat_dat->init (imx_dwmac_init), but also plat_dat->exit
-> (imx_dwmac_exit) appropriately if stmmac_dvr_probe() fails. This
-> results in an overall simplification of the glue driver.
-> 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v2] net: stmmac: imx: use stmmac_pltfr_probe()
-    https://git.kernel.org/netdev/net-next/c/b2ee4451c1d4
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Applied to nf-next, thanks
 
