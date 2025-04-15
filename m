@@ -1,360 +1,191 @@
-Return-Path: <netdev+bounces-182551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47351A89100
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 03:06:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92669A89109
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 03:11:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 489E916CA60
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 01:06:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FC6B1778F7
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 01:11:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948A019644B;
-	Tue, 15 Apr 2025 01:06:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 180291990AF;
+	Tue, 15 Apr 2025 01:11:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="4XE3aCOx";
-	dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b="pflZgK1D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NeSNrsbA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.uniroma2.it (smtp.uniroma2.it [160.80.4.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB5315B54C;
-	Tue, 15 Apr 2025 01:06:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.80.4.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84525E552
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 01:11:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744679193; cv=none; b=a90GT4aWdGKxQmnJiaX1FlulOQmEY+Xs3V7CXnCEDO0HJ5dG/SjN77Y4awGUvXn5pVj/hE6S6grApR1PJRz808d2TGKL6yY4aY0NVEVQ6fJyL+6VEYNBBBYhqyfbG8GBzdO7AdzMMRLWSn2hxMQQnq9qIn+/KKhf+85T5JmNM40=
+	t=1744679479; cv=none; b=LcZ3l4oJnfm6BFlP+06Fx+R86otz/8zTD86dvyo51Hczf0sjY2KtogyPbQWSyGZ3PqHPb4LW4H6aNGxL9NcD4/ZAUmwZPSCiYs6nq8e5RQrbogVVR2WJWFk3PXI1Khr5uCc66gqKDyAqBZtNaTHoJmJj9vTtcdsICJUQyoapxN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744679193; c=relaxed/simple;
-	bh=mRdxcCyz9Wa8G3XYNb0Hs2Idss2ELFSgAEytfFDPHiY=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=WufJeUT7OuXsfhcMRrIWxSnTGpzX+PLiYW/huuwK6erzC8SRdzOjXTgKhRJ/3A3em2gQTwS8CBABP5y2OaqZKMdQBXmeZGDb9JYHQiZCn6NFxAiCx9B47STL+byiLCgzA0EaWqNBW4xKyq7TkTaZyv1On3vKV93jp8eNiV4zSD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it; spf=pass smtp.mailfrom=uniroma2.it; dkim=permerror (0-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=4XE3aCOx; dkim=pass (2048-bit key) header.d=uniroma2.it header.i=@uniroma2.it header.b=pflZgK1D; arc=none smtp.client-ip=160.80.4.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniroma2.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniroma2.it
-Received: from smtpauth-2019-1.uniroma2.it (smtpauth.uniroma2.it [160.80.5.46])
-	by smtp-2015.uniroma2.it (8.14.4/8.14.4/Debian-8) with ESMTP id 53F0rsZa015796;
-	Tue, 15 Apr 2025 02:53:59 +0200
-Received: from lubuntu-18.04 (unknown [160.80.103.126])
-	by smtpauth-2019-1.uniroma2.it (Postfix) with ESMTPSA id ABE851228DB;
-	Tue, 15 Apr 2025 02:54:16 +0200 (CEST)
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=uniroma2.it;
-	s=ed201904; t=1744678457; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5D3RC7ITnpDs+DKKDxLRzxADpKFmVqiUi5BSFovN7pk=;
-	b=4XE3aCOxSOWQXxVPfPJQ/8j9qb/XUF5XGbbjxdXp/jv1nl16AM6FvVfAnJZ+TLJuXof7Ct
-	nGGmH14KIpZJRcDg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniroma2.it; s=rsa201904;
-	t=1744678457; h=from:from:sender:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5D3RC7ITnpDs+DKKDxLRzxADpKFmVqiUi5BSFovN7pk=;
-	b=pflZgK1DbJZiq9GJVMMcMqq1HPOzCVnE8ouTL/HsQlXJtav3aA2n4dPapkRYlykQ/bziPj
-	YfW58Nr+SS4pNmFRm93EbedNAOsMwBck/X0oW6xdMpuGE20iQnAZku++KrmImtd6y7J7c/
-	23PLUxCSneK2bMkOz7d7E3l/uNweVFaDqY1ToNwIFIQfsc2q8R0r4nW2n/8B9ZDSlZz2GZ
-	HVjuxnGozCIMKPBQPiMIYCwstCSyEDm7H5FUJb+Q19yZuIsgx4fC8Km9PFWsklLxUkgdsa
-	e/XUtvHDHdnLDL0CKkJAmlOhgfay120Xv6JD5GE1FLR8K1HI5CMyIV2vaVhVSA==
-Date: Tue, 15 Apr 2025 02:54:16 +0200
-From: Andrea Mayer <andrea.mayer@uniroma2.it>
-To: Justin Iurman <justin.iurman@uliege.be>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-        Sebastian Sewior
- <bigeasy@linutronix.de>,
-        Stanislav Fomichev <stfomichev@gmail.com>,
-        Network
- Development <netdev@vger.kernel.org>,
-        "David S. Miller"
- <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>,
-        Kuniyuki Iwashima <kuniyu@amazon.com>, bpf
- <bpf@vger.kernel.org>,
-        Stefano Salsano <stefano.salsano@uniroma2.it>,
-        Paolo
- Lungaroni <paolo.lungaroni@uniroma2.it>,
-        Andrea Mayer
- <andrea.mayer@uniroma2.it>
-Subject: Re: [PATCH net] net: lwtunnel: disable preemption when required
-Message-Id: <20250415025416.0273812f0322a6b1728d9c7b@uniroma2.it>
-In-Reply-To: <d326726d-7050-4e88-b950-f49cf5901d34@uliege.be>
-References: <20250403083956.13946-1-justin.iurman@uliege.be>
-	<Z-62MSCyMsqtMW1N@mini-arch>
-	<cb0df409-ebbf-4970-b10c-4ea9f863ff00@uliege.be>
-	<CAADnVQLiM5MA3Xyrkqmubku6751ZPrDk6v-HmC1jnOaL47=t+g@mail.gmail.com>
-	<20250404141955.7Rcvv7nB@linutronix.de>
-	<85eefdd9-ec5d-4113-8a50-5d9ea11c8bf5@uliege.be>
-	<CAADnVQK7vNPbMS7T9TUOW7s6HNbfr4H8CWbjPgVXW7xa+ybPsw@mail.gmail.com>
-	<d326726d-7050-4e88-b950-f49cf5901d34@uliege.be>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1744679479; c=relaxed/simple;
+	bh=Hym2Pk7ayMSydqqHOdn8KF9tp8cNLwB8GgLb5VP3Abw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HJZtL8TNjLXW2idvGC9RbjPnqOYdEscjmKlR71WXkZ5IFvx2Tr12rByKShot4CgC7xb3K+yYrvlDH7iAsQAEfgTAlpPtf4hcExVe7TBpV7qbBKBIv+PYLETUwYApHA+2NEw9WVtcSKYuQZTMJvJDb2iik/wSL8E6LlRIHQ8peF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NeSNrsbA; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2279915e06eso52671865ad.1
+        for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 18:11:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1744679476; x=1745284276; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Rs95jORlHfrTMaOf63UykYdQScyocsdoZuF+g2o8qWU=;
+        b=NeSNrsbA3R/4vCJL5c67ia6k5NA90xmR01RaLNLancPZ9ftFIlSoE814wjpzqs9v7v
+         OJ3vdGrBm27wX69diwkRwAY+tO/gOMQlDEBhFBX5bppoDQE7MJW+hN6d90HD+cvn1cpm
+         PggQLM0f55Ns3nnLQIIRx8bdFu15KuLpTbNDYxlmeiWpJi1T4c3e7eb403StaniSaxPb
+         bByE+w6ratGm8djpLoPQPWqfJY+dETNEXlhg8p9bu2ahH80I9zR0QvDWq+IQxoTkydhS
+         CVo+tfk7g0mAPrYzQSqXatL6mqWlVjjG+kUhr0Dw6EJutpOHF8M7Qm023gWFSkLob29k
+         l7Yw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744679476; x=1745284276;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Rs95jORlHfrTMaOf63UykYdQScyocsdoZuF+g2o8qWU=;
+        b=I6CNsnCnOlRAB1KYcdhFx/0B3w8cthpRewzxnsMxdCIsPhbV/ZJD4BA1HaVV9mqtdp
+         6JYLLNYQe2a6vWtDGWf5+2bj6xzEuQ02JAZkW1+AZZNuPOFvTPe4S72k/SnAOre+D8P/
+         uzQ3v7E80AxPqgafE9nPEbrNUtCawoobIQNnpe/nIRsYUbBwDi63EdEhFuPtVXMCo5IT
+         RGGU1Ni6odGgl25yZ90C3627o1R45nOIfDxQk4FvFO6MoMkmBlwO1DdiwpwTt0jNpygj
+         gpSNuUmPqaDpfocShCi5RXjkof8CKZagsA5AcNGDYSCc5Nrk4yJciFwCYq/HjmCgiRSX
+         mabQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXEnG80S6HXgSrFJEP7PA5alJa9V8sH55eJ+CTLfdAg3UYVTWOyfVs1txOA1CN2+Ry9y0QScK4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxI1YzONVABn3Y6HhwG6kHP4lMib9wHa1b7BATweEJv7fyXShAa
+	N2JUz+G7haJs6XTWtzffFpPAIu8O9xngQEWkwxyZd4CP/WtsIuQ=
+X-Gm-Gg: ASbGncti6PLU0Ys9V/Jzwq3Df3yfvQHMQo3vAL4D0l91uQH7p48zKz37tvO5SeuyfWn
+	hTKjde045lBbEMrYuwzh69Sne7H6KCj7YNVNMB1z29qzGjwt0WlJaH8VtcfXoRZbatcV/aNpQUV
+	JX6XZ8vwuKMT9bmEBt/Dis3Rvbiy33N2877IQ9Jt7pvcu6Ri/srk4fxmK64rUZj9TW6hklZLddg
+	x64g5FkYzrBzW3Km2phxpchFH9F3k89SeGmpBqKCTgv4lzxPy+a/+5m6vDpA0kU2tWfSHuhPu/J
+	W6hl06G0mOgNgyEdpkrTK5ZAtPjOwDzgfG+tgdOz
+X-Google-Smtp-Source: AGHT+IE4Q1yxZA/WFhaPKfq+1j9vMr76WhZyQw85fSfS9mxAZEoT0hWmlN4kfwqsRaMYiRmuDTD/sA==
+X-Received: by 2002:a17:902:e545:b0:224:1157:6d26 with SMTP id d9443c01a7336-22bea49616dmr228500865ad.4.1744679475621;
+        Mon, 14 Apr 2025 18:11:15 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-22ac7ccb58asm105987825ad.231.2025.04.14.18.11.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Apr 2025 18:11:15 -0700 (PDT)
+Date: Mon, 14 Apr 2025 18:11:14 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	syzkaller <syzkaller@googlegroups.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, sdf@fomichev.me,
+	jdamato@fastly.com, almasrymina@google.com
+Subject: Re: [PATCH net-next v2] netdev: fix the locking for netdev
+ notifications
+Message-ID: <Z_2yMjGtbQ0ehtDN@mini-arch>
+References: <20250414195903.574489-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.100.0 at smtp-2015
-X-Virus-Status: Clean
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250414195903.574489-1-kuba@kernel.org>
 
-On Fri, 11 Apr 2025 20:34:54 +0200
-Justin Iurman <justin.iurman@uliege.be> wrote:
-
-> On 4/7/25 19:54, Alexei Starovoitov wrote:
-> > On Sun, Apr 6, 2025 at 1:59 AM Justin Iurman <justin.iurman@uliege.be> wrote:
-> >>
-> >> On 4/4/25 16:19, Sebastian Sewior wrote:
-> >>> Alexei, thank you for the Cc.
-> >>>
-> >>> On 2025-04-03 13:35:10 [-0700], Alexei Starovoitov wrote:
-> >>>> Stating the obvious...
-> >>>> Sebastian did a lot of work removing preempt_disable from the networking
-> >>>> stack.
-> >>>> We're certainly not adding them back.
-> >>>> This patch is no go.
-> >>>
-> >>> While looking through the code, it looks as if lwtunnel_xmit() lacks a
-> >>> local_bh_disable().
-> >>
-> >> Thanks Sebastian for the confirmation, as the initial idea was to use
-> >> local_bh_disable() as well. Then I thought preempt_disable() would be
-> >> enough in this context, but I didn't realize you made efforts to remove
-> >> it from the networking stack.
-> >>
-> >> @Alexei, just to clarify: would you ACK this patch if we do
-> >> s/preempt_{disable|enable}()/local_bh_{disable|enable}()/g ?
-> > 
-> > You need to think it through and not sprinkle local_bh_disable in
-> > every lwt related function.
-> > Like lwtunnel_input should be running with bh disabled already.
+On 04/14, Jakub Kicinski wrote:
+> Kuniyuki reports that the assert for netdev lock fires when
+> there are netdev event listeners (otherwise we skip the netlink
+> event generation).
 > 
-> Having nested calls to local_bh_{disable|enable}() is fine (i.e., 
-> disabling BHs when they're already disabled), but I guess it's cleaner 
-> to avoid it here as you suggest. And since lwtunnel_input() is indeed 
-> (always) running with BHs disabled, no changes needed. Thanks for the 
-> reminder.
+> Correct the locking when coming from the notifier.
 > 
-> > I don't remember the exact conditions where bh is disabled in xmit path.
+> The NETDEV_XDP_FEAT_CHANGE notifier is already fully locked,
+> it's the documentation that's incorrect.
 > 
-> Right. Not sure for lwtunnel_xmit(), but lwtunnel_output() can
+> Fixes: 99e44f39a8f7 ("netdev: depend on netdev->lock for xdp features")
+> Reported-by: syzkaller <syzkaller@googlegroups.com>
+> Reported-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Link: https://lore.kernel.org/20250410171019.62128-1-kuniyu@amazon.com
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Justin, thanks for the Cc.
+Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
-I have been looking into the behavior of the lwtunnel_xmit() function in both
-task and softirq contexts. To facilitate this investigation, I have written a
-simple eBPF program that only prints messages to the trace pipe. This program
-is attached to the LWT BPF XMIT hook by configuring a route (on my test node)
-with a destination address (DA) pointing to an external node, referred to as
-x.x.x.x, within my testbed network.
-
-To trigger that LWT BPF XMIT instance from a softirq context, it is sufficient
-to receive (on the test node) a packet with a DA matching x.x.x.x. This packet
-is then processed through the forwarding path, eventually leading to the
-ip_output() function. Processing ends with a call to ip_finish_output2(), which
-then calls lwtunnel_xmit().
-
-Below is the stack trace from my testing machine, highlighting the key
-functions involved in this processing path:
-
- ============================================
-  <IRQ>                                         
-  ...
-  lwtunnel_xmit+0x18/0x3f0                      
-  ip_finish_output2+0x45a/0xcc0                 
-  ip_output+0xe2/0x380                          
-  NF_HOOK.constprop.0+0x7e/0x2f0                
-  ip_rcv+0x4bf/0x4d0                            
-  __netif_receive_skb_one_core+0x11c/0x130      
-  process_backlog+0x277/0x980
-  __napi_poll.constprop.0+0x58/0x260
-  net_rx_action+0x396/0x6e0
-  handle_softirqs+0x116/0x640
-  do_softirq+0xa9/0xe0
-  </IRQ>
- ============================================
-
-Conversely, to trigger lwtunnel_xmit() from the task context, simply ping
-x.x.x.x on the same testing node. Below is the corresponding stack trace:
-
- ============================================
-  <TASK>                                                               
-  ...
-  lwtunnel_xmit+0x18/0x3f0                                             
-  ip_finish_output2+0x45a/0xcc0                                        
-  ip_output+0xe2/0x380                                                 
-  ip_push_pending_frames+0x17a/0x200                                   
-  raw_sendmsg+0x9fa/0x1060                                             
-  __sys_sendto+0x294/0x2e0                                             
-  __x64_sys_sendto+0x6d/0x80                                           
-  do_syscall_64+0x64/0x140                                             
-  entry_SYSCALL_64_after_hwframe+0x76/0x7e                             
-  </TASK>    
- ============================================
-
-So also for the lwtunnel_xmit(), we need to make sure that the functions
-dev_xmit_recursion{_inc/dec}() and the necessary logic to avoid lwt recursion
-are protected, i.e. inside a local_bh_{disable/enable} block.
-
-> definitely run with or without BHs disabled. So, what I propose is the 
-> following logic (applied to lwtunnel_xmit() too): if BHs disabled then 
-> NOP else local_bh_disable(). Thoughts on this new version? (sorry, my 
-> mailer messes it up, but you got the idea):
+> ---
+> v2:
+>  - rebase vs net merge which brought in
+>    commit 04efcee6ef8d ("net: hold instance lock during NETDEV_CHANGE")
+> v1: https://lore.kernel.org/20250411204629.128669-1-kuba@kernel.org
 > 
-> diff --git a/net/core/lwtunnel.c b/net/core/lwtunnel.c
-> index e39a459540ec..d44d341683c5 100644
-> --- a/net/core/lwtunnel.c
-> +++ b/net/core/lwtunnel.c
-> @@ -331,8 +331,13 @@ int lwtunnel_output(struct net *net, struct sock 
-> *sk, struct sk_buff *skb)
->   	const struct lwtunnel_encap_ops *ops;
->   	struct lwtunnel_state *lwtstate;
->   	struct dst_entry *dst;
-> +	bool in_softirq;
->   	int ret;
+> CC: kuniyu@amazon.com
+> CC: sdf@fomichev.me
+> CC: jdamato@fastly.com
+> CC: almasrymina@google.com
+> ---
+>  Documentation/networking/netdevices.rst |  4 +++-
+>  include/linux/netdevice.h               |  2 +-
+>  include/net/netdev_lock.h               | 12 ++++++++++++
+>  net/core/lock_debug.c                   |  4 +++-
+>  net/core/netdev-genl.c                  |  4 ++++
+>  5 files changed, 23 insertions(+), 3 deletions(-)
 > 
-> +	in_softirq = in_softirq();
-> +	if (!in_softirq)
-> +		local_bh_disable();
+> diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
+> index f87bb55b4afe..a73a39b206e3 100644
+> --- a/Documentation/networking/netdevices.rst
+> +++ b/Documentation/networking/netdevices.rst
+> @@ -387,12 +387,14 @@ For device drivers that implement shaping or queue management APIs,
+>  some of the notifiers (``enum netdev_cmd``) are running under the netdev
+>  instance lock.
+>  
+> +The following netdev notifiers are always run under the instance lock:
+> +* ``NETDEV_XDP_FEAT_CHANGE``
 > +
+>  For devices with locked ops, currently only the following notifiers are
+>  running under the lock:
+>  * ``NETDEV_CHANGE``
+>  * ``NETDEV_REGISTER``
+>  * ``NETDEV_UP``
+> -* ``NETDEV_XDP_FEAT_CHANGE``
+>  
+>  The following notifiers are running without the lock:
+>  * ``NETDEV_UNREGISTER``
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index e6036b82ef4c..0321fd952f70 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -2520,7 +2520,7 @@ struct net_device {
+>  	 *	@net_shaper_hierarchy, @reg_state, @threaded
+>  	 *
+>  	 * Double protects:
+> -	 *	@up, @moving_ns, @nd_net, @xdp_flags
+> +	 *	@up, @moving_ns, @nd_net, @xdp_features
+>  	 *
+>  	 * Double ops protects:
+>  	 *	@real_num_rx_queues, @real_num_tx_queues
+> diff --git a/include/net/netdev_lock.h b/include/net/netdev_lock.h
+> index 5706835a660c..c63448b17f9e 100644
+> --- a/include/net/netdev_lock.h
+> +++ b/include/net/netdev_lock.h
+> @@ -48,6 +48,18 @@ static inline void netdev_unlock_ops(struct net_device *dev)
+>  		netdev_unlock(dev);
+>  }
+>  
+> +static inline void netdev_lock_ops_to_full(struct net_device *dev)
+> +{
+> +	if (!netdev_need_ops_lock(dev))
+> +		netdev_lock(dev);
 
-In a non-preemptible real-time environment (i.e., when !PREEMPT_RT), the
-in_softirq() expands to softirq_count(), which in turn uses the preempt_count()
-function. On my x86 architecture, preempt_count() accesses the per-CPU
-__preempt_count variable.
+Optional nit: I'm getting lost in all the helpers, I'd add the following here:
 
-If in_softirq() returns 0, it indicates that no softirqs are currently being
-processed on the local CPU and BH are not disabled. Therefore, following the
-logic above, we disable bottom halves (BH) on that particular CPU.
+else
+	netdev_ops_assert_locked(dev);
 
-However, there is my opinion an issue that can occur: between the check on
-in_softirq() and the call to local_bh_disable(), the task may be scheduled on
-another CPU. As a result, the check on in_softirq() becomes ineffective because
-we may end up disabling BH on a CPU that is not the one we just checked (with
-if (in_softirq()) { ... }).
+Or maybe even:
 
+if (netdev_need_ops_lock)
+	netdev_ops_assert_locked
+else
+	netdev_lock
 
->   	if (dev_xmit_recursion()) {
->   		net_crit_ratelimited("%s(): recursion limit reached on datapath\n",
->   				     __func__);
-> @@ -345,11 +350,13 @@ int lwtunnel_output(struct net *net, struct sock 
-> *sk, struct sk_buff *skb)
->   		ret = -EINVAL;
->   		goto drop;
->   	}
-> -	lwtstate = dst->lwtstate;
-> 
-> +	lwtstate = dst->lwtstate;
->   	if (lwtstate->type == LWTUNNEL_ENCAP_NONE ||
-> -	    lwtstate->type > LWTUNNEL_ENCAP_MAX)
-> -		return 0;
-> +	    lwtstate->type > LWTUNNEL_ENCAP_MAX) {
-> +		ret = 0;
-> +		goto out;
-> +	}
-> 
->   	ret = -EOPNOTSUPP;
->   	rcu_read_lock();
-> @@ -364,10 +371,12 @@ int lwtunnel_output(struct net *net, struct sock 
-> *sk, struct sk_buff *skb)
->   	if (ret == -EOPNOTSUPP)
->   		goto drop;
-> 
-> -	return ret;
-> -
-> +	goto out;
->   drop:
->   	kfree_skb(skb);
-> +out:
-> +	if (!in_softirq)
-> +		local_bh_enable();
-> 
->   	return ret;
->   }
-> @@ -378,8 +387,13 @@ int lwtunnel_xmit(struct sk_buff *skb)
->   	const struct lwtunnel_encap_ops *ops;
->   	struct lwtunnel_state *lwtstate;
->   	struct dst_entry *dst;
-> +	bool in_softirq;
->   	int ret;
-> 
-> +	in_softirq = in_softirq();
-> +	if (!in_softirq)
-> +		local_bh_disable();
-> +
->   	if (dev_xmit_recursion()) {
->   		net_crit_ratelimited("%s(): recursion limit reached on datapath\n",
->   				     __func__);
-> @@ -394,10 +408,11 @@ int lwtunnel_xmit(struct sk_buff *skb)
->   	}
-> 
->   	lwtstate = dst->lwtstate;
-> -
->   	if (lwtstate->type == LWTUNNEL_ENCAP_NONE ||
-> -	    lwtstate->type > LWTUNNEL_ENCAP_MAX)
-> -		return 0;
-> +	    lwtstate->type > LWTUNNEL_ENCAP_MAX) {
-> +		ret = 0;
-> +		goto out;
-> +	}
-> 
->   	ret = -EOPNOTSUPP;
->   	rcu_read_lock();
-> @@ -412,10 +427,12 @@ int lwtunnel_xmit(struct sk_buff *skb)
->   	if (ret == -EOPNOTSUPP)
->   		goto drop;
-> 
-> -	return ret;
-> -
-> +	goto out;
->   drop:
->   	kfree_skb(skb);
-> +out:
-> +	if (!in_softirq)
-> +		local_bh_enable();
-> 
->   	return ret;
->   }
-> @@ -428,6 +445,8 @@ int lwtunnel_input(struct sk_buff *skb)
->   	struct dst_entry *dst;
->   	int ret;
-> 
-> +	WARN_ON_ONCE(!in_softirq());
-> +
-
-What about DEBUG_NET_WARN_ON_ONCE instead?
-
-Ciao,
-Andrea
-
->   	if (dev_xmit_recursion()) {
->   		net_crit_ratelimited("%s(): recursion limit reached on datapath\n",
->   				     __func__);
-> @@ -440,8 +459,8 @@ int lwtunnel_input(struct sk_buff *skb)
->   		ret = -EINVAL;
->   		goto drop;
->   	}
-> -	lwtstate = dst->lwtstate;
-> 
-> +	lwtstate = dst->lwtstate;
->   	if (lwtstate->type == LWTUNNEL_ENCAP_NONE ||
->   	    lwtstate->type > LWTUNNEL_ENCAP_MAX)
->   		return 0;
-> @@ -460,10 +479,8 @@ int lwtunnel_input(struct sk_buff *skb)
->   		goto drop;
-> 
->   	return ret;
-> -
->   drop:
->   	kfree_skb(skb);
-> -
->   	return ret;
->   }
->   EXPORT_SYMBOL_GPL(lwtunnel_input);
+To express the constraints better.
 
