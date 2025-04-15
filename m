@@ -1,236 +1,176 @@
-Return-Path: <netdev+bounces-182787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1725A89E77
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 14:45:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2984BA89E82
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 14:47:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4FC4175D7D
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 12:45:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE2823A33CA
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 12:46:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0CFA2957DB;
-	Tue, 15 Apr 2025 12:45:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C423292911;
+	Tue, 15 Apr 2025 12:47:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Pb6tvvc7"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20BBE22F01;
-	Tue, 15 Apr 2025 12:45:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 425BE28B4F1;
+	Tue, 15 Apr 2025 12:47:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744721135; cv=none; b=k6Jv4qJlj/MS2pLlC5OXiy3zxpZ/GMsVEbCYaIFlHPkVembEYIh3k2JYKL+uS3lzfNFWa6gjdRTCtdKPITKePTrTPaHxd8OoDi8NUgmLiLD24I/GPa4rh6dCj8hFhYDnPCRAtaRNos26ItgJghFgxF2fSRYrIr1MboICrGe5LcM=
+	t=1744721224; cv=none; b=LYUozLV6/mrODf5gP+l/F9Ji09VCzTorFUP67bvflWQpbqyFaQTRGP55bPx3TvuDRgNL2OK/XotGGBb7TK/cfJMXYPCdnzsVcOXDTmZhC/T8UB875MBhVd8NYLAkvUysuCD0XAYU2pWH+VlFZ9cMXwuuNyIlf6ce2GdT1ZWR4Sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744721135; c=relaxed/simple;
-	bh=E5XQcw4IEaB0LKYRVD7ZDLH2kh1PfwrDrSF+4CKaanw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=DGsijTsC2fBPEP2QGzcylRWKtPJpNFCAVqonJXR2YlUvg0iTmktJBv7Xbqd8VEPvs8J7fgbu9zyBv8XyNcbq+no5o0lOeD5OrYjfI6id9B1KE/ZTveWWkbarE3kFYPkHzRZg1aj0XpIJdURkCcDZWCk/MkL+clG8YUEc9OwMbKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4ZcP374bdHz1R7gs;
-	Tue, 15 Apr 2025 20:43:31 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id D4EBE1A016C;
-	Tue, 15 Apr 2025 20:45:27 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 15 Apr 2025 20:45:27 +0800
-Message-ID: <28772dbe-1ae9-4ff7-91ef-c45d174b88d6@huawei.com>
-Date: Tue, 15 Apr 2025 20:45:22 +0800
+	s=arc-20240116; t=1744721224; c=relaxed/simple;
+	bh=5vRosKX5Osw72EvS+mxpqaBtV03BB8wYWXzLNWqTvNU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VscrMf5Z9vcPJLfsdRX8xR3T/IfPYH68qe8JrHNLl0AC1DRdz7qs3ckQXEdliLVBfEm2CygvrlF8ROdjWzEtJQXaYNKzQHTo/TsmXv2FFMUic3UPqY/nYYvfnNA+ntejAJZmU26Tanc3ZMRkmzhc7sD1UlMIJCoS645ztW5ewQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Pb6tvvc7; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 299544397E;
+	Tue, 15 Apr 2025 12:46:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1744721219;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aOROKFQ2lacCi0F/sGRNvCq/N5utu9L8rxls16miSXo=;
+	b=Pb6tvvc76apWhHbdIEqp/Stcts3c7Sm/V+f6ZLnsfk6BojnBRT3ZEPHzce74zAiG4TniuH
+	cf13yoXltXjAjAuMf/nMIooDISY8kg3lLrKYXVpABFT8hWrAiNUXeGmlQPo2GSjvp7E7s8
+	nP0BG3XeaMRpAMTv3JjUC11g9nPwDyW+DWQc64GMv/oDLsNq9lvhQdPPKKwNDCLg9295KJ
+	f1opItPe2LX2cVUnrs1U6ILDCrw+XxVkwlNZM2aH6/vzMyahQXRf/rtH4SAlxny+yiheen
+	/F5b1OniD+8tDZbayxWleJlcC4r8MzWx8MlhSXxh6XKSMiey9Wo2XVxnEROBEw==
+Date: Tue, 15 Apr 2025 14:46:55 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Andy Whitcroft <apw@canonical.com>, Dwaipayan Ray
+ <dwaipayanray1@gmail.com>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, Joe
+ Perches <joe@perches.com>, Jonathan Corbet <corbet@lwn.net>, Nishanth Menon
+ <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>, Siddharth Vadapalli
+ <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>, Tero Kristo
+ <kristo@kernel.org>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux@ew.tq-group.com, Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH net-next 4/4] checkpatch: check for comment explaining
+ rgmii(|-rxid|-txid) PHY modes
+Message-ID: <20250415144655.416c31ab@fedora.home>
+In-Reply-To: <a40072f780a531e5274ce7f2ed28d1319b12d872.camel@ew.tq-group.com>
+References: <cover.1744710099.git.matthias.schiffer@ew.tq-group.com>
+	<16a08c72ec6cf68bbe55b82d6fb2f12879941f16.1744710099.git.matthias.schiffer@ew.tq-group.com>
+	<20250415131548.0ae3b66f@fedora.home>
+	<a40072f780a531e5274ce7f2ed28d1319b12d872.camel@ew.tq-group.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] mm: alloc_pages_bulk: support both simple and
- full-featured API
-To: Chuck Lever <chuck.lever@oracle.com>, Andrew Morton
-	<akpm@linux-foundation.org>, Yishai Hadas <yishaih@nvidia.com>, Jason
- Gunthorpe <jgg@ziepe.ca>, Shameer Kolothum
-	<shameerali.kolothum.thodi@huawei.com>, Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>, Chris Mason <clm@fb.com>, Josef
- Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>, Gao Xiang
-	<xiang@kernel.org>, Chao Yu <chao@kernel.org>, Yue Hu <zbestahu@gmail.com>,
-	Jeffle Xu <jefflexu@linux.alibaba.com>, Sandeep Dhavale <dhavale@google.com>,
-	Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, Olga
- Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
-	<tom@talpey.com>, Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
-	<mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong
- Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
- Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo
-	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Jesper Dangaard Brouer
-	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker
-	<anna@kernel.org>
-CC: Luiz Capitulino <luizcap@redhat.com>, Mel Gorman
-	<mgorman@techsingularity.net>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<linux-btrfs@vger.kernel.org>, <linux-erofs@lists.ozlabs.org>,
-	<linux-mm@kvack.org>, <linux-nfs@vger.kernel.org>,
-	<linux-trace-kernel@vger.kernel.org>, <bpf@vger.kernel.org>,
-	<netdev@vger.kernel.org>
-References: <20250414120819.3053967-1-linyunsheng@huawei.com>
- <18713073-342e-48b2-9864-24004445e234@oracle.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <18713073-342e-48b2-9864-24004445e234@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvvdefheefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtjeertdertddvnecuhfhrohhmpeforgigihhmvgcuvehhvghvrghllhhivghruceomhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepudfgleelvddtffdvkeduieejudeuvedvveffheduhedvueduteehkeehiefgteehnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucfkphepvdgrtddumegtsgduleemkegugeehmeegledttdemieehieekmedvlegsudemlegvfhehmegvkegtjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudelmeekugegheemgeeltddtmeeiheeikeemvdelsgdumeelvghfheemvgektgejpdhhvghlohepfhgvughorhgrrdhhohhmvgdpmhgrihhlfhhrohhmpehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedviedprhgtphhtthhopehmrghtthhhihgrshdrshgthhhifhhfvghrsegvfidrthhqqdhgrhhouhhprdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvhesl
+ hhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehrohgshheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhriihkodgutheskhgvrhhnvghlrdhorhhg
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On 2025/4/15 1:39, Chuck Lever wrote:
-> On 4/14/25 8:08 AM, Yunsheng Lin wrote:
->> As mentioned in [1], it seems odd to check NULL elements in
->> the middle of page bulk allocating, and it seems caller can
->> do a better job of bulk allocating pages into a whole array
->> sequentially without checking NULL elements first before
->> doing the page bulk allocation for most of existing users
->> by passing 'page_array + allocated' and 'nr_pages - allocated'
->> when calling subsequent page bulk alloc API so that NULL
->> checking can be avoided, see the pattern in mm/mempolicy.c.
->>
->> Through analyzing of existing bulk allocation API users, it
->> seems only the fs users are depending on the assumption of
->> populating only NULL elements, see:
->> commit 91d6ac1d62c3 ("btrfs: allocate page arrays using bulk page allocator")
->> commit d6db47e571dc ("erofs: do not use pagepool in z_erofs_gbuf_growsize()")
->> commit f6e70aab9dfe ("SUNRPC: refresh rq_pages using a bulk page allocator")
->> commit 88e4d41a264d ("SUNRPC: Use __alloc_bulk_pages() in svc_init_buffer()")
->>
->> The current API adds a mental burden for most users. For most
->> users, their code would be much cleaner if the interface accepts
->> an uninitialised array with length, and were told how many pages
->> had been stored in that array, so support one simple and one
->> full-featured to meet the above different use cases as below:
->> - alloc_pages_bulk() would be given an uninitialised array of page
->>   pointers and a required count and would return the number of
->>   pages that were allocated.
->> - alloc_pages_bulk_refill() would be given an initialised array
->>   of page pointers some of which might be NULL. It would attempt
->>   to allocate pages for the non-NULL pointers, return 0 if all
->>   pages are allocated, -EAGAIN if at least one page allocated,
->>   ok to try again immediately or -ENOMEM if don't bother trying
->>   again soon, which provides a more consistent semantics than the
->>   current API as mentioned in [2], at the cost of the pages might
->>   be getting re-ordered to make the implementation simpler.
->>
->> Change the existing fs users to use the full-featured API, except
->> for the one for svc_init_buffer() in net/sunrpc/svc.c. Other
->> existing callers can use the simple API as they seems to be passing
->> all NULL elements via memset, kzalloc, etc, only remove unnecessary
->> memset for existing users calling the simple API in this patch.
->>
->> The test result for xfstests full test:
->> Before this patch:
->> btrfs/default: 1061 tests, 3 failures, 290 skipped, 13152 seconds
->>   Failures: btrfs/012 btrfs/226
->>   Flaky: generic/301: 60% (3/5)
->> Totals: 1073 tests, 290 skipped, 13 failures, 0 errors, 12540s
->>
->> nfs/loopback: 530 tests, 3 failures, 392 skipped, 3942 seconds
->>   Failures: generic/464 generic/551
->>   Flaky: generic/650: 40% (2/5)
->> Totals: 542 tests, 392 skipped, 12 failures, 0 errors, 3799s
->>
->> After this patch:
->> btrfs/default: 1061 tests, 2 failures, 290 skipped, 13446 seconds
->>   Failures: btrfs/012 btrfs/226
->> Totals: 1069 tests, 290 skipped, 10 failures, 0 errors, 12853s
->>
->> nfs/loopback: 530 tests, 3 failures, 392 skipped, 4103 seconds
->>   Failures: generic/464 generic/551
->>   Flaky: generic/650: 60% (3/5)
->> Totals: 542 tests, 392 skipped, 13 failures, 0 errors, 3933s
+On Tue, 15 Apr 2025 13:21:25 +0200
+Matthias Schiffer <matthias.schiffer@ew.tq-group.com> wrote:
+
+> On Tue, 2025-04-15 at 13:15 +0200, Maxime Chevallier wrote:
+> > On Tue, 15 Apr 2025 12:18:04 +0200
+> > Matthias Schiffer <matthias.schiffer@ew.tq-group.com> wrote:
+> >   
+> > > Historially, the RGMII PHY modes specified in Device Trees have been  
+> >   ^^^^^^^^^^^
+> >   Historically  
+> > > used inconsistently, often referring to the usage of delays on the PHY
+> > > side rather than describing the board; many drivers still implement this
+> > > incorrectly.
+> > > 
+> > > Require a comment in Devices Trees using these modes (usually mentioning
+> > > that the delay is relalized on the PCB), so we can avoid adding more
+> > > incorrect uses (or will at least notice which drivers still need to be
+> > > fixed).
+> > > 
+> > > Suggested-by: Andrew Lunn <andrew@lunn.ch>
+> > > Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> > > ---
+> > >  Documentation/dev-tools/checkpatch.rst |  9 +++++++++
+> > >  scripts/checkpatch.pl                  | 11 +++++++++++
+> > >  2 files changed, 20 insertions(+)
+> > > 
+> > > diff --git a/Documentation/dev-tools/checkpatch.rst b/Documentation/dev-tools/checkpatch.rst
+> > > index abb3ff6820766..8692d3bc155f1 100644
+> > > --- a/Documentation/dev-tools/checkpatch.rst
+> > > +++ b/Documentation/dev-tools/checkpatch.rst
+> > > @@ -513,6 +513,15 @@ Comments
+> > >  
+> > >      See: https://lore.kernel.org/lkml/20131006222342.GT19510@leaf/
+> > >  
+> > > +  **UNCOMMENTED_RGMII_MODE**
+> > > +    Historially, the RGMII PHY modes specified in Device Trees have been  
+> >        ^^^^^^^^^^^
+> >       	 Historically  
+> > > +    used inconsistently, often referring to the usage of delays on the PHY
+> > > +    side rather than describing the board.
+> > > +
+> > > +    PHY modes "rgmii", "rgmii-rxid" and "rgmii-txid" modes require the clock
+> > > +    signal to be delayed on the PCB; this unusual configuration should be
+> > > +    described in a comment. If they are not (meaning that the delay is realized
+> > > +    internally in the MAC or PHY), "rgmii-id" is the correct PHY mode.
+> > >  
+> > >  Commit message
+> > >  --------------
+> > > diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> > > index 784912f570e9d..57fcbd4b63ede 100755
+> > > --- a/scripts/checkpatch.pl
+> > > +++ b/scripts/checkpatch.pl
+> > > @@ -3735,6 +3735,17 @@ sub process {
+> > >  			}
+> > >  		}
+> > >  
+> > > +# Check for RGMII phy-mode with delay on PCB
+> > > +		if ($realfile =~ /\.dtsi?$/ && $line =~ /^\+\s*(phy-mode|phy-connection-type)\s*=\s*"/ &&
+> > > +		    !ctx_has_comment($first_line, $linenr)) {
+> > > +			my $prop = $1;
+> > > +			my $mode = get_quoted_string($line, $rawline);
+> > > +			if ($mode =~ /^"rgmii(?:|-rxid|-txid)"$/) {
+> > > +				CHK("UNCOMMENTED_RGMII_MODE",
+> > > +				    "$prop $mode without comment -- delays on the PCB should be described, otherwise use \"rgmii-id\"\n" . $herecurr);
+> > > +			}
+> > > +		}
+> > > +  
+> > 
+> > My Perl-fu isn't good enough for me to review this properly... I think
+> > though that Andrew mentioned something along the lines of 'Comment
+> > should include PCB somewhere', but I don't know if this is easily
+> > doable with checkpatch though.
+> > 
+> > Maxime  
 > 
-> Hi -
-> 
-> The "after" run for NFS took longer, and not by a little bit. Can you
-> explain the difference?
+> I think it can be done using ctx_locate_comment instead of ctx_has_comment, but
+> I decided against it - requiring to have a comment at all should be sufficient
+> to make people think about the used mode, and a comment with a bad explanation
+> would hopefully be caught during review.
 
-Ah, I overlooked the difference as I was not looking to have a performance
-comparasion using xfstest full test due to possible noise, so the above test
-might be done with other job like kernel compiling behind the scenes as it
-was tested with the same machine where I was doing some kernel compiling.
+True, and having looked at other stuff in checkpatch, it looks like
+there's no other example of rules expecting a specific word in a
+comment.
 
-And I used a temporary patch to enable the using of full-featured API in
-page_pool to test if the full-featured API will cause performance regression
-for the existing users in fs as mentioned at the end of commit log.
+So besides the typo above, I'm OK with this patch :)
 
-> 
-> You can expunge the flakey test (generic/650) to help make the results
-> more directly comparable. 650 is a CPU hot-plugging test.
+Maxime
 
-I retested in a newer and more powerful machine without obvious heavy job
-behind the scenes based on linux-next-20250411, and the flakey test seems
-gone too.
-
-before:
--------------------- Summary report
-KERNEL:    kernel 6.15.0-rc1-next-20250411-xfstests #369 SMP PREEMPT_DYNAMIC Tue Apr 15 16:17:08 CST 2025 x86_64
-CMDLINE:   full
-CPUS:      2
-MEM:       1972.54
-
-nfs/loopback: 539 tests, 4 failures, 400 skipped, 2364 seconds
-  Failures: generic/169 generic/363 generic/464 generic/551
-Totals: 555 tests, 400 skipped, 20 failures, 0 errors, 2205s
-
-after:
--------------------- Summary report
-KERNEL:    kernel 6.15.0-rc1-next-20250411-xfstests-00001-g316d17a7f7bb #370 SMP PREEMPT_DYNAMIC Tue Apr 15 19:57:48 CST 2025 x86_64
-CMDLINE:   full
-CPUS:      2
-MEM:       1972.54
-
-nfs/loopback: 539 tests, 4 failures, 400 skipped, 2327 seconds
-  Failures: generic/169 generic/363 generic/464 generic/551
-Totals: 555 tests, 400 skipped, 20 failures, 0 errors, 2148s
-
-> 
-> 
->> The stress test also suggest there is no regression for the erofs
->> too.
->>
->> Using the simple API also enable the caller to not zero the array
->> before calling the page bulk allocating API, which has about 1~2 ns
->> performance improvement for time_bench_page_pool03_slow() test case
->> of page_pool in a x86 vm system, this reduces some performance impact
->> of fixing the DMA API misuse problem in [3], performance improves
->> from 87.886 ns to 86.429 ns.
->>
->> Also a temporary patch to enable the using of full-featured API in
->> page_pool suggests that the new full-featured API doesn't seem to have
->> noticeable performance impact for the existing users, like SUNRPC, btrfs
->> and erofs.
->>
->> 1. https://lore.kernel.org/all/bd8c2f5c-464d-44ab-b607-390a87ea4cd5@huawei.com/
->> 2. https://lore.kernel.org/all/180818a1-b906-4a0b-89d3-34cb71cc26c9@huawei.com/
->> 3. https://lore.kernel.org/all/20250212092552.1779679-1-linyunsheng@huawei.com/
->> CC: Jesper Dangaard Brouer <hawk@kernel.org>
->> CC: Luiz Capitulino <luizcap@redhat.com>
->> CC: Mel Gorman <mgorman@techsingularity.net>
->> Suggested-by: Neil Brown <neilb@suse.de>
->> Acked-by: Jeff Layton <jlayton@kernel.org>
->> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
->> ---
->> V3:
->> 1. Provide both simple and full-featured API as suggested by NeilBrown.
->> 2. Do the fs testing as suggested in V2.
->>
->> V2:
->> 1. Drop RFC tag.
->> 2. Fix a compile error for xfs.
->> 3. Defragmemt the page_array for SUNRPC and btrfs.
 
