@@ -1,59 +1,63 @@
-Return-Path: <netdev+bounces-182849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F581A8A1E6
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 16:53:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E8F8A8A241
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 17:01:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67EA5441CC3
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 14:53:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49C444424BE
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 15:01:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A31C01B043F;
-	Tue, 15 Apr 2025 14:53:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A9C2BCF7C;
+	Tue, 15 Apr 2025 14:58:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ie6Fx5sK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XUMwfFQM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC292DFA56
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 14:53:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B28912BCF78;
+	Tue, 15 Apr 2025 14:58:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744728782; cv=none; b=HrUHK17BdXfHZKgnDdjdgZQoMSE7F5lrvBIRx81K+oF6Ih5xKSCLJ/ziNfCTaUX4B5Ft/SZTIWU+1vMWqiyTDcMsgJsNJrV0KtXDtnFGO3tKrXFYUeNauJQePRAJlWVe2B9rzeez0M4j7u7WeKCL2Yk3DoScNs4eH/O62Y7ipEI=
+	t=1744729099; cv=none; b=XEETXohG+9tOXNh5sMjkx12lI1jj/n1Eb1FBMvULmMAWLTrJ24kotsdTU00QK3qrSfdnUgbJlZO9DPgtg2JaOFs+3kZE1B0zsKuEKTeGAQpNCZdhpy6BLDoKIsQaNwqkh7Cn3ngkrWhZdMIsi0Dv4doB2Fg0/UMJOIHNz1a8HWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744728782; c=relaxed/simple;
-	bh=M+/KqYLeWHDkFnt1+EQIm2cnYkuvOKb1sChNTekePCg=;
+	s=arc-20240116; t=1744729099; c=relaxed/simple;
+	bh=i/1iowM4EWgHXIVmePDA5yseMSSqi0+ioDg3Ey0+4BU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZlTOE2MBEX/zGJRDjebjU6GHX6NkcFWXEwO/m9M0cB9eLssyN5coOZy3UAd00Im+7poBInzhBaijrFZKMYYQwkjgAeN9JNYi9emVn2EdbeESUaX8XqEWxicBynhaqqM5w8KGvgqhpqoVO5f1isKSBwtkVQ7hfB3HLpljQTc7c1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ie6Fx5sK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA53BC4CEEB;
-	Tue, 15 Apr 2025 14:53:01 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ZyXr6NpsCo/Z09lhtPCnx6Jb8EA3flwzyzR4Zq5MleBfGdEAWBO5pqxwwVQoTyjuDtndgVHzFaWcloqfjFaH8d4lktD1cnCZG4n1ZfGKhcyKxjQLo3QKH+/fly+/+M3c6BjXRE8xOsxCpnh+DthpWbMq3iQ4psBLkZfhxAlffR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XUMwfFQM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 480DCC4CEEB;
+	Tue, 15 Apr 2025 14:58:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1744728782;
-	bh=M+/KqYLeWHDkFnt1+EQIm2cnYkuvOKb1sChNTekePCg=;
+	s=k20201202; t=1744729098;
+	bh=i/1iowM4EWgHXIVmePDA5yseMSSqi0+ioDg3Ey0+4BU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ie6Fx5sKZGpJaITuRfFrWG4fvO7KuPvMN98eokJnqs9vQHj7akSlS/kmEdtj7ERHH
-	 sf6zkPxCXoB0dlIZ8vR3wkphhIhbSUrSVRjf6UOG/CkugqR6XR54P+MWXO/WhpLjrY
-	 a97v+/BHMZ3JB2rUJuNy9n1L5tdyNlRuHMiAmZIZsblzt/xF6eM8nw6s7X3m0nNlpi
-	 IAUODDgiLgsIkrdR9IK2sR1CqDEM8QZ4Cau4f7pZ267YXEEZdRahJ2KTrX2QAbpo1w
-	 BX9YuxavWPYuPP+wodg6JlhuZNynSBzJ6kyGgNTkiZTCY0KYiod5TlrjBd5wmB9jqA
-	 7qBbD1w1xKD0A==
-Date: Tue, 15 Apr 2025 07:53:00 -0700
+	b=XUMwfFQM+CRgGE455BG1k9FeeYBqfszmJDEc61MVt7Vnk0aNxecOgL58LDv3IGN75
+	 GaO4UZ1FtOADKrHfX6CQB4n004vgl3v9HnHrxQzjc76GLsmr4VC/vvRsQHXkbxNpMk
+	 ebO1V7QyWyrGN1amiuVIlJgcrpunW0G2dimsH6w0k94yEGWscsBeoEgQIdzNniX8ld
+	 Z+pQgeK6J+pp1bCN5W9DBecqjZv4mt7a6malbLTOEV5rJOd2xjjZrtqUMOknbnzmZ6
+	 Kkfmzf6qwK7wNRK2hvrPlLc52dGmmdB3XvtTgOlSf6NyBFRELImsbwAeJEJkPLu+Sc
+	 dpdVj4n3c/gDA==
+Date: Tue, 15 Apr 2025 07:58:14 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, syzkaller
- <syzkaller@googlegroups.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- sdf@fomichev.me, jdamato@fastly.com, almasrymina@google.com
-Subject: Re: [PATCH net-next v2] netdev: fix the locking for netdev
- notifications
-Message-ID: <20250415075300.5c5fcb76@kernel.org>
-In-Reply-To: <Z_2yMjGtbQ0ehtDN@mini-arch>
-References: <20250414195903.574489-1-kuba@kernel.org>
-	<Z_2yMjGtbQ0ehtDN@mini-arch>
+To: chia-yu.chang@nokia-bell-labs.com
+Cc: xandfury@gmail.com, netdev@vger.kernel.org, dave.taht@gmail.com,
+ pabeni@redhat.com, jhs@mojatatu.com, stephen@networkplumber.org,
+ xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
+ edumazet@google.com, horms@kernel.org, andrew+netdev@lunn.ch,
+ donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
+ ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+ g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
+ mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+ Jason_Livingood@comcast.com, vidhi_goel@apple.com
+Subject: Re: [PATCH v11 net-next 0/5] DUALPI2 patch
+Message-ID: <20250415075814.5b182f04@kernel.org>
+In-Reply-To: <20250415124317.11561-1-chia-yu.chang@nokia-bell-labs.com>
+References: <20250415124317.11561-1-chia-yu.chang@nokia-bell-labs.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,25 +67,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 14 Apr 2025 18:11:14 -0700 Stanislav Fomichev wrote:
-> > +static inline void netdev_lock_ops_to_full(struct net_device *dev)
-> > +{
-> > +	if (!netdev_need_ops_lock(dev))
-> > +		netdev_lock(dev);  
-> 
-> Optional nit: I'm getting lost in all the helpers, I'd add the following here:
-> 
-> else
-> 	netdev_ops_assert_locked(dev);
-> 
-> Or maybe even:
-> 
-> if (netdev_need_ops_lock)
-> 	netdev_ops_assert_locked
-> else
-> 	netdev_lock
-> 
-> To express the constraints better.
+On Tue, 15 Apr 2025 14:43:12 +0200 chia-yu.chang@nokia-bell-labs.com
+wrote:
+>   Please find the reposted DualPI2 patch v11.
 
-Hm, yes, I like.
+24 hours means 24 hours, not 23, especially when you're reposting
+because your previous version did not build!
+
+Our infra is severely behind on testing, such sloppiness is
+impacting our ability to process patches :|
 
