@@ -1,108 +1,146 @@
-Return-Path: <netdev+bounces-182571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-182572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18FBDA89254
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 04:55:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43244A8925C
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 05:03:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58CB1189BEBF
-	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 02:55:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A6A76189BEDA
+	for <lists+netdev@lfdr.de>; Tue, 15 Apr 2025 03:04:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A992413D52F;
-	Tue, 15 Apr 2025 02:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DBCA2DFA5B;
+	Tue, 15 Apr 2025 03:03:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="drDkCUAP"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E4963209
-	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 02:54:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DEC22DFA2D
+	for <netdev@vger.kernel.org>; Tue, 15 Apr 2025 03:03:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1744685702; cv=none; b=SaG/y1s2HkpoxqoXRx4mmaJmwzUAnJ3vfhZb/nHVxlEGSeIKATOWv9TqjtdTYTI1+Tqfo/8popke1503N/THEx+OvAQXgo6Uqxm4X/zFOrpPqrItPrkzhfdpCbDlrMWvVSBqd3Y9czpYTzumw1h89nudt5F3ekEzNplpc/VKdBM=
+	t=1744686229; cv=none; b=UNVvyn2rrjKRYYIBq5bvwwwjTD+ZV5GQ32nVezavdykj365oFLO5aluL7nGkvZlMbYimy0zCJZv6LngO3ykD2l29YnX/7Hv+LN0VcgkaA/y8l9KBpO4Cum55O05/st/4IIm8Uvh1fborPrp3KYXJE0xMPdgcQaO/VCr8W8fJIV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1744685702; c=relaxed/simple;
-	bh=ZX1lj6d2NQLtIhFJahGG5pYb+PyLGZUyl6Ld/hsR7R4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gcmpu9shqjoodzPNdPhRDZwDuRNR22ebKcUN/tttgl/uXloPwEAmC9pnCC5LF4NjL5QrHOI7vmWgLazsWEYKjr3YxvMj7fUiek5DXmgVC4miTPFNvtkm6njJH2FA6uzwx7S3pl51lTy85pZ5S6/raK9uoYrrDFWOyrw2/hHtk6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iie.ac.cn; spf=pass smtp.mailfrom=iie.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iie.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iie.ac.cn
-Received: from localhost.localdomain (unknown [159.226.95.28])
-	by APP-03 (Coremail) with SMTP id rQCowACnFkN2yv1nfEDvCA--.15747S2;
-	Tue, 15 Apr 2025 10:54:48 +0800 (CST)
-From: Chen Yufeng <chenyufeng@iie.ac.cn>
-To: krzk@kernel.org
-Cc: chenyufeng@iie.ac.cn,
-	davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com
-Subject: Re: Re: [PATCH]nfc: replace improper check device_is_registered() in nfc_se_io()
-Date: Tue, 15 Apr 2025 10:54:36 +0800
-Message-ID: <20250415025436.203-1-chenyufeng@iie.ac.cn>
-X-Mailer: git-send-email 2.43.0.windows.1
-In-Reply-To: <962edb17-a861-4e23-b878-fcc1fd5ac006@kernel.org>
-References: <962edb17-a861-4e23-b878-fcc1fd5ac006@kernel.org>
+	s=arc-20240116; t=1744686229; c=relaxed/simple;
+	bh=7Ddcg7W3er1d5ROCgYCdnGJ6X4gYZggHsbvsekodTFc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=I62Ye5PgHVjGqIL/8gjunFNz3YVNUzXrEIq50aGbE+dNJpEm/kpC9zDHN2a4dAVEY+H4IZj+fWJcdGu024mGlc0j28Dvxi2PepZSv2JKgQFnXdA6u+fNbhqrCjLOVBlSubSjdHPqn3AkxHEH+p6RZj3MRZRw3shTzLVO7meY/BA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=drDkCUAP; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5499c8c95beso4321e87.0
+        for <netdev@vger.kernel.org>; Mon, 14 Apr 2025 20:03:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1744686224; x=1745291024; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k5o8wCf0ZmAetYO0UliI4/Ia44n4Ie/lZPY4GaHmnSc=;
+        b=drDkCUAPO1TudHWSIWqUtAsLGX8wALf7GYJ5tMff66cfugc9pvhntppk+YPfH+Gteo
+         b3pSksAKclnPWn7sXNZmbnfX4oZ2j7WR1RtxII0caN7eabiJofZTanpWu5w80ocd3kY/
+         5VFKQXu3VNAUCbUvwHebuoBV5nhb5Az89hR7U/bN2Qq6ACOWUjLJ/TbHW5l9BcstDxzQ
+         R87crqN9Gh7ZUWcoZuarAkWiEZA5EHTfHGvF6UgqHxzmFIiyPBZ+rWeMZOSZ850IidYx
+         HCDtJeo2AYLummhlSkDk1lHlFwwAomLEX8wK25zqzz8HefmRARlwgBsSrcqYLkMg7lgN
+         mRIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1744686224; x=1745291024;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=k5o8wCf0ZmAetYO0UliI4/Ia44n4Ie/lZPY4GaHmnSc=;
+        b=DYFm+k28tHgcsAdwLedWaCMuAVyxEfLo9VPlum4YWVp+l+vFYiyQY8y4F39ZP+GIr9
+         KT1tfzZrwLRa6SJlCy6Dz7PpzvsbwPo88N5Xp34Xj+sBG95we9gkBdWUezn+DibtmOZk
+         DBcUcu2OaUVXgc2I+kzW0pm0f1AY6aYM7qJX6iOfjMLOvDmiTQMu8llTUwfJXAJYUIG4
+         w6K+P9WyqUNziw7WON99dPWAY+sCOZr6y2dqN7DoXamPzcqHDwCrqCZRXuBanJ0k7FhX
+         c7MddixIvAmbOnBENsIJfnkfF3nj4nNRQsjCSGE4mHkeP0KI+o4gi8Hq1CqONLwxC54R
+         PvPQ==
+X-Gm-Message-State: AOJu0YxmZcXKJpsW6KsOxnDjg8E/oj6twVSA88ScPto6gfh1tx759YgL
+	yxpnOAlkWCgpQ1aa+5NN5Vq9UGduVtQJt3T7MVqqXW4P1w4N2Tibz87rGUqh+xHCcWDnvDOVc5L
+	Uz5phKz/yZg0Jyjv47Ku+5VUsWFGrtD9WsMiZ+FnfJWyOD+r2MqMw
+X-Gm-Gg: ASbGncuYzlZcTCk4I8mnZ/tJg+GcW7OqcKrVHGPystPjbisDo7eG1jA9tpsrwrF41PZ
+	Kk2Icq8bz1ASzHeXOVCWEAVvIb6URCqO9nLvz07uzIPrc9G4b0jtRuN1awnXMFDl1ZDWeFufTQp
+	ZMUD7LusXWkhmOUKMm+kgm79SqjbacfqI0bl5NrFSIohcX5TRUc0RI
+X-Google-Smtp-Source: AGHT+IFOz/w+m1S6m21IB3+fV7O1fvdVvxc+JZui6nrtvDFFnCzkgS49+OMM+IPU+ETrULO7ucXDrN71/PpDZ6hKSps=
+X-Received: by 2002:a05:6512:3f08:b0:549:7c56:5300 with SMTP id
+ 2adb3069b0e04-54d5b76b359mr70098e87.1.1744686223842; Mon, 14 Apr 2025
+ 20:03:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250313023641.1007052-1-chiachangwang@google.com>
+In-Reply-To: <20250313023641.1007052-1-chiachangwang@google.com>
+From: Chiachang Wang <chiachangwang@google.com>
+Date: Tue, 15 Apr 2025 11:03:31 +0800
+X-Gm-Features: ATxdqUGhj8mAwq_9yVMVHlV7TlBS2vnmuubPHHlGx8D9KxmcL8tbrUTIxEKyB3E
+Message-ID: <CAOb+sWGK5ufBSBDkhXfwJTH+C9Jpa+0qCVvf=9RW1GQig9Vosw@mail.gmail.com>
+Subject: Re: [PATCH ipsec-next v5 0/2] Update offload configuration with SA
+To: netdev@vger.kernel.org, steffen.klassert@secunet.com, leonro@nvidia.com
+Cc: stanleyjhu@google.com, yumike@google.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-CM-TRANSID:rQCowACnFkN2yv1nfEDvCA--.15747S2
-X-Coremail-Antispam: 1UD129KBjvdXoWrurWkZw1rGw18Ww18AF4xWFg_yoWkWwb_C3
-	4vva4fCw1kJrs5Ww1Fkr4UZr4fZa1IqFWSyr18Jrn5Kr1rXw4DWFs7Jryj9F15XrWIvwnx
-	Ar1rKF4Skwn2gjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb4xFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
-	Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
-	0_GcWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
-	JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67
-	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
-	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
-	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
-	JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x0JUBVbkUUU
-	UU=
-X-CM-SenderInfo: xfkh05xxih0wo6llvhldfou0/1tbiDAgNEmf9oqmpQAAAsj
 
-> On 14/04/2025 16:11, Chen Yufeng wrote:=0D
-> > A patch similar to commit da5c0f119203 ("nfc: replace improper check de=
-vice_is_registered() in netlink related functions")=0D
-=0D
-> Please wrap commit message according to Linux coding style / submission=0D
-> process (neither too early nor over the limit):=0D
-> https://elixir.bootlin.com/linux/v6.4-rc1/source/Documentation/process/su=
-bmitting-patches.rst#L597=0D
-=0D
-Thanks for your reply!=0D
-I have reorganized commit message as follows.=0D
-=0D
-A patch similar to commit da5c0f119203 ("nfc: replace improper check =0D
-device_is_registered() in netlink related functions").=0D
-=0D
-The nfc_se_io() function in the NFC subsystem suffers from a race =0D
-condition similar to previously reported issues in other netlink-related =0D
-functions. The function checks device status using device_is_registered(),=
-=0D
-but this check can race with device unregistration despite being protected=
-=0D
-by device_lock.=0D
-=0D
-This patch also uses bool variable dev->shutting_down instead of=0D
-device_is_registered() to judge whether the nfc device is registered,=0D
-which is well synchronized.=0D
-=0D
---=0D
-Thanks, =0D
-=0D
-Chen Yufeng=
+Hi Steffen,
 
+I understand you may be occupied by other works. I would like to reach
+out to you as this was uploaded for around a month.
+May I know if you have any review comment for this patchset ?
+
+Thank you.
+Chiachang
+
+Chiachang Wang <chiachangwang@google.com> =E6=96=BC 2025=E5=B9=B43=E6=9C=88=
+13=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8A=E5=8D=8810:36=E5=AF=AB=E9=81=93=EF=
+=BC=9A
+
+>
+> The current Security Association (SA) offload setting
+> cannot be modified without removing and re-adding the
+> SA with the new configuration. Although existing netlink
+> messages allow SA migration, the offload setting will
+> be removed after migration.
+>
+> This patchset enhances SA migration to include updating
+> the offload setting. This is beneficial for devices that
+> support IPsec session management.
+>
+> Chiachang Wang (2):
+>   xfrm: Migrate offload configuration
+>   xfrm: Refactor migration setup during the cloning process
+>
+>  include/net/xfrm.h     |  8 ++++++--
+>  net/key/af_key.c       |  2 +-
+>  net/xfrm/xfrm_policy.c |  4 ++--
+>  net/xfrm/xfrm_state.c  | 24 ++++++++++++++++--------
+>  net/xfrm/xfrm_user.c   | 15 ++++++++++++---
+>  5 files changed, 37 insertions(+), 16 deletions(-)
+>
+> ---
+> v4 -> v5:
+>  - Remove redundant xfrm_migrate pointer validation in the
+>    xfrm_state_clone_and_setup() method
+> v3 -> v4:
+>  - Change the target tree to ipsec-next
+>  - Rebase commit to adopt updated xfrm_init_state()
+>  - Remove redundant variable to rely on validiaty of pointer
+>  - Refactor xfrm_migrate copy into xfrm_state_clone and rename the
+>    method
+> v2 -> v3:
+>  - Update af_key.c to address kbuild error
+> v1 -> v2:
+>  - Revert "xfrm: Update offload configuration during SA update"
+>    change as the patch can be protentially handled in the
+>    hardware without the change.
+>  - Address review feedback to correct the logic in the
+>    xfrm_state_migrate in the migration offload configuration
+>    change.
+>  - Revise the commit message for "xfrm: Migrate offload configuration"
+> --
+> 2.49.0.rc1.451.g8f38331e32-goog
+>
 
